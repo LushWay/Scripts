@@ -1,0 +1,25 @@
+{
+  "format_version": "1.19.10",
+  "animation_controllers": {
+    "controller.animation.system_mouse": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "scroll": "query.client_input_type == ''"
+            }
+          ],
+          "on_exit": ["/tag @s add input"]
+        },
+        "scroll": {
+          "transitions": [
+            {
+              "default": "query.client_input_type != ''"
+            }
+          ],
+          "on_exit": ["/tag @s remove input"]
+        }
+      }
+    }
+  }
+}

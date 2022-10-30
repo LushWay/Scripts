@@ -1,0 +1,51 @@
+{
+  "format_version": "1.19.10",
+  "animation_controllers": {
+    "controller.animation.mark": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "default": "q.mark_variant == 0"
+            },
+            {
+              "m1": "q.mark_variant == 1"
+            },
+            {
+              "m2": "q.mark_variant == 2"
+            }
+          ],
+          "on_entry": ["/scoreboard objectives add mark dummy", "/scoreboard players set @s mark 0"]
+        },
+        "m1": {
+          "transitions": [
+            {
+              "default": "q.mark_variant == 0"
+            },
+            {
+              "m1": "q.mark_variant == 1"
+            },
+            {
+              "m2": "q.mark_variant == 2"
+            }
+          ],
+          "on_entry": ["/scoreboard objectives add mark dummy", "/scoreboard players set @s mark 1"]
+        },
+        "m2": {
+          "transitions": [
+            {
+              "default": "q.mark_variant == 0"
+            },
+            {
+              "m1": "q.mark_variant == 1"
+            },
+            {
+              "m2": "q.mark_variant == 2"
+            }
+          ],
+          "on_entry": ["/scoreboard objectives add mark dummy", "/scoreboard players set @s mark 2"]
+        }
+      }
+    }
+  }
+}

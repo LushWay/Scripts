@@ -1,0 +1,14 @@
+{
+  "name": "xapi",
+  "version": "1.0.0",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "description": "",
+  "dependencies": {
+    "@minecraft/server": "^1.0.0-beta.release.1.19.40",
+    "@minecraft/server-ui": "^1.0.0-beta.11940b24",
+    "ts-to-jsdoc": "^1.2.0"
+  }
+}

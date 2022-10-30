@@ -1,0 +1,507 @@
+{
+  "format_version": "1.17.10",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "minecraft:player",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "animations": {
+        "digging": "controller.animation.digging",
+        "eating": "controller.animation.eating",
+        "gliding": "controller.animation.gliding",
+        "ground": "controller.animation.ground",
+        "jumping": "controller.animation.jumping",
+        "levitating": "controller.animation.levitating",
+        "moving": "controller.animation.moving",
+        "riding": "controller.animation.riding",
+        "swimming": "controller.animation.swimming",
+        "using_item": "controller.animation.using_item",
+        "attacking": "controller.animation.attacking",
+        "system_mouse": "controller.animation.system_mouse",
+        "system_touch": "controller.animation.system_touch",
+        "mark": "controller.animation.mark"
+      },
+      "scripts": {
+        "animate": [
+          "digging",
+          "eating",
+          "gliding",
+          "ground",
+          "jumping",
+          "levitating",
+          "moving",
+          "riding",
+          "swimming",
+          "using_item",
+          "attacking",
+          "system_mouse",
+          "system_touch",
+          "mark"
+        ]
+      }
+    },
+    "component_groups": {
+      "smelly:spawn_inventory": {
+        "minecraft:spawn_entity": {
+          "entities": {
+            "min_wait_time": 0,
+            "max_wait_time": 0,
+            "spawn_entity": "smelly:tamed_inventory",
+            "single_use": true,
+            "num_to_spawn": 1
+          }
+        }
+      },
+      "minecraft:add_bad_omen": {
+        "minecraft:spell_effects": {
+          "add_effects": [
+            {
+              "effect": "bad_omen",
+              "duration": 6000,
+              "display_on_screen_animation": true
+            }
+          ]
+        },
+        "minecraft:timer": {
+          "time": [0.0, 0.0],
+          "looping": false,
+          "time_down_event": {
+            "event": "minecraft:clear_add_bad_omen",
+            "target": "self"
+          }
+        }
+      },
+      "minecraft:clear_bad_omen_spell_effect": {
+        "minecraft:spell_effects": {}
+      },
+      "minecraft:raid_trigger": {
+        "minecraft:raid_trigger": {
+          "triggered_event": {
+            "event": "minecraft:remove_raid_trigger",
+            "target": "self"
+          }
+        },
+        "minecraft:spell_effects": {
+          "remove_effects": "bad_omen"
+        }
+      },
+      "speed:0": {
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "speed:10": {
+        "minecraft:movement": {
+          "value": 1.0
+        }
+      },
+      "spawn": {
+        "minecraft:spell_effects": {
+          "add_effects": [
+            {
+              "effect": "instant_health",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": false
+            },
+            {
+              "effect": "weakness",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": false
+            },
+            {
+              "effect": "resistance",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": true
+            },
+            {
+              "effect": "saturation",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": false
+            },
+            {
+              "effect": "fire_resistance",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": false
+            }
+          ]
+        }
+      },
+      "warn": {
+        "minecraft:spell_effects": {
+          "add_effects": [
+            {
+              "effect": "resistance",
+              "duration": 2,
+              "amplifier": 1,
+              "visible": false,
+              "display_on_screen_animation": true
+            }
+          ]
+        }
+      },
+      "notspawn": {
+        "minecraft:spell_effects": {
+          "remove_effects": [
+            "instant_health",
+            "weakness",
+            "resistance",
+            "saturation",
+            "fire_resistance"
+          ]
+        }
+      },
+      "kick": {
+        "minecraft:instant_despawn": {},
+        "minecraft:explode": {}
+      },
+      "mark:clear": {
+        "minecraft:mark_variant": {
+          "value": 0
+        }
+      },
+      "skin1": {
+        "minecraft:variant": {
+          "value": 1
+        }
+      },
+      "skin0": {
+        "minecraft:variant": {
+          "value": 0
+        }
+      },
+      "mark:shoot": {
+        "minecraft:mark_variant": {
+          "value": 1
+        }
+      },
+      "mark:reload": {
+        "minecraft:mark_variant": {
+          "value": 2
+        }
+      }
+    },
+    "components": {
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "on_damage": {
+              "filters": {
+                "all_of": [
+                  {
+                    "test": "has_tag",
+                    "subject": "self",
+                    "value": "protected"
+                  }
+                ]
+              }
+            },
+            "deals_damage": false
+          },
+          {
+            "on_damage": {
+              "filters": {
+                "all_of": [
+                  {
+                    "test": "has_tag",
+                    "subject": "self",
+                    "value": "cps_protection"
+                  }
+                ]
+              },
+              "event": "remove_cps_protection_tag"
+            },
+            "deals_damage": false
+          }
+        ]
+      },
+      "minecraft:type_family": {
+        "family": ["player"]
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:loot": {
+        "table": "loot_tables/empty.json"
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:can_climb": {},
+      "minecraft:movement": {
+        "value": 0.1
+      },
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:attack": {
+        "damage": 1
+      },
+      "minecraft:player.saturation": {
+        "value": 20
+      },
+      "minecraft:player.exhaustion": {
+        "value": 0,
+        "max": 4
+      },
+      "minecraft:player.level": {
+        "value": 0,
+        "max": 24791
+      },
+      "minecraft:player.experience": {
+        "value": 0,
+        "max": 1
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": -1,
+        "inhale_time": 3.75,
+        "generates_bubbles": false
+      },
+      "minecraft:nameable": {
+        "always_show": true,
+        "allow_name_tag_renaming": false
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:insomnia": {
+        "days_until_insomnia": 3
+      },
+      "minecraft:rideable": {
+        "seat_count": 2,
+        "family_types": ["parrot_tame"],
+        "pull_in_entities": true,
+        "seats": [
+          {
+            "position": [0.4, -0.2, -0.1],
+            "min_rider_count": 0,
+            "max_rider_count": 0,
+            "lock_rider_rotation": 0
+          },
+          {
+            "position": [-0.4, -0.2, -0.1],
+            "min_rider_count": 1,
+            "max_rider_count": 2,
+            "lock_rider_rotation": 0
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:block_climber": {},
+      "minecraft:environment_sensor": {
+        "triggers": [
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_mob_effect",
+                  "subject": "self",
+                  "value": "bad_omen"
+                },
+                {
+                  "test": "is_in_village",
+                  "subject": "self",
+                  "value": true
+                }
+              ]
+            },
+            "event": "minecraft:trigger_raid"
+          },
+
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "value": "speed:0"
+                }
+              ]
+            },
+            "event": "speed:0"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "value": "speed:10"
+                }
+              ]
+            },
+            "event": "speed:10"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_container_open"
+                }
+              ]
+            },
+            "event": "mcbehub:has_container_open"
+          },
+          {
+            "filters": {
+              "none_of": [
+                {
+                  "test": "has_container_open"
+                }
+              ]
+            },
+            "event": "mcbehub:dosent_have_container_open"
+          }
+        ]
+      },
+      "minecraft:on_death": {
+        "event": "binocraft:on_death"
+      }
+    },
+    "events": {
+      "smelly:spawn_inventory": {
+        "add": {
+          "component_groups": ["smelly:spawn_inventory"]
+        }
+      },
+
+      "speed:0": {
+        "add": {
+          "component_groups": ["speed:0"]
+        }
+      },
+      "speed:10": {
+        "add": {
+          "component_groups": ["speed:10"]
+        }
+      },
+
+      "spawn": {
+        "add": {
+          "component_groups": ["spawn"]
+        }
+      },
+      "warn": {
+        "add": {
+          "component_groups": ["warn"]
+        }
+      },
+      "notspawn": {
+        "add": {
+          "component_groups": ["notspawn"]
+        }
+      },
+
+      "remove_cps_protection_tag": {
+        "run_command": {
+          "command": ["tag @s remove cps_protection"]
+        }
+      },
+      "mcbehub:has_container_open": {
+        "run_command": {
+          "command": ["tag @s add has_container_open"]
+        }
+      },
+      "mcbehub:dosent_have_container_open": {
+        "run_command": {
+          "command": ["tag @s remove has_container_open"]
+        }
+      },
+      "we:wand_in_hand": {
+        "run_command": {
+          "command": ["tag @s add hasWandInHand"]
+        }
+      },
+      "we:wand_not_in_hand": {
+        "run_command": {
+          "command": ["tag @s remove hasWandInHand"]
+        }
+      },
+      "portal": {
+        "run_command": {
+          "command": ["testfor @s"]
+        }
+      },
+      "binocraft:on_death": {
+        "run_command": {
+          "command": ["tag @s add on_death"],
+          "target": "self"
+        }
+      },
+      "mark:clear": {
+        "add": {
+          "component_groups": ["mark:clear"]
+        }
+      },
+      "mark:shoot": {
+        "add": {
+          "component_groups": ["mark:shoot"]
+        }
+      },
+      "skin1": {
+        "add": {
+          "component_groups": ["skin1"]
+        }
+      },
+      "skin0": {
+        "add": {
+          "component_groups": ["skin0"]
+        }
+      },
+      "mark:reload": {
+        "add": {
+          "component_groups": ["mark:reload"]
+        }
+      },
+      "kick": {
+        "add": {
+          "component_groups": ["kick"]
+        }
+      },
+      "minecraft:gain_bad_omen": {
+        "add": {
+          "component_groups": ["minecraft:add_bad_omen"]
+        }
+      },
+      "minecraft:clear_add_bad_omen": {
+        "remove": {
+          "component_groups": ["minecraft:add_bad_omen"]
+        },
+        "add": {
+          "component_groups": ["minecraft:clear_bad_omen_spell_effect"]
+        }
+      },
+      "minecraft:trigger_raid": {
+        "add": {
+          "component_groups": ["minecraft:raid_trigger"]
+        }
+      },
+      "minecraft:remove_raid_trigger": {
+        "remove": {
+          "component_groups": ["minecraft:raid_trigger"]
+        }
+      }
+    }
+  }
+}

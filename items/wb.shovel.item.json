@@ -1,0 +1,22 @@
+{
+  "format_version": "1.18.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "we:s"
+    },
+    "components": {
+        "minecraft:max_stack_size": 1,
+        "minecraft:foil": true,
+        "minecraft:icon": {
+          "texture": "prismarine_shard",
+          "frame": 0
+        },
+        "minecraft:display_name": {
+          "value": "Лопата \n(-sh)"
+        },
+        "minecraft:creative_category": {
+          "category": "commands"
+        }
+      }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "minecraft:chest_minecart",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      
+      "default": {
+        "minecraft:rail_movement": {
+        },
+        "minecraft:collision_box": {
+          "width": 0.98,
+          "height": 0.7
+        },
+        "minecraft:conditional_bandwidth_optimization": {
+          "default_values": {
+            "max_optimized_distance": 60.0,
+            "max_dropped_ticks": 20,
+            "use_motion_prediction_hints": true
+          },
+          "conditional_values": [
+            {
+              "max_optimized_distance": 0.0,
+              "max_dropped_ticks": 0,
+              "conditional_values": [
+                { "test": "is_moving", "subject": "self", "operator": "==", "value": true}
+              ]
+            }
+          ]
+        }
+      },
+      "drop": {
+        "minecraft:pushable": {
+          "is_pushable": false,
+          "is_pushable_by_piston": false
+        },
+        "minecraft:collision_box": {
+          "width": -1,
+          "height": -1
+        },
+        "minecraft:push_through": {
+          "value": 1
+        },
+        "minecraft:knockback_resistance": {
+          "value": 100,
+          "max": 100
+        },
+        "minecraft:physics": {
+          "has_gravity": false,
+          "has_collision": false
+        }
+      },
+      "ground": {
+        "minecraft:collision_box": {
+          "width": 0.98,
+          "height": 0.7
+        },
+        "minecraft:pushable": {
+          "is_pushable": false,
+          "is_pushable_by_piston": false
+        }
+      }
+    },
+    "components": {
+      "minecraft:environment_sensor": {
+        "triggers": [
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "value": "держится"
+                },
+                { "test": "on_ground", "subject": "self", "operator": "equals", "value": "true" }
+              ]
+            },
+            "event": "ground"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_tag",
+                  "value": "держится"
+                },
+                { "test": "on_ground", "subject": "self", "operator": "equals", "value": "false" }
+              ]
+            },
+            "event": "drop"
+          }
+        ]
+      },
+      "minecraft:type_family": {
+        "family": [ "minecart", "inanimate" ]
+      },
+      "minecraft:inventory": {
+        "container_type": "minecart_chest",
+        "inventory_size": 27,
+        "can_be_siphoned_from": true
+      },
+      "minecraft:is_stackable": {
+        "value": true
+      },
+	    "minecraft:physics": {
+      }
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": ["default"]
+        }
+      },
+      "ground": {
+        "add": {
+          "component_groups": ["ground"]
+        },
+        "remove": {
+          "component_groups": ["drop", "default"]
+        }
+      },
+      "drop": {
+        "add": {
+          "component_groups": ["drop"]
+        },
+        "remove": {
+          "component_groups": ["ground", "default"]
+        }
+      }
+    }
+  }
+}
