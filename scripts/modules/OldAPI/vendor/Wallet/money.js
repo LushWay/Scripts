@@ -1,11 +1,11 @@
 import { SA } from "../../index.js";
-import { XA } from "xapi.js";
+import { XA, setTickInterval} from "xapi.js";
 
 const score = "c",
   scoreName = "§aShp1nat §6Coins";
 
-SA.Utilities.time.setTickInterval(() => {
-  SA.Build.chat.runCommand(
+setTickInterval(() => {
+  XA.world.runCommand(
     `scoreboard objectives add ${score} dummy "${scoreName}"`
   );
 }, 20);
@@ -14,10 +14,13 @@ export class Wallet {
   constructor(player) {
     this.w = player;
   }
-  balance() {
+  get balance() {
     return SA.Build.entity.getScore(this.w, score);
   }
-  set(count) {
+  /**
+   * @param {number} count
+   */
+  set balance(count) {
     try {
       this.w.runCommand(`scoreboard players set @s ${score} ${count}`);
     } catch (error) {}

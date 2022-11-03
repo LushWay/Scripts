@@ -34,7 +34,7 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
  * @param {string} key
  * @returns {object}
  */
-function GetDBData(source, key) {
+function GetData(source, key) {
   /** @type {import("./types.js").Source} */
   const t = source;
 
@@ -58,7 +58,7 @@ function GetDBData(source, key) {
  * @param {object} data
  * @returns {object}
  */
-function SafeDBData(source, key, data) {
+function SafeData(source, key, data) {
   /** @type {import("./types.js").Source} */
   const t = source;
 
@@ -85,7 +85,7 @@ class InstantDB {
     this.#key = name;
   }
   get data() {
-    return GetDBData(this.#source, this.#key);
+    return GetData(this.#source, this.#key);
   }
   /**
    *
@@ -104,7 +104,7 @@ class InstantDB {
   set(key, value) {
     const data = this.data;
     data[key] = value;
-    SafeDBData(this.#source, this.#key, data);
+    SafeData(this.#source, this.#key, data);
   }
 }
 
@@ -125,11 +125,11 @@ class CacheDB {
     this.#key = name;
   }
   get data() {
-    this.#CachedData = GetDBData(this.#source, this.#key);
+    this.#CachedData = GetData(this.#source, this.#key);
     return this.#CachedData;
   }
   safe() {
-    SafeDBData(this.#source, this.#key, this.#CachedData);
+    SafeData(this.#source, this.#key, this.#CachedData);
   }
 }
 

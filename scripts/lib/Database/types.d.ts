@@ -1,11 +1,11 @@
 import { World, Player } from "@minecraft/server";
-import { CONFIGDB } from "config.js";
+import { CONFIG_DB } from "config.js";
 
 export type Source = World | Player;
 
 export namespace DBkey {
-  type player = keyof typeof CONFIGDB.player;
-  type world = keyof typeof CONFIGDB.world;
+  type player = keyof typeof CONFIG_DB.player;
+  type world = keyof typeof CONFIG_DB.world;
 }
 
 export type DBvalue = string | boolean | number | undefined;

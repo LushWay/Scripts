@@ -13,7 +13,7 @@ export const CONFIG = {
   commandPrefix: "-",
 };
 
-export const CONFIGDB = {
+export const CONFIG_DB = {
   player: {
     test: "t",
   },

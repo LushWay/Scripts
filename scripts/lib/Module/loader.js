@@ -12,7 +12,7 @@ export const __MODULES__ = {};
  * @param {(file: string) => Promise} importFunction
  * @param {Object<string, string>} arrayOfFiles
  */
-export async function multiload(importFunction, arrayOfFiles, type = "sub") {
+export async function multiload(importFunction, arrayOfFiles, type = "sub", wait) {
   for (const [path, name] of Object.entries(arrayOfFiles)) {
     const er = (e) =>
       ThrowError({
@@ -27,7 +27,7 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
     try {
       const module = importFunction(path);
 
-      if (CONFIG.module.loadAwait) await module;
+      if (wait) await module;
       else module.catch(er);
     } catch (e) {
       er(e);
@@ -36,5 +36,5 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 }
 
 export async function load() {
-  return multiload(__CORE_IMPORT__, __MODULES__, "X-API");
+  return multiload(__CORE_IMPORT__, __MODULES__, "X-API", CONFIG.module.loadAwait);
 }
