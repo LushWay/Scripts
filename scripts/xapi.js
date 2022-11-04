@@ -143,23 +143,28 @@ export function toStr(obj, space = "  ", cw = "", funcCode = false, depth = 0) {
       switch (typeof value) {
         case "function":
           // const reg = /(.*\(.+\)\s*=?>?\s*\{).+\}/g;
-          // /**
-          //  * @type {String}
-          //  */
-          // let r = reg.test(value) ? value.toString().replace(/[\n\r]/g, "") : 'function() { }';
+          /**
+           * @type {String}
+           */
+          let r = //reg.test(value) ?
+            value.toString().replace(/[\n\r]/g, "");
+          // : "function() { }";
 
-          // if (!funcCode) {
-          //   const code = r.includes("[native code]") ? " [native code] " : " ";
+          if (!funcCode) {
+            const code = r.includes("[native code]") ? " [native code] " : " ";
 
-          //   world.say("§7" + _ + "§8: " + r);
+            // world.say("§7" + _ + "§8: " + r);
 
-          //   // Delete "function name(args) { >>code<< }" part
-          //   r = r.replace(/(.*\(.+\)\s*=?>?\s*\{).+(\})/g, `$1${code}}`);
+            // Delete "function name(args) { >>code<< }" part
+            r = r.replace(
+              /((?:function)?(?:\s*\w*)\((?:\w*\s*(?:=\s*"[^"]*")?,?\s*)+\)\s*(?:=>\s*)?)\{.*\}/,
+              `$1${code}}`
+            );
 
-          //   world.say("§7" + _ + "§8: " + r);
-          // }
+            // world.say("§7" + _ + "§8: " + r);
+          }
 
-          value = "§7function() { }§f";
+          value = r;
 
           break;
 
