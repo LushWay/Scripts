@@ -72,7 +72,7 @@ q.includeLiquidBlocks = false;
 SA.Utilities.time.setTickTimeout(() => {
   world.events.tick.subscribe(() => {
     for (const player of world.getPlayers()) {
-      const heldItem = SA.Models.entity.getHeldItem(player)?.id,
+      const heldItem = SA.Models.entity.getHeldItem(player)?.typeId,
         gui = guis[heldItem];
       let activeGui = CURRENT_GUIS[player.name];
 
@@ -102,11 +102,11 @@ SA.Utilities.time.setTickTimeout(() => {
       }
 
       const bl = player.getBlockFromViewVector(q);
-      if (bl?.id && bl?.id === "minecraft:air") {
+      if (bl?.typeId && bl?.typeId === "minecraft:air") {
         const bl2 = player.dimension.getBlock(bl.location.offset(0, -4, 0)); //
         if (
-          bl2?.id &&
-          bl2.id === "minecraft:chest" &&
+          bl2?.typeId &&
+          bl2.typeId === "minecraft:chest" &&
           bl2.getComponent("inventory")?.container?.getItem(0)
         ) {
           const page = bl2

@@ -1,5 +1,5 @@
 import { SA } from "../../index.js";
-import { XA, setTickInterval} from "xapi.js";
+import { XA, setTickInterval } from "xapi.js";
 
 const score = "c",
   scoreName = "§aShp1nat §6Coins";
@@ -15,7 +15,7 @@ export class Wallet {
     this.w = player;
   }
   get balance() {
-    return SA.Build.entity.getScore(this.w, score);
+    return XA.Entity.getScore(this.w, score);
   }
   /**
    * @param {number} count

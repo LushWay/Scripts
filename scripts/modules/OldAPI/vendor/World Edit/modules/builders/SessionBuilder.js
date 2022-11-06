@@ -4,17 +4,14 @@ import {
   MinecraftBlockTypes,
   Player,
 } from "@minecraft/server";
-import { SA } from "../../../../index.js";
 import { XA } from "xapi.js";
 import { configuration } from "../config.js";
 
 class SessionBuilder {
   data(player) {
     return JSON.parse(
-      SA.build.entity.getTagStartsWith(
-        player,
-        configuration.DATA_PREFIX + ":"
-      ) ?? "{}"
+      XA.Entity.getTagStartsWith(player, configuration.DATA_PREFIX + ":") ??
+        "{}"
     );
   }
 

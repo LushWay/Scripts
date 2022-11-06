@@ -9,21 +9,16 @@ const lba = new XA.Command({
   aliases: ["leaderboard"],
   description:
     "Create custom leaderboards that track players data in the world",
-  usage: [
-    `create <objective: string> <x> <y> <z>`,
-    `remove <objective: string> <x> <y> <z>`,
-    `list`,
-  ],
-  tags: ["owner"],
-  type: "serv",
+  requires: (p) => p.hasTag("owner"),
+  /*type: "serv"*/
 });
 lba
-  .addSubCommand({ name: "create" })
-  .addOption("objective", "string")
-  .addOption("location", "location")
-  .executes((ctx, { objective, location }) => {
+  .literal({ name: "create" })
+  .string("objective")
+  .location("location")
+  .executes((ctx, objective, location) => {
     if (objective.length > 16 || !/^[a-zA-Z]+$/.test(objective))
-      return ctx.invalidArg(objective);
+      return ctx.reply(objective);
     if (lb.has(objective))
       return ctx.reply("§сТакая таблица уже существует лол");
     LeaderboardBuild.createLeaderboard(
@@ -39,17 +34,16 @@ lba
     return ctx.sender.playSound(`random.orb`);
   });
 lba
-  .addSubCommand({ name: "remove" })
-  .addOption("objective", "string")
-  .addOption("location", "location")
-  .executes((ctx, { objective, location }) => {
+  .literal({ name: "remove" })
+  .string("objective")
+  .location("location")
+  .executes((ctx, objective, location) => {
     if (objective.length > 16 || !/^[a-zA-Z]+$/.test(objective))
-      return ctx.invalidArg(objective);
+      return ctx.reply(objective);
     const leaderboardData = lb.get(objective);
-    if (!leaderboardData)
-      return ctx.reply("§cнет такой", data.sender.nameTag, [objective]);
+    if (!leaderboardData) return ctx.reply("§cнет такой " + objective); //§r
     if (leaderboardData.location.dimension != ctx.sender.dimension.id)
-      return ctx.reply("§снето измерение");
+      return ctx.reply("§cне то измерение");
     if (
       LeaderboardBuild.removeLeaderboard(
         objective,
@@ -65,11 +59,11 @@ lba
       );
       return ctx.sender.playSound(`random.orb`);
     } else {
-      return ctx.reply("§cхз че за ошибка");
+      return ctx.reply("§cхз че за ошибка"); //§r
     }
   });
 
-lba.addSubCommand({ name: "list" }, (ctx) => {
+lba.literal({ name: "list" }).executes((ctx) => {
   if (!SA.tables.lb || lb.keys().length == 0)
     return ctx.reply(`§сНет лидербордов`);
   for (let leaderboard of lb.values()) {

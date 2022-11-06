@@ -4,7 +4,6 @@ import {
   MinecraftBlockTypes,
   Player,
 } from "@minecraft/server";
-import { SA } from "../../../../index.js";
 import { XA } from "xapi.js";
 import { configuration } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";

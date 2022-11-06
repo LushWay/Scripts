@@ -1,24 +1,21 @@
-import { SA } from "../../../../index.js";
+import { XA } from "../../../../../../xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 new XA.Command({
-  type: "wb",
+  /*type: "wb"*/
   name: "paste",
   description: "Вставляет заранее скопированную зону",
-  tags: ["commands"],
-  type: "wb",
+  requires: (p) => p.hasTag("commands"),
+  /*type: "wb"*/
 })
-  .addOption("rotation", "int", "", true)
-  .addOption("mirror", "string", "", true)
-  .addOption("includeEntites", "boolean", "", true)
-  .addOption("includeBlocks", "boolean", "", true)
-  .addOption("integrity", "int", "", true)
-  .addOption("seed", "int", "", true)
+  .int("rotation", true)
+  .string("mirror", true)
+  .boolean("includeEntites", true)
+  .boolean("includeBlocks", true)
+  .int("integrity", true)
+  .int("seed", true)
   .executes(
-    (
-      ctx,
-      { rotation, mirror, includeEntites, includeBlocks, integrity, seed }
-    ) => {
+    (ctx, rotation, mirror, includeEntites, includeBlocks, integrity, seed) => {
       let b, e;
       if (!includeEntites && !includeBlocks) {
         e = false;
@@ -27,8 +24,11 @@ new XA.Command({
         b = includeBlocks;
         e = includeEntites;
       }
+      if (![0, 90, 180, 270].includes(rotation))
+        return ctx.reply("§c" + rotation);
       const command = WorldEditBuild.paste(
         ctx.sender,
+        // @ts-expect-error
         rotation,
         mirror,
         e,

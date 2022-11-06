@@ -38,9 +38,7 @@ export function GiveAction(chestGUI, Item) {
     itemStack.getComponent("enchantments").enchantments = ItemStackEnchantments;
   }
   itemStack.nameTag = Item.name;
-  chestGUI.player
-    .getComponent("minecraft:inventory")
-    .container.addItem(itemStack);
+  XA.Entity.getI(chestGUI.player).addItem(itemStack);
 }
 
 /**

@@ -50,7 +50,7 @@ export class ItemDatabase {
    * @returns {Array<Entity>}
    */
   get ENTITIES() {
-    const q = new EntityQueryOptions();
+    const q = {};
     q.type = ENTITY_DATABSE_ID;
     q.location = ENTITY_LOCATION;
     q.tags = [this.TABLE_NAME];

@@ -9,20 +9,20 @@ const brushCMD = new XA.Command({
   name: "brush",
   description: "Brushing commands",
   aliases: ["bru"],
-  tags: ["commands"],
-  type: "wb",
+  requires: (p) => p.hasTag("commands"),
+  /*type: "wb"*/
 })
-  .addOption("shape", "string", "Shape of the sphere", true)
-  .addOption("blocks", "string", "Blocks to use", true)
-  .addOption("size", "int", "Size of Shape", true)
-  .executes((ctx, { shape, blocks, size }) => {
+  .string("shape", true)
+  .string("blocks", true)
+  .int("size", true)
+  .executes((ctx, shape, blocks, size) => {
     if (!size) return ctx.reply(Object.keys(SHAPES).join("\n§7"));
     if (size > 6) return ctx.reply("§c► Зачем тебе такая БОЛЬШАЯ кисть?)");
     const brush = new ItemStack(Items.get(`we:brush`));
-    if (!SHAPES[shape]) return ctx.invalidArg(shape);
+    if (!SHAPES[shape]) return ctx.reply("§c" + shape);
     let bblocks;
     blocks == "st"
-      ? (bblocks = SA.Build.entity.getTagStartsWith(ctx.sender, "st:"))
+      ? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:"))
       : (bblocks = blocks);
     brush.nameTag = "§r§6" + shape;
     brush.setLore([
@@ -31,69 +31,63 @@ const brushCMD = new XA.Command({
       `Size: ${size}`,
       `Range: 300`,
     ]);
-    ctx.give(brush);
+    XA.Entity.getI(ctx.sender).addItem(brush);
     ctx.reply(
       `§a► §rАктивирована кисть ${shape} с ${blocks} блоками и размером ${size}`
     );
   });
 
 brushCMD
-  .addSubCommand({
+  .literal({
     name: "size",
     description: "Устанавливает размер кисти",
   })
-  .addOption("size", "int", "Size of Sphere")
-  .executes((ctx, { size }) => {
-    const item = SA.Build.entity.getHeldItem(ctx.sender);
-    if (!item || item.id != "we:brush")
+  .int("size")
+  .executes((ctx, size) => {
+    const item = XA.Entity.getHeldItem(ctx.sender);
+    if (!item || item.typeId != "we:brush")
       return ctx.reply(`§cТы держишь не кисть!`);
     let lore = item.getLore();
     lore[2] = `Size: ${size}`;
     item.setLore(lore);
-    ctx.sender
-      .getComponent("minecraft:inventory")
-      .container.setItem(ctx.sender.selectedSlot, item);
+    XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
     ctx.reply(`§a► §rРазмер кисти изменен на ${size}`);
   });
 
 brushCMD
-  .addSubCommand({
+  .literal({
     name: "mat",
     description: "Устанавливает блоки кисти",
   })
-  .addOption("blocks", "string", "Blocks to use")
-  .executes((ctx, { blocks }) => {
-    const item = SA.Build.entity.getHeldItem(ctx.sender);
-    if (!item || item.id != "we:brush")
+  .string("blocks")
+  .executes((ctx, blocks) => {
+    const item = XA.Entity.getHeldItem(ctx.sender);
+    if (!item || item.typeId != "we:brush")
       return ctx.reply(`§cТы держишь не кисть!`);
     let lore = item.getLore();
     let bblocks;
     blocks == "st"
-      ? (bblocks = SA.Build.entity.getTagStartsWith(ctx.sender, "st:"))
+      ? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:"))
       : (bblocks = blocks);
     lore[1] = `Blocks: ${bblocks}`;
     item.setLore(lore);
-    ctx.sender
-      .getComponent("minecraft:inventory")
-      .container.setItem(ctx.sender.selectedSlot, item);
+    XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
     ctx.reply(`§a► §rБлок(и) кисти изменен(ы) на ${blocks}`);
   });
 
 brushCMD
-  .addSubCommand({
+  .literal({
     name: "range",
     description: "Устанавливает максимальное расстояние для кисти",
   })
-  .addOption("range", "int", "Range the brush can reach")
-  .executes((ctx, { range }) => {
-    const item = SA.Build.entity.getHeldItem(ctx.sender);
-    if (!item || item.id != "we:brush")
+  .int("range")
+  .executes((ctx, range) => {
+    const item = XA.Entity.getHeldItem(ctx.sender);
+    if (!item || item.typeId != "we:brush")
       return ctx.reply(`§cТы держишь не кисть!`);
     let lore = item.getLore();
     lore[3] = `Range: ${range}`;
     item.setLore(lore);
-    ctx.sender
-      .getComponent("minecraft:inventory")
-      .container.setItem(ctx.sender.selectedSlot, item);
+    XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
     ctx.reply(`§a► §rРасстояние для кисти изменено на ${range}`);
   });

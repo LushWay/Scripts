@@ -1,4 +1,4 @@
-import { CONFIGDB } from "config.js";
+import { CONFIG_DB } from "config.js";
 import { ThrowError, XA } from "xapi.js";
 import {
   DynamicPropertiesDefinition,
@@ -18,11 +18,11 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
   const add = (s, p) => s.defineString(p, 4294967295);
 
   const e = new DynamicPropertiesDefinition();
-  for (const prop of Object.values(CONFIGDB.world)) add(e, prop);
+  for (const prop of Object.values(CONFIG_DB.world)) add(e, prop);
   propertyRegistry.registerWorldDynamicProperties(e);
 
   const e2 = new DynamicPropertiesDefinition();
-  for (const prop of Object.values(CONFIGDB.player)) add(e2, prop);
+  for (const prop of Object.values(CONFIG_DB.player)) add(e2, prop);
   propertyRegistry.registerEntityTypeDynamicProperties(
     e2,
     MinecraftEntityTypes.player

@@ -68,7 +68,7 @@ export class LeaderboardBuilder {
   removeLeaderboard(objective, x, y, z, dimension) {
     try {
       lb.delete(objective);
-      let entitys = SA.Build.entity.getAtPos({ x, y, z }, dimension);
+      let entitys = XA.Entity.getAtPos({ x, y, z }, dimension);
       if (entitys.length == 0) return false;
       entitys
         .find((entity) => entity.typeId == "f:t" && entity.hasTag("lb"))
@@ -113,9 +113,9 @@ export class LeaderboardBuilder {
    */
   updateLeaderboard(objective, x, y, z, dimension = "overworld", name, stylee) {
     try {
-      let entity = SA.Build.entity
-        .getAtPos({ x, y, z }, dimension)
-        ?.find((entity) => entity.typeId == "f:t" && entity.hasTag("lb"));
+      let entity = XA.Entity.getAtPos({ x, y, z }, dimension)?.find(
+        (entity) => entity.typeId == "f:t" && entity.hasTag("lb")
+      );
       if (!entity) return;
 
       let sortedPlayers;
@@ -130,12 +130,12 @@ export class LeaderboardBuilder {
             // player already has score
             const index = leaderboardScores.indexOf(found);
             leaderboardScores[index].score = `${
-              SA.Build.entity.getScore(player, objective) ?? 0
+              XA.Entity.getScore(player, objective) ?? 0
             }`;
           } else {
             leaderboardScores.push({
               name: `${player.name}`,
-              score: `${SA.Build.entity.getScore(player, objective) ?? 0}`,
+              score: `${XA.Entity.getScore(player, objective) ?? 0}`,
             });
           }
         }
@@ -144,7 +144,7 @@ export class LeaderboardBuilder {
         for (const player of world.getPlayers()) {
           leaderboardScores.push({
             name: `${player.name}`,
-            score: `${SA.Build.entity.getScore(player, objective) ?? 0}`,
+            score: `${XA.Entity.getScore(player, objective) ?? 0}`,
           });
         }
       } // first leaderboard score is set

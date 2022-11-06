@@ -18,9 +18,6 @@ function isNear(x, xx, z, zz) {
 /**
  *
  * @param {Player} player
- * @param {Number} x
- * @param {Number} y
- * @param {Number} rad
  */
 export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
   let y,
@@ -81,9 +78,9 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
     }
   }
   if (!y) {
-    world.say("§cНе удалось найти подходящее место на земле", player.name);
+    player.tell("§cНе удалось найти подходящее место на земле");
     y = 100;
-    player.runCommand("effect @s slow_falling 20 1 true");
+    player.runCommandAsync("effect @s slow_falling 20 1 true");
   }
   player.teleport(
     new Location(x, y, z),

@@ -8,7 +8,6 @@ import {
   Player,
   world,
 } from "@minecraft/server";
-import { EntityQueryOptions } from "../../app/Models/EntityQueryOptions.js";
 import { wo } from "../../app/Models/Options.js";
 import { SA } from "../../index.js";
 import { XA } from "xapi.js";
@@ -54,7 +53,7 @@ class BattleRoyal {
       C++;
     }
     SA.Exceptions.E.triggerEvent(event, {
-      player: SA.Build.entity.fetch(name),
+      player: XA.Entity.fetch(name),
     });
   }
 
@@ -83,7 +82,7 @@ class BattleRoyal {
       /**
        * @type {Array<String>}
        */
-      const a = players.filter((e) => SA.Build.entity.fetch(e));
+      const a = players.filter((e) => XA.Entity.fetch(e));
       if (a.length < 1) {
         return this.end("error", "§cЗапуск без игроков невозможен");
       }
@@ -125,20 +124,19 @@ class BattleRoyal {
       // Для каждого игрока
       for (const e of a) {
         // Тэги
-        const p = SA.Build.entity.fetch(e);
+        const p = XA.Entity.fetch(e);
         this.tags.forEach((e) => p.addTag(e));
 
         // Список
         this.players.push(p);
 
         // Инфо
-        world.say(
+        p.tell(
           SA.Lang.lang["br.start"](
             this.reward,
             players.join("§r, "),
             this.game.rad
-          ),
-          e
+          )
         );
 
         // Очистка, звук
@@ -228,7 +226,7 @@ class BattleRoyal {
                 0,
                 this.center.z - this.game.rad
               );
-            const l = SA.Build.entity.locationToBlockLocation(p.location);
+            const l = XA.Entity.locationToBlockLocation(p.location);
             if (
               l.x >= rmax.x &&
               l.x <= rmax.x + 10 &&
@@ -358,14 +356,13 @@ class BattleRoyal {
     //Причины и соответствующие выводы
     if (reason == "time") {
       this.players.forEach((e) => {
-        world.say(
+        e.tell(
           SA.Lang.lang["br.end.time"](
             this.players
               .filter((e) => e.hasTag("br:alive"))
               .map((e) => e.name)
               .join("§r, ")
-          ),
-          e.name
+          )
         );
       });
     }
@@ -380,8 +377,8 @@ class BattleRoyal {
        * @type {Player}
        */
       const winner = ex;
-      if (typeof winner == "object" && SA.Build.entity.fetch(winner.name)) {
-        world.say(SA.Lang.lang["br.end.winner"](this.reward), winner.name);
+      if (typeof winner == "object" && XA.Entity.fetch(winner.name)) {
+        winner.tell(SA.Lang.lang["br.end.winner"](this.reward));
         SA.Build.chat.runCommand(`title "${winner.name}" title §6Ты победил!`);
         SA.Build.chat.runCommand(
           `title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`
@@ -389,14 +386,11 @@ class BattleRoyal {
         this.players
           .filter((e) => e.name != winner.name)
           .forEach((e) => {
-            world.say(
-              SA.Lang.lang["br.end.looser"](winner.name, this.reward),
-              e.name
-            );
+            e.tell(SA.Lang.lang["br.end.looser"](winner.name, this.reward));
           });
       } else {
         this.players.forEach((e) => {
-          world.say(SA.Lang.lang["br.end.draw"], e.name);
+          e.tell(SA.Lang.lang["br.end.draw"]());
         });
       }
     }
@@ -429,7 +423,7 @@ class BattleRoyal {
     //         .getDimension("overworld")
     //         .getBlock(loc)
     //         .setType(MinecraftBlockTypes.air);
-    //       const q = new EntityQueryOptions();
+    //       const q = {}
     //       (q.type = "minecraft:item"),
     //         (q.location = new Location(loc.x, loc.y, loc.z));
     //       q.maxDistance = 2;
@@ -443,7 +437,7 @@ class BattleRoyal {
     //Альтернативная чепуха
     SA.tables.chests.clear();
 
-    const q = new EntityQueryOptions();
+    const q = {};
     q.type = "minecraft:item";
     for (const p of world.getDimension("overworld").getEntities(q)) {
       const rmax = new BlockLocation(
@@ -456,7 +450,7 @@ class BattleRoyal {
           0,
           this.center.z - this.game.startrad
         );
-      const l = SA.Build.entity.locationToBlockLocation(p.location);
+      const l = XA.Entity.locationToBlockLocation(p.location);
       if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x)
         p.kill();
     }
@@ -483,6 +477,7 @@ class BattleRoyal {
       tick: 20,
     };
     this.game = {
+      startrad: 0,
       started: false,
       rad: 0,
       minrad: 0,

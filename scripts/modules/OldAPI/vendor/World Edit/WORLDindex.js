@@ -5,6 +5,7 @@ import {
   BlockRaycastOptions,
   world,
   MinecraftBlockTypes,
+  Player,
   // Items,
   // ItemStack,
   // PlayerInventoryComponentContainer,
@@ -33,8 +34,8 @@ new PlayerOption("worldBuilder:NoBrushView", "Отключает партикл�
 new PlayerOption("mobile", "Включает мобильное управление");
 
 world.events.blockPlace.subscribe((data) => {
-  if (data.block.id != "minecraft:warped_nylium") return;
-  const item = SA.Build.entity.getHeldItem(data.player);
+  if (data.block.typeId != "minecraft:warped_nylium") return;
+  const item = XA.Entity.getHeldItem(data.player);
   if (!item.getLore()) return;
   const blocks = SA.Utilities.format.clearColors(item.getLore()[0]).split(",");
   const location = data.block.location;
@@ -60,16 +61,12 @@ world.events.blockPlace.subscribe((data) => {
 
 SA.Utilities.time.setTickInterval(() => {
   for (const p of world.getPlayers()) {
-    if (SA.Build.entity.getHeldItem(p)?.id == "we:s") {
-      const i = SA.Build.entity.getHeldItem(p);
+    if (XA.Entity.getHeldItem(p)?.typeId == "we:s") {
+      const i = XA.Entity.getHeldItem(p);
       const lore = i.getLore();
       if (lore[4] && lore[0] == "§9Adv") {
         const B = lore[1].split(" ")[1].split(",");
-        let RB;
-        lore[2]?.split(" ")[1] != "any"
-          ? (RB = lore[2].split(" ")[1])
-          : (RB = "any");
-
+        const RB = lore[2]?.split(" ")[1];
         const R = Number(lore[3].split(" ")[3]);
         if (R < 2) continue;
         const Z = lore[4].split(" ")[1].replace("+", "");
@@ -101,12 +98,12 @@ SA.Utilities.time.setTickInterval(() => {
 SA.Utilities.time.setTickInterval(() => {
   for (const p of world.getPlayers()) {
     if (
-      SA.Build.entity.getHeldItem(p)?.id == "we:s" ||
+      XA.Entity.getHeldItem(p)?.typeId == "we:s" ||
       (po.Q("mobile", p) &&
         p.hasTag("using_item") &&
-        SA.Build.entity.getHeldItem(p)?.id == "we:s")
+        XA.Entity.getHeldItem(p)?.typeId == "we:s")
     ) {
-      const i = SA.Build.entity.getHeldItem(p);
+      const i = XA.Entity.getHeldItem(p);
       const lore = i.getLore();
       if (lore[4] && lore[0] == "§aActive") {
         const B = lore[1].split(" ")[1];
@@ -150,10 +147,10 @@ SA.Utilities.time.setTickInterval(() => {
       }
     }
     if (
-      SA.Build.entity.getHeldItem(p)?.id == "we:brush" &&
+      XA.Entity.getHeldItem(p)?.typeId == "we:brush" &&
       !po.Q("worldBuilder:NoBrushView", p)
     ) {
-      const lore = SA.Build.entity.getHeldItem(p).getLore();
+      const lore = XA.Entity.getHeldItem(p).getLore();
       const q = new BlockRaycastOptions();
       const range = lore[3]?.replace("Range: ", "");
       if (range) {
@@ -165,7 +162,7 @@ SA.Utilities.time.setTickInterval(() => {
             block.location.y,
             block.location.z
           );
-          if (ent1.length == 0) {
+          if (!ent1) {
             SA.Build.chat.runCommand(
               `event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`
             );
@@ -218,11 +215,11 @@ SA.Utilities.time.setTickInterval(() => {
     if (
       !p.hasTag("mobile") ||
       !p.hasTag("attacking") ||
-      SA.Build.entity.getHeldItem(p)?.id != "we:brush"
+      XA.Entity.getHeldItem(p)?.typeId != "we:brush"
     )
       continue; ////console.warn(p.name + " id fail");
 
-    const lore = SA.Build.entity.getHeldItem(p).getLore();
+    const lore = XA.Entity.getHeldItem(p).getLore();
     const shape = lore[0]?.replace("Shape: ", "");
     const blocks = lore[1]?.replace("Blocks: ", "").split(",");
     const size = lore[2]?.replace("Size: ", "");
@@ -241,7 +238,7 @@ SA.Utilities.time.setTickInterval(() => {
 ////////////////////////////////
 
 world.events.beforeItemUseOn.subscribe((data) => {
-  if (data.item.id === "we:wand") {
+  if (data.item.typeId === "we:wand" && data.source instanceof Player) {
     const poss = WorldEditBuild.getPoses().p2;
     if (
       poss.x == data.blockLocation.x &&
@@ -254,9 +251,8 @@ world.events.beforeItemUseOn.subscribe((data) => {
       data.blockLocation.y,
       data.blockLocation.z
     );
-    world.say(
-      `§d►2◄§f (использовать) ${data.blockLocation.x}, ${data.blockLocation.y}, ${data.blockLocation.z}`,
-      data.source.nameTag
+    data.source.tell(
+      `§d►2◄§f (использовать) ${data.blockLocation.x}, ${data.blockLocation.y}, ${data.blockLocation.z}` //§r
     );
   }
 });
@@ -265,7 +261,8 @@ world.events.beforeItemUseOn.subscribe((data) => {
 /////ИСПОЛЬЗОВАНИЕ//////
 ///////////////////////
 world.events.beforeItemUse.subscribe((data) => {
-  if (data.item.id === "we:s") {
+  if (!(data.source instanceof Player)) return;
+  if (data.item.typeId === "we:s") {
     let lore = data.item.getLore();
     let q = true;
     switch (lore[0]) {
@@ -292,12 +289,10 @@ world.events.beforeItemUse.subscribe((data) => {
     }
     const item = data.item;
     item.setLore(lore);
-    data.source
-      .getComponent("minecraft:inventory")
-      .container.setItem(data.source.selectedSlot, item);
+    XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
   }
 
-  if (data.item.id != "we:brush") return;
+  if (data.item.typeId != "we:brush") return;
   if (po.Q("mobile", data.source)) return;
   const lore = data.item.getLore();
   const shape = lore[0]?.replace("Shape: ", "");
@@ -311,7 +306,7 @@ world.events.beforeItemUse.subscribe((data) => {
   if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 });
 world.events.itemUse.subscribe((data) => {
-  if (data.item.id.startsWith("l:")) {
+  if (data.item.typeId.startsWith("l:")) {
     data.source.runCommand(`tp ^^^5`);
   }
 });
@@ -320,7 +315,7 @@ world.events.itemUse.subscribe((data) => {
 /////РАЗРУШЕНИЕ БЛОКА//////
 //////////////////////////
 world.events.blockBreak.subscribe((data) => {
-  if (SA.Build.entity.getHeldItem(data.player)?.id != "we:wand") return;
+  if (XA.Entity.getHeldItem(data.player)?.typeId != "we:wand") return;
   const poss = WorldEditBuild.getPoses().p2;
   if (
     poss.x == data.block.location.x &&
@@ -333,9 +328,8 @@ world.events.blockBreak.subscribe((data) => {
     data.block.location.y,
     data.block.location.z
   );
-  world.say(
-    `§5►1◄§r (сломать) ${data.block.location.x}, ${data.block.location.y}, ${data.block.location.z}`,
-    data.player.name
+  data.player.tell(
+    `§5►1◄§r (сломать) ${data.block.location.x}, ${data.block.location.y}, ${data.block.location.z}`
   );
   data.dimension
     .getBlock(data.block.location)

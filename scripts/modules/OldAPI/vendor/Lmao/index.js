@@ -51,7 +51,7 @@ SA.Utilities.time.setTickInterval(
 // SA.Utilities.time.setTickInterval(() => {
 //   for (const e of world.getDimension("overworld").getEntities()) {
 //     if (e.id != "f:t" || !e.nameTag.startsWith("tags: ")) continue;
-//     const pl = SA.Build.entity.getClosetsEntitys(e)[0];
+//     const pl = XA.Entity.getClosetsEntitys(e)[0];
 //     for (let tag of pl.getTags()) {
 //       if (arro.includes(tag)) continue;
 //       if (tag.match(/[0-9]|cooldown|owner|Seen|commands/g)) continue;

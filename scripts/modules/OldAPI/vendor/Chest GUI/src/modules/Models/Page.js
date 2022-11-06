@@ -33,7 +33,7 @@ export const PAGES = {};
 export function getItemUid(item) {
   let uid = "";
   if (item) {
-    let { id, name, amount, data } = item;
+    let { typeId: id, name, amount, data } = item;
     let lore = item.getLore();
     uid = [id, name, amount, data, lore].join("");
   }
@@ -74,7 +74,7 @@ export class Page {
     }
     return {
       uid: getItemUid(item),
-      type: item.id,
+      type: item.typeId,
       amount: item.amount,
       data: item.data,
       name: item.nameTag,

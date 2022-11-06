@@ -226,7 +226,7 @@ SA.Utilities.time.setTickInterval(() => {
       isInRad(
         //@ts-ignore
         new BlockLocation(...wo.Q("spawn:pos").split(" ")),
-        SA.Build.entity.locationToBlockLocation(f.location),
+        XA.Entity.locationToBlockLocation(f.location),
         200
       )
     )
@@ -235,13 +235,13 @@ SA.Utilities.time.setTickInterval(() => {
       isInRad(
         //@ts-ignore
         new BlockLocation(...wo.Q("minigames:pos").split(" ")),
-        SA.Build.entity.locationToBlockLocation(f.location),
+        XA.Entity.locationToBlockLocation(f.location),
         50
       )
     )
       continue;
-    if (!SA.Build.entity.getTagStartsWith(f, "l:")) {
-      const sender = SA.Build.entity.getClosetsEntitys(
+    if (!XA.Entity.getTagStartsWith(f, "l:")) {
+      const sender = XA.Entity.getClosetsEntitys(
         f,
         2,
         "minecraft:player",
@@ -249,7 +249,7 @@ SA.Utilities.time.setTickInterval(() => {
         false
       )[0];
       if (sender instanceof Player) {
-        const lore = SA.Build.entity.getHeldItem(sender).getLore()[0];
+        const lore = XA.Entity.getHeldItem(sender).getLore()[0];
         if (!lore || lore == "§r§н") continue;
         if (lore == "§r§б") f.addTag("блоки");
         if (lore == "§r§и") f.addTag("игроки");
@@ -258,10 +258,10 @@ SA.Utilities.time.setTickInterval(() => {
       }
     }
     // const id = f.dimension.getBlock(
-    //     SA.Build.entity.locationToBlockLocationn(f.location)
+    //     XA.Entity.locationToBlockLocationn(f.location)
     //   ).id,
     //   id2 = f.dimension.getBlock(
-    //     SA.Build.entity.locationToBlockLocationn(
+    //     XA.Entity.locationToBlockLocationn(
     //       new Location(
     //         f.location.x,
     //         Math.round(f.location.y + 0.8),
@@ -270,7 +270,7 @@ SA.Utilities.time.setTickInterval(() => {
     //     )
     //   ).id,
     //   id3 = f.dimension.getBlock(
-    //     SA.Build.entity.locationToBlockLocationn(
+    //     XA.Entity.locationToBlockLocationn(
     //       new Location(
     //         f.location.x,
     //         Math.round(f.location.y - 0.8),
@@ -300,7 +300,7 @@ SA.Utilities.time.setTickInterval(() => {
         continue;
       } catch (e) {}
     let a = [...world.getPlayers()].find(
-      (e) => e.name == SA.Build.entity.getTagStartsWith(f, "l:")
+      (e) => e.name == XA.Entity.getTagStartsWith(f, "l:")
     );
     // world.say(a.name);
     if (a) stats.FVboom.Eadd(a, 1);
@@ -342,7 +342,7 @@ SA.Utilities.time.setTickInterval(
           0,
           Number(center[1]) - rad
         );
-      const l = SA.Build.entity.locationToBlockLocation(p.location);
+      const l = XA.Entity.locationToBlockLocation(p.location);
       if (l.x >= rmax.x && l.x <= rmax.x + 10 && l.z <= rmax.z && l.z >= rmin.z)
         ret(p, true, rmax);
       if (l.x >= rmax.x - 10 && l.x <= rmax.x && l.z <= rmax.z && l.z >= rmin.z)
@@ -368,7 +368,7 @@ SA.Utilities.time.setTickInterval(
         l.x <= rmin.x &&
         l.x <= rmax.x &&
         l.x >= rmin.x &&
-        SA.Build.entity.getScore(p, "inv") != 2 &&
+        XA.Entity.getScore(p, "inv") != 2 &&
         !p.hasTag("saving") &&
         !p.hasTag("br:ded")
       ) {
@@ -396,7 +396,7 @@ SA.Utilities.time.setTickInterval(
         ent.runCommand(
           "execute if block ~ -64 ~ deny run testfor @s[family=monster]"
         );
-        SA.Build.entity.despawn(ent);
+        XA.Entity.despawn(ent);
       } catch (e) {}
   },
   0,
@@ -471,10 +471,10 @@ SA.Utilities.time.setTickInterval(
       if (
         wo.Q("server:pvpmode:enable") &&
         po.Q("title:pvpmode", p) &&
-        !SA.Build.entity.getTagStartsWith(p, "lockpvp:") &&
-        SA.Build.entity.getScore(p, "pvp") > 0
+        !XA.Entity.getTagStartsWith(p, "lockpvp:") &&
+        XA.Entity.getScore(p, "pvp") > 0
       ) {
-        const score = SA.Build.entity.getScore(p, "pvp");
+        const score = XA.Entity.getScore(p, "pvp");
         const max = wo.Q("server:pvpmode:cooldown") ?? 15;
         const q = score == max;
         try {
@@ -488,9 +488,8 @@ SA.Utilities.time.setTickInterval(
       /*========================================================================*/
 
       /*================================ ON JOIN ==============================*/
-      if (SA.Build.entity.getTagStartsWith(p, "joinedAt:")) {
-        const pos = SA.Build.entity
-          .getTagStartsWith(p, "joinedAt:")
+      if (XA.Entity.getTagStartsWith(p, "joinedAt:")) {
+        const pos = XA.Entity.getTagStartsWith(p, "joinedAt:")
           .split(" ")
           .map((e) => parseInt(e));
         const message =
@@ -509,7 +508,7 @@ SA.Utilities.time.setTickInterval(
             SA.Build.chat.runCommand(
               "scoreboard objectives add animStage1 dummy"
             );
-            const q = SA.Build.entity.getScore(p, "animStage1");
+            const q = XA.Entity.getScore(p, "animStage1");
             let start;
             const co = wo.Q("spawn:animcolor") ?? "§f";
             q <= 5 ? (start = `${co}»  `) : (start = `${co}» `);
@@ -535,7 +534,7 @@ SA.Utilities.time.setTickInterval(
               ? p.runCommand("scoreboard players set @s animStage1 10")
               : p.runCommand("scoreboard players add @s animStage1 -2");
           } else {
-            SA.Build.entity.removeTagsStartsWith(p, "joinedAt:");
+            XA.Entity.removeTagsStartsWith(p, "joinedAt:");
 
             SA.Build.chat.rcs([
               `tellraw @a[tag=!"another:join:disable",name=!"${p.name}"] {"rawtext":[{"translate":"§7${p.name} §8Очнулся в воздухе"}]}`,
@@ -547,7 +546,7 @@ SA.Utilities.time.setTickInterval(
             p.runCommand("title @s clear");
           }
         } else if (!p.hasTag("WSeenJoinMessage")) {
-          SA.Build.entity.removeTagsStartsWith(p, "joinedAt:");
+          XA.Entity.removeTagsStartsWith(p, "joinedAt:");
           SA.Build.chat.rcs([
             `tellraw @a[tag=!"another:join:disable",name=!"${p.name}"] {"rawtext":[{"translate":"§7${p.name} §8Сдвинулся"}]}`,
             `playsound break.amethyst_cluster @a[tag=!"joinsound:disable"]`,
@@ -662,7 +661,7 @@ SA.Utilities.time.setTickInterval(
     /*================== -sit доработка =================*/
     for (const e of SA.Build.world.getEntitys()) {
       if (e.typeId != "s:it") continue;
-      const pl = SA.Build.entity.getClosetsEntitys(
+      const pl = XA.Entity.getClosetsEntitys(
         e,
         1,
         "minecraft:player",
@@ -676,16 +675,16 @@ SA.Utilities.time.setTickInterval(
     /*================== -base доработка =================*/
     for (const e of world.getDimension("overworld").getEntities(no)) {
       const block = e.dimension.getBlock(
-        SA.Build.entity.locationToBlockLocation(e.location)
+        XA.Entity.locationToBlockLocation(e.location)
       );
       if (block && block.typeId == "minecraft:barrel") continue;
       e.nameTag
         .split(", ")
         // @ts-ignore
         .forEach((e, i, a) =>
-          SA.Build.entity
-            .fetch(e)
-            .tell("§cБаза с владельцем §f" + a[0] + "§c разрушена.")
+          XA.Entity.fetch(e).tell(
+            "§cБаза с владельцем §f" + a[0] + "§c разрушена."
+          )
         );
       e.triggerEvent("kill");
     }
@@ -723,8 +722,8 @@ SA.Utilities.time.setTickInterval(
           Atp(p, "currentpos", true);
         } catch (e) {}
       /*================ TOOL FUNCTIONS ===================*/
-      if (SA.Build.entity.getHeldItem(p)?.typeId == "we:tool") {
-        const lore = SA.Build.entity.getHeldItem(p).getLore();
+      if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
+        const lore = XA.Entity.getHeldItem(p).getLore();
         if (lore[0] == "Particle") {
           const q = new BlockRaycastOptions();
           q.maxDistance = 100;
@@ -816,8 +815,8 @@ SA.Utilities.time.setTickInterval(
 SA.Utilities.time.setTickInterval(() => {
   //SA.Build.chat.runCommand('music stop')
   for (const p of world.getPlayers()) {
-    if (SA.Build.entity.getHeldItem(p)?.typeId == "we:tool") {
-      const lore = SA.Build.entity.getHeldItem(p).getLore();
+    if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
+      const lore = XA.Entity.getHeldItem(p).getLore();
       if (lore[0] == "Sound") {
         const s = {};
         //s.pitch = lore[2] ?? 0
@@ -839,9 +838,9 @@ new XA.Command(
   {
     name: "ы",
     description: "",
-    tags: ["commands"],
-  },
-  (ctx) => {
+    requires: (p) => p.hasTag("commands"),
+  }
+  ).executes((ctx) => {
 
   }
 );
@@ -849,68 +848,57 @@ new XA.Command(
 
 */
 
-new XA.Command(
-  {
-    name: "test",
-    description: "",
-    tags: ["commands"],
-  },
-  (ctx) => {
-    const block = world
-      .getDimension("overworld")
-      .getBlock(
-        SA.Build.entity
-          .locationToBlockLocation(ctx.sender.location)
-          .offset(0, -1, 0)
-      );
-    if (block.getComponent("inventory")?.container)
-      return ctx.reply(
-        stringifyEx(block.getComponent("inventory")?.container, " ") +
-          "\n" +
-          stringifyEx(block, " ")
-      );
-    ctx.reply("§cError");
-  }
-);
+new XA.Command({
+  name: "test",
+  description: "",
+  requires: (p) => p.hasTag("commands"),
+}).executes((ctx) => {
+  const block = world
+    .getDimension("overworld")
+    .getBlock(
+      XA.Entity.locationToBlockLocation(ctx.sender.location).offset(0, -1, 0)
+    );
+  if (block.getComponent("inventory")?.container)
+    return ctx.reply(
+      stringifyEx(block.getComponent("inventory")?.container, " ") +
+        "\n" +
+        stringifyEx(block, " ")
+    );
+  ctx.reply("§cError");
+});
 
-new XA.Command(
-  {
-    name: "db",
-    description: "",
-    tags: ["commands"],
-  },
-  (ctx) => {
-    for (const key of Object.keys(SA.tables).filter((e) => e != "i")) {
-      ctx.reply(key);
-      const c = SA.tables[key].getCollection();
-      const b = SA.Utilities.format.stringifyEx(c, " ");
-      ctx.reply(b);
-    }
+new XA.Command({
+  name: "db",
+  description: "",
+  requires: (p) => p.hasTag("commands"),
+}).executes((ctx) => {
+  for (const key of Object.keys(SA.tables).filter((e) => e != "i")) {
+    ctx.reply(key);
+    const c = SA.tables[key].getCollection();
+    const b = SA.Utilities.format.stringifyEx(c, " ");
+    ctx.reply(b);
   }
-);
+});
 
-new XA.Command(
-  {
-    name: "time",
-    description: "",
-    tags: ["commands"],
-  },
-  (ctx) => {
-    ctx.reply(shortTime());
-  }
-);
+new XA.Command({
+  name: "time",
+  description: "",
+  requires: (p) => p.hasTag("commands"),
+}).executes((ctx) => {
+  ctx.reply(shortTime());
+});
 
 const casda = new XA.Command({
   name: "name",
   description: "",
-  tags: ["commands"],
+  requires: (p) => p.hasTag("commands"),
 })
-  .addOption("Name", "string")
+  .string("Name")
   .executes((ctx) => {
     ctx.sender.nameTag = ctx.args.join("\n");
     console.warn(ctx.sender.name + " => " + ctx.sender.nameTag);
   });
-casda.addSubCommand({ name: "reset", description: "Возвращает" }, (ctx) => {
+casda.literal({ name: "reset", description: "Возвращает" }).executes((ctx) => {
   ctx.sender.nameTag = ctx.sender.name;
 });
 
@@ -932,7 +920,7 @@ world.events.entityHurt.subscribe((data) => {
   if (
     data.hurtEntity.typeId == "t:hpper_minecart" ||
     !wo.Q("server:pvpmode:enable") ||
-    SA.Build.entity.getTagStartsWith(data.hurtEntity, "lockpvp:")
+    XA.Entity.getTagStartsWith(data.hurtEntity, "lockpvp:")
   )
     return;
   let lastHit = false;
@@ -973,7 +961,11 @@ world.events.entityHurt.subscribe((data) => {
         );
       }
     }
-    if (data.cause != "projectile" && lastHit && data.hurtEntity instanceof Player)
+    if (
+      data.cause != "projectile" &&
+      lastHit &&
+      data.hurtEntity instanceof Player
+    )
       data.damagingEntity.onScreenDisplay.setActionBar(
         SA.Lang.lang["title.kill.hit"](data.hurtEntity.name)
       );

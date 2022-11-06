@@ -4,7 +4,6 @@ import {
   BlockLocation,
   InventoryComponentContainer,
   Player,
-  EntityQueryScoreOptions,
   MinecraftEffectTypes,
   MinecraftBlockTypes,
   ItemStack,
@@ -13,7 +12,6 @@ import {
   Vector,
   BlockType,
 } from "@minecraft/server";
-import { EntityQueryOptions } from "../../app/Models/EntityQueryOptions.js";
 import { po, wo, WorldOption } from "../../app/Models/Options.js";
 import { parseLocationAugs } from "../../app/Utilities/formatter.js";
 import { SA } from "../../index.js";
@@ -107,7 +105,7 @@ class inventory {
    * @returns
    */
   async saveInv(i, pl) {
-    const inv = SA.Build.entity.getI(pl);
+    const inv = XA.Entity.getI(pl);
     if (i != invs.anarch || inv.size == inv.emptySlotsCount) return;
     //console.warn("Сохранение инвентаря, старт");
     this.#gamerules(true);
@@ -137,7 +135,7 @@ class inventory {
         } true disk false`,
         "overworld"
       );
-      const a = SA.Build.entity.getAtPos({
+      const a = XA.Entity.getAtPos({
         x: zone.x,
         y: zone.y,
         z: zone.z,
@@ -146,7 +144,7 @@ class inventory {
         `kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`,
         "overworld"
       );
-      world.say(`Сохранено ${a} предметов`, name);
+      pl.tell(`Сохранено ${a} предметов`);
     });
     //console.warn("Сохранение инвентаря, прода");
     let C = 0;
@@ -156,7 +154,7 @@ class inventory {
     }
 
     //console.warn("Инвентарь сохранен");
-    const player = SA.Build.entity.fetch(name);
+    const player = XA.Entity.fetch(name);
     player.removeTag("saving");
     this.#gamerules(false);
   }
@@ -224,7 +222,7 @@ const objectives = ["inv"];
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
   if (
     data.id != "binocraft:on_death" ||
-    SA.Build.entity.getScore(data.entity, objectives[0]) != invs.anarch ||
+    XA.Entity.getScore(data.entity, objectives[0]) != invs.anarch ||
     data.entity.hasTag("saving")
   )
     return;
@@ -244,7 +242,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
       "tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]"
     );
   } catch (e) {
-    SA.Build.entity.despawn(ent);
+    XA.Entity.despawn(ent);
     return;
   }
   data.entity.dimension.spawnEntity(
@@ -254,13 +252,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 });
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
   if (data.id != "ded") return;
-  const c = SA.Build.entity.getClosetsEntitys(
-    data.entity,
-    1,
-    "f:t",
-    1,
-    false
-  )[0];
+  const c = XA.Entity.getClosetsEntitys(data.entity, 1, "f:t", 1, false)[0];
   c.nameTag = `§6-=[§f    §6]=-`;
   SA.Utilities.time.setTickTimeout(() => {
     c.nameTag = `§6-=[  ]=-`;
@@ -281,7 +273,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 });
 SA.Utilities.time.setTickInterval(() => {
   for (const e of SA.Build.world.getEntitys("t:hpper_minecart")) {
-    const inv = SA.Build.entity.getI(e);
+    const inv = XA.Entity.getI(e);
     if (inv.size == inv.emptySlotsCount) {
       e.triggerEvent("ded");
       e.kill();
@@ -305,9 +297,9 @@ export function Atp(
   setDefaultInventory
 ) {
   //log(`Atp ${place} ${ignorepvp}`)
-  if (!ignorebr && SA.Build.entity.getTagStartsWith(player, "locktp:"))
+  if (!ignorebr && XA.Entity.getTagStartsWith(player, "locktp:"))
     return player.runCommand(
-      `tellraw @s {"rawtext":[{"translate":"§c► Сейчас это запрещено (префикс запрета: ${SA.Build.entity.getTagStartsWith(
+      `tellraw @s {"rawtext":[{"translate":"§c► Сейчас это запрещено (префикс запрета: ${XA.Entity.getTagStartsWith(
         player,
         "locktp:"
       )})"}]}`
@@ -316,11 +308,11 @@ export function Atp(
     return player.runCommand(
       `tellraw @s {"rawtext":[{"translate":"§c► Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit"}]}`
     );
-  if (!ignorepvp && SA.Build.entity.getScore(player, "pvp") > 0)
+  if (!ignorepvp && XA.Entity.getScore(player, "pvp") > 0)
     return player.runCommand(
       `tellraw @s {"rawtext":[{"translate":"§c► В режиме пвп это запрещено"}]}`
     );
-  const currentInv = SA.Build.entity.getScore(player, objectives[0]);
+  const currentInv = XA.Entity.getScore(player, objectives[0]);
   const ps = invs[place];
   if (!ps) return console.warn("Неправильное место: " + place);
   if (place != "anarch" && place != "currentpos" && !wo.Q(`${place}:pos`))
@@ -336,14 +328,14 @@ export function Atp(
       : (rtp = true);
     if (currentInv == invs.anarch && !rtp) return;
   } else if (place == "currentpos") {
-    const l = SA.Build.entity.locationToBlockLocation(player.location);
+    const l = XA.Entity.locationToBlockLocation(player.location);
     pos = l.x + " " + l.y + " " + l.z;
   } else {
     pos = wo.Q(`${place}:pos`);
   }
   if (rtp) {
     const center = wo.Q("zone:center")
-      ? wo.Q("zone:center").split(", ")
+      ? wo.G("zone:center").split(", ")
       : [0, 0];
     let y,
       x,
@@ -377,19 +369,18 @@ export function Atp(
   }
 
   if (ps == invs.anarch) {
-    world.say(
+    player.tell(
       `§r§${air ? "5Воздух" : "9Земля"}§r ${
         po.Q("anarchy:hideCoordinates", player) ? "" : pos
-      }`,
-      player.name
+      }`
     );
   }
 
   if (currentInv == invs.anarch) {
-    const l = SA.Build.entity.locationToBlockLocation(player.location);
+    const l = XA.Entity.locationToBlockLocation(player.location);
     SA.tables.pos.set(player.name, l.x + " " + l.y + " " + l.z);
   }
-  const inve = SA.Build.entity.getI(player);
+  const inve = XA.Entity.getI(player);
   let obj = { on: false };
   if (Object.keys(invs).find((e) => invs[e] == currentInv))
     obj = {
@@ -404,7 +395,7 @@ export function Atp(
       setDefaultInventory
     )
   ) {
-    SA.Build.entity.tp(
+    XA.Entity.tp(
       player,
       pos,
       place,
@@ -420,7 +411,7 @@ export function Atp(
       inv.saveInv(currentInv, player).then(() =>
         inv.loadInv(ps, player).then(() => {
           player.runCommand(`scoreboard players set @s ${objectives[0]} ${ps}`);
-          SA.Build.entity.tp(
+          XA.Entity.tp(
             player,
             pos,
             place,
@@ -435,7 +426,7 @@ export function Atp(
       );
     } catch (e) {
       player.runCommand(`scoreboard players set @s ${objectives[0]} ${ps}`);
-      SA.Build.entity.tp(
+      XA.Entity.tp(
         player,
         pos,
         place,
@@ -448,8 +439,8 @@ export function Atp(
   }
 }
 
-const qqq = new EntityQueryOptions();
-const scores = new EntityQueryScoreOptions();
+const qqq = {};
+const scores = {};
 scores.objective = objectives[0];
 scores.minScore = 1;
 scores.maxScore = 1;
@@ -463,18 +454,18 @@ SA.Utilities.time.setTickInterval(
         );
       } catch (ee) {}
     const pos = wo
-      .Q("spawn:pos")
+      .G("spawn:pos")
       ?.split(" ")
-      ?.map((e) => (e = Number(e)));
+      ?.map((e) => Number(e));
     const pos2 = wo
-      .Q("minigames:pos")
+      .G("minigames:pos")
       ?.split(" ")
-      ?.map((e) => (e = Number(e)));
+      ?.map((e) => Number(e));
     for (const pl of world.getPlayers(qqq)) {
       if (
         pos &&
-        SA.Build.entity.getScore(pl, "inv") == 1 &&
-        !SA.Build.entity.hasItem(pl, "armor.chest", "elytra") &&
+        XA.Entity.getScore(pl, "inv") == 1 &&
+        !XA.Entity.hasItem(pl, "armor.chest", "elytra") &&
         pl.location.y < pos[1] - 10
       ) {
         try {
@@ -522,7 +513,7 @@ SA.Utilities.time.setTickInterval(
 );
 
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
-  if (data.id != "portal") return;
+  if (data.id != "portal" || !(data.entity instanceof Player)) return;
   data.cancel = true;
   const to = world
     .getDimension(data.entity.dimension.id)
@@ -533,7 +524,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
         Math.floor(data.entity.location.z)
       )
     );
-  if (to.id != "minecraft:chest") return;
+  if (to.typeId != "minecraft:chest") return;
   /**
    * @type {InventoryComponentContainer}
    */
@@ -543,9 +534,10 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
   switch (i.getLore()[0]) {
     case "forward":
       let poo;
-      if (i.getLore()[1] == "minigames") poo = wo.Q("minigames:pos");
+      if (i.getLore()[1] == "minigames") poo = wo.G("minigames:pos");
       if (!poo) poo = i.getLore()[1];
-      SA.Build.entity.tp(
+
+      XA.Entity.tp(
         data.entity,
         poo,
         i.getLore()[2],
@@ -566,113 +558,56 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
   }
 });
 
-new XA.Command(
-  {
-    name: "hub",
-    aliases: ["spawn", "tp"],
-    description: "§bПеремещает на спавн",
-    type: "public",
-  },
-  (ctx) => {
-    Atp(ctx.sender, "spawn");
-  }
-)
-  .addSubCommand({ name: "set", tags: ["commands"] })
-  .addOption("pos", "location", "")
+new XA.Command({
+  name: "hub",
+  aliases: ["spawn", "tp"],
+  description: "§bПеремещает на спавн",
+  /*type: "public"*/
+})
   .executes((ctx) => {
-    let loc = new BlockLocation(
-      Math.floor(ctx.sender.location.x),
-      Math.floor(ctx.sender.location.y),
-      Math.floor(ctx.sender.location.z)
-    );
-    if (ctx.args[2])
-      loc = parseLocationAugs([ctx.args[0], ctx.args[1], ctx.args[2]], {
-        location: [
-          Math.floor(ctx.sender.location.x),
-          Math.floor(ctx.sender.location.y),
-          Math.floor(ctx.sender.location.z),
-        ],
-        viewVector: [
-          ctx.sender.viewVector.x,
-          ctx.sender.viewVector.y,
-          ctx.sender.viewVector.z,
-        ],
-      });
+    Atp(ctx.sender, "spawn");
+  })
+  .literal({ name: "set", requires: (p) => p.hasTag("commands") })
+  .location("pos", true)
+  .executes((ctx, pos) => {
+    let loc = XA.Entity.locationToBlockLocation(pos ?? ctx.sender.location);
     const rl = loc.x + " " + loc.y + " " + loc.z;
     ctx.reply(rl);
     wo.set("spawn:pos", rl);
-    ctx.run("setworldspawn " + rl);
+    ctx.sender.runCommandAsync("setworldspawn " + rl);
   });
 
-new XA.Command(
-  {
-    name: "minigames",
-    aliases: ["mg"],
-    description: "§bПеремещает на спавн минигр",
-    type: "public",
-  },
-  (ctx) => {
-    Atp(ctx.sender, "minigames");
-  }
-)
-  .addSubCommand({ name: "set", tags: ["commands"] })
-  .addOption("pos", "location", "")
+new XA.Command({
+  name: "minigames",
+  aliases: ["mg"],
+  description: "§bПеремещает на спавн минигр",
+  /*type: "public"*/
+})
   .executes((ctx) => {
-    let loc = new BlockLocation(
-      Math.floor(ctx.sender.location.x),
-      Math.floor(ctx.sender.location.y),
-      Math.floor(ctx.sender.location.z)
-    );
-    if (ctx.args[2])
-      loc = parseLocationAugs([ctx.args[0], ctx.args[1], ctx.args[2]], {
-        location: [
-          Math.floor(ctx.sender.location.x),
-          Math.floor(ctx.sender.location.y),
-          Math.floor(ctx.sender.location.z),
-        ],
-        viewVector: [
-          ctx.sender.viewVector.x,
-          ctx.sender.viewVector.y,
-          ctx.sender.viewVector.z,
-        ],
-      });
+    Atp(ctx.sender, "minigames");
+  })
+  .literal({ name: "set", requires: (p) => p.hasTag("commands") })
+  .location("pos", true)
+  .executes((ctx, pos) => {
+    let loc = XA.Entity.locationToBlockLocation(pos ?? ctx.sender.location);
     const rl = loc.x + " " + loc.y + " " + loc.z;
     ctx.reply(rl);
     wo.set("minigames:pos", rl);
   });
 
-new XA.Command(
-  {
-    name: "anarchy",
-    aliases: ["anarch"],
-    description: "§bПеремещает на анархию",
-    type: "public",
-  },
-  (ctx) => {
-    Atp(ctx.sender, "anarch");
-  }
-)
-  .addSubCommand({ name: "set", tags: ["commands"] })
-  .addOption("pos", "location", "")
+new XA.Command({
+  name: "anarchy",
+  aliases: ["anarch"],
+  description: "§bПеремещает на анархию",
+  /*type: "public"*/
+})
   .executes((ctx) => {
-    let loc = new BlockLocation(
-      Math.floor(ctx.sender.location.x),
-      Math.floor(ctx.sender.location.y),
-      Math.floor(ctx.sender.location.z)
-    );
-    if (ctx.args[2])
-      loc = parseLocationAugs([ctx.args[0], ctx.args[1], ctx.args[2]], {
-        location: [
-          Math.floor(ctx.sender.location.x),
-          Math.floor(ctx.sender.location.y),
-          Math.floor(ctx.sender.location.z),
-        ],
-        viewVector: [
-          ctx.sender.viewVector.x,
-          ctx.sender.viewVector.y,
-          ctx.sender.viewVector.z,
-        ],
-      });
+    Atp(ctx.sender, "anarch");
+  })
+  .literal({ name: "set", requires: (p) => p.hasTag("commands") })
+  .location("pos", true)
+  .executes((ctx, pos) => {
+    let loc = XA.Entity.locationToBlockLocation(pos ?? ctx.sender.location);
     const rl = loc.x + " " + loc.y + " " + loc.z;
     ctx.reply(rl);
     wo.set("anarch:pos", rl);
@@ -682,24 +617,27 @@ new XA.Command({
   name: "portal",
   aliases: ["port"],
   description: "Ставит портал",
-  tags: ["owner"],
+  requires: (p) => p.hasTag("owner"),
 })
-  .addOption("addOrSet", "boolean")
-  .addOption("lore", "string")
-  .executes((ctx) => {
+  .boolean("addOrSet")
+  .string("lore")
+  .executes((ctx, q) => {
     let item = new ItemStack(MinecraftItemTypes.grayCandle, 1, 0);
     item.setLore(ctx.args.slice(1));
-    const q = ctx.args[0] == "true";
     const block = ctx.sender.dimension.getBlock(
-      SA.Build.entity
-        .locationToBlockLocation(ctx.sender.location)
-        .offset(0, q ? -3 : -4, 0)
+      XA.Entity.locationToBlockLocation(ctx.sender.location).offset(
+        0,
+        q ? -3 : -4,
+        0
+      )
     );
     block.setType(MinecraftBlockTypes.chest);
     block.getComponent("inventory").container.setItem(0, item);
-    const loc = SA.Build.entity
-      .locationToBlockLocation(ctx.sender.location)
-      .offset(0, 1, 0);
+    const loc = XA.Entity.locationToBlockLocation(ctx.sender.location).offset(
+      0,
+      1,
+      0
+    );
     const l = new Location(loc.x + 0.5, loc.y, loc.z + 0.5);
     if (q)
       ctx.sender.teleport(

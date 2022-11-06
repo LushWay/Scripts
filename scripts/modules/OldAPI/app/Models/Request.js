@@ -2,7 +2,7 @@ import { Player, world } from "@minecraft/server";
 
 const openRequests = [
   /**
-   * {sender: "Steve", target: "Steve", type: "default"}
+   * {sender: "Steve", target: "Steve", /*type: "default"*/}
    */
 ];
 export class Request {

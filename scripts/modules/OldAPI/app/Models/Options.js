@@ -16,9 +16,9 @@ export class PlayerOption {
    * Register an option
    * @param {string} name Имя опции
    * @param {string} desc Описание
-   * @param {number} permissionLvL Уровень разрешений
-   * @param {string} ActiveItem
-   * @param {boolean} isExpiremental
+   * @param {number} [permissionLvL] Уровень разрешений
+   * @param {string} [ActiveItem]
+   * @param {boolean} [isExpiremental]
    * @example new option('JS:enable', 'Ниче не делает', 10)
    */
   constructor(

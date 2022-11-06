@@ -6,7 +6,6 @@ import {
   Location,
 } from "@minecraft/server";
 //import { GameTestSequence } from "mojang-gametest";
-import { SA } from "../../../../index.js";
 import { XA } from "xapi.js";
 import { Return } from "../../../../app/Exceptions/Return.js";
 import { configuration } from "../config.js";

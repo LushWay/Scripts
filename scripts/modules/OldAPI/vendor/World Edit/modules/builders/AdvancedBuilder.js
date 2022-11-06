@@ -4,7 +4,6 @@ import {
   MinecraftBlockTypes,
   Player,
 } from "@minecraft/server";
-import { SA } from "../../../../index.js";
 import { XA } from "xapi.js";
 import { configuration } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
@@ -16,8 +15,7 @@ export class Fill {
    * @param {BlockLocation} pos1 pos1
    * @param {BlockLocation} pos2 pos2
    * @param {Array<string>} blocks blocks to use to fill block
-   * @param {Array<string>} rb Blocks to replace
-   * @returns {void}
+   * @param {string} rb Blocks to replace
    * @example new Fill(BlockLocation, BlockLocation ["stone", "wood"], ["grass"]);
    */
   constructor(pos1, pos2, blocks, rb = "any") {
@@ -57,14 +55,14 @@ export class Fill {
             if (this.rb != "any") {
               for (const b of rbs) {
                 let replace = ` replace ${b.b} ` + b.d;
-                SA.Build.chat.runCommand(
+                XA.Build.chat.runCommand(
                   `fill ${x} ${y} ${z} ${x} ${y} ${z} ${blocks} ` +
                     bdata +
                     replace
                 );
               }
             } else
-              SA.Build.chat.runCommand(
+              XA.Build.chat.runCommand(
                 `fill ${x} ${y} ${z} ${x} ${y} ${z} ${blocks} ` + bdata
               );
 
@@ -72,7 +70,7 @@ export class Fill {
           }
         }
         if (blocksSet >= configuration.BLOCKS_BEFORE_AWAIT) {
-          await SA.Utilities.time.sleep(configuration.TICKS_TO_SLEEP);
+          await new Promise((r) => setTimeout(r, configuration.TICKS_TO_SLEEP))
           blocksSet = 0;
         }
       }

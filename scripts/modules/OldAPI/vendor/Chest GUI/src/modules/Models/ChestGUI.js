@@ -374,10 +374,7 @@ class PlayerFill {
        */
       let item = page?.items[i];
       if (i < players.length) {
-        const lvl = SA.Build.entity.getScore(
-          SA.Build.entity.fetch(players[i]),
-          "perm"
-        );
+        const lvl = XA.Entity.getScore(XA.Entity.fetch(players[i]), "perm");
         let color, id;
         if (lvl == 2) (color = "6"), (id = "ender_chest");
         if (lvl == 1) (color = "9"), (id = "barrel");
@@ -467,7 +464,7 @@ class Itemss {
         item.data = im.amount;
         item.lore = im.getLore();
         item.name = im.nameTag;
-        item.type = im.id;
+        item.type = im.typeId;
       }
       if (!item || !item.type) {
         container.setItem(i, new ItemStack(MinecraftItemTypes.air));
@@ -535,8 +532,8 @@ export const ACTIONS1 = {
         "§9Модер§r (команды, OP)",
         "§6Админ§r (команды, OP, настройки)",
       ],
-      SA.Build.entity.getScore(
-        SA.Build.entity.fetch(SA.Utilities.format.clearColors(item.name)),
+      XA.Entity.getScore(
+        XA.Entity.fetch(SA.Utilities.format.clearColors(item.name)),
         "perm"
       )
     );
@@ -650,22 +647,23 @@ export const ACTIONS1 = {
     form.textField("Оставь пустым для удаления", "gray | orange | green", "");
     OpenForm(his, his.player, form, (data) => {
       if (data.isCanceled) return;
-      const ent = SA.Build.entity
-        .getClosetsEntitys(his.player, 10, "f:t", 44, false)
-        .find(
-          (e) =>
-            e.nameTag ==
-            item.name.replace("§m§n§m§r", "").replace("§m§n§m§r", "")
-        );
+      const ent = XA.Entity.getClosetsEntitys(
+        his.player,
+        10,
+        "f:t",
+        44,
+        false
+      ).find(
+        (e) =>
+          e.nameTag == item.name.replace("§m§n§m§r", "").replace("§m§n§m§r", "")
+      );
       if (!data.formValues[0]) {
-        LeaderboardBuild.removeObj(
-          SA.Build.entity.getTagStartsWith(ent, "obj:")
-        );
+        LeaderboardBuild.removeObj(XA.Entity.getTagStartsWith(ent, "obj:"));
         ent.triggerEvent("kill");
         return;
       }
       LeaderboardBuild.shangeStyle(
-        SA.Build.entity.getTagStartsWith(ent, "obj:"),
+        XA.Entity.getTagStartsWith(ent, "obj:"),
         data.formValues[0]
       );
     });
@@ -687,9 +685,13 @@ export const ACTIONS1 = {
        */
       const data = d;
       if (data.isCanceled) return;
-      const ent = SA.Build.entity
-        .getClosetsEntitys(his.player, 10, "f:t", 44, false)
-        .find((e) => e.nameTag.cc() == item.name.cc());
+      const ent = XA.Entity.getClosetsEntitys(
+        his.player,
+        10,
+        "f:t",
+        44,
+        false
+      ).find((e) => e.nameTag.cc() == item.name.cc());
       if (!data.formValues[0]) ent.triggerEvent("kill");
       ent.nameTag = data.formValues[0];
     });
@@ -702,7 +704,7 @@ export const ACTIONS1 = {
       if (data.isCanceled || !data.formValues[0]) return;
       const ent = his.player.dimension.spawnEntity(
         "f:t",
-        SA.Build.entity.locationToBlockLocation(his.player.location)
+        XA.Entity.locationToBlockLocation(his.player.location)
       );
       ent.nameTag = data.formValues[0];
     });
@@ -714,7 +716,7 @@ export const ACTIONS1 = {
     form.textField("Стиль", "gray | orange | green", "");
     OpenForm(his, his.player, form, (data) => {
       if (data.isCanceled || !data.formValues[0] || !data.formValues[1]) return;
-      const l = SA.Build.entity.locationToBlockLocation(his.player.location);
+      const l = XA.Entity.locationToBlockLocation(his.player.location);
       world.say(
         LeaderboardBuild.createLeaderboard(
           data.formValues[0],
@@ -935,7 +937,7 @@ export class ChestGUI {
     for (let i = 0; i < oldInv.length; i++) {
       if (
         oldInv[i].uid != newInv[i].uid &&
-        oldInv[i].item?.id == newInv[i].item?.id &&
+        oldInv[i].item?.typeId == newInv[i].item?.typeId &&
         oldInv[i].item?.nameTag == newInv[i].item?.nameTag &&
         oldInv[i].item?.data == newInv[i].item?.data //&&
         //oldInv[i].item.getLore() == newInv[i].item.getLore()
@@ -983,11 +985,11 @@ export class ChestGUI {
           this.kill();
         }
         if (GUIitem && GUIitem != "other") {
-          if (SA.Models.entity.getHeldItem(this.player)?.id != GUIitem)
+          if (SA.Models.entity.getHeldItem(this.player)?.typeId != GUIitem)
             return this.kill();
         } else if (
           GUIitem != "other" &&
-          SA.Models.entity.getHeldItem(this.player)?.id != GUI_ITEM
+          SA.Models.entity.getHeldItem(this.player)?.typeId != GUI_ITEM
         )
           return this.kill();
 
@@ -1129,11 +1131,9 @@ export class ChestGUI {
           this.entity,
           page,
           this.player,
-          SA.Build.entity
-            .getClosetsEntitys(this.player, 10, "f:t", 44, false)
-            .map((e) =>
-              e.hasTag("lb") ? "2(::)" + e.nameTag : "1(::)" + e.nameTag
-            ),
+          XA.Entity.getClosetsEntitys(this.player, 10, "f:t", 44, false).map(
+            (e) => (e.hasTag("lb") ? "2(::)" + e.nameTag : "1(::)" + e.nameTag)
+          ),
           "text",
           "minecraft:writable_book",
           "redo",
@@ -1145,8 +1145,7 @@ export class ChestGUI {
           this.entity,
           page,
           this.player,
-          SA.Build.entity
-            .getClosetsEntitys(this.player, 10, "f:t", 44, false)
+          XA.Entity.getClosetsEntitys(this.player, 10, "f:t", 44, false)
             .filter((e) => e.hasTag("lb"))
             .map((e) => "1(::)" + e.nameTag),
           "text",
@@ -1263,7 +1262,7 @@ export async function clearPlayersPointer(player, ItemToClear) {
     for (let i = 0; i < inventory.size; i++) {
       const item = inventory.getItem(i);
       if (!item) continue;
-      if (item?.id == ItemToClear?.id) {
+      if (item?.typeId == ItemToClear?.id) {
         itemsToLoad.push({ slot: i, item: item });
         inventory.setItem;
         if (i < 9) {

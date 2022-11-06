@@ -24,8 +24,8 @@ export class WorldBuilder {
   }
   /**
    * Look if player is in the game
-   * @param {Player.name} player Player you are looking for
-   * @param {Dimension.id} dimension dimension id you want to look
+   * @param {typeof Player.name} player Player you are looking for
+   * @param {string} dimension dimension id you want to look
    * @returns {boolean}
    * @example PlayerBuilder.has('notbeer');
    */
@@ -34,7 +34,7 @@ export class WorldBuilder {
   }
   /**
    * Fetch an online players data
-   * @param {Player.name} player players name
+   * @param {typeof Player.name} player players name
    * @returns {Player | null}
    */
   fetch(player) {
@@ -45,8 +45,8 @@ export class WorldBuilder {
    * @param {number} x X position of the entity
    * @param {number} y Y position of the entity
    * @param {number} z Z position of the entity
-   * @param {String} dimension Dimesion of the entity
-   * @returns {Entity}
+   * @param {string} dimension Dimesion of the entity
+   * @returns {Entity[]}
    * @example EntityBuilder.getEntityAtPos(0, 5, 0, { dimension: 'nether', ignoreType: ['minecraft:player']});
    */
   getEntityAtPos(x, y, z, dimension = "overworld") {
