@@ -12,5 +12,6 @@
     },
     "moduleResolution": "classic"
   },
-  "include": ["./scripts/"]
+  "include": ["./scripts/"],
+  "exclude": ["loot_tables.gen.js"]
 }

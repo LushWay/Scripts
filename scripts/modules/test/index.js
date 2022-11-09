@@ -2,11 +2,10 @@ import { Log, toStr, XA } from "xapi.js";
 import {} from "@minecraft/server";
 import { CommandCallback } from "../../lib/Command/Callback.js";
 
+/**
+ * @type {Object<string, (ctx: CommandCallback) => void>}
+ */
 const tests = {
-  /**
-   *
-   * @param {CommandCallback} ctx
-   */
   1: (ctx) => {
     const o = new XA.cacheDB(ctx.sender, "basic"),
       data = o.data;
@@ -14,22 +13,18 @@ const tests = {
     data.ee = "ee";
     o.safe();
   },
-
-  /**
-   *
-   * @param {CommandCallback} ctx
-   */
   2: (ctx) => {
     const o = new XA.instantDB(ctx.sender, "basic").data;
 
     Log(toStr(o));
   },
+  3: (ctx) => {},
 };
 
 const c = new XA.Command({
-  name: "DB",
+  name: "test",
 });
 
-c.int("n").executes((ctx, n) => {
+c.int("number").executes((ctx, n) => {
   tests[n](ctx);
 });

@@ -5,6 +5,9 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "scripts": {
+    "loot_functions": "node loot_tables.gen"
+  },
   "description": "",
   "dependencies": {
     "@minecraft/server": "^1.0.0-beta.release.1.19.40",

@@ -24,7 +24,7 @@ import { CDBClass, IDBClass } from "./lib/Database/index.js";
 new Module("help", "HelpCommand");
 new Module("gui");
 new Module("test");
-new Module("error", "ErrorModule");
+// new Module("error", "ErrorModule");
 // new Module("test", "testFolder");
 // new Module("migrate");
 
