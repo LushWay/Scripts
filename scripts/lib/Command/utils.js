@@ -1,6 +1,6 @@
 import { BeforeChatEvent, Player, Location, Vector } from "@minecraft/server";
 import { CONFIG } from "config.js";
-import { handler } from "xapi.js";
+import { handler, Log } from "xapi.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandCallback } from "./Callback.js";
 import { __COMMANDS__ } from "./index.js";
@@ -163,7 +163,8 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
     argsToReturn.push(arg.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
   }
   handler(
-    () => lastArg.callback(new CommandCallback(event, cmdArgs), ...argsToReturn),
+    () =>
+      lastArg.callback(new CommandCallback(event, cmdArgs), ...argsToReturn),
     "Command"
   );
 }

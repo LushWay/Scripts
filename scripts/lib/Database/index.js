@@ -1,10 +1,9 @@
 import { CONFIG_DB } from "config.js";
-import { ThrowError, XA } from "xapi.js";
+import { ThrowError } from "xapi.js";
 import {
   DynamicPropertiesDefinition,
   world,
   MinecraftEntityTypes,
-  World,
   Player,
 } from "@minecraft/server";
 
@@ -31,7 +30,7 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 
 /**
  * @param {object} source
- * @param {string} key
+ * @param {string | any} key
  * @returns {object}
  */
 function GetData(source, key) {
@@ -41,12 +40,12 @@ function GetData(source, key) {
   let res = {};
 
   try {
+    if (!key) throw new Error("No key!");
     const a = t.getDynamicProperty(key);
-    if (typeof a !== "string") throw "Property isnt a string";
+    if (typeof a !== "string") return res;
     res = JSON.parse(a);
   } catch (e) {
-    ThrowError({ message: e.message ?? e });
-    // t.setDynamicProperty(key, "{}")
+    ThrowError({ message: `${e.message ?? e} key: ${key}`, stack: e.stack });
   }
 
   return res;
@@ -54,7 +53,7 @@ function GetData(source, key) {
 
 /**
  * @param {object} source
- * @param {string} key
+ * @param {string | any} key
  * @param {object} data
  * @returns {object}
  */
@@ -63,26 +62,30 @@ function SafeData(source, key, data) {
   const t = source;
 
   try {
+    if (!key) throw new Error("No key!");
     t.setDynamicProperty(key, JSON.stringify(data));
   } catch (e) {
-    ThrowError({ message: e.message ?? e });
-    // t.setDynamicProperty(key, "{}")
+    ThrowError({ message: `${e.message ?? e} key: ${key}`, stack: e.stack });
   }
 }
 
 /**
- * @template [S = import("./types.js").Source], [KEY = S extends typeof Player ? import("./types.js").DBkey.player : import("./types.js").DBkey.world ]
+ * @template [S = import("./types.js").Source]
  */
-class InstantDB {
+export class IDBClass {
   #source;
   #key;
   /**
    * @param {S} source
-   * @param {KEY extends string ? KEY : string} name
+   * @param {S extends Player ? import("./types.js").DBkey.player : import("./types.js").DBkey.world} name
    */
   constructor(source, name) {
     this.#source = source;
     this.#key = name;
+    this.#key =
+      source instanceof Player
+        ? CONFIG_DB.player[this.#key]
+        : CONFIG_DB.world[this.#key];
   }
   get data() {
     return GetData(this.#source, this.#key);
@@ -106,19 +109,44 @@ class InstantDB {
     data[key] = value;
     SafeData(this.#source, this.#key, data);
   }
+  values() {
+    return Object.values(this.data);
+  }
+  keys() {
+    return Object.keys(this.data);
+  }
+  /**
+   *
+   * @param {string} key
+   * @returns
+   */
+  has(key) {
+    return this.keys().includes(key);
+  }
+  /**
+   *
+   * @param {string} key
+   * @returns
+   */
+  delete(key) {
+    const data = this.data;
+    const result = delete data[key];
+    SafeData(this.#source, this.#key, data);
+    return result;
+  }
 }
 
 /**
- * @template [S = import("./types.js").Source], [KEY = S extends typeof Player ? import("./types.js").DBkey.player : import("./types.js").DBkey.world ]
+ * @template [S = import("./types.js").Source]
  */
-class CacheDB {
+export class CDBClass {
   #source;
   #key;
   /**@type {object} */
   #CachedData;
   /**
    * @param {S} source
-   * @param {KEY extends string ? KEY : string} name
+   * @param {S extends Player ? import("./types.js").DBkey.player : import("./types.js").DBkey.world} name
    */
   constructor(source, name) {
     this.#source = source;
@@ -132,6 +160,3 @@ class CacheDB {
     SafeData(this.#source, this.#key, this.#CachedData);
   }
 }
-
-export const CDBClass = CacheDB,
-  IDBClass = InstantDB;

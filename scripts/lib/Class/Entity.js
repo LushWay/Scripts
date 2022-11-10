@@ -1,11 +1,11 @@
 import {
-  world,
   BlockLocation,
   Entity,
-  Location,
   ItemStack,
+  Location,
   Player,
   PlayerInventoryComponentContainer,
+  world,
 } from "@minecraft/server";
 
 export function getPlace(place, text) {
@@ -21,6 +21,16 @@ export function getPlace(place, text) {
 }
 
 export const EClass = {
+  /**
+   *
+   * @param {string} [type]
+   * @returns
+   */
+  getEntitys(type) {
+    const e = {};
+    if (type) e.type = type;
+    return world.getDimension("overworld").getEntities(e);
+  },
   /**
    * Get entitie(s) at a position
    * @param {{x: number, y: number, z: number}} p0 position of the entity
@@ -46,38 +56,7 @@ export const EClass = {
    * @returns {Array<Entity>}
    * @example getClosetsEntitys(Entity, n=1, maxDistance = 10, type = Entity.type)
    */
-  getCClosetsEntitys(
-    entity,
-    maxDistance = null,
-    ex = null,
-    type,
-    n = 2
-  ) {
-    let q = {};
-    q.location = entity.location;
-    if (n) q.closest = n;
-    if (type) q.type = type;
-    if (ex) q.excludeTypes = ex;
-    if (maxDistance) q.maxDistance = maxDistance;
-    let entitys = [...world.getDimension("overworld").getEntities(q)];
-    return entitys;
-  },
-  /**
-   * Returns a location of the inputed aguments
-   * @param {{location: Location}} entity your using
-   * @param {number} [n] how many you want to get
-   * @param {number} [maxDistance] max distance away
-   * @param {string} [type] type of entity you want to get
-   * @returns {Array<Entity>}
-   * @example getClosetsEntitys(Entity, n=1, maxDistance = 10, type = Entity.type)
-   */
-  getClosetsEntitys(
-    entity,
-    maxDistance = null,
-    type,
-    n = 2,
-    shift = true
-  ) {
+  getClosetsEntitys(entity, maxDistance = null, type, n = 2, shift = true) {
     let q = {};
     q.location = entity.location;
     if (n) q.closest = n;
@@ -128,18 +107,6 @@ export const EClass = {
     } catch (error) {
       return 0;
     }
-  },
-  /**
-   * Gets the entitys dimension
-   * @param {Entity} entity entity you want to search
-   * @returns "overworld" | "the end" | "nether"
-   * @example getDimension('Smell of curry');
-   */
-  getDimension(entity) {
-    for (const dimension of ["overworld", "nether", "the end"]) {
-      if (entity.dimension == world.getDimension(dimension)) return dimension;
-    }
-    return "overworld";
   },
   /**
    * Tests if a entity is dead
@@ -214,7 +181,7 @@ export const EClass = {
    * @param {Entity} entity entity you want to get
    * @returns {Number}
    */
-  itemsCountClear(entity, id, count) {
+  clearItems(entity, id, count) {
     const countt = entity
       .runCommand(`clear @s ${id} -1 ${count}`)
       .statusMessage.split(": ")[1]
@@ -224,29 +191,17 @@ export const EClass = {
   /**
    *
    * @param {Player} entity
-   * @param {String} location armor | armor.chest | armor.feet | armor.legs | slot.enderchest | weapon.mainhand | weapon.offhand
-   * @param {*} itemId
+   * @param {0 | "armor" | "armor.chest" | "armor.feet" | "armor.legs" | "slot.enderchest" | "weapon.mainhand" | "weapon.offhand"} location
+   * @param {string} [itemId]
    * @returns
    */
   hasItem(entity, location, itemId) {
+    let g = "",
+      u = 0;
+    if (location) (g += `location=slot.${location}`), (u = 1);
+    if (itemId) g += `${u ? "," : ""}item=${itemId}`;
     try {
-      entity.runCommand(
-        `testfor @s[hasitem={location=slot.${location},item=${itemId}}]`
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  },
-  /**
-   *
-   * @param {Player} entity
-   * @param {*} itemId
-   * @returns
-   */
-  hasItemm(entity, itemId) {
-    try {
-      entity.runCommand(`testfor @s[hasitem={item=${itemId}}]`);
+      entity.runCommand(`testfor @s[hasitem={${g}}]`);
       return true;
     } catch (e) {
       return false;
@@ -287,8 +242,7 @@ export const EClass = {
    */
   getHeldItem(player) {
     try {
-      // @ts-ignore
-      const inventory = player.getComponent("minecraft:inventory").container;
+      const inventory = EClass.getI(player);
       return inventory.getItem(player.selectedSlot);
     } catch (error) {
       return null;
@@ -335,18 +289,6 @@ export const EClass = {
     );
   },
   /**
-   * Gets the inventory of a entity
-   * @param {Entity} entity entity you want to get
-   * @param {ItemStack} item item you want to add
-   * @returns {void}
-   * @example giveItem(Entity, itemstack);
-   */
-  giveItem(entity, item) {
-    // @ts-ignore
-    const inventory = entity.getComponent("minecraft:inventory").container;
-    inventory.addItem(item);
-  },
-  /**
    * Get the current chunk of a entity
    * @param {Entity} entity entity to check
    * @returns {Object}
@@ -385,13 +327,6 @@ export const EClass = {
       Math.floor(loc.z)
     );
   },
-  locationToBlockLocationn(loc) {
-    return new BlockLocation(
-      Math.round(loc.x),
-      Math.round(loc.y),
-      Math.round(loc.z)
-    );
-  },
   /**
    * Despawns a entity
    * @param {Entity} entity entity to despawn
@@ -409,5 +344,5 @@ export const EClass = {
     for (const p of world.getPlayers()) {
       if (p.name == name) return p;
     }
-  }
-}
+  },
+};

@@ -10,15 +10,21 @@ export const CONFIG = {
     // Enables await on every module load
     loadAwait: true,
   },
+  chat: {
+    chatCooldown: 0, // this is a cool down when players type in chat
+    range: 30,
+  },
   commandPrefix: "-",
 };
 
 export const CONFIG_DB = {
   player: {
-    test: "t",
+    chat: "chat",
   },
   world: {
     basic: "default",
     pos: "pos",
+    options: "world",
+    region: "region"
   },
 };

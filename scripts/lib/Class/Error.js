@@ -1,31 +1,27 @@
+/** @type {[RegExp | ((s: string) => string), string?][]} */
 const replaces = [
   [/\\/g, "/"],
   [/<anonymous>/, "<>"],
-  [/run \(.+\)/],
+  // [/run \(.+\)/],
   // [/\(scripts\/(.+)\)/g, "§8(§7$1§8)§f"],
   [/<> \((.+)\)/, "$1"],
   [/<input>/, "§7<eval>§r"],
   [/(.+)\(native\)/, "§8$1(native)§f"],
-  [/\.js:(\S)/, ".js:§6$1§f"],
   [
-    /**
-     *
-     * @param {string} s
-     * @returns
-     */
-    (s) => {
-      if (s.includes("lib")) return `§7${s.replace(/§./g, "")}`;
-    },
+    (s) =>
+      s.includes("lib") || s.includes("xapi.js")
+        ? `§7${s.replace(/§./g, "")}§f`
+        : s,
   ],
+  [(s) => (s.startsWith("§7") ? s : s.replace(/\.js:(\d+)/, ".js:§6$1§f"))],
 ];
 
 /**
  * @param {string} e
  */
-function lowlevelStackParse(e) {
+function oneStackParse(e) {
   for (const [r, p] of replaces) {
     if (typeof e === "string")
-      // @ts-ignore
       typeof r !== "function" ? (e = e.replace(r, p ?? "")) : (e = r(e));
   }
   return e;
@@ -42,7 +38,7 @@ export function stackParse(deleteStack = 0, stack = getStack(3 + deleteStack)) {
 
   const mappedStack = stackArray
     .map((e) => e.replace(/\s+at\s/g, ""))
-    .map(lowlevelStackParse)
+    .map(oneStackParse)
     .filter((e) => e)
     .map((e) => `\n   ${e}`);
 

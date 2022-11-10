@@ -4,11 +4,9 @@ export class Module {
   /**
    *
    * @param {string} folderName
-   * @param {string} [displayName]
    * @param {ModuleOptions} [options]
    */
-  constructor(folderName, displayName = folderName, options = {}) {
-    this.name = displayName;
+  constructor(folderName, options = {}) {
     this.folder = folderName;
 
     this.path = options.path ?? "./modules/";
@@ -17,6 +15,6 @@ export class Module {
 
     if (this.condition)
       __MODULES__[this.path + this.folder + "/" + this.file + ".js"] =
-        displayName;
+        folderName;
   }
 }

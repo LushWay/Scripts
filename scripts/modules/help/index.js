@@ -43,7 +43,7 @@ help.string("commandName").executes((ctx, commandName) => {
    * @type {CClass}
    */
   const cmd = __COMMANDS__.find(
-    (e) => e.data.name == commandName || e.data.aliases.includes(commandName)
+    (e) => e.data.name == commandName || e.data?.aliases?.includes(commandName)
   );
 
   if (!cmd) return commandNotFound(ctx.sender, commandName);

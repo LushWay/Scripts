@@ -1,4 +1,5 @@
 import { BeforeChatEvent, Player } from "@minecraft/server";
+import { Log } from "xapi.js";
 
 export class CommandCallback {
   /**

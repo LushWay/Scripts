@@ -1,19 +1,24 @@
-import { Player, system, world } from "@minecraft/server";
+import { Items, Player, system, world } from "@minecraft/server";
 world.say("§9┌ §fLoading...");
 let loading = true;
 
-import "./lib/types/prototypes.js";
 import { CONFIG } from "config.js";
-import { Timeout } from "./lib/Timeout.js";
-import { load } from "./lib/Module/loader.js";
-import { Module } from "./lib/Module/creator.js";
 import { EClass } from "./lib/Class/Entity.js";
-import { text } from "./lib/Lang/text.js";
+import { stackParse } from "./lib/Class/Error.js";
+import { EVClass } from "./lib/Class/Events.js";
+import { CClass } from "./lib/Command/Command.js";
+import { CDBClass, IDBClass } from "./lib/Database/index.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { parse } from "./lib/Lang/parser.js";
-import { CClass } from "./lib/Command/Command.js";
-import { stackParse } from "./lib/Class/Error.js";
-import { CDBClass, IDBClass } from "./lib/Database/index.js";
+import { text } from "./lib/Lang/text.js";
+import { Module } from "./lib/Module/creator.js";
+import { load } from "./lib/Module/loader.js";
+import * as tables from "./lib/oldDB/tables.js";
+import { Timeout } from "./lib/Timeout.js";
+import "./lib/types/prototypes.js";
+import { Chat } from "./lib/Class/Chat.js";
+import { wo } from "./lib/Class/Options.js";
+import { O } from "./lib/Class/D.js";
 
 /**==============================================
  * *                  Modules
@@ -21,28 +26,44 @@ import { CDBClass, IDBClass } from "./lib/Database/index.js";
  * List of ALL modules that will be loaded
  *
  *=============================================**/
-new Module("help", "HelpCommand");
-new Module("gui");
+new Module("help");
+new Module("Gui");
 new Module("test");
-// new Module("error", "ErrorModule");
-// new Module("test", "testFolder");
-// new Module("migrate");
+new Module("Battle Royal");
+new Module("Server");
+new Module("BuildRegion");
+new Module("Chat");
+
+if (false) {
+  new Module("Lmao");
+  new Module("GameTest");
+  new Module("Leaderboards");
+  new Module("Airdrops");
+  new Module("Chest GUI/src");
+  if (!wo.QQ("import:cmd:wb:disable"))
+    new Module("World Edit", { fileName: "WORLDindex.js" });
+  if (Items.get("addon:akm")) new Module("Guns");
+  new Module("migrate");
+}
 
 /*=============================================*/
 
-export const XA = {
-  Entity: EClass,
-  Lang: {
+export class XA {
+  static events = EVClass;
+  static Entity = EClass;
+  static Chat = new Chat();
+  static Lang = {
     lang: text,
     emoji: emoji,
     parse: parse,
-  },
-  Command: CClass,
-  o: world.getDimension("overworld"),
+  };
+  static Command = CClass;
+  static o = O;
+  static OLDDB = tables;
 
-  instantDB: IDBClass,
-  cacheDB: CDBClass,
-};
+  static instantDB = IDBClass;
+  static cacheDB = CDBClass;
+}
 
 system.events.beforeWatchdogTerminate.subscribe((d) => {
   d.cancel = true;
@@ -56,14 +77,23 @@ system.events.beforeWatchdogTerminate.subscribe((d) => {
  * @param {function} callback
  * @param {number} ticks
  */
-export function setInterval(callback, ticks) {
+export function setTickInterval(callback, ticks) {
   return Timeout(ticks, callback, true);
 }
+
+/**
+ *
+ * @param {number} time
+ * @returns
+ */
+export const sleep = (time) =>
+  new Promise((resolve) => setTickTimeout(resolve, time));
+
 /**
  * @param {function} callback
  * @param {number} ticks
  */
-export function setTimeout(callback, ticks) {
+export function setTickTimeout(callback, ticks) {
   return Timeout(ticks, callback);
 }
 
@@ -207,6 +237,7 @@ export async function handler(func, type) {
       {
         message: `${e.name}: §f${e.message ?? e}`,
         name: type,
+        stack: e.stack,
       },
       1
     );

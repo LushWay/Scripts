@@ -1,5 +1,5 @@
 import { Log, toStr, XA } from "xapi.js";
-import {} from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { CommandCallback } from "../../lib/Command/Callback.js";
 
 /**
@@ -7,16 +7,18 @@ import { CommandCallback } from "../../lib/Command/Callback.js";
  */
 const tests = {
   1: (ctx) => {
-    const o = new XA.cacheDB(ctx.sender, "basic"),
+    const o = new XA.cacheDB(ctx.sender, "test"),
       data = o.data;
     data.val = 34;
     data.ee = "ee";
     o.safe();
   },
   2: (ctx) => {
-    const o = new XA.instantDB(ctx.sender, "basic").data;
+    const o = new XA.instantDB(ctx.sender, "test");
 
-    Log(toStr(o));
+    o.set("c", "e");
+
+    Log(toStr(o.data));
   },
   3: (ctx) => {},
 };

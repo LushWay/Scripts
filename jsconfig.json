@@ -3,8 +3,9 @@
     "alwaysStrict": true,
     "checkJs": true,
     "forceConsistentCasingInFileNames": true,
-    "target": "es2020",
     "lib": ["ES2020"],
+    "target": "es2020",
+    "traceResolution": true,
     "module": "es2020",
     "baseUrl": "./",
     "paths": {

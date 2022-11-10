@@ -59,6 +59,7 @@ Array.prototype.inaccurateSearch = function (e) {
   return Object.entries(res).sort((a, b) => b[1] - a[1]);
 };
 
+String.prototype.cc = () => this.replace(/§./g, "");
 /**
  *
  * @param {*} string

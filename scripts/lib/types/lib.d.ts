@@ -23,6 +23,7 @@ interface String {
    * @param search Строка, которую нужно сравнить
    */
   similiarTo(search: string): number;
+  cc(): string;
 }
 
 interface Array {
@@ -45,6 +46,10 @@ interface Configuration {
     logPath: "chat" | "console" | "disabled";
     /* Where you wanna see error messages */
     errPath: "chat" | "console";
+  };
+  chat: {
+    chatCooldown: number;
+    range: number;
   };
   module: {
     /* Enables await on every module load */
