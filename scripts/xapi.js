@@ -74,6 +74,28 @@ system.events.beforeWatchdogTerminate.subscribe((d) => {
 });
 
 /**
+ * The roles that are in this server
+ */
+export const ROLES = {
+  member: 0,
+  admin: 1,
+  moderator: 2,
+  builder: 3,
+};
+
+/**
+ * Gets the role of this player
+ * @param  {Player | string} player player to get role from
+ * @returns {keyof typeof ROLES}
+ * @example getRole("Smell of curry")
+ */
+export function getRole(player) {
+  if (!(player instanceof Player)) player = XA.Entity.fetch(player);
+  // TODO!
+  return player.getDynamicProperty("role") ?? "member";
+}
+
+/**
  * @param {function} callback
  * @param {number} ticks
  */
