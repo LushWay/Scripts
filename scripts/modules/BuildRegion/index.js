@@ -1,4 +1,4 @@
-import { setTickInterval } from "xapi.js";
+import { setTickInterval, getRole } from "xapi.js";
 import { BlockLocation, world } from "@minecraft/server";
 
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "./config.js";
