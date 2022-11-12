@@ -1,62 +1,26 @@
-import { Log } from "xapi.js";
+import { XA } from "xapi.js";
 import { world } from "@minecraft/server";
-import { ScoreboardDatabase } from "./Scoreboard.js";
-//import { DynamicPropertysDatabase } from "./types/DynamicPropertys.js"
-/*
-|--------------------------------------------------------------------------
-| Scoreboard Databases
-|--------------------------------------------------------------------------
-|
-| This is a list of all then Scoreboard Database consts each one
-| registers the database instance on world load to add a new
-| one simply construct a new ScoreboardDatabase instance
-|
-*/
 
-const a = {};
-a.basic = new ScoreboardDatabase("default");
-a.permissions = new ScoreboardDatabase("permissions");
-a.chests = new ScoreboardDatabase("chests");
-a.pos = new ScoreboardDatabase("pos");
-a.kits = new ScoreboardDatabase("kits");
-a.drops = new ScoreboardDatabase("drop");
-a.lb = new ScoreboardDatabase("liderboards");
-a.db = new ScoreboardDatabase("world");
+const db = new XA.cacheDB(world, "options");
 
-/*
-|--------------------------------------------------------------------------
-| Item Databases
-|--------------------------------------------------------------------------
-|
-| This is a list of all then item Database consts each one
-| registers the database instance on world load to add a new
-| one simply construct a new ItemDatabase instance
-|
-*/
-
-//a.sett = new DynamicPropertysDatabase('set')
-// a.i = new ItemDatabase('items')
-
-let w = {};
-for (const [i, e] of Object.entries(a)) {
-  w[e.TABLE_NAME + "___" + i] = e.getCollection();
+const data = {
+	"chat:range": 40,
+	"chat:Cooldown": 0,
+	"spawn:pos": "-462 244 730",
+	"aa:save": "список постоек на спавне",
+	"anarch:pos": "-453 243 762",
+	"minigames:pos": "10000 245 10000",
+	"perm:data": 19715,
+	"spawn:title": "§aShpinat §6Mine",
+	"spawn:subtitle": "§3Привет!",
+	"zone:center": "-4500, -4500",
+	"br:pos": "6737 -14 9142",
+	"br:time": "15:00",
+	"br:gamepos": "6775 9261",
+	"simulatedplayer:name": "ботик",
+	"simulatedplayer:time": "100000",
+};
+for (const key in data) {
+	db.data[key] = data[key];
 }
-console.warn(JSON.stringify(w));
-
-world.events.beforeChat.subscribe((data) => {
-  data.sendToTargets = true;
-  data.targets = [];
-});
-
-world.events.chat.subscribe((data) => {
-  if (data.message.startsWith("defow.")) return;
-  world.say(
-    `§l§8[§r${
-      data.sender
-        .getTags()
-        .find((tag) => tag.startsWith("rank:"))
-        ?.substring(5)
-        ?.replace(/--/g, "§r§l§8][§r") ?? "§bMember"
-    }§l§8]§r §7${data.sender.nameTag}:§r ${data.message}`
-  );
-});
+db.safe();

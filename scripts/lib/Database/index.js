@@ -12,16 +12,17 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
    *
    * @param {DynamicPropertiesDefinition} s
    * @param {string} p
+   * @param {number} [v]
    * @returns
    */
-  const add = (s, p) => s.defineString(p, 4294967295);
+  const add = (s, p, v) => s.defineString(p, v > 0 ? v : 4294967295);
 
   const e = new DynamicPropertiesDefinition();
-  for (const prop of Object.values(CONFIG_DB.world)) add(e, prop);
+  for (const prop in CONFIG_DB.world) add(e, prop);
   propertyRegistry.registerWorldDynamicProperties(e);
 
   const e2 = new DynamicPropertiesDefinition();
-  for (const prop of Object.values(CONFIG_DB.player)) add(e2, prop);
+  for (const prop in CONFIG_DB.player) add(e2, prop);
   propertyRegistry.registerEntityTypeDynamicProperties(
     e2,
     MinecraftEntityTypes.player
@@ -82,10 +83,6 @@ export class IDBClass {
   constructor(source, name) {
     this.#source = source;
     this.#key = name;
-    this.#key =
-      source instanceof Player
-        ? CONFIG_DB.player[this.#key]
-        : CONFIG_DB.world[this.#key];
   }
   get data() {
     return GetData(this.#source, this.#key);
@@ -142,8 +139,8 @@ export class IDBClass {
 export class CDBClass {
   #source;
   #key;
-  /**@type {object} */
-  #CachedData;
+  /** @type {Object} */
+  #data;
   /**
    * @param {S} source
    * @param {S extends Player ? import("./types.js").DBkey.player : import("./types.js").DBkey.world} name
@@ -153,10 +150,10 @@ export class CDBClass {
     this.#key = name;
   }
   get data() {
-    this.#CachedData = GetData(this.#source, this.#key);
-    return this.#CachedData;
+    if (!this.#data) this.#data = GetData(this.#source, this.#key);
+    return this.#data;
   }
   safe() {
-    SafeData(this.#source, this.#key, this.#CachedData);
+    SafeData(this.#source, this.#key, this.#data);
   }
 }
