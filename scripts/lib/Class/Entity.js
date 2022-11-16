@@ -20,7 +20,7 @@ export function getPlace(place, text) {
 	return { P, C, rot };
 }
 
-export const EClass = {
+export const XEntity = {
 	/**
 	 *
 	 * @param {string} [type]
@@ -242,7 +242,7 @@ export const EClass = {
 	 */
 	getHeldItem(player) {
 		try {
-			const inventory = EClass.getI(player);
+			const inventory = XEntity.getI(player);
 			return inventory.getItem(player.selectedSlot);
 		} catch (error) {
 			return null;

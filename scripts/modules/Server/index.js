@@ -587,7 +587,7 @@ setTickInterval(() => {
 				);
 				q = false;
 				Atp(p, "spawn", true);
-				XA.OLDDB.pos.delete(p.name);
+				new XA.instantDB(world, "pos").delete(p.id)
 			} catch (e) {}
 		if (q)
 			try {
@@ -755,9 +755,9 @@ new XA.Command({
 	description: "",
 	requires: (p) => p.hasTag("commands"),
 }).executes((ctx) => {
-	for (const key of Object.keys(XA.OLDDB).filter((e) => e != "i")) {
+	for (const key of Object.keys(XA.tables).filter((e) => e != "i")) {
 		ctx.reply(key);
-		const c = XA.OLDDB[key].getCollection();
+		const c = XA.tables[key].getCollection();
 		const b = toStr(c, " ");
 		ctx.reply(b);
 	}
