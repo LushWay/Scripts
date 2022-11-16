@@ -1,6 +1,6 @@
-import { BeforeChatEvent, Player, Location, Vector } from "@minecraft/server";
+import { BeforeChatEvent, Location, Player, Vector } from "@minecraft/server";
 import { CONFIG } from "config.js";
-import { handler, Log } from "xapi.js";
+import { handler } from "xapi.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandCallback } from "./Callback.js";
 import { __COMMANDS__ } from "./index.js";
@@ -70,7 +70,7 @@ export function commandNotFound(player, command) {
 /**
  * Sends a command not found message to a player
  * @param {Player} player  player to send message to
- * @param {import("./Command.js").CClass} command
+ * @param {import("./Command.js").XCommand} command
  * @returns {void}
  */
 export function noPerm(player, command) {
@@ -88,7 +88,7 @@ export function noPerm(player, command) {
 /**
  * Sends a syntax failure message to player
  * @param {Player} player  undefined
- * @param {import("./Command.js").CClass} command  undefined
+ * @param {import("./Command.js").XCommand} command  undefined
  * @param {string[]} args  undefined
  * @param {number} i  undefined
  * @returns {void}
@@ -141,9 +141,9 @@ export function parseLocationAugs([x, y, z], { location, viewVector }) {
 /**
  * Sends a callback back to the command
  * @param {string[]} cmdArgs the args that the command used
- * @param {import("./Command.js").CClass<any>[]} args args to use
+ * @param {import("./Command.js").XCommand<any>[]} args args to use
  * @param {BeforeChatEvent} event
- * @param {import("./Command.js").CClass<any>} baseCommand
+ * @param {import("./Command.js").XCommand<any>} baseCommand
  */
 export function sendCallback(cmdArgs, args, event, baseCommand) {
 	const lastArg = args[args.length - 1] ?? baseCommand;
@@ -170,7 +170,7 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 }
 
 /**
- * @param {import("./Command.js").CClass} command
+ * @param {import("./Command.js").XCommand} command
  * @returns {string[]}
  */
 export function getUsage(command) {
@@ -183,7 +183,7 @@ export function getUsage(command) {
 
 /**
  *
- * @param {import("./Command.js").CClass} o
+ * @param {import("./Command.js").XCommand} o
  * @returns
  */
 function getType(o) {

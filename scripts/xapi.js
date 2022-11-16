@@ -5,37 +5,45 @@ let loading = true;
 import { CONFIG } from "config.js";
 import { Chat } from "./lib/Class/Chat.js";
 import { O } from "./lib/Class/D.js";
-import { EClass } from "./lib/Class/Entity.js";
+import { XEntity } from "./lib/Class/Entity.js";
 import { stackParse } from "./lib/Class/Error.js";
 import { EVClass } from "./lib/Class/Events.js";
-import { CClass } from "./lib/Command/Command.js";
-import { CDBClass, IDBClass } from "./lib/Database/index.js";
+import { XCommand } from "./lib/Command/Command.js";
+import { XCacheDatabase, XInstantDatabase } from "./lib/Database/index.js";
+import { XItemDatabase } from "./lib/Database/Item.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { parse } from "./lib/Lang/parser.js";
 import { text } from "./lib/Lang/text.js";
 import { load } from "./lib/Module/loader.js";
-import * as tables from "./lib/oldDB/tables.js";
+import { XMSync } from "./lib/Module/sync.js";
 import { Timeout } from "./lib/Timeout.js";
 import "./lib/types/prototypes.js";
 import "./modules/modules.js";
-import { MSync } from "./lib/Module/sync.js";
 
 export class XA {
 	static events = EVClass;
-	static Entity = EClass;
-	static Chat = new Chat();
+	static Entity = XEntity;
+	static Chat = Chat;
 	static Lang = {
 		lang: text,
 		emoji: emoji,
 		parse: parse,
 	};
-	static Command = CClass;
+	static Command = XCommand;
 	static o = O;
-	static OLDDB = tables;
+	static tables = {
+		chests: new XInstantDatabase(world, "chests"),
+		pos: new XInstantDatabase(world, "pos"),
+		kits: new XInstantDatabase(world, "kits"),
+		drops: new XInstantDatabase(world, "drop"),
+		i: new XItemDatabase("items"),
+	};
 
-	static instantDB = IDBClass;
-	static cacheDB = CDBClass;
-	static Module = MSync;
+	static instantDB = XInstantDatabase;
+	static cacheDB = XCacheDatabase;
+	static Module = XMSync;
+	/** @protected */
+	constructor() {}
 }
 
 system.events.beforeWatchdogTerminate.subscribe((d) => {
@@ -64,7 +72,7 @@ export const ROLES = {
  */
 export function getRole(player) {
 	if (player instanceof Player) player = player.id;
-	const e = new IDBClass(world, "roles").get(player);
+	const e = new XInstantDatabase(world, "roles").get(player);
 	if (e !== "member" && e !== "admin" && e !== "moderator" && e !== "builder")
 		return "member";
 

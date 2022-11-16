@@ -1,5 +1,5 @@
 import { BlockLocation, Entity, world } from "@minecraft/server";
-import { IDBClass } from "../../../lib/Database/index.js";
+import { XInstantDatabase } from "../../../lib/Database/index.js";
 import { DEFAULT_REGION_PERMISSIONS } from "../config.js";
 
 /**
@@ -33,7 +33,7 @@ function betweenXYZ(XYZa, XYZb, XYZc) {
 	);
 }
 
-const TABLE = new IDBClass(world, "region");
+const TABLE = new XInstantDatabase(world, "region");
 
 export class Region {
 	/** @type {string} */

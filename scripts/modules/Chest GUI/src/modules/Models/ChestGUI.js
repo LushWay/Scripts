@@ -442,14 +442,14 @@ class Itemss {
 	 */
 	static fill(entity, itema = null) {
 		if (itema) {
-			XA.OLDDB.i.add(itema);
+			// XA.tables.i.add(itema);
 			console.warn(itema.id);
 		}
 		/**
 		 * @type {InventoryComponentContainer}
 		 */
 		const container = entity.getComponent("minecraft:inventory").container;
-		let items = XA.OLDDB.i.items();
+		// let items = XA.tables.i.items();
 		for (let i = 0; i < container.size; i++) {
 			let im;
 			/**

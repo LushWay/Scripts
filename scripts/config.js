@@ -19,13 +19,18 @@ export const CONFIG = {
 
 export const CONFIG_DB = {
 	player: {
-		basic: 0,
+		basic: 2 ** 15,
 	},
 	world: {
-		basic: 0,
-		pos: 0,
-		options: 0,
-		region: 0,
-		roles: 0,
+		pos: 2 ** 10,
+		chests: 2 ** 10,
+		options: 2 ** 10,
+		region: 2 ** 10,
+		kits: 2 ** 10,
+		chest: 2 ** 10,
+		drop: 2 ** 10,
+		roles: 2 ** 11,
+		leaderboard: 2 ** 15,
+		basic: 2 ** 10,
 	},
 };

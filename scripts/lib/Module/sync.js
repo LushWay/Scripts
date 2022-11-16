@@ -5,7 +5,7 @@ import { XA } from "xapi.js";
  * @param {string} name Name
  * @param {any} data Data to sync
  */
-function register(name, data) {
+function sync(name, data) {
 	XA.Module.data[name] = data;
 }
 
@@ -21,8 +21,8 @@ function get(name) {
 	return synced;
 }
 
-export const MSync = {
-	data: {},
-	register,
+export const XMSync = {
+	sync,
 	get,
+	data: {},
 };
