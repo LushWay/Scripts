@@ -1,5 +1,5 @@
 import { BeforeChatEvent, Location, Player, Vector } from "@minecraft/server";
-import { CONFIG } from "config.js";
+import { CONFIG } from "../../config.js";
 import { handler } from "xapi.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandCallback } from "./Callback.js";

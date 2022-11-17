@@ -7,10 +7,10 @@ new Module("Gui");
 new Module("test");
 new Module("Battle Royal");
 new Module("Server");
-new Module("BuildRegion");
 new Module("Chat");
 
 if (false) {
+  new Module("BuildRegion");
 	new Module("Lmao");
 	new Module("GameTest");
 	new Module("Leaderboards");

@@ -2,7 +2,7 @@ import { Player, system, world } from "@minecraft/server";
 world.say("§9┌ §fLoading...");
 let loading = true;
 
-import { CONFIG } from "config.js";
+import { CONFIG } from "./config.js";
 import { Chat } from "./lib/Class/Chat.js";
 import { O } from "./lib/Class/D.js";
 import { XEntity } from "./lib/Class/Entity.js";
@@ -93,7 +93,7 @@ export function setTickInterval(callback, ticks) {
  * @returns
  */
 export const sleep = (time) =>
-	new Promise((resolve) => setTickTimeout(resolve, time));
+	new Promise((resolve) => setTickTimeout(() => resolve(), time));
 
 /**
  * @param {Function} callback

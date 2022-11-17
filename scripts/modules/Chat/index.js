@@ -1,6 +1,6 @@
 import { Player, world } from "@minecraft/server";
 import { getRole, ThrowError, XA } from "xapi.js";
-import { CONFIG } from "config.js";
+import { CONFIG } from "../../config.js";
 import { po, wo } from "../../lib/Class/Options.js";
 
 world.events.beforeChat.subscribe((data) => {

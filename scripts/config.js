@@ -32,5 +32,6 @@ export const CONFIG_DB = {
 		roles: 2 ** 11,
 		leaderboard: 2 ** 15,
 		basic: 2 ** 10,
+		buildRegion: 2 ** 11,
 	},
 };

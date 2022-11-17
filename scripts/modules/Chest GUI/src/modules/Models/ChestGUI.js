@@ -41,7 +41,6 @@ import {
 } from "../../../../Server/index.js";
 import { Atp } from "../../../../Server/portals.js";
 import { stats } from "../../../../Server/stats.js";
-import { ENTITY_INVENTORY, GUI_ITEM } from "../../config.js";
 import {
 	auxa,
 	DEFAULT_STATIC_PAGE_ID,

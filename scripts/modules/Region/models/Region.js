@@ -1,6 +1,6 @@
 import { BlockLocation, Entity, world } from "@minecraft/server";
-import { XInstantDatabase } from "../../../lib/Database/index.js";
 import { DEFAULT_REGION_PERMISSIONS } from "../config.js";
+import { XA } from "../../../xapi.js";
 
 /**
  * Holds all regions in memory so its not grabbing them so much
@@ -33,7 +33,7 @@ function betweenXYZ(XYZa, XYZb, XYZc) {
 	);
 }
 
-const TABLE = new XInstantDatabase(world, "region");
+const TABLE = new XA.instantDB(world, "region");
 
 export class Region {
 	/** @type {string} */
@@ -103,8 +103,8 @@ export class Region {
 	 * @param {IRegionCords} from
 	 * @param {IRegionCords} to
 	 * @param {string} dimensionId
-	 * @param {IRegionPermissions} permissions
-	 * @param {string} key
+	 * @param {IRegionPermissions} [permissions]
+	 * @param {string} [key]
 	 */
 	constructor(from, to, dimensionId, permissions, key) {
 		this.from = from;

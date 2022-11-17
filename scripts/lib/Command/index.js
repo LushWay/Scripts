@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { CONFIG } from "config.js";
+import { CONFIG } from "../../config.js";
 import {
 	commandNotFound,
 	commandSyntaxFail,

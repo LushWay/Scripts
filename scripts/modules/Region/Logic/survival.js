@@ -1,16 +1,16 @@
 import {
-	Player,
-	Entity,
-	world,
-	Location,
 	BlockLocation,
+	Entity,
+	Location,
+	Player,
+	world,
 } from "@minecraft/server";
+import { setTickInterval, setTickTimeout, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../lib/Class/D.js";
-import { setTickTimeout, XA, setTickInterval } from "xapi.js";
-import { DOORS_SWITCHES, BLOCK_CONTAINERS } from "../config.js";
+import { ScoreboardDB } from "../../../lib/Class/Options.js";
+import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../config.js";
 import { CONTAINER_LOCATIONS } from "../container.js";
 import { Region } from "../Models/Region.js";
-import { ScoreboardDB } from "../../../lib/Class/Options.js";
 
 XA.Module.sync("InRaid", {});
 
@@ -66,14 +66,6 @@ world.events.beforeItemUseOn.subscribe((data) => {
 	);
 	if (!region || allowed(data.source, region)) return;
 	const block = data.source.dimension.getBlock(data.blockLocation);
-
-
-
-
-
-
-
-
 
 	if (
 		DOORS_SWITCHES.includes(block.typeId) &&

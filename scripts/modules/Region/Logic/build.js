@@ -1,15 +1,16 @@
 import {
-	Player,
-	Entity,
-	world,
-	Location,
 	BlockLocation,
+	Entity,
+	Location,
+	Player,
+	world,
 } from "@minecraft/server";
+import { getRole, setTickInterval, setTickTimeout } from "xapi.js";
 import { DIMENSIONS } from "../../../lib/Class/D.js";
-import { setTickTimeout, XA, setTickInterval, getRole } from "xapi.js";
-import { DOORS_SWITCHES, BLOCK_CONTAINERS } from "../config.js";
+import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../config.js";
 import { CONTAINER_LOCATIONS } from "../container.js";
 import { Region } from "../Models/Region.js";
+import "./buildManage.js";
 
 /**
  *
