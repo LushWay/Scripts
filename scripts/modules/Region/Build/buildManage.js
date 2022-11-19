@@ -1,8 +1,8 @@
+import { Player, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { world, Player, BlockLocation } from "@minecraft/server";
-import { sleep, XA } from "xapi.js";
-import { Region } from "../Models/Region.js";
-import { lang } from "../lang.js";
+import { XA } from "xapi.js";
+import { lang } from "../utils/lang.js";
+import { Region } from "../utils/Region.js";
 import { findFreePlace } from "./utils.js";
 
 const db = new XA.instantDB(world, "buildRegion");

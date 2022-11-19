@@ -1,6 +1,6 @@
 import { BlockLocation } from "@minecraft/server";
 import { sleep } from "../../../xapi.js";
-import { Region } from "../Models/Region.js";
+import { Region } from "../utils/Region.js";
 
 /**
  * @param {IRegionCords} center

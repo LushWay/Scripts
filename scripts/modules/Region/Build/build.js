@@ -5,45 +5,12 @@ import {
 	Player,
 	world,
 } from "@minecraft/server";
-import { setTickInterval, setTickTimeout, XA } from "xapi.js";
+import { getRole, setTickInterval, setTickTimeout } from "xapi.js";
 import { DIMENSIONS } from "../../../lib/Class/D.js";
-import { ScoreboardDB } from "../../../lib/Class/Options.js";
-import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../config.js";
-import { CONTAINER_LOCATIONS } from "../container.js";
-import { Region } from "../Models/Region.js";
-
-XA.Module.sync("InRaid", {});
-
-/**
- * @type {Record<string, number>}
- */
-const InRaid = XA.Module.require("InRaid");
-
-const pvpDB = new ScoreboardDB("pvp");
-
-setTickInterval(() => {
-	for (const id in InRaid) {
-		const player = XA.Entity.fetch(id);
-		if (player) {
-			if (pvpDB.Eget(player) === 0) {
-				player.tell(
-					"§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны."
-				);
-				player.playSound("mob.wolf.bark");
-			}
-			pvpDB.Eset(player, InRaid[id]);
-			delete InRaid[id];
-			continue;
-		}
-
-		InRaid[id]--;
-		if (InRaid[id] <= 0) {
-			// Время вышло, игрока не было
-			delete InRaid[id];
-			continue;
-		}
-	}
-}, 20);
+import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
+import { CONTAINER_LOCATIONS } from "../utils/container.js";
+import { Region } from "../utils/Region.js";
+import "./buildManage.js";
 
 /**
  *
@@ -52,7 +19,8 @@ setTickInterval(() => {
  */
 function allowed(player, region) {
 	return (
-		region.permissions.owners.includes(player.id) || player.hasTag("modding")
+		region.permissions.owners.includes(player.id) ||
+		["admin", "moderator"].includes(getRole(player.id))
 	);
 }
 
@@ -64,9 +32,8 @@ world.events.beforeItemUseOn.subscribe((data) => {
 		data.blockLocation,
 		data.source.dimension.id
 	);
-	if (!region || allowed(data.source, region)) return;
+	if (region && allowed(data.source, region)) return;
 	const block = data.source.dimension.getBlock(data.blockLocation);
-
 	if (
 		DOORS_SWITCHES.includes(block.typeId) &&
 		region.permissions.doorsAndSwitches
@@ -88,7 +55,7 @@ world.events.blockPlace.subscribe((data) => {
 		data.block.location,
 		data.player.dimension.id
 	);
-	if (!region || allowed(data.player, region)) return;
+	if (region && allowed(data.player, region)) return;
 	const l = data.block.location;
 	data.dimension.runCommandAsync(`setblock ${l.x} ${l.y} ${l.z} air 0 destroy`);
 });
@@ -102,7 +69,7 @@ world.events.blockBreak.subscribe(
 			block.location,
 			player.dimension.id
 		);
-		if (!region || allowed(player, region)) return;
+		if (region && allowed(player, region)) return;
 		// setting block back
 		dimension
 			.getBlock(block.location)
@@ -131,13 +98,7 @@ world.events.blockBreak.subscribe(
 	}
 );
 
-world.events.beforeExplosion.subscribe((data) => {
-	for (const bl of data.impactedBlocks) {
-		let region = Region.blockLocationInRegion(bl, data.dimension.id);
-		if (region && !region.permissions.pvp) return (data.cancel = true);
-		for (const id of region.permissions.owners) XA.Module.InRaid[id] = 60;
-	}
-});
+world.events.beforeExplosion.subscribe((data) => (data.cancel = true));
 world.events.entityCreate.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
 		new BlockLocation(

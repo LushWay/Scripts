@@ -3,7 +3,7 @@
 	"header": {
 		"name": "X-API",
 		"description": "Server Plugin on XilLeR API (based on Smelly API)",
-		"uuid": "13a3a79d-e77d-4aa2-9aa5-8d7822a5b8fa",
+		"uuid": "8198b306-bfbb-48c9-874d-217cd4cef1ae",
 		"version": [1, 0, 0],
 		"min_engine_version": [1, 19, 40]
 	},
@@ -11,16 +11,16 @@
 		{
 			"description": "Data Module",
 			"type": "data",
-			"uuid": "295215cf-54ae-4b06-ac30-04add39b11b0",
+			"uuid": "786cb1e6-e840-40d7-a986-9fb9e348634a",
 			"version": [2, 1, 0]
 		},
 		{
 			"description": "Gametest Module",
 			"language": "javascript",
 			"type": "script",
-			"uuid": "89efbcb5-02ff-4faf-b58f-5dd9574a8069",
+			"uuid": "4f6a99e0-c4a2-4172-8818-c753d5cdab1f",
 			"version": [2, 1, 0],
-			"entry": "scripts/xapi.js"
+			"entry": "scripts/index.js"
 		}
 	],
 	"dependencies": [

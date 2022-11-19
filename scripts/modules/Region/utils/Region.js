@@ -1,6 +1,6 @@
 import { BlockLocation, Entity, world } from "@minecraft/server";
-import { DEFAULT_REGION_PERMISSIONS } from "../config.js";
 import { XA } from "../../../xapi.js";
+import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
 /**
  * Holds all regions in memory so its not grabbing them so much

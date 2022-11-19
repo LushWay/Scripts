@@ -1,8 +1,8 @@
 import { world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
 
+import { BlockInventory } from "./BlockInventory.js";
 import { BLOCK_CONTAINERS, CHECK_SIZE } from "./config.js";
-import { BlockInventory } from "./Models/BlockInventory.js";
 
 /**
  * storage of all container locations in the world

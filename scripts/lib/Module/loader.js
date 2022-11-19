@@ -1,18 +1,17 @@
 import { ThrowError, __CORE_IMPORT__ } from "xapi.js";
 import { CONFIG } from "config.js";
-import { MODULES } from "../../modules/modules.js";
+
+/**
+ * @type {Object<string, string>}
+ */
+export const __MODULES__ = {};
 
 /**
  *
  * @param {(file: string) => Promise} importFunction
  * @param {Object<string, string>} arrayOfFiles
  */
-export async function multiload(
-	importFunction,
-	arrayOfFiles,
-	type = "sub",
-	wait = false
-) {
+export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 	for (const [path, name] of Object.entries(arrayOfFiles)) {
 		const er = (e) =>
 			ThrowError({
@@ -27,7 +26,7 @@ export async function multiload(
 		try {
 			const module = importFunction(path);
 
-			if (wait) await module;
+			if (CONFIG.module.loadAwait) await module;
 			else module.catch(er);
 		} catch (e) {
 			er(e);
@@ -36,15 +35,5 @@ export async function multiload(
 }
 
 export async function load() {
-	return multiload(
-		__CORE_IMPORT__,
-		Object.fromEntries(
-			Object.entries(MODULES).map(([key, value]) => [
-				value.path + key + "/" + value.fileName + ".js",
-				key,
-			])
-		),
-		"X-API",
-		CONFIG.module.loadAwait
-	);
+	return multiload(__CORE_IMPORT__, __MODULES__, "X-API");
 }

@@ -23,6 +23,4 @@ interface IModuleOptions {
 	fileName?: string;
 	/* Default: true */
 	condition?: boolean;
-	/* */
-	dependencies?: keyof import("../../modules/modules.js").MODULES;
 }

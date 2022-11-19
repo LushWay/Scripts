@@ -15,7 +15,6 @@ import { emoji } from "./lib/Lang/emoji.js";
 import { parse } from "./lib/Lang/parser.js";
 import { text } from "./lib/Lang/text.js";
 import { load } from "./lib/Module/loader.js";
-import { XMSync } from "./lib/Module/sync.js";
 import { Timeout } from "./lib/Timeout.js";
 import "./lib/types/prototypes.js";
 import "./modules/modules.js";
@@ -41,7 +40,7 @@ export class XA {
 
 	static instantDB = XInstantDatabase;
 	static cacheDB = XCacheDatabase;
-	static Module = XMSync;
+
 	/** @protected */
 	constructor() {}
 }

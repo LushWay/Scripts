@@ -1,19 +1,3 @@
-/**
- *
- * @param {IModuleOptions} options
- */
-export function m(options) {
-	/** @type {IModuleOptions} */
-	const data = {
-		path: options.path ?? "./modules/",
-		fileName: options.fileName ?? "index",
-		condition: options.condition ?? true,
-		dependencies: options.dependencies ?? [],
-	};
-
-	return data;
-}
-
 export class Module {
 	/**
 	 *

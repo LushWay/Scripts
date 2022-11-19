@@ -1,6 +1,6 @@
 import { Items } from "@minecraft/server";
 import { wo } from "../lib/Class/Options.js";
-import { m, Module } from "../lib/Module/creator.js";
+import { Module } from "../lib/Module/creator.js";
 
 new Module("help");
 new Module("Gui");
@@ -23,10 +23,3 @@ if (false) {
 	if (Items.get("addon:akm")) new Module("Guns");
 	new Module("migrate");
 }
-
-export const MODULES = {
-	e: m({}),
-	s: m({
-		dependencies: "e",
-	}),
-};

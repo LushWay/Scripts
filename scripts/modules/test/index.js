@@ -7,7 +7,8 @@ import {
 	world,
 } from "@minecraft/server";
 import { CommandCallback } from "../../lib/Command/Callback.js";
-import "./t.js";
+import "./t.js.js";
+import { ModalForm } from "../../lib/Form/Models/ModelForm.js";
 
 /**
  * @type {Object<string, (ctx?: CommandCallback) => void | Promise>}
@@ -27,7 +28,7 @@ const tests = {
 
 		Log(toStr(o.data));
 	},
-	3: async (ctx) => {
+	3: async () => {
 		try {
 			await tests[4]();
 		} catch (error) {}
@@ -114,6 +115,16 @@ const tests = {
 		}
 	},
 	4: async () => XA.o.runCommandAsync("fill -10 -60 -10 10 -60 10 air"),
+	5: (ctx) => {
+		const form = new ModalForm("TITLE");
+
+		for (let c = 0; c < 20; c++) form.addToggle("toggle", false);
+
+		form.show(ctx.sender, (ctx, ...values) => {
+			if (values[0]) ctx.error("ER");
+			Log(toStr(values));
+		});
+	},
 };
 
 const c = new XA.Command({
