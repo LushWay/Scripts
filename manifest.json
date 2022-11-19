@@ -1,36 +1,36 @@
 {
-  "format_version": 2,
-  "header": {
-    "name": "X-API",
-    "description": "Server Plugin on XilLeR API (based on Smelly API)",
-    "uuid": "13a3a79d-e77d-4aa2-9aa5-8d7822a5b8fa",
-    "version": [1, 0, 0],
-    "min_engine_version": [1, 19, 40]
-  },
-  "modules": [
-    {
-      "description": "Data Module",
-      "type": "data",
-      "uuid": "295215cf-54ae-4b06-ac30-04add39b11b0",
-      "version": [2, 1, 0]
-    },
-    {
-      "description": "Gametest Module",
-      "language": "javascript",
-      "type": "script",
-      "uuid": "89efbcb5-02ff-4faf-b58f-5dd9574a8069",
-      "version": [2, 1, 0],
-      "entry": "scripts/index.js"
-    }
-  ],
-  "dependencies": [
-    {
-      "module_name": "@minecraft/server",
-      "version": "1.0.0-beta"
-    },
-    {
-      "module_name": "@minecraft/server-ui",
-      "version": "1.0.0-beta"
-    }
-  ]
+	"format_version": 2,
+	"header": {
+		"name": "X-API",
+		"description": "Server Plugin on XilLeR API (based on Smelly API)",
+		"uuid": "13a3a79d-e77d-4aa2-9aa5-8d7822a5b8fa",
+		"version": [1, 0, 0],
+		"min_engine_version": [1, 19, 40]
+	},
+	"modules": [
+		{
+			"description": "Data Module",
+			"type": "data",
+			"uuid": "295215cf-54ae-4b06-ac30-04add39b11b0",
+			"version": [2, 1, 0]
+		},
+		{
+			"description": "Gametest Module",
+			"language": "javascript",
+			"type": "script",
+			"uuid": "89efbcb5-02ff-4faf-b58f-5dd9574a8069",
+			"version": [2, 1, 0],
+			"entry": "scripts/xapi.js"
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "1.0.0-beta"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "1.0.0-beta"
+		}
+	]
 }

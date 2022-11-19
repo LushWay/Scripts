@@ -17,7 +17,7 @@ XA.Module.sync("InRaid", {});
 /**
  * @type {Record<string, number>}
  */
-const InRaid = XA.Module.get("InRaid");
+const InRaid = XA.Module.require("InRaid");
 
 const pvpDB = new ScoreboardDB("pvp");
 

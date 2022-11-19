@@ -1,4 +1,18 @@
-import { __MODULES__ } from "./loader.js";
+/**
+ *
+ * @param {IModuleOptions} options
+ */
+export function m(options) {
+	/** @type {IModuleOptions} */
+	const data = {
+		path: options.path ?? "./modules/",
+		fileName: options.fileName ?? "index",
+		condition: options.condition ?? true,
+		dependencies: options.dependencies ?? [],
+	};
+
+	return data;
+}
 
 export class Module {
 	/**
@@ -13,8 +27,6 @@ export class Module {
 		this.file = options.fileName ?? "index";
 		this.condition = options.condition ?? true;
 
-		if (this.condition)
-			__MODULES__[this.path + this.folder + "/" + this.file + ".js"] =
-				folderName;
+		if (this.condition) false;
 	}
 }

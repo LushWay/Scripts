@@ -1,4 +1,4 @@
-import { XA } from "xapi.js";
+const SYNCED_DATA = {};
 
 /**
  * Registers sycnable data
@@ -6,7 +6,7 @@ import { XA } from "xapi.js";
  * @param {any} data Data to sync
  */
 function sync(name, data) {
-	XA.Module.data[name] = data;
+	SYNCED_DATA[name] = data;
 }
 
 /**
@@ -15,14 +15,13 @@ function sync(name, data) {
  * @throws
  * @returns {any}
  */
-function get(name) {
-	const synced = XA.Module.data[name];
+function require(name) {
+	const synced = SYNCED_DATA[name];
 	if (!synced) throw new Error("Unable to get synced data with name §f" + name);
 	return synced;
 }
 
 export const XMSync = {
 	sync,
-	get,
-	data: {},
+	require,
 };

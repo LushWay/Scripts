@@ -80,14 +80,6 @@ export function getRole(player) {
 }
 
 /**
- * @param {Function} callback
- * @param {number} ticks
- */
-export function setTickInterval(callback, ticks) {
-	return Timeout(ticks, callback, true);
-}
-
-/**
  *
  * @param {number} time
  * @returns
@@ -99,7 +91,15 @@ export const sleep = (time) =>
  * @param {Function} callback
  * @param {number} ticks
  */
-export function setTickTimeout(callback, ticks) {
+export function setTickInterval(callback, ticks) {
+	return Timeout(ticks, callback, true);
+}
+
+/**
+ * @param {Function} callback
+ * @param {number} ticks
+ */
+export function setTickTimeout(callback, ticks = 1) {
 	return Timeout(ticks, callback);
 }
 
@@ -107,7 +107,7 @@ export function setTickTimeout(callback, ticks) {
  * @param {(cl: Player) => void} callback
  * @param {number} ticks
  */
-export function setPlayerInterval(callback, ticks) {
+export function setPlayerInterval(callback, ticks = 0) {
 	return Timeout(ticks, () => forPlayers(callback), true);
 }
 
@@ -115,7 +115,7 @@ export function setPlayerInterval(callback, ticks) {
  * @param {(cl: Player) => void} callback
  * @param {number} ticks
  */
-export function setPlayerTimeout(callback, ticks) {
+export function setPlayerTimeout(callback, ticks = 1) {
 	return Timeout(ticks, () => forPlayers(callback));
 }
 
