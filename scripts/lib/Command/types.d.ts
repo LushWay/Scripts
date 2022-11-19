@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { XCommand } from "./Command";
+import { XCommand } from "./Command.js";
 
 export interface ICommandData {
 	/**

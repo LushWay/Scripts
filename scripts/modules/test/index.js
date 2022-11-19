@@ -7,6 +7,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { CommandCallback } from "../../lib/Command/Callback.js";
+import "./t.js";
 
 /**
  * @type {Object<string, (ctx?: CommandCallback) => void | Promise>}
@@ -39,7 +40,7 @@ const tests = {
 		/** @type {IRegionCords[]} */
 		const regs = [];
 
-		const size = 1; // size
+		const size = 30; // size
 		const size2 = size / 2;
 
 		/**
@@ -58,8 +59,8 @@ const tests = {
 		 * @returns {T[]}
 		 */
 		function moveEls(arr) {
-			let lm = arr.shift();
-			return lm ? [...arr, lm] : arr;
+			const lm = arr.shift();
+			return undefined !== lm ? [...arr, lm] : arr;
 		}
 
 		/**
@@ -71,47 +72,41 @@ const tests = {
 			let from;
 			let to;
 			const visited = [];
-			/** @type {"x" | "z"} */
-			let xORz = "x";
-			let x = 1;
-			let z = -1;
+			let x = [-1, 0, 1, 0];
+			let z = [0, -1, 0, 1];
 
 			while (!from) {
-				if (tries >= 10) await sleep(10), (tries = 0);
+				tries++;
+				if (tries >= 20) await sleep(1), (tries = 0);
 
 				const reg = regs.find((e) => e.x === center.x && e.z === center.z);
 
 				if (reg) {
-					Log("§cBL:§f " + center.x + " " + center.z);
-					visited.push(center.x + " " + center.z);
-					if (xORz === "x") {
-						xORz = "z";
-						z = -z;
-					} else {
-						xORz = "x";
-						x = -x;
+					const nextCenter = moveCenter(center, x[1], z[1]);
+					if (!visited.includes(nextCenter.x + " " + nextCenter.z)) {
+						x = moveEls(x);
+						z = moveEls(z);
 					}
-					center = moveCenter(
-						center,
-						xORz === "x" ? x : 0,
-						xORz === "z" ? z : 0
-					);
+
+					center = moveCenter(center, x[0], z[0]);
+					visited.push(center.x + " " + center.z);
 				} else {
 					from = { x: center.x - size2, z: center.z - size2 };
 					to = { x: center.x + size2, z: center.z + size2 };
 					break;
 				}
 			}
-			await sleep(20);
+
 			return { from, to };
 		}
 
 		let c = 0;
-		while (c < 5) {
+		while (c < 100) {
 			c++;
 			const reg = await findFreePlace();
+			await sleep(5);
+			if (!reg.from) continue;
 			const center = { x: reg.from.x + size2, z: reg.from.z + size2 };
-			Log(`x: ${center.x}, z: ${center.z}`);
 			XA.o
 				.getBlock(new BlockLocation(center.x, -60, center.z))
 				.setType(MinecraftBlockTypes.amethystBlock);

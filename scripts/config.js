@@ -20,6 +20,7 @@ export const CONFIG = {
 export const CONFIG_DB = {
 	player: {
 		basic: 2 ** 15,
+		test: 2 ** 3,
 	},
 	world: {
 		pos: 2 ** 10,

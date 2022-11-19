@@ -1,8 +1,8 @@
 import { Location } from "@minecraft/server";
 import { IArgumentType } from "./ArgumentTypes.js";
 import { CommandCallback } from "./Callback.js";
-import type { ArgReturn, ICommandData } from "./types";
-export { ArgumentTypes } from "./ArgumentTypes";
+import { ArgReturn, ICommandData } from "./types.js";
+export { ArgumentTypes } from "./ArgumentTypes.js";
 
 export class XCommand<
 	Callback extends Function = (ctx: CommandCallback) => void
