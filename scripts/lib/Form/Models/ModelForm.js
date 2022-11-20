@@ -28,7 +28,6 @@ export class ModalForm {
 	 * The amount of times it takes to show this form in ms
 	 * if this value goes above 200 it will time out
 	 * @type {number}
-	 * @private
 	 */
 	triedToShow;
 	/**
@@ -107,7 +106,7 @@ export class ModalForm {
 	 */
 	async show(player, callback) {
 		const response = await this.form.show(player);
-		if (XFormCanceled(response, player)) return;
+		if (XFormCanceled(response, player, this)) return;
 		callback(
 			new FormCallback(this, player, callback),
 			...response.formValues.map((v, i) =>

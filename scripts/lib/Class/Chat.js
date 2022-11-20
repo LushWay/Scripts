@@ -2,27 +2,6 @@ import { Player, world } from "@minecraft/server";
 
 export const Chat = {
 	/**
-	 * Отправьте сообщение в чат
-	 * @param {string} text текстовое сообщение или код языка
-	 * @param {string} [player] Игрок, которому вы хотите транслировать
-	 * @param {Array<string>} args аргументы языка
-	 * @returns {any} Для команд, возвращающих данные, возвращает структуру JSON со значениями ответа команды.
-	 * @example broadcast('Текст', player.name)
-	 */
-	broadcast(text, player, args = []) {
-		try {
-			args = args.map(String).filter((n) => n);
-			text = text.toString().replace(/["]/g, '\\"');
-			return this.runCommand(
-				`tellraw ${
-					player ? `"${player}"` : "@a"
-				} {"rawtext":[{"translate":"${text}","with":${JSON.stringify(args)}}]}`
-			);
-		} catch (error) {
-			return { error: true };
-		}
-	},
-	/**
 	 *Запускает команду
 	 * @param {string} command minecraft /command
 	 * @param {"overworld" | "nether" | "end"} [dimension]

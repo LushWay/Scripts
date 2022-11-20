@@ -3,7 +3,7 @@ import { wo } from "../lib/Class/Options.js";
 import { Module } from "../lib/Module/creator.js";
 
 new Module("help");
-new Module("Gui");
+new Module("Menu");
 new Module("test");
 new Module("Battle Royal");
 new Module("Server");

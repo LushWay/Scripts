@@ -1,3 +1,5 @@
+import { __MODULES__ } from "./loader.js";
+
 export class Module {
 	/**
 	 *
@@ -11,6 +13,8 @@ export class Module {
 		this.file = options.fileName ?? "index";
 		this.condition = options.condition ?? true;
 
-		if (this.condition) false;
+		if (this.condition)
+			__MODULES__[this.path + this.folder + "/" + this.file + ".js"] =
+				folderName;
 	}
 }

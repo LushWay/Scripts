@@ -1245,16 +1245,16 @@ export async function clearPlayersPointer(player, ItemToClear) {
 				itemsToLoad.push({ slot: i, item: item });
 				inventory.setItem;
 				if (i < 9) {
-					player.runCommand(`replaceitem entity @s slot.hotbar ${i} air`);
+					await player.runCommandAsync(`replaceitem entity @s slot.hotbar ${i} air`);
 				} else {
-					player.runCommand(
+					await player.runCommandAsync(
 						`replaceitem entity @s slot.inventory ${i - 9} air`
 					);
 				}
 			}
 		}
 		try {
-			player.runCommand(
+			await player.runCommandAsync(
 				`clear @s ${ItemToClear?.id ?? ItemToClear?.type} ${ItemToClear.data} ${
 					ItemToClear.amount
 				}`

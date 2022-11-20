@@ -14,7 +14,8 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	 * @param {number} [v]
 	 * @returns
 	 */
-	const add = (s, p, v) => s.defineString(p, v > 0 ? v : 4294967295);
+	const add = (s, p, v) =>
+		s.defineString(p, v > 0 && v <= 4294967295 ? v : 4294967295);
 
 	const e = new DynamicPropertiesDefinition();
 	for (const prop in CONFIG_DB.world) add(e, prop);

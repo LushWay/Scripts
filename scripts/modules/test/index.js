@@ -1,13 +1,6 @@
+import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
 import { Log, sleep, ThrowError, toStr, XA } from "xapi.js";
-import {
-	BlockLocation,
-	BlockType,
-	MinecraftBlockTypes,
-	Player,
-	world,
-} from "@minecraft/server";
 import { CommandCallback } from "../../lib/Command/Callback.js";
-import "./t.js.js";
 import { ModalForm } from "../../lib/Form/Models/ModelForm.js";
 
 /**
@@ -41,7 +34,7 @@ const tests = {
 		/** @type {IRegionCords[]} */
 		const regs = [];
 
-		const size = 30; // size
+		const size = 1; // size
 		const size2 = size / 2;
 
 		/**
@@ -115,12 +108,15 @@ const tests = {
 		}
 	},
 	4: async () => XA.o.runCommandAsync("fill -10 -60 -10 10 -60 10 air"),
-	5: (ctx) => {
-		const form = new ModalForm("TITLE");
+	5: async (ctx) => {
+		let form = new ModalForm("TITLE");
 
-		for (let c = 0; c < 20; c++) form.addToggle("toggle", false);
+		for (let c = 0; c < 20; c++)
+			form.addToggle("Опция\n\n§7Описание описание описание\n \n \n ", false);
 
-		form.show(ctx.sender, (ctx, ...values) => {
+		await form.show(ctx.sender, (ctx, ...values) => {
+			Log("ee");
+			// @ts-expect-error
 			if (values[0]) ctx.error("ER");
 			Log(toStr(values));
 		});
@@ -131,8 +127,9 @@ const c = new XA.Command({
 	name: "test",
 });
 
-c.int("number").executes(async (ctx, n) => {
-	const res = tests[n](ctx);
+c.int("number", true).executes(async (ctx, n) => {
+	const i = n ? n : Object.keys(tests).pop();
+	const res = tests[i](ctx);
 	if (res && typeof res?.catch === "function")
 		res.catch((w) =>
 			ThrowError({

@@ -288,20 +288,21 @@ setTickInterval(() => {
  * @returns {void}
  * @example tp(player, 'spawn')
  */
+
 export function Atp(player, place, ignore, setDefaultInventory) {
 	/** @param {string} reason */
 	const fail = (reason) => player.tell("§c► " + reason);
 	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
 
-	if (!ignore.lock && tag)
+	if (!ignore?.lock && tag)
 		return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
 
-	if (!ignore.quene && Object.keys(quene).includes(player.name))
+	if (!ignore?.quene && Object.keys(quene).includes(player.name))
 		return fail(
 			`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`
 		);
 
-	if (!ignore.pvp && XA.Entity.getScore(player, "pvp") > 0)
+	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0)
 		return fail(`В режиме пвп это запрещенo`);
 
 	const currentInventory = XA.Entity.getScore(player, objectives[0]);
@@ -323,7 +324,8 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		pos = l.x + " " + l.y + " " + l.z;
 	}
 	if (rtp) {
-		const center = wo.G("zone:center")?.split(", ") ?? [0, 0];
+		const pcenter = wo.G("zone:center");
+		const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
 		let y,
 			x,
 			z,

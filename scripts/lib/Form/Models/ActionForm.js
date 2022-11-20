@@ -1,6 +1,5 @@
 import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { TIMEOUT_THRESHOLD } from "../../../../../../../../../../../../../Desktop/-=x=-/rubedo/scripts/config/form.js";
 import { XFormCanceled } from "../utils.js";
 /** */
 export class ActionForm {
@@ -29,8 +28,7 @@ export class ActionForm {
 	/**
 	 * The amount of times it takes to show this form in ms
 	 * if this value goes above 200 it will time out
-	 * @param {number}
-	 * @private
+	 * @type {number}
 	 */
 	triedToShow;
 	/**
@@ -73,7 +71,7 @@ export class ActionForm {
 	 */
 	async show(player) {
 		const response = await this.form.show(player);
-		if (XFormCanceled(response, player)) return;
+		if (XFormCanceled(response, player, this)) return;
 		this.buttons[response.selection].callback?.();
 	}
 }

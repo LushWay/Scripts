@@ -262,7 +262,9 @@ setTickInterval(() => {
 	const players = [...world.getPlayers()];
 	globalRadius = 200 + 20 * players.length;
 	const rad = globalRadius;
-	const center = wo.G("zone:center").split(", ").map(Number) ?? [0, 0];
+	const pcenter = wo.G("zone:center");
+	const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
+
 	/**
 	 *
 	 * @param {number} value
@@ -315,7 +317,7 @@ setTickInterval(() => {
 					-64 - pl.location.y,
 					0
 				)
-			).typeId === "minecraft:deny"
+			)?.typeId === "minecraft:deny"
 		)
 			pl.triggerEvent("spawn");
 
@@ -608,24 +610,24 @@ new XA.Command(
 
 */
 
-new XA.Command({
-	name: "test",
-	description: "",
-	requires: (p) => p.hasTag("commands"),
-}).executes((ctx) => {
-	const block = world
-		.getDimension("overworld")
-		.getBlock(
-			XA.Entity.locationToBlockLocation(ctx.sender.location).offset(0, -1, 0)
-		);
-	if (block.getComponent("inventory")?.container)
-		return ctx.reply(
-			toStr(block.getComponent("inventory")?.container, " ") +
-				"\n" +
-				toStr(block, " ")
-		);
-	ctx.reply("§cError");
-});
+// new XA.Command({
+// 	name: "test",
+// 	description: "",
+// 	requires: (p) => p.hasTag("commands"),
+// }).executes((ctx) => {
+// 	const block = world
+// 		.getDimension("overworld")
+// 		.getBlock(
+// 			XA.Entity.locationToBlockLocation(ctx.sender.location).offset(0, -1, 0)
+// 		);
+// 	if (block.getComponent("inventory")?.container)
+// 		return ctx.reply(
+// 			toStr(block.getComponent("inventory")?.container, " ") +
+// 				"\n" +
+// 				toStr(block, " ")
+// 		);
+// 	ctx.reply("§cError");
+// });
 
 new XA.Command({
 	name: "db",

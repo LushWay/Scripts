@@ -54,22 +54,24 @@ export class FormCallback {
 			.show(this.player);
 	}
 }
+
 /**
  *
  * @param {ActionFormResponse | ModalFormResponse | MessageFormResponse} response
+ * @param {ActionForm | MessageForm | ModalForm<any>} ctx
  * @param {Player} player
  * @returns
  */
-export function XFormCanceled(response, player) {
+export function XFormCanceled(response, player, ctx) {
 	if (response.canceled) {
 		if (response.cancelationReason == "userBusy") {
 			// check time and reshow form
-			if (this.triedToShow > 200)
+			if (ctx.triedToShow > 200)
 				return player.tell(
 					`§cНе удалось открыть форму. Закрой чат и попробуй снова`
 				);
-			this.triedToShow++;
-			this.show(player);
+			ctx.triedToShow++;
+			ctx.show(player);
 		}
 		return true;
 	}

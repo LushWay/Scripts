@@ -60,8 +60,8 @@ export function commandNotFound(player, command) {
 	const ig = (a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%)§c`;
 	let ans = "§cВы имели ввиду " + ig(a[0]),
 		s = a[0][1];
-	a = a.filter((e) => s - e[1] <= 0.1);
-	for (const [i, e] of a.slice(1).entries())
+	a = a.filter((e) => s - e[1] <= 0.15);
+	for (const [i, e] of a.slice(1, 3).entries())
 		ans += `${i + 2 === a.length ? " или " : ", "}${ig(e)}`;
 
 	player.tell(ans + "§c?");
