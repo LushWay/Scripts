@@ -30,15 +30,8 @@ const GrayStyle = {
 };
 
 export class LeaderboardBuilder {
-	/**
-	 * Get the players faction
-	 * @example LeaderboardBuilder.getLeaderboard(`Smell of curry`);
-	 */
 	createLeaderboard(obj, x, y, z, dimension = "overworld", style) {
-		let objective;
-		if (XA.Chat.runCommand(`scoreboard objectives add ${obj} dummy`)?.error) {
-			objective = world.scoreboard.getObjective(obj).displayName;
-		} else objective = obj;
+		let objective = world.scoreboard.getObjective(obj).displayName;
 		const data = {
 			scores: [],
 			objective: obj,
@@ -46,13 +39,9 @@ export class LeaderboardBuilder {
 			style: style,
 			location: { x: x, y: y, z: z, dimension: dimension },
 		};
-		console.warn(JSON.stringify(data.location));
 		lb.set(obj, data);
-		let entity = world
-			.getDimension(dimension)
-			.spawnEntity("f:t", new BlockLocation(x, y, z));
+		let entity = world.getDimension(dimension).spawnEntity("f:t", new BlockLocation(x, y, z));
 		entity.nameTag = "Updating...";
-		console.warn(JSON.stringify(entity.location));
 		entity.addTag("lb");
 		entity.addTag("obj:" + obj);
 	}
@@ -66,9 +55,7 @@ export class LeaderboardBuilder {
 			lb.delete(objective);
 			let entitys = XA.Entity.getAtPos({ x, y, z }, dimension);
 			if (entitys.length == 0) return false;
-			entitys
-				.find((entity) => entity.typeId == "f:t" && entity.hasTag("lb"))
-				?.triggerEvent("kill");
+			entitys.find((entity) => entity.typeId == "f:t" && entity.hasTag("lb"))?.triggerEvent("kill");
 			return true;
 		} catch (error) {
 			return false;
@@ -119,15 +106,12 @@ export class LeaderboardBuilder {
 			if (leaderboardScores.length > 0) {
 				// there are stored scores
 				for (const player of world.getPlayers()) {
-					const found =
-						leaderboardScores.find((x) => x.name === player.name) ?? false;
+					const found = leaderboardScores.find((x) => x.name === player.name) ?? false;
 
 					if (found) {
 						// player already has score
 						const index = leaderboardScores.indexOf(found);
-						leaderboardScores[index].score = (
-							XA.Entity.getScore(player, objective) ?? 0
-						).toString(10);
+						leaderboardScores[index].score = (XA.Entity.getScore(player, objective) ?? 0).toString(10);
 					} else {
 						leaderboardScores.push({
 							name: `${player.name}`,
@@ -157,25 +141,19 @@ export class LeaderboardBuilder {
 			if (stylee == "gray") style = GrayStyle;
 			if (stylee == "orange") style = OrangeStyle;
 
-			sortedPlayers = leaderboardScores
-				.sort((a, b) => b.score - a.score)
-				.slice(0, 10); // Cuts the array to only get top 10;
+			sortedPlayers = leaderboardScores.sort((a, b) => b.score - a.score).slice(0, 10); // Cuts the array to only get top 10;
 
 			let completedLeaderboard = ``;
 			for (var i = 0; i < sortedPlayers.length; i++) {
-				completedLeaderboard += `§${style.top}#${i + 1}§r §${style.nick}${
-					sortedPlayers[i].name
-				}§r §${style.score}${numFormatter(
-					parseInt(sortedPlayers[i].score)
-				)}§r\n`;
+				completedLeaderboard += `§${style.top}#${i + 1}§r §${style.nick}${sortedPlayers[i].name}§r §${
+					style.score
+				}${numFormatter(parseInt(sortedPlayers[i].score))}§r\n`;
 			}
 
 			entity.nameTag = `§l§${style.name}${
 				//§r
 				name.charAt(0).toUpperCase() + name.slice(1)
-			}\n§l${`§${style.color1}-§${style.color2}`.repeat(
-				5
-			)}§r\n${completedLeaderboard}`;
+			}\n§l${`§${style.color1}-§${style.color2}`.repeat(5)}§r\n${completedLeaderboard}`;
 		} catch (error) {
 			ThrowError(error);
 		}
@@ -191,7 +169,7 @@ export class LeaderboardBuilder {
 	}
 	/**
 	 * Get the players faction
-	 * @returns {String}
+	 * @returns {string}
 	 * @example LeaderboardBuilder.getLeaderboard(`Smell of curry`);
 	 */
 	getLeaderboard(objective) {
@@ -249,7 +227,7 @@ export class LeaderboardBuilder {
 	}
 	/**
 	 * Get the players faction
-	 * @returns {String}
+	 * @returns {string}
 	 * @example LeaderboardBuilder.getLeaderboard(`Smell of curry`);
 	 */
 }

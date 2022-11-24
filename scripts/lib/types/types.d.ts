@@ -24,3 +24,16 @@ interface IModuleOptions {
 	/* Default: true */
 	condition?: boolean;
 }
+
+interface IColorScheme {
+	function: {
+		function: string;
+		name: string;
+		arguments: string;
+		code: string;
+		brackets: string;
+	};
+	nonstring: string;
+	symbol: string;
+	string: string;
+}

@@ -16,23 +16,3 @@ export const CONFIG = {
 	},
 	commandPrefix: "-",
 };
-
-export const CONFIG_DB = {
-	player: {
-		basic: 2 ** 15,
-		test: 2 ** 3,
-	},
-	world: {
-		pos: 2 ** 10,
-		chests: 2 ** 10,
-		options: 2 ** 10,
-		region: 2 ** 10,
-		kits: 2 ** 10,
-		chest: 2 ** 10,
-		drop: 2 ** 10,
-		roles: 2 ** 11,
-		leaderboard: 2 ** 15,
-		basic: 2 ** 10,
-		buildRegion: 2 ** 11,
-	},
-};

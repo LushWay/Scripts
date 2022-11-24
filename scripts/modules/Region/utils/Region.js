@@ -28,9 +28,7 @@ const HIGEST_Y_VALUE = 320;
  * @returns {boolean}
  */
 function betweenXYZ(XYZa, XYZb, XYZc) {
-	return XYZc.every(
-		(c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i])
-	);
+	return XYZc.every((c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i]));
 }
 
 const TABLE = new XA.instantDB(world, "region");
@@ -54,14 +52,7 @@ export class Region {
 	static getAllRegions() {
 		if (REGIONS_HAVE_BEEN_GRABBED) return REGIONS;
 		const regions = TABLE.values().map(
-			(region) =>
-				new Region(
-					region.from,
-					region.to,
-					region.dimensionId,
-					region.permissions,
-					region.key
-				)
+			(region) => new Region(region.from, region.to, region.dimensionId, region.permissions, region.key)
 		);
 		regions.forEach((r) => {
 			REGIONS.push(r);
@@ -89,7 +80,7 @@ export class Region {
 	/**
 	 * Removes a region at a block Location
 	 * @param {string} dimensionId  the id of this dimension
-	 * @returns {Boolean} if the region was removed or not
+	 * @returns {boolean} if the region was removed or not
 	 * @static
 	 * @param {BlockLocation} blockLocation
 	 */

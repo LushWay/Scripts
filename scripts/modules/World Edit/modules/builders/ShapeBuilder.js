@@ -7,7 +7,7 @@ import { WorldEditBuild } from "./WorldEditBuilder.js";
 export class Shape {
 	/**
 	 * Sets Pos1 To a new Block Location
-	 * @param {String} shape shape equation to caculate
+	 * @param {string} shape shape equation to caculate
 	 * @param {BlockLocation} pos location to generate shape
 	 * @param {Array<string>} blocks blocks to use to fill block
 	 * @param {number} rad size of sphere
@@ -38,24 +38,17 @@ export class Shape {
 				for (let y = -this.rad; y <= this.rad; y++) {
 					for (let z = -this.rad; z <= this.rad; z++) {
 						if (!this.condition(x, y, z)) continue;
-						const location = new BlockLocation(
-							this.pos.x + x,
-							this.pos.y + y,
-							this.pos.z + z
-						);
+						const location = new BlockLocation(this.pos.x + x, this.pos.y + y, this.pos.z + z);
 						if (this.blocks.find((e) => e.split(".")[1])) {
 							const block = this.blocks[~~(Math.random() * this.blocks.length)];
 
 							XA.Build.chat.runCommand(
-								`setblock ${location.x} ${location.y} ${location.z} ${
-									block.split(".")[0]
-								} ${block.split(".")[1] ? block.split(".")[1] : ""}`
+								`setblock ${location.x} ${location.y} ${location.z} ${block.split(".")[0]} ${
+									block.split(".")[1] ? block.split(".")[1] : ""
+								}`
 							);
 						} else {
-							const block = MinecraftBlockTypes.get(
-								"minecraft:" +
-									this.blocks[~~(Math.random() * this.blocks.length)]
-							);
+							const block = MinecraftBlockTypes.get("minecraft:" + this.blocks[~~(Math.random() * this.blocks.length)]);
 							world.getDimension("overworld").getBlock(location).setType(block);
 						}
 
@@ -119,10 +112,7 @@ export class spawn {
 		this.z2 = pos2z;
 		this.r = remove;
 
-		WorldEditBuild.backup(
-			new BlockLocation(this.x1, -64, this.z1),
-			new BlockLocation(this.x2, -64, this.z2)
-		);
+		WorldEditBuild.backup(new BlockLocation(this.x1, -64, this.z1), new BlockLocation(this.x2, -64, this.z2));
 
 		this.generate();
 	}
@@ -143,11 +133,7 @@ export class spawn {
 					world
 						.getDimension("overworld")
 						.getBlock(new BlockLocation(x, -64, z))
-						.setType(
-							MinecraftBlockTypes.get(
-								!this.r ? "minecraft:deny" : "minecraft:bedrock"
-							)
-						);
+						.setType(MinecraftBlockTypes.get(!this.r ? "minecraft:deny" : "minecraft:bedrock"));
 					blocksSet++;
 				}
 				if (blocksSet >= configuration.BLOCKS_BEFORE_AWAIT) {

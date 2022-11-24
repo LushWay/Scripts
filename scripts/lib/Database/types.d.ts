@@ -1,5 +1,5 @@
-import { World, Player } from "@minecraft/server";
-import { CONFIG_DB } from "config.js";
+import { Player, World } from "@minecraft/server";
+import { CONFIG_DB } from "../Setup/registryDynamicProperties.js";
 
 type Source = World | Player;
 

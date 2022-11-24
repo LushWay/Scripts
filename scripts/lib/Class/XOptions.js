@@ -1,9 +1,12 @@
-import { Entity, Player, world } from "@minecraft/server";
-import { XInstantDatabase } from "../Database/index.js";
-import { O } from "./D.js";
+import { Player, world } from "@minecraft/server";
+import { XInstantDatabase } from "../Database/DynamicProperties.js";
+import { ScoreboardDB } from "../Database/Scoreboard.js";
+import { DIMENSIONS } from "../List/dimensions.js";
 
 /** @type {Array<{name: string; desc: string; lvl: number; exp: boolean; Aitem: string;}>} */
 export let OPTIONS = [];
+
+const lightDB = new ScoreboardDB("worldSettings");
 
 export class PlayerOption {
 	/**
@@ -15,17 +18,10 @@ export class PlayerOption {
 	 * @param {boolean} [isExpiremental]
 	 * @example new option('JS:enable', 'Ниче не делает', 10)
 	 */
-	constructor(
-		name,
-		desc = null,
-		permissionLvL = 0,
-		isExpiremental = false,
-		ActiveItem
-	) {
+	constructor(name, desc = null, permissionLvL = 0, isExpiremental = false, ActiveItem) {
 		if (!po.E(name)) {
 			let description = desc;
-			if (isExpiremental)
-				description = desc + "§r§e\n\n▲ Экспериментальная настройка ▲";
+			if (isExpiremental) description = desc + "§r§e\n\n▲ Экспериментальная настройка ▲";
 			const a = {
 				name: name,
 				desc: description,
@@ -91,6 +87,7 @@ export const po = {
 	},
 	/**
 	 * Возвращает список всех элементов и их описание у игрока
+	 * @param {{ hasTag: (arg0: string) => any; }} player
 	 */
 	list(player) {
 		let el = [];
@@ -107,91 +104,6 @@ export const po = {
 export let WORLDOPTIONS = [];
 
 export const db = new XInstantDatabase(world, "options");
-
-export class ScoreboardDB {
-	scoreboard;
-	/**
-	 *
-	 * @param {string} name
-	 * @param {string} [displayName]
-	 */
-	constructor(name, displayName = "a") {
-		let a = displayName || name;
-		if (a.length > 16) a = a.substring(0, 16);
-		this.name = name;
-		this.displayName = a;
-
-		try {
-			this.scoreboard = world.scoreboard.addObjective(name, a);
-		} catch (e) {
-			this.scoreboard = world.scoreboard.getObjective(name);
-		}
-	}
-	set(option, value) {
-		O.runCommand(`scoreboard players set "${option}" ${this.name} ${value}`);
-	}
-	/**
-	 *
-	 * @param {string} option
-	 * @returns
-	 */
-	get(option) {
-		try {
-			return this.scoreboard
-				.getScores()
-				.find((e) => e.participant.displayName === option).score;
-		} catch (e) {
-			return 0;
-		}
-	}
-	/**
-	 *
-	 * @param {Entity} entity
-	 * @param {number} value
-	 */
-	Eset(entity, value) {
-		entity.runCommandAsync(`scoreboard players set @s ${this.name} ${value}`);
-	}
-	/**
-	 *
-	 * @param {Entity} entity
-	 * @param {number} value
-	 */
-	Eadd(entity, value) {
-		entity.runCommandAsync(`scoreboard players add @s ${this.name} ${value}`);
-	}
-	/**
-	 *
-	 * @param {Entity} entity
-	 */
-	Eget(entity) {
-		try {
-			this.scoreboard.getScore(entity.scoreboard);
-		} catch (e) {
-			return 0;
-		}
-	}
-	reset() {
-		O.runCommand(`scoreboard players reset * ${this.name}`);
-	}
-	reset0() {
-		for (let opt of WORLDOPTIONS) {
-			console.warn(opt.name);
-			if (opt.lvl <= 10 && !wo.Q(opt.name)) {
-				console.warn(opt.name);
-				try {
-					world
-						.getDimension("overworld")
-						.runCommand(`scoreboard players reset "${opt.name}" ${this.name}`);
-				} catch (e) {
-					console.warn(e);
-				}
-			}
-		}
-	}
-}
-
-const lightDB = new ScoreboardDB("worldSettings");
 
 export class WorldOption {
 	/**
@@ -313,5 +225,17 @@ export const wo = {
 		db.set(option, value);
 	},
 	reset: lightDB.reset,
-	reset0: lightDB.reset0,
+	reset0() {
+		for (let opt of WORLDOPTIONS) {
+			console.warn(opt.name);
+			if (opt.lvl <= 10 && !wo.Q(opt.name)) {
+				console.warn(opt.name);
+				try {
+					DIMENSIONS.overworld.runCommand(`scoreboard players reset "${opt.name}" ${this.name}`);
+				} catch (e) {
+					console.warn(e);
+				}
+			}
+		}
+	},
 };

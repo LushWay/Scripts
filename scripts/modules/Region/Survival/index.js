@@ -1,13 +1,7 @@
-import {
-	BlockLocation,
-	Entity,
-	Location,
-	Player,
-	world,
-} from "@minecraft/server";
+import { BlockLocation, Entity, Location, Player, world } from "@minecraft/server";
 import { setTickInterval, setTickTimeout, XA } from "xapi.js";
-import { DIMENSIONS } from "../../../lib/Class/D.js";
-import { ScoreboardDB } from "../../../lib/Class/Options.js";
+import { ScoreboardDB } from "../../../lib/Database/Scoreboard.js";
+import { DIMENSIONS } from "../../../lib/List/dimensions.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 import { CONTAINER_LOCATIONS } from "../utils/container.js";
 import { Region } from "../utils/Region.js";
@@ -19,13 +13,11 @@ setTickInterval(() => {
 	for (const id in InRaid) {
 		const player = XA.Entity.fetch(id);
 		if (player) {
-			if (pvpDB.Eget(player) === 0) {
-				player.tell(
-					"§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны."
-				);
+			if (pvpDB.eGet(player) === 0) {
+				player.tell("§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны.");
 				player.playSound("mob.wolf.bark");
 			}
-			pvpDB.Eset(player, InRaid[id]);
+			pvpDB.eSet(player, InRaid[id]);
 			delete InRaid[id];
 			continue;
 		}
@@ -45,32 +37,19 @@ setTickInterval(() => {
  * @param {Region} region
  */
 function allowed(player, region) {
-	return (
-		region.permissions.owners.includes(player.id) || player.hasTag("modding")
-	);
+	return region.permissions.owners.includes(player.id) || player.hasTag("modding");
 }
 
 /**
  * Permissions for region
  */
 world.events.beforeItemUseOn.subscribe((data) => {
-	const region = Region.blockLocationInRegion(
-		data.blockLocation,
-		data.source.dimension.id
-	);
+	const region = Region.blockLocationInRegion(data.blockLocation, data.source.dimension.id);
 	if (!region || allowed(data.source, region)) return;
 	const block = data.source.dimension.getBlock(data.blockLocation);
 
-	if (
-		DOORS_SWITCHES.includes(block.typeId) &&
-		region.permissions.doorsAndSwitches
-	)
-		return;
-	if (
-		BLOCK_CONTAINERS.includes(block.typeId) &&
-		region.permissions.openContainers
-	)
-		return;
+	if (DOORS_SWITCHES.includes(block.typeId) && region.permissions.doorsAndSwitches) return;
+	if (BLOCK_CONTAINERS.includes(block.typeId) && region.permissions.openContainers) return;
 	data.cancel = true;
 });
 
@@ -78,10 +57,7 @@ world.events.beforeItemUseOn.subscribe((data) => {
  * Permissions for region
  */
 world.events.blockPlace.subscribe((data) => {
-	const region = Region.blockLocationInRegion(
-		data.block.location,
-		data.player.dimension.id
-	);
+	const region = Region.blockLocationInRegion(data.block.location, data.player.dimension.id);
 	if (!region || allowed(data.player, region)) return;
 	const l = data.block.location;
 	data.dimension.runCommandAsync(`setblock ${l.x} ${l.y} ${l.z} air 0 destroy`);
@@ -90,55 +66,40 @@ world.events.blockPlace.subscribe((data) => {
 /**
  * Permissions for region
  */
-world.events.blockBreak.subscribe(
-	({ player, block, brokenBlockPermutation, dimension }) => {
-		const region = Region.blockLocationInRegion(
-			block.location,
-			player.dimension.id
-		);
-		if (!region || allowed(player, region)) return;
-		// setting block back
-		dimension
-			.getBlock(block.location)
-			.setPermutation(brokenBlockPermutation.clone());
-		// setting chest inventory back
-		if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
-			const OLD_INVENTORY = CONTAINER_LOCATIONS[JSON.stringify(block.location)];
-			if (OLD_INVENTORY) {
-				OLD_INVENTORY.load(block.getComponent("inventory").container);
-			}
+world.events.blockBreak.subscribe(({ player, block, brokenBlockPermutation, dimension }) => {
+	const region = Region.blockLocationInRegion(block.location, player.dimension.id);
+	if (!region || allowed(player, region)) return;
+	// setting block back
+	dimension.getBlock(block.location).setPermutation(brokenBlockPermutation.clone());
+	// setting chest inventory back
+	if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
+		const OLD_INVENTORY = CONTAINER_LOCATIONS[JSON.stringify(block.location)];
+		if (OLD_INVENTORY) {
+			OLD_INVENTORY.load(block.getComponent("inventory").container);
 		}
-		// killing dropped items
-		setTickTimeout(() => {
-			[
-				...dimension.getEntities({
-					maxDistance: 2,
-					type: "minecraft:item",
-					location: new Location(
-						block.location.x,
-						block.location.y,
-						block.location.z
-					),
-				}),
-			].forEach((e) => e.kill());
-		}, 0);
 	}
-);
+	// killing dropped items
+	setTickTimeout(() => {
+		[
+			...dimension.getEntities({
+				maxDistance: 2,
+				type: "minecraft:item",
+				location: new Location(block.location.x, block.location.y, block.location.z),
+			}),
+		].forEach((e) => e.kill());
+	}, 0);
+});
 
 world.events.beforeExplosion.subscribe((data) => {
 	for (const bl of data.impactedBlocks) {
 		let region = Region.blockLocationInRegion(bl, data.dimension.id);
 		if (region && !region.permissions.pvp) return (data.cancel = true);
-		for (const id of region.permissions.owners) XA.Module.InRaid[id] = 60;
+		for (const id of region.permissions.owners) InRaid[id] = 60;
 	}
 });
 world.events.entityCreate.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
-		new BlockLocation(
-			data.entity.location.x,
-			data.entity.location.y,
-			data.entity.location.z
-		),
+		new BlockLocation(data.entity.location.x, data.entity.location.y, data.entity.location.z),
 		data.entity.dimension.id
 	);
 	if (!region) return;

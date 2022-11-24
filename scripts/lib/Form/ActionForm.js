@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { XFormCanceled } from "../utils.js";
+import { XFormCanceled } from "./utils.js";
 /** */
 export class ActionForm {
 	/**

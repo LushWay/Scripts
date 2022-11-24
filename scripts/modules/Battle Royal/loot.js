@@ -13,17 +13,12 @@ import { rd } from "../Airdrops/index.js";
 export class LootChest {
 	/**
 	 *
-	 * @param {Number} posx
-	 * @param {Number} posz
-	 * @param {Number} loot_tier
+	 * @param {number} posx
+	 * @param {number} posz
+	 * @param {number} loot_tier
 	 */
 	constructor(posx, posz, loot_tier = 1, rdrad) {
-		this.pos = LootChest.summon(
-			posx,
-			posz,
-			LootChest.getTable(loot_tier),
-			rdrad
-		);
+		this.pos = LootChest.summon(posx, posz, LootChest.getTable(loot_tier), rdrad);
 	}
 	static getTable(t) {
 		/**
@@ -44,13 +39,9 @@ export class LootChest {
 			z = rd(zx + rdrad, zx - rdrad);
 			const q = new BlockRaycastOptions();
 			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
-			const b = world
-				.getDimension("overworld")
-				.getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
+			const b = world.getDimension("overworld").getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
 			if (b && b.location.y >= 50) {
-				block = b.dimension.getBlock(
-					new BlockLocation(b.location.x, b.location.y + 1, b.location.z)
-				);
+				block = b.dimension.getBlock(new BlockLocation(b.location.x, b.location.y + 1, b.location.z));
 				break;
 			}
 		}

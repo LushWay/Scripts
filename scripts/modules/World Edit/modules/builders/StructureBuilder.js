@@ -20,16 +20,14 @@ export class Structure {
 	}
 
 	async save() {
-		const regions = new Cuboid(this.pos1, this.pos2).split(
-			configuration.STRUCTURE_CHUNK_SIZE
-		);
+		const regions = new Cuboid(this.pos1, this.pos2).split(configuration.STRUCTURE_CHUNK_SIZE);
 		let errors = 0;
 		let all = 0;
 		for (const region of regions) {
 			const name = `${this.prefix}|${regions.indexOf(region)}"`;
 			const pos1 = region.pos1;
 			const pos2 = region.pos2;
-			const out = await XA.Chat.runCommand(
+			const out = await XA.runCommand(
 				`structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
 			);
 			all++;
@@ -46,12 +44,12 @@ export class Structure {
         world.say(
           "§c► §fЧанки будут подгружены с помощью игрока"
         );
-        XA.Chat.runCommand(`tickingarea remove safezone`);
-        XA.Chat.runCommand(
+        XA.runCommand(`tickingarea remove safezone`);
+        XA.runCommand(
           `tickingarea add ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} safezone`
         );
         setTickTimeout(() => {
-            XA.Chat.runCommand(
+            XA.runCommand(
             `structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
           )
           this.files.push({
@@ -71,28 +69,25 @@ export class Structure {
 		let errors = 0;
 		let all = 0;
 		for (const file of this.files) {
-			const out = await XA.Chat.runCommand(
-				`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`
-			)?.error;
+			const out =
+				(await XA.runCommand(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`)).successCount >
+				0;
 			all++;
 			if (out) {
 				errors++;
 				world.say("§c► §fЧанки будут подгружены с помощью области");
-				XA.Chat.runCommand(`tickingarea remove safezone`);
-				XA.Chat.runCommand(
+				XA.runCommand(`tickingarea remove safezone`);
+				XA.runCommand(
 					`tickingarea add ${file.pos1.x} ${file.pos1.y} ${file.pos1.z} ${file.pos2.x} ${file.pos2.y} ${file.pos2.z} safezone`
 				);
 				setTickTimeout(() => {
 					world.say("§9►");
-					XA.Chat.runCommand(
-						`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`
-					);
+					XA.runCommand(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
 					world.say("§9► §fЗагружено.");
 				}, 40);
 			}
 			await sleep(1);
-			if (errors > 0)
-				throw new Error(`§c${errors}§f\\§a${all}§f не загружено.`);
+			if (errors > 0) throw new Error(`§c${errors}§f\\§a${all}§f не загружено.`);
 		}
 	}
 }

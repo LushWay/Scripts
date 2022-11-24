@@ -1,13 +1,8 @@
-import {
-	BlockRaycastOptions,
-	Player,
-	world,
-} from "@minecraft/server";
+import { BlockRaycastOptions, Player, world } from "@minecraft/server";
 
 import { XA } from "xapi.js";
-import { P } from "../../lib/lists/particles.js";
-import { S } from "../../lib/lists/sounds.js";
-
+import { P } from "../../lib/List/particles.js";
+import { S } from "../../lib/List/sounds.js";
 
 world.events.beforeItemUse.subscribe((data) => {
 	if (data.item.typeId == "we:tool" && data.source instanceof Player) {
@@ -17,7 +12,7 @@ world.events.beforeItemUse.subscribe((data) => {
 			if (data.source.isSneaking) {
 				if (Number(lore[2]) - 1 >= 0) {
 					lore[1] = P[Number(lore[2]) - 1] ?? lore[1];
-					lore[2] = String(Number(lore[2]) - 1);
+					lore[2] = string(Number(lore[2]) - 1);
 					item.setLore(lore);
 					XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 				}
@@ -25,7 +20,7 @@ world.events.beforeItemUse.subscribe((data) => {
 			if (!data.source.isSneaking) {
 				if (Number(lore[2]) + 1 <= P.length) {
 					lore[1] = P[Number(lore[2]) + 1] ?? lore[1];
-					lore[2] = String(Number(lore[2]) + 1);
+					lore[2] = string(Number(lore[2]) + 1);
 					item.setLore(lore);
 					XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 				}
@@ -34,14 +29,14 @@ world.events.beforeItemUse.subscribe((data) => {
 		if (lore && lore[0] == "Loot") {
 			if (data.source.isSneaking) {
 				if (Number(lore[1] ?? 1) - 1 >= 0) {
-					lore[1] = String(Number(lore[1]) - 1);
+					lore[1] = string(Number(lore[1]) - 1);
 					item.setLore(lore);
 					XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 				}
 			}
 			if (!data.source.isSneaking) {
 				if (Number(lore[1] ?? 0) + 1 <= P.length) {
-					lore[1] = String(Number(lore[1]) + 1);
+					lore[1] = string(Number(lore[1]) + 1);
 					item.setLore(lore);
 					XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 				}
@@ -51,35 +46,28 @@ world.events.beforeItemUse.subscribe((data) => {
 			if (data.source.isSneaking) {
 				if (Number(lore[2]) - 1 >= 0) {
 					lore[1] = S[Number(lore[2]) - 1] ?? lore[1];
-					lore[2] = String(Number(lore[2]) - 1);
+					lore[2] = string(Number(lore[2]) - 1);
 					item.setLore(lore);
 					XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 				}
 			}
 			if (!data.source.isSneaking) {
 				lore[1] = S[Number(lore[2]) + 1] ?? lore[1];
-				lore[2] = String(Number(lore[2]) + 1);
+				lore[2] = string(Number(lore[2]) + 1);
 				item.setLore(lore);
 				XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 			}
 		}
 		if (lore && lore[0] == "run") {
-			XA.Chat.runCommand(lore[1]);
+			XA.runCommand(lore[1]);
 		}
 		if (lore && lore[0] == "runE") {
 			data.source.runCommand(lore[1]);
 		}
 		if (lore && lore[0] == "viewTP") {
-			const block = data.source.getBlockFromViewVector(
-				new BlockRaycastOptions()
-			);
+			const block = data.source.getBlockFromViewVector(new BlockRaycastOptions());
 			if (block && block.location)
-				data.source.teleport(
-					block.location,
-					data.source.dimension,
-					data.source.rotation.x,
-					data.source.rotation.y
-				);
+				data.source.teleport(block.location, data.source.dimension, data.source.rotation.x, data.source.rotation.y);
 		}
 	}
 });

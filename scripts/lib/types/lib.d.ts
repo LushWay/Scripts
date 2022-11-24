@@ -23,6 +23,9 @@ interface String {
 	 * @param search Строка, которую нужно сравнить
 	 */
 	similiarTo(search: string): number;
+	/**
+	 * Clears all § colos from string
+	 */
 	cc(): string;
 }
 

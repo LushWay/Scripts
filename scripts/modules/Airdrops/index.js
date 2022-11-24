@@ -2,19 +2,19 @@ import { Location, world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
 
 export function rd(max, min = 0, msg) {
-  if (max == min || max < min) return max;
+	if (max == min || max < min) return max;
 
-  const rd = Math.round(min + Math.random() * (max - min));
-  if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
-  return rd;
+	const rd = Math.round(min + Math.random() * (max - min));
+	if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
+	return rd;
 }
 
 // export class airdrope {
 //   /**
 //    *
-//    * @param {Number} posx
-//    * @param {Number} posz
-//    * @param {Number} loot_tier
+//    * @param {number} posx
+//    * @param {number} posz
+//    * @param {number} loot_tier
 //    * @returns
 //    */
 //   constructor(posx, posz, loot_tier = 0) {
@@ -151,49 +151,41 @@ export function rd(max, min = 0, msg) {
 //   }
 // }
 const q = {
-  tags: ["держит"],
-  type: "minecraft:chicken",
+	tags: ["держит"],
+	type: "minecraft:chicken",
 };
 const qq = {
-  maxDistance: 20,
+	maxDistance: 20,
 };
 
 setTickInterval(() => {
-  for (const ent of world.getDimension("overworld").getEntities(q)) {
-    if (!XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"))
-      return ent.removeTag("держит");
-    qq.location = ent.location;
-    qq.tags = [
-      "держится_за_номер:" +
-        XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"),
-    ];
-    const cl = ent.dimension.getEntities(qq);
-    if (!cl) return ent.removeTag("держит");
-    const block = ent.dimension.getBlock(
-      XA.Entity.locationToBlockLocation(
-        new Location(ent.location.x, ent.location.y - 4, ent.location.z)
-      )
-    );
-    const block2 = ent.dimension.getBlock(
-      XA.Entity.locationToBlockLocation(
-        new Location(ent.location.x, ent.location.y - 1, ent.location.z)
-      )
-    );
-    if (block2.typeId != "minecraft:air") {
-      XA.Entity.despawn(ent);
-      continue;
-    }
-    for (const clo of cl) {
-      if (block.typeId == "minecraft:air")
-        clo.teleport(
-          new Location(ent.location.x, ent.location.y - 3, ent.location.z),
-          ent.dimension,
-          clo.rotation.x,
-          clo.rotation.y
-        );
-      break;
-    }
-  }
+	for (const ent of world.getDimension("overworld").getEntities(q)) {
+		if (!XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:")) return ent.removeTag("держит");
+		qq.location = ent.location;
+		qq.tags = ["держится_за_номер:" + XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:")];
+		const cl = ent.dimension.getEntities(qq);
+		if (!cl) return ent.removeTag("держит");
+		const block = ent.dimension.getBlock(
+			XA.Entity.locationToBlockLocation(new Location(ent.location.x, ent.location.y - 4, ent.location.z))
+		);
+		const block2 = ent.dimension.getBlock(
+			XA.Entity.locationToBlockLocation(new Location(ent.location.x, ent.location.y - 1, ent.location.z))
+		);
+		if (block2.typeId != "minecraft:air") {
+			XA.Entity.despawn(ent);
+			continue;
+		}
+		for (const clo of cl) {
+			if (block.typeId == "minecraft:air")
+				clo.teleport(
+					new Location(ent.location.x, ent.location.y - 3, ent.location.z),
+					ent.dimension,
+					clo.rotation.x,
+					clo.rotation.y
+				);
+			break;
+		}
+	}
 }, 0); /*
 /*
 const kit = new XA.Command({

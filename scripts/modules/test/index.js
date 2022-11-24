@@ -1,25 +1,38 @@
-import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
-import { Log, sleep, ThrowError, toStr, XA } from "xapi.js";
+import { BlockLocation, MinecraftBlockTypes, system, world } from "@minecraft/server";
+import { handler, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
 import { CommandCallback } from "../../lib/Command/Callback.js";
-import { ModalForm } from "../../lib/Form/Models/ModelForm.js";
+import { ActionForm } from "../../lib/Form/ActionForm.js";
+import { ModalForm } from "../../lib/Form/ModelForm.js";
 
 /**
  * @type {Object<string, (ctx?: CommandCallback) => void | Promise>}
  */
 const tests = {
 	1: (ctx) => {
-		const o = new XA.cacheDB(ctx.sender, "test"),
-			data = o.data;
+		const o = new XA.cacheDB(ctx.sender, "basic");
+
+		let data = o.data;
 		data.val = 34;
 		data.ee = "ee";
 		o.safe();
+
+		const newDate = new XA.cacheDB(ctx.sender, "basic");
+		data = newDate.data;
+		world.say(toStr(data));
+
+		delete data.ee;
+		delete data.val;
+
+		newDate.safe();
 	},
 	2: (ctx) => {
-		const o = new XA.instantDB(ctx.sender, "test");
+		const o = new XA.instantDB(ctx.sender, "basic");
 
 		o.set("c", "e");
 
-		Log(toStr(o.data));
+		world.say(toStr(o.data));
+
+		o.delete("c");
 	},
 	3: async () => {
 		try {
@@ -34,7 +47,7 @@ const tests = {
 		/** @type {IRegionCords[]} */
 		const regs = [];
 
-		const size = 1; // size
+		const size = 2; // size
 		const size2 = size / 2;
 
 		/**
@@ -101,34 +114,72 @@ const tests = {
 			await sleep(5);
 			if (!reg.from) continue;
 			const center = { x: reg.from.x + size2, z: reg.from.z + size2 };
-			XA.o
+			XA.dimensions.overworld
 				.getBlock(new BlockLocation(center.x, -60, center.z))
 				.setType(MinecraftBlockTypes.amethystBlock);
 			regs.push(center);
 		}
 	},
-	4: async () => XA.o.runCommandAsync("fill -10 -60 -10 10 -60 10 air"),
+	4: async () => XA.dimensions.overworld.runCommandAsync("fill -10 -60 -10 10 -60 10 air"),
 	5: async (ctx) => {
 		let form = new ModalForm("TITLE");
 
-		for (let c = 0; c < 20; c++)
-			form.addToggle("Опция\n\n§7Описание описание описание\n \n \n ", false);
+		for (let c = 0; c < 20; c++) form.addToggle("Опция\n\n§7Описание описание описание\n \n \n ", false);
 
 		await form.show(ctx.sender, (ctx, ...values) => {
-			Log("ee");
+			world.say("ee");
 			// @ts-expect-error
 			if (values[0]) ctx.error("ER");
-			Log(toStr(values));
+			world.say(toStr(values));
 		});
 	},
+	6: (ctx) => {
+		world.scoreboard.getObjectives().forEach((e) => world.scoreboard.removeObjective(e));
+	},
+	7: (ctx) => {
+		world.say(toStr({ ...XA.Entity.getHeldItem(ctx.sender), obj: { str: "string", symbol: Symbol("desc") } }));
+	},
+	8: () => {
+		throw new Error("ERR");
+	},
+	9: (ctx) => {
+		const form = new ActionForm("Like this", "Logs will be showed there");
+		form.addButton("Exit", null, (ctx) => {
+			ctx;
+		});
+		form.show(ctx.sender);
+	},
+	10: (ctx) => {
+		let e = 1;
+
+		const r = () => {
+			e++;
+			if (e > 10) {
+				handler(tests[11]);
+			} else {
+				world.say(e + "");
+				system.run(r);
+			}
+		};
+		system.run(r);
+	},
+	11: () => {
+		throw new Error("m");
+	},
+	12: () => {
+		setTickTimeout(tests[11]);
+	},
 };
+setTickTimeout(tests[11]);
 
 const c = new XA.Command({
 	name: "test",
 });
 
 c.int("number", true).executes(async (ctx, n) => {
-	const i = n ? n : Object.keys(tests).pop();
+	const keys = Object.keys(tests);
+	const i = n && keys.includes(n + "") ? n : keys.pop();
+	ctx.reply(i);
 	const res = tests[i](ctx);
 	if (res && typeof res?.catch === "function")
 		res.catch((w) =>
@@ -138,4 +189,9 @@ c.int("number", true).executes(async (ctx, n) => {
 				name: w?.name ?? "CommandError",
 			})
 		);
+});
+
+world.events.beforeItemUseOn.subscribe((d) => {
+	d.cancel = true;
+	world.say("beforeItemUse");
 });

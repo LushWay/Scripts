@@ -1,7 +1,6 @@
-import { Player } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
-import { FormCallback } from "../utils.js";
-import { XFormCanceled } from "../utils.js";
+import { FormCallback, XFormCanceled } from "./utils.js";
 
 /**
  * @template [Callback = (ctx: FormCallback) => void]
@@ -58,18 +57,20 @@ export class ModalForm {
 		return this;
 	}
 	/**
-	 * @type {ModalFormAddSlider}
+	 * Adds a slider to this form
+	 * @param {string} label  label to be shown on this slider
+	 * @param {number} minimumValue  the smallest value this can be
+	 * @param {number} maximumValue  the maximum value this can be
+	 * @param {number} valueStep  how this slider increments
+	 * @param {number} defaultValue  the default value in slider
+	 * @returns {ModalForm<AppendFormField<Callback, number>>}
 	 */
 	addSlider(label, minimumValue, maximumValue, valueStep, defaultValue) {
 		this.args.push({ type: "slider" });
-		this.form.slider(
-			label,
-			minimumValue,
-			maximumValue,
-			valueStep,
-			defaultValue
-		);
-		// @ts-ignore
+		if (typeof minimumValue !== "number") return;
+		if (typeof maximumValue !== "number") return;
+		this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue);
+		// @ts-expect-error
 		return this;
 	}
 	/**
@@ -109,9 +110,7 @@ export class ModalForm {
 		if (XFormCanceled(response, player, this)) return;
 		callback(
 			new FormCallback(this, player, callback),
-			...response.formValues.map((v, i) =>
-				this.args[i].type == "dropdown" ? this.args[i].options[v] : v
-			)
+			...response.formValues.map((v, i) => (this.args[i].type == "dropdown" ? this.args[i].options[v] : v))
 		);
 	}
 }

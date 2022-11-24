@@ -1,11 +1,4 @@
-import {
-	BlockLocation,
-	Entity,
-	InventoryComponentContainer,
-	ItemStack,
-	Location,
-	world,
-} from "@minecraft/server";
+import { BlockLocation, Entity, InventoryComponentContainer, ItemStack, Location, world } from "@minecraft/server";
 import { XA } from "../../xapi.js";
 
 /**
@@ -27,9 +20,7 @@ import { XA } from "../../xapi.js";
 const ENTITY_LOCATION = new Location(0, 0, 0);
 
 try {
-	world
-		.getDimension("overworld")
-		.runCommand("tickingarea add 0 0 0 0 0 0 ItemDB true");
+	world.getDimension("overworld").runCommand("tickingarea add 0 0 0 0 0 0 ItemDB true");
 	console.warn("ItemDB tickingarea was created");
 } catch (e) {}
 
@@ -38,7 +29,7 @@ const ENTITY_DATABSE_ID = "mcbehub:inventory2";
 export class XItemDatabase {
 	/**
 	 * The name of the table
-	 * @param {String} TABLE_NAME
+	 * @param {string} TABLE_NAME
 	 */
 	constructor(TABLE_NAME) {
 		this.TABLE_NAME = TABLE_NAME;
@@ -110,23 +101,11 @@ export class XItemDatabase {
 		if (!entity) {
 			world
 				.getDimension("overworld")
-				.getEntitiesAtBlockLocation(
-					new BlockLocation(
-						ENTITY_LOCATION.x,
-						ENTITY_LOCATION.y,
-						ENTITY_LOCATION.z
-					)
-				)
-				?.find(
-					(e) =>
-						e.typeId == ENTITY_DATABSE_ID &&
-						e.getTags().includes(this.TABLE_NAME)
-				)
+				.getEntitiesAtBlockLocation(new BlockLocation(ENTITY_LOCATION.x, ENTITY_LOCATION.y, ENTITY_LOCATION.z))
+				?.find((e) => e.typeId == ENTITY_DATABSE_ID && e.getTags().includes(this.TABLE_NAME))
 				?.triggerEvent("despawn");
 			try {
-				entity = world
-					.getDimension("overworld")
-					.spawnEntity(ENTITY_DATABSE_ID, ENTITY_LOCATION);
+				entity = world.getDimension("overworld").spawnEntity(ENTITY_DATABSE_ID, ENTITY_LOCATION);
 				entity.addTag(this.TABLE_NAME);
 			} catch (eee) {
 				console.warn(eee);
@@ -140,9 +119,7 @@ export class XItemDatabase {
 						world.events.entityCreate.unsubscribe(e);
 					}
 				});
-				world
-					.getDimension("overworld")
-					.runCommand(`summon ${ENTITY_DATABSE_ID} 0 0 0`);
+				world.getDimension("overworld").runCommand(`summon ${ENTITY_DATABSE_ID} 0 0 0`);
 			}
 		}
 		/**
@@ -160,7 +137,7 @@ export class XItemDatabase {
 	/**
 	 * deletes a item from the chests
 	 * @param {string} id
-	 * @returns {Boolean} If it deleted or not
+	 * @returns {boolean} If it deleted or not
 	 */
 	delete(id) {
 		for (const entity of this.ENTITIES) {

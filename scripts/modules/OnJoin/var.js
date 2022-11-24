@@ -1,6 +1,6 @@
 /**
  * Выводит строку времени
- * @returns {String}
+ * @returns {string}
  */
 export function timeNow() {
 	const time = new Date(Date()).getHours() + 3;
@@ -12,7 +12,7 @@ export function timeNow() {
 
 /**
  * Выводит время в формате 00:00
- * @returns {String}
+ * @returns {string}
  */
 export function shortTime() {
 	const time = new Date(Date());
@@ -20,3 +20,13 @@ export function shortTime() {
 	const min = String(time.getMinutes());
 	return `${time.getTime()}:${min.length == 2 ? min : "0" + min}`;
 }
+
+export const CONFIG_JOIN = {
+	message: (player) => `${timeNow()}, ${player.name}!\n§9Время • ${shortTime()}`,
+	animaton: {
+		color: "§f",
+	},
+	actionBar: "§eСдвинься что бы продолжить",
+	title: "§aServer",
+	subtitle: "Добро пожаловать!",
+};

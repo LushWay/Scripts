@@ -1,9 +1,9 @@
 /**
  * @typedef {Object} gun
- * @property {String} type
+ * @property {string} type
  * @property {number} maxAmmo
  * @property {number} reloadTime
- * @property {String} scoreName the name of this item
+ * @property {string} scoreName the name of this item
  */
 
 export const guns = {

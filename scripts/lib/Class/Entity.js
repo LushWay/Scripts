@@ -8,19 +8,21 @@ import {
 	world,
 } from "@minecraft/server";
 
-export function getPlace(place, text) {
-	//Place, prefix symbol color, rotation
-	let P, C, rot;
-	if (place == "anarch") (P = "§cАнархия"), (C = "4");
-	if (place == "spawn") (P = "§aСпавн"), (C = "2"), (rot = "0 0");
-	if (place == "br") (P = "§6Батл рояль"), (C = "e"), (rot = "0 0");
-	if (place == "minigames" || place == "currentpos")
-		(P = "§dМиниигры§r"), (C = "5"), (rot = "0 0");
-	if (!P) (P = place), (C = text);
-	return { P, C, rot };
-}
+// Authots: Smell of curry, mrpatches
 
 export const XEntity = {
+	/**
+	 * Checks if position is in radius
+	 * @param {import("@minecraft/server").IVec3} center Center of radius
+	 * @param {import("@minecraft/server").IVec3} pos Position to check
+	 * @param {number} r Radius
+	 * @returns {boolean}
+	 */
+	inRadius(center, pos, r) {
+		const inR = (value, center) => value <= r + center && value <= r - center;
+
+		return inR(pos.x, center.x) && inR(pos.y, center.y) && inR(pos.z, center.z);
+	},
 	/**
 	 *
 	 * @param {string} [type]
@@ -34,15 +36,13 @@ export const XEntity = {
 	/**
 	 * Get entitie(s) at a position
 	 * @param {{x: number, y: number, z: number}} p0 position of the entity
-	 * @param {String} dimension Dimesion of the entity
+	 * @param {string} dimension Dimesion of the entity
 	 * @returns {Array<Entity>}
 	 * @example EntityBuilder.getEntityAtPos({0, 5, 0} 'nether');
 	 */
 	getAtPos({ x, y, z }, dimension = "overworld") {
 		try {
-			return world
-				.getDimension(dimension)
-				.getEntitiesAtBlockLocation(new BlockLocation(x, y, z));
+			return world.getDimension(dimension).getEntitiesAtBlockLocation(new BlockLocation(x, y, z));
 		} catch (error) {
 			return [];
 		}
@@ -75,11 +75,8 @@ export const XEntity = {
 	 */
 	getTagStartsWith(entity, value) {
 		const tags = entity.getTags();
-		if (tags.length === 0) return null;
-		const tag = tags.find((tag) => tag.startsWith(value));
-		if (!tag) return null;
-		if (tag.length < value.length) return null;
-		return tag.substring(value.length);
+		const tag = tags.find((tag) => tag?.startsWith(value) && tag?.length > value.length);
+		return tag ? tag.substring(value.length) : null;
 	},
 	/**
 	 * Returns a location of the inputed aguments
@@ -101,9 +98,7 @@ export const XEntity = {
 	 */
 	getScore(entity, objective) {
 		try {
-			return world.scoreboard
-				.getObjective(objective)
-				.getScore(entity.scoreboard);
+			return world.scoreboard.getObjective(objective).getScore(entity.scoreboard);
 		} catch (error) {
 			return 0;
 		}
@@ -111,7 +106,7 @@ export const XEntity = {
 	/**
 	 * Tests if a entity is dead
 	 * @param {Entity} entity entity you want to test
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 * @example isDead(Entity);
 	 */
 	isDead(entity) {
@@ -122,70 +117,28 @@ export const XEntity = {
 		);
 	},
 	/**
-	 * Gets the name of a entity after : in id
-	 * @param {String} entityName entity you want to test
-	 * @returns {String}
-	 * @example getGenericName(Entity);
-	 */
-	getGenericName(entityName) {
-		return entityName.split(":")[1].replace(/_/g, " ");
-	},
-	/**
-	 * Gets the inventory of a entity
-	 * @param {Entity} entity entity you want to get
-	 * @returns {Array<ItemStack>}
-	 * @example getGenericName(Entity);
-	 */
-	getInventory(entity) {
-		// @ts-ignore
-		const inventory = entity.getComponent("minecraft:inventory").container;
-		let items = [];
-		for (let i = 0; i < inventory.size; i++) {
-			items.push(
-				inventory.getItem(i) ?? { id: "minecraft:air", amount: 0, data: 0 }
-			);
-		}
-		return items;
-	},
-	/**
-	 * Gets the inventory of a entity
-	 * @param {Entity} entity entity you want to get
-	 * @returns {Number}
+	 * Gets items count from inventory
+	 * @param {Entity} entity entity from you want to get
+	 * @param {string} id
+	 * @returns {number}
 	 */
 	getItemsCount(entity, id) {
-		// @ts-ignore
-		const inventory = entity.getComponent("minecraft:inventory").container;
+		const inventory = this.getI(entity);
 		let count = 0;
 		for (let i = 0; i < inventory.size; i++) {
 			const item = inventory.getItem(i);
 			if (!item) continue;
-			if (item.id == id) count = count + item.amount;
+			if (item.typeId == id) count = count + item.amount;
 		}
 		return count;
 	},
 	/**
 	 * Gets the inventory of a entity
 	 * @param {Entity} entity entity you want to get
-	 * @returns {Number}
-	 */
-	getItemsCountClear(entity, id) {
-		const count = entity
-			.runCommand(`clear @s ${id}`)
-			.statusMessage.split(": ")[1]
-			.replace(/\D/gi, "");
-		entity.runCommand(`give @s ${id} ${count}`);
-		return count;
-	},
-	/**
-	 * Gets the inventory of a entity
-	 * @param {Entity} entity entity you want to get
-	 * @returns {Number}
+	 * @returns {number}
 	 */
 	clearItems(entity, id, count) {
-		const countt = entity
-			.runCommand(`clear @s ${id} -1 ${count}`)
-			.statusMessage.split(": ")[1]
-			.replace(/\D/gi, "");
+		const countt = entity.runCommand(`clear @s ${id} -1 ${count}`).statusMessage.split(": ")[1].replace(/\D/gi, "");
 		return countt;
 	},
 	/**
@@ -195,13 +148,12 @@ export const XEntity = {
 	 * @param {string} [itemId]
 	 * @returns
 	 */
-	hasItem(entity, location, itemId) {
-		let g = "",
-			u = 0;
-		if (location) (g += `location=slot.${location}`), (u = 1);
-		if (itemId) g += `${u ? "," : ""}item=${itemId}`;
+	async hasItem(entity, location, itemId) {
+		let g = "";
+		if (location) g += `location=slot.${location}`;
+		if (itemId) g += `${location ? "," : ""}item=${itemId}`;
 		try {
-			entity.runCommand(`testfor @s[hasitem={${g}}]`);
+			await entity.runCommandAsync(`testfor @s[hasitem={${g}}]`);
 			return true;
 		} catch (e) {
 			return false;
@@ -211,28 +163,10 @@ export const XEntity = {
 	 * Gets the inventory of a entity
 	 * @param {Entity} entity entity you want to get
 	 * @returns {PlayerInventoryComponentContainer}
-	 * @example getGenericName(Entity);
 	 */
 	getI(entity) {
 		// @ts-ignore
 		return entity.getComponent("minecraft:inventory").container;
-	},
-	/**
-	 * Gets a players held item
-	 * @param {Entity} entity player you want to get
-	 * @param {string} id
-	 * @param {boolean} [loreFirst]
-	 * @returns {Array<ItemStack, Number>}
-	 */
-	findItem(entity, id, loreFirst = null) {
-		// @ts-ignore
-		const inventory = entity.getComponent("minecraft:inventory").container;
-		for (let i = 0; i < inventory.size; i++) {
-			const item = inventory.getItem(i);
-			if (!item || item.id != id) continue;
-			if (loreFirst && item.getLore()[0] != loreFirst) continue;
-			return [item, i];
-		}
 	},
 	/**
 	 * Gets a players held item
@@ -244,105 +178,33 @@ export const XEntity = {
 		try {
 			const inventory = XEntity.getI(player);
 			return inventory.getItem(player.selectedSlot);
-		} catch (error) {
-			return null;
-		}
+		} catch (error) {}
 	},
-	/**
-	 *
-	 * @param {Player} player
-	 * @param {String} pos
-	 * @param {String} place
-	 * @param {Boolean} resultActionbar
-	 * @returns void
-	 * @example tp(player, '0 0 0', 'spawn', po.Q('tp', player))
-	 */
-	tp(
-		player,
-		pos,
-		place,
-		resultActionbar = false,
-		obj,
-		text,
-		slow_falling,
-		tpAnimation = true
-	) {
-		if (tpAnimation)
-			try {
-				player.runCommand("effect @s clear");
-			} catch (e) {}
-		if (slow_falling) player.runCommand("effect @s slow_falling 17 1 true");
-		let befplace;
-		if (obj && obj.on) {
-			let { P, C } = getPlace(obj.place, "");
-			befplace = `§${C}◙ §3${P}§r > `;
-		}
 
-		let { P, C, rot } = getPlace(place, text);
-		player.runCommand(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
-		if (resultActionbar)
-			player.runCommand(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
-		player.runCommand(
-			`tellraw @s {"rawtext":[{"translate":"${
-				befplace ? befplace : ""
-			}§${C}◙ §3${P}"}]}`
-		);
-	},
-	/**
-	 * Get the current chunk of a entity
-	 * @param {Entity} entity entity to check
-	 * @returns {Object}
-	 * @example getCurrentChunk(Entity);
-	 */
-	getCurrentChunk(entity) {
-		return {
-			x: Math.floor(entity.location.x / 16),
-			z: Math.floor(entity.location.z / 16),
-		};
-	},
-	/**
-	 * Gets the cuboid positions of a entitys chunk
-	 * @param {Entity} entity entity to check
-	 * @returns {Object}
-	 * @example getChunkCuboidPositions(Entity);
-	 */
-	getChunkCuboidPositions(entity) {
-		const chunk = this.getCurrentChunk(entity);
-		const pos1 = new BlockLocation(chunk.x * 16, -63, chunk.z * 16);
-		const pos2 = pos1.offset(16, 383, 16);
-		return {
-			pos1: pos1,
-			pos2: pos2,
-		};
-	},
 	/**
 	 * Converts a location to a block location
 	 * @param {Location} loc a location to convert
 	 * @returns {BlockLocation}
 	 */
 	locationToBlockLocation(loc) {
-		return new BlockLocation(
-			Math.floor(loc.x),
-			Math.floor(loc.y),
-			Math.floor(loc.z)
-		);
+		return new BlockLocation(Math.floor(loc.x), Math.floor(loc.y), Math.floor(loc.z));
 	},
 	/**
 	 * Despawns a entity
 	 * @param {Entity} entity entity to despawn
 	 */
 	despawn(entity) {
-		entity.teleport(new Location(0, -64, 0), entity.dimension, 0, 0);
+		entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
 		entity.kill();
 	},
 	/**
-	 * Despawns a entity
-	 * @param {string} name entity to despawn
+	 * Finds a player by name or ID
+	 * @param {string} name
 	 * @return {Player}
 	 */
 	fetch(name) {
 		for (const p of world.getPlayers()) {
-			if (p.name == name || p.id == name) return p;
+			if (p.name === name || p.id === name) return p;
 		}
 	},
 };

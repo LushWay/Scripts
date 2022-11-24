@@ -15,15 +15,15 @@ interface IRegionPermissions {
 	/**
 	 * if the player can use chests, defualt: true
 	 */
-	doorsAndSwitches: Boolean;
+	doorsAndSwitches: boolean;
 	/**
 	 * if the player can use doors, default: true
 	 */
-	openContainers: Boolean;
+	openContainers: boolean;
 	/**
 	 * if players can fight, default: false
 	 */
-	pvp: Boolean;
+	pvp: boolean;
 	/**
 	 * the entitys allowed in this region
 	 */

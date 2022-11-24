@@ -4,6 +4,6 @@ import { ThrowError, XA } from "xapi.js";
 /** @type {"build" | "survival"} */
 const logic = new XA.instantDB(world, "basic").get("server.logic") ?? "build";
 
-if (logic === "build") import("./Build/build.js");
-else if (logic === "survival") import("./Survival/survival.js");
+if (logic === "build") import("./Build/index.js");
+else if (logic === "survival") import("./Survival/index.js");
 else ThrowError(new TypeError("Invalid logic: " + logic));

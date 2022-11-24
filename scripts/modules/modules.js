@@ -1,7 +1,10 @@
-import { Items } from "@minecraft/server";
-import { wo } from "../lib/Class/Options.js";
+// Class for register X-API module
 import { Module } from "../lib/Module/creator.js";
 
+import { Items } from "@minecraft/server";
+import { wo } from "../lib/Class/XOptions.js";
+
+new Module("fast_reload");
 new Module("help");
 new Module("Menu");
 new Module("test");

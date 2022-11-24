@@ -10,29 +10,54 @@ import {
 	Vector,
 	world,
 } from "@minecraft/server";
-import {
-	setTickInterval,
-	setTickTimeout,
-	sleep,
-	ThrowError,
-	XA,
-} from "xapi.js";
-import { po, wo, WorldOption } from "../../lib/Class/Options.js";
+import { setTickInterval, setTickTimeout, sleep, ThrowError, XA } from "xapi.js";
+import { po, wo, WorldOption } from "../../lib/Class/XOptions.js";
 import { rd } from "../Airdrops/index.js";
-import { quene } from "../Battle Royal/index.js";
-import { globalRadius } from "./index.js";
-import { stats } from "./stats.js";
+import { quene } from "../Battle Royal/var.js";
+import { global, stats } from "./var.js";
 
-new WorldOption(
-	"spawn:pos",
-	"(x y z)\nТакже можно выставить через -spawn set <pos: Pos>",
-	true
-);
-new WorldOption(
-	"minigames:pos",
-	"(x y z)\nТакже можно выставить через -mg set <pos: Pos>",
-	true
-);
+new WorldOption("spawn:pos", "(x y z)\nТакже можно выставить через -spawn set <pos: Pos>", true);
+new WorldOption("minigames:pos", "(x y z)\nТакже можно выставить через -mg set <pos: Pos>", true);
+
+/**
+	 *
+	 * @param {Player} player
+	 * @param {string} pos
+	 * @param {string} place
+	 * @param {boolean} resultActionbar
+	 * @returns void
+	 * @example tp(player, '0 0 0', 'spawn', po.Q('tp', player))
+	 */
+function tp(player, pos, place, resultActionbar = false, obj, text, slow_falling, tpAnimation = true) {
+  if (tpAnimation)
+    try {
+      player.runCommand("effect @s clear");
+    } catch (e) {}
+  if (slow_falling) player.runCommand("effect @s slow_falling 17 1 true");
+  let befplace;
+  if (obj && obj.on) {
+    let { P, C } = getPlace(obj.place, "");
+    befplace = `§${C}◙ §3${P}§r > `;
+  }
+
+  let { P, C, rot } = getPlace(place, text);
+  player.runCommand(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
+  if (resultActionbar) player.runCommand(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
+  player.runCommand(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
+}
+
+function getPlace(place, text) {
+	let P = place,
+		C = text,
+		rot;
+	if (place == "anarch") (P = "§cАнархия"), (C = "4");
+	if (place == "spawn") (P = "§aСпавн"), (C = "2"), (rot = "0 0");
+	if (place == "br") (P = "§6Батл рояль"), (C = "e"), (rot = "0 0");
+	if (place == "minigames" || place == "currentpos") (P = "§dМиниигры§r"), (C = "5"), (rot = "0 0");
+	return { P, C, rot };
+}
+
+
 class inventory {
 	constructor() {
 		this.gamerules = [
@@ -72,15 +97,9 @@ class inventory {
 		if (IsSet) {
 			this.save = [];
 			for (const g of this.gamerules) {
-				this.save.push(
-					XA.Chat.runCommand(`gamerule ${g.split(":")[0]}`)?.statusMessage
-				);
-				XA.Chat.runCommand(`gamerule ${g.split(":")[0]} ${g.split(":")[1]}`);
+				XA.runCommand(`gamerule ${g.split(":")[0]} ${g.split(":")[1]}`);
 			}
-		} else
-			this.save.forEach((g) =>
-				XA.Chat.runCommand(`gamerule ${g.split(" = ")[0]} ${g.split(" = ")[1]}`)
-			);
+		} else this.save.forEach((g) => XA.runCommand(`gamerule ${g.split(" = ")[0]} ${g.split(" = ")[1]}`));
 	}
 	#setZone(bl) {
 		this.fillblocks.bedrock.forEach((e) => {
@@ -98,7 +117,7 @@ class inventory {
 	}
 	/**
 	 *
-	 * @param {Number} i
+	 * @param {number} i
 	 * @param {Player} pl
 	 * @returns
 	 */
@@ -107,46 +126,31 @@ class inventory {
 		if (i != invs.anarch || inv.size == inv.emptySlotsCount) return;
 		//console.warn("Сохранение инвентаря, старт");
 		this.#gamerules(true);
-		const zone = this.savezones.find(
-			(e) =>
-				world.getDimension("overworld").getEntitiesAtBlockLocation(e).length < 1
-		);
+		const zone = this.savezones.find((e) => world.getDimension("overworld").getEntitiesAtBlockLocation(e).length < 1);
 		if (!zone) return world.say("§cError");
 		this.#setZone(zone);
-		pl.teleport(
-			new Location(zone.x, zone.y, zone.z),
-			world.getDimension("overworld"),
-			0,
-			0,
-			false
-		);
+		pl.teleport(new Location(zone.x, zone.y, zone.z), world.getDimension("overworld"), 0, 0, false);
 		await sleep(10);
 		pl.addTag("saving");
 		const name = pl.name;
 		pl.kill();
 		sleep(10).then((e) => {
-			XA.Chat.runCommand(
-				`structure save ${this.structureName.replace("$name", pl.name)} ${
-					zone.x
-				} ${zone.y} ${zone.z} ${zone.x} ${zone.y + 1} ${
-					zone.z
-				} true disk false`,
-				"overworld"
+			XA.runCommand(
+				`structure save ${this.structureName.replace("$name", pl.name)} ${zone.x} ${zone.y} ${zone.z} ${zone.x} ${
+					zone.y + 1
+				} ${zone.z} true disk false`
 			);
 			const a = XA.Entity.getAtPos({
 				x: zone.x,
 				y: zone.y,
 				z: zone.z,
 			}).length;
-			XA.Chat.runCommand(
-				`kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`,
-				"overworld"
-			);
+			XA.runCommand(`kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`);
 			pl.tell(`Сохранено ${a} предметов`);
 		});
 		//console.warn("Сохранение инвентаря, прода");
 		let C = 0;
-		while (XA.Chat.runCommand("testfor " + name)?.error && C < 100) {
+		while ((await XA.runCommand("testfor " + name))?.successCount < 1 && C < 100) {
 			C++;
 			await sleep(5);
 		}
@@ -158,45 +162,31 @@ class inventory {
 	}
 	/**
 	 *
-	 * @param {Number} i
+	 * @param {number} i
 	 * @param {Player} pl
 	 * @returns
 	 */
 	async loadInv(i, pl) {
 		if (i != invs.anarch) {
 			//console.warn("Загрузка стандартного инвентаря");
-			XA.Chat.runCommand(`clear ${pl.name}`);
-			XA.Chat.runCommand(
+			XA.runCommand(`clear ${pl.name}`);
+			XA.runCommand(
 				`replaceitem entity ${pl.name} slot.hotbar 4 mcbehub:gui 1 0 {"item_lock":{"mode":"lock_in_slot"}}`
 			);
 		} else {
 			//console.warn("Загрузка инвентаря анархии, старт");
 
-			const zone = this.savezones.find(
-				(e) =>
-					world.getDimension("overworld").getEntitiesAtBlockLocation(e).length <
-					1
-			);
+			const zone = this.savezones.find((e) => world.getDimension("overworld").getEntitiesAtBlockLocation(e).length < 1);
 			if (!zone) return world.say("§cError");
 			this.#setZone(zone);
-			pl.teleport(
-				new Location(zone.x, zone.y, zone.z),
-				world.getDimension("overworld"),
-				0,
-				0,
-				false
+			pl.teleport(new Location(zone.x, zone.y, zone.z), world.getDimension("overworld"), 0, 0, false);
+			XA.runCommand(`clear ${pl.name}`);
+			XA.runCommand(
+				`structure load ${this.structureName.replace("$name", pl.name)} ${zone.x} ${zone.y} ${
+					zone.z
+				} 0_degrees none true false`
 			);
-			XA.Chat.runCommand(`clear ${pl.name}`);
-			XA.Chat.runCommand(
-				`structure load ${this.structureName.replace("$name", pl.name)} ${
-					zone.x
-				} ${zone.y} ${zone.z} 0_degrees none true false`,
-				"overworld"
-			);
-			XA.Chat.runCommand(
-				`structure delete ${this.structureName.replace("$name", pl.name)}`,
-				"overworld"
-			);
+			XA.runCommand(`structure delete ${this.structureName.replace("$name", pl.name)}`);
 			await sleep(1);
 			while (
 				world
@@ -215,38 +205,142 @@ class inventory {
 const inv = new inventory();
 
 const invs = { spawn: 1, anarch: 2, minigames: 1, currentplace: 1, br: 1 };
-const objectives = ["inv"];
+const objective = ["inv"];
+XA.objectives.push({ id: objective[0], watch: true });
+
+/**
+ *
+ * @param {Player} player
+ * @param {"spawn" | "anarch" | "minigames" | "currentpos" | "br"} [place]
+ * @param {{pvp?: boolean; lock?: boolean; quene?: boolean}} [ignore]
+ * @param {boolean} [setDefaultInventory]
+ * @returns {void}
+ * @example tp(player, 'spawn')
+ */
+export function Atp(player, place, ignore, setDefaultInventory) {
+	/** @param {string} reason */
+	const fail = (reason) => player.tell("§c► " + reason);
+	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
+
+	if (!ignore?.lock && tag) return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
+
+	if (!ignore?.quene && Object.keys(quene).includes(player.name))
+		return fail(`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`);
+
+	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0) return fail(`В режиме пвп это запрещенo`);
+
+	const currentInventory = XA.Entity.getScore(player, objective[0]);
+	const ps = invs[place];
+	if (!ps) return ThrowError(new Error("Неправильное место: " + place));
+
+	let pos = wo.G(`${place}:pos`);
+	if (place !== "anarch" && place !== "currentpos" && !pos)
+		return fail(`Админы забыли поставить точку телепортации для ${place}`);
+
+	let rtp = false,
+		air = false;
+	if (place === "anarch") {
+		const getPos = new XA.instantDB(world, "pos").get(player.id);
+		getPos ? (pos = getPos) : (rtp = true);
+		if (currentInventory == invs.anarch && !rtp) return;
+	} else if (place === "currentpos") {
+		const l = XA.Entity.locationToBlockLocation(player.location);
+		pos = l.x + " " + l.y + " " + l.z;
+	}
+	if (rtp) {
+		const pcenter = wo.G("zone:center");
+		const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
+		let y,
+			x,
+			z,
+			count = 0;
+
+		while (!y && count < 30) {
+			count++;
+			x = rd(Number(center[0]) + global.Radius - 10, Number(center[0]) - global.Radius + 10);
+			z = rd(Number(center[1]) + global.Radius - 10, Number(center[1]) - global.Radius + 10);
+			const q = new BlockRaycastOptions();
+			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
+			const b = world.getDimension("overworld").getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
+			if (b && b.location.y >= 63) {
+				y = b.location.y + 1;
+				break;
+			}
+		}
+		if (!y) {
+			air = true;
+			y = 200;
+		}
+		pos = x + " " + y + " " + z;
+	}
+
+	if (ps == invs.anarch) {
+		player.tell(`§r§${air ? "5Воздух" : "9Земля"}§r ${po.Q("anarchy:hideCoordinates", player) ? "" : pos}`);
+	}
+
+	if (currentInventory == invs.anarch) {
+		const l = XA.Entity.locationToBlockLocation(player.location);
+		XA.tables.pos.set(player.name, l.x + " " + l.y + " " + l.z);
+	}
+	const inve = XA.Entity.getI(player);
+	let obj = { on: false };
+	if (Object.keys(invs).find((e) => invs[e] == currentInventory))
+		obj = {
+			on: true,
+			place: Object.keys(invs).find((e) => invs[e] == currentInventory),
+		};
+	if (
+		(currentInventory == ps || (inve.size == inve.emptySlotsCount && place != "anarch")) &&
+		!((!setDefaultInventory && inve.size == inve.emptySlotsCount) || setDefaultInventory)
+	) {
+		tp(player, pos, place, po.Q("title:spawn:enable", player), null, null, air);
+		player.runCommand(`scoreboard players set @s ${objective[0]} ${ps}`);
+	} else {
+		try {
+			if (!setDefaultInventory) player.runCommand("testfor @s[m=!c]");
+			inv.saveInv(currentInventory, player).then(() =>
+				inv.loadInv(ps, player).then(() => {
+					player.runCommand(`scoreboard players set @s ${objective[0]} ${ps}`);
+					tp(
+						player,
+						pos,
+						place,
+						po.Q("title:spawn:enable", player),
+						obj,
+						null,
+						air,
+						(!setDefaultInventory && inve.size == inve.emptySlotsCount) || place == "currentpos"
+					);
+				})
+			);
+		} catch (e) {
+			player.runCommand(`scoreboard players set @s ${objective[0]} ${ps}`);
+			tp(player, pos, place, po.Q("title:spawn:enable", player), obj, null, air);
+		}
+	}
+}
 
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	if (
 		data.id != "binocraft:on_death" ||
-		XA.Entity.getScore(data.entity, objectives[0]) != invs.anarch ||
+		XA.Entity.getScore(data.entity, objective[0]) != invs.anarch ||
 		data.entity.hasTag("saving")
 	)
 		return;
-	stats.deaths.Eadd(data.entity, 1);
+	stats.deaths.eAdd(data.entity, 1);
 	if (data.entity.hasTag("br:alive")) return;
 	data.cancel = true;
 	const ent = data.entity.dimension.spawnEntity(
 		"t:hpper_minecart",
-		new Location(
-			data.entity.location.x,
-			data.entity.location.y + 0.2,
-			data.entity.location.z
-		)
+		new Location(data.entity.location.x, data.entity.location.y + 0.2, data.entity.location.z)
 	);
 	try {
-		data.entity.runCommand(
-			"tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]"
-		);
+		data.entity.runCommand("tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]");
 	} catch (e) {
 		XA.Entity.despawn(ent);
 		return;
 	}
-	data.entity.dimension.spawnEntity(
-		"f:t",
-		ent.location
-	).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
+	data.entity.dimension.spawnEntity("f:t", ent.location).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
 });
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	if (data.id != "ded") return;
@@ -279,168 +373,14 @@ setTickInterval(() => {
 		}
 	}
 }, 20);
-/**
- *
- * @param {Player} player
- * @param {"spawn" | "anarch" | "minigames" | "currentpos" | "br"} [place]
- * @param {{pvp?: boolean; lock?: boolean; quene?: boolean}} [ignore]
- * @param {boolean} [setDefaultInventory]
- * @returns {void}
- * @example tp(player, 'spawn')
- */
 
-export function Atp(player, place, ignore, setDefaultInventory) {
-	/** @param {string} reason */
-	const fail = (reason) => player.tell("§c► " + reason);
-	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
-
-	if (!ignore?.lock && tag)
-		return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
-
-	if (!ignore?.quene && Object.keys(quene).includes(player.name))
-		return fail(
-			`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`
-		);
-
-	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0)
-		return fail(`В режиме пвп это запрещенo`);
-
-	const currentInventory = XA.Entity.getScore(player, objectives[0]);
-	const ps = invs[place];
-	if (!ps) return ThrowError(new Error("Неправильное место: " + place));
-
-	let pos = wo.G(`${place}:pos`);
-	if (place !== "anarch" && place !== "currentpos" && !pos)
-		return fail(`Админы забыли поставить точку телепортации для ${place}`);
-
-	let rtp = false,
-		air = false;
-	if (place === "anarch") {
-		const getPos = new XA.instantDB(world, "pos").get(player.id);
-		getPos ? (pos = getPos) : (rtp = true);
-		if (currentInventory == invs.anarch && !rtp) return;
-	} else if (place === "currentpos") {
-		const l = XA.Entity.locationToBlockLocation(player.location);
-		pos = l.x + " " + l.y + " " + l.z;
-	}
-	if (rtp) {
-		const pcenter = wo.G("zone:center");
-		const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
-		let y,
-			x,
-			z,
-			count = 0;
-
-		while (!y && count < 30) {
-			count++;
-			x = rd(
-				Number(center[0]) + globalRadius - 10,
-				Number(center[0]) - globalRadius + 10
-			);
-			z = rd(
-				Number(center[1]) + globalRadius - 10,
-				Number(center[1]) - globalRadius + 10
-			);
-			const q = new BlockRaycastOptions();
-			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
-			const b = world
-				.getDimension("overworld")
-				.getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
-			if (b && b.location.y >= 63) {
-				y = b.location.y + 1;
-				break;
-			}
-		}
-		if (!y) {
-			air = true;
-			y = 200;
-		}
-		pos = x + " " + y + " " + z;
-	}
-
-	if (ps == invs.anarch) {
-		player.tell(
-			`§r§${air ? "5Воздух" : "9Земля"}§r ${
-				po.Q("anarchy:hideCoordinates", player) ? "" : pos
-			}`
-		);
-	}
-
-	if (currentInventory == invs.anarch) {
-		const l = XA.Entity.locationToBlockLocation(player.location);
-		XA.tables.pos.set(player.name, l.x + " " + l.y + " " + l.z);
-	}
-	const inve = XA.Entity.getI(player);
-	let obj = { on: false };
-	if (Object.keys(invs).find((e) => invs[e] == currentInventory))
-		obj = {
-			on: true,
-			place: Object.keys(invs).find((e) => invs[e] == currentInventory),
-		};
-	if (
-		(currentInventory == ps ||
-			(inve.size == inve.emptySlotsCount && place != "anarch")) &&
-		!(
-			(!setDefaultInventory && inve.size == inve.emptySlotsCount) ||
-			setDefaultInventory
-		)
-	) {
-		XA.Entity.tp(
-			player,
-			pos,
-			place,
-			po.Q("title:spawn:enable", player),
-			null,
-			null,
-			air
-		);
-		player.runCommand(`scoreboard players set @s ${objectives[0]} ${ps}`);
-	} else {
-		try {
-			if (!setDefaultInventory) player.runCommand("testfor @s[m=!c]");
-			inv.saveInv(currentInventory, player).then(() =>
-				inv.loadInv(ps, player).then(() => {
-					player.runCommand(`scoreboard players set @s ${objectives[0]} ${ps}`);
-					XA.Entity.tp(
-						player,
-						pos,
-						place,
-						po.Q("title:spawn:enable", player),
-						obj,
-						null,
-						air,
-						(!setDefaultInventory && inve.size == inve.emptySlotsCount) ||
-							place == "currentpos"
-					);
-				})
-			);
-		} catch (e) {
-			player.runCommand(`scoreboard players set @s ${objectives[0]} ${ps}`);
-			XA.Entity.tp(
-				player,
-				pos,
-				place,
-				po.Q("title:spawn:enable", player),
-				obj,
-				null,
-				air
-			);
-		}
-	}
-}
-
-const qqq = {};
-const scores = {};
-scores.objective = objectives[0];
-scores.minScore = 1;
-scores.maxScore = 1;
-qqq.scoreOptions = [scores];
-setTickInterval(() => {
+const qqq = {
+	scoreOptions: [{ objective: objective[0], minScore: 1, maxScore: 1 }],
+};
+setTickInterval(async () => {
 	for (const p of world.getPlayers())
 		try {
-			p.runCommand(
-				"execute as @s if block ~~-2~ bedrock if block ~~-3~ chest run event entity @s portal"
-			);
+			p.runCommand("execute as @s if block ~~-2~ bedrock if block ~~-3~ chest run event entity @s portal");
 		} catch (ee) {}
 	const pos = wo
 		.G("spawn:pos")
@@ -454,48 +394,30 @@ setTickInterval(() => {
 		if (
 			pos &&
 			XA.Entity.getScore(pl, "inv") == 1 &&
-			!XA.Entity.hasItem(pl, "armor.chest", "elytra") &&
+			!(await XA.Entity.hasItem(pl, "armor.chest", "elytra")) &&
 			pl.location.y < pos[1] - 10
 		) {
 			try {
-				pl.runCommand(
-					`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${
-						pl.name
-					}",r=50]`
-				);
+				pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=50]`);
 				Atp(pl, "spawn", { pvp: true });
 			} catch (e) {}
 		} else {
 			try {
-				pl.runCommand(
-					`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${
-						pl.name
-					}",r=200]`
-				);
+				pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=200]`);
 				if (pl.location.y < pos[1] - 50) Atp(pl, "spawn", { pvp: true });
 			} catch (e) {}
 			try {
-				pl.runCommand(
-					`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${
-						pl.name
-					}",rm=200,r=210]`
-				);
+				pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",rm=200,r=210]`);
 				Atp(pl, "spawn", { pvp: true });
 			} catch (e) {}
 		}
 		if (pos2 && pl.location.y < pos2[1] - 10) {
 			try {
-				pl.runCommand(
-					`execute positioned ${wo.Q("minigames:pos")} run testfor @a[name="${
-						pl.name
-					}",r=50]`
-				);
+				pl.runCommand(`execute positioned ${wo.Q("minigames:pos")} run testfor @a[name="${pl.name}",r=50]`);
 				Atp(pl, "minigames", { pvp: true });
 			} catch (e) {}
 		}
 	}
-	for (const obj of objectives)
-		XA.Chat.runCommand(`scoreboard objectives add ${obj} dummy`);
 }, 0);
 
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
@@ -523,7 +445,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 			if (i.getLore()[1] == "minigames") poo = wo.G("minigames:pos");
 			if (!poo) poo = i.getLore()[1];
 
-			XA.Entity.tp(
+			tp(
 				data.entity,
 				poo,
 				i.getLore()[2],
@@ -533,7 +455,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 			);
 			break;
 		case "trigger":
-			XA.events.triggerEvent(i.getLore()[1], {
+			XA.events.emit(i.getLore()[1], {
 				player: data.entity,
 				item: i,
 			});
@@ -615,20 +537,10 @@ new XA.Command({
 		);
 		block.setType(MinecraftBlockTypes.chest);
 		block.getComponent("inventory").container.setItem(0, item);
-		const loc = XA.Entity.locationToBlockLocation(ctx.sender.location).offset(
-			0,
-			1,
-			0
-		);
+		const loc = XA.Entity.locationToBlockLocation(ctx.sender.location).offset(0, 1, 0);
 		const l = new Location(loc.x + 0.5, loc.y, loc.z + 0.5);
 
-		ctx.sender.teleport(
-			l,
-			ctx.sender.dimension,
-			ctx.sender.rotation.x,
-			ctx.sender.rotation.y,
-			false
-		);
+		ctx.sender.teleport(l, ctx.sender.dimension, ctx.sender.rotation.x, ctx.sender.rotation.y, false);
 
 		ctx.reply(`§f► ${ctx.args.slice(1).join("§r, ")}`);
 		ctx.sender.runCommandAsync("setblock ~~-3~ bedrock");

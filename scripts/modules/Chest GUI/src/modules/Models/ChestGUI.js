@@ -20,33 +20,12 @@ import {
 	ModalFormResponse,
 } from "@minecraft/server-ui";
 import { sleep, XA } from "xapi.js";
-import {
-	OPTIONS,
-	po,
-	wo,
-	WORLDOPTIONS,
-} from "../../../../../lib/Class/Options.js";
-import { Wallet } from "../../../../../lib/Class/Wallet.js";
+import { OPTIONS, po, wo, WORLDOPTIONS } from "../../../../../lib/Class/XOptions.js";
+import { Wallet } from "../../../../../lib/Class/XWallet.js";
 import { LeaderboardBuild } from "../../../../Leaderboards/LeaderboardBuilder.js";
-import {
-	Allhrs,
-	Allmin,
-	Allsec,
-	Dayhrs,
-	Daymin,
-	Daysec,
-	Seahrs,
-	Seamin,
-	Seasec,
-} from "../../../../Server/index.js";
 import { Atp } from "../../../../Server/portals.js";
-import { stats } from "../../../../Server/stats.js";
-import {
-	auxa,
-	DEFAULT_STATIC_PAGE_ID,
-	pls,
-	предметы,
-} from "../../static_pages.js";
+import { stats, time } from "../../../../Server/var.js";
+import { auxa, DEFAULT_STATIC_PAGE_ID, pls, предметы } from "../../static_pages.js";
 import {
 	ChangeAction,
 	ChangePAction,
@@ -81,9 +60,7 @@ class DefaultFill {
 				entity.runCommand(`replaceitem entity @s slot.inventory ${i} air`);
 				continue;
 			}
-			entity.runCommand(
-				`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`
-			);
+			entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -95,8 +72,7 @@ class DefaultFill {
 				/**
 				 * @type {EnchantmentList}
 				 */
-				const ItemStackEnchantments =
-					chestItem.getComponent("enchantments").enchantments;
+				const ItemStackEnchantments = chestItem.getComponent("enchantments").enchantments;
 				for (const ench of item.components.enchantments) {
 					ItemStackEnchantments.addEnchantment(
 						new Enchantment(
@@ -105,8 +81,7 @@ class DefaultFill {
 						)
 					);
 				}
-				chestItem.getComponent("enchantments").enchantments =
-					ItemStackEnchantments;
+				chestItem.getComponent("enchantments").enchantments = ItemStackEnchantments;
 			}
 			container.setItem(i, chestItem);
 		}
@@ -125,9 +100,7 @@ function ShopFill(entity, page, player) {
 	const container = entity.getComponent("minecraft:inventory").container;
 	const id = page.id + "::dm::" + player.name;
 	let custom_page;
-	PAGES[id]
-		? (custom_page = PAGES[id])
-		: (custom_page = new Page(id, 54, "shop"));
+	PAGES[id] ? (custom_page = PAGES[id]) : (custom_page = new Page(id, 54, "shop"));
 	for (let i = 0; i < container.size; i++) {
 		/**
 		 * @type {import("./Page").Item}
@@ -140,14 +113,9 @@ function ShopFill(entity, page, player) {
 		if (item.lore[0] == XA.Lang.lang["shop.lore"]()[0]) {
 			const w = new Wallet(player);
 
-			item.lore = XA.Lang.lang["shop.lore"](
-				XA.Lang.parse(item.lore, "shop.lore").price,
-				w.balance()
-			);
+			item.lore = XA.Lang.lang["shop.lore"](XA.Lang.parse(item.lore, "shop.lore").price, w.balance());
 		}
-		entity.runCommand(
-			`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`
-		);
+		entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 		/**
 		 * @type {ItemStack}
 		 */
@@ -159,8 +127,7 @@ function ShopFill(entity, page, player) {
 			/**
 			 * @type {EnchantmentList}
 			 */
-			const ItemStackEnchantments =
-				chestItem.getComponent("enchantments").enchantments;
+			const ItemStackEnchantments = chestItem.getComponent("enchantments").enchantments;
 			for (const ench of item.components.enchantments) {
 				ItemStackEnchantments.addEnchantment(
 					new Enchantment(
@@ -169,19 +136,10 @@ function ShopFill(entity, page, player) {
 					)
 				);
 			}
-			chestItem.getComponent("enchantments").enchantments =
-				ItemStackEnchantments;
+			chestItem.getComponent("enchantments").enchantments = ItemStackEnchantments;
 		}
 		container.setItem(i, chestItem);
-		custom_page.createItem(
-			i,
-			item.type,
-			item?.amount,
-			item?.data,
-			item?.action,
-			item?.name,
-			item?.lore
-		);
+		custom_page.createItem(i, item.type, item?.amount, item?.data, item?.action, item?.name, item?.lore);
 		if (i == 0) co("crItem: " + item.type);
 		//console.warn(iitem + ' ' + item.type)
 	}
@@ -203,9 +161,7 @@ class SpecialFill {
 		const container = entity.getComponent("minecraft:inventory").container;
 		const id = "forplayer:" + player.name;
 		let custom_page;
-		PAGES[id]
-			? (custom_page = PAGES[id])
-			: (custom_page = new Page(id, 54, "spec"));
+		PAGES[id] ? (custom_page = PAGES[id]) : (custom_page = new Page(id, 54, "spec"));
 		for (let i = 0; i < container.size; i++) {
 			/**
 			 * @type {import("./Page").Item}
@@ -232,13 +188,8 @@ class SpecialFill {
 						iitem = `${po.Q(opt, player) ? "lime" : "red"}_candle`;
 					} else iitem = `${po.Q(opt, player) ? "yellow" : "red"}_candle`;
 				}
-				entity.runCommand(
-					`replaceitem entity @s slot.inventory ${i} ${iitem} ${item?.amount} ${item?.data}`
-				);
-			} else
-				entity.runCommand(
-					`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`
-				);
+				entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${iitem} ${item?.amount} ${item?.data}`);
+			} else entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -250,8 +201,7 @@ class SpecialFill {
 				/**
 				 * @type {EnchantmentList}
 				 */
-				const ItemStackEnchantments =
-					chestItem.getComponent("enchantments").enchantments;
+				const ItemStackEnchantments = chestItem.getComponent("enchantments").enchantments;
 				for (const ench of item.components.enchantments) {
 					ItemStackEnchantments.addEnchantment(
 						new Enchantment(
@@ -260,21 +210,12 @@ class SpecialFill {
 						)
 					);
 				}
-				chestItem.getComponent("enchantments").enchantments =
-					ItemStackEnchantments;
+				chestItem.getComponent("enchantments").enchantments = ItemStackEnchantments;
 			}
 			let it;
 			iitem ? (it = iitem) : (it = item.type);
 			container.setItem(i, chestItem);
-			custom_page.createItem(
-				i,
-				it,
-				item?.amount,
-				item?.data,
-				item?.action,
-				item?.name,
-				item?.lore
-			);
+			custom_page.createItem(i, it, item?.amount, item?.data, item?.action, item?.name, item?.lore);
 			if (i == 0) co("crItem: " + item.type);
 			//console.warn(iitem + ' ' + item.type)
 		}
@@ -303,9 +244,7 @@ class SpecialFill {
 		const container = entity.getComponent("minecraft:inventory").container;
 		const id = "forrplayer:" + player.name;
 		let custom_page;
-		PAGES[id]
-			? (custom_page = PAGES[id])
-			: (custom_page = new Page(id, 54, "array:" + arrayType));
+		PAGES[id] ? (custom_page = PAGES[id]) : (custom_page = new Page(id, 54, "array:" + arrayType));
 		for (let i = 0; i < container.size; i++) {
 			/**
 			 * @type {import("./Page").Item}
@@ -326,9 +265,7 @@ class SpecialFill {
 				container.setItem(i, new ItemStack(MinecraftItemTypes.air));
 				continue;
 			}
-			entity.runCommand(
-				`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`
-			);
+			entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -336,15 +273,7 @@ class SpecialFill {
 			if (item?.name) chestItem.nameTag = item.name;
 			if (item?.lore) chestItem.setLore(item.lore);
 			container.setItem(i, chestItem);
-			custom_page.createItem(
-				i,
-				item.type,
-				item?.amount,
-				item?.data,
-				item?.action,
-				item?.name,
-				item?.lore
-			);
+			custom_page.createItem(i, item.type, item?.amount, item?.data, item?.action, item?.name, item?.lore);
 
 			//console.warn(iitem + ' ' + item.type)
 		}
@@ -391,9 +320,7 @@ class PlayerFill {
 				container.setItem(i, new ItemStack(MinecraftItemTypes.air));
 				continue;
 			}
-			entity.runCommand(
-				`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`
-			);
+			entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -406,8 +333,7 @@ class PlayerFill {
 				/**
 				 * @type {EnchantmentList}
 				 */
-				const ItemStackEnchantments =
-					chestItem.getComponent("enchantments").enchantments;
+				const ItemStackEnchantments = chestItem.getComponent("enchantments").enchantments;
 				for (const ench of item.components.enchantments) {
 					ItemStackEnchantments.addEnchantment(
 						new Enchantment(
@@ -416,19 +342,10 @@ class PlayerFill {
 						)
 					);
 				}
-				chestItem.getComponent("enchantments").enchantments =
-					ItemStackEnchantments;
+				chestItem.getComponent("enchantments").enchantments = ItemStackEnchantments;
 			}
 			container.setItem(i, chestItem);
-			pls.createItem(
-				i,
-				item.type,
-				item?.amount,
-				item?.data,
-				item?.action,
-				item?.name,
-				item?.lore
-			);
+			pls.createItem(i, item.type, item?.amount, item?.data, item?.action, item?.name, item?.lore);
 		}
 	}
 }
@@ -470,9 +387,7 @@ class Itemss {
 				continue;
 			}
 			if (!im) {
-				entity.runCommand(
-					`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`
-				);
+				entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			} else {
 				container.setItem(i, im);
 				continue;
@@ -484,28 +399,20 @@ class Itemss {
 			if (item?.name) chestItem.name = item.name;
 			if (item?.lore) chestItem.setLore(item.lore);
 			container.setItem(i, chestItem);
-			предметы.createItem(
-				i,
-				item.type,
-				item?.amount,
-				item?.data,
-				item?.action,
-				item?.name,
-				item?.lore
-			);
+			предметы.createItem(i, item.type, item?.amount, item?.data, item?.action, item?.name, item?.lore);
 		}
 	}
 }
 
 /**
  * @typedef {Object} MappedInventoryItem a inventory that has been saved
- * @property {String} uid a unique id for a itemStack
+ * @property {string} uid a unique id for a itemStack
  * @property {ItemStack} item the item
  */
 
 /**
  * @typedef {Object} SlotChangeReturn What gets return on a slot change
- * @property {Number} slot Slot that changed
+ * @property {number} slot Slot that changed
  * @property {ItemStack} item the item that was grabbed
  */
 
@@ -526,11 +433,7 @@ export const ACTIONS1 = {
 		//form.textField('Введи значение:', 'значение', wo.Q(item.name.cc()) ? wo.Q(item.name.cc()) : undefined)
 		form.dropdown(
 			"Уровень разрешений:",
-			[
-				"Участник",
-				"§9Модер§r (команды, OP)",
-				"§6Админ§r (команды, OP, настройки)",
-			],
+			["Участник", "§9Модер§r (команды, OP)", "§6Админ§r (команды, OP, настройки)"],
 			XA.Entity.getScore(XA.Entity.fetch(item.name.cc()), "perm")
 		);
 		OpenForm(his, his.player, form, (res) => {
@@ -538,7 +441,7 @@ export const ACTIONS1 = {
 				switch (res.formValues[0]) {
 					case 0:
 						/**
-						 * @type {Array<String>}
+						 * @type {Array<string>}
 						 */
 						let list1 = wo.Q("perm:владельцы").split(", ");
 						let list2 = wo.Q("perm:модеры").split(", ");
@@ -593,11 +496,7 @@ export const ACTIONS1 = {
 	open: (his, item) => {
 		const form = new ModalFormData();
 		form.title("§l§f" + item.name.cc() + "§r");
-		form.textField(
-			"Введи значение:",
-			"значение",
-			wo.Q(item.name.cc()) ? wo.Q(item.name.cc()) : undefined
-		);
+		form.textField("Введи значение:", "значение", wo.Q(item.name.cc()) ? wo.Q(item.name.cc()) : undefined);
 		OpenForm(his, his.player, form, (res) => {
 			if (!res.isCanceled) {
 				wo.set(item.name.cc(), res.formValues[0]);
@@ -626,25 +525,15 @@ export const ACTIONS1 = {
 		form.textField("Оставь пустым для удаления", "gray | orange | green", "");
 		OpenForm(his, his.player, form, (data) => {
 			if (data.isCanceled) return;
-			const ent = XA.Entity.getClosetsEntitys(
-				his.player,
-				10,
-				"f:t",
-				44,
-				false
-			).find(
-				(e) =>
-					e.nameTag == item.name.replace("§m§n§m§r", "").replace("§m§n§m§r", "")
+			const ent = XA.Entity.getClosetsEntitys(his.player, 10, "f:t", 44, false).find(
+				(e) => e.nameTag == item.name.replace("§m§n§m§r", "").replace("§m§n§m§r", "")
 			);
 			if (!data.formValues[0]) {
 				LeaderboardBuild.removeObj(XA.Entity.getTagStartsWith(ent, "obj:"));
 				ent.triggerEvent("kill");
 				return;
 			}
-			LeaderboardBuild.shangeStyle(
-				XA.Entity.getTagStartsWith(ent, "obj:"),
-				data.formValues[0]
-			);
+			LeaderboardBuild.shangeStyle(XA.Entity.getTagStartsWith(ent, "obj:"), data.formValues[0]);
 		});
 	},
 	tag: (his, item) => {
@@ -653,24 +542,16 @@ export const ACTIONS1 = {
 	redo: (his, item) => {
 		const form = new ModalFormData();
 		form.title("§l§fРедактирование§r");
-		form.textField(
-			"Оставь пустым для удаления",
-			"Имя",
-			item.name.replace("§m§n§m§r§m§n§m§r", "")
-		);
+		form.textField("Оставь пустым для удаления", "Имя", item.name.replace("§m§n§m§r§m§n§m§r", ""));
 		OpenForm(his, his.player, form, (d) => {
 			/**
 			 * @type {ModalFormResponse}
 			 */
 			const data = d;
 			if (data.isCanceled) return;
-			const ent = XA.Entity.getClosetsEntitys(
-				his.player,
-				10,
-				"f:t",
-				44,
-				false
-			).find((e) => e.nameTag.cc() == item.name.cc());
+			const ent = XA.Entity.getClosetsEntitys(his.player, 10, "f:t", 44, false).find(
+				(e) => e.nameTag.cc() == item.name.cc()
+			);
 			if (!data.formValues[0]) ent.triggerEvent("kill");
 			ent.nameTag = data.formValues[0];
 		});
@@ -681,10 +562,7 @@ export const ACTIONS1 = {
 		form.textField("Имя", "Оставь пустым для отмены", "§");
 		OpenForm(his, his.player, form, (data) => {
 			if (data.isCanceled || !data.formValues[0]) return;
-			const ent = his.player.dimension.spawnEntity(
-				"f:t",
-				XA.Entity.locationToBlockLocation(his.player.location)
-			);
+			const ent = his.player.dimension.spawnEntity("f:t", XA.Entity.locationToBlockLocation(his.player.location));
 			ent.nameTag = data.formValues[0];
 		});
 	},
@@ -728,16 +606,7 @@ export const ACTIONS1 = {
 				lore: item.item.getLore(),
 				name: item.item.nameTag,
 			};
-			SetAction(
-				his,
-				nei,
-				count,
-				new ItemStack(
-					MinecraftItemTypes.redCandle,
-					item.item.amount,
-					item.item.data
-				)
-			);
+			SetAction(his, nei, count, new ItemStack(MinecraftItemTypes.redCandle, item.item.amount, item.item.data));
 			PAGES[his.page.id].createItem(
 				count,
 				"minecraft:red_candle",
@@ -763,22 +632,22 @@ export const ACTIONS1 = {
 			//   his.player
 			// )}:${Daysec.Eget(his.player)}${"\n\n\n\n"}`
 			XA.Lang.lang.stats(
-				Allhrs.Eget(his.player),
-				Allmin.Eget(his.player),
-				Allsec.Eget(his.player),
-				Seahrs.Eget(his.player),
-				Seamin.Eget(his.player),
-				Seasec.Eget(his.player),
-				Dayhrs.Eget(his.player),
-				Daymin.Eget(his.player),
-				Daysec.Eget(his.player),
-				stats.kills.Eget(his.player),
-				stats.deaths.Eget(his.player),
-				stats.Hget.Eget(his.player),
-				stats.Hgive.Eget(his.player),
-				stats.Bplace.Eget(his.player),
-				stats.Bbreak.Eget(his.player),
-				stats.FVlaunc.Eget(his.player)
+				time.all.hours.eGet(his.player),
+				time.all.minutes.eGet(his.player),
+				time.all.seconds.eGet(his.player),
+				time.anarchy.hours.eGet(his.player),
+				time.anarchy.minutes.eGet(his.player),
+				time.anarchy.seconds.eGet(his.player),
+				time.day.hours.eGet(his.player),
+				time.day.minutes.eGet(his.player),
+				time.day.seconds.eGet(his.player),
+				stats.kills.eGet(his.player),
+				stats.deaths.eGet(his.player),
+				stats.Hget.eGet(his.player),
+				stats.Hgive.eGet(his.player),
+				stats.Bplace.eGet(his.player),
+				stats.Bbreak.eGet(his.player),
+				stats.FVlaunc.eGet(his.player)
 			)
 		);
 		OpenForm(his, his.player, form);
@@ -801,16 +670,7 @@ const STARTACTIONS1 = {
 					lore: item.item.getLore(),
 					name: item.item.nameTag,
 				};
-				SetAction(
-					his,
-					nei,
-					count,
-					new ItemStack(
-						MinecraftItemTypes.redCandle,
-						item.item.amount,
-						item.item.data
-					)
-				);
+				SetAction(his, nei, count, new ItemStack(MinecraftItemTypes.redCandle, item.item.amount, item.item.data));
 				auxa.createItem(
 					count,
 					"minecraft:red_candle",
@@ -844,10 +704,7 @@ const STARTACTIONS1 = {
 			form = new MessageFormData(),
 			w = new Wallet(his.player);
 		if (w.balance() < price) {
-			world.say(
-				XA.Lang.lang["shop.notenought"](price, w.balance()),
-				his.player.name
-			);
+			world.say(XA.Lang.lang["shop.notenought"](price, w.balance()), his.player.name);
 			his.player.playSound("note.bass");
 			his.setPage(his.page.id);
 			return;
@@ -869,24 +726,13 @@ const STARTACTIONS1 = {
 			const data = d;
 			if (data.isCanceled || data.selection == 0) return;
 			if (w.balance() < price) {
-				world.say(
-					XA.Lang.lang["shop.notenought"](price, w.balance()),
-					his.player.name
-				);
+				world.say(XA.Lang.lang["shop.notenought"](price, w.balance()), his.player.name);
 				his.player.playSound("note.bass");
 				return;
 			}
 			GiveAction(his, item);
 			w.add(-price);
-			world.say(
-				XA.Lang.lang["shop.suc"](
-					item.type.split(":")[1],
-					item.amount,
-					price,
-					w.balance()
-				),
-				his.player.name
-			);
+			world.say(XA.Lang.lang["shop.suc"](item.type.split(":")[1], item.amount, price, w.balance()), his.player.name);
 			his.player.playSound("random.levelup");
 		});
 	},
@@ -925,8 +771,7 @@ export class ChestGUI {
 				return { slot: i, item: oldInv[i].item, ex: true };
 			}
 
-			if (oldInv[i].uid != newInv[i].uid)
-				return { slot: i, item: oldInv[i].item };
+			if (oldInv[i].uid != newInv[i].uid) return { slot: i, item: oldInv[i].item };
 		}
 		return null;
 	}
@@ -936,13 +781,7 @@ export class ChestGUI {
 	 * @param {Player} player the player this chestGUI is asigned to
 	 * @param {Entity} entity entity to use if undefined will create one
 	 */
-	constructor(
-		player,
-		entity = null,
-		GUIitem = null,
-		GUIid = null,
-		GUIpage = null
-	) {
+	constructor(player, entity = null, GUIitem = null, GUIid = null, GUIpage = null) {
 		this.player = player;
 		this.entity = entity;
 		this.previousMap = null;
@@ -958,36 +797,22 @@ export class ChestGUI {
 		this.events = {
 			tick: world.events.tick.subscribe(() => {
 				try {
-					if (this.entity.getComponent("minecraft:health").current <= 0)
-						return this.kill();
+					if (this.entity.getComponent("minecraft:health").current <= 0) return this.kill();
 				} catch (error) {
 					this.kill();
 				}
 				if (GUIitem && GUIitem != "other") {
-					if (XA.Entity.getHeldItem(this.player)?.typeId != GUIitem)
-						return this.kill();
-				} else if (
-					GUIitem != "other" &&
-					XA.Entity.getHeldItem(this.player)?.typeId != GUI_ITEM
-				)
-					return this.kill();
+					if (XA.Entity.getHeldItem(this.player)?.typeId != GUIitem) return this.kill();
+				} else if (GUIitem != "other" && XA.Entity.getHeldItem(this.player)?.typeId != GUI_ITEM) return this.kill();
 
 				try {
-					this.entity.teleport(
-						this.player.location,
-						this.player.dimension,
-						0,
-						0
-					);
+					this.entity.teleport(this.player.location, this.player.dimension, 0, 0);
 				} catch (error) {}
 
 				if (!this.player.hasTag(`has_container_open`)) return;
 				if (!this.previousMap) return;
 
-				const change = ChestGUI.getSlotChange(
-					this.previousMap,
-					this.mapInventory
-				);
+				const change = ChestGUI.getSlotChange(this.previousMap, this.mapInventory);
 				if (change == null) return;
 				this.onSlotChange(change, change.ex ? change.item.amount : "");
 			}),
@@ -1033,9 +858,7 @@ export class ChestGUI {
 			delete CURRENT_GUIS[this.player.name];
 			delete PAGES["forplayer:" + this.player.name];
 			delete PAGES["forrplayer:" + this.player.name];
-			const k = Object.keys(PAGES).find((e) =>
-				e.endsWith("::dm::" + this.player.name)
-			);
+			const k = Object.keys(PAGES).find((e) => e.endsWith("::dm::" + this.player.name));
 			if (k) delete PAGES[k];
 			try {
 				this.entity.triggerEvent("despawn");
@@ -1110,8 +933,8 @@ export class ChestGUI {
 					this.entity,
 					page,
 					this.player,
-					XA.Entity.getClosetsEntitys(this.player, 10, "f:t", 44, false).map(
-						(e) => (e.hasTag("lb") ? "2(::)" + e.nameTag : "1(::)" + e.nameTag)
+					XA.Entity.getClosetsEntitys(this.player, 10, "f:t", 44, false).map((e) =>
+						e.hasTag("lb") ? "2(::)" + e.nameTag : "1(::)" + e.nameTag
 					),
 					"text",
 					"minecraft:writable_book",
@@ -1181,12 +1004,7 @@ export class ChestGUI {
 			/**
 			 * @type {InventoryComponentContainer}
 			 */
-			this.setPage(
-				this.page.id == "lich"
-					? PAGES["forplayer:" + this.player] ?? this.page.id
-					: this.page.id,
-				item
-			);
+			this.setPage(this.page.id == "lich" ? PAGES["forplayer:" + this.player] ?? this.page.id : this.page.id, item);
 		} else {
 			// item was taken from this page
 			const clearItem = Object.assign(item);
@@ -1196,8 +1014,7 @@ export class ChestGUI {
 			if (!change.item && !getItemAtSlot(this.entity, change.slot)) return;
 
 			// Действия
-			let act = (_his, item) =>
-				world.say("§c[ChestGUI] §fUnknown action: §r" + item.action);
+			let act = (_his, item) => world.say("§c[ChestGUI] §fUnknown action: §r" + item.action);
 
 			if (ACTIONS1[item.action]) act = ACTIONS1[item.action];
 			for (const key of Object.keys(STARTACTIONS1)) {
@@ -1247,17 +1064,13 @@ export async function clearPlayersPointer(player, ItemToClear) {
 				if (i < 9) {
 					await player.runCommandAsync(`replaceitem entity @s slot.hotbar ${i} air`);
 				} else {
-					await player.runCommandAsync(
-						`replaceitem entity @s slot.inventory ${i - 9} air`
-					);
+					await player.runCommandAsync(`replaceitem entity @s slot.inventory ${i - 9} air`);
 				}
 			}
 		}
 		try {
 			await player.runCommandAsync(
-				`clear @s ${ItemToClear?.id ?? ItemToClear?.type} ${ItemToClear.data} ${
-					ItemToClear.amount
-				}`
+				`clear @s ${ItemToClear?.id ?? ItemToClear?.type} ${ItemToClear.data} ${ItemToClear.amount}`
 			);
 		} catch (e) {
 			// the item couldnt be cleared that means

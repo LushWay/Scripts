@@ -1,3 +1,3 @@
 export const lang = {
-	new: 0,
+	newPlayer: "Пр",
 };

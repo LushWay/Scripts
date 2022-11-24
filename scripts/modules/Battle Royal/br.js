@@ -1,6 +1,6 @@
 import { BlockLocation, Player, world } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
-import { wo } from "../../lib/Class/Options.js";
+import { wo } from "../../lib/Class/XOptions.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
 import { rtp } from "./rtp.js";
@@ -37,17 +37,20 @@ class BattleRoyal {
 	}
 	async waitToRespawn(name, event) {
 		let C = 0;
-		while (XA.Chat.runCommand("testfor " + name)?.error && C < 100) {
+		while ((await XA.runCommand("testfor " + name)).successCount < 1 && C < 100) {
 			await sleep(5);
 			C++;
 		}
-		XA.events.triggerEvent(event, {
+		XA.events.emit(event, {
 			player: XA.Entity.fetch(name),
 		});
 	}
 
-	//СТАРТ
-
+	/**
+	 *
+	 * @param {string[]} players
+	 * @returns
+	 */
 	start(players) {
 		try {
 			// Ресет
@@ -55,10 +58,8 @@ class BattleRoyal {
 			this.quene.time = 0;
 			// Варн
 			if (!wo.Q("br:gamepos") || !wo.Q("br:time"))
-				return this.end(
-					"error",
-					"§cТребуемые для запуска значения (br:time, br:gamepos) не выставлены."
-				);
+				return this.end("error", "§cТребуемые для запуска значения (br:time, br:gamepos) не выставлены.");
+
 			// Значения из настроек
 			this.time.min = Number((wo.Q("br:time") + "").split(":")[0]);
 			this.time.sec = Number((wo.Q("br:time") + "").split(":")[1]);
@@ -67,51 +68,36 @@ class BattleRoyal {
 			this.game.started = true;
 			this.reward = 0;
 
-			// Значения, зависящие от кол-ва игроков
-			/**
-			 * @type {Array<String>}
-			 */
-			const a = players.filter((e) => XA.Entity.fetch(e));
-			if (a.length < 1) {
-				return this.end("error", "§cЗапуск без игроков невозможен");
-			}
-			a.forEach(
-				() => (
-					(this.reward = this.reward + 100),
-					(this.game.rad = Math.min(this.game.rad + 60, 128)),
-					(this.game.startrad = this.game.rad),
-					(this.game.minrad = Math.min(this.game.minrad + 15, 40))
-				)
-			);
+			const allplayers = [...world.getPlayers()].map((e) => e.id);
+			const players = allplayers.filter((e) => allplayers.includes(e));
+
+			if (players.length < 1) return this.end("error", "§cЗапуск без игроков невозможен");
+
+			this.reward = this.reward + players.length * 100;
+			this.game.rad = Math.min(60 * players.length, 128);
+			this.game.minrad = Math.min(15 * players.length, 40);
+			this.game.startrad = this.game.rad;
 
 			// Центр
-			this.center.z = rd(
-				this.pos.z + 128 + 50,
-				this.pos.z + 128 - 50,
-				"centerZ"
-			);
-			this.center.x = rd(
-				this.pos.x + 128 + 50,
-				this.pos.x + 128 - 50,
-				"centerX"
-			);
+			this.center.z = rd(this.pos.z + 128 + 50, this.pos.z + 128 - 50, "centerZ");
+			this.center.x = rd(this.pos.x + 128 + 50, this.pos.x + 128 - 50, "centerX");
 
 			/** Сундуки (для удаления в будущем)
-			 * @type {Array<String>}
+			 * @type {Array<string>}
 			 */
 			let chest = [];
 			let poses = [];
 			let debug = false;
 			if (debug) {
 				world.say(
-					`Pos1: ${this.pos.x} ${this.pos.z}\nCenter: ${this.center.x} ${
-						this.center.z
-					}\nPos2: ${this.pos.x + 256} ${this.pos.z + 256}`
+					`Pos1: ${this.pos.x} ${this.pos.z}\nCenter: ${this.center.x} ${this.center.z}\nPos2: ${this.pos.x + 256} ${
+						this.pos.z + 256
+					}`
 				);
 			}
 
 			// Для каждого игрока
-			for (const e of a) {
+			for (const e of players) {
 				// Тэги
 				const p = XA.Entity.fetch(e);
 				this.tags.forEach((e) => p.addTag(e));
@@ -120,13 +106,7 @@ class BattleRoyal {
 				this.players.push(p);
 
 				// Инфо
-				p.tell(
-					XA.Lang.lang["br.start"](
-						this.reward,
-						players.join("§r, "),
-						this.game.rad
-					)
-				);
+				p.tell(XA.Lang.lang["br.start"](this.reward, allplayers.join("§r, "), this.game.rad));
 
 				// Очистка, звук
 				try {
@@ -135,18 +115,9 @@ class BattleRoyal {
 				p.playSound("note.pling");
 
 				// Ртп
-				const pos = rtp(
-					p,
-					this.center.x,
-					this.center.z,
-					this.game.rad - 15,
-					this.game.rad - 30,
-					poses
-				);
+				const pos = rtp(p, this.center.x, this.center.z, this.game.rad - 15, this.game.rad - 30, poses);
 				poses.push(pos);
-				XA.Chat.runCommand(
-					`kill @e[x=${pos.x},z=${pos.z},y=${pos.y},r=100,type=item]`
-				);
+				XA.runCommand(`kill @e[x=${pos.x},z=${pos.z},y=${pos.y},r=100,type=item]`);
 
 				//Стартовый сундук
 				// const ps = new LootChest(pos.x, pos.z, 0, 10).pos;
@@ -162,130 +133,35 @@ class BattleRoyal {
 						this.time.sec--, (this.time.tick = 20);
 						for (const val of XA.tables.chests.values()) {
 							for (const pos of val) {
-								XA.Chat.runCommand(
-									`particle minecraft:campfire_smoke_particle ${pos}`
-								);
+								XA.runCommand(`particle minecraft:campfire_smoke_particle ${pos}`);
 							}
 						}
 					}
-					//   if (this.time.min == 14 && this.time.sec == 50 && sp ) {
-					//       sp = false
-					// //Средние сундуки
-					// for (let c = 0; c <= a.length * 60; c++) {
-					//   let x = rd(
-					//       this.center.x + this.game.rad,
-					//       this.center.x + this.game.minrad
-					//     ),
-					//     z = rd(
-					//       this.center.z + this.game.rad,
-					//       this.center.z + this.game.minrad
-					//     );
-					//   if (Math.round(Math.random())) x = !x;
-					//   if (Math.round(Math.random())) z = !z;
-					//   const pos = new LootChest(x, z, 1, 0).pos;
-					//   if (pos) chest.push(pos);
-					// }
-
-					// let cc = 0
-					// //Топовые сундуки
-					// for (let c = 0; c <= a.length * 3; c++) {
-					//   const pos = new LootChest(
-					//     this.center.x,
-					//     this.center.z,
-					//     2,
-					//     this.game.minrad
-					//   ).pos;
-					//   if (pos) chest.push(pos);
-					//   if (pos) cc++
-					// }
-					// console.warn(chest.length);
-					// console.warn(cc);
-					//     }
 					if (this.time.sec <= 0) this.time.min--, (this.time.sec = 59);
 
 					//Зона
 					for (const p of world.getPlayers()) {
-						const rmax = new BlockLocation(
-								this.center.x + this.game.rad,
-								0,
-								this.center.z + this.game.rad
-							),
-							rmin = new BlockLocation(
-								this.center.x - this.game.rad,
-								0,
-								this.center.z - this.game.rad
-							);
+						const rmax = new BlockLocation(this.center.x + this.game.rad, 0, this.center.z + this.game.rad),
+							rmin = new BlockLocation(this.center.x - this.game.rad, 0, this.center.z - this.game.rad);
 						const l = XA.Entity.locationToBlockLocation(p.location);
-						if (
-							l.x >= rmax.x &&
-							l.x <= rmax.x + 10 &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.ret(p, true, rmax);
-						if (
-							l.x >= rmax.x - 10 &&
-							l.x <= rmax.x &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.pret(p, true, rmax);
+						if (l.x >= rmax.x && l.x <= rmax.x + 10 && l.z <= rmax.z && l.z >= rmin.z) zone.ret(p, true, rmax);
+						if (l.x >= rmax.x - 10 && l.x <= rmax.x && l.z <= rmax.z && l.z >= rmin.z) zone.pret(p, true, rmax);
 
-						if (
-							l.z >= rmax.z &&
-							l.z <= rmax.z + 10 &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.ret(p, false, rmax);
-						if (
-							l.z >= rmax.z - 10 &&
-							l.z <= rmax.z &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.pret(p, false, rmax);
+						if (l.z >= rmax.z && l.z <= rmax.z + 10 && l.x <= rmax.x && l.x >= rmin.x) zone.ret(p, false, rmax);
+						if (l.z >= rmax.z - 10 && l.z <= rmax.z && l.x <= rmax.x && l.x >= rmin.x) zone.pret(p, false, rmax);
 
-						if (
-							l.x <= rmin.x &&
-							l.x >= rmin.x - 10 &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.ret(p, true, rmin, true);
-						if (
-							l.x <= rmin.x + 10 &&
-							l.x >= rmin.x &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.pret(p, true, rmin);
+						if (l.x <= rmin.x && l.x >= rmin.x - 10 && l.z <= rmax.z && l.z >= rmin.z) zone.ret(p, true, rmin, true);
+						if (l.x <= rmin.x + 10 && l.x >= rmin.x && l.z <= rmax.z && l.z >= rmin.z) zone.pret(p, true, rmin);
 
-						if (
-							l.z <= rmin.z &&
-							l.z >= rmin.z - 10 &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.ret(p, false, rmin, true);
-						if (
-							l.z <= rmin.z + 10 &&
-							l.z >= rmin.z &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.pret(p, false, rmin);
+						if (l.z <= rmin.z && l.z >= rmin.z - 10 && l.x <= rmax.x && l.x >= rmin.x) zone.ret(p, false, rmin, true);
+						if (l.z <= rmin.z + 10 && l.z >= rmin.z && l.x <= rmax.x && l.x >= rmin.x) zone.pret(p, false, rmin);
 					}
 
 					//Отображение таймера и игроков
-					XA.Chat.runCommand(
-						`title @a[tag="br:inGame"] actionbar §6${
-							this.players.filter((e) => e.hasTag("br:alive")).length
-						} §g○ §6${this.time.min}:${
-							`${this.time.sec}`.length < 2
-								? `0${this.time.sec}`
-								: this.time.sec
-						} §g○ §6${this.game.rad}`
+					XA.runCommand(
+						`title @a[tag="br:inGame"] actionbar §6${this.players.filter((e) => e.hasTag("br:alive")).length} §g○ §6${
+							this.time.min
+						}:${`${this.time.sec}`.length < 2 ? `0${this.time.sec}` : this.time.sec} §g○ §6${this.game.rad}`
 					);
 
 					//Конец игры
@@ -297,34 +173,24 @@ class BattleRoyal {
 						);
 				}),
 				playerLeave: world.events.playerLeave.subscribe((pl) => {
-					if (this.players.find((e) => e.name == pl.playerName))
-						delete this.players[pl.playerName];
+					if (this.players.find((e) => e.name == pl.playerName)) delete this.players[pl.playerName];
 				}),
-				beforeDataDrivenEntityTriggerEvent:
-					world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
-						if (
-							data.id != "binocraft:on_death" ||
-							!data.entity.hasTag("br:alive")
-						)
-							return;
+				beforeDataDrivenEntityTriggerEvent: world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
+					if (data.id != "binocraft:on_death" || !data.entity.hasTag("br:alive")) return;
 
-						this.tags.forEach((e) => data.entity.removeTag(e));
-						this.waitToRespawn(data.entity.nameTag, "br:ded");
-					}),
+					this.tags.forEach((e) => data.entity.removeTag(e));
+					this.waitToRespawn(data.entity.nameTag, "br:ded");
+				}),
 				buttonPush: world.events.buttonPush.subscribe((data) => {
-					if (!data.source.hasTag("br:alive")) return;
-					const block = data.dimension.getBlock(
-						data.block.location.offset(0, -1, 0)
-					);
+					if (!data.source.hasTag("br:alive") || !(data.source instanceof Player)) return;
+					const block = data.dimension.getBlock(data.block.location.offset(0, -1, 0));
 					if (block.typeId != "minecraft:barrel") return;
 					const id = `${block.location.x} ${block.location.y} ${block.location.z}`;
 					if (XA.tables.chests.get(id)) return;
 					XA.tables.chests.set(id, true);
 					// Loot
-					XA.Chat.debug(
-						[`title @s title §r`, `title @s subtitle Открыто.`],
-						data.source
-					);
+					data.source.onScreenDisplay.setTitle("§r");
+					data.source.onScreenDisplay.updateSubtitle("Открыто");
 				}),
 			};
 		} catch (e) {
@@ -334,7 +200,7 @@ class BattleRoyal {
 
 	/**
 	 *
-	 * @param {String} reason
+	 * @param {string} reason
 	 * @param {*} ex
 	 */
 	end(reason, ex) {
@@ -365,10 +231,8 @@ class BattleRoyal {
 			const winner = ex;
 			if (typeof winner == "object" && XA.Entity.fetch(winner.name)) {
 				winner.tell(XA.Lang.lang["br.end.winner"](this.reward));
-				XA.Chat.runCommand(`title "${winner.name}" title §6Ты победил!`);
-				XA.Chat.runCommand(
-					`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`
-				);
+				XA.runCommand(`title "${winner.name}" title §6Ты победил!`);
+				XA.runCommand(`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`);
 				this.players
 					.filter((e) => e.name != winner.name)
 					.forEach((e) => {
@@ -396,29 +260,6 @@ class BattleRoyal {
 		for (const key of Object.keys(this.events)) {
 			world.events[key].unsubscribe(this.events[key]);
 		}
-		// Чепуха
-		// XA.tables.chests.values().forEach((e) => {
-		//   for (const p of e) {
-		//     if (typeof p == "string") {
-		//       const loc = new BlockLocation(
-		//         Number(p.split(" ")[0]),
-		//         Number(p.split(" ")[1]),
-		//         Number(p.split(" ")[2])
-		//       );
-		//       world
-		//         .getDimension("overworld")
-		//         .getBlock(loc)
-		//         .setType(MinecraftBlockTypes.air);
-		//       const q = {}
-		//       (q.type = "minecraft:item"),
-		//         (q.location = new Location(loc.x, loc.y, loc.z));
-		//       q.maxDistance = 2;
-		//       [...world.getDimension("overworld").getEntities(q)].forEach((e) =>
-		//         e.kill()
-		//       );
-		//     }
-		//   }
-		// });
 
 		//Альтернативная чепуха
 		XA.tables.chests.keys().forEach((E) => XA.tables.chests.delete(E));
@@ -426,34 +267,11 @@ class BattleRoyal {
 		const q = {};
 		q.type = "minecraft:item";
 		for (const p of world.getDimension("overworld").getEntities(q)) {
-			const rmax = new BlockLocation(
-					this.center.x + this.game.startrad,
-					0,
-					this.center.z + this.game.startrad
-				),
-				rmin = new BlockLocation(
-					this.center.x - this.game.startrad,
-					0,
-					this.center.z - this.game.startrad
-				);
+			const rmax = new BlockLocation(this.center.x + this.game.startrad, 0, this.center.z + this.game.startrad),
+				rmin = new BlockLocation(this.center.x - this.game.startrad, 0, this.center.z - this.game.startrad);
 			const l = XA.Entity.locationToBlockLocation(p.location);
-			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x)
-				p.kill();
+			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x) p.kill();
 		}
-		// XA.tables.chests.keys().forEach((e) => {
-		//   const l = e.split(" ").map((e) => Number(e));
-		//   /**
-		//    * @type {BlockInventoryComponentContainer}
-		//    */
-		//   const inv = world
-		//     .getDimension("overworld")
-		//     .getBlock(new BlockLocation(l[0], l[1], l[2]))
-		//     .getComponent("inventory").container;
-		//   for (let i = 0; i <= inv.size; i++) {
-		//     inv.setItem(i, new ItemStack(MinecraftItemTypes.air, 1, 0));
-		//   }
-		//   XA.tables.chests.set(e, false);
-		// });
 		this.players = [];
 		this.reward = 0;
 		this.pos = { x: 256, z: 256 };

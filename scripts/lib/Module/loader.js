@@ -1,5 +1,5 @@
-import { ThrowError, __CORE_IMPORT__ } from "xapi.js";
 import { CONFIG } from "config.js";
+import { DIR_IMPORT, ThrowError } from "xapi.js";
 
 /**
  * @type {Object<string, string>}
@@ -35,5 +35,5 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 }
 
 export async function load() {
-	return multiload(__CORE_IMPORT__, __MODULES__, "X-API");
+	return multiload(DIR_IMPORT, __MODULES__, "X-API");
 }

@@ -20,10 +20,10 @@ export class WorldEditBuilder {
 
   drawSelection() {
     if (!this.drawsel)
-      return XA.Chat.rcs([
+      return [
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION1_NAME}"] kill`,
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION2_NAME}"] kill`,
-      ]);
+      ].forEach(e => XA.runCommand(e))
     const ent1 = XA.Entity.getEntityAtPos(
       this.pos1.x,
       this.pos1.y,
@@ -35,28 +35,28 @@ export class WorldEditBuilder {
       this.pos2.z
     );
     if (ent1.length == 0) {
-      XA.Chat.runCommand(
+      XA.runCommand(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION1_NAME}"] kill`
       );
-      XA.Chat.runCommand(
+      XA.runCommand(
         `summon f:t ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} spawn "${configuration.DRAW_SELECTION1_NAME}"`
       );
     }
     if (ent2.length == 0) {
-      XA.Chat.runCommand(
+      XA.runCommand(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION2_NAME}"] kill`
       );
-      XA.Chat.runCommand(
+      XA.runCommand(
         `summon f:t ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} spawn "${configuration.DRAW_SELECTION2_NAME}"`
       );
     }
     for (let ent of ent1) {
       if (ent.id == "f:t" && ent.nameTag == configuration.DRAW_SELECTION1_NAME)
         break;
-      XA.Chat.runCommand(
+      XA.runCommand(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION1_NAME}"] kill`
       );
-      XA.Chat.runCommand(
+      XA.runCommand(
         `summon f:t ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} spawn "${configuration.DRAW_SELECTION1_NAME}"`
       );
       break;
@@ -64,10 +64,10 @@ export class WorldEditBuilder {
     for (let ent of ent2) {
       if (ent.id == "f:t" && ent.nameTag == configuration.DRAW_SELECTION2_NAME)
         break;
-      XA.Chat.runCommand(
+      XA.runCommand(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION2_NAME}"] kill`
       );
-      XA.Chat.runCommand(
+      XA.runCommand(
         `summon f:t ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} spawn "${configuration.DRAW_SELECTION2_NAME}"`
       );
       break;
@@ -150,9 +150,9 @@ export class WorldEditBuilder {
         pos2: this.pos2,
         name: configuration.COPY_FILE_NAME,
       };
-      const opt = XA.Chat.newCommand(
+      const opt = (await XA.runCommand(
         `structure save ${configuration.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
-      );
+      )).successCount > 0;;
       if (opt) throw new Error(opt);
       return new Return(false, 0, {
         pos1: this.pos1,
@@ -171,8 +171,8 @@ export class WorldEditBuilder {
    * @param {Player} player player to execute on
    * @param {0 | 90 | 180 | 270} rotation Specifies the rotation when loading a structure
    * @param {"none" | "x" | "xz" | "z"} mirror Specifies the axis of mirror flip when loading a structure
-   * @param {Boolean} includesEntites Specifies whether including entites or not
-   * @param {Boolean} includesBlocks Specifies whether including blocks or not
+   * @param {boolean} includesEntites Specifies whether including entites or not
+   * @param {boolean} includesBlocks Specifies whether including blocks or not
    * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in the structure are loaded.
    * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity. If unspecified, a random seed is taken.
    * @returns {Return}
@@ -200,7 +200,7 @@ export class WorldEditBuilder {
       this.backup(player.location, pos2);
 
       player.runCommand(
-        `structure load ${configuration.COPY_FILE_NAME} ~ ~ ~ ${String(
+        `structure load ${configuration.COPY_FILE_NAME} ~ ~ ~ ${string(
           rotation
         ).replace(
           "NaN",
@@ -239,13 +239,13 @@ export class WorldEditBuilder {
     let errors = 0;
     let comm = 0;
     for (const cube of Cube.split(configuration.FILL_CHUNK_SIZE)) {
-      const opt = XA.Chat.newCommand(
+      const opt = (await XA.runCommand(
         `fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${
           cube.pos2.y
         } ${cube.pos2.z} ${block} ${data} ${replaceMode ? replaceMode : ""} ${
           replaceBlock ? replaceBlock : ""
         } ${rbData ? rbData : ""}`
-      );
+      )).successCount > 0;
       if (opt) {
         errors++;
       }
