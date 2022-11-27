@@ -18,15 +18,23 @@ export function shortTime() {
 	const time = new Date(Date());
 	time.setHours(time.getHours() + 3);
 	const min = String(time.getMinutes());
-	return `${time.getTime()}:${min.length == 2 ? min : "0" + min}`;
+	return `${time.getHours()}:${min.length == 2 ? min : "0" + min}`;
 }
 
 export const CONFIG_JOIN = {
-	message: (player) => `${timeNow()}, ${player.name}!\n§9Время • ${shortTime()}`,
-	animaton: {
-		color: "§f",
+	/** Array with strings to show on join. They will change every second. You can use $<value> with any string value in this.animation_vars  */
+	animation: {
+		stages: ["» $title «", "»  $title  «"],
+		vars: {
+			title: "§b§lBuild§r§f",
+		},
 	},
-	actionBar: "§eСдвинься что бы продолжить",
-	title: "§aServer",
-	subtitle: "Добро пожаловать!",
+	// actionBar: "§3Сдвинься что бы продолжить", // Optional
+	subtitle: "Добро пожаловать!", // Optional
+	onJoin: {
+		excludeTag: "join:sound",
+		air: "§8Очнулся в воздухе",
+		ground: "§8Сдвинулся",
+		sound: "break.amethyst_cluster",
+	},
 };

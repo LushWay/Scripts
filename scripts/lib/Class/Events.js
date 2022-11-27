@@ -1,26 +1,59 @@
-/** @typedef {(data: any, name: string) => void} IEventCallback */
+import { world } from "@minecraft/server";
+import { handler, ThrowError, toStr } from "xapi.js";
 
-/** @type {{ name: string; callback: IEventCallback }[]} */
-const EVENTS = [];
+/**
+ * @template C, B
+ * @param {C extends Function ? C : never} callback
+ * @param {B} _this
+ * @returns {C}
+ */
+function BINDER(callback, _this) {
+	return callback.bind(_this);
+}
 
-export const XEvents = {
+/**
+ * @template Data, [Callback = (arg: Data) => void]
+ */
+export class Subscriber {
+	/**
+	 * @private
+	 * @type {Map<Callback, number>}
+	 */
+	events = new Map();
 	/**
 	 *
-	 * @param {string} name
-	 * @param {IEventCallback} callbak
+	 * @param {Callback} callback
+	 * @param {number} position
 	 */
-	addEventListener(name, callbak) {
-		EVENTS.push({ name: name, callback: callbak });
-	},
+	subscribe(callback, position = 0) {
+		this.events.set(callback, position);
+		return callback;
+	}
 	/**
 	 *
-	 * @param {string} name
-	 * @param {any} extras
-	 * @param {boolean} debug
+	 * @param {Callback} callback
+	 * @returns
 	 */
-	emit(name, extras = null, debug = false) {
-		const event = EVENTS.find((e) => e.name === name);
-		if (debug) console.warn(name);
-		if (event && typeof event.callback === "function") event.callback(extras, name);
-	},
-};
+	unsubscribe(callback) {
+		return this.events.delete(callback);
+	}
+	/**
+	 *
+	 * @param {Data} data
+	 * @param {number} count
+	 */
+	async emit(data, count = 0) {
+		const events = [...this.events.entries()].sort(([_c0, a], [_c1, b]) => a - b);
+		const length = count > 0 && count > events.length ? count : events.length;
+		for (let i = 0; i < length; i++) {
+			const callback = events[i][0];
+			if (typeof callback === "function") await callback(data);
+		}
+	}
+	get export() {
+		return {
+			subscribe: BINDER(this.subscribe, this),
+			unsubscribe: BINDER(this.unsubscribe, this),
+		};
+	}
+}

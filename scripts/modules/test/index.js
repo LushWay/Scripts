@@ -1,7 +1,9 @@
 import { BlockLocation, MinecraftBlockTypes, system, world } from "@minecraft/server";
-import { handler, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
+import { handler, setPlayerInterval, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
+import { benchmark } from "../../lib/Benchmark.js";
 import { CommandCallback } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
+import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 
 /**
@@ -9,30 +11,23 @@ import { ModalForm } from "../../lib/Form/ModelForm.js";
  */
 const tests = {
 	1: (ctx) => {
-		const o = new XA.cacheDB(ctx.sender, "basic");
-
-		let data = o.data;
-		data.val = 34;
-		data.ee = "ee";
-		o.safe();
-
-		const newDate = new XA.cacheDB(ctx.sender, "basic");
-		data = newDate.data;
-		world.say(toStr(data));
-
-		delete data.ee;
-		delete data.val;
-
-		newDate.safe();
+		const menu = new ActionForm("Action", "body").addButton("button", null, () => {
+			new ModalForm("ModalForm")
+				.addDropdown("drdown", ["op", "op2"])
+				.addSlider("slider", 0, 5, 1)
+				.addTextField("textField", "placeholder", "defval")
+				.addToggle("toggle", false)
+				.show(ctx.sender, () => {
+					new MessageForm("MessageForm", "body")
+						.setButton1("b1", () => void 0)
+						.setButton2("b2", () => void 0)
+						.show(ctx.sender);
+				});
+		});
+		menu.show(ctx.sender);
 	},
 	2: (ctx) => {
-		const o = new XA.instantDB(ctx.sender, "basic");
-
-		o.set("c", "e");
-
-		world.say(toStr(o.data));
-
-		o.delete("c");
+		setRole(ctx.sender, "admin");
 	},
 	3: async () => {
 		try {
@@ -169,8 +164,57 @@ const tests = {
 	12: () => {
 		setTickTimeout(tests[11]);
 	},
+	13: (ctx) => {
+		ctx.reply(toStr(ctx.sender.getComponents()));
+	},
+	14: () => {
+		world.say(bigdata.length + "");
+		done = true;
+	},
+	16: async (ctx) => {
+		if (!bigdata) {
+			for (let i = 0; i < 42949672; i++) {
+				if (done) break;
+				if (i % 10000 === 0) {
+					world.say(i + "");
+					await sleep(1);
+				}
+				bigdata += "1";
+			}
+			ctx.reply("String generated");
+		}
+
+		for (let i = 0; i < 1000; i++) {
+			if (i % 5 === 0) await sleep(1);
+			const end1 = benchmark("SetMaxValueSpeed");
+			world.setDynamicProperty("speed_test", bigdata);
+			end1();
+		}
+		ctx.reply("Set test done");
+
+		let e = 0;
+
+		for (let i = 0; i < 1000; i++) {
+			if (i % 5 === 0) await sleep(1);
+			const end1 = benchmark("GetMaxValueSpeed");
+			const data = world.getDynamicProperty("speed_test");
+			if (!e) {
+				e = 1;
+				if (typeof data === "string") world.say(`${data.length}  ${data === bigdata}`);
+			}
+			end1();
+		}
+		ctx.reply("Get test done");
+	},
+	17: (ctx) => {
+		const end = benchmark("PROP");
+		const prop = world.getDynamicProperty("speed_test");
+		if (typeof prop === "string") ctx.reply(prop.length);
+		end();
+	},
 };
-setTickTimeout(tests[11]);
+let bigdata = "";
+let done = false;
 
 const c = new XA.Command({
 	name: "test",
@@ -191,7 +235,6 @@ c.int("number", true).executes(async (ctx, n) => {
 		);
 });
 
-world.events.beforeItemUseOn.subscribe((d) => {
-	d.cancel = true;
-	world.say("beforeItemUse");
+setPlayerInterval((_) => {
+	_.getComponents();
 });

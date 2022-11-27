@@ -34,19 +34,8 @@ function betweenXYZ(XYZa, XYZb, XYZc) {
 const TABLE = new XA.instantDB(world, "region");
 
 export class Region {
-	/** @type {string} */
-	dimensionId;
-	/** @type {IRegionCords} */
-	from;
-	/** @type {IRegionCords} */
-	to;
-	/** @type {string} */
-	key;
-	/** @type {IRegionPermissions} */
-	permissions;
 	/**
 	 * Gets all regions
-	 * @static
 	 * @returns {Region[]}
 	 */
 	static getAllRegions() {
@@ -61,7 +50,6 @@ export class Region {
 	}
 	/**
 	 * Checks if a block location is in region
-	 * @static
 	 * @param {BlockLocation} blockLocation
 	 * @param {string} dimensionId
 	 * @returns {Region}
@@ -80,15 +68,24 @@ export class Region {
 	/**
 	 * Removes a region at a block Location
 	 * @param {string} dimensionId  the id of this dimension
+   * @param {BlockLocation} blockLocation
 	 * @returns {boolean} if the region was removed or not
-	 * @static
-	 * @param {BlockLocation} blockLocation
 	 */
 	static removeRegionAtBlockLocation(blockLocation, dimensionId) {
 		const region = this.blockLocationInRegion(blockLocation, dimensionId);
 		if (!region) return false;
 		return TABLE.delete(region.key);
 	}
+	/** @type {string} */
+	dimensionId;
+	/** @type {IRegionCords} */
+	from;
+	/** @type {IRegionCords} */
+	to;
+	/** @type {string} */
+	key;
+	/** @type {IRegionPermissions} */
+	permissions;
 	/**
 	 *
 	 * @param {IRegionCords} from
@@ -145,15 +142,5 @@ export class Region {
 				[entity.location.x, entity.location.y, entity.location.z]
 			)
 		);
-	}
-	/**
-	 * Changes a permission to on or off
-	 * @param {string} key
-	 * @param {boolean} value
-	 * @returns {void}
-	 */
-	changePermission(key, value) {
-		this.permissions[key] = value;
-		this.update();
 	}
 }

@@ -4,46 +4,31 @@ import { XFormCanceled } from "./utils.js";
 /** */
 export class ActionForm {
 	/**
-	 * The title that this form should have
-	 * @type {string}
-	 */
-	title;
-	/**
-	 * extra text that should be displayed in the form
-	 * @type {string}
-	 */
-	body;
-	/**
 	 * The buttons this form has
 	 * @type {IActionFormButton[]}
 	 * @private
 	 */
-	buttons;
+	buttons = [];
 	/**
 	 * The default minecraft form this form is based on
 	 * @type {ActionFormData}
 	 * @private
 	 */
-	form;
+	form = new ActionFormData();
 	/**
 	 * The amount of times it takes to show this form in ms
 	 * if this value goes above 200 it will time out
 	 * @type {number}
 	 */
-	triedToShow;
+	triedToShow = 0;
 	/**
 	 * Creates a new form to be shown to a player
-	 * @param {string} [title] the title that this form should have
+	 * @param {string} title the title that this form should have
 	 * @param {string} [body] extra text that should be displayed in the form
 	 */
 	constructor(title, body) {
-		this.title = title;
-		this.body = body;
-		this.form = new ActionFormData();
-		if (title) this.form.title(title);
+		this.form.title(title);
 		if (body) this.form.body(body);
-		this.buttons = [];
-		this.triedToShow = 0;
 	}
 	/**
 	 * Adds a button to this form

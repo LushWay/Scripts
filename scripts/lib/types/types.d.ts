@@ -15,25 +15,3 @@ interface IConfiguration {
 	};
 	commandPrefix: string;
 }
-
-interface IModuleOptions {
-	/* Default:  "./modules/" */
-	path?: string;
-	/* Default: "index". YOU DONT NEED TO .js IN END OF FILENAME */
-	fileName?: string;
-	/* Default: true */
-	condition?: boolean;
-}
-
-interface IColorScheme {
-	function: {
-		function: string;
-		name: string;
-		arguments: string;
-		code: string;
-		brackets: string;
-	};
-	nonstring: string;
-	symbol: string;
-	string: string;
-}

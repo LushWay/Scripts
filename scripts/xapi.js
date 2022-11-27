@@ -18,7 +18,6 @@ import { DIMENSIONS } from "./lib/List/dimensions.js";
 
 // X-API methods
 import { XEntity } from "./lib/Class/Entity.js";
-import { XEvents } from "./lib/Class/Events.js";
 import { XrunCommand } from "./lib/Class/XrunCommand.js";
 import { XCommand } from "./lib/Command/Command.js";
 import { XCacheDatabase, XInstantDatabase } from "./lib/Database/DynamicProperties.js";
@@ -55,7 +54,6 @@ export class XA {
 	};
 
 	static dimensions = DIMENSIONS;
-	static events = XEvents;
 
 	static instantDB = XInstantDatabase;
 	static cacheDB = XCacheDatabase;
@@ -79,16 +77,45 @@ export const ROLES = {
 
 /**
  * Gets the role of this player
- * @param  {Player | string} player player or his id to get role from
+ * @param  {Player | string} playerID player or his id to get role from
  * @returns {keyof typeof ROLES}
  * @example getRole("23529890")
  */
-export function getRole(player) {
-	if (player instanceof Player) player = player.id;
-	const e = new XInstantDatabase(world, "roles").get(player);
-	if (!Object.keys(ROLES).includes(e)) return "member";
+export function getRole(playerID) {
+	if (playerID instanceof Player) playerID = playerID.id;
 
-	return e;
+	const role = new XInstantDatabase(world, "roles").get(playerID);
+
+	if (!Object.keys(ROLES).includes(role)) return "member";
+	return role;
+}
+
+/**
+ * Sets the role of this player
+ * @example setRole("342423452", "admin")
+ * @param {Player | string} player
+ * @param {keyof typeof ROLES} role
+ * @returns {void}
+ */
+export function setRole(player, role) {
+	if (player instanceof Player) player = player.id;
+	const DB = new XInstantDatabase(world, "roles");
+	DB.set(player, role);
+}
+
+/**
+ * Checks if player role included in given array
+ * @param {string} playerID
+ * @param {keyof typeof ROLES} role
+ */
+export function IS(playerID, role) {
+	/** @type {(keyof typeof ROLES)[]} */
+	let arr = ["moderator", "admin"];
+
+	if (role === "admin") arr = ["admin"];
+	if (role === "builder") arr.push("builder");
+
+	return arr.includes(getRole(playerID));
 }
 
 /**
@@ -113,31 +140,28 @@ export function ThrowError(e, deleteStack = 0, additionalStack = []) {
 
 /**
  *
- * @param {(plr: Player) => void} clb
+ * @param {(plr: Player) => void} callback
  */
-export function forPlayers(clb) {
-	for (const player of world.getPlayers()) if (typeof clb === "function") clb(player);
+export function forPlayers(callback) {
+	for (const player of world.getPlayers()) if (typeof callback === "function") callback(player);
 }
 
 /**
  * @param {Object} target
  */
 export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0) {
-	/**
-	 * @type {IColorScheme}
-	 */
 	const c = {
 		function: {
 			function: "§5",
 			name: "§9",
-			arguments: "§7",
+			arguments: "§f",
 			code: "§8",
 			brackets: "§7",
 		},
 
 		nonstring: "§6",
 		symbol: "§7",
-		string: "§2",
+		string: "§3",
 	};
 
 	if (depth > 10 || typeof target !== "object") return `${rep(target)}` ?? `${target}` ?? "{}";
@@ -153,8 +177,8 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 				if (!funcCode) {
 					const native = r.includes("[native code]");
 					const code = native ? " [native code] " : "...";
-					let isArrow = true,
-						name = "<>";
+					let isArrow = true;
+					let name = "";
 
 					if (r.startsWith("function")) {
 						r = r.replace(/^function\s*/, "");
@@ -166,7 +190,7 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 						r = r.replace(name, "");
 					}
 
-					let count = 0,
+					let args = "()",
 						bracket = false,
 						escape = false;
 
@@ -180,7 +204,7 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 						} else escape = false;
 
 						if (!bracket && char === ")") {
-							count = i;
+							args = r.substring(0, i);
 							break;
 						}
 					}
@@ -190,7 +214,7 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 					// "name"
 					r += `${cl.name}${name}`;
 					// "(arg, arg)"
-					r += `${cl.arguments}${r.substring(0, count)})`;
+					r += `${cl.arguments}${args})`;
 					// " => "  or  " "
 					r += `${cl.function}${isArrow ? " => " : " "}`;
 					// "{ code }"
@@ -225,15 +249,13 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 			case "symbol":
 				value = `${c.symbol}[Symbol.${value.description}]§r`;
 				break;
-			case "number":
-			case "bigint":
-			case "boolean":
-			case "undefined":
-				value = c.nonstring + value + "§r";
-				break;
 
 			case "string":
-				value = c.string + value + "§r";
+				value = c.string + "'" + value + "'§r";
+				break;
+
+			default:
+				value = c.nonstring + value + "§r";
 				break;
 		}
 		return value;

@@ -20,7 +20,7 @@ export function Timeout(ticks, callback, loop, id = Date.now()) {
 		if (!loop) return;
 	}
 
-	// if (AT[id] >= 0) system.run(() => Timeout(ticks, callback, loop, id));
+	if (AT[id] >= 0) system.run(() => Timeout(ticks, callback, loop, id));
 
 	const stop = () => {
 		AT[id] = -10;

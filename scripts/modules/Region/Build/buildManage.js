@@ -1,11 +1,13 @@
 import { Player, world } from "@minecraft/server";
-import { ActionFormData } from "@minecraft/server-ui";
 import { XA } from "xapi.js";
-import { lang } from "../utils/lang.js";
+import { ActionForm } from "../../../lib/Form/ActionForm.js";
+import { CONFIG_MENU } from "../../Menu/var.js";
+import { JOIN_EVENTS } from "../../OnJoin/events.js";
+import { lang } from "./lang.js";
 import { Region } from "../utils/Region.js";
 import { findFreePlace } from "./utils.js";
 
-const db = new XA.instantDB(world, "buildRegion");
+const DB = new XA.instantDB(world, "buildRegion");
 
 /**
  *
@@ -13,37 +15,34 @@ const db = new XA.instantDB(world, "buildRegion");
  */
 async function CreateRegion(player) {
 	const place = await findFreePlace();
-	new Region(place.from, place.to, "overworld", {
+
+	const region = new Region(place.from, place.to, "overworld", {
 		owners: [player.id],
 		doorsAndSwitches: false,
 		allowedEntitys: ["minecraft:player"],
 		openContainers: false,
 		pvp: false,
 	});
+	DB.set(player.id, region.key);
 }
 
-world.events.playerJoin.subscribe((data) => {
-	const player = data.player;
-	if (!db.has(player.id)) {
-		player.tell(lang.newPlayer);
-		CreateRegion(player);
+JOIN_EVENTS.playerGuide.subscribe((player) => {
+	player.playSound("random.levelup");
+	player.tell(lang.newPlayer);
+	const oldRegion = DB.get(player.id);
+	if (!oldRegion) CreateRegion(player);
+});
+
+CONFIG_MENU.menu = (player) => {
+	const regionID = DB.get(player.id);
+	const region = Region.getAllRegions().find((e) => e.key === regionID);
+	if (!region) {
+		player.tell("§cНет региона!");
+		return false;
 	}
-});
-
-const gui = "xa:menu";
-
-const menu = (/** @type {Player} */ player) => {
-	const a = new ActionFormData()
-		.title("Меню")
-		.button("Спавн")
-		.button("Анархия")
-		.button("Миниигры")
-		.button("Статистика");
-
-	return a;
+	const menu = new ActionForm(lang.regionManageTitle, lang.regionManageBody(region))
+		.addButton("Переместиться", null, () => {})
+		.addButton("§7Перейти на новую", null, () => {})
+		.addButton("§cОчистить", null, () => {});
+	return menu;
 };
-
-world.events.beforeItemUse.subscribe(async (d) => {
-	if (d.item.typeId !== gui || !(d.source instanceof Player)) return;
-	menu(d.source).show(d.source);
-});

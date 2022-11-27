@@ -4,6 +4,7 @@ import { handler } from "xapi.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandCallback } from "./Callback.js";
 import { __COMMANDS__ } from "./index.js";
+import { inaccurateSearch } from "./suggestions.js";
 
 /**
  * Returns a Before chat events augments
@@ -53,18 +54,26 @@ export function commandNotFound(player, command) {
 			c.data.aliases.forEach((e) => add(e));
 		}
 	}
-	let a = cmds.inaccurateSearch(command);
+	let search = inaccurateSearch(command, cmds);
 
-	if (!a[0] || (a[0] && a[0][1] < 0.5)) return;
+	const options = {
+		minMatchTriggerValue: 0.5,
+		maxDifferenceBeetwenSuggestions: 0.15,
+		maxSuggestionsCount: 3,
+	};
 
-	const ig = (a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%)§c`;
-	let ans = "§cВы имели ввиду " + ig(a[0]),
-		s = a[0][1];
-	a = a.filter((e) => s - e[1] <= 0.15);
-	for (const [i, e] of a.slice(1, 3).entries())
-		ans += `${i + 2 === a.length ? " или " : ", "}${ig(e)}`;
+	if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return;
 
-	player.tell(ans + "§c?");
+	const suggest = (a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`;
+	let suggestion = "§cВы имели ввиду " + suggest(search[0]);
+	let firstValue = search[0][1];
+	search = search
+		.filter((e) => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
+		.slice(1, options.maxSuggestionsCount);
+
+	for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? " или " : ", "}${suggest(e)}`;
+
+	player.tell(suggestion + "§c?");
 }
 
 /**
@@ -102,9 +111,7 @@ export function commandSyntaxFail(player, command, args, i) {
 			{
 				translate: `commands.generic.syntax`,
 				with: [
-					`${CONFIG.commandPrefix}${command.data.name} ${args
-						.slice(0, i)
-						.join(" ")}`,
+					`${CONFIG.commandPrefix}${command.data.name} ${args.slice(0, i).join(" ")}`,
 					args[i] ?? " ",
 					args.slice(i + 1).join(" "),
 				],
@@ -151,22 +158,13 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 	for (const [i, arg] of args.entries()) {
 		if (arg.type.name.endsWith("*")) continue;
 		if (arg.type instanceof LocationArgumentType) {
-			argsToReturn.push(
-				parseLocationAugs(
-					[cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]],
-					event.sender
-				)
-			);
+			argsToReturn.push(parseLocationAugs([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender));
 			continue;
 		}
 		if (arg.type instanceof LiteralArgumentType) continue;
 		argsToReturn.push(arg.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
 	}
-	handler(
-		() =>
-			lastArg.callback(new CommandCallback(event, cmdArgs), ...argsToReturn),
-		"Command"
-	);
+	handler(() => lastArg.callback(new CommandCallback(event, cmdArgs), ...argsToReturn), "Command");
 }
 
 /**
@@ -174,11 +172,7 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
  * @returns {string[]}
  */
 export function getUsage(command) {
-	return [
-		getType(command.parent),
-		getType(command),
-		...command.children.map(getType),
-	];
+	return [getType(command.parent), getType(command), ...command.children.map(getType)];
 }
 
 /**
@@ -191,9 +185,5 @@ function getType(o) {
 		q = t.optional;
 	return t.typeName === "literal"
 		? `${q ? "§7" : "§f"}${t.name}`
-		: `${
-				q
-					? `§7[${o.type.name}: §7${o.type.typeName}§7]`
-					: `§6<${o.type.name}: §6${o.type.typeName}§6>`
-		  }`;
+		: `${q ? `§7[${o.type.name}: §7${o.type.typeName}§7]` : `§6<${o.type.name}: §6${o.type.typeName}§6>`}`;
 }

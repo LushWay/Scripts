@@ -37,13 +37,8 @@ export interface ICommandData {
 	invaildPermission?: string;
 }
 
-export type AppendArgument<Base, Next> = Base extends (
-	ctx: infer X,
-	...args: infer E
-) => infer R
+export type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
 	? (ctx: X, ...args: [...E, Next]) => R
 	: never;
 
-export type ArgReturn<Callback extends any, type extends any> = XCommand<
-	AppendArgument<Callback, type>
->;
+export type ArgReturn<Callback extends any, type extends any> = XCommand<AppendArgument<Callback, type>>;

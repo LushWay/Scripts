@@ -5,6 +5,19 @@ import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
 import { rtp } from "./rtp.js";
 import { zone } from "./zone.js";
+import { Subscriber } from "../../lib/Class/Events.js";
+
+/** @type {Subscriber<Player>} */
+const playerJoinQuene = new Subscriber();
+
+/** @type {Subscriber<Player>} */
+const playerDeath = new Subscriber();
+
+export const BATTLE_ROYAL_EVENTS = {
+	playerJoin: playerJoinQuene.export,
+	death: playerDeath.export,
+};
+
 class BattleRoyal {
 	constructor() {
 		/**
@@ -35,15 +48,13 @@ class BattleRoyal {
 		this.events = {};
 		this.tags = ["lockpvp:br", "locktp:br", "br:alive", "br:inGame"];
 	}
-	async waitToRespawn(name, event) {
+	async waitToRespawn(name) {
 		let C = 0;
 		while ((await XA.runCommand("testfor " + name)).successCount < 1 && C < 100) {
 			await sleep(5);
 			C++;
 		}
-		XA.events.emit(event, {
-			player: XA.Entity.fetch(name),
-		});
+		playerJoinQuene.emit(XA.Entity.fetch(name));
 	}
 
 	/**
@@ -179,7 +190,7 @@ class BattleRoyal {
 					if (data.id != "binocraft:on_death" || !data.entity.hasTag("br:alive")) return;
 
 					this.tags.forEach((e) => data.entity.removeTag(e));
-					this.waitToRespawn(data.entity.nameTag, "br:ded");
+					this.waitToRespawn(data.entity.nameTag);
 				}),
 				buttonPush: world.events.buttonPush.subscribe((data) => {
 					if (!data.source.hasTag("br:alive") || !(data.source instanceof Player)) return;

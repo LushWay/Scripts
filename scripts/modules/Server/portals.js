@@ -20,30 +20,30 @@ new WorldOption("spawn:pos", "(x y z)\nТакже можно выставить 
 new WorldOption("minigames:pos", "(x y z)\nТакже можно выставить через -mg set <pos: Pos>", true);
 
 /**
-	 *
-	 * @param {Player} player
-	 * @param {string} pos
-	 * @param {string} place
-	 * @param {boolean} resultActionbar
-	 * @returns void
-	 * @example tp(player, '0 0 0', 'spawn', po.Q('tp', player))
-	 */
+ *
+ * @param {Player} player
+ * @param {string} pos
+ * @param {string} place
+ * @param {boolean} resultActionbar
+ * @returns void
+ * @example tp(player, '0 0 0', 'spawn', po.Q('tp', player))
+ */
 function tp(player, pos, place, resultActionbar = false, obj, text, slow_falling, tpAnimation = true) {
-  if (tpAnimation)
-    try {
-      player.runCommand("effect @s clear");
-    } catch (e) {}
-  if (slow_falling) player.runCommand("effect @s slow_falling 17 1 true");
-  let befplace;
-  if (obj && obj.on) {
-    let { P, C } = getPlace(obj.place, "");
-    befplace = `§${C}◙ §3${P}§r > `;
-  }
+	if (tpAnimation)
+		try {
+			player.runCommand("effect @s clear");
+		} catch (e) {}
+	if (slow_falling) player.runCommand("effect @s slow_falling 17 1 true");
+	let befplace;
+	if (obj && obj.on) {
+		let { P, C } = getPlace(obj.place, "");
+		befplace = `§${C}◙ §3${P}§r > `;
+	}
 
-  let { P, C, rot } = getPlace(place, text);
-  player.runCommand(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
-  if (resultActionbar) player.runCommand(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
-  player.runCommand(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
+	let { P, C, rot } = getPlace(place, text);
+	player.runCommand(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
+	if (resultActionbar) player.runCommand(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
+	player.runCommand(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
 }
 
 function getPlace(place, text) {
@@ -56,7 +56,6 @@ function getPlace(place, text) {
 	if (place == "minigames" || place == "currentpos") (P = "§dМиниигры§r"), (C = "5"), (rot = "0 0");
 	return { P, C, rot };
 }
-
 
 class inventory {
 	constructor() {
@@ -445,20 +444,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 			if (i.getLore()[1] == "minigames") poo = wo.G("minigames:pos");
 			if (!poo) poo = i.getLore()[1];
 
-			tp(
-				data.entity,
-				poo,
-				i.getLore()[2],
-				po.Q("title:spawn:enable", data.entity),
-				{ on: false },
-				i.getLore()[3]
-			);
-			break;
-		case "trigger":
-			XA.events.emit(i.getLore()[1], {
-				player: data.entity,
-				item: i,
-			});
+			tp(data.entity, poo, i.getLore()[2], po.Q("title:spawn:enable", data.entity), { on: false }, i.getLore()[3]);
 			break;
 		default:
 			// @ts-expect-error

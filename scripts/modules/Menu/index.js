@@ -1,37 +1,37 @@
 import { Player, world } from "@minecraft/server";
-import { ActionFormData } from "@minecraft/server-ui";
+import { handler, toStr, XA } from "xapi.js";
+import { ActionForm } from "../../lib/Form/ActionForm.js";
+import { CONFIG_MENU } from "./var.js";
 
-const gui = "xa:menu";
+/**
+ *
+ * @param {Player} player
+ * @returns
+ */
+function defaultmenu(player) {
+	const e = new ActionForm("Пустое меню", "Кодер его еще не сделал").addButton("Да", null, () => void 0);
+	return e;
+}
 
-const menu = {
-	home: () => {
-		const a = new ActionFormData()
-			.title("Меню")
-			.button("Спавн")
-			.button("Анархия")
-			.button("Миниигры")
-			.button("Статистика");
+world.events.beforeItemUse.subscribe(async ({ source: player, item }) => {
+	if (item.typeId !== CONFIG_MENU.itemId || !(player instanceof Player)) return;
+	handler(() => {
+		const menu = CONFIG_MENU.menu(player);
+		if (menu === false) return;
+		menu.show(player);
+	});
+});
 
-		return a;
-	},
-};
-
-world.events.beforeItemUse.subscribe(async (d) => {
-	if (d.item.typeId !== gui || !(d.source instanceof Player)) return;
-	const res = await menu.home().show(d.source);
-	if (res.canceled) return;
-	switch (res.selection) {
-		case 0:
-			world.say("atp spawn");
-			break;
-		case 1:
-			world.say("atp anarch");
-			break;
-		case 2:
-			world.say("atp minigames");
-			break;
-		case 3:
-			world.say("stats");
-			break;
+new XA.Command({
+	name: "menu",
+	description: "Выдает/убирает меню из инвентаря",
+	/*type: "public"*/
+}).executes(async (ctx) => {
+	if (await XA.Entity.hasItem(ctx.sender, 0, CONFIG_MENU.itemId)) {
+		ctx.sender.runCommandAsync(`clear @s ${CONFIG_MENU.itemId}`);
+		ctx.reply("§c- §3Меню");
+	} else {
+		ctx.sender.runCommandAsync(`give @s ${CONFIG_MENU.itemId} 1 0 {"item_lock":{"mode":"lock_in_inventory"}}`);
+		ctx.reply("§a+ §3Меню");
 	}
 });

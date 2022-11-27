@@ -2,7 +2,7 @@ import { Player, world } from "@minecraft/server";
 import { setTickInterval, setTickTimeout, XA } from "xapi.js";
 import { WorldOption } from "../../lib/Class/XOptions.js";
 import { Atp } from "../Server/portals.js";
-import { br } from "./br.js";
+import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
 import { quene } from "./var.js";
 
 new WorldOption("br:time", "Время игры в формате MM:SS (15:00)", true);
@@ -31,8 +31,7 @@ function forEveryQuenedPlayer(sound, text) {
 }
 
 const ks = Object.keys;
-
-XA.events.addEventListener("br:join", ({ player }) => {
+BATTLE_ROYAL_EVENTS.playerJoin.subscribe((player) => {
 	/**
 	 * @type {Player}
 	 */
@@ -45,8 +44,7 @@ XA.events.addEventListener("br:join", ({ player }) => {
 	pl.playSound("random.orb");
 });
 
-XA.events.addEventListener("br:ded", (player) => {
-	const pl = player.player;
+BATTLE_ROYAL_EVENTS.death.subscribe((pl) => {
 	pl.tell("§6Ты погиб!");
 	Atp(pl, "br", { lock: true, pvp: true, quene: true });
 });

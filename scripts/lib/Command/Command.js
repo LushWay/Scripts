@@ -50,12 +50,7 @@ export class XCommand {
 		return cmd;
 	}
 	literal(data, optional) {
-		const cmd = new XCommand(
-			data,
-			new LiteralArgumentType(data.name, optional),
-			this.depth + 1,
-			this
-		);
+		const cmd = new XCommand(data, new LiteralArgumentType(data.name, optional), this.depth + 1, this);
 		this.children.push(cmd);
 		return cmd;
 	}

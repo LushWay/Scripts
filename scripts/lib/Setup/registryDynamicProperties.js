@@ -16,6 +16,7 @@ export const CONFIG_DB = {
 		leaderboard: 2 ** 15,
 		basic: 2 ** 10,
 		buildRegion: 2 ** 11,
+		speed_test: 0,
 	},
 };
 

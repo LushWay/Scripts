@@ -1,45 +1,7 @@
 import { BlockLocation, Items, ItemStack, Location } from "@minecraft/server";
-import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
-import { setTickTimeout, XA } from "xapi.js";
+import { XA } from "xapi.js";
 import { global } from "../var.js";
-new XA.Command({
-	name: "form",
-	description: "",
-	requires: (p) => p.hasTag("commands"),
-	/*type: "test"*/
-})
-	.int("type")
-	.executes((ctx, type) => {
-		setTickTimeout(() => {
-			if (type == 0) {
-				new ModalFormData()
-					.title("modal")
-					.dropdown("dropdown", ["", ""])
-					.show(ctx.sender)
-					.then((ModalFormResponse) => console.warn(ModalFormResponse));
-			}
-			if (type == 1) {
-				new ActionFormData()
-					.title("action")
-					.button("ok")
-					.show(ctx.sender)
-					.then((ActionFormResponse) => console.warn(ActionFormResponse));
-			}
-			if (type == 2) {
-				new MessageFormData()
-					.title("modal")
-					.button1("btn1")
-					.show(ctx.sender)
-					.then((MessageFormResponse) => console.warn(MessageFormResponse));
-			}
-		}, 40);
-	});
-new XA.Command({
-	name: "info",
-	description: "Открывает гайд" /*type: "public"*/,
-}).executes((ctx) => {
-	ctx.sender.removeTag("WSeenLearning");
-});
+
 const daily_reward_hours = 24;
 const kit = new XA.Command({
 	name: "kit",
@@ -260,7 +222,7 @@ new XA.Command({ name: "sit", description: "" /*type: "public"*/ }).executes((ct
 		new Location(ctx.sender.location.x, ctx.sender.location.y - 0.1, ctx.sender.location.z)
 	);
 	entity.addTag("sit:" + ctx.sender.name);
-	ctx.sender.runCommand(`ride @s start_riding @e[type=s:it,tag="sit:${ctx.sender.name}",c=1] teleport_rider`);
+	ctx.sender.runCommandAsync(`ride @s start_riding @e[type=s:it,tag="sit:${ctx.sender.name}",c=1] teleport_rider`);
 });
 const cos = new XA.Command({
 	name: "i",
@@ -321,19 +283,7 @@ new XA.Command({
 	XA.Entity.removeTagsStartsWith(ctx.sender, "joinedAt:");
 	ctx.sender.addTag("joinedAt:" + ctx.sender.location.x + " " + ctx.sender.location.y + " " + ctx.sender.location.z);
 });
-new XA.Command({
-	name: "menu",
-	description: "Выдает/убирает меню из инвентаря",
-	/*type: "public"*/
-}).executes(async (ctx) => {
-	if (await XA.Entity.hasItem(ctx.sender, 0, "mcbehub:gui")) {
-		XA.runCommand(`clear "${ctx.sender.name}" mcbehub:gui`);
-		ctx.reply("§a► §fМеню убрано.");
-	} else {
-		XA.runCommand(`give "${ctx.sender.name}" mcbehub:gui 1 0 {"item_lock":{"mode":"lock_in_inventory"}}`);
-		ctx.reply("§a► §fМеню выдано.");
-	}
-});
+
 new XA.Command({
 	name: "ws",
 	description: "Выдает/убирает меню из инвентаря",

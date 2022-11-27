@@ -327,19 +327,6 @@ setTickInterval(() => {
 	}
 }, 40);
 
-new XA.Command({
-	name: "db",
-	description: "",
-	requires: (p) => p.hasTag("commands"),
-}).executes((ctx) => {
-	for (const key of Object.keys(XA.tables).filter((e) => e != "i")) {
-		ctx.reply(key);
-		const c = XA.tables[key].getCollection();
-		const b = toStr(c, " ");
-		ctx.reply(b);
-	}
-});
-
 const casda = new XA.Command({
 	name: "name",
 	description: "",

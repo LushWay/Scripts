@@ -9,12 +9,9 @@ export class Module {
 	constructor(folderName, options = {}) {
 		this.folder = folderName;
 
-		this.path = options.path ?? "./modules/";
+		this.path = options.folderPath ?? "./modules/";
 		this.file = options.fileName ?? "index";
-		this.condition = options.condition ?? true;
 
-		if (this.condition)
-			__MODULES__[this.path + this.folder + "/" + this.file + ".js"] =
-				folderName;
+		__MODULES__[this.path + this.folder + "/" + this.file + ".js"] = folderName;
 	}
 }

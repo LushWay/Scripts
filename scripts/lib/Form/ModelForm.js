@@ -48,7 +48,7 @@ export class ModalForm {
 	 * @param {number} defaultValueIndex  the default value index
 	 * @returns {ModalForm<AppendFormField<Callback, T[number]>>} this
 	 */
-	addDropdown(label, options, defaultValueIndex) {
+	addDropdown(label, options, defaultValueIndex = 0) {
 		// @ts-ignore
 		this.args.push({ type: "dropdown", options: options });
 		// @ts-ignore
@@ -65,7 +65,7 @@ export class ModalForm {
 	 * @param {number} defaultValue  the default value in slider
 	 * @returns {ModalForm<AppendFormField<Callback, number>>}
 	 */
-	addSlider(label, minimumValue, maximumValue, valueStep, defaultValue) {
+	addSlider(label, minimumValue, maximumValue, valueStep = 1, defaultValue = 0) {
 		this.args.push({ type: "slider" });
 		if (typeof minimumValue !== "number") return;
 		if (typeof maximumValue !== "number") return;
@@ -89,7 +89,7 @@ export class ModalForm {
 	 * Adds a text field to this form
 	 * @param {string} label  label for this textField
 	 * @param {string} placeholderText  the text that shows on this field
-	 * @param {string} defaultValue  the default value that this field has
+	 * @param {string} [defaultValue]  the default value that this field has
 	 * @returns {ModalForm<AppendFormField<Callback, string>>}
 	 */
 	addTextField(label, placeholderText, defaultValue) {
@@ -107,7 +107,7 @@ export class ModalForm {
 	 */
 	async show(player, callback) {
 		const response = await this.form.show(player);
-		if (XFormCanceled(response, player, this)) return;
+		if (XFormCanceled(response, player, this, callback)) return;
 		callback(
 			new FormCallback(this, player, callback),
 			...response.formValues.map((v, i) => (this.args[i].type == "dropdown" ? this.args[i].options[v] : v))
