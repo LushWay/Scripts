@@ -27,7 +27,7 @@ export class Structure {
 			const name = `${this.prefix}|${regions.indexOf(region)}"`;
 			const pos1 = region.pos1;
 			const pos2 = region.pos2;
-			const out = await XA.runCommand(
+			const out = await XA.runCommandX(
 				`structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
 			);
 			all++;
@@ -44,12 +44,12 @@ export class Structure {
         world.say(
           "§c► §fЧанки будут подгружены с помощью игрока"
         );
-        XA.runCommand(`tickingarea remove safezone`);
-        XA.runCommand(
+        XA.runCommandAsync(`tickingarea remove safezone`);
+        XA.runCommandAsync(
           `tickingarea add ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} safezone`
         );
         setTickTimeout(() => {
-            XA.runCommand(
+            XA.runCommandAsync(
             `structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
           )
           this.files.push({
@@ -70,19 +70,19 @@ export class Structure {
 		let all = 0;
 		for (const file of this.files) {
 			const out =
-				(await XA.runCommand(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`)).successCount >
-				0;
+				(await XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`))
+					.successCount > 0;
 			all++;
 			if (out) {
 				errors++;
 				world.say("§c► §fЧанки будут подгружены с помощью области");
-				XA.runCommand(`tickingarea remove safezone`);
-				XA.runCommand(
+				XA.runCommandX(`tickingarea remove safezone`);
+				XA.runCommandX(
 					`tickingarea add ${file.pos1.x} ${file.pos1.y} ${file.pos1.z} ${file.pos2.x} ${file.pos2.y} ${file.pos2.z} safezone`
 				);
 				setTickTimeout(() => {
 					world.say("§9►");
-					XA.runCommand(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
+					XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
 					world.say("§9► §fЗагружено.");
 				}, 40);
 			}

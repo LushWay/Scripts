@@ -4,9 +4,9 @@ import { Module } from "../lib/Module/creator.js";
 import { Items } from "@minecraft/server";
 import { wo } from "../lib/Class/XOptions.js";
 
+new Module("S_DBview");
 new Module("S_HelpCommand");
 new Module("S_FastReload");
-new Module("S_DBview");
 new Module("Menu");
 new Module("Region");
 new Module("test");

@@ -20,12 +20,12 @@ import {
 	ModalFormResponse,
 } from "@minecraft/server-ui";
 import { sleep, XA } from "xapi.js";
-import { OPTIONS, po, wo, WORLDOPTIONS } from "../../../../../lib/Class/XOptions.js";
-import { Wallet } from "../../../../../lib/Class/XWallet.js";
-import { LeaderboardBuild } from "../../../../Leaderboards/LeaderboardBuilder.js";
-import { Atp } from "../../../../Server/portals.js";
-import { stats, time } from "../../../../Server/var.js";
-import { auxa, DEFAULT_STATIC_PAGE_ID, pls, предметы } from "../../static_pages.js";
+import { OPTIONS, po, wo, WORLDOPTIONS } from "../../../lib/Class/XOptions.js";
+import { Wallet } from "../../../lib/Class/XWallet.js";
+import { LeaderboardBuild } from "../../DEPRECATED_Leaderboards/LeaderboardBuilder.js";
+import { Atp } from "../../Server/portals.js";
+import { stats, time } from "../../Server/var.js";
+import { auxa, DEFAULT_STATIC_PAGE_ID, pls, предметы } from "../static_pages.js";
 import {
 	ChangeAction,
 	ChangePAction,
@@ -57,10 +57,10 @@ class DefaultFill {
 		for (let i = 0; i < container.size; i++) {
 			const item = page.items[i];
 			if (!item || !item.type) {
-				entity.runCommand(`replaceitem entity @s slot.inventory ${i} air`);
+				entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} air`);
 				continue;
 			}
-			entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
+			entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -103,7 +103,7 @@ function ShopFill(entity, page, player) {
 	PAGES[id] ? (custom_page = PAGES[id]) : (custom_page = new Page(id, 54, "shop"));
 	for (let i = 0; i < container.size; i++) {
 		/**
-		 * @type {import("./Page").Item}
+		 * @type {import("./Page.js").Item}
 		 */
 		let item = custom_page?.items[i] ?? page?.items[i];
 		if (!item || !item.type) {
@@ -115,7 +115,7 @@ function ShopFill(entity, page, player) {
 
 			item.lore = XA.Lang.lang["shop.lore"](XA.Lang.parse(item.lore, "shop.lore").price, w.balance());
 		}
-		entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
+		entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 		/**
 		 * @type {ItemStack}
 		 */
@@ -164,7 +164,7 @@ class SpecialFill {
 		PAGES[id] ? (custom_page = PAGES[id]) : (custom_page = new Page(id, 54, "spec"));
 		for (let i = 0; i < container.size; i++) {
 			/**
-			 * @type {import("./Page").Item}
+			 * @type {import("./Page.js").Item}
 			 */
 			let item = custom_page?.items[i] ?? page?.items[i];
 			if (!item || !item.type) {
@@ -188,8 +188,9 @@ class SpecialFill {
 						iitem = `${po.Q(opt, player) ? "lime" : "red"}_candle`;
 					} else iitem = `${po.Q(opt, player) ? "yellow" : "red"}_candle`;
 				}
-				entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${iitem} ${item?.amount} ${item?.data}`);
-			} else entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
+				entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${iitem} ${item?.amount} ${item?.data}`);
+			} else
+				entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -247,7 +248,7 @@ class SpecialFill {
 		PAGES[id] ? (custom_page = PAGES[id]) : (custom_page = new Page(id, 54, "array:" + arrayType));
 		for (let i = 0; i < container.size; i++) {
 			/**
-			 * @type {import("./Page").Item}
+			 * @type {import("./Page.js").Item}
 			 */
 			let item = custom_page?.items[i] ?? page?.items[i];
 			if (i <= 44 && array[i]) {
@@ -265,7 +266,7 @@ class SpecialFill {
 				container.setItem(i, new ItemStack(MinecraftItemTypes.air));
 				continue;
 			}
-			entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
+			entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -298,7 +299,7 @@ class PlayerFill {
 		}
 		for (let i = 0; i < container.size; i++) {
 			/**
-			 * @type {import("./Page").Item}
+			 * @type {import("./Page.js").Item}
 			 */
 			let item = page?.items[i];
 			if (i < players.length) {
@@ -320,7 +321,7 @@ class PlayerFill {
 				container.setItem(i, new ItemStack(MinecraftItemTypes.air));
 				continue;
 			}
-			entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
+			entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			/**
 			 * @type {ItemStack}
 			 */
@@ -369,7 +370,7 @@ class Itemss {
 		for (let i = 0; i < container.size; i++) {
 			let im;
 			/**
-			 * @type {import("./Page").Item}
+			 * @type {import("./Page.js").Item}
 			 */
 			let item = предметы.items[i];
 			if (i < items.length) {
@@ -387,7 +388,7 @@ class Itemss {
 				continue;
 			}
 			if (!im) {
-				entity.runCommand(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
+				entity.runCommandAsync(`replaceitem entity @s slot.inventory ${i} ${item?.type} ${item?.amount} ${item?.data}`);
 			} else {
 				container.setItem(i, im);
 				continue;

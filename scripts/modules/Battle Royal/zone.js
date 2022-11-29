@@ -14,8 +14,8 @@ export class zone {
 			? `${plus ? zone.x + 1 : zone.x - 1} ${player.location.y} ${player.location.z}`
 			: `${player.location.x} ${player.location.y} ${plus ? zone.z + 1 : zone.z - 1}`;
 
-		XA.runCommand(`damage "${player.name}" 1 void`);
-		XA.runCommand(`tp "${player.name}" ${a}`);
+		XA.runCommandX(`damage "${player.name}" 1 void`);
+		XA.runCommandX(`tp "${player.name}" ${a}`);
 		player.onScreenDisplay.setActionBar("§cЗона!");
 	}
 	/**

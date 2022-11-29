@@ -36,8 +36,8 @@ const cmd = new XA.Command({
 	o.setType(MinecraftBlockTypes.redstoneBlock);
 	await sleep(10);
 	console.log(world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13)).type.id);
-	XA.runCommand(`tp "${name}" "${ctx.sender.name}"`);
-	// ctx.sender.runCommand("gametest runthis");
+	XA.runCommandX(`tp "${name}" "${ctx.sender.name}"`);
+	// ctx.sender.runCommandAsync("gametest runthis");
 });
 cmd
 	.literal({ name: "name" })

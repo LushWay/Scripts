@@ -1,11 +1,11 @@
 import { BlockLocation, Player, world } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
+import { Subscriber } from "../../lib/Class/Events.js";
 import { wo } from "../../lib/Class/XOptions.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
 import { rtp } from "./rtp.js";
 import { zone } from "./zone.js";
-import { Subscriber } from "../../lib/Class/Events.js";
 
 /** @type {Subscriber<Player>} */
 const playerJoinQuene = new Subscriber();
@@ -50,7 +50,7 @@ class BattleRoyal {
 	}
 	async waitToRespawn(name) {
 		let C = 0;
-		while ((await XA.runCommand("testfor " + name)).successCount < 1 && C < 100) {
+		while ((await XA.runCommandX("testfor " + name)).successCount < 1 && C < 100) {
 			await sleep(5);
 			C++;
 		}
@@ -121,14 +121,14 @@ class BattleRoyal {
 
 				// Очистка, звук
 				try {
-					p.runCommand("clear @s");
+					p.runCommandAsync("clear @s");
 				} catch (error) {}
 				p.playSound("note.pling");
 
 				// Ртп
 				const pos = rtp(p, this.center.x, this.center.z, this.game.rad - 15, this.game.rad - 30, poses);
 				poses.push(pos);
-				XA.runCommand(`kill @e[x=${pos.x},z=${pos.z},y=${pos.y},r=100,type=item]`);
+				XA.runCommandX(`kill @e[x=${pos.x},z=${pos.z},y=${pos.y},r=100,type=item]`);
 
 				//Стартовый сундук
 				// const ps = new LootChest(pos.x, pos.z, 0, 10).pos;
@@ -144,7 +144,7 @@ class BattleRoyal {
 						this.time.sec--, (this.time.tick = 20);
 						for (const val of XA.tables.chests.values()) {
 							for (const pos of val) {
-								XA.runCommand(`particle minecraft:campfire_smoke_particle ${pos}`);
+								XA.runCommandX(`particle minecraft:campfire_smoke_particle ${pos}`);
 							}
 						}
 					}
@@ -169,7 +169,7 @@ class BattleRoyal {
 					}
 
 					//Отображение таймера и игроков
-					XA.runCommand(
+					XA.runCommandX(
 						`title @a[tag="br:inGame"] actionbar §6${this.players.filter((e) => e.hasTag("br:alive")).length} §g○ §6${
 							this.time.min
 						}:${`${this.time.sec}`.length < 2 ? `0${this.time.sec}` : this.time.sec} §g○ §6${this.game.rad}`
@@ -242,8 +242,8 @@ class BattleRoyal {
 			const winner = ex;
 			if (typeof winner == "object" && XA.Entity.fetch(winner.name)) {
 				winner.tell(XA.Lang.lang["br.end.winner"](this.reward));
-				XA.runCommand(`title "${winner.name}" title §6Ты победил!`);
-				XA.runCommand(`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`);
+				XA.runCommandX(`title "${winner.name}" title §6Ты победил!`);
+				XA.runCommandX(`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`);
 				this.players
 					.filter((e) => e.name != winner.name)
 					.forEach((e) => {

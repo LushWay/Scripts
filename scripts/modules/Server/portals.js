@@ -29,11 +29,8 @@ new WorldOption("minigames:pos", "(x y z)\nТакже можно выстави�
  * @example tp(player, '0 0 0', 'spawn', po.Q('tp', player))
  */
 function tp(player, pos, place, resultActionbar = false, obj, text, slow_falling, tpAnimation = true) {
-	if (tpAnimation)
-		try {
-			player.runCommand("effect @s clear");
-		} catch (e) {}
-	if (slow_falling) player.runCommand("effect @s slow_falling 17 1 true");
+	if (tpAnimation) player.runCommandAsync("effect @s clear");
+	if (slow_falling) player.runCommandAsync("effect @s slow_falling 17 1 true");
 	let befplace;
 	if (obj && obj.on) {
 		let { P, C } = getPlace(obj.place, "");
@@ -41,9 +38,9 @@ function tp(player, pos, place, resultActionbar = false, obj, text, slow_falling
 	}
 
 	let { P, C, rot } = getPlace(place, text);
-	player.runCommand(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
-	if (resultActionbar) player.runCommand(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
-	player.runCommand(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
+	player.runCommandAsync(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
+	if (resultActionbar) player.runCommandAsync(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
+	player.runCommandAsync(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
 }
 
 function getPlace(place, text) {
@@ -96,9 +93,9 @@ class inventory {
 		if (IsSet) {
 			this.save = [];
 			for (const g of this.gamerules) {
-				XA.runCommand(`gamerule ${g.split(":")[0]} ${g.split(":")[1]}`);
+				XA.runCommandX(`gamerule ${g.split(":")[0]} ${g.split(":")[1]}`);
 			}
-		} else this.save.forEach((g) => XA.runCommand(`gamerule ${g.split(" = ")[0]} ${g.split(" = ")[1]}`));
+		} else this.save.forEach((g) => XA.runCommandX(`gamerule ${g.split(" = ")[0]} ${g.split(" = ")[1]}`));
 	}
 	#setZone(bl) {
 		this.fillblocks.bedrock.forEach((e) => {
@@ -134,7 +131,7 @@ class inventory {
 		const name = pl.name;
 		pl.kill();
 		sleep(10).then((e) => {
-			XA.runCommand(
+			XA.runCommandX(
 				`structure save ${this.structureName.replace("$name", pl.name)} ${zone.x} ${zone.y} ${zone.z} ${zone.x} ${
 					zone.y + 1
 				} ${zone.z} true disk false`
@@ -144,12 +141,12 @@ class inventory {
 				y: zone.y,
 				z: zone.z,
 			}).length;
-			XA.runCommand(`kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`);
+			XA.runCommandX(`kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`);
 			pl.tell(`Сохранено ${a} предметов`);
 		});
 		//console.warn("Сохранение инвентаря, прода");
 		let C = 0;
-		while ((await XA.runCommand("testfor " + name))?.successCount < 1 && C < 100) {
+		while ((await XA.runCommandX("testfor " + name))?.successCount < 1 && C < 100) {
 			C++;
 			await sleep(5);
 		}
@@ -168,8 +165,8 @@ class inventory {
 	async loadInv(i, pl) {
 		if (i != invs.anarch) {
 			//console.warn("Загрузка стандартного инвентаря");
-			XA.runCommand(`clear ${pl.name}`);
-			XA.runCommand(
+			XA.runCommandX(`clear ${pl.name}`);
+			XA.runCommandX(
 				`replaceitem entity ${pl.name} slot.hotbar 4 mcbehub:gui 1 0 {"item_lock":{"mode":"lock_in_slot"}}`
 			);
 		} else {
@@ -179,13 +176,13 @@ class inventory {
 			if (!zone) return world.say("§cError");
 			this.#setZone(zone);
 			pl.teleport(new Location(zone.x, zone.y, zone.z), world.getDimension("overworld"), 0, 0, false);
-			XA.runCommand(`clear ${pl.name}`);
-			XA.runCommand(
+			XA.runCommandX(`clear ${pl.name}`);
+			XA.runCommandX(
 				`structure load ${this.structureName.replace("$name", pl.name)} ${zone.x} ${zone.y} ${
 					zone.z
 				} 0_degrees none true false`
 			);
-			XA.runCommand(`structure delete ${this.structureName.replace("$name", pl.name)}`);
+			XA.runCommandX(`structure delete ${this.structureName.replace("$name", pl.name)}`);
 			await sleep(1);
 			while (
 				world
@@ -193,7 +190,7 @@ class inventory {
 					.getEntitiesAtBlockLocation(zone)
 					.filter((e) => e.typeId == "minecraft:item").length > 0
 			) {
-				pl.runCommand("title @s title §cОдень броню!");
+				pl.runCommandAsync("title @s title §cОдень броню!");
 				await sleep(3);
 			}
 			return;
@@ -293,13 +290,13 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		!((!setDefaultInventory && inve.size == inve.emptySlotsCount) || setDefaultInventory)
 	) {
 		tp(player, pos, place, po.Q("title:spawn:enable", player), null, null, air);
-		player.runCommand(`scoreboard players set @s ${objective[0]} ${ps}`);
+		player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${ps}`);
 	} else {
 		try {
-			if (!setDefaultInventory) player.runCommand("testfor @s[m=!c]");
+			if (!setDefaultInventory) player.runCommandAsync("testfor @s[m=!c]");
 			inv.saveInv(currentInventory, player).then(() =>
 				inv.loadInv(ps, player).then(() => {
-					player.runCommand(`scoreboard players set @s ${objective[0]} ${ps}`);
+					player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${ps}`);
 					tp(
 						player,
 						pos,
@@ -313,7 +310,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 				})
 			);
 		} catch (e) {
-			player.runCommand(`scoreboard players set @s ${objective[0]} ${ps}`);
+			player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${ps}`);
 			tp(player, pos, place, po.Q("title:spawn:enable", player), obj, null, air);
 		}
 	}
@@ -333,12 +330,13 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 		"t:hpper_minecart",
 		new Location(data.entity.location.x, data.entity.location.y + 0.2, data.entity.location.z)
 	);
-	try {
-		data.entity.runCommand("tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]");
-	} catch (e) {
-		XA.Entity.despawn(ent);
-		return;
-	}
+	//TODO! FIX
+	// try {
+	// 	data.entity.runCommandAsync("tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]");
+	// } catch (e) {
+	// 	XA.Entity.despawn(ent);
+	// 	return;
+	// }
 	data.entity.dimension.spawnEntity("f:t", ent.location).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
 });
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
@@ -383,9 +381,7 @@ const qqq = {
 setTickInterval(
 	async () => {
 		for (const p of world.getPlayers())
-			try {
-				p.runCommand("execute as @s if block ~~-2~ bedrock if block ~~-3~ chest run event entity @s portal");
-			} catch (ee) {}
+			p.runCommandAsync("execute as @s if block ~~-2~ bedrock if block ~~-3~ chest run event entity @s portal");
 		const pos = wo
 			.G("spawn:pos")
 			?.split(" ")
@@ -402,22 +398,22 @@ setTickInterval(
 				pl.location.y < pos[1] - 10
 			) {
 				try {
-					pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=50]`);
+					pl.runCommandAsync(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=50]`);
 					Atp(pl, "spawn", { pvp: true });
 				} catch (e) {}
 			} else {
 				try {
-					pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=200]`);
+					pl.runCommandAsync(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=200]`);
 					if (pl.location.y < pos[1] - 50) Atp(pl, "spawn", { pvp: true });
 				} catch (e) {}
 				try {
-					pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",rm=200,r=210]`);
+					pl.runCommandAsync(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",rm=200,r=210]`);
 					Atp(pl, "spawn", { pvp: true });
 				} catch (e) {}
 			}
 			if (pos2 && pl.location.y < pos2[1] - 10) {
 				try {
-					pl.runCommand(`execute positioned ${wo.Q("minigames:pos")} run testfor @a[name="${pl.name}",r=50]`);
+					pl.runCommandAsync(`execute positioned ${wo.Q("minigames:pos")} run testfor @a[name="${pl.name}",r=50]`);
 					Atp(pl, "minigames", { pvp: true });
 				} catch (e) {}
 			}

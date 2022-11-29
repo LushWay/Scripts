@@ -1,6 +1,6 @@
 import { BlockLocation, MinecraftBlockTypes, world } from "@minecraft/server";
-import { configuration } from "config.js";
 import { sleep, XA } from "xapi.js";
+import { configuration } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
@@ -42,7 +42,7 @@ export class Shape {
 						if (this.blocks.find((e) => e.split(".")[1])) {
 							const block = this.blocks[~~(Math.random() * this.blocks.length)];
 
-							XA.Build.chat.runCommand(
+							XA.runCommandX(
 								`setblock ${location.x} ${location.y} ${location.z} ${block.split(".")[0]} ${
 									block.split(".")[1] ? block.split(".")[1] : ""
 								}`

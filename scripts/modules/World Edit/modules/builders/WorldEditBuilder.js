@@ -23,7 +23,7 @@ export class WorldEditBuilder {
       return [
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION1_NAME}"] kill`,
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION2_NAME}"] kill`,
-      ].forEach(e => XA.runCommand(e))
+      ].forEach(e => XA.runCommandX(e))
     const ent1 = XA.Entity.getEntityAtPos(
       this.pos1.x,
       this.pos1.y,
@@ -35,28 +35,28 @@ export class WorldEditBuilder {
       this.pos2.z
     );
     if (ent1.length == 0) {
-      XA.runCommand(
+      XA.runCommandX(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION1_NAME}"] kill`
       );
-      XA.runCommand(
+      XA.runCommandX(
         `summon f:t ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} spawn "${configuration.DRAW_SELECTION1_NAME}"`
       );
     }
     if (ent2.length == 0) {
-      XA.runCommand(
+      XA.runCommandX(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION2_NAME}"] kill`
       );
-      XA.runCommand(
+      XA.runCommandX(
         `summon f:t ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} spawn "${configuration.DRAW_SELECTION2_NAME}"`
       );
     }
     for (let ent of ent1) {
       if (ent.id == "f:t" && ent.nameTag == configuration.DRAW_SELECTION1_NAME)
         break;
-      XA.runCommand(
+      XA.runCommandX(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION1_NAME}"] kill`
       );
-      XA.runCommand(
+      XA.runCommandX(
         `summon f:t ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} spawn "${configuration.DRAW_SELECTION1_NAME}"`
       );
       break;
@@ -64,10 +64,10 @@ export class WorldEditBuilder {
     for (let ent of ent2) {
       if (ent.id == "f:t" && ent.nameTag == configuration.DRAW_SELECTION2_NAME)
         break;
-      XA.runCommand(
+      XA.runCommandX(
         `event entity @e[type=f:t,name="${configuration.DRAW_SELECTION2_NAME}"] kill`
       );
-      XA.runCommand(
+      XA.runCommandX(
         `summon f:t ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} spawn "${configuration.DRAW_SELECTION2_NAME}"`
       );
       break;
@@ -150,7 +150,7 @@ export class WorldEditBuilder {
         pos2: this.pos2,
         name: configuration.COPY_FILE_NAME,
       };
-      const opt = (await XA.runCommand(
+      const opt = (await XA.runCommandX(
         `structure save ${configuration.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
       )).successCount > 0;;
       if (opt) throw new Error(opt);
@@ -199,8 +199,8 @@ export class WorldEditBuilder {
 
       this.backup(player.location, pos2);
 
-      player.runCommand(
-        `structure load ${configuration.COPY_FILE_NAME} ~ ~ ~ ${string(
+      player.runCommandAsync(
+        `structure load ${configuration.COPY_FILE_NAME} ~ ~ ~ ${String(
           rotation
         ).replace(
           "NaN",
@@ -239,7 +239,7 @@ export class WorldEditBuilder {
     let errors = 0;
     let comm = 0;
     for (const cube of Cube.split(configuration.FILL_CHUNK_SIZE)) {
-      const opt = (await XA.runCommand(
+      const opt = (await XA.runCommandX(
         `fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${
           cube.pos2.y
         } ${cube.pos2.z} ${block} ${data} ${replaceMode ? replaceMode : ""} ${

@@ -2,12 +2,9 @@ import { BlockRaycastOptions, Player, world } from "@minecraft/server";
 import { setTickTimeout, XA } from "xapi.js";
 
 import { ENTITY_INVENTORY, GUI_ITEM, GUI_ITEM2 } from "./config.js";
-import { ChestGUI, CURRENT_GUIS } from "./modules/Models/ChestGUI.js";
-import { PAGES } from "./modules/Models/Page.js";
-import {
-	DEFAULT_STATIC_PAGE_ID,
-	DEFAULT_STATIC_PAGE_ID2,
-} from "./static_pages.js";
+import { ChestGUI, CURRENT_GUIS } from "./Models/ChestGUI.js";
+import { PAGES } from "./Models/Page.js";
+import { DEFAULT_STATIC_PAGE_ID, DEFAULT_STATIC_PAGE_ID2 } from "./static_pages.js";
 
 const guis = {};
 
@@ -18,12 +15,7 @@ const guis = {};
  * @param {string} id
  * @param {string} startPage
  */
-function identyGui(
-	item,
-	permission = () => true,
-	id = "id",
-	startPage = DEFAULT_STATIC_PAGE_ID
-) {
+function identyGui(item, permission = () => true, id = "id", startPage = DEFAULT_STATIC_PAGE_ID) {
 	guis[item] = {
 		permission,
 		item,
@@ -42,12 +34,7 @@ identyGui(
 	"moder_menu"
 );
 
-identyGui(
-	GUI_ITEM2,
-	(player) => player.hasTag("owner") || player.name === "XilLeR228",
-	"wo",
-	DEFAULT_STATIC_PAGE_ID2
-);
+identyGui(GUI_ITEM2, (player) => player.hasTag("owner") || player.name === "XilLeR228", "wo", DEFAULT_STATIC_PAGE_ID2);
 
 const q = new BlockRaycastOptions();
 q.maxDistance = 9;
@@ -75,20 +62,12 @@ setTickTimeout(() => {
 				// Gui exist
 				if (activeGui && activeGui?.id !== gui?.id) {
 					activeGui.killa().then(() => {
-						if (gui.permission(player))
-							activeGui = new ChestGUI(
-								player,
-								null,
-								gui.item,
-								gui.id,
-								gui.page
-							);
+						if (gui.permission(player)) activeGui = new ChestGUI(player, null, gui.item, gui.id, gui.page);
 					});
 					continue;
 				}
 
-				if (!activeGui && gui.permission(player))
-					activeGui = new ChestGUI(player, null, gui.item, gui.id, gui.page);
+				if (!activeGui && gui.permission(player)) activeGui = new ChestGUI(player, null, gui.item, gui.id, gui.page);
 				continue;
 			} else if (activeGui && activeGui?.id !== "chest") {
 				// if Gui exist and player dont hold gui item, we need to kill gui
@@ -99,18 +78,10 @@ setTickTimeout(() => {
 			const bl = player.getBlockFromViewVector(q);
 			if (bl?.typeId && bl?.typeId === "minecraft:air") {
 				const bl2 = player.dimension.getBlock(bl.location.offset(0, -4, 0)); //
-				if (
-					bl2?.typeId &&
-					bl2.typeId === "minecraft:chest" &&
-					bl2.getComponent("inventory")?.container?.getItem(0)
-				) {
-					const page = bl2
-						.getComponent("inventory")
-						.container.getItem(0)
-						.getLore()[0];
+				if (bl2?.typeId && bl2.typeId === "minecraft:chest" && bl2.getComponent("inventory")?.container?.getItem(0)) {
+					const page = bl2.getComponent("inventory").container.getItem(0).getLore()[0];
 					//console.warn(page);
-					if (!activeGui && PAGES[page])
-						activeGui = new ChestGUI(player, null, "other", "chest", page);
+					if (!activeGui && PAGES[page]) activeGui = new ChestGUI(player, null, "other", "chest", page);
 				} else if (activeGui && activeGui?.id === "chest") {
 					activeGui.kill();
 				}

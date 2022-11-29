@@ -186,7 +186,7 @@ kit
 					XA.tables.kits.keys().join("\n  ")
 			);
 		const kit = XA.tables.kits.get(n);
-		ctx.sender.runCommand("setblock ~~~ chest");
+		ctx.sender.runCommandAsync("setblock ~~~ chest");
 		/** * @type {BlockInventoryComponentContainer} */ const inv = ctx.sender.dimension
 			.getBlock(XA.Entity.locationToBlockLocation(ctx.sender.location))
 			.getComponent("inventory").container;
@@ -269,7 +269,7 @@ new XA.Command({
 }).executes((ctx) => {
 	const a = ctx.args;
 	ctx.reply(a.join(" "));
-	const ab = ctx.sender.runCommand(a.join(" "));
+	const ab = ctx.sender.runCommandAsync(a.join(" "));
 	ctx.reply(ab.statusMessage);
 });
 new XA.Command({
@@ -291,10 +291,10 @@ new XA.Command({
 	/*type: "serv"*/
 }).executes(async (ctx) => {
 	if (await XA.Entity.hasItem(ctx.sender, 0, "sa:a")) {
-		XA.runCommand(`clear "${ctx.sender.name}" sa:a`);
+		XA.runCommandX(`clear "${ctx.sender.name}" sa:a`);
 		ctx.reply("§a► §fМеню убрано.");
 	} else {
-		XA.runCommand(`give "${ctx.sender.name}" sa:a`);
+		XA.runCommandX(`give "${ctx.sender.name}" sa:a`);
 		ctx.reply("§a► §fМеню выдано.");
 	}
 });

@@ -26,7 +26,7 @@ world.events.blockPlace.subscribe((data) => {
 	const location = data.block.location;
 	if (blocks.find((e) => e.split(".")[1])) {
 		const block = blocks[~~(Math.random() * blocks.length)];
-		XA.runCommand(
+		XA.runCommandX(
 			`setblock ${location.x} ${location.y} ${location.z} ${block.split(".")[0]} ${
 				block.split(".")[1] ? block.split(".")[1] : ""
 			}`
@@ -85,7 +85,7 @@ setTickInterval(() => {
 				const R = lore[3].split(" ")[3];
 				const Z = lore[4].split(" ")[1].replace("+", "");
 				const O = lore[4].split(" ")[3];
-				if (lore[0] == "§aActive") p.runCommand(`fill ~-${R} ~${Z}${H} ~-${R} ~${R} ~${Z}${O} ~${R} ${B} ${D}`);
+				if (lore[0] == "§aActive") p.runCommandAsync(`fill ~-${R} ~${Z}${H} ~-${R} ~${R} ~${Z}${O} ~${R} ${B} ${D}`);
 			}
 			if (lore[4] && lore[0] == "§9Adv") {
 				const B = lore[1].split(" ")[1].split(",");
@@ -118,13 +118,13 @@ setTickInterval(() => {
 				if (block) {
 					const ent1 = XA.Entity.getEntityAtPos(block.location.x, block.location.y, block.location.z);
 					if (!ent1) {
-						XA.runCommand(`event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
-						XA.runCommand(
+						XA.runCommandX(`event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+						XA.runCommandX(
 							`summon f:t ${block.location.x} ${block.location.y - configuration.H} ${block.location.z} spawn "${
 								configuration.BRUSH_LOCATOR
 							}"`
 						);
-						XA.runCommand(
+						XA.runCommandX(
 							`tag @e[x=${block.location.x},y=${block.location.y - configuration.H},z=${
 								block.location.z
 							},r=1,type=f:t,name="${configuration.BRUSH_LOCATOR}"] add "${p.name}"`
@@ -132,13 +132,13 @@ setTickInterval(() => {
 					}
 					for (let ent of ent1) {
 						if (ent.id == "f:t" && ent.nameTag == configuration.BRUSH_LOCATOR) break;
-						XA.runCommand(`event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
-						XA.runCommand(
+						XA.runCommandX(`event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+						XA.runCommandX(
 							`summon f:t ${block.location.x} ${block.location.y - configuration.H} ${block.location.z} spawn "${
 								configuration.BRUSH_LOCATOR
 							}"`
 						);
-						XA.runCommand(
+						XA.runCommandX(
 							`tag @e[x=${block.location.x},y=${block.location.y - configuration.H},z=${
 								block.location.z
 							},r=1,type=f:t,name="${configuration.BRUSH_LOCATOR}"] add "${p.name}"`
@@ -148,7 +148,7 @@ setTickInterval(() => {
 				}
 			}
 		} else {
-			XA.runCommand(`event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+			XA.runCommandX(`event entity @e[type=f:t,name="${configuration.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
 		}
 	}
 }, 0);
@@ -237,7 +237,7 @@ world.events.beforeItemUse.subscribe((data) => {
 });
 world.events.itemUse.subscribe((data) => {
 	if (data.item.typeId.startsWith("l:")) {
-		data.source.runCommand(`tp ^^^5`);
+		data.source.runCommandAsync(`tp ^^^5`);
 	}
 });
 

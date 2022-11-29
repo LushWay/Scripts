@@ -316,7 +316,7 @@ kit
           XA.tables.drops.keys().join("\n  ")
       );
     const kit = XA.tables.drops.get(n);
-    ctx.sender.runCommand("setblock ~~~ chest");
+    ctx.sender.runCommandAsync("setblock ~~~ chest");
     /** * @type {BlockInventoryComponentContainer} */ /* const inv =
       ctx.sender.dimension
         .getBlock(XA.Entity.locationToBlockLocation(ctx.sender.location))

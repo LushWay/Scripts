@@ -91,7 +91,7 @@ base.literal({ name: "add", description: "Добавляет игрока" }).ex
 		return ctx.reply(lang.nobase);
 	}
 	try {
-		ent.runCommand(`testfor @p[name="${ctx.sender.nameTag}",r=20]`);
+		ent.runCommandAsync(`testfor @p[name="${ctx.sender.nameTag}",r=20]`);
 	} catch (e) {
 		return ctx.reply("§сТы слишком далеко от базы! (Вне зоны привата)");
 	}
@@ -124,7 +124,7 @@ base
 			return ctx.reply(lang.nobase);
 		}
 		try {
-			ent.runCommand(`testfor @p[name="${ctx.sender.nameTag}",r=20]`);
+			ent.runCommandAsync(`testfor @p[name="${ctx.sender.nameTag}",r=20]`);
 		} catch (e) {
 			return ctx.reply("§сТы слишком далеко от базы! (Вне зоны привата)§r");
 		}
@@ -169,7 +169,7 @@ base.literal({ name: "list", description: "Список баз" }).executes((ctx
 		return ctx.reply(lang.nobase);
 	}
 	try {
-		ent.runCommand(`testfor @p[name="${ctx.sender.name}",r=20]`);
+		ent.runCommandAsync(`testfor @p[name="${ctx.sender.name}",r=20]`);
 	} catch (e) {
 		return ctx.reply("§cТы слишком далеко от базы! (Вне зоны привата)");
 	}
@@ -203,7 +203,7 @@ setTickInterval(
 // 	data.player.tell("§cПриват игрока " + ent[0].nameTag.split(", ")[0]);
 // 	const bl = data.block.location;
 // 	setTickTimeout(() => {
-// 		XA.runCommand(`kill @e[type=item,x=${bl.x},z=${bl.z},y=${bl.y},r=2]`);
+// 		XA.runCommandAsync(`kill @e[type=item,x=${bl.x},z=${bl.z},y=${bl.y},r=2]`);
 // 	}, 1);
 // });
 
@@ -212,7 +212,7 @@ setTickInterval(
 // 	if (ent.length < 1 || ent[0].nameTag.split(", ").includes(data.player.name))
 // 		return stats.Bplace.Eadd(data.player, 1);
 // 	const bl = data.block.location;
-// 	XA.runCommand(
+// 	XA.runCommandAsync(
 // 		`fill ${bl.x} ${bl.y} ${bl.z} ${bl.x} ${bl.y} ${bl.z} air 0 destroy`
 // 	);
 // 	data.player.tell("§cПриват игрока " + ent[0].nameTag.split(", ")[0]);

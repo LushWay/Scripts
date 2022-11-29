@@ -25,7 +25,7 @@ export class ScoreboardDB {
 	 * @param {number} value
 	 */
 	set(option, value) {
-		DIMENSIONS.overworld.runCommand(`scoreboard players set "${option}" ${this.name} ${value}`);
+		DIMENSIONS.overworld.runCommandAsync(`scoreboard players set "${option}" ${this.name} ${value}`);
 	}
 	/**
 	 *
@@ -67,6 +67,6 @@ export class ScoreboardDB {
 		}
 	}
 	reset() {
-		DIMENSIONS.overworld.runCommand(`scoreboard players reset * ${this.name}`);
+		DIMENSIONS.overworld.runCommandAsync(`scoreboard players reset * ${this.name}`);
 	}
 }

@@ -37,7 +37,7 @@ import "./modules/modules.js";
  */
 export class XA {
 	static Entity = XEntity;
-	static runCommand = XrunCommand;
+	static runCommandX = XrunCommand;
 	static Command = XCommand;
 
 	static tables = {

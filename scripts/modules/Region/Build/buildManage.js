@@ -52,7 +52,7 @@ CONFIG_MENU.menu = (player) => {
 		CreateRegion(player);
 		return false;
 	}
-	const menu = new ActionForm("Меню площадки", lang.regionManageBody(region))
+	const menu = new ActionForm("Меню площадки", lang.regionManageBody(region, player))
 		.addButton("Переместиться", null, () => {})
 		.addButton("§7Перейти на новую", null, () => {})
 		.addButton("§cОчистить", null, () => {});

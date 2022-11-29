@@ -4,6 +4,7 @@ import {
 	Items,
 	ItemStack,
 	Location,
+	MinecraftDimensionTypes,
 	MinecraftEnchantmentTypes,
 	MolangVariableMap,
 	Player,
@@ -12,7 +13,7 @@ import {
 
 import { po, wo } from "../../lib/Class/XOptions.js";
 
-import { setTickInterval, toStr, XA } from "xapi.js";
+import { setTickInterval, XA } from "xapi.js";
 
 /**======================
  **       PLUGINS
@@ -24,7 +25,6 @@ import "./commands/particle.js";
 import "./commands/sound.js";
 import "./commands/world.js";
 import "./options.js";
-import { Atp } from "./portals.js";
 import "./tool.js";
 import { stats, time } from "./var.js";
 
@@ -80,12 +80,12 @@ setTickInterval(
 				} else boom.breaksBlocks = true;
 			}
 
-			if (type == 3)
-				try {
-					f.runCommand("testforblock ^^^1 air");
-					f.runCommand("testforblock ^^^2 air");
-					continue;
-				} catch (e) {}
+			// if (type == 3)
+			// 	try {
+			// 		f.runCommandAsync("testforblock ^^^1 air");
+			// 		f.runCommandAsync("testforblock ^^^2 air");
+			// 		continue;
+			// 	} catch (e) {}
 			let a = [...world.getPlayers()].find((e) => e.name == XA.Entity.getTagStartsWith(f, "l:"));
 			if (a) stats.FVboom.eAdd(a, 1);
 			f.dimension.createExplosion(f.location, type, boom);
@@ -102,7 +102,7 @@ XA.objectives.push({ id: obj, watch: true });
 
 setTickInterval(
 	() => {
-		XA.runCommand(`scoreboard players add @a ${obj} 0`);
+		XA.runCommandX(`scoreboard players add @a ${obj} 0`);
 		for (const pl of world.getPlayers({ excludeTags: ["br:inGame"] }))
 			if (
 				pl.dimension.getBlock(XA.Entity.locationToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))
@@ -177,13 +177,10 @@ setTickInterval(
 
 			/*================== Блокировка незера =================*/
 			if (wo.Q("lock:nether")) {
-				try {
-					player.runCommand(`testforblock ~~~ portal`);
-					player.runCommand(
-						`tellraw @a {"rawtext":[{"text":"§c► §f${player.name}§c Измерение ''Незер'' заблокированно."}]}`
-					);
-					player.runCommand(`fill ~-2~-2~-2 ~2~2~2 air 0 replace portal`);
-				} catch (e) {}
+				if (player.dimension.id === MinecraftDimensionTypes.nether) {
+					player.teleport({ x: 0, z: 0, y: 0 }, XA.dimensions.overworld, 0, 0);
+					world.say(`§c► §f${player.name}§c Измерение "Незер" заблокированно.`);
+				}
 			}
 		}
 		/*================================ DEBUG2 ==============================*/
@@ -191,7 +188,7 @@ setTickInterval(
 			for (const ent of XA.dimensions.overworld.getEntities({
 				type: "mcbehub:inventory",
 			})) {
-				ent.runCommand("particle minecraft:endrod ~~~");
+				ent.runCommandAsync("particle minecraft:endrod ~~~");
 			}
 		}
 	},
@@ -223,35 +220,35 @@ setTickInterval(
 		for (const p of world.getPlayers()) {
 			let q = true;
 			//* Переключение инвентаря
-			if (q)
-				try {
-					p.runCommand(
-						`execute positioned ${wo.Q("spawn:pos")} run testfor @p[name="${
-							p.name
-						}",scores={inv=!1},r=200,tag=!"br:ded"]`
-					);
-					q = false;
-					Atp(p, "spawn", { pvp: true });
-					new XA.instantDB(world, "pos").delete(p.id);
-				} catch (e) {}
-			if (q)
-				try {
-					p.runCommand(
-						`execute positioned ${wo.Q("minigames:pos")} run testfor @p[name="${
-							p.name
-						}",scores={inv=!1},r=200,tag=!"br:ded"]`
-					);
-					q = false;
-					Atp(p, "minigames", { pvp: true });
-				} catch (e) {}
-			if (q)
-				try {
-					p.runCommand(
-						`execute as @s if block ~ -64 ~ deny 0 run testfor @p[name="${p.name}",scores={inv=!1},tag=!"br:ded"]`
-					);
-					q = false;
-					Atp(p, "currentpos", { pvp: true });
-				} catch (e) {}
+			// if (q)
+			// 	try {
+			// 		p.runCommandAsync(
+			// 			`execute positioned ${wo.Q("spawn:pos")} run testfor @p[name="${
+			// 				p.name
+			// 			}",scores={inv=!1},r=200,tag=!"br:ded"]`
+			// 		);
+			// 		q = false;
+			// 		Atp(p, "spawn", { pvp: true });
+			// 		new XA.instantDB(world, "pos").delete(p.id);
+			// 	} catch (e) {}
+			// if (q)
+			// 	try {
+			// 		p.runCommandAsync(
+			// 			`execute positioned ${wo.Q("minigames:pos")} run testfor @p[name="${
+			// 				p.name
+			// 			}",scores={inv=!1},r=200,tag=!"br:ded"]`
+			// 		);
+			// 		q = false;
+			// 		Atp(p, "minigames", { pvp: true });
+			// 	} catch (e) {}
+			// if (q)
+			// 	try {
+			// 		p.runCommandAsync(
+			// 			`execute as @s if block ~ -64 ~ deny 0 run testfor @p[name="${p.name}",scores={inv=!1},tag=!"br:ded"]`
+			// 		);
+			// 		q = false;
+			// 		Atp(p, "currentpos", { pvp: true });
+			// 	} catch (e) {}
 			/*================ TOOL FUNCTIONS ===================*/
 			if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
 				const lore = XA.Entity.getHeldItem(p).getLore();
@@ -270,8 +267,8 @@ setTickInterval(
 					}
 				}
 				if (lore[0] == "Stopsound") {
-					p.runCommand("stopsound @s");
-					p.runCommand("music stop");
+					p.runCommandAsync("stopsound @s");
+					p.runCommandAsync("music stop");
 				}
 			}
 			/*===================================================*/
@@ -279,7 +276,7 @@ setTickInterval(
 			/*================== ПВП -сек =================*/
 			if (wo.Q("server:pvpmode:enable"))
 				try {
-					p.runCommand("scoreboard players remove @s[scores={pvp=1..}] pvp 1");
+					p.runCommandAsync("scoreboard players remove @s[scores={pvp=1..}] pvp 1");
 				} catch (e) {}
 			/*===================================================*/
 
@@ -320,9 +317,7 @@ setTickInterval(
 				time.day.seconds.reset();
 				world.say("Days reseted");
 			}
-			try {
-				p.runCommand("scoreboard players remove @s[scores={lockedtitle=1..}] lockedtitle 1");
-			} catch (e) {}
+			p.runCommandAsync("scoreboard players remove @s[scores={lockedtitle=1..}] lockedtitle 1");
 		}
 	},
 	20,
@@ -331,7 +326,7 @@ setTickInterval(
 
 setTickInterval(
 	() => {
-		//XA.runCommand('music stop')
+		//XA.runCommandAsync('music stop')
 		for (const p of world.getPlayers()) {
 			if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
 				const lore = XA.Entity.getHeldItem(p).getLore();
@@ -411,7 +406,7 @@ world.events.entityHurt.subscribe(
 				data.damagingEntity.onScreenDisplay.setActionBar(XA.Lang.lang["title.kill.hit"](data.hurtEntity.name));
 		}
 		if (data?.hurtEntity?.typeId != "minecraft:player") return;
-		data.hurtEntity.runCommand(
+		data.hurtEntity.runCommandAsync(
 			`scoreboard players set @s pvp ${wo.G("server:pvpmode:cooldown") ? wo.G("server:pvpmode:cooldown") : 15}`
 		);
 		stats.Hget.eAdd(data.hurtEntity, data.damage);

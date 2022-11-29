@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Enchantment, Items, ItemStack, MinecraftEnchantmentTypes } from "@minecraft/server";
 
 /**

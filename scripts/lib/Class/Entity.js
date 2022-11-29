@@ -133,15 +133,6 @@ export const XEntity = {
 		return count;
 	},
 	/**
-	 * Gets the inventory of a entity
-	 * @param {Entity} entity entity you want to get
-	 * @returns {number}
-	 */
-	clearItems(entity, id, count) {
-		const countt = entity.runCommand(`clear @s ${id} -1 ${count}`).statusMessage.split(": ")[1].replace(/\D/gi, "");
-		return countt;
-	},
-	/**
 	 *
 	 * @param {Player} entity
 	 * @param {0 | "armor" | "armor.chest" | "armor.feet" | "armor.legs" | "slot.enderchest" | "weapon.mainhand" | "weapon.offhand"} location

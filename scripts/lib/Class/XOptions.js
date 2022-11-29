@@ -230,11 +230,7 @@ export const wo = {
 			console.warn(opt.name);
 			if (opt.lvl <= 10 && !wo.Q(opt.name)) {
 				console.warn(opt.name);
-				try {
-					DIMENSIONS.overworld.runCommand(`scoreboard players reset "${opt.name}" ${this.name}`);
-				} catch (e) {
-					console.warn(e);
-				}
+					DIMENSIONS.overworld.runCommandAsync(`scoreboard players reset "${opt.name}" ${this.name}`);
 			}
 		}
 	},

@@ -2,20 +2,20 @@ import { DynamicPropertiesDefinition, MinecraftEntityTypes, world } from "@minec
 
 export const CONFIG_DB = {
 	player: {
-		basic: 2 ** 10,
+		basic: 0,
 	},
 	world: {
-		pos: 2 ** 10,
-		chests: 2 ** 10,
-		options: 2 ** 10,
-		region: 2 ** 10,
-		kits: 2 ** 10,
-		chest: 2 ** 10,
-		drop: 2 ** 10,
-		roles: 2 ** 11,
-		leaderboard: 2 ** 15,
-		basic: 2 ** 10,
-		buildRegion: 2 ** 11,
+		pos: 0,
+		chests: 0,
+		options: 0,
+		region: 0,
+		kits: 0,
+		chest: 0,
+		drop: 0,
+		roles: 0,
+		leaderboard: 0,
+		basic: 0,
+		buildRegion: 0,
 		speed_test: 0,
 	},
 };
@@ -28,13 +28,15 @@ export const CONFIG_DB = {
  * @returns
  */
 function add(s, p, v) {
-	s.defineString(p, v > 0 && v <= 4294967295 ? v : 4294967295);
+	const size = v > 0 ? v : 4294967295;
+	world.say(`§9| §f${p} => ${size}`);
+	s.defineString(p, size);
 }
 
 world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	try {
 		const e = new DynamicPropertiesDefinition();
-		for (const prop in CONFIG_DB.world) add(e, prop);
+		for (const prop in CONFIG_DB.world) add(e, prop, CONFIG_DB.world[prop]);
 		propertyRegistry.registerWorldDynamicProperties(e);
 	} catch (e) {
 		console.warn(e);

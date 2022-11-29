@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
 	Enchantment,
 	InventoryComponentContainer,
@@ -7,8 +9,8 @@ import {
 } from "@minecraft/server";
 import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { XA } from "xapi.js";
-import { po, wo } from "../../../../../lib/Class/XOptions.js";
-import { auxa, lich } from "../../static_pages.js";
+import { po, wo } from "../../../lib/Class/XOptions.js";
+import { auxa, lich } from "../static_pages.js";
 import { ChestGUI } from "./ChestGUI.js";
 import { PAGES } from "./Page.js";
 //import { ActionFormData, MessageFormData, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
@@ -63,7 +65,7 @@ export function CloseAction(chestGUI) {
 export function CommandAction(chestGUI, Item) {
 	const command = Item.action.split("command:")?.[1];
 	try {
-		chestGUI.player.runCommand(command);
+		chestGUI.player.runCommandAsync(command);
 	} catch (error) {}
 }
 

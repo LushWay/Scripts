@@ -43,7 +43,6 @@ world.events.blockPlace.subscribe((data) => {
  */
 world.events.blockBreak.subscribe(({ player, block, brokenBlockPermutation, dimension }) => {
 	const region = Region.blockLocationInRegion(block.location, player.dimension.id);
-	world.say(toStr(region));
 	if (allowed(player, region)) return;
 	// setting block back
 	dimension.getBlock(block.location).setPermutation(brokenBlockPermutation.clone());

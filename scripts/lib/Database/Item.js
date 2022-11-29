@@ -1,5 +1,6 @@
 import { BlockLocation, Entity, InventoryComponentContainer, ItemStack, Location, world } from "@minecraft/server";
 import { XA } from "../../xapi.js";
+import { DIMENSIONS } from "../List/dimensions.js";
 
 /**
  * Minecraft Bedrock Item Database
@@ -19,10 +20,7 @@ import { XA } from "../../xapi.js";
  */
 const ENTITY_LOCATION = new Location(0, 0, 0);
 
-try {
-	world.getDimension("overworld").runCommand("tickingarea add 0 0 0 0 0 0 ItemDB true");
-	console.warn("ItemDB tickingarea was created");
-} catch (e) {}
+DIMENSIONS.overworld.runCommandAsync("tickingarea add 0 0 0 0 0 0 ItemDB true");
 
 const ENTITY_DATABSE_ID = "mcbehub:inventory2";
 
@@ -119,7 +117,7 @@ export class XItemDatabase {
 						world.events.entityCreate.unsubscribe(e);
 					}
 				});
-				world.getDimension("overworld").runCommand(`summon ${ENTITY_DATABSE_ID} 0 0 0`);
+				DIMENSIONS.overworld.runCommandAsync(`summon ${ENTITY_DATABSE_ID} 0 0 0`);
 			}
 		}
 		/**
