@@ -1,5 +1,21 @@
 import { BlockLocation, world } from "@minecraft/server";
 import { ThrowError, XA } from "xapi.js";
+
+/**
+ * This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc...
+ * @param {number} number The number you want to convert
+ * @returns {string}
+ * @example metricNumbers(15000);
+ */
+function metricNumbers(value) {
+  const types = ["", "к", "млн", "млрд", "трлн"];
+  const selectType = (Math.log10(value) / 3) | 0;
+  if (selectType == 0) return value;
+  const scaled = value / Math.pow(10, selectType * 3);
+  return `${scaled.toFixed(1)}${types[selectType] ? ` ${types[selectType]}`: "e" + selectType}`;
+}
+
+
 const lb = new XA.instantDB(world, "leaderboard");
 
 // key: objective , value {"scores":[{"name": "smell of curry", "score": "10"},{"name": "leeshdsd", "score": "103"}], "location": {"x":10,"y":30,"z":50}}
