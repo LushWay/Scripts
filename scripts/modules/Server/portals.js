@@ -363,61 +363,69 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 		c.triggerEvent("kill");
 	}, 25);
 });
-setTickInterval(() => {
-	for (const e of XA.Entity.getEntitys("t:hpper_minecart")) {
-		const inv = XA.Entity.getI(e);
-		if (inv.size == inv.emptySlotsCount) {
-			e.triggerEvent("ded");
-			e.kill();
+setTickInterval(
+	() => {
+		for (const e of XA.Entity.getEntitys("t:hpper_minecart")) {
+			const inv = XA.Entity.getI(e);
+			if (inv.size == inv.emptySlotsCount) {
+				e.triggerEvent("ded");
+				e.kill();
+			}
 		}
-	}
-}, 20);
+	},
+	20,
+	"portal20shit"
+);
 
 const qqq = {
 	scoreOptions: [{ objective: objective[0], minScore: 1, maxScore: 1 }],
 };
-setTickInterval(async () => {
-	for (const p of world.getPlayers())
-		try {
-			p.runCommand("execute as @s if block ~~-2~ bedrock if block ~~-3~ chest run event entity @s portal");
-		} catch (ee) {}
-	const pos = wo
-		.G("spawn:pos")
-		?.split(" ")
-		?.map((e) => Number(e));
-	const pos2 = wo
-		.G("minigames:pos")
-		?.split(" ")
-		?.map((e) => Number(e));
-	for (const pl of world.getPlayers(qqq)) {
-		if (
-			pos &&
-			XA.Entity.getScore(pl, "inv") == 1 &&
-			!(await XA.Entity.hasItem(pl, "armor.chest", "elytra")) &&
-			pl.location.y < pos[1] - 10
-		) {
+setTickInterval(
+	async () => {
+		for (const p of world.getPlayers())
 			try {
-				pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=50]`);
-				Atp(pl, "spawn", { pvp: true });
-			} catch (e) {}
-		} else {
-			try {
-				pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=200]`);
-				if (pl.location.y < pos[1] - 50) Atp(pl, "spawn", { pvp: true });
-			} catch (e) {}
-			try {
-				pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",rm=200,r=210]`);
-				Atp(pl, "spawn", { pvp: true });
-			} catch (e) {}
+				p.runCommand("execute as @s if block ~~-2~ bedrock if block ~~-3~ chest run event entity @s portal");
+			} catch (ee) {}
+		const pos = wo
+			.G("spawn:pos")
+			?.split(" ")
+			?.map((e) => Number(e));
+		const pos2 = wo
+			.G("minigames:pos")
+			?.split(" ")
+			?.map((e) => Number(e));
+		for (const pl of world.getPlayers(qqq)) {
+			if (
+				pos &&
+				XA.Entity.getScore(pl, "inv") == 1 &&
+				!(await XA.Entity.hasItem(pl, "armor.chest", "elytra")) &&
+				pl.location.y < pos[1] - 10
+			) {
+				try {
+					pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=50]`);
+					Atp(pl, "spawn", { pvp: true });
+				} catch (e) {}
+			} else {
+				try {
+					pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",r=200]`);
+					if (pl.location.y < pos[1] - 50) Atp(pl, "spawn", { pvp: true });
+				} catch (e) {}
+				try {
+					pl.runCommand(`execute positioned ${wo.Q("spawn:pos")} run testfor @a[name="${pl.name}",rm=200,r=210]`);
+					Atp(pl, "spawn", { pvp: true });
+				} catch (e) {}
+			}
+			if (pos2 && pl.location.y < pos2[1] - 10) {
+				try {
+					pl.runCommand(`execute positioned ${wo.Q("minigames:pos")} run testfor @a[name="${pl.name}",r=50]`);
+					Atp(pl, "minigames", { pvp: true });
+				} catch (e) {}
+			}
 		}
-		if (pos2 && pl.location.y < pos2[1] - 10) {
-			try {
-				pl.runCommand(`execute positioned ${wo.Q("minigames:pos")} run testfor @a[name="${pl.name}",r=50]`);
-				Atp(pl, "minigames", { pvp: true });
-			} catch (e) {}
-		}
-	}
-}, 0);
+	},
+	0,
+	"portalShit"
+);
 
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	if (data.id != "portal" || !(data.entity instanceof Player)) return;

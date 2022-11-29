@@ -35,49 +35,53 @@ function pret(player, isX, zone) {
 	player.dimension.spawnParticle("minecraft:rising_border_dust_particle", loc, new MolangVariableMap());
 }
 
-setTickInterval(() => {
-	/*================================================================================================*/
+setTickInterval(
+	() => {
+		/*================================================================================================*/
 
-	/*=========================================== ЗОНА ===========================================*/
-	const players = [...world.getPlayers()];
-	global.Radius = 200 + 20 * players.length;
-	const rad = global.Radius;
-	const pcenter = wo.G("zone:center");
-	const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
+		/*=========================================== ЗОНА ===========================================*/
+		const players = [...world.getPlayers()];
+		global.Radius = 200 + 20 * players.length;
+		const rad = global.Radius;
+		const pcenter = wo.G("zone:center");
+		const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
 
-	/**
-	 *
-	 * @param {number} value
-	 * @param {number} min
-	 * @param {number} max
-	 * @returns
-	 */
-	const inRange = (value, min, max) => value <= max && value >= min;
+		/**
+		 *
+		 * @param {number} value
+		 * @param {number} min
+		 * @param {number} max
+		 * @returns
+		 */
+		const inRange = (value, min, max) => value <= max && value >= min;
 
-	for (const p of players) {
-		const rmax = { x: center[0] + rad, z: center[1] + rad };
-		const rmin = { x: center[0] - rad, z: center[1] - rad };
-		const l = { x: Math.floor(p.location.x), y: Math.floor(p.location.y), z: Math.floor(p.location.z) };
+		for (const p of players) {
+			const rmax = { x: center[0] + rad, z: center[1] + rad };
+			const rmin = { x: center[0] - rad, z: center[1] - rad };
+			const l = { x: Math.floor(p.location.x), y: Math.floor(p.location.y), z: Math.floor(p.location.z) };
 
-		const xtrue = inRange(l.x, rmin.x, rmax.x);
-		const ztrue = inRange(l.z, rmin.z, rmax.z);
+			const xtrue = inRange(l.x, rmin.x, rmax.x);
+			const ztrue = inRange(l.z, rmin.z, rmax.z);
 
-		if (xtrue && ztrue) {
-			if (XA.Entity.getScore(p, "inv") !== 2 && !p.hasTag("saving") && !p.hasTag("br:ded")) {
-				Atp(p, "anarch", { pvp: true });
+			if (xtrue && ztrue) {
+				if (XA.Entity.getScore(p, "inv") !== 2 && !p.hasTag("saving") && !p.hasTag("br:ded")) {
+					Atp(p, "anarch", { pvp: true });
+				}
 			}
+
+			if (l.x >= rmax.x && l.x <= rmax.x + 10 && ztrue) ret(p, true, rmax);
+			if (l.x >= rmax.x - 10 && l.x <= rmax.x && ztrue) pret(p, true, rmax);
+
+			if (l.z >= rmax.z && l.z <= rmax.z + 10 && xtrue) ret(p, false, rmax);
+			if (l.z >= rmax.z - 10 && l.z <= rmax.z && xtrue) pret(p, false, rmax);
+
+			if (l.x <= rmin.x && l.x >= rmin.x - 10 && ztrue) ret(p, true, rmin, true);
+			if (l.x <= rmin.x + 10 && l.x >= rmin.x && ztrue) pret(p, true, rmin);
+
+			if (l.z <= rmin.z && l.z >= rmin.z - 10 && xtrue) ret(p, false, rmin, true);
+			if (l.z <= rmin.z + 10 && l.z >= rmin.z && xtrue) pret(p, false, rmin);
 		}
-
-		if (l.x >= rmax.x && l.x <= rmax.x + 10 && ztrue) ret(p, true, rmax);
-		if (l.x >= rmax.x - 10 && l.x <= rmax.x && ztrue) pret(p, true, rmax);
-
-		if (l.z >= rmax.z && l.z <= rmax.z + 10 && xtrue) ret(p, false, rmax);
-		if (l.z >= rmax.z - 10 && l.z <= rmax.z && xtrue) pret(p, false, rmax);
-
-		if (l.x <= rmin.x && l.x >= rmin.x - 10 && ztrue) ret(p, true, rmin, true);
-		if (l.x <= rmin.x + 10 && l.x >= rmin.x && ztrue) pret(p, true, rmin);
-
-		if (l.z <= rmin.z && l.z >= rmin.z - 10 && xtrue) ret(p, false, rmin, true);
-		if (l.z <= rmin.z + 10 && l.z >= rmin.z && xtrue) pret(p, false, rmin);
-	}
-});
+	},
+	0,
+	"zone"
+);

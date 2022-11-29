@@ -3,7 +3,7 @@ import { setTickInterval, setTickTimeout, XA } from "xapi.js";
 import { ScoreboardDB } from "../../../lib/Database/Scoreboard.js";
 import { DIMENSIONS } from "../../../lib/List/dimensions.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
-import { CONTAINER_LOCATIONS } from "../utils/container.js";
+import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
 import { Region } from "../utils/Region.js";
 import { InRaid } from "../var.js";
 
@@ -37,7 +37,7 @@ setTickInterval(() => {
  * @param {Region} region
  */
 function allowed(player, region) {
-	return region.permissions.owners.includes(player.id) || player.hasTag("modding");
+	return player.hasTag("modding") || region.permissions.owners.includes(player.id);
 }
 
 /**
@@ -73,7 +73,7 @@ world.events.blockBreak.subscribe(({ player, block, brokenBlockPermutation, dime
 	dimension.getBlock(block.location).setPermutation(brokenBlockPermutation.clone());
 	// setting chest inventory back
 	if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
-		const OLD_INVENTORY = CONTAINER_LOCATIONS[JSON.stringify(block.location)];
+		const OLD_INVENTORY = CONTAINER_LOCATIONS[locationToKey(block.location)];
 		if (OLD_INVENTORY) {
 			OLD_INVENTORY.load(block.getComponent("inventory").container);
 		}
@@ -107,14 +107,18 @@ world.events.entityCreate.subscribe((data) => {
 	data.entity.teleport({ x: 0, y: -64, z: 0 }, data.entity.dimension, 0, 0);
 	data.entity.kill();
 });
-setTickInterval(() => {
-	for (const region of Region.getAllRegions()) {
-		for (const entity of DIMENSIONS[region.dimensionId].getEntities({
-			excludeTypes: region.permissions.allowedEntitys,
-		})) {
-			if (!region.entityInRegion(entity)) continue;
-			entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
-			entity.kill();
+setTickInterval(
+	() => {
+		for (const region of Region.getAllRegions()) {
+			for (const entity of DIMENSIONS[region.dimensionId].getEntities({
+				excludeTypes: region.permissions.allowedEntitys,
+			})) {
+				if (!region.entityInRegion(entity)) continue;
+				entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
+				entity.kill();
+			}
 		}
-	}
-}, 100);
+	},
+	100,
+	"regEntClear"
+);

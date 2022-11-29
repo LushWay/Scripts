@@ -8,35 +8,39 @@ if (wo.Q("debug:enable")) {
 }
 let arro = [];
 
-setTickInterval(() => {
-	for (const pl of world.getPlayers()) {
-		//if(!po.Q('debug:enable', pl)) continue
-		if (po.Q("debug:enable", pl)) {
-			for (let tag of pl.getTags()) {
-				if (arro.includes(tag)) continue;
-				if (tag.match(/[0-9]|cooldown|owner|:|Seen|commands/g)) continue;
-				arro.push(tag);
-			}
-			let arr = [];
-			let tags = pl.getTags();
-			arro.map((el) => arr.push(tags.includes(el) ? `§f${el}` : `§8${el}`));
-			let count = 0;
-			let has = false;
-			let string = "";
-			for (let tag of arr) {
-				count++;
-				if (count > 5) {
-					string = string + "\n" + tag;
-					count = 0;
-				} else {
-					has ? (string = string + ", §r" + tag) : (string = tag);
-					has = true;
+setTickInterval(
+	() => {
+		for (const pl of world.getPlayers()) {
+			//if(!po.Q('debug:enable', pl)) continue
+			if (po.Q("debug:enable", pl)) {
+				for (let tag of pl.getTags()) {
+					if (arro.includes(tag)) continue;
+					if (tag.match(/[0-9]|cooldown|owner|:|Seen|commands/g)) continue;
+					arro.push(tag);
 				}
+				let arr = [];
+				let tags = pl.getTags();
+				arro.map((el) => arr.push(tags.includes(el) ? `§f${el}` : `§8${el}`));
+				let count = 0;
+				let has = false;
+				let string = "";
+				for (let tag of arr) {
+					count++;
+					if (count > 5) {
+						string = string + "\n" + tag;
+						count = 0;
+					} else {
+						has ? (string = string + ", §r" + tag) : (string = tag);
+						has = true;
+					}
+				}
+				pl.onScreenDisplay.setActionBar(string ?? " ");
 			}
-			pl.onScreenDisplay.setActionBar(string ?? " ");
 		}
-	}
-}, 0);
+	},
+	0,
+	"debug"
+);
 
 // setTickInterval(() => {
 //   for (const e of world.getDimension("overworld").getEntities()) {

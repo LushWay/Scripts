@@ -4,7 +4,7 @@ export const BECHMARK_RESULTS = {};
 /**
  *
  * @param {string} label
- * @returns {() => void}
+ * @returns {() => number}
  */
 export function benchmark(label) {
 	const start_time = Date.now();
@@ -13,6 +13,7 @@ export function benchmark(label) {
 		if (!(label in BECHMARK_RESULTS)) BECHMARK_RESULTS[label] = [];
 		// const timeMark = new Date(Date.now()); `${timeMark.getMinutes()}m ${timeMark.getSeconds()}s ${timeMark.getMilliseconds()}ms`
 		BECHMARK_RESULTS[label].push(took_time);
+		return took_time;
 	};
 }
 

@@ -1,8 +1,8 @@
 import { BlockLocation, Entity, Location, Player, world } from "@minecraft/server";
-import { getRole, setTickInterval, setTickTimeout } from "xapi.js";
+import { IS, setTickInterval, setTickTimeout, toStr } from "xapi.js";
 import { DIMENSIONS } from "../../../lib/List/dimensions.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
-import { CONTAINER_LOCATIONS } from "../utils/container.js";
+// import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
 import { Region } from "../utils/Region.js";
 import "./buildManage.js";
 
@@ -12,7 +12,8 @@ import "./buildManage.js";
  * @param {Region} region
  */
 function allowed(player, region) {
-	return region.permissions.owners.includes(player.id) || ["admin", "moderator"].includes(getRole(player.id));
+	const is = IS(player.id, "builder") || region?.permissions?.owners?.includes(player.id);
+	return is;
 }
 
 /**
@@ -20,10 +21,10 @@ function allowed(player, region) {
  */
 world.events.beforeItemUseOn.subscribe((data) => {
 	const region = Region.blockLocationInRegion(data.blockLocation, data.source.dimension.id);
-	if (region && allowed(data.source, region)) return;
+	if (allowed(data.source, region)) return;
 	const block = data.source.dimension.getBlock(data.blockLocation);
-	if (DOORS_SWITCHES.includes(block.typeId) && region.permissions.doorsAndSwitches) return;
-	if (BLOCK_CONTAINERS.includes(block.typeId) && region.permissions.openContainers) return;
+	if (DOORS_SWITCHES.includes(block.typeId) && region?.permissions?.doorsAndSwitches) return;
+	if (BLOCK_CONTAINERS.includes(block.typeId) && region?.permissions?.openContainers) return;
 	data.cancel = true;
 });
 
@@ -32,9 +33,9 @@ world.events.beforeItemUseOn.subscribe((data) => {
  */
 world.events.blockPlace.subscribe((data) => {
 	const region = Region.blockLocationInRegion(data.block.location, data.player.dimension.id);
-	if (region && allowed(data.player, region)) return;
+	if (allowed(data.player, region)) return;
 	const l = data.block.location;
-	data.dimension.runCommandAsync(`setblock ${l.x} ${l.y} ${l.z} air 0 destroy`);
+	data.dimension.runCommandAsync(`setblock ${l.x} ${l.y} ${l.z} air 0`);
 });
 
 /**
@@ -42,16 +43,17 @@ world.events.blockPlace.subscribe((data) => {
  */
 world.events.blockBreak.subscribe(({ player, block, brokenBlockPermutation, dimension }) => {
 	const region = Region.blockLocationInRegion(block.location, player.dimension.id);
-	if (region && allowed(player, region)) return;
+	world.say(toStr(region));
+	if (allowed(player, region)) return;
 	// setting block back
 	dimension.getBlock(block.location).setPermutation(brokenBlockPermutation.clone());
 	// setting chest inventory back
-	if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
-		const OLD_INVENTORY = CONTAINER_LOCATIONS[JSON.stringify(block.location)];
-		if (OLD_INVENTORY) {
-			OLD_INVENTORY.load(block.getComponent("inventory").container);
-		}
-	}
+	// if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
+	// 	const OLD_INVENTORY = CONTAINER_LOCATIONS[locationToKey(block.location)];
+	// 	if (OLD_INVENTORY) {
+	// 		OLD_INVENTORY.load(block.getComponent("inventory").container);
+	// 	}
+	// }
 	// killing dropped items
 	setTickTimeout(() => {
 		[
@@ -75,14 +77,19 @@ world.events.entityCreate.subscribe((data) => {
 	data.entity.teleport({ x: 0, y: -64, z: 0 }, data.entity.dimension, 0, 0);
 	data.entity.kill();
 });
-setTickInterval(() => {
-	for (const region of Region.getAllRegions()) {
-		for (const entity of DIMENSIONS[region.dimensionId].getEntities({
-			excludeTypes: region.permissions.allowedEntitys,
-		})) {
-			if (!region.entityInRegion(entity)) continue;
-			entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
-			entity.kill();
-		}
-	}
-}, 100);
+if (false)
+	setTickInterval(
+		() => {
+			for (const region of Region.getAllRegions()) {
+				for (const entity of DIMENSIONS[region.dimensionId].getEntities({
+					excludeTypes: region.permissions.allowedEntitys,
+				})) {
+					if (!region.entityInRegion(entity)) continue;
+					entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
+					entity.kill();
+				}
+			}
+		},
+		100,
+		"regionEntityClear"
+	);

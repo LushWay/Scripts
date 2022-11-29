@@ -13,6 +13,7 @@ new Module("test");
 new Module("Battle Royal");
 new Module("Server");
 new Module("Chat");
+new Module("Modding");
 new Module("OnJoin", { fileName: "join" });
 
 if (false) {

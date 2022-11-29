@@ -57,68 +57,72 @@ world.events.playerJoin.subscribe((data) => {
 	WDB.delete("J:" + data.player.id);
 });
 
-setPlayerInterval(async (player) => {
-	const DB = new XA.cacheDB(player, "basic");
-	const data = DB.data;
+setPlayerInterval(
+	async (player) => {
+		const DB = new XA.cacheDB(player, "basic");
+		const data = DB.data;
 
-	if (!WDB.has("J:" + player.id)) {
-		// New player (player joined)
-		WDB.set("J:" + player.id, 1);
-		data[KEY.at] = player.location.x + " " + player.location.y + " " + player.location.z;
-		delete data[KEY.seenMessage];
-	}
-
-	// Pos where player joined
-	const at = data[KEY.at];
-
-	if (typeof at === "string") {
-		const pos = at.split(" ").map(parseFloat);
-		const not_moved = player.location.equals(new Location(pos[0], pos[1], pos[2]));
-
-		if (not_moved) {
-			// Player still stays at joined position...
-			if (player.hasTag("on_ground")) {
-				// Player doesnt falling down, show animation
-				data[KEY.stage] = data[KEY.stage] ?? -1;
-				data[KEY.stage]++;
-				if (typeof data[KEY.stage] !== "number" || data[KEY.stage] >= CONFIG_JOIN.animation.stages.length)
-					data[KEY.stage] = 0;
-
-				// Creating title
-				let title = CONFIG_JOIN.animation.stages[data[KEY.stage]];
-				for (const key in CONFIG_JOIN.animation.vars) {
-					title = title.replace("$" + key, CONFIG_JOIN.animation.vars[key]);
-				}
-
-				// Show actionBar
-				if (CONFIG_JOIN.actionBar) player.onScreenDisplay.setActionBar(CONFIG_JOIN.actionBar);
-
-				// Title + subtitle
-				/** @type {import("@minecraft/server").TitleDisplayOptions} */
-				const options = {
-					fadeInSeconds: 0,
-					fadeOutSeconds: 1,
-					staySeconds: 2,
-				};
-				if (CONFIG_JOIN.subtitle) options.subtitle = CONFIG_JOIN.subtitle;
-				// Show...
-				player.onScreenDisplay.setTitle(title, options);
-			} else {
-				// Player joined in air
-				JOIN(player, data, "air");
-			}
-		} else if (!data[KEY.seenMessage]) {
-			// Player moved on ground
-			JOIN(player, data, "ground");
+		if (!WDB.has("J:" + player.id)) {
+			// New player (player joined)
+			WDB.set("J:" + player.id, 1);
+			data[KEY.at] = player.location.x + " " + player.location.y + " " + player.location.z;
+			delete data[KEY.seenMessage];
 		}
-	}
-	if (!data[KEY.seenLearning] && data[KEY.seenMessage]) {
-		// Show fisrt join guide
-		__EMITTERS.PlayerGuide.emit(player, 1);
-		data[KEY.seenLearning] = 1;
-	}
-	DB.safe();
-}, 20);
+
+		// Pos where player joined
+		const at = data[KEY.at];
+
+		if (typeof at === "string") {
+			const pos = at.split(" ").map(parseFloat);
+			const not_moved = player.location.equals(new Location(pos[0], pos[1], pos[2]));
+
+			if (not_moved) {
+				// Player still stays at joined position...
+				if (player.hasTag("on_ground")) {
+					// Player doesnt falling down, show animation
+					data[KEY.stage] = data[KEY.stage] ?? -1;
+					data[KEY.stage]++;
+					if (typeof data[KEY.stage] !== "number" || data[KEY.stage] >= CONFIG_JOIN.animation.stages.length)
+						data[KEY.stage] = 0;
+
+					// Creating title
+					let title = CONFIG_JOIN.animation.stages[data[KEY.stage]];
+					for (const key in CONFIG_JOIN.animation.vars) {
+						title = title.replace("$" + key, CONFIG_JOIN.animation.vars[key]);
+					}
+
+					// Show actionBar
+					if (CONFIG_JOIN.actionBar) player.onScreenDisplay.setActionBar(CONFIG_JOIN.actionBar);
+
+					// Title + subtitle
+					/** @type {import("@minecraft/server").TitleDisplayOptions} */
+					const options = {
+						fadeInSeconds: 0,
+						fadeOutSeconds: 1,
+						staySeconds: 2,
+					};
+					if (CONFIG_JOIN.subtitle) options.subtitle = CONFIG_JOIN.subtitle;
+					// Show...
+					player.onScreenDisplay.setTitle(title, options);
+				} else {
+					// Player joined in air
+					JOIN(player, data, "air");
+				}
+			} else if (!data[KEY.seenMessage]) {
+				// Player moved on ground
+				JOIN(player, data, "ground");
+			}
+		}
+		if (!data[KEY.seenLearning] && data[KEY.seenMessage]) {
+			// Show fisrt join guide
+			__EMITTERS.PlayerGuide.emit(player, 1);
+			data[KEY.seenLearning] = 1;
+		}
+		DB.safe();
+	},
+	20,
+	"joinInterval"
+);
 
 new XA.Command({
 	name: "info",

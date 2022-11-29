@@ -1,20 +1,40 @@
-import { world } from "@minecraft/server";
-import { ThrowError, XA } from "xapi.js";
+import { MinecraftEffectTypes, world } from "@minecraft/server";
+import { setPlayerInterval, ThrowError, XA } from "xapi.js";
 
-const key = "server.logic";
 const DB = new XA.instantDB(world, "basic");
+const key = "server.type";
+
+const VALUE = {
+	0: "build",
+	1: "survival",
+};
+const toDefault = () => {
+	DB.set(key, 0);
+	return 0;
+};
 
 /** @type {"build" | "survival"} */
-const logic =
-	DB.get(key) ??
-	(() => {
-		DB.set(key, "build");
-		return "build";
-	})();
+const type = VALUE[DB.get(key) ?? toDefault()] ?? DB.get(key);
 
-if (logic === "build") import("./Build/index.js");
-else if (logic === "survival") import("./Survival/index.js");
-else {
-	DB.set(key, "build");
-	ThrowError(new TypeError("Invalid logic: " + logic));
+if (type !== "build" && type !== "survival") {
+	toDefault();
+	ThrowError(new TypeError("Invalid region type: " + type));
 }
+
+if (type === "build") import("./Build/index.js");
+else if (type === "survival") import("./Survival/index.js");
+
+setPlayerInterval(
+	(player) => {
+		if (player.location.y < -60) player.addEffect(MinecraftEffectTypes.levitation, 2, 5, false);
+		if (player.location.y < -63)
+			player.teleport(
+				{ x: player.location.x, y: -60, z: player.location.z },
+				player.dimension,
+				player.rotation.x,
+				player.rotation.y
+			);
+	},
+	0,
+	"effectS"
+);

@@ -41,7 +41,7 @@ export class Region {
 	static getAllRegions() {
 		if (REGIONS_HAVE_BEEN_GRABBED) return REGIONS;
 		const regions = TABLE.values().map(
-			(region) => new Region(region.from, region.to, region.dimensionId, region.permissions, region.key)
+			(region) => new Region(region.from, region.to, region.dimensionId, region.permissions, region.key, false)
 		);
 		regions.forEach((r) => {
 			REGIONS.push(r);
@@ -68,7 +68,7 @@ export class Region {
 	/**
 	 * Removes a region at a block Location
 	 * @param {string} dimensionId  the id of this dimension
-   * @param {BlockLocation} blockLocation
+	 * @param {BlockLocation} blockLocation
 	 * @returns {boolean} if the region was removed or not
 	 */
 	static removeRegionAtBlockLocation(blockLocation, dimensionId) {
@@ -94,13 +94,14 @@ export class Region {
 	 * @param {IRegionPermissions} [permissions]
 	 * @param {string} [key]
 	 */
-	constructor(from, to, dimensionId, permissions, key) {
+	constructor(from, to, dimensionId, permissions, key, creating = true) {
 		this.from = from;
 		this.to = to;
 		this.dimensionId = dimensionId;
 		this.permissions = permissions ?? DEFAULT_REGION_PERMISSIONS;
-		this.key = key ? key : Date.now().toString();
-		if (!key) {
+		key = key ?? new Date(Date.now()).toISOString();
+		this.key = key;
+		if (creating) {
 			this.update();
 			REGIONS.push(this);
 		}
@@ -110,16 +111,13 @@ export class Region {
 	 * @returns {void}
 	 */
 	update() {
-		TABLE.set(
-			this.key,
-			JSON.stringify({
-				key: this.key,
-				from: this.from,
-				dimensionId: this.dimensionId,
-				permissions: this.permissions,
-				to: this.to,
-			})
-		);
+		TABLE.set(this.key, {
+			key: this.key,
+			from: this.from,
+			dimensionId: this.dimensionId,
+			permissions: this.permissions,
+			to: this.to,
+		});
 	}
 	/**
 	 * removes this region

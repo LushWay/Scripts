@@ -176,18 +176,22 @@ base.literal({ name: "list", description: "Список баз" }).executes((ctx
 	ctx.reply(`§7В привате базы есть такие игроки: §6${ent.nameTag}`);
 });
 
-setTickInterval(() => {
-	for (const base of XA.dimensions.overworld.getEntities({ type: "s:base" })) {
-		const block = base.dimension.getBlock(XA.Entity.locationToBlockLocation(base.location));
-		if (block && block.typeId === "minecraft:barrel") continue;
+setTickInterval(
+	() => {
+		for (const base of XA.dimensions.overworld.getEntities({ type: "s:base" })) {
+			const block = base.dimension.getBlock(XA.Entity.locationToBlockLocation(base.location));
+			if (block && block.typeId === "minecraft:barrel") continue;
 
-		base.nameTag
-			.split(", ")
-			// @ts-ignore
-			.forEach((e, i, a) => XA.Entity.fetch(e).tell("§cБаза с владельцем §f" + a[0] + "§c разрушена."));
-		base.triggerEvent("kill");
-	}
-}, 10);
+			base.nameTag
+				.split(", ")
+				// @ts-ignore
+				.forEach((e, i, a) => XA.Entity.fetch(e).tell("§cБаза с владельцем §f" + a[0] + "§c разрушена."));
+			base.triggerEvent("kill");
+		}
+	},
+	10,
+	"baseInterval"
+);
 
 // world.events.blockBreak.subscribe((data) => {
 // 	const ent = XA.Entity.getClosetsEntitys(data.player, 20, "s:base", 1, false);

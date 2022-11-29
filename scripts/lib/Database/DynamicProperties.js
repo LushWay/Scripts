@@ -1,4 +1,4 @@
-import { Player, World } from "@minecraft/server";
+import { Player, world, World } from "@minecraft/server";
 import { ThrowError } from "xapi.js";
 
 /**
@@ -107,6 +107,7 @@ function GetData(source, key) {
 		res = JSON.parse(a);
 	} catch (e) {
 		err(e, source, key);
+		return res;
 	}
 
 	return res;

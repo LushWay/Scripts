@@ -1,8 +1,16 @@
-import { world } from "@minecraft/server";
-import { setTickInterval, XA } from "xapi.js";
+import { Location, world } from "@minecraft/server";
+import { setTickInterval, sleep, XA } from "xapi.js";
 
 import { BlockInventory } from "./BlockInventory.js";
 import { BLOCK_CONTAINERS, CHECK_SIZE } from "./config.js";
+
+/**
+ *
+ * @param {import("@minecraft/server").IVec3} location
+ */
+export function locationToKey(location) {
+	return `${location.x} ${location.y} ${location.z}`;
+}
 
 /**
  * storage of all container locations in the world
@@ -10,7 +18,7 @@ import { BLOCK_CONTAINERS, CHECK_SIZE } from "./config.js";
  */
 export let CONTAINER_LOCATIONS = {};
 
-setTickInterval(() => {
+setTickInterval(async () => {
 	CONTAINER_LOCATIONS = {};
 	for (const player of world.getPlayers()) {
 		const blockLoc = XA.Entity.locationToBlockLocation(player.location);
@@ -21,9 +29,7 @@ setTickInterval(() => {
 			if (location.y < -64) continue;
 			const block = player.dimension.getBlock(location);
 			if (!BLOCK_CONTAINERS.includes(block.typeId)) continue;
-			CONTAINER_LOCATIONS[JSON.stringify(location)] = new BlockInventory(
-				block.getComponent("inventory").container
-			);
+			CONTAINER_LOCATIONS[locationToKey(location)] = new BlockInventory(block.getComponent("inventory").container);
 		}
 	}
-}, 100);
+}, 40);

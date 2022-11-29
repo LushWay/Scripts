@@ -5,6 +5,13 @@ import { CommandCallback } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
+import { Region } from "../Region/utils/Region.js";
+/**
+ * @typedef {{x: number, z: number}} IRegionCords
+ */
+
+/** @type {[IRegionCords, IRegionCords][]} */
+const regs = [];
 
 /**
  * @type {Object<string, (ctx?: CommandCallback) => void | Promise>}
@@ -30,20 +37,8 @@ const tests = {
 		setRole(ctx.sender, "admin");
 	},
 	3: async () => {
-		try {
-			await tests[4]();
-		} catch (error) {}
-		await sleep(20);
-
-		/**
-		 * @typedef {{x: number, z: number}} IRegionCords
-		 */
-
-		/** @type {IRegionCords[]} */
-		const regs = [];
-
-		const size = 2; // size
-		const size2 = size / 2;
+		const size = 30; // size
+		const size2 = size / 2 - 1;
 
 		/**
 		 * @param {IRegionCords} center
@@ -66,6 +61,18 @@ const tests = {
 		}
 
 		/**
+		 * Compare a array of numbers with 2 arrays
+		 * @param {[number, number, number]} XYZa  The first set of numbers
+		 * @param {[number, number, number]} XYZb  The second set of numbers
+		 * @param {[number, number, number]} XYZc  The set of numbers that should between the first and second set of numbers
+		 * @example betweenXYZ([1, 0, 1], [22, 81, 10], [19, 40, 6]));
+		 * @returns {boolean}
+		 */
+		function betweenXYZ(XYZa, XYZb, XYZc) {
+			return XYZc.every((c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i]));
+		}
+
+		/**
 		 * @returns {Promise<{from: IRegionCords, to: IRegionCords}>}
 		 */
 		async function findFreePlace() {
@@ -81,9 +88,11 @@ const tests = {
 				tries++;
 				if (tries >= 20) await sleep(1), (tries = 0);
 
-				const reg = regs.find((e) => e.x === center.x && e.z === center.z);
+				const alreadyExist = regs.find((e) =>
+					betweenXYZ([e[0].x, 1, e[0].z], [e[1].x, -1, e[1].z], [center.x, 0, center.z])
+				);
 
-				if (reg) {
+				if (alreadyExist) {
 					const nextCenter = moveCenter(center, x[1], z[1]);
 					if (!visited.includes(nextCenter.x + " " + nextCenter.z)) {
 						x = moveEls(x);
@@ -102,20 +111,21 @@ const tests = {
 			return { from, to };
 		}
 
-		let c = 0;
-		while (c < 100) {
-			c++;
-			const reg = await findFreePlace();
-			await sleep(5);
-			if (!reg.from) continue;
-			const center = { x: reg.from.x + size2, z: reg.from.z + size2 };
-			XA.dimensions.overworld
-				.getBlock(new BlockLocation(center.x, -60, center.z))
-				.setType(MinecraftBlockTypes.amethystBlock);
-			regs.push(center);
-		}
+		const reg = await findFreePlace();
+		const set = (pos) =>
+			XA.dimensions.overworld.getBlock(new BlockLocation(pos.x, -60, pos.z)).setType(MinecraftBlockTypes.bedrock);
+
+		set(reg.from);
+		set(reg.to);
+		regs.push([reg.from, reg.to]);
 	},
-	4: async () => XA.dimensions.overworld.runCommandAsync("fill -10 -60 -10 10 -60 10 air"),
+
+	4: async () => {
+		const db = new XA.cacheDB(world, "region");
+		const data = db.data;
+		Object.assign(data, {});
+		db.safe();
+	},
 	5: async (ctx) => {
 		let form = new ModalForm("TITLE");
 
@@ -123,7 +133,7 @@ const tests = {
 
 		await form.show(ctx.sender, (ctx, ...values) => {
 			world.say("ee");
-			// @ts-expect-error
+			// @ts-expect-errorf0993d58-5734-43ee-9008-8546337c6785
 			if (values[0]) ctx.error("ER");
 			world.say(toStr(values));
 		});
@@ -212,6 +222,14 @@ const tests = {
 		if (typeof prop === "string") ctx.reply(prop.length);
 		end();
 	},
+	18: (ctx) => {
+		const region = Region.blockLocationInRegion(
+			XA.Entity.locationToBlockLocation(ctx.sender.location),
+			ctx.sender.dimension.id
+		);
+		region.permissions.owners = region.permissions.owners.filter((e) => e !== ctx.sender.id);
+		region.update();
+	},
 };
 let bigdata = "";
 let done = false;
@@ -233,8 +251,4 @@ c.int("number", true).executes(async (ctx, n) => {
 				name: w?.name ?? "CommandError",
 			})
 		);
-});
-
-setPlayerInterval((_) => {
-	_.getComponents();
 });

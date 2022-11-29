@@ -9,10 +9,13 @@ export const __MODULES__ = {};
 /**
  *
  * @param {(file: string) => Promise} importFunction
- * @param {Object<string, string>} arrayOfFiles
+ * @param {[string, string][]} arrayOfFiles
+ * @example ```js
+ * multiload((file) => import("./" + file + ".js"), [["filePath", "Name"]], "ModuleName")
+ * ```
  */
 export async function multiload(importFunction, arrayOfFiles, type = "sub") {
-	for (const [path, name] of Object.entries(arrayOfFiles)) {
+	for (const [path, name] of arrayOfFiles) {
 		const er = (e) =>
 			ThrowError({
 				message: `§c${name}: §f${`${e.message ?? e}`.replace(
@@ -35,5 +38,5 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 }
 
 export async function load() {
-	return multiload(DIR_IMPORT, __MODULES__, "X-API");
+	return multiload(DIR_IMPORT, Object.entries(__MODULES__), "X-API");
 }

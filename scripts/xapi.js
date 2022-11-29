@@ -226,6 +226,8 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 				break;
 
 			case "object":
+				if (Array.isArray(value)) break;
+
 				if (visited.has(value)) {
 					// Circular structure detected
 					value = "{...}";
@@ -299,9 +301,10 @@ export const sleep = (time) => new Promise((resolve) => setTickTimeout(() => res
 /**
  * @param {Function} callback
  * @param {number} ticks
+ * @param {string} [name]
  */
-export function setTickInterval(callback, ticks = 0) {
-	return Timeout(ticks, callback, true);
+export function setTickInterval(callback, ticks = 0, name) {
+	return Timeout(ticks, callback, true, name);
 }
 
 /**
@@ -309,15 +312,16 @@ export function setTickInterval(callback, ticks = 0) {
  * @param {number} ticks
  */
 export function setTickTimeout(callback, ticks = 1) {
-	return Timeout(ticks, callback);
+	return Timeout(ticks, callback, false, Date.now());
 }
 
 /**
  * @param {(cl: Player) => void} callback
+ *  * @param {string} [name]
  * @param {number} ticks
  */
-export function setPlayerInterval(callback, ticks = 0) {
-	return Timeout(ticks, () => forPlayers(callback), true);
+export function setPlayerInterval(callback, ticks = 0, name) {
+	return Timeout(ticks, () => forPlayers(callback), true, name);
 }
 
 /**
@@ -325,7 +329,7 @@ export function setPlayerInterval(callback, ticks = 0) {
  * @param {number} ticks
  */
 export function setPlayerTimeout(callback, ticks = 1) {
-	return Timeout(ticks, () => forPlayers(callback));
+	return Timeout(ticks, () => forPlayers(callback), false, Date.now());
 }
 
 /**

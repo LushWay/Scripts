@@ -49,51 +49,55 @@ BATTLE_ROYAL_EVENTS.death.subscribe((pl) => {
 	Atp(pl, "br", { lock: true, pvp: true, quene: true });
 });
 
-setTickInterval(() => {
-	if (!br.game.started && [...world.getPlayers()].filter((e) => XA.Entity.getTagStartsWith(e, "br:")).length > 0) {
-		br.end("specially", "Перезагрузка");
-	}
-	if (ks(quene).length >= minpl && ks(quene).length < 10) {
-		if (!br.quene.open) {
-			br.quene.open = true;
-			br.quene.time = fulltime;
-			forEveryQuenedPlayer(
-				"random.levelup",
-				`§7${ks(quene).length}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
-			);
+setTickInterval(
+	() => {
+		if (!br.game.started && [...world.getPlayers()].filter((e) => XA.Entity.getTagStartsWith(e, "br:")).length > 0) {
+			br.end("specially", "Перезагрузка");
 		}
-		if (ks(quene).length >= 10) {
-			br.quene.open = true;
-			br.quene.time = 16;
-			forEveryQuenedPlayer("random.levelup", `§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`);
-		}
-		if (br.quene.open && br.quene.time > 0) {
-			br.quene.time--;
-		}
-		if (br.quene.time >= 1 && br.quene.time <= shorttime) {
-			let sec = "секунд",
-				hrs = `${br.quene.time}`;
-			if (hrs.endsWith("1") && hrs != "11") {
-				sec = "секунду";
-			} else if (hrs == "2" || hrs == "3" || hrs == "4") {
-				sec = `секунды`;
+		if (ks(quene).length >= minpl && ks(quene).length < 10) {
+			if (!br.quene.open) {
+				br.quene.open = true;
+				br.quene.time = fulltime;
+				forEveryQuenedPlayer(
+					"random.levelup",
+					`§7${ks(quene).length}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
+				);
 			}
-			forEveryQuenedPlayer("random.click", `§9Игра начнется через §7${br.quene.time} ${sec}`);
+			if (ks(quene).length >= 10) {
+				br.quene.open = true;
+				br.quene.time = 16;
+				forEveryQuenedPlayer("random.levelup", `§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`);
+			}
+			if (br.quene.open && br.quene.time > 0) {
+				br.quene.time--;
+			}
+			if (br.quene.time >= 1 && br.quene.time <= shorttime) {
+				let sec = "секунд",
+					hrs = `${br.quene.time}`;
+				if (hrs.endsWith("1") && hrs != "11") {
+					sec = "секунду";
+				} else if (hrs == "2" || hrs == "3" || hrs == "4") {
+					sec = `секунды`;
+				}
+				forEveryQuenedPlayer("random.click", `§9Игра начнется через §7${br.quene.time} ${sec}`);
+			}
+			if (br.quene.open && br.quene.time == 0) {
+				br.start(ks(quene));
+				Object.assign({}, quene);
+			}
 		}
-		if (br.quene.open && br.quene.time == 0) {
-			br.start(ks(quene));
-			Object.assign({}, quene);
+		ks(quene).forEach((e) => {
+			if (!XA.Entity.fetch(e)) delete quene[e];
+		});
+		if (br.quene.open && ks(quene).length < minpl) {
+			br.quene.open = false;
+			br.quene.time = 0;
+			forEveryQuenedPlayer("note.bass", `§7${ks(quene).length}/${minpl} §9Игроков в очереди. §cИгра отменена...`);
 		}
-	}
-	ks(quene).forEach((e) => {
-		if (!XA.Entity.fetch(e)) delete quene[e];
-	});
-	if (br.quene.open && ks(quene).length < minpl) {
-		br.quene.open = false;
-		br.quene.time = 0;
-		forEveryQuenedPlayer("note.bass", `§7${ks(quene).length}/${minpl} §9Игроков в очереди. §cИгра отменена...`);
-	}
-}, 20);
+	},
+	20,
+	"battleRoyal"
+);
 
 const bbr = new XA.Command({
 	name: "br",
