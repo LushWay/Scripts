@@ -33,3 +33,5 @@ interface IRegionPermissions {
 	 */
 	owners: Array<string>;
 }
+
+type EX<T, EXT> = T extends EXT ? T : EXT

@@ -1,10 +1,10 @@
 import { wo, WORLDOPTIONS } from "../../../lib/Class/XOptions.js";
 
-import { XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 const opt = new XA.Command({
 	name: "world",
 	description: "Настройки мира",
-	requires: (p) => p.hasTag("owner"),
+	requires: (p) => IS(p.id, "admin"),
 }).executes((ctx) => {
 	ctx.reply("§7► §fAvaible options §7◄");
 	for (let opt of WORLDOPTIONS) {

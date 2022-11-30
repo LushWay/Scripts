@@ -18,7 +18,6 @@ import { DIMENSIONS } from "./lib/List/dimensions.js";
 
 // X-API methods
 import { XEntity } from "./lib/Class/Entity.js";
-import { XrunCommand } from "./lib/Class/XrunCommand.js";
 import { XCommand } from "./lib/Command/Command.js";
 import { XCacheDatabase, XInstantDatabase } from "./lib/Database/DynamicProperties.js";
 import { XItemDatabase } from "./lib/Database/Item.js";
@@ -26,6 +25,7 @@ import { emoji } from "./lib/Lang/emoji.js";
 import { parse } from "./lib/Lang/parser.js";
 import { text } from "./lib/Lang/text.js";
 import { Timeout } from "./lib/Timeout.js";
+import { XrunCommand } from "./lib/XrunCommand.js";
 
 // Modules and undeletable scoreboards
 import { load } from "./lib/Module/loader.js";
@@ -42,7 +42,7 @@ export class XA {
 
 	static tables = {
 		chests: new XInstantDatabase(world, "chests"),
-		pos: new XInstantDatabase(world, "pos"),
+		player: new XInstantDatabase(world, "player"),
 		kits: new XInstantDatabase(world, "kits"),
 		drops: new XInstantDatabase(world, "drop"),
 		i: new XItemDatabase("items"),
@@ -73,6 +73,14 @@ export const ROLES = {
 	admin: 1,
 	moderator: 2,
 	builder: 3,
+};
+
+/** @type {Record<keyof typeof ROLES, string>}} */
+export const T_roles = {
+	admin: "§cАдмин",
+	builder: "§3Строитель",
+	member: "§fУчастник",
+	moderator: "§5Модератор",
 };
 
 /**
@@ -120,22 +128,39 @@ export function IS(playerID, role) {
 
 /**
  * Parse and show error in chat
- * @param {{ message: string; stack?: string; name?: string}} e
+ * @param {{ message: string; stack?: string; name?: string} | string} e
  * @param {number} [deleteStack]
  * @param {string[]} [additionalStack]
  */
 export function ThrowError(e, deleteStack = 0, additionalStack = []) {
-	const stack = stackParse(deleteStack + 1, additionalStack, e?.stack);
-	const message = e?.message ?? e;
-	const type = e?.name ?? "Error";
+	const isStr = typeof e === "string";
+	const stack = stackParse(deleteStack + 1, additionalStack, isStr ? void 0 : e.stack);
+	const message = (isStr ? e ?? "Unknown" : e.message).replace(/\n/g, "");
+
+	const type = isStr ? "CommandError" : e?.name ?? "Error";
 
 	const c = loading ? "§9├§r " : "";
 	const l = loading ? "§9│§r" : "";
-	const s = `${stack}\n`.replace(/\n/g, `\n${l}`);
+	const s = `\n§f${stack}\n`.replace(/\n/g, `\n${l}`);
 
-	const text = `§4${type}: §c${message} §f${s}`;
+	const text = `§4${type}: §c${message}${s}`;
 
 	CONFIG.console.errPath === "chat" ? world.say(c + text) : console.warn(text.cc());
+}
+
+/**
+ *
+ * @param {number} C
+ */
+export function createWaiter(C) {
+	let count = 0;
+	return async () => {
+		count++;
+		if (count % C === 0) {
+			await sleep(1);
+			return count;
+		}
+	};
 }
 
 /**
@@ -283,7 +308,7 @@ export async function handler(func, type = "Handled", additionalStack) {
 			{
 				message: `${e.name ? `${e.name}: §f` : ""}${e.message ?? e}`,
 				name: type,
-				stack: e.stack,
+				stack: e?.stack,
 			},
 			1,
 			additionalStack

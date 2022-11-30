@@ -13,7 +13,7 @@ import {
 
 import { po, wo } from "../../lib/Class/XOptions.js";
 
-import { setTickInterval, XA } from "xapi.js";
+import { IS, setTickInterval, XA } from "xapi.js";
 
 /**======================
  **       PLUGINS
@@ -346,7 +346,7 @@ setTickInterval(
 const casda = new XA.Command({
 	name: "name",
 	description: "",
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 })
 	.string("Name")
 	.executes((ctx) => {

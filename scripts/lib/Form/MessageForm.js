@@ -1,5 +1,6 @@
 import { Player } from "@minecraft/server";
 import { MessageFormData } from "@minecraft/server-ui";
+import { handler } from "../../xapi.js";
 import { XFormCanceled } from "./utils.js";
 /** */
 export class MessageForm {
@@ -86,7 +87,7 @@ export class MessageForm {
 	async show(player) {
 		const response = await this.form.show(player);
 		if (XFormCanceled(response, player, this)) return;
-		if (response.selection == 1) this.button1?.callback?.();
-		if (response.selection == 0) this.button2?.callback?.();
+		if (response.selection === 1) handler(this.button1?.callback, null, ["MessageFormCallback"]);
+		if (response.selection === 0) handler(this.button2?.callback, null, ["MessageFormCallback"]);
 	}
 }

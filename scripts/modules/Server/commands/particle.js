@@ -1,10 +1,10 @@
 import { P } from "../../../lib/List/particles.js";
 
-import { XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 new XA.Command({
 	name: "particle",
 	aliases: ["p"],
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 	/*type: "test"*/
 })
 	.string("particle", true)
@@ -30,7 +30,7 @@ new XA.Command({
 		let particle = P[number];
 		lore[0] = "Particle";
 		lore[1] = particle ?? P[0];
-		lore[2] = string(number);
+		lore[2] = String(number);
 		console.warn(JSON.stringify(lore));
 		item.setLore(lore);
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);

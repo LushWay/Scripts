@@ -49,12 +49,21 @@ function JOIN(player, data, messageType) {
 	__EMITTERS.PlayerJoin.emit(player, 1);
 	data[KEY.seenMessage] = 1;
 	player.onScreenDisplay.clearTitle();
+
+	const oldTag = WDB.get("NAME:" + player.id);
+
+	if (oldTag === player.name) return;
+	if (oldTag && oldTag !== player.name) {
+		world.say("§c> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name);
+	}
+
+	WDB.set("NAME:" + player.id, player.name);
 }
 
-const WDB = new XA.instantDB(world, "pos");
+const WDB = XA.tables.player;
 
 world.events.playerJoin.subscribe((data) => {
-	WDB.delete("J:" + data.player.id);
+	WDB.delete("JOIN:" + data.player.id);
 });
 
 setPlayerInterval(
@@ -62,9 +71,9 @@ setPlayerInterval(
 		const DB = new XA.cacheDB(player, "basic");
 		const data = DB.data;
 
-		if (!WDB.has("J:" + player.id)) {
+		if (!WDB.has("JOIN:" + player.id)) {
 			// New player (player joined)
-			WDB.set("J:" + player.id, 1);
+			WDB.set("JOIN:" + player.id, 1);
 			data[KEY.at] = player.location.x + " " + player.location.y + " " + player.location.z;
 			delete data[KEY.seenMessage];
 		}
@@ -138,5 +147,5 @@ new XA.Command({
 	description: "Имитирует вход",
 	/*type: "public"*/
 }).executes((ctx) => {
-	WDB.delete("J:" + ctx.sender.id);
+	WDB.delete("JOIN:" + ctx.sender.id);
 });

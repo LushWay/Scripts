@@ -1,5 +1,5 @@
 import { BlockLocation, Entity } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 import { SelectionBuild } from "../../modules/builders/SelectionBuilder.js";
 
 /**
@@ -34,7 +34,7 @@ new XA.Command({
 	/*type: "wb"*/
 	name: "chunk",
 	description: "Set the selection to your current chunk.",
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 }).executes((ctx) => {
 	const chunkBorder = getChunkCuboidPositions(ctx.sender);
 	SelectionBuild.setPos1(chunkBorder.pos1.x, chunkBorder.pos1.y, chunkBorder.pos1.z);

@@ -1,17 +1,9 @@
 import { Player, world } from "@minecraft/server";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { getRole, IS, ROLES, setRole, XA } from "../../xapi.js";
+import { getRole, IS, ROLES, setRole, T_roles as TR, XA } from "../../xapi.js";
 
 const DB = new XA.instantDB(world, "roles");
-
-/** @type {Record<keyof typeof ROLES, string>}} */
-const roles = {
-	admin: "§cАдмин",
-	builder: "§3Строитель",
-	member: "§fУчастник",
-	moderator: "§5Модератор",
-};
 
 const R = new XA.Command({
 	name: "role",
@@ -23,11 +15,11 @@ R.executes((ctx) => {
 
 	if (ctx.args[0] === "ACCESS" || (DB.has(`SETTER:` + ctx.sender.id) && !isAdmin)) {
 		setRole(ctx.sender.id, "admin");
-		return ctx.reply("§b> §r" + roles.admin);
+		return ctx.reply("§b> §r" + TR.admin);
 	}
 
 	const role = getRole(ctx.sender.id);
-	if (!isAdmin) return ctx.reply(`§b> §r${roles[role]}`);
+	if (!isAdmin) return ctx.reply(`§b> §r${TR[role]}`);
 
 	/**
 	 *
@@ -37,7 +29,7 @@ R.executes((ctx) => {
 	const callback = (player, fakeChange = false) => {
 		return () => {
 			const role = getRole(player.id);
-			const ROLE = Object.keys(ROLES).map((e) => `${role === e ? "> " : ""}` + roles[e]);
+			const ROLE = Object.keys(ROLES).map((e) => `${role === e ? "> " : ""}` + TR[e]);
 			new ModalForm(player.name)
 				.addToggle("Уведомлять", false)
 				.addToggle("Показать Ваш ник в уведомлении", false)
@@ -49,10 +41,10 @@ R.executes((ctx) => {
 				.addTextField("Причина смены роли", `Например, "космокс"`)
 				.show(player, (_, notify, showName, selected, message) => {
 					if (selected.startsWith(">")) return;
-					const newrole = Object.entries(roles).find((e) => e[1] === selected)[0];
+					const newrole = Object.entries(TR).find((e) => e[1] === selected)[0];
 					if (notify)
 						player.tell(
-							`§b> §3Ваша роль сменена c ${roles[role]} §3на ${selected}${
+							`§b> §3Ваша роль сменена c ${TR[role]} §3на ${selected}${
 								showName ? `§3 игроком §r${ctx.sender.name}` : ""
 							}${message ? `\n§r§3Причина: §r${message}` : ""}`
 						);
@@ -62,7 +54,7 @@ R.executes((ctx) => {
 				});
 		};
 	};
-	const form = new ActionForm("Roles", "§3Ваша роль: " + roles[role]).addButton(
+	const form = new ActionForm("Roles", "§3Ваша роль: " + TR[role]).addButton(
 		"Сменить мою роль",
 		null,
 		callback(ctx.sender, true)

@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { setTickInterval, setTickTimeout, XA } from "xapi.js";
+import { IS, setTickInterval, setTickTimeout, XA } from "xapi.js";
 import { WorldOption } from "../../lib/Class/XOptions.js";
 import { Atp } from "../Server/portals.js";
 import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
@@ -130,7 +130,7 @@ bbr
 	.literal({
 		name: "start",
 		description: "",
-		requires: (p) => p.hasTag("owner"),
+		requires: (p) => IS(p.id, "admin"),
 	})
 	.executes(() => {
 		br.start(ks(quene));
@@ -141,7 +141,7 @@ bbr
 	.literal({
 		name: "stop",
 		description: "",
-		requires: (p) => p.hasTag("owner"),
+		requires: (p) => IS(p.id, "admin"),
 	})
 	.executes(() => {
 		br.end("specially", "Так надо");

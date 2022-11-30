@@ -1,11 +1,11 @@
 import { Items, ItemStack } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 
 const shovelCMD = new XA.Command({
 	name: "shovel",
 	description: "Выдает лопату",
 	aliases: ["sh"],
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 	/*type: "wb"*/
 })
 

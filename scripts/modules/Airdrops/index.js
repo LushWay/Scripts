@@ -195,7 +195,7 @@ setTickInterval(
 const kit = new XA.Command({
   name: "drop",
   description: "Управление таблицами дропа",
-  requires: (p) => p.hasTag("commands"),
+  requires: (p) => IS(p.id, "moderator"),
 }).executes((ctx) => {
   new airdrope(
     Math.floor(ctx.sender.location.x),
@@ -249,7 +249,7 @@ kit
   .literal({
     name: "add",
     description: "Добавляет",
-    requires: (p) => p.hasTag("commands"),
+    requires: (p) => IS(p.id, "moderator"),
   })
   .int("number")
   .executes((ctx,  number ) => {
@@ -290,7 +290,7 @@ kit
   .literal({
     name: "del",
     description: "ДЦт",
-    requires: (p) => p.hasTag("commands"),
+    requires: (p) => IS(p.id, "moderator"),
   })
   .string("number")
   .executes((ctx,  number ) => {

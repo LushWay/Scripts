@@ -1,11 +1,11 @@
 import { S } from "../../../lib/List/sounds.js";
 import { SG } from "../../../lib/List/sounds2.js";
 
-import { XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 new XA.Command({
 	name: "sound",
 	aliases: ["so"],
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 	/*type: "test"*/
 })
 	.string("sound", true)
@@ -35,7 +35,7 @@ new XA.Command({
 		let particle = S[number];
 		lore[0] = "Sound";
 		lore[1] = particle ?? S[0];
-		lore[2] = string(number);
+		lore[2] = String(number);
 		item.nameTag = "§r§9Sound";
 		console.warn(JSON.stringify(lore));
 		item.setLore(lore);

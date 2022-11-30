@@ -10,12 +10,12 @@ const AT = {};
  * @param {boolean} [loop]
  * @param {string | number} [id]
  */
-export function Timeout(ticks, callback, loop, id) {
+export function Timeout(ticks, callback, loop, id, n = true) {
 	if (!id) {
-		ThrowError(new ReferenceError("NO_TIME_ID"));
+		ThrowError(new ReferenceError("NO_TIMEOUT_ID"));
 		id = Date.now();
 	}
-	if (!AT[id]) AT[id] = 0;
+	if (!(id in AT) || n) AT[id] = 0;
 
 	AT[id]++;
 
@@ -28,7 +28,7 @@ export function Timeout(ticks, callback, loop, id) {
 		if (!loop) return;
 	}
 
-	if (AT[id] >= 0) system.run(() => Timeout(ticks, callback, loop, id));
+	if (AT[id] >= 0) system.run(() => Timeout(ticks, callback, loop, id, false));
 
 	const stop = () => {
 		AT[id] = -10;

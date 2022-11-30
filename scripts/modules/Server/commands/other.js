@@ -1,5 +1,5 @@
 import { BlockLocation, Items, ItemStack, Location } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 import { global } from "../var.js";
 
 const daily_reward_hours = 24;
@@ -100,7 +100,7 @@ kit
 	.literal({
 		name: "add",
 		description: "Добавляет",
-		requires: (p) => p.hasTag("commands"),
+		requires: (p) => IS(p.id, "moderator"),
 	})
 	.string("tag")
 	.string("name")
@@ -129,7 +129,7 @@ kit
 	.literal({
 		name: "set",
 		description: "Добавляет",
-		requires: (p) => p.hasTag("commands"),
+		requires: (p) => IS(p.id, "moderator"),
 	})
 	.string("name")
 	.executes((ctx, name) => {
@@ -160,7 +160,7 @@ kit
 	.literal({
 		name: "del",
 		description: "ДЦт",
-		requires: (p) => p.hasTag("commands"),
+		requires: (p) => IS(p.id, "moderator"),
 	})
 	.string("name")
 	.executes((ctx, name) => {
@@ -207,7 +207,7 @@ new XA.Command({
 	description: "Удаляет информацию о позиции  на анархии",
 	/*type: "public"*/
 }).executes((ctx) => {
-	ctx.reply(XA.tables.pos.delete(ctx.sender.name) + "");
+	ctx.reply(XA.tables.player.delete("POS:" + ctx.sender.id) + "");
 });
 new XA.Command({
 	name: "radius",
@@ -227,7 +227,7 @@ new XA.Command({ name: "sit", description: "" /*type: "public"*/ }).executes((ct
 const cos = new XA.Command({
 	name: "i",
 	description: "Создает динамический список предметов",
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 	/*type: "test"*/
 });
 cos
@@ -261,33 +261,11 @@ cos.literal({ name: "list" }).executes((ctx) => {
 		ctx.reply("§cПусто.");
 	}
 });
-new XA.Command({
-	name: "cmd",
-	description: "",
-	requires: (p) => p.hasTag("commands"),
-	/*type: "test"*/
-}).executes((ctx) => {
-	const a = ctx.args;
-	ctx.reply(a.join(" "));
-	const ab = ctx.sender.runCommandAsync(a.join(" "));
-	ctx.reply(ab.statusMessage);
-});
-new XA.Command({
-	name: "join",
-	description: "Имитирует вход",
-	requires: (p) => p.hasTag("commands"),
-	/*type: "test"*/
-}).executes((ctx) => {
-	ctx.sender.removeTag("WSeenJoinMessage");
-	ctx.reply("joinedAt:" + ctx.sender.location.x + " " + ctx.sender.location.y + " " + ctx.sender.location.z);
-	XA.Entity.removeTagsStartsWith(ctx.sender, "joinedAt:");
-	ctx.sender.addTag("joinedAt:" + ctx.sender.location.x + " " + ctx.sender.location.y + " " + ctx.sender.location.z);
-});
 
 new XA.Command({
 	name: "ws",
 	description: "Выдает/убирает меню из инвентаря",
-	requires: (p) => p.hasTag("owner"),
+	requires: (p) => IS(p.id, "admin"),
 	/*type: "serv"*/
 }).executes(async (ctx) => {
 	if (await XA.Entity.hasItem(ctx.sender, 0, "sa:a")) {
@@ -301,7 +279,7 @@ new XA.Command({
 new XA.Command({
 	name: "s",
 	description: "Выжа",
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 	/*type: "serv"*/
 }).executes((ctx) => {
 	ctx.sender.runCommandAsync("gamemode s");
@@ -310,7 +288,7 @@ new XA.Command({
 new XA.Command({
 	name: "c",
 	description: "Креатив",
-	requires: (p) => p.hasTag("commands"),
+	requires: (p) => IS(p.id, "moderator"),
 	/*type: "serv"*/
 }).executes((ctx) => {
 	ctx.sender.runCommandAsync("gamemode c");

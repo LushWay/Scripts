@@ -230,6 +230,19 @@ const tests = {
 		region.permissions.owners = region.permissions.owners.filter((e) => e !== ctx.sender.id);
 		region.update();
 	},
+	19: (ctx) => {
+		console.warn("WARN");
+	},
+	20: async () => {
+		ThrowError(new ReferenceError("Test reference error"));
+		try {
+			await XA.dimensions.overworld.runCommandAsync("EEEEEE");
+		} catch (e) {
+			ThrowError(e);
+		}
+		XA.runCommandX("TEST", { showError: true });
+    ThrowError(new TypeError("ADDITION_STACK_TEST"), 0, ['stack1', 'stack2'])
+	},
 };
 let bigdata = "";
 let done = false;

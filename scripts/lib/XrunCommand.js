@@ -1,6 +1,6 @@
 import { CommandResult, world } from "@minecraft/server";
 import { ThrowError, toStr } from "xapi.js";
-import { DIMENSIONS } from "../List/dimensions.js";
+import { DIMENSIONS } from "./List/dimensions.js";
 
 /**
  * @typedef {{showOutput?: boolean; showError?: boolean; dimension?: "overworld" | "nether" | "the_end"}} ICommandOptions

@@ -18,9 +18,16 @@ export const lang = {
 		const current_region = Region.blockLocationInRegion(pos, player.dimension.id);
 
 		if (current_region) {
+			if (current_region.permissions.owners[0] !== region.permissions.owners[0]) {
+				const name = XA.tables.player.get("NAME:" + current_region.permissions.owners[0]);
+				add("§3Сейчас вы на квадрате игрока §f" + name);
+			} else {
+				add("§3Вы находитесь на своем квадрате");
+			}
+			add("");
 		}
 
-		add(`§fКоординаты вашей площадки: §c${region.from.x} §b${region.from.z}§f\n`);
+		add(`§3Координаты вашего квадрата: §c${region.from.x} §b${region.from.z}\n `);
 
 		return output;
 	},

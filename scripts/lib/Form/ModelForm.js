@@ -1,5 +1,6 @@
 import { Player, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
+import { handler } from "../../xapi.js";
 import { FormCallback, XFormCanceled } from "./utils.js";
 
 /**
@@ -108,9 +109,14 @@ export class ModalForm {
 	async show(player, callback) {
 		const response = await this.form.show(player);
 		if (XFormCanceled(response, player, this, callback)) return;
-		callback(
-			new FormCallback(this, player, callback),
-			...response.formValues.map((v, i) => (this.args[i].type == "dropdown" ? this.args[i].options[v] : v))
+		handler(
+			() =>
+				callback(
+					new FormCallback(this, player, callback),
+					...response.formValues.map((v, i) => (this.args[i].type == "dropdown" ? this.args[i].options[v] : v))
+				),
+			null,
+			["ModalFormCallback"]
 		);
 	}
 }

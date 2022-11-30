@@ -1,6 +1,6 @@
 import { BlockLocation, MinecraftBlockTypes, world } from "@minecraft/server";
 import * as GameTest from "mojang-gametest";
-import { sleep, XA } from "xapi.js";
+import { IS, sleep, XA } from "xapi.js";
 import { wo } from "../../lib/Class/XOptions.js";
 
 let name = wo.G("simulatedplayer:name") ?? "Simulated",
@@ -29,7 +29,7 @@ GameTest.registerAsync("sim", "spawn", async (test) => {
 const cmd = new XA.Command({
 	name: "player",
 	description: "Спавнит фэйкового игрока",
-	requires: (p) => p.hasTag("owner"),
+	requires: (p) => IS(p.id, "admin"),
 	/*type: "test"*/
 }).executes(async (ctx) => {
 	const o = world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13));

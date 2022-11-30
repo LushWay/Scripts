@@ -5,12 +5,11 @@ export const CONFIG_DB = {
 		basic: 0,
 	},
 	world: {
-		pos: 0,
+		player: 0,
 		chests: 0,
 		options: 0,
 		region: 0,
 		kits: 0,
-		chest: 0,
 		drop: 0,
 		roles: 0,
 		leaderboard: 0,
@@ -29,7 +28,6 @@ export const CONFIG_DB = {
  */
 function add(s, p, v) {
 	const size = v > 0 ? v : 4294967295;
-	world.say(`§9| §f${p} => ${size}`);
 	s.defineString(p, size);
 }
 

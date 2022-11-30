@@ -10,7 +10,7 @@ import {
 	Vector,
 	world,
 } from "@minecraft/server";
-import { setTickInterval, setTickTimeout, sleep, ThrowError, XA } from "xapi.js";
+import { IS, setTickInterval, setTickTimeout, sleep, ThrowError, XA } from "xapi.js";
 import { po, wo, WorldOption } from "../../lib/Class/XOptions.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
@@ -236,7 +236,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	let rtp = false,
 		air = false;
 	if (place === "anarch") {
-		const getPos = new XA.instantDB(world, "pos").get(player.id);
+		const getPos = XA.tables.player.get("POS:" + player.id);
 		getPos ? (pos = getPos) : (rtp = true);
 		if (currentInventory == invs.anarch && !rtp) return;
 	} else if (place === "currentpos") {
@@ -276,7 +276,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 
 	if (currentInventory == invs.anarch) {
 		const l = XA.Entity.locationToBlockLocation(player.location);
-		XA.tables.pos.set(player.name, l.x + " " + l.y + " " + l.z);
+		XA.tables.player.set("POS:" + player.id, l.x + " " + l.y + " " + l.z);
 	}
 	const inve = XA.Entity.getI(player);
 	let obj = { on: false };
@@ -516,7 +516,7 @@ new XA.Command({
 	name: "portal",
 	aliases: ["port"],
 	description: "Ставит портал",
-	requires: (p) => p.hasTag("owner"),
+	requires: (p) => IS(p.id, "admin"),
 })
 	.string("lore")
 	.executes((ctx) => {

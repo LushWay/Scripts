@@ -3,18 +3,19 @@ import { ThrowError, XA } from "xapi.js";
 
 /**
  * This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc...
- * @param {number} number The number you want to convert
+ * @param {number} value The number you want to convert
  * @returns {string}
  * @example metricNumbers(15000);
  */
 function metricNumbers(value) {
-  const types = ["", "к", "млн", "млрд", "трлн"];
-  const selectType = (Math.log10(value) / 3) | 0;
-  if (selectType == 0) return value;
-  const scaled = value / Math.pow(10, selectType * 3);
-  return `${scaled.toFixed(1)}${types[selectType] ? ` ${types[selectType]}`: "e" + selectType}`;
-}
+	const types = ["", "к", "млн", "млрд", "трлн"];
+	const exp = (Math.log10(value) / 3) | 0;
 
+	if (exp === 0) return value.toString();
+
+	const scaled = value / Math.pow(10, exp * 3);
+	return `${scaled.toFixed(1)}${exp > 5 ? " " + types[exp] : "e" + exp}`;
+}
 
 const lb = new XA.instantDB(world, "leaderboard");
 
@@ -163,7 +164,7 @@ export class LeaderboardBuilder {
 			for (var i = 0; i < sortedPlayers.length; i++) {
 				completedLeaderboard += `§${style.top}#${i + 1}§r §${style.nick}${sortedPlayers[i].name}§r §${
 					style.score
-				}${numFormatter(parseInt(sortedPlayers[i].score))}§r\n`;
+				}${metricNumbers(parseInt(sortedPlayers[i].score))}§r\n`;
 			}
 
 			entity.nameTag = `§l§${style.name}${

@@ -35,8 +35,8 @@ export function stackParse(deleteStack = 0, additionalStack = [], stack = getSta
 	const mappedStack = stackArray
 		.map((e) => e?.replace(/\s+at\s/g, "")?.replace(/\n/g, ""))
 		.map(oneLineStackParse)
-		.filter((e) => e && e?.replace(/\s/g, "").length)
-		.map((e) => `\n   ${e}`);
+		.filter((e) => e && /^\s*\S/g.test(e))
+		.map((e) => `   ${e}\n`);
 
 	return [...new Set(mappedStack).values()].join("");
 }

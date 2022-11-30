@@ -1,5 +1,6 @@
 import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
+import { handler } from "../../xapi.js";
 import { XFormCanceled } from "./utils.js";
 /** */
 export class ActionForm {
@@ -57,6 +58,6 @@ export class ActionForm {
 	async show(player) {
 		const response = await this.form.show(player);
 		if (XFormCanceled(response, player, this)) return;
-		this.buttons[response.selection].callback?.();
+		handler(this.buttons[response.selection].callback, null, ["ActionFormCallback"]);
 	}
 }
