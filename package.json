@@ -10,8 +10,9 @@
   },
   "description": "",
   "dependencies": {
-    "@minecraft/server": "^1.0.0-beta.release.1.19.40",
-    "@minecraft/server-ui": "^1.0.0-beta.11940b24",
-    "jsonminify": "^0.4.2"
+    "@minecraft/server-ui": "^1.0.0-beta.11940b24"
+  },
+  "devDependencies": {
+    "@minecraft/server": "^1.0.0"
   }
 }

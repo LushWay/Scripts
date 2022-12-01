@@ -1,7 +1,7 @@
 import { Player, world } from "@minecraft/server";
 
 world.say("§9┌ §fLoading...");
-// Var because it needs to be avaible before initialization
+// Var because it maybe need to be avaible before initialization
 var loading = true;
 
 // Custom prototypes
