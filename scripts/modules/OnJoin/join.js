@@ -83,7 +83,7 @@ setPlayerInterval(
 
 		if (typeof at === "string") {
 			const pos = at.split(" ").map(parseFloat);
-			const not_moved = player.location.equals(new Location(pos[0], pos[1], pos[2]));
+			const not_moved = player.location.x === pos[0] && player.location.y === pos[1] && player.location.z === pos[2];
 
 			if (not_moved) {
 				// Player still stays at joined position...

@@ -15,3 +15,4 @@ interface IConfiguration {
 	};
 	commandPrefix: string;
 }
+type Vector3 = import("@minecraft/server").Vector3;

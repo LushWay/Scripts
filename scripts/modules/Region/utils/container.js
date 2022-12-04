@@ -1,12 +1,12 @@
-import { Location, world } from "@minecraft/server";
-import { setTickInterval, sleep, XA } from "xapi.js";
+import { world } from "@minecraft/server";
+import { setTickInterval, XA } from "xapi.js";
 
 import { BlockInventory } from "./BlockInventory.js";
 import { BLOCK_CONTAINERS, CHECK_SIZE } from "./config.js";
 
 /**
  *
- * @param {import("@minecraft/server").IVec3} location
+ * @param {Vector3} location
  */
 export function locationToKey(location) {
 	return `${location.x} ${location.y} ${location.z}`;

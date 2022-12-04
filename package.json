@@ -13,6 +13,6 @@
     "@minecraft/server-ui": "^1.0.0-beta.11940b24"
   },
   "devDependencies": {
-    "@minecraft/server": "^1.0.0"
+    "@minecraft/server": "^1.1.0-beta.release.1.19.50"
   }
 }

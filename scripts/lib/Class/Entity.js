@@ -7,14 +7,15 @@ import {
 	PlayerInventoryComponentContainer,
 	world,
 } from "@minecraft/server";
+import { DIMENSIONS } from "../List/dimensions.js";
 
 // Authots: Smell of curry, mrpatches
 
 export const XEntity = {
 	/**
 	 * Checks if position is in radius
-	 * @param {import("@minecraft/server").IVec3} center Center of radius
-	 * @param {import("@minecraft/server").IVec3} pos Position to check
+	 * @param {Vector3} center Center of radius
+	 * @param {Vector3} pos Position to check
 	 * @param {number} r Radius
 	 * @returns {boolean}
 	 */
@@ -31,7 +32,7 @@ export const XEntity = {
 	getEntitys(type) {
 		const e = {};
 		if (type) e.type = type;
-		return world.getDimension("overworld").getEntities(e);
+		return DIMENSIONS.overworld.getEntities(e);
 	},
 	/**
 	 * Get entitie(s) at a position
@@ -42,14 +43,14 @@ export const XEntity = {
 	 */
 	getAtPos({ x, y, z }, dimension = "overworld") {
 		try {
-			return world.getDimension(dimension).getEntitiesAtBlockLocation(new BlockLocation(x, y, z));
+			return DIMENSIONS[dimension].getEntitiesAtBlockLocation(new BlockLocation(x, y, z));
 		} catch (error) {
 			return [];
 		}
 	},
 	/**
 	 * Returns a location of the inputed aguments
-	 * @param {{location: Location}} entity your using
+	 * @param {{location: Location | Vector3}} entity your using
 	 * @param {number} [n] how many you want to get
 	 * @param {number} [maxDistance] max distance away
 	 * @param {string} [type] type of entity you want to get
@@ -58,12 +59,12 @@ export const XEntity = {
 	 */
 	getClosetsEntitys(entity, maxDistance = null, type, n = 2, shift = true) {
 		let q = {};
-		q.location = entity.location;
+		q.location = new Location(entity.location.x, entity.location.y, entity.location.z);
 		if (n) q.closest = n;
 		if (type) q.type = type;
 
 		if (maxDistance) q.maxDistance = maxDistance;
-		let entitys = [...world.getDimension("overworld").getEntities(q)];
+		let entitys = [...DIMENSIONS.overworld.getEntities(q)];
 		if (shift) entitys.shift();
 		return entitys;
 	},
@@ -82,7 +83,7 @@ export const XEntity = {
 	 * Returns a location of the inputed aguments
 	 * @param {Entity} entity your using
 	 * @param {string} value what you want to search for
-	 * @example getTagStartsWith(Entity, "stuff:")
+	 * @example removetTagStartsWith(Entity, "stuff:")
 	 */
 	removeTagsStartsWith(entity, value) {
 		const tags = entity.getTags();
@@ -174,7 +175,7 @@ export const XEntity = {
 
 	/**
 	 * Converts a location to a block location
-	 * @param {Location} loc a location to convert
+	 * @param {Vector3} loc a location to convert
 	 * @returns {BlockLocation}
 	 */
 	locationToBlockLocation(loc) {
@@ -185,7 +186,7 @@ export const XEntity = {
 	 * @param {Entity} entity entity to despawn
 	 */
 	despawn(entity) {
-		entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
+		entity.teleport({ x: 0, y: -64, z: 0 }, DIMENSIONS.overworld, 0, 0);
 		entity.kill();
 	},
 	/**

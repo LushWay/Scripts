@@ -1,5 +1,5 @@
-import { BlockLocation, Entity, Location, Player, world } from "@minecraft/server";
-import { IS, setTickInterval, setTickTimeout, toStr } from "xapi.js";
+import { BlockLocation, Entity, Location, MinecraftEntityTypes, Player, world } from "@minecraft/server";
+import { IS, setTickInterval, setTickTimeout, sleep, toStr, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../lib/List/dimensions.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 // import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
@@ -71,24 +71,9 @@ world.events.entityCreate.subscribe((data) => {
 		new BlockLocation(data.entity.location.x, data.entity.location.y, data.entity.location.z),
 		data.entity.dimension.id
 	);
-	if (!region) return;
-	if (region.permissions.allowedEntitys.includes(data.entity.typeId)) return;
-	data.entity.teleport({ x: 0, y: -64, z: 0 }, data.entity.dimension, 0, 0);
-	data.entity.kill();
+	if (!region && global_allowed_entitys.includes(data.entity.typeId)) return;
+	if (region && region.permissions.allowedEntitys.includes(data.entity.typeId)) return;
+	XA.Entity.despawn(data.entity);
 });
-if (false)
-	setTickInterval(
-		() => {
-			for (const region of Region.getAllRegions()) {
-				for (const entity of DIMENSIONS[region.dimensionId].getEntities({
-					excludeTypes: region.permissions.allowedEntitys,
-				})) {
-					if (!region.entityInRegion(entity)) continue;
-					entity.teleport({ x: 0, y: -64, z: 0 }, entity.dimension, 0, 0);
-					entity.kill();
-				}
-			}
-		},
-		100,
-		"regionEntityClear"
-	);
+
+const global_allowed_entitys = ["minecraft:player"];

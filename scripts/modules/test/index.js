@@ -1,4 +1,4 @@
-import { BlockLocation, MinecraftBlockTypes, system, world } from "@minecraft/server";
+import { BlockLocation, Items, ItemStack, MinecraftBlockTypes, system, world } from "@minecraft/server";
 import { handler, setPlayerInterval, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
 import { benchmark } from "../../lib/Benchmark.js";
 import { CommandCallback } from "../../lib/Command/Callback.js";
@@ -233,7 +233,7 @@ const tests = {
 	19: (ctx) => {
 		console.warn("WARN");
 	},
-	20: async () => {
+	ERROR: async () => {
 		ThrowError(new ReferenceError("Test reference error"));
 		try {
 			await XA.dimensions.overworld.runCommandAsync("EEEEEE");
@@ -241,7 +241,29 @@ const tests = {
 			ThrowError(e);
 		}
 		XA.runCommandX("TEST", { showError: true });
-    ThrowError(new TypeError("ADDITION_STACK_TEST"), 0, ['stack1', 'stack2'])
+		ThrowError(new TypeError("ADDITION_STACK_TEST"), 0, ["stack1", "stack2"]);
+	},
+	TIME: (ctx) => {
+		for (let a of [1000, 1000 * 60, 1000 * 60 * 60, 1000 * 60 * 60 * 60, 1000 * 60 * 60 * 60 * 24]) {
+			const date = new Date();
+			ctx.reply(a);
+			date.setTime(a);
+			ctx.reply(
+				"Date: " +
+					date.getDate() +
+					" " +
+					(date.getTime() / (1000 * 60 * 60 * 60 * 24)).toFixed(2) +
+					" " +
+					date.getHours() +
+					"hh" +
+					date.getMinutes() +
+					"mm" +
+					date.getSeconds() +
+					"ss " +
+					date.getMilliseconds() +
+					"ms"
+			);
+		}
 	},
 };
 let bigdata = "";
@@ -251,17 +273,9 @@ const c = new XA.Command({
 	name: "test",
 });
 
-c.int("number", true).executes(async (ctx, n) => {
+c.string("number", true).executes(async (ctx, n) => {
 	const keys = Object.keys(tests);
-	const i = n && keys.includes(n + "") ? n : keys.pop();
+	const i = n && keys.includes(n) ? n : keys.pop();
 	ctx.reply(i);
-	const res = tests[i](ctx);
-	if (res && typeof res?.catch === "function")
-		res.catch((w) =>
-			ThrowError({
-				message: w?.message ?? w,
-				stack: w?.stack ?? new Error().stack,
-				name: w?.name ?? "CommandError",
-			})
-		);
+	handler(() => tests[i](ctx), "Test");
 });

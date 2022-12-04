@@ -1,5 +1,4 @@
 import {
-	BlockRaycastOptions,
 	EnchantmentList,
 	Items,
 	ItemStack,
@@ -88,7 +87,7 @@ setTickInterval(
 			// 	} catch (e) {}
 			let a = [...world.getPlayers()].find((e) => e.name == XA.Entity.getTagStartsWith(f, "l:"));
 			if (a) stats.FVboom.eAdd(a, 1);
-			f.dimension.createExplosion(f.location, type, boom);
+			f.dimension.createExplosion(new Location(f.location.x, f.location.y, f.location.z), type, boom);
 			f.kill();
 			boom.breaksBlocks = false;
 		}
@@ -130,35 +129,35 @@ setTickInterval(
 			players.push(player.name);
 
 			//*Фильтр предметов в инвентаре для Chest Gui
-			const inv = XA.Entity.getI(player);
-			for (let i = 0; i < inv.size; i++) {
-				const item = inv.getItem(i);
-				const lore = item?.getLore();
-				let lastInd, lastLore;
-				if (lore) (lastInd = lore.length - 1), (lastLore = lore[lastInd]);
-				if (
-					item &&
-					(item?.nameTag?.startsWith("§r§m§n§m") ||
-						item?.nameTag?.startsWith("§m§n§m") ||
-						(lastLore && lastLore?.endsWith("§{§-§}")))
-				) {
-					const item2 = new ItemStack(Items.get(item.typeId), item.amount, item.data);
-					inv.setItem(i, item2);
-				}
-				if (item && item.typeId == "minecraft:crossbow") {
-					/**
-					 * @type {EnchantmentList}
-					 */
-					let ench = item.getComponent("enchantments").enchantments,
-						o = false;
-					const mm = ench.getEnchantment(MinecraftEnchantmentTypes.multishot),
-						m = ench.getEnchantment(MinecraftEnchantmentTypes.piercing);
-					if (m) item.setLore(["§r§б", "§r§fЦель ракет: §6блоки"]), (o = true), (item.nameTag = "§r§fРазрывная");
-					if (mm) item.setLore(["§r§и", "§r§fЦель ракет: §6игроки"]), (o = true), (item.nameTag = "§r§fПодрыв жоп");
-					if (!o) item.setLore(["§r§н", "§r§fБронебойность: §6блоки", "§r§fТройной выстрел: §6игроки"]);
-					inv.setItem(i, item);
-				}
-			}
+			// const inv = XA.Entity.getI(player);
+			// for (let i = 0; i < inv.size; i++) {
+			// 	const item = inv.getItem(i);
+			// 	const lore = item?.getLore();
+			// 	let lastInd, lastLore;
+			// 	if (lore) (lastInd = lore.length - 1), (lastLore = lore[lastInd]);
+			// 	if (
+			// 		item &&
+			// 		(item?.nameTag?.startsWith("§r§m§n§m") ||
+			// 			item?.nameTag?.startsWith("§m§n§m") ||
+			// 			(lastLore && lastLore?.endsWith("§{§-§}")))
+			// 	) {
+			// 		const item2 = new ItemStack(Items.get(item.typeId), item.amount, item.data);
+			// 		inv.setItem(i, item2);
+			// 	}
+			// 	if (item && item.typeId == "minecraft:crossbow") {
+			// 		/**
+			// 		 * @type {EnchantmentList}
+			// 		 */
+			// 		let ench = item.getComponent("enchantments").enchantments,
+			// 			o = false;
+			// 		const mm = ench.getEnchantment(MinecraftEnchantmentTypes.multishot),
+			// 			m = ench.getEnchantment(MinecraftEnchantmentTypes.piercing);
+			// 		if (m) item.setLore(["§r§б", "§r§fЦель ракет: §6блоки"]), (o = true), (item.nameTag = "§r§fРазрывная");
+			// 		if (mm) item.setLore(["§r§и", "§r§fЦель ракет: §6игроки"]), (o = true), (item.nameTag = "§r§fПодрыв жоп");
+			// 		if (!o) item.setLore(["§r§н", "§r§fБронебойность: §6блоки", "§r§fТройной выстрел: §6игроки"]);
+			// 		inv.setItem(i, item);
+			// 	}
+			// }
 
 			/*================================ PVP MODE ==============================*/
 			if (
@@ -218,7 +217,7 @@ setTickInterval(
 
 		/*===================================================*/
 		for (const p of world.getPlayers()) {
-			let q = true;
+			// let q = true;
 			//* Переключение инвентаря
 			// if (q)
 			// 	try {
@@ -253,9 +252,7 @@ setTickInterval(
 			if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
 				const lore = XA.Entity.getHeldItem(p).getLore();
 				if (lore[0] == "Particle") {
-					const q = new BlockRaycastOptions();
-					q.maxDistance = 100;
-					const block = p.getBlockFromViewVector(q);
+					const block = p.getBlockFromViewVector({ maxDistance: 100 });
 					if (block) {
 						world
 							.getDimension("overworld")
@@ -390,7 +387,11 @@ world.events.entityHurt.subscribe(
 			if (data.cause == "projectile" && wo.Q("server:bowhit")) {
 				if (po.Q("pvp:bowhitsound", data.damagingEntity))
 					data.damagingEntity.playSound("", {
-						location: data.damagingEntity.location,
+						location: new Location(
+							data.damagingEntity.location.x,
+							data.damagingEntity.location.y,
+							data.damagingEntity.location.z
+						),
 						pitch: data.damage / 2,
 						volume: 1,
 					});

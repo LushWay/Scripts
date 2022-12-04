@@ -31,6 +31,7 @@ import { XrunCommand } from "./lib/XrunCommand.js";
 import { load } from "./lib/Module/loader.js";
 import "./lib/Setup/registryScore.js";
 import "./modules/modules.js";
+import { XCooldown } from "./lib/Class/Cooldown.js";
 
 /**
  * Class with all X-API features
@@ -39,6 +40,7 @@ export class XA {
 	static Entity = XEntity;
 	static runCommandX = XrunCommand;
 	static Command = XCommand;
+	static Cooldown = XCooldown;
 
 	static tables = {
 		chests: new XInstantDatabase(world, "chests"),
@@ -321,7 +323,7 @@ export async function handler(func, type = "Handled", additionalStack) {
  * @param {number} time time in ticks
  * @returns {Promise<void>}
  */
-export const sleep = (time) => new Promise((resolve) => setTickTimeout(() => resolve(), time));
+export const sleep = (time) => new Promise((resolve) => setTickTimeout(() => resolve(), time, "sleep"));
 
 /**
  * @param {Function} callback
@@ -335,26 +337,28 @@ export function setTickInterval(callback, ticks = 0, name) {
 /**
  * @param {Function} callback
  * @param {number} ticks
+ * @param {string} [name]
  */
-export function setTickTimeout(callback, ticks = 1) {
-	return Timeout(ticks, callback, false, Date.now());
+export function setTickTimeout(callback, ticks = 1, name) {
+	return Timeout(ticks, callback, false, name ?? Date.now());
 }
 
 /**
- * @param {(cl: Player) => void} callback
- *  * @param {string} [name]
+ * @param {(player: Player) => void} callback
  * @param {number} ticks
+ * @param {string} [name]
  */
 export function setPlayerInterval(callback, ticks = 0, name) {
 	return Timeout(ticks, () => forPlayers(callback), true, name);
 }
 
 /**
- * @param {(cl: Player) => void} callback
+ * @param {(player: Player) => void} callback
  * @param {number} ticks
+ * @param {string} [name]
  */
-export function setPlayerTimeout(callback, ticks = 1) {
-	return Timeout(ticks, () => forPlayers(callback), false, Date.now());
+export function setPlayerTimeout(callback, ticks = 1, name) {
+	return Timeout(ticks, () => forPlayers(callback), false, name ?? Date.now());
 }
 
 /**

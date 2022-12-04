@@ -39,7 +39,7 @@ R.executes((ctx) => {
 					ROLE.findIndex((e) => e.startsWith(">"))
 				)
 				.addTextField("Причина смены роли", `Например, "космокс"`)
-				.show(player, (_, notify, showName, selected, message) => {
+				.show(ctx.sender, (_, notify, showName, selected, message) => {
 					if (selected.startsWith(">")) return;
 					const newrole = Object.entries(TR).find((e) => e[1] === selected)[0];
 					if (notify)
