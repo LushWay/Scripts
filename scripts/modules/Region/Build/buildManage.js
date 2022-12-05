@@ -1,235 +1,247 @@
-import { BlockLocation, MinecraftBlockTypes, MinecraftDimensionTypes, Player, world } from "@minecraft/server";
-import { createWaiter, handler, IS, setTickInterval, sleep, ThrowError, XA } from "xapi.js";
+import { world } from "@minecraft/server";
+import { handler, IS, XA } from "xapi.js";
 import { ActionForm } from "../../../lib/Form/ActionForm.js";
-import { MessageForm } from "../../../lib/Form/MessageForm.js";
 import { CONFIG_MENU } from "../../Menu/var.js";
 import { JOIN_EVENTS } from "../../OnJoin/events.js";
 import { Region } from "../utils/Region.js";
-import { lang } from "./lang.js";
-import { findFreePlace } from "./utils.js";
+import { ClearRegion, CreateRegion, fillRegion, prompt, teleportToRegion } from "./utils.js";
 
 const DB = new XA.instantDB(world, "buildRegion");
 
-const squarePlace = -55;
-
-/**
- *
- * @param {IRegionCords} from
- * @param {IRegionCords} to
- */
-async function fillRegion(from, to) {
-	const firstLoc = new BlockLocation(from.x, squarePlace, from.z);
-	const secondLoc = new BlockLocation(to.x, squarePlace, to.z);
-	const exec = createWaiter(10);
-	for (const loc of safeBlocksBetween(firstLoc.above(), secondLoc.above(), true)) {
-		await exec();
-		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
-	}
-	for (const loc of safeBlocksBetween(firstLoc, secondLoc, true)) {
-		await exec();
-		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
-	}
-}
-
-/**
- *
- * @param {Player} player
- * @param {Region} region
- */
-function teleportToRegion(player, region) {
-	player.teleport(
-		{ x: region.from.x, y: squarePlace + 3, z: region.from.z },
-		XA.dimensions.overworld,
-		player.rotation.x,
-		player.rotation.y
-	);
-}
-
-/**
- *
- * @param {Player} player
- */
-async function CreateRegion(player, tp = true) {
-	const place = await findFreePlace();
-
-	const region = new Region(place.from, place.to, MinecraftDimensionTypes.overworld, {
-		owners: [player.id],
-		doorsAndSwitches: false,
-		allowedEntitys: ["minecraft:player", "minecraft:item"],
-		openContainers: false,
-		pvp: false,
-	});
-	DB.set(player.id, region.key);
-	fillRegion(region.from, region.to);
-	if (tp) teleportToRegion(player, region);
-	return region;
-}
-
 JOIN_EVENTS.playerGuide.subscribe((player) => {
 	player.playSound("random.levelup");
-	player.tell(lang.newPlayer);
+	player.tell("привте");
 	const oldRegion = DB.get(player.id);
 	if (!oldRegion) CreateRegion(player);
 });
 
-/**
- * @param {Player} player
- * @param {string} text
- * @param {string} yesText
- * @param {() => void} onYesAction
- * @param {string} noText
- * @param {() => void} onNoAction
- */
-function propmt(player, text, yesText, onYesAction, noText, onNoAction) {
-	new MessageForm("Вы уверены?", text).setButton1(yesText, onYesAction).setButton2(noText, onNoAction).show(player);
-}
-
-/**
- *
- * @param {string} spining
- * @param {number} percents
- */
-function getProgressBar(spining, percents) {
-	const pb = new Array(10).join(" ").split(" ");
-	const e = pb.map((_, i) => (Math.floor(percents / 10) > i ? "§a▌" : "§7▌"));
-	return `§d${spining[0]} ${e.join("")} §f${~~percents}%`;
-}
-
 CONFIG_MENU.menu = (player) => {
 	const regionID = DB.get(player.id);
-	let region = Region.getAllRegions().find((e) => e.key === regionID);
-	if (!region) {
-		player.tell("§cРегион был создан.");
+	let Pregion = Region.getAllRegions().find((e) => e.key === regionID);
+	if (!Pregion) {
+		player.tell("§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую.");
 		CreateRegion(player);
 		return false;
 	}
-	const menu = new ActionForm("Меню площадки", lang.regionManageBody(region, player))
-		.addButton("Переместиться", null, () => {
-			teleportToRegion(player, region);
-			player.tell("§b> §3Вы были перемещены на свою площадку");
-		})
-		.addButton("Перейти на новую", null, () => {
-			const CD = new XA.Cooldown(DB, "ARCHIVE", player.id, 1000 * 60 * 60 * 24);
-			const status = CD.statusTime;
 
-			if (status !== "EXPIRED") {
-				player.tell("§cПодожди еще §f" + (status / (60 * 60 * 24)).toFixed(2) + "§c часов");
-			} else
-				propmt(
-					player,
-					"§fВы уверены, что хотите перейти на новую площадку? После этого §cвернуть предыдущую§f будет уже §cнельзя§f. Это действие можно совершать раз в 24 часа.",
-					"§cДа, перейти",
-					() => {
-						const oldRegion = DB.get(player.id);
-						DB.set("ARHIVE:" + player.id, oldRegion);
-						for (const builder of world.getPlayers()) {
-							if (IS(builder.id, "builder"))
-								builder.tell("§b> §3Игрок §f" + player.name + "§r§3 перевел свой квадрат в архив.");
-						}
-						CreateRegion(player, true);
-						CD.update();
-					},
-					"Отмена",
-					() => {}
-				);
-		})
-		.addButton("§cОчистить", null, () => {
-			const CD = new XA.Cooldown(DB, "CLEAR", player.id, 1000 * 60);
-			const status = CD.statusTime;
+	const current_region = Region.blockLocationInRegion(player.location, player.dimension.id);
+	const inOwnRegion = current_region && current_region.permissions.owners[0] === Pregion.permissions.owners[0];
 
-			if (status !== "EXPIRED") {
-				player.tell("§cПодожди еще §f" + status.toFixed(2) + "§c секунд");
-			} else
-				propmt(
-					player,
-					"§fВы уверены что хотите §cбезвозвратно§f очистить площадку§f? Это действие §cнельзя отменить.",
-					"§cВсе равно очистить",
-					async () => {
-						let percents = 0;
-						let spining = ["/", "-", "\\", "|"];
-						let time = 0;
-						const end = setTickInterval(
+	let body = "";
+	const add = (/** @type {string} */ t) => (body += `${t}\n`);
+	add(`§3Координаты вашей площадки: §c${Pregion.from.x} §b${Pregion.from.z}\n `);
+
+	/** @type {import("../../../lib/Class/XRequest.js").XRequest} */
+	let req;
+	/** @type {string} */
+	let regionOwnerName;
+
+	if (current_region) {
+		req = new XA.Request(DB, "EDIT", current_region.permissions.owners[0]);
+		regionOwnerName = XA.Entity.getNameByID(current_region.permissions.owners[0]);
+		if (!inOwnRegion) {
+			if (regionOwnerName) {
+				add("§3Сейчас вы на площадке игрока §f" + regionOwnerName);
+			} else {
+				const oldRegionData = DB.get("ARCHIVE:" + current_region.key);
+				const oldRegion = Array.isArray(oldRegionData) ? oldRegionData : [];
+				regionOwnerName = XA.Entity.getNameByID(oldRegion[0]);
+				add("§cЭто площадка была заархивирована");
+				add("§3Строители: §f" + oldRegion.map(XA.Entity.getNameByID).join("§r§3, §f"));
+			}
+		} else {
+			add("§3Вы находитесь на §fсвоей§3 площадке");
+		}
+		add("");
+	}
+
+	const menu = new ActionForm("Меню площадки", body);
+	/**
+	 *
+	 * @param {ActionForm} form
+	 */
+	function addBackButton(form) {
+		form.addButton("§b< §3Назад", null, () => menu.show(player));
+		return form;
+	}
+
+	menu.addButton("Площадки", null, () => {
+		const form = new ActionForm(
+			"Доступные площадки",
+			"§3Здесь вы можете телепортироваться на любую площадку, где можете строить"
+		);
+		/**
+		 *
+		 * @param {Region} region
+		 * @param {string} name
+		 */
+		const toPlatform = (region, name) => {
+			form.addButton(name, null, () => {
+				teleportToRegion(player, region);
+				player.tell("§b> §3Вы были перемещены на площадку §r" + name);
+			});
+		};
+		toPlatform(Pregion, "Основная");
+		for (const reg of Region.getAllRegions().filter(
+			(e) => e.permissions.owners.includes(player.id) && e.key !== Pregion.key
+		)) {
+			toPlatform(reg, XA.Entity.getNameByID(reg.permissions.owners[0]));
+		}
+		addBackButton(form);
+		form.show(player);
+	});
+
+	if (current_region) {
+		if (inOwnRegion) {
+			menu.addButton("Строители", null, () => {
+				const form = new ActionForm("Строители", "§3Тут можно просмотреть и удалить строителей вашего региона");
+
+				for (const id of current_region.permissions.owners.slice(1)) {
+					const playerName = XA.Entity.getNameByID(id);
+					form.addButton(playerName, null, () => {
+						prompt(
+							player,
+							"Вы точно хотите удалить игрока " + playerName + "§r из строителей вашего региона?",
+							"ДА",
 							() => {
-								player.onScreenDisplay.setActionBar(getProgressBar(spining[0], percents));
-								time++;
-								if (time % 10 === 0) spining = spining.slice(1).concat(spining.shift());
+								current_region.permissions.owners = current_region.permissions.owners.filter((e) => e !== id);
+								current_region.update();
+								player.tell("§b> §3Успешно!");
+								const requestedPlayer = XA.Entity.fetch(id);
+								if (requestedPlayer)
+									requestedPlayer.tell(`§cИгрок §f${player.name} §r§cудалил вас из строителей своей площадки`);
 							},
-							0,
-							"ResetSquare_ProgressActionbar"
+							"нет",
+							() => form.show(player)
 						);
-						const loc1 = { x: region.from.x, y: -63, z: region.from.z };
-						const loc2 = { x: region.to.x, y: 100, z: region.to.z };
-						const blocks = getBlocksCount(loc1, loc2);
+					});
+				}
 
-						let c = 0;
-						await sleep(40);
-						console.warn("start gen");
-						const e = safeBlocksBetween(loc1, loc2, true);
-						await sleep(40);
-						console.warn("end gen");
+				addBackButton(form);
+				form.show(player);
+			});
+			menu.addButton("Запросы редактирования", null, () => {
+				const newmenu = new ActionForm(
+					"Запросы редактирования",
+					"§3В этом меню вы можете посмотреть запросы на редактирование площадки, отправление другими игроками"
+				);
+				for (const ID of req.activeRequests) {
+					const name = XA.Entity.getNameByID(ID);
+					newmenu.addButton(name, null, () => {
+						prompt(
+							player,
+							"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
+							"Принять",
+							() => {
+								req.deleteRequest(ID);
+								player.tell("§b> §3Запрос на редактирование успешно принят!");
+								const requestedPlayer = XA.Entity.fetch(ID);
+								if (requestedPlayer)
+									requestedPlayer.tell(`§b> §3Игрок §f${player.name} §r§3принял ваш запрос на редактирование площадки`);
+							},
+							"Отклонить",
+							() => {
+								req.deleteRequest(ID);
+								newmenu.show(player);
+							}
+						);
+					});
+				}
+				addBackButton(newmenu);
+				newmenu.show(player);
+			});
+			menu.addButton("Перейти на новую", null, () => {
+				const CD = new XA.Cooldown(DB, "ARHCIVE", player, 1000 * 60 * 60 * 24);
+				if (CD.isExpired())
+					prompt(
+						player,
+						"§fВы уверены, что хотите перейти на новую площадку? После этого настощая площадка будет архивирована, и §cвернуть её§f будет уже §cнельзя§f. Это действие можно совершать раз в 24 часа.",
+						"§cДа, перейти",
+						() => {
+							const oldRegionID = DB.get(player.id);
+							const oldRegion = Region.getAllRegions().find((e) => e.key === oldRegionID);
 
-						for (const loc of e) {
-							c++;
-							if (c % 500 === 0 || c === 0) await sleep(0);
-							percents = c / ~~(blocks / 100);
+							DB.set("ARCHIVE:" + oldRegionID, [...oldRegion.permissions.owners]);
+							const u = [];
+							oldRegion.forEachOwner((player, i, arr) => {
+								u.push(player.id);
+								player.tell("§cРегион игрока §f" + arr[0].name + "§r§c был заархивирован.");
+							});
 
-							const block = XA.dimensions.overworld.getBlock(loc);
-							if (block.typeId === MinecraftBlockTypes.air.id) continue;
-							// await XA.dimensions.overworld.runCommandAsync(`setblock ${loc.x} ${loc.y} ${loc.z} air`);
-							block.setType(MinecraftBlockTypes.air);
-						}
-						await handler(() => fillRegion(region.from, region.to));
-						CD.update();
+							oldRegion.permissions.owners = [];
+							oldRegion.update();
+
+							for (const builder of world.getPlayers()) {
+								if (!u.includes(builder.id) && IS(builder.id, "builder"))
+									builder.tell("§b> §3Игрок §f" + player.name + "§r§3 перевел свою площадку в архив.");
+							}
+
+							CreateRegion(player, true);
+							CD.update();
+						},
+						"Отмена",
+						() => {}
+					);
+			});
+			menu.addButton("§cОчистить", null, () => {
+				const CD = new XA.Cooldown(DB, "CLEAR", player, 1000 * 60);
+				if (CD.isExpired())
+					prompt(
+						player,
+						"§fВы уверены что хотите §cбезвозвратно§f очистить площадку§f? Это действие §cнельзя отменить.",
+						"§cВсе равно очистить§r",
+						async () => {
+							CD.update();
+							const end = await ClearRegion(player, Pregion);
+							await handler(() => fillRegion(Pregion.from, Pregion.to));
+							end();
+						},
+						"Отмена, не очищайте",
+						() => menu.show(player)
+					);
+			});
+		} else if (current_region.permissions.owners[0]) {
+			menu.addButton("Запросить разрешение", null, () => {
+				const CD = new XA.Cooldown(DB, "REQ", player, 1000 * 60);
+
+				if (CD.isExpired())
+					prompt(
+						player,
+						"Владельцу площадки будет отправлен запрос на редактирование. Если он его примет, вы сможете строить на его площадке.",
+						"Запросить",
+						() => {
+							CD.update();
+							req.createRequest(player.id);
+							player.tell("§b> §3Запрос на редактирование успешно отправлен!");
+							const requestedPlayer = XA.Entity.fetch(current_region.permissions.owners[0]);
+							if (requestedPlayer)
+								requestedPlayer.tell(`§b> §3Игрок §f${player.name} §r§3отправил вам запрос на редактирование площадки`);
+						},
+						"Отмена",
+						() => menu.show(player)
+					);
+			});
+		}
+		if (IS(player.id, "admin")) {
+			menu.addButton("§cУдалить площадку", null, () => {
+				prompt(
+					player,
+					`§cВы действительно хотите удалить площадку игрока §r§f${regionOwnerName}?`,
+					"§cДа",
+					async () => {
+						const end = await ClearRegion(player, current_region);
+						current_region.forEachOwner((player) =>
+							player.tell(`§cРегион с владельцем §f${regionOwnerName}§r§c был удален`)
+						);
+						current_region.delete();
 						end();
 					},
-					"Отмена, не очищайте",
+					"НЕТ!",
 					() => menu.show(player)
 				);
-		});
+			});
+		}
+	}
+
 	return menu;
 };
-
-/**
- *
- * @param {Vector3} loc1
- * @param {Vector3} loc2
- */
-function getBlocksCount(loc1, loc2) {
-	const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [Math.min(v1, v2), Math.max(v1, v2)];
-	const [xmin, xmax] = minmax(loc1.x, loc2.x);
-	const [zmin, zmax] = minmax(loc1.z, loc2.z);
-	const [ymin, ymax] = minmax(loc1.y, loc2.y);
-	const x = xmax - xmin + 1;
-	const y = ymax - ymin + 1;
-	const z = zmax - zmin + 1;
-	return x * y * z;
-}
-
-/**
- *
- * @template T
- * @param {Vector3} loc1
- * @param {Vector3} loc2
- * @param {EX<T, boolean>} convert
- * @returns {Generator<T extends true ? BlockLocation : Vector3, void, unknown>}
- */
-function* safeBlocksBetween(loc1, loc2, convert) {
-	try {
-		const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [Math.min(v1, v2), Math.max(v1, v2)];
-		const [xmin, xmax] = minmax(loc1.x, loc2.x);
-		const [zmin, zmax] = minmax(loc1.z, loc2.z);
-		const [ymin, ymax] = minmax(loc1.y, loc2.y);
-		for (let x = xmin; x <= xmax; x++) {
-			for (let z = zmin; z <= zmax; z++) {
-				for (let y = ymin; y <= ymax; y++) {
-					// @ts-expect-error
-					if (convert) yield new BlockLocation(x, y, z);
-					// @ts-expect-error
-					else yield { x, y, z };
-				}
-			}
-		}
-	} catch (e) {
-		ThrowError(e);
-	}
-}

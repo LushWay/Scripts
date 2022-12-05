@@ -1,6 +1,6 @@
 import { BlockLocation, Player, world } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
-import { Subscriber } from "../../lib/Class/Events.js";
+import { Subscriber } from "../../lib/Class/XEvents.js";
 import { wo } from "../../lib/Class/XOptions.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";

@@ -31,7 +31,8 @@ import { XrunCommand } from "./lib/XrunCommand.js";
 import { load } from "./lib/Module/loader.js";
 import "./lib/Setup/registryScore.js";
 import "./modules/modules.js";
-import { XCooldown } from "./lib/Class/Cooldown.js";
+import { XCooldown } from "./lib/Class/XCooldown.js";
+import { XRequest } from "./lib/Class/XRequest.js";
 
 /**
  * Class with all X-API features
@@ -41,6 +42,7 @@ export class XA {
 	static runCommandX = XrunCommand;
 	static Command = XCommand;
 	static Cooldown = XCooldown;
+	static Request = XRequest;
 
 	static tables = {
 		chests: new XInstantDatabase(world, "chests"),

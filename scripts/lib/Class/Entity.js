@@ -7,11 +7,21 @@ import {
 	PlayerInventoryComponentContainer,
 	world,
 } from "@minecraft/server";
+import { XInstantDatabase } from "../Database/DynamicProperties.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
-// Authots: Smell of curry, mrpatches
+const DB = new XInstantDatabase(world, "player");
+
+// Authots: Smell of curry, mrpatches, mo9ses and xiller (Leaftail)
 
 export const XEntity = {
+	/**
+	 * Gets player name from player database with specific ID
+	 * @param {string} ID
+	 */
+	getNameByID(ID) {
+		return DB.get("NAME:" + ID);
+	},
 	/**
 	 * Checks if position is in radius
 	 * @param {Vector3} center Center of radius
@@ -192,7 +202,7 @@ export const XEntity = {
 	/**
 	 * Finds a player by name or ID
 	 * @param {string} name
-	 * @return {Player}
+	 * @return {Player | undefined}
 	 */
 	fetch(name) {
 		for (const p of world.getPlayers()) {

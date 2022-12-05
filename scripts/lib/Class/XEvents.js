@@ -1,6 +1,3 @@
-import { world } from "@minecraft/server";
-import { handler, ThrowError, toStr } from "xapi.js";
-
 /**
  * @template C, B
  * @param {C extends Function ? C : never} callback

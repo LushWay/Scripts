@@ -1,5 +1,5 @@
-import { BlockLocation, Entity, world } from "@minecraft/server";
-import { XA } from "../../../xapi.js";
+import { BlockLocation, Entity, Player, world } from "@minecraft/server";
+import { handler, XA } from "../../../xapi.js";
 import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
 /**
@@ -50,9 +50,9 @@ export class Region {
 	}
 	/**
 	 * Checks if a block location is in region
-	 * @param {BlockLocation} blockLocation
+	 * @param {Vector3} blockLocation
 	 * @param {string} dimensionId
-	 * @returns {Region}
+	 * @returns {Region | undefined}
 	 */
 	static blockLocationInRegion(blockLocation, dimensionId) {
 		return this.getAllRegions().find(
@@ -68,7 +68,7 @@ export class Region {
 	/**
 	 * Removes a region at a block Location
 	 * @param {string} dimensionId  the id of this dimension
-	 * @param {BlockLocation} blockLocation
+	 * @param {Vector3} blockLocation
 	 * @returns {boolean} if the region was removed or not
 	 */
 	static removeRegionAtBlockLocation(blockLocation, dimensionId) {
@@ -140,5 +140,17 @@ export class Region {
 				[entity.location.x, entity.location.y, entity.location.z]
 			)
 		);
+	}
+	/**
+	 *
+	 * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback
+	 */
+	forEachOwner(callback) {
+		// TODO Make it to activate if player has joined the world and when it joins again callback will be called
+		if (this.permissions.owners.length < 1) return;
+		this.permissions.owners
+			.map(XA.Entity.fetch)
+			.filter((e) => e)
+			.forEach((player, i, owners) => handler(() => callback(player, i, owners), "Region.forEachOwner"));
 	}
 }
