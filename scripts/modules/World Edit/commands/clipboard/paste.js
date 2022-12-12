@@ -14,7 +14,7 @@ new XA.Command({
 	.boolean("includeBlocks", true)
 	.int("integrity", true)
 	.int("seed", true)
-	.executes((ctx, rotation, mirror, includeEntites, includeBlocks, integrity, seed) => {
+	.executes(async (ctx, rotation, mirror, includeEntites, includeBlocks, integrity, seed) => {
 		let b, e;
 		if (!includeEntites && !includeBlocks) {
 			e = false;
@@ -24,7 +24,7 @@ new XA.Command({
 			e = includeEntites;
 		}
 		if (![0, 90, 180, 270].includes(rotation)) return ctx.reply("§c" + rotation);
-		const command = WorldEditBuild.paste(
+		const command = await WorldEditBuild.paste(
 			ctx.sender,
 			// @ts-expect-error
 			rotation,

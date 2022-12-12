@@ -21,7 +21,7 @@ export let CONTAINER_LOCATIONS = {};
 setTickInterval(async () => {
 	CONTAINER_LOCATIONS = {};
 	for (const player of world.getPlayers()) {
-		const blockLoc = XA.Entity.locationToBlockLocation(player.location);
+		const blockLoc = XA.Entity.vecToBlockLocation(player.location);
 		const pos1 = blockLoc.offset(CHECK_SIZE.x, CHECK_SIZE.y, CHECK_SIZE.z);
 		const pos2 = blockLoc.offset(-CHECK_SIZE.x, -CHECK_SIZE.y, -CHECK_SIZE.z);
 

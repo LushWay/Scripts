@@ -1,4 +1,4 @@
-import { Player, system, world } from "@minecraft/server";
+import { ItemTypes, Player, system, world } from "@minecraft/server";
 import { visualise_benchmark_result } from "../../lib/Benchmark.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
@@ -153,5 +153,14 @@ new XA.Command({
 	name: "benchmark",
 	description: "Показывает время работы серверных систем",
 }).executes((ctx) => {
-	new ActionForm("Benchmark", visualise_benchmark_result()).addButton("ok", null, () => void 0).show(ctx.sender);
+	function show() {
+		new ActionForm("Benchmark", visualise_benchmark_result())
+			.addButton("Refresh", null, show)
+			.addButton("Exit", null, () => void 0)
+			.show(ctx.sender);
+	}
+	show();
 });
+
+function a() { a() }
+a()

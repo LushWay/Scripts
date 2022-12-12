@@ -1,6 +1,6 @@
 import { BlockLocation } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
-import { configuration } from "../config.js";
+import { WB_CONFIG } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
@@ -57,35 +57,13 @@ export class Fill {
 						blocksSet++;
 					}
 				}
-				if (blocksSet >= configuration.BLOCKS_BEFORE_AWAIT) {
-					await sleep(configuration.TICKS_TO_SLEEP);
+				if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
+					await sleep(WB_CONFIG.TICKS_TO_SLEEP);
 					blocksSet = 0;
 				}
 			}
 		} catch (error) {
 			console.warn(error + error.stack);
 		}
-	}
-	/**
-	 * Gets the relavent values for shape generation
-	 */
-	getValues() {
-		return {
-			xmin: Math.min(this.pos1.x, this.pos2.x),
-			xmax: Math.max(this.pos1.x, this.pos2.x),
-			ymin: Math.min(this.pos1.y, this.pos2.y),
-			ymax: Math.max(this.pos1.y, this.pos2.y),
-			zmin: Math.min(this.pos1.z, this.pos2.z),
-			zmax: Math.max(this.pos1.z, this.pos2.z),
-			get cx() {
-				return (this.xmax + this.xmin) / 2;
-			},
-			get cy() {
-				return (this.ymax + this.ymin) / 2;
-			},
-			get cz() {
-				return (this.zmax + this.zmin) / 2;
-			},
-		};
 	}
 }

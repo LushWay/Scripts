@@ -1,6 +1,5 @@
 import {
 	BlockLocation,
-	BlockRaycastOptions,
 	InventoryComponentContainer,
 	ItemStack,
 	Location,
@@ -11,7 +10,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { IS, setTickInterval, setTickTimeout, sleep, ThrowError, XA } from "xapi.js";
-import { po, wo, WorldOption } from "../../lib/Class/XOptions.js";
+import { po, wo, WorldOption } from "../../lib/Class/Options.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
 import { global, stats } from "./var.js";
@@ -216,6 +215,7 @@ XA.objectives.push({ id: objective[0], watch: true });
 export function Atp(player, place, ignore, setDefaultInventory) {
 	/** @param {string} reason */
 	const fail = (reason) => player.tell("§c► " + reason);
+
 	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
 
 	if (!ignore?.lock && tag) return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
@@ -223,11 +223,11 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	if (!ignore?.quene && Object.keys(quene).includes(player.name))
 		return fail(`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`);
 
-	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0) return fail(`В режиме пвп это запрещенo`);
+	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0) return fail(`Вы находитесь в режиме PVP!`);
 
 	const currentInventory = XA.Entity.getScore(player, objective[0]);
-	const ps = invs[place];
-	if (!ps) return ThrowError(new Error("Неправильное место: " + place));
+	const placeIndex = invs[place];
+	if (!placeIndex) return ThrowError(new TypeError("Неправильное место: " + place));
 
 	let pos = wo.G(`${place}:pos`);
 	if (place !== "anarch" && place !== "currentpos" && !pos)
@@ -240,7 +240,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		getPos ? (pos = getPos) : (rtp = true);
 		if (currentInventory == invs.anarch && !rtp) return;
 	} else if (place === "currentpos") {
-		const l = XA.Entity.locationToBlockLocation(player.location);
+		const l = XA.Entity.vecToBlockLocation(player.location);
 		pos = l.x + " " + l.y + " " + l.z;
 	}
 	if (rtp) {
@@ -255,7 +255,8 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 			count++;
 			x = rd(Number(center[0]) + global.Radius - 10, Number(center[0]) - global.Radius + 10);
 			z = rd(Number(center[1]) + global.Radius - 10, Number(center[1]) - global.Radius + 10);
-			const q = new BlockRaycastOptions();
+			/** @type {import("@minecraft/server").BlockRaycastOptions} */
+			const q = {};
 			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
 			const b = world.getDimension("overworld").getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
 			if (b && b.location.y >= 63) {
@@ -270,12 +271,12 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		pos = x + " " + y + " " + z;
 	}
 
-	if (ps == invs.anarch) {
+	if (placeIndex == invs.anarch) {
 		player.tell(`§r§${air ? "5Воздух" : "9Земля"}§r ${po.Q("anarchy:hideCoordinates", player) ? "" : pos}`);
 	}
 
 	if (currentInventory == invs.anarch) {
-		const l = XA.Entity.locationToBlockLocation(player.location);
+		const l = XA.Entity.vecToBlockLocation(player.location);
 		XA.tables.player.set("POS:" + player.id, l.x + " " + l.y + " " + l.z);
 	}
 	const inve = XA.Entity.getI(player);
@@ -286,17 +287,17 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 			place: Object.keys(invs).find((e) => invs[e] == currentInventory),
 		};
 	if (
-		(currentInventory == ps || (inve.size == inve.emptySlotsCount && place != "anarch")) &&
+		(currentInventory == placeIndex || (inve.size == inve.emptySlotsCount && place != "anarch")) &&
 		!((!setDefaultInventory && inve.size == inve.emptySlotsCount) || setDefaultInventory)
 	) {
 		tp(player, pos, place, po.Q("title:spawn:enable", player), null, null, air);
-		player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${ps}`);
+		player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 	} else {
 		try {
 			if (!setDefaultInventory) player.runCommandAsync("testfor @s[m=!c]");
 			inv.saveInv(currentInventory, player).then(() =>
-				inv.loadInv(ps, player).then(() => {
-					player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${ps}`);
+				inv.loadInv(placeIndex, player).then(() => {
+					player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 					tp(
 						player,
 						pos,
@@ -310,7 +311,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 				})
 			);
 		} catch (e) {
-			player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${ps}`);
+			player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 			tp(player, pos, place, po.Q("title:spawn:enable", player), obj, null, air);
 		}
 	}
@@ -337,7 +338,10 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	// 	XA.Entity.despawn(ent);
 	// 	return;
 	// }
-	data.entity.dimension.spawnEntity("f:t", ent.location).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
+	data.entity.dimension.spawnEntity(
+		"f:t",
+		new Location(ent.location.x, ent.location.y, ent.location.z)
+	).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
 });
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	if (data.id != "ded") return;
@@ -469,7 +473,7 @@ new XA.Command({
 	.literal({ name: "set", requires: (p) => p.hasTag("commands") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Entity.locationToBlockLocation(pos ?? ctx.sender.location);
+		let loc = XA.Entity.vecToBlockLocation(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("spawn:pos", rl);
@@ -488,7 +492,7 @@ new XA.Command({
 	.literal({ name: "set", requires: (p) => p.hasTag("commands") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Entity.locationToBlockLocation(pos ?? ctx.sender.location);
+		let loc = XA.Entity.vecToBlockLocation(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("minigames:pos", rl);
@@ -506,7 +510,7 @@ new XA.Command({
 	.literal({ name: "set", requires: (p) => p.hasTag("commands") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Entity.locationToBlockLocation(pos ?? ctx.sender.location);
+		let loc = XA.Entity.vecToBlockLocation(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("anarch:pos", rl);
@@ -522,12 +526,10 @@ new XA.Command({
 	.executes((ctx) => {
 		let item = new ItemStack(MinecraftItemTypes.grayCandle, 1, 0);
 		item.setLore(ctx.args);
-		const block = ctx.sender.dimension.getBlock(
-			XA.Entity.locationToBlockLocation(ctx.sender.location).offset(0, -4, 0)
-		);
+		const block = ctx.sender.dimension.getBlock(XA.Entity.vecToBlockLocation(ctx.sender.location).offset(0, -4, 0));
 		block.setType(MinecraftBlockTypes.chest);
 		block.getComponent("inventory").container.setItem(0, item);
-		const loc = XA.Entity.locationToBlockLocation(ctx.sender.location).offset(0, 1, 0);
+		const loc = XA.Entity.vecToBlockLocation(ctx.sender.location).offset(0, 1, 0);
 		const l = new Location(loc.x + 0.5, loc.y, loc.z + 0.5);
 
 		ctx.sender.teleport(l, ctx.sender.dimension, ctx.sender.rotation.x, ctx.sender.rotation.y, false);

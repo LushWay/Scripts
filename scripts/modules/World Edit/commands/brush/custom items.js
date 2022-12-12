@@ -1,4 +1,4 @@
-import { Items, ItemStack } from "@minecraft/server";
+import { ItemStack, ItemTypes } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 
 const shovelCMD = new XA.Command({
@@ -20,7 +20,7 @@ const shovelCMD = new XA.Command({
 			ctx.reply("brush.help.text");
 		}
 		if (!радиус) return ctx.reply("§c" + радиус);
-		const brush = new ItemStack(Items.get(`we:s`));
+		const brush = new ItemStack(ItemTypes.get(`we:s`));
 		if (радиус > 6) return ctx.reply("§c► Зачем тебе такой БОЛЬШОЙ?)");
 		if (высота > 10) return ctx.reply("§c► Зачем тебе такой БОЛЬШОЙ?)");
 		let bblocks;

@@ -1,7 +1,7 @@
-import { Items, ItemStack } from "@minecraft/server";
+import { ItemStack, ItemTypes } from "@minecraft/server";
 
 import { IS, XA } from "xapi.js";
-import { SHAPES } from "../../modules/definitions/shapes.js";
+import { SHAPES } from "../../modules/utils/shapes.js";
 
 const brushCMD = new XA.Command({
 	name: "brush",
@@ -16,7 +16,7 @@ const brushCMD = new XA.Command({
 	.executes((ctx, shape, blocks, size) => {
 		if (!size) return ctx.reply(Object.keys(SHAPES).join("\n§7"));
 		if (size > 6) return ctx.reply("§c► Зачем тебе такая БОЛЬШАЯ кисть?)");
-		const brush = new ItemStack(Items.get(`we:brush`));
+		const brush = new ItemStack(ItemTypes.get(`we:brush`));
 		if (!SHAPES[shape]) return ctx.reply("§c" + shape);
 		let bblocks;
 		blocks == "st" ? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:")) : (bblocks = blocks);

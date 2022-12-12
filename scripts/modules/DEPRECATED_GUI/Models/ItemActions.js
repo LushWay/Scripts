@@ -3,13 +3,13 @@
 import {
 	Enchantment,
 	InventoryComponentContainer,
-	Items,
 	ItemStack,
+	ItemTypes,
 	MinecraftEnchantmentTypes,
 } from "@minecraft/server";
 import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { XA } from "xapi.js";
-import { po, wo } from "../../../lib/Class/XOptions.js";
+import { po, wo } from "../../../lib/Class/Options.js";
 import { auxa, lich } from "../static_pages.js";
 import { ChestGUI } from "./ChestGUI.js";
 import { PAGES } from "./Page.js";
@@ -21,7 +21,7 @@ import { PAGES } from "./Page.js";
  * @param {import("./Page.js").Item} Item item that was grabbed
  */
 export function GiveAction(chestGUI, Item) {
-	let itemStack = new ItemStack(Items.get(Item.type), Item.amount, Item.data);
+	let itemStack = new ItemStack(ItemTypes.get(Item.type), Item.amount, Item.data);
 	if (Item?.components?.enchantments?.length > 0) {
 		const MinecraftEnchantments = Object.values(MinecraftEnchantmentTypes);
 		const ItemStackEnchantments = itemStack.getComponent("enchantments").enchantments;

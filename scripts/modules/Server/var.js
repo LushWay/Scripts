@@ -8,12 +8,12 @@ export const time = {
 };
 
 export const stats = {
-	Bplace: db("blockPlace", "Поставлено блок"),
-	Bbreak: db("blockBreak", "Сломано блоков"),
-	FVlaunc: db("FVlaunc", "Фв запущено"),
-	FVboom: db("FVboom", "Фв взорвано"),
-	Hget: db("Hget", "Урона получено"),
-	Hgive: db("Hgive", "Урона нанесено"),
+	blocksPlaced: db("blockPlace", "Поставлено блок"),
+	blocksBreaked: db("blockBreak", "Сломано блоков"),
+	fireworksLaunched: db("FVlaunch", "Фв запущено"),
+	fireworksExpoded: db("FVboom", "Фв взорвано"),
+	damageRecieve: db("Hget", "Урона получено"),
+	damageGive: db("Hgive", "Урона нанесено"),
 	kills: db("kills", "Убийств"),
 	deaths: db("deaths", "Смертей"),
 };

@@ -26,6 +26,7 @@ else if (type === "survival") import("./Survival/index.js");
 
 setPlayerInterval(
 	(player) => {
+		if (player.location.y >= -61) return;
 		if (player.location.y < -60) player.addEffect(MinecraftEffectTypes.levitation, 2, 5, false);
 		if (player.location.y < -63)
 			player.teleport(

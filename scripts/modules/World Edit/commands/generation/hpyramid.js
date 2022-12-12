@@ -2,7 +2,7 @@ import { BlockLocation } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 import { Shape } from "../../modules/builders/ShapeBuilder.js";
 //import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
-import { SHAPES } from "../../modules/definitions/shapes.js";
+import { SHAPES } from "../../modules/utils/shapes.js";
 
 new XA.Command({
 	/*type: "wb"*/

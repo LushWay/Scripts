@@ -1,18 +1,12 @@
 import { world } from "@minecraft/server";
-import { PlayerOption, po, wo, WorldOption } from "../../lib/Class/XOptions.js";
+import { PlayerOption, po, wo, WorldOption } from "../../lib/Class/Options.js";
 
 import { XA } from "xapi.js";
-
-new WorldOption("simulatedplayer:name", "имя ботика", true);
-
-new WorldOption("simulatedplayer:time", "время за компом у ботика", true);
 
 new PlayerOption("anarchy:hideCoordinates", "Скрывает координаты при телепортации на анархию");
 
 new WorldOption("import:br", "Включает плагин батл рояля");
 
-new WorldOption("perm:владельцы", 'Ники владельцев через ", "', true);
-new WorldOption("perm:модеры", 'Ники модеров через ", "', true);
 new WorldOption("perm:data", "JS data", true);
 
 new WorldOption("chat:Cooldown", "0 что бы отключить (число)", true);

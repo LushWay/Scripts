@@ -1,11 +1,15 @@
-import { BlockLocation, Items, ItemStack, MinecraftBlockTypes, system, world } from "@minecraft/server";
-import { handler, setPlayerInterval, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
+import { BlockLocation, Location, MinecraftBlockTypes, MolangVariableMap, system, world } from "@minecraft/server";
+import { handler, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
 import { benchmark } from "../../lib/Benchmark.js";
+import { XPlayerOptions } from "../../lib/Class/XOptions.js";
 import { CommandCallback } from "../../lib/Command/Callback.js";
+import { CreatedInstances, EntityDatabase } from "../../lib/Database/Entity.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { Region } from "../Region/utils/Region.js";
+import { Cuboid } from "../World Edit/modules/utils/Cuboid.js";
+
 /**
  * @typedef {{x: number, z: number}} IRegionCords
  */
@@ -224,7 +228,7 @@ const tests = {
 	},
 	18: (ctx) => {
 		const region = Region.blockLocationInRegion(
-			XA.Entity.locationToBlockLocation(ctx.sender.location),
+			XA.Entity.vecToBlockLocation(ctx.sender.location),
 			ctx.sender.dimension.id
 		);
 		region.permissions.owners = region.permissions.owners.filter((e) => e !== ctx.sender.id);
@@ -233,7 +237,7 @@ const tests = {
 	19: (ctx) => {
 		console.warn("WARN");
 	},
-	ERROR: async () => {
+	20: async () => {
 		ThrowError(new ReferenceError("Test reference error"));
 		try {
 			await XA.dimensions.overworld.runCommandAsync("EEEEEE");
@@ -243,7 +247,7 @@ const tests = {
 		XA.runCommandX("TEST", { showError: true });
 		ThrowError(new TypeError("ADDITION_STACK_TEST"), 0, ["stack1", "stack2"]);
 	},
-	TIME: (ctx) => {
+	21: (ctx) => {
 		for (let a of [1000, 1000 * 60, 1000 * 60 * 60, 1000 * 60 * 60 * 60, 1000 * 60 * 60 * 60 * 24]) {
 			const date = new Date();
 			ctx.reply(a);
@@ -263,6 +267,57 @@ const tests = {
 					date.getMilliseconds() +
 					"ms"
 			);
+		}
+	},
+	22: (ctx) => {
+		/** @type {EntityDatabase<string>} */
+		const table = new EntityDatabase("db");
+
+		table.set("key", "sad");
+
+		const a = table.getCollection();
+
+		world.say(toStr(a));
+	},
+	23(ctx) {
+		const Options = XPlayerOptions("pr", {
+			e: { desc: "dec", value: true },
+			d: { desc: "d", value: false },
+		})(ctx.sender);
+
+		Options.e = true;
+
+		const db = new EntityDatabase("pr");
+		world.say(toStr(db.getCollection()));
+	},
+	24(ctx) {
+		const m = ctx.sender.getComponent("movement");
+	},
+	25(ctx) {
+		for (const key in CreatedInstances) {
+			const db = CreatedInstances[key];
+			const data = db.data();
+			world.say(toStr(data));
+		}
+	},
+	26(ctx) {
+		const pos1 = XA.Entity.vecToBlockLocation(ctx.sender.location);
+		const pos2 = pos1.offset(10, 10, 10);
+		const cube = new Cuboid(pos1, pos2);
+		const { xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin } = cube;
+
+		for (let x = cube.min.x; x <= cube.max.x; x++) {
+			for (let z = cube.min.z; z <= cube.max.z; z++) {
+				for (let y = cube.min.x; y <= cube.max.y; y++) {
+					/* It's checking if the block is on the edge of the cuboid. */
+					const q =
+						((x + xCenter == xMin || x + xCenter == xMax) && (y + yCenter == yMin || y + yCenter == yMax)) ||
+						((y + yCenter == yMin || y + yCenter == yMax) && (z + zCenter == zMin || z + zCenter == zMax)) ||
+						((z + zCenter == zMin || z + zCenter == zMax) && (x + xCenter == xMin || x + xCenter == xMax));
+
+					if (q) ctx.sender.dimension.spawnParticle("minecraft:endrod", new Location(x, y, z), new MolangVariableMap());
+				}
+			}
 		}
 	},
 };

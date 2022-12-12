@@ -7,6 +7,8 @@ const reasons = {
 };
 
 system.events.beforeWatchdogTerminate.subscribe((event) => {
-	event.cancel = true;
 	world.say("§cСобакаСутулая: §f" + reasons[event.terminateReason]);
+	event.cancel = true;
 });
+
+while (true) world.getPlayers();

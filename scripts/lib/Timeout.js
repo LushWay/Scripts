@@ -5,10 +5,12 @@ import { benchmark } from "./Benchmark.js";
 const AT = {};
 
 /**
- * @param {number} ticks
- * @param {Function} callback
- * @param {boolean} [loop]
- * @param {string | number} [id]
+ * It runs a function after a certain amount of ticks
+ * @param {number} ticks - The amount of ticks to wait before running the callback.
+ * @param {Function} callback - The function to be called after the timeout.
+ * @param {boolean} [loop] - Whether or not the timeout should loop.
+ * @param {string | number} [id] - The id of the timeout.
+ * @returns A function thats reset a timeout
  */
 export function Timeout(ticks, callback, loop, id, n = true) {
 	if (!id) {
@@ -21,7 +23,7 @@ export function Timeout(ticks, callback, loop, id, n = true) {
 
 	if (AT[id] >= ticks) {
 		AT[id] = 0;
-		const end = benchmark(id + "");
+		const end = benchmark(`${id} (${loop ? "loop " : ""}${ticks} ticks)`);
 		handler(callback, "Timeout");
 		const took_ticks = ~~(end() / 20);
 		if (took_ticks > ticks) console.warn(callback.toString());

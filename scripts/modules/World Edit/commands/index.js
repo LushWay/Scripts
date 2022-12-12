@@ -1,3 +1,4 @@
+import { multiload } from "../../../lib/Module/loader.js";
 import "./brush/brush.js";
 import "./brush/custom items.js";
 
@@ -20,11 +21,13 @@ import "./region/set.js";
 import "./clipboard/copy.js";
 import "./clipboard/paste.js";
 
-import "./generation/hcyl.js"
-import "./generation/cyl.js"
-import "./generation/hpyramid.js"
-import "./generation/pyramid.js"
-import "./generation/hsphere.js"
-import "./generation/sphere.js"
+import "./generation/hcyl.js";
+import "./generation/cyl.js";
+import "./generation/hpyramid.js";
+import "./generation/pyramid.js";
+import "./generation/hsphere.js";
+import "./generation/sphere.js";
 
-import "./tool/tool.js"
+import "./tool/tool.js";
+
+multiload((f) => import("./" + f + ".js"), [], "WB Commands");

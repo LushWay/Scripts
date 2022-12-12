@@ -1,6 +1,7 @@
 import {
 	BlockLocation,
 	Entity,
+	IEntityComponent,
 	ItemStack,
 	Location,
 	Player,
@@ -116,16 +117,12 @@ export const XEntity = {
 	},
 	/**
 	 * Tests if a entity is dead
-	 * @param {Entity} entity entity you want to test
+	 * @param {{hasComponent(s: string): boolean; getComponent(s: string): any}} entity entity you want to test
 	 * @returns {boolean}
 	 * @example isDead(Entity);
 	 */
 	isDead(entity) {
-		return (
-			entity.hasComponent("minecraft:health") &&
-			// @ts-ignore
-			entity.getComponent("minecraft:health").current <= 0
-		);
+		return entity.hasComponent("minecraft:health") && entity.getComponent("minecraft:health").current <= 0;
 	},
 	/**
 	 * Gets items count from inventory
@@ -188,7 +185,7 @@ export const XEntity = {
 	 * @param {Vector3} loc a location to convert
 	 * @returns {BlockLocation}
 	 */
-	locationToBlockLocation(loc) {
+	vecToBlockLocation(loc) {
 		return new BlockLocation(Math.floor(loc.x), Math.floor(loc.y), Math.floor(loc.z));
 	},
 	/**

@@ -1,21 +1,20 @@
-import { DynamicPropertiesDefinition, MinecraftEntityTypes, world } from "@minecraft/server";
+import { DynamicPropertiesDefinition, EntityTypes, MinecraftEntityTypes, world } from "@minecraft/server";
 
 export const CONFIG_DB = {
 	player: {
-		basic: 0,
+		basic: 980,
 	},
 	world: {
-		player: 0,
-		chests: 0,
-		options: 0,
-		region: 0,
-		kits: 0,
-		drop: 0,
-		roles: 0,
-		leaderboard: 0,
-		basic: 0,
-		buildRegion: 0,
-		speed_test: 0,
+		player: 1000,
+		chests: 100,
+		options: 1000,
+		region: 1000,
+		kits: 100,
+		drop: 10,
+		roles: 1000,
+		leaderboard: 100,
+		basic: 1000,
+		buildRegion: 1000,
 	},
 };
 
@@ -44,8 +43,19 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	try {
 		const e = new DynamicPropertiesDefinition();
-		for (const prop in CONFIG_DB.player) add(e, prop);
+		for (const prop in CONFIG_DB.player) add(e, prop, CONFIG_DB.player[prop]);
 		propertyRegistry.registerEntityTypeDynamicProperties(e, MinecraftEntityTypes.player);
+	} catch (e) {
+		console.warn(e);
+	}
+});
+
+world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
+	try {
+		const e = new DynamicPropertiesDefinition();
+		e.defineNumber("index");
+		e.defineString("name", 16);
+		propertyRegistry.registerEntityTypeDynamicProperties(e, EntityTypes.get("rubedo:database"));
 	} catch (e) {
 		console.warn(e);
 	}

@@ -11,7 +11,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@minecraft/*": ["node_modules/@minecraft/*/index.js"],
-			"@minecraft/server": ["node_modules/@minecraft/server/index.js"],
+			// "@minecraft/server": ["node_modules/@minecraft/server/index.js"],
 			"xapi.js": ["scripts/xapi.js"],
 			"config.js": ["scripts/config.js"]
 		},

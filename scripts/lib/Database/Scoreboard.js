@@ -1,6 +1,17 @@
 import { Entity, world } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
 
+/**
+ * @template Func, [This = any]
+ * @param {Func} func
+ * @param {This} context
+ * @returns {Func}
+ */
+function BIND(func, context) {
+	if (typeof func !== "function") return func;
+	return func.bind(context);
+}
+
 export class ScoreboardDB {
 	scoreboard;
 	/**
@@ -21,20 +32,20 @@ export class ScoreboardDB {
 		}
 	}
 	/**
-	 * @param {string} option
+	 * @param {string} name
 	 * @param {number} value
 	 */
-	set(option, value) {
-		DIMENSIONS.overworld.runCommandAsync(`scoreboard players set "${option}" ${this.name} ${value}`);
+	set(name, value) {
+		DIMENSIONS.overworld.runCommandAsync(`scoreboard players set "${name}" ${this.name} ${value}`);
 	}
 	/**
 	 *
-	 * @param {string} option
+	 * @param {string} name
 	 * @returns
 	 */
-	get(option) {
+	get(name) {
 		try {
-			return this.scoreboard.getScores().find((e) => e.participant.displayName === option).score;
+			return this.scoreboard.getScores().find((e) => e.participant.displayName === name).score;
 		} catch (e) {
 			return 0;
 		}

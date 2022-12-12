@@ -1,6 +1,6 @@
 import { Player, world } from "@minecraft/server";
 import { IS, setTickInterval, setTickTimeout, XA } from "xapi.js";
-import { WorldOption } from "../../lib/Class/XOptions.js";
+import { WorldOption } from "../../lib/Class/Options.js";
 import { Atp } from "../Server/portals.js";
 import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
 import { quene } from "./var.js";
@@ -14,10 +14,11 @@ let minpl = 2,
 	shorttime = 3;
 
 /**
- *
- * @param {string} sound
- * @param {string} text
+ * It plays a sound and sends a message to every player in the quene.
+ * @param {string} sound - The sound to play.
+ * @param {string} text - The text that will be displayed to the player.
  */
+
 function forEveryQuenedPlayer(sound, text) {
 	for (const name in quene) {
 		const player = XA.Entity.fetch(name);
@@ -116,7 +117,7 @@ bbr.literal({ name: "quit", description: "Выйти из очереди" }).exe
 });
 
 bbr.literal({ name: "quitgame", description: "Выйти из игры" }).executes((ctx) => {
-	if (ctx.sender.hasTag("locktp:br")) {
+	if (ctx.sender.hasTag("locktp:Battle Royal")) {
 		delete br.players[br.players.findIndex((e) => e.name == ctx.sender.name)];
 		br.tags.forEach((e) => ctx.sender.removeTag(e));
 		ctx.reply("§aВы вышли из игры.");

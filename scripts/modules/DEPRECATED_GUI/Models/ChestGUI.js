@@ -20,7 +20,7 @@ import {
 	ModalFormResponse,
 } from "@minecraft/server-ui";
 import { sleep, XA } from "xapi.js";
-import { OPTIONS, po, wo, WORLDOPTIONS } from "../../../lib/Class/XOptions.js";
+import { OPTIONS, po, wo, WORLDOPTIONS } from "../../../lib/Class/Options.js";
 import { Wallet } from "../../../lib/Class/XWallet.js";
 import { LeaderboardBuild } from "../../DEPRECATED_Leaderboards/LeaderboardBuilder.js";
 import { Atp } from "../../Server/portals.js";
@@ -563,7 +563,7 @@ export const ACTIONS1 = {
 		form.textField("Имя", "Оставь пустым для отмены", "§");
 		OpenForm(his, his.player, form, (data) => {
 			if (data.isCanceled || !data.formValues[0]) return;
-			const ent = his.player.dimension.spawnEntity("f:t", XA.Entity.locationToBlockLocation(his.player.location));
+			const ent = his.player.dimension.spawnEntity("f:t", XA.Entity.vecToBlockLocation(his.player.location));
 			ent.nameTag = data.formValues[0];
 		});
 	},
@@ -574,7 +574,7 @@ export const ACTIONS1 = {
 		form.textField("Стиль", "gray | orange | green", "");
 		OpenForm(his, his.player, form, (data) => {
 			if (data.isCanceled || !data.formValues[0] || !data.formValues[1]) return;
-			const l = XA.Entity.locationToBlockLocation(his.player.location);
+			const l = XA.Entity.vecToBlockLocation(his.player.location);
 			world.say(
 				LeaderboardBuild.createLeaderboard(
 					data.formValues[0],
@@ -644,11 +644,11 @@ export const ACTIONS1 = {
 				time.day.seconds.eGet(his.player),
 				stats.kills.eGet(his.player),
 				stats.deaths.eGet(his.player),
-				stats.Hget.eGet(his.player),
-				stats.Hgive.eGet(his.player),
-				stats.Bplace.eGet(his.player),
-				stats.Bbreak.eGet(his.player),
-				stats.FVlaunc.eGet(his.player)
+				stats.damageRecieve.eGet(his.player),
+				stats.damageGive.eGet(his.player),
+				stats.blocksPlaced.eGet(his.player),
+				stats.blocksBreaked.eGet(his.player),
+				stats.fireworksLaunched.eGet(his.player)
 			)
 		);
 		OpenForm(his, his.player, form);

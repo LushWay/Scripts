@@ -1,4 +1,4 @@
-import { wo, WORLDOPTIONS } from "../../../lib/Class/XOptions.js";
+import { wo, WORLDOPTIONS } from "../../../lib/Class/Options.js";
 
 import { IS, XA } from "xapi.js";
 const opt = new XA.Command({

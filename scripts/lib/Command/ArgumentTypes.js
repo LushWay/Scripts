@@ -40,6 +40,7 @@ export class StringArgumentType {
 	}
 }
 
+/** @type {import("./ArgumentTypes.js").IArgumentType} */
 export class IntegerArgumentType {
 	type;
 	typeName = "int";
@@ -61,7 +62,7 @@ export class FloatArgumentType {
 	typeName = "float";
 	matches(value) {
 		return {
-			success: boolean(value?.match(/^\d+\.\d+$/)?.[0]),
+			success: Boolean(value?.match(/^\d+\.\d+$/)?.[0]),
 			value: parseInt(value),
 		};
 	}
@@ -93,7 +94,7 @@ export class BooleanArgumentType {
 	typeName = "boolean";
 	matches(value) {
 		return {
-			success: boolean(value?.match(/^(true|false)$/)?.[0]),
+			success: Boolean(value?.match(/^(true|false)$/)?.[0]),
 			value: value == "true" ? true : false,
 		};
 	}
@@ -125,7 +126,7 @@ export class TargetArgumentType {
 	typeName = "Target";
 	matches(value) {
 		return {
-			success: boolean(value?.match(/^(@.|"[\s\S]+")$/)?.[0]),
+			success: Boolean(value?.match(/^(@.|"[\s\S]+")$/)?.[0]),
 			value: value,
 		};
 	}

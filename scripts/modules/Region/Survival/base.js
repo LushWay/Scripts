@@ -56,7 +56,7 @@ base.executes((ctx) => {
 	}
 	if (XA.Entity.getScore(ctx.sender, "inv") == 1) return ctx.reply("§cБазу можно поставить только на анархии");
 
-	const block = ctx.sender.dimension.getBlock(XA.Entity.locationToBlockLocation(ctx.sender.location));
+	const block = ctx.sender.dimension.getBlock(XA.Entity.vecToBlockLocation(ctx.sender.location));
 
 	if (block.typeId !== "minecraft:chest") return ctx.reply(lang.nobase);
 
@@ -179,7 +179,7 @@ base.literal({ name: "list", description: "Список баз" }).executes((ctx
 setTickInterval(
 	() => {
 		for (const base of XA.dimensions.overworld.getEntities({ type: "s:base" })) {
-			const block = base.dimension.getBlock(XA.Entity.locationToBlockLocation(base.location));
+			const block = base.dimension.getBlock(XA.Entity.vecToBlockLocation(base.location));
 			if (block && block.typeId === "minecraft:barrel") continue;
 
 			base.nameTag

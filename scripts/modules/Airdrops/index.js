@@ -167,10 +167,10 @@ setTickInterval(
 			const cl = ent.dimension.getEntities(qq);
 			if (!cl) return ent.removeTag("держит");
 			const block = ent.dimension.getBlock(
-				XA.Entity.locationToBlockLocation(new Location(ent.location.x, ent.location.y - 4, ent.location.z))
+				XA.Entity.vecToBlockLocation(new Location(ent.location.x, ent.location.y - 4, ent.location.z))
 			);
 			const block2 = ent.dimension.getBlock(
-				XA.Entity.locationToBlockLocation(new Location(ent.location.x, ent.location.y - 1, ent.location.z))
+				XA.Entity.vecToBlockLocation(new Location(ent.location.x, ent.location.y - 1, ent.location.z))
 			);
 			if (block2.typeId != "minecraft:air") {
 				XA.Entity.despawn(ent);

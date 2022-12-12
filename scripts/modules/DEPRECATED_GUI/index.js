@@ -14,6 +14,7 @@ const guis = {};
  * @param {(player: Player) => void} permission
  * @param {string} id
  * @param {string} startPage
+ * @
  */
 function identyGui(item, permission = () => true, id = "id", startPage = DEFAULT_STATIC_PAGE_ID) {
 	guis[item] = {

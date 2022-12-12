@@ -1,5 +1,5 @@
 import { setTickTimeout, XA } from "xapi.js";
-import { OPTIONS, wo, WORLDOPTIONS } from "../../lib/Class/XOptions.js";
+import { OPTIONS, wo, WORLDOPTIONS } from "../../lib/Class/Options.js";
 import { Page } from "./Models/Page.js";
 
 /**

@@ -1,6 +1,4 @@
 export const text = {
-  "title.kill.bow": (a) => `§gВы застрелили §6${a}`,
-  "title.kill.hit": (a) => `§gВы убили §6${a}`,
   "api.name": () => "Smelly API",
   "api.error.unknown": () => "An unknown error has occured.",
   "api.database.error.table_name": (a, b) =>

@@ -3,7 +3,7 @@ import { XA } from "xapi.js";
 
 export class zone {
 	/**
-	 *
+	 * It's a function that teleports the player to the edge of the zone.
 	 * @param {Player} player
 	 * @param {boolean} isX
 	 * @param {BlockLocation} zone
@@ -25,7 +25,7 @@ export class zone {
 	 * @param {BlockLocation} zone
 	 */
 	static pret(player, isX, zone) {
-		const floored = XA.Entity.locationToBlockLocation(player.location);
+		const floored = XA.Entity.vecToBlockLocation(player.location);
 		const l = isX ? [zone.x, floored.y + 1, floored.z] : [floored.x, floored.y + 1, zone.z];
 
 		const loc = new Location(l[0], l[1], l[2]);

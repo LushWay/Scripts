@@ -1,4 +1,4 @@
-import { BlockLocation, Entity, Location, Player, world } from "@minecraft/server";
+import { BlockLocation, Entity, Location, MinecraftEntityTypes, Player, world } from "@minecraft/server";
 import { setTickInterval, setTickTimeout, XA } from "xapi.js";
 import { ScoreboardDB } from "../../../lib/Database/Scoreboard.js";
 import { DIMENSIONS } from "../../../lib/List/dimensions.js";
@@ -6,30 +6,6 @@ import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
 import { Region } from "../utils/Region.js";
 import { InRaid } from "../var.js";
-
-const pvpDB = new ScoreboardDB("pvp");
-
-setTickInterval(() => {
-	for (const id in InRaid) {
-		const player = XA.Entity.fetch(id);
-		if (player) {
-			if (pvpDB.eGet(player) === 0) {
-				player.tell("§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны.");
-				player.playSound("mob.wolf.bark");
-			}
-			pvpDB.eSet(player, InRaid[id]);
-			delete InRaid[id];
-			continue;
-		}
-
-		InRaid[id]--;
-		if (InRaid[id] <= 0) {
-			// Время вышло, игрока не было
-			delete InRaid[id];
-			continue;
-		}
-	}
-}, 20);
 
 /**
  *

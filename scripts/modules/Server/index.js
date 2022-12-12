@@ -1,18 +1,8 @@
-import {
-	EnchantmentList,
-	Items,
-	ItemStack,
-	Location,
-	MinecraftDimensionTypes,
-	MinecraftEnchantmentTypes,
-	MolangVariableMap,
-	Player,
-	world,
-} from "@minecraft/server";
+import { Location, MinecraftDimensionTypes, MolangVariableMap, Player, world } from "@minecraft/server";
 
-import { po, wo } from "../../lib/Class/XOptions.js";
+import { wo } from "../../lib/Class/Options.js";
 
-import { IS, setTickInterval, XA } from "xapi.js";
+import { setTickInterval, XA } from "xapi.js";
 
 /**======================
  **       PLUGINS
@@ -25,6 +15,7 @@ import "./commands/sound.js";
 import "./commands/world.js";
 import "./options.js";
 import "./tool.js";
+import "./pvp.js";
 import { stats, time } from "./var.js";
 
 /**
@@ -45,7 +36,7 @@ setTickInterval(
 				XA.Entity.inRadius(
 					// @ts-expect-error
 					new Location(...wo.G("spawn:pos").split(" ")),
-					XA.Entity.locationToBlockLocation(f.location),
+					XA.Entity.vecToBlockLocation(f.location),
 					200
 				)
 			)
@@ -54,7 +45,7 @@ setTickInterval(
 				XA.Entity.inRadius(
 					// @ts-expect-error
 					new Location(...wo.G("minigames:pos").split(" ")),
-					XA.Entity.locationToBlockLocation(f.location),
+					XA.Entity.vecToBlockLocation(f.location),
 					50
 				)
 			)
@@ -66,7 +57,7 @@ setTickInterval(
 					if (!lore || lore == "§r§н") continue;
 					if (lore == "§r§б") f.addTag("блоки");
 					if (lore == "§r§и") f.addTag("игроки");
-					stats.FVlaunc.eAdd(sender, 1);
+					stats.fireworksLaunched.eAdd(sender, 1);
 					f.addTag("l:" + sender.name);
 				}
 			}
@@ -86,7 +77,7 @@ setTickInterval(
 			// 		continue;
 			// 	} catch (e) {}
 			let a = [...world.getPlayers()].find((e) => e.name == XA.Entity.getTagStartsWith(f, "l:"));
-			if (a) stats.FVboom.eAdd(a, 1);
+			if (a) stats.fireworksExpoded.eAdd(a, 1);
 			f.dimension.createExplosion(new Location(f.location.x, f.location.y, f.location.z), type, boom);
 			f.kill();
 			boom.breaksBlocks = false;
@@ -96,16 +87,12 @@ setTickInterval(
 	"serverBoomShit"
 );
 
-const obj = "lockedtitle";
-XA.objectives.push({ id: obj, watch: true });
-
 setTickInterval(
 	() => {
-		XA.runCommandX(`scoreboard players add @a ${obj} 0`);
 		for (const pl of world.getPlayers({ excludeTags: ["br:inGame"] }))
 			if (
-				pl.dimension.getBlock(XA.Entity.locationToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))
-					?.typeId === "minecraft:deny"
+				pl.dimension.getBlock(XA.Entity.vecToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))?.typeId ===
+				"minecraft:deny"
 			)
 				pl.triggerEvent("spawn");
 
@@ -113,8 +100,8 @@ setTickInterval(
 			families: ["monster"],
 		}))
 			if (
-				ent.dimension.getBlock(XA.Entity.locationToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0))
-					.typeId === "minecraft:deny"
+				ent.dimension.getBlock(XA.Entity.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
+				"minecraft:deny"
 			)
 				XA.Entity.despawn(ent);
 	},
@@ -160,19 +147,6 @@ setTickInterval(
 			// }
 
 			/*================================ PVP MODE ==============================*/
-			if (
-				wo.Q("server:pvpmode:enable") &&
-				po.Q("title:pvpmode", player) &&
-				!XA.Entity.getTagStartsWith(player, "lockpvp:") &&
-				XA.Entity.getScore(player, "pvp") > 0
-			) {
-				const score = XA.Entity.getScore(player, "pvp");
-				const max = wo.Q("server:pvpmode:cooldown") ?? 15;
-				const q = (p) => (score == max ? `§4${p}` : "");
-				if (XA.Entity.getScore(player, "lockedtitle") <= 0) {
-					player.onScreenDisplay.setActionBar(`${q("»")} §6PvP: ${score} ${q("«")}`);
-				}
-			}
 
 			/*================== Блокировка незера =================*/
 			if (wo.Q("lock:nether")) {
@@ -205,17 +179,6 @@ setTickInterval(
 */
 setTickInterval(
 	() => {
-		/*================== -sit доработка =================*/
-		for (const e of XA.Entity.getEntitys()) {
-			if (e.typeId !== "s:it") continue;
-			const pl = XA.Entity.getClosetsEntitys(e, 1, "minecraft:player", 1, false);
-			if (pl.length < 1) e.triggerEvent("kill");
-		}
-		/*===================================================*/
-
-		/*================== -base доработка =================*/
-
-		/*===================================================*/
 		for (const p of world.getPlayers()) {
 			// let q = true;
 			//* Переключение инвентаря
@@ -268,17 +231,9 @@ setTickInterval(
 					p.runCommandAsync("music stop");
 				}
 			}
-			/*===================================================*/
-
-			/*================== ПВП -сек =================*/
-			if (wo.Q("server:pvpmode:enable"))
-				try {
-					p.runCommandAsync("scoreboard players remove @s[scores={pvp=1..}] pvp 1");
-				} catch (e) {}
-			/*===================================================*/
 
 			/*================== Другие таймеры =================*/
-			if (wo.Q("timer:enable")) {
+			if (false && wo.Q("timer:enable")) {
 				time.all.seconds.eAdd(p, 1);
 				if (time.all.seconds.eGet(p) >= 60) {
 					time.all.minutes.eAdd(p, 1);
@@ -314,7 +269,6 @@ setTickInterval(
 				time.day.seconds.reset();
 				world.say("Days reseted");
 			}
-			p.runCommandAsync("scoreboard players remove @s[scores={lockedtitle=1..}] lockedtitle 1");
 		}
 	},
 	20,
@@ -323,15 +277,11 @@ setTickInterval(
 
 setTickInterval(
 	() => {
-		//XA.runCommandAsync('music stop')
 		for (const p of world.getPlayers()) {
 			if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
 				const lore = XA.Entity.getHeldItem(p).getLore();
 				if (lore[0] == "Sound") {
-					const s = {};
-					//s.pitch = lore[2] ?? 0
-					//s.volume = 4
-					p.playSound(lore[1], s);
+					p.playSound(lore[1]);
 				}
 			}
 		}
@@ -339,20 +289,6 @@ setTickInterval(
 	40,
 	"serverToolShit"
 );
-
-const casda = new XA.Command({
-	name: "name",
-	description: "",
-	requires: (p) => IS(p.id, "moderator"),
-})
-	.string("Name")
-	.executes((ctx) => {
-		ctx.sender.nameTag = ctx.args.join("\n");
-		console.warn(ctx.sender.name + " => " + ctx.sender.nameTag);
-	});
-casda.literal({ name: "reset", description: "Возвращает" }).executes((ctx) => {
-	ctx.sender.nameTag = ctx.sender.name;
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -362,55 +298,3 @@ casda.literal({ name: "reset", description: "Возвращает" }).executes((
 | 
 | 
 */
-XA.objectives.push({ id: "pvp", watch: true });
-world.events.entityHurt.subscribe(
-	(data) => {
-		if (data.cause != "fire" && data.cause != "fireworks" && data.cause != "projectile") return;
-		if (
-			data.hurtEntity.typeId == "t:hpper_minecart" ||
-			!wo.Q("server:pvpmode:enable") ||
-			XA.Entity.getTagStartsWith(data.hurtEntity, "lockpvp:")
-		)
-			return;
-		let lastHit = false;
-		// @ts-ignore
-		if (data.damage >= data.hurtEntity.getComponent("minecraft:health").current) lastHit = true;
-		if (data?.damagingEntity instanceof Player) {
-			//Всякая фигня без порядка
-			data.damagingEntity.runCommandAsync(
-				`scoreboard players set @s pvp ${wo.Q("server:pvpmode:cooldown") ? wo.Q("server:pvpmode:cooldown") : 15}`
-			);
-			stats.Hgive.eAdd(data.damagingEntity, data.damage);
-			if (lastHit) stats.kills.eAdd(data.damagingEntity, 1);
-
-			//Если лук, визуализируем
-			if (data.cause == "projectile" && wo.Q("server:bowhit")) {
-				if (po.Q("pvp:bowhitsound", data.damagingEntity))
-					data.damagingEntity.playSound("", {
-						location: new Location(
-							data.damagingEntity.location.x,
-							data.damagingEntity.location.y,
-							data.damagingEntity.location.z
-						),
-						pitch: data.damage / 2,
-						volume: 1,
-					});
-
-				if (po.Q("pvp:bowhittitle", data.damagingEntity) && data.hurtEntity instanceof Player) {
-					data.damagingEntity.onScreenDisplay.setActionBar(
-						lastHit ? XA.Lang.lang["title.kill.bow"](data.hurtEntity.name) : `§c-${data.damage}♥`
-					);
-					data.damagingEntity.runCommandAsync("scoreboard players set @s lockedtitle 2");
-				}
-			}
-			if (data.cause != "projectile" && lastHit && data.hurtEntity instanceof Player)
-				data.damagingEntity.onScreenDisplay.setActionBar(XA.Lang.lang["title.kill.hit"](data.hurtEntity.name));
-		}
-		if (data?.hurtEntity?.typeId != "minecraft:player") return;
-		data.hurtEntity.runCommandAsync(
-			`scoreboard players set @s pvp ${wo.G("server:pvpmode:cooldown") ? wo.G("server:pvpmode:cooldown") : 15}`
-		);
-		stats.Hget.eAdd(data.hurtEntity, data.damage);
-	},
-	{ entities: [], entityTypes: ["t:hpper_minecart"] }
-);

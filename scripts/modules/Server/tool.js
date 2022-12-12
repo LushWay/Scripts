@@ -1,4 +1,4 @@
-import { BlockRaycastOptions, Player, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 
 import { XA } from "xapi.js";
 import { P } from "../../lib/List/particles.js";
@@ -65,7 +65,7 @@ world.events.beforeItemUse.subscribe((data) => {
 			data.source.runCommandAsync(lore[1]);
 		}
 		if (lore && lore[0] == "viewTP") {
-			const block = data.source.getBlockFromViewVector(new BlockRaycastOptions());
+			const block = data.source.getBlockFromViewVector({});
 			if (block && block.location)
 				data.source.teleport(block.location, data.source.dimension, data.source.rotation.x, data.source.rotation.y);
 		}

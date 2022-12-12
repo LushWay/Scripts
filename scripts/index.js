@@ -1,1 +1,2 @@
-import "xapi.js";
+// import "xapi.js";
+import "help.js";

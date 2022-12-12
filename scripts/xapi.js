@@ -28,11 +28,12 @@ import { Timeout } from "./lib/Timeout.js";
 import { XrunCommand } from "./lib/XrunCommand.js";
 
 // Modules and undeletable scoreboards
+import { XCooldown } from "./lib/Class/XCooldown.js";
+import { XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
+import { XRequest } from "./lib/Class/XRequest.js";
 import { load } from "./lib/Module/loader.js";
 import "./lib/Setup/registryScore.js";
-import "./modules/modules.js";
-import { XCooldown } from "./lib/Class/XCooldown.js";
-import { XRequest } from "./lib/Class/XRequest.js";
+import "./modules/import.js";
 
 /**
  * Class with all X-API features
@@ -43,6 +44,9 @@ export class XA {
 	static Command = XCommand;
 	static Cooldown = XCooldown;
 	static Request = XRequest;
+
+	static PlayerOptions = XPlayerOptions;
+	static WorldOptions = XOptions;
 
 	static tables = {
 		chests: new XInstantDatabase(world, "chests"),

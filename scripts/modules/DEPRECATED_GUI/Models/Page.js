@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { Enchantment, Items, ItemStack, MinecraftEnchantmentTypes } from "@minecraft/server";
+import { Enchantment, ItemStack, ItemTypes, MinecraftEnchantmentTypes } from "@minecraft/server";
 
 /**
  * @typedef {Object} Item a gui item
@@ -136,7 +136,7 @@ export class Page {
 		if (!id) {
 			Iitem = { type: null };
 		} else {
-			const item = new ItemStack(Items.get(id.includes(":") ? id : "minecraft:" + id), amount, data);
+			const item = new ItemStack(ItemTypes.get(id.includes(":") ? id : "minecraft:" + id), amount, data);
 			if (name) item.nameTag = "§m§n§m§r" + name;
 			if (lore) item.setLore(lore);
 			Iitem = Page.itemStackToItem(item, action);

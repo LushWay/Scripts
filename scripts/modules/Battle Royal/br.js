@@ -1,7 +1,7 @@
 import { BlockLocation, Player, world } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
+import { wo } from "../../lib/Class/Options.js";
 import { Subscriber } from "../../lib/Class/XEvents.js";
-import { wo } from "../../lib/Class/XOptions.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
 import { rtp } from "./rtp.js";
@@ -46,10 +46,15 @@ class BattleRoyal {
 			time: 0,
 		};
 		this.events = {};
-		this.tags = ["lockpvp:br", "locktp:br", "br:alive", "br:inGame"];
+		this.tags = ["lockpvp:Battle royal", "locktp:Battle royal", "br:alive", "br:inGame"];
 	}
+	/**
+	 * Waiting for the player to respawn.
+	 * @param {string} name Name of the player
+	 */
 	async waitToRespawn(name) {
 		let C = 0;
+
 		while ((await XA.runCommandX("testfor " + name)).successCount < 1 && C < 100) {
 			await sleep(5);
 			C++;
@@ -67,6 +72,7 @@ class BattleRoyal {
 			// Ресет
 			this.quene.open = false;
 			this.quene.time = 0;
+
 			// Варн
 			if (!wo.Q("br:gamepos") || !wo.Q("br:time"))
 				return this.end("error", "§cТребуемые для запуска значения (br:time, br:gamepos) не выставлены.");
@@ -154,7 +160,7 @@ class BattleRoyal {
 					for (const p of world.getPlayers()) {
 						const rmax = new BlockLocation(this.center.x + this.game.rad, 0, this.center.z + this.game.rad),
 							rmin = new BlockLocation(this.center.x - this.game.rad, 0, this.center.z - this.game.rad);
-						const l = XA.Entity.locationToBlockLocation(p.location);
+						const l = XA.Entity.vecToBlockLocation(p.location);
 						if (l.x >= rmax.x && l.x <= rmax.x + 10 && l.z <= rmax.z && l.z >= rmin.z) zone.ret(p, true, rmax);
 						if (l.x >= rmax.x - 10 && l.x <= rmax.x && l.z <= rmax.z && l.z >= rmin.z) zone.pret(p, true, rmax);
 
@@ -280,33 +286,10 @@ class BattleRoyal {
 		for (const p of world.getDimension("overworld").getEntities(q)) {
 			const rmax = new BlockLocation(this.center.x + this.game.startrad, 0, this.center.z + this.game.startrad),
 				rmin = new BlockLocation(this.center.x - this.game.startrad, 0, this.center.z - this.game.startrad);
-			const l = XA.Entity.locationToBlockLocation(p.location);
+			const l = XA.Entity.vecToBlockLocation(p.location);
 			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x) p.kill();
 		}
-		this.players = [];
-		this.reward = 0;
-		this.pos = { x: 256, z: 256 };
-		this.time = {
-			min: 0,
-			sec: 0,
-			tick: 20,
-		};
-		this.game = {
-			startrad: 0,
-			started: false,
-			rad: 0,
-			minrad: 0,
-		};
-		this.center = {
-			x: 0,
-			z: 0,
-		};
-		this.quene = {
-			open: false,
-			time: 0,
-		};
-		this.events = {};
-		this.tags = ["lockpvp:br", "locktp:br", "br:alive", "br:inGame"];
+		Object.assign(this, new BattleRoyal());
 	}
 }
 

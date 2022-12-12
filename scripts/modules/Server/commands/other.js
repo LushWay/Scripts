@@ -1,6 +1,20 @@
-import { BlockLocation, Items, ItemStack, Location } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { BlockLocation, ItemStack, ItemTypes, Location } from "@minecraft/server";
+import { IS, setTickInterval, XA } from "xapi.js";
 import { global } from "../var.js";
+
+const casda = new XA.Command({
+	name: "name",
+	description: "",
+	requires: (p) => IS(p.id, "moderator"),
+})
+	.string("Name")
+	.executes((ctx) => {
+		ctx.sender.nameTag = ctx.args.join("\n");
+		console.warn(ctx.sender.name + " => " + ctx.sender.nameTag);
+	});
+casda.literal({ name: "reset", description: "Возвращает" }).executes((ctx) => {
+	ctx.sender.nameTag = ctx.sender.name;
+});
 
 const daily_reward_hours = 24;
 const kit = new XA.Command({
@@ -118,7 +132,7 @@ kit
 		let inv = [];
 		for (let i = 0; i < b.size; i++) {
 			/** * @type {ItemStack} */ const item = b.getItem(i);
-			if (item) inv.push(item.id + " " + item.amount + " " + item.data);
+			if (item) inv.push(item.typeId + " " + item.amount + " " + item.data);
 		}
 		ctx.reply(`§fДобавлен кит с такими предметами:\n  §7` + inv.join("\n  "));
 		let cd = daily_reward_hours;
@@ -151,7 +165,7 @@ kit
 		let inv = [];
 		for (let i = 0; i < b.size; i++) {
 			/** * @type {ItemStack} */ const item = b.getItem(i);
-			if (item) inv.push(item.id + " " + item.amount + " " + item.data);
+			if (item) inv.push(item.typeId + " " + item.amount + " " + item.data);
 		}
 		ctx.reply(`§fДобавлен кит с такими предметами:\n  §7` + inv.join("\n  "));
 		XA.tables.kits.set(n, inv);
@@ -188,13 +202,13 @@ kit
 		const kit = XA.tables.kits.get(n);
 		ctx.sender.runCommandAsync("setblock ~~~ chest");
 		/** * @type {BlockInventoryComponentContainer} */ const inv = ctx.sender.dimension
-			.getBlock(XA.Entity.locationToBlockLocation(ctx.sender.location))
+			.getBlock(XA.Entity.vecToBlockLocation(ctx.sender.location))
 			.getComponent("inventory").container;
 		for (const [i, k] of kit.entries()) {
 			inv.setItem(
 				i,
 				new ItemStack(
-					Items.get(k.split(" ")[0].includes(":") ? k.split(" ")[0] : "minecraft:" + k.split(" ")[0]),
+					ItemTypes.get(k.split(" ")[0].includes(":") ? k.split(" ")[0] : "minecraft:" + k.split(" ")[0]),
 					Number(k.split(" ")[1]),
 					Number(k.split(" ")[2])
 				)
@@ -216,14 +230,26 @@ new XA.Command({
 }).executes((ctx) => {
 	ctx.reply(`☺ ${global.Radius}`);
 });
+
 new XA.Command({ name: "sit", description: "" /*type: "public"*/ }).executes((ctx) => {
 	const entity = ctx.sender.dimension.spawnEntity(
 		"s:it",
 		new Location(ctx.sender.location.x, ctx.sender.location.y - 0.1, ctx.sender.location.z)
 	);
 	entity.addTag("sit:" + ctx.sender.name);
-	ctx.sender.runCommandAsync(`ride @s start_riding @e[type=s:it,tag="sit:${ctx.sender.name}",c=1] teleport_rider`);
+	entity.getComponent("rideable").addRider(ctx.sender);
 });
+setTickInterval(
+	() => {
+		for (const e of XA.Entity.getEntitys("s:it")) {
+			const players = XA.Entity.getClosetsEntitys(e, 1, "minecraft:player", 1, false);
+			if (players.length < 1) e.triggerEvent("kill");
+		}
+	},
+	20,
+	"sit entity clear"
+);
+
 const cos = new XA.Command({
 	name: "i",
 	description: "Создает динамический список предметов",

@@ -1,5 +1,5 @@
 import { IS, XA } from "xapi.js";
-import { configuration } from "../../config.js";
+import { WB_CONFIG } from "../../config.js";
 
 const WECommand = new XA.Command({
 	/*type: "wb"*/
@@ -15,5 +15,5 @@ WECommand.literal({
 	description: "Get WorldEdit version",
 	aliases: ["ver"],
 }).executes((ctx) => {
-	ctx.reply(`Current World Edit Version: ${configuration.VERSION}`);
+	ctx.reply(`Current World Edit Version: ${WB_CONFIG.VERSION}`);
 });

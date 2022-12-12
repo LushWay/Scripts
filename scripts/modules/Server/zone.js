@@ -1,5 +1,5 @@
 import { Location, MolangVariableMap, Player, world } from "@minecraft/server";
-import { wo } from "../../lib/Class/XOptions.js";
+import { wo } from "../../lib/Class/Options.js";
 import { setTickInterval, XA } from "../../xapi.js";
 import { Atp } from "./portals.js";
 import { global } from "./var.js";
@@ -26,7 +26,7 @@ function ret(player, isX, zone, plus) {
  * @param {{x: number, z: number}} zone
  */
 function pret(player, isX, zone) {
-	const floored = XA.Entity.locationToBlockLocation(player.location);
+	const floored = XA.Entity.vecToBlockLocation(player.location);
 	const l = isX ? [zone.x, floored.y + 1, floored.z] : [floored.x, floored.y + 1, zone.z];
 
 	const loc = new Location(l[0], l[1], l[2]);
