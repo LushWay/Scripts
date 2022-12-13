@@ -6,7 +6,7 @@ interface IConfiguration {
 		errPath: "chat" | "console";
 	};
 	chat: {
-		chatCooldown: number;
+		cooldown: number;
 		range: number;
 	};
 	module: {
@@ -16,3 +16,8 @@ interface IConfiguration {
 	commandPrefix: string;
 }
 type Vector3 = import("@minecraft/server").Vector3;
+interface IanyDB<K = string, V = any> {
+	get(k: K): V;
+	set(k: K): void;
+	delete(k: K): boolean;
+}

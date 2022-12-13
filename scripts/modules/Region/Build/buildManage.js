@@ -6,7 +6,7 @@ import { JOIN_EVENTS } from "../../OnJoin/events.js";
 import { Region } from "../utils/Region.js";
 import { ClearRegion, CreateRegion, fillRegion, prompt, teleportToRegion } from "./utils.js";
 
-const DB = new XA.instantDB(world, "buildRegion");
+const DB = XA.tables.buildRegion;
 
 JOIN_EVENTS.playerGuide.subscribe((player) => {
 	player.playSound("random.levelup");

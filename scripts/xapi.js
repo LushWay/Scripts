@@ -29,7 +29,7 @@ import { XrunCommand } from "./lib/XrunCommand.js";
 
 // Modules and undeletable scoreboards
 import { XCooldown } from "./lib/Class/XCooldown.js";
-import { XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
+import { wo, XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
 import { XRequest } from "./lib/Class/XRequest.js";
 import { load } from "./lib/Module/loader.js";
 import "./lib/Setup/registryScore.js";
@@ -53,6 +53,9 @@ export class XA {
 		player: new XInstantDatabase(world, "player"),
 		kits: new XInstantDatabase(world, "kits"),
 		drops: new XInstantDatabase(world, "drop"),
+		basic: new XInstantDatabase(world, "basic"),
+		region: new XInstantDatabase(world, "region"),
+		buildRegion: new XInstantDatabase(world, "buildRegion"),
 		i: new XItemDatabase("items"),
 	};
 	static Lang = {

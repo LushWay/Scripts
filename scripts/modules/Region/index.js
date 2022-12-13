@@ -1,7 +1,7 @@
-import { MinecraftEffectTypes, world } from "@minecraft/server";
+import { MinecraftEffectTypes } from "@minecraft/server";
 import { setPlayerInterval, ThrowError, XA } from "xapi.js";
 
-const DB = new XA.instantDB(world, "basic");
+const DB = XA.tables.basic;
 const key = "server.type";
 
 const VALUE = {

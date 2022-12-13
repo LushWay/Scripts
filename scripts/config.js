@@ -11,7 +11,7 @@ export const CONFIG = {
 		loadAwait: true,
 	},
 	chat: {
-		chatCooldown: 0, // this is a cool down when players type in chat
+		cooldown: 0, // this is a cool down when players type in chat
 		range: 30,
 	},
 	commandPrefix: "-",

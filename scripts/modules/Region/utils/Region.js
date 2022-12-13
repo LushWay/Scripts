@@ -31,7 +31,7 @@ function betweenXYZ(XYZa, XYZb, XYZc) {
 	return XYZc.every((c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i]));
 }
 
-const TABLE = new XA.instantDB(world, "region");
+const TABLE = XA.tables.region;
 
 export class Region {
 	/**

@@ -1,4 +1,4 @@
-import { Location, Player, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { IS, setPlayerInterval, XA } from "xapi.js";
 import { JOIN_EVENTS, __EMITTERS } from "./events.js";
@@ -138,7 +138,7 @@ new XA.Command({
 	description: "Открывает гайд",
 	/*type: "public"*/
 }).executes((ctx) => {
-	const DB = new XA.instantDB(ctx.sender, "basic");
+	const DB = XA.tables.basic;
 	DB.delete(KEY.seenLearning);
 });
 new XA.Command({

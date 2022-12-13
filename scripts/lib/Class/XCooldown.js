@@ -1,6 +1,4 @@
-import { Player, world } from "@minecraft/server";
-import { toStr } from "../../xapi.js";
-import { XInstantDatabase } from "../Database/DynamicProperties.js";
+import { Player } from "@minecraft/server";
 
 export class XCooldown {
 	/**
@@ -60,7 +58,7 @@ export class XCooldown {
 		return o;
 	}
 	/**
-	 * @type {XInstantDatabase}
+	 * @type {IanyDB}
 	 * @private
 	 */
 	db;
@@ -80,7 +78,7 @@ export class XCooldown {
 	player;
 	/**
 	 * create class for manage player cooldowns
-	 * @param {XInstantDatabase} db Database to store cooldowns
+	 * @param {{get(): string, }} db Database to store cooldowns
 	 * @param {string} prefix Preifx of the cooldown
 	 * @param {string | Player} source id or player that used for generate key and tell messages
 	 * @param {number} time Time in ms
@@ -94,6 +92,9 @@ export class XCooldown {
 	update() {
 		this.db.set(this.key, Date.now());
 	}
+	/**
+	 * DB requred!
+	 */
 	get statusTime() {
 		const data = this.db.get(this.key);
 		if (typeof data === "number" && Date.now() - data <= this.time) return Date.now() - data;
@@ -107,6 +108,9 @@ export class XCooldown {
 			this.player.tell(`§cПодожди еще §f${time.parsedTime} §c${time.type}`);
 		}
 		return false;
+	}
+	get expired() {
+		return this.isExpired();
 	}
 	expire() {
 		this.db.delete(this.key);

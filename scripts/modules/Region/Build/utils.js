@@ -3,7 +3,7 @@ import { MessageForm } from "../../../lib/Form/MessageForm.js";
 import { createWaiter, setTickInterval, sleep, ThrowError, XA } from "../../../xapi.js";
 import { Region } from "../utils/Region.js";
 
-const DB = new XA.instantDB(world, "buildRegion");
+const DB = XA.tables.buildRegion;
 
 const squarePlace = -55;
 

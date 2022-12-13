@@ -31,7 +31,7 @@ const base = new XA.Command({
 base.executes((ctx) => {
 	if (lang.inpvp(ctx)) return;
 
-	const db = new XA.instantDB(ctx.sender, "basic");
+	const db = XA.tables.basic;
 
 	/** @type {[number, number, number,]} */
 	const basepos = db.get("basepos");
@@ -74,7 +74,7 @@ base.executes((ctx) => {
 base.literal({ name: "add", description: "Добавляет игрока" }).executes((ctx) => {
 	if (lang.inpvp(ctx)) return;
 
-	const db = new XA.instantDB(ctx.sender, "basic");
+	const db = XA.tables.basic;
 
 	/** @type {[number, number, number,]} */
 	const basepos = db.get("basepos");
@@ -108,7 +108,7 @@ base
 	.executes((ctx, player) => {
 		if (lang.inpvp(ctx)) return;
 
-		const db = new XA.instantDB(ctx.sender, "basic");
+		const db = XA.tables.basic;
 
 		/** @type {[number, number, number,]} */
 		const basepos = db.get("basepos");
@@ -153,7 +153,7 @@ base
 base.literal({ name: "list", description: "Список баз" }).executes((ctx) => {
 	if (lang.inpvp(ctx)) return;
 
-	const db = new XA.instantDB(ctx.sender, "basic");
+	const db = XA.tables.basic;
 
 	/** @type {[number, number, number,]} */
 	const basepos = db.get("basepos");
