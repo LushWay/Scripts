@@ -24,7 +24,7 @@ new XA.Command({
 			e = includeEntites;
 		}
 		if (![0, 90, 180, 270].includes(rotation)) return ctx.reply("§c" + rotation);
-		const command = await WorldEditBuild.paste(
+		const status = await WorldEditBuild.paste(
 			ctx.sender,
 			// @ts-expect-error
 			rotation,
@@ -34,5 +34,5 @@ new XA.Command({
 			integrity,
 			seed
 		);
-		ctx.reply(command.data.statusMessage);
+		ctx.reply(status);
 	});

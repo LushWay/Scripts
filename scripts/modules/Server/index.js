@@ -1,7 +1,4 @@
-import { Location, MinecraftDimensionTypes, MolangVariableMap, Player, world } from "@minecraft/server";
-
-import { wo } from "../../lib/Class/Options.js";
-
+import { Location, MinecraftDimensionTypes, Player, world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
 
 /**======================
@@ -13,10 +10,9 @@ import "./commands/other.js";
 import "./commands/particle.js";
 import "./commands/sound.js";
 import "./commands/world.js";
-import "./options.js";
-import "./tool.js";
 import "./pvp.js";
-import { stats, time } from "./var.js";
+import "./tool.js";
+import { options, stats } from "./var.js";
 
 /**
  * @type {import("@minecraft/server").ExplosionOptions}
@@ -149,7 +145,7 @@ setTickInterval(
 			/*================================ PVP MODE ==============================*/
 
 			/*================== Блокировка незера =================*/
-			if (wo.Q("lock:nether")) {
+			if (options.lockNether) {
 				if (player.dimension.id === MinecraftDimensionTypes.nether) {
 					player.teleport({ x: 0, z: 0, y: 0 }, XA.dimensions.overworld, 0, 0);
 					world.say(`§c► §f${player.name}§c Измерение "Незер" заблокированно.`);
@@ -157,17 +153,10 @@ setTickInterval(
 			}
 		}
 		/*================================ DEBUG2 ==============================*/
-		if (wo.Q("debug:menu")) {
-			for (const ent of XA.dimensions.overworld.getEntities({
-				type: "mcbehub:inventory",
-			})) {
-				ent.runCommandAsync("particle minecraft:endrod ~~~");
-			}
-		}
 	},
 	10,
 	"serverAsyncShit"
-);
+); /*
 
 /*
 |--------------------------------------------------------------------------
@@ -176,7 +165,7 @@ setTickInterval(
 |
 | -sit, -base, TOOL, PVP -sec, Другие таймеры
 | 
-*/
+
 setTickInterval(
 	() => {
 		for (const p of world.getPlayers()) {
@@ -211,28 +200,28 @@ setTickInterval(
 			// 		q = false;
 			// 		Atp(p, "currentpos", { pvp: true });
 			// 	} catch (e) {}
-			/*================ TOOL FUNCTIONS ===================*/
-			if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
-				const lore = XA.Entity.getHeldItem(p).getLore();
-				if (lore[0] == "Particle") {
-					const block = p.getBlockFromViewVector({ maxDistance: 100 });
-					if (block) {
-						world
-							.getDimension("overworld")
-							.spawnParticle(
-								lore[1],
-								new Location(block.location.x + 0.5, block.location.y + 1.5, block.location.z + 0.5),
-								new MolangVariableMap()
-							);
-					}
-				}
-				if (lore[0] == "Stopsound") {
-					p.runCommandAsync("stopsound @s");
-					p.runCommandAsync("music stop");
-				}
-			}
+			/*================ TOOL FUNCTIONS ===================*/ /*
+if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
+	const lore = XA.Entity.getHeldItem(p).getLore();
+	if (lore[0] == "Particle") {
+		const block = p.getBlockFromViewVector({ maxDistance: 100 });
+		if (block) {
+			world
+				.getDimension("overworld")
+				.spawnParticle(
+					lore[1],
+					new Location(block.location.x + 0.5, block.location.y + 1.5, block.location.z + 0.5),
+					new MolangVariableMap()
+				);
+		}
+	}
+	if (lore[0] == "Stopsound") {
+		p.runCommandAsync("stopsound @s");
+		p.runCommandAsync("music stop");
+	}
+} /*
 
-			/*================== Другие таймеры =================*/
+/*================== Другие таймеры =================*/ /*
 			if (false && wo.Q("timer:enable")) {
 				time.all.seconds.eAdd(p, 1);
 				if (time.all.seconds.eGet(p) >= 60) {
@@ -289,7 +278,7 @@ setTickInterval(
 	40,
 	"serverToolShit"
 );
-
+*/
 /*
 |--------------------------------------------------------------------------
 * * Активация режима пвп

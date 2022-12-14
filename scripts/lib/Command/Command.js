@@ -9,6 +9,7 @@ import {
 } from "./ArgumentTypes.js";
 import { __COMMANDS__ } from "./index.js";
 
+/** @type {import("./Command.js").XCommand} */
 export class XCommand {
 	constructor(data, type, depth = 0, parent) {
 		if (!data.requires) data.requires = () => true;

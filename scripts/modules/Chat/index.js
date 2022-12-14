@@ -4,12 +4,15 @@ import { CONFIG } from "../../config.js";
 
 const options = XA.WorldOptions("chat", {
 	cooldown: { desc: "Задержка, 0 что бы отключить", value: CONFIG.chat.cooldown },
-	range: { desc: "Радиус", value: CONFIG.chat.range },
-	ranks: { desc: "АВ", value: false },
+	range: { desc: "Радиус для затемнения сообщений дальних игроков", value: CONFIG.chat.range },
+	ranks: { desc: "Ранги в чате", value: false },
 });
 
 const playerOptions = XA.PlayerOptions("chat", {
-	hightlightMessages: { desc: "", value: true },
+	hightlightMessages: {
+		desc: "Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r",
+		value: true,
+	},
 	disableSound: { desc: "", value: false },
 });
 
@@ -19,8 +22,10 @@ world.events.beforeChat.subscribe((data) => {
 	try {
 		const cooldown = options.cooldown;
 
-		if (cooldown && cooldown > Date.now())
-			return data.sender.tell(`§c► Подожди §b${Math.ceil((cooldown - Date.now()) / 1000)}сек§c!§r`);
+		if (cooldown && cooldown > Date.now()) {
+			const time = XA.Cooldown.getRemainingTime(cooldown - Date.now());
+			return data.sender.tell(`§c► Подожди еще §b${time.parsedTime}§c ${time.type}`);
+		}
 
 		const pR = getRole(data.sender);
 

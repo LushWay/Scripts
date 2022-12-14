@@ -32,7 +32,6 @@ export const CONFIG_JOIN = {
 	// actionBar: "§3Сдвинься что бы продолжить", // Optional
 	subtitle: "Добро пожаловать!", // Optional
 	onJoin: {
-		excludeTag: "join:sound",
 		air: "§8Очнулся в воздухе",
 		ground: "§8Сдвинулся",
 		sound: "break.amethyst_cluster",

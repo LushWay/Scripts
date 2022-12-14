@@ -17,6 +17,9 @@ import { global, stats } from "./var.js";
 
 new WorldOption("spawn:pos", "(x y z)\nТакже можно выставить через -spawn set <pos: Pos>", true);
 new WorldOption("minigames:pos", "(x y z)\nТакже можно выставить через -mg set <pos: Pos>", true);
+const getSettings = XA.PlayerOptions("Atp", {
+	showCoordinates: { desc: "Показывать координаты телепортации (выключите если вы стример)", value: true },
+});
 
 /**
  *
@@ -145,7 +148,7 @@ class inventory {
 		});
 		//console.warn("Сохранение инвентаря, прода");
 		let C = 0;
-		while ((await XA.runCommandX("testfor " + name))?.successCount < 1 && C < 100) {
+		while ((await XA.runCommandX("testfor " + name)) < 1 && C < 100) {
 			C++;
 			await sleep(5);
 		}
@@ -233,6 +236,8 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	if (place !== "anarch" && place !== "currentpos" && !pos)
 		return fail(`Админы забыли поставить точку телепортации для ${place}`);
 
+	const settings = getSettings(player);
+
 	let rtp = false,
 		air = false;
 	if (place === "anarch") {
@@ -272,7 +277,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	}
 
 	if (placeIndex == invs.anarch) {
-		player.tell(`§r§${air ? "5Воздух" : "9Земля"}§r ${po.Q("anarchy:hideCoordinates", player) ? "" : pos}`);
+		player.tell(`§r§${air ? "5Воздух" : "9Земля"}§r ${settings.showCoordinates ? "" : pos}`);
 	}
 
 	if (currentInventory == invs.anarch) {
@@ -382,6 +387,7 @@ setTickInterval(
 const qqq = {
 	scoreOptions: [{ objective: objective[0], minScore: 1, maxScore: 1 }],
 };
+/**
 setTickInterval(
 	async () => {
 		for (const p of world.getPlayers())
@@ -426,6 +432,7 @@ setTickInterval(
 	0,
 	"portalShit"
 );
+*/
 
 world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	if (data.id != "portal" || !(data.entity instanceof Player)) return;

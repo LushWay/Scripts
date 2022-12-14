@@ -1,7 +1,9 @@
 import { BlockLocation, MinecraftBlockTypes, world } from "@minecraft/server";
-import { sleep, XA } from "xapi.js";
+import { handler, sleep, ThrowError, XA } from "xapi.js";
+import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { WB_CONFIG } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
+import { safeBlocksBetween, setblock } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 export class Shape {
@@ -25,67 +27,33 @@ export class Shape {
 
 		this.values = new Cuboid(this.pos1, this.pos2);
 
-		this.generate();
+		try {
+			this.generate();
+		} catch (e) {
+			ThrowError(e);
+		}
 	}
 	/**
 	 * Generates the shape to location
 	 */
 	async generate() {
-		try {
-			const blocks = Math.pow(this.rad * 2, 3);
-			let blocksSet = 0;
-			for (let x = -this.rad; x <= this.rad; x++) {
-				for (let y = -this.rad; y <= this.rad; y++) {
-					for (let z = -this.rad; z <= this.rad; z++) {
-						if (!this.condition(x, y, z)) continue;
-						const location = new BlockLocation(this.pos.x + x, this.pos.y + y, this.pos.z + z);
-						if (this.blocks.find((e) => e.split(".")[1])) {
-							const block = this.blocks[~~(Math.random() * this.blocks.length)];
+		let blocksSet = 0;
 
-							XA.runCommandX(
-								`setblock ${location.x} ${location.y} ${location.z} ${block.split(".")[0]} ${
-									block.split(".")[1] ? block.split(".")[1] : ""
-								}`
-							);
-						} else {
-							const block = MinecraftBlockTypes.get("minecraft:" + this.blocks[~~(Math.random() * this.blocks.length)]);
-							world.getDimension("overworld").getBlock(location).setType(block);
-						}
+		const loc1 = { x: -this.rad, y: -this.rad, z: -this.rad };
+		const loc2 = { x: this.rad, z: this.rad, y: this.rad };
 
-						blocksSet++;
-					}
-				}
-				if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
-					await sleep(WB_CONFIG.TICKS_TO_SLEEP);
+		for (const { x, y, z } of safeBlocksBetween(loc1, loc2, false)) {
+			if (!this.condition(x, y, z)) continue;
+			const location = new BlockLocation(this.pos.x + x, this.pos.y + y, this.pos.z + z);
+			const block = this.blocks[~~(Math.random() * this.blocks.length)];
+			setblock(block, location);
+			blocksSet++;
 
-					blocksSet = 0;
-				}
+			if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
+				await sleep(WB_CONFIG.TICKS_TO_SLEEP);
+				blocksSet = 0;
 			}
-		} catch (error) {
-			console.warn(error + error.stack);
 		}
-	}
-	/**
-	 * Gets the relavent values for shape generation
-	 */
-	getValues() {
-		return {
-			xmin: Math.min(this.pos1.x, this.pos2.x),
-			xmax: Math.max(this.pos1.x, this.pos2.x),
-			ymin: Math.min(this.pos1.y, this.pos2.y),
-			ymax: Math.max(this.pos1.y, this.pos2.y),
-			zmin: Math.min(this.pos1.z, this.pos2.z),
-			zmax: Math.max(this.pos1.z, this.pos2.z),
-			get cx() {
-				return (this.xmax + this.xmin) / 2;
-			},
-			get cy() {
-				return (this.ymax + this.ymin) / 2;
-			},
-			get cz() {
-				return (this.zmax + this.zmin) / 2;
-			},
-		};
 	}
 	/**
 	 * Tests weather the courrent coordinate should have a block there
@@ -114,35 +82,34 @@ export class spawn {
 
 		WorldEditBuild.backup(new BlockLocation(this.x1, -64, this.z1), new BlockLocation(this.x2, -64, this.z2));
 
-		this.generate();
+		try {
+			this.generate();
+		} catch (e) {
+			ThrowError(e);
+		}
 	}
 	/**
 	 * Generates the shape to location
 	 */
 	async generate() {
-		try {
-			let v = {
-				xmin: Math.min(this.x1, this.x2),
-				xmax: Math.max(this.x1, this.x2),
-				zmin: Math.min(this.z1, this.z2),
-				zmax: Math.max(this.z1, this.z2),
-			};
-			let blocksSet = 0;
-			for (let x = v.xmin; x <= v.xmax; x++) {
-				for (let z = v.zmin; z <= v.zmax; z++) {
-					world
-						.getDimension("overworld")
-						.getBlock(new BlockLocation(x, -64, z))
-						.setType(MinecraftBlockTypes.get(!this.r ? "minecraft:deny" : "minecraft:bedrock"));
-					blocksSet++;
-				}
-				if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
-					await sleep(WB_CONFIG.TICKS_TO_SLEEP);
-					blocksSet = 0;
-				}
+		let v = {
+			xmin: Math.min(this.x1, this.x2),
+			xmax: Math.max(this.x1, this.x2),
+			zmin: Math.min(this.z1, this.z2),
+			zmax: Math.max(this.z1, this.z2),
+		};
+		let blocksSet = 0;
+		for (let x = v.xmin; x <= v.xmax; x++) {
+			for (let z = v.zmin; z <= v.zmax; z++) {
+				DIMENSIONS.overworld
+					.getBlock(new BlockLocation(x, -64, z))
+					.setType(MinecraftBlockTypes.get(!this.r ? "minecraft:deny" : "minecraft:bedrock"));
+				blocksSet++;
 			}
-		} catch (error) {
-			console.warn(error + error.stack);
+			if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
+				await sleep(WB_CONFIG.TICKS_TO_SLEEP);
+				blocksSet = 0;
+			}
 		}
 	}
 }

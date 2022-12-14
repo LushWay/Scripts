@@ -58,7 +58,7 @@ export class XCooldown {
 		return o;
 	}
 	/**
-	 * @type {IanyDB}
+	 * @type {IAbstactDatabase}
 	 * @private
 	 */
 	db;
@@ -78,7 +78,7 @@ export class XCooldown {
 	player;
 	/**
 	 * create class for manage player cooldowns
-	 * @param {{get(): string, }} db Database to store cooldowns
+	 * @param {IAbstactDatabase} db Database to store cooldowns
 	 * @param {string} prefix Preifx of the cooldown
 	 * @param {string | Player} source id or player that used for generate key and tell messages
 	 * @param {number} time Time in ms

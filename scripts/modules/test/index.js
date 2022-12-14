@@ -3,7 +3,7 @@ import { handler, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "
 import { benchmark } from "../../lib/Benchmark.js";
 import { XPlayerOptions } from "../../lib/Class/XOptions.js";
 import { CommandCallback } from "../../lib/Command/Callback.js";
-import { CreatedInstances, EntityDatabase } from "../../lib/Database/Entity.js";
+import { CreatedInstances, Database } from "../../lib/Database/Entity.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
@@ -122,13 +122,6 @@ const tests = {
 		set(reg.from);
 		set(reg.to);
 		regs.push([reg.from, reg.to]);
-	},
-
-	4: async () => {
-		const db = new XA.cacheDB(world, "region");
-		const data = db.data;
-		Object.assign(data, {});
-		db.safe();
 	},
 	5: async (ctx) => {
 		let form = new ModalForm("TITLE");
@@ -270,8 +263,8 @@ const tests = {
 		}
 	},
 	22: (ctx) => {
-		/** @type {EntityDatabase<string>} */
-		const table = new EntityDatabase("db");
+		/** @type {Database<string>} */
+		const table = new Database("db");
 
 		table.set("key", "sad");
 
@@ -287,7 +280,7 @@ const tests = {
 
 		Options.e = true;
 
-		const db = new EntityDatabase("pr");
+		const db = new Database("pr");
 		world.say(toStr(db.getCollection()));
 	},
 	24(ctx) {

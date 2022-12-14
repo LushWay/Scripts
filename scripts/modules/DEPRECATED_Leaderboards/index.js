@@ -1,9 +1,8 @@
 import { setTickInterval, ThrowError, XA } from "xapi.js";
-import { world } from "@minecraft/server";
 import "./commands.js";
 import { LeaderboardBuild } from "./LeaderboardBuilder.js";
 
-const lb = new XA.instantDB(world, "leaderboard");
+const lb = XA.tables.basic;
 
 setTickInterval(
 	() => {

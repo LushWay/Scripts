@@ -16,8 +16,9 @@ interface IConfiguration {
 	commandPrefix: string;
 }
 type Vector3 = import("@minecraft/server").Vector3;
-interface IanyDB<K = string, V = any> {
-	get(k: K): V;
-	set(k: K): void;
-	delete(k: K): boolean;
+
+interface IAbstactDatabase<Key = string, Value = any> {
+	get(k: Key): Value;
+	set(k: Key, v: Value): void;
+	delete(k: Key): boolean;
 }

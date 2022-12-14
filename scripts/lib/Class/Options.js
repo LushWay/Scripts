@@ -1,5 +1,4 @@
-import { Player, world } from "@minecraft/server";
-import { XInstantDatabase } from "../Database/DynamicProperties.js";
+import { Player } from "@minecraft/server";
 import { ScoreboardDB } from "../Database/Scoreboard.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
@@ -103,7 +102,7 @@ export const po = {
  */
 export let WORLDOPTIONS = [];
 
-export const db = new XInstantDatabase(world, "options");
+export const db = {};
 
 export class WorldOption {
 	/**

@@ -1,5 +1,3 @@
-import { XInstantDatabase } from "../Database/DynamicProperties.js";
-
 export class XRequest {
 	/**
 	 *
@@ -11,7 +9,7 @@ export class XRequest {
 		return "REQ_" + prefix + ":" + ID;
 	}
 	/**
-	 * @type {XInstantDatabase}
+	 * @type {IAbstactDatabase}
 	 * @private
 	 */
 	db;
@@ -22,7 +20,7 @@ export class XRequest {
 	key;
 	/**
 	 *
-	 * @param {XInstantDatabase} db DB to store request data
+	 * @param {IAbstactDatabase} db DB to store request data
 	 * @param {string} prefix
 	 * @param {string} ID
 	 */

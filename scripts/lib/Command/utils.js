@@ -124,7 +124,7 @@ export function commandSyntaxFail(player, command, args, i) {
  * Returns a location of the inputed aguments
  * @example parseLocationAugs(["~1", "3", "^7"], { location: [1,2,3] , viewVector: [1,2,3] })
  * @param {[x: string, y: string, z: string]} a0
- * @param {{ location: Location; viewVector: Vector }} a1
+ * @param {{ location: Vector3; viewVector: Vector }} a1
  * @returns {{x: number, y: number, z: number}}
  */
 export function parseLocationAugs([x, y, z], { location, viewVector }) {

@@ -1,6 +1,6 @@
 import { Player, world } from "@minecraft/server";
-import { ActionFormData } from "@minecraft/server-ui";
 import { IS, setPlayerInterval, XA } from "xapi.js";
+import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { JOIN_EVENTS, __EMITTERS } from "./events.js";
 import { CONFIG_JOIN, shortTime, timeNow } from "./var.js";
 
@@ -8,16 +8,20 @@ JOIN_EVENTS.playerJoin.subscribe((player) => {
 	player.tell(`${timeNow()}, §b§l${player.name}!\n§r§9Время • ${shortTime()}`);
 }, -1);
 
+const getSettings = XA.PlayerOptions("join", {
+	message: { desc: "Сообщения о входе других игроков", value: true },
+	sound: { desc: "Звук входа других игроков", value: true },
+});
+
 JOIN_EVENTS.playerGuide.subscribe((player) => {
-	const f = new ActionFormData();
-	f.title("Краткий гайд");
-	f.body(
+	const f = new ActionForm(
+		"Краткий гайд",
 		`  ${timeNow()}, ${
 			player.name
 		}!\n  §7Для навигации по серверу используется §fменю§7 (зачарованный алмаз в инвентаре). Что бы открыть меню, возьми его в руку и §fиспользуй§7 (зажми на телефоне, ПКМ на пк)\n\n  Помимо него есть еще кастомные §fкоманды§7. Все они вводятся в чат и должны начинаться с '§f-§7'.\n  Что бы получить список всех доступных команд пропиши в чат §f-help§7.\n\n\n `
-	);
-	f.button("Oк!");
-	f.show(player);
+	)
+		.addButton("Oк!", null, () => {})
+		.show(player);
 }, -1);
 
 const KEY = {
@@ -40,10 +44,11 @@ function JOIN(player, data, messageType) {
 
 	data[KEY.times] = (data[KEY.times] ?? 0) + 1;
 
-	for (const plr of world.getPlayers({ excludeTags: [CONFIG_JOIN.onJoin.excludeTag] })) {
+	for (const plr of world.getPlayers()) {
 		if (plr.id === player.id) continue;
-		plr.playSound(CONFIG_JOIN.onJoin.sound);
-		plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
+		const settings = getSettings(plr);
+		if (settings.sound) plr.playSound(CONFIG_JOIN.onJoin.sound);
+		if (settings.message) plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
 	}
 
 	__EMITTERS.PlayerJoin.emit(player, 1);
@@ -68,8 +73,8 @@ world.events.playerJoin.subscribe((data) => {
 
 setPlayerInterval(
 	async (player) => {
-		const DB = new XA.cacheDB(player, "basic");
-		const data = DB.data;
+		const DB = XA.tables.basic;
+		const data = DB.collection();
 
 		if (!WDB.has("JOIN:" + player.id)) {
 			// New player (player joined)
@@ -127,7 +132,7 @@ setPlayerInterval(
 			__EMITTERS.PlayerGuide.emit(player, 1);
 			data[KEY.seenLearning] = 1;
 		}
-		DB.safe();
+		DB.saveCollection(data);
 	},
 	20,
 	"joinInterval"

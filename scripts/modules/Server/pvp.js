@@ -14,14 +14,14 @@ const PVP = new ScoreboardDB(pvpScore);
 const LOCKTITLE = new ScoreboardDB(lockedTitleScore);
 
 const options = XA.WorldOptions("pvp", {
-	enabled: { value: false, desc: "Да" },
+	enabled: { value: false, desc: "Возможность входа в пвп режим (блокировка всех тп команд)§r" },
 	cooldown: { value: 15, desc: "Да" },
 	bowhit: { value: false, desc: "Да" },
 });
 
 const getPlayerSettings = XA.PlayerOptions("pvp", {
-	title_enabled: { desc: "", value: true },
-	sound_enabled: { desc: "", value: true },
+	title_enabled: { desc: "§aВключает§7 титл попадания по энтити из лука", value: true },
+	sound_enabled: { desc: "§aВключает§7 звук попадания по энтити из лука", value: true },
 });
 
 setTickInterval(
@@ -64,7 +64,7 @@ setPlayerInterval(
 		if (!options.enabled) return;
 		const settings = getPlayerSettings(player);
 
-		if (!settings.title_enabled || isPvpLocked(player) || PVP.eGet(player) <= 0) return;
+		if (!settings.title_enabled || isPvpLocked(player) || PVP.eGet(player) <= 0) return; //
 
 		const score = PVP.eGet(player);
 		const q = score === options.cooldown;

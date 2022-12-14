@@ -3,7 +3,7 @@ import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { getRole, IS, ROLES, setRole, T_roles as TR, XA } from "../../xapi.js";
 
-const DB = new XA.instantDB(world, "roles");
+const DB = XA.tables.roles;
 
 const R = new XA.Command({
 	name: "role",

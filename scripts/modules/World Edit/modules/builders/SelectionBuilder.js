@@ -1,4 +1,5 @@
 import { BlockLocation } from "@minecraft/server";
+import { getBlocksCount } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 class SelectionBuilder {
@@ -67,7 +68,7 @@ class SelectionBuilder {
 	 * @example count();
 	 */
 	count() {
-		return WorldEditBuild.pos1.blocksBetween(WorldEditBuild.pos2)?.length ?? 0;
+		return getBlocksCount(WorldEditBuild.pos1, WorldEditBuild.pos2);
 	}
 }
 export const SelectionBuild = new SelectionBuilder();

@@ -1,26 +1,45 @@
 import { BlockLocation, Player } from "@minecraft/server";
-import { sleep, XA } from "xapi.js";
+import { sleep, ThrowError, XA } from "xapi.js";
 import { WB_CONFIG } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { Return } from "../utils/Return.js";
 import { Structure } from "./StructureBuilder.js";
 
 class WorldEditBuilder {
-	constructor() {
-		this.drawsel = WB_CONFIG.DRAW_SELECTION_DEFAULT;
-		this.pos1 = { x: 0, y: 0, z: 0 };
-		this.pos2 = { x: 0, y: 0, z: 0 };
-		this.history = [];
-		this.undos = [];
-		this.current_copy = { pos1: null, pos2: null, name: "" };
-	}
+	drawselection = WB_CONFIG.DRAW_SELECTION_DEFAULT;
+	pos1 = { x: 0, y: 0, z: 0 };
+	pos2 = { x: 0, y: 0, z: 0 };
+
+	/**
+	 * @type {Structure[]}
+	 * @private
+	 */
+	history = [];
+
+	/**
+	 * @type {Structure[]}
+	 * @private
+	 */
+	undos = [];
+
+	/**
+	 * @type {{pos1:Vector3; pos2:Vector3; name:string}}
+	 * @private
+	 */
+	current_copy = {
+		pos1: null,
+		pos2: null,
+		name: "",
+	};
+
+	constructor() {}
 
 	drawSelection() {
-		if (!this.drawsel)
-			return [
-				`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION1_NAME}"] kill`,
-				`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION2_NAME}"] kill`,
-			].forEach((e) => XA.runCommandX(e));
+		if (!this.drawselection) return;
+		return [
+			`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION1_NAME}"] kill`,
+			`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION2_NAME}"] kill`,
+		].forEach((e) => XA.runCommandX(e));
 		const ent1 = XA.Entity.getEntityAtPos(this.pos1.x, this.pos1.y, this.pos1.z);
 		const ent2 = XA.Entity.getEntityAtPos(this.pos2.x, this.pos2.y, this.pos2.z);
 		if (ent1.length == 0) {
@@ -56,61 +75,49 @@ class WorldEditBuilder {
 	 * Backups a location
 	 * @param {Vector3} pos1 Position 1 of cuboid location
 	 * @param {Vector3} pos2 Position 2 of cuboid location
-	 * @param {Array} saveLocation Save location where you want the data to store your backup
-	 * @returns {Promise<Return>}
+	 * @param {Structure[]} saveLocation Save location where you want the data to store your backup
 	 * @example backup(pos1, pos2, history);
 	 */
 	async backup(pos1 = this.pos1, pos2 = this.pos2, saveLocation = this.history) {
 		const structure = new Structure(WB_CONFIG.BACKUP_PREFIX, pos1, pos2);
 		saveLocation.push(structure);
-		return new Return(false);
 	}
 
 	/**
 	 * Undoes the latest history save
-	 * @param {number} ammount times you want to undo
-	 * @returns {Return}
+	 * @param {number} amount times you want to undo
+	 * @returns {string}
 	 * @example undo(2);
 	 */
-	undo(ammount = 1) {
+	undo(amount = 1) {
 		try {
-			if (this.history.length < ammount) ammount = this.history.length;
-			const backups = this.history.slice(-ammount);
-			for (const elm of backups.reverse()) {
-				this.backup(elm.pos1, elm.pos2, this.undos);
-				elm.load();
-				this.history.splice(this.history.indexOf(elm), 1);
+			if (this.history.length < amount) amount = this.history.length;
+			const backups = this.history.slice(-amount);
+			for (const backup of backups.reverse()) {
+				this.backup(backup.pos1, backup.pos2, this.undos);
+				backup.load();
+				this.history.splice(this.history.indexOf(backup), 1);
 			}
-			return new Return(false, 0, {
-				statusMessage: `§a► §rУспешно отменено ${ammount} бэкапов!`,
-			});
+			return `§a► §rУспешно отменено ${amount} бэкапов!`;
 		} catch (error) {
-			//console.warn(error + error.stack);
-			return new Return(true, 1, {
-				statusMessage: `§4► ${error}`,
-			});
+			return `§4► ${error}`;
 		}
 	}
 	/**
 	 * Redoes the latest history save
-	 * @returns {Return}
+	 * @returns {string}
 	 * @example redo();
 	 */
 	redo() {
 		try {
-			if (this.undos.length == 0) throw new Error("Нечего отменять");
+			if (this.undos.length < 1) throw new Error("Нечего отменять");
 			const data = this.undos.slice(-1)[0];
 			this.backup(data.pos1, data.pos2);
 			data.load();
 			this.undos.pop();
-			return new Return(false, 0, {
-				statusMessage: `§a► §rУспешно возвращено!`,
-			});
+			return `§a► §rУспешно возвращено!`;
 		} catch (error) {
-			//console.warn(error + error.stack);
-			return new Return(true, 1, {
-				statusMessage: `§4► ${error}`,
-			});
+			ThrowError(error);
 		}
 	}
 	/**
@@ -126,11 +133,9 @@ class WorldEditBuilder {
 				name: WB_CONFIG.COPY_FILE_NAME,
 			};
 			const opt =
-				(
-					await XA.runCommandX(
-						`structure save ${WB_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
-					)
-				).successCount > 0;
+				(await XA.runCommandX(
+					`structure save ${WB_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
+				)) > 0;
 			if (opt) throw new Error(opt + "");
 			return new Return(false, 0, {
 				pos1: this.pos1,
@@ -153,7 +158,7 @@ class WorldEditBuilder {
 	 * @param {boolean} includesBlocks Specifies whether including blocks or not
 	 * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in the structure are loaded.
 	 * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity. If unspecified, a random seed is taken.
-	 * @returns {Promise<Return>}
+	 * @returns {Promise<string>}
 	 * @example paste(Player, 0, "none", false, true, 100.0, "");
 	 */
 	async paste(
@@ -171,7 +176,9 @@ class WorldEditBuilder {
 			const dz = Math.abs(this.current_copy.pos2.z - this.current_copy.pos1.z);
 			const pos2 = new BlockLocation(player.location.x, player.location.y, player.location.z).offset(dx, dy, dz);
 
-			this.backup(player.location, pos2);
+			const loc = XA.Entity.vecToBlockLocation(player.location);
+
+			this.backup(loc, pos2);
 
 			await player.runCommandAsync(
 				`structure load ${WB_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(rotation).replace(
@@ -179,17 +186,11 @@ class WorldEditBuilder {
 					"0"
 				)}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${integrity ? integrity : ""} ${seed ? seed : ""}`
 			);
-			return new Return(false, 0, {
-				location: player.location,
-				statusMessage: `§a► §rВставлено в ${Math.floor(player.location.x)} ${Math.floor(
-					player.location.y
-				)} ${Math.floor(player.location.z)}`,
-			});
+
+			return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`;
 		} catch (error) {
-			console.warn(error + error.stack);
-			return new Return(true, 1, {
-				statusMessage: `§4Не удалось вставить [${error.statusMessage ? error.statusMessage : error}]`,
-			});
+			ThrowError(error);
+			return `§4Не удалось вставить`;
 		}
 	}
 	/**
@@ -208,15 +209,13 @@ class WorldEditBuilder {
 		let comm = 0;
 		for (const cube of Cube.split(WB_CONFIG.FILL_CHUNK_SIZE)) {
 			const opt =
-				(
-					await XA.runCommandX(
-						`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${
-							cube.pos2.z
-						} ${block} ${data} ${replaceMode ? replaceMode : ""} ${replaceBlock ? replaceBlock : ""} ${
-							rbData ? rbData : ""
-						}`
-					)
-				).successCount > 0;
+				(await XA.runCommandX(
+					`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${
+						cube.pos2.z
+					} ${block} ${data} ${replaceMode ? replaceMode : ""} ${replaceBlock ? replaceBlock : ""} ${
+						rbData ? rbData : ""
+					}`
+				)) > 0;
 			if (opt) {
 				errors++;
 			}

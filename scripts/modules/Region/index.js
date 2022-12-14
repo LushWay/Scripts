@@ -13,16 +13,18 @@ const toDefault = () => {
 	return 0;
 };
 
-/** @type {"build" | "survival"} */
-const type = VALUE[DB.get(key) ?? toDefault()] ?? DB.get(key);
+(async () => {
+	/** @type {"build" | "survival"} */
+	const type = VALUE[(await DB.getSync(key)) ?? toDefault()];
 
-if (type !== "build" && type !== "survival") {
-	toDefault();
-	ThrowError(new TypeError("Invalid region type: " + type));
-}
+	if (type !== "build" && type !== "survival") {
+		toDefault();
+		ThrowError(new TypeError("Invalid region type: " + type));
+	}
 
-if (type === "build") import("./Build/index.js");
-else if (type === "survival") import("./Survival/index.js");
+	if (type === "build") import("./Build/index.js");
+	else if (type === "survival") import("./Survival/index.js");
+})();
 
 setPlayerInterval(
 	(player) => {

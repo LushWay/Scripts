@@ -1,12 +1,12 @@
 import { IS, XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+
 new XA.Command({
-	/*type: "wb"*/
-	/*type: "wb"*/
+	type: "wb",
 	name: "redo",
 	description: "Возвращает последнее действие (из памяти)",
 	requires: (p) => IS(p.id, "moderator"),
-}).executes((ctx, r) => {
+}).executes((ctx) => {
 	const command = WorldEditBuild.redo();
-	ctx.reply(command.data.statusMessage);
+	if (command) ctx.reply(command);
 });

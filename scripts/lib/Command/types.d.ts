@@ -35,6 +35,7 @@ export interface ICommandData {
 	 * @example "You have failed to meet the required paramaters for this command"
 	 */
 	invaildPermission?: string;
+  type?: string;
 }
 
 export type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R

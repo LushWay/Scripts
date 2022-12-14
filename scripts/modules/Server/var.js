@@ -1,6 +1,16 @@
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
+import { XA } from "../../xapi.js";
 
 export const global = { Radius: 200 };
+
+export const options = XA.WorldOptions("server", {
+	spawn: { desc: "Включает команду /hub, пункт в меню и приветствие.\n\n(требуется перезагрузка)", value: false },
+	lockNether: { desc: "Выключает незер", value: true },
+	bowhit: { desc: "Звук попадания по энтити из лука", value: true },
+	timer: { value: true, desc: "" },
+	zoneCenter: { value: "0 0", desc: "" },
+});
+
 export const time = {
 	anarchy: timer("anarchy", "на анархии"),
 	all: timer("all", "всего"),

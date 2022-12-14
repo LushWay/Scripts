@@ -4,7 +4,7 @@ import { m, mm } from "../lib/Module/creator.js";
 import { ItemTypes } from "@minecraft/server";
 import { wo } from "../lib/Class/Options.js";
 
-m`S_DBview`;
+// m`S_DBview`;
 m`S_HelpCommand`;
 m`S_FastReload`;
 m`Menu`;

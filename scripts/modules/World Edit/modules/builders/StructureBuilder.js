@@ -6,11 +6,16 @@ import { Cuboid } from "../utils/Cuboid.js";
 export class Structure {
 	/**
 	 * Creates a new structure save
-	 * @example new Shape(DefaultModes.sphere,BlockLocation, ["stone", "wood"], 10);
+	 */
+	/**
+	 *
+	 * @param {string} prefix
+	 * @param {*} pos1
+	 * @param {*} pos2
 	 */
 	constructor(prefix, pos1, pos2) {
-		this.id = Date.now();
-		this.prefix = `"${prefix}|${this.id}`;
+		this.id = Date.now().toString(32);
+		this.prefix = `${prefix}|${this.id}`;
 		this.pos1 = pos1;
 		this.pos2 = pos2;
 
@@ -24,14 +29,14 @@ export class Structure {
 		let errors = 0;
 		let all = 0;
 		for (const region of regions) {
-			const name = `${this.prefix}|${regions.indexOf(region)}"`;
+			const name = `${this.prefix}|${regions.indexOf(region)}`;
 			const pos1 = region.pos1;
 			const pos2 = region.pos2;
 			const out = await XA.runCommandX(
-				`structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
+				`structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
 			);
 			all++;
-			if (!out) {
+			if (out) {
 				this.files.push({
 					name: name,
 					pos1: pos1,
@@ -70,8 +75,7 @@ export class Structure {
 		let all = 0;
 		for (const file of this.files) {
 			const out =
-				(await XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`))
-					.successCount > 0;
+				(await XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`)) > 0;
 			all++;
 			if (out) {
 				errors++;

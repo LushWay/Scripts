@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { EntityDatabase } from "../Database/Entity.js";
+import { Database } from "../Database/Entity.js";
 
 export const AllPlayerOptions = {};
 
@@ -29,8 +29,8 @@ export function XOptions(prefix, CONFIG) {
  * @returns {Record<string, any>} An object with getters and setters
  */
 function generateOptionsProxy(prefix, CONFIG, player = null) {
-	/** @type {EntityDatabase<string | boolean | number>} */
-	const DB = new EntityDatabase(prefix);
+	/** @type {Database<string, string | boolean | number>} */
+	const DB = new Database(prefix);
 	const OptionsProxy = {};
 	for (const prop in CONFIG) {
 		const key = player ? player.id + ":" + prop : prop;

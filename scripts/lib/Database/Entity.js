@@ -1,9 +1,30 @@
-import { BlockLocation, Entity, ItemStack, MinecraftItemTypes, world } from "@minecraft/server";
+import {
+	BlockLocation,
+	DynamicPropertiesDefinition,
+	Entity,
+	EntityTypes,
+	ItemStack,
+	MinecraftItemTypes,
+	system,
+	world,
+} from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
 
+world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
+	let def = new DynamicPropertiesDefinition();
+	def.defineString("tableName", 30);
+	def.defineNumber("index");
+	propertyRegistry.registerEntityTypeDynamicProperties(def, EntityTypes.get(ENTITY_IDENTIFIER));
+});
+
+/**
+ * This is air as a item,
+ */
+export const AIR = new ItemStack(MinecraftItemTypes.stick, 0);
 const MAX_DATABASE_STRING_SIZE = 32000;
 const ENTITY_IDENTIFIER = "rubedo:database";
 const ENTITY_LOCATION = new BlockLocation(0, -64, 0);
+const INVENTORY_SIZE = 128;
 
 /**
  * Splits a string into chunk sizes
@@ -15,235 +36,322 @@ function chunkString(str, length) {
 	return str.match(new RegExp(".{1," + length + "}", "g"));
 }
 
-/** @type {Record<string, EntityDatabase<any>>} */
+let WORLD_IS_LOADED = false;
+/**
+ * Awaits till work load
+ * @returns {Promise<void>}
+ */
+async function awaitWorldLoad() {
+	if (WORLD_IS_LOADED) return;
+	return new Promise((resolve) => {
+		let s = system.runSchedule(async () => {
+			try {
+				await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+				system.clearRunSchedule(s);
+				WORLD_IS_LOADED = true;
+				resolve();
+			} catch (error) {}
+		}, 1);
+	});
+}
+/**
+ * Sends a callback once world is loaded
+ * @param {() => void} callback  undefined
+ * @returns {void}
+ */
+function onWorldLoad(callback) {
+	if (WORLD_IS_LOADED) return callback();
+	let s = system.runSchedule(async () => {
+		try {
+			await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+			system.clearRunSchedule(s);
+			WORLD_IS_LOADED = true;
+			callback();
+		} catch (error) {}
+	}, 1);
+}
+
+/** @type {Record<string, Database<any, any>>} */
 export const CreatedInstances = {};
 
 /**
- * @template [Type = never]
+ * @template {string} [Key = string]
+ * @template [Value=any]
  */
-export class EntityDatabase {
+export class Database {
 	/**
-	 * The databse name
-	 * @type {string}
-	 * @private
+	 * Creates a table entity that is used for data storage
+	 * @param {string} tableName  undefined
+	 * @param {number} [index] if not specified no index will be set
+	 * @returns {Entity} *
 	 */
-	name;
+	static createTableEntity(tableName, index) {
+		const entity = DIMENSIONS.overworld.spawnEntity(ENTITY_IDENTIFIER, ENTITY_LOCATION);
+		entity.setDynamicProperty("tableName", tableName);
+		entity.nameTag = `§7Database Table: §f${tableName}§r`;
+		if (index) entity.setDynamicProperty("index", index);
+		return entity;
+	}
 	/**
-	 * The entitys this database has saved, used for memory and speed
-	 * @type {Array<Entity>?}
-	 * @private
+	 * Gets all table Entities associated with this tableName
+	 * @param {string} tableName  undefined
+	 * @returns {Entity[]} *
 	 */
-	savedEntitys;
+	static getTableEntities(tableName) {
+		return DIMENSIONS.overworld
+			.getEntitiesAtBlockLocation(ENTITY_LOCATION)
+			.filter((e) => e.typeId == ENTITY_IDENTIFIER && e.getDynamicProperty("tableName") == tableName);
+	}
 	/**
-	 * Stores the information that this databse has saved
-	 * @type {any | undefined}
+	 * Data saved in memory
+	 * @type {{ [key in Key]: Value } | null}
 	 * @private
 	 */
 	MEMORY;
 	/**
-	 * Compresses a value into a shorter string
-	 * @param {string} string  value to compress
-	 * @returns {string}
+	 * List of queued tasks on this table
+	 * @type {Array<() => void>}
+	 * @private
 	 */
-	static compress(string) {
-		//return LZString.compress(string);
-		return string;
-	}
+	QUEUE;
 	/**
-	 * Compresses a value into a shorter string
-	 * @param {string} string  value to compress
-	 * @returns {string}
+	 *
+	 * @param {string} tableName
 	 */
-	static decompress(string) {
-		//return LZString.decompress(string);
-		return string;
-	}
-	/**
-	 * Creates a new Database Entity
-	 * @param {string} name  the database name
-	 * @param {number} index  the index this entity is
-	 * @returns {Entity} Entity that was made
-	 */
-	static createEntity(name, index) {
-		let entity = DIMENSIONS.overworld.spawnEntity(ENTITY_IDENTIFIER, ENTITY_LOCATION);
-		entity.setDynamicProperty("name", name);
-		entity.setDynamicProperty("index", index);
-		const inv = entity.getComponent("inventory").container;
-		const defaultItem = new ItemStack(MinecraftItemTypes.acaciaBoat, 1);
-		if (index == 0) defaultItem.nameTag = "{}";
-		inv.setItem(0, defaultItem);
-		return entity;
-	}
+	constructor(tableName) {
+		if (tableName in CreatedInstances) return CreatedInstances[tableName];
+		this.tableName = tableName;
+		this.MEMORY = null;
+		this.QUEUE = [];
 
-	/**
-	 * Gets the nameTag of the slot from the entitys inventory
-	 * @param {Entity} entity  entity to grab from
-	 * @param {number} slot  slot value to get
-	 * @returns {string}
-	 */
-	static getInventorySlotName(entity, slot) {
-		const inv = entity.getComponent("inventory").container;
-		return inv.getItem(slot)?.nameTag;
-	}
-	/**
-	 * Sets the nameTag of the slot from the entitys inventory
-	 * @param {Entity} entity  entity to grab from
-	 * @param {number} slot  slot value to get
-	 * @param {string} value  the value to set it to
-	 * @returns {void}
-	 */
-	static setInventorySlotName(entity, slot, value) {
-		const inv = entity.getComponent("inventory").container;
-		let item = inv.getItem(slot);
-		item.nameTag = value;
-		return inv.setItem(slot, item);
-	}
-	/**
-	 * Creates a new Database
-	 * @param {string} name max length 16
-	 */
-	constructor(name) {
-		if (CreatedInstances[name]) return CreatedInstances[name];
-		this.name = name;
-		CreatedInstances[name] = this;
-	}
-	/**
-	 * Grabs all entities this database is associated with
-	 * @returns {Array<Entity>}
-	 */
-	get entitys() {
-		if (this.savedEntitys) return this.savedEntitys;
-		const ens = DIMENSIONS.overworld
-			.getEntitiesAtBlockLocation(ENTITY_LOCATION)
-			.filter((e) => e.typeId == ENTITY_IDENTIFIER && e.getDynamicProperty("name") == this.name);
-		this.savedEntitys = ens;
-		return ens;
-	}
-	/**
-	 * Grabs the data of this name out of the local database
-	 * @returns {{ [key: string]: Type; }}
-	 */
-	data() {
-		if (this.MEMORY) return this.MEMORY;
-		if (this.entitys.length == 0) EntityDatabase.createEntity(this.name, 0);
-		// If there is only one entity there is no need to sort the data out
-		if (this.entitys.length == 1) {
-			let data = JSON.parse(EntityDatabase.decompress(EntityDatabase.getInventorySlotName(this.entitys[0], 0)));
-			this.MEMORY = data;
-			return data;
-		}
-		let data = new Array(this.entitys.length);
-		for (const entity of this.entitys) {
-			let index = entity.getDynamicProperty("index");
-			if (typeof index !== "number") throw new TypeError("Given index type doesnt match number");
-			data[index] = EntityDatabase.getInventorySlotName(entity, 0);
-		}
+		system.runSchedule(() => {
+			if (this.QUEUE.length == 0) return;
+			this.QUEUE.shift()?.(); // removes queue item and runs it
+		}, 1);
 
-		let newdata;
-		try {
-			newdata = JSON.parse(data.join(""));
-		} catch (error) {
-			newdata = {};
-		}
-		this.MEMORY = data;
-		return newdata;
+		onWorldLoad(() => {
+			this.MEMORY = this.getData();
+		});
+		CreatedInstances[tableName] = this;
 	}
 	/**
-	 * Saves data into the database
-	 * @param {{ [key: string]: Type }} data  data to save
-	 * @returns {void}
+	 * Adds a queue task to be awaited
+	 * @returns {Promise<void>} once its this items time to run in queue
+	 * @private
 	 */
-	save(data) {
-		this.MEMORY = data;
+	async addQueueTask() {
+		return new Promise((resolve) => {
+			this.QUEUE.push(() => {
+				resolve();
+			});
+		});
+	}
+	/**
+	 * Saves data into this database
+	 * @param {{ [key in Key]: Value }} data
+	 * @returns {Promise<void>} once data is saved
+	 * @private
+	 */
+	async saveData(data) {
+		await this.addQueueTask();
+		await awaitWorldLoad(); // Await till world is loaded
+		this.MEMORY = data; // set memory
+		let entities = Database.getTableEntities(this.tableName);
 		/**
-		 * Splits the data into chunks to then save across an array of entitys
+		 * The split chunks of the stringified data, This is done because we can
+		 * only store {@link MAX_DATABASE_STRING_SIZE} chars in a single nameTag
 		 */
-		const dataSplit = chunkString(EntityDatabase.compress(JSON.stringify(data)), MAX_DATABASE_STRING_SIZE);
-		if (this.entitys && dataSplit.length == this.entitys.length) {
-			for (let i = 0; i < dataSplit.length; i++) {
-				EntityDatabase.setInventorySlotName(this.entitys[i], 0, dataSplit[i]);
-			}
-		} else {
-			// there is either no entitys or a diffrent amount
-			this.entitys?.forEach((e) => e?.triggerEvent("despawn"));
-			delete this.savedEntitys;
-			for (let i = 0; i < dataSplit.length; i++) {
-				const entity = EntityDatabase.createEntity(this.name, i);
-				EntityDatabase.setInventorySlotName(entity, 0, dataSplit[i]);
+		let chunks = chunkString(JSON.stringify(data), MAX_DATABASE_STRING_SIZE);
+		/**
+		 * The amount of entities that is needed to store {@link chunks} data
+		 */
+		const entitiesNeeded = Math.ceil(chunks.length / INVENTORY_SIZE) - entities.length;
+		if (entitiesNeeded > 0) {
+			for (let i = 0; i < entitiesNeeded; i++) {
+				entities.push(Database.createTableEntity(this.tableName));
 			}
 		}
+		for (const [i, entity] of entities.entries()) {
+			const inventory = entity.getComponent("inventory").container;
+			for (const [i, chunk] of chunks.entries()) {
+				if (!chunk) continue;
+				if (i > inventory.size - 1) break; // Exit because it has maxed items
+				let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
+				item.nameTag = chunk;
+				inventory.setItem(i, item);
+				chunks[i] = null; // Delete chunk because its been set.
+			}
+			// Set all unUsed slots to air
+			for (let i = chunks.length + 1; i < inventory.size; i++) {
+				inventory.setItem(i, AIR);
+			}
+			entity.setDynamicProperty("index", i);
+			entities[i] = null; // Set this entity to null because its maxed out!
+			// If all chunks have been saved no need to go to next entity
+			if (!chunks.find((v) => v)) break;
+		}
+		// Check for unUsed entities and despawn them
+		entities.filter((e) => e).forEach((e) => e.triggerEvent("despawn"));
+		return;
 	}
 	/**
-	 * Sets a key to a value in this database
-	 * @param {string} key  key to set
-	 * @param {Type} value  value to set the key to
-	 * @returns {void}
+	 * Grabs all data from this table
+	 * @returns {{ [key in Key]: Value; }} *
+	 * @private
 	 */
-	set(key, value) {
-		const data = this.data();
-		data[key] = value;
-		this.save(data);
+	getData() {
+		// await awaitWorldLoad(); // Await till world is loaded
+		if (this.MEMORY) return this.MEMORY;
+		let entities = Database.getTableEntities(this.tableName).sort(
+			// @ts-expect-error
+			(a, b) => a.getDynamicProperty("index") - b.getDynamicProperty("index")
+		);
+		let stringifiedData = "";
+		for (const entity of entities) {
+			const inventory = entity.getComponent("inventory").container;
+			for (let i = 0; i < inventory.size; i++) {
+				const item = inventory.getItem(i);
+				if (!item) continue;
+				stringifiedData = stringifiedData + item.nameTag;
+			}
+		}
+		return stringifiedData === "" ? {} : JSON.parse(stringifiedData);
 	}
 	/**
-	 * Grabs a value from the database by key
-	 * @param {string} key  value to grab
-	 * @returns {Type}
+	 *  Saves data into this database
+	 * @param {{ [key in Key]: Value }} collection
+	 * @returns {Promise<void>} once data is saved
+	 */
+	async saveCollection(collection) {
+		return this.saveData(collection);
+	}
+	/**
+	 * Sets a key to a value in this table
+	 * @param {Key} key  undefined
+	 * @param {Value} value  undefined
+	 * @returns {Promise<void>}
+	 */
+	async set(key, value) {
+		const data = await this.getData();
+		data[key] = value;
+		await this.saveData(data);
+		return;
+	}
+	/**
+	 * Gets a value from this table
+	 * @param {Key} key  undefined
+	 * @returns {Value} the keys corresponding key
 	 */
 	get(key) {
-		return this.data()[key];
+		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `getAsync` instead!");
+		return this.MEMORY[key];
 	}
 	/**
-	 * Check if the key exists in the table
-	 * @param {string} key  the key to test
-	 * @returns {boolean}
+	 * Gets a value async from this table, this should be used on calls from like
+	 * entityCreate, system.runSchedule or things that could be before database entities spawn
+	 * @param {Key} key  undefined
+	 * @returns {Promise<Value>}
 	 */
-	has(key) {
-		return this.keys().includes(key);
-	}
-	/**
-	 * Delete the key from the table
-	 * @param {string} key  the key to test
-	 * @returns {boolean}
-	 */
-	delete(key) {
-		let data = this.data();
-		const status = delete data[key];
-		this.save(data);
-		return status;
-	}
-	/**
-	 * Returns the number of key/value pairs in the Map object.
-	 * @returns {number}
-	 */
-	size() {
-		return this.keys().length;
-	}
-	/**
-	 * Clear everything in the table
-	 * @returns {void}
-	 */
-	clear() {
-		this.save({});
+	async getSync(key) {
+		const data = await this.getData();
+		return data[key];
 	}
 	/**
 	 * Get all the keys in the table
-	 * @returns {string[]}
+	 * @returns {Key[]}
 	 */
 	keys() {
-		return Object.keys(this.data());
+		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `keysSync` instead!");
+		// @ts-expect-error
+		return Object.keys(this.MEMORY);
+	}
+	/**
+	 * Get all the keys in the table async, this should be used on world load
+	 * @returns {Promise<Key[]>}
+	 */
+	async keysSync() {
+		const data = await this.getData();
+		// @ts-expect-error
+		return Object.keys(data);
 	}
 	/**
 	 * Get all the values in the table
-	 * @returns {Type[]}
+	 * @returns {Value[]}
 	 */
 	values() {
-		return Object.values(this.data());
+		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `valuesSync` instead!");
+		return Object.values(this.MEMORY);
+	}
+	/**
+	 * Get all the values in the table async, this should be used on world load
+	 * @returns {Promise<Value[]>}
+	 */
+	async valuesSync() {
+		const data = await this.getData();
+		return Object.values(data);
+	}
+	/**
+	 * Check if the key exists in the table
+	 * @param {Key} key  the key to test
+	 * @returns {boolean}
+	 */
+	has(key) {
+		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `hasSync` instead!");
+		const keys = this.keys();
+		return keys.includes(key);
+	}
+	/**
+	 * Check if the key exists in the table async, this should be used on worldLoad
+	 * @param {Key} key  the key to test
+	 * @returns {Promise<boolean>}
+	 */
+	async hasSync(key) {
+		const keys = await this.keysSync();
+		return keys.includes(key);
 	}
 	/**
 	 * Gets all the keys and values
-	 * @returns {{ [key: string]: Type; }}
+	 * @returns {{ [key in Key]: Value; }}
 	 */
-	getCollection() {
-		return this.data();
+	collection() {
+		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `collectionSync` instead!");
+		return this.MEMORY;
+	}
+	/**
+	 * Gets all the keys and values async, this should be used for grabbingCollection on world load
+	 * @returns {Promise<{ [key in Key]: Value; }>}
+	 */
+	async collectionSync() {
+		return await this.getData();
+	}
+	/**
+	 * Delete the key from the table
+	 * @param {Key} key  the key to delete
+	 * @returns {boolean}
+	 */
+	delete(key) {
+		const status = delete this.MEMORY[key];
+		this.saveData(this.MEMORY);
+		return status;
+	}
+	/**
+	 * Delete the key from the table
+	 * @param {Key} key  the key to delete
+	 * @returns {Promise<boolean>}
+	 */
+	async deleteSync(key) {
+		const data = await this.getData();
+		const status = delete data[key];
+		await this.saveData(data);
+		return status;
+	}
+	/**
+	 * Clear everything in the table
+	 * @returns {Promise<void>}
+	 */
+	async clear() {
+		// @ts-expect-error
+		await this.saveData({});
+		return;
 	}
 }

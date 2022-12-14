@@ -2,7 +2,6 @@ import { ItemTypes, Player, system, world } from "@minecraft/server";
 import { visualise_benchmark_result } from "../../lib/Benchmark.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { CONFIG_DB } from "../../lib/Setup/registryDynamicProperties.js";
 import { handler, IS, toStr, XA } from "../../xapi.js";
 
 /** @type {Record<string, "player" | "world">} */
@@ -161,6 +160,3 @@ new XA.Command({
 	}
 	show();
 });
-
-function a() { a() }
-a()

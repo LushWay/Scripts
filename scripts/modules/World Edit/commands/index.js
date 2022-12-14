@@ -2,7 +2,6 @@ import { multiload } from "../../../lib/Module/loader.js";
 import "./brush/brush.js";
 import "./brush/custom items.js";
 
-import "./general/main.js";
 import "./general/undo.js";
 import "./general/redo.js";
 import "./general/drawsel.js";

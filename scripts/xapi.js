@@ -8,7 +8,7 @@ var loading = true;
 import "./lib/Types/prototypes.js";
 
 // This need to be loaded before all another scripts
-import "./lib/Setup/registryDynamicProperties.js";
+import { Database } from "./lib/Database/Entity.js";
 import "./lib/Setup/watchdog.js";
 
 // Some system stuff
@@ -18,19 +18,19 @@ import { DIMENSIONS } from "./lib/List/dimensions.js";
 
 // X-API methods
 import { XEntity } from "./lib/Class/Entity.js";
+import { XCooldown } from "./lib/Class/XCooldown.js";
+import { XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
+import { XRequest } from "./lib/Class/XRequest.js";
 import { XCommand } from "./lib/Command/Command.js";
-import { XCacheDatabase, XInstantDatabase } from "./lib/Database/DynamicProperties.js";
-import { XItemDatabase } from "./lib/Database/Item.js";
+
 import { emoji } from "./lib/Lang/emoji.js";
 import { parse } from "./lib/Lang/parser.js";
 import { text } from "./lib/Lang/text.js";
 import { Timeout } from "./lib/Timeout.js";
 import { XrunCommand } from "./lib/XrunCommand.js";
 
+import { XItemDatabase } from "./lib/Database/Item.js";
 // Modules and undeletable scoreboards
-import { XCooldown } from "./lib/Class/XCooldown.js";
-import { wo, XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
-import { XRequest } from "./lib/Class/XRequest.js";
 import { load } from "./lib/Module/loader.js";
 import "./lib/Setup/registryScore.js";
 import "./modules/import.js";
@@ -49,13 +49,28 @@ export class XA {
 	static WorldOptions = XOptions;
 
 	static tables = {
-		chests: new XInstantDatabase(world, "chests"),
-		player: new XInstantDatabase(world, "player"),
-		kits: new XInstantDatabase(world, "kits"),
-		drops: new XInstantDatabase(world, "drop"),
-		basic: new XInstantDatabase(world, "basic"),
-		region: new XInstantDatabase(world, "region"),
-		buildRegion: new XInstantDatabase(world, "buildRegion"),
+		/**
+		 * Database to save server roles
+		 * @type {Database<string, keyof typeof ROLES>}
+		 */
+		roles: new Database("roles"),
+
+		/**
+		 * Database to store any player data
+		 * @type {Database<string, any>}
+		 */
+		player: new Database("player"),
+
+		/** @type {Database<string, any>} */
+		basic: new Database("basic"),
+
+		region: new Database("region"),
+		buildRegion: new Database("buildRegion"),
+
+		// Trash
+		chests: new Database("chests"),
+		kits: new Database("kits"),
+		drops: new Database("drop"),
 		i: new XItemDatabase("items"),
 	};
 	static Lang = {
@@ -65,9 +80,6 @@ export class XA {
 	};
 
 	static dimensions = DIMENSIONS;
-
-	static instantDB = XInstantDatabase;
-	static cacheDB = XCacheDatabase;
 
 	/** @type {{name?: string, id: string, watch?: boolean}[]} */
 	static objectives = [];
@@ -103,7 +115,7 @@ export const T_roles = {
 export function getRole(playerID) {
 	if (playerID instanceof Player) playerID = playerID.id;
 
-	const role = new XInstantDatabase(world, "roles").get(playerID);
+	const role = XA.tables.roles.get(playerID);
 
 	if (!Object.keys(ROLES).includes(role)) return "member";
 	return role;
@@ -118,8 +130,7 @@ export function getRole(playerID) {
  */
 export function setRole(player, role) {
 	if (player instanceof Player) player = player.id;
-	const DB = new XInstantDatabase(world, "roles");
-	DB.set(player, role);
+	XA.tables.roles.set(player, role);
 }
 
 /**
@@ -368,6 +379,22 @@ export function setPlayerInterval(callback, ticks = 0, name) {
  */
 export function setPlayerTimeout(callback, ticks = 1, name) {
 	return Timeout(ticks, () => forPlayers(callback), false, name ?? Date.now());
+}
+
+/**
+ * Awaits till work load
+ * @returns {Promise<void>}
+ */
+export async function awaitWorldLoad() {
+	return;
+}
+/**
+ * Sends a callback once world is loaded
+ * @param {() => void} callback  undefined
+ * @returns {void}
+ */
+export function onWorldLoad(callback) {
+	return callback();
 }
 
 /**

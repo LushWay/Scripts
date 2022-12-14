@@ -1,7 +1,8 @@
-import { setPlayerInterval, XA } from "xapi.js";
+import { setPlayerInterval, setTickInterval, XA } from "xapi.js";
 
 const Opts = XA.WorldOptions("debug", {
 	enabled: { value: true, desc: "Включает режим отладки" },
+	chestGUI: { desc: "", value: true },
 });
 if (Opts.enabled) {
 	const getPLayerSettings = XA.PlayerOptions("debug", {
@@ -33,6 +34,14 @@ if (Opts.enabled) {
 		0,
 		"debug"
 	);
+
+	setTickInterval(() => {
+		for (const ent of XA.dimensions.overworld.getEntities({
+			type: "mcbehub:inventory",
+		})) {
+			ent.runCommandAsync("particle minecraft:endrod ~~~");
+		}
+	}, 40);
 }
 
 // setTickInterval(() => {

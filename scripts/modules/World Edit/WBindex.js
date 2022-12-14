@@ -21,7 +21,7 @@ world.events.blockPlace.subscribe((data) => {
 	if (blocks.length < 1) return;
 	const location = data.block.location;
 	const block = blocks[~~(Math.random() * blocks.length)];
-	if (/^.+\.\d+/g.test(block)) {
+	if (/^(.+)\.(\d+)/g.test(block)) {
 		// Block is written like "stone.3", so we need to get data and id
 		const [_, id, data] = /^(.+)\.(\d+)/g.exec(block);
 		XA.runCommandX(`setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`);

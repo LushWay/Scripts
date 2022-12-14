@@ -1,20 +1,20 @@
 import {
 	BlockLocation,
 	Entity,
-	IEntityComponent,
 	ItemStack,
 	Location,
 	Player,
 	PlayerInventoryComponentContainer,
 	world,
 } from "@minecraft/server";
-import { XInstantDatabase } from "../Database/DynamicProperties.js";
+import { Database } from "../Database/Entity.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
-const DB = new XInstantDatabase(world, "player");
+const DB = new Database("player");
 
-// Authots: Smell of curry, mrpatches, mo9ses and xiller (Leaftail)
-
+/**
+ * @author Smell of Curry, mrpatches123, mo9ses, xiller229 (Leaftail)
+ */
 export const XEntity = {
 	/**
 	 * Gets player name from player database with specific ID
