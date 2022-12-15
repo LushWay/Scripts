@@ -151,10 +151,14 @@ bbr
 
 world.events.playerJoin.subscribe((j) => {
 	const jj = j.player;
-	setTickTimeout(() => {
-		if (jj && jj?.name && XA.Entity.fetch(jj.name) && XA.Entity.getTagStartsWith(jj, "br:")) {
-			br.tags.forEach((e) => jj.removeTag(e));
-			Atp(jj, "br");
-		}
-	}, 5);
+	setTickTimeout(
+		() => {
+			if (jj && jj?.name && XA.Entity.fetch(jj.name) && XA.Entity.getTagStartsWith(jj, "br:")) {
+				br.tags.forEach((e) => jj.removeTag(e));
+				Atp(jj, "br");
+			}
+		},
+		5,
+		"br"
+	);
 });

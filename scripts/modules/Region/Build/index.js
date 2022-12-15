@@ -54,15 +54,19 @@ world.events.blockBreak.subscribe(({ player, block, brokenBlockPermutation, dime
 	// 	}
 	// }
 	// killing dropped items
-	setTickTimeout(() => {
-		[
-			...dimension.getEntities({
-				maxDistance: 2,
-				type: "minecraft:item",
-				location: new Location(block.location.x, block.location.y, block.location.z),
-			}),
-		].forEach((e) => e.kill());
-	}, 0);
+	setTickTimeout(
+		() => {
+			[
+				...dimension.getEntities({
+					maxDistance: 2,
+					type: "minecraft:item",
+					location: new Location(block.location.x, block.location.y, block.location.z),
+				}),
+			].forEach((e) => e.kill());
+		},
+		0,
+		"itemClear"
+	);
 });
 
 world.events.beforeExplosion.subscribe((data) => (data.cancel = true));

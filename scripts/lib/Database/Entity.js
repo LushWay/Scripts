@@ -37,38 +37,38 @@ function chunkString(str, length) {
 }
 
 let WORLD_IS_LOADED = false;
+
+/** @type {Function[]} */
+const onLoad = [];
+
+let s = system.runSchedule(async () => {
+	try {
+		await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+		system.clearRunSchedule(s);
+		WORLD_IS_LOADED = true;
+		onLoad.forEach((e) => e());
+	} catch (error) {}
+}, 1);
+
 /**
  * Awaits till work load
  * @returns {Promise<void>}
  */
-async function awaitWorldLoad() {
+export async function awaitWorldLoad() {
 	if (WORLD_IS_LOADED) return;
 	return new Promise((resolve) => {
-		let s = system.runSchedule(async () => {
-			try {
-				await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
-				system.clearRunSchedule(s);
-				WORLD_IS_LOADED = true;
-				resolve();
-			} catch (error) {}
-		}, 1);
+		onLoad.push(resolve);
 	});
 }
+
 /**
  * Sends a callback once world is loaded
  * @param {() => void} callback  undefined
  * @returns {void}
  */
-function onWorldLoad(callback) {
+export function onWorldLoad(callback) {
 	if (WORLD_IS_LOADED) return callback();
-	let s = system.runSchedule(async () => {
-		try {
-			await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
-			system.clearRunSchedule(s);
-			WORLD_IS_LOADED = true;
-			callback();
-		} catch (error) {}
-	}, 1);
+	onLoad.push(callback);
 }
 
 /** @type {Record<string, Database<any, any>>} */
@@ -98,9 +98,13 @@ export class Database {
 	 * @returns {Entity[]} *
 	 */
 	static getTableEntities(tableName) {
-		return DIMENSIONS.overworld
-			.getEntitiesAtBlockLocation(ENTITY_LOCATION)
-			.filter((e) => e.typeId == ENTITY_IDENTIFIER && e.getDynamicProperty("tableName") == tableName);
+		try {
+			return DIMENSIONS.overworld
+				.getEntitiesAtBlockLocation(ENTITY_LOCATION)
+				.filter((e) => e?.typeId === ENTITY_IDENTIFIER && e?.getDynamicProperty("tableName") === tableName);
+		} catch (e) {
+			return [];
+		}
 	}
 	/**
 	 * Data saved in memory
@@ -120,6 +124,7 @@ export class Database {
 	 */
 	constructor(tableName) {
 		if (tableName in CreatedInstances) return CreatedInstances[tableName];
+		world.say(tableName);
 		this.tableName = tableName;
 		this.MEMORY = null;
 		this.QUEUE = [];
@@ -196,7 +201,7 @@ export class Database {
 	}
 	/**
 	 * Grabs all data from this table
-	 * @returns {{ [key in Key]: Value; }} *
+	 * @returns {{ [key in Key]: Value; }}
 	 * @private
 	 */
 	getData() {
@@ -340,6 +345,7 @@ export class Database {
 	 * @returns {Promise<boolean>}
 	 */
 	async deleteSync(key) {
+		await awaitWorldLoad();
 		const data = await this.getData();
 		const status = delete data[key];
 		await this.saveData(data);

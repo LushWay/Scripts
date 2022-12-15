@@ -1,23 +1,22 @@
 import { BlockLocation, world } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 
-const genb = new XA.Command({
+const root = new XA.Command({
 	name: "id",
 	description: "Выдает айди",
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "test"*/
+	type: "test",
 }).executes((ctx) => {
 	const item = XA.Entity.getHeldItem(ctx.sender);
-
-	ctx.reply(`§a► §f${item?.typeId} ${item?.data} ${item?.nameTag ? item?.nameTag : ""}`);
+	ctx.reply(`§b► §f${item?.typeId} ${item?.data} ${item?.nameTag ? item?.nameTag : ""}`);
 });
 
-genb.literal({ name: "c", description: "очсищ" }).executes((ctx) => {
+root.literal({ name: "c", description: "очсищ" }).executes((ctx) => {
 	const tag = XA.Entity.getTagStartsWith(ctx.sender, "st:");
-	ctx.reply(`§a► §c-§f${tag}`);
+	ctx.reply(`§b► §c-§f${tag}`);
 	XA.Entity.removeTagsStartsWith(ctx.sender, "st:");
 });
-genb.literal({ name: "a", description: "добав" }).executes((ctx) => {
+root.literal({ name: "a", description: "добав" }).executes((ctx) => {
 	const blocks = [];
 	XA.Entity.getTagStartsWith(ctx.sender, "st:")
 		?.split(",")
@@ -27,7 +26,7 @@ genb.literal({ name: "a", description: "добав" }).executes((ctx) => {
 	XA.Entity.removeTagsStartsWith(ctx.sender, "st:");
 	ctx.sender.addTag("st:" + blocks.join(","));
 });
-genb
+root
 	.literal({ name: "l", description: "Выдает id блока" })
 	.location("location", true)
 	.executes((ctx, location) => {
@@ -41,7 +40,7 @@ genb
 			  ));
 		ctx.reply(`§a► §f${world.getDimension("overworld").getBlock(l)?.typeId}`);
 	});
-genb
+root
 	.literal({ name: "sl", description: "Задает лор предмета" })
 	.string("lore")
 	.executes((ctx) => {
@@ -51,14 +50,14 @@ genb
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
 	});
-genb.literal({ name: "st", description: "Задает лор предмета" }).executes((ctx) => {
+root.literal({ name: "st", description: "Задает лор предмета" }).executes((ctx) => {
 	let item = XA.Entity.getHeldItem(ctx.sender);
 	let oldtag = item.getLore();
 	item.setLore([XA.Entity.getTagStartsWith(ctx.sender, "st:")]);
 	XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 	ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
 });
-genb
+root
 	.literal({ name: "sn", description: "Задает имя предмета" })
 	.string("name")
 	.executes((ctx, name) => {
@@ -68,7 +67,7 @@ genb
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.nameTag}`);
 	});
-genb
+root
 	.literal({ name: "sc", description: "Задает количество предметов" })
 	.int("count")
 	.executes((ctx, count) => {
@@ -78,6 +77,6 @@ genb
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.amount}`);
 	});
-genb.literal({ name: "rot", description: "Выдает ротатион" }).executes((ctx) => {
+root.literal({ name: "rot", description: "Выдает ротатион" }).executes((ctx) => {
 	ctx.reply(`§a► §f${ctx.sender.rotation.x} ${ctx.sender.rotation.y}`);
 });

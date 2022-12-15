@@ -9,7 +9,6 @@ import "./commands/lore.js";
 import "./commands/other.js";
 import "./commands/particle.js";
 import "./commands/sound.js";
-import "./commands/world.js";
 import "./pvp.js";
 import "./tool.js";
 import { options, stats } from "./var.js";
@@ -24,7 +23,7 @@ const boom = {
 
 XA.objectives.push({ id: "join", watch: true });
 
-/*=========================================== ВЗРЫВНЫЕ ФЕЙРВЕРКИ ===========================================*/
+/*=========================================== ВЗРЫВНЫЕ ФЕЙРВЕРКИ ===========================================
 setTickInterval(
 	() => {
 		for (const f of XA.dimensions.overworld.getEntities({ type: "fireworks_rocket" })) {
@@ -81,7 +80,7 @@ setTickInterval(
 	},
 	0,
 	"serverBoomShit"
-);
+);*/
 
 setTickInterval(
 	() => {
@@ -92,14 +91,14 @@ setTickInterval(
 			)
 				pl.triggerEvent("spawn");
 
-		for (const ent of XA.dimensions.overworld.getEntities({
-			families: ["monster"],
-		}))
-			if (
-				ent.dimension.getBlock(XA.Entity.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
-				"minecraft:deny"
-			)
-				XA.Entity.despawn(ent);
+		// for (const ent of XA.dimensions.overworld.getEntities({
+		// 	families: ["monster"],
+		// }))
+		// 	if (
+		// 		ent.dimension.getBlock(XA.Entity.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
+		// 		"minecraft:deny"
+		// 	)
+		// 		XA.Entity.despawn(ent);
 	},
 	0,
 	"serverTpShit"

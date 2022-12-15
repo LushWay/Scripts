@@ -2,7 +2,7 @@ import { BlockLocation, Player } from "@minecraft/server";
 import { sleep, ThrowError, XA } from "xapi.js";
 import { WB_CONFIG } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
-import { Return } from "../utils/Return.js";
+import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";
 
 class WorldEditBuilder {
@@ -98,7 +98,9 @@ class WorldEditBuilder {
 				backup.load();
 				this.history.splice(this.history.indexOf(backup), 1);
 			}
-			return `§a► §rУспешно отменено ${amount} бэкапов!`;
+
+			const e = XA.Cooldown.getT(amount.toString(), ["бэкап", "бэкапа", "бэкапов"]);
+			return `§b► §3Успешно отменен${amount.toString().endsWith("1") ? "" : "о"} §f${amount} §3${e}!`;
 		} catch (error) {
 			return `§4► ${error}`;
 		}
@@ -108,45 +110,41 @@ class WorldEditBuilder {
 	 * @returns {string}
 	 * @example redo();
 	 */
-	redo() {
+	redo(amount = 1) {
 		try {
-			if (this.undos.length < 1) throw new Error("Нечего отменять");
-			const data = this.undos.slice(-1)[0];
-			this.backup(data.pos1, data.pos2);
-			data.load();
-			this.undos.pop();
-			return `§a► §rУспешно возвращено!`;
+			if (this.undos.length < amount) amount = this.undos.length;
+			const backups = this.undos.slice(-amount);
+			for (const backup of backups.reverse()) {
+				this.backup(backup.pos1, backup.pos2, this.undos);
+				backup.load();
+				this.undos.splice(this.undos.indexOf(backup), 1);
+			}
+
+			const e = XA.Cooldown.getT(amount.toString(), ["бэкап", "бэкапа", "бэкапов"]);
+			return `§b► §3Успешно возвращен${amount.toString().endsWith("1") ? "" : "о"} §f${amount} §3${e}!`;
 		} catch (error) {
-			ThrowError(error);
+			return `§4► ${error}`;
 		}
 	}
 	/**
 	 * Copys The curret positions
-	 * @returns {Promise<Return>}
+	 * @returns {Promise<string>}
 	 * @example copy();
 	 */
 	async copy() {
 		try {
+			const opt = await XA.runCommandX(
+				`structure save ${WB_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
+			);
+			if (!opt) throw new Error(opt + "");
 			this.current_copy = {
 				pos1: this.pos1,
 				pos2: this.pos2,
 				name: WB_CONFIG.COPY_FILE_NAME,
 			};
-			const opt =
-				(await XA.runCommandX(
-					`structure save ${WB_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
-				)) > 0;
-			if (opt) throw new Error(opt + "");
-			return new Return(false, 0, {
-				pos1: this.pos1,
-				pos2: this.pos2,
-				statusMessage: `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`,
-			});
+			return `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`;
 		} catch (error) {
-			//console.warn(error + error.stack);
-			return new Return(true, 1, {
-				statusMessage: `§4► Не удалось скорпировать [${error}]`,
-			});
+			return `§4► Не удалось скорпировать [${error}]`;
 		}
 	}
 	/**
@@ -194,11 +192,13 @@ class WorldEditBuilder {
 		}
 	}
 	/**
-	 * Fills All blocks between pos1 and pos 2
-	 * @async
-	 * @param {string} block valid minecraft block
-	 * @returns {Promise<Return>}
-	 * @example fillBetween("stone");
+	 *
+	 * @param {string} block
+	 * @param {*} data
+	 * @param {*} replaceMode
+	 * @param {*} replaceBlock
+	 * @param {*} rbData
+	 * @returns
 	 */
 	async fillBetween(block, data = -1, replaceMode, replaceBlock, rbData) {
 		const startTime = Date.now();
@@ -206,39 +206,41 @@ class WorldEditBuilder {
 		const Cube = new Cuboid(this.pos1, this.pos2);
 		const blocks = Cube.blocksBetween;
 		let errors = 0;
-		let comm = 0;
-		for (const cube of Cube.split(WB_CONFIG.FILL_CHUNK_SIZE)) {
-			const opt =
-				(await XA.runCommandX(
-					`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${
-						cube.pos2.z
-					} ${block} ${data} ${replaceMode ? replaceMode : ""} ${replaceBlock ? replaceBlock : ""} ${
-						rbData ? rbData : ""
-					}`
-				)) > 0;
-			if (opt) {
-				errors++;
-			}
-			comm++;
+		let all = 0;
 
+		let fulldata = block;
+		const add = (/** @type {string | number} */ s) => (fulldata += ` ${s}`);
+
+		if (!isNaN(data)) add(data);
+
+		if (replaceMode) {
+			add(replaceMode);
+			if (replaceMode === "replace") {
+				if (replaceBlock) add(replaceBlock);
+				if (!isNaN(rbData)) add(rbData);
+			}
+		}
+
+		for (const cube of Cube.split(WB_CONFIG.FILL_CHUNK_SIZE)) {
+			const result = await XA.runCommandX(
+				`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
+				{ showError: true, showOutput: true }
+			);
+			if (result === 0) errors++;
+			all++;
 			await sleep(1);
 		}
 
-		const endTime = Math.round(Date.now() - startTime);
-		if (errors) {
-			return new Return(false, 0, {
-				fillCount: blocks,
-				statusMessage: `§4► §c${errors}§f\\§a${0}§7 Заполнено с ошибкой, §f${blocks} §7(§f~${endTime}§7 мс). ${
-					replaceMode ? `Режим заполнения: §f${replaceMode}§7, заполняемый блок: §f${replaceBlock} ` : ""
-				}${rbData ? rbData : ""}`,
-			});
-		}
-		return new Return(false, 0, {
-			fillCount: blocks,
-			statusMessage: `§a► §7Заполненно, §f${blocks} §7(§f~${endTime}§7 мс). ${
-				replaceMode ? `Режим заполнения: §f${replaceMode}§7, заполняемый блок: §f${replaceBlock} ` : ""
-			}${rbData ? rbData : ""}`,
-		});
+		const endTime = get(Date.now() - startTime);
+
+		let reply = `§3Заполненно §f${blocks} §3блоков ${
+			endTime.parsedTime !== "0" ? `за §f${endTime.parsedTime} §3${endTime.type}.` : ""
+		}`;
+		if (replaceMode) reply += ` §3Режим заполнения: §b${replaceMode}`;
+		if (replaceMode === "replace") reply += `§3, заполняемый блок: §f${replaceBlock} ${rbData ? rbData : ""}`;
+
+		if (errors) return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок. ${reply}`;
+		return `§b► ${reply}`;
 	}
 	getPoses() {
 		return {

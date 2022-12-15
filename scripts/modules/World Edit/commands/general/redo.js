@@ -6,7 +6,9 @@ new XA.Command({
 	name: "redo",
 	description: "Возвращает последнее действие (из памяти)",
 	requires: (p) => IS(p.id, "moderator"),
-}).executes((ctx) => {
-	const command = WorldEditBuild.redo();
-	if (command) ctx.reply(command);
-});
+})
+	.int("redoCount", true)
+	.executes((ctx, r) => {
+		const status = WorldEditBuild.redo(!isNaN(r) ? r : 1);
+		if (status) ctx.reply(status);
+	});

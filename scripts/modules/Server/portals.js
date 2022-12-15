@@ -20,7 +20,6 @@ new WorldOption("minigames:pos", "(x y z)\nТакже можно выстави�
 const getSettings = XA.PlayerOptions("Atp", {
 	showCoordinates: { desc: "Показывать координаты телепортации (выключите если вы стример)", value: true },
 });
-
 /**
  *
  * @param {Player} player
@@ -352,29 +351,49 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
 	if (data.id != "ded") return;
 	const c = XA.Entity.getClosetsEntitys(data.entity, 1, "f:t", 1, false)[0];
 	c.nameTag = `§6-=[§f    §6]=-`;
-	setTickTimeout(() => {
-		c.nameTag = `§6-=[  ]=-`;
-	}, 5);
+	setTickTimeout(
+		() => {
+			c.nameTag = `§6-=[  ]=-`;
+		},
+		5,
+		"nt"
+	);
 
-	setTickTimeout(() => {
-		c.nameTag = `§6-=[ ]=-`;
-	}, 10);
-	setTickTimeout(() => {
-		c.nameTag = `§6-[]-`;
-	}, 15);
-	setTickTimeout(() => {
-		c.nameTag = `§6-`;
-	}, 20);
-	setTickTimeout(() => {
-		c.teleport(new Location(0, -64, 0), c.dimension, 0, 0);
-		c.triggerEvent("kill");
-	}, 25);
+	setTickTimeout(
+		() => {
+			c.nameTag = `§6-=[ ]=-`;
+		},
+		10,
+		"nt"
+	);
+	setTickTimeout(
+		() => {
+			c.nameTag = `§6-[]-`;
+		},
+		15,
+		"nt"
+	);
+	setTickTimeout(
+		() => {
+			c.nameTag = `§6-`;
+		},
+		20,
+		"nt"
+	);
+	setTickTimeout(
+		() => {
+			c.teleport(new Location(0, -64, 0), c.dimension, 0, 0);
+			c.triggerEvent("kill");
+		},
+		25,
+		"nt"
+	);
 });
 setTickInterval(
 	() => {
 		for (const e of XA.Entity.getEntitys("t:hpper_minecart")) {
 			const inv = XA.Entity.getI(e);
-			if (inv.size == inv.emptySlotsCount) {
+			if (inv.size === inv.emptySlotsCount) {
 				e.triggerEvent("ded");
 				e.kill();
 			}
@@ -383,10 +402,6 @@ setTickInterval(
 	20,
 	"portal20shit"
 );
-
-const qqq = {
-	scoreOptions: [{ objective: objective[0], minScore: 1, maxScore: 1 }],
-};
 /**
 setTickInterval(
 	async () => {
@@ -434,39 +449,25 @@ setTickInterval(
 );
 */
 
-world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
-	if (data.id != "portal" || !(data.entity instanceof Player)) return;
-	data.cancel = true;
-	const to = world
-		.getDimension(data.entity.dimension.id)
-		.getBlock(
-			new BlockLocation(
-				Math.floor(data.entity.location.x),
-				Math.floor(data.entity.location.y - 3),
-				Math.floor(data.entity.location.z)
-			)
-		);
-	if (to.typeId != "minecraft:chest") return;
-	/**
-	 * @type {InventoryComponentContainer}
-	 */
-	const toi = to.getComponent("inventory").container;
-	const i = toi.getItem(0);
-	if (!i) return;
-	switch (i.getLore()[0]) {
-		case "forward":
-			let poo;
-			if (i.getLore()[1] == "minigames") poo = wo.G("minigames:pos");
-			if (!poo) poo = i.getLore()[1];
-
-			tp(data.entity, poo, i.getLore()[2], po.Q("title:spawn:enable", data.entity), { on: false }, i.getLore()[3]);
-			break;
-		default:
-			// @ts-expect-error
-			Atp(data.entity, i.getLore()[0]);
-			break;
-	}
-});
+world.events.beforeDataDrivenEntityTriggerEvent.subscribe(
+	(data) => {
+		if (data.id !== "portal" || !(data.entity instanceof Player)) return;
+		data.cancel = true;
+		const to = world
+			.getDimension(data.entity.dimension.id)
+			.getBlock(XA.Entity.vecToBlockLocation(data.entity.location).offset(0, -3, 0));
+		if (to.typeId !== "minecraft:chest") return;
+		const toi = to.getComponent("inventory").container;
+		const i = toi.getItem(0);
+		if (!i) return;
+		const lore = i.getLore()[0];
+		if (!lore) return;
+		if (!["anarch", "spawn", "br", "minigames", "currentpos"].includes(lore)) return;
+		// @ts-expect-error
+		Atp(data.entity, lore);
+	},
+	{ eventTypes: ["portal"], entityTypes: ["minecraft:player"] }
+);
 
 new XA.Command({
 	name: "hub",
@@ -477,7 +478,7 @@ new XA.Command({
 	.executes((ctx) => {
 		Atp(ctx.sender, "spawn");
 	})
-	.literal({ name: "set", requires: (p) => p.hasTag("commands") })
+	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
 		let loc = XA.Entity.vecToBlockLocation(pos ?? ctx.sender.location);
@@ -496,7 +497,7 @@ new XA.Command({
 	.executes((ctx) => {
 		Atp(ctx.sender, "minigames");
 	})
-	.literal({ name: "set", requires: (p) => p.hasTag("commands") })
+	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
 		let loc = XA.Entity.vecToBlockLocation(pos ?? ctx.sender.location);
@@ -514,7 +515,7 @@ new XA.Command({
 	.executes((ctx) => {
 		Atp(ctx.sender, "anarch");
 	})
-	.literal({ name: "set", requires: (p) => p.hasTag("commands") })
+	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
 		let loc = XA.Entity.vecToBlockLocation(pos ?? ctx.sender.location);

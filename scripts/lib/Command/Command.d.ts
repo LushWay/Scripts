@@ -68,7 +68,7 @@ export class XCommand<
 	 * @param name name this argument  should have
 	 * @returns new branch to this command
 	 */
-	location(name: string, optional?: boolean): ArgReturn<Callback, Location>;
+	location(name: string, optional?: boolean): ArgReturn<Callback, Vector3>;
 
 	/**
 	 * Adds a subCommand to this argument

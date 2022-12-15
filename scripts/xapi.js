@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, system, world } from "@minecraft/server";
 
 world.say("§9┌ §fLoading...");
 // Var because it maybe need to be avaible before initialization
@@ -157,17 +157,18 @@ export function IS(playerID, role) {
 export function ThrowError(e, deleteStack = 0, additionalStack = []) {
 	const isStr = typeof e === "string";
 	const stack = stackParse(deleteStack + 1, additionalStack, isStr ? void 0 : e.stack);
-	const message = (isStr ? e ?? "Unknown" : e.message).replace(/\n/g, "");
-
+	const message = (isStr ? e : e.message).replace(/\n/g, "");
 	const type = isStr ? "CommandError" : e?.name ?? "Error";
 
-	const c = loading ? "§9├§r " : "";
-	const l = loading ? "§9│§r" : "";
-	const s = `\n§f${stack}\n`.replace(/\n/g, `\n${l}`);
+	const text = `§4${type}: §c${message}\n§f${stack}\n`;
+	console.warn(text);
 
-	const text = `§4${type}: §c${message}${s}`;
-
-	CONFIG.console.errPath === "chat" ? world.say(c + text) : console.warn(text.cc());
+	// try {
+	// 	world.say(text); // CONFIG.console.errPath === "chat" ?  : console.warn(text.cc());
+	// } catch (e) {
+	// 	console.warn(isStr ? e : `${e.name} ${e.message}: ${e.stack}`);
+	// }
+	// console.warn(text.cc());
 }
 
 /**
@@ -348,7 +349,7 @@ export const sleep = (time) => new Promise((resolve) => setTickTimeout(() => res
 /**
  * @param {Function} callback
  * @param {number} ticks
- * @param {string} [name]
+ * @param {string} name
  */
 export function setTickInterval(callback, ticks = 0, name) {
 	return Timeout(ticks, callback, true, name);
@@ -357,7 +358,7 @@ export function setTickInterval(callback, ticks = 0, name) {
 /**
  * @param {Function} callback
  * @param {number} ticks
- * @param {string} [name]
+ * @param {string} name
  */
 export function setTickTimeout(callback, ticks = 1, name) {
 	return Timeout(ticks, callback, false, name ?? Date.now());
@@ -366,7 +367,7 @@ export function setTickTimeout(callback, ticks = 1, name) {
 /**
  * @param {(player: Player) => void} callback
  * @param {number} ticks
- * @param {string} [name]
+ * @param {string} name
  */
 export function setPlayerInterval(callback, ticks = 0, name) {
 	return Timeout(ticks, () => forPlayers(callback), true, name);
@@ -375,26 +376,45 @@ export function setPlayerInterval(callback, ticks = 0, name) {
 /**
  * @param {(player: Player) => void} callback
  * @param {number} ticks
- * @param {string} [name]
+ * @param {string} name
  */
 export function setPlayerTimeout(callback, ticks = 1, name) {
 	return Timeout(ticks, () => forPlayers(callback), false, name ?? Date.now());
 }
+
+let WORLD_IS_LOADED = false;
+
+/** @type {Function[]} */
+const onLoad = [];
+
+let s = system.runSchedule(async () => {
+	try {
+		await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+		system.clearRunSchedule(s);
+		WORLD_IS_LOADED = true;
+		onLoad.forEach((e) => e());
+	} catch (error) {}
+}, 1);
 
 /**
  * Awaits till work load
  * @returns {Promise<void>}
  */
 export async function awaitWorldLoad() {
-	return;
+	if (WORLD_IS_LOADED) return;
+	return new Promise((resolve) => {
+		onLoad.push(resolve);
+	});
 }
+
 /**
  * Sends a callback once world is loaded
  * @param {() => void} callback  undefined
  * @returns {void}
  */
 export function onWorldLoad(callback) {
-	return callback();
+	if (WORLD_IS_LOADED) return callback();
+	onLoad.push(callback);
 }
 
 /**
@@ -404,7 +424,8 @@ export function onWorldLoad(callback) {
 export const DIR_IMPORT = (path) => import(path);
 
 // Load modules
-load().then(() => {
+awaitWorldLoad().then(async (e) => {
+	await load();
 	world.say("§9└ §fDone.");
 	loading = false;
 });

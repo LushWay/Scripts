@@ -1,6 +1,7 @@
 import { BlockLocation, Entity } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 import { SelectionBuild } from "../../modules/builders/SelectionBuilder.js";
+import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 /**
  * Get the current chunk of a entity
@@ -17,7 +18,6 @@ function getCurrentChunk(entity) {
 /**
  * Gets the cuboid positions of a entitys chunk
  * @param {Entity} entity entity to check
- * @returns {Object}
  * @example getChunkCuboidPositions(Entity);
  */
 function getChunkCuboidPositions(entity) {
@@ -37,9 +37,9 @@ new XA.Command({
 	requires: (p) => IS(p.id, "moderator"),
 }).executes((ctx) => {
 	const chunkBorder = getChunkCuboidPositions(ctx.sender);
-	SelectionBuild.setPos1(chunkBorder.pos1.x, chunkBorder.pos1.y, chunkBorder.pos1.z);
-	SelectionBuild.setPos2(chunkBorder.pos2.x, chunkBorder.pos2.y, chunkBorder.pos2.z);
+	WorldEditBuild.pos1 = chunkBorder.pos1;
+	WorldEditBuild.pos2 = chunkBorder.pos2;
 	ctx.reply(
-		`§9►§rВыделенна зона: §5Позиция 1§r: ${chunkBorder.pos1.x} ${chunkBorder.pos1.y} ${chunkBorder.pos1.z}, §dПозиция 2§r: ${chunkBorder.pos2.x} ${chunkBorder.pos2.y} ${chunkBorder.pos2.z}`
+		`§b►§3Выделенна зона: §5Позиция 1§3: ${chunkBorder.pos1.x} ${chunkBorder.pos1.y} ${chunkBorder.pos1.z}, §dПозиция 2§3: ${chunkBorder.pos2.x} ${chunkBorder.pos2.y} ${chunkBorder.pos2.z}`
 	);
 });

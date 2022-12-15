@@ -40,7 +40,7 @@ setTickInterval(
 		/*================================================================================================*/
 
 		/*=========================================== ЗОНА ===========================================*/
-		const players = [...world.getPlayers()];
+		const players = world.getAllPlayers();
 		global.Radius = 200 + 20 * players.length;
 		const rad = global.Radius;
 		const pcenter = wo.G("zone:center");
@@ -66,7 +66,7 @@ setTickInterval(
 			if (xtrue && ztrue) {
 				if (XA.Entity.getScore(p, "inv") !== 2 && !p.hasTag("saving") && !p.hasTag("br:ded")) {
 					Atp(p, "anarch", { pvp: true });
-				}
+				} else continue;
 			}
 
 			if (l.x >= rmax.x && l.x <= rmax.x + 10 && ztrue) ret(p, true, rmax);

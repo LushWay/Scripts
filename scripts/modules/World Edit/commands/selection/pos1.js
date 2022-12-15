@@ -1,5 +1,5 @@
 import { IS, XA } from "xapi.js";
-import { SelectionBuild } from "../../modules/builders/SelectionBuilder.js";
+import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 new XA.Command({
 	name: "pos1",
@@ -9,8 +9,6 @@ new XA.Command({
 })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		SelectionBuild.setPos1(pos.x, pos.y, pos.z);
+		WorldEditBuild.pos1 = pos;
 		ctx.reply(`§5►§r (1) ${pos.x}, ${pos.y}, ${pos.z}`);
-		const a = [];
-		a.toString();
 	});

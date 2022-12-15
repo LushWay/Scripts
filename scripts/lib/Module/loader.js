@@ -20,7 +20,7 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 			ThrowError({
 				message: `§c${name}: §f${`${e.message ?? e}`.replace(
 					// Get "Module (>>modules/ex/index.js:12<<)" part
-					/([\w\/]+\.js:?\s?)/,
+					/([\w\s\/]+\.js:?\s?)/,
 					"§6$1§f"
 				)}`,
 				stack: e.stack,

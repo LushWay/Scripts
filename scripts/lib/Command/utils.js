@@ -17,6 +17,7 @@ export function getChatAugments(message, prefix) {
 	return message
 		.slice(prefix.length)
 		.trim()
+		.replace(/([~^][^~^\s]*)/g, "$1 ")
 		.match(/"[^"]+"|[^\s]+/g)
 		.map((e) => e.replace(/"(.+)"/, "$1").toString());
 }
@@ -42,19 +43,15 @@ export function commandNotFound(player, command) {
 
 	if (!command) return;
 
-	let cmds = [];
-
-	const add = (e) => {
-		if (!cmds.includes(e)) cmds.push(e);
-	};
+	const cmds = new Set();
 
 	for (const c of __COMMANDS__) {
-		add(c.data.name);
+		cmds.add(c.data.name);
 		if (c.data.aliases?.length > 0) {
-			c.data.aliases.forEach((e) => add(e));
+			c.data.aliases.forEach((e) => cmds.add(e));
 		}
 	}
-	let search = inaccurateSearch(command, cmds);
+	let search = inaccurateSearch(command, [...cmds.values()]);
 
 	const options = {
 		minMatchTriggerValue: 0.5,
@@ -158,7 +155,9 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 	for (const [i, arg] of args.entries()) {
 		if (arg.type.name.endsWith("*")) continue;
 		if (arg.type instanceof LocationArgumentType) {
-			argsToReturn.push(parseLocationAugs([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender));
+			argsToReturn.push(
+				parseLocationAugs([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender) ?? event.sender.location
+			);
 			continue;
 		}
 		if (arg.type instanceof LiteralArgumentType) continue;

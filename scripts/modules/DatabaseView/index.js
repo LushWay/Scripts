@@ -1,11 +1,13 @@
-import { ItemTypes, Player, system, world } from "@minecraft/server";
+import { Player, system, world } from "@minecraft/server";
 import { visualise_benchmark_result } from "../../lib/Benchmark.js";
+import { CreatedInstances } from "../../lib/Database/Entity.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { handler, IS, toStr, XA } from "../../xapi.js";
 
-/** @type {Record<string, "player" | "world">} */
-const type = {};
+/**
+ * @typedef {import("../../lib/Database/Entity.js").Database<string, any>} defDB
+ */
 
 const db = new XA.Command({
 	name: "db",
@@ -21,20 +23,15 @@ db.executes((ctx) => selectTable(ctx.sender, true));
  * @param {true} [firstCall]
  */
 function selectTable(player, firstCall) {
-	if (!type[player.id]) type[player.id] = "world";
-	const form = new ActionForm("Таблицы данных", `§3Таблица для §f${type[player.id]}`);
-	for (const key in CONFIG_DB[type[player.id]]) {
-		// @ts-expect-error
-		const DB = new XA.instantDB(type[player.id] === "world" ? world : player, key);
-		const name = key + " §7" + DB.keys().length + "";
+	const form = new ActionForm("Таблицы данных");
+	for (const key in CreatedInstances) {
+		/** @type {defDB} */
+		const DB = CreatedInstances[key];
+		const name = `${key} §7${DB.keys().length}§r`;
 		form.addButton(name, null, () => {
 			showTable(player, key);
 		});
 	}
-	form.addButton("§3Сменить на §b§l" /*§r*/ + (type[player.id] === "player" ? "world" : "player"), null, () => {
-		type[player.id] = type[player.id] === "player" ? "world" : "player";
-		system.run(() => selectTable(player));
-	});
 	form.show(player);
 	if (firstCall) player.tell("§l§b> §r§3Закрой чат!");
 }
@@ -45,10 +42,10 @@ function selectTable(player, firstCall) {
  * @param {string} table
  */
 function showTable(player, table) {
-	// @ts-expect-error
-	const DB = new XA.instantDB(type[player.id] === "player" ? player : world, table);
+	/** @type {defDB} */
+	const DB = CreatedInstances[table];
 
-	const menu = new ActionForm(`${table} §7(${type[player.id]})`);
+	const menu = new ActionForm(`${table}`);
 	menu.addButton("§b§l<§r§3 Назад§r", null, () => selectTable(player));
 	menu.addButton("§3Новое значение§r", null, () => {
 		const form = new ModalForm("§3+Значение в §f" + table).addTextField("Ключ", " ");
@@ -99,9 +96,8 @@ function showTable(player, table) {
 
 /**
  *
- * @param {ModalForm} form
+ * @param {ModalForm<(args_0: any, args_1: string) => void>} form
  * @param {*} value
-
  */
 function changeValue(form, value) {
 	let type = typeof value;
@@ -114,8 +110,11 @@ function changeValue(form, value) {
 
 	return {
 		newform,
-		callback: (input, /** @type {string} */ inputType, /** @type {(newValue: any) => void} */ onChange) => {
-			/** @type {*} */
+		callback: (
+			/** @type {*} */ input,
+			/** @type {string} */ inputType,
+			/** @type {(newValue: any) => void} */ onChange
+		) => {
 			let newValue = input;
 
 			if (

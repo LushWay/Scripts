@@ -50,6 +50,7 @@ R.executes((ctx) => {
 						);
 					// @ts-expect-error
 					setRole(player.id, newrole);
+					// @ts-expect-error
 					if (fakeChange) DB.set(`SETTER:` + player.id, 1);
 				});
 		};

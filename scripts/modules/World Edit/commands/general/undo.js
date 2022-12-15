@@ -7,8 +7,8 @@ new XA.Command({
 	description: "Отменяет последнее действие (из памяти)",
 	requires: (p) => IS(p.id, "moderator"),
 })
-	.int("undoCount")
+	.int("undoCount", true)
 	.executes((ctx, r) => {
-		const status = WorldEditBuild.undo(r);
+		const status = WorldEditBuild.undo(!isNaN(r) ? r : 1);
 		ctx.reply(status);
 	});

@@ -1,8 +1,52 @@
+import { MinecraftBlockTypes, Player, world } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
-import { spawn } from "../../modules/builders/ShapeBuilder.js";
+import { inaccurateSearch } from "../../../../lib/Command/suggestions.js";
+import { ModalForm } from "../../../../lib/Form/ModelForm.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
-//import { SHAPES } from "../../modules/definitions/shapes.js";
 import { Cuboid } from "../../modules/utils/Cuboid.js";
+
+const set = new XA.Command({
+	name: "set",
+	description: "Частично или полностью заполняет блоки в выделенной области",
+	requires: (p) => IS(p.id, "moderator"),
+});
+
+set
+	.string("block")
+	.int("data", true)
+	.array("mode", ["destroy", "hollow", "keep", "outline", "replace"], true)
+	.string("other", true)
+	.int("otherData", true)
+	.executes((ctx, block, blockData, mode, other, otherData) => {
+		if (!blockIsAvaible(block, ctx.sender)) return;
+		if (other && !blockIsAvaible(other, ctx.sender)) return;
+
+		const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
+		if (time >= 0.01) ctx.reply(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`);
+
+		WorldEditBuild.fillBetween(block, blockData, mode, other, otherData).then((result) => ctx.reply(result));
+	});
+
+set.executes((ctx) => {
+	ctx.reply("§b> §3Закрой чат!");
+	new ModalForm("Заполнить")
+		.addTextField("Block", "e.g. stone", "")
+		.addSlider("Block data", 0, 15, 1, 0)
+		.addDropdown("Replace mode", ["none", "replace", "destroy", "hollow", "keep", "outline"])
+		.addTextField("Replacable block (only for replace!)", "e.g. stone", "")
+		.addSlider("Replace block data", 0, 15, 1, 0)
+		.show(ctx.sender, (_, block, blockData, mode, other, otherData) => {
+			if (!blockIsAvaible(block, ctx.sender)) return;
+			if (other && !blockIsAvaible(other, ctx.sender)) return;
+
+			const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
+			if (time >= 0.01) ctx.reply(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`);
+
+			WorldEditBuild.fillBetween(block, blockData, mode !== "none" ? mode : "", other, otherData).then((result) =>
+				ctx.reply(result)
+			);
+		});
+});
 
 /**
  * Caculates average time it will take to complete fill
@@ -17,29 +61,39 @@ function timeCaculation(pos1, pos2) {
 	return Math.round((cube.blocksBetween / fillSize) * timeForEachFill * 0.05);
 }
 
-new XA.Command({
-	name: "set",
-	description: "Частично или полностью заполняет блоки в выделенной области",
-	requires: (p) => IS(p.id, "moderator"),
-})
-	.string("block")
-	.int("data", true)
-	.array("mode", ["destroy", "hollow", "keep", "outline", "replace"], true)
-	.string("other", true)
-	.int("otherData", true)
-	.executes((ctx, block, blockData, mode, other, otherData) => {
-		if (block != "spawn") {
-			//if (!Object.keys(MinecraftBlockTypes).find((e) => e.id == 'minecraft:' + block)) return ctx.reply("§c"+block)
-			//if (replaceBlock && !Object.keys(MinecraftBlockTypes).find((e) => e.id == 'minecraft:' + replaceBlock)) return ctx.reply("§c"+replaceBlock)
-			const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
-			if (time >= 0.01) ctx.reply(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`);
-			WorldEditBuild.fillBetween(block, blockData, mode, other, otherData).then((result) =>
-				ctx.reply(result.data.statusMessage)
-			);
-		} else {
-			const p = WorldEditBuild.getPoses();
-			new spawn(p.p1.x, p.p1.z, p.p2.x, p.p2.z, blockData ? false : true);
-			const a = blockData ? "§aдобавлена" : "§cудалена";
-			ctx.reply("§a► §rЗона спавна " + a);
-		}
-	});
+const prefix = "minecraft:";
+
+const blocks = MinecraftBlockTypes.getAllBlockTypes().map((e) => e.id.substring(prefix.length));
+
+/**
+ *
+ * @param {string} block
+ * @param {Player} player
+ * @returns {boolean}
+ */
+function blockIsAvaible(block, player) {
+	if (blocks.includes(block)) return true;
+
+	player.tell("§cБлока §f" + block + "§c не существует.");
+
+	let search = inaccurateSearch(block, blocks);
+
+	const options = {
+		minMatchTriggerValue: 0.5,
+		maxDifferenceBeetwenSuggestions: 0.15,
+		maxSuggestionsCount: 3,
+	};
+
+	if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return;
+
+	const suggest = (a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`;
+	let suggestion = "§cВы имели ввиду " + suggest(search[0]);
+	let firstValue = search[0][1];
+	search = search
+		.filter((e) => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
+		.slice(1, options.maxSuggestionsCount);
+
+	for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? " или " : ", "}${suggest(e)}`;
+
+	player.tell(suggestion + "§c?");
+}

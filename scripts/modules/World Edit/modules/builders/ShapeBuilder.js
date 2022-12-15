@@ -1,5 +1,5 @@
-import { BlockLocation, MinecraftBlockTypes, world } from "@minecraft/server";
-import { handler, sleep, ThrowError, XA } from "xapi.js";
+import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
+import { sleep, ThrowError } from "xapi.js";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { WB_CONFIG } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";

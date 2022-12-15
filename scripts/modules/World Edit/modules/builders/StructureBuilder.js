@@ -6,12 +6,9 @@ import { Cuboid } from "../utils/Cuboid.js";
 export class Structure {
 	/**
 	 * Creates a new structure save
-	 */
-	/**
-	 *
 	 * @param {string} prefix
-	 * @param {*} pos1
-	 * @param {*} pos2
+	 * @param {Vector3} pos1
+	 * @param {Vector3} pos2
 	 */
 	constructor(prefix, pos1, pos2) {
 		this.id = Date.now().toString(32);
@@ -32,11 +29,12 @@ export class Structure {
 			const name = `${this.prefix}|${regions.indexOf(region)}`;
 			const pos1 = region.pos1;
 			const pos2 = region.pos2;
-			const out = await XA.runCommandX(
-				`structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
+			const result = await XA.runCommandX(
+				`structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`,
+				{ showError: true }
 			);
 			all++;
-			if (out) {
+			if (result > 0) {
 				this.files.push({
 					name: name,
 					pos1: pos1,
@@ -67,31 +65,39 @@ export class Structure {
         */
 			}
 		}
-		if (errors > 0) throw new Error(`§c${errors}§f\\§a${all}§f не сохранено.`);
+		if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не сохранено.`);
 	}
 
 	async load() {
 		let errors = 0;
 		let all = 0;
 		for (const file of this.files) {
-			const out =
-				(await XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`)) > 0;
+			const result = await XA.runCommandX(
+				`structure load "${file.name}" ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`,
+				{
+					showError: true,
+				}
+			);
 			all++;
-			if (out) {
+			if (result === 0) {
 				errors++;
-				world.say("§c► §fЧанки будут подгружены с помощью области");
-				XA.runCommandX(`tickingarea remove safezone`);
-				XA.runCommandX(
-					`tickingarea add ${file.pos1.x} ${file.pos1.y} ${file.pos1.z} ${file.pos2.x} ${file.pos2.y} ${file.pos2.z} safezone`
-				);
-				setTickTimeout(() => {
-					world.say("§9►");
-					XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
-					world.say("§9► §fЗагружено.");
-				}, 40);
+				// world.say("§c► §fЧанки будут подгружены с помощью области");
+				// XA.runCommandX(`tickingarea remove safezone`);
+				// XA.runCommandX(
+				// 	`tickingarea add ${file.pos1.x} ${file.pos1.y} ${file.pos1.z} ${file.pos2.x} ${file.pos2.y} ${file.pos2.z} safezone`
+				// );
+				// setTickTimeout(
+				// 	() => {
+				// 		world.say("§9►");
+				// 		XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
+				// 		world.say("§9► §fЗагружено.");
+				// 	},
+				// 	40,
+				// 	"structureLoad"
+				// );
 			}
 			await sleep(1);
-			if (errors > 0) throw new Error(`§c${errors}§f\\§a${all}§f не загружено.`);
 		}
+		if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не загружено.`);
 	}
 }

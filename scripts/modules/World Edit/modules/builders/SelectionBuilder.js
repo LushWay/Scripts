@@ -1,30 +1,7 @@
-import { BlockLocation } from "@minecraft/server";
 import { getBlocksCount } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 class SelectionBuilder {
-	/**
-	 * Sets Pos1 To a new Block Location
-	 * @param {number} x location x of pos1
-	 * @param {number} y location y of pos1
-	 * @param {number} z location z of pos1
-	 * @returns {void}
-	 * @example setPos1(11, 16, 10);
-	 */
-	setPos1(x, y, z) {
-		WorldEditBuild.pos1 = new BlockLocation(x, y, z);
-	}
-	/**
-	 * Sets Pos1 To a new Block Location
-	 * @param {number} x location x of pos1
-	 * @param {number} y location y of pos1
-	 * @param {number} z location z of pos1
-	 * @returns {void}
-	 * @example setPos1(11, 16, 10);
-	 */
-	setPos2(x, y, z) {
-		WorldEditBuild.pos2 = new BlockLocation(x, y, z);
-	}
 	/**
 	 * Expands the selection area
 	 * @param {number} amount ammount to expand selection in all directions

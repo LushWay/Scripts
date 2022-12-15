@@ -10,7 +10,6 @@ export function fetch(playerName) {
 }
 
 export class LiteralArgumentType {
-	type;
 	typeName = "literal";
 	optional;
 	matches(value) {
@@ -25,11 +24,10 @@ export class LiteralArgumentType {
 }
 
 export class StringArgumentType {
-	type;
 	typeName = "string";
 	matches(value) {
 		return {
-			success: value && value != "",
+			success: value && value !== "",
 			value: value,
 		};
 	}
@@ -40,9 +38,8 @@ export class StringArgumentType {
 	}
 }
 
-/** @type {import("./ArgumentTypes.js").IArgumentType} */
+/** @type {import("./ArgumentTypes.js").IntegerArgumentType} */
 export class IntegerArgumentType {
-	type;
 	typeName = "int";
 	matches(value) {
 		return {
@@ -58,7 +55,6 @@ export class IntegerArgumentType {
 }
 
 export class FloatArgumentType {
-	type;
 	typeName = "float";
 	matches(value) {
 		return {
@@ -74,11 +70,12 @@ export class FloatArgumentType {
 }
 
 export class LocationArgumentType {
-	type;
 	typeName = "location";
 	matches(value) {
+		const res = /^([~^]?-?\d+)|([~^])$/g.test(value);
+
 		return {
-			success: !isNaN(value),
+			success: res,
 			value: value,
 		};
 	}
@@ -90,11 +87,10 @@ export class LocationArgumentType {
 }
 
 export class BooleanArgumentType {
-	type;
 	typeName = "boolean";
 	matches(value) {
 		return {
-			success: Boolean(value?.match(/^(true|false)$/)?.[0]),
+			success: /^(true|false)$/g.test(value),
 			value: value == "true" ? true : false,
 		};
 	}
@@ -106,12 +102,12 @@ export class BooleanArgumentType {
 }
 
 export class PlayerArgumentType {
-	type;
 	typeName = "playerName";
 	matches(value) {
+		const p = fetch(value);
 		return {
-			success: fetch(value) ? true : false,
-			value: fetch(value),
+			success: p ? true : false,
+			value: p,
 		};
 	}
 
@@ -122,11 +118,10 @@ export class PlayerArgumentType {
 }
 
 export class TargetArgumentType {
-	type;
 	typeName = "Target";
 	matches(value) {
 		return {
-			success: Boolean(value?.match(/^(@.|"[\s\S]+")$/)?.[0]),
+			success: Boolean(value?.match(/^(@.+|"[^"]+")$/)?.[0]),
 			value: value,
 		};
 	}
@@ -138,7 +133,6 @@ export class TargetArgumentType {
 }
 
 export class ArrayArgumentType {
-	type;
 	typeName = "string";
 	matches(value) {
 		return {
@@ -157,32 +151,27 @@ export class ArrayArgumentType {
 }
 
 export class UnitArgumentType {
-	type;
 	typeName = "UnitValueType";
 	matches(value) {
-		if (
-			![
-				"years",
-				"yrs",
-				"weeks",
-				"days",
-				"hours",
-				"hrs",
-				"minutes",
-				"mins",
-				"seconds",
-				"secs",
-				"milliseconds",
-				"msecs",
-				"ms",
-			].includes(value)
-		)
-			return {
-				success: false,
-			};
+		const result = ![
+			"years",
+			"yrs",
+			"weeks",
+			"days",
+			"hours",
+			"hrs",
+			"minutes",
+			"mins",
+			"seconds",
+			"secs",
+			"milliseconds",
+			"msecs",
+			"ms",
+		].includes(value);
+
 		return {
-			success: value && value != "",
-			value: value,
+			success: result,
+			value: result ? value : null,
 		};
 	}
 	constructor(_name, optional) {

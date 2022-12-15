@@ -45,7 +45,7 @@ export class XCommand {
 	location(name, optional) {
 		const cmd = this.argument(new LocationArgumentType(name, optional));
 		if (!name.endsWith("*")) {
-			const newArg = cmd.location(name + "_y*").location(name + "_z*");
+			const newArg = cmd.location(name + "_y*", optional).location(name + "_z*", optional);
 			return newArg;
 		}
 		return cmd;
@@ -55,7 +55,6 @@ export class XCommand {
 		this.children.push(cmd);
 		return cmd;
 	}
-
 	executes(callback) {
 		this.callback = callback;
 		return this;

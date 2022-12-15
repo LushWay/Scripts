@@ -68,7 +68,7 @@ function JOIN(player, data, messageType) {
 const WDB = XA.tables.player;
 
 world.events.playerJoin.subscribe((data) => {
-	WDB.delete("JOIN:" + data.player.id);
+	WDB.deleteSync("JOIN:" + data.player.id);
 });
 
 setPlayerInterval(

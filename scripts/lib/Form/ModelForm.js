@@ -43,7 +43,7 @@ export class ModalForm {
 	}
 	/**
 	 * Adds a dropdown to this form
-	 * @template [T = ReadonlyArray<string>]
+	 * @template {ReadonlyArray<string>} T
 	 * @param {string} label  label to show on dropdown
 	 * @param {T} options  the availiabe options for this dropdown
 	 * @param {number} defaultValueIndex  the default value index

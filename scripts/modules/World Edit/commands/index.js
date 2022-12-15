@@ -1,32 +1,19 @@
 import { multiload } from "../../../lib/Module/loader.js";
-import "./brush/brush.js";
-import "./brush/custom items.js";
 
-import "./general/undo.js";
-import "./general/redo.js";
-import "./general/drawsel.js";
+const modules = {
+	brush: ["brush", "custom items"],
+	general: ["undo", "redo", "drawsel"],
+	selection: ["pos1", "pos2", "hpos1", "hpos2", "chunk", "wand", "expand", "size"],
+	region: ["set"],
+	clipboard: ["copy", "paste"],
+	generation: ["hcyl", "cyl", "hpyramid", "pyramid", "hsphere", "sphere"],
+	tool: ["tool"],
+};
 
-import "./selection/pos1.js";
-import "./selection/pos2.js";
-import "./selection/hpos1.js";
-import "./selection/hpos2.js";
-import "./selection/chunk.js";
-import "./selection/wand.js";
-import "./selection/expand.js";
-import "./selection/size.js";
+/** @type {[string, string][]} */
+const all = [];
+for (const type in modules) {
+	for (const module of modules[type]) all.push([`${type}/${module}`, module]);
+}
 
-import "./region/set.js";
-
-import "./clipboard/copy.js";
-import "./clipboard/paste.js";
-
-import "./generation/hcyl.js";
-import "./generation/cyl.js";
-import "./generation/hpyramid.js";
-import "./generation/pyramid.js";
-import "./generation/hsphere.js";
-import "./generation/sphere.js";
-
-import "./tool/tool.js";
-
-multiload((f) => import("./" + f + ".js"), [], "WB Commands");
+multiload((f) => import("./" + f + ".js"), all, "WB Commands");

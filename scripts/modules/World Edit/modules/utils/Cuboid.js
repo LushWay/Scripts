@@ -49,11 +49,10 @@ export class Cuboid {
 	 * @returns {number}
 	 */
 	get blocksBetween() {
-		let blocks = 0;
-		for (const cube of this.split(WB_CONFIG.FILL_CHUNK_SIZE)) {
-			blocks += cube.pos1.blocksBetween(cube.pos2).length;
-		}
-		return blocks;
+		const x = this.xMax - this.xMin + 1;
+		const y = this.yMax - this.yMin + 1;
+		const z = this.zMax - this.zMin + 1;
+		return x * y * z;
 	}
 	/**
 	 * Splits a cuboid into mulitple cuboid of a chunk size
