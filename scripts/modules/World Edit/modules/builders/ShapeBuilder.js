@@ -1,9 +1,9 @@
 import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
-import { sleep, ThrowError } from "xapi.js";
+import { sleep, ThrowError, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { WB_CONFIG } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
-import { safeBlocksBetween, setblock } from "../utils/utils.js";
+import { setblock } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 export class Shape {
@@ -42,7 +42,7 @@ export class Shape {
 		const loc1 = { x: -this.rad, y: -this.rad, z: -this.rad };
 		const loc2 = { x: this.rad, z: this.rad, y: this.rad };
 
-		for (const { x, y, z } of safeBlocksBetween(loc1, loc2, false)) {
+		for (const { x, y, z } of XA.Utils.safeBlocksBetween(loc1, loc2, false)) {
 			if (!this.condition(x, y, z)) continue;
 			const location = new BlockLocation(this.pos.x + x, this.pos.y + y, this.pos.z + z);
 			const block = this.blocks[~~(Math.random() * this.blocks.length)];

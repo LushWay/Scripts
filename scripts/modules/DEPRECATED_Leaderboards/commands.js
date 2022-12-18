@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 import { LeaderboardBuild } from "./LeaderboardBuilder.js";
-const lb = new XA.instantDB(world, "leaderboard");
+const lb = XA.tables;
 
 const lba = new XA.Command({
 	name: "lb",

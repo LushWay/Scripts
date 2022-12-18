@@ -1,18 +1,46 @@
 import { Player } from "@minecraft/server";
 import { Database } from "../Database/Entity.js";
 
+/**
+ * @typedef {Record<string, { desc: string; value: T }>} DefaultConfig
+ * @template [T = boolean | string | number]
+ */
+
+/**
+ *
+ * @typedef {T extends true | false ? boolean : T} Normalize
+ * @template T
+ * TS doesnt converting true and false to boolean, so we need to manually convert them
+ */
+
+/** @type {Record<string, DefaultConfig<boolean>>} */
 export const AllPlayerOptions = {};
 
+/** @type {Record<string, DefaultConfig>} */
 export const AllOptions = {};
 
-/** @type {import("./XOptions.js").XPlayerOptions} */
+/**
+ * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
+ * stored in a database
+ * @template {DefaultConfig<boolean>} Config
+ * @param {string} prefix - The prefix for the database.
+ * @param {Config} CONFIG - This is an object that contains the default values for each option.
+ * @returns {(player: import("@minecraft/server").Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
+ */
 export function XPlayerOptions(prefix, CONFIG) {
 	if (!(prefix in AllPlayerOptions)) AllPlayerOptions[prefix] = CONFIG;
 	// @ts-expect-error Trust me, TS
 	return (player) => generateOptionsProxy(prefix, CONFIG, player);
 }
 
-/** @type {import("./XOptions.js").XOptions} */
+/**
+ * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
+ * configuration object's properties in localStorage
+ * @template {DefaultConfig} Config
+ * @param {string} prefix - The prefix for the database.
+ * @param {Config} CONFIG - The default values for the options.
+ * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
+ */
 export function XOptions(prefix, CONFIG) {
 	if (!(prefix in AllOptions)) AllOptions[prefix] = CONFIG;
 	// @ts-expect-error Trust me, TS

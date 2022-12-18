@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { handler, toStr, XA } from "xapi.js";
+import { handler, XA } from "xapi.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { CONFIG_MENU } from "./var.js";
 
@@ -25,7 +25,7 @@ world.events.beforeItemUse.subscribe(async ({ source: player, item }) => {
 new XA.Command({
 	name: "menu",
 	description: "Выдает/убирает меню из инвентаря",
-	/*type: "public"*/
+	type: "public",
 }).executes(async (ctx) => {
 	if (await XA.Entity.hasItem(ctx.sender, 0, CONFIG_MENU.itemId)) {
 		ctx.sender.runCommandAsync(`clear @s ${CONFIG_MENU.itemId}`);

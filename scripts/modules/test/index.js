@@ -1,9 +1,7 @@
 import { BlockLocation, Location, MinecraftBlockTypes, MolangVariableMap, system, world } from "@minecraft/server";
-import { handler, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
+import { handler, IS, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
 import { benchmark } from "../../lib/Benchmark.js";
-import { XPlayerOptions } from "../../lib/Class/XOptions.js";
 import { CommandCallback } from "../../lib/Command/Callback.js";
-import { CreatedInstances, Database } from "../../lib/Database/Entity.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
@@ -169,7 +167,7 @@ const tests = {
 		throw new Error("m");
 	},
 	12: () => {
-		setTickTimeout(tests[11]);
+		setTickTimeout(tests[11], 0, "test");
 	},
 	13: (ctx) => {
 		ctx.reply(toStr(ctx.sender.getComponents()));
@@ -262,56 +260,36 @@ const tests = {
 			);
 		}
 	},
-	22: (ctx) => {
-		/** @type {Database<string>} */
-		const table = new Database("db");
-
-		table.set("key", "sad");
-
-		const a = table.getCollection();
-
-		world.say(toStr(a));
-	},
-	23(ctx) {
-		const Options = XPlayerOptions("pr", {
-			e: { desc: "dec", value: true },
-			d: { desc: "d", value: false },
-		})(ctx.sender);
-
-		Options.e = true;
-
-		const db = new Database("pr");
-		world.say(toStr(db.getCollection()));
-	},
-	24(ctx) {
-		const m = ctx.sender.getComponent("movement");
-	},
-	25(ctx) {
-		for (const key in CreatedInstances) {
-			const db = CreatedInstances[key];
-			const data = db.data();
-			world.say(toStr(data));
-		}
-	},
 	26(ctx) {
 		const pos1 = XA.Entity.vecToBlockLocation(ctx.sender.location);
-		const pos2 = pos1.offset(10, 10, 10);
+		const pos2 = pos1.offset(3, 3, 3);
 		const cube = new Cuboid(pos1, pos2);
 		const { xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin } = cube;
+		const end1 = benchmark("safeBlocksForOF");
+		for (const { x, y, z } of XA.Utils.safeBlocksBetween(pos1, pos2, false)) {
+			const q =
+				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
+				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
+				((z == zMin || z == zMax) && (x == xMin || x == xMax));
 
-		for (let x = cube.min.x; x <= cube.max.x; x++) {
-			for (let z = cube.min.z; z <= cube.max.z; z++) {
-				for (let y = cube.min.x; y <= cube.max.y; y++) {
-					/* It's checking if the block is on the edge of the cuboid. */
-					const q =
-						((x + xCenter == xMin || x + xCenter == xMax) && (y + yCenter == yMin || y + yCenter == yMax)) ||
-						((y + yCenter == yMin || y + yCenter == yMax) && (z + zCenter == zMin || z + zCenter == zMax)) ||
-						((z + zCenter == zMin || z + zCenter == zMax) && (x + xCenter == xMin || x + xCenter == xMax));
-
-					if (q) ctx.sender.dimension.spawnParticle("minecraft:endrod", new Location(x, y, z), new MolangVariableMap());
-				}
-			}
+			if (q) ctx.sender.dimension.spawnParticle("minecraft:endrod", new Location(x, y, z), new MolangVariableMap());
 		}
+		end1();
+		const end2 = benchmark("safeBlocksWhile");
+		const gen = XA.Utils.safeBlocksBetween(pos1, pos2, false);
+		let val;
+		while (!val?.done) {
+			val = gen.next();
+			if (!val.value) continue;
+			const { x, y, z } = val.value;
+			const q =
+				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
+				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
+				((z == zMin || z == zMax) && (x == xMin || x == xMax));
+
+			if (q) ctx.sender.dimension.spawnParticle("minecraft:endrod", new Location(x, y, z), new MolangVariableMap());
+		}
+		end2();
 	},
 };
 let bigdata = "";
@@ -319,6 +297,7 @@ let done = false;
 
 const c = new XA.Command({
 	name: "test",
+	requires: (p) => IS(p.id, "admin"),
 });
 
 c.string("number", true).executes(async (ctx, n) => {

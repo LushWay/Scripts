@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
-import { MessageFormData } from "@minecraft/server-ui";
+import { MessageFormData, MessageFormResponse } from "@minecraft/server-ui";
 import { handler } from "../../xapi.js";
-import { XFormCanceled } from "./utils.js";
+import { XShowForm } from "./utils.js";
 /** */
 export class MessageForm {
 	/**
@@ -32,12 +32,6 @@ export class MessageForm {
 	 * @private
 	 */
 	button2;
-	/**
-	 * The amount of times it takes to show this form in ms
-	 * if this value goes above 200 it will time out
-	 * @type {number}
-	 */
-	triedToShow;
 	/**
 	 * Creates a new form to be shown to a player
 	 * @param {string} title the title that this form should have
@@ -85,8 +79,8 @@ export class MessageForm {
 	 * @returns {Promise<void>}
 	 */
 	async show(player) {
-		const response = await this.form.show(player);
-		if (XFormCanceled(response, player, this)) return;
+		const response = await XShowForm(this.form, player);
+		if (response === false || !(response instanceof MessageFormResponse)) return;
 		if (response.selection === 1) handler(this.button1?.callback, null, ["MessageFormCallback"]);
 		if (response.selection === 0) handler(this.button2?.callback, null, ["MessageFormCallback"]);
 	}

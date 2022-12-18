@@ -1,10 +1,9 @@
-import { BlockLocation, Player, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { setPlayerInterval, setTickInterval, XA } from "xapi.js";
 
 import "./commands/index.js";
 import { WB_CONFIG } from "./config.js";
 import { FillFloor } from "./modules/builders/FillBuilder.js";
-import { SelectionBuild } from "./modules/builders/SelectionBuilder.js";
 import { Shape } from "./modules/builders/ShapeBuilder.js";
 import { WorldEditBuild } from "./modules/builders/WorldEditBuilder.js";
 import { SHAPES } from "./modules/utils/shapes.js";

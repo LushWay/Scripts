@@ -51,19 +51,8 @@ let s = system.runSchedule(async () => {
 }, 1);
 
 /**
- * Awaits till work load
- * @returns {Promise<void>}
- */
-export async function awaitWorldLoad() {
-	if (WORLD_IS_LOADED) return;
-	return new Promise((resolve) => {
-		onLoad.push(resolve);
-	});
-}
-
-/**
  * Sends a callback once world is loaded
- * @param {() => void} callback  undefined
+ * @param {() => void} callback
  * @returns {void}
  */
 export function onWorldLoad(callback) {
@@ -111,31 +100,23 @@ export class Database {
 	 * @type {{ [key in Key]: Value } | null}
 	 * @private
 	 */
-	MEMORY;
+	MEMORY = null;
 	/**
 	 * List of queued tasks on this table
 	 * @type {Array<() => void>}
 	 * @private
 	 */
-	QUEUE;
+	QUEUE = [];
 	/**
 	 *
 	 * @param {string} tableName
 	 */
 	constructor(tableName) {
 		if (tableName in CreatedInstances) return CreatedInstances[tableName];
-		world.say(tableName);
 		this.tableName = tableName;
-		this.MEMORY = null;
-		this.QUEUE = [];
-
-		system.runSchedule(() => {
-			if (this.QUEUE.length == 0) return;
-			this.QUEUE.shift()?.(); // removes queue item and runs it
-		}, 1);
-
-		onWorldLoad(() => {
-			this.MEMORY = this.getData();
+		onWorldLoad(async () => {
+			await this.initData();
+			this.QUEUE.forEach((v) => v());
 		});
 		CreatedInstances[tableName] = this;
 	}
@@ -153,20 +134,17 @@ export class Database {
 	}
 	/**
 	 * Saves data into this database
-	 * @param {{ [key in Key]: Value }} data
 	 * @returns {Promise<void>} once data is saved
 	 * @private
 	 */
-	async saveData(data) {
-		await this.addQueueTask();
-		await awaitWorldLoad(); // Await till world is loaded
-		this.MEMORY = data; // set memory
+	async saveData() {
+		if (!this.MEMORY) await this.addQueueTask();
 		let entities = Database.getTableEntities(this.tableName);
 		/**
 		 * The split chunks of the stringified data, This is done because we can
 		 * only store {@link MAX_DATABASE_STRING_SIZE} chars in a single nameTag
 		 */
-		let chunks = chunkString(JSON.stringify(data), MAX_DATABASE_STRING_SIZE);
+		let chunks = chunkString(JSON.stringify(this.MEMORY), MAX_DATABASE_STRING_SIZE);
 		/**
 		 * The amount of entities that is needed to store {@link chunks} data
 		 */
@@ -201,14 +179,12 @@ export class Database {
 	}
 	/**
 	 * Grabs all data from this table
-	 * @returns {{ [key in Key]: Value; }}
+	 * @returns {Promise<{ [key in Key]: Value; }>}
 	 * @private
 	 */
-	getData() {
-		// await awaitWorldLoad(); // Await till world is loaded
-		if (this.MEMORY) return this.MEMORY;
+	async initData() {
 		let entities = Database.getTableEntities(this.tableName).sort(
-			// @ts-expect-error
+			//@ts-expect-error
 			(a, b) => a.getDynamicProperty("index") - b.getDynamicProperty("index")
 		);
 		let stringifiedData = "";
@@ -220,7 +196,9 @@ export class Database {
 				stringifiedData = stringifiedData + item.nameTag;
 			}
 		}
-		return stringifiedData === "" ? {} : JSON.parse(stringifiedData);
+		const data = stringifiedData == "" ? {} : JSON.parse(stringifiedData);
+		this.MEMORY = data;
+		return data;
 	}
 	/**
 	 *  Saves data into this database
@@ -228,7 +206,8 @@ export class Database {
 	 * @returns {Promise<void>} once data is saved
 	 */
 	async saveCollection(collection) {
-		return this.saveData(collection);
+		this.MEMORY = collection;
+		return this.saveData();
 	}
 	/**
 	 * Sets a key to a value in this table
@@ -237,10 +216,8 @@ export class Database {
 	 * @returns {Promise<void>}
 	 */
 	async set(key, value) {
-		const data = await this.getData();
-		data[key] = value;
-		await this.saveData(data);
-		return;
+		this.MEMORY[key] = value;
+		return await this.saveData();
 	}
 	/**
 	 * Gets a value from this table
@@ -248,7 +225,7 @@ export class Database {
 	 * @returns {Value} the keys corresponding key
 	 */
 	get(key) {
-		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `getAsync` instead!");
+		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `getSync` instead!");
 		return this.MEMORY[key];
 	}
 	/**
@@ -258,15 +235,16 @@ export class Database {
 	 * @returns {Promise<Value>}
 	 */
 	async getSync(key) {
-		const data = await this.getData();
-		return data[key];
+		if (this.MEMORY) return this.get(key);
+		await this.addQueueTask();
+		return this.MEMORY[key];
 	}
 	/**
 	 * Get all the keys in the table
 	 * @returns {Key[]}
 	 */
 	keys() {
-		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `keysSync` instead!");
+		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `keysSync` instead!");
 		// @ts-expect-error
 		return Object.keys(this.MEMORY);
 	}
@@ -275,16 +253,17 @@ export class Database {
 	 * @returns {Promise<Key[]>}
 	 */
 	async keysSync() {
-		const data = await this.getData();
+		if (this.MEMORY) return this.keys();
+		await this.addQueueTask();
 		// @ts-expect-error
-		return Object.keys(data);
+		return Object.keys(this.MEMORY);
 	}
 	/**
 	 * Get all the values in the table
 	 * @returns {Value[]}
 	 */
 	values() {
-		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `valuesSync` instead!");
+		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `valuesSync` instead!");
 		return Object.values(this.MEMORY);
 	}
 	/**
@@ -292,8 +271,9 @@ export class Database {
 	 * @returns {Promise<Value[]>}
 	 */
 	async valuesSync() {
-		const data = await this.getData();
-		return Object.values(data);
+		if (this.MEMORY) return this.values();
+		await this.addQueueTask();
+		return Object.values(this.MEMORY);
 	}
 	/**
 	 * Check if the key exists in the table
@@ -301,9 +281,8 @@ export class Database {
 	 * @returns {boolean}
 	 */
 	has(key) {
-		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `hasSync` instead!");
-		const keys = this.keys();
-		return keys.includes(key);
+		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `hasSync` instead!");
+		return Object.keys(this.MEMORY).includes(key);
 	}
 	/**
 	 * Check if the key exists in the table async, this should be used on worldLoad
@@ -311,15 +290,16 @@ export class Database {
 	 * @returns {Promise<boolean>}
 	 */
 	async hasSync(key) {
-		const keys = await this.keysSync();
-		return keys.includes(key);
+		if (this.MEMORY) return this.has(key);
+		await this.addQueueTask();
+		return Object.keys(this.MEMORY).includes(key);
 	}
 	/**
 	 * Gets all the keys and values
 	 * @returns {{ [key in Key]: Value; }}
 	 */
 	collection() {
-		if (!this.MEMORY) throw new Error("World is not loaded! Consider using `collectionSync` instead!");
+		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `collectionSync` instead!");
 		return this.MEMORY;
 	}
 	/**
@@ -327,28 +307,18 @@ export class Database {
 	 * @returns {Promise<{ [key in Key]: Value; }>}
 	 */
 	async collectionSync() {
-		return await this.getData();
-	}
-	/**
-	 * Delete the key from the table
-	 * @param {Key} key  the key to delete
-	 * @returns {boolean}
-	 */
-	delete(key) {
-		const status = delete this.MEMORY[key];
-		this.saveData(this.MEMORY);
-		return status;
+		if (this.MEMORY) return this.collection();
+		await this.addQueueTask();
+		return this.MEMORY;
 	}
 	/**
 	 * Delete the key from the table
 	 * @param {Key} key  the key to delete
 	 * @returns {Promise<boolean>}
 	 */
-	async deleteSync(key) {
-		await awaitWorldLoad();
-		const data = await this.getData();
-		const status = delete data[key];
-		await this.saveData(data);
+	async delete(key) {
+		const status = delete this.MEMORY[key];
+		await this.saveData();
 		return status;
 	}
 	/**
@@ -357,7 +327,7 @@ export class Database {
 	 */
 	async clear() {
 		// @ts-expect-error
-		await this.saveData({});
-		return;
+		this.MEMORY = {};
+		return await this.saveData();
 	}
 }

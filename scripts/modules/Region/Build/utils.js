@@ -59,10 +59,10 @@ export async function ClearRegion(player, Pregion) {
 	);
 	const loc1 = { x: Pregion.from.x, y: -63, z: Pregion.from.z };
 	const loc2 = { x: Pregion.to.x, y: 100, z: Pregion.to.z };
-	const blocks = getBlocksCount(loc1, loc2);
+	const blocks = XA.Utils.getBlocksCount(loc1, loc2);
 
 	let c = 0;
-	const e = safeBlocksBetween(loc1, loc2, true);
+	const e = XA.Utils.safeBlocksBetween(loc1, loc2, true);
 	for (const loc of e) {
 		c++;
 		if (c % 500 === 0 || c === 0) await sleep(0);
@@ -110,36 +110,6 @@ export function getBlocksCount(loc1, loc2) {
 	const z = zmax - zmin + 1;
 	return x * y * z;
 }
-
-/**
- *
- * @template T
- * @param {Vector3} loc1
- * @param {Vector3} loc2
- * @param {EX<T, boolean>} convert
- * @returns {Generator<T extends true ? BlockLocation : Vector3, void, unknown>}
- */
-export function* safeBlocksBetween(loc1, loc2, convert) {
-	try {
-		const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [Math.min(v1, v2), Math.max(v1, v2)];
-		const [xmin, xmax] = minmax(loc1.x, loc2.x);
-		const [zmin, zmax] = minmax(loc1.z, loc2.z);
-		const [ymin, ymax] = minmax(loc1.y, loc2.y);
-		for (let x = xmin; x <= xmax; x++) {
-			for (let z = zmin; z <= zmax; z++) {
-				for (let y = ymin; y <= ymax; y++) {
-					// @ts-expect-error
-					if (convert) yield new BlockLocation(x, y, z);
-					// @ts-expect-error
-					else yield { x, y, z };
-				}
-			}
-		}
-	} catch (e) {
-		ThrowError(e);
-	}
-}
-
 /**
  *
  * @param {IRegionCords} from
@@ -149,11 +119,11 @@ export async function fillRegion(from, to) {
 	const firstLoc = new BlockLocation(from.x, squarePlace, from.z);
 	const secondLoc = new BlockLocation(to.x, squarePlace, to.z);
 	const exec = createWaiter(10);
-	for (const loc of safeBlocksBetween(firstLoc.above(), secondLoc.above(), true)) {
+	for (const loc of XA.Utils.safeBlocksBetween(firstLoc.above(), secondLoc.above(), true)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
 	}
-	for (const loc of safeBlocksBetween(firstLoc, secondLoc, true)) {
+	for (const loc of XA.Utils.safeBlocksBetween(firstLoc, secondLoc, true)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
 	}

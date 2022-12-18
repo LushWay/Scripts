@@ -11,6 +11,7 @@ import "./commands/particle.js";
 import "./commands/sound.js";
 import "./pvp.js";
 import "./tool.js";
+import "./commands/ping.js";
 import { options, stats } from "./var.js";
 
 /**
@@ -82,27 +83,27 @@ setTickInterval(
 	"serverBoomShit"
 );*/
 
-setTickInterval(
-	() => {
-		for (const pl of world.getPlayers({ excludeTags: ["br:inGame"] }))
-			if (
-				pl.dimension.getBlock(XA.Entity.vecToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))?.typeId ===
-				"minecraft:deny"
-			)
-				pl.triggerEvent("spawn");
+// setTickInterval(
+// 	() => {
+// 		for (const pl of world.getPlayers({ excludeTags: ["br:inGame"] }))
+// 			if (
+// 				pl.dimension.getBlock(XA.Entity.vecToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))?.typeId ===
+// 				"minecraft:deny"
+// 			)
+// 				pl.triggerEvent("spawn");
 
-		// for (const ent of XA.dimensions.overworld.getEntities({
-		// 	families: ["monster"],
-		// }))
-		// 	if (
-		// 		ent.dimension.getBlock(XA.Entity.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
-		// 		"minecraft:deny"
-		// 	)
-		// 		XA.Entity.despawn(ent);
-	},
-	0,
-	"serverTpShit"
-);
+// 		// for (const ent of XA.dimensions.overworld.getEntities({
+// 		// 	families: ["monster"],
+// 		// }))
+// 		// 	if (
+// 		// 		ent.dimension.getBlock(XA.Entity.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
+// 		// 		"minecraft:deny"
+// 		// 	)
+// 		// 		XA.Entity.despawn(ent);
+// 	},
+// 	0,
+// 	"serverTpShit"
+// );
 
 setTickInterval(
 	async () => {
@@ -146,7 +147,7 @@ setTickInterval(
 			/*================== Блокировка незера =================*/
 			if (options.lockNether) {
 				if (player.dimension.id === MinecraftDimensionTypes.nether) {
-					player.teleport({ x: 0, z: 0, y: 0 }, XA.dimensions.overworld, 0, 0);
+					player.teleport({ x: 0, z: 100, y: 0 }, XA.dimensions.overworld, 0, 0);
 					world.say(`§c► §f${player.name}§c Измерение "Незер" заблокированно.`);
 				}
 			}

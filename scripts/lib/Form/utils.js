@@ -1,5 +1,12 @@
 import { Player, system } from "@minecraft/server";
-import { ActionFormResponse, MessageFormResponse, ModalFormResponse } from "@minecraft/server-ui";
+import {
+	ActionFormData,
+	ActionFormResponse,
+	MessageFormData,
+	MessageFormResponse,
+	ModalFormData,
+	ModalFormResponse,
+} from "@minecraft/server-ui";
 import { ActionForm } from "./ActionForm.js";
 import { MessageForm } from "./MessageForm.js";
 import { ModalForm } from "./ModelForm.js";
@@ -53,20 +60,20 @@ export class FormCallback {
 
 /**
  *
- * @param {ActionFormResponse | ModalFormResponse | MessageFormResponse} response
- * @param {ActionForm | MessageForm | ModalForm<any>} ctx
+ * @param {ActionFormData | ModalFormData | MessageFormData} form
  * @param {Player} player
- * @param {Function} [callback]
  * @returns
  */
-export function XFormCanceled(response, player, ctx, callback) {
-	if (response.canceled) {
-		if (response.cancelationReason == "userBusy") {
+export async function XShowForm(form, player) {
+	let hold = 100;
+	for (let i = 0; i <= hold; i++) {
+		const response = await form.show(player);
+		if (response.canceled && response.cancelationReason === "userBusy") {
 			// check time and reshow form
-			if (ctx.triedToShow > 100) return player.tell(`§cНе удалось открыть форму. Закрой чат и попробуй снова`);
-			ctx.triedToShow++;
-			system.run(() => ctx.show(player, callback));
-		}
-		return true;
+			if (i === hold) {
+				player.tell(`§cНе удалось открыть форму. Закрой чат и попробуй снова`);
+				return false;
+			}
+		} else return response;
 	}
 }

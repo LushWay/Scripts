@@ -5,7 +5,7 @@ new XA.Command({
 	name: "particle",
 	aliases: ["p"],
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "test"*/
+	type: "test",
 })
 	.string("particle", true)
 	.executes((ctx, particle) => {

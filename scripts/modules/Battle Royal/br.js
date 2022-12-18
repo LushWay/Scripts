@@ -1,10 +1,10 @@
 import { BlockLocation, Player, world } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
-import { wo } from "../../lib/Class/Options.js";
 import { Subscriber } from "../../lib/Class/XEvents.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
 import { rtp } from "./rtp.js";
+import { BR_CONFIG } from "./var.js";
 import { zone } from "./zone.js";
 
 /** @type {Subscriber<Player>} */
@@ -55,7 +55,7 @@ class BattleRoyal {
 	async waitToRespawn(name) {
 		let C = 0;
 
-		while ((await XA.runCommandX("testfor " + name)).successCount < 1 && C < 100) {
+		while ((await XA.runCommandX("testfor " + name)) < 1 && C < 100) {
 			await sleep(5);
 			C++;
 		}
@@ -74,19 +74,17 @@ class BattleRoyal {
 			this.quene.time = 0;
 
 			// Варн
-			if (!wo.Q("br:gamepos") || !wo.Q("br:time"))
-				return this.end("error", "§cТребуемые для запуска значения (br:time, br:gamepos) не выставлены.");
+			if (!BR_CONFIG.pos || !BR_CONFIG.gamepos)
+				return this.end("error", "§cТребуемые для запуска значения (br:pos, br:gamepos) не выставлены.");
 
 			// Значения из настроек
-			this.time.min = Number((wo.Q("br:time") + "").split(":")[0]);
-			this.time.sec = Number((wo.Q("br:time") + "").split(":")[1]);
-			this.pos.z = Number((wo.Q("br:gamepos") + "").split(" ")[1]);
-			this.pos.x = Number((wo.Q("br:gamepos") + "").split(" ")[0]);
+			[this.time.min, this.time.sec] = BR_CONFIG.time.split(":").map(Number);
+			[this.pos.x, this.pos.z] = BR_CONFIG.gamepos.split(":").map(Number);
 			this.game.started = true;
 			this.reward = 0;
 
-			const allplayers = [...world.getPlayers()].map((e) => e.id);
-			const players = allplayers.filter((e) => allplayers.includes(e));
+			const allplayers = world.getAllPlayers().map((e) => e.id);
+			players = players.filter((e) => allplayers.includes(e));
 
 			if (players.length < 1) return this.end("error", "§cЗапуск без игроков невозможен");
 
@@ -126,9 +124,7 @@ class BattleRoyal {
 				p.tell(XA.Lang.lang["br.start"](this.reward, allplayers.join("§r, "), this.game.rad));
 
 				// Очистка, звук
-				try {
-					p.runCommandAsync("clear @s");
-				} catch (error) {}
+				p.runCommandAsync("clear @s");
 				p.playSound("note.pling");
 
 				// Ртп
@@ -141,7 +137,7 @@ class BattleRoyal {
 				// if (ps) chest.push(ps);
 			}
 
-			XA.tables.chests.set("br:" + Date.now(), chest);
+			XA.tables.chests.set("br:" + Date.now(), JSON.stringify(chest));
 			this.events = {
 				tick: world.events.tick.subscribe(() => {
 					//Таймер
@@ -149,7 +145,11 @@ class BattleRoyal {
 					if (this.time.tick <= 0) {
 						this.time.sec--, (this.time.tick = 20);
 						for (const val of XA.tables.chests.values()) {
-							for (const pos of val) {
+							let p = [];
+							try {
+								p = JSON.parse(val);
+							} catch (e) {}
+							for (const pos of p) {
 								XA.runCommandX(`particle minecraft:campfire_smoke_particle ${pos}`);
 							}
 						}
@@ -201,10 +201,10 @@ class BattleRoyal {
 				buttonPush: world.events.buttonPush.subscribe((data) => {
 					if (!data.source.hasTag("br:alive") || !(data.source instanceof Player)) return;
 					const block = data.dimension.getBlock(data.block.location.offset(0, -1, 0));
-					if (block.typeId != "minecraft:barrel") return;
+					if (block.typeId !== "minecraft:barrel") return;
 					const id = `${block.location.x} ${block.location.y} ${block.location.z}`;
 					if (XA.tables.chests.get(id)) return;
-					XA.tables.chests.set(id, true);
+					XA.tables.chests.set(id, "true");
 					// Loot
 					data.source.onScreenDisplay.setTitle("§r");
 					data.source.onScreenDisplay.updateSubtitle("Открыто");
@@ -223,7 +223,7 @@ class BattleRoyal {
 	end(reason, ex) {
 		this.game.started = false;
 		//Причины и соответствующие выводы
-		if (reason == "time") {
+		if (reason === "time") {
 			this.players.forEach((e) => {
 				e.tell(
 					XA.Lang.lang["br.end.time"](
@@ -235,13 +235,13 @@ class BattleRoyal {
 				);
 			});
 		}
-		if (reason == "error") {
+		if (reason === "error") {
 			world.say(`§cБатл рояль> §c\n${ex} ${ex.stack ? "" : `\n§f${ex.stack}`}`);
 		}
-		if (reason == "specially") {
+		if (reason === "specially") {
 			world.say(XA.Lang.lang["br.end.spec"](ex));
 		}
-		if (reason == "last") {
+		if (reason === "last") {
 			/**
 			 * @type {Player}
 			 */
@@ -279,13 +279,11 @@ class BattleRoyal {
 		}
 
 		//Альтернативная чепуха
-		XA.tables.chests.keys().forEach((E) => XA.tables.chests.delete(E));
+		XA.tables.chests.clear();
 
-		const q = {};
-		q.type = "minecraft:item";
-		for (const p of world.getDimension("overworld").getEntities(q)) {
-			const rmax = new BlockLocation(this.center.x + this.game.startrad, 0, this.center.z + this.game.startrad),
-				rmin = new BlockLocation(this.center.x - this.game.startrad, 0, this.center.z - this.game.startrad);
+		const rmax = new BlockLocation(this.center.x + this.game.startrad, 0, this.center.z + this.game.startrad);
+		const rmin = new BlockLocation(this.center.x - this.game.startrad, 0, this.center.z - this.game.startrad);
+		for (const p of XA.dimensions.overworld.getEntities({ type: "minecraft:item" })) {
 			const l = XA.Entity.vecToBlockLocation(p.location);
 			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x) p.kill();
 		}

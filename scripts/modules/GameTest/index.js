@@ -15,11 +15,15 @@ GameTest.registerAsync("s", "s", async (test) => {
 	const spawnLoc = new BlockLocation(1, 5, 1);
 	const player = test.spawnSimulatedPlayer(spawnLoc, name);
 
-	const end = setTickInterval(() => {
-		if (!player || XA.Entity.isDead(player)) test.fail("Игрок сдох");
-		player.nameTag = name + "\n" + time;
-		time--;
-	});
+	const end = setTickInterval(
+		() => {
+			if (!player || XA.Entity.isDead(player)) test.fail("Игрок сдох");
+			player.nameTag = name + "\n" + time;
+			time--;
+		},
+		0,
+		"simulatedPlayer"
+	);
 	await sleep(time);
 	end();
 })
@@ -31,7 +35,7 @@ const cmd = new XA.Command({
 	name: "player",
 	description: "Спавнит фэйкового игрока",
 	requires: (p) => IS(p.id, "admin"),
-	/*type: "test"*/
+	type: "test",
 }).executes(async (ctx) => {
 	const o = world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13));
 	o.setType(MinecraftBlockTypes.redstoneBlock);

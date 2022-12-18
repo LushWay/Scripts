@@ -1,13 +1,9 @@
 import { Player, world } from "@minecraft/server";
 import { IS, setTickInterval, setTickTimeout, XA } from "xapi.js";
-import { WorldOption } from "../../lib/Class/Options.js";
 import { Atp } from "../Server/portals.js";
 import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
 import { quene } from "./var.js";
 
-new WorldOption("br:time", "Время игры в формате MM:SS (15:00)", true);
-new WorldOption("br:pos", "x y z", true);
-new WorldOption("br:gamepos", "x z", true);
 
 let minpl = 2,
 	fulltime = 5,

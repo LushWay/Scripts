@@ -1,8 +1,11 @@
 import { Location, MolangVariableMap, Player, world } from "@minecraft/server";
-import { wo } from "../../lib/Class/Options.js";
 import { setTickInterval, XA } from "../../xapi.js";
 import { Atp } from "./portals.js";
 import { global } from "./var.js";
+
+const options = XA.WorldOptions("zone", {
+	center: { desc: "", value: "0 0" },
+});
 
 /**
  *
@@ -37,14 +40,10 @@ function pret(player, isX, zone) {
 
 setTickInterval(
 	() => {
-		/*================================================================================================*/
-
-		/*=========================================== ЗОНА ===========================================*/
 		const players = world.getAllPlayers();
 		global.Radius = 200 + 20 * players.length;
 		const rad = global.Radius;
-		const pcenter = wo.G("zone:center");
-		const center = pcenter ? pcenter.split(", ").map(Number) : [0, 0];
+		const center = options.center.split(", ").map(Number);
 
 		/**
 		 *
@@ -58,7 +57,7 @@ setTickInterval(
 		for (const p of players) {
 			const rmax = { x: center[0] + rad, z: center[1] + rad };
 			const rmin = { x: center[0] - rad, z: center[1] - rad };
-			const l = { x: Math.floor(p.location.x), y: Math.floor(p.location.y), z: Math.floor(p.location.z) };
+			const l = XA.Entity.vecToBlockLocation(p.location);
 
 			const xtrue = inRange(l.x, rmin.x, rmax.x);
 			const ztrue = inRange(l.z, rmin.z, rmax.z);

@@ -6,7 +6,7 @@ const shovelCMD = new XA.Command({
 	description: "Выдает лопату",
 	aliases: ["sh"],
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "wb"*/
+	type: "wb",
 })
 
 	.string("blocks", true)

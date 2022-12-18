@@ -6,7 +6,7 @@ new XA.Command({
 	name: "sound",
 	aliases: ["so"],
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "test"*/
+	type: "test",
 })
 	.string("sound", true)
 	.executes((ctx, sound) => {

@@ -34,6 +34,7 @@ import { XItemDatabase } from "./lib/Database/Item.js";
 import { load } from "./lib/Module/loader.js";
 import "./lib/Setup/registryScore.js";
 import "./modules/import.js";
+import { XUtils } from "./lib/Class/Xutils.js";
 
 /**
  * Class with all X-API features
@@ -44,6 +45,7 @@ export class XA {
 	static Command = XCommand;
 	static Cooldown = XCooldown;
 	static Request = XRequest;
+	static Utils = XUtils;
 
 	static PlayerOptions = XPlayerOptions;
 	static WorldOptions = XOptions;
@@ -68,6 +70,7 @@ export class XA {
 		buildRegion: new Database("buildRegion"),
 
 		// Trash
+		/** @type {Database<string, string>} */
 		chests: new Database("chests"),
 		kits: new Database("kits"),
 		drops: new Database("drop"),

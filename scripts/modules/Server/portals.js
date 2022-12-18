@@ -1,6 +1,5 @@
 import {
 	BlockLocation,
-	InventoryComponentContainer,
 	ItemStack,
 	Location,
 	MinecraftBlockTypes,
@@ -10,7 +9,6 @@ import {
 	world,
 } from "@minecraft/server";
 import { IS, setTickInterval, setTickTimeout, sleep, ThrowError, XA } from "xapi.js";
-import { po, wo, WorldOption } from "../../lib/Class/Options.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
 import { global, stats } from "./var.js";
@@ -19,6 +17,7 @@ new WorldOption("spawn:pos", "(x y z)\nТакже можно выставить 
 new WorldOption("minigames:pos", "(x y z)\nТакже можно выставить через -mg set <pos: Pos>", true);
 const getSettings = XA.PlayerOptions("Atp", {
 	showCoordinates: { desc: "Показывать координаты телепортации (выключите если вы стример)", value: true },
+	title: { desc: "", value: true },
 });
 /**
  *
@@ -42,6 +41,25 @@ function tp(player, pos, place, resultActionbar = false, obj, text, slow_falling
 	player.runCommandAsync(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
 	if (resultActionbar) player.runCommandAsync(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
 	player.runCommandAsync(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {*} options
+ */
+function newtp(player, options) {
+	const a = {
+		player: Player,
+		pos: "",
+		place: "",
+		befplace: false,
+		obj: { on: "", place: "" },
+		text: "",
+		display_result_on_actionbar: false,
+		slow_falling: false,
+		animation: true,
+	};
 }
 
 function getPlace(place, text) {
@@ -215,10 +233,10 @@ XA.objectives.push({ id: objective[0], watch: true });
  * @example tp(player, 'spawn')
  */
 export function Atp(player, place, ignore, setDefaultInventory) {
+	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
+
 	/** @param {string} reason */
 	const fail = (reason) => player.tell("§c► " + reason);
-
-	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
 
 	if (!ignore?.lock && tag) return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
 
@@ -290,11 +308,12 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 			on: true,
 			place: Object.keys(invs).find((e) => invs[e] == currentInventory),
 		};
+
 	if (
 		(currentInventory == placeIndex || (inve.size == inve.emptySlotsCount && place != "anarch")) &&
 		!((!setDefaultInventory && inve.size == inve.emptySlotsCount) || setDefaultInventory)
 	) {
-		tp(player, pos, place, po.Q("title:spawn:enable", player), null, null, air);
+		tp(player, pos, place, settings.title, null, null, air);
 		player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 	} else {
 		try {
@@ -306,7 +325,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 						player,
 						pos,
 						place,
-						po.Q("title:spawn:enable", player),
+						settings.title,
 						obj,
 						null,
 						air,
@@ -316,92 +335,92 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 			);
 		} catch (e) {
 			player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
-			tp(player, pos, place, po.Q("title:spawn:enable", player), obj, null, air);
+			tp(player, pos, place, settings.title, obj, null, air);
 		}
 	}
 }
 
-world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
-	if (
-		data.id != "binocraft:on_death" ||
-		XA.Entity.getScore(data.entity, objective[0]) != invs.anarch ||
-		data.entity.hasTag("saving")
-	)
-		return;
-	stats.deaths.eAdd(data.entity, 1);
-	if (data.entity.hasTag("br:alive")) return;
-	data.cancel = true;
-	const ent = data.entity.dimension.spawnEntity(
-		"t:hpper_minecart",
-		new Location(data.entity.location.x, data.entity.location.y + 0.2, data.entity.location.z)
-	);
-	//TODO! FIX
-	// try {
-	// 	data.entity.runCommandAsync("tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]");
-	// } catch (e) {
-	// 	XA.Entity.despawn(ent);
-	// 	return;
-	// }
-	data.entity.dimension.spawnEntity(
-		"f:t",
-		new Location(ent.location.x, ent.location.y, ent.location.z)
-	).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
-});
-world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
-	if (data.id != "ded") return;
-	const c = XA.Entity.getClosetsEntitys(data.entity, 1, "f:t", 1, false)[0];
-	c.nameTag = `§6-=[§f    §6]=-`;
-	setTickTimeout(
-		() => {
-			c.nameTag = `§6-=[  ]=-`;
-		},
-		5,
-		"nt"
-	);
+// world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
+// 	if (
+// 		data.id !== "binocraft:on_death" ||
+// 		XA.Entity.getScore(data.entity, objective[0]) !== invs.anarch ||
+// 		data.entity.hasTag("saving")
+// 	)
+// 		return;
+// 	stats.deaths.eAdd(data.entity, 1);
+// 	if (data.entity.hasTag("br:alive")) return;
+// 	data.cancel = true;
+// 	const ent = data.entity.dimension.spawnEntity(
+// 		"t:hpper_minecart",
+// 		new Location(data.entity.location.x, data.entity.location.y + 0.2, data.entity.location.z)
+// 	);
+// 	//TODO! FIX
+// 	// try {
+// 	// 	data.entity.runCommandAsync("tp @e[type=item,r=4] @e[type=t:hpper_minecart,c=1]");
+// 	// } catch (e) {
+// 	// 	XA.Entity.despawn(ent);
+// 	// 	return;
+// 	// }
+// 	data.entity.dimension.spawnEntity(
+// 		"f:t",
+// 		new Location(ent.location.x, ent.location.y, ent.location.z)
+// 	).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
+// });
+// world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
+// 	if (data.id !== "ded") return;
+// 	const c = XA.Entity.getClosetsEntitys(data.entity, 1, "f:t", 1, false)[0];
+// 	c.nameTag = `§6-=[§f    §6]=-`;
+// 	setTickTimeout(
+// 		() => {
+// 			c.nameTag = `§6-=[  ]=-`;
+// 		},
+// 		5,
+// 		"nt"
+// 	);
 
-	setTickTimeout(
-		() => {
-			c.nameTag = `§6-=[ ]=-`;
-		},
-		10,
-		"nt"
-	);
-	setTickTimeout(
-		() => {
-			c.nameTag = `§6-[]-`;
-		},
-		15,
-		"nt"
-	);
-	setTickTimeout(
-		() => {
-			c.nameTag = `§6-`;
-		},
-		20,
-		"nt"
-	);
-	setTickTimeout(
-		() => {
-			c.teleport(new Location(0, -64, 0), c.dimension, 0, 0);
-			c.triggerEvent("kill");
-		},
-		25,
-		"nt"
-	);
-});
-setTickInterval(
-	() => {
-		for (const e of XA.Entity.getEntitys("t:hpper_minecart")) {
-			const inv = XA.Entity.getI(e);
-			if (inv.size === inv.emptySlotsCount) {
-				e.triggerEvent("ded");
-				e.kill();
-			}
-		}
-	},
-	20,
-	"portal20shit"
-);
+// 	setTickTimeout(
+// 		() => {
+// 			c.nameTag = `§6-=[ ]=-`;
+// 		},
+// 		10,
+// 		"nt"
+// 	);
+// 	setTickTimeout(
+// 		() => {
+// 			c.nameTag = `§6-[]-`;
+// 		},
+// 		15,
+// 		"nt"
+// 	);
+// 	setTickTimeout(
+// 		() => {
+// 			c.nameTag = `§6-`;
+// 		},
+// 		20,
+// 		"nt"
+// 	);
+// 	setTickTimeout(
+// 		() => {
+// 			c.teleport(new Location(0, -64, 0), c.dimension, 0, 0);
+// 			c.triggerEvent("kill");
+// 		},
+// 		25,
+// 		"nt"
+// 	);
+// });
+// setTickInterval(
+// 	() => {
+// 		for (const e of XA.Entity.getEntitys("t:hpper_minecart")) {
+// 			const inv = XA.Entity.getI(e);
+// 			if (inv.size === inv.emptySlotsCount) {
+// 				e.triggerEvent("ded");
+// 				e.kill();
+// 			}
+// 		}
+// 	},
+// 	20,
+// 	"portal20shit"
+// );
 /**
 setTickInterval(
 	async () => {
@@ -473,7 +492,7 @@ new XA.Command({
 	name: "hub",
 	aliases: ["spawn", "tp"],
 	description: "§bПеремещает на спавн",
-	/*type: "public"*/
+	type: "public",
 })
 	.executes((ctx) => {
 		Atp(ctx.sender, "spawn");
@@ -492,7 +511,7 @@ new XA.Command({
 	name: "minigames",
 	aliases: ["mg"],
 	description: "§bПеремещает на спавн минигр",
-	/*type: "public"*/
+	type: "public",
 })
 	.executes((ctx) => {
 		Atp(ctx.sender, "minigames");
@@ -510,7 +529,7 @@ new XA.Command({
 	name: "anarchy",
 	aliases: ["anarch"],
 	description: "§bПеремещает на анархию",
-	/*type: "public"*/
+	type: "public",
 })
 	.executes((ctx) => {
 		Atp(ctx.sender, "anarch");

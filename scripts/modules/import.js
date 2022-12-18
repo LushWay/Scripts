@@ -3,12 +3,11 @@ import { m, mm } from "../lib/Module/creator.js";
 
 m`DatabaseView`;
 m`HelpCommand`;
-m`FastReload`;
 m`Menu`;
 m`Region`;
 m`test`;
-m`Battle Royal`;
-m`Server`;
+// m`Battle Royal`;
+// m`Server`;
 m`Chat`;
 m`Modding`;
 mm("OnJoin", { fileName: "join" });

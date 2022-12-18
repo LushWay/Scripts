@@ -3,7 +3,7 @@ import { SelectionBuild } from "../../modules/builders/SelectionBuilder.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 const expand = new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "expand",
 	description: "Expand the selection area",
 	requires: (p) => IS(p.id, "moderator"),

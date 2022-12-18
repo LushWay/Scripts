@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
-import { ActionFormData } from "@minecraft/server-ui";
+import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { handler } from "../../xapi.js";
-import { XFormCanceled } from "./utils.js";
+import { XShowForm } from "./utils.js";
 /** */
 export class ActionForm {
 	/**
@@ -16,12 +16,7 @@ export class ActionForm {
 	 * @private
 	 */
 	form = new ActionFormData();
-	/**
-	 * The amount of times it takes to show this form in ms
-	 * if this value goes above 200 it will time out
-	 * @type {number}
-	 */
-	triedToShow = 0;
+	title = "";
 	/**
 	 * Creates a new form to be shown to a player
 	 * @param {string} title the title that this form should have
@@ -29,6 +24,7 @@ export class ActionForm {
 	 */
 	constructor(title, body) {
 		this.form.title(title);
+		this.title = title;
 		if (body) this.form.body(body);
 	}
 	/**
@@ -56,8 +52,8 @@ export class ActionForm {
 	 * @returns {Promise<void>}
 	 */
 	async show(player) {
-		const response = await this.form.show(player);
-		if (XFormCanceled(response, player, this)) return;
+		const response = await XShowForm(this.form, player);
+		if (response === false || !(response instanceof ActionFormResponse)) return;
 		handler(this.buttons[response.selection].callback, null, ["ActionFormCallback"]);
 	}
 }

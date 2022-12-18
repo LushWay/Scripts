@@ -5,7 +5,7 @@ import { Shape } from "../../modules/builders/ShapeBuilder.js";
 import { SHAPES } from "../../modules/utils/shapes.js";
 
 new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "hcyl",
 	description: "Generates a hollow cylinder.",
 	requires: (p) => IS(p.id, "moderator"),

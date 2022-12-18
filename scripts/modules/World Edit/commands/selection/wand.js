@@ -3,7 +3,7 @@ import { IS, XA } from "xapi.js";
 //import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "wand",
 	description: "Выдет топор",
 	requires: (p) => IS(p.id, "moderator"),

@@ -5,7 +5,7 @@ import { Shape } from "../../modules/builders/ShapeBuilder.js";
 import { SHAPES } from "../../modules/utils/shapes.js";
 
 new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "hpyramid",
 	description: "Generate a hollow pyramid",
 	requires: (p) => IS(p.id, "moderator"),

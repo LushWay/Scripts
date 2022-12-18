@@ -20,7 +20,7 @@ const daily_reward_hours = 24;
 const kit = new XA.Command({
 	name: "kit",
 	description: "Выдает кит",
-	/*type: "public"*/
+	type: "public",
 });
 kit.string("name", true).executes((ctx, name) => {
 	const ALLkits = XA.tables.kits.keys();
@@ -219,19 +219,19 @@ kit
 new XA.Command({
 	name: "resetpos",
 	description: "Удаляет информацию о позиции  на анархии",
-	/*type: "public"*/
+	type: "public",
 }).executes((ctx) => {
 	ctx.reply(XA.tables.player.delete("POS:" + ctx.sender.id) + "");
 });
 new XA.Command({
 	name: "radius",
 	description: "Выдает радиус границы анархии сейчас",
-	/*type: "public"*/
+	type: "public",
 }).executes((ctx) => {
 	ctx.reply(`☺ ${global.Radius}`);
 });
 
-new XA.Command({ name: "sit", description: "" /*type: "public"*/ }).executes((ctx) => {
+new XA.Command({ name: "sit", description: "", type: "public", }).executes((ctx) => {
 	const entity = ctx.sender.dimension.spawnEntity(
 		"s:it",
 		new Location(ctx.sender.location.x, ctx.sender.location.y - 0.1, ctx.sender.location.z)
@@ -254,7 +254,7 @@ const cos = new XA.Command({
 	name: "i",
 	description: "Создает динамический список предметов",
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "test"*/
+	type: "test",
 });
 cos
 	.literal({

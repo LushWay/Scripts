@@ -1,17 +1,13 @@
-import { Player, world } from "@minecraft/server";
-import { ModalFormData } from "@minecraft/server-ui";
+import { Player } from "@minecraft/server";
+import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { handler } from "../../xapi.js";
-import { FormCallback, XFormCanceled } from "./utils.js";
+import { FormCallback, XShowForm } from "./utils.js";
 
 /**
- * @template [Callback = (ctx: FormCallback) => void]
+ * @template {Function} [Callback = (ctx: FormCallback) => void]
  */
 export class ModalForm {
-	/**
-	 *  the title that this form should have
-	 * @type {string}
-	 */
-	title;
+	title = "";
 	/**
 	 * The default minecraft form this form is based on
 	 * @type {ModalFormData}
@@ -25,18 +21,12 @@ export class ModalForm {
 	 */
 	args;
 	/**
-	 * The amount of times it takes to show this form in ms
-	 * if this value goes above 200 it will time out
-	 * @type {number}
-	 */
-	triedToShow;
-	/**
 	 * Creates a new form to be shown to a player
 	 * @param {string} title the title that this form should have
 	 */
 	constructor(title) {
-		this.title = title;
 		this.form = new ModalFormData();
+		this.title = title;
 		if (title) this.form.title(title);
 		this.args = [];
 		this.triedToShow = 0;
@@ -103,17 +93,17 @@ export class ModalForm {
 	/**
 	 * Shows this form to a player
 	 * @param {Player} player  player to show to
-	 * @param {Callback extends Function ? Callback : never} callback  sends a callback when this form is submited
+	 * @param {Callback} callback  sends a callback when this form is submited
 	 * @returns {Promise<void>}
 	 */
 	async show(player, callback) {
-		const response = await this.form.show(player);
-		if (XFormCanceled(response, player, this, callback)) return;
+		const response = await XShowForm(this.form, player);
+		if (response === false || !(response instanceof ModalFormResponse)) return;
 		handler(
 			() =>
 				callback(
 					new FormCallback(this, player, callback),
-					...response.formValues.map((v, i) => (this.args[i].type == "dropdown" ? this.args[i].options[v] : v))
+					...response.formValues.map((v, i) => (this.args[i].type === "dropdown" ? this.args[i].options[v] : v))
 				),
 			null,
 			["ModalFormCallback"]

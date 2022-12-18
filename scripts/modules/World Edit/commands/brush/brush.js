@@ -8,7 +8,7 @@ const brushCMD = new XA.Command({
 	description: "Brushing commands",
 	aliases: ["bru"],
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "wb"*/
+	type: "wb",
 })
 	.string("shape", true)
 	.string("blocks", true)

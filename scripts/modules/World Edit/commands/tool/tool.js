@@ -2,7 +2,7 @@
 import { IS, XA } from "xapi.js";
 
 new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "tool",
 	description: "Gives a tool item in your inventory",
 	requires: (p) => IS(p.id, "moderator"),

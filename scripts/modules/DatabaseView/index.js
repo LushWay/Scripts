@@ -150,6 +150,7 @@ function changeValue(form, value) {
 new XA.Command({
 	name: "benchmark",
 	description: "Показывает время работы серверных систем",
+	requires: (p) => IS(p.id, "admin"),
 }).executes((ctx) => {
 	function show() {
 		new ActionForm("Benchmark", visualise_benchmark_result())

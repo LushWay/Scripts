@@ -5,7 +5,7 @@ import { Shape } from "../../modules/builders/ShapeBuilder.js";
 import { SHAPES } from "../../modules/utils/shapes.js";
 
 new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "sphere",
 	description: "Generates a filled sphere.",
 	requires: (p) => IS(p.id, "moderator"),

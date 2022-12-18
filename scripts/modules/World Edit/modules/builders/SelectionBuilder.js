@@ -1,4 +1,3 @@
-import { getBlocksCount } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 class SelectionBuilder {
@@ -38,14 +37,6 @@ class SelectionBuilder {
 	 */
 	expandVert(amount) {
 		WorldEditBuild.pos2 = WorldEditBuild.pos2.offset(0, amount, 0);
-	}
-	/**
-	 * Counts the number of blocks matching a mask
-	 * @returns {number}
-	 * @example count();
-	 */
-	count() {
-		return getBlocksCount(WorldEditBuild.pos1, WorldEditBuild.pos2);
 	}
 }
 export const SelectionBuild = new SelectionBuilder();

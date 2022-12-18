@@ -3,7 +3,7 @@ const ll = new XA.Command({
 	name: "lore",
 	aliases: ["l"],
 	requires: (p) => IS(p.id, "moderator"),
-	/*type: "test"*/
+	type: "test",
 }).executes((ctx) => {
 	ctx.reply("lore.help.text");
 });

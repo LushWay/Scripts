@@ -1,6 +1,5 @@
 import { BlockLocation, Entity } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
-import { SelectionBuild } from "../../modules/builders/SelectionBuilder.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 /**
@@ -31,7 +30,7 @@ function getChunkCuboidPositions(entity) {
 }
 
 new XA.Command({
-	/*type: "wb"*/
+	type: "wb",
 	name: "chunk",
 	description: "Set the selection to your current chunk.",
 	requires: (p) => IS(p.id, "moderator"),
