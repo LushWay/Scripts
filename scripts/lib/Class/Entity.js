@@ -10,6 +10,7 @@ import {
 import { Database } from "../Database/Entity.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
+/** @type {Database<string, IJoinData>} */
 const DB = new Database("player");
 
 /**
@@ -21,7 +22,7 @@ export const XEntity = {
 	 * @param {string} ID
 	 */
 	getNameByID(ID) {
-		return DB.get("NAME:" + ID);
+		return DB.get(`JOIN:${ID}`)?.name;
 	},
 	/**
 	 * Checks if position is in radius

@@ -54,6 +54,7 @@ export class ActionForm {
 	async show(player) {
 		const response = await XShowForm(this.form, player);
 		if (response === false || !(response instanceof ActionFormResponse)) return;
-		handler(this.buttons[response.selection].callback, null, ["ActionFormCallback"]);
+		const callback = this.buttons[response.selection]?.callback;
+		if (typeof callback === "function") handler(callback, null, ["ActionFormCallback"]);
 	}
 }

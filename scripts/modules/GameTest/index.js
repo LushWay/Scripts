@@ -1,10 +1,10 @@
-import { BlockLocation, MinecraftBlockTypes, world } from "@minecraft/server";
+import { BlockLocation, GameMode, MinecraftBlockTypes, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { IS, setTickInterval, sleep, XA } from "xapi.js";
+import { IS, setTickInterval, sleep, toStr, XA } from "xapi.js";
 
 const Options = XA.WorldOptions("simulatedPlayer", {
 	name: { value: "", desc: "Имя бота" },
-	time: { value: 0, desc: "Время бота" },
+	time: { value: 1500, desc: "Время бота" },
 });
 
 let name = Options.name;
@@ -28,8 +28,8 @@ GameTest.registerAsync("s", "s", async (test) => {
 	end();
 })
 	.maxTicks(time + 20)
-	.structureName("ComponentTests:platform")
-	.tag(GameTest.Tags.suiteDisabled);
+	.structureName("Component:grass5x5")
+	.tag("sim");
 
 const cmd = new XA.Command({
 	name: "player",
@@ -52,3 +52,15 @@ cmd
 		name = newname;
 		Options.name = newname;
 	});
+
+GameTest.registerAsync("s", "m", async (test) => {
+	for (let e = 0; e < 30; e++) {
+		test.spawnSimulatedPlayer(new BlockLocation(0, 0, 0), "Tester (" + e + ")", GameMode.adventure);
+		await test.idle(10);
+	}
+	await test.idle(1000);
+	test.succeed();
+})
+	.maxTicks(1500)
+	.structureName("Component:grass5x5")
+	.tag("sim");

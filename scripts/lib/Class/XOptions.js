@@ -51,7 +51,7 @@ export function XOptions(prefix, CONFIG) {
  * It creates a proxy object that allows you to access and modify the values of a given object, but the
  * values are stored in a database
  * @param {string} prefix - The prefix for the database.
- * @param {object} CONFIG - This is the default configuration object. It's an object with the keys being the
+ * @param {DefaultConfig} CONFIG - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
  * @param {Player} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
@@ -66,7 +66,7 @@ function generateOptionsProxy(prefix, CONFIG, player = null) {
 			configurable: false,
 			enumerable: true,
 			get() {
-				return DB.get(key) ?? CONFIG[prop];
+				return DB.get(key) ?? CONFIG[prop].value;
 			},
 			set(v) {
 				DB.set(key, v);

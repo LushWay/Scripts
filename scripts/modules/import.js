@@ -8,16 +8,17 @@ m`Region`;
 m`test`;
 // m`Battle Royal`;
 // m`Server`;
+// mm(`Server/commands`, { fileName: "import" });
 m`Chat`;
 m`Modding`;
 mm("OnJoin", { fileName: "join" });
 mm("World Edit", {
 	fileName: "WBindex",
 });
+m`GameTest`;
 
 if (false) {
 	m`Debug`;
-	m`GameTest`;
 	m`Leaderboards`;
 	m`Airdrops`;
 	m`Chest GUI/src`;

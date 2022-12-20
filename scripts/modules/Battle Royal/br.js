@@ -160,7 +160,7 @@ class BattleRoyal {
 					for (const p of world.getPlayers()) {
 						const rmax = new BlockLocation(this.center.x + this.game.rad, 0, this.center.z + this.game.rad),
 							rmin = new BlockLocation(this.center.x - this.game.rad, 0, this.center.z - this.game.rad);
-						const l = XA.Entity.vecToBlockLocation(p.location);
+						const l = XA.Utils.vecToBlockLocation(p.location);
 						if (l.x >= rmax.x && l.x <= rmax.x + 10 && l.z <= rmax.z && l.z >= rmin.z) zone.ret(p, true, rmax);
 						if (l.x >= rmax.x - 10 && l.x <= rmax.x && l.z <= rmax.z && l.z >= rmin.z) zone.pret(p, true, rmax);
 
@@ -284,7 +284,7 @@ class BattleRoyal {
 		const rmax = new BlockLocation(this.center.x + this.game.startrad, 0, this.center.z + this.game.startrad);
 		const rmin = new BlockLocation(this.center.x - this.game.startrad, 0, this.center.z - this.game.startrad);
 		for (const p of XA.dimensions.overworld.getEntities({ type: "minecraft:item" })) {
-			const l = XA.Entity.vecToBlockLocation(p.location);
+			const l = XA.Utils.vecToBlockLocation(p.location);
 			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x) p.kill();
 		}
 		Object.assign(this, new BattleRoyal());

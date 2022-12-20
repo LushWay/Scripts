@@ -1,14 +1,34 @@
-import { BlockLocation, Player } from "@minecraft/server";
+import { BlockLocation, Location, MolangVariableMap, Player } from "@minecraft/server";
 import { sleep, ThrowError, XA } from "xapi.js";
-import { WB_CONFIG } from "../../config.js";
+import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";
 
 class WorldEditBuilder {
-	drawselection = WB_CONFIG.DRAW_SELECTION_DEFAULT;
-	pos1 = { x: 0, y: 0, z: 0 };
-	pos2 = { x: 0, y: 0, z: 0 };
+	drawselection = CONFIG_WB.DRAW_SELECTION_DEFAULT;
+	/** @type {Vector3} */
+	#pos1 = null;
+	/** @type {Vector3} */
+	#pos2 = null;
+	/**
+	 * @type {Cuboid}
+	 */
+	selectionCuboid;
+	get pos1() {
+		return this.#pos1;
+	}
+	set pos1(val) {
+		this.#pos1 = val;
+		if (this.#pos2) this.selectionCuboid = new Cuboid(val, this.#pos2);
+	}
+	get pos2() {
+		return this.#pos2;
+	}
+	set pos2(val) {
+		this.#pos2 = val;
+		if (this.#pos1) this.selectionCuboid = new Cuboid(this.#pos1, val);
+	}
 
 	/**
 	 * @type {Structure[]}
@@ -35,40 +55,27 @@ class WorldEditBuilder {
 	constructor() {}
 
 	drawSelection() {
-		if (!this.drawselection) return;
-		return [
-			`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION1_NAME}"] kill`,
-			`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION2_NAME}"] kill`,
-		].forEach((e) => XA.runCommandX(e));
-		const ent1 = XA.Entity.getEntityAtPos(this.pos1.x, this.pos1.y, this.pos1.z);
-		const ent2 = XA.Entity.getEntityAtPos(this.pos2.x, this.pos2.y, this.pos2.z);
-		if (ent1.length == 0) {
-			XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION1_NAME}"] kill`);
-			XA.runCommandX(
-				`summon f:t ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} spawn "${WB_CONFIG.DRAW_SELECTION1_NAME}"`
-			);
-		}
-		if (ent2.length == 0) {
-			XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION2_NAME}"] kill`);
-			XA.runCommandX(
-				`summon f:t ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} spawn "${WB_CONFIG.DRAW_SELECTION2_NAME}"`
-			);
-		}
-		for (let ent of ent1) {
-			if (ent.id == "f:t" && ent.nameTag == WB_CONFIG.DRAW_SELECTION1_NAME) break;
-			XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION1_NAME}"] kill`);
-			XA.runCommandX(
-				`summon f:t ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} spawn "${WB_CONFIG.DRAW_SELECTION1_NAME}"`
-			);
-			break;
-		}
-		for (let ent of ent2) {
-			if (ent.id == "f:t" && ent.nameTag == WB_CONFIG.DRAW_SELECTION2_NAME) break;
-			XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.DRAW_SELECTION2_NAME}"] kill`);
-			XA.runCommandX(
-				`summon f:t ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} spawn "${WB_CONFIG.DRAW_SELECTION2_NAME}"`
-			);
-			break;
+		if (!this.drawselection || !this.selectionCuboid) return;
+		const selectedSize = XA.Utils.getBlocksCount(this.selectionCuboid.min, this.selectionCuboid.max);
+		if (selectedSize > CONFIG_WB.DRAW_SELECTION_MAX_SIZE) return;
+		const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid;
+		const gen = XA.Utils.safeBlocksBetween(this.selectionCuboid.min, this.selectionCuboid.max, false);
+		let step;
+		while (!step?.done) {
+			step = gen.next();
+			if (!step.value) continue;
+			const { x, y, z } = step.value;
+			const q =
+				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
+				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
+				((z == zMin || z == zMax) && (x == xMin || x == xMax));
+
+			if (q)
+				XA.dimensions.overworld.spawnParticle(
+					"minecraft:endrod",
+					new Location(x + 0.5, y + 0.5, z + 0.5),
+					new MolangVariableMap()
+				);
 		}
 	}
 	/**
@@ -79,7 +86,7 @@ class WorldEditBuilder {
 	 * @example backup(pos1, pos2, history);
 	 */
 	async backup(pos1 = this.pos1, pos2 = this.pos2, saveLocation = this.history) {
-		const structure = new Structure(WB_CONFIG.BACKUP_PREFIX, pos1, pos2);
+		const structure = new Structure(CONFIG_WB.BACKUP_PREFIX, pos1, pos2);
 		saveLocation.push(structure);
 	}
 
@@ -102,7 +109,8 @@ class WorldEditBuilder {
 			const e = XA.Cooldown.getT(amount.toString(), ["бэкап", "бэкапа", "бэкапов"]);
 			return `§b► §3Успешно отменен${amount.toString().endsWith("1") ? "" : "о"} §f${amount} §3${e}!`;
 		} catch (error) {
-			return `§4► ${error}`;
+			ThrowError(error);
+			return `§4► §cНе удалось отменить`;
 		}
 	}
 	/**
@@ -123,7 +131,8 @@ class WorldEditBuilder {
 			const e = XA.Cooldown.getT(amount.toString(), ["бэкап", "бэкапа", "бэкапов"]);
 			return `§b► §3Успешно возвращен${amount.toString().endsWith("1") ? "" : "о"} §f${amount} §3${e}!`;
 		} catch (error) {
-			return `§4► ${error}`;
+			ThrowError(error);
+			return `§4► §cНе удалось вернуть`;
 		}
 	}
 	/**
@@ -133,18 +142,20 @@ class WorldEditBuilder {
 	 */
 	async copy() {
 		try {
+			if (!this.selectionCuboid) return "§4► §cЗона для копирования не выделена!";
 			const opt = await XA.runCommandX(
-				`structure save ${WB_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
+				`structure save ${CONFIG_WB.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
 			);
 			if (!opt) throw new Error(opt + "");
 			this.current_copy = {
 				pos1: this.pos1,
 				pos2: this.pos2,
-				name: WB_CONFIG.COPY_FILE_NAME,
+				name: CONFIG_WB.COPY_FILE_NAME,
 			};
 			return `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`;
 		} catch (error) {
-			return `§4► Не удалось скорпировать [${error}]`;
+			ThrowError(error);
+			return `§4► §cНе удалось скорпировать`;
 		}
 	}
 	/**
@@ -174,12 +185,12 @@ class WorldEditBuilder {
 			const dz = Math.abs(this.current_copy.pos2.z - this.current_copy.pos1.z);
 			const pos2 = new BlockLocation(player.location.x, player.location.y, player.location.z).offset(dx, dy, dz);
 
-			const loc = XA.Entity.vecToBlockLocation(player.location);
+			const loc = XA.Utils.vecToBlockLocation(player.location);
 
 			this.backup(loc, pos2);
 
 			await player.runCommandAsync(
-				`structure load ${WB_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(rotation).replace(
+				`structure load ${CONFIG_WB.COPY_FILE_NAME} ~ ~ ~ ${String(rotation).replace(
 					"NaN",
 					"0"
 				)}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${integrity ? integrity : ""} ${seed ? seed : ""}`
@@ -188,7 +199,7 @@ class WorldEditBuilder {
 			return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`;
 		} catch (error) {
 			ThrowError(error);
-			return `§4Не удалось вставить`;
+			return `§4► §cНе удалось вставить`;
 		}
 	}
 	/**
@@ -221,7 +232,7 @@ class WorldEditBuilder {
 			}
 		}
 
-		for (const cube of Cube.split(WB_CONFIG.FILL_CHUNK_SIZE)) {
+		for (const cube of Cube.split(CONFIG_WB.FILL_CHUNK_SIZE)) {
 			const result = await XA.runCommandX(
 				`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
 				{ showError: true, showOutput: true }
@@ -241,14 +252,6 @@ class WorldEditBuilder {
 
 		if (errors) return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок. ${reply}`;
 		return `§b► ${reply}`;
-	}
-	getPoses() {
-		return {
-			p1: this.pos1,
-			p2: this.pos2,
-			bp1: new BlockLocation(this.pos1.x, this.pos1.y, this.pos1.z),
-			bp2: new BlockLocation(this.pos2.x, this.pos2.y, this.pos2.z),
-		};
 	}
 }
 export const WorldEditBuild = new WorldEditBuilder();

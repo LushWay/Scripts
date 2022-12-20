@@ -1,4 +1,4 @@
-import { BlockLocation } from "@minecraft/server";
+import { Block, BlockLocation, BoolBlockProperty, IntBlockProperty, StringBlockProperty } from "@minecraft/server";
 import { ThrowError } from "../../xapi.js";
 
 export const XUtils = {
@@ -44,5 +44,37 @@ export const XUtils = {
 		const y = ymax - ymin + 1;
 		const z = zmax - zmin + 1;
 		return x * y * z;
+	},
+	/**
+	 * Converts a location to a block location
+	 * @param {Vector3} loc a location to convert
+	 * @returns {BlockLocation}
+	 */
+	vecToBlockLocation(loc) {
+		return new BlockLocation(Math.floor(loc.x), Math.floor(loc.y), Math.floor(loc.z));
+	},
+	/**
+	 * Returns the block data of a block.
+	 * @param {Block} block - Block to get data
+	 * @returns {number} Data
+	 */
+	getBlockData(block) {
+		const allProperies = block.permutation.getAllProperties();
+		const needProps = allProperies.filter((p) => "validValues" in p);
+
+		/** @type {StringBlockProperty | IntBlockProperty} */
+		// @ts-expect-error
+		const main = needProps.find((e) => typeof e.value === "string" || typeof e.value === "number");
+
+		/** @type {BoolBlockProperty} */
+		// @ts-expect-error
+		const bit = needProps.find((e) => typeof e.value === "boolean");
+
+		const data = main?.validValues?.findIndex((e) => e === main.value);
+
+		// Cannot find property...
+		if (!data) return 0;
+		if (bit.value) return data + main.validValues.length;
+		else return data;
 	},
 };

@@ -563,7 +563,7 @@ export const ACTIONS1 = {
 		form.textField("Имя", "Оставь пустым для отмены", "§");
 		OpenForm(his, his.player, form, (data) => {
 			if (data.isCanceled || !data.formValues[0]) return;
-			const ent = his.player.dimension.spawnEntity("f:t", XA.Entity.vecToBlockLocation(his.player.location));
+			const ent = his.player.dimension.spawnEntity("f:t", XA.Utils.vecToBlockLocation(his.player.location));
 			ent.nameTag = data.formValues[0];
 		});
 	},
@@ -574,7 +574,7 @@ export const ACTIONS1 = {
 		form.textField("Стиль", "gray | orange | green", "");
 		OpenForm(his, his.player, form, (data) => {
 			if (data.isCanceled || !data.formValues[0] || !data.formValues[1]) return;
-			const l = XA.Entity.vecToBlockLocation(his.player.location);
+			const l = XA.Utils.vecToBlockLocation(his.player.location);
 			world.say(
 				LeaderboardBuild.createLeaderboard(
 					data.formValues[0],

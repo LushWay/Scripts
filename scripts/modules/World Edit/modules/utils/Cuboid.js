@@ -6,7 +6,6 @@
  */
 
 import { BlockLocation } from "@minecraft/server";
-import { WB_CONFIG } from "../../config.js";
 
 export class Cuboid {
 	/**

@@ -10,14 +10,3 @@ interface Console {
 }
 
 declare var console: Console;
-
-/**----------------------------------------------
- *                  Prototypes
- *-----------------------------------------------**/
-
-interface String {
-	/**
-	 * Clears all § colos from string
-	 */
-	cc(): string;
-}

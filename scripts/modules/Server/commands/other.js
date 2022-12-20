@@ -202,7 +202,7 @@ kit
 		const kit = XA.tables.kits.get(n);
 		ctx.sender.runCommandAsync("setblock ~~~ chest");
 		/** * @type {BlockInventoryComponentContainer} */ const inv = ctx.sender.dimension
-			.getBlock(XA.Entity.vecToBlockLocation(ctx.sender.location))
+			.getBlock(XA.Utils.vecToBlockLocation(ctx.sender.location))
 			.getComponent("inventory").container;
 		for (const [i, k] of kit.entries()) {
 			inv.setItem(
@@ -231,7 +231,7 @@ new XA.Command({
 	ctx.reply(`☺ ${global.Radius}`);
 });
 
-new XA.Command({ name: "sit", description: "", type: "public", }).executes((ctx) => {
+new XA.Command({ name: "sit", description: "", type: "public" }).executes((ctx) => {
 	const entity = ctx.sender.dimension.spawnEntity(
 		"s:it",
 		new Location(ctx.sender.location.x, ctx.sender.location.y - 0.1, ctx.sender.location.z)

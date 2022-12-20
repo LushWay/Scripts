@@ -4,9 +4,6 @@ world.say("§9┌ §fLoading...");
 // Var because it maybe need to be avaible before initialization
 var loading = true;
 
-// Custom prototypes
-import "./lib/Types/prototypes.js";
-
 // This need to be loaded before all another scripts
 import { Database } from "./lib/Database/Entity.js";
 import "./lib/Setup/watchdog.js";
@@ -69,7 +66,6 @@ export class XA {
 		region: new Database("region"),
 		buildRegion: new Database("buildRegion"),
 
-		// Trash
 		/** @type {Database<string, string>} */
 		chests: new Database("chests"),
 		kits: new Database("kits"),

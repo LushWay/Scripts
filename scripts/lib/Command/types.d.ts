@@ -35,7 +35,10 @@ export interface ICommandData {
 	 * @example "You have failed to meet the required paramaters for this command"
 	 */
 	invaildPermission?: string;
-  type?: string;
+	/**
+	 * @type {'test' | 'wb' | 'public'}
+	 */
+	type?: string;
 }
 
 export type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
@@ -43,3 +46,30 @@ export type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: in
 	: never;
 
 export type ArgReturn<Callback extends any, type extends any> = XCommand<AppendArgument<Callback, type>>;
+
+export type MSValueType =
+	| "years"
+	| "yrs"
+	| "weeks"
+	| "days"
+	| "hours"
+	| "hrs"
+	| "minutes"
+	| "mins"
+	| "seconds"
+	| "secs"
+	| "milliseconds"
+	| "msecs"
+	| "ms";
+
+export interface IArgumentReturnData<T> {
+	/**
+	 * If this argument matches the value
+	 */
+	success: boolean;
+	/**
+	 * The parsed value that should be passed in command callback
+	 * if there is no return type this will be null
+	 */
+	value?: T;
+}

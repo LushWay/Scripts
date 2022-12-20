@@ -8,9 +8,9 @@ import { ClearRegion, CreateRegion, fillRegion, prompt, teleportToRegion } from 
 
 const DB = XA.tables.buildRegion;
 
-JOIN_EVENTS.playerGuide.subscribe((player) => {
+JOIN_EVENTS.playerClosedGuide.subscribe((player) => {
 	player.playSound("random.levelup");
-	player.tell("привте");
+	player.tell("Приветствую на сервере, лера напиши уже гайд");
 	const oldRegion = DB.get(player.id);
 	if (!oldRegion) CreateRegion(player);
 });

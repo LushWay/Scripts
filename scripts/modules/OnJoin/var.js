@@ -4,9 +4,9 @@
  */
 export function timeNow() {
 	const time = new Date(Date()).getHours() + 3;
-	if (time < 6) return "§dДоброй ночи";
+	if (time < 6) return "§9Доброй ночи";
 	if (time < 12) return "§6Доброе утро";
-	if (time < 18) return "§gДобрый день";
+	if (time < 18) return "§bДобрый день";
 	return "§3Добрый вечер";
 }
 

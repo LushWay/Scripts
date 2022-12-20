@@ -1,17 +1,19 @@
 import { Player, world } from "@minecraft/server";
 import { IS, setPlayerInterval, XA } from "xapi.js";
-import { __EMITTERS } from "./events.js";
-import { CONFIG_JOIN } from "./var.js";
+import { Database } from "../../lib/Database/Entity.js";
+import { __JOIN_EMITTERS } from "./events.js";
 import "./subscribes.js";
+import { CONFIG_JOIN } from "./var.js";
 
-const PDB = XA.tables.player;
+/** @type {Database<string, IJoinData>} */
+const PDB = new Database("player");
 
 /**
  *
  * @param {Player | string} player
  * @returns
  */
-function getKey(player) {
+function getKeyPlayerDBkey(player) {
 	return `JOIN:${player instanceof Player ? player.id : player}`;
 }
 
@@ -21,7 +23,7 @@ function getKey(player) {
  * @returns {IJoinData}
  */
 function getData(player) {
-	return XA.tables.player.get(getKey(player)) ?? {};
+	return PDB.get(getKeyPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
 }
 /**
  *
@@ -30,50 +32,12 @@ function getData(player) {
  * @returns
  */
 function setData(player, data) {
-	return XA.tables.player.set(getKey(player), data);
+	return PDB.set(getKeyPlayerDBkey(player), data);
 }
 
-const getSettings = XA.PlayerOptions("join", {
-	message: { desc: "Сообщения о входе других игроков", value: true },
-	sound: { desc: "Звук входа других игроков", value: true },
-});
-
-/**
- *
- * @param {Player} player
- * @param {IJoinData} data
- * @param {"air" | "ground"} messageType
- */
-function JOIN(player, data, messageType) {
-	delete data.at;
-	delete data.stage;
-
-	data.times = (data.times ?? 0) + 1;
-
-	for (const plr of world.getPlayers()) {
-		if (plr.id === player.id) continue;
-		const settings = getSettings(plr);
-		if (settings.sound) plr.playSound(CONFIG_JOIN.onJoin.sound);
-		if (settings.message) plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
-	}
-
-	__EMITTERS.PlayerJoin.emit(player, 1);
-	data.message = 1;
-	player.onScreenDisplay.clearTitle();
-
-	const oldTag = PDB.get("NAME:" + player.id);
-
-	if (oldTag === player.name) return;
-	if (oldTag && oldTag !== player.name) {
-		world.say("§c> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name);
-	}
-
-	PDB.set("NAME:" + player.id, player.name);
-}
-
-world.events.playerJoin.subscribe((data) => {
+world.events.playerJoin.subscribe(async (data) => {
 	const D = getData(data.player);
-	delete D?.waiting;
+	D.waiting = 1;
 	setData(data.player, D);
 });
 
@@ -81,11 +45,11 @@ setPlayerInterval(
 	(player) => {
 		const data = getData(player);
 
-		if (!data.waiting) {
+		if (data.waiting === 1) {
 			// New player (player joined)
-			data.waiting = 1;
+			delete data.waiting;
+			data.message = 1;
 			data.at = player.location.x + " " + player.location.y + " " + player.location.z;
-			delete data.message;
 		}
 
 		// Pos where player joined
@@ -126,15 +90,15 @@ setPlayerInterval(
 					// Player joined in air
 					JOIN(player, data, "air");
 				}
-			} else if (!data.message) {
+			} else if (data.message) {
 				// Player moved on ground
 				JOIN(player, data, "ground");
 			}
 		}
-		if (!data.learning && data.message) {
-			// Show fisrt join guide
-			__EMITTERS.PlayerGuide.emit(player, 1);
-			data.learning = 1;
+		if (data.learning && !data.message) {
+			// Show first time join guide
+			__JOIN_EMITTERS.PlayerGuide.emit(player);
+			delete data.learning;
 		}
 		setData(player, data);
 	},
@@ -142,15 +106,54 @@ setPlayerInterval(
 	"joinInterval"
 );
 
+const getSettings = XA.PlayerOptions("join", {
+	message: { desc: "Сообщения о входе других игроков", value: true },
+	sound: { desc: "Звук входа других игроков", value: true },
+});
+
+/**
+ *
+ * @param {Player} player
+ * @param {IJoinData} data
+ * @param {"air" | "ground"} messageType
+ */
+function JOIN(player, data, messageType) {
+	delete data.at;
+	delete data.stage;
+	delete data.message;
+
+	data.times = (data.times ?? 0) + 1;
+
+	for (const plr of world.getPlayers()) {
+		if (plr.id === player.id) continue;
+		const settings = getSettings(plr);
+		if (settings.sound) plr.playSound(CONFIG_JOIN.onJoin.sound);
+		if (settings.message) plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
+	}
+
+	if (!data.learning) __JOIN_EMITTERS.PlayerJoin.emit(player);
+	player.onScreenDisplay.clearTitle();
+
+	const oldTag = data.name;
+
+	if (oldTag === player.name) return;
+	if (oldTag && oldTag !== player.name) {
+		world.say("§c> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name);
+	}
+
+	data.name = player.name;
+}
+
 new XA.Command({
 	name: "info",
 	description: "Открывает гайд",
 	type: "public",
 }).executes((ctx) => {
 	const D = getData(ctx.sender);
-	delete D?.learning;
+	D.learning = 1;
 	setData(ctx.sender, D);
 });
+
 new XA.Command({
 	name: "join",
 	requires: (p) => IS(p.id, "admin"),
@@ -158,6 +161,6 @@ new XA.Command({
 	type: "public",
 }).executes((ctx) => {
 	const D = getData(ctx.sender);
-	delete D?.waiting;
+	D.waiting = 1;
 	setData(ctx.sender, D);
 });

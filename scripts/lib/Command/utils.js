@@ -1,8 +1,8 @@
-import { BeforeChatEvent, Location, Player, Vector } from "@minecraft/server";
-import { CONFIG } from "../../config.js";
+import { BeforeChatEvent, Player, Vector } from "@minecraft/server";
 import { handler } from "xapi.js";
+import { CONFIG } from "../../config.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
-import { CommandCallback } from "./Callback.js";
+import { CommandContext } from "./Callback.js";
 import { __COMMANDS__ } from "./index.js";
 import { inaccurateSearch } from "./suggestions.js";
 
@@ -125,11 +125,11 @@ export function commandSyntaxFail(player, command, args, i) {
  * @returns {{x: number, y: number, z: number}}
  */
 export function parseLocationAugs([x, y, z], { location, viewVector }) {
-	if (!x || !y || !x) return null;
+	if (typeof x !== "string" || typeof y !== "string" || typeof z !== "string") return null;
 	const locations = [location.x, location.y, location.z];
 	const viewVectors = [viewVector.x, viewVector.y, viewVector.z];
 	const a = [x, y, z].map((arg) => {
-		const r = parseInt(arg.replace(/\D/g, ""));
+		const r = parseFloat(arg?.replace(/^[~^]/g, ""));
 		return isNaN(r) ? 0 : r;
 	});
 	const b = [x, y, z].map((arg, index) => {
@@ -163,26 +163,6 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 		if (arg.type instanceof LiteralArgumentType) continue;
 		argsToReturn.push(arg.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
 	}
-	handler(() => lastArg.callback(new CommandCallback(event, cmdArgs), ...argsToReturn), "Command");
-}
-
-/**
- * @param {import("./Command.js").XCommand} command
- * @returns {string[]}
- */
-export function getUsage(command) {
-	return [getType(command.parent), getType(command), ...command.children.map(getType)];
-}
-
-/**
- *
- * @param {import("./Command.js").XCommand} o
- * @returns
- */
-function getType(o) {
-	const t = o.type,
-		q = t.optional;
-	return t.typeName === "literal"
-		? `${q ? "§7" : "§f"}${t.name}`
-		: `${q ? `§7[${o.type.name}: §7${o.type.typeName}§7]` : `§6<${o.type.name}: §6${o.type.typeName}§6>`}`;
+	if (typeof lastArg.callback !== "function") return event.sender.tell("§cУпс, эта команда пока не работает.");
+	handler(() => lastArg.callback(new CommandContext(event, cmdArgs), ...argsToReturn), "Command");
 }

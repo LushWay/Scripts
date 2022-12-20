@@ -1,6 +1,6 @@
 import { BeforeChatEvent, Player } from "@minecraft/server";
 
-export class CommandCallback {
+export class CommandContext {
 	/**
 	 * @type {BeforeChatEvent}
 	 */

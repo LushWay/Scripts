@@ -18,6 +18,8 @@ set
 	.string("other", true)
 	.int("otherData", true)
 	.executes((ctx, block, blockData, mode, other, otherData) => {
+		if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
+
 		if (!blockIsAvaible(block, ctx.sender)) return;
 		if (other && !blockIsAvaible(other, ctx.sender)) return;
 
@@ -28,6 +30,7 @@ set
 	});
 
 set.executes((ctx) => {
+	if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
 	ctx.reply("§b> §3Закрой чат!");
 	new ModalForm("Заполнить")
 		.addTextField("Block", "e.g. stone", "")

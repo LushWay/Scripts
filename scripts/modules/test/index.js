@@ -1,7 +1,7 @@
 import { BlockLocation, Location, MinecraftBlockTypes, MolangVariableMap, system, world } from "@minecraft/server";
 import { handler, IS, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
 import { benchmark } from "../../lib/Benchmark.js";
-import { CommandCallback } from "../../lib/Command/Callback.js";
+import { CommandContext } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
@@ -16,7 +16,7 @@ import { Cuboid } from "../World Edit/modules/utils/Cuboid.js";
 const regs = [];
 
 /**
- * @type {Object<string, (ctx?: CommandCallback) => void | Promise>}
+ * @type {Object<string, (ctx?: CommandContext) => void | Promise>}
  */
 const tests = {
 	1: (ctx) => {
@@ -219,7 +219,7 @@ const tests = {
 	},
 	18: (ctx) => {
 		const region = Region.blockLocationInRegion(
-			XA.Entity.vecToBlockLocation(ctx.sender.location),
+			XA.Utils.vecToBlockLocation(ctx.sender.location),
 			ctx.sender.dimension.id
 		);
 		region.permissions.owners = region.permissions.owners.filter((e) => e !== ctx.sender.id);
@@ -261,7 +261,7 @@ const tests = {
 		}
 	},
 	26(ctx) {
-		const pos1 = XA.Entity.vecToBlockLocation(ctx.sender.location);
+		const pos1 = XA.Utils.vecToBlockLocation(ctx.sender.location);
 		const pos2 = pos1.offset(3, 3, 3);
 		const cube = new Cuboid(pos1, pos2);
 		const { xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin } = cube;

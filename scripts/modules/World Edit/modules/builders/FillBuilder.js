@@ -1,6 +1,6 @@
 import { BlockLocation } from "@minecraft/server";
 import { handler, sleep, XA } from "xapi.js";
-import { WB_CONFIG } from "../../config.js";
+import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
@@ -45,8 +45,8 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 						blocksSet++;
 					}
 				}
-				if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
-					await sleep(WB_CONFIG.TICKS_TO_SLEEP);
+				if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
+					await sleep(CONFIG_WB.TICKS_TO_SLEEP);
 					blocksSet = 0;
 				}
 			}

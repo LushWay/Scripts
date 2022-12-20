@@ -29,7 +29,7 @@ function ret(player, isX, zone, plus) {
  * @param {{x: number, z: number}} zone
  */
 function pret(player, isX, zone) {
-	const floored = XA.Entity.vecToBlockLocation(player.location);
+	const floored = XA.Utils.vecToBlockLocation(player.location);
 	const l = isX ? [zone.x, floored.y + 1, floored.z] : [floored.x, floored.y + 1, zone.z];
 
 	const loc = new Location(l[0], l[1], l[2]);
@@ -57,7 +57,7 @@ setTickInterval(
 		for (const p of players) {
 			const rmax = { x: center[0] + rad, z: center[1] + rad };
 			const rmin = { x: center[0] - rad, z: center[1] - rad };
-			const l = XA.Entity.vecToBlockLocation(p.location);
+			const l = XA.Utils.vecToBlockLocation(p.location);
 
 			const xtrue = inRange(l.x, rmin.x, rmax.x);
 			const ztrue = inRange(l.z, rmin.z, rmax.z);

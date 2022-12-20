@@ -1,8 +1,8 @@
 import { Player, world } from "@minecraft/server";
-import { setPlayerInterval, setTickInterval, XA } from "xapi.js";
+import { setPlayerInterval, setTickInterval, toStr, XA } from "xapi.js";
 
 import "./commands/index.js";
-import { WB_CONFIG } from "./config.js";
+import { CONFIG_WB } from "./config.js";
 import { FillFloor } from "./modules/builders/FillBuilder.js";
 import { Shape } from "./modules/builders/ShapeBuilder.js";
 import { WorldEditBuild } from "./modules/builders/WorldEditBuilder.js";
@@ -27,33 +27,9 @@ world.events.blockPlace.subscribe((data) => {
 setPlayerInterval(
 	(p) => {
 		const i = XA.Entity.getHeldItem(p);
-		if (i?.typeId !== "we:s") return;
-
-		const lore = i.getLore();
-		if (!lore[4] && lore[0] !== "§9Adv") return;
-
-		const B = lore[1].split(" ")[1].split(",");
-		const RB = lore[2]?.split(" ")[1];
-		const R = Number(lore[3].split(" ")[3]);
-		if (R < 2) return;
-		const Z = lore[4].split(" ")[1].replace("+", "");
-		const H = Number(`${Z}${lore[3].split(" ")[1]}`);
-		const O = Number(`${Z}${lore[4].split(" ")[3]}`);
-		const newloc = XA.Entity.vecToBlockLocation(p.location);
-		newloc.offset(-R, H, -R);
-		newloc.offset(R, O, R);
-		FillFloor(newloc.offset(-R, H, -R), newloc.offset(R, O, R), B, RB ?? "any");
-	},
-	10,
-	"WB:AdvancedFiller"
-);
-
-setPlayerInterval(
-	(p) => {
-		const i = XA.Entity.getHeldItem(p);
 		const settings = GetPlayerSettings(p);
-		if (i?.typeId === "we:s" && settings.enableMobile && p.hasTag("using_item")) {
-			const lore = i.getLore();
+		const lore = i?.getLore() ?? [];
+		if (i.typeId === "we:s" && settings.enableMobile && p.hasTag("using_item")) {
 			if (lore[4] && lore[0] === "§aActive") {
 				const block = lore[1].split(" ")[1];
 				const data = lore[1].split(" ")[2];
@@ -65,8 +41,7 @@ setPlayerInterval(
 					p.runCommandAsync(`fill ~-${R} ~${Z}${H} ~-${R} ~${R} ~${Z}${O} ~${R} ${block} ${data}`);
 			}
 		}
-		if (i?.typeId === "we:brush" && !settings.noBrushParticles) {
-			const lore = i.getLore();
+		if (i.typeId === "we:brush" && !settings.noBrushParticles) {
 			/** @type {import("@minecraft/server").BlockRaycastOptions} */
 			const q = {};
 			const range = lore[3]?.replace("Range: ", "");
@@ -76,74 +51,92 @@ setPlayerInterval(
 				if (block) {
 					const ent1 = XA.Entity.getEntityAtPos(block.location.x, block.location.y, block.location.z);
 					if (!ent1) {
-						XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+						XA.runCommandX(`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
 						XA.runCommandX(
-							`summon f:t ${block.location.x} ${block.location.y - WB_CONFIG.H} ${block.location.z} spawn "${
-								WB_CONFIG.BRUSH_LOCATOR
+							`summon f:t ${block.location.x} ${block.location.y - CONFIG_WB.H} ${block.location.z} spawn "${
+								CONFIG_WB.BRUSH_LOCATOR
 							}"`
 						);
 						XA.runCommandX(
-							`tag @e[x=${block.location.x},y=${block.location.y - WB_CONFIG.H},z=${
+							`tag @e[x=${block.location.x},y=${block.location.y - CONFIG_WB.H},z=${
 								block.location.z
-							},r=1,type=f:t,name="${WB_CONFIG.BRUSH_LOCATOR}"] add "${p.name}"`
+							},r=1,type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}"] add "${p.name}"`
 						);
 					}
 					for (let ent of ent1) {
-						if (ent.id == "f:t" && ent.nameTag == WB_CONFIG.BRUSH_LOCATOR) break;
-						XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+						if (ent.id == "f:t" && ent.nameTag == CONFIG_WB.BRUSH_LOCATOR) break;
+						XA.runCommandX(`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
 						XA.runCommandX(
-							`summon f:t ${block.location.x} ${block.location.y - WB_CONFIG.H} ${block.location.z} spawn "${
-								WB_CONFIG.BRUSH_LOCATOR
+							`summon f:t ${block.location.x} ${block.location.y - CONFIG_WB.H} ${block.location.z} spawn "${
+								CONFIG_WB.BRUSH_LOCATOR
 							}"`
 						);
 						XA.runCommandX(
-							`tag @e[x=${block.location.x},y=${block.location.y - WB_CONFIG.H},z=${
+							`tag @e[x=${block.location.x},y=${block.location.y - CONFIG_WB.H},z=${
 								block.location.z
-							},r=1,type=f:t,name="${WB_CONFIG.BRUSH_LOCATOR}"] add "${p.name}"`
+							},r=1,type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}"] add "${p.name}"`
 						);
 						break;
 					}
 				}
 			}
 		} else {
-			XA.runCommandX(`event entity @e[type=f:t,name="${WB_CONFIG.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+			XA.runCommandX(`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+		}
+		if (i?.typeId === "we:s" && lore[4] && lore[0] === "§9Adv") {
+			const B = lore[1].split(" ")[1].split(",");
+			const RB = lore[2]?.split(" ")[1];
+			const R = Number(lore[3].split(" ")[3]);
+			if (R < 2) return;
+			const Z = lore[4].split(" ")[1].replace("+", "");
+			const H = Number(`${Z}${lore[3].split(" ")[1]}`);
+			const O = Number(`${Z}${lore[4].split(" ")[3]}`);
+			const newloc = XA.Utils.vecToBlockLocation(p.location);
+			newloc.offset(-R, H, -R);
+			newloc.offset(R, O, R);
+			FillFloor(newloc.offset(-R, H, -R), newloc.offset(R, O, R), B, RB ?? "any");
 		}
 	},
 	10,
-	"WB "
+	"§3WB§r Main"
+);
+
+setPlayerInterval(
+	(p) => {
+		const i = XA.Entity.getHeldItem(p);
+		if (!p.hasTag("attacking") || i?.typeId !== "we:brush") return;
+
+		const lore = i.getLore();
+		const shape = lore[0]?.replace("Shape: ", "");
+		const blocks = lore[1]?.replace("Blocks: ", "").split(",");
+		const size = lore[2]?.replace("Size: ", "");
+		const range = lore[3]?.replace("Range: ", "");
+
+		if (!shape || !blocks || !size || !range) return;
+
+		const block = p.getBlockFromViewVector({ maxDistance: parseInt(range) });
+		if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
+	},
+	5,
+	"§3WB§r Brush"
 );
 
 setTickInterval(
 	() => {
-		for (const p of world.getPlayers()) {
-			const i = XA.Entity.getHeldItem(p);
-			if (!p.hasTag("mobile") || !p.hasTag("attacking") || i?.typeId !== "we:brush") continue;
-
-			const lore = i.getLore();
-			const shape = lore[0]?.replace("Shape: ", "");
-			const blocks = lore[1]?.replace("Blocks: ", "").split(",");
-			const size = lore[2]?.replace("Size: ", "");
-			const range = lore[3]?.replace("Range: ", "");
-
-			if (!shape || !blocks || !size || !range) continue;
-
-			const block = p.getBlockFromViewVector({ maxDistance: parseInt(range) });
-			if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
-		}
+		WorldEditBuild.drawSelection();
 	},
-	5,
-	"wbBrush"
+	20,
+	"§3WB§r Selection"
 );
 
 world.events.beforeItemUseOn.subscribe((data) => {
-	if (data.item.typeId === "we:wand" && data.source instanceof Player) {
-		const poss = WorldEditBuild.getPoses().p2;
-		if (poss.x == data.blockLocation.x && poss.y == data.blockLocation.y && poss.z == data.blockLocation.z) return;
-		WorldEditBuild.pos2 = data.blockLocation;
-		data.source.tell(
-			`§d►2◄§f (использовать) ${data.blockLocation.x}, ${data.blockLocation.y}, ${data.blockLocation.z}` //§r
-		);
-	}
+	if (data.item.typeId !== "we:wand" || !(data.source instanceof Player)) return;
+	const pos = WorldEditBuild.pos2 ?? { x: 0, y: 0, z: 0 };
+	if (pos.x === data.blockLocation.x && pos.y === data.blockLocation.y && pos.z === data.blockLocation.z) return;
+	WorldEditBuild.pos2 = data.blockLocation;
+	data.source.tell(
+		`§d►2◄§f (use) ${data.blockLocation.x}, ${data.blockLocation.y}, ${data.blockLocation.z}` //§r
+	);
 });
 
 world.events.beforeItemUse.subscribe((data) => {
@@ -193,6 +186,7 @@ world.events.beforeItemUse.subscribe((data) => {
 	const block = data.source.getBlockFromViewVector(q);
 	if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 });
+
 world.events.itemUse.subscribe((data) => {
 	if (data.item.typeId.startsWith("l:")) {
 		data.source.runCommandAsync(`tp ^^^5`);
@@ -201,13 +195,9 @@ world.events.itemUse.subscribe((data) => {
 
 world.events.blockBreak.subscribe((data) => {
 	if (XA.Entity.getHeldItem(data.player)?.typeId !== "we:wand") return;
-	const poss = WorldEditBuild.getPoses().p2;
-	if (poss.x == data.block.location.x && poss.y == data.block.location.y && poss.z == data.block.location.z) return;
+	const pos = WorldEditBuild.pos1 ?? { x: 0, y: 0, z: 0 };
+	if (pos.x === data.block.location.x && pos.y === data.block.location.y && pos.z === data.block.location.z) return;
 	WorldEditBuild.pos1 = data.block.location;
-	data.player.tell(`§5►1◄§r (сломать) ${data.block.location.x}, ${data.block.location.y}, ${data.block.location.z}`);
+	data.player.tell(`§5►1◄§r (break) ${data.block.location.x}, ${data.block.location.y}, ${data.block.location.z}`);
 	data.dimension.getBlock(data.block.location).setPermutation(data.brokenBlockPermutation);
 });
-
-// setTickInterval(() => {
-// 	WorldEditBuild.drawSelection();
-// }, 20);

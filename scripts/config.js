@@ -1,18 +1,11 @@
 /** @type {IConfiguration} */
 export const CONFIG = {
-	console: {
-		// Where you wanna see log messages
-		logPath: "chat",
-		// Where you wanna see error messages
-		errPath: "chat",
-	},
-	module: {
-		// Enables await on every module load
-		loadAwait: true,
-	},
 	chat: {
-		cooldown: 0, // this is a cool down when players type in chat
+		cooldown: 0,
 		range: 30,
 	},
 	commandPrefix: "-",
+	module: {
+		loadAwait: true,
+	},
 };

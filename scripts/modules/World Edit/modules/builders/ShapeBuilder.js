@@ -1,7 +1,7 @@
 import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
 import { sleep, ThrowError, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
-import { WB_CONFIG } from "../../config.js";
+import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { setblock } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
@@ -49,8 +49,8 @@ export class Shape {
 			setblock(block, location);
 			blocksSet++;
 
-			if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
-				await sleep(WB_CONFIG.TICKS_TO_SLEEP);
+			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
+				await sleep(CONFIG_WB.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}
@@ -106,8 +106,8 @@ export class spawn {
 					.setType(MinecraftBlockTypes.get(!this.r ? "minecraft:deny" : "minecraft:bedrock"));
 				blocksSet++;
 			}
-			if (blocksSet >= WB_CONFIG.BLOCKS_BEFORE_AWAIT) {
-				await sleep(WB_CONFIG.TICKS_TO_SLEEP);
+			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
+				await sleep(CONFIG_WB.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}

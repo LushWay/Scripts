@@ -1,18 +1,12 @@
-import { Location, MinecraftDimensionTypes, Player, world } from "@minecraft/server";
+import { MinecraftDimensionTypes, world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
 
 /**======================
  **       PLUGINS
  *========================**/
-import "./commands/id.js";
-import "./commands/lore.js";
-import "./commands/other.js";
-import "./commands/particle.js";
-import "./commands/sound.js";
 import "./pvp.js";
 import "./tool.js";
-import "./commands/ping.js";
-import { options, stats } from "./var.js";
+import { options } from "./var.js";
 
 /**
  * @type {import("@minecraft/server").ExplosionOptions}
@@ -32,7 +26,7 @@ setTickInterval(
 				XA.Entity.inRadius(
 					// @ts-expect-error
 					new Location(...wo.G("spawn:pos").split(" ")),
-					XA.Entity.vecToBlockLocation(f.location),
+					XA.Utils.vecToBlockLocation(f.location),
 					200
 				)
 			)
@@ -41,7 +35,7 @@ setTickInterval(
 				XA.Entity.inRadius(
 					// @ts-expect-error
 					new Location(...wo.G("minigames:pos").split(" ")),
-					XA.Entity.vecToBlockLocation(f.location),
+					XA.Utils.vecToBlockLocation(f.location),
 					50
 				)
 			)
@@ -87,7 +81,7 @@ setTickInterval(
 // 	() => {
 // 		for (const pl of world.getPlayers({ excludeTags: ["br:inGame"] }))
 // 			if (
-// 				pl.dimension.getBlock(XA.Entity.vecToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))?.typeId ===
+// 				pl.dimension.getBlock(XA.Utils.vecToBlockLocation(pl.location).offset(0, -64 - pl.location.y, 0))?.typeId ===
 // 				"minecraft:deny"
 // 			)
 // 				pl.triggerEvent("spawn");
@@ -96,7 +90,7 @@ setTickInterval(
 // 		// 	families: ["monster"],
 // 		// }))
 // 		// 	if (
-// 		// 		ent.dimension.getBlock(XA.Entity.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
+// 		// 		ent.dimension.getBlock(XA.Utils.vecToBlockLocation(ent.location).offset(0, -64 - ent.location.y, 0)).typeId ===
 // 		// 		"minecraft:deny"
 // 		// 	)
 // 		// 		XA.Entity.despawn(ent);

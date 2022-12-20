@@ -57,10 +57,12 @@ function forEveryChar(string, callback) {
 }
 
 /**
- * Неточно ищет строку в массиве
- * @param {string} search Строка, которую надо найти
- * @param {string[]} arr Массив, в котором ищем
- * @returns {[string, number][]}
+ * It takes a string and an array of strings, and returns an array of arrays, where each sub-array
+ * contains a string from the array and the Levenshtein distance between that string and the search
+ * string
+ * @param {string} search - The string you're searching for
+ * @param {string[]} arr - an array of strings
+ * @returns {[string, number][]} An array of arrays. Each sub-array contains the element and the distance.
  */
 export function inaccurateSearch(search, arr) {
 	let res = {};

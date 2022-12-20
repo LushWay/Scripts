@@ -25,7 +25,7 @@ export class zone {
 	 * @param {BlockLocation} zone
 	 */
 	static pret(player, isX, zone) {
-		const floored = XA.Entity.vecToBlockLocation(player.location);
+		const floored = XA.Utils.vecToBlockLocation(player.location);
 		const l = isX ? [zone.x, floored.y + 1, floored.z] : [floored.x, floored.y + 1, zone.z];
 
 		const loc = new Location(l[0], l[1], l[2]);

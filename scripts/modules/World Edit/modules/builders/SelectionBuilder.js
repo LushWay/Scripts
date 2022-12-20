@@ -1,3 +1,4 @@
+import { XA } from "../../../../xapi.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 class SelectionBuilder {
@@ -13,20 +14,20 @@ class SelectionBuilder {
 
 		if (dx < 0 && dz < 0) {
 			//means u need to sub,  sub to get to pos1
-			WorldEditBuild.pos1 = WorldEditBuild.pos1.offset(amount, -amount, amount);
-			WorldEditBuild.pos2 = WorldEditBuild.pos2.offset(-amount, amount, -amount);
+			WorldEditBuild.pos1 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos1).offset(amount, -amount, amount);
+			WorldEditBuild.pos2 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos2).offset(-amount, amount, -amount);
 		} else if (dx < 0 && dz >= 0) {
 			//means u need to sub,  add to get to pos1
-			WorldEditBuild.pos1 = WorldEditBuild.pos1.offset(amount, -amount, -amount);
-			WorldEditBuild.pos2 = WorldEditBuild.pos2.offset(-amount, amount, amount);
+			WorldEditBuild.pos1 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos1).offset(amount, -amount, -amount);
+			WorldEditBuild.pos2 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos2).offset(-amount, amount, amount);
 		} else if (dx >= 0 && dz >= 0) {
 			//means u need to add,  add to get to pos1
-			WorldEditBuild.pos1 = WorldEditBuild.pos1.offset(-amount, -amount, -amount);
-			WorldEditBuild.pos2 = WorldEditBuild.pos2.offset(amount, amount, amount);
+			WorldEditBuild.pos1 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos1).offset(-amount, -amount, -amount);
+			WorldEditBuild.pos2 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos2).offset(amount, amount, amount);
 		} else if (dx >= 0 && dz < 0) {
 			//means u need to add, sub to get to pos1
-			WorldEditBuild.pos1 = WorldEditBuild.pos1.offset(-amount, -amount, amount);
-			WorldEditBuild.pos2 = WorldEditBuild.pos2.offset(amount, amount, -amount);
+			WorldEditBuild.pos1 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos1).offset(-amount, -amount, amount);
+			WorldEditBuild.pos2 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos2).offset(amount, amount, -amount);
 		}
 	}
 	/**
@@ -36,7 +37,7 @@ class SelectionBuilder {
 	 * @example expandVert(11);
 	 */
 	expandVert(amount) {
-		WorldEditBuild.pos2 = WorldEditBuild.pos2.offset(0, amount, 0);
+		WorldEditBuild.pos2 = XA.Utils.vecToBlockLocation(WorldEditBuild.pos2).offset(0, amount, 0);
 	}
 }
 export const SelectionBuild = new SelectionBuilder();

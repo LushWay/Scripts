@@ -7,9 +7,13 @@ const PlayerJoin = new Subscriber();
 /** @type {Subscriber<Player>} */
 const PlayerGuide = new Subscriber();
 
-export const __EMITTERS = { PlayerJoin, PlayerGuide };
+/** @type {Subscriber<Player>} */
+const PlayerClosedGuide = new Subscriber();
+
+export const __JOIN_EMITTERS = { PlayerJoin, PlayerGuide, PlayerClosedGuide };
 
 export const JOIN_EVENTS = {
 	playerJoin: PlayerJoin.export,
 	playerGuide: PlayerGuide.export,
+	playerClosedGuide: PlayerClosedGuide.export,
 };

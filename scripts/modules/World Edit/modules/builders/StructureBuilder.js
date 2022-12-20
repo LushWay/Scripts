@@ -1,6 +1,5 @@
-import { world } from "@minecraft/server";
-import { setTickTimeout, sleep, XA } from "xapi.js";
-import { WB_CONFIG } from "../../config.js";
+import { sleep, XA } from "xapi.js";
+import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 
 export class Structure {
@@ -22,7 +21,7 @@ export class Structure {
 	}
 
 	async save() {
-		const regions = new Cuboid(this.pos1, this.pos2).split(WB_CONFIG.STRUCTURE_CHUNK_SIZE);
+		const regions = new Cuboid(this.pos1, this.pos2).split(CONFIG_WB.STRUCTURE_CHUNK_SIZE);
 		let errors = 0;
 		let all = 0;
 		for (const region of regions) {
