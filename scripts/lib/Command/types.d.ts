@@ -41,7 +41,7 @@ export interface ICommandData {
 	type?: string;
 }
 
-export type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
+type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
 	? (ctx: X, ...args: [...E, Next]) => R
 	: never;
 

@@ -1,9 +1,10 @@
 import { Player, system, world } from "@minecraft/server";
 import { visualise_benchmark_result } from "../../lib/Benchmark.js";
+import { stackParse } from "../../lib/Class/Error.js";
 import { CreatedInstances } from "../../lib/Database/Entity.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { handler, IS, toStr, XA } from "../../xapi.js";
+import { handle, IS, toStr, XA } from "../../xapi.js";
 
 /**
  * @typedef {import("../../lib/Database/Entity.js").Database<string, any>} defDB
@@ -63,6 +64,8 @@ function showTable(player, table) {
 	const callback = (key) => {
 		key = key + "";
 		const value = DB.get(key);
+		world.say(stackParse());
+
 		const AForm = new ActionForm(key, `§7Тип: §f${typeof value}\n \n${toStr(value)}\n `);
 
 		AForm.addButton("Изменить", null, () => {
@@ -73,7 +76,7 @@ function showTable(player, table) {
 						DB.set(key, newValue);
 						player.tell(toStr(value) + "§r -> " + toStr(newValue));
 					});
-				system.run(() => callback(key));
+				callback(key);
 			});
 		});
 
@@ -83,12 +86,12 @@ function showTable(player, table) {
 		});
 		AForm.addButton("< Назад", null, () => system.run(() => showTable(player, table)));
 
-		AForm.show(player);
+		system.run(() => AForm.show(player));
 	};
 
 	let keys = DB.keys();
 	for (const key of keys) {
-		menu.addButton(key, null, () => handler(() => callback(key), "FormBuilder"));
+		menu.addButton(key, null, () => handle(() => callback(key), "FormBuilder"));
 	}
 
 	menu.show(player);

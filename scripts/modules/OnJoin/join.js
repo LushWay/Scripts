@@ -17,13 +17,36 @@ function getKeyPlayerDBkey(player) {
 	return `JOIN:${player instanceof Player ? player.id : player}`;
 }
 
+const isModified = Symbol("modified");
+
 /**
  *
  * @param {Player | string} player
  * @returns {IJoinData}
  */
 function getData(player) {
-	return PDB.get(getKeyPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
+	const data = PDB.get(getKeyPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
+	// let modified = false;
+	// const proxy = {};
+	// Object.defineProperty(proxy, isModified, {
+	// 	enumerable: true,
+	// 	configurable: false,
+	// 	get: () => modified,
+	// });
+	// for (const key in data) {
+	// 	Object.defineProperty(proxy, key, {
+	// 		enumerable: true,
+	// 		configurable: false,
+	// 		get() {
+	// 			return data[key];
+	// 		},
+	// 		set(v) {
+	// 			modified = true;
+	// 			data[key] = modified;
+	// 		},
+	// 	});
+	// }
+	return data;
 }
 /**
  *
@@ -44,12 +67,14 @@ world.events.playerJoin.subscribe(async (data) => {
 setPlayerInterval(
 	(player) => {
 		const data = getData(player);
+		let modified = false;
 
 		if (data.waiting === 1) {
 			// New player (player joined)
 			delete data.waiting;
 			data.message = 1;
 			data.at = player.location.x + " " + player.location.y + " " + player.location.z;
+			modified = true;
 		}
 
 		// Pos where player joined
@@ -94,13 +119,16 @@ setPlayerInterval(
 				// Player moved on ground
 				JOIN(player, data, "ground");
 			}
+			modified = true;
 		}
 		if (data.learning && !data.message) {
 			// Show first time join guide
 			__JOIN_EMITTERS.PlayerGuide.emit(player);
 			delete data.learning;
+			modified = true;
 		}
-		setData(player, data);
+
+		if (modified) setData(player, data);
 	},
 	20,
 	"joinInterval"

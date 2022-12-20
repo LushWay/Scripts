@@ -1,6 +1,7 @@
 import { BlockLocation, Location, MinecraftBlockTypes, MolangVariableMap, system, world } from "@minecraft/server";
-import { handler, IS, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
+import { handle, IS, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
 import { benchmark } from "../../lib/Benchmark.js";
+import { stackParse } from "../../lib/Class/Error.js";
 import { CommandContext } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
@@ -155,7 +156,7 @@ const tests = {
 		const r = () => {
 			e++;
 			if (e > 10) {
-				handler(tests[11]);
+				handle(tests[11]);
 			} else {
 				world.say(e + "");
 				system.run(r);
@@ -291,6 +292,11 @@ const tests = {
 		}
 		end2();
 	},
+	27(ctx) {
+		system.run(() => {
+			world.say(stackParse());
+		});
+	},
 };
 let bigdata = "";
 let done = false;
@@ -304,5 +310,5 @@ c.string("number", true).executes(async (ctx, n) => {
 	const keys = Object.keys(tests);
 	const i = n && keys.includes(n) ? n : keys.pop();
 	ctx.reply(i);
-	handler(() => tests[i](ctx), "Test");
+	handle(() => tests[i](ctx), "Test");
 });

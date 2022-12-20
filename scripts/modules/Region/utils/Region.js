@@ -1,5 +1,5 @@
-import { BlockLocation, Entity, Player, world } from "@minecraft/server";
-import { handler, XA } from "../../../xapi.js";
+import { Entity, Player } from "@minecraft/server";
+import { handle, XA } from "../../../xapi.js";
 import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
 /**
@@ -151,6 +151,6 @@ export class Region {
 		this.permissions.owners
 			.map(XA.Entity.fetch)
 			.filter((e) => e)
-			.forEach((player, i, owners) => handler(() => callback(player, i, owners), "Region.forEachOwner"));
+			.forEach((player, i, owners) => handle(() => callback(player, i, owners), "Region.forEachOwner"));
 	}
 }

@@ -72,7 +72,7 @@ export class ScoreboardDB {
 	 */
 	eGet(entity) {
 		try {
-			this.scoreboard.getScore(entity.scoreboard);
+			return this.scoreboard.getScore(entity.scoreboard);
 		} catch (e) {
 			return 0;
 		}

@@ -1,5 +1,5 @@
 import { system } from "@minecraft/server";
-import { handler, ThrowError } from "../xapi.js";
+import { handle, ThrowError } from "../xapi.js";
 import { benchmark } from "./Benchmark.js";
 
 const AT = {};
@@ -24,7 +24,7 @@ export function Timeout(ticks, callback, loop, id, n = true) {
 	if (AT[id] >= ticks) {
 		AT[id] = 0;
 		const end = benchmark(`${id} (${loop ? "loop " : ""}${ticks} ticks)`);
-		handler(callback, "Timeout");
+		handle(callback, "Timeout");
 		const took_ticks = ~~(end() / 20);
 		if (took_ticks > ticks) console.warn(callback.toString());
 		if (!loop) return;

@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { handler, IS, XA } from "xapi.js";
+import { handle, IS, XA } from "xapi.js";
 import { ActionForm } from "../../../lib/Form/ActionForm.js";
 import { CONFIG_MENU } from "../../Menu/var.js";
 import { JOIN_EVENTS } from "../../OnJoin/events.js";
@@ -193,7 +193,7 @@ CONFIG_MENU.menu = (player) => {
 						async () => {
 							CD.update();
 							const end = await ClearRegion(player, Pregion);
-							await handler(() => fillRegion(Pregion.from, Pregion.to));
+							await handle(() => fillRegion(Pregion.from, Pregion.to));
 							end();
 						},
 						"Отмена, не очищайте",

@@ -29,7 +29,7 @@ setPlayerInterval(
 		const i = XA.Entity.getHeldItem(p);
 		const settings = GetPlayerSettings(p);
 		const lore = i?.getLore() ?? [];
-		if (i.typeId === "we:s" && settings.enableMobile && p.hasTag("using_item")) {
+		if (i?.typeId === "we:s" && settings.enableMobile && p.hasTag("using_item")) {
 			if (lore[4] && lore[0] === "§aActive") {
 				const block = lore[1].split(" ")[1];
 				const data = lore[1].split(" ")[2];
@@ -41,7 +41,7 @@ setPlayerInterval(
 					p.runCommandAsync(`fill ~-${R} ~${Z}${H} ~-${R} ~${R} ~${Z}${O} ~${R} ${block} ${data}`);
 			}
 		}
-		if (i.typeId === "we:brush" && !settings.noBrushParticles) {
+		if (i?.typeId === "we:brush" && !settings.noBrushParticles) {
 			/** @type {import("@minecraft/server").BlockRaycastOptions} */
 			const q = {};
 			const range = lore[3]?.replace("Range: ", "");
@@ -98,7 +98,7 @@ setPlayerInterval(
 		}
 	},
 	10,
-	"§3WB§r Main"
+	"WB Main"
 );
 
 setPlayerInterval(
@@ -118,7 +118,7 @@ setPlayerInterval(
 		if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 	},
 	5,
-	"§3WB§r Brush"
+	"WB Brush"
 );
 
 setTickInterval(
@@ -126,7 +126,7 @@ setTickInterval(
 		WorldEditBuild.drawSelection();
 	},
 	20,
-	"§3WB§r Selection"
+	"WB Selection"
 );
 
 world.events.beforeItemUseOn.subscribe((data) => {

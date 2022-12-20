@@ -35,13 +35,17 @@ if (Opts.enabled) {
 		"debug"
 	);
 
-	setTickInterval(() => {
-		for (const ent of XA.dimensions.overworld.getEntities({
-			type: "mcbehub:inventory",
-		})) {
-			ent.runCommandAsync("particle minecraft:endrod ~~~");
-		}
-	}, 40);
+	setTickInterval(
+		() => {
+			for (const ent of XA.dimensions.overworld.getEntities({
+				type: "mcbehub:inventory",
+			})) {
+				ent.runCommandAsync("particle minecraft:endrod ~~~");
+			}
+		},
+		40,
+		"s"
+	);
 }
 
 // setTickInterval(() => {

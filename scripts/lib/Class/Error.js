@@ -38,7 +38,7 @@ export function stackParse(deleteStack = 0, additionalStack = [], stack = getSta
 		.filter((e) => e && /^\s*\S/g.test(e))
 		.map((e) => `   ${e}\n`);
 
-	return [...new Set(mappedStack).values()].join("");
+	return mappedStack.join("");
 }
 
 /**

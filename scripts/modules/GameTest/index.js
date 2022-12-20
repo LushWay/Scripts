@@ -1,6 +1,6 @@
-import { BlockLocation, GameMode, MinecraftBlockTypes, world } from "@minecraft/server";
+import { BlockLocation, GameMode, Location, MinecraftBlockTypes, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { IS, setTickInterval, sleep, toStr, XA } from "xapi.js";
+import { handle, IS, setTickInterval, sleep, toStr, XA } from "xapi.js";
 
 const Options = XA.WorldOptions("simulatedPlayer", {
 	name: { value: "", desc: "Имя бота" },
@@ -53,12 +53,45 @@ cmd
 		Options.name = newname;
 	});
 
+/**
+ *
+ * @param {number} max
+ * @param {number} min
+ * @param {boolean} msg
+ * @returns
+ */
+export function rd(max, min = 0, msg = false) {
+	if (max == min || max < min) return max;
+
+	const rd = Math.round(min + Math.random() * (max - min));
+	if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
+	return rd;
+}
+
 GameTest.registerAsync("s", "m", async (test) => {
-	for (let e = 0; e < 30; e++) {
-		test.spawnSimulatedPlayer(new BlockLocation(0, 0, 0), "Tester (" + e + ")", GameMode.adventure);
-		await test.idle(10);
+	let succeed = false;
+	for (let e = 0; e < 2; e++) {
+		const player = test.spawnSimulatedPlayer(new BlockLocation(-1, 3, -1), "Tester (" + e + ")", GameMode.adventure);
+		player.setVelocity({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
+		await test.idle(Math.random() * 50);
+		handle(async () => {
+			while (!succeed) {
+				await test.idle(Math.random() * 40);
+				if (!player) break;
+				const net = XA.Entity.getClosetsEntitys(player, 5, "minecraft:player")[0];
+				if (!net) continue;
+				player.lookAtEntity(net);
+				await test.idle(20);
+				// player.stopMoving();
+				// world.say(toStr(net.location));
+				// player.moveToLocation(new Location(net.location.x, net.location.y, net.location.z), 1);
+				// await test.idle(rd(30, 10));
+				// player.attackEntity(net);
+			}
+		});
 	}
 	await test.idle(1000);
+	succeed = true;
 	test.succeed();
 })
 	.maxTicks(1500)

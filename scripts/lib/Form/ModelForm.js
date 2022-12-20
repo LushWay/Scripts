@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
-import { handler } from "../../xapi.js";
+import { handle } from "../../xapi.js";
 import { FormCallback, XShowForm } from "./utils.js";
 
 /**
@@ -99,7 +99,7 @@ export class ModalForm {
 	async show(player, callback) {
 		const response = await XShowForm(this.form, player);
 		if (response === false || !(response instanceof ModalFormResponse)) return;
-		handler(
+		handle(
 			() =>
 				callback(
 					new FormCallback(this, player, callback),

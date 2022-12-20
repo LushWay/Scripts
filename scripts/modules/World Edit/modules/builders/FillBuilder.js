@@ -1,5 +1,5 @@
 import { BlockLocation } from "@minecraft/server";
-import { handler, sleep, XA } from "xapi.js";
+import { handle, sleep, XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
@@ -13,7 +13,7 @@ import { WorldEditBuild } from "./WorldEditBuilder.js";
  * @example new Fill(BlockLocation, BlockLocation, ["stone", "wood"], ["grass"]);
  */
 export function FillFloor(pos1, pos2, blocks, rb = "any") {
-	handler(async () => {
+	handle(async () => {
 		WorldEditBuild.backup(pos1, pos2);
 
 		const values = new Cuboid(pos1, pos2);

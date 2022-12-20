@@ -1,5 +1,5 @@
 import { BeforeChatEvent, Player, Vector } from "@minecraft/server";
-import { handler } from "xapi.js";
+import { handle } from "xapi.js";
 import { CONFIG } from "../../config.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
@@ -164,5 +164,5 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 		argsToReturn.push(arg.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
 	}
 	if (typeof lastArg.callback !== "function") return event.sender.tell("§cУпс, эта команда пока не работает.");
-	handler(() => lastArg.callback(new CommandContext(event, cmdArgs), ...argsToReturn), "Command");
+	handle(() => lastArg.callback(new CommandContext(event, cmdArgs), ...argsToReturn), "Command");
 }

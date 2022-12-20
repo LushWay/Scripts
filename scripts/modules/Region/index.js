@@ -39,5 +39,5 @@ setPlayerInterval(
 			);
 	},
 	0,
-	"effectS"
+	"underground effects"
 );

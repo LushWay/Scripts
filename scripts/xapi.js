@@ -9,7 +9,6 @@ import { Database } from "./lib/Database/Entity.js";
 import "./lib/Setup/watchdog.js";
 
 // Some system stuff
-import { CONFIG } from "./config.js";
 import { stackParse } from "./lib/Class/Error.js";
 import { DIMENSIONS } from "./lib/List/dimensions.js";
 
@@ -28,10 +27,9 @@ import { XrunCommand } from "./lib/XrunCommand.js";
 
 import { XItemDatabase } from "./lib/Database/Item.js";
 // Modules and undeletable scoreboards
-import { load } from "./lib/Module/loader.js";
-import "./lib/Setup/registryScore.js";
-import "./modules/import.js";
 import { XUtils } from "./lib/Class/Xutils.js";
+import { load } from "./lib/Module/loader.js";
+import "./modules/import.js";
 
 /**
  * Class with all X-API features
@@ -213,7 +211,11 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 
 	if (depth > 10 || typeof target !== "object") return `${rep(target)}` ?? `${target}` ?? "{}";
 
+	/**
+	 * @param {any} value
+	 */
 	function rep(value) {
+		world.say(stackParse());
 		switch (typeof value) {
 			case "function":
 				/**
@@ -322,7 +324,7 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
  * @param {string} [type]
  * @param {string[]} [additionalStack]
  */
-export async function handler(func, type = "Handled", additionalStack) {
+export async function handle(func, type = "Handled", additionalStack) {
 	try {
 		await func();
 	} catch (e) {
@@ -425,6 +427,7 @@ export const DIR_IMPORT = (path) => import(path);
 // Load modules
 awaitWorldLoad().then(async (e) => {
 	await load();
+	await handle(() => import("./lib/Setup/registryScore.js"));
 	world.say("§9└ §fDone.");
 	loading = false;
 });

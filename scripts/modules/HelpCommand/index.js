@@ -1,3 +1,4 @@
+import { world } from "@minecraft/server";
 import { getRole, ROLES, toStr, XA } from "xapi.js";
 import { XCommand } from "../../lib/Command/Command.js";
 import { __COMMANDS__ } from "../../lib/Command/index.js";
@@ -27,11 +28,23 @@ function childrensToHelpText(command) {
 /**
  *
  * @param {XCommand} command
+ * @returns {[string, undefined | string]}
  */
-function getParentType(command) {
+function getParentType(command, init = true) {
 	let curtype = getType(command);
-	if (command.depth === 0) return curtype;
-	else return `${getParentType(command.parent)} ${curtype}`;
+
+	let description;
+
+	if (init && command.data.description) {
+		description = command.data.description;
+		init = false;
+	}
+
+	if (command.depth === 0) return [curtype, description];
+	else {
+		const parents = getParentType(command.parent, init);
+		return [`${parents[0]}§f ${curtype}`, description ?? parents[1] ?? "Not"];
+	}
 }
 /**
  * const path = getUsage(command);
@@ -102,20 +115,19 @@ help.string("commandName").executes((ctx, commandName) => {
 	const aliases = d.aliases?.length > 0 ? "§7(также §f" + d.aliases.join("§7, §f") + "§7)§r" : "";
 	const str = `   §fКоманда §6-${d.name} ${aliases}`;
 
-	ctx.reply(`§7§ы┌──`);
+	// ctx.reply(`§7§ы┌──`);
+	ctx.reply(" ");
 	ctx.reply(str);
 	ctx.reply(" ");
 
 	let l = str.length;
 
-	// for (const command of childrensToHelpText(cmd)) {
-	// 	const path = getUsage(command);
-	// 	const _ = `§7   §f-${path.join(" ")}§7§o - ${command.data.description}§r`;
-	// 	l = Math.max(l, _.length);
-	// 	ctx.reply(_);
-	// }
-	ctx.reply(`${new Array(l - 2).join(" ")}§7§ы──┘`);
-	ctx.reply(toStr(childrensToHelpText(cmd).map(getParentType)));
+	for (const [command, description] of childrensToHelpText(cmd).map(getParentType)) {
+		const _ = `§7   §f-${command}§7§o - ${description}§r`;
+		l = Math.max(l, _.length);
+		ctx.reply(_);
+	}
+	// ctx.reply(`${new Array(l).join(" ")}§7§ы──┘`);
 	return;
 });
 
@@ -131,7 +143,7 @@ const l2 = testCMD.string("LL");
 l2.string("ls");
 l2.int("li");
 
-const literal = testCMD.literal({ name: "literal" });
+const literal = testCMD.literal({ name: "literal", description: "descx" });
 
 literal.int("i").int("i").string("s");
 

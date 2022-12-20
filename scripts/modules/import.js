@@ -3,18 +3,19 @@ import { m, mm } from "../lib/Module/creator.js";
 
 m`DatabaseView`;
 m`HelpCommand`;
-m`Menu`;
-m`Region`;
+// m`Menu`;
+// m`Region`;
 m`test`;
 // m`Battle Royal`;
 // m`Server`;
 // mm(`Server/commands`, { fileName: "import" });
+mm(`Server`, { fileName: "pvp" });
+
 m`Chat`;
 m`Modding`;
-mm("OnJoin", { fileName: "join" });
-mm("World Edit", {
-	fileName: "WBindex",
-});
+// m`Debug`;
+// mm("OnJoin", { fileName: "join" });
+mm("World Edit", { fileName: "WBindex" });
 m`GameTest`;
 
 if (false) {

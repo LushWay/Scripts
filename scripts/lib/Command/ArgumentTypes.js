@@ -81,7 +81,7 @@ export class StringArgumentType {
 	 * @type {string}
 	 */
 	type;
-	typeName = "string";
+	typeName = "§3string";
 	/**
 	 *
 	 * @param {string} value

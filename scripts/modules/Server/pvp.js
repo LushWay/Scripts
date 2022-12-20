@@ -14,9 +14,9 @@ const PVP = new ScoreboardDB(pvpScore);
 const LOCKTITLE = new ScoreboardDB(lockedTitleScore);
 
 const options = XA.WorldOptions("pvp", {
-	enabled: { value: false, desc: "Возможность входа в пвп режим (блокировка всех тп команд)§r" },
+	enabled: { value: true, desc: "Возможность входа в пвп режим (блокировка всех тп команд)§r" },
 	cooldown: { value: 15, desc: "Да" },
-	bowhit: { value: false, desc: "Да" },
+	bowhit: { value: true, desc: "Да" },
 });
 
 const getPlayerSettings = XA.PlayerOptions("pvp", {
@@ -59,14 +59,22 @@ setTickInterval(
 	"PVP"
 );
 
+let e = 0;
+
 setPlayerInterval(
 	(player) => {
 		if (!options.enabled) return;
-		const settings = getPlayerSettings(player);
-
-		if (!settings.title_enabled || isPvpLocked(player) || PVP.eGet(player) <= 0) return; //
-
 		const score = PVP.eGet(player);
+		if (!e) {
+			world.say(score + "");
+			e = 1;
+		}
+
+		if (isPvpLocked(player) || !score) return;
+
+		const settings = getPlayerSettings(player);
+		if (!settings.title_enabled) return;
+
 		const q = score === options.cooldown;
 		const g = (/** @type {string} */ p) => (q ? `§4${p}` : "");
 

@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { handler, XA } from "xapi.js";
+import { handle, XA } from "xapi.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { CONFIG_MENU } from "./var.js";
 
@@ -15,7 +15,7 @@ function defaultmenu(player) {
 
 world.events.beforeItemUse.subscribe(async ({ source: player, item }) => {
 	if (item.typeId !== CONFIG_MENU.itemId || !(player instanceof Player)) return;
-	handler(() => {
+	handle(() => {
 		const menu = CONFIG_MENU.menu(player);
 		if (menu === false) return;
 		menu.show(player);

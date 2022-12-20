@@ -197,6 +197,7 @@ export class Database {
 			}
 		}
 		const data = stringifiedData == "" ? {} : JSON.parse(stringifiedData);
+    this.ss = stringifiedData
 		this.MEMORY = data;
 		return data;
 	}

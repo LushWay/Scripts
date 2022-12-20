@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
-import { handler } from "../../xapi.js";
+import { handle } from "../../xapi.js";
 import { XShowForm } from "./utils.js";
 /** */
 export class ActionForm {
@@ -55,6 +55,6 @@ export class ActionForm {
 		const response = await XShowForm(this.form, player);
 		if (response === false || !(response instanceof ActionFormResponse)) return;
 		const callback = this.buttons[response.selection]?.callback;
-		if (typeof callback === "function") handler(callback, null, ["ActionFormCallback"]);
+		if (typeof callback === "function") handle(callback, null, ["ActionFormCallback"]);
 	}
 }
