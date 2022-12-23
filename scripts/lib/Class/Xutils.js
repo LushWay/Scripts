@@ -1,5 +1,15 @@
-import { Block, BlockLocation, BoolBlockProperty, IntBlockProperty, StringBlockProperty } from "@minecraft/server";
+import {
+	Block,
+	BlockLocation,
+	BoolBlockProperty,
+	IntBlockProperty,
+	MinecraftBlockTypes,
+	Player,
+	StringBlockProperty,
+} from "@minecraft/server";
+import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { ThrowError } from "../../xapi.js";
+import { XShowForm } from "../Form/utils.js";
 
 export const XUtils = {
 	/**
@@ -76,5 +86,41 @@ export const XUtils = {
 		if (!data) return 0;
 		if (bit.value) return data + main.validValues.length;
 		else return data;
+	},
+	/**
+	 *
+	 * @param {Player} player
+	 */
+	async selectBlock(player) {
+		/** @type {[string, number][]} */
+		const blocks = [];
+
+		const underfeatBlock = player.dimension.getBlock(this.vecToBlockLocation(player.location).offset(0, -2, 0));
+
+		if (underfeatBlock && underfeatBlock.typeId !== "minecraft:air") {
+			blocks.push([underfeatBlock.typeId, this.getBlockData(underfeatBlock)]);
+		}
+
+		const inventory = player.getComponent("inventory").container;
+		for (let i = 0; i < inventory.size; i++) {
+			const item = inventory.getItem(i);
+			if (!item || !MinecraftBlockTypes.get(item.typeId)) continue;
+			blocks.push([item.typeId, item.data]);
+		}
+
+		const form = new ActionFormData();
+		form.title("Выбери блок");
+		form.body("Первая кнопка это блок под ногами, а остальные - блоки в инвентаре.");
+
+		for (let [block, data] of blocks) {
+			block = block.replace("minecraft:", "");
+			form.button(`${block} ${data}`, `textures/blocks/${block}`);
+		}
+
+		const result = await XShowForm(form, player);
+		if (result === false || !(result instanceof ActionFormResponse)) return false;
+
+		const selectedBlock = blocks[result.selection];
+		return selectedBlock;
 	},
 };

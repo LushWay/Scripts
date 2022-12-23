@@ -59,21 +59,23 @@ export class FormCallback {
 }
 
 /**
- *
- * @param {ActionFormData | ModalFormData | MessageFormData} form
- * @param {Player} player
- * @returns
+ * It shows a form to a player and if the player is busy, it will try to show the form again until it
+ * succeeds or the maximum number of attempts is reached.
+ * @param {ActionFormData | ModalFormData | MessageFormData} form - The form you want to show.
+ * @param {Player} player - The player who will receive the form.
+ * @returns  The response from the form.
  */
 export async function XShowForm(form, player) {
 	let hold = 100;
 	for (let i = 0; i <= hold; i++) {
+		/** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
 		const response = await form.show(player);
 		if (response.canceled && response.cancelationReason === "userBusy") {
-			// check time and reshow form
 			if (i === hold) {
 				player.tell(`§cНе удалось открыть форму. Закрой чат и попробуй снова`);
 				return false;
 			}
+			// check time and reshow form
 		} else return response;
 	}
 }

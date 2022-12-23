@@ -297,6 +297,10 @@ const tests = {
 			world.say(stackParse());
 		});
 	},
+  async 28(ctx) {
+    const block = await XA.Utils.selectBlock(ctx.sender)
+    world.say(toStr(block))
+  }
 };
 let bigdata = "";
 let done = false;
