@@ -24,7 +24,7 @@ const argv = process.argv[3] ?? "f"
 
 const actions = {
   r() {
-    updateVersion(2,
+    updateVersion(0,
       "Release: ")
   },
   u() {
@@ -32,7 +32,7 @@ const actions = {
       "Update: ")
   },
   f() {
-    updateVersion(0)
+    updateVersion(2)
   }
 }
 
