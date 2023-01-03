@@ -1,12 +1,11 @@
 {
  "name": "xapi",
- "version": "0.0.21",
+ "version": "0.0.22",
  "keywords": [],
  "author": "",
  "license": "ISC",
  "type": "module",
  "scripts": {
-  "run": "",
   "update_leafs": "cd node_modules/leafy-utils && node install.js",
   "commit": "node node_scripts/commit.js",
   "loot": "node node_scripts/loot.js"
