@@ -1,0 +1,22 @@
+{
+ "name": "xapi",
+ "version": "0.0.20",
+ "keywords": [],
+ "author": "",
+ "license": "ISC",
+ "type": "module",
+ "scripts": {
+  "run": "",
+  "update_leafs": "cd node_modules/leafy-utils && node install.js",
+  "commit": "node node_scripts/commit.js",
+  "loot": "node node_scripts/loot.js"
+ },
+ "description": "",
+ "dependencies": {
+  "@minecraft/server-ui": "^1.0.0-beta.11940b24",
+  "leafy-utils": "0.0.5"
+ },
+ "devDependencies": {
+  "@minecraft/server": "^1.1.0-beta.release.1.19.50"
+ }
+}
