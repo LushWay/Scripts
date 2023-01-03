@@ -1,18 +1,18 @@
 {
-  "name": "xapi",
-  "version": "1.0.0",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "scripts": {
-    "loot_functions": "node loot_tables.gen"
-  },
-  "description": "",
-  "dependencies": {
-    "@minecraft/server-ui": "^1.0.0-beta.11940b24"
-  },
-  "devDependencies": {
-    "@minecraft/server": "^1.1.0-beta.release.1.19.50"
-  }
+ "name": "xapi",
+ "version": "2.0.3",
+ "keywords": [],
+ "author": "",
+ "license": "ISC",
+ "type": "module",
+ "scripts": {
+  "loot_functions": "node loot_tables.gen"
+ },
+ "description": "",
+ "dependencies": {
+  "@minecraft/server-ui": "^1.0.0-beta.11940b24"
+ },
+ "devDependencies": {
+  "@minecraft/server": "^1.1.0-beta.release.1.19.50"
+ }
 }
