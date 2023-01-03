@@ -8,11 +8,11 @@
       "minecraft:max_stack_size": 1,
       "minecraft:foil": true,
       "minecraft:icon": {
-        "texture": "axe",
+        "texture": "diamond_axe",
         "frame": 0
       },
       "minecraft:display_name": {
-        "value": "Топорик"
+        "value": "Топор"
       },
       "minecraft:cooldown": {
         "duration": 0.5,

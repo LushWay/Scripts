@@ -1,10 +1,9 @@
 # Server on X-API
 
-Just an api for anarchy Server. This project is based on [Smelly API](https://github.com/Smelly-API/Smelly-API)
+Simple pack for Minecraft PE anarchy server. 
 
-Also this project inludes many code from [Rubedo](https://github.com/smell-of-curry/rubedo) and [Bedrock Scripting API](https://discord.gg/wMSBmuBB) discord server 
-## License
+X-API is based on [Smelly API](https://github.com/Smelly-API/Smelly-API)
 
-[MIT](https://choosealicense.com/licenses/mit/)
-
-
+This project uses many code from:
+  [Rubedo](https://github.com/smell-of-curry/rubedo)
+  [Bedrock Scripting API](https://discord.gg/wMSBmuBB)

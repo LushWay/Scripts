@@ -10,13 +10,12 @@
 		"baseUrl": ".",
 		"paths": {
 			"@minecraft/*": ["node_modules/@minecraft/*/index.js"],
-			"xapi.js": ["scripts/xapi.js"],
-			"config.js": ["scripts/config.js"]
+			"*": ["scripts/*"]
 		},
 		"maxNodeModuleJsDepth": -1,
 		"moduleResolution": "Node16",
 		"types": []
 	},
 	"include": ["./scripts/"],
-	"exclude": ["loot_tables.gen.js"]
+	"exclude": ["./node_scripts/"]
 }

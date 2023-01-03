@@ -4,13 +4,14 @@
 		{
 			"type": "minecraft-js",
 			"request": "attach",
-			"name": "Minecraft debugger /script debugger connect localhost 1000",
+			"name": "Minecraft debugger",
 			"mode": "listen",
 			"localRoot": "${workspaceFolder}/scripts/",
 			"port": 1000
 		}
 	]
 }
+
 /*
 
 /script debugger connect localhost 1000
