@@ -19,7 +19,7 @@
   resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.1.0-beta.release.1.19.50.tgz#ea7c9d9b11db2d6618da3f2639180116f53c5d81"
   integrity sha512-cuyY7QMd5HgzI71Pu/Z7Ii6Ux4fNUf2q/OtXZn14+QTRlC3SaPrPvGIVkSswMhQbcPxL7+uRNtN3CAB3H3PJMA==
 
-leafy-utils@0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-0.0.5.tgz#fb8a013ebdff2ecca06dbf43ea241c0f100b5ecb"
-  integrity sha512-fVpyQ4B7MXw/z9g1NBD7fF6R0O5bigG1WM+KsEpkRYLM8+V+VoMtWNy1f6XmDc2Cf6qbNatMZlCFL0ShtW9CXw==
+leafy-utils@^2.0.13:
+  version "2.0.20"
+  resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-2.0.20.tgz#922c33776c32e00c6dca5a36bdae03d9a42815a3"
+  integrity sha512-0b4DhJBg1GuGhuuCA2TGCy3eZLOm1nHlsntm6cmdrMRxA/AjPj5muTu5lG4iSZdaD03dpBc62TZVGslC8mUFTg==

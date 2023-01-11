@@ -17,5 +17,5 @@
 		"types": []
 	},
 	"include": ["./scripts/"],
-	"exclude": ["./node_scripts/"]
+	"exclude": ["leafs"]
 }

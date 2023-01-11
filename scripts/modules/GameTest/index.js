@@ -70,7 +70,7 @@ export function rd(max, min = 0, msg = false) {
 
 GameTest.registerAsync("s", "m", async (test) => {
 	let succeed = false;
-	for (let e = 0; e < 2; e++) {
+	for (let e = 0; e < 5; e++) {
 		const player = test.spawnSimulatedPlayer(new BlockLocation(-1, 3, -1), "Tester (" + e + ")", GameMode.adventure);
 		player.setVelocity({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
 		await test.idle(Math.random() * 50);

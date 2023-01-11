@@ -1,48 +1,53 @@
 Arguments: 
-  /data/data/com.termux/files/usr/bin/node /data/data/com.termux/files/usr/share/yarn/bin/yarn.js run commit
+  C:\Program Files\nodejs\node.exe C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js run run
 
 PATH: 
-  /data/data/com.termux/files/usr/bin
+  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\Настя\AppData\Local\Microsoft\WindowsApps;C:\Users\Настя\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Настя\AppData\Roaming\npm;C:\Program Files\heroku\bin
 
 Yarn version: 
   1.22.19
 
 Node version: 
-  18.10.0
+  18.2.0
 
 Platform: 
-  android arm64
+  win32 x64
 
 Trace: 
-  SyntaxError: /storage/emulated/0/Termux/package.json: Unexpected end of JSON input
-      at JSON.parse (<anonymous>)
-      at /data/data/com.termux/files/usr/share/yarn/lib/cli.js:1629:59
+  Invariant Violation: Script must exist
+      at invariant (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:2318:15)
+      at C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61545:11
       at Generator.next (<anonymous>)
-      at step (/data/data/com.termux/files/usr/share/yarn/lib/cli.js:310:30)
-      at /data/data/com.termux/files/usr/share/yarn/lib/cli.js:321:13
+      at step (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:310:30)
+      at C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:328:14
+      at new Promise (<anonymous>)
+      at new F (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:5305:28)
+      at C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:307:12
+      at realRunCommand (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61630:23)
+      at action.action (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61691:16)
 
 npm manifest: 
   {
-   "name": "xapi",
-   "version": "0.0.17",
-   "keywords": [],
-   "author": "",
-   "license": "ISC",
-   "type": "module",
-   "scripts": {
-    "run": "",
-    "update_leafs": "cd node_modules/leafy-utils && node install.js",
-    "commit": "node node_scripts/commit.js",
-    "loot": "node node_scripts/loot.js"
-   },
-   "description": "",
-   "dependencies": {
-    "@minecraft/server-ui": "^1.0.0-beta.11940b24",
-    "leafy-utils": "0.0.5"
-   },
-   "devDependencies": {
-    "@minecraft/server": "^1.1.0-beta.release.1.19.50"
-   }
+    "name": "xapi",
+    "version": "0.0.21",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "scripts": {
+      "run": "",
+      "update_leafs": "cd node_modules/leafy-utils && node install.js",
+      "loot": "node leafs/loot.js",
+      "README.md": "node leafs/README.md"
+    },
+    "description": "",
+    "dependencies": {
+      "@minecraft/server-ui": "^1.0.0-beta.11940b24",
+      "leafy-utils": "^2.0.13"
+    },
+    "devDependencies": {
+      "@minecraft/server": "^1.1.0-beta.release.1.19.50"
+    }
   }
 
 yarn manifest: 
@@ -70,7 +75,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.1.0-beta.release.1.19.50.tgz#ea7c9d9b11db2d6618da3f2639180116f53c5d81"
     integrity sha512-cuyY7QMd5HgzI71Pu/Z7Ii6Ux4fNUf2q/OtXZn14+QTRlC3SaPrPvGIVkSswMhQbcPxL7+uRNtN3CAB3H3PJMA==
   
-  leafy-utils@0.0.5:
-    version "0.0.5"
-    resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-0.0.5.tgz#fb8a013ebdff2ecca06dbf43ea241c0f100b5ecb"
-    integrity sha512-fVpyQ4B7MXw/z9g1NBD7fF6R0O5bigG1WM+KsEpkRYLM8+V+VoMtWNy1f6XmDc2Cf6qbNatMZlCFL0ShtW9CXw==
+  leafy-utils@^2.0.13:
+    version "2.0.17"
+    resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-2.0.17.tgz#536ffe9ed7ceaa74e817f0f191f29e6b046fc87f"
+    integrity sha512-2GJO18zaDQJPu+YdR7FWdltHjNk08CW+rFiggqmCh6uV3o1iG40Dgi1YQLYjronIXRaXV2t4sUABsWh0NDSQWQ==
