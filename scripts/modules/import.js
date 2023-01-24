@@ -5,20 +5,17 @@ m`DatabaseView`;
 m`HelpCommand`;
 m`Menu`;
 m`Region`;
-m`test`;
-// m`Battle Royal`;
+m`Test`;
 m`Server`;
-// mm(`Server/commands`, { fileName: "import" });
-mm(`Server`, { fileName: "pvp" });
 
 m`Chat`;
-m`Modding`;
-// m`Debug`;
+m`Admin`;
 mm("OnJoin", { fileName: "join" });
 mm("World Edit", { fileName: "WBindex" });
 m`GameTest`;
 
 if (false) {
+	m`Battle Royal`;
 	m`Debug`;
 	m`Leaderboards`;
 	m`Airdrops`;

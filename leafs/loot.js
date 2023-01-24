@@ -1,4 +1,4 @@
-import { fordir } from "leafy-utils/src/fordir.js";
+import { fordir } from "leafy-utils";
 import path from "path";
 
 fordir({

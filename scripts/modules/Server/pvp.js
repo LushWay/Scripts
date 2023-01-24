@@ -59,16 +59,10 @@ setTickInterval(
 	"PVP"
 );
 
-let e = 0;
-
 setPlayerInterval(
 	(player) => {
 		if (!options.enabled) return;
 		const score = PVP.eGet(player);
-		if (!e) {
-			world.say(score + "");
-			e = 1;
-		}
 
 		if (isPvpLocked(player) || !score) return;
 

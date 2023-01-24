@@ -1,10 +1,10 @@
 import { BeforeChatEvent, Player, Vector } from "@minecraft/server";
 import { handle } from "xapi.js";
 import { CONFIG } from "../../config.js";
+import { inaccurateSearch } from "../Class/Search.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
 import { __COMMANDS__ } from "./index.js";
-import { inaccurateSearch } from "./suggestions.js";
 
 /**
  * Returns a Before chat events augments

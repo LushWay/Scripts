@@ -101,7 +101,7 @@ CONFIG_MENU.menu = (player) => {
 					form.addButton(playerName, null, () => {
 						prompt(
 							player,
-							"Вы точно хотите удалить игрока " + playerName + "§r из строителей вашего региона?",
+							"§cВы точно хотите удалить игрока §r" + playerName + "§r§c из строителей вашего региона?",
 							"ДА",
 							() => {
 								current_region.permissions.owners = current_region.permissions.owners.filter((e) => e !== id);
@@ -133,11 +133,16 @@ CONFIG_MENU.menu = (player) => {
 							"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
 							"Принять",
 							() => {
-								req.deleteRequest(ID);
-								player.tell("§b> §3Запрос на редактирование успешно принят!");
 								const requestedPlayer = XA.Entity.fetch(ID);
-								if (requestedPlayer)
+								if (requestedPlayer) {
+									req.deleteRequest(ID);
+									player.tell("§b> §3Запрос на редактирование успешно принят!");
 									requestedPlayer.tell(`§b> §3Игрок §f${player.name} §r§3принял ваш запрос на редактирование площадки`);
+									current_region.permissions.owners.push(requestedPlayer.id);
+									current_region.update();
+								} else {
+									player.tell("§4> §3Игрок не в сети.");
+								}
 							},
 							"Отклонить",
 							() => {

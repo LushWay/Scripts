@@ -1,3 +1,4 @@
+import { IS } from "../../xapi.js";
 import {
 	ArrayArgumentType,
 	BooleanArgumentType,
@@ -33,8 +34,14 @@ export class XCommand {
 	 * @param {XCommand<any>} parent
 	 */
 	constructor(data, type = new LiteralArgumentType(data.name), depth = 0, parent = null) {
-		if (!data.requires) data.requires = () => true;
-		if (!data.type) data.type = "test";
+		data.requires ??= () => true;
+		data.type ??= "test";
+
+		if ("require" in data) {
+			data.requires = (p) => IS(p.id, data.require);
+			delete data.require;
+		}
+
 		this.data = data;
 		this.type = type;
 		this.children = [];

@@ -13,11 +13,9 @@ const PDB = new Database("player");
  * @param {Player | string} player
  * @returns
  */
-function getKeyPlayerDBkey(player) {
+function genPlayerDBkey(player) {
 	return `JOIN:${player instanceof Player ? player.id : player}`;
 }
-
-const isModified = Symbol("modified");
 
 /**
  *
@@ -25,7 +23,7 @@ const isModified = Symbol("modified");
  * @returns {IJoinData}
  */
 function getData(player) {
-	const data = PDB.get(getKeyPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
+	const data = PDB.get(genPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
 	// let modified = false;
 	// const proxy = {};
 	// Object.defineProperty(proxy, isModified, {
@@ -55,7 +53,7 @@ function getData(player) {
  * @returns
  */
 function setData(player, data) {
-	return PDB.set(getKeyPlayerDBkey(player), data);
+	return PDB.set(genPlayerDBkey(player), data);
 }
 
 world.events.playerJoin.subscribe(async (data) => {

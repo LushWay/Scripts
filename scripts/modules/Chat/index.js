@@ -17,16 +17,6 @@ const playerOptions = XA.PlayerOptions("chat", {
 });
 
 world.events.beforeChat.subscribe((data) => {
-	data.sendToTargets = true;
-	data.targets = [];
-});
-
-world.events.chat.subscribe((data) => {
-	if (data.message.startsWith("-")) return;
-	world.say(`${data.sender.name}: ${data.message}`);
-});
-
-world.events.beforeChat.subscribe((data) => {
 	if (data.message.startsWith(CONFIG.commandPrefix)) return;
 	data.cancel = true;
 	try {

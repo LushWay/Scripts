@@ -160,12 +160,12 @@ export function ThrowError(e, deleteStack = 0, additionalStack = []) {
 	const text = `§4${type}: §c${message}\n§f${stack}\n`;
 	console.warn(text);
 
-	// try {
-	// 	world.say(text); // CONFIG.console.errPath === "chat" ?  : console.warn(text.cc());
-	// } catch (e) {
-	// 	console.warn(isStr ? e : `${e.name} ${e.message}: ${e.stack}`);
-	// }
-	// console.warn(text.cc());
+	try {
+		world.say(text);
+	} catch (e) {
+		console.warn(e);
+	}
+	console.warn(text.replace(/$./g, ""));
 }
 
 /**

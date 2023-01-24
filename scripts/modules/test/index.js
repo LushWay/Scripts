@@ -129,7 +129,7 @@ const tests = {
 
 		await form.show(ctx.sender, (ctx, ...values) => {
 			world.say("ee");
-			// @ts-expect-errorf0993d58-5734-43ee-9008-8546337c6785
+			// @ts-expect-error f0993d58-5734-43ee-9008-8546337c6785
 			if (values[0]) ctx.error("ER");
 			world.say(toStr(values));
 		});
@@ -297,10 +297,10 @@ const tests = {
 			world.say(stackParse());
 		});
 	},
-  async 28(ctx) {
-    const block = await XA.Utils.selectBlock(ctx.sender)
-    world.say(toStr(block))
-  }
+	async 28(ctx) {
+		const block = await XA.Utils.selectBlock(ctx.sender);
+		world.say(toStr(block));
+	},
 };
 let bigdata = "";
 let done = false;

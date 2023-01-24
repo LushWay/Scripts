@@ -64,7 +64,6 @@ function showTable(player, table) {
 	const callback = (key) => {
 		key = key + "";
 		const value = DB.get(key);
-		world.say(stackParse());
 
 		const AForm = new ActionForm(key, `§7Тип: §f${typeof value}\n \n${toStr(value)}\n `);
 

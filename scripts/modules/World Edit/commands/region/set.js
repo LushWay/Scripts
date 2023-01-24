@@ -1,6 +1,6 @@
-import { MinecraftBlockTypes, Player, world } from "@minecraft/server";
+import { MinecraftBlockTypes, Player } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
-import { inaccurateSearch } from "../../../../lib/Command/suggestions.js";
+import { inaccurateSearch } from "../../../../lib/Class/Search.js";
 import { ModalForm } from "../../../../lib/Form/ModelForm.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 import { Cuboid } from "../../modules/utils/Cuboid.js";

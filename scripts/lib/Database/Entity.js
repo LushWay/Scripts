@@ -139,6 +139,7 @@ export class Database {
 	 */
 	async saveData() {
 		if (!this.MEMORY) await this.addQueueTask();
+
 		let entities = Database.getTableEntities(this.tableName);
 		/**
 		 * The split chunks of the stringified data, This is done because we can
@@ -154,28 +155,26 @@ export class Database {
 				entities.push(Database.createTableEntity(this.tableName));
 			}
 		}
+
+		let chunkIndex = 0;
 		for (const [i, entity] of entities.entries()) {
 			const inventory = entity.getComponent("inventory").container;
-			for (const [i, chunk] of chunks.entries()) {
-				if (!chunk) continue;
-				if (i > inventory.size - 1) break; // Exit because it has maxed items
+			while (chunkIndex < chunks.length && inventory.size > 0) {
 				let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
-				item.nameTag = chunk;
+				item.nameTag = chunks[chunkIndex];
 				inventory.setItem(i, item);
-				chunks[i] = null; // Delete chunk because its been set.
+				chunkIndex++;
 			}
 			// Set all unUsed slots to air
-			for (let i = chunks.length + 1; i < inventory.size; i++) {
-				inventory.setItem(i, AIR);
+			for (let i = inventory.size; i < INVENTORY_SIZE; i++) {
+				inventory.setItem(i, new ItemStack(MinecraftItemTypes.stick, 0));
 			}
 			entity.setDynamicProperty("index", i);
-			entities[i] = null; // Set this entity to null because its maxed out!
-			// If all chunks have been saved no need to go to next entity
-			if (!chunks.find((v) => v)) break;
 		}
 		// Check for unUsed entities and despawn them
-		entities.filter((e) => e).forEach((e) => e.triggerEvent("despawn"));
-		return;
+		for (let i = entities.length - 1; i >= chunkIndex / INVENTORY_SIZE; i--) {
+			entities[i].triggerEvent("despawn");
+		}
 	}
 	/**
 	 * Grabs all data from this table
@@ -197,18 +196,9 @@ export class Database {
 			}
 		}
 		const data = stringifiedData == "" ? {} : JSON.parse(stringifiedData);
-    this.ss = stringifiedData
+		this.ss = stringifiedData;
 		this.MEMORY = data;
 		return data;
-	}
-	/**
-	 *  Saves data into this database
-	 * @param {{ [key in Key]: Value }} collection
-	 * @returns {Promise<void>} once data is saved
-	 */
-	async saveCollection(collection) {
-		this.MEMORY = collection;
-		return this.saveData();
 	}
 	/**
 	 * Sets a key to a value in this table
@@ -216,9 +206,9 @@ export class Database {
 	 * @param {Value} value  undefined
 	 * @returns {Promise<void>}
 	 */
-	async set(key, value) {
+	set(key, value) {
 		this.MEMORY[key] = value;
-		return await this.saveData();
+		return this.saveData();
 	}
 	/**
 	 * Gets a value from this table
@@ -226,7 +216,7 @@ export class Database {
 	 * @returns {Value} the keys corresponding key
 	 */
 	get(key) {
-		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `getSync` instead!");
+		if (!this.MEMORY) throw new Error("Entities not loaded!");
 		return this.MEMORY[key];
 	}
 	/**
@@ -245,17 +235,7 @@ export class Database {
 	 * @returns {Key[]}
 	 */
 	keys() {
-		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `keysSync` instead!");
-		// @ts-expect-error
-		return Object.keys(this.MEMORY);
-	}
-	/**
-	 * Get all the keys in the table async, this should be used on world load
-	 * @returns {Promise<Key[]>}
-	 */
-	async keysSync() {
-		if (this.MEMORY) return this.keys();
-		await this.addQueueTask();
+		if (!this.MEMORY) throw new Error("Entities not loaded!");
 		// @ts-expect-error
 		return Object.keys(this.MEMORY);
 	}
@@ -264,16 +244,7 @@ export class Database {
 	 * @returns {Value[]}
 	 */
 	values() {
-		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `valuesSync` instead!");
-		return Object.values(this.MEMORY);
-	}
-	/**
-	 * Get all the values in the table async, this should be used on world load
-	 * @returns {Promise<Value[]>}
-	 */
-	async valuesSync() {
-		if (this.MEMORY) return this.values();
-		await this.addQueueTask();
+		if (!this.MEMORY) throw new Error("Entities not loaded!");
 		return Object.values(this.MEMORY);
 	}
 	/**
@@ -282,34 +253,24 @@ export class Database {
 	 * @returns {boolean}
 	 */
 	has(key) {
-		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `hasSync` instead!");
+		if (!this.MEMORY) throw new Error("Entities not loaded!");
 		return Object.keys(this.MEMORY).includes(key);
 	}
 	/**
-	 * Check if the key exists in the table async, this should be used on worldLoad
-	 * @param {Key} key  the key to test
-	 * @returns {Promise<boolean>}
+	 *  Saves data into this database
+	 * @param {{ [key in Key]: Value; }} collection
+	 * @returns {Promise<void>} once data is saved
 	 */
-	async hasSync(key) {
-		if (this.MEMORY) return this.has(key);
-		await this.addQueueTask();
-		return Object.keys(this.MEMORY).includes(key);
+	set collection(collection) {
+		this.MEMORY = collection;
+		this.saveData();
 	}
 	/**
 	 * Gets all the keys and values
 	 * @returns {{ [key in Key]: Value; }}
 	 */
-	collection() {
-		if (!this.MEMORY) throw new Error("Entities not loaded! Consider using `collectionSync` instead!");
-		return this.MEMORY;
-	}
-	/**
-	 * Gets all the keys and values async, this should be used for grabbingCollection on world load
-	 * @returns {Promise<{ [key in Key]: Value; }>}
-	 */
-	async collectionSync() {
-		if (this.MEMORY) return this.collection();
-		await this.addQueueTask();
+	get collection() {
+		if (!this.MEMORY) throw new Error("Entities not loaded!");
 		return this.MEMORY;
 	}
 	/**
@@ -318,7 +279,7 @@ export class Database {
 	 * @returns {Promise<boolean>}
 	 */
 	async delete(key) {
-		const status = delete this.MEMORY[key];
+		const status = Reflect.deleteProperty(this.MEMORY, key);
 		await this.saveData();
 		return status;
 	}

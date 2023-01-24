@@ -4,7 +4,7 @@ import { DIMENSIONS } from "../../../lib/List/dimensions.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 // import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
 import { Region } from "../utils/Region.js";
-import "./buildManage.js";
+import "./menu.js";
 
 /**
  *

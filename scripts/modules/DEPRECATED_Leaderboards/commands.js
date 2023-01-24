@@ -1,4 +1,3 @@
-import { world } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 import { LeaderboardBuild } from "./LeaderboardBuilder.js";
 const lb = XA.tables;

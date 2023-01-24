@@ -10,6 +10,8 @@ import {
 import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { ThrowError } from "../../xapi.js";
 import { XShowForm } from "../Form/utils.js";
+import { untyped_terrain_textures } from "../List/terrain-textures.js";
+import { inaccurateSearch } from "./Search.js";
 
 export const XUtils = {
 	/**
@@ -95,7 +97,7 @@ export const XUtils = {
 		/** @type {[string, number][]} */
 		const blocks = [];
 
-		const underfeatBlock = player.dimension.getBlock(this.vecToBlockLocation(player.location).offset(0, -2, 0));
+		const underfeatBlock = player.dimension.getBlock(this.vecToBlockLocation(player.location).offset(0, -1, 0));
 
 		if (underfeatBlock && underfeatBlock.typeId !== "minecraft:air") {
 			blocks.push([underfeatBlock.typeId, this.getBlockData(underfeatBlock)]);
@@ -114,7 +116,16 @@ export const XUtils = {
 
 		for (let [block, data] of blocks) {
 			block = block.replace("minecraft:", "");
-			form.button(`${block} ${data}`, `textures/blocks/${block}`);
+			const search = inaccurateSearch(block, Object.keys(untyped_terrain_textures));
+			const textures = untyped_terrain_textures[search[0][0]].textures;
+
+			let path;
+			if (!Array.isArray(textures)) {
+				path = textures;
+			} else {
+				path = textures[data] ?? textures[0];
+			}
+			form.button(`${block} ${data}`, path);
 		}
 
 		const result = await XShowForm(form, player);

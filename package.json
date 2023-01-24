@@ -1,21 +1,1 @@
-{  "name": "xapi",
-  "version": "0.0.22",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "scripts": {
-    "run": "",
-    "update_leafs": "cd node_modules/leafy-utils && node install.js",
-    "commit": "node leafs/commit.js",
-    "loot": "node leafs/loot.js"
-  },
-  "description": "",
-  "dependencies": {
-    "@minecraft/server-ui": "^1.0.0-beta.11940b24",
-    "leafy-utils": "^2.0.13"
-  },
-  "devDependencies": {
-    "@minecraft/server": "^1.1.0-beta.release.1.19.50"
-  }
-}
+{  "name": "xapi",  "version": "0.0.23",  "keywords": [],  "author": "",  "license": "ISC",  "type": "module",  "scripts": {    "run": "",    "update_leafs": "cd node_modules/leafy-utils && node install.js",    "commit": "node leafs/commit.js",    "loot": "node leafs/loot.js"  },  "description": "",  "devDependencies": {},  "dependencies": {    "@minecraft/server": "1.1.0-beta.release.1.19.50",    "@minecraft/server-ui": "1.0.0-beta.release.1.19.50"  }}

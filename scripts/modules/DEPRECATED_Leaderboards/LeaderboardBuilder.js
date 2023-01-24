@@ -1,5 +1,6 @@
 import { BlockLocation, world } from "@minecraft/server";
 import { ThrowError, XA } from "xapi.js";
+import { Database } from "../../lib/Database/Entity.js";
 
 /**
  * This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc...
@@ -17,7 +18,7 @@ function metricNumbers(value) {
 	return `${scaled.toFixed(1)}${exp > 5 ? " " + types[exp] : "e" + exp}`;
 }
 
-const lb = new XA.instantDB(world, "leaderboard");
+const lb = new Database("leaderboard");
 
 // key: objective , value {"scores":[{"name": "smell of curry", "score": "10"},{"name": "leeshdsd", "score": "103"}], "location": {"x":10,"y":30,"z":50}}
 

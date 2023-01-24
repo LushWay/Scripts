@@ -38,7 +38,7 @@ export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
  * @param {string} spining
  * @param {number} percents
  */
-export function getProgressBar(spining, percents) {
+function getProgressBar(spining, percents) {
 	const pb = new Array(10).join(" ").split(" ");
 	const e = pb.map((_, i) => (Math.floor(percents / 10) > i ? "§a▌" : "§7▌"));
 	return `§d${spining[0]} ${e.join("")} §f${~~percents}%`;

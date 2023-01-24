@@ -22,7 +22,7 @@ const ENTITY_LOCATION = new Location(0, 0, 0);
 
 DIMENSIONS.overworld.runCommandAsync("tickingarea add 0 0 0 0 0 0 ItemDB true");
 
-const ENTITY_DATABSE_ID = "mcbehub:inventory2";
+const ENTITY_DATABSE_ID = "mcbehub:inventory";
 
 export class XItemDatabase {
 	/**
