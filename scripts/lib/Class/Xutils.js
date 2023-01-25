@@ -93,45 +93,90 @@ export const XUtils = {
 	 *
 	 * @param {Player} player
 	 */
-	async selectBlock(player) {
+	selectBlock(player) {
 		/** @type {[string, number][]} */
 		const blocks = [];
+
+		/**
+		 * @type {ActionFormData & {
+		 *   buffer?: ActionFormData["button"];
+		 * }}
+		 */
+		const form = new ActionFormData();
+		form.title("Выбери блок");
+
+		const addButton = this.TypedBind(form.button, form);
+		form.buffer = (text, iconPath) => {
+			blocks.push(["buffer", 0]);
+
+			addButton(text, iconPath);
+			return form;
+		};
+
+		form.button = (text, iconPath) => {
+			addButton(text, iconPath);
+			return form;
+		};
 
 		const underfeatBlock = player.dimension.getBlock(this.vecToBlockLocation(player.location).offset(0, -1, 0));
 
 		if (underfeatBlock && underfeatBlock.typeId !== "minecraft:air") {
-			blocks.push([underfeatBlock.typeId, this.getBlockData(underfeatBlock)]);
+			const id = underfeatBlock.typeId.replace(/^minecraft:/, "");
+			const data = this.getBlockData(underfeatBlock);
+			form.buffer("Блок под ногами");
+
+			form.button(`${id}${data > 0 ? ` ${data}` : ""}`, this.getBlockTexture(id, data));
+			blocks.push([id, data]);
 		}
+
+		form.buffer("Инвентарь");
 
 		const inventory = player.getComponent("inventory").container;
 		for (let i = 0; i < inventory.size; i++) {
 			const item = inventory.getItem(i);
 			if (!item || !MinecraftBlockTypes.get(item.typeId)) continue;
-			blocks.push([item.typeId, item.data]);
+			const id = item.typeId.replace(/^minecraft:/, "");
+			const data = item.data;
+			form.button(`${id}${data > 0 ? ` ${data}` : ""}`, this.getBlockTexture(id, data));
+			blocks.push([id, data]);
 		}
 
-		const form = new ActionFormData();
-		form.title("Выбери блок");
-		form.body("Первая кнопка это блок под ногами, а остальные - блоки в инвентаре.");
+		return new Promise(async (resolve) => {
+			const result = await XShowForm(form, player);
+			if (result === false || !(result instanceof ActionFormResponse)) return false;
 
-		for (let [block, data] of blocks) {
-			block = block.replace("minecraft:", "");
-			const search = inaccurateSearch(block, Object.keys(untyped_terrain_textures));
-			const textures = untyped_terrain_textures[search[0][0]].textures;
+			const selectedBlock = blocks[result.selection];
 
-			let path;
-			if (!Array.isArray(textures)) {
-				path = textures;
-			} else {
-				path = textures[data] ?? textures[0];
-			}
-			form.button(`${block} ${data}`, path);
+			if (selectedBlock[0] === "buffer") resolve(await this.selectBlock(player));
+
+			resolve(selectedBlock);
+		});
+	},
+	/**
+	 * @param {string} id
+	 * @param {number} data
+	 */
+	getBlockTexture(id, data) {
+		id = id.replace(/^minecraft:/, "");
+		const search = inaccurateSearch(id, Object.keys(untyped_terrain_textures));
+		const textures = untyped_terrain_textures[search[0][0]].textures;
+
+		let path;
+		if (!Array.isArray(textures)) {
+			path = textures;
+		} else {
+			path = textures[data] ?? textures[0];
 		}
-
-		const result = await XShowForm(form, player);
-		if (result === false || !(result instanceof ActionFormResponse)) return false;
-
-		const selectedBlock = blocks[result.selection];
-		return selectedBlock;
+		return path;
+	},
+	/**
+	 * @template Func, [This = any]
+	 * @param {Func} func
+	 * @param {This} context
+	 * @returns {Func}
+	 */
+	TypedBind(func, context) {
+		if (typeof func !== "function") return func;
+		return func.bind(context);
 	},
 };

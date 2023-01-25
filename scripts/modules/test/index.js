@@ -1,11 +1,11 @@
 import { BlockLocation, Location, MinecraftBlockTypes, MolangVariableMap, system, world } from "@minecraft/server";
 import { handle, IS, setRole, setTickTimeout, sleep, ThrowError, toStr, XA } from "xapi.js";
-import { benchmark } from "../../lib/Benchmark.js";
 import { stackParse } from "../../lib/Class/Error.js";
 import { CommandContext } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
+import { benchmark } from "../../lib/XBenchmark.js";
 import { Region } from "../Region/utils/Region.js";
 import { Cuboid } from "../World Edit/modules/utils/Cuboid.js";
 

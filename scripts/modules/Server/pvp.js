@@ -1,4 +1,4 @@
-import { Entity, Location, MinecraftEntityTypes, Player, world } from "@minecraft/server";
+import { Entity, Location, Player, world } from "@minecraft/server";
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
 import { setPlayerInterval, setTickInterval, XA } from "../../xapi.js";
 import { InRaid } from "../Region/var.js";

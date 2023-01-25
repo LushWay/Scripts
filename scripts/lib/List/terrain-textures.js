@@ -411,17 +411,8 @@ export const terrain_textures = {
 	chain2: {
 		textures: "textures/blocks/chain2",
 	},
-	chest_inventory: {
+	chest: {
 		textures: ["textures/blocks/chest_top", "textures/blocks/chest_side", "textures/blocks/chest_front"],
-	},
-	chest_inventory_front: {
-		textures: ["textures/blocks/chest_front"],
-	},
-	chest_inventory_side: {
-		textures: ["textures/blocks/chest_side"],
-	},
-	chest_inventory_top: {
-		textures: ["textures/blocks/chest_top"],
 	},
 	chiseled_deepslate: {
 		textures: "textures/blocks/deepslate/chiseled_deepslate",
@@ -3058,5 +3049,5 @@ export const terrain_textures = {
 	},
 };
 
-/** @type {Record<string, {textures: string | string[]}} */
+/** @type {Record<string, {textures: string | string[]}>} */
 export const untyped_terrain_textures = terrain_textures;

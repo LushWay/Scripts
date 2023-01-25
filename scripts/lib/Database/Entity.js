@@ -5,10 +5,10 @@ import {
 	EntityTypes,
 	ItemStack,
 	MinecraftItemTypes,
-	system,
 	world,
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
+import { onWorldLoad } from "../Setup/loader.js";
 
 world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
@@ -17,57 +17,19 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	propertyRegistry.registerEntityTypeDynamicProperties(def, EntityTypes.get(ENTITY_IDENTIFIER));
 });
 
-/**
- * This is air as a item,
- */
-export const AIR = new ItemStack(MinecraftItemTypes.stick, 0);
 const MAX_DATABASE_STRING_SIZE = 32000;
 const ENTITY_IDENTIFIER = "rubedo:database";
 const ENTITY_LOCATION = new BlockLocation(0, -64, 0);
 const INVENTORY_SIZE = 128;
 
 /**
- * Splits a string into chunk sizes
- * @param {string} str
- * @param {number} length
- * @returns {string[]}
- */
-function chunkString(str, length) {
-	return str.match(new RegExp(".{1," + length + "}", "g"));
-}
-
-let WORLD_IS_LOADED = false;
-
-/** @type {Function[]} */
-const onLoad = [];
-
-let s = system.runSchedule(async () => {
-	try {
-		await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
-		system.clearRunSchedule(s);
-		WORLD_IS_LOADED = true;
-		onLoad.forEach((e) => e());
-	} catch (error) {}
-}, 1);
-
-/**
- * Sends a callback once world is loaded
- * @param {() => void} callback
- * @returns {void}
- */
-export function onWorldLoad(callback) {
-	if (WORLD_IS_LOADED) return callback();
-	onLoad.push(callback);
-}
-
-/** @type {Record<string, Database<any, any>>} */
-export const CreatedInstances = {};
-
-/**
  * @template {string} [Key = string]
  * @template [Value=any]
  */
 export class Database {
+	/** @type {Record<string, Database<any, any>>} */
+	static instances = {};
+	static chunkRegexp = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");
 	/**
 	 * Creates a table entity that is used for data storage
 	 * @param {string} tableName  undefined
@@ -112,13 +74,13 @@ export class Database {
 	 * @param {string} tableName
 	 */
 	constructor(tableName) {
-		if (tableName in CreatedInstances) return CreatedInstances[tableName];
+		if (tableName in Database.instances) return Database.instances[tableName];
 		this.tableName = tableName;
 		onWorldLoad(async () => {
 			await this.initData();
 			this.QUEUE.forEach((v) => v());
 		});
-		CreatedInstances[tableName] = this;
+		Database.instances[tableName] = this;
 	}
 	/**
 	 * Adds a queue task to be awaited
@@ -145,7 +107,8 @@ export class Database {
 		 * The split chunks of the stringified data, This is done because we can
 		 * only store {@link MAX_DATABASE_STRING_SIZE} chars in a single nameTag
 		 */
-		let chunks = chunkString(JSON.stringify(this.MEMORY), MAX_DATABASE_STRING_SIZE);
+		let chunks = JSON.stringify(this.MEMORY).match(Database.chunkRegexp);
+
 		/**
 		 * The amount of entities that is needed to store {@link chunks} data
 		 */

@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { IS, setPlayerInterval, XA } from "xapi.js";
+import { IS, setPlayerInterval, setTickTimeout, XA } from "xapi.js";
 import { Database } from "../../lib/Database/Entity.js";
 import { __JOIN_EMITTERS } from "./events.js";
 import "./subscribes.js";
@@ -9,58 +9,44 @@ import { CONFIG_JOIN } from "./var.js";
 const PDB = new Database("player");
 
 /**
- *
  * @param {Player | string} player
- * @returns
  */
 function genPlayerDBkey(player) {
 	return `JOIN:${player instanceof Player ? player.id : player}`;
 }
-
 /**
- *
  * @param {Player | string} player
  * @returns {IJoinData}
  */
 function getData(player) {
 	const data = PDB.get(genPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
-	// let modified = false;
-	// const proxy = {};
-	// Object.defineProperty(proxy, isModified, {
-	// 	enumerable: true,
-	// 	configurable: false,
-	// 	get: () => modified,
-	// });
-	// for (const key in data) {
-	// 	Object.defineProperty(proxy, key, {
-	// 		enumerable: true,
-	// 		configurable: false,
-	// 		get() {
-	// 			return data[key];
-	// 		},
-	// 		set(v) {
-	// 			modified = true;
-	// 			data[key] = modified;
-	// 		},
-	// 	});
-	// }
 	return data;
 }
 /**
- *
  * @param {Player | string} player
  * @param {IJoinData} data
- * @returns
  */
 function setData(player, data) {
 	return PDB.set(genPlayerDBkey(player), data);
 }
 
-world.events.playerJoin.subscribe(async (data) => {
+world.events.playerJoin.subscribe((data) => {
 	const D = getData(data.player);
 	D.waiting = 1;
 	setData(data.player, D);
 });
+
+setTickTimeout(
+	() => {
+		if (!XA.isFirstLoaded) return;
+		const player = world.getAllPlayers()[0];
+		const D = getData(player);
+		D.waiting = 1;
+		setData(player, D);
+	},
+	80,
+	"owner start screen"
+);
 
 setPlayerInterval(
 	(player) => {

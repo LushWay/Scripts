@@ -37,6 +37,6 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 	}
 }
 
-export async function load() {
+export async function load_modules() {
 	return multiload(DIR_IMPORT, Object.entries(__MODULES__), "X-API");
 }

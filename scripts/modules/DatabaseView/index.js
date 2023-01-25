@@ -1,9 +1,8 @@
 import { Player, system, world } from "@minecraft/server";
-import { visualise_benchmark_result } from "../../lib/Benchmark.js";
-import { stackParse } from "../../lib/Class/Error.js";
-import { CreatedInstances } from "../../lib/Database/Entity.js";
+import { Database } from "../../lib/Database/Entity.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
+import { visualise_benchmark_result } from "../../lib/XBenchmark.js";
 import { handle, IS, toStr, XA } from "../../xapi.js";
 
 /**
@@ -25,9 +24,9 @@ db.executes((ctx) => selectTable(ctx.sender, true));
  */
 function selectTable(player, firstCall) {
 	const form = new ActionForm("Таблицы данных");
-	for (const key in CreatedInstances) {
+	for (const key in Database.instances) {
 		/** @type {defDB} */
-		const DB = CreatedInstances[key];
+		const DB = Database.instances[key];
 		const name = `${key} §7${DB.keys().length}§r`;
 		form.addButton(name, null, () => {
 			showTable(player, key);
@@ -44,7 +43,7 @@ function selectTable(player, firstCall) {
  */
 function showTable(player, table) {
 	/** @type {defDB} */
-	const DB = CreatedInstances[table];
+	const DB = Database.instances[table];
 
 	const menu = new ActionForm(`${table}`);
 	menu.addButton("§b§l<§r§3 Назад§r", null, () => selectTable(player));

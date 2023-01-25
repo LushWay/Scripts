@@ -2,7 +2,7 @@ Arguments:
   C:\Program Files\nodejs\node.exe C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js run run
 
 PATH: 
-  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\Настя\AppData\Local\Microsoft\WindowsApps;C:\Users\Настя\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Настя\AppData\Roaming\npm;C:\Program Files\heroku\bin
+  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\Настя\AppData\Local\Microsoft\WindowsApps;C:\Users\Настя\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Настя\AppData\Roaming\npm;C:\Users\Настя\AppData\Local\Yarn\bin;
 
 Yarn version: 
   1.22.19
@@ -27,28 +27,7 @@ Trace:
       at action.action (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61691:16)
 
 npm manifest: 
-  {
-    "name": "xapi",
-    "version": "0.0.21",
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "type": "module",
-    "scripts": {
-      "run": "",
-      "update_leafs": "cd node_modules/leafy-utils && node install.js",
-      "loot": "node leafs/loot.js",
-      "README.md": "node leafs/README.md"
-    },
-    "description": "",
-    "dependencies": {
-      "@minecraft/server-ui": "^1.0.0-beta.11940b24",
-      "leafy-utils": "^2.0.13"
-    },
-    "devDependencies": {
-      "@minecraft/server": "^1.1.0-beta.release.1.19.50"
-    }
-  }
+  {  "name": "xapi",  "version": "0.0.23",  "keywords": [],  "author": "",  "license": "ISC",  "type": "module",  "scripts": {    "run": "",    "update_leafs": "cd node_modules/leafy-utils && node install.js",    "commit": "node leafs/commit.js",    "loot": "node leafs/loot.js"  },  "description": "",  "devDependencies": {},  "dependencies": {    "@minecraft/server": "1.1.0-beta.release.1.19.50",    "@minecraft/server-ui": "1.0.0-beta.release.1.19.50"  }}
 
 yarn manifest: 
   No manifest
@@ -58,24 +37,14 @@ Lockfile:
   # yarn lockfile v1
   
   
-  "@minecraft/server-ui@^1.0.0-beta.11940b24":
-    version "1.0.0-beta.11940b24"
-    resolved "https://registry.yarnpkg.com/@minecraft/server-ui/-/server-ui-1.0.0-beta.11940b24.tgz#12d1e790d148ba0c3e614272939023585f543a87"
-    integrity sha512-/E4FKC5Wv5ALExzfT0L45xyawQGAwlRn9W5cs5GmvaTMVwndAcWF39oAcsQcsn/hKEpMzuVFsSIao/pm00+Cgg==
+  "@minecraft/server-ui@1.0.0-beta.release.1.19.50":
+    version "1.0.0-beta.release.1.19.50"
+    resolved "https://registry.yarnpkg.com/@minecraft/server-ui/-/server-ui-1.0.0-beta.release.1.19.50.tgz#5d6d42069d2eaa3c93964e03a37f900b0b86b76b"
+    integrity sha512-hWd1pPmil66kECrbqtMRebp4hSDRbUbjs4+A0L1fvUsXb45uL7HTvuxKIbyhbccTHs3VCod/hQSdoTIzCrsfSw==
     dependencies:
-      "@minecraft/server" "1.0.0-beta.11940b24"
+      "@minecraft/server" "1.1.0-beta.release.1.19.50"
   
-  "@minecraft/server@1.0.0-beta.11940b24":
-    version "1.0.0-beta.11940b24"
-    resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.0.0-beta.11940b24.tgz#f5905c25d98e3f0d3fb1849c16d2e5f640a44c51"
-    integrity sha512-1d5hXQ/g+kWvpoWiQ/IInxTeOxM6RECQ2+l3bR4AmmZ58NRq4pPYevaEvhVs06yKeM/3FmSPVqBu1/Lr6gN1Rg==
-  
-  "@minecraft/server@^1.1.0-beta.release.1.19.50":
+  "@minecraft/server@1.1.0-beta.release.1.19.50":
     version "1.1.0-beta.release.1.19.50"
     resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.1.0-beta.release.1.19.50.tgz#ea7c9d9b11db2d6618da3f2639180116f53c5d81"
     integrity sha512-cuyY7QMd5HgzI71Pu/Z7Ii6Ux4fNUf2q/OtXZn14+QTRlC3SaPrPvGIVkSswMhQbcPxL7+uRNtN3CAB3H3PJMA==
-  
-  leafy-utils@^2.0.13:
-    version "2.0.17"
-    resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-2.0.17.tgz#536ffe9ed7ceaa74e817f0f191f29e6b046fc87f"
-    integrity sha512-2GJO18zaDQJPu+YdR7FWdltHjNk08CW+rFiggqmCh6uV3o1iG40Dgi1YQLYjronIXRaXV2t4sUABsWh0NDSQWQ==

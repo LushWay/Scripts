@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import { handle, ThrowError } from "../xapi.js";
-import { benchmark } from "./Benchmark.js";
+import { benchmark } from "./XBenchmark.js";
 
 const AT = {};
 
