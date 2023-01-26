@@ -1,5 +1,5 @@
 /** @type {[RegExp | ((s: string) => string), string?][]} */
-const replaces = [
+const REPLACES = [
 	[/\\/g, "/"],
 	[/<anonymous>/, "<>"],
 	// [/run \(.+\)/],
@@ -16,7 +16,7 @@ const replaces = [
  * @param {string} e
  */
 function oneLineStackParse(e) {
-	for (const [r, p] of replaces) {
+	for (const [r, p] of REPLACES) {
 		if (typeof e === "string") typeof r !== "function" ? (e = e.replace(r, p ?? "")) : (e = r(e));
 	}
 	return e;

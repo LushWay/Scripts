@@ -16,6 +16,7 @@ const DB = new Database("player");
 /**
  * @author Smell of Curry, mrpatches123, mo9ses, xiller229 (Leaftail)
  */
+
 export const XEntity = {
 	/**
 	 * Gets player name from player database with specific ID
@@ -32,9 +33,10 @@ export const XEntity = {
 	 * @returns {boolean}
 	 */
 	inRadius(center, pos, r) {
-		const inR = (value, center) => value <= r + center && value <= r - center;
+		const inRange = (/** @type {number} */ value, /** @type {number} */ center) =>
+			value <= r + center && value <= r - center;
 
-		return inR(pos.x, center.x) && inR(pos.y, center.y) && inR(pos.z, center.z);
+		return inRange(pos.x, center.x) && inRange(pos.y, center.y) && inRange(pos.z, center.z);
 	},
 	/**
 	 *
