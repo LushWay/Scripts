@@ -29,24 +29,20 @@ export class XCommand {
 	/**
 	 *
 	 * @param {import("./types.js").ICommandData} data
-	 * @param {IArgumentType} type
-	 * @param {number} depth
-	 * @param {XCommand<any>} parent
+	 * @param {IArgumentType} [type]
+	 * @param {number} [depth]
+	 * @param {XCommand<any>} [parent]
 	 */
-	constructor(data, type = new LiteralArgumentType(data.name), depth = 0, parent = null) {
+	constructor(data, type, depth, parent) {
 		data.requires ??= () => true;
 		data.type ??= "test";
-
-		if ("require" in data) {
-			data.requires = (p) => IS(p.id, data.require);
-			delete data.require;
-		}
+		if ("require" in data) data.requires = (p) => IS(p.id, data.require);
 
 		this.data = data;
-		this.type = type;
+		this.type = type ?? new LiteralArgumentType(data.name);
 		this.children = [];
-		this.depth = depth;
-		this.parent = parent;
+		this.depth = depth ?? 0;
+		this.parent = parent ?? null;
 		this.callback = null;
 
 		if (depth === 0) __COMMANDS__.push(this);
@@ -57,6 +53,7 @@ export class XCommand {
 	 * @param {T} type a special type to be added
 	 * @returns {import("./types.js").ArgReturn<Callback, T['type']>} new branch to this command
 	 * @template {IArgumentType} T
+	 * @private
 	 */
 	argument(type) {
 		const cmd = new XCommand(this.data, type, this.depth + 1, this);

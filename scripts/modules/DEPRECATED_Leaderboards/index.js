@@ -1,26 +1,23 @@
-import { setTickInterval, ThrowError, XA } from "xapi.js";
+import { setTickInterval, ThrowError } from "xapi.js";
+import { Database } from "../../lib/Database/Entity.js";
 import "./commands.js";
 import { LeaderboardBuild } from "./LeaderboardBuilder.js";
 
-const lb = XA.tables.basic;
+export const lb = new Database("leaderboard");
 
 setTickInterval(
 	() => {
-		try {
-			if (!lb || lb.keys().length == 0) return;
-			for (let leaderboard of lb.values()) {
-				LeaderboardBuild.updateLeaderboard(
-					leaderboard.objective,
-					leaderboard.location.x,
-					leaderboard.location.y,
-					leaderboard.location.z,
-					leaderboard.location.dimension,
-					leaderboard.displayName,
-					leaderboard.style
-				);
-			}
-		} catch (error) {
-			ThrowError(error);
+		if (!lb || lb.keys().length == 0) return;
+		for (let leaderboard of lb.values()) {
+			LeaderboardBuild.updateLeaderboard(
+				leaderboard.objective,
+				leaderboard.location.x,
+				leaderboard.location.y,
+				leaderboard.location.z,
+				leaderboard.location.dimension,
+				leaderboard.displayName,
+				leaderboard.style
+			);
 		}
 	},
 	0,

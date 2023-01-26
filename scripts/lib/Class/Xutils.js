@@ -8,53 +8,50 @@ import {
 	StringBlockProperty,
 } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
-import { ThrowError } from "../../xapi.js";
 import { XShowForm } from "../Form/utils.js";
 import { untyped_terrain_textures } from "../List/terrain-textures.js";
 import { inaccurateSearch } from "./Search.js";
 
 export const XUtils = {
 	/**
-	 *
-	 * @template T
-	 * @param {Vector3} loc1
-	 * @param {Vector3} loc2
-	 * @param {EX<T, boolean>} convert
-	 * @returns {Generator<T extends true ? BlockLocation : Vector3, void, unknown>}
+	 * Generates a generator of either BlockLocation or Vector3 objects between two provided Vector3 objects
+	 * @template {boolean} T
+	 * @param {Vector3} loc1 - starting Vector3 point
+	 * @param {Vector3} loc2 - ending Vector3 point
+	 * @param {T} convert - flag determining the output type. true for BlockLocation, false for Vector3
+	 * @returns {Generator<T extends true ? BlockLocation : Vector3, void, unknown>} - generator of either BlockLocation or Vector3 objects
 	 */
 	*safeBlocksBetween(loc1, loc2, convert) {
-		try {
-			const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [Math.min(v1, v2), Math.max(v1, v2)];
-			const [xmin, xmax] = minmax(loc1.x, loc2.x);
-			const [zmin, zmax] = minmax(loc1.z, loc2.z);
-			const [ymin, ymax] = minmax(loc1.y, loc2.y);
-			for (let x = xmin; x <= xmax; x++) {
+		const [xmin, xmax] = loc1.x < loc2.x ? [loc1.x, loc2.x] : [loc2.x, loc1.x];
+		const [ymin, ymax] = loc1.y < loc2.y ? [loc1.y, loc2.y] : [loc2.y, loc1.y];
+		const [zmin, zmax] = loc1.z < loc2.z ? [loc1.z, loc2.z] : [loc2.z, loc1.z];
+		for (let x = xmin; x <= xmax; x++) {
+			for (let y = ymin; y <= ymax; y++) {
 				for (let z = zmin; z <= zmax; z++) {
-					for (let y = ymin; y <= ymax; y++) {
-						// @ts-expect-error
-						if (convert) yield new BlockLocation(x, y, z);
-						// @ts-expect-error
-						else yield { x, y, z };
-					}
+					// @ts-expect-error
+					if (convert) yield new BlockLocation(x, y, z);
+					// @ts-expect-error
+					else yield { x, y, z };
 				}
 			}
-		} catch (e) {
-			ThrowError(e);
 		}
 	},
 	/**
-	 *
-	 * @param {Vector3} loc1
-	 * @param {Vector3} loc2
+	 * Calculates the total number of blocks in a 3D space defined by two Vector3 locations.
+	 * @param {Vector3} loc1 - The first Vector3 location defining the space.
+	 * @param {Vector3} loc2 - The second Vector3 location defining the space.
+	 * @returns {number} The total number of blocks in the defined space.
 	 */
 	getBlocksCount(loc1, loc2) {
-		const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [Math.min(v1, v2), Math.max(v1, v2)];
+		const minmax = (v1, v2) => [Math.min(v1, v2), Math.max(v2, v2)];
 		const [xmin, xmax] = minmax(loc1.x, loc2.x);
 		const [zmin, zmax] = minmax(loc1.z, loc2.z);
 		const [ymin, ymax] = minmax(loc1.y, loc2.y);
+
 		const x = xmax - xmin + 1;
 		const y = ymax - ymin + 1;
 		const z = zmax - zmin + 1;
+
 		return x * y * z;
 	},
 	/**
@@ -74,13 +71,9 @@ export const XUtils = {
 		const allProperies = block.permutation.getAllProperties();
 		const needProps = allProperies.filter((p) => "validValues" in p);
 
-		/** @type {StringBlockProperty | IntBlockProperty} */
-		// @ts-expect-error
-		const main = needProps.find((e) => typeof e.value === "string" || typeof e.value === "number");
+		const main = needProps.find((e) => e instanceof StringBlockProperty || e instanceof IntBlockProperty);
 
-		/** @type {BoolBlockProperty} */
-		// @ts-expect-error
-		const bit = needProps.find((e) => typeof e.value === "boolean");
+		const bit = needProps.find((e) => e instanceof BoolBlockProperty);
 
 		const data = main?.validValues?.findIndex((e) => e === main.value);
 

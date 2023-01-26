@@ -1,6 +1,6 @@
 import { BlockLocation, world } from "@minecraft/server";
 import { ThrowError, XA } from "xapi.js";
-import { Database } from "../../lib/Database/Entity.js";
+import { lb } from "./index.js";
 
 /**
  * This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc...
@@ -17,8 +17,6 @@ function metricNumbers(value) {
 	const scaled = value / Math.pow(10, exp * 3);
 	return `${scaled.toFixed(1)}${exp > 5 ? " " + types[exp] : "e" + exp}`;
 }
-
-const lb = new Database("leaderboard");
 
 // key: objective , value {"scores":[{"name": "smell of curry", "score": "10"},{"name": "leeshdsd", "score": "103"}], "location": {"x":10,"y":30,"z":50}}
 
@@ -48,7 +46,14 @@ const GrayStyle = {
 };
 
 export class LeaderboardBuilder {
-	createLeaderboard(obj, x, y, z, dimension = "overworld", style) {
+	/**
+	 *
+	 * @param {string} obj
+	 * @param {Vector3} loc
+	 * @param {string} dimension
+	 * @param {*} style
+	 */
+	createLeaderboard(obj, loc, dimension = "overworld", style) {
 		let objective = world.scoreboard.getObjective(obj).displayName;
 		const data = {
 			scores: [],
@@ -60,8 +65,8 @@ export class LeaderboardBuilder {
 		lb.set(obj, data);
 		let entity = world.getDimension(dimension).spawnEntity("f:t", new BlockLocation(x, y, z));
 		entity.nameTag = "Updating...";
-		entity.addTag("lb");
-		entity.addTag("obj:" + obj);
+		entity.addTag("LEADERBOARD");
+		entity.addTag("OBJECTIVE:" + obj);
 	}
 	/**
 	 * Get the players faction
