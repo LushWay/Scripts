@@ -13,11 +13,11 @@ m`Admin`;
 mm("OnJoin", { fileName: "join" });
 mm("World Edit", { fileName: "WBindex" });
 m`GameTest`;
+m`Leaderboards`;
 
 if (false) {
 	m`Battle Royal`;
 	m`Debug`;
-	m`Leaderboards`;
 	m`Airdrops`;
 	m`Chest GUI/src`;
 	m`migrate`;

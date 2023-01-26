@@ -14,6 +14,14 @@ import { inaccurateSearch } from "./Search.js";
 
 export const XUtils = {
 	/**
+	 * @param {string | symbol | number} str
+	 * @param {{[]: any}} obj
+	 * @returns {str is keyof obj}
+	 */
+	isKeyof(str, obj) {
+		return str in obj;
+	},
+	/**
 	 * Generates a generator of either BlockLocation or Vector3 objects between two provided Vector3 objects
 	 * @template {boolean} T
 	 * @param {Vector3} loc1 - starting Vector3 point

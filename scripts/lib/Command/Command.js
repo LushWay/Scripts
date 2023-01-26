@@ -33,7 +33,7 @@ export class XCommand {
 	 * @param {number} [depth]
 	 * @param {XCommand<any>} [parent]
 	 */
-	constructor(data, type, depth, parent) {
+	constructor(data, type, depth = 0, parent) {
 		data.requires ??= () => true;
 		data.type ??= "test";
 		if ("require" in data) data.requires = (p) => IS(p.id, data.require);

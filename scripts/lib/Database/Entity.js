@@ -183,6 +183,31 @@ export class Database {
 		return this.MEMORY[key];
 	}
 	/**
+	 * Shorthand for db.get(); and db.set(); pair
+	 * @param {Key} key
+	 * @example ```js
+	 * // Get work
+	 * const {data, save} = db.work(key)
+	 *
+	 * // Change values
+	 * data.value = 10
+	 *
+	 * data.obj = { value2: 1 }
+	 *
+	 * // Save without specify key and data
+	 * save()
+	 * ```
+	 */
+	work(key) {
+		const data = this.get(key);
+		const T = this;
+
+		return {
+			data,
+			save: () => T.set(key, data),
+		};
+	}
+	/**
 	 * Gets a value async from this table, this should be used on calls from like
 	 * entityCreate, system.runSchedule or things that could be before database entities spawn
 	 * @param {Key} key  undefined

@@ -1,10 +1,10 @@
-import { BlockLocation, Entity, Location, MinecraftEntityTypes, Player, world } from "@minecraft/server";
-import { IS, setTickInterval, setTickTimeout, sleep, toStr, XA } from "xapi.js";
-import { DIMENSIONS } from "../../../lib/List/dimensions.js";
+import { BlockLocation, Entity, Location, Player, world } from "@minecraft/server";
+import { IS, setTickTimeout, XA } from "xapi.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
-// import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
 import { Region } from "../utils/Region.js";
 import "./menu.js";
+
+const GLOBAL_ALLOWED_ENTITIES = ["minecraft:player", "f:t"];
 
 /**
  *
@@ -75,9 +75,7 @@ world.events.entityCreate.subscribe((data) => {
 		new BlockLocation(data.entity.location.x, data.entity.location.y, data.entity.location.z),
 		data.entity.dimension.id
 	);
-	if (!region && global_allowed_entitys.includes(data.entity.typeId)) return;
+	if (!region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)) return;
 	if (region && region.permissions.allowedEntitys.includes(data.entity.typeId)) return;
 	XA.Entity.despawn(data.entity);
 });
-
-const global_allowed_entitys = ["minecraft:player"];
