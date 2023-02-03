@@ -36,6 +36,7 @@ export class XItemDatabase {
 	/**
 	 * Grabs all database entitys
 	 * @returns {Array<Entity>}
+	 * @private
 	 */
 	get ENTITIES() {
 		const q = {};
@@ -48,6 +49,7 @@ export class XItemDatabase {
 	/**
 	 * Returns all items that are stored
 	 * @returns {Array<ItemStack>}
+	 * @private
 	 */
 	get ITEMS() {
 		let ITEMS = [];

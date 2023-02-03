@@ -125,7 +125,7 @@ CONFIG_MENU.menu = (player) => {
 					"Запросы редактирования",
 					"§3В этом меню вы можете посмотреть запросы на редактирование площадки, отправление другими игроками"
 				);
-				for (const ID of req.activeRequests) {
+				for (const ID of req.reqList) {
 					const name = XA.Entity.getNameByID(ID);
 					newmenu.addButton(name, null, () => {
 						prompt(

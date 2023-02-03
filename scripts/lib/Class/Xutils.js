@@ -99,26 +99,22 @@ export const XUtils = {
 		const blocks = [];
 
 		/**
-		 * @type {ActionFormData & {
-		 *   buffer?: ActionFormData["button"];
-		 * }}
+		 * @type {ActionFormData & { buffer?: ActionFormData["button"]; }}
 		 */
 		const form = new ActionFormData();
-		form.title("Выбери блок");
 
-		const addButton = this.TypedBind(form.button, form);
+		const nativeAddButton = this.TypedBind(form.button, form);
 		form.buffer = (text, iconPath) => {
 			blocks.push(["buffer", 0]);
-
-			addButton(text, iconPath);
+			nativeAddButton(text, iconPath);
 			return form;
 		};
-
 		form.button = (text, iconPath) => {
-			addButton(text, iconPath);
+			nativeAddButton(text, iconPath);
 			return form;
 		};
 
+		form.title("Выбери блок");
 		const underfeatBlock = player.dimension.getBlock(this.vecToBlockLocation(player.location).offset(0, -1, 0));
 
 		if (underfeatBlock && underfeatBlock.typeId !== "minecraft:air") {

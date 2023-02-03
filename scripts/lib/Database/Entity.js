@@ -124,7 +124,7 @@ export class Database {
 			const inventory = entity.getComponent("inventory").container;
 			while (chunkIndex < chunks.length && inventory.size > 0) {
 				let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
-				item.nameTag = chunks[chunkIndex];
+				item.setLore([chunks[chunkIndex]]);
 				inventory.setItem(i, item);
 				chunkIndex++;
 			}
@@ -155,7 +155,7 @@ export class Database {
 			for (let i = 0; i < inventory.size; i++) {
 				const item = inventory.getItem(i);
 				if (!item) continue;
-				stringifiedData = stringifiedData + item.nameTag;
+				stringifiedData = stringifiedData + item.getLore()[0];
 			}
 		}
 		const data = stringifiedData == "" ? {} : JSON.parse(stringifiedData);

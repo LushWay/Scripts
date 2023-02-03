@@ -2,11 +2,9 @@
 const REPLACES = [
 	[/\\/g, "/"],
 	[/<anonymous>/, "<>"],
-	// [/run \(.+\)/],
-	// [/\(scripts\/(.+)\)/g, "§8(§7$1§8)§f"],
 	[/<> \((.+)\)/, "$1"],
 	[/<input>/, "§7<eval>§r"],
-	[/(.+)\(native\)/, "§8$1(native)§f"],
+	[/(.*)\(native\)(.*)/, "§8$1(native)$2§f"],
 	[(s) => (s.includes("lib") || s.includes("xapi.js") ? `§7${s.replace(/§./g, "")}§f` : s)],
 	[(s) => (s.startsWith("§7") ? s : s.replace(/\.js:(\d+)/, ".js:§6$1§f"))],
 ];
@@ -17,7 +15,10 @@ const REPLACES = [
  */
 function oneLineStackParse(e) {
 	for (const [r, p] of REPLACES) {
-		if (typeof e === "string") typeof r !== "function" ? (e = e.replace(r, p ?? "")) : (e = r(e));
+		if (typeof e !== "string" || e.length < 1) break;
+
+		if (typeof r === "function") e = r(e);
+		else e = e.replace(r, p ?? "");
 	}
 	return e;
 }

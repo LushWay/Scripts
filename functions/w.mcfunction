@@ -1,1 +1,0 @@
-loot insert ~~~ loot "w"

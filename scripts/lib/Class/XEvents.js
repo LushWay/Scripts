@@ -14,8 +14,8 @@ export class Subscriber {
 	events = new Map();
 	/**
 	 * Subscribes a callback function to the events with the specified position.
-	 * @param {Callback} callback The callback function to subscribe to the events.
-	 * @param {number} position The position of the subscriber, defaults to 0.
+	 * @param {Callback} callback - The callback function to subscribe to the events.
+	 * @param {number} position - The position of the subscriber, defaults to 0.
 	 * @returns {Callback} The callback function that has been subscribed.
 	 */
 	subscribe(callback, position = 0) {
@@ -24,7 +24,7 @@ export class Subscriber {
 	}
 	/**
 	 * Unsubscribes a callback function from the events.
-	 * @param {Callback} callback The callback function to unsubscribe from the events.
+	 * @param {Callback} callback - The callback function to unsubscribe from the events.
 	 * @returns {boolean} If the callback function is removed successfully it returns true, otherwise false.
 	 */
 	unsubscribe(callback) {
@@ -32,8 +32,8 @@ export class Subscriber {
 	}
 	/**
 	 * Emits an event to all subscribers, passing the data to the callback function.
-	 * @param {Data} data The data to pass to the callback function when the event is emitted.
-	 * @param {number} count The number of subscribers that will receive the event, defaults to all subscribers.
+	 * @param {Data} data - The data to pass to the callback function when the event is emitted.
+	 * @param {number} count - The number of subscribers that will receive the event, defaults to all subscribers.
 	 */
 	async emit(data, count = 0) {
 		const events = [...this.events.entries()].sort(([, a], [, b]) => a - b);

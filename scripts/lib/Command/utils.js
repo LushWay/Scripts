@@ -4,7 +4,7 @@ import { CONFIG } from "../../config.js";
 import { inaccurateSearch } from "../Class/Search.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
-import { __COMMANDS__ } from "./index.js";
+import { XCommand } from "./Command.js";
 
 /**
  * Returns a Before chat events augments
@@ -45,7 +45,7 @@ export function commandNotFound(player, command) {
 
 	const cmds = new Set();
 
-	for (const c of __COMMANDS__) {
+	for (const c of XCommand.COMMANDS) {
 		cmds.add(c.data.name);
 		if (c.data.aliases?.length > 0) {
 			c.data.aliases.forEach((e) => cmds.add(e));

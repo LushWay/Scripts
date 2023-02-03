@@ -9,12 +9,16 @@ import {
 	StringArgumentType,
 } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
-import { __COMMANDS__ } from "./index.js";
 
 /**
  *  @template {Function} [Callback = (ctx: CommandContext) => void]
  */
 export class XCommand {
+	/**
+	 * An array of all active commands
+	 * @type {import("./Command.js").XCommand<any>[]}
+	 */
+	static COMMANDS = [];
 	/**
 	 * The Arguments on this command
 	 * @type {XCommand<any>[]}
@@ -45,7 +49,7 @@ export class XCommand {
 		this.parent = parent ?? null;
 		this.callback = null;
 
-		if (depth === 0) __COMMANDS__.push(this);
+		if (depth === 0) XCommand.COMMANDS.push(this);
 	}
 
 	/**

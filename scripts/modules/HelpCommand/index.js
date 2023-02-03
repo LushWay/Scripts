@@ -1,7 +1,5 @@
-import { world } from "@minecraft/server";
-import { getRole, ROLES, toStr, XA } from "xapi.js";
+import { getRole, ROLES, XA } from "xapi.js";
 import { XCommand } from "../../lib/Command/Command.js";
-import { __COMMANDS__ } from "../../lib/Command/index.js";
 import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
 
 /**
@@ -82,7 +80,7 @@ help
 	.int("page", true)
 	.int("commandsInPage", true)
 	.executes((ctx, inputPage, commandsInPage) => {
-		const avaibleCommands = __COMMANDS__.filter((e) => e.data.requires(ctx.sender));
+		const avaibleCommands = XCommand.COMMANDS.filter((e) => e.data.requires(ctx.sender));
 		const cmds = commandsInPage || 15;
 		const maxPages = Math.ceil(avaibleCommands.length / cmds);
 		const page = Math.min(inputPage || 1, maxPages);
@@ -99,14 +97,11 @@ help
 			}`;
 			ctx.reply("§ы" + c);
 		}
-		ctx.reply(`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${__COMMANDS__.length} ${cv}═─═─═─═─`);
+		ctx.reply(`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${XCommand.COMMANDS.length} ${cv}═─═─═─═─`);
 	});
 
 help.string("commandName").executes((ctx, commandName) => {
-	/**
-	 * @type {XCommand}
-	 */
-	const cmd = __COMMANDS__.find((e) => e.data.name == commandName || e.data?.aliases?.includes(commandName));
+	const cmd = XCommand.COMMANDS.find((e) => e.data.name == commandName || e.data?.aliases?.includes(commandName));
 
 	if (!cmd) return commandNotFound(ctx.sender, commandName);
 	if (!cmd.data?.requires(ctx.data.sender)) return noPerm(ctx.data.sender, cmd), "fail";

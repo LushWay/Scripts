@@ -13,9 +13,8 @@
 			"*": ["scripts/*"]
 		},
 		"maxNodeModuleJsDepth": 0,
-		"moduleResolution": "Node16",
 		"types": []
 	},
 	"include": ["./scripts/"],
-	"exclude": ["leafs", "types"]
+	"exclude": ["leafs"]
 }

@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js run run
+  C:\Program Files\nodejs\node.exe C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @minecraft/server-gemtest
 
 PATH: 
   C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\Настя\AppData\Local\Microsoft\WindowsApps;C:\Users\Настя\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Настя\AppData\Roaming\npm;C:\Users\Настя\AppData\Local\Yarn\bin;
@@ -14,20 +14,20 @@ Platform:
   win32 x64
 
 Trace: 
-  Invariant Violation: Script must exist
-      at invariant (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:2318:15)
-      at C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61545:11
-      at Generator.next (<anonymous>)
-      at step (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:310:30)
-      at C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:328:14
-      at new Promise (<anonymous>)
-      at new F (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:5305:28)
-      at C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:307:12
-      at realRunCommand (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61630:23)
-      at action.action (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:61691:16)
+  Error: https://registry.yarnpkg.com/@minecraft%2fserver-gemtest: Not found
+      at params.callback [as _callback] (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66145:18)
+      at self.callback (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140890:22)
+      at Request.emit (node:events:527:28)
+      at Request.<anonymous> (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141862:10)
+      at Request.emit (node:events:527:28)
+      at IncomingMessage.<anonymous> (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141784:12)
+      at Object.onceWrapper (node:events:641:28)
+      at IncomingMessage.emit (node:events:539:35)
+      at endReadableNT (node:internal/streams/readable:1344:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
 
 npm manifest: 
-  {  "name": "xapi",  "version": "0.0.23",  "keywords": [],  "author": "",  "license": "ISC",  "type": "module",  "scripts": {    "run": "",    "update_leafs": "cd node_modules/leafy-utils && node install.js",    "commit": "node leafs/commit.js",    "loot": "node leafs/loot.js"  },  "description": "",  "devDependencies": {},  "dependencies": {    "@minecraft/server": "1.1.0-beta.release.1.19.50",    "@minecraft/server-ui": "1.0.0-beta.release.1.19.50"  }}
+  {  "name": "xapi",  "version": "0.0.27",  "keywords": [],  "author": "",  "license": "ISC",  "type": "module",  "scripts": {    "run": "",    "update_leafs": "cd node_modules/leafy-utils && node install.js",    "commit": "node leafs/commit.js",    "loot": "node leafs/loot.js"  },  "description": "",  "devDependencies": {},  "dependencies": {    "@minecraft/server": "1.1.0-beta.release.1.19.50",    "@minecraft/server-ui": "1.0.0-beta.release.1.19.50"  }}
 
 yarn manifest: 
   No manifest

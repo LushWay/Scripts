@@ -7,10 +7,9 @@ import { Database } from "../Database/Entity.js";
  */
 
 /**
- *
+ * TS doesn't converting true and false to boolean
  * @typedef {T extends true | false ? boolean : T} Normalize
  * @template T
- * TS doesnt converting true and false to boolean, so we need to manually convert them
  */
 
 /** @type {Record<string, DefaultConfig<boolean>>} */
