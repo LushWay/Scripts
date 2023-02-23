@@ -4,23 +4,29 @@ import {
 	Entity,
 	EntityTypes,
 	ItemStack,
+	Location,
 	MinecraftItemTypes,
 	world,
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
 import { onWorldLoad } from "../Setup/loader.js";
+import { ThrowError } from "../Setup/utils.js";
 
 world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
 	def.defineString("tableName", 30);
 	def.defineNumber("index");
-	propertyRegistry.registerEntityTypeDynamicProperties(def, EntityTypes.get(ENTITY_IDENTIFIER));
+	propertyRegistry.registerEntityTypeDynamicProperties(
+		def,
+		EntityTypes.get(ENTITY_IDENTIFIER)
+	);
 });
 
 const MAX_DATABASE_STRING_SIZE = 32000;
 const ENTITY_IDENTIFIER = "rubedo:database";
 const ENTITY_LOCATION = new BlockLocation(0, -64, 0);
-const INVENTORY_SIZE = 128;
+const INVENTORY_SIZE = 54;
+const CHUNK_REGEXP = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");
 
 /**
  * @template {string} [Key = string]
@@ -29,7 +35,6 @@ const INVENTORY_SIZE = 128;
 export class Database {
 	/** @type {Record<string, Database<any, any>>} */
 	static instances = {};
-	static chunkRegexp = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");
 	/**
 	 * Creates a table entity that is used for data storage
 	 * @param {string} tableName  undefined
@@ -37,7 +42,10 @@ export class Database {
 	 * @returns {Entity} *
 	 */
 	static createTableEntity(tableName, index) {
-		const entity = DIMENSIONS.overworld.spawnEntity(ENTITY_IDENTIFIER, ENTITY_LOCATION);
+		const entity = DIMENSIONS.overworld.spawnEntity(
+			ENTITY_IDENTIFIER,
+			ENTITY_LOCATION
+		);
 		entity.setDynamicProperty("tableName", tableName);
 		entity.nameTag = `§7Database Table: §f${tableName}§r`;
 		if (index) entity.setDynamicProperty("index", index);
@@ -50,10 +58,25 @@ export class Database {
 	 */
 	static getTableEntities(tableName) {
 		try {
-			return DIMENSIONS.overworld
-				.getEntitiesAtBlockLocation(ENTITY_LOCATION)
-				.filter((e) => e?.typeId === ENTITY_IDENTIFIER && e?.getDynamicProperty("tableName") === tableName);
+			const all = DIMENSIONS.overworld.getEntities({
+				location: new Location(
+					ENTITY_LOCATION.x,
+					ENTITY_LOCATION.y,
+					ENTITY_LOCATION.z
+				),
+				maxDistance: 5,
+			});
+
+			const filtered = [...all].filter(
+				(e) =>
+					e &&
+					e.typeId === ENTITY_IDENTIFIER &&
+					e.getDynamicProperty("tableName") === tableName
+			);
+
+			return filtered;
 		} catch (e) {
+			ThrowError(e);
 			return [];
 		}
 	}
@@ -77,7 +100,7 @@ export class Database {
 		if (tableName in Database.instances) return Database.instances[tableName];
 		this.tableName = tableName;
 		onWorldLoad(async () => {
-			await this.initData();
+			await this.init();
 			this.QUEUE.forEach((v) => v());
 		});
 		Database.instances[tableName] = this;
@@ -88,31 +111,28 @@ export class Database {
 	 * @private
 	 */
 	async addQueueTask() {
-		return new Promise((resolve) => {
-			this.QUEUE.push(() => {
-				resolve();
-			});
-		});
+		return new Promise((resolve) => this.QUEUE.push(resolve));
 	}
 	/**
 	 * Saves data into this database
-	 * @returns {Promise<void>} once data is saved
 	 * @private
 	 */
-	async saveData() {
-		if (!this.MEMORY) await this.addQueueTask();
+	save() {
+		// if (!this.MEMORY) await this.addQueueTask();
 
 		let entities = Database.getTableEntities(this.tableName);
+
 		/**
 		 * The split chunks of the stringified data, This is done because we can
-		 * only store {@link MAX_DATABASE_STRING_SIZE} chars in a single nameTag
+		 * only store {@link MAX_DATABASE_STRING_SIZE} chars in a single lore
 		 */
-		let chunks = JSON.stringify(this.MEMORY).match(Database.chunkRegexp);
+		let chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
 
 		/**
 		 * The amount of entities that is needed to store {@link chunks} data
 		 */
-		const entitiesNeeded = Math.ceil(chunks.length / INVENTORY_SIZE) - entities.length;
+		const entitiesNeeded =
+			Math.ceil(chunks.length / INVENTORY_SIZE) - entities.length;
 		if (entitiesNeeded > 0) {
 			for (let i = 0; i < entitiesNeeded; i++) {
 				entities.push(Database.createTableEntity(this.tableName));
@@ -122,15 +142,12 @@ export class Database {
 		let chunkIndex = 0;
 		for (const [i, entity] of entities.entries()) {
 			const inventory = entity.getComponent("inventory").container;
+			inventory.clearAll();
 			while (chunkIndex < chunks.length && inventory.size > 0) {
 				let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
 				item.setLore([chunks[chunkIndex]]);
 				inventory.setItem(i, item);
 				chunkIndex++;
-			}
-			// Set all unUsed slots to air
-			for (let i = inventory.size; i < INVENTORY_SIZE; i++) {
-				inventory.setItem(i, new ItemStack(MinecraftItemTypes.stick, 0));
 			}
 			entity.setDynamicProperty("index", i);
 		}
@@ -141,11 +158,12 @@ export class Database {
 	}
 	/**
 	 * Grabs all data from this table
-	 * @returns {Promise<{ [key in Key]: Value; }>}
 	 * @private
 	 */
-	async initData() {
-		let entities = Database.getTableEntities(this.tableName).sort(
+	async init() {
+		this.isInited = true;
+		let entities = Database.getTableEntities(this.tableName);
+		entities = entities.sort(
 			//@ts-expect-error
 			(a, b) => a.getDynamicProperty("index") - b.getDynamicProperty("index")
 		);
@@ -155,23 +173,25 @@ export class Database {
 			for (let i = 0; i < inventory.size; i++) {
 				const item = inventory.getItem(i);
 				if (!item) continue;
-				stringifiedData = stringifiedData + item.getLore()[0];
+				stringifiedData += item.getLore().join("");
 			}
 		}
-		const data = stringifiedData == "" ? {} : JSON.parse(stringifiedData);
-		this.ss = stringifiedData;
-		this.MEMORY = data;
-		return data;
+		this.stringifiedData = stringifiedData;
+		try {
+			this.MEMORY = stringifiedData ? JSON.parse(stringifiedData) : {};
+		} catch (e) {
+			ThrowError(e);
+		}
+		this.sucInit = true;
 	}
 	/**
 	 * Sets a key to a value in this table
 	 * @param {Key} key  undefined
 	 * @param {Value} value  undefined
-	 * @returns {Promise<void>}
 	 */
 	set(key, value) {
 		this.MEMORY[key] = value;
-		return this.saveData();
+		return this.save();
 	}
 	/**
 	 * Gets a value from this table
@@ -208,22 +228,11 @@ export class Database {
 		};
 	}
 	/**
-	 * Gets a value async from this table, this should be used on calls from like
-	 * entityCreate, system.runSchedule or things that could be before database entities spawn
-	 * @param {Key} key  undefined
-	 * @returns {Promise<Value>}
-	 */
-	async getSync(key) {
-		if (this.MEMORY) return this.get(key);
-		await this.addQueueTask();
-		return this.MEMORY[key];
-	}
-	/**
 	 * Get all the keys in the table
 	 * @returns {Key[]}
 	 */
 	keys() {
-		if (!this.MEMORY) throw new Error("Entities not loaded!");
+		if (!this.MEMORY) throw new Error("Keys: Entities not loaded!");
 		// @ts-expect-error
 		return Object.keys(this.MEMORY);
 	}
@@ -232,7 +241,7 @@ export class Database {
 	 * @returns {Value[]}
 	 */
 	values() {
-		if (!this.MEMORY) throw new Error("Entities not loaded!");
+		if (!this.MEMORY) throw new Error("Values: Entities not loaded!");
 		return Object.values(this.MEMORY);
 	}
 	/**
@@ -241,43 +250,39 @@ export class Database {
 	 * @returns {boolean}
 	 */
 	has(key) {
-		if (!this.MEMORY) throw new Error("Entities not loaded!");
-		return Object.keys(this.MEMORY).includes(key);
+		if (!this.MEMORY) throw new Error("Has: Entities not loaded!");
+		return this.MEMORY && typeof this.MEMORY === "object" && key in this.MEMORY;
 	}
 	/**
-	 *  Saves data into this database
+	 * Saves data into this database
 	 * @param {{ [key in Key]: Value; }} collection
-	 * @returns {Promise<void>} once data is saved
 	 */
 	set collection(collection) {
 		this.MEMORY = collection;
-		this.saveData();
+		this.save();
 	}
 	/**
 	 * Gets all the keys and values
-	 * @returns {{ [key in Key]: Value; }}
 	 */
 	get collection() {
-		if (!this.MEMORY) throw new Error("Entities not loaded!");
+		if (!this.MEMORY) throw new Error("Collection: Entities not loaded!");
 		return this.MEMORY;
 	}
 	/**
 	 * Delete the key from the table
 	 * @param {Key} key  the key to delete
-	 * @returns {Promise<boolean>}
 	 */
-	async delete(key) {
-		const status = Reflect.deleteProperty(this.MEMORY, key);
-		await this.saveData();
-		return status;
+	delete(key) {
+		if (!this.MEMORY) throw new Error("Delete: Entities not loaded!");
+		Reflect.deleteProperty(this.MEMORY, key);
+		return this.save();
 	}
 	/**
 	 * Clear everything in the table
-	 * @returns {Promise<void>}
 	 */
-	async clear() {
-		// @ts-expect-error
-		this.MEMORY = {};
-		return await this.saveData();
+	clear() {
+		if (!this.MEMORY) throw new Error("Clear: Entities not loaded!");
+		Object.assign(this.MEMORY, {});
+		return this.save();
 	}
 }

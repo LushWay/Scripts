@@ -9,6 +9,7 @@ import {
 	StringArgumentType,
 } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
+import "./index.js";
 
 /**
  *  @template {Function} [Callback = (ctx: CommandContext) => void]

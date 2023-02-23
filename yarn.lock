@@ -21,6 +21,11 @@
   resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.0.0-beta.11940b24.tgz#f5905c25d98e3f0d3fb1849c16d2e5f640a44c51"
   integrity sha512-1d5hXQ/g+kWvpoWiQ/IInxTeOxM6RECQ2+l3bR4AmmZ58NRq4pPYevaEvhVs06yKeM/3FmSPVqBu1/Lr6gN1Rg==
 
+"@minecraft/server@1.1.0-beta.1.19.60-stable":
+  version "1.1.0-beta.1.19.60-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.1.0-beta.1.19.60-stable.tgz#38a418e95620c32895000ad2eec765a100704a4f"
+  integrity sha512-o7koQPeyX/R+MUdgexYMIfoZtdkWgr51s+e1f7gR2EqomTUu8/J/8N3sDEWIdeMU2zM5MzWaezCJK0+rEUpZTg==
+
 "@minecraft/server@1.1.0-beta.release.1.19.50":
   version "1.1.0-beta.release.1.19.50"
   resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.1.0-beta.release.1.19.50.tgz#ea7c9d9b11db2d6618da3f2639180116f53c5d81"

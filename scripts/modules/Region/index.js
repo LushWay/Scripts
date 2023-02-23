@@ -1,5 +1,5 @@
-import { MinecraftEffectTypes } from "@minecraft/server";
-import { setPlayerInterval, ThrowError, XA } from "xapi.js";
+import {MinecraftEffectTypes, world} from "@minecraft/server";
+import {awaitWorldLoad, setPlayerInterval, ThrowError, XA} from "xapi.js";
 
 const DB = XA.tables.basic;
 const key = "server.type";
@@ -13,9 +13,11 @@ const toDefault = () => {
 	return 0;
 };
 
+world.events.playerSpawn;
 (async () => {
+	await awaitWorldLoad();
 	/** @type {"build" | "survival"} */
-	const type = VALUE[(await DB.getSync(key)) ?? toDefault()];
+	const type = VALUE[DB.get(key) ?? toDefault()];
 
 	if (type !== "build" && type !== "survival") {
 		toDefault();
@@ -26,16 +28,23 @@ const toDefault = () => {
 	else if (type === "survival") import("./Survival/index.js");
 })();
 
+const EFFECT_Y = -55;
+const TP_Y = -63;
+const TP_TO = TP_Y + 5;
+
 setPlayerInterval(
-	(player) => {
-		if (player.location.y >= -61) return;
-		if (player.location.y < -60) player.addEffect(MinecraftEffectTypes.levitation, 2, 5, false);
-		if (player.location.y < -63)
+	player => {
+		const loc = player.location;
+		const rotation = player.rotation;
+		if (loc.y >= EFFECT_Y + 1) return;
+		if (loc.y < EFFECT_Y)
+			player.addEffect(MinecraftEffectTypes.levitation, 3, 5, false);
+		if (loc.y < TP_Y)
 			player.teleport(
-				{ x: player.location.x, y: -60, z: player.location.z },
+				{x: loc.x, y: TP_TO, z: loc.z},
 				player.dimension,
-				player.rotation.x,
-				player.rotation.y
+				rotation.x,
+				rotation.y
 			);
 	},
 	0,

@@ -112,11 +112,11 @@ export class XItemDatabase {
 			}
 
 			if (!entity) {
-				let e = world.events.entityCreate.subscribe((data) => {
+				let e = world.events.entitySpawn.subscribe((data) => {
 					if (data.entity.typeId == ENTITY_DATABSE_ID) {
 						entity = data.entity;
 						entity.addTag(this.TABLE_NAME);
-						world.events.entityCreate.unsubscribe(e);
+						world.events.entitySpawn.unsubscribe(e);
 					}
 				});
 				DIMENSIONS.overworld.runCommandAsync(`summon ${ENTITY_DATABSE_ID} 0 0 0`);

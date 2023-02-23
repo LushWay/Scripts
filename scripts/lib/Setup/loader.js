@@ -1,5 +1,6 @@
-import { system } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
+import { ThrowError } from "./utils.js";
 
 var WORLD_IS_LOADED = false;
 
@@ -9,10 +10,17 @@ var onLoad = [];
 let s = system.runSchedule(async () => {
 	try {
 		await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+	} catch (error) {
+		return;
+	}
+	try {
+		world.say("load");
 		system.clearRunSchedule(s);
 		WORLD_IS_LOADED = true;
 		onLoad.forEach((e) => e());
-	} catch (error) {}
+	} catch (error) {
+		ThrowError(error, 0, ["world load"]);
+	}
 }, 1);
 
 /**

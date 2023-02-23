@@ -10,10 +10,10 @@ m`Server`;
 
 m`Chat`;
 m`Admin`;
-mm("OnJoin", { fileName: "join" });
+// mm("OnJoin", { fileName: "join" });
 mm("World Edit", { fileName: "WBindex" });
 m`GameTest`;
-m`Leaderboards`;
+// m`Leaderboards`;
 
 if (false) {
 	m`Battle Royal`;

@@ -6,7 +6,7 @@
 				"default": {
 					"transitions": [
 						{
-							"scroll": "query.client_input_type == 2"
+							"scroll": "query.client_input_type == 'touch'"
 						}
 					],
 					"on_exit": ["/tag @s add input_touch"]
@@ -14,7 +14,7 @@
 				"scroll": {
 					"transitions": [
 						{
-							"default": "query.client_input_type != 2"
+							"default": "query.client_input_type != 'touch'"
 						}
 					],
 					"on_exit": ["/tag @s remove input_touch"]

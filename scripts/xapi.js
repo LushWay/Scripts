@@ -5,6 +5,7 @@ let loading = Date.now();
 
 // This need to be loaded before all another scripts
 import "./lib/Setup/watchdog.js";
+import "./lib/Setup/patcher.js";
 
 import { DIMENSIONS } from "./lib/List/dimensions.js";
 import { awaitWorldLoad } from "./lib/Setup/loader.js";
@@ -95,7 +96,7 @@ export * from "./lib/Setup/utils.js";
  */
 export const DIR_IMPORT = (path) => import(path);
 
-world.events.playerJoin.subscribe(() => {
+world.events.playerSpawn.subscribe(() => {
 	if (Date.now() - loading < 2000) XA.isFirstLoaded = true;
 });
 

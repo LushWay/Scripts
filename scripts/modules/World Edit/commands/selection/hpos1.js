@@ -7,7 +7,7 @@ new XA.Command({
 	description: "Set position 1 to targeted block",
 	requires: (p) => IS(p.id, "moderator"),
 }).executes((ctx) => {
-	const pos = ctx.sender.getBlockFromViewVector().location;
+	const pos = ctx.sender.getBlockFromViewDirection().location;
 	if (!pos) return ctx.reply("Неа!");
 	WorldEditBuild.pos1 = pos;
 	ctx.reply(`§5Позиция§r 1 теперь ${pos.x}, ${pos.y}, ${pos.z}`);

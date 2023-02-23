@@ -30,10 +30,10 @@ function setData(player, data) {
 	return PDB.set(genPlayerDBkey(player), data);
 }
 
-world.events.playerJoin.subscribe((data) => {
-	const D = getData(data.player);
+world.events.playerJoin.subscribe(({ playerId }) => {
+	const D = getData(playerId);
 	D.waiting = 1;
-	setData(data.player, D);
+	setData(playerId, D);
 });
 
 setTickTimeout(

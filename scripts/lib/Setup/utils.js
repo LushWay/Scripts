@@ -10,19 +10,21 @@ import { sleep } from "./timers.js";
  */
 export function ThrowError(e, deleteStack = 0, additionalStack = []) {
 	const isStr = typeof e === "string";
-	const stack = stackParse(deleteStack + 1, additionalStack, isStr ? void 0 : e.stack);
+	const stack = stackParse(
+		deleteStack + 1,
+		additionalStack,
+		isStr ? void 0 : e.stack
+	);
 	const message = (isStr ? e : e.message).replace(/\n/g, "");
 	const type = isStr ? "CommandError" : e?.name ?? "Error";
 
 	const text = `§4${type}: §c${message}\n§f${stack}\n`;
-	console.warn(text);
 
 	try {
 		world.say(text);
 	} catch (e) {
 		console.warn(e);
 	}
-	console.warn(text.replace(/$./g, ""));
 }
 
 /**
@@ -43,7 +45,13 @@ export function createWaiter(C) {
 /**
  * @param {Object} target
  */
-export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0) {
+export function toStr(
+	target,
+	space = "  ",
+	cw = "",
+	funcCode = false,
+	depth = 0
+) {
 	const c = {
 		function: {
 			function: "§5",
@@ -58,7 +66,8 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 		string: "§3",
 	};
 
-	if (depth > 10 || typeof target !== "object") return `${rep(target)}` ?? `${target}` ?? "{}";
+	if (depth > 10 || typeof target !== "object")
+		return `${rep(target)}` ?? `${target}` ?? "{}";
 
 	/**
 	 * @param {any} value
@@ -163,7 +172,10 @@ export function toStr(target, space = "  ", cw = "", funcCode = false, depth = 0
 	// avoid Circular structure error
 	const visited = new WeakSet();
 
-	return JSON.stringify(target, (_, value) => rep(value), space)?.replace(/"/g, cw);
+	return JSON.stringify(target, (_, value) => rep(value), space)?.replace(
+		/"/g,
+		cw
+	);
 }
 
 /**

@@ -4,7 +4,6 @@ import { Atp } from "../Server/portals.js";
 import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
 import { quene } from "./var.js";
 
-
 let minpl = 2,
 	fulltime = 5,
 	shorttime = 3;
@@ -145,13 +144,13 @@ bbr
 		Object.assign({}, quene);
 	});
 
-world.events.playerJoin.subscribe((j) => {
-	const jj = j.player;
+world.events.playerJoin.subscribe(({ playerId, playerName }) => {
 	setTickTimeout(
 		() => {
-			if (jj && jj?.name && XA.Entity.fetch(jj.name) && XA.Entity.getTagStartsWith(jj, "br:")) {
-				br.tags.forEach((e) => jj.removeTag(e));
-				Atp(jj, "br");
+			const joinedPlayer = XA.Entity.fetch(playerId);
+			if (joinedPlayer && XA.Entity.getTagStartsWith(joinedPlayer, "br:")) {
+				br.tags.forEach((e) => joinedPlayer.removeTag(e));
+				Atp(joinedPlayer, "br");
 			}
 		},
 		5,

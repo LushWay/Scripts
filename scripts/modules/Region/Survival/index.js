@@ -1,6 +1,5 @@
-import { BlockLocation, Entity, Location, MinecraftEntityTypes, Player, world } from "@minecraft/server";
-import { setTickInterval, setTickTimeout, XA } from "xapi.js";
-import { ScoreboardDB } from "../../../lib/Database/Scoreboard.js";
+import { BlockLocation, Entity, Location, Player, world } from "@minecraft/server";
+import { setTickInterval, setTickTimeout } from "xapi.js";
 import { DIMENSIONS } from "../../../lib/List/dimensions.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 import { CONTAINER_LOCATIONS, locationToKey } from "../utils/container.js";
@@ -55,15 +54,19 @@ world.events.blockBreak.subscribe(({ player, block, brokenBlockPermutation, dime
 		}
 	}
 	// killing dropped items
-	setTickTimeout(() => {
-		[
-			...dimension.getEntities({
-				maxDistance: 2,
-				type: "minecraft:item",
-				location: new Location(block.location.x, block.location.y, block.location.z),
-			}),
-		].forEach((e) => e.kill());
-	}, 0);
+	setTickTimeout(
+		() => {
+			[
+				...dimension.getEntities({
+					maxDistance: 2,
+					type: "minecraft:item",
+					location: new Location(block.location.x, block.location.y, block.location.z),
+				}),
+			].forEach((e) => e.kill());
+		},
+		0,
+		"asd"
+	);
 });
 
 world.events.beforeExplosion.subscribe((data) => {
@@ -73,7 +76,7 @@ world.events.beforeExplosion.subscribe((data) => {
 		for (const id of region.permissions.owners) InRaid[id] = 60;
 	}
 });
-world.events.entityCreate.subscribe((data) => {
+world.events.entitySpawn.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
 		new BlockLocation(data.entity.location.x, data.entity.location.y, data.entity.location.z),
 		data.entity.dimension.id
