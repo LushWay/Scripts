@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { ThrowError } from "xapi.js";
+import { DisplayError } from "xapi.js";
 import { DIMENSIONS } from "./List/dimensions.js";
 
 /**
@@ -18,11 +18,13 @@ import { DIMENSIONS } from "./List/dimensions.js";
  */
 export async function XRunCommand(command, options = {}) {
 	try {
-		const result = await DIMENSIONS[options.dimension ?? "overworld"].runCommandAsync(command);
+		const result = await DIMENSIONS[
+			options.dimension ?? "overworld"
+		].runCommandAsync(command);
 		if (options.showOutput) world.say(result.successCount + "");
 		return result.successCount;
 	} catch (error) {
-		if (options.showError) ThrowError(error);
+		if (options.showError) DisplayError(error);
 		return 0;
 	}
 }

@@ -133,7 +133,12 @@ setTickInterval(
 			/*================== Блокировка незера =================*/
 			if (options.lockNether) {
 				if (player.dimension.id === MinecraftDimensionTypes.nether) {
-					player.teleport({ x: 0, z: 100, y: 0 }, XA.dimensions.overworld, 0, 0);
+					player.teleport(
+						{ x: 0, z: 100, y: 0 },
+						XA.dimensions.overworld,
+						0,
+						0
+					);
 					world.say(`§c► §f${player.name}§c Измерение "Незер" заблокированно.`);
 				}
 			}

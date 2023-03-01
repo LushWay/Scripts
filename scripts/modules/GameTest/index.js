@@ -1,6 +1,11 @@
-import { BlockLocation, GameMode, Location, MinecraftBlockTypes, world } from "@minecraft/server";
+import {
+	BlockLocation,
+	GameMode,
+	MinecraftBlockTypes,
+	world,
+} from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { handle, IS, setTickInterval, sleep, toStr, XA } from "xapi.js";
+import { handle, IS, setTickInterval, sleep, XA } from "xapi.js";
 
 const Options = XA.WorldOptions("simulatedPlayer", {
 	name: { value: "", desc: "Имя бота" },
@@ -37,10 +42,15 @@ const cmd = new XA.Command({
 	requires: (p) => IS(p.id, "admin"),
 	type: "test",
 }).executes(async (ctx) => {
-	const o = world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13));
+	const o = world
+		.getDimension("overworld")
+		.getBlock(new BlockLocation(10, 63, 13));
 	o.setType(MinecraftBlockTypes.redstoneBlock);
 	await sleep(10);
-	console.log(world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13)).typeId);
+	console.log(
+		world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13))
+			.typeId
+	);
 	XA.runCommandX(`tp "${name}" "${ctx.sender.name}"`);
 	// ctx.sender.runCommandAsync("gametest runthis");
 });
@@ -60,25 +70,26 @@ cmd
  * @param {boolean} msg
  * @returns
  */
-export function rd(max, min = 0, msg = false) {
-	if (max == min || max < min) return max;
-
-	const rd = Math.round(min + Math.random() * (max - min));
-	if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
-	return rd;
-}
 
 GameTest.registerAsync("s", "m", async (test) => {
 	let succeed = false;
 	for (let e = 0; e < 5; e++) {
-		const player = test.spawnSimulatedPlayer(new BlockLocation(-1, 3, -1), "Tester (" + e + ")", GameMode.adventure);
+		const player = test.spawnSimulatedPlayer(
+			new BlockLocation(-1, 3, -1),
+			"Tester (" + e + ")",
+			GameMode.adventure
+		);
 		player.setVelocity({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
 		await test.idle(Math.random() * 50);
 		handle(async () => {
 			while (!succeed) {
 				await test.idle(Math.random() * 40);
 				if (!player) break;
-				const net = XA.Entity.getClosetsEntitys(player, 5, "minecraft:player")[0];
+				const net = XA.Entity.getClosetsEntitys(
+					player,
+					5,
+					"minecraft:player"
+				)[0];
 				if (!net) continue;
 				player.lookAtEntity(net);
 				await test.idle(20);
@@ -97,3 +108,11 @@ GameTest.registerAsync("s", "m", async (test) => {
 	.maxTicks(1500)
 	.structureName("Component:grass5x5")
 	.tag("sim");
+
+function rd(max, min = 0, msg = false) {
+	if (max == min || max < min) return max;
+
+	const rd = Math.round(min + Math.random() * (max - min));
+	if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
+	return rd;
+}

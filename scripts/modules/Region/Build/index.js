@@ -115,5 +115,6 @@ world.events.entitySpawn.subscribe((data) => {
 	if (!region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)) return;
 	if (region && region.permissions.allowedEntitys.includes(data.entity.typeId))
 		return;
+
 	XA.Entity.despawn(data.entity);
 });

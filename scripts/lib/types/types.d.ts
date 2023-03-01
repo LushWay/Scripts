@@ -14,6 +14,10 @@ interface IConfiguration {
 		loadAwait: boolean;
 	};
 	commandPrefix: string;
+	/**
+	 * Time in ms to mark XA.state.first_load
+	 */
+	firstPlayerJoinTime: number;
 }
 type Vector3 = import("@minecraft/server").Vector3;
 

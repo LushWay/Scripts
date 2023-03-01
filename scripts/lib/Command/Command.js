@@ -55,9 +55,9 @@ export class XCommand {
 
 	/**
 	 * Adds a ranch to this command of your own type
+	 * @template {IArgumentType} T
 	 * @param {T} type a special type to be added
 	 * @returns {import("./types.js").ArgReturn<Callback, T['type']>} new branch to this command
-	 * @template {IArgumentType} T
 	 * @private
 	 */
 	argument(type) {
@@ -108,7 +108,9 @@ export class XCommand {
 	location(name, optional = false) {
 		const cmd = this.argument(new LocationArgumentType(name, optional));
 		if (!name.endsWith("*")) {
-			const newArg = cmd.location(name + "_y*", optional).location(name + "_z*", optional);
+			const newArg = cmd
+				.location(name + "_y*", optional)
+				.location(name + "_z*", optional);
 			// @ts-expect-error
 			return newArg;
 		}
@@ -120,7 +122,12 @@ export class XCommand {
 	 * @returns {XCommand<Callback>} new branch to this command
 	 */
 	literal(data, optional = false) {
-		const cmd = new XCommand(data, new LiteralArgumentType(data.name, optional), this.depth + 1, this);
+		const cmd = new XCommand(
+			data,
+			new LiteralArgumentType(data.name, optional),
+			this.depth + 1,
+			this
+		);
 		this.children.push(cmd);
 		// @ts-expect-error
 		return cmd;

@@ -1,12 +1,12 @@
 import { Player, system, world } from "@minecraft/server";
-import { Database } from "../../lib/Database/Entity.js";
+import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { visualise_benchmark_result } from "../../lib/XBenchmark.js";
 import { handle, IS, toStr, XA } from "../../xapi.js";
 
 /**
- * @typedef {import("../../lib/Database/Entity.js").Database<string, any>} defDB
+ * @typedef {import("../../lib/Database/Rubedo.js").Database<string, any>} defDB
  */
 
 const db = new XA.Command({
@@ -48,7 +48,10 @@ function showTable(player, table) {
 	const menu = new ActionForm(`${table}`);
 	menu.addButton("§b§l<§r§3 Назад§r", null, () => selectTable(player));
 	menu.addButton("§3Новое значение§r", null, () => {
-		const form = new ModalForm("§3+Значение в §f" + table).addTextField("Ключ", " ");
+		const form = new ModalForm("§3+Значение в §f" + table).addTextField(
+			"Ключ",
+			" "
+		);
 		const { newform, callback } = changeValue(form, null);
 		newform.show(player, (_, key, input, type) => {
 			if (input)
@@ -64,10 +67,16 @@ function showTable(player, table) {
 		key = key + "";
 		const value = DB.get(key);
 
-		const AForm = new ActionForm(key, `§7Тип: §f${typeof value}\n \n${toStr(value)}\n `);
+		const AForm = new ActionForm(
+			key,
+			`§7Тип: §f${typeof value}\n \n${toStr(value)}\n `
+		);
 
 		AForm.addButton("Изменить", null, () => {
-			const { newform, callback: ncallback } = changeValue(new ModalForm(key), value);
+			const { newform, callback: ncallback } = changeValue(
+				new ModalForm(key),
+				value
+			);
 			newform.show(player, (_, input, inputType) => {
 				if (input)
 					ncallback(input, inputType, (newValue) => {
@@ -82,7 +91,9 @@ function showTable(player, table) {
 			DB.delete(key);
 			system.run(() => showTable(player, table));
 		});
-		AForm.addButton("< Назад", null, () => system.run(() => showTable(player, table)));
+		AForm.addButton("< Назад", null, () =>
+			system.run(() => showTable(player, table))
+		);
 
 		system.run(() => AForm.show(player));
 	};
@@ -104,7 +115,11 @@ function changeValue(form, value) {
 	let type = typeof value;
 	let typeDropdown = ["string", "number", "boolean", "object"];
 	if (value) typeDropdown.unshift("Оставить прежний §7(" + type + ")");
-	const stringifiedValue = value ? (typeof value === "object" ? JSON.stringify(value) : value + "") : "";
+	const stringifiedValue = value
+		? typeof value === "object"
+			? JSON.stringify(value)
+			: value + ""
+		: "";
 	const newform = form
 		.addTextField("Значение", "оставь пустым для отмены", stringifiedValue)
 		.addDropdown("Тип", typeDropdown);
@@ -120,7 +135,10 @@ function changeValue(form, value) {
 
 			if (
 				!inputType.includes(type) &&
-				(inputType === "string" || inputType === "object" || inputType === "boolean" || inputType === "number")
+				(inputType === "string" ||
+					inputType === "object" ||
+					inputType === "boolean" ||
+					inputType === "number")
 			) {
 				type = inputType;
 			}

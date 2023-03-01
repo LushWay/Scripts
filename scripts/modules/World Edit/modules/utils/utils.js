@@ -1,6 +1,6 @@
 import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
-import { ThrowError, XA } from "../../../../xapi.js";
+import { DisplayError, XA } from "../../../../xapi.js";
 
 /**
  *
@@ -12,11 +12,17 @@ export function setblock(blockTypeID, location) {
 	if (blockTypeID.includes(".") || blockTypeID === "air") {
 		// Block is written like "stone.3", so we need to get data and id
 		const [_, id, data] = /^(.+)\.(\d+)/g.exec(blockTypeID);
-		XA.runCommandX(`setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`, { showError: true });
+		XA.runCommandX(
+			`setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`,
+			{ showError: true }
+		);
 	} else {
 		// Normal block type
 		const blockType = MinecraftBlockTypes.get(`minecraft:${blockTypeID}`);
-		if (!blockType) return ThrowError(new TypeError(`BlockType ${blockTypeID} does not exist!`));
+		if (!blockType)
+			return DisplayError(
+				new TypeError(`BlockType ${blockTypeID} does not exist!`)
+			);
 		DIMENSIONS.overworld.getBlock(location).setType(blockType);
 	}
 }

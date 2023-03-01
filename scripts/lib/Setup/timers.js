@@ -1,12 +1,51 @@
 import { Player, world } from "@minecraft/server";
-import { Timeout } from "../XTimeout.js";
+import { system } from "@minecraft/server";
+import { DisplayError, handle } from "../../xapi.js";
+import { benchmark } from "../XBenchmark.js";
+
+// Active timers
+const AT = {};
+
+/**
+ * It runs a function after a certain amount of ticks
+ * @param {number} ticks - The amount of ticks to wait before running the callback.
+ * @param {Function} callback - The function to be called after the timeout.
+ * @param {boolean} [loop] - Whether or not the timeout should loop.
+ * @param {string | number} [id] - The id of the timeout.
+ * @returns A function thats reset a timeout
+ */
+function Timeout(ticks, callback, loop, id, n = true) {
+	if (!id) {
+		DisplayError(new ReferenceError("NO_TIMEOUT_ID"));
+		id = Date.now();
+	}
+	if (!(id in AT) || n) AT[id] = 0;
+
+	AT[id]++;
+
+	if (AT[id] >= ticks) {
+		AT[id] = 0;
+		const end = benchmark(`${id} (${loop ? "loop " : ""}${ticks} ticks)`);
+		handle(callback, "Timeout");
+		const took_ticks = ~~(end() / 20);
+		if (took_ticks > ticks) console.warn(callback.toString());
+		if (!loop) return;
+	}
+
+	if (AT[id] >= 0) system.run(() => Timeout(ticks, callback, loop, id, false));
+
+	const stop = () => {
+		AT[id] = -10;
+	};
+	return stop;
+}
 
 /**
  *
  * @param {(plr: Player) => void} callback
  */
-export function forPlayers(callback) {
-	for (const player of world.getPlayers()) if (typeof callback === "function") callback(player);
+function forPlayers(callback) {
+	for (const player of world.getPlayers()) callback(player);
 }
 
 /**
@@ -14,7 +53,8 @@ export function forPlayers(callback) {
  * @param {number} time time in ticks
  * @returns {Promise<void>}
  */
-export const sleep = (time) => new Promise((resolve) => setTickTimeout(() => resolve(), time, "sleep"));
+export const sleep = (time) =>
+	new Promise((resolve) => setTickTimeout(() => resolve(), time, "sleep"));
 
 /**
  * @param {Function} callback

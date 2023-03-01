@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { Database } from "../Database/Entity.js";
+import { Database } from "../Database/Rubedo.js";
 
 /**
  * @typedef {Record<string, { desc: string; value: T }>} DefaultConfig

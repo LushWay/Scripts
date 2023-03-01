@@ -8,7 +8,7 @@ import { sleep } from "./timers.js";
  * @param {number} [deleteStack]
  * @param {string[]} [additionalStack]
  */
-export function ThrowError(e, deleteStack = 0, additionalStack = []) {
+export function DisplayError(e, deleteStack = 0, additionalStack = []) {
 	const isStr = typeof e === "string";
 	const stack = stackParse(
 		deleteStack + 1,
@@ -188,7 +188,7 @@ export async function handle(func, type = "Handled", additionalStack) {
 	try {
 		await func();
 	} catch (e) {
-		ThrowError(
+		DisplayError(
 			{
 				message: `${e.name ? `${e.name}: §f` : ""}${e.message ?? e}`,
 				name: type,

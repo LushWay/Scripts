@@ -1,73 +1,26 @@
 // @ts-check
-
-import * as fs from "fs/promises";
-import path from "path";
-
-/**
- * Replaces and adds code to a package's TypeScript definition file.
- * @param {string} packageName - The name of the package to patch.
- * @param {object} options - The patching options.
- * @param {{find: RegExp | string, replace: string, all?: boolean}[]} options.replaces - The replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
- * @param {object} options.additions
- * @param {string} options.additions.beginning - The code to add to the beginning of the file.
- * @param {string} options.additions.afterImports - The code to add after any import statements.
- * @param {string} options.additions.ending - The code to add to the end of the file.
- */
-async function patchPackage(packageName, options) {
-	// Get the path to the package's TypeScript definition file
-	const packagePath = path.join("node_modules", packageName, `index.d.ts`);
-
-	// Read the original code from the file
-	const originalCode = await fs.readFile(packagePath, "utf-8");
-
-	// Apply the replacements
-	let patchedCode = originalCode;
-	for (const replace of options.replaces) {
-		patchedCode = patchedCode[replace.all ? "replaceAll" : "replace"](
-			replace.find,
-			replace.replace
-		);
-	}
-
-	options.additions.beginning ??= "";
-	options.additions.ending ??= "";
-
-	let newCode = `${options.additions.beginning}\n${patchedCode}\n${options.additions.ending}`;
-
-	if (options.additions.afterImports) {
-		const lines = newCode.split(/\n/g);
-
-		let lastImport = 0;
-		for (const [i, line] of lines.entries()) {
-			if (line.trim().startsWith("import ")) lastImport = i + 1;
-		}
-
-		newCode = [
-			...lines.slice(0, lastImport),
-			options.additions.afterImports,
-			...lines.slice(lastImport),
-		].join("\n");
-	}
-
-	// Write the patched code back to the file
-	await fs.writeFile(packagePath, newCode);
-}
+import { m, patchPackage } from "./utils.js";
 
 patchPackage("@minecraft/server", {
+	classes: {
+		World: m`
+    logOnce(message: any): any 
+`,
+	},
 	replaces: [
 		{
 			find: "getComponent(componentName: string): any;",
-			replace: `
+			replace: m`
 getComponent<N extends keyof BlockComponents>(
 	componentName: N
-): BlockComponents[N];`.trim(),
+): BlockComponents[N];`,
 		},
 		{
 			find: "getComponent(componentId: string): IEntityComponent;",
-			replace: `
+			replace: m`
 getComponent<N extends keyof EntityComponents>(
   componentName: N
-): EntityComponents[N]`.trim(),
+): EntityComponents[N]`,
 			all: true,
 		},
 	],

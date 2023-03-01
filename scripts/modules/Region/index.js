@@ -1,5 +1,5 @@
-import {MinecraftEffectTypes, world} from "@minecraft/server";
-import {awaitWorldLoad, setPlayerInterval, ThrowError, XA} from "xapi.js";
+import { MinecraftEffectTypes, world } from "@minecraft/server";
+import { DisplayError, onWorldLoad, setPlayerInterval, XA } from "xapi.js";
 
 const DB = XA.tables.basic;
 const key = "server.type";
@@ -13,15 +13,14 @@ const toDefault = () => {
 	return 0;
 };
 
-world.events.playerSpawn;
 (async () => {
-	await awaitWorldLoad();
+	await onWorldLoad.promise;
 	/** @type {"build" | "survival"} */
 	const type = VALUE[DB.get(key) ?? toDefault()];
 
 	if (type !== "build" && type !== "survival") {
 		toDefault();
-		ThrowError(new TypeError("Invalid region type: " + type));
+		DisplayError(new TypeError("Invalid region type: " + type));
 	}
 
 	if (type === "build") import("./Build/index.js");
@@ -33,7 +32,7 @@ const TP_Y = -63;
 const TP_TO = TP_Y + 5;
 
 setPlayerInterval(
-	player => {
+	(player) => {
 		const loc = player.location;
 		const rotation = player.rotation;
 		if (loc.y >= EFFECT_Y + 1) return;
@@ -41,7 +40,7 @@ setPlayerInterval(
 			player.addEffect(MinecraftEffectTypes.levitation, 3, 5, false);
 		if (loc.y < TP_Y)
 			player.teleport(
-				{x: loc.x, y: TP_TO, z: loc.z},
+				{ x: loc.x, y: TP_TO, z: loc.z },
 				player.dimension,
 				rotation.x,
 				rotation.y

@@ -1,6 +1,6 @@
 import { Entity, world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
-import { Database } from "../../lib/Database/Entity.js";
+import { Database } from "../../lib/Database/Rubedo.js";
 import "./commands.js";
 
 /**
@@ -47,13 +47,30 @@ const STYLES = {
 export const LB_DB = new Database("leaderboard");
 export const LeaderboardBuild = {
 	/**
+	 * @param {Vector3} loc
+	 * @param {string} dimension
+	 */
+	get(loc, dimension) {
+		return XA.Entity.getAtPos(loc, dimension).find(
+			(entity) =>
+				entity &&
+				entity.typeId === LEADERBOARD_ID &&
+				entity.hasTag(LEADERBOARD_TAG)
+		);
+	},
+	/**
 	 *
 	 * @param {string} objective
 	 * @param {Vector3} location
 	 * @param {string} dimension
 	 * @param {keyof typeof STYLES} style
 	 */
-	createLeaderboard(objective, location, dimension = "overworld", style = "green") {
+	createLeaderboard(
+		objective,
+		location,
+		dimension = "overworld",
+		style = "green"
+	) {
 		const data = {
 			style,
 			objective,
@@ -61,20 +78,26 @@ export const LeaderboardBuild = {
 			dimension,
 		};
 		LB_DB.set(objective, data);
-		let entity = world.getDimension(dimension).spawnEntity(LEADERBOARD_ID, XA.Utils.vecToBlockLocation(location));
+		let entity = world
+			.getDimension(dimension)
+			.spawnEntity(LEADERBOARD_ID, XA.Utils.vecToBlockLocation(location));
+
 		entity.nameTag = "Updating...";
 		entity.addTag(LEADERBOARD_TAG);
 	},
 	/**
-	 * Get the players faction
-	 * @returns {boolean}
-	 * @example LeaderboardBuilder.getLeaderboard(`Smell of curry`);
+	 * Removing the leaderboard.
+	 * @param {string} objective
+	 * @param {Vector3} loc
+	 * @param {string} dimension
+	 * @returns
 	 */
-	removeLeaderboard(objective, x, y, z, dimension) {
+	removeLeaderboard(objective, loc, dimension) {
 		LB_DB.delete(objective);
-		let entitys = XA.Entity.getAtPos({ x, y, z }, dimension);
-		if (entitys.length == 0) return false;
-		entitys.find(isLeaderboard)?.triggerEvent("kill");
+		let entity = LeaderboardBuild.get(loc, dimension);
+		if (!entity) return false;
+
+		entity.triggerEvent("kill");
 		return true;
 	},
 	/**
@@ -92,23 +115,25 @@ export const LeaderboardBuild = {
 	 * @param {LB} data
 	 */
 	updateLeaderboard(data) {
-		const entity = XA.Entity.getAtPos(data.location, data.dimension)?.find(isLeaderboard);
+		const entity = LeaderboardBuild.get(data.location, data.dimension);
 		if (!entity) return LB_DB.delete(data.objective);
 
 		const scoreboard = world.scoreboard.getObjective(data.objective);
-		const name = scoreboard.displayName;
+		const dname = scoreboard.displayName;
+		const name = dname.charAt(0).toUpperCase() + dname.slice(1);
 		const style = STYLES[data.style];
+		const filler = `§${style.color1}-§${style.color2}`.repeat(5);
 
-		let completedLeaderboard = ``;
+		let leaderboard = ``;
 		for (const [i, scoreInfo] of scoreboard.getScores().entries()) {
-			completedLeaderboard += `§${style.top}#${i + 1}§r §${style.nick}${scoreInfo.participant.displayName}§r`;
-			completedLeaderboard += `§${style.score}${metricNumbers(scoreInfo.score)}§r\n`;
+			const { top: t, nick: n, score: s } = style;
+
+			leaderboard += `§${t}#${i + 1}§r §${n}`;
+			leaderboard += `${scoreInfo.participant.displayName}§r`;
+			leaderboard += `§${s}${toMetricNumbers(scoreInfo.score)}§r\n`;
 		}
 
-		entity.nameTag = `§l§${style.name}${
-			//§r
-			name.charAt(0).toUpperCase() + name.slice(1)
-		}\n§l${`§${style.color1}-§${style.color2}`.repeat(5)}§r\n${completedLeaderboard}`;
+		entity.nameTag = `§l§${style.name}${name}\n§l${filler}§r\n${leaderboard}`;
 	},
 };
 
@@ -129,7 +154,7 @@ setTickInterval(
  * @returns {string}
  * @example metricNumbers(15000);
  */
-function metricNumbers(value) {
+function toMetricNumbers(value) {
 	const types = ["", "к", "млн", "млрд", "трлн"];
 	const exp = (Math.log10(value) / 3) | 0;
 
@@ -137,12 +162,4 @@ function metricNumbers(value) {
 
 	const scaled = value / Math.pow(10, exp * 3);
 	return `${scaled.toFixed(1)}${exp > 5 ? " " + types[exp] : "e" + exp}`;
-}
-
-/**
- *
- * @param {Entity} entity
- */
-function isLeaderboard(entity) {
-	return entity && entity.typeId === LEADERBOARD_ID && entity.hasTag(LEADERBOARD_TAG);
 }

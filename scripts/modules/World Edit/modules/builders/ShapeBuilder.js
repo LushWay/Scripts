@@ -1,5 +1,5 @@
 import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
-import { sleep, ThrowError, XA } from "xapi.js";
+import { DisplayError, sleep, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
@@ -30,7 +30,7 @@ export class Shape {
 		try {
 			this.generate();
 		} catch (e) {
-			ThrowError(e);
+			DisplayError(e);
 		}
 	}
 	/**
@@ -44,7 +44,11 @@ export class Shape {
 
 		for (const { x, y, z } of XA.Utils.safeBlocksBetween(loc1, loc2, false)) {
 			if (!this.condition(x, y, z)) continue;
-			const location = new BlockLocation(this.pos.x + x, this.pos.y + y, this.pos.z + z);
+			const location = new BlockLocation(
+				this.pos.x + x,
+				this.pos.y + y,
+				this.pos.z + z
+			);
 			const block = this.blocks[~~(Math.random() * this.blocks.length)];
 			setblock(block, location);
 			blocksSet++;
@@ -80,12 +84,15 @@ export class spawn {
 		this.z2 = pos2z;
 		this.r = remove;
 
-		WorldEditBuild.backup(new BlockLocation(this.x1, -64, this.z1), new BlockLocation(this.x2, -64, this.z2));
+		WorldEditBuild.backup(
+			new BlockLocation(this.x1, -64, this.z1),
+			new BlockLocation(this.x2, -64, this.z2)
+		);
 
 		try {
 			this.generate();
 		} catch (e) {
-			ThrowError(e);
+			DisplayError(e);
 		}
 	}
 	/**
@@ -103,7 +110,11 @@ export class spawn {
 			for (let z = v.zmin; z <= v.zmax; z++) {
 				DIMENSIONS.overworld
 					.getBlock(new BlockLocation(x, -64, z))
-					.setType(MinecraftBlockTypes.get(!this.r ? "minecraft:deny" : "minecraft:bedrock"));
+					.setType(
+						MinecraftBlockTypes.get(
+							!this.r ? "minecraft:deny" : "minecraft:bedrock"
+						)
+					);
 				blocksSet++;
 			}
 			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {

@@ -4,13 +4,11 @@ import {
 	Entity,
 	EntityTypes,
 	ItemStack,
-	Location,
 	MinecraftItemTypes,
 	world,
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
-import { onWorldLoad } from "../Setup/loader.js";
-import { ThrowError } from "../Setup/utils.js";
+import { DisplayError } from "../Setup/utils.js";
 
 world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
@@ -22,10 +20,10 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	);
 });
 
-const MAX_DATABASE_STRING_SIZE = 32000;
 const ENTITY_IDENTIFIER = "rubedo:database";
 const ENTITY_LOCATION = new BlockLocation(0, -64, 0);
 const INVENTORY_SIZE = 54;
+const MAX_DATABASE_STRING_SIZE = 32000;
 const CHUNK_REGEXP = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");
 
 /**
@@ -33,6 +31,11 @@ const CHUNK_REGEXP = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");
  * @template [Value=any]
  */
 export class Database {
+	static tablesInited = false;
+	static initAllTables() {
+		this.tablesInited = true;
+		return Object.values(this.instances).map((e) => e.init());
+	}
 	/** @type {Record<string, Database<any, any>>} */
 	static instances = {};
 	/**
@@ -58,25 +61,23 @@ export class Database {
 	 */
 	static getTableEntities(tableName) {
 		try {
-			const all = DIMENSIONS.overworld.getEntities({
-				location: new Location(
-					ENTITY_LOCATION.x,
-					ENTITY_LOCATION.y,
-					ENTITY_LOCATION.z
-				),
-				maxDistance: 5,
-			});
+			const all = [
+				...DIMENSIONS.overworld.getEntities({ type: ENTITY_IDENTIFIER }),
+			];
 
-			const filtered = [...all].filter(
-				(e) =>
-					e &&
-					e.typeId === ENTITY_IDENTIFIER &&
-					e.getDynamicProperty("tableName") === tableName
-			);
+			const filtered = all
+				.filter((e) => e.getDynamicProperty("tableName") === tableName)
+				.map((entity) => {
+					let index = entity.getDynamicProperty("index");
+					if (typeof index !== "number") index = 0;
+					return { entity, index };
+				})
+				.sort((a, b) => a.index - b.index)
+				.map((e) => e.entity);
 
 			return filtered;
 		} catch (e) {
-			ThrowError(e);
+			DisplayError(e);
 			return [];
 		}
 	}
@@ -86,41 +87,28 @@ export class Database {
 	 * @private
 	 */
 	MEMORY = null;
-	/**
-	 * List of queued tasks on this table
-	 * @type {Array<() => void>}
-	 * @private
-	 */
-	QUEUE = [];
+
 	/**
 	 *
 	 * @param {string} tableName
 	 */
 	constructor(tableName) {
 		if (tableName in Database.instances) return Database.instances[tableName];
+
 		this.tableName = tableName;
-		onWorldLoad(async () => {
-			await this.init();
-			this.QUEUE.forEach((v) => v());
-		});
+		if (Database.tablesInited) this.initPromise = this.init();
+
 		Database.instances[tableName] = this;
-	}
-	/**
-	 * Adds a queue task to be awaited
-	 * @returns {Promise<void>} once its this items time to run in queue
-	 * @private
-	 */
-	async addQueueTask() {
-		return new Promise((resolve) => this.QUEUE.push(resolve));
 	}
 	/**
 	 * Saves data into this database
 	 * @private
 	 */
-	save() {
-		// if (!this.MEMORY) await this.addQueueTask();
-
-		let entities = Database.getTableEntities(this.tableName);
+	async save() {
+		if (!this.MEMORY)
+			throw new Error(
+				`Cannot save data on table '${this.tableName}' before initing them. Add await to world load to solve that`
+			);
 
 		/**
 		 * The split chunks of the stringified data, This is done because we can
@@ -128,14 +116,13 @@ export class Database {
 		 */
 		let chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
 
-		/**
-		 * The amount of entities that is needed to store {@link chunks} data
-		 */
-		const entitiesNeeded =
-			Math.ceil(chunks.length / INVENTORY_SIZE) - entities.length;
-		if (entitiesNeeded > 0) {
-			for (let i = 0; i < entitiesNeeded; i++) {
-				entities.push(Database.createTableEntity(this.tableName));
+		const entities = Database.getTableEntities(this.tableName);
+		const totalEntities = Math.ceil(chunks.length / INVENTORY_SIZE);
+		const entitiesToSpawn = totalEntities - entities.length;
+
+		if (entitiesToSpawn > 0) {
+			for (let i = 0; i < entitiesToSpawn; i++) {
+				entities.push(Database.createTableEntity(this.tableName, i));
 			}
 		}
 
@@ -161,12 +148,16 @@ export class Database {
 	 * @private
 	 */
 	async init() {
-		this.isInited = true;
 		let entities = Database.getTableEntities(this.tableName);
-		entities = entities.sort(
-			//@ts-expect-error
-			(a, b) => a.getDynamicProperty("index") - b.getDynamicProperty("index")
-		);
+
+		if (entities.length < 1) {
+			world.say("§cNo entities found for table " + this.tableName);
+			this.noMemory = true;
+			Reflect.set(this, "MEMORY", {});
+			await this.save();
+			return;
+		}
+
 		let stringifiedData = "";
 		for (const entity of entities) {
 			const inventory = entity.getComponent("inventory").container;
@@ -176,13 +167,18 @@ export class Database {
 				stringifiedData += item.getLore().join("");
 			}
 		}
-		this.stringifiedData = stringifiedData;
+
 		try {
-			this.MEMORY = stringifiedData ? JSON.parse(stringifiedData) : {};
+			const isJSON = stringifiedData && /\{.+\}/.test(stringifiedData);
+			this.MEMORY = isJSON ? JSON.parse(stringifiedData) : {};
 		} catch (e) {
-			ThrowError(e);
+			DisplayError(e);
+			Reflect.set(this, "MEMORY", {});
+			await this.save();
 		}
-		this.sucInit = true;
+
+		this.stringifiedData = stringifiedData;
+		this.isInited = true;
 	}
 	/**
 	 * Sets a key to a value in this table
@@ -193,15 +189,17 @@ export class Database {
 		this.MEMORY[key] = value;
 		return this.save();
 	}
+
 	/**
 	 * Gets a value from this table
 	 * @param {Key} key  undefined
 	 * @returns {Value} the keys corresponding key
 	 */
 	get(key) {
-		if (!this.MEMORY) throw new Error("Entities not loaded!");
+		if (!this.MEMORY) throw new Error("Get: Entities not loaded!");
 		return this.MEMORY[key];
 	}
+
 	/**
 	 * Shorthand for db.get(); and db.set(); pair
 	 * @param {Key} key
@@ -251,7 +249,8 @@ export class Database {
 	 */
 	has(key) {
 		if (!this.MEMORY) throw new Error("Has: Entities not loaded!");
-		return this.MEMORY && typeof this.MEMORY === "object" && key in this.MEMORY;
+
+		return Reflect.has(this.MEMORY, key);
 	}
 	/**
 	 * Saves data into this database

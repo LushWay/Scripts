@@ -1,45 +1,39 @@
-import { system, world } from "@minecraft/server";
+import { system } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
-import { ThrowError } from "./utils.js";
+import { handle } from "./utils.js";
 
 var WORLD_IS_LOADED = false;
 
 /** @type {Function[]} */
-var onLoad = [];
+var ON_LOAD_CALLBACKS = [];
 
-let s = system.runSchedule(async () => {
-	try {
-		await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
-	} catch (error) {
-		return;
-	}
-	try {
-		world.say("load");
-		system.clearRunSchedule(s);
+var ON_LOAD_PROMISE = new Promise((resolve) =>
+	system.run(async function waiter() {
+		try {
+			await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+		} catch (error) {
+			// No players found, we need to re-run this...
+			return system.run(waiter);
+		}
+
 		WORLD_IS_LOADED = true;
-		onLoad.forEach((e) => e());
-	} catch (error) {
-		ThrowError(error, 0, ["world load"]);
-	}
-}, 1);
+		ON_LOAD_CALLBACKS.forEach((callback) => handle(callback));
+
+		resolve();
+	})
+);
 
 /**
- * Awaits till work load
+ * Runs function when first player was found by scrpits. Automatically catches any error Uses "testfor" and runCommandAsync underhood.
+ * @param {Function} callback
  * @returns {Promise<void>}
  */
-export async function awaitWorldLoad() {
-	if (WORLD_IS_LOADED) return;
-	return new Promise((resolve) => {
-		onLoad.push(resolve);
-	});
+export async function onWorldLoad(callback) {
+	if (WORLD_IS_LOADED) return handle(callback);
+
+	ON_LOAD_CALLBACKS.push(() => handle(callback));
 }
 
-/**
- * Sends a callback once world is loaded
- * @param {() => void} callback  undefined
- * @returns {void}
- */
-export function onWorldLoad(callback) {
-	if (WORLD_IS_LOADED) return callback();
-	onLoad.push(callback);
-}
+// To not export rare usable things, i put them to exported function
+onWorldLoad.promise = ON_LOAD_PROMISE;
+onWorldLoad.callbacks = ON_LOAD_CALLBACKS;

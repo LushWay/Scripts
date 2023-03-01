@@ -4,28 +4,26 @@ import {
 	MinecraftBlockTypes,
 	MolangVariableMap,
 	system,
+	World,
 	world,
 } from "@minecraft/server";
 import {
+	DisplayError,
 	handle,
 	IS,
-	onWorldLoad,
-	setRole,
 	setTickTimeout,
 	sleep,
-	ThrowError,
 	toStr,
 	XA,
 } from "xapi.js";
-import {stackParse} from "../../lib/Class/Error.js";
-import {CommandContext} from "../../lib/Command/Callback.js";
-import {Database} from "../../lib/Database/Entity.js";
-import {ActionForm} from "../../lib/Form/ActionForm.js";
-import {MessageForm} from "../../lib/Form/MessageForm.js";
-import {ModalForm} from "../../lib/Form/ModelForm.js";
-import {benchmark} from "../../lib/XBenchmark.js";
-import {Region} from "../Region/utils/Region.js";
-import {Cuboid} from "../World Edit/modules/utils/Cuboid.js";
+import { stackParse } from "../../lib/Class/Error.js";
+import { CommandContext } from "../../lib/Command/Callback.js";
+import { ActionForm } from "../../lib/Form/ActionForm.js";
+import { MessageForm } from "../../lib/Form/MessageForm.js";
+import { ModalForm } from "../../lib/Form/ModelForm.js";
+import { benchmark } from "../../lib/XBenchmark.js";
+import { Region } from "../Region/utils/Region.js";
+import { Cuboid } from "../World Edit/modules/utils/Cuboid.js";
 
 /**
  * @typedef {{x: number, z: number}} IRegionCords
@@ -38,7 +36,7 @@ const regs = [];
  * @type {Object<string, (ctx?: CommandContext) => void | Promise>}
  */
 const tests = {
-	1: ctx => {
+	1: (ctx) => {
 		const menu = new ActionForm("Action", "body").addButton(
 			"button",
 			null,
@@ -69,7 +67,7 @@ const tests = {
 		 * @returns {IRegionCords}
 		 */
 		function moveCenter(center, x, z) {
-			return {x: center.x + x * size, z: center.z + z * size};
+			return { x: center.x + x * size, z: center.z + z * size };
 		}
 
 		/**
@@ -101,7 +99,7 @@ const tests = {
 		 * @returns {Promise<{from: IRegionCords, to: IRegionCords}>}
 		 */
 		async function findFreePlace() {
-			let center = {x: 0, z: 0};
+			let center = { x: 0, z: 0 };
 			let tries = 0;
 			let from;
 			let to;
@@ -113,7 +111,7 @@ const tests = {
 				tries++;
 				if (tries >= 20) await sleep(1), (tries = 0);
 
-				const alreadyExist = regs.find(e =>
+				const alreadyExist = regs.find((e) =>
 					betweenXYZ(
 						[e[0].x, 1, e[0].z],
 						[e[1].x, -1, e[1].z],
@@ -131,17 +129,17 @@ const tests = {
 					center = moveCenter(center, x[0], z[0]);
 					visited.push(center.x + " " + center.z);
 				} else {
-					from = {x: center.x - size2, z: center.z - size2};
-					to = {x: center.x + size2, z: center.z + size2};
+					from = { x: center.x - size2, z: center.z - size2 };
+					to = { x: center.x + size2, z: center.z + size2 };
 					break;
 				}
 			}
 
-			return {from, to};
+			return { from, to };
 		}
 
 		const reg = await findFreePlace();
-		const set = pos =>
+		const set = (pos) =>
 			XA.dimensions.overworld
 				.getBlock(new BlockLocation(pos.x, -60, pos.z))
 				.setType(MinecraftBlockTypes.bedrock);
@@ -150,7 +148,7 @@ const tests = {
 		set(reg.to);
 		regs.push([reg.from, reg.to]);
 	},
-	5: async ctx => {
+	5: async (ctx) => {
 		let form = new ModalForm("TITLE");
 
 		for (let c = 0; c < 20; c++)
@@ -166,14 +164,14 @@ const tests = {
 	8: () => {
 		throw new Error("ERR");
 	},
-	9: ctx => {
+	9: (ctx) => {
 		const form = new ActionForm("Like this", "Logs will be showed there");
-		form.addButton("Exit", null, ctx => {
+		form.addButton("Exit", null, (ctx) => {
 			ctx;
 		});
 		form.show(ctx.sender);
 	},
-	10: ctx => {
+	10: (ctx) => {
 		let e = 1;
 
 		const r = () => {
@@ -193,14 +191,14 @@ const tests = {
 	12: () => {
 		setTickTimeout(tests[11], 0, "test");
 	},
-	13: ctx => {
+	13: (ctx) => {
 		ctx.reply(toStr(ctx.sender.getComponents()));
 	},
 	14: () => {
 		world.say(bigdata.length + "");
 		done = true;
 	},
-	16: async ctx => {
+	16: async (ctx) => {
 		if (!bigdata) {
 			for (let i = 0; i < 42949672; i++) {
 				if (done) break;
@@ -236,36 +234,36 @@ const tests = {
 		}
 		ctx.reply("Get test done");
 	},
-	17: ctx => {
+	17: (ctx) => {
 		const end = benchmark("PROP");
 		const prop = world.getDynamicProperty("speed_test");
 		if (typeof prop === "string") ctx.reply(prop.length);
 		end();
 	},
-	18: ctx => {
+	18: (ctx) => {
 		const region = Region.blockLocationInRegion(
 			XA.Utils.vecToBlockLocation(ctx.sender.location),
 			ctx.sender.dimension.id
 		);
 		region.permissions.owners = region.permissions.owners.filter(
-			e => e !== ctx.sender.id
+			(e) => e !== ctx.sender.id
 		);
 		region.update();
 	},
-	19: ctx => {
+	19: (ctx) => {
 		console.warn("WARN");
 	},
 	20: async () => {
-		ThrowError(new ReferenceError("Test reference error"));
+		DisplayError(new ReferenceError("Test reference error"));
 		try {
 			await XA.dimensions.overworld.runCommandAsync("EEEEEE");
 		} catch (e) {
-			ThrowError(e);
+			DisplayError(e);
 		}
-		XA.runCommandX("TEST", {showError: true});
-		ThrowError(new TypeError("ADDITION_STACK_TEST"), 0, ["stack1", "stack2"]);
+		XA.runCommandX("TEST", { showError: true });
+		DisplayError(new TypeError("ADDITION_STACK_TEST"), 0, ["stack1", "stack2"]);
 	},
-	21: ctx => {
+	21: (ctx) => {
 		for (let a of [
 			1000,
 			1000 * 60,
@@ -297,10 +295,10 @@ const tests = {
 		const pos1 = XA.Utils.vecToBlockLocation(ctx.sender.location);
 		const pos2 = pos1.offset(3, 3, 3);
 		const cube = new Cuboid(pos1, pos2);
-		const {xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin} =
+		const { xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin } =
 			cube;
 		const end1 = benchmark("safeBlocksForOF");
-		for (const {x, y, z} of XA.Utils.safeBlocksBetween(pos1, pos2, false)) {
+		for (const { x, y, z } of XA.Utils.safeBlocksBetween(pos1, pos2, false)) {
 			const q =
 				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
 				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
@@ -320,7 +318,7 @@ const tests = {
 		while (!val?.done) {
 			val = gen.next();
 			if (!val.value) continue;
-			const {x, y, z} = val.value;
+			const { x, y, z } = val.value;
 			const q =
 				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
 				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
@@ -347,7 +345,7 @@ const tests = {
 	29(ctx) {
 		ctx.sender;
 
-		const location = {x: 1, y: 1, z: 1};
+		const location = { x: 1, y: 1, z: 1 };
 
 		class Location {
 			constructor(x, y, z) {
@@ -374,9 +372,16 @@ const tests = {
 
 		world.say(
 			toStr(
-				XA.dimensions.overworld.getEntities({location: new Location(12, 23, 1)})
+				XA.dimensions.overworld.getEntities({
+					location: new Location(12, 23, 1),
+				})
 			)
 		);
+	},
+	30(ctx) {
+		World.prototype["e"] = () => world.say("EEEE");
+		world["e"]();
+		world.say(toStr(world));
 	},
 };
 let bigdata = "";
@@ -384,7 +389,7 @@ let done = false;
 
 const c = new XA.Command({
 	name: "test",
-	requires: p => IS(p.id, "admin"),
+	requires: (p) => IS(p.id, "admin"),
 });
 
 c.string("number", true).executes(async (ctx, n) => {
