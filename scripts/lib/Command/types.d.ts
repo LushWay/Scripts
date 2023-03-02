@@ -1,4 +1,5 @@
 import { Player } from "@minecraft/server";
+import { ROLES } from "../../xapi.js";
 import { XCommand } from "./Command.js";
 
 export interface ICommandData {
@@ -27,6 +28,11 @@ export interface ICommandData {
 	 * ```
 	 */
 	requires?: (player: Player) => boolean;
+
+	/**
+	 * Specify this to generate ```requires: (p) => IS(player, require)```
+	 */
+	require?: keyof typeof ROLES;
 	/**
 	 * The message that will be send if a player doest have permission to use this command
 	 * Its good to explain why this failed here

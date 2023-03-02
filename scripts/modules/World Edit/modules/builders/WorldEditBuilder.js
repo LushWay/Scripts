@@ -1,5 +1,10 @@
-import { BlockLocation, Location, MolangVariableMap, Player } from "@minecraft/server";
-import { sleep, ThrowError, XA } from "xapi.js";
+import {
+	BlockLocation,
+	Location,
+	MolangVariableMap,
+	Player,
+} from "@minecraft/server";
+import { DisplayError, sleep, XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
@@ -56,10 +61,17 @@ class WorldEditBuilder {
 
 	drawSelection() {
 		if (!this.drawselection || !this.selectionCuboid) return;
-		const selectedSize = XA.Utils.getBlocksCount(this.selectionCuboid.min, this.selectionCuboid.max);
+		const selectedSize = XA.Utils.getBlocksCount(
+			this.selectionCuboid.min,
+			this.selectionCuboid.max
+		);
 		if (selectedSize > CONFIG_WB.DRAW_SELECTION_MAX_SIZE) return;
 		const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid;
-		const gen = XA.Utils.safeBlocksBetween(this.selectionCuboid.min, this.selectionCuboid.max, false);
+		const gen = XA.Utils.safeBlocksBetween(
+			this.selectionCuboid.min,
+			this.selectionCuboid.max,
+			false
+		);
 		let step;
 		while (!step?.done) {
 			step = gen.next();
@@ -85,7 +97,11 @@ class WorldEditBuilder {
 	 * @param {Structure[]} saveLocation Save location where you want the data to store your backup
 	 * @example backup(pos1, pos2, history);
 	 */
-	async backup(pos1 = this.pos1, pos2 = this.pos2, saveLocation = this.history) {
+	async backup(
+		pos1 = this.pos1,
+		pos2 = this.pos2,
+		saveLocation = this.history
+	) {
 		const structure = new Structure(CONFIG_WB.BACKUP_PREFIX, pos1, pos2);
 		saveLocation.push(structure);
 	}
@@ -106,10 +122,16 @@ class WorldEditBuilder {
 				this.history.splice(this.history.indexOf(backup), 1);
 			}
 
-			const e = XA.Cooldown.getT(amount.toString(), ["бэкап", "бэкапа", "бэкапов"]);
-			return `§b► §3Успешно отменен${amount.toString().endsWith("1") ? "" : "о"} §f${amount} §3${e}!`;
+			const e = XA.Cooldown.getT(amount.toString(), [
+				"бэкап",
+				"бэкапа",
+				"бэкапов",
+			]);
+			return `§b► §3Успешно отменен${
+				amount.toString().endsWith("1") ? "" : "о"
+			} §f${amount} §3${e}!`;
 		} catch (error) {
-			ThrowError(error);
+			DisplayError(error);
 			return `§4► §cНе удалось отменить`;
 		}
 	}
@@ -128,10 +150,16 @@ class WorldEditBuilder {
 				this.undos.splice(this.undos.indexOf(backup), 1);
 			}
 
-			const e = XA.Cooldown.getT(amount.toString(), ["бэкап", "бэкапа", "бэкапов"]);
-			return `§b► §3Успешно возвращен${amount.toString().endsWith("1") ? "" : "о"} §f${amount} §3${e}!`;
+			const e = XA.Cooldown.getT(amount.toString(), [
+				"бэкап",
+				"бэкапа",
+				"бэкапов",
+			]);
+			return `§b► §3Успешно возвращен${
+				amount.toString().endsWith("1") ? "" : "о"
+			} §f${amount} §3${e}!`;
 		} catch (error) {
-			ThrowError(error);
+			DisplayError(error);
 			return `§4► §cНе удалось вернуть`;
 		}
 	}
@@ -142,7 +170,8 @@ class WorldEditBuilder {
 	 */
 	async copy() {
 		try {
-			if (!this.selectionCuboid) return "§4► §cЗона для копирования не выделена!";
+			if (!this.selectionCuboid)
+				return "§4► §cЗона для копирования не выделена!";
 			const opt = await XA.runCommandX(
 				`structure save ${CONFIG_WB.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
 			);
@@ -154,7 +183,7 @@ class WorldEditBuilder {
 			};
 			return `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`;
 		} catch (error) {
-			ThrowError(error);
+			DisplayError(error);
 			return `§4► §cНе удалось скорпировать`;
 		}
 	}
@@ -183,22 +212,30 @@ class WorldEditBuilder {
 			const dx = Math.abs(this.current_copy.pos2.x - this.current_copy.pos1.x);
 			const dy = Math.abs(this.current_copy.pos2.y - this.current_copy.pos1.y);
 			const dz = Math.abs(this.current_copy.pos2.z - this.current_copy.pos1.z);
-			const pos2 = new BlockLocation(player.location.x, player.location.y, player.location.z).offset(dx, dy, dz);
+			const pos2 = new BlockLocation(
+				player.location.x,
+				player.location.y,
+				player.location.z
+			).offset(dx, dy, dz);
 
 			const loc = XA.Utils.vecToBlockLocation(player.location);
 
 			this.backup(loc, pos2);
 
 			await player.runCommandAsync(
-				`structure load ${CONFIG_WB.COPY_FILE_NAME} ~ ~ ~ ${String(rotation).replace(
+				`structure load ${CONFIG_WB.COPY_FILE_NAME} ~ ~ ~ ${String(
+					rotation
+				).replace(
 					"NaN",
 					"0"
-				)}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${integrity ? integrity : ""} ${seed ? seed : ""}`
+				)}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${
+					integrity ? integrity : ""
+				} ${seed ? seed : ""}`
 			);
 
 			return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`;
 		} catch (error) {
-			ThrowError(error);
+			DisplayError(error);
 			return `§4► §cНе удалось вставить`;
 		}
 	}
@@ -245,10 +282,15 @@ class WorldEditBuilder {
 		const endTime = get(Date.now() - startTime);
 
 		let reply = `§3Заполненно §f${blocks} §3блоков ${
-			endTime.parsedTime !== "0" ? `за §f${endTime.parsedTime} §3${endTime.type}.` : ""
+			endTime.parsedTime !== "0"
+				? `за §f${endTime.parsedTime} §3${endTime.type}.`
+				: ""
 		}`;
 		if (replaceMode) reply += ` §3Режим заполнения: §b${replaceMode}`;
-		if (replaceMode === "replace") reply += `§3, заполняемый блок: §f${replaceBlock} ${rbData ? rbData : ""}`;
+		if (replaceMode === "replace")
+			reply += `§3, заполняемый блок: §f${replaceBlock} ${
+				rbData ? rbData : ""
+			}`;
 
 		if (errors) return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок. ${reply}`;
 		return `§b► ${reply}`;

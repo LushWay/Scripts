@@ -1,8 +1,8 @@
 import { MinecraftDimensionTypes, world } from "@minecraft/server";
 
-export const O = world.getDimension(MinecraftDimensionTypes.overworld);
-export const N = world.getDimension(MinecraftDimensionTypes.nether);
-export const E = world.getDimension(MinecraftDimensionTypes.theEnd);
+const O = world.getDimension(MinecraftDimensionTypes.overworld);
+const N = world.getDimension(MinecraftDimensionTypes.nether);
+const E = world.getDimension(MinecraftDimensionTypes.theEnd);
 
 export const DIMENSIONS = {
 	"minecraft:overworld": O,

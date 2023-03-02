@@ -1,9 +1,13 @@
 import { world } from "@minecraft/server";
-import { ThrowError } from "xapi.js";
+import { DisplayError } from "xapi.js";
 import { DIMENSIONS } from "./List/dimensions.js";
 
 /**
- * @typedef {{showOutput?: boolean; showError?: boolean; dimension?: "overworld" | "nether" | "the_end"}} ICommandOptions
+ * @typedef {{
+ *   showOutput?: boolean;
+ *   showError?: boolean;
+ *   dimension?: "overworld" | "nether" | "the_end"
+ * }} ICommandOptions
  */
 
 /**
@@ -12,13 +16,15 @@ import { DIMENSIONS } from "./List/dimensions.js";
  * @param {ICommandOptions} [options] Options
  * @returns {Promise<number>}
  */
-export async function XrunCommand(command, options) {
+export async function XRunCommand(command, options = {}) {
 	try {
-		const result = await DIMENSIONS[options?.dimension ?? "overworld"].runCommandAsync(command);
-		if (options?.showOutput) world.say(result.successCount + "");
+		const result = await DIMENSIONS[
+			options.dimension ?? "overworld"
+		].runCommandAsync(command);
+		if (options.showOutput) world.say(result.successCount + "");
 		return result.successCount;
 	} catch (error) {
-		if (options?.showError) ThrowError(error);
+		if (options.showError) DisplayError(error);
 		return 0;
 	}
 }

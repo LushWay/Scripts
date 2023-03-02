@@ -1,5 +1,5 @@
 import { CONFIG } from "config.js";
-import { DIR_IMPORT, ThrowError } from "xapi.js";
+import { DIR_IMPORT, DisplayError } from "xapi.js";
 
 /**
  * @type {Object<string, string>}
@@ -17,7 +17,7 @@ export const __MODULES__ = {};
 export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 	for (const [path, name] of arrayOfFiles) {
 		const er = (e) =>
-			ThrowError({
+			DisplayError({
 				message: `§c${name}: §f${`${e.message ?? e}`.replace(
 					// Get "Module (>>modules/ex/index.js:12<<)" part
 					/([\w\s\/]+\.js:?\s?)/,
@@ -37,6 +37,6 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 	}
 }
 
-export async function load() {
+export async function load_modules() {
 	return multiload(DIR_IMPORT, Object.entries(__MODULES__), "X-API");
 }

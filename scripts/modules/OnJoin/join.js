@@ -1,6 +1,6 @@
 import { Player, world } from "@minecraft/server";
-import { IS, setPlayerInterval, XA } from "xapi.js";
-import { Database } from "../../lib/Database/Entity.js";
+import { IS, setPlayerInterval, setTickTimeout, XA } from "xapi.js";
+import { Database } from "../../lib/Database/Rubedo.js";
 import { __JOIN_EMITTERS } from "./events.js";
 import "./subscribes.js";
 import { CONFIG_JOIN } from "./var.js";
@@ -9,60 +9,47 @@ import { CONFIG_JOIN } from "./var.js";
 const PDB = new Database("player");
 
 /**
- *
  * @param {Player | string} player
- * @returns
  */
-function getKeyPlayerDBkey(player) {
+function genPlayerDBkey(player) {
 	return `JOIN:${player instanceof Player ? player.id : player}`;
 }
-
-const isModified = Symbol("modified");
-
 /**
- *
  * @param {Player | string} player
  * @returns {IJoinData}
  */
 function getData(player) {
-	const data = PDB.get(getKeyPlayerDBkey(player)) ?? { learning: 1, joined: Date.now() };
-	// let modified = false;
-	// const proxy = {};
-	// Object.defineProperty(proxy, isModified, {
-	// 	enumerable: true,
-	// 	configurable: false,
-	// 	get: () => modified,
-	// });
-	// for (const key in data) {
-	// 	Object.defineProperty(proxy, key, {
-	// 		enumerable: true,
-	// 		configurable: false,
-	// 		get() {
-	// 			return data[key];
-	// 		},
-	// 		set(v) {
-	// 			modified = true;
-	// 			data[key] = modified;
-	// 		},
-	// 	});
-	// }
+	const data = PDB.get(genPlayerDBkey(player)) ?? {
+		learning: 1,
+		joined: Date.now(),
+	};
 	return data;
 }
 /**
- *
  * @param {Player | string} player
  * @param {IJoinData} data
- * @returns
  */
 function setData(player, data) {
-	return PDB.set(getKeyPlayerDBkey(player), data);
+	return PDB.set(genPlayerDBkey(player), data);
 }
 
-world.events.playerJoin.subscribe(async (data) => {
-	const D = getData(data.player);
+world.events.playerJoin.subscribe(({ playerId }) => {
+	const D = getData(playerId);
 	D.waiting = 1;
-	setData(data.player, D);
+	setData(playerId, D);
 });
+
+setTickTimeout(
+	() => {
+		if (!XA.state.first_load) return;
+		const player = world.getAllPlayers()[0];
+		const D = getData(player);
+		D.waiting = 1;
+		setData(player, D);
+	},
+	80,
+	"owner start screen"
+);
 
 setPlayerInterval(
 	(player) => {
@@ -73,7 +60,8 @@ setPlayerInterval(
 			// New player (player joined)
 			delete data.waiting;
 			data.message = 1;
-			data.at = player.location.x + " " + player.location.y + " " + player.location.z;
+			data.at =
+				player.location.x + " " + player.location.y + " " + player.location.z;
 			modified = true;
 		}
 
@@ -82,7 +70,10 @@ setPlayerInterval(
 
 		if (typeof at === "string") {
 			const pos = at.split(" ").map(parseFloat);
-			const not_moved = player.location.x === pos[0] && player.location.y === pos[1] && player.location.z === pos[2];
+			const not_moved =
+				player.location.x === pos[0] &&
+				player.location.y === pos[1] &&
+				player.location.z === pos[2];
 
 			if (not_moved) {
 				// Player still stays at joined position...
@@ -90,7 +81,11 @@ setPlayerInterval(
 					// Player doesnt falling down, show animation
 					data.stage = data.stage ?? -1;
 					data.stage++;
-					if (typeof data.stage !== "number" || data.stage >= CONFIG_JOIN.animation.stages.length) data.stage = 0;
+					if (
+						typeof data.stage !== "number" ||
+						data.stage >= CONFIG_JOIN.animation.stages.length
+					)
+						data.stage = 0;
 
 					// Creating title
 					let title = CONFIG_JOIN.animation.stages[data.stage];
@@ -99,7 +94,8 @@ setPlayerInterval(
 					}
 
 					// Show actionBar
-					if (CONFIG_JOIN.actionBar) player.onScreenDisplay.setActionBar(CONFIG_JOIN.actionBar);
+					if (CONFIG_JOIN.actionBar)
+						player.onScreenDisplay.setActionBar(CONFIG_JOIN.actionBar);
 
 					// Title + subtitle
 					/** @type {import("@minecraft/server").TitleDisplayOptions} */
@@ -156,7 +152,8 @@ function JOIN(player, data, messageType) {
 		if (plr.id === player.id) continue;
 		const settings = getSettings(plr);
 		if (settings.sound) plr.playSound(CONFIG_JOIN.onJoin.sound);
-		if (settings.message) plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
+		if (settings.message)
+			plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
 	}
 
 	if (!data.learning) __JOIN_EMITTERS.PlayerJoin.emit(player);
@@ -166,7 +163,9 @@ function JOIN(player, data, messageType) {
 
 	if (oldTag === player.name) return;
 	if (oldTag && oldTag !== player.name) {
-		world.say("§c> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name);
+		world.say(
+			"§c> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name
+		);
 	}
 
 	data.name = player.name;

@@ -22,7 +22,7 @@ const ENTITY_LOCATION = new Location(0, 0, 0);
 
 DIMENSIONS.overworld.runCommandAsync("tickingarea add 0 0 0 0 0 0 ItemDB true");
 
-const ENTITY_DATABSE_ID = "mcbehub:inventory2";
+const ENTITY_DATABSE_ID = "mcbehub:inventory";
 
 export class XItemDatabase {
 	/**
@@ -36,6 +36,7 @@ export class XItemDatabase {
 	/**
 	 * Grabs all database entitys
 	 * @returns {Array<Entity>}
+	 * @private
 	 */
 	get ENTITIES() {
 		const q = {};
@@ -48,6 +49,7 @@ export class XItemDatabase {
 	/**
 	 * Returns all items that are stored
 	 * @returns {Array<ItemStack>}
+	 * @private
 	 */
 	get ITEMS() {
 		let ITEMS = [];
@@ -110,11 +112,11 @@ export class XItemDatabase {
 			}
 
 			if (!entity) {
-				let e = world.events.entityCreate.subscribe((data) => {
+				let e = world.events.entitySpawn.subscribe((data) => {
 					if (data.entity.typeId == ENTITY_DATABSE_ID) {
 						entity = data.entity;
 						entity.addTag(this.TABLE_NAME);
-						world.events.entityCreate.unsubscribe(e);
+						world.events.entitySpawn.unsubscribe(e);
 					}
 				});
 				DIMENSIONS.overworld.runCommandAsync(`summon ${ENTITY_DATABSE_ID} 0 0 0`);

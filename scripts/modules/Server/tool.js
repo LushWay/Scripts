@@ -65,7 +65,7 @@ world.events.beforeItemUse.subscribe((data) => {
 			data.source.runCommandAsync(lore[1]);
 		}
 		if (lore && lore[0] == "viewTP") {
-			const block = data.source.getBlockFromViewVector({});
+			const block = data.source.getBlockFromViewDirection({});
 			if (block && block.location)
 				data.source.teleport(block.location, data.source.dimension, data.source.rotation.x, data.source.rotation.y);
 		}

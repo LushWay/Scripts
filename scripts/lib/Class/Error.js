@@ -1,12 +1,10 @@
 /** @type {[RegExp | ((s: string) => string), string?][]} */
-const replaces = [
+const REPLACES = [
 	[/\\/g, "/"],
 	[/<anonymous>/, "<>"],
-	// [/run \(.+\)/],
-	// [/\(scripts\/(.+)\)/g, "§8(§7$1§8)§f"],
 	[/<> \((.+)\)/, "$1"],
 	[/<input>/, "§7<eval>§r"],
-	[/(.+)\(native\)/, "§8$1(native)§f"],
+	[/(.*)\(native\)(.*)/, "§8$1(native)$2§f"],
 	[(s) => (s.includes("lib") || s.includes("xapi.js") ? `§7${s.replace(/§./g, "")}§f` : s)],
 	[(s) => (s.startsWith("§7") ? s : s.replace(/\.js:(\d+)/, ".js:§6$1§f"))],
 ];
@@ -16,8 +14,11 @@ const replaces = [
  * @param {string} e
  */
 function oneLineStackParse(e) {
-	for (const [r, p] of replaces) {
-		if (typeof e === "string") typeof r !== "function" ? (e = e.replace(r, p ?? "")) : (e = r(e));
+	for (const [r, p] of REPLACES) {
+		if (typeof e !== "string" || e.length < 1) break;
+
+		if (typeof r === "function") e = r(e);
+		else e = e.replace(r, p ?? "");
 	}
 	return e;
 }

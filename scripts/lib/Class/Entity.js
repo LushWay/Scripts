@@ -7,7 +7,7 @@ import {
 	PlayerInventoryComponentContainer,
 	world,
 } from "@minecraft/server";
-import { Database } from "../Database/Entity.js";
+import { Database } from "../Database/Rubedo.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
 /** @type {Database<string, IJoinData>} */
@@ -16,6 +16,7 @@ const DB = new Database("player");
 /**
  * @author Smell of Curry, mrpatches123, mo9ses, xiller229 (Leaftail)
  */
+
 export const XEntity = {
 	/**
 	 * Gets player name from player database with specific ID
@@ -32,19 +33,16 @@ export const XEntity = {
 	 * @returns {boolean}
 	 */
 	inRadius(center, pos, r) {
-		const inR = (value, center) => value <= r + center && value <= r - center;
+		const inRange = (
+			/** @type {number} */ value,
+			/** @type {number} */ center
+		) => value <= r + center && value <= r - center;
 
-		return inR(pos.x, center.x) && inR(pos.y, center.y) && inR(pos.z, center.z);
-	},
-	/**
-	 *
-	 * @param {string} [type]
-	 * @returns
-	 */
-	getEntitys(type) {
-		const e = {};
-		if (type) e.type = type;
-		return DIMENSIONS.overworld.getEntities(e);
+		return (
+			inRange(pos.x, center.x) &&
+			inRange(pos.y, center.y) &&
+			inRange(pos.z, center.z)
+		);
 	},
 	/**
 	 * Get entitie(s) at a position
@@ -55,7 +53,9 @@ export const XEntity = {
 	 */
 	getAtPos({ x, y, z }, dimension = "overworld") {
 		try {
-			return DIMENSIONS[dimension].getEntitiesAtBlockLocation(new BlockLocation(x, y, z));
+			return DIMENSIONS[dimension].getEntitiesAtBlockLocation(
+				new BlockLocation(x, y, z)
+			);
 		} catch (error) {
 			return [];
 		}
@@ -71,7 +71,11 @@ export const XEntity = {
 	 */
 	getClosetsEntitys(entity, maxDistance = null, type, n = 2, shift = true) {
 		let q = {};
-		q.location = new Location(entity.location.x, entity.location.y, entity.location.z);
+		q.location = new Location(
+			entity.location.x,
+			entity.location.y,
+			entity.location.z
+		);
 		if (n) q.closest = n;
 		if (type) q.type = type;
 
@@ -88,7 +92,9 @@ export const XEntity = {
 	 */
 	getTagStartsWith(entity, value) {
 		const tags = entity.getTags();
-		const tag = tags.find((tag) => tag?.startsWith(value) && tag?.length > value.length);
+		const tag = tags.find(
+			(tag) => tag?.startsWith(value) && tag?.length > value.length
+		);
 		return tag ? tag.substring(value.length) : null;
 	},
 	/**
@@ -111,7 +117,9 @@ export const XEntity = {
 	 */
 	getScore(entity, objective) {
 		try {
-			return world.scoreboard.getObjective(objective).getScore(entity.scoreboard);
+			return world.scoreboard
+				.getObjective(objective)
+				.getScore(entity.scoreboard);
 		} catch (error) {
 			return 0;
 		}
@@ -123,7 +131,10 @@ export const XEntity = {
 	 * @example isDead(Entity);
 	 */
 	isDead(entity) {
-		return entity.hasComponent("minecraft:health") && entity.getComponent("minecraft:health").current <= 0;
+		return (
+			entity.hasComponent("minecraft:health") &&
+			entity.getComponent("minecraft:health").current <= 0
+		);
 	},
 	/**
 	 * Gets items count from inventory
@@ -187,7 +198,11 @@ export const XEntity = {
 	 * @returns {BlockLocation}
 	 */
 	vecToBlockLocation(loc) {
-		return new BlockLocation(Math.floor(loc.x), Math.floor(loc.y), Math.floor(loc.z));
+		return new BlockLocation(
+			Math.floor(loc.x),
+			Math.floor(loc.y),
+			Math.floor(loc.z)
+		);
 	},
 	/**
 	 * Despawns a entity

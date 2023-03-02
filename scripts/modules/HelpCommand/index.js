@@ -1,16 +1,6 @@
-import { world } from "@minecraft/server";
-import { getRole, ROLES, toStr, XA } from "xapi.js";
+import { getRole, ROLES, XA } from "xapi.js";
 import { XCommand } from "../../lib/Command/Command.js";
-import { __COMMANDS__ } from "../../lib/Command/index.js";
 import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
-
-/**
- * @param {XCommand} command
- * @returns {string[]}
- */
-function getUsage(command) {
-	return [getType(command.parent), getType(command), ...command.children.map(getType)];
-}
 
 /**
  *
@@ -43,13 +33,12 @@ function getParentType(command, init = true) {
 	if (command.depth === 0) return [curtype, description];
 	else {
 		const parents = getParentType(command.parent, init);
-		return [`${parents[0]}§f ${curtype}`, description ?? parents[1] ?? "Not"];
+		return [
+			`${parents[0]}§f ${curtype}`,
+			description ?? parents[1] ?? "<no description>",
+		];
 	}
 }
-/**
- * const path = getUsage(command);
-		const _ = `§7   §f-${path.join(" ")}§7§o - ${command.data.description ?? "Мы не знаем что оно делает"}§r`;
- */
 
 /**
  *
@@ -61,7 +50,11 @@ function getType(o) {
 	const q = t.optional;
 
 	if (t.typeName === "literal") return `${q ? "§7" : "§f"}${t.name}`;
-	return `${q ? `§7[${o.type.name}: §7${o.type.typeName}§7]` : `§6<${o.type.name}: §6${o.type.typeName}§6>`}`;
+	return `${
+		q
+			? `§7[${o.type.name}: §7${o.type.typeName}§7]`
+			: `§6<${o.type.name}: §6${o.type.typeName}§6>`
+	}`;
 }
 
 const help = new XA.Command({
@@ -82,7 +75,9 @@ help
 	.int("page", true)
 	.int("commandsInPage", true)
 	.executes((ctx, inputPage, commandsInPage) => {
-		const avaibleCommands = __COMMANDS__.filter((e) => e.data.requires(ctx.sender));
+		const avaibleCommands = XCommand.COMMANDS.filter((e) =>
+			e.data.requires(ctx.sender)
+		);
 		const cmds = commandsInPage || 15;
 		const maxPages = Math.ceil(avaibleCommands.length / cmds);
 		const page = Math.min(inputPage || 1, maxPages);
@@ -99,20 +94,25 @@ help
 			}`;
 			ctx.reply("§ы" + c);
 		}
-		ctx.reply(`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${__COMMANDS__.length} ${cv}═─═─═─═─`);
+		ctx.reply(
+			`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${XCommand.COMMANDS.length} ${cv}═─═─═─═─`
+		);
 	});
 
 help.string("commandName").executes((ctx, commandName) => {
-	/**
-	 * @type {XCommand}
-	 */
-	const cmd = __COMMANDS__.find((e) => e.data.name == commandName || e.data?.aliases?.includes(commandName));
+	const cmd = XCommand.COMMANDS.find(
+		(e) => e.data.name == commandName || e.data?.aliases?.includes(commandName)
+	);
 
 	if (!cmd) return commandNotFound(ctx.sender, commandName);
-	if (!cmd.data?.requires(ctx.data.sender)) return noPerm(ctx.data.sender, cmd), "fail";
+	if (!cmd.data?.requires(ctx.data.sender))
+		return noPerm(ctx.data.sender, cmd), "fail";
 
 	const d = cmd.data;
-	const aliases = d.aliases?.length > 0 ? "§7(также §f" + d.aliases.join("§7, §f") + "§7)§r" : "";
+	const aliases =
+		d.aliases?.length > 0
+			? "§7(также §f" + d.aliases.join("§7, §f") + "§7)§r"
+			: "";
 	const str = `   §fКоманда §6-${d.name} ${aliases}`;
 
 	// ctx.reply(`§7§ы┌──`);
@@ -122,7 +122,9 @@ help.string("commandName").executes((ctx, commandName) => {
 
 	let l = str.length;
 
-	for (const [command, description] of childrensToHelpText(cmd).map(getParentType)) {
+	for (const [command, description] of childrensToHelpText(cmd).map(
+		getParentType
+	)) {
 		const _ = `§7   §f-${command}§7§o - ${description}§r`;
 		l = Math.max(l, _.length);
 		ctx.reply(_);
@@ -133,6 +135,8 @@ help.string("commandName").executes((ctx, commandName) => {
 
 const testCMD = new XA.Command({
 	name: "owo",
+	description: "Для теста дерева команд",
+	require: "admin",
 });
 
 testCMD.executes(() => {});

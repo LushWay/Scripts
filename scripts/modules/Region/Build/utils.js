@@ -1,6 +1,11 @@
-import { BlockLocation, MinecraftBlockTypes, MinecraftDimensionTypes, Player, world } from "@minecraft/server";
+import {
+	BlockLocation,
+	MinecraftBlockTypes,
+	MinecraftDimensionTypes,
+	Player,
+} from "@minecraft/server";
 import { MessageForm } from "../../../lib/Form/MessageForm.js";
-import { createWaiter, setTickInterval, sleep, ThrowError, XA } from "../../../xapi.js";
+import { createWaiter, setTickInterval, sleep, XA } from "../../../xapi.js";
 import { Region } from "../utils/Region.js";
 
 const DB = XA.tables.buildRegion;
@@ -30,7 +35,10 @@ export function teleportToRegion(player, region) {
  * @param {() => void} onNoAction
  */
 export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
-	new MessageForm("Вы уверены?", text).setButton1(yesText, onYesAction).setButton2(noText, onNoAction).show(player);
+	new MessageForm("Вы уверены?", text)
+		.setButton1(yesText, onYesAction)
+		.setButton2(noText, onNoAction)
+		.show(player);
 }
 
 /**
@@ -38,7 +46,7 @@ export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
  * @param {string} spining
  * @param {number} percents
  */
-export function getProgressBar(spining, percents) {
+function getProgressBar(spining, percents) {
 	const pb = new Array(10).join(" ").split(" ");
 	const e = pb.map((_, i) => (Math.floor(percents / 10) > i ? "§a▌" : "§7▌"));
 	return `§d${spining[0]} ${e.join("")} §f${~~percents}%`;
@@ -82,13 +90,18 @@ export async function ClearRegion(player, Pregion) {
 export async function CreateRegion(player, tp = true) {
 	const place = await findFreePlace();
 
-	const region = new Region(place.from, place.to, MinecraftDimensionTypes.overworld, {
-		owners: [player.id],
-		doorsAndSwitches: false,
-		allowedEntitys: ["minecraft:player", "minecraft:item"],
-		openContainers: false,
-		pvp: false,
-	});
+	const region = new Region(
+		place.from,
+		place.to,
+		MinecraftDimensionTypes.overworld,
+		{
+			owners: [player.id],
+			doorsAndSwitches: false,
+			allowedEntitys: ["minecraft:player", "minecraft:item"],
+			openContainers: false,
+			pvp: false,
+		}
+	);
 	DB.set(player.id, region.key);
 	fillRegion(region.from, region.to);
 	if (tp) teleportToRegion(player, region);
@@ -101,7 +114,10 @@ export async function CreateRegion(player, tp = true) {
  * @param {Vector3} loc2
  */
 export function getBlocksCount(loc1, loc2) {
-	const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [Math.min(v1, v2), Math.max(v1, v2)];
+	const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [
+		Math.min(v1, v2),
+		Math.max(v1, v2),
+	];
 	const [xmin, xmax] = minmax(loc1.x, loc2.x);
 	const [zmin, zmax] = minmax(loc1.z, loc2.z);
 	const [ymin, ymax] = minmax(loc1.y, loc2.y);
@@ -119,7 +135,11 @@ export async function fillRegion(from, to) {
 	const firstLoc = new BlockLocation(from.x, squarePlace, from.z);
 	const secondLoc = new BlockLocation(to.x, squarePlace, to.z);
 	const exec = createWaiter(10);
-	for (const loc of XA.Utils.safeBlocksBetween(firstLoc.above(), secondLoc.above(), true)) {
+	for (const loc of XA.Utils.safeBlocksBetween(
+		firstLoc.above(),
+		secondLoc.above(),
+		true
+	)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
 	}

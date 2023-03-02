@@ -1,3 +1,4 @@
+import { IS } from "../../xapi.js";
 import {
 	ArrayArgumentType,
 	BooleanArgumentType,
@@ -8,12 +9,17 @@ import {
 	StringArgumentType,
 } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
-import { __COMMANDS__ } from "./index.js";
+import "./index.js";
 
 /**
  *  @template {Function} [Callback = (ctx: CommandContext) => void]
  */
 export class XCommand {
+	/**
+	 * An array of all active commands
+	 * @type {import("./Command.js").XCommand<any>[]}
+	 */
+	static COMMANDS = [];
 	/**
 	 * The Arguments on this command
 	 * @type {XCommand<any>[]}
@@ -28,28 +34,31 @@ export class XCommand {
 	/**
 	 *
 	 * @param {import("./types.js").ICommandData} data
-	 * @param {IArgumentType} type
-	 * @param {number} depth
-	 * @param {XCommand<any>} parent
+	 * @param {IArgumentType} [type]
+	 * @param {number} [depth]
+	 * @param {XCommand<any>} [parent]
 	 */
-	constructor(data, type = new LiteralArgumentType(data.name), depth = 0, parent = null) {
-		if (!data.requires) data.requires = () => true;
-		if (!data.type) data.type = "test";
+	constructor(data, type, depth = 0, parent) {
+		data.requires ??= () => true;
+		data.type ??= "test";
+		if ("require" in data) data.requires = (p) => IS(p.id, data.require);
+
 		this.data = data;
-		this.type = type;
+		this.type = type ?? new LiteralArgumentType(data.name);
 		this.children = [];
-		this.depth = depth;
-		this.parent = parent;
+		this.depth = depth ?? 0;
+		this.parent = parent ?? null;
 		this.callback = null;
 
-		if (depth === 0) __COMMANDS__.push(this);
+		if (depth === 0) XCommand.COMMANDS.push(this);
 	}
 
 	/**
 	 * Adds a ranch to this command of your own type
+	 * @template {IArgumentType} T
 	 * @param {T} type a special type to be added
 	 * @returns {import("./types.js").ArgReturn<Callback, T['type']>} new branch to this command
-	 * @template {IArgumentType} T
+	 * @private
 	 */
 	argument(type) {
 		const cmd = new XCommand(this.data, type, this.depth + 1, this);
@@ -99,7 +108,9 @@ export class XCommand {
 	location(name, optional = false) {
 		const cmd = this.argument(new LocationArgumentType(name, optional));
 		if (!name.endsWith("*")) {
-			const newArg = cmd.location(name + "_y*", optional).location(name + "_z*", optional);
+			const newArg = cmd
+				.location(name + "_y*", optional)
+				.location(name + "_z*", optional);
 			// @ts-expect-error
 			return newArg;
 		}
@@ -111,7 +122,12 @@ export class XCommand {
 	 * @returns {XCommand<Callback>} new branch to this command
 	 */
 	literal(data, optional = false) {
-		const cmd = new XCommand(data, new LiteralArgumentType(data.name, optional), this.depth + 1, this);
+		const cmd = new XCommand(
+			data,
+			new LiteralArgumentType(data.name, optional),
+			this.depth + 1,
+			this
+		);
 		this.children.push(cmd);
 		// @ts-expect-error
 		return cmd;
