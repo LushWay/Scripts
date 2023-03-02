@@ -69,6 +69,7 @@ export class Region {
 	 * Removes a region at a block Location
 	 * @param {string} dimensionId  the id of this dimension
 	 * @param {Vector3} blockLocation
+	 * @returns {boolean} if the region was removed or not
 	 */
 	static removeRegionAtBlockLocation(blockLocation, dimensionId) {
 		const region = this.blockLocationInRegion(blockLocation, dimensionId);
@@ -120,6 +121,7 @@ export class Region {
 	}
 	/**
 	 * removes this region
+	 * @returns {boolean} if the region was removed succesfully
 	 */
 	delete() {
 		return TABLE.delete(this.key);

@@ -1,13 +1,5 @@
-/**
- * @author {Zdyn}
- * @link https://github.com/zdyn/jaro-winkler-js/blob/master/jaro-winkler-js.min.js
- */
-
-/**
- * @param {string} string1
- * @param {string} string2
- */
-export function stringDistance(string1, string2) {
+//author: https://github.com/zdyn/jaro-winkler-js/blob/master/jaro-winkler-js.min.js
+function distance(string1, string2) {
 	if (string1.length > string2.length) [string1, string2] = [string2, string1];
 
 	const matchWindow = ~~Math.max(0, string2.length / 2 - 1);
@@ -75,7 +67,7 @@ function forEveryChar(string, callback) {
 export function inaccurateSearch(search, arr) {
 	let res = {};
 	for (const el of arr) {
-		res[el] = stringDistance(search, el);
+		res[el] = distance(search, el);
 	}
 	return Object.entries(res).sort((a, b) => b[1] - a[1]);
 }

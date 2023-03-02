@@ -1,33 +1,49 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @minecraft/server-gemtest
+  /data/data/com.termux/files/usr/bin/node /data/data/com.termux/files/usr/share/yarn/bin/yarn.js run commit
 
 PATH: 
-  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\Настя\AppData\Local\Microsoft\WindowsApps;C:\Users\Настя\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Настя\AppData\Roaming\npm;C:\Users\Настя\AppData\Local\Yarn\bin;
+  /data/data/com.termux/files/usr/bin
 
 Yarn version: 
   1.22.19
 
 Node version: 
-  18.2.0
+  18.10.0
 
 Platform: 
-  win32 x64
+  android arm64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@minecraft%2fserver-gemtest: Not found
-      at params.callback [as _callback] (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66145:18)
-      at self.callback (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140890:22)
-      at Request.emit (node:events:527:28)
-      at Request.<anonymous> (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141862:10)
-      at Request.emit (node:events:527:28)
-      at IncomingMessage.<anonymous> (C:\Users\Настя\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141784:12)
-      at Object.onceWrapper (node:events:641:28)
-      at IncomingMessage.emit (node:events:539:35)
-      at endReadableNT (node:internal/streams/readable:1344:12)
-      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+  SyntaxError: /storage/emulated/0/Termux/package.json: Unexpected end of JSON input
+      at JSON.parse (<anonymous>)
+      at /data/data/com.termux/files/usr/share/yarn/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/data/data/com.termux/files/usr/share/yarn/lib/cli.js:310:30)
+      at /data/data/com.termux/files/usr/share/yarn/lib/cli.js:321:13
 
 npm manifest: 
-  {  "name": "xapi",  "version": "0.0.27",  "keywords": [],  "author": "",  "license": "ISC",  "type": "module",  "scripts": {    "run": "",    "update_leafs": "cd node_modules/leafy-utils && node install.js",    "commit": "node leafs/commit.js",    "loot": "node leafs/loot.js"  },  "description": "",  "devDependencies": {},  "dependencies": {    "@minecraft/server": "1.1.0-beta.release.1.19.50",    "@minecraft/server-ui": "1.0.0-beta.release.1.19.50"  }}
+  {
+   "name": "xapi",
+   "version": "0.0.17",
+   "keywords": [],
+   "author": "",
+   "license": "ISC",
+   "type": "module",
+   "scripts": {
+    "run": "",
+    "update_leafs": "cd node_modules/leafy-utils && node install.js",
+    "commit": "node node_scripts/commit.js",
+    "loot": "node node_scripts/loot.js"
+   },
+   "description": "",
+   "dependencies": {
+    "@minecraft/server-ui": "^1.0.0-beta.11940b24",
+    "leafy-utils": "0.0.5"
+   },
+   "devDependencies": {
+    "@minecraft/server": "^1.1.0-beta.release.1.19.50"
+   }
+  }
 
 yarn manifest: 
   No manifest
@@ -37,14 +53,24 @@ Lockfile:
   # yarn lockfile v1
   
   
-  "@minecraft/server-ui@1.0.0-beta.release.1.19.50":
-    version "1.0.0-beta.release.1.19.50"
-    resolved "https://registry.yarnpkg.com/@minecraft/server-ui/-/server-ui-1.0.0-beta.release.1.19.50.tgz#5d6d42069d2eaa3c93964e03a37f900b0b86b76b"
-    integrity sha512-hWd1pPmil66kECrbqtMRebp4hSDRbUbjs4+A0L1fvUsXb45uL7HTvuxKIbyhbccTHs3VCod/hQSdoTIzCrsfSw==
+  "@minecraft/server-ui@^1.0.0-beta.11940b24":
+    version "1.0.0-beta.11940b24"
+    resolved "https://registry.yarnpkg.com/@minecraft/server-ui/-/server-ui-1.0.0-beta.11940b24.tgz#12d1e790d148ba0c3e614272939023585f543a87"
+    integrity sha512-/E4FKC5Wv5ALExzfT0L45xyawQGAwlRn9W5cs5GmvaTMVwndAcWF39oAcsQcsn/hKEpMzuVFsSIao/pm00+Cgg==
     dependencies:
-      "@minecraft/server" "1.1.0-beta.release.1.19.50"
+      "@minecraft/server" "1.0.0-beta.11940b24"
   
-  "@minecraft/server@1.1.0-beta.release.1.19.50":
+  "@minecraft/server@1.0.0-beta.11940b24":
+    version "1.0.0-beta.11940b24"
+    resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.0.0-beta.11940b24.tgz#f5905c25d98e3f0d3fb1849c16d2e5f640a44c51"
+    integrity sha512-1d5hXQ/g+kWvpoWiQ/IInxTeOxM6RECQ2+l3bR4AmmZ58NRq4pPYevaEvhVs06yKeM/3FmSPVqBu1/Lr6gN1Rg==
+  
+  "@minecraft/server@^1.1.0-beta.release.1.19.50":
     version "1.1.0-beta.release.1.19.50"
     resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.1.0-beta.release.1.19.50.tgz#ea7c9d9b11db2d6618da3f2639180116f53c5d81"
     integrity sha512-cuyY7QMd5HgzI71Pu/Z7Ii6Ux4fNUf2q/OtXZn14+QTRlC3SaPrPvGIVkSswMhQbcPxL7+uRNtN3CAB3H3PJMA==
+  
+  leafy-utils@0.0.5:
+    version "0.0.5"
+    resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-0.0.5.tgz#fb8a013ebdff2ecca06dbf43ea241c0f100b5ecb"
+    integrity sha512-fVpyQ4B7MXw/z9g1NBD7fF6R0O5bigG1WM+KsEpkRYLM8+V+VoMtWNy1f6XmDc2Cf6qbNatMZlCFL0ShtW9CXw==

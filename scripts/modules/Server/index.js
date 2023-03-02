@@ -8,6 +8,14 @@ import "./pvp.js";
 import "./tool.js";
 import { options } from "./var.js";
 
+/**
+ * @type {import("@minecraft/server").ExplosionOptions}
+ */
+const boom = {
+	breaksBlocks: false,
+	causesFire: true,
+};
+
 XA.objectives.push({ id: "join", watch: true });
 
 /*=========================================== ВЗРЫВНЫЕ ФЕЙРВЕРКИ ===========================================
@@ -133,12 +141,7 @@ setTickInterval(
 			/*================== Блокировка незера =================*/
 			if (options.lockNether) {
 				if (player.dimension.id === MinecraftDimensionTypes.nether) {
-					player.teleport(
-						{ x: 0, z: 100, y: 0 },
-						XA.dimensions.overworld,
-						0,
-						0
-					);
+					player.teleport({ x: 0, z: 100, y: 0 }, XA.dimensions.overworld, 0, 0);
 					world.say(`§c► §f${player.name}§c Измерение "Незер" заблокированно.`);
 				}
 			}
@@ -148,8 +151,6 @@ setTickInterval(
 	10,
 	"serverAsyncShit"
 ); /*
-
-/*
 
 /*
 |--------------------------------------------------------------------------
@@ -194,27 +195,27 @@ setTickInterval(
 			// 		Atp(p, "currentpos", { pvp: true });
 			// 	} catch (e) {}
 			/*================ TOOL FUNCTIONS ===================*/ /*
-// if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
-// 	const lore = XA.Entity.getHeldItem(p).getLore();
-// 	if (lore[0] == "Particle") {
-// 		const block = p.getBlockFromViewVector({ maxDistance: 100 });
-// 		if (block) {
-// 			world
-// 				.getDimension("overworld")
-// 				.spawnParticle(
-// 					lore[1],
-// 					new Location(block.location.x + 0.5, block.location.y + 1.5, block.location.z + 0.5),
-// 					new MolangVariableMap()
-// 				);
-// 		}
-// 	}
-// 	if (lore[0] == "Stopsound") {
-// 		p.runCommandAsync("stopsound @s");
-// 		p.runCommandAsync("music stop");
-// 	}
-// } /*
+if (XA.Entity.getHeldItem(p)?.typeId == "we:tool") {
+	const lore = XA.Entity.getHeldItem(p).getLore();
+	if (lore[0] == "Particle") {
+		const block = p.getBlockFromViewVector({ maxDistance: 100 });
+		if (block) {
+			world
+				.getDimension("overworld")
+				.spawnParticle(
+					lore[1],
+					new Location(block.location.x + 0.5, block.location.y + 1.5, block.location.z + 0.5),
+					new MolangVariableMap()
+				);
+		}
+	}
+	if (lore[0] == "Stopsound") {
+		p.runCommandAsync("stopsound @s");
+		p.runCommandAsync("music stop");
+	}
+} /*
 
-/*================== Другие таймеры =================
+/*================== Другие таймеры =================*/ /*
 			if (false && wo.Q("timer:enable")) {
 				time.all.seconds.eAdd(p, 1);
 				if (time.all.seconds.eGet(p) >= 60) {

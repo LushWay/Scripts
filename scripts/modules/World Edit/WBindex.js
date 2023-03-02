@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { setPlayerInterval, setTickInterval, XA } from "xapi.js";
+import { setPlayerInterval, setTickInterval, toStr, XA } from "xapi.js";
 
 import "./commands/index.js";
 import { CONFIG_WB } from "./config.js";
@@ -47,7 +47,7 @@ setPlayerInterval(
 			const range = lore[3]?.replace("Range: ", "");
 			if (range) {
 				q.maxDistance = parseInt(range);
-				const block = p.getBlockFromViewDirection(q);
+				const block = p.getBlockFromViewVector(q);
 				if (block) {
 					const ent1 = XA.Entity.getEntityAtPos(block.location.x, block.location.y, block.location.z);
 					if (!ent1) {
@@ -114,7 +114,7 @@ setPlayerInterval(
 
 		if (!shape || !blocks || !size || !range) return;
 
-		const block = p.getBlockFromViewDirection({ maxDistance: parseInt(range) });
+		const block = p.getBlockFromViewVector({ maxDistance: parseInt(range) });
 		if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 	},
 	5,
@@ -183,7 +183,7 @@ world.events.beforeItemUse.subscribe((data) => {
 	/** @type {import("@minecraft/server").BlockRaycastOptions} */
 	const q = {};
 	q.maxDistance = parseInt(range);
-	const block = data.source.getBlockFromViewDirection(q);
+	const block = data.source.getBlockFromViewVector(q);
 	if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 });
 

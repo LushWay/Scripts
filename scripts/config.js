@@ -8,5 +8,4 @@ export const CONFIG = {
 	module: {
 		loadAwait: true,
 	},
-	firstPlayerJoinTime: 5000,
 };

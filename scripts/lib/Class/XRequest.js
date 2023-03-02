@@ -1,67 +1,60 @@
 export class XRequest {
 	/**
-	 * Generates unique DB key
+	 *
 	 * @param {string} prefix
 	 * @param {string} ID
+	 * @returns
 	 */
 	static genDBkey(prefix, ID) {
-		return `REQ_${prefix}:${ID}`;
+		return "REQ_" + prefix + ":" + ID;
 	}
 	/**
-	 * DB to store requests across the sessions
 	 * @type {IAbstactDatabase}
 	 * @private
 	 */
 	db;
-
 	/**
-	 * Unique key for db
 	 * @type {string}
 	 * @private
 	 */
 	key;
-
 	/**
-	 * This class is used to help manage requests for specified id in db
-	 * @param {IAbstactDatabase} db - DB to store request data
-	 * @param {string} prefix - Prefix of request type.
-	 * @param {string} ID - May be player.id or any string
+	 *
+	 * @param {IAbstactDatabase} db DB to store request data
+	 * @param {string} prefix
+	 * @param {string} ID
 	 */
 	constructor(db, prefix, ID) {
 		this.db = db;
 		this.key = XRequest.genDBkey(prefix, ID);
 	}
 	/**
-	 * Returns all active ids
 	 * @returns {Set<string>}
 	 */
-	get reqList() {
+	get activeRequests() {
 		let data = this.db.get(this.key);
-
-		if (!Array.isArray(data)) {
-			// Data on this key already exists, and it isnt reqList
+		const isEmpty = !(Array.isArray(data) && data[0]);
+		if (isEmpty) {
 			if (data) this.db.delete(this.key);
-
 			data = [];
 		}
-
 		return new Set(data);
 	}
 	/**
-	 * Adds ID to request list and saves it to db
+	 *
 	 * @param {string} ID
 	 */
 	createRequest(ID) {
-		const requests = this.reqList;
+		const requests = this.activeRequests;
 		requests.add(ID);
 		this.db.set(this.key, [...requests.values()]);
 	}
 	/**
-	 * Deletes request from db
-	 * @param {string} ID - ID of request
+	 *
+	 * @param {string} ID
 	 */
 	deleteRequest(ID) {
-		const requests = this.reqList;
+		const requests = this.activeRequests;
 		requests.delete(ID);
 		this.db.set(this.key, [...requests.values()]);
 	}

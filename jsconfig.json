@@ -12,9 +12,10 @@
 			"@minecraft/*": ["node_modules/@minecraft/*/index.js"],
 			"*": ["scripts/*"]
 		},
-		"maxNodeModuleJsDepth": 0,
+		"maxNodeModuleJsDepth": -1,
+		"moduleResolution": "Node16",
 		"types": []
 	},
 	"include": ["./scripts/"],
-	"exclude": ["leafs"]
+	"exclude": ["./node_scripts/"]
 }

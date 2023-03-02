@@ -1,4 +1,4 @@
-import { BlockLocation, ItemStack, ItemTypes, Location, world } from "@minecraft/server";
+import { BlockLocation, ItemStack, ItemTypes, Location } from "@minecraft/server";
 import { IS, setTickInterval, XA } from "xapi.js";
 import { global } from "../var.js";
 
@@ -241,7 +241,7 @@ new XA.Command({ name: "sit", description: "", type: "public" }).executes((ctx) 
 });
 setTickInterval(
 	() => {
-		for (const e of XA.dimensions.overworld.getEntities({type: "s:t"})) {
+		for (const e of XA.Entity.getEntitys("s:it")) {
 			const players = XA.Entity.getClosetsEntitys(e, 1, "minecraft:player", 1, false);
 			if (players.length < 1) e.triggerEvent("kill");
 		}

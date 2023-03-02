@@ -1,14 +1,6 @@
 {
-	"version": "0.3.0",
+	"version": "0.2.0",
 	"configurations": [
-		{
-			"type": "minecraft-js",
-			"request": "attach",
-			"name": "Connect to Minecraft",
-			"mode": "connect",
-			"localRoot": "${workspaceFolder}/scripts/",
-			"port": 1234
-		},
 		{
 			"type": "minecraft-js",
 			"request": "attach",
@@ -16,15 +8,6 @@
 			"mode": "listen",
 			"localRoot": "${workspaceFolder}/scripts/",
 			"port": 1000
-		},
-		{
-			"type": "minecraft-js",
-			"request": "attach",
-			"name": "Minecraft Script API",
-			"mode": "listen",
-			"localRoot": "${workspaceFolder}/src/",
-			"sourceMapRoot": "${workspaceFolder}/scripts/",
-			"port": 4000
 		}
 	]
 }

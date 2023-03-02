@@ -1,6 +1,17 @@
 import { Entity, world } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
 
+/**
+ * @template Func, [This = any]
+ * @param {Func} func
+ * @param {This} context
+ * @returns {Func}
+ */
+function BIND(func, context) {
+	if (typeof func !== "function") return func;
+	return func.bind(context);
+}
+
 export class ScoreboardDB {
 	scoreboard;
 	/**

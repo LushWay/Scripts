@@ -1,5 +1,5 @@
 import { S } from "../../../lib/List/sounds.js";
-import { SG } from "../../../lib/List/sounds-types.js";
+import { SG } from "../../../lib/List/sounds2.js";
 
 import { IS, XA } from "xapi.js";
 new XA.Command({

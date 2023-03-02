@@ -8,26 +8,15 @@ import {
 	Vector,
 	world,
 } from "@minecraft/server";
-import { DisplayError, IS, sleep, XA } from "xapi.js";
+import { IS, sleep, ThrowError, XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
 import { global } from "./var.js";
 
-new WorldOption(
-	"spawn:pos",
-	"(x y z)\nТакже можно выставить через -spawn set <pos: Pos>",
-	true
-);
-new WorldOption(
-	"minigames:pos",
-	"(x y z)\nТакже можно выставить через -mg set <pos: Pos>",
-	true
-);
+new WorldOption("spawn:pos", "(x y z)\nТакже можно выставить через -spawn set <pos: Pos>", true);
+new WorldOption("minigames:pos", "(x y z)\nТакже можно выставить через -mg set <pos: Pos>", true);
 const getSettings = XA.PlayerOptions("Atp", {
-	showCoordinates: {
-		desc: "Показывать координаты телепортации (выключите если вы стример)",
-		value: true,
-	},
+	showCoordinates: { desc: "Показывать координаты телепортации (выключите если вы стример)", value: true },
 	title: { desc: "", value: true },
 });
 /**
@@ -39,16 +28,7 @@ const getSettings = XA.PlayerOptions("Atp", {
  * @returns void
  * @example tp(player, '0 0 0', 'spawn', po.Q('tp', player))
  */
-function tp(
-	player,
-	pos,
-	place,
-	resultActionbar = false,
-	obj,
-	text,
-	slow_falling,
-	tpAnimation = true
-) {
+function tp(player, pos, place, resultActionbar = false, obj, text, slow_falling, tpAnimation = true) {
 	if (tpAnimation) player.runCommandAsync("effect @s clear");
 	if (slow_falling) player.runCommandAsync("effect @s slow_falling 17 1 true");
 	let befplace;
@@ -59,13 +39,8 @@ function tp(
 
 	let { P, C, rot } = getPlace(place, text);
 	player.runCommandAsync(`tp ${pos}${rot != undefined ? ` ${rot}` : ""}`);
-	if (resultActionbar)
-		player.runCommandAsync(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
-	player.runCommandAsync(
-		`tellraw @s {"rawtext":[{"translate":"${
-			befplace ? befplace : ""
-		}§${C}◙ §3${P}"}]}`
-	);
+	if (resultActionbar) player.runCommandAsync(`title @s actionbar §${C}◙ §3${P} §${C}◙§r`);
+	player.runCommandAsync(`tellraw @s {"rawtext":[{"translate":"${befplace ? befplace : ""}§${C}◙ §3${P}"}]}`);
 }
 
 /**
@@ -94,8 +69,7 @@ function getPlace(place, text) {
 	if (place == "anarch") (P = "§cАнархия"), (C = "4");
 	if (place == "spawn") (P = "§aСпавн"), (C = "2"), (rot = "0 0");
 	if (place == "br") (P = "§6Батл рояль"), (C = "e"), (rot = "0 0");
-	if (place == "minigames" || place == "currentpos")
-		(P = "§dМиниигры§r"), (C = "5"), (rot = "0 0");
+	if (place == "minigames" || place == "currentpos") (P = "§dМиниигры§r"), (C = "5"), (rot = "0 0");
 	return { P, C, rot };
 }
 
@@ -140,10 +114,7 @@ class inventory {
 			for (const g of this.gamerules) {
 				XA.runCommandX(`gamerule ${g.split(":")[0]} ${g.split(":")[1]}`);
 			}
-		} else
-			this.save.forEach((g) =>
-				XA.runCommandX(`gamerule ${g.split(" = ")[0]} ${g.split(" = ")[1]}`)
-			);
+		} else this.save.forEach((g) => XA.runCommandX(`gamerule ${g.split(" = ")[0]} ${g.split(" = ")[1]}`));
 	}
 	#setZone(bl) {
 		this.fillblocks.bedrock.forEach((e) => {
@@ -170,37 +141,26 @@ class inventory {
 		if (i != invs.anarch || inv.size == inv.emptySlotsCount) return;
 		//console.warn("Сохранение инвентаря, старт");
 		this.#gamerules(true);
-		const zone = this.savezones.find(
-			(e) =>
-				world.getDimension("overworld").getEntitiesAtBlockLocation(e).length < 1
-		);
+		const zone = this.savezones.find((e) => world.getDimension("overworld").getEntitiesAtBlockLocation(e).length < 1);
 		if (!zone) return world.say("§cError");
 		this.#setZone(zone);
-		pl.teleport(
-			new Location(zone.x, zone.y, zone.z),
-			world.getDimension("overworld"),
-			0,
-			0,
-			false
-		);
+		pl.teleport(new Location(zone.x, zone.y, zone.z), world.getDimension("overworld"), 0, 0, false);
 		await sleep(10);
 		pl.addTag("saving");
 		const name = pl.name;
 		pl.kill();
 		sleep(10).then((e) => {
 			XA.runCommandX(
-				`structure save ${this.structureName.replace("$name", pl.name)} ${
-					zone.x
-				} ${zone.y} ${zone.z} ${zone.x} ${zone.y + 1} ${zone.z} true disk false`
+				`structure save ${this.structureName.replace("$name", pl.name)} ${zone.x} ${zone.y} ${zone.z} ${zone.x} ${
+					zone.y + 1
+				} ${zone.z} true disk false`
 			);
 			const a = XA.Entity.getAtPos({
 				x: zone.x,
 				y: zone.y,
 				z: zone.z,
 			}).length;
-			XA.runCommandX(
-				`kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`
-			);
+			XA.runCommandX(`kill @e[type=item,x=${zone.x},y=${zone.y},z=${zone.z},r=2]`);
 			pl.tell(`Сохранено ${a} предметов`);
 		});
 		//console.warn("Сохранение инвентаря, прода");
@@ -231,29 +191,17 @@ class inventory {
 		} else {
 			//console.warn("Загрузка инвентаря анархии, старт");
 
-			const zone = this.savezones.find(
-				(e) =>
-					world.getDimension("overworld").getEntitiesAtBlockLocation(e).length <
-					1
-			);
+			const zone = this.savezones.find((e) => world.getDimension("overworld").getEntitiesAtBlockLocation(e).length < 1);
 			if (!zone) return world.say("§cError");
 			this.#setZone(zone);
-			pl.teleport(
-				new Location(zone.x, zone.y, zone.z),
-				world.getDimension("overworld"),
-				0,
-				0,
-				false
-			);
+			pl.teleport(new Location(zone.x, zone.y, zone.z), world.getDimension("overworld"), 0, 0, false);
 			XA.runCommandX(`clear ${pl.name}`);
 			XA.runCommandX(
-				`structure load ${this.structureName.replace("$name", pl.name)} ${
-					zone.x
-				} ${zone.y} ${zone.z} 0_degrees none true false`
+				`structure load ${this.structureName.replace("$name", pl.name)} ${zone.x} ${zone.y} ${
+					zone.z
+				} 0_degrees none true false`
 			);
-			XA.runCommandX(
-				`structure delete ${this.structureName.replace("$name", pl.name)}`
-			);
+			XA.runCommandX(`structure delete ${this.structureName.replace("$name", pl.name)}`);
 			await sleep(1);
 			while (
 				world
@@ -290,21 +238,16 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	/** @param {string} reason */
 	const fail = (reason) => player.tell("§c► " + reason);
 
-	if (!ignore?.lock && tag)
-		return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
+	if (!ignore?.lock && tag) return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
 
 	if (!ignore?.quene && Object.keys(quene).includes(player.name))
-		return fail(
-			`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`
-		);
+		return fail(`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`);
 
-	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0)
-		return fail(`Вы находитесь в режиме PVP!`);
+	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0) return fail(`Вы находитесь в режиме PVP!`);
 
 	const currentInventory = XA.Entity.getScore(player, objective[0]);
 	const placeIndex = invs[place];
-	if (!placeIndex)
-		return DisplayError(new TypeError("Неправильное место: " + place));
+	if (!placeIndex) return ThrowError(new TypeError("Неправильное место: " + place));
 
 	let pos = wo.G(`${place}:pos`);
 	if (place !== "anarch" && place !== "currentpos" && !pos)
@@ -332,20 +275,12 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 
 		while (!y && count < 30) {
 			count++;
-			x = rd(
-				Number(center[0]) + global.Radius - 10,
-				Number(center[0]) - global.Radius + 10
-			);
-			z = rd(
-				Number(center[1]) + global.Radius - 10,
-				Number(center[1]) - global.Radius + 10
-			);
+			x = rd(Number(center[0]) + global.Radius - 10, Number(center[0]) - global.Radius + 10);
+			z = rd(Number(center[1]) + global.Radius - 10, Number(center[1]) - global.Radius + 10);
 			/** @type {import("@minecraft/server").BlockRaycastOptions} */
 			const q = {};
 			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
-			const b = world
-				.getDimension("overworld")
-				.getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
+			const b = world.getDimension("overworld").getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
 			if (b && b.location.y >= 63) {
 				y = b.location.y + 1;
 				break;
@@ -359,11 +294,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	}
 
 	if (placeIndex == invs.anarch) {
-		player.tell(
-			`§r§${air ? "5Воздух" : "9Земля"}§r ${
-				settings.showCoordinates ? "" : pos
-			}`
-		);
+		player.tell(`§r§${air ? "5Воздух" : "9Земля"}§r ${settings.showCoordinates ? "" : pos}`);
 	}
 
 	if (currentInventory == invs.anarch) {
@@ -379,25 +310,17 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		};
 
 	if (
-		(currentInventory == placeIndex ||
-			(inve.size == inve.emptySlotsCount && place != "anarch")) &&
-		!(
-			(!setDefaultInventory && inve.size == inve.emptySlotsCount) ||
-			setDefaultInventory
-		)
+		(currentInventory == placeIndex || (inve.size == inve.emptySlotsCount && place != "anarch")) &&
+		!((!setDefaultInventory && inve.size == inve.emptySlotsCount) || setDefaultInventory)
 	) {
 		tp(player, pos, place, settings.title, null, null, air);
-		player.runCommandAsync(
-			`scoreboard players set @s ${objective[0]} ${placeIndex}`
-		);
+		player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 	} else {
 		try {
 			if (!setDefaultInventory) player.runCommandAsync("testfor @s[m=!c]");
 			inv.saveInv(currentInventory, player).then(() =>
 				inv.loadInv(placeIndex, player).then(() => {
-					player.runCommandAsync(
-						`scoreboard players set @s ${objective[0]} ${placeIndex}`
-					);
+					player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 					tp(
 						player,
 						pos,
@@ -406,15 +329,12 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 						obj,
 						null,
 						air,
-						(!setDefaultInventory && inve.size == inve.emptySlotsCount) ||
-							place == "currentpos"
+						(!setDefaultInventory && inve.size == inve.emptySlotsCount) || place == "currentpos"
 					);
 				})
 			);
 		} catch (e) {
-			player.runCommandAsync(
-				`scoreboard players set @s ${objective[0]} ${placeIndex}`
-			);
+			player.runCommandAsync(`scoreboard players set @s ${objective[0]} ${placeIndex}`);
 			tp(player, pos, place, settings.title, obj, null, air);
 		}
 	}
@@ -554,17 +474,14 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe(
 		data.cancel = true;
 		const to = world
 			.getDimension(data.entity.dimension.id)
-			.getBlock(
-				XA.Utils.vecToBlockLocation(data.entity.location).offset(0, -3, 0)
-			);
+			.getBlock(XA.Utils.vecToBlockLocation(data.entity.location).offset(0, -3, 0));
 		if (to.typeId !== "minecraft:chest") return;
 		const toi = to.getComponent("inventory").container;
 		const i = toi.getItem(0);
 		if (!i) return;
 		const lore = i.getLore()[0];
 		if (!lore) return;
-		if (!["anarch", "spawn", "br", "minigames", "currentpos"].includes(lore))
-			return;
+		if (!["anarch", "spawn", "br", "minigames", "currentpos"].includes(lore)) return;
 		// @ts-expect-error
 		Atp(data.entity, lore);
 	},
@@ -636,25 +553,13 @@ new XA.Command({
 	.executes((ctx) => {
 		let item = new ItemStack(MinecraftItemTypes.grayCandle, 1, 0);
 		item.setLore(ctx.args);
-		const block = ctx.sender.dimension.getBlock(
-			XA.Utils.vecToBlockLocation(ctx.sender.location).offset(0, -4, 0)
-		);
+		const block = ctx.sender.dimension.getBlock(XA.Utils.vecToBlockLocation(ctx.sender.location).offset(0, -4, 0));
 		block.setType(MinecraftBlockTypes.chest);
 		block.getComponent("inventory").container.setItem(0, item);
-		const loc = XA.Utils.vecToBlockLocation(ctx.sender.location).offset(
-			0,
-			1,
-			0
-		);
+		const loc = XA.Utils.vecToBlockLocation(ctx.sender.location).offset(0, 1, 0);
 		const l = new Location(loc.x + 0.5, loc.y, loc.z + 0.5);
 
-		ctx.sender.teleport(
-			l,
-			ctx.sender.dimension,
-			ctx.sender.rotation.x,
-			ctx.sender.rotation.y,
-			false
-		);
+		ctx.sender.teleport(l, ctx.sender.dimension, ctx.sender.rotation.x, ctx.sender.rotation.y, false);
 
 		ctx.reply(`§f► ${ctx.args.slice(1).join("§r, ")}`);
 		ctx.sender.runCommandAsync("setblock ~~-3~ bedrock");

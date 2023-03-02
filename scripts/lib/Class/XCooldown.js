@@ -2,18 +2,17 @@ import { Player } from "@minecraft/server";
 
 export class XCooldown {
 	/**
-	 * Generates a unique key for the cooldown in the database
-	 * @param {string} name - The name of the cooldown
-	 * @param {string} ID - The ID of the player or source related to the cooldown
-	 * @returns {string} - The generated key
+	 *
+	 * @param {string} name
+	 * @param {string} ID
+	 * @returns
 	 */
 	static genDBkey(name, ID) {
 		return "COOLDOWN_" + name + ":" + ID;
 	}
 	/**
-	 * Parses the remaining time in milliseconds into a more human-readable format
-	 * @param {number} ms - Milliseconds to parse
-	 * @returns {{ parsedTime: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
+	 *
+	 * @param {number} ms Milliseconds to parse
 	 */
 	static getRemainingTime(ms) {
 		let parsedTime = "0";

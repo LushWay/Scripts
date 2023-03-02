@@ -1,4 +1,4 @@
-import { ItemStack, ItemTypes } from "@minecraft/server";
+import { ItemStack, ItemTypes, MinecraftItemTypes } from "@minecraft/server";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { JOIN_EVENTS, __JOIN_EMITTERS } from "./events.js";
 import { shortTime, timeNow } from "./var.js";
