@@ -4,8 +4,9 @@ world.say("§9┌ §fLoading...");
 let loading = Date.now();
 
 // This need to be loaded before all another scripts
-import "./lib/Setup/patcher.js";
 import "./lib/Setup/watchdog.js";
+
+import "./lib/Setup/prototypes.js";
 
 import { DIMENSIONS } from "./lib/List/dimensions.js";
 import { onWorldLoad } from "./lib/Setup/loader.js";
@@ -15,7 +16,7 @@ import { XEntity } from "./lib/Class/Entity.js";
 import { XCooldown } from "./lib/Class/XCooldown.js";
 import { XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
 import { XRequest } from "./lib/Class/XRequest.js";
-import { XCommand } from "./lib/Command/Command.js";
+import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
 
 import { XItemDatabase } from "./lib/Database/Item.js";
@@ -24,11 +25,11 @@ import { parse } from "./lib/Lang/parser.js";
 import { text } from "./lib/Lang/text.js";
 import { XRunCommand } from "./lib/XRunCommand.js";
 
+import { CONFIG } from "./config.js";
 import { XUtils } from "./lib/Class/XUtils.js";
 import { load_modules } from "./lib/Module/loader.js";
-import { DisplayError, handle } from "./lib/Setup/utils.js";
+import { handle } from "./lib/Setup/utils.js";
 import "./modules/import.js";
-import { CONFIG } from "./config.js";
 
 /**
  * Class with all X-API features
@@ -113,12 +114,7 @@ world.events.playerJoin.subscribe(() => {
 onWorldLoad(async () => {
 	XA.state.world_loaded = true;
 
-	await Promise.all(
-		Database.initAllTables().map((initingTable) => {
-			initingTable.catch((err) => DisplayError(err, 0, ["TableInit"]));
-			return initingTable;
-		})
-	);
+	await Database.initAllTables();
 	XA.state.db_loaded = true;
 
 	await load_modules();

@@ -4,18 +4,18 @@ import { toStr } from "./utils.js";
 export * as Prototypes from "./patcher.js";
 
 const originalSay = world.say.bind(world);
-addMethod("to prototype in", World, "debug", (...data) => {
+addMethod(World.prototype, "debug", (...data) => {
 	originalSay(data.map((e) => toStr(e)).join(" "));
 });
 
-const LOGS = [];
-addMethod("to prototype in", World, "logOnce", (name, ...data) => {
-	if (LOGS.includes(name)) return;
+const LOGS = new Set();
+addMethod(World.prototype, "logOnce", (name, ...data) => {
+	if (LOGS.has(name)) return;
 	world["debug"](...data);
-	LOGS.push(name);
+	LOGS.add(name);
 });
 
-addMethod("to", JSON, "safeParse", (str, reviever, onError) => {
+addMethod(JSON, "safeParse", (str, reviever, onError) => {
 	try {
 		JSON.parse(str, reviever);
 	} catch (e) {

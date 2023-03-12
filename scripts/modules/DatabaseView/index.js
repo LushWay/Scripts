@@ -2,8 +2,8 @@ import { Player, system, world } from "@minecraft/server";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { visualise_benchmark_result } from "../../lib/XBenchmark.js";
-import { handle, IS, toStr, XA } from "../../xapi.js";
+import { BECHMARK_RESULTS } from "../../lib/XBenchmark.js";
+import { handle, IS, TIMERS_PATHES, toStr, XA } from "../../xapi.js";
 
 /**
  * @typedef {import("../../lib/Database/Rubedo.js").Database<string, any>} defDB
@@ -166,16 +166,80 @@ function changeValue(form, value) {
 	};
 }
 
+/**
+ * It takes the benchmark results and sorts them by average time, then it prints them out in a nice
+ * format
+ * @returns A string.
+ */
+export function visualise_benchmark_result({
+	type = "test",
+	timer_pathes = false,
+} = {}) {
+	let output = "";
+	let res = [];
+	for (const [key, val] of Object.entries(BECHMARK_RESULTS[type])) {
+		const total_count = val.length;
+		const total_time = val.reduce((p, c) => p + c);
+		const average = total_time / total_count;
+
+		res.push({ key, total_count, total_time, average });
+	}
+
+	res = res.sort((a, b) => a.average - b.average);
+
+	for (const { key, total_count, total_time, average } of res) {
+		/** @type {[number, string][]} */
+		const style = [
+			[0.1, "§a"],
+			[0.3, "§2"],
+			[0.5, "§g"],
+			[0.65, "§6"],
+			[0.8, "§c"],
+		];
+
+		const cur_style = style.find((e) => e[0] > average)?.[1] ?? "§4";
+		const isPath = timer_pathes && key in TIMERS_PATHES;
+
+		output += `§3Label §f${key}§r\n`;
+		output += `§3| §7average: ${cur_style}${average.toFixed(2)}ms\n`;
+		output += `§3| §7total time: §f${total_time}ms\n`;
+		output += `§3| §7call count: §f${total_count}\n`;
+		if (isPath) output += `§3| §7path:§f${getPath(key)}\n`;
+		output += "\n\n";
+	}
+	return output;
+}
+
+/**
+ *
+ * @param {string} key
+ */
+function getPath(key) {
+	("\n" + TIMERS_PATHES[key]).replace(/\n/g, "\n§3| §f");
+}
+
 new XA.Command({
 	name: "benchmark",
 	description: "Показывает время работы серверных систем",
 	requires: (p) => IS(p.id, "admin"),
-}).executes((ctx) => {
-	function show() {
-		new ActionForm("Benchmark", visualise_benchmark_result())
-			.addButton("Refresh", null, show)
-			.addButton("Exit", null, () => void 0)
-			.show(ctx.sender);
-	}
-	show();
-});
+})
+	.string("type", true)
+	.boolean("pathes", true)
+	.executes((ctx, type, pathes) => {
+		if (type && !(type in BECHMARK_RESULTS))
+			return ctx.error("Неизвестный тип!");
+
+		function show() {
+			new ActionForm(
+				"Benchmark",
+				visualise_benchmark_result({
+					type: type ?? "timers",
+					timer_pathes: pathes ?? false,
+				})
+			)
+				.addButton("Refresh", null, show)
+				.addButton("Exit", null, () => void 0)
+				.show(ctx.sender);
+		}
+		show();
+	});

@@ -1,7 +1,7 @@
 import { Entity, Location, Player, world } from "@minecraft/server";
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
 import { setPlayerInterval, setTickInterval, XA } from "../../xapi.js";
-import { InRaid } from "../Region/var.js";
+import { getServerType, InRaid } from "../Region/var.js";
 import { stats } from "./var.js";
 
 const lockedTitleScore = "lockedtitle";
@@ -15,7 +15,7 @@ const LOCKTITLE = new ScoreboardDB(lockedTitleScore);
 
 const options = XA.WorldOptions("pvp", {
 	enabled: {
-		value: true,
+		value: getServerType() === "survival",
 		desc: "Возможность входа в пвп режим (блокировка всех тп команд)§r",
 	},
 	cooldown: { value: 15, desc: "Да" },

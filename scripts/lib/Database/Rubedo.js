@@ -34,7 +34,16 @@ export class Database {
 	static tablesInited = false;
 	static initAllTables() {
 		this.tablesInited = true;
-		return Object.values(this.instances).map((e) => e.init());
+		return Promise.all(
+			Object.values(this.instances).map((table) => {
+				const initing = table.init();
+				initing.catch((err) =>
+					DisplayError(err, 0, [`${table.tableName} init`])
+				);
+
+				return initing;
+			})
+		);
 	}
 	/** @type {Record<string, Database<any, any>>} */
 	static instances = {};

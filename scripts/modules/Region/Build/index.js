@@ -2,10 +2,11 @@ import {
 	BlockLocation,
 	Entity,
 	Location,
+	MinecraftEffectTypes,
 	Player,
 	world,
 } from "@minecraft/server";
-import { IS, setTickTimeout, XA } from "xapi.js";
+import { IS, setPlayerInterval, setTickTimeout, XA } from "xapi.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 import { Region } from "../utils/Region.js";
 import "./menu.js";
@@ -118,3 +119,26 @@ world.events.entitySpawn.subscribe((data) => {
 
 	XA.Entity.despawn(data.entity);
 });
+
+const EFFECT_Y = -53;
+const TP_Y = -63;
+const TP_TO = TP_Y + 5;
+
+setPlayerInterval(
+	(player) => {
+		const loc = player.location;
+		const rotation = player.rotation;
+		if (loc.y >= EFFECT_Y + 1) return;
+		if (loc.y < EFFECT_Y)
+			player.addEffect(MinecraftEffectTypes.levitation, 3, 7, false);
+		if (loc.y < TP_Y)
+			player.teleport(
+				{ x: loc.x, y: TP_TO, z: loc.z },
+				player.dimension,
+				rotation.x,
+				rotation.y
+			);
+	},
+	0,
+	"underground effects"
+);

@@ -2,8 +2,17 @@ import { multiload } from "../../../lib/Module/loader.js";
 
 const modules = {
 	brush: ["brush", "custom items"],
-	general: ["undo", "redo", "drawsel", "id", "item"],
-	selection: ["pos1", "pos2", "hpos1", "hpos2", "chunk", "wand", "expand", "size"],
+	general: ["undo", "redo", "drawsel", "id", "item", "desel"],
+	selection: [
+		"pos1",
+		"pos2",
+		"hpos1",
+		"hpos2",
+		"chunk",
+		"wand",
+		"expand",
+		"size",
+	],
 	region: ["set"],
 	clipboard: ["copy", "paste"],
 	generation: ["hcyl", "cyl", "hpyramid", "pyramid", "hsphere", "sphere"],

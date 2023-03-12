@@ -1,10 +1,17 @@
-import { Player, world } from "@minecraft/server";
-import { system } from "@minecraft/server";
-import { DisplayError, handle } from "../../xapi.js";
+import { Player, system, world } from "@minecraft/server";
+import { handle } from "../../xapi.js";
+import { stackParse } from "../Class/Error.js";
 import { benchmark } from "../XBenchmark.js";
 
-// Active timers
-const AT = {};
+/**
+ * Active timers
+ * @type {Record<string | number, any>}
+ */
+const TIMERS = {};
+/**
+ * @type {Record<string, string>}
+ */
+export const TIMERS_PATHES = {};
 
 /**
  * It runs a function after a certain amount of ticks
@@ -12,32 +19,43 @@ const AT = {};
  * @param {Function} callback - The function to be called after the timeout.
  * @param {boolean} [loop] - Whether or not the timeout should loop.
  * @param {string | number} [id] - The id of the timeout.
- * @returns A function thats reset a timeout
+ * @returns A function thats stops a timeout.
  */
-function Timeout(ticks, callback, loop, id, n = true) {
-	if (!id) {
-		DisplayError(new ReferenceError("NO_TIMEOUT_ID"));
-		id = Date.now();
+function Timeout(
+	ticks,
+	callback,
+	loop,
+	id = new Error().stack,
+	path = stackParse(6, [], new Error().stack)
+) {
+	TIMERS[id] ??= 0;
+	const visual_id = `${id} (${loop ? "loop " : ""}${ticks} ticks)`;
+	TIMERS_PATHES[visual_id] ??= path;
+
+	function tick() {
+		if (TIMERS[id] === "stop") return;
+
+		TIMERS[id]++;
+
+		if (TIMERS[id] >= ticks) {
+			TIMERS[id] = 0;
+			const end = benchmark(visual_id, "timers");
+
+			handle(callback, "Timeout");
+
+			const took_ticks = ~~(end() / 20);
+			if (took_ticks > ticks) console.warn(`Found slow script at:\n${path}`);
+			if (!loop) return;
+		}
+
+		system.run(tick);
 	}
-	if (!(id in AT) || n) AT[id] = 0;
 
-	AT[id]++;
+	tick();
 
-	if (AT[id] >= ticks) {
-		AT[id] = 0;
-		const end = benchmark(`${id} (${loop ? "loop " : ""}${ticks} ticks)`);
-		handle(callback, "Timeout");
-		const took_ticks = ~~(end() / 20);
-		if (took_ticks > ticks) console.warn(callback.toString());
-		if (!loop) return;
-	}
-
-	if (AT[id] >= 0) system.run(() => Timeout(ticks, callback, loop, id, false));
-
-	const stop = () => {
-		AT[id] = -10;
+	return function stop() {
+		TIMERS[id] = "stop";
 	};
-	return stop;
 }
 
 /**

@@ -4,7 +4,6 @@ import {
 	MinecraftBlockTypes,
 	MolangVariableMap,
 	system,
-	World,
 	world,
 } from "@minecraft/server";
 import {
@@ -339,8 +338,13 @@ const tests = {
 		});
 	},
 	async 28(ctx) {
-		const block = await XA.Utils.selectBlock(ctx.sender);
-		world.say(toStr(block));
+		for (const player of world.getPlayers()) {
+			async function run() {
+				const block = await XA.Utils.selectBlock(player);
+				world.say(toStr(block));
+			}
+			run();
+		}
 	},
 	29(ctx) {
 		ctx.sender;
@@ -379,9 +383,24 @@ const tests = {
 		);
 	},
 	30(ctx) {
-		World.prototype["e"] = () => world.say("EEEE");
-		world["e"]();
-		world.say(toStr(world));
+		const pos1 = XA.Utils.vecToBlockLocation(ctx.sender.location);
+		const pos2 = pos1.offset(0, -1, 0);
+		const block = ctx.sender.dimension.getBlock(pos2);
+
+		world.debug(block.getTags());
+		world.debug(block.permutation.getAllProperties());
+	},
+	31(ctx) {
+		const reg = Region.blockLocationInRegion(
+			ctx.sender.location,
+			ctx.sender.dimension.id
+		);
+		if (!reg) return ctx.error("No region!");
+
+		reg.permissions.allowedEntitys.push(
+			...ctx.args.filter((e) => e.includes(":"))
+		);
+		reg.update();
 	},
 };
 let bigdata = "";

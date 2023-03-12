@@ -1,5 +1,5 @@
 import { getRole, ROLES, XA } from "xapi.js";
-import { XCommand } from "../../lib/Command/Command.js";
+import { XCommand } from "../../lib/Command/index.js";
 import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
 
 /**

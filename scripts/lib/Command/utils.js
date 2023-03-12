@@ -1,10 +1,10 @@
-import { BeforeChatEvent, Player, Vector } from "@minecraft/server";
+import { BeforeChatEvent, Player } from "@minecraft/server";
 import { handle } from "xapi.js";
 import { CONFIG } from "../../config.js";
 import { inaccurateSearch } from "../Class/Search.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
-import { XCommand } from "./Command.js";
+import { XCommand } from "./index.js";
 
 /**
  * Returns a Before chat events augments
@@ -78,7 +78,7 @@ export function commandNotFound(player, command) {
 /**
  * Sends a command not found message to a player
  * @param {Player} player  player to send message to
- * @param {import("./Command.js").XCommand} command
+ * @param {import("./index.js").XCommand} command
  * @returns {void}
  */
 export function noPerm(player, command) {
@@ -96,7 +96,7 @@ export function noPerm(player, command) {
 /**
  * Sends a syntax failure message to player
  * @param {Player} player  undefined
- * @param {import("./Command.js").XCommand} command  undefined
+ * @param {import("./index.js").XCommand} command  undefined
  * @param {string[]} args  undefined
  * @param {number} i  undefined
  * @returns {void}
@@ -153,9 +153,9 @@ export function parseLocationAugs(
 /**
  * Sends a callback back to the command
  * @param {string[]} cmdArgs the args that the command used
- * @param {import("./Command.js").XCommand<any>[]} args args to use
+ * @param {import("./index.js").XCommand<any>[]} args args to use
  * @param {BeforeChatEvent} event
- * @param {import("./Command.js").XCommand<any>} baseCommand
+ * @param {import("./index.js").XCommand<any>} baseCommand
  */
 export function sendCallback(cmdArgs, args, event, baseCommand) {
 	const lastArg = args[args.length - 1] ?? baseCommand;

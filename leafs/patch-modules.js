@@ -4,7 +4,16 @@ import { m, patchPackage } from "./utils.js";
 patchPackage("@minecraft/server", {
 	classes: {
 		World: m`
-    logOnce(message: any): any 
+    /**
+     * Logs given message once
+     * @param type Type of log
+     * @param messages Data to log using world.debug()
+     */
+    logOnce(type: string, ...messages: any): void;
+    /**
+     * Prints data using world.say() and parses any object to string using toStr method. 
+     */
+    debug(...data: any): void;
 `,
 	},
 	replaces: [
@@ -26,7 +35,14 @@ getComponent<N extends keyof EntityComponents>(
 	],
 	additions: {
 		beginning: "",
-		afterImports: `
+		afterImports: m`
+/**
+ * This file was automatically edited by 
+ * leafs/patch-modules.js
+ * 
+ * New methods assigments can be finded in 
+ * scripts/lib/Setup/prototypes.js 
+ */
 
 type BlockComponents = {
 	"minecraft:inventory": BlockInventoryComponent;

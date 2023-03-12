@@ -46,9 +46,8 @@ export async function patchPackage(packageName, options) {
 
 			if (line.startsWith("import ")) lastImport = i + 1;
 
-			if (line.startsWith("class ") && options.classes) {
-				const match = line.match(/^class\s+(\w+)\s+\{/);
-
+			const match = line.match(/^(?:export )?class\s+(\w+)\s+\{/);
+			if (options.classes && match) {
 				if (match) {
 					const [, className] = match;
 

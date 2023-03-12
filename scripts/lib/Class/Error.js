@@ -5,7 +5,12 @@ const REPLACES = [
 	[/<> \((.+)\)/, "$1"],
 	[/<input>/, "§7<eval>§r"],
 	[/(.*)\(native\)(.*)/, "§8$1(native)$2§f"],
-	[(s) => (s.includes("lib") || s.includes("xapi.js") ? `§7${s.replace(/§./g, "")}§f` : s)],
+	[
+		(s) =>
+			s.includes("lib") || s.includes("xapi.js")
+				? `§7${s.replace(/§./g, "")}§f`
+				: s,
+	],
 	[(s) => (s.startsWith("§7") ? s : s.replace(/\.js:(\d+)/, ".js:§6$1§f"))],
 ];
 
@@ -30,7 +35,11 @@ function oneLineStackParse(e) {
  * @param {number} deleteStack
  * @returns {string}
  */
-export function stackParse(deleteStack = 0, additionalStack = [], stack = getStack(2 + deleteStack)) {
+export function stackParse(
+	deleteStack = 0,
+	additionalStack = [],
+	stack = getStack(2 + deleteStack)
+) {
 	const stackArray = additionalStack.concat(stack.split("\n"));
 
 	const mappedStack = stackArray

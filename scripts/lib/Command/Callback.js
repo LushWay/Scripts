@@ -34,4 +34,12 @@ export class CommandContext {
 	reply(text) {
 		this.sender.tell(text + "");
 	}
+	/**
+	 * Replys to the sender of a command callback
+	 * @param {any} errorText Message or a lang code
+	 * @example ctx.reply('Hello World!');
+	 */
+	error(errorText) {
+		this.sender.tell(`§c${errorText}`);
+	}
 }

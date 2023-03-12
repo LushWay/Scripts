@@ -4,7 +4,13 @@ import { ActionForm } from "../../../lib/Form/ActionForm.js";
 import { CONFIG_MENU } from "../../Menu/var.js";
 import { JOIN_EVENTS } from "../../OnJoin/events.js";
 import { Region } from "../utils/Region.js";
-import { ClearRegion, CreateRegion, fillRegion, prompt, teleportToRegion } from "./utils.js";
+import {
+	ClearRegion,
+	CreateRegion,
+	fillRegion,
+	prompt,
+	teleportToRegion,
+} from "./utils.js";
 
 const DB = XA.tables.buildRegion;
 
@@ -19,17 +25,28 @@ CONFIG_MENU.menu = (player) => {
 	const regionID = DB.get(player.id);
 	let Pregion = Region.getAllRegions().find((e) => e.key === regionID);
 	if (!Pregion) {
-		player.tell("§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую.");
+		player.tell(
+			"§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую."
+		);
 		CreateRegion(player);
 		return false;
 	}
 
-	const current_region = Region.blockLocationInRegion(player.location, player.dimension.id);
-	const inOwnRegion = current_region && current_region.permissions.owners[0] === Pregion.permissions.owners[0];
+	const current_region = Region.blockLocationInRegion(
+		player.location,
+		player.dimension.id
+	);
+	const inOwnRegion =
+		current_region &&
+		current_region.permissions.owners[0] === Pregion.permissions.owners[0];
+	const isRegionBuilder =
+		current_region && current_region.permissions.owners.includes(player.id);
 
 	let body = "";
 	const add = (/** @type {string} */ t) => (body += `${t}\n`);
-	add(`§3Координаты вашей площадки: §c${Pregion.from.x} §b${Pregion.from.z}\n `);
+	add(
+		`§3Координаты вашей площадки: §c${Pregion.from.x} §b${Pregion.from.z}\n `
+	);
 
 	/** @type {import("../../../lib/Class/XRequest.js").XRequest} */
 	let req;
@@ -38,7 +55,9 @@ CONFIG_MENU.menu = (player) => {
 
 	if (current_region) {
 		req = new XA.Request(DB, "EDIT", current_region.permissions.owners[0]);
-		regionOwnerName = XA.Entity.getNameByID(current_region.permissions.owners[0]);
+		regionOwnerName = XA.Entity.getNameByID(
+			current_region.permissions.owners[0]
+		);
 		if (!inOwnRegion) {
 			if (regionOwnerName) {
 				add("§3Сейчас вы на площадке игрока §f" + regionOwnerName);
@@ -47,8 +66,13 @@ CONFIG_MENU.menu = (player) => {
 				const oldRegion = Array.isArray(oldRegionData) ? oldRegionData : [];
 				regionOwnerName = XA.Entity.getNameByID(oldRegion[0]);
 				add("§cЭто площадка была заархивирована");
-				add("§3Строители: §f" + oldRegion.map(XA.Entity.getNameByID).join("§r§3, §f"));
+				add(
+					"§3Строители: §f" +
+						oldRegion.map(XA.Entity.getNameByID).join("§r§3, §f")
+				);
 			}
+		} else if (isRegionBuilder) {
+			add("§3Вам разрешено строить на этой площадке.");
 		} else {
 			add("§3Вы находитесь на §fсвоей§3 площадке");
 		}
@@ -94,22 +118,30 @@ CONFIG_MENU.menu = (player) => {
 	if (current_region) {
 		if (inOwnRegion) {
 			menu.addButton("Строители", null, () => {
-				const form = new ActionForm("Строители", "§3Тут можно просмотреть и удалить строителей вашего региона");
+				const form = new ActionForm(
+					"Строители",
+					"§3Тут можно просмотреть и удалить строителей вашего региона"
+				);
 
 				for (const id of current_region.permissions.owners.slice(1)) {
 					const playerName = XA.Entity.getNameByID(id);
 					form.addButton(playerName, null, () => {
 						prompt(
 							player,
-							"§cВы точно хотите удалить игрока §r" + playerName + "§r§c из строителей вашего региона?",
+							"§cВы точно хотите удалить игрока §r" +
+								playerName +
+								"§r§c из строителей вашего региона?",
 							"ДА",
 							() => {
-								current_region.permissions.owners = current_region.permissions.owners.filter((e) => e !== id);
+								current_region.permissions.owners =
+									current_region.permissions.owners.filter((e) => e !== id);
 								current_region.update();
 								player.tell("§b> §3Успешно!");
 								const requestedPlayer = XA.Entity.fetch(id);
 								if (requestedPlayer)
-									requestedPlayer.tell(`§cИгрок §f${player.name} §r§cудалил вас из строителей своей площадки`);
+									requestedPlayer.tell(
+										`§cИгрок §f${player.name} §r§cудалил вас из строителей своей площадки`
+									);
 							},
 							"нет",
 							() => form.show(player)
@@ -120,41 +152,51 @@ CONFIG_MENU.menu = (player) => {
 				addBackButton(form);
 				form.show(player);
 			});
-			menu.addButton("Запросы редактирования", null, () => {
-				const newmenu = new ActionForm(
-					"Запросы редактирования",
-					"§3В этом меню вы можете посмотреть запросы на редактирование площадки, отправление другими игроками"
-				);
-				for (const ID of req.reqList) {
-					const name = XA.Entity.getNameByID(ID);
-					newmenu.addButton(name, null, () => {
-						prompt(
-							player,
-							"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
-							"Принять",
-							() => {
-								const requestedPlayer = XA.Entity.fetch(ID);
-								if (requestedPlayer) {
+
+			const reqs = req.reqList.size;
+			menu.addButton(
+				`Запросы редактирования${reqs > 0 ? `: §c${reqs}!` : ""}`,
+				null,
+				() => {
+					const newmenu = new ActionForm(
+						"Запросы редактирования",
+						"§3В этом меню вы можете посмотреть запросы на редактирование площадки, отправление другими игроками"
+					);
+					for (const ID of req.reqList) {
+						const name = XA.Entity.getNameByID(ID);
+						newmenu.addButton(name, null, () => {
+							prompt(
+								player,
+								"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
+								"Принять",
+								() => {
+									const requestedPlayer = XA.Entity.fetch(ID);
+									if (requestedPlayer) {
+										req.deleteRequest(ID);
+										player.tell(
+											"§b> §3Запрос на редактирование успешно принят!"
+										);
+										requestedPlayer.tell(
+											`§b> §3Игрок §f${player.name} §r§3принял ваш запрос на редактирование площадки`
+										);
+										current_region.permissions.owners.push(requestedPlayer.id);
+										current_region.update();
+									} else {
+										player.tell("§4> §3Игрок не в сети.");
+									}
+								},
+								"Отклонить",
+								() => {
 									req.deleteRequest(ID);
-									player.tell("§b> §3Запрос на редактирование успешно принят!");
-									requestedPlayer.tell(`§b> §3Игрок §f${player.name} §r§3принял ваш запрос на редактирование площадки`);
-									current_region.permissions.owners.push(requestedPlayer.id);
-									current_region.update();
-								} else {
-									player.tell("§4> §3Игрок не в сети.");
+									newmenu.show(player);
 								}
-							},
-							"Отклонить",
-							() => {
-								req.deleteRequest(ID);
-								newmenu.show(player);
-							}
-						);
-					});
+							);
+						});
+					}
+					addBackButton(newmenu);
+					newmenu.show(player);
 				}
-				addBackButton(newmenu);
-				newmenu.show(player);
-			});
+			);
 			menu.addButton("Перейти на новую", null, () => {
 				const CD = new XA.Cooldown(DB, "ARHCIVE", player, 1000 * 60 * 60 * 24);
 				if (CD.isExpired())
@@ -164,13 +206,19 @@ CONFIG_MENU.menu = (player) => {
 						"§cДа, перейти",
 						() => {
 							const oldRegionID = DB.get(player.id);
-							const oldRegion = Region.getAllRegions().find((e) => e.key === oldRegionID);
+							const oldRegion = Region.getAllRegions().find(
+								(e) => e.key === oldRegionID
+							);
 
-							DB.set("ARCHIVE:" + oldRegionID, [...oldRegion.permissions.owners]);
+							DB.set("ARCHIVE:" + oldRegionID, [
+								...oldRegion.permissions.owners,
+							]);
 							const u = [];
 							oldRegion.forEachOwner((player, i, arr) => {
 								u.push(player.id);
-								player.tell("§cРегион игрока §f" + arr[0].name + "§r§c был заархивирован.");
+								player.tell(
+									"§cРегион игрока §f" + arr[0].name + "§r§c был заархивирован."
+								);
 							});
 
 							oldRegion.permissions.owners = [];
@@ -178,7 +226,11 @@ CONFIG_MENU.menu = (player) => {
 
 							for (const builder of world.getPlayers()) {
 								if (!u.includes(builder.id) && IS(builder.id, "builder"))
-									builder.tell("§b> §3Игрок §f" + player.name + "§r§3 перевел свою площадку в архив.");
+									builder.tell(
+										"§b> §3Игрок §f" +
+											player.name +
+											"§r§3 перевел свою площадку в архив."
+									);
 							}
 
 							CreateRegion(player, true);
@@ -205,6 +257,7 @@ CONFIG_MENU.menu = (player) => {
 						() => menu.show(player)
 					);
 			});
+		} else if (current_region.permissions.owners.includes(player.id)) {
 		} else if (current_region.permissions.owners[0]) {
 			menu.addButton("Запросить разрешение", null, () => {
 				const CD = new XA.Cooldown(DB, "REQ", player, 1000 * 60);
@@ -218,9 +271,13 @@ CONFIG_MENU.menu = (player) => {
 							CD.update();
 							req.createRequest(player.id);
 							player.tell("§b> §3Запрос на редактирование успешно отправлен!");
-							const requestedPlayer = XA.Entity.fetch(current_region.permissions.owners[0]);
+							const requestedPlayer = XA.Entity.fetch(
+								current_region.permissions.owners[0]
+							);
 							if (requestedPlayer)
-								requestedPlayer.tell(`§b> §3Игрок §f${player.name} §r§3отправил вам запрос на редактирование площадки`);
+								requestedPlayer.tell(
+									`§b> §3Игрок §f${player.name} §r§3отправил вам запрос на редактирование площадки`
+								);
 						},
 						"Отмена",
 						() => menu.show(player)
@@ -236,7 +293,9 @@ CONFIG_MENU.menu = (player) => {
 					async () => {
 						const end = await ClearRegion(player, current_region);
 						current_region.forEachOwner((player) =>
-							player.tell(`§cРегион с владельцем §f${regionOwnerName}§r§c был удален`)
+							player.tell(
+								`§cРегион с владельцем §f${regionOwnerName}§r§c был удален`
+							)
 						);
 						current_region.delete();
 						end();
