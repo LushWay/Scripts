@@ -5,6 +5,10 @@ patchPackage("@minecraft/server", {
 	classes: {
 		World: m`
     /**
+     * See {@link World.sendMessage}
+     */
+    say(message: (RawMessage | string)[] | RawMessage | string): void;
+    /**
      * Logs given message once
      * @param type Type of log
      * @param messages Data to log using world.debug()
@@ -15,6 +19,12 @@ patchPackage("@minecraft/server", {
      */
     debug(...data: any): void;
 `,
+		Player: m`
+    /**
+     * See {@link Player.sendMessage}
+     */
+    tell(message: (RawMessage | string)[] | RawMessage | string): void;
+    `,
 	},
 	replaces: [
 		{

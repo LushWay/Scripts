@@ -1,5 +1,4 @@
 import {
-	BlockLocation,
 	DynamicPropertiesDefinition,
 	Entity,
 	EntityTypes,
@@ -9,6 +8,10 @@ import {
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
 import { DisplayError } from "../Setup/utils.js";
+
+/**
+ * Original database created by Smell Of Curry for Rubedo anticheat, and lighty modified by Leaftail1880
+ */
 
 world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
@@ -21,7 +24,7 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 });
 
 const ENTITY_IDENTIFIER = "rubedo:database";
-const ENTITY_LOCATION = new BlockLocation(0, -64, 0);
+const ENTITY_LOCATION = { x: 0, y: -64, z: 0 };
 const INVENTORY_SIZE = 54;
 const MAX_DATABASE_STRING_SIZE = 32000;
 const CHUNK_REGEXP = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");

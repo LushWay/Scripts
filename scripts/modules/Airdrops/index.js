@@ -1,4 +1,4 @@
-import { Location, world } from "@minecraft/server";
+import { world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
 
 export function rd(max, min = 0, msg) {
@@ -89,7 +89,7 @@ export function rd(max, min = 0, msg) {
 //       for (let v = 62; v <= 320; v++) {
 //         const b = world
 //           .getDimension("overworld")
-//           .getBlock(new BlockLocation(x, v, z));
+//           .getBlock({ x: x, y: v, z: z) };
 //         if (b.typeId == "minecraft:air") {
 //           ac++;
 //           if (ac < 100) continue;
@@ -100,7 +100,7 @@ export function rd(max, min = 0, msg) {
 //     }
 //     const ent = world
 //       .getDimension("overworld")
-//       .spawnEntity("minecraft:chest_minecart", new Location(x, y, z));
+//       .spawnEntity("minecraft:chest_minecart", { x: x, y: y, z: z) };
 //     const inv = XA.Entity.getI(ent);
 //     for (let i = 0; i < inv.size; i++) {
 //       const n = this.loot[i];
@@ -140,7 +140,7 @@ export function rd(max, min = 0, msg) {
 //     }
 //     const chicken = world
 //       .getDimension("overworld")
-//       .spawnEntity("minecraft:chicken<drop>", new Location(x, y + 3, z));
+//       .spawnEntity("minecraft:chicken<drop>", { x: x, y: y + 3, z: z) };
 //     chicken.addEffect(MinecraftEffectTypes.slowFalling, 500, 2, false);
 //     chicken.addEffect(MinecraftEffectTypes.resistance, 500, 255, false);
 //     const date = Date.now();
@@ -161,28 +161,41 @@ const qq = {
 setTickInterval(
 	() => {
 		for (const ent of world.getDimension("overworld").getEntities(q)) {
-			if (!XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:")) return ent.removeTag("держит");
+			if (!XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"))
+				return ent.removeTag("держит");
 			qq.location = ent.location;
-			qq.tags = ["держится_за_номер:" + XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:")];
+			qq.tags = [
+				"держится_за_номер:" +
+					XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"),
+			];
 			const cl = ent.dimension.getEntities(qq);
 			if (!cl) return ent.removeTag("держит");
 			const block = ent.dimension.getBlock(
-				XA.Utils.vecToBlockLocation(new Location(ent.location.x, ent.location.y - 4, ent.location.z))
+				XA.Utils.floorVector({
+					x: ent.location.x,
+					y: ent.location.y - 4,
+					z: ent.location.z,
+				})
 			);
 			const block2 = ent.dimension.getBlock(
-				XA.Utils.vecToBlockLocation(new Location(ent.location.x, ent.location.y - 1, ent.location.z))
+				XA.Utils.floorVector({
+					x: ent.location.x,
+					y: ent.location.y - 1,
+					z: ent.location.z,
+				})
 			);
 			if (block2.typeId != "minecraft:air") {
 				XA.Entity.despawn(ent);
 				continue;
 			}
 			for (const clo of cl) {
+				const rotation = clo.getRotation();
 				if (block.typeId == "minecraft:air")
 					clo.teleport(
-						new Location(ent.location.x, ent.location.y - 3, ent.location.z),
+						{ x: ent.location.x, y: ent.location.y - 3, z: ent.location.z },
 						ent.dimension,
-						clo.rotation.x,
-						clo.rotation.y
+						rotation.x,
+						rotation.y
 					);
 				break;
 			}

@@ -1,19 +1,17 @@
 import {
-	BlockLocation,
-	Location,
-	MinecraftBlockTypes,
-	MolangVariableMap,
-	system,
-	world,
+    MinecraftBlockTypes,
+    MolangVariableMap,
+    system,
+    world
 } from "@minecraft/server";
 import {
-	DisplayError,
-	handle,
-	IS,
-	setTickTimeout,
-	sleep,
-	toStr,
-	XA,
+    DisplayError,
+    handle,
+    IS,
+    setTickTimeout,
+    sleep,
+    toStr,
+    XA
 } from "xapi.js";
 import { stackParse } from "../../lib/Class/Error.js";
 import { CommandContext } from "../../lib/Command/Callback.js";
@@ -140,7 +138,7 @@ const tests = {
 		const reg = await findFreePlace();
 		const set = (pos) =>
 			XA.dimensions.overworld
-				.getBlock(new BlockLocation(pos.x, -60, pos.z))
+				.getBlock({ x: pos.x, y: -60, z: pos.z) }
 				.setType(MinecraftBlockTypes.bedrock);
 
 		set(reg.from);
@@ -241,7 +239,7 @@ const tests = {
 	},
 	18: (ctx) => {
 		const region = Region.blockLocationInRegion(
-			XA.Utils.vecToBlockLocation(ctx.sender.location),
+			XA.Utils.floorVector(ctx.sender.location),
 			ctx.sender.dimension.id
 		);
 		region.permissions.owners = region.permissions.owners.filter(
@@ -291,13 +289,13 @@ const tests = {
 		}
 	},
 	26(ctx) {
-		const pos1 = XA.Utils.vecToBlockLocation(ctx.sender.location);
+		const pos1 = XA.Utils.floorVector(ctx.sender.location);
 		const pos2 = pos1.offset(3, 3, 3);
 		const cube = new Cuboid(pos1, pos2);
 		const { xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin } =
 			cube;
 		const end1 = benchmark("safeBlocksForOF");
-		for (const { x, y, z } of XA.Utils.safeBlocksBetween(pos1, pos2, false)) {
+		for (const { x, y, z } of XA.Utils.safeBlocksBetween(pos1, pos2)) {
 			const q =
 				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
 				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
@@ -306,13 +304,13 @@ const tests = {
 			if (q)
 				ctx.sender.dimension.spawnParticle(
 					"minecraft:endrod",
-					new Location(x, y, z),
+					{ x: x, y: y, z: z },
 					new MolangVariableMap()
 				);
 		}
 		end1();
 		const end2 = benchmark("safeBlocksWhile");
-		const gen = XA.Utils.safeBlocksBetween(pos1, pos2, false);
+		const gen = XA.Utils.safeBlocksBetween(pos1, pos2);
 		let val;
 		while (!val?.done) {
 			val = gen.next();
@@ -326,7 +324,7 @@ const tests = {
 			if (q)
 				ctx.sender.dimension.spawnParticle(
 					"minecraft:endrod",
-					new Location(x, y, z),
+					{ x: x, y: y, z: z },
 					new MolangVariableMap()
 				);
 		}
@@ -377,13 +375,13 @@ const tests = {
 		world.say(
 			toStr(
 				XA.dimensions.overworld.getEntities({
-					location: new Location(12, 23, 1),
+					location: { x: 12, y: 23, z: 1 },
 				})
 			)
 		);
 	},
 	30(ctx) {
-		const pos1 = XA.Utils.vecToBlockLocation(ctx.sender.location);
+		const pos1 = XA.Utils.floorVector(ctx.sender.location);
 		const pos2 = pos1.offset(0, -1, 0);
 		const block = ctx.sender.dimension.getBlock(pos2);
 

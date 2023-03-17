@@ -1,4 +1,4 @@
-import { Location, Player, Vector, world } from "@minecraft/server";
+import { Player, Vector, world } from "@minecraft/server";
 
 import { toStr } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
@@ -48,7 +48,7 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 					break;
 				}
 			}
-		const b = world.getDimension("overworld").getBlockFromRay(new Location(x, 320, z), new Vector(0, -220, 0));
+		const b = world.getDimension("overworld").getBlockFromRay({ x: x, 320, z), new Vector(0, y: -220, z: 0) };
 		if (b && b.location.y >= 63) {
 			y = b.location.y + 1;
 			break;
@@ -59,6 +59,6 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 		y = 100;
 		player.runCommandAsync("effect @s slow_falling 20 1 true");
 	}
-	player.teleport(new Location(x, y, z), world.getDimension("overworld"), 0, 90, false);
+	player.teleport({ x: x, y, z), world.getDimension("overworld"), 0, y: 90, z: false };
 	return { x: x, y: y, z: z };
 }

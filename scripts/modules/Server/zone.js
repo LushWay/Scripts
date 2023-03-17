@@ -1,4 +1,4 @@
-import { Location, MolangVariableMap, Player, world } from "@minecraft/server";
+import { MolangVariableMap, Player, world } from "@minecraft/server";
 import { setTickInterval, XA } from "../../xapi.js";
 import { Atp } from "./portals.js";
 import { global } from "./var.js";
@@ -19,8 +19,15 @@ function ret(player, isX, zone, plus) {
 		? [zone.x + (plus ? 1 : -1), player.location.y, player.location.z]
 		: [player.location.x, player.location.y, zone.z + (plus ? 1 : -1)];
 
-	player.teleport({ x: loc[1], y: loc[2], z: loc[3] }, player.dimension, player.rotation.x, player.rotation.y);
-	player.onScreenDisplay.setActionBar(`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? "x" : "z"}`);
+	player.teleport(
+		{ x: loc[1], y: loc[2], z: loc[3] },
+		player.dimension,
+		player.rotation.x,
+		player.rotation.y
+	);
+	player.onScreenDisplay.setActionBar(
+		`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? "x" : "z"}`
+	);
 }
 /**
  *
@@ -29,13 +36,23 @@ function ret(player, isX, zone, plus) {
  * @param {{x: number, z: number}} zone
  */
 function pret(player, isX, zone) {
-	const floored = XA.Utils.vecToBlockLocation(player.location);
-	const l = isX ? [zone.x, floored.y + 1, floored.z] : [floored.x, floored.y + 1, zone.z];
+	const floored = XA.Utils.floorVector(player.location);
+	const l = isX
+		? [zone.x, floored.y + 1, floored.z]
+		: [floored.x, floored.y + 1, zone.z];
 
-	const loc = new Location(l[0], l[1], l[2]);
+	const loc = { x: l[0], y: l[1], z: l[2] };
 
-	player.dimension.spawnParticle("minecraft:falling_border_dust_particle", loc, new MolangVariableMap());
-	player.dimension.spawnParticle("minecraft:rising_border_dust_particle", loc, new MolangVariableMap());
+	player.dimension.spawnParticle(
+		"minecraft:falling_border_dust_particle",
+		loc,
+		new MolangVariableMap()
+	);
+	player.dimension.spawnParticle(
+		"minecraft:rising_border_dust_particle",
+		loc,
+		new MolangVariableMap()
+	);
 }
 
 setTickInterval(
@@ -57,13 +74,17 @@ setTickInterval(
 		for (const p of players) {
 			const rmax = { x: center[0] + rad, z: center[1] + rad };
 			const rmin = { x: center[0] - rad, z: center[1] - rad };
-			const l = XA.Utils.vecToBlockLocation(p.location);
+			const l = XA.Utils.floorVector(p.location);
 
 			const xtrue = inRange(l.x, rmin.x, rmax.x);
 			const ztrue = inRange(l.z, rmin.z, rmax.z);
 
 			if (xtrue && ztrue) {
-				if (XA.Entity.getScore(p, "inv") !== 2 && !p.hasTag("saving") && !p.hasTag("br:ded")) {
+				if (
+					XA.Entity.getScore(p, "inv") !== 2 &&
+					!p.hasTag("saving") &&
+					!p.hasTag("br:ded")
+				) {
 					Atp(p, "anarch", { pvp: true });
 				} else continue;
 			}
@@ -74,10 +95,12 @@ setTickInterval(
 			if (l.z >= rmax.z && l.z <= rmax.z + 10 && xtrue) ret(p, false, rmax);
 			if (l.z >= rmax.z - 10 && l.z <= rmax.z && xtrue) pret(p, false, rmax);
 
-			if (l.x <= rmin.x && l.x >= rmin.x - 10 && ztrue) ret(p, true, rmin, true);
+			if (l.x <= rmin.x && l.x >= rmin.x - 10 && ztrue)
+				ret(p, true, rmin, true);
 			if (l.x <= rmin.x + 10 && l.x >= rmin.x && ztrue) pret(p, true, rmin);
 
-			if (l.z <= rmin.z && l.z >= rmin.z - 10 && xtrue) ret(p, false, rmin, true);
+			if (l.z <= rmin.z && l.z >= rmin.z - 10 && xtrue)
+				ret(p, false, rmin, true);
 			if (l.z <= rmin.z + 10 && l.z >= rmin.z && xtrue) pret(p, false, rmin);
 		}
 	},

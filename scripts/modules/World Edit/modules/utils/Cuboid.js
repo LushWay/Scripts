@@ -5,8 +5,6 @@
  * @property {number} z - The max Width of a chunk
  */
 
-import { BlockLocation } from "@minecraft/server";
-
 export class Cuboid {
 	/**
 	 *
@@ -14,8 +12,8 @@ export class Cuboid {
 	 * @param {Vector3} pos2
 	 */
 	constructor(pos1, pos2) {
-		this.pos1 = new BlockLocation(pos1.x, pos1.y, pos1.z);
-		this.pos2 = new BlockLocation(pos2.x, pos2.y, pos2.z);
+		this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z };
+		this.pos2 = { x: pos2.x, y: pos2.y, z: pos2.z };
 
 		this.xMin = Math.min(this.pos1.x, this.pos2.x);
 		this.yMin = Math.min(this.pos1.y, this.pos2.y);

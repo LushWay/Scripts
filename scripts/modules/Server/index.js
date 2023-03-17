@@ -60,7 +60,7 @@ setTickInterval(
 			// 	} catch (e) {}
 			let a = [...world.getPlayers()].find((e) => e.name == XA.Entity.getTagStartsWith(f, "l:"));
 			if (a) stats.fireworksExpoded.eAdd(a, 1);
-			f.dimension.createExplosion(new Location(f.location.x, f.location.y, f.location.z), type, boom);
+			f.dimension.createExplosion({ x: f.location.x, f.location.y, f.location.z), y: type, z: boom };
 			f.kill();
 			boom.breaksBlocks = false;
 		}
@@ -203,7 +203,7 @@ setTickInterval(
 // 				.getDimension("overworld")
 // 				.spawnParticle(
 // 					lore[1],
-// 					new Location(block.location.x + 0.5, block.location.y + 1.5, block.location.z + 0.5),
+// 					{ x: block.location.x + 0.5, y: block.location.y + 1.5, z: block.location.z + 0.5 },
 // 					new MolangVariableMap()
 // 				);
 // 		}

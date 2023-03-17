@@ -22,7 +22,7 @@ setTickInterval(
 	async () => {
 		CONTAINER_LOCATIONS = {};
 		for (const player of world.getPlayers()) {
-			const blockLoc = XA.Utils.vecToBlockLocation(player.location);
+			const blockLoc = XA.Utils.floorVector(player.location);
 			const pos1 = blockLoc.offset(CHECK_SIZE.x, CHECK_SIZE.y, CHECK_SIZE.z);
 			const pos2 = blockLoc.offset(-CHECK_SIZE.x, -CHECK_SIZE.y, -CHECK_SIZE.z);
 
@@ -30,7 +30,9 @@ setTickInterval(
 				if (location.y < -64) continue;
 				const block = player.dimension.getBlock(location);
 				if (!BLOCK_CONTAINERS.includes(block.typeId)) continue;
-				CONTAINER_LOCATIONS[locationToKey(location)] = new BlockInventory(block.getComponent("inventory").container);
+				CONTAINER_LOCATIONS[locationToKey(location)] = new BlockInventory(
+					block.getComponent("inventory").container
+				);
 			}
 		}
 	},

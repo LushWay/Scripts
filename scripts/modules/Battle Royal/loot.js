@@ -1,4 +1,4 @@
-import { BlockLocation, ItemStack, Location, MinecraftBlockTypes, Vector, world } from "@minecraft/server";
+import { ItemStack, MinecraftBlockTypes, Vector, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
 
@@ -35,9 +35,9 @@ export class LootChest {
 				includePassableBlocks: false,
 				maxDistance: 100,
 			};
-			const b = world.getDimension("overworld").getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
+			const b = world.getDimension("overworld").getBlockFromRay({ x: x, 320, z), new Vector(0, y: -1, z: 0) };
 			if (b && b.location.y >= 50) {
-				block = b.dimension.getBlock(new BlockLocation(b.location.x, b.location.y + 1, b.location.z));
+				block = b.dimension.getBlock({ x: b.location.x, y: b.location.y + 1, z: b.location.z) };
 				break;
 			}
 		}

@@ -1,9 +1,4 @@
-import {
-	BlockLocation,
-	GameMode,
-	MinecraftBlockTypes,
-	world,
-} from "@minecraft/server";
+import { GameMode, MinecraftBlockTypes, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 import { handle, IS, setTickInterval, sleep, XA } from "xapi.js";
 
@@ -17,7 +12,7 @@ let time = Options.time;
 
 GameTest.registerAsync("s", "s", async (test) => {
 	world.say(`На игры с ботиком даю вам ${time} тиков`);
-	const spawnLoc = new BlockLocation(1, 5, 1);
+	const spawnLoc = { x: 1, y: 5, z: 1 };
 	const player = test.spawnSimulatedPlayer(spawnLoc, name);
 
 	const end = setTickInterval(
@@ -42,14 +37,11 @@ const cmd = new XA.Command({
 	requires: (p) => IS(p.id, "admin"),
 	type: "test",
 }).executes(async (ctx) => {
-	const o = world
-		.getDimension("overworld")
-		.getBlock(new BlockLocation(10, 63, 13));
+	const o = world.getDimension("overworld").getBlock({ x: 10, y: 63, z: 13 });
 	o.setType(MinecraftBlockTypes.redstoneBlock);
 	await sleep(10);
 	console.log(
-		world.getDimension("overworld").getBlock(new BlockLocation(10, 63, 13))
-			.typeId
+		world.getDimension("overworld").getBlock({ x: 10, y: 63, z: 13 }).typeId
 	);
 	XA.runCommandX(`tp "${name}" "${ctx.sender.name}"`);
 	// ctx.sender.runCommandAsync("gametest runthis");
@@ -75,7 +67,7 @@ GameTest.registerAsync("s", "m", async (test) => {
 	let succeed = false;
 	for (let e = 0; e < 5; e++) {
 		const player = test.spawnSimulatedPlayer(
-			new BlockLocation(-1, 3, -1),
+			{ x: -1, y: 3, z: -1 },
 			"Tester (" + e + ")",
 			GameMode.adventure
 		);
@@ -95,7 +87,7 @@ GameTest.registerAsync("s", "m", async (test) => {
 				await test.idle(20);
 				// player.stopMoving();
 				// world.say(toStr(net.location));
-				// player.moveToLocation(new Location(net.location.x, net.location.y, net.location.z), 1);
+				// player.moveToLocation({ x: net.location.x, net.location.y, y: net.location.z), z: 1 };
 				// await test.idle(rd(30, 10));
 				// player.attackEntity(net);
 			}

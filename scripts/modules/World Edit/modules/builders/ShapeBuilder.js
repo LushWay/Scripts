@@ -42,7 +42,7 @@ export class Shape {
 		const loc1 = { x: -this.rad, y: -this.rad, z: -this.rad };
 		const loc2 = { x: this.rad, z: this.rad, y: this.rad };
 
-		for (const { x, y, z } of XA.Utils.safeBlocksBetween(loc1, loc2, false)) {
+		for (const { x, y, z } of XA.Utils.safeBlocksBetween(loc1, loc2)) {
 			if (!this.condition(x, y, z)) continue;
 			const location = new BlockLocation(
 				this.pos.x + x,
@@ -85,8 +85,8 @@ export class spawn {
 		this.r = remove;
 
 		WorldEditBuild.backup(
-			new BlockLocation(this.x1, -64, this.z1),
-			new BlockLocation(this.x2, -64, this.z2)
+			{ x: this.x1, y: -64, z: this.z1 },
+			{ x: this.x2, y: -64, z: this.z2 }
 		);
 
 		try {
@@ -109,7 +109,7 @@ export class spawn {
 		for (let x = v.xmin; x <= v.xmax; x++) {
 			for (let z = v.zmin; z <= v.zmax; z++) {
 				DIMENSIONS.overworld
-					.getBlock(new BlockLocation(x, -64, z))
+					.getBlock({ x: x, y: -64, z: z) }
 					.setType(
 						MinecraftBlockTypes.get(
 							!this.r ? "minecraft:deny" : "minecraft:bedrock"

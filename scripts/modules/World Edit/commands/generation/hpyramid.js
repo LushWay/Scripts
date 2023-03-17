@@ -1,4 +1,3 @@
-import { BlockLocation } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 import { Shape } from "../../modules/builders/ShapeBuilder.js";
 //import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
@@ -14,7 +13,13 @@ new XA.Command({
 	const size = parseInt(ctx.args[1]);
 	if (!blocks) return ctx.reply("§c" + blocks);
 	if (!size) return ctx.reply("§c" + size);
-	const location = new BlockLocation(ctx.sender.location.x, ctx.sender.location.y, ctx.sender.location.z);
+	const location = {
+		x: ctx.sender.location.x,
+		y: ctx.sender.location.y,
+		z: ctx.sender.location.z,
+	};
 	new Shape(SHAPES.square_pyramid, location, blocks, size);
-	ctx.reply(`Generated a Hollow Pyramid at ${location.x} ${location.y}${location.z}`);
+	ctx.reply(
+		`Generated a Hollow Pyramid at ${location.x} ${location.y}${location.z}`
+	);
 });

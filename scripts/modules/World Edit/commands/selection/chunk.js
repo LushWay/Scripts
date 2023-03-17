@@ -1,4 +1,4 @@
-import { BlockLocation, Entity } from "@minecraft/server";
+import { Entity } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
@@ -21,7 +21,7 @@ function getCurrentChunk(entity) {
  */
 function getChunkCuboidPositions(entity) {
 	const chunk = getCurrentChunk(entity);
-	const pos1 = new BlockLocation(chunk.x * 16, -63, chunk.z * 16);
+	const pos1 = { x: chunk.x * 16, y: -63, z: chunk.z * 16 };
 	const pos2 = pos1.offset(16, 383, 16);
 	return {
 		pos1: pos1,

@@ -1,4 +1,9 @@
-import { BlockLocation, Entity, InventoryComponentContainer, ItemStack, Location, world } from "@minecraft/server";
+import {
+	Entity,
+	InventoryComponentContainer,
+	ItemStack,
+	world,
+} from "@minecraft/server";
 import { XA } from "../../xapi.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
@@ -16,9 +21,8 @@ import { DIMENSIONS } from "../List/dimensions.js";
 
 /**
  * Where the entity is going to be at
- * @type {Location}
  */
-const ENTITY_LOCATION = new Location(0, 0, 0);
+const ENTITY_LOCATION = { x: 0, y: 0, z: 0 };
 
 DIMENSIONS.overworld.runCommandAsync("tickingarea add 0 0 0 0 0 0 ItemDB true");
 
@@ -101,11 +105,17 @@ export class XItemDatabase {
 		if (!entity) {
 			world
 				.getDimension("overworld")
-				.getEntitiesAtBlockLocation(new BlockLocation(ENTITY_LOCATION.x, ENTITY_LOCATION.y, ENTITY_LOCATION.z))
-				?.find((e) => e.typeId == ENTITY_DATABSE_ID && e.getTags().includes(this.TABLE_NAME))
+				.getEntitiesAtBlockLocation(ENTITY_LOCATION)
+				?.find(
+					(e) =>
+						e.typeId == ENTITY_DATABSE_ID &&
+						e.getTags().includes(this.TABLE_NAME)
+				)
 				?.triggerEvent("despawn");
 			try {
-				entity = world.getDimension("overworld").spawnEntity(ENTITY_DATABSE_ID, ENTITY_LOCATION);
+				entity = world
+					.getDimension("overworld")
+					.spawnEntity(ENTITY_DATABSE_ID, ENTITY_LOCATION);
 				entity.addTag(this.TABLE_NAME);
 			} catch (eee) {
 				console.warn(eee);
@@ -119,7 +129,9 @@ export class XItemDatabase {
 						world.events.entitySpawn.unsubscribe(e);
 					}
 				});
-				DIMENSIONS.overworld.runCommandAsync(`summon ${ENTITY_DATABSE_ID} 0 0 0`);
+				DIMENSIONS.overworld.runCommandAsync(
+					`summon ${ENTITY_DATABSE_ID} 0 0 0`
+				);
 			}
 		}
 		/**

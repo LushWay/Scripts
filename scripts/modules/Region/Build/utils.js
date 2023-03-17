@@ -1,5 +1,4 @@
 import {
-	BlockLocation,
 	MinecraftBlockTypes,
 	MinecraftDimensionTypes,
 	Player,
@@ -18,11 +17,12 @@ const squarePlace = -55;
  * @param {Region} region
  */
 export function teleportToRegion(player, region) {
+	const rotation = player.getRotation();
 	player.teleport(
 		{ x: region.from.x, y: squarePlace + 3, z: region.from.z },
 		XA.dimensions.overworld,
-		player.rotation.x,
-		player.rotation.y
+		rotation.x,
+		rotation.y
 	);
 }
 
@@ -70,7 +70,7 @@ export async function ClearRegion(player, Pregion) {
 	const blocks = XA.Utils.getBlocksCount(loc1, loc2);
 
 	let c = 0;
-	const e = XA.Utils.safeBlocksBetween(loc1, loc2, true);
+	const e = XA.Utils.safeBlocksBetween(loc1, loc2);
 	for (const loc of e) {
 		c++;
 		if (c % 500 === 0 || c === 0) await sleep(0);
@@ -132,18 +132,17 @@ export function getBlocksCount(loc1, loc2) {
  * @param {IRegionCords} to
  */
 export async function fillRegion(from, to) {
-	const firstLoc = new BlockLocation(from.x, squarePlace, from.z);
-	const secondLoc = new BlockLocation(to.x, squarePlace, to.z);
+	const firstLoc = { x: from.x, y: squarePlace, z: from.z };
+	const secondLoc = { x: to.x, y: squarePlace, z: to.z };
 	const exec = createWaiter(10);
 	for (const loc of XA.Utils.safeBlocksBetween(
 		firstLoc.above(),
-		secondLoc.above(),
-		true
+		secondLoc.above()
 	)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
 	}
-	for (const loc of XA.Utils.safeBlocksBetween(firstLoc, secondLoc, true)) {
+	for (const loc of XA.Utils.safeBlocksBetween(firstLoc, secondLoc)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
 	}
@@ -189,7 +188,7 @@ export async function findFreePlace() {
 		if (tries >= 20) await sleep(1), (tries = 0);
 
 		const alreadyExist = Region.blockLocationInRegion(
-			new BlockLocation(center.x, 0, center.z),
+			{ x: center.x, y: 0, z: center.z },
 			MinecraftDimensionTypes.overworld
 		);
 

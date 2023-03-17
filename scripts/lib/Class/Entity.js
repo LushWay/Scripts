@@ -1,8 +1,6 @@
 import {
-	BlockLocation,
 	Entity,
 	ItemStack,
-	Location,
 	Player,
 	PlayerInventoryComponentContainer,
 	world,
@@ -53,16 +51,18 @@ export const XEntity = {
 	 */
 	getAtPos({ x, y, z }, dimension = "overworld") {
 		try {
-			return DIMENSIONS[dimension].getEntitiesAtBlockLocation(
-				new BlockLocation(x, y, z)
-			);
+			return DIMENSIONS[dimension].getEntitiesAtBlockLocation({
+				x: x,
+				y: y,
+				z: z,
+			});
 		} catch (error) {
 			return [];
 		}
 	},
 	/**
 	 * Returns a location of the inputed aguments
-	 * @param {{location: Location | Vector3}} entity your using
+	 * @param {{location: Vector3}} entity your using
 	 * @param {number} [n] how many you want to get
 	 * @param {number} [maxDistance] max distance away
 	 * @param {string} [type] type of entity you want to get
@@ -70,12 +70,11 @@ export const XEntity = {
 	 * @example getClosetsEntitys(Entity, n=1, maxDistance = 10, type = Entity.type)
 	 */
 	getClosetsEntitys(entity, maxDistance = null, type, n = 2, shift = true) {
+		/**
+		 * @type {import("@minecraft/server").EntityQueryOptions}
+		 */
 		let q = {};
-		q.location = new Location(
-			entity.location.x,
-			entity.location.y,
-			entity.location.z
-		);
+		q.location = entity.location;
 		if (n) q.closest = n;
 		if (type) q.type = type;
 
@@ -192,18 +191,6 @@ export const XEntity = {
 		} catch (error) {}
 	},
 
-	/**
-	 * Converts a location to a block location
-	 * @param {Vector3} loc a location to convert
-	 * @returns {BlockLocation}
-	 */
-	vecToBlockLocation(loc) {
-		return new BlockLocation(
-			Math.floor(loc.x),
-			Math.floor(loc.y),
-			Math.floor(loc.z)
-		);
-	},
 	/**
 	 * Despawns a entity
 	 * @param {Entity} entity entity to despawn

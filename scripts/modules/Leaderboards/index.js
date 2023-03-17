@@ -1,4 +1,4 @@
-import { Entity, world } from "@minecraft/server";
+import { world } from "@minecraft/server";
 import { setTickInterval, XA } from "xapi.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 import "./commands.js";
@@ -80,7 +80,7 @@ export const LeaderboardBuild = {
 		LB_DB.set(objective, data);
 		let entity = world
 			.getDimension(dimension)
-			.spawnEntity(LEADERBOARD_ID, XA.Utils.vecToBlockLocation(location));
+			.spawnEntity(LEADERBOARD_ID, XA.Utils.floorVector(location));
 
 		entity.nameTag = "Updating...";
 		entity.addTag(LEADERBOARD_TAG);

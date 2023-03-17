@@ -1,7 +1,9 @@
-import { Player, world } from "@minecraft/server";
+import { ItemLockMode, ItemStack, Player, world } from "@minecraft/server";
 import { handle, XA } from "xapi.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { CONFIG_MENU } from "./var.js";
+
+CONFIG_MENU.menu ??= defaultmenu;
 
 /**
  *
@@ -9,7 +11,12 @@ import { CONFIG_MENU } from "./var.js";
  * @returns
  */
 function defaultmenu(player) {
-	const e = new ActionForm("Пустое меню", "Кодер его еще не сделал").addButton("Да", null, () => void 0);
+	const e = new ActionForm("Пустое меню", "Кодер его еще не сделал").addButton(
+		"Да",
+		null,
+		() => void 0
+	);
+
 	return e;
 }
 
@@ -31,7 +38,14 @@ new XA.Command({
 		ctx.sender.runCommandAsync(`clear @s ${CONFIG_MENU.itemId}`);
 		ctx.reply("§c- §3Меню");
 	} else {
-		ctx.sender.runCommandAsync(`give @s ${CONFIG_MENU.itemId} 1 0 {"item_lock":{"mode":"lock_in_inventory"}}`);
+		const item = new ItemStack(CONFIG_MENU.itemId);
+		item.lockMode = ItemLockMode.inventory;
+		item.setLore([
+			"Для открытия возьми в руку и",
+			"зажми на телефоне, лкм на пк",
+		]);
+
+		ctx.sender.getComponent("inventory").container.addItem(item);
 		ctx.reply("§a+ §3Меню");
 	}
 });

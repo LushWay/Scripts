@@ -1,4 +1,4 @@
-import { Location, Player, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { DisplayError, getRole, T_roles, XA } from "xapi.js";
 import { CONFIG } from "../../config.js";
 
@@ -48,11 +48,7 @@ world.events.beforeChat.subscribe((data) => {
 
 		const nearPlayers = [
 			...data.sender.dimension.getEntities({
-				location: new Location(
-					data.sender.location.x,
-					data.sender.location.y,
-					data.sender.location.z
-				),
+				location: data.sender.location,
 				maxDistance: options.range,
 				type: "minecraft:player",
 			}),

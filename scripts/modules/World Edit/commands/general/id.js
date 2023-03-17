@@ -1,4 +1,3 @@
-import { world } from "@minecraft/server";
 import { IS, toStr, XA } from "xapi.js";
 
 const root = new XA.Command({
@@ -11,32 +10,43 @@ const root = new XA.Command({
 root.executes((ctx) => {
 	const item = XA.Entity.getHeldItem(ctx.sender);
 	if (!item) return ctx.reply("§cВ руке нет предмета!");
-	ctx.reply(`§b► §f${item?.typeId.replace("minecraft:", "")} ${item?.data} ${item?.nameTag ? item?.nameTag : ""}`);
+	ctx.reply(
+		`§b► §f${item?.typeId.replace("minecraft:", "")} ${item?.data} ${
+			item?.nameTag ? item?.nameTag : ""
+		}`
+	);
 });
 
 root
 	.literal({ name: "l", description: "Выдает id блока по локации" })
 	.location("location", true)
 	.executes((ctx, location) => {
-		const l = XA.Utils.vecToBlockLocation(location);
+		const l = XA.Utils.floorVector(location);
 		const block = ctx.sender.dimension.getBlock(l);
 		if (!block) return ctx.reply("§cНет блока!");
-		ctx.reply(`§b► §f${block.typeId.replace("minecraft:", "")} §6${XA.Utils.getBlockData(block)}`);
+		ctx.reply(
+			`§b► §f${block.typeId.replace(
+				"minecraft:",
+				""
+			)} §6${XA.Utils.getBlockData(block)}`
+		);
 	});
 
 root
 	.literal({ name: "p", description: "Выдает все properties блока по локации" })
 	.location("location", true)
 	.executes((ctx, location) => {
-		const l = XA.Utils.vecToBlockLocation(location);
+		const l = XA.Utils.floorVector(location);
 		const block = ctx.sender.dimension.getBlock(l);
 		if (!block) return ctx.reply("§cНет блока!");
 		ctx.reply(toStr(block.permutation.getAllProperties()));
 	});
 
-root.literal({ name: "r", description: "Выдает наклон головы" }).executes((ctx) => {
-	ctx.reply(`§a► §f${ctx.sender.rotation.x} ${ctx.sender.rotation.y}`);
-});
+root
+	.literal({ name: "r", description: "Выдает наклон головы" })
+	.executes((ctx) => {
+		ctx.reply(`§a► §f${ctx.sender.rotation.x} ${ctx.sender.rotation.y}`);
+	});
 
 // root.literal({ name: "c", description: "очсищ" }).executes((ctx) => {
 // 	const tag = XA.Entity.getTagStartsWith(ctx.sender, "st:");

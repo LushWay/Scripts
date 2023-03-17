@@ -1,12 +1,9 @@
 import {
-	BlockLocation,
-	ItemStack,
-	Location,
-	MinecraftBlockTypes,
-	MinecraftItemTypes,
-	Player,
-	Vector,
-	world,
+    ItemStack, MinecraftBlockTypes,
+    MinecraftItemTypes,
+    Player,
+    Vector,
+    world
 } from "@minecraft/server";
 import { DisplayError, IS, sleep, XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
@@ -110,10 +107,10 @@ class inventory {
 		this.save = [];
 		this.structureName = "i:$name";
 		this.savezones = [
-			new BlockLocation(20, -62, 20),
-			new BlockLocation(24, -62, 20),
-			new BlockLocation(26, -62, 20),
-			new BlockLocation(28, -62, 20),
+			{ x: 20, y: -62, z: 20 },
+			{ x: 24, y: -62, z: 20 },
+			{ x: 26, y: -62, z: 20 },
+			{ x: 28, y: -62, z: 20 },
 		];
 		this.fillblocks = {
 			air: [
@@ -149,13 +146,13 @@ class inventory {
 		this.fillblocks.bedrock.forEach((e) => {
 			world
 				.getDimension("overworld")
-				.getBlock(new BlockLocation(bl.x + e.x, bl.y + e.y, bl.z + e.z))
+				.getBlock({ x: bl.x + e.x, y: bl.y + e.y, z: bl.z + e.z) }
 				.setType(MinecraftBlockTypes.bedrock);
 		});
 		this.fillblocks.air.forEach((e) => {
 			world
 				.getDimension("overworld")
-				.getBlock(new BlockLocation(bl.x + e.x, bl.y + e.y, bl.z + e.z))
+				.getBlock({ x: bl.x + e.x, y: bl.y + e.y, z: bl.z + e.z) }
 				.setType(MinecraftBlockTypes.air);
 		});
 	}
@@ -177,7 +174,7 @@ class inventory {
 		if (!zone) return world.say("§cError");
 		this.#setZone(zone);
 		pl.teleport(
-			new Location(zone.x, zone.y, zone.z),
+			{ x: zone.x, y: zone.y, z: zone.z },
 			world.getDimension("overworld"),
 			0,
 			0,
@@ -239,7 +236,7 @@ class inventory {
 			if (!zone) return world.say("§cError");
 			this.#setZone(zone);
 			pl.teleport(
-				new Location(zone.x, zone.y, zone.z),
+				{ x: zone.x, y: zone.y, z: zone.z },
 				world.getDimension("overworld"),
 				0,
 				0,
@@ -319,7 +316,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		getPos ? (pos = getPos) : (rtp = true);
 		if (currentInventory == invs.anarch && !rtp) return;
 	} else if (place === "currentpos") {
-		const l = XA.Utils.vecToBlockLocation(player.location);
+		const l = XA.Utils.floorVector(player.location);
 		pos = l.x + " " + l.y + " " + l.z;
 	}
 	if (rtp) {
@@ -345,7 +342,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
 			const b = world
 				.getDimension("overworld")
-				.getBlockFromRay(new Location(x, 320, z), new Vector(0, -1, 0));
+				.getBlockFromRay({ x: x, 320, z), new Vector(0, y: -1, z: 0) };
 			if (b && b.location.y >= 63) {
 				y = b.location.y + 1;
 				break;
@@ -367,7 +364,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	}
 
 	if (currentInventory == invs.anarch) {
-		const l = XA.Utils.vecToBlockLocation(player.location);
+		const l = XA.Utils.floorVector(player.location);
 		XA.tables.player.set("POS:" + player.id, l.x + " " + l.y + " " + l.z);
 	}
 	const inve = XA.Entity.getI(player);
@@ -432,7 +429,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 // 	data.cancel = true;
 // 	const ent = data.entity.dimension.spawnEntity(
 // 		"t:hpper_minecart",
-// 		new Location(data.entity.location.x, data.entity.location.y + 0.2, data.entity.location.z)
+// 		{ x: data.entity.location.x, y: data.entity.location.y + 0.2, z: data.entity.location.z }
 // 	);
 // 	//TODO! FIX
 // 	// try {
@@ -443,7 +440,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 // 	// }
 // 	data.entity.dimension.spawnEntity(
 // 		"f:t",
-// 		new Location(ent.location.x, ent.location.y, ent.location.z)
+// 		{ x: ent.location.x, y: ent.location.y, z: ent.location.z }
 // 	).nameTag = `§6-=[§f${data.entity.nameTag}§6]=-`;
 // });
 // world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
@@ -481,7 +478,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 // 	);
 // 	setTickTimeout(
 // 		() => {
-// 			c.teleport(new Location(0, -64, 0), c.dimension, 0, 0);
+// 			c.teleport({ x: 0, y: -64, z: 0 }, c.dimension, 0, 0);
 // 			c.triggerEvent("kill");
 // 		},
 // 		25,
@@ -555,7 +552,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe(
 		const to = world
 			.getDimension(data.entity.dimension.id)
 			.getBlock(
-				XA.Utils.vecToBlockLocation(data.entity.location).offset(0, -3, 0)
+				XA.Utils.floorVector(data.entity.location).offset(0, -3, 0)
 			);
 		if (to.typeId !== "minecraft:chest") return;
 		const toi = to.getComponent("inventory").container;
@@ -583,7 +580,7 @@ new XA.Command({
 	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Utils.vecToBlockLocation(pos ?? ctx.sender.location);
+		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("spawn:pos", rl);
@@ -602,7 +599,7 @@ new XA.Command({
 	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Utils.vecToBlockLocation(pos ?? ctx.sender.location);
+		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("minigames:pos", rl);
@@ -620,7 +617,7 @@ new XA.Command({
 	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Utils.vecToBlockLocation(pos ?? ctx.sender.location);
+		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("anarch:pos", rl);
@@ -637,16 +634,16 @@ new XA.Command({
 		let item = new ItemStack(MinecraftItemTypes.grayCandle, 1, 0);
 		item.setLore(ctx.args);
 		const block = ctx.sender.dimension.getBlock(
-			XA.Utils.vecToBlockLocation(ctx.sender.location).offset(0, -4, 0)
+			XA.Utils.floorVector(ctx.sender.location).offset(0, -4, 0)
 		);
 		block.setType(MinecraftBlockTypes.chest);
 		block.getComponent("inventory").container.setItem(0, item);
-		const loc = XA.Utils.vecToBlockLocation(ctx.sender.location).offset(
+		const loc = XA.Utils.floorVector(ctx.sender.location).offset(
 			0,
 			1,
 			0
 		);
-		const l = new Location(loc.x + 0.5, loc.y, loc.z + 0.5);
+		const l = { x: loc.x + 0.5, y: loc.y, z: loc.z + 0.5 };
 
 		ctx.sender.teleport(
 			l,

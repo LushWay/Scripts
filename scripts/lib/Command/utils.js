@@ -46,9 +46,9 @@ export function commandNotFound(player, command) {
 	const cmds = new Set();
 
 	for (const c of XCommand.COMMANDS) {
-		cmds.add(c.data.name);
-		if (c.data.aliases?.length > 0) {
-			c.data.aliases.forEach((e) => cmds.add(e));
+		cmds.add(c.sys.data.name);
+		if (c.sys.data.aliases?.length > 0) {
+			c.sys.data.aliases.forEach((e) => cmds.add(e));
 		}
 	}
 	let search = inaccurateSearch(command, [...cmds.values()]);
@@ -85,9 +85,9 @@ export function noPerm(player, command) {
 	player.tell({
 		rawtext: [
 			{
-				text: command.data.invaildPermission
-					? command.data.invaildPermission
-					: `§cУ вас нет разрешения для использования команды §f${command.data.name}`,
+				text: command.sys.data.invaildPermission
+					? command.sys.data.invaildPermission
+					: `§cУ вас нет разрешения для использования команды §f${command.sys.data.name}`,
 			},
 		],
 	});
@@ -110,7 +110,7 @@ export function commandSyntaxFail(player, command, args, i) {
 			{
 				translate: `commands.generic.syntax`,
 				with: [
-					`${CONFIG.commandPrefix}${command.data.name} ${args
+					`${CONFIG.commandPrefix}${command.sys.data.name} ${args
 						.slice(0, i)
 						.join(" ")}`,
 					args[i] ?? " ",
@@ -125,13 +125,12 @@ export function commandSyntaxFail(player, command, args, i) {
  * Returns a location of the inputed aguments
  * @example parseLocationAugs(["~1", "3", "^7"], { location: [1,2,3] , viewVector: [1,2,3] })
  * @param {[x: string, y: string, z: string]} a0
- * @param {{ location: Vector3; viewDirection: Vector3 }} a1
+ * @param {{ location: Vector3; getViewDirection(): Vector3 }} data
  * @returns {{x: number, y: number, z: number}}
  */
-export function parseLocationAugs(
-	[x, y, z],
-	{ location, viewDirection: viewVector }
-) {
+export function parseLocationAugs([x, y, z], data) {
+	const { location } = data;
+	const viewVector = data.getViewDirection();
 	if (typeof x !== "string" || typeof y !== "string" || typeof z !== "string")
 		return null;
 	const locations = [location.x, location.y, location.z];
@@ -161,8 +160,8 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 	const lastArg = args[args.length - 1] ?? baseCommand;
 	const argsToReturn = [];
 	for (const [i, arg] of args.entries()) {
-		if (arg.type.name.endsWith("*")) continue;
-		if (arg.type instanceof LocationArgumentType) {
+		if (arg.sys.type.name.endsWith("*")) continue;
+		if (arg.sys.type instanceof LocationArgumentType) {
 			argsToReturn.push(
 				parseLocationAugs(
 					[cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]],
@@ -171,13 +170,14 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 			);
 			continue;
 		}
-		if (arg.type instanceof LiteralArgumentType) continue;
-		argsToReturn.push(arg.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
+		if (arg.sys.type instanceof LiteralArgumentType) continue;
+		argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
 	}
-	if (typeof lastArg.callback !== "function")
+	if (typeof lastArg.sys.callback !== "function")
 		return event.sender.tell("§cУпс, эта команда пока не работает.");
 	handle(
-		() => lastArg.callback(new CommandContext(event, cmdArgs), ...argsToReturn),
+		() =>
+			lastArg.sys.callback(new CommandContext(event, cmdArgs), ...argsToReturn),
 		"Command"
 	);
 }

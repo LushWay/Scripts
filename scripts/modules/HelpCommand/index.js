@@ -8,7 +8,7 @@ import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
  */
 function childrensToHelpText(command) {
 	const _ = [];
-	for (const children of command.children) {
+	for (const children of command.sys.children) {
 		if (children.children.length < 1) _.push(children);
 		else _.push(...childrensToHelpText(children));
 	}
@@ -25,14 +25,14 @@ function getParentType(command, init = true) {
 
 	let description;
 
-	if (init && command.data.description) {
-		description = command.data.description;
+	if (init && command.sys.data.description) {
+		description = command.sys.data.description;
 		init = false;
 	}
 
-	if (command.depth === 0) return [curtype, description];
+	if (command.sys.depth === 0) return [curtype, description];
 	else {
-		const parents = getParentType(command.parent, init);
+		const parents = getParentType(command.sys.parent, init);
 		return [
 			`${parents[0]}§f ${curtype}`,
 			description ?? parents[1] ?? "<no description>",
@@ -46,14 +46,12 @@ function getParentType(command, init = true) {
  * @returns
  */
 function getType(o) {
-	const t = o.type;
+	const t = o.sys.type;
 	const q = t.optional;
 
 	if (t.typeName === "literal") return `${q ? "§7" : "§f"}${t.name}`;
 	return `${
-		q
-			? `§7[${o.type.name}: §7${o.type.typeName}§7]`
-			: `§6<${o.type.name}: §6${o.type.typeName}§6>`
+		q ? `§7[${t.name}: §7${t.typeName}§7]` : `§6<${t.name}: §6${t.typeName}§6>`
 	}`;
 }
 
@@ -76,7 +74,7 @@ help
 	.int("commandsInPage", true)
 	.executes((ctx, inputPage, commandsInPage) => {
 		const avaibleCommands = XCommand.COMMANDS.filter((e) =>
-			e.data.requires(ctx.sender)
+			e.sys.data.requires(ctx.sender)
 		);
 		const cmds = commandsInPage || 15;
 		const maxPages = Math.ceil(avaibleCommands.length / cmds);
@@ -89,8 +87,10 @@ help
 
 		for (const command of path) {
 			const q = "§f-";
-			let c = `${cv}§r ${q}${command.data.name} §o§7- ${
-				command.data.description ? `${command.data.description}` : " Пусто" //§r
+			let c = `${cv}§r ${q}${command.sys.data.name} §o§7- ${
+				command.sys.data.description
+					? `${command.sys.data.description}`
+					: " Пусто" //§r
 			}`;
 			ctx.reply("§ы" + c);
 		}
@@ -101,14 +101,16 @@ help
 
 help.string("commandName").executes((ctx, commandName) => {
 	const cmd = XCommand.COMMANDS.find(
-		(e) => e.data.name == commandName || e.data?.aliases?.includes(commandName)
+		(e) =>
+			e.sys.data.name == commandName ||
+			e.sys.data?.aliases?.includes(commandName)
 	);
 
 	if (!cmd) return commandNotFound(ctx.sender, commandName);
-	if (!cmd.data?.requires(ctx.data.sender))
+	if (!cmd.sys.data?.requires(ctx.data.sender))
 		return noPerm(ctx.data.sender, cmd), "fail";
 
-	const d = cmd.data;
+	const d = cmd.sys.data;
 	const aliases =
 		d.aliases?.length > 0
 			? "§7(также §f" + d.aliases.join("§7, §f") + "§7)§r"

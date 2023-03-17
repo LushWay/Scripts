@@ -1,14 +1,10 @@
-import {
-	BlockLocation,
-	Location,
-	MolangVariableMap,
-	Player,
-} from "@minecraft/server";
+import { MolangVariableMap, Player, Vector } from "@minecraft/server";
 import { DisplayError, sleep, XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";
+
 
 class WorldEditBuilder {
 	drawselection = CONFIG_WB.DRAW_SELECTION_DEFAULT;
@@ -69,8 +65,7 @@ class WorldEditBuilder {
 		const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid;
 		const gen = XA.Utils.safeBlocksBetween(
 			this.selectionCuboid.min,
-			this.selectionCuboid.max,
-			false
+			this.selectionCuboid.max
 		);
 		let step;
 		while (!step?.done) {
@@ -85,7 +80,7 @@ class WorldEditBuilder {
 			if (q)
 				XA.dimensions.overworld.spawnParticle(
 					"minecraft:endrod",
-					new Location(x + 0.5, y + 0.5, z + 0.5),
+					{ x: x + 0.5, y: y + 0.5, z: z + 0.5 },
 					new MolangVariableMap()
 				);
 		}
@@ -212,13 +207,9 @@ class WorldEditBuilder {
 			const dx = Math.abs(this.current_copy.pos2.x - this.current_copy.pos1.x);
 			const dy = Math.abs(this.current_copy.pos2.y - this.current_copy.pos1.y);
 			const dz = Math.abs(this.current_copy.pos2.z - this.current_copy.pos1.z);
-			const pos2 = new BlockLocation(
-				player.location.x,
-				player.location.y,
-				player.location.z
-			).offset(dx, dy, dz);
+			const pos2 = Vector.add(player.location, new Vector(dx, dy, dz));
 
-			const loc = XA.Utils.vecToBlockLocation(player.location);
+			const loc = XA.Utils.floorVector(player.location);
 
 			this.backup(loc, pos2);
 

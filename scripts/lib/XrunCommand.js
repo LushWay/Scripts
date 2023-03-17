@@ -22,6 +22,7 @@ export async function XRunCommand(command, options = {}) {
 			options.dimension ?? "overworld"
 		].runCommandAsync(command);
 		if (options.showOutput) world.say(result.successCount + "");
+		world.sendMessage;
 		return result.successCount;
 	} catch (error) {
 		if (options.showError) DisplayError(error);

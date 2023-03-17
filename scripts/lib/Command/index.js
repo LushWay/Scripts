@@ -32,10 +32,10 @@ export class XCommand {
 		data.cancel = true;
 		const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix);
 		const command = XCommand.COMMANDS.find(
-			(c) => c.data.name === cmd || c.data.aliases?.includes(cmd)
+			(c) => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
 		);
 		if (!command) return commandNotFound(data.sender, cmd);
-		if (!command.data?.requires(data.sender))
+		if (!command.sys.data?.requires(data.sender))
 			return noPerm(data.sender, command);
 		/**
 		 * Check Args/SubCommands for errors
@@ -49,15 +49,15 @@ export class XCommand {
 		 * @returns {string}
 		 */
 		function getArg(start, i) {
-			if (start.children.length > 0) {
-				const arg = start.children.find(
+			if (start.sys.children.length > 0) {
+				const arg = start.sys.children.find(
 					(v) =>
-						v.type.matches(args[i]).success || (!args[i] && v.type.optional)
+						v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional)
 				);
-				if (!arg && !args[i] && start.callback) return;
+				if (!arg && !args[i] && start.sys.callback) return;
 				if (!arg)
 					return commandSyntaxFail(data.sender, command, args, i), "fail";
-				if (!arg.data?.requires(data.sender))
+				if (!arg.sys.data?.requires(data.sender))
 					return noPerm(data.sender, arg), "fail";
 				verifiedCommands.push(arg);
 				return getArg(arg, i + 1);
@@ -84,38 +84,35 @@ export class XCommand {
 		data.type ??= "test";
 		if ("require" in data) data.requires = (p) => IS(p.id, data.require);
 
-		/**
+    this.sys = {}
+
+    /**
 		 * @type {import("./types.js").ICommandData}
 		 * @private
 		 */
-		this.data = data;
+		this.sys.data = data;
 		/**
 		 * @type {IArgumentType}
-		 * @private
 		 */
-		this.type = type ?? new LiteralArgumentType(data.name);
+		this.sys.type = type ?? new LiteralArgumentType(data.name);
 		/**
 		 * The Arguments on this command
 		 * @type {XCommand<any>[]}
-		 * @private
 		 */
-		this.children = [];
+		this.sys.children = [];
 		/**
 		 * @type {number}
-		 * @private
 		 */
-		this.depth = depth;
+		this.sys.depth = depth;
 		/**
 		 * @type {XCommand<any>}
-		 * @private
 		 */
-		this.parent = parent;
+		this.sys.parent = parent;
 		/**
 		 * Function to run when this command is called
 		 * @type {Callback}
-		 * @private
 		 */
-		this.callback = null;
+		this.sys.callback = null;
 
 		if (depth === 0) XCommand.COMMANDS.push(this);
 	}
@@ -128,8 +125,8 @@ export class XCommand {
 	 * @private
 	 */
 	argument(type) {
-		const cmd = new XCommand(this.data, type, this.depth + 1, this);
-		this.children.push(cmd);
+		const cmd = new XCommand(this.sys.data, type, this.sys.depth + 1, this);
+		this.sys.children.push(cmd);
 		// @ts-expect-error
 		return cmd;
 	}
@@ -192,10 +189,10 @@ export class XCommand {
 		const cmd = new XCommand(
 			data,
 			new LiteralArgumentType(data.name, optional),
-			this.depth + 1,
+			this.sys.depth + 1,
 			this
 		);
-		this.children.push(cmd);
+		this.sys.children.push(cmd);
 		// @ts-expect-error
 		return cmd;
 	}
@@ -205,7 +202,7 @@ export class XCommand {
 	 * @returns {XCommand<Callback>}
 	 */
 	executes(callback) {
-		this.callback = callback;
+		this.sys.callback = callback;
 		return this;
 	}
 }

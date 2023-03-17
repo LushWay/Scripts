@@ -29,7 +29,11 @@ setPlayerInterval(
 		const i = XA.Entity.getHeldItem(p);
 		const settings = GetPlayerSettings(p);
 		const lore = i?.getLore() ?? [];
-		if (i?.typeId === "we:s" && settings.enableMobile && p.hasTag("using_item")) {
+		if (
+			i?.typeId === "we:s" &&
+			settings.enableMobile &&
+			p.hasTag("using_item")
+		) {
 			if (lore[4] && lore[0] === "§aActive") {
 				const block = lore[1].split(" ")[1];
 				const data = lore[1].split(" ")[2];
@@ -38,7 +42,9 @@ setPlayerInterval(
 				const Z = lore[4].split(" ")[1].replace("+", "");
 				const O = lore[4].split(" ")[3];
 				if (lore[0] == "§aActive")
-					p.runCommandAsync(`fill ~-${R} ~${Z}${H} ~-${R} ~${R} ~${Z}${O} ~${R} ${block} ${data}`);
+					p.runCommandAsync(
+						`fill ~-${R} ~${Z}${H} ~-${R} ~${R} ~${Z}${O} ~${R} ${block} ${data}`
+					);
 			}
 		}
 		if (i?.typeId === "we:brush" && !settings.noBrushParticles) {
@@ -49,39 +55,54 @@ setPlayerInterval(
 				q.maxDistance = parseInt(range);
 				const block = p.getBlockFromViewDirection(q);
 				if (block) {
-					const ent1 = XA.Entity.getEntityAtPos(block.location.x, block.location.y, block.location.z);
+					const ent1 = XA.Entity.getEntityAtPos(
+						block.location.x,
+						block.location.y,
+						block.location.z
+					);
 					if (!ent1) {
-						XA.runCommandX(`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
 						XA.runCommandX(
-							`summon f:t ${block.location.x} ${block.location.y - CONFIG_WB.H} ${block.location.z} spawn "${
-								CONFIG_WB.BRUSH_LOCATOR
-							}"`
+							`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`
 						);
 						XA.runCommandX(
-							`tag @e[x=${block.location.x},y=${block.location.y - CONFIG_WB.H},z=${
-								block.location.z
-							},r=1,type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}"] add "${p.name}"`
+							`summon f:t ${block.location.x} ${
+								block.location.y - CONFIG_WB.H
+							} ${block.location.z} spawn "${CONFIG_WB.BRUSH_LOCATOR}"`
+						);
+						XA.runCommandX(
+							`tag @e[x=${block.location.x},y=${
+								block.location.y - CONFIG_WB.H
+							},z=${block.location.z},r=1,type=f:t,name="${
+								CONFIG_WB.BRUSH_LOCATOR
+							}"] add "${p.name}"`
 						);
 					}
 					for (let ent of ent1) {
-						if (ent.id == "f:t" && ent.nameTag == CONFIG_WB.BRUSH_LOCATOR) break;
-						XA.runCommandX(`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+						if (ent.id == "f:t" && ent.nameTag == CONFIG_WB.BRUSH_LOCATOR)
+							break;
 						XA.runCommandX(
-							`summon f:t ${block.location.x} ${block.location.y - CONFIG_WB.H} ${block.location.z} spawn "${
-								CONFIG_WB.BRUSH_LOCATOR
-							}"`
+							`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`
 						);
 						XA.runCommandX(
-							`tag @e[x=${block.location.x},y=${block.location.y - CONFIG_WB.H},z=${
-								block.location.z
-							},r=1,type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}"] add "${p.name}"`
+							`summon f:t ${block.location.x} ${
+								block.location.y - CONFIG_WB.H
+							} ${block.location.z} spawn "${CONFIG_WB.BRUSH_LOCATOR}"`
+						);
+						XA.runCommandX(
+							`tag @e[x=${block.location.x},y=${
+								block.location.y - CONFIG_WB.H
+							},z=${block.location.z},r=1,type=f:t,name="${
+								CONFIG_WB.BRUSH_LOCATOR
+							}"] add "${p.name}"`
 						);
 						break;
 					}
 				}
 			}
 		} else {
-			XA.runCommandX(`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`);
+			XA.runCommandX(
+				`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`
+			);
 		}
 		if (i?.typeId === "we:s" && lore[4] && lore[0] === "§9Adv") {
 			const B = lore[1].split(" ")[1].split(",");
@@ -91,10 +112,15 @@ setPlayerInterval(
 			const Z = lore[4].split(" ")[1].replace("+", "");
 			const H = Number(`${Z}${lore[3].split(" ")[1]}`);
 			const O = Number(`${Z}${lore[4].split(" ")[3]}`);
-			const newloc = XA.Utils.vecToBlockLocation(p.location);
+			const newloc = XA.Utils.floorVector(p.location);
 			newloc.offset(-R, H, -R);
 			newloc.offset(R, O, R);
-			FillFloor(newloc.offset(-R, H, -R), newloc.offset(R, O, R), B, RB ?? "any");
+			FillFloor(
+				newloc.offset(-R, H, -R),
+				newloc.offset(R, O, R),
+				B,
+				RB ?? "any"
+			);
 		}
 	},
 	10,
@@ -130,9 +156,15 @@ setTickInterval(
 );
 
 world.events.beforeItemUseOn.subscribe((data) => {
-	if (data.item.typeId !== "we:wand" || !(data.source instanceof Player)) return;
+	if (data.item.typeId !== "we:wand" || !(data.source instanceof Player))
+		return;
 	const pos = WorldEditBuild.pos2 ?? { x: 0, y: 0, z: 0 };
-	if (pos.x === data.blockLocation.x && pos.y === data.blockLocation.y && pos.z === data.blockLocation.z) return;
+	if (
+		pos.x === data.blockLocation.x &&
+		pos.y === data.blockLocation.y &&
+		pos.z === data.blockLocation.z
+	)
+		return;
 	WorldEditBuild.pos2 = data.blockLocation;
 	data.source.tell(
 		`§d►2◄§f (use) ${data.blockLocation.x}, ${data.blockLocation.y}, ${data.blockLocation.z}` //§r
@@ -196,8 +228,17 @@ world.events.itemUse.subscribe((data) => {
 world.events.blockBreak.subscribe((data) => {
 	if (XA.Entity.getHeldItem(data.player)?.typeId !== "we:wand") return;
 	const pos = WorldEditBuild.pos1 ?? { x: 0, y: 0, z: 0 };
-	if (pos.x === data.block.location.x && pos.y === data.block.location.y && pos.z === data.block.location.z) return;
+	if (
+		pos.x === data.block.location.x &&
+		pos.y === data.block.location.y &&
+		pos.z === data.block.location.z
+	)
+		return;
 	WorldEditBuild.pos1 = data.block.location;
-	data.player.tell(`§5►1◄§r (break) ${data.block.location.x}, ${data.block.location.y}, ${data.block.location.z}`);
-	data.dimension.getBlock(data.block.location).setPermutation(data.brokenBlockPermutation);
+	data.player.tell(
+		`§5►1◄§r (break) ${data.block.location.x}, ${data.block.location.y}, ${data.block.location.z}`
+	);
+	data.dimension
+		.getBlock(data.block.location)
+		.setPermutation(data.brokenBlockPermutation);
 });
