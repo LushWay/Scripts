@@ -12,12 +12,8 @@
 				"gliding": "controller.animation.gliding",
 				"ground": "controller.animation.ground",
 				"jumping": "controller.animation.jumping",
-				"levitating": "controller.animation.levitating",
 				"moving": "controller.animation.moving",
-				"riding": "controller.animation.riding",
-				"swimming": "controller.animation.swimming",
-				"using_item": "controller.animation.using_item",
-				"attacking": "controller.animation.attacking"
+				"swimming": "controller.animation.swimming"
 			},
 			"scripts": {
 				"animate": [
@@ -26,49 +22,12 @@
 					"gliding",
 					"ground",
 					"jumping",
-					"levitating",
 					"moving",
-					"riding",
-					"swimming",
-					"using_item",
-					"attacking"
+					"swimming"
 				]
 			}
 		},
 		"component_groups": {
-			"minecraft:add_bad_omen": {
-				"minecraft:spell_effects": {
-					"add_effects": [
-						{
-							"effect": "bad_omen",
-							"duration": 6000,
-							"display_on_screen_animation": true
-						}
-					]
-				},
-				"minecraft:timer": {
-					"time": [0.0, 0.0],
-					"looping": false,
-					"time_down_event": {
-						"event": "minecraft:clear_add_bad_omen",
-						"target": "self"
-					}
-				}
-			},
-			"minecraft:clear_bad_omen_spell_effect": {
-				"minecraft:spell_effects": {}
-			},
-			"minecraft:raid_trigger": {
-				"minecraft:raid_trigger": {
-					"triggered_event": {
-						"event": "minecraft:remove_raid_trigger",
-						"target": "self"
-					}
-				},
-				"minecraft:spell_effects": {
-					"remove_effects": "bad_omen"
-				}
-			},
 			"spawn": {
 				"minecraft:spell_effects": {
 					"add_effects": [
@@ -123,7 +82,7 @@
 					]
 				}
 			},
-			"notspawn": {
+			"not_in_spawn": {
 				"minecraft:spell_effects": {
 					"remove_effects": [
 						"instant_health",
@@ -137,6 +96,39 @@
 			"kick": {
 				"minecraft:instant_despawn": {},
 				"minecraft:explode": {}
+			},
+			"minecraft:add_bad_omen": {
+				"minecraft:spell_effects": {
+					"add_effects": [
+						{
+							"effect": "bad_omen",
+							"duration": 6000,
+							"display_on_screen_animation": true
+						}
+					]
+				},
+				"minecraft:timer": {
+					"time": [0.0, 0.0],
+					"looping": false,
+					"time_down_event": {
+						"event": "minecraft:clear_add_bad_omen",
+						"target": "self"
+					}
+				}
+			},
+			"minecraft:clear_bad_omen_spell_effect": {
+				"minecraft:spell_effects": {}
+			},
+			"minecraft:raid_trigger": {
+				"minecraft:raid_trigger": {
+					"triggered_event": {
+						"event": "minecraft:remove_raid_trigger",
+						"target": "self"
+					}
+				},
+				"minecraft:spell_effects": {
+					"remove_effects": "bad_omen"
+				}
 			}
 		},
 		"components": {
@@ -306,32 +298,23 @@
 					"command": ["testfor @s"]
 				}
 			},
-			"warn": {
+			"player:warn": {
 				"add": {
 					"component_groups": ["warn"]
 				}
 			},
-			"notspawn": {
+			"player:spawn": {
+				"add": {
+					"component_groups": ["spawn"]
+				}
+			},
+			"player:not_in_spawn": {
 				"add": {
 					"component_groups": ["notspawn"]
 				}
 			},
-			"we:wand_in_hand": {
-				"run_command": {
-					"command": ["tag @s add hasWandInHand"]
-				}
-			},
-			"we:wand_not_in_hand": {
-				"run_command": {
-					"command": ["tag @s remove hasWandInHand"]
-				}
-			},
-			"portal": {
-				"run_command": {
-					"command": ["testfor @s"]
-				}
-			},
-			"kick": {
+			"player:portal": {},
+			"player:kick": {
 				"add": {
 					"component_groups": ["kick"]
 				}

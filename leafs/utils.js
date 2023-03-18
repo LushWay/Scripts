@@ -7,7 +7,7 @@ import path from "path";
  * Replaces and adds code to a package's TypeScript definition file.
  * @param {string} packageName - The name of the package to patch.
  * @param {object} options - The patching options.
- * @param {{find: RegExp | string, replace: string, all?: boolean}[]} options.replaces - The replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
+ * @param {{find: RegExp | string, replace: string, all?: boolean; throw?: boolean}[]} options.replaces - The replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
  * @param {Record<string, string> | undefined} options.classes Pairs of class name and method to add.
  * @param {object} options.additions
  * @param {string} options.additions.beginning - The code to add to the beginning of the file.
@@ -24,10 +24,17 @@ export async function patchPackage(packageName, options) {
 	// Apply the replacements
 	let patchedCode = originalCode;
 	for (const replace of options.replaces) {
-		patchedCode = patchedCode[replace.all ? "replaceAll" : "replace"](
+		let newCode = patchedCode[replace.all ? "replaceAll" : "replace"](
 			replace.find,
 			replace.replace
 		);
+
+		if (newCode !== patchedCode) {
+			patchedCode = newCode;
+		} else {
+			if (replace.throw || !("throw" in replace))
+				throw new Error(`Unable to find replace for ${replace.find}`);
+		}
 	}
 
 	options.additions.beginning ??= "";

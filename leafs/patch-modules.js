@@ -1,4 +1,5 @@
 // @ts-check
+import { Player } from "@minecraft/server";
 import { m, patchPackage } from "./utils.js";
 
 patchPackage("@minecraft/server", {
@@ -41,14 +42,14 @@ patchPackage("@minecraft/server", {
         keepVelocity?: boolean,`,
 		},
 		{
-			find: "getComponent(componentName: string): any;",
+			find: "getComponent(componentName: string): BlockComponent | undefined;",
 			replace: m`
 getComponent<N extends keyof BlockComponents>(
 	componentName: N
 ): BlockComponents[N];`,
 		},
 		{
-			find: "getComponent(componentId: string): IEntityComponent;",
+			find: "getComponent(componentId: string): EntityComponent;",
 			replace: m`
 getComponent<N extends keyof EntityComponents>(
   componentName: N
@@ -87,6 +88,7 @@ type BlockComponents = {
 };    
 
 type EntityComponents = {
+  equipment_inventory: EntityEquipmentInventoryComponent;
 	addrider: EntityAddRiderComponent;
 	"minecraft:addrider": EntityAddRiderComponent;
 	ageable: EntityAgeableComponent;
