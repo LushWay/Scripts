@@ -4,7 +4,10 @@ import { XA } from "../../xapi.js";
 export const global = { Radius: 200 };
 
 export const options = XA.WorldOptions("server", {
-	spawn: { desc: "Включает команду /hub, пункт в меню и приветствие.\n\n(требуется перезагрузка)", value: false },
+	spawn: {
+		desc: "Включает команду /hub, пункт в меню и приветствие.\n\n(требуется перезагрузка)",
+		value: false,
+	},
 	lockNether: { desc: "Выключает незер", value: true },
 	bowhit: { desc: "Звук попадания по энтити из лука", value: true },
 	timer: { value: true, desc: "" },
