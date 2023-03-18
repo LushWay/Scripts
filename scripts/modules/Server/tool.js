@@ -66,8 +66,7 @@ world.events.beforeItemUse.subscribe((data) => {
 		}
 		if (lore && lore[0] == "viewTP") {
 			const block = data.source.getBlockFromViewDirection({});
-			if (block && block.location)
-				data.source.teleport(block.location, data.source.dimension, data.source.rotation.x, data.source.rotation.y);
+			if (block && block.location) data.source.teleport(block.location);
 		}
 	}
 });

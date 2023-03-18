@@ -9,11 +9,11 @@ async function getServerTPS() {
 	let startTime = Date.now();
 	let ticks = 0;
 	return new Promise((resolve) => {
-		let s = system.runSchedule(() => {
+		system.run(function tick() {
 			if (Date.now() - startTime < 1000) {
 				ticks++;
+				system.run(tick);
 			} else {
-				system.clearRunSchedule(s);
 				resolve(ticks);
 			}
 		});
@@ -26,6 +26,12 @@ new XA.Command({
 }).executes(async (ctx) => {
 	let ticks = await getServerTPS();
 	ctx.reply(
-		`§b> §3TPS сервера: ${ticks > 18 ? "§f{ §aХороший" : ticks > 13 ? "§f{ §eНормальный" : "§f{ §cПлохой"} ${ticks} §f}`
+		`§b> §3TPS сервера: ${
+			ticks > 18
+				? "§f{ §aХороший"
+				: ticks > 13
+				? "§f{ §eНормальный"
+				: "§f{ §cПлохой"
+		} ${ticks} §f}`
 	);
 });

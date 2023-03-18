@@ -1,4 +1,4 @@
-import { Player, world, World } from "@minecraft/server";
+import { Entity, Player, world, World } from "@minecraft/server";
 import { addMethod, editMethod } from "./patcher.js";
 import { toStr } from "./utils.js";
 export * as Prototypes from "./patcher.js";
@@ -27,3 +27,39 @@ addMethod(JSON, "safeParse", (str, reviever, onError) => {
 		onError(e);
 	}
 });
+
+addMethod(
+	Player.prototype,
+	"applyDash",
+	(target, horizontalStrength, verticalStrength) => {
+		const view = target.getViewDirection();
+		const hStrength = Math.sqrt(view.x ** 2 + view.z ** 2) * horizontalStrength;
+		const vStrength = view.y * verticalStrength;
+		target.applyKnockback(view.x, view.z, hStrength, vStrength);
+	}
+);
+
+/**
+ *
+ * @param {{original: Entity["teleport"], args: Parameters<Entity["teleport"]>, context: Entity}} param0
+ * @returns
+ */
+function teleport({
+	original,
+	args: [location, dimension, xRot, yRot, keepVelocity],
+	context,
+}) {
+	if (typeof xRot === "undefined" || typeof yRot === "undefined") {
+		const rotation = context.getRotation();
+		xRot = rotation.x;
+		yRot = rotation.y;
+	}
+
+	keepVelocity ??= false;
+	dimension ??= context.dimension;
+
+	return original(location, dimension, xRot, yRot, keepVelocity);
+}
+
+editMethod(Player.prototype, "teleport", teleport);
+editMethod(Entity.prototype, "teleport", teleport);

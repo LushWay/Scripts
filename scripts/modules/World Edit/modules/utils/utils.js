@@ -1,11 +1,11 @@
-import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
+import {  MinecraftBlockTypes } from "@minecraft/server";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { DisplayError, XA } from "../../../../xapi.js";
 
 /**
  *
  * @param {string} blockTypeID
- * @param {BlockLocation} location
+ * @param {Vector3} location
  * @returns
  */
 export function setblock(blockTypeID, location) {

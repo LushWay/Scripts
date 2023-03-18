@@ -1,13 +1,11 @@
-import { BlockLocation } from "@minecraft/server";
 import { handle, sleep, XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
-import { Cuboid } from "../utils/Cuboid.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 /**
  * Sets Pos1 To a new Block Location
- * @param {BlockLocation} pos1 pos1
- * @param {BlockLocation} pos2 pos2
+ * @param {Vector3} pos1 pos1
+ * @param {Vector3} pos2 pos2
  * @param {Array<string>} blocks blocks to use to fill block
  * @param {string} rb Blocks to replace
  * @example new Fill(BlockLocation, BlockLocation, ["stone", "wood"], ["grass"]);
@@ -15,8 +13,6 @@ import { WorldEditBuild } from "./WorldEditBuilder.js";
 export function FillFloor(pos1, pos2, blocks, rb = "any") {
 	handle(async () => {
 		WorldEditBuild.backup(pos1, pos2);
-
-		const values = new Cuboid(pos1, pos2);
 
 		try {
 			let rbs = [];
@@ -38,9 +34,16 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 						if (rb !== "any") {
 							for (const b of rbs) {
 								let replace = ` replace ${b.b} ` + b.d;
-								XA.runCommandX(`fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ` + bdata + replace);
+								XA.runCommandX(
+									`fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ` +
+										bdata +
+										replace
+								);
 							}
-						} else XA.runCommandX(`fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ` + bdata);
+						} else
+							XA.runCommandX(
+								`fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ` + bdata
+							);
 
 						blocksSet++;
 					}

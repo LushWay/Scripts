@@ -1,4 +1,4 @@
-import { Entity, Location, Player, world } from "@minecraft/server";
+import { Entity, Player, world } from "@minecraft/server";
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
 import { setPlayerInterval, setTickInterval, XA } from "../../xapi.js";
 import { getServerType, InRaid } from "../Region/var.js";
@@ -152,11 +152,7 @@ world.events.entityHurt.subscribe((data) => {
  */
 function playHitSound(player, damage) {
 	player.playSound("block.end_portal_frame.fill", {
-		location: new Location(
-			player.location.x,
-			player.location.y,
-			player.location.z
-		),
+		location: player.location,
 		pitch: damage / 2,
 		volume: 1,
 	});

@@ -1,4 +1,4 @@
-import { BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
+import { MinecraftBlockTypes, Vector } from "@minecraft/server";
 import { DisplayError, sleep, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { CONFIG_WB } from "../../config.js";
@@ -10,7 +10,7 @@ export class Shape {
 	/**
 	 * Sets Pos1 To a new Block Location
 	 * @param {string} shape shape equation to caculate
-	 * @param {BlockLocation} pos location to generate shape
+	 * @param {Vector3} pos location to generate shape
 	 * @param {Array<string>} blocks blocks to use to fill block
 	 * @param {number} rad size of sphere
 	 * @example new Shape(DefaultModes.sphere,BlockLocation, ["stone", "wood"], 10);
@@ -20,8 +20,8 @@ export class Shape {
 		this.blocks = blocks;
 		this.pos = pos;
 		this.rad = rad;
-		this.pos1 = pos.offset(-rad, -rad, -rad);
-		this.pos2 = pos.offset(rad, rad, rad);
+		this.pos1 = Vector.multiply(pos, { x: -rad, y: -rad, z: -rad });
+		this.pos2 = Vector.multiply(pos, { x: rad, y: rad, z: rad });
 
 		WorldEditBuild.backup(this.pos1, this.pos2);
 
@@ -44,11 +44,7 @@ export class Shape {
 
 		for (const { x, y, z } of XA.Utils.safeBlocksBetween(loc1, loc2)) {
 			if (!this.condition(x, y, z)) continue;
-			const location = new BlockLocation(
-				this.pos.x + x,
-				this.pos.y + y,
-				this.pos.z + z
-			);
+			const location = Vector.multiply(this.pos, { x, y, z });
 			const block = this.blocks[~~(Math.random() * this.blocks.length)];
 			setblock(block, location);
 			blocksSet++;
@@ -109,7 +105,7 @@ export class spawn {
 		for (let x = v.xmin; x <= v.xmax; x++) {
 			for (let z = v.zmin; z <= v.zmax; z++) {
 				DIMENSIONS.overworld
-					.getBlock({ x: x, y: -64, z: z) }
+					.getBlock({ x: x, y: -64, z: z })
 					.setType(
 						MinecraftBlockTypes.get(
 							!this.r ? "minecraft:deny" : "minecraft:bedrock"

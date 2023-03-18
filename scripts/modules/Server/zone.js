@@ -19,12 +19,7 @@ function ret(player, isX, zone, plus) {
 		? [zone.x + (plus ? 1 : -1), player.location.y, player.location.z]
 		: [player.location.x, player.location.y, zone.z + (plus ? 1 : -1)];
 
-	player.teleport(
-		{ x: loc[1], y: loc[2], z: loc[3] },
-		player.dimension,
-		player.rotation.x,
-		player.rotation.y
-	);
+	player.teleport({ x: loc[1], y: loc[2], z: loc[3] });
 	player.onScreenDisplay.setActionBar(
 		`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? "x" : "z"}`
 	);

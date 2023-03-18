@@ -156,18 +156,19 @@ setTickInterval(
 );
 
 world.events.beforeItemUseOn.subscribe((data) => {
+	const blockLocation = data.getBlockLocation();
 	if (data.item.typeId !== "we:wand" || !(data.source instanceof Player))
 		return;
 	const pos = WorldEditBuild.pos2 ?? { x: 0, y: 0, z: 0 };
 	if (
-		pos.x === data.blockLocation.x &&
-		pos.y === data.blockLocation.y &&
-		pos.z === data.blockLocation.z
+		pos.x === blockLocation.x &&
+		pos.y === blockLocation.y &&
+		pos.z === blockLocation.z
 	)
 		return;
-	WorldEditBuild.pos2 = data.blockLocation;
+	WorldEditBuild.pos2 = blockLocation;
 	data.source.tell(
-		`§d►2◄§f (use) ${data.blockLocation.x}, ${data.blockLocation.y}, ${data.blockLocation.z}` //§r
+		`§d►2◄§f (use) ${blockLocation.x}, ${blockLocation.y}, ${blockLocation.z}` //§r
 	);
 });
 

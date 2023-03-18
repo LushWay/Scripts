@@ -1,17 +1,17 @@
 import {
-    MinecraftBlockTypes,
-    MolangVariableMap,
-    system,
-    world
+	MinecraftBlockTypes,
+	MolangVariableMap,
+	system,
+	world,
 } from "@minecraft/server";
 import {
-    DisplayError,
-    handle,
-    IS,
-    setTickTimeout,
-    sleep,
-    toStr,
-    XA
+	DisplayError,
+	handle,
+	IS,
+	setTickTimeout,
+	sleep,
+	toStr,
+	XA,
 } from "xapi.js";
 import { stackParse } from "../../lib/Class/Error.js";
 import { CommandContext } from "../../lib/Command/Callback.js";
@@ -138,7 +138,7 @@ const tests = {
 		const reg = await findFreePlace();
 		const set = (pos) =>
 			XA.dimensions.overworld
-				.getBlock({ x: pos.x, y: -60, z: pos.z) }
+				.getBlock({ x: pos.x, y: -60, z: pos.z })
 				.setType(MinecraftBlockTypes.bedrock);
 
 		set(reg.from);

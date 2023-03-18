@@ -24,9 +24,22 @@ patchPackage("@minecraft/server", {
      * See {@link Player.sendMessage}
      */
     tell(message: (RawMessage | string)[] | RawMessage | string): void;
+    /**
+     * Applies a knock-back to a player in the direction they are facing, like dashing forward
+     * @author @wuw.sh
+     */
+    applyDash(target: Player | Entity, horizontalStrength: number, verticalStrength: number): void;
     `,
 	},
 	replaces: [
+		{
+			find: /location: Vector3,\s*\n?\s*dimension: Dimension,\s*\n?\s*xRotation: number,\s*\n?\s*yRotation: number,\s*\n?\s*keepVelocity\?: boolean,/gm,
+			replace: `location: Vector3,
+        dimension?: Dimension,
+        xRotation?: number,
+        yRotation?: number,
+        keepVelocity?: boolean,`,
+		},
 		{
 			find: "getComponent(componentName: string): any;",
 			replace: m`

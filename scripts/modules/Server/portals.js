@@ -1,9 +1,10 @@
 import {
-    ItemStack, MinecraftBlockTypes,
-    MinecraftItemTypes,
-    Player,
-    Vector,
-    world
+	ItemStack,
+	MinecraftBlockTypes,
+	MinecraftItemTypes,
+	Player,
+	Vector,
+	world,
 } from "@minecraft/server";
 import { DisplayError, IS, sleep, XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
@@ -146,13 +147,13 @@ class inventory {
 		this.fillblocks.bedrock.forEach((e) => {
 			world
 				.getDimension("overworld")
-				.getBlock({ x: bl.x + e.x, y: bl.y + e.y, z: bl.z + e.z) }
+				.getBlock({ x: bl.x + e.x, y: bl.y + e.y, z: bl.z + e.z })
 				.setType(MinecraftBlockTypes.bedrock);
 		});
 		this.fillblocks.air.forEach((e) => {
 			world
 				.getDimension("overworld")
-				.getBlock({ x: bl.x + e.x, y: bl.y + e.y, z: bl.z + e.z) }
+				.getBlock({ x: bl.x + e.x, y: bl.y + e.y, z: bl.z + e.z })
 				.setType(MinecraftBlockTypes.air);
 		});
 	}
@@ -342,7 +343,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 			(q.includeLiquidBlocks = false), (q.includePassableBlocks = false);
 			const b = world
 				.getDimension("overworld")
-				.getBlockFromRay({ x: x, 320, z), new Vector(0, y: -1, z: 0) };
+				.getBlockFromRay({ x: x, y: 320, z }, { x: 0, y: -1, z: 0 });
 			if (b && b.location.y >= 63) {
 				y = b.location.y + 1;
 				break;
@@ -551,9 +552,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe(
 		data.cancel = true;
 		const to = world
 			.getDimension(data.entity.dimension.id)
-			.getBlock(
-				XA.Utils.floorVector(data.entity.location).offset(0, -3, 0)
-			);
+			.getBlock(XA.Utils.floorVector(data.entity.location).offset(0, -3, 0));
 		if (to.typeId !== "minecraft:chest") return;
 		const toi = to.getComponent("inventory").container;
 		const i = toi.getItem(0);
@@ -638,18 +637,15 @@ new XA.Command({
 		);
 		block.setType(MinecraftBlockTypes.chest);
 		block.getComponent("inventory").container.setItem(0, item);
-		const loc = XA.Utils.floorVector(ctx.sender.location).offset(
-			0,
-			1,
-			0
-		);
+		const loc = XA.Utils.floorVector(ctx.sender.location).offset(0, 1, 0);
 		const l = { x: loc.x + 0.5, y: loc.y, z: loc.z + 0.5 };
 
+    const rotation = ctx.sender.getRotation()
 		ctx.sender.teleport(
 			l,
 			ctx.sender.dimension,
-			ctx.sender.rotation.x,
-			ctx.sender.rotation.y,
+			rotation.x,
+			rotation.y,
 			false
 		);
 
