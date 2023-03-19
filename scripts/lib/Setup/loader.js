@@ -39,4 +39,3 @@ export async function onWorldLoad(callback) {
 onWorldLoad.promise = ON_LOAD_PROMISE;
 onWorldLoad.callbacks = ON_LOAD_CALLBACKS;
 onWorldLoad.loaded = () => WORLD_IS_LOADED;
-
