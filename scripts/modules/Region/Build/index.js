@@ -1,11 +1,4 @@
-import {
-	BlockLocation,
-	Entity,
-	Location,
-	MinecraftEffectTypes,
-	Player,
-	world,
-} from "@minecraft/server";
+import { Entity, MinecraftEffectTypes, Player, world } from "@minecraft/server";
 import { IS, setPlayerInterval, setTickTimeout, XA } from "xapi.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
 import { Region } from "../utils/Region.js";
@@ -89,11 +82,7 @@ world.events.blockBreak.subscribe(
 					...dimension.getEntities({
 						maxDistance: 2,
 						type: "minecraft:item",
-						location: new Location(
-							block.location.x,
-							block.location.y,
-							block.location.z
-						),
+						location: block.location,
 					}),
 				].forEach((e) => e.kill());
 			},
@@ -106,11 +95,7 @@ world.events.blockBreak.subscribe(
 world.events.beforeExplosion.subscribe((data) => (data.cancel = true));
 world.events.entitySpawn.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
-		new BlockLocation(
-			data.entity.location.x,
-			data.entity.location.y,
-			data.entity.location.z
-		),
+		data.entity.location,
 		data.entity.dimension.id
 	);
 	if (!region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)) return;
@@ -127,7 +112,7 @@ const TP_TO = TP_Y + 5;
 setPlayerInterval(
 	(player) => {
 		const loc = player.location;
-		const rotation = player.rotation;
+		const rotation = player.getRotation();
 		if (loc.y >= EFFECT_Y + 1) return;
 		if (loc.y < EFFECT_Y)
 			player.addEffect(MinecraftEffectTypes.levitation, 3, 7, false);

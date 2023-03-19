@@ -6,14 +6,14 @@ m`HelpCommand`;
 m`Menu`;
 m`Region`;
 m`Test`;
-m`Server`;
+// m`Server`;
 
 m`Chat`;
 m`Admin`;
 mm("OnJoin", { fileName: "join" });
-mm("World Edit", { fileName: "WBindex" });
-m`GameTest`;
-m`Leaderboards`;
+// mm("World Edit", { fileName: "WBindex" });
+// m`GameTest`;
+// m`Leaderboards`;
 
 if (false) {
 	m`Battle Royal`;

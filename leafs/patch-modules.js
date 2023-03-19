@@ -1,6 +1,7 @@
 // @ts-check
-import { Player } from "@minecraft/server";
 import { m, patchPackage } from "./utils.js";
+
+// file:///C:\Users\Настя\AppData\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState\games\com.mojang\development_behavior_packs\X-API\scripts\lib\Setup\prototypes.js
 
 patchPackage("@minecraft/server", {
 	classes: {
@@ -30,6 +31,12 @@ patchPackage("@minecraft/server", {
      * @author @wuw.sh
      */
     applyDash(target: Player | Entity, horizontalStrength: number, verticalStrength: number): void;
+    `,
+		ItemUseOnEvent: m`
+    /**
+     * Check {@link ItemUseOnEvent.getBlockLocation} for more info
+     */
+    blockLocation: Vector3;
     `,
 	},
 	replaces: [

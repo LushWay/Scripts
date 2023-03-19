@@ -1,4 +1,4 @@
-import { BlockLocation, MolangVariableMap, Player } from "@minecraft/server";
+import { MolangVariableMap, Player } from "@minecraft/server";
 import { XA } from "xapi.js";
 
 export class zone {
@@ -6,7 +6,7 @@ export class zone {
 	 * It's a function that teleports the player to the edge of the zone.
 	 * @param {Player} player
 	 * @param {boolean} isX
-	 * @param {BlockLocation} zone
+	 * @param {Vector3} zone
 	 * @param {boolean} [plus]
 	 */
 	static ret(player, isX, zone, plus) {
@@ -26,7 +26,7 @@ export class zone {
 	 *
 	 * @param {Player} player
 	 * @param {boolean} isX
-	 * @param {BlockLocation} zone
+	 * @param {Vector3} zone
 	 */
 	static pret(player, isX, zone) {
 		const floored = XA.Utils.floorVector(player.location);

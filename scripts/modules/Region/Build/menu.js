@@ -213,6 +213,7 @@ CONFIG_MENU.menu = (player) => {
 							DB.set("ARCHIVE:" + oldRegionID, [
 								...oldRegion.permissions.owners,
 							]);
+              /** @type {string[]} */
 							const u = [];
 							oldRegion.forEachOwner((player, i, arr) => {
 								u.push(player.id);

@@ -4,7 +4,7 @@
 		"name": "X-API",
 		"description": "Server Plugin on XilLeR API (based on Smelly API)",
 		"uuid": "8198b306-bfbb-48c9-874d-217cd4cef1ae",
-		"version": [3, 0, 1],
+		"version": [3, 0, 2],
 		"min_engine_version": [1, 19, 50]
 	},
 	"modules": [
@@ -12,21 +12,21 @@
 			"description": "Data Module",
 			"type": "data",
 			"uuid": "786cb1e6-e840-40d7-a986-9fb9e348634a",
-			"version": [3, 0, 1]
+			"version": [0, 0, 0]
 		},
 		{
 			"description": "Gametest Module",
 			"language": "javascript",
 			"type": "script",
 			"uuid": "4f6a99e0-c4a2-4172-8818-c753d5cdab1f",
-			"version": [3, 0, 1],
+			"version": [0, 0, 0],
 			"entry": "scripts/index.js"
 		}
 	],
 	"dependencies": [
 		{
 			"module_name": "@minecraft/server",
-			"version": "1.1.0-beta"
+			"version": "1.2.0-beta"
 		},
 		{
 			"module_name": "@minecraft/server-ui",

@@ -34,5 +34,3 @@ type FunctionFilter<T> = {
 type ObjectWithFunction<T> = {
 	[K in keyof T]: T[K] extends (...arg: any) => any ? K : never;
 };
-
-type e = Exclude;

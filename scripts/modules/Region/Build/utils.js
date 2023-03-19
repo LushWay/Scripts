@@ -2,6 +2,7 @@ import {
 	MinecraftBlockTypes,
 	MinecraftDimensionTypes,
 	Player,
+	Vector,
 } from "@minecraft/server";
 import { MessageForm } from "../../../lib/Form/MessageForm.js";
 import { createWaiter, setTickInterval, sleep, XA } from "../../../xapi.js";
@@ -17,12 +18,9 @@ const squarePlace = -55;
  * @param {Region} region
  */
 export function teleportToRegion(player, region) {
-	const rotation = player.getRotation();
 	player.teleport(
 		{ x: region.from.x, y: squarePlace + 3, z: region.from.z },
-		XA.dimensions.overworld,
-		rotation.x,
-		rotation.y
+		XA.dimensions.overworld
 	);
 }
 
@@ -52,6 +50,12 @@ function getProgressBar(spining, percents) {
 	return `§d${spining[0]} ${e.join("")} §f${~~percents}%`;
 }
 
+/**
+ *
+ * @param {Player} player
+ * @param {Region} Pregion
+ * @returns
+ */
 export async function ClearRegion(player, Pregion) {
 	let percents = 0;
 	let spining = ["/", "-", "\\", "|"];
@@ -136,8 +140,8 @@ export async function fillRegion(from, to) {
 	const secondLoc = { x: to.x, y: squarePlace, z: to.z };
 	const exec = createWaiter(10);
 	for (const loc of XA.Utils.safeBlocksBetween(
-		firstLoc.above(),
-		secondLoc.above()
+		Vector.add(firstLoc, Vector.up),
+		Vector.add(secondLoc, Vector.up)
 	)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
@@ -179,6 +183,7 @@ export async function findFreePlace() {
 	let tries = 0;
 	let from;
 	let to;
+	/** @type {string[]} */
 	const visited = [];
 	let x = [-1, 0, 1, 0];
 	let z = [0, -1, 0, 1];

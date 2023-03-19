@@ -97,7 +97,7 @@ world.events.blockBreak.subscribe(
 );
 
 world.events.beforeExplosion.subscribe((data) => {
-	for (const bl of data.impactedBlocks) {
+	for (const bl of data.getImpactedBlocks()) {
 		let region = Region.blockLocationInRegion(bl, data.dimension.id);
 		if (region && !region.permissions.pvp) return (data.cancel = true);
 		for (const id of region.permissions.owners) InRaid[id] = 60;

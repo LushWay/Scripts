@@ -1,4 +1,4 @@
-import { BlockInventoryComponentContainer, ItemStack } from "@minecraft/server";
+import { Container, ItemStack } from "@minecraft/server";
 export class BlockInventory {
 	/** @type {number} */
 	emptySlotsCount;
@@ -8,7 +8,7 @@ export class BlockInventory {
 	items;
 	/**
 	 * Coverts a blockInventoryComponentContainer and saves it
-	 * @param {BlockInventoryComponentContainer} inventory
+	 * @param {Container} inventory
 	 */
 	constructor(inventory) {
 		this.emptySlotsCount = inventory.emptySlotsCount;
@@ -21,7 +21,7 @@ export class BlockInventory {
 
 	/**
 	 * Loads this inventory onto a BlockInventoryComponentContainer
-	 * @param {BlockInventoryComponentContainer} block block to load on
+	 * @param {Container} block block to load on
 	 */
 	load(block) {
 		for (let i = 0; i < block.size; i++) {

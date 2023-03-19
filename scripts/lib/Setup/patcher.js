@@ -12,8 +12,13 @@ export function editMethod(classToPatch, methodName, fn) {
 
 	// @ts-expect-error
 	classToPatch[methodName] = function (...args) {
-		// @ts-expect-error
-		return fn({ original: originalMethod, args, context: this });
+		return fn({
+			// @ts-expect-error
+			original: originalMethod.bind(this),
+			// @ts-expect-error
+			args,
+			context: this,
+		});
 	};
 }
 

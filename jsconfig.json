@@ -13,6 +13,7 @@
 			"*": ["scripts/*"]
 		},
 		"maxNodeModuleJsDepth": 0,
+		"noImplicitAny": true,
 		"types": []
 	},
 	"include": ["./scripts/"],

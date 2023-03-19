@@ -1,4 +1,4 @@
-import { BlockLocation, ItemStack, ItemTypes } from "@minecraft/server";
+import { ItemStack, ItemTypes } from "@minecraft/server";
 import { IS, setTickInterval, XA } from "xapi.js";
 import { global } from "../var.js";
 
@@ -128,20 +128,14 @@ kit
 	.string("name")
 	.int("cdhours", true)
 	.executes((ctx, name, tag, cdhours) => {
-		const wb = ctx.sender.dimension.getBlock(
-			new BlockLocation(
-				Math.floor(ctx.sender.location.x),
-				Math.floor(ctx.sender.location.y),
-				Math.floor(ctx.sender.location.z)
-			)
-		);
+		const wb = ctx.sender.dimension.getBlock(ctx.sender.location);
 		const b = wb.getComponent("inventory")?.container;
 		if (!b)
 			return ctx.reply("§cВстань на сундук с китом! (блок: " + wb.typeId + ")");
 		let inv = [];
 		for (let i = 0; i < b.size; i++) {
 			/** * @type {ItemStack} */ const item = b.getItem(i);
-			if (item) inv.push(item.typeId + " " + item.amount + " " + item.data);
+			if (item) inv.push(item.typeId + " " + item.amount);
 		}
 		ctx.reply(`§fДобавлен кит с такими предметами:\n  §7` + inv.join("\n  "));
 		let cd = daily_reward_hours;
@@ -162,20 +156,14 @@ kit
 				`§cКита с названием '§f${name}§c' не существует. \n§fДоступные киты: \n  §7` +
 					XA.tables.kits.keys().join("\n  ")
 			);
-		const wb = ctx.sender.dimension.getBlock(
-			new BlockLocation(
-				Math.floor(ctx.sender.location.x),
-				Math.floor(ctx.sender.location.y),
-				Math.floor(ctx.sender.location.z)
-			)
-		);
+		const wb = ctx.sender.dimension.getBlock(ctx.sender.location);
 		const b = wb.getComponent("inventory")?.container;
 		if (!b)
 			return ctx.reply("§cВстань на сундук с китом! (блок: " + wb.typeId + ")");
 		let inv = [];
 		for (let i = 0; i < b.size; i++) {
 			/** * @type {ItemStack} */ const item = b.getItem(i);
-			if (item) inv.push(item.typeId + " " + item.amount + " " + item.data);
+			if (item) inv.push(item.typeId + " " + item.amount);
 		}
 		ctx.reply(`§fДобавлен кит с такими предметами:\n  §7` + inv.join("\n  "));
 		XA.tables.kits.set(n, inv);
@@ -224,8 +212,7 @@ kit
 							? k.split(" ")[0]
 							: "minecraft:" + k.split(" ")[0]
 					),
-					Number(k.split(" ")[1]),
-					Number(k.split(" ")[2])
+					Number(k.split(" ")[1])
 				)
 			);
 		}

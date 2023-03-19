@@ -4,27 +4,10 @@
 		{
 			"type": "minecraft-js",
 			"request": "attach",
-			"name": "Connect to Minecraft",
-			"mode": "connect",
-			"localRoot": "${workspaceFolder}/scripts/",
-			"port": 1234
-		},
-		{
-			"type": "minecraft-js",
-			"request": "attach",
 			"name": "Minecraft debugger",
 			"mode": "listen",
 			"localRoot": "${workspaceFolder}/scripts/",
 			"port": 1000
-		},
-		{
-			"type": "minecraft-js",
-			"request": "attach",
-			"name": "Minecraft Script API",
-			"mode": "listen",
-			"localRoot": "${workspaceFolder}/src/",
-			"sourceMapRoot": "${workspaceFolder}/scripts/",
-			"port": 4000
 		}
 	]
 }

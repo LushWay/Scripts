@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Player, world } from "@minecraft/server";
 import { sleep, XA } from "xapi.js";
 import { Subscriber } from "../../lib/Class/XEvents.js";

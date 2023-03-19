@@ -1,4 +1,10 @@
-import { Entity, Player, world, World } from "@minecraft/server";
+import {
+	Entity,
+	ItemUseOnEvent,
+	Player,
+	world,
+	World,
+} from "@minecraft/server";
 import { addMethod, editMethod } from "./patcher.js";
 import { toStr } from "./utils.js";
 export * as Prototypes from "./patcher.js";
@@ -9,7 +15,7 @@ World.prototype.say = World.prototype.sendMessage;
 const originalSay = world.sendMessage.bind(world);
 
 addMethod(World.prototype, "debug", (...data) => {
-	originalSay(data.map((e) => toStr(e)).join(" "));
+	originalSay(data.map((/** @type {*} */ e) => toStr(e)).join(" "));
 });
 
 const LOGS = new Set();
@@ -63,3 +69,12 @@ function teleport({
 
 editMethod(Player.prototype, "teleport", teleport);
 editMethod(Entity.prototype, "teleport", teleport);
+
+Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
+	get() {
+		this.location ??= this.getBlockLocation();
+		return this.location;
+	},
+	configurable: false,
+	enumerable: true,
+});

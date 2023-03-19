@@ -1,103 +1,103 @@
 {
-  "format_version": "1.17.0",
-  "minecraft:entity": {
-    "description": {
-      "identifier": "t:hpper_minecart",
-      "is_spawnable": false,
-      "is_summonable": true,
-      "is_experimental": false
-    },
-    "component_groups": {
-      "active": {
-        "minecraft:item_hopper": {}
-      }
-    },
-    "components": {
-      "minecraft:inventory": {
-        "container_type": "inventory",
-        "inventory_size": 54
-      },
-      "minecraft:nameable": {
-        "allow_name_tag_renaming": true,
-        "always_show": true
-      },
-      "minecraft:collision_box": {
-        "width": 1,
-        "height": 1
-      },
-      "minecraft:health": {
-        "value": 1,
-        "max": 1
-      },
-      "minecraft:is_stackable": {},
-      "minecraft:physics": {},
-      "minecraft:pushable": {
-        "is_pushable": false,
-        "is_pushable_by_piston": false
-      },
-      "minecraft:on_death": {
-        "event": "ded"
-      },
-      "minecraft:damage_sensor": {
-        "triggers": [
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "has_damage",
-                    "value": "entity_explosion"
-                  }
-                ]
-              },
-              "deals_damage": false
-            }
-          },
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "has_damage",
-                    "value": "block_explosion"
-                  }
-                ]
-              },
-              "deals_damage": false
-            }
-          },
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "has_damage",
-                    "value": "attack"
-                  },
-                  {
-                    "test": "is_family",
-                    "subject": "other",
-                    "value": "player"
-                  }
-                ]
-              },
-              "deals_damage": true
-            }
-          }
-        ]
-      }
-    },
-    "events": {
-      "minecraft:entity_spawned": {
-        "add": {
-          "component_groups": ["active"]
-        }
-      },
-      "ded": {
-        "remove": {
-          "component_groups": ["active"]
-        }
-      }
-    }
-  }
+	"format_version": "1.17.0",
+	"minecraft:entity": {
+		"description": {
+			"identifier": "minecraft:hopper_minecart",
+			"is_spawnable": false,
+			"is_summonable": true,
+			"is_experimental": false
+		},
+		"component_groups": {
+			"active": {
+				"minecraft:item_hopper": {}
+			}
+		},
+		"components": {
+			"minecraft:inventory": {
+				"container_type": "inventory",
+				"inventory_size": 54
+			},
+			"minecraft:nameable": {
+				"allow_name_tag_renaming": true,
+				"always_show": true
+			},
+			"minecraft:collision_box": {
+				"width": 1,
+				"height": 1
+			},
+			"minecraft:health": {
+				"value": 1,
+				"max": 1
+			},
+			"minecraft:is_stackable": {},
+			"minecraft:physics": {},
+			"minecraft:pushable": {
+				"is_pushable": false,
+				"is_pushable_by_piston": false
+			},
+			"minecraft:on_death": {
+				"event": "ded"
+			},
+			"minecraft:damage_sensor": {
+				"triggers": [
+					{
+						"on_damage": {
+							"filters": {
+								"all_of": [
+									{
+										"test": "has_damage",
+										"value": "entity_explosion"
+									}
+								]
+							},
+							"deals_damage": false
+						}
+					},
+					{
+						"on_damage": {
+							"filters": {
+								"all_of": [
+									{
+										"test": "has_damage",
+										"value": "block_explosion"
+									}
+								]
+							},
+							"deals_damage": false
+						}
+					},
+					{
+						"on_damage": {
+							"filters": {
+								"all_of": [
+									{
+										"test": "has_damage",
+										"value": "attack"
+									},
+									{
+										"test": "is_family",
+										"subject": "other",
+										"value": "player"
+									}
+								]
+							},
+							"deals_damage": true
+						}
+					}
+				]
+			}
+		},
+		"events": {
+			"minecraft:entity_spawned": {
+				"add": {
+					"component_groups": ["active"]
+				}
+			},
+			"hopper_minecart:not_active": {
+				"remove": {
+					"component_groups": ["active"]
+				}
+			}
+		}
+	}
 }

@@ -71,7 +71,7 @@ GameTest.registerAsync("s", "m", async (test) => {
 			"Tester (" + e + ")",
 			GameMode.adventure
 		);
-		player.setVelocity({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
+		player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
 		await test.idle(Math.random() * 50);
 		handle(async () => {
 			while (!succeed) {

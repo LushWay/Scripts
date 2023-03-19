@@ -12,7 +12,6 @@
 				"gliding": "controller.animation.gliding",
 				"ground": "controller.animation.ground",
 				"jumping": "controller.animation.jumping",
-				"moving": "controller.animation.moving",
 				"swimming": "controller.animation.swimming"
 			},
 			"scripts": {
@@ -22,7 +21,6 @@
 					"gliding",
 					"ground",
 					"jumping",
-					"moving",
 					"swimming"
 				]
 			}
@@ -283,21 +281,9 @@
 			}
 		},
 		"events": {
-			"player:no_container_open": {
-				"run_command": {
-					"command": ["testfor @s"]
-				}
-			},
-			"player:has_container_open": {
-				"run_command": {
-					"command": ["testfor @s"]
-				}
-			},
-			"player:on_death": {
-				"run_command": {
-					"command": ["testfor @s"]
-				}
-			},
+			"player:no_container_open": {},
+			"player:has_container_open": {},
+			"player:on_death": {},
 			"player:warn": {
 				"add": {
 					"component_groups": ["warn"]

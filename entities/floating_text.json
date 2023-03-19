@@ -63,7 +63,7 @@
 			}
 		},
 		"events": {
-			"kill": {
+			"f:t:kill": {
 				"add": {
 					"component_groups": ["kill"]
 				}

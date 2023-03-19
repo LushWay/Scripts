@@ -32,7 +32,18 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 	zzz = zz + r;
 	ttt = zz - r;
 	ooo = xx - r;
-	world.say("x: " + xxx + " z: " + zzz + " -x: " + ooo + " -z: " + ttt + " o: " + toStr(otherposes, " "));
+	world.say(
+		"x: " +
+			xxx +
+			" z: " +
+			zzz +
+			" -x: " +
+			ooo +
+			" -z: " +
+			ttt +
+			" o: " +
+			toStr(otherposes, " ")
+	);
 	while (!y && C < 300) {
 		C++;
 		x = rd(xx + r, xx + mr);
@@ -48,7 +59,9 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 					break;
 				}
 			}
-		const b = world.getDimension("overworld").getBlockFromRay({ x: x, 320, z), new Vector(0, y: -220, z: 0) };
+		const b = world
+			.getDimension("overworld")
+			.getBlockFromRay({ x, y: 320, z }, { x: 0, y: -220, z: 0 });
 		if (b && b.location.y >= 63) {
 			y = b.location.y + 1;
 			break;
@@ -59,6 +72,6 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 		y = 100;
 		player.runCommandAsync("effect @s slow_falling 20 1 true");
 	}
-	player.teleport({ x: x, y, z), world.getDimension("overworld"), 0, y: 90, z: false };
+	player.teleport({ x, y, z }, world.getDimension("overworld"), 0, 90, false);
 	return { x: x, y: y, z: z };
 }

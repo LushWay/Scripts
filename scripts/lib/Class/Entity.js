@@ -1,10 +1,4 @@
-import {
-	Entity,
-	ItemStack,
-	Player,
-	PlayerInventoryComponentContainer,
-	world,
-} from "@minecraft/server";
+import { Container, Entity, ItemStack, Player, world } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
@@ -51,6 +45,7 @@ export const XEntity = {
 	 */
 	getAtPos({ x, y, z }, dimension = "overworld") {
 		try {
+			// @ts-expect-error
 			return DIMENSIONS[dimension].getEntitiesAtBlockLocation({
 				x: x,
 				y: y,
@@ -100,6 +95,7 @@ export const XEntity = {
 	 * Returns a location of the inputed aguments
 	 * @param {Entity} entity your using
 	 * @param {string} value what you want to search for
+	 * @returns {void}
 	 * @example removetTagStartsWith(Entity, "stuff:")
 	 */
 	removeTagsStartsWith(entity, value) {
@@ -163,7 +159,9 @@ export const XEntity = {
 		if (location) g += `location=slot.${location}`;
 		if (itemId) g += `${location ? "," : ""}item=${itemId}`;
 		try {
-			await entity.runCommandAsync(`testfor @s[hasitem={${g}}]`);
+			const res = await entity.runCommandAsync(`testfor @s[hasitem={${g}}]`);
+			if (res.successCount < 1) return false;
+
 			return true;
 		} catch (e) {
 			return false;
@@ -172,7 +170,7 @@ export const XEntity = {
 	/**
 	 * Gets the inventory of a entity
 	 * @param {Entity} entity entity you want to get
-	 * @returns {PlayerInventoryComponentContainer}
+	 * @returns {Container}
 	 */
 	getI(entity) {
 		// @ts-ignore

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
 	ItemStack,
 	MinecraftBlockTypes,
@@ -640,14 +642,8 @@ new XA.Command({
 		const loc = XA.Utils.floorVector(ctx.sender.location).offset(0, 1, 0);
 		const l = { x: loc.x + 0.5, y: loc.y, z: loc.z + 0.5 };
 
-    const rotation = ctx.sender.getRotation()
-		ctx.sender.teleport(
-			l,
-			ctx.sender.dimension,
-			rotation.x,
-			rotation.y,
-			false
-		);
+		const rotation = ctx.sender.getRotation();
+		ctx.sender.teleport(l, ctx.sender.dimension, rotation.x, rotation.y, false);
 
 		ctx.reply(`§f► ${ctx.args.slice(1).join("§r, ")}`);
 		ctx.sender.runCommandAsync("setblock ~~-3~ bedrock");

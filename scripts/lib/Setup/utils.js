@@ -144,6 +144,7 @@ export function toStr(
 					visited.add(value);
 				} catch (e) {}
 
+				/** @type {any} */
 				const allInherits = {};
 
 				for (const key in value)
@@ -180,7 +181,7 @@ export function toStr(
 
 /**
  * Runs the given callback safly. If it throws any error it will be handled
- * @param {Function | (() => void | Promise)} func
+ * @param {Function | (() => void | Promise<any>)} func
  * @param {string} [type]
  * @param {string[]} [additionalStack]
  */

@@ -1,9 +1,4 @@
-import {
-	Entity,
-	InventoryComponentContainer,
-	ItemStack,
-	world,
-} from "@minecraft/server";
+import { Entity, ItemStack, world } from "@minecraft/server";
 import { XA } from "../../xapi.js";
 import { DIMENSIONS } from "../List/dimensions.js";
 
@@ -58,9 +53,6 @@ export class XItemDatabase {
 	get ITEMS() {
 		let ITEMS = [];
 		for (const entity of this.ENTITIES) {
-			/**
-			 * @type {InventoryComponentContainer}
-			 */
 			const inv = XA.Entity.getI(entity);
 			for (let i = 0; i < inv.size; i++) {
 				const item = inv.getItem(i);
@@ -92,9 +84,6 @@ export class XItemDatabase {
 	add(item, id = null) {
 		let entity = null;
 		for (const e of this.ENTITIES) {
-			/**
-			 * @type {InventoryComponentContainer}
-			 */
 			const inv = XA.Entity.getI(e);
 			console.warn(inv.emptySlotsCount);
 			if (inv.emptySlotsCount > 0) {
@@ -134,9 +123,6 @@ export class XItemDatabase {
 				);
 			}
 		}
-		/**
-		 * @type {InventoryComponentContainer}
-		 */
 		const inv = XA.Entity.getI(entity);
 		const ID = id ? id : Date.now();
 		let lore = item.getLore() ?? [];
@@ -153,9 +139,6 @@ export class XItemDatabase {
 	 */
 	delete(id) {
 		for (const entity of this.ENTITIES) {
-			/**
-			 * @type {InventoryComponentContainer}
-			 */
 			const inv = XA.Entity.getI(entity);
 			for (let i = 0; i < inv.size; i++) {
 				const item = inv.getItem(i);

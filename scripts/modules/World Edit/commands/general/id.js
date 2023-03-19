@@ -11,7 +11,7 @@ root.executes((ctx) => {
 	const item = XA.Entity.getHeldItem(ctx.sender);
 	if (!item) return ctx.reply("§cВ руке нет предмета!");
 	ctx.reply(
-		`§b► §f${item?.typeId.replace("minecraft:", "")} ${item?.data} ${
+		`§b► §f${item?.typeId.replace("minecraft:", "")} ${
 			item?.nameTag ? item?.nameTag : ""
 		}`
 	);
@@ -45,7 +45,9 @@ root
 root
 	.literal({ name: "r", description: "Выдает наклон головы" })
 	.executes((ctx) => {
-		ctx.reply(`§a► §f${ctx.sender.rotation.x} ${ctx.sender.rotation.y}`);
+		ctx.reply(
+			`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
+		);
 	});
 
 // root.literal({ name: "c", description: "очсищ" }).executes((ctx) => {

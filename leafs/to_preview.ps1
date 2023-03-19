@@ -1,6 +1,18 @@
+$Beta = "..\..\..\..\..\..\Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe\LocalState\games\com.mojang"
 
-Copy-Item -Path "." -Destination "..\..\..\..\..\..\Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe\LocalState\\games\com.mojang\development_behavior_packs\X-API-PREVIEW" -Recurse -Exclude "$$OLD", ".vscode" -Force
+function Copy-Exclude($Path, $Destination, $Exclude) {
+  $Dest = "$Beta\$Destination"
+ 
+  Remove-Item $Dest -Force -Recurse
 
-Copy-Item -Path "..\..\minecraftpe" -Destination "..\..\..\..\..\..\Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe\LocalState\\games\com.mojang" -Recurse -Force
+  New-Item $Dest -ItemType Directory
 
-Copy-Item -Path "..\..\development_resource_packs\Steltimize" -Destination "..\..\..\..\..\..\Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe\LocalState\\games\com.mojang\development_resource_packs\Steltimize-PREVIEW" -Recurse -Exclude ".git" -Force
+  Copy-Item $Path $Dest -Recurse -Exclude $Exclude
+}
+
+
+Copy-Exclude ".\*" "development_behavior_packs\X-API-PREVIEW\"  @("node_modules", ".git", ".vscode", "*yarn*", "*.log", "*.md", "LICENSE", "package.json", ".gitignore", "leafs") 
+
+Copy-Exclude "..\..\development_resource_packs\Steltimize\*" "development_resource_packs\Steltimize-PREVIEW\" @("`$OLD", ".vscode", "*.txt")
+
+Copy-Item "..\..\minecraftpe\" "$Beta\" -Recurse -Force
