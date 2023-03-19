@@ -79,7 +79,9 @@ export class XItemDatabase {
 	/**
 	 * Saves a item to the database
 	 * @param {ItemStack} item
+	 * @param {string} id
 	 * @returns {string} an id to grab the item
+	 *
 	 */
 	add(item, id = null) {
 		let entity = null;
@@ -150,3 +152,4 @@ export class XItemDatabase {
 		return false;
 	}
 }
+

@@ -8,6 +8,8 @@ import "./lib/Setup/watchdog.js";
 
 import "./lib/Setup/prototypes.js";
 
+// import "./lib/Setup/dynamicProps.js";
+
 import { DIMENSIONS } from "./lib/List/dimensions.js";
 import { onWorldLoad } from "./lib/Setup/loader.js";
 
@@ -118,10 +120,11 @@ onWorldLoad(async () => {
 	XA.state.db_loaded = true;
 
 	await load_modules();
-	await handle(() => import("./lib/Setup/registryScore.js"));
+	await handle(() => import("./lib/Setup/scoreboards.js"));
 	XA.state.modules_loaded = true;
 
 	XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
 	if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
 	else world.say(`§fFirst loaded in ${XA.state.load_time}`);
 });
+

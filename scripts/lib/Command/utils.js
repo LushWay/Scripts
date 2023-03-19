@@ -45,7 +45,9 @@ export function commandNotFound(player, command) {
 
 	const cmds = new Set();
 
-	for (const c of XCommand.COMMANDS) {
+	for (const c of XCommand.COMMANDS.filter((e) =>
+		e.sys.data.requires(player)
+	)) {
 		cmds.add(c.sys.data.name);
 		if (c.sys.data.aliases?.length > 0) {
 			c.sys.data.aliases.forEach((e) => cmds.add(e));
@@ -62,7 +64,9 @@ export function commandNotFound(player, command) {
 	if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue))
 		return;
 
-	const suggest = (a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`;
+	const suggest = (/** @type {[string, number]} */ a) =>
+		`§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`;
+
 	let suggestion = "§cВы имели ввиду " + suggest(search[0]);
 	let firstValue = search[0][1];
 	search = search
@@ -158,6 +162,7 @@ export function parseLocationAugs([x, y, z], data) {
  */
 export function sendCallback(cmdArgs, args, event, baseCommand) {
 	const lastArg = args[args.length - 1] ?? baseCommand;
+	/** @type {any[]} */
 	const argsToReturn = [];
 	for (const [i, arg] of args.entries()) {
 		if (arg.sys.type.name.endsWith("*")) continue;
@@ -181,3 +186,4 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 		"Command"
 	);
 }
+

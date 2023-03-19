@@ -16,7 +16,7 @@ R.executes((ctx) => {
 	const needAdmin = ctx.args[0] === "ACCESS";
 	const beenAdmin = DB.has(`SETTER:` + ctx.sender.id) && !isAdmin;
 
-	if (noAdmins && (needAdmin || beenAdmin)) {
+	if (noAdmins && (needAdmin || beenAdmin) && ctx.sender.isOp()) {
 		setRole(ctx.sender.id, "admin");
 		return ctx.reply("§b> §r" + TR.admin);
 	}
@@ -33,6 +33,7 @@ R.executes((ctx) => {
 		return () => {
 			const role = getRole(player.id);
 			const ROLE = Object.keys(ROLES).map(
+				// @ts-expect-error
 				(e) => `${role === e ? "> " : ""}` + TR[e]
 			);
 			new ModalForm(player.name)
@@ -71,3 +72,4 @@ R.executes((ctx) => {
 
 	form.show(ctx.sender);
 });
+

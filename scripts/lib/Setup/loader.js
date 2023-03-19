@@ -9,12 +9,13 @@ var ON_LOAD_CALLBACKS = [];
 
 var ON_LOAD_PROMISE = new Promise((resolve) =>
 	system.run(async function waiter() {
-		try {
-			await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
-		} catch (error) {
+		const players = await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+		if (players.successCount < 1) {
 			// No players found, we need to re-run this...
 			return system.run(waiter);
 		}
+
+		console.warn("WORLD LOADED");
 
 		WORLD_IS_LOADED = true;
 		ON_LOAD_CALLBACKS.forEach((callback) => handle(callback));
@@ -37,3 +38,5 @@ export async function onWorldLoad(callback) {
 // To not export rare usable things, i put them to exported function
 onWorldLoad.promise = ON_LOAD_PROMISE;
 onWorldLoad.callbacks = ON_LOAD_CALLBACKS;
+onWorldLoad.loaded = () => WORLD_IS_LOADED;
+

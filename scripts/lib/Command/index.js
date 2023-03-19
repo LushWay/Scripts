@@ -52,7 +52,8 @@ export class XCommand {
 			if (start.sys.children.length > 0) {
 				const arg = start.sys.children.find(
 					(v) =>
-						v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional)
+						v.sys.type.matches(args[i]).success ||
+						(!args[i] && v.sys.type.optional)
 				);
 				if (!arg && !args[i] && start.sys.callback) return;
 				if (!arg)
@@ -84,35 +85,22 @@ export class XCommand {
 		data.type ??= "test";
 		if ("require" in data) data.requires = (p) => IS(p.id, data.require);
 
-    this.sys = {}
-
-    /**
-		 * @type {import("./types.js").ICommandData}
-		 * @private
-		 */
-		this.sys.data = data;
-		/**
-		 * @type {IArgumentType}
-		 */
-		this.sys.type = type ?? new LiteralArgumentType(data.name);
-		/**
-		 * The Arguments on this command
-		 * @type {XCommand<any>[]}
-		 */
-		this.sys.children = [];
-		/**
-		 * @type {number}
-		 */
-		this.sys.depth = depth;
-		/**
-		 * @type {XCommand<any>}
-		 */
-		this.sys.parent = parent;
-		/**
-		 * Function to run when this command is called
-		 * @type {Callback}
-		 */
-		this.sys.callback = null;
+		this.sys = {
+			data,
+			type: type ?? new LiteralArgumentType(data.name),
+			/**
+			 * The Arguments on this command
+			 * @type {XCommand<any>[]}
+			 */
+			children: [],
+			depth,
+			parent,
+			/**
+			 * Function to run when this command is called
+			 * @type {Callback}
+			 */
+			callback: undefined,
+		};
 
 		if (depth === 0) XCommand.COMMANDS.push(this);
 	}
@@ -208,3 +196,4 @@ export class XCommand {
 }
 
 world.events.beforeChat.subscribe(XCommand.chatListener);
+

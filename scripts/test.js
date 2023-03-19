@@ -1,8 +1,14 @@
-import { ItemUseOnEvent, Vector, world } from "@minecraft/server";
-import { toStr } from "./lib/Setup/utils.js";
+import { ItemUseOnEvent, system, Vector, world } from "@minecraft/server";
 
 world.debug = (...data) => {
-	world.sendMessage(data.map((/** @type {*} */ e) => toStr(e)).join(" "));
+	world.sendMessage(
+		data.map((/** @type {*} */ e) => JSON.stringify(e)).join(" ")
+	);
+};
+
+const err = console.error;
+console.error = (...data) => {
+	err(data.map((/** @type {*} */ e) => JSON.stringify(e)).join(" "));
 };
 
 Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {

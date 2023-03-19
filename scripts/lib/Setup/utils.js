@@ -1,5 +1,6 @@
 import { world } from "@minecraft/server";
 import { stackParse } from "../Class/Error.js";
+import { onWorldLoad } from "./loader.js";
 import { sleep } from "./timers.js";
 
 /**
@@ -21,10 +22,11 @@ export function DisplayError(e, deleteStack = 0, additionalStack = []) {
 	const text = `§4${type}: §c${message}\n§f${stack}\n`;
 
 	try {
-		world.say(text);
-	} catch (e) {
-		console.warn(e);
-	}
+		if (false) {
+		}
+		// if (onWorldLoad.loaded()) world.say(text);
+		else console.error(text);
+	} catch (e) {}
 }
 
 /**
@@ -200,3 +202,4 @@ export async function handle(func, type = "Handled", additionalStack) {
 		);
 	}
 }
+

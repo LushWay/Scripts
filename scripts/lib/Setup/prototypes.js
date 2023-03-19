@@ -78,3 +78,8 @@ Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
 	configurable: false,
 	enumerable: true,
 });
+
+editMethod(console, "warn", ({ original, args }) => {
+	original(...args.map((e) => toStr(e)));
+});
+

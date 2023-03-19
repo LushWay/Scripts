@@ -10,15 +10,15 @@ m`Test`;
 
 m`Chat`;
 m`Admin`;
+m`DamageIndicator`;
 mm("OnJoin", { fileName: "join" });
-// mm("World Edit", { fileName: "WBindex" });
+mm("World Edit", { fileName: "WBindex" });
 // m`GameTest`;
 // m`Leaderboards`;
 
-if (false) {
-	m`Battle Royal`;
-	m`Debug`;
-	m`Airdrops`;
-	m`Chest GUI/src`;
-	m`migrate`;
-}
+// m`Battle Royal`;
+// m`Debug`;
+// m`Airdrops`;
+// m`Chest GUI/src`;
+// m`migrate`;
+

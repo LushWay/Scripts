@@ -9,6 +9,8 @@ new XA.Command({
 })
 	.location("pos", true)
 	.executes((ctx, pos) => {
+		pos = XA.Utils.floorVector(pos);
 		WorldEditBuild.pos1 = pos;
 		ctx.reply(`§5►§r (1) ${pos.x}, ${pos.y}, ${pos.z}`);
 	});
+
