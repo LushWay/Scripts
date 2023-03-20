@@ -4,6 +4,7 @@ import {
 	EntityTypes,
 	ItemStack,
 	MinecraftItemTypes,
+	Vector,
 	world,
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
@@ -62,9 +63,42 @@ export class Database {
 			ENTITY_LOCATION
 		);
 		entity.setDynamicProperty("tableName", tableName);
-		entity.nameTag = `§7Database Table: §f${tableName}§r`;
+		entity.nameTag = `§7DB §f${tableName}§r`;
 		if (index) entity.setDynamicProperty("index", index);
 		return entity;
+	}
+	/**
+	 * @type {{
+	 *   entity: Entity;
+	 *   index: number;
+	 *   tableName: string | number | boolean;
+	 * }[]}
+	 */
+	static allDB;
+	static all() {
+		this.allDB ??= DIMENSIONS.overworld
+			.getEntities({ type: ENTITY_IDENTIFIER })
+			.map((entity) => {
+				let index = entity.getDynamicProperty("index");
+				if (typeof index !== "number") index = 0;
+
+				const tableName = entity.getDynamicProperty("tableName");
+				if (typeof tableName !== "string")
+					return { entity, index, tableName: "NOTDB" };
+
+				const loc = entity.location;
+				if (Vector.distance(loc, ENTITY_LOCATION) > 1)
+					entity.teleport(ENTITY_LOCATION);
+
+				return {
+					entity,
+					index,
+					tableName,
+				};
+			})
+			.filter((e) => e.tableName !== "NOTDB");
+
+		return this.allDB;
 	}
 	/**
 	 * Gets all table Entities associated with this tableName
@@ -73,21 +107,10 @@ export class Database {
 	 */
 	static getTableEntities(tableName) {
 		try {
-			const all = [
-				...DIMENSIONS.overworld.getEntities({ type: ENTITY_IDENTIFIER }),
-			];
-
-			const filtered = all
-				.filter((e) => e.getDynamicProperty("tableName") === tableName)
-				.map((entity) => {
-					let index = entity.getDynamicProperty("index");
-					if (typeof index !== "number") index = 0;
-					return { entity, index };
-				})
+			return this.all()
+				.filter((e) => e.tableName === tableName)
 				.sort((a, b) => a.index - b.index)
 				.map((e) => e.entity);
-
-			return filtered;
 		} catch (e) {
 			DisplayError(e);
 			return [];
@@ -163,8 +186,10 @@ export class Database {
 		let entities = Database.getTableEntities(this.tableName);
 
 		if (entities.length < 1) {
-			world.say("§cNo entities found for table " + this.tableName);
 			this.noMemory = true;
+			console.warn("§cNo entities found for table §f" + this.tableName);
+			world.say("§cNo entities found for table §f" + this.tableName);
+
 			Reflect.set(this, "MEMORY", {});
 			await this.save();
 			return;

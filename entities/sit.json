@@ -21,6 +21,9 @@
 					"position": [0.0, 0.925, -0.2]
 				}
 			},
+			"minecraft:type_family": {
+				"family": ["inanimate"]
+			},
 			"minecraft:fire_immune": true,
 			"minecraft:movement": {
 				"value": 0

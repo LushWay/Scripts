@@ -17,6 +17,9 @@
 			"minecraft:movement": {
 				"value": 0
 			},
+			"minecraft:type_family": {
+				"family": ["inanimate"]
+			},
 			"minecraft:damage_sensor": {
 				"triggers": [
 					{
@@ -57,10 +60,10 @@
 			},
 			"minecraft:navigation.walk": {
 				"can_sink": false
-			},
-			"minecraft:ground_offset": {
-				"value": 100
 			}
+			// "minecraft:ground_offset": {
+			// 	"value": 100
+			// }
 		},
 		"events": {
 			"f:t:kill": {

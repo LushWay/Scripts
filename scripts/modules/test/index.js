@@ -1,9 +1,4 @@
-import {
-	MinecraftBlockTypes,
-	MolangVariableMap,
-	system,
-	world,
-} from "@minecraft/server";
+import { system, Vector, world } from "@minecraft/server";
 import {
 	DisplayError,
 	handle,
@@ -20,7 +15,6 @@ import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { benchmark } from "../../lib/XBenchmark.js";
 import { Region } from "../Region/utils/Region.js";
-import { Cuboid } from "../World Edit/modules/utils/Cuboid.js";
 
 /**
  * @typedef {{x: number, z: number}} IRegionCords
@@ -30,7 +24,7 @@ import { Cuboid } from "../World Edit/modules/utils/Cuboid.js";
 const regs = [];
 
 /**
- * @type {Object<string, (ctx?: CommandContext) => void | Promise>}
+ * @type {Object<string, (ctx?: CommandContext) => void | Promise<any>>}
  */
 const tests = {
 	1: (ctx) => {
@@ -53,120 +47,8 @@ const tests = {
 		);
 		menu.show(ctx.sender);
 	},
-	3: async () => {
-		const size = 30; // size
-		const size2 = size / 2 - 1;
-
-		/**
-		 * @param {IRegionCords} center
-		 * @param {number} x
-		 * @param {number} z
-		 * @returns {IRegionCords}
-		 */
-		function moveCenter(center, x, z) {
-			return { x: center.x + x * size, z: center.z + z * size };
-		}
-
-		/**
-		 * @template T
-		 * @param {T[]} arr
-		 * @returns {T[]}
-		 */
-		function moveEls(arr) {
-			const lm = arr.shift();
-			return undefined !== lm ? [...arr, lm] : arr;
-		}
-
-		/**
-		 * Compare a array of numbers with 2 arrays
-		 * @param {[number, number, number]} XYZa  The first set of numbers
-		 * @param {[number, number, number]} XYZb  The second set of numbers
-		 * @param {[number, number, number]} XYZc  The set of numbers that should between the first and second set of numbers
-		 * @example betweenXYZ([1, 0, 1], [22, 81, 10], [19, 40, 6]));
-		 * @returns {boolean}
-		 */
-		function betweenXYZ(XYZa, XYZb, XYZc) {
-			return XYZc.every(
-				(c, i) =>
-					c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i])
-			);
-		}
-
-		/**
-		 * @returns {Promise<{from: IRegionCords, to: IRegionCords}>}
-		 */
-		async function findFreePlace() {
-			let center = { x: 0, z: 0 };
-			let tries = 0;
-			let from;
-			let to;
-			const visited = [];
-			let x = [-1, 0, 1, 0];
-			let z = [0, -1, 0, 1];
-
-			while (!from) {
-				tries++;
-				if (tries >= 20) await sleep(1), (tries = 0);
-
-				const alreadyExist = regs.find((e) =>
-					betweenXYZ(
-						[e[0].x, 1, e[0].z],
-						[e[1].x, -1, e[1].z],
-						[center.x, 0, center.z]
-					)
-				);
-
-				if (alreadyExist) {
-					const nextCenter = moveCenter(center, x[1], z[1]);
-					if (!visited.includes(nextCenter.x + " " + nextCenter.z)) {
-						x = moveEls(x);
-						z = moveEls(z);
-					}
-
-					center = moveCenter(center, x[0], z[0]);
-					visited.push(center.x + " " + center.z);
-				} else {
-					from = { x: center.x - size2, z: center.z - size2 };
-					to = { x: center.x + size2, z: center.z + size2 };
-					break;
-				}
-			}
-
-			return { from, to };
-		}
-
-		const reg = await findFreePlace();
-		const set = (pos) =>
-			XA.dimensions.overworld
-				.getBlock({ x: pos.x, y: -60, z: pos.z })
-				.setType(MinecraftBlockTypes.bedrock);
-
-		set(reg.from);
-		set(reg.to);
-		regs.push([reg.from, reg.to]);
-	},
-	5: async (ctx) => {
-		let form = new ModalForm("TITLE");
-
-		for (let c = 0; c < 20; c++)
-			form.addToggle("Опция\n\n§7Описание описание описание\n \n \n ", false);
-
-		await form.show(ctx.sender, (ctx, ...values) => {
-			world.say("ee");
-			// @ts-expect-error f0993d58-5734-43ee-9008-8546337c6785
-			if (values[0]) ctx.error("ER");
-			world.say(toStr(values));
-		});
-	},
 	8: () => {
 		throw new Error("ERR");
-	},
-	9: (ctx) => {
-		const form = new ActionForm("Like this", "Logs will be showed there");
-		form.addButton("Exit", null, (ctx) => {
-			ctx;
-		});
-		form.show(ctx.sender);
 	},
 	10: (ctx) => {
 		let e = 1;
@@ -247,9 +129,6 @@ const tests = {
 		);
 		region.update();
 	},
-	19: (ctx) => {
-		console.warn("WARN");
-	},
 	20: async () => {
 		DisplayError(new ReferenceError("Test reference error"));
 		try {
@@ -288,48 +167,6 @@ const tests = {
 			);
 		}
 	},
-	26(ctx) {
-		const pos1 = XA.Utils.floorVector(ctx.sender.location);
-		const pos2 = pos1.offset(3, 3, 3);
-		const cube = new Cuboid(pos1, pos2);
-		const { xCenter, xMax, xMin, zCenter, zMax, zMin, yCenter, yMax, yMin } =
-			cube;
-		const end1 = benchmark("safeBlocksForOF");
-		for (const { x, y, z } of XA.Utils.safeBlocksBetween(pos1, pos2)) {
-			const q =
-				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
-				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
-				((z == zMin || z == zMax) && (x == xMin || x == xMax));
-
-			if (q)
-				ctx.sender.dimension.spawnParticle(
-					"minecraft:endrod",
-					{ x: x, y: y, z: z },
-					new MolangVariableMap()
-				);
-		}
-		end1();
-		const end2 = benchmark("safeBlocksWhile");
-		const gen = XA.Utils.safeBlocksBetween(pos1, pos2);
-		let val;
-		while (!val?.done) {
-			val = gen.next();
-			if (!val.value) continue;
-			const { x, y, z } = val.value;
-			const q =
-				((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
-				((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
-				((z == zMin || z == zMax) && (x == xMin || x == xMax));
-
-			if (q)
-				ctx.sender.dimension.spawnParticle(
-					"minecraft:endrod",
-					{ x: x, y: y, z: z },
-					new MolangVariableMap()
-				);
-		}
-		end2();
-	},
 	27(ctx) {
 		system.run(() => {
 			world.say(stackParse());
@@ -344,45 +181,9 @@ const tests = {
 			run();
 		}
 	},
-	29(ctx) {
-		ctx.sender;
-
-		const location = { x: 1, y: 1, z: 1 };
-
-		class Location {
-			constructor(x, y, z) {
-				this.y = y;
-				this.z = z;
-				this.x = x;
-			}
-			isNear() {
-				return true;
-			}
-			equals() {
-				return true;
-			}
-		}
-
-		class BlockLocation {
-			constructor(x, y, z) {
-				this.y = y;
-				this.z = z;
-				this.x = x;
-			}
-			offset(x, y, z) {}
-		}
-
-		world.say(
-			toStr(
-				XA.dimensions.overworld.getEntities({
-					location: { x: 12, y: 23, z: 1 },
-				})
-			)
-		);
-	},
 	30(ctx) {
 		const pos1 = XA.Utils.floorVector(ctx.sender.location);
-		const pos2 = pos1.offset(0, -1, 0);
+		const pos2 = Vector.add(pos1, Vector.down);
 		const block = ctx.sender.dimension.getBlock(pos2);
 
 		world.debug(block.getTags());

@@ -1,68 +1,55 @@
-import { GameMode, MinecraftBlockTypes, world } from "@minecraft/server";
+import {
+	GameMode,
+	MinecraftBlockTypes,
+	Vector,
+	world,
+} from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { handle, IS, setTickInterval, sleep, XA } from "xapi.js";
+import { handle, IS, sleep, XA } from "xapi.js";
+import { DIMENSIONS } from "../../lib/List/dimensions.js";
 
-const Options = XA.WorldOptions("simulatedPlayer", {
-	name: { value: "", desc: "Имя бота" },
-	time: { value: 1500, desc: "Время бота" },
-});
+const time = 9999999;
 
-let name = Options.name;
-let time = Options.time;
+let name = "Бот";
+/** @type {GameTest.SimulatedPlayer} */
+let simp;
+const test_loc = { x: 1000, y: -60, z: 1000 };
 
 GameTest.registerAsync("s", "s", async (test) => {
-	world.say(`На игры с ботиком даю вам ${time} тиков`);
 	const spawnLoc = { x: 1, y: 5, z: 1 };
-	const player = test.spawnSimulatedPlayer(spawnLoc, name);
+	simp = test.spawnSimulatedPlayer(spawnLoc, name);
 
-	const end = setTickInterval(
-		() => {
-			if (!player || XA.Entity.isDead(player)) test.fail("Игрок сдох");
-			player.nameTag = name + "\n" + time;
-			time--;
-		},
-		0,
-		"simulatedPlayer"
-	);
-	await sleep(time);
-	end();
+	await test.idle(time - 30);
+	test.succeed();
 })
-	.maxTicks(time + 20)
+	.maxTicks(time)
 	.structureName("Component:grass5x5")
 	.tag("sim");
 
-const cmd = new XA.Command({
+new XA.Command({
 	name: "player",
 	description: "Спавнит фэйкового игрока",
 	requires: (p) => IS(p.id, "admin"),
 	type: "test",
-}).executes(async (ctx) => {
-	const o = world.getDimension("overworld").getBlock({ x: 10, y: 63, z: 13 });
-	o.setType(MinecraftBlockTypes.redstoneBlock);
-	await sleep(10);
-	console.log(
-		world.getDimension("overworld").getBlock({ x: 10, y: 63, z: 13 }).typeId
-	);
-	XA.runCommandX(`tp "${name}" "${ctx.sender.name}"`);
-	// ctx.sender.runCommandAsync("gametest runthis");
-});
-cmd
-	.literal({ name: "name" })
-	.string("new name")
-	.executes((ctx, newname) => {
-		ctx.reply(name + " > " + newname);
-		name = newname;
-		Options.name = newname;
+})
+	.string("new name", true)
+	.executes(async (ctx, newname) => {
+		if (newname) name = newname;
+
+		await XA.runCommandX(
+			`execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`
+		);
+
+		DIMENSIONS.overworld
+			.getBlock(Vector.add(test_loc, { x: 1, y: 0, z: 1 }))
+			.setType(MinecraftBlockTypes.redstoneBlock);
+
+		await sleep(10);
+
+		simp.teleport(ctx.sender.location);
 	});
 
-/**
- *
- * @param {number} max
- * @param {number} min
- * @param {boolean} msg
- * @returns
- */
-
+// Many players
 GameTest.registerAsync("s", "m", async (test) => {
 	let succeed = false;
 	for (let e = 0; e < 5; e++) {
@@ -101,6 +88,13 @@ GameTest.registerAsync("s", "m", async (test) => {
 	.structureName("Component:grass5x5")
 	.tag("sim");
 
+/**
+ *
+ * @param {number} max
+ * @param {number} min
+ * @param {boolean} msg
+ * @returns
+ */
 function rd(max, min = 0, msg = false) {
 	if (max == min || max < min) return max;
 
