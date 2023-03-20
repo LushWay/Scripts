@@ -5,11 +5,12 @@ import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
 /**
  *
  * @param {XCommand} command
+ * @returns {XCommand<any>[]}
  */
 function childrensToHelpText(command) {
 	const _ = [];
 	for (const children of command.sys.children) {
-		if (children.children.length < 1) _.push(children);
+		if (children.sys.children.length < 1) _.push(children);
 		else _.push(...childrensToHelpText(children));
 	}
 	return _;
@@ -124,8 +125,8 @@ help.string("commandName").executes((ctx, commandName) => {
 
 	let l = str.length;
 
-	for (const [command, description] of childrensToHelpText(cmd).map(
-		getParentType
+	for (const [command, description] of childrensToHelpText(cmd).map((e) =>
+		getParentType(e)
 	)) {
 		const _ = `§7   §f-${command}§7§o - ${description}§r`;
 		l = Math.max(l, _.length);

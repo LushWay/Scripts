@@ -71,7 +71,7 @@ world.events.beforeChat.subscribe((data) => {
 		data.sender.tell(
 			!hightlight
 				? `${role ? role + " " : ""}§7${data.sender.name}§r: ${data.message}`
-				: `§6§lЯ§r: §f${data.message}`
+				: `§6§lЯ§r: §f${data.message.replace(/\\n/g, "\n")}`
 		);
 	} catch (error) {
 		DisplayError(error);

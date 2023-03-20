@@ -14,6 +14,8 @@ m`DamageIndicator`;
 mm("OnJoin", { fileName: "join" });
 mm("World Edit", { fileName: "WBindex" });
 m`GameTest`;
+m`Guard`;
+
 // m`Leaderboards`;
 
 // m`Battle Royal`;

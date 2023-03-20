@@ -201,7 +201,26 @@ const tests = {
 		);
 		reg.update();
 	},
+	32(ctx) {
+		const show = () => {
+			new ModalForm("Tet")
+				.addTextField(
+					text.replace(/\\n/g, "\n") || "input and submit",
+					"",
+					text
+				)
+				.show(ctx.sender, (_, text2) => {
+					text = text2;
+					world.say(text2);
+					show();
+				});
+		};
+
+		show();
+	},
 };
+
+let text = "";
 let bigdata = "";
 let done = false;
 
