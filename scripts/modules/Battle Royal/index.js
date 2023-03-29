@@ -1,5 +1,5 @@
 import { Player, world, system } from "@minecraft/server";
-import { IS,  XA } from "xapi.js";
+import { IS, XA } from "xapi.js";
 import { Atp } from "../Server/portals.js";
 import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
 import { quene } from "./var.js";
@@ -116,7 +116,7 @@ system.runInterval(
 		}
 	},
 	"battleRoyal",
-	20,
+	20
 );
 
 const bbr = new XA.Command({
@@ -182,7 +182,6 @@ world.events.playerJoin.subscribe(({ playerId, playerName }) => {
 			}
 		},
 		"br",
-		5,
+		5
 	);
 });
-
