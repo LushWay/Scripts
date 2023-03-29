@@ -5,10 +5,10 @@ import {
 	MinecraftBlockTypes,
 	MinecraftItemTypes,
 	Player,
-	Vector,
 	world,
+	system,
 } from "@minecraft/server";
-import { DisplayError, IS, sleep, XA } from "xapi.js";
+import { DisplayError, IS, XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
 import { global } from "./var.js";
@@ -183,11 +183,11 @@ class inventory {
 			0,
 			false
 		);
-		await sleep(10);
+		await system.sleep(10);
 		pl.addTag("saving");
 		const name = pl.name;
 		pl.kill();
-		sleep(10).then((e) => {
+		system.sleep(10).then((e) => {
 			XA.runCommandX(
 				`structure save ${this.structureName.replace("$name", pl.name)} ${
 					zone.x
@@ -207,7 +207,7 @@ class inventory {
 		let C = 0;
 		while ((await XA.runCommandX("testfor " + name)) < 1 && C < 100) {
 			C++;
-			await sleep(5);
+			await system.sleep(5);
 		}
 
 		//console.warn("Инвентарь сохранен");
@@ -254,7 +254,7 @@ class inventory {
 			XA.runCommandX(
 				`structure delete ${this.structureName.replace("$name", pl.name)}`
 			);
-			await sleep(1);
+			await system.sleep(1);
 			while (
 				world
 					.getDimension("overworld")
@@ -262,7 +262,7 @@ class inventory {
 					.filter((e) => e.typeId == "minecraft:item").length > 0
 			) {
 				pl.runCommandAsync("title @s title §cОдень броню!");
-				await sleep(3);
+				await system.sleep(3);
 			}
 			return;
 			//console.warn('Загрузка завершена');
@@ -648,3 +648,4 @@ new XA.Command({
 		ctx.reply(`§f► ${ctx.args.slice(1).join("§r, ")}`);
 		ctx.sender.runCommandAsync("setblock ~~-3~ bedrock");
 	});
+

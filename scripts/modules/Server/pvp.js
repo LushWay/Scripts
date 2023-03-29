@@ -1,6 +1,6 @@
-import { Entity, Player, world } from "@minecraft/server";
+import { Entity, Player, system, world } from "@minecraft/server";
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
-import { setPlayerInterval, setTickInterval, XA } from "../../xapi.js";
+import { XA } from "../../xapi.js";
 import { getServerType, InRaid } from "../Region/var.js";
 import { stats } from "./var.js";
 
@@ -33,7 +33,7 @@ const getPlayerSettings = XA.PlayerOptions("pvp", {
 	},
 });
 
-setTickInterval(
+system.runInterval(
 	() => {
 		for (const id in InRaid) {
 			const player = XA.Entity.fetch(id);
@@ -66,11 +66,11 @@ setTickInterval(
 			for (const p of world.getPlayers(opts(lockedTitleScore))) PVP.eAdd(p, -1);
 		}
 	},
-	20,
-	"PVP"
+	"PVP",
+	20
 );
 
-setPlayerInterval(
+system.runPlayerInterval(
 	(player) => {
 		if (!XA.state.modules_loaded || !options.enabled) return;
 		const score = PVP.eGet(player);
@@ -88,8 +88,8 @@ setPlayerInterval(
 				`${g("»")} §6PvP: ${score} ${g("«")}`
 			);
 	},
-	0,
-	"PVP player"
+	"PVP player",
+	0
 );
 
 world.events.entityHurt.subscribe((data) => {
@@ -166,3 +166,4 @@ function playHitSound(player, damage) {
 function isPvpLocked(entity) {
 	return XA.Entity.getTagStartsWith(entity, "lockpvp:");
 }
+

@@ -1,10 +1,9 @@
-import { MolangVariableMap, Player, Vector } from "@minecraft/server";
-import { DisplayError, sleep, XA } from "xapi.js";
+import { MolangVariableMap, Player, Vector, system } from "@minecraft/server";
+import { DisplayError, XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";
-
 
 class WorldEditBuilder {
 	drawselection = CONFIG_WB.DRAW_SELECTION_DEFAULT;
@@ -267,7 +266,7 @@ class WorldEditBuilder {
 			);
 			if (result === 0) errors++;
 			all++;
-			await sleep(1);
+			await system.sleep(1);
 		}
 
 		const endTime = get(Date.now() - startTime);
@@ -288,3 +287,4 @@ class WorldEditBuilder {
 	}
 }
 export const WorldEditBuild = new WorldEditBuilder();
+

@@ -8,7 +8,7 @@ export const __MODULES__ = {};
 
 /**
  *
- * @param {(file: string) => Promise} importFunction
+ * @param {(file: string) => Promise<any>} importFunction
  * @param {[string, string][]} arrayOfFiles
  * @example ```js
  * multiload((file) => import("./" + file + ".js"), [["filePath", "Name"]], "ModuleName")
@@ -16,7 +16,7 @@ export const __MODULES__ = {};
  */
 export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 	for (const [path, name] of arrayOfFiles) {
-		const er = (e) =>
+		const error = (/** @type {Error} */ e) =>
 			DisplayError({
 				message: `§c${name}: §f${`${e.message ?? e}`.replace(
 					// Get "Module (>>modules/ex/index.js:12<<)" part
@@ -30,9 +30,9 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 			const module = importFunction(path);
 
 			if (CONFIG.module.loadAwait) await module;
-			else module.catch(er);
+			else module.catch(error);
 		} catch (e) {
-			er(e);
+			error(e);
 		}
 	}
 }
@@ -40,3 +40,4 @@ export async function multiload(importFunction, arrayOfFiles, type = "sub") {
 export async function load_modules() {
 	return multiload(DIR_IMPORT, Object.entries(__MODULES__), "X-API");
 }
+

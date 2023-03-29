@@ -1,5 +1,5 @@
-import { MinecraftDimensionTypes, world } from "@minecraft/server";
-import { setTickInterval, XA } from "xapi.js";
+import { MinecraftDimensionTypes, system, world } from "@minecraft/server";
+import { XA } from "xapi.js";
 
 /**======================
  **       PLUGINS
@@ -91,7 +91,7 @@ setTickInterval(
 // 	"serverTpShit"
 // );
 
-setTickInterval(
+system.runInterval(
 	async () => {
 		let players = [];
 		for (const player of world.getPlayers()) {
@@ -145,8 +145,8 @@ setTickInterval(
 		}
 		/*================================ DEBUG2 ==============================*/
 	},
-	10,
-	"serverAsyncShit"
+	"serverAsyncShit",
+	10
 ); /*
 
 /*
@@ -280,3 +280,4 @@ setTickInterval(
 | 
 | 
 */
+

@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { Player, world } from "@minecraft/server";
-import { sleep, XA } from "xapi.js";
+import { system, XA } from "xapi.js";
 import { Subscriber } from "../../lib/Class/XEvents.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
@@ -63,7 +63,7 @@ class BattleRoyal {
 		let C = 0;
 
 		while ((await XA.runCommandX("testfor " + name)) < 1 && C < 100) {
-			await sleep(5);
+			await system.sleep(5);
 			C++;
 		}
 		playerJoinQuene.emit(XA.Entity.fetch(name));
@@ -413,3 +413,4 @@ class BattleRoyal {
 }
 
 export const br = new BattleRoyal();
+

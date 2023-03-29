@@ -24,12 +24,7 @@ root
 		const l = XA.Utils.floorVector(location);
 		const block = ctx.sender.dimension.getBlock(l);
 		if (!block) return ctx.reply("§cНет блока!");
-		ctx.reply(
-			`§b► §f${block.typeId.replace(
-				"minecraft:",
-				""
-			)} §6${XA.Utils.getBlockData(block)}`
-		);
+		ctx.reply(`§b► §f${block.typeId.replace("minecraft:", "")}`);
 	});
 
 root
@@ -73,3 +68,4 @@ root
 // 	XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 // 	ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
 // });
+

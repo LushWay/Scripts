@@ -12,7 +12,9 @@ export function stringDistance(string1, string2) {
 
 	const matchWindow = ~~Math.max(0, string2.length / 2 - 1);
 
+	/** @type {string[]} */
 	let str1Matches = [];
+	/** @type {string[]} */
 	let str2Matches = [];
 
 	forEveryChar(string1, (i, char) => {
@@ -51,7 +53,10 @@ export function stringDistance(string1, string2) {
 	});
 
 	const jaro =
-		(matchesN / string1.length + matchesN / string2.length + (matchesN - ~~(transpositions / 2)) / matchesN) / 3.0;
+		(matchesN / string1.length +
+			matchesN / string2.length +
+			(matchesN - ~~(transpositions / 2)) / matchesN) /
+		3.0;
 	return jaro + Math.min(prefix, 4) * 0.1 * (1 - jaro);
 }
 
@@ -69,13 +74,17 @@ function forEveryChar(string, callback) {
  * contains a string from the array and the Levenshtein distance between that string and the search
  * string
  * @param {string} search - The string you're searching for
- * @param {string[]} arr - an array of strings
+ * @param {string[]} array - an array of strings
  * @returns {[string, number][]} An array of arrays. Each sub-array contains the element and the distance.
  */
-export function inaccurateSearch(search, arr) {
-	let res = {};
-	for (const el of arr) {
-		res[el] = stringDistance(search, el);
-	}
-	return Object.entries(res).sort((a, b) => b[1] - a[1]);
+export function inaccurateSearch(search, array) {
+	return array
+		.map(
+			/** @type {(v: string,) => [string, number]} */ (element) => [
+				element,
+				stringDistance(search, element),
+			]
+		)
+		.sort((a, b) => b[1] - a[1]);
 }
+

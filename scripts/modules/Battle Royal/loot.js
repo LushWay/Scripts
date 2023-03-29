@@ -1,9 +1,5 @@
-import {
-	ItemStack,
-	MinecraftBlockTypes,
-	Vector,
-	world,
-} from "@minecraft/server";
+// @ts-nocheck
+import { ItemStack, MinecraftBlockTypes, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
 
@@ -66,3 +62,4 @@ export class LootChest {
 		return `${block.location.x} ${block.location.y} ${block.location.z}`;
 	}
 }
+

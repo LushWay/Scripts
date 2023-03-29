@@ -1,6 +1,6 @@
-import { Entity, Vector, world } from "@minecraft/server";
+import { Entity, Vector, world, system } from "@minecraft/server";
 import { DIMENSIONS } from "../../lib/List/dimensions.js";
-import { setTickInterval, XA } from "../../xapi.js";
+import { XA } from "../../xapi.js";
 import { NameModifiers } from "./var.js";
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
@@ -50,7 +50,7 @@ world.events.entityDie.subscribe((data) => {
 	delete HURT_ENTITIES[data.deadEntity.id];
 });
 
-setTickInterval(
+system.runInterval(
 	() => {
 		for (const [id, info] of Object.entries(HURT_ENTITIES)) {
 			const entity = DIMENSIONS.overworld
@@ -77,19 +77,19 @@ setTickInterval(
 				);
 		}
 	},
-	0,
-	"hurt indicator"
+	"hurt indicator",
+	0
 );
 
-setTickInterval(
+system.runInterval(
 	() => {
 		for (const id in HURT_ENTITIES) {
 			const damage = HURT_ENTITIES[id].damage;
 			if (damage > 0) HURT_ENTITIES[id].damage -= damage / 2;
 		}
 	},
-	20,
-	"damage counter"
+	"damage counter",
+	20
 );
 
 let stat = false;

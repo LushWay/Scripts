@@ -1,5 +1,5 @@
-import { MinecraftBlockTypes, Vector } from "@minecraft/server";
-import { DisplayError, sleep, XA } from "xapi.js";
+import { MinecraftBlockTypes, system, Vector } from "@minecraft/server";
+import { DisplayError, XA } from "xapi.js";
 import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
@@ -20,8 +20,8 @@ export class Shape {
 		this.blocks = blocks;
 		this.pos = pos;
 		this.rad = rad;
-		this.pos1 = Vector.multiply(pos, { x: -rad, y: -rad, z: -rad });
-		this.pos2 = Vector.multiply(pos, { x: rad, y: rad, z: rad });
+		this.pos1 = Vector.add(pos, { x: -rad, y: -rad, z: -rad });
+		this.pos2 = Vector.add(pos, { x: rad, y: rad, z: rad });
 
 		WorldEditBuild.backup(this.pos1, this.pos2);
 
@@ -44,13 +44,13 @@ export class Shape {
 
 		for (const { x, y, z } of XA.Utils.safeBlocksBetween(loc1, loc2)) {
 			if (!this.condition(x, y, z)) continue;
-			const location = Vector.multiply(this.pos, { x, y, z });
+			const location = Vector.add(this.pos, { x, y, z });
 			const block = this.blocks[~~(Math.random() * this.blocks.length)];
 			setblock(block, location);
 			blocksSet++;
 
 			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
-				await sleep(CONFIG_WB.TICKS_TO_SLEEP);
+				await system.sleep(CONFIG_WB.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}
@@ -73,7 +73,7 @@ export class spawn {
 	/**
 	 * @param {boolean} remove
 	 */
-	constructor(pos1x, pos1z, pos2x, pos2z, remove = false) {
+	constructor(pos1x = 0, pos1z = 0, pos2x = 0, pos2z = 0, remove = false) {
 		this.x1 = pos1x;
 		this.x2 = pos2x;
 		this.z1 = pos1z;
@@ -114,9 +114,10 @@ export class spawn {
 				blocksSet++;
 			}
 			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
-				await sleep(CONFIG_WB.TICKS_TO_SLEEP);
+				await system.sleep(CONFIG_WB.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}
 	}
 }
+

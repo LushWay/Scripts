@@ -38,16 +38,19 @@ export const XUtils = {
 	 * @returns {number} The total number of blocks in the defined space.
 	 */
 	getBlocksCount(loc1, loc2) {
-		const minmax = (v1, v2) => [Math.min(v1, v2), Math.max(v2, v2)];
-		const [xmin, xmax] = minmax(loc1.x, loc2.x);
-		const [zmin, zmax] = minmax(loc1.z, loc2.z);
-		const [ymin, ymax] = minmax(loc1.y, loc2.y);
+		const x1 = loc1.x;
+		const y1 = loc1.y;
+		const z1 = loc1.z;
 
-		const x = xmax - xmin + 1;
-		const y = ymax - ymin + 1;
-		const z = zmax - zmin + 1;
+		const x2 = loc2.x;
+		const y2 = loc2.y;
+		const z2 = loc2.z;
 
-		return x * y * z;
+		const x = x2 > x1 ? x2 - x1 : x1 - x2;
+		const y = y2 > y1 ? y2 - y1 : y1 - y2;
+		const z = z2 > z1 ? z2 - z1 : z1 - z2;
+
+		return (x + 1) * (y + 1) * (z + 1);
 	},
 	/**
 	 * Converts a location to a block location
@@ -146,3 +149,4 @@ export const XUtils = {
 		return func.bind(context);
 	},
 };
+

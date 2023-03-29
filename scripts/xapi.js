@@ -23,7 +23,6 @@ import { Database } from "./lib/Database/Rubedo.js";
 
 import { XItemDatabase } from "./lib/Database/Item.js";
 import { emoji } from "./lib/Lang/emoji.js";
-import { parse } from "./lib/Lang/parser.js";
 import { text } from "./lib/Lang/text.js";
 import { XRunCommand } from "./lib/XRunCommand.js";
 
@@ -50,7 +49,6 @@ export class XA {
 	static Lang = {
 		lang: text,
 		emoji: emoji,
-		parse: parse,
 	};
 
 	static tables = {

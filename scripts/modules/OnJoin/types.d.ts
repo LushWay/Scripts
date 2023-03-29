@@ -1,7 +1,7 @@
 interface IJoinData {
 	name?: string;
 	waiting?: 1 | undefined;
-	at?: string;
+	at?: number[];
 	stage?: number;
 	times?: number;
 	learning?: 1 | undefined;

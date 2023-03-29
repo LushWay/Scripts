@@ -1,14 +1,16 @@
-import { MinecraftBlockTypes, Player, world } from "@minecraft/server";
-
-/**======================
- **       ARRAYS
- *========================**/
-import { setTickInterval, XA } from "xapi.js";
+import { MinecraftBlockTypes, Player, system, world } from "@minecraft/server";
+import { XA } from "xapi.js";
+import { CommandContext } from "../../../lib/Command/Callback.js";
 
 const lang = {
 	nobase:
 		"§cДля создания базы поставьте сундук, встаньте на него и напишите §f-base",
-	inpvp: (ctx) => {
+	/**
+	 *
+	 * @param {CommandContext} ctx
+	 * @returns
+	 */
+	inpvp(ctx) {
 		if (XA.Entity.getScore(ctx.sender, "pvp") > 0) {
 			ctx.reply(
 				"§4► §cПодождите еще §6" +
@@ -209,7 +211,7 @@ base.literal({ name: "list", description: "Список баз" }).executes((ctx
 	ctx.reply(`§7В привате базы есть такие игроки: §6${ent.nameTag}`);
 });
 
-setTickInterval(
+system.runInterval(
 	() => {
 		for (const base of XA.dimensions.overworld.getEntities({
 			type: "s:base",
@@ -230,8 +232,8 @@ setTickInterval(
 			base.triggerEvent("kill");
 		}
 	},
-	10,
-	"baseInterval"
+	"baseInterval",
+	10
 );
 
 // world.events.blockBreak.subscribe((data) => {
@@ -269,3 +271,4 @@ setTickInterval(
 // 	if (ent.length < 1) return;
 // 	for (const name of ent[0].nameTag.split(", ")) InRaid[name] = 60;
 // });
+

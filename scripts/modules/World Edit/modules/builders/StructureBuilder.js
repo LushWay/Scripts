@@ -1,4 +1,5 @@
-import { sleep, XA } from "xapi.js";
+import { system } from "@minecraft/server";
+import { XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 
@@ -15,13 +16,22 @@ export class Structure {
 		this.pos1 = pos1;
 		this.pos2 = pos2;
 
+		/**
+		 * @type {{
+		 *		name: string,
+		 *		pos1: Vector3,
+		 *		pos2: Vector3,
+		 *	}[]}
+		 */
 		this.files = [];
 
 		this.save();
 	}
 
 	async save() {
-		const regions = new Cuboid(this.pos1, this.pos2).split(CONFIG_WB.STRUCTURE_CHUNK_SIZE);
+		const regions = new Cuboid(this.pos1, this.pos2).split(
+			CONFIG_WB.STRUCTURE_CHUNK_SIZE
+		);
 		let errors = 0;
 		let all = 0;
 		for (const region of regions) {
@@ -35,9 +45,9 @@ export class Structure {
 			all++;
 			if (result > 0) {
 				this.files.push({
-					name: name,
-					pos1: pos1,
-					pos2: pos2,
+					name,
+					pos1,
+					pos2,
 				});
 			} else {
 				errors++;
@@ -95,8 +105,9 @@ export class Structure {
 				// 	"structureLoad"
 				// );
 			}
-			await sleep(1);
+			await system.sleep(1);
 		}
 		if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не загружено.`);
 	}
 }
+

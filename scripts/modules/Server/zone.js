@@ -1,5 +1,5 @@
-import { MolangVariableMap, Player, world } from "@minecraft/server";
-import { setTickInterval, XA } from "../../xapi.js";
+import { MolangVariableMap, Player, system, world } from "@minecraft/server";
+import { XA } from "../../xapi.js";
 import { Atp } from "./portals.js";
 import { global } from "./var.js";
 
@@ -50,7 +50,7 @@ function pret(player, isX, zone) {
 	);
 }
 
-setTickInterval(
+system.runInterval(
 	() => {
 		const players = world.getAllPlayers();
 		global.Radius = 200 + 20 * players.length;
@@ -99,6 +99,7 @@ setTickInterval(
 			if (l.z <= rmin.z + 10 && l.z >= rmin.z && xtrue) pret(p, false, rmin);
 		}
 	},
-	0,
-	"zone"
+	"zone",
+	0
 );
+

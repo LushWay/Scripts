@@ -6,7 +6,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"lib": ["ES2020"],
 		"target": "es2020",
-		"module": "es2020",
 		"baseUrl": ".",
 		"paths": {
 			"@minecraft/*": ["node_modules/@minecraft/*/index.js"],
@@ -14,8 +13,10 @@
 		},
 		"maxNodeModuleJsDepth": 0,
 		"noImplicitAny": true,
-		"types": []
+		"types": [],
+		"module": "AMD",
+		"outFile": "del_me.js"
 	},
-	"include": ["./scripts/"],
-	"exclude": ["leafs"]
+	"include": ["./scripts/"]
 }
+

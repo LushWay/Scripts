@@ -1,5 +1,5 @@
-import { Player, world } from "@minecraft/server";
-import { IS, setPlayerInterval, setTickTimeout, XA } from "xapi.js";
+import { Player, system, world } from "@minecraft/server";
+import { IS, XA } from "xapi.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { __JOIN_EMITTERS } from "./events.js";
 import "./subscribes.js";
@@ -39,7 +39,7 @@ world.events.playerJoin.subscribe(({ playerId }) => {
 	setData(playerId, D);
 });
 
-setTickTimeout(
+system.runTimeout(
 	() => {
 		if (!XA.state.first_load) return;
 		const player = world.getAllPlayers()[0];
@@ -47,11 +47,11 @@ setTickTimeout(
 		D.waiting = 1;
 		setData(player, D);
 	},
+	"owner start screen",
 	80,
-	"owner start screen"
 );
 
-setPlayerInterval(
+system.runPlayerInterval(
 	(player) => {
 		const data = getData(player);
 		let modified = false;
@@ -60,20 +60,29 @@ setPlayerInterval(
 			// New player (player joined)
 			delete data.waiting;
 			data.message = 1;
-			data.at =
-				player.location.x + " " + player.location.y + " " + player.location.z;
+
+			const rot = player.getRotation();
+			data.at = [
+				player.location.x,
+				player.location.y,
+				player.location.z,
+				rot.x,
+				rot.y,
+			];
 			modified = true;
 		}
 
 		// Pos where player joined
-		const at = data.at;
+		const pos = data.at;
 
-		if (typeof at === "string") {
-			const pos = at.split(" ").map(parseFloat);
+		if (Array.isArray(pos)) {
+			const rot = player.getRotation();
 			const not_moved =
 				player.location.x === pos[0] &&
 				player.location.y === pos[1] &&
-				player.location.z === pos[2];
+				player.location.z === pos[2] &&
+				rot.x === pos[3] &&
+				rot.y === pos[4];
 
 			if (not_moved) {
 				// Player still stays at joined position...
@@ -89,12 +98,17 @@ setPlayerInterval(
 
 					// Creating title
 					let title = CONFIG_JOIN.animation.stages[data.stage];
-					for (const key in CONFIG_JOIN.animation.vars) {
-						title = title.replace("$" + key, CONFIG_JOIN.animation.vars[key]);
+					for (const [key, value] of Object.entries(
+						CONFIG_JOIN.animation.vars
+					)) {
+						title = title.replace("$" + key, value);
 					}
 
 					// Show actionBar
-					if (CONFIG_JOIN.actionBar)
+					if (
+						"actionBar" in CONFIG_JOIN &&
+						typeof CONFIG_JOIN.actionBar === "string"
+					)
 						player.onScreenDisplay.setActionBar(CONFIG_JOIN.actionBar);
 
 					// Title + subtitle
@@ -126,8 +140,8 @@ setPlayerInterval(
 
 		if (modified) setData(player, data);
 	},
-	20,
-	"joinInterval"
+	"joinInterval",
+	20
 );
 
 const getSettings = XA.PlayerOptions("join", {

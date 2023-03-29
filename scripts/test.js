@@ -1,4 +1,4 @@
-import { ItemUseOnEvent, system, Vector, world } from "@minecraft/server";
+import { ItemUseOnEvent, Vector, world } from "@minecraft/server";
 
 world.debug = (...data) => {
 	world.sendMessage(

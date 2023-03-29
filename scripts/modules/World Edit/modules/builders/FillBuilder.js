@@ -1,4 +1,5 @@
-import { handle, sleep, XA } from "xapi.js";
+import { system } from "@minecraft/server";
+import { handle, XA } from "xapi.js";
 import { CONFIG_WB } from "../../config.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
@@ -49,7 +50,7 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 					}
 				}
 				if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
-					await sleep(CONFIG_WB.TICKS_TO_SLEEP);
+					await system.sleep(CONFIG_WB.TICKS_TO_SLEEP);
 					blocksSet = 0;
 				}
 			}
@@ -58,3 +59,4 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 		}
 	});
 }
+

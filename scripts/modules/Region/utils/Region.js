@@ -1,4 +1,4 @@
-import { Entity, Player } from "@minecraft/server";
+import { Dimension, Entity, Player } from "@minecraft/server";
 import { handle, XA } from "../../../xapi.js";
 import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
@@ -28,7 +28,9 @@ const HIGEST_Y_VALUE = 320;
  * @returns {boolean}
  */
 function betweenXYZ(XYZa, XYZb, XYZc) {
-	return XYZc.every((c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i]));
+	return XYZc.every(
+		(c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i])
+	);
 }
 
 const TABLE = XA.tables.region;
@@ -41,7 +43,15 @@ export class Region {
 	static getAllRegions() {
 		if (REGIONS_HAVE_BEEN_GRABBED) return REGIONS;
 		const regions = TABLE.values().map(
-			(region) => new Region(region.from, region.to, region.dimensionId, region.permissions, region.key, false)
+			(region) =>
+				new Region(
+					region.from,
+					region.to,
+					region.dimensionId,
+					region.permissions,
+					region.key,
+					false
+				)
 		);
 		regions.forEach((r) => {
 			REGIONS.push(r);
@@ -149,6 +159,25 @@ export class Region {
 		this.permissions.owners
 			.map(XA.Entity.fetch)
 			.filter((e) => e)
-			.forEach((player, i, owners) => handle(() => callback(player, i, owners), "Region.forEachOwner"));
+			.forEach((player, i, owners) =>
+				handle(() => callback(player, i, owners), "Region.forEachOwner")
+			);
 	}
 }
+
+/**
+ *
+ * @param {Dimension} dimension
+ * @param {Vector3} location
+ * @param {(e: Entity) => any} callback
+ */
+export function WorkWithItems(dimension, location, callback = (e) => e.kill()) {
+	dimension
+		.getEntities({
+			location: location,
+			maxDistance: 2,
+			type: "minecraft:item",
+		})
+		.forEach(callback);
+}
+

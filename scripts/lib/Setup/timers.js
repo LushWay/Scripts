@@ -1,111 +1,82 @@
-import { Player, system, world } from "@minecraft/server";
+import { System, system, world } from "@minecraft/server";
 import { handle } from "../../xapi.js";
-import { stackParse } from "../Class/Error.js";
+import { stackParse } from "../Class/XError.js";
 import { benchmark } from "../XBenchmark.js";
+import { addMethod, editMethod } from "./patcher.js";
 
-/**
- * Active timers
- * @type {Record<string | number, any>}
- */
-const TIMERS = {};
 /**
  * @type {Record<string, string>}
  */
 export const TIMERS_PATHES = {};
 
-/**
- * It runs a function after a certain amount of ticks
- * @param {number} ticks - The amount of ticks to wait before running the callback.
- * @param {Function} callback - The function to be called after the timeout.
- * @param {boolean} [loop] - Whether or not the timeout should loop.
- * @param {string | number} [id] - The id of the timeout.
- * @returns A function thats stops a timeout.
- */
-function Timeout(
-	ticks,
-	callback,
-	loop,
-	id = new Error().stack,
-	path = stackParse(6, [], new Error().stack)
-) {
-	TIMERS[id] ??= 0;
-	const visual_id = `${id} (${loop ? "loop " : ""}${ticks} ticks)`;
-	TIMERS_PATHES[visual_id] ??= path;
+addMethod(
+	System.prototype,
+	"sleep",
+	(time) => new Promise((resolve) => system.runInterval(resolve, "sleep", time))
+);
 
-	function tick() {
-		if (TIMERS[id] === "stop") return;
+const originalInterval = System.prototype.runInterval.bind(system);
+editMethod(
+	System.prototype,
+	"runInterval",
+	function ({ original, args: [fn, name, ticks] }) {
+		const visual_id = `${name} (loop ${ticks} ticks)`;
+		const path = stackParse();
+		TIMERS_PATHES[visual_id] = path;
 
-		TIMERS[id]++;
-
-		if (TIMERS[id] >= ticks) {
-			TIMERS[id] = 0;
+		return original(() => {
 			const end = benchmark(visual_id, "timers");
 
-			handle(callback, "Timeout");
+			handle(fn, "Interval");
 
 			const took_ticks = ~~(end() / 20);
-			if (took_ticks > ticks) console.warn(`Found slow script at:\n${path}`);
-			if (!loop) return;
-		}
-
-		system.run(tick);
+			if (took_ticks > ticks)
+				console.warn(
+					`Found slow interval (${took_ticks}/${ticks})  at:\n${path}`
+				);
+			// @ts-expect-error
+		}, ticks);
 	}
+);
 
-	tick();
+editMethod(
+	System.prototype,
+	"runTimeout",
+	function ({ original, args: [fn, name, ticks] }) {
+		const visual_id = `${name} (loop ${ticks} ticks)`;
+		const path = stackParse();
+		TIMERS_PATHES[visual_id] = path;
 
-	return function stop() {
-		TIMERS[id] = "stop";
+		return original(() => {
+			const end = benchmark(visual_id, "timers");
+
+			handle(fn, "Timeout");
+
+			const took_ticks = ~~(end() / 20);
+			if (took_ticks > ticks)
+				console.warn(
+					`Found slow timeout (${took_ticks}/${ticks}) at:\n${path}`
+				);
+			// @ts-expect-error
+		}, ticks);
+	}
+);
+
+addMethod(System.prototype, "runPlayerInterval", function (fn, name, ticks) {
+	const visual_id = `${name} (loop ${ticks} ticks)`;
+	const path = stackParse();
+	TIMERS_PATHES[visual_id] = path;
+	const forEach = () => {
+		for (const player of world.getPlayers()) fn(player);
 	};
-}
 
-/**
- *
- * @param {(plr: Player) => void} callback
- */
-function forPlayers(callback) {
-	for (const player of world.getPlayers()) callback(player);
-}
+	return originalInterval(() => {
+		const end = benchmark(visual_id, "timers");
 
-/**
- * Returns a promise that will be resolved after given time
- * @param {number} time time in ticks
- * @returns {Promise<void>}
- */
-export const sleep = (time) =>
-	new Promise((resolve) => setTickTimeout(() => resolve(), time, "sleep"));
+		handle(forEach, "Player interval");
 
-/**
- * @param {Function} callback
- * @param {number} ticks
- * @param {string} name
- */
-export function setTickInterval(callback, ticks = 0, name) {
-	return Timeout(ticks, callback, true, name);
-}
-
-/**
- * @param {Function} callback
- * @param {number} ticks
- * @param {string} name
- */
-export function setTickTimeout(callback, ticks = 1, name) {
-	return Timeout(ticks, callback, false, name ?? Date.now());
-}
-
-/**
- * @param {(player: Player) => void} callback
- * @param {number} ticks
- * @param {string} name
- */
-export function setPlayerInterval(callback, ticks = 0, name) {
-	return Timeout(ticks, () => forPlayers(callback), true, name);
-}
-
-/**
- * @param {(player: Player) => void} callback
- * @param {number} ticks
- * @param {string} name
- */
-export function setPlayerTimeout(callback, ticks = 1, name) {
-	return Timeout(ticks, () => forPlayers(callback), false, name ?? Date.now());
-}
+		const took_ticks = ~~(end() / 20);
+		if (took_ticks > ticks)
+			console.warn(`Found slow players interval at:\n${path}`);
+	}, ticks);
+});

@@ -1,14 +1,11 @@
-import { system, Vector, world } from "@minecraft/server";
 import {
-	DisplayError,
-	handle,
-	IS,
-	setTickTimeout,
-	sleep,
-	toStr,
-	XA,
-} from "xapi.js";
-import { stackParse } from "../../lib/Class/Error.js";
+	MinecraftEnchantmentTypes,
+	system,
+	Vector,
+	world,
+} from "@minecraft/server";
+import { DisplayError, handle, IS, toStr, XA } from "xapi.js";
+import { stackParse } from "../../lib/Class/XError.js";
 import { CommandContext } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
@@ -64,12 +61,6 @@ const tests = {
 		};
 		system.run(r);
 	},
-	11: () => {
-		throw new Error("m");
-	},
-	12: () => {
-		setTickTimeout(tests[11], 0, "test");
-	},
 	13: (ctx) => {
 		ctx.reply(toStr(ctx.sender.getComponents()));
 	},
@@ -83,7 +74,7 @@ const tests = {
 				if (done) break;
 				if (i % 10000 === 0) {
 					world.say(i + "");
-					await sleep(1);
+					await system.sleep(1);
 				}
 				bigdata += "1";
 			}
@@ -91,7 +82,7 @@ const tests = {
 		}
 
 		for (let i = 0; i < 1000; i++) {
-			if (i % 5 === 0) await sleep(1);
+			if (i % 5 === 0) await system.sleep(1);
 			const end1 = benchmark("SetMaxValueSpeed");
 			world.setDynamicProperty("speed_test", bigdata);
 			end1();
@@ -101,7 +92,7 @@ const tests = {
 		let e = 0;
 
 		for (let i = 0; i < 1000; i++) {
-			if (i % 5 === 0) await sleep(1);
+			if (i % 5 === 0) await system.sleep(1);
 			const end1 = benchmark("GetMaxValueSpeed");
 			const data = world.getDynamicProperty("speed_test");
 			if (!e) {
@@ -218,6 +209,27 @@ const tests = {
 
 		show();
 	},
+	33(ctx) {
+		const item = ctx.sender
+			.getComponent("inventory")
+			.container.getItem(ctx.sender.selectedSlot);
+
+		world.debug([...item.getComponent("enchantments").enchantments]);
+
+		const nitem = ctx.sender
+			.getComponent("inventory")
+			.container.getItem(ctx.sender.selectedSlot + 1);
+
+		nitem
+			.getComponent("enchantments")
+			.enchantments.addEnchantment(
+				item
+					.getComponent("enchantments")
+					.enchantments.getEnchantment(MinecraftEnchantmentTypes.power)
+			);
+
+		world.debug([...nitem.getComponent("enchantments").enchantments]);
+	},
 };
 
 let text = "";
@@ -235,3 +247,4 @@ c.string("number", true).executes(async (ctx, n) => {
 	ctx.reply(i);
 	handle(() => tests[i](ctx), "Test");
 });
+

@@ -1,4 +1,4 @@
-import { GameMode, Player, system } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import {
 	ActionFormData,
 	ActionFormResponse,
@@ -72,13 +72,18 @@ export async function XShowForm(form, player) {
 		/** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
 		const response = await form.show(player);
 		if (response.canceled) {
-			if (response.cancelationReason === FormCancelationReason.userClosed) return false;
+			if (response.cancelationReason === FormCancelationReason.userClosed)
+				return false;
 
 			// check time and reshow form
-			if (response.cancelationReason === FormCancelationReason.userBusy && i === hold) {
+			if (
+				response.cancelationReason === FormCancelationReason.userBusy &&
+				i === hold
+			) {
 				player.tell(`§cНе удалось открыть форму. Закрой чат и попробуй снова`);
 				return false;
 			}
 		} else return response;
 	}
 }
+

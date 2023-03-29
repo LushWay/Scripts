@@ -1,6 +1,13 @@
-import { world } from "@minecraft/server";
-import { setTickInterval, XA } from "xapi.js";
+import { system, world } from "@minecraft/server";
+import { XA } from "xapi.js";
 
+/**
+ *
+ * @param {number} max
+ * @param {number} min
+ * @param {string} msg
+ * @returns
+ */
 export function rd(max, min = 0, msg) {
 	if (max == min || max < min) return max;
 
@@ -154,21 +161,21 @@ const q = {
 	tags: ["держит"],
 	type: "minecraft:chicken",
 };
-const qq = {
-	maxDistance: 20,
-};
 
-setTickInterval(
+system.runInterval(
 	() => {
 		for (const ent of world.getDimension("overworld").getEntities(q)) {
 			if (!XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"))
 				return ent.removeTag("держит");
-			qq.location = ent.location;
-			qq.tags = [
-				"держится_за_номер:" +
-					XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"),
-			];
-			const cl = ent.dimension.getEntities(qq);
+
+			const cl = ent.dimension.getEntities({
+				maxDistance: 20,
+				location: ent.location,
+				tags: [
+					"держится_за_номер:" +
+						XA.Entity.getTagStartsWith(ent, "держит_эирдроп_номер:"),
+				],
+			});
 			if (!cl) return ent.removeTag("держит");
 			const block = ent.dimension.getBlock(
 				XA.Utils.floorVector({
@@ -201,8 +208,8 @@ setTickInterval(
 			}
 		}
 	},
-	0,
-	"airDrop"
+	"airDrop",
+	0
 ); /*
 /*
 const kit = new XA.Command({
@@ -345,3 +352,4 @@ kit
     );
   });
 */
+

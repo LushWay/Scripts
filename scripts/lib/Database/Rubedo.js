@@ -8,7 +8,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
-import { DisplayError } from "../Setup/utils.js";
+import { DisplayError, handle } from "../Setup/utils.js";
 
 /**
  * Original database created by Smell Of Curry for Rubedo anticheat, and lighty modified by Leaftail1880
@@ -42,7 +42,7 @@ export class Database {
 			Object.values(this.instances).map((table) => {
 				const initing = table.init();
 				initing.catch((err) =>
-					DisplayError(err, 0, [`${table.tableName} init`])
+					DisplayError(err, 0, [`${table.TABLE_NAME} init`])
 				);
 
 				return initing;
@@ -117,11 +117,32 @@ export class Database {
 		}
 	}
 	/**
+	 * Returns all private methods
+	 * @param {Database} DB
+	 */
+	static system(DB) {
+		const { initPromise, stringifiedData, isInited } = DB;
+		return { initPromise, stringifiedData, isInited };
+	}
+
+	/**
 	 * Data saved in memory
 	 * @type {{ [key in Key]: Value } | null}
 	 * @private
 	 */
 	MEMORY = null;
+
+	/**
+	 * @type {Promise<void>}
+	 * @private
+	 */
+	initPromise = null;
+
+	/** @private */
+	isInited = false;
+
+	/** @private */
+	stringifiedData = "{}";
 
 	/**
 	 *
@@ -130,8 +151,35 @@ export class Database {
 	constructor(tableName) {
 		if (tableName in Database.instances) return Database.instances[tableName];
 
-		this.tableName = tableName;
-		if (Database.tablesInited) this.initPromise = this.init();
+		this.TABLE_NAME = tableName;
+		if (Database.tablesInited) {
+			const promise = this.init();
+			let isListened = false;
+
+			const origThen = promise.then.bind(promise);
+			promise.then = (fl) => {
+				isListened = true;
+				return origThen(fl);
+			};
+
+			const origFinally = promise.finally.bind(promise);
+			promise.finally = (fl) => {
+				isListened = true;
+				return origFinally(fl);
+			};
+
+			origFinally(() => {
+				if (isListened) return;
+
+				handle(() => {
+					throw new DatabaseError(
+						`§6Unlistened database.initPromise. Table: §f${this.TABLE_NAME}§6. To disable this warning, simple add then or finally listener to Database.system(db).initPromise`
+					);
+				});
+			});
+
+			this.initPromise = promise;
+		}
 
 		Database.instances[tableName] = this;
 	}
@@ -140,10 +188,7 @@ export class Database {
 	 * @private
 	 */
 	async save() {
-		if (!this.MEMORY)
-			throw new Error(
-				`Cannot save data on table '${this.tableName}' before initing them. Add await to world load to solve that`
-			);
+		if (!this.isInited) this.failedTo("save");
 
 		/**
 		 * The split chunks of the stringified data, This is done because we can
@@ -151,13 +196,13 @@ export class Database {
 		 */
 		let chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
 
-		const entities = Database.getTableEntities(this.tableName);
+		const entities = Database.getTableEntities(this.TABLE_NAME);
 		const totalEntities = Math.ceil(chunks.length / INVENTORY_SIZE);
 		const entitiesToSpawn = totalEntities - entities.length;
 
 		if (entitiesToSpawn > 0) {
 			for (let i = 0; i < entitiesToSpawn; i++) {
-				entities.push(Database.createTableEntity(this.tableName, i));
+				entities.push(Database.createTableEntity(this.TABLE_NAME, i));
 			}
 		}
 
@@ -183,14 +228,17 @@ export class Database {
 	 * @private
 	 */
 	async init() {
-		let entities = Database.getTableEntities(this.tableName);
+		let entities = Database.getTableEntities(this.TABLE_NAME);
 
 		if (entities.length < 1) {
+			/** @private */
 			this.noMemory = true;
-			console.warn("§cNo entities found for table §f" + this.tableName);
-			world.say("§cNo entities found for table §f" + this.tableName);
+
+			console.warn("§cNo entities found for table §f" + this.TABLE_NAME);
+			world.say("§cNo entities found for table §f" + this.TABLE_NAME);
 
 			Reflect.set(this, "MEMORY", {});
+			this.isInited = true;
 			await this.save();
 			return;
 		}
@@ -217,13 +265,14 @@ export class Database {
 		this.stringifiedData = stringifiedData;
 		this.isInited = true;
 	}
+
 	/**
 	 * Sets a key to a value in this table
 	 * @param {Key} key  undefined
 	 * @param {Value} value  undefined
 	 */
 	set(key, value) {
-		this.MEMORY[key] = value;
+		Reflect.set(this.MEMORY, key, value);
 		return this.save();
 	}
 
@@ -233,7 +282,8 @@ export class Database {
 	 * @returns {Value} the keys corresponding key
 	 */
 	get(key) {
-		if (!this.MEMORY) throw new Error("Get: Entities not loaded!");
+		if (!this.isInited) this.failedTo("get", key);
+
 		return this.MEMORY[key];
 	}
 
@@ -255,11 +305,11 @@ export class Database {
 	 */
 	work(key) {
 		const data = this.get(key);
-		const T = this;
+		const self = this;
 
 		return {
 			data,
-			save: () => T.set(key, data),
+			save: () => self.set(key, data),
 		};
 	}
 	/**
@@ -267,7 +317,8 @@ export class Database {
 	 * @returns {Key[]}
 	 */
 	keys() {
-		if (!this.MEMORY) throw new Error("Keys: Entities not loaded!");
+		if (!this.isInited) this.failedTo("keys");
+
 		// @ts-expect-error
 		return Object.keys(this.MEMORY);
 	}
@@ -276,8 +327,17 @@ export class Database {
 	 * @returns {Value[]}
 	 */
 	values() {
-		if (!this.MEMORY) throw new Error("Values: Entities not loaded!");
+		if (!this.isInited) this.failedTo("values");
+
 		return Object.values(this.MEMORY);
+	}
+	/**
+	 * Get entries of the table
+	 */
+	entries() {
+		if (!this.isInited) this.failedTo("entries");
+
+		return Object.entries(this.MEMORY);
 	}
 	/**
 	 * Check if the key exists in the table
@@ -285,7 +345,7 @@ export class Database {
 	 * @returns {boolean}
 	 */
 	has(key) {
-		if (!this.MEMORY) throw new Error("Has: Entities not loaded!");
+		if (!this.isInited) this.failedTo("has", key);
 
 		return Reflect.has(this.MEMORY, key);
 	}
@@ -293,15 +353,16 @@ export class Database {
 	 * Saves data into this database
 	 * @param {{ [key in Key]: Value; }} collection
 	 */
-	set collection(collection) {
+	set COLLECTION(collection) {
 		this.MEMORY = collection;
 		this.save();
 	}
 	/**
 	 * Gets all the keys and values
 	 */
-	get collection() {
-		if (!this.MEMORY) throw new Error("Collection: Entities not loaded!");
+	get COLLECTION() {
+		if (!this.isInited) this.failedTo("COLLECTION");
+
 		return this.MEMORY;
 	}
 	/**
@@ -309,7 +370,8 @@ export class Database {
 	 * @param {Key} key  the key to delete
 	 */
 	delete(key) {
-		if (!this.MEMORY) throw new Error("Delete: Entities not loaded!");
+		if (!this.isInited) this.failedTo("delete", key);
+
 		Reflect.deleteProperty(this.MEMORY, key);
 		return this.save();
 	}
@@ -317,8 +379,49 @@ export class Database {
 	 * Clear everything in the table
 	 */
 	clear() {
-		if (!this.MEMORY) throw new Error("Clear: Entities not loaded!");
-		Object.assign(this.MEMORY, {});
+		if (!this.isInited) this.failedTo("clear");
+
+		Reflect.set(this, "MEMORY", {});
+
 		return this.save();
+	}
+
+	/**
+	 * Throws error like this: (x11) Failed to call delete key 'server.type' on table 'basic'. Make sure you inited them and calling 'delete' after init.
+	 * @param {string} method
+	 * @param {string} key
+	 * @private
+	 */
+	failedTo(method, key = "") {
+		this.log[method] ??= { count: 0, date: Date.now() };
+
+		const lm = this.log[method];
+		lm.count++;
+
+		// Disable spam (Limit: one error per 10 seconds)
+		if (Date.now() - lm.date < 10000) return;
+
+		throw new DatabaseError(
+			`${lm.count > 0 ? `(x${lm.count}) ` : ""}Failed to call ${method}${
+				key ? ` key "${key}"` : key
+			} on table "${
+				this.TABLE_NAME
+			}". Make sure you inited them and calling "${method}" after init.`
+		);
+	}
+
+	/**
+	 * @private
+	 * @type {Record<string, {count: number, date: number}>}
+	 */
+	log = {};
+}
+
+class DatabaseError extends Error {
+	/**
+	 * @param {string} message
+	 */
+	constructor(message) {
+		super(message);
 	}
 }

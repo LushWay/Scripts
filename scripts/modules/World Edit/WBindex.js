@@ -1,5 +1,5 @@
-import { Player, world } from "@minecraft/server";
-import { setPlayerInterval, setTickInterval, XA } from "xapi.js";
+import { Player, system, Vector, world } from "@minecraft/server";
+import { XA } from "xapi.js";
 
 import "./commands/index.js";
 import { CONFIG_WB } from "./config.js";
@@ -24,7 +24,7 @@ world.events.blockPlace.subscribe((data) => {
 	setblock(block, location);
 });
 
-setPlayerInterval(
+system.runPlayerInterval(
 	(p) => {
 		const i = XA.Entity.getHeldItem(p);
 		const settings = GetPlayerSettings(p);
@@ -55,10 +55,8 @@ setPlayerInterval(
 				q.maxDistance = parseInt(range);
 				const block = p.getBlockFromViewDirection(q);
 				if (block) {
-					const ent1 = XA.Entity.getEntityAtPos(
-						block.location.x,
-						block.location.y,
-						block.location.z
+					const ent1 = block.dimension.getEntitiesAtBlockLocation(
+						block.location
 					);
 					if (!ent1) {
 						XA.runCommandX(
@@ -113,21 +111,19 @@ setPlayerInterval(
 			const H = Number(`${Z}${lore[3].split(" ")[1]}`);
 			const O = Number(`${Z}${lore[4].split(" ")[3]}`);
 			const newloc = XA.Utils.floorVector(p.location);
-			newloc.offset(-R, H, -R);
-			newloc.offset(R, O, R);
 			FillFloor(
-				newloc.offset(-R, H, -R),
-				newloc.offset(R, O, R),
+				Vector.add(newloc, new Vector(-R, H, -R)),
+				Vector.add(newloc, new Vector(R, O, R)),
 				B,
 				RB ?? "any"
 			);
 		}
 	},
-	10,
-	"WB Main"
+	"WB Main",
+	10
 );
 
-setPlayerInterval(
+system.runPlayerInterval(
 	(p) => {
 		const i = XA.Entity.getHeldItem(p);
 		if (!p.hasTag("attacking") || i?.typeId !== "we:brush") return;
@@ -143,16 +139,16 @@ setPlayerInterval(
 		const block = p.getBlockFromViewDirection({ maxDistance: parseInt(range) });
 		if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 	},
-	5,
-	"WB Brush"
+	"WB Brush",
+	5
 );
 
-setTickInterval(
+system.runInterval(
 	() => {
 		WorldEditBuild.drawSelection();
 	},
-	20,
-	"WB Selection"
+	"WB Selection",
+	20
 );
 
 world.events.beforeItemUseOn.subscribe((data) => {
@@ -213,10 +209,11 @@ world.events.beforeItemUse.subscribe((data) => {
 	const size = lore[2]?.replace("Size: ", "");
 	const range = lore[3]?.replace("Range: ", "");
 	if (!shape || !blocks || !size || !range) return;
-	/** @type {import("@minecraft/server").BlockRaycastOptions} */
-	const q = {};
-	q.maxDistance = parseInt(range);
-	const block = data.source.getBlockFromViewDirection(q);
+
+	const block = data.source.getBlockFromViewDirection({
+		maxDistance: parseInt(range),
+	});
+
 	if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 });
 
@@ -243,3 +240,4 @@ world.events.blockBreak.subscribe((data) => {
 		.getBlock(data.block.location)
 		.setPermutation(data.brokenBlockPermutation);
 });
+

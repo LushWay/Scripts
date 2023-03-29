@@ -32,6 +32,27 @@ patchPackage("@minecraft/server", {
      */
     applyDash(target: Player | Entity, horizontalStrength: number, verticalStrength: number): void;
     `,
+		System: m`
+    /**
+    * @beta
+    * @remarks
+    * Runs a set of code on an interval for each player.
+    * @param callback
+    * Functional code that will run when this interval occurs.
+    * @param tickInterval
+    * An interval of every N ticks that the callback will be
+    * called upon.
+    * @returns
+    * An opaque handle that can be used with the clearRun method
+    * to stop the run of this function on an interval.
+    */
+    runPlayerInterval(callback: (player: Player) => void, name: string, tickInterval?: number): number;
+    /**
+    * Returns a promise that resolves after given ticks time
+    * @param time time in ticks
+    * @returns Promise that resolves after given ticks time
+    */
+    sleep(time: number): Promise<void>`,
 		ItemUseOnEvent: m`
     /**
      * Check {@link ItemUseOnEvent.getBlockLocation} for more info
@@ -40,6 +61,16 @@ patchPackage("@minecraft/server", {
     `,
 	},
 	replaces: [
+		{
+			find: "runInterval(callback: () => void, tickInterval?: number): number;",
+			replace:
+				"runInterval(callback: () => void, name: string, tickInterval?: number): number;",
+		},
+		{
+			find: "runTimeout(callback: () => void, tickDelay?: number): number;",
+			replace:
+				"runTimeout(callback: () => void, name: string, tickDelay?: number): number;",
+		},
 		{
 			find: /location: Vector3,\s*\n?\s*dimension: Dimension,\s*\n?\s*xRotation: number,\s*\n?\s*yRotation: number,\s*\n?\s*keepVelocity\?: boolean,/gm,
 			replace: `location: Vector3,
@@ -63,6 +94,13 @@ getComponent<N extends keyof EntityComponents>(
 ): EntityComponents[N]`,
 			all: true,
 		},
+		{
+			find: "getComponent(componentId: string): ItemComponent | undefined;",
+			replace: m`
+      getComponent<N extends keyof ItemComponents>(
+        componentName: N
+      ): ItemComponents[N]`,
+		},
 	],
 	additions: {
 		beginning: "",
@@ -74,6 +112,17 @@ getComponent<N extends keyof EntityComponents>(
  * New methods assigments can be finded in 
  * scripts/lib/Setup/prototypes.js 
  */
+
+type ItemComponents = {
+  cooldown: ItemCooldownComponent;
+  "minecraft:cooldown": ItemCooldownComponent;
+  enchantments: ItemEnchantsComponent
+  "minecraft:enchantments": ItemEnchantsComponent;
+  durability: ItemDurabilityComponent
+  "minecraft:durability": ItemDurabilityComponent;
+  food: ItemFoodComponent;
+  "minecraft:food": ItemFoodComponent;
+}
 
 type BlockComponents = {
 	"minecraft:inventory": BlockInventoryComponent;

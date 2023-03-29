@@ -3,9 +3,10 @@ import {
 	MinecraftDimensionTypes,
 	Player,
 	Vector,
+	system,
 } from "@minecraft/server";
 import { MessageForm } from "../../../lib/Form/MessageForm.js";
-import { createWaiter, setTickInterval, sleep, XA } from "../../../xapi.js";
+import { createWaiter, XA } from "../../../xapi.js";
 import { Region } from "../utils/Region.js";
 
 const DB = XA.tables.buildRegion;
@@ -60,14 +61,14 @@ export async function ClearRegion(player, Pregion) {
 	let percents = 0;
 	let spining = ["/", "-", "\\", "|"];
 	let time = 0;
-	const end = setTickInterval(
+	const end = system.runInterval(
 		() => {
 			player.onScreenDisplay.setActionBar(getProgressBar(spining[0], percents));
 			time++;
 			if (time % 10 === 0) spining = spining.slice(1).concat(spining.shift());
 		},
-		0,
-		"ResetSquare_ProgressActionbar"
+		"ResetSquare_ProgressActionbar",
+		0
 	);
 	const loc1 = { x: Pregion.from.x, y: -63, z: Pregion.from.z };
 	const loc2 = { x: Pregion.to.x, y: 100, z: Pregion.to.z };
@@ -77,7 +78,7 @@ export async function ClearRegion(player, Pregion) {
 	const e = XA.Utils.safeBlocksBetween(loc1, loc2);
 	for (const loc of e) {
 		c++;
-		if (c % 500 === 0 || c === 0) await sleep(0);
+		if (c % 500 === 0 || c === 0) await system.sleep(0);
 		percents = c / ~~(blocks / 100);
 
 		const block = XA.dimensions.overworld.getBlock(loc);
@@ -190,7 +191,7 @@ export async function findFreePlace() {
 
 	while (!from) {
 		tries++;
-		if (tries >= 20) await sleep(1), (tries = 0);
+		if (tries >= 20) await system.sleep(1), (tries = 0);
 
 		const alreadyExist = Region.blockLocationInRegion(
 			{ x: center.x, y: 0, z: center.z },
@@ -215,3 +216,4 @@ export async function findFreePlace() {
 
 	return { from, to };
 }
+

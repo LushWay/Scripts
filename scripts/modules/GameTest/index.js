@@ -3,9 +3,10 @@ import {
 	MinecraftBlockTypes,
 	Vector,
 	world,
+	system,
 } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { handle, IS, sleep, XA } from "xapi.js";
+import { handle, IS, XA } from "xapi.js";
 import { DIMENSIONS } from "../../lib/List/dimensions.js";
 
 const time = 9999999;
@@ -44,7 +45,7 @@ new XA.Command({
 			.getBlock(Vector.add(test_loc, { x: 1, y: 0, z: 1 }))
 			.setType(MinecraftBlockTypes.redstoneBlock);
 
-		await sleep(10);
+		await system.sleep(10);
 
 		simp.teleport(ctx.sender.location);
 	});

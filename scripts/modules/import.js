@@ -16,10 +16,8 @@ mm("World Edit", { fileName: "WBindex" });
 m`GameTest`;
 m`Guard`;
 
-// m`Leaderboards`;
+m`Leaderboards`;
 
 // m`Battle Royal`;
-// m`Debug`;
 // m`Airdrops`;
-// m`Chest GUI/src`;
-// m`migrate`;
+

@@ -204,7 +204,7 @@ export function visualise_benchmark_result({
 		output += `§3| §7average: ${cur_style}${average.toFixed(2)}ms\n`;
 		output += `§3| §7total time: §f${total_time}ms\n`;
 		output += `§3| §7call count: §f${total_count}\n`;
-		if (isPath) output += `§3| §7path:§f${getPath(key)}\n`;
+		if (isPath) output += `§3| §7path: §f${getPath(key)}\n`;
 		output += "\n\n";
 	}
 	return output;
@@ -227,7 +227,10 @@ new XA.Command({
 	.boolean("pathes", true)
 	.executes((ctx, type, pathes) => {
 		if (type && !(type in BECHMARK_RESULTS))
-			return ctx.error("Неизвестный тип!");
+			return ctx.error(
+				"Неизвестный тип бенчмарка! Доступные типы: \n  §f" +
+					Object.keys(BECHMARK_RESULTS).join("\n  ")
+			);
 
 		function show() {
 			new ActionForm(
@@ -243,3 +246,4 @@ new XA.Command({
 		}
 		show();
 	});
+

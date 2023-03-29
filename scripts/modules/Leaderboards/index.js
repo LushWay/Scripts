@@ -1,7 +1,12 @@
-import { world } from "@minecraft/server";
-import { setTickInterval, XA } from "xapi.js";
+import { Entity, world, system } from "@minecraft/server";
+import { XA } from "xapi.js";
 import { Database } from "../../lib/Database/Rubedo.js";
-import "./commands.js";
+import { DIMENSIONS } from "../../lib/List/dimensions.js";
+
+/**
+ * @type {Database<string, LB>}
+ */
+const LB_DB = new Database("leaderboard");
 
 /**
  * @typedef {{
@@ -41,23 +46,26 @@ const STYLES = {
 	},
 };
 
-/**
- * @type {Database<string, LB>}
- */
-export const LB_DB = new Database("leaderboard");
-export const LeaderboardBuild = {
+class Leaderboard {
 	/**
 	 * @param {Vector3} loc
-	 * @param {string} dimension
+	 * @param {keyof typeof DIMENSIONS} dimension
+	 * @param {string} id
 	 */
-	get(loc, dimension) {
-		return XA.Entity.getAtPos(loc, dimension).find(
-			(entity) =>
-				entity &&
-				entity.typeId === LEADERBOARD_ID &&
-				entity.hasTag(LEADERBOARD_TAG)
-		);
-	},
+	static get(loc, dimension, id) {
+		const entity = DIMENSIONS[dimension]
+			.getEntitiesAtBlockLocation(loc)
+			.find(
+				(entity) =>
+					entity.id === id &&
+					entity.typeId === LEADERBOARD_ID &&
+					entity.hasTag(LEADERBOARD_TAG)
+			);
+
+		if (!entity) return false;
+
+		return new Leaderboard(entity);
+	}
 	/**
 	 *
 	 * @param {string} objective
@@ -65,7 +73,7 @@ export const LeaderboardBuild = {
 	 * @param {string} dimension
 	 * @param {keyof typeof STYLES} style
 	 */
-	createLeaderboard(
+	static createLeaderboard(
 		objective,
 		location,
 		dimension = "overworld",
@@ -77,51 +85,38 @@ export const LeaderboardBuild = {
 			location,
 			dimension,
 		};
-		LB_DB.set(objective, data);
-		let entity = world
+		const entity = world
 			.getDimension(dimension)
 			.spawnEntity(LEADERBOARD_ID, XA.Utils.floorVector(location));
 
+		LB_DB.set(entity.id, data);
 		entity.nameTag = "Updating...";
 		entity.addTag(LEADERBOARD_TAG);
-	},
-	/**
-	 * Removing the leaderboard.
-	 * @param {string} objective
-	 * @param {Vector3} loc
-	 * @param {string} dimension
-	 * @returns
-	 */
-	removeLeaderboard(objective, loc, dimension) {
-		LB_DB.delete(objective);
-		let entity = LeaderboardBuild.get(loc, dimension);
-		if (!entity) return false;
 
-		entity.triggerEvent("kill");
-		return true;
-	},
+		return new Leaderboard(entity);
+	}
 	/**
 	 *
-	 * @param {string} objective
-	 * @param {string} style
-	 */
-	changeStyle(objective, style) {
-		const { data, save } = LB_DB.work(objective);
-		if (!XA.Utils.isKeyof(style, STYLES)) return;
-		data.style = style;
-		save();
-	},
-	/**
+	 * @param {Entity} entity
 	 * @param {LB} data
 	 */
-	updateLeaderboard(data) {
-		const entity = LeaderboardBuild.get(data.location, data.dimension);
-		if (!entity) return LB_DB.delete(data.objective);
-
-		const scoreboard = world.scoreboard.getObjective(data.objective);
+	constructor(entity, data = LB_DB.get(entity.id)) {
+		this.entity = entity;
+		this.data = data;
+	}
+	remove() {
+		LB_DB.delete(this.entity.id);
+		this.entity.teleport({ x: 0, y: 0, z: 0 });
+		this.entity.triggerEvent("kill");
+	}
+	updateData() {
+		LB_DB.set(this.entity.id, this.data);
+	}
+	updateLeaderboard() {
+		const scoreboard = world.scoreboard.getObjective(this.data.objective);
 		const dname = scoreboard.displayName;
 		const name = dname.charAt(0).toUpperCase() + dname.slice(1);
-		const style = STYLES[data.style];
+		const style = STYLES[this.data.style];
 		const filler = `§${style.color1}-§${style.color2}`.repeat(5);
 
 		let leaderboard = ``;
@@ -133,19 +128,24 @@ export const LeaderboardBuild = {
 			leaderboard += `§${s}${toMetricNumbers(scoreInfo.score)}§r\n`;
 		}
 
-		entity.nameTag = `§l§${style.name}${name}\n§l${filler}§r\n${leaderboard}`;
-	},
-};
+		this.entity.nameTag = `§l§${style.name}${name}\n§l${filler}§r\n${leaderboard}`;
+	}
+}
 
-setTickInterval(
+system.runInterval(
 	() => {
-		if (!LB_DB || LB_DB.keys().length < 0) return;
-		for (let leaderboard of LB_DB.values()) {
-			LeaderboardBuild.updateLeaderboard(leaderboard);
+		for (const [id, leaderboard] of LB_DB.entries()) {
+			const lb = Leaderboard.get(
+				leaderboard.location,
+				leaderboard.dimension,
+				id
+			);
+
+			if (lb) lb.updateLeaderboard();
 		}
 	},
-	10,
-	"leaderboardsInterval"
+	"leaderboardsInterval",
+	10
 );
 
 /**
