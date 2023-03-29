@@ -1,4 +1,6 @@
 import { getRole, ROLES, XA } from "xapi.js";
+import { CommandContext } from "../../lib/Command/Callback.js";
+import { CmdLet } from "../../lib/Command/Cmdlet.js";
 import { XCommand } from "../../lib/Command/index.js";
 import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
 
@@ -100,7 +102,13 @@ help
 		);
 	});
 
-help.string("commandName").executes((ctx, commandName) => {
+/**
+ *
+ * @param {CommandContext} ctx
+ * @param {string} commandName
+ * @returns
+ */
+function helpForCommand(ctx, commandName) {
 	const cmd = XCommand.COMMANDS.find(
 		(e) =>
 			e.sys.data.name == commandName ||
@@ -134,6 +142,16 @@ help.string("commandName").executes((ctx, commandName) => {
 	}
 	// ctx.reply(`${new Array(l).join(" ")}§7§ы──┘`);
 	return;
+}
+
+help.string("commandName").executes(helpForCommand);
+
+new CmdLet({
+	name: "help",
+	callback(ctx) {
+		helpForCommand(ctx, ctx.command.sys.data.name);
+		return "stop";
+	},
 });
 
 const testCMD = new XA.Command({

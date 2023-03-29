@@ -11,6 +11,7 @@ import {
 	StringArgumentType,
 } from "./ArgumentTypes.js";
 import { CommandContext } from "./Callback.js";
+import { CmdLet } from "./Cmdlet.js";
 import "./index.js";
 import {
 	commandNotFound,
@@ -37,6 +38,9 @@ export class XCommand {
 		if (!command) return commandNotFound(data.sender, cmd);
 		if (!command.sys.data?.requires(data.sender))
 			return noPerm(data.sender, command);
+
+		if (CmdLet.workWithCmdlets(data, args, command) === "stop") return;
+
 		/**
 		 * Check Args/SubCommands for errors
 		 * @type {XCommand[]}
