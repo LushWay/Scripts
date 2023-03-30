@@ -3,7 +3,7 @@ import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { BECHMARK_RESULTS } from "../../lib/XBenchmark.js";
-import { handle, IS, TIMERS_PATHES, toStr, XA } from "../../xapi.js";
+import { handle, TIMERS_PATHES, toStr, XA } from "../../xapi.js";
 
 /**
  * @typedef {import("../../lib/Database/Rubedo.js").Database<string, any>} defDB
@@ -12,7 +12,7 @@ import { handle, IS, TIMERS_PATHES, toStr, XA } from "../../xapi.js";
 const db = new XA.Command({
 	name: "db",
 	description: "Просматривает базу данных",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 });
 
 db.executes((ctx) => selectTable(ctx.sender, true));
@@ -221,7 +221,7 @@ function getPath(key) {
 new XA.Command({
 	name: "benchmark",
 	description: "Показывает время работы серверных систем",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 })
 	.string("type", true)
 	.boolean("pathes", true)

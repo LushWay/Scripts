@@ -5,10 +5,10 @@ import {
 	MinecraftBlockTypes,
 	MinecraftItemTypes,
 	Player,
-	world,
 	system,
+	world,
 } from "@minecraft/server";
-import { DisplayError, IS, XA } from "xapi.js";
+import { DisplayError, XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
 import { global } from "./var.js";
@@ -578,7 +578,7 @@ new XA.Command({
 	.executes((ctx) => {
 		Atp(ctx.sender, "spawn");
 	})
-	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
+	.literal({ name: "set", role: "admin" })
 	.location("pos", true)
 	.executes((ctx, pos) => {
 		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
@@ -597,7 +597,7 @@ new XA.Command({
 	.executes((ctx) => {
 		Atp(ctx.sender, "minigames");
 	})
-	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
+	.literal({ name: "set", role: "admin" })
 	.location("pos", true)
 	.executes((ctx, pos) => {
 		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
@@ -615,7 +615,7 @@ new XA.Command({
 	.executes((ctx) => {
 		Atp(ctx.sender, "anarch");
 	})
-	.literal({ name: "set", requires: (p) => IS(p.id, "admin") })
+	.literal({ name: "set", role: "admin" })
 	.location("pos", true)
 	.executes((ctx, pos) => {
 		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
@@ -628,7 +628,7 @@ new XA.Command({
 	name: "portal",
 	aliases: ["port"],
 	description: "Ставит портал",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 })
 	.string("lore")
 	.executes((ctx) => {

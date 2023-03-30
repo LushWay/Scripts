@@ -1,5 +1,5 @@
-import { Player, world, system } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { Player, system, world } from "@minecraft/server";
+import { XA } from "xapi.js";
 import { Atp } from "../Server/portals.js";
 import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
 import { quene } from "./var.js";
@@ -154,7 +154,7 @@ bbr
 	.literal({
 		name: "start",
 		description: "",
-		requires: (p) => IS(p.id, "admin"),
+		role: "admin",
 	})
 	.executes(() => {
 		br.start(ks(quene));
@@ -165,7 +165,7 @@ bbr
 	.literal({
 		name: "stop",
 		description: "",
-		requires: (p) => IS(p.id, "admin"),
+		role: "admin",
 	})
 	.executes(() => {
 		br.end("specially", "Так надо");

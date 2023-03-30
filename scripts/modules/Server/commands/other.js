@@ -1,11 +1,11 @@
-import { system } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { system, Vector } from "@minecraft/server";
+import { XA } from "xapi.js";
 import { global } from "../var.js";
 
 const casda = new XA.Command({
 	name: "name",
 	description: "",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 })
 	.string("Name")
 	.executes((ctx) => {
@@ -20,7 +20,7 @@ new XA.Command({
 	name: "resetpos",
 	description: "Удаляет информацию о позиции  на анархии",
 	type: "public",
-	require: "member",
+	role: "member",
 }).executes((ctx) => {
 	ctx.reply(XA.tables.player.delete("POS:" + ctx.sender.id) + "");
 });
@@ -28,7 +28,7 @@ new XA.Command({
 	name: "radius",
 	description: "Выдает радиус границы анархии сейчас",
 	type: "public",
-	require: "member",
+	role: "member",
 }).executes((ctx) => {
 	ctx.reply(`☺ ${global.Radius}`);
 });
@@ -37,37 +37,34 @@ new XA.Command({
 	name: "sit",
 	description: "",
 	type: "public",
-	require: "member",
+	role: "member",
 }).executes((ctx) => {
-	const entity = ctx.sender.dimension.spawnEntity("s:it", {
-		x: ctx.sender.location.x,
-		y: ctx.sender.location.y - 0.1,
-		z: ctx.sender.location.z,
-	});
-	entity.addTag("sit:" + ctx.sender.name);
+	const entity = ctx.sender.dimension.spawnEntity(
+		"x:sit",
+		Vector.add(ctx.sender.location, { x: 0, y: -0.1, z: 0 })
+	);
 	entity.getComponent("rideable").addRider(ctx.sender);
 });
+
 system.runInterval(
 	() => {
-		for (const e of XA.dimensions.overworld.getEntities({ type: "s:t" })) {
-			const players = XA.Entity.getClosetsEntitys(
-				e,
-				1,
-				"minecraft:player",
-				1,
-				false
-			);
-			if (players.length < 1) e.triggerEvent("kill");
+		for (const e of XA.dimensions.overworld.getEntities({ type: "x:sit" })) {
+			const players = e.dimension.getEntities({
+				type: "minecraft:player",
+				location: e.location,
+				maxDistance: 1,
+			});
+			if (players.length < 1) e.triggerEvent("sit:kill");
 		}
 	},
 	"sit entity clear",
-	20
+	40
 );
 
 const cos = new XA.Command({
 	name: "i",
 	description: "Создает динамический список предметов",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "test",
 });
 cos
@@ -114,7 +111,7 @@ cos.literal({ name: "list" }).executes((ctx) => {
 new XA.Command({
 	name: "ws",
 	description: "Выдает/убирает меню из инвентаря",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 	/*type: "serv"*/
 }).executes(async (ctx) => {
 	if (await XA.Entity.hasItem(ctx.sender, 0, "sa:a")) {
@@ -128,7 +125,7 @@ new XA.Command({
 new XA.Command({
 	name: "s",
 	description: "Выжа",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	/*type: "serv"*/
 }).executes((ctx) => {
 	ctx.sender.runCommandAsync("gamemode s");
@@ -137,7 +134,7 @@ new XA.Command({
 new XA.Command({
 	name: "c",
 	description: "Креатив",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	/*type: "serv"*/
 }).executes((ctx) => {
 	ctx.sender.runCommandAsync("gamemode c");

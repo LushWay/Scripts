@@ -179,7 +179,8 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 		argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i]);
 	}
 	if (typeof lastArg.sys.callback !== "function")
-		return event.sender.tell("§cУпс, эта команда пока не работает.");
+		return event.sender.tell("§6⚠ Упс, эта команда пока не работает.");
+
 	handle(
 		() =>
 			lastArg.sys.callback(

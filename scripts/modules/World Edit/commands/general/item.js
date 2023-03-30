@@ -1,9 +1,9 @@
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 
 const root = new XA.Command({
 	name: "item",
 	description: "Управляет предметом в руке",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "test",
 });
 
@@ -31,7 +31,11 @@ root
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.nameTag}`);
 	});
 root
-	.literal({ name: "count", aliases: ["c"], description: "Задает количество предметов" })
+	.literal({
+		name: "count",
+		aliases: ["c"],
+		description: "Задает количество предметов",
+	})
 	.int("count")
 	.executes((ctx, count) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
@@ -41,3 +45,4 @@ root
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.amount}`);
 	});
+

@@ -1,16 +1,6 @@
 import { Dimension, Entity, Player } from "@minecraft/server";
 import { handle, XA } from "../../../xapi.js";
-import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
-/**
- * Holds all regions in memory so its not grabbing them so much
- * @type {Region[]}
- */
-export const REGIONS = [];
-/**
- * If the regions have been grabbed if not it will grab them and set this to true
- */
-let REGIONS_HAVE_BEEN_GRABBED = false;
 /**
  * The Lowest Y value in minecraft
  */
@@ -37,12 +27,45 @@ const TABLE = XA.tables.region;
 
 export class Region {
 	/**
+	 * The default permissions for all regions made
+	 * @type {IRegionPermissions}
+	 */
+	static DEFAULT_REGION_PERMISSIONS = {
+		/**
+		 * If players in this region can use doors, trapdoors, and switches like buttons and levers
+		 */
+		doorsAndSwitches: true,
+		/**
+		 * If players in this region can open containers, this is like chests, furnaces, hoppers, etc
+		 */
+		openContainers: true,
+		/**
+		 * If the players in this region can fight each other
+		 */
+		pvp: false,
+		/**
+		 * the entitys allowed in this region
+		 */
+		allowedEntitys: ["minecraft:player", "minecraft:npc", "minecraft:item"],
+		owners: [],
+	};
+	/**
+	 * Holds all regions in memory so its not grabbing them so much
+	 * @type {Region[]}
+	 */
+	static REGIONS = [];
+	/**
+	 * If the regions have been grabbed if not it will grab them and set this to true
+	 */
+	static REGIONS_HAVE_BEEN_GRABBED = false;
+	/**
 	 * Gets all regions
 	 * @returns {Region[]}
 	 */
 	static getAllRegions() {
-		if (REGIONS_HAVE_BEEN_GRABBED) return REGIONS;
-		const regions = TABLE.values().map(
+		if (this.REGIONS_HAVE_BEEN_GRABBED) return this.REGIONS;
+
+		this.REGIONS = TABLE.values().map(
 			(region) =>
 				new Region(
 					region.from,
@@ -53,10 +76,10 @@ export class Region {
 					false
 				)
 		);
-		regions.forEach((r) => {
-			REGIONS.push(r);
-		});
-		return regions;
+
+		this.REGIONS_HAVE_BEEN_GRABBED = true;
+
+		return this.REGIONS;
 	}
 	/**
 	 * Checks if a block location is in region
@@ -107,12 +130,13 @@ export class Region {
 		this.from = from;
 		this.to = to;
 		this.dimensionId = dimensionId;
-		this.permissions = permissions ?? DEFAULT_REGION_PERMISSIONS;
+		this.permissions = permissions ?? this.DEFAULT_REGION_PERMISSIONS;
 		key = key ?? new Date(Date.now()).toISOString();
 		this.key = key;
+
 		if (creating) {
 			this.update();
-			REGIONS.push(this);
+			Region.REGIONS.push(this);
 		}
 	}
 	/**

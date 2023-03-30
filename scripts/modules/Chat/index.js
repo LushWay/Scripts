@@ -23,7 +23,12 @@ const playerOptions = XA.PlayerOptions("chat", {
 });
 
 world.events.beforeChat.subscribe((data) => {
-	if (data.message.startsWith(CONFIG.commandPrefix)) return;
+	if (
+		data.message.startsWith(CONFIG.commandPrefix) &&
+		data.message !== CONFIG.commandPrefix
+	)
+		return;
+
 	data.cancel = true;
 	try {
 		const cooldown = options.cooldown;
@@ -77,3 +82,4 @@ world.events.beforeChat.subscribe((data) => {
 		DisplayError(error);
 	}
 });
+

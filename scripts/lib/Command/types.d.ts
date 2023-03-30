@@ -32,7 +32,7 @@ export interface ICommandData {
 	/**
 	 * Specify this to generate ```requires: (p) => IS(player, require)```
 	 */
-	require?: keyof typeof ROLES;
+	role?: keyof typeof ROLES;
 	/**
 	 * The message that will be send if a player doest have permission to use this command
 	 * Its good to explain why this failed here
@@ -84,3 +84,4 @@ export interface IArgumentReturnData<T> {
 	 */
 	value?: T;
 }
+

@@ -1,12 +1,12 @@
 import {
 	GameMode,
 	MinecraftBlockTypes,
+	system,
 	Vector,
 	world,
-	system,
 } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { handle, IS, XA } from "xapi.js";
+import { handle, XA } from "xapi.js";
 import { DIMENSIONS } from "../../lib/List/dimensions.js";
 
 const time = 9999999;
@@ -30,7 +30,7 @@ GameTest.registerAsync("s", "s", async (test) => {
 new XA.Command({
 	name: "player",
 	description: "Спавнит фэйкового игрока",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 	type: "test",
 })
 	.string("new name", true)

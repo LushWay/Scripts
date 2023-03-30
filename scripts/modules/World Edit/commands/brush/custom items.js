@@ -1,11 +1,11 @@
 import { ItemStack, ItemTypes } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 
 const shovelCMD = new XA.Command({
 	name: "shovel",
 	description: "Выдает лопату",
 	aliases: ["sh"],
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "wb",
 })
 
@@ -24,7 +24,9 @@ const shovelCMD = new XA.Command({
 		if (радиус > 6) return ctx.reply("§c► Зачем тебе такой БОЛЬШОЙ?)");
 		if (высота > 10) return ctx.reply("§c► Зачем тебе такой БОЛЬШОЙ?)");
 		let bblocks;
-		blocks == "st" ? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:")) : (bblocks = blocks);
+		blocks == "st"
+			? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:"))
+			: (bblocks = blocks);
 		brush.setLore([
 			"§9Adv",
 			`Blocks: ${bblocks}`,
@@ -47,7 +49,8 @@ shovelCMD
 	.int("height")
 	.executes((ctx, height) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
-		if (!item || item.typeId != "we:shovel") return ctx.reply(`§cТы держишь не лопату!`);
+		if (!item || item.typeId != "we:shovel")
+			return ctx.reply(`§cТы держишь не лопату!`);
 		let lore = item.getLore();
 		let c = lore[3].split(" ");
 		c[1] = height;
@@ -65,10 +68,13 @@ shovelCMD
 	.string("blocks")
 	.executes((ctx, blocks) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
-		if (!item || item.typeId != "we:s") return ctx.reply(`§cТы держишь не лопату!`);
+		if (!item || item.typeId != "we:s")
+			return ctx.reply(`§cТы держишь не лопату!`);
 		let lore = item.getLore();
 		let bblocks;
-		blocks == "st" ? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:")) : (bblocks = blocks);
+		blocks == "st"
+			? (bblocks = XA.Entity.getTagStartsWith(ctx.sender, "st:"))
+			: (bblocks = blocks);
 		lore[1] = `Blocks: ${bblocks}`;
 		item.setLore(lore);
 		XA.Entity.getI(ctx.sender);
@@ -82,7 +88,8 @@ shovelCMD
 	.string("blocks")
 	.executes((ctx, blocks) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
-		if (!item || item.typeId != "we:s") return ctx.reply(`§cТы держишь не лопату!`);
+		if (!item || item.typeId != "we:s")
+			return ctx.reply(`§cТы держишь не лопату!`);
 		let lore = item.getLore();
 		lore[2] = `RBlocks: ${blocks}`;
 		item.setLore(lore);
@@ -97,7 +104,8 @@ shovelCMD
 	.int("radius")
 	.executes((ctx, radius) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
-		if (!item || item.typeId != "we:s") return ctx.reply(`§cТы держишь не лопату!`);
+		if (!item || item.typeId != "we:s")
+			return ctx.reply(`§cТы держишь не лопату!`);
 		let lore = item.getLore();
 		let c = lore[3].split(" ");
 		c[3] = radius;
@@ -106,3 +114,4 @@ shovelCMD
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a(s) §rРадиус лопаты изменен на ${radius}`);
 	});
+

@@ -1,9 +1,9 @@
-import { IS, toStr, XA } from "xapi.js";
+import { toStr, XA } from "xapi.js";
 
 const root = new XA.Command({
 	name: "id",
 	description: "Выдает айди",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "test",
 });
 

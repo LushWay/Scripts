@@ -4,9 +4,9 @@ import { m, mm } from "../lib/Module/creator.js";
 m`DatabaseView`;
 m`HelpCommand`;
 m`Menu`;
-// m`Region`;
+m`Region`;
 m`Test`;
-// m`Server`;
+m`Server`;
 
 m`Chat`;
 m`Admin`;

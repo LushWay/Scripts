@@ -1,10 +1,10 @@
 import { P } from "../../../lib/List/particles.js";
 
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 new XA.Command({
 	name: "particle",
 	aliases: ["p"],
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "test",
 })
 	.string("particle", true)
@@ -26,12 +26,12 @@ new XA.Command({
 	})
 	.literal({ name: "n" })
 	.int("number")
-	.executes((ctx, number) => {
+	.executes((ctx, _, number) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
-		let particle = P[parseInt(number)];
+		let particle = P[number];
 		lore[0] = "Particle";
 		lore[1] = particle ?? P[0];
 		lore[2] = String(number);

@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes, Player } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 import { inaccurateSearch } from "../../../../lib/Class/Search.js";
 import { ModalForm } from "../../../../lib/Form/ModelForm.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
@@ -8,7 +8,7 @@ import { Cuboid } from "../../modules/utils/Cuboid.js";
 const set = new XA.Command({
 	name: "set",
 	description: "Частично или полностью заполняет блоки в выделенной области",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 });
 
 set
@@ -18,15 +18,21 @@ set
 	.string("other", true)
 	.int("otherData", true)
 	.executes((ctx, block, blockData, mode, other, otherData) => {
-		if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
+		if (!WorldEditBuild.selectionCuboid)
+			return ctx.reply("§cЗона не выделена!");
 
 		if (!blockIsAvaible(block, ctx.sender)) return;
 		if (other && !blockIsAvaible(other, ctx.sender)) return;
 
 		const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
-		if (time >= 0.01) ctx.reply(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`);
+		if (time >= 0.01)
+			ctx.reply(
+				`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
+			);
 
-		WorldEditBuild.fillBetween(block, blockData, mode, other, otherData).then((result) => ctx.reply(result));
+		WorldEditBuild.fillBetween(block, blockData, mode, other, otherData).then(
+			(result) => ctx.reply(result)
+		);
 	});
 
 set.executes((ctx) => {
@@ -35,7 +41,14 @@ set.executes((ctx) => {
 	new ModalForm("Заполнить")
 		.addTextField("Block", "e.g. stone", "")
 		.addSlider("Block data", 0, 15, 1, 0)
-		.addDropdown("Replace mode", ["none", "replace", "destroy", "hollow", "keep", "outline"])
+		.addDropdown("Replace mode", [
+			"none",
+			"replace",
+			"destroy",
+			"hollow",
+			"keep",
+			"outline",
+		])
 		.addTextField("Replacable block (only for replace!)", "e.g. stone", "")
 		.addSlider("Replace block data", 0, 15, 1, 0)
 		.show(ctx.sender, (_, block, blockData, mode, other, otherData) => {
@@ -43,11 +56,18 @@ set.executes((ctx) => {
 			if (other && !blockIsAvaible(other, ctx.sender)) return;
 
 			const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
-			if (time >= 0.01) ctx.reply(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`);
+			if (time >= 0.01)
+				ctx.reply(
+					`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
+				);
 
-			WorldEditBuild.fillBetween(block, blockData, mode !== "none" ? mode : "", other, otherData).then((result) =>
-				ctx.reply(result)
-			);
+			WorldEditBuild.fillBetween(
+				block,
+				blockData,
+				mode !== "none" ? mode : "",
+				other,
+				otherData
+			).then((result) => ctx.reply(result));
 		});
 });
 
@@ -66,7 +86,9 @@ function timeCaculation(pos1, pos2) {
 
 const prefix = "minecraft:";
 
-const blocks = MinecraftBlockTypes.getAllBlockTypes().map((e) => e.id.substring(prefix.length));
+const blocks = MinecraftBlockTypes.getAllBlockTypes().map((e) =>
+	e.id.substring(prefix.length)
+);
 
 /**
  *
@@ -87,7 +109,8 @@ function blockIsAvaible(block, player) {
 		maxSuggestionsCount: 3,
 	};
 
-	if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return;
+	if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue))
+		return;
 
 	const suggest = (a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`;
 	let suggestion = "§cВы имели ввиду " + suggest(search[0]);
@@ -96,7 +119,9 @@ function blockIsAvaible(block, player) {
 		.filter((e) => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
 		.slice(1, options.maxSuggestionsCount);
 
-	for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? " или " : ", "}${suggest(e)}`;
+	for (const [i, e] of search.entries())
+		suggestion += `${i + 1 === search.length ? " или " : ", "}${suggest(e)}`;
 
 	player.tell(suggestion + "§c?");
 }
+

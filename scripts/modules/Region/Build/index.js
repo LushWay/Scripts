@@ -1,9 +1,15 @@
 import { MinecraftEffectTypes, system, world } from "@minecraft/server";
 import { IS } from "xapi.js";
 import { setRegionGuards } from "../Default/index.js";
+import { Region } from "../utils/Region.js";
 import "./menu.js";
 
-const GLOBAL_ALLOWED_ENTITIES = ["minecraft:player", "f:t", "rubedo:database"];
+const GLOBAL_ALLOWED_ENTITIES = [
+	"minecraft:player",
+	"f:t",
+	"rubedo:database",
+	"x:sit",
+];
 
 setRegionGuards(
 	// Common actions guard
@@ -16,6 +22,7 @@ setRegionGuards(
 		!region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)
 );
 
+Region.DEFAULT_REGION_PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES;
 world.events.beforeExplosion.subscribe((data) => (data.cancel = true));
 
 const EFFECT_Y = -53;

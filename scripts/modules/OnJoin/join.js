@@ -1,5 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { __JOIN_EMITTERS } from "./events.js";
 import "./subscribes.js";
@@ -48,7 +48,7 @@ system.runTimeout(
 		setData(player, D);
 	},
 	"owner start screen",
-	80,
+	80
 );
 
 system.runPlayerInterval(
@@ -197,7 +197,7 @@ new XA.Command({
 
 new XA.Command({
 	name: "join",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 	description: "Имитирует вход",
 	type: "public",
 }).executes((ctx) => {

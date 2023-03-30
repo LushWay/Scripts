@@ -140,6 +140,7 @@ function helpForCommand(ctx, commandName) {
 		l = Math.max(l, _.length);
 		ctx.reply(_);
 	}
+	ctx.reply(" ");
 	// ctx.reply(`${new Array(l).join(" ")}§7§ы──┘`);
 	return;
 }
@@ -148,6 +149,7 @@ help.string("commandName").executes(helpForCommand);
 
 new CmdLet({
 	name: "help",
+	description: "Выводит справку о команде",
 	callback(ctx) {
 		helpForCommand(ctx, ctx.command.sys.data.name);
 		return "stop";
@@ -157,7 +159,7 @@ new CmdLet({
 const testCMD = new XA.Command({
 	name: "owo",
 	description: "Для теста дерева команд",
-	require: "admin",
+	role: "admin",
 });
 
 testCMD.executes(() => {});

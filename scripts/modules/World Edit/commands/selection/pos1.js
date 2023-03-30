@@ -1,11 +1,11 @@
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 new XA.Command({
 	name: "pos1",
 	aliases: ["p1"],
 	description: "Set position 1",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 })
 	.location("pos", true)
 	.executes((ctx, pos) => {

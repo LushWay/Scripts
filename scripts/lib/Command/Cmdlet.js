@@ -1,4 +1,4 @@
-import { BeforeChatEvent, world } from "@minecraft/server";
+import { BeforeChatEvent } from "@minecraft/server";
 import { CommandContext } from "./Callback.js";
 import { XCommand } from "./index.js";
 
@@ -38,14 +38,28 @@ export class CmdLet {
 			}
 		}
 
+		if (cmdlets.length > 0 && results.length < 1) {
+			const many = cmdlets.length > 1;
+			data.sender.tell(
+				`§cНеизвестны${many ? "e" : "й"} командлет${
+					many ? "ы" : ""
+				} §f${cmdlets.join(
+					"§c, §f"
+				)}§c.\nДоступные командлеты: \n§f${CmdLet.ALL.map(
+					(e) => `\n  §f${e.data.name} §7§o- ${e.data.description}`
+				)}\n `
+			);
+			return "stop";
+		}
+
 		if (results.includes("stop")) return "stop";
 	}
 	/**
 	 * Creates a new cmdlet to use it in command like 'name --help'
-	 * @param {{name: string, callback(ctx: CommandContext, param: string): 'stop' | void}} info
+	 * @param {{name: string, callback(ctx: CommandContext, param: string): 'stop' | void, description: string}} info
 	 */
-	constructor({ name, callback }) {
-		this.data = { name, callback };
+	constructor({ name, callback, description }) {
+		this.data = { name, callback, description };
 
 		CmdLet.ALL.push(this);
 	}

@@ -23,6 +23,7 @@ async function getServerTPS() {
 new XA.Command({
 	name: "ping",
 	description: "Returns the current Ticks Per Second of the servers ping",
+	role: "member",
 }).executes(async (ctx) => {
 	let ticks = await getServerTPS();
 	ctx.reply(
@@ -35,3 +36,4 @@ new XA.Command({
 		} ${ticks} §f}`
 	);
 });
+

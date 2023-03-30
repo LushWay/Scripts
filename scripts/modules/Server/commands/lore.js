@@ -1,8 +1,8 @@
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 const ll = new XA.Command({
 	name: "lore",
 	aliases: ["l"],
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "test",
 }).executes((ctx) => {
 	ctx.reply("lore.help.text");
@@ -11,7 +11,8 @@ ll.literal({ name: "run" })
 	.string("command")
 	.executes((ctx, command) => {
 		let item = XA.Entity.getHeldItem(ctx.sender);
-		if (!item || item.typeId != "we:tool") return ctx.reply(`§cТы держишь не tool!`);
+		if (!item || item.typeId != "we:tool")
+			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
 		lore[0] = "run";
 		let commandd = "";
@@ -31,7 +32,8 @@ ll.literal({ name: "rune" })
 	.string("command")
 	.executes((ctx, command) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
-		if (!item || item.typeId != "we:tool") return ctx.reply(`§cТы держишь не tool!`);
+		if (!item || item.typeId != "we:tool")
+			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
 		lore[0] = "runE";
 		let commandd = "";
@@ -50,7 +52,8 @@ ll.literal({ name: "rune" })
 	});
 ll.literal({ name: "viewtp" }).executes((ctx) => {
 	const item = XA.Entity.getHeldItem(ctx.sender);
-	if (!item || item.typeId != "we:tool") return ctx.reply(`§cТы держишь не tool!`);
+	if (!item || item.typeId != "we:tool")
+		return ctx.reply(`§cТы держишь не tool!`);
 	let lore = item.getLore();
 	lore[0] = "viewTP";
 	item.nameTag = `§r§a► ViewTP}`;
@@ -58,3 +61,4 @@ ll.literal({ name: "viewtp" }).executes((ctx) => {
 	XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 	ctx.reply(`§a► §rРежим инструмента изменен на телепорт по взгляду`);
 });
+

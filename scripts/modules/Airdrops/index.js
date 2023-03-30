@@ -215,7 +215,7 @@ system.runInterval(
 const kit = new XA.Command({
   name: "drop",
   description: "Управление таблицами дропа",
-  requires: (p) => IS(p.id, "moderator"),
+  require: "moderator",
 }).executes((ctx) => {
   new airdrope(
     Math.floor(ctx.sender.location.x),
@@ -269,7 +269,7 @@ kit
   .literal({
     name: "add",
     description: "Добавляет",
-    requires: (p) => IS(p.id, "moderator"),
+    require: "moderator",
   })
   .int("number")
   .executes((ctx,  number ) => {
@@ -310,7 +310,7 @@ kit
   .literal({
     name: "del",
     description: "ДЦт",
-    requires: (p) => IS(p.id, "moderator"),
+    require: "moderator",
   })
   .string("number")
   .executes((ctx,  number ) => {

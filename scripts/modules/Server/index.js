@@ -1,9 +1,7 @@
 import { MinecraftDimensionTypes, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 
-/**======================
- **       PLUGINS
- *========================**/
+import "./commands/import.js";
 import "./pvp.js";
 import "./tool.js";
 import { options } from "./var.js";

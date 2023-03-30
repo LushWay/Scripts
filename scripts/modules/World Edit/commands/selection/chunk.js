@@ -1,5 +1,5 @@
 import { Entity } from "@minecraft/server";
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 /**
@@ -33,7 +33,7 @@ new XA.Command({
 	type: "wb",
 	name: "chunk",
 	description: "Set the selection to your current chunk.",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 }).executes((ctx) => {
 	const chunkBorder = getChunkCuboidPositions(ctx.sender);
 	WorldEditBuild.pos1 = chunkBorder.pos1;
@@ -42,3 +42,4 @@ new XA.Command({
 		`§b►§3Выделенна зона: §5Позиция 1§3: ${chunkBorder.pos1.x} ${chunkBorder.pos1.y} ${chunkBorder.pos1.z}, §dПозиция 2§3: ${chunkBorder.pos2.x} ${chunkBorder.pos2.y} ${chunkBorder.pos2.z}`
 	);
 });
+

@@ -29,7 +29,11 @@ export class XCommand {
 	 * @param {BeforeChatEvent} data
 	 */
 	static chatListener(data) {
-		if (!data.message.startsWith(CONFIG.commandPrefix)) return; // This is not a command
+		if (
+			!data.message.startsWith(CONFIG.commandPrefix) ||
+			data.message === CONFIG.commandPrefix
+		)
+			return; // This is not a command
 		data.cancel = true;
 		const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix);
 		const command = XCommand.COMMANDS.find(
@@ -87,7 +91,7 @@ export class XCommand {
 	constructor(data, type, depth = 0, parent = null) {
 		data.requires ??= () => true;
 		data.type ??= "test";
-		if ("require" in data) data.requires = (p) => IS(p.id, data.require);
+		if ("require" in data) data.requires = (p) => IS(p.id, data.role);
 
 		this.sys = {
 			data,

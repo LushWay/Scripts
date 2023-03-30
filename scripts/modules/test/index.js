@@ -4,7 +4,7 @@ import {
 	Vector,
 	world,
 } from "@minecraft/server";
-import { DisplayError, handle, IS, toStr, XA } from "xapi.js";
+import { DisplayError, handle, toStr, XA } from "xapi.js";
 import { stackParse } from "../../lib/Class/XError.js";
 import { CommandContext } from "../../lib/Command/Callback.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
@@ -230,6 +230,9 @@ const tests = {
 
 		world.debug([...nitem.getComponent("enchantments").enchantments]);
 	},
+	34(ctx) {
+		world.debug(XA.Lang.emoji);
+	},
 };
 
 let text = "";
@@ -238,7 +241,7 @@ let done = false;
 
 const c = new XA.Command({
 	name: "test",
-	requires: (p) => IS(p.id, "admin"),
+	role: "admin",
 });
 
 c.string("number", true).executes(async (ctx, n) => {

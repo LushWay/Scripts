@@ -1,10 +1,10 @@
-import { IS, XA } from "xapi.js";
+import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 
 new XA.Command({
 	name: "paste",
 	description: "Вставляет заранее скопированную зону",
-	requires: (p) => IS(p.id, "moderator"),
+	role: "moderator",
 	type: "wb",
 })
 	.int("rotation", true)
@@ -46,3 +46,4 @@ new XA.Command({
 			ctx.reply(status);
 		}
 	);
+
