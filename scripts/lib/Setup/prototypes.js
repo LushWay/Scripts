@@ -110,6 +110,7 @@ addMethod(Player.prototype, "closeChat", function (message) {
 		cause: EntityDamageCause.entityAttack,
 	});
 	health.setCurrent(current);
+	this.runCommand("stopsound @s game.player.hurt");
 
 	// Return player back to creative mode
 	if (isCreative) this.runCommand("gamemode c");

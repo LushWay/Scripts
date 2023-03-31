@@ -69,14 +69,14 @@ export function removeDefaults(
 	for (const key in sourceObject) {
 		const value = sourceObject[key];
 		const defaultValue = defaultObject[key];
-		const subSetDefaults =
-			typeof defaultValue === "object" &&
-			defaultValue !== null &&
-			!visited.has(value);
 
 		if (value === defaultValue) continue;
 
-		if (subSetDefaults) {
+		if (
+			typeof defaultValue === "object" &&
+			defaultValue !== null &&
+			!visited.has(value)
+		) {
 			if (Array.isArray(defaultValue)) {
 				const composedArray = removeDefaultsFromArray(value, defaultValue);
 				if (composedArray.length < 1) continue;

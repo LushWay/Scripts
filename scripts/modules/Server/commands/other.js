@@ -38,11 +38,14 @@ new XA.Command({
 	description: "",
 	type: "public",
 	role: "member",
-}).executes((ctx) => {
+}).executes(async (ctx) => {
 	const entity = ctx.sender.dimension.spawnEntity("x:sit", ctx.sender.location);
 	ctx.sender.closeChat();
-	// Rideable component doesnt works(
+	// Rideable component doesnt workы
 	entity.runCommand("ride @p start_riding @s teleport_rider ");
+
+	await Promise.resolve();
+	ctx.sender.onScreenDisplay.setActionBar("Вы сели. Чтобы встать, крадитесь");
 });
 
 system.runInterval(
