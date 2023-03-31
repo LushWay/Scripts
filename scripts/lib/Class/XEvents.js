@@ -1,5 +1,3 @@
-import { XUtils } from "./XUtils.js";
-
 /**
  * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
  * @template Data The type of the data that the events will be emitted with.
@@ -15,10 +13,10 @@ export class Subscriber {
 	/**
 	 * Subscribes a callback function to the events with the specified position.
 	 * @param {Callback} callback - The callback function to subscribe to the events.
-	 * @param {number} position - The position of the subscriber, defaults to 0.
+	 * @param {number} position - The position of the subscriber, defaults last position
 	 * @returns {Callback} The callback function that has been subscribed.
 	 */
-	subscribe(callback, position = 0) {
+	subscribe(callback, position = this.events.size) {
 		this.events.set(callback, position);
 		return callback;
 	}
@@ -48,8 +46,9 @@ export class Subscriber {
 	 */
 	get export() {
 		return {
-			subscribe: XUtils.TypedBind(this.subscribe, this),
-			unsubscribe: XUtils.TypedBind(this.unsubscribe, this),
+			subscribe: this.subscribe.typedBind(this),
+			unsubscribe: this.unsubscribe.typedBind(this),
 		};
 	}
 }
+

@@ -17,7 +17,6 @@ mm("OnJoin", { fileName: "join" });
 m`DamageIndicator`;
 m`Menu`;
 m`Region`;
-
 // m`Battle Royal`;
 // m`Airdrops`;
 
@@ -27,6 +26,5 @@ m`Region`;
 m`Test`;
 m`GameTest`;
 m`Leaderboards`;
-
 // mm("World Edit", { fileName: "WBindex" });
 

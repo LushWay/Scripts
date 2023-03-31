@@ -56,13 +56,13 @@ class WorldEditBuilder {
 
 	drawSelection() {
 		if (!this.drawselection || !this.selectionCuboid) return;
-		const selectedSize = XA.Utils.getBlocksCount(
+		const selectedSize = Vector.size(
 			this.selectionCuboid.min,
 			this.selectionCuboid.max
 		);
 		if (selectedSize > CONFIG_WB.DRAW_SELECTION_MAX_SIZE) return;
 		const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid;
-		const gen = XA.Utils.safeBlocksBetween(
+		const gen = Vector.foreach(
 			this.selectionCuboid.min,
 			this.selectionCuboid.max
 		);
@@ -208,7 +208,7 @@ class WorldEditBuilder {
 			const dz = Math.abs(this.current_copy.pos2.z - this.current_copy.pos1.z);
 			const pos2 = Vector.add(player.location, new Vector(dx, dy, dz));
 
-			const loc = XA.Utils.floorVector(player.location);
+			const loc = Vector.floor(player.location);
 
 			this.backup(loc, pos2);
 

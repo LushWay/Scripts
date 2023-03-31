@@ -19,10 +19,3 @@ Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
 	configurable: false,
 	enumerable: true,
 });
-
-world.events.beforeItemUseOn.subscribe((data) => {
-	world.debug(
-		data.blockLocation,
-		Vector.add(data.blockLocation, { z: 1, y: 1, x: 1 })
-	);
-});

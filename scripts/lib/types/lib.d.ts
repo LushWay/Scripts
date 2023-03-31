@@ -7,7 +7,7 @@ interface Console {
 	info(...data: any[]): void;
 	log(...data: any[]): void;
 	warn(...data: any[]): void;
-  debug(...data: any[]): void;
+	debug(...data: any[]): void;
 }
 
 declare var console: Console;
@@ -18,7 +18,12 @@ interface JSON {
 	 */
 	safeParse(
 		text: string,
-		reviver?: (this: any, key: string, value: any) => any,
+		reciever?: (this: any, key: string, value: any) => any,
 		errorCallback?: (error: Error) => any
 	): any;
 }
+
+interface Function {
+	typedBind<fn extends Function>(this: fn, context: object): fn;
+}
+

@@ -5,6 +5,27 @@ import { m, patchPackage } from "./utils.js";
 
 patchPackage("@minecraft/server", {
 	classes: {
+		Vector: m`
+    /**
+     * Returns size between two vectors
+     */
+    static size(a: Vector3, b: Vector3): number;
+    /**
+     * Floors each vector axis using Math.floor
+     */
+    static floor(a: Vector3): Vector3;
+    /**
+	   * Generates a generator of Vector3 objects between two provided Vector3 objects
+	   * @param a - starting Vector3 point
+	   * @param b - ending Vector3 point
+	   * @returns - generator of Vector3 objects
+	   */
+    static foreach(a: Vector3, b: Vector3): Generator<Vector3, void, unknown>;
+    /**
+     * Checks if vector c is between a and b
+     */
+    static between(a: Vector3, b: Vector3, c: Vector3): boolean
+    `,
 		World: m`
     /**
      * See {@link World.sendMessage}

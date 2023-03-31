@@ -110,7 +110,7 @@ system.runPlayerInterval(
 			const Z = lore[4].split(" ")[1].replace("+", "");
 			const H = Number(`${Z}${lore[3].split(" ")[1]}`);
 			const O = Number(`${Z}${lore[4].split(" ")[3]}`);
-			const newloc = XA.Utils.floorVector(p.location);
+			const newloc = Vector.floor(p.location);
 			FillFloor(
 				Vector.add(newloc, new Vector(-R, H, -R)),
 				Vector.add(newloc, new Vector(R, O, R)),

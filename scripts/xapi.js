@@ -94,6 +94,8 @@ export class XA {
 	constructor() {}
 }
 
+globalThis.XA = XA;
+
 export * from "./lib/Setup/loader.js";
 export * from "./lib/Setup/roles.js";
 export * from "./lib/Setup/timers.js";
@@ -103,7 +105,7 @@ export * from "./lib/Setup/utils.js";
  * Importing file from dir of the project
  * @param {string} path
  */
-export const DIR_IMPORT = (path) => import(path);
+globalThis.DIR_IMPORT = (path) => import(path);
 
 world.events.playerJoin.subscribe(() => {
 	if (Date.now() - loading < CONFIG.firstPlayerJoinTime) {

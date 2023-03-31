@@ -31,7 +31,7 @@ function ret(player, isX, zone, plus) {
  * @param {{x: number, z: number}} zone
  */
 function pret(player, isX, zone) {
-	const floored = XA.Utils.floorVector(player.location);
+	const floored = Vector.floor(player.location);
 	const l = isX
 		? [zone.x, floored.y + 1, floored.z]
 		: [floored.x, floored.y + 1, zone.z];
@@ -69,7 +69,7 @@ system.runInterval(
 		for (const p of players) {
 			const rmax = { x: center[0] + rad, z: center[1] + rad };
 			const rmin = { x: center[0] - rad, z: center[1] - rad };
-			const l = XA.Utils.floorVector(p.location);
+			const l = Vector.floor(p.location);
 
 			const xtrue = inRange(l.x, rmin.x, rmax.x);
 			const ztrue = inRange(l.z, rmin.z, rmax.z);

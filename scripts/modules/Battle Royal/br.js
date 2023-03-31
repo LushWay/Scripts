@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { Player, world } from "@minecraft/server";
-import { system, XA } from "xapi.js";
+import { XA, system } from "xapi.js";
 import { Subscriber } from "../../lib/Class/XEvents.js";
 import { rd } from "../Airdrops/index.js";
 import { Atp } from "../Server/portals.js";
@@ -204,7 +204,7 @@ class BattleRoyal {
 								y: 0,
 								z: this.center.z - this.game.rad,
 							};
-						const l = XA.Utils.floorVector(p.location);
+						const l = Vector.floor(p.location);
 						if (
 							l.x >= rmax.x &&
 							l.x <= rmax.x + 10 &&
@@ -404,7 +404,7 @@ class BattleRoyal {
 		for (const p of XA.dimensions.overworld.getEntities({
 			type: "minecraft:item",
 		})) {
-			const l = XA.Utils.floorVector(p.location);
+			const l = Vector.floor(p.location);
 			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x)
 				p.kill();
 		}

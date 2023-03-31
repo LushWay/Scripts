@@ -29,7 +29,7 @@ export class zone {
 	 * @param {Vector3} zone
 	 */
 	static pret(player, isX, zone) {
-		const floored = XA.Utils.floorVector(player.location);
+		const floored = Vector.floor(player.location);
 		const l = isX
 			? [zone.x, floored.y + 1, floored.z]
 			: [floored.x, floored.y + 1, zone.z];
@@ -48,3 +48,4 @@ export class zone {
 		);
 	}
 }
+

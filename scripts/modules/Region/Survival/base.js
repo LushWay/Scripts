@@ -1,4 +1,10 @@
-import { MinecraftBlockTypes, Player, system, world } from "@minecraft/server";
+import {
+	MinecraftBlockTypes,
+	Player,
+	Vector,
+	system,
+	world,
+} from "@minecraft/server";
 import { XA } from "xapi.js";
 import { CommandContext } from "../../../lib/Command/Context.js";
 
@@ -65,7 +71,7 @@ base.executes((ctx) => {
 		return ctx.reply("§cБазу можно поставить только на анархии");
 
 	const block = ctx.sender.dimension.getBlock(
-		XA.Utils.floorVector(ctx.sender.location)
+		Vector.floor(ctx.sender.location)
 	);
 
 	if (block.typeId !== "minecraft:chest") return ctx.reply(lang.nobase);
@@ -156,6 +162,9 @@ base
 			return ctx.reply(
 				`§сИгрока §f${player}§c нет в привате. Там есть только: §f${ent.nameTag}`
 			);
+		/**
+		 * @type {string[]}
+		 */
 		let arr2 = [];
 		arr.forEach((e) => {
 			if (e != player) arr2.push(e);
@@ -216,9 +225,7 @@ system.runInterval(
 		for (const base of XA.dimensions.overworld.getEntities({
 			type: "s:base",
 		})) {
-			const block = base.dimension.getBlock(
-				XA.Utils.floorVector(base.location)
-			);
+			const block = base.dimension.getBlock(Vector.floor(base.location));
 			if (block && block.typeId === "minecraft:barrel") continue;
 
 			base.nameTag

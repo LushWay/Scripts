@@ -14,60 +14,6 @@ export const XUtils = {
 		return str in obj;
 	},
 	/**
-	 * Generates a generator of either BlockLocation or Vector3 objects between two provided Vector3 objects
-	 * @param {Vector3} loc1 - starting Vector3 point
-	 * @param {Vector3} loc2 - ending Vector3 point
-	 * @returns {Generator<Vector3, void, unknown>} - generator of either BlockLocation or Vector3 objects
-	 */
-	*safeBlocksBetween(loc1, loc2) {
-		const [xmin, xmax] = loc1.x < loc2.x ? [loc1.x, loc2.x] : [loc2.x, loc1.x];
-		const [ymin, ymax] = loc1.y < loc2.y ? [loc1.y, loc2.y] : [loc2.y, loc1.y];
-		const [zmin, zmax] = loc1.z < loc2.z ? [loc1.z, loc2.z] : [loc2.z, loc1.z];
-		for (let x = xmin; x <= xmax; x++) {
-			for (let y = ymin; y <= ymax; y++) {
-				for (let z = zmin; z <= zmax; z++) {
-					yield { x, y, z };
-				}
-			}
-		}
-	},
-	/**
-	 * Calculates the total number of blocks in a 3D space defined by two Vector3 locations.
-	 * @param {Vector3} loc1 - The first Vector3 location defining the space.
-	 * @param {Vector3} loc2 - The second Vector3 location defining the space.
-	 * @returns {number} The total number of blocks in the defined space.
-	 */
-	getBlocksCount(loc1, loc2) {
-		const x1 = loc1.x;
-		const y1 = loc1.y;
-		const z1 = loc1.z;
-
-		const x2 = loc2.x;
-		const y2 = loc2.y;
-		const z2 = loc2.z;
-
-		const x = x2 > x1 ? x2 - x1 : x1 - x2;
-		const y = y2 > y1 ? y2 - y1 : y1 - y2;
-		const z = z2 > z1 ? z2 - z1 : z1 - z2;
-
-		return (x + 1) * (y + 1) * (z + 1);
-	},
-	/**
-	 * Converts a location to a block location
-	 * @param {Vector3} loc a location to convert
-	 */
-	floorVector(loc) {
-		return { x: Math.floor(loc.x), y: Math.floor(loc.y), z: Math.floor(loc.z) };
-	},
-	/**
-	 * Returns the block data of a block.
-	 * @param {Block} block - Block to get data
-	 * @returns {number} Data
-	 */
-	getBlockData(block) {
-		return 0;
-	},
-	/**
 	 *
 	 * @param {Player} player
 	 */
@@ -80,7 +26,7 @@ export const XUtils = {
 		 */
 		const form = new ActionFormData();
 
-		const nativeAddButton = this.TypedBind(form.button, form);
+		const nativeAddButton = form.button.typedBind(form);
 		form.buffer = (text, iconPath) => {
 			blocks.push("buffer");
 			nativeAddButton(text, iconPath);
@@ -137,16 +83,6 @@ export const XUtils = {
 		const textures = untyped_terrain_textures[search[0][0]].textures;
 
 		return textures[0];
-	},
-	/**
-	 * @template Func, [This = any]
-	 * @param {Func} func
-	 * @param {This} context
-	 * @returns {Func}
-	 */
-	TypedBind(func, context) {
-		if (typeof func !== "function") return func;
-		return func.bind(context);
 	},
 };
 

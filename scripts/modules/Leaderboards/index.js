@@ -1,5 +1,4 @@
-import { Entity, world, system } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { Entity, Vector, system, world } from "@minecraft/server";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { DIMENSIONS } from "../../lib/List/dimensions.js";
 
@@ -87,7 +86,7 @@ class Leaderboard {
 		};
 		const entity = world
 			.getDimension(dimension)
-			.spawnEntity(LEADERBOARD_ID, XA.Utils.floorVector(location));
+			.spawnEntity(LEADERBOARD_ID, Vector.floor(location));
 
 		LB_DB.set(entity.id, data);
 		entity.nameTag = "Updating...";

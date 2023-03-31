@@ -1,5 +1,6 @@
 import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { Vector } from "@minecraft/server";
 
 new XA.Command({
 	name: "pos2",
@@ -9,7 +10,7 @@ new XA.Command({
 })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		pos = XA.Utils.floorVector(pos);
+		pos = Vector.floor(pos);
 
 		WorldEditBuild.pos2 = pos;
 		ctx.reply(`§d►§r (2) ${pos.x}, ${pos.y}, ${pos.z}`);

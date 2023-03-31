@@ -1,5 +1,5 @@
-import { Dimension, Entity, Player } from "@minecraft/server";
-import { handle, XA } from "../../../xapi.js";
+import { Dimension, Entity, Player, Vector } from "@minecraft/server";
+import { XA, handle } from "../../../xapi.js";
 
 /**
  * The Lowest Y value in minecraft
@@ -24,7 +24,6 @@ function betweenXYZ(XYZa, XYZb, XYZc) {
 }
 
 const TABLE = XA.tables.region;
-
 export class Region {
 	/**
 	 * The default permissions for all regions made
@@ -119,18 +118,19 @@ export class Region {
 	/** @type {IRegionPermissions} */
 	permissions;
 	/**
-	 *
-	 * @param {IRegionCords} from
-	 * @param {IRegionCords} to
-	 * @param {string} dimensionId
-	 * @param {IRegionPermissions} [permissions]
-	 * @param {string} [key]
+	 * Creates a new region
+	 * @param {IRegionCords} from - The position of the first block of the region.
+	 * @param {IRegionCords} to - The position of the region's end.
+	 * @param {string} dimensionId - The dimension ID of the region.
+	 * @param {IRegionPermissions} [permissions] - An object containing the permissions for the region.
+	 * @param {string} [key] - The key of the region. This is used to identify the region.
+	 * @param {boolean} [creating] - Whether or not the region is being created.
 	 */
 	constructor(from, to, dimensionId, permissions, key, creating = true) {
 		this.from = from;
 		this.to = to;
 		this.dimensionId = dimensionId;
-		this.permissions = permissions ?? this.DEFAULT_REGION_PERMISSIONS;
+		this.permissions = permissions ?? Region.DEFAULT_REGION_PERMISSIONS;
 		key = key ?? new Date(Date.now()).toISOString();
 		this.key = key;
 
@@ -153,15 +153,15 @@ export class Region {
 		});
 	}
 	/**
-	 * removes this region
+	 * Removes this region
 	 */
 	delete() {
 		return TABLE.delete(this.key);
 	}
 	/**
-	 * Checks if a player is in this region
-	 * @returns {boolean} if a entity is in this region or not
-	 * @param {Entity} entity
+	 * Checks if a entity is in this region
+	 * @param {Entity} entity - Entity to check
+	 * @returns {boolean} - if a entity is in this region or not
 	 */
 	entityInRegion(entity) {
 		return (
@@ -174,11 +174,12 @@ export class Region {
 		);
 	}
 	/**
-	 *
-	 * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback
+	 * A function that will loop through all the owners
+	 * of a region and call the callback function on each
+	 * of them.
+	 * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback - Callback to run
 	 */
 	forEachOwner(callback) {
-		// TODO Make it to activate if player has joined the world and when it joins again callback will be called
 		if (this.permissions.owners.length < 1) return;
 		this.permissions.owners
 			.map(XA.Entity.fetch)
@@ -190,10 +191,11 @@ export class Region {
 }
 
 /**
- *
- * @param {Dimension} dimension
- * @param {Vector3} location
- * @param {(e: Entity) => any} callback
+ * WorkWithItems() will get all the items within a 2 block radius of the given location and then call
+ * the given callback function on each of them.
+ * @param {Dimension} dimension - The dimension you want to work with.
+ * @param {Vector3} location  - The location to search around.
+ * @param {(e: Entity) => any} callback - The function to run on each item.
  */
 export function WorkWithItems(dimension, location, callback = (e) => e.kill()) {
 	dimension

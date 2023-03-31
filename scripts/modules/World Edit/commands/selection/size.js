@@ -1,5 +1,6 @@
 import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { Vector } from "@minecraft/server";
 
 new XA.Command({
 	type: "wb",
@@ -9,7 +10,7 @@ new XA.Command({
 }).executes((ctx) => {
 	if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
 	ctx.reply(
-		`В выделенной зоне ${XA.Utils.getBlocksCount(
+		`В выделенной зоне ${Vector.size(
 			WorldEditBuild.pos1,
 			WorldEditBuild.pos2
 		)} блоков`

@@ -112,7 +112,7 @@ const tests = {
 	},
 	18: (ctx) => {
 		const region = Region.blockLocationInRegion(
-			XA.Utils.floorVector(ctx.sender.location),
+			Vector.floor(ctx.sender.location),
 			ctx.sender.dimension.id
 		);
 		region.permissions.owners = region.permissions.owners.filter(
@@ -173,7 +173,7 @@ const tests = {
 		}
 	},
 	30(ctx) {
-		const pos1 = XA.Utils.floorVector(ctx.sender.location);
+		const pos1 = Vector.floor(ctx.sender.location);
 		const pos2 = Vector.add(pos1, Vector.down);
 		const block = ctx.sender.dimension.getBlock(pos2);
 
@@ -232,6 +232,60 @@ const tests = {
 	},
 	34(ctx) {
 		world.debug(XA.Lang.emoji);
+	},
+	35(ctx) {
+		/**
+		 *
+		 * @param {Vector3} a
+		 * @param {Vector3} b
+		 * @returns
+		 */
+		const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
+
+		/**
+		 * Checks if a vector is between two other vectors.
+		 * @param {Vector3} a - The vector to check.
+		 * @param {Vector3} b - The first vector to compare against.
+		 * @param {Vector3} c - The second vector to compare against.
+		 * @returns {boolean} Whether or not the vector is between the two other vectors.
+		 */
+		function between(a, b, c) {
+			return (
+				c.x >= (a.x < b.x ? a.x : b.x) &&
+				c.x <= (a.x > b.x ? a.x : b.x) &&
+				c.y >= (a.y < b.y ? a.y : b.y) &&
+				c.y <= (a.y > b.y ? a.y : b.y) &&
+				c.z >= (a.z < b.z ? a.z : b.z) &&
+				c.z <= (a.z > b.z ? a.z : b.z)
+			);
+		}
+		Vector.between = between;
+
+		world.debug([
+			Vector.between(
+				new Vector(1, 1, 1),
+				new Vector(4, 4, 4),
+				new Vector(3, 2, 2)
+			) === true,
+
+			Vector.between(
+				new Vector(1, 1, 1),
+				new Vector(4, 4, 4),
+				new Vector(3, 2, 1)
+			) === true,
+
+			Vector.between(
+				new Vector(1, 1, 1),
+				new Vector(4, 4, 4),
+				new Vector(3, 32, 5)
+			) === false,
+
+			Vector.between(
+				new Vector(1, 1, 1),
+				new Vector(4, 4, 4),
+				new Vector(3, 2, 5)
+			) === false,
+		]);
 	},
 };
 

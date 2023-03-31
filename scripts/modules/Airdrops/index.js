@@ -1,4 +1,4 @@
-import { system, world } from "@minecraft/server";
+import { Vector, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 
 /**
@@ -178,14 +178,14 @@ system.runInterval(
 			});
 			if (!cl) return ent.removeTag("держит");
 			const block = ent.dimension.getBlock(
-				XA.Utils.floorVector({
+				Vector.floor({
 					x: ent.location.x,
 					y: ent.location.y - 4,
 					z: ent.location.z,
 				})
 			);
 			const block2 = ent.dimension.getBlock(
-				XA.Utils.floorVector({
+				Vector.floor({
 					x: ent.location.x,
 					y: ent.location.y - 1,
 					z: ent.location.z,

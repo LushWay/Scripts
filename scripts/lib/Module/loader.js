@@ -1,5 +1,5 @@
 import { CONFIG } from "config.js";
-import { DIR_IMPORT, DisplayError } from "xapi.js";
+import { DisplayError } from "xapi.js";
 
 /**
  * @type {Object<string, string>}

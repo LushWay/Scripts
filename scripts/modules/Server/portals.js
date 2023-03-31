@@ -319,7 +319,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		getPos ? (pos = getPos) : (rtp = true);
 		if (currentInventory == invs.anarch && !rtp) return;
 	} else if (place === "currentpos") {
-		const l = XA.Utils.floorVector(player.location);
+		const l = Vector.floor(player.location);
 		pos = l.x + " " + l.y + " " + l.z;
 	}
 	if (rtp) {
@@ -367,7 +367,7 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 	}
 
 	if (currentInventory == invs.anarch) {
-		const l = XA.Utils.floorVector(player.location);
+		const l = Vector.floor(player.location);
 		XA.tables.player.set("POS:" + player.id, l.x + " " + l.y + " " + l.z);
 	}
 	const inve = XA.Entity.getI(player);
@@ -554,7 +554,7 @@ world.events.beforeDataDrivenEntityTriggerEvent.subscribe(
 		data.cancel = true;
 		const to = world
 			.getDimension(data.entity.dimension.id)
-			.getBlock(XA.Utils.floorVector(data.entity.location).offset(0, -3, 0));
+			.getBlock(Vector.floor(data.entity.location).offset(0, -3, 0));
 		if (to.typeId !== "minecraft:chest") return;
 		const toi = to.getComponent("inventory").container;
 		const i = toi.getItem(0);
@@ -581,7 +581,7 @@ new XA.Command({
 	.literal({ name: "set", role: "admin" })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
+		let loc = Vector.floor(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("spawn:pos", rl);
@@ -600,7 +600,7 @@ new XA.Command({
 	.literal({ name: "set", role: "admin" })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
+		let loc = Vector.floor(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("minigames:pos", rl);
@@ -618,7 +618,7 @@ new XA.Command({
 	.literal({ name: "set", role: "admin" })
 	.location("pos", true)
 	.executes((ctx, pos) => {
-		let loc = XA.Utils.floorVector(pos ?? ctx.sender.location);
+		let loc = Vector.floor(pos ?? ctx.sender.location);
 		const rl = loc.x + " " + loc.y + " " + loc.z;
 		ctx.reply(rl);
 		wo.set("anarch:pos", rl);
@@ -635,11 +635,11 @@ new XA.Command({
 		let item = new ItemStack(MinecraftItemTypes.grayCandle, 1, 0);
 		item.setLore(ctx.args);
 		const block = ctx.sender.dimension.getBlock(
-			XA.Utils.floorVector(ctx.sender.location).offset(0, -4, 0)
+			Vector.floor(ctx.sender.location).offset(0, -4, 0)
 		);
 		block.setType(MinecraftBlockTypes.chest);
 		block.getComponent("inventory").container.setItem(0, item);
-		const loc = XA.Utils.floorVector(ctx.sender.location).offset(0, 1, 0);
+		const loc = Vector.floor(ctx.sender.location).offset(0, 1, 0);
 		const l = { x: loc.x + 0.5, y: loc.y, z: loc.z + 0.5 };
 
 		const rotation = ctx.sender.getRotation();

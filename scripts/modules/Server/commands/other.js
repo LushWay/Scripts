@@ -1,4 +1,4 @@
-import { system, Vector } from "@minecraft/server";
+import { system } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { global } from "../var.js";
 
@@ -39,11 +39,10 @@ new XA.Command({
 	type: "public",
 	role: "member",
 }).executes((ctx) => {
-	const entity = ctx.sender.dimension.spawnEntity(
-		"x:sit",
-		Vector.add(ctx.sender.location, { x: 0, y: -0.1, z: 0 })
-	);
-	entity.getComponent("rideable").addRider(ctx.sender);
+	const entity = ctx.sender.dimension.spawnEntity("x:sit", ctx.sender.location);
+	ctx.sender.closeChat();
+	// Rideable component doesnt works(
+	entity.runCommand("ride @p start_riding @s teleport_rider ");
 });
 
 system.runInterval(
@@ -52,9 +51,12 @@ system.runInterval(
 			const players = e.dimension.getEntities({
 				type: "minecraft:player",
 				location: e.location,
-				maxDistance: 1,
+				maxDistance: 2,
 			});
-			if (players.length < 1) e.triggerEvent("sit:kill");
+
+			if (players.length < 1) {
+				e.triggerEvent("sit:kill");
+			}
 		}
 	},
 	"sit entity clear",
@@ -122,6 +124,7 @@ new XA.Command({
 		ctx.reply("§a► §fМеню выдано.");
 	}
 });
+
 new XA.Command({
 	name: "s",
 	description: "Выживание",

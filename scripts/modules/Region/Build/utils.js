@@ -2,8 +2,8 @@ import {
 	MinecraftBlockTypes,
 	MinecraftDimensionTypes,
 	Player,
-	Vector,
 	system,
+	Vector,
 } from "@minecraft/server";
 import { MessageForm } from "../../../lib/Form/MessageForm.js";
 import { createWaiter, XA } from "../../../xapi.js";
@@ -61,7 +61,7 @@ export async function ClearRegion(player, Pregion) {
 	let percents = 0;
 	let spining = ["/", "-", "\\", "|"];
 	let time = 0;
-	const end = system.runInterval(
+	const id = system.runInterval(
 		() => {
 			player.onScreenDisplay.setActionBar(getProgressBar(spining[0], percents));
 			time++;
@@ -72,10 +72,10 @@ export async function ClearRegion(player, Pregion) {
 	);
 	const loc1 = { x: Pregion.from.x, y: -63, z: Pregion.from.z };
 	const loc2 = { x: Pregion.to.x, y: 100, z: Pregion.to.z };
-	const blocks = XA.Utils.getBlocksCount(loc1, loc2);
+	const blocks = Vector.size(loc1, loc2);
 
 	let c = 0;
-	const e = XA.Utils.safeBlocksBetween(loc1, loc2);
+	const e = Vector.foreach(loc1, loc2);
 	for (const loc of e) {
 		c++;
 		if (c % 500 === 0 || c === 0) await system.sleep(0);
@@ -85,7 +85,7 @@ export async function ClearRegion(player, Pregion) {
 		if (block.typeId === MinecraftBlockTypes.air.id) continue;
 		block.setType(MinecraftBlockTypes.air);
 	}
-	return end;
+	return () => system.clearRun(id);
 }
 
 /**
@@ -100,11 +100,8 @@ export async function CreateRegion(player, tp = true) {
 		place.to,
 		MinecraftDimensionTypes.overworld,
 		{
+			...Region.DEFAULT_REGION_PERMISSIONS,
 			owners: [player.id],
-			doorsAndSwitches: false,
-			allowedEntitys: ["minecraft:player", "minecraft:item"],
-			openContainers: false,
-			pvp: false,
 		}
 	);
 	DB.set(player.id, region.key);
@@ -115,24 +112,6 @@ export async function CreateRegion(player, tp = true) {
 
 /**
  *
- * @param {Vector3} loc1
- * @param {Vector3} loc2
- */
-export function getBlocksCount(loc1, loc2) {
-	const minmax = (/** @type {number} */ v1, /** @type {number} */ v2) => [
-		Math.min(v1, v2),
-		Math.max(v1, v2),
-	];
-	const [xmin, xmax] = minmax(loc1.x, loc2.x);
-	const [zmin, zmax] = minmax(loc1.z, loc2.z);
-	const [ymin, ymax] = minmax(loc1.y, loc2.y);
-	const x = xmax - xmin + 1;
-	const y = ymax - ymin + 1;
-	const z = zmax - zmin + 1;
-	return x * y * z;
-}
-/**
- *
  * @param {IRegionCords} from
  * @param {IRegionCords} to
  */
@@ -140,14 +119,14 @@ export async function fillRegion(from, to) {
 	const firstLoc = { x: from.x, y: squarePlace, z: from.z };
 	const secondLoc = { x: to.x, y: squarePlace, z: to.z };
 	const exec = createWaiter(10);
-	for (const loc of XA.Utils.safeBlocksBetween(
+	for (const loc of Vector.foreach(
 		Vector.add(firstLoc, Vector.up),
 		Vector.add(secondLoc, Vector.up)
 	)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
 	}
-	for (const loc of XA.Utils.safeBlocksBetween(firstLoc, secondLoc)) {
+	for (const loc of Vector.foreach(firstLoc, secondLoc)) {
 		await exec();
 		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
 	}

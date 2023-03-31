@@ -48,6 +48,7 @@ world.events.beforeItemUseOn.subscribe((data) => {
 		data.source.dimension.id
 	);
 	if (allowed(data.source, region)) return;
+
 	const block = data.source.dimension.getBlock(data.blockLocation);
 
 	if (

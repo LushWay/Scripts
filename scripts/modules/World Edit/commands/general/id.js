@@ -1,3 +1,4 @@
+import { Vector } from "@minecraft/server";
 import { toStr, XA } from "xapi.js";
 
 const root = new XA.Command({
@@ -21,7 +22,7 @@ root
 	.literal({ name: "l", description: "Выдает id блока по локации" })
 	.location("location", true)
 	.executes((ctx, location) => {
-		const l = XA.Utils.floorVector(location);
+		const l = Vector.floor(location);
 		const block = ctx.sender.dimension.getBlock(l);
 		if (!block) return ctx.reply("§cНет блока!");
 		ctx.reply(`§b► §f${block.typeId.replace("minecraft:", "")}`);
@@ -31,7 +32,7 @@ root
 	.literal({ name: "p", description: "Выдает все properties блока по локации" })
 	.location("location", true)
 	.executes((ctx, location) => {
-		const l = XA.Utils.floorVector(location);
+		const l = Vector.floor(location);
 		const block = ctx.sender.dimension.getBlock(l);
 		if (!block) return ctx.reply("§cНет блока!");
 		ctx.reply(toStr(block.permutation.getAllProperties()));
