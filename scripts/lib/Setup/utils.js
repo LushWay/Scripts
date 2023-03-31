@@ -66,6 +66,8 @@ export function toStr(
 		string: "§3",
 	};
 
+	const uniqueKey = Date.now().toString();
+
 	if (depth > 10 || typeof target !== "object")
 		return `${rep(target)}` ?? `${target}` ?? "{}";
 
@@ -160,7 +162,7 @@ export function toStr(
 				break;
 
 			case "string":
-				value = c.string + "'" + value + "'§r";
+				value = `${c.string}\`${value.replace(/"/g, uniqueKey)}\`§r`;
 				break;
 
 			default:
@@ -173,10 +175,9 @@ export function toStr(
 	// avoid Circular structure error
 	const visited = new WeakSet();
 
-	return JSON.stringify(target, (_, value) => rep(value), space)?.replace(
-		/"/g,
-		cw
-	);
+	return JSON.stringify(target, (_, value) => rep(value), space)
+		?.replace(/"/g, cw)
+		?.replace(new RegExp(uniqueKey, "g"), '"');
 }
 
 /**
@@ -200,4 +201,3 @@ export async function handle(func, type = "Handled", additionalStack) {
 		);
 	}
 }
-

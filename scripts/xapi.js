@@ -29,7 +29,7 @@ import { XRunCommand } from "./lib/XRunCommand.js";
 import { CONFIG } from "./config.js";
 import { XUtils } from "./lib/Class/XUtils.js";
 import { load_modules } from "./lib/Module/loader.js";
-import { handle } from "./lib/Setup/utils.js";
+import { DisplayError, handle } from "./lib/Setup/utils.js";
 import "./modules/import.js";
 
 /**
@@ -126,5 +126,5 @@ onWorldLoad(async () => {
 	XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
 	if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
 	else world.say(`§fFirst loaded in ${XA.state.load_time}`);
-});
+}).catch(DisplayError);
 

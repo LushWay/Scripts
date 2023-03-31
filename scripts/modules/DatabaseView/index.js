@@ -3,7 +3,7 @@ import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { BECHMARK_RESULTS } from "../../lib/XBenchmark.js";
-import { handle, TIMERS_PATHES, toStr, XA } from "../../xapi.js";
+import { TIMERS_PATHES, XA, handle, toStr } from "../../xapi.js";
 
 /**
  * @typedef {import("../../lib/Database/Rubedo.js").Database<string, any>} defDB
@@ -28,7 +28,7 @@ function selectTable(player, firstCall) {
 		/** @type {defDB} */
 		const DB = Database.instances[key];
 		const name = `${key} §7${DB.keys().length} ${
-			Database.system(DB).stringifiedData.length
+			Database.private(DB).raw.length
 		}§r`;
 		form.addButton(name, null, () => {
 			showTable(player, key);

@@ -7,6 +7,7 @@ import {
 import { DisplayError, handle, toStr, XA } from "xapi.js";
 import { stackParse } from "../../lib/Class/XError.js";
 import { CommandContext } from "../../lib/Command/Context.js";
+import { Database } from "../../lib/Database/Rubedo";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
@@ -286,6 +287,10 @@ const tests = {
 				new Vector(3, 2, 5)
 			) === false,
 		]);
+	},
+	36(ctx) {
+		world.debug(Database.private(Database.instances[ctx.args[0]]));
+		world.debug(Region.getAllRegions());
 	},
 };
 

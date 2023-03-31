@@ -6,8 +6,8 @@ import {
 	world,
 } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
+import { Region, forEachItemAt } from "../utils/Region.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "../utils/config.js";
-import { Region, WorkWithItems } from "../utils/Region.js";
 
 /**
  *
@@ -101,11 +101,11 @@ world.events.blockBreak.subscribe(
 
 			// setting chest inventory back
 			const { container } = block.getComponent("inventory");
-			WorkWithItems(dimension, block.location, (e) => {
+			forEachItemAt(dimension, block.location, (e) => {
 				container.addItem(e.getComponent("item").itemStack);
 				e.kill();
 			});
-		} else WorkWithItems(dimension, block.location);
+		} else forEachItemAt(dimension, block.location);
 	}
 );
 

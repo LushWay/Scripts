@@ -8,7 +8,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
-import { DisplayError, handle } from "../Setup/utils.js";
+import { DisplayError } from "../Setup/utils.js";
 
 /**
  * Original database created by Smell Of Curry for Rubedo anticheat, and lighty modified by Leaftail1880
@@ -120,9 +120,9 @@ export class Database {
 	 * Returns all private methods
 	 * @param {Database} DB
 	 */
-	static system(DB) {
-		const { initPromise, stringifiedData, isInited } = DB;
-		return { initPromise, stringifiedData, isInited };
+	static private(DB) {
+		const { initPromise, raw, isInited } = DB;
+		return { initPromise, raw, isInited };
 	}
 
 	/**
@@ -142,7 +142,38 @@ export class Database {
 	isInited = false;
 
 	/** @private */
-	stringifiedData = "{}";
+	raw = "{}";
+
+	/**
+	 * @template {keyof this["events"]} EventName
+	 * @param {EventName} event
+	 * @param {this["events"][EventName]} callback
+	 */
+	on(event, callback) {
+		// @ts-expect-error Trust me, TS
+		this.events[event] = callback;
+	}
+	// /** @private */
+	events = {
+		/**
+		 * This function will trigger until key set to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
+		 * @param {Key} key
+		 * @param {Value} value
+		 * @returns {Value}
+		 */
+		beforeSet(key, value) {
+			return value;
+		},
+		/**
+		 * This function will trigger until key get from db and can be used to modify data. For example, add default values to keep db clean and lightweigth
+		 * @param {Key} key
+		 * @param {Value} value
+		 * @returns {Value}
+		 */
+		beforeGet(key, value) {
+			return value;
+		},
+	};
 
 	/**
 	 *
@@ -152,34 +183,7 @@ export class Database {
 		if (tableName in Database.instances) return Database.instances[tableName];
 
 		this.TABLE_NAME = tableName;
-		if (Database.tablesInited) {
-			const promise = this.init();
-			let isListened = false;
-
-			const origThen = promise.then.bind(promise);
-			promise.then = (fl) => {
-				isListened = true;
-				return origThen(fl);
-			};
-
-			const origFinally = promise.finally.bind(promise);
-			promise.finally = (fl) => {
-				isListened = true;
-				return origFinally(fl);
-			};
-
-			origFinally(() => {
-				if (isListened) return;
-
-				handle(() => {
-					throw new DatabaseError(
-						`§6Unlistened database.initPromise. Table: §f${this.TABLE_NAME}§6. To disable this warning, simple add then or finally listener to Database.system(db).initPromise`
-					);
-				});
-			});
-
-			this.initPromise = promise;
-		}
+		if (Database.tablesInited) this.initPromise = this.init();
 
 		Database.instances[tableName] = this;
 	}
@@ -262,7 +266,7 @@ export class Database {
 			await this.save();
 		}
 
-		this.stringifiedData = stringifiedData;
+		this.raw = stringifiedData;
 		this.isInited = true;
 	}
 
@@ -272,7 +276,7 @@ export class Database {
 	 * @param {Value} value  undefined
 	 */
 	set(key, value) {
-		Reflect.set(this.MEMORY, key, value);
+		Reflect.set(this.MEMORY, key, this.events.beforeSet(key, value));
 		return this.save();
 	}
 
@@ -284,7 +288,7 @@ export class Database {
 	get(key) {
 		if (!this.isInited) this.failedTo("get", key);
 
-		return this.MEMORY[key];
+		return this.events.beforeGet(key, this.MEMORY[key]);
 	}
 
 	/**
@@ -329,7 +333,10 @@ export class Database {
 	values() {
 		if (!this.isInited) this.failedTo("values");
 
-		return Object.values(this.MEMORY);
+		return Object.entries(this.MEMORY).map((e) =>
+			// @ts-expect-error
+			this.events.beforeGet(e[0], e[1])
+		);
 	}
 	/**
 	 * Get entries of the table
@@ -337,7 +344,10 @@ export class Database {
 	entries() {
 		if (!this.isInited) this.failedTo("entries");
 
-		return Object.entries(this.MEMORY);
+		return Object.entries(this.MEMORY).map((e) =>
+			// @ts-expect-error
+			[e[0], this.events.beforeGet(e[0], e[1])]
+		);
 	}
 	/**
 	 * Check if the key exists in the table
@@ -406,7 +416,7 @@ export class Database {
 				key ? ` key "${key}"` : key
 			} on table "${
 				this.TABLE_NAME
-			}". Make sure you inited them and calling "${method}" after init.`
+			}". Try to call "${method}" after resolving of §fDatabase.system(§6db§f).initPromise`
 		);
 	}
 

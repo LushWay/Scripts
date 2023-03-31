@@ -1,4 +1,6 @@
 import { Dimension, Entity, Player, Vector } from "@minecraft/server";
+import { removeDefaults, setDefaults } from "../../../lib/Database/Defaults";
+import { Database } from "../../../lib/Database/Rubedo";
 import { XA, handle } from "../../../xapi.js";
 
 /**
@@ -10,20 +12,16 @@ const LOWEST_Y_VALUE = -64;
  */
 const HIGEST_Y_VALUE = 320;
 /**
- * Compare a array of numbers with 2 arrays
- * @param {[number, number, number]} XYZa  The first set of numbers
- * @param {[number, number, number]} XYZb  The second set of numbers
- * @param {[number, number, number]} XYZc  The set of numbers that should between the first and second set of numbers
- * @example betweenXYZ([1, 0, 1], [22, 81, 10], [19, 40, 6]));
- * @returns {boolean}
+ * @type {Database<string, {
+ *  key: string;
+ *  from: IRegionCords;
+ *  dimensionId: string;
+ *  permissions: IRegionPermissions;
+ *  to: IRegionCords;
+ * }>}
  */
-function betweenXYZ(XYZa, XYZb, XYZc) {
-	return XYZc.every(
-		(c, i) => c >= Math.min(XYZa[i], XYZb[i]) && c <= Math.max(XYZa[i], XYZb[i])
-	);
-}
-
 const TABLE = XA.tables.region;
+
 export class Region {
 	/**
 	 * The default permissions for all regions made
@@ -89,11 +87,11 @@ export class Region {
 	static blockLocationInRegion(blockLocation, dimensionId) {
 		return this.getAllRegions().find(
 			(region) =>
-				region.dimensionId == dimensionId &&
-				betweenXYZ(
-					[region.from.x, LOWEST_Y_VALUE, region.from.z],
-					[region.to.x, HIGEST_Y_VALUE, region.to.z],
-					[blockLocation.x, blockLocation.y, blockLocation.z]
+				region.dimensionId === dimensionId &&
+				Vector.between(
+					{ x: region.from.x, y: LOWEST_Y_VALUE, z: region.from.z },
+					{ x: region.to.x, y: HIGEST_Y_VALUE, z: region.to.z },
+					blockLocation
 				)
 		);
 	}
@@ -159,21 +157,6 @@ export class Region {
 		return TABLE.delete(this.key);
 	}
 	/**
-	 * Checks if a entity is in this region
-	 * @param {Entity} entity - Entity to check
-	 * @returns {boolean} - if a entity is in this region or not
-	 */
-	entityInRegion(entity) {
-		return (
-			this.dimensionId == entity.dimension.id &&
-			betweenXYZ(
-				[this.from.x, LOWEST_Y_VALUE, this.from.z],
-				[this.to.x, HIGEST_Y_VALUE, this.to.z],
-				[entity.location.x, entity.location.y, entity.location.z]
-			)
-		);
-	}
-	/**
 	 * A function that will loop through all the owners
 	 * of a region and call the callback function on each
 	 * of them.
@@ -190,14 +173,26 @@ export class Region {
 	}
 }
 
+const defaultRegion = {
+	dimensionId: "minecraft:overworld",
+	permissions: Region.DEFAULT_REGION_PERMISSIONS,
+};
+
+TABLE.on("beforeGet", (key, value) => {
+	return setDefaults(value, { ...defaultRegion, key });
+});
+TABLE.on("beforeSet", (key, value) => {
+	return removeDefaults(value, { ...defaultRegion, key });
+});
+
 /**
- * WorkWithItems() will get all the items within a 2 block radius of the given location and then call
+ * Will get all the items within a 2 block radius of the given location and then call
  * the given callback function on each of them.
  * @param {Dimension} dimension - The dimension you want to work with.
  * @param {Vector3} location  - The location to search around.
  * @param {(e: Entity) => any} callback - The function to run on each item.
  */
-export function WorkWithItems(dimension, location, callback = (e) => e.kill()) {
+export function forEachItemAt(dimension, location, callback = (e) => e.kill()) {
 	dimension
 		.getEntities({
 			location: location,

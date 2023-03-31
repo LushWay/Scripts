@@ -4,7 +4,7 @@ import { DisplayError } from "xapi.js";
 /**
  * @type {Object<string, string>}
  */
-export const __MODULES__ = {};
+globalThis.__MODULES__ = {};
 
 /**
  *
