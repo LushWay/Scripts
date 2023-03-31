@@ -3,7 +3,7 @@ import { handle } from "xapi.js";
 import { CONFIG } from "../../config.js";
 import { inaccurateSearch } from "../Class/Search.js";
 import { LiteralArgumentType, LocationArgumentType } from "./ArgumentTypes.js";
-import { CommandContext } from "./Callback.js";
+import { CommandContext } from "./Context.js";
 import { XCommand } from "./index.js";
 
 /**
@@ -159,8 +159,9 @@ export function parseLocationAugs([x, y, z], data) {
  * @param {import("./index.js").XCommand<any>[]} args args to use
  * @param {BeforeChatEvent} event
  * @param {import("./index.js").XCommand<any>} baseCommand
+ * @param {string} rawInput
  */
-export function sendCallback(cmdArgs, args, event, baseCommand) {
+export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
 	const lastArg = args[args.length - 1] ?? baseCommand;
 	/** @type {any[]} */
 	const argsToReturn = [];
@@ -184,7 +185,7 @@ export function sendCallback(cmdArgs, args, event, baseCommand) {
 	handle(
 		() =>
 			lastArg.sys.callback(
-				new CommandContext(event, cmdArgs, baseCommand),
+				new CommandContext(event, cmdArgs, baseCommand, rawInput),
 				...argsToReturn
 			),
 		"Command"

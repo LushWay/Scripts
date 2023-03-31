@@ -27,7 +27,7 @@ export const AllOptions = {};
  * @returns {(player: import("@minecraft/server").Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
  */
 export function XPlayerOptions(prefix, CONFIG) {
-	if (!(prefix in AllPlayerOptions)) AllPlayerOptions[prefix] = CONFIG;
+	AllPlayerOptions[prefix] ??= CONFIG;
 	// @ts-expect-error Trust me, TS
 	return (player) => generateOptionsProxy(prefix, CONFIG, player);
 }
@@ -41,7 +41,7 @@ export function XPlayerOptions(prefix, CONFIG) {
  * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
  */
 export function XOptions(prefix, CONFIG) {
-	if (!(prefix in AllOptions)) AllOptions[prefix] = CONFIG;
+	AllOptions[prefix] ??= CONFIG;
 	// @ts-expect-error Trust me, TS
 	return generateOptionsProxy(prefix, CONFIG);
 }

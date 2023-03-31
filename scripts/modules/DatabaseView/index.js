@@ -27,7 +27,9 @@ function selectTable(player, firstCall) {
 	for (const key in Database.instances) {
 		/** @type {defDB} */
 		const DB = Database.instances[key];
-		const name = `${key} §7${DB.keys().length}§r`;
+		const name = `${key} §7${DB.keys().length} ${
+			Database.system(DB).stringifiedData.length
+		}§r`;
 		form.addButton(name, null, () => {
 			showTable(player, key);
 		});

@@ -1,7 +1,7 @@
 import { Player, world } from "@minecraft/server";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { getRole, IS, ROLES, setRole, T_roles as TR, XA } from "../../xapi.js";
+import { getRole, ROLES, setRole, T_roles as TR, XA } from "../../xapi.js";
 
 const DB = XA.tables.roles;
 
@@ -11,17 +11,17 @@ const R = new XA.Command({
 });
 
 R.executes((ctx) => {
+	const role = getRole(ctx.sender.id);
 	const noAdmins = !DB.values().includes("admin");
-	const isAdmin = IS(ctx.sender.id, "admin");
+	const isAdmin = role === "admin";
 	const needAdmin = ctx.args[0] === "ACCESS";
 	const beenAdmin = DB.has(`SETTER:` + ctx.sender.id) && !isAdmin;
 
-	if (noAdmins && (needAdmin || beenAdmin) && ctx.sender.isOp()) {
+	if (noAdmins && ctx.sender.isOp() && (needAdmin || beenAdmin)) {
 		setRole(ctx.sender.id, "admin");
-		return ctx.reply("§b> §r" + TR.admin);
+		return ctx.reply("§b> §3Вы получили роль §r" + TR.admin);
 	}
 
-	const role = getRole(ctx.sender.id);
 	if (!isAdmin) return ctx.reply(`§b> §r${TR[role]}`);
 
 	/**

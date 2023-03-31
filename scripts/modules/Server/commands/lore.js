@@ -1,18 +1,23 @@
 import { XA } from "xapi.js";
-const ll = new XA.Command({
+import { XCommand } from "../../../lib/Command/index.js";
+
+const lore = new XA.Command({
 	name: "lore",
 	aliases: ["l"],
 	role: "moderator",
 	type: "test",
 }).executes((ctx) => {
-	ctx.reply("lore.help.text");
+	XCommand.getHelpForCommand(lore, ctx);
 });
-ll.literal({ name: "run" })
+
+lore
+	.literal({ name: "run" })
 	.string("command")
 	.executes((ctx, command) => {
 		let item = XA.Entity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
+
 		let lore = item.getLore();
 		lore[0] = "run";
 		let commandd = "";
@@ -28,7 +33,9 @@ ll.literal({ name: "run" })
 		item.setLore(lore);
 		XA.Entity.getI(ctx.sender);
 	});
-ll.literal({ name: "rune" })
+
+lore
+	.literal({ name: "rune" })
 	.string("command")
 	.executes((ctx, command) => {
 		const item = XA.Entity.getHeldItem(ctx.sender);
@@ -50,7 +57,8 @@ ll.literal({ name: "rune" })
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§aE► §f${commandd}`);
 	});
-ll.literal({ name: "viewtp" }).executes((ctx) => {
+
+lore.literal({ name: "viewtp" }).executes((ctx) => {
 	const item = XA.Entity.getHeldItem(ctx.sender);
 	if (!item || item.typeId != "we:tool")
 		return ctx.reply(`§cТы держишь не tool!`);

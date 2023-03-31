@@ -124,7 +124,7 @@ new XA.Command({
 });
 new XA.Command({
 	name: "s",
-	description: "Выжа",
+	description: "Выживание",
 	role: "moderator",
 	/*type: "serv"*/
 }).executes((ctx) => {

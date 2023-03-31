@@ -1,5 +1,5 @@
 import { BeforeChatEvent } from "@minecraft/server";
-import { CommandContext } from "./Callback.js";
+import { CommandContext } from "./Context.js";
 import { XCommand } from "./index.js";
 
 export class CmdLet {
@@ -12,9 +12,10 @@ export class CmdLet {
 	 * @param {string[]} args
 	 * @param {BeforeChatEvent} data
 	 * @param {XCommand} cmd
+	 * @param {string} raw
 	 * @returns
 	 */
-	static workWithCmdlets(data, args, cmd) {
+	static workWithCmdlets(data, args, cmd, raw) {
 		const cmdlets = args
 			.filter((e) => e.startsWith("--"))
 			.map((e) => {
@@ -33,7 +34,10 @@ export class CmdLet {
 			const input = cmdlets.find((e) => e[0] === cmdlet.data.name);
 			if (input) {
 				results.push(
-					cmdlet.data.callback(new CommandContext(data, args, cmd), input[0])
+					cmdlet.data.callback(
+						new CommandContext(data, args, cmd, raw),
+						input[0]
+					)
 				);
 			}
 		}

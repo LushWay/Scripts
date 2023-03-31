@@ -1,4 +1,4 @@
-import { Entity, Vector, world, system } from "@minecraft/server";
+import { Entity, system, Vector, world } from "@minecraft/server";
 import { DIMENSIONS } from "../../lib/List/dimensions.js";
 import { XA } from "../../xapi.js";
 import { NameModifiers } from "./var.js";
@@ -93,7 +93,9 @@ system.runInterval(
 );
 
 let stat = false;
-new XA.Command({ name: "s" }).executes(() => (stat = true));
+new XA.Command({ name: "dmgstat", role: "admin" }).executes(
+	() => (stat = true)
+);
 
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied

@@ -6,7 +6,7 @@ import {
 } from "@minecraft/server";
 import { DisplayError, handle, toStr, XA } from "xapi.js";
 import { stackParse } from "../../lib/Class/XError.js";
-import { CommandContext } from "../../lib/Command/Callback.js";
+import { CommandContext } from "../../lib/Command/Context.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";

@@ -59,6 +59,8 @@ export class FormCallback {
 	}
 }
 
+const { userBusy, userClosed } = FormCancelationReason;
+
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it
  * succeeds or the maximum number of attempts is reached.
@@ -68,20 +70,31 @@ export class FormCallback {
  */
 export async function XShowForm(form, player) {
 	let hold = 100;
+
 	for (let i = 0; i <= hold; i++) {
 		/** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
 		const response = await form.show(player);
 		if (response.canceled) {
-			if (response.cancelationReason === FormCancelationReason.userClosed)
-				return false;
+			if (response.cancelationReason === userClosed) return false;
 
-			// check time and reshow form
-			if (
-				response.cancelationReason === FormCancelationReason.userBusy &&
-				i === hold
-			) {
-				player.tell(`§cНе удалось открыть форму. Закрой чат и попробуй снова`);
-				return false;
+			if (response.cancelationReason === userBusy) {
+				// First attempt, maybe chat closed...
+				if (i === 1) {
+					player.closeChat();
+				}
+
+				// 10 Attempt, tell player to manually close chat...
+				if (i === 10) {
+					player.tell("§b> §3Закрой чат!");
+				}
+
+				// Last attempt, we cant do anything
+				if (i === hold) {
+					player.tell(
+						`§cНе удалось открыть форму. Закрой чат и попробуй снова`
+					);
+					return false;
+				}
 			}
 		} else return response;
 	}

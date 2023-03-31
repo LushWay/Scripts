@@ -1,6 +1,6 @@
 import { MinecraftBlockTypes, Player, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { CommandContext } from "../../../lib/Command/Callback.js";
+import { CommandContext } from "../../../lib/Command/Context.js";
 
 const lang = {
 	nobase:

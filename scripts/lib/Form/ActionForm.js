@@ -15,17 +15,18 @@ export class ActionForm {
 	 * @type {ActionFormData}
 	 * @private
 	 */
-	form = new ActionFormData();
+	form;
 	title = "";
 	/**
 	 * Creates a new form to be shown to a player
 	 * @param {string} title the title that this form should have
 	 * @param {string} [body] extra text that should be displayed in the form
 	 */
-	constructor(title, body) {
+	constructor(title, body = "") {
+		this.form = new ActionFormData();
 		this.form.title(title);
 		this.title = title;
-		if (body) this.form.body(body);
+		this.form.body(body);
 	}
 	/**
 	 * Adds a button to this form
@@ -55,6 +56,8 @@ export class ActionForm {
 		const response = await XShowForm(this.form, player);
 		if (response === false || !(response instanceof ActionFormResponse)) return;
 		const callback = this.buttons[response.selection]?.callback;
-		if (typeof callback === "function") handle(callback, null, ["ActionFormCallback"]);
+		if (typeof callback === "function")
+			handle(callback, null, ["ActionFormCallback"]);
 	}
 }
+

@@ -10,8 +10,8 @@ import {
 	LocationArgumentType,
 	StringArgumentType,
 } from "./ArgumentTypes.js";
-import { CommandContext } from "./Callback.js";
 import { CmdLet } from "./Cmdlet.js";
+import { CommandContext } from "./Context.js";
 import "./index.js";
 import {
 	commandNotFound,
@@ -43,7 +43,15 @@ export class XCommand {
 		if (!command.sys.data?.requires(data.sender))
 			return noPerm(data.sender, command);
 
-		if (CmdLet.workWithCmdlets(data, args, command) === "stop") return;
+		/**
+		 * Part after command (-help <rawInput>). Usefull for setters or any other stuff
+		 */
+		const rawInput = data.message.replace(
+			new RegExp(`^${CONFIG.commandPrefix}${cmd}\\s`),
+			""
+		);
+		if (CmdLet.workWithCmdlets(data, args, command, rawInput) === "stop")
+			return;
 
 		/**
 		 * Check Args/SubCommands for errors
@@ -74,13 +82,21 @@ export class XCommand {
 		}
 
 		if (getArg(command, 0)) return;
-		sendCallback(args, verifiedCommands, data, command);
+		sendCallback(args, verifiedCommands, data, command, rawInput);
 	}
 	/**
 	 * An array of all active commands
 	 * @type {import("./index.js").XCommand<any>[]}
 	 */
 	static COMMANDS = [];
+
+	/**
+	 * @param {XCommand} Command
+	 * @param {CommandContext} ctx
+	 */
+	static getHelpForCommand(Command, ctx) {
+		return ctx.error("Генератор справки для команд выключен!");
+	}
 	/**
 	 *
 	 * @param {import("./types.js").ICommandData} data
@@ -91,7 +107,7 @@ export class XCommand {
 	constructor(data, type, depth = 0, parent = null) {
 		data.requires ??= () => true;
 		data.type ??= "test";
-		if ("require" in data) data.requires = (p) => IS(p.id, data.role);
+		if ("role" in data) data.requires = (p) => IS(p.id, data.role);
 
 		this.sys = {
 			data,

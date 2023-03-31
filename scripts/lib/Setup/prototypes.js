@@ -1,5 +1,7 @@
 import {
 	Entity,
+	EntityDamageCause,
+	GameMode,
 	ItemUseOnEvent,
 	Player,
 	world,
@@ -81,5 +83,38 @@ Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
 
 editMethod(console, "warn", ({ original, args }) => {
 	original(...args.map((e) => toStr(e)));
+});
+
+addMethod(Player.prototype, "isGamemode", function (mode) {
+	return !!this.dimension
+		.getPlayers({
+			location: this.location,
+			maxDistance: 1,
+			gameMode: GameMode[mode],
+		})
+		.find((e) => e.id === this.id);
+});
+
+addMethod(Player.prototype, "closeChat", function (message) {
+	const health = this.getComponent("health");
+	const { current } = health;
+	if (current <= 1) {
+		if (message) this.tell(message);
+		return false;
+	}
+
+	// We need to switch player to gamemode where we can apply damage to them
+	const isCreative = this.isGamemode("creative");
+	if (isCreative) this.runCommand("gamemode s");
+
+	this.applyDamage(1, {
+		cause: EntityDamageCause.entityAttack,
+	});
+	health.setCurrent(current);
+
+	// Return player back to creative mode
+	if (isCreative) this.runCommand("gamemode c");
+
+	return true;
 });
 

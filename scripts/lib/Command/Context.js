@@ -27,12 +27,14 @@ export class CommandContext {
 	 * @param {BeforeChatEvent} data chat data that was used
 	 * @param {string[]} args
 	 * @param {XCommand} command
+	 * @param {string} rawInput
 	 */
-	constructor(data, args, command) {
+	constructor(data, args, command, rawInput) {
 		this.data = data;
 		this.sender = data.sender;
 		this.command = command;
 		this.args = args;
+		this.input = rawInput;
 	}
 	/**
 	 * Replys to the sender of a command callback

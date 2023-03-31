@@ -25,15 +25,11 @@ new XA.Command({
 	description: "Returns the current Ticks Per Second of the servers ping",
 	role: "member",
 }).executes(async (ctx) => {
+	ctx.reply("§b> §3Понг! Проверка начата...");
 	let ticks = await getServerTPS();
 	ctx.reply(
-		`§b> §3TPS сервера: ${
-			ticks > 18
-				? "§f{ §aХороший"
-				: ticks > 13
-				? "§f{ §eНормальный"
-				: "§f{ §cПлохой"
-		} ${ticks} §f}`
+		`§b> §3TPS сервера ${
+			ticks > 18 ? "§aхороший" : ticks > 13 ? "§gнормальный" : "§cплохой"
+		}§f: ${ticks}`
 	);
 });
-

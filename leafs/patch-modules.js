@@ -10,12 +10,14 @@ patchPackage("@minecraft/server", {
      * See {@link World.sendMessage}
      */
     say(message: (RawMessage | string)[] | RawMessage | string): void;
+
     /**
      * Logs given message once
      * @param type Type of log
      * @param messages Data to log using world.debug()
      */
     logOnce(type: string, ...messages: any): void;
+
     /**
      * Prints data using world.say() and parses any object to string using toStr method. 
      */
@@ -26,32 +28,39 @@ patchPackage("@minecraft/server", {
      * See {@link Player.sendMessage}
      */
     tell(message: (RawMessage | string)[] | RawMessage | string): void;
+
     /**
      * Applies a knock-back to a player in the direction they are facing, like dashing forward
      * @author @wuw.sh
      */
     applyDash(target: Player | Entity, horizontalStrength: number, verticalStrength: number): void;
+
+    /**
+     * Determines player gamemode
+     */
+    isGamemode(mode: keyof typeof GameMode): boolean;
+
+    /**
+     * Turns player into survival, damages (if hp < 1 shows lowHealthMessage), and then returns to previous gamemode
+     * @returns True if damaged, false if not and lowHealthMessage was shown
+     */
+    closeChat(lowHealthMessage?: string): boolean;
     `,
 		System: m`
     /**
-    * @beta
-    * @remarks
-    * Runs a set of code on an interval for each player.
-    * @param callback
-    * Functional code that will run when this interval occurs.
-    * @param tickInterval
-    * An interval of every N ticks that the callback will be
-    * called upon.
-    * @returns
-    * An opaque handle that can be used with the clearRun method
-    * to stop the run of this function on an interval.
-    */
+     * Runs a set of code on an interval for each player.
+     * @param callback Functional code that will run when this interval occurs.
+     * @param tickInterval An interval of every N ticks that the callback will be
+     * called upon.
+     * @returns An opaque handle that can be used with the clearRun method
+     * to stop the run of this function on an interval.
+     */
     runPlayerInterval(callback: (player: Player) => void, name: string, tickInterval?: number): number;
     /**
-    * Returns a promise that resolves after given ticks time
-    * @param time time in ticks
-    * @returns Promise that resolves after given ticks time
-    */
+     * Returns a promise that resolves after given ticks time
+     * @param time time in ticks
+     * @returns Promise that resolves after given ticks time
+     */
     sleep(time: number): Promise<void>`,
 		ItemUseOnEvent: m`
     /**
@@ -113,6 +122,10 @@ getComponent<N extends keyof EntityComponents>(
  * scripts/lib/Setup/prototypes.js 
  */
 
+
+/**
+ * Used in {@link ItemStack.getComponent}
+ */
 type ItemComponents = {
   cooldown: ItemCooldownComponent;
   "minecraft:cooldown": ItemCooldownComponent;
@@ -124,6 +137,9 @@ type ItemComponents = {
   "minecraft:food": ItemFoodComponent;
 }
 
+/**
+ * Used in {@link Block.getComponent}
+ */
 type BlockComponents = {
 	"minecraft:inventory": BlockInventoryComponent;
 	inventory: BlockInventoryComponent;
@@ -143,6 +159,9 @@ type BlockComponents = {
 	waterContainer: BlockWaterContainerComponent;
 };    
 
+/**
+ * Used in {@link Entity.getComponent}
+ */
 type EntityComponents = {
   equipment_inventory: EntityEquipmentInventoryComponent;
 	addrider: EntityAddRiderComponent;
@@ -264,6 +283,14 @@ type EntityComponents = {
 };
 
 `,
-		ending: ``,
+		ending: m`
+    
+/**
+ * This file was automatically edited by 
+ * leafs/patch-modules.js
+ * 
+ * New methods assigments can be finded in 
+ * scripts/lib/Setup/prototypes.js 
+ */`,
 	},
 });

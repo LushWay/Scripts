@@ -1,6 +1,6 @@
 import { getRole, ROLES, XA } from "xapi.js";
-import { CommandContext } from "../../lib/Command/Callback.js";
 import { CmdLet } from "../../lib/Command/Cmdlet.js";
+import { CommandContext } from "../../lib/Command/Context.js";
 import { XCommand } from "../../lib/Command/index.js";
 import { commandNotFound, noPerm } from "../../lib/Command/utils.js";
 
@@ -144,6 +144,9 @@ function helpForCommand(ctx, commandName) {
 	// ctx.reply(`${new Array(l).join(" ")}§7§ы──┘`);
 	return;
 }
+
+XA.Command.getHelpForCommand = (Command, ctx) =>
+	helpForCommand(ctx, Command.sys.data.name);
 
 help.string("commandName").executes(helpForCommand);
 
