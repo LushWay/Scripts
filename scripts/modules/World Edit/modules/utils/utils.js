@@ -58,3 +58,4 @@ export function get(ms) {
 
 	return { parsedTime, type };
 }
+

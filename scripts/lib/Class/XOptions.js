@@ -74,3 +74,4 @@ function generateOptionsProxy(prefix, CONFIG, player = null) {
 	}
 	return OptionsProxy;
 }
+

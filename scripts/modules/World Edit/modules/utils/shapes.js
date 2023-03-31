@@ -132,3 +132,4 @@ export const SHAPES = {
 		"Math.pow((x) /(xRadius), 2) - Math.pow((y) /(yRadius), 2) <= z/zRadius",
 };
 
+

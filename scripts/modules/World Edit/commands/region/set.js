@@ -125,3 +125,4 @@ function blockIsAvaible(block, player) {
 	player.tell(suggestion + "§c?");
 }
 
+

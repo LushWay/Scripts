@@ -22,3 +22,4 @@ new XA.Command({
 	ctx.reply(`Generated a Sphere at ${location.x} ${location.y}${location.z}`);
 });
 
+

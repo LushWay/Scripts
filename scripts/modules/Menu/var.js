@@ -11,3 +11,4 @@ export const CONFIG_MENU = {
 	itemId: "xa:menu",
 	menu: example,
 };
+

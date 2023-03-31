@@ -162,3 +162,4 @@ function toMetricNumbers(value) {
 	const scaled = value / Math.pow(10, exp * 3);
 	return `${scaled.toFixed(1)}${exp > 5 ? " " + types[exp] : "e" + exp}`;
 }
+

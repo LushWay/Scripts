@@ -17,3 +17,4 @@ export function benchmark(label, type = "test") {
 		return took_time;
 	};
 }
+

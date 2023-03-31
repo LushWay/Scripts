@@ -10,3 +10,4 @@ new XA.Command({
 	WorldEditBuild.pos1 = WorldEditBuild.pos2 = { x: 0, z: 0, y: 0 };
 	ctx.reply(`§c► §fОчищено.`);
 });
+

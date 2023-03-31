@@ -1,6 +1,6 @@
 import { Dimension, Entity, Player, Vector } from "@minecraft/server";
-import { removeDefaults, setDefaults } from "../../../lib/Database/Defaults";
-import { Database } from "../../../lib/Database/Rubedo";
+import { removeDefaults, setDefaults } from "../../../lib/Database/Defaults.js";
+import { Database } from "../../../lib/Database/Rubedo.js";
 import { XA, handle } from "../../../xapi.js";
 
 /**
@@ -21,6 +21,8 @@ const HIGEST_Y_VALUE = 320;
  * }>}
  */
 const TABLE = XA.tables.region;
+
+Region.getAllRegions(a);
 
 export class Region {
 	/**

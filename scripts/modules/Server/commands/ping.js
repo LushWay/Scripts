@@ -33,3 +33,4 @@ new XA.Command({
 		}§f: ${ticks}`
 	);
 });
+

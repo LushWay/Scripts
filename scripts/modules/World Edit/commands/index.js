@@ -26,3 +26,4 @@ for (const type in modules) {
 }
 
 multiload((f) => import("./" + f + ".js"), all, "WB Commands");
+

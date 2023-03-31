@@ -3051,3 +3051,4 @@ export const terrain_textures = {
 
 /** @type {Record<string, {textures: string | string[]}>} */
 export const untyped_terrain_textures = terrain_textures;
+

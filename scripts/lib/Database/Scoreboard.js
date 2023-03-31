@@ -70,3 +70,4 @@ export class ScoreboardDB {
 		DIMENSIONS.overworld.runCommandAsync(`scoreboard players reset * ${this.name}`);
 	}
 }
+

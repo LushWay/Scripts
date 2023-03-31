@@ -120,3 +120,4 @@ world.events.entitySpawn.subscribe((data) => {
 
 	XA.Entity.despawn(data.entity);
 });
+

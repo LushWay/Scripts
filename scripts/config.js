@@ -10,3 +10,4 @@ export const CONFIG = {
 	},
 	firstPlayerJoinTime: 5000,
 };
+

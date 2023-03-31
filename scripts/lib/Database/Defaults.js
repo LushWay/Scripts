@@ -1,3 +1,28 @@
+import {
+	DynamicPropertiesDefinition,
+	EntityTypes,
+	world,
+} from "@minecraft/server";
+
+world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
+	let def = new DynamicPropertiesDefinition();
+	def.defineString("tableName", 30);
+	def.defineString("tableType", 30);
+	def.defineNumber("index");
+	propertyRegistry.registerEntityTypeDynamicProperties(
+		def,
+		EntityTypes.get(DB.ENTITY_IDENTIFIER)
+	);
+});
+
+export const DB = {
+	ENTITY_IDENTIFIER: "rubedo:database",
+	ENTITY_LOCATION: { x: 0, y: -64, z: 0 },
+	INVENTORY_SIZE: 54,
+	CHUNK_REGEXP: /.{1,32000}/g,
+	MAX_LORE_SIZE: 32000,
+};
+
 /**
  * @typedef {Record<string | symbol | number, any>} JSON_OBJECT
  */
@@ -108,3 +133,4 @@ function removeDefaultsFromArray(source, defaults) {
 
 	return composed;
 }
+

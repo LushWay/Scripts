@@ -4,19 +4,20 @@
 		"allowJs": true,
 		"checkJs": true,
 		"forceConsistentCasingInFileNames": true,
+		"noImplicitAny": true,
 		"lib": ["ES2020"],
 		"target": "es2020",
+		"module": "NodeNext",
 		"baseUrl": ".",
+		"maxNodeModuleJsDepth": 0,
+		"types": [],
+		"outDir": "del_me",
 		"paths": {
 			"@minecraft/*": ["node_modules/@minecraft/*/index.js"],
 			"*": ["scripts/*"]
-		},
-		"maxNodeModuleJsDepth": 0,
-		"noImplicitAny": true,
-		"types": [],
-		"module": "AMD",
-		"outFile": "del_me.js"
+		}
 	},
 	"include": ["./scripts/"]
 }
+
 

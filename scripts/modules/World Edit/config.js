@@ -17,3 +17,4 @@ export const CONFIG_WB = {
 	DRAW_SELECTION_PARTICLE: "minecraft:endrod",
 	DRAW_SELECTION_MAX_SIZE: 5000,
 };
+

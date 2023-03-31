@@ -60,3 +60,4 @@ export function IS(playerID, role) {
 
 	return arr.includes(getRole(playerID));
 }
+

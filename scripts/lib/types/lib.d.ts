@@ -27,3 +27,4 @@ interface Function {
 	typedBind<fn extends Function>(this: fn, context: object): fn;
 }
 
+

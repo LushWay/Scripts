@@ -37,3 +37,4 @@ export function addMethod(objToPatch, methodName, fn) {
 	// @ts-expect-error
 	objToPatch[methodName] = fn;
 }
+

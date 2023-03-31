@@ -147,3 +147,4 @@ new XA.Command({
 	ctx.reply("§a► C");
 });
 
+

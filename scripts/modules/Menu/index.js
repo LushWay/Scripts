@@ -49,3 +49,4 @@ new XA.Command({
 		ctx.reply("§a+ §3Меню");
 	}
 });
+

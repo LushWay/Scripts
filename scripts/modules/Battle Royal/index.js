@@ -185,3 +185,4 @@ world.events.playerJoin.subscribe(({ playerId, playerName }) => {
 		5
 	);
 });
+

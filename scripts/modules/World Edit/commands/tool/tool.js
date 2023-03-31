@@ -10,3 +10,4 @@ new XA.Command({
 	ctx.sender.runCommandAsync("give @s we:tool");
 });
 
+

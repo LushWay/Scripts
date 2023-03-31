@@ -53,3 +53,4 @@ export class CommandContext {
 		this.sender.tell(`§c${errorText}`);
 	}
 }
+

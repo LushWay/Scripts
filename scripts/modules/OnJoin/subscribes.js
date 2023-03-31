@@ -25,3 +25,4 @@ JOIN_EVENTS.playerClosedGuide.subscribe((p) => {
 		new ItemStack(ItemTypes.get("xa:menu"))
 	);
 });
+

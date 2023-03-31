@@ -10,3 +10,4 @@ export const BR_CONFIG = XA.WorldOptions("BattleRoyal", {
 	gamepos: { desc: "x y", value: "" },
 	time: { desc: "Время игры в формате MM:SS (15:00)", value: "15:00" },
 });
+

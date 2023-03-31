@@ -16,3 +16,4 @@ new XA.Command({
 		ctx.reply(`§d►§r (2) ${pos.x}, ${pos.y}, ${pos.z}`);
 	});
 
+

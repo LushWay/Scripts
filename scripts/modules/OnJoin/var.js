@@ -37,3 +37,4 @@ export const CONFIG_JOIN = {
 		sound: "break.amethyst_cluster",
 	},
 };
+

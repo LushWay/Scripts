@@ -205,3 +205,4 @@ new XA.Command({
 	D.waiting = 1;
 	setData(ctx.sender, D);
 });
+

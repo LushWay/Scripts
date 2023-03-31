@@ -14,6 +14,11 @@
 			}
 		},
 		"components": {
+			"minecraft:inventory": {
+				"container_type": "inventory",
+				"inventory_size": 190,
+				"private": true
+			},
 			"minecraft:collision_box": {
 				"width": 0,
 				"height": 0
@@ -25,7 +30,6 @@
 				"is_pushable": false,
 				"is_pushable_by_piston": false
 			},
-			"minecraft:conditional_bandwidth_optimization": {},
 			"minecraft:damage_sensor": {
 				"triggers": {
 					"cause": "all",
@@ -33,16 +37,11 @@
 				}
 			},
 			"minecraft:fire_immune": true,
-			"minecraft:tameable": true,
 			"minecraft:health": {
 				"value": 999999,
 				"min": 1
 			},
-			"minecraft:inventory": {
-				"container_type": "inventory",
-				"inventory_size": 54,
-				"private": true
-			}
+			"minecraft:conditional_bandwidth_optimization": {}
 		},
 		"events": {
 			"despawn": {
@@ -53,3 +52,5 @@
 		}
 	}
 }
+
+

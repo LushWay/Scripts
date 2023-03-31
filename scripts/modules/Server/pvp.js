@@ -167,3 +167,4 @@ function isPvpLocked(entity) {
 	return XA.Entity.getTagStartsWith(entity, "lockpvp:");
 }
 
+

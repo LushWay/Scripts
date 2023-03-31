@@ -19,3 +19,4 @@ Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
 	configurable: false,
 	enumerable: true,
 });
+

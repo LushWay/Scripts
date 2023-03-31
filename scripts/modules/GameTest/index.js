@@ -103,3 +103,4 @@ function rd(max, min = 0, msg = false) {
 	if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
 	return rd;
 }
+

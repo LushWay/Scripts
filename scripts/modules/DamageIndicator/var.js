@@ -10,3 +10,4 @@ export const NameModifiers = [
 		return `\n${entity.name}`;
 	},
 ];
+

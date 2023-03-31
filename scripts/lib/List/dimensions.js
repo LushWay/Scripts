@@ -12,3 +12,4 @@ export const DIMENSIONS = {
 	"minecraft:the_end": E,
 	the_end: E,
 };
+

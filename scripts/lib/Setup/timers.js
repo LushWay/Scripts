@@ -80,3 +80,4 @@ addMethod(System.prototype, "runPlayerInterval", function (fn, name, ticks) {
 			console.warn(`Found slow players interval at:\n${path}`);
 	}, ticks);
 });
+

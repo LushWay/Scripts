@@ -85,3 +85,4 @@ export class MessageForm {
 		if (response.selection === 0) handle(this.button2?.callback, null, ["MessageFormCallback"]);
 	}
 }
+

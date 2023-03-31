@@ -44,3 +44,4 @@ export const loot_tables = [
   "chests/village/village_weaponsmith",
   "chests/woodland_mansion",
 ];
+

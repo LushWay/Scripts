@@ -8,3 +8,4 @@ interface IJoinData {
 	message?: 1 | undefined;
 	joined?: number;
 }
+

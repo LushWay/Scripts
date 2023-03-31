@@ -1,7 +1,5 @@
 import {
-	DynamicPropertiesDefinition,
 	Entity,
-	EntityTypes,
 	ItemStack,
 	MinecraftItemTypes,
 	Vector,
@@ -9,26 +7,10 @@ import {
 } from "@minecraft/server";
 import { DIMENSIONS } from "../List/dimensions.js";
 import { DisplayError } from "../Setup/utils.js";
+import { DB } from "./Defaults.js";
 
-/**
- * Original database created by Smell Of Curry for Rubedo anticheat, and lighty modified by Leaftail1880
- */
-
-world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
-	let def = new DynamicPropertiesDefinition();
-	def.defineString("tableName", 30);
-	def.defineNumber("index");
-	propertyRegistry.registerEntityTypeDynamicProperties(
-		def,
-		EntityTypes.get(ENTITY_IDENTIFIER)
-	);
-});
-
-const ENTITY_IDENTIFIER = "rubedo:database";
-const ENTITY_LOCATION = { x: 0, y: -64, z: 0 };
-const INVENTORY_SIZE = 54;
-const MAX_DATABASE_STRING_SIZE = 32000;
-const CHUNK_REGEXP = new RegExp(".{1," + MAX_DATABASE_STRING_SIZE + "}", "g");
+const TABLE_TYPE = "rubedo";
+const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
 
 /**
  * @template {string} [Key = string]
@@ -39,7 +21,7 @@ export class Database {
 	static initAllTables() {
 		this.tablesInited = true;
 		return Promise.all(
-			Object.values(this.instances).map((table) => {
+			Object.values(this.tables).map((table) => {
 				const initing = table.init();
 				initing.catch((err) =>
 					DisplayError(err, 0, [`${table.TABLE_NAME} init`])
@@ -50,21 +32,22 @@ export class Database {
 		);
 	}
 	/** @type {Record<string, Database<any, any>>} */
-	static instances = {};
+	static tables = {};
 	/**
 	 * Creates a table entity that is used for data storage
 	 * @param {string} tableName  undefined
 	 * @param {number} [index] if not specified no index will be set
 	 * @returns {Entity} *
 	 */
-	static createTableEntity(tableName, index) {
+	static createTableEntity(tableName, index = 0) {
 		const entity = DIMENSIONS.overworld.spawnEntity(
-			ENTITY_IDENTIFIER,
-			ENTITY_LOCATION
+			DB.ENTITY_IDENTIFIER,
+			DB.ENTITY_LOCATION
 		);
 		entity.setDynamicProperty("tableName", tableName);
+		entity.setDynamicProperty("index", index);
+		entity.setDynamicProperty("tableType", TABLE_TYPE);
 		entity.nameTag = `§7DB §f${tableName}§r`;
-		if (index) entity.setDynamicProperty("index", index);
 		return entity;
 	}
 	/**
@@ -77,18 +60,20 @@ export class Database {
 	static allDB;
 	static all() {
 		this.allDB ??= DIMENSIONS.overworld
-			.getEntities({ type: ENTITY_IDENTIFIER })
+			.getEntities({ type: DB.ENTITY_IDENTIFIER })
 			.map((entity) => {
 				let index = entity.getDynamicProperty("index");
 				if (typeof index !== "number") index = 0;
 
+				const tableType = entity.getDynamicProperty("tableType") === TABLE_TYPE;
 				const tableName = entity.getDynamicProperty("tableName");
+				world.debug(tableName, tableType);
 				if (typeof tableName !== "string")
 					return { entity, index, tableName: "NOTDB" };
 
 				const loc = entity.location;
-				if (Vector.distance(loc, ENTITY_LOCATION) > 1)
-					entity.teleport(ENTITY_LOCATION);
+				if (Vector.distance(loc, DB.ENTITY_LOCATION) > 1)
+					entity.teleport(DB.ENTITY_LOCATION);
 
 				return {
 					entity,
@@ -180,12 +165,12 @@ export class Database {
 	 * @param {string} tableName
 	 */
 	constructor(tableName) {
-		if (tableName in Database.instances) return Database.instances[tableName];
+		if (tableName in Database.tables) return Database.tables[tableName];
 
 		this.TABLE_NAME = tableName;
 		if (Database.tablesInited) this.initPromise = this.init();
 
-		Database.instances[tableName] = this;
+		Database.tables[tableName] = this;
 	}
 	/**
 	 * Saves data into this database
@@ -201,7 +186,7 @@ export class Database {
 		let chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
 
 		const entities = Database.getTableEntities(this.TABLE_NAME);
-		const totalEntities = Math.ceil(chunks.length / INVENTORY_SIZE);
+		const totalEntities = Math.ceil(chunks.length / DB.INVENTORY_SIZE);
 		const entitiesToSpawn = totalEntities - entities.length;
 
 		if (entitiesToSpawn > 0) {
@@ -214,6 +199,7 @@ export class Database {
 		for (const [i, entity] of entities.entries()) {
 			const inventory = entity.getComponent("inventory").container;
 			inventory.clearAll();
+
 			while (chunkIndex < chunks.length && inventory.size > 0) {
 				let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
 				item.setLore([chunks[chunkIndex]]);
@@ -223,7 +209,11 @@ export class Database {
 			entity.setDynamicProperty("index", i);
 		}
 		// Check for unUsed entities and despawn them
-		for (let i = entities.length - 1; i >= chunkIndex / INVENTORY_SIZE; i--) {
+		for (
+			let i = entities.length - 1;
+			i >= chunkIndex / DB.INVENTORY_SIZE;
+			i--
+		) {
 			entities[i].triggerEvent("despawn");
 		}
 	}
@@ -238,35 +228,37 @@ export class Database {
 			/** @private */
 			this.noMemory = true;
 
-			console.warn("§cNo entities found for table §f" + this.TABLE_NAME);
-			world.say("§cNo entities found for table §f" + this.TABLE_NAME);
+			console.warn(
+				"§cNo entities found for maybe unusable table §f" + this.TABLE_NAME
+			);
 
 			Reflect.set(this, "MEMORY", {});
 			this.isInited = true;
-			await this.save();
 			return;
 		}
 
-		let stringifiedData = "";
+		let raw = "";
 		for (const entity of entities) {
 			const inventory = entity.getComponent("inventory").container;
 			for (let i = 0; i < inventory.size; i++) {
 				const item = inventory.getItem(i);
 				if (!item) continue;
-				stringifiedData += item.getLore().join("");
+				raw += item.getLore().join("");
 			}
 		}
 
 		try {
-			const isJSON = stringifiedData && /\{.+\}/.test(stringifiedData);
-			this.MEMORY = isJSON ? JSON.parse(stringifiedData) : {};
+			const length = raw.length;
+			const isJSON = length && raw[0] === "{" && raw[length - 1] === "}";
+
+			this.MEMORY = isJSON ? JSON.parse(raw) : {};
 		} catch (e) {
 			DisplayError(e);
 			Reflect.set(this, "MEMORY", {});
 			await this.save();
 		}
 
-		this.raw = stringifiedData;
+		this.raw = raw;
 		this.isInited = true;
 	}
 
@@ -435,3 +427,4 @@ class DatabaseError extends Error {
 		super(message);
 	}
 }
+

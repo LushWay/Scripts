@@ -14,3 +14,4 @@ new XA.Command({
 	ctx.reply(`§5Позиция§r 1 теперь ${pos.x}, ${pos.y}, ${pos.z}`);
 });
 
+

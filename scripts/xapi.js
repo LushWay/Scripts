@@ -128,3 +128,4 @@ onWorldLoad(async () => {
 	else world.say(`§fFirst loaded in ${XA.state.load_time}`);
 }).catch(DisplayError);
 
+

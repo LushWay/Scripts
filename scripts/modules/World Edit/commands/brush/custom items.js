@@ -115,3 +115,4 @@ shovelCMD
 		ctx.reply(`§a(s) §rРадиус лопаты изменен на ${radius}`);
 	});
 
+

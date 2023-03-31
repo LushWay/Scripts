@@ -221,3 +221,4 @@ export class XCommand {
 
 world.events.beforeChat.subscribe(XCommand.chatListener);
 
+

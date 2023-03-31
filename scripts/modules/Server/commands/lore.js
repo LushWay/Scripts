@@ -70,3 +70,4 @@ lore.literal({ name: "viewtp" }).executes((ctx) => {
 	ctx.reply(`§a► §rРежим инструмента изменен на телепорт по взгляду`);
 });
 
+

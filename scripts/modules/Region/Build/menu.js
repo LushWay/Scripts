@@ -310,3 +310,4 @@ CONFIG_MENU.menu = (player) => {
 
 	return menu;
 };
+

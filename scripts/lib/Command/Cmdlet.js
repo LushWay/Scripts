@@ -68,3 +68,4 @@ export class CmdLet {
 		CmdLet.ALL.push(this);
 	}
 }
+

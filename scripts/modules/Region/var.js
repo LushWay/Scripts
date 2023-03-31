@@ -30,3 +30,4 @@ export function getServerType() {
 	return type;
 }
 
+

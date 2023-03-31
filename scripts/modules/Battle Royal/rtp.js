@@ -75,3 +75,4 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 	player.teleport({ x, y, z }, world.getDimension("overworld"), 0, 90, false);
 	return { x: x, y: y, z: z };
 }
+

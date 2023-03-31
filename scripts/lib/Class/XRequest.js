@@ -66,3 +66,4 @@ export class XRequest {
 		this.db.set(this.key, [...requests.values()]);
 	}
 }
+

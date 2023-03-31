@@ -47,3 +47,4 @@ new XA.Command({
 		ctx.reply(`§a(s) §rПартикл инструмента изменен на ${particle} (${number})`);
 	});
 
+

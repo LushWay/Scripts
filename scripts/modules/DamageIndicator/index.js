@@ -196,3 +196,4 @@ function getIndicators() {
 		tags: [INDICATOR_TAG],
 	});
 }
+

@@ -53,3 +53,4 @@ function timer(name, displayName) {
 function db(id, name) {
 	return new ScoreboardDB(id, name);
 }
+

@@ -22,3 +22,4 @@ new XA.Command({
 	ctx.reply(`Generated a Pyramid at ${location.x} ${location.y}${location.z}`);
 });
 
+

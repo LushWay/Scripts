@@ -73,3 +73,4 @@ export function applyToStack(stack, ...lines) {
 	parsedStack = [...lines, ...parsedStack];
 	return parsedStack.join("\n");
 }
+
