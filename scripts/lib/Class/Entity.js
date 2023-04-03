@@ -1,6 +1,5 @@
 import { Container, Entity, ItemStack, Player, world } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
-import { DIMENSIONS } from "../List/dimensions.js";
 
 /** @type {Database<string, IJoinData>} */
 const DB = new Database("player");
@@ -46,7 +45,7 @@ export const XEntity = {
 	getAtPos({ x, y, z }, dimension = "overworld") {
 		try {
 			// @ts-expect-error
-			return DIMENSIONS[dimension].getEntitiesAtBlockLocation({
+			return world[dimension].getEntitiesAtBlockLocation({
 				x: x,
 				y: y,
 				z: z,
@@ -74,7 +73,7 @@ export const XEntity = {
 		if (type) q.type = type;
 
 		if (maxDistance) q.maxDistance = maxDistance;
-		let entitys = [...DIMENSIONS.overworld.getEntities(q)];
+		let entitys = [...world.overworld.getEntities(q)];
 		if (shift) entitys.shift();
 		return entitys;
 	},
@@ -194,7 +193,7 @@ export const XEntity = {
 	 * @param {Entity} entity entity to despawn
 	 */
 	despawn(entity) {
-		entity.teleport({ x: 0, y: -64, z: 0 }, DIMENSIONS.overworld, 0, 0);
+		entity.teleport({ x: 0, y: -64, z: 0 }, world.overworld, 0, 0);
 		entity.kill();
 	},
 	/**
@@ -208,4 +207,3 @@ export const XEntity = {
 		}
 	},
 };
-

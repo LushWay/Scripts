@@ -5,9 +5,9 @@ import {
 	system,
 	Vector,
 } from "@minecraft/server";
-import { MessageForm } from "../../../lib/Form/MessageForm.js";
-import { createWaiter, XA } from "../../../xapi.js";
-import { Region } from "../utils/Region.js";
+import { MessageForm } from "../../lib/Form/MessageForm.js";
+import { createWaiter, XA } from "../../xapi.js";
+import { Region } from "../Region/Region.js";
 
 const DB = XA.tables.buildRegion;
 
@@ -21,7 +21,7 @@ const squarePlace = -55;
 export function teleportToRegion(player, region) {
 	player.teleport(
 		{ x: region.from.x, y: squarePlace + 3, z: region.from.z },
-		XA.dimensions.overworld
+		world.overworld
 	);
 }
 
@@ -81,7 +81,7 @@ export async function ClearRegion(player, Pregion) {
 		if (c % 500 === 0 || c === 0) await system.sleep(0);
 		percents = c / ~~(blocks / 100);
 
-		const block = XA.dimensions.overworld.getBlock(loc);
+		const block = world.overworld.getBlock(loc);
 		if (block.typeId === MinecraftBlockTypes.air.id) continue;
 		block.setType(MinecraftBlockTypes.air);
 	}
@@ -124,11 +124,11 @@ export async function fillRegion(from, to) {
 		Vector.add(secondLoc, Vector.up)
 	)) {
 		await exec();
-		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
+		world.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
 	}
 	for (const loc of Vector.foreach(firstLoc, secondLoc)) {
 		await exec();
-		XA.dimensions.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
+		world.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
 	}
 }
 
@@ -195,5 +195,3 @@ export async function findFreePlace() {
 
 	return { from, to };
 }
-
-

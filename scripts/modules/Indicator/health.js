@@ -1,7 +1,6 @@
 import { Entity, system, Vector, world } from "@minecraft/server";
-import { DIMENSIONS } from "../../lib/List/dimensions.js";
 import { XA } from "../../xapi.js";
-import { NameModifiers } from "./var.js";
+import { NAME_MODIFIERS } from "./var.js";
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {};
@@ -53,7 +52,7 @@ world.events.entityDie.subscribe((data) => {
 system.runInterval(
 	() => {
 		for (const [id, info] of Object.entries(HURT_ENTITIES)) {
-			const entity = DIMENSIONS.overworld
+			const entity = world.overworld
 				.getEntities({
 					type: info.hurt_type,
 				})
@@ -133,7 +132,7 @@ function getName(entity, hp = entity.getComponent("health")) {
 	return (
 		"§c" +
 		health_bar +
-		NameModifiers.map((modifier) => modifier(entity))
+		NAME_MODIFIERS.map((modifier) => modifier(entity))
 			.filter((result) => result !== false)
 			.join("")
 	);
@@ -191,9 +190,8 @@ function createIndicator(entity) {
 }
 
 function getIndicators() {
-	return DIMENSIONS.overworld.getEntities({
+	return world.overworld.getEntities({
 		type: "f:t",
 		tags: [INDICATOR_TAG],
 	});
 }
-

@@ -1,5 +1,4 @@
-import {  MinecraftBlockTypes } from "@minecraft/server";
-import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
+import { MinecraftBlockTypes, world } from "@minecraft/server";
 import { DisplayError, XA } from "../../../../xapi.js";
 
 /**
@@ -23,7 +22,7 @@ export function setblock(blockTypeID, location) {
 			return DisplayError(
 				new TypeError(`BlockType ${blockTypeID} does not exist!`)
 			);
-		DIMENSIONS.overworld.getBlock(location).setType(blockType);
+		world.overworld.getBlock(location).setType(blockType);
 	}
 }
 
@@ -58,4 +57,3 @@ export function get(ms) {
 
 	return { parsedTime, type };
 }
-

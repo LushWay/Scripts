@@ -6,7 +6,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { CommandContext } from "../../../lib/Command/Context.js";
+import { CommandContext } from "../../lib/Command/Context.js";
 
 const lang = {
 	nobase:
@@ -222,7 +222,7 @@ base.literal({ name: "list", description: "Список баз" }).executes((ctx
 
 system.runInterval(
 	() => {
-		for (const base of XA.dimensions.overworld.getEntities({
+		for (const base of world.overworld.getEntities({
 			type: "s:base",
 		})) {
 			const block = base.dimension.getBlock(Vector.floor(base.location));
@@ -278,5 +278,3 @@ system.runInterval(
 // 	if (ent.length < 1) return;
 // 	for (const name of ent[0].nameTag.split(", ")) InRaid[name] = 60;
 // });
-
-

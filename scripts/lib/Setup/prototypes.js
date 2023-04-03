@@ -3,6 +3,7 @@ import {
 	EntityDamageCause,
 	GameMode,
 	ItemUseOnEvent,
+	MinecraftDimensionTypes,
 	Player,
 	Vector,
 	world,
@@ -15,10 +16,20 @@ export * as Prototypes from "./patcher.js";
 World.prototype.say = World.prototype.sendMessage;
 Player.prototype.tell = Player.prototype.sendMessage;
 
+World.prototype.overworld = world.getDimension(
+	MinecraftDimensionTypes.overworld
+);
+World.prototype.nether = world.getDimension(MinecraftDimensionTypes.nether);
+World.prototype.end = world.getDimension(MinecraftDimensionTypes.theEnd);
+
 const originalSay = world.sendMessage.bind(world);
 
 addMethod(World.prototype, "debug", (...data) => {
-	originalSay(data.map((/** @type {*} */ e) => toStr(e)).join(" "));
+	originalSay(
+		data
+			.map((/** @type {*} */ e) => (typeof e === "string" ? e : toStr(e)))
+			.join(" ")
+	);
 });
 
 const LOGS = new Set();
@@ -81,7 +92,7 @@ Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
 });
 
 editMethod(console, "warn", ({ original, args }) => {
-	original(...args.map((e) => toStr(e)));
+	original(...args.map((e) => (typeof e === "string" ? e : toStr(e))));
 });
 
 addMethod(Player.prototype, "isGamemode", function (mode) {
@@ -124,6 +135,8 @@ addMethod(Player.prototype, "closeChat", function (message) {
  *
  *
  */
+
+addMethod(Vector, "string", (a) => `${a.x} ${a.y} ${a.z}`);
 
 addMethod(Vector, "foreach", function* (a, b) {
 	const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x];
@@ -180,4 +193,6 @@ addMethod(JSON, "safeParse", (str, reciever, onError) => {
 	}
 });
 
-
+addMethod(Array, "equals", function (one, two) {
+	return one.every((e, i) => e === two[i]);
+});

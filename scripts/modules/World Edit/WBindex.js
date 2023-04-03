@@ -3,6 +3,7 @@ import { XA } from "xapi.js";
 
 import "./commands/index.js";
 import { CONFIG_WB } from "./config.js";
+import "./helpers/import.js";
 import { FillFloor } from "./modules/builders/FillBuilder.js";
 import { Shape } from "./modules/builders/ShapeBuilder.js";
 import { WorldEditBuild } from "./modules/builders/WorldEditBuilder.js";
@@ -240,5 +241,3 @@ world.events.blockBreak.subscribe((data) => {
 		.getBlock(data.block.location)
 		.setPermutation(data.brokenBlockPermutation);
 });
-
-

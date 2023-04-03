@@ -54,6 +54,26 @@ export const BLOCK_CONTAINERS = [
 	"minecraft:undyed_shulker_box",
 ];
 
-export const CHECK_SIZE = { x: 7, y: 7, z: 7 };
-
-
+/**
+ * The default permissions for all regions made
+ * @type {IRegionPermissions}
+ */
+export const DEFAULT_REGION_PERMISSIONS = {
+	/**
+	 * If players in this region can use doors, trapdoors, and switches like buttons and levers
+	 */
+	doorsAndSwitches: true,
+	/**
+	 * If players in this region can open containers, this is like chests, furnaces, hoppers, etc
+	 */
+	openContainers: true,
+	/**
+	 * If the players in this region can fight each other
+	 */
+	pvp: false,
+	/**
+	 * the entitys allowed in this region
+	 */
+	allowedEntitys: ["minecraft:player", "minecraft:item", "x:sit"],
+	owners: [],
+};

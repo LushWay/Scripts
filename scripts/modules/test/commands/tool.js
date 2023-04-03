@@ -1,8 +1,8 @@
 import { Player, world } from "@minecraft/server";
 
 import { XA } from "xapi.js";
-import { P } from "../../lib/List/particles.js";
-import { S } from "../../lib/List/sounds.js";
+import { P } from "../../../lib/List/particles.js";
+import { S } from "../../../lib/List/sounds.js";
 
 world.events.beforeItemUse.subscribe((data) => {
 	if (data.item.typeId == "we:tool" && data.source instanceof Player) {
@@ -70,4 +70,3 @@ world.events.beforeItemUse.subscribe((data) => {
 		}
 	}
 });
-

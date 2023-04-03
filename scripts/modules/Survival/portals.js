@@ -11,7 +11,8 @@ import {
 import { DisplayError, XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
-import { global } from "./var.js";
+import { Objectives } from "../Objectives/var.js";
+import { SERVER } from "../Server/var.js";
 
 new WorldOption(
 	"spawn:pos",
@@ -273,7 +274,7 @@ const inv = new inventory();
 
 const invs = { spawn: 1, anarch: 2, minigames: 1, currentplace: 1, br: 1 };
 const objective = ["inv"];
-XA.objectives.push({ id: objective[0], watch: true });
+Objectives.push({ id: objective[0], watch: true });
 
 /**
  *
@@ -333,12 +334,12 @@ export function Atp(player, place, ignore, setDefaultInventory) {
 		while (!y && count < 30) {
 			count++;
 			x = rd(
-				Number(center[0]) + global.Radius - 10,
-				Number(center[0]) - global.Radius + 10
+				Number(center[0]) + SERVER.radius - 10,
+				Number(center[0]) - SERVER.radius + 10
 			);
 			z = rd(
-				Number(center[1]) + global.Radius - 10,
-				Number(center[1]) - global.Radius + 10
+				Number(center[1]) + SERVER.radius - 10,
+				Number(center[1]) - SERVER.radius + 10
 			);
 			/** @type {import("@minecraft/server").BlockRaycastOptions} */
 			const q = {};
@@ -648,5 +649,3 @@ new XA.Command({
 		ctx.reply(`§f► ${ctx.args.slice(1).join("§r, ")}`);
 		ctx.sender.runCommandAsync("setblock ~~-3~ bedrock");
 	});
-
-

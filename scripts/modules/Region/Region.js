@@ -1,7 +1,8 @@
 import { Dimension, Entity, Player, Vector } from "@minecraft/server";
-import { removeDefaults, setDefaults } from "../../../lib/Database/Defaults.js";
-import { Database } from "../../../lib/Database/Rubedo.js";
-import { XA, handle } from "../../../xapi.js";
+import { DB } from "../../lib/Database/Default.js";
+import { Database } from "../../lib/Database/Rubedo.js";
+import { XA, handle } from "../../xapi.js";
+import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
 /**
  * The Lowest Y value in minecraft
@@ -21,33 +22,11 @@ const HIGEST_Y_VALUE = 320;
  * }>}
  */
 const TABLE = XA.tables.region;
-
-Region.getAllRegions(a);
-
 export class Region {
 	/**
 	 * The default permissions for all regions made
-	 * @type {IRegionPermissions}
 	 */
-	static DEFAULT_REGION_PERMISSIONS = {
-		/**
-		 * If players in this region can use doors, trapdoors, and switches like buttons and levers
-		 */
-		doorsAndSwitches: true,
-		/**
-		 * If players in this region can open containers, this is like chests, furnaces, hoppers, etc
-		 */
-		openContainers: true,
-		/**
-		 * If the players in this region can fight each other
-		 */
-		pvp: false,
-		/**
-		 * the entitys allowed in this region
-		 */
-		allowedEntitys: ["minecraft:player", "minecraft:npc", "minecraft:item"],
-		owners: [],
-	};
+	static DEFAULT_REGION_PERMISSIONS = DEFAULT_REGION_PERMISSIONS;
 	/**
 	 * Holds all regions in memory so its not grabbing them so much
 	 * @type {Region[]}
@@ -176,15 +155,42 @@ export class Region {
 }
 
 const defaultRegion = {
-	dimensionId: "minecraft:overworld",
+	dimensionId: "overworld",
 	permissions: Region.DEFAULT_REGION_PERMISSIONS,
 };
 
 TABLE.on("beforeGet", (key, value) => {
-	return setDefaults(value, { ...defaultRegion, key });
+	// Unlink
+	value = Object.assign({}, value);
+
+	// Decompress
+	const [x1, z1] = Reflect.get(value, "f").split(" ").map(Number);
+	Reflect.deleteProperty(value, "f");
+	value.from = { x: x1, z: z1 };
+
+	const [x2, z2] = Reflect.get(value, "t").split(" ").map(Number);
+	Reflect.deleteProperty(value, "t");
+	value.to = { x: x2, z: z2 };
+
+	value.permissions = Reflect.get(value, "p");
+	Reflect.deleteProperty(value, "p");
+
+	value = DB.setDefaults(value, { ...defaultRegion, key });
+	return value;
 });
 TABLE.on("beforeSet", (key, value) => {
-	return removeDefaults(value, { ...defaultRegion, key });
+	value = DB.removeDefaults(value, { ...defaultRegion, key });
+
+	// Compress
+	Reflect.set(value, "f", `${value.from.x} ${value.from.z}`);
+	Reflect.deleteProperty(value, "from");
+
+	Reflect.set(value, "t", `${value.to.x} ${value.to.z}`);
+	Reflect.deleteProperty(value, "to");
+
+	Reflect.set(value, "p", value.permissions);
+	Reflect.deleteProperty(value, "permissions");
+	return value;
 });
 
 /**
@@ -203,4 +209,3 @@ export function forEachItemAt(dimension, location, callback = (e) => e.kill()) {
 		})
 		.forEach(callback);
 }
-

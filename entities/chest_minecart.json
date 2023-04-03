@@ -76,7 +76,7 @@
 							"all_of": [
 								{
 									"test": "has_tag",
-									"value": "держится"
+									"value": "drop"
 								},
 								{
 									"test": "on_ground",
@@ -93,7 +93,7 @@
 							"all_of": [
 								{
 									"test": "has_tag",
-									"value": "держится"
+									"value": "drop"
 								},
 								{
 									"test": "on_ground",
@@ -145,4 +145,3 @@
 		}
 	}
 }
-

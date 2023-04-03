@@ -1,6 +1,5 @@
-import { Entity, ItemStack, world } from "@minecraft/server";
-import { XA } from "../../xapi.js";
-import { DIMENSIONS } from "../List/dimensions.js";
+import { ItemStack } from "@minecraft/server";
+import { DB } from "./Default.js";
 
 /**
  * Minecraft Bedrock Item Database
@@ -14,35 +13,25 @@ import { DIMENSIONS } from "../List/dimensions.js";
  * --------------------------------------------------------------------------
  */
 
-/**
- * Where the entity is going to be at
- */
-const ENTITY_LOCATION = { x: 0, y: 0, z: 0 };
-
-DIMENSIONS.overworld.runCommandAsync("tickingarea add 0 0 0 0 0 0 ItemDB true");
-
-const ENTITY_DATABSE_ID = "mcbehub:inventory";
+const TABLE_TYPE = "item";
 
 export class XItemDatabase {
+	_ = {
+		TABLE_TYPE,
+		TABLE_NAME: "",
+	};
 	/**
 	 * The name of the table
 	 * @param {string} TABLE_NAME
 	 */
 	constructor(TABLE_NAME) {
-		this.TABLE_NAME = TABLE_NAME;
+		/** @private */
+		this._.TABLE_NAME = TABLE_NAME;
 	}
 
-	/**
-	 * Grabs all database entitys
-	 * @returns {Array<Entity>}
-	 * @private
-	 */
+	/** @private */
 	get ENTITIES() {
-		const q = {};
-		q.type = ENTITY_DATABSE_ID;
-		q.location = ENTITY_LOCATION;
-		q.tags = [this.TABLE_NAME];
-		return [...world.getDimension("overworld").getEntities(q)];
+		return DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
 	}
 
 	/**
@@ -53,15 +42,17 @@ export class XItemDatabase {
 	get ITEMS() {
 		let ITEMS = [];
 		for (const entity of this.ENTITIES) {
-			const inv = XA.Entity.getI(entity);
-			for (let i = 0; i < inv.size; i++) {
-				const item = inv.getItem(i);
+			const inventory = entity.getComponent("inventory").container;
+
+			for (let i = 0; i < inventory.size; i++) {
+				const item = inventory.getItem(i);
 				if (!item) continue;
 				ITEMS.push(item);
 			}
 		}
 		return ITEMS;
 	}
+
 	items() {
 		return this.ITEMS;
 	}
@@ -70,10 +61,13 @@ export class XItemDatabase {
 	 * @param {string} id
 	 */
 	get(id) {
-		const item = this.ITEMS.find((item) => item.getLore().includes(id));
-		if (!item) return null;
-		item.setLore(item.getLore().filter((i) => i !== id));
-		return item;
+		return this.ITEMS.find((item) => {
+			const [item_id, ...lore] = item.getLore();
+			if (item_id !== id) return false;
+
+			item.setLore(lore);
+			return true;
+		});
 	}
 
 	/**
@@ -84,54 +78,24 @@ export class XItemDatabase {
 	 *
 	 */
 	add(item, id = null) {
-		let entity = null;
-		for (const e of this.ENTITIES) {
-			const inv = XA.Entity.getI(e);
-			console.warn(inv.emptySlotsCount);
-			if (inv.emptySlotsCount > 0) {
-				entity = e;
-				break;
-			}
-		}
-		if (!entity) {
-			world
-				.getDimension("overworld")
-				.getEntitiesAtBlockLocation(ENTITY_LOCATION)
-				?.find(
-					(e) =>
-						e.typeId == ENTITY_DATABSE_ID &&
-						e.getTags().includes(this.TABLE_NAME)
-				)
-				?.triggerEvent("despawn");
-			try {
-				entity = world
-					.getDimension("overworld")
-					.spawnEntity(ENTITY_DATABSE_ID, ENTITY_LOCATION);
-				entity.addTag(this.TABLE_NAME);
-			} catch (eee) {
-				console.warn(eee);
-			}
+		let entity =
+			this.ENTITIES.find(
+				(e) => e.getComponent("inventory").container.emptySlotsCount > 0
+			) ??
+			DB.createTableEntity(
+				this._.TABLE_NAME,
+				TABLE_TYPE,
+				this.ENTITIES.length + 1
+			);
 
-			if (!entity) {
-				let e = world.events.entitySpawn.subscribe((data) => {
-					if (data.entity.typeId == ENTITY_DATABSE_ID) {
-						entity = data.entity;
-						entity.addTag(this.TABLE_NAME);
-						world.events.entitySpawn.unsubscribe(e);
-					}
-				});
-				DIMENSIONS.overworld.runCommandAsync(
-					`summon ${ENTITY_DATABSE_ID} 0 0 0`
-				);
-			}
-		}
-		const inv = XA.Entity.getI(entity);
-		const ID = id ? id : Date.now();
-		let lore = item.getLore() ?? [];
-		lore.push(`${ID}`);
+		const inventory = entity.getComponent("inventory").container;
+		const ID = id ?? Date.now().toString();
+		const lore = item.getLore();
+		lore.unshift(ID);
 		item.setLore(lore);
-		inv.addItem(item);
-		return `${ID}`;
+
+		inventory.addItem(item);
+		return ID;
 	}
 
 	/**
@@ -141,16 +105,15 @@ export class XItemDatabase {
 	 */
 	delete(id) {
 		for (const entity of this.ENTITIES) {
-			const inv = XA.Entity.getI(entity);
-			for (let i = 0; i < inv.size; i++) {
-				const item = inv.getItem(i);
-				if (!item || !item.getLore().includes(id)) continue;
-				inv.setItem(i, new ItemStack({ id: "minecraft:air" }));
+			const inventory = entity.getComponent("inventory").container;
+			for (let i = 0; i < inventory.size; i++) {
+				const item = inventory.getItem(i);
+
+				if (!item || item.getLore()[0] !== id) continue;
+				inventory.setItem(i, new ItemStack({ id: "minecraft:air" }));
 				return true;
 			}
 		}
 		return false;
 	}
 }
-
-

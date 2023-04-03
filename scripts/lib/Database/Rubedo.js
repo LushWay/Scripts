@@ -1,13 +1,6 @@
-import {
-	Entity,
-	ItemStack,
-	MinecraftItemTypes,
-	Vector,
-	world,
-} from "@minecraft/server";
-import { DIMENSIONS } from "../List/dimensions.js";
+import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
 import { DisplayError } from "../Setup/utils.js";
-import { DB } from "./Defaults.js";
+import { DB } from "./Default.js";
 
 const TABLE_TYPE = "rubedo";
 const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
@@ -17,98 +10,17 @@ const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
  * @template [Value=any]
  */
 export class Database {
-	static tablesInited = false;
 	static initAllTables() {
-		this.tablesInited = true;
-		return Promise.all(
-			Object.values(this.tables).map((table) => {
-				const initing = table.init();
-				initing.catch((err) =>
-					DisplayError(err, 0, [`${table.TABLE_NAME} init`])
-				);
-
-				return initing;
-			})
-		);
-	}
-	/** @type {Record<string, Database<any, any>>} */
-	static tables = {};
-	/**
-	 * Creates a table entity that is used for data storage
-	 * @param {string} tableName  undefined
-	 * @param {number} [index] if not specified no index will be set
-	 * @returns {Entity} *
-	 */
-	static createTableEntity(tableName, index = 0) {
-		const entity = DIMENSIONS.overworld.spawnEntity(
-			DB.ENTITY_IDENTIFIER,
-			DB.ENTITY_LOCATION
-		);
-		entity.setDynamicProperty("tableName", tableName);
-		entity.setDynamicProperty("index", index);
-		entity.setDynamicProperty("tableType", TABLE_TYPE);
-		entity.nameTag = `§7DB §f${tableName}§r`;
-		return entity;
-	}
-	/**
-	 * @type {{
-	 *   entity: Entity;
-	 *   index: number;
-	 *   tableName: string | number | boolean;
-	 * }[]}
-	 */
-	static allDB;
-	static all() {
-		this.allDB ??= DIMENSIONS.overworld
-			.getEntities({ type: DB.ENTITY_IDENTIFIER })
-			.map((entity) => {
-				let index = entity.getDynamicProperty("index");
-				if (typeof index !== "number") index = 0;
-
-				const tableType = entity.getDynamicProperty("tableType") === TABLE_TYPE;
-				const tableName = entity.getDynamicProperty("tableName");
-				world.debug(tableName, tableType);
-				if (typeof tableName !== "string")
-					return { entity, index, tableName: "NOTDB" };
-
-				const loc = entity.location;
-				if (Vector.distance(loc, DB.ENTITY_LOCATION) > 1)
-					entity.teleport(DB.ENTITY_LOCATION);
-
-				return {
-					entity,
-					index,
-					tableName,
-				};
-			})
-			.filter((e) => e.tableName !== "NOTDB");
-
-		return this.allDB;
-	}
-	/**
-	 * Gets all table Entities associated with this tableName
-	 * @param {string} tableName  undefined
-	 * @returns {Entity[]} *
-	 */
-	static getTableEntities(tableName) {
-		try {
-			return this.all()
-				.filter((e) => e.tableName === tableName)
-				.sort((a, b) => a.index - b.index)
-				.map((e) => e.entity);
-		} catch (e) {
-			DisplayError(e);
-			return [];
+		this.isTablesInited = true;
+		for (const table in this.tables) {
+			this.tables[table].init();
 		}
 	}
 	/**
-	 * Returns all private methods
-	 * @param {Database} DB
+	 * Record with all tables. Used to not reinit each of them
+	 * @type {Record<string, Database<any, any>>}
 	 */
-	static private(DB) {
-		const { initPromise, raw, isInited } = DB;
-		return { initPromise, raw, isInited };
-	}
+	static tables = {};
 
 	/**
 	 * Data saved in memory
@@ -117,46 +29,53 @@ export class Database {
 	 */
 	MEMORY = null;
 
-	/**
-	 * @type {Promise<void>}
-	 * @private
-	 */
-	initPromise = null;
+	_ = {
+		/** @private */
+		parent: this,
 
-	/** @private */
-	isInited = false;
-
-	/** @private */
-	raw = "{}";
-
-	/**
-	 * @template {keyof this["events"]} EventName
-	 * @param {EventName} event
-	 * @param {this["events"][EventName]} callback
-	 */
-	on(event, callback) {
-		// @ts-expect-error Trust me, TS
-		this.events[event] = callback;
-	}
-	// /** @private */
-	events = {
 		/**
-		 * This function will trigger until key set to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
-		 * @param {Key} key
-		 * @param {Value} value
-		 * @returns {Value}
+		 * Raw string representation of whole database
 		 */
-		beforeSet(key, value) {
-			return value;
+		RAW_MEMORY: "{}",
+
+		IS_INITED: false,
+		TABLE_NAME: "",
+		TABLE_TYPE,
+		EVENTS: {
+			/**
+			 * This function will trigger until key set to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
+			 * @param {Key} key
+			 * @param {Value} value
+			 * @returns {Value}
+			 */
+			beforeSet(key, value) {
+				return value;
+			},
+			/**
+			 * This function will trigger until key get from db and can be used to modify data. For example, add default values to keep db clean and lightweigth
+			 * @param {Key} key
+			 * @param {Value} value
+			 * @returns {Value}
+			 */
+			beforeGet(key, value) {
+				return value;
+			},
 		},
 		/**
-		 * This function will trigger until key get from db and can be used to modify data. For example, add default values to keep db clean and lightweigth
-		 * @param {Key} key
-		 * @param {Value} value
-		 * @returns {Value}
+		 * Saves data into this database
+		 * @param {{ [key in Key]: Value; }} collection
 		 */
-		beforeGet(key, value) {
-			return value;
+		set COLLECTION(collection) {
+			this.parent.MEMORY = collection;
+			this.parent.save();
+		},
+		/**
+		 * Gets all the keys and values
+		 */
+		get COLLECTION() {
+			if (!this.IS_INITED) this.parent.failedTo("COLLECTION");
+
+			return this.parent.MEMORY;
 		},
 	};
 
@@ -167,17 +86,26 @@ export class Database {
 	constructor(tableName) {
 		if (tableName in Database.tables) return Database.tables[tableName];
 
-		this.TABLE_NAME = tableName;
-		if (Database.tablesInited) this.initPromise = this.init();
+		this._.TABLE_NAME = tableName;
+		if (Database.isTablesInited) this.init();
 
 		Database.tables[tableName] = this;
+	}
+	/**
+	 * @template {keyof this["_"]["EVENTS"]} EventName
+	 * @param {EventName} event
+	 * @param {this["_"]["EVENTS"][EventName]} callback
+	 */
+	on(event, callback) {
+		// @ts-expect-error Trust me, TS
+		this._.EVENTS[event] = callback;
 	}
 	/**
 	 * Saves data into this database
 	 * @private
 	 */
-	async save() {
-		if (!this.isInited) this.failedTo("save");
+	save() {
+		if (!this._.IS_INITED) this.failedTo("save");
 
 		/**
 		 * The split chunks of the stringified data, This is done because we can
@@ -185,13 +113,13 @@ export class Database {
 		 */
 		let chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
 
-		const entities = Database.getTableEntities(this.TABLE_NAME);
+		const entities = DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
 		const totalEntities = Math.ceil(chunks.length / DB.INVENTORY_SIZE);
 		const entitiesToSpawn = totalEntities - entities.length;
 
 		if (entitiesToSpawn > 0) {
 			for (let i = 0; i < entitiesToSpawn; i++) {
-				entities.push(Database.createTableEntity(this.TABLE_NAME, i));
+				entities.push(DB.createTableEntity(this._.TABLE_NAME, TABLE_TYPE, i));
 			}
 		}
 
@@ -221,19 +149,22 @@ export class Database {
 	 * Grabs all data from this table
 	 * @private
 	 */
-	async init() {
-		let entities = Database.getTableEntities(this.TABLE_NAME);
+	init() {
+		let entities = DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
 
 		if (entities.length < 1) {
 			/** @private */
 			this.noMemory = true;
 
-			console.warn(
-				"§cNo entities found for maybe unusable table §f" + this.TABLE_NAME
-			);
+			// 3 means that no any table or backup found, so we dont need to spam
+			// about it for each db
+			if (DB.LOAD_TRY !== 3)
+				console.warn(
+					"§cNo entities found for maybe unusable table §f" + this._.TABLE_NAME
+				);
 
 			Reflect.set(this, "MEMORY", {});
-			this.isInited = true;
+			this._.IS_INITED = true;
 			return;
 		}
 
@@ -255,11 +186,11 @@ export class Database {
 		} catch (e) {
 			DisplayError(e);
 			Reflect.set(this, "MEMORY", {});
-			await this.save();
+			this.save();
 		}
 
-		this.raw = raw;
-		this.isInited = true;
+		this._.RAW_MEMORY = raw;
+		this._.IS_INITED = true;
 	}
 
 	/**
@@ -268,7 +199,7 @@ export class Database {
 	 * @param {Value} value  undefined
 	 */
 	set(key, value) {
-		Reflect.set(this.MEMORY, key, this.events.beforeSet(key, value));
+		Reflect.set(this.MEMORY, key, this._.EVENTS.beforeSet(key, value));
 		return this.save();
 	}
 
@@ -278,9 +209,9 @@ export class Database {
 	 * @returns {Value} the keys corresponding key
 	 */
 	get(key) {
-		if (!this.isInited) this.failedTo("get", key);
+		if (!this._.IS_INITED) this.failedTo("get", key);
 
-		return this.events.beforeGet(key, this.MEMORY[key]);
+		return this._.EVENTS.beforeGet(key, this.MEMORY[key]);
 	}
 
 	/**
@@ -313,7 +244,7 @@ export class Database {
 	 * @returns {Key[]}
 	 */
 	keys() {
-		if (!this.isInited) this.failedTo("keys");
+		if (!this._.IS_INITED) this.failedTo("keys");
 
 		// @ts-expect-error
 		return Object.keys(this.MEMORY);
@@ -323,23 +254,26 @@ export class Database {
 	 * @returns {Value[]}
 	 */
 	values() {
-		if (!this.isInited) this.failedTo("values");
+		if (!this._.IS_INITED) this.failedTo("values");
 
 		return Object.entries(this.MEMORY).map((e) =>
 			// @ts-expect-error
-			this.events.beforeGet(e[0], e[1])
+			this._.EVENTS.beforeGet(e[0], e[1])
 		);
 	}
 	/**
 	 * Get entries of the table
+	 * @returns {[Key, Value][]}
 	 */
 	entries() {
-		if (!this.isInited) this.failedTo("entries");
+		if (!this._.IS_INITED) this.failedTo("entries");
 
-		return Object.entries(this.MEMORY).map((e) =>
+		// @ts-expect-error
+		return Object.entries(this.MEMORY).map((e) => [
+			e[0],
 			// @ts-expect-error
-			[e[0], this.events.beforeGet(e[0], e[1])]
-		);
+			this._.EVENTS.beforeGet(e[0], e[1]),
+		]);
 	}
 	/**
 	 * Check if the key exists in the table
@@ -347,32 +281,16 @@ export class Database {
 	 * @returns {boolean}
 	 */
 	has(key) {
-		if (!this.isInited) this.failedTo("has", key);
+		if (!this._.IS_INITED) this.failedTo("has", key);
 
 		return Reflect.has(this.MEMORY, key);
-	}
-	/**
-	 * Saves data into this database
-	 * @param {{ [key in Key]: Value; }} collection
-	 */
-	set COLLECTION(collection) {
-		this.MEMORY = collection;
-		this.save();
-	}
-	/**
-	 * Gets all the keys and values
-	 */
-	get COLLECTION() {
-		if (!this.isInited) this.failedTo("COLLECTION");
-
-		return this.MEMORY;
 	}
 	/**
 	 * Delete the key from the table
 	 * @param {Key} key  the key to delete
 	 */
 	delete(key) {
-		if (!this.isInited) this.failedTo("delete", key);
+		if (!this._.IS_INITED) this.failedTo("delete", key);
 
 		Reflect.deleteProperty(this.MEMORY, key);
 		return this.save();
@@ -381,7 +299,7 @@ export class Database {
 	 * Clear everything in the table
 	 */
 	clear() {
-		if (!this.isInited) this.failedTo("clear");
+		if (!this._.IS_INITED) this.failedTo("clear");
 
 		Reflect.set(this, "MEMORY", {});
 
@@ -407,7 +325,7 @@ export class Database {
 			`${lm.count > 0 ? `(x${lm.count}) ` : ""}Failed to call ${method}${
 				key ? ` key "${key}"` : key
 			} on table "${
-				this.TABLE_NAME
+				this._.TABLE_NAME
 			}". Try to call "${method}" after resolving of §fDatabase.system(§6db§f).initPromise`
 		);
 	}
@@ -427,4 +345,3 @@ class DatabaseError extends Error {
 		super(message);
 	}
 }
-

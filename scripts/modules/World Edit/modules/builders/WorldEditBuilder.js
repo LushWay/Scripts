@@ -77,7 +77,7 @@ class WorldEditBuilder {
 				((z == zMin || z == zMax) && (x == xMin || x == xMax));
 
 			if (q)
-				XA.dimensions.overworld.spawnParticle(
+				world.overworld.spawnParticle(
 					"minecraft:endrod",
 					{ x: x + 0.5, y: y + 0.5, z: z + 0.5 },
 					new MolangVariableMap()
@@ -287,5 +287,3 @@ class WorldEditBuilder {
 	}
 }
 export const WorldEditBuild = new WorldEditBuilder();
-
-

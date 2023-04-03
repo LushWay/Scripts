@@ -99,5 +99,3 @@ export async function XShowForm(form, player) {
 		} else return response;
 	}
 }
-
-

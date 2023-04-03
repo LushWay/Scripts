@@ -2,7 +2,7 @@
 	"format_version": "1.17.0",
 	"minecraft:entity": {
 		"description": {
-			"identifier": "minecraft:hopper_minecart",
+			"identifier": "x:loot",
 			"is_spawnable": false,
 			"is_summonable": true,
 			"is_experimental": false
@@ -34,9 +34,6 @@
 			"minecraft:pushable": {
 				"is_pushable": false,
 				"is_pushable_by_piston": false
-			},
-			"minecraft:on_death": {
-				"event": "ded"
 			},
 			"minecraft:damage_sensor": {
 				"triggers": [
@@ -101,4 +98,3 @@
 		}
 	}
 }
-

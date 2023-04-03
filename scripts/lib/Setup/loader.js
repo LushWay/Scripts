@@ -1,5 +1,4 @@
-import { system } from "@minecraft/server";
-import { DIMENSIONS } from "../List/dimensions.js";
+import { system, world } from "@minecraft/server";
 import { handle } from "./utils.js";
 
 var WORLD_IS_LOADED = false;
@@ -9,7 +8,7 @@ var ON_LOAD_CALLBACKS = [];
 
 var ON_LOAD_PROMISE = new Promise((resolve) =>
 	system.run(async function waiter() {
-		const players = await DIMENSIONS.overworld.runCommandAsync(`testfor @a`);
+		const players = await world.overworld.runCommandAsync(`testfor @a`);
 		if (players.successCount < 1) {
 			// No players found, we need to re-run this...
 			return system.run(waiter);
@@ -39,4 +38,3 @@ export async function onWorldLoad(callback) {
 onWorldLoad.promise = ON_LOAD_PROMISE;
 onWorldLoad.callbacks = ON_LOAD_CALLBACKS;
 onWorldLoad.loaded = () => WORLD_IS_LOADED;
-

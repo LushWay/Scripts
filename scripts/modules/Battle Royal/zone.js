@@ -1,4 +1,4 @@
-import { MolangVariableMap, Player } from "@minecraft/server";
+import { MolangVariableMap, Player, Vector } from "@minecraft/server";
 import { XA } from "xapi.js";
 
 export class zone {
@@ -48,5 +48,3 @@ export class zone {
 		);
 	}
 }
-
-

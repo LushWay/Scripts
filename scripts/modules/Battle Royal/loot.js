@@ -1,7 +1,11 @@
 // @ts-nocheck
 import { ItemStack, MinecraftBlockTypes, world } from "@minecraft/server";
-import { XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
+
+/**
+ * @type {Array<ItemStack>}
+ */
+const drops = [];
 
 export class LootChest {
 	/**
@@ -19,12 +23,7 @@ export class LootChest {
 		);
 	}
 	static getTable(t) {
-		/**
-		 * @type {Array<ItemStack>}
-		 */
-		let array = XA.tables.drops.get("drop:" + t);
-		if (!array) throw new Error("§cНет массива под именем: " + t);
-		return array;
+		return drops;
 	}
 	static summon(xz, zx, loot, rdrad) {
 		let x,
@@ -62,5 +61,3 @@ export class LootChest {
 		return `${block.location.x} ${block.location.y} ${block.location.z}`;
 	}
 }
-
-

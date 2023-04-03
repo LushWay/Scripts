@@ -275,15 +275,11 @@
 						"event": "player:no_container_open"
 					}
 				]
-			},
-			"minecraft:on_death": {
-				"event": "player:on_death"
 			}
 		},
 		"events": {
 			"player:no_container_open": {},
 			"player:has_container_open": {},
-			"player:on_death": {},
 			"player:warn": {
 				"add": {
 					"component_groups": ["warn"]
@@ -331,4 +327,3 @@
 		}
 	}
 }
-

@@ -1,6 +1,5 @@
-import { MinecraftBlockTypes, system, Vector } from "@minecraft/server";
+import { MinecraftBlockTypes, system, Vector, world } from "@minecraft/server";
 import { DisplayError } from "xapi.js";
-import { DIMENSIONS } from "../../../../lib/List/dimensions.js";
 import { CONFIG_WB } from "../../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { setblock } from "../utils/utils.js";
@@ -104,7 +103,7 @@ export class spawn {
 		let blocksSet = 0;
 		for (let x = v.xmin; x <= v.xmax; x++) {
 			for (let z = v.zmin; z <= v.zmax; z++) {
-				DIMENSIONS.overworld
+				world.overworld
 					.getBlock({ x: x, y: -64, z: z })
 					.setType(
 						MinecraftBlockTypes.get(
@@ -120,5 +119,3 @@ export class spawn {
 		}
 	}
 }
-
-

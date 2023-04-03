@@ -24,7 +24,11 @@ patchPackage("@minecraft/server", {
     /**
      * Checks if vector c is between a and b
      */
-    static between(a: Vector3, b: Vector3, c: Vector3): boolean
+    static between(a: Vector3, b: Vector3, c: Vector3): boolean;
+    /**
+     * Returns string representation of vector ('x y z')
+     */
+    static string(a: Vector3): string;
     `,
 		World: m`
     /**
@@ -43,6 +47,9 @@ patchPackage("@minecraft/server", {
      * Prints data using world.say() and parses any object to string using toStr method. 
      */
     debug(...data: any): void;
+    overworld: Dimension;
+    end: Dimension;
+    nether: Dimension;
 `,
 		Player: m`
     /**
@@ -315,4 +322,3 @@ type EntityComponents = {
  */`,
 	},
 });
-

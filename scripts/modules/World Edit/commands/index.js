@@ -1,4 +1,4 @@
-import { multiload } from "../../../lib/Module/loader.js";
+import { multiload } from "../../../lib/Class/Module.js";
 
 const modules = {
 	brush: ["brush", "custom items"],
@@ -26,4 +26,3 @@ for (const type in modules) {
 }
 
 multiload((f) => import("./" + f + ".js"), all, "WB Commands");
-

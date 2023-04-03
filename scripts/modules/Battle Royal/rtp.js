@@ -1,4 +1,4 @@
-import { Player, Vector, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 
 import { toStr } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
@@ -75,4 +75,3 @@ export function rtp(player, xx, zz, maxrad, minrad, otherposes) {
 	player.teleport({ x, y, z }, world.getDimension("overworld"), 0, 90, false);
 	return { x: x, y: y, z: z };
 }
-

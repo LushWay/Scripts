@@ -35,3 +35,6 @@ type ObjectWithFunction<T> = {
 	[K in keyof T]: T[K] extends (...arg: any) => any ? K : never;
 };
 
+type Dimensions = "nether" | "end" | "overworld";
+
+type JSONLike = Record<string | symbol | number, any>;

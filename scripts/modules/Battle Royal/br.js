@@ -1,27 +1,17 @@
-// @ts-nocheck
-
-import { Player, world } from "@minecraft/server";
-import { XA, system } from "xapi.js";
-import { Subscriber } from "../../lib/Class/XEvents.js";
+import { Player, Vector, system, world } from "@minecraft/server";
+import { XA } from "xapi.js";
 import { rd } from "../Airdrops/index.js";
-import { Atp } from "../Server/portals.js";
+import { PVP_LOCKED } from "../Indicator/var.js";
+import { Atp } from "../Survival/portals.js";
 import { rtp } from "./rtp.js";
-import { BR_CONFIG } from "./var.js";
+import { BR_CONFIG, BR_DB, __BR_EMITTERS } from "./var.js";
 import { zone } from "./zone.js";
 
-/** @type {Subscriber<Player>} */
-const playerJoinQuene = new Subscriber();
-
-/** @type {Subscriber<Player>} */
-const playerDeath = new Subscriber();
-
-export const BATTLE_ROYAL_EVENTS = {
-	playerJoin: playerJoinQuene.export,
-	death: playerDeath.export,
-};
-
 class BattleRoyal {
+	/** @type {{[Key in keyof typeof world['events']]?: Parameters<typeof world['events'][Key]["subscribe"]>[0]}} */
+	events;
 	constructor() {
+		this.dimension = world.overworld;
 		/**
 		 * @type {Array<Player>}
 		 */
@@ -47,13 +37,7 @@ class BattleRoyal {
 			open: false,
 			time: 0,
 		};
-		this.events = {};
-		this.tags = [
-			"lockpvp:Battle royal",
-			"locktp:Battle royal",
-			"br:alive",
-			"br:inGame",
-		];
+		this.tags = ["locktp:Battle royal", "br:alive", "br:inGame"];
 	}
 	/**
 	 * Waiting for the player to respawn.
@@ -62,11 +46,14 @@ class BattleRoyal {
 	async waitToRespawn(name) {
 		let C = 0;
 
-		while ((await XA.runCommandX("testfor " + name)) < 1 && C < 100) {
+		while (
+			world.overworld.runCommand("testfor " + name).successCount < 1 &&
+			C < 100
+		) {
 			await system.sleep(5);
 			C++;
 		}
-		playerJoinQuene.emit(XA.Entity.fetch(name));
+		__BR_EMITTERS.playerJoinQuene.emit(XA.Entity.fetch(name));
 	}
 
 	/**
@@ -116,11 +103,17 @@ class BattleRoyal {
 				"centerX"
 			);
 
-			/** Сундуки (для удаления в будущем)
+			/**
+			 * Сундуки (для удаления в будущем)
 			 * @type {Array<string>}
 			 */
-			let chest = [];
-			let poses = [];
+			const chests = [];
+			/**
+			 * Позиции спавна игроков
+			 * @type {Vector3[]}
+			 */
+			const poses = [];
+
 			let debug = false;
 			if (debug) {
 				world.say(
@@ -135,6 +128,7 @@ class BattleRoyal {
 				// Тэги
 				const p = XA.Entity.fetch(e);
 				this.tags.forEach((e) => p.addTag(e));
+				PVP_LOCKED.push(p.id);
 
 				// Список
 				this.players.push(p);
@@ -162,132 +156,148 @@ class BattleRoyal {
 					poses
 				);
 				poses.push(pos);
-				XA.runCommandX(
-					`kill @e[x=${pos.x},z=${pos.z},y=${pos.y},r=100,type=item]`
-				);
+				this.dimension
+					.getEntities({
+						location: pos,
+						maxDistance: 100,
+						type: "minecraft:item",
+					})
+					.forEach((item) => item.kill());
 
 				//Стартовый сундук
 				// const ps = new LootChest(pos.x, pos.z, 0, 10).pos;
 				// if (ps) chest.push(ps);
 			}
 
-			XA.tables.chests.set("br:" + Date.now(), JSON.stringify(chest));
-			this.events = {
-				tick: world.events.tick.subscribe(() => {
-					//Таймер
-					this.time.tick--;
-					if (this.time.tick <= 0) {
-						this.time.sec--, (this.time.tick = 20);
-						for (const val of XA.tables.chests.values()) {
-							let p = [];
-							try {
-								p = JSON.parse(val);
-							} catch (e) {}
-							for (const pos of p) {
-								XA.runCommandX(
-									`particle minecraft:campfire_smoke_particle ${pos}`
-								);
-							}
+			BR_DB.set("br:" + Date.now(), chests);
+			this.timers = {
+				0: system.runInterval(
+					() => {
+						//Таймер
+						this.time.tick--;
+						if (this.time.tick <= 0) {
+							this.time.sec--, (this.time.tick = 20);
+							// for (const val of BR_DB.values()) {
+							// 	let p = [];
+							// 	try {
+							// 		p = JSON.parse(val);
+							// 	} catch (e) {}
+							// 	for (const pos of p) {
+							// 		XA.runCommandX(
+							// 			`particle minecraft:campfire_smoke_particle ${pos}`
+							// 		);
+							// 	}
+							// }
 						}
-					}
-					if (this.time.sec <= 0) this.time.min--, (this.time.sec = 59);
+						if (this.time.sec <= 0) this.time.min--, (this.time.sec = 59);
 
-					//Зона
-					for (const p of world.getPlayers()) {
-						const rmax = {
-								x: this.center.x + this.game.rad,
-								y: 0,
-								z: this.center.z + this.game.rad,
-							},
-							rmin = {
-								x: this.center.x - this.game.rad,
-								y: 0,
-								z: this.center.z - this.game.rad,
-							};
-						const l = Vector.floor(p.location);
-						if (
-							l.x >= rmax.x &&
-							l.x <= rmax.x + 10 &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.ret(p, true, rmax);
-						if (
-							l.x >= rmax.x - 10 &&
-							l.x <= rmax.x &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.pret(p, true, rmax);
+						//Зона
+						for (const p of world.getPlayers()) {
+							const rmax = {
+									x: this.center.x + this.game.rad,
+									y: 0,
+									z: this.center.z + this.game.rad,
+								},
+								rmin = {
+									x: this.center.x - this.game.rad,
+									y: 0,
+									z: this.center.z - this.game.rad,
+								};
 
-						if (
-							l.z >= rmax.z &&
-							l.z <= rmax.z + 10 &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.ret(p, false, rmax);
-						if (
-							l.z >= rmax.z - 10 &&
-							l.z <= rmax.z &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.pret(p, false, rmax);
+							const l = Vector.floor(p.location);
+							if (
+								l.x >= rmax.x &&
+								l.x <= rmax.x + 10 &&
+								l.z <= rmax.z &&
+								l.z >= rmin.z
+							)
+								zone.ret(p, true, rmax);
+							if (
+								l.x >= rmax.x - 10 &&
+								l.x <= rmax.x &&
+								l.z <= rmax.z &&
+								l.z >= rmin.z
+							)
+								zone.pret(p, true, rmax);
 
-						if (
-							l.x <= rmin.x &&
-							l.x >= rmin.x - 10 &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.ret(p, true, rmin, true);
-						if (
-							l.x <= rmin.x + 10 &&
-							l.x >= rmin.x &&
-							l.z <= rmax.z &&
-							l.z >= rmin.z
-						)
-							zone.pret(p, true, rmin);
+							if (
+								l.z >= rmax.z &&
+								l.z <= rmax.z + 10 &&
+								l.x <= rmax.x &&
+								l.x >= rmin.x
+							)
+								zone.ret(p, false, rmax);
+							if (
+								l.z >= rmax.z - 10 &&
+								l.z <= rmax.z &&
+								l.x <= rmax.x &&
+								l.x >= rmin.x
+							)
+								zone.pret(p, false, rmax);
 
-						if (
-							l.z <= rmin.z &&
-							l.z >= rmin.z - 10 &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.ret(p, false, rmin, true);
-						if (
-							l.z <= rmin.z + 10 &&
-							l.z >= rmin.z &&
-							l.x <= rmax.x &&
-							l.x >= rmin.x
-						)
-							zone.pret(p, false, rmin);
-					}
+							if (
+								l.x <= rmin.x &&
+								l.x >= rmin.x - 10 &&
+								l.z <= rmax.z &&
+								l.z >= rmin.z
+							)
+								zone.ret(p, true, rmin, true);
+							if (
+								l.x <= rmin.x + 10 &&
+								l.x >= rmin.x &&
+								l.z <= rmax.z &&
+								l.z >= rmin.z
+							)
+								zone.pret(p, true, rmin);
 
-					//Отображение таймера и игроков
-					XA.runCommandX(
-						`title @a[tag="br:inGame"] actionbar §6${
-							this.players.filter((e) => e.hasTag("br:alive")).length
-						} §g○ §6${this.time.min}:${
-							`${this.time.sec}`.length < 2
-								? `0${this.time.sec}`
-								: this.time.sec
-						} §g○ §6${this.game.rad}`
-					);
+							if (
+								l.z <= rmin.z &&
+								l.z >= rmin.z - 10 &&
+								l.x <= rmax.x &&
+								l.x >= rmin.x
+							)
+								zone.ret(p, false, rmin, true);
+							if (
+								l.z <= rmin.z + 10 &&
+								l.z >= rmin.z &&
+								l.x <= rmax.x &&
+								l.x >= rmin.x
+							)
+								zone.pret(p, false, rmin);
+						}
 
-					//Конец игры
-					if (this.time.min <= -1) this.end("time");
-					if (this.players.filter((e) => e.hasTag("br:alive")).length <= 1)
-						this.end(
-							"last",
-							this.players.find((e) => e && e.hasTag("br:alive"))
-						);
-				}),
+						//Отображение таймера и игроков
+						for (const player of world.getPlayers({ tags: ["br:inGame"] })) {
+							player.onScreenDisplay.setActionBar(
+								`§6${
+									this.players.filter((e) => e.hasTag("br:alive")).length
+								} §g○ §6${this.time.min}:${
+									`${this.time.sec}`.length < 2
+										? `0${this.time.sec}`
+										: this.time.sec
+								} §g○ §6${this.game.rad}`
+							);
+						}
+
+						//Конец игры
+						if (this.time.min <= -1) this.end("time");
+						if (this.players.filter((e) => e.hasTag("br:alive")).length <= 1)
+							this.end(
+								"last",
+								this.players.find((e) => e && e.hasTag("br:alive"))
+							);
+					},
+					"BR game",
+					0
+				),
+			};
+			this.events = {
 				playerLeave: world.events.playerLeave.subscribe((pl) => {
-					if (this.players.find((e) => e.name == pl.playerName))
-						delete this.players[pl.playerName];
+					this.players.forEach((e, i) => {
+						if (e.name === pl.playerName) {
+							delete this.players[i];
+						}
+					});
 				}),
 				beforeDataDrivenEntityTriggerEvent:
 					world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
@@ -306,13 +316,20 @@ class BattleRoyal {
 						!(data.source instanceof Player)
 					)
 						return;
+
 					const block = data.dimension.getBlock(
-						data.block.location.offset(0, -1, 0)
+						Vector.add(data.block.location, Vector.down)
 					);
 					if (block.typeId !== "minecraft:barrel") return;
+
+					/** @type {string[]} */
+					const barrels = BR_DB.get("chests") ?? [];
 					const id = `${block.location.x} ${block.location.y} ${block.location.z}`;
-					if (XA.tables.chests.get(id)) return;
-					XA.tables.chests.set(id, "true");
+
+					if (barrels.includes(id)) return;
+					barrels.push(id);
+					BR_DB.set("chests", barrels);
+
 					// Loot
 					data.source.onScreenDisplay.setTitle("§r");
 					data.source.onScreenDisplay.updateSubtitle("Открыто");
@@ -384,12 +401,16 @@ class BattleRoyal {
 			// Если играл нужно его вернуть на спавн батл рояля
 			if (ingame) Atp(e, "br", { lock: true, pvp: true, quene: true });
 		}
-		for (const key of Object.keys(this.events)) {
+		for (const key in this.events) {
+			// @ts-expect-error Strange TS moment
 			world.events[key].unsubscribe(this.events[key]);
+		}
+		for (const id of Object.keys(this.timers).map(Number)) {
+			system.clearRun(id);
 		}
 
 		//Альтернативная чепуха
-		XA.tables.chests.clear();
+		BR_DB.clear();
 
 		const rmax = {
 			x: this.center.x + this.game.startrad,
@@ -401,17 +422,17 @@ class BattleRoyal {
 			y: 0,
 			z: this.center.z - this.game.startrad,
 		};
-		for (const p of XA.dimensions.overworld.getEntities({
+
+		for (const p of world.overworld.getEntities({
 			type: "minecraft:item",
 		})) {
 			const l = Vector.floor(p.location);
 			if (l.z <= rmin.z && l.x <= rmin.x && l.x <= rmax.x && l.x >= rmin.x)
 				p.kill();
 		}
+
 		Object.assign(this, new BattleRoyal());
 	}
 }
 
 export const br = new BattleRoyal();
-
-

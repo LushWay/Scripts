@@ -1,9 +1,19 @@
 import { Player, world } from "@minecraft/server";
+import { OPTIONS } from "../../lib/Class/XOptions.js";
+import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { getRole, ROLES, setRole, T_roles as TR, XA } from "../../xapi.js";
+import {
+	ROLES,
+	ROLES_NAMES as TR,
+	XA,
+	getRole,
+	setRole,
+	toStr,
+} from "../../xapi.js";
 
-const DB = XA.tables.roles;
+/** @type {Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
+const DB = XA.tables.player;
 
 const R = new XA.Command({
 	name: "role",
@@ -12,13 +22,18 @@ const R = new XA.Command({
 
 R.executes((ctx) => {
 	const role = getRole(ctx.sender.id);
-	const noAdmins = !DB.values().includes("admin");
+	const noAdmins = !DB.values()
+		.map((e) => e.role)
+		.includes("admin");
 	const isAdmin = role === "admin";
 	const needAdmin = ctx.args[0] === "ACCESS";
-	const beenAdmin = DB.has(`SETTER:` + ctx.sender.id) && !isAdmin;
+	const beenAdmin = DB.get(ctx.sender.id).setter && !isAdmin;
 
 	if (noAdmins && ctx.sender.isOp() && (needAdmin || beenAdmin)) {
-		setRole(ctx.sender.id, "admin");
+		const { data, save } = DB.work(ctx.sender.id);
+		data.role = "admin";
+		delete data.setter;
+		save();
 		return ctx.reply("§b> §3Вы получили роль §r" + TR.admin);
 	}
 
@@ -56,8 +71,13 @@ R.executes((ctx) => {
 						);
 					// @ts-expect-error
 					setRole(player.id, newrole);
-					// @ts-expect-error
-					if (fakeChange) DB.set(`SETTER:` + player.id, 1);
+					if (fakeChange) {
+						const { data, save } = DB.work(player.id);
+						// @ts-expect-error
+						data.role = newrole;
+						data.setter = 1;
+						save();
+					}
 				});
 		};
 	};
@@ -73,3 +93,93 @@ R.executes((ctx) => {
 	form.show(ctx.sender);
 });
 
+world.events.beforeItemUse.subscribe(async ({ source: player, item }) => {
+	if (item.typeId !== "xa:admin" || !(player instanceof Player)) return;
+	options(player);
+});
+
+/**
+ *
+ * @param {Player} player
+ */
+function options(player) {
+	const form = new ActionForm("§dНастройки мира");
+
+	for (const groupName in OPTIONS) {
+		form.addButton(groupName, null, () => {
+			group(player, groupName);
+		});
+	}
+
+	form.show(player);
+}
+
+/** @type {import("../../lib/Class/XOptions.js").DB} */
+const OPTIONS_DB = new Database("options");
+
+/**
+ *
+ * @param {Player} player
+ * @param {string} groupName
+ */
+function group(player, groupName) {
+	const config = OPTIONS[groupName];
+	const data = OPTIONS_DB.get(groupName);
+	/** @type {[string, () => void][]} */
+	const buttons = [];
+	const form = new ActionForm(
+		groupName,
+		Object.entries(config)
+			.map(([KEY, OPTION]) => {
+				const value = data[KEY];
+				buttons.push([
+					KEY,
+					function edit(mesasge = "") {
+						const displayValue = value ?? "§8<не установлено>";
+						new ModalForm(`${groupName} - ${KEY}`)
+							.addTextField(
+								`${mesasge}§f${OPTION.desc}§r\n \n §7Значение: ${
+									typeof displayValue === "string"
+										? displayValue
+										: toStr(displayValue)
+								}\n §7Дефолт: ${toStr(
+									OPTION.value
+								)}§r\n §7Тип: §f${typeof OPTION.value}\n \n `,
+								"Оставьте пустым для отмены",
+								`${value ?? OPTION.value}`
+							)
+							.show(player, (ctx, input) => {
+								if (input) {
+									let total;
+									switch (typeof OPTION.value) {
+										case "string":
+											total = input;
+											break;
+										case "number":
+											total = Number(input);
+											if (isNaN(total)) return edit("§cВведите число!");
+											break;
+										case "boolean":
+											total = input === "true";
+											break;
+									}
+
+									data[KEY] = total;
+									OPTIONS_DB.set(groupName, data);
+									group(player, groupName);
+								}
+							});
+					},
+				]);
+
+				return `§f${KEY}§7 - ${OPTION.desc}§r\n ${
+					typeof value !== "undefined" ? `§7Значение: ${toStr(value)}` : ""
+				}\n §7Дефолт: ${toStr(OPTION.value)}§r\n \n \n`;
+			})
+			.join("")
+	);
+
+	form.addButton("< Назад", null, () => options(player));
+	for (const [key, callback] of buttons) form.addButton(key, null, callback);
+	form.show(player);
+}

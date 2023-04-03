@@ -1,8 +1,8 @@
 import { Player, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { Atp } from "../Server/portals.js";
-import { BATTLE_ROYAL_EVENTS, br } from "./br.js";
-import { quene } from "./var.js";
+import { Atp } from "../Survival/portals.js";
+import { br } from "./br.js";
+import { BATTLE_ROYAL_EVENTS, quene } from "./var.js";
 
 let minpl = 2,
 	fulltime = 5,
@@ -57,12 +57,12 @@ system.runInterval(
 	() => {
 		if (
 			!br.game.started &&
-			[...world.getPlayers()].filter((e) =>
-				XA.Entity.getTagStartsWith(e, "br:")
-			).length > 0
+			world.getPlayers().filter((e) => XA.Entity.getTagStartsWith(e, "br:"))
+				.length > 0
 		) {
 			br.end("specially", "Перезагрузка");
 		}
+
 		if (ks(quene).length >= minpl && ks(quene).length < 10) {
 			if (!br.quene.open) {
 				br.quene.open = true;
@@ -185,4 +185,3 @@ world.events.playerJoin.subscribe(({ playerId, playerName }) => {
 		5
 	);
 });
-

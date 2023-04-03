@@ -1,7 +1,13 @@
-import { MolangVariableMap, Player, system, world } from "@minecraft/server";
+import {
+	MolangVariableMap,
+	Player,
+	Vector,
+	system,
+	world,
+} from "@minecraft/server";
 import { XA } from "../../xapi.js";
+import { SERVER } from "../Server/var.js";
 import { Atp } from "./portals.js";
-import { global } from "./var.js";
 
 const options = XA.WorldOptions("zone", {
 	center: { desc: "", value: "0 0" },
@@ -53,8 +59,8 @@ function pret(player, isX, zone) {
 system.runInterval(
 	() => {
 		const players = world.getAllPlayers();
-		global.Radius = 200 + 20 * players.length;
-		const rad = global.Radius;
+		SERVER.radius = 200 + 20 * players.length;
+		const rad = SERVER.radius;
 		const center = options.center.split(", ").map(Number);
 
 		/**
@@ -102,5 +108,3 @@ system.runInterval(
 	"zone",
 	0
 );
-
-

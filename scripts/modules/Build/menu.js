@@ -1,9 +1,9 @@
 import { world } from "@minecraft/server";
 import { handle, IS, XA } from "xapi.js";
-import { ActionForm } from "../../../lib/Form/ActionForm.js";
-import { CONFIG_MENU } from "../../Menu/var.js";
-import { JOIN_EVENTS } from "../../OnJoin/events.js";
-import { Region } from "../utils/Region.js";
+import { ActionForm } from "../../lib/Form/ActionForm.js";
+import { CONFIG_MENU } from "../Menu/var.js";
+import { JOIN_EVENTS } from "../OnJoin/events.js";
+import { Region } from "../Region/Region.js";
 import {
 	ClearRegion,
 	CreateRegion,
@@ -24,6 +24,7 @@ JOIN_EVENTS.playerClosedGuide.subscribe((player) => {
 CONFIG_MENU.menu = (player) => {
 	const regionID = DB.get(player.id);
 	let Pregion = Region.getAllRegions().find((e) => e.key === regionID);
+	world.debug(Pregion);
 	if (!Pregion) {
 		player.tell(
 			"§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую."
@@ -48,7 +49,7 @@ CONFIG_MENU.menu = (player) => {
 		`§3Координаты вашей площадки: §c${Pregion.from.x} §b${Pregion.from.z}\n `
 	);
 
-	/** @type {import("../../../lib/Class/XRequest.js").XRequest} */
+	/** @type {import("../../lib/Class/XRequest.js").XRequest} */
 	let req;
 	/** @type {string} */
 	let regionOwnerName;
@@ -213,7 +214,7 @@ CONFIG_MENU.menu = (player) => {
 							DB.set("ARCHIVE:" + oldRegionID, [
 								...oldRegion.permissions.owners,
 							]);
-              /** @type {string[]} */
+							/** @type {string[]} */
 							const u = [];
 							oldRegion.forEachOwner((player, i, arr) => {
 								u.push(player.id);
@@ -310,4 +311,3 @@ CONFIG_MENU.menu = (player) => {
 
 	return menu;
 };
-

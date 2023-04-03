@@ -27,4 +27,11 @@ interface Function {
 	typedBind<fn extends Function>(this: fn, context: object): fn;
 }
 
-
+interface ArrayConstructor {
+	/**
+	 * Checks if two arrays are the same
+	 * @param one
+	 * @param two
+	 */
+	equals(one: any[], two: any[]): boolean;
+}

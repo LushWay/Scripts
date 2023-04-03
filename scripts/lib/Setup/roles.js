@@ -1,6 +1,30 @@
 import { Player } from "@minecraft/server";
-import { XA } from "../../xapi.js";
+import { Database } from "../Database/Rubedo.js";
 
+/** @type {Database<string, {role: keyof typeof ROLES}>} */
+const DB = new Database("player");
+/**
+ * @param {string} player
+ * @returns {{role: keyof typeof ROLES}}
+ */
+function getData(player) {
+	const value = DB.get(player);
+
+	if (typeof value === "undefined") return { role: "member" };
+
+	value.role ??= "member";
+	return value;
+}
+
+/**
+ * @param {string} player
+ * @param {{role: keyof typeof ROLES}} value
+ */
+function setData(player, value) {
+	if (value.role === "member") delete value.role;
+
+	DB.set(player, value);
+}
 /**
  * The roles that are in this server
  */
@@ -12,7 +36,7 @@ export const ROLES = {
 };
 
 /** @type {Record<keyof typeof ROLES, string>}} */
-export const T_roles = {
+export const ROLES_NAMES = {
 	admin: "§cАдмин",
 	builder: "§3Строитель",
 	member: "§fУчастник",
@@ -28,7 +52,7 @@ export const T_roles = {
 export function getRole(playerID) {
 	if (playerID instanceof Player) playerID = playerID.id;
 
-	const role = XA.tables.roles.get(playerID);
+	const role = getData(playerID).role;
 
 	if (!Object.keys(ROLES).includes(role)) return "member";
 	return role;
@@ -43,7 +67,9 @@ export function getRole(playerID) {
  */
 export function setRole(player, role) {
 	if (player instanceof Player) player = player.id;
-	XA.tables.roles.set(player, role);
+	const data = getData(player);
+	data.role = role;
+	setData(player, data);
 }
 
 /**
@@ -60,4 +86,3 @@ export function IS(playerID, role) {
 
 	return arr.includes(getRole(playerID));
 }
-

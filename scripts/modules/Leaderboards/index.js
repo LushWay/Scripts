@@ -1,58 +1,56 @@
 import { Entity, Vector, system, world } from "@minecraft/server";
 import { Database } from "../../lib/Database/Rubedo.js";
-import { DIMENSIONS } from "../../lib/List/dimensions.js";
-
-/**
- * @type {Database<string, LB>}
- */
-const LB_DB = new Database("leaderboard");
 
 /**
  * @typedef {{
  *   style: keyof typeof STYLES;
  *   objective: string;
  *   location: Vector3;
- *   dimension: string;
+ *   dimension: Dimensions
  * }} LB
  */
 
+/**
+ * @type {Database<string, LB>}
+ */
+const LB_DB = new Database("leaderboard");
 const LEADERBOARD_TAG = "LEADERBOARD";
 const LEADERBOARD_ID = "f:t";
 const STYLES = {
 	gray: {
-		color1: "7",
-		color2: "f",
-		top: "7",
+		fill1: "7",
+		fill2: "f",
+		pos: "7",
 		nick: "f",
 		score: "7",
 		name: "7",
 	},
 	orange: {
-		color1: "",
-		color2: "",
-		top: "",
-		nick: "",
-		score: "",
-		name: "",
+		fill1: "ф",
+		fill2: "ф",
+		pos: "ф",
+		nick: "ф",
+		score: "ф",
+		name: "ф",
 	},
 	green: {
-		color1: "7",
-		color2: "f",
-		top: "7",
+		fill1: "7",
+		fill2: "f",
+		pos: "7",
 		nick: "f",
 		score: "7",
 		name: "7",
 	},
 };
 
-class Leaderboard {
+export class Leaderboard {
 	/**
 	 * @param {Vector3} loc
-	 * @param {keyof typeof DIMENSIONS} dimension
+	 * @param {Dimensions} dimension
 	 * @param {string} id
 	 */
 	static get(loc, dimension, id) {
-		const entity = DIMENSIONS[dimension]
+		const entity = world[dimension]
 			.getEntitiesAtBlockLocation(loc)
 			.find(
 				(entity) =>
@@ -69,7 +67,7 @@ class Leaderboard {
 	 *
 	 * @param {string} objective
 	 * @param {Vector3} location
-	 * @param {string} dimension
+	 * @param {Dimensions} dimension
 	 * @param {keyof typeof STYLES} style
 	 */
 	static createLeaderboard(
@@ -92,10 +90,10 @@ class Leaderboard {
 		entity.nameTag = "Updating...";
 		entity.addTag(LEADERBOARD_TAG);
 
-		return new Leaderboard(entity);
+		return new Leaderboard(entity, data);
 	}
 	/**
-	 *
+	 * Creates manager of Leaderboard
 	 * @param {Entity} entity
 	 * @param {LB} data
 	 */
@@ -106,7 +104,7 @@ class Leaderboard {
 	remove() {
 		LB_DB.delete(this.entity.id);
 		this.entity.teleport({ x: 0, y: 0, z: 0 });
-		this.entity.triggerEvent("kill");
+		this.entity.triggerEvent("f:t:kill");
 	}
 	updateData() {
 		LB_DB.set(this.entity.id, this.data);
@@ -116,14 +114,14 @@ class Leaderboard {
 		const dname = scoreboard.displayName;
 		const name = dname.charAt(0).toUpperCase() + dname.slice(1);
 		const style = STYLES[this.data.style];
-		const filler = `§${style.color1}-§${style.color2}`.repeat(5);
+		const filler = `§${style.fill1}-§${style.fill2}`.repeat(20);
 
 		let leaderboard = ``;
 		for (const [i, scoreInfo] of scoreboard.getScores().entries()) {
-			const { top: t, nick: n, score: s } = style;
+			const { pos: t, nick: n, score: s } = style;
 
-			leaderboard += `§${t}#${i + 1}§r §${n}`;
-			leaderboard += `${scoreInfo.participant.displayName}§r`;
+			leaderboard += `§${t}#${i + 1}§r `;
+			leaderboard += `§${n}${scoreInfo.participant.displayName}§r `;
 			leaderboard += `§${s}${toMetricNumbers(scoreInfo.score)}§r\n`;
 		}
 
@@ -160,6 +158,5 @@ function toMetricNumbers(value) {
 	if (exp === 0) return value.toString();
 
 	const scaled = value / Math.pow(10, exp * 3);
-	return `${scaled.toFixed(1)}${exp > 5 ? " " + types[exp] : "e" + exp}`;
+	return `${scaled.toFixed(1)}${exp > 5 ? "e" + exp : types[exp]}`;
 }
-

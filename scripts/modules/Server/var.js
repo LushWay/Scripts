@@ -1,34 +1,45 @@
+import { world } from "@minecraft/server";
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
-import { XA } from "../../xapi.js";
+import { toStr } from "../../lib/Setup/utils.js";
 
-export const global = { Radius: 200 };
-
-export const options = XA.WorldOptions("server", {
-	spawn: {
-		desc: "Включает команду /hub, пункт в меню и приветствие.\n\n(требуется перезагрузка)",
-		value: false,
-	},
+/**
+ * @type {Array<"unknown" | "build" | "survival" | "disabled">}
+ */
+const TYPES = ["unknown", "build", "survival", "disabled"];
+const options = XA.WorldOptions("server", {
 	lockNether: { desc: "Выключает незер", value: true },
-	bowhit: { desc: "Звук попадания по энтити из лука", value: true },
-	timer: { value: true, desc: "" },
-	zoneCenter: { value: "0 0", desc: "" },
+	timer: { value: true, desc: "Какой-та таймер, я сам хз че это" },
+	type: {
+		value: 0,
+		desc: `Тип сервера. Доступные значения: \n§f${toStr(
+			Object.fromEntries(Object.entries(TYPES))
+		)
+			.replace("{", "")
+			.replace("}", "")}`,
+	},
 });
 
-export const time = {
-	anarchy: timer("anarchy", "на анархии"),
-	all: timer("all", "всего"),
-	day: timer("day", "за день"),
-};
+const TYPE = TYPES[getType()];
 
-export const stats = {
-	blocksPlaced: db("blockPlace", "Поставлено блок"),
-	blocksBreaked: db("blockBreak", "Сломано блоков"),
-	fireworksLaunched: db("FVlaunch", "Фв запущено"),
-	fireworksExpoded: db("FVboom", "Фв взорвано"),
-	damageRecieve: db("Hget", "Урона получено"),
-	damageGive: db("Hgive", "Урона нанесено"),
-	kills: db("kills", "Убийств"),
-	deaths: db("deaths", "Смертей"),
+export const SERVER = {
+	radius: 200,
+	stats: {
+		blocksPlaced: db("blockPlace", "Поставлено блок"),
+		blocksBreaked: db("blockBreak", "Сломано блоков"),
+		fireworksLaunched: db("FVlaunch", "Фв запущено"),
+		fireworksExpoded: db("FVboom", "Фв взорвано"),
+		damageRecieve: db("Hget", "Урона получено"),
+		damageGive: db("Hgive", "Урона нанесено"),
+		kills: db("kills", "Убийств"),
+		deaths: db("deaths", "Смертей"),
+	},
+	options,
+	time: {
+		anarchy: timer("anarchy", "на анархии"),
+		all: timer("all", "всего"),
+		day: timer("day", "за день"),
+	},
+	type: TYPE,
 };
 
 /**
@@ -54,3 +65,17 @@ function db(id, name) {
 	return new ScoreboardDB(id, name);
 }
 
+function getType() {
+	let num = options.type;
+
+	if (!(num in TYPES) || num === 0) {
+		options.type = 0;
+		num = 0;
+		const text = `§cДля полноценной работы сервера установите значение §ftype§c в настройках §fserver§c и перезагрузите скрипты. `;
+
+		world.say(text);
+		console[XA.state.first_load ? "warn" : "log"](text);
+	}
+
+	return num;
+}

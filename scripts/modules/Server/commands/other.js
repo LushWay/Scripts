@@ -1,6 +1,5 @@
-import { system } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { global } from "../var.js";
 
 const casda = new XA.Command({
 	name: "name",
@@ -14,23 +13,6 @@ const casda = new XA.Command({
 	});
 casda.literal({ name: "reset", description: "Возвращает" }).executes((ctx) => {
 	ctx.sender.nameTag = ctx.sender.name;
-});
-
-new XA.Command({
-	name: "resetpos",
-	description: "Удаляет информацию о позиции  на анархии",
-	type: "public",
-	role: "member",
-}).executes((ctx) => {
-	ctx.reply(XA.tables.player.delete("POS:" + ctx.sender.id) + "");
-});
-new XA.Command({
-	name: "radius",
-	description: "Выдает радиус границы анархии сейчас",
-	type: "public",
-	role: "member",
-}).executes((ctx) => {
-	ctx.reply(`☺ ${global.Radius}`);
 });
 
 new XA.Command({
@@ -50,7 +32,7 @@ new XA.Command({
 
 system.runInterval(
 	() => {
-		for (const e of XA.dimensions.overworld.getEntities({ type: "x:sit" })) {
+		for (const e of world.overworld.getEntities({ type: "x:sit" })) {
 			const players = e.dimension.getEntities({
 				type: "minecraft:player",
 				location: e.location,
@@ -65,53 +47,6 @@ system.runInterval(
 	"sit entity clear",
 	40
 );
-
-const cos = new XA.Command({
-	name: "i",
-	description: "Создает динамический список предметов",
-	role: "moderator",
-	type: "test",
-});
-cos
-	.literal({
-		name: "add",
-		description: "Добавляет предмет в руке в список",
-	})
-	.string("id")
-	.executes((ctx, id) => {
-		ctx.reply(
-			"Зарегано под айди: " +
-				XA.tables.i.add(XA.Entity.getHeldItem(ctx.sender), id)
-		);
-	});
-cos
-	.literal({ name: "get" })
-	.string("lore")
-	.executes((ctx, lore) => {
-		XA.Entity.getI(ctx.sender).setItem(
-			ctx.sender.selectedSlot,
-			XA.tables.i.get(lore)
-		);
-	});
-cos
-	.literal({ name: "del" })
-	.string("lore")
-	.executes((ctx, lore) => {
-		ctx.reply(XA.tables.i.delete(lore));
-	});
-cos.literal({ name: "list" }).executes((ctx) => {
-	const ii = XA.tables.i.items();
-	if (ii.length > 1) {
-		ctx.reply(
-			ii
-				.map((e) => `${e.typeId} (§r ${e.getLore().join(", ")} §r)`)
-				.sort()
-				.join("\n")
-		);
-	} else {
-		ctx.reply("§cПусто.");
-	}
-});
 
 new XA.Command({
 	name: "ws",
@@ -134,17 +69,16 @@ new XA.Command({
 	role: "moderator",
 	/*type: "serv"*/
 }).executes((ctx) => {
-	ctx.sender.runCommandAsync("gamemode s");
+	ctx.sender.runCommand("gamemode s");
 	ctx.reply("§a► S");
 });
+
 new XA.Command({
 	name: "c",
 	description: "Креатив",
 	role: "moderator",
 	/*type: "serv"*/
 }).executes((ctx) => {
-	ctx.sender.runCommandAsync("gamemode c");
+	ctx.sender.runCommand("gamemode c");
 	ctx.reply("§a► C");
 });
-
-

@@ -1,22 +1,21 @@
-// Class for register X-API module
-import { m, mm } from "../lib/Module/creator.js";
+// Functions for registering X-API modules
+import { m, mm } from "../lib/Class/Module.js";
 
 /**
  * Common server modules:
  */
+m`Server`;
 m`Admin`;
 m`DatabaseView`;
 m`HelpCommand`;
-m`Server`;
 m`Chat`;
 mm("OnJoin", { fileName: "join" });
+m`Menu`;
 
 /**
- * RPG and build modules (gameplay):
+ * Gameplay modules
  */
-m`DamageIndicator`;
-m`Menu`;
-m`Region`;
+m`Indicator`;
 // m`Battle Royal`;
 // m`Airdrops`;
 
@@ -25,7 +24,7 @@ m`Region`;
  */
 m`Test`;
 m`GameTest`;
-m`Leaderboards`;
-// mm("World Edit", { fileName: "WBindex" });
+// m`Leaderboards`;
+mm("World Edit", { fileName: "WBindex" });
 
-
+m`Objectives`;

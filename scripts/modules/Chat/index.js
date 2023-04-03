@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { DisplayError, getRole, T_roles, XA } from "xapi.js";
+import { DisplayError, getRole, ROLES_NAMES, XA } from "xapi.js";
 import { CONFIG } from "../../config.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 
@@ -52,7 +52,8 @@ world.events.beforeChat.subscribe((data) => {
 		const playerRole = getRole(data.sender);
 
 		let role = "";
-		if (OPTIONS.ranks && playerRole !== "member") role = T_roles[playerRole];
+		if (OPTIONS.ranks && playerRole !== "member")
+			role = ROLES_NAMES[playerRole];
 
 		const allPlayers = world.getAllPlayers();
 
@@ -90,5 +91,3 @@ world.events.beforeChat.subscribe((data) => {
 		DisplayError(error);
 	}
 });
-
-

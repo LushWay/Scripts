@@ -1,11 +1,12 @@
 import { MinecraftEffectTypes, system, world } from "@minecraft/server";
 import { IS } from "xapi.js";
-import { setRegionGuards } from "../Default/index.js";
-import { Region } from "../utils/Region.js";
+import { Region } from "../Region/Region.js";
+import { setRegionGuards } from "../Region/index.js";
 import "./menu.js";
 
 const GLOBAL_ALLOWED_ENTITIES = [
 	"minecraft:player",
+	"minecraft:item",
 	"f:t",
 	"rubedo:database",
 	"x:sit",
@@ -43,4 +44,3 @@ system.runPlayerInterval((player) => {
 			rotation.y
 		);
 }, "underground effects");
-

@@ -9,28 +9,22 @@ import { CONFIG_JOIN } from "./var.js";
 const PDB = new Database("player");
 
 /**
- * @param {Player | string} player
- */
-function genPlayerDBkey(player) {
-	return `JOIN:${player instanceof Player ? player.id : player}`;
-}
-/**
- * @param {Player | string} player
+ * @param {string} player
  * @returns {IJoinData}
  */
 function getData(player) {
-	const data = PDB.get(genPlayerDBkey(player)) ?? {
+	const data = PDB.get(player) ?? {
 		learning: 1,
 		joined: Date.now(),
 	};
 	return data;
 }
 /**
- * @param {Player | string} player
+ * @param {string} player
  * @param {IJoinData} data
  */
 function setData(player, data) {
-	return PDB.set(genPlayerDBkey(player), data);
+	return PDB.set(player, data);
 }
 
 world.events.playerJoin.subscribe(({ playerId }) => {
@@ -43,9 +37,9 @@ system.runTimeout(
 	() => {
 		if (!XA.state.first_load) return;
 		const player = world.getAllPlayers()[0];
-		const D = getData(player);
+		const D = getData(player.id);
 		D.waiting = 1;
-		setData(player, D);
+		setData(player.id, D);
 	},
 	"owner start screen",
 	80
@@ -53,7 +47,7 @@ system.runTimeout(
 
 system.runPlayerInterval(
 	(player) => {
-		const data = getData(player);
+		const data = getData(player.id);
 		let modified = false;
 
 		if (data.waiting === 1) {
@@ -138,7 +132,7 @@ system.runPlayerInterval(
 			modified = true;
 		}
 
-		if (modified) setData(player, data);
+		if (modified) setData(player.id, data);
 	},
 	"joinInterval",
 	20
@@ -190,9 +184,9 @@ new XA.Command({
 	description: "Открывает гайд",
 	type: "public",
 }).executes((ctx) => {
-	const D = getData(ctx.sender);
+	const D = getData(ctx.sender.id);
 	D.learning = 1;
-	setData(ctx.sender, D);
+	setData(ctx.sender.id, D);
 });
 
 new XA.Command({
@@ -201,8 +195,7 @@ new XA.Command({
 	description: "Имитирует вход",
 	type: "public",
 }).executes((ctx) => {
-	const D = getData(ctx.sender);
+	const D = getData(ctx.sender.id);
 	D.waiting = 1;
-	setData(ctx.sender, D);
+	setData(ctx.sender.id, D);
 });
-

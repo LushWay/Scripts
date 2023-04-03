@@ -7,20 +7,25 @@ import {
 } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
 import { handle, XA } from "xapi.js";
-import { DIMENSIONS } from "../../lib/List/dimensions.js";
-
 const time = 9999999;
 
 let name = "Бот";
 /** @type {GameTest.SimulatedPlayer} */
-let simp;
+let player;
 const test_loc = { x: 1000, y: -60, z: 1000 };
 
 GameTest.registerAsync("s", "s", async (test) => {
 	const spawnLoc = { x: 1, y: 5, z: 1 };
-	simp = test.spawnSimulatedPlayer(spawnLoc, name);
+	player = test.spawnSimulatedPlayer(spawnLoc, name);
+	const id = player.id;
+
+	const event = world.events.entityDie.subscribe((data) => {
+		if (data.deadEntity.id !== id) return;
+		test.fail("bot died");
+	});
 
 	await test.idle(time - 30);
+	world.events.entityDie.unsubscribe(event);
 	test.succeed();
 })
 	.maxTicks(time)
@@ -41,13 +46,13 @@ new XA.Command({
 			`execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`
 		);
 
-		DIMENSIONS.overworld
+		world.overworld
 			.getBlock(Vector.add(test_loc, { x: 1, y: 0, z: 1 }))
 			.setType(MinecraftBlockTypes.redstoneBlock);
 
 		await system.sleep(10);
 
-		simp.teleport(ctx.sender.location);
+		player.teleport(ctx.sender.location);
 	});
 
 // Many players
@@ -103,4 +108,3 @@ function rd(max, min = 0, msg = false) {
 	if (msg) world.say(msg + "\nmax: " + max + " min: " + min + " rd: " + rd);
 	return rd;
 }
-

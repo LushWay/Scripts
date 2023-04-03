@@ -1,13 +1,13 @@
 import { world } from "@minecraft/server";
-import { setRegionGuards } from "../Default/index.js";
-import { Region } from "../utils/Region.js";
-import { InRaid } from "../var.js";
+import { Region } from "../Region/Region.js";
+import { setRegionGuards } from "../Region/index.js";
+import { RaidNotify } from "./var.js";
 
 world.events.beforeExplosion.subscribe((data) => {
 	for (const bl of data.getImpactedBlocks()) {
 		let region = Region.blockLocationInRegion(bl, data.dimension.id);
 		if (region && !region.permissions.pvp) return (data.cancel = true);
-		for (const id of region.permissions.owners) InRaid[id] = 60;
+		for (const id of region.permissions.owners) RaidNotify[id] = 60;
 	}
 });
 
@@ -22,4 +22,4 @@ setRegionGuards(
 	(region, data) => !region
 );
 
-
+Region.DEFAULT_REGION_PERMISSIONS.pvp = true;

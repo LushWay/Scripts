@@ -1,5 +1,4 @@
 import { Entity, world } from "@minecraft/server";
-import { DIMENSIONS } from "../List/dimensions.js";
 
 export class ScoreboardDB {
 	scoreboard;
@@ -12,7 +11,6 @@ export class ScoreboardDB {
 		displayName = displayName ?? name;
 		if (name.length > 16) name = name.substring(0, 16);
 		this.name = name;
-		this.displayName = displayName;
 
 		try {
 			this.scoreboard = world.scoreboard.addObjective(name, displayName);
@@ -25,7 +23,9 @@ export class ScoreboardDB {
 	 * @param {number} value
 	 */
 	set(name, value) {
-		DIMENSIONS.overworld.runCommandAsync(`scoreboard players set "${name}" ${this.name} ${value}`);
+		world.overworld.runCommandAsync(
+			`scoreboard players set "${name}" ${this.name} ${value}`
+		);
 	}
 	/**
 	 *
@@ -34,7 +34,9 @@ export class ScoreboardDB {
 	 */
 	get(name) {
 		try {
-			return this.scoreboard.getScores().find((e) => e.participant.displayName === name).score;
+			return this.scoreboard
+				.getScores()
+				.find((e) => e.participant.displayName === name).score;
 		} catch (e) {
 			return 0;
 		}
@@ -67,7 +69,6 @@ export class ScoreboardDB {
 		}
 	}
 	reset() {
-		DIMENSIONS.overworld.runCommandAsync(`scoreboard players reset * ${this.name}`);
+		world.overworld.runCommandAsync(`scoreboard players reset * ${this.name}`);
 	}
 }
-
