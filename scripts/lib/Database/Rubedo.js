@@ -10,6 +10,23 @@ const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
  * @template [Value=any]
  */
 export class Database {
+	/**
+	 *
+	 * @template {Database} Source
+	 * @param {Source} source
+	 * @param {Source["_"]["EVENTS"]} events
+	 * @returns {Source}
+	 */
+	static eventProxy(source, events) {
+		/**
+		 * @type {{_: Pick<Source["_"], "EVENTS">}}
+		 */
+		const proxy = {
+			...source,
+			_: { ...source._, EVENTS: events },
+		};
+		return Object.setPrototypeOf(proxy, source);
+	}
 	static initAllTables() {
 		this.isTablesInited = true;
 		for (const table in this.tables) {
@@ -82,15 +99,72 @@ export class Database {
 	/**
 	 *
 	 * @param {string} tableName
+	 * @param {{
+	 *  beforeSet(key: Key, value: Value): Value;
+	 * beforeGet(key: Key, value: Value): Value;
+	 * }} [events]
 	 */
-	constructor(tableName) {
-		if (tableName in Database.tables) return Database.tables[tableName];
+	constructor(tableName, events) {
+		if (tableName in Database.tables) {
+			// DB with this name already exists...
+
+			return Database.tables[tableName];
+		}
 
 		this._.TABLE_NAME = tableName;
+		if (events) this._.EVENTS = events;
 		if (Database.isTablesInited) this.init();
 
 		Database.tables[tableName] = this;
 	}
+	/**
+	 * Loads data to {@link Database.MEMORY}
+	 * @private
+	 */
+	init() {
+		let entities = DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
+
+		if (entities.length < 1) {
+			/** @private */
+			this.noMemory = true;
+
+			// 3 means that no any table or backup found, so we dont need to spam
+			// about it for each db
+			// if (DB.LOAD_TRY !== 3)
+			// 	console.warn(
+			// 		"§6No entities found for maybe unusable table §f" + this._.TABLE_NAME
+			// 	);
+
+			Reflect.set(this, "MEMORY", {});
+			this._.IS_INITED = true;
+			return;
+		}
+
+		let raw = "";
+		for (const entity of entities) {
+			const inventory = entity.getComponent("inventory").container;
+			for (let i = 0; i < inventory.size; i++) {
+				const item = inventory.getItem(i);
+				if (!item) continue;
+				raw += item.getLore().join("");
+			}
+		}
+
+		try {
+			const length = raw.length;
+			const isJSON = length && raw[0] === "{" && raw[length - 1] === "}";
+
+			this.MEMORY = isJSON ? JSON.parse(raw) : {};
+		} catch (e) {
+			DisplayError(e);
+			Reflect.set(this, "MEMORY", {});
+			this.save();
+		}
+
+		this._.RAW_MEMORY = raw;
+		this._.IS_INITED = true;
+	}
+
 	/**
 	 * @template {keyof this["_"]["EVENTS"]} EventName
 	 * @param {EventName} event
@@ -144,53 +218,6 @@ export class Database {
 		) {
 			entities[i].triggerEvent("despawn");
 		}
-	}
-	/**
-	 * Grabs all data from this table
-	 * @private
-	 */
-	init() {
-		let entities = DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
-
-		if (entities.length < 1) {
-			/** @private */
-			this.noMemory = true;
-
-			// 3 means that no any table or backup found, so we dont need to spam
-			// about it for each db
-			if (DB.LOAD_TRY !== 3)
-				console.warn(
-					"§cNo entities found for maybe unusable table §f" + this._.TABLE_NAME
-				);
-
-			Reflect.set(this, "MEMORY", {});
-			this._.IS_INITED = true;
-			return;
-		}
-
-		let raw = "";
-		for (const entity of entities) {
-			const inventory = entity.getComponent("inventory").container;
-			for (let i = 0; i < inventory.size; i++) {
-				const item = inventory.getItem(i);
-				if (!item) continue;
-				raw += item.getLore().join("");
-			}
-		}
-
-		try {
-			const length = raw.length;
-			const isJSON = length && raw[0] === "{" && raw[length - 1] === "}";
-
-			this.MEMORY = isJSON ? JSON.parse(raw) : {};
-		} catch (e) {
-			DisplayError(e);
-			Reflect.set(this, "MEMORY", {});
-			this.save();
-		}
-
-		this._.RAW_MEMORY = raw;
-		this._.IS_INITED = true;
 	}
 
 	/**

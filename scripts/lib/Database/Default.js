@@ -84,7 +84,9 @@ export class DB {
 	 * @returns {TABLE[]}
 	 */
 	static loadTables() {
-		this.ALL_TABLE_ENTITIES ??= world.overworld
+		if (this.ALL_TABLE_ENTITIES) return this.ALL_TABLE_ENTITIES;
+
+		this.ALL_TABLE_ENTITIES = world.overworld
 			.getEntities({ type: DB.ENTITY_IDENTIFIER })
 			.map((entity) => {
 				let index = entity.getDynamicProperty("index");

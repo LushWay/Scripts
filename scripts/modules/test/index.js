@@ -1,4 +1,5 @@
 import {
+	EquipmentSlot,
 	MinecraftEnchantmentTypes,
 	system,
 	Vector,
@@ -6,14 +7,15 @@ import {
 } from "@minecraft/server";
 import { DisplayError, handle, toStr, XA } from "xapi.js";
 import { stackParse } from "../../lib/Class/XError.js";
-import { OPTIONS } from "../../lib/Class/XOptions.js";
 import { CommandContext } from "../../lib/Command/Context.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { benchmark } from "../../lib/XBenchmark.js";
+import { CustomEnchantments } from "../Enchantments/var.js";
 import { Region } from "../Region/Region.js";
+import { SERVER } from "../Server/var.js";
 import "./commands/import.js";
 
 /**
@@ -220,13 +222,8 @@ const tests = {
 			.getComponent("inventory")
 			.container.getItem(ctx.sender.selectedSlot + 1);
 
-		nitem
-			.getComponent("enchantments")
-			.enchantments.addEnchantment(
-				item
-					.getComponent("enchantments")
-					.enchantments.getEnchantment(MinecraftEnchantmentTypes.power)
-			);
+		nitem.getComponent("enchantments").enchantments =
+			nitem.getComponent("enchantments").enchantments;
 
 		world.debug([...nitem.getComponent("enchantments").enchantments]);
 	},
@@ -296,7 +293,21 @@ const tests = {
 		entity.nameTag = ctx.sender.name;
 	},
 	38(ctx) {
-		world.debug(OPTIONS);
+		const mainhand = ctx.sender
+			.getComponent("equipment_inventory")
+			.getEquipmentSlot(EquipmentSlot.mainhand);
+
+		const item = mainhand.getItem();
+		const { enchantments } = item.getComponent("enchantments");
+		enchantments.removeEnchantment(MinecraftEnchantmentTypes.sharpness);
+		enchantments.addEnchantment(
+			CustomEnchantments[MinecraftEnchantmentTypes.sharpness.id][10]
+		);
+
+		mainhand.setItem(item);
+	},
+	39(ctx) {
+		world.debug("type ", SERVER.options.type);
 	},
 };
 

@@ -6,40 +6,33 @@ import "./subscribes.js";
 import { CONFIG_JOIN } from "./var.js";
 
 /** @type {Database<string, IJoinData>} */
-const PDB = new Database("player");
-
-/**
- * @param {string} player
- * @returns {IJoinData}
- */
-function getData(player) {
-	const data = PDB.get(player) ?? {
-		learning: 1,
-		joined: Date.now(),
-	};
-	return data;
-}
-/**
- * @param {string} player
- * @param {IJoinData} data
- */
-function setData(player, data) {
-	return PDB.set(player, data);
-}
+const PDB = Database.eventProxy(new Database("player"), {
+	beforeGet(player, data) {
+		return (
+			data ?? {
+				learning: 1,
+				joined: Date.now(),
+			}
+		);
+	},
+	beforeSet(key, value) {
+		return value;
+	},
+});
 
 world.events.playerJoin.subscribe(({ playerId }) => {
-	const D = getData(playerId);
-	D.waiting = 1;
-	setData(playerId, D);
+	const { data, save } = PDB.work(playerId);
+	data.waiting = 1;
+	save;
 });
 
 system.runTimeout(
 	() => {
 		if (!XA.state.first_load) return;
 		const player = world.getAllPlayers()[0];
-		const D = getData(player.id);
+		const D = PDB.get(player.id);
 		D.waiting = 1;
-		setData(player.id, D);
+		PDB.set(player.id, D);
 	},
 	"owner start screen",
 	80
@@ -47,7 +40,7 @@ system.runTimeout(
 
 system.runPlayerInterval(
 	(player) => {
-		const data = getData(player.id);
+		const data = PDB.get(player.id);
 		let modified = false;
 
 		if (data.waiting === 1) {
@@ -132,7 +125,7 @@ system.runPlayerInterval(
 			modified = true;
 		}
 
-		if (modified) setData(player.id, data);
+		if (modified) PDB.set(player.id, data);
 	},
 	"joinInterval",
 	20
@@ -184,9 +177,9 @@ new XA.Command({
 	description: "Открывает гайд",
 	type: "public",
 }).executes((ctx) => {
-	const D = getData(ctx.sender.id);
+	const D = PDB.get(ctx.sender.id);
 	D.learning = 1;
-	setData(ctx.sender.id, D);
+	PDB.set(ctx.sender.id, D);
 });
 
 new XA.Command({
@@ -195,7 +188,7 @@ new XA.Command({
 	description: "Имитирует вход",
 	type: "public",
 }).executes((ctx) => {
-	const D = getData(ctx.sender.id);
+	const D = PDB.get(ctx.sender.id);
 	D.waiting = 1;
-	setData(ctx.sender.id, D);
+	PDB.set(ctx.sender.id, D);
 });

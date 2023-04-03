@@ -51,6 +51,24 @@ patchPackage("@minecraft/server", {
     end: Dimension;
     nether: Dimension;
 `,
+		ItemStack: m`
+		    /**
+		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     */
+		    cooldown: ItemCooldownComponent;
+		    /**
+		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     */
+		    enchantments: ItemCooldownComponent;
+		    /**
+		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     */
+		    durability: ItemCooldownComponent;
+		    /**
+		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     */
+		    cooldown: ItemCooldownComponent;
+		`,
 		Player: m`
     /**
      * See {@link Player.sendMessage}

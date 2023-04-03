@@ -1,4 +1,3 @@
-import { world } from "@minecraft/server";
 import { ScoreboardDB } from "../../lib/Database/Scoreboard.js";
 import { toStr } from "../../lib/Setup/utils.js";
 
@@ -73,7 +72,6 @@ function getType() {
 		num = 0;
 		const text = `§cДля полноценной работы сервера установите значение §ftype§c в настройках §fserver§c и перезагрузите скрипты. `;
 
-		world.say(text);
 		console[XA.state.first_load ? "warn" : "log"](text);
 	}
 

@@ -21,7 +21,7 @@ const HIGEST_Y_VALUE = 320;
  *  to: IRegionCords;
  * }>}
  */
-const TABLE = XA.tables.region;
+const TABLE = new Database("region");
 export class Region {
 	/**
 	 * The default permissions for all regions made

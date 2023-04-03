@@ -6,7 +6,7 @@ import { Database } from "../Database/Rubedo.js";
  * @template [T = boolean | string | number]
  */
 
-/** @typedef {Database<string, Record<string, string | boolean | number>>} DB */
+/** @typedef {Database<string, Record<string, string | boolean | number>>} OPTIONS_DB */
 
 /**
  * TS doesn't converting true and false to boolean
@@ -17,9 +17,15 @@ import { Database } from "../Database/Rubedo.js";
 /** @type {Record<string, DefaultConfig<boolean>>} */
 export const PLAYER_OPTIONS = {};
 
-/** @type {DB} */
-const PLAYER_DB = new Database("player");
-
+/** @type {OPTIONS_DB} */
+const PLAYER_DB = Database.eventProxy(new Database("player"), {
+	beforeGet(key, value) {
+		return value ?? {};
+	},
+	beforeSet(key, value) {
+		return value;
+	},
+});
 /**
  * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
  * stored in a database
@@ -44,8 +50,11 @@ export function XPlayerOptions(prefix, CONFIG) {
 /** @type {Record<string, DefaultConfig>} */
 export const OPTIONS = {};
 
-/** @type {DB} */
-const DB = new Database("options");
+/** @type {OPTIONS_DB} */
+const WORLD_OPTIONS = new Database("options", {
+	beforeGet: (key, value) => value ?? {},
+	beforeSet: (key, value) => value,
+});
 
 /**
  * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
@@ -65,13 +74,13 @@ export function XOptions(prefix, CONFIG) {
 		};
 	}
 	// @ts-expect-error Trust me, TS
-	return generateOptionsProxy(DB, CONFIG);
+	return generateOptionsProxy(WORLD_OPTIONS, CONFIG);
 }
 
 /**
  * It creates a proxy object that allows you to access and modify the values of a given object, but the
  * values are stored in a database
- * @param {DB} database - The prefix for the database.
+ * @param {OPTIONS_DB} database - The prefix for the database.
  * @param {string} prefix - The prefix for the database.
  * @param {DefaultConfig} CONFIG - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
@@ -86,13 +95,12 @@ function generateOptionsProxy(database, prefix, CONFIG, player = null) {
 			configurable: false,
 			enumerable: true,
 			get() {
-				const value = DB.get(prefix) ?? {};
-				return value[key] ?? CONFIG[prop].value;
+				return database.get(prefix)?.[key] ?? CONFIG[prop].value;
 			},
 			set(v) {
-				const value = DB.get(prefix) ?? {};
+				const value = database.get(prefix) ?? {};
 				value[key] = v;
-				DB.set(prefix, value);
+				database.set(prefix, value);
 			},
 		});
 	}

@@ -2,29 +2,18 @@ import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
 /** @type {Database<string, {role: keyof typeof ROLES}>} */
-const DB = new Database("player");
-/**
- * @param {string} player
- * @returns {{role: keyof typeof ROLES}}
- */
-function getData(player) {
-	const value = DB.get(player);
+const table = Database.eventProxy(new Database("player"), {
+	beforeGet(key, value) {
+		value ??= { role: "member" };
+		value.role ??= "member";
+		return value;
+	},
+	beforeSet(key, value) {
+		if (value.role === "member") delete value.role;
+		return value;
+	},
+});
 
-	if (typeof value === "undefined") return { role: "member" };
-
-	value.role ??= "member";
-	return value;
-}
-
-/**
- * @param {string} player
- * @param {{role: keyof typeof ROLES}} value
- */
-function setData(player, value) {
-	if (value.role === "member") delete value.role;
-
-	DB.set(player, value);
-}
 /**
  * The roles that are in this server
  */
@@ -52,7 +41,7 @@ export const ROLES_NAMES = {
 export function getRole(playerID) {
 	if (playerID instanceof Player) playerID = playerID.id;
 
-	const role = getData(playerID).role;
+	const role = table.get(playerID).role;
 
 	if (!Object.keys(ROLES).includes(role)) return "member";
 	return role;
@@ -67,9 +56,9 @@ export function getRole(playerID) {
  */
 export function setRole(player, role) {
 	if (player instanceof Player) player = player.id;
-	const data = getData(player);
+	const { data, save } = table.work(player);
 	data.role = role;
-	setData(player, data);
+	save();
 }
 
 /**

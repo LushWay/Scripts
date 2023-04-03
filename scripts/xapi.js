@@ -54,7 +54,6 @@ export class XA {
 		 */
 		player: new Database("player"),
 
-		region: new Database("region"),
 		buildRegion: new Database("buildRegion"),
 
 		i: new XItemDatabase("items"),

@@ -15,6 +15,7 @@ m`Menu`;
 /**
  * Gameplay modules
  */
+m`Enchantments`;
 m`Indicator`;
 // m`Battle Royal`;
 // m`Airdrops`;
@@ -25,6 +26,6 @@ m`Indicator`;
 m`Test`;
 m`GameTest`;
 // m`Leaderboards`;
-mm("World Edit", { fileName: "WBindex" });
+// mm("World Edit", { fileName: "WBindex" });
 
 m`Objectives`;

@@ -1,7 +1,6 @@
 import { Enchantment } from "@minecraft/server";
 
 /**
- * @type {Enchantment[][]}
+ * @type {{[key: string]: { [key: number]: Enchantment }}}
  */
-export const IllegalInchantments = [];
-
+export const CustomEnchantments = {};

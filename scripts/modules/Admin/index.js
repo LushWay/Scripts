@@ -114,7 +114,7 @@ function options(player) {
 	form.show(player);
 }
 
-/** @type {import("../../lib/Class/XOptions.js").DB} */
+/** @type {import("../../lib/Class/XOptions.js").OPTIONS_DB} */
 const OPTIONS_DB = new Database("options");
 
 /**
