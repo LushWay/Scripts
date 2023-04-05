@@ -5,7 +5,7 @@ import {
 	Vector,
 	world,
 } from "@minecraft/server";
-import { DisplayError, handle, toStr, XA } from "xapi.js";
+import { handle, toStr, XA } from "xapi.js";
 import { benchmark } from "../../lib/Class/XBenchmark.js";
 import { stackParse } from "../../lib/Class/XError.js";
 import { CommandContext } from "../../lib/Command/Context.js";
@@ -15,7 +15,6 @@ import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
 import { CustomEnchantments } from "../Enchantments/var.js";
 import { Region } from "../Region/Region.js";
-import { SERVER } from "../Server/var.js";
 import "./commands/import.js";
 
 /**
@@ -121,16 +120,6 @@ const tests = {
 			(e) => e !== ctx.sender.id
 		);
 		region.update();
-	},
-	20: async () => {
-		DisplayError(new ReferenceError("Test reference error"));
-		try {
-			await world.overworld.runCommandAsync("EEEEEE");
-		} catch (e) {
-			DisplayError(e);
-		}
-		XA.runCommandX("TEST", { showError: true });
-		DisplayError(new TypeError("ADDITION_STACK_TEST"), 0, ["stack1", "stack2"]);
 	},
 	21: (ctx) => {
 		for (let a of [
@@ -305,9 +294,6 @@ const tests = {
 		);
 
 		mainhand.setItem(item);
-	},
-	39(ctx) {
-		world.debug("type ", SERVER.options.type);
 	},
 };
 

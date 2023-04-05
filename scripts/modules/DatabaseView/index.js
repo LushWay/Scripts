@@ -238,7 +238,7 @@ export function visualise_benchmark_result({
  * @param {string} key
  */
 function getPath(key) {
-	("\n" + TIMERS_PATHES[key]).replace(/\n/g, "\n§3| §f");
+	return `\n${TIMERS_PATHES[key]}`.replace(/\n/g, "\n§3| §r");
 }
 
 new XA.Command({

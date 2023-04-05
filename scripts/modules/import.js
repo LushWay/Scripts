@@ -1,31 +1,45 @@
-import "./Server/index.js";
+import { DisplayError } from "../xapi.js";
 
-import "./Admin/index.js";
+const modules = [
+	"./Server/index.js",
 
-import "./DatabaseView/index.js";
+	"./Admin/index.js",
 
-import "./HelpCommand/index.js";
+	"./DatabaseView/index.js",
 
-import "./Chat/index.js";
+	"./HelpCommand/index.js",
 
-import "./OnJoin/join.js";
+	"./Chat/index.js",
 
-import "./Menu/index.js";
+	"./OnJoin/join.js",
 
-/**
- * Gameplay modules
- */
-import "./Enchantments/index.js";
-import "./Indicator/index.js";
-// import "./BattleRoyal/index.js";
-// import "./Airdrops/index.js";
+	"./Menu/index.js",
 
-/**
- * Development modules:
- */
-import "./GameTest/index.js";
-import "./Test/index.js";
-// import "./Leaderboards/index.js";
-import "./World Edit/WBindex.js";
+	/**
+	 * Gameplay modules
+	 */
+	"./Enchantments/index.js",
+	"./Indicator/index.js",
+	// "./BattleRoyal/index.js",
+	// "./Airdrops/index.js",
 
-import "./Objectives/index.js";
+	/**
+	 * Development modules:
+	 */
+	"./GameTest/index.js",
+	"./Test/index.js",
+	"./Leaderboards/index.js",
+	// "./World Edit/WBindex.js",
+
+	"./Objectives/index.js",
+];
+
+export async function loadModules() {
+	for (const module of modules) {
+		try {
+			await import(module);
+		} catch (e) {
+			DisplayError(e, { errorName: "ModuleError" });
+		}
+	}
+}

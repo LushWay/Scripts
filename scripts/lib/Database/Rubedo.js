@@ -1,4 +1,4 @@
-import { ItemStack, MinecraftItemTypes, world } from "@minecraft/server";
+import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
 import { stackParse } from "../Class/XError.js";
 import { DisplayError } from "../Setup/utils.js";
 import { DB } from "./Default.js";
@@ -204,6 +204,8 @@ export class Database {
 			item.setLore([chunks[i]]);
 			inventory.setItem(i, item);
 		}
+
+		DB.backup();
 	}
 
 	/**

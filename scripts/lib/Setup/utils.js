@@ -1,24 +1,27 @@
 import { system, world } from "@minecraft/server";
-import { stackParse } from "../Class/XError.js";
+import { errorMessageParse, stackParse } from "../Class/XError.js";
 import { onWorldLoad } from "./loader.js";
 
 /**
  * Parse and show error in chat
  * @param {{ message: string; stack?: string; name?: string} | string} e
- * @param {number} [deleteStack]
- * @param {string[]} [additionalStack]
+ * @param {object} [arg2]
+ * @param {number} [arg2.deleteStack]
+ * @param {string[]} [arg2.additionalStack]
+ * @param {string} [arg2.errorName]
  */
-export function DisplayError(e, deleteStack = 0, additionalStack = []) {
-	const isStr = typeof e === "string";
-	const stack = stackParse(
-		deleteStack + 1,
-		additionalStack,
-		isStr ? void 0 : e.stack
-	);
-	const message = (isStr ? e : e.message).replace(/\n/g, "");
-	const type = isStr ? "CommandError" : e?.name ?? "Error";
-
-	const text = `§4${type}: §c${message}\n§f${stack}\n`;
+export function DisplayError(
+	e,
+	{ deleteStack = 0, additionalStack = [], errorName = "Error" } = {}
+) {
+	if (typeof e === "string") {
+		e = new Error(e);
+		e.name = "CommandError";
+	}
+	const stack = stackParse(deleteStack + 1, additionalStack, e.stack);
+	const message = errorMessageParse(e);
+	const name = e?.name ?? errorName;
+	const text = `§4${name}: §c${message}\n§f${stack}\n`;
 
 	try {
 		if (onWorldLoad.loaded()) world.say(text);
@@ -197,8 +200,7 @@ export async function handle(func, type = "Handled", additionalStack) {
 				name: type,
 				stack: e?.stack,
 			},
-			1,
-			additionalStack
+			{ additionalStack, deleteStack: 1 }
 		);
 	}
 }

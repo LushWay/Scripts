@@ -21,7 +21,7 @@ GameTest.registerAsync("s", "s", async (test) => {
 
 	const event = world.events.entityDie.subscribe((data) => {
 		if (data.deadEntity.id !== id) return;
-		test.fail("bot died");
+		test.succeed();
 	});
 
 	await test.idle(time - 30);

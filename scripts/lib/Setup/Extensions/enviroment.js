@@ -27,6 +27,8 @@ editMethod(console, "warn", ({ original, args }) => {
 	original(...args.map((e) => (typeof e === "string" ? e : toStr(e))));
 });
 
+globalThis.nextTick = null;
+
 /**
  *
  *

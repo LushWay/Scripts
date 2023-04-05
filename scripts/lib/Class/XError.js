@@ -74,3 +74,27 @@ export function applyToStack(stack, ...lines) {
 	return parsedStack.join("\n");
 }
 
+/** @type {[RegExp | string, string, string?][]} */
+const MESSAGE_REPLACES = [
+	[/\n/g, ""],
+	[
+		/Module \[(.*)\] not found\. Native module error or file not found\./g,
+		"§cNot found: §6$1",
+		"LoadError",
+	],
+];
+
+/**
+ *
+ * @param {Error} error
+ */
+export function errorMessageParse(error) {
+	let message = error.message;
+	for (const [find, replace, newname] of MESSAGE_REPLACES) {
+		const newmessage = message.replace(find, replace);
+		if (newmessage !== message && newname) error.name = newname;
+		message = newmessage;
+	}
+
+	return message;
+}

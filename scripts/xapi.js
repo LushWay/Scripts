@@ -21,8 +21,9 @@ import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
 
 import { CONFIG } from "./config.js";
-import { CatchLoadError, LoadModules } from "./lib/Class/Module.js";
 import { XUtils } from "./lib/Class/XUtils.js";
+import { loadModules } from "./modules/import.js";
+import { DisplayError } from "./xapi.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
@@ -90,8 +91,9 @@ onWorldLoad(
 
 		Database.initAllTables();
 		XA.state.db_loaded = true;
+		await nextTick;
 
-		await LoadModules();
+		await loadModules();
 		XA.state.modules_loaded = true;
 
 		XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
@@ -99,5 +101,5 @@ onWorldLoad(
 		if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
 		else world.say(`§fFirst loaded in ${XA.state.load_time}`);
 	},
-	(fn) => fn().catch((e) => CatchLoadError(e, "X-API Load"))
+	(fn) => fn().catch((e) => DisplayError(e, { errorName: "X-API-ERR" }))
 );

@@ -27,46 +27,11 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
  */
 
 export class DB {
-	/**
-	 * Creates a table entity that is used for data storage
-	 * @param {string} tableType
-	 * @param {string} tableName
-	 * @returns {Entity}
-	 */
-	static createTableEntity(tableType, tableName) {
-		const entity = world.overworld.spawnEntity(
-			DB.ENTITY_IDENTIFIER,
-			DB.ENTITY_LOCATION
-		);
-
-		entity.setDynamicProperty("tableName", tableName);
-		entity.setDynamicProperty("tableType", tableType);
-		entity.nameTag = `§7DB §f${tableName} `;
-
-		return entity;
-	}
-	/**
-	 * A function that returns an array of entities that have the same tableType and tableName.
-	 * @param {string} tableType
-	 * @param {string} tableName
-	 * @returns
-	 */
-	static getTableEntity(tableType, tableName) {
-		try {
-			return this.loadTables().find(
-				(e) => e.tableType === tableType && e.tableName === tableName
-			)?.entity;
-		} catch (e) {
-			DisplayError(e);
-			return null;
-		}
-	}
 	static ENTITY_IDENTIFIER = "rubedo:database";
 	static ENTITY_LOCATION = { x: 0, y: -64, z: 0 };
 	static INVENTORY_SIZE = 96;
 	static CHUNK_REGEXP = /.{1,32000}/g;
 	static MAX_LORE_SIZE = 32000;
-	static BACKUP_NAME = "database";
 	/**
 	 * @type {TABLE[]}
 	 * @private
@@ -126,6 +91,61 @@ export class DB {
 		}
 
 		return this.ALL_TABLE_ENTITIES;
+	}
+	/**
+	 * Creates a table entity that is used for data storage
+	 * @param {string} tableType
+	 * @param {string} tableName
+	 * @returns {Entity}
+	 */
+	static createTableEntity(tableType, tableName) {
+		const entity = world.overworld.spawnEntity(
+			DB.ENTITY_IDENTIFIER,
+			DB.ENTITY_LOCATION
+		);
+
+		entity.setDynamicProperty("tableName", tableName);
+		entity.setDynamicProperty("tableType", tableType);
+		entity.nameTag = `§7DB §f${tableName} `;
+
+		return entity;
+	}
+	/**
+	 * A function that returns an array of entities that have the same tableType and tableName.
+	 * @param {string} tableType
+	 * @param {string} tableName
+	 * @returns
+	 */
+	static getTableEntity(tableType, tableName) {
+		try {
+			return this.loadTables().find(
+				(e) => e.tableType === tableType && e.tableName === tableName
+			)?.entity;
+		} catch (e) {
+			DisplayError(e);
+			return null;
+		}
+	}
+
+	static BACKUP_NAME = "database";
+	static BACKUP_LOCATION = Vector.string(this.ENTITY_LOCATION);
+	static BACKUP_COMMAND = `structure save ${this.BACKUP_NAME} ${this.BACKUP_LOCATION} ${this.BACKUP_LOCATION} true disk false`;
+	/**
+	 * @private
+	 */
+	static WAITING_FOR_BACKUP = false;
+	static backup() {
+		if (this.WAITING_FOR_BACKUP) return;
+
+		system.runTimeout(
+			() => {
+				this.WAITING_FOR_BACKUP = false;
+				world.overworld.runCommand(this.BACKUP_COMMAND);
+			},
+			"database backup",
+			200
+		);
+		this.WAITING_FOR_BACKUP = true;
 	}
 
 	/**
@@ -223,18 +243,6 @@ export class DB {
 	/** @protected */
 	constructor() {}
 }
-
-const STRING_LOC = Vector.string(DB.ENTITY_LOCATION);
-
-system.runInterval(
-	() => {
-		world.overworld.runCommand(
-			`structure save database ${STRING_LOC} ${STRING_LOC} true disk false`
-		);
-	},
-	"database backup",
-	100
-);
 
 export class DatabaseError extends Error {
 	/**
