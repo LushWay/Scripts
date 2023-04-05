@@ -81,12 +81,9 @@ export class DB {
 	static LOAD_TRY = 0;
 	/**
 	 * @private
-	 * @returns {TABLE[]}
 	 */
-	static loadTables() {
-		if (this.ALL_TABLE_ENTITIES) return this.ALL_TABLE_ENTITIES;
-
-		this.ALL_TABLE_ENTITIES = world.overworld
+	static getEntities() {
+		return world.overworld
 			.getEntities({ type: DB.ENTITY_IDENTIFIER })
 			.map((entity) => {
 				let index = entity.getDynamicProperty("index");
@@ -110,30 +107,33 @@ export class DB {
 				};
 			})
 			.filter((e) => e.tableName !== "NOTDB");
-
-		this.LOAD_TRY++;
+	}
+	/**
+	 * @private
+	 * @returns {TABLE[]}
+	 */
+	static loadTables() {
+		if (this.ALL_TABLE_ENTITIES) return this.ALL_TABLE_ENTITIES;
+		this.ALL_TABLE_ENTITIES = this.getEntities();
 
 		if (this.ALL_TABLE_ENTITIES.length < 1) {
-			if (this.LOAD_TRY === 1) {
-				console.warn(
-					"§6Не удалось найти базы данных. Попытка загрузить бэкап..."
-				);
-				world.overworld.runCommand(
-					`structure load ${DB.BACKUP_NAME} ${Vector.string(
-						DB.ENTITY_LOCATION
-					)}`
-				);
-				return this.loadTables();
-			} else if (this.LOAD_TRY === 2) {
-				this.LOAD_TRY = 3;
+			console.warn(
+				"§6Не удалось найти базы данных. Попытка загрузить бэкап..."
+			);
+			world.overworld.runCommand(
+				`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`
+			);
+			this.ALL_TABLE_ENTITIES = this.getEntities();
+
+			if (this.ALL_TABLE_ENTITIES.length < 1) {
 				console.warn("§cНе удалось загрузить базы данных из бэкапа.");
 				return [];
-			}
-		} else if (this.LOAD_TRY === 2)
-			console.warn(
-				"Бэкап успешно загружен! Всего баз данных: " +
-					this.ALL_TABLE_ENTITIES.length
-			);
+			} else
+				console.warn(
+					"Бэкап успешно загружен! Всего баз данных: " +
+						this.ALL_TABLE_ENTITIES.length
+				);
+		}
 
 		return this.ALL_TABLE_ENTITIES;
 	}

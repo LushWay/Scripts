@@ -1,31 +1,31 @@
-// Functions for registering X-API modules
-import { m, mm } from "../lib/Class/Module.js";
+import "./Server/index.js";
 
-/**
- * Common server modules:
- */
-m`Server`;
-m`Admin`;
-m`DatabaseView`;
-m`HelpCommand`;
-m`Chat`;
-mm("OnJoin", { fileName: "join" });
-m`Menu`;
+import "./Admin/index.js";
+
+import "./DatabaseView/index.js";
+
+import "./HelpCommand/index.js";
+
+import "./Chat/index.js";
+
+import "./OnJoin/join.js";
+
+import "./Menu/index.js";
 
 /**
  * Gameplay modules
  */
-m`Enchantments`;
-m`Indicator`;
-// m`Battle Royal`;
-// m`Airdrops`;
+import "./Enchantments/index.js";
+import "./Indicator/index.js";
+// import "./BattleRoyal/index.js";
+// import "./Airdrops/index.js";
 
 /**
  * Development modules:
  */
-m`Test`;
-m`GameTest`;
-// m`Leaderboards`;
-// mm("World Edit", { fileName: "WBindex" });
+import "./GameTest/index.js";
+import "./Test/Test/index.js";
+// import "./Leaderboards/index.js";
+import "./World Edit/WBindex.js";
 
-m`Objectives`;
+import "./Objectives/index.js";

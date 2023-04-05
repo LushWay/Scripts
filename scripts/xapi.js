@@ -24,9 +24,8 @@ import { text } from "./lib/Lang/text.js";
 import { XRunCommand } from "./lib/XRunCommand.js";
 
 import { CONFIG } from "./config.js";
-import { load_modules } from "./lib/Class/Module.js";
+import { CatchLoadError } from "./lib/Class/Module.js";
 import { XUtils } from "./lib/Class/XUtils.js";
-import { DisplayError } from "./lib/Setup/utils.js";
 
 /**
  * Class with all X-API features
@@ -96,10 +95,11 @@ onWorldLoad(async () => {
 	Database.initAllTables();
 	XA.state.db_loaded = true;
 
-	await load_modules();
+	// await LoadModules();
+	await import("modules/Test/e..js");
 	XA.state.modules_loaded = true;
 
 	XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
 	if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
 	else world.say(`§fFirst loaded in ${XA.state.load_time}`);
-}).catch(DisplayError);
+}).catch((e) => CatchLoadError(e, "X-API Load"));
