@@ -161,8 +161,6 @@ export class Database {
 
 		this._.RAW_MEMORY = raw;
 		this._.IS_INITED = true;
-
-		world.debug(this._);
 	}
 
 	/**
