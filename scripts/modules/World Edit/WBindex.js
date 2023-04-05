@@ -2,8 +2,9 @@ import { Player, system, Vector, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 
 import "./commands/index.js";
-import { CONFIG_WB } from "./config.js";
 import "./helpers/import.js";
+
+import { CONFIG_WB } from "./config.js";
 import { FillFloor } from "./modules/builders/FillBuilder.js";
 import { Shape } from "./modules/builders/ShapeBuilder.js";
 import { WorldEditBuild } from "./modules/builders/WorldEditBuilder.js";

@@ -1,5 +1,6 @@
-import { system } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import { stackParse } from "../Class/XError.js";
+import { onWorldLoad } from "./loader.js";
 
 /**
  * Parse and show error in chat
@@ -20,10 +21,10 @@ export function DisplayError(e, deleteStack = 0, additionalStack = []) {
 	const text = `§4${type}: §c${message}\n§f${stack}\n`;
 
 	try {
-		if (false) {
-		}
-		// if (onWorldLoad.loaded()) world.say(text);
+		if (onWorldLoad.loaded()) world.say(text);
 		else console.error(text);
+
+		console.log(text);
 	} catch (e) {}
 }
 
@@ -201,4 +202,3 @@ export async function handle(func, type = "Handled", additionalStack) {
 		);
 	}
 }
-

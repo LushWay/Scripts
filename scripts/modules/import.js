@@ -24,7 +24,7 @@ import "./Indicator/index.js";
  * Development modules:
  */
 import "./GameTest/index.js";
-import "./Test/Test/index.js";
+import "./Test/index.js";
 // import "./Leaderboards/index.js";
 import "./World Edit/WBindex.js";
 

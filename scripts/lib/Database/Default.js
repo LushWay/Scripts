@@ -3,6 +3,7 @@ import {
 	Entity,
 	EntityTypes,
 	Vector,
+	system,
 	world,
 } from "@minecraft/server";
 import { DisplayError } from "../Setup/utils.js";
@@ -11,7 +12,6 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
 	def.defineString("tableName", 30);
 	def.defineString("tableType", 30);
-	def.defineNumber("index");
 	propertyRegistry.registerEntityTypeDynamicProperties(
 		def,
 		EntityTypes.get(DB.ENTITY_IDENTIFIER)
@@ -21,7 +21,6 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 /**
  * @typedef {{
  *   entity: Entity;
- *   index: number;
  *   tableName: string | number | boolean;
  *   tableType: string | number | boolean;
  * }} TABLE
@@ -30,12 +29,11 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 export class DB {
 	/**
 	 * Creates a table entity that is used for data storage
-	 * @param {string} tableName  undefined
 	 * @param {string} tableType
-	 * @param {number} [index] if not specified no index will be set
-	 * @returns {Entity} *
+	 * @param {string} tableName
+	 * @returns {Entity}
 	 */
-	static createTableEntity(tableName, tableType, index = 0) {
+	static createTableEntity(tableType, tableName) {
 		const entity = world.overworld.spawnEntity(
 			DB.ENTITY_IDENTIFIER,
 			DB.ENTITY_LOCATION
@@ -43,10 +41,7 @@ export class DB {
 
 		entity.setDynamicProperty("tableName", tableName);
 		entity.setDynamicProperty("tableType", tableType);
-		entity.setDynamicProperty("index", index);
 		entity.nameTag = `§7DB §f${tableName} `;
-
-		entity.runCommand("structure save database ~~~ ~~~ true disk false");
 
 		return entity;
 	}
@@ -56,20 +51,19 @@ export class DB {
 	 * @param {string} tableName
 	 * @returns
 	 */
-	static getTableEntities(tableType, tableName) {
+	static getTableEntity(tableType, tableName) {
 		try {
-			return this.loadTables()
-				.filter((e) => e.tableType === tableType && e.tableName === tableName)
-				.sort((a, b) => a.index - b.index)
-				.map((e) => e.entity);
+			return this.loadTables().find(
+				(e) => e.tableType === tableType && e.tableName === tableName
+			)?.entity;
 		} catch (e) {
 			DisplayError(e);
-			return [];
+			return null;
 		}
 	}
 	static ENTITY_IDENTIFIER = "rubedo:database";
 	static ENTITY_LOCATION = { x: 0, y: -64, z: 0 };
-	static INVENTORY_SIZE = 54;
+	static INVENTORY_SIZE = 96;
 	static CHUNK_REGEXP = /.{1,32000}/g;
 	static MAX_LORE_SIZE = 32000;
 	static BACKUP_NAME = "database";
@@ -86,14 +80,11 @@ export class DB {
 		return world.overworld
 			.getEntities({ type: DB.ENTITY_IDENTIFIER })
 			.map((entity) => {
-				let index = entity.getDynamicProperty("index");
-				if (typeof index !== "number") index = 0;
-
 				const tableType = entity.getDynamicProperty("tableType");
 				const tableName = entity.getDynamicProperty("tableName");
 
 				if (typeof tableName !== "string" || typeof tableType !== "string")
-					return { entity, index, tableName: "NOTDB", tableType: "NONE" };
+					return { entity, tableName: "NOTDB", tableType: "NONE" };
 
 				if (Vector.distance(entity.location, DB.ENTITY_LOCATION) > 1) {
 					entity.teleport(DB.ENTITY_LOCATION);
@@ -101,7 +92,6 @@ export class DB {
 
 				return {
 					entity,
-					index,
 					tableName,
 					tableType,
 				};
@@ -232,4 +222,26 @@ export class DB {
 
 	/** @protected */
 	constructor() {}
+}
+
+const STRING_LOC = Vector.string(DB.ENTITY_LOCATION);
+
+system.runInterval(
+	() => {
+		world.overworld.runCommand(
+			`structure save database ${STRING_LOC} ${STRING_LOC} true disk false`
+		);
+	},
+	"database backup",
+	100
+);
+
+export class DatabaseError extends Error {
+	/**
+	 *
+	 * @param {string} message
+	 */
+	constructor(message) {
+		super(message);
+	}
 }

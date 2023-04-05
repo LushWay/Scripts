@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
 /** @type {Database<string, {role: keyof typeof ROLES}>} */
@@ -39,6 +39,8 @@ export const ROLES_NAMES = {
  * @example getRole("23529890")
  */
 export function getRole(playerID) {
+	world.debug(table._);
+
 	if (playerID instanceof Player) playerID = playerID.id;
 
 	const role = table.get(playerID).role;

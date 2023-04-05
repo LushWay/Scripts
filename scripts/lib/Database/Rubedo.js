@@ -1,4 +1,5 @@
-import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
+import { ItemStack, MinecraftItemTypes, world } from "@minecraft/server";
+import { stackParse } from "../Class/XError.js";
 import { DisplayError } from "../Setup/utils.js";
 import { DB } from "./Default.js";
 
@@ -18,14 +19,11 @@ export class Database {
 	 * @returns {Source}
 	 */
 	static eventProxy(source, events) {
-		/**
-		 * @type {{_: Pick<Source["_"], "EVENTS">}}
-		 */
-		const proxy = {
-			...source,
-			_: { ...source._, EVENTS: events },
-		};
-		return Object.setPrototypeOf(proxy, source);
+		const proxy = { _: { EVENTS: events, PROXY_PATH: stackParse(1) } };
+		Object.setPrototypeOf(proxy, source);
+		Object.setPrototypeOf(proxy._, source._);
+		// @ts-expect-error
+		return proxy;
 	}
 	static initAllTables() {
 		this.isTablesInited = true;
@@ -94,6 +92,7 @@ export class Database {
 
 			return this.parent.MEMORY;
 		},
+		PATH: "",
 	};
 
 	/**
@@ -112,6 +111,7 @@ export class Database {
 		}
 
 		this._.TABLE_NAME = tableName;
+		this._.PATH = stackParse();
 		if (events) this._.EVENTS = events;
 		if (Database.isTablesInited) this.init();
 
@@ -122,9 +122,9 @@ export class Database {
 	 * @private
 	 */
 	init() {
-		let entities = DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
+		const entity = DB.getTableEntity(TABLE_TYPE, this._.TABLE_NAME);
 
-		if (entities.length < 1) {
+		if (!entity) {
 			/** @private */
 			this.noMemory = true;
 
@@ -141,13 +141,11 @@ export class Database {
 		}
 
 		let raw = "";
-		for (const entity of entities) {
-			const inventory = entity.getComponent("inventory").container;
-			for (let i = 0; i < inventory.size; i++) {
-				const item = inventory.getItem(i);
-				if (!item) continue;
-				raw += item.getLore().join("");
-			}
+		const inventory = entity.getComponent("inventory").container;
+		for (let i = 0; i < inventory.size; i++) {
+			const item = inventory.getItem(i);
+			if (!item) continue;
+			raw += item.getLore().join("");
 		}
 
 		try {
@@ -163,6 +161,8 @@ export class Database {
 
 		this._.RAW_MEMORY = raw;
 		this._.IS_INITED = true;
+
+		world.debug(this._);
 	}
 
 	/**
@@ -183,40 +183,28 @@ export class Database {
 
 		/**
 		 * The split chunks of the stringified data, This is done because we can
-		 * only store {@link MAX_DATABASE_STRING_SIZE} chars in a single lore
+		 * only store {@link DB.MAX_LORE_SIZE} chars in a single lore
 		 */
-		let chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
+		const chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
+		const entity =
+			DB.getTableEntity(TABLE_TYPE, this._.TABLE_NAME) ??
+			DB.createTableEntity(TABLE_TYPE, this._.TABLE_NAME);
+		const inventory = entity.getComponent("inventory").container;
 
-		const entities = DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
-		const totalEntities = Math.ceil(chunks.length / DB.INVENTORY_SIZE);
-		const entitiesToSpawn = totalEntities - entities.length;
+		inventory.clearAll();
 
-		if (entitiesToSpawn > 0) {
-			for (let i = 0; i < entitiesToSpawn; i++) {
-				entities.push(DB.createTableEntity(this._.TABLE_NAME, TABLE_TYPE, i));
-			}
+		if (chunks.length > inventory.size) {
+			return DisplayError(
+				new DatabaseError(
+					"Too many data tried saved to table " + this._.TABLE_NAME
+				)
+			);
 		}
 
-		let chunkIndex = 0;
-		for (const [i, entity] of entities.entries()) {
-			const inventory = entity.getComponent("inventory").container;
-			inventory.clearAll();
-
-			while (chunkIndex < chunks.length && inventory.size > 0) {
-				let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
-				item.setLore([chunks[chunkIndex]]);
-				inventory.setItem(i, item);
-				chunkIndex++;
-			}
-			entity.setDynamicProperty("index", i);
-		}
-		// Check for unUsed entities and despawn them
-		for (
-			let i = entities.length - 1;
-			i >= chunkIndex / DB.INVENTORY_SIZE;
-			i--
-		) {
-			entities[i].triggerEvent("despawn");
+		for (let i = 0; i < chunks.length; i++) {
+			let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
+			item.setLore([chunks[i]]);
+			inventory.setItem(i, item);
 		}
 	}
 

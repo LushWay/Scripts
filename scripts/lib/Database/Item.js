@@ -1,4 +1,4 @@
-import { ItemStack } from "@minecraft/server";
+import { Entity, ItemStack } from "@minecraft/server";
 import { DB } from "./Default.js";
 
 /**
@@ -29,9 +29,16 @@ export class XItemDatabase {
 		this._.TABLE_NAME = TABLE_NAME;
 	}
 
+	/**
+	 * @type {Entity}
+	 * @private
+	 */
+	entity = null;
+
 	/** @private */
-	get ENTITIES() {
-		return DB.getTableEntities(TABLE_TYPE, this._.TABLE_NAME);
+	get ENTITY() {
+		this.entity ??= DB.getTableEntity(TABLE_TYPE, this._.TABLE_NAME);
+		return this.entity;
 	}
 
 	/**
@@ -40,16 +47,16 @@ export class XItemDatabase {
 	 * @private
 	 */
 	get ITEMS() {
-		let ITEMS = [];
-		for (const entity of this.ENTITIES) {
-			const inventory = entity.getComponent("inventory").container;
+		const ITEMS = [];
 
-			for (let i = 0; i < inventory.size; i++) {
-				const item = inventory.getItem(i);
-				if (!item) continue;
-				ITEMS.push(item);
-			}
+		const inventory = this.entity.getComponent("inventory").container;
+
+		for (let i = 0; i < inventory.size; i++) {
+			const item = inventory.getItem(i);
+			if (!item) continue;
+			ITEMS.push(item);
 		}
+
 		return ITEMS;
 	}
 
@@ -78,17 +85,7 @@ export class XItemDatabase {
 	 *
 	 */
 	add(item, id = null) {
-		let entity =
-			this.ENTITIES.find(
-				(e) => e.getComponent("inventory").container.emptySlotsCount > 0
-			) ??
-			DB.createTableEntity(
-				this._.TABLE_NAME,
-				TABLE_TYPE,
-				this.ENTITIES.length + 1
-			);
-
-		const inventory = entity.getComponent("inventory").container;
+		const inventory = this.entity.getComponent("inventory").container;
 		const ID = id ?? Date.now().toString();
 		const lore = item.getLore();
 		lore.unshift(ID);
@@ -104,16 +101,15 @@ export class XItemDatabase {
 	 * @returns {boolean} If it deleted or not
 	 */
 	delete(id) {
-		for (const entity of this.ENTITIES) {
-			const inventory = entity.getComponent("inventory").container;
-			for (let i = 0; i < inventory.size; i++) {
-				const item = inventory.getItem(i);
+		const inventory = this.entity.getComponent("inventory").container;
+		for (let i = 0; i < inventory.size; i++) {
+			const item = inventory.getItem(i);
 
-				if (!item || item.getLore()[0] !== id) continue;
-				inventory.setItem(i, new ItemStack({ id: "minecraft:air" }));
-				return true;
-			}
+			if (!item || item.getLore()[0] !== id) continue;
+			inventory.setItem(i, new ItemStack({ id: "minecraft:air" }));
+			return true;
 		}
+
 		return false;
 	}
 }

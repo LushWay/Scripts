@@ -1,8 +1,5 @@
 import { world } from "@minecraft/server";
 
-world.say("§9┌ §fLoading...");
-let loading = Date.now();
-
 // This need to be loaded before all another scripts
 import "./lib/Setup/watchdog.js";
 
@@ -18,14 +15,17 @@ import { XRequest } from "./lib/Class/XRequest.js";
 import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
 
+import { XRunCommand } from "./lib/Class/XRunCommand.js";
 import { XItemDatabase } from "./lib/Database/Item.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
-import { XRunCommand } from "./lib/XRunCommand.js";
 
 import { CONFIG } from "./config.js";
-import { CatchLoadError } from "./lib/Class/Module.js";
+import { CatchLoadError, LoadModules } from "./lib/Class/Module.js";
 import { XUtils } from "./lib/Class/XUtils.js";
+
+world.say("§9┌ §fLoading...");
+let loading = Date.now();
 
 /**
  * Class with all X-API features
@@ -72,16 +72,11 @@ export class XA {
 
 globalThis.XA = XA;
 
+export * from "./lib/Setup/Extensions/system.js";
 export * from "./lib/Setup/loader.js";
+export * from "./lib/Setup/prototypes.js";
 export * from "./lib/Setup/roles.js";
-export * from "./lib/Setup/timers.js";
 export * from "./lib/Setup/utils.js";
-
-/**
- * Importing file from dir of the project
- * @param {string} path
- */
-globalThis.DIR_IMPORT = (path) => import(path);
 
 world.events.playerJoin.subscribe(() => {
 	if (Date.now() - loading < CONFIG.firstPlayerJoinTime) {
@@ -89,17 +84,20 @@ world.events.playerJoin.subscribe(() => {
 	}
 });
 
-onWorldLoad(async () => {
-	XA.state.world_loaded = true;
+onWorldLoad(
+	async () => {
+		XA.state.world_loaded = true;
 
-	Database.initAllTables();
-	XA.state.db_loaded = true;
+		Database.initAllTables();
+		XA.state.db_loaded = true;
 
-	// await LoadModules();
-	await import("modules/Test/e..js");
-	XA.state.modules_loaded = true;
+		await LoadModules();
+		XA.state.modules_loaded = true;
 
-	XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
-	if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
-	else world.say(`§fFirst loaded in ${XA.state.load_time}`);
-}).catch((e) => CatchLoadError(e, "X-API Load"));
+		XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
+
+		if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
+		else world.say(`§fFirst loaded in ${XA.state.load_time}`);
+	},
+	(fn) => fn().catch((e) => CatchLoadError(e, "X-API Load"))
+);

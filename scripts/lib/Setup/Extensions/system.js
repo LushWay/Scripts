@@ -1,8 +1,8 @@
 import { System, system, world } from "@minecraft/server";
-import { handle } from "../../xapi.js";
-import { stackParse } from "../Class/XError.js";
-import { benchmark } from "../XBenchmark.js";
-import { addMethod, editMethod } from "./patcher.js";
+import { handle } from "../../../xapi.js";
+import { benchmark } from "../../Class/XBenchmark.js";
+import { stackParse } from "../../Class/XError.js";
+import { addMethod, editMethod } from "../patcher.js";
 
 /**
  * @type {Record<string, string>}
@@ -80,4 +80,3 @@ addMethod(System.prototype, "runPlayerInterval", function (fn, name, ticks) {
 			console.warn(`Found slow players interval at:\n${path}`);
 	}, ticks);
 });
-

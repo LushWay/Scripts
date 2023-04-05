@@ -1,8 +1,8 @@
 import { Player, system, world } from "@minecraft/server";
+import { BECHMARK_RESULTS } from "../../lib/Class/XBenchmark.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { BECHMARK_RESULTS } from "../../lib/XBenchmark.js";
 import { DisplayError, TIMERS_PATHES, XA, handle, toStr } from "../../xapi.js";
 
 /**

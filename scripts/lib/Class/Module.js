@@ -17,8 +17,10 @@ export function CatchLoadError(e, name) {
 	});
 }
 
-export function LoadModules() {
-	const promise = import("../../modules/import.js");
-	promise.catch((e) => CatchLoadError(e, "X-API Module"));
-	return promise;
+export async function LoadModules() {
+	try {
+		await import("../../modules/import.js");
+	} catch (e) {
+		CatchLoadError(e, "X-API Module");
+	}
 }

@@ -17,7 +17,7 @@ var ON_LOAD_PROMISE = new Promise((resolve) =>
 		console.warn("WORLD LOADED");
 
 		WORLD_IS_LOADED = true;
-		ON_LOAD_CALLBACKS.forEach((callback) => handle(callback));
+		ON_LOAD_CALLBACKS.forEach((callback) => callback());
 
 		resolve();
 	})
@@ -25,16 +25,17 @@ var ON_LOAD_PROMISE = new Promise((resolve) =>
 
 /**
  * Runs function when first player was found by scrpits. Automatically catches any error Uses "testfor" and runCommandAsync underhood.
- * @param {Function} callback
- * @returns {Promise<void>}
+ * @template {Function} FN
+ * @param {FN} callback
+ * @param {(func: FN) => any} handler
+ * @returns {void}
  */
-export async function onWorldLoad(callback) {
-	if (WORLD_IS_LOADED) return handle(callback);
+export function onWorldLoad(callback, handler = (func) => handle(func)) {
+	if (WORLD_IS_LOADED) return handler(callback);
 
-	ON_LOAD_CALLBACKS.push(() => handle(callback));
+	ON_LOAD_CALLBACKS.push(() => handler(callback));
 }
 
 // To not export rare usable things, i put them to exported function
 onWorldLoad.promise = ON_LOAD_PROMISE;
-onWorldLoad.callbacks = ON_LOAD_CALLBACKS;
 onWorldLoad.loaded = () => WORLD_IS_LOADED;

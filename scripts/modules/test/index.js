@@ -6,13 +6,13 @@ import {
 	world,
 } from "@minecraft/server";
 import { DisplayError, handle, toStr, XA } from "xapi.js";
+import { benchmark } from "../../lib/Class/XBenchmark.js";
 import { stackParse } from "../../lib/Class/XError.js";
 import { CommandContext } from "../../lib/Command/Context.js";
 import { Database } from "../../lib/Database/Rubedo.js";
 import { ActionForm } from "../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../lib/Form/MessageForm.js";
 import { ModalForm } from "../../lib/Form/ModelForm.js";
-import { benchmark } from "../../lib/XBenchmark.js";
 import { CustomEnchantments } from "../Enchantments/var.js";
 import { Region } from "../Region/Region.js";
 import { SERVER } from "../Server/var.js";
