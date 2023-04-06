@@ -1,37 +1,31 @@
-import { DisplayError } from "../xapi.js";
+import { DisplayError } from "xapi.js";
 
 const modules = [
-	"./Server/index.js",
-
-	"./Admin/index.js",
-
-	"./DatabaseView/index.js",
-
-	"./HelpCommand/index.js",
-
-	"./Chat/index.js",
-
-	"./OnJoin/join.js",
-
-	"./Menu/index.js",
+	"./Server/Server/index.js",
+	"./Server/Admin/index.js",
+	"./Server/DatabaseView/index.js",
+	"./Server/HelpCommand/index.js",
+	"./Server/Chat/index.js",
+	"./Server/OnJoin/join.js",
+	"./Server/Menu/index.js",
+	"./Server/Leaderboards/index.js",
 
 	/**
 	 * Gameplay modules
 	 */
-	"./Enchantments/index.js",
-	"./Indicator/index.js",
-	// "./BattleRoyal/index.js",
-	// "./Airdrops/index.js",
+	"./Gameplay/Enchantments/index.js",
+	"./Gameplay/Indicator/index.js",
+	// "./Gameplay/BattleRoyal/index.js",
+	// "./Gameplay/Airdrops/index.js",
 
 	/**
 	 * Development modules:
 	 */
-	"./GameTest/index.js",
-	"./Test/index.js",
-	"./Leaderboards/index.js",
-	// "./World Edit/WBindex.js",
+	"./Development/GameTest/index.js",
+	"./Development/Test/index.js",
+	// "./Development/World Edit/WBindex.js",
 
-	"./Objectives/index.js",
+	"./Server/Objectives/index.js",
 ];
 
 export async function loadModules() {

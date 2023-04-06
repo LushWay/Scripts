@@ -43,6 +43,8 @@ export class MessageForm {
 		this.form = new MessageFormData();
 		if (title) this.form.title(title);
 		if (body) this.form.body(body);
+		this.setButton1("Ок", () => 0);
+		this.setButton2("", () => 0);
 		this.triedToShow = 0;
 	}
 	/**
@@ -80,9 +82,11 @@ export class MessageForm {
 	 */
 	async show(player) {
 		const response = await XShowForm(this.form, player);
-		if (response === false || !(response instanceof MessageFormResponse)) return;
-		if (response.selection === 1) handle(this.button1?.callback, null, ["MessageFormCallback"]);
-		if (response.selection === 0) handle(this.button2?.callback, null, ["MessageFormCallback"]);
+		if (response === false || !(response instanceof MessageFormResponse))
+			return;
+		if (response.selection === 1)
+			handle(this.button1?.callback, null, ["MessageFormCallback"]);
+		if (response.selection === 0)
+			handle(this.button2?.callback, null, ["MessageFormCallback"]);
 	}
 }
-

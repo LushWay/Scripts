@@ -86,10 +86,10 @@ const MESSAGE_REPLACES = [
 
 /**
  *
- * @param {Error} error
+ * @param {{message?: string, name?: string}} error
  */
 export function errorMessageParse(error) {
-	let message = error.message;
+	let message = error.message ?? "";
 	for (const [find, replace, newname] of MESSAGE_REPLACES) {
 		const newmessage = message.replace(find, replace);
 		if (newmessage !== message && newname) error.name = newname;
