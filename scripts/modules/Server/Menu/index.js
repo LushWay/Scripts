@@ -2,8 +2,9 @@ import { ItemLockMode, ItemStack, Player, world } from "@minecraft/server";
 import { XA, handle } from "xapi.js";
 import { CONFIG_MENU } from "./var.js";
 
-world.events.beforeItemUse.subscribe(async ({ source: player, item }) => {
-	if (item.typeId !== CONFIG_MENU.itemId || !(player instanceof Player)) return;
+world.events.itemUse.subscribe(async ({ source: player, itemStack }) => {
+	if (itemStack.typeId !== CONFIG_MENU.itemId || !(player instanceof Player))
+		return;
 	handle(() => {
 		const menu = CONFIG_MENU.menu(player);
 		if (menu === false) return;

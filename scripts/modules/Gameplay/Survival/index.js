@@ -3,7 +3,7 @@ import { Region } from "../../Server/Region/Region.js";
 import { setRegionGuards } from "../../Server/Region/index.js";
 import { RaidNotify } from "./var.js";
 
-world.events.beforeExplosion.subscribe((data) => {
+world.beforeEvents.explosion.subscribe((data) => {
 	for (const bl of data.getImpactedBlocks()) {
 		let region = Region.blockLocationInRegion(bl, data.dimension.id);
 		if (region && !region.permissions.pvp) return (data.cancel = true);

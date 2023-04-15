@@ -1,9 +1,9 @@
-import { BeforeChatEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { XCommand } from "./index.js";
 
 export class CommandContext {
 	/**
-	 * @type {BeforeChatEvent}
+	 * @type {ChatSendAfterEvent}
 	 */
 	data;
 
@@ -24,7 +24,7 @@ export class CommandContext {
 
 	/**
 	 * Returns a commands callback
-	 * @param {BeforeChatEvent} data chat data that was used
+	 * @param {ChatSendAfterEvent} data chat data that was used
 	 * @param {string[]} args
 	 * @param {XCommand} command
 	 * @param {string} rawInput
@@ -53,4 +53,3 @@ export class CommandContext {
 		this.sender.tell(`§c${errorText}`);
 	}
 }
-

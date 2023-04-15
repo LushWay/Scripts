@@ -61,7 +61,7 @@ system.runInterval(
 			if (!entity) {
 				getIndicators()
 					.find((e) => e.id === info.indicator)
-					?.kill();
+					?.triggerEvent("f:t:kill");
 
 				delete HURT_ENTITIES[id];
 				continue;

@@ -24,7 +24,7 @@ setRegionGuards(
 );
 
 Region.DEFAULT_REGION_PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES;
-world.events.beforeExplosion.subscribe((data) => (data.cancel = true));
+world.beforeEvents.explosion.subscribe((data) => (data.cancel = true));
 
 const EFFECT_Y = -53;
 const TP_Y = -63;
@@ -32,15 +32,9 @@ const TP_TO = TP_Y + 5;
 
 system.runPlayerInterval((player) => {
 	const loc = player.location;
-	const rotation = player.getRotation();
 	if (loc.y >= EFFECT_Y + 1) return;
 	if (loc.y < EFFECT_Y)
 		player.addEffect(MinecraftEffectTypes.levitation, 3, 7, false);
-	if (loc.y < TP_Y)
-		player.teleport(
-			{ x: loc.x, y: TP_TO, z: loc.z },
-			player.dimension,
-			rotation.x,
-			rotation.y
-		);
+
+	if (loc.y < TP_Y) player.teleport({ x: loc.x, y: TP_TO, z: loc.z });
 }, "underground effects");

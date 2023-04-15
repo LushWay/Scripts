@@ -8,20 +8,19 @@ import "./lib/Setup/prototypes.js";
 import { onWorldLoad } from "./lib/Setup/loader.js";
 
 // X-API methods
+import { XCooldown } from "./lib/Class/Cooldown.js";
 import { XEntity } from "./lib/Class/Entity.js";
-import { XCooldown } from "./lib/Class/XCooldown.js";
-import { XOptions, XPlayerOptions } from "./lib/Class/XOptions.js";
-import { XRequest } from "./lib/Class/XRequest.js";
+import { XOptions, XPlayerOptions } from "./lib/Class/Options.js";
+import { XRequest } from "./lib/Class/Request.js";
 import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
 
-import { XRunCommand } from "./lib/Class/XRunCommand.js";
-import { XItemDatabase } from "./lib/Database/Item.js";
+import { XRunCommand } from "./lib/Class/RunCommand.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
 
 import { CONFIG } from "./config.js";
-import { XUtils } from "./lib/Class/XUtils.js";
+import { XUtils } from "./lib/Class/Utils.js";
 import { loadModules } from "./modules/import.js";
 import { DisplayError } from "./xapi.js";
 
@@ -53,10 +52,6 @@ export class XA {
 		 * @type {Database<string, any>}
 		 */
 		player: new Database("player"),
-
-		buildRegion: new Database("buildRegion"),
-
-		i: new XItemDatabase("items"),
 	};
 
 	static state = {

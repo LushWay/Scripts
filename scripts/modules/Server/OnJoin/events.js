@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { Subscriber } from "lib/Class/XEvents.js";
+import { Subscriber } from "lib/Class/Events.js";
 
 /** @type {Subscriber<Player>} */
 const PlayerJoin = new Subscriber();

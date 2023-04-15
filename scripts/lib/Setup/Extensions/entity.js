@@ -1,4 +1,4 @@
-import { Entity, EntityDamageCause, GameMode, Player } from "@minecraft/server";
+import { EntityDamageCause, GameMode, Player } from "@minecraft/server";
 import { addMethod, editMethod } from "../patcher.js";
 
 /**
@@ -19,31 +19,6 @@ addMethod(
 		target.applyKnockback(view.x, view.z, hStrength, vStrength);
 	}
 );
-
-/**
- *
- * @param {{original: Entity["teleport"], args: Parameters<Entity["teleport"]>, context: Entity}} param0
- * @returns
- */
-function teleport({
-	original,
-	args: [location, dimension, xRot, yRot, keepVelocity],
-	context,
-}) {
-	if (typeof xRot === "undefined" || typeof yRot === "undefined") {
-		const rotation = context.getRotation();
-		xRot = rotation.x;
-		yRot = rotation.y;
-	}
-
-	keepVelocity ??= false;
-	dimension ??= context.dimension;
-
-	return original(location, dimension, xRot, yRot, keepVelocity);
-}
-
-editMethod(Player.prototype, "teleport", teleport);
-editMethod(Entity.prototype, "teleport", teleport);
 
 addMethod(Player.prototype, "isGamemode", function (mode) {
 	return !!this.dimension

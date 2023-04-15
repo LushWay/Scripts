@@ -1,7 +1,7 @@
 import { System, system, world } from "@minecraft/server";
 import { handle } from "../../../xapi.js";
-import { benchmark } from "../../Class/XBenchmark.js";
-import { stackParse } from "../../Class/XError.js";
+import { benchmark } from "../../Class/Benchmark.js";
+import { stackParse } from "../../Class/Error.js";
 import { addMethod, editMethod } from "../patcher.js";
 
 /**

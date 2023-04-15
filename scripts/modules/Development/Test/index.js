@@ -1,20 +1,13 @@
-import {
-	EquipmentSlot,
-	MinecraftEnchantmentTypes,
-	system,
-	Vector,
-	world,
-} from "@minecraft/server";
-import { benchmark } from "lib/Class/XBenchmark.js";
-import { stackParse } from "lib/Class/XError.js";
+import { ItemStack, Items, Vector, system, world } from "@minecraft/server";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { handle, toStr, XA } from "xapi.js";
-import { CustomEnchantments } from "../../Gameplay/Enchantments/var.js";
+import { XA, handle, toStr } from "xapi.js";
+import { DB } from "../../../lib/Database/Default.js";
+import { InventoryStore } from "../../../lib/Database/Inventory.js";
 import { Region } from "../../Server/Region/Region.js";
-import "./commands/import.js";
+import "./enchant.js";
 
 /**
  * @typedef {{x: number, z: number}} IRegionCords
@@ -44,71 +37,8 @@ const tests = {
 		);
 		menu.show(ctx.sender);
 	},
-	8: () => {
-		throw new Error("ERR");
-	},
-	10: (ctx) => {
-		let e = 1;
-
-		const r = () => {
-			e++;
-			if (e > 10) {
-				handle(tests[11]);
-			} else {
-				world.say(e + "");
-				system.run(r);
-			}
-		};
-		system.run(r);
-	},
 	13: (ctx) => {
 		ctx.reply(toStr(ctx.sender.getComponents()));
-	},
-	14: () => {
-		world.say(bigdata.length + "");
-		done = true;
-	},
-	16: async (ctx) => {
-		if (!bigdata) {
-			for (let i = 0; i < 42949672; i++) {
-				if (done) break;
-				if (i % 10000 === 0) {
-					world.say(i + "");
-					await system.sleep(1);
-				}
-				bigdata += "1";
-			}
-			ctx.reply("String generated");
-		}
-
-		for (let i = 0; i < 1000; i++) {
-			if (i % 5 === 0) await system.sleep(1);
-			const end1 = benchmark("SetMaxValueSpeed");
-			world.setDynamicProperty("speed_test", bigdata);
-			end1();
-		}
-		ctx.reply("Set test done");
-
-		let e = 0;
-
-		for (let i = 0; i < 1000; i++) {
-			if (i % 5 === 0) await system.sleep(1);
-			const end1 = benchmark("GetMaxValueSpeed");
-			const data = world.getDynamicProperty("speed_test");
-			if (!e) {
-				e = 1;
-				if (typeof data === "string")
-					world.say(`${data.length}  ${data === bigdata}`);
-			}
-			end1();
-		}
-		ctx.reply("Get test done");
-	},
-	17: (ctx) => {
-		const end = benchmark("PROP");
-		const prop = world.getDynamicProperty("speed_test");
-		if (typeof prop === "string") ctx.reply(prop.length);
-		end();
 	},
 	18: (ctx) => {
 		const region = Region.blockLocationInRegion(
@@ -148,28 +78,6 @@ const tests = {
 			);
 		}
 	},
-	27(ctx) {
-		system.run(() => {
-			world.say(stackParse());
-		});
-	},
-	async 28(ctx) {
-		for (const player of world.getPlayers()) {
-			async function run() {
-				const block = await XA.Utils.selectBlock(player);
-				world.say(toStr(block));
-			}
-			run();
-		}
-	},
-	30(ctx) {
-		const pos1 = Vector.floor(ctx.sender.location);
-		const pos2 = Vector.add(pos1, Vector.down);
-		const block = ctx.sender.dimension.getBlock(pos2);
-
-		world.debug(block.getTags());
-		world.debug(block.permutation.getAllProperties());
-	},
 	31(ctx) {
 		const reg = Region.blockLocationInRegion(
 			ctx.sender.location,
@@ -182,64 +90,79 @@ const tests = {
 		);
 		reg.update();
 	},
-	32(ctx) {
-		const show = () => {
-			new ModalForm("Tet")
-				.addTextField(
-					text.replace(/\\n/g, "\n") || "input and submit",
-					"",
-					text
-				)
-				.show(ctx.sender, (_, text2) => {
-					text = text2;
-					world.say(text2);
-					show();
-				});
-		};
 
-		show();
+	40(ctx) {
+		if (ctx.args[1] === "in") {
+			Store.saveFromEntity(ctx.sender);
+			InventoryStore.load(ctx.sender, {
+				xp: 0,
+				health: 10,
+				equipment: {},
+				slots: [new ItemStack(Items.get("xa:menu"))],
+			});
+		} else {
+			InventoryStore.load(ctx.sender, Store.getEntityStore(ctx.sender.id));
+		}
 	},
-	33(ctx) {
-		const item = ctx.sender
-			.getComponent("inventory")
-			.container.getItem(ctx.sender.selectedSlot);
-
-		world.debug([...item.getComponent("enchantments").enchantments]);
-
-		const nitem = ctx.sender
-			.getComponent("inventory")
-			.container.getItem(ctx.sender.selectedSlot + 1);
-
-		nitem.getComponent("enchantments").enchantments =
-			nitem.getComponent("enchantments").enchantments;
-
-		world.debug([...nitem.getComponent("enchantments").enchantments]);
-	},
-	38(ctx) {
-		const mainhand = ctx.sender
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
-
-		const item = mainhand.getItem();
-		const { enchantments } = item.getComponent("enchantments");
-		enchantments.removeEnchantment(MinecraftEnchantmentTypes.sharpness);
-		enchantments.addEnchantment(
-			CustomEnchantments[MinecraftEnchantmentTypes.sharpness.id][10]
-		);
+	41(ctx) {
 		world.debug(
-			"enchs",
-			CustomEnchantments[MinecraftEnchantmentTypes.sharpness.id][10]
+			"test41",
+			{ DB },
+			world.overworld.getEntities({ type: DB.ENTITY_IDENTIFIER }).map((e) => {
+				const { nameTag, location } = e;
+				const type = e.getDynamicProperty("tableType");
+				let data = "";
+				const a = e.getComponent("inventory").container;
+				for (let i = 0; i < 2; i++) {
+					if (a.getItem(i)) data += a.getItem(i).getLore().join("");
+				}
+
+				return {
+					nameTag,
+					location,
+					table: e.getDynamicProperty("tableName"),
+					type,
+					index: e.getDynamicProperty("index"),
+					data,
+				};
+			})
 		);
-
-		item.getComponent("enchantments").enchantments = enchantments;
-
-		mainhand.setItem(item);
 	},
 };
 
-let text = "";
-let bigdata = "";
-let done = false;
+const Store = new InventoryStore("anarchy");
+
+system.runInterval(
+	() => {
+		const player = world.overworld.getPlayers({
+			maxDistance: 1,
+			location: { x: -2, y: 191, z: 4 },
+		})[0];
+
+		if (player) {
+			Store.saveFromEntity(player);
+			InventoryStore.load(player, {
+				xp: 0,
+				health: 10,
+				equipment: {},
+				slots: [new ItemStack(Items.get("xa:menu"))],
+			});
+			player.teleport({ x: -2, y: 191, z: -1 });
+		}
+
+		const player2 = world.overworld.getPlayers({
+			location: { x: -2, y: 191, z: 1 },
+			maxDistance: 1,
+		})[0];
+
+		if (player2) {
+			InventoryStore.load(player2, Store.getEntityStore(player2.id));
+			player2.teleport({ x: -2, y: 191, z: 6 });
+		}
+	},
+	"a",
+	10
+);
 
 const c = new XA.Command({
 	name: "test",

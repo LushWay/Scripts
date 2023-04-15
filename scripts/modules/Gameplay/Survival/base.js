@@ -7,6 +7,7 @@ import {
 } from "@minecraft/server";
 import { CommandContext } from "lib/Command/Context.js";
 import { XA } from "xapi.js";
+import { Database } from "../../../lib/Database/Rubedo.js";
 
 const lang = {
 	nobase:
@@ -28,6 +29,8 @@ const lang = {
 	},
 };
 
+const db = new Database("basic");
+
 /*
 |--------------------------------------------------------------------------
 * -base
@@ -43,8 +46,6 @@ const base = new XA.Command({
 });
 base.executes((ctx) => {
 	if (lang.inpvp(ctx)) return;
-
-	const db = XA.tables.basic;
 
 	/** @type {[number, number, number,]} */
 	const basepos = db.get("basepos");
@@ -94,8 +95,6 @@ base
 	.executes((ctx) => {
 		if (lang.inpvp(ctx)) return;
 
-		const db = XA.tables.basic;
-
 		/** @type {[number, number, number,]} */
 		const basepos = db.get("basepos");
 
@@ -136,8 +135,6 @@ base
 	.string("player")
 	.executes((ctx, player) => {
 		if (lang.inpvp(ctx)) return;
-
-		const db = XA.tables.basic;
 
 		/** @type {[number, number, number,]} */
 		const basepos = db.get("basepos");
@@ -196,8 +193,6 @@ base
 	});
 base.literal({ name: "list", description: "Список баз" }).executes((ctx) => {
 	if (lang.inpvp(ctx)) return;
-
-	const db = XA.tables.basic;
 
 	/** @type {[number, number, number,]} */
 	const basepos = db.get("basepos");

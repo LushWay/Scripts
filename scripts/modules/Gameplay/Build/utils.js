@@ -7,10 +7,11 @@ import {
 	world,
 } from "@minecraft/server";
 import { MessageForm } from "lib/Form/MessageForm.js";
-import { createWaiter, XA } from "xapi.js";
+import { createWaiter } from "xapi.js";
+import { Database } from "../../../lib/Database/Rubedo.js";
 import { Region } from "../../Server/Region/Region.js";
 
-const DB = XA.tables.buildRegion;
+const DB = new Database("buildRegion");
 
 const squarePlace = -55;
 
@@ -22,7 +23,7 @@ const squarePlace = -55;
 export function teleportToRegion(player, region) {
 	player.teleport(
 		{ x: region.from.x, y: squarePlace + 3, z: region.from.z },
-		world.overworld
+		{ dimension: world.overworld }
 	);
 }
 

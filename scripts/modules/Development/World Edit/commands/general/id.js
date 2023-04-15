@@ -46,28 +46,28 @@ root
 		);
 	});
 
-// root.literal({ name: "c", description: "очсищ" }).executes((ctx) => {
-// 	const tag = XA.Entity.getTagStartsWith(ctx.sender, "st:");
-// 	ctx.reply(`§b► §c-§f${tag}`);
-// 	XA.Entity.removeTagsStartsWith(ctx.sender, "st:");
-// });
+root.literal({ name: "c", description: "очсищ" }).executes((ctx) => {
+	const tag = XA.Entity.getTagStartsWith(ctx.sender, "st:");
+	ctx.reply(`§b► §c-§f${tag}`);
+	XA.Entity.removeTagsStartsWith(ctx.sender, "st:");
+});
 
-// root.literal({ name: "a", description: "добав" }).executes((ctx) => {
-// 	const blocks = [];
-// 	XA.Entity.getTagStartsWith(ctx.sender, "st:")
-// 		?.split(",")
-// 		?.every((e) => blocks.push(e));
-// 	blocks.push(`${XA.Entity.getHeldItem(ctx.sender)?.typeId}.${XA.Entity.getHeldItem(ctx.sender)?.data}`);
-// 	ctx.reply(`§a► §f${blocks.join(", ")}`);
-// 	XA.Entity.removeTagsStartsWith(ctx.sender, "st:");
-// 	ctx.sender.addTag("st:" + blocks.join(","));
-// });
-// root.literal({ name: "st", description: "Задает лор предмета" }).executes((ctx) => {
-// 	let item = XA.Entity.getHeldItem(ctx.sender);
-// 	let oldtag = item.getLore();
-// 	item.setLore([XA.Entity.getTagStartsWith(ctx.sender, "st:")]);
-// 	XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
-// 	ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
-// });
-
-
+root.literal({ name: "a", description: "добав" }).executes((ctx) => {
+	const blocks = [];
+	XA.Entity.getTagStartsWith(ctx.sender, "st:")
+		?.split(",")
+		?.every((e) => blocks.push(e));
+	blocks.push(`${XA.Entity.getHeldItem(ctx.sender)?.typeId}`);
+	ctx.reply(`§a► §f${blocks.join(", ")}`);
+	XA.Entity.removeTagsStartsWith(ctx.sender, "st:");
+	ctx.sender.addTag("st:" + blocks.join(","));
+});
+root
+	.literal({ name: "st", description: "Задает лор предмета" })
+	.executes((ctx) => {
+		let item = XA.Entity.getHeldItem(ctx.sender);
+		let oldtag = item.getLore();
+		item.setLore([XA.Entity.getTagStartsWith(ctx.sender, "st:")]);
+		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
+	});

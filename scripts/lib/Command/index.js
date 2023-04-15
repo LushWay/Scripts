@@ -1,4 +1,4 @@
-import { BeforeChatEvent, world } from "@minecraft/server";
+import { ChatSendAfterEvent, world } from "@minecraft/server";
 import { CONFIG } from "../../config.js";
 import { IS } from "../../xapi.js";
 import {
@@ -26,7 +26,7 @@ import {
  */
 export class XCommand {
 	/**
-	 * @param {BeforeChatEvent} data
+	 * @param {ChatSendAfterEvent} data
 	 */
 	static chatListener(data) {
 		if (
@@ -34,7 +34,7 @@ export class XCommand {
 			data.message === CONFIG.commandPrefix
 		)
 			return; // This is not a command
-		data.cancel = true;
+
 		const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix);
 		const command = XCommand.COMMANDS.find(
 			(c) => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
@@ -219,6 +219,8 @@ export class XCommand {
 	}
 }
 
-world.events.beforeChat.subscribe(XCommand.chatListener);
-
-
+world.beforeEvents.chatSend.subscribe((data) => {
+	data.sendToTargets = true;
+	data.setTargets([]);
+});
+world.events.chatSend.subscribe(XCommand.chatListener);

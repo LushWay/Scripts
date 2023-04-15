@@ -1,4 +1,4 @@
-import { BeforeChatEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { handle } from "xapi.js";
 import { CONFIG } from "../../config.js";
 import { inaccurateSearch } from "../Class/Search.js";
@@ -157,7 +157,7 @@ export function parseLocationAugs([x, y, z], data) {
  * Sends a callback back to the command
  * @param {string[]} cmdArgs the args that the command used
  * @param {import("./index.js").XCommand<any>[]} args args to use
- * @param {BeforeChatEvent} event
+ * @param {ChatSendAfterEvent} event
  * @param {import("./index.js").XCommand<any>} baseCommand
  * @param {string} rawInput
  */
@@ -191,5 +191,3 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
 		"Command"
 	);
 }
-
-

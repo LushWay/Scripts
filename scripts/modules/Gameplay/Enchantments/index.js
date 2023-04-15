@@ -1,12 +1,28 @@
-import {
-	Enchantment,
-	MinecraftItemTypes,
-	Vector,
-	world,
-} from "@minecraft/server";
+import { Enchantment, MinecraftEnchantmentTypes } from "@minecraft/server";
+import { Subscriber } from "../../../lib/Class/Events.js";
+
+const ON_LOAD = new Subscriber();
+
+export const Enchantments = {
+	/**
+	 * @type {{[key: string]: { [key: number]: Enchantment }}}
+	 */
+	Custom: {},
+
+	/**
+	 * @type {Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }>}
+	 */
+	// @ts-expect-error
+	Typed: {},
+
+	events: {
+		onLoad: ON_LOAD.export,
+	},
+};
+
+import { MinecraftItemTypes, Vector, world } from "@minecraft/server";
 import { DB } from "lib/Database/Default.js";
 import { DisplayError, toStr } from "xapi.js";
-import { CustomEnchantments } from "./var.js";
 
 const location = { x: 0, y: -10, z: 0 };
 
@@ -41,7 +57,7 @@ function load() {
 
 	for (let i = 0; i < container.size; i++) {
 		const item = container.getItem(i);
-		if (item?.typeId !== MinecraftItemTypes.enchantedBook.id) return;
+		if (item?.typeId !== MinecraftItemTypes.enchantedBook.id) break;
 
 		const enchantments = item.getComponent("enchantments");
 		if (!enchantments?.enchantments)
@@ -55,18 +71,22 @@ function load() {
 			);
 
 		for (const enchantment of enchantments.enchantments) {
-			CustomEnchantments[enchantment.type.id] ??= [];
-			CustomEnchantments[enchantment.type.id][enchantment.level] = enchantment;
+			Enchantments.Custom[enchantment.type.id] ??= [
+				null,
+				new Enchantment(enchantment.type, 1),
+			];
+			Enchantments.Custom[enchantment.type.id][enchantment.level] = enchantment;
 		}
 	}
 
-	entity.triggerEvent("despawn");
+	world.overworld
+		.getEntities({ type: DB.ENTITY_IDENTIFIER, location, maxDistance: 2 })
+		.forEach((e) => e.triggerEvent("minecraft:despawn"));
 
-	for (const key in CustomEnchantments)
-		CustomEnchantments[key][1] = new Enchantment(
-			CustomEnchantments[key][2].type,
-			1
-		);
+	// @ts-expect-error
+	Enchantments.Typed = Enchantments.Custom;
+
+	ON_LOAD.emit();
 }
 
 load();

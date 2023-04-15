@@ -1,5 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { BECHMARK_RESULTS } from "lib/Class/XBenchmark.js";
+import { BECHMARK_RESULTS } from "lib/Class/Benchmark.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";

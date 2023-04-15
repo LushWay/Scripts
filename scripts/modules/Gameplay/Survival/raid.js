@@ -8,13 +8,13 @@ system.runInterval(
 			// Ищем игрока...
 			const player = XA.Entity.fetch(id);
 			if (player) {
-				if (PVP.eGet(player) === 0) {
+				if (PVP.get(player) === 0) {
 					player.tell(
 						"§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны."
 					);
 					player.playSound("mob.wolf.bark");
 				}
-				PVP.eSet(player, RaidNotify[id]);
+				PVP.set(player, RaidNotify[id]);
 				delete RaidNotify[id];
 				continue;
 			}

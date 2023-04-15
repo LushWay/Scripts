@@ -113,7 +113,7 @@ export const XEntity = {
 		try {
 			return world.scoreboard
 				.getObjective(objective)
-				.getScore(entity.scoreboard);
+				.getScore(entity.scoreboardIdentity);
 		} catch (error) {
 			return 0;
 		}
@@ -193,7 +193,7 @@ export const XEntity = {
 	 * @param {Entity} entity entity to despawn
 	 */
 	despawn(entity) {
-		entity.teleport({ x: 0, y: -64, z: 0 }, world.overworld, 0, 0);
+		entity.teleport({ x: 0, y: -64, z: 0 }, { dimension: world.overworld });
 		entity.kill();
 	},
 	/**

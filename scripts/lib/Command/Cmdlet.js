@@ -1,4 +1,4 @@
-import { BeforeChatEvent } from "@minecraft/server";
+import { ChatSendAfterEvent } from "@minecraft/server";
 import { CommandContext } from "./Context.js";
 import { XCommand } from "./index.js";
 
@@ -10,7 +10,7 @@ export class CmdLet {
 	/**
 	 *
 	 * @param {string[]} args
-	 * @param {BeforeChatEvent} data
+	 * @param {ChatSendAfterEvent} data
 	 * @param {XCommand} cmd
 	 * @param {string} raw
 	 * @returns
@@ -68,4 +68,3 @@ export class CmdLet {
 		CmdLet.ALL.push(this);
 	}
 }
-

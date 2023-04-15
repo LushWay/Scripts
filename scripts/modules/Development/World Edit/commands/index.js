@@ -29,7 +29,7 @@ import "./generation/hsphere.js";
 import "./generation/pyramid.js";
 import "./generation/sphere.js";
 
+import "./tool/lore.js";
+import "./tool/particle.js";
+import "./tool/sound.js";
 import "./tool/tool.js";
-
-import "./helpers/lore.js";
-import "./helpers/other.js";

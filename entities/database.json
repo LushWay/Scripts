@@ -44,7 +44,7 @@
 			"minecraft:conditional_bandwidth_optimization": {}
 		},
 		"events": {
-			"despawn": {
+			"minecraft:despawn": {
 				"add": {
 					"component_groups": ["despawn"]
 				}

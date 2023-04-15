@@ -43,8 +43,9 @@ export function XPlayerOptions(prefix, CONFIG) {
 			...CONFIG,
 		};
 	}
-	// @ts-expect-error Trust me, TS
-	return (player) => generateOptionsProxy(PLAYER_DB, CONFIG, player);
+	return (player) =>
+		// @ts-expect-error Trust me, TS
+		generateOptionsProxy(PLAYER_DB, prefix, PLAYER_OPTIONS[prefix], player);
 }
 
 /** @type {Record<string, DefaultConfig>} */
@@ -74,7 +75,7 @@ export function XOptions(prefix, CONFIG) {
 		};
 	}
 	// @ts-expect-error Trust me, TS
-	return generateOptionsProxy(WORLD_OPTIONS, CONFIG);
+	return generateOptionsProxy(WORLD_OPTIONS, prefix, OPTIONS[prefix]);
 }
 
 /**

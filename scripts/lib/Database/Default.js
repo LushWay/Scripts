@@ -12,17 +12,23 @@ world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
 	def.defineString("tableName", 30);
 	def.defineString("tableType", 30);
+	def.defineNumber("index");
 	propertyRegistry.registerEntityTypeDynamicProperties(
 		def,
 		EntityTypes.get(DB.ENTITY_IDENTIFIER)
+	);
+
+	world.overworld.runCommandAsync(
+		"tickingarea add 0 -64 0 0 200 0 database true"
 	);
 });
 
 /**
  * @typedef {{
  *   entity: Entity;
- *   tableName: string | number | boolean;
- *   tableType: string | number | boolean;
+ *   tableName: string
+ *   tableType: string
+ *   index: number
  * }} TABLE
  */
 
@@ -47,9 +53,14 @@ export class DB {
 			.map((entity) => {
 				const tableType = entity.getDynamicProperty("tableType");
 				const tableName = entity.getDynamicProperty("tableName");
+				const index = entity.getDynamicProperty("index");
 
-				if (typeof tableName !== "string" || typeof tableType !== "string")
-					return { entity, tableName: "NOTDB", tableType: "NONE" };
+				if (
+					typeof tableName !== "string" ||
+					typeof tableType !== "string" ||
+					typeof index !== "number"
+				)
+					return { entity, tableName: "NOTDB", tableType: "NONE", index: 0 };
 
 				if (Vector.distance(entity.location, DB.ENTITY_LOCATION) > 1) {
 					entity.teleport(DB.ENTITY_LOCATION);
@@ -59,6 +70,7 @@ export class DB {
 					entity,
 					tableName,
 					tableType,
+					index,
 				};
 			})
 			.filter((e) => e.tableName !== "NOTDB");
@@ -67,7 +79,7 @@ export class DB {
 	 * @private
 	 * @returns {TABLE[]}
 	 */
-	static loadTables() {
+	static tables() {
 		if (this.ALL_TABLE_ENTITIES) return this.ALL_TABLE_ENTITIES;
 		this.ALL_TABLE_ENTITIES = this.getEntities();
 
@@ -75,6 +87,13 @@ export class DB {
 			console.warn(
 				"§6Не удалось найти базы данных. Попытка загрузить бэкап..."
 			);
+			world.overworld
+				.getEntities({
+					location: DB.ENTITY_LOCATION,
+					type: DB.ENTITY_IDENTIFIER,
+					maxDistance: 2,
+				})
+				.forEach((e) => e.triggerEvent("minecraft:despawn"));
 			world.overworld.runCommand(
 				`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`
 			);
@@ -96,9 +115,10 @@ export class DB {
 	 * Creates a table entity that is used for data storage
 	 * @param {string} tableType
 	 * @param {string} tableName
+	 * @param {number} index
 	 * @returns {Entity}
 	 */
-	static createTableEntity(tableType, tableName) {
+	static createTableEntity(tableType, tableName, index = 0) {
 		const entity = world.overworld.spawnEntity(
 			DB.ENTITY_IDENTIFIER,
 			DB.ENTITY_LOCATION
@@ -106,6 +126,7 @@ export class DB {
 
 		entity.setDynamicProperty("tableName", tableName);
 		entity.setDynamicProperty("tableType", tableType);
+		entity.setDynamicProperty("index", index);
 		entity.nameTag = `§7DB §f${tableName} `;
 
 		return entity;
@@ -118,9 +139,26 @@ export class DB {
 	 */
 	static getTableEntity(tableType, tableName) {
 		try {
-			return this.loadTables().find(
+			return this.tables().find(
 				(e) => e.tableType === tableType && e.tableName === tableName
 			)?.entity;
+		} catch (e) {
+			DisplayError(e);
+			return null;
+		}
+	}
+	/**
+	 * A function that returns an array of entities that have the same tableType and tableName.
+	 * @param {string} tableType
+	 * @param {string} tableName
+	 * @returns
+	 */
+	static getTableEntities(tableType, tableName) {
+		try {
+			return this.tables()
+				.filter((e) => e.tableType === tableType && e.tableName === tableName)
+				.sort((a, b) => a.index - b.index)
+				.map((e) => e.entity);
 		} catch (e) {
 			DisplayError(e);
 			return null;

@@ -1,6 +1,6 @@
 import {
 	Entity,
-	EntitySpawnEvent,
+	EntitySpawnAfterEvent,
 	MinecraftBlockTypes,
 	Player,
 	world,
@@ -25,7 +25,7 @@ let allowed = (player, region) => {
 /**
  *
  * @param {Region} region
- * @param { EntitySpawnEvent} data
+ * @param {EntitySpawnAfterEvent} data
  */
 let spawnAllowed = (region, data) => !region;
 
@@ -42,14 +42,14 @@ export function setRegionGuards(allowFN, spawnFN) {
 /**
  * Permissions for region
  */
-world.events.beforeItemUseOn.subscribe((data) => {
+world.beforeEvents.itemUseOn.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
-		data.blockLocation,
+		data.block,
 		data.source.dimension.id
 	);
 	if (allowed(data.source, region)) return;
 
-	const block = data.source.dimension.getBlock(data.blockLocation);
+	const block = data.source.dimension.getBlock(data.block);
 
 	if (
 		DOORS_SWITCHES.includes(block.typeId) &&

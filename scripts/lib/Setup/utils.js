@@ -1,6 +1,5 @@
-import { system, world } from "@minecraft/server";
-import { errorMessageParse, stackParse } from "../Class/XError.js";
-import { onWorldLoad } from "./loader.js";
+import { system } from "@minecraft/server";
+import { errorMessageParse, stackParse } from "../Class/Error.js";
 
 /**
  * Parse and show error in chat
@@ -24,7 +23,9 @@ export function DisplayError(
 	const text = `§4${name}: §c${message}\n§f${stack}\n`;
 
 	try {
-		if (onWorldLoad.loaded()) world.say(text);
+		if (false) {
+		}
+		// if (onWorldLoad.loaded()) world.say(text);
 		else console.error(text);
 
 		console.log(text);

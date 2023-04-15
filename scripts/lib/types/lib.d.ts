@@ -35,3 +35,7 @@ interface ArrayConstructor {
 	 */
 	equals(one: any[], two: any[]): boolean;
 }
+
+interface Math {
+	randomBetween(minimum: number, maximum: number): number;
+}

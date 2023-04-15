@@ -22,7 +22,7 @@ export class ScoreboardDB {
 	 * @param {string} name
 	 * @param {number} value
 	 */
-	set(name, value) {
+	nameSet(name, value) {
 		world.overworld.runCommandAsync(
 			`scoreboard players set "${name}" ${this.name} ${value}`
 		);
@@ -32,7 +32,7 @@ export class ScoreboardDB {
 	 * @param {string} name
 	 * @returns
 	 */
-	get(name) {
+	nameGet(name) {
 		try {
 			return this.scoreboard
 				.getScores()
@@ -46,24 +46,27 @@ export class ScoreboardDB {
 	 * @param {Entity} entity
 	 * @param {number} value
 	 */
-	eSet(entity, value) {
-		entity.runCommandAsync(`scoreboard players set @s ${this.name} ${value}`);
+	set(entity, value) {
+		this.scoreboard.setScore(entity.scoreboardIdentity, value);
 	}
 	/**
 	 *
 	 * @param {Entity} entity
 	 * @param {number} value
 	 */
-	eAdd(entity, value) {
-		entity.runCommandAsync(`scoreboard players add @s ${this.name} ${value}`);
+	add(entity, value) {
+		this.scoreboard.setScore(
+			entity.scoreboardIdentity,
+			this.get(entity) + value
+		);
 	}
 	/**
 	 *
 	 * @param {Entity} entity
 	 */
-	eGet(entity) {
+	get(entity) {
 		try {
-			return this.scoreboard.getScore(entity.scoreboard);
+			return this.scoreboard.getScore(entity.scoreboardIdentity);
 		} catch (e) {
 			return 0;
 		}
@@ -72,3 +75,16 @@ export class ScoreboardDB {
 		world.overworld.runCommandAsync(`scoreboard players reset * ${this.name}`);
 	}
 }
+
+/*
+const objective = new ScoreboardDB('objectiveName', 'display name')
+
+const score = objective.get(player)
+objective.set(player, 1)
+objective.add(player, 1)
+
+objective.nameSet('custom name', 1)
+objective.nameGet('custom name')
+
+objective.reset()
+*/

@@ -6,6 +6,7 @@ import "./commands/index.js";
 import { CONFIG_WB } from "./config.js";
 import { FillFloor } from "./modules/builders/FillBuilder.js";
 import { Shape } from "./modules/builders/ShapeBuilder.js";
+import "./modules/builders/ToolBuilder.js";
 import { WorldEditBuild } from "./modules/builders/WorldEditBuilder.js";
 import { SHAPES } from "./modules/utils/shapes.js";
 import { setblock } from "./modules/utils/utils.js";
@@ -18,8 +19,9 @@ const GetPlayerSettings = XA.PlayerOptions("wb", {
 /* It's a code that replaces the block with a random block from the lore of the item. */
 world.events.blockPlace.subscribe((data) => {
 	if (data.block.typeId !== "minecraft:warped_nylium") return;
-	const blocks = XA.Entity.getHeldItem(data.player).getLore();
+	let blocks = XA.Entity.getHeldItem(data.player).getLore();
 	if (blocks.length < 1) return;
+	blocks = blocks[0].split(",");
 	const location = data.block.location;
 	const block = blocks[~~(Math.random() * blocks.length)];
 	setblock(block, location);
@@ -152,9 +154,9 @@ system.runInterval(
 	20
 );
 
-world.events.beforeItemUseOn.subscribe((data) => {
-	const blockLocation = data.getBlockLocation();
-	if (data.item.typeId !== "we:wand" || !(data.source instanceof Player))
+world.events.itemUseOn.subscribe((data) => {
+	const blockLocation = data.block;
+	if (data.itemStack.typeId !== "we:wand" || !(data.source instanceof Player))
 		return;
 	const pos = WorldEditBuild.pos2 ?? { x: 0, y: 0, z: 0 };
 	if (
@@ -169,10 +171,10 @@ world.events.beforeItemUseOn.subscribe((data) => {
 	);
 });
 
-world.events.beforeItemUse.subscribe((data) => {
+world.events.itemUse.subscribe((data) => {
 	if (!(data.source instanceof Player)) return;
-	if (data.item.typeId === "we:s") {
-		let lore = data.item.getLore();
+	if (data.itemStack.typeId === "we:s") {
+		let lore = data.itemStack.getLore();
 		let q = true;
 		switch (lore[0]) {
 			case "§Active":
@@ -196,15 +198,15 @@ world.events.beforeItemUse.subscribe((data) => {
 				q = false;
 				break;
 		}
-		const item = data.item;
+		const item = data.itemStack;
 		item.setLore(lore);
 		XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 	}
 
-	if (data.item.typeId != "we:brush") return;
+	if (data.itemStack.typeId != "we:brush") return;
 	const sett = GetPlayerSettings(data.source);
 	if (sett.enableMobile) return;
-	const lore = data.item.getLore();
+	const lore = data.itemStack.getLore();
 	const shape = lore[0]?.replace("Shape: ", "");
 	const blocks = lore[1]?.replace("Blocks: ", "").split(",");
 	const size = lore[2]?.replace("Size: ", "");
@@ -219,7 +221,7 @@ world.events.beforeItemUse.subscribe((data) => {
 });
 
 world.events.itemUse.subscribe((data) => {
-	if (data.item.typeId.startsWith("l:")) {
+	if (data.itemStack.typeId.startsWith("l:")) {
 		data.source.runCommandAsync(`tp ^^^5`);
 	}
 });

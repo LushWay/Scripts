@@ -1,5 +1,5 @@
 import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
-import { stackParse } from "../Class/XError.js";
+import { stackParse } from "../Class/Error.js";
 import { DisplayError } from "../Setup/utils.js";
 import { DB } from "./Default.js";
 

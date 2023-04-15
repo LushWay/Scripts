@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Player, world } from "@minecraft/server";
 
 import { toStr } from "xapi.js";

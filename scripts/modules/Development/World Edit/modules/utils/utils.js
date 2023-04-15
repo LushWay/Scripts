@@ -17,7 +17,9 @@ export function setblock(blockTypeID, location) {
 		);
 	} else {
 		// Normal block type
-		const blockType = MinecraftBlockTypes.get(`minecraft:${blockTypeID}`);
+		const blockType = MinecraftBlockTypes.get(
+			`minecraft:${blockTypeID.replace("minecraft:", "")}`
+		);
 		if (!blockType)
 			return DisplayError(
 				new TypeError(`BlockType ${blockTypeID} does not exist!`)

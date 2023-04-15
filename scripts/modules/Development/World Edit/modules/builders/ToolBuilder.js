@@ -4,9 +4,9 @@ import { P } from "lib/List/particles.js";
 import { S } from "lib/List/sounds.js";
 import { XA } from "xapi.js";
 
-world.events.beforeItemUse.subscribe((data) => {
-	if (data.item.typeId == "we:tool" && data.source instanceof Player) {
-		let item = data.item;
+world.events.itemUse.subscribe((data) => {
+	const item = data.itemStack;
+	if (item.typeId == "we:tool" && data.source instanceof Player) {
 		let lore = item.getLore();
 		if (lore && lore[0] == "Particle") {
 			if (data.source.isSneaking) {

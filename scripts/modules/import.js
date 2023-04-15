@@ -13,7 +13,6 @@ const modules = [
 	/**
 	 * Gameplay modules
 	 */
-	"./Gameplay/Enchantments/index.js",
 	"./Gameplay/Indicator/index.js",
 	// "./Gameplay/BattleRoyal/index.js",
 	// "./Gameplay/Airdrops/index.js",
@@ -23,7 +22,7 @@ const modules = [
 	 */
 	"./Development/GameTest/index.js",
 	"./Development/Test/index.js",
-	// "./Development/World Edit/WBindex.js",
+	"./Development/World Edit/WBindex.js",
 
 	"./Server/Objectives/index.js",
 ];

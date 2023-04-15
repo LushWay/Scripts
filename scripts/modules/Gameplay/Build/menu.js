@@ -1,6 +1,7 @@
 import { world } from "@minecraft/server";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { handle, IS, XA } from "xapi.js";
+import { Database } from "../../../lib/Database/Rubedo.js";
 import { CONFIG_MENU } from "../../Server/Menu/var.js";
 import { JOIN_EVENTS } from "../../Server/OnJoin/events.js";
 import { Region } from "../../Server/Region/Region.js";
@@ -12,7 +13,7 @@ import {
 	teleportToRegion,
 } from "./utils.js";
 
-const DB = XA.tables.buildRegion;
+const DB = new Database("buildRegion");
 
 JOIN_EVENTS.playerClosedGuide.subscribe((player) => {
 	player.playSound("random.levelup");
@@ -49,7 +50,7 @@ CONFIG_MENU.menu = (player) => {
 		`§3Координаты вашей площадки: §c${Pregion.from.x} §b${Pregion.from.z}\n `
 	);
 
-	/** @type {import("lib/Class/XRequest.js").XRequest} */
+	/** @type {import("lib/Class/Request.js").XRequest} */
 	let req;
 	/** @type {string} */
 	let regionOwnerName;

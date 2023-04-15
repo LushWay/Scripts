@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { OPTIONS } from "lib/Class/XOptions.js";
+import { OPTIONS } from "lib/Class/Options.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
@@ -86,9 +86,17 @@ R.executes((ctx) => {
 	form.show(ctx.sender);
 });
 
-world.events.beforeItemUse.subscribe(async ({ source: player, item }) => {
-	if (item.typeId !== "xa:admin" || !(player instanceof Player)) return;
+world.events.itemUse.subscribe(async ({ source: player, itemStack }) => {
+	if (itemStack.typeId !== "xa:admin" || !(player instanceof Player)) return;
 	options(player);
+});
+
+new XA.Command({
+	name: "options",
+	role: "admin",
+	description: "Настройки мира",
+}).executes((ctx) => {
+	options(ctx.sender);
 });
 
 /**
@@ -107,7 +115,7 @@ function options(player) {
 	form.show(player);
 }
 
-/** @type {import("lib/Class/XOptions.js").OPTIONS_DB} */
+/** @type {import("lib/Class/Options.js").OPTIONS_DB} */
 const OPTIONS_DB = new Database("options");
 
 /**
@@ -165,9 +173,13 @@ function group(player, groupName) {
 					},
 				]);
 
-				return `§f${KEY}§7 - ${OPTION.desc}§r\n ${
-					typeof value !== "undefined" ? `§7Значение: ${toStr(value)}` : ""
-				}\n §7Дефолт: ${toStr(OPTION.value)}§r\n \n \n`;
+				let button = "";
+
+				button += `§f${KEY}§7 - ${OPTION.desc}§r`;
+				if (value) button += `\n §iЗначение: ${toStr(value)}`;
+				button += `\n §iДефолт: ${toStr(OPTION.value)}§r\n \n \n`;
+
+				return button;
 			})
 			.join("")
 	);

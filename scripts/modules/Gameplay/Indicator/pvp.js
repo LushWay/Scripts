@@ -9,15 +9,14 @@ const options = XA.WorldOptions("pvp", {
 		desc: "Возможность входа в пвп режим (блокировка всех тп команд)§r",
 	},
 	cooldown: { value: 15, desc: "Да" },
-	bowhit: { value: true, desc: "Да" },
 });
 
 const getPlayerSettings = XA.PlayerOptions("pvp", {
-	title_enabled: {
+	indicator: {
 		desc: "§aВключает§7 титл попадания по энтити из лука",
 		value: true,
 	},
-	sound_enabled: {
+	bow_sound: {
 		desc: "§aВключает§7 звук попадания по энтити из лука",
 		value: true,
 	},
@@ -29,7 +28,7 @@ system.runInterval(
 			for (const p of world.getPlayers({
 				scoreOptions: [{ objective: PVP.scoreboard.id }],
 			})) {
-				PVP.eAdd(p, -1);
+				PVP.add(p, -1);
 			}
 
 			for (const e in LOCKED_TITLES) {
@@ -45,18 +44,18 @@ system.runInterval(
 system.runPlayerInterval(
 	(player) => {
 		if (!XA.state.modules_loaded || !options.enabled) return;
-		const score = PVP.eGet(player);
+		const score = PVP.get(player);
 
 		if (PVP_LOCKED.includes(player.id) || score < 0) return;
 
 		const settings = getPlayerSettings(player);
-		if (!settings.title_enabled) return;
+		if (!settings.indicator) return;
 
 		const q = score === options.cooldown || score === 0;
 		const g = (/** @type {string} */ p) => (q ? `§4${p}` : "");
 
 		if (!LOCKED_TITLES[player.id]) {
-			player.onScreenDisplay.setActionBar(
+			-player.onScreenDisplay.setActionBar(
 				`${g("»")} §6PvP: ${score} ${g("«")}`
 			);
 		}
@@ -84,43 +83,71 @@ world.events.entityHurt.subscribe((data) => {
 	)
 		return;
 
+	// Its player.chatClose
+	if (
+		!damage.damagingEntity &&
+		data.hurtEntity &&
+		damage.cause === EntityDamageCause.entityAttack
+	)
+		return;
+
 	const lastHit = data.hurtEntity.getComponent("minecraft:health").current <= 0;
 
-	if (!(data?.hurtEntity instanceof Player)) return;
-	if (damage?.damagingEntity instanceof Player) {
+	// Если наносящий урон игрок
+	if (damage.damagingEntity instanceof Player) {
 		// Кулдаун
-		PVP.eSet(damage.damagingEntity, options.cooldown);
+		PVP.set(damage.damagingEntity, options.cooldown);
 		// Стата
-		SERVER.stats.damageGive.eAdd(damage.damagingEntity, data.damage);
-		if (lastHit) SERVER.stats.kills.eAdd(damage.damagingEntity, 1);
+		SERVER.stats.damageGive.add(damage.damagingEntity, data.damage);
+		if (lastHit) SERVER.stats.kills.add(damage.damagingEntity, 1);
 
 		const setting = getPlayerSettings(damage.damagingEntity);
 
-		//Если лук, визуализируем
-		if (damage.cause === "projectile" && options.bowhit) {
-			if (setting.sound_enabled)
-				playHitSound(damage.damagingEntity, data.damage);
-
-			if (setting.title_enabled) {
-				damage.damagingEntity.onScreenDisplay.setActionBar(
-					lastHit
-						? `§gВы застрелили §6${data.hurtEntity.name}`
-						: `§c-${data.damage}♥`
-				);
-				LOCKED_TITLES[damage.damagingEntity.id] = 2;
-			}
+		const isBow = damage.cause === EntityDamageCause.projectile;
+		if (isBow && setting.bow_sound) {
+			playHitSound(damage.damagingEntity, data.damage);
 		}
-		if (
-			damage.cause !== "projectile" &&
-			lastHit &&
-			data.hurtEntity instanceof Player
-		)
-			damage.damagingEntity.onScreenDisplay.setActionBar(
-				`§gВы убили §6${data.hurtEntity.name}`
-			);
+
+		if (setting.indicator) {
+			if (!lastHit) {
+				// Обычный урон
+				damage.damagingEntity.onScreenDisplay.setActionBar(
+					`§c-${data.damage}♥`
+				);
+			} else {
+				// Kill
+				if (data?.hurtEntity instanceof Player) {
+					// Player
+					damage.damagingEntity.onScreenDisplay.setActionBar(
+						`§gВы ${isBow ? "застрелили" : "убили"} §6${data.hurtEntity.name}`
+					);
+				} else {
+					// Entity
+
+					const entityName = data.hurtEntity.typeId.replace("minecraft:", "");
+					damage.damagingEntity.runCommand(
+						"titleraw @s actionbar " +
+							JSON.stringify({
+								rawtext: [
+									{ text: "§6" },
+									{
+										translate: `entity.${entityName}.name`,
+									},
+									{ text: isBow ? " §gзастрелен" : " §gубит" },
+								],
+							})
+					);
+				}
+			}
+
+			LOCKED_TITLES[damage.damagingEntity.id] = 2;
+		}
 	}
-	PVP.eAdd(data.hurtEntity, options.cooldown);
-	SERVER.stats.damageRecieve.eAdd(data.hurtEntity, data.damage);
+
+	if (data.hurtEntity instanceof Player) {
+		PVP.set(data.hurtEntity, options.cooldown);
+		SERVER.stats.damageRecieve.add(data.hurtEntity, data.damage);
+	}
 });
 
 /**

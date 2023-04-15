@@ -196,13 +196,10 @@ system.runInterval(
 				continue;
 			}
 			for (const clo of cl) {
-				const rotation = clo.getRotation();
 				if (block.typeId == "minecraft:air")
 					clo.teleport(
 						{ x: ent.location.x, y: ent.location.y - 3, z: ent.location.z },
-						ent.dimension,
-						rotation.x,
-						rotation.y
+						{ dimension: ent.dimension }
 					);
 				break;
 			}
@@ -352,5 +349,3 @@ kit
     );
   });
 */
-
-

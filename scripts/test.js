@@ -1,4 +1,4 @@
-import { ItemUseOnEvent, world } from "@minecraft/server";
+import { world } from "@minecraft/server";
 
 world.debug = (...data) => {
 	world.sendMessage(
@@ -10,15 +10,6 @@ const err = console.error;
 console.error = (...data) => {
 	err(data.map((/** @type {*} */ e) => JSON.stringify(e)).join(" "));
 };
-
-Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
-	get() {
-		this.location ??= this.getBlockLocation();
-		return this.location;
-	},
-	configurable: false,
-	enumerable: true,
-});
 
 world.events.entityHurt.subscribe(
 	(data) => {

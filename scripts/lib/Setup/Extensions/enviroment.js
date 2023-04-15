@@ -19,6 +19,10 @@ addMethod(JSON, "safeParse", (str, reciever, onError) => {
 	}
 });
 
+addMethod(Math, "randomBetween", function (min, max) {
+	return Math.round(min + Math.random() * (max - min));
+});
+
 addMethod(Array, "equals", function (one, two) {
 	return one.every((e, i) => e === two[i]);
 });
@@ -28,26 +32,3 @@ editMethod(console, "warn", ({ original, args }) => {
 });
 
 globalThis.nextTick = null;
-
-/**
- *
- *
- */
-
-import { ItemUseOnEvent } from "@minecraft/server";
-
-/**
- * ItemUseOnEvent
- *
- *
- *
- */
-
-Reflect.defineProperty(ItemUseOnEvent.prototype, "blockLocation", {
-	get() {
-		this.location ??= this.getBlockLocation();
-		return this.location;
-	},
-	configurable: false,
-	enumerable: true,
-});

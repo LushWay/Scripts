@@ -25,14 +25,13 @@ const PLAYER_OPTIONS = XA.PlayerOptions("chat", {
 	disableSound: { desc: "", value: false },
 });
 
-world.events.beforeChat.subscribe((data) => {
+world.events.chatSend.subscribe((data) => {
 	if (
 		data.message.startsWith(CONFIG.commandPrefix) &&
 		data.message !== CONFIG.commandPrefix
 	)
 		return;
 
-	data.cancel = true;
 	try {
 		const cooldown = OPTIONS.cooldown;
 

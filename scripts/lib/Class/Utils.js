@@ -1,4 +1,4 @@
-import { Block, MinecraftBlockTypes, Player } from "@minecraft/server";
+import { MinecraftBlockTypes, Player } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { XShowForm } from "../Form/utils.js";
 import { untyped_terrain_textures } from "../List/terrain-textures.js";
@@ -84,6 +84,9 @@ export const XUtils = {
 
 		return textures[0];
 	},
+	/**
+	 *
+	 * @param {string} langcode
+	 */
+	getTextByLangCode(langcode) {},
 };
-
-

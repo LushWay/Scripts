@@ -299,17 +299,12 @@ class BattleRoyal {
 						}
 					});
 				}),
-				beforeDataDrivenEntityTriggerEvent:
-					world.events.beforeDataDrivenEntityTriggerEvent.subscribe((data) => {
-						if (
-							data.id != "binocraft:on_death" ||
-							!data.entity.hasTag("br:alive")
-						)
-							return;
+				entityDie: world.events.entityDie.subscribe((data) => {
+					if (!data.deadEntity.hasTag("br:alive")) return;
 
-						this.tags.forEach((e) => data.entity.removeTag(e));
-						this.waitToRespawn(data.entity.nameTag);
-					}),
+					this.tags.forEach((e) => data.deadEntity.removeTag(e));
+					this.waitToRespawn(data.deadEntity.nameTag);
+				}),
 				buttonPush: world.events.buttonPush.subscribe((data) => {
 					if (
 						!data.source.hasTag("br:alive") ||

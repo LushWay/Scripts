@@ -108,12 +108,6 @@ patchPackage("@minecraft/server", {
      * @returns Promise that resolves after given ticks time
      */
     sleep(time: number): Promise<void>`,
-		ItemUseOnEvent: m`
-    /**
-     * Check {@link ItemUseOnEvent.getBlockLocation} for more info
-     */
-    blockLocation: Vector3;
-    `,
 	},
 	replaces: [
 		{
@@ -125,14 +119,6 @@ patchPackage("@minecraft/server", {
 			find: "runTimeout(callback: () => void, tickDelay?: number): number;",
 			replace:
 				"runTimeout(callback: () => void, name: string, tickDelay?: number): number;",
-		},
-		{
-			find: /location: Vector3,\s*\n?\s*dimension: Dimension,\s*\n?\s*xRotation: number,\s*\n?\s*yRotation: number,\s*\n?\s*keepVelocity\?: boolean,/gm,
-			replace: `location: Vector3,
-        dimension?: Dimension,
-        xRotation?: number,
-        yRotation?: number,
-        keepVelocity?: boolean,`,
 		},
 		{
 			find: "getComponent(componentName: string): BlockComponent | undefined;",
