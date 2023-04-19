@@ -1,6 +1,6 @@
 import { XA } from "xapi.js";
-import { SelectionBuild } from "../../modules/builders/SelectionBuilder.js";
-import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { SelectionBuild } from "../../builders/SelectionBuilder.js";
+import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 const expand = new XA.Command({
 	type: "wb",
@@ -32,5 +32,3 @@ expand
 			`§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с \n§f${WorldEditBuild.pos1.x} ${WorldEditBuild.pos1.y} ${WorldEditBuild.pos1.z} \n§3по \n§f${WorldEditBuild.pos2.x} ${WorldEditBuild.pos2.y} ${WorldEditBuild.pos2.z}`
 		);
 	});
-
-

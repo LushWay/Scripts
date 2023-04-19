@@ -1,8 +1,44 @@
-import { Player, world } from "@minecraft/server";
+import { Player, Vector, system, world } from "@minecraft/server";
 
 import { P } from "lib/List/particles.js";
 import { S } from "lib/List/sounds.js";
 import { XA } from "xapi.js";
+import { DefaultParticlePropertiesBuilder } from "../../../../lib/Class/Particles.js";
+
+const map = new DefaultParticlePropertiesBuilder();
+// map.setAmount(1).setColor({red: 1, blue: 2, green: 3, alpha: 0}).setDirection(Vector.up)
+const variables = map.getMolangVariableMap();
+
+system.runPlayerInterval(
+	(player) => {
+		const item = XA.Entity.getHeldItem(player);
+		if (!item || item.typeId !== "we:tool") return;
+
+		const lore = item.getLore();
+
+		if (lore[0] === "Particle") {
+			const block = player.getBlockFromViewDirection({
+				includeLiquidBlocks: false,
+				includePassableBlocks: false,
+				maxDistance: 50,
+			});
+
+			if (!block) return;
+
+			block.dimension.spawnParticle(
+				lore[1],
+				Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+				variables
+			);
+		}
+
+		if (lore[0] === "Sound") {
+			player.playSound(lore[1]);
+		}
+	},
+	"wb tool",
+	20
+);
 
 world.events.itemUse.subscribe((data) => {
 	const item = data.itemStack;

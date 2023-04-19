@@ -6,7 +6,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { DisplayError, XA } from "xapi.js";
-import { CONFIG_WB } from "../../config.js";
+import { CONFIG_WB } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";

@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { CONFIG_WB } from "../../config.js";
+import { CONFIG_WB } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 
 export class Structure {
@@ -110,5 +110,3 @@ export class Structure {
 		if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не загружено.`);
 	}
 }
-
-

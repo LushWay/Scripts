@@ -1,6 +1,6 @@
 import { system } from "@minecraft/server";
 import { handle, XA } from "xapi.js";
-import { CONFIG_WB } from "../../config.js";
+import { CONFIG_WB } from "../config.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 /**
@@ -59,5 +59,3 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 		}
 	});
 }
-
-

@@ -1,7 +1,7 @@
 import { XA } from "xapi.js";
-import { Shape } from "../../modules/builders/ShapeBuilder.js";
+import { Shape } from "../../builders/ShapeBuilder.js";
 //import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
-import { SHAPES } from "../../modules/utils/shapes.js";
+import { SHAPES } from "../../utils/shapes.js";
 
 new XA.Command({
 	type: "wb",
@@ -21,5 +21,3 @@ new XA.Command({
 	new Shape(SHAPES.sphere, location, blocks, size);
 	ctx.reply(`Generated a Sphere at ${location.x} ${location.y}${location.z}`);
 });
-
-

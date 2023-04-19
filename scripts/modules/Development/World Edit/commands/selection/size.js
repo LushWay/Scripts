@@ -1,6 +1,6 @@
-import { XA } from "xapi.js";
-import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 import { Vector } from "@minecraft/server";
+import { XA } from "xapi.js";
+import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XA.Command({
 	type: "wb",
@@ -16,5 +16,3 @@ new XA.Command({
 		)} блоков`
 	);
 });
-
-

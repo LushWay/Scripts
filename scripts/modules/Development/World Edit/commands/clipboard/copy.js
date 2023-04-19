@@ -1,5 +1,5 @@
 import { XA } from "xapi.js";
-import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XA.Command({
 	name: "copy",
@@ -10,5 +10,3 @@ new XA.Command({
 	const status = WorldEditBuild.copy();
 	if (status) ctx.reply(status);
 });
-
-

@@ -1,4 +1,10 @@
-import { EntityDamageCause, Player, system, world } from "@minecraft/server";
+import {
+	Entity,
+	EntityDamageCause,
+	Player,
+	system,
+	world,
+} from "@minecraft/server";
 import { XA } from "xapi.js";
 import { SERVER } from "../../Server/Server/var.js";
 import { LOCKED_TITLES, PVP, PVP_LOCKED } from "./var.js";
@@ -64,7 +70,27 @@ system.runPlayerInterval(
 	0
 );
 
+world.events.entityDie.subscribe((data) => {
+	onDamage(
+		{
+			damage: 999999,
+			damageSource: data.damageSource,
+			hurtEntity: data.deadEntity,
+		},
+		true
+	);
+});
 world.events.entityHurt.subscribe((data) => {
+	onDamage(data, false);
+});
+
+/**
+ *
+ * @param {{damageSource: import("@minecraft/server").EntityDamageSource, hurtEntity: Entity, damage: number}} data
+ * @param {boolean} fatal
+ * @returns
+ */
+function onDamage(data, fatal = false) {
 	const damage = data.damageSource;
 	if (
 		![
@@ -91,26 +117,22 @@ world.events.entityHurt.subscribe((data) => {
 	)
 		return;
 
-	const lastHit = data.hurtEntity.getComponent("minecraft:health").current <= 0;
+	const { current, value } = data.hurtEntity.getComponent("minecraft:health");
 
-	// Если наносящий урон игрок
 	if (damage.damagingEntity instanceof Player) {
-		// Кулдаун
 		PVP.set(damage.damagingEntity, options.cooldown);
-		// Стата
 		SERVER.stats.damageGive.add(damage.damagingEntity, data.damage);
-		if (lastHit) SERVER.stats.kills.add(damage.damagingEntity, 1);
+		if (fatal) SERVER.stats.kills.add(damage.damagingEntity, 1);
 
 		const setting = getPlayerSettings(damage.damagingEntity);
 
 		const isBow = damage.cause === EntityDamageCause.projectile;
 		if (isBow && setting.bow_sound) {
-			playHitSound(damage.damagingEntity, data.damage);
+			playHitSound(damage.damagingEntity, current, value);
 		}
 
 		if (setting.indicator) {
-			if (!lastHit) {
-				// Обычный урон
+			if (!fatal) {
 				damage.damagingEntity.onScreenDisplay.setActionBar(
 					`§c-${data.damage}♥`
 				);
@@ -145,20 +167,29 @@ world.events.entityHurt.subscribe((data) => {
 	}
 
 	if (data.hurtEntity instanceof Player) {
+		// skip SimulatedPlayer because of error
+		// @ts-expect-error
+		if (data.hurtEntity.jump) return;
+
 		PVP.set(data.hurtEntity, options.cooldown);
 		SERVER.stats.damageRecieve.add(data.hurtEntity, data.damage);
 	}
-});
+}
 
 /**
  *
  * @param {Player} player
- * @param {number} damage
+ * @param {number} health
+ * @param {number} max
  */
-function playHitSound(player, damage) {
-	player.playSound("block.end_portal_frame.fill", {
-		location: player.location,
-		pitch: damage / 2,
-		volume: 1,
-	});
+function playHitSound(player, health, max) {
+	health = ~~health;
+	max = ~~max;
+	const pitch = 2 + health / (max / 3);
+	const options = {
+		pitch: Math.max(1, pitch),
+		volume: 4,
+	};
+	world.debug({ pitch, max, health });
+	player.playSound("note.bell", options);
 }

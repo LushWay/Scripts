@@ -1,7 +1,7 @@
 import { ItemStack, ItemTypes } from "@minecraft/server";
 
 import { XA } from "xapi.js";
-import { SHAPES } from "../../modules/utils/shapes.js";
+import { SHAPES } from "../../utils/shapes.js";
 
 const brushCMD = new XA.Command({
 	name: "brush",
@@ -90,5 +90,3 @@ brushCMD
 		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §rРасстояние для кисти изменено на ${range}`);
 	});
-
-

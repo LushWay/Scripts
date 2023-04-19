@@ -15,7 +15,7 @@ let player;
 const test_loc = { x: 1000, y: -60, z: 1000 };
 
 GameTest.registerAsync("s", "s", async (test) => {
-	const spawnLoc = { x: 1, y: 5, z: 1 };
+	const spawnLoc = { x: 0, y: 3, z: 0 };
 	player = test.spawnSimulatedPlayer(spawnLoc, name);
 	const id = player.id;
 

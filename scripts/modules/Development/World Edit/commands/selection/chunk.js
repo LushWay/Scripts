@@ -1,6 +1,6 @@
 import { Entity, Vector } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 /**
  * Get the current chunk of a entity

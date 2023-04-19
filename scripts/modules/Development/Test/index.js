@@ -1,4 +1,11 @@
-import { ItemStack, Items, Vector, system, world } from "@minecraft/server";
+import {
+	ItemStack,
+	Items,
+	MolangVariableMap,
+	Vector,
+	system,
+	world,
+} from "@minecraft/server";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
@@ -126,6 +133,37 @@ const tests = {
 					data,
 				};
 			})
+		);
+	},
+	42(ctx) {
+		const block = ctx.sender.getBlockFromViewDirection({
+			includeLiquidBlocks: false,
+			includePassableBlocks: false,
+			maxDistance: 50,
+		});
+
+		if (!block) return;
+
+		const variables = new MolangVariableMap().setSpeedAndDirection(
+			"variable.actor",
+			10,
+			{ x: 0, z: 0, y: 5 }
+		);
+
+		let c = 0;
+		const id = system.runInterval(
+			() => {
+				c++;
+				block.dimension.spawnParticle(
+					"minecraft:dragon_breath_fire",
+					Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+					variables
+				);
+
+				if (c >= 6) system.clearRun(id);
+			},
+			"test",
+			10
 		);
 	},
 };

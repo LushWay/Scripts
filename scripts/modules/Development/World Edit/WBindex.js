@@ -3,13 +3,13 @@ import { XA } from "xapi.js";
 
 import "./commands/index.js";
 
+import { FillFloor } from "./builders/FillBuilder.js";
+import { Shape } from "./builders/ShapeBuilder.js";
+import "./builders/ToolBuilder.js";
+import { WorldEditBuild } from "./builders/WorldEditBuilder.js";
 import { CONFIG_WB } from "./config.js";
-import { FillFloor } from "./modules/builders/FillBuilder.js";
-import { Shape } from "./modules/builders/ShapeBuilder.js";
-import "./modules/builders/ToolBuilder.js";
-import { WorldEditBuild } from "./modules/builders/WorldEditBuilder.js";
-import { SHAPES } from "./modules/utils/shapes.js";
-import { setblock } from "./modules/utils/utils.js";
+import { SHAPES } from "./utils/shapes.js";
+import { setblock } from "./utils/utils.js";
 
 const GetPlayerSettings = XA.PlayerOptions("wb", {
 	noBrushParticles: { desc: "Отключает партиклы у кисти", value: false },
@@ -124,26 +124,6 @@ system.runPlayerInterval(
 	},
 	"WB Main",
 	10
-);
-
-system.runPlayerInterval(
-	(p) => {
-		const i = XA.Entity.getHeldItem(p);
-		if (!p.hasTag("attacking") || i?.typeId !== "we:brush") return;
-
-		const lore = i.getLore();
-		const shape = lore[0]?.replace("Shape: ", "");
-		const blocks = lore[1]?.replace("Blocks: ", "").split(",");
-		const size = lore[2]?.replace("Size: ", "");
-		const range = lore[3]?.replace("Range: ", "");
-
-		if (!shape || !blocks || !size || !range) return;
-
-		const block = p.getBlockFromViewDirection({ maxDistance: parseInt(range) });
-		if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
-	},
-	"WB Brush",
-	5
 );
 
 system.runInterval(

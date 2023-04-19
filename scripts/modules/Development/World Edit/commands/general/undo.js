@@ -1,5 +1,5 @@
 import { XA } from "xapi.js";
-import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XA.Command({
 	type: "wb",
@@ -12,5 +12,3 @@ new XA.Command({
 		const status = WorldEditBuild.undo(!isNaN(r) ? r : 1);
 		ctx.reply(status);
 	});
-
-

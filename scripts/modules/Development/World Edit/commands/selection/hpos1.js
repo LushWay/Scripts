@@ -1,5 +1,5 @@
 import { XA } from "xapi.js";
-import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
+import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XA.Command({
 	type: "wb",
@@ -13,5 +13,3 @@ new XA.Command({
 	WorldEditBuild.pos1 = pos;
 	ctx.reply(`§5Позиция§r 1 теперь ${pos.x}, ${pos.y}, ${pos.z}`);
 });
-
-
