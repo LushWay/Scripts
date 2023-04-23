@@ -162,7 +162,8 @@ system.runInterval(
 
 		for (const base of RadiusRegion.getAllRegions()) {
 			const block = world[base.dimensionId].getBlock(Vector.floor(base.center));
-			if (block && block.typeId === MinecraftBlockTypes.barrel.id) {
+			if (!block) continue;
+			if (block.typeId === MinecraftBlockTypes.barrel.id) {
 				if (
 					playersLocations.find(
 						(e) =>

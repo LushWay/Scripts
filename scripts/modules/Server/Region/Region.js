@@ -280,52 +280,6 @@ export class RadiusRegion extends Region {
 	}
 }
 
-TABLE.on("beforeGet", (key, value) => {
-	// Unlink
-	value = Object.assign({}, value);
-
-	if (value.t === "c") {
-		// Decompress
-		const [x1, z1] = Reflect.get(value, "f").split(" ").map(Number);
-		Reflect.deleteProperty(value, "f");
-		value.from = { x: x1, z: z1 };
-
-		const [x2, z2] = Reflect.get(value, "t").split(" ").map(Number);
-		Reflect.deleteProperty(value, "t");
-		value.to = { x: x2, z: z2 };
-	}
-
-	value.permissions = Reflect.get(value, "p");
-	Reflect.deleteProperty(value, "p");
-
-	value = DB.setDefaults(value, {
-		dimensionId: "overworld",
-		permissions: Region.CONFIG.PERMISSIONS,
-		key,
-	});
-	return value;
-});
-TABLE.on("beforeSet", (key, value) => {
-	value = DB.removeDefaults(value, {
-		dimensionId: "overworld",
-		permissions: Region.CONFIG.PERMISSIONS,
-		key,
-	});
-
-	if (value.t === "c") {
-		// Compress
-		Reflect.set(value, "f", `${value.from.x} ${value.from.z}`);
-		Reflect.deleteProperty(value, "from");
-
-		Reflect.set(value, "t", `${value.to.x} ${value.to.z}`);
-		Reflect.deleteProperty(value, "to");
-	}
-
-	Reflect.set(value, "p", value.permissions);
-	Reflect.deleteProperty(value, "permissions");
-	return value;
-});
-
 /**
  * Will get all the items within a 2 block radius of the given location and then call
  * the given callback function on each of them.
