@@ -37,5 +37,5 @@ interface ArrayConstructor {
 }
 
 interface Math {
-	randomBetween(minimum: number, maximum: number): number;
+	randomInt(minimum: number, maximum: number): number;
 }

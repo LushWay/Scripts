@@ -4,7 +4,7 @@ import { handle, IS, XA } from "xapi.js";
 import { Database } from "../../../lib/Database/Rubedo.js";
 import { CONFIG_MENU } from "../../Server/Menu/var.js";
 import { JOIN_EVENTS } from "../../Server/OnJoin/events.js";
-import { Region } from "../../Server/Region/Region.js";
+import { CubeRegion, Region } from "../../Server/Region/Region.js";
 import {
 	ClearRegion,
 	CreateRegion,
@@ -24,7 +24,7 @@ JOIN_EVENTS.playerClosedGuide.subscribe((player) => {
 
 CONFIG_MENU.menu = (player) => {
 	const regionID = DB.get(player.id);
-	let Pregion = Region.getAllRegions().find((e) => e.key === regionID);
+	let Pregion = CubeRegion.getAllRegions().find((e) => e.key === regionID);
 	world.debug(Pregion);
 	if (!Pregion) {
 		player.tell(
@@ -34,7 +34,7 @@ CONFIG_MENU.menu = (player) => {
 		return false;
 	}
 
-	const current_region = Region.blockLocationInRegion(
+	const current_region = CubeRegion.blockLocationInRegion(
 		player.location,
 		player.dimension.id
 	);
@@ -98,7 +98,7 @@ CONFIG_MENU.menu = (player) => {
 		);
 		/**
 		 *
-		 * @param {Region} region
+		 * @param {CubeRegion} region
 		 * @param {string} name
 		 */
 		const toPlatform = (region, name) => {
@@ -108,7 +108,7 @@ CONFIG_MENU.menu = (player) => {
 			});
 		};
 		toPlatform(Pregion, "Основная");
-		for (const reg of Region.getAllRegions().filter(
+		for (const reg of CubeRegion.getAllRegions().filter(
 			(e) => e.permissions.owners.includes(player.id) && e.key !== Pregion.key
 		)) {
 			toPlatform(reg, XA.Entity.getNameByID(reg.permissions.owners[0]));

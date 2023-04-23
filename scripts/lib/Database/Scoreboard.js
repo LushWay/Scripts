@@ -1,6 +1,17 @@
 import { Entity, world } from "@minecraft/server";
 
 export class ScoreboardDB {
+	/**
+	 * Gets entity.scroebaordIdentity or creates if not exists
+	 * @param {Entity} entity
+	 */
+	static ID(entity) {
+		return (
+			entity.scoreboardIdentity ??
+			(entity.runCommand(`scoreboard players set @s "${this.name}" 0`),
+			entity.scoreboardIdentity)
+		);
+	}
 	scoreboard;
 	/**
 	 *
@@ -47,7 +58,12 @@ export class ScoreboardDB {
 	 * @param {number} value
 	 */
 	set(entity, value) {
-		this.scoreboard.setScore(entity.scoreboardIdentity, value);
+		const id =
+			entity.scoreboardIdentity ??
+			(entity.runCommand(`scoreboard players set @s "${this.name}" ${value}`),
+			entity.scoreboardIdentity);
+
+		this.scoreboard.setScore(id, value);
 	}
 	/**
 	 *
@@ -55,10 +71,13 @@ export class ScoreboardDB {
 	 * @param {number} value
 	 */
 	add(entity, value) {
-		this.scoreboard.setScore(
-			entity.scoreboardIdentity,
-			this.get(entity) + value
-		);
+		const score = this.get(entity);
+		const id =
+			entity.scoreboardIdentity ??
+			(entity.runCommand(`scoreboard players add @s "${this.name}" ${value}`),
+			entity.scoreboardIdentity);
+
+		this.scoreboard.setScore(id, score + value);
 	}
 	/**
 	 *

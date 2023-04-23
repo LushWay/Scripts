@@ -9,7 +9,7 @@ import {
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { createWaiter } from "xapi.js";
 import { Database } from "../../../lib/Database/Rubedo.js";
-import { Region } from "../../Server/Region/Region.js";
+import { CubeRegion, Region } from "../../Server/Region/Region.js";
 
 const DB = new Database("buildRegion");
 
@@ -18,7 +18,7 @@ const squarePlace = -55;
 /**
  *
  * @param {Player} player
- * @param {Region} region
+ * @param {CubeRegion} region
  */
 export function teleportToRegion(player, region) {
 	player.teleport(
@@ -56,7 +56,7 @@ function getProgressBar(spining, percents) {
 /**
  *
  * @param {Player} player
- * @param {Region} Pregion
+ * @param {CubeRegion} Pregion
  * @returns
  */
 export async function ClearRegion(player, Pregion) {
@@ -97,12 +97,12 @@ export async function ClearRegion(player, Pregion) {
 export async function CreateRegion(player, tp = true) {
 	const place = await findFreePlace();
 
-	const region = new Region(
+	const region = new CubeRegion(
 		place.from,
 		place.to,
 		MinecraftDimensionTypes.overworld,
 		{
-			...Region.DEFAULT_REGION_PERMISSIONS,
+			...Region.CONFIG.PERMISSIONS,
 			owners: [player.id],
 		}
 	);

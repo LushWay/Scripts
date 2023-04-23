@@ -5,6 +5,12 @@ import { m, patchPackage } from "./utils.js";
 
 patchPackage("@minecraft/server", {
 	classes: {
+		Dimension: m`
+    /**
+     * Dimension type shortcut (id without namespace, e.g. "minecraft:")
+     */
+    type: Dimensions;
+    `,
 		Vector: m`
     /**
      * Returns size between two vectors
@@ -57,17 +63,17 @@ patchPackage("@minecraft/server", {
 		     */
 		    cooldown: ItemCooldownComponent;
 		    /**
-		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     * Alias to {@link ItemStack.getComponent}('enchantments')
 		     */
-		    enchantments: ItemCooldownComponent;
+		    enchantments: ItemEnchantsComponent;
 		    /**
-		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     * Alias to {@link ItemStack.getComponent}('durability')
 		     */
-		    durability: ItemCooldownComponent;
+		    durability: ItemDurabilityComponent;
 		    /**
-		     * Alias to {@link ItemStack.getComponent}('cooldown')
+		     * Alias to {@link ItemStack.getComponent}('food')
 		     */
-		    cooldown: ItemCooldownComponent;
+		    food: ItemFoodComponent;
 		`,
 		Player: m`
     /**
@@ -153,6 +159,11 @@ getComponent<N extends keyof EntityComponents>(
  * New methods assigments can be finded in 
  * scripts/lib/Setup/prototypes.js 
  */
+
+/**
+ * Dimension names. Used in {@link Dimension.type}
+ */
+type Dimensions = "nether" | "overworld" | "end"
 
 
 /**

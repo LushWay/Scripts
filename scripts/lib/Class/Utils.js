@@ -1,8 +1,61 @@
-import { MinecraftBlockTypes, Player } from "@minecraft/server";
+import { ItemStack, MinecraftBlockTypes, Player } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { XShowForm } from "../Form/utils.js";
 import { untyped_terrain_textures } from "../List/terrain-textures.js";
 import { inaccurateSearch } from "./Search.js";
+
+const blocks = Object.values(MinecraftBlockTypes).map((e) => e.id);
+
+const itemTypes = ["boat", "banner_pattern"];
+const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join("|")})`);
+
+/** @type {((s: string) => string)[]} */
+const itemModifiers = [
+	(spawn_egg) => {
+		const match = spawn_egg.match(/^(.+)_spawn_egg$/);
+		if (!match) return;
+		return `spawn_egg.entity.${match[1]}`;
+	},
+	(chest_boat) => {
+		const match = chest_boat.match(/^(.+)_chest_boat$/);
+		if (!match) return;
+		return `chest_boat.${match[1]}`;
+	},
+	(id) => {
+		if (id.includes(".")) return;
+		const match = id.match(itemRegExp);
+		if (!match) return;
+		const [, color, type] = match;
+		return `${type}.${color}`;
+	},
+	(dark_oak) => {
+		if (dark_oak.includes("dark_oak") && dark_oak !== "dark_oak_door")
+			return dark_oak.replace("dark_oak", "big_oak");
+	},
+];
+/** @type {((s: string) => string)[]} */
+const afterItems = [
+	(s) => {
+		if (s.includes("banner_pattern")) return s.replace(/.name$/, "");
+	},
+];
+
+const blockTypes = ["wool"];
+const blockRegExp = new RegExp(`^(.+)_(${blockTypes.join("|")})`);
+
+/** @type {((s: string) => string)[]} */
+const blockModifiers = [
+	(id) => {
+		if (id === "cobblestone_wall") return `cobblestone_wall.normal`;
+	},
+	(id) => {
+		if (id.includes(".")) return;
+		const match = id.match(blockRegExp);
+		if (!match) return;
+		const [, color, type] = match;
+		return `${type}.${color}`;
+	},
+];
 
 export const XUtils = {
 	/**
@@ -12,6 +65,31 @@ export const XUtils = {
 	 */
 	isKeyof(str, obj) {
 		return str in obj;
+	},
+	/**
+	 *
+	 * @param {ItemStack} item
+	 */
+	localizationName(item) {
+		let id = item.typeId.replace("minecraft:", "");
+		if (blocks.includes(item.typeId)) {
+			for (const fn of blockModifiers) {
+				const result = fn(id);
+				id = result ?? id;
+			}
+
+			return `%tile.${id}.name`;
+		}
+
+		for (const fn of itemModifiers) {
+			const result = fn(id);
+			id = result ?? id;
+		}
+
+		let name = `%item.${id}.name`;
+		for (const fn of afterItems) name = fn(name) ?? name;
+
+		return name;
 	},
 	/**
 	 *

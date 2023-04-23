@@ -47,41 +47,43 @@ system.runInterval(
 	20
 );
 
-system.runPlayerInterval(
-	(player) => {
-		if (!XA.state.modules_loaded || !options.enabled) return;
-		const score = PVP.get(player);
+XA.state.afterModulesLoad.subscribe(() => {
+	system.runPlayerInterval(
+		(player) => {
+			if (!XA.state.modules_loaded || !options.enabled) return;
+			const score = PVP.get(player);
 
-		if (PVP_LOCKED.includes(player.id) || score < 0) return;
+			if (PVP_LOCKED.includes(player.id) || score < 0) return;
 
-		const settings = getPlayerSettings(player);
-		if (!settings.indicator) return;
+			const settings = getPlayerSettings(player);
+			if (!settings.indicator) return;
 
-		const q = score === options.cooldown || score === 0;
-		const g = (/** @type {string} */ p) => (q ? `§4${p}` : "");
+			const q = score === options.cooldown || score === 0;
+			const g = (/** @type {string} */ p) => (q ? `§4${p}` : "");
 
-		if (!LOCKED_TITLES[player.id]) {
-			-player.onScreenDisplay.setActionBar(
-				`${g("»")} §6PvP: ${score} ${g("«")}`
-			);
-		}
-	},
-	"PVP player",
-	0
-);
-
-world.events.entityDie.subscribe((data) => {
-	onDamage(
-		{
-			damage: 999999,
-			damageSource: data.damageSource,
-			hurtEntity: data.deadEntity,
+			if (!LOCKED_TITLES[player.id]) {
+				-player.onScreenDisplay.setActionBar(
+					`${g("»")} §6PvP: ${score} ${g("«")}`
+				);
+			}
 		},
-		true
+		"PVP player",
+		0
 	);
-});
-world.events.entityHurt.subscribe((data) => {
-	onDamage(data, false);
+
+	world.events.entityDie.subscribe((data) => {
+		onDamage(
+			{
+				damage: 999999,
+				damageSource: data.damageSource,
+				hurtEntity: data.deadEntity,
+			},
+			true
+		);
+	});
+	world.events.entityHurt.subscribe((data) => {
+		onDamage(data, false);
+	});
 });
 
 /**

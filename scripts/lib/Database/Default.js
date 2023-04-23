@@ -223,7 +223,7 @@ export class DB {
 				}
 			} else {
 				// Primitive value, assign
-				COMPOSED[key] = defaultValue;
+				COMPOSED[key] = typeof value === "undefined" ? defaultValue : value;
 			}
 		}
 
@@ -256,10 +256,14 @@ export class DB {
 
 			if (value === defaultValue) continue;
 
-			if (typeof defaultValue === "object" && defaultValue !== null) {
+			if (
+				typeof defaultValue === "object" &&
+				defaultValue !== null &&
+				typeof value === "object"
+			) {
 				if (Array.isArray(defaultValue)) {
 					//
-					if (value.length < 1 || Array.equals(value, defaultValue)) continue;
+					if (!value?.length || Array.equals(value, defaultValue)) continue;
 
 					COMPOSED[key] = value;
 				} else {
@@ -271,7 +275,7 @@ export class DB {
 				}
 			} else {
 				// Primitive value, assign
-				COMPOSED[key] = defaultValue;
+				COMPOSED[key] = value;
 			}
 		}
 

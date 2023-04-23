@@ -1,7 +1,8 @@
 /**
  * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
  * @template Data The type of the data that the events will be emitted with.
- * @template [Callback = (arg: Data) => void] The type of the callback function that will be used for the events.
+ * @template [Return=void] Return type of the subscriber
+ * @template [Callback = (arg: Data) => Return] The type of the callback function that will be used for the events.
  */
 export class Subscriber {
 	/**
@@ -32,14 +33,26 @@ export class Subscriber {
 	 * Emits an event to all subscribers, passing the data to the callback function.
 	 * @param {Data} data - The data to pass to the callback function when the event is emitted.
 	 * @param {number} count - The number of subscribers that will receive the event, defaults to all subscribers.
+	 * @returns {Promise<Return[]>}
 	 */
-	async emit(data, count = 0) {
+	async emitAsync(data, count = 0) {
+		return Promise.all(this.emit(data, count));
+	}
+	/**
+	 * Emits an event to all subscribers, passing the data to the callback function.
+	 * @param {Data} data - The data to pass to the callback function when the event is emitted.
+	 * @param {number} count - The number of subscribers that will receive the event, defaults to all subscribers.
+	 * @returns {Return[]}
+	 */
+	emit(data, count = 0) {
 		const events = [...this.events.entries()].sort(([, a], [, b]) => a - b);
 		const length = count > 0 && count > events.length ? count : events.length;
+		const results = [];
 		for (let i = 0; i < length; i++) {
 			const callback = events[i][0];
-			if (typeof callback === "function") await callback(data);
+			if (typeof callback === "function") results.push(callback(data));
 		}
+		return results;
 	}
 	/**
 	 * Export the subscribe and unsubscribe method
@@ -51,5 +64,3 @@ export class Subscriber {
 		};
 	}
 }
-
-

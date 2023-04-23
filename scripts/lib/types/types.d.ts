@@ -31,10 +31,6 @@ type FunctionFilter<T> = {
 	[K in keyof T as T[K] extends Function ? K : never]: T[K];
 };
 
-type ObjectWithFunction<T> = {
-	[K in keyof T]: T[K] extends (...arg: any) => any ? K : never;
-};
-
 type Dimensions = "nether" | "end" | "overworld";
 
 type JSONLike = Record<string | symbol | number, any>;

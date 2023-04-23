@@ -107,9 +107,19 @@ function options(player) {
 	const form = new ActionForm("§dНастройки мира");
 
 	for (const groupName in OPTIONS) {
-		form.addButton(groupName, null, () => {
-			group(player, groupName);
-		});
+		const data = OPTIONS_DB.get(groupName);
+		const requires = Object.entries(OPTIONS[groupName]).reduce(
+			(count, [key, option]) =>
+				option.requires && typeof data[key] === "undefined" ? count + 1 : count,
+			0
+		);
+		form.addButton(
+			`${groupName}${requires ? ` §c(${requires}!)` : ""}`,
+			null,
+			() => {
+				group(player, groupName);
+			}
+		);
 	}
 
 	form.show(player);
@@ -133,10 +143,13 @@ function group(player, groupName) {
 		Object.entries(config)
 			.map(([KEY, OPTION]) => {
 				const value = data[KEY];
+				const { requires } = config[KEY];
+
 				buttons.push([
-					KEY,
+					`${KEY}${requires && typeof value === "undefined" ? " §c(!)" : ""}`,
 					function edit(mesasge = "") {
 						const displayValue = value ?? "§8<не установлено>";
+						const val = value ?? OPTION.value;
 						new ModalForm(`${groupName} - ${KEY}`)
 							.addTextField(
 								`${mesasge}§f${OPTION.desc}§r\n \n §7Значение: ${
@@ -147,7 +160,7 @@ function group(player, groupName) {
 									OPTION.value
 								)}§r\n §7Тип: §f${typeof OPTION.value}\n \n `,
 								"Оставьте пустым для отмены",
-								`${value ?? OPTION.value}`
+								typeof val === "string" ? val : JSON.stringify(val)
 							)
 							.show(player, (ctx, input) => {
 								if (input) {
@@ -162,6 +175,13 @@ function group(player, groupName) {
 											break;
 										case "boolean":
 											total = input === "true";
+											break;
+										case "object":
+											total = JSON.safeParse(input, null, (error) =>
+												edit(error.message)
+											);
+
+											if (!total) return;
 											break;
 									}
 

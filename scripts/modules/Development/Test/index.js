@@ -1,6 +1,7 @@
 import {
 	ItemStack,
 	Items,
+	MinecraftItemTypes,
 	MolangVariableMap,
 	Vector,
 	system,
@@ -13,7 +14,8 @@ import { ModalForm } from "lib/Form/ModelForm.js";
 import { XA, handle, toStr } from "xapi.js";
 import { DB } from "../../../lib/Database/Default.js";
 import { InventoryStore } from "../../../lib/Database/Inventory.js";
-import { Region } from "../../Server/Region/Region.js";
+import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
+import { MoneyCost, Store } from "../../Gameplay/Survival/store.js";
 import "./enchant.js";
 
 /**
@@ -47,16 +49,6 @@ const tests = {
 	13: (ctx) => {
 		ctx.reply(toStr(ctx.sender.getComponents()));
 	},
-	18: (ctx) => {
-		const region = Region.blockLocationInRegion(
-			Vector.floor(ctx.sender.location),
-			ctx.sender.dimension.id
-		);
-		region.permissions.owners = region.permissions.owners.filter(
-			(e) => e !== ctx.sender.id
-		);
-		region.update();
-	},
 	21: (ctx) => {
 		for (let a of [
 			1000,
@@ -85,22 +77,10 @@ const tests = {
 			);
 		}
 	},
-	31(ctx) {
-		const reg = Region.blockLocationInRegion(
-			ctx.sender.location,
-			ctx.sender.dimension.id
-		);
-		if (!reg) return ctx.error("No region!");
-
-		reg.permissions.allowedEntitys.push(
-			...ctx.args.filter((e) => e.includes(":"))
-		);
-		reg.update();
-	},
 
 	40(ctx) {
 		if (ctx.args[1] === "in") {
-			Store.saveFromEntity(ctx.sender);
+			AnarchyStore.saveFromEntity(ctx.sender);
 			InventoryStore.load(ctx.sender, {
 				xp: 0,
 				health: 10,
@@ -108,7 +88,10 @@ const tests = {
 				slots: [new ItemStack(Items.get("xa:menu"))],
 			});
 		} else {
-			InventoryStore.load(ctx.sender, Store.getEntityStore(ctx.sender.id));
+			InventoryStore.load(
+				ctx.sender,
+				AnarchyStore.getEntityStore(ctx.sender.id)
+			);
 		}
 	},
 	41(ctx) {
@@ -166,9 +149,71 @@ const tests = {
 			10
 		);
 	},
+	43(ctx) {
+		const loc = randomTeleport(
+			ctx.sender,
+			{ x: 0, y: 0, z: 0 },
+			{ x: 500, y: 0, z: 500 },
+			{ elytra: true, keepInSkyTime: 8 }
+		);
+		ctx.sender.tell(`Вы были перемещены на ${Vector.string(loc)}. `);
+		let count = 8;
+		const id = system.runInterval(
+			() => {
+				count--;
+				if (count) {
+					ctx.sender.onScreenDisplay.setActionBar(
+						`   Вы полетите через ${count}\nНе забудьте открыть элитры!`
+					);
+					ctx.sender.playSound("note.pling", {
+						pitch: 1 - count / 8,
+					});
+				} else {
+					ctx.sender.playSound("note.pling");
+					ctx.sender.onScreenDisplay.setActionBar(`Мягкой посадки!`);
+					system.clearRun(id);
+				}
+			},
+			"testasd",
+			20
+		);
+	},
+	44(ctx) {
+		world.debug(world.getPlayers({ scoreOptions: [{ objective: "pvp" }] }));
+	},
+	45(ctx) {
+		const i = MinecraftItemTypes;
+
+		const items = [
+			i.acaciaButton,
+			i.acaciaStairs,
+			i.apple,
+			i.bannerPattern,
+			i.netheriteAxe,
+			i.zombieHorseSpawnEgg,
+			i.boat,
+			i.chestBoat,
+			i.darkOakBoat,
+			i.blueWool,
+			i.cobblestoneWall,
+		];
+
+		for (const item of items) {
+			const stack = new ItemStack(item);
+			ctx.reply(XA.Utils.localizationName(stack));
+		}
+	},
 };
 
-const Store = new InventoryStore("anarchy");
+// const i = MinecraftItemTypes;
+// new Store({ x: -180, y: 69, z: -144 }, "minecraft:overworld", {
+// 	prompt: true,
+// })
+// 	.addItem(new ItemStack(i.chest, 5), new MoneyCost(30))
+// 	.addItem(new ItemStack(i.boat), new MoneyCost(10))
+// 	.addItem(new ItemStack(i.apple), new MoneyCost(1));
+
+const AnarchyStore = new InventoryStore("anarchy");
 
 system.runInterval(
 	() => {
@@ -178,7 +223,7 @@ system.runInterval(
 		})[0];
 
 		if (player) {
-			Store.saveFromEntity(player);
+			AnarchyStore.saveFromEntity(player);
 			InventoryStore.load(player, {
 				xp: 0,
 				health: 10,
@@ -194,7 +239,7 @@ system.runInterval(
 		})[0];
 
 		if (player2) {
-			InventoryStore.load(player2, Store.getEntityStore(player2.id));
+			InventoryStore.load(player2, AnarchyStore.getEntityStore(player2.id));
 			player2.teleport({ x: -2, y: 191, z: 6 });
 		}
 	},

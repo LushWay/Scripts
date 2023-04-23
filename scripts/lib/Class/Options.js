@@ -48,7 +48,9 @@ export function XPlayerOptions(prefix, CONFIG) {
 		generateOptionsProxy(PLAYER_DB, prefix, PLAYER_OPTIONS[prefix], player);
 }
 
-/** @type {Record<string, DefaultConfig>} */
+/** @typedef {DefaultConfig<string | number | boolean | JSONLike> & Record<string, { requires?: boolean }>} WorldOptionsConfig */
+
+/** @type {Record<string, WorldOptionsConfig>} */
 export const OPTIONS = {};
 
 /** @type {OPTIONS_DB} */
@@ -60,7 +62,7 @@ const WORLD_OPTIONS = new Database("options", {
 /**
  * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
  * configuration object's properties in localStorage
- * @template {DefaultConfig} Config
+ * @template {WorldOptionsConfig} Config
  * @param {string} prefix - The prefix for the database.
  * @param {Config} CONFIG - The default values for the options.
  * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.

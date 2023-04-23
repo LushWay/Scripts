@@ -39,13 +39,14 @@ export function setRegionGuards(allowFN, spawnFN) {
 	spawnAllowed = spawnFN;
 }
 
+
 /**
  * Permissions for region
  */
 world.beforeEvents.itemUseOn.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
 		data.block,
-		data.source.dimension.id
+		data.source.dimension.type
 	);
 	if (allowed(data.source, region)) return;
 
@@ -72,7 +73,7 @@ world.beforeEvents.itemUseOn.subscribe((data) => {
 world.events.blockPlace.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
 		data.block.location,
-		data.player.dimension.id
+		data.player.dimension.type
 	);
 	if (allowed(data.player, region)) return;
 
@@ -86,7 +87,7 @@ world.events.blockBreak.subscribe(
 	({ player, block, brokenBlockPermutation, dimension }) => {
 		const region = Region.blockLocationInRegion(
 			block.location,
-			player.dimension.id
+			player.dimension.type
 		);
 
 		if (allowed(player, region)) return;
@@ -112,10 +113,14 @@ world.events.blockBreak.subscribe(
 world.events.entitySpawn.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
 		data.entity.location,
-		data.entity.dimension.id
+		data.entity.dimension.type
 	);
 	if (spawnAllowed(region, data)) return;
-	if (region && region.permissions.allowedEntitys.includes(data.entity.typeId))
+	if (
+		region &&
+		(region.permissions.allowedEntitys.includes(data.entity.typeId) ||
+			region.permissions.allowedEntitys === "all")
+	)
 		return;
 
 	XA.Entity.despawn(data.entity);

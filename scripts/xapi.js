@@ -23,6 +23,7 @@ import { CONFIG } from "./config.js";
 import { XUtils } from "./lib/Class/Utils.js";
 import { loadModules } from "./modules/import.js";
 import { DisplayError } from "./xapi.js";
+import { Subscriber } from "./lib/Class/Events.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
@@ -56,9 +57,8 @@ export class XA {
 
 	static state = {
 		first_load: false,
-		world_loaded: false,
-		db_loaded: false,
 		modules_loaded: false,
+		afterModulesLoad: new Subscriber(),
 		load_time: "",
 	};
 
@@ -82,14 +82,12 @@ world.events.playerJoin.subscribe(() => {
 
 onWorldLoad(
 	async () => {
-		XA.state.world_loaded = true;
-
 		Database.initAllTables();
-		XA.state.db_loaded = true;
 		await nextTick;
 
 		await loadModules();
 		XA.state.modules_loaded = true;
+		XA.state.afterModulesLoad.emit();
 
 		XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
 

@@ -40,7 +40,7 @@ export class XRequest {
 
 		if (!Array.isArray(data)) {
 			// Data on this key already exists, and it isnt reqList
-			if (data) this.db.delete(this.key);
+			if (data) this.db.set(this.key, data);
 
 			data = [];
 		}
@@ -66,4 +66,3 @@ export class XRequest {
 		this.db.set(this.key, [...requests.values()]);
 	}
 }
-

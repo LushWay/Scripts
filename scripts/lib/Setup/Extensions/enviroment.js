@@ -19,8 +19,8 @@ addMethod(JSON, "safeParse", (str, reciever, onError) => {
 	}
 });
 
-addMethod(Math, "randomBetween", function (min, max) {
-	return Math.round(min + Math.random() * (max - min));
+addMethod(Math, "randomInt", function (min, max) {
+	return min + Math.random() * (max - min);
 });
 
 addMethod(Array, "equals", function (one, two) {

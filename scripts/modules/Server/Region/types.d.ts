@@ -27,12 +27,11 @@ interface IRegionPermissions {
 	/**
 	 * the entitys allowed in this region
 	 */
-	allowedEntitys: Array<string>;
+	allowedEntitys: Array<string> | "all";
 	/**
 	 * Owners of region
 	 */
 	owners: Array<string>;
 }
 
-type EX<T, EXT> = T extends EXT ? T : EXT
-
+type EX<T, EXT> = T extends EXT ? T : EXT;

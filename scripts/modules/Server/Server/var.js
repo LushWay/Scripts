@@ -15,12 +15,15 @@ const options = XA.WorldOptions("server", {
 		)
 			.replace("{", "")
 			.replace("}", "")}`,
+		requires: true,
 	},
 });
 
 const TYPE = TYPES[getType()];
 
 export const SERVER = {
+	money: db("money", "Монеты"),
+	leafs: db("leafs", "Листы"),
 	radius: 200,
 	stats: {
 		blocksPlaced: db("blockPlace", "Поставлено блок"),

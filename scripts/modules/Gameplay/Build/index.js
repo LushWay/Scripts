@@ -23,7 +23,7 @@ setRegionGuards(
 		!region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)
 );
 
-Region.DEFAULT_REGION_PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES;
+Region.CONFIG.PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES;
 world.beforeEvents.explosion.subscribe((data) => (data.cancel = true));
 
 const EFFECT_Y = -53;

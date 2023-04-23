@@ -179,11 +179,13 @@ export class Database {
 	save() {
 		if (!this._.IS_INITED) this.failedTo("save");
 
+		this._.RAW_MEMORY = JSON.stringify(this.MEMORY);
+
 		/**
 		 * The split chunks of the stringified data, This is done because we can
 		 * only store {@link DB.MAX_LORE_SIZE} chars in a single lore
 		 */
-		const chunks = JSON.stringify(this.MEMORY).match(CHUNK_REGEXP);
+		const chunks = this._.RAW_MEMORY.match(CHUNK_REGEXP);
 		const entity =
 			DB.getTableEntity(TABLE_TYPE, this._.TABLE_NAME) ??
 			DB.createTableEntity(TABLE_TYPE, this._.TABLE_NAME);
@@ -341,7 +343,7 @@ export class Database {
 				key ? ` key "${key}"` : key
 			} on table "${
 				this._.TABLE_NAME
-			}". Try to call "${method}" after resolving of §fDatabase.system(§6db§f).initPromise`
+			}": Table is not inited. Make sure you called Database.initAllTables() before`
 		);
 	}
 

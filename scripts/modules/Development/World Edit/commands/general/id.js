@@ -11,9 +11,10 @@ const root = new XA.Command({
 root.executes((ctx) => {
 	const item = XA.Entity.getHeldItem(ctx.sender);
 	if (!item) return ctx.reply("§cВ руке нет предмета!");
+
 	ctx.reply(
 		`§b► §f${item?.typeId.replace("minecraft:", "")} ${
-			item?.nameTag ? item?.nameTag : ""
+			item?.nameTag ? `(${item?.nameTag}) ` : ""
 		}`
 	);
 });

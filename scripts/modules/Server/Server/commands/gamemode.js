@@ -13,5 +13,4 @@ new XA.Command({
 	role: "moderator",
 }).executes((ctx) => {
 	ctx.sender.runCommand("gamemode c");
-	ctx.reply("§a► C");
 });

@@ -2,7 +2,14 @@ import { Container, Entity, ItemStack, Player, world } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
 /** @type {Database<string, IJoinData>} */
-const DB = new Database("player");
+const DB = new Database("player", {
+	beforeGet(key, value) {
+		return value ?? {};
+	},
+	beforeSet(key, value) {
+		return value;
+	},
+});
 
 /**
  * @author Smell of Curry, mrpatches123, mo9ses, xiller229 (Leaftail)
@@ -14,7 +21,7 @@ export const XEntity = {
 	 * @param {string} ID
 	 */
 	getNameByID(ID) {
-		return DB.get(`JOIN:${ID}`)?.name;
+		return DB.get(ID)?.name;
 	},
 	/**
 	 * Checks if position is in radius

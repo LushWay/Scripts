@@ -1,275 +1,196 @@
 import {
+	ItemStack,
 	MinecraftBlockTypes,
+	MinecraftItemTypes,
+	MolangVariableMap,
 	Player,
 	Vector,
 	system,
 	world,
 } from "@minecraft/server";
-import { CommandContext } from "lib/Command/Context.js";
 import { XA } from "xapi.js";
-import { Database } from "../../../lib/Database/Rubedo.js";
+import {
+	RadiusRegion,
+	Region,
+	forEachItemAt,
+} from "../../Server/Region/Region.js";
+import { baseMenu } from "./baseMenu.js";
+import { MoneyCost, Store } from "./store.js";
 
-const lang = {
-	nobase:
-		"§cДля создания базы поставьте сундук, встаньте на него и напишите §f-base",
-	/**
-	 *
-	 * @param {CommandContext} ctx
-	 * @returns
-	 */
-	inpvp(ctx) {
-		if (XA.Entity.getScore(ctx.sender, "pvp") > 0) {
-			ctx.reply(
-				"§4► §cПодождите еще §6" +
-					XA.Entity.getScore(ctx.sender, "pvp") +
-					" сек"
-			);
-			return true;
+/**
+ *
+ * @param {Player} player
+ * @returns
+ */
+function inpvp(player) {
+	const pvp = XA.Entity.getScore(player, "pvp");
+	if (pvp > 0) {
+		player.tell("§4► §cПодождите еще §6" + pvp + " §cсек");
+		return true;
+	}
+}
+
+function updateBases() {
+	bases = RadiusRegion.getAllRegions().map((e) => e.center);
+}
+
+/**
+ * @type {Vector3[]}
+ */
+let bases = [];
+
+world.events.blockBreak.subscribe(
+	({ block, brokenBlockPermutation, dimension }) => {
+		if (bases.includes(block.location)) {
+			block.setPermutation(brokenBlockPermutation);
+
+			// setting chest inventory back
+			const { container } = block.getComponent("inventory");
+			forEachItemAt(dimension, block.location, (e) => {
+				container.addItem(e.getComponent("item").itemStack);
+				e.kill();
+			});
 		}
-	},
-};
+	}
+);
 
-const db = new Database("basic");
+const baseItemStack = new ItemStack(MinecraftItemTypes.barrel);
+baseItemStack.setLore(["Поставьте эту бочку и она", "станет базой."]);
 
-/*
-|--------------------------------------------------------------------------
-* -base
-|--------------------------------------------------------------------------
-|
-TODO: Список доступных функций 
-| 
-| 
-*/
+new Store(new Vector(-234, 65, -74), "overworld").addItem(
+	baseItemStack,
+	new MoneyCost(10)
+);
+
+world.beforeEvents.itemUseOn.subscribe((data) => {
+	if (
+		data.itemStack.typeId !== baseItemStack.typeId ||
+		!Array.equals(data.itemStack.getLore(), baseItemStack.getLore())
+	)
+		return;
+
+	if (data.source instanceof Player) {
+		if (inpvp(data.source)) return;
+
+		const region = RadiusRegion.getAllRegions().find((e) =>
+			e.permissions.owners.includes(data.source.nameTag)
+		);
+
+		if (region) {
+			const isOwner = region.permissions.owners[0] === data.source.id;
+			return data.source.tell(
+				`§cВы уже ${
+					isOwner
+						? "владеете базой"
+						: `состоите в базе игрока '${XA.Entity.getNameByID(
+								region.permissions.owners[0]
+						  )}'`
+				} !`
+			);
+		}
+
+		const nearRegion = Region.getAllRegions().find((r) => {
+			if (r instanceof RadiusRegion) {
+				return Vector.distance(r.center, data.block.location) < r.radius + 100;
+			} else {
+				const from = {
+					x: r.from.x,
+					y: Region.CONFIG.LOWEST_Y_VALUE,
+					z: r.from.z,
+				};
+				const to = { x: r.to.x, y: Region.CONFIG.HIGEST_Y_VALUE, z: r.to.z };
+
+				const min = Vector.min(from, to);
+				const max = Vector.max(from, to);
+
+				const size = 30;
+
+				return Vector.between(
+					Vector.add(min, { x: -size, y: 0, z: -size }),
+					Vector.add(max, { x: size, y: 0, z: size }),
+					data.block.location
+				);
+			}
+		});
+
+		if (nearRegion) return data.source.tell("§cРядом есть другие регионы!");
+
+		const loc = Vector.floor(
+			Vector.add(data.block.location, data.faceLocation)
+		);
+		const dim = data.block.dimension.type;
+		const source = data.source;
+		system.run(() => {
+			new RadiusRegion(loc, 30, dim, {
+				doorsAndSwitches: false,
+				openContainers: false,
+				pvp: true,
+				allowedEntitys: "all",
+				owners: [source.id],
+			});
+			source.tell(
+				"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base"
+			);
+			source.playSound("random.levelup");
+		});
+	}
+});
+
 const base = new XA.Command({
 	name: "base",
-	description: "Встаньте на сундук и запустите это, что бы создать базу",
+	description: "Меню базы",
 });
 base.executes((ctx) => {
-	if (lang.inpvp(ctx)) return;
-
-	/** @type {[number, number, number,]} */
-	const basepos = db.get("basepos");
-
-	if (basepos?.map) {
-		const bl = { x: basepos[0], y: basepos[1], z: basepos[2] };
-		let ent = world
-			.getDimension("overworld")
-			?.getEntitiesAtBlockLocation(bl)
-			?.find((e) => e.typeId == "s:base");
-
-		if (ent) {
-			return ctx.reply(
-				"§7Доступные действия с базой на §6" +
-					basepos.join(", ") +
-					":\n§f  -base add - §o§7Добавить игрока. §fИгрок должен встать рядом с базой, а затем вы должны прописать это.§r" +
-					"\n§f  -base remove <Имя игрока> - §o§7Удалить игрока.§r" +
-					"\n§f  -base list - §o§7Список баз, в которые вы добавлены.§r" +
-					"\n§7Что бы убрать базу, сломай бочку.§r"
-			);
-		} else db.delete("basepos");
-	}
-	if (XA.Entity.getScore(ctx.sender, "inv") == 1)
-		return ctx.reply("§cБазу можно поставить только на анархии");
-
-	const block = ctx.sender.dimension.getBlock(
-		Vector.floor(ctx.sender.location)
+	if (inpvp(ctx.sender)) return;
+	const base = RadiusRegion.getAllRegions().find((e) =>
+		e.permissions.owners.includes(ctx.sender.id)
 	);
 
-	if (block.typeId !== "minecraft:chest") return ctx.reply(lang.nobase);
-
-	if (
-		XA.Entity.getClosetsEntitys(ctx.sender, 30, "s:base", 1, false).length > 1
-	)
-		return ctx.reply("§cРядом есть другие базы");
-
-	block.setType(MinecraftBlockTypes.barrel);
-	const entity = block.dimension.spawnEntity("s:base", block.location);
-
-	db.set("basepos", [block.location.x, block.location.y, block.location.z]);
-	ctx.reply(
-		"§7  База успешно зарегистрированна!\n\n  Теперь взаимодействовать с блоками в радиусе 20 блоков от базы можете только вы и добавленные пользователи(добавить: §f-base add§7)\n\n  Из блока базы (бочки) каждый час будет удалятся несколько предметов. Если в базе не будет никаких ресурсов, приват перестанет работать.§r"
-	);
-});
-base
-	.literal({ name: "add", description: "Добавляет игрока" })
-	.executes((ctx) => {
-		if (lang.inpvp(ctx)) return;
-
-		/** @type {[number, number, number,]} */
-		const basepos = db.get("basepos");
-
-		if (!basepos?.map) return ctx.reply(lang.nobase);
-		const bl = { x: basepos[0], y: basepos[1], z: basepos[2] };
-		let ent = world
-			.getDimension("overworld")
-			?.getEntitiesAtBlockLocation(bl)
-			?.find((e) => e.typeId == "s:base");
-
-		if (!ent) {
-			XA.Entity.removeTagsStartsWith(ctx.sender, "base: ");
-			return ctx.reply(lang.nobase);
-		}
-		try {
-			ent.runCommandAsync(`testfor @p[name="${ctx.sender.nameTag}",r=20]`);
-		} catch (e) {
-			return ctx.reply("§сТы слишком далеко от базы! (Вне зоны привата)");
-		}
-		const pl = XA.Entity.getClosetsEntitys(
-			ent,
-			1,
-			"minecraft:player",
-			1,
-			false
-		).find((e) => e.nameTag != ctx.sender.name);
-		if (!(pl instanceof Player))
-			return ctx.reply(
-				"§сРядом с базой должен стоять игрок, которого вы хотите добавить!"
-			);
-		ent.nameTag = ent.nameTag + ", " + pl.name;
-		ctx.reply(
-			`§6${pl.name}§7 добавлен в приват. Теперь там §6${ent.nameTag}§r`
+	if (!base)
+		return ctx.reply(
+			"§cУ вас нет базы! Вступите в существующую или создайте свою."
 		);
-	});
-base
-	.literal({ name: "remove", description: "Удаляет игрока из базы" })
-	.string("player")
-	.executes((ctx, player) => {
-		if (lang.inpvp(ctx)) return;
 
-		/** @type {[number, number, number,]} */
-		const basepos = db.get("basepos");
-
-		if (!basepos?.map) return ctx.reply(lang.nobase);
-		const bl = { x: basepos[0], y: basepos[1], z: basepos[2] };
-		let ent = world
-			.getDimension("overworld")
-			.getEntitiesAtBlockLocation(bl)
-			.find((e) => e.typeId == "s:base");
-		if (!ent) {
-			XA.Entity.removeTagsStartsWith(ctx.sender, "base: ");
-			return ctx.reply(lang.nobase);
-		}
-		try {
-			ent.runCommandAsync(`testfor @p[name="${ctx.sender.nameTag}",r=20]`);
-		} catch (e) {
-			return ctx.reply("§сТы слишком далеко от базы! (Вне зоны привата)§r");
-		}
-		const arr = ent.nameTag.split(", ");
-		if (!arr.includes(player))
-			return ctx.reply(
-				`§сИгрока §f${player}§c нет в привате. Там есть только: §f${ent.nameTag}`
-			);
-		/**
-		 * @type {string[]}
-		 */
-		let arr2 = [];
-		arr.forEach((e) => {
-			if (e != player) arr2.push(e);
-		});
-		if (arr2.length < 1)
-			return ctx.reply("§cВ привате должен быть хотя бы один игрок.");
-		if (player == ctx.sender.nameTag) {
-			let igr;
-			for (const pl of arr2) {
-				if (XA.Entity.fetch(pl)) igr = XA.Entity.fetch(pl);
-			}
-			if (!igr)
-				return ctx.reply(
-					"§cПри удалении себя из привата нужно что бы хотя бы один игрок в привате был онлайн."
-				);
-			igr.addTag("base: " + XA.Entity.getTagStartsWith(ctx.sender, "base: "));
-			igr.tell(
-				`§7Вам переданы права управления базой на §6${XA.Entity.getTagStartsWith(
-					ctx.sender,
-					"base: "
-				)}`
-			);
-			XA.Entity.removeTagsStartsWith(ctx.sender, "base: ");
-		}
-		ent.nameTag = arr2.join(", ");
-		ctx.reply(
-			`§6${player}§7 удален из в привата. Теперь там §6${ent.nameTag}§r`
-		);
-	});
-base.literal({ name: "list", description: "Список баз" }).executes((ctx) => {
-	if (lang.inpvp(ctx)) return;
-
-	/** @type {[number, number, number,]} */
-	const basepos = db.get("basepos");
-
-	if (!basepos?.map) return ctx.reply(lang.nobase);
-	const bl = { x: basepos[0], y: basepos[1], z: basepos[2] };
-	let ent = world
-		.getDimension("overworld")
-		.getEntitiesAtBlockLocation(bl)
-		.find((e) => e.typeId == "s:base");
-	if (!ent) {
-		XA.Entity.removeTagsStartsWith(ctx.sender, "base: ");
-		return ctx.reply(lang.nobase);
-	}
-	try {
-		ent.runCommandAsync(`testfor @p[name="${ctx.sender.name}",r=20]`);
-	} catch (e) {
-		return ctx.reply("§cТы слишком далеко от базы! (Вне зоны привата)");
-	}
-	ctx.reply(`§7В привате базы есть такие игроки: §6${ent.nameTag}`);
+	baseMenu(ctx.sender, base);
 });
 
 system.runInterval(
 	() => {
-		for (const base of world.overworld.getEntities({
-			type: "s:base",
-		})) {
-			const block = base.dimension.getBlock(Vector.floor(base.location));
-			if (block && block.typeId === "minecraft:barrel") continue;
+		const playersLocations = world.getPlayers().map((p) => {
+			return { dimension: p.dimension.type, loc: p.location };
+		});
 
-			base.nameTag
-				.split(", ")
-				// @ts-ignore
-				.forEach((e, i, a) =>
-					XA.Entity.fetch(e).tell(
-						"§cБаза с владельцем §f" + a[0] + "§c разрушена."
+		for (const base of RadiusRegion.getAllRegions()) {
+			const block = world[base.dimensionId].getBlock(Vector.floor(base.center));
+			if (block && block.typeId === MinecraftBlockTypes.barrel.id) {
+				if (
+					playersLocations.find(
+						(e) =>
+							e.dimension === base.dimensionId &&
+							Vector.distance(base.center, e.loc) < 10
 					)
+				)
+					world[base.dimensionId].spawnParticle(
+						"minecraft:endrod",
+						Vector.add(base.center, { x: 0.5, y: 1.5, z: 0.5 }),
+						new MolangVariableMap()
+					);
+
+				continue;
+			}
+
+			base.forEachOwner((player) => {
+				player.tell(
+					`§cБаза с владельцем §f${XA.Entity.getNameByID(
+						player.id
+					)}§c разрушена.`
 				);
-			base.triggerEvent("kill");
+			});
+			base.delete();
 		}
+
+		updateBases();
 	},
 	"baseInterval",
 	10
 );
-
-// world.events.blockBreak.subscribe((data) => {
-// 	const ent = XA.Entity.getClosetsEntitys(data.player, 20, "s:base", 1, false);
-// 	if (ent.length < 1 || ent[0].nameTag.split(", ").includes(data.player.name))
-// 		return stats.Bbreak.Eadd(data.player, 1);
-// 	data.dimension
-// 		.getBlock(data.block.location)
-// 		.setPermutation(data.brokenBlockPermutation.clone());
-// 	data.player.tell("§cПриват игрока " + ent[0].nameTag.split(", ")[0]);
-// 	const bl = data.block.location;
-// 	setTickTimeout(() => {
-// 		XA.runCommandAsync(`kill @e[type=item,x=${bl.x},z=${bl.z},y=${bl.y},r=2]`);
-// 	}, 1);
-// });
-
-// world.events.blockPlace.subscribe((data) => {
-// 	const ent = XA.Entity.getClosetsEntitys(data.player, 20, "s:base", 1, false);
-// 	if (ent.length < 1 || ent[0].nameTag.split(", ").includes(data.player.name))
-// 		return stats.Bplace.Eadd(data.player, 1);
-// 	const bl = data.block.location;
-// 	XA.runCommandAsync(
-// 		`fill ${bl.x} ${bl.y} ${bl.z} ${bl.x} ${bl.y} ${bl.z} air 0 destroy`
-// 	);
-// 	data.player.tell("§cПриват игрока " + ent[0].nameTag.split(", ")[0]);
-// 	console.warn(data.block.permutation.getAllProperties());
-// });
-
-// world.events.beforeExplosion.subscribe((data) => {
-// 	if (!data.impactedBlocks[0]) return;
-// 	const e = {},
-// 		loc = data.impactedBlocks.find((e) => e && e.x);
-// 	e.location = { x: loc.x, y: loc.y, z: loc.z };
-// 	const ent = XA.Entity.getClosetsEntitys(e, 20, "s:base", 1, false);
-// 	if (ent.length < 1) return;
-// 	for (const name of ent[0].nameTag.split(", ")) InRaid[name] = 60;
-// });

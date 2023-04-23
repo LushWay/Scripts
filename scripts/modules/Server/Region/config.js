@@ -59,21 +59,9 @@ export const BLOCK_CONTAINERS = [
  * @type {IRegionPermissions}
  */
 export const DEFAULT_REGION_PERMISSIONS = {
-	/**
-	 * If players in this region can use doors, trapdoors, and switches like buttons and levers
-	 */
 	doorsAndSwitches: true,
-	/**
-	 * If players in this region can open containers, this is like chests, furnaces, hoppers, etc
-	 */
 	openContainers: true,
-	/**
-	 * If the players in this region can fight each other
-	 */
 	pvp: false,
-	/**
-	 * the entitys allowed in this region
-	 */
 	allowedEntitys: ["minecraft:player", "minecraft:item", "x:sit"],
 	owners: [],
 };
