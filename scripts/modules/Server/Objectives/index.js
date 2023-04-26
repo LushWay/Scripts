@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
-import { Objectives } from "./var.js";
+import { OBJECTIVES } from "./var.js";
 
-for (const { id, name, watch } of Objectives) {
+for (const { id, name, watch } of OBJECTIVES) {
 	try {
 		world.scoreboard.addObjective(id, name ?? id);
 		if (watch) world.say("§cAdded objective with id " + id);

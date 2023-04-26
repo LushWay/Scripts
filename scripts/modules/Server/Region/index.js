@@ -3,6 +3,7 @@ import {
 	EntitySpawnAfterEvent,
 	MinecraftBlockTypes,
 	Player,
+	system,
 	world,
 } from "@minecraft/server";
 import { IS, XA } from "xapi.js";
@@ -38,7 +39,6 @@ export function setRegionGuards(allowFN, spawnFN) {
 	allowed = allowFN;
 	spawnAllowed = spawnFN;
 }
-
 
 /**
  * Permissions for region
@@ -111,6 +111,7 @@ world.events.blockBreak.subscribe(
 );
 
 world.events.entitySpawn.subscribe((data) => {
+	if (data.entity.typeId === "rubedo:database") return;
 	const region = Region.blockLocationInRegion(
 		data.entity.location,
 		data.entity.dimension.type
@@ -125,3 +126,28 @@ world.events.entitySpawn.subscribe((data) => {
 
 	XA.Entity.despawn(data.entity);
 });
+
+system.runInterval(
+	() => {
+		if (!Region.CONFIG.PERMS_SETTED) return;
+		const noPVPregions = Region.getAllRegions().filter(
+			(e) => !e.permissions.pvp
+		);
+
+		for (const player of world.getAllPlayers()) {
+			const {
+				location,
+				dimension: { type },
+			} = player;
+
+			if (
+				noPVPregions.find(
+					(e) => e.vectorInRegion(location) && e.dimensionId === type
+				)
+			)
+				player.triggerEvent("player:spawn");
+		}
+	},
+	"pvp region disable",
+	20
+);

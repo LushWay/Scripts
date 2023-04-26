@@ -1,12 +1,16 @@
 import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
+export const OptionsNameSymbol = Symbol("name");
+
 /**
- * @typedef {Record<string, { desc: string; value: T }>} DefaultConfig
- * @template [T = boolean | string | number]
+ * @typedef {string | boolean | number | JSONLike} Option
  */
 
-/** @typedef {Database<string, Record<string, string | boolean | number>>} OPTIONS_DB */
+/**
+ * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OptionsNameSymbol]?: string}} DefaultConfig
+ * @template [T = boolean | string | number]
+ */
 
 /**
  * TS doesn't converting true and false to boolean
@@ -14,70 +18,71 @@ import { Database } from "../Database/Rubedo.js";
  * @template T
  */
 
-/** @type {Record<string, DefaultConfig<boolean>>} */
-export const PLAYER_OPTIONS = {};
-
+/** @typedef {Database<string, Record<string, Option>>} OPTIONS_DB */
 /** @type {OPTIONS_DB} */
 const PLAYER_DB = Database.eventProxy(new Database("player"), {
-	beforeGet(key, value) {
-		return value ?? {};
-	},
-	beforeSet(key, value) {
-		return value;
-	},
+	beforeGet: (key, value) => value ?? {},
+	beforeSet: (key, value) => value,
 });
-/**
- * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
- * stored in a database
- * @template {DefaultConfig<boolean>} Config
- * @param {string} prefix - The prefix for the database.
- * @param {Config} CONFIG - This is an object that contains the default values for each option.
- * @returns {(player: Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
- */
-export function XPlayerOptions(prefix, CONFIG) {
-	if (!(prefix in PLAYER_OPTIONS)) {
-		PLAYER_OPTIONS[prefix] = CONFIG;
-	} else {
-		PLAYER_OPTIONS[prefix] = {
-			...PLAYER_OPTIONS[prefix],
-			...CONFIG,
-		};
-	}
-	return (player) =>
-		// @ts-expect-error Trust me, TS
-		generateOptionsProxy(PLAYER_DB, prefix, PLAYER_OPTIONS[prefix], player);
-}
 
-/** @typedef {DefaultConfig<string | number | boolean | JSONLike> & Record<string, { requires?: boolean }>} WorldOptionsConfig */
-
-/** @type {Record<string, WorldOptionsConfig>} */
-export const OPTIONS = {};
-
+/** @typedef {DefaultConfig<Option> & Record<string, { requires?: boolean }>} WorldOptionsConfig */
 /** @type {OPTIONS_DB} */
 const WORLD_OPTIONS = new Database("options", {
 	beforeGet: (key, value) => value ?? {},
 	beforeSet: (key, value) => value,
 });
 
-/**
- * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
- * configuration object's properties in localStorage
- * @template {WorldOptionsConfig} Config
- * @param {string} prefix - The prefix for the database.
- * @param {Config} CONFIG - The default values for the options.
- * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
- */
-export function XOptions(prefix, CONFIG) {
-	if (!(prefix in OPTIONS)) {
-		OPTIONS[prefix] = CONFIG;
-	} else {
-		OPTIONS[prefix] = {
-			...OPTIONS[prefix],
-			...CONFIG,
-		};
+export class Options {
+	/** @type {Record<string, DefaultConfig<boolean>>} */
+	static PLAYER = {};
+	/**
+	 * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
+	 * stored in a database
+	 * @template {DefaultConfig<boolean>} Config
+	 * @param {string} name - The name that shows to players
+	 * @param {string} prefix - The prefix for the database.
+	 * @param {Config} CONFIG - This is an object that contains the default values for each option.
+	 * @returns {(player: Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
+	 */
+	static player(name, prefix, CONFIG) {
+		CONFIG[OptionsNameSymbol] = name;
+
+		if (!(prefix in this.PLAYER)) {
+			this.PLAYER[prefix] = CONFIG;
+		} else {
+			this.PLAYER[prefix] = {
+				...this.PLAYER[prefix],
+				...CONFIG,
+			};
+		}
+		return (player) =>
+			// @ts-expect-error Trust me, TS
+			generateOptionsProxy(PLAYER_DB, prefix, this.PLAYER[prefix], player);
 	}
-	// @ts-expect-error Trust me, TS
-	return generateOptionsProxy(WORLD_OPTIONS, prefix, OPTIONS[prefix]);
+
+	/** @type {Record<string, WorldOptionsConfig>} */
+	static WORLD = {};
+
+	/**
+	 * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
+	 * configuration object's properties in localStorage
+	 * @template {WorldOptionsConfig} Config
+	 * @param {string} prefix - The prefix for the database.
+	 * @param {Config} CONFIG - The default values for the options.
+	 * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
+	 */
+	static world(prefix, CONFIG) {
+		if (!(prefix in this.WORLD)) {
+			this.WORLD[prefix] = CONFIG;
+		} else {
+			this.WORLD[prefix] = {
+				...this.WORLD[prefix],
+				...CONFIG,
+			};
+		}
+		// @ts-expect-error Trust me, TS
+		return generateOptionsProxy(WORLD_OPTIONS, prefix, this.WORLD[prefix]);
+	}
 }
 
 /**

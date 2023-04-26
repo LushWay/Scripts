@@ -1,9 +1,10 @@
-import { Player, world } from "@minecraft/server";
-import { OPTIONS } from "lib/Class/Options.js";
+import { ItemStack, Player, world } from "@minecraft/server";
+import { Options, OptionsNameSymbol } from "lib/Class/Options.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
 import { ROLES, ROLES_NAMES as TR, XA, getRole, setRole, toStr } from "xapi.js";
+import { FormCallback } from "../../../lib/Form/utils.js";
 
 /** @type {Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
 const DB = XA.tables.player;
@@ -86,13 +87,32 @@ R.executes((ctx) => {
 	form.show(ctx.sender);
 });
 
-world.events.itemUse.subscribe(async ({ source: player, itemStack }) => {
-	if (itemStack.typeId !== "xa:admin" || !(player instanceof Player)) return;
-	options(player);
-});
-
 new XA.Command({
 	name: "options",
+	role: "member",
+	description: "Настройки",
+}).executes((ctx) => {
+	poptions(ctx.sender);
+});
+
+/**
+ * @param {Player} player
+ */
+function poptions(player) {
+	const form = new ActionForm("§dНастройки");
+
+	for (const groupName in Options.PLAYER) {
+		const name = Options.PLAYER[groupName][OptionsNameSymbol];
+		form.addButton(name, null, () => {
+			group(player, groupName, "PLAYER");
+		});
+	}
+
+	form.show(player);
+}
+
+new XA.Command({
+	name: "wsettings",
 	role: "admin",
 	description: "Настройки мира",
 }).executes((ctx) => {
@@ -100,15 +120,14 @@ new XA.Command({
 });
 
 /**
- *
  * @param {Player} player
  */
 function options(player) {
 	const form = new ActionForm("§dНастройки мира");
 
-	for (const groupName in OPTIONS) {
+	for (const groupName in Options.WORLD) {
 		const data = OPTIONS_DB.get(groupName);
-		const requires = Object.entries(OPTIONS[groupName]).reduce(
+		const requires = Object.entries(Options.WORLD[groupName]).reduce(
 			(count, [key, option]) =>
 				option.requires && typeof data[key] === "undefined" ? count + 1 : count,
 			0
@@ -117,7 +136,7 @@ function options(player) {
 			`${groupName}${requires ? ` §c(${requires}!)` : ""}`,
 			null,
 			() => {
-				group(player, groupName);
+				group(player, groupName, "WORLD");
 			}
 		);
 	}
@@ -132,79 +151,119 @@ const OPTIONS_DB = new Database("options");
  *
  * @param {Player} player
  * @param {string} groupName
+ * @param {"PLAYER" | "WORLD"} groupType
+ * @param {Record<string, string>} [errors]
  */
-function group(player, groupName) {
-	const config = OPTIONS[groupName];
+function group(player, groupName, groupType, errors = {}) {
+	const source = groupType === "PLAYER" ? Options.PLAYER : Options.WORLD;
+	const config = source[groupName];
+	const name = config[OptionsNameSymbol];
 	const data = OPTIONS_DB.get(groupName);
-	/** @type {[string, () => void][]} */
+
+	/** @type {[string, (input: string | boolean) => string][]} */
 	const buttons = [];
-	const form = new ActionForm(
-		groupName,
-		Object.entries(config)
-			.map(([KEY, OPTION]) => {
-				const value = data[KEY];
-				const { requires } = config[KEY];
+	/** @type {ModalForm<(ctx: FormCallback, ...options: any) => void>} */
+	const form = new ModalForm(name ?? groupName);
 
-				buttons.push([
-					`${KEY}${requires && typeof value === "undefined" ? " §c(!)" : ""}`,
-					function edit(mesasge = "") {
-						const displayValue = value ?? "§8<не установлено>";
-						const val = value ?? OPTION.value;
-						new ModalForm(`${groupName} - ${KEY}`)
-							.addTextField(
-								`${mesasge}§f${OPTION.desc}§r\n \n §7Значение: ${
-									typeof displayValue === "string"
-										? displayValue
-										: toStr(displayValue)
-								}\n §7Дефолт: ${toStr(
-									OPTION.value
-								)}§r\n §7Тип: §f${typeof OPTION.value}\n \n `,
-								"Оставьте пустым для отмены",
-								typeof val === "string" ? val : JSON.stringify(val)
-							)
-							.show(player, (ctx, input) => {
-								if (input) {
-									let total;
-									switch (typeof OPTION.value) {
-										case "string":
-											total = input;
-											break;
-										case "number":
-											total = Number(input);
-											if (isNaN(total)) return edit("§cВведите число!");
-											break;
-										case "boolean":
-											total = input === "true";
-											break;
-										case "object":
-											total = JSON.safeParse(input, null, (error) =>
-												edit(error.message)
-											);
+	for (const KEY in config) {
+		const OPTION = config[KEY];
+		const dbValue = data[KEY];
+		const isDef = typeof dbValue === "undefined";
+		const message = errors[KEY] ? `${errors[KEY]}\n` : "";
+		const requires =
+			Reflect.get(config[KEY], "requires") && typeof dbValue === "undefined";
 
-											if (!total) return;
-											break;
-									}
+		const value = dbValue ?? OPTION.value;
+		const toggle = typeof value === "boolean";
 
-									data[KEY] = total;
-									OPTIONS_DB.set(groupName, data);
-									group(player, groupName);
+		let label = toggle ? "" : "\n";
+		label += message;
+		if (requires) label += "§c(!) ";
+		label += `§f${OPTION.name}`; //§r
+		if (OPTION.desc) label += `§i - ${OPTION.desc}`;
+
+		if (toggle) {
+			if (isDef) label += `\n §8(По умолчанию)`;
+			label += "\n ";
+		} else {
+			label += `\n   §7Значение: ${str(dbValue ?? OPTION.value)}`;
+			label += `${isDef ? ` §8(По умолчанию)` : ""}\n`;
+
+			label += `   §7Тип: §f${Types[typeof value] ?? typeof value}`;
+		}
+
+		if (toggle) form.addToggle(label, value);
+		else
+			form.addTextField(
+				label,
+				"Настройка не изменится",
+				typeof value === "string" ? value : JSON.stringify(value)
+			);
+
+		buttons.push([
+			KEY,
+			(input) => {
+				let total;
+				if (typeof input !== "undefined") {
+					if (typeof input === "boolean") total = input;
+					else
+						switch (typeof OPTION.value) {
+							case "string":
+								total = input;
+								break;
+							case "number":
+								total = Number(input);
+								if (isNaN(total)) return "§cВведите число!";
+								break;
+							case "object":
+								try {
+									total = JSON.parse(input);
+								} catch (error) {
+									return `§c${error.message}`;
 								}
-							});
-					},
-				]);
+								break;
+						}
 
-				let button = "";
+					if (str(data[KEY]) === str(total)) return;
+					data[KEY] = total;
+					OPTIONS_DB.set(groupName, data);
+					return "§aСохранено!";
+				}
+			},
+		]);
+	}
 
-				button += `§f${KEY}§7 - ${OPTION.desc}§r`;
-				if (value) button += `\n §iЗначение: ${toStr(value)}`;
-				button += `\n §iДефолт: ${toStr(OPTION.value)}§r\n \n \n`;
+	form.show(player, (ctx, ...options) => {
+		/** @type {Record<string, string>} */
+		const messages = {};
+		for (const [i, option] of options.entries()) {
+			const [KEY, callback] = buttons[i];
+			const result = callback(option);
+			if (result) messages[KEY] = result;
+		}
 
-				return button;
-			})
-			.join("")
-	);
+		if (Object.keys(messages).length)
+			group(player, groupName, groupType, messages);
+		else {
+			if (groupType === "PLAYER") poptions(player);
+			else options(player);
+		}
+	});
+}
+ItemStack;
 
-	form.addButton("< Назад", null, () => options(player));
-	for (const [key, callback] of buttons) form.addButton(key, null, callback);
-	form.show(player);
+/** @type {Partial<Record<AllTypes, string>>} */
+const Types = {
+	string: "Строка",
+	number: "Число",
+	object: "JSON-Объект",
+	boolean: "Переключатель",
+};
+
+/**
+ * @param {any} value
+ */
+function str(value) {
+	if (typeof value === "string") return value;
+	return toStr(value);
 }

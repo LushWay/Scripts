@@ -1,10 +1,30 @@
+const DATA_TYPE = Symbol("data");
+const RETURN_TYPE = Symbol("return");
+const EMIT = Symbol("emit");
+
 /**
  * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
  * @template Data The type of the data that the events will be emitted with.
  * @template [Return=void] Return type of the subscriber
  * @template [Callback = (arg: Data) => Return] The type of the callback function that will be used for the events.
  */
-export class Subscriber {
+export class EventSignal {
+	/** @type {Data} */
+	[DATA_TYPE];
+
+	/** @type {Return} */
+	[RETURN_TYPE];
+	/**
+	 *
+	 * @template {EventSignal<any>} Signal
+	 * @param {Signal} signal
+	 * @param {Signal[DATA_TYPE]} data
+	 */
+	static emit(signal, data) {
+		const results = [];
+		for (const [fn] of signal.events) results.push(fn(data));
+		return results;
+	}
 	/**
 	 * A private Map that stores the event subscribers, with the key being the callback function and the value being the position of the subscriber.
 	 * @type {Map<Callback, number>}
@@ -33,15 +53,6 @@ export class Subscriber {
 	 * Emits an event to all subscribers, passing the data to the callback function.
 	 * @param {Data} data - The data to pass to the callback function when the event is emitted.
 	 * @param {number} count - The number of subscribers that will receive the event, defaults to all subscribers.
-	 * @returns {Promise<Return[]>}
-	 */
-	async emitAsync(data, count = 0) {
-		return Promise.all(this.emit(data, count));
-	}
-	/**
-	 * Emits an event to all subscribers, passing the data to the callback function.
-	 * @param {Data} data - The data to pass to the callback function when the event is emitted.
-	 * @param {number} count - The number of subscribers that will receive the event, defaults to all subscribers.
 	 * @returns {Return[]}
 	 */
 	emit(data, count = 0) {
@@ -53,14 +64,5 @@ export class Subscriber {
 			if (typeof callback === "function") results.push(callback(data));
 		}
 		return results;
-	}
-	/**
-	 * Export the subscribe and unsubscribe method
-	 */
-	get export() {
-		return {
-			subscribe: this.subscribe.typedBind(this),
-			unsubscribe: this.unsubscribe.typedBind(this),
-		};
 	}
 }

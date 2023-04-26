@@ -1,27 +1,8 @@
-interface IConfiguration {
-	// console: {
-	// 	/* Where you wanna see log messages */
-	// 	logPath: "chat" | "console" | "disabled";
-	// 	/* Where you wanna see error messages */
-	// 	errPath: "chat" | "console";
-	// };
-	chat: {
-		cooldown: number;
-		range: number;
-	};
-	module: {
-		/* Enables await on every module load */
-		loadAwait: boolean;
-	};
-	commandPrefix: string;
-	/**
-	 * Time in ms to mark XA.state.first_load
-	 */
-	firstPlayerJoinTime: number;
-}
 type Vector3 = import("@minecraft/server").Vector3;
+type Vector2 = import("@minecraft/server").Vector2;
+type Point = { x: number; z: number };
 
-interface IAbstactDatabase<Key = string, Value = any, DeleteReturn = any> {
+interface AbstactDatabase<Key = string, Value = any, DeleteReturn = any> {
 	get(k: Key): Value;
 	set(k: Key, v: Value): void;
 	delete(k: Key): DeleteReturn;
@@ -34,3 +15,13 @@ type FunctionFilter<T> = {
 type Dimensions = "nether" | "end" | "overworld";
 
 type JSONLike = Record<string | symbol | number, any>;
+
+type AllTypes =
+	| "string"
+	| "number"
+	| "object"
+	| "boolean"
+	| "symbol"
+	| "bigint"
+	| "undefined"
+	| "function";

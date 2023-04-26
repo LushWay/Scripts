@@ -3,7 +3,7 @@ import { ActionForm } from "lib/Form/ActionForm.js";
 import { handle, IS, XA } from "xapi.js";
 import { Database } from "../../../lib/Database/Rubedo.js";
 import { CONFIG_MENU } from "../../Server/Menu/var.js";
-import { JOIN_EVENTS } from "../../Server/OnJoin/events.js";
+import { JOIN_EVENTS } from "../../Server/OnJoin/var.js";
 import { CubeRegion, Region } from "../../Server/Region/Region.js";
 import {
 	ClearRegion,

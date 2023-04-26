@@ -41,14 +41,31 @@ const HIGEST_Y_VALUE = 320;
 const TABLE = new Database("region");
 
 export class Region {
+	/** @private */
+	static PERMISSIONS = DEFAULT_REGION_PERMISSIONS;
 	static CONFIG = {
 		HIGEST_Y_VALUE,
 		LOWEST_Y_VALUE,
 
+		PERMS_SETTED: false,
 		/**
 		 * The default permissions for all regions made
 		 */
-		PERMISSIONS: DEFAULT_REGION_PERMISSIONS,
+		get PERMISSIONS() {
+			if (!this.PERMS_SETTED)
+				throw new ReferenceError(
+					"Cannot access Region.CONFIG.PERMISSIONS before setting."
+				);
+
+			return Region.PERMISSIONS;
+		},
+		set PERMISSIONS(NEW) {
+			if (this.PERMS_SETTED)
+				throw new ReferenceError("Already set Region.CONFIG.PERMISSIONS.");
+
+			Region.PERMISSIONS = NEW;
+			this.PERMS_SETTED = true;
+		},
 
 		/**
 		 * If the regions have been grabbed if not it will grab them and set this to true
@@ -224,6 +241,22 @@ export class CubeRegion extends Region {
 		});
 	}
 }
+
+TABLE.on("beforeGet", (key, value) => {
+	value = DB.setDefaults(value, {
+		dimensionId: "overworld",
+		permissions: Region.CONFIG.PERMISSIONS,
+		key,
+	});
+	return value;
+});
+TABLE.on("beforeSet", (key, value) => {
+	return DB.removeDefaults(value, {
+		dimensionId: "overworld",
+		permissions: Region.CONFIG.PERMISSIONS,
+		key,
+	});
+});
 
 export class RadiusRegion extends Region {
 	/**

@@ -1,5 +1,5 @@
 import { ItemStack, Player, world } from "@minecraft/server";
-import { Subscriber } from "../../../lib/Class/Events.js";
+import { EventSignal } from "../../../lib/Class/Events.js";
 import { ActionForm } from "../../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../../lib/Form/MessageForm.js";
 import { SERVER } from "../../Server/Server/var.js";
@@ -111,20 +111,20 @@ export class Store {
 	items = [];
 
 	#EVENTS = {
-		/** @type {Subscriber<Player>} */
-		open: new Subscriber(),
+		/** @type {EventSignal<Player>} */
+		open: new EventSignal(),
 
-		/** @type {Subscriber<Player>} */
-		buy: new Subscriber(),
+		/** @type {EventSignal<Player>} */
+		buy: new EventSignal(),
 
-		/** @type {Subscriber<Player>} */
-		beforeBuy: new Subscriber(),
+		/** @type {EventSignal<Player>} */
+		beforeBuy: new EventSignal(),
 	};
 
 	events = {
-		open: this.#EVENTS.open.export,
-		buy: this.#EVENTS.buy.export,
-		beforeBuy: this.#EVENTS.beforeBuy.export,
+		open: this.#EVENTS.open,
+		buy: this.#EVENTS.buy,
+		beforeBuy: this.#EVENTS.beforeBuy,
 	};
 
 	/**
@@ -235,7 +235,10 @@ function itemDescription(item, c = "§g") {
 
 world.events.entityHit.subscribe((data) => {
 	if (!data.hitBlock) return;
-	const store = Store.find(data.hitBlock.location, data.hitBlock.dimension.type);
+	const store = Store.find(
+		data.hitBlock.location,
+		data.hitBlock.dimension.type
+	);
 
 	if (!store || !(data.entity instanceof Player)) return;
 

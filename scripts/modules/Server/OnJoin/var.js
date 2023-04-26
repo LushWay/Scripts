@@ -1,3 +1,6 @@
+import { Player } from "@minecraft/server";
+import { EventSignal } from "lib/Class/Events.js";
+
 /**
  * Выводит строку времени
  * @returns {string}
@@ -21,20 +24,31 @@ export function shortTime() {
 	return `${time.getHours()}:${min.length == 2 ? min : "0" + min}`;
 }
 
-export const CONFIG_JOIN = {
-	/** Array with strings to show on join. They will change every second. You can use $<value> with any string value in this.animation_vars  */
-	animation: {
+export const JOIN_CONFIG = {
+	/** Array with strings to show on join. They will change every second. You can use $<var name> from animation.vars  */
+	title_animation: {
 		stages: ["» $title «", "»  $title  «"],
+		/** @type {Record<string, string>} */
 		vars: {
-			title: "§b§lBuild§r§f",
+			title: "§6§lDevelopment§r§f",
 		},
 	},
-	// actionBar: "§3Сдвинься что бы продолжить", // Optional
-	subtitle: "Добро пожаловать!", // Optional
-	onJoin: {
+	actionBar: "", // Optional
+	subtitle: "Разработка!", // Optional
+	messages: {
 		air: "§8Очнулся в воздухе",
 		ground: "§8Сдвинулся",
 		sound: "break.amethyst_cluster",
 	},
 };
 
+export const JOIN_EVENTS = {
+	/** @type {EventSignal<Player>} */
+	playerJoin: new EventSignal(),
+
+	/** @type {EventSignal<Player>} */
+	playerGuide: new EventSignal(),
+
+	/** @type {EventSignal<Player>} */
+	playerClosedGuide: new EventSignal(),
+};

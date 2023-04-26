@@ -59,7 +59,7 @@ export class XCooldown {
 		return o;
 	}
 	/**
-	 * @type {IAbstactDatabase}
+	 * @type {AbstactDatabase}
 	 * @private
 	 */
 	db;
@@ -79,7 +79,7 @@ export class XCooldown {
 	player;
 	/**
 	 * create class for manage player cooldowns
-	 * @param {IAbstactDatabase} db Database to store cooldowns
+	 * @param {AbstactDatabase} db Database to store cooldowns
 	 * @param {string} prefix Preifx of the cooldown
 	 * @param {string | Player} source id or player that used for generate key and tell messages
 	 * @param {number} time Time in ms
@@ -118,5 +118,3 @@ export class XCooldown {
 		this.db.delete(this.key);
 	}
 }
-
-

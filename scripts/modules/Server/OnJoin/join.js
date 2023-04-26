@@ -1,9 +1,9 @@
 import { Player, system, world } from "@minecraft/server";
 import { Database } from "lib/Database/Rubedo.js";
 import { XA } from "xapi.js";
-import { __JOIN_EMITTERS } from "./events.js";
+import { EventSignal } from "../../../lib/Class/Events.js";
 import "./subscribes.js";
-import { CONFIG_JOIN } from "./var.js";
+import { JOIN_CONFIG, JOIN_EVENTS } from "./var.js";
 
 /** @type {Database<string, IJoinData>} */
 const PDB = Database.eventProxy(new Database("player"), {
@@ -79,24 +79,24 @@ system.runPlayerInterval(
 					data.stage++;
 					if (
 						typeof data.stage !== "number" ||
-						data.stage >= CONFIG_JOIN.animation.stages.length
+						data.stage >= JOIN_CONFIG.title_animation.stages.length
 					)
 						data.stage = 0;
 
 					// Creating title
-					let title = CONFIG_JOIN.animation.stages[data.stage];
+					let title = JOIN_CONFIG.title_animation.stages[data.stage];
 					for (const [key, value] of Object.entries(
-						CONFIG_JOIN.animation.vars
+						JOIN_CONFIG.title_animation.vars
 					)) {
 						title = title.replace("$" + key, value);
 					}
 
 					// Show actionBar
 					if (
-						"actionBar" in CONFIG_JOIN &&
-						typeof CONFIG_JOIN.actionBar === "string"
+						"actionBar" in JOIN_CONFIG &&
+						typeof JOIN_CONFIG.actionBar === "string"
 					)
-						player.onScreenDisplay.setActionBar(CONFIG_JOIN.actionBar);
+						player.onScreenDisplay.setActionBar(JOIN_CONFIG.actionBar);
 
 					// Title + subtitle
 					/** @type {import("@minecraft/server").TitleDisplayOptions} */
@@ -105,7 +105,7 @@ system.runPlayerInterval(
 						fadeOutSeconds: 1,
 						staySeconds: 2,
 					};
-					if (CONFIG_JOIN.subtitle) options.subtitle = CONFIG_JOIN.subtitle;
+					if (JOIN_CONFIG.subtitle) options.subtitle = JOIN_CONFIG.subtitle;
 					// Show...
 					player.onScreenDisplay.setTitle(title, options);
 				} else {
@@ -120,7 +120,7 @@ system.runPlayerInterval(
 		}
 		if (data.learning && !data.message) {
 			// Show first time join guide
-			__JOIN_EMITTERS.PlayerGuide.emit(player);
+			EventSignal.emit(JOIN_EVENTS.playerGuide, player);
 			delete data.learning;
 			modified = true;
 		}
@@ -131,9 +131,13 @@ system.runPlayerInterval(
 	20
 );
 
-const getSettings = XA.PlayerOptions("join", {
-	message: { desc: "Сообщения о входе других игроков", value: true },
-	sound: { desc: "Звук входа других игроков", value: true },
+const getSettings = XA.PlayerOptions("Вход", "join", {
+	message: {
+		desc: "Сообщения о входе других игроков",
+		value: true,
+		name: "Сообщение",
+	},
+	sound: { desc: "Звук входа других игроков", value: true, name: "Звук" },
 });
 
 /**
@@ -152,12 +156,12 @@ function JOIN(player, data, messageType) {
 	for (const plr of world.getPlayers()) {
 		if (plr.id === player.id) continue;
 		const settings = getSettings(plr);
-		if (settings.sound) plr.playSound(CONFIG_JOIN.onJoin.sound);
+		if (settings.sound) plr.playSound(JOIN_CONFIG.messages.sound);
 		if (settings.message)
-			plr.tell(`§7${player.name} ${CONFIG_JOIN.onJoin[messageType]}`);
+			plr.tell(`§7${player.name} ${JOIN_CONFIG.messages[messageType]}`);
 	}
 
-	if (!data.learning) __JOIN_EMITTERS.PlayerJoin.emit(player);
+	if (!data.learning) EventSignal.emit(JOIN_EVENTS.playerJoin, player);
 	player.onScreenDisplay.clearTitle();
 
 	const oldTag = data.name;

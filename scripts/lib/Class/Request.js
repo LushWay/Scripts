@@ -9,7 +9,7 @@ export class XRequest {
 	}
 	/**
 	 * DB to store requests across the sessions
-	 * @type {IAbstactDatabase}
+	 * @type {AbstactDatabase}
 	 * @private
 	 */
 	db;
@@ -23,7 +23,7 @@ export class XRequest {
 
 	/**
 	 * This class is used to help manage requests for specified id in db
-	 * @param {IAbstactDatabase} db - DB to store request data
+	 * @param {AbstactDatabase} db - DB to store request data
 	 * @param {string} prefix - Prefix of request type.
 	 * @param {string} ID - May be player.id or any string
 	 */

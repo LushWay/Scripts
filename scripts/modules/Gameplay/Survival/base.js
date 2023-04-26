@@ -57,7 +57,7 @@ world.events.blockBreak.subscribe(
 const baseItemStack = new ItemStack(MinecraftItemTypes.barrel);
 baseItemStack.setLore(["Поставьте эту бочку и она", "станет базой."]);
 
-new Store(new Vector(-234, 65, -74), "overworld").addItem(
+new Store({ x: -234, y: 65, z: -74 }, "overworld").addItem(
 	baseItemStack,
 	new MoneyCost(10)
 );

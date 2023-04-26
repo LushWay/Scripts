@@ -1,16 +1,14 @@
 import { MinecraftEffectTypes, system, world } from "@minecraft/server";
 import { IS } from "xapi.js";
+import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
 import { setRegionGuards } from "../../Server/Region/index.js";
 import "./menu.js";
+import { CONFIG } from "../../../config.js";
 
-const GLOBAL_ALLOWED_ENTITIES = [
-	"minecraft:player",
-	"minecraft:item",
-	"f:t",
-	"rubedo:database",
-	"x:sit",
-];
+const GLOBAL_ALLOWED_ENTITIES = ["minecraft:player", "minecraft:item"].concat(
+	CONFIG.system_entities
+);
 
 setRegionGuards(
 	// Common actions guard
@@ -24,6 +22,14 @@ setRegionGuards(
 );
 
 Region.CONFIG.PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES;
+JOIN_CONFIG.title_animation = {
+	stages: ["» $title «", "»  $title  «"],
+	vars: {
+		title: "§b§lBuild§r§f",
+	},
+};
+JOIN_CONFIG.subtitle = "Строим вместе!";
+
 world.beforeEvents.explosion.subscribe((data) => (data.cancel = true));
 
 const EFFECT_Y = -53;

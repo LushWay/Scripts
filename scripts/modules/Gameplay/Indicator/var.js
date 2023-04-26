@@ -1,9 +1,9 @@
 import { Entity, Player } from "@minecraft/server";
 import { ScoreboardDB } from "lib/Database/Scoreboard.js";
-import { Objectives } from "../../Server/Objectives/var.js";
+import { OBJECTIVES } from "../../Server/Objectives/var.js";
 
 const pvpScore = "pvp";
-Objectives.push({ id: pvpScore, watch: true });
+OBJECTIVES.push({ id: pvpScore, watch: true });
 export const PVP = new ScoreboardDB(pvpScore);
 
 /**

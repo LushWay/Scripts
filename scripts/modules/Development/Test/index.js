@@ -3,6 +3,7 @@ import {
 	Items,
 	MinecraftItemTypes,
 	MolangVariableMap,
+	Player,
 	Vector,
 	system,
 	world,
@@ -118,37 +119,7 @@ const tests = {
 			})
 		);
 	},
-	42(ctx) {
-		const block = ctx.sender.getBlockFromViewDirection({
-			includeLiquidBlocks: false,
-			includePassableBlocks: false,
-			maxDistance: 50,
-		});
 
-		if (!block) return;
-
-		const variables = new MolangVariableMap().setSpeedAndDirection(
-			"variable.actor",
-			10,
-			{ x: 0, z: 0, y: 5 }
-		);
-
-		let c = 0;
-		const id = system.runInterval(
-			() => {
-				c++;
-				block.dimension.spawnParticle(
-					"minecraft:dragon_breath_fire",
-					Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-					variables
-				);
-
-				if (c >= 6) system.clearRun(id);
-			},
-			"test",
-			10
-		);
-	},
 	43(ctx) {
 		const loc = randomTeleport(
 			ctx.sender,
@@ -178,9 +149,6 @@ const tests = {
 			20
 		);
 	},
-	44(ctx) {
-		world.debug(world.getPlayers({ scoreOptions: [{ objective: "pvp" }] }));
-	},
 	45(ctx) {
 		const i = MinecraftItemTypes;
 
@@ -203,7 +171,64 @@ const tests = {
 			ctx.reply(XA.Utils.localizationName(stack));
 		}
 	},
+	48(ctx) {
+		const block = ctx.sender.getBlockFromViewDirection({
+			includeLiquidBlocks: false,
+			includePassableBlocks: false,
+			maxDistance: 50,
+		});
+
+		if (!block) return;
+
+		// falling_dust explosion_particle explosion_manual glow_particle sparkler_emitter wax_particle
+
+		const variables = new MolangVariableMap().setColorRGB("color", {
+			red: 1,
+			green: 1,
+			blue: 1,
+			alpha: 0,
+		});
+
+		let c = 0;
+		const id = system.runInterval(
+			() => {
+				c++;
+				block.dimension.spawnParticle(
+					"minecraft:colored_flame_particle",
+					Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+					variables
+				);
+
+				if (c >= 6) system.clearRun(id);
+			},
+			"test",
+			10
+		);
+	},
+	50(ctx) {
+		const nums = ctx.args.map(Number);
+		const full = nums[1] ?? 10;
+		const current = nums[2] ?? 5;
+		const damage = nums[3] ?? 0;
+		let bar = "";
+		for (let i = 1; i <= full; i++) {
+			if (i <= current) bar += "§c/";
+			if (i > current && i <= current + damage) bar += "§e/";
+			if (i > current + damage) bar += "§7/";
+		}
+
+		ctx.reply(bar);
+	},
 };
+
+world.events.entityHit.subscribe((data) => {
+	if (data.entity instanceof Player) {
+		const axe = XA.Entity.getHeldItem(data.entity);
+		if (axe && !axe.typeId.includes("axe")) return;
+
+		data.entity.startItemCooldown("axe", 10);
+	}
+});
 
 // const i = MinecraftItemTypes;
 // new Store({ x: -180, y: 69, z: -144 }, "minecraft:overworld", {

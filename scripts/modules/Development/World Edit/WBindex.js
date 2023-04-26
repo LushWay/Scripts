@@ -11,9 +11,17 @@ import { CONFIG_WB } from "./config.js";
 import { SHAPES } from "./utils/shapes.js";
 import { setblock } from "./utils/utils.js";
 
-const GetPlayerSettings = XA.PlayerOptions("wb", {
-	noBrushParticles: { desc: "Отключает партиклы у кисти", value: false },
-	enableMobile: { desc: "Включает мобильное управление", value: false },
+const GetPlayerSettings = XA.PlayerOptions('Строитель мира', "wb", {
+	noBrushParticles: {
+		desc: "Отключает партиклы у кисти",
+		value: false,
+		name: "Партиклы кисти",
+	},
+	enableMobile: {
+		desc: "Включает мобильное управление",
+		value: false,
+		name: "Мобильное управление",
+	},
 });
 
 /* It's a code that replaces the block with a random block from the lore of the item. */

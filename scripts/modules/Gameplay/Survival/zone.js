@@ -1,16 +1,9 @@
-import {
-	MolangVariableMap,
-	Player,
-	Vector,
-	system,
-	world,
-} from "@minecraft/server";
+import { Player, Vector, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { SERVER } from "../../Server/Server/var.js";
-import { Atp } from "./portals.js";
 
-const options = XA.WorldOptions("zone", {
-	center: { desc: "", value: "0 0" },
+const options = XA.WorldOptions("server", {
+	zone_center: { desc: "", value: "0 0", name: "Центр зоны" },
 });
 
 /**
@@ -20,7 +13,7 @@ const options = XA.WorldOptions("zone", {
  * @param {{x: number, z: number}} zone
  * @param {boolean} [plus]
  */
-function ret(player, isX, zone, plus) {
+function zone(player, isX, zone, plus) {
 	const loc = isX
 		? [zone.x + (plus ? 1 : -1), player.location.y, player.location.z]
 		: [player.location.x, player.location.y, zone.z + (plus ? 1 : -1)];
@@ -30,38 +23,13 @@ function ret(player, isX, zone, plus) {
 		`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? "x" : "z"}`
 	);
 }
-/**
- *
- * @param {Player} player
- * @param {boolean} isX
- * @param {{x: number, z: number}} zone
- */
-function pret(player, isX, zone) {
-	const floored = Vector.floor(player.location);
-	const l = isX
-		? [zone.x, floored.y + 1, floored.z]
-		: [floored.x, floored.y + 1, zone.z];
-
-	const loc = { x: l[0], y: l[1], z: l[2] };
-
-	player.dimension.spawnParticle(
-		"minecraft:falling_border_dust_particle",
-		loc,
-		new MolangVariableMap()
-	);
-	player.dimension.spawnParticle(
-		"minecraft:rising_border_dust_particle",
-		loc,
-		new MolangVariableMap()
-	);
-}
 
 system.runInterval(
 	() => {
 		const players = world.getAllPlayers();
 		SERVER.radius = 200 + 20 * players.length;
 		const rad = SERVER.radius;
-		const center = options.center.split(", ").map(Number);
+		const center = options.zone_center.split(", ").map(Number);
 
 		/**
 		 *
@@ -75,34 +43,15 @@ system.runInterval(
 		for (const p of players) {
 			const rmax = { x: center[0] + rad, z: center[1] + rad };
 			const rmin = { x: center[0] - rad, z: center[1] - rad };
-			const l = Vector.floor(p.location);
+			const { x, z } = Vector.floor(p.location);
 
-			const xtrue = inRange(l.x, rmin.x, rmax.x);
-			const ztrue = inRange(l.z, rmin.z, rmax.z);
+			const xtrue = inRange(x, rmin.x, rmax.x);
+			const ztrue = inRange(z, rmin.z, rmax.z);
 
-			if (xtrue && ztrue) {
-				if (
-					XA.Entity.getScore(p, "inv") !== 2 &&
-					!p.hasTag("saving") &&
-					!p.hasTag("br:ded")
-				) {
-					Atp(p, "anarch", { pvp: true });
-				} else continue;
-			}
-
-			if (l.x >= rmax.x && l.x <= rmax.x + 10 && ztrue) ret(p, true, rmax);
-			if (l.x >= rmax.x - 10 && l.x <= rmax.x && ztrue) pret(p, true, rmax);
-
-			if (l.z >= rmax.z && l.z <= rmax.z + 10 && xtrue) ret(p, false, rmax);
-			if (l.z >= rmax.z - 10 && l.z <= rmax.z && xtrue) pret(p, false, rmax);
-
-			if (l.x <= rmin.x && l.x >= rmin.x - 10 && ztrue)
-				ret(p, true, rmin, true);
-			if (l.x <= rmin.x + 10 && l.x >= rmin.x && ztrue) pret(p, true, rmin);
-
-			if (l.z <= rmin.z && l.z >= rmin.z - 10 && xtrue)
-				ret(p, false, rmin, true);
-			if (l.z <= rmin.z + 10 && l.z >= rmin.z && xtrue) pret(p, false, rmin);
+			if (x >= rmax.x && x <= rmax.x + 10 && ztrue) zone(p, true, rmax);
+			if (z >= rmax.z && z <= rmax.z + 10 && xtrue) zone(p, false, rmax);
+			if (x <= rmin.x && x >= rmin.x - 10 && ztrue) zone(p, true, rmin, true);
+			if (z <= rmin.z && z >= rmin.z - 10 && xtrue) zone(p, false, rmin, true);
 		}
 	},
 	"zone",

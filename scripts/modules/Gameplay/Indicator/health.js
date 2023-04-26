@@ -1,6 +1,7 @@
 import { Entity, system, Vector, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { NAME_MODIFIERS } from "./var.js";
+import { EventSignal } from "../../../lib/Class/Events.js";
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {};
@@ -22,14 +23,14 @@ world.events.entityHurt.subscribe((data) => {
 	if (data.hurtEntity.id === "f:t") return;
 
 	const hp = data.hurtEntity.getComponent("health");
-	if (data.damage >= hp.current) return;
+	if (!hp.current) return;
 
-	const { indicator, same } = getIndicator(data.hurtEntity);
+	const { indicator, entityNameTag } = getIndicator(data.hurtEntity);
 
-	HURT_ENTITIES[data.hurtEntity.id].damage = data.damage;
+	HURT_ENTITIES[data.hurtEntity.id].damage += data.damage;
 	indicator.nameTag = getName(data.hurtEntity, hp);
 
-	if (!same)
+	if (!entityNameTag)
 		indicator.teleport(
 			Vector.add(data.hurtEntity.getHeadLocation(), { x: 0, y: 1, z: 0 })
 		);
@@ -39,14 +40,16 @@ world.events.entityDie.subscribe((data) => {
 	if (data.deadEntity.id === "f:t") return;
 	if (!(data.deadEntity.id in HURT_ENTITIES)) return;
 
-	const { indicator, same } = getIndicator(data.deadEntity);
-
-	if (!same) {
-		indicator.teleport({ x: 0, y: -64, z: 0 });
-		indicator.triggerEvent("f:t:kill");
-	}
+	const { indicator, entityNameTag } = getIndicator(data.deadEntity);
 
 	delete HURT_ENTITIES[data.deadEntity.id];
+
+	if (!entityNameTag) {
+		system.run(() => {
+			indicator.teleport({ x: 0, y: -64, z: 0 });
+			indicator.triggerEvent("f:t:kill");
+		});
+	}
 });
 
 system.runInterval(
@@ -67,10 +70,10 @@ system.runInterval(
 				continue;
 			}
 
-			const { indicator, same } = getIndicator(entity);
+			const { indicator, entityNameTag } = getIndicator(entity);
 
 			indicator.nameTag = getName(entity);
-			if (!same)
+			if (!entityNameTag)
 				indicator.teleport(
 					Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 })
 				);
@@ -84,7 +87,7 @@ system.runInterval(
 	() => {
 		for (const id in HURT_ENTITIES) {
 			const damage = HURT_ENTITIES[id].damage;
-			if (damage > 0) HURT_ENTITIES[id].damage -= damage / 2;
+			if (damage) HURT_ENTITIES[id].damage -= damage / 2;
 		}
 	},
 	"damage counter",
@@ -104,34 +107,31 @@ new XA.Command({ name: "dmgstat", role: "admin" }).executes(
 function getName(entity, hp = entity.getComponent("health")) {
 	const maxHP = hp.value;
 
-	const scale = maxHP <= 50 ? 1 : maxHP / 50;
+	const s = 50;
+	const scale = maxHP <= s ? 1 : maxHP / s;
 
 	const full = ~~(maxHP / scale);
 	const current = ~~(hp.current / scale);
 	const damage = ~~(HURT_ENTITIES[entity.id].damage / scale);
 
-	const health_bar = new Array(full)
-		.fill("§c", 0, current)
-		.fill("§6", current + 1, current + damage + 1)
-		.fill("§7", current + damage + 2, full)
-		.join("|");
-
-	if (stat) {
-		stat = false;
-		world.debug("a", {
-			health_bar,
-			damage,
-			current,
-			full,
-			scale,
-			maxHP,
-			e: entity.typeId,
-		});
+	let bar = "";
+	for (let i = 1; i <= full; i++) {
+		if (i <= current) bar += "§c|";
+		if (i > current && i <= current + damage) bar += "§e|";
+		if (i > current + damage) bar += "§7|";
 	}
 
+	if (stat)
+		world.debug({
+			current,
+			emit: current + 1,
+			emitTo: current + damage + 1,
+			empty: current + damage + 2,
+			full,
+		});
+
 	return (
-		"§c" +
-		health_bar +
+		bar +
 		NAME_MODIFIERS.map((modifier) => modifier(entity))
 			.filter((result) => result !== false)
 			.join("")
@@ -142,9 +142,9 @@ function getName(entity, hp = entity.getComponent("health")) {
  *
  * @param {Entity} entity
  * @param {number} damage
+ * @returns {{indicator: Entity, entityNameTag: boolean}}
  */
 function getIndicator(entity, damage = 0) {
-	if (stat) world.debug(entity.typeId);
 	if (ALWAYS_SHOWS.includes(entity.typeId)) {
 		HURT_ENTITIES[entity.id] ??= {
 			damage,
@@ -153,17 +153,20 @@ function getIndicator(entity, damage = 0) {
 			indicator: "NULL",
 		};
 
-		return { indicator: entity, same: true };
+		return { indicator: entity, entityNameTag: true };
 	}
 
 	if (entity && entity.id in HURT_ENTITIES) {
 		const indi_id = HURT_ENTITIES[entity.id].indicator;
 		const indicator = getIndicators().find((e) => e && e.id === indi_id);
 
-		return { indicator: indicator ?? createIndicator(entity), same: false };
+		return {
+			indicator: indicator ?? createIndicator(entity),
+			entityNameTag: false,
+		};
 	}
 
-	return { indicator: createIndicator(entity), same: false };
+	return { indicator: createIndicator(entity), entityNameTag: false };
 }
 
 /**

@@ -4,8 +4,9 @@ import { rd } from "../Airdrops/index.js";
 import { PVP_LOCKED } from "../Indicator/var.js";
 import { Atp } from "../Survival/portals.js";
 import { rtp } from "./rtp.js";
-import { BR_CONFIG, BR_DB, __BR_EMITTERS } from "./var.js";
+import { BATTLE_ROYAL_EVENTS, BR_CONFIG, BR_DB } from "./var.js";
 import { zone } from "./zone.js";
+import { EventSignal } from "../../../lib/Class/Events.js";
 
 class BattleRoyal {
 	/** @type {{[Key in keyof typeof world['events']]?: Parameters<typeof world['events'][Key]["subscribe"]>[0]}} */
@@ -53,7 +54,7 @@ class BattleRoyal {
 			await system.sleep(5);
 			C++;
 		}
-		__BR_EMITTERS.playerJoinQuene.emit(XA.Entity.fetch(name));
+		EventSignal.emit(BATTLE_ROYAL_EVENTS.playerJoin, XA.Entity.fetch(name));
 	}
 
 	/**

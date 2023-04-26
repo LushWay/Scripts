@@ -5,24 +5,27 @@ import { CONFIG } from "../../../config.js";
 
 const OPTIONS = XA.WorldOptions("chat", {
 	cooldown: {
-		desc: "Задержка, 0 что бы отключить",
-		value: CONFIG.chat.cooldown,
+		name: "Задержка",
+		desc: "0 что бы отключить",
+		value: 0,
 	},
 	range: {
+		name: "Радиус",
 		desc: "Радиус для затемнения сообщений дальних игроков",
-		value: CONFIG.chat.range,
+		value: 30,
 	},
-	ranks: { desc: "Ранги в чате", value: false },
+	ranks: { desc: "Ранги в чате", value: false, name: "Ранги" },
 });
 
 const COOLDOWN_DB = new Database("chat");
 
-const PLAYER_OPTIONS = XA.PlayerOptions("chat", {
+const PLAYER_OPTIONS = XA.PlayerOptions("Чат", "chat", {
 	hightlightMessages: {
+		name: "Подсветка моих сообщений",
 		desc: "Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r",
 		value: true,
 	},
-	disableSound: { desc: "", value: false },
+	disableSound: { desc: "", value: false, name: "Выключение звука" },
 });
 
 world.events.chatSend.subscribe((data) => {

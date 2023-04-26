@@ -10,7 +10,7 @@ import { onWorldLoad } from "./lib/Setup/loader.js";
 // X-API methods
 import { XCooldown } from "./lib/Class/Cooldown.js";
 import { XEntity } from "./lib/Class/Entity.js";
-import { XOptions, XPlayerOptions } from "./lib/Class/Options.js";
+import { Options } from "./lib/Class/Options.js";
 import { XRequest } from "./lib/Class/Request.js";
 import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
@@ -20,10 +20,10 @@ import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
 
 import { CONFIG } from "./config.js";
+import { EventSignal } from "./lib/Class/Events.js";
 import { XUtils } from "./lib/Class/Utils.js";
 import { loadModules } from "./modules/import.js";
 import { DisplayError } from "./xapi.js";
-import { Subscriber } from "./lib/Class/Events.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
@@ -39,8 +39,8 @@ export class XA {
 	static Request = XRequest;
 	static Utils = XUtils;
 
-	static PlayerOptions = XPlayerOptions;
-	static WorldOptions = XOptions;
+	static PlayerOptions = Options.player.typedBind(Options);
+	static WorldOptions = Options.world.typedBind(Options);
 
 	static Lang = {
 		lang: text,
@@ -58,7 +58,7 @@ export class XA {
 	static state = {
 		first_load: false,
 		modules_loaded: false,
-		afterModulesLoad: new Subscriber(),
+		afterModulesLoad: new EventSignal(),
 		load_time: "",
 	};
 

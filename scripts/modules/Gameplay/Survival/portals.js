@@ -9,27 +9,18 @@ import {
 	world,
 } from "@minecraft/server";
 import { DisplayError, XA } from "xapi.js";
-import { Objectives } from "../../Server/Objectives/var.js";
+import { OBJECTIVES } from "../../Server/Objectives/var.js";
 import { SERVER } from "../../Server/Server/var.js";
 import { rd } from "../Airdrops/index.js";
 import { quene } from "../Battle Royal/var.js";
 
-new WorldOption(
-	"spawn:pos",
-	"(x y z)\nТакже можно выставить через -spawn set <pos: Pos>",
-	true
-);
-new WorldOption(
-	"minigames:pos",
-	"(x y z)\nТакже можно выставить через -mg set <pos: Pos>",
-	true
-);
-const getSettings = XA.PlayerOptions("Atp", {
+const getSettings = XA.PlayerOptions('Телепорт', "Atp", {
 	showCoordinates: {
 		desc: "Показывать координаты телепортации (выключите если вы стример)",
 		value: true,
+    name: ''
 	},
-	title: { desc: "", value: true },
+	title: { desc: "", value: true, name: '' },
 });
 /**
  *
@@ -274,7 +265,7 @@ const inv = new inventory();
 
 const invs = { spawn: 1, anarch: 2, minigames: 1, currentplace: 1, br: 1 };
 const objective = ["inv"];
-Objectives.push({ id: objective[0], watch: true });
+OBJECTIVES.push({ id: objective[0], watch: true });
 
 /**
  *

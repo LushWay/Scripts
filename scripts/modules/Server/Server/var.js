@@ -6,11 +6,20 @@ import { toStr } from "lib/Setup/utils.js";
  */
 const TYPES = ["unknown", "build", "survival", "disabled"];
 const options = XA.WorldOptions("server", {
-	lockNether: { desc: "Выключает незер", value: true },
-	timer: { value: true, desc: "Какой-та таймер, я сам хз че это" },
+	lockNether: {
+		desc: "Выключает незер",
+		value: true,
+		name: "Блокировка незера",
+	},
+	timer: {
+		value: true,
+		desc: "Какой-та таймер, я сам хз че это",
+		name: "Таймер",
+	},
 	type: {
+		name: "Тип сервера",
 		value: 0,
-		desc: `Тип сервера. Доступные значения: \n§f${toStr(
+		desc: `Доступные значения: \n§f${toStr(
 			Object.fromEntries(Object.entries(TYPES))
 		)
 			.replace("{", "")

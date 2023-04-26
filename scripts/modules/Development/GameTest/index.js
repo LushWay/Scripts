@@ -1,6 +1,9 @@
 import {
+	EquipmentSlot,
 	GameMode,
+	ItemStack,
 	MinecraftBlockTypes,
+	MinecraftItemTypes,
 	system,
 	Vector,
 	world,
@@ -27,6 +30,87 @@ GameTest.registerAsync("s", "s", async (test) => {
 	await test.idle(time - 30);
 	world.events.entityDie.unsubscribe(event);
 	test.succeed();
+})
+	.maxTicks(time)
+	.structureName("Component:grass5x5")
+	.tag("sim");
+
+GameTest.registerAsync("s", "test", async (test) => {
+	const spawnLoc = { x: 0, y: 3, z: 0 };
+
+	test.setBlockType(MinecraftBlockTypes.grass, { x: -1, z: 0, y: 1 });
+	test.setBlockType(MinecraftBlockTypes.grass, { x: -2, z: 0, y: 1 });
+
+	player = test.spawnSimulatedPlayer(spawnLoc, name);
+
+	const id = player.id;
+	const event = world.events.entityDie.subscribe((data) => {
+		if (data.deadEntity.id !== id) return;
+		test.succeed();
+	});
+
+	test.idle(time - 30).then((e) => {
+		world.events.entityDie.unsubscribe(event);
+		test.succeed();
+	});
+
+	// player
+	// .getComponent("equipment_inventory")
+	// .getEquipmentSlot(EquipmentSlot.mainhand)
+	// .setItem(new ItemStack(MinecraftItemTypes.stoneAxe));
+
+	// First move
+	player.moveToBlock({ x: -5, z: 0, y: 1 });
+	await test.idle(30);
+
+	// Look to door
+	player.stopMoving();
+	player.lookAtBlock({ x: -5, z: 3, y: 3 });
+	await test.idle(40);
+
+	// Use item
+	player.attack();
+	player.interactWithBlock({ x: -5, z: 2, y: 2 });
+	await test.idle(20);
+
+	// Next stage, button
+	player.moveToBlock({ x: -7, z: 0, y: 1 });
+	await test.idle(20);
+
+	// Look at button
+	player.stopMoving();
+	player.lookAtBlock({ x: -7, z: 2, y: 3 });
+	await test.idle(10);
+
+	// Press button
+	player.attack();
+	player.interactWithBlock({ x: -7, z: 1, y: 3 });
+	await test.idle(40);
+	player.stopInteracting();
+
+	// Try to break block
+	player.breakBlock({ x: -7, z: 2, y: 3 });
+	await test.idle(80);
+	player.stopBreakingBlock();
+
+	// Next stage, chest
+	player.moveToBlock({ x: -9, z: 0, y: 1 });
+	await test.idle(10);
+
+	player.stopMoving();
+	player.lookAtBlock({ x: -9, z: 2, y: 2 });
+	await test.idle(20);
+
+	player.attack();
+	player.interactWithBlock({ x: -9, z: 2, y: 2 });
+	await test.idle(40);
+	player.stopInteracting();
+
+	// Break chest
+	await test.idle(40);
+	player.breakBlock({ x: -9, z: 2, y: 2 });
+	await test.idle(90);
+	player.stopBreakingBlock();
 })
 	.maxTicks(time)
 	.structureName("Component:grass5x5")

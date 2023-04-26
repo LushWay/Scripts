@@ -13,16 +13,19 @@ const options = XA.WorldOptions("pvp", {
 	enabled: {
 		value: SERVER.type === "survival",
 		desc: "Возможность входа в пвп режим (блокировка всех тп команд)§r",
+		name: "Включено",
 	},
-	cooldown: { value: 15, desc: "Да" },
+	cooldown: { value: 15, desc: "Время блокировки в секундах", name: "Время" },
 });
 
-const getPlayerSettings = XA.PlayerOptions("pvp", {
+const getPlayerSettings = XA.PlayerOptions("PvP", "pvp", {
 	indicator: {
-		desc: "§aВключает§7 титл попадания по энтити из лука",
+		name: "Индикатор",
+		desc: "§aВключает§7 индикатор попадания по энтити из лука",
 		value: true,
 	},
 	bow_sound: {
+		name: "Звук лука",
 		desc: "§aВключает§7 звук попадания по энтити из лука",
 		value: true,
 	},
@@ -133,36 +136,37 @@ function onDamage(data, fatal = false) {
 			playHitSound(damage.damagingEntity, current, value);
 		}
 
-		if (setting.indicator) {
-			if (!fatal) {
+		if (setting.indicator && fatal) {
+			// remove fatal and uncomment code \/
+			// if (!fatal) {
+			// 	damage.damagingEntity.onScreenDisplay.setActionBar(
+			// 		`§c-${data.damage}♥`
+			// 	);
+			// } else {
+			// Kill
+			if (data?.hurtEntity instanceof Player) {
+				// Player
 				damage.damagingEntity.onScreenDisplay.setActionBar(
-					`§c-${data.damage}♥`
+					`§gВы ${isBow ? "застрелили" : "убили"} §6${data.hurtEntity.name}`
 				);
 			} else {
-				// Kill
-				if (data?.hurtEntity instanceof Player) {
-					// Player
-					damage.damagingEntity.onScreenDisplay.setActionBar(
-						`§gВы ${isBow ? "застрелили" : "убили"} §6${data.hurtEntity.name}`
-					);
-				} else {
-					// Entity
+				// Entity
 
-					const entityName = data.hurtEntity.typeId.replace("minecraft:", "");
-					damage.damagingEntity.runCommand(
-						"titleraw @s actionbar " +
-							JSON.stringify({
-								rawtext: [
-									{ text: "§6" },
-									{
-										translate: `entity.${entityName}.name`,
-									},
-									{ text: isBow ? " §gзастрелен" : " §gубит" },
-								],
-							})
-					);
-				}
+				const entityName = data.hurtEntity.typeId.replace("minecraft:", "");
+				damage.damagingEntity.runCommand(
+					"titleraw @s actionbar " +
+						JSON.stringify({
+							rawtext: [
+								{ text: "§6" },
+								{
+									translate: `entity.${entityName}.name`,
+								},
+								{ text: isBow ? " §gзастрелен" : " §gубит" },
+							],
+						})
+				);
 			}
+			// }
 
 			LOCKED_TITLES[damage.damagingEntity.id] = 2;
 		}
@@ -192,6 +196,6 @@ function playHitSound(player, health, max) {
 		pitch: Math.max(1, pitch),
 		volume: 4,
 	};
-	world.debug({ pitch, max, health });
+	// world.debug({ pitch, max, health });
 	player.playSound("note.bell", options);
 }

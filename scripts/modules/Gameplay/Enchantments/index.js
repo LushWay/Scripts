@@ -1,7 +1,7 @@
 import { Enchantment, MinecraftEnchantmentTypes } from "@minecraft/server";
-import { Subscriber } from "../../../lib/Class/Events.js";
+import { EventSignal } from "../../../lib/Class/Events.js";
 
-const ON_LOAD = new Subscriber();
+const ON_LOAD = new EventSignal();
 
 export const Enchantments = {
 	/**
@@ -16,7 +16,7 @@ export const Enchantments = {
 	Typed: {},
 
 	events: {
-		onLoad: ON_LOAD.export,
+		onLoad: ON_LOAD,
 	},
 };
 
@@ -86,7 +86,7 @@ function load() {
 	// @ts-expect-error
 	Enchantments.Typed = Enchantments.Custom;
 
-	ON_LOAD.emit();
+	EventSignal.emit(ON_LOAD, null);
 }
 
 load();

@@ -206,7 +206,11 @@ export class DB {
 			if (typeof defaultValue === "object" && defaultValue !== null) {
 				// Value is Object or array, recurse...
 
-				if (Array.isArray(defaultValue)) {
+				if (
+					Array.isArray(defaultValue) &&
+					typeof value !== "undefined" &&
+					Array.isArray(value)
+				) {
 					if (key in sourceObject) {
 						COMPOSED[key] = [...value];
 					} else {

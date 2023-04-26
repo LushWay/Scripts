@@ -1,19 +1,13 @@
 import { Player } from "@minecraft/server";
-import { Subscriber } from "lib/Class/Events.js";
+import { EventSignal } from "lib/Class/Events.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { XA } from "xapi.js";
 
-/** @type {Subscriber<Player>} */
-const playerJoinQuene = new Subscriber();
-
-/** @type {Subscriber<Player>} */
-const playerDeath = new Subscriber();
-
-export const __BR_EMITTERS = { playerDeath, playerJoinQuene };
-
 export const BATTLE_ROYAL_EVENTS = {
-	playerJoin: playerJoinQuene.export,
-	death: playerDeath.export,
+	/** @type {EventSignal<Player>} */
+	playerJoin: new EventSignal(),
+	/** @type {EventSignal<Player>} */
+	death: new EventSignal(),
 };
 
 /**
@@ -22,9 +16,12 @@ export const BATTLE_ROYAL_EVENTS = {
 export const quene = {};
 
 export const BR_CONFIG = XA.WorldOptions("BattleRoyal", {
-	pos: { desc: "x y z", value: "" },
-	gamepos: { desc: "x y", value: "" },
-	time: { desc: "Время игры в формате MM:SS (15:00)", value: "15:00" },
+	gamepos: { desc: "x y", value: "", name: "Центр игры" },
+	time: {
+		desc: "Время игры в формате MM:SS (15:00)",
+		value: "15:00",
+		name: "Время игры",
+	},
 });
 
 export const BR_DB = new Database("BattleRoyal");

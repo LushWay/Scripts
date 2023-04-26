@@ -1,16 +1,8 @@
-import { world } from "@minecraft/server";
+import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
 import { setRegionGuards } from "../../Server/Region/index.js";
-import { RaidNotify } from "./var.js";
 import "./base.js";
-
-world.beforeEvents.explosion.subscribe((data) => {
-	for (const bl of data.getImpactedBlocks()) {
-		let region = Region.blockLocationInRegion(bl, data.dimension.type);
-		if (region && !region.permissions.pvp) return (data.cancel = true);
-		for (const id of region.permissions.owners) RaidNotify[id] = 60;
-	}
-});
+import "./raid.js";
 
 setRegionGuards(
 	// Common actions guard
@@ -30,3 +22,11 @@ Region.CONFIG.PERMISSIONS = {
 	owners: [],
 	pvp: true,
 };
+
+JOIN_CONFIG.title_animation = {
+	stages: ["» $title «", "»  $title  «"],
+	vars: {
+		title: "§aShp1nat§6Mine§r§f",
+	},
+};
+JOIN_CONFIG.subtitle = "Добро пожаловать!";
