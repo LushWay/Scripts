@@ -1,4 +1,3 @@
-//import { Items, ItemStack } from "@minecraft/server";
 import { XA } from "xapi.js";
 
 new XA.Command({
@@ -9,5 +8,3 @@ new XA.Command({
 }).executes((ctx) => {
 	ctx.sender.runCommandAsync("give @s we:tool");
 });
-
-

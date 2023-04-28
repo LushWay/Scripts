@@ -14,8 +14,8 @@ import {
 	Region,
 	forEachItemAt,
 } from "../../Server/Region/Region.js";
+import { MoneyCost, Store } from "../../Server/Server/store.js";
 import { baseMenu } from "./baseMenu.js";
-import { MoneyCost, Store } from "./store.js";
 
 /**
  *
@@ -39,7 +39,7 @@ function updateBases() {
  */
 let bases = [];
 
-world.events.blockBreak.subscribe(
+world.afterEvents.blockBreak.subscribe(
 	({ block, brokenBlockPermutation, dimension }) => {
 		if (bases.includes(block.location)) {
 			block.setPermutation(brokenBlockPermutation);
@@ -62,78 +62,74 @@ new Store({ x: -234, y: 65, z: -74 }, "overworld").addItem(
 	new MoneyCost(10)
 );
 
-world.beforeEvents.itemUseOn.subscribe((data) => {
+world.afterEvents.itemUseOn.subscribe((data) => {
 	if (
 		data.itemStack.typeId !== baseItemStack.typeId ||
-		!Array.equals(data.itemStack.getLore(), baseItemStack.getLore())
+		!Array.equals(data.itemStack.getLore(), baseItemStack.getLore()) ||
+		!(data.source instanceof Player) ||
+		inpvp(data.source)
 	)
 		return;
 
-	if (data.source instanceof Player) {
-		if (inpvp(data.source)) return;
+	const region = RadiusRegion.getAllRegions().find((e) =>
+		e.permissions.owners.includes(data.source.nameTag)
+	);
 
-		const region = RadiusRegion.getAllRegions().find((e) =>
-			e.permissions.owners.includes(data.source.nameTag)
+	if (region) {
+		const isOwner = region.permissions.owners[0] === data.source.id;
+		return data.source.tell(
+			`§cВы уже ${
+				isOwner
+					? "владеете базой"
+					: `состоите в базе игрока '${XA.Entity.getNameByID(
+							region.permissions.owners[0]
+					  )}'`
+			} !`
 		);
+	}
 
-		if (region) {
-			const isOwner = region.permissions.owners[0] === data.source.id;
-			return data.source.tell(
-				`§cВы уже ${
-					isOwner
-						? "владеете базой"
-						: `состоите в базе игрока '${XA.Entity.getNameByID(
-								region.permissions.owners[0]
-						  )}'`
-				} !`
+	const nearRegion = Region.getAllRegions().find((r) => {
+		if (r instanceof RadiusRegion) {
+			return Vector.distance(r.center, data.block.location) < r.radius + 100;
+		} else {
+			const from = {
+				x: r.from.x,
+				y: Region.CONFIG.LOWEST_Y_VALUE,
+				z: r.from.z,
+			};
+			const to = { x: r.to.x, y: Region.CONFIG.HIGEST_Y_VALUE, z: r.to.z };
+
+			const min = Vector.min(from, to);
+			const max = Vector.max(from, to);
+
+			const size = 30;
+
+			return Vector.between(
+				Vector.add(min, { x: -size, y: 0, z: -size }),
+				Vector.add(max, { x: size, y: 0, z: size }),
+				data.block.location
 			);
 		}
+	});
 
-		const nearRegion = Region.getAllRegions().find((r) => {
-			if (r instanceof RadiusRegion) {
-				return Vector.distance(r.center, data.block.location) < r.radius + 100;
-			} else {
-				const from = {
-					x: r.from.x,
-					y: Region.CONFIG.LOWEST_Y_VALUE,
-					z: r.from.z,
-				};
-				const to = { x: r.to.x, y: Region.CONFIG.HIGEST_Y_VALUE, z: r.to.z };
+	if (nearRegion) return data.source.tell("§cРядом есть другие регионы!");
 
-				const min = Vector.min(from, to);
-				const max = Vector.max(from, to);
-
-				const size = 30;
-
-				return Vector.between(
-					Vector.add(min, { x: -size, y: 0, z: -size }),
-					Vector.add(max, { x: size, y: 0, z: size }),
-					data.block.location
-				);
-			}
-		});
-
-		if (nearRegion) return data.source.tell("§cРядом есть другие регионы!");
-
-		const loc = Vector.floor(
-			Vector.add(data.block.location, data.faceLocation)
-		);
-		const dim = data.block.dimension.type;
-		const source = data.source;
-		system.run(() => {
-			new RadiusRegion(loc, 30, dim, {
-				doorsAndSwitches: false,
-				openContainers: false,
-				pvp: true,
-				allowedEntitys: "all",
-				owners: [source.id],
-			});
-			source.tell(
-				"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base"
-			);
-			source.playSound("random.levelup");
-		});
-	}
+	new RadiusRegion(
+		Vector.floor(Vector.add(data.block.location, data.faceLocation)),
+		30,
+		data.block.dimension.type,
+		{
+			doorsAndSwitches: false,
+			openContainers: false,
+			pvp: true,
+			allowedEntitys: "all",
+			owners: [data.source.id],
+		}
+	);
+	data.source.tell(
+		"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base"
+	);
+	data.source.playSound("random.levelup");
 });
 
 const base = new XA.Command({

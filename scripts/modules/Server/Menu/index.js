@@ -2,7 +2,7 @@ import { ItemLockMode, ItemStack, Player, world } from "@minecraft/server";
 import { XA, handle } from "xapi.js";
 import { CONFIG_MENU } from "./var.js";
 
-world.events.itemUse.subscribe(async ({ source: player, itemStack }) => {
+world.afterEvents.itemUse.subscribe(async ({ source: player, itemStack }) => {
 	if (itemStack.typeId !== CONFIG_MENU.itemId || !(player instanceof Player))
 		return;
 	handle(() => {

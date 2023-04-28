@@ -1,15 +1,15 @@
-import { Player, Vector, system, world } from "@minecraft/server";
+import { AfterEvents, Player, Vector, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
+import { EventSignal } from "../../../lib/Class/Events.js";
 import { rd } from "../Airdrops/index.js";
 import { PVP_LOCKED } from "../Indicator/var.js";
-import { Atp } from "../Survival/portals.js";
+import { teleportToBR } from "./index.js";
 import { rtp } from "./rtp.js";
 import { BATTLE_ROYAL_EVENTS, BR_CONFIG, BR_DB } from "./var.js";
 import { zone } from "./zone.js";
-import { EventSignal } from "../../../lib/Class/Events.js";
 
 class BattleRoyal {
-	/** @type {{[Key in keyof typeof world['events']]?: Parameters<typeof world['events'][Key]["subscribe"]>[0]}} */
+	/** @type {{[Key in keyof AfterEvents]?: Parameters<AfterEvents[Key]["subscribe"]>[0]}} */
 	events;
 	constructor() {
 		this.dimension = world.overworld;
@@ -67,13 +67,6 @@ class BattleRoyal {
 			// Ресет
 			this.quene.open = false;
 			this.quene.time = 0;
-
-			// Варн
-			if (!BR_CONFIG.pos || !BR_CONFIG.gamepos)
-				return this.end(
-					"error",
-					"§cТребуемые для запуска значения (br:pos, br:gamepos) не выставлены."
-				);
 
 			// Значения из настроек
 			[this.time.min, this.time.sec] = BR_CONFIG.time.split(":").map(Number);
@@ -171,8 +164,8 @@ class BattleRoyal {
 			}
 
 			BR_DB.set("br:" + Date.now(), chests);
-			this.timers = {
-				0: system.runInterval(
+			this.timers = [
+				system.runInterval(
 					() => {
 						//Таймер
 						this.time.tick--;
@@ -291,22 +284,22 @@ class BattleRoyal {
 					"BR game",
 					0
 				),
-			};
+			];
 			this.events = {
-				playerLeave: world.events.playerLeave.subscribe((pl) => {
+				playerLeave: world.afterEvents.playerLeave.subscribe((pl) => {
 					this.players.forEach((e, i) => {
 						if (e.name === pl.playerName) {
 							delete this.players[i];
 						}
 					});
 				}),
-				entityDie: world.events.entityDie.subscribe((data) => {
+				entityDie: world.afterEvents.entityDie.subscribe((data) => {
 					if (!data.deadEntity.hasTag("br:alive")) return;
 
 					this.tags.forEach((e) => data.deadEntity.removeTag(e));
 					this.waitToRespawn(data.deadEntity.nameTag);
 				}),
-				buttonPush: world.events.buttonPush.subscribe((data) => {
+				buttonPush: world.afterEvents.buttonPush.subscribe((data) => {
 					if (
 						!data.source.hasTag("br:alive") ||
 						!(data.source instanceof Player)
@@ -389,21 +382,18 @@ class BattleRoyal {
 
 		for (const e of world.getPlayers()) {
 			// Eсли у игрока был хоть один тэг из батл рояля - он играл.
-
 			let ingame = false;
 			this.tags.forEach((t) => {
 				if (e.removeTag(t)) ingame = true;
 			});
 			// Если играл нужно его вернуть на спавн батл рояля
-			if (ingame) Atp(e, "br", { lock: true, pvp: true, quene: true });
+			if (ingame) teleportToBR(e);
 		}
 		for (const key in this.events) {
 			// @ts-expect-error Strange TS moment
-			world.events[key].unsubscribe(this.events[key]);
+			world.afterEvents[key].unsubscribe(this.events[key]);
 		}
-		for (const id of Object.keys(this.timers).map(Number)) {
-			system.clearRun(id);
-		}
+		this.timers.forEach(system.clearRun);
 
 		//Альтернативная чепуха
 		BR_DB.clear();

@@ -97,15 +97,10 @@ export async function ClearRegion(player, Pregion) {
 export async function CreateRegion(player, tp = true) {
 	const place = await findFreePlace();
 
-	const region = new CubeRegion(
-		place.from,
-		place.to,
-		MinecraftDimensionTypes.overworld,
-		{
-			...Region.CONFIG.PERMISSIONS,
-			owners: [player.id],
-		}
-	);
+	const region = new CubeRegion(place.from, place.to, "overworld", {
+		...Region.CONFIG.PERMISSIONS,
+		owners: [player.id],
+	});
 	DB.set(player.id, region.key);
 	fillRegion(region.from, region.to);
 	if (tp) teleportToRegion(player, region);
@@ -176,7 +171,7 @@ export async function findFreePlace() {
 
 		const alreadyExist = Region.blockLocationInRegion(
 			{ x: center.x, y: 0, z: center.z },
-			MinecraftDimensionTypes.overworld
+			"overworld"
 		);
 
 		if (alreadyExist) {

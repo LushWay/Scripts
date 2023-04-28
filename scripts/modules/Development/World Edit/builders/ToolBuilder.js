@@ -45,7 +45,7 @@ const actions = {
 	Sound: S,
 };
 
-world.events.itemUse.subscribe((data) => {
+world.afterEvents.itemUse.subscribe((data) => {
 	const item = data.itemStack;
 	if (item.typeId === "we:tool" && data.source instanceof Player) {
 		let lore = item.getLore();

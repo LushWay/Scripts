@@ -2,7 +2,7 @@ import { ItemStack, Player, world } from "@minecraft/server";
 import { EventSignal } from "../../../lib/Class/Events.js";
 import { ActionForm } from "../../../lib/Form/ActionForm.js";
 import { MessageForm } from "../../../lib/Form/MessageForm.js";
-import { SERVER } from "../../Server/Server/var.js";
+import { SERVER } from "./var.js";
 
 class Cost {
 	/**
@@ -233,7 +233,7 @@ function itemDescription(item, c = "§g") {
 	}`;
 }
 
-world.events.entityHit.subscribe((data) => {
+world.afterEvents.entityHit.subscribe((data) => {
 	if (!data.hitBlock) return;
 	const store = Store.find(
 		data.hitBlock.location,

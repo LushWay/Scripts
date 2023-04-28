@@ -58,7 +58,9 @@ export function randomTeleport(
 				y,
 				dimension,
 				fromYtoBlock,
+				elytra,
 				c,
+				keepInSkyTime,
 			});
 		}
 	}

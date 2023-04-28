@@ -1,4 +1,10 @@
-import { Entity, Vector, system, world } from "@minecraft/server";
+import {
+	Entity,
+	EntityLifetimeState,
+	Vector,
+	system,
+	world,
+} from "@minecraft/server";
 import { Database } from "lib/Database/Rubedo.js";
 
 /**
@@ -45,24 +51,9 @@ const STYLES = {
 
 export class Leaderboard {
 	/**
-	 * @param {Vector3} loc
-	 * @param {Dimensions} dimension
-	 * @param {string} id
+	 * @type {Record<string, Leaderboard>}
 	 */
-	static get(loc, dimension, id) {
-		const entity = world[dimension]
-			.getEntitiesAtBlockLocation(loc)
-			.find(
-				(entity) =>
-					entity.id === id &&
-					entity.typeId === LEADERBOARD_ID &&
-					entity.hasTag(LEADERBOARD_TAG)
-			);
-
-		if (!entity) return false;
-
-		return new Leaderboard(entity);
-	}
+	static ALL = {};
 	/**
 	 *
 	 * @param {string} objective
@@ -97,16 +88,19 @@ export class Leaderboard {
 	 * @param {Entity} entity
 	 * @param {LB} data
 	 */
-	constructor(entity, data = LB_DB.get(entity.id)) {
+	constructor(entity, data) {
+		if (entity.id in Leaderboard.ALL) return Leaderboard.ALL[entity.id];
+
 		this.entity = entity;
 		this.data = data;
+		Leaderboard.ALL[entity.id] = this;
 	}
 	remove() {
 		LB_DB.delete(this.entity.id);
 		this.entity.teleport({ x: 0, y: 0, z: 0 });
 		this.entity.triggerEvent("f:t:kill");
 	}
-	updateData() {
+	saveData() {
 		LB_DB.set(this.entity.id, this.data);
 	}
 	updateLeaderboard() {
@@ -132,13 +126,24 @@ export class Leaderboard {
 system.runInterval(
 	() => {
 		for (const [id, leaderboard] of LB_DB.entries()) {
-			const lb = Leaderboard.get(
-				leaderboard.location,
-				leaderboard.dimension,
-				id
-			);
+			const LB = Leaderboard.ALL[id];
 
-			if (lb) lb.updateLeaderboard();
+			if (LB) {
+				if (LB.entity.lifetimeState === EntityLifetimeState.unloaded) continue;
+				LB.updateLeaderboard();
+			} else {
+				const entity = world[leaderboard.dimension]
+					.getEntities({
+						location: leaderboard.location,
+						tags: [LEADERBOARD_TAG],
+						type: LEADERBOARD_ID,
+					})
+					.find((e) => e.id === id);
+
+				if (!entity || entity.lifetimeState === EntityLifetimeState.unloaded)
+					continue;
+				new Leaderboard(entity, leaderboard).updateLeaderboard();
+			}
 		}
 	},
 	"leaderboardsInterval",

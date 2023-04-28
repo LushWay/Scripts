@@ -223,4 +223,4 @@ world.beforeEvents.chatSend.subscribe((data) => {
 	data.sendToTargets = true;
 	data.setTargets([]);
 });
-world.events.chatSend.subscribe(XCommand.chatListener);
+world.afterEvents.chatSend.subscribe(XCommand.chatListener);

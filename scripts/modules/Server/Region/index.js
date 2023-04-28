@@ -70,7 +70,7 @@ world.beforeEvents.itemUseOn.subscribe((data) => {
 /**
  * Permissions for region
  */
-world.events.blockPlace.subscribe((data) => {
+world.afterEvents.blockPlace.subscribe((data) => {
 	const region = Region.blockLocationInRegion(
 		data.block.location,
 		data.player.dimension.type
@@ -83,7 +83,7 @@ world.events.blockPlace.subscribe((data) => {
 /**
  * Permissions for region
  */
-world.events.blockBreak.subscribe(
+world.afterEvents.blockBreak.subscribe(
 	({ player, block, brokenBlockPermutation, dimension }) => {
 		const region = Region.blockLocationInRegion(
 			block.location,
@@ -110,7 +110,7 @@ world.events.blockBreak.subscribe(
 	}
 );
 
-world.events.entitySpawn.subscribe((data) => {
+world.afterEvents.entitySpawn.subscribe((data) => {
 	if (data.entity.typeId === "rubedo:database") return;
 	const region = Region.blockLocationInRegion(
 		data.entity.location,

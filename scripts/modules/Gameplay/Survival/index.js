@@ -3,6 +3,8 @@ import { Region } from "../../Server/Region/Region.js";
 import { setRegionGuards } from "../../Server/Region/index.js";
 import "./base.js";
 import "./raid.js";
+import "./fireworks.js";
+import "./bouncyTnt.js";
 
 setRegionGuards(
 	// Common actions guard

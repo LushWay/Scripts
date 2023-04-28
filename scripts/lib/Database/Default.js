@@ -8,7 +8,7 @@ import {
 } from "@minecraft/server";
 import { DisplayError } from "../Setup/utils.js";
 
-world.events.worldInitialize.subscribe(({ propertyRegistry }) => {
+world.afterEvents.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
 	def.defineString("tableName", 30);
 	def.defineString("tableType", 30);

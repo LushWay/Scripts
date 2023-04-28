@@ -1,12 +1,13 @@
 import { system, world } from "@minecraft/server";
+import { Region } from "../../Server/Region/Region.js";
 import { PVP } from "../Indicator/var.js";
 import { RaidNotify } from "./var.js";
-import { Region } from "../../Server/Region/Region.js";
 
 world.beforeEvents.explosion.subscribe((data) => {
 	for (const bl of data.getImpactedBlocks()) {
-		let region = Region.blockLocationInRegion(bl, data.dimension.type);
-		if (region && !region.permissions.pvp) return (data.cancel = true);
+		const region = Region.blockLocationInRegion(bl, data.dimension.type);
+		if (!region) return;
+		if (!region.permissions?.pvp) return (data.cancel = true);
 		for (const id of region.permissions.owners) RaidNotify[id] = 60;
 	}
 });

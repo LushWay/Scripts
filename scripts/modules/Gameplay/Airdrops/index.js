@@ -114,7 +114,7 @@ export function rd(max, min = 0, msg) {
 //       if (!n || n == "air") continue;
 //       const count = rd(n.amount, Number(n.lore[0]));
 //       if (count == 0) continue;
-//       let it = new ItemStack(Items.get(n.id), count, n.data);
+//       let it = new ItemStack(n.id, count, n.data);
 //       if (n.lore[1]) {
 //         /**
 //          * @type {EnchantmentList}
@@ -339,7 +339,7 @@ kit
         .getBlock(XA.Entity.locationToBlockLocation(ctx.sender.location))
         .getComponent("inventory").container;
     for (const [i, k] of kit.entries()) {
-      const st = new ItemStack(Items.get(k.id), k.amount, k.data);
+      const st = new ItemStack(k.id, k.amount, k.data);
       if (k.name) st.nameTag = k.name;
       if (k.lore) st.setLore(k.lore);
       inv.setItem(i, st);

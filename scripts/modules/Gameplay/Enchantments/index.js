@@ -1,4 +1,4 @@
-import { Enchantment, MinecraftEnchantmentTypes } from "@minecraft/server";
+import { Enchantment } from "@minecraft/server";
 import { EventSignal } from "../../../lib/Class/Events.js";
 
 const ON_LOAD = new EventSignal();
@@ -23,6 +23,7 @@ export const Enchantments = {
 import { MinecraftItemTypes, Vector, world } from "@minecraft/server";
 import { DB } from "lib/Database/Default.js";
 import { DisplayError, toStr } from "xapi.js";
+import { MinecraftEnchantmentTypes } from "../../../lib/List/enchantments.js";
 
 const location = { x: 0, y: -10, z: 0 };
 

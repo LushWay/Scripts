@@ -1,9 +1,15 @@
 import { Player, Vector, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { SERVER } from "../../Server/Server/var.js";
+import { SERVER } from "./var.js";
 
 const options = XA.WorldOptions("server", {
-	zone_center: { desc: "", value: "0 0", name: "Центр зоны" },
+	zone_center: { desc: "Точка", value: { x: 0, z: 0 }, name: "Центр зоны" },
+	zone_size: { name: "Размер зоны", desc: "", value: 100 },
+	zone_is_for_players: {
+		name: "Игровая",
+		desc: "Зависимость зоны от кол-ва игроков",
+		value: true,
+	},
 });
 
 /**
@@ -29,7 +35,7 @@ system.runInterval(
 		const players = world.getAllPlayers();
 		SERVER.radius = 200 + 20 * players.length;
 		const rad = SERVER.radius;
-		const center = options.zone_center.split(", ").map(Number);
+		const center = options.zone_center;
 
 		/**
 		 *
@@ -41,8 +47,8 @@ system.runInterval(
 		const inRange = (value, min, max) => value <= max && value >= min;
 
 		for (const p of players) {
-			const rmax = { x: center[0] + rad, z: center[1] + rad };
-			const rmin = { x: center[0] - rad, z: center[1] - rad };
+			const rmax = { x: center.x + rad, z: center.x + rad };
+			const rmin = { x: center.z - rad, z: center.z - rad };
 			const { x, z } = Vector.floor(p.location);
 
 			const xtrue = inRange(x, rmin.x, rmax.x);

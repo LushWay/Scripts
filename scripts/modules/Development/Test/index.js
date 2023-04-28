@@ -1,6 +1,5 @@
 import {
 	ItemStack,
-	Items,
 	MinecraftItemTypes,
 	MolangVariableMap,
 	Player,
@@ -16,7 +15,6 @@ import { XA, handle, toStr } from "xapi.js";
 import { DB } from "../../../lib/Database/Default.js";
 import { InventoryStore } from "../../../lib/Database/Inventory.js";
 import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
-import { MoneyCost, Store } from "../../Gameplay/Survival/store.js";
 import "./enchant.js";
 
 /**
@@ -86,7 +84,7 @@ const tests = {
 				xp: 0,
 				health: 10,
 				equipment: {},
-				slots: [new ItemStack(Items.get("xa:menu"))],
+				slots: [new ItemStack("xa:menu")],
 			});
 		} else {
 			InventoryStore.load(
@@ -221,7 +219,7 @@ const tests = {
 	},
 };
 
-world.events.entityHit.subscribe((data) => {
+world.afterEvents.entityHit.subscribe((data) => {
 	if (data.entity instanceof Player) {
 		const axe = XA.Entity.getHeldItem(data.entity);
 		if (axe && !axe.typeId.includes("axe")) return;
@@ -253,7 +251,7 @@ system.runInterval(
 				xp: 0,
 				health: 10,
 				equipment: {},
-				slots: [new ItemStack(Items.get("xa:menu"))],
+				slots: [new ItemStack("xa:menu")],
 			});
 			player.teleport({ x: -2, y: 191, z: -1 });
 		}

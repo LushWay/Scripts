@@ -28,7 +28,7 @@ const PLAYER_OPTIONS = XA.PlayerOptions("Чат", "chat", {
 	disableSound: { desc: "", value: false, name: "Выключение звука" },
 });
 
-world.events.chatSend.subscribe((data) => {
+world.afterEvents.chatSend.subscribe((data) => {
 	if (
 		data.message.startsWith(CONFIG.commandPrefix) &&
 		data.message !== CONFIG.commandPrefix

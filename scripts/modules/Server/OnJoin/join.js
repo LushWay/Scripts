@@ -20,7 +20,7 @@ const PDB = Database.eventProxy(new Database("player"), {
 	},
 });
 
-world.events.playerJoin.subscribe(({ playerId }) => {
+world.afterEvents.playerJoin.subscribe(({ playerId }) => {
 	const { data, save } = PDB.work(playerId);
 	data.waiting = 1;
 	save;

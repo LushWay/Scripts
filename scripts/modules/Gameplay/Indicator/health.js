@@ -1,7 +1,6 @@
 import { Entity, system, Vector, world } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { NAME_MODIFIERS } from "./var.js";
-import { EventSignal } from "../../../lib/Class/Events.js";
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {};
@@ -19,7 +18,7 @@ getIndicators().forEach((e) => {
 	e.triggerEvent("f:t:kill");
 });
 
-world.events.entityHurt.subscribe((data) => {
+world.afterEvents.entityHurt.subscribe((data) => {
 	if (data.hurtEntity.id === "f:t") return;
 
 	const hp = data.hurtEntity.getComponent("health");
@@ -36,8 +35,15 @@ world.events.entityHurt.subscribe((data) => {
 		);
 });
 
-world.events.entityDie.subscribe((data) => {
-	if (data.deadEntity.id === "f:t") return;
+world.afterEvents.entityDie.subscribe((data) => {
+	let id;
+	try {
+		id = data.deadEntity.id;
+	} catch (e) {
+		return;
+	}
+
+	if (id === "f:t") return;
 	if (!(data.deadEntity.id in HURT_ENTITIES)) return;
 
 	const { indicator, entityNameTag } = getIndicator(data.deadEntity);

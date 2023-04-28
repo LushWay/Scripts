@@ -74,7 +74,7 @@ XA.state.afterModulesLoad.subscribe(() => {
 		0
 	);
 
-	world.events.entityDie.subscribe((data) => {
+	world.afterEvents.entityDie.subscribe((data) => {
 		onDamage(
 			{
 				damage: 999999,
@@ -84,7 +84,7 @@ XA.state.afterModulesLoad.subscribe(() => {
 			true
 		);
 	});
-	world.events.entityHurt.subscribe((data) => {
+	world.afterEvents.entityHurt.subscribe((data) => {
 		onDamage(data, false);
 	});
 });

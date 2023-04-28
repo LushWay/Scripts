@@ -1,9 +1,6 @@
 import {
-	EquipmentSlot,
 	GameMode,
-	ItemStack,
 	MinecraftBlockTypes,
-	MinecraftItemTypes,
 	system,
 	Vector,
 	world,
@@ -22,13 +19,13 @@ GameTest.registerAsync("s", "s", async (test) => {
 	player = test.spawnSimulatedPlayer(spawnLoc, name);
 	const id = player.id;
 
-	const event = world.events.entityDie.subscribe((data) => {
+	const event = world.afterEvents.entityDie.subscribe((data) => {
 		if (data.deadEntity.id !== id) return;
 		test.succeed();
 	});
 
 	await test.idle(time - 30);
-	world.events.entityDie.unsubscribe(event);
+	world.afterEvents.entityDie.unsubscribe(event);
 	test.succeed();
 })
 	.maxTicks(time)
@@ -44,13 +41,13 @@ GameTest.registerAsync("s", "test", async (test) => {
 	player = test.spawnSimulatedPlayer(spawnLoc, name);
 
 	const id = player.id;
-	const event = world.events.entityDie.subscribe((data) => {
+	const event = world.afterEvents.entityDie.subscribe((data) => {
 		if (data.deadEntity.id !== id) return;
 		test.succeed();
 	});
 
 	test.idle(time - 30).then((e) => {
-		world.events.entityDie.unsubscribe(event);
+		world.afterEvents.entityDie.unsubscribe(event);
 		test.succeed();
 	});
 

@@ -4,7 +4,7 @@
 		"name": "X-API",
 		"description": "Server Plugin on XilLeR API (based on Smelly API)",
 		"uuid": "8198b306-bfbb-48c9-874d-217cd4cef1ae",
-		"version": [3, 0, 2],
+		"version": [3, 0, 4],
 		"min_engine_version": [1, 19, 50]
 	},
 	"modules": [
@@ -26,11 +26,11 @@
 	"dependencies": [
 		{
 			"module_name": "@minecraft/server",
-			"version": "1.2.0-beta"
+			"version": "1.3.0-beta"
 		},
 		{
 			"module_name": "@minecraft/server-ui",
-			"version": "1.0.0-beta"
+			"version": "1.1.0-beta"
 		},
 		{
 			"module_name": "@minecraft/server-gametest",

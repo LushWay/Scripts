@@ -11,7 +11,7 @@ import { CONFIG_WB } from "./config.js";
 import { SHAPES } from "./utils/shapes.js";
 import { setblock } from "./utils/utils.js";
 
-const GetPlayerSettings = XA.PlayerOptions('Строитель мира', "wb", {
+const GetPlayerSettings = XA.PlayerOptions("Строитель мира", "wb", {
 	noBrushParticles: {
 		desc: "Отключает партиклы у кисти",
 		value: false,
@@ -25,7 +25,7 @@ const GetPlayerSettings = XA.PlayerOptions('Строитель мира', "wb", 
 });
 
 /* It's a code that replaces the block with a random block from the lore of the item. */
-world.events.blockPlace.subscribe((data) => {
+world.afterEvents.blockPlace.subscribe((data) => {
 	if (data.block.typeId !== "minecraft:warped_nylium") return;
 	let blocks = XA.Entity.getHeldItem(data.player).getLore();
 	if (blocks.length < 1) return;
@@ -142,10 +142,11 @@ system.runInterval(
 	20
 );
 
-world.events.itemUseOn.subscribe((data) => {
-	const blockLocation = data.block;
+world.afterEvents.itemUseOn.subscribe((data) => {
 	if (data.itemStack.typeId !== "we:wand" || !(data.source instanceof Player))
 		return;
+
+	const blockLocation = data.block;
 	const pos = WorldEditBuild.pos2 ?? { x: 0, y: 0, z: 0 };
 	if (
 		pos.x === blockLocation.x &&
@@ -159,7 +160,7 @@ world.events.itemUseOn.subscribe((data) => {
 	);
 });
 
-world.events.itemUse.subscribe((data) => {
+world.afterEvents.itemUse.subscribe((data) => {
 	if (!(data.source instanceof Player)) return;
 	if (data.itemStack.typeId === "we:s") {
 		let lore = data.itemStack.getLore();
@@ -191,7 +192,7 @@ world.events.itemUse.subscribe((data) => {
 		XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
 	}
 
-	if (data.itemStack.typeId != "we:brush") return;
+	if (data.itemStack.typeId !== "we:brush") return;
 	const sett = GetPlayerSettings(data.source);
 	if (sett.enableMobile) return;
 	const lore = data.itemStack.getLore();
@@ -208,13 +209,13 @@ world.events.itemUse.subscribe((data) => {
 	if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 });
 
-world.events.itemUse.subscribe((data) => {
+world.afterEvents.itemUse.subscribe((data) => {
 	if (data.itemStack.typeId.startsWith("l:")) {
 		data.source.runCommandAsync(`tp ^^^5`);
 	}
 });
 
-world.events.blockBreak.subscribe((data) => {
+world.afterEvents.blockBreak.subscribe((data) => {
 	if (XA.Entity.getHeldItem(data.player)?.typeId !== "we:wand") return;
 	const pos = WorldEditBuild.pos1 ?? { x: 0, y: 0, z: 0 };
 	if (

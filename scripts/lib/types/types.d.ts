@@ -1,6 +1,7 @@
 type Vector3 = import("@minecraft/server").Vector3;
 type Vector2 = import("@minecraft/server").Vector2;
 type Point = { x: number; z: number };
+type Dimensions = import("@minecraft/server").Dimensions;
 
 interface AbstactDatabase<Key = string, Value = any, DeleteReturn = any> {
 	get(k: Key): Value;
@@ -11,8 +12,6 @@ interface AbstactDatabase<Key = string, Value = any, DeleteReturn = any> {
 type FunctionFilter<T> = {
 	[K in keyof T as T[K] extends Function ? K : never]: T[K];
 };
-
-type Dimensions = "nether" | "end" | "overworld";
 
 type JSONLike = Record<string | symbol | number, any>;
 

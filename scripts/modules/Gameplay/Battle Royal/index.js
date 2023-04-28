@@ -1,7 +1,6 @@
 import { Player, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { Atp } from "../Survival/portals.js";
-import { br } from "./br.js";
+import { br } from "./game.js";
 import { BATTLE_ROYAL_EVENTS, quene } from "./var.js";
 
 let minpl = 2,
@@ -26,6 +25,12 @@ function forEveryQuenedPlayer(sound, text) {
 	}
 }
 
+/**
+ *
+ * @param {Player} player
+ */
+export function teleportToBR(player) {}
+
 const ks = Object.keys;
 BATTLE_ROYAL_EVENTS.playerJoin.subscribe((player) => {
 	/**
@@ -48,9 +53,9 @@ BATTLE_ROYAL_EVENTS.playerJoin.subscribe((player) => {
 	pl.playSound("random.orb");
 });
 
-BATTLE_ROYAL_EVENTS.death.subscribe((pl) => {
-	pl.tell("§6Ты погиб!");
-	Atp(pl, "br", { lock: true, pvp: true, quene: true });
+BATTLE_ROYAL_EVENTS.death.subscribe((player) => {
+	player.tell("§6Ты погиб!");
+	teleportToBR(player);
 });
 
 system.runInterval(
@@ -123,7 +128,7 @@ const bbr = new XA.Command({
 	name: "br",
 	description: "Телепортирует на спавн батл рояля",
 }).executes((ctx) => {
-	Atp(ctx.sender, "br");
+	teleportToBR(ctx.sender);
 });
 
 bbr
@@ -144,7 +149,7 @@ bbr
 			delete br.players[br.players.findIndex((e) => e.name == ctx.sender.name)];
 			br.tags.forEach((e) => ctx.sender.removeTag(e));
 			ctx.reply("§aВы вышли из игры.");
-			Atp(ctx.sender, "br");
+			teleportToBR(ctx.sender);
 		} else {
 			ctx.reply("§cВы не находитесь в игре.");
 		}
@@ -172,13 +177,13 @@ bbr
 		Object.assign({}, quene);
 	});
 
-world.events.playerJoin.subscribe(({ playerId, playerName }) => {
+world.afterEvents.playerJoin.subscribe(({ playerId, playerName }) => {
 	system.runTimeout(
 		() => {
 			const joinedPlayer = XA.Entity.fetch(playerId);
 			if (joinedPlayer && XA.Entity.getTagStartsWith(joinedPlayer, "br:")) {
 				br.tags.forEach((e) => joinedPlayer.removeTag(e));
-				Atp(joinedPlayer, "br");
+				teleportToBR(joinedPlayer);
 			}
 		},
 		"br",

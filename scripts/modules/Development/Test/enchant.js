@@ -1,9 +1,6 @@
-import {
-	EquipmentSlot,
-	MinecraftEnchantmentTypes,
-	world,
-} from "@minecraft/server";
+import { EquipmentSlot, world } from "@minecraft/server";
 import { Enchantments } from "../../Gameplay/Enchantments/index.js";
+import { MinecraftEnchantmentTypes } from "../../../lib/List/enchantments.js";
 
 new XA.Command({
 	name: "enchant",
@@ -24,7 +21,7 @@ new XA.Command({
 		const item = mainhand.getItem();
 		const { enchantments } = item.getComponent("enchantments");
 		enchantments.removeEnchantment(ench);
-		enchantments.addEnchantment(Enchantments.Custom[ench.id][level]);
+		enchantments.addEnchantment(Enchantments.Custom[ench][level]);
 
 		world.debug("enca", [...enchantments]);
 		item.getComponent("enchantments").enchantments = enchantments;

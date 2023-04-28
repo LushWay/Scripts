@@ -74,7 +74,7 @@ export * from "./lib/Setup/prototypes.js";
 export * from "./lib/Setup/roles.js";
 export * from "./lib/Setup/utils.js";
 
-world.events.playerJoin.subscribe(() => {
+world.afterEvents.playerJoin.subscribe(() => {
 	if (Date.now() - loading < CONFIG.firstPlayerJoinTime) {
 		XA.state.first_load = true;
 	}

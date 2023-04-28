@@ -9,7 +9,7 @@ patchPackage("@minecraft/server", {
     /**
      * Dimension type shortcut (id without namespace, e.g. "minecraft:")
      */
-    type: Dimensions;
+    type: ShortcutDimensions;
     `,
 		Vector: m`
     /**
@@ -163,7 +163,7 @@ getComponent<N extends keyof EntityComponents>(
 /**
  * Dimension names. Used in {@link Dimension.type}
  */
-type Dimensions = "nether" | "overworld" | "end"
+type ShortcutDimensions = "nether" | "overworld" | "end"
 
 
 /**
