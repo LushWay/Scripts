@@ -1,6 +1,7 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { quene } from "../Battle Royal/var.js";
+import { LockAction, PlaceAction } from "../../../lib/Class/Action.js";
+import { Minigame } from "../Minigames/Builder.js";
 
 const getSettings = XA.PlayerOptions("Телепорт", "Atp", {
 	showCoordinates: {
@@ -12,68 +13,75 @@ const getSettings = XA.PlayerOptions("Телепорт", "Atp", {
 });
 
 /**
- *
- * @param {Player} player
- * @param {Vector3} pos
+ * @typedef {{
+ *   ignorePvp?: boolean;
+ *   ignoreQuene?: string;
+ * }} CustomTeleportOptions
  */
-function tp(player, pos, tpAnimation = true) {
-	if (tpAnimation) player.runCommandAsync("effect @s clear");
-	let befplace;
-	player.teleport(pos);
-	player.tell(`${befplace ? befplace : ""}§a◙ §3b`);
-}
 
 /**
  *
  * @param {Player} player
- * @param {Vector3} pos
- * @param {{pvp?: boolean; lock?: boolean; quene?: boolean}} [ignore]
+ * @param {Vector3} to
+ * @param {object} [options]
+ * @param {string} [options.ignoreQuene]
  */
-export function Atp(player, pos, ignore) {
-	const tag = XA.Entity.getTagStartsWith(player, "locktp:");
-
+export function teleport(player, to, options = {}) {
 	/** @param {string} reason */
 	const fail = (reason) => player.tell("§c► " + reason);
 
-	if (!ignore?.lock && tag)
-		return fail(`Сейчас это запрещено (префикс запрета: ${tag})`);
-
-	if (!ignore?.quene && Object.keys(quene).includes(player.name))
+	const quene = Minigame.getQuene(player).name;
+	if (quene && quene !== options.ignoreQuene) {
 		return fail(
-			`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-br quit`
+			`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-quit`
 		);
+	}
 
-	if (!ignore?.pvp && XA.Entity.getScore(player, "pvp") > 0)
-		return fail(`Вы находитесь в режиме PVP!`);
+	if (LockAction.tellLocked(player, {})) return;
 
-	const settings = getSettings(player);
-
-	tp(player, pos, settings.title);
+	player.teleport(to);
 }
 
-new XA.Command({
-	name: "hub",
-	aliases: ["spawn", "tp"],
-	description: "§bПеремещает на спавн",
-	type: "public",
-}).executes((ctx) => {
-	Atp(ctx.sender, { x: 1, y: 1, z: 1 });
-});
+export class Portal {
+	/**
+	 * Creates new portal.
+	 * @param {string} name
+	 * @param {Vector3} from
+	 * @param {Vector3} to
+	 * @param {Vector3} place
+	 * @param {object} [o]
+	 * @param {string[]} [o.aliases]
+	 * @param {boolean} [o.createCommand]
+	 * @param {string} [o.commandDescription]
+	 */
+	constructor(
+		name,
+		from,
+		to,
+		place,
+		{ aliases = [], createCommand = true, commandDescription } = {}
+	) {
+		this.from = from;
+		this.to = to;
+		this.place = place;
 
-new XA.Command({
-	name: "minigames",
-	aliases: ["mg"],
-	description: "§bПеремещает на спавн минигр",
-	type: "public",
-}).executes((ctx) => {
-	Atp(ctx.sender, { x: 1, y: 1, z: 1 });
-});
+		if (createCommand)
+			new XA.Command({
+				name,
+				aliases,
+				description: commandDescription ?? `§bТелепорт на ${name}`,
+				type: "public",
+			}).executes((ctx) => {
+				this.teleport(ctx.sender);
+			});
 
-new XA.Command({
-	name: "anarchy",
-	aliases: ["anarch"],
-	description: "§bПеремещает на анархию",
-	type: "public",
-}).executes((ctx) => {
-	Atp(ctx.sender, { x: 1, y: 1, z: 1 });
-});
+		for (const pos of Vector.foreach(from, to))
+			new PlaceAction(pos, (p) => this.teleport(p));
+	}
+	/**
+	 * @param {Player} player
+	 */
+	teleport(player) {
+		teleport(player, this.place);
+	}
+}

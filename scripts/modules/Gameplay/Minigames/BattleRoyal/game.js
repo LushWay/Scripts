@@ -1,8 +1,8 @@
 import { AfterEvents, Player, Vector, system, world } from "@minecraft/server";
 import { XA } from "xapi.js";
-import { EventSignal } from "../../../lib/Class/Events.js";
-import { rd } from "../Airdrops/index.js";
-import { PVP_LOCKED } from "../Indicator/var.js";
+import { EventSignal } from "../../../../lib/Class/Events.js";
+import { rd } from "../../Airdrops/index.js";
+import { NO_PVP_MODE } from "../../Indicator/var.js";
 import { teleportToBR } from "./index.js";
 import { rtp } from "./rtp.js";
 import { BATTLE_ROYAL_EVENTS, BR_CONFIG, BR_DB } from "./var.js";
@@ -38,7 +38,7 @@ class BattleRoyal {
 			open: false,
 			time: 0,
 		};
-		this.tags = ["locktp:Battle royal", "br:alive", "br:inGame"];
+		this.tags = ["br:alive", "br:inGame"];
 	}
 	/**
 	 * Waiting for the player to respawn.
@@ -122,7 +122,7 @@ class BattleRoyal {
 				// Тэги
 				const p = XA.Entity.fetch(e);
 				this.tags.forEach((e) => p.addTag(e));
-				PVP_LOCKED.push(p.id);
+				NO_PVP_MODE.push(p.id);
 
 				// Список
 				this.players.push(p);

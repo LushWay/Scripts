@@ -2,7 +2,7 @@
 import { Player, world } from "@minecraft/server";
 
 import { toStr } from "xapi.js";
-import { rd } from "../Airdrops/index.js";
+import { rd } from "../../Airdrops/index.js";
 
 function isNear(x, xx, z, zz) {
 	if (Math.max(x, xx) - Math.min(xx, x) < 10) return true;

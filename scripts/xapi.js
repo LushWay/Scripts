@@ -11,7 +11,6 @@ import { onWorldLoad } from "./lib/Setup/loader.js";
 import { XCooldown } from "./lib/Class/Cooldown.js";
 import { XEntity } from "./lib/Class/Entity.js";
 import { Options } from "./lib/Class/Options.js";
-import { XRequest } from "./lib/Class/Request.js";
 import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
 
@@ -22,21 +21,20 @@ import { text } from "./lib/Lang/text.js";
 import { CONFIG } from "./config.js";
 import { EventSignal } from "./lib/Class/Events.js";
 import { XUtils } from "./lib/Class/Utils.js";
+import { DisplayError } from "./lib/Setup/utils.js";
 import { loadModules } from "./modules/import.js";
-import { DisplayError } from "./xapi.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
 
 /**
- * Class with all X-API features
+ * Class because variable hoisting
  */
 export class XA {
 	static Entity = XEntity;
 	static runCommandX = XRunCommand;
 	static Command = XCommand;
 	static Cooldown = XCooldown;
-	static Request = XRequest;
 	static Utils = XUtils;
 
 	static PlayerOptions = Options.player.typedBind(Options);

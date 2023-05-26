@@ -78,8 +78,10 @@ export function randomTeleport(
 		target.addEffect(
 			MinecraftEffectTypes.slowFalling,
 			((y - 60) / 2 + keepInSkyTime) * 20,
-			1,
-			false
+			{
+				amplifier: 1,
+				showParticles: false,
+			}
 		);
 	}
 

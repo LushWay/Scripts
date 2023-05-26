@@ -33,16 +33,14 @@ export class ModalForm {
 	}
 	/**
 	 * Adds a dropdown to this form
-	 * @template {ReadonlyArray<string>} T
+	 * @template {string[]} T
 	 * @param {string} label  label to show on dropdown
 	 * @param {T} options  the availiabe options for this dropdown
 	 * @param {number} defaultValueIndex  the default value index
 	 * @returns {ModalForm<AppendFormField<Callback, T[number]>>} this
 	 */
 	addDropdown(label, options, defaultValueIndex = 0) {
-		// @ts-ignore
 		this.args.push({ type: "dropdown", options: options });
-		// @ts-ignore
 		this.form.dropdown(label, options, defaultValueIndex);
 		// @ts-ignore
 		return this;
@@ -56,11 +54,23 @@ export class ModalForm {
 	 * @param {number} defaultValue  the default value in slider
 	 * @returns {ModalForm<AppendFormField<Callback, number>>}
 	 */
-	addSlider(label, minimumValue, maximumValue, valueStep = 1, defaultValue = 0) {
+	addSlider(
+		label,
+		minimumValue,
+		maximumValue,
+		valueStep = 1,
+		defaultValue = 0
+	) {
 		this.args.push({ type: "slider" });
 		if (typeof minimumValue !== "number") return;
 		if (typeof maximumValue !== "number") return;
-		this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue);
+		this.form.slider(
+			label,
+			minimumValue,
+			maximumValue,
+			valueStep,
+			defaultValue
+		);
 		// @ts-expect-error
 		return this;
 	}
@@ -103,7 +113,11 @@ export class ModalForm {
 			() =>
 				callback(
 					new FormCallback(this, player, callback),
-					...response.formValues.map((v, i) => (this.args[i].type === "dropdown" ? this.args[i].options[v] : v))
+					...response.formValues.map((v, i) =>
+						this.args[i].type === "dropdown" && typeof v === "number"
+							? this.args[i].options[v]
+							: v
+					)
 				),
 			null,
 			["ModalFormCallback"]

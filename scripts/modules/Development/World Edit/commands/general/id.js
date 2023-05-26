@@ -30,13 +30,13 @@ root
 	});
 
 root
-	.literal({ name: "p", description: "Выдает все properties блока по локации" })
+	.literal({ name: "p", description: "Выдает все states блока по локации" })
 	.location("location", true)
 	.executes((ctx, location) => {
 		const l = Vector.floor(location);
 		const block = ctx.sender.dimension.getBlock(l);
 		if (!block) return ctx.reply("§cНет блока!");
-		ctx.reply(toStr(block.permutation.getAllProperties()));
+		ctx.reply(toStr(block.permutation.getAllStates()));
 	});
 
 root

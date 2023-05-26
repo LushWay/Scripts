@@ -11,9 +11,7 @@
 		"baseUrl": ".",
 		"maxNodeModuleJsDepth": 0,
 		"types": [],
-		"outDir": "del_me",
 		"paths": {
-			"@minecraft/*": ["node_modules/@minecraft/*/index.js"],
 			"*": ["scripts/*"]
 		}
 	},

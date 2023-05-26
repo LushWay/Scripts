@@ -12,10 +12,10 @@ export const PVP = new ScoreboardDB(pvpScore);
 export const LOCKED_TITLES = {};
 
 /**
- * Array of players who dont will get pvp lock
+ * Array of players who wouldn't get pvp lock
  * @type {string[]}
  */
-export const PVP_LOCKED = [];
+export const NO_PVP_MODE = [];
 
 /**
  * @type {((entity: Entity) => string | false)[]}

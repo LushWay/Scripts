@@ -39,3 +39,4 @@ interface ArrayConstructor {
 interface Math {
 	randomInt(minimum: number, maximum: number): number;
 }
+

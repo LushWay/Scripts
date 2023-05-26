@@ -1,13 +1,10 @@
-import { Player, Vector, system, world } from "@minecraft/server";
+import { MolangVariableMap, Player, Vector, system, world } from "@minecraft/server";
 
 import { P } from "lib/List/particles.js";
 import { S } from "lib/List/sounds.js";
 import { XA } from "xapi.js";
-import { DefaultParticlePropertiesBuilder } from "../../../../lib/Class/Particles.js";
 
-const map = new DefaultParticlePropertiesBuilder();
-// map.setAmount(1).setColor({red: 1, blue: 2, green: 3, alpha: 0}).setDirection(Vector.up)
-const variables = map.getMolangVariableMap();
+const variables= new MolangVariableMap()
 
 system.runPlayerInterval(
 	(player) => {

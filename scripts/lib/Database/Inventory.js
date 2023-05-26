@@ -52,7 +52,7 @@ export class InventoryStore {
 		to.resetLevel();
 		to.addExperience(from.xp);
 
-		to.getComponent("health").setCurrent(from.health);
+		to.getComponent("health").setCurrentValue(from.health);
 
 		const { container } = to.getComponent("inventory");
 		if (clearAll) container.clearAll();
@@ -72,7 +72,7 @@ export class InventoryStore {
 		const equipment = from.getComponent("equipment_inventory");
 		const { container } = from.getComponent("inventory");
 		const xp = from.getTotalXp();
-		const health = from.getComponent("health").current;
+		const health = from.getComponent("health").currentValue;
 
 		return {
 			xp,

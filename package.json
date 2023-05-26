@@ -1,1 +1,20 @@
-{  "name": "xapi",  "version": "0.13.3",  "keywords": [],  "author": "",  "license": "ISC",  "type": "module",  "scripts": {    "postinstall": "node leafs/patch-modules.js",    "loot": "node leafs/loot.js",    "update_modules": "powershell.exe -ExecutionPolicy Bypass -File \"./leafs/update_modules.ps1\"",    "to_preview": "powershell.exe -ExecutionPolicy Bypass -File \"./leafs/to_preview.ps1\"",    "patch-modules": "node leafs/patch-modules.js",    "utils": "node leafs/utils.js",    "update_leafs": "cd node_modules/leafy-utils && node install.js"  },  "description": "",  "devDependencies": {},  "dependencies": {    "@minecraft/server": "^1.3.0-beta.1.20.0-preview.22",    "@minecraft/server-gametest": "1.0.0-beta.1.19.80-preview.21",    "@minecraft/server-ui": "1.0.0-beta.1.19.80-preview.21",    "leafy-utils": "^2.7.4"  }}
+{
+  "name": "xapi",
+  "version": "0.13.3",
+  "license": "ISC",
+  "scripts": {
+    "postinstall": "node leafs/patch-modules.js",
+    "loot": "node leafs/loot.js",
+    "update_modules": "powershell.exe -ExecutionPolicy Bypass -File \"./leafs/update_modules.ps1\"",
+    "patch-modules": "node leafs/patch-modules.js",
+    "update_leafs": "cd node_modules/leafy-utils && node install.js"
+  },
+  "dependencies": {
+    "@minecraft/server": "1.4.0-beta.1.20.10-preview.20",
+    "@minecraft/server-gametest": "1.0.0-beta.1.20.10-preview.20",
+    "@minecraft/server-ui": "1.1.0-beta.1.20.10-preview.20",
+    "leafy-utils": "^5.1.1"
+  },
+  "type": "module",
+  "private": true
+}

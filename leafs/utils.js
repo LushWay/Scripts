@@ -3,6 +3,9 @@
 import * as fs from "fs/promises";
 import path from "path";
 
+const LAST_UPDATE_PATH = path.join(process.cwd(), "leafs", "last-update");
+let LAST_UPDATE;
+
 /**
  * Replaces and adds code to a package's TypeScript definition file.
  * @param {string} packageName - The name of the package to patch.
@@ -15,14 +18,21 @@ import path from "path";
  * @param {string} options.additions.ending - The code to add to the end of the file.
  */
 export async function patchPackage(packageName, options) {
+	if (!LAST_UPDATE) {
+		try {
+			LAST_UPDATE = await fs.readFile(LAST_UPDATE_PATH, "utf-8");
+		} catch {}
+	}
+
 	// Get the path to the package's TypeScript definition file
 	const packagePath = path.join("node_modules", packageName, `index.d.ts`);
+	const stat = await fs.stat(packagePath);
 
-	// Read the original code from the file
-	const originalCode = await fs.readFile(packagePath, "utf-8");
+	if (stat.mtimeMs.toString() === LAST_UPDATE) return;
+
+	let patchedCode = await fs.readFile(packagePath, "utf-8");
 
 	// Apply the replacements
-	let patchedCode = originalCode;
 	for (const replace of options.replaces) {
 		let newCode = patchedCode[replace.all ? "replaceAll" : "replace"](
 			replace.find,
@@ -32,7 +42,7 @@ export async function patchPackage(packageName, options) {
 		if (newCode !== patchedCode) {
 			patchedCode = newCode;
 		} else {
-			if (replace.throw || !("throw" in replace))
+			if (replace.throw !== false)
 				throw new Error(`Unable to find replace for ${replace.find}`);
 		}
 	}
@@ -75,6 +85,10 @@ export async function patchPackage(packageName, options) {
 
 	// Write the patched code back to the file
 	await fs.writeFile(packagePath, newCode);
+	await fs.writeFile(
+		LAST_UPDATE_PATH,
+		(await fs.stat(packagePath)).mtimeMs.toString()
+	);
 }
 
 /**
@@ -129,4 +143,3 @@ export function m(strings, ...values) {
 
 	return newString;
 }
-

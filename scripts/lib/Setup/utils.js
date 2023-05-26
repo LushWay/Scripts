@@ -23,10 +23,8 @@ export function DisplayError(
 	const text = `§4${name}: §c${message}\n§f${stack}\n`;
 
 	try {
-		if (false) {
-		}
 		// if (onWorldLoad.loaded()) world.say(text);
-		else console.error(text);
+		console.error(text);
 
 		console.log(text);
 	} catch (e) {}

@@ -1,4 +1,10 @@
-import { ItemStack, MinecraftBlockTypes, Player } from "@minecraft/server";
+import {
+	Block,
+	Entity,
+	ItemStack,
+	MinecraftBlockTypes,
+	Player,
+} from "@minecraft/server";
 import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { XShowForm } from "../Form/utils.js";
 import { untyped_terrain_textures } from "../List/terrain-textures.js";
@@ -92,11 +98,11 @@ export const XUtils = {
 		return name;
 	},
 	/**
-	 *
 	 * @param {Player} player
+	 * @returns {Promise<Block | ItemStack | false>}
 	 */
 	selectBlock(player) {
-		/** @type {string[]} */
+		/** @type {Array<Block | ItemStack | 'buffer'>} */
 		const blocks = [];
 
 		/**
@@ -125,7 +131,7 @@ export const XUtils = {
 			form.buffer("Блок под ногами");
 
 			form.button(id, this.getBlockTexture(id));
-			blocks.push(id);
+			blocks.push(underfeatBlock);
 		}
 
 		form.buffer("Инвентарь");
@@ -136,19 +142,18 @@ export const XUtils = {
 			if (!item || !MinecraftBlockTypes.get(item.typeId)) continue;
 			const id = item.typeId.replace(/^minecraft:/, "");
 			form.button(id, this.getBlockTexture(id));
-			blocks.push(id);
+			blocks.push(item);
 		}
 
 		return new Promise(async (resolve) => {
 			const result = await XShowForm(form, player);
 			if (result === false || !(result instanceof ActionFormResponse))
-				return false;
+				return resolve(false);
 
 			const selectedBlock = blocks[result.selection];
 
-			if (selectedBlock[0] === "buffer")
-				resolve(await this.selectBlock(player));
-
+			if (selectedBlock === "buffer")
+				return resolve(await this.selectBlock(player));
 			resolve(selectedBlock);
 		});
 	},
@@ -160,11 +165,18 @@ export const XUtils = {
 		const search = inaccurateSearch(id, Object.keys(untyped_terrain_textures));
 		const textures = untyped_terrain_textures[search[0][0]].textures;
 
-		return textures[0];
+		return Array.isArray(textures) ? textures[0] : textures;
 	},
 	/**
-	 *
-	 * @param {string} langcode
+	 * Sometimes entity.typeId throws
+	 * @param {Entity} entity
+	 * @returns
 	 */
-	getTextByLangCode(langcode) {},
+	safeGetTypeID(entity) {
+		try {
+			return entity.typeId;
+		} catch (e) {
+			return undefined;
+		}
+	},
 };

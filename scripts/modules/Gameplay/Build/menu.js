@@ -12,6 +12,7 @@ import {
 	prompt,
 	teleportToRegion,
 } from "./utils.js";
+import { StoredRequest } from "lib/Class/StoredRequest.js";
 
 const DB = new Database("buildRegion");
 
@@ -50,13 +51,10 @@ CONFIG_MENU.menu = (player) => {
 		`§3Координаты вашей площадки: §c${Pregion.from.x} §b${Pregion.from.z}\n `
 	);
 
-	/** @type {import("lib/Class/Request.js").XRequest} */
-	let req;
 	/** @type {string} */
 	let regionOwnerName;
 
 	if (current_region) {
-		req = new XA.Request(DB, "EDIT", current_region.permissions.owners[0]);
 		regionOwnerName = XA.Entity.getNameByID(
 			current_region.permissions.owners[0]
 		);
@@ -118,6 +116,12 @@ CONFIG_MENU.menu = (player) => {
 	});
 
 	if (current_region) {
+		const editRequest = new StoredRequest(
+			DB,
+			"EDIT",
+			current_region.permissions.owners[0]
+		);
+
 		if (inOwnRegion) {
 			menu.addButton("Строители", null, () => {
 				const form = new ActionForm(
@@ -155,7 +159,7 @@ CONFIG_MENU.menu = (player) => {
 				form.show(player);
 			});
 
-			const reqs = req.reqList.size;
+			const reqs = editRequest.list.size;
 			menu.addButton(
 				`Запросы редактирования${reqs > 0 ? `: §c${reqs}!` : ""}`,
 				null,
@@ -164,7 +168,7 @@ CONFIG_MENU.menu = (player) => {
 						"Запросы редактирования",
 						"§3В этом меню вы можете посмотреть запросы на редактирование площадки, отправление другими игроками"
 					);
-					for (const ID of req.reqList) {
+					for (const ID of editRequest.list) {
 						const name = XA.Entity.getNameByID(ID);
 						newmenu.addButton(name, null, () => {
 							prompt(
@@ -174,7 +178,7 @@ CONFIG_MENU.menu = (player) => {
 								() => {
 									const requestedPlayer = XA.Entity.fetch(ID);
 									if (requestedPlayer) {
-										req.deleteRequest(ID);
+										editRequest.deleteRequest(ID);
 										player.tell(
 											"§b> §3Запрос на редактирование успешно принят!"
 										);
@@ -184,12 +188,12 @@ CONFIG_MENU.menu = (player) => {
 										current_region.permissions.owners.push(requestedPlayer.id);
 										current_region.update();
 									} else {
-										player.tell("§4> §3Игрок не в сети.");
+										player.tell("§4> §cИгрок не в сети.");
 									}
 								},
 								"Отклонить",
 								() => {
-									req.deleteRequest(ID);
+									editRequest.deleteRequest(ID);
 									newmenu.show(player);
 								}
 							);
@@ -272,7 +276,7 @@ CONFIG_MENU.menu = (player) => {
 						"Запросить",
 						() => {
 							CD.update();
-							req.createRequest(player.id);
+							editRequest.createRequest(player.id);
 							player.tell("§b> §3Запрос на редактирование успешно отправлен!");
 							const requestedPlayer = XA.Entity.fetch(
 								current_region.permissions.owners[0]

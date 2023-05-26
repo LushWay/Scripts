@@ -1,7 +1,7 @@
 type Vector3 = import("@minecraft/server").Vector3;
 type Vector2 = import("@minecraft/server").Vector2;
 type Point = { x: number; z: number };
-type Dimensions = import("@minecraft/server").Dimensions;
+type Dimensions = import("@minecraft/server").ShortcutDimensions;
 
 interface AbstactDatabase<Key = string, Value = any, DeleteReturn = any> {
 	get(k: Key): Value;

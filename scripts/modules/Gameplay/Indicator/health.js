@@ -22,7 +22,7 @@ world.afterEvents.entityHurt.subscribe((data) => {
 	if (data.hurtEntity.id === "f:t") return;
 
 	const hp = data.hurtEntity.getComponent("health");
-	if (!hp.current) return;
+	if (!hp.currentValue) return;
 
 	const { indicator, entityNameTag } = getIndicator(data.hurtEntity);
 
@@ -111,13 +111,13 @@ new XA.Command({ name: "dmgstat", role: "admin" }).executes(
  * @returns {string}
  */
 function getName(entity, hp = entity.getComponent("health")) {
-	const maxHP = hp.value;
+	const maxHP = hp.defaultValue;
 
 	const s = 50;
 	const scale = maxHP <= s ? 1 : maxHP / s;
 
 	const full = ~~(maxHP / scale);
-	const current = ~~(hp.current / scale);
+	const current = ~~(hp.currentValue / scale);
 	const damage = ~~(HURT_ENTITIES[entity.id].damage / scale);
 
 	let bar = "";

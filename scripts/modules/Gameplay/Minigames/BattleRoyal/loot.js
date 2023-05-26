@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { ItemStack, MinecraftBlockTypes, world } from "@minecraft/server";
-import { rd } from "../Airdrops/index.js";
+import { rd } from "../../Airdrops/index.js";
 
 /**
  * @type {Array<ItemStack>}

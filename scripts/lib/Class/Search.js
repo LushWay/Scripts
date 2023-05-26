@@ -1,11 +1,11 @@
 /**
- * @author {Zdyn}
- * @link https://github.com/zdyn/jaro-winkler-js/blob/master/jaro-winkler-js.min.js
+
  */
 
 /**
  * @param {string} string1
  * @param {string} string2
+ * Code by {@link https://github.com/zdyn/jaro-winkler-js/ Zdyn}
  */
 export function stringDistance(string1, string2) {
 	if (string1.length > string2.length) [string1, string2] = [string2, string1];
@@ -87,5 +87,3 @@ export function inaccurateSearch(search, array) {
 		)
 		.sort((a, b) => b[1] - a[1]);
 }
-
-

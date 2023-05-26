@@ -1,4 +1,4 @@
-export class XRequest {
+export class StoredRequest {
 	/**
 	 * Generates unique DB key
 	 * @param {string} prefix
@@ -29,13 +29,13 @@ export class XRequest {
 	 */
 	constructor(db, prefix, ID) {
 		this.db = db;
-		this.key = XRequest.genDBkey(prefix, ID);
+		this.key = StoredRequest.genDBkey(prefix, ID);
 	}
 	/**
 	 * Returns all active ids
 	 * @returns {Set<string>}
 	 */
-	get reqList() {
+	get list() {
 		let data = this.db.get(this.key);
 
 		if (!Array.isArray(data)) {
@@ -52,7 +52,7 @@ export class XRequest {
 	 * @param {string} ID
 	 */
 	createRequest(ID) {
-		const requests = this.reqList;
+		const requests = this.list;
 		requests.add(ID);
 		this.db.set(this.key, [...requests.values()]);
 	}
@@ -61,7 +61,7 @@ export class XRequest {
 	 * @param {string} ID - ID of request
 	 */
 	deleteRequest(ID) {
-		const requests = this.reqList;
+		const requests = this.list;
 		requests.delete(ID);
 		this.db.set(this.key, [...requests.values()]);
 	}

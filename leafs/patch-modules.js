@@ -1,8 +1,6 @@
 // @ts-check
 import { m, patchPackage } from "./utils.js";
 
-// file:///C:\Users\Настя\AppData\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState\games\com.mojang\development_behavior_packs\X-API\scripts\lib\Setup\prototypes.js
-
 patchPackage("@minecraft/server", {
 	classes: {
 		Dimension: m`
@@ -134,7 +132,7 @@ getComponent<N extends keyof BlockComponents>(
 ): BlockComponents[N];`,
 		},
 		{
-			find: "getComponent(componentId: string): EntityComponent;",
+			find: "getComponent(componentId: string): EntityComponent | undefined;",
 			replace: m`
 getComponent<N extends keyof EntityComponents>(
   componentName: N
@@ -243,8 +241,8 @@ type EntityComponents = {
 	"minecraft:is_charged": EntityIsChargedComponent;
 	is_chested: EntityIsChestedComponent;
 	"minecraft:is_chested": EntityIsChestedComponent;
-	is_dyeable: EntityIsDyableComponent;
-	"minecraft:is_dyeable": EntityIsDyableComponent;
+	is_dyeable: EntityIsDyeableComponent;
+	"minecraft:is_dyeable": EntityIsDyeableComponent;
 	is_hidden_when_invisible: EntityIsHiddenWhenInvisibleComponent;
 	"minecraft:is_hidden_when_invisible": EntityIsHiddenWhenInvisibleComponent;
 	is_ignited: EntityIsIgnitedComponent;

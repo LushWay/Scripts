@@ -4,7 +4,6 @@ import {
 	MinecraftItemTypes,
 	Player,
 	Vector,
-	World,
 	system,
 	world,
 } from "@minecraft/server";
@@ -12,10 +11,11 @@ import {
 /** @type {Record<string, [number, Entity]>} */
 const SPAWNED_FIREWORKS = {};
 
-world.afterEvents.entitySpawn.subscribe((data) => {
-	if (data.entity.typeId !== MinecraftEntityTypes.fireworksRocket.id) return;
+world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+	if (XA.Utils.safeGetTypeID(entity) !== MinecraftEntityTypes.fireworksRocket.id)
+		return;
 
-	SPAWNED_FIREWORKS[data.entity.id] = [Date.now(), data.entity];
+	SPAWNED_FIREWORKS[entity.id] = [Date.now(), entity];
 });
 
 world.afterEvents.itemUse.subscribe((data) => {
@@ -53,7 +53,7 @@ system.runInterval(
 			);
 
 			if (block && !block.isAir()) {
-				firework.dimension.createExplosion(firework.location, 4, {
+				firework.dimension.createExplosion(firework.location, 0.8, {
 					source,
 					breaksBlocks: true,
 				});

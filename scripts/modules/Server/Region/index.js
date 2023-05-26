@@ -110,21 +110,22 @@ world.afterEvents.blockBreak.subscribe(
 	}
 );
 
-world.afterEvents.entitySpawn.subscribe((data) => {
-	if (data.entity.typeId === "rubedo:database") return;
+world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+	const typeId = XA.Utils.safeGetTypeID(entity);
+	if (!typeId || typeId === "rubedo:database") return;
 	const region = Region.blockLocationInRegion(
-		data.entity.location,
-		data.entity.dimension.type
+		entity.location,
+		entity.dimension.type
 	);
-	if (spawnAllowed(region, data)) return;
+	if (spawnAllowed(region, { entity })) return;
 	if (
 		region &&
-		(region.permissions.allowedEntitys.includes(data.entity.typeId) ||
+		(region.permissions.allowedEntitys.includes(typeId) ||
 			region.permissions.allowedEntitys === "all")
 	)
 		return;
 
-	XA.Entity.despawn(data.entity);
+	XA.Entity.despawn(entity);
 });
 
 system.runInterval(

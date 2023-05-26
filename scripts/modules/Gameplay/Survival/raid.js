@@ -1,6 +1,7 @@
 import { system, world } from "@minecraft/server";
+import { LockAction } from "../../../lib/Class/Action.js";
+import { ScoreboardDB } from "../../../lib/Database/Scoreboard.js";
 import { Region } from "../../Server/Region/Region.js";
-import { PVP } from "../Indicator/var.js";
 import { RaidNotify } from "./var.js";
 
 world.beforeEvents.explosion.subscribe((data) => {
@@ -12,19 +13,26 @@ world.beforeEvents.explosion.subscribe((data) => {
 	}
 });
 
+const RAID = new ScoreboardDB("raid", "Raid");
+new LockAction(
+	"raid",
+	(player) => RAID.get(player) > 0,
+	"Вы находитесь в режиме рейдблока."
+);
+
 system.runInterval(
 	() => {
 		for (const id in RaidNotify) {
 			// Ищем игрока...
 			const player = XA.Entity.fetch(id);
 			if (player) {
-				if (PVP.get(player) === 0) {
+				if (RAID.get(player) === 0) {
 					player.tell(
 						"§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны."
 					);
 					player.playSound("mob.wolf.bark");
 				}
-				PVP.set(player, RaidNotify[id]);
+				RAID.set(player, RaidNotify[id]);
 				delete RaidNotify[id];
 				continue;
 			}
@@ -40,3 +48,4 @@ system.runInterval(
 	"raid notify",
 	20
 );
+

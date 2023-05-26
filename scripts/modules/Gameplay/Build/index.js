@@ -13,8 +13,7 @@ const GLOBAL_ALLOWED_ENTITIES = ["minecraft:player", "minecraft:item"].concat(
 setRegionGuards(
 	// Common actions guard
 	(player, region) =>
-		IS(player.id, "builder") ||
-		region?.permissions?.owners?.includes(player.id),
+		IS(player.id, "builder") || region.permissions.owners.includes(player.id),
 
 	// Spawn entity guard
 	(region, data) =>
@@ -40,7 +39,10 @@ system.runPlayerInterval((player) => {
 	const loc = player.location;
 	if (loc.y >= EFFECT_Y + 1) return;
 	if (loc.y < EFFECT_Y)
-		player.addEffect(MinecraftEffectTypes.levitation, 3, 7, false);
+		player.addEffect(MinecraftEffectTypes.levitation, 3, {
+			amplifier: 7,
+			showParticles: false,
+		});
 
 	if (loc.y < TP_Y) player.teleport({ x: loc.x, y: TP_TO, z: loc.z });
-}, "underground effects");
+}, "Server.type::Build('underground effects')");

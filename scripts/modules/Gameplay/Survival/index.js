@@ -9,12 +9,14 @@ import "./bouncyTnt.js";
 setRegionGuards(
 	// Common actions guard
 	(player, region) =>
-		!region ||
-		player.hasTag("modding") ||
-		region.permissions.owners.includes(player.id),
+		(region && region.permissions.owners.includes(player.id)) ||
+		player.hasTag("modding"),
 
 	// Spawn entity guard
-	(region, data) => !region
+	(region, data) =>
+		!region ||
+		region.permissions.allowedEntitys === "all" ||
+		region.permissions.allowedEntitys.includes(data.entity.typeId)
 );
 
 Region.CONFIG.PERMISSIONS = {

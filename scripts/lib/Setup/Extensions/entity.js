@@ -1,5 +1,5 @@
 import { EntityDamageCause, GameMode, Player } from "@minecraft/server";
-import { addMethod, editMethod } from "../patcher.js";
+import { addMethod } from "../patcher.js";
 
 /**
  * Player/Entity
@@ -32,7 +32,7 @@ addMethod(Player.prototype, "isGamemode", function (mode) {
 
 addMethod(Player.prototype, "closeChat", function (message) {
 	const health = this.getComponent("health");
-	const { current } = health;
+	const { currentValue: current } = health;
 	if (current <= 1) {
 		if (message) this.tell(message);
 		return false;
@@ -45,7 +45,7 @@ addMethod(Player.prototype, "closeChat", function (message) {
 	this.applyDamage(1, {
 		cause: EntityDamageCause.entityAttack,
 	});
-	health.setCurrent(current);
+	health.setCurrentValue(current);
 	this.runCommand("stopsound @s game.player.hurt");
 
 	// Return player back to creative mode

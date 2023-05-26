@@ -7,7 +7,7 @@ import {
 } from "@minecraft/server";
 import { XA } from "xapi.js";
 import { SERVER } from "../../Server/Server/var.js";
-import { LOCKED_TITLES, PVP, PVP_LOCKED } from "./var.js";
+import { LOCKED_TITLES, NO_PVP_MODE, PVP } from "./var.js";
 
 const options = XA.WorldOptions("pvp", {
 	enabled: {
@@ -56,7 +56,7 @@ XA.state.afterModulesLoad.subscribe(() => {
 			if (!XA.state.modules_loaded || !options.enabled) return;
 			const score = PVP.get(player);
 
-			if (PVP_LOCKED.includes(player.id) || score < 0) return;
+			if (NO_PVP_MODE.includes(player.id) || score < 0) return;
 
 			const settings = getPlayerSettings(player);
 			if (!settings.indicator) return;
@@ -110,7 +110,7 @@ function onDamage(data, fatal = false) {
 	if (
 		!data.hurtEntity.typeId.startsWith("minecraft:") ||
 		!options.enabled ||
-		PVP_LOCKED.includes(data.hurtEntity.id)
+		NO_PVP_MODE.includes(data.hurtEntity.id)
 	)
 		return;
 
@@ -122,7 +122,8 @@ function onDamage(data, fatal = false) {
 	)
 		return;
 
-	const { current, value } = data.hurtEntity.getComponent("minecraft:health");
+	const { currentValue: current, defaultValue: value } =
+		data.hurtEntity.getComponent("minecraft:health");
 
 	if (damage.damagingEntity instanceof Player) {
 		PVP.set(damage.damagingEntity, options.cooldown);

@@ -79,7 +79,7 @@ const tests = {
 
 	40(ctx) {
 		if (ctx.args[1] === "in") {
-			AnarchyStore.saveFromEntity(ctx.sender);
+			AnarchyInventory.saveFromEntity(ctx.sender);
 			InventoryStore.load(ctx.sender, {
 				xp: 0,
 				health: 10,
@@ -89,7 +89,7 @@ const tests = {
 		} else {
 			InventoryStore.load(
 				ctx.sender,
-				AnarchyStore.getEntityStore(ctx.sender.id)
+				AnarchyInventory.getEntityStore(ctx.sender.id)
 			);
 		}
 	},
@@ -236,7 +236,7 @@ world.afterEvents.entityHit.subscribe((data) => {
 // 	.addItem(new ItemStack(i.boat), new MoneyCost(10))
 // 	.addItem(new ItemStack(i.apple), new MoneyCost(1));
 
-const AnarchyStore = new InventoryStore("anarchy");
+const AnarchyInventory = new InventoryStore("anarchy");
 
 system.runInterval(
 	() => {
@@ -246,7 +246,7 @@ system.runInterval(
 		})[0];
 
 		if (player) {
-			AnarchyStore.saveFromEntity(player);
+			AnarchyInventory.saveFromEntity(player);
 			InventoryStore.load(player, {
 				xp: 0,
 				health: 10,
@@ -262,7 +262,7 @@ system.runInterval(
 		})[0];
 
 		if (player2) {
-			InventoryStore.load(player2, AnarchyStore.getEntityStore(player2.id));
+			InventoryStore.load(player2, AnarchyInventory.getEntityStore(player2.id));
 			player2.teleport({ x: -2, y: 191, z: 6 });
 		}
 	},

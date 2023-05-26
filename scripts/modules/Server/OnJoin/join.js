@@ -101,9 +101,9 @@ system.runPlayerInterval(
 					// Title + subtitle
 					/** @type {import("@minecraft/server").TitleDisplayOptions} */
 					const options = {
-						fadeInSeconds: 0,
-						fadeOutSeconds: 1,
-						staySeconds: 2,
+						fadeInDuration: 0,
+						fadeOutDuration: 20,
+						stayDuration: 40,
 					};
 					if (JOIN_CONFIG.subtitle) options.subtitle = JOIN_CONFIG.subtitle;
 					// Show...
@@ -162,7 +162,7 @@ function JOIN(player, data, messageType) {
 	}
 
 	if (!data.learning) EventSignal.emit(JOIN_EVENTS.playerJoin, player);
-	player.onScreenDisplay.clearTitle();
+	player.onScreenDisplay.setTitle("");
 
 	const oldTag = data.name;
 
