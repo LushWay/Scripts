@@ -38,9 +38,6 @@ interface IModalFormArg {
 	options?: string[];
 }
 
-type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R ? (...args: [...E, Next]) => R : never;
-
-type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N
-	? Acc[number]
-	: Enumerate<N, [...Acc, Acc["length"]]>;
-
+type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R
+	? (...args: [...E, Next]) => R
+	: never;

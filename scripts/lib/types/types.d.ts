@@ -24,3 +24,18 @@ type AllTypes =
 	| "bigint"
 	| "undefined"
 	| "function";
+
+type RandomCost = {
+	[key: `${number}...${number}` | number]: `${number}%`;
+};
+
+type Range<F extends number, T extends number> =
+	| Exclude<Enumerate<T>, Enumerate<F>>
+	| T;
+
+type Enumerate<
+	N extends number,
+	Acc extends number[] = []
+> = Acc["length"] extends N
+	? Acc[number]
+	: Enumerate<N, [...Acc, Acc["length"]]>;
