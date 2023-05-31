@@ -1,6 +1,5 @@
-import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
-import { getRandomiserForCost } from "../../../lib/Class/RandomCost.js";
-import { MinecraftEnchantmentTypes } from "../../../lib/List/enchantments.js";
+import { ItemStack, ItemTypes, MinecraftItemTypes } from "@minecraft/server";
+import { RandomCost } from "../../../lib/Class/RandomCost.js";
 
 export class LootTable {
 	/**
@@ -15,68 +14,44 @@ export class LootTable {
 	 */
 	constructor(...items) {
 		this.items = items.map((item) => {
-			const id = "type" in item ? MinecraftItemTypes[item.type] : item.id;
-			if (typeof id !== "string")
-				throw new TypeError(
-					"Unknown item type: " + ("type" in item ? item.type : item.id)
-				);
+			const id =
+				"type" in item ? MinecraftItemTypes[item.type] : ItemTypes.get(item.id);
 
-			/** @type {() => number} */
-			let slot;
-			item.slots ??= 0;
-			if (typeof item.slots === "number") {
-				// @ts-expect-error
-				slot = function () {
-					return item.slots;
-				};
-			} else slot = getRandomiserForCost(item.slots);
+			/** @type {number[]} */
+			const amount =
+				typeof item.amount === "number"
+					? [item.amount]
+					: RandomCost.toArray(item.amount);
 
-			/** @type {() => number} */
-			let amount;
-			item.amount ??= 0;
-			if (typeof item.amount === "number") {
-				// @ts-expect-error
-				amount = function () {
-					return item.amount;
-				};
-			} else amount = getRandomiserForCost(item.amount);
-
-			/** @type {Record<string, () => number>} */
-			const enchs = {};
+			/** @type {Record<string, number[]>} */
+			const enchantments = {};
 			for (const [key, value] of Object.entries(item.enchantments)) {
-				enchs[key] = getRandomiserForCost(value);
+				enchantments[key] = RandomCost.toArray(value);
 			}
 
-			function enchantments() {
-				/** @type {Record<string, number>} */
-				const map = {};
-				for (const [key, value] of Object.entries(enchs)) {
-					map[key] = value();
-				}
-				return map;
-			}
+			const chance = parseInt(item.chance);
+			if (isNaN(chance)) throw new TypeError("Chance must be `{number}%`");
 
-			// Due to JS engines object schemes we need to
-			// specify all properties and nothing more
 			return {
-				id,
-				slot,
+				id: id,
+				chance: chance,
 				nameTag: item.nameTag ?? "",
 				lore: item.lore,
-				enchantments,
-				amount,
+				enchantments: enchantments,
+				amount: amount,
 				options: item.options ?? {},
 			};
 		});
 	}
 
 	/**
-	 * Randomises items and returns array with specified szie
+	 * Randomises items and returns array with specified size
 	 * @param {number} size - Size of the array
 	 * @returns {Array<ItemStack | null>}
 	 */
 	generate(size) {
-		this.items;
+		let step = 0;
+		const array = new Array(size).fill(null).map((e, i) => {});
 		return [];
 	}
 }
@@ -84,9 +59,10 @@ export class LootTable {
 new LootTable(
 	{
 		id: "minecraft:diamond_sword",
+		chance: "5%",
 		amount: {
-			0: "1%",
-			1: "1%",
+			0: "50%",
+			1: "50%",
 		},
 		enchantments: {
 			sharpness: {
@@ -99,5 +75,6 @@ new LootTable(
 	{
 		type: "apple",
 		amount: 1,
+		chance: "5%",
 	}
 );

@@ -1,13 +1,17 @@
-import { ItemLockMode, MinecraftItemTypes } from "@minecraft/server";
+import { ItemLockMode, ItemType, MinecraftItemTypes } from "@minecraft/server";
 import { MinecraftEnchantmentTypes } from "lib/List/enchantments.js";
 
 export namespace LootItem {
 	interface Common {
 		/**
-		 * - Cost of item. Items with higher cost will be generated more often
+		 * - Item amount in format amount: percent
 		 * @default 1
 		 */
-		slots?: RandomCost | number;
+		amount?: RandomCostMapType | number;
+		/**
+		 * - Cost of item. Items with higher cost will be generated more often
+		 */
+		chance: `${number}%`;
 		/**
 		 * - Custom nameTag
 		 */
@@ -20,12 +24,9 @@ export namespace LootItem {
 		 * - Map in format enchant: { level: percent }
 		 */
 		enchantments?: Partial<
-			Record<keyof typeof MinecraftEnchantmentTypes, RandomCost>
+			Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>
 		>;
-		/**
-		 * - Item amount in format amount: percent
-		 */
-		amount: RandomCost | number;
+
 		/**
 		 * - Additional options for item like canPlaceOn, canDestroy, durability component etc
 		 */
@@ -51,17 +52,18 @@ export namespace LootItem {
 		/**
 		 * - Item type name. Its key of MinecraftItemTypes
 		 */
-		type: keyof typeof MinecraftItemTypes;
+		type: Exclude<keyof typeof MinecraftItemTypes, "prototype" | "string">;
 	}
 
 	type Input = (ID | Type) & Common;
 
-	type Stored = ID & {
+	type Stored = {
+		id: ItemType;
 		nameTag: string;
 		lore: string[];
-		slot: () => number;
-		enchantments: () => Record<keyof typeof MinecraftEnchantmentTypes, number>;
-		amount: () => number;
+		chance: number;
+		enchantments: Record<keyof typeof MinecraftEnchantmentTypes, number[]>;
+		amount: number[];
 		options: Options;
 	};
 }

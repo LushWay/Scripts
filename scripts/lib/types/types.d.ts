@@ -25,7 +25,7 @@ type AllTypes =
 	| "undefined"
 	| "function";
 
-type RandomCost = {
+type RandomCostMapType = {
 	[key: `${number}...${number}` | number]: `${number}%`;
 };
 
