@@ -1,7 +1,6 @@
 import { ItemStack, ItemTypes } from "@minecraft/server";
-import { ActionForm } from "lib/Form/ActionForm.js";
-import { EventSignal } from "../../../lib/Class/Events.js";
 import { JOIN_EVENTS, shortTime, timeNow } from "./var.js";
+import { ActionForm, EventSignal } from "xapi.js";
 
 JOIN_EVENTS.playerJoin.subscribe((player) => {
 	player.tell(`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`);

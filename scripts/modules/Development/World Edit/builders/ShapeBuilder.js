@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes, system, Vector, world } from "@minecraft/server";
-import { DisplayError } from "xapi.js";
+import { util } from "xapi.js";
 import { CONFIG_WB } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { setblock } from "../utils/utils.js";
@@ -29,7 +29,7 @@ export class Shape {
 		try {
 			this.generate();
 		} catch (e) {
-			DisplayError(e);
+			util.error(e);
 		}
 	}
 	/**
@@ -87,7 +87,7 @@ export class spawn {
 		try {
 			this.generate();
 		} catch (e) {
-			DisplayError(e);
+			util.error(e);
 		}
 	}
 	/**

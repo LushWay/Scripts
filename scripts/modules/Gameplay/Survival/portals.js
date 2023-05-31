@@ -1,9 +1,8 @@
 import { Player, Vector } from "@minecraft/server";
-import { XA } from "xapi.js";
-import { LockAction, PlaceAction } from "../../../lib/Class/Action.js";
 import { Minigame } from "../Minigames/Builder.js";
+import { Options, LockAction, PlaceAction } from "xapi.js";
 
-const getSettings = XA.PlayerOptions("Телепорт", "Atp", {
+const getSettings = Options.player("Телепорт", "Atp", {
 	showCoordinates: {
 		desc: "Показывать координаты телепортации (выключите если вы стример)",
 		value: true,
@@ -37,7 +36,7 @@ export function teleport(player, to, options = {}) {
 		);
 	}
 
-	if (LockAction.tellLocked(player, {})) return;
+	if (LockAction.locked(player, {})) return;
 
 	player.teleport(to);
 }
@@ -66,7 +65,7 @@ export class Portal {
 		this.place = place;
 
 		if (createCommand)
-			new XA.Command({
+			new XCommand({
 				name,
 				aliases,
 				description: commandDescription ?? `§bТелепорт на ${name}`,

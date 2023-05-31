@@ -2,7 +2,7 @@ import { CmdLet } from "lib/Command/Cmdlet.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { XCommand } from "lib/Command/index.js";
 import { commandNotFound, noPerm } from "lib/Command/utils.js";
-import { getRole, ROLES, XA } from "xapi.js";
+import { ROLES, XA, getRole } from "xapi.js";
 
 /**
  *
@@ -58,7 +58,7 @@ function getType(o) {
 	}`;
 }
 
-const help = new XA.Command({
+const help = new XCommand({
 	name: "help",
 	description: "Выводит список команд",
 	aliases: ["?", "h"],
@@ -145,8 +145,8 @@ function helpForCommand(ctx, commandName) {
 	return;
 }
 
-XA.Command.getHelpForCommand = (Command, ctx) =>
-	helpForCommand(ctx, Command.sys.data.name);
+XCommand.getHelpForCommand = (command, ctx) =>
+	helpForCommand(ctx, command.sys.data.name);
 
 help.string("commandName").executes(helpForCommand);
 
@@ -158,25 +158,3 @@ new CmdLet({
 		return "stop";
 	},
 });
-
-const testCMD = new XA.Command({
-	name: "owo",
-	description: "Для теста дерева команд",
-	role: "admin",
-});
-
-testCMD.executes(() => {});
-
-testCMD.int("i").int("i").string("s");
-
-const l2 = testCMD.string("LL");
-l2.string("ls");
-l2.int("li");
-
-const literal = testCMD.literal({ name: "literal", description: "descx" });
-
-literal.int("i").int("i").string("s");
-
-const ll2 = literal.int("i").string("s").string("s");
-ll2.string("ls");
-ll2.int("li");

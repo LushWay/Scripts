@@ -1,11 +1,11 @@
 import { ScoreboardDB } from "lib/Database/Scoreboard.js";
-import { toStr } from "lib/Setup/utils.js";
+import { Options, util } from "xapi.js";
 
 /**
  * @type {Array<"unknown" | "build" | "survival" | "disabled">}
  */
 const TYPES = ["unknown", "build", "survival", "disabled"];
-const options = XA.WorldOptions("server", {
+const options = Options.world("server", {
 	lockNether: {
 		desc: "Выключает незер",
 		value: true,
@@ -19,9 +19,8 @@ const options = XA.WorldOptions("server", {
 	type: {
 		name: "Тип сервера",
 		value: 0,
-		desc: `Доступные значения: \n§f${toStr(
-			Object.fromEntries(Object.entries(TYPES))
-		)
+		desc: `Доступные значения: \n§f${util
+			.inspect(Object.fromEntries(Object.entries(TYPES)))
 			.replace("{", "")
 			.replace("}", "")}`,
 		requires: true,

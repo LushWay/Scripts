@@ -51,20 +51,18 @@ export class LockAction {
 	 * @param {object} o
 	 * @param {string[]} [o.ignore] - Which LockerActions ignore
 	 * @param {string[]} [o.accept] - Which LockerActions only accept
+	 * @param {boolean} [o.tell]
+	 * @param {boolean} [o.returnText] - Return lock text instead of boolean
 	 */
-	static getLocked(player, { ignore, accept }) {
+	static locked(player, { ignore, accept, tell, returnText } = {}) {
 		for (const key in this.LOCKERS) {
 			if (ignore && ignore.includes(key)) continue;
 			if (accept && !accept.includes(key)) continue;
-			if (this.LOCKERS[key].fn(player)) return this.LOCKERS[key].lockText;
-		}
-	}
-	/** @type {(...args: Parameters<typeof LockAction["getLocked"]>) => boolean} */
-	static tellLocked(player, options) {
-		const lock = this.getLocked(player, options);
-		if (typeof lock === "string") {
-			player.tell(lock);
-			return true;
+			if (this.LOCKERS[key].fn(player)) {
+				const { lockText } = this.LOCKERS[key];
+				if (tell) player.tell(lockText);
+				return returnText ? lockText : true;
+			}
 		}
 
 		return false;

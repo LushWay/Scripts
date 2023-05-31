@@ -1,11 +1,10 @@
 import { MinecraftBlockTypes, Player } from "@minecraft/server";
 import { inaccurateSearch } from "lib/Class/Search.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 import { Cuboid } from "../../utils/Cuboid.js";
 
-const set = new XA.Command({
+const set = new XCommand({
 	name: "set",
 	description: "Частично или полностью заполняет блоки в выделенной области",
 	role: "moderator",

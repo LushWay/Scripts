@@ -8,7 +8,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { LockAction, XCommand, XEntity } from "xapi.js";
 import {
 	RadiusRegion,
 	Region,
@@ -18,26 +18,13 @@ import { MoneyCost, Store } from "../../Server/Server/store.js";
 import { baseMenu } from "./baseMenu.js";
 
 /**
- *
- * @param {Player} player
- * @returns
+ * @type {Vector3[]}
  */
-function inpvp(player) {
-	const pvp = XA.Entity.getScore(player, "pvp");
-	if (pvp > 0) {
-		player.tell("§4► §cПодождите еще §6" + pvp + " §cсек");
-		return true;
-	}
-}
+let bases = [];
 
 function updateBases() {
 	bases = RadiusRegion.getAllRegions().map((e) => e.center);
 }
-
-/**
- * @type {Vector3[]}
- */
-let bases = [];
 
 world.afterEvents.blockBreak.subscribe(
 	({ block, brokenBlockPermutation, dimension }) => {
@@ -67,7 +54,7 @@ world.afterEvents.itemUseOn.subscribe((data) => {
 		data.itemStack.typeId !== baseItemStack.typeId ||
 		!Array.equals(data.itemStack.getLore(), baseItemStack.getLore()) ||
 		!(data.source instanceof Player) ||
-		inpvp(data.source)
+		LockAction.locked(data.source)
 	)
 		return;
 
@@ -81,7 +68,7 @@ world.afterEvents.itemUseOn.subscribe((data) => {
 			`§cВы уже ${
 				isOwner
 					? "владеете базой"
-					: `состоите в базе игрока '${XA.Entity.getNameByID(
+					: `состоите в базе игрока '${XEntity.getNameByID(
 							region.permissions.owners[0]
 					  )}'`
 			} !`
@@ -132,12 +119,12 @@ world.afterEvents.itemUseOn.subscribe((data) => {
 	data.source.playSound("random.levelup");
 });
 
-const base = new XA.Command({
+const base = new XCommand({
 	name: "base",
 	description: "Меню базы",
 });
 base.executes((ctx) => {
-	if (inpvp(ctx.sender)) return;
+	if (LockAction.locked(ctx.sender)) return;
 	const base = RadiusRegion.getAllRegions().find((e) =>
 		e.permissions.owners.includes(ctx.sender.id)
 	);
@@ -178,9 +165,7 @@ system.runInterval(
 
 			base.forEachOwner((player) => {
 				player.tell(
-					`§cБаза с владельцем §f${XA.Entity.getNameByID(
-						player.id
-					)}§c разрушена.`
+					`§cБаза с владельцем §f${XEntity.getNameByID(player.id)}§c разрушена.`
 				);
 			});
 			base.delete();

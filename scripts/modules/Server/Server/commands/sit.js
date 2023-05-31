@@ -1,6 +1,6 @@
 import { system, world } from "@minecraft/server";
 
-new XA.Command({
+new XCommand({
 	name: "sit",
 	description: "",
 	type: "public",

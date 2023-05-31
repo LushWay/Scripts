@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { MessageFormData, MessageFormResponse } from "@minecraft/server-ui";
-import { handle } from "../../xapi.js";
+import { util } from "xapi.js";
 import { XShowForm } from "./utils.js";
 /** */
 export class MessageForm {
@@ -85,8 +85,8 @@ export class MessageForm {
 		if (response === false || !(response instanceof MessageFormResponse))
 			return;
 		if (response.selection === 1)
-			handle(this.button1?.callback, null, ["MessageFormCallback"]);
+			util.handle(this.button1?.callback, null, ["MessageFormCallback"]);
 		if (response.selection === 0)
-			handle(this.button2?.callback, null, ["MessageFormCallback"]);
+			util.handle(this.button2?.callback, null, ["MessageFormCallback"]);
 	}
 }

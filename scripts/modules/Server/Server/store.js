@@ -1,8 +1,6 @@
 import { ItemStack, Player, world } from "@minecraft/server";
-import { EventSignal } from "../../../lib/Class/Events.js";
-import { ActionForm } from "../../../lib/Form/ActionForm.js";
-import { MessageForm } from "../../../lib/Form/MessageForm.js";
 import { SERVER } from "./var.js";
+import { GameUtils, MessageForm, EventSignal, ActionForm } from "xapi.js";
 
 class Cost {
 	/**
@@ -228,7 +226,7 @@ export class Store {
  * @param {ItemStack} item
  */
 function itemDescription(item, c = "§g") {
-	return `${item.nameTag ?? XA.Utils.localizationName(item)}§r${
+	return `${item.nameTag ?? GameUtils.localizationName(item)}§r${
 		item.amount ? ` ${c}x${item.amount}` : ""
 	}`;
 }

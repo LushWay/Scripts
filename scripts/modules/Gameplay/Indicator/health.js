@@ -1,16 +1,27 @@
 import { Entity, system, Vector, world } from "@minecraft/server";
-import { XA } from "xapi.js";
 import { NAME_MODIFIERS } from "./var.js";
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {};
 const INDICATOR_TAG = "HEALTH_INDICATOR";
 
-// Entities that have nameTag "always_show": true
+/**
+ * Entities that have nameTag "always_show": true
+ */
 const ALWAYS_SHOWS = [
 	//"minecraft:warden",
 	"minecraft:player",
 ];
+
+/**
+ * Families that are allowed
+ */
+const FAMILIES = ["player", "monster"];
+
+/**
+ * List of entity ids to skip (updates dynamically)
+ */
+const NOT_SHOWN = [];
 
 // Kill previosly used entities
 getIndicators().forEach((e) => {
@@ -101,9 +112,7 @@ system.runInterval(
 );
 
 let stat = false;
-new XA.Command({ name: "dmgstat", role: "admin" }).executes(
-	() => (stat = true)
-);
+new XCommand({ name: "dmgstat", role: "admin" }).executes(() => (stat = true));
 
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied

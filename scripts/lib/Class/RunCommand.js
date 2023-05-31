@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { DisplayError } from "xapi.js";
+import { util } from "xapi.js";
 
 /**
  * @typedef {{
@@ -24,7 +24,7 @@ export async function XRunCommand(command, options = {}) {
 		world.sendMessage;
 		return result.successCount;
 	} catch (error) {
-		if (options.showError) DisplayError(error);
+		if (options.showError) util.error(error);
 		return 0;
 	}
 }

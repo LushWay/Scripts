@@ -1,6 +1,5 @@
 import { Player, Vector } from "@minecraft/server";
-import { ActionForm } from "../../../lib/Form/ActionForm.js";
-import { ModalForm } from "../../../lib/Form/ModelForm.js";
+import { ActionForm, ModalForm, XEntity } from "xapi.js";
 import { RadiusRegion } from "../../Server/Region/Region.js";
 
 /**
@@ -14,7 +13,7 @@ export function baseMenu(player, base) {
 		`${
 			isOwner
 				? "Это ваша база."
-				: "База игрока " + XA.Entity.getNameByID(base.permissions.owners[0])
+				: "База игрока " + XEntity.getNameByID(base.permissions.owners[0])
 		}\n\nКоординаты: ${Vector.string(base.center)}`
 	)
 		.addButton("Телепорт!", null, () =>
@@ -45,7 +44,7 @@ function members(player, base) {
 
 	if (isOwner) form.addButton("Добавить!", "textures/ui/plus", () => {});
 	for (const member of base.permissions.owners) {
-		const name = XA.Entity.getNameByID(member) ?? "§7<unknown>";
+		const name = XEntity.getNameByID(member) ?? "§7<unknown>";
 		form.addButton(name, null, () => {});
 	}
 

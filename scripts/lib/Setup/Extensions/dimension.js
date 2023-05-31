@@ -1,4 +1,6 @@
-import { Dimension } from "@minecraft/server";
+import { Dimension, world } from "@minecraft/server";
+import { editMethod } from "../patcher.js";
+import { util } from "../utils.js";
 
 Object.defineProperty(Dimension.prototype, "type", {
 	get() {
@@ -9,4 +11,19 @@ Object.defineProperty(Dimension.prototype, "type", {
 			: "end";
 	},
 });
-Dimension.prototype;
+
+editMethod(
+	Dimension.prototype,
+	"runCommand",
+	({ original, args: [command, options = {}] }) => {
+		try {
+			/** @type {any} */
+			const result = original(command);
+			if (options.showOutput) world.sendMessage(result.successCount + "");
+			return result.successCount;
+		} catch (error) {
+			if (options.showError) util.error(error);
+			return 0;
+		}
+	}
+);

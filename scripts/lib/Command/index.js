@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent, world } from "@minecraft/server";
+import { IS } from "xapi.js";
 import { CONFIG } from "../../config.js";
-import { IS } from "../../xapi.js";
 import {
 	ArrayArgumentType,
 	BooleanArgumentType,
@@ -91,10 +91,10 @@ export class XCommand {
 	static COMMANDS = [];
 
 	/**
-	 * @param {XCommand} Command
+	 * @param {XCommand} command
 	 * @param {CommandContext} ctx
 	 */
-	static getHelpForCommand(Command, ctx) {
+	static getHelpForCommand(command, ctx) {
 		return ctx.error("Генератор справки для команд выключен!");
 	}
 	/**

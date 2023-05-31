@@ -1,5 +1,5 @@
 import { System, system, world } from "@minecraft/server";
-import { handle } from "../../../xapi.js";
+import { util } from "xapi.js";
 import { benchmark } from "../../Class/Benchmark.js";
 import { stackParse } from "../../Class/Error.js";
 import { addMethod, editMethod } from "../patcher.js";
@@ -27,7 +27,7 @@ editMethod(
 		return original(() => {
 			const end = benchmark(visual_id, "timers");
 
-			handle(fn, "Interval");
+			util.handle(fn, "Interval");
 
 			const took_ticks = ~~(end() / 20);
 			if (took_ticks > ticks)
@@ -50,7 +50,7 @@ editMethod(
 		return original(() => {
 			const end = benchmark(visual_id, "timers");
 
-			handle(fn, "Timeout");
+			util.handle(fn, "Timeout");
 
 			const took_ticks = ~~(end() / 20);
 			if (took_ticks > ticks)
@@ -73,10 +73,11 @@ addMethod(System.prototype, "runPlayerInterval", function (fn, name, ticks) {
 	return originalInterval(() => {
 		const end = benchmark(visual_id, "timers");
 
-		handle(forEach, "Player interval");
+		util.handle(forEach, "Player interval");
 
 		const took_ticks = ~~(end() / 20);
 		if (took_ticks > ticks)
 			console.warn(`Found slow players interval at:\n${path}`);
+		// @ts-expect-error
 	}, ticks);
 });

@@ -1,5 +1,5 @@
 /** @type {[RegExp | ((s: string) => string), string?][]} */
-const REPLACES = [
+const STACK_REPLACES = [
 	[/\\/g, "/"],
 	[/<anonymous>/, "<>"],
 	[/<> \((.+)\)/, "$1"],
@@ -13,20 +13,6 @@ const REPLACES = [
 	],
 	[(s) => (s.startsWith("§7") ? s : s.replace(/\.js:(\d+)/, ".js:§6$1§f"))],
 ];
-
-/**
- * Parse line of stack
- * @param {string} e
- */
-function oneLineStackParse(e) {
-	for (const [r, p] of REPLACES) {
-		if (typeof e !== "string" || e.length < 1) break;
-
-		if (typeof r === "function") e = r(e);
-		else e = e.replace(r, p ?? "");
-	}
-	return e;
-}
 
 /**
  * Parse stack
@@ -44,7 +30,15 @@ export function stackParse(
 
 	const mappedStack = stackArray
 		.map((e) => e?.replace(/\s+at\s/g, "")?.replace(/\n/g, ""))
-		.map(oneLineStackParse)
+		.map((e) => {
+			for (const [r, p] of STACK_REPLACES) {
+				if (typeof e !== "string" || e.length < 1) break;
+
+				if (typeof r === "function") e = r(e);
+				else e = e.replace(r, p ?? "");
+			}
+			return e;
+		})
 		.filter((e) => e && /^\s*\S/g.test(e))
 		.map((e) => `   ${e}\n`);
 
@@ -60,18 +54,6 @@ function getStack(pathRemove = 0) {
 	let a = new Error().stack.split("\n");
 	a = a.slice(pathRemove);
 	return a.join("\n");
-}
-
-/**
- * Adds a line to existing error stack
- * @param {string} stack
- * @param {...string} lines
- */
-export function applyToStack(stack, ...lines) {
-	stack = stack ?? "";
-	let parsedStack = stack.split("\n");
-	parsedStack = [...lines, ...parsedStack];
-	return parsedStack.join("\n");
 }
 
 /** @type {[RegExp | string, string, string?][]} */

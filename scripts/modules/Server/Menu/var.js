@@ -1,5 +1,4 @@
-import { ActionForm } from "lib/Form/ActionForm.js";
-import { MessageForm } from "../../../lib/Form/MessageForm.js";
+import { ActionForm, MessageForm } from "xapi.js";
 
 /**
  *

@@ -1,8 +1,8 @@
 import { Player, system, Vector, world } from "@minecraft/server";
-import { XA } from "xapi.js";
 
 import "./commands/index.js";
 
+import { Options, XEntity } from "xapi.js";
 import { FillFloor } from "./builders/FillBuilder.js";
 import { Shape } from "./builders/ShapeBuilder.js";
 import "./builders/ToolBuilder.js";
@@ -11,7 +11,7 @@ import { CONFIG_WB } from "./config.js";
 import { SHAPES } from "./utils/shapes.js";
 import { setblock } from "./utils/utils.js";
 
-const GetPlayerSettings = XA.PlayerOptions("Строитель мира", "wb", {
+const GetPlayerSettings = Options.player("Строитель мира", "wb", {
 	noBrushParticles: {
 		desc: "Отключает партиклы у кисти",
 		value: false,
@@ -24,10 +24,10 @@ const GetPlayerSettings = XA.PlayerOptions("Строитель мира", "wb", 
 	},
 });
 
-/* It's a code that replaces the block with a random block from the lore of the item. */
+/* Replaces the block with a random block from the lore of the item. */
 world.afterEvents.blockPlace.subscribe((data) => {
 	if (data.block.typeId !== "minecraft:warped_nylium") return;
-	let blocks = XA.Entity.getHeldItem(data.player).getLore();
+	let blocks = XEntity.getHeldItem(data.player).getLore();
 	if (blocks.length < 1) return;
 	blocks = blocks[0].split(",");
 	const location = data.block.location;
@@ -37,7 +37,7 @@ world.afterEvents.blockPlace.subscribe((data) => {
 
 system.runPlayerInterval(
 	(p) => {
-		const i = XA.Entity.getHeldItem(p);
+		const i = XEntity.getHeldItem(p);
 		const settings = GetPlayerSettings(p);
 		const lore = i?.getLore() ?? [];
 		if (
@@ -70,15 +70,15 @@ system.runPlayerInterval(
 						block.location
 					);
 					if (!ent1) {
-						XA.runCommandX(
+						world.overworld.runCommand(
 							`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`
 						);
-						XA.runCommandX(
+						world.overworld.runCommand(
 							`summon f:t ${block.location.x} ${
 								block.location.y - CONFIG_WB.H
 							} ${block.location.z} spawn "${CONFIG_WB.BRUSH_LOCATOR}"`
 						);
-						XA.runCommandX(
+						world.overworld.runCommand(
 							`tag @e[x=${block.location.x},y=${
 								block.location.y - CONFIG_WB.H
 							},z=${block.location.z},r=1,type=f:t,name="${
@@ -89,15 +89,15 @@ system.runPlayerInterval(
 					for (let ent of ent1) {
 						if (ent.id == "f:t" && ent.nameTag == CONFIG_WB.BRUSH_LOCATOR)
 							break;
-						XA.runCommandX(
+						world.overworld.runCommand(
 							`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`
 						);
-						XA.runCommandX(
+						world.overworld.runCommand(
 							`summon f:t ${block.location.x} ${
 								block.location.y - CONFIG_WB.H
 							} ${block.location.z} spawn "${CONFIG_WB.BRUSH_LOCATOR}"`
 						);
-						XA.runCommandX(
+						world.overworld.runCommand(
 							`tag @e[x=${block.location.x},y=${
 								block.location.y - CONFIG_WB.H
 							},z=${block.location.z},r=1,type=f:t,name="${
@@ -109,7 +109,7 @@ system.runPlayerInterval(
 				}
 			}
 		} else {
-			XA.runCommandX(
+			world.overworld.runCommand(
 				`event entity @e[type=f:t,name="${CONFIG_WB.BRUSH_LOCATOR}",tag="${p.name}"] kill`
 			);
 		}
@@ -189,7 +189,9 @@ world.afterEvents.itemUse.subscribe((data) => {
 		}
 		const item = data.itemStack;
 		item.setLore(lore);
-		XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
+		data.source
+			.getComponent("inventory")
+			.container.setItem(data.source.selectedSlot, item);
 	}
 
 	if (data.itemStack.typeId !== "we:brush") return;
@@ -216,7 +218,7 @@ world.afterEvents.itemUse.subscribe((data) => {
 });
 
 world.afterEvents.blockBreak.subscribe((data) => {
-	if (XA.Entity.getHeldItem(data.player)?.typeId !== "we:wand") return;
+	if (XEntity.getHeldItem(data.player)?.typeId !== "we:wand") return;
 	const pos = WorldEditBuild.pos1 ?? { x: 0, y: 0, z: 0 };
 	if (
 		pos.x === data.block.location.x &&

@@ -1,15 +1,23 @@
 import { ItemStack, Player, world } from "@minecraft/server";
-import { Options, OptionsNameSymbol } from "lib/Class/Options.js";
+import { OPTIONS_NAME, Options } from "lib/Class/Options.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { ROLES, ROLES_NAMES as TR, XA, getRole, setRole, toStr } from "xapi.js";
-import { FormCallback } from "../../../lib/Form/utils.js";
+import {
+	FormCallback,
+	ROLES,
+	ROLES_NAMES as TR,
+	XA,
+	XCommand,
+	getRole,
+	setRole,
+	util,
+} from "xapi.js";
 
 /** @type {Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
 const DB = XA.tables.player;
 
-const R = new XA.Command({
+const R = new XCommand({
 	name: "role",
 	description: "Показывает вашу роль",
 });
@@ -42,7 +50,6 @@ R.executes((ctx) => {
 		return () => {
 			const role = getRole(player.id);
 			const ROLE = Object.keys(ROLES).map(
-				// @ts-expect-error
 				(e) => `${role === e ? "> " : ""}` + TR[e]
 			);
 			new ModalForm(player.name)
@@ -87,7 +94,7 @@ R.executes((ctx) => {
 	form.show(ctx.sender);
 });
 
-new XA.Command({
+new XCommand({
 	name: "options",
 	role: "member",
 	description: "Настройки",
@@ -102,7 +109,7 @@ function poptions(player) {
 	const form = new ActionForm("§dНастройки");
 
 	for (const groupName in Options.PLAYER) {
-		const name = Options.PLAYER[groupName][OptionsNameSymbol];
+		const name = Options.PLAYER[groupName][OPTIONS_NAME];
 		form.addButton(name, null, () => {
 			group(player, groupName, "PLAYER");
 		});
@@ -111,7 +118,7 @@ function poptions(player) {
 	form.show(player);
 }
 
-new XA.Command({
+new XCommand({
 	name: "wsettings",
 	role: "admin",
 	description: "Настройки мира",
@@ -157,7 +164,7 @@ const OPTIONS_DB = new Database("options");
 function group(player, groupName, groupType, errors = {}) {
 	const source = groupType === "PLAYER" ? Options.PLAYER : Options.WORLD;
 	const config = source[groupName];
-	const name = config[OptionsNameSymbol];
+	const name = config[OPTIONS_NAME];
 	const data = OPTIONS_DB.get(groupName);
 
 	/** @type {[string, (input: string | boolean) => string][]} */
@@ -265,5 +272,5 @@ const Types = {
  */
 function str(value) {
 	if (typeof value === "string") return value;
-	return toStr(value);
+	return util.inspect(value);
 }

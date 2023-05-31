@@ -115,6 +115,10 @@ patchPackage("@minecraft/server", {
 	},
 	replaces: [
 		{
+			find: "runCommand(commandString: string): CommandResult",
+			replace: m`runCommand(command: string, options?: CommandOptions): number`,
+		},
+		{
 			find: "runInterval(callback: () => void, tickInterval?: number): number;",
 			replace:
 				"runInterval(callback: () => void, name: string, tickInterval?: number): number;",
@@ -163,6 +167,13 @@ getComponent<N extends keyof EntityComponents>(
  */
 type ShortcutDimensions = "nether" | "overworld" | "end"
 
+/**
+ * Used in {@link Dimension.runCommand}
+ */
+interface CommandOptions {
+	showOutput?: boolean;
+	showError?: boolean;
+}
 
 /**
  * Used in {@link ItemStack.getComponent}

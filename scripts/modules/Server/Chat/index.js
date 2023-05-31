@@ -1,9 +1,9 @@
 import { world } from "@minecraft/server";
 import { Database } from "lib/Database/Rubedo.js";
-import { DisplayError, getRole, ROLES_NAMES, XA } from "xapi.js";
+import { Cooldown, Options, ROLES_NAMES, getRole, util } from "xapi.js";
 import { CONFIG } from "../../../config.js";
 
-const OPTIONS = XA.WorldOptions("chat", {
+const OPTIONS = Options.world("chat", {
 	cooldown: {
 		name: "Задержка",
 		desc: "0 что бы отключить",
@@ -19,7 +19,7 @@ const OPTIONS = XA.WorldOptions("chat", {
 
 const COOLDOWN_DB = new Database("chat");
 
-const PLAYER_OPTIONS = XA.PlayerOptions("Чат", "chat", {
+const PLAYER_OPTIONS = Options.player("Чат", "chat", {
 	hightlightMessages: {
 		name: "Подсветка моих сообщений",
 		desc: "Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r",
@@ -40,11 +40,11 @@ world.afterEvents.chatSend.subscribe((data) => {
 
 		// Is cooldown enabled?
 		if (cooldown) {
-			const cool = new XA.Cooldown(COOLDOWN_DB, "CLDW", data.sender, cooldown);
+			const cool = new Cooldown(COOLDOWN_DB, "CLDW", data.sender, cooldown);
 
 			if (cool.statusTime !== "EXPIRED") {
 				// Player is under chat cooldown, show error message
-				const time = XA.Cooldown.getRemainingTime(cooldown - Date.now());
+				const time = Cooldown.getRemainingTime(cooldown - Date.now());
 				return data.sender.tell(
 					`§c► Подожди еще §b${time.parsedTime}§c ${time.type}`
 				);
@@ -90,6 +90,6 @@ world.afterEvents.chatSend.subscribe((data) => {
 				: `§6§lЯ§r: §f${data.message.replace(/\\n/g, "\n")}`
 		);
 	} catch (error) {
-		DisplayError(error);
+		util.error(error);
 	}
 });

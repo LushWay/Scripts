@@ -1,5 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { XCommand, XEntity } from "xapi.js";
 import { br } from "./game.js";
 import { BATTLE_ROYAL_EVENTS, quene } from "./var.js";
 
@@ -15,7 +15,7 @@ let minpl = 2,
 
 function forEveryQuenedPlayer(sound, text) {
 	for (const name in quene) {
-		const player = XA.Entity.fetch(name);
+		const player = XEntity.fetch(name);
 		if (!player) {
 			delete quene[name];
 			continue;
@@ -62,7 +62,7 @@ system.runInterval(
 	() => {
 		if (
 			!br.game.started &&
-			world.getPlayers().filter((e) => XA.Entity.getTagStartsWith(e, "br:"))
+			world.getPlayers().filter((e) => XEntity.getTagStartsWith(e, "br:"))
 				.length > 0
 		) {
 			br.end("specially", "Перезагрузка");
@@ -109,7 +109,7 @@ system.runInterval(
 			}
 		}
 		ks(quene).forEach((e) => {
-			if (!XA.Entity.fetch(e)) delete quene[e];
+			if (!XEntity.fetch(e)) delete quene[e];
 		});
 		if (br.quene.open && ks(quene).length < minpl) {
 			br.quene.open = false;
@@ -124,7 +124,7 @@ system.runInterval(
 	20
 );
 
-const bbr = new XA.Command({
+const bbr = new XCommand({
 	name: "br",
 	description: "Телепортирует на спавн батл рояля",
 }).executes((ctx) => {
@@ -180,8 +180,8 @@ bbr
 world.afterEvents.playerJoin.subscribe(({ playerId, playerName }) => {
 	system.runTimeout(
 		() => {
-			const joinedPlayer = XA.Entity.fetch(playerId);
-			if (joinedPlayer && XA.Entity.getTagStartsWith(joinedPlayer, "br:")) {
+			const joinedPlayer = XEntity.fetch(playerId);
+			if (joinedPlayer && XEntity.getTagStartsWith(joinedPlayer, "br:")) {
 				br.tags.forEach((e) => joinedPlayer.removeTag(e));
 				teleportToBR(joinedPlayer);
 			}

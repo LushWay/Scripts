@@ -1,7 +1,6 @@
-import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
-new XA.Command({
+new XCommand({
 	type: "wb",
 	name: "drawsel",
 	description: "Переключает отрисовку текущего выделения",

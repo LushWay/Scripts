@@ -1,11 +1,14 @@
 /**
  *
- * @template {object} C
- * @param {C} classToPatch
- *
- * @template {keyof FunctionFilter<C>} M
- * @param {M} methodName
- * @param {C[M] extends (...args: any) => any ? (arg: {original: C[M], args: Parameters<C[M]>, context: C}) => ReturnType<C[M]> : never} fn
+*
+* @template {object} C
+* @param {C} classToPatch
+*
+* @template {keyof FunctionFilter<C>} M
+* @param {M} methodName
+
+ * @template {(...args: any) => any} [FN=C[M] extends (...args: any) => any? C[M] : never] Specify old type of function if needed
+ * @param {(arg: {original: FN, args: Parameters<FN>, context: C}) => ReturnType<FN>} fn
  */
 export function editMethod(classToPatch, methodName, fn) {
 	const originalMethod = classToPatch[methodName];
@@ -37,4 +40,3 @@ export function addMethod(objToPatch, methodName, fn) {
 	// @ts-expect-error
 	objToPatch[methodName] = fn;
 }
-

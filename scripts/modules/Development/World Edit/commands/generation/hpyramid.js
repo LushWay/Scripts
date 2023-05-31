@@ -1,9 +1,8 @@
-import { XA } from "xapi.js";
 import { Shape } from "../../builders/ShapeBuilder.js";
 //import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 import { SHAPES } from "../../utils/shapes.js";
 
-new XA.Command({
+new XCommand({
 	type: "wb",
 	name: "hpyramid",
 	description: "Generate a hollow pyramid",

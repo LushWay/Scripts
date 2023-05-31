@@ -1,7 +1,7 @@
 import { P } from "lib/List/particles.js";
+import { XEntity } from "xapi.js";
 
-import { XA } from "xapi.js";
-new XA.Command({
+new XCommand({
 	name: "particle",
 	aliases: ["p"],
 	role: "moderator",
@@ -9,7 +9,7 @@ new XA.Command({
 })
 	.string("particle", true)
 	.executes((ctx, particle) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
@@ -17,7 +17,9 @@ new XA.Command({
 		lore[1] = particle ?? P[0];
 		lore[2] = "0";
 		item.setLore(lore);
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(
 			`§a► §fПартикл инструмента изменен на ${particle ?? P[0]} (${
 				P.includes(particle) ? P.indexOf(particle) : "0"
@@ -27,7 +29,7 @@ new XA.Command({
 	.literal({ name: "n" })
 	.int("number")
 	.executes((ctx, _, number) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
@@ -37,6 +39,8 @@ new XA.Command({
 		lore[2] = String(number);
 		console.warn(JSON.stringify(lore));
 		item.setLore(lore);
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §fПартикл инструмента изменен на ${particle} (${number})`);
 	});

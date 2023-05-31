@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 
-export class XCooldown {
+export class Cooldown {
 	/**
 	 * Generates a unique key for the cooldown in the database
 	 * @param {string} name - The name of the cooldown
@@ -30,7 +30,7 @@ export class XCooldown {
 					.toFixed(fiction)
 					.replace(/(\.[1-9]*)0+$/m, "$1")
 					.replace(/\.$/m, "");
-				type = XCooldown.getT(parsedTime, valueType);
+				type = Cooldown.getT(parsedTime, valueType);
 			}
 		};
 
@@ -86,7 +86,7 @@ export class XCooldown {
 	 */
 	constructor(db, prefix, source, time) {
 		this.db = db;
-		this.key = XCooldown.genDBkey(
+		this.key = Cooldown.genDBkey(
 			prefix,
 			typeof source === "string" ? source : source.id
 		);
@@ -109,7 +109,7 @@ export class XCooldown {
 		const status = this.statusTime;
 		if (status === "EXPIRED") return true;
 		if (this.player) {
-			const time = XCooldown.getRemainingTime(this.time - status);
+			const time = Cooldown.getRemainingTime(this.time - status);
 			this.player.tell(`§cПодожди еще §f${time.parsedTime} §c${time.type}`);
 		}
 		return false;

@@ -1,7 +1,7 @@
-import { Dimension, Entity, Player, Vector, world } from "@minecraft/server";
+import { Dimension, Entity, Player, Vector } from "@minecraft/server";
 import { DB } from "lib/Database/Default.js";
 import { Database } from "lib/Database/Rubedo.js";
-import { XA, handle } from "xapi.js";
+import { XEntity, util } from "xapi.js";
 import { DEFAULT_REGION_PERMISSIONS } from "./config.js";
 
 /**
@@ -146,6 +146,7 @@ export class Region {
 	 * @param {Vector3} vector
 	 */
 	vectorInRegion(vector) {
+		// Actual implementation in extended class
 		return false;
 	}
 	/**
@@ -166,12 +167,11 @@ export class Region {
 	 * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback - Callback to run
 	 */
 	forEachOwner(callback) {
-		if (this.permissions.owners.length < 1) return;
 		this.permissions.owners
-			.map(XA.Entity.fetch)
+			.map(XEntity.fetch)
 			.filter((e) => e)
 			.forEach((player, i, owners) =>
-				handle(() => callback(player, i, owners), "Region.forEachOwner")
+				util.handle(() => callback(player, i, owners), "Region.forEachOwner")
 			);
 	}
 }

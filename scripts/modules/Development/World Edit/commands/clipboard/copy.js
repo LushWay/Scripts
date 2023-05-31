@@ -1,7 +1,6 @@
-import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
-new XA.Command({
+new XCommand({
 	name: "copy",
 	description: "Копирует зону",
 	role: "moderator",

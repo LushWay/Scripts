@@ -11,9 +11,7 @@ import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { XA, handle, toStr } from "xapi.js";
-import { DB } from "../../../lib/Database/Default.js";
-import { InventoryStore } from "../../../lib/Database/Inventory.js";
+import { DB, GameUtils, InventoryStore, XEntity, util } from "xapi.js";
 import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
 import "./enchant.js";
 
@@ -46,7 +44,7 @@ const tests = {
 		menu.show(ctx.sender);
 	},
 	13: (ctx) => {
-		ctx.reply(toStr(ctx.sender.getComponents()));
+		ctx.reply(util.inspect(ctx.sender.getComponents()));
 	},
 	21: (ctx) => {
 		for (let a of [
@@ -166,7 +164,7 @@ const tests = {
 
 		for (const item of items) {
 			const stack = new ItemStack(item);
-			ctx.reply(XA.Utils.localizationName(stack));
+			ctx.reply(GameUtils.localizationName(stack));
 		}
 	},
 	48(ctx) {
@@ -221,7 +219,7 @@ const tests = {
 
 world.afterEvents.entityHit.subscribe((data) => {
 	if (data.entity instanceof Player) {
-		const axe = XA.Entity.getHeldItem(data.entity);
+		const axe = XEntity.getHeldItem(data.entity);
 		if (axe && !axe.typeId.includes("axe")) return;
 
 		data.entity.startItemCooldown("axe", 10);
@@ -270,7 +268,7 @@ system.runInterval(
 	10
 );
 
-const c = new XA.Command({
+const c = new XCommand({
 	name: "test",
 	role: "admin",
 });
@@ -279,5 +277,5 @@ c.string("number", true).executes(async (ctx, n) => {
 	const keys = Object.keys(tests);
 	const i = n && keys.includes(n) ? n : keys.pop();
 	ctx.reply(i);
-	handle(() => tests[i](ctx), "Test");
+	util.handle(() => tests[i](ctx), "Test");
 });

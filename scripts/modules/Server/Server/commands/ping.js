@@ -1,5 +1,4 @@
 import { system } from "@minecraft/server";
-import { XA } from "xapi.js";
 
 /**
  *
@@ -20,7 +19,7 @@ async function getServerTPS() {
 	});
 }
 
-new XA.Command({
+new XCommand({
 	name: "ping",
 	description: "Returns the current Ticks Per Second of the servers ping",
 	role: "member",

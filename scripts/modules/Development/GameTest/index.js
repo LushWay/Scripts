@@ -6,7 +6,7 @@ import {
 	world,
 } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { handle, XA } from "xapi.js";
+import { util } from "xapi.js";
 const time = 9999999;
 
 let name = "Бот";
@@ -113,7 +113,7 @@ GameTest.registerAsync("s", "test", async (test) => {
 	.structureName("Component:grass5x5")
 	.tag("sim");
 
-new XA.Command({
+new XCommand({
 	name: "player",
 	description: "Спавнит фэйкового игрока",
 	role: "admin",
@@ -123,7 +123,7 @@ new XA.Command({
 	.executes(async (ctx, newname) => {
 		if (newname) name = newname;
 
-		await XA.runCommandX(
+		await world.overworld.runCommand(
 			`execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`
 		);
 
@@ -147,15 +147,15 @@ GameTest.registerAsync("s", "m", async (test) => {
 		);
 		player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
 		await test.idle(Math.random() * 50);
-		handle(async () => {
+		util.handle(async () => {
 			while (!succeed) {
 				await test.idle(Math.random() * 40);
 				if (!player) break;
-				const net = XA.Entity.getClosetsEntitys(
-					player,
-					5,
-					"minecraft:player"
-				)[0];
+				const net = player.dimension.getEntities({
+					location: player.location,
+					type: "minecraft:player",
+					closest: 1,
+				})[0];
 				if (!net) continue;
 				player.lookAtEntity(net);
 				await test.idle(20);

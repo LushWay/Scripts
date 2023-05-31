@@ -1,8 +1,7 @@
 import { Vector } from "@minecraft/server";
-import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
-new XA.Command({
+new XCommand({
 	name: "pos2",
 	aliases: ["p2"],
 	description: "Устанавливает позицию 2 (использовать)",

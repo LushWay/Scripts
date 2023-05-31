@@ -9,7 +9,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { Database } from "../../../lib/Database/Rubedo.js";
+import { Database } from "xapi.js";
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.elytra, 1);
 const lore = ["§r§7Элитра перелета, пропадает на земле"];

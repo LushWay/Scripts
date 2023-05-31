@@ -1,4 +1,4 @@
-new XA.Command({
+new XCommand({
 	name: "s",
 	description: "Выживание",
 	role: "moderator",
@@ -7,7 +7,7 @@ new XA.Command({
 	ctx.reply("§a► S");
 });
 
-new XA.Command({
+new XCommand({
 	name: "c",
 	description: "Креатив",
 	role: "moderator",

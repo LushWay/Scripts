@@ -5,25 +5,7 @@
 			"identifier": "minecraft:player",
 			"is_spawnable": false,
 			"is_summonable": true,
-			"is_experimental": false,
-			"animations": {
-				"digging": "controller.animation.digging",
-				"eating": "controller.animation.eating",
-				"gliding": "controller.animation.gliding",
-				"ground": "controller.animation.ground",
-				"jumping": "controller.animation.jumping",
-				"swimming": "controller.animation.swimming"
-			},
-			"scripts": {
-				"animate": [
-					"digging",
-					"eating",
-					"gliding",
-					"ground",
-					"jumping",
-					"swimming"
-				]
-			}
+			"is_experimental": false
 		},
 		"component_groups": {
 			"spawn": {

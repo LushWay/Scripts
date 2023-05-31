@@ -3,13 +3,13 @@ import { BECHMARK_RESULTS } from "lib/Class/Benchmark.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { DisplayError, TIMERS_PATHES, XA, handle, toStr } from "xapi.js";
+import { TIMERS_PATHES, util } from "xapi.js";
 
 /**
  * @typedef {import("lib/Database/Rubedo.js").Database<string, any>} defDB
  */
 
-const db = new XA.Command({
+const db = new XCommand({
 	name: "db",
 	description: "Просматривает базу данных",
 	role: "admin",
@@ -79,7 +79,7 @@ function showTable(player, table) {
 		try {
 			value = DB.get(key);
 		} catch (e) {
-			DisplayError(e);
+			util.error(e);
 			value = DB._.COLLECTION[key];
 			failedToLoad = true;
 		}
@@ -88,7 +88,7 @@ function showTable(player, table) {
 			key,
 			`§7Тип: §f${typeof value}\n ${
 				failedToLoad ? "\n§cОшибка [beforeGet] в таблице!§r\n\n" : ""
-			}\n${toStr(value)}\n `
+			}\n${util.inspect(value)}\n `
 		);
 
 		AForm.addButton("Изменить", null, () => {
@@ -101,7 +101,9 @@ function showTable(player, table) {
 				if (input)
 					ncallback(input, inputType, (newValue) => {
 						DB.set(key, newValue);
-						player.tell(toStr(value) + "§r -> " + toStr(newValue));
+						player.tell(
+							util.inspect(value) + "§r -> " + util.inspect(newValue)
+						);
 					});
 
 				propertyForm(key);
@@ -122,7 +124,7 @@ function showTable(player, table) {
 	let keys = DB.keys();
 	for (const key of keys) {
 		menu.addButton(key, null, () =>
-			handle(() => propertyForm(key), "FormBuilder")
+			util.handle(() => propertyForm(key), "FormBuilder")
 		);
 	}
 
@@ -241,7 +243,7 @@ function getPath(key) {
 	return `\n${TIMERS_PATHES[key]}`.replace(/\n/g, "\n§3| §r");
 }
 
-new XA.Command({
+new XCommand({
 	name: "benchmark",
 	description: "Показывает время работы серверных систем",
 	role: "admin",

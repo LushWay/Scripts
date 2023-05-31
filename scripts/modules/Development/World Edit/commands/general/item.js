@@ -1,6 +1,6 @@
-import { XA } from "xapi.js";
+import { XEntity } from "xapi.js";
 
-const root = new XA.Command({
+const root = new XCommand({
 	name: "item",
 	description: "Управляет предметом в руке",
 	role: "moderator",
@@ -11,11 +11,13 @@ root
 	.literal({ name: "lore", aliases: ["l"], description: "Задает лор предмета" })
 	.string("lore")
 	.executes((ctx) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item) return ctx.reply("§cВ руке нет предмета!");
 		let oldtag = item.getLore();
 		item.setLore(ctx.args);
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
 	});
 
@@ -23,11 +25,13 @@ root
 	.literal({ name: "name", aliases: ["n"], description: "Задает имя предмета" })
 	.string("name")
 	.executes((ctx, name) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item) return ctx.reply("§cВ руке нет предмета!");
 		let oldtag = item.nameTag;
 		item.nameTag = name;
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.nameTag}`);
 	});
 root
@@ -38,12 +42,12 @@ root
 	})
 	.int("count")
 	.executes((ctx, count) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item) return ctx.reply("§cВ руке нет предмета!");
 		let oldtag = item.amount;
 		item.amount = count;
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.amount}`);
 	});
-
-

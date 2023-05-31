@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { ROLES } from "../../xapi.js";
+import { ROLES } from "xapi.js";
 import { XCommand } from "./index.js";
 
 export interface ICommandData {
@@ -84,5 +84,3 @@ export interface IArgumentReturnData<T> {
 	 */
 	value?: T;
 }
-
-

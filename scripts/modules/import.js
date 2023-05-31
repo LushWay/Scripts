@@ -1,4 +1,4 @@
-import { DisplayError } from "xapi.js";
+import { util } from "xapi.js";
 
 const modules = [
 	"./Server/Server/index.js",
@@ -14,8 +14,6 @@ const modules = [
 	 * Gameplay modules
 	 */
 	"./Gameplay/Indicator/index.js",
-	// "./Gameplay/BattleRoyal/index.js",
-	// "./Gameplay/Airdrops/index.js",
 
 	/**
 	 * Development modules:
@@ -32,7 +30,7 @@ export async function loadModules() {
 		try {
 			await import(module);
 		} catch (e) {
-			DisplayError(e, { errorName: "ModuleError" });
+			util.error(e, { errorName: "ModuleError" });
 		}
 	}
 }

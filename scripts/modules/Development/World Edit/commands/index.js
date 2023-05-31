@@ -1,5 +1,5 @@
 import "./brush/brush.js";
-import "./brush/custom items.js";
+import "./brush/other.js";
 
 import "./general/desel.js";
 import "./general/drawsel.js";

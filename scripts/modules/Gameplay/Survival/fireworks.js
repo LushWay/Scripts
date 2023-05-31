@@ -7,12 +7,15 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
+import { GameUtils } from "xapi.js";
 
 /** @type {Record<string, [number, Entity]>} */
 const SPAWNED_FIREWORKS = {};
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-	if (XA.Utils.safeGetTypeID(entity) !== MinecraftEntityTypes.fireworksRocket.id)
+	if (
+		GameUtils.safeGetTypeID(entity) !== MinecraftEntityTypes.fireworksRocket.id
+	)
 		return;
 
 	SPAWNED_FIREWORKS[entity.id] = [Date.now(), entity];

@@ -1,12 +1,12 @@
 import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
-import { setRegionGuards } from "../../Server/Region/index.js";
+import { loadRegionsWithGuards } from "../../Server/Region/index.js";
 import "./base.js";
-import "./raid.js";
-import "./fireworks.js";
 import "./bouncyTnt.js";
+import "./fireworks.js";
+import "./raid.js";
 
-setRegionGuards(
+loadRegionsWithGuards(
 	// Common actions guard
 	(player, region) =>
 		(region && region.permissions.owners.includes(player.id)) ||

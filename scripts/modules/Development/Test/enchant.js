@@ -1,8 +1,8 @@
 import { EquipmentSlot, world } from "@minecraft/server";
-import { Enchantments } from "../../Gameplay/Enchantments/index.js";
 import { MinecraftEnchantmentTypes } from "../../../lib/List/enchantments.js";
+import { Enchantments } from "../../Gameplay/Loot/enchantments.js";
 
-new XA.Command({
+new XCommand({
 	name: "enchant",
 	description: "Зачаровывает предмет",
 })
@@ -11,7 +11,6 @@ new XA.Command({
 	.executes((ctx, enchant, level) => {
 		if (!enchant)
 			return ctx.reply(Object.keys(MinecraftEnchantmentTypes).join("\n"));
-		// @ts-expect-error
 		const ench = MinecraftEnchantmentTypes[enchant];
 
 		const mainhand = ctx.sender
@@ -21,7 +20,7 @@ new XA.Command({
 		const item = mainhand.getItem();
 		const { enchantments } = item.getComponent("enchantments");
 		enchantments.removeEnchantment(ench);
-		enchantments.addEnchantment(Enchantments.Custom[ench][level]);
+		enchantments.addEnchantment(Enchantments.custom[ench][level]);
 
 		world.debug("enca", [...enchantments]);
 		item.getComponent("enchantments").enchantments = enchantments;

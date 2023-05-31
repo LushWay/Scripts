@@ -5,7 +5,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { DisplayError, XA } from "xapi.js";
+import { Cooldown, util } from "xapi.js";
 import { CONFIG_WB } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
@@ -122,7 +122,7 @@ class WorldEditBuilder {
 				this.history.splice(this.history.indexOf(backup), 1);
 			}
 
-			const e = XA.Cooldown.getT(amount.toString(), [
+			const e = Cooldown.getT(amount.toString(), [
 				"бэкап",
 				"бэкапа",
 				"бэкапов",
@@ -131,7 +131,7 @@ class WorldEditBuilder {
 				amount.toString().endsWith("1") ? "" : "о"
 			} §f${amount} §3${e}!`;
 		} catch (error) {
-			DisplayError(error);
+			util.error(error);
 			return `§4► §cНе удалось отменить`;
 		}
 	}
@@ -150,7 +150,7 @@ class WorldEditBuilder {
 				this.undos.splice(this.undos.indexOf(backup), 1);
 			}
 
-			const e = XA.Cooldown.getT(amount.toString(), [
+			const e = Cooldown.getT(amount.toString(), [
 				"бэкап",
 				"бэкапа",
 				"бэкапов",
@@ -159,7 +159,7 @@ class WorldEditBuilder {
 				amount.toString().endsWith("1") ? "" : "о"
 			} §f${amount} §3${e}!`;
 		} catch (error) {
-			DisplayError(error);
+			util.error(error);
 			return `§4► §cНе удалось вернуть`;
 		}
 	}
@@ -172,7 +172,7 @@ class WorldEditBuilder {
 		try {
 			if (!this.selectionCuboid)
 				return "§4► §cЗона для копирования не выделена!";
-			const opt = await XA.runCommandX(
+			const opt = world.overworld.runCommand(
 				`structure save ${CONFIG_WB.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
 			);
 			if (!opt) throw new Error(opt + "");
@@ -183,7 +183,7 @@ class WorldEditBuilder {
 			};
 			return `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`;
 		} catch (error) {
-			DisplayError(error);
+			util.error(error);
 			return `§4► §cНе удалось скорпировать`;
 		}
 	}
@@ -231,7 +231,7 @@ class WorldEditBuilder {
 
 			return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`;
 		} catch (error) {
-			DisplayError(error);
+			util.error(error);
 			return `§4► §cНе удалось вставить`;
 		}
 	}
@@ -266,7 +266,7 @@ class WorldEditBuilder {
 		}
 
 		for (const cube of Cube.split(CONFIG_WB.FILL_CHUNK_SIZE)) {
-			const result = await XA.runCommandX(
+			const result = world.overworld.runCommand(
 				`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
 				{ showError: true, showOutput: true }
 			);

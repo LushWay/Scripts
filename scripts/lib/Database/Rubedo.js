@@ -1,6 +1,6 @@
 import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
 import { stackParse } from "../Class/Error.js";
-import { DisplayError } from "../Setup/utils.js";
+import { util } from "../Setup/utils.js";
 import { DB } from "./Default.js";
 
 const TABLE_TYPE = "rubedo";
@@ -154,7 +154,7 @@ export class Database {
 
 			this.MEMORY = isJSON ? JSON.parse(raw) : {};
 		} catch (e) {
-			DisplayError(e);
+			util.error(e);
 			Reflect.set(this, "MEMORY", {});
 			this.save();
 		}
@@ -194,7 +194,7 @@ export class Database {
 		inventory.clearAll();
 
 		if (chunks.length > inventory.size) {
-			return DisplayError(
+			return util.error(
 				new DatabaseError(
 					"Too many data tried saved to table " + this._.TABLE_NAME
 				)
@@ -263,7 +263,6 @@ export class Database {
 	keys() {
 		if (!this._.IS_INITED) this.failedTo("keys");
 
-		// @ts-expect-error
 		return Object.keys(this.MEMORY);
 	}
 	/**

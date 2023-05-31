@@ -6,7 +6,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { DisplayError } from "../Setup/utils.js";
+import { util } from "../Setup/utils.js";
 
 world.afterEvents.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
@@ -143,7 +143,7 @@ export class DB {
 				(e) => e.tableType === tableType && e.tableName === tableName
 			)?.entity;
 		} catch (e) {
-			DisplayError(e);
+			util.error(e);
 			return null;
 		}
 	}
@@ -160,7 +160,7 @@ export class DB {
 				.sort((a, b) => a.index - b.index)
 				.map((e) => e.entity);
 		} catch (e) {
-			DisplayError(e);
+			util.error(e);
 			return null;
 		}
 	}

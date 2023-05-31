@@ -1,6 +1,6 @@
 import { MinecraftDimensionTypes, World, world } from "@minecraft/server";
 import { addMethod } from "../patcher.js";
-import { toStr } from "../utils.js";
+import { util } from "../utils.js";
 
 const send = world.sendMessage.bind(world);
 
@@ -27,7 +27,9 @@ World.prototype.end = world.getDimension(MinecraftDimensionTypes.theEnd);
 addMethod(World.prototype, "debug", (...data) => {
 	say(
 		data
-			.map((/** @type {*} */ e) => (typeof e === "string" ? e : toStr(e)))
+			.map((/** @type {*} */ e) =>
+				typeof e === "string" ? e : util.inspect(e)
+			)
 			.join(" ")
 	);
 });

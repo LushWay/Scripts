@@ -1,11 +1,7 @@
 /**
-
- */
-
-/**
  * @param {string} string1
  * @param {string} string2
- * Code by {@link https://github.com/zdyn/jaro-winkler-js/ Zdyn}
+ * Code by {@link https://github.com/zdyn/jaro-winkler-js Zdyn}
  */
 export function stringDistance(string1, string2) {
 	if (string1.length > string2.length) [string1, string2] = [string2, string1];
@@ -31,10 +27,6 @@ export function stringDistance(string1, string2) {
 				break;
 			}
 	});
-	//@ts-ignore
-	str1Matches = str1Matches.join("");
-	//@ts-ignore
-	str2Matches = str2Matches.join("");
 
 	const matchesN = str1Matches.length;
 	if (!matchesN) {
@@ -42,9 +34,9 @@ export function stringDistance(string1, string2) {
 	}
 	// Count transpositions
 	let transpositions = 0;
-	forEveryChar(str1Matches, (i, char) => {
+	for (const [i, char] of str1Matches.entries()) {
 		if (char !== str2Matches[i]) transpositions++;
-	});
+	}
 
 	// Count prefix matches
 	let prefix = 0;
@@ -62,7 +54,7 @@ export function stringDistance(string1, string2) {
 
 /**
  *
- * @param {*} string
+ * @param {string} string
  * @param {function(number, string): void} callback
  */
 function forEveryChar(string, callback) {

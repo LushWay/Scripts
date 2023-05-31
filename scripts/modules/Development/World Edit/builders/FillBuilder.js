@@ -1,5 +1,5 @@
-import { system } from "@minecraft/server";
-import { handle, XA } from "xapi.js";
+import { system, world } from "@minecraft/server";
+import { util } from "xapi.js";
 import { CONFIG_WB } from "../config.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
@@ -12,7 +12,7 @@ import { WorldEditBuild } from "./WorldEditBuilder.js";
  * @example new Fill(BlockLocation, BlockLocation, ["stone", "wood"], ["grass"]);
  */
 export function FillFloor(pos1, pos2, blocks, rb = "any") {
-	handle(async () => {
+	util.handle(async () => {
 		WorldEditBuild.backup(pos1, pos2);
 
 		try {
@@ -35,14 +35,14 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 						if (rb !== "any") {
 							for (const b of rbs) {
 								let replace = ` replace ${b.b} ` + b.d;
-								XA.runCommandX(
+								world.overworld.runCommand(
 									`fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ` +
 										bdata +
 										replace
 								);
 							}
 						} else
-							XA.runCommandX(
+							world.overworld.runCommand(
 								`fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ` + bdata
 							);
 

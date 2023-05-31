@@ -5,23 +5,14 @@ import "./lib/Setup/watchdog.js";
 
 import "./lib/Setup/prototypes.js";
 
-import { onWorldLoad } from "./lib/Setup/loader.js";
-
-// X-API methods
-import { XCooldown } from "./lib/Class/Cooldown.js";
-import { XEntity } from "./lib/Class/Entity.js";
-import { Options } from "./lib/Class/Options.js";
-import { XCommand } from "./lib/Command/index.js";
-import { Database } from "./lib/Database/Rubedo.js";
-
-import { XRunCommand } from "./lib/Class/RunCommand.js";
-import { emoji } from "./lib/Lang/emoji.js";
-import { text } from "./lib/Lang/text.js";
-
 import { CONFIG } from "./config.js";
 import { EventSignal } from "./lib/Class/Events.js";
-import { XUtils } from "./lib/Class/Utils.js";
-import { DisplayError } from "./lib/Setup/utils.js";
+import { XCommand } from "./lib/Command/index.js";
+import { Database } from "./lib/Database/Rubedo.js";
+import { emoji } from "./lib/Lang/emoji.js";
+import { text } from "./lib/Lang/text.js";
+import { onWorldLoad } from "./lib/Setup/loader.js";
+import { util } from "./lib/Setup/utils.js";
 import { loadModules } from "./modules/import.js";
 
 world.say("§9┌ §fLoading...");
@@ -31,15 +22,6 @@ let loading = Date.now();
  * Class because variable hoisting
  */
 export class XA {
-	static Entity = XEntity;
-	static runCommandX = XRunCommand;
-	static Command = XCommand;
-	static Cooldown = XCooldown;
-	static Utils = XUtils;
-
-	static PlayerOptions = Options.player.typedBind(Options);
-	static WorldOptions = Options.world.typedBind(Options);
-
 	static Lang = {
 		lang: text,
 		emoji: emoji,
@@ -65,7 +47,28 @@ export class XA {
 }
 
 globalThis.XA = XA;
+globalThis.XCommand = XCommand;
 
+// Class
+export * from "./lib/Class/Action.js";
+export * from "./lib/Class/Cooldown.js";
+export * from "./lib/Class/Entity.js";
+export * from "./lib/Class/Events.js";
+export * from "./lib/Class/Options.js";
+export * from "./lib/Class/Utils.js";
+// Command
+export * from "./lib/Command/index.js";
+// Database
+export * from "./lib/Database/Default.js";
+export * from "./lib/Database/Inventory.js";
+export * from "./lib/Database/Rubedo.js";
+export * from "./lib/Database/Scoreboard.js";
+// Form
+export * from "./lib/Form/ActionForm.js";
+export * from "./lib/Form/MessageForm.js";
+export * from "./lib/Form/ModelForm.js";
+export * from "./lib/Form/utils.js";
+// Setup
 export * from "./lib/Setup/Extensions/system.js";
 export * from "./lib/Setup/loader.js";
 export * from "./lib/Setup/prototypes.js";
@@ -85,12 +88,12 @@ onWorldLoad(
 
 		await loadModules();
 		XA.state.modules_loaded = true;
-		XA.state.afterModulesLoad.emit();
+		EventSignal.emit(XA.state.afterModulesLoad, {});
 
 		XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
 
 		if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
 		else world.say(`§fFirst loaded in ${XA.state.load_time}`);
 	},
-	(fn) => fn().catch((e) => DisplayError(e, { errorName: "X-API-ERR" }))
+	(fn) => fn().catch((e) => util.error(e, { errorName: "X-API-ERR" }))
 );

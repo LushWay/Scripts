@@ -1,14 +1,20 @@
-import { MolangVariableMap, Player, Vector, system, world } from "@minecraft/server";
+import {
+	MolangVariableMap,
+	Player,
+	Vector,
+	system,
+	world,
+} from "@minecraft/server";
 
 import { P } from "lib/List/particles.js";
 import { S } from "lib/List/sounds.js";
-import { XA } from "xapi.js";
+import { XEntity } from "xapi.js";
 
-const variables= new MolangVariableMap()
+const variables = new MolangVariableMap();
 
 system.runPlayerInterval(
 	(player) => {
-		const item = XA.Entity.getHeldItem(player);
+		const item = XEntity.getHeldItem(player);
 		if (!item || item.typeId !== "we:tool") return;
 
 		const lore = item.getLore();
@@ -56,10 +62,12 @@ world.afterEvents.itemUse.subscribe((data) => {
 			lore[1] = action[num] ?? lore[1];
 			lore[2] = num.toString();
 			item.setLore(lore);
-			XA.Entity.getI(data.source).setItem(data.source.selectedSlot, item);
+			data.source
+				.getComponent("inventory")
+				.container.setItem(data.source.selectedSlot, item);
 		}
 		if (act === "run") {
-			XA.runCommandX(lore[1]);
+			world.overworld.runCommand(lore[1]);
 		}
 		if (act === "runE") {
 			data.source.runCommandAsync(lore[1]);

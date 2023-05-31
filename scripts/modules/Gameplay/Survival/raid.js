@@ -1,6 +1,5 @@
 import { system, world } from "@minecraft/server";
-import { LockAction } from "../../../lib/Class/Action.js";
-import { ScoreboardDB } from "../../../lib/Database/Scoreboard.js";
+import { LockAction, ScoreboardDB, XEntity } from "xapi.js";
 import { Region } from "../../Server/Region/Region.js";
 import { RaidNotify } from "./var.js";
 
@@ -24,7 +23,7 @@ system.runInterval(
 	() => {
 		for (const id in RaidNotify) {
 			// Ищем игрока...
-			const player = XA.Entity.fetch(id);
+			const player = XEntity.fetch(id);
 			if (player) {
 				if (RAID.get(player) === 0) {
 					player.tell(
@@ -48,4 +47,3 @@ system.runInterval(
 	"raid notify",
 	20
 );
-

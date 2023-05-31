@@ -1,5 +1,4 @@
-import { system } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { system, world } from "@minecraft/server";
 import { CONFIG_WB } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 
@@ -32,13 +31,14 @@ export class Structure {
 		const regions = new Cuboid(this.pos1, this.pos2).split(
 			CONFIG_WB.STRUCTURE_CHUNK_SIZE
 		);
+
 		let errors = 0;
 		let all = 0;
 		for (const region of regions) {
 			const name = `${this.prefix}|${regions.indexOf(region)}`;
 			const pos1 = region.pos1;
 			const pos2 = region.pos2;
-			const result = await XA.runCommandX(
+			const result = world.overworld.runCommand(
 				`structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`,
 				{ showError: true }
 			);
@@ -56,12 +56,12 @@ export class Structure {
         world.say(
           "§c► §fЧанки будут подгружены с помощью игрока"
         );
-        XA.runCommandAsync(`tickingarea remove safezone`);
-        XA.runCommandAsync(
+        world.overworld.runCommandAsync(`tickingarea remove safezone`);
+        world.overworld.runCommandAsync(
           `tickingarea add ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} safezone`
         );
         setTickTimeout(() => {
-            XA.runCommandAsync(
+            world.overworld.runCommandAsync(
             `structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
           )
           this.files.push({
@@ -81,7 +81,7 @@ export class Structure {
 		let errors = 0;
 		let all = 0;
 		for (const file of this.files) {
-			const result = await XA.runCommandX(
+			const result = await world.overworld.runCommand(
 				`structure load "${file.name}" ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`,
 				{
 					showError: true,
@@ -91,14 +91,14 @@ export class Structure {
 			if (result === 0) {
 				errors++;
 				// world.say("§c► §fЧанки будут подгружены с помощью области");
-				// XA.runCommandX(`tickingarea remove safezone`);
-				// XA.runCommandX(
+				// world.overworld.runCommand(`tickingarea remove safezone`);
+				// world.overworld.runCommand(
 				// 	`tickingarea add ${file.pos1.x} ${file.pos1.y} ${file.pos1.z} ${file.pos2.x} ${file.pos2.y} ${file.pos2.z} safezone`
 				// );
 				// setTickTimeout(
 				// 	() => {
 				// 		world.say("§9►");
-				// 		XA.runCommandX(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
+				// 		world.overworld.runCommand(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
 				// 		world.say("§9► §fЗагружено.");
 				// 	},
 				// 	40,

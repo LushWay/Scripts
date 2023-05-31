@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
+import { StoredRequest } from "lib/Class/StoredRequest.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
-import { handle, IS, XA } from "xapi.js";
-import { Database } from "../../../lib/Database/Rubedo.js";
+import { Cooldown, Database, IS, util, XEntity } from "xapi.js";
 import { CONFIG_MENU } from "../../Server/Menu/var.js";
 import { JOIN_EVENTS } from "../../Server/OnJoin/var.js";
 import { CubeRegion, Region } from "../../Server/Region/Region.js";
@@ -12,7 +12,6 @@ import {
 	prompt,
 	teleportToRegion,
 } from "./utils.js";
-import { StoredRequest } from "lib/Class/StoredRequest.js";
 
 const DB = new Database("buildRegion");
 
@@ -55,20 +54,18 @@ CONFIG_MENU.menu = (player) => {
 	let regionOwnerName;
 
 	if (current_region) {
-		regionOwnerName = XA.Entity.getNameByID(
-			current_region.permissions.owners[0]
-		);
+		regionOwnerName = XEntity.getNameByID(current_region.permissions.owners[0]);
 		if (!inOwnRegion) {
 			if (regionOwnerName) {
 				add("§3Сейчас вы на площадке игрока §f" + regionOwnerName);
 			} else {
 				const oldRegionData = DB.get("ARCHIVE:" + current_region.key);
 				const oldRegion = Array.isArray(oldRegionData) ? oldRegionData : [];
-				regionOwnerName = XA.Entity.getNameByID(oldRegion[0]);
+				regionOwnerName = XEntity.getNameByID(oldRegion[0]);
 				add("§cЭто площадка была заархивирована");
 				add(
 					"§3Строители: §f" +
-						oldRegion.map(XA.Entity.getNameByID).join("§r§3, §f")
+						oldRegion.map(XEntity.getNameByID).join("§r§3, §f")
 				);
 			}
 		} else if (isRegionBuilder) {
@@ -109,7 +106,7 @@ CONFIG_MENU.menu = (player) => {
 		for (const reg of CubeRegion.getAllRegions().filter(
 			(e) => e.permissions.owners.includes(player.id) && e.key !== Pregion.key
 		)) {
-			toPlatform(reg, XA.Entity.getNameByID(reg.permissions.owners[0]));
+			toPlatform(reg, XEntity.getNameByID(reg.permissions.owners[0]));
 		}
 		addBackButton(form);
 		form.show(player);
@@ -130,7 +127,7 @@ CONFIG_MENU.menu = (player) => {
 				);
 
 				for (const id of current_region.permissions.owners.slice(1)) {
-					const playerName = XA.Entity.getNameByID(id);
+					const playerName = XEntity.getNameByID(id);
 					form.addButton(playerName, null, () => {
 						prompt(
 							player,
@@ -143,7 +140,7 @@ CONFIG_MENU.menu = (player) => {
 									current_region.permissions.owners.filter((e) => e !== id);
 								current_region.update();
 								player.tell("§b> §3Успешно!");
-								const requestedPlayer = XA.Entity.fetch(id);
+								const requestedPlayer = XEntity.fetch(id);
 								if (requestedPlayer)
 									requestedPlayer.tell(
 										`§cИгрок §f${player.name} §r§cудалил вас из строителей своей площадки`
@@ -169,14 +166,14 @@ CONFIG_MENU.menu = (player) => {
 						"§3В этом меню вы можете посмотреть запросы на редактирование площадки, отправление другими игроками"
 					);
 					for (const ID of editRequest.list) {
-						const name = XA.Entity.getNameByID(ID);
+						const name = XEntity.getNameByID(ID);
 						newmenu.addButton(name, null, () => {
 							prompt(
 								player,
 								"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
 								"Принять",
 								() => {
-									const requestedPlayer = XA.Entity.fetch(ID);
+									const requestedPlayer = XEntity.fetch(ID);
 									if (requestedPlayer) {
 										editRequest.deleteRequest(ID);
 										player.tell(
@@ -204,7 +201,7 @@ CONFIG_MENU.menu = (player) => {
 				}
 			);
 			menu.addButton("Перейти на новую", null, () => {
-				const CD = new XA.Cooldown(DB, "ARHCIVE", player, 1000 * 60 * 60 * 24);
+				const CD = new Cooldown(DB, "ARHCIVE", player, 1000 * 60 * 60 * 24);
 				if (CD.isExpired())
 					prompt(
 						player,
@@ -248,7 +245,7 @@ CONFIG_MENU.menu = (player) => {
 					);
 			});
 			menu.addButton("§cОчистить", null, () => {
-				const CD = new XA.Cooldown(DB, "CLEAR", player, 1000 * 60);
+				const CD = new Cooldown(DB, "CLEAR", player, 1000 * 60);
 				if (CD.isExpired())
 					prompt(
 						player,
@@ -257,7 +254,7 @@ CONFIG_MENU.menu = (player) => {
 						async () => {
 							CD.update();
 							const end = await ClearRegion(player, Pregion);
-							await handle(() => fillRegion(Pregion.from, Pregion.to));
+							await util.handle(() => fillRegion(Pregion.from, Pregion.to));
 							end();
 						},
 						"Отмена, не очищайте",
@@ -267,7 +264,7 @@ CONFIG_MENU.menu = (player) => {
 		} else if (current_region.permissions.owners.includes(player.id)) {
 		} else if (current_region.permissions.owners[0]) {
 			menu.addButton("Запросить разрешение", null, () => {
-				const CD = new XA.Cooldown(DB, "REQ", player, 1000 * 60);
+				const CD = new Cooldown(DB, "REQ", player, 1000 * 60);
 
 				if (CD.isExpired())
 					prompt(
@@ -278,7 +275,7 @@ CONFIG_MENU.menu = (player) => {
 							CD.update();
 							editRequest.createRequest(player.id);
 							player.tell("§b> §3Запрос на редактирование успешно отправлен!");
-							const requestedPlayer = XA.Entity.fetch(
+							const requestedPlayer = XEntity.fetch(
 								current_region.permissions.owners[0]
 							);
 							if (requestedPlayer)

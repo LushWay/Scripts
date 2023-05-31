@@ -1,5 +1,4 @@
-import { MolangVariableMap, Player, Vector } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { MolangVariableMap, Player, Vector, world } from "@minecraft/server";
 
 export class zone {
 	/**
@@ -18,8 +17,8 @@ export class zone {
 					plus ? zone.z + 1 : zone.z - 1
 			  }`;
 
-		XA.runCommandX(`damage "${player.name}" 1 void`);
-		XA.runCommandX(`tp "${player.name}" ${a}`);
+		world.overworld.runCommand(`damage "${player.name}" 1 void`);
+		world.overworld.runCommand(`tp "${player.name}" ${a}`);
 		player.onScreenDisplay.setActionBar("§cЗона!");
 	}
 	/**

@@ -1,6 +1,4 @@
-import { XA } from "xapi.js";
-
-new XA.Command({
+new XCommand({
 	type: "wb",
 	name: "tool",
 	description: "Gives a tool item in your inventory",

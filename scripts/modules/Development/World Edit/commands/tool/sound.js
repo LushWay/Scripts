@@ -1,8 +1,8 @@
 import { SG } from "lib/List/sounds-types.js";
 import { S } from "lib/List/sounds.js";
+import { XEntity } from "xapi.js";
 
-import { XA } from "xapi.js";
-new XA.Command({
+new XCommand({
 	name: "sound",
 	aliases: ["so"],
 	role: "moderator",
@@ -10,7 +10,7 @@ new XA.Command({
 })
 	.string("sound", true)
 	.executes((ctx, sound) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 		if (!sound) {
@@ -22,7 +22,9 @@ new XA.Command({
 		lore[2] = `${S.includes(sound) ? S.indexOf(sound) : 0}`;
 		item.setLore(lore);
 		item.nameTag = "§r§9Sound";
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(
 			`§a(s) §rПартикл инструмента изменен на ${sound ?? S[0]} (${
 				S.includes(sound) ? S.indexOf(sound) : "0"
@@ -32,7 +34,7 @@ new XA.Command({
 	.literal({ name: "n" })
 	.int("number")
 	.executes((ctx, _, number) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
@@ -43,6 +45,8 @@ new XA.Command({
 		item.nameTag = "§r§9Sound";
 		console.warn(JSON.stringify(lore));
 		item.setLore(lore);
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a(s) §rПартикл инструмента изменен на ${particle} (${number})`);
 	});

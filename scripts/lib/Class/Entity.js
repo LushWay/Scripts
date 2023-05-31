@@ -1,4 +1,4 @@
-import { Container, Entity, ItemStack, Player, world } from "@minecraft/server";
+import { Entity, ItemStack, Player, world } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
 /** @type {Database<string, IJoinData>} */
@@ -12,7 +12,7 @@ const DB = new Database("player", {
 });
 
 /**
- * @author Smell of Curry, mrpatches123, mo9ses, xiller229 (Leaftail)
+ * @author Smell of Curry, mrpatches123, mo9ses, xiller228 (Leaftail)
  */
 
 export const XEntity = {
@@ -22,67 +22,6 @@ export const XEntity = {
 	 */
 	getNameByID(ID) {
 		return DB.get(ID)?.name;
-	},
-	/**
-	 * Checks if position is in radius
-	 * @param {Vector3} center Center of radius
-	 * @param {Vector3} pos Position to check
-	 * @param {number} r Radius
-	 * @returns {boolean}
-	 */
-	inRadius(center, pos, r) {
-		const inRange = (
-			/** @type {number} */ value,
-			/** @type {number} */ center
-		) => value <= r + center && value <= r - center;
-
-		return (
-			inRange(pos.x, center.x) &&
-			inRange(pos.y, center.y) &&
-			inRange(pos.z, center.z)
-		);
-	},
-	/**
-	 * Get entitie(s) at a position
-	 * @param {{x: number, y: number, z: number}} p0 position of the entity
-	 * @param {string} dimension Dimesion of the entity
-	 * @returns {Array<Entity>}
-	 * @example EntityBuilder.getEntityAtPos({0, 5, 0} 'nether');
-	 */
-	getAtPos({ x, y, z }, dimension = "overworld") {
-		try {
-			// @ts-expect-error
-			return world[dimension].getEntitiesAtBlockLocation({
-				x: x,
-				y: y,
-				z: z,
-			});
-		} catch (error) {
-			return [];
-		}
-	},
-	/**
-	 * Returns a location of the inputed aguments
-	 * @param {{location: Vector3}} entity your using
-	 * @param {number} [n] how many you want to get
-	 * @param {number} [maxDistance] max distance away
-	 * @param {string} [type] type of entity you want to get
-	 * @returns {Array<Entity>}
-	 * @example getClosetsEntitys(Entity, n=1, maxDistance = 10, type = Entity.type)
-	 */
-	getClosetsEntitys(entity, maxDistance = null, type, n = 2, shift = true) {
-		/**
-		 * @type {import("@minecraft/server").EntityQueryOptions}
-		 */
-		let q = {};
-		q.location = entity.location;
-		if (n) q.closest = n;
-		if (type) q.type = type;
-
-		if (maxDistance) q.maxDistance = maxDistance;
-		let entitys = [...world.overworld.getEntities(q)];
-		if (shift) entitys.shift();
-		return entitys;
 	},
 	/**
 	 * Returns a location of the inputed aguments
@@ -110,41 +49,13 @@ export const XEntity = {
 		tags.forEach((tag) => (tag.startsWith(value) ? entity.removeTag(tag) : ""));
 	},
 	/**
-	 * Get score of an entity
-	 * @param {Entity} entity you want to test
-	 * @param {string} objective Objective name you want to search
-	 * @returns {number} 0
-	 * @example getScore(Entity, 'Money');
-	 */
-	getScore(entity, objective) {
-		try {
-			return world.scoreboard
-				.getObjective(objective)
-				.getScore(entity.scoreboardIdentity);
-		} catch (error) {
-			return 0;
-		}
-	},
-	/**
-	 * Tests if a entity is dead
-	 * @param {{hasComponent(s: string): boolean; getComponent(s: string): any}} entity entity you want to test
-	 * @returns {boolean}
-	 * @example isDead(Entity);
-	 */
-	isDead(entity) {
-		return (
-			entity.hasComponent("minecraft:health") &&
-			entity.getComponent("minecraft:health").current <= 0
-		);
-	},
-	/**
 	 * Gets items count from inventory
 	 * @param {Entity} entity entity from you want to get
 	 * @param {string} id
 	 * @returns {number}
 	 */
 	getItemsCount(entity, id) {
-		const inventory = this.getI(entity);
+		const inventory = entity.getComponent("inventory").container;
 		let count = 0;
 		for (let i = 0; i < inventory.size; i++) {
 			const item = inventory.getItem(i);
@@ -174,15 +85,6 @@ export const XEntity = {
 		}
 	},
 	/**
-	 * Gets the inventory of a entity
-	 * @param {Entity} entity entity you want to get
-	 * @returns {Container}
-	 */
-	getI(entity) {
-		// @ts-ignore
-		return entity.getComponent("minecraft:inventory").container;
-	},
-	/**
 	 * Gets a players held item
 	 * @param {Player} player player you want to get
 	 * @returns {ItemStack}
@@ -190,7 +92,7 @@ export const XEntity = {
 	 */
 	getHeldItem(player) {
 		try {
-			const inventory = XEntity.getI(player);
+			const inventory = player.getComponent("inventory").container;
 			return inventory.getItem(player.selectedSlot);
 		} catch (error) {}
 	},

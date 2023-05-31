@@ -1,14 +1,14 @@
 import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
-export const OptionsNameSymbol = Symbol("name");
+export const OPTIONS_NAME = Symbol("name");
 
 /**
  * @typedef {string | boolean | number | JSONLike} Option
  */
 
 /**
- * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OptionsNameSymbol]?: string}} DefaultConfig
+ * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OPTIONS_NAME]?: string}} DefaultConfig
  * @template [T = boolean | string | number]
  */
 
@@ -45,7 +45,7 @@ export class Options {
 	 * @returns {(player: Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
 	 */
 	static player(name, prefix, CONFIG) {
-		CONFIG[OptionsNameSymbol] = name;
+		CONFIG[OPTIONS_NAME] = name;
 
 		if (!(prefix in this.PLAYER)) {
 			this.PLAYER[prefix] = CONFIG;

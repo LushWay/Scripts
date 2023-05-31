@@ -1,12 +1,12 @@
 import { Player, Vector, system, world } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { Options } from "xapi.js";
 import { SERVER } from "./var.js";
 
-const options = XA.WorldOptions("server", {
+const options = Options.world("server", {
 	zone_center: { desc: "Точка", value: { x: 0, z: 0 }, name: "Центр зоны" },
 	zone_size: { name: "Размер зоны", desc: "", value: 100 },
 	zone_is_for_players: {
-		name: "Игровая",
+		name: "Динамическая",
 		desc: "Зависимость зоны от кол-ва игроков",
 		value: true,
 	},

@@ -1,14 +1,12 @@
 import {
 	MinecraftBlockTypes,
-	MinecraftDimensionTypes,
 	Player,
 	system,
 	Vector,
 	world,
 } from "@minecraft/server";
 import { MessageForm } from "lib/Form/MessageForm.js";
-import { createWaiter } from "xapi.js";
-import { Database } from "../../../lib/Database/Rubedo.js";
+import { util, Database } from "xapi.js";
 import { CubeRegion, Region } from "../../Server/Region/Region.js";
 
 const DB = new Database("buildRegion");
@@ -115,16 +113,16 @@ export async function CreateRegion(player, tp = true) {
 export async function fillRegion(from, to) {
 	const firstLoc = { x: from.x, y: squarePlace, z: from.z };
 	const secondLoc = { x: to.x, y: squarePlace, z: to.z };
-	const exec = createWaiter(10);
+	const waiter = util.waitEach(10);
 	for (const loc of Vector.foreach(
 		Vector.add(firstLoc, Vector.up),
 		Vector.add(secondLoc, Vector.up)
 	)) {
-		await exec();
+		await waiter();
 		world.overworld.getBlock(loc).setType(MinecraftBlockTypes.grass);
 	}
 	for (const loc of Vector.foreach(firstLoc, secondLoc)) {
-		await exec();
+		await waiter();
 		world.overworld.getBlock(loc).setType(MinecraftBlockTypes.allow);
 	}
 }

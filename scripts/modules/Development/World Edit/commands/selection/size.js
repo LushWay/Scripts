@@ -1,8 +1,7 @@
 import { Vector } from "@minecraft/server";
-import { XA } from "xapi.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
-new XA.Command({
+new XCommand({
 	type: "wb",
 	name: "size",
 	description: "Получет информация о выделенной зоне",

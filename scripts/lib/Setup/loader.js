@@ -1,5 +1,5 @@
 import { system, world } from "@minecraft/server";
-import { handle } from "./utils.js";
+import { util } from "./utils.js";
 
 var WORLD_IS_LOADED = false;
 
@@ -30,7 +30,7 @@ var ON_LOAD_PROMISE = new Promise((resolve) =>
  * @param {(func: FN) => any} handler
  * @returns {void}
  */
-export function onWorldLoad(callback, handler = (func) => handle(func)) {
+export function onWorldLoad(callback, handler = (func) => util.handle(func)) {
 	if (WORLD_IS_LOADED) return handler(callback);
 
 	ON_LOAD_CALLBACKS.push(() => handler(callback));

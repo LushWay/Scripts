@@ -1,15 +1,11 @@
 import { addMethod, editMethod } from "../patcher.js";
-import { toStr } from "../utils.js";
+import { util } from "../utils.js";
 
 /**
  * Common JavaScript objects
  *
  *
  */
-
-addMethod(Function.prototype, "typedBind", function (context) {
-	return this.bind(context);
-});
 
 addMethod(JSON, "safeParse", (str, reciever, onError) => {
 	try {
@@ -20,6 +16,10 @@ addMethod(JSON, "safeParse", (str, reciever, onError) => {
 });
 
 addMethod(Math, "randomInt", function (min, max) {
+	return ~~(min + Math.random() * (max - min));
+});
+
+addMethod(Math, "randomFloat", function (min, max) {
 	return min + Math.random() * (max - min);
 });
 
@@ -28,7 +28,7 @@ addMethod(Array, "equals", function (one, two) {
 });
 
 editMethod(console, "warn", ({ original, args }) => {
-	original(...args.map((e) => (typeof e === "string" ? e : toStr(e))));
+	original(...args.map((e) => (typeof e === "string" ? e : util.inspect(e))));
 });
 
 globalThis.nextTick = null;

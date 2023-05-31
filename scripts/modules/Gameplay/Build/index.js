@@ -1,16 +1,16 @@
 import { MinecraftEffectTypes, system, world } from "@minecraft/server";
 import { IS } from "xapi.js";
+import { CONFIG } from "../../../config.js";
 import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
-import { setRegionGuards } from "../../Server/Region/index.js";
+import { loadRegionsWithGuards } from "../../Server/Region/index.js";
 import "./menu.js";
-import { CONFIG } from "../../../config.js";
 
 const GLOBAL_ALLOWED_ENTITIES = ["minecraft:player", "minecraft:item"].concat(
 	CONFIG.system_entities
 );
 
-setRegionGuards(
+loadRegionsWithGuards(
 	// Common actions guard
 	(player, region) =>
 		IS(player.id, "builder") || region.permissions.owners.includes(player.id),

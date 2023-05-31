@@ -1,5 +1,5 @@
 import { Entity, Vector } from "@minecraft/server";
-import { XA } from "xapi.js";
+import { XCommand } from "xapi.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 /**
@@ -28,7 +28,7 @@ function getChunkCuboidPositions(entity) {
 	};
 }
 
-new XA.Command({
+new XCommand({
 	type: "wb",
 	name: "chunk",
 	description: "Set the selection to your current chunk.",

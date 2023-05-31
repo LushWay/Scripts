@@ -24,7 +24,7 @@ interface JSON {
 }
 
 interface Function {
-	typedBind<fn extends Function>(this: fn, context: object): fn;
+	bind<fn extends Function>(this: fn, context: object, agrs: any): fn;
 }
 
 interface ArrayConstructor {
@@ -38,5 +38,9 @@ interface ArrayConstructor {
 
 interface Math {
 	randomInt(minimum: number, maximum: number): number;
+	randomFloat(minimum: number, maximum: number): number;
 }
 
+interface ObjectConstructor {
+	keys<T extends object>(o: T): Array<keyof T>;
+}

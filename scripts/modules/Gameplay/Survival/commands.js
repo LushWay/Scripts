@@ -1,6 +1,6 @@
 import { SERVER } from "../../Server/Server/var.js";
 
-// new XA.Command({
+// new XCommand({
 // 	name: "resetpos",
 // 	description: "Удаляет информацию о позиции на анархии",
 // 	type: "public",
@@ -9,7 +9,7 @@ import { SERVER } from "../../Server/Server/var.js";
 // 	ctx.reply(XA.tables.player.delete("POS:" + ctx.sender.id) + "");
 // });
 
-new XA.Command({
+new XCommand({
 	name: "radius",
 	description: "Выдает радиус границы анархии сейчас",
 	type: "public",

@@ -1,8 +1,7 @@
-import { XA } from "xapi.js";
 import { SelectionBuild } from "../../builders/SelectionBuilder.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
-const expand = new XA.Command({
+const expand = new XCommand({
 	type: "wb",
 	name: "expand",
 	description: "Expand the selection area",

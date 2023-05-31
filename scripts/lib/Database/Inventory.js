@@ -6,7 +6,7 @@ import {
 	Player,
 	system,
 } from "@minecraft/server";
-import { DisplayError } from "../Setup/utils.js";
+import { util } from "../Setup/utils.js";
 import { DB } from "./Default.js";
 
 const TABLE_TYPE = "inventory";
@@ -30,7 +30,7 @@ const TABLE_TYPE = "inventory";
  *   slots: Array<number | Equipment>
  *   xp: number;
  *   health: number;
- * }} Manifest
+ * }} StoreManifest
  */
 
 export class InventoryStore {
@@ -145,7 +145,7 @@ export class InventoryStore {
 
 			// Finding manifest
 			if (raw && raw[0] === "{" && raw[raw.length - 1] === "}") {
-				/** @type {Manifest} */
+				/** @type {StoreManifest} */
 				const manifest = JSON.safeParse(raw);
 
 				// No data means that this isnt manifest, do nothing
@@ -176,7 +176,7 @@ export class InventoryStore {
 			}
 
 			if (!slots)
-				return DisplayError(
+				return util.error(
 					new Error(
 						`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`
 					),
@@ -203,7 +203,7 @@ export class InventoryStore {
 			const store = this._.STORES[owner];
 			const storeIndex = items.length;
 
-			/** @type {Manifest} */
+			/** @type {StoreManifest} */
 			const manifest = {
 				health: store.health,
 				xp: store.xp,
@@ -211,9 +211,7 @@ export class InventoryStore {
 				slots: [],
 			};
 
-			for (const key in store.equipment) {
-				if (!XA.Utils.isKeyof(key, store.equipment)) continue;
-
+			for (const key of Object.keys(store.equipment)) {
 				if (!store.equipment[key]) continue;
 				const move = manifest.slots.push(key);
 				items[storeIndex + move] = store.equipment[key];

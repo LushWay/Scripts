@@ -1,7 +1,5 @@
 import { AfterEvents, Player, Vector, system, world } from "@minecraft/server";
-import { XA } from "xapi.js";
-import { EventSignal } from "../../../../lib/Class/Events.js";
-import { rd } from "../../Airdrops/index.js";
+import { EventSignal, XA, XEntity } from "xapi.js";
 import { NO_PVP_MODE } from "../../Indicator/var.js";
 import { teleportToBR } from "./index.js";
 import { rtp } from "./rtp.js";
@@ -47,14 +45,12 @@ class BattleRoyal {
 	async waitToRespawn(name) {
 		let C = 0;
 
-		while (
-			world.overworld.runCommand("testfor " + name).successCount < 1 &&
-			C < 100
-		) {
+		while (world.overworld.runCommand("testfor " + name) < 1 && C < 100) {
 			await system.sleep(5);
 			C++;
 		}
-		EventSignal.emit(BATTLE_ROYAL_EVENTS.playerJoin, XA.Entity.fetch(name));
+
+		EventSignal.emit(BATTLE_ROYAL_EVENTS.playerJoin, XEntity.fetch(name));
 	}
 
 	/**
@@ -86,15 +82,13 @@ class BattleRoyal {
 			this.game.startrad = this.game.rad;
 
 			// Центр
-			this.center.z = rd(
+			this.center.z = Math.randomInt(
 				this.pos.z + 128 + 50,
-				this.pos.z + 128 - 50,
-				"centerZ"
+				this.pos.z + 128 - 50
 			);
-			this.center.x = rd(
+			this.center.x = Math.randomInt(
 				this.pos.x + 128 + 50,
-				this.pos.x + 128 - 50,
-				"centerX"
+				this.pos.x + 128 - 50
 			);
 
 			/**
@@ -120,7 +114,7 @@ class BattleRoyal {
 			// Для каждого игрока
 			for (const e of players) {
 				// Тэги
-				const p = XA.Entity.fetch(e);
+				const p = XEntity.fetch(e);
 				this.tags.forEach((e) => p.addTag(e));
 				NO_PVP_MODE.push(p.id);
 
@@ -177,7 +171,7 @@ class BattleRoyal {
 							// 		p = JSON.parse(val);
 							// 	} catch (e) {}
 							// 	for (const pos of p) {
-							// 		XA.runCommandX(
+							// 		world.overworld.runCommand(
 							// 			`particle minecraft:campfire_smoke_particle ${pos}`
 							// 		);
 							// 	}
@@ -360,10 +354,12 @@ class BattleRoyal {
 			 * @type {Player}
 			 */
 			const winner = ex;
-			if (typeof winner == "object" && XA.Entity.fetch(winner.name)) {
+			if (typeof winner == "object" && XEntity.fetch(winner.name)) {
 				winner.tell(XA.Lang.lang["br.end.winner"](this.reward));
-				XA.runCommandX(`title "${winner.name}" title §6Ты победил!`);
-				XA.runCommandX(
+				world.overworld.runCommand(
+					`title "${winner.name}" title §6Ты победил!`
+				);
+				world.overworld.runCommand(
 					`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`
 				);
 				this.players

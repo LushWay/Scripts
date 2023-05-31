@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes, world } from "@minecraft/server";
-import { DisplayError, XA } from "xapi.js";
+import { Cooldown, util } from "xapi.js";
 
 /**
  *
@@ -11,7 +11,7 @@ export function setblock(blockTypeID, location) {
 	if (blockTypeID.includes(".") || blockTypeID === "air") {
 		// Block is written like "stone.3", so we need to get data and id
 		const [_, id, data] = /^(.+)\.(\d+)/g.exec(blockTypeID);
-		XA.runCommandX(
+		world.overworld.runCommand(
 			`setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`,
 			{ showError: true }
 		);
@@ -21,7 +21,7 @@ export function setblock(blockTypeID, location) {
 			`minecraft:${blockTypeID.replace("minecraft:", "")}`
 		);
 		if (!blockType)
-			return DisplayError(
+			return util.error(
 				new TypeError(`BlockType ${blockTypeID} does not exist!`)
 			);
 		world.overworld.getBlock(location).setType(blockType);
@@ -49,7 +49,7 @@ export function get(ms) {
 				.replace(/(\.[1-9]*)0+$/m, "$1")
 				.replace(/\.$/m, "");
 
-			type = XA.Cooldown.getT(parsedTime, valueType);
+			type = Cooldown.getT(parsedTime, valueType);
 		}
 	};
 

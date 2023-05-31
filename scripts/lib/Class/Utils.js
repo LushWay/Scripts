@@ -63,15 +63,7 @@ const blockModifiers = [
 	},
 ];
 
-export const XUtils = {
-	/**
-	 * @param {string | symbol | number} str
-	 * @param {{[]: any}} obj
-	 * @returns {str is keyof obj}
-	 */
-	isKeyof(str, obj) {
-		return str in obj;
-	},
+export const GameUtils = {
 	/**
 	 *
 	 * @param {ItemStack} item
@@ -110,7 +102,7 @@ export const XUtils = {
 		 */
 		const form = new ActionFormData();
 
-		const nativeAddButton = form.button.typedBind(form);
+		const nativeAddButton = form.button.bind(form);
 		form.buffer = (text, iconPath) => {
 			blocks.push("buffer");
 			nativeAddButton(text, iconPath);

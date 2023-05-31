@@ -1,6 +1,4 @@
-import { XA } from "xapi.js";
-
-new XA.Command({
+new XCommand({
 	type: "wb",
 	name: "wand",
 	description: "Выдет топор",
@@ -8,5 +6,3 @@ new XA.Command({
 }).executes((ctx) => {
 	ctx.sender.runCommandAsync(`give @s we:wand`);
 });
-
-

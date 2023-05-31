@@ -1,7 +1,6 @@
-import { XCommand } from "lib/Command/index.js";
-import { XA } from "xapi.js";
+import { XEntity } from "xapi.js";
 
-const lore = new XA.Command({
+const lore = new XCommand({
 	name: "lore",
 	aliases: ["l"],
 	role: "moderator",
@@ -14,7 +13,7 @@ lore
 	.literal({ name: "run" })
 	.string("command")
 	.executes((ctx, command) => {
-		let item = XA.Entity.getHeldItem(ctx.sender);
+		let item = XEntity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 
@@ -31,14 +30,14 @@ lore
 		item.nameTag = `§r§aW► §f${commandd}`;
 		lore[1] = commandd;
 		item.setLore(lore);
-		XA.Entity.getI(ctx.sender);
+		ctx.sender.getComponent("inventory").container;
 	});
 
 lore
 	.literal({ name: "rune" })
 	.string("command")
 	.executes((ctx, command) => {
-		const item = XA.Entity.getHeldItem(ctx.sender);
+		const item = XEntity.getHeldItem(ctx.sender);
 		if (!item || item.typeId != "we:tool")
 			return ctx.reply(`§cТы держишь не tool!`);
 		let lore = item.getLore();
@@ -54,18 +53,22 @@ lore
 		item.nameTag = `§r§aW► §f${commandd}`;
 		lore[1] = commandd;
 		item.setLore(lore);
-		XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+		ctx.sender
+			.getComponent("inventory")
+			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§aE► §f${commandd}`);
 	});
 
 lore.literal({ name: "viewtp" }).executes((ctx) => {
-	const item = XA.Entity.getHeldItem(ctx.sender);
+	const item = XEntity.getHeldItem(ctx.sender);
 	if (!item || item.typeId != "we:tool")
 		return ctx.reply(`§cТы держишь не tool!`);
 	let lore = item.getLore();
 	lore[0] = "viewTP";
 	item.nameTag = `§r§a► ViewTP}`;
 	item.setLore(lore);
-	XA.Entity.getI(ctx.sender).setItem(ctx.sender.selectedSlot, item);
+	ctx.sender
+		.getComponent("inventory")
+		.container.setItem(ctx.sender.selectedSlot, item);
 	ctx.reply(`§a► §rРежим инструмента изменен на телепорт по взгляду`);
 });

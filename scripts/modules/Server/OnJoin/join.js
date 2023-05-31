@@ -1,7 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { Database } from "lib/Database/Rubedo.js";
-import { XA } from "xapi.js";
-import { EventSignal } from "../../../lib/Class/Events.js";
+import { Database, EventSignal, Options, XA } from "xapi.js";
 import "./subscribes.js";
 import { JOIN_CONFIG, JOIN_EVENTS } from "./var.js";
 
@@ -131,7 +129,7 @@ system.runPlayerInterval(
 	20
 );
 
-const getSettings = XA.PlayerOptions("Вход", "join", {
+const getSettings = Options.player("Вход", "join", {
 	message: {
 		desc: "Сообщения о входе других игроков",
 		value: true,
@@ -176,7 +174,7 @@ function JOIN(player, data, messageType) {
 	data.name = player.name;
 }
 
-new XA.Command({
+new XCommand({
 	name: "info",
 	description: "Открывает гайд",
 	type: "public",
@@ -186,7 +184,7 @@ new XA.Command({
 	PDB.set(ctx.sender.id, D);
 });
 
-new XA.Command({
+new XCommand({
 	name: "join",
 	role: "admin",
 	description: "Имитирует вход",
