@@ -217,7 +217,8 @@ const tests = {
 		ctx.reply(bar);
 	},
 	async 51(ctx) {
-		ctx.reply(await fetch("index", {}));
+		const res = await fetch("index", { data: true });
+		console.warn(util.inspect(res, " ").replace(/§./g, ""));
 	},
 };
 
