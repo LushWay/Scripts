@@ -168,6 +168,7 @@ const table = new LootTable(
 
 new XCommand({
 	name: "loott",
+	role: "admin",
 }).executes((ctx) => {
 	const { container } = ctx.sender.getComponent("inventory");
 	const gen = table.generate(container.size, "30%");

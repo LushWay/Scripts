@@ -2,12 +2,24 @@
 # yarn lockfile v1
 
 
+"@minecraft/server-admin@1.0.0-beta.1.20.10-preview.20":
+  version "1.0.0-beta.1.20.10-preview.20"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.1.20.10-preview.20.tgz#0a7bb907f48f38c8b2ff7a6fce53bdd903fa2b38"
+  integrity sha512-t/S41A7UKUPqj7GLHQHNujk22xP2ydxkE1X/KIH7u+0Xq9YI/vGueAT1K0nQitGIRbfa/XV8R7YYBfdlIeufUA==
+
 "@minecraft/server-gametest@1.0.0-beta.1.20.10-preview.20":
   version "1.0.0-beta.1.20.10-preview.20"
   resolved "https://registry.yarnpkg.com/@minecraft/server-gametest/-/server-gametest-1.0.0-beta.1.20.10-preview.20.tgz#713f5a166cc4fe3a1c6953b3d40adff2b2c19b5c"
   integrity sha512-Y31XfgOhNSPOG8bnhisNwA3N4S/+ZiodJ2122MUSWqY4gcyux7ZbD/n2mhR/fVWr34DsK+ricHrWsUmMMqq1aA==
   dependencies:
     "@minecraft/server" "1.4.0-beta.1.20.10-preview.20"
+
+"@minecraft/server-net@^1.0.0-beta.1.20.10-preview.20":
+  version "1.0.0-beta.1.20.10-preview.20"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-net/-/server-net-1.0.0-beta.1.20.10-preview.20.tgz#f71e7c3275788a130fa6d42b85e64de82cc34119"
+  integrity sha512-/oZQbNYLTmIKJ1nuKErv5liYprDVFJflBNQ53wOQfvteQUw2AmkQ557cMlAA1z/6LLq7c7t8mD4TTY+tLN0tDA==
+  dependencies:
+    "@minecraft/server-admin" "1.0.0-beta.1.20.10-preview.20"
 
 "@minecraft/server-ui@1.1.0-beta.1.20.10-preview.20":
   version "1.1.0-beta.1.20.10-preview.20"

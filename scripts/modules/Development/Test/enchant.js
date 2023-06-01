@@ -5,6 +5,7 @@ import { Enchantments } from "../../Gameplay/Loot/enchantments.js";
 new XCommand({
 	name: "enchant",
 	description: "Зачаровывает предмет",
+	role: "admin",
 })
 	.array("enchantName", Object.keys(MinecraftEnchantmentTypes), true)
 	.int("level", true)

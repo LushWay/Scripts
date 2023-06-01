@@ -7,6 +7,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
+import { fetch } from "lib/Class/Net.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
@@ -214,6 +215,9 @@ const tests = {
 		}
 
 		ctx.reply(bar);
+	},
+	async 51(ctx) {
+		ctx.reply(await fetch("index", {}));
 	},
 };
 
