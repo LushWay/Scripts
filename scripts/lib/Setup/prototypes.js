@@ -6,3 +6,4 @@ import "./Extensions/system.js";
 import "./Extensions/vector.js";
 import "./Extensions/world.js";
 import "./Extensions/dimension.js";
+import "./Extensions/itemstack.js";

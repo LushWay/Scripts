@@ -27,6 +27,10 @@ addMethod(Array, "equals", function (one, two) {
 	return one.every((e, i) => e === two[i]);
 });
 
+addMethod(Array.prototype, "randomElement", function () {
+	return this[~~(Math.random() * (this.length - 1))];
+});
+
 editMethod(console, "warn", ({ original, args }) => {
 	original(...args.map((e) => (typeof e === "string" ? e : util.inspect(e))));
 });

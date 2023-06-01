@@ -26,7 +26,7 @@ type AllTypes =
 	| "function";
 
 type RandomCostMapType = {
-	[key: `${number}...${number}` | number]: `${number}%`;
+	[key: `${number}...${number}` | number]: percent;
 };
 
 type Range<F extends number, T extends number> =
@@ -39,3 +39,5 @@ type Enumerate<
 > = Acc["length"] extends N
 	? Acc[number]
 	: Enumerate<N, [...Acc, Acc["length"]]>;
+
+type percent = `${number}%`;

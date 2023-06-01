@@ -5,7 +5,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { DB, EventSignal, util } from "xapi.js";
-import { MinecraftEnchantmentTypes } from "../../../lib/List/enchantments.js";
+import { MinecraftEnchantmentTypes } from "lib/List/enchantments.js";
 
 const ON_LOAD = new EventSignal();
 const LOCATION = { x: 0, y: -10, z: 0 };

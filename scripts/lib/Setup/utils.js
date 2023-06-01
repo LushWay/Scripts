@@ -198,4 +198,13 @@ export const util = {
 			}
 		};
 	},
+
+	/**
+	 * @param {string | symbol | number} str
+	 * @param {{[]: any}} obj
+	 * @returns {str is keyof obj}
+	 */
+	isKeyof(str, obj) {
+		return str in obj;
+	},
 };

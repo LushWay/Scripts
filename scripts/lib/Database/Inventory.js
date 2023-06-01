@@ -7,7 +7,7 @@ import {
 	system,
 } from "@minecraft/server";
 import { util } from "../Setup/utils.js";
-import { DB } from "./Default.js";
+import { DB, DatabaseError } from "./Default.js";
 
 const TABLE_TYPE = "inventory";
 
@@ -282,18 +282,18 @@ export class InventoryStore {
 	}
 	/**
 	 * Gets entity store from saved and removes to avoid bugs
-	 * @param {string} entityID - The ID of the entity whose store is being retrieved.
+	 * @param {string} key - The ID of the entity whose store is being retrieved.
 	 * @param {boolean} remove - A boolean parameter that determines whether the entity store should be
 	 * removed from the internal stores object after it has been retrieved. If set to true, the store will
 	 * be deleted from the object. If set to false, the store will remain in the object.
 	 * @returns the entity store associated with the given entity ID.
 	 */
-	getEntityStore(entityID, remove = true) {
-		if (!(entityID in this._.STORES))
-			throw new ReferenceError("Not found inventory!");
+	getEntityStore(key, remove = true) {
+		if (!(key in this._.STORES))
+			throw new DatabaseError("Not found inventory!");
 
-		const store = this._.STORES[entityID];
-		if (remove) delete this._.STORES[entityID];
+		const store = this._.STORES[key];
+		if (remove) delete this._.STORES[key];
 		return store;
 	}
 	/**
@@ -302,16 +302,20 @@ export class InventoryStore {
 	 * @param {object} options - Options
 	 * @param {boolean} [options.rewrite] - A boolean parameter that determines whether or not to allow rewriting of an
 	 * existing entity in the store. If set to false and the entity already exists in the store, a
-	 * ReferenceError will be thrown. If set to true, the existing entity will be overwritten with the new
+	 * DatabaseError will be thrown. If set to true, the existing entity will be overwritten with the new
 	 * entity.
 	 * @param {boolean} [options.keepInventory] - A boolean that determines keep entity's invetory or not
+	 * @param {string} [options.key] - Key to associate inventory with
 	 */
-	saveFromEntity(entity, { rewrite = false, keepInventory = false } = {}) {
-		if (entity.id in this._.STORES && !rewrite)
-			throw new ReferenceError(
+	saveFromEntity(
+		entity,
+		{ rewrite = false, keepInventory = false, key = entity.id } = {}
+	) {
+		if (key in this._.STORES && !rewrite)
+			throw new DatabaseError(
 				"Failed to rewrite entity store with disabled rewriting."
 			);
-		this._.STORES[entity.id] = InventoryStore.get(entity);
+		this._.STORES[key] = InventoryStore.get(entity);
 		if (!keepInventory) entity.getComponent("inventory").container.clearAll();
 
 		this.requestSave();

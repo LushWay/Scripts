@@ -36,6 +36,13 @@ interface ArrayConstructor {
 	equals(one: any[], two: any[]): boolean;
 }
 
+interface Array<T> {
+	/**
+	 * Returns random array element. Alias to Array[{@link Math.randomInt}(0, Array.length - 1)]
+	 */
+	randomElement(): T;
+}
+
 interface Math {
 	randomInt(minimum: number, maximum: number): number;
 	randomFloat(minimum: number, maximum: number): number;

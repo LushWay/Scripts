@@ -3,11 +3,11 @@ export const RandomCost = {
 	 * @param {RandomCostMapType} inputMap
 	 */
 	toArray(inputMap) {
-		/** @type {Array<number>} */
-		const newMap = [];
+		/** @type {Record<number, number>} */
+		const newMap = {};
 
 		for (const [range, rawValue] of Object.entries(inputMap)) {
-			const value = parseInt(rawValue.substring(0, rawValue.length - 1));
+			const value = parseInt(rawValue.slice(0, -1));
 
 			if (range.includes(".")) {
 				// Extract `number...number`
@@ -41,20 +41,16 @@ export const RandomCost = {
 		}
 
 		/** @type {number[]} */
-		const finalMap = new Array(newMap.reduce((p, c) => p + c, 0));
+		const finalMap = new Array(
+			Object.values(newMap).reduce((p, c) => p + c, 0)
+		);
 
 		let i = 0;
-		for (const [key, value] of newMap.entries()) {
-			finalMap.fill(key, i, i + value);
+		for (const [key, value] of Object.entries(newMap)) {
+			finalMap.fill(Number(key), i, i + value);
 			i += value;
 		}
 
 		return finalMap;
-	},
-	/**
-	 * @param {Array<number>} map
-	 */
-	getElement(map) {
-		return map[Math.randomInt(0, map.length)];
 	},
 };

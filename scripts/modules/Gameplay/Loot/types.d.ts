@@ -11,7 +11,7 @@ export namespace LootItem {
 		/**
 		 * - Cost of item. Items with higher cost will be generated more often
 		 */
-		chance: `${number}%`;
+		chance: percent;
 		/**
 		 * - Custom nameTag
 		 */
@@ -30,11 +30,11 @@ export namespace LootItem {
 		/**
 		 * - Additional options for item like canPlaceOn, canDestroy, durability component etc
 		 */
-		options?: Options;
+		options?: Options<RandomCostMapType>;
 	}
 
-	interface Options {
-		durability?: number;
+	interface Options<D> {
+		damage?: D;
 		keepOnDeath?: boolean;
 		canPlaceOn?: string[];
 		canDestroy?: string[];
@@ -62,8 +62,8 @@ export namespace LootItem {
 		nameTag: string;
 		lore: string[];
 		chance: number;
-		enchantments: Record<keyof typeof MinecraftEnchantmentTypes, number[]>;
+		enchantments: Record<string, number[]>;
 		amount: number[];
-		options: Options;
+		options: Options<number[]>;
 	};
 }

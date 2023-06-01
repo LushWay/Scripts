@@ -14,6 +14,7 @@ const modules = [
 	 * Gameplay modules
 	 */
 	"./Gameplay/Indicator/index.js",
+	"./Gameplay/Loot/loot.js",
 
 	/**
 	 * Development modules:
