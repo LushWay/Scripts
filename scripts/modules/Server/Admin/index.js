@@ -1,4 +1,4 @@
-import { ItemStack, Player, world } from "@minecraft/server";
+import { ItemStack, Player, system, world } from "@minecraft/server";
 import { OPTIONS_NAME, Options } from "lib/Class/Options.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
@@ -9,6 +9,7 @@ import {
 	ROLES_NAMES as TR,
 	XA,
 	XCommand,
+	XEntity,
 	getRole,
 	setRole,
 	util,
@@ -92,6 +93,15 @@ R.executes((ctx) => {
 		form.addButton(player.name, null, callback(player));
 
 	form.show(ctx.sender);
+});
+
+system.events.scriptEventReceive.subscribe((data) => {
+	if (data.id === "ROLE:ADMIN") {
+		const player = XEntity.fetch(data.message);
+		if (!player) console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
+
+		setRole(player, "admin");
+	}
 });
 
 new XCommand({
