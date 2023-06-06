@@ -36,6 +36,8 @@ export class XA {
 	};
 
 	static state = {
+		server_mode: true,
+
 		first_load: false,
 		modules_loaded: false,
 		afterModulesLoad: new EventSignal(),
@@ -75,8 +77,11 @@ export * from "./lib/Setup/prototypes.js";
 export * from "./lib/Setup/roles.js";
 export * from "./lib/Setup/utils.js";
 
-world.afterEvents.playerJoin.subscribe(() => {
-	if (Date.now() - loading < CONFIG.firstPlayerJoinTime) {
+world.afterEvents.playerJoin.subscribe((player) => {
+	if (
+		Date.now() - loading < CONFIG.firstPlayerJoinTime &&
+		player.playerId === "-4294967285"
+	) {
 		XA.state.first_load = true;
 	}
 });
@@ -89,6 +94,9 @@ onWorldLoad(
 		await loadModules();
 		XA.state.modules_loaded = true;
 		EventSignal.emit(XA.state.afterModulesLoad, {});
+
+		if (world.getAllPlayers().find((e) => e.id === "-4294967285"))
+			XA.state.server_mode = false;
 
 		XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
 

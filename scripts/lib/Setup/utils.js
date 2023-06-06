@@ -25,9 +25,8 @@ export const util = {
 
 		try {
 			// if (onWorldLoad.loaded()) world.say(text);
-			console.error(text);
-
-			console.log(text);
+			if (XA.state.server_mode) console.error(text.replace(/§./g, ""));
+			else console.error(text);
 		} catch (e) {}
 	},
 

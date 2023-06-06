@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@minecraft/server-admin@1.0.0-beta.1.20.10-preview.20":
-  version "1.0.0-beta.1.20.10-preview.20"
-  resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.1.20.10-preview.20.tgz#0a7bb907f48f38c8b2ff7a6fce53bdd903fa2b38"
-  integrity sha512-t/S41A7UKUPqj7GLHQHNujk22xP2ydxkE1X/KIH7u+0Xq9YI/vGueAT1K0nQitGIRbfa/XV8R7YYBfdlIeufUA==
+"@minecraft/server-admin@1.0.0-beta.11940b24":
+  version "1.0.0-beta.11940b24"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.11940b24.tgz#9c37bbeb41cf6bb65e60a819f82b19ade1ae0f36"
+  integrity sha512-UZ8YyB8mvF31f22+uM67gJums9d6NDgz9AQ2l4a++EHUP9uen0m3aaBaqM9RyumJpRBJbv/hslAKOyeDT01qew==
 
-"@minecraft/server-gametest@1.0.0-beta.1.20.10-preview.20":
+"@minecraft/server-gametest@1.0.0-beta.1.20.10-preview.210":
   version "1.0.0-beta.1.20.10-preview.20"
   resolved "https://registry.yarnpkg.com/@minecraft/server-gametest/-/server-gametest-1.0.0-beta.1.20.10-preview.20.tgz#713f5a166cc4fe3a1c6953b3d40adff2b2c19b5c"
   integrity sha512-Y31XfgOhNSPOG8bnhisNwA3N4S/+ZiodJ2122MUSWqY4gcyux7ZbD/n2mhR/fVWr34DsK+ricHrWsUmMMqq1aA==
@@ -15,11 +15,11 @@
     "@minecraft/server" "1.4.0-beta.1.20.10-preview.20"
 
 "@minecraft/server-net@^1.0.0-beta.1.20.10-preview.20":
-  version "1.0.0-beta.1.20.10-preview.20"
-  resolved "https://registry.yarnpkg.com/@minecraft/server-net/-/server-net-1.0.0-beta.1.20.10-preview.20.tgz#f71e7c3275788a130fa6d42b85e64de82cc34119"
-  integrity sha512-/oZQbNYLTmIKJ1nuKErv5liYprDVFJflBNQ53wOQfvteQUw2AmkQ557cMlAA1z/6LLq7c7t8mD4TTY+tLN0tDA==
+  version "1.0.0-beta.11940b24"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-net/-/server-net-1.0.0-beta.11940b24.tgz#3e8792641a827c318a81e8288b9fd49117f3ab48"
+  integrity sha512-jiL03mGNpADCfvPDyydheEAhdi7J++nx5nB7Gyu3GImDlV5pv9uTwKCrnmILrLs4qJTtxhuRLKBKRlVyYDpKMw==
   dependencies:
-    "@minecraft/server-admin" "1.0.0-beta.1.20.10-preview.20"
+    "@minecraft/server-admin" "1.0.0-beta.11940b24"
 
 "@minecraft/server-ui@1.1.0-beta.1.20.10-preview.20":
   version "1.1.0-beta.1.20.10-preview.20"

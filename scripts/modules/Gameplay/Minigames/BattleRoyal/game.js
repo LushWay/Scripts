@@ -1,4 +1,4 @@
-import { AfterEvents, Player, Vector, system, world } from "@minecraft/server";
+import { Player, Vector, AfterEvents, system, world } from "@minecraft/server";
 import { EventSignal, XA, XEntity } from "xapi.js";
 import { NO_PVP_MODE } from "../../Indicator/var.js";
 import { teleportToBR } from "./index.js";

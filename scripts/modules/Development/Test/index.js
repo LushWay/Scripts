@@ -7,12 +7,13 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { fetch } from "lib/Class/Net.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
+import "lib/Net/mc.js";
 import { DB, GameUtils, InventoryStore, XEntity, util } from "xapi.js";
+import { MCApp } from "../../../lib/Net/mc.js";
 import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
 import "./enchant.js";
 
@@ -217,8 +218,11 @@ const tests = {
 		ctx.reply(bar);
 	},
 	async 51(ctx) {
-		const res = await fetch("index", { data: true });
-		console.warn(util.inspect(res, " ").replace(/§./g, ""));
+		const res = await MCApp.SendToNode("playerPlatform", {
+			playerName: ctx.sender.name,
+		});
+
+		console.warn(util.inspect(res).replace(/§./g, ""));
 	},
 };
 

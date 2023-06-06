@@ -10,4 +10,3 @@ system.events.beforeWatchdogTerminate.subscribe((event) => {
 	world.say("§cСобакаСутулая: §f" + reasons[event.terminateReason]);
 	event.cancel = true;
 });
-

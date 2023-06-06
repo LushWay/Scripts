@@ -8,8 +8,8 @@ var ON_LOAD_CALLBACKS = [];
 
 var ON_LOAD_PROMISE = new Promise((resolve) =>
 	system.run(async function waiter() {
-		const players = await world.overworld.runCommandAsync(`testfor @a`);
-		if (players.successCount < 1) {
+		const entities = await world.overworld.runCommandAsync(`testfor @e`);
+		if (entities.successCount < 1) {
 			// No players found, we need to re-run this...
 			return system.run(waiter);
 		}
