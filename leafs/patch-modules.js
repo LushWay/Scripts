@@ -3,6 +3,11 @@ import { m, patchPackage } from "./utils.js";
 
 patchPackage("@minecraft/server", {
 	classes: {
+	  EntityHealthComponent: m`
+	    defaultValue: number;
+	    currentValue: number;
+	    setCurrentValue(n: number): void;
+	  `,
 		Dimension: m`
     /**
      * Dimension type shortcut (id without namespace, e.g. "minecraft:")

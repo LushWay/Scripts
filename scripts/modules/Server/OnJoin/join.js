@@ -96,16 +96,12 @@ system.runPlayerInterval(
 					)
 						player.onScreenDisplay.setActionBar(JOIN_CONFIG.actionBar);
 
-					// Title + subtitle
-					/** @type {import("@minecraft/server").TitleDisplayOptions} */
-					const options = {
-						fadeInDuration: 0,
-						fadeOutDuration: 20,
-						stayDuration: 40,
-					};
-					if (JOIN_CONFIG.subtitle) options.subtitle = JOIN_CONFIG.subtitle;
-					// Show...
-					player.onScreenDisplay.setTitle(title, options);
+					player.onScreenDisplay.setTitle(title, {
+						fadeInSeconds: 0,
+						fadeOutSeconds: 1,
+						staySeconds: 2,
+						subtitle: JOIN_CONFIG.subtitle
+					});
 				} else {
 					// Player joined in air
 					JOIN(player, data, "air");
