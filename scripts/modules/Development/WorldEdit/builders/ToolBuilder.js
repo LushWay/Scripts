@@ -20,7 +20,7 @@ system.runPlayerInterval(
 		const lore = item.getLore();
 
 		if (lore[0] === "Particle") {
-			const block = player.getBlockFromViewDirection({
+			const { block } = player.getBlockFromViewDirection({
 				includeLiquidBlocks: false,
 				includePassableBlocks: false,
 				maxDistance: 50,
@@ -73,7 +73,7 @@ world.afterEvents.itemUse.subscribe((data) => {
 			data.source.runCommandAsync(lore[1]);
 		}
 		if (act === "viewTP") {
-			const block = data.source.getBlockFromViewDirection({});
+			const block = data.source.getBlockFromViewDirection().block;
 			if (block && block.location) data.source.teleport(block.location);
 		}
 	}

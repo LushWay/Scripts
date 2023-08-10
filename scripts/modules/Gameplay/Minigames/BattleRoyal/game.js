@@ -1,4 +1,10 @@
-import { Player, Vector, AfterEvents, system, world } from "@minecraft/server";
+import {
+	Player,
+	Vector,
+	WorldAfterEvents,
+	system,
+	world,
+} from "@minecraft/server";
 import { EventSignal, XA, XEntity } from "xapi.js";
 import { NO_PVP_MODE } from "../../Indicator/var.js";
 import { teleportToBR } from "./index.js";
@@ -7,7 +13,7 @@ import { BATTLE_ROYAL_EVENTS, BR_CONFIG, BR_DB } from "./var.js";
 import { zone } from "./zone.js";
 
 class BattleRoyal {
-	/** @type {{[Key in keyof AfterEvents]?: Parameters<AfterEvents[Key]["subscribe"]>[0]}} */
+	/** @type {{[Key in keyof WorldAfterEvents]?: Parameters<WorldAfterEvents[Key]["subscribe"]>[0]}} */
 	events;
 	constructor() {
 		this.dimension = world.overworld;

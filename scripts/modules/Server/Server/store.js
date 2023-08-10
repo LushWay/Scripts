@@ -231,14 +231,13 @@ function itemDescription(item, c = "§g") {
 	}`;
 }
 
-world.afterEvents.entityHit.subscribe((data) => {
-	if (!data.hitBlock) return;
+world.afterEvents.entityHitBlock.subscribe((event) => {
 	const store = Store.find(
-		data.hitBlock.location,
-		data.hitBlock.dimension.type
+		event.hitBlock.location,
+		event.hitBlock.dimension.type
 	);
 
-	if (!store || !(data.entity instanceof Player)) return;
+	if (!store || !(event.damagingEntity instanceof Player)) return;
 
-	store.open(data.entity);
+	store.open(event.damagingEntity);
 });

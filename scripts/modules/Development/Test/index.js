@@ -17,9 +17,9 @@ import { MCApp } from "../../../lib/Net/mc.js";
 import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
 import "./enchant.js";
 
-/**
- * @typedef {{x: number, z: number}} IRegionCords
- */
+world.afterEvents.chatSend.subscribe((event) => {
+	console.warn(event.sender + ": " + event.message);
+});
 
 /**
  * @type {Object<string, (ctx?: CommandContext) => void | Promise<any>>}
@@ -170,7 +170,7 @@ const tests = {
 		}
 	},
 	48(ctx) {
-		const block = ctx.sender.getBlockFromViewDirection({
+		const { block } = ctx.sender.getBlockFromViewDirection({
 			includeLiquidBlocks: false,
 			includePassableBlocks: false,
 			maxDistance: 50,
@@ -226,12 +226,12 @@ const tests = {
 	},
 };
 
-world.afterEvents.entityHit.subscribe((data) => {
-	if (data.entity instanceof Player) {
-		const axe = XEntity.getHeldItem(data.entity);
+world.afterEvents.entityHitEntity.subscribe((event) => {
+	if (event.damagingEntity instanceof Player) {
+		const axe = XEntity.getHeldItem(event.damagingEntity);
 		if (axe && !axe.typeId.includes("axe")) return;
 
-		data.entity.startItemCooldown("axe", 10);
+		event.damagingEntity.startItemCooldown("axe", 10);
 	}
 });
 

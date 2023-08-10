@@ -6,7 +6,7 @@ new XCommand({
 	description: "Set position 2 to targeted block",
 	role: "moderator",
 }).executes((ctx) => {
-	const pos = ctx.sender.getBlockFromViewDirection().location;
+	const pos = ctx.sender.getBlockFromViewDirection().block;
 	if (!pos) return ctx.reply("Неа!");
 
 	WorldEditBuild.pos2 = pos;

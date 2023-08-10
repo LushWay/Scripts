@@ -2,7 +2,6 @@ import {
 	EquipmentSlot,
 	ItemLockMode,
 	ItemStack,
-	MinecraftEffectTypes,
 	MinecraftItemTypes,
 	Player,
 	Vector,
@@ -10,6 +9,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { Database } from "xapi.js";
+import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.elytra, 1);
 const lore = ["§r§7Элитра перелета, пропадает на земле"];
@@ -50,7 +50,7 @@ export function randomTeleport(
 	const z = ~~Math.randomInt(from.z, to.z);
 
 	const d = world[dimension];
-	const block = d.getBlockFromRay({ x, y: y - 2, z }, Vector.down);
+	const { block } = d.getBlockFromRay({ x, y: y - 2, z }, Vector.down);
 	if (block) {
 		if ((y - block.y < fromYtoBlock || block.isLiquid()) && c < 10) {
 			c++;
@@ -76,7 +76,7 @@ export function randomTeleport(
 	if (elytra) giveElytra(target);
 	else {
 		target.addEffect(
-			MinecraftEffectTypes.slowFalling,
+			MinecraftEffectTypes.SlowFalling,
 			((y - 60) / 2 + keepInSkyTime) * 20,
 			{
 				amplifier: 1,

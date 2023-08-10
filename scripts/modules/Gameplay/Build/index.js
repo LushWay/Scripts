@@ -1,6 +1,7 @@
-import { MinecraftEffectTypes, system, world } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import { IS } from "xapi.js";
 import { CONFIG } from "../../../config.js";
+import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
 import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
 import { loadRegionsWithGuards } from "../../Server/Region/index.js";
@@ -39,7 +40,7 @@ system.runPlayerInterval((player) => {
 	const loc = player.location;
 	if (loc.y >= EFFECT_Y + 1) return;
 	if (loc.y < EFFECT_Y)
-		player.addEffect(MinecraftEffectTypes.levitation, 3, {
+		player.addEffect(MinecraftEffectTypes.Levitation, 3, {
 			amplifier: 7,
 			showParticles: false,
 		});

@@ -129,7 +129,7 @@ system.runInterval(
 			const LB = Leaderboard.ALL[id];
 
 			if (LB) {
-				if (LB.entity.lifetimeState === EntityLifetimeState.unloaded) continue;
+				if (LB.entity.lifetimeState === EntityLifetimeState.Unloaded) continue;
 				LB.updateLeaderboard();
 			} else {
 				const entity = world[leaderboard.dimension]
@@ -140,7 +140,7 @@ system.runInterval(
 					})
 					.find((e) => e.id === id);
 
-				if (!entity || entity.lifetimeState === EntityLifetimeState.unloaded)
+				if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded)
 					continue;
 				new Leaderboard(entity, leaderboard).updateLeaderboard();
 			}

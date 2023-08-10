@@ -26,7 +26,7 @@ class MinecraftManager {
 		if (NET) {
 			const res = await NET.http.request(
 				new NET.HttpRequest("http://localhost:9090/" + path)
-					.setMethod(NET.HttpRequestMethod.POST)
+					.setMethod(NET.HttpRequestMethod.Post)
 					.setHeaders([
 						new NET.HttpHeader("content-type", "text/plain"),
 						new NET.HttpHeader("content-length", sbody.length.toString()),
@@ -56,7 +56,7 @@ class MinecraftManager {
 	CHUNKS = {};
 
 	constructor() {
-		system.events.scriptEventReceive.subscribe(
+		system.afterEvents.scriptEventReceive.subscribe(
 			async (data) => {
 				try {
 					const path = data.id.replace(/^NODE:/, "");
@@ -69,16 +69,16 @@ class MinecraftManager {
 							/**
 							 * @type {import("../../../../../X-API-node/src/Net/routes.js").MCDataChunk}
 							 */
-							const dataChank = JSON.parse(data.message);
-							if (dataChank.done) {
+							const dataChunk = JSON.parse(data.message);
+							if (dataChunk.done) {
 								this.receiveDataFromNode(path, {
-									uuid: dataChank.uuid,
-									data: this.CHUNKS[dataChank.uuid] + dataChank.chunk,
+									uuid: dataChunk.uuid,
+									data: this.CHUNKS[dataChunk.uuid] + dataChunk.chunk,
 								});
 
-								delete this.CHUNKS[dataChank.uuid];
+								delete this.CHUNKS[dataChunk.uuid];
 							} else {
-								this.CHUNKS[dataChank.uuid] += dataChank.chunk;
+								this.CHUNKS[dataChunk.uuid] += dataChunk.chunk;
 							}
 						}
 					}
@@ -124,5 +124,5 @@ onWorldLoad(() => {
 		showError: true,
 		showOutput: true,
 	});
-	console.warn(o, "BBBBBBBBBB");
+	console.warn(o + "BBBBBBBBBB");
 });

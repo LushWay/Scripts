@@ -21,7 +21,7 @@ const modules = [
 	 */
 	"./Development/GameTest/index.js",
 	"./Development/Test/index.js",
-	"./Development/World Edit/WBindex.js",
+	"./Development/WorldEdit/WBindex.js",
 
 	"./Server/Objectives/index.js",
 ];

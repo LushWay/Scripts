@@ -97,10 +97,10 @@ system.runPlayerInterval(
 						player.onScreenDisplay.setActionBar(JOIN_CONFIG.actionBar);
 
 					player.onScreenDisplay.setTitle(title, {
-						fadeInSeconds: 0,
-						fadeOutSeconds: 1,
-						staySeconds: 2,
-						subtitle: JOIN_CONFIG.subtitle
+						fadeInDuration: 0,
+						fadeOutDuration: 20,
+						stayDuration: 40,
+						subtitle: JOIN_CONFIG.subtitle,
 					});
 				} else {
 					// Player joined in air

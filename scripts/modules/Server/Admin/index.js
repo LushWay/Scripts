@@ -95,9 +95,9 @@ R.executes((ctx) => {
 	form.show(ctx.sender);
 });
 
-system.events.scriptEventReceive.subscribe((data) => {
-	if (data.id === "ROLE:ADMIN") {
-		const player = XEntity.fetch(data.message);
+system.afterEvents.scriptEventReceive.subscribe((event) => {
+	if (event.id === "ROLE:ADMIN") {
+		const player = XEntity.fetch(event.message);
 		if (!player) console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
 
 		setRole(player, "admin");

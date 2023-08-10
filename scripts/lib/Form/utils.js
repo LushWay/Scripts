@@ -58,8 +58,7 @@ export class FormCallback {
 			.show(this.player);
 	}
 }
-
-const { userBusy, userClosed } = FormCancelationReason;
+const { UserBusy, UserClosed } = FormCancelationReason;
 
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it
@@ -75,9 +74,9 @@ export async function XShowForm(form, player) {
 		/** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
 		const response = await form.show(player);
 		if (response.canceled) {
-			if (response.cancelationReason === userClosed) return false;
+			if (response.cancelationReason === UserClosed) return false;
 
-			if (response.cancelationReason === userBusy) {
+			if (response.cancelationReason === UserBusy) {
 				// First attempt, maybe chat closed...
 				if (i === 1) {
 					player.closeChat();

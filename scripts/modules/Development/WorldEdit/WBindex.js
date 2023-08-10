@@ -64,7 +64,7 @@ system.runPlayerInterval(
 			const range = lore[3]?.replace("Range: ", "");
 			if (range) {
 				q.maxDistance = parseInt(range);
-				const block = p.getBlockFromViewDirection(q);
+				const { block } = p.getBlockFromViewDirection(q);
 				if (block) {
 					const ent1 = block.dimension.getEntitiesAtBlockLocation(
 						block.location
@@ -204,7 +204,7 @@ world.afterEvents.itemUse.subscribe((data) => {
 	const range = lore[3]?.replace("Range: ", "");
 	if (!shape || !blocks || !size || !range) return;
 
-	const block = data.source.getBlockFromViewDirection({
+	const { block } = data.source.getBlockFromViewDirection({
 		maxDistance: parseInt(range),
 	});
 

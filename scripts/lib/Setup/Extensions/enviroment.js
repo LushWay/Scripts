@@ -1,6 +1,6 @@
 import { addMethod, editMethod } from "../patcher.js";
 import { util } from "../utils.js";
-import { EntityHealthComponent } from "@minecraft/server"
+import { EntityHealthComponent } from "@minecraft/server";
 
 /**
  * Common JavaScript objects
@@ -37,34 +37,3 @@ editMethod(console, "warn", ({ original, args }) => {
 });
 
 globalThis.nextTick = null;
-
-/**
- * 
- * Polyfills
- * 
- * 
- */
- 
-if (!("defaultValue" in EntityHealthComponent.prototype)) Object.defineProperties(EntityHealthComponent.prototype, {
-  defaultValue: {
-    get() {
-			return this.default
-		},
-		configurable: false,
-		enumerable: true,
-  },
-  currentValue: {
-    get() {
-			return this.current
-		},
-		configurable: false,
-		enumerable: true,
-  },
-  setCurrentValue: {
-    value(v) {
-      this.current = v
-    },
-		configurable: false,
-		enumerable: true,
-  }
-});
