@@ -83,7 +83,7 @@ function getType() {
 		num = 0;
 		const text = `§cДля полноценной работы сервера установите значение §ftype§c в настройках §fserver§c и перезагрузите скрипты. `;
 
-		console[XA.state.first_load ? "warn" : "log"](text);
+		console[XA.state.firstLoad ? "warn" : "log"](text);
 	}
 
 	return num;

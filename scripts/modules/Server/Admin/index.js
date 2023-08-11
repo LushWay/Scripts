@@ -250,10 +250,10 @@ function group(player, groupName, groupType, errors = {}) {
 		]);
 	}
 
-	form.show(player, (ctx, ...options) => {
+	form.show(player, (ctx, ...opts) => {
 		/** @type {Record<string, string>} */
 		const messages = {};
-		for (const [i, option] of options.entries()) {
+		for (const [i, option] of opts.entries()) {
 			const [KEY, callback] = buttons[i];
 			const result = callback(option);
 			if (result) messages[KEY] = result;

@@ -1,5 +1,6 @@
 import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
+import { util } from "../Setup/utils.js";
 
 export const OPTIONS_NAME = Symbol("name");
 
@@ -25,7 +26,8 @@ const PLAYER_DB = Database.eventProxy(new Database("player"), {
 	beforeSet: (key, value) => value,
 });
 
-/** @typedef {DefaultConfig<Option> & Record<string, { requires?: boolean }>} WorldOptionsConfig */
+/**
+ * @typedef {DefaultConfig<Option> & Record<string, { requires?: boolean }>} WorldOptionsConfig */
 /** @type {OPTIONS_DB} */
 const WORLD_OPTIONS = new Database("options", {
 	beforeGet: (key, value) => value ?? {},
@@ -114,3 +116,55 @@ function generateOptionsProxy(database, prefix, CONFIG, player = null) {
 	}
 	return OptionsProxy;
 }
+
+export class EditableLocation {
+	static OPTION_KEY = "locations";
+	valid = true;
+	x = 0;
+	y = 0;
+	z = 0;
+	/**
+	 *
+	 * @param {string} id
+	 * @param {Object} [options]
+	 * @param {boolean | Vector3} [options.fallback]
+	 */
+	constructor(id, { fallback = false } = {}) {
+		this.id = id;
+		let location = WORLD_OPTIONS.get(EditableLocation.OPTION_KEY)[id];
+		Options.WORLD[EditableLocation.OPTION_KEY][id] = {
+			desc: `Позиция ${id}`,
+			name: id,
+			value: fallback ? fallback : {},
+		};
+
+		if (
+			!location ||
+			(typeof location === "object" && Object.keys(location).length === 0)
+		) {
+			if (!fallback) {
+				util.error(
+					new ReferenceError(
+						"Location doesn't defined and fallback is disabled!"
+					)
+				);
+				this.valid = false;
+				return;
+			} else location = fallback;
+		}
+		if (
+			typeof location !== "object" ||
+			!["x", "y", "z"].every((pos) => Object.keys(location).includes(pos))
+		) {
+			util.error(new TypeError("Invalid location:" + util.inspect(location)));
+			this.valid = false;
+			return;
+		}
+
+		this.x = location.x;
+		this.y = location.y;
+		this.z = location.z;
+	}
+}
+
+Options.WORLD[EditableLocation.OPTION_KEY] = {};

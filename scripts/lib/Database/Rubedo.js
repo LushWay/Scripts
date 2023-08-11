@@ -25,10 +25,11 @@ export class Database {
 		// @ts-expect-error
 		return proxy;
 	}
-	static initAllTables() {
+	static async initAllTables() {
 		this.isTablesInited = true;
 		for (const table in this.tables) {
 			this.tables[table].init();
+			await nextTick;
 		}
 	}
 	/**

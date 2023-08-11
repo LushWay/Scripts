@@ -1,6 +1,5 @@
 import {
 	Entity,
-	MinecraftEntityTypes,
 	MinecraftItemTypes,
 	Player,
 	Vector,
@@ -13,11 +12,7 @@ import { GameUtils } from "xapi.js";
 const SPAWNED_FIREWORKS = {};
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-	if (
-		GameUtils.safeGetTypeID(entity) !== MinecraftEntityTypes.fireworksRocket.id
-	)
-		return;
-
+	if (GameUtils.safeGetTypeID(entity) !== "minecraft:firework_rocket") return;
 	SPAWNED_FIREWORKS[entity.id] = [Date.now(), entity];
 });
 

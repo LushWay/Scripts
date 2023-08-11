@@ -50,10 +50,10 @@ system.runInterval(
 	20
 );
 
-XA.state.afterModulesLoad.subscribe(() => {
+XA.afterEvents.modulesLoad.subscribe(() => {
 	system.runPlayerInterval(
 		(player) => {
-			if (!XA.state.modules_loaded || !options.enabled) return;
+			if (!options.enabled) return;
 			const score = PVP.get(player);
 
 			if (NO_PVP_MODE.includes(player.id) || score < 0) return;

@@ -18,3 +18,14 @@ export function benchmark(label, type = "test") {
 	};
 }
 
+export function strikeTest() {
+	let start = Date.now();
+	/**
+	 * @param {string} label
+	 */
+	return (label) => {
+		const date = Date.now();
+		console.log(label, "§e" + (date - start) + "ms");
+		start = date;
+	};
+}

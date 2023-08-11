@@ -15,7 +15,7 @@ export class PlaceAction {
 
 system.runPlayerInterval(
 	(player) => {
-		const location = Vector.string(player.location);
+		const location = Vector.string(Vector.floor(player.location));
 		if (location in PlaceAction.ACTIONS) {
 			PlaceAction.ACTIONS[location](player);
 		}

@@ -1,4 +1,4 @@
-import { world } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 
 // This need to be loaded before all another scripts
 import "./lib/Setup/watchdog.js";
@@ -6,14 +6,12 @@ import "./lib/Setup/watchdog.js";
 import "./lib/Setup/prototypes.js";
 
 import { CONFIG } from "./config.js";
-import { EventSignal } from "./lib/Class/Events.js";
+import { EventLoader } from "./lib/Class/Events.js";
 import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
-import { onWorldLoad } from "./lib/Setup/loader.js";
 import { util } from "./lib/Setup/utils.js";
-import { loadModules } from "./modules/import.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
@@ -35,17 +33,16 @@ export class XA {
 		player: new Database("player"),
 	};
 
-	static state = {
-		server_mode: true,
-
-		first_load: false,
-		modules_loaded: false,
-		afterModulesLoad: new EventSignal(),
-		load_time: "",
+	static afterEvents = {
+		modulesLoad: new EventLoader(),
+		worldLoad: new EventLoader(),
 	};
 
-	/** @protected */
-	constructor() {}
+	static state = {
+		firstLoad: false,
+		modulesLoaded: false,
+		loadTime: "",
+	};
 }
 
 globalThis.XA = XA;
@@ -72,7 +69,6 @@ export * from "./lib/Form/ModelForm.js";
 export * from "./lib/Form/utils.js";
 // Setup
 export * from "./lib/Setup/Extensions/system.js";
-export * from "./lib/Setup/loader.js";
 export * from "./lib/Setup/prototypes.js";
 export * from "./lib/Setup/roles.js";
 export * from "./lib/Setup/utils.js";
@@ -82,26 +78,40 @@ world.afterEvents.playerJoin.subscribe((player) => {
 		Date.now() - loading < CONFIG.firstPlayerJoinTime &&
 		player.playerId === "-4294967285"
 	) {
-		XA.state.first_load = true;
+		XA.state.firstLoad = true;
 	}
 });
 
-onWorldLoad(
-	async () => {
-		Database.initAllTables();
-		await nextTick;
+system.run(async function waiter() {
+	const entities = await world.overworld.runCommandAsync(`testfor @e`);
+	if (entities.successCount < 1) {
+		// No entity found, we need to re-run this...
+		return system.run(waiter);
+	}
 
-		await loadModules();
-		XA.state.modules_loaded = true;
-		EventSignal.emit(XA.state.afterModulesLoad, {});
+	console.log("WORLD LOADED, X-API STARTED");
+	EventLoader.load(XA.afterEvents.worldLoad);
+});
 
-		if (world.getAllPlayers().find((e) => e.id === "-4294967285"))
-			XA.state.server_mode = false;
+XA.afterEvents.worldLoad.subscribe(async () => {
+	let errorName = "DatabaseError";
+	try {
+		await Database.initAllTables();
 
-		XA.state.load_time = ((Date.now() - loading) / 1000).toFixed(2);
+		errorName = "LoadingError";
+		await import("./modules/import.js");
 
-		if (!XA.state.first_load) world.say(`§9└ §fDone in ${XA.state.load_time}`);
-		else world.say(`§fFirst loaded in ${XA.state.load_time}`);
-	},
-	(fn) => fn().catch((e) => util.error(e, { errorName: "X-API-ERR" }))
-);
+		EventLoader.load(XA.afterEvents.modulesLoad);
+
+		if (world.getAllPlayers().find((e) => e.id === "-4294967285")) {
+			util.settings.BDSMode = true;
+		}
+
+		XA.state.loadTime = ((Date.now() - loading) / 1000).toFixed(2);
+
+		if (!XA.state.firstLoad) world.say(`§9└ §fDone in ${XA.state.loadTime}`);
+		else world.say(`§fFirst loaded in ${XA.state.loadTime}`);
+	} catch (e) {
+		util.error(e, { errorName });
+	}
+});

@@ -55,3 +55,27 @@ export class EventSignal {
 		return this.events.delete(callback);
 	}
 }
+
+/**
+ * @extends {EventSignal<{}>}
+ */
+export class EventLoader extends EventSignal {
+	/**
+	 * @param {EventLoader} loader
+	 */
+	static load(loader) {
+		loader.loaded = true;
+		return super.emit(loader, {});
+	}
+
+	loaded = false;
+
+	/**
+	 * @type {EventSignal<{}>["subscribe"]}
+	 */
+	subscribe(callback, position) {
+		if (this.loaded) callback({});
+		else super.subscribe(callback, position);
+		return callback;
+	}
+}

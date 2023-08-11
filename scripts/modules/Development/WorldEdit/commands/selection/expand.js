@@ -6,16 +6,15 @@ const expand = new XCommand({
 	name: "expand",
 	description: "Expand the selection area",
 	role: "moderator",
-})
-	.int("size")
-	.executes((ctx, size) => {
-		if (!WorldEditBuild.selectionCuboid)
-			return ctx.reply("§cЗона не выделена!");
-		SelectionBuild.expand(size);
-		ctx.reply(
-			`§b► §3Выделенная зона поднята на §f${size} §3блоков, теперь она с \n§f${WorldEditBuild.pos1.x} ${WorldEditBuild.pos1.y} ${WorldEditBuild.pos1.z} \n§3по \n§f${WorldEditBuild.pos2.x} ${WorldEditBuild.pos2.y} ${WorldEditBuild.pos2.z}`
-		);
-	});
+});
+
+expand.int("size").executes((ctx, size) => {
+	if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
+	SelectionBuild.expand(size);
+	ctx.reply(
+		`§b► §3Выделенная зона поднята на §f${size} §3блоков, теперь она с \n§f${WorldEditBuild.pos1.x} ${WorldEditBuild.pos1.y} ${WorldEditBuild.pos1.z} \n§3по \n§f${WorldEditBuild.pos2.x} ${WorldEditBuild.pos2.y} ${WorldEditBuild.pos2.z}`
+	);
+});
 
 expand
 	.literal({

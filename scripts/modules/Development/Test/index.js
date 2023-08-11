@@ -18,7 +18,7 @@ import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
 import "./enchant.js";
 
 world.afterEvents.chatSend.subscribe((event) => {
-	console.warn(event.sender + ": " + event.message);
+	console.info(event.sender.name + ": " + event.message);
 });
 
 /**

@@ -1,9 +1,12 @@
+import { Vector } from "@minecraft/server";
+import { EditableLocation } from "../../../xapi.js";
 import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
 import { loadRegionsWithGuards } from "../../Server/Region/index.js";
 import "./base.js";
 import "./bouncyTnt.js";
 import "./fireworks.js";
+import { Portal } from "./portals.js";
 import "./raid.js";
 
 loadRegionsWithGuards(
@@ -34,3 +37,19 @@ JOIN_CONFIG.title_animation = {
 	},
 };
 JOIN_CONFIG.subtitle = "Добро пожаловать!";
+
+function setup() {
+	const AnarchyPortalLocation = new EditableLocation("anarchy");
+	if (AnarchyPortalLocation.valid) {
+		new Portal(
+			"anarchy",
+			Vector.add(AnarchyPortalLocation, { x: 0, y: -1, z: -1 }),
+			Vector.add(AnarchyPortalLocation, { x: 0, y: 1, z: 1 }),
+			(player) => {
+				player.tell("§cВы типо телепортированы");
+			}
+		);
+	}
+}
+
+setup();

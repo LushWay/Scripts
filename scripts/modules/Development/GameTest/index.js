@@ -6,7 +6,7 @@ import {
 	world,
 } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
-import { util } from "xapi.js";
+import { GameUtils, util } from "xapi.js";
 const time = 9999999;
 
 let name = "Бот";
@@ -42,7 +42,7 @@ GameTest.registerAsync("s", "test", async (test) => {
 
 	const id = player.id;
 	const event = world.afterEvents.entityDie.subscribe((data) => {
-		if (data.deadEntity.id !== id) return;
+		if (GameUtils.safeGetTypeID(data.deadEntity) !== id) return;
 		test.succeed();
 	});
 

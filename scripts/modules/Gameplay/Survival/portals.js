@@ -1,22 +1,15 @@
 import { Player, Vector } from "@minecraft/server";
+import { LockAction, PlaceAction } from "xapi.js";
 import { Minigame } from "../Minigames/Builder.js";
-import { Options, LockAction, PlaceAction } from "xapi.js";
 
-const getSettings = Options.player("Телепорт", "Atp", {
-	showCoordinates: {
-		desc: "Показывать координаты телепортации (выключите если вы стример)",
-		value: true,
-		name: "",
-	},
-	title: { desc: "", value: true, name: "" },
-});
-
-/**
- * @typedef {{
- *   ignorePvp?: boolean;
- *   ignoreQuene?: string;
- * }} CustomTeleportOptions
- */
+// const getSettings = Options.player("Телепорт", "Atp", {
+// 	showCoordinates: {
+// 		desc: "Показывать координаты телепортации (выключите если вы стример)",
+// 		value: true,
+// 		name: "",
+// 	},
+// 	title: { desc: "", value: true, name: "" },
+// });
 
 /**
  *
@@ -47,7 +40,7 @@ export class Portal {
 	 * @param {string} name
 	 * @param {Vector3} from
 	 * @param {Vector3} to
-	 * @param {Vector3} place
+	 * @param {Vector3 | ((player: Player) => void)} place
 	 * @param {object} [o]
 	 * @param {string[]} [o.aliases]
 	 * @param {boolean} [o.createCommand]
@@ -81,6 +74,7 @@ export class Portal {
 	 * @param {Player} player
 	 */
 	teleport(player) {
-		teleport(player, this.place);
+		if (typeof this.place === "function") this.place(player);
+		else teleport(player, this.place);
 	}
 }

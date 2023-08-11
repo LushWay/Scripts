@@ -142,7 +142,7 @@ system.runInterval(
 	20
 );
 
-world.afterEvents.itemUseOn.subscribe((data) => {
+world.beforeEvents.itemUseOn.subscribe((data) => {
 	if (data.itemStack.typeId !== "we:wand" || !(data.source instanceof Player))
 		return;
 

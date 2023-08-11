@@ -26,7 +26,7 @@ world.afterEvents.playerJoin.subscribe(({ playerId }) => {
 
 system.runTimeout(
 	() => {
-		if (!XA.state.first_load) return;
+		if (!XA.state.firstLoad) return;
 		const player = world.getAllPlayers()[0];
 		const D = PDB.get(player.id);
 		D.waiting = 1;

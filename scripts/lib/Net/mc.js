@@ -1,5 +1,4 @@
-import { system, world } from "@minecraft/server";
-import { onWorldLoad } from "../Setup/loader.js";
+import { system } from "@minecraft/server";
 import { util } from "../Setup/utils.js";
 
 class MinecraftManager {
@@ -34,7 +33,7 @@ class MinecraftManager {
 					.setBody(sbody)
 			);
 			const body = JSON.safeParse(res.body, null, (err) =>
-				console.warn("Error while parsing ")
+				console.warn("Error while parsing ", res.body, err)
 			);
 			if (!body || body.status === 404)
 				throw new Error(body?.message ?? "Got unexpected body: " + res.body);
@@ -117,12 +116,3 @@ void (async function load() {
 		console.warn("server-net DISABLED");
 	}
 })();
-
-onWorldLoad(() => {
-	console.warn("AAAAAAAAAAAA");
-	const o = world.overworld.runCommand("function connect", {
-		showError: true,
-		showOutput: true,
-	});
-	console.warn(o + "BBBBBBBBBB");
-});
