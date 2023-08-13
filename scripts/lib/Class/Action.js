@@ -21,7 +21,7 @@ system.runPlayerInterval(
 		}
 	},
 	"PlaceAction",
-	0
+	10
 );
 
 /**
@@ -33,10 +33,10 @@ export class LockAction {
 	static LOCKERS = {};
 
 	/**
-	 * Creates new blocker that can block other actions
-	 * @param {string} name - Name of BlockerAction (used in isBlocked(ignore))
-	 * @param {Fn} fn - Fn that checks if player is blocked
-	 * @param {string} lockText - Text that returns when player is blocked
+	 * Creates new locker that can lock other actions
+	 * @param {string} name - Name of LockAction (used in isLocked(ignore))
+	 * @param {Fn} fn - Fn that checks if player is locked
+	 * @param {string} lockText - Text that returns when player is locked
 	 */
 	constructor(name, fn, lockText) {
 		this.fn = fn;

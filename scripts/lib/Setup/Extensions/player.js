@@ -1,14 +1,11 @@
 import { EntityDamageCause, GameMode, Player } from "@minecraft/server";
 import { OverTakes } from "../prototypes.js";
 
-/**
- * Player/Entity
- *
- *
- */
-
 Player.prototype.tell = Player.prototype.sendMessage;
 OverTakes(Player.prototype, {
+	db() {
+		throw new ReferenceError("DB isn't loaded!");
+	},
 	tell: Player.prototype.sendMessage,
 	applyDash(target, horizontalStrength, verticalStrength) {
 		const view = target.getViewDirection();

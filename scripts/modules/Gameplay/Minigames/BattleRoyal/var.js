@@ -5,7 +5,7 @@ import { Options } from "xapi.js";
 
 export const BATTLE_ROYAL_EVENTS = {
 	/** @type {EventSignal<Player>} */
-	playerJoin: new EventSignal(),
+	join: new EventSignal(),
 	/** @type {EventSignal<Player>} */
 	death: new EventSignal(),
 };

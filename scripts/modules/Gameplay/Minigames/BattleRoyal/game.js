@@ -56,7 +56,7 @@ class BattleRoyal {
 			C++;
 		}
 
-		EventSignal.emit(BATTLE_ROYAL_EVENTS.playerJoin, XEntity.fetch(name));
+		EventSignal.emit(BATTLE_ROYAL_EVENTS.join, XEntity.fetch(name));
 	}
 
 	/**

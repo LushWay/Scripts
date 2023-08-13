@@ -6,7 +6,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { MessageForm } from "lib/Form/MessageForm.js";
-import { util, Database } from "xapi.js";
+import { Database, util } from "xapi.js";
 import { CubeRegion, Region } from "../../Server/Region/Region.js";
 
 const DB = new Database("buildRegion");
@@ -167,7 +167,7 @@ export async function findFreePlace() {
 		tries++;
 		if (tries >= 20) await system.sleep(1), (tries = 0);
 
-		const alreadyExist = Region.blockLocationInRegion(
+		const alreadyExist = Region.locationInRegion(
 			{ x: center.x, y: 0, z: center.z },
 			"overworld"
 		);

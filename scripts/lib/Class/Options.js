@@ -156,7 +156,8 @@ export class EditableLocation {
 			typeof location !== "object" ||
 			!["x", "y", "z"].every((pos) => Object.keys(location).includes(pos))
 		) {
-			util.error(new TypeError("Invalid location:" + util.inspect(location)));
+			util.error(new TypeError("Invalid location"));
+			console.error(util.inspect(location));
 			this.valid = false;
 			return;
 		}

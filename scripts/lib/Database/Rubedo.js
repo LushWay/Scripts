@@ -11,6 +11,7 @@ const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
  * @template [Value=any]
  */
 export class Database {
+	static UUID = 0;
 	/**
 	 *
 	 * @template {Database} Source
@@ -29,7 +30,6 @@ export class Database {
 		this.isTablesInited = true;
 		for (const table in this.tables) {
 			this.tables[table].init();
-			await nextTick;
 		}
 	}
 	/**
@@ -57,6 +57,7 @@ export class Database {
 		IS_INITED: false,
 		TABLE_NAME: "",
 		TABLE_TYPE,
+		UUID: ++Database.UUID,
 		EVENTS: {
 			/**
 			 * This function will trigger until key set to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
@@ -94,6 +95,7 @@ export class Database {
 			return this.parent.MEMORY;
 		},
 		PATH: "",
+		PROXY_PATH: ""
 	};
 
 	/**
@@ -249,7 +251,8 @@ export class Database {
 	 * ```
 	 */
 	work(key) {
-		const data = this.get(key);
+		let data = this.get(key);
+		if (typeof data === "object") Object.assign({}, data);
 		const self = this;
 
 		return {

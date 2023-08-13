@@ -24,31 +24,38 @@ export function shortTime() {
 	return `${time.getHours()}:${min.length == 2 ? min : "0" + min}`;
 }
 
-export const JOIN_CONFIG = {
-	/** Array with strings to show on join. They will change every second. You can use $<var name> from animation.vars  */
-	title_animation: {
-		stages: ["» $title «", "»  $title  «"],
-		/** @type {Record<string, string>} */
-		vars: {
-			title: "§6§lDevelopment§r§f",
+/**
+ * @typedef {"join" | "firstTime" | "playerClosedGuide"} JoinEvents
+ */
+
+export const JOIN = {
+	CONFIG: {
+		/** Array with strings to show on join. They will change every second. You can use $<var name> from animation.vars  */
+		title_animation: {
+			stages: ["» $title «", "»  $title  «"],
+			/** @type {Record<string, string>} */
+			vars: {
+				title: "§6§lDevelopment§r§f",
+			},
+		},
+		actionBar: "", // Optional
+		subtitle: "Разработка!", // Optional
+		messages: {
+			air: "§8Очнулся в воздухе",
+			ground: "§8Сдвинулся",
+			sound: "break.amethyst_cluster",
 		},
 	},
-	actionBar: "", // Optional
-	subtitle: "Разработка!", // Optional
-	messages: {
-		air: "§8Очнулся в воздухе",
-		ground: "§8Сдвинулся",
-		sound: "break.amethyst_cluster",
+	/**
+	 * @type {Partial<Record<JoinEvents, any>>}
+	 */
+	EVENT_DEFAULTS: {},
+	/**
+	 * @type {Record<JoinEvents, EventSignal<Player>>}
+	 */
+	EVENTS: {
+		join: new EventSignal(),
+		firstTime: new EventSignal(),
+		playerClosedGuide: new EventSignal(),
 	},
-};
-
-export const JOIN_EVENTS = {
-	/** @type {EventSignal<Player>} */
-	playerJoin: new EventSignal(),
-
-	/** @type {EventSignal<Player>} */
-	playerGuide: new EventSignal(),
-
-	/** @type {EventSignal<Player>} */
-	playerClosedGuide: new EventSignal(),
 };

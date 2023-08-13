@@ -74,6 +74,10 @@ patchPackage("@minecraft/server", {
 		    food: ItemFoodComponent;
 		`,
 		Player: m`
+		/**
+		 * Gets player data from database
+		 */
+		db(): { save(): void, data: any };
     /**
      * See {@link Player.sendMessage}
      */

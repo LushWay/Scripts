@@ -5,7 +5,7 @@ import { RaidNotify } from "./var.js";
 
 world.beforeEvents.explosion.subscribe((data) => {
 	for (const bl of data.getImpactedBlocks()) {
-		const region = Region.blockLocationInRegion(bl, data.dimension.type);
+		const region = Region.locationInRegion(bl, data.dimension.type);
 		if (!region) return;
 		if (!region.permissions?.pvp) return (data.cancel = true);
 		for (const id of region.permissions.owners) RaidNotify[id] = 60;

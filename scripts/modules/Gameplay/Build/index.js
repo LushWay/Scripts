@@ -2,7 +2,7 @@ import { system, world } from "@minecraft/server";
 import { IS } from "xapi.js";
 import { CONFIG } from "../../../config.js";
 import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
-import { JOIN_CONFIG } from "../../Server/OnJoin/var.js";
+import { JOIN } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
 import { loadRegionsWithGuards } from "../../Server/Region/index.js";
 import "./menu.js";
@@ -22,13 +22,13 @@ loadRegionsWithGuards(
 );
 
 Region.CONFIG.PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES;
-JOIN_CONFIG.title_animation = {
+JOIN.CONFIG.title_animation = {
 	stages: ["» $title «", "»  $title  «"],
 	vars: {
 		title: "§b§lBuild§r§f",
 	},
 };
-JOIN_CONFIG.subtitle = "Строим вместе!";
+JOIN.CONFIG.subtitle = "Строим вместе!";
 
 world.beforeEvents.explosion.subscribe((data) => (data.cancel = true));
 

@@ -1,6 +1,6 @@
 import { ItemStack, Player, world } from "@minecraft/server";
+import { ActionForm, EventSignal, GameUtils, MessageForm } from "xapi.js";
 import { SERVER } from "./var.js";
-import { GameUtils, MessageForm, EventSignal, ActionForm } from "xapi.js";
 
 class Cost {
 	/**
@@ -241,3 +241,22 @@ world.afterEvents.entityHitBlock.subscribe((event) => {
 
 	store.open(event.damagingEntity);
 });
+
+/**
+ *
+ * @template {Object} F
+ * @param {F} from
+ * @template {keyof F} T
+ * @param {T} name
+ */
+function listen(from, name) {
+	// @ts-expect-error
+	from[name].subscribe(() => {
+		console.log(name);
+	});
+}
+
+listen(world.afterEvents, "entityHitBlock");
+listen(world.afterEvents, "targetBlockHit");
+listen(world.beforeEvents, "itemUse");
+listen(world.beforeEvents, "itemUseOn");

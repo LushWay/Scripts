@@ -32,7 +32,7 @@ function forEveryQuenedPlayer(sound, text) {
 export function teleportToBR(player) {}
 
 const ks = Object.keys;
-BATTLE_ROYAL_EVENTS.playerJoin.subscribe((player) => {
+BATTLE_ROYAL_EVENTS.join.subscribe((player) => {
 	/**
 	 * @type {Player}
 	 */
@@ -177,7 +177,7 @@ bbr
 		Object.assign({}, quene);
 	});
 
-world.afterEvents.playerJoin.subscribe(({ playerId, playerName }) => {
+world.afterEvents.playerJoin.subscribe(({ playerId  }) => {
 	system.runTimeout(
 		() => {
 			const joinedPlayer = XEntity.fetch(playerId);

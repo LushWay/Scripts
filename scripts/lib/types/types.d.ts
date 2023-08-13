@@ -41,3 +41,5 @@ type Enumerate<
 	: Enumerate<N, [...Acc, Acc["length"]]>;
 
 type percent = `${number}%`;
+
+type PlayerDB<Value = any> = { save(): void; data: Value };

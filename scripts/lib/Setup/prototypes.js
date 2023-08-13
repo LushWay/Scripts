@@ -16,9 +16,9 @@ export function OverTakes(prototype, object) {
 }
 
 import "./Extensions/dimension.js";
-import "./Extensions/entity.js";
 import "./Extensions/enviroment.js";
 import "./Extensions/itemstack.js";
+import "./Extensions/player.js";
 import "./Extensions/system.js";
 import "./Extensions/vector.js";
 import "./Extensions/world.js";

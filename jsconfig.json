@@ -5,6 +5,8 @@
 		"checkJs": true,
 		"forceConsistentCasingInFileNames": true,
 		"noImplicitAny": true,
+		"skipLibCheck": false,
+		"skipDefaultLibCheck": true,
 		"lib": ["ES2020"],
 		"target": "es2020",
 		"module": "NodeNext",
@@ -17,5 +19,3 @@
 	},
 	"include": ["./scripts/"]
 }
-
-

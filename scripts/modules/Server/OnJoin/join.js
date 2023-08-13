@@ -1,7 +1,7 @@
 import { Player, system, world } from "@minecraft/server";
 import { Database, EventSignal, Options, XA } from "xapi.js";
 import "./subscribes.js";
-import { JOIN_CONFIG, JOIN_EVENTS } from "./var.js";
+import { JOIN } from "./var.js";
 
 /** @type {Database<string, IJoinData>} */
 const PDB = Database.eventProxy(new Database("player"), {
@@ -71,50 +71,50 @@ system.runPlayerInterval(
 
 			if (not_moved) {
 				// Player still stays at joined position...
-				if (player.hasTag("on_ground")) {
+				if (player.isOnGround) {
 					// Player doesnt falling down, show animation
 					data.stage = data.stage ?? -1;
 					data.stage++;
 					if (
 						typeof data.stage !== "number" ||
-						data.stage >= JOIN_CONFIG.title_animation.stages.length
+						data.stage >= JOIN.CONFIG.title_animation.stages.length
 					)
 						data.stage = 0;
 
 					// Creating title
-					let title = JOIN_CONFIG.title_animation.stages[data.stage];
+					let title = JOIN.CONFIG.title_animation.stages[data.stage];
 					for (const [key, value] of Object.entries(
-						JOIN_CONFIG.title_animation.vars
+						JOIN.CONFIG.title_animation.vars
 					)) {
 						title = title.replace("$" + key, value);
 					}
 
 					// Show actionBar
 					if (
-						"actionBar" in JOIN_CONFIG &&
-						typeof JOIN_CONFIG.actionBar === "string"
+						"actionBar" in JOIN.CONFIG &&
+						typeof JOIN.CONFIG.actionBar === "string"
 					)
-						player.onScreenDisplay.setActionBar(JOIN_CONFIG.actionBar);
+						player.onScreenDisplay.setActionBar(JOIN.CONFIG.actionBar);
 
 					player.onScreenDisplay.setTitle(title, {
 						fadeInDuration: 0,
 						fadeOutDuration: 20,
 						stayDuration: 40,
-						subtitle: JOIN_CONFIG.subtitle,
+						subtitle: JOIN.CONFIG.subtitle,
 					});
 				} else {
 					// Player joined in air
-					JOIN(player, data, "air");
+					join(player, data, "air");
 				}
 			} else if (data.message) {
 				// Player moved on ground
-				JOIN(player, data, "ground");
+				join(player, data, "ground");
 			}
 			modified = true;
 		}
 		if (data.learning && !data.message) {
 			// Show first time join guide
-			EventSignal.emit(JOIN_EVENTS.playerGuide, player);
+			EventSignal.emit(JOIN.EVENTS.firstTime, player);
 			delete data.learning;
 			modified = true;
 		}
@@ -140,7 +140,7 @@ const getSettings = Options.player("Вход", "join", {
  * @param {IJoinData} data
  * @param {"air" | "ground"} messageType
  */
-function JOIN(player, data, messageType) {
+function join(player, data, messageType) {
 	delete data.at;
 	delete data.stage;
 	delete data.message;
@@ -150,12 +150,12 @@ function JOIN(player, data, messageType) {
 	for (const plr of world.getPlayers()) {
 		if (plr.id === player.id) continue;
 		const settings = getSettings(plr);
-		if (settings.sound) plr.playSound(JOIN_CONFIG.messages.sound);
+		if (settings.sound) plr.playSound(JOIN.CONFIG.messages.sound);
 		if (settings.message)
-			plr.tell(`§7${player.name} ${JOIN_CONFIG.messages[messageType]}`);
+			plr.tell(`§7${player.name} ${JOIN.CONFIG.messages[messageType]}`);
 	}
 
-	if (!data.learning) EventSignal.emit(JOIN_EVENTS.playerJoin, player);
+	if (!data.learning) EventSignal.emit(JOIN.EVENTS.join, player);
 	player.onScreenDisplay.setTitle("");
 
 	const oldTag = data.name;

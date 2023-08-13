@@ -14,7 +14,6 @@ import { ModalForm } from "lib/Form/ModelForm.js";
 import "lib/Net/mc.js";
 import { DB, GameUtils, InventoryStore, XEntity, util } from "xapi.js";
 import { MCApp } from "../../../lib/Net/mc.js";
-import { randomTeleport } from "../../Gameplay/Survival/rtp.js";
 import "./enchant.js";
 
 world.afterEvents.chatSend.subscribe((event) => {
@@ -77,22 +76,6 @@ const tests = {
 		}
 	},
 
-	40(ctx) {
-		if (ctx.args[1] === "in") {
-			AnarchyInventory.saveFromEntity(ctx.sender);
-			InventoryStore.load(ctx.sender, {
-				xp: 0,
-				health: 10,
-				equipment: {},
-				slots: [new ItemStack("xa:menu")],
-			});
-		} else {
-			InventoryStore.load(
-				ctx.sender,
-				AnarchyInventory.getEntityStore(ctx.sender.id)
-			);
-		}
-	},
 	41(ctx) {
 		world.debug(
 			"test41",
@@ -115,36 +98,6 @@ const tests = {
 					data,
 				};
 			})
-		);
-	},
-
-	43(ctx) {
-		const loc = randomTeleport(
-			ctx.sender,
-			{ x: 0, y: 0, z: 0 },
-			{ x: 500, y: 0, z: 500 },
-			{ elytra: true, keepInSkyTime: 8 }
-		);
-		ctx.sender.tell(`Вы были перемещены на ${Vector.string(loc)}. `);
-		let count = 8;
-		const id = system.runInterval(
-			() => {
-				count--;
-				if (count) {
-					ctx.sender.onScreenDisplay.setActionBar(
-						`   Вы полетите через ${count}\nНе забудьте открыть элитры!`
-					);
-					ctx.sender.playSound("note.pling", {
-						pitch: 1 - count / 8,
-					});
-				} else {
-					ctx.sender.playSound("note.pling");
-					ctx.sender.onScreenDisplay.setActionBar(`Мягкой посадки!`);
-					system.clearRun(id);
-				}
-			},
-			"testasd",
-			20
 		);
 	},
 	45(ctx) {
@@ -242,40 +195,6 @@ world.afterEvents.entityHitEntity.subscribe((event) => {
 // 	.addItem(new ItemStack(i.chest, 5), new MoneyCost(30))
 // 	.addItem(new ItemStack(i.boat), new MoneyCost(10))
 // 	.addItem(new ItemStack(i.apple), new MoneyCost(1));
-
-const AnarchyInventory = new InventoryStore("anarchy");
-
-system.runInterval(
-	() => {
-		const player = world.overworld.getPlayers({
-			maxDistance: 1,
-			location: { x: -2, y: 191, z: 4 },
-		})[0];
-
-		if (player) {
-			AnarchyInventory.saveFromEntity(player);
-			InventoryStore.load(player, {
-				xp: 0,
-				health: 10,
-				equipment: {},
-				slots: [new ItemStack("xa:menu")],
-			});
-			player.teleport({ x: -2, y: 191, z: -1 });
-		}
-
-		const player2 = world.overworld.getPlayers({
-			location: { x: -2, y: 191, z: 1 },
-			maxDistance: 1,
-		})[0];
-
-		if (player2) {
-			InventoryStore.load(player2, AnarchyInventory.getEntityStore(player2.id));
-			player2.teleport({ x: -2, y: 191, z: 6 });
-		}
-	},
-	"a",
-	10
-);
 
 const c = new XCommand({
 	name: "test",

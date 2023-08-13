@@ -117,7 +117,7 @@ export class Region {
 	 * @param {Dimensions} dimensionId
 	 * @returns {CubeRegion | RadiusRegion | undefined}
 	 */
-	static blockLocationInRegion(blockLocation, dimensionId) {
+	static locationInRegion(blockLocation, dimensionId) {
 		return this.getAllRegions().find(
 			(region) =>
 				region.dimensionId === dimensionId &&
@@ -329,3 +329,20 @@ export function forEachItemAt(dimension, location, callback = (e) => e.kill()) {
 		})
 		.forEach(callback);
 }
+
+new XCommand({
+	name: "region",
+	role: "admin",
+	type: "server",
+})
+	.literal({ name: "create" })
+	.int("radius")
+	.executes((ctx, radius) => {
+		const reg = new RadiusRegion(
+			Vector.floor(ctx.sender.location),
+			radius,
+			ctx.sender.dimension.type
+		);
+		reg.update();
+		ctx.reply("Created with radius " + radius);
+	});

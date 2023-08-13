@@ -1,4 +1,4 @@
-import { system, world } from "@minecraft/server";
+import { Player, system, world } from "@minecraft/server";
 
 // This need to be loaded before all another scripts
 import "./lib/Setup/watchdog.js";
@@ -11,6 +11,7 @@ import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
+import { OverTakes } from "./lib/Setup/prototypes.js";
 import { util } from "./lib/Setup/utils.js";
 
 world.say("§9┌ §fLoading...");
@@ -35,12 +36,12 @@ export class XA {
 
 	static afterEvents = {
 		modulesLoad: new EventLoader(),
+		databaseInit: new EventLoader(),
 		worldLoad: new EventLoader(),
 	};
 
 	static state = {
 		firstLoad: false,
-		modulesLoaded: false,
 		loadTime: "",
 	};
 }
@@ -89,18 +90,17 @@ system.run(async function waiter() {
 		return system.run(waiter);
 	}
 
-	console.log("WORLD LOADED, X-API STARTED");
-	EventLoader.load(XA.afterEvents.worldLoad);
-});
-
-XA.afterEvents.worldLoad.subscribe(async () => {
-	let errorName = "DatabaseError";
+	let errorName = "LoadError";
 	try {
+		console.log("WORLD LOADED, X-API STARTED");
+		EventLoader.load(XA.afterEvents.worldLoad);
+
+		errorName = "DatabaseError";
 		await Database.initAllTables();
+		EventLoader.load(XA.afterEvents.databaseInit);
 
-		errorName = "LoadingError";
+		errorName = "ModuleError";
 		await import("./modules/import.js");
-
 		EventLoader.load(XA.afterEvents.modulesLoad);
 
 		if (world.getAllPlayers().find((e) => e.id === "-4294967285")) {
@@ -115,3 +115,11 @@ XA.afterEvents.worldLoad.subscribe(async () => {
 		util.error(e, { errorName });
 	}
 });
+
+XA.afterEvents.databaseInit.subscribe(() =>
+	OverTakes(Player.prototype, {
+		db() {
+			return XA.tables.player.work(super.id);
+		},
+	})
+);

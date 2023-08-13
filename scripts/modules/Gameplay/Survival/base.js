@@ -41,7 +41,7 @@ world.afterEvents.blockBreak.subscribe(
 	}
 );
 
-const baseItemStack = new ItemStack(MinecraftItemTypes.barrel);
+export const baseItemStack = new ItemStack(MinecraftItemTypes.barrel);
 baseItemStack.setLore(["Поставьте эту бочку и она", "станет базой."]);
 
 new Store({ x: -234, y: 65, z: -74 }, "overworld").addItem(
@@ -49,22 +49,23 @@ new Store({ x: -234, y: 65, z: -74 }, "overworld").addItem(
 	new MoneyCost(10)
 );
 
-world.afterEvents.itemUseOn.subscribe((data) => {
+world.beforeEvents.itemUseOn.subscribe((data) => {
+	const { source, block, faceLocation, itemStack } = data;
 	if (
-		data.itemStack.typeId !== baseItemStack.typeId ||
-		!Array.equals(data.itemStack.getLore(), baseItemStack.getLore()) ||
-		!(data.source instanceof Player) ||
-		LockAction.locked(data.source)
+		!itemStack.isStackableWith(baseItemStack) ||
+		!(source instanceof Player) ||
+		LockAction.locked(source)
 	)
 		return;
 
 	const region = RadiusRegion.getAllRegions().find((e) =>
-		e.permissions.owners.includes(data.source.nameTag)
+		e.permissions.owners.includes(source.nameTag)
 	);
 
 	if (region) {
-		const isOwner = region.permissions.owners[0] === data.source.id;
-		return data.source.tell(
+		const isOwner = region.permissions.owners[0] === source.id;
+		data.cancel = true;
+		return source.tell(
 			`§cВы уже ${
 				isOwner
 					? "владеете базой"
@@ -77,7 +78,7 @@ world.afterEvents.itemUseOn.subscribe((data) => {
 
 	const nearRegion = Region.getAllRegions().find((r) => {
 		if (r instanceof RadiusRegion) {
-			return Vector.distance(r.center, data.block.location) < r.radius + 100;
+			return Vector.distance(r.center, block.location) < r.radius + 100;
 		} else {
 			const from = {
 				x: r.from.x,
@@ -94,29 +95,34 @@ world.afterEvents.itemUseOn.subscribe((data) => {
 			return Vector.between(
 				Vector.add(min, { x: -size, y: 0, z: -size }),
 				Vector.add(max, { x: size, y: 0, z: size }),
-				data.block.location
+				block.location
 			);
 		}
 	});
 
-	if (nearRegion) return data.source.tell("§cРядом есть другие регионы!");
+	if (nearRegion) {
+		data.cancel = true;
+		return source.tell("§cРядом есть другие регионы!");
+	}
 
-	new RadiusRegion(
-		Vector.floor(Vector.add(data.block.location, data.faceLocation)),
-		30,
-		data.block.dimension.type,
-		{
-			doorsAndSwitches: false,
-			openContainers: false,
-			pvp: true,
-			allowedEntitys: "all",
-			owners: [data.source.id],
-		}
-	);
-	data.source.tell(
-		"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base"
-	);
-	data.source.playSound("random.levelup");
+	system.run(() => {
+		new RadiusRegion(
+			Vector.floor(Vector.add(block.location, faceLocation)),
+			30,
+			block.dimension.type,
+			{
+				doorsAndSwitches: false,
+				openContainers: false,
+				pvp: true,
+				allowedEntitys: "all",
+				owners: [source.id],
+			}
+		);
+		source.tell(
+			"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base"
+		);
+		source.playSound("random.levelup");
+	});
 });
 
 const base = new XCommand({

@@ -1,5 +1,6 @@
 import {
-	Entity,
+	Block,
+	BlockBreakAfterEvent,
 	EntitySpawnAfterEvent,
 	MinecraftBlockTypes,
 	Player,
@@ -14,7 +15,15 @@ let LOADED = false;
 
 /**
  * @callback interactionAllowed
- * @param {Player | Entity} player
+ * @param {Player} player
+ * @param {Region} region
+ * @param {{type: "break", event: BlockBreakAfterEvent} | {type: "place"} | {type: "useOn"}} context
+ */
+
+/**
+ * @callback survivalNeeded
+ * @param {Player} player
+ * @param {Block} block
  * @param {Region} region
  */
 
@@ -29,8 +38,13 @@ let LOADED = false;
  * WARNING! Loads only one time
  * @param {interactionAllowed} allowed
  * @param {spawnAllowed} spawnAllowed
+ * @param {survivalNeeded} suvivalNeeded
  */
-export function loadRegionsWithGuards(allowed, spawnAllowed) {
+export function loadRegionsWithGuards(
+	allowed,
+	spawnAllowed,
+	suvivalNeeded = () => false
+) {
 	if (LOADED) throw new ReferenceError("Regions already loaded!");
 	LOADED = true;
 
@@ -38,22 +52,21 @@ export function loadRegionsWithGuards(allowed, spawnAllowed) {
 	 * Permissions for region
 	 */
 	world.beforeEvents.itemUseOn.subscribe((data) => {
-		const region = Region.blockLocationInRegion(
+		if (!(data.source instanceof Player)) return;
+		const region = Region.locationInRegion(
 			data.block,
 			data.source.dimension.type
 		);
-		if (allowed(data.source, region)) return;
-
-		const block = data.source.dimension.getBlock(data.block);
+		if (allowed(data.source, region, { type: "useOn" })) return;
 
 		if (
-			DOORS_SWITCHES.includes(block.typeId) &&
+			DOORS_SWITCHES.includes(data.block.typeId) &&
 			region?.permissions?.doorsAndSwitches
 		)
 			return;
 
 		if (
-			BLOCK_CONTAINERS.includes(block.typeId) &&
+			BLOCK_CONTAINERS.includes(data.block.typeId) &&
 			region?.permissions?.openContainers
 		)
 			return;
@@ -65,11 +78,11 @@ export function loadRegionsWithGuards(allowed, spawnAllowed) {
 	 * Permissions for region
 	 */
 	world.afterEvents.blockPlace.subscribe((data) => {
-		const region = Region.blockLocationInRegion(
+		const region = Region.locationInRegion(
 			data.block.location,
 			data.player.dimension.type
 		);
-		if (allowed(data.player, region)) return;
+		if (allowed(data.player, region, { type: "place" })) return;
 
 		data.block.setType(MinecraftBlockTypes.air);
 	});
@@ -79,12 +92,18 @@ export function loadRegionsWithGuards(allowed, spawnAllowed) {
 	 */
 	world.afterEvents.blockBreak.subscribe(
 		({ player, block, brokenBlockPermutation, dimension }) => {
-			const region = Region.blockLocationInRegion(
+			const region = Region.locationInRegion(
 				block.location,
 				player.dimension.type
 			);
 
-			if (allowed(player, region)) return;
+			if (
+				allowed(player, region, {
+					type: "break",
+					event: { player, block, brokenBlockPermutation, dimension },
+				})
+			)
+				return;
 
 			// setting block back
 			dimension
@@ -107,7 +126,7 @@ export function loadRegionsWithGuards(allowed, spawnAllowed) {
 	world.afterEvents.entitySpawn.subscribe(({ entity }) => {
 		const typeId = GameUtils.safeGetTypeID(entity);
 		if (!typeId || typeId === "rubedo:database") return;
-		const region = Region.blockLocationInRegion(
+		const region = Region.locationInRegion(
 			entity.location,
 			entity.dimension.type
 		);
@@ -125,22 +144,34 @@ export function loadRegionsWithGuards(allowed, spawnAllowed) {
 	system.runInterval(
 		() => {
 			if (!Region.CONFIG.PERMS_SETTED) return;
-			const noPVPregions = Region.getAllRegions().filter(
-				(e) => !e.permissions.pvp
-			);
 
 			for (const player of world.getAllPlayers()) {
-				const {
-					location,
-					dimension: { type },
-				} = player;
-
-				if (
-					noPVPregions.find(
-						(e) => e.vectorInRegion(location) && e.dimensionId === type
-					)
-				)
+				const currentRegion = Region.locationInRegion(
+					player.location,
+					player.dimension.type
+				);
+				if (currentRegion && !currentRegion.permissions.pvp) {
 					player.triggerEvent("player:spawn");
+				}
+
+				const isOwner =
+					currentRegion && currentRegion.permissions.owners.includes(player.id);
+				if (!isOwner) {
+					if (!player.hasTag("modding")) {
+						const facing = player.getBlockFromViewDirection({
+							includeLiquidBlocks: true,
+							includePassableBlocks: true,
+							maxDistance: 10,
+						});
+						if (suvivalNeeded(player, facing?.block, currentRegion)) {
+							player.runCommand("gamemode survival");
+						} else {
+							player.runCommand("gamemode adventure");
+						}
+					}
+				} else if (player.isGamemode("adventure")) {
+					player.runCommand("gamemode survival");
+				}
 			}
 		},
 		"pvp region disable",

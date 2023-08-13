@@ -2,8 +2,8 @@ import { world } from "@minecraft/server";
 import { StoredRequest } from "lib/Class/StoredRequest.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { Cooldown, Database, IS, util, XEntity } from "xapi.js";
-import { CONFIG_MENU } from "../../Server/Menu/var.js";
-import { JOIN_EVENTS } from "../../Server/OnJoin/var.js";
+import { MENU } from "../../Server/Menu/var.js";
+import { JOIN } from "../../Server/OnJoin/var.js";
 import { CubeRegion, Region } from "../../Server/Region/Region.js";
 import {
 	ClearRegion,
@@ -15,14 +15,14 @@ import {
 
 const DB = new Database("buildRegion");
 
-JOIN_EVENTS.playerClosedGuide.subscribe((player) => {
+JOIN.EVENTS.playerClosedGuide.subscribe((player) => {
 	player.playSound("random.levelup");
 	player.tell("Приветствую на сервере, лера напиши уже гайд");
 	const oldRegion = DB.get(player.id);
 	if (!oldRegion) CreateRegion(player);
 });
 
-CONFIG_MENU.menu = (player) => {
+MENU.OnOpen = (player) => {
 	const regionID = DB.get(player.id);
 	let Pregion = CubeRegion.getAllRegions().find((e) => e.key === regionID);
 	world.debug(Pregion);

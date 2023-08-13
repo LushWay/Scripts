@@ -8,7 +8,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { Database } from "xapi.js";
+import { Database, LockAction, util } from "xapi.js";
 import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.elytra, 1);
@@ -18,6 +18,15 @@ RTP_ELYTRA.nameTag = "§6Элитра перемещения";
 RTP_ELYTRA.lockMode = ItemLockMode.slot;
 /** @type {Database<string, {elytra?: 1}>} */
 const DB = XA.tables.player;
+/**
+ * @type {Set<string>}
+ */
+const IN_SKY = new Set();
+new LockAction(
+	"teleportWaiting",
+	(player) => IN_SKY.has(player.id),
+	"§cВ начале коснитесь земли!"
+);
 
 /**
  * Teleports a player randomly within a specified range
@@ -30,7 +39,9 @@ const DB = XA.tables.player;
  * @param {Dimensions} [options.dimension='overworld'] - The dimension in which to teleport the player
  * @param {boolean} [options.elytra=true] - Whether or not to give the player an elytra after teleportation
  * @param {number} [options.c=0] - A counter to prevent infinite recursion in case of invalid teleportation
+ * @param {(location: Vector3) => void} [options.teleportCallback] - Function that calls after player teleport
  * @param {number} [options.keepInSkyTime=5] - The amount of time (in seconds) to keep the player in the air after teleportation
+ * @param {(second: number) => void} [options.keepInSkyCallback] - Function that calls every second while player is in the air
  * @returns {Vector3}
  */
 export function randomTeleport(
@@ -43,35 +54,41 @@ export function randomTeleport(
 		fromYtoBlock = 60,
 		elytra = true,
 		c = 0,
+		teleportCallback = () => {},
 		keepInSkyTime = 5,
+		keepInSkyCallback = () => {},
 	}
 ) {
 	const x = ~~Math.randomInt(from.x, to.x);
 	const z = ~~Math.randomInt(from.z, to.z);
 
-	const d = world[dimension];
-	const { block } = d.getBlockFromRay({ x, y: y - 2, z }, Vector.down);
-	if (block) {
-		if ((y - block.y < fromYtoBlock || block.isLiquid()) && c < 10) {
-			c++;
-			return randomTeleport(target, from, to, {
-				y,
-				dimension,
-				fromYtoBlock,
-				elytra,
-				c,
-				keepInSkyTime,
-			});
-		}
-	}
+	// TODO Load by tickingarea
+	// const { block } = world[dimension].getBlockFromRay({ x, y: y - 2, z }, Vector.down);
+	// if (block) {
+	// if ((y - block.y < fromYtoBlock || block.isLiquid()) && c < 10) {
+	// c++;
+	// 		return randomTeleport(target, from, to, {
+	// 			y,
+	// 			dimension,
+	// 			fromYtoBlock,
+	// 			elytra,
+	// 			c,
+	// 			keepInSkyTime,
+	// 		});
+	// 	}
+	// }
 
 	target.teleport(
 		{ x, y, z },
 		{
 			facingLocation: { x, y: y - 10, z },
 			keepVelocity: false,
+			dimension: world[dimension],
 		}
 	);
+	util.handle(() => {
+		teleportCallback({ x, y, z });
+	});
 
 	if (elytra) giveElytra(target);
 	else {
@@ -87,12 +104,19 @@ export function randomTeleport(
 
 	if (keepInSkyTime) {
 		keepInSkyTime *= 20;
+		IN_SKY.add(target.id);
 		const interval = system.runInterval(
 			() => {
+				util.handle(() => {
+					keepInSkyCallback(keepInSkyTime);
+				});
 				if (keepInSkyTime) {
 					keepInSkyTime--;
 					target.teleport({ x, y, z }, { keepVelocity: false });
-				} else system.clearRun(interval);
+				} else {
+					system.clearRun(interval);
+					IN_SKY.delete(target.id);
+				}
 			},
 			"randomTeleport::keepInSky",
 			0

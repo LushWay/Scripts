@@ -2,44 +2,49 @@ import { Player, Vector } from "@minecraft/server";
 import { LockAction, PlaceAction } from "xapi.js";
 import { Minigame } from "../Minigames/Builder.js";
 
-// const getSettings = Options.player("Телепорт", "Atp", {
-// 	showCoordinates: {
-// 		desc: "Показывать координаты телепортации (выключите если вы стример)",
-// 		value: true,
-// 		name: "",
-// 	},
-// 	title: { desc: "", value: true, name: "" },
-// });
-
 /**
- *
- * @param {Player} player
- * @param {Vector3} to
- * @param {object} [options]
- * @param {string} [options.ignoreQuene]
+ * @typedef {Object} TeleportOptions
+ * @prop {string} [ignoreQueneName]
  */
-export function teleport(player, to, options = {}) {
-	/** @param {string} reason */
-	const fail = (reason) => player.tell("§c► " + reason);
-
-	const quene = Minigame.getQuene(player).name;
-	if (quene && quene !== options.ignoreQuene) {
-		return fail(
-			`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-quit`
-		);
-	}
-
-	if (LockAction.locked(player, {})) return;
-
-	player.teleport(to);
-}
 
 export class Portal {
 	/**
+	 *
+	 * @param {Player} player
+	 * @param {TeleportOptions} [options]
+	 */
+	static canTeleport(player, options = {}) {
+		/** @param {string} reason */
+		const fail = (reason) => {
+			player.tell("§c► " + reason);
+			return false;
+		};
+
+		const quene = Minigame.getQuene(player)?.name;
+		if (quene && quene !== options.ignoreQueneName) {
+			return fail(
+				`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-quit`
+			);
+		}
+
+		if (LockAction.locked(player, {})) return false;
+
+		return true;
+	}
+	/**
+	 *
+	 * @param {Player} player
+	 * @param {Vector3} to
+	 * @param {TeleportOptions} [options]
+	 */
+	static teleport(player, to, options = {}) {
+		if (this.canTeleport(player, options)) player.teleport(to);
+	}
+	/**
 	 * Creates new portal.
 	 * @param {string} name
-	 * @param {Vector3} from
-	 * @param {Vector3} to
+	 * @param {Vector3 | null} from
+	 * @param {Vector3 | null} to
 	 * @param {Vector3 | ((player: Player) => void)} place
 	 * @param {object} [o]
 	 * @param {string[]} [o.aliases]
@@ -55,7 +60,9 @@ export class Portal {
 	) {
 		this.from = from;
 		this.to = to;
-		this.place = place;
+		if (typeof place === "function") {
+			this.teleport = place;
+		} else this.place = place;
 
 		if (createCommand)
 			new XCommand({
@@ -67,14 +74,16 @@ export class Portal {
 				this.teleport(ctx.sender);
 			});
 
-		for (const pos of Vector.foreach(from, to))
-			new PlaceAction(pos, (p) => this.teleport(p));
+		if (from && to) {
+			for (const pos of Vector.foreach(from, to)) {
+				new PlaceAction(pos, (p) => this.teleport(p));
+			}
+		}
 	}
 	/**
 	 * @param {Player} player
 	 */
 	teleport(player) {
-		if (typeof this.place === "function") this.place(player);
-		else teleport(player, this.place);
+		Portal.teleport(player, this.place);
 	}
 }
