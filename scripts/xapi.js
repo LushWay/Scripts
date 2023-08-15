@@ -92,7 +92,7 @@ system.run(async function waiter() {
 
 	let errorName = "LoadError";
 	try {
-		console.log("WORLD LOADED, X-API STARTED");
+		console.log("WORLD LOADED, X-API LOADING...");
 		EventLoader.load(XA.afterEvents.worldLoad);
 
 		errorName = "DatabaseError";

@@ -7,13 +7,13 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
+import "lib/Class/Net.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import "lib/Net/mc.js";
-import { DB, GameUtils, InventoryStore, XEntity, util } from "xapi.js";
-import { MCApp } from "../../../lib/Net/mc.js";
+import { DB, GameUtils, XEntity, util } from "xapi.js";
+import { APIRequest } from "../../../lib/Class/Net.js";
 import "./enchant.js";
 
 world.afterEvents.chatSend.subscribe((event) => {
@@ -171,13 +171,17 @@ const tests = {
 		ctx.reply(bar);
 	},
 	async 51(ctx) {
-		const res = await MCApp.SendToNode("playerPlatform", {
+		const res = await APIRequest("playerPlatform", {
 			playerName: ctx.sender.name,
 		});
 
-		console.warn(util.inspect(res).replace(/§./g, ""));
+		console.warn(util.inspect(res));
 	},
 };
+
+console.log("This is log §6color§r test §lbold");
+console.info("This is info test");
+util.error(new TypeError("This is error test"));
 
 world.afterEvents.entityHitEntity.subscribe((event) => {
 	if (event.damagingEntity instanceof Player) {

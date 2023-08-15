@@ -256,7 +256,7 @@ function listen(from, name) {
 	});
 }
 
-listen(world.afterEvents, "entityHitBlock");
-listen(world.afterEvents, "targetBlockHit");
-listen(world.beforeEvents, "itemUse");
-listen(world.beforeEvents, "itemUseOn");
+// listen(world.afterEvents, "entityHitBlock");
+// listen(world.afterEvents, "targetBlockHit");
+// listen(world.beforeEvents, "itemUse");
+// listen(world.beforeEvents, "itemUseOn");

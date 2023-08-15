@@ -13,17 +13,14 @@ export const util = {
 	 * @param {string[]} [arg2.additionalStack]
 	 * @param {string} [arg2.errorName]
 	 */
-	error(
-		err,
-		{ deleteStack = 0, additionalStack = [], errorName = "Error" } = {}
-	) {
+	error(err, { deleteStack = 0, additionalStack = [], errorName } = {}) {
 		if (typeof err === "string") {
 			err = new Error(err);
-			err.name = "CommandError";
+			err.name = "StringError";
 		}
 		const stack = stackParse(deleteStack + 1, additionalStack, err.stack);
 		const message = errorMessageParse(err);
-		const name = err?.name ?? errorName;
+		const name = errorName ?? err?.name ?? "Error";
 		const text = `§4${name}: §c${message}\n§f${stack}\n`;
 
 		try {
