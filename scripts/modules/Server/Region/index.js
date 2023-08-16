@@ -150,7 +150,7 @@ export function loadRegionsWithGuards(
 					player.location,
 					player.dimension.type
 				);
-				if (currentRegion && !currentRegion.permissions.pvp) {
+				if (currentRegion && !currentRegion?.permissions.pvp) {
 					player.triggerEvent("player:spawn");
 				}
 

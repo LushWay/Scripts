@@ -85,7 +85,7 @@ function showTable(player, table) {
 		}
 
 		const AForm = new ActionForm(
-			key,
+			"§3Ключ " + key,
 			`§7Тип: §f${typeof value}\n ${
 				failedToLoad ? "\n§cОшибка [beforeGet] в таблице!§r\n\n" : ""
 			}\n${util.inspect(value)}\n `

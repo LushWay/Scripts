@@ -167,6 +167,7 @@ export class Region {
 	 * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback - Callback to run
 	 */
 	forEachOwner(callback) {
+		if (!Array.isArray(this.permissions.owners)) return;
 		this.permissions.owners
 			.map(XEntity.fetch)
 			.filter((e) => e)

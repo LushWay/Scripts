@@ -8,7 +8,7 @@ export class zone {
 	 * @param {Vector3} zone
 	 * @param {boolean} [plus]
 	 */
-	static ret(player, isX, zone, plus) {
+	static tp(player, isX, zone, plus) {
 		const a = isX
 			? `${plus ? zone.x + 1 : zone.x - 1} ${player.location.y} ${
 					player.location.z
@@ -27,7 +27,7 @@ export class zone {
 	 * @param {boolean} isX
 	 * @param {Vector3} zone
 	 */
-	static pret(player, isX, zone) {
+	static warn(player, isX, zone) {
 		const floored = Vector.floor(player.location);
 		const l = isX
 			? [zone.x, floored.y + 1, floored.z]

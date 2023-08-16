@@ -1,5 +1,4 @@
 import { Shape } from "../../builders/ShapeBuilder.js";
-//import { WorldEditBuild } from "../../modules/builders/WorldEditBuilder.js";
 import { SHAPES } from "../../utils/shapes.js";
 
 new XCommand({

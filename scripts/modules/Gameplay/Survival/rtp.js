@@ -41,7 +41,6 @@ new LockAction(
  * @param {number} [options.c=0] - A counter to prevent infinite recursion in case of invalid teleportation
  * @param {(location: Vector3) => void} [options.teleportCallback] - Function that calls after player teleport
  * @param {number} [options.keepInSkyTime=5] - The amount of time (in seconds) to keep the player in the air after teleportation
- * @param {(second: number) => void} [options.keepInSkyCallback] - Function that calls every second while player is in the air
  * @returns {Vector3}
  */
 export function randomTeleport(
@@ -56,7 +55,6 @@ export function randomTeleport(
 		c = 0,
 		teleportCallback = () => {},
 		keepInSkyTime = 5,
-		keepInSkyCallback = () => {},
 	}
 ) {
 	const x = ~~Math.randomInt(from.x, to.x);
@@ -102,26 +100,11 @@ export function randomTeleport(
 		);
 	}
 
-	if (keepInSkyTime) {
-		keepInSkyTime *= 20;
-		IN_SKY.add(target.id);
-		const interval = system.runInterval(
-			() => {
-				util.handle(() => {
-					keepInSkyCallback(keepInSkyTime);
-				});
-				if (keepInSkyTime) {
-					keepInSkyTime--;
-					target.teleport({ x, y, z }, { keepVelocity: false });
-				} else {
-					system.clearRun(interval);
-					IN_SKY.delete(target.id);
-				}
-			},
-			"randomTeleport::keepInSky",
-			0
-		);
-	}
+	if (elytra && keepInSkyTime)
+		target.addEffect(MinecraftEffectTypes.SlowFalling, keepInSkyTime * 20, {
+			showParticles: false,
+			amplifier: 200,
+		});
 
 	return { x, y, z };
 }

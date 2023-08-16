@@ -149,7 +149,10 @@ system.runInterval(
 			return { dimension: p.dimension.type, loc: p.location };
 		});
 
-		for (const base of RadiusRegion.getAllRegions()) {
+		for (const base of RadiusRegion.getAllRegions().filter(
+			// Ensure that region is a base (enabled pvp)
+			(e) => e.permissions.pvp
+		)) {
 			const block = world[base.dimensionId].getBlock(Vector.floor(base.center));
 			if (!block) continue;
 			if (block.typeId === MinecraftBlockTypes.barrel.id) {

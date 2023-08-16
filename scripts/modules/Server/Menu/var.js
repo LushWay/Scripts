@@ -1,22 +1,15 @@
-import { ItemLockMode, ItemStack, Player } from "@minecraft/server";
+import { ItemLockMode, ItemStack } from "@minecraft/server";
 import { ActionForm, MessageForm } from "xapi.js";
 
+const item = new ItemStack("xa:menu");
+item.lockMode = ItemLockMode.inventory;
+item.setLore([
+	"§r§7Для открытия возьми в руку и",
+	"§r§7зажми на телефоне, лкм на пк",
+]);
+
 export const MENU = {
-	item: new ItemStack("xa:menu"),
-	/**
-	 *
-	 * @param {Player} player
-	 * @returns
-	 */
-	GetItem(player = null, option = false) {
-		const item = this.item.clone();
-		item.lockMode = ItemLockMode.inventory;
-		item.setLore([
-			"§r§7Для открытия возьми в руку и",
-			"§r§7зажми на телефоне, лкм на пк",
-		]);
-		return item;
-	},
+	item,
 	/**
 	 *
 	 * @param {import("@minecraft/server").Player} player

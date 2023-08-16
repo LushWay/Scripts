@@ -205,14 +205,14 @@ class BattleRoyal {
 								l.z <= rmax.z &&
 								l.z >= rmin.z
 							)
-								zone.ret(p, true, rmax);
+								zone.tp(p, true, rmax);
 							if (
 								l.x >= rmax.x - 10 &&
 								l.x <= rmax.x &&
 								l.z <= rmax.z &&
 								l.z >= rmin.z
 							)
-								zone.pret(p, true, rmax);
+								zone.warn(p, true, rmax);
 
 							if (
 								l.z >= rmax.z &&
@@ -220,14 +220,14 @@ class BattleRoyal {
 								l.x <= rmax.x &&
 								l.x >= rmin.x
 							)
-								zone.ret(p, false, rmax);
+								zone.tp(p, false, rmax);
 							if (
 								l.z >= rmax.z - 10 &&
 								l.z <= rmax.z &&
 								l.x <= rmax.x &&
 								l.x >= rmin.x
 							)
-								zone.pret(p, false, rmax);
+								zone.warn(p, false, rmax);
 
 							if (
 								l.x <= rmin.x &&
@@ -235,14 +235,14 @@ class BattleRoyal {
 								l.z <= rmax.z &&
 								l.z >= rmin.z
 							)
-								zone.ret(p, true, rmin, true);
+								zone.tp(p, true, rmin, true);
 							if (
 								l.x <= rmin.x + 10 &&
 								l.x >= rmin.x &&
 								l.z <= rmax.z &&
 								l.z >= rmin.z
 							)
-								zone.pret(p, true, rmin);
+								zone.warn(p, true, rmin);
 
 							if (
 								l.z <= rmin.z &&
@@ -250,14 +250,14 @@ class BattleRoyal {
 								l.x <= rmax.x &&
 								l.x >= rmin.x
 							)
-								zone.ret(p, false, rmin, true);
+								zone.tp(p, false, rmin, true);
 							if (
 								l.z <= rmin.z + 10 &&
 								l.z >= rmin.z &&
 								l.x <= rmax.x &&
 								l.x >= rmin.x
 							)
-								zone.pret(p, false, rmin);
+								zone.warn(p, false, rmin);
 						}
 
 						//Отображение таймера и игроков
