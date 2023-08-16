@@ -3,6 +3,7 @@
 		"alwaysStrict": true,
 		"allowJs": true,
 		"checkJs": true,
+		"noEmit": true,
 		"forceConsistentCasingInFileNames": true,
 		"noImplicitAny": true,
 		"skipLibCheck": false,
@@ -17,5 +18,6 @@
 			"*": ["scripts/*"]
 		}
 	},
-	"include": ["./scripts/"]
+	"include": ["./scripts/"],
+	"exclude": ["./scripts/chestui"]
 }

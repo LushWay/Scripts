@@ -63,7 +63,7 @@ const { UserBusy, UserClosed } = FormCancelationReason;
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it
  * succeeds or the maximum number of attempts is reached.
- * @param {ActionFormData | ModalFormData | MessageFormData} form - The form you want to show.
+ * @param {Pick<ActionFormData, "show"> | Pick<ModalFormData, "show"> | Pick<MessageFormData, "show">} form - The form you want to show.
  * @param {Player} player - The player who will receive the form.
  * @returns  The response from the form.
  */

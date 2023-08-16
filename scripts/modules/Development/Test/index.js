@@ -12,7 +12,8 @@ import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { DB, GameUtils, XEntity, util } from "xapi.js";
+import { DB, GameUtils, XEntity, XShowForm, util } from "xapi.js";
+import { ChestFormData } from "../../../chestui/forms.js";
 import { APIRequest } from "../../../lib/Class/Net.js";
 import "./enchant.js";
 
@@ -176,6 +177,40 @@ const tests = {
 		});
 
 		console.warn(util.inspect(res));
+	},
+	52(ctx) {
+		const form = new ChestFormData("large").pattern(
+			[0, 0],
+			[
+				"xxxxxxxxx",
+				"x_______x",
+				"x___a___x",
+				"x_______x",
+				"x_______x",
+				"xxxxxxxxx",
+			],
+			{
+				x: {
+					data: {
+						itemName: "",
+						itemDesc: [],
+						enchanted: false,
+						stackSize: 1,
+					},
+					iconPath: "minecraft:stained_glass_pane",
+				},
+				a: {
+					data: {
+						itemName: "%item.anvil.name",
+						itemDesc: ["Click me!"],
+						enchanted: true,
+						stackSize: 1,
+					},
+					iconPath: "minecraft:anvil",
+				},
+			}
+		);
+		XShowForm(form, ctx.sender);
 	},
 };
 

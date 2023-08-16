@@ -1,12 +1,18 @@
 # Server on X-API
 
-Simple pack for Minecraft PE anarchy server. 
-
-X-API is based on [Smelly API](https://github.com/Smelly-API/Smelly-API)
+Script API pack for Minecraft PE anarchy server called Shp1natMine. 
 
 This project uses many code from:
-  [Rubedo](https://github.com/smell-of-curry/rubedo)
   [Bedrock Scripting API](https://discord.gg/wMSBmuBB)
+  [Herobrine's Chest UI](https://github.com/Herobrine643928/Chest-UI/)
+  [Smelly API](https://github.com/Smelly-API/Smelly-API)
+  [Rubedo](https://github.com/smell-of-curry/rubedo)
+
+
+## Update dependencies:
+```bash
+git read-tree --prefix=scripts/chestui -u chestuib:BP/scripts/extensions
+```
 
 ## Folder overview
 
