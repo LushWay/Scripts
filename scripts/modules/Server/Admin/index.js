@@ -1,4 +1,4 @@
-import { ItemStack, Player, system, world } from "@minecraft/server";
+import { Player, system, world } from "@minecraft/server";
 import { OPTIONS_NAME, Options } from "lib/Class/Options.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
@@ -101,6 +101,7 @@ system.afterEvents.scriptEventReceive.subscribe((event) => {
 		if (!player) console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
 
 		setRole(player, "admin");
+		console.warn("ROLE HAS BEEN SET");
 	}
 });
 
@@ -267,7 +268,6 @@ function group(player, groupName, groupType, errors = {}) {
 		}
 	});
 }
-ItemStack;
 
 /** @type {Partial<Record<AllTypes, string>>} */
 const Types = {

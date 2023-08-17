@@ -12,7 +12,7 @@ import { Database } from "./lib/Database/Rubedo.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
 import { OverTakes } from "./lib/Setup/prototypes.js";
-import { util } from "./lib/Setup/utils.js";
+import { util } from "./lib/Setup/util.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
@@ -72,7 +72,7 @@ export * from "./lib/Form/utils.js";
 export * from "./lib/Setup/Extensions/system.js";
 export * from "./lib/Setup/prototypes.js";
 export * from "./lib/Setup/roles.js";
-export * from "./lib/Setup/utils.js";
+export * from "./lib/Setup/util.js";
 
 world.afterEvents.playerJoin.subscribe((player) => {
 	if (

@@ -64,8 +64,9 @@ system.runPlayerInterval(
 			const range = lore[3]?.replace("Range: ", "");
 			if (range) {
 				q.maxDistance = parseInt(range);
-				const { block } = p.getBlockFromViewDirection(q);
-				if (block) {
+				const raycast = p.getBlockFromViewDirection(q);
+				if (raycast) {
+					const { block } = raycast;
 					const ent1 = block.dimension.getEntitiesAtBlockLocation(
 						block.location
 					);

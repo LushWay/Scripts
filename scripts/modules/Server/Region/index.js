@@ -21,9 +21,8 @@ let LOADED = false;
  */
 
 /**
- * @callback survivalNeeded
+ * @callback regionCallback
  * @param {Player} player
- * @param {Block} block
  * @param {Region} region
  */
 
@@ -38,12 +37,12 @@ let LOADED = false;
  * WARNING! Loads only one time
  * @param {interactionAllowed} allowed
  * @param {spawnAllowed} spawnAllowed
- * @param {survivalNeeded} suvivalNeeded
+ * @param {regionCallback} regionCallback
  */
 export function loadRegionsWithGuards(
 	allowed,
 	spawnAllowed,
-	suvivalNeeded = () => false
+	regionCallback = () => void 0
 ) {
 	if (LOADED) throw new ReferenceError("Regions already loaded!");
 	LOADED = true;
@@ -150,28 +149,9 @@ export function loadRegionsWithGuards(
 					player.location,
 					player.dimension.type
 				);
-				if (currentRegion && !currentRegion?.permissions.pvp) {
-					player.triggerEvent("player:spawn");
-				}
+				
 
-				const isOwner =
-					currentRegion && currentRegion.permissions.owners.includes(player.id);
-				if (!isOwner) {
-					if (!player.hasTag("modding")) {
-						const facing = player.getBlockFromViewDirection({
-							includeLiquidBlocks: true,
-							includePassableBlocks: true,
-							maxDistance: 10,
-						});
-						if (suvivalNeeded(player, facing?.block, currentRegion)) {
-							player.runCommand("gamemode survival");
-						} else {
-							player.runCommand("gamemode adventure");
-						}
-					}
-				} else if (player.isGamemode("adventure")) {
-					player.runCommand("gamemode survival");
-				}
+				regionCallback(player, currentRegion);
 			}
 		},
 		"pvp region disable",

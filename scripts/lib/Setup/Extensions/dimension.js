@@ -1,6 +1,6 @@
 import { Dimension, world } from "@minecraft/server";
 import { OverTakes } from "../prototypes.js";
-import { util } from "../utils.js";
+import { util } from "../util.js";
 
 OverTakes(Dimension.prototype, {
 	get type() {

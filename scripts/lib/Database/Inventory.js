@@ -6,7 +6,7 @@ import {
 	Player,
 	system,
 } from "@minecraft/server";
-import { util } from "../Setup/utils.js";
+import { util } from "../Setup/util.js";
 import { DB, DatabaseError } from "./Default.js";
 
 const TABLE_TYPE = "inventory";

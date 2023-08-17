@@ -12,7 +12,7 @@ import { WorldEditBuild } from "./WorldEditBuilder.js";
  * @example new Fill(BlockLocation, BlockLocation, ["stone", "wood"], ["grass"]);
  */
 export function FillFloor(pos1, pos2, blocks, rb = "any") {
-	util.handle(async () => {
+	util.catch(async () => {
 		WorldEditBuild.backup(pos1, pos2);
 
 		try {

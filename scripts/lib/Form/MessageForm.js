@@ -43,8 +43,8 @@ export class MessageForm {
 		this.form = new MessageFormData();
 		if (title) this.form.title(title);
 		if (body) this.form.body(body);
-		this.setButton1("Ок", () => 0);
-		this.setButton2("", () => 0);
+		this.setButton2("Ок", () => 0);
+		this.setButton1("", () => 0);
 		this.triedToShow = 0;
 	}
 	/**
@@ -58,7 +58,7 @@ export class MessageForm {
 	 */
 	setButton1(text, callback) {
 		this.button1 = { text: text, callback: callback };
-		this.form.button1(text);
+		this.form.button2(text);
 		return this;
 	}
 	/**
@@ -72,7 +72,7 @@ export class MessageForm {
 	 */
 	setButton2(text, callback) {
 		this.button2 = { text: text, callback: callback };
-		this.form.button2(text);
+		this.form.button1(text);
 		return this;
 	}
 	/**
@@ -85,8 +85,8 @@ export class MessageForm {
 		if (response === false || !(response instanceof MessageFormResponse))
 			return;
 		if (response.selection === 1)
-			util.handle(this.button1?.callback, null, ["MessageFormCallback"]);
+			util.catch(this.button1?.callback, null, ["MessageFormCallback"]);
 		if (response.selection === 0)
-			util.handle(this.button2?.callback, null, ["MessageFormCallback"]);
+			util.catch(this.button2?.callback, null, ["MessageFormCallback"]);
 	}
 }

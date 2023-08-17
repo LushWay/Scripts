@@ -11,7 +11,7 @@ const brushCMD = new XCommand({
 	type: "wb",
 });
 brushCMD
-	.string("shape", true)
+	.string("shape", false)
 	.string("blocks", true)
 	.int("size", true)
 	.executes((ctx, shape, blocks, size) => {

@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
-import { util } from "../Setup/utils.js";
+import { util } from "../Setup/util.js";
 
 export const OPTIONS_NAME = Symbol("name");
 
@@ -143,10 +143,8 @@ export class EditableLocation {
 			(typeof location === "object" && Object.keys(location).length === 0)
 		) {
 			if (!fallback) {
-				util.error(
-					new ReferenceError(
-						"Location doesn't defined and fallback is disabled!"
-					)
+				console.warn(
+					"§eSetup location §f" + id + "§e in\n" + util.error.stack.get()
 				);
 				this.valid = false;
 				return;

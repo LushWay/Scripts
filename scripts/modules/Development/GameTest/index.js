@@ -147,7 +147,7 @@ GameTest.registerAsync("s", "m", async (test) => {
 		);
 		player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
 		await test.idle(Math.random() * 50);
-		util.handle(async () => {
+		util.catch(async () => {
 			while (!succeed) {
 				await test.idle(Math.random() * 40);
 				if (!player) break;

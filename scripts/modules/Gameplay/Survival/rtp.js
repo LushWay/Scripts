@@ -84,7 +84,7 @@ export function randomTeleport(
 			dimension: world[dimension],
 		}
 	);
-	util.handle(() => {
+	util.catch(() => {
 		teleportCallback({ x, y, z });
 	});
 

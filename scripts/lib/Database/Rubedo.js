@@ -1,7 +1,6 @@
 import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
-import { stackParse } from "../Class/Error.js";
-import { util } from "../Setup/utils.js";
 import { DB } from "./Default.js";
+import { util } from "../Setup/util.js";
 
 const TABLE_TYPE = "rubedo";
 const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
@@ -20,7 +19,9 @@ export class Database {
 	 * @returns {Source}
 	 */
 	static eventProxy(source, events) {
-		const proxy = { _: { EVENTS: events, PROXY_PATH: stackParse(1) } };
+		const proxy = {
+			_: { EVENTS: events, PROXY_PATH: util.error.stack.get(1) },
+		};
 		Object.setPrototypeOf(proxy, source);
 		Object.setPrototypeOf(proxy._, source._);
 		// @ts-expect-error
@@ -95,7 +96,7 @@ export class Database {
 			return this.parent.MEMORY;
 		},
 		PATH: "",
-		PROXY_PATH: ""
+		PROXY_PATH: "",
 	};
 
 	/**
@@ -114,7 +115,7 @@ export class Database {
 		}
 
 		this._.TABLE_NAME = tableName;
-		this._.PATH = stackParse();
+		this._.PATH = util.error.stack.get();
 		if (events) this._.EVENTS = events;
 		if (Database.isTablesInited) this.init();
 

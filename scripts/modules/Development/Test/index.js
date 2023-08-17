@@ -1,5 +1,6 @@
 import {
 	ItemStack,
+	MinecraftBlockTypes,
 	MinecraftItemTypes,
 	MolangVariableMap,
 	Player,
@@ -15,6 +16,7 @@ import { ModalForm } from "lib/Form/ModelForm.js";
 import { DB, GameUtils, XEntity, XShowForm, util } from "xapi.js";
 import { ChestFormData } from "../../../chestui/forms.js";
 import { APIRequest } from "../../../lib/Class/Net.js";
+import { generateOre } from "../../Gameplay/Survival/ore.js";
 import "./enchant.js";
 
 world.afterEvents.chatSend.subscribe((event) => {
@@ -25,6 +27,12 @@ world.afterEvents.chatSend.subscribe((event) => {
  * @type {Object<string, (ctx?: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+	0() {
+		console.log("This is log §6color§r test §lbold");
+		console.info("This is info test");
+		console.warn("This is warn test");
+		util.error(new TypeError("This is error test"));
+	},
 	1: (ctx) => {
 		const menu = new ActionForm("Action", "body").addButton(
 			"button",
@@ -212,11 +220,20 @@ const tests = {
 		);
 		XShowForm(form, ctx.sender);
 	},
-};
+	53(ctx) {
+		const rad = Number(ctx.args[1]);
+		if (isNaN(rad)) return ctx.error(ctx.args[1] + " should be number!");
+		// new Shape(SHAPES.sphere, ctx.sender.location, ["air"], rad);
 
-console.log("This is log §6color§r test §lbold");
-console.info("This is info test");
-util.error(new TypeError("This is error test"));
+		const orePositions = generateOre(ctx.sender.location, rad);
+
+		for (const position of orePositions) {
+			ctx.sender.dimension
+				.getBlock(position)
+				.setType(MinecraftBlockTypes.stone);
+		}
+	},
+};
 
 world.afterEvents.entityHitEntity.subscribe((event) => {
 	if (event.damagingEntity instanceof Player) {
@@ -244,5 +261,5 @@ c.string("number", true).executes(async (ctx, n) => {
 	const keys = Object.keys(tests);
 	const i = n && keys.includes(n) ? n : keys.pop();
 	ctx.reply(i);
-	util.handle(() => tests[i](ctx), "Test");
+	util.catch(() => tests[i](ctx), "Test");
 });

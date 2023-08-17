@@ -1,5 +1,4 @@
 import { Player, system, world } from "@minecraft/server";
-import { BECHMARK_RESULTS } from "lib/Class/Benchmark.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
@@ -124,7 +123,7 @@ function showTable(player, table) {
 	let keys = DB.keys();
 	for (const key of keys) {
 		menu.addButton(key, null, () =>
-			util.handle(() => propertyForm(key), "FormBuilder")
+			util.catch(() => propertyForm(key), "FormBuilder")
 		);
 	}
 
@@ -202,7 +201,7 @@ export function visualise_benchmark_result({
 } = {}) {
 	let output = "";
 	let res = [];
-	for (const [key, val] of Object.entries(BECHMARK_RESULTS[type])) {
+	for (const [key, val] of Object.entries(util.benchmark.results[type])) {
 		const total_count = val.length;
 		const total_time = val.reduce((p, c) => p + c);
 		const average = total_time / total_count;
@@ -251,10 +250,10 @@ new XCommand({
 	.string("type", true)
 	.boolean("pathes", true)
 	.executes((ctx, type, pathes) => {
-		if (type && !(type in BECHMARK_RESULTS))
+		if (type && !(type in util.benchmark.results))
 			return ctx.error(
 				"Неизвестный тип бенчмарка! Доступные типы: \n  §f" +
-					Object.keys(BECHMARK_RESULTS).join("\n  ")
+					Object.keys(util.benchmark.results).join("\n  ")
 			);
 
 		function show() {

@@ -25,7 +25,6 @@ JOIN.EVENTS.playerClosedGuide.subscribe((player) => {
 MENU.OnOpen = (player) => {
 	const regionID = DB.get(player.id);
 	let Pregion = CubeRegion.getAllRegions().find((e) => e.key === regionID);
-	world.debug(Pregion);
 	if (!Pregion) {
 		player.tell(
 			"§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую."
@@ -36,7 +35,7 @@ MENU.OnOpen = (player) => {
 
 	const current_region = CubeRegion.blockLocationInRegion(
 		player.location,
-		player.dimension.id
+		player.dimension.type
 	);
 	const inOwnRegion =
 		current_region &&
@@ -167,7 +166,7 @@ MENU.OnOpen = (player) => {
 					);
 					for (const ID of editRequest.list) {
 						const name = XEntity.getNameByID(ID);
-						newmenu.addButton(name, null, () => {
+						newmenu.addButton(name ?? "unnamed", null, () => {
 							prompt(
 								player,
 								"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
@@ -254,7 +253,7 @@ MENU.OnOpen = (player) => {
 						async () => {
 							CD.update();
 							const end = await ClearRegion(player, Pregion);
-							await util.handle(() => fillRegion(Pregion.from, Pregion.to));
+							await util.catch(() => fillRegion(Pregion.from, Pregion.to));
 							end();
 						},
 						"Отмена, не очищайте",

@@ -52,10 +52,14 @@ export class Region {
 		 * The default permissions for all regions made
 		 */
 		get PERMISSIONS() {
-			if (!this.PERMS_SETTED)
-				throw new ReferenceError(
-					"Cannot access Region.CONFIG.PERMISSIONS before setting."
+			if (!this.PERMS_SETTED) {
+				util.error(
+					new ReferenceError(
+						"Cannot access Region.CONFIG.PERMISSIONS before setting."
+					)
 				);
+				return;
+			}
 
 			return Region.PERMISSIONS;
 		},
@@ -167,12 +171,11 @@ export class Region {
 	 * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback - Callback to run
 	 */
 	forEachOwner(callback) {
-		if (!Array.isArray(this.permissions.owners)) return;
 		this.permissions.owners
 			.map(XEntity.fetch)
 			.filter((e) => e)
 			.forEach((player, i, owners) =>
-				util.handle(() => callback(player, i, owners), "Region.forEachOwner")
+				util.catch(() => callback(player, i, owners), "Region.forEachOwner")
 			);
 	}
 }
@@ -188,7 +191,7 @@ export class CubeRegion extends Region {
 	}
 	/**
 	 * @param {Vector3} blockLocation
-	 * @param {string} dimensionId
+	 * @param {Dimensions} dimensionId
 	 * @returns {CubeRegion | undefined}
 	 */
 	static blockLocationInRegion(blockLocation, dimensionId) {
@@ -240,6 +243,7 @@ export class CubeRegion extends Region {
 			permissions: this.permissions,
 			to: this.to,
 		});
+		console.debug(this.permissions, TABLE.get(this.key));
 	}
 }
 

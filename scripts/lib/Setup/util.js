@@ -1,33 +1,122 @@
 import { system } from "@minecraft/server";
-import { errorMessageParse, stackParse } from "../Class/Error.js";
 
 export const util = {
 	settings: {
 		BDSMode: true,
 	},
-	/**
-	 * Parse and show error in chat
-	 * @param {{ message: string; stack?: string; name?: string} | string} err
-	 * @param {object} [arg2]
-	 * @param {number} [arg2.deleteStack]
-	 * @param {string[]} [arg2.additionalStack]
-	 * @param {string} [arg2.errorName]
-	 */
-	error(err, { deleteStack = 0, additionalStack = [], errorName } = {}) {
-		if (typeof err === "string") {
-			err = new Error(err);
-			err.name = "StringError";
-		}
-		const stack = stackParse(deleteStack + 1, additionalStack, err.stack);
-		const message = errorMessageParse(err);
-		const name = errorName ?? err?.name ?? "Error";
-		const text = `§4${name}: §c${message}\n§f${stack}\n`;
+	error: Object.assign(
+		/**
+		 * Parse and show error in chat
+		 * @param {{ message: string; stack?: string; name?: string} | string} error
+		 * @param {object} [arg2]
+		 * @param {number} [arg2.deleteStack]
+		 * @param {string[]} [arg2.additionalStack]
+		 * @param {string} [arg2.errorName]
+		 */
+		function error(
+			error,
+			{ deleteStack = 0, additionalStack = [], errorName } = {}
+		) {
+			if (typeof error === "string") {
+				error = new Error(error);
+				error.name = "StringError";
+			}
+			const stack = util.error.stack.get(
+				deleteStack + 1,
+				additionalStack,
+				error.stack
+			);
+			const message = util.error.message.get(error);
+			const name = errorName ?? error?.name ?? "Error";
+			const text = `§4${name}: §c${message}\n§f${stack}\n`;
 
-		try {
-			// if (onWorldLoad.loaded()) world.say(text);
-			console.error(text);
-		} catch (e) {}
-	},
+			try {
+				// if (onWorldLoad.loaded()) world.say(text);
+				console.error(text);
+			} catch (e) {}
+		},
+		{
+			stack: {
+				/** @type {[RegExp | ((s: string) => string), string?][]} */
+				modifiers: [
+					[/\\/g, "/"],
+					[/<anonymous>/, "<>"],
+					[/<> \((.+)\)/, "$1"],
+					[/<input>/, "§7<eval>§r"],
+					[/(.*)\(native\)(.*)/, "§8$1(native)$2§f"],
+					[
+						(s) =>
+							s.includes("lib") || s.includes("xapi.js")
+								? `§7${s.replace(/§./g, "")}§f`
+								: s,
+					],
+					[
+						(s) =>
+							s.startsWith("§7") ? s : s.replace(/\.js:(\d+)/, ".js:§6$1§f"),
+					],
+				],
+
+				/**
+				 * Parse stack
+				 * @param {string} stack
+				 * @param {string[]} additionalStack
+				 * @param {number} deleteStack
+				 * @returns {string}
+				 */
+				get(
+					deleteStack = 0,
+					additionalStack = [],
+					stack = new Error().stack
+						.split("\n")
+						.slice(deleteStack + 1)
+						.join("\n")
+				) {
+					const stackArray = additionalStack.concat(stack.split("\n"));
+
+					const mappedStack = stackArray
+						.map((e) => e?.replace(/\s+at\s/g, "")?.replace(/\n/g, ""))
+						.map((e) => {
+							for (const [r, p] of this.modifiers) {
+								if (typeof e !== "string" || e.length < 1) break;
+
+								if (typeof r === "function") e = r(e);
+								else e = e.replace(r, p ?? "");
+							}
+							return e;
+						})
+						.filter((e) => e && /^\s*\S/g.test(e))
+						.map((e) => `   ${e}\n`);
+
+					return mappedStack.join("");
+				},
+			},
+			message: {
+				/** @type {[RegExp | string, string, string?][]} */
+				modifiers: [
+					[/\n/g, ""],
+					[
+						/Module \[(.*)\] not found\. Native module error or file not found\./g,
+						"§cNot found: §6$1",
+						"LoadError",
+					],
+				],
+
+				/**
+				 * @param {{message?: string, name?: string}} error
+				 */
+				get(error) {
+					let message = error.message ?? "";
+					for (const [find, replace, newname] of this.modifiers) {
+						const newmessage = message.replace(find, replace);
+						if (newmessage !== message && newname) error.name = newname;
+						message = newmessage;
+					}
+
+					return message;
+				},
+			},
+		}
+	),
 
 	/**
 	 * @param {Object} target
@@ -167,7 +256,7 @@ export const util = {
 	 * @param {string} [type]
 	 * @param {string[]} [additionalStack]
 	 */
-	async handle(func, type = "Handled", additionalStack) {
+	async catch(func, type = "Handled", additionalStack) {
 		try {
 			await func();
 		} catch (e) {
@@ -194,6 +283,41 @@ export const util = {
 				await system.sleep(1);
 				return count;
 			}
+		};
+	},
+
+	benchmark: Object.assign(
+		/**
+		 * It returns a function that when called, returns the time it took to call the function and records result to const
+		 * @param {string} label - The name of the benchmark.
+		 * @returns {() => number} A function that returns the time it took to run the function.
+		 */
+		function benchmark(label, type = "test") {
+			const start_time = Date.now();
+
+			return function end() {
+				const took_time = Date.now() - start_time;
+				util.benchmark.results[type] ??= {};
+				util.benchmark.results[type][label] ??= [];
+				util.benchmark.results[type][label].push(took_time);
+				return took_time;
+			};
+		},
+		{
+			/** @type {Record<string, Record<string, number[]>>} */
+			results: {},
+		}
+	),
+
+	strikeTest() {
+		let start = Date.now();
+		/**
+		 * @param {string} label
+		 */
+		return (label) => {
+			const date = Date.now();
+			console.log(label, "§e" + (date - start) + "ms");
+			start = date;
 		};
 	},
 

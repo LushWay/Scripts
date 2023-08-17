@@ -27,6 +27,8 @@ import { Portal } from "./portals.js";
 import "./raid.js";
 import { randomTeleport } from "./rtp.js";
 
+console.log("SURVIVAL LOADED");
+
 loadRegionsWithGuards(
 	// Common actions guard
 	(player, region, context) => {
@@ -49,10 +51,35 @@ loadRegionsWithGuards(
 		region.permissions.allowedEntitys === "all" ||
 		region.permissions.allowedEntitys.includes(data.entity.typeId),
 
-	(player, block, region) => {
-		if (block && block?.type?.id === "minecraft:smithing_table") return true;
-		const heldItem = XEntity.getHeldItem(player);
-		if (!region && heldItem?.isStackableWith(baseItemStack)) return true;
+	(player, currentRegion) => {
+		// @ts-expect-error
+		function survivalNeeded(player, block, region) {
+			if (block && block?.type?.id === "minecraft:smithing_table") return true;
+			const heldItem = XEntity.getHeldItem(player);
+			if (!region && heldItem?.isStackableWith(baseItemStack)) return true;
+		}
+		if (currentRegion && !currentRegion?.permissions.pvp) {
+			player.triggerEvent("player:spawn");
+		}
+
+		const isOwner =
+			currentRegion && currentRegion.permissions.owners.includes(player.id);
+		if (!isOwner) {
+			if (!player.hasTag("modding")) {
+				const facing = player.getBlockFromViewDirection({
+					includeLiquidBlocks: true,
+					includePassableBlocks: true,
+					maxDistance: 10,
+				});
+				if (survivalNeeded(player, facing?.block, currentRegion)) {
+					player.runCommand("gamemode survival");
+				} else {
+					player.runCommand("gamemode adventure");
+				}
+			}
+		} else if (player.isGamemode("adventure")) {
+			player.runCommand("gamemode survival");
+		}
 	}
 );
 
@@ -116,7 +143,6 @@ if (SpawnLocation.valid) {
 	});
 	world.setDefaultSpawnLocation(SpawnLocation);
 	let spawnregion = Region.locationInRegion(SpawnLocation, "overworld");
-	console.log(spawnregion);
 	if (!spawnregion || !(spawnregion instanceof RadiusRegion)) {
 		spawnregion = new RadiusRegion(
 			{ x: SpawnLocation.x, z: SpawnLocation.z, y: SpawnLocation.y },
@@ -292,7 +318,7 @@ if (AnarchyPortalLocation.valid) {
 			}
 
 			system.run(() =>
-				util.handle(() => {
+				util.catch(() => {
 					if (!data.anarchy) {
 						InventoryStore.load(
 							player,

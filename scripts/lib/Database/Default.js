@@ -6,7 +6,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { util } from "../Setup/utils.js";
+import { util } from "../Setup/util.js";
 
 world.afterEvents.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();

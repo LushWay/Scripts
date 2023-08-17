@@ -1,5 +1,5 @@
 import { OverTakes } from "../prototypes.js";
-import { util } from "../utils.js";
+import { util } from "../util.js";
 
 /**
  * Common JavaScript objects
@@ -35,33 +35,30 @@ Array.prototype.randomElement = function () {
 	return this[~~(Math.random() * (this.length - 1))];
 };
 
+/**
+ *
+ * @param  {any[]} args
+ */
+function format(args) {
+	return args
+		.map((e) =>
+			util.toTerminalColors(typeof e === "string" ? e : util.inspect(e))
+		)
+		.join(" ");
+}
+
 OverTakes(console, {
 	error(...args) {
-		super.error(
-			args
-				.map((e) =>
-					util.toTerminalColors(typeof e === "string" ? e : util.inspect(e))
-				)
-				.join(" ")
-		);
+		super.error(format(args));
 	},
 	warn(...args) {
-		super.warn(
-			args
-				.map((e) =>
-					util.toTerminalColors(typeof e === "string" ? e : util.inspect(e))
-				)
-				.join(" ")
-		);
+		super.warn(format(args));
 	},
 	log(...args) {
-		super.log(
-			args
-				.map((e) =>
-					util.toTerminalColors(typeof e === "string" ? e : util.inspect(e))
-				)
-				.join(" ")
-		);
+		super.log(format(args));
+	},
+	debug(...args) {
+		super.log(format(args));
 	},
 });
 

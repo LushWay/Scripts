@@ -1,6 +1,6 @@
 import { MinecraftDimensionTypes, World, world } from "@minecraft/server";
 import { OverTakes } from "../prototypes.js";
-import { util } from "../utils.js";
+import { util } from "../util.js";
 
 const send = world.sendMessage.bind(world);
 

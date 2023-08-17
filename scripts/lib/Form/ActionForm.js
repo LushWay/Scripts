@@ -57,6 +57,6 @@ export class ActionForm {
 		if (response === false || !(response instanceof ActionFormResponse)) return;
 		const callback = this.buttons[response.selection]?.callback;
 		if (typeof callback === "function")
-			util.handle(callback, null, ["ActionFormCallback"]);
+			util.catch(callback, null, ["ActionFormCallback"]);
 	}
 }

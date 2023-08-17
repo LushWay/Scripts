@@ -182,7 +182,7 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
 	if (typeof lastArg.sys.callback !== "function")
 		return event.sender.tell("§6⚠ Упс, эта команда пока не работает.");
 
-	util.handle(
+	util.catch(
 		() =>
 			lastArg.sys.callback(
 				new CommandContext(event, cmdArgs, baseCommand, rawInput),

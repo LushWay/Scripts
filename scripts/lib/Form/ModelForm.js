@@ -109,7 +109,7 @@ export class ModalForm {
 	async show(player, callback) {
 		const response = await XShowForm(this.form, player);
 		if (response === false || !(response instanceof ModalFormResponse)) return;
-		util.handle(
+		util.catch(
 			() =>
 				callback(
 					new FormCallback(this, player, callback),
