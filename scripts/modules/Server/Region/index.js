@@ -1,5 +1,4 @@
 import {
-	Block,
 	BlockBreakAfterEvent,
 	EntitySpawnAfterEvent,
 	MinecraftBlockTypes,

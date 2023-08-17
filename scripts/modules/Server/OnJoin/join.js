@@ -71,7 +71,7 @@ system.runPlayerInterval(
 
 			if (not_moved) {
 				// Player still stays at joined position...
-				if (player.isOnGround) {
+				if (player.isOnGround || player.isFlying) {
 					// Player doesnt falling down, show animation
 					data.stage = data.stage ?? -1;
 					data.stage++;

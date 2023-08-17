@@ -1,8 +1,8 @@
 /**
- *
+ * @author ConMaster2112
  * @template b
  * @param {b} prototype
- * @param {Partial<b>} object
+ * @param {PartialParts<b>} object
  * @returns {b}
  */
 export function OverTakes(prototype, object) {

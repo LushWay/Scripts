@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 
 /** @type {Database<string, {role: keyof typeof ROLES}>} */
@@ -70,8 +70,9 @@ export function IS(playerID, role) {
 	/** @type {(keyof typeof ROLES)[]} */
 	let arr = ["moderator", "admin"];
 
-	if (role === "admin") arr = ["admin"];
+	if (role === "member") arr = ["member"];
 	if (role === "builder") arr.push("builder");
+	if (role === "admin") arr = ["admin"];
 
 	return arr.includes(getRole(playerID));
 }

@@ -28,7 +28,7 @@ export const util = {
 			);
 			const message = util.error.message.get(error);
 			const name = errorName ?? error?.name ?? "Error";
-			const text = `§4${name}: §c${message}\n§f${stack}\n`;
+			const text = `§4${name}: §c${message}\n§f${stack}`;
 
 			try {
 				// if (onWorldLoad.loaded()) world.say(text);

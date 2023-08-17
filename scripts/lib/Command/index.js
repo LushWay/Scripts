@@ -107,7 +107,8 @@ export class XCommand {
 	constructor(data, type, depth = 0, parent = null) {
 		data.requires ??= () => true;
 		data.type ??= "test";
-		if ("role" in data) data.requires = (p) => IS(p.id, data.role);
+		if ("role" in data && data.role !== "member")
+			data.requires = (p) => IS(p.id, data.role);
 
 		this.sys = {
 			data,
@@ -125,6 +126,8 @@ export class XCommand {
 			 */
 			callback: undefined,
 		};
+
+		if (data.name === "sit") console.debug(this.sys);
 
 		if (depth === 0) XCommand.COMMANDS.push(this);
 	}

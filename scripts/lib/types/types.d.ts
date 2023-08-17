@@ -43,3 +43,9 @@ type Enumerate<
 type percent = `${number}%`;
 
 type PlayerDB<Value = any> = { save(): void; data: Value };
+
+type PartialParts<b, thisArg = b> = {
+	[P in keyof b]?: b[P] extends (...param: infer param) => infer ret
+		? (this: thisArg, ...param: param) => ret
+		: b[P];
+};

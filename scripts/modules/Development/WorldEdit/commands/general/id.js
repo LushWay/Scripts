@@ -4,7 +4,7 @@ import { XEntity, util } from "xapi.js";
 const root = new XCommand({
 	name: "id",
 	description: "Выдает айди",
-	role: "moderator",
+	role: "builder",
 	type: "test",
 });
 
