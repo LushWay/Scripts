@@ -212,9 +212,11 @@ world.afterEvents.itemUse.subscribe((data) => {
 	if (block) new Shape(SHAPES[shape], block.location, blocks, parseInt(size));
 });
 
-world.afterEvents.itemUse.subscribe((data) => {
-	if (data.itemStack.typeId.startsWith("l:")) {
-		data.source.runCommandAsync(`tp ^^^5`);
+world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
+	if (itemStack.typeId === "we:dash") {
+		source.teleport(
+			Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5))
+		);
 	}
 });
 

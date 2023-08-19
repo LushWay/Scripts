@@ -23,15 +23,8 @@ world.afterEvents.chatSend.subscribe((event) => {
 	console.info(event.sender.name + ": " + event.message);
 });
 
-const err = new TypeError("This is error duplicate test");
-
-util.error(err);
-util.error(err);
-util.error(err);
-util.error(err);
-
 /**
- * @type {Object<string, (ctx?: CommandContext) => void | Promise<any>>}
+ * @type {Record<string, (ctx?: CommandContext) => void | Promise<any>>}
  */
 const tests = {
 	0() {

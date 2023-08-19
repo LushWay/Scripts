@@ -33,5 +33,5 @@ system.runTimeout(
 		}
 	},
 	"wb",
-	40
+	100
 );

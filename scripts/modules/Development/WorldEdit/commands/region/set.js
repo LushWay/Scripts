@@ -38,18 +38,22 @@ set.executes((ctx) => {
 	if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
 	ctx.reply("§b> §3Закрой чат!");
 	new ModalForm("Заполнить")
-		.addTextField("Block", "e.g. stone", "")
-		.addSlider("Block data", 0, 15, 1, 0)
-		.addDropdown("Replace mode", [
-			"none",
+		.addTextField("Блок", "e.g. stone", "")
+		.addSlider("Дата блока", 0, 15, 1, 0)
+		.addDropdown("Режим замены", [
+			"Отключено",
 			"replace",
 			"destroy",
 			"hollow",
 			"keep",
 			"outline",
 		])
-		.addTextField("Replacable block (only for replace!)", "e.g. stone", "")
-		.addSlider("Replace block data", 0, 15, 1, 0)
+		.addTextField(
+			"Заменяемый блок (только для режима replace!)",
+			"например, stone",
+			""
+		)
+		.addSlider("Дата заменяемого блока", 0, 15, 1, 0)
 		.show(ctx.sender, (_, block, blockData, mode, other, otherData) => {
 			if (!blockIsAvaible(block, ctx.sender)) return;
 			if (other && !blockIsAvaible(other, ctx.sender)) return;
@@ -63,7 +67,7 @@ set.executes((ctx) => {
 			WorldEditBuild.fillBetween(
 				block,
 				blockData,
-				mode !== "none" ? mode : "",
+				mode === "Отключено" ? "" : mode,
 				other,
 				otherData
 			).then((result) => ctx.reply(result));

@@ -2,7 +2,7 @@ import { system, world } from "@minecraft/server";
 
 new XCommand({
 	name: "sit",
-	description: "",
+	description: "В описании не требуется",
 	type: "public",
 	role: "member",
 }).executes(async (ctx) => {
@@ -12,7 +12,7 @@ new XCommand({
 	entity.runCommand("ride @p start_riding @s teleport_rider ");
 
 	await nextTick;
-	ctx.sender.onScreenDisplay.setActionBar("Вы сели. Чтобы встать, крадитесь");
+	ctx.sender.tell("§3> §fВы сели. Чтобы встать, крадитесь");
 });
 
 system.runInterval(

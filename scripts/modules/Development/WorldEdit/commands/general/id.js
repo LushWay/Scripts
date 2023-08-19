@@ -5,7 +5,7 @@ const root = new XCommand({
 	name: "id",
 	description: "Выдает айди",
 	role: "builder",
-	type: "test",
+	type: "wb",
 });
 
 root.executes((ctx) => {

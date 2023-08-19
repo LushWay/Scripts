@@ -6,8 +6,8 @@ import {
 	world,
 } from "@minecraft/server";
 
-import { P } from "lib/List/particles.js";
-import { S } from "lib/List/sounds.js";
+import { ListParticles } from "lib/List/particles.js";
+import { ListSounds } from "lib/List/sounds.js";
 import { XEntity } from "xapi.js";
 
 const variables = new MolangVariableMap();
@@ -43,9 +43,9 @@ system.runPlayerInterval(
 	20
 );
 
-const actions = {
-	Particle: P,
-	Sound: S,
+const lists = {
+	Particle: ListParticles,
+	Sound: ListSounds,
 };
 
 world.afterEvents.itemUse.subscribe((data) => {
@@ -55,24 +55,21 @@ world.afterEvents.itemUse.subscribe((data) => {
 		if (!lore || !lore[0]) return;
 		const act = lore[0];
 
-		if (lore && act in actions) {
+		if (lore && act in lists) {
 			// @ts-expect-error
-			const action = actions[act];
+			const list = lists[act];
 			const num = Number(lore[2]) + (data.source.isSneaking ? 1 : -1);
-			lore[1] = action[num] ?? lore[1];
+			lore[1] = list[num] ?? lore[1];
 			lore[2] = num.toString();
 			item.setLore(lore);
 			data.source
 				.getComponent("inventory")
 				.container.setItem(data.source.selectedSlot, item);
 		}
-		if (act === "run") {
+		if (act === "runCommand") {
 			world.overworld.runCommand(lore[1]);
 		}
-		if (act === "runE") {
-			data.source.runCommandAsync(lore[1]);
-		}
-		if (act === "viewTP") {
+		if (act === "teleportToView") {
 			const block = data.source.getBlockFromViewDirection().block;
 			if (block && block.location) data.source.teleport(block.location);
 		}

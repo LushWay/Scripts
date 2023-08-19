@@ -9,9 +9,9 @@ new XCommand({
 }).executes((ctx) => {
 	if (!WorldEditBuild.selectionCuboid) return ctx.reply("§cЗона не выделена!");
 	ctx.reply(
-		`В выделенной зоне ${Vector.size(
+		`§3В выделенной зоне §f${Vector.size(
 			WorldEditBuild.pos1,
 			WorldEditBuild.pos2
-		)} блоков`
+		)}§3 блоков`
 	);
 });

@@ -42,7 +42,7 @@ export const JOIN = {
 		subtitle: "Разработка!", // Optional
 		messages: {
 			air: "§8Очнулся в воздухе",
-			ground: "§8Сдвинулся",
+			ground: "§8Проснулся",
 			sound: "break.amethyst_cluster",
 		},
 	},

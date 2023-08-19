@@ -21,10 +21,10 @@ async function getServerTPS() {
 
 new XCommand({
 	name: "ping",
-	description: "Returns the current Ticks Per Second of the servers ping",
+	description: "Показывает пинг сервера",
 	role: "member",
 }).executes(async (ctx) => {
-	ctx.reply("§b> §3Понг! Проверка начата...");
+	ctx.reply("§b> §3Понг! Проверяем...");
 	let ticks = await getServerTPS();
 	ctx.reply(
 		`§b> §3TPS сервера ${

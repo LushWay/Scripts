@@ -131,7 +131,8 @@ export function loadRegionsWithGuards(
 		if (spawnAllowed(region, { entity })) return;
 		if (
 			region &&
-			(region.permissions.allowedEntitys.includes(typeId) ||
+			((Array.isArray(region.permissions.allowedEntitys) &&
+				region.permissions.allowedEntitys.includes(typeId)) ||
 				region.permissions.allowedEntitys === "all")
 		)
 			return;
@@ -148,7 +149,6 @@ export function loadRegionsWithGuards(
 					player.location,
 					player.dimension.type
 				);
-				
 
 				regionCallback(player, currentRegion);
 			}

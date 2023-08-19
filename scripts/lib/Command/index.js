@@ -127,8 +127,6 @@ export class XCommand {
 			callback: undefined,
 		};
 
-		if (data.name === "sit") console.debug(this.sys);
-
 		if (depth === 0) XCommand.COMMANDS.push(this);
 	}
 

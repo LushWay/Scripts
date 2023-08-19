@@ -14,15 +14,12 @@ OverTakes(Player.prototype, {
 		target.applyKnockback(view.x, view.z, hStrength, vStrength);
 	},
 	isGamemode(mode) {
-		// @ts-expect-error
 		return !!this.dimension
 			.getPlayers({
-				// @ts-expect-error
 				location: this.location,
 				maxDistance: 1,
 				gameMode: GameMode[mode],
 			})
-			// @ts-expect-error
 			.find((e) => e.id === this.id);
 	},
 	closeChat(message) {
