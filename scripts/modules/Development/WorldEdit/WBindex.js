@@ -25,14 +25,12 @@ const GetPlayerSettings = Options.player("Строитель мира", "wb", {
 });
 
 /* Replaces the block with a random block from the lore of the item. */
-world.afterEvents.blockPlace.subscribe((data) => {
-	if (data.block.typeId !== "minecraft:warped_nylium") return;
-	let blocks = XEntity.getHeldItem(data.player).getLore();
+world.afterEvents.blockPlace.subscribe(({ block, player }) => {
+	if (block.typeId !== "minecraft:warped_nylium") return;
+	let blocks = XEntity.getHeldItem(player).getLore();
 	if (blocks.length < 1) return;
 	blocks = blocks[0].split(",");
-	const location = data.block.location;
-	const block = blocks[~~(Math.random() * blocks.length)];
-	setblock(block, location);
+	setblock(blocks.randomElement(), block.location);
 });
 
 system.runPlayerInterval(

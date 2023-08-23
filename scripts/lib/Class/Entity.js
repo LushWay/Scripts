@@ -49,42 +49,6 @@ export const XEntity = {
 		tags.forEach((tag) => (tag.startsWith(value) ? entity.removeTag(tag) : ""));
 	},
 	/**
-	 * Gets items count from inventory
-	 * @param {Entity} entity entity from you want to get
-	 * @param {string} id
-	 * @returns {number}
-	 */
-	getItemsCount(entity, id) {
-		const inventory = entity.getComponent("inventory").container;
-		let count = 0;
-		for (let i = 0; i < inventory.size; i++) {
-			const item = inventory.getItem(i);
-			if (!item) continue;
-			if (item.typeId == id) count = count + item.amount;
-		}
-		return count;
-	},
-	/**
-	 *
-	 * @param {Player} entity
-	 * @param {0 | "armor" | "armor.chest" | "armor.feet" | "armor.legs" | "slot.enderchest" | "weapon.mainhand" | "weapon.offhand"} location
-	 * @param {string} [itemId]
-	 * @returns
-	 */
-	async hasItem(entity, location, itemId) {
-		let g = "";
-		if (location) g += `location=slot.${location}`;
-		if (itemId) g += `${location ? "," : ""}item=${itemId}`;
-		try {
-			const res = await entity.runCommandAsync(`testfor @s[hasitem={${g}}]`);
-			if (res.successCount < 1) return false;
-
-			return true;
-		} catch (e) {
-			return false;
-		}
-	},
-	/**
 	 * Gets a players held item
 	 * @param {Player} player player you want to get
 	 * @returns {ItemStack}

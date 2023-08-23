@@ -18,10 +18,11 @@ new XCommand({
 	description: "Выдает/убирает меню из инвентаря",
 	type: "public",
 }).executes(async (ctx) => {
-	if (await XEntity.hasItem(ctx.sender, 0, MENU.item.typeId)) {
-		ctx.sender.runCommandAsync(`clear @s ${MENU.item}`);
+	try {
+		ctx.sender.runCommand(`testfor @s[hasitem={item=${MENU.item.typeId}}]`);
+		ctx.sender.runCommand(`clear @s ${MENU.item.typeId}`);
 		ctx.reply("§c- §3Меню");
-	} else {
+	} catch (e) {
 		ctx.sender.getComponent("inventory").container.addItem(MENU.item);
 		ctx.reply("§a+ §3Меню");
 	}

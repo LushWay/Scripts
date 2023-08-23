@@ -1,7 +1,23 @@
-import { EntityDamageCause, GameMode, Player } from "@minecraft/server";
+import {
+	Entity,
+	EntityDamageCause,
+	GameMode,
+	Player,
+	world,
+} from "@minecraft/server";
 import { OverTakes } from "../prototypes.js";
 
 Player.prototype.tell = Player.prototype.sendMessage;
+OverTakes(Player, {
+	fetch(name) {
+		for (const p of world.getPlayers()) {
+			if (p.name === name || p.id === name) return p;
+		}
+	},
+	name(id) {
+		throw new ReferenceError("X-API is not fully loaded!");
+	},
+});
 OverTakes(Player.prototype, {
 	db() {
 		throw new ReferenceError("DB isn't loaded!");
@@ -44,5 +60,12 @@ OverTakes(Player.prototype, {
 		if (isCreative) this.runCommand("gamemode c");
 
 		return true;
+	},
+});
+
+OverTakes(Entity.prototype, {
+	despawn() {
+		this.teleport({ x: 0, y: 300, z: 0 });
+		this.kill();
 	},
 });
