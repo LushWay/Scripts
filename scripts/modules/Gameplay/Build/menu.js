@@ -201,7 +201,7 @@ MENU.OnOpen = (player) => {
           "§3Тут можно просмотреть и удалить строителей вашего региона"
         );
 
-        for (const id of current_region.permissions.owners.slice(1)) {
+        for (const id of currentRegion.permissions.owners.slice(1)) {
           const playerName = XEntity.getNameByID(id);
           form.addButton(playerName, null, () => {
             prompt(
@@ -211,9 +211,9 @@ MENU.OnOpen = (player) => {
                 "§r§c из строителей вашего региона?",
               "ДА",
               () => {
-                current_region.permissions.owners =
-                  current_region.permissions.owners.filter((e) => e !== id);
-                current_region.update();
+                currentRegion.permissions.owners =
+                  currentRegion.permissions.owners.filter((e) => e !== id);
+                currentRegion.update();
                 player.tell("§b> §3Успешно!");
                 const requestedPlayer = XEntity.fetch(id);
                 if (requestedPlayer)
@@ -257,8 +257,8 @@ MENU.OnOpen = (player) => {
                     requestedPlayer.tell(
                       `§b> §3Игрок §f${player.name} §r§3принял ваш запрос на редактирование площадки`
                     );
-                    current_region.permissions.owners.push(requestedPlayer.id);
-                    current_region.update();
+                    currentRegion.permissions.owners.push(requestedPlayer.id);
+                    currentRegion.update();
                   } else {
                     player.tell("§4> §cИгрок не в сети.");
                   }
@@ -336,8 +336,8 @@ MENU.OnOpen = (player) => {
             () => menu.show(player)
           );
       });
-    } else if (current_region.permissions.owners.includes(player.id)) {
-    } else if (current_region.permissions.owners[0]) {
+    } else if (currentRegion.permissions.owners.includes(player.id)) {
+    } else if (currentRegion.permissions.owners[0]) {
       menu.addButton("Запросить разрешение", null, () => {
         const CD = new Cooldown(DB, "REQ", player, 1000 * 60);
 
@@ -351,7 +351,7 @@ MENU.OnOpen = (player) => {
               editRequest.createRequest(player.id);
               player.tell("§b> §3Запрос на редактирование успешно отправлен!");
               const requestedPlayer = XEntity.fetch(
-                current_region.permissions.owners[0]
+                currentRegion.permissions.owners[0]
               );
               if (requestedPlayer)
                 requestedPlayer.tell(
@@ -370,13 +370,13 @@ MENU.OnOpen = (player) => {
           `§cВы действительно хотите удалить площадку игрока §r§f${regionOwnerName}?`,
           "§cДа",
           async () => {
-            const end = await ClearRegion(player, current_region);
-            current_region.forEachOwner((player) =>
+            const end = await ClearRegion(player, currentRegion);
+            currentRegion.forEachOwner((player) =>
               player.tell(
                 `§cРегион с владельцем §f${regionOwnerName}§r§c был удален`
               )
             );
-            current_region.delete();
+            currentRegion.delete();
             end();
           },
           "НЕТ!",
