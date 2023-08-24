@@ -1,6 +1,8 @@
+import { Vector } from "@minecraft/server";
 import { ModalForm } from "xapi.js";
+import { FillFloor } from "../../builders/FillBuilder.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
-import { getBlockSets } from "../general/menu.js";
+import { getBlockSet, getBlockSets } from "../general/menu.js";
 
 const shovel = new WorldEditTool({
 	name: "shovel",
@@ -38,6 +40,20 @@ const shovel = new WorldEditTool({
 					} лопата с ${blocksSet} набором блоков и радиусом ${radius}`
 				);
 			});
+	},
+	interval(player, slot) {
+		const lore = shovel.parseLore(slot.getLore());
+		const blocks = getBlockSet(getBlockSets(player), lore.blocksSet);
+		const H = lore.height;
+		const O = -1;
+		const base = Vector.floor(player.location);
+
+		FillFloor(
+			Vector.add(base, new Vector(-lore.radius, H, -lore.radius)),
+			Vector.add(base, new Vector(lore.radius, O, lore.radius)),
+			blocks,
+			"any"
+		);
 	},
 	onUse(_, item) {
 		const lore = item.getLore();

@@ -4,9 +4,11 @@ import {
 	ItemStack,
 	ItemTypes,
 	Player,
+	system,
 	world,
 } from "@minecraft/server";
 import { MessageForm, util } from "xapi.js";
+import { WorldEditPlayerSettings } from "../WBindex.js";
 
 /**
  * @template {Record<string, any> & {version: number}} [LoreFormat=any]
@@ -21,8 +23,9 @@ export class WorldEditTool {
 	 * @param {string} o.name
 	 * @param {string} o.displayName
 	 * @param {string} o.itemStackId
-	 * @param {WorldEditTool['editToolForm']} o.editToolForm
+	 * @param {WorldEditTool['editToolForm']} [o.editToolForm]
 	 * @param {LoreFormat} [o.loreFormat]
+	 * @param {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WorldEditPlayerSettings>) => void} [o.interval]
 	 * @param {(player: Player, item: ItemStack) => void} [o.onUse]
 	 */
 	constructor({
@@ -31,6 +34,7 @@ export class WorldEditTool {
 		itemStackId,
 		editToolForm,
 		loreFormat,
+		interval,
 		onUse,
 	}) {
 		WorldEditTool.TOOLS.push(this);
@@ -41,6 +45,7 @@ export class WorldEditTool {
 		this.loreFormat = loreFormat ?? { version: 0 };
 		this.loreFormat.version ??= 0;
 		this.onUse = onUse;
+		this.interval = interval;
 		this.command = new XCommand({
 			name,
 			description: `Создает или редактирует ${displayName}`,
@@ -144,3 +149,16 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 	const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
 	if (tool) tool.onUse(player, item);
 });
+
+system.runPlayerInterval(
+	(player) => {
+		const item = player
+			.getComponent("equipment_inventory")
+			.getEquipmentSlot(EquipmentSlot.mainhand);
+
+		const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
+		if (tool) tool.interval(player, item, WorldEditPlayerSettings(player));
+	},
+	"we tool",
+	10
+);

@@ -52,7 +52,7 @@ class WorldEditBuilder {
 	 * @type {{pos1:Vector3; pos2:Vector3; name:string}}
 	 * @private
 	 */
-	current_copy = {
+	currentCopy = {
 		pos1: null,
 		pos2: null,
 		name: "",
@@ -84,7 +84,7 @@ class WorldEditBuilder {
 
 			if (q)
 				world.overworld.spawnParticle(
-					"minecraft:endrod",
+					CONFIG_WE.DRAW_SELECTION_PARTICLE,
 					{ x: x + 0.5, y: y + 0.5, z: z + 0.5 },
 					new MolangVariableMap()
 				);
@@ -132,7 +132,7 @@ class WorldEditBuilder {
 			} §f${amount} §3${e}!`;
 		} catch (error) {
 			util.error(error);
-			return `§4► §cНе удалось отменить`;
+			return `§4► §cНе удалось отменить: ${error.message}`;
 		}
 	}
 	/**
@@ -160,7 +160,7 @@ class WorldEditBuilder {
 			} §f${amount} §3${e}!`;
 		} catch (error) {
 			util.error(error);
-			return `§4► §cНе удалось вернуть`;
+			return `§4► §cНе удалось вернуть: ${error.message}`;
 		}
 	}
 	/**
@@ -177,12 +177,15 @@ class WorldEditBuilder {
 			);
 			if (!result)
 				return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`;
-			this.current_copy = {
+
+			this.currentCopy = {
 				pos1: this.pos1,
 				pos2: this.pos2,
 				name: CONFIG_WE.COPY_FILE_NAME,
 			};
-			return `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`;
+			return `§9► §fСкопированно из ${Vector.string(
+				this.pos1
+			)} в ${Vector.string(this.pos2)}`;
 		} catch (error) {
 			util.error(error);
 			return `§4► §cНе удалось скорпировать: ${error.message}`;
@@ -210,9 +213,9 @@ class WorldEditBuilder {
 		seed = ""
 	) {
 		try {
-			const dx = Math.abs(this.current_copy.pos2.x - this.current_copy.pos1.x);
-			const dy = Math.abs(this.current_copy.pos2.y - this.current_copy.pos1.y);
-			const dz = Math.abs(this.current_copy.pos2.z - this.current_copy.pos1.z);
+			const dx = Math.abs(this.currentCopy.pos2.x - this.currentCopy.pos1.x);
+			const dy = Math.abs(this.currentCopy.pos2.y - this.currentCopy.pos1.y);
+			const dz = Math.abs(this.currentCopy.pos2.z - this.currentCopy.pos1.z);
 			const pos2 = Vector.add(player.location, new Vector(dx, dy, dz));
 
 			const loc = Vector.floor(player.location);

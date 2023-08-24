@@ -1,9 +1,18 @@
+import { Vector, world } from "@minecraft/server";
 import { ModalForm } from "xapi.js";
 import { WorldEditPlayerSettings } from "../../WBindex.js";
 import { Shape } from "../../builders/ShapeBuilder.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
+import { CONFIG_WE } from "../../config.js";
 import { SHAPES } from "../../utils/shapes.js";
 import { getBlockSet, getBlockSets } from "../general/menu.js";
+
+world.overworld
+	.getEntities({
+		type: "f:t",
+		name: CONFIG_WE.BRUSH_LOCATOR,
+	})
+	.forEach((e) => e.triggerEvent("f:t:kill"));
 
 const brush = new WorldEditTool({
 	name: "brush",
@@ -48,6 +57,31 @@ const brush = new WorldEditTool({
 					} кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`
 				);
 			});
+	},
+	interval(player, slot, settings) {
+		const lore = brush.parseLore(slot.getLore());
+		const dot = player.getBlockFromViewDirection({
+			maxDistance: lore.maxDistance,
+		});
+		const entities = player.dimension.getEntities({
+			type: "f:t",
+			name: CONFIG_WE.BRUSH_LOCATOR,
+			tags: [player.name],
+		});
+		if (dot && !settings.noBrushParticles) {
+			const { block } = dot;
+			if (!entities) {
+				const entity = player.dimension.spawnEntity("f:t", block.location);
+				entity.addTag(player.name);
+			}
+			for (const entity of entities) {
+				if (Vector.distance(entity.location, block) > 1) {
+					entity.triggerEvent("f:t:kill");
+				}
+			}
+		} else {
+			for (const entity of entities) entity.triggerEvent("f:t:kill");
+		}
 	},
 	onUse(player, item) {
 		const settings = WorldEditPlayerSettings(player);
