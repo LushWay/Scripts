@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@minecraft/server-admin@1.0.0-beta.1.20.10-stable":
+  version "1.0.0-beta.1.20.10-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.1.20.10-stable.tgz#9cc4228cf4aa7fec17a3b92533c808e61f85eee3"
+  integrity sha512-xY4HFpWptf0HkHyJ+qTWjDCYZoHOeDLB/wKTfl00QgbHzjJM1jy6kKoqlvokXWgJKzoy/b8p37b5ztXHhGBeMQ==
+
 "@minecraft/server-admin@^1.0.0-beta.1.20.10-stable":
   version "1.0.0-beta.11940b24"
   resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.11940b24.tgz#9c37bbeb41cf6bb65e60a819f82b19ade1ae0f36"

@@ -1,32 +1,44 @@
-import "./brush/brush.js";
-import "./brush/other.js";
+const commands = [
+	"./general/desel.js",
+	"./general/drawsel.js",
+	"./general/id.js",
+	"./general/menu.js",
+	"./general/item.js",
+	"./general/redo.js",
+	"./general/undo.js",
 
-import "./general/desel.js";
-import "./general/drawsel.js";
-import "./general/id.js";
-import "./general/item.js";
-import "./general/redo.js";
-import "./general/undo.js";
+	"./selection/chunk.js",
+	"./selection/expand.js",
+	"./selection/hpos1.js",
+	"./selection/hpos2.js",
+	"./selection/pos1.js",
+	"./selection/pos2.js",
+	"./selection/size.js",
+	"./selection/wand.js",
 
-import "./selection/chunk.js";
-import "./selection/expand.js";
-import "./selection/hpos1.js";
-import "./selection/hpos2.js";
-import "./selection/pos1.js";
-import "./selection/pos2.js";
-import "./selection/size.js";
-import "./selection/wand.js";
+	"./region/set.js",
 
-import "./region/set.js";
+	"./clipboard/copy.js",
+	"./clipboard/paste.js",
 
-import "./clipboard/copy.js";
-import "./clipboard/paste.js";
+	"./generation/cyl.js",
+	"./generation/hcyl.js",
+	"./generation/hpyramid.js",
+	"./generation/hsphere.js",
+	"./generation/pyramid.js",
+	"./generation/sphere.js",
 
-import "./generation/cyl.js";
-import "./generation/hcyl.js";
-import "./generation/hpyramid.js";
-import "./generation/hsphere.js";
-import "./generation/pyramid.js";
-import "./generation/sphere.js";
+	"./tools/brush.js",
+	"./tools/nylium.js",
+	"./tools/shovel.js",
+	"./tools/tool.js",
+];
 
-import "./tool/tool.js";
+import load from "../../../import.js";
+
+load({
+	array: commands,
+	message: "WorldEdit commands",
+	fn: (module) => import(module),
+	st: 0,
+});

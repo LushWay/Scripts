@@ -243,7 +243,6 @@ export class CubeRegion extends Region {
 			permissions: this.permissions,
 			to: this.to,
 		});
-		console.debug(this.permissions, TABLE.get(this.key));
 	}
 }
 

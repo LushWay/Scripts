@@ -1,6 +1,6 @@
-import { MinecraftBlockTypes, system, Vector, world } from "@minecraft/server";
+import { system, Vector } from "@minecraft/server";
 import { util } from "xapi.js";
-import { CONFIG_WB } from "../config.js";
+import { CONFIG_WE } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { setblock } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
@@ -48,8 +48,8 @@ export class Shape {
 			setblock(block, location);
 			blocksSet++;
 
-			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
-				await system.sleep(CONFIG_WB.TICKS_TO_SLEEP);
+			if (blocksSet >= CONFIG_WE.BLOCKS_BEFORE_AWAIT) {
+				await system.sleep(CONFIG_WE.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}
@@ -65,57 +65,5 @@ export class Shape {
 			"x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad",
 			`return ${this.shape}`
 		)(x, y, z, this.values, this.rad);
-	}
-}
-
-export class spawn {
-	/**
-	 * @param {boolean} remove
-	 */
-	constructor(pos1x = 0, pos1z = 0, pos2x = 0, pos2z = 0, remove = false) {
-		this.x1 = pos1x;
-		this.x2 = pos2x;
-		this.z1 = pos1z;
-		this.z2 = pos2z;
-		this.r = remove;
-
-		WorldEditBuild.backup(
-			{ x: this.x1, y: -64, z: this.z1 },
-			{ x: this.x2, y: -64, z: this.z2 }
-		);
-
-		try {
-			this.generate();
-		} catch (e) {
-			util.error(e);
-		}
-	}
-	/**
-	 * Generates the shape to location
-	 */
-	async generate() {
-		let v = {
-			xmin: Math.min(this.x1, this.x2),
-			xmax: Math.max(this.x1, this.x2),
-			zmin: Math.min(this.z1, this.z2),
-			zmax: Math.max(this.z1, this.z2),
-		};
-		let blocksSet = 0;
-		for (let x = v.xmin; x <= v.xmax; x++) {
-			for (let z = v.zmin; z <= v.zmax; z++) {
-				world.overworld
-					.getBlock({ x: x, y: -64, z: z })
-					.setType(
-						MinecraftBlockTypes.get(
-							!this.r ? "minecraft:deny" : "minecraft:bedrock"
-						)
-					);
-				blocksSet++;
-			}
-			if (blocksSet >= CONFIG_WB.BLOCKS_BEFORE_AWAIT) {
-				await system.sleep(CONFIG_WB.TICKS_TO_SLEEP);
-				blocksSet = 0;
-			}
-		}
 	}
 }

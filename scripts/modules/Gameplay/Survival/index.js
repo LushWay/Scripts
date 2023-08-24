@@ -1,4 +1,5 @@
 import {
+	EquipmentSlot,
 	ItemStack,
 	MinecraftBlockTypes,
 	MinecraftItemTypes,
@@ -11,7 +12,6 @@ import {
 	EditableLocation,
 	InventoryStore,
 	Options,
-	XEntity,
 	util,
 } from "../../../xapi.js";
 import { MENU } from "../../Server/Menu/var.js";
@@ -35,7 +35,9 @@ loadRegionsWithGuards(
 		if (region) {
 			if (region.permissions.owners.includes(player.id)) return true;
 		} else {
-			const heldItem = XEntity.getHeldItem(player);
+			const heldItem = player
+				.getComponent("equipment_inventory")
+				.getEquipmentSlot(EquipmentSlot.mainhand);
 			if (heldItem?.isStackableWith(baseItemStack)) return true;
 
 			if (context.type === "break" && player.isGamemode("adventure"))
@@ -55,7 +57,9 @@ loadRegionsWithGuards(
 		// @ts-expect-error
 		function survivalNeeded(player, block, region) {
 			if (block && block?.type?.id === "minecraft:smithing_table") return true;
-			const heldItem = XEntity.getHeldItem(player);
+			const heldItem = player
+				.getComponent("equipment_inventory")
+				.getEquipmentSlot(EquipmentSlot.mainhand);
 			if (!region && heldItem?.isStackableWith(baseItemStack)) return true;
 		}
 		if (currentRegion && !currentRegion?.permissions.pvp) {

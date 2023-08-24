@@ -1,8 +1,17 @@
 import { system, world } from "@minecraft/server";
-import { CONFIG_WB } from "../config.js";
+import { CONFIG_WE } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 
 export class Structure {
+	/**
+	 * @type {{
+	 *		name: string,
+	 *		pos1: Vector3,
+	 *		pos2: Vector3,
+	 *	}[]}
+	 */
+	files = [];
+
 	/**
 	 * Creates a new structure save
 	 * @param {string} prefix
@@ -15,21 +24,12 @@ export class Structure {
 		this.pos1 = pos1;
 		this.pos2 = pos2;
 
-		/**
-		 * @type {{
-		 *		name: string,
-		 *		pos1: Vector3,
-		 *		pos2: Vector3,
-		 *	}[]}
-		 */
-		this.files = [];
-
 		this.save();
 	}
 
-	async save() {
+	save() {
 		const regions = new Cuboid(this.pos1, this.pos2).split(
-			CONFIG_WB.STRUCTURE_CHUNK_SIZE
+			CONFIG_WE.STRUCTURE_CHUNK_SIZE
 		);
 
 		let errors = 0;

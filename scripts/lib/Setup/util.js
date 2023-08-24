@@ -4,6 +4,7 @@ import { TerminalColors } from "../List/terminal-colors.js";
 export const util = {
 	settings: {
 		BDSMode: true,
+		firstLoad: false,
 	},
 	error: Object.assign(
 		/**

@@ -1,37 +1,50 @@
-import "./Server/Admin/index.js";
-import "./Server/Chat/index.js";
-import "./Server/DatabaseView/index.js";
-import "./Server/HelpCommand/index.js";
-import "./Server/Menu/index.js";
-import "./Server/OnJoin/join.js";
-import "./Server/Server/index.js";
-
-/**
- * Gameplay modules
- */
-import "./Gameplay/Indicator/index.js";
-import "./Gameplay/Loot/loot.js";
-import "./Server/Leaderboards/index.js";
-/**
- * Development modules:
- */
-import "./Development/GameTest/index.js";
-import "./Development/Test/index.js";
-import "./Server/Objectives/index.js";
-
-/**
- * Lazy loading to not cause script spike
- */
-import { system } from "@minecraft/server";
 import { util } from "../xapi.js";
-system.runTimeout(
-	async () => {
-		try {
-			await import("./Development/WorldEdit/WBindex.js");
-		} catch (e) {
-			util.error(e);
-		}
-	},
-	"wb",
-	100
-);
+
+const modules = [
+	"./Server/Admin/index.js",
+	"./Server/Chat/index.js",
+	"./Server/DatabaseView/index.js",
+	"./Server/HelpCommand/index.js",
+	"./Server/Menu/index.js",
+	"./Server/OnJoin/join.js",
+	"./Server/Server/index.js",
+
+	/**
+	 * Gameplay modules
+	 */
+	"./Gameplay/Indicator/index.js",
+	"./Gameplay/Loot/loot.js",
+	"./Server/Leaderboards/index.js",
+	/**
+	 * Development modules:
+	 */
+	"./Development/GameTest/index.js",
+	"./Development/Test/index.js",
+	"./Server/Objectives/index.js",
+	"./Development/WorldEdit/WBindex.js",
+];
+
+let enabled = 0;
+const strike = util.strikeTest();
+
+/**
+ * @param {Object} [o]
+ * @param {string[]} [o.array]
+ * @param {string} [o.message]
+ * @param {(m: string) => Promise<any>} [o.fn]
+ * @param {number} [o.st]
+ */
+export default async function ({
+	array = modules,
+	message = "X-API init and loading took",
+	fn = (module) => import(module),
+	st = enabled,
+} = {}) {
+	if (st) strike(message);
+
+	for (const module of array) {
+		await nextTick;
+		await fn(module);
+		if (st) strike(module);
+	}
+}

@@ -4,7 +4,7 @@ new XCommand({
 	name: "paste",
 	description: "Вставляет заранее скопированную зону",
 	role: "moderator",
-	type: "wb",
+	type: "we",
 })
 	.int("rotation", true)
 	.string("mirror", true)
@@ -13,35 +13,29 @@ new XCommand({
 	.int("integrity", true)
 	.int("seed", true)
 	.executes(
-		async (
-			ctx,
-			rotation,
-			mirror,
-			includeEntites,
-			includeBlocks,
-			integrity,
-			seed
-		) => {
-			let b, e;
+		(ctx, rotation, mirror, includeEntites, includeBlocks, integrity, seed) => {
+			let blocks, entities;
 			if (!includeEntites && !includeBlocks) {
-				e = false;
-				b = true;
+				entities = false;
+				blocks = true;
 			} else {
-				b = includeBlocks;
-				e = includeEntites;
+				blocks = includeBlocks;
+				entities = includeEntites;
 			}
 			if (![0, 90, 180, 270].includes(rotation))
-				return ctx.reply("§c" + rotation);
-			const status = await WorldEditBuild.paste(
-				ctx.sender,
-				// @ts-expect-error
-				rotation,
-				mirror,
-				e,
-				b,
-				integrity,
-				seed
+				return ctx.error("Неправильный градус: §f" + rotation);
+
+			ctx.reply(
+				WorldEditBuild.paste(
+					ctx.sender,
+					// @ts-expect-error
+					rotation,
+					mirror,
+					entities,
+					blocks,
+					integrity,
+					seed
+				)
 			);
-			ctx.reply(status);
 		}
 	);

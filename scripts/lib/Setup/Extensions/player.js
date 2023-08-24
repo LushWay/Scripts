@@ -1,6 +1,7 @@
 import {
 	Entity,
 	EntityDamageCause,
+	EquipmentSlot,
 	GameMode,
 	Player,
 	world,

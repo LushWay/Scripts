@@ -3,7 +3,7 @@ import { SelectionBuild } from "../../builders/SelectionBuilder.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 const expand = new XCommand({
-	type: "wb",
+	type: "we",
 	name: "expand",
 	description: "Расширить выделенную зону во все стороны или вертикально",
 	role: "moderator",

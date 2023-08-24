@@ -2,10 +2,8 @@ import { MinecraftBlockTypes, world } from "@minecraft/server";
 import { Cooldown, util } from "xapi.js";
 
 /**
- *
  * @param {string} blockTypeID
  * @param {Vector3} location
- * @returns
  */
 export function setblock(blockTypeID, location) {
 	if (blockTypeID.includes(".") || blockTypeID === "air") {

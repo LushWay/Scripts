@@ -3,7 +3,7 @@ import { Shape } from "../../builders/ShapeBuilder.js";
 import { SHAPES } from "../../utils/shapes.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "hsphere",
 	description: "Generates a hollow sphere.",
 	role: "moderator",

@@ -96,7 +96,7 @@ MENU.OnOpen = (player) => {
 		 * @param {string} name
 		 */
 		const toPlatform = (region, name) => {
-			form.addButton(name, null, () => {
+			form.addButton(name, () => {
 				teleportToRegion(player, region);
 				player.tell("§b> §3Вы были перемещены на площадку §r" + name);
 			});
@@ -119,7 +119,7 @@ MENU.OnOpen = (player) => {
 		);
 
 		if (inOwnRegion) {
-			menu.addButton("Строители", null, () => {
+			menu.addButton("Строители", () => {
 				const form = new ActionForm(
 					"Строители",
 					"§3Тут можно просмотреть и удалить строителей вашего региона"
@@ -127,7 +127,7 @@ MENU.OnOpen = (player) => {
 
 				for (const id of current_region.permissions.owners.slice(1)) {
 					const playerName = XEntity.getNameByID(id);
-					form.addButton(playerName, null, () => {
+					form.addButton(playerName, () => {
 						prompt(
 							player,
 							"§cВы точно хотите удалить игрока §r" +
@@ -166,7 +166,7 @@ MENU.OnOpen = (player) => {
 					);
 					for (const ID of editRequest.list) {
 						const name = XEntity.getNameByID(ID);
-						newmenu.addButton(name ?? "unnamed", null, () => {
+						newmenu.addButton(name ?? "unnamed", () => {
 							prompt(
 								player,
 								"Принимая запрос на редактирование, вы даете игроку право редактировать ваш регион.",
@@ -199,7 +199,7 @@ MENU.OnOpen = (player) => {
 					newmenu.show(player);
 				}
 			);
-			menu.addButton("Перейти на новую", null, () => {
+			menu.addButton("Перейти на новую", () => {
 				const CD = new Cooldown(DB, "ARHCIVE", player, 1000 * 60 * 60 * 24);
 				if (CD.isExpired())
 					prompt(
@@ -243,7 +243,7 @@ MENU.OnOpen = (player) => {
 						() => {}
 					);
 			});
-			menu.addButton("§cОчистить", null, () => {
+			menu.addButton("§cОчистить", () => {
 				const CD = new Cooldown(DB, "CLEAR", player, 1000 * 60);
 				if (CD.isExpired())
 					prompt(
@@ -262,7 +262,7 @@ MENU.OnOpen = (player) => {
 			});
 		} else if (current_region.permissions.owners.includes(player.id)) {
 		} else if (current_region.permissions.owners[0]) {
-			menu.addButton("Запросить разрешение", null, () => {
+			menu.addButton("Запросить разрешение", () => {
 				const CD = new Cooldown(DB, "REQ", player, 1000 * 60);
 
 				if (CD.isExpired())
@@ -288,7 +288,7 @@ MENU.OnOpen = (player) => {
 			});
 		}
 		if (IS(player.id, "admin")) {
-			menu.addButton("§cУдалить площадку", null, () => {
+			menu.addButton("§cУдалить площадку", () => {
 				prompt(
 					player,
 					`§cВы действительно хотите удалить площадку игрока §r§f${regionOwnerName}?`,

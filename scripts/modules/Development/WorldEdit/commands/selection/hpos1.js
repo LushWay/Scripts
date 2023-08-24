@@ -1,7 +1,7 @@
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "hpos1",
 	description: "Set position 1 to targeted block",
 	role: "moderator",

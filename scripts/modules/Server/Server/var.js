@@ -1,33 +1,10 @@
 import { ScoreboardDB } from "lib/Database/Scoreboard.js";
-import { Options, util } from "xapi.js";
+import { GameUtils, Options, util } from "xapi.js";
 
 /**
  * @type {Array<"unknown" | "build" | "survival" | "disabled">}
  */
 const TYPES = ["unknown", "build", "survival", "disabled"];
-const options = Options.world("server", {
-	lockNether: {
-		desc: "Выключает незер",
-		value: true,
-		name: "Блокировка незера",
-	},
-	timer: {
-		value: true,
-		desc: "Какой-та таймер, я сам хз че это",
-		name: "Таймер",
-	},
-	type: {
-		name: "Тип сервера",
-		value: 0,
-		desc: `Доступные значения: \n§f${util
-			.inspect(Object.fromEntries(Object.entries(TYPES)))
-			.replace("{", "")
-			.replace("}", "")}`,
-		requires: true,
-	},
-});
-
-const TYPE = TYPES[getType()];
 
 export const SERVER = {
 	money: db("money", "Монеты"),
@@ -43,14 +20,46 @@ export const SERVER = {
 		kills: db("kills", "Убийств"),
 		deaths: db("deaths", "Смертей"),
 	},
-	options,
 	time: {
 		anarchy: timer("anarchy", "на анархии"),
 		all: timer("all", "всего"),
 		day: timer("day", "за день"),
 	},
-	type: TYPE,
+	options: Options.world("server", {
+		lockNether: {
+			desc: "Выключает незер",
+			value: true,
+			name: "Блокировка незера",
+		},
+		type: {
+			name: "Тип сервера",
+			value: 0,
+			desc: `§eТОЛЬКО ДЛЯ ХОСТА МИРА, НА СЕРВЕРЕ ВЫСТАВЛЯЕТСЯ СКРИПТОМ\n\n§fДоступные значения:\n§f${util
+				.inspect(Object.fromEntries(Object.entries(TYPES)))
+				.replace("{", "")
+				.replace("}", "")}`,
+			requires: true,
+		},
+	}),
+	type: "unknown",
 };
+
+SERVER.type =
+	TYPES[
+		(function getType() {
+			let num = Number(GameUtils.env("type"));
+			if (!num || isNaN(num)) num = SERVER.options.type;
+
+			if (!(num in TYPES) || num === 0) {
+				num = 0;
+				console[util.settings.firstLoad ? "warn" : "log"](
+					`§cДля полноценной работы сервера используйте §f-wsettings§c, установите §fserver§c/§ftype§c и перезагрузите скрипты.`
+				);
+			}
+
+			return num;
+		})()
+	];
 
 /**
  *
@@ -73,18 +82,4 @@ function timer(name, displayName) {
  */
 function db(id, name) {
 	return new ScoreboardDB(id, name);
-}
-
-function getType() {
-	let num = options.type;
-
-	if (!(num in TYPES) || num === 0) {
-		options.type = 0;
-		num = 0;
-		const text = `§cДля полноценной работы сервера установите значение §ftype§c в настройках §fserver§c и перезагрузите скрипты. `;
-
-		console[XA.state.firstLoad ? "warn" : "log"](text);
-	}
-
-	return num;
 }

@@ -7,6 +7,15 @@ import { FormCallback, XShowForm } from "./utils.js";
  * @template {Function} [Callback = (ctx: FormCallback) => void]
  */
 export class ModalForm {
+	/**
+	 * @param {string[]} array
+	 * @param {string} defaultValue
+	 * @returns {[string[], number]}
+	 */
+	static arrayAndDefault(array, defaultValue) {
+		const i = array.indexOf(defaultValue);
+		return [array, i ? i : 0];
+	}
 	title = "";
 	/**
 	 * The default minecraft form this form is based on

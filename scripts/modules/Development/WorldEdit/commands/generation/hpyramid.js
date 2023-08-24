@@ -3,7 +3,7 @@ import { Shape } from "../../builders/ShapeBuilder.js";
 import { SHAPES } from "../../utils/shapes.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "hpyramid",
 	description: "Generate a hollow pyramid",
 	role: "moderator",

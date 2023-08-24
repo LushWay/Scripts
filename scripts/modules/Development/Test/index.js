@@ -1,4 +1,5 @@
 import {
+	EquipmentSlot,
 	ItemStack,
 	MinecraftBlockTypes,
 	MinecraftItemTypes,
@@ -13,7 +14,7 @@ import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModelForm.js";
-import { DB, GameUtils, XEntity, XShowForm, util } from "xapi.js";
+import { DB, GameUtils, XShowForm, util } from "xapi.js";
 import { ChestFormData } from "../../../chestui/forms.js";
 import { APIRequest } from "../../../lib/Class/Net.js";
 import { generateOre } from "../../Gameplay/Survival/ore.js";
@@ -34,23 +35,19 @@ const tests = {
 		util.error(new TypeError("This is error test"));
 	},
 	1: (ctx) => {
-		const menu = new ActionForm("Action", "body").addButton(
-			"button",
-			null,
-			() => {
-				new ModalForm("ModalForm")
-					.addDropdown("drdown", ["op", "op2"])
-					.addSlider("slider", 0, 5, 1)
-					.addTextField("textField", "placeholder", "defval")
-					.addToggle("toggle", false)
-					.show(ctx.sender, () => {
-						new MessageForm("MessageForm", "body")
-							.setButton1("b1", () => void 0)
-							.setButton2("b2", () => void 0)
-							.show(ctx.sender);
-					});
-			}
-		);
+		const menu = new ActionForm("Action", "body").addButton("button", () => {
+			new ModalForm("ModalForm")
+				.addDropdown("drdown", ["op", "op2"])
+				.addSlider("slider", 0, 5, 1)
+				.addTextField("textField", "placeholder", "defval")
+				.addToggle("toggle", false)
+				.show(ctx.sender, () => {
+					new MessageForm("MessageForm", "body")
+						.setButton1("b1", () => void 0)
+						.setButton2("b2", () => void 0)
+						.show(ctx.sender);
+				});
+		});
 		menu.show(ctx.sender);
 	},
 	13: (ctx) => {
@@ -237,7 +234,9 @@ const tests = {
 
 world.afterEvents.entityHitEntity.subscribe((event) => {
 	if (event.damagingEntity instanceof Player) {
-		const axe = XEntity.getHeldItem(event.damagingEntity);
+		const axe = event.damagingEntity
+			.getComponent("equipment_inventory")
+			.getEquipmentSlot(EquipmentSlot.mainhand);
 		if (axe && !axe.typeId.includes("axe")) return;
 
 		event.damagingEntity.startItemCooldown("axe", 10);

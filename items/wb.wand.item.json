@@ -11,7 +11,7 @@
 				"texture": "axe"
 			},
 			"minecraft:display_name": {
-				"value": "Топор"
+				"value": "Строительный топор"
 			},
 			"minecraft:cooldown": {
 				"duration": 0.5,
@@ -23,5 +23,3 @@
 		}
 	}
 }
-
-

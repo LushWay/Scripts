@@ -4,7 +4,7 @@ new XCommand({
 	name: "copy",
 	description: "Копирует зону",
 	role: "moderator",
-	type: "wb",
+	type: "we",
 }).executes((ctx) => {
 	const status = WorldEditBuild.copy();
 	if (status) ctx.reply(status);

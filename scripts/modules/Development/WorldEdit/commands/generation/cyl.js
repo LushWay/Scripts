@@ -3,7 +3,7 @@ import { Shape } from "../../builders/ShapeBuilder.js";
 import { SHAPES } from "../../utils/shapes.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "cyl",
 	description: "Generates a cylinder.",
 	role: "moderator",
