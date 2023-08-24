@@ -1,7 +1,7 @@
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "redo",
 	description: "Возвращает последнее действие (из памяти)",
 	role: "moderator",

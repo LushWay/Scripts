@@ -1,7 +1,7 @@
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "drawsel",
 	description: "Переключает отрисовку текущего выделения",
 	role: "moderator",

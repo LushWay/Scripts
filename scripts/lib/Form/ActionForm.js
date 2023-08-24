@@ -31,19 +31,20 @@ export class ActionForm {
 	/**
 	 * Adds a button to this form
 	 * @param {string} text  text to show on this button
-	 * @param {string} iconPath  the path this button shows
-	 * @param {ButtonCallback} callback  what happens when this button is clicked
-	 * @example ```
-	 * addButton("settings", "textures/items/sum")
-	 * ```
+	 * @param {string | ButtonCallback} iconPathOrCallback  the path this button shows or callback
+	 * @param {ButtonCallback} [callback]  what happens when this button is clicked
+	 * @example addButton("settings", "textures/items/sum", () => {})
+	 * @example addButton("settings", () => {})
 	 * @returns {ActionForm}
 	 */
-	addButton(text, iconPath = null, callback) {
-		this.buttons.push({
-			text: text,
-			iconPath: iconPath,
-			callback: callback,
-		});
+	addButton(text, iconPathOrCallback, callback) {
+		let iconPath;
+		if (typeof iconPathOrCallback === "function") {
+			callback = iconPathOrCallback;
+			iconPath = null;
+		} else iconPath = iconPathOrCallback;
+
+		this.buttons.push({ text, iconPath, callback });
 		this.form.button(text, iconPath);
 		return this;
 	}

@@ -42,7 +42,7 @@ export interface ICommandData {
 	 */
 	invaildPermission?: string;
 	/**
-	 * @type {'test' | 'wb' | 'public'}
+	 * @type {'test' | 'we' | 'public'}
 	 */
 	type?: string;
 }

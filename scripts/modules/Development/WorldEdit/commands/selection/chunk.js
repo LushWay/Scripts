@@ -29,7 +29,7 @@ function getChunkCuboidPositions(entity) {
 }
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "chunk",
 	description: "Set the selection to your current chunk.",
 	role: "moderator",

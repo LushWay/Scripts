@@ -1,77 +1,146 @@
 import {
-	MolangVariableMap,
+	ContainerSlot,
+	EquipmentSlot,
+	ItemStack,
+	ItemTypes,
 	Player,
-	Vector,
-	system,
 	world,
 } from "@minecraft/server";
+import { MessageForm, util } from "xapi.js";
 
-import { ListParticles } from "lib/List/particles.js";
-import { ListSounds } from "lib/List/sounds.js";
-import { XEntity } from "xapi.js";
+/**
+ * @template {Record<string, any> & {version: number}} [LoreFormat=any]
+ */
+export class WorldEditTool {
+	/**
+	 * @type {WorldEditTool<any>[]}
+	 */
+	static TOOLS = [];
+	/**
+	 * @param {Object} o
+	 * @param {string} o.name
+	 * @param {string} o.displayName
+	 * @param {string} o.itemStackId
+	 * @param {WorldEditTool['editToolForm']} o.editToolForm
+	 * @param {LoreFormat} [o.loreFormat]
+	 * @param {(player: Player, item: ItemStack) => void} [o.onUse]
+	 */
+	constructor({
+		name,
+		displayName,
+		itemStackId,
+		editToolForm,
+		loreFormat,
+		onUse,
+	}) {
+		WorldEditTool.TOOLS.push(this);
+		this.name = name;
+		this.displayName = displayName;
+		this.item = itemStackId;
+		this.editToolForm = editToolForm;
+		this.loreFormat = loreFormat ?? { version: 0 };
+		this.loreFormat.version ??= 0;
+		this.onUse = onUse;
+		this.command = new XCommand({
+			name,
+			description: `Создает или редактирует ${displayName}`,
+			role: "builder",
+			type: "we",
+		}).executes((ctx) => {
+			const slotOrError = this.getToolSlot(ctx.sender);
 
-const variables = new MolangVariableMap();
-
-system.runPlayerInterval(
-	(player) => {
-		const item = XEntity.getHeldItem(player);
-		if (!item || item.typeId !== "we:tool") return;
-
-		const lore = item.getLore();
-
-		if (lore[0] === "Particle") {
-			const { block } = player.getBlockFromViewDirection({
-				includeLiquidBlocks: false,
-				includePassableBlocks: false,
-				maxDistance: 50,
-			});
-
-			if (!block) return;
-
-			block.dimension.spawnParticle(
-				lore[1],
-				Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-				variables
-			);
-		}
-
-		if (lore[0] === "Sound") {
-			player.playSound(lore[1]);
-		}
-	},
-	"wb tool",
-	20
-);
-
-const lists = {
-	Particle: ListParticles,
-	Sound: ListSounds,
-};
-
-world.afterEvents.itemUse.subscribe((data) => {
-	const item = data.itemStack;
-	if (item.typeId === "we:tool" && data.source instanceof Player) {
-		let lore = item.getLore();
-		if (!lore || !lore[0]) return;
-		const act = lore[0];
-
-		if (lore && act in lists) {
-			// @ts-expect-error
-			const list = lists[act];
-			const num = Number(lore[2]) + (data.source.isSneaking ? 1 : -1);
-			lore[1] = list[num] ?? lore[1];
-			lore[2] = num.toString();
-			item.setLore(lore);
-			data.source
-				.getComponent("inventory")
-				.container.setItem(data.source.selectedSlot, item);
-		}
-		if (act === "runCommand") {
-			world.overworld.runCommand(lore[1]);
-		}
-		if (act === "teleportToView") {
-			const block = data.source.getBlockFromViewDirection().block;
-			if (block && block.location) data.source.teleport(block.location);
-		}
+			if (typeof slotOrError === "string") ctx.error(slotOrError);
+			else this.editToolForm(slotOrError, ctx.sender);
+		});
 	}
+	/**
+	 * @param {Player} player
+	 */
+	getToolSlot(player) {
+		const slot = player
+			.getComponent("inventory")
+			.container.getSlot(player.selectedSlot);
+
+		if (slot.getItem()?.typeId) {
+			if (slot.typeId !== this.item) {
+				return `Возьми ${this.displayName} в руки для настройки или выбери пустой слот чтобы создать!`;
+			}
+		} else {
+			slot.setItem(new ItemStack(ItemTypes.get(this.item)));
+		}
+
+		return slot;
+	}
+	/**
+	 * @param {Player} player
+	 * @returns {string}
+	 */
+	getMenuButtonName(player) {
+		const { typeId } = player
+			.getComponent("equipment_inventory")
+			.getEquipmentSlot(EquipmentSlot.mainhand);
+
+		const edit = typeId === this.item;
+
+		return `${edit ? "§2Редактировать" : "Создать"} ${this.displayName}`;
+	}
+	/**
+	 * @param {ContainerSlot} slot
+	 * @param {Player} player
+	 */
+	editToolForm(slot, player) {
+		new MessageForm(
+			"Не настроено.",
+			"Редактирование этого инструмента не настроено."
+		).show(player);
+	}
+	/**
+	 * @param {string[]} lore
+	 * @returns {LoreFormat | undefined}
+	 */
+	parseLore(lore) {
+		let raw;
+		try {
+			raw = JSON.parse(lore[0].replace(/§(.)/g, "$1"));
+		} catch (e) {}
+		if (raw?.version !== this.loreFormat.version) {
+			// @ts-expect-error
+			return this.loreFormat;
+		}
+		delete raw.version;
+
+		return raw;
+	}
+	/** @type {Record<string, string>} */
+	loreTranslation = {
+		shape: "Форма",
+		size: "Размер",
+		height: "Высота",
+		blocksSet: "Набор блоков",
+	};
+	/**
+	 * @param {LoreFormat} format
+	 * @returns {string[]}
+	 */
+	stringifyLore(format) {
+		return [
+			JSON.stringify(format)
+				.split("")
+				.map((e) => "§" + e)
+				.join(""),
+
+			...Object.entries(format)
+				.filter(([key]) => key !== "version")
+				.map(
+					([key, value]) =>
+						`§r§f${this.loreTranslation[key] ?? key}: ${util.inspect(value)}`
+				),
+		];
+	}
+}
+
+world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
+	if (!(player instanceof Player)) return;
+	const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
+	if (tool) tool.onUse(player, item);
 });

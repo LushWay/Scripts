@@ -40,11 +40,7 @@ const itemModifiers = [
 	},
 ];
 /** @type {((s: string) => string)[]} */
-const afterItems = [
-	(s) => {
-		if (s.includes("banner_pattern")) return s.replace(/.name$/, "");
-	},
-];
+const afterItems = [(s) => s.replace(/\.name$/, "")];
 
 const blockTypes = ["wool"];
 const blockRegExp = new RegExp(`^(.+)_(${blockTypes.join("|")})`);
@@ -63,7 +59,26 @@ const blockModifiers = [
 	},
 ];
 
+/**
+ * @type {import("@minecraft/server-admin")}
+ */
+let ServerAdmin;
+(async () => {
+	try {
+		ServerAdmin = await import("@minecraft/server-admin");
+	} catch {}
+})();
+
 export const GameUtils = {
+	/**
+	 * @param {string} name
+	 * @returns {undefined | string}
+	 */
+	env(name) {
+		if (ServerAdmin) {
+			return ServerAdmin.variables.get(name);
+		}
+	},
 	/**
 	 *
 	 * @param {ItemStack} item

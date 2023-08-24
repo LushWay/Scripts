@@ -1,15 +1,17 @@
-import { Vector } from "@minecraft/server";
+import { EquipmentSlot, Vector } from "@minecraft/server";
 import { XEntity, util } from "xapi.js";
 
 const root = new XCommand({
 	name: "id",
 	description: "Выдает айди",
 	role: "builder",
-	type: "wb",
+	type: "we",
 });
 
 root.executes((ctx) => {
-	const item = XEntity.getHeldItem(ctx.sender);
+	const item = ctx.sender
+		.getComponent("equipment_inventory")
+		.getEquipmentSlot(EquipmentSlot.mainhand);
 	if (!item) return ctx.reply("§cВ руке нет предмета!");
 
 	ctx.reply(
@@ -58,7 +60,13 @@ root.literal({ name: "a", description: "добав" }).executes((ctx) => {
 	XEntity.getTagStartsWith(ctx.sender, "st:")
 		?.split(",")
 		?.every((e) => blocks.push(e));
-	blocks.push(`${XEntity.getHeldItem(ctx.sender)?.typeId}`);
+	blocks.push(
+		`${
+			ctx.sender
+				.getComponent("equipment_inventory")
+				.getEquipmentSlot(EquipmentSlot.mainhand)?.typeId
+		}`
+	);
 	ctx.reply(`§a► §f${blocks.join(", ")}`);
 	XEntity.removeTagsStartsWith(ctx.sender, "st:");
 	ctx.sender.addTag("st:" + blocks.join(","));
@@ -66,11 +74,10 @@ root.literal({ name: "a", description: "добав" }).executes((ctx) => {
 root
 	.literal({ name: "st", description: "Задает лор предмета" })
 	.executes((ctx) => {
-		let item = XEntity.getHeldItem(ctx.sender);
+		let item = ctx.sender
+			.getComponent("equipment_inventory")
+			.getEquipmentSlot(EquipmentSlot.mainhand);
 		let oldtag = item.getLore();
 		item.setLore([XEntity.getTagStartsWith(ctx.sender, "st:")]);
-		ctx.sender
-			.getComponent("inventory")
-			.container.setItem(ctx.sender.selectedSlot, item);
 		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
 	});

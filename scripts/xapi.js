@@ -13,6 +13,7 @@ import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
 import { OverTakes } from "./lib/Setup/prototypes.js";
 import { util } from "./lib/Setup/util.js";
+import importModules from "./modules/import.js";
 
 world.say("§9┌ §fLoading...");
 let loading = Date.now();
@@ -38,11 +39,6 @@ export class XA {
 		modulesLoad: new EventLoader(),
 		databaseInit: new EventLoader(),
 		worldLoad: new EventLoader(),
-	};
-
-	static state = {
-		firstLoad: false,
-		loadTime: "",
 	};
 }
 
@@ -79,7 +75,7 @@ world.afterEvents.playerJoin.subscribe((player) => {
 		Date.now() - loading < CONFIG.firstPlayerJoinTime &&
 		player.playerId === "-4294967285"
 	) {
-		XA.state.firstLoad = true;
+		util.settings.firstLoad = true;
 	}
 });
 
@@ -100,26 +96,34 @@ system.run(async function waiter() {
 		EventLoader.load(XA.afterEvents.databaseInit);
 
 		errorName = "ModuleError";
-		await import("./modules/import.js");
+		await importModules();
 		EventLoader.load(XA.afterEvents.modulesLoad);
 
 		if (world.getAllPlayers().find((e) => e.id === "-4294967285")) {
-			util.settings.BDSMode = true;
+			util.settings.BDSMode = false;
 		}
 
-		XA.state.loadTime = ((Date.now() - loading) / 1000).toFixed(2);
-
-		if (!XA.state.firstLoad) world.say(`§9└ §fDone in ${XA.state.loadTime}`);
-		else world.say(`§fFirst loaded in ${XA.state.loadTime}`);
+		world.say(
+			`${util.settings.firstLoad ? "§fFirst loaded in " : "§9└ §fDone in "}${(
+				(Date.now() - loading) /
+				1000
+			).toFixed(2)}`
+		);
 	} catch (e) {
 		util.error(e, { errorName });
 	}
 });
 
-XA.afterEvents.databaseInit.subscribe(() =>
+XA.afterEvents.databaseInit.subscribe(() => {
 	OverTakes(Player.prototype, {
 		db() {
 			return XA.tables.player.work(super.id);
 		},
-	})
-);
+	});
+
+	OverTakes(Player, {
+		name(id) {
+			return XA.tables.player.get(id)?.name;
+		},
+	});
+});

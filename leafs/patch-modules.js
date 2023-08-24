@@ -73,7 +73,26 @@ patchPackage("@minecraft/server", {
 		     */
 		    food: ItemFoodComponent;
 		`,
+		Entity: m`
+		/**
+		 * Teleports entity to 0 300 0 and kills it
+		 */
+		despawn(): void;
+		`,
 		Player: m`
+		/**
+	 	* Finds a player by name or ID
+	 	* @param name - Player name or ID
+	 	*/
+		static fetch(name: string): Player | undefined;
+		/**
+		 * Gets player name from database by id
+		 */
+		static name(id: string): string | undefined;
+		/**
+		 * Gets ItemStack from player mainhand
+		 */
+		itemInHand(): ItemStack | undefined;
 		/**
 		 * Gets player data from database
 		 */

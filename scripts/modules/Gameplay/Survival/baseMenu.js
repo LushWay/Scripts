@@ -16,13 +16,12 @@ export function baseMenu(player, base) {
 				: "База игрока " + XEntity.getNameByID(base.permissions.owners[0])
 		}\n\nКоординаты: ${Vector.string(base.center)}`
 	)
-		.addButton("Телепорт!", null, () =>
+		.addButton("Телепорт!", () =>
 			player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 }))
 		)
-		.addButton("Участники", null, () => members(player, base));
+		.addButton("Участники", () => members(player, base));
 
-	if (isOwner)
-		form.addButton("Разрешения", null, () => permissions(player, base));
+	if (isOwner) form.addButton("Разрешения", () => permissions(player, base));
 
 	form.show(player);
 }
@@ -40,7 +39,7 @@ function members(player, base) {
 			: "Вы можете только посмотреть их"
 	);
 
-	form.addButton("< Назад", null, () => baseMenu(player, base));
+	form.addButton("< Назад", () => baseMenu(player, base));
 
 	if (isOwner) form.addButton("Добавить!", "textures/ui/plus", () => {});
 	for (const member of base.permissions.owners) {

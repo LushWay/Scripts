@@ -6,13 +6,13 @@ import {
 	world,
 } from "@minecraft/server";
 import { Cooldown, util } from "xapi.js";
-import { CONFIG_WB } from "../config.js";
+import { CONFIG_WE } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";
 
 class WorldEditBuilder {
-	drawselection = CONFIG_WB.DRAW_SELECTION_DEFAULT;
+	drawselection = CONFIG_WE.DRAW_SELECTION_DEFAULT;
 	/** @type {Vector3} */
 	#pos1 = null;
 	/** @type {Vector3} */
@@ -66,7 +66,7 @@ class WorldEditBuilder {
 			this.selectionCuboid.min,
 			this.selectionCuboid.max
 		);
-		if (selectedSize > CONFIG_WB.DRAW_SELECTION_MAX_SIZE) return;
+		if (selectedSize > CONFIG_WE.DRAW_SELECTION_MAX_SIZE) return;
 		const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid;
 		const gen = Vector.foreach(
 			this.selectionCuboid.min,
@@ -102,7 +102,7 @@ class WorldEditBuilder {
 		pos2 = this.pos2,
 		saveLocation = this.history
 	) {
-		const structure = new Structure(CONFIG_WB.BACKUP_PREFIX, pos1, pos2);
+		const structure = new Structure(CONFIG_WE.BACKUP_PREFIX, pos1, pos2);
 		saveLocation.push(structure);
 	}
 
@@ -165,26 +165,27 @@ class WorldEditBuilder {
 	}
 	/**
 	 * Copys The curret positions
-	 * @returns {Promise<string>}
-	 * @example copy();
+	 * @returns {string}
 	 */
-	async copy() {
+	copy() {
 		try {
 			if (!this.selectionCuboid)
 				return "§4► §cЗона для копирования не выделена!";
-			const opt = world.overworld.runCommand(
-				`structure save ${CONFIG_WB.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
+
+			const result = world.overworld.runCommand(
+				`structure save ${CONFIG_WE.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
 			);
-			if (!opt) throw new Error(opt + "");
+			if (!result)
+				return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`;
 			this.current_copy = {
 				pos1: this.pos1,
 				pos2: this.pos2,
-				name: CONFIG_WB.COPY_FILE_NAME,
+				name: CONFIG_WE.COPY_FILE_NAME,
 			};
 			return `§9► §rСкопированно из ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} to ${this.pos2.x} ${this.pos2.y} ${this.pos2.z}`;
 		} catch (error) {
 			util.error(error);
-			return `§4► §cНе удалось скорпировать`;
+			return `§4► §cНе удалось скорпировать: ${error.message}`;
 		}
 	}
 	/**
@@ -196,10 +197,10 @@ class WorldEditBuilder {
 	 * @param {boolean} includesBlocks Specifies whether including blocks or not
 	 * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in the structure are loaded.
 	 * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity. If unspecified, a random seed is taken.
-	 * @returns {Promise<string>}
+	 * @returns {string}
 	 * @example paste(Player, 0, "none", false, true, 100.0, "");
 	 */
-	async paste(
+	paste(
 		player,
 		rotation = 0,
 		mirror = "none",
@@ -218,8 +219,8 @@ class WorldEditBuilder {
 
 			this.backup(loc, pos2);
 
-			await player.runCommandAsync(
-				`structure load ${CONFIG_WB.COPY_FILE_NAME} ~ ~ ~ ${String(
+			player.runCommand(
+				`structure load ${CONFIG_WE.COPY_FILE_NAME} ~ ~ ~ ${String(
 					rotation
 				).replace(
 					"NaN",
@@ -232,7 +233,7 @@ class WorldEditBuilder {
 			return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`;
 		} catch (error) {
 			util.error(error);
-			return `§4► §cНе удалось вставить`;
+			return `§4► §cНе удалось вставить: ${error.message}`;
 		}
 	}
 	/**
@@ -265,10 +266,10 @@ class WorldEditBuilder {
 			}
 		}
 
-		for (const cube of Cube.split(CONFIG_WB.FILL_CHUNK_SIZE)) {
+		for (const cube of Cube.split(CONFIG_WE.FILL_CHUNK_SIZE)) {
 			const result = world.overworld.runCommand(
 				`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
-				{ showError: true, showOutput: true }
+				{ showError: true, showOutput: false }
 			);
 			if (result === 0) errors++;
 			all++;
@@ -277,18 +278,20 @@ class WorldEditBuilder {
 
 		const endTime = get(Date.now() - startTime);
 
-		let reply = `§3Заполненно §f${blocks} §3блоков ${
-			endTime.parsedTime !== "0"
-				? `за §f${endTime.parsedTime} §3${endTime.type}.`
-				: ""
-		}`;
-		if (replaceMode) reply += ` §3Режим заполнения: §b${replaceMode}`;
-		if (replaceMode === "replace")
+		let reply = `§3Заполненно §f${blocks} §3блоков`;
+		if (endTime.parsedTime !== "0") {
+			reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`;
+		}
+		if (replaceMode) {
+			reply += ` §3Режим заполнения: §b${replaceMode}`;
+		}
+		if (replaceMode === "replace") {
 			reply += `§3, заполняемый блок: §f${replaceBlock} ${
 				rbData ? rbData : ""
 			}`;
-
-		if (errors) return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок. ${reply}`;
+		}
+		if (errors)
+			return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок при заполнении. ${reply}`;
 		return `§b► ${reply}`;
 	}
 }

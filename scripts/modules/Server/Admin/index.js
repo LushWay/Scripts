@@ -15,7 +15,7 @@ import {
 	util,
 } from "xapi.js";
 
-/** @type {Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
+/** @type {import("lib/Database/Rubedo.js").Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
 const DB = XA.tables.player;
 
 const R = new XCommand({

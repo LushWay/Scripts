@@ -1,5 +1,5 @@
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "wand",
 	description: "Выдет топор",
 	role: "moderator",

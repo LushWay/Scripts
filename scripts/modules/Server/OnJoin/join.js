@@ -1,5 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { Database, EventSignal, Options, XA } from "xapi.js";
+import { Database, EventSignal, Options, XA, util } from "xapi.js";
 import "./subscribes.js";
 import { JOIN } from "./var.js";
 
@@ -26,7 +26,7 @@ world.afterEvents.playerJoin.subscribe(({ playerId }) => {
 
 system.runTimeout(
 	() => {
-		if (!XA.state.firstLoad) return;
+		if (!util.settings.firstLoad) return;
 		const player = world.getAllPlayers()[0];
 		const D = PDB.get(player.id);
 		D.waiting = 1;

@@ -1,4 +1,4 @@
-export const CONFIG_WB = {
+export const CONFIG_WE = {
 	VERSION: "2.0.0",
 	BRUSH_LOCATOR: "§c╔═╗\n§c║  ║\n§c╚═╝",
 	H: 0.2,
@@ -17,4 +17,3 @@ export const CONFIG_WB = {
 	DRAW_SELECTION_PARTICLE: "minecraft:endrod",
 	DRAW_SELECTION_MAX_SIZE: 5000,
 };
-

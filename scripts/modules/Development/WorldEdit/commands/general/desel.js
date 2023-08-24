@@ -1,7 +1,7 @@
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
 new XCommand({
-	type: "wb",
+	type: "we",
 	name: "desel",
 	description: "Выключает отрисовку текущего выделения",
 	role: "moderator",

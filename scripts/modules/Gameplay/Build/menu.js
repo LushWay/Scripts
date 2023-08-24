@@ -172,7 +172,7 @@ MENU.OnOpen = (player) => {
      * @param {string} name
      */
     const toPlatform = (region, name) => {
-      form.addButton(name, null, () => {
+      form.addButton(name, () => {
         teleportToRegion(player, region);
         player.tell("§b> §3Вы были перемещены на площадку §r" + name);
       });
@@ -195,66 +195,13 @@ MENU.OnOpen = (player) => {
     );
 
     if (inOwnRegion) {
-      menu.addButton("Темы", null, () => {
-        const pathDelimeter = " §f> ";
-        /**
-         *
-         * @param {Record<string | symbol, any>} obj
-         * @param {ActionForm} parentForm
-         */
-        function listButtons(obj, parentForm, path = "") {
-          const description = obj[Description];
-          const form = new ActionForm(
-            path ? path : "Темы",
-            description ??
-              "§3Тут можно просмотреть и выбрать темы для строительства"
-          );
-
-          // {theme: {subteme1: desc, subteme2: desc}}
-          // {subteme1: desc, subteme2: desc}
-
-          for (const [key, value] of Object.entries(obj)) {
-            if (typeof value === "symbol") continue;
-            if (typeof value === "string") {
-              // key - theme, value - description
-              form.addButton(key, null, () => {
-                new MessageForm("Выбор темы", value)
-                  .setButton1("§aВыбрать тему", () => {
-                    const { data, save } = DB.work(player.id);
-                    data.theme = path.split(pathDelimeter).concat([key]);
-                    save();
-
-                    player.tell(`Выбранная тема: ${path} ${key}`);
-                  })
-                  .setButton2(backButton, () => form.show(player))
-                  .show(player);
-              });
-            } else {
-              form.addButton(key, null, () => {
-                listButtons(
-                  value,
-                  form,
-                  `${path ? path + pathDelimeter : ""}§3${key}`
-                );
-              });
-            }
-          }
-
-          form.addButton(backButton, null, () => parentForm.show(player));
-
-          form.show(player);
-        }
-
-        listButtons(Themes, menu);
-      });
-
       menu.addButton("Строители", null, () => {
         const form = new ActionForm(
           "Строители",
           "§3Тут можно просмотреть и удалить строителей вашего региона"
         );
 
-        for (const id of currentRegion.permissions.owners.slice(1)) {
+        for (const id of current_region.permissions.owners.slice(1)) {
           const playerName = XEntity.getNameByID(id);
           form.addButton(playerName, null, () => {
             prompt(
@@ -264,9 +211,9 @@ MENU.OnOpen = (player) => {
                 "§r§c из строителей вашего региона?",
               "ДА",
               () => {
-                currentRegion.permissions.owners =
-                  currentRegion.permissions.owners.filter((e) => e !== id);
-                currentRegion.update();
+                current_region.permissions.owners =
+                  current_region.permissions.owners.filter((e) => e !== id);
+                current_region.update();
                 player.tell("§b> §3Успешно!");
                 const requestedPlayer = XEntity.fetch(id);
                 if (requestedPlayer)
@@ -310,8 +257,8 @@ MENU.OnOpen = (player) => {
                     requestedPlayer.tell(
                       `§b> §3Игрок §f${player.name} §r§3принял ваш запрос на редактирование площадки`
                     );
-                    currentRegion.permissions.owners.push(requestedPlayer.id);
-                    currentRegion.update();
+                    current_region.permissions.owners.push(requestedPlayer.id);
+                    current_region.update();
                   } else {
                     player.tell("§4> §cИгрок не в сети.");
                   }
@@ -336,7 +283,7 @@ MENU.OnOpen = (player) => {
             "§fВы уверены, что хотите перейти на новую площадку? После этого настощая площадка будет архивирована, и §cвернуть её§f будет уже §cнельзя§f. Это действие можно совершать раз в 24 часа.",
             "§cДа, перейти",
             () => {
-              const oldRegionID = DB.get(player.id)?.id;
+              const oldRegionID = DB.get(player.id);
               const oldRegion = Region.getAllRegions().find(
                 (e) => e.key === oldRegionID
               );
@@ -389,8 +336,8 @@ MENU.OnOpen = (player) => {
             () => menu.show(player)
           );
       });
-    } else if (currentRegion.permissions.owners.includes(player.id)) {
-    } else if (currentRegion.permissions.owners[0]) {
+    } else if (current_region.permissions.owners.includes(player.id)) {
+    } else if (current_region.permissions.owners[0]) {
       menu.addButton("Запросить разрешение", null, () => {
         const CD = new Cooldown(DB, "REQ", player, 1000 * 60);
 
@@ -404,7 +351,7 @@ MENU.OnOpen = (player) => {
               editRequest.createRequest(player.id);
               player.tell("§b> §3Запрос на редактирование успешно отправлен!");
               const requestedPlayer = XEntity.fetch(
-                currentRegion.permissions.owners[0]
+                current_region.permissions.owners[0]
               );
               if (requestedPlayer)
                 requestedPlayer.tell(
@@ -423,13 +370,13 @@ MENU.OnOpen = (player) => {
           `§cВы действительно хотите удалить площадку игрока §r§f${regionOwnerName}?`,
           "§cДа",
           async () => {
-            const end = await ClearRegion(player, currentRegion);
-            currentRegion.forEachOwner((player) =>
+            const end = await ClearRegion(player, current_region);
+            current_region.forEachOwner((player) =>
               player.tell(
                 `§cРегион с владельцем §f${regionOwnerName}§r§c был удален`
               )
             );
-            currentRegion.delete();
+            current_region.delete();
             end();
           },
           "НЕТ!",
