@@ -8,7 +8,7 @@ new XCommand({
 }).executes((ctx) => {
 	WorldEditBuild.drawselection = !WorldEditBuild.drawselection;
 	ctx.reply(
-		`§c► §fОтображение выделения: ${
+		`§3► §fОтображение выделения: ${
 			WorldEditBuild.drawselection ? "§aвключено" : "§cвыключено"
 		}`
 	);

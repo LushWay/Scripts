@@ -48,36 +48,3 @@ root
 			`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
 		);
 	});
-
-root.literal({ name: "c", description: "очсищ" }).executes((ctx) => {
-	const tag = XEntity.getTagStartsWith(ctx.sender, "st:");
-	ctx.reply(`§b► §c-§f${tag}`);
-	XEntity.removeTagsStartsWith(ctx.sender, "st:");
-});
-
-root.literal({ name: "a", description: "добав" }).executes((ctx) => {
-	const blocks = [];
-	XEntity.getTagStartsWith(ctx.sender, "st:")
-		?.split(",")
-		?.every((e) => blocks.push(e));
-	blocks.push(
-		`${
-			ctx.sender
-				.getComponent("equipment_inventory")
-				.getEquipmentSlot(EquipmentSlot.mainhand)?.typeId
-		}`
-	);
-	ctx.reply(`§a► §f${blocks.join(", ")}`);
-	XEntity.removeTagsStartsWith(ctx.sender, "st:");
-	ctx.sender.addTag("st:" + blocks.join(","));
-});
-root
-	.literal({ name: "st", description: "Задает лор предмета" })
-	.executes((ctx) => {
-		let item = ctx.sender
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
-		let oldtag = item.getLore();
-		item.setLore([XEntity.getTagStartsWith(ctx.sender, "st:")]);
-		ctx.reply(`§a► §f${oldtag ?? ""} ► ${item.getLore()}`);
-	});

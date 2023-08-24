@@ -14,7 +14,6 @@ const commands = [
 	"./selection/pos1.js",
 	"./selection/pos2.js",
 	"./selection/size.js",
-	"./selection/wand.js",
 
 	"./region/set.js",
 
@@ -29,6 +28,7 @@ const commands = [
 	"./generation/sphere.js",
 
 	"./tools/brush.js",
+	"./tools/wand.js",
 	"./tools/nylium.js",
 	"./tools/shovel.js",
 	"./tools/tool.js",
