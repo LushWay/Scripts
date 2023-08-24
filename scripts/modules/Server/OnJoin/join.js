@@ -1,5 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { Database, EventSignal, Options, XA, util } from "xapi.js";
+import { Database, EventSignal, Options, util } from "xapi.js";
 import "./subscribes.js";
 import { JOIN } from "./var.js";
 
@@ -21,16 +21,16 @@ const PDB = Database.eventProxy(new Database("player"), {
 world.afterEvents.playerJoin.subscribe(({ playerId }) => {
 	const { data, save } = PDB.work(playerId);
 	data.waiting = 1;
-	save;
+	save();
 });
 
 system.runTimeout(
 	() => {
 		if (!util.settings.firstLoad) return;
 		const player = world.getAllPlayers()[0];
-		const D = PDB.get(player.id);
-		D.waiting = 1;
-		PDB.set(player.id, D);
+		const { data, save } = PDB.work(player.id);
+		data.waiting = 1;
+		save();
 	},
 	"owner start screen",
 	80
@@ -38,7 +38,7 @@ system.runTimeout(
 
 system.runPlayerInterval(
 	(player) => {
-		const data = PDB.get(player.id);
+		const { data, save } = PDB.work(player.id);
 		let modified = false;
 
 		if (data.waiting === 1) {
@@ -119,7 +119,7 @@ system.runPlayerInterval(
 			modified = true;
 		}
 
-		if (modified) PDB.set(player.id, data);
+		if (modified) save();
 	},
 	"joinInterval",
 	20
@@ -162,9 +162,11 @@ function join(player, data, messageType) {
 
 	if (oldTag === player.name) return;
 	if (oldTag && oldTag !== player.name) {
-		world.say(
-			"§c> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name
-		);
+		const message =
+			"§e> §3Игрок §f" + oldTag + " §r§3сменил ник на §f" + player.name;
+
+		world.say(message);
+		console.warn(message);
 	}
 
 	data.name = player.name;
