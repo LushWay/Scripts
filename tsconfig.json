@@ -1,23 +1,24 @@
 {
-	"compilerOptions": {
-		"alwaysStrict": true,
-		"allowJs": true,
-		"checkJs": true,
-		"noEmit": true,
-		"forceConsistentCasingInFileNames": true,
-		"noImplicitAny": true,
-		"skipLibCheck": false,
-		"skipDefaultLibCheck": true,
-		"lib": ["ES2020"],
-		"target": "es2020",
-		"module": "NodeNext",
-		"baseUrl": ".",
-		"maxNodeModuleJsDepth": 0,
-		"types": [],
-		"paths": {
-			"*": ["scripts/*"]
-		}
-	},
-	"include": ["./scripts/"],
-	"exclude": ["./scripts/chestui"]
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "skipDefaultLibCheck": true,
+    "lib": ["ES2020"],
+    "target": "es2020",
+    "module": "NodeNext",
+    "baseUrl": ".",
+    "maxNodeModuleJsDepth": 0,
+    "types": [],
+    "paths": {
+      "*": ["scripts/*"]
+    }
+  },
+  "include": ["./scripts/"],
+  "exclude": ["./scripts/chestui"]
 }

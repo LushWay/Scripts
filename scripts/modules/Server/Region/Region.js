@@ -53,12 +53,9 @@ export class Region {
      */
     get PERMISSIONS() {
       if (!this.PERMS_SETTED) {
-        util.error(
-          new ReferenceError(
-            "Cannot access Region.CONFIG.PERMISSIONS before setting."
-          )
+        throw new ReferenceError(
+          "Cannot access Region.CONFIG.PERMISSIONS before setting."
         );
-        return;
       }
 
       return Region.PERMISSIONS;
@@ -174,8 +171,19 @@ export class Region {
     this.permissions.owners
       .map(XEntity.fetch)
       .filter((e) => e)
-      .forEach((player, i, owners) =>
-        util.catch(() => callback(player, i, owners), "Region.forEachOwner")
+      .forEach(
+        (player, i, owners) =>
+          player &&
+          util.catch(
+            () =>
+              callback(
+                player,
+                i,
+                // @ts-ignore
+                owners
+              ),
+            "Region.forEachOwner"
+          )
       );
   }
 }

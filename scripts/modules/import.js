@@ -1,27 +1,27 @@
 import { util } from "../xapi.js";
 
 const modules = [
-	"./Server/Admin/index.js",
-	"./Server/Chat/index.js",
-	"./Server/DatabaseView/index.js",
-	"./Server/HelpCommand/index.js",
-	"./Server/Menu/index.js",
-	"./Server/OnJoin/join.js",
-	"./Server/Server/index.js",
+  "./Server/Admin/index.js",
+  "./Server/Chat/index.js",
+  "./Server/DatabaseView/index.js",
+  "./Server/HelpCommand/index.js",
+  "./Server/Menu/index.js",
+  "./Server/OnJoin/join.js",
+  "./Server/Server/index.js",
 
-	/**
-	 * Gameplay modules
-	 */
-	"./Gameplay/Indicator/index.js",
-	"./Gameplay/Loot/loot.js",
-	"./Server/Leaderboards/index.js",
-	/**
-	 * Development modules:
-	 */
-	"./Development/GameTest/index.js",
-	"./Development/Test/index.js",
-	"./Server/Objectives/index.js",
-	"./Development/WorldEdit/WBindex.js",
+  /**
+   * Gameplay modules
+   */
+  // "./Gameplay/Indicator/index.js",
+  "./Gameplay/Loot/loot.js",
+  "./Server/Leaderboards/index.js",
+  /**
+   * Development modules:
+   */
+  "./Development/GameTest/index.js",
+  "./Development/Test/index.js",
+  "./Server/Objectives/index.js",
+  "./Development/WorldEdit/WBindex.js",
 ];
 
 let enabled = 0;
@@ -35,16 +35,16 @@ const strike = util.strikeTest();
  * @param {number} [o.st]
  */
 export default async function ({
-	array = modules,
-	message = "X-API init and loading took",
-	fn = (module) => import(module),
-	st = enabled,
+  array = modules,
+  message = "X-API init and loading took",
+  fn = (module) => import(module),
+  st = enabled,
 } = {}) {
-	if (st) strike(message);
+  if (st) strike(message);
 
-	for (const module of array) {
-		await nextTick;
-		await fn(module);
-		if (st) strike(module);
-	}
+  for (const module of array) {
+    await nextTick;
+    await fn(module);
+    if (st) strike(module);
+  }
 }
