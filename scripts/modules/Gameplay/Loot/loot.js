@@ -29,7 +29,9 @@ export class LootTable {
 			const amount =
 				typeof item.amount === "number"
 					? [item.amount]
-					: RandomCost.toArray(item.amount);
+					: typeof item.amount === "object"
+					? RandomCost.toArray(item.amount)
+					: [1];
 
 			/** @type {Record<string, number[]>} */
 			const enchantments = {};
@@ -63,7 +65,7 @@ export class LootTable {
 	 * Randomises items and returns array with specified size
 	 * @param {number} size - Size of the array
 	 * @param {percent} air
-	 * @returns {Array<ItemStack | null>}
+	 * @returns {Array<ItemStack | null | undefined>}
 	 */
 	generate(size, air = "70%") {
 		let step = 0;
@@ -94,6 +96,8 @@ export class LootTable {
 					break;
 				}
 			}
+
+			item = this.items[0];
 
 			// Randomise item properties
 			const amount = item.amount.randomElement();
@@ -173,6 +177,6 @@ new XCommand({
 	const { container } = ctx.sender.getComponent("inventory");
 	const gen = table.generate(container.size, "30%");
 	for (const [i, item] of gen.entries()) {
-		container.setItem(i, item);
+		if (item) container.setItem(i, item);
 	}
 });

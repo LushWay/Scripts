@@ -47,5 +47,5 @@ world.afterEvents.blockBreak.subscribe((event) => {
 
 	event.dimension
 		.getBlock(event.block.location)
-		.setPermutation(event.brokenBlockPermutation);
+		?.setPermutation(event.brokenBlockPermutation);
 });

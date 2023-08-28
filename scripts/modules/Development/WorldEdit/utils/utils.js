@@ -8,7 +8,7 @@ import { Cooldown, util } from "xapi.js";
 export function setblock(blockTypeID, location) {
 	if (blockTypeID.includes(".") || blockTypeID === "air") {
 		// Block is written like "stone.3", so we need to get data and id
-		const [_, id, data] = /^(.+)\.(\d+)/g.exec(blockTypeID);
+		const [_, id, data] = /^(.+)\.(\d+)/g.exec(blockTypeID) ?? [];
 		world.overworld.runCommand(
 			`setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`,
 			{ showError: true }
@@ -22,7 +22,7 @@ export function setblock(blockTypeID, location) {
 			return util.error(
 				new TypeError(`BlockType ${blockTypeID} does not exist!`)
 			);
-		world.overworld.getBlock(location).setType(blockType);
+		world.overworld.getBlock(location)?.setType(blockType);
 	}
 }
 

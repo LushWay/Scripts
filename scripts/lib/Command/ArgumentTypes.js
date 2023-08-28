@@ -37,7 +37,9 @@ export class IArgumentType {
 	 * @returns {import("./types.js").IArgumentReturnData<any>}
 	 */
 	matches(value) {
-		return;
+		return {
+			success: false,
+		};
 	}
 	constructor(name = "any", optional = false) {}
 }
@@ -89,7 +91,7 @@ export class StringArgumentType {
 	 */
 	matches(value) {
 		return {
-			success: value && value !== "",
+			success: !!value,
 			value: value,
 		};
 	}
@@ -363,4 +365,3 @@ export const ArgumentTypes = {
 	array: ArrayArgumentType,
 	unit: UnitArgumentType,
 };
-

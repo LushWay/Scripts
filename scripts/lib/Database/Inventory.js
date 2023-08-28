@@ -84,9 +84,11 @@ export class InventoryStore {
 				legs: equipment.getEquipment(EquipmentSlot.legs),
 				feet: equipment.getEquipment(EquipmentSlot.feet),
 			},
+			// @ts-expect-error
 			slots: new Array(container.size)
 				.fill(undefined)
-				.map((_, i) => container.getItem(i)),
+				.map((_, i) => container.getItem(i))
+				.filter((e) => typeof e !== "undefined"),
 		};
 	}
 	_ = {
@@ -113,7 +115,12 @@ export class InventoryStore {
 	}
 	/** @private */
 	init() {
-		this._.ENTITIES = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME);
+		const entities = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME);
+		if (!entities)
+			throw new DatabaseError(
+				"Failed to get inventory entities in table " + this._.TABLE_NAME
+			);
+		this._.ENTITIES = entities;
 
 		const items = [];
 
@@ -214,7 +221,13 @@ export class InventoryStore {
 			for (const key of Object.keys(store.equipment)) {
 				if (!store.equipment[key]) continue;
 				const move = manifest.slots.push(key);
-				items[storeIndex + move] = store.equipment[key];
+				const eq = store.equipment[key];
+				if (!eq)
+					throw new DatabaseError(
+						"Failed to get equipment with key " + util.inspect(key)
+					);
+
+				items[storeIndex + move] = eq;
 			}
 
 			for (const [key, stack] of store.slots.entries()) {
@@ -230,6 +243,9 @@ export class InventoryStore {
 
 		const totalEntities = Math.ceil(items.length / DB.INVENTORY_SIZE);
 		const entities = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME);
+
+		if (!entities) throw new DatabaseError("Failed to get entities");
+
 		const entitiesToSpawn = totalEntities - entities.length;
 
 		if (entitiesToSpawn > 0) {

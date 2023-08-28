@@ -1,16 +1,16 @@
 import { Vector, world } from "@minecraft/server";
 import { ModalForm } from "xapi.js";
-import { WorldEditPlayerSettings } from "../../WBindex.js";
 import { Shape } from "../../builders/ShapeBuilder.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
-import { CONFIG_WE } from "../../config.js";
+import { WE_CONFIG } from "../../config.js";
+import { WorldEditPlayerSettings } from "../../index.js";
 import { SHAPES } from "../../utils/shapes.js";
 import { getBlockSet, getBlockSets } from "../general/menu.js";
 
 world.overworld
 	.getEntities({
 		type: "f:t",
-		name: CONFIG_WE.BRUSH_LOCATOR,
+		name: WE_CONFIG.BRUSH_LOCATOR,
 	})
 	.forEach((e) => e.triggerEvent("f:t:kill"));
 
@@ -65,7 +65,7 @@ const brush = new WorldEditTool({
 		});
 		const entities = player.dimension.getEntities({
 			type: "f:t",
-			name: CONFIG_WE.BRUSH_LOCATOR,
+			name: WE_CONFIG.BRUSH_LOCATOR,
 			tags: [player.name],
 		});
 		if (dot && !settings.noBrushParticles) {
@@ -92,7 +92,7 @@ const brush = new WorldEditTool({
 			maxDistance: lore.maxDistance,
 		});
 
-		if (dot.block) {
+		if (dot) {
 			new Shape(
 				SHAPES[lore.shape],
 				dot.block.location,

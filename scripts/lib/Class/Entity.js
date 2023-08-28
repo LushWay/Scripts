@@ -45,13 +45,13 @@ export const XEntity = {
 	 */
 	removeTagsStartsWith(entity, value) {
 		const tags = entity.getTags();
-		if (tags.length === 0) return null;
+		if (tags.length === 0) return;
 		tags.forEach((tag) => (tag.startsWith(value) ? entity.removeTag(tag) : ""));
 	},
 	/**
 	 * Gets a players held item
 	 * @param {Player} player player you want to get
-	 * @returns {ItemStack}
+	 * @returns {ItemStack | undefined}
 	 * @example getHeldItem(Player);
 	 */
 	getHeldItem(player) {

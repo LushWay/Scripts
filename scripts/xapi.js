@@ -62,7 +62,7 @@ export * from "./lib/Database/Scoreboard.js";
 // Form
 export * from "./lib/Form/ActionForm.js";
 export * from "./lib/Form/MessageForm.js";
-export * from "./lib/Form/ModelForm.js";
+export * from "./lib/Form/ModalForm.js";
 export * from "./lib/Form/utils.js";
 // Setup
 export * from "./lib/Setup/Extensions/system.js";

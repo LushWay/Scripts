@@ -1,7 +1,7 @@
 import { Player, system, world } from "@minecraft/server";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
-import { ModalForm } from "lib/Form/ModelForm.js";
+import { ModalForm } from "lib/Form/ModalForm.js";
 import { TIMERS_PATHES, util } from "xapi.js";
 
 /**
@@ -71,7 +71,7 @@ function showTable(player, table) {
 	/** @param {string} key */
 	const propertyForm = (key) => {
 		key = key + "";
-		/** @type {unknown} */
+		/** @type {any} */
 		let value;
 		let failedToLoad = false;
 

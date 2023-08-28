@@ -12,10 +12,13 @@ export class ModalForm {
 	 * @param {string} defaultValue
 	 * @returns {[string[], number]}
 	 */
-	static arrayAndDefault(array, defaultValue) {
+	static arrayAndDefault(array, defaultValue, none = false) {
+		if (none) array = [this.arrayDefaultNone, ...array];
 		const i = array.indexOf(defaultValue);
 		return [array, i ? i : 0];
 	}
+	static arrayDefaultNone = "Никакой";
+
 	title = "";
 	/**
 	 * The default minecraft form this form is based on
@@ -71,8 +74,6 @@ export class ModalForm {
 		defaultValue = 0
 	) {
 		this.args.push({ type: "slider" });
-		if (typeof minimumValue !== "number") return;
-		if (typeof maximumValue !== "number") return;
 		this.form.slider(
 			label,
 			minimumValue,
@@ -117,19 +118,23 @@ export class ModalForm {
 	 */
 	async show(player, callback) {
 		const response = await XShowForm(this.form, player);
-		if (response === false || !(response instanceof ModalFormResponse)) return;
+		if (
+			response === false ||
+			!(response instanceof ModalFormResponse) ||
+			!response.formValues
+		)
+			return;
 		util.catch(
 			() =>
+				response.formValues &&
 				callback(
 					new FormCallback(this, player, callback),
 					...response.formValues.map((v, i) =>
 						this.args[i].type === "dropdown" && typeof v === "number"
-							? this.args[i].options[v]
+							? this.args[i].options?.[v]
 							: v
 					)
-				),
-			null,
-			["ModalFormCallback"]
+				)
 		);
 	}
 }

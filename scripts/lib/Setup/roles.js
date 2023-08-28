@@ -9,6 +9,7 @@ const table = Database.eventProxy(new Database("player"), {
 		return value;
 	},
 	beforeSet(key, value) {
+		// @ts-expect-error
 		if (value.role === "member") delete value.role;
 		return value;
 	},

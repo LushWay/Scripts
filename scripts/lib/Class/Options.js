@@ -94,7 +94,7 @@ export class Options {
  * @param {string} prefix - The prefix for the database.
  * @param {DefaultConfig} CONFIG - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
- * @param {Player} [player] - The player object.
+ * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
  */
 function generateOptionsProxy(database, prefix, CONFIG, player = null) {

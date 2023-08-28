@@ -8,7 +8,7 @@ import {
 	world,
 } from "@minecraft/server";
 import { MessageForm, util } from "xapi.js";
-import { WorldEditPlayerSettings } from "../WBindex.js";
+import { WorldEditPlayerSettings } from "../index.js";
 
 /**
  * @template {Record<string, any> & {version: number}} [LoreFormat=any]
@@ -41,7 +41,7 @@ export class WorldEditTool {
 		this.name = name;
 		this.displayName = displayName;
 		this.item = itemStackId;
-		this.editToolForm = editToolForm;
+		if (editToolForm) this.editToolForm = editToolForm;
 		this.loreFormat = loreFormat ?? { version: 0 };
 		this.loreFormat.version ??= 0;
 		this.onUse = onUse;
@@ -101,7 +101,7 @@ export class WorldEditTool {
 	}
 	/**
 	 * @param {string[]} lore
-	 * @returns {LoreFormat | undefined}
+	 * @returns {LoreFormat}
 	 */
 	parseLore(lore) {
 		let raw;
@@ -109,7 +109,7 @@ export class WorldEditTool {
 			raw = JSON.parse(lore[0].replace(/§(.)/g, "$1"));
 		} catch (e) {}
 		if (raw?.version !== this.loreFormat.version) {
-			// @ts-expect-error
+			// @ts-expect-error yes
 			return this.loreFormat;
 		}
 		delete raw.version;
@@ -147,7 +147,7 @@ export class WorldEditTool {
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 	if (!(player instanceof Player)) return;
 	const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
-	if (tool) tool.onUse(player, item);
+	if (tool && tool.onUse) tool.onUse(player, item);
 });
 
 system.runPlayerInterval(
@@ -157,7 +157,8 @@ system.runPlayerInterval(
 			.getEquipmentSlot(EquipmentSlot.mainhand);
 
 		const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
-		if (tool) tool.interval(player, item, WorldEditPlayerSettings(player));
+		if (tool && tool.interval)
+			tool.interval(player, item, WorldEditPlayerSettings(player));
 	},
 	"we tool",
 	10

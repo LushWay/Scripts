@@ -1,5 +1,5 @@
 import { EquipmentSlot, Vector } from "@minecraft/server";
-import { XEntity, util } from "xapi.js";
+import { util } from "xapi.js";
 
 const root = new XCommand({
 	name: "id",
@@ -15,7 +15,7 @@ root.executes((ctx) => {
 	if (!item) return ctx.reply("§cВ руке нет предмета!");
 
 	ctx.reply(
-		`§b► §f${item?.typeId.replace("minecraft:", "")} ${
+		`§b► §f${item?.typeId?.replace("minecraft:", "")} ${
 			item?.nameTag ? `(${item?.nameTag}) ` : ""
 		}`
 	);

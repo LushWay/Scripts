@@ -11,7 +11,7 @@ OverTakes(System.prototype, {
 	sleep(time) {
 		return new Promise((resolve) => super.runInterval(resolve, time));
 	},
-	runInterval(fn, name, ticks) {
+	runInterval(fn, name, ticks = 0) {
 		const visual_id = `${name} (loop ${ticks} ticks)`;
 		const path = util.error.stack.get();
 		TIMERS_PATHES[visual_id] = path;
@@ -28,7 +28,7 @@ OverTakes(System.prototype, {
 				);
 		}, ticks);
 	},
-	runTimeout(fn, name, ticks) {
+	runTimeout(fn, name, ticks = 0) {
 		const visual_id = `${name} (loop ${ticks} ticks)`;
 		const path = util.error.stack.get();
 		TIMERS_PATHES[visual_id] = path;
@@ -45,7 +45,7 @@ OverTakes(System.prototype, {
 				);
 		}, ticks);
 	},
-	runPlayerInterval(fn, name, ticks) {
+	runPlayerInterval(fn, name, ticks = 0) {
 		const visual_id = `${name} (loop ${ticks} ticks)`;
 		const path = util.error.stack.get();
 		TIMERS_PATHES[visual_id] = path;

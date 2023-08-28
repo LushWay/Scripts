@@ -84,9 +84,8 @@ export class MessageForm {
 		const response = await XShowForm(this.form, player);
 		if (response === false || !(response instanceof MessageFormResponse))
 			return;
-		if (response.selection === 1)
-			util.catch(this.button1?.callback, null, ["MessageFormCallback"]);
-		if (response.selection === 0)
-			util.catch(this.button2?.callback, null, ["MessageFormCallback"]);
+
+		const callback = this[response.selection ? "button1" : "button2"].callback;
+		if (callback) util.catch(callback);
 	}
 }

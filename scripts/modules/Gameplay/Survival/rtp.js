@@ -119,10 +119,11 @@ function giveElytra(player) {
 		.getEquipmentSlot(EquipmentSlot.chest);
 
 	// Item in slot
-	if (slot.getItem()) {
+	const item = slot.getItem();
+	if (item) {
 		const { container } = player.getComponent("inventory");
 		if (container.emptySlotsCount) {
-			container.addItem(slot.getItem());
+			container.addItem(item);
 		} else {
 			player.tell("§cСними нагрудник или свою элитру!");
 		}

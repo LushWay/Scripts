@@ -13,7 +13,7 @@ import "lib/Class/Net.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
-import { ModalForm } from "lib/Form/ModelForm.js";
+import { ModalForm } from "lib/Form/ModalForm.js";
 import { DB, GameUtils, XShowForm, util } from "xapi.js";
 import { ChestFormData } from "../../../chestui/forms.js";
 import { APIRequest } from "../../../lib/Class/Net.js";
@@ -25,7 +25,7 @@ world.afterEvents.chatSend.subscribe((event) => {
 });
 
 /**
- * @type {Record<string, (ctx?: CommandContext) => void | Promise<any>>}
+ * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
 	0() {
@@ -92,7 +92,7 @@ const tests = {
 				let data = "";
 				const a = e.getComponent("inventory").container;
 				for (let i = 0; i < 2; i++) {
-					if (a.getItem(i)) data += a.getItem(i).getLore().join("");
+					if (a.getItem(i)) data += a.getItem(i)?.getLore().join("");
 				}
 
 				return {
@@ -129,11 +129,11 @@ const tests = {
 		}
 	},
 	48(ctx) {
-		const { block } = ctx.sender.getBlockFromViewDirection({
+		const block = ctx.sender.getBlockFromViewDirection({
 			includeLiquidBlocks: false,
 			includePassableBlocks: false,
 			maxDistance: 50,
-		});
+		})?.block;
 
 		if (!block) return;
 
@@ -227,7 +227,7 @@ const tests = {
 		for (const position of orePositions) {
 			ctx.sender.dimension
 				.getBlock(position)
-				.setType(MinecraftBlockTypes.stone);
+				?.setType(MinecraftBlockTypes.stone);
 		}
 	},
 };
@@ -237,7 +237,7 @@ world.afterEvents.entityHitEntity.subscribe((event) => {
 		const axe = event.damagingEntity
 			.getComponent("equipment_inventory")
 			.getEquipmentSlot(EquipmentSlot.mainhand);
-		if (axe && !axe.typeId.includes("axe")) return;
+		if (axe && !axe.typeId?.includes("axe")) return;
 
 		event.damagingEntity.startItemCooldown("axe", 10);
 	}
@@ -258,7 +258,7 @@ const c = new XCommand({
 
 c.string("number", true).executes(async (ctx, n) => {
 	const keys = Object.keys(tests);
-	const i = n && keys.includes(n) ? n : keys.pop();
+	const i = n && keys.includes(n) ? n : 0;
 	ctx.reply(i);
 	util.catch(() => tests[i](ctx), "Test");
 });

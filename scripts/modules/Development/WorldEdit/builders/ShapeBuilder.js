@@ -1,6 +1,6 @@
 import { system, Vector } from "@minecraft/server";
 import { util } from "xapi.js";
-import { CONFIG_WE } from "../config.js";
+import { WE_CONFIG } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { setblock } from "../utils/utils.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
@@ -48,8 +48,8 @@ export class Shape {
 			setblock(block, location);
 			blocksSet++;
 
-			if (blocksSet >= CONFIG_WE.BLOCKS_BEFORE_AWAIT) {
-				await system.sleep(CONFIG_WE.TICKS_TO_SLEEP);
+			if (blocksSet >= WE_CONFIG.BLOCKS_BEFORE_AWAIT) {
+				await system.sleep(WE_CONFIG.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}

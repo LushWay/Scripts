@@ -2,7 +2,7 @@ import { CmdLet } from "lib/Command/Cmdlet.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { XCommand } from "lib/Command/index.js";
 import { commandNotFound, noPerm } from "lib/Command/utils.js";
-import { ROLES, XA, getRole } from "xapi.js";
+import { ROLES, getRole } from "xapi.js";
 
 /**
  *
@@ -33,7 +33,8 @@ function getParentType(command, init = true) {
 		init = false;
 	}
 
-	if (command.sys.depth === 0) return [curtype, description];
+	if (command.sys.depth === 0 || !command.sys.parent)
+		return [curtype, description];
 	else {
 		const parents = getParentType(command.sys.parent, init);
 		return [

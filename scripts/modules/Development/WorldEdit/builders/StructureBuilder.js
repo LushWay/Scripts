@@ -1,5 +1,5 @@
 import { system, world } from "@minecraft/server";
-import { CONFIG_WE } from "../config.js";
+import { WE_CONFIG } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 
 export class Structure {
@@ -29,7 +29,7 @@ export class Structure {
 
 	save() {
 		const regions = new Cuboid(this.pos1, this.pos2).split(
-			CONFIG_WE.STRUCTURE_CHUNK_SIZE
+			WE_CONFIG.STRUCTURE_CHUNK_SIZE
 		);
 
 		let errors = 0;

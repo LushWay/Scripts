@@ -14,12 +14,14 @@ import { XCommand } from "./index.js";
  * @returns {string[]}
  */
 export function getChatAugments(message, prefix) {
-	return message
+	const augments = message
 		.slice(prefix.length)
 		.trim()
 		.replace(/([~^][^~^\s]*)/g, "$1 ")
-		.match(/"[^"]+"|[^\s]+/g)
-		.map((e) => e.replace(/"(.+)"/, "$1").toString());
+		.match(/"[^"]+"|[^\s]+/g);
+	if (augments)
+		return augments.map((e) => e.replace(/"(.+)"/, "$1").toString());
+	return [];
 }
 
 /**
@@ -45,11 +47,11 @@ export function commandNotFound(player, command) {
 
 	const cmds = new Set();
 
-	for (const c of XCommand.COMMANDS.filter((e) =>
-		e.sys.data.requires(player)
+	for (const c of XCommand.COMMANDS.filter(
+		(e) => e.sys.data.requires && e.sys.data.requires(player)
 	)) {
 		cmds.add(c.sys.data.name);
-		if (c.sys.data.aliases?.length > 0) {
+		if (c.sys.data.aliases && c.sys.data.aliases?.length > 0) {
 			c.sys.data.aliases.forEach((e) => cmds.add(e));
 		}
 	}
@@ -130,13 +132,14 @@ export function commandSyntaxFail(player, command, args, i) {
  * @example parseLocationAugs(["~1", "3", "^7"], { location: [1,2,3] , viewVector: [1,2,3] })
  * @param {[x: string, y: string, z: string]} a0
  * @param {{ location: Vector3; getViewDirection(): Vector3 }} data
- * @returns {{x: number, y: number, z: number}}
+ * @returns {{x: number, y: number, z: number} | null}
  */
 export function parseLocationAugs([x, y, z], data) {
 	const { location } = data;
 	const viewVector = data.getViewDirection();
 	if (typeof x !== "string" || typeof y !== "string" || typeof z !== "string")
 		return null;
+
 	const locations = [location.x, location.y, location.z];
 	const viewVectors = [viewVector.x, viewVector.y, viewVector.z];
 	const a = [x, y, z].map((arg) => {

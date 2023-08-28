@@ -11,7 +11,7 @@ OverTakes(JSON, {
 		try {
 			return JSON.parse(str, reciever);
 		} catch (e) {
-			onError(e);
+			onError && onError(e);
 		}
 	},
 });
@@ -62,4 +62,5 @@ OverTakes(console, {
 	},
 });
 
+// @ts-expect-error
 globalThis.nextTick = null;

@@ -12,6 +12,8 @@ interface Console {
 
 declare var console: Console;
 
+declare var nextTick: Promise<any>;
+
 interface JSON {
 	/**
 	 * Parses string and catches any error. If callback param is specified, it will be called with catched error. For more info see {@link JSON.parse}

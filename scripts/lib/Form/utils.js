@@ -10,7 +10,7 @@ import {
 } from "@minecraft/server-ui";
 import { ActionForm } from "./ActionForm.js";
 import { MessageForm } from "./MessageForm.js";
-import { ModalForm } from "./ModelForm.js";
+import { ModalForm } from "./ModalForm.js";
 
 /** */
 export class FormCallback {
@@ -50,11 +50,11 @@ export class FormCallback {
 	 * @returns {void}
 	 */
 	error(message) {
-		new MessageForm("Error", message)
-			.setButton1("Return to form", () => {
+		new MessageForm("§cОшибка", message)
+			.setButton1("Вернуться к форме", () => {
 				this.form.show(this.player, this.callback);
 			})
-			.setButton2("Cancel", null)
+			.setButton2("§cЗакрыть", () => {})
 			.show(this.player);
 	}
 }

@@ -34,7 +34,7 @@ export async function APIRequest(path, body) {
 				])
 				.setBody(sbody)
 		);
-		const body = JSON.safeParse(res.body, null, (err) =>
+		const body = JSON.safeParse(res.body, void 0, (err) =>
 			console.warn("Error while parsing ", res.body, err)
 		);
 

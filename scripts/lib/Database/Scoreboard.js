@@ -1,4 +1,4 @@
-import { Entity, world } from "@minecraft/server";
+import { Entity, ScoreboardObjective, world } from "@minecraft/server";
 
 export class ScoreboardDB {
 	/**
@@ -12,7 +12,6 @@ export class ScoreboardDB {
 			entity.scoreboardIdentity)
 		);
 	}
-	scoreboard;
 	/**
 	 *
 	 * @param {string} name
@@ -24,8 +23,10 @@ export class ScoreboardDB {
 		this.name = name;
 
 		try {
+			/** @type {ScoreboardObjective} */
 			this.scoreboard = world.scoreboard.addObjective(name, displayName);
 		} catch (e) {
+			/** @type {ScoreboardObjective} */
 			this.scoreboard = world.scoreboard.getObjective(name);
 		}
 	}
@@ -47,7 +48,7 @@ export class ScoreboardDB {
 		try {
 			return this.scoreboard
 				.getScores()
-				.find((e) => e.participant.displayName === name).score;
+				.find((e) => e.participant.displayName === name)?.score;
 		} catch (e) {
 			return 0;
 		}
@@ -62,6 +63,7 @@ export class ScoreboardDB {
 			entity.scoreboardIdentity ??
 			(entity.runCommand(`scoreboard players set @s "${this.name}" ${value}`),
 			entity.scoreboardIdentity);
+		if (!id) return;
 
 		this.scoreboard.setScore(id, value);
 	}
@@ -71,21 +73,26 @@ export class ScoreboardDB {
 	 * @param {number} value
 	 */
 	add(entity, value) {
-		const score = this.get(entity);
+		const score = this.get(entity) ?? 0;
 		const id =
 			entity.scoreboardIdentity ??
 			(entity.runCommand(`scoreboard players add @s "${this.name}" ${value}`),
 			entity.scoreboardIdentity);
+		if (!id) return;
 
 		this.scoreboard.setScore(id, score + value);
 	}
 	/**
 	 *
 	 * @param {Entity} entity
+	 * @returns {number}
 	 */
 	get(entity) {
 		try {
-			return this.scoreboard.getScore(entity.scoreboardIdentity);
+			if (!entity.scoreboardIdentity) return 0;
+			const result = this.scoreboard.getScore(entity.scoreboardIdentity);
+			if (typeof result !== "number") return 0;
+			else return result;
 		} catch (e) {
 			return 0;
 		}

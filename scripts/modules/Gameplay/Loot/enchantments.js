@@ -4,8 +4,8 @@ import {
 	Vector,
 	world,
 } from "@minecraft/server";
-import { DB, EventSignal, util } from "xapi.js";
 import { MinecraftEnchantmentTypes } from "lib/List/enchantments.js";
+import { DB, EventSignal, util } from "xapi.js";
 
 const ON_LOAD = new EventSignal();
 const LOCATION = { x: 0, y: -10, z: 0 };
@@ -72,7 +72,7 @@ function load() {
 
 		for (const enchantment of enchantments.enchantments) {
 			Enchantments.custom[enchantment.type.id] ??= [
-				null,
+				new Enchantment(enchantment.type, 1),
 				new Enchantment(enchantment.type, 1),
 			];
 			Enchantments.custom[enchantment.type.id][enchantment.level] = enchantment;

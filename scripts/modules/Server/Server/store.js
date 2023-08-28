@@ -49,7 +49,7 @@ export class MoneyCost extends Cost {
 	 */
 	check(player) {
 		const money = SERVER.money.get(player);
-		return money >= this.money;
+		return !!money && money >= this.money;
 	}
 
 	/**
@@ -68,7 +68,7 @@ export class MoneyCost extends Cost {
 		const money = SERVER.money.get(player);
 		return `§cНедостаточно средств (§4${money}/${this.money}§c). Нужно еще §6${
 			//§r
-			this.money - money
+			this.money - (money ?? 0)
 		}`;
 	}
 }
@@ -212,7 +212,6 @@ export class Store {
 					item,
 					canBuy ? "§g" : "§7"
 				)}\n${cost.string(canBuy)}`,
-				null,
 				() => this.buy({ item, cost, player })
 			);
 		}

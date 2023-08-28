@@ -84,6 +84,6 @@ export class Portal {
 	 * @param {Player} player
 	 */
 	teleport(player) {
-		Portal.teleport(player, this.place);
+		if (this.place) Portal.teleport(player, this.place);
 	}
 }

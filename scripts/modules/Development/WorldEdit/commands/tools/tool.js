@@ -137,17 +137,17 @@ system.runPlayerInterval(
 		const lore = item.getLore();
 
 		if (lore[0] === "Particle") {
-			const { block } = player.getBlockFromViewDirection({
+			const hit = player.getBlockFromViewDirection({
 				includeLiquidBlocks: false,
 				includePassableBlocks: false,
 				maxDistance: 50,
 			});
 
-			if (!block) return;
+			if (!hit) return;
 
-			block.dimension.spawnParticle(
+			hit.block.dimension.spawnParticle(
 				lore[1],
-				Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+				Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
 				variables
 			);
 		}

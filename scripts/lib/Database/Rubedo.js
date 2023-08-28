@@ -1,6 +1,6 @@
 import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
-import { DB } from "./Default.js";
 import { util } from "../Setup/util.js";
+import { DB } from "./Default.js";
 
 const TABLE_TYPE = "rubedo";
 const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
@@ -41,10 +41,11 @@ export class Database {
 
 	/**
 	 * Data saved in memory
-	 * @type {{ [key in Key]: Value } | null}
+	 * @type {{ [key in Key]: Value }}
 	 * @private
 	 */
-	MEMORY = null;
+	// @ts-expect-error
+	MEMORY = {};
 
 	_ = {
 		/** @private */
@@ -197,6 +198,7 @@ export class Database {
 
 		inventory.clearAll();
 
+		if (!chunks) throw new DatabaseError("Failed to parse");
 		if (chunks.length > inventory.size) {
 			return util.error(
 				new DatabaseError(
@@ -331,6 +333,7 @@ export class Database {
 	 * Throws error like this: (x11) Failed to call delete key 'server.type' on table 'basic'. Make sure you inited them and calling 'delete' after init.
 	 * @param {string} method
 	 * @param {string} key
+	 * @returns {never}
 	 * @private
 	 */
 	failedTo(method, key = "") {
@@ -338,9 +341,6 @@ export class Database {
 
 		const lm = this.log[method];
 		lm.count++;
-
-		// Disable spam (Limit: one error per 10 seconds)
-		if (Date.now() - lm.date < 10000) return;
 
 		throw new DatabaseError(
 			`${lm.count > 0 ? `(x${lm.count}) ` : ""}Failed to call ${method}${

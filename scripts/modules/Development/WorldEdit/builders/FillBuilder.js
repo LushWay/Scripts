@@ -1,6 +1,6 @@
 import { system, world } from "@minecraft/server";
 import { util } from "xapi.js";
-import { CONFIG_WE } from "../config.js";
+import { WE_CONFIG } from "../config.js";
 import { WorldEditBuild } from "./WorldEditBuilder.js";
 
 /**
@@ -40,8 +40,8 @@ export function FillFloor(pos1, pos2, blocks, rb = "any") {
 					blocksSet++;
 				}
 			}
-			if (blocksSet >= CONFIG_WE.BLOCKS_BEFORE_AWAIT) {
-				await system.sleep(CONFIG_WE.TICKS_TO_SLEEP);
+			if (blocksSet >= WE_CONFIG.BLOCKS_BEFORE_AWAIT) {
+				await system.sleep(WE_CONFIG.TICKS_TO_SLEEP);
 				blocksSet = 0;
 			}
 		}

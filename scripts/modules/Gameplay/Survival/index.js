@@ -163,7 +163,7 @@ if (SpawnLocation.valid) {
 	}
 	system.runPlayerInterval(
 		(player) => {
-			if (spawnregion.vectorInRegion(player.location)) {
+			if (spawnregion && spawnregion.vectorInRegion(player.location)) {
 				/** @type {PlayerDB<DB>} */
 				const { save, data } = player.db();
 				if (data.inv !== "spawn") {

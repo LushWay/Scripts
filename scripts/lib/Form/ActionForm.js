@@ -31,7 +31,7 @@ export class ActionForm {
 	/**
 	 * Adds a button to this form
 	 * @param {string} text  text to show on this button
-	 * @param {string | ButtonCallback} iconPathOrCallback  the path this button shows or callback
+	 * @param {string | null | ButtonCallback} iconPathOrCallback  the path this button shows or callback
 	 * @param {ButtonCallback} [callback]  what happens when this button is clicked
 	 * @example addButton("settings", "textures/items/sum", () => {})
 	 * @example addButton("settings", () => {})
@@ -45,7 +45,7 @@ export class ActionForm {
 		} else iconPath = iconPathOrCallback;
 
 		this.buttons.push({ text, iconPath, callback });
-		this.form.button(text, iconPath);
+		this.form.button(text, iconPath ? iconPath : void 0);
 		return this;
 	}
 	/**
@@ -55,9 +55,14 @@ export class ActionForm {
 	 */
 	async show(player) {
 		const response = await XShowForm(this.form, player);
-		if (response === false || !(response instanceof ActionFormResponse)) return;
+		if (
+			response === false ||
+			!(response instanceof ActionFormResponse) ||
+			typeof response.selection === "undefined"
+		)
+			return;
+
 		const callback = this.buttons[response.selection]?.callback;
-		if (typeof callback === "function")
-			util.catch(callback, null, ["ActionFormCallback"]);
+		if (typeof callback === "function") util.catch(callback);
 	}
 }

@@ -123,13 +123,13 @@ new XCommand({
 	.executes(async (ctx, newname) => {
 		if (newname) name = newname;
 
-		await world.overworld.runCommand(
+		world.overworld.runCommand(
 			`execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`
 		);
 
 		world.overworld
 			.getBlock(Vector.add(test_loc, { x: 1, y: 0, z: 1 }))
-			.setType(MinecraftBlockTypes.redstoneBlock);
+			?.setType(MinecraftBlockTypes.redstoneBlock);
 
 		await system.sleep(10);
 

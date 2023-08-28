@@ -1,7 +1,7 @@
 import { ActionForm, Database, InventoryStore } from "xapi.js";
 
 /**
- * @type {Database<string, {invs: Record<string, string>}>}
+ * @type {Database<string, {invs?: Record<string, string>}>}
  *
  */
 const table = XA.tables.player;
@@ -23,7 +23,7 @@ new XCommand({
 	role: "moderator",
 	description: "Управляет сохраненными инвентарями",
 }).executes((ctx) => {
-	const inventories = DB.get(ctx.sender.id).invs;
+	const inventories = DB.get(ctx.sender.id).invs ?? {};
 	const form = new ActionForm(
 		"Inventories",
 		"Выбери слот для выгрузки:"

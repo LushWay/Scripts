@@ -22,6 +22,10 @@ import {
 } from "./utils.js";
 
 /**
+ * @typedef {import("./types.js").ICommandData} ICommandData
+ */
+
+/**
  *  @template {Function} [Callback = (ctx: CommandContext) => void]
  */
 export class XCommand {
@@ -62,16 +66,17 @@ export class XCommand {
 		/**
 		 * @param {XCommand<any>} start
 		 * @param {number} i
-		 * @returns {string}
+		 * @returns {'fail' | 'success'}
 		 */
 		function getArg(start, i) {
+			if (!command) return "fail";
 			if (start.sys.children.length > 0) {
 				const arg = start.sys.children.find(
 					(v) =>
 						v.sys.type.matches(args[i]).success ||
 						(!args[i] && v.sys.type.optional)
 				);
-				if (!arg && !args[i] && start.sys.callback) return;
+				if (!arg && !args[i] && start.sys.callback) return "success";
 				if (!arg)
 					return commandSyntaxFail(data.sender, command, args, i), "fail";
 				if (!arg.sys.data?.requires(data.sender))
@@ -79,14 +84,16 @@ export class XCommand {
 				verifiedCommands.push(arg);
 				return getArg(arg, i + 1);
 			}
+			return "success";
 		}
 
-		if (getArg(command, 0)) return;
+		if (getArg(command, 0) === "fail") return;
+
 		sendCallback(args, verifiedCommands, data, command, rawInput);
 	}
 	/**
 	 * An array of all active commands
-	 * @type {import("./index.js").XCommand<any>[]}
+	 * @type {XCommand<any>[]}
 	 */
 	static COMMANDS = [];
 
@@ -99,19 +106,24 @@ export class XCommand {
 	}
 	/**
 	 *
-	 * @param {import("./types.js").ICommandData} data
+	 * @param {ICommandData} data
 	 * @param {IArgumentType} [type]
 	 * @param {number} [depth]
-	 * @param {XCommand<any>} [parent]
+	 * @param {XCommand<any> | null} [parent]
 	 */
 	constructor(data, type, depth = 0, parent = null) {
-		data.requires ??= () => true;
-		data.type ??= "test";
-		if ("role" in data && data.role !== "member")
-			data.requires = (p) => IS(p.id, data.role);
+		if (data.role && data.role !== "member") {
+			data.requires = (p) => IS(p.id, data.role ?? "admin");
+		}
 
 		this.sys = {
-			data,
+			/** @type {ICommandData & Required<Pick<ICommandData, "requires" | "aliases" | "type">>} */
+			data: {
+				requires: () => true,
+				aliases: [],
+				type: "test",
+				...data,
+			},
 			type: type ?? new LiteralArgumentType(data.name),
 			/**
 			 * The Arguments on this command
@@ -122,7 +134,7 @@ export class XCommand {
 			parent,
 			/**
 			 * Function to run when this command is called
-			 * @type {Callback}
+			 * @type {Callback | undefined}
 			 */
 			callback: undefined,
 		};

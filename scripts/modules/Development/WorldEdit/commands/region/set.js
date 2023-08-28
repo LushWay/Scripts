@@ -1,6 +1,6 @@
 import { MinecraftBlockTypes, Player } from "@minecraft/server";
 import { inaccurateSearch } from "lib/Class/Search.js";
-import { ModalForm } from "lib/Form/ModelForm.js";
+import { ModalForm } from "lib/Form/ModalForm.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 import { Cuboid } from "../../utils/Cuboid.js";
 
@@ -113,7 +113,7 @@ function blockIsAvaible(block, player) {
 	};
 
 	if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue))
-		return;
+		return false;
 
 	const suggest = (/**@type {[string, number]}*/ a) =>
 		`§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`;
@@ -128,4 +128,5 @@ function blockIsAvaible(block, player) {
 		suggestion += `${i + 1 === search.length ? " или " : ", "}${suggest(e)}`;
 
 	player.tell(suggestion + "§c?");
+	return false;
 }

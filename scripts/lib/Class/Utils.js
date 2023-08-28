@@ -15,7 +15,7 @@ const blocks = Object.values(MinecraftBlockTypes).map((e) => e.id);
 const itemTypes = ["boat", "banner_pattern"];
 const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join("|")})`);
 
-/** @type {((s: string) => string)[]} */
+/** @type {((s: string) => string | undefined)[]} */
 const itemModifiers = [
 	(spawn_egg) => {
 		const match = spawn_egg.match(/^(.+)_spawn_egg$/);
@@ -45,7 +45,7 @@ const afterItems = [(s) => s.replace(/\.name$/, "")];
 const blockTypes = ["wool"];
 const blockRegExp = new RegExp(`^(.+)_(${blockTypes.join("|")})`);
 
-/** @type {((s: string) => string)[]} */
+/** @type {((s: string) => string | undefined)[]} */
 const blockModifiers = [
 	(id) => {
 		if (id === "cobblestone_wall") return `cobblestone_wall.normal`;
@@ -154,7 +154,11 @@ export const GameUtils = {
 
 		return new Promise(async (resolve) => {
 			const result = await XShowForm(form, player);
-			if (result === false || !(result instanceof ActionFormResponse))
+			if (
+				result === false ||
+				!(result instanceof ActionFormResponse) ||
+				!result.selection
+			)
 				return resolve(false);
 
 			const selectedBlock = blocks[result.selection];

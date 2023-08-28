@@ -1,17 +1,10 @@
-import {
-	EquipmentSlot,
-	Player,
-	system,
-	Vector,
-	world,
-} from "@minecraft/server";
+import { system, Vector, world } from "@minecraft/server";
+import { Options } from "xapi.js";
+import "./builders/ToolBuilder.js";
+import "./builders/WorldEditBuilder.js";
 
 // Lazy load to prevent script spike
 system.runTimeout(() => import("./commands/index.js"), "command import", 40);
-
-import { Options } from "xapi.js";
-import "./builders/ToolBuilder.js";
-import { WorldEditBuild } from "./builders/WorldEditBuilder.js";
 
 export const WorldEditPlayerSettings = Options.player("Строитель мира", "we", {
 	noBrushParticles: {
@@ -25,14 +18,6 @@ export const WorldEditPlayerSettings = Options.player("Строитель мир
 		value: false,
 	},
 });
-
-system.runInterval(
-	() => {
-		WorldEditBuild.drawSelection();
-	},
-	"we Selection",
-	20
-);
 
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
 	if (itemStack.typeId === "we:dash") {

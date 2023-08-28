@@ -91,7 +91,13 @@ export class Leaderboard {
 	constructor(entity, data) {
 		if (entity.id in Leaderboard.ALL) return Leaderboard.ALL[entity.id];
 
+		/**
+		 * @type {Entity}
+		 */
 		this.entity = entity;
+		/**
+		 * @type {LB}
+		 */
 		this.data = data;
 		Leaderboard.ALL[entity.id] = this;
 	}

@@ -15,19 +15,19 @@ let LOADED = false;
 /**
  * @callback interactionAllowed
  * @param {Player} player
- * @param {Region} region
+ * @param {Region} [region]
  * @param {{type: "break", event: BlockBreakAfterEvent} | {type: "place"} | {type: "useOn"}} context
  */
 
 /**
  * @callback regionCallback
  * @param {Player} player
- * @param {Region} region
+ * @param {Region} [region]
  */
 
 /**
  * @callback spawnAllowed
- * @param {Region} region
+ * @param {Region} [region]
  * @param {EntitySpawnAfterEvent} data
  */
 
@@ -104,13 +104,8 @@ export function loadRegionsWithGuards(
 				return;
 
 			// setting block back
-			dimension
-				.getBlock(block.location)
-				.setPermutation(brokenBlockPermutation.clone());
-
+			block.setPermutation(brokenBlockPermutation);
 			if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
-				block.setPermutation(brokenBlockPermutation);
-
 				// setting chest inventory back
 				const { container } = block.getComponent("inventory");
 				forEachItemAt(dimension, block.location, (e) => {

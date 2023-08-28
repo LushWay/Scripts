@@ -6,34 +6,42 @@ import {
 	world,
 } from "@minecraft/server";
 import { Cooldown, util } from "xapi.js";
-import { CONFIG_WE } from "../config.js";
+import { WE_CONFIG } from "../config.js";
 import { Cuboid } from "../utils/Cuboid.js";
 import { get } from "../utils/utils.js";
 import { Structure } from "./StructureBuilder.js";
 
-class WorldEditBuilder {
-	drawselection = CONFIG_WE.DRAW_SELECTION_DEFAULT;
-	/** @type {Vector3} */
-	#pos1 = null;
-	/** @type {Vector3} */
-	#pos2 = null;
+export class WorldEditBuilder {
+	drawselection = WE_CONFIG.DRAW_SELECTION_DEFAULT;
+
+	/**
+	 * @type {Vector3}
+	 */
+	#pos1 = Vector.one;
+	/**
+	 * @type {Vector3}
+	 */
+	#pos2 = Vector.one;
+
 	/**
 	 * @type {Cuboid}
 	 */
 	selectionCuboid;
+
 	get pos1() {
 		return this.#pos1;
 	}
-	set pos1(val) {
-		this.#pos1 = val;
-		if (this.#pos2) this.selectionCuboid = new Cuboid(val, this.#pos2);
+	set pos1(value) {
+		this.#pos1 = value;
+		if (this.#pos2) this.selectionCuboid = new Cuboid(value, this.#pos2);
 	}
+
 	get pos2() {
 		return this.#pos2;
 	}
-	set pos2(val) {
-		this.#pos2 = val;
-		if (this.#pos1) this.selectionCuboid = new Cuboid(this.#pos1, val);
+	set pos2(value) {
+		this.#pos2 = value;
+		if (this.#pos1) this.selectionCuboid = new Cuboid(this.#pos1, value);
 	}
 
 	/**
@@ -53,8 +61,8 @@ class WorldEditBuilder {
 	 * @private
 	 */
 	currentCopy = {
-		pos1: null,
-		pos2: null,
+		pos1: Vector.one,
+		pos2: Vector.one,
 		name: "",
 	};
 
@@ -66,7 +74,7 @@ class WorldEditBuilder {
 			this.selectionCuboid.min,
 			this.selectionCuboid.max
 		);
-		if (selectedSize > CONFIG_WE.DRAW_SELECTION_MAX_SIZE) return;
+		if (selectedSize > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return;
 		const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid;
 		const gen = Vector.foreach(
 			this.selectionCuboid.min,
@@ -84,7 +92,7 @@ class WorldEditBuilder {
 
 			if (q)
 				world.overworld.spawnParticle(
-					CONFIG_WE.DRAW_SELECTION_PARTICLE,
+					WE_CONFIG.DRAW_SELECTION_PARTICLE,
 					{ x: x + 0.5, y: y + 0.5, z: z + 0.5 },
 					new MolangVariableMap()
 				);
@@ -97,74 +105,59 @@ class WorldEditBuilder {
 	 * @param {Structure[]} saveLocation Save location where you want the data to store your backup
 	 * @example backup(pos1, pos2, history);
 	 */
-	async backup(
-		pos1 = this.pos1,
-		pos2 = this.pos2,
-		saveLocation = this.history
-	) {
-		const structure = new Structure(CONFIG_WE.BACKUP_PREFIX, pos1, pos2);
-		saveLocation.push(structure);
+	backup(pos1 = this.pos1, pos2 = this.pos2, saveLocation = this.history) {
+		saveLocation.push(new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2));
+	}
+
+	/**
+	 * @private
+	 */
+	loadFromArray(amount = 1, array = this.history) {
+		try {
+			// Max allowed amount is array length
+			if (amount > array.length) amount = array.length;
+
+			const backups = array.slice(-amount);
+			for (const backup of backups.reverse()) {
+				this.backup(backup.pos1, backup.pos2, this.undos);
+				backup.load();
+
+				// Remove backup from history
+				array.splice(array.indexOf(backup), 1);
+			}
+
+			const e = Cooldown.getT(amount.toString(), [
+				"сохранение",
+				"сохранения",
+				"сохранений",
+			]);
+			const o = amount.toString().endsWith("1") ? "" : "о";
+
+			return `§b► §3Успешно отменен${o} §f${amount} §3${e}!`;
+		} catch (error) {
+			util.error(error);
+			return `§4► §cНе удалось отменить: ${error.message}`;
+		}
 	}
 
 	/**
 	 * Undoes the latest history save
 	 * @param {number} amount times you want to undo
 	 * @returns {string}
-	 * @example undo(2);
 	 */
 	undo(amount = 1) {
-		try {
-			if (this.history.length < amount) amount = this.history.length;
-			const backups = this.history.slice(-amount);
-			for (const backup of backups.reverse()) {
-				this.backup(backup.pos1, backup.pos2, this.undos);
-				backup.load();
-				this.history.splice(this.history.indexOf(backup), 1);
-			}
-
-			const e = Cooldown.getT(amount.toString(), [
-				"бэкап",
-				"бэкапа",
-				"бэкапов",
-			]);
-			return `§b► §3Успешно отменен${
-				amount.toString().endsWith("1") ? "" : "о"
-			} §f${amount} §3${e}!`;
-		} catch (error) {
-			util.error(error);
-			return `§4► §cНе удалось отменить: ${error.message}`;
-		}
+		return this.loadFromArray(amount, this.history);
 	}
 	/**
 	 * Redoes the latest history save
+	 * @param {number} amount times you want to redo
 	 * @returns {string}
-	 * @example redo();
 	 */
 	redo(amount = 1) {
-		try {
-			if (this.undos.length < amount) amount = this.undos.length;
-			const backups = this.undos.slice(-amount);
-			for (const backup of backups.reverse()) {
-				this.backup(backup.pos1, backup.pos2, this.undos);
-				backup.load();
-				this.undos.splice(this.undos.indexOf(backup), 1);
-			}
-
-			const e = Cooldown.getT(amount.toString(), [
-				"бэкап",
-				"бэкапа",
-				"бэкапов",
-			]);
-			return `§b► §3Успешно возвращен${
-				amount.toString().endsWith("1") ? "" : "о"
-			} §f${amount} §3${e}!`;
-		} catch (error) {
-			util.error(error);
-			return `§4► §cНе удалось вернуть: ${error.message}`;
-		}
+		return this.loadFromArray(amount, this.undos);
 	}
 	/**
-	 * Copys The curret positions
+	 * Copys from the curret positions
 	 * @returns {string}
 	 */
 	copy() {
@@ -173,7 +166,7 @@ class WorldEditBuilder {
 				return "§4► §cЗона для копирования не выделена!";
 
 			const result = world.overworld.runCommand(
-				`structure save ${CONFIG_WE.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
+				`structure save ${WE_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
 			);
 			if (!result)
 				return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`;
@@ -181,7 +174,7 @@ class WorldEditBuilder {
 			this.currentCopy = {
 				pos1: this.pos1,
 				pos2: this.pos2,
-				name: CONFIG_WE.COPY_FILE_NAME,
+				name: WE_CONFIG.COPY_FILE_NAME,
 			};
 			return `§9► §fСкопированно из ${Vector.string(
 				this.pos1
@@ -223,7 +216,7 @@ class WorldEditBuilder {
 			this.backup(loc, pos2);
 
 			player.runCommand(
-				`structure load ${CONFIG_WE.COPY_FILE_NAME} ~ ~ ~ ${String(
+				`structure load ${WE_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(
 					rotation
 				).replace(
 					"NaN",
@@ -269,7 +262,7 @@ class WorldEditBuilder {
 			}
 		}
 
-		for (const cube of Cube.split(CONFIG_WE.FILL_CHUNK_SIZE)) {
+		for (const cube of Cube.split(WE_CONFIG.FILL_CHUNK_SIZE)) {
 			const result = world.overworld.runCommand(
 				`fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
 				{ showError: true, showOutput: false }
@@ -299,3 +292,11 @@ class WorldEditBuilder {
 	}
 }
 export const WorldEditBuild = new WorldEditBuilder();
+
+system.runInterval(
+	() => {
+		WorldEditBuild.drawSelection();
+	},
+	"we Selection",
+	20
+);

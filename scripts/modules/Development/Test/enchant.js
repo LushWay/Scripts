@@ -19,6 +19,7 @@ new XCommand({
 			.getEquipmentSlot(EquipmentSlot.mainhand);
 
 		const item = mainhand.getItem();
+		if (!item) return ctx.error("No item!");
 		const { enchantments } = item.getComponent("enchantments");
 		enchantments.removeEnchantment(ench);
 		enchantments.addEnchantment(Enchantments.custom[ench][level]);

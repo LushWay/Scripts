@@ -8,7 +8,7 @@ interface IActionFormButton {
 	/**
 	 * The icon that is showed with this button
 	 */
-	iconPath?: string;
+	iconPath?: string | null;
 	/**
 	 * What gets called when this gets clicked
 	 */
