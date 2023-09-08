@@ -1,4 +1,6 @@
-// @ts-nocheck
+/**
+ * @type {Record<string, (...args: any[]) => string>}
+ */
 export const text = {
 	"api.name": () => "Smelly API",
 	"api.error.unknown": () => "An unknown error has occured.",
@@ -14,12 +16,6 @@ export const text = {
 	"br.end.looser": (a, b) =>
 		`§7│----------------\n│§c  Ты проиграл!\n§7│----------------\n│  §eПобедил:§f ${a}, §eзабрав награду в §f${b} §a(S)\n§7│`,
 	"br.end.draw": () => `§7│----------------\n│  §eНичья!\n§7│----------------`,
-	"shop.lore": (price, balance) => [
-		"§7----------",
-		` §${balance >= price ? "f§r" : "c"}Цена: ${price}`,
-		`§r Баланс: ${balance}`,
-		"§7----------§{§-§}",
-	],
 
 	"shop.notenought": (price, balance) =>
 		`§c☼ Недостаточно средств (Цена: §f${price} §c Баланс: §f${balance}§c)`,

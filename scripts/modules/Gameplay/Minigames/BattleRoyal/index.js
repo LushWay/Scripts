@@ -1,5 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
-import { XCommand, XEntity } from "xapi.js";
+import { XCommand } from "xapi.js";
 import { br } from "./game.js";
 import { BATTLE_ROYAL_EVENTS, quene } from "./var.js";
 
@@ -15,7 +15,7 @@ let minpl = 2,
 
 function forEveryQuenedPlayer(sound, text) {
 	for (const name in quene) {
-		const player = XEntity.fetch(name);
+		const player = Player.fetch(name);
 		if (!player) {
 			delete quene[name];
 			continue;
@@ -42,13 +42,13 @@ BATTLE_ROYAL_EVENTS.join.subscribe((player) => {
 		return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`);
 	if (quene[pl.name])
 		return pl.onScreenDisplay.setActionBar(
-			`§6${ks(quene).length}/${minpl} §g○ §6${br.quene.time}`
+			`§6${ks(quene).length}/${minpl} §g○ §6${br.quene.time}`,
 		);
 	quene[pl.name] = true;
 	pl.tell(
 		`§aВы успешно встали в очередь. §f(${
 			ks(quene).length
-		}/${minpl}). §aДля выхода пропишите §f-br quit`
+		}/${minpl}). §aДля выхода пропишите §f-br quit`,
 	);
 	pl.playSound("random.orb");
 });
@@ -62,8 +62,9 @@ system.runInterval(
 	() => {
 		if (
 			!br.game.started &&
-			world.getPlayers().filter((e) => XEntity.getTagStartsWith(e, "br:"))
-				.length > 0
+			world
+				.getPlayers()
+				.find((e) => e.getTags().find((e) => e.startsWith("br:")))
 		) {
 			br.end("specially", "Перезагрузка");
 		}
@@ -76,7 +77,7 @@ system.runInterval(
 					"random.levelup",
 					`§7${
 						ks(quene).length
-					}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
+					}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`,
 				);
 			}
 			if (ks(quene).length >= 10) {
@@ -84,7 +85,7 @@ system.runInterval(
 				br.quene.time = 16;
 				forEveryQuenedPlayer(
 					"random.levelup",
-					`§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`
+					`§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`,
 				);
 			}
 			if (br.quene.open && br.quene.time > 0) {
@@ -100,7 +101,7 @@ system.runInterval(
 				}
 				forEveryQuenedPlayer(
 					"random.click",
-					`§9Игра начнется через §7${br.quene.time} ${sec}`
+					`§9Игра начнется через §7${br.quene.time} ${sec}`,
 				);
 			}
 			if (br.quene.open && br.quene.time == 0) {
@@ -109,19 +110,21 @@ system.runInterval(
 			}
 		}
 		ks(quene).forEach((e) => {
-			if (!XEntity.fetch(e)) delete quene[e];
+			if (!Player.fetch(e)) delete quene[e];
 		});
 		if (br.quene.open && ks(quene).length < minpl) {
 			br.quene.open = false;
 			br.quene.time = 0;
 			forEveryQuenedPlayer(
 				"note.bass",
-				`§7${ks(quene).length}/${minpl} §9Игроков в очереди. §cИгра отменена...`
+				`§7${
+					ks(quene).length
+				}/${minpl} §9Игроков в очереди. §cИгра отменена...`,
 			);
 		}
 	},
 	"battleRoyal",
-	20
+	20,
 );
 
 const bbr = new XCommand({
@@ -177,16 +180,9 @@ bbr
 		Object.assign({}, quene);
 	});
 
-world.afterEvents.playerJoin.subscribe(({ playerId  }) => {
-	system.runTimeout(
-		() => {
-			const joinedPlayer = XEntity.fetch(playerId);
-			if (joinedPlayer && XEntity.getTagStartsWith(joinedPlayer, "br:")) {
-				br.tags.forEach((e) => joinedPlayer.removeTag(e));
-				teleportToBR(joinedPlayer);
-			}
-		},
-		"br",
-		5
-	);
+world.afterEvents.playerSpawn.subscribe(({ player }) => {
+	if (player.getTags().find((e) => e.startsWith("br:"))) {
+		br.tags.forEach((e) => player.removeTag(e));
+		teleportToBR(player);
+	}
 });

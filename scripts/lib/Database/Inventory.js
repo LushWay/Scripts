@@ -6,7 +6,7 @@ import {
 	Player,
 	system,
 } from "@minecraft/server";
-import { util } from "../Setup/util.js";
+import { util } from "../util.js";
 import { DB, DatabaseError } from "./Default.js";
 
 const TABLE_TYPE = "inventory";
@@ -118,7 +118,7 @@ export class InventoryStore {
 		const entities = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME);
 		if (!entities)
 			throw new DatabaseError(
-				"Failed to get inventory entities in table " + this._.TABLE_NAME
+				"Failed to get inventory entities in table " + this._.TABLE_NAME,
 			);
 		this._.ENTITIES = entities;
 
@@ -185,9 +185,9 @@ export class InventoryStore {
 			if (!slots)
 				return util.error(
 					new Error(
-						`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`
+						`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`,
 					),
-					{ errorName: "LoadError" }
+					{ errorName: "LoadError" },
 				);
 
 			const { type, index } = slots[step];
@@ -224,7 +224,7 @@ export class InventoryStore {
 				const eq = store.equipment[key];
 				if (!eq)
 					throw new DatabaseError(
-						"Failed to get equipment with key " + util.inspect(key)
+						"Failed to get equipment with key " + util.inspect(key),
 					);
 
 				items[storeIndex + move] = eq;
@@ -251,7 +251,7 @@ export class InventoryStore {
 		if (entitiesToSpawn > 0) {
 			for (let i = 0; i < entitiesToSpawn; i++) {
 				entities.push(
-					DB.createTableEntity(this._.TABLE_TYPE, this._.TABLE_NAME, i)
+					DB.createTableEntity(this._.TABLE_TYPE, this._.TABLE_NAME, i),
 				);
 			}
 		} else if (entitiesToSpawn < 0) {
@@ -292,7 +292,7 @@ export class InventoryStore {
 				this.SAVING = false;
 			},
 			"inventorySave",
-			40
+			40,
 		);
 		this.SAVING = true;
 	}
@@ -325,11 +325,11 @@ export class InventoryStore {
 	 */
 	saveFromEntity(
 		entity,
-		{ rewrite = false, keepInventory = false, key = entity.id } = {}
+		{ rewrite = false, keepInventory = false, key = entity.id } = {},
 	) {
 		if (key in this._.STORES && !rewrite)
 			throw new DatabaseError(
-				"Failed to rewrite entity store with disabled rewriting."
+				"Failed to rewrite entity store with disabled rewriting.",
 			);
 		this._.STORES[key] = InventoryStore.get(entity);
 		if (!keepInventory) entity.getComponent("inventory").container.clearAll();

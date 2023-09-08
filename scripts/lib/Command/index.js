@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, world } from "@minecraft/server";
-import { IS } from "xapi.js";
+import { is } from "xapi.js";
 import { CONFIG } from "../../config.js";
 import {
 	ArrayArgumentType,
@@ -41,7 +41,7 @@ export class XCommand {
 
 		const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix);
 		const command = XCommand.COMMANDS.find(
-			(c) => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
+			(c) => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd),
 		);
 		if (!command) return commandNotFound(data.sender, cmd);
 		if (!command.sys.data?.requires(data.sender))
@@ -52,7 +52,7 @@ export class XCommand {
 		 */
 		const rawInput = data.message.replace(
 			new RegExp(`^${CONFIG.commandPrefix}${cmd}\\s`),
-			""
+			"",
 		);
 		if (CmdLet.workWithCmdlets(data, args, command, rawInput) === "stop")
 			return;
@@ -74,7 +74,7 @@ export class XCommand {
 				const arg = start.sys.children.find(
 					(v) =>
 						v.sys.type.matches(args[i]).success ||
-						(!args[i] && v.sys.type.optional)
+						(!args[i] && v.sys.type.optional),
 				);
 				if (!arg && !args[i] && start.sys.callback) return "success";
 				if (!arg)
@@ -113,7 +113,7 @@ export class XCommand {
 	 */
 	constructor(data, type, depth = 0, parent = null) {
 		if (data.role && data.role !== "member") {
-			data.requires = (p) => IS(p.id, data.role ?? "admin");
+			data.requires = (p) => is(p.id, data.role ?? "admin");
 		}
 
 		this.sys = {
@@ -215,7 +215,7 @@ export class XCommand {
 			data,
 			new LiteralArgumentType(data.name, optional),
 			this.sys.depth + 1,
-			this
+			this,
 		);
 		this.sys.children.push(cmd);
 		// @ts-expect-error

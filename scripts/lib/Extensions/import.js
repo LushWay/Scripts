@@ -8,17 +8,17 @@
 export function OverTakes(prototype, object) {
 	const prototypeOrigin = Object.setPrototypeOf(
 		Object.defineProperties({}, Object.getOwnPropertyDescriptors(prototype)),
-		Object.getPrototypeOf(prototype)
+		Object.getPrototypeOf(prototype),
 	);
 	Object.setPrototypeOf(object, prototypeOrigin);
 	Object.defineProperties(prototype, Object.getOwnPropertyDescriptors(object));
 	return prototypeOrigin;
 }
 
-import "./Extensions/dimension.js";
-import "./Extensions/enviroment.js";
-import "./Extensions/itemstack.js";
-import "./Extensions/player.js";
-import "./Extensions/system.js";
-import "./Extensions/vector.js";
-import "./Extensions/world.js";
+import "./dimension.js";
+import "./enviroment.js";
+import "./itemstack.js";
+import "./player.js";
+import "./system.js";
+import "./vector.js";
+import "./world.js";

@@ -1,5 +1,5 @@
-import { OverTakes } from "../prototypes.js";
 import { util } from "../util.js";
+import { OverTakes } from "./import.js";
 
 /**
  * Common JavaScript objects
@@ -42,7 +42,7 @@ Array.prototype.randomElement = function () {
 function format(args) {
 	return args
 		.map((e) =>
-			util.toTerminalColors(typeof e === "string" ? e : util.inspect(e))
+			util.toTerminalColors(typeof e === "string" ? e : util.inspect(e)),
 		)
 		.join(" ");
 }
@@ -60,7 +60,11 @@ OverTakes(console, {
 	debug(...args) {
 		super.log(format(args));
 	},
+	verbose(...args) {
+		if (globalThis.verbose) super.log(format(args));
+	},
 });
 
 // @ts-expect-error
 globalThis.nextTick = null;
+globalThis.verbose = false;

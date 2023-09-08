@@ -1,18 +1,18 @@
 import { Player, system, world } from "@minecraft/server";
 
 // This need to be loaded before all another scripts
-import "./lib/Setup/watchdog.js";
+import "./lib/watchdog.js";
 
-import "./lib/Setup/prototypes.js";
+import "./lib/Extensions/import.js";
 
 import { CONFIG } from "./config.js";
 import { EventLoader } from "./lib/Class/Events.js";
 import { XCommand } from "./lib/Command/index.js";
 import { Database } from "./lib/Database/Rubedo.js";
+import { OverTakes } from "./lib/Extensions/import.js";
 import { emoji } from "./lib/Lang/emoji.js";
 import { text } from "./lib/Lang/text.js";
-import { OverTakes } from "./lib/Setup/prototypes.js";
-import { util } from "./lib/Setup/util.js";
+import { util } from "./lib/util.js";
 import importModules from "./modules/import.js";
 
 world.say("§9┌ §fLoading...");
@@ -48,7 +48,6 @@ globalThis.XCommand = XCommand;
 // Class
 export * from "./lib/Class/Action.js";
 export * from "./lib/Class/Cooldown.js";
-export * from "./lib/Class/Entity.js";
 export * from "./lib/Class/Events.js";
 export * from "./lib/Class/Options.js";
 export * from "./lib/Class/Utils.js";
@@ -65,10 +64,10 @@ export * from "./lib/Form/MessageForm.js";
 export * from "./lib/Form/ModalForm.js";
 export * from "./lib/Form/utils.js";
 // Setup
-export * from "./lib/Setup/Extensions/system.js";
-export * from "./lib/Setup/prototypes.js";
-export * from "./lib/Setup/roles.js";
-export * from "./lib/Setup/util.js";
+export * from "./lib/Extensions/import.js";
+export * from "./lib/Extensions/system.js";
+export * from "./lib/roles.js";
+export * from "./lib/util.js";
 
 world.afterEvents.playerJoin.subscribe((player) => {
 	if (
@@ -88,7 +87,7 @@ system.run(async function waiter() {
 
 	let errorName = "LoadError";
 	try {
-		console.log("WORLD LOADED, X-API LOADING...");
+		console.log("Script initialized");
 		EventLoader.load(XA.afterEvents.worldLoad);
 
 		errorName = "DatabaseError";
@@ -107,7 +106,7 @@ system.run(async function waiter() {
 			`${util.settings.firstLoad ? "§fFirst loaded in " : "§9└ §fDone in "}${(
 				(Date.now() - loading) /
 				1000
-			).toFixed(2)}`
+			).toFixed(2)}`,
 		);
 	} catch (e) {
 		util.error(e, { errorName });

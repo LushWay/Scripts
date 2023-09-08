@@ -1,4 +1,5 @@
 import { Player } from "@minecraft/server";
+import { LockAction } from "../../../xapi.js";
 
 export class Minigame {
 	/** @type {Record<string, Minigame>} */
@@ -8,7 +9,7 @@ export class Minigame {
 	 */
 	static getCurrent(player) {
 		return Object.values(this.MINIGAMES).find((e) =>
-			e.players.includes(player.id)
+			e.players.includes(player.id),
 		);
 	}
 	/**

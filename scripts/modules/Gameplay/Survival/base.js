@@ -8,7 +8,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { LockAction, XCommand, XEntity } from "xapi.js";
+import { LockAction, XCommand } from "xapi.js";
 import {
 	RadiusRegion,
 	Region,
@@ -38,7 +38,7 @@ world.afterEvents.blockBreak.subscribe(
 				e.kill();
 			});
 		}
-	}
+	},
 );
 
 export const baseItemStack = new ItemStack(MinecraftItemTypes.barrel);
@@ -46,7 +46,7 @@ baseItemStack.setLore(["Поставьте эту бочку и она", "ста
 
 new Store({ x: -234, y: 65, z: -74 }, "overworld").addItem(
 	baseItemStack,
-	new MoneyCost(10)
+	new MoneyCost(10),
 );
 
 world.beforeEvents.itemUseOn.subscribe((data) => {
@@ -59,7 +59,7 @@ world.beforeEvents.itemUseOn.subscribe((data) => {
 		return;
 
 	const region = RadiusRegion.getAllRegions().find((e) =>
-		e.permissions.owners.includes(source.nameTag)
+		e.permissions.owners.includes(source.nameTag),
 	);
 
 	if (region) {
@@ -69,10 +69,10 @@ world.beforeEvents.itemUseOn.subscribe((data) => {
 			`§cВы уже ${
 				isOwner
 					? "владеете базой"
-					: `состоите в базе игрока '${XEntity.getNameByID(
-							region.permissions.owners[0]
+					: `состоите в базе игрока '${Player.name(
+							region.permissions.owners[0],
 					  )}'`
-			} !`
+			} !`,
 		);
 	}
 
@@ -95,7 +95,7 @@ world.beforeEvents.itemUseOn.subscribe((data) => {
 			return Vector.between(
 				Vector.add(min, { x: -size, y: 0, z: -size }),
 				Vector.add(max, { x: size, y: 0, z: size }),
-				block.location
+				block.location,
 			);
 		}
 	});
@@ -116,10 +116,10 @@ world.beforeEvents.itemUseOn.subscribe((data) => {
 				pvp: true,
 				allowedEntitys: "all",
 				owners: [source.id],
-			}
+			},
 		);
 		source.tell(
-			"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base"
+			"§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base",
 		);
 		source.playSound("random.levelup");
 	});
@@ -132,12 +132,12 @@ const base = new XCommand({
 base.executes((ctx) => {
 	if (LockAction.locked(ctx.sender)) return;
 	const base = RadiusRegion.getAllRegions().find((e) =>
-		e.permissions.owners.includes(ctx.sender.id)
+		e.permissions.owners.includes(ctx.sender.id),
 	);
 
 	if (!base)
 		return ctx.reply(
-			"§cУ вас нет базы! Вступите в существующую или создайте свою."
+			"§cУ вас нет базы! Вступите в существующую или создайте свою.",
 		);
 
 	baseMenu(ctx.sender, base);
@@ -151,7 +151,7 @@ system.runInterval(
 
 		for (const base of RadiusRegion.getAllRegions().filter(
 			// Ensure that region is a base (enabled pvp)
-			(e) => e.permissions.pvp
+			(e) => e.permissions.pvp,
 		)) {
 			const block = world[base.dimensionId].getBlock(Vector.floor(base.center));
 			if (!block) continue;
@@ -160,13 +160,13 @@ system.runInterval(
 					playersLocations.find(
 						(e) =>
 							e.dimension === base.dimensionId &&
-							Vector.distance(base.center, e.loc) < 10
+							Vector.distance(base.center, e.loc) < 10,
 					)
 				)
 					world[base.dimensionId].spawnParticle(
 						"minecraft:endrod",
 						Vector.add(base.center, { x: 0.5, y: 1.5, z: 0.5 }),
-						new MolangVariableMap()
+						new MolangVariableMap(),
 					);
 
 				continue;
@@ -174,7 +174,7 @@ system.runInterval(
 
 			base.forEachOwner((player) => {
 				player.tell(
-					`§cБаза с владельцем §f${XEntity.getNameByID(player.id)}§c разрушена.`
+					`§cБаза с владельцем §f${Player.name(player.id)}§c разрушена.`,
 				);
 			});
 			base.delete();
@@ -183,5 +183,5 @@ system.runInterval(
 		updateBases();
 	},
 	"baseInterval",
-	10
+	10,
 );

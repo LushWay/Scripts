@@ -1,5 +1,5 @@
 import { Player, Vector } from "@minecraft/server";
-import { ActionForm, ModalForm, XEntity } from "xapi.js";
+import { ActionForm, ModalForm } from "xapi.js";
 import { RadiusRegion } from "../../Server/Region/Region.js";
 
 /**
@@ -13,11 +13,11 @@ export function baseMenu(player, base) {
 		`${
 			isOwner
 				? "Это ваша база."
-				: "База игрока " + XEntity.getNameByID(base.permissions.owners[0])
-		}\n\nКоординаты: ${Vector.string(base.center)}`
+				: "База игрока " + Player.name(base.permissions.owners[0])
+		}\n\nКоординаты: ${Vector.string(base.center)}`,
 	)
 		.addButton("Телепорт!", () =>
-			player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 }))
+			player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 })),
 		)
 		.addButton("Участники", () => members(player, base));
 
@@ -36,14 +36,14 @@ function members(player, base) {
 		"Участники базы",
 		isOwner
 			? "Для управления участником нажмите на кнопку с его ником"
-			: "Вы можете только посмотреть их"
+			: "Вы можете только посмотреть их",
 	);
 
 	form.addButton("< Назад", () => baseMenu(player, base));
 
 	if (isOwner) form.addButton("Добавить!", "textures/ui/plus", () => {});
 	for (const member of base.permissions.owners) {
-		const name = XEntity.getNameByID(member) ?? "§7<unknown>";
+		const name = Player.name(member) ?? "§7<unknown>";
 		form.addButton(name, null, () => {});
 	}
 
@@ -58,11 +58,11 @@ function permissions(player, base) {
 	new ModalForm("Разрешения базы")
 		.addToggle(
 			"Двери и переключатели\n§7Определяет, смогут ли не добавленные в базу игроки использовать двери и переключатели.",
-			base.permissions.doorsAndSwitches
+			base.permissions.doorsAndSwitches,
 		)
 		.addToggle(
 			"Контейнеры\n§7Определяет, смогут ли не добавленные в базу игроки открывать контейнеры (сундуки, шалкеры и тд)",
-			base.permissions.openContainers
+			base.permissions.openContainers,
 		)
 		.show(player, (ctx, doors, containers) => {
 			base.permissions.doorsAndSwitches = doors;

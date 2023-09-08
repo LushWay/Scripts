@@ -1,6 +1,6 @@
 import { MinecraftDimensionTypes, World, world } from "@minecraft/server";
-import { OverTakes } from "../prototypes.js";
 import { util } from "../util.js";
+import { OverTakes } from "./import.js";
 
 const send = world.sendMessage.bind(world);
 
@@ -23,9 +23,9 @@ OverTakes(World.prototype, {
 		this.say(
 			data
 				.map((/**@type {*}*/ e) =>
-					typeof e === "string" ? e : util.inspect(e)
+					typeof e === "string" ? e : util.inspect(e),
 				)
-				.join(" ")
+				.join(" "),
 		);
 	},
 	logOnce(name, ...data) {

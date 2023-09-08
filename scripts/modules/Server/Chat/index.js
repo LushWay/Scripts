@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import { Database } from "lib/Database/Rubedo.js";
-import { Cooldown, Options, ROLES_NAMES, getRole, util } from "xapi.js";
+import { Cooldown, Options, ROLES, getRole, util } from "xapi.js";
 import { CONFIG } from "../../../config.js";
 
 const OPTIONS = Options.world("chat", {
@@ -46,7 +46,7 @@ world.afterEvents.chatSend.subscribe((data) => {
 				// Player is under chat cooldown, show error message
 				const time = Cooldown.getRemainingTime(cooldown - Date.now());
 				return data.sender.tell(
-					`§c► Подожди еще §b${time.parsedTime}§c ${time.type}`
+					`§c► Подожди еще §b${time.parsedTime}§c ${time.type}`,
 				);
 			}
 		}
@@ -54,8 +54,7 @@ world.afterEvents.chatSend.subscribe((data) => {
 		const playerRole = getRole(data.sender);
 
 		let role = "";
-		if (OPTIONS.ranks && playerRole !== "member")
-			role = ROLES_NAMES[playerRole];
+		if (OPTIONS.ranks && playerRole !== "member") role = ROLES[playerRole];
 
 		const allPlayers = world.getAllPlayers();
 
@@ -87,7 +86,7 @@ world.afterEvents.chatSend.subscribe((data) => {
 		data.sender.tell(
 			!hightlight
 				? `${role ? role + " " : ""}§7${data.sender.name}§r: ${data.message}`
-				: `§6§lЯ§r: §f${data.message.replace(/\\n/g, "\n")}`
+				: `§6§lЯ§r: §f${data.message.replace(/\\n/g, "\n")}`,
 		);
 	} catch (error) {
 		util.error(error);

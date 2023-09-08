@@ -2,20 +2,15 @@ import { ActionForm, Database, InventoryStore } from "xapi.js";
 
 /**
  * @type {Database<string, {invs?: Record<string, string>}>}
- *
  */
-const table = XA.tables.player;
-const DB = Database.eventProxy(table, {
-	beforeGet(key, value) {
-		value ??= { invs: {} };
-		value.invs ??= {};
-		return value;
-	},
-	beforeSet(key, value) {
-		if (!Object.keys(value.invs ?? {}).length) delete value.invs;
-		return value;
+const DB = new Database("player", {
+	defaultValue() {
+		return {
+			invs: {},
+		};
 	},
 });
+
 const STORE = new InventoryStore("inventories");
 
 new XCommand({
@@ -26,7 +21,7 @@ new XCommand({
 	const inventories = DB.get(ctx.sender.id).invs ?? {};
 	const form = new ActionForm(
 		"Inventories",
-		"Выбери слот для выгрузки:"
+		"Выбери слот для выгрузки:",
 	).addButton("Новый", null, () => {});
 
 	for (const [key, value] of Object.entries(inventories)) {

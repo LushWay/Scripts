@@ -6,7 +6,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { GameUtils, XEntity } from "xapi.js";
+import { GameUtils } from "xapi.js";
 import { Region, forEachItemAt } from "./Region.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "./config.js";
 
@@ -41,7 +41,7 @@ let LOADED = false;
 export function loadRegionsWithGuards(
 	allowed,
 	spawnAllowed,
-	regionCallback = () => void 0
+	regionCallback = () => void 0,
 ) {
 	if (LOADED) throw new ReferenceError("Regions already loaded!");
 	LOADED = true;
@@ -53,7 +53,7 @@ export function loadRegionsWithGuards(
 		if (!(data.source instanceof Player)) return;
 		const region = Region.locationInRegion(
 			data.block,
-			data.source.dimension.type
+			data.source.dimension.type,
 		);
 		if (allowed(data.source, region, { type: "useOn" })) return;
 
@@ -78,7 +78,7 @@ export function loadRegionsWithGuards(
 	world.afterEvents.blockPlace.subscribe((data) => {
 		const region = Region.locationInRegion(
 			data.block.location,
-			data.player.dimension.type
+			data.player.dimension.type,
 		);
 		if (allowed(data.player, region, { type: "place" })) return;
 
@@ -92,7 +92,7 @@ export function loadRegionsWithGuards(
 		({ player, block, brokenBlockPermutation, dimension }) => {
 			const region = Region.locationInRegion(
 				block.location,
-				player.dimension.type
+				player.dimension.type,
 			);
 
 			if (
@@ -113,7 +113,7 @@ export function loadRegionsWithGuards(
 					e.kill();
 				});
 			} else forEachItemAt(dimension, block.location);
-		}
+		},
 	);
 
 	world.afterEvents.entitySpawn.subscribe(({ entity }) => {
@@ -121,7 +121,7 @@ export function loadRegionsWithGuards(
 		if (!typeId || typeId === "rubedo:database") return;
 		const region = Region.locationInRegion(
 			entity.location,
-			entity.dimension.type
+			entity.dimension.type,
 		);
 		if (spawnAllowed(region, { entity })) return;
 		if (
@@ -132,7 +132,7 @@ export function loadRegionsWithGuards(
 		)
 			return;
 
-		XEntity.despawn(entity);
+		entity.despawn();
 	});
 
 	system.runInterval(
@@ -142,13 +142,13 @@ export function loadRegionsWithGuards(
 			for (const player of world.getAllPlayers()) {
 				const currentRegion = Region.locationInRegion(
 					player.location,
-					player.dimension.type
+					player.dimension.type,
 				);
 
 				regionCallback(player, currentRegion);
 			}
 		},
 		"pvp region disable",
-		20
+		20,
 	);
 }

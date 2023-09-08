@@ -1,46 +1,47 @@
 import { Player } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
-import { util } from "../Setup/util.js";
+import { util } from "../util.js";
 
 export const OPTIONS_NAME = Symbol("name");
 
 /**
- * @typedef {string | boolean | number | JSONLike} Option
- */
-
-/**
- * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OPTIONS_NAME]?: string}} DefaultConfig
- * @template [T = boolean | string | number]
- */
-
-/**
- * TS doesn't converting true and false to boolean
- * @typedef {T extends true | false ? boolean : T} Normalize
+ * Сonverting true and false to boolean
  * @template T
+ * @typedef {T extends true | false ? boolean : T} Normalize
  */
 
-/** @typedef {Database<string, Record<string, Option>>} OPTIONS_DB */
+/**
+ * @typedef {string | boolean | number | JSONLike} OptionValue
+ */
+
+/**
+ * @template [T = boolean | string | number]
+ * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OPTIONS_NAME]?: string}} DefaultOptions
+ */
+
+/** @typedef {Database<string, Record<string, OptionValue>>} OPTIONS_DB */
 /** @type {OPTIONS_DB} */
-const PLAYER_DB = Database.eventProxy(new Database("player"), {
-	beforeGet: (key, value) => value ?? {},
-	beforeSet: (key, value) => value,
+const PLAYER_DB = new Database("player", {
+	defaultValue: () => {
+		return {};
+	},
 });
 
-/**
- * @typedef {DefaultConfig<Option> & Record<string, { requires?: boolean }>} WorldOptionsConfig */
+/** @typedef {DefaultOptions<OptionValue> & Record<string, { requires?: boolean }>} WorldOptions */
 /** @type {OPTIONS_DB} */
 const WORLD_OPTIONS = new Database("options", {
-	beforeGet: (key, value) => value ?? {},
-	beforeSet: (key, value) => value,
+	defaultValue: () => {
+		return {};
+	},
 });
 
 export class Options {
-	/** @type {Record<string, DefaultConfig<boolean>>} */
+	/** @type {Record<string, DefaultOptions<boolean>>} */
 	static PLAYER = {};
 	/**
 	 * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
 	 * stored in a database
-	 * @template {DefaultConfig<boolean>} Config
+	 * @template {DefaultOptions<boolean>} Config
 	 * @param {string} name - The name that shows to players
 	 * @param {string} prefix - The prefix for the database.
 	 * @param {Config} CONFIG - This is an object that contains the default values for each option.
@@ -62,13 +63,13 @@ export class Options {
 			generateOptionsProxy(PLAYER_DB, prefix, this.PLAYER[prefix], player);
 	}
 
-	/** @type {Record<string, WorldOptionsConfig>} */
+	/** @type {Record<string, WorldOptions>} */
 	static WORLD = {};
 
 	/**
 	 * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
 	 * configuration object's properties in localStorage
-	 * @template {WorldOptionsConfig} Config
+	 * @template {WorldOptions} Config
 	 * @param {string} prefix - The prefix for the database.
 	 * @param {Config} CONFIG - The default values for the options.
 	 * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
@@ -92,7 +93,7 @@ export class Options {
  * values are stored in a database
  * @param {OPTIONS_DB} database - The prefix for the database.
  * @param {string} prefix - The prefix for the database.
- * @param {DefaultConfig} CONFIG - This is the default configuration object. It's an object with the keys being the
+ * @param {DefaultOptions} CONFIG - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
  * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
@@ -144,7 +145,7 @@ export class EditableLocation {
 		) {
 			if (!fallback) {
 				console.warn(
-					"§eSetup location §f" + id + "§e in\n" + util.error.stack.get()
+					"§eSet location §f" + id + "§e used in\n" + util.error.stack.get(),
 				);
 				this.valid = false;
 				return;

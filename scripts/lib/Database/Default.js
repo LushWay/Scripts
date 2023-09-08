@@ -6,7 +6,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { util } from "../Setup/util.js";
+import { util } from "../util.js";
 
 world.afterEvents.worldInitialize.subscribe(({ propertyRegistry }) => {
 	let def = new DynamicPropertiesDefinition();
@@ -15,11 +15,11 @@ world.afterEvents.worldInitialize.subscribe(({ propertyRegistry }) => {
 	def.defineNumber("index");
 	propertyRegistry.registerEntityTypeDynamicProperties(
 		def,
-		EntityTypes.get(DB.ENTITY_IDENTIFIER)
+		EntityTypes.get(DB.ENTITY_IDENTIFIER),
 	);
 
 	world.overworld.runCommandAsync(
-		"tickingarea add 0 -64 0 0 200 0 database true"
+		"tickingarea add 0 -64 0 0 200 0 database true",
 	);
 });
 
@@ -85,7 +85,7 @@ export class DB {
 
 		if (this.ALL_TABLE_ENTITIES.length < 1) {
 			console.warn(
-				"§6Не удалось найти базы данных. Попытка загрузить бэкап..."
+				"§6Не удалось найти базы данных. Попытка загрузить бэкап...",
 			);
 			world.overworld
 				.getEntities({
@@ -95,7 +95,7 @@ export class DB {
 				})
 				.forEach((e) => e.triggerEvent("minecraft:despawn"));
 			world.overworld.runCommand(
-				`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`
+				`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`,
 			);
 			this.ALL_TABLE_ENTITIES = this.getEntities();
 
@@ -105,7 +105,7 @@ export class DB {
 			} else
 				console.warn(
 					"Бэкап успешно загружен! Всего баз данных: " +
-						this.ALL_TABLE_ENTITIES.length
+						this.ALL_TABLE_ENTITIES.length,
 				);
 		}
 
@@ -121,7 +121,7 @@ export class DB {
 	static createTableEntity(tableType, tableName, index = 0) {
 		const entity = world.overworld.spawnEntity(
 			DB.ENTITY_IDENTIFIER,
-			DB.ENTITY_LOCATION
+			DB.ENTITY_LOCATION,
 		);
 
 		entity.setDynamicProperty("tableName", tableName);
@@ -140,7 +140,7 @@ export class DB {
 	static getTableEntity(tableType, tableName) {
 		try {
 			return this.tables().find(
-				(e) => e.tableType === tableType && e.tableName === tableName
+				(e) => e.tableType === tableType && e.tableName === tableName,
 			)?.entity;
 		} catch (e) {
 			util.error(e);
@@ -181,10 +181,12 @@ export class DB {
 				world.overworld.runCommand(this.BACKUP_COMMAND);
 			},
 			"database backup",
-			200
+			200,
 		);
 		this.WAITING_FOR_BACKUP = true;
 	}
+
+	static defaultKeyReplacerSymbol = Symbol("defaultKeyReplacer");
 
 	/**
 	 * @template {JSONLike} O
@@ -206,12 +208,8 @@ export class DB {
 			if (typeof defaultValue === "object" && defaultValue !== null) {
 				// Value is Object or array, recurse...
 
-				if (
-					Array.isArray(defaultValue) &&
-					typeof value !== "undefined" &&
-					Array.isArray(value)
-				) {
-					if (key in sourceObject) {
+				if (Array.isArray(defaultValue)) {
+					if (typeof value !== "undefined" && Array.isArray(value)) {
 						COMPOSED[key] = [...value];
 					} else {
 						COMPOSED[key] = [...defaultValue];
@@ -222,7 +220,7 @@ export class DB {
 					} else {
 						// If the original object doesn't have the property, add default value
 						// And unlink properties...
-						COMPOSED[key] = Object.assign({}, defaultValue);
+						COMPOSED[key] = this.setDefaults({}, defaultObject);
 					}
 				}
 			} else {

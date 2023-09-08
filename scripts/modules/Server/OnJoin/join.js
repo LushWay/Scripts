@@ -4,17 +4,19 @@ import "./subscribes.js";
 import { JOIN } from "./var.js";
 
 /** @type {Database<string, IJoinData>} */
-const PDB = Database.eventProxy(new Database("player"), {
-	beforeGet(player, data) {
-		return (
-			data ?? {
-				learning: 1,
-				joined: Date.now(),
-			}
-		);
-	},
-	beforeSet(key, value) {
-		return value;
+const PDB = new Database("player", {
+	events: {
+		beforeGet(key, value) {
+			return (
+				value ?? {
+					learning: 1,
+					joined: Date.now(),
+				}
+			);
+		},
+		beforeSet(key, value) {
+			return value;
+		},
 	},
 });
 
@@ -33,7 +35,7 @@ system.runTimeout(
 		save();
 	},
 	"owner start screen",
-	80
+	80,
 );
 
 system.runPlayerInterval(
@@ -84,7 +86,7 @@ system.runPlayerInterval(
 					// Creating title
 					let title = JOIN.CONFIG.title_animation.stages[data.stage];
 					for (const [key, value] of Object.entries(
-						JOIN.CONFIG.title_animation.vars
+						JOIN.CONFIG.title_animation.vars,
 					)) {
 						title = title.replace("$" + key, value);
 					}
@@ -122,7 +124,7 @@ system.runPlayerInterval(
 		if (modified) save();
 	},
 	"joinInterval",
-	20
+	20,
 );
 
 const getSettings = Options.player("Вход", "join", {

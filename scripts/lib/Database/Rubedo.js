@@ -1,9 +1,17 @@
 import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
-import { util } from "../Setup/util.js";
+import { util } from "../util.js";
 import { DB } from "./Default.js";
 
 const TABLE_TYPE = "rubedo";
 const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
+
+/**
+ * @template {string} [Key = string]
+ * @template [Value=any]
+ * @typedef {Object} DatabaseEvents
+ * @prop {(key: Key, value: Value) => Value} beforeGet This function will trigger until key get to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
+ * @prop {(key: Key, value: Value) => Value} beforeSet This function will trigger until key set to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
+ */
 
 /**
  * @template {string} [Key = string]
@@ -60,22 +68,11 @@ export class Database {
 		TABLE_NAME: "",
 		TABLE_TYPE,
 		UUID: ++Database.UUID,
+		/** @type {DatabaseEvents<Key, Value>} */
 		EVENTS: {
-			/**
-			 * This function will trigger until key set to db and can be used to modify data. For example, remove default values to keep db clean and lightweigth
-			 * @param {Key} key
-			 * @param {Value} value
-			 * @returns {Value}
-			 */
 			beforeSet(key, value) {
 				return value;
 			},
-			/**
-			 * This function will trigger until key get from db and can be used to modify data. For example, add default values to keep db clean and lightweigth
-			 * @param {Key} key
-			 * @param {Value} value
-			 * @returns {Value}
-			 */
 			beforeGet(key, value) {
 				return value;
 			},
@@ -103,16 +100,27 @@ export class Database {
 	/**
 	 *
 	 * @param {string} tableName
-	 * @param {{
-	 *  beforeSet(key: Key, value: Value): Value;
-	 * beforeGet(key: Key, value: Value): Value;
-	 * }} [events]
+	 * @param {{events?: DatabaseEvents<Key, Value>, defaultValue?: (key: Key) => Value extends JSONLike ? Partial<Value> : never}} [options]
 	 */
-	constructor(tableName, events) {
+	constructor(tableName, { events, defaultValue } = {}) {
+		if (defaultValue) {
+			events = {
+				beforeGet(key, value) {
+					if (value && typeof value === "object")
+						return DB.setDefaults(value, defaultValue(key));
+					return value;
+				},
+				beforeSet(key, value) {
+					if (value && typeof value === "object")
+						return DB.removeDefaults(value, defaultValue(key));
+					return value;
+				},
+			};
+		}
 		if (tableName in Database.tables) {
 			// DB with this name already exists...
-
-			return Database.tables[tableName];
+			const db = Database.tables[tableName];
+			return events ? Database.eventProxy(db, events) : db;
 		}
 
 		this._.TABLE_NAME = tableName;
@@ -167,16 +175,6 @@ export class Database {
 		this._.RAW_MEMORY = raw;
 		this._.IS_INITED = true;
 	}
-
-	/**
-	 * @template {keyof this["_"]["EVENTS"]} EventName
-	 * @param {EventName} event
-	 * @param {this["_"]["EVENTS"][EventName]} callback
-	 */
-	on(event, callback) {
-		// @ts-expect-error Trust me, TS
-		this._.EVENTS[event] = callback;
-	}
 	/**
 	 * Saves data into this database
 	 * @private
@@ -202,8 +200,8 @@ export class Database {
 		if (chunks.length > inventory.size) {
 			return util.error(
 				new DatabaseError(
-					"Too many data tried saved to table " + this._.TABLE_NAME
-				)
+					"Too many data tried saved to table " + this._.TABLE_NAME,
+				),
 			);
 		}
 
@@ -281,7 +279,7 @@ export class Database {
 
 		return Object.entries(this.MEMORY).map((e) =>
 			// @ts-expect-error
-			this._.EVENTS.beforeGet(e[0], e[1])
+			this._.EVENTS.beforeGet(e[0], e[1]),
 		);
 	}
 	/**
@@ -347,7 +345,7 @@ export class Database {
 				key ? ` key "${key}"` : key
 			} on table "${
 				this._.TABLE_NAME
-			}": Table is not inited. Make sure you called Database.initAllTables() before`
+			}": Table is not inited. Make sure you called Database.initAllTables() before`,
 		);
 	}
 

@@ -3,17 +3,7 @@ import { OPTIONS_NAME, Options } from "lib/Class/Options.js";
 import { Database } from "lib/Database/Rubedo.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModalForm.js";
-import {
-	FormCallback,
-	ROLES,
-	ROLES_NAMES as TR,
-	XA,
-	XCommand,
-	XEntity,
-	getRole,
-	setRole,
-	util,
-} from "xapi.js";
+import { FormCallback, ROLES, getRole, setRole, util } from "xapi.js";
 
 /** @type {import("lib/Database/Rubedo.js").Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
 const DB = XA.tables.player;
@@ -53,10 +43,10 @@ R.executes((ctx) => {
 		data.role = "admin";
 		delete data.setter;
 		save();
-		return ctx.reply("§b> §3Вы получили роль §r" + TR.admin);
+		return ctx.reply("§b> §3Вы получили роль §r" + ROLES.admin);
 	}
 
-	if (!isAdmin) return ctx.reply(`§b> §r${TR[role]}`);
+	if (!isAdmin) return ctx.reply(`§b> §r${ROLES[role]}`);
 
 	/**
 	 *
@@ -67,7 +57,7 @@ R.executes((ctx) => {
 		return () => {
 			const role = getRole(player.id);
 			const ROLE = Object.keys(ROLES).map(
-				(e) => `${role === e ? "> " : ""}` + TR[e]
+				(e) => `${role === e ? "> " : ""}` + ROLES[e],
 			);
 			new ModalForm(player.name)
 				.addToggle("Уведомлять", false)
@@ -75,20 +65,20 @@ R.executes((ctx) => {
 				.addDropdown(
 					"Роль",
 					ROLE,
-					ROLE.findIndex((e) => e.startsWith(">"))
+					ROLE.findIndex((e) => e.startsWith(">")),
 				)
 				.addTextField("Причина смены роли", `Например, "космокс"`)
 				.show(ctx.sender, (_, notify, showName, selected, message) => {
 					if (selected.startsWith(">")) return;
-					const newrole = Object.entries(TR).find(
-						(e) => e[1] === selected
+					const newrole = Object.entries(ROLES).find(
+						(e) => e[1] === selected,
 					)?.[0];
 					if (!newrole) _.error("Unknown role: " + newrole);
 					if (notify)
 						player.tell(
-							`§b> §3Ваша роль сменена c ${TR[role]} §3на ${selected}${
+							`§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${selected}${
 								showName ? `§3 игроком §r${ctx.sender.name}` : ""
-							}${message ? `\n§r§3Причина: §r${message}` : ""}`
+							}${message ? `\n§r§3Причина: §r${message}` : ""}`,
 						);
 					// @ts-expect-error
 					setRole(player.id, newrole);
@@ -102,10 +92,10 @@ R.executes((ctx) => {
 				});
 		};
 	};
-	const form = new ActionForm("Roles", "§3Ваша роль: " + TR[role]).addButton(
+	const form = new ActionForm("Roles", "§3Ваша роль: " + ROLES[role]).addButton(
 		"Сменить мою роль",
 		null,
-		callback(ctx.sender, true)
+		callback(ctx.sender, true),
 	);
 
 	for (const player of world.getPlayers({ excludeNames: [ctx.sender.name] }))
@@ -116,7 +106,7 @@ R.executes((ctx) => {
 
 system.afterEvents.scriptEventReceive.subscribe((event) => {
 	if (event.id === "ROLE:ADMIN") {
-		const player = XEntity.fetch(event.message);
+		const player = Player.fetch(event.message);
 		if (!player)
 			return console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
 
@@ -169,14 +159,14 @@ function options(player) {
 		const requires = Object.entries(Options.WORLD[groupName]).reduce(
 			(count, [key, option]) =>
 				option.requires && typeof data[key] === "undefined" ? count + 1 : count,
-			0
+			0,
 		);
 		form.addButton(
 			`${groupName}${requires ? ` §c(${requires}!)` : ""}`,
 			null,
 			() => {
 				group(player, groupName, "WORLD");
-			}
+			},
 		);
 	}
 
@@ -236,7 +226,7 @@ function group(player, groupName, groupType, errors = {}) {
 			form.addTextField(
 				label,
 				"Настройка не изменится",
-				typeof value === "string" ? value : JSON.stringify(value)
+				typeof value === "string" ? value : JSON.stringify(value),
 			);
 
 		buttons.push([
@@ -289,6 +279,17 @@ function group(player, groupName, groupType, errors = {}) {
 		}
 	});
 }
+
+/**
+ * @typedef {"string"
+ * 	| "number"
+ * 	| "object"
+ * 	| "boolean"
+ * 	| "symbol"
+ * 	| "bigint"
+ * 	| "undefined"
+ * 	| "function"} AllTypes
+ */
 
 /** @type {Partial<Record<AllTypes, string>>} */
 const Types = {

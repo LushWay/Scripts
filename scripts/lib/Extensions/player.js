@@ -1,12 +1,11 @@
 import {
 	Entity,
 	EntityDamageCause,
-	EquipmentSlot,
 	GameMode,
 	Player,
 	world,
 } from "@minecraft/server";
-import { OverTakes } from "../prototypes.js";
+import { OverTakes } from "./import.js";
 
 Player.prototype.tell = Player.prototype.sendMessage;
 OverTakes(Player, {
@@ -17,6 +16,12 @@ OverTakes(Player, {
 	},
 	name(id) {
 		throw new ReferenceError("X-API is not fully loaded!");
+	},
+});
+OverTakes(Entity.prototype, {
+	despawn() {
+		this.teleport({ x: 0, y: -300, z: 0 }, { checkForBlocks: false });
+		this.kill();
 	},
 });
 OverTakes(Player.prototype, {

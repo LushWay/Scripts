@@ -1,17 +1,10 @@
 import { Player } from "@minecraft/server";
-import { Database } from "../Database/Rubedo.js";
+import { Database } from "./Database/Rubedo.js";
 
 /** @type {Database<string, {role: keyof typeof ROLES}>} */
-const table = Database.eventProxy(new Database("player"), {
-	beforeGet(key, value) {
-		value ??= { role: "member" };
-		value.role ??= "member";
-		return value;
-	},
-	beforeSet(key, value) {
-		// @ts-expect-error
-		if (value.role === "member") delete value.role;
-		return value;
+const table = new Database("player", {
+	defaultValue() {
+		return { role: "member" };
 	},
 });
 
@@ -19,18 +12,10 @@ const table = Database.eventProxy(new Database("player"), {
  * The roles that are in this server
  */
 export const ROLES = {
-	member: 0,
-	admin: 1,
-	moderator: 2,
-	builder: 3,
-};
-
-/** @type {Record<keyof typeof ROLES, string>}} */
-export const ROLES_NAMES = {
 	admin: "§cАдмин",
+	moderator: "§5Модератор",
 	builder: "§3Строитель",
 	member: "§fУчастник",
-	moderator: "§5Модератор",
 };
 
 /**
@@ -67,11 +52,11 @@ export function setRole(player, role) {
  * @param {string} playerID
  * @param {keyof typeof ROLES} role
  */
-export function IS(playerID, role) {
+export function is(playerID, role) {
 	/** @type {(keyof typeof ROLES)[]} */
 	let arr = ["moderator", "admin"];
 
-	if (role === "member") arr = ["member"];
+	if (role === "member") return true;
 	if (role === "builder") arr.push("builder");
 	if (role === "admin") arr = ["admin"];
 

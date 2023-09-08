@@ -54,37 +54,10 @@ loadRegionsWithGuards(
 		region.permissions.allowedEntitys.includes(data.entity.typeId),
 
 	(player, currentRegion) => {
-		// @ts-expect-error
-		function survivalNeeded(player, block, region) {
-			if (block && block?.type?.id === "minecraft:smithing_table") return true;
-			const heldItem = player
-				.getComponent("equipment_inventory")
-				.getEquipmentSlot(EquipmentSlot.mainhand);
-			if (!region && heldItem?.isStackableWith(baseItemStack)) return true;
-		}
 		if (currentRegion && !currentRegion?.permissions.pvp) {
 			player.triggerEvent("player:spawn");
 		}
-
-		const isOwner =
-			currentRegion && currentRegion.permissions.owners.includes(player.id);
-		if (!isOwner) {
-			if (!player.hasTag("modding")) {
-				const facing = player.getBlockFromViewDirection({
-					includeLiquidBlocks: true,
-					includePassableBlocks: true,
-					maxDistance: 10,
-				});
-				if (survivalNeeded(player, facing?.block, currentRegion)) {
-					player.runCommand("gamemode survival");
-				} else {
-					player.runCommand("gamemode adventure");
-				}
-			}
-		} else if (player.isGamemode("adventure")) {
-			player.runCommand("gamemode survival");
-		}
-	}
+	},
 );
 
 Region.CONFIG.PERMISSIONS = {
@@ -107,7 +80,7 @@ const StartAxeItem = new ItemStack(MinecraftItemTypes.woodenAxe);
 StartAxeItem.setCanDestroy(
 	Object.entries(MinecraftBlockTypes)
 		.filter((e) => e[0].match(/log/i))
-		.map((e) => e[1].id)
+		.map((e) => e[1].id),
 );
 StartAxeItem.nameTag = "Начальный топор";
 StartAxeItem.setLore(["§r§7Начальный топор"]);
@@ -148,6 +121,7 @@ if (SpawnLocation.valid) {
 	world.setDefaultSpawnLocation(SpawnLocation);
 	let spawnregion = Region.locationInRegion(SpawnLocation, "overworld");
 	if (!spawnregion || !(spawnregion instanceof RadiusRegion)) {
+		verbose = true;
 		spawnregion = new RadiusRegion(
 			{ x: SpawnLocation.x, z: SpawnLocation.z, y: SpawnLocation.y },
 			200,
@@ -158,8 +132,9 @@ if (SpawnLocation.valid) {
 				pvp: false,
 				allowedEntitys: "all",
 				owners: [],
-			}
+			},
 		);
+		verbose = false;
 	}
 	system.runPlayerInterval(
 		(player) => {
@@ -185,7 +160,7 @@ if (SpawnLocation.valid) {
 			}
 		},
 		"SpawnRegion",
-		20
+		20,
 	);
 }
 const AnarchyCenter = new EditableLocation("anarchy_center");
@@ -285,7 +260,7 @@ if (AnarchyCenter.valid) {
 			}
 		},
 		"zone",
-		10
+		10,
 	);
 }
 
@@ -332,7 +307,7 @@ if (AnarchyPortalLocation.valid) {
 								xp: 0,
 								slots: [StartAxeItem],
 							},
-							{ clearAll: true }
+							{ clearAll: true },
 						);
 						randomTeleport(
 							player,
@@ -343,20 +318,20 @@ if (AnarchyPortalLocation.valid) {
 								teleportCallback(loc) {
 									if (getSettings(player).showCoordinates)
 										player.tell(
-											`§aВы были перемещены на ${Vector.string(loc)}. `
+											`§aВы были перемещены на ${Vector.string(loc)}. `,
 										);
 									else player.tell("§aВы были перемещены.");
 									player.tell("§eРаскройте элитры для быстрого падения!");
 									player.playSound("note.pling");
 								},
 								keepInSkyTime: 20,
-							}
+							},
 						);
 						data.inv = "anarchy";
 					} else {
 						InventoryStore.load(
 							player,
-							AnarchyInventory.getEntityStore(player.id)
+							AnarchyInventory.getEntityStore(player.id),
 						);
 						data.inv = "anarchy";
 
@@ -365,8 +340,8 @@ if (AnarchyPortalLocation.valid) {
 					}
 
 					save();
-				})
+				}),
 			);
-		}
+		},
 	);
 }

@@ -7,7 +7,7 @@ import {
 	system,
 	world,
 } from "@minecraft/server";
-import { EventSignal, XA, XEntity } from "xapi.js";
+import { EventSignal, XA } from "xapi.js";
 import { NO_PVP_MODE } from "../../Indicator/var.js";
 import { teleportToBR } from "./index.js";
 import { rtp } from "./rtp.js";
@@ -58,7 +58,7 @@ class BattleRoyal {
 			C++;
 		}
 
-		EventSignal.emit(BATTLE_ROYAL_EVENTS.join, XEntity.fetch(name));
+		EventSignal.emit(BATTLE_ROYAL_EVENTS.join, Player.fetch(name));
 	}
 
 	/**
@@ -92,11 +92,11 @@ class BattleRoyal {
 			// Центр
 			this.center.z = Math.randomInt(
 				this.pos.z + 128 + 50,
-				this.pos.z + 128 - 50
+				this.pos.z + 128 - 50,
 			);
 			this.center.x = Math.randomInt(
 				this.pos.x + 128 + 50,
-				this.pos.x + 128 - 50
+				this.pos.x + 128 - 50,
 			);
 
 			/**
@@ -115,14 +115,14 @@ class BattleRoyal {
 				world.say(
 					`Pos1: ${this.pos.x} ${this.pos.z}\nCenter: ${this.center.x} ${
 						this.center.z
-					}\nPos2: ${this.pos.x + 256} ${this.pos.z + 256}`
+					}\nPos2: ${this.pos.x + 256} ${this.pos.z + 256}`,
 				);
 			}
 
 			// Для каждого игрока
 			for (const e of players) {
 				// Тэги
-				const p = XEntity.fetch(e);
+				const p = Player.fetch(e);
 				this.tags.forEach((e) => p.addTag(e));
 				NO_PVP_MODE.push(p.id);
 
@@ -134,8 +134,8 @@ class BattleRoyal {
 					XA.Lang.lang["br.start"](
 						this.reward,
 						allplayers.join("§r, "),
-						this.game.rad
-					)
+						this.game.rad,
+					),
 				);
 
 				// Очистка, звук
@@ -149,7 +149,7 @@ class BattleRoyal {
 					this.center.z,
 					this.game.rad - 15,
 					this.game.rad - 30,
-					poses
+					poses,
 				);
 				poses.push(pos);
 				this.dimension
@@ -271,7 +271,7 @@ class BattleRoyal {
 									`${this.time.sec}`.length < 2
 										? `0${this.time.sec}`
 										: this.time.sec
-								} §g○ §6${this.game.rad}`
+								} §g○ §6${this.game.rad}`,
 							);
 						}
 
@@ -280,11 +280,11 @@ class BattleRoyal {
 						if (this.players.filter((e) => e.hasTag("br:alive")).length <= 1)
 							this.end(
 								"last",
-								this.players.find((e) => e && e.hasTag("br:alive"))
+								this.players.find((e) => e && e.hasTag("br:alive")),
 							);
 					},
 					"BR game",
-					0
+					0,
 				),
 			];
 			this.events = {
@@ -309,7 +309,7 @@ class BattleRoyal {
 						return;
 
 					const block = data.dimension.getBlock(
-						Vector.add(data.block.location, Vector.down)
+						Vector.add(data.block.location, Vector.down),
 					);
 					if (block.typeId !== "minecraft:barrel") return;
 
@@ -346,8 +346,8 @@ class BattleRoyal {
 						this.players
 							.filter((e) => e.hasTag("br:alive"))
 							.map((e) => e.name)
-							.join("§r, ")
-					)
+							.join("§r, "),
+					),
 				);
 			});
 		}
@@ -362,13 +362,13 @@ class BattleRoyal {
 			 * @type {Player}
 			 */
 			const winner = ex;
-			if (typeof winner == "object" && XEntity.fetch(winner.name)) {
+			if (typeof winner == "object" && Player.fetch(winner.name)) {
 				winner.tell(XA.Lang.lang["br.end.winner"](this.reward));
 				world.overworld.runCommand(
-					`title "${winner.name}" title §6Ты победил!`
+					`title "${winner.name}" title §6Ты победил!`,
 				);
 				world.overworld.runCommand(
-					`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`
+					`title "${winner.name}" subtitle §gНаграда: §f${this.reward} §gмонет`,
 				);
 				this.players
 					.filter((e) => e.name != winner.name)

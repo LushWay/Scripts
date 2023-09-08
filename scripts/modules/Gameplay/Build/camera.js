@@ -46,36 +46,36 @@ function setupCameraForm(player, target) {
 			"Тип",
 			...ModalForm.arrayAndDefault(
 				CAMERA.TYPES,
-				data.camera?.type ?? CAMERA.TYPES[0]
-			)
+				data.camera?.type ?? CAMERA.TYPES[0],
+			),
 		)
 		.addDropdown(
 			"Переход",
 			...ModalForm.arrayAndDefault(
 				CAMERA.EASE,
-				data.camera?.ease ?? CAMERA.EASE[0]
-			)
+				data.camera?.ease ?? CAMERA.EASE[0],
+			),
 		)
 		.addSlider("Длительность движения в секундах", 0, 100, 1, 1)
 		.addTextField("Координаты центральной позиция (~ разрешены)", "0 ~1 0")
 		.addTextField(
 			"Позиция куда камера будет повернута (либо игрок в меню ниже)",
-			"0 ~1 0"
+			"0 ~1 0",
 		)
 		.addDropdown(
 			"Игрок к которому камера будет повернута (либо позиция в меню выше)",
 			...ModalForm.arrayAndDefault(
 				world.getAllPlayers().map((e) => e.name),
 				ModalForm.arrayDefaultNone,
-				true
-			)
+				true,
+			),
 		)
 		.addDropdown(
 			"Режим камеры",
 			...ModalForm.arrayAndDefault(
 				Object.values(CAMERA.MODES),
-				CAMERA.MODES.spinAroundPos
-			)
+				CAMERA.MODES.spinAroundPos,
+			),
 		)
 		.addSlider("Радиус при прокрутке вокруг позиции", 0, 100)
 		.show(
@@ -89,18 +89,18 @@ function setupCameraForm(player, target) {
 				facingPosRaw,
 				facingPlayer,
 				rawMode,
-				spinRadius
+				spinRadius,
 			) => {
 				const rawPosArray = getChatAugments(rawPos, "");
 				const pos = parseLocationAugs(
 					[rawPosArray[0], rawPosArray[1], rawPosArray[2]],
-					player
+					player,
 				);
 
 				if (!pos)
 					return ctx.error(
 						"Неправильныe координаты центральной позиции камеры: " +
-							util.inspect(rawPosArray)
+							util.inspect(rawPosArray),
 					);
 
 				let facing;
@@ -108,7 +108,7 @@ function setupCameraForm(player, target) {
 					const rawPosArray = getChatAugments(facingPosRaw, "");
 					facing = parseLocationAugs(
 						[rawPosArray[0], rawPosArray[1], rawPosArray[2]],
-						player
+						player,
 					);
 				} else if (
 					facingPlayer &&
@@ -123,7 +123,7 @@ function setupCameraForm(player, target) {
 				/** @type {CameraDBModes | undefined} */
 				// @ts-expect-error
 				const mode = Object.entries(CAMERA.MODES).find(
-					([, value]) => value === rawMode
+					([, value]) => value === rawMode,
 				)?.[0];
 
 				if (!mode)
@@ -142,7 +142,7 @@ function setupCameraForm(player, target) {
 				save();
 				createCameraInteval(target);
 				player.tell("§3§l> §rСохранено!");
-			}
+			},
 		);
 }
 
@@ -203,17 +203,19 @@ function createCameraInteval(player) {
 			}
 		},
 		"camera",
-		data.camera.easeTime * 20
+		data.camera.easeTime * 20,
 	);
 }
 
 for (const player of world.getAllPlayers()) createCameraInteval(player);
 world.afterEvents.playerSpawn.subscribe(({ player }) =>
-	createCameraInteval(player)
+	createCameraInteval(player),
 );
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-	system.clearRun(intervales[playerId]);
-	Reflect.deleteProperty(intervales, playerId);
+	if (playerId in intervales) {
+		system.clearRun(intervales[playerId]);
+		Reflect.deleteProperty(intervales, playerId);
+	}
 });
 
 const cmd = new XCommand({ name: "camera", role: "admin" });

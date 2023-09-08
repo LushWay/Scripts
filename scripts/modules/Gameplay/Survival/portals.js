@@ -5,6 +5,7 @@ import { Minigame } from "../Minigames/Builder.js";
 /**
  * @typedef {Object} TeleportOptions
  * @prop {string} [ignoreQueneName]
+ * @prop {boolean} [fadeScreen=true]
  */
 
 export class Portal {
@@ -13,7 +14,7 @@ export class Portal {
 	 * @param {Player} player
 	 * @param {TeleportOptions} [options]
 	 */
-	static canTeleport(player, options = {}) {
+	static canTeleport(player, { ignoreQueneName, fadeScreen = true } = {}) {
 		/** @param {string} reason */
 		const fail = (reason) => {
 			player.tell("§c► " + reason);
@@ -21,13 +22,28 @@ export class Portal {
 		};
 
 		const quene = Minigame.getQuene(player)?.name;
-		if (quene && quene !== options.ignoreQueneName) {
+		if (quene && quene !== ignoreQueneName) {
 			return fail(
-				`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-quit`
+				`Вы не можете телепортироваться, стоя в очереди. Выйти: §f-quit`,
 			);
 		}
 
-		if (LockAction.locked(player, {})) return false;
+		if (LockAction.locked(player)) return false;
+
+		if (fadeScreen) {
+			const inS = 0.5;
+			const stayS = 0.5;
+			const outS = 0.7;
+			// player.onScreenDisplay.setTitle("§aПеремещение...", {
+			// 	fadeInDuration: inS * 20,
+			// 	stayDuration: stayS * 20,
+			// 	fadeOutDuration: outS * 20,
+			// });
+			player.runCommand(
+				//                                              red green blue
+				`camera @s fade time ${inS} ${stayS} ${outS} color 1 20 10`,
+			);
+		}
 
 		return true;
 	}
@@ -56,7 +72,7 @@ export class Portal {
 		from,
 		to,
 		place,
-		{ aliases = [], createCommand = true, commandDescription } = {}
+		{ aliases = [], createCommand = true, commandDescription } = {},
 	) {
 		this.from = from;
 		this.to = to;

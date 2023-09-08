@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { XEntity, util } from "xapi.js";
+import { util } from "xapi.js";
 import { MENU } from "./var.js";
 
 world.afterEvents.itemUse.subscribe(async ({ source: player, itemStack }) => {

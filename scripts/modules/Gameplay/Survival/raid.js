@@ -1,5 +1,5 @@
-import { system, world } from "@minecraft/server";
-import { LockAction, ScoreboardDB, XEntity } from "xapi.js";
+import { Player, system, world } from "@minecraft/server";
+import { LockAction, ScoreboardDB } from "xapi.js";
 import { Region } from "../../Server/Region/Region.js";
 import { RaidNotify } from "./var.js";
 
@@ -16,18 +16,18 @@ const RAID = new ScoreboardDB("raid", "Raid");
 new LockAction(
 	"raid",
 	(player) => RAID.get(player) > 0,
-	"Вы находитесь в режиме рейдблока."
+	"Вы находитесь в режиме рейдблока.",
 );
 
 system.runInterval(
 	() => {
 		for (const id in RaidNotify) {
 			// Ищем игрока...
-			const player = XEntity.fetch(id);
+			const player = Player.fetch(id);
 			if (player) {
 				if (RAID.get(player) === 0) {
 					player.tell(
-						"§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны."
+						"§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны.",
 					);
 					player.playSound("mob.wolf.bark");
 				}
@@ -45,5 +45,5 @@ system.runInterval(
 		}
 	},
 	"raid notify",
-	20
+	20,
 );

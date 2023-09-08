@@ -1,6 +1,6 @@
 import { System, world } from "@minecraft/server";
 import { util } from "xapi.js";
-import { OverTakes } from "../prototypes.js";
+import { OverTakes } from "./import.js";
 
 /**
  * @type {Record<string, string>}
@@ -24,7 +24,7 @@ OverTakes(System.prototype, {
 			const took_ticks = ~~(end() / 20);
 			if (took_ticks > ticks)
 				console.warn(
-					`Found slow interval (${took_ticks}/${ticks})  at:\n${path}`
+					`Found slow interval (${took_ticks}/${ticks})  at:\n${path}`,
 				);
 		}, ticks);
 	},
@@ -41,7 +41,7 @@ OverTakes(System.prototype, {
 			const took_ticks = ~~(end() / 20);
 			if (took_ticks > ticks)
 				console.warn(
-					`Found slow timeout (${took_ticks}/${ticks}) at:\n${path}`
+					`Found slow timeout (${took_ticks}/${ticks}) at:\n${path}`,
 				);
 		}, ticks);
 	},
