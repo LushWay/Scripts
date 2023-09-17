@@ -9,6 +9,7 @@ import { ActionFormData, ActionFormResponse } from "@minecraft/server-ui";
 import { XShowForm } from "../Form/utils.js";
 import { untyped_terrain_textures } from "../List/terrain-textures.js";
 import { inaccurateSearch } from "./Search.js";
+import { Module } from "./OptionalModules.js";
 
 const blocks = Object.values(MinecraftBlockTypes).map((e) => e.id);
 
@@ -59,24 +60,14 @@ const blockModifiers = [
 	},
 ];
 
-/**
- * @type {import("@minecraft/server-admin")}
- */
-let ServerAdmin;
-(async () => {
-	try {
-		ServerAdmin = await import("@minecraft/server-admin");
-	} catch {}
-})();
-
 export const GameUtils = {
 	/**
 	 * @param {string} name
 	 * @returns {undefined | string}
 	 */
 	env(name) {
-		if (ServerAdmin) {
-			return ServerAdmin.variables.get(name);
+		if (Module.ServerAdmin) {
+			return Module.ServerAdmin.variables.get(name);
 		}
 	},
 	/**

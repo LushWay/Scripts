@@ -1,18 +1,8 @@
 /**
- * Module not avaible on common worlds, so using boilerplate
- * @type {typeof import("@minecraft/server-net")}
- */
-let NET;
-
-import("@minecraft/server-net")
-	.then((MODULE) => {
-		NET = MODULE;
-	})
-	.catch(() => console.log("MODULE @minecraft/server-net ARE DISABLED"));
-
-/**
  * @typedef {import("../../../../../tools/server/Net/routes.js").NODE_ROUTES} NODE_ROUTES
  */
+
+import { Module } from "./OptionalModules.js";
 
 /**
  * Makes http request to node.js instance
@@ -24,22 +14,21 @@ import("@minecraft/server-net")
 export async function APIRequest(path, body) {
 	const sbody = JSON.stringify(body);
 	console.warn("REQ TO ", path, " WITH BODY ", sbody);
-	if (NET) {
-		const res = await NET.http.request(
-			new NET.HttpRequest("http://localhost:9090/" + path)
-				.setMethod(NET.HttpRequestMethod.Post)
-				.setHeaders([
-					new NET.HttpHeader("content-type", "text/plain"),
-					new NET.HttpHeader("content-length", sbody.length.toString()),
-				])
-				.setBody(sbody)
+	if (Module.ServerNet) {
+		const { http, HttpRequest, HttpRequestMethod } = Module.ServerNet;
+		const response = await http.request(
+			new HttpRequest("http://localhost:19000/" + path)
+				.setMethod(HttpRequestMethod.Post)
+				.addHeader("content-type", "text/plain")
+				.addHeader("content-length", sbody.length.toString())
+				.setBody(sbody),
 		);
-		const body = JSON.safeParse(res.body, void 0, (err) =>
-			console.warn("Error while parsing ", res.body, err)
+		const body = JSON.safeParse(response.body, void 0, (err) =>
+			console.warn("Error while parsing ", response.body, err),
 		);
 
 		if (!body || body.status === 404)
-			throw new Error(body?.message ?? "Got unexpected body: " + res.body);
+			throw new Error(body?.message ?? "Got unexpected body: " + response.body);
 
 		return body;
 	} else console.error("NET MODULE ARE DISABLED, ABORTING");
