@@ -3,6 +3,7 @@ import { Anarchy, Spawn } from "../../modules/Gameplay/Survival/index.js";
 import { ActionForm } from "../Form/ActionForm.js";
 import { Place } from "./Action.js";
 import { Sidebar } from "./Sidebar.js";
+import { OverTakes } from "../Extensions/import.js";
 
 // @ts-expect-error
 Set.prototype.toJSON = function () {
@@ -24,7 +25,7 @@ export class Quest {
 	/** @type {import("./Sidebar.js").SidebarLinePreinit} */
 	static sidebar = {
 		preinit(sidebar) {
-			const onquestupdate = sidebar.updateAll.bind(sidebar);
+			const onquestupdate = sidebar.update.bind(sidebar);
 
 			return function (player) {
 				const status = Quest.active(player);
@@ -46,7 +47,7 @@ export class Quest {
 	static instances = {};
 
 	/**
-	 * @type {Record<string, QuestSteps>}
+	 * @type {Record<string, PlayerQuest>}
 	 */
 	players = {};
 
@@ -56,7 +57,7 @@ export class Quest {
 	steps(player) {
 		if (this.players[player.id]) return this.players[player.id];
 
-		this.players[player.id] = new QuestSteps(this, player);
+		this.players[player.id] = new PlayerQuest(this, player);
 		this.init(this.players[player.id], player);
 
 		world.afterEvents.playerLeave.subscribe(
@@ -68,7 +69,7 @@ export class Quest {
 
 	/**
 	 * @param {string} name
-	 * @param {(q: QuestSteps, p: Player) => void} init
+	 * @param {(q: PlayerQuest, p: Player) => void} init
 	 */
 	constructor(name, init) {
 		this.name = name;
@@ -88,7 +89,7 @@ export class Quest {
 	 * @param {Player} player
 	 * @param {number} stepNum
 	 */
-	step(player, stepNum, deleteAdd = true) {
+	step(player, stepNum, clearAdditionalBeforeNextStep = true) {
 		/** @type {PlayerDB<QuestDB>} */
 		const { data, save } = player.db();
 		data.quest ??= {
@@ -96,7 +97,7 @@ export class Quest {
 		};
 		data.quest.active = this.name;
 
-		if (deleteAdd) delete data.quest.additional;
+		if (clearAdditionalBeforeNextStep) delete data.quest.additional;
 		data.quest.step = stepNum;
 		save();
 
@@ -164,20 +165,20 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player));
 
 /**
  * @typedef {{
- *   finish(): void
+ *   next(): void
  *   cleanup?(): void
  *   player: Player
- *   parent: Quest
- * } & QuestStepInput & Pick<QuestSteps, "parent" | "player" | "updateListeners" | "update">} QuestStepThis
+ *   quest: Quest
+ * } & QuestStepInput & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
  */
 
-class QuestSteps {
+class PlayerQuest {
 	/**
 	 * @param {Quest} parent
 	 * @param {Player} player
 	 */
 	constructor(parent, player) {
-		this.parent = parent;
+		this.quest = parent;
 		this.player = player;
 	}
 
@@ -186,9 +187,12 @@ class QuestSteps {
 	 */
 	list = [];
 
+	/**
+	 * @type {Set<(p: Player) => void>}
+	 */
 	updateListeners = new Set();
 	update() {
-		this.updateListeners.forEach((e) => e());
+		this.updateListeners.forEach((e) => e(this.player));
 	}
 
 	/**
@@ -197,28 +201,31 @@ class QuestSteps {
 	dynamic(options) {
 		const step = this;
 		const i = this.list.length;
-		/** @type {QuestSteps["list"][number]} */
-		const listStep = {
-			updateListeners: this.updateListeners,
-			player: this.player,
-			update: this.update.bind(this),
-			parent: this.parent,
+		/** @type {PlayerQuest["list"][number]} */
+		const ctx = {
 			...options,
 
-			finish() {
+			player: this.player,
+			update: this.update.bind(this),
+			quest: this.quest,
+			next() {
 				this.cleanup?.();
 				if (step.list[i + 1]) {
-					this.parent.step(this.player, i + 1);
+					this.quest.step(this.player, i + 1);
 				} else {
-					this.parent.exit(this.player);
+					this.quest.exit(this.player);
 					step._end();
+					delete this.quest.players[this.player.id];
 				}
 				this.update();
-				this.updateListeners.clear();
+				step.updateListeners.clear();
 			},
 		};
-		this.list.push(listStep);
-		return listStep;
+
+		// Share properties between mixed objects
+		Object.setPrototypeOf(options, ctx);
+		this.list.push(ctx);
+		return ctx;
 	}
 
 	/**
@@ -232,7 +239,7 @@ class QuestSteps {
 			},
 			activate() {
 				action.bind(this)();
-				this.finish();
+				this.next();
 				return { cleanup() {} };
 			},
 		});
@@ -244,20 +251,17 @@ class QuestSteps {
 	 * @param {string} text
 	 */
 	place(from, to, text) {
-		const steps = this;
-		return this.dynamic({
-			text() {
-				return text;
-			},
+		this.dynamic({
+			text: () => text,
 			activate() {
 				/** @type {ReturnType<typeof Place.action>[]} */
 				const actions = [];
 				for (const pos of Vector.foreach(from, to)) {
 					actions.push(
 						Place.action(pos, (player) => {
-							if (player.id !== steps.player.id) return;
+							if (player.id !== this.player.id) return;
 
-							this.finish();
+							this.next();
 						}),
 					);
 				}
@@ -275,15 +279,18 @@ class QuestSteps {
 
 	/**
 	 * @typedef {{
-	 *   value?: number,
-	 *   end: number,
 	 *   text(value: number): string,
+	 *   end: number,
+	 *   value?: number,
 	 * } & Omit<QuestStepInput, "text">
 	 * } QuestCounterInput
 	 */
 
 	/**
-	 * @typedef {QuestStepThis & { diff(this: QuestStepThis, m: number): void } & QuestCounterInput} QuestCounterThis
+	 * @typedef {QuestStepThis &
+	 * { diff(this: QuestStepThis, m: number): void; } &
+	 * QuestCounterInput
+	 * } QuestCounterThis
 	 */
 
 	/**
@@ -305,33 +312,28 @@ class QuestSteps {
 
 				// Updating interface
 				options.value = result;
-				console.debug({ update: result });
 				this.update();
 			} else {
-				console.debug({ finish: result, this: this });
-
-				this.finish();
+				this.next();
 			}
 		};
 
 		const inputedActivate = options.activate?.bind(options);
-		const listStep = this.dynamic({
-			...options,
-			activate() {
-				/** @type {PlayerDB<QuestDB>} */
-				const { data } = this.player.db();
-				if (typeof data.quest?.additional === "number")
-					options.value = data.quest?.additional;
+		options.activate = function () {
+			if (!this.player) throw new Error("Wrong this!");
+			/** @type {PlayerDB<QuestDB>} */
+			const { data } = this.player.db();
+			if (typeof data.quest?.additional === "number")
+				options.value = data.quest?.additional;
 
-				options.value ??= 0;
+			options.value ??= 0;
 
-				return inputedActivate() ?? { cleanup() {} };
-			},
-			text: () => options.text.bind(options)(options.value),
-		});
+			return inputedActivate?.() ?? { cleanup() {} };
+		};
+		const inputedText = options.text.bind(options);
+		options.text = () => inputedText(options.value);
 
-		// Make access to step this. values
-		Object.setPrototypeOf(options, listStep);
+		this.dynamic(options);
 	}
 
 	/**
@@ -346,7 +348,7 @@ class QuestSteps {
 		this.dynamic({
 			activate: () => {
 				this.player.tell(reason);
-				this.parent.exit(this.player);
+				this.quest.exit(this.player);
 				return { cleanup() {} };
 			},
 			text: () => "",
@@ -357,7 +359,7 @@ class QuestSteps {
 	_end = () => {};
 
 	/**
-	 * @param {(this: QuestSteps) => void} action
+	 * @param {(this: PlayerQuest) => void} action
 	 */
 	end(action) {
 		this._end = action;

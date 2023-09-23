@@ -1,4 +1,56 @@
-import { Entity, Player, world } from "@minecraft/server";
+import { Entity, Player, ScoreboardObjective, world } from "@minecraft/server";
+
+/**
+ * @type {Record<string, {player: Player, proxy: any}>}
+ */
+const players = {};
+Reflect.defineProperty(Player.prototype, "scores", {
+	configurable: false,
+	enumerable: true,
+	get() {
+		/** @type {Player} */
+		const player = this;
+
+		if (players[player.id]) {
+			if (!players[player.id].player.isValid())
+				players[player.id].player = player;
+
+			return players[player.id].proxy;
+		} else {
+			/** @type {(typeof players)[string]} */
+			const obj = {
+				player,
+				proxy: new Proxy(
+					{
+						leafs: 0,
+						money: 0,
+					},
+					{
+						set(_, p, newValue) {
+							if (typeof p === "symbol")
+								throw new Error("Symbol objectives are not accepted");
+
+							if (!obj.player.scoreboardIdentity)
+								obj.player.runCommand(`scoreboard players set @s ${p} 0`);
+
+							ScoreboardDB.objective(p).setScore(obj.player, newValue);
+							return true;
+						},
+						get(_, p) {
+							if (typeof p === "symbol")
+								throw new Error("Symbol objectives are not accepted");
+
+							if (!obj.player.scoreboardIdentity) return 0;
+							return ScoreboardDB.objective(p).getScore(obj.player) ?? 0;
+						},
+					},
+				),
+			};
+
+			return (players[player.id] = obj);
+		}
+	},
+});
 
 export class ScoreboardDB {
 	/**
@@ -12,44 +64,33 @@ export class ScoreboardDB {
 			entity.scoreboardIdentity)
 		);
 	}
+
 	/**
 	 *
+	 * @param {string} name
+	 */
+	static objective(name, displayName = name) {
+		if (name in this.objectives) return this.objectives[name];
+
+		return (this.objectives[name] =
+			world.scoreboard.getObjective(name) ??
+			world.scoreboard.addObjective(name, displayName));
+	}
+
+	/**
+	 * @type {Record<string, ScoreboardObjective>}
+	 */
+	static objectives = {};
+
+	/**
 	 * @param {string} name
 	 * @param {string} [displayName]
 	 */
-	constructor(name, displayName = "a") {
-		displayName = displayName ?? name;
+	constructor(name, displayName = name) {
 		if (name.length > 16) name = name.substring(0, 16);
-		this.name = name;
 
-		try {
-			this.scoreboard = world.scoreboard.addObjective(name, displayName);
-		} catch (e) {
-			this.scoreboard = world.scoreboard.getObjective(name);
-		}
-	}
-	/**
-	 * @param {string} name
-	 * @param {number} value
-	 */
-	nameSet(name, value) {
-		world.overworld.runCommand(
-			`scoreboard players set "${name}" ${this.name} ${value}`,
-		);
-	}
-	/**
-	 *
-	 * @param {string} name
-	 * @returns
-	 */
-	nameGet(name) {
-		try {
-			return this.scoreboard
-				.getScores()
-				.find((e) => e.participant.displayName === name)?.score;
-		} catch (e) {
-			return 0;
-		}
+		this.name = name;
+		this.scoreboard = ScoreboardDB.objective(name, displayName);
 	}
 	/**
 	 *
@@ -68,11 +109,10 @@ export class ScoreboardDB {
 	 * @param {number} value
 	 */
 	add(entity, value) {
-		const score = this.get(entity);
 		const id = ScoreboardDB.ID(entity);
 		if (!id) return;
 
-		this.scoreboard.setScore(id, score + value);
+		this.scoreboard.setScore(id, this.get(entity) + value);
 	}
 	/**
 	 *
@@ -80,62 +120,13 @@ export class ScoreboardDB {
 	 * @returns {number}
 	 */
 	get(entity) {
-		try {
-			if (!entity.scoreboardIdentity) return 0;
-			const result = this.scoreboard.getScore(entity.scoreboardIdentity);
-			if (typeof result !== "number") return 0;
-			else return result;
-		} catch (e) {
-			return 0;
-		}
+		if (!entity.scoreboardIdentity) return 0;
+		return this.scoreboard.getScore(entity.scoreboardIdentity) ?? 0;
 	}
+
 	reset() {
 		world.overworld.runCommand(`scoreboard players reset * ${this.name}`);
 	}
-}
-
-Reflect.defineProperty(Player.prototype, "scores", {
-	configurable: false,
-	enumerable: true,
-	get() {
-		/** @type {Player} */
-		const player = this;
-		return new Proxy(
-			{
-				leafs: 0,
-				money: 0,
-			},
-			{
-				set(_, p, newValue) {
-					if (typeof p === "symbol")
-						throw new Error("Symbol objectives are not accepted");
-
-					if (!player.scoreboardIdentity)
-						player.runCommand(`scoreboard players set @s ${p} 0`);
-
-					objective(p).setScore(player, newValue);
-					return true;
-				},
-				get(_, p) {
-					if (typeof p === "symbol")
-						throw new Error("Symbol objectives are not accepted");
-
-					if (!player.scoreboardIdentity) return 0;
-					return objective(p).getScore(player);
-				},
-			},
-		);
-	},
-});
-
-/**
- *
- * @param {string} p
- */
-function objective(p) {
-	return (
-		world.scoreboard.getObjective(p) ?? world.scoreboard.addObjective(p, p)
-	);
 }
 
 /*

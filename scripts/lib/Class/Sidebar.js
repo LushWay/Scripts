@@ -60,7 +60,6 @@ export class Sidebar {
 	 * @param {Player} player
 	 */
 	update(player) {
-		this.onupdate.forEach((e) => e());
 		let content = "";
 		for (let line of this.content) {
 			if (typeof line === "function") line = line(player);
@@ -70,9 +69,6 @@ export class Sidebar {
 		}
 		player.onScreenDisplay.setActionBar(content);
 	}
-
-	/** @type {Set<() => void>} */
-	onupdate = new Set();
 
 	updateAll() {
 		const players = world.getAllPlayers();
