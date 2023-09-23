@@ -1,4 +1,4 @@
-import { Entity, world } from "@minecraft/server";
+import { Entity, Player, world } from "@minecraft/server";
 
 export class ScoreboardDB {
 	/**
@@ -92,6 +92,50 @@ export class ScoreboardDB {
 	reset() {
 		world.overworld.runCommand(`scoreboard players reset * ${this.name}`);
 	}
+}
+
+Reflect.defineProperty(Player.prototype, "scores", {
+	configurable: false,
+	enumerable: true,
+	get() {
+		/** @type {Player} */
+		const player = this;
+		return new Proxy(
+			{
+				leafs: 0,
+				money: 0,
+			},
+			{
+				set(_, p, newValue) {
+					if (typeof p === "symbol")
+						throw new Error("Symbol objectives are not accepted");
+
+					if (!player.scoreboardIdentity)
+						player.runCommand(`scoreboard players set @s ${p} 0`);
+
+					objective(p).setScore(player, newValue);
+					return true;
+				},
+				get(_, p) {
+					if (typeof p === "symbol")
+						throw new Error("Symbol objectives are not accepted");
+
+					if (!player.scoreboardIdentity) return 0;
+					return objective(p).getScore(player);
+				},
+			},
+		);
+	},
+});
+
+/**
+ *
+ * @param {string} p
+ */
+function objective(p) {
+	return (
+		world.scoreboard.getObjective(p) ?? world.scoreboard.addObjective(p, p)
+	);
 }
 
 /*

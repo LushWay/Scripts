@@ -14,7 +14,6 @@ world.beforeEvents.explosion.subscribe((data) => {
 
 const RAID = new ScoreboardDB("raid", "Raid");
 new LockAction(
-	"raid",
 	(player) => RAID.get(player) > 0,
 	"Вы находитесь в режиме рейдблока.",
 );

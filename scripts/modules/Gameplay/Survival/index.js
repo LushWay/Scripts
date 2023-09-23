@@ -3,17 +3,13 @@ import {
 	ItemStack,
 	MinecraftBlockTypes,
 	MinecraftItemTypes,
+	Player,
 	Vector,
 	system,
 	world,
 } from "@minecraft/server";
 import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
-import {
-	EditableLocation,
-	InventoryStore,
-	Options,
-	util,
-} from "../../../xapi.js";
+import { EditableLocation, InventoryStore, util } from "../../../xapi.js";
 import { MENU } from "../../Server/Menu/var.js";
 import { JOIN } from "../../Server/OnJoin/var.js";
 import { RadiusRegion, Region } from "../../Server/Region/Region.js";
@@ -76,54 +72,75 @@ JOIN.CONFIG.title_animation = {
 };
 JOIN.CONFIG.subtitle = "Добро пожаловать!";
 
-const StartAxeItem = new ItemStack(MinecraftItemTypes.woodenAxe);
-StartAxeItem.setCanDestroy(
-	Object.entries(MinecraftBlockTypes)
-		.filter((e) => e[0].match(/log/i))
-		.map((e) => e[1].id),
-);
-StartAxeItem.nameTag = "Начальный топор";
-StartAxeItem.setLore(["§r§7Начальный топор"]);
-
-const SpawnInventory = {
-	xp: 0,
-	health: 20,
-	equipment: {},
-	slots: [MENU.item],
-};
+for (const key of Object.keys(JOIN.EVENT_DEFAULTS)) {
+	JOIN.EVENTS[key].unsubscribe(JOIN.EVENT_DEFAULTS[key]);
+}
 
 JOIN.EVENTS.firstTime.subscribe((player) => {
 	player.getComponent("inventory").container.addItem(MENU.item);
 });
 
-const SpawnLocation = new EditableLocation("spawn", {
-	fallback: new Vector(0, 200, 0),
-});
-if (SpawnLocation.valid) {
+export const Spawn = {
+	startAxeItem: new ItemStack(MinecraftItemTypes.woodenAxe),
+	startAxeCanBreak: Object.entries(MinecraftBlockTypes)
+		.filter((e) => e[0].match(/log/i))
+		.map((e) => e[1].id),
+	inventory: {
+		xp: 0,
+		health: 20,
+		equipment: {},
+		slots: [MENU.item],
+	},
+	location: new EditableLocation("spawn", {
+		fallback: new Vector(0, 200, 0),
+	}),
+	/** @type {undefined | Region} */
+	region: void 0,
+};
+
+Spawn.startAxeItem.setCanDestroy(Spawn.startAxeCanBreak);
+Spawn.startAxeItem.nameTag = "Начальный топор";
+Spawn.startAxeItem.setLore(["§r§7Начальный топор"]);
+
+/**
+ *
+ * @param {Player} player
+ */
+function spawnInventory(player) {
+	/** @type {PlayerDB<DB>} */
+	const { save, data } = player.db();
+	let needSave = false;
+
+	if (data.inv === "anarchy") {
+		Anarchy.inventory.saveFromEntity(player, {
+			rewrite: false,
+			keepInventory: false,
+		});
+		data.anarchy = Vector.floor(player.location);
+		needSave = true;
+	}
+
+	if (data.inv !== "spawn") {
+		InventoryStore.load({ to: player, from: Spawn.inventory });
+		data.inv = "spawn";
+		needSave = true;
+	}
+
+	if (needSave) save();
+}
+
+if (Spawn.location.valid) {
 	new Portal("spawn", null, null, (player) => {
 		if (!Portal.canTeleport(player)) return;
-		/** @type {PlayerDB<DB>} */
-		const { save, data } = player.db();
+		spawnInventory(player);
 
-		if (data.inv === "anarchy") {
-			AnarchyInventory.saveFromEntity(player);
-			data.anarchy = Vector.floor(player.location);
-		}
-
-		if (data.inv !== "spawn") {
-			InventoryStore.load(player, SpawnInventory);
-			data.inv = "spawn";
-		}
-
-		save();
-		player.teleport(SpawnLocation);
+		player.teleport(Spawn.location);
 	});
-	world.setDefaultSpawnLocation(SpawnLocation);
-	let spawnregion = Region.locationInRegion(SpawnLocation, "overworld");
-	if (!spawnregion || !(spawnregion instanceof RadiusRegion)) {
-		verbose = true;
-		spawnregion = new RadiusRegion(
-			{ x: SpawnLocation.x, z: SpawnLocation.z, y: SpawnLocation.y },
+	world.setDefaultSpawnLocation(Spawn.location);
+	Spawn.region = Region.locationInRegion(Spawn.location, "overworld");
+	if (!Spawn.region || !(Spawn.region instanceof RadiusRegion)) {
+		Spawn.region = new RadiusRegion(
+			{ x: Spawn.location.x, z: Spawn.location.z, y: Spawn.location.y },
 			200,
 			"overworld",
 			{
@@ -134,24 +151,11 @@ if (SpawnLocation.valid) {
 				owners: [],
 			},
 		);
-		verbose = false;
 	}
 	system.runPlayerInterval(
 		(player) => {
-			if (spawnregion && spawnregion.vectorInRegion(player.location)) {
-				/** @type {PlayerDB<DB>} */
-				const { save, data } = player.db();
-				if (data.inv !== "spawn") {
-					if (data.inv === "anarchy") {
-						AnarchyInventory.saveFromEntity(player, {
-							rewrite: true,
-							keepInventory: false,
-						});
-					}
-					InventoryStore.load(player, SpawnInventory);
-					data.inv = "spawn";
-					save();
-				}
+			if (Spawn.region && Spawn.region.vectorInRegion(player.location)) {
+				spawnInventory(player);
 
 				player.addEffect(MinecraftEffectTypes.Saturation, 1, {
 					amplifier: 255,
@@ -163,23 +167,30 @@ if (SpawnLocation.valid) {
 		20,
 	);
 }
-const AnarchyCenter = new EditableLocation("anarchy_center");
-if (AnarchyCenter.valid) {
+
+export const Anarchy = {
+	centerLocation: new EditableLocation("anarchy_center"),
+	portalLocation: new EditableLocation("anarchy"),
+	inventory: new InventoryStore("anarchy"),
+	/** @type {undefined | Portal} */
+	portal: void 0,
+};
+if (Anarchy.centerLocation.valid) {
 	system.runInterval(
 		() => {
 			const players = world.getPlayers();
 			const radius = players.length * 50;
 
 			const rmax = {
-				x: AnarchyCenter.x + radius,
+				x: Anarchy.centerLocation.x + radius,
 				y: 0,
-				z: AnarchyCenter.z + radius,
+				z: Anarchy.centerLocation.z + radius,
 			};
 
 			const rmin = {
-				x: AnarchyCenter.x - radius,
+				x: Anarchy.centerLocation.x - radius,
 				y: 0,
-				z: AnarchyCenter.z - radius,
+				z: Anarchy.centerLocation.z - radius,
 			};
 
 			for (const p of players) {
@@ -248,15 +259,8 @@ if (AnarchyCenter.valid) {
 				)
 					return zone.warn(p, false, rmin);
 
-				/** @type {PlayerDB<DB>} */
-				const { data, save } = p.db();
-				if (data.inv !== "anarchy") {
-					if (p.id in AnarchyInventory._.STORES) {
-						InventoryStore.load(p, AnarchyInventory.getEntityStore(p.id, true));
-						data.inv = "anarchy";
-						save();
-					}
-				}
+				// TODO detect if player in the zone
+				// anarchyInventory(p, p.db());
 			}
 		},
 		"zone",
@@ -264,29 +268,33 @@ if (AnarchyCenter.valid) {
 	);
 }
 
-for (const key of Object.keys(JOIN.EVENT_DEFAULTS)) {
-	JOIN.EVENTS[key].unsubscribe(JOIN.EVENT_DEFAULTS[key]);
+/**
+ *
+ * @param {Player} player
+ * @param {PlayerDB<DB>} param1
+ */
+function anarchyInventory(player, { data, save }, ss = true) {
+	if (data.inv !== "anarchy") {
+		if (player.id in Anarchy.inventory._.STORES) {
+			InventoryStore.load({
+				to: player,
+				from: Anarchy.inventory.getEntityStore(player.id, true),
+			});
+			data.inv = "anarchy";
+			if (ss) save();
+		}
+	}
 }
-
-const getSettings = Options.player("Телепорт", "Atp", {
-	showCoordinates: {
-		name: "Показать координаты",
-		desc: "Выключите если вы стример",
-		value: true,
-	},
-});
 
 /**
  * @typedef {{anarchy?: Vector3, inv: "anarchy" | "spawn" | "mg"}} DB
  */
 
-const AnarchyInventory = new InventoryStore("anarchy");
-const AnarchyPortalLocation = new EditableLocation("anarchy");
-if (AnarchyPortalLocation.valid) {
-	new Portal(
+if (Anarchy.portalLocation.valid) {
+	Anarchy.portal = new Portal(
 		"anarchy",
-		Vector.add(AnarchyPortalLocation, { x: 0, y: -1, z: -1 }),
-		Vector.add(AnarchyPortalLocation, { x: 0, y: 1, z: 1 }),
+		Vector.add(Anarchy.portalLocation, { x: 0, y: -1, z: -1 }),
+		Vector.add(Anarchy.portalLocation, { x: 0, y: 1, z: 1 }),
 		(player) => {
 			if (!Portal.canTeleport(player)) return;
 			/** @type {PlayerDB<DB>} */
@@ -298,48 +306,40 @@ if (AnarchyPortalLocation.valid) {
 
 			system.run(() =>
 				util.catch(() => {
-					if (!data.anarchy) {
-						InventoryStore.load(
-							player,
-							{
-								equipment: {},
-								health: 20,
-								xp: 0,
-								slots: [StartAxeItem],
-							},
-							{ clearAll: true },
-						);
+					if (!data.anarchy || !(player.id in Anarchy.inventory._.STORES)) {
 						randomTeleport(
 							player,
 							{ x: 500, y: 0, z: 500 },
 							{ x: 1500, y: 0, z: 1500 },
 							{
 								elytra: true,
-								teleportCallback(loc) {
-									if (getSettings(player).showCoordinates)
-										player.tell(
-											`§aВы были перемещены на ${Vector.string(loc)}. `,
-										);
-									else player.tell("§aВы были перемещены.");
-									player.tell("§eРаскройте элитры для быстрого падения!");
+								teleportCallback() {
+									player.tell("§a> §fВы были перемещены.");
 									player.playSound("note.pling");
 								},
 								keepInSkyTime: 20,
 							},
 						);
+
+						InventoryStore.load({
+							from: {
+								equipment: {},
+								health: 20,
+								xp: 0,
+								slots: [Spawn.startAxeItem],
+							},
+							to: player,
+							clearAll: true,
+						});
 						data.inv = "anarchy";
+						save();
 					} else {
-						InventoryStore.load(
-							player,
-							AnarchyInventory.getEntityStore(player.id),
-						);
-						data.inv = "anarchy";
+						anarchyInventory(player, { data, save }, false);
 
 						player.teleport(data.anarchy);
 						delete data.anarchy;
+						save();
 					}
-
-					save();
 				}),
 			);
 		},

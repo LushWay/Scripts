@@ -1,5 +1,5 @@
 import { Player, Vector } from "@minecraft/server";
-import { LockAction, PlaceAction } from "xapi.js";
+import { LockAction, Place } from "xapi.js";
 import { Minigame } from "../Minigames/Builder.js";
 
 /**
@@ -92,7 +92,7 @@ export class Portal {
 
 		if (from && to) {
 			for (const pos of Vector.foreach(from, to)) {
-				new PlaceAction(pos, (p) => this.teleport(p));
+				Place.action(pos, (p) => this.teleport(p));
 			}
 		}
 	}

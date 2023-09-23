@@ -149,6 +149,15 @@ export const util = {
 		 * @param {any} value
 		 */
 		function rep(value) {
+			if (visited.has(value)) {
+				// Circular structure detected
+				return "§b<Circular>§r";
+			} else {
+				try {
+					visited.add(value);
+				} catch (e) {}
+			}
+
 			switch (typeof value) {
 				case "function":
 					/**
@@ -210,16 +219,6 @@ export const util = {
 
 				case "object":
 					if (Array.isArray(value)) break;
-
-					if (visited.has(value)) {
-						// Circular structure detected
-						value = "{...}";
-						break;
-					}
-
-					try {
-						visited.add(value);
-					} catch (e) {}
 
 					/** @type {any} */
 					const allInherits = {};

@@ -20,6 +20,7 @@ const modules = [
 	/**
 	 * Development modules:
 	 */
+	"../lib/Class/Quest.js",
 	"./Development/GameTest/index.js",
 	"./Development/Test/index.js",
 	"./Development/WorldEdit/index.js",

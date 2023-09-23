@@ -94,3 +94,10 @@ declare global {
 			: b[P];
 	};
 }
+
+declare module "@minecraft/server" {
+	type ScoreNames = "money" | "leafs";
+	interface Player {
+		scores: Record<ScoreNames, number>;
+	}
+}

@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector } from "@minecraft/server";
 import { Database } from "../Database/Rubedo.js";
 import { util } from "../util.js";
 
@@ -128,42 +128,44 @@ export class EditableLocation {
 	 *
 	 * @param {string} id
 	 * @param {Object} [options]
-	 * @param {boolean | Vector3} [options.fallback]
+	 * @param {false | Vector3} [options.fallback]
 	 */
 	constructor(id, { fallback = false } = {}) {
 		this.id = id;
-		let location = WORLD_OPTIONS.get(EditableLocation.OPTION_KEY)[id];
+		let rawLocation = WORLD_OPTIONS.get(EditableLocation.OPTION_KEY)[id];
 		Options.WORLD[EditableLocation.OPTION_KEY][id] = {
 			desc: `Позиция ${id}`,
 			name: id,
-			value: fallback ? fallback : {},
+			value: fallback ? Vector.string(fallback) : "",
 		};
 
-		if (
-			!location ||
-			(typeof location === "object" && Object.keys(location).length === 0)
-		) {
-			if (!fallback) {
+		let location =
+			typeof rawLocation === "string"
+				? rawLocation.split(" ").map(Number)
+				: void 0;
+
+		if (!rawLocation) {
+			if (fallback === false) {
 				console.warn(
 					"§eSet location §f" + id + "§e used in\n" + util.error.stack.get(),
 				);
 				this.valid = false;
 				return;
-			} else location = fallback;
+			} else {
+				location = [fallback.x, fallback.y, fallback.z];
+			}
 		}
-		if (
-			typeof location !== "object" ||
-			!["x", "y", "z"].every((pos) => Object.keys(location).includes(pos))
-		) {
+
+		if (!location || location.length !== 3) {
 			util.error(new TypeError("Invalid location"));
-			console.error(util.inspect(location));
+			console.error(util.inspect(rawLocation));
 			this.valid = false;
 			return;
 		}
 
-		this.x = location.x;
-		this.y = location.y;
-		this.z = location.z;
+		this.x = location[0];
+		this.y = location[1];
+		this.z = location[2];
 	}
 }
 

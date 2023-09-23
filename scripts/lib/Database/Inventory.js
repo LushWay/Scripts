@@ -36,12 +36,12 @@ const TABLE_TYPE = "inventory";
 export class InventoryStore {
 	/**
 	 * The function loads equipment and inventory items from inventory object to entity in a game.
-	 * @param {Player} to - The entity that is receiving the equipment and inventory items being loaded.
-	 * @param {Inventory} from - The object from which the equipment and inventory items are being loaded.
 	 * @param {object} o
+	 * @param {Player} o.to - The entity that is receiving the equipment and inventory items being loaded.
+	 * @param {Inventory} o.from - The object from which the equipment and inventory items are being loaded.
 	 * @param {boolean} [o.clearAll] - Boolean that determines clear entity inventory before loading or not
 	 */
-	static load(to, from, { clearAll = true } = {}) {
+	static load({to, from, clearAll = true }) {
 		const equipment = to.getComponent("equipment_inventory");
 		equipment.setEquipment(EquipmentSlot.offhand, from.equipment.offhand);
 		equipment.setEquipment(EquipmentSlot.head, from.equipment.head);

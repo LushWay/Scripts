@@ -23,9 +23,8 @@ const DB = XA.tables.player;
  */
 const IN_SKY = new Set();
 new LockAction(
-	"teleportWaiting",
 	(player) => IN_SKY.has(player.id),
-	"§cВ начале коснитесь земли!"
+	"§cВ начале коснитесь земли!",
 );
 
 /**
@@ -55,7 +54,7 @@ export function randomTeleport(
 		c = 0,
 		teleportCallback = () => {},
 		keepInSkyTime = 5,
-	}
+	},
 ) {
 	const x = ~~Math.randomInt(from.x, to.x);
 	const z = ~~Math.randomInt(from.z, to.z);
@@ -82,7 +81,7 @@ export function randomTeleport(
 			facingLocation: { x, y: y - 10, z },
 			keepVelocity: false,
 			dimension: world[dimension],
-		}
+		},
 	);
 	util.catch(() => {
 		teleportCallback({ x, y, z });
@@ -96,7 +95,7 @@ export function randomTeleport(
 			{
 				amplifier: 1,
 				showParticles: false,
-			}
+			},
 		);
 	}
 
@@ -154,7 +153,7 @@ system.runInterval(
 		for (const player of players) clearElytra(player);
 	},
 	"clear rtp elytra",
-	20
+	20,
 );
 
 /**

@@ -1,5 +1,4 @@
 import { Player } from "@minecraft/server";
-import { LockAction } from "../../../xapi.js";
 
 export class Minigame {
 	/** @type {Record<string, Minigame>} */

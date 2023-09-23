@@ -182,7 +182,7 @@ getComponent<N extends keyof EntityComponents>(
  * leafs/patch-modules.js
  * 
  * New methods assigments can be finded in 
- * scripts/lib/Setup/prototypes.js 
+ * scripts/lib/Extensions
  */
 
 /**
@@ -365,7 +365,7 @@ type EntityComponents = {
  * leafs/patch-modules.js
  * 
  * New methods assigments can be finded in 
- * scripts/lib/Setup/prototypes.js 
+ * scripts/lib/Extensions
  */`,
 	},
 });

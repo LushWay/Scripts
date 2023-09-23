@@ -14,7 +14,7 @@ import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModalForm.js";
-import { DB, GameUtils, XShowForm, util } from "xapi.js";
+import { DB, GameUtils, Place, XShowForm, util } from "xapi.js";
 import { ChestFormData } from "../../../chestui/forms.js";
 import { APIRequest } from "../../../lib/Class/Net.js";
 import { generateOre } from "../../Gameplay/Survival/ore.js";
@@ -77,7 +77,7 @@ const tests = {
 					date.getSeconds() +
 					"ss " +
 					date.getMilliseconds() +
-					"ms"
+					"ms",
 			);
 		}
 	},
@@ -103,7 +103,7 @@ const tests = {
 					index: e.getDynamicProperty("index"),
 					data,
 				};
-			})
+			}),
 		);
 	},
 	45(ctx) {
@@ -153,13 +153,13 @@ const tests = {
 				block.dimension.spawnParticle(
 					"minecraft:colored_flame_particle",
 					Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-					variables
+					variables,
 				);
 
 				if (c >= 6) system.clearRun(id);
 			},
 			"test",
-			10
+			10,
 		);
 	},
 	50(ctx) {
@@ -213,7 +213,7 @@ const tests = {
 					},
 					iconPath: "minecraft:anvil",
 				},
-			}
+			},
 		);
 		XShowForm(form, ctx.sender);
 	},
@@ -229,6 +229,10 @@ const tests = {
 				.getBlock(position)
 				?.setType(MinecraftBlockTypes.stone);
 		}
+	},
+	54(ctx) {
+		Place.action(Vector.floor(ctx.sender.location), (p) => p.tell("1"));
+		Place.action(Vector.floor(ctx.sender.location), (p) => p.tell("2"));
 	},
 };
 
