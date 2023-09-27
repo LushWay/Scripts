@@ -2,41 +2,41 @@
 # yarn lockfile v1
 
 
-"@minecraft/server-admin@1.0.0-beta.1.20.10-stable":
-  version "1.0.0-beta.1.20.10-stable"
-  resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.1.20.10-stable.tgz#9cc4228cf4aa7fec17a3b92533c808e61f85eee3"
-  integrity sha512-xY4HFpWptf0HkHyJ+qTWjDCYZoHOeDLB/wKTfl00QgbHzjJM1jy6kKoqlvokXWgJKzoy/b8p37b5ztXHhGBeMQ==
+"@minecraft/server-admin@1.0.0-beta.1.20.30-stable":
+  version "1.0.0-beta.1.20.30-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.1.20.30-stable.tgz#a1b8f765672f1f8a0b37dc08d83a6b5d0ad61b48"
+  integrity sha512-8kHB8g6psZWr4MCorwazCsNWhBajMqDQPAtKWlzASN0nCIa4HpwHJ0zc8lQl27TZyISGxLifpeoBbjKE7xGWWw==
 
-"@minecraft/server-admin@^1.0.0-beta.1.20.10-stable":
+"@minecraft/server-admin@^1.0.0-beta.1.20.30-stable":
   version "1.0.0-beta.11940b24"
   resolved "https://registry.yarnpkg.com/@minecraft/server-admin/-/server-admin-1.0.0-beta.11940b24.tgz#9c37bbeb41cf6bb65e60a819f82b19ade1ae0f36"
   integrity sha512-UZ8YyB8mvF31f22+uM67gJums9d6NDgz9AQ2l4a++EHUP9uen0m3aaBaqM9RyumJpRBJbv/hslAKOyeDT01qew==
 
-"@minecraft/server-gametest@1.0.0-beta.1.20.10-stable":
-  version "1.0.0-beta.1.20.10-stable"
-  resolved "https://registry.yarnpkg.com/@minecraft/server-gametest/-/server-gametest-1.0.0-beta.1.20.10-stable.tgz#1fb444e2876023c13743f1392ec247ae77cffb74"
-  integrity sha512-7E5mkOGL+m0EiKYmnVK1x0Kge7SNZwIGsHKL3Wigcrgga2LALq+xff5y7hSs87goddDxZfDsyFxVD0uQovOR1g==
+"@minecraft/server-gametest@1.0.0-beta.1.20.30-stable":
+  version "1.0.0-beta.1.20.30-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-gametest/-/server-gametest-1.0.0-beta.1.20.30-stable.tgz#792184f0d1feecd59cd06347be314813d5c986ef"
+  integrity sha512-lZr+daZO3xFP8QwAUi3efs4JWgBY1hpLTzDJOT19940LhEdKd99CxlM52dmUNMoryRgsgfHnUKMIuEqsvggZ8w==
   dependencies:
-    "@minecraft/server" "^1.4.0-beta.1.20.10-stable"
+    "@minecraft/server" "^1.6.0-beta.1.20.30-stable"
 
-"@minecraft/server-net@1.0.0-beta.1.20.10-stable":
-  version "1.0.0-beta.1.20.10-stable"
-  resolved "https://registry.yarnpkg.com/@minecraft/server-net/-/server-net-1.0.0-beta.1.20.10-stable.tgz#36a7b6114277d3a3539c2b660be0481a0c9ff182"
-  integrity sha512-1UW6Qyh3uLkaAILm6yXtH2WCI0lZTNyhelDCPDXuqcRgveWOrgPPIzJNJSYMUWc6Z9BQkMR3yTvHUCjPEgiNIA==
+"@minecraft/server-net@1.0.0-beta.1.20.30-stable":
+  version "1.0.0-beta.1.20.30-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-net/-/server-net-1.0.0-beta.1.20.30-stable.tgz#7e7e7b6d9356cce671c783e15016e8b1551ae831"
+  integrity sha512-qQ/3+2o0I2ozbSQBHoDT9nLPYeULQxTIyFM89yMBW5fqdmUnPnVotK+O91KURgJOE3P3VYfF0LNmJqFZz7Irfw==
   dependencies:
-    "@minecraft/server-admin" "^1.0.0-beta.1.20.10-stable"
+    "@minecraft/server-admin" "^1.0.0-beta.1.20.30-stable"
 
-"@minecraft/server-ui@1.2.0-beta.1.20.10-stable":
-  version "1.2.0-beta.1.20.10-stable"
-  resolved "https://registry.yarnpkg.com/@minecraft/server-ui/-/server-ui-1.2.0-beta.1.20.10-stable.tgz#64193b56a0ac55772a20fdd4dbcf38521bf8cf8b"
-  integrity sha512-ciStJuaHMxQhddJzZPiaJJBi6LjVEugr5LoamUaQhdd2qfgILAz/k3Nfwsx7YYDSTrg6jmMrAj4+Na5IJ7VITw==
+"@minecraft/server-ui@1.2.0-beta.1.20.30-stable":
+  version "1.2.0-beta.1.20.30-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server-ui/-/server-ui-1.2.0-beta.1.20.30-stable.tgz#5cbf7d1498fc6e44eed6a85a5b84ec799cba4cee"
+  integrity sha512-0Sk3qFwOmMpihk/q5LTlpi4TfsuM6I/3PbMz1ijM/3zFP49CgXu9ZyDAYT6gQAOtnBIaQBM0Y7BFVrwtxDoMYw==
   dependencies:
-    "@minecraft/server" "^1.4.0-beta.1.20.10-stable"
+    "@minecraft/server" "^1.6.0-beta.1.20.30-stable"
 
-"@minecraft/server@1.4.0-beta.1.20.10-stable", "@minecraft/server@^1.4.0-beta.1.20.10-stable":
-  version "1.4.0-beta.1.20.10-stable"
-  resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.4.0-beta.1.20.10-stable.tgz#4c326a55b360b6351c1704389cbb90a7fc1205d5"
-  integrity sha512-GFxR3rc83fLG4G1QV51D6a7V1EylomZrUMO1oUNINhkMpNBe2ACA9CBpLpkixxg0Y3aDpUnTkuhjQpoMnekPSA==
+"@minecraft/server@1.6.0-beta.1.20.30-stable", "@minecraft/server@^1.6.0-beta.1.20.30-stable":
+  version "1.6.0-beta.1.20.30-stable"
+  resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.6.0-beta.1.20.30-stable.tgz#53ca52c2c4636b88217f09f9db39e056dcdea015"
+  integrity sha512-hvRjxbI7cl7LVAv+wmw253O6IHFUVBEMvTl+FJLnUaQv9f/JkGBaVDKgyH0yR7G1SMgVLRoQIA5CM8IZWYDHew==
 
 leafy-utils@^5.1.1:
   version "5.1.5"

@@ -88,33 +88,33 @@ export function loadRegionsWithGuards(
 	/**
 	 * Permissions for region
 	 */
-	world.afterEvents.blockBreak.subscribe(
-		({ player, block, brokenBlockPermutation, dimension }) => {
-			const region = Region.locationInRegion(
-				block.location,
-				player.dimension.type,
-			);
 
-			if (
-				allowed(player, region, {
-					type: "break",
-					event: { player, block, brokenBlockPermutation, dimension },
-				})
-			)
-				return;
+	world.beforeEvents.playerBreakBlock.subscribe((event) => {
+		event.cancel;
+		const region = Region.locationInRegion(
+			event.block.location,
+			event.player.dimension.type,
+		);
 
-			// setting block back
-			block.setPermutation(brokenBlockPermutation);
-			if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
-				// setting chest inventory back
-				const { container } = block.getComponent("inventory");
-				forEachItemAt(dimension, block.location, (e) => {
-					container.addItem(e.getComponent("item").itemStack);
-					e.kill();
-				});
-			} else forEachItemAt(dimension, block.location);
-		},
-	);
+		if (
+			allowed(player, region, {
+				type: "break",
+				event: { player, block, brokenBlockPermutation, dimension },
+			})
+		)
+			return;
+
+		// setting block back
+		block.setPermutation(brokenBlockPermutation);
+		if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
+			// setting chest inventory back
+			const { container } = block.getComponent("inventory");
+			forEachItemAt(dimension, block.location, (e) => {
+				container.addItem(e.getComponent("item").itemStack);
+				e.kill();
+			});
+		} else forEachItemAt(dimension, block.location);
+	});
 
 	world.afterEvents.entitySpawn.subscribe(({ entity }) => {
 		const typeId = GameUtils.safeGetTypeID(entity);
