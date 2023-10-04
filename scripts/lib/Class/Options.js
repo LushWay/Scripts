@@ -1,5 +1,5 @@
 import { Player, Vector } from "@minecraft/server";
-import { Database } from "../Database/Rubedo.js";
+import { WorldDynamicPropertiesKey } from "lib/Database/Properties.js";
 import { util } from "../util.js";
 
 export const OPTIONS_NAME = Symbol("name");
@@ -19,21 +19,24 @@ export const OPTIONS_NAME = Symbol("name");
  * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OPTIONS_NAME]?: string}} DefaultOptions
  */
 
-/** @typedef {Database<string, Record<string, OptionValue>>} OPTIONS_DB */
-/** @type {OPTIONS_DB} */
-const PLAYER_DB = new Database("player", {
+/** @typedef {WorldDynamicPropertiesKey<string, Record<string, OptionValue>>} OPTIONS_DYN */
+/** @typedef {ReturnType<OPTIONS_DYN["proxy"]>} OPTIONS_DB */
+/** @type {OPTIONS_DYN} */
+const PLAYER_DYN = new WorldDynamicPropertiesKey("player", {
 	defaultValue: () => {
 		return {};
 	},
 });
+const PLAYER_DB = PLAYER_DYN.proxy();
 
 /** @typedef {DefaultOptions<OptionValue> & Record<string, { requires?: boolean }>} WorldOptions */
-/** @type {OPTIONS_DB} */
-const WORLD_OPTIONS = new Database("options", {
+/** @type {OPTIONS_DYN} */
+const WORLD_OPTIONS_DYN = new WorldDynamicPropertiesKey("options", {
 	defaultValue: () => {
 		return {};
 	},
 });
+const WORLD_OPTIONS = WORLD_OPTIONS_DYN.proxy();
 
 export class Options {
 	/** @type {Record<string, DefaultOptions<boolean>>} */
@@ -106,12 +109,12 @@ function generateOptionsProxy(database, prefix, CONFIG, player = null) {
 			configurable: false,
 			enumerable: true,
 			get() {
-				return database.get(prefix)?.[key] ?? CONFIG[prop].value;
+				return database[prefix]?.[key] ?? CONFIG[prop].value;
 			},
 			set(v) {
-				const value = database.get(prefix) ?? {};
+				const value = database[prefix] ?? {};
 				value[key] = v;
-				database.set(prefix, value);
+				database[prefix] = value;
 			},
 		});
 	}
@@ -132,7 +135,7 @@ export class EditableLocation {
 	 */
 	constructor(id, { fallback = false } = {}) {
 		this.id = id;
-		let rawLocation = WORLD_OPTIONS.get(EditableLocation.OPTION_KEY)[id];
+		let rawLocation = WORLD_OPTIONS[EditableLocation.OPTION_KEY][id];
 		Options.WORLD[EditableLocation.OPTION_KEY][id] = {
 			desc: `Позиция ${id}`,
 			name: id,

@@ -2,10 +2,10 @@ import {
 	Entity,
 	EquipmentSlot,
 	ItemStack,
-	MinecraftItemTypes,
 	Player,
 	system,
 } from "@minecraft/server";
+import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
 import { util } from "../util.js";
 import { DB, DatabaseError } from "./Default.js";
 
@@ -41,13 +41,13 @@ export class InventoryStore {
 	 * @param {Inventory} o.from - The object from which the equipment and inventory items are being loaded.
 	 * @param {boolean} [o.clearAll] - Boolean that determines clear entity inventory before loading or not
 	 */
-	static load({to, from, clearAll = true }) {
-		const equipment = to.getComponent("equipment_inventory");
-		equipment.setEquipment(EquipmentSlot.offhand, from.equipment.offhand);
-		equipment.setEquipment(EquipmentSlot.head, from.equipment.head);
-		equipment.setEquipment(EquipmentSlot.chest, from.equipment.chest);
-		equipment.setEquipment(EquipmentSlot.legs, from.equipment.legs);
-		equipment.setEquipment(EquipmentSlot.feet, from.equipment.feet);
+	static load({ to, from, clearAll = true }) {
+		const equipment = to.getComponent("equippable");
+		equipment.setEquipment(EquipmentSlot.Offhand, from.equipment.Offhand);
+		equipment.setEquipment(EquipmentSlot.Head, from.equipment.Head);
+		equipment.setEquipment(EquipmentSlot.Chest, from.equipment.Chest);
+		equipment.setEquipment(EquipmentSlot.Legs, from.equipment.Legs);
+		equipment.setEquipment(EquipmentSlot.Feet, from.equipment.Feet);
 
 		to.resetLevel();
 		to.addExperience(from.xp);
@@ -64,12 +64,12 @@ export class InventoryStore {
 	/**
 	 * The function returns an object containing the equipment and inventory slots of a game entity.
 	 * @param {Player} from - The entity  from which we are retrieving the
-	 * equipment and inventory information. It is used to access the "equipment_inventory" and "inventory"
+	 * equipment and inventory information. It is used to access the "equippable" and "inventory"
 	 * components of the entity.
 	 * @returns {Inventory}
 	 */
 	static get(from) {
-		const equipment = from.getComponent("equipment_inventory");
+		const equipment = from.getComponent("equippable");
 		const { container } = from.getComponent("inventory");
 		const xp = from.getTotalXp();
 		const health = from.getComponent("health").currentValue;
@@ -78,11 +78,11 @@ export class InventoryStore {
 			xp,
 			health,
 			equipment: {
-				offhand: equipment.getEquipment(EquipmentSlot.offhand),
-				head: equipment.getEquipment(EquipmentSlot.head),
-				chest: equipment.getEquipment(EquipmentSlot.chest),
-				legs: equipment.getEquipment(EquipmentSlot.legs),
-				feet: equipment.getEquipment(EquipmentSlot.feet),
+				Offhand: equipment.getEquipment(EquipmentSlot.Offhand),
+				Head: equipment.getEquipment(EquipmentSlot.Head),
+				Chest: equipment.getEquipment(EquipmentSlot.Chest),
+				Legs: equipment.getEquipment(EquipmentSlot.Legs),
+				Feet: equipment.getEquipment(EquipmentSlot.Feet),
 			},
 			// @ts-expect-error
 			slots: new Array(container.size)
@@ -147,8 +147,7 @@ export class InventoryStore {
 		let owner = "";
 
 		for (const item of items) {
-			const lore = item.getLore();
-			const raw = lore[0];
+			const raw = item.getLore().join('');
 
 			// Finding manifest
 			if (raw && raw[0] === "{" && raw[raw.length - 1] === "}") {
@@ -236,8 +235,10 @@ export class InventoryStore {
 				items[storeIndex + move] = stack;
 			}
 
-			const item = new ItemStack(MinecraftItemTypes.acaciaBoat);
-			item.setLore([JSON.stringify(manifest)]);
+			const item = new ItemStack(MinecraftItemTypes.AcaciaBoat);
+			const save = JSON.stringify(manifest).match(DB.CHUNK_REGEXP)
+			if (!save) throw new DatabaseError("Failed to split save to chunks")
+			item.setLore(save);
 			items[storeIndex] = item;
 		}
 

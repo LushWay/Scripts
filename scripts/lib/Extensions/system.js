@@ -1,5 +1,5 @@
 import { System, world } from "@minecraft/server";
-import { util } from "xapi.js";
+import { util } from "../util.js";
 import { OverTakes } from "./import.js";
 
 /**

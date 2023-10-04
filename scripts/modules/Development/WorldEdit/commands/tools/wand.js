@@ -22,15 +22,15 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
 		return;
 	WorldEditBuild.pos2 = blockLocation;
 	event.source.tell(
-		`§d►2◄§f (use) ${Vector.string(WorldEditBuild.pos2)}` //§r
+		`§d►2◄§f (use) ${Vector.string(WorldEditBuild.pos2)}`, //§r
 	);
 });
 
-world.afterEvents.blockBreak.subscribe((event) => {
+world.beforeEvents.playerBreakBlock.subscribe((event) => {
 	if (
 		event.player
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand)?.typeId !== wand.item
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand)?.typeId !== wand.item
 	)
 		return;
 
@@ -45,7 +45,5 @@ world.afterEvents.blockBreak.subscribe((event) => {
 	WorldEditBuild.pos1 = event.block.location;
 	event.player.tell(`§5►1◄§r (break) ${Vector.string(WorldEditBuild.pos1)}`);
 
-	event.dimension
-		.getBlock(event.block.location)
-		?.setPermutation(event.brokenBlockPermutation);
+	event.cancel = true;
 });

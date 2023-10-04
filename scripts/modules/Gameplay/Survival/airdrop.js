@@ -2,7 +2,7 @@ import { LootTable } from "../Loot/loot.js";
 
 const starter = new LootTable(
 	{
-		type: "woodenSword",
+		type: "WoodenSword",
 		chance: "100%",
 		enchantments: {
 			unbreaking: {
@@ -12,19 +12,19 @@ const starter = new LootTable(
 		},
 	},
 	{
-		type: "leatherBoots",
+		type: "LeatherBoots",
 		chance: "50%",
 	},
 	{
-		type: "leatherLeggings",
+		type: "LeatherLeggings",
 		chance: "100%",
 	},
 	{
-		type: "leatherChestplate",
+		type: "LeatherChestplate",
 		chance: "100%",
 	},
 	{
-		type: "leatherHelmet",
+		type: "LeatherHelmet",
 		chance: "50%",
-	}
+	},
 );

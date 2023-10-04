@@ -1,22 +1,21 @@
 import {
-	BlockBreakAfterEvent,
 	EntitySpawnAfterEvent,
-	MinecraftBlockTypes,
 	Player,
+	PlayerBreakBlockBeforeEvent,
 	system,
 	world,
 } from "@minecraft/server";
 import { GameUtils } from "xapi.js";
-import { Region, forEachItemAt } from "./Region.js";
+import { Region } from "./Region.js";
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from "./config.js";
-
+console.log("regions loaded");
 let LOADED = false;
 
 /**
  * @callback interactionAllowed
  * @param {Player} player
  * @param {Region} [region]
- * @param {{type: "break", event: BlockBreakAfterEvent} | {type: "place"} | {type: "useOn"}} context
+ * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place"} | {type: "useOn"}} context
  */
 
 /**
@@ -75,14 +74,12 @@ export function loadRegionsWithGuards(
 	/**
 	 * Permissions for region
 	 */
-	world.afterEvents.blockPlace.subscribe((data) => {
+	world.beforeEvents.playerPlaceBlock.subscribe((event) => {
 		const region = Region.locationInRegion(
-			data.block.location,
-			data.player.dimension.type,
+			event.block.location,
+			event.player.dimension.type,
 		);
-		if (allowed(data.player, region, { type: "place" })) return;
-
-		data.block.setType(MinecraftBlockTypes.air);
+		if (!allowed(event.player, region, { type: "place" })) event.cancel = true;
 	});
 
 	/**
@@ -90,40 +87,29 @@ export function loadRegionsWithGuards(
 	 */
 
 	world.beforeEvents.playerBreakBlock.subscribe((event) => {
-		event.cancel;
 		const region = Region.locationInRegion(
 			event.block.location,
 			event.player.dimension.type,
 		);
 
 		if (
-			allowed(player, region, {
+			!allowed(event.player, region, {
 				type: "break",
-				event: { player, block, brokenBlockPermutation, dimension },
+				event,
 			})
-		)
-			return;
-
-		// setting block back
-		block.setPermutation(brokenBlockPermutation);
-		if (BLOCK_CONTAINERS.includes(brokenBlockPermutation.type.id)) {
-			// setting chest inventory back
-			const { container } = block.getComponent("inventory");
-			forEachItemAt(dimension, block.location, (e) => {
-				container.addItem(e.getComponent("item").itemStack);
-				e.kill();
-			});
-		} else forEachItemAt(dimension, block.location);
+		) {
+			event.cancel = true;
+		}
 	});
 
-	world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+	world.afterEvents.entitySpawn.subscribe(({ entity, cause }) => {
 		const typeId = GameUtils.safeGetTypeID(entity);
 		if (!typeId || typeId === "rubedo:database") return;
 		const region = Region.locationInRegion(
 			entity.location,
 			entity.dimension.type,
 		);
-		if (spawnAllowed(region, { entity })) return;
+		if (spawnAllowed(region, { entity, cause })) return;
 		if (
 			region &&
 			((Array.isArray(region.permissions.allowedEntitys) &&

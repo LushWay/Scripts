@@ -15,8 +15,8 @@ new XCommand({
 		const ench = MinecraftEnchantmentTypes[enchant];
 
 		const mainhand = ctx.sender
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 
 		const item = mainhand.getItem();
 		if (!item) return ctx.error("No item!");

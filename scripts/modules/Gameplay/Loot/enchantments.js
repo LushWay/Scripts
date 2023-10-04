@@ -1,9 +1,5 @@
-import {
-	Enchantment,
-	MinecraftItemTypes,
-	Vector,
-	world,
-} from "@minecraft/server";
+import { Enchantment, Vector, world } from "@minecraft/server";
+import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
 import { MinecraftEnchantmentTypes } from "lib/List/enchantments.js";
 import { DB, EventSignal, util } from "xapi.js";
 
@@ -30,15 +26,15 @@ export const Enchantments = {
 function load() {
 	let status;
 	status = world.overworld.runCommand(
-		"structure load CustomEnchantments " + Vector.string(LOCATION)
+		"structure load CustomEnchantments " + Vector.string(LOCATION),
 	);
 
 	if (!status)
 		return util.error(
 			new Error(
 				"Unable to load CustomEnchantments structure. Status: " +
-					util.inspect(status)
-			)
+					util.inspect(status),
+			),
 		);
 
 	let entities = world.overworld.getEntities({
@@ -57,7 +53,7 @@ function load() {
 
 	for (let i = 0; i < container.size; i++) {
 		const item = container.getItem(i);
-		if (item?.typeId !== MinecraftItemTypes.enchantedBook.id) break;
+		if (item?.typeId !== MinecraftItemTypes.EnchantedBook) break;
 
 		const enchantments = item.getComponent("enchantments");
 		if (!enchantments?.enchantments)
@@ -66,8 +62,8 @@ function load() {
 					"Found unexpected enchantment type on slot " +
 						i +
 						". Enchantments: " +
-						util.inspect(enchantments)
-				)
+						util.inspect(enchantments),
+				),
 			);
 
 		for (const enchantment of enchantments.enchantments) {

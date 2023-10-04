@@ -1,4 +1,5 @@
-import { ItemLockMode, ItemType, MinecraftItemTypes } from "@minecraft/server";
+import { ItemLockMode } from "@minecraft/server";
+import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
 import { MinecraftEnchantmentTypes } from "lib/List/enchantments.js";
 
 export namespace LootItem {
@@ -58,7 +59,7 @@ export namespace LootItem {
 	type Input = (ID | Type) & Common;
 
 	type Stored = {
-		id: ItemType;
+		id: string;
 		nameTag: string;
 		lore: string[];
 		chance: number;

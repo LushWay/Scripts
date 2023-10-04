@@ -10,14 +10,14 @@ const root = new XCommand({
 
 root.executes((ctx) => {
 	const item = ctx.sender
-		.getComponent("equipment_inventory")
-		.getEquipmentSlot(EquipmentSlot.mainhand);
+		.getComponent("equippable")
+		.getEquipmentSlot(EquipmentSlot.Mainhand);
 	if (!item) return ctx.reply("§cВ руке нет предмета!");
 
 	ctx.reply(
 		`§b► §f${item?.typeId?.replace("minecraft:", "")} ${
 			item?.nameTag ? `(${item?.nameTag}) ` : ""
-		}`
+		}`,
 	);
 });
 
@@ -45,6 +45,6 @@ root
 	.literal({ name: "r", description: "Выдает наклон головы" })
 	.executes((ctx) => {
 		ctx.reply(
-			`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
+			`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`,
 		);
 	});

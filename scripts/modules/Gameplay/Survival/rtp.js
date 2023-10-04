@@ -2,16 +2,18 @@ import {
 	EquipmentSlot,
 	ItemLockMode,
 	ItemStack,
-	MinecraftItemTypes,
 	Player,
 	Vector,
 	system,
 	world,
 } from "@minecraft/server";
+import {
+	MinecraftEffectTypes,
+	MinecraftItemTypes,
+} from "@minecraft/vanilla-data.js";
 import { Database, LockAction, util } from "xapi.js";
-import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
 
-const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.elytra, 1);
+const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1);
 const lore = ["§r§7Элитра перелета, пропадает на земле"];
 RTP_ELYTRA.setLore(lore);
 RTP_ELYTRA.nameTag = "§6Элитра перемещения";
@@ -114,8 +116,8 @@ export function randomTeleport(
  */
 function giveElytra(player) {
 	const slot = player
-		.getComponent("equipment_inventory")
-		.getEquipmentSlot(EquipmentSlot.chest);
+		.getComponent("equippable")
+		?.getEquipmentSlot(EquipmentSlot.Chest);
 
 	// Item in slot
 	const item = slot.getItem();
@@ -146,7 +148,7 @@ system.runInterval(
 			.filter((e) => {
 				const block = e.dimension.getBlock(Vector.add(e.location, Vector.down));
 				if (!block) return;
-				if (block.isAir()) return;
+				if (block.isAir) return;
 				return true;
 			});
 
@@ -162,8 +164,8 @@ system.runInterval(
  */
 function clearElytra(player) {
 	const slot = player
-		.getComponent("equipment_inventory")
-		.getEquipmentSlot(EquipmentSlot.chest);
+		.getComponent("equippable")
+		.getEquipmentSlot(EquipmentSlot.Chest);
 	if (slot.nameTag === RTP_ELYTRA.nameTag) slot.setItem(undefined);
 	const { data, save } = DB.work(player.id);
 	delete data.elytra;

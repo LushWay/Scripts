@@ -26,32 +26,38 @@ export class Shape {
 
 		this.values = new Cuboid(this.pos1, this.pos2);
 
-		try {
-			this.generate();
-		} catch (e) {
-			util.error(e);
-		}
+		this.generate();
 	}
 	/**
 	 * Generates the shape to location
 	 */
 	async generate() {
-		let blocksSet = 0;
+		try {
+			let blocksSet = 0;
 
-		const loc1 = { x: -this.rad, y: -this.rad, z: -this.rad };
-		const loc2 = { x: this.rad, z: this.rad, y: this.rad };
+			const loc1 = { x: -this.rad, y: -this.rad, z: -this.rad };
+			const loc2 = { x: this.rad, z: this.rad, y: this.rad };
 
-		for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
-			if (!this.condition(x, y, z)) continue;
-			const location = Vector.add(this.pos, { x, y, z });
-			const block = this.blocks[~~(Math.random() * this.blocks.length)];
-			setblock(block, location);
-			blocksSet++;
+			for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
+				if (!this.condition(x, y, z)) continue;
+				const location = Vector.add(this.pos, { x, y, z });
+				const block = this.blocks[~~(Math.random() * this.blocks.length)];
+				if (!block)
+					return util.error(
+						new Error(
+							"No block found, blocks array length: " + this.blocks.length,
+						),
+					);
+				setblock(block, location);
+				blocksSet++;
 
-			if (blocksSet >= WE_CONFIG.BLOCKS_BEFORE_AWAIT) {
-				await system.sleep(WE_CONFIG.TICKS_TO_SLEEP);
-				blocksSet = 0;
+				if (blocksSet >= WE_CONFIG.BLOCKS_BEFORE_AWAIT) {
+					await system.sleep(WE_CONFIG.TICKS_TO_SLEEP);
+					blocksSet = 0;
+				}
 			}
+		} catch (e) {
+			util.error(e);
 		}
 	}
 	/**
@@ -63,7 +69,7 @@ export class Shape {
 	condition(x, y, z) {
 		return new Function(
 			"x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad",
-			`return ${this.shape}`
+			`return ${this.shape}`,
 		)(x, y, z, this.values, this.rad);
 	}
 }

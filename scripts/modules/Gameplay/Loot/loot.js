@@ -1,9 +1,5 @@
-import {
-	ItemStack,
-	ItemTypes,
-	MinecraftItemTypes,
-	world,
-} from "@minecraft/server";
+import { ItemStack, ItemTypes, world } from "@minecraft/server";
+import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
 import { Enchantments } from "./enchantments.js";
 
 export class LootTable {
@@ -22,7 +18,9 @@ export class LootTable {
 	constructor(...items) {
 		this.items = items.map((item) => {
 			const id =
-				"type" in item ? MinecraftItemTypes[item.type] : ItemTypes.get(item.id);
+				"type" in item
+					? MinecraftItemTypes[item.type]
+					: ItemTypes.get(item.id).id;
 
 			/** @type {number[]} */
 			const amount =
@@ -220,7 +218,7 @@ const table = new LootTable(
 		},
 	},
 	{
-		type: "apple",
+		type: "Apple",
 		amount: {
 			"1...40": "6%",
 			"41...64": "1%",

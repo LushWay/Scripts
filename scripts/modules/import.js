@@ -1,27 +1,27 @@
 import { util } from "../xapi.js";
 
 const modules = [
-	"./Server/Admin/index.js",
-	"./Server/Chat/index.js",
-	"./Server/DatabaseView/index.js",
+	// "./Server/Admin/index.js",
+	// "./Server/Chat/index.js",
+	// "./Server/DatabaseView/index.js",
 	"./Server/HelpCommand/index.js",
-	"./Server/Menu/index.js",
-	"./Server/OnJoin/join.js",
-	"./Server/Server/index.js",
-	"./Server/Leaderboards/index.js",
-	"./Server/Objectives/index.js",
+	// "./Server/Menu/index.js",
+	// "./Server/OnJoin/join.js",
+	// "./Server/Server/index.js",
+	// "./Server/Leaderboards/index.js",
+	// "./Server/Objectives/index.js",
 
 	/**
 	 * Gameplay modules
 	 */
-	"./Gameplay/Loot/loot.js",
-	"./Gameplay/Build/camera.js",
+	// "./Gameplay/Loot/loot.js",
+	// "./Gameplay/Build/camera.js",
 
 	/**
 	 * Development modules:
 	 */
-	"../lib/Class/Quest.js",
-	"./Development/GameTest/index.js",
+	// "../lib/Class/Quest.js",
+	// "./Development/GameTest/index.js",
 	"./Development/Test/index.js",
 	"./Development/WorldEdit/index.js",
 ];

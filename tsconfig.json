@@ -1,24 +1,34 @@
 {
-  "compilerOptions": {
-    "alwaysStrict": true,
-    "allowJs": true,
-    "checkJs": true,
-    "noEmit": true,
-    "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "skipLibCheck": false,
-    "skipDefaultLibCheck": true,
-    "lib": ["ES2020"],
-    "target": "es2020",
-    "module": "NodeNext",
-    "baseUrl": ".",
-    "maxNodeModuleJsDepth": 0,
-    "types": [],
-    "paths": {
-      "*": ["scripts/*"]
-    }
-  },
-  "include": ["./scripts/"],
-  "exclude": ["./scripts/chestui"]
+	"compilerOptions": {
+		"alwaysStrict": true,
+		"allowJs": true,
+		"checkJs": true,
+		"noEmit": true,
+		"strictNullChecks": true,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitAny": true,
+		"lib": ["es2020"],
+		"target": "es2020",
+		"module": "ES2020",
+		"moduleResolution": "Bundler",
+		"baseUrl": "scripts/",
+		"paths": {
+			"@minecraft/server": ["../node_modules/@minecraft/server/index.d.ts"],
+			"@minecraft/server-ui": [
+				"../node_modules/@minecraft/server-ui/index.d.ts"
+			],
+			"@minecraft/server-admin": [
+				"../node_modules/@minecraft/server-admin/index.d.ts"
+			],
+			"@minecraft/server-gametest": [
+				"../node_modules/@minecraft/server-gametest/index.d.ts"
+			],
+			"@minecraft/server-net": [
+				"../node_modules/@minecraft/server-net/index.d.ts"
+			],
+			"@minecraft/vanilla-data": ["Use @minecraft/vanilla-data.js"]
+		}
+	},
+	"include": ["scripts"],
+	"exclude": ["scripts/chestui", "@minecraft/vanilla-data", "node_modules"]
 }

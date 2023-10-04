@@ -3,7 +3,6 @@ import { ModalForm } from "xapi.js";
 import { Shape } from "../../builders/ShapeBuilder.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
 import { WE_CONFIG } from "../../config.js";
-import { WorldEditPlayerSettings } from "../../index.js";
 import { SHAPES } from "../../utils/shapes.js";
 import { getBlockSet, getBlockSets } from "../general/menu.js";
 
@@ -21,7 +20,7 @@ const brush = new WorldEditTool({
 	loreFormat: {
 		version: 1,
 
-		blocksSet: "",
+		blocksSet: "DEFAULT",
 		shape: "sphere",
 		radius: 1,
 		maxDistance: 300,
@@ -34,15 +33,15 @@ const brush = new WorldEditTool({
 			.addDropdown(
 				"Форма",
 				shapes,
-				shapes.findIndex((e) => e === lore.shape)
+				shapes.findIndex((e) => e === lore.shape),
 			)
 			.addSlider("Размер", 1, 10, 1, lore.radius)
 			.addDropdown(
 				"Набор блоков",
 				...ModalForm.arrayAndDefault(
 					Object.keys(getBlockSets(player)),
-					lore.blocksSet
-				)
+					lore.blocksSet,
+				),
 			)
 			.show(player, (ctx, shape, radius, blocksSet) => {
 				if (!SHAPES[shape]) return ctx.error("§c" + shape);
@@ -54,7 +53,7 @@ const brush = new WorldEditTool({
 				player.tell(
 					`§a► §r${
 						lore.blocksSet ? "Отредактирована" : "Создана"
-					} кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`
+					} кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`,
 				);
 			});
 	},
@@ -68,7 +67,8 @@ const brush = new WorldEditTool({
 			name: WE_CONFIG.BRUSH_LOCATOR,
 			tags: [player.name],
 		});
-		if (dot && !settings.noBrushParticles) {
+		if (dot) {
+			//!settings.noBrushParticles
 			const { block } = dot;
 			if (!entities) {
 				const entity = player.dimension.spawnEntity("f:t", block.location);
@@ -84,8 +84,8 @@ const brush = new WorldEditTool({
 		}
 	},
 	onUse(player, item) {
-		const settings = WorldEditPlayerSettings(player);
-		if (settings.enableMobile) return;
+		// const settings = WorldEditPlayerSettings(player);
+		// if (settings.enableMobile) return;
 
 		const lore = brush.parseLore(item.getLore());
 		const dot = player.getBlockFromViewDirection({
@@ -97,7 +97,7 @@ const brush = new WorldEditTool({
 				SHAPES[lore.shape],
 				dot.block.location,
 				getBlockSet(getBlockSets(player), lore.blocksSet),
-				lore.radius
+				lore.radius,
 			);
 		}
 	},

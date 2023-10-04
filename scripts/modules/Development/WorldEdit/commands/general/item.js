@@ -12,8 +12,8 @@ root
 	.string("lore")
 	.executes((ctx) => {
 		const item = ctx.sender
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 		if (!item) return ctx.reply("§cВ руке нет предмета!");
 		let oldtag = item.getLore();
 		item.setLore(ctx.args);
@@ -25,8 +25,8 @@ root
 	.string("name")
 	.executes((ctx, name) => {
 		const item = ctx.sender
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 		if (!item) return ctx.reply("§cВ руке нет предмета!");
 		let oldtag = item.nameTag;
 		item.nameTag = name;
@@ -41,8 +41,8 @@ root
 	.int("count")
 	.executes((ctx, count) => {
 		const item = ctx.sender
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 		if (!item) return ctx.reply("§cВ руке нет предмета!");
 		let oldtag = item.amount;
 		item.amount = count;

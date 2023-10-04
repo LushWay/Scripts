@@ -1,4 +1,4 @@
-import { MinecraftBlockTypes, Player } from "@minecraft/server";
+import { BlockTypes, Player } from "@minecraft/server";
 import { inaccurateSearch } from "lib/Class/Search.js";
 import { ModalForm } from "lib/Form/ModalForm.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
@@ -26,11 +26,11 @@ set
 		const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
 		if (time >= 0.01)
 			ctx.reply(
-				`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
+				`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`,
 			);
 
 		WorldEditBuild.fillBetween(block, blockData, mode, other, otherData).then(
-			(result) => ctx.reply(result)
+			(result) => ctx.reply(result),
 		);
 	});
 
@@ -51,7 +51,7 @@ set.executes((ctx) => {
 		.addTextField(
 			"Заменяемый блок (только для режима replace!)",
 			"например, stone",
-			""
+			"",
 		)
 		.addSlider("Дата заменяемого блока", 0, 15, 1, 0)
 		.show(ctx.sender, (_, block, blockData, mode, other, otherData) => {
@@ -61,7 +61,7 @@ set.executes((ctx) => {
 			const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2);
 			if (time >= 0.01)
 				ctx.reply(
-					`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
+					`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`,
 				);
 
 			WorldEditBuild.fillBetween(
@@ -69,7 +69,7 @@ set.executes((ctx) => {
 				blockData,
 				mode === "Отключено" ? "" : mode,
 				other,
-				otherData
+				otherData,
 			).then((result) => ctx.reply(result));
 		});
 });
@@ -89,10 +89,7 @@ function timeCaculation(pos1, pos2) {
 
 const prefix = "minecraft:";
 
-const blocks = MinecraftBlockTypes.getAllBlockTypes().map((e) =>
-	e.id.substring(prefix.length)
-);
-
+const blocks = BlockTypes.getAll().map((e) => e.id.substring(prefix.length));
 /**
  *
  * @param {string} block

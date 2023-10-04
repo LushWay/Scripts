@@ -82,8 +82,8 @@ export class WorldEditTool {
 	 */
 	getMenuButtonName(player) {
 		const { typeId } = player
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 
 		const edit = typeId === this.item;
 
@@ -96,7 +96,7 @@ export class WorldEditTool {
 	editToolForm(slot, player) {
 		new MessageForm(
 			"Не настроено.",
-			"Редактирование этого инструмента не настроено."
+			"Редактирование этого инструмента не настроено.",
 		).show(player);
 	}
 	/**
@@ -106,7 +106,12 @@ export class WorldEditTool {
 	parseLore(lore) {
 		let raw;
 		try {
-			raw = JSON.parse(lore[0].replace(/§(.)/g, "$1"));
+			raw = JSON.parse(
+				lore
+					.slice(lore.findIndex((e) => e.includes("\x01")) + 1)
+					.join("")
+					.replace(/§(.)/g, "$1"),
+			);
 		} catch (e) {}
 		if (raw?.version !== this.loreFormat.version) {
 			// @ts-expect-error yes
@@ -128,18 +133,22 @@ export class WorldEditTool {
 	 * @returns {string[]}
 	 */
 	stringifyLore(format) {
+		format.version ??= this.loreFormat.version;
 		return [
-			JSON.stringify(format)
-				.split("")
-				.map((e) => "§" + e)
-				.join(""),
-
 			...Object.entries(format)
 				.filter(([key]) => key !== "version")
 				.map(
 					([key, value]) =>
-						`§r§f${this.loreTranslation[key] ?? key}: ${util.inspect(value)}`
+						`§r§f${this.loreTranslation[key] ?? key}: ${util.inspect(value)}`,
 				),
+
+			"\x01",
+
+			...(JSON.stringify(format)
+				.split("")
+				.map((e) => "§" + e)
+				.join("")
+				.match(/.{0,50}/g) || []),
 		];
 	}
 }
@@ -147,19 +156,19 @@ export class WorldEditTool {
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 	if (!(player instanceof Player)) return;
 	const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
-	if (tool && tool.onUse) tool.onUse(player, item);
+	util.catch(() => tool && tool.onUse && tool.onUse(player, item));
 });
 
 system.runPlayerInterval(
 	(player) => {
 		const item = player
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 
 		const tool = WorldEditTool.TOOLS.find((e) => e.item === item.typeId);
 		if (tool && tool.interval)
-			tool.interval(player, item, WorldEditPlayerSettings(player));
+			tool.interval(player, item, WorldEditPlayerSettings(player)); //
 	},
 	"we tool",
-	10
+	10,
 );

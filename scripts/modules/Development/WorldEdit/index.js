@@ -22,7 +22,10 @@ export const WorldEditPlayerSettings = Options.player("Строитель мир
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
 	if (itemStack.typeId === "we:dash") {
 		source.teleport(
-			Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5))
+			Vector.add(
+				source.location,
+				Vector.multiply(source.getViewDirection(), 5),
+			),
 		);
 	}
 });

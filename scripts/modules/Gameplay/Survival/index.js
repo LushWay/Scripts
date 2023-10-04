@@ -1,14 +1,16 @@
 import {
 	EquipmentSlot,
 	ItemStack,
-	MinecraftBlockTypes,
-	MinecraftItemTypes,
 	Player,
 	Vector,
 	system,
 	world,
 } from "@minecraft/server";
-import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
+import {
+	MinecraftBlockTypes,
+	MinecraftEffectTypes,
+	MinecraftItemTypes,
+} from "@minecraft/vanilla-data.js";
 import { EditableLocation, InventoryStore, util } from "../../../xapi.js";
 import { MENU } from "../../Server/Menu/var.js";
 import { JOIN } from "../../Server/OnJoin/var.js";
@@ -32,8 +34,8 @@ loadRegionsWithGuards(
 			if (region.permissions.owners.includes(player.id)) return true;
 		} else {
 			const heldItem = player
-				.getComponent("equipment_inventory")
-				.getEquipmentSlot(EquipmentSlot.mainhand);
+				.getComponent("equippable")
+				.getEquipmentSlot(EquipmentSlot.Mainhand);
 			if (heldItem?.isStackableWith(baseItemStack)) return true;
 
 			if (context.type === "break" && player.isGamemode("adventure"))
@@ -81,10 +83,11 @@ JOIN.EVENTS.firstTime.subscribe((player) => {
 });
 
 export const Spawn = {
-	startAxeItem: new ItemStack(MinecraftItemTypes.woodenAxe),
+	startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe),
+	/** @type {string[]} */
 	startAxeCanBreak: Object.entries(MinecraftBlockTypes)
 		.filter((e) => e[0].match(/log/i))
-		.map((e) => e[1].id),
+		.map((e) => e[1]),
 	inventory: {
 		xp: 0,
 		health: 20,

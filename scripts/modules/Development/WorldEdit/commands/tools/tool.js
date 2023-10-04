@@ -22,7 +22,7 @@ new WorldEditTool({
 		let lore = item.getLore();
 		new ActionForm(
 			"§3Инструмент",
-			"Настройте что будет происходить при использовании инструмента."
+			"Настройте что будет происходить при использовании инструмента.",
 		)
 			.addButton("Телепорт по взгляду", () => {
 				item.nameTag = `§r§a► Телепорт по взгляду`;
@@ -90,7 +90,7 @@ new WorldEditTool({
 						index = array.indexOf(element);
 						if (!index)
 							return ctx.error(
-								"Неизвестный ID! Убедитесь что он начинается с minecraft:"
+								"Неизвестный ID! Убедитесь что он начинается с minecraft:",
 							);
 					} else {
 						element = list;
@@ -129,8 +129,8 @@ const variables = new MolangVariableMap();
 system.runPlayerInterval(
 	(player) => {
 		const item = player
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 
 		if (!item || item.typeId !== "we:tool") return;
 
@@ -148,7 +148,7 @@ system.runPlayerInterval(
 			hit.block.dimension.spawnParticle(
 				lore[1],
 				Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-				variables
+				variables,
 			);
 		}
 
@@ -157,5 +157,5 @@ system.runPlayerInterval(
 		}
 	},
 	"we tool",
-	20
+	20,
 );

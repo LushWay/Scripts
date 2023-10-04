@@ -1,3 +1,4 @@
 node_modules
 yarn-error.log
 leafs/last-update
+scripts/@minecraft/vanilla-data.js

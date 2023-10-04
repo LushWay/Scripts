@@ -384,13 +384,10 @@ if (Anarchy.portal) {
 				return `§6Наруби §f${value}/${this.end} §6блоков дерева`;
 			},
 			activate() {
-				const blocksEvent = world.afterEvents.blockBreak.subscribe(
-					({ player, brokenBlockPermutation }) => {
+				const blocksEvent = world.beforeEvents.playerBreakBlock.subscribe(
+					({ player, block }) => {
 						if (player.id !== this.player.id) return;
-						if (
-							!Spawn.startAxeCanBreak.includes(brokenBlockPermutation.type.id)
-						)
-							return;
+						if (!Spawn.startAxeCanBreak.includes(block.type.id)) return;
 
 						this.diff(1);
 					},
@@ -398,7 +395,7 @@ if (Anarchy.portal) {
 
 				return {
 					cleanup() {
-						world.afterEvents.blockBreak.unsubscribe(blocksEvent);
+						world.beforeEvents.playerBreakBlock.unsubscribe(blocksEvent);
 					},
 				};
 			},

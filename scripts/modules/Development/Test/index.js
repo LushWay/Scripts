@@ -1,14 +1,16 @@
 import {
 	EquipmentSlot,
 	ItemStack,
-	MinecraftBlockTypes,
-	MinecraftItemTypes,
 	MolangVariableMap,
 	Player,
 	Vector,
 	system,
 	world,
 } from "@minecraft/server";
+import {
+	MinecraftBlockTypes,
+	MinecraftItemTypes,
+} from "@minecraft/vanilla-data.js";
 import "lib/Class/Net.js";
 import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
@@ -110,17 +112,17 @@ const tests = {
 		const i = MinecraftItemTypes;
 
 		const items = [
-			i.acaciaButton,
-			i.acaciaStairs,
-			i.apple,
-			i.bannerPattern,
-			i.netheriteAxe,
-			i.zombieHorseSpawnEgg,
-			i.boat,
-			i.chestBoat,
-			i.darkOakBoat,
-			i.blueWool,
-			i.cobblestoneWall,
+			i.AcaciaButton,
+			i.AcaciaStairs,
+			i.Apple,
+			i.BannerPattern,
+			i.NetheriteAxe,
+			i.ZombieHorseSpawnEgg,
+			i.Boat,
+			i.ChestBoat,
+			i.DarkOakBoat,
+			i.BlueWool,
+			i.CobblestoneWall,
 		];
 
 		for (const item of items) {
@@ -139,7 +141,8 @@ const tests = {
 
 		// falling_dust explosion_particle explosion_manual glow_particle sparkler_emitter wax_particle
 
-		const variables = new MolangVariableMap().setColorRGB("color", {
+		const variables = new MolangVariableMap();
+		variables.setColorRGBA("color", {
 			red: 1,
 			green: 1,
 			blue: 1,
@@ -227,7 +230,7 @@ const tests = {
 		for (const position of orePositions) {
 			ctx.sender.dimension
 				.getBlock(position)
-				?.setType(MinecraftBlockTypes.stone);
+				?.setType(MinecraftBlockTypes.Stone);
 		}
 	},
 	54(ctx) {
@@ -239,8 +242,8 @@ const tests = {
 world.afterEvents.entityHitEntity.subscribe((event) => {
 	if (event.damagingEntity instanceof Player) {
 		const axe = event.damagingEntity
-			.getComponent("equipment_inventory")
-			.getEquipmentSlot(EquipmentSlot.mainhand);
+			.getComponent("equippable")
+			.getEquipmentSlot(EquipmentSlot.Mainhand);
 		if (axe && !axe.typeId?.includes("axe")) return;
 
 		event.damagingEntity.startItemCooldown("axe", 10);

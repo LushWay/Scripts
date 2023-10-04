@@ -1,4 +1,4 @@
-import { MinecraftBlockTypes, world } from "@minecraft/server";
+import { BlockTypes, world } from "@minecraft/server";
 import { Cooldown, util } from "xapi.js";
 
 /**
@@ -11,16 +11,16 @@ export function setblock(blockTypeID, location) {
 		const [_, id, data] = /^(.+)\.(\d+)/g.exec(blockTypeID) ?? [];
 		world.overworld.runCommand(
 			`setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`,
-			{ showError: true }
+			{ showError: true },
 		);
 	} else {
 		// Normal block type
-		const blockType = MinecraftBlockTypes.get(
-			`minecraft:${blockTypeID.replace("minecraft:", "")}`
+		const blockType = BlockTypes.get(
+			`minecraft:${blockTypeID.replace("minecraft:", "")}`,
 		);
 		if (!blockType)
 			return util.error(
-				new TypeError(`BlockType ${blockTypeID} does not exist!`)
+				new TypeError(`BlockType ${blockTypeID} does not exist!`),
 			);
 		world.overworld.getBlock(location)?.setType(blockType);
 	}

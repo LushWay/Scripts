@@ -1,5 +1,6 @@
-import { EquipmentSlot, MinecraftBlockTypes, world } from "@minecraft/server";
-import { ModalForm } from "xapi.js";
+import { EquipmentSlot, system, world } from "@minecraft/server";
+import { MinecraftBlockTypes } from "@minecraft/vanilla-data.js";
+import { ModalForm, util } from "xapi.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
 import { setblock } from "../../utils/utils.js";
 import { getBlockSet, getBlockSets } from "../general/menu.js";
@@ -7,7 +8,7 @@ import { getBlockSet, getBlockSets } from "../general/menu.js";
 const nylium = new WorldEditTool({
 	name: "nylium",
 	displayName: "слуйчайный блок из набора",
-	itemStackId: MinecraftBlockTypes.warpedNylium.id,
+	itemStackId: MinecraftBlockTypes.WarpedNylium,
 	loreFormat: {
 		version: 1,
 
@@ -20,8 +21,8 @@ const nylium = new WorldEditTool({
 				"Набор блоков",
 				...ModalForm.arrayAndDefault(
 					Object.keys(getBlockSets(player)),
-					lore.blocksSet
-				)
+					lore.blocksSet,
+				),
 			)
 			.show(player, (_, blocksSet) => {
 				lore.blocksSet = blocksSet;
@@ -32,17 +33,21 @@ const nylium = new WorldEditTool({
 });
 
 /* Replaces the block with a random block from the lore of the item. */
-world.afterEvents.blockPlace.subscribe(({ block, player }) => {
+world.beforeEvents.playerPlaceBlock.subscribe(({ block, player }) => {
 	if (block.typeId !== nylium.item) return;
 
 	const slot = player
-		.getComponent("equipment_inventory")
-		.getEquipmentSlot(EquipmentSlot.mainhand);
+		.getComponent("equippable")
+		.getEquipmentSlot(EquipmentSlot.Mainhand);
 	const blocksSets = getBlockSets(player);
 	const name = nylium.parseLore(slot.getLore())?.blocksSet;
 
 	if (name in blocksSets) {
-		setblock(getBlockSet(blocksSets, name).randomElement(), block.location);
+		system.run(() =>
+			util.catch(() => {
+				setblock(getBlockSet(blocksSets, name).randomElement(), block.location);
+			}),
+		);
 	} else {
 		player.tell("§cНеизвестный набор блоков! Выберите существующий из списка");
 		nylium.editToolForm(slot, player);

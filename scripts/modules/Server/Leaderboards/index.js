@@ -65,7 +65,7 @@ export class Leaderboard {
 		objective,
 		location,
 		dimension = "overworld",
-		style = "green"
+		style = "green",
 	) {
 		const data = {
 			style,
@@ -110,7 +110,9 @@ export class Leaderboard {
 		LB_DB.set(this.entity.id, this.data);
 	}
 	updateLeaderboard() {
-		const scoreboard = world.scoreboard.getObjective(this.data.objective);
+		const scoreboard =
+			world.scoreboard.getObjective(this.data.objective) ??
+			world.scoreboard.addObjective(this.data.objective, this.data.objective);
 		const dname = scoreboard.displayName;
 		const name = dname.charAt(0).toUpperCase() + dname.slice(1);
 		const style = STYLES[this.data.style];
@@ -153,7 +155,7 @@ system.runInterval(
 		}
 	},
 	"leaderboardsInterval",
-	10
+	10,
 );
 
 /**

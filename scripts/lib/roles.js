@@ -1,12 +1,25 @@
-import { Player } from "@minecraft/server";
-import { Database } from "./Database/Rubedo.js";
-
-/** @type {Database<string, {role: keyof typeof ROLES}>} */
-const table = new Database("player", {
+import { Player, system } from "@minecraft/server";
+import { WorldDynamicPropertiesKey } from "lib/Database/Properties.js";
+console.log("imported");
+/** @type {WorldDynamicPropertiesKey<string, {role?: keyof typeof ROLES} | undefined>} */
+const db = new WorldDynamicPropertiesKey("player", {
 	defaultValue() {
 		return { role: "member" };
 	},
 });
+
+system.afterEvents.scriptEventReceive.subscribe((event) => {
+	if (event.id === "ROLE:ADMIN") {
+		const player = Player.fetch(event.message);
+		if (!player)
+			return console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
+
+		setRole(player, "admin");
+		console.warn("(SCRIPTEVENT::ROLE:ADMIN) ROLE HAS BEEN SET");
+	}
+});
+
+const table = db.proxy();
 
 /**
  * The roles that are in this server
@@ -25,11 +38,13 @@ export const ROLES = {
  * @example getRole("23529890")
  */
 export function getRole(playerID) {
+	return "admin";
+
 	if (playerID instanceof Player) playerID = playerID.id;
 
-	const role = table.get(playerID).role;
+	const role = table[playerID]?.role;
 
-	if (!Object.keys(ROLES).includes(role)) return "member";
+	if (!role || !Object.keys(ROLES).includes(role)) return "member";
 	return role;
 }
 
@@ -41,10 +56,12 @@ export function getRole(playerID) {
  * @returns {void}
  */
 export function setRole(player, role) {
+	return;
+
 	if (player instanceof Player) player = player.id;
-	const { data, save } = table.work(player);
-	data.role = role;
-	save();
+	table[player] ??= {};
+	const obj = table[player];
+	if (obj) obj.role = role;
 }
 
 /**

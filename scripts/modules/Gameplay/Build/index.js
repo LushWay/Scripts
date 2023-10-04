@@ -1,7 +1,7 @@
 import { system, world } from "@minecraft/server";
+import { MinecraftEffectTypes } from "@minecraft/vanilla-data.js";
 import { is } from "xapi.js";
 import { CONFIG } from "../../../config.js";
-import { MinecraftEffectTypes } from "../../../lib/List/effects.js";
 import { JOIN } from "../../Server/OnJoin/var.js";
 import { Region } from "../../Server/Region/Region.js";
 import { loadRegionsWithGuards } from "../../Server/Region/index.js";

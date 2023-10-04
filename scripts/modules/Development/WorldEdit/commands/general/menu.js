@@ -1,9 +1,10 @@
+import { Player } from "@minecraft/server";
 import {
 	MinecraftBlockTypes,
 	MinecraftItemTypes,
-	Player,
-} from "@minecraft/server";
-import { ActionForm, Database, ModalForm, XShowForm } from "xapi.js";
+} from "@minecraft/vanilla-data.js";
+import { WorldDynamicPropertiesKey } from "lib/Database/Properties.js";
+import { ActionForm, ModalForm, XShowForm } from "xapi.js";
 import { ChestFormData } from "../../../../../chestui/forms.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
 
@@ -11,16 +12,18 @@ import { WorldEditTool } from "../../builders/ToolBuilder.js";
  * @typedef {Record<string, [string, number][]>} BlocksSets
  */
 
-/** @type {Database<string, BlocksSets | undefined>} */
-const DB = new Database("worldEditBlockSets");
+/** @type {WorldDynamicPropertiesKey<string, BlocksSets | undefined>} */
+const DB = new WorldDynamicPropertiesKey("blockSets");
+const table = DB.proxy();
 
 /** @type {BlocksSets} */
 const defaultBlockSets = {
+	Земля: [[MinecraftBlockTypes.Grass, 0]],
 	"Пещерный камень": [
-		[MinecraftBlockTypes.stone.id, 0],
-		[MinecraftBlockTypes.cobblestone.id, 0],
+		[MinecraftBlockTypes.Stone, 0],
+		[MinecraftBlockTypes.Cobblestone, 0],
 	],
-	"Каменная стена": [[MinecraftBlockTypes.stonebrick.id, 1]],
+	"Каменная стена": [[MinecraftBlockTypes.Stonebrick, 1]],
 };
 
 /**
@@ -28,7 +31,7 @@ const defaultBlockSets = {
  * @returns {BlocksSets}
  */
 export function getBlockSets(player) {
-	const playerBlockSets = DB.get(player.id) ?? {};
+	const playerBlockSets = table[player.id] ?? {};
 	return { ...defaultBlockSets, ...playerBlockSets };
 }
 
@@ -62,9 +65,9 @@ function WBMenu(player, body = "") {
 				new ModalForm("§3Имя")
 					.addTextField(
 						`Существующие наборы:\n${Object.keys(blockSets).join(
-							"\n"
+							"\n",
 						)}\n\nВведи новое имя набора`,
-						""
+						"",
 					)
 					.show(player, (ctx, name) => {
 						if (name in blockSets)
@@ -77,14 +80,14 @@ function WBMenu(player, body = "") {
 				sets.addButton(key, () => editBlocksSet(player, key, blockSets));
 			}
 			sets.show(player);
-		}
+		},
 	);
 
 	for (const tool of WorldEditTool.TOOLS) {
 		form.addButton(tool.getMenuButtonName(player), () => {
 			const slotOrError = tool.getToolSlot(player);
 			if (typeof slotOrError === "string") {
-				WBMenu(player, '§c' + slotOrError);
+				WBMenu(player, "§c" + slotOrError);
 			} else {
 				tool.editToolForm(slotOrError, player);
 			}
@@ -116,9 +119,9 @@ function editBlocksSet(player, setName, sets, mode = "see") {
 			"xxxxxxxxx",
 		],
 		{
-			x: { iconPath: MinecraftBlockTypes.stainedGlassPane.id, data: {} },
-			O: { iconPath: MinecraftItemTypes.arrow.id, data: {} },
-		}
+			x: { iconPath: MinecraftBlockTypes.WhiteStainedGlassPane, data: {} },
+			O: { iconPath: MinecraftItemTypes.Arrow, data: {} },
+		},
 	);
 
 	if (mode === "inventory") {
@@ -131,7 +134,7 @@ function editBlocksSet(player, setName, sets, mode = "see") {
 					9 + i,
 					item.typeId.replace("minecraft:", ""),
 					[],
-					item.typeId
+					item.typeId,
 				);
 			}
 		}

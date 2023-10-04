@@ -1,19 +1,17 @@
 import {
 	ItemStack,
-	MinecraftBlockTypes,
-	MinecraftItemTypes,
 	MolangVariableMap,
 	Player,
 	Vector,
 	system,
 	world,
 } from "@minecraft/server";
-import { LockAction, XCommand } from "xapi.js";
 import {
-	RadiusRegion,
-	Region,
-	forEachItemAt,
-} from "../../Server/Region/Region.js";
+	MinecraftBlockTypes,
+	MinecraftItemTypes,
+} from "@minecraft/vanilla-data.js";
+import { LockAction, XCommand } from "xapi.js";
+import { RadiusRegion, Region } from "../../Server/Region/Region.js";
 import { MoneyCost, Store } from "../../Server/Server/store.js";
 import { baseMenu } from "./baseMenu.js";
 
@@ -26,22 +24,7 @@ function updateBases() {
 	bases = RadiusRegion.getAllRegions().map((e) => e.center);
 }
 
-world.afterEvents.blockBreak.subscribe(
-	({ block, brokenBlockPermutation, dimension }) => {
-		if (bases.includes(block.location)) {
-			block.setPermutation(brokenBlockPermutation);
-
-			// setting chest inventory back
-			const { container } = block.getComponent("inventory");
-			forEachItemAt(dimension, block.location, (e) => {
-				container.addItem(e.getComponent("item").itemStack);
-				e.kill();
-			});
-		}
-	},
-);
-
-export const baseItemStack = new ItemStack(MinecraftItemTypes.barrel);
+export const baseItemStack = new ItemStack(MinecraftItemTypes.Barrel);
 baseItemStack.setLore(["Поставьте эту бочку и она", "станет базой."]);
 
 new Store({ x: -234, y: 65, z: -74 }, "overworld").addItem(
@@ -155,7 +138,7 @@ system.runInterval(
 		)) {
 			const block = world[base.dimensionId].getBlock(Vector.floor(base.center));
 			if (!block) continue;
-			if (block.typeId === MinecraftBlockTypes.barrel.id) {
+			if (block.typeId === MinecraftBlockTypes.Barrel) {
 				if (
 					playersLocations.find(
 						(e) =>

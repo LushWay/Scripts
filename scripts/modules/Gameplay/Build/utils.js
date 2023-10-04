@@ -1,10 +1,5 @@
-import {
-	MinecraftBlockTypes,
-	Player,
-	system,
-	Vector,
-	world,
-} from "@minecraft/server";
+import { Player, system, Vector, world } from "@minecraft/server";
+import { MinecraftBlockTypes } from "@minecraft/vanilla-data.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { util } from "xapi.js";
 import { CubeRegion, Region } from "../../Server/Region/Region.js";
@@ -20,7 +15,7 @@ const squarePlace = -55;
 export function teleportToRegion(player, region) {
 	player.teleport(
 		{ x: region.from.x, y: squarePlace + 3, z: region.from.z },
-		{ dimension: world.overworld }
+		{ dimension: world.overworld },
 	);
 }
 
@@ -70,7 +65,7 @@ export async function ClearRegion(player, Pregion) {
 			}
 		},
 		"ResetSquare_ProgressActionbar",
-		0
+		0,
 	);
 	const loc1 = { x: Pregion.from.x, y: -63, z: Pregion.from.z };
 	const loc2 = { x: Pregion.to.x, y: 100, z: Pregion.to.z };
@@ -84,8 +79,8 @@ export async function ClearRegion(player, Pregion) {
 		percents = c / ~~(blocks / 100);
 
 		const block = world.overworld.getBlock(loc);
-		if (!block || block.typeId === MinecraftBlockTypes.air.id) continue;
-		block.setType(MinecraftBlockTypes.air);
+		if (!block || block.isAir) continue;
+		block.setType(MinecraftBlockTypes.Air);
 	}
 	return () => system.clearRun(id);
 }
@@ -118,16 +113,16 @@ export async function fillRegion(from, to) {
 	const waiter = util.waitEach(10);
 	for (const loc of Vector.foreach(
 		Vector.add(firstLoc, Vector.up),
-		Vector.add(secondLoc, Vector.up)
+		Vector.add(secondLoc, Vector.up),
 	)) {
 		await waiter();
 		const block = world.overworld.getBlock(loc);
-		if (block) block.setType(MinecraftBlockTypes.grass);
+		if (block) block.setType(MinecraftBlockTypes.Grass);
 	}
 	for (const loc of Vector.foreach(firstLoc, secondLoc)) {
 		await waiter();
 		const block = world.overworld.getBlock(loc);
-		if (block) block.setType(MinecraftBlockTypes.allow);
+		if (block) block.setType(MinecraftBlockTypes.Allow);
 	}
 }
 
@@ -173,7 +168,7 @@ export async function findFreePlace() {
 
 		const alreadyExist = Region.locationInRegion(
 			{ x: center.x, y: 0, z: center.z },
-			"overworld"
+			"overworld",
 		);
 
 		if (alreadyExist) {

@@ -5,20 +5,24 @@ import { JOIN } from "./var.js";
 
 /** @type {Database<string, IJoinData>} */
 const PDB = new Database("player", {
-	events: {
-		beforeGet(key, value) {
-			return (
-				value ?? {
-					learning: 1,
-					joined: Date.now(),
-				}
-			);
-		},
-		beforeSet(key, value) {
-			return value;
-		},
-	},
+	// events: {
+	// 	beforeGet(key, value) {
+	// 		return (
+	// 			value ?? {
+	// 				learning: 1,
+	// 				joined: Date.now(),
+	// 			}
+	// 		);
+	// 	},
+	// 	beforeSet(key, value) {
+	// 		return value;
+	// 	},
+	// },
 });
+
+// TODO Move stage/waiting and other to variables
+// TODO Add trigger to set joined score on join
+// TODO Remove unused events
 
 world.afterEvents.playerJoin.subscribe(({ playerId }) => {
 	const { data, save } = PDB.work(playerId);

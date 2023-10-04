@@ -36,8 +36,8 @@ export class DB {
 	static ENTITY_IDENTIFIER = "rubedo:database";
 	static ENTITY_LOCATION = { x: 0, y: -64, z: 0 };
 	static INVENTORY_SIZE = 96;
-	static CHUNK_REGEXP = /.{1,32000}/g;
-	static MAX_LORE_SIZE = 32000;
+	static CHUNK_REGEXP = /.{1,50}/g;
+	static MAX_LORE_SIZE = 50;
 	/**
 	 * @type {TABLE[]}
 	 * @private
@@ -196,6 +196,8 @@ export class DB {
 	 * @returns {O & D}
 	 */
 	static setDefaults(sourceObject, defaultObject) {
+		if (Array.isArray(sourceObject)) return sourceObject;
+
 		// Create a new object to avoid modifying the original object
 		/** @type {JSONLike}*/
 		const COMPOSED = {};

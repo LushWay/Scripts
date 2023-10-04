@@ -78,6 +78,8 @@ world.afterEvents.playerJoin.subscribe((player) => {
 	}
 });
 
+importModules();
+
 system.run(async function waiter() {
 	const entities = await world.overworld.runCommandAsync(`testfor @e`);
 	if (entities.successCount < 1) {
@@ -90,13 +92,13 @@ system.run(async function waiter() {
 		console.log("Script initialized");
 		EventLoader.load(XA.afterEvents.worldLoad);
 
-		errorName = "DatabaseError";
-		await Database.initAllTables();
-		EventLoader.load(XA.afterEvents.databaseInit);
+		// errorName = "DatabaseError";
+		// await Database.initAllTables();
+		// EventLoader.load(XA.afterEvents.databaseInit);
 
-		errorName = "ModuleError";
-		await importModules();
-		EventLoader.load(XA.afterEvents.modulesLoad);
+		// errorName = "ModuleError";
+		// await importModules();
+		// EventLoader.load(XA.afterEvents.modulesLoad);
 
 		if (world.getAllPlayers().find((e) => e.id === "-4294967285")) {
 			util.settings.BDSMode = false;

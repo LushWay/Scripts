@@ -142,6 +142,9 @@ export const util = {
 
 		const uniqueKey = Date.now().toString();
 
+		// avoid Circular structure error
+		const visited = new WeakSet();
+
 		if (depth > 10 || typeof target !== "object")
 			return `${rep(target)}` ?? `${target}` ?? "{}";
 
@@ -248,9 +251,6 @@ export const util = {
 			return value;
 		}
 
-		// avoid Circular structure error
-		const visited = new WeakSet();
-
 		return JSON.stringify(target, (_, value) => rep(value), space)
 			?.replace(/"/g, cw)
 			?.replace(new RegExp(uniqueKey, "g"), '"');
@@ -303,9 +303,7 @@ export const util = {
 
 			return function end() {
 				const took_time = Date.now() - start_time;
-				util.benchmark.results[type] ??= {};
-				util.benchmark.results[type][label] ??= [];
-				util.benchmark.results[type][label].push(took_time);
+				((util.benchmark.results[type] ??= {})[label] ??= []).push(took_time);
 				return took_time;
 			};
 		},

@@ -1,13 +1,6 @@
-import {
-	Entity,
-	MinecraftItemTypes,
-	Player,
-	Vector,
-	system,
-	world,
-} from "@minecraft/server";
+import { Entity, Player, Vector, system, world } from "@minecraft/server";
+import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
 import { GameUtils } from "xapi.js";
-
 /** @type {Record<string, [number, Entity]>} */
 const SPAWNED_FIREWORKS = {};
 
@@ -17,7 +10,7 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
 });
 
 world.afterEvents.itemUse.subscribe((data) => {
-	if (data.itemStack.typeId !== MinecraftItemTypes.crossbow.id) return;
+	if (data.itemStack.typeId !== MinecraftItemTypes.Crossbow) return;
 	if (!(data.source instanceof Player)) return;
 
 	for (const [id, [date, entity]] of Object.entries(SPAWNED_FIREWORKS)) {
@@ -47,10 +40,10 @@ system.runInterval(
 			}
 
 			const block = firework.dimension.getBlock(
-				Vector.add(firework.location, firework.getViewDirection())
+				Vector.add(firework.location, firework.getViewDirection()),
 			);
 
-			if (block && !block.isAir()) {
+			if (block && !block.isAir) {
 				firework.dimension.createExplosion(firework.location, 0.8, {
 					source,
 					breaksBlocks: true,
@@ -60,5 +53,5 @@ system.runInterval(
 		}
 	},
 	"firework boom",
-	10
+	10,
 );

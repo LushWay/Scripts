@@ -38,6 +38,11 @@
   resolved "https://registry.yarnpkg.com/@minecraft/server/-/server-1.6.0-beta.1.20.30-stable.tgz#53ca52c2c4636b88217f09f9db39e056dcdea015"
   integrity sha512-hvRjxbI7cl7LVAv+wmw253O6IHFUVBEMvTl+FJLnUaQv9f/JkGBaVDKgyH0yR7G1SMgVLRoQIA5CM8IZWYDHew==
 
+"@minecraft/vanilla-data@^1.20.30":
+  version "1.20.30"
+  resolved "https://registry.yarnpkg.com/@minecraft/vanilla-data/-/vanilla-data-1.20.30.tgz#5aebd5f6bce2663bdd72303b09f8381144b2a64a"
+  integrity sha512-ADFHOm5BPmeNCN3P2seCVtMFaCDeUD6in/SgtAsYQrWS2lcrdmQjYqMAKVYwDlsUejoLzcmObFbTZI1/L21fww==
+
 leafy-utils@^5.1.1:
   version "5.1.5"
   resolved "https://registry.yarnpkg.com/leafy-utils/-/leafy-utils-5.1.5.tgz#fe59b7e8784a9ae70b2bf202acfc64cd5b088dcf"

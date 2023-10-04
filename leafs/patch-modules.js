@@ -238,7 +238,7 @@ type BlockComponents = {
  * Used in {@link Entity.getComponent}
  */
 type EntityComponents = {
-  equipment_inventory: EntityEquipmentInventoryComponent;
+  equipment: EntityEquipmentComponent;
 	addrider: EntityAddRiderComponent;
 	"minecraft:addrider": EntityAddRiderComponent;
 	ageable: EntityAgeableComponent;
@@ -369,3 +369,10 @@ type EntityComponents = {
  */`,
 	},
 });
+
+import fs from "fs";
+
+fs.copyFileSync(
+	"./node_modules/@minecraft/vanilla-data/lib/index.js",
+	"./scripts/@minecraft/vanilla-data.js",
+);

@@ -1,11 +1,6 @@
-import {
-	GameMode,
-	MinecraftBlockTypes,
-	system,
-	Vector,
-	world,
-} from "@minecraft/server";
+import { GameMode, system, Vector, world } from "@minecraft/server";
 import * as GameTest from "@minecraft/server-gametest";
+import { MinecraftBlockTypes } from "@minecraft/vanilla-data.js";
 import { GameUtils, util } from "xapi.js";
 const time = 9999999;
 
@@ -35,8 +30,8 @@ GameTest.registerAsync("s", "s", async (test) => {
 GameTest.registerAsync("s", "test", async (test) => {
 	const spawnLoc = { x: 0, y: 3, z: 0 };
 
-	test.setBlockType(MinecraftBlockTypes.grass, { x: -1, z: 0, y: 1 });
-	test.setBlockType(MinecraftBlockTypes.grass, { x: -2, z: 0, y: 1 });
+	test.setBlockType(MinecraftBlockTypes.Grass, { x: -1, z: 0, y: 1 });
+	test.setBlockType(MinecraftBlockTypes.Grass, { x: -2, z: 0, y: 1 });
 
 	player = test.spawnSimulatedPlayer(spawnLoc, name);
 
@@ -52,8 +47,8 @@ GameTest.registerAsync("s", "test", async (test) => {
 	});
 
 	// player
-	// .getComponent("equipment_inventory")
-	// .getEquipmentSlot(EquipmentSlot.mainhand)
+	// .getComponent("equippable")
+	// .getEquipmentSlot(EquipmentSlot.Mainhand)
 	// .setItem(new ItemStack(MinecraftItemTypes.stoneAxe));
 
 	// First move
@@ -124,12 +119,12 @@ new XCommand({
 		if (newname) name = newname;
 
 		world.overworld.runCommand(
-			`execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`
+			`execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`,
 		);
 
 		world.overworld
 			.getBlock(Vector.add(test_loc, { x: 1, y: 0, z: 1 }))
-			?.setType(MinecraftBlockTypes.redstoneBlock);
+			?.setType(MinecraftBlockTypes.RedstoneBlock);
 
 		await system.sleep(10);
 
@@ -143,7 +138,7 @@ GameTest.registerAsync("s", "m", async (test) => {
 		const player = test.spawnSimulatedPlayer(
 			{ x: -1, y: 3, z: -1 },
 			"Tester (" + e + ")",
-			GameMode.adventure
+			GameMode.adventure,
 		);
 		player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) });
 		await test.idle(Math.random() * 50);

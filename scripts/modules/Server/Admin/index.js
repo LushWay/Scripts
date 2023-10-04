@@ -1,12 +1,13 @@
-import { Player, system, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { OPTIONS_NAME, Options } from "lib/Class/Options.js";
-import { Database } from "lib/Database/Rubedo.js";
+import { WorldDynamicPropertiesKey } from "lib/Database/Properties.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { ModalForm } from "lib/Form/ModalForm.js";
 import { FormCallback, ROLES, getRole, setRole, util } from "xapi.js";
 
-/** @type {import("lib/Database/Rubedo.js").Database<string, {role: keyof typeof ROLES, setter?: 1}>} */
-const DB = XA.tables.player;
+/** @type {WorldDynamicPropertiesKey<string, {role: keyof typeof ROLES, setter?: 1}>} */
+const key = new WorldDynamicPropertiesKey("player");
+const DB = key.proxy();
 
 const NAME = new XCommand({
 	name: "name",
@@ -31,18 +32,16 @@ const R = new XCommand({
 
 R.executes((ctx) => {
 	const role = getRole(ctx.sender.id);
-	const noAdmins = !DB.values()
+	const noAdmins = !Object.values(DB)
 		.map((e) => e.role)
 		.includes("admin");
 	const isAdmin = role === "admin";
 	const needAdmin = ctx.args[0] === "ACCESS";
-	const beenAdmin = DB.get(ctx.sender.id).setter && !isAdmin;
+	const beenAdmin = DB[ctx.sender.id].setter && !isAdmin;
 
 	if (noAdmins && ctx.sender.isOp() && (needAdmin || beenAdmin)) {
-		const { data, save } = DB.work(ctx.sender.id);
-		data.role = "admin";
-		delete data.setter;
-		save();
+		DB[ctx.sender.id].role = "admin";
+		delete DB[ctx.sender.id].setter;
 		return ctx.reply("§b> §3Вы получили роль §r" + ROLES.admin);
 	}
 
@@ -83,11 +82,9 @@ R.executes((ctx) => {
 					// @ts-expect-error
 					setRole(player.id, newrole);
 					if (fakeChange) {
-						const { data, save } = DB.work(player.id);
 						// @ts-expect-error
-						data.role = newrole;
-						data.setter = 1;
-						save();
+						DB[player.id].role = newrole;
+						DB[player.id].setter = 1;
 					}
 				});
 		};
@@ -102,17 +99,6 @@ R.executes((ctx) => {
 		form.addButton(player.name, null, callback(player));
 
 	form.show(ctx.sender);
-});
-
-system.afterEvents.scriptEventReceive.subscribe((event) => {
-	if (event.id === "ROLE:ADMIN") {
-		const player = Player.fetch(event.message);
-		if (!player)
-			return console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
-
-		setRole(player, "admin");
-		console.warn("(SCRIPTEVENT::ROLE:ADMIN) ROLE HAS BEEN SET");
-	}
 });
 
 new XCommand({
@@ -155,7 +141,7 @@ function options(player) {
 	const form = new ActionForm("§dНастройки мира");
 
 	for (const groupName in Options.WORLD) {
-		const data = OPTIONS_DB.get(groupName);
+		const data = OPTIONS_DB[groupName];
 		const requires = Object.entries(Options.WORLD[groupName]).reduce(
 			(count, [key, option]) =>
 				option.requires && typeof data[key] === "undefined" ? count + 1 : count,
@@ -173,8 +159,9 @@ function options(player) {
 	form.show(player);
 }
 
-/** @type {import("lib/Class/Options.js").OPTIONS_DB} */
-const OPTIONS_DB = new Database("options");
+/** @type {import("lib/Class/Options.js").OPTIONS_DYN} */
+const OPTIONS_DYN = new WorldDynamicPropertiesKey("options");
+const OPTIONS_DB = OPTIONS_DYN.proxy();
 
 /**
  *
@@ -187,7 +174,7 @@ function group(player, groupName, groupType, errors = {}) {
 	const source = groupType === "PLAYER" ? Options.PLAYER : Options.WORLD;
 	const config = source[groupName];
 	const name = config[OPTIONS_NAME];
-	const data = OPTIONS_DB.get(groupName);
+	const data = OPTIONS_DB[groupName];
 
 	/** @type {[string, (input: string | boolean) => string][]} */
 	const buttons = [];
@@ -255,7 +242,7 @@ function group(player, groupName, groupType, errors = {}) {
 
 					if (str(data[KEY]) === str(total)) return "";
 					data[KEY] = total;
-					OPTIONS_DB.set(groupName, data);
+					OPTIONS_DB[groupName] = data;
 					return "§aСохранено!";
 				} else return "";
 			},
@@ -306,3 +293,15 @@ function str(value) {
 	if (typeof value === "string") return value;
 	return util.inspect(value);
 }
+
+new XCommand({
+	name: "speed",
+	description: "Меняет скорость",
+}).executes((ctx) => {
+	const speedc = ctx.sender.getComponent("flying_speed");
+	new ModalForm("Скорость")
+		.addSlider("Скросоть", 1, 100, 1, speedc.value)
+		.show(ctx.sender, (_, speed) => {
+			speedc.value = speed;
+		});
+});

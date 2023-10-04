@@ -1,7 +1,7 @@
-import { ItemStack, MinecraftItemTypes } from "@minecraft/server";
+import { ItemStack } from "@minecraft/server";
+import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
 import { util } from "../util.js";
 import { DB } from "./Default.js";
-
 const TABLE_TYPE = "rubedo";
 const CHUNK_REGEXP = new RegExp(".{1," + DB.MAX_LORE_SIZE + "}", "g");
 
@@ -105,15 +105,19 @@ export class Database {
 	constructor(tableName, { events, defaultValue } = {}) {
 		if (defaultValue) {
 			events = {
+				// @ts-expect-error
 				beforeGet(key, value) {
 					if (value && typeof value === "object")
 						return DB.setDefaults(value, defaultValue(key));
-					return value;
+
+					return value ?? defaultValue(key);
 				},
+				// @ts-expect-error
 				beforeSet(key, value) {
 					if (value && typeof value === "object")
 						return DB.removeDefaults(value, defaultValue(key));
-					return value;
+
+					return value ?? defaultValue(key);
 				},
 			};
 		}
@@ -206,7 +210,7 @@ export class Database {
 		}
 
 		for (let i = 0; i < chunks.length; i++) {
-			let item = new ItemStack(MinecraftItemTypes.acaciaBoat);
+			let item = new ItemStack(MinecraftItemTypes.AcaciaBoat);
 			item.setLore([chunks[i]]);
 			inventory.setItem(i, item);
 		}
