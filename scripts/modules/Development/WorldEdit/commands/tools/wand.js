@@ -1,4 +1,4 @@
-import { EquipmentSlot, Player, Vector, world } from "@minecraft/server";
+import { Player, Vector, world } from "@minecraft/server";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
 import { WorldEditBuild } from "../../builders/WorldEditBuilder.js";
 
@@ -27,12 +27,7 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
 });
 
 world.beforeEvents.playerBreakBlock.subscribe((event) => {
-	if (
-		event.player
-			.getComponent("equippable")
-			.getEquipmentSlot(EquipmentSlot.Mainhand)?.typeId !== wand.item
-	)
-		return;
+	if (event.itemStack?.typeId !== wand.item) return;
 
 	const pos = WorldEditBuild.pos1 ?? { x: 0, y: 0, z: 0 };
 	if (
