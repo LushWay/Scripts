@@ -40,12 +40,12 @@ export const ROLES = {
 export function getRole(playerID) {
 	return "admin";
 
-	if (playerID instanceof Player) playerID = playerID.id;
+	// if (playerID instanceof Player) playerID = playerID.id;
 
-	const role = table[playerID]?.role;
+	// const role = table[playerID]?.role;
 
-	if (!role || !Object.keys(ROLES).includes(role)) return "member";
-	return role;
+	// if (!role || !Object.keys(ROLES).includes(role)) return "member";
+	// return role;
 }
 
 /**
@@ -58,10 +58,10 @@ export function getRole(playerID) {
 export function setRole(player, role) {
 	return;
 
-	if (player instanceof Player) player = player.id;
-	table[player] ??= {};
-	const obj = table[player];
-	if (obj) obj.role = role;
+	// if (player instanceof Player) player = player.id;
+	// table[player] ??= {};
+	// const obj = table[player];
+	// if (obj) obj.role = role;
 }
 
 /**

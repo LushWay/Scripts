@@ -19,11 +19,19 @@ const table = DB.proxy();
 /** @type {BlocksSets} */
 const defaultBlockSets = {
 	Земля: [[MinecraftBlockTypes.Grass, 0]],
+	"": [],
 	"Пещерный камень": [
 		[MinecraftBlockTypes.Stone, 0],
 		[MinecraftBlockTypes.Cobblestone, 0],
 	],
-	"Каменная стена": [[MinecraftBlockTypes.Stonebrick, 1]],
+	"Каменная стена": [
+		[MinecraftBlockTypes.MudBricks, 0],
+		[MinecraftBlockTypes.PackedMud, 0],
+		[MinecraftBlockTypes.BrickBlock, 0],
+		[MinecraftBlockTypes.CobblestoneWall, 9],
+		[MinecraftBlockTypes.HardenedClay, 0],
+		[MinecraftBlockTypes.Stone, 1],
+	],
 };
 
 /**
