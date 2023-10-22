@@ -16,7 +16,7 @@ import { CommandContext } from "lib/Command/Context.js";
 import { ActionForm } from "lib/Form/ActionForm.js";
 import { MessageForm } from "lib/Form/MessageForm.js";
 import { ModalForm } from "lib/Form/ModalForm.js";
-import { DB, GameUtils, Place, XShowForm, util } from "xapi.js";
+import { DB, GameUtils, Place, showForm, util } from "xapi.js";
 import { ChestFormData } from "../../../chestui/forms.js";
 import { APIRequest } from "../../../lib/Class/Net.js";
 import { generateOre } from "../../Gameplay/Survival/ore.js";
@@ -218,7 +218,7 @@ const tests = {
 				},
 			},
 		);
-		XShowForm(form, ctx.sender);
+		showForm(form, ctx.sender);
 	},
 	53(ctx) {
 		const rad = Number(ctx.args[1]);

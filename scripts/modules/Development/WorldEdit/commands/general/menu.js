@@ -4,7 +4,7 @@ import {
 	MinecraftItemTypes,
 } from "@minecraft/vanilla-data.js";
 import { WorldDynamicPropertiesKey } from "lib/Database/Properties.js";
-import { ActionForm, ModalForm, XShowForm } from "xapi.js";
+import { ActionForm, ModalForm, showForm } from "xapi.js";
 import { ChestFormData } from "../../../../../chestui/forms.js";
 import { WorldEditTool } from "../../builders/ToolBuilder.js";
 
@@ -149,7 +149,7 @@ function editBlocksSet(player, setName, sets, mode = "see") {
 	} else {
 	}
 
-	XShowForm(form, player).then((e) => {
+	showForm(form, player).then((e) => {
 		console.debug(e);
 	});
 }

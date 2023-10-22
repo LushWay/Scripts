@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
 import { MessageFormData, MessageFormResponse } from "@minecraft/server-ui";
 import { util } from "xapi.js";
-import { XShowForm } from "./utils.js";
+import { showForm } from "./utils.js";
 /** */
 export class MessageForm {
 	/**
@@ -81,7 +81,7 @@ export class MessageForm {
 	 * @returns {Promise<void>}
 	 */
 	async show(player) {
-		const response = await XShowForm(this.form, player);
+		const response = await showForm(this.form, player);
 		if (response === false || !(response instanceof MessageFormResponse))
 			return;
 

@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
 import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { util } from "xapi.js";
-import { FormCallback, XShowForm } from "./utils.js";
+import { FormCallback, showForm } from "./utils.js";
 
 /**
  * @template {Function} [Callback = (ctx: FormCallback) => void]
@@ -71,7 +71,7 @@ export class ModalForm {
 		minimumValue,
 		maximumValue,
 		valueStep = 1,
-		defaultValue = 0
+		defaultValue = 0,
 	) {
 		this.args.push({ type: "slider" });
 		this.form.slider(
@@ -79,7 +79,7 @@ export class ModalForm {
 			minimumValue,
 			maximumValue,
 			valueStep,
-			defaultValue
+			defaultValue,
 		);
 		// @ts-expect-error
 		return this;
@@ -117,7 +117,7 @@ export class ModalForm {
 	 * @returns {Promise<void>}
 	 */
 	async show(player, callback) {
-		const response = await XShowForm(this.form, player);
+		const response = await showForm(this.form, player);
 		if (
 			response === false ||
 			!(response instanceof ModalFormResponse) ||
@@ -132,9 +132,9 @@ export class ModalForm {
 					...response.formValues.map((v, i) =>
 						this.args[i].type === "dropdown" && typeof v === "number"
 							? this.args[i].options?.[v]
-							: v
-					)
-				)
+							: v,
+					),
+				),
 		);
 	}
 }

@@ -67,7 +67,7 @@ const { UserBusy, UserClosed } = FormCancelationReason;
  * @param {Player} player - The player who will receive the form.
  * @returns  The response from the form.
  */
-export async function XShowForm(form, player) {
+export async function showForm(form, player) {
 	let hold = 100;
 
 	for (let i = 0; i <= hold; i++) {
@@ -90,7 +90,7 @@ export async function XShowForm(form, player) {
 				// Last attempt, we cant do anything
 				if (i === hold) {
 					player.tell(
-						`§cНе удалось открыть форму. Закрой чат и попробуй снова`
+						`§cНе удалось открыть форму. Закрой чат и попробуй снова`,
 					);
 					return false;
 				}
