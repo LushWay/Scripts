@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"target": "ES2019",
+		"noImplicitAny": true,
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	}
+}

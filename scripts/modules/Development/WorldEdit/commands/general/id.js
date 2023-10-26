@@ -1,50 +1,50 @@
-import { EquipmentSlot, Vector } from "@minecraft/server";
-import { util } from "xapi.js";
+import { EquipmentSlot, Vector } from '@minecraft/server'
+import { util } from 'xapi.js'
 
 const root = new XCommand({
-	name: "id",
-	description: "Выдает айди",
-	role: "builder",
-	type: "we",
-});
+  name: 'id',
+  description: 'Выдает айди',
+  role: 'builder',
+  type: 'we',
+})
 
-root.executes((ctx) => {
-	const item = ctx.sender
-		.getComponent("equippable")
-		.getEquipmentSlot(EquipmentSlot.Mainhand);
-	if (!item) return ctx.reply("§cВ руке нет предмета!");
+root.executes(ctx => {
+  const item = ctx.sender
+    .getComponent('equippable')
+    .getEquipmentSlot(EquipmentSlot.Mainhand)
+  if (!item) return ctx.reply('§cВ руке нет предмета!')
 
-	ctx.reply(
-		`§b► §f${item?.typeId?.replace("minecraft:", "")} ${
-			item?.nameTag ? `(${item?.nameTag}) ` : ""
-		}`,
-	);
-});
-
-root
-	.literal({ name: "l", description: "Выдает id блока по локации" })
-	.location("location", true)
-	.executes((ctx, location) => {
-		const l = Vector.floor(location);
-		const block = ctx.sender.dimension.getBlock(l);
-		if (!block) return ctx.reply("§cНет блока!");
-		ctx.reply(`§b► §f${block.typeId.replace("minecraft:", "")}`);
-	});
+  ctx.reply(
+    `§b► §f${item?.typeId?.replace('minecraft:', '')} ${
+      item?.nameTag ? `(${item?.nameTag}) ` : ''
+    }`
+  )
+})
 
 root
-	.literal({ name: "p", description: "Выдает все states блока по локации" })
-	.location("location", true)
-	.executes((ctx, location) => {
-		const l = Vector.floor(location);
-		const block = ctx.sender.dimension.getBlock(l);
-		if (!block) return ctx.reply("§cНет блока!");
-		ctx.reply(util.inspect(block.permutation.getAllStates()));
-	});
+  .literal({ name: 'l', description: 'Выдает id блока по локации' })
+  .location('location', true)
+  .executes((ctx, location) => {
+    const l = Vector.floor(location)
+    const block = ctx.sender.dimension.getBlock(l)
+    if (!block) return ctx.reply('§cНет блока!')
+    ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}`)
+  })
 
 root
-	.literal({ name: "r", description: "Выдает наклон головы" })
-	.executes((ctx) => {
-		ctx.reply(
-			`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`,
-		);
-	});
+  .literal({ name: 'p', description: 'Выдает все states блока по локации' })
+  .location('location', true)
+  .executes((ctx, location) => {
+    const l = Vector.floor(location)
+    const block = ctx.sender.dimension.getBlock(l)
+    if (!block) return ctx.reply('§cНет блока!')
+    ctx.reply(util.inspect(block.permutation.getAllStates()))
+  })
+
+root
+  .literal({ name: 'r', description: 'Выдает наклон головы' })
+  .executes(ctx => {
+    ctx.reply(
+      `§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
+    )
+  })

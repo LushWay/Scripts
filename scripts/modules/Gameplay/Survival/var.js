@@ -1,4 +1,4 @@
 /**
  * @type {Record<string, number>}
  */
-export const RaidNotify = {};
+export const RaidNotify = {}

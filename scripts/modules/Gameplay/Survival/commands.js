@@ -1,4 +1,4 @@
-import { SERVER } from "../../Server/Server/var.js";
+import { SERVER } from '../../Server/Server/var.js'
 
 // new XCommand({
 // 	name: "resetpos",
@@ -10,10 +10,10 @@ import { SERVER } from "../../Server/Server/var.js";
 // });
 
 new XCommand({
-	name: "radius",
-	description: "Выдает радиус границы анархии сейчас",
-	type: "public",
-	role: "member",
-}).executes((ctx) => {
-	ctx.reply(`☺ ${SERVER.radius}`);
-});
+  name: 'radius',
+  description: 'Выдает радиус границы анархии сейчас',
+  type: 'public',
+  role: 'member',
+}).executes(ctx => {
+  ctx.reply(`☺ ${SERVER.radius}`)
+})

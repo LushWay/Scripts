@@ -1,179 +1,206 @@
-import { Player, system, world } from "@minecraft/server";
-import { util } from "../util.js";
-import { DB, DatabaseError } from "./Default.js";
+import { Player, World, system, world } from '@minecraft/server'
+import { util } from '../util.js'
+import { DB, DatabaseError } from './Default.js'
+
+/**
+ * @template {string} [Key = string]
+ * @template [Value=undefined]
+ * @param {string} key
+ * @param {{defaultValue?: DynamicPropertyDB<Key, Value>["defaultValue"]}} [options]
+ * @param {World | Player} [source=world]
+ * @returns {Record<Key, Value>}
+ */
+export function DPDBProxy(key, options, source) {
+  return new DynamicPropertyDB(key, options, source).proxy()
+}
 
 /**
  * @template {string} [Key = string]
  * @template [Value=undefined]
  */
-export class WorldDynamicPropertiesKey {
-	/**
-	 * @private
-	 * @type {Record<any, any>}
-	 */
-	value = {};
+class DynamicPropertyDB {
+  /**
+   * @type {Record<string, DynamicPropertyDB<any, any>>}
+   */
+  static keys = {}
 
-	/**
-	 *
-	 * @param {string} key
-	 * @param {{defaultValue?: WorldDynamicPropertiesKey<Key, Value>["defaultValue"]}} [options]
-	 */
-	constructor(key, options = {}) {
-		if (key in WorldDynamicPropertiesKey.keys) {
-			const source = WorldDynamicPropertiesKey.keys[key];
-			return options?.defaultValue
-				? Object.setPrototypeOf(
-						{
-							defaultValue: options.defaultValue,
-						},
-						source,
-				  )
-				: source;
-		}
+  /**
+   * @private
+   * @type {Record<any, any>}
+   */
+  value = {}
 
-		/** @type {string} */
-		this.key = key;
-		if (options.defaultValue) this.defaultValue = options.defaultValue;
-		WorldDynamicPropertiesKey.keys[key] = this;
+  /**
+   *
+   * @param {string} key
+   * @param {{defaultValue?: DynamicPropertyDB<Key, Value>["defaultValue"]}} [options]
+   * @param {World | Player} [source=world]
+   */
+  constructor(key, options = {}, source = world) {
+    if (key in DynamicPropertyDB.keys) {
+      const source = DynamicPropertyDB.keys[key]
+      return options?.defaultValue
+        ? Object.setPrototypeOf(
+            {
+              defaultValue: options.defaultValue,
+            },
+            source
+          )
+        : source
+    }
 
-		this.init();
-	}
-	initTries = 0;
-	init() {
-		this.initTries++;
-		// Init
-		try {
-			const value = world.getDynamicProperty(this.key) ?? "{}";
-			if (typeof value !== "string") {
-				throw new DatabaseError(
-					`Unexpected type for key '${this.key}': ${typeof value}`,
-				);
-			}
-			this.value = JSON.parse(value);
-		} catch (error) {
-			if (
-				error &&
-				error.message &&
-				error.message.startsWith("Dynamic property") &&
-				this.initTries < 2
-			) {
-				return system.runTimeout(
-					() => {
-						this.init();
-					},
-					"dyn reinit",
-					10,
-				);
-			}
-			util.error(
-				new DatabaseError(`Failed to parse init key '${this.key}': ${error}`),
-			);
-		}
-	}
-	/**
-	 *
-	 * @returns {Record<string, Value>}
-	 */
-	proxy() {
-		return this.subproxy(this.value, "", "", true);
-	}
+    /** @type {World | Player} */
+    this.source = source
+    /** @type {string} */
+    this.key = key
+    if (options.defaultValue) this.defaultValue = options.defaultValue
+    DynamicPropertyDB.keys[key] = this
 
-	_needSave = false;
-	needSave() {
-		console.log("save requested for " + this.key);
-		if (!this._needSave)
-			system.run(() =>
-				util.catch(() => {
-					world.setDynamicProperty(this.key, JSON.stringify(this.value));
-					this._needSave = false;
-				}, "PropertySave"),
-			);
-	}
+    this.init()
+  }
+  init() {
+    // Init
+    try {
+      const value = this.source.getDynamicProperty(this.key) ?? '{}'
+      if (typeof value !== 'string') {
+        throw new DatabaseError(`Expected string, recieved ${typeof value}`)
+      }
 
-	/**
-	 *
-	 * @private
-	 * @param {string} p
-	 * @returns {NonNullable<Value> extends JSONLike ? Partial<Value> : never}
-	 */
-	defaultValue(p) {
-		return {};
-	}
+      this.value = Object.fromEntries(
+        Object.entries(JSON.parse(value)).map(([key, value]) => {
+          const defaultv = typeof key !== 'symbol' && this.defaultValue(key)
+          return [
+            key,
+            typeof value === 'object' &&
+            value !== null &&
+            typeof defaultv === 'object' &&
+            defaultv !== null
+              ? DB.setDefaults(value, defaultv)
+              : value ?? defaultv,
+          ]
+        })
+      )
+    } catch (error) {
+      util.error(
+        new DatabaseError(`Failed to parse init key '${this.key}': ${error}`)
+      )
+    }
+  }
+  /**
+   *
+   * @returns {Record<string, Value>}
+   */
+  proxy() {
+    return this.subproxy(this.value, '', '', true)
+  }
 
-	/**
-	 *
-	 * @param {Record<string, any>} object
-	 * @param {string} key
-	 * @param {string} keys
-	 * @returns {Record<string, any>}
-	 */
-	subproxy(object, key, keys, initial = false) {
-		const db = this;
-		return new Proxy(object, {
-			get(target, p, reciever) {
-				const value = Reflect.get(target, p, reciever);
-				if (typeof p === "symbol") return value;
-				if (typeof value === "object")
-					return db.subproxy(
-						initial ? DB.setDefaults(value, db.defaultValue(p)) : value,
-						p,
-						initial ? db.key : keys + "." + key,
-					);
+  /** @private */
+  _needSave = false
+  needSave() {
+    if (!this._needSave)
+      system.run(() =>
+        util.catch(() => {
+          this.source.setDynamicProperty(
+            this.key,
+            JSON.stringify(
+              Object.fromEntries(
+                Object.entries(this.value).map(([key, value]) => {
+                  const defaultv =
+                    typeof key !== 'symbol' && this.defaultValue(key)
+                  return [
+                    key,
+                    typeof value === 'object' &&
+                    value !== null &&
+                    typeof defaultv === 'object' &&
+                    defaultv !== null
+                      ? DB.removeDefaults(value, defaultv)
+                      : value,
+                  ]
+                })
+              )
+            )
+          )
+          this._needSave = false
+        }, 'DynamicPropertySave')
+      )
+  }
 
-				return value;
-			},
-			set(target, p, value, reciever) {
-				if (typeof p === "symbol")
-					return Reflect.set(target, p, value, reciever);
-				// if (typeof value === "object") {
-				// 	Object.defineProperties(
-				// 		value,
-				// 		Object.fromEntries(
-				// 			Object.entries(Object.getOwnPropertyDescriptors(value))
-				// 				.filter(([_, d]) => (d.writable || d.set) && d.configurable)
-				// 				.map(([key, descriptor]) => {
-				// 					console.log({ key, descriptor });
-				// 					/** @type {any} */
-				// 					let v1 = descriptor.value;
-				// 					delete descriptor.value;
-				// 					delete descriptor.writable;
+  /**
+   *
+   * @private
+   * @param {string} p
+   * @returns {NonNullable<Value> extends JSONLike ? Partial<Value> : Value}
+   */
+  defaultValue(p) {
+    return {}
+  }
 
-				// 					const originalSet = descriptor.set?.bind(descriptor);
-				// 					descriptor.set = (v2) => {
-				// 						db.needSave();
-				// 						originalSet ? originalSet(v2) : (v1 = v2);
-				// 					};
-				// 					if (descriptor.get) {
-				// 						descriptor.get =
-				// 							descriptor.get?.bind(descriptor) ?? (() => v1);
-				// 					}
+  /**
+   *
+   * @param {Record<string, any>} object
+   * @param {string} key
+   * @param {string} keys
+   * @returns {Record<string, any>}
+   */
+  subproxy(object, key, keys, initial = false) {
+    const db = this
+    return new Proxy(object, {
+      get(target, p, reciever) {
+        let value = Reflect.get(target, p, reciever)
+        if (typeof p === 'symbol') return value
+        if (typeof value === 'undefined') {
+          value = db.defaultValue(p)
+          Reflect.set(target, p, value, reciever)
+        }
+        if (typeof value === 'object' && value !== null) {
+          return db.subproxy(value, p, keys + '.' + key)
+        }
 
-				// 					return [key, descriptor];
-				// 				}),
-				// 		),
-				// 	);
-				// }
+        return value
+      },
+      set(target, p, value, reciever) {
+        if (typeof p === 'symbol') {
+          return Reflect.set(target, p, value, reciever)
+        }
+        // if (typeof value === "object") {
+        // 	Object.defineProperties(
+        // 		value,
+        // 		Object.fromEntries(
+        // 			Object.entries(Object.getOwnPropertyDescriptors(value))
+        // 				.filter(([_, d]) => (d.writable || d.set) && d.configurable)
+        // 				.map(([key, descriptor]) => {
+        // 					console.log({ key, descriptor });
+        // 					/** @type {any} */
+        // 					let v1 = descriptor.value;
+        // 					delete descriptor.value;
+        // 					delete descriptor.writable;
 
-				const setted = Reflect.set(
-					target,
-					p,
-					initial ? DB.setDefaults(value, db.defaultValue(p)) : value,
-					reciever,
-				);
-				if (setted) db.needSave();
-				return setted;
-			},
-		});
-	}
+        // 					const originalSet = descriptor.set?.bind(descriptor);
+        // 					descriptor.set = (v2) => {
+        // 						db.needSave();
+        // 						originalSet ? originalSet(v2) : (v1 = v2);
+        // 					};
+        // 					if (descriptor.get) {
+        // 						descriptor.get =
+        // 							descriptor.get?.bind(descriptor) ?? (() => v1);
+        // 					}
 
-	/**
-	 * @type {Record<string, WorldDynamicPropertiesKey<any, any>>}
-	 */
-	static keys = {};
+        // 					return [key, descriptor];
+        // 				}),
+        // 		),
+        // 	);
+        // }
+
+        const setted = Reflect.set(target, p, value, reciever)
+        if (setted) db.needSave()
+        return setted
+      },
+    })
+  }
 }
 
-Object.defineProperty(Player.prototype, "database", {
-	enumerable: true,
-	configurable: false,
-	get() {},
-});
+Object.defineProperty(Player.prototype, 'database', {
+  enumerable: true,
+  configurable: false,
+  get() {},
+})

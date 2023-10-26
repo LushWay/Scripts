@@ -1,239 +1,242 @@
-import { ItemStack, ItemTypes, world } from "@minecraft/server";
-import { MinecraftItemTypes } from "@minecraft/vanilla-data.js";
-import { Enchantments } from "./enchantments.js";
+import { ItemStack, ItemTypes, world } from '@minecraft/server'
+import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { Enchantments } from './enchantments.js'
 
 export class LootTable {
-	/**
-	 * Stored items
-	 * @type {Array<import("./types.js").LootItem.Stored & import("./types.js").LootItem.Stored>}
-	 */
-	items;
+  /**
+   * Stored items
+   * @type {Array<import("./types.js").LootItem.Stored & import("./types.js").LootItem.Stored>}
+   */
+  items
 
-	totalChance = 0;
+  totalChance = 0
 
-	/**
-	 * Creates new LootTable with specified items
-	 * @param  {...import("./types.js").LootItem.Input} items - Items to randomise
-	 */
-	constructor(...items) {
-		this.items = items.map((item) => {
-			const id =
-				"type" in item
-					? MinecraftItemTypes[item.type]
-					: ItemTypes.get(item.id).id;
+  /**
+   * Creates new LootTable with specified items
+   * @param  {...import("./types.js").LootItem.Input} items - Items to randomise
+   */
+  constructor(...items) {
+    this.items = items.map(item => {
+      const id =
+        'type' in item
+          ? MinecraftItemTypes[item.type]
+          : ItemTypes.get(item.id)?.id
 
-			/** @type {number[]} */
-			const amount =
-				typeof item.amount === "number"
-					? [item.amount]
-					: typeof item.amount === "object"
-					? RandomCost.toArray(item.amount)
-					: [1];
+      if (!id)
+        throw new TypeError(
+          'Unkown LootTable.item id: ' + ('type' in item ? item.type : item.id)
+        )
 
-			/** @type {Record<string, number[]>} */
-			const enchantments = {};
-			for (const [key, value] of Object.entries(item.enchantments ?? {})) {
-				enchantments[key] = RandomCost.toArray(value);
-			}
+      /** @type {number[]} */
+      const amount =
+        typeof item.amount === 'number'
+          ? [item.amount]
+          : typeof item.amount === 'object'
+          ? RandomCost.toArray(item.amount)
+          : [1]
 
-			const chance = parseInt(item.chance);
-			if (isNaN(chance))
-				throw new TypeError(
-					`Chance must be \`{number}%\`, got '${chance}' instead!`,
-				);
-			this.totalChance += chance;
+      /** @type {Record<string, number[]>} */
+      const enchantments = {}
+      for (const [key, value] of Object.entries(item.enchantments ?? {})) {
+        enchantments[key] = RandomCost.toArray(value)
+      }
 
-			/** @type {import("./types.js").LootItem.Options<number[]>} */
-			const options = Object.assign(item?.options ?? {});
-			if (item.options?.damage) {
-				options.damage = RandomCost.toArray(item.options.damage);
-			}
+      const chance = parseInt(item.chance)
+      if (isNaN(chance))
+        throw new TypeError(
+          `Chance must be \`{number}%\`, got '${chance}' instead!`
+        )
+      this.totalChance += chance
 
-			return {
-				id: id,
-				chance: chance,
-				nameTag: item.nameTag ?? "",
-				lore: item.lore ?? [],
-				enchantments: enchantments,
-				amount: amount,
-				options: options ?? {},
-			};
-		});
-	}
+      /** @type {import("./types.js").LootItem.Options<number[]>} */
+      const options = Object.assign(item?.options ?? {})
+      if (item.options?.damage) {
+        options.damage = RandomCost.toArray(item.options.damage)
+      }
 
-	/**
-	 * Randomises items and returns array with specified size
-	 * @param {number} size - Size of the array
-	 * @param {percent} air
-	 * @returns {Array<ItemStack | null | undefined>}
-	 */
-	generate(size, air = "70%") {
-		let step = 0;
-		const stepMax = ~~(size * (parseInt(air) / 100));
-		world.debug({ stepMax });
+      return {
+        id: id,
+        chance: chance,
+        nameTag: item.nameTag ?? '',
+        lore: item.lore ?? [],
+        enchantments: enchantments,
+        amount: amount,
+        options: options ?? {},
+      }
+    })
+  }
 
-		return new Array(size).fill(null).map(() => {
-			// Select air between items
-			if (step > 0) {
-				step--;
-				return null;
-			}
+  /**
+   * Randomises items and returns array with specified size
+   * @param {number} size - Size of the array
+   * @param {percent} air
+   * @returns {Array<ItemStack | null | undefined>}
+   */
+  generate(size, air = '70%') {
+    let step = 0
+    const stepMax = ~~(size * (parseInt(air) / 100))
+    world.debug({ stepMax })
 
-			step = Math.randomInt(0, stepMax);
+    return new Array(size).fill(null).map(() => {
+      // Select air between items
+      if (step > 0) {
+        step--
+        return null
+      }
 
-			// Get random item depends on chance
-			let random = Math.randomInt(0, this.totalChance);
-			/**
-			 * @type {import("./types.js").LootItem.Stored}
-			 */
-			let item;
+      step = Math.randomInt(0, stepMax)
 
-			for (const current of this.items) {
-				random -= current.chance;
+      // Get random item depends on chance
+      let random = Math.randomInt(0, this.totalChance)
+      /**
+       * @type {import("./types.js").LootItem.Stored}
+       */
+      let item
 
-				if (0 > random) {
-					item = current;
-					break;
-				}
-			}
+      for (const current of this.items) {
+        random -= current.chance
 
-			item = this.items[0];
+        if (0 > random) {
+          item = current
+          break
+        }
+      }
 
-			// Randomise item properties
-			const amount = item.amount.randomElement();
-			if (amount <= 0) return;
+      item = this.items[0]
 
-			const stack = new ItemStack(item.id, amount);
+      // Randomise item properties
+      const amount = item.amount.randomElement()
+      if (amount <= 0) return
 
-			const { enchantments } = stack.enchantments;
-			for (const [name, levels] of Object.entries(item.enchantments)) {
-				const level = levels.randomElement();
-				if (!level) continue;
-				enchantments.addEnchantment(Enchantments.custom[name][level]);
-			}
-			stack.enchantments.enchantments = enchantments;
+      const stack = new ItemStack(item.id, amount)
 
-			const {
-				canDestroy,
-				canPlaceOn,
-				damage: durability,
-				lockMode,
-				keepOnDeath,
-			} = item.options;
+      const { enchantments } = stack.enchantments
+      for (const [name, levels] of Object.entries(item.enchantments)) {
+        const level = levels.randomElement()
+        if (!level) continue
+        enchantments.addEnchantment(Enchantments.custom[name][level])
+      }
+      stack.enchantments.enchantments = enchantments
 
-			if (item.nameTag) stack.nameTag = item.nameTag;
-			if (item.lore.length) stack.setLore(item.lore);
+      const {
+        canDestroy,
+        canPlaceOn,
+        damage: durability,
+        lockMode,
+        keepOnDeath,
+      } = item.options
 
-			if (keepOnDeath) stack.keepOnDeath = true;
-			if (lockMode) stack.lockMode = lockMode;
-			if (canDestroy?.length) stack.setCanDestroy(canDestroy);
-			if (canPlaceOn?.length) stack.setCanPlaceOn(canPlaceOn);
-			if (durability?.length) {
-				const damage = durability.randomElement();
-				if (damage) stack.durability.damage = damage;
-			}
+      if (item.nameTag) stack.nameTag = item.nameTag
+      if (item.lore.length) stack.setLore(item.lore)
 
-			return stack;
-		});
-	}
+      if (keepOnDeath) stack.keepOnDeath = true
+      if (lockMode) stack.lockMode = lockMode
+      if (canDestroy?.length) stack.setCanDestroy(canDestroy)
+      if (canPlaceOn?.length) stack.setCanPlaceOn(canPlaceOn)
+      if (durability?.length) {
+        const damage = durability.randomElement()
+        if (damage) stack.durability.damage = damage
+      }
+
+      return stack
+    })
+  }
 }
 
 const RandomCost = {
-	/**
-	 * @param {RandomCostMapType} inputMap
-	 */
-	toArray(inputMap) {
-		/** @type {Record<number, number>} */
-		const newMap = {};
+  /**
+   * @param {RandomCostMapType} inputMap
+   */
+  toArray(inputMap) {
+    /** @type {Record<number, number>} */
+    const newMap = {}
 
-		for (const [range, rawValue] of Object.entries(inputMap)) {
-			const value = parseInt(rawValue.slice(0, -1));
+    for (const [range, rawValue] of Object.entries(inputMap)) {
+      const value = parseInt(rawValue.slice(0, -1))
 
-			if (range.includes(".")) {
-				// Extract `number...number`
-				const match = range.match(/^(\d{1,4})\.\.\.(\d{1,4})$/);
+      if (range.includes('.')) {
+        // Extract `number...number`
+        const match = range.match(/^(\d{1,4})\.\.\.(\d{1,4})$/)
 
-				if (!match) {
-					throw new RangeError(`Range '${range}' doesn't matches the pattern.`);
-				}
-				const [, min, max] = match.map((n) => parseInt(n));
+        if (!match) {
+          throw new RangeError(`Range '${range}' doesn't matches the pattern.`)
+        }
+        const [, min, max] = match.map(n => parseInt(n))
 
-				if (min > max) throw new RangeError("Min cannot be greater than max");
-				if (min === max) {
-					throw new RangeError(
-						"Min cannot be equal to max. Use one number as key instead.",
-					);
-				}
+        if (min > max) throw new RangeError('Min cannot be greater than max')
+        if (min === max) {
+          throw new RangeError(
+            'Min cannot be equal to max. Use one number as key instead.'
+          )
+        }
 
-				for (let i = min; i <= max; i++) {
-					if (newMap[i]) {
-						throw new RangeError(
-							`Key '${i}' already exists and has value of ${newMap[i]}%. (Affected range: '${range}')`,
-						);
-					}
-					newMap[i] = value;
-				}
-			} else {
-				const key = parseInt(range);
-				if (isNaN(key)) throw new TypeError(`Not a number! (${range})`);
-				newMap[key] = value;
-			}
-		}
+        for (let i = min; i <= max; i++) {
+          if (newMap[i]) {
+            throw new RangeError(
+              `Key '${i}' already exists and has value of ${newMap[i]}%. (Affected range: '${range}')`
+            )
+          }
+          newMap[i] = value
+        }
+      } else {
+        const key = parseInt(range)
+        if (isNaN(key)) throw new TypeError(`Not a number! (${range})`)
+        newMap[key] = value
+      }
+    }
 
-		/** @type {number[]} */
-		const finalMap = new Array(
-			Object.values(newMap).reduce((p, c) => p + c, 0),
-		);
+    /** @type {number[]} */
+    const finalMap = new Array(Object.values(newMap).reduce((p, c) => p + c, 0))
 
-		let i = 0;
-		for (const [key, value] of Object.entries(newMap)) {
-			finalMap.fill(Number(key), i, i + value);
-			i += value;
-		}
+    let i = 0
+    for (const [key, value] of Object.entries(newMap)) {
+      finalMap.fill(Number(key), i, i + value)
+      i += value
+    }
 
-		return finalMap;
-	},
-};
+    return finalMap
+  },
+}
 
 const table = new LootTable(
-	{
-		id: "minecraft:diamond_sword",
-		chance: "40%",
-		amount: {
-			0: "50%",
-			1: "50%",
-		},
-		enchantments: {
-			sharpness: {
-				0: "40%",
-				"1...2": "50%",
-				"3...5": "10%",
-			},
-		},
-		options: {
-			damage: {
-				0: "20%",
-				40: "60%",
-			},
-		},
-	},
-	{
-		type: "Apple",
-		amount: {
-			"1...40": "6%",
-			"41...64": "1%",
-		},
-		chance: "50%",
-	},
-);
+  {
+    id: 'minecraft:diamond_sword',
+    chance: '40%',
+    amount: {
+      0: '50%',
+      1: '50%',
+    },
+    enchantments: {
+      sharpness: {
+        '0': '40%',
+        '1...2': '50%',
+        '3...5': '10%',
+      },
+    },
+    options: {
+      damage: {
+        0: '20%',
+        40: '60%',
+      },
+    },
+  },
+  {
+    type: 'Apple',
+    amount: {
+      '1...40': '6%',
+      '41...64': '1%',
+    },
+    chance: '50%',
+  }
+)
 
 new XCommand({
-	name: "loott",
-	role: "admin",
-}).executes((ctx) => {
-	const { container } = ctx.sender.getComponent("inventory");
-	const gen = table.generate(container.size, "30%");
-	for (const [i, item] of gen.entries()) {
-		if (item) container.setItem(i, item);
-	}
-});
+  name: 'loott',
+  role: 'admin',
+}).executes(ctx => {
+  const { container } = ctx.sender.getComponent('inventory')
+  const gen = table.generate(container.size, '30%')
+  for (const [i, item] of gen.entries()) {
+    if (item) container.setItem(i, item)
+  }
+})

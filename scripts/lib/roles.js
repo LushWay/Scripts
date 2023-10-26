@@ -1,35 +1,32 @@
-import { Player, system } from "@minecraft/server";
-import { WorldDynamicPropertiesKey } from "lib/Database/Properties.js";
-console.log("imported");
-/** @type {WorldDynamicPropertiesKey<string, {role?: keyof typeof ROLES} | undefined>} */
-const db = new WorldDynamicPropertiesKey("player", {
-	defaultValue() {
-		return { role: "member" };
-	},
-});
+import { Player, system } from '@minecraft/server'
+import { DPDBProxy } from 'lib/Database/Properties.js'
+/** @type {Record<string, {role?: keyof typeof ROLES} | undefined>} */
+const DB = DPDBProxy('player', {
+  defaultValue() {
+    return { role: 'member' }
+  },
+})
 
-system.afterEvents.scriptEventReceive.subscribe((event) => {
-	if (event.id === "ROLE:ADMIN") {
-		const player = Player.fetch(event.message);
-		if (!player)
-			return console.warn("(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND");
+system.afterEvents.scriptEventReceive.subscribe(event => {
+  if (event.id === 'ROLE:ADMIN') {
+    const player = Player.fetch(event.message)
+    if (!player)
+      return console.warn('(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND')
 
-		setRole(player, "admin");
-		console.warn("(SCRIPTEVENT::ROLE:ADMIN) ROLE HAS BEEN SET");
-	}
-});
-
-const table = db.proxy();
+    setRole(player, 'admin')
+    console.warn('(SCRIPTEVENT::ROLE:ADMIN) ROLE HAS BEEN SET')
+  }
+})
 
 /**
  * The roles that are in this server
  */
 export const ROLES = {
-	admin: "§cАдмин",
-	moderator: "§5Модератор",
-	builder: "§3Строитель",
-	member: "§fУчастник",
-};
+  admin: '§cАдмин',
+  moderator: '§5Модератор',
+  builder: '§3Строитель',
+  member: '§fУчастник',
+}
 
 /**
  * Gets the role of this player
@@ -38,14 +35,12 @@ export const ROLES = {
  * @example getRole("23529890")
  */
 export function getRole(playerID) {
-	return "admin";
+  if (playerID instanceof Player) playerID = playerID.id
 
-	// if (playerID instanceof Player) playerID = playerID.id;
+  const role = DB[playerID]?.role
 
-	// const role = table[playerID]?.role;
-
-	// if (!role || !Object.keys(ROLES).includes(role)) return "member";
-	// return role;
+  if (!role || !Object.keys(ROLES).includes(role)) return 'member'
+  return role
 }
 
 /**
@@ -56,12 +51,10 @@ export function getRole(playerID) {
  * @returns {void}
  */
 export function setRole(player, role) {
-	return;
-
-	// if (player instanceof Player) player = player.id;
-	// table[player] ??= {};
-	// const obj = table[player];
-	// if (obj) obj.role = role;
+  if (player instanceof Player) player = player.id
+  DB[player] ??= {}
+  const obj = DB[player]
+  if (obj) obj.role = role
 }
 
 /**
@@ -70,12 +63,12 @@ export function setRole(player, role) {
  * @param {keyof typeof ROLES} role
  */
 export function is(playerID, role) {
-	/** @type {(keyof typeof ROLES)[]} */
-	let arr = ["moderator", "admin"];
+  /** @type {(keyof typeof ROLES)[]} */
+  let arr = ['moderator', 'admin']
 
-	if (role === "member") return true;
-	if (role === "builder") arr.push("builder");
-	if (role === "admin") arr = ["admin"];
+  if (role === 'member') return true
+  if (role === 'builder') arr.push('builder')
+  if (role === 'admin') arr = ['admin']
 
-	return arr.includes(getRole(playerID));
+  return arr.includes(getRole(playerID))
 }

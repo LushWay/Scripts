@@ -1,66 +1,64 @@
-import { System, world } from "@minecraft/server";
-import { util } from "../util.js";
-import { OverTakes } from "./import.js";
+import { System, world } from '@minecraft/server'
+import { util } from '../util.js'
+import { OverTakes } from './import.js'
 
 /**
  * @type {Record<string, string>}
  */
-export const TIMERS_PATHES = {};
+export const TIMERS_PATHES = {}
 
 OverTakes(System.prototype, {
-	sleep(time) {
-		return new Promise((resolve) => super.runInterval(resolve, time));
-	},
-	runInterval(fn, name, ticks = 0) {
-		const visual_id = `${name} (loop ${ticks} ticks)`;
-		const path = util.error.stack.get();
-		TIMERS_PATHES[visual_id] = path;
+  sleep(time) {
+    return new Promise(resolve => super.runInterval(resolve, time))
+  },
+  runInterval(fn, name, ticks = 0) {
+    const visual_id = `${name} (loop ${ticks} ticks)`
+    const path = util.error.stack.get()
+    TIMERS_PATHES[visual_id] = path
 
-		return super.runInterval(() => {
-			const end = util.benchmark(visual_id, "timers");
+    return super.runInterval(() => {
+      const end = util.benchmark(visual_id, 'timers')
 
-			util.catch(fn, "Interval");
+      util.catch(fn, 'Interval')
 
-			const took_ticks = ~~(end() / 20);
-			if (took_ticks > ticks)
-				console.warn(
-					`Found slow interval (${took_ticks}/${ticks})  at:\n${path}`,
-				);
-		}, ticks);
-	},
-	runTimeout(fn, name, ticks = 0) {
-		const visual_id = `${name} (loop ${ticks} ticks)`;
-		const path = util.error.stack.get();
-		TIMERS_PATHES[visual_id] = path;
+      const took_ticks = ~~(end() / 20)
+      if (took_ticks > ticks)
+        console.warn(
+          `Found slow interval (${took_ticks}/${ticks})  at:\n${path}`
+        )
+    }, ticks)
+  },
+  runTimeout(fn, name, ticks = 0) {
+    const visual_id = `${name} (loop ${ticks} ticks)`
+    const path = util.error.stack.get()
+    TIMERS_PATHES[visual_id] = path
 
-		return super.runTimeout(() => {
-			const end = util.benchmark(visual_id, "timers");
+    return super.runTimeout(() => {
+      const end = util.benchmark(visual_id, 'timers')
 
-			util.catch(fn, "Timeout");
+      util.catch(fn, 'Timeout')
 
-			const took_ticks = ~~(end() / 20);
-			if (took_ticks > ticks)
-				console.warn(
-					`Found slow timeout (${took_ticks}/${ticks}) at:\n${path}`,
-				);
-		}, ticks);
-	},
-	runPlayerInterval(fn, name, ticks = 0) {
-		const visual_id = `${name} (loop ${ticks} ticks)`;
-		const path = util.error.stack.get();
-		TIMERS_PATHES[visual_id] = path;
-		const forEach = () => {
-			for (const player of world.getPlayers()) fn(player);
-		};
+      const took_ticks = ~~(end() / 20)
+      if (took_ticks > ticks)
+        console.warn(`Found slow timeout (${took_ticks}/${ticks}) at:\n${path}`)
+    }, ticks)
+  },
+  runPlayerInterval(fn, name, ticks = 0) {
+    const visual_id = `${name} (loop ${ticks} ticks)`
+    const path = util.error.stack.get()
+    TIMERS_PATHES[visual_id] = path
+    const forEach = () => {
+      for (const player of world.getPlayers()) fn(player)
+    }
 
-		return super.runInterval(() => {
-			const end = util.benchmark(visual_id, "timers");
+    return super.runInterval(() => {
+      const end = util.benchmark(visual_id, 'timers')
 
-			util.catch(forEach, "Player interval");
+      util.catch(forEach, 'Player interval')
 
-			const took_ticks = ~~(end() / 20);
-			if (took_ticks > ticks)
-				console.warn(`Found slow players interval at:\n${path}`);
-		}, ticks);
-	},
-});
+      const took_ticks = ~~(end() / 20)
+      if (took_ticks > ticks)
+        console.warn(`Found slow players interval at:\n${path}`)
+    }, ticks)
+  },
+})

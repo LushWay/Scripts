@@ -1,14 +1,14 @@
-import { Player, Vector, world } from "@minecraft/server";
-import { Anarchy, Spawn } from "../../modules/Gameplay/Survival/index.js";
-import { ActionForm } from "../Form/ActionForm.js";
-import { Place } from "./Action.js";
-import { Sidebar } from "./Sidebar.js";
-import { OverTakes } from "../Extensions/import.js";
+import { Player, Vector, world } from '@minecraft/server'
+import { Anarchy, Spawn } from '../../modules/Gameplay/Survival/index.js'
+import { ActionForm } from '../Form/ActionForm.js'
+import { Place } from './Action.js'
+import { Sidebar } from './Sidebar.js'
+import { OverTakes } from '../Extensions/import.js'
 
 // @ts-expect-error
 Set.prototype.toJSON = function () {
-	return "Set<size=" + this.size + ">";
-};
+  return 'Set<size=' + this.size + '>'
+}
 
 /**
  * @typedef {{
@@ -22,135 +22,135 @@ Set.prototype.toJSON = function () {
  */
 
 export class Quest {
-	/** @type {import("./Sidebar.js").SidebarLinePreinit} */
-	static sidebar = {
-		preinit(sidebar) {
-			const onquestupdate = sidebar.update.bind(sidebar);
+  /** @type {import("./Sidebar.js").SidebarLinePreinit} */
+  static sidebar = {
+    preinit(sidebar) {
+      const onquestupdate = sidebar.update.bind(sidebar)
 
-			return function (player) {
-				const status = Quest.active(player);
-				if (!status) return false;
+      return function (player) {
+        const status = Quest.active(player)
+        if (!status) return false
 
-				const listeners = status.quest.steps(player).updateListeners;
-				if (!listeners.has(onquestupdate)) listeners.add(onquestupdate);
+        const listeners = status.quest.steps(player).updateListeners
+        if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-				return `§6Квест: §f${
-					status.quest.name
-				}\n${status.step.text()}\n§6Подробнее: §f-q`;
-			};
-		},
-	};
+        return `§6Квест: §f${
+          status.quest.name
+        }\n${status.step.text()}\n§6Подробнее: §f-q`
+      }
+    },
+  }
 
-	/**
-	 * @type {Record<string, Quest>}
-	 */
-	static instances = {};
+  /**
+   * @type {Record<string, Quest>}
+   */
+  static instances = {}
 
-	/**
-	 * @type {Record<string, PlayerQuest>}
-	 */
-	players = {};
+  /**
+   * @type {Record<string, PlayerQuest>}
+   */
+  players = {}
 
-	/**
-	 * @param {Player} player
-	 */
-	steps(player) {
-		if (this.players[player.id]) return this.players[player.id];
+  /**
+   * @param {Player} player
+   */
+  steps(player) {
+    if (this.players[player.id]) return this.players[player.id]
 
-		this.players[player.id] = new PlayerQuest(this, player);
-		this.init(this.players[player.id], player);
+    this.players[player.id] = new PlayerQuest(this, player)
+    this.init(this.players[player.id], player)
 
-		world.afterEvents.playerLeave.subscribe(
-			({ playerId }) => delete this.players[playerId],
-		);
+    world.afterEvents.playerLeave.subscribe(
+      ({ playerId }) => delete this.players[playerId]
+    )
 
-		return this.players[player.id];
-	}
+    return this.players[player.id]
+  }
 
-	/**
-	 * @param {string} name
-	 * @param {(q: PlayerQuest, p: Player) => void} init
-	 */
-	constructor(name, init) {
-		this.name = name;
-		this.init = init;
-		Quest.instances[this.name] = this;
-		world.getAllPlayers().forEach(setQuests);
-	}
+  /**
+   * @param {string} name
+   * @param {(q: PlayerQuest, p: Player) => void} init
+   */
+  constructor(name, init) {
+    this.name = name
+    this.init = init
+    Quest.instances[this.name] = this
+    world.getAllPlayers().forEach(setQuests)
+  }
 
-	/**
-	 * @param {Player} player
-	 */
-	enter(player) {
-		this.step(player, 0);
-	}
+  /**
+   * @param {Player} player
+   */
+  enter(player) {
+    this.step(player, 0)
+  }
 
-	/**
-	 * @param {Player} player
-	 * @param {number} stepNum
-	 */
-	step(player, stepNum, clearAdditionalBeforeNextStep = true) {
-		/** @type {PlayerDB<QuestDB>} */
-		const { data, save } = player.db();
-		data.quest ??= {
-			active: this.name,
-		};
-		data.quest.active = this.name;
+  /**
+   * @param {Player} player
+   * @param {number} stepNum
+   */
+  step(player, stepNum, clearAdditionalBeforeNextStep = true) {
+    /** @type {PlayerDB<QuestDB>} */
+    const { data, save } = player.db()
+    data.quest ??= {
+      active: this.name,
+    }
+    data.quest.active = this.name
 
-		if (clearAdditionalBeforeNextStep) delete data.quest.additional;
-		data.quest.step = stepNum;
-		save();
+    if (clearAdditionalBeforeNextStep) delete data.quest.additional
+    data.quest.step = stepNum
+    save()
 
-		const step = this.steps(player).list[stepNum];
-		if (!step) return false;
-		step.cleanup = step.activate?.().cleanup;
-	}
+    const step = this.steps(player).list[stepNum]
+    if (!step) return false
+    step.cleanup = step.activate?.().cleanup
+  }
 
-	/**
-	 * @param {Player} player
-	 */
-	exit(player) {
-		/** @type {PlayerDB<QuestDB>} */
-		const { data, save } = player.db();
+  /**
+   * @param {Player} player
+   */
+  exit(player) {
+    /** @type {PlayerDB<QuestDB>} */
+    const { data, save } = player.db()
 
-		data.quest = {
-			active: "",
-			completed: data.quest?.completed ?? [],
-		};
+    data.quest = {
+      active: '',
+      completed: data.quest?.completed ?? [],
+    }
 
-		save();
-	}
+    save()
+  }
 
-	/**
-	 * @param {Player} player
-	 */
-	static active(player) {
-		/** @type {PlayerDB<QuestDB>} */
-		const { data } = player.db();
-		if (!data.quest || typeof data.quest.active === "undefined") return false;
+  /**
+   * @param {Player} player
+   */
+  static active(player) {
+    /** @type {PlayerDB<QuestDB>} */
+    const { data } = player.db()
+    if (!data.quest || typeof data.quest.active === 'undefined') return false
 
-		const quest = Quest.instances[data.quest.active];
-		if (!quest || typeof data.quest.step === "undefined") return false;
+    const quest = Quest.instances[data.quest.active]
+    if (!quest || typeof data.quest.step === 'undefined') return false
 
-		return {
-			quest,
-			stepNum: data.quest.step,
-			step: quest.steps(player).list[data.quest.step],
-		};
-	}
+    return {
+      quest,
+      stepNum: data.quest.step,
+      step: quest.steps(player).list[data.quest.step],
+    }
+  }
 }
 
 /**
  * @param {Player} player
  */
 function setQuests(player) {
-	const status = Quest.active(player);
-	if (!status) return;
+  const status = Quest.active(player)
+  if (!status) return
 
-	status.quest.step(player, status.stepNum, false);
+  status.quest.step(player, status.stepNum, false)
 }
 
-world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player));
+world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
 
 /**
  * @typedef {() => string} QuestText
@@ -173,273 +173,273 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player));
  */
 
 class PlayerQuest {
-	/**
-	 * @param {Quest} parent
-	 * @param {Player} player
-	 */
-	constructor(parent, player) {
-		this.quest = parent;
-		this.player = player;
-	}
+  /**
+   * @param {Quest} parent
+   * @param {Player} player
+   */
+  constructor(parent, player) {
+    this.quest = parent
+    this.player = player
+  }
 
-	/**
-	 * @type {(QuestStepThis)[]}
-	 */
-	list = [];
+  /**
+   * @type {(QuestStepThis)[]}
+   */
+  list = []
 
-	/**
-	 * @type {Set<(p: Player) => void>}
-	 */
-	updateListeners = new Set();
-	update() {
-		this.updateListeners.forEach((e) => e(this.player));
-	}
+  /**
+   * @type {Set<(p: Player) => void>}
+   */
+  updateListeners = new Set()
+  update() {
+    this.updateListeners.forEach(e => e(this.player))
+  }
 
-	/**
-	 * @param {QuestStepInput & ThisType<QuestStepThis>} options
-	 */
-	dynamic(options) {
-		const step = this;
-		const i = this.list.length;
-		/** @type {PlayerQuest["list"][number]} */
-		const ctx = {
-			...options,
+  /**
+   * @param {QuestStepInput & ThisType<QuestStepThis>} options
+   */
+  dynamic(options) {
+    const step = this
+    const i = this.list.length
+    /** @type {PlayerQuest["list"][number]} */
+    const ctx = {
+      ...options,
 
-			player: this.player,
-			update: this.update.bind(this),
-			quest: this.quest,
-			next() {
-				this.cleanup?.();
-				if (step.list[i + 1]) {
-					this.quest.step(this.player, i + 1);
-				} else {
-					this.quest.exit(this.player);
-					step._end();
-					delete this.quest.players[this.player.id];
-				}
-				this.update();
-				step.updateListeners.clear();
-			},
-		};
+      player: this.player,
+      update: this.update.bind(this),
+      quest: this.quest,
+      next() {
+        this.cleanup?.()
+        if (step.list[i + 1]) {
+          this.quest.step(this.player, i + 1)
+        } else {
+          this.quest.exit(this.player)
+          step._end()
+          delete this.quest.players[this.player.id]
+        }
+        this.update()
+        step.updateListeners.clear()
+      },
+    }
 
-		// Share properties between mixed objects
-		Object.setPrototypeOf(options, ctx);
-		this.list.push(ctx);
-		return ctx;
-	}
+    // Share properties between mixed objects
+    Object.setPrototypeOf(options, ctx)
+    this.list.push(ctx)
+    return ctx
+  }
 
-	/**
-	 *
-	 * @param {(this: QuestStepThis) => void} action
-	 */
-	start(action) {
-		this.dynamic({
-			text() {
-				return "";
-			},
-			activate() {
-				action.bind(this)();
-				this.next();
-				return { cleanup() {} };
-			},
-		});
-	}
+  /**
+   *
+   * @param {(this: QuestStepThis) => void} action
+   */
+  start(action) {
+    this.dynamic({
+      text() {
+        return ''
+      },
+      activate() {
+        action.bind(this)()
+        this.next()
+        return { cleanup() {} }
+      },
+    })
+  }
 
-	/**
-	 * @param {Vector3} from
-	 * @param {Vector3} to
-	 * @param {string} text
-	 */
-	place(from, to, text) {
-		this.dynamic({
-			text: () => text,
-			activate() {
-				/** @type {ReturnType<typeof Place.action>[]} */
-				const actions = [];
-				for (const pos of Vector.foreach(from, to)) {
-					actions.push(
-						Place.action(pos, (player) => {
-							if (player.id !== this.player.id) return;
+  /**
+   * @param {Vector3} from
+   * @param {Vector3} to
+   * @param {string} text
+   */
+  place(from, to, text) {
+    this.dynamic({
+      text: () => text,
+      activate() {
+        /** @type {ReturnType<typeof Place.action>[]} */
+        const actions = []
+        for (const pos of Vector.foreach(from, to)) {
+          actions.push(
+            Place.action(pos, player => {
+              if (player.id !== this.player.id) return
 
-							this.next();
-						}),
-					);
-				}
+              this.next()
+            })
+          )
+        }
 
-				return {
-					cleanup() {
-						actions.forEach((e) => {
-							Place.actions[e.id].delete(e.action);
-						});
-					},
-				};
-			},
-		});
-	}
+        return {
+          cleanup() {
+            actions.forEach(e => {
+              Place.actions[e.id].delete(e.action)
+            })
+          },
+        }
+      },
+    })
+  }
 
-	/**
-	 * @typedef {{
-	 *   text(value: number): string,
-	 *   end: number,
-	 *   value?: number,
-	 * } & Omit<QuestStepInput, "text">
-	 * } QuestCounterInput
-	 */
+  /**
+   * @typedef {{
+   *   text(value: number): string,
+   *   end: number,
+   *   value?: number,
+   * } & Omit<QuestStepInput, "text">
+   * } QuestCounterInput
+   */
 
-	/**
-	 * @typedef {QuestStepThis &
-	 * { diff(this: QuestStepThis, m: number): void; } &
-	 * QuestCounterInput
-	 * } QuestCounterThis
-	 */
+  /**
+   * @typedef {QuestStepThis &
+   * { diff(this: QuestStepThis, m: number): void; } &
+   * QuestCounterInput
+   * } QuestCounterThis
+   */
 
-	/**
-	 * @param {QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>} options
-	 */
-	counter(options) {
-		options.value ??= 0;
+  /**
+   * @param {QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>} options
+   */
+  counter(options) {
+    options.value ??= 0
 
-		options.diff = function (diff) {
-			options.value ??= 0;
-			const result = options.value + diff;
+    options.diff = function (diff) {
+      options.value ??= 0
+      const result = options.value + diff
 
-			if (result < options.end) {
-				// Saving value to db
-				/** @type {PlayerDB<QuestDB>} */
-				const { data, save } = this.player.db();
-				if (data.quest) data.quest.additional = result;
-				save();
+      if (result < options.end) {
+        // Saving value to db
+        /** @type {PlayerDB<QuestDB>} */
+        const { data, save } = this.player.db()
+        if (data.quest) data.quest.additional = result
+        save()
 
-				// Updating interface
-				options.value = result;
-				this.update();
-			} else {
-				this.next();
-			}
-		};
+        // Updating interface
+        options.value = result
+        this.update()
+      } else {
+        this.next()
+      }
+    }
 
-		const inputedActivate = options.activate?.bind(options);
-		options.activate = function () {
-			if (!this.player) throw new Error("Wrong this!");
-			/** @type {PlayerDB<QuestDB>} */
-			const { data } = this.player.db();
-			if (typeof data.quest?.additional === "number")
-				options.value = data.quest?.additional;
+    const inputedActivate = options.activate?.bind(options)
+    options.activate = function () {
+      if (!this.player) throw new Error('Wrong this!')
+      /** @type {PlayerDB<QuestDB>} */
+      const { data } = this.player.db()
+      if (typeof data.quest?.additional === 'number')
+        options.value = data.quest?.additional
 
-			options.value ??= 0;
+      options.value ??= 0
 
-			return inputedActivate?.() ?? { cleanup() {} };
-		};
-		const inputedText = options.text.bind(options);
-		options.text = () => inputedText(options.value);
+      return inputedActivate?.() ?? { cleanup() {} }
+    }
+    const inputedText = options.text.bind(options)
+    options.text = () => inputedText(options.value)
 
-		this.dynamic(options);
-	}
+    this.dynamic(options)
+  }
 
-	/**
-	 * @param {QuestStepInput} o
-	 */
-	dialogue({ text }) {}
+  /**
+   * @param {QuestStepInput} o
+   */
+  dialogue({ text }) {}
 
-	/**
-	 * @param {string} reason
-	 */
-	failed(reason) {
-		this.dynamic({
-			activate: () => {
-				this.player.tell(reason);
-				this.quest.exit(this.player);
-				return { cleanup() {} };
-			},
-			text: () => "",
-		});
-	}
+  /**
+   * @param {string} reason
+   */
+  failed(reason) {
+    this.dynamic({
+      activate: () => {
+        this.player.tell(reason)
+        this.quest.exit(this.player)
+        return { cleanup() {} }
+      },
+      text: () => '',
+    })
+  }
 
-	/** @private */
-	_end = () => {};
+  /** @private */
+  _end = () => {}
 
-	/**
-	 * @param {(this: PlayerQuest) => void} action
-	 */
-	end(action) {
-		this._end = action;
-	}
+  /**
+   * @param {(this: PlayerQuest) => void} action
+   */
+  end(action) {
+    this._end = action
+  }
 }
 
 if (Anarchy.portal) {
-	const learning = new Quest("Обучение", (q) => {
-		if (!Anarchy.portal || !Anarchy.portal.from || !Anarchy.portal.to)
-			return q.failed("§cСервер не настроен");
+  const learning = new Quest('Обучение', q => {
+    if (!Anarchy.portal || !Anarchy.portal.from || !Anarchy.portal.to)
+      return q.failed('§cСервер не настроен')
 
-		q.start(function () {
-			this.player.tell("§6Квест начался!");
-			this.player.playSound("note.pling");
-		});
+    q.start(function () {
+      this.player.tell('§6Квест начался!')
+      this.player.playSound('note.pling')
+    })
 
-		q.place(Anarchy.portal.from, Anarchy.portal.to, "§6Зайди в портал анархии");
+    q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
 
-		q.counter({
-			end: 5,
-			text(value) {
-				return `§6Наруби §f${value}/${this.end} §6блоков дерева`;
-			},
-			activate() {
-				const blocksEvent = world.beforeEvents.playerBreakBlock.subscribe(
-					({ player, block }) => {
-						if (player.id !== this.player.id) return;
-						if (!Spawn.startAxeCanBreak.includes(block.type.id)) return;
+    q.counter({
+      end: 5,
+      text(value) {
+        return `§6Наруби §f${value}/${this.end} §6блоков дерева`
+      },
+      activate() {
+        const blocksEvent = world.beforeEvents.playerBreakBlock.subscribe(
+          ({ player, block }) => {
+            if (player.id !== this.player.id) return
+            if (!Spawn.startAxeCanBreak.includes(block.type.id)) return
 
-						this.diff(1);
-					},
-				);
+            this.diff(1)
+          }
+        )
 
-				return {
-					cleanup() {
-						world.beforeEvents.playerBreakBlock.unsubscribe(blocksEvent);
-					},
-				};
-			},
-		});
+        return {
+          cleanup() {
+            world.beforeEvents.playerBreakBlock.unsubscribe(blocksEvent)
+          },
+        }
+      },
+    })
 
-		q.end(function () {
-			this.player.playSound("note.pling");
-			this.player.tell("§6Квест закончен!");
-		});
-	});
+    q.end(function () {
+      this.player.playSound('note.pling')
+      this.player.tell('§6Квест закончен!')
+    })
+  })
 
-	new XCommand({
-		name: "q",
-		role: "admin",
-	}).executes((ctx) => {
-		const form = new ActionForm("Quests", "Выбери");
-		form.addButton("Learning", () => {
-			learning.enter(ctx.sender);
-		});
-		form.show(ctx.sender);
-	});
+  new XCommand({
+    name: 'q',
+    role: 'admin',
+  }).executes(ctx => {
+    const form = new ActionForm('Quests', 'Выбери')
+    form.addButton('Learning', () => {
+      learning.enter(ctx.sender)
+    })
+    form.show(ctx.sender)
+  })
 
-	const anarchySidebar = new Sidebar(
-		{ name: "Anarchy" },
-		(player) => {
-			return "§7Инвентарь: " + player.db().data.inv;
-		},
-		(player) => {
-			return `§7Монеты: §6${player.scores.money}§7 | Листья: §2${player.scores.leafs}`;
-		},
-		" ",
-		Quest.sidebar,
-		" ",
-		"§7shp1nat56655.portmap.io",
-	);
-	anarchySidebar.setUpdateInterval(20);
+  const anarchySidebar = new Sidebar(
+    { name: 'Anarchy' },
+    player => {
+      return '§7Инвентарь: ' + player.db().data.inv
+    },
+    player => {
+      return `§7Монеты: §6${player.scores.money}§7 | Листья: §2${player.scores.leafs}`
+    },
+    ' ',
+    Quest.sidebar,
+    ' ',
+    '§7shp1nat56655.portmap.io'
+  )
+  anarchySidebar.setUpdateInterval(20)
 
-	world.getAllPlayers().forEach((e) => anarchySidebar.subscribe(e));
+  world.getAllPlayers().forEach(e => anarchySidebar.subscribe(e))
 
-	world.afterEvents.playerSpawn.subscribe(({ player }) => {
-		anarchySidebar.subscribe(player);
-	});
+  world.afterEvents.playerSpawn.subscribe(({ player }) => {
+    anarchySidebar.subscribe(player)
+  })
 
-	world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-		anarchySidebar.unsubscribe(playerId);
-	});
+  world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+    anarchySidebar.unsubscribe(playerId)
+  })
 }

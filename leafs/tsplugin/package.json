@@ -1,0 +1,4 @@
+{
+	"name": "tsplugin",
+	"main": "./index.js"
+}

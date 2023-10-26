@@ -1,65 +1,65 @@
-import { ScoreboardDB } from "lib/Database/Scoreboard.js";
-import { GameUtils, Options, util } from "xapi.js";
+import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
+import { GameUtils, Options, util } from 'xapi.js'
 
 /**
  * @type {Array<"unknown" | "build" | "survival" | "disabled">}
  */
-const TYPES = ["unknown", "build", "survival", "disabled"];
+const TYPES = ['unknown', 'build', 'survival', 'disabled']
 
 export const SERVER = {
-	money: db("money", "Монеты"),
-	leafs: db("leafs", "Листы"),
-	radius: 200,
-	stats: {
-		blocksPlaced: db("blockPlace", "Поставлено блок"),
-		blocksBreaked: db("blockBreak", "Сломано блоков"),
-		fireworksLaunched: db("FVlaunch", "Фв запущено"),
-		fireworksExpoded: db("FVboom", "Фв взорвано"),
-		damageRecieve: db("Hget", "Урона получено"),
-		damageGive: db("Hgive", "Урона нанесено"),
-		kills: db("kills", "Убийств"),
-		deaths: db("deaths", "Смертей"),
-	},
-	time: {
-		anarchy: timer("anarchy", "на анархии"),
-		all: timer("all", "всего"),
-		day: timer("day", "за день"),
-	},
-	options: Options.world("server", {
-		lockNether: {
-			desc: "Выключает незер",
-			value: true,
-			name: "Блокировка незера",
-		},
-		type: {
-			name: "Тип сервера",
-			value: 0,
-			desc: `§eТОЛЬКО ДЛЯ ХОСТА МИРА, НА СЕРВЕРЕ ВЫСТАВЛЯЕТСЯ СКРИПТОМ\n\n§fДоступные значения:\n§f${util
-				.inspect(Object.fromEntries(Object.entries(TYPES)))
-				.replace("{", "")
-				.replace("}", "")}`,
-			requires: true,
-		},
-	}),
-	type: "unknown",
-};
+  money: db('money', 'Монеты'),
+  leafs: db('leafs', 'Листы'),
+  radius: 200,
+  stats: {
+    blocksPlaced: db('blockPlace', 'Поставлено блок'),
+    blocksBreaked: db('blockBreak', 'Сломано блоков'),
+    fireworksLaunched: db('FVlaunch', 'Фв запущено'),
+    fireworksExpoded: db('FVboom', 'Фв взорвано'),
+    damageRecieve: db('Hget', 'Урона получено'),
+    damageGive: db('Hgive', 'Урона нанесено'),
+    kills: db('kills', 'Убийств'),
+    deaths: db('deaths', 'Смертей'),
+  },
+  time: {
+    anarchy: timer('anarchy', 'на анархии'),
+    all: timer('all', 'всего'),
+    day: timer('day', 'за день'),
+  },
+  options: Options.world('server', {
+    lockNether: {
+      desc: 'Выключает незер',
+      value: true,
+      name: 'Блокировка незера',
+    },
+    type: {
+      name: 'Тип сервера',
+      value: 0,
+      desc: `§eТОЛЬКО ДЛЯ ХОСТА МИРА, НА СЕРВЕРЕ ВЫСТАВЛЯЕТСЯ СКРИПТОМ\n\n§fДоступные значения:\n§f${util
+        .inspect(Object.fromEntries(Object.entries(TYPES)))
+        .replace('{', '')
+        .replace('}', '')}`,
+      requires: true,
+    },
+  }),
+  type: 'unknown',
+}
 
 SERVER.type =
-	TYPES[
-		(function getType() {
-			let num = Number(GameUtils.env("type"));
-			if (!num || isNaN(num)) num = SERVER.options.type;
+  TYPES[
+    (function getType() {
+      let num = Number(GameUtils.env('type'))
+      if (!num || isNaN(num)) num = SERVER.options.type
 
-			if (!(num in TYPES) || num === 0) {
-				num = 0;
-				console[util.settings.firstLoad ? "warn" : "log"](
-					`§cДля полноценной работы сервера используйте §f-wsettings§c, установите §fserver§c/§ftype§c и перезагрузите скрипты.`
-				);
-			}
+      if (!(num in TYPES) || num === 0) {
+        num = 0
+        console[util.settings.firstLoad ? 'warn' : 'log'](
+          `§cДля полноценной работы сервера используйте §f-wsettings§c, установите §fserver§c/§ftype§c и перезагрузите скрипты.`
+        )
+      }
 
-			return num;
-		})()
-	];
+      return num
+    })()
+  ]
 
 /**
  *
@@ -67,11 +67,11 @@ SERVER.type =
  * @param {string} displayName
  */
 function timer(name, displayName) {
-	return {
-		hours: db(name + "_hours", "Часов " + displayName),
-		minutes: db(name + "_mins", "Минут " + displayName),
-		seconds: db(name + "_secs", "Секунд " + displayName),
-	};
+  return {
+    hours: db(name + '_hours', 'Часов ' + displayName),
+    minutes: db(name + '_mins', 'Минут ' + displayName),
+    seconds: db(name + '_secs', 'Секунд ' + displayName),
+  }
 }
 
 /**
@@ -81,5 +81,5 @@ function timer(name, displayName) {
  * @returns
  */
 function db(id, name) {
-	return new ScoreboardDB(id, name);
+  return new ScoreboardDB(id, name)
 }

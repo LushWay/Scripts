@@ -6,119 +6,119 @@
  */
 
 export class Cuboid {
-	/**
-	 *
-	 * @param {Vector3} pos1
-	 * @param {Vector3} pos2
-	 */
-	constructor(pos1, pos2) {
-		this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z };
-		this.pos2 = { x: pos2.x, y: pos2.y, z: pos2.z };
+  /**
+   *
+   * @param {Vector3} pos1
+   * @param {Vector3} pos2
+   */
+  constructor(pos1, pos2) {
+    this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z }
+    this.pos2 = { x: pos2.x, y: pos2.y, z: pos2.z }
 
-		this.xMin = Math.min(this.pos1.x, this.pos2.x);
-		this.yMin = Math.min(this.pos1.y, this.pos2.y);
-		this.zMin = Math.min(this.pos1.z, this.pos2.z);
-		this.xMax = Math.max(this.pos1.x, this.pos2.x);
-		this.yMax = Math.max(this.pos1.y, this.pos2.y);
-		this.zMax = Math.max(this.pos1.z, this.pos2.z);
+    this.xMin = Math.min(this.pos1.x, this.pos2.x)
+    this.yMin = Math.min(this.pos1.y, this.pos2.y)
+    this.zMin = Math.min(this.pos1.z, this.pos2.z)
+    this.xMax = Math.max(this.pos1.x, this.pos2.x)
+    this.yMax = Math.max(this.pos1.y, this.pos2.y)
+    this.zMax = Math.max(this.pos1.z, this.pos2.z)
 
-		this.min = {
-			x: this.xMin,
-			y: this.yMin,
-			z: this.zMin,
-		};
+    this.min = {
+      x: this.xMin,
+      y: this.yMin,
+      z: this.zMin,
+    }
 
-		this.max = {
-			x: this.xMax,
-			y: this.yMax,
-			z: this.zMax,
-		};
+    this.max = {
+      x: this.xMax,
+      y: this.yMax,
+      z: this.zMax,
+    }
 
-		this.xRadius = (this.xMax - this.xMin) / 2;
-		this.yRadius = (this.yMax - this.yMin) / 2;
-		this.zRadius = (this.zMax - this.zMin) / 2;
-		this.xCenter = (this.xMax + this.xMin) / 2;
-		this.yCenter = (this.yMax + this.yMin) / 2;
-		this.zCenter = (this.zMax + this.zMin) / 2;
-	}
-	/**
-	 * Returns the ammount of blocks in this cuboid
-	 * @returns {number}
-	 */
-	get blocksBetween() {
-		const x = this.xMax - this.xMin + 1;
-		const y = this.yMax - this.yMin + 1;
-		const z = this.zMax - this.zMin + 1;
-		return x * y * z;
-	}
-	/**
-	 * Splits a cuboid into mulitple cuboid of a chunk size
-	 * @param {Vector3} size
-	 * @returns {Cuboid[]}
-	 */
-	split(size = { x: 1, y: 1, z: 1 }) {
-		/** @type {Record<string, number[]>} */
-		const breakpoints = {
-			x: [],
-			y: [],
-			z: [],
-		};
-		/** @type {Cuboid[]} */
-		const cubes = [];
+    this.xRadius = (this.xMax - this.xMin) / 2
+    this.yRadius = (this.yMax - this.yMin) / 2
+    this.zRadius = (this.zMax - this.zMin) / 2
+    this.xCenter = (this.xMax + this.xMin) / 2
+    this.yCenter = (this.yMax + this.yMin) / 2
+    this.zCenter = (this.zMax + this.zMin) / 2
+  }
+  /**
+   * Returns the ammount of blocks in this cuboid
+   * @returns {number}
+   */
+  get blocksBetween() {
+    const x = this.xMax - this.xMin + 1
+    const y = this.yMax - this.yMin + 1
+    const z = this.zMax - this.zMin + 1
+    return x * y * z
+  }
+  /**
+   * Splits a cuboid into mulitple cuboid of a chunk size
+   * @param {Vector3} size
+   * @returns {Cuboid[]}
+   */
+  split(size = { x: 1, y: 1, z: 1 }) {
+    /** @type {Record<string, number[]>} */
+    const breakpoints = {
+      x: [],
+      y: [],
+      z: [],
+    }
+    /** @type {Cuboid[]} */
+    const cubes = []
 
-		for (const entry of Object.entries(size)) {
-			/** @type {[keyof Vector3, number]} */
-			// @ts-expect-error
-			const [axis, value] = entry;
+    for (const entry of Object.entries(size)) {
+      /** @type {[keyof Vector3, number]} */
+      // @ts-expect-error
+      const [axis, value] = entry
 
-			for (let coordinate = this.min[axis]; ; coordinate = coordinate + value) {
-				if (coordinate < this.max[axis]) {
-					breakpoints[axis].push(coordinate);
-				} else {
-					breakpoints[axis].push(this.max[axis]);
-					break;
-				}
-			}
-		}
+      for (let coordinate = this.min[axis]; ; coordinate = coordinate + value) {
+        if (coordinate < this.max[axis]) {
+          breakpoints[axis].push(coordinate)
+        } else {
+          breakpoints[axis].push(this.max[axis])
+          break
+        }
+      }
+    }
 
-		breakpoints.x.forEach((x, x_index) => {
-			breakpoints.y.forEach((y, y_index) => {
-				breakpoints.z.forEach((z, z_index) => {
-					const CurCord = {
-						x: x,
-						y: y,
-						z: z,
-					};
+    breakpoints.x.forEach((x, x_index) => {
+      breakpoints.y.forEach((y, y_index) => {
+        breakpoints.z.forEach((z, z_index) => {
+          const CurCord = {
+            x: x,
+            y: y,
+            z: z,
+          }
 
-					const indexOf = {
-						x: x_index,
-						y: y_index,
-						z: z_index,
-					};
+          const indexOf = {
+            x: x_index,
+            y: y_index,
+            z: z_index,
+          }
 
-					/** @type {Vector3} */
-					// @ts-expect-error
-					const NextCord = {};
+          /** @type {Vector3} */
+          // @ts-expect-error
+          const NextCord = {}
 
-					for (const key in breakpoints) {
-						/** @type {keyof Vector3} */
-						// @ts-expect-error
-						const axis = key;
+          for (const key in breakpoints) {
+            /** @type {keyof Vector3} */
+            // @ts-expect-error
+            const axis = key
 
-						let nextValue = breakpoints[axis][indexOf[axis] + 1];
+            let nextValue = breakpoints[axis][indexOf[axis] + 1]
 
-						if (!nextValue && breakpoints[axis].length > 1) return;
+            if (!nextValue && breakpoints[axis].length > 1) return
 
-						NextCord[axis] = nextValue ?? CurCord[axis];
+            NextCord[axis] = nextValue ?? CurCord[axis]
 
-						if (NextCord[axis] !== this.max[axis]) NextCord[axis]--;
-					}
+            if (NextCord[axis] !== this.max[axis]) NextCord[axis]--
+          }
 
-					cubes.push(new Cuboid(CurCord, NextCord));
-				});
-			});
-		});
+          cubes.push(new Cuboid(CurCord, NextCord))
+        })
+      })
+    })
 
-		return cubes;
-	}
+    return cubes
+  }
 }

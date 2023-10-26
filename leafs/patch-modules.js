@@ -238,7 +238,7 @@ type BlockComponents = {
  * Used in {@link Entity.getComponent}
  */
 type EntityComponents = {
-  equipment: EntityEquipmentComponent;
+  equippable: EntityEquippableComponent;
 	addrider: EntityAddRiderComponent;
 	"minecraft:addrider": EntityAddRiderComponent;
 	ageable: EntityAgeableComponent;

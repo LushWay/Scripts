@@ -1,11 +1,11 @@
-import { Player, system, world } from "@minecraft/server";
-import { XCommand } from "xapi.js";
-import { br } from "./game.js";
-import { BATTLE_ROYAL_EVENTS, quene } from "./var.js";
+import { Player, system, world } from '@minecraft/server'
+import { XCommand } from 'xapi.js'
+import { br } from './game.js'
+import { BATTLE_ROYAL_EVENTS, quene } from './var.js'
 
 let minpl = 2,
-	fulltime = 5,
-	shorttime = 3;
+  fulltime = 5,
+  shorttime = 3
 
 /**
  * It plays a sound and sends a message to every player in the quene.
@@ -14,15 +14,15 @@ let minpl = 2,
  */
 
 function forEveryQuenedPlayer(sound, text) {
-	for (const name in quene) {
-		const player = Player.fetch(name);
-		if (!player) {
-			delete quene[name];
-			continue;
-		}
-		player.tell(text);
-		player.playSound(sound);
-	}
+  for (const name in quene) {
+    const player = Player.fetch(name)
+    if (!player) {
+      delete quene[name]
+      continue
+    }
+    player.tell(text)
+    player.playSound(sound)
+  }
 }
 
 /**
@@ -31,158 +31,152 @@ function forEveryQuenedPlayer(sound, text) {
  */
 export function teleportToBR(player) {}
 
-const ks = Object.keys;
-BATTLE_ROYAL_EVENTS.join.subscribe((player) => {
-	/**
-	 * @type {Player}
-	 */
-	const pl = player;
-	if (br.players.map((e) => e.name).includes(pl.name)) return;
-	if (br.game.started)
-		return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`);
-	if (quene[pl.name])
-		return pl.onScreenDisplay.setActionBar(
-			`§6${ks(quene).length}/${minpl} §g○ §6${br.quene.time}`,
-		);
-	quene[pl.name] = true;
-	pl.tell(
-		`§aВы успешно встали в очередь. §f(${
-			ks(quene).length
-		}/${minpl}). §aДля выхода пропишите §f-br quit`,
-	);
-	pl.playSound("random.orb");
-});
+const ks = Object.keys
+BATTLE_ROYAL_EVENTS.join.subscribe(player => {
+  /**
+   * @type {Player}
+   */
+  const pl = player
+  if (br.players.map(e => e.name).includes(pl.name)) return
+  if (br.game.started)
+    return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`)
+  if (quene[pl.name])
+    return pl.onScreenDisplay.setActionBar(
+      `§6${ks(quene).length}/${minpl} §g○ §6${br.quene.time}`
+    )
+  quene[pl.name] = true
+  pl.tell(
+    `§aВы успешно встали в очередь. §f(${
+      ks(quene).length
+    }/${minpl}). §aДля выхода пропишите §f-br quit`
+  )
+  pl.playSound('random.orb')
+})
 
-BATTLE_ROYAL_EVENTS.death.subscribe((player) => {
-	player.tell("§6Ты погиб!");
-	teleportToBR(player);
-});
+BATTLE_ROYAL_EVENTS.death.subscribe(player => {
+  player.tell('§6Ты погиб!')
+  teleportToBR(player)
+})
 
 system.runInterval(
-	() => {
-		if (
-			!br.game.started &&
-			world
-				.getPlayers()
-				.find((e) => e.getTags().find((e) => e.startsWith("br:")))
-		) {
-			br.end("specially", "Перезагрузка");
-		}
+  () => {
+    if (
+      !br.game.started &&
+      world.getPlayers().find(e => e.getTags().find(e => e.startsWith('br:')))
+    ) {
+      br.end('specially', 'Перезагрузка')
+    }
 
-		if (ks(quene).length >= minpl && ks(quene).length < 10) {
-			if (!br.quene.open) {
-				br.quene.open = true;
-				br.quene.time = fulltime;
-				forEveryQuenedPlayer(
-					"random.levelup",
-					`§7${
-						ks(quene).length
-					}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`,
-				);
-			}
-			if (ks(quene).length >= 10) {
-				br.quene.open = true;
-				br.quene.time = 16;
-				forEveryQuenedPlayer(
-					"random.levelup",
-					`§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`,
-				);
-			}
-			if (br.quene.open && br.quene.time > 0) {
-				br.quene.time--;
-			}
-			if (br.quene.time >= 1 && br.quene.time <= shorttime) {
-				let sec = "секунд",
-					hrs = `${br.quene.time}`;
-				if (hrs.endsWith("1") && hrs != "11") {
-					sec = "секунду";
-				} else if (hrs == "2" || hrs == "3" || hrs == "4") {
-					sec = `секунды`;
-				}
-				forEveryQuenedPlayer(
-					"random.click",
-					`§9Игра начнется через §7${br.quene.time} ${sec}`,
-				);
-			}
-			if (br.quene.open && br.quene.time == 0) {
-				br.start(ks(quene));
-				Object.assign({}, quene);
-			}
-		}
-		ks(quene).forEach((e) => {
-			if (!Player.fetch(e)) delete quene[e];
-		});
-		if (br.quene.open && ks(quene).length < minpl) {
-			br.quene.open = false;
-			br.quene.time = 0;
-			forEveryQuenedPlayer(
-				"note.bass",
-				`§7${
-					ks(quene).length
-				}/${minpl} §9Игроков в очереди. §cИгра отменена...`,
-			);
-		}
-	},
-	"battleRoyal",
-	20,
-);
+    if (ks(quene).length >= minpl && ks(quene).length < 10) {
+      if (!br.quene.open) {
+        br.quene.open = true
+        br.quene.time = fulltime
+        forEveryQuenedPlayer(
+          'random.levelup',
+          `§7${
+            ks(quene).length
+          }/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
+        )
+      }
+      if (ks(quene).length >= 10) {
+        br.quene.open = true
+        br.quene.time = 16
+        forEveryQuenedPlayer(
+          'random.levelup',
+          `§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`
+        )
+      }
+      if (br.quene.open && br.quene.time > 0) {
+        br.quene.time--
+      }
+      if (br.quene.time >= 1 && br.quene.time <= shorttime) {
+        let sec = 'секунд',
+          hrs = `${br.quene.time}`
+        if (hrs.endsWith('1') && hrs != '11') {
+          sec = 'секунду'
+        } else if (hrs == '2' || hrs == '3' || hrs == '4') {
+          sec = `секунды`
+        }
+        forEveryQuenedPlayer(
+          'random.click',
+          `§9Игра начнется через §7${br.quene.time} ${sec}`
+        )
+      }
+      if (br.quene.open && br.quene.time == 0) {
+        br.start(ks(quene))
+        Object.assign({}, quene)
+      }
+    }
+    ks(quene).forEach(e => {
+      if (!Player.fetch(e)) delete quene[e]
+    })
+    if (br.quene.open && ks(quene).length < minpl) {
+      br.quene.open = false
+      br.quene.time = 0
+      forEveryQuenedPlayer(
+        'note.bass',
+        `§7${ks(quene).length}/${minpl} §9Игроков в очереди. §cИгра отменена...`
+      )
+    }
+  },
+  'battleRoyal',
+  20
+)
 
 const bbr = new XCommand({
-	name: "br",
-	description: "Телепортирует на спавн батл рояля",
-}).executes((ctx) => {
-	teleportToBR(ctx.sender);
-});
+  name: 'br',
+  description: 'Телепортирует на спавн батл рояля',
+}).executes(ctx => {
+  teleportToBR(ctx.sender)
+})
+
+bbr.literal({ name: 'quit', description: 'Выйти из очереди' }).executes(ctx => {
+  if (quene[ctx.sender.name]) {
+    delete quene[ctx.sender.name]
+    ctx.reply('§aВы вышли из очереди.')
+  } else {
+    ctx.reply('§cВы не стоите в очереди.')
+  }
+})
 
 bbr
-	.literal({ name: "quit", description: "Выйти из очереди" })
-	.executes((ctx) => {
-		if (quene[ctx.sender.name]) {
-			delete quene[ctx.sender.name];
-			ctx.reply("§aВы вышли из очереди.");
-		} else {
-			ctx.reply("§cВы не стоите в очереди.");
-		}
-	});
+  .literal({ name: 'quitgame', description: 'Выйти из игры' })
+  .executes(ctx => {
+    if (ctx.sender.hasTag('locktp:Battle Royal')) {
+      delete br.players[br.players.findIndex(e => e.name == ctx.sender.name)]
+      br.tags.forEach(e => ctx.sender.removeTag(e))
+      ctx.reply('§aВы вышли из игры.')
+      teleportToBR(ctx.sender)
+    } else {
+      ctx.reply('§cВы не находитесь в игре.')
+    }
+  })
 
 bbr
-	.literal({ name: "quitgame", description: "Выйти из игры" })
-	.executes((ctx) => {
-		if (ctx.sender.hasTag("locktp:Battle Royal")) {
-			delete br.players[br.players.findIndex((e) => e.name == ctx.sender.name)];
-			br.tags.forEach((e) => ctx.sender.removeTag(e));
-			ctx.reply("§aВы вышли из игры.");
-			teleportToBR(ctx.sender);
-		} else {
-			ctx.reply("§cВы не находитесь в игре.");
-		}
-	});
+  .literal({
+    name: 'start',
+    description: '',
+    role: 'admin',
+  })
+  .executes(() => {
+    br.start(ks(quene))
+    Object.assign({}, quene)
+  })
 
 bbr
-	.literal({
-		name: "start",
-		description: "",
-		role: "admin",
-	})
-	.executes(() => {
-		br.start(ks(quene));
-		Object.assign({}, quene);
-	});
-
-bbr
-	.literal({
-		name: "stop",
-		description: "",
-		role: "admin",
-	})
-	.executes(() => {
-		br.end("specially", "Так надо");
-		Object.assign({}, quene);
-	});
+  .literal({
+    name: 'stop',
+    description: '',
+    role: 'admin',
+  })
+  .executes(() => {
+    br.end('specially', 'Так надо')
+    Object.assign({}, quene)
+  })
 
 world.afterEvents.playerSpawn.subscribe(({ player }) => {
-	if (player.getTags().find((e) => e.startsWith("br:"))) {
-		br.tags.forEach((e) => player.removeTag(e));
-		teleportToBR(player);
-	}
-});
+  if (player.getTags().find(e => e.startsWith('br:'))) {
+    br.tags.forEach(e => player.removeTag(e))
+    teleportToBR(player)
+  }
+})

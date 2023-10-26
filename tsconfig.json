@@ -27,8 +27,14 @@
 				"../node_modules/@minecraft/server-net/index.d.ts"
 			],
 			"@minecraft/vanilla-data": ["Use @minecraft/vanilla-data.js"]
-		}
+		},
+		"plugins": [{ "name": "tsplugin" }]
 	},
 	"include": ["scripts"],
-	"exclude": ["scripts/chestui", "@minecraft/vanilla-data", "node_modules"]
+	"exclude": [
+		"scripts/chestui",
+		"scripts/@minecraft/",
+		"@minecraft/vanilla-data",
+		"node_modules"
+	]
 }

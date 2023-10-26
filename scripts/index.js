@@ -1,2 +1,2 @@
-import "xapi.js";
+import 'xapi.js'
 // import "./test/lib/Database/Rubedo.js";
