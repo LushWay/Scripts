@@ -20,11 +20,11 @@ const commands = [
   './clipboard/copy.js',
   './clipboard/paste.js',
 
-  './tools/brush.js',
-  './tools/wand.js',
-  './tools/nylium.js',
-  './tools/shovel.js',
-  './tools/tool.js',
+  '../tools/brush.js',
+  '../tools/wand.js',
+  '../tools/nylium.js',
+  '../tools/shovel.js',
+  '../tools/tool.js',
 ]
 
 import load from '../../../import.js'

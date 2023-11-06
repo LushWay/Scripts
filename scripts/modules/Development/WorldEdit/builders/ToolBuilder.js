@@ -7,7 +7,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { MessageForm, util } from 'xapi.js'
+import { util } from 'xapi.js'
 import { WE_PLAYER_SETTINGS } from '../index.js'
 
 /**
@@ -18,12 +18,13 @@ export class WorldEditTool {
    * @type {WorldEditTool<any>[]}
    */
   static tools = []
+
   /**
    * @param {Object} o
    * @param {string} o.name
    * @param {string} o.displayName
    * @param {string} o.itemStackId
-   * @param {WorldEditTool['editToolForm']} [o.editToolForm]
+   * @param {(slot: ContainerSlot, player: Player) => void} [o.editToolForm]
    * @param {LoreFormat} [o.loreFormat]
    * @param {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} [o.interval]
    * @param {(player: Player, item: ItemStack) => void} [o.onUse]
@@ -48,14 +49,16 @@ export class WorldEditTool {
     this.interval = interval
     this.command = new XCommand({
       name,
-      description: `Создает или редактирует ${displayName}`,
+      description: `Создает${
+        editToolForm ? ' или редактирует ' : ''
+      }${displayName}`,
       role: 'builder',
       type: 'we',
     }).executes(ctx => {
       const slotOrError = this.getToolSlot(ctx.sender)
 
       if (typeof slotOrError === 'string') ctx.error(slotOrError)
-      else this.editToolForm(slotOrError, ctx.sender)
+      else if (this.editToolForm) this.editToolForm(slotOrError, ctx.sender)
     })
   }
   /**
@@ -63,21 +66,33 @@ export class WorldEditTool {
    */
   getToolSlot(player) {
     const slot = player
-      .getComponent('inventory')
-      .container.getSlot(player.selectedSlot)
+      .getComponent('equippable')
+      .getEquipmentSlot(EquipmentSlot.Mainhand)
 
-    if (slot.getItem()?.typeId) {
-      if (slot.typeId !== this.itemId) {
-        return `Возьми ${this.displayName} в руки для настройки или выбери пустой слот чтобы создать!`
-      }
-    } else {
+    if (!slot.typeId) {
       const item = ItemTypes.get(this.itemId)
       if (!item)
         throw new TypeError(`ItemType '${this.itemId}' does not exists`)
       slot.setItem(new ItemStack(item))
+      return slot
+    } else if (slot.typeId === this.itemId) {
+      return slot
+    } else {
+      return `Выбери пустой слот чтобы создать ${this.displayName} или возьми для настройки!`
     }
+  }
+  /**
+   * @param {Player} player
+   * @returns {string}
+   */
+  getMenuButtonNameColor(player) {
+    const { typeId } = player
+      .getComponent('equippable')
+      .getEquipmentSlot(EquipmentSlot.Mainhand)
 
-    return slot
+    const edit = typeId === this.itemId
+    const air = !typeId
+    return edit ? '§2' : air ? '' : '§8'
   }
   /**
    * @param {Player} player
@@ -90,17 +105,11 @@ export class WorldEditTool {
 
     const edit = typeId === this.itemId
 
-    return `${edit ? '§2Редактировать' : 'Создать'} ${this.displayName}`
-  }
-  /**
-   * @param {ContainerSlot} slot
-   * @param {Player} player
-   */
-  editToolForm(slot, player) {
-    new MessageForm(
-      'Не настроено.',
-      'Редактирование этого инструмента не настроено.'
-    ).show(player)
+    if (!this.editToolForm && edit) return ''
+
+    return `${this.getMenuButtonNameColor(player)}${
+      edit ? 'Редактировать' : 'Создать'
+    } ${this.displayName}`
   }
   /**
    * @param {string[]} lore

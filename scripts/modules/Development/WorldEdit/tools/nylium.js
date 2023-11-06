@@ -1,9 +1,9 @@
 import { EquipmentSlot, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { ModalForm } from 'xapi.js'
-import { WorldEditTool } from '../../builders/ToolBuilder.js'
-import { setblock } from '../../utils/utils.js'
-import { getBlockSet, getBlockSets } from '../general/menu.js'
+import { WorldEditTool } from '../builders/ToolBuilder.js'
+import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
+import { setblock } from '../utils/utils.js'
 
 const nylium = new WorldEditTool({
   name: 'nylium',
@@ -26,6 +26,7 @@ const nylium = new WorldEditTool({
       )
       .show(player, (_, blocksSet) => {
         lore.blocksSet = blocksSet
+        slot.nameTag = '§3> §f' + blocksSet
         slot.setLore(nylium.stringifyLore(lore))
         player.tell('§3> §fНабор блоков сменен на ' + blocksSet)
       })
@@ -33,8 +34,12 @@ const nylium = new WorldEditTool({
 })
 
 /* Replaces the block with a random block from the lore of the item. */
-world.beforeEvents.playerPlaceBlock.subscribe(({ block, player }) => {
-  if (block.typeId !== nylium.itemId) return
+world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
+  if (
+    player.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Mainhand)
+      .typeId !== nylium.itemId
+  )
+    return
 
   system.run(() => {
     const slot = player
@@ -47,7 +52,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(({ block, player }) => {
       setblock(getBlockSet(blocksSets, name).randomElement(), block.location)
     } else {
       player.tell('§cНеизвестный набор блоков! Выберите существующий из списка')
-      nylium.editToolForm(slot, player)
+      nylium.editToolForm?.(slot, player)
     }
   })
 })

@@ -1,10 +1,17 @@
 import { Vector } from '@minecraft/server'
 import { ModalForm } from 'xapi.js'
-import { FillFloor } from '../../builders/FillBuilder.js'
-import { WorldEditTool } from '../../builders/ToolBuilder.js'
-import { getBlockSet, getBlockSets } from '../general/menu.js'
+import { FillFloor } from '../builders/FillBuilder.js'
+import { WorldEditTool } from '../builders/ToolBuilder.js'
+import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
 
-const shovel = new WorldEditTool({
+class ShovelTool extends WorldEditTool {
+  /** @type {WorldEditTool["getMenuButtonName"]} */
+  getMenuButtonName(player) {
+    return super.getMenuButtonName(player).replace(/а$/, 'у')
+  }
+}
+
+const shovel = new ShovelTool({
   name: 'shovel',
   displayName: 'лопата',
   loreFormat: {

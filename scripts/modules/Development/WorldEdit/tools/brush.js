@@ -1,10 +1,10 @@
 import { Vector, world } from '@minecraft/server'
 import { ModalForm } from 'xapi.js'
-import { Shape } from '../../builders/ShapeBuilder.js'
-import { WorldEditTool } from '../../builders/ToolBuilder.js'
-import { WE_CONFIG } from '../../config.js'
-import { SHAPES } from '../../utils/shapes.js'
-import { getBlockSet, getBlockSets } from '../general/menu.js'
+import { Shape } from '../builders/ShapeBuilder.js'
+import { WorldEditTool } from '../builders/ToolBuilder.js'
+import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
+import { WE_CONFIG } from '../config.js'
+import { SHAPES } from '../utils/shapes.js'
 
 world.overworld
   .getEntities({
