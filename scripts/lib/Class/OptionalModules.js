@@ -1,4 +1,4 @@
-export const Module = {
+export const MODULE = {
   /**
    * Module not avaible on common worlds, so using boilerplate
    * @type {typeof import("@minecraft/server-admin") | false}
@@ -16,12 +16,12 @@ dynamicImport('@minecraft/server-net', 'ServerNet')
 
 /**
  * @param {string} module
- * @param {keyof typeof Module} key
+ * @param {keyof typeof MODULE} key
  */
 function dynamicImport(module, key) {
   import(module)
-    .then(MODULE => {
-      Module[key] = MODULE
+    .then(module => {
+      MODULE[key] = module
     })
     .catch(e => console.warn(`§eDisabled§r: ${module}, ${e}`))
 }

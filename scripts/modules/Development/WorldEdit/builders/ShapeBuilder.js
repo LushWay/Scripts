@@ -3,7 +3,7 @@ import { util } from 'xapi.js'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/Cuboid.js'
 import { setblock } from '../utils/utils.js'
-import { WorldEditBuild } from './WorldEditBuilder.js'
+import { WEBUILD } from './WorldEditBuilder.js'
 
 export class Shape {
   /**
@@ -22,7 +22,7 @@ export class Shape {
     this.pos1 = Vector.add(pos, { x: -rad, y: -rad, z: -rad })
     this.pos2 = Vector.add(pos, { x: rad, y: rad, z: rad })
 
-    WorldEditBuild.backup(this.pos1, this.pos2)
+    WEBUILD.backup(this.pos1, this.pos2)
 
     this.values = new Cuboid(this.pos1, this.pos2)
 

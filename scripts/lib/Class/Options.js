@@ -37,54 +37,54 @@ const WORLD_OPTIONS_DB = DPDBProxy('options', {
 
 export class Options {
   /** @type {Record<string, DefaultOptions<boolean>>} */
-  static PLAYER = {}
+  static playerO = {}
   /**
    * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
    * stored in a database
    * @template {DefaultOptions<boolean>} Config
    * @param {string} name - The name that shows to players
    * @param {string} prefix - The prefix for the database.
-   * @param {Config} CONFIG - This is an object that contains the default values for each option.
+   * @param {Config} config - This is an object that contains the default values for each option.
    * @returns {(player: Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
    */
-  static player(name, prefix, CONFIG) {
-    CONFIG[OPTIONS_NAME] = name
+  static player(name, prefix, config) {
+    config[OPTIONS_NAME] = name
 
-    if (!(prefix in this.PLAYER)) {
-      this.PLAYER[prefix] = CONFIG
+    if (!(prefix in this.playerO)) {
+      this.playerO[prefix] = config
     } else {
-      this.PLAYER[prefix] = {
-        ...this.PLAYER[prefix],
-        ...CONFIG,
+      this.playerO[prefix] = {
+        ...this.playerO[prefix],
+        ...config,
       }
     }
     return player =>
       // @ts-expect-error Trust me, TS
-      generateOptionsProxy(PLAYER_DB, prefix, this.PLAYER[prefix], player)
+      generateOptionsProxy(PLAYER_DB, prefix, this.playerO[prefix], player)
   }
 
   /** @type {Record<string, WorldOptions>} */
-  static WORLD = {}
+  static worldO = {}
 
   /**
    * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
    * configuration object's properties in localStorage
    * @template {WorldOptions} Config
    * @param {string} prefix - The prefix for the database.
-   * @param {Config} CONFIG - The default values for the options.
+   * @param {Config} config - The default values for the options.
    * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
    */
-  static world(prefix, CONFIG) {
-    if (!(prefix in this.WORLD)) {
-      this.WORLD[prefix] = CONFIG
+  static world(prefix, config) {
+    if (!(prefix in this.worldO)) {
+      this.worldO[prefix] = config
     } else {
-      this.WORLD[prefix] = {
-        ...this.WORLD[prefix],
-        ...CONFIG,
+      this.worldO[prefix] = {
+        ...this.worldO[prefix],
+        ...config,
       }
     }
     // @ts-expect-error Trust me, TS
-    return generateOptionsProxy(WORLD_OPTIONS_DB, prefix, this.WORLD[prefix])
+    return generateOptionsProxy(WORLD_OPTIONS_DB, prefix, this.worldO[prefix])
   }
 }
 
@@ -93,20 +93,20 @@ export class Options {
  * values are stored in a database
  * @param {OPTIONS_DB} database - The prefix for the database.
  * @param {string} prefix - The prefix for the database.
- * @param {DefaultOptions} CONFIG - This is the default configuration object. It's an object with the keys being the
+ * @param {DefaultOptions} config - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
  * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
  */
-function generateOptionsProxy(database, prefix, CONFIG, player = null) {
+function generateOptionsProxy(database, prefix, config, player = null) {
   const OptionsProxy = {}
-  for (const prop in CONFIG) {
+  for (const prop in config) {
     const key = player ? player.id + ':' + prop : prop
     Object.defineProperty(OptionsProxy, prop, {
       configurable: false,
       enumerable: true,
       get() {
-        return database[prefix]?.[key] ?? CONFIG[prop].value
+        return database[prefix]?.[key] ?? config[prop].value
       },
       set(v) {
         const value = database[prefix] ?? {}
@@ -119,7 +119,7 @@ function generateOptionsProxy(database, prefix, CONFIG, player = null) {
 }
 
 export class EditableLocation {
-  static OPTION_KEY = 'locations'
+  static key = 'locations'
   valid = true
   x = 0
   y = 0
@@ -132,8 +132,8 @@ export class EditableLocation {
    */
   constructor(id, { fallback = false } = {}) {
     this.id = id
-    let rawLocation = WORLD_OPTIONS_DB[EditableLocation.OPTION_KEY][id]
-    Options.WORLD[EditableLocation.OPTION_KEY][id] = {
+    const rawLocation = WORLD_OPTIONS_DB[EditableLocation.key][id]
+    Options.worldO[EditableLocation.key][id] = {
       desc: `Позиция ${id}`,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
@@ -169,4 +169,4 @@ export class EditableLocation {
   }
 }
 
-Options.WORLD[EditableLocation.OPTION_KEY] = {}
+Options.worldO[EditableLocation.key] = {}

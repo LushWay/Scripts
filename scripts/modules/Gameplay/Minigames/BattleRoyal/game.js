@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 
 import {
@@ -12,7 +13,7 @@ import { NO_PVP_MODE } from '../../Indicator/var.js'
 import { teleportToBR } from './index.js'
 import { rtp } from './rtp.js'
 import { BATTLE_ROYAL_EVENTS, BR_CONFIG, BR_DB } from './var.js'
-import { zone } from './zone.js'
+import { Zone } from './zone.js'
 
 class BattleRoyal {
   /** @type {{[Key in keyof WorldAfterEvents]?: Parameters<WorldAfterEvents[Key]["subscribe"]>[0]}} */
@@ -110,7 +111,7 @@ class BattleRoyal {
        */
       const poses = []
 
-      let debug = false
+      const debug = false
       if (debug) {
         world.say(
           `Pos1: ${this.pos.x} ${this.pos.z}\nCenter: ${this.center.x} ${
@@ -207,14 +208,14 @@ class BattleRoyal {
                 l.z <= rmax.z &&
                 l.z >= rmin.z
               )
-                zone.tp(p, true, rmax)
+                Zone.tp(p, true, rmax)
               if (
                 l.x >= rmax.x - 10 &&
                 l.x <= rmax.x &&
                 l.z <= rmax.z &&
                 l.z >= rmin.z
               )
-                zone.warn(p, true, rmax)
+                Zone.warn(p, true, rmax)
 
               if (
                 l.z >= rmax.z &&
@@ -222,14 +223,14 @@ class BattleRoyal {
                 l.x <= rmax.x &&
                 l.x >= rmin.x
               )
-                zone.tp(p, false, rmax)
+                Zone.tp(p, false, rmax)
               if (
                 l.z >= rmax.z - 10 &&
                 l.z <= rmax.z &&
                 l.x <= rmax.x &&
                 l.x >= rmin.x
               )
-                zone.warn(p, false, rmax)
+                Zone.warn(p, false, rmax)
 
               if (
                 l.x <= rmin.x &&
@@ -237,14 +238,14 @@ class BattleRoyal {
                 l.z <= rmax.z &&
                 l.z >= rmin.z
               )
-                zone.tp(p, true, rmin, true)
+                Zone.tp(p, true, rmin, true)
               if (
                 l.x <= rmin.x + 10 &&
                 l.x >= rmin.x &&
                 l.z <= rmax.z &&
                 l.z >= rmin.z
               )
-                zone.warn(p, true, rmin)
+                Zone.warn(p, true, rmin)
 
               if (
                 l.z <= rmin.z &&
@@ -252,14 +253,14 @@ class BattleRoyal {
                 l.x <= rmax.x &&
                 l.x >= rmin.x
               )
-                zone.tp(p, false, rmin, true)
+                Zone.tp(p, false, rmin, true)
               if (
                 l.z <= rmin.z + 10 &&
                 l.z >= rmin.z &&
                 l.x <= rmax.x &&
                 l.x >= rmin.x
               )
-                zone.warn(p, false, rmin)
+                Zone.warn(p, false, rmin)
             }
 
             //Отображение таймера и игроков

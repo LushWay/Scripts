@@ -1,5 +1,3 @@
-import { Player, world } from '@minecraft/server'
-
 /**
  * @abstract
  *
@@ -140,36 +138,6 @@ export class IntegerArgumentType {
 /**
  * @implements {IArgumentType}
  */
-export class FloatArgumentType {
-  /** @type {number} */
-  type
-  optional
-  typeName = 'float'
-  /**
-   *
-   * @param {string} value
-   * @returns
-   */
-  matches(value) {
-    return {
-      success: /^\d+\.\d+$/.test(value),
-      value: parseInt(value),
-    }
-  }
-  /**
-   *
-   * @param {string} name
-   * @param {boolean} optional
-   */
-  constructor(name = 'float', optional = false) {
-    this.optional = optional
-    this.name = name
-  }
-}
-
-/**
- * @implements {IArgumentType}
- */
 export class LocationArgumentType {
   /** @type {Vector3} */
   type
@@ -227,55 +195,6 @@ export class BooleanArgumentType {
 
 /**
  * @implements {IArgumentType}
- */
-export class PlayerArgumentType {
-  /** @type {Player} */
-  type
-  optional
-  typeName = 'playerName'
-  /**
-   * @param {string} value
-   */
-  matches(value) {
-    const p = world.getAllPlayers().find(player => player.name === value)
-    return {
-      success: p ? true : false,
-      value: p,
-    }
-  }
-  constructor(name = 'player', optional = false) {
-    this.optional = optional
-    this.name = name
-  }
-}
-
-/**
- * @implements {IArgumentType}
- */
-export class TargetArgumentType {
-  /** @type {string} */
-  type
-  optional
-  typeName = 'Target'
-  /**
-   *
-   * @param {string} value
-   * @returns
-   */
-  matches(value) {
-    return {
-      success: Boolean(value?.match(/^(@.+|"[^"]+")$/)?.[0]),
-      value: value,
-    }
-  }
-  constructor(name = 'target', optional = false) {
-    this.optional = optional
-    this.name = name
-  }
-}
-
-/**
- * @implements {IArgumentType}
  * @template {ReadonlyArray<string>} T
  */
 export class ArrayArgumentType {
@@ -307,61 +226,4 @@ export class ArrayArgumentType {
 
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
   }
-}
-
-/**
- * @implements {IArgumentType}
- */
-export class UnitArgumentType {
-  /** @type {import("./types.js").MSValueType} */
-  type
-  optional
-  typeName = 'UnitValueType'
-  /**
-   *
-   * @param {string} value
-   * @returns
-   */
-  matches(value) {
-    const result = ![
-      'years',
-      'yrs',
-      'weeks',
-      'days',
-      'hours',
-      'hrs',
-      'minutes',
-      'mins',
-      'seconds',
-      'secs',
-      'milliseconds',
-      'msecs',
-      'ms',
-    ].includes(value)
-
-    return {
-      success: result,
-      value: result ? value : null,
-    }
-  }
-  /**
-   *
-   * @param {string} name
-   */
-  constructor(name, optional = false) {
-    this.name = name
-    this.optional = optional
-  }
-}
-
-export const ArgumentTypes = {
-  string: StringArgumentType,
-  int: IntegerArgumentType,
-  float: FloatArgumentType,
-  location: LocationArgumentType,
-  boolean: BooleanArgumentType,
-  player: PlayerArgumentType,
-  target: TargetArgumentType,
-  array: ArrayArgumentType,
-  unit: UnitArgumentType,
 }

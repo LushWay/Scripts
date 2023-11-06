@@ -118,7 +118,7 @@ function showTable(player, table) {
     system.run(() => AForm.show(player))
   }
 
-  let keys = DB.keys()
+  const keys = DB.keys()
   for (const key of keys) {
     menu.addButton(key, null, () =>
       util.catch(() => propertyForm(key), 'FormBuilder')
@@ -135,7 +135,7 @@ function showTable(player, table) {
  */
 function changeValue(form, value) {
   let type = typeof value
-  let typeDropdown = ['string', 'number', 'boolean', 'object']
+  const typeDropdown = ['string', 'number', 'boolean', 'object']
   if (value) typeDropdown.unshift('Оставить прежний §7(' + type + ')')
   const stringifiedValue = value
     ? typeof value === 'object'
@@ -193,44 +193,44 @@ function changeValue(form, value) {
  * format
  * @returns A string.
  */
-export function visualise_benchmark_result({
+export function stringifyBenchmarkReult({
   type = 'test',
-  timer_pathes = false,
+  timerPathes = false,
 } = {}) {
   let output = ''
   let res = []
   for (const [key, val] of Object.entries(util.benchmark.results[type])) {
-    const total_count = val.length
-    const total_time = val.reduce((p, c) => p + c)
-    const average = total_time / total_count
+    const totalCount = val.length
+    const totalTime = val.reduce((p, c) => p + c)
+    const average = totalTime / totalCount
 
-    res.push({ key, total_count, total_time, average })
+    res.push({ key, totalCount, totalTime, average })
   }
 
   res = res.sort((a, b) => a.average - b.average)
 
-  for (const { key, total_count, total_time, average } of res) {
-    /** @type {[number, string][]} */
-    const style = [
-      [0.1, '§a'],
-      [0.3, '§2'],
-      [0.5, '§g'],
-      [0.65, '§6'],
-      [0.8, '§c'],
-    ]
-
-    const cur_style = style.find(e => e[0] > average)?.[1] ?? '§4'
-    const isPath = timer_pathes && key in TIMERS_PATHES
+  for (const { key, totalCount, totalTime, average } of res) {
+    const color = colors.find(e => e[0] > average)?.[1] ?? '§4'
+    const isPath = timerPathes && key in TIMERS_PATHES
 
     output += `§3Label §f${key}§r\n`
-    output += `§3| §7average: ${cur_style}${average.toFixed(2)}ms\n`
-    output += `§3| §7total time: §f${total_time}ms\n`
-    output += `§3| §7call count: §f${total_count}\n`
+    output += `§3| §7average: ${color}${average.toFixed(2)}ms\n`
+    output += `§3| §7total time: §f${totalTime}ms\n`
+    output += `§3| §7call count: §f${totalCount}\n`
     if (isPath) output += `§3| §7path: §f${getPath(key)}\n`
     output += '\n\n'
   }
   return output
 }
+
+/** @type {[number, string][]} */
+const colors = [
+  [0.1, '§a'],
+  [0.3, '§2'],
+  [0.5, '§g'],
+  [0.65, '§6'],
+  [0.8, '§c'],
+]
 
 /**
  *
@@ -257,9 +257,9 @@ new XCommand({
     function show() {
       new ActionForm(
         'Benchmark',
-        visualise_benchmark_result({
+        stringifyBenchmarkReult({
           type: type ?? 'timers',
-          timer_pathes: pathes ?? false,
+          timerPathes: pathes ?? false,
         })
       )
         .addButton('Refresh', null, show)

@@ -35,7 +35,7 @@ interface IModalFormArg {
    * if this option is a dropdown this is
    * the Values that this dropdown can have
    */
-  options?: string[]
+  options?: (string | null)[]
 }
 
 type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R

@@ -3,7 +3,7 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { showForm } from '../Form/utils.js'
 import { untyped_terrain_textures } from '../List/terrain-textures.js'
-import { Module } from './OptionalModules.js'
+import { MODULE } from './OptionalModules.js'
 import { inaccurateSearch } from './Search.js'
 
 /** @type {string[]} */
@@ -14,13 +14,13 @@ const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join('|')})`)
 
 /** @type {((s: string) => string | undefined)[]} */
 const itemModifiers = [
-  spawn_egg => {
-    const match = spawn_egg.match(/^(.+)_spawn_egg$/)
+  spawnEgg => {
+    const match = spawnEgg.match(/^(.+)_spawn_egg$/)
     if (!match) return
     return `spawn_egg.entity.${match[1]}`
   },
-  chest_boat => {
-    const match = chest_boat.match(/^(.+)_chest_boat$/)
+  chestBoat => {
+    const match = chestBoat.match(/^(.+)_chest_boat$/)
     if (!match) return
     return `chest_boat.${match[1]}`
   },
@@ -31,9 +31,9 @@ const itemModifiers = [
     const [, color, type] = match
     return `${type}.${color}`
   },
-  dark_oak => {
-    if (dark_oak.includes('dark_oak') && dark_oak !== 'dark_oak_door')
-      return dark_oak.replace('dark_oak', 'big_oak')
+  darkOak => {
+    if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door')
+      return darkOak.replace('dark_oak', 'big_oak')
   },
 ]
 /** @type {((s: string) => string)[]} */
@@ -56,14 +56,14 @@ const blockModifiers = [
   },
 ]
 
-export const GameUtils = {
+export const GAME_UTILS = {
   /**
    * @param {string} name
    * @returns {undefined | string}
    */
   env(name) {
-    if (Module.ServerAdmin) {
-      return Module.ServerAdmin.variables.get(name)
+    if (MODULE.ServerAdmin) {
+      return MODULE.ServerAdmin.variables.get(name)
     }
   },
   /**
@@ -95,7 +95,7 @@ export const GameUtils = {
    * @param {Player} player
    * @returns {Promise<Block | ItemStack | false>}
    */
-  selectBlock(player) {
+  async selectBlock(player) {
     /** @type {Array<Block | ItemStack | 'buffer'>} */
     const blocks = []
 
@@ -139,21 +139,18 @@ export const GameUtils = {
       blocks.push(item)
     }
 
-    return new Promise(async resolve => {
-      const result = await showForm(form, player)
-      if (
-        result === false ||
-        !(result instanceof ActionFormResponse) ||
-        !result.selection
-      )
-        return resolve(false)
+    const result = await showForm(form, player)
+    if (
+      result === false ||
+      !(result instanceof ActionFormResponse) ||
+      !result.selection
+    )
+      return false
 
-      const selectedBlock = blocks[result.selection]
+    const selectedBlock = blocks[result.selection]
 
-      if (selectedBlock === 'buffer')
-        return resolve(await this.selectBlock(player))
-      resolve(selectedBlock)
-    })
+    if (selectedBlock === 'buffer') return await this.selectBlock(player)
+    return selectedBlock
   },
   /**
    * @param {string} id

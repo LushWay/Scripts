@@ -2,10 +2,10 @@ export class StoredRequest {
   /**
    * Generates unique DB key
    * @param {string} prefix
-   * @param {string} ID
+   * @param {string} id
    */
-  static genDBkey(prefix, ID) {
-    return `REQ_${prefix}:${ID}`
+  static genDBkey(prefix, id) {
+    return `REQ_${prefix}:${id}`
   }
   /**
    * DB to store requests across the sessions
@@ -25,11 +25,11 @@ export class StoredRequest {
    * This class is used to help manage requests for specified id in db
    * @param {Record<string, any>} db - DB to store request data
    * @param {string} prefix - Prefix of request type.
-   * @param {string} ID - May be player.id or any string
+   * @param {string} id - May be player.id or any string
    */
-  constructor(db, prefix, ID) {
+  constructor(db, prefix, id) {
     this.db = db
-    this.key = StoredRequest.genDBkey(prefix, ID)
+    this.key = StoredRequest.genDBkey(prefix, id)
   }
   /**
    * Returns all active ids
@@ -47,20 +47,20 @@ export class StoredRequest {
   }
   /**
    * Adds ID to request list and saves it to db
-   * @param {string} ID
+   * @param {string} id
    */
-  createRequest(ID) {
+  createRequest(id) {
     const requests = this.list
-    requests.add(ID)
+    requests.add(id)
     this.db[this.key] = [...requests.values()]
   }
   /**
    * Deletes request from db
-   * @param {string} ID - ID of request
+   * @param {string} id - ID of request
    */
-  deleteRequest(ID) {
+  deleteRequest(id) {
     const requests = this.list
-    requests.delete(ID)
+    requests.delete(id)
     this.db[this.key] = [...requests.values()]
   }
 }

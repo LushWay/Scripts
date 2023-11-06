@@ -68,7 +68,7 @@ const { UserBusy, UserClosed } = FormCancelationReason
  * @returns  The response from the form.
  */
 export async function showForm(form, player) {
-  let hold = 100
+  const hold = 100
 
   for (let i = 0; i <= hold; i++) {
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */

@@ -9,6 +9,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
   enumerable: true,
   get() {
     /** @type {Player} */
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const player = this
 
     if (players[player.id]) {
@@ -57,7 +58,7 @@ export class ScoreboardDB {
    * Gets entity.scroebaordIdentity or creates if not exists
    * @param {Entity} entity
    */
-  static ID(entity) {
+  static id(entity) {
     return (
       entity.scoreboardIdentity ??
       (entity.runCommand(`scoreboard players set @s "${this.name}" 0`),
@@ -98,7 +99,7 @@ export class ScoreboardDB {
    * @param {number} value
    */
   set(entity, value) {
-    const id = ScoreboardDB.ID(entity)
+    const id = ScoreboardDB.id(entity)
     if (!id) return
 
     this.scoreboard.setScore(id, value)
@@ -109,7 +110,7 @@ export class ScoreboardDB {
    * @param {number} value
    */
   add(entity, value) {
-    const id = ScoreboardDB.ID(entity)
+    const id = ScoreboardDB.id(entity)
     if (!id) return
 
     this.scoreboard.setScore(id, this.get(entity) + value)

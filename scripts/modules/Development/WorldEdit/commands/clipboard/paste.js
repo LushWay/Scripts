@@ -1,4 +1,8 @@
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { util } from 'xapi.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+
+/** @type {( "none" | "x" | "xz" | "z")[]} */
+const rotTypes = ['none', 'x', 'xz', 'z']
 
 new XCommand({
   name: 'paste',
@@ -7,11 +11,11 @@ new XCommand({
   type: 'we',
 })
   .int('rotation', true)
-  .string('mirror', true)
+  .array('mirror', rotTypes, true)
   .boolean('includeEntites', true)
   .boolean('includeBlocks', true)
   .int('integrity', true)
-  .int('seed', true)
+  .string('seed', true)
   .executes(
     (ctx, rotation, mirror, includeEntites, includeBlocks, integrity, seed) => {
       let blocks, entities
@@ -22,13 +26,12 @@ new XCommand({
         blocks = includeBlocks
         entities = includeEntites
       }
-      if (![0, 90, 180, 270].includes(rotation))
+      if (!util.isKeyof(rotation, { 0: 0, 90: 90, 180: 180, 270: 270 }))
         return ctx.error('Неправильный градус: §f' + rotation)
 
       ctx.reply(
-        WorldEditBuild.paste(
+        WEBUILD.paste(
           ctx.sender,
-          // @ts-expect-error
           rotation,
           mirror,
           entities,

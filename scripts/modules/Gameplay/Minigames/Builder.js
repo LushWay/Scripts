@@ -2,12 +2,12 @@ import { Player } from '@minecraft/server'
 
 export class Minigame {
   /** @type {Record<string, Minigame>} */
-  static MINIGAMES = {}
+  static instances = {}
   /**
    * @param {Player} player
    */
   static getCurrent(player) {
-    return Object.values(this.MINIGAMES).find(e =>
+    return Object.values(this.instances).find(e =>
       e.players.includes(player.id)
     )
   }
@@ -15,7 +15,7 @@ export class Minigame {
    * @param {Player} player
    */
   static getQuene(player) {
-    return Object.values(this.MINIGAMES).find(e => e.quene.has(player.id))
+    return Object.values(this.instances).find(e => e.quene.has(player.id))
   }
 
   /** @type {string[]} */
@@ -34,6 +34,6 @@ export class Minigame {
     this.name = name
     this.spawn = spawn
 
-    Minigame.MINIGAMES[name] = this
+    Minigame.instances[name] = this
   }
 }

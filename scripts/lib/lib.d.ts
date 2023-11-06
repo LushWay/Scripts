@@ -9,9 +9,9 @@ declare global {
     verbose(...data: any[]): void
   }
 
-  var console: Console
-  var nextTick: Promise<void>
-  var verbose: boolean
+  let console: Console
+  let nextTick: Promise<void>
+  let verbose: boolean
 
   interface JSON {
     /**
@@ -33,9 +33,9 @@ declare global {
     equals(one: any[], two: any[]): boolean
   }
 
-  interface Function {
-    bind<fn extends Function>(this: fn, context: object, args: any): fn
-  }
+  // interface Function {
+  //   bind<Fn extends (...args: unknown[]) => unknown>(this: Fn, context: object, args: any): Fn
+  // }
 
   interface Array<T> {
     /**
@@ -53,7 +53,7 @@ declare global {
   }
 
   interface ObjectConstructor {
-    keys<T extends object>(o: T): Array<keyof T>
+    keys<T extends object>(o: T): (keyof T)[]
   }
 
   type Vector3 = mc.Vector3
@@ -64,7 +64,7 @@ declare global {
   type JSONLike = Record<string | symbol | number, any>
 
   type RandomCostMapType = {
-    [key: `${number}...${number}` | number]: percent
+    [key: `${number}...${number}` | number]: Percent
   }
 
   type Range<F extends number, T extends number> =
@@ -78,14 +78,14 @@ declare global {
     ? Acc[number]
     : Enumerate<N, [...Acc, Acc['length']]>
 
-  type percent = `${number}%`
+  type Percent = `${number}%`
 
   type PlayerDB<Value = any> = { save(): void; data: Value }
 
-  type PartialParts<b, thisArg = b> = {
-    [P in keyof b]?: b[P] extends (...param: infer param) => infer ret
-      ? (this: thisArg, ...param: param) => ret
-      : b[P]
+  type PartialParts<B, ThisArg = B> = {
+    [P in keyof B]?: B[P] extends (...param: infer param) => infer ret
+      ? (this: ThisArg, ...param: param) => ret
+      : B[P]
   }
 }
 

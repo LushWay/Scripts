@@ -5,7 +5,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { GameUtils } from 'xapi.js'
+import { GAME_UTILS } from 'xapi.js'
 import { Region } from './Region.js'
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from './config.js'
 console.log('regions loaded')
@@ -103,7 +103,7 @@ export function loadRegionsWithGuards(
   })
 
   world.afterEvents.entitySpawn.subscribe(({ entity, cause }) => {
-    const typeId = GameUtils.safeGetTypeID(entity)
+    const typeId = GAME_UTILS.safeGetTypeID(entity)
     if (!typeId || typeId === 'rubedo:database') return
     const region = Region.locationInRegion(
       entity.location,
@@ -123,7 +123,7 @@ export function loadRegionsWithGuards(
 
   system.runInterval(
     () => {
-      if (!Region.CONFIG.PERMS_SETTED) return
+      if (!Region.config.PERMS_SETTED) return
 
       for (const player of world.getAllPlayers()) {
         const currentRegion = Region.locationInRegion(

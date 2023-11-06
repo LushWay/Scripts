@@ -1,13 +1,14 @@
 import { GameMode, system, Vector, world } from '@minecraft/server'
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as GameTest from '@minecraft/server-gametest'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { GameUtils, util } from 'xapi.js'
+import { GAME_UTILS, util } from 'xapi.js'
 const time = 9999999
 
 let name = 'Бот'
 /** @type {GameTest.SimulatedPlayer} */
 let player
-const test_loc = { x: 1000, y: -60, z: 1000 }
+const testLoc = { x: 1000, y: -60, z: 1000 }
 
 GameTest.registerAsync('s', 's', async test => {
   const spawnLoc = { x: 0, y: 3, z: 0 }
@@ -37,7 +38,7 @@ GameTest.registerAsync('s', 'test', async test => {
 
   const id = player.id
   const event = world.afterEvents.entityDie.subscribe(data => {
-    if (GameUtils.safeGetTypeID(data.deadEntity) !== id) return
+    if (GAME_UTILS.safeGetTypeID(data.deadEntity) !== id) return
     test.succeed()
   })
 
@@ -119,11 +120,11 @@ new XCommand({
     if (newname) name = newname
 
     world.overworld.runCommand(
-      `execute positioned ${test_loc.x} ${test_loc.y} ${test_loc.z} run gametest create "s:s"`
+      `execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "s:s"`
     )
 
     world.overworld
-      .getBlock(Vector.add(test_loc, { x: 1, y: 0, z: 1 }))
+      .getBlock(Vector.add(testLoc, { x: 1, y: 0, z: 1 }))
       ?.setType(MinecraftBlockTypes.RedstoneBlock)
 
     await system.sleep(10)

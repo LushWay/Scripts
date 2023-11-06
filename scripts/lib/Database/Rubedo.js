@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
@@ -32,7 +34,7 @@ export class Database {
     }
     Object.setPrototypeOf(proxy, source)
     Object.setPrototypeOf(proxy._, source._)
-    // @ts-expect-error
+    // @ts-expect-error Proxy type
     return proxy
   }
   static async initAllTables() {
@@ -52,7 +54,7 @@ export class Database {
    * @type {{ [key in Key]: Value }}
    * @private
    */
-  // @ts-expect-error
+  // @ts-expect-error Memory type
   MEMORY = {}
 
   _ = {
@@ -105,14 +107,14 @@ export class Database {
   constructor(tableName, { events, defaultValue } = {}) {
     if (defaultValue) {
       events = {
-        // @ts-expect-error
+        // @ts-expect-error Value type
         beforeGet(key, value) {
           if (value && typeof value === 'object')
             return DB.setDefaults(value, defaultValue(key))
 
           return value ?? defaultValue(key)
         },
-        // @ts-expect-error
+        // @ts-expect-error Value type
         beforeSet(key, value) {
           if (value && typeof value === 'object')
             return DB.removeDefaults(value, defaultValue(key))
@@ -210,7 +212,7 @@ export class Database {
     }
 
     for (let i = 0; i < chunks.length; i++) {
-      let item = new ItemStack(MinecraftItemTypes.AcaciaBoat)
+      const item = new ItemStack(MinecraftItemTypes.AcaciaBoat)
       item.setLore([chunks[i]])
       inventory.setItem(i, item)
     }
@@ -256,7 +258,7 @@ export class Database {
    * ```
    */
   work(key) {
-    let data = this.get(key)
+    const data = this.get(key)
     if (typeof data === 'object') Object.assign({}, data)
     const self = this
 

@@ -1,6 +1,7 @@
 import { system } from '@minecraft/server'
 import { TerminalColors } from './List/terminal-colors.js'
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const util = {
   settings: {
     BDSMode: true,
@@ -162,7 +163,7 @@ export const util = {
       }
 
       switch (typeof value) {
-        case 'function':
+        case 'function': {
           /**
            * @type {string}
            */
@@ -219,8 +220,9 @@ export const util = {
           value = r
 
           break
+        }
 
-        case 'object':
+        case 'object': {
           if (Array.isArray(value)) break
 
           /** @type {any} */
@@ -234,6 +236,7 @@ export const util = {
 
           value = allInherits
           break
+        }
         case 'symbol':
           value = `${c.symbol}[Symbol.${value.description}]§r`
           break
@@ -279,13 +282,13 @@ export const util = {
 
   /**
    *
-   * @param {number} C
+   * @param {number} c
    */
-  waitEach(C) {
+  waitEach(c) {
     let count = 0
     return async () => {
       count++
-      if (count % C === 0) {
+      if (count % c === 0) {
         await system.sleep(1)
         return count
       }
@@ -299,12 +302,12 @@ export const util = {
      * @returns {() => number} A function that returns the time it took to run the function.
      */
     function benchmark(label, type = 'test') {
-      const start_time = Date.now()
+      const startTime = Date.now()
 
       return function end() {
-        const took_time = Date.now() - start_time
-        ;((util.benchmark.results[type] ??= {})[label] ??= []).push(took_time)
-        return took_time
+        const tookTime = Date.now() - startTime
+        ;((util.benchmark.results[type] ??= {})[label] ??= []).push(tookTime)
+        return tookTime
       }
     },
     {

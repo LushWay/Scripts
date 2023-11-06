@@ -61,10 +61,11 @@ OverTakes(console, {
     super.log(format(args))
   },
   verbose(...args) {
-    if (globalThis.verbose) super.log(format(args))
+    if (verbose) super.log(format(args))
   },
 })
 
-// @ts-expect-error
+// @ts-expect-error Assign
 globalThis.nextTick = null
+// @ts-expect-error Assign
 globalThis.verbose = false

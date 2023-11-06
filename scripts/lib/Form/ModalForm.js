@@ -54,7 +54,50 @@ export class ModalForm {
   addDropdown(label, options, defaultValueIndex = 0) {
     this.args.push({ type: 'dropdown', options: options })
     this.form.dropdown(label, options, defaultValueIndex)
-    // @ts-ignore
+    // @ts-expect-error This type
+    return this
+  }
+  /**
+   * Adds a dropdown to this form
+   * @template {Record<string, string>} [T=Record<string, string>]
+   * @template {false | true} [None=false]
+   * @param {string} label  label to show on dropdown
+   * @param {T} object  the availiabe options for this dropdown
+   * @param {object} [options]
+   * @param {number} [options.defaultValueIndex]  the default value index
+   * @param {T[keyof T]} [options.defaultValue]  the default value
+   * @param {None} [options.none]
+   * @param {string} [options.noneText]
+   * @returns {ModalForm<AppendFormField<Callback, Exclude<None extends false ? keyof T : keyof T | null, number>>>} this
+   */
+  addDropdownFromObject(
+    label,
+    object,
+    {
+      defaultValueIndex = 0,
+      defaultValue,
+      none,
+      noneText = ModalForm.arrayDefaultNone,
+    } = {}
+  ) {
+    if (defaultValue) {
+      defaultValueIndex = Object.values(object).findIndex(
+        e => e === defaultValue
+      )
+    }
+    /** @type {(string | null)[]} */
+    // @ts-expect-error Type
+    let objectKeys = Object.keys(object)
+    let visibleKeys = Object.values(object)
+
+    if (none) {
+      visibleKeys = [noneText, ...visibleKeys]
+      objectKeys = [null, ...objectKeys]
+    }
+
+    this.args.push({ type: 'dropdown', options: objectKeys })
+    this.form.dropdown(label, visibleKeys, defaultValueIndex)
+    // @ts-expect-error This type
     return this
   }
   /**
@@ -75,7 +118,7 @@ export class ModalForm {
   ) {
     this.args.push({ type: 'slider' })
     this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue)
-    // @ts-expect-error
+    // @ts-expect-error This type
     return this
   }
   /**
@@ -87,7 +130,7 @@ export class ModalForm {
   addToggle(label, defaultValue) {
     this.args.push({ type: 'toggle' })
     this.form.toggle(label, defaultValue)
-    // @ts-ignore
+    // @ts-expect-error This type
     return this
   }
   /**
@@ -100,7 +143,7 @@ export class ModalForm {
   addTextField(label, placeholderText, defaultValue) {
     this.args.push({ type: 'textField' })
     this.form.textField(label, placeholderText, defaultValue)
-    // @ts-ignore
+    // @ts-expect-error This type
     return this
   }
 

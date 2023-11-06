@@ -1,20 +1,23 @@
 import { Player, Vector, system } from '@minecraft/server'
 
-export const Place = {
+export class Place {
   /**
    * Creates action that triggers function when any player gets this place.
    * @param {Vector3} place
    * @param {(player: Player) => void} action
    */
-  action(place, action) {
+  static action(place, action) {
     const id = Vector.string(place)
     this.actions[id] ??= new Set()
     this.actions[id].add(action)
 
     return { id, action }
-  },
+  }
   /** @type {Record<string, Set<(player: Player) => void>>} */
-  actions: {},
+  static actions = {}
+
+  /** @protected */
+  constructor() {}
 }
 
 system.runPlayerInterval(

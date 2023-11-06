@@ -1,6 +1,6 @@
 import { MolangVariableMap, Player, Vector, world } from '@minecraft/server'
 
-export class zone {
+export class Zone {
   /**
    * It's a function that teleports the player to the edge of the zone.
    * @param {Player} player

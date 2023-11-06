@@ -12,52 +12,52 @@ OverTakes(System.prototype, {
     return new Promise(resolve => super.runInterval(resolve, time))
   },
   runInterval(fn, name, ticks = 0) {
-    const visual_id = `${name} (loop ${ticks} ticks)`
+    const visualId = `${name} (loop ${ticks} ticks)`
     const path = util.error.stack.get()
-    TIMERS_PATHES[visual_id] = path
+    TIMERS_PATHES[visualId] = path
 
     return super.runInterval(() => {
-      const end = util.benchmark(visual_id, 'timers')
+      const end = util.benchmark(visualId, 'timers')
 
       util.catch(fn, 'Interval')
 
-      const took_ticks = ~~(end() / 20)
-      if (took_ticks > ticks)
+      const tookTicks = ~~(end() / 20)
+      if (tookTicks > ticks)
         console.warn(
-          `Found slow interval (${took_ticks}/${ticks})  at:\n${path}`
+          `Found slow interval (${tookTicks}/${ticks})  at:\n${path}`
         )
     }, ticks)
   },
   runTimeout(fn, name, ticks = 0) {
-    const visual_id = `${name} (loop ${ticks} ticks)`
+    const visualId = `${name} (loop ${ticks} ticks)`
     const path = util.error.stack.get()
-    TIMERS_PATHES[visual_id] = path
+    TIMERS_PATHES[visualId] = path
 
     return super.runTimeout(() => {
-      const end = util.benchmark(visual_id, 'timers')
+      const end = util.benchmark(visualId, 'timers')
 
       util.catch(fn, 'Timeout')
 
-      const took_ticks = ~~(end() / 20)
-      if (took_ticks > ticks)
-        console.warn(`Found slow timeout (${took_ticks}/${ticks}) at:\n${path}`)
+      const tookTicks = ~~(end() / 20)
+      if (tookTicks > ticks)
+        console.warn(`Found slow timeout (${tookTicks}/${ticks}) at:\n${path}`)
     }, ticks)
   },
   runPlayerInterval(fn, name, ticks = 0) {
-    const visual_id = `${name} (loop ${ticks} ticks)`
+    const visualId = `${name} (loop ${ticks} ticks)`
     const path = util.error.stack.get()
-    TIMERS_PATHES[visual_id] = path
+    TIMERS_PATHES[visualId] = path
     const forEach = () => {
       for (const player of world.getPlayers()) fn(player)
     }
 
     return super.runInterval(() => {
-      const end = util.benchmark(visual_id, 'timers')
+      const end = util.benchmark(visualId, 'timers')
 
       util.catch(forEach, 'Player interval')
 
-      const took_ticks = ~~(end() / 20)
-      if (took_ticks > ticks)
+      const tookTicks = ~~(end() / 20)
+      if (tookTicks > ticks)
         console.warn(`Found slow players interval at:\n${path}`)
     }, ticks)
   },

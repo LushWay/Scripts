@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 
 new XCommand({
   name: 'pos1',
@@ -10,6 +10,6 @@ new XCommand({
   .location('pos', true)
   .executes((ctx, pos) => {
     pos = Vector.floor(pos)
-    WorldEditBuild.pos1 = pos
+    WEBUILD.pos1 = pos
     ctx.reply(`§5►§r (1) ${pos.x}, ${pos.y}, ${pos.z}`)
   })

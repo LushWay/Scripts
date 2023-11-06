@@ -40,7 +40,7 @@ export class XCommand {
       return // This is not a command
 
     const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix)
-    const command = XCommand.COMMANDS.find(
+    const command = XCommand.commands.find(
       c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
     )
     if (!command) return commandNotFound(data.sender, cmd)
@@ -94,7 +94,7 @@ export class XCommand {
    * An array of all active commands
    * @type {XCommand<any>[]}
    */
-  static COMMANDS = []
+  static commands = []
 
   /**
    * @param {XCommand} command
@@ -138,7 +138,7 @@ export class XCommand {
       callback: undefined,
     }
 
-    if (depth === 0) XCommand.COMMANDS.push(this)
+    if (depth === 0) XCommand.commands.push(this)
   }
 
   /**
@@ -151,7 +151,7 @@ export class XCommand {
   argument(type) {
     const cmd = new XCommand(this.sys.data, type, this.sys.depth + 1, this)
     this.sys.children.push(cmd)
-    // @ts-expect-error
+    // @ts-expect-error This mistype
     return cmd
   }
   /**
@@ -199,7 +199,7 @@ export class XCommand {
       const newArg = cmd
         .location(name + '_y*', optional)
         .location(name + '_z*', optional)
-      // @ts-expect-error
+      // @ts-expect-error This mistype
       return newArg
     }
     return cmd
@@ -217,7 +217,7 @@ export class XCommand {
       this
     )
     this.sys.children.push(cmd)
-    // @ts-expect-error
+    // @ts-expect-error This mistype
     return cmd
   }
   /**

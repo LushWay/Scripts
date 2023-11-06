@@ -54,9 +54,7 @@ type AppendArgument<Base, Next> = Base extends (
   ? (ctx: X, ...args: [...E, Next]) => R
   : never
 
-export type ArgReturn<Callback extends any, type extends any> = XCommand<
-  AppendArgument<Callback, type>
->
+export type ArgReturn<Callback, Type> = XCommand<AppendArgument<Callback, Type>>
 
 export type MSValueType =
   | 'years'

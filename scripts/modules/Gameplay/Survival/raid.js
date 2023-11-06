@@ -1,14 +1,14 @@
 import { Player, system, world } from '@minecraft/server'
 import { LockAction, ScoreboardDB } from 'xapi.js'
 import { Region } from '../../Server/Region/Region.js'
-import { RaidNotify } from './var.js'
+import { RAID_NOTIFY } from './var.js'
 
 world.beforeEvents.explosion.subscribe(data => {
   for (const bl of data.getImpactedBlocks()) {
     const region = Region.locationInRegion(bl, data.dimension.type)
     if (!region) return
     if (!region.permissions?.pvp) return (data.cancel = true)
-    for (const id of region.permissions.owners) RaidNotify[id] = 60
+    for (const id of region.permissions.owners) RAID_NOTIFY[id] = 60
   }
 })
 
@@ -20,7 +20,7 @@ new LockAction(
 
 system.runInterval(
   () => {
-    for (const id in RaidNotify) {
+    for (const id in RAID_NOTIFY) {
       // Ищем игрока...
       const player = Player.fetch(id)
       if (player) {
@@ -30,15 +30,15 @@ system.runInterval(
           )
           player.playSound('mob.wolf.bark')
         }
-        RAID.set(player, RaidNotify[id])
-        delete RaidNotify[id]
+        RAID.set(player, RAID_NOTIFY[id])
+        delete RAID_NOTIFY[id]
         continue
       }
 
-      RaidNotify[id]--
-      if (RaidNotify[id] <= 0) {
+      RAID_NOTIFY[id]--
+      if (RAID_NOTIFY[id] <= 0) {
         // Время вышло, игрока не было
-        delete RaidNotify[id]
+        delete RAID_NOTIFY[id]
         continue
       }
     }

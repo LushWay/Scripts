@@ -84,7 +84,7 @@ export class InventoryStore {
         Legs: equipment.getEquipment(EquipmentSlot.Legs),
         Feet: equipment.getEquipment(EquipmentSlot.Feet),
       },
-      // @ts-expect-error
+      // @ts-expect-error Filter misstype
       slots: new Array(container.size)
         .fill(undefined)
         .map((_, i) => container.getItem(i))
@@ -282,20 +282,20 @@ export class InventoryStore {
    * @type {boolean}
    * @private
    */
-  SAVING = true
+  saving = true
   /** @private */
   requestSave() {
-    if (this.SAVING) return
+    if (this.saving) return
 
     system.runTimeout(
       () => {
         this.save()
-        this.SAVING = false
+        this.saving = false
       },
       'inventorySave',
       40
     )
-    this.SAVING = true
+    this.saving = true
   }
   /**
    * Gets entity store from saved and removes to avoid bugs

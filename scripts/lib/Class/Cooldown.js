@@ -4,11 +4,11 @@ export class Cooldown {
   /**
    * Generates a unique key for the cooldown in the database
    * @param {string} name - The name of the cooldown
-   * @param {string} ID - The ID of the player or source related to the cooldown
+   * @param {string} id - The ID of the player or source related to the cooldown
    * @returns {string} - The generated key
    */
-  static genDBkey(name, ID) {
-    return 'COOLDOWN_' + name + ':' + ID
+  static genDBkey(name, id) {
+    return 'COOLDOWN_' + name + ':' + id
   }
   /**
    * Parses the remaining time in milliseconds into a more human-readable format

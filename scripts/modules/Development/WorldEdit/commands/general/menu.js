@@ -91,7 +91,7 @@ function WBMenu(player, body = '') {
     }
   )
 
-  for (const tool of WorldEditTool.TOOLS) {
+  for (const tool of WorldEditTool.tools) {
     form.addButton(tool.getMenuButtonName(player), () => {
       const slotOrError = tool.getToolSlot(player)
       if (typeof slotOrError === 'string') {

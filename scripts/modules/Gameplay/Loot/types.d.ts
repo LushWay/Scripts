@@ -12,7 +12,7 @@ export namespace LootItem {
     /**
      * - Cost of item. Items with higher cost will be generated more often
      */
-    chance: percent
+    chance: Percent
     /**
      * - Custom nameTag
      */

@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 
 new XCommand({
   type: 'we',
@@ -7,11 +7,8 @@ new XCommand({
   description: 'Получет информация о выделенной зоне',
   role: 'moderator',
 }).executes(ctx => {
-  if (!WorldEditBuild.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
   ctx.reply(
-    `§3В выделенной зоне §f${Vector.size(
-      WorldEditBuild.pos1,
-      WorldEditBuild.pos2
-    )}§3 блоков`
+    `§3В выделенной зоне §f${Vector.size(WEBUILD.pos1, WEBUILD.pos2)}§3 блоков`
   )
 })

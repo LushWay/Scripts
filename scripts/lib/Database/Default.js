@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Entity, Vector, system, world } from '@minecraft/server'
 import { util } from '../util.js'
 

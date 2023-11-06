@@ -9,9 +9,9 @@ export function stringDistance(string1, string2) {
   const matchWindow = ~~Math.max(0, string2.length / 2 - 1)
 
   /** @type {string[]} */
-  let str1Matches = []
+  const str1Matches = []
   /** @type {string[]} */
-  let str2Matches = []
+  const str2Matches = []
 
   forEveryChar(string1, (i, char) => {
     const start = Math.max(0, i - matchWindow)

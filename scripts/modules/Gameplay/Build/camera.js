@@ -1,4 +1,4 @@
-import { Player, Vector, system, world } from '@minecraft/server'
+import { EasingType, Player, Vector, system, world } from '@minecraft/server'
 import { ActionForm, ModalForm, util } from 'xapi.js'
 import {
   getChatAugments,
@@ -12,7 +12,7 @@ import {
  *   camera?: {
  *     pos: Vector3;
  *     type: string;
- *     ease: string;
+ *     ease: EasingType;
  *     easeTime: number;
  *     facing: string | Vector3
  *     mode: CameraDBModes
@@ -24,7 +24,8 @@ import {
 
 const CAMERA = {
   TYPES: ['minecraft:free'],
-  EASE: ['linear'],
+  /** @type {EasingType[]} */
+  EASE: [EasingType.Linear],
   /**
    * @type {Record<CameraDBModes, string>}
    */
@@ -42,41 +43,25 @@ function setupCameraForm(player, target) {
   const { data, save } = target.db()
 
   new ModalForm('§3Настройки камеры §f' + target.name)
-    .addDropdown(
+    .addDropdownFromObject(
       'Тип',
-      ...ModalForm.arrayAndDefault(
-        CAMERA.TYPES,
-        data.camera?.type ?? CAMERA.TYPES[0]
-      )
+      Object.fromEntries(CAMERA.TYPES.map(e => [e, e]))
     )
-    .addDropdown(
-      'Переход',
-      ...ModalForm.arrayAndDefault(
-        CAMERA.EASE,
-        data.camera?.ease ?? CAMERA.EASE[0]
-      )
-    )
+    .addDropdownFromObject('Переход', EasingType, {
+      defaultValue: EasingType.Linear,
+    })
     .addSlider('Длительность движения в секундах', 0, 100, 1, 1)
     .addTextField('Координаты центральной позиция (~ разрешены)', '0 ~1 0')
     .addTextField(
       'Позиция куда камера будет повернута (либо игрок в меню ниже)',
       '0 ~1 0'
     )
-    .addDropdown(
+    .addDropdownFromObject(
       'Игрок к которому камера будет повернута (либо позиция в меню выше)',
-      ...ModalForm.arrayAndDefault(
-        world.getAllPlayers().map(e => e.name),
-        ModalForm.arrayDefaultNone,
-        true
-      )
+      Object.fromEntries(world.getAllPlayers().map(e => [e.name, e.name])),
+      { none: true }
     )
-    .addDropdown(
-      'Режим камеры',
-      ...ModalForm.arrayAndDefault(
-        Object.values(CAMERA.MODES),
-        CAMERA.MODES.spinAroundPos
-      )
-    )
+    .addDropdownFromObject('Режим камеры', CAMERA.MODES)
     .addSlider('Радиус при прокрутке вокруг позиции', 0, 100)
     .show(
       target,
@@ -88,7 +73,7 @@ function setupCameraForm(player, target) {
         rawPos,
         facingPosRaw,
         facingPlayer,
-        rawMode,
+        mode,
         spinRadius
       ) => {
         const rawPosArray = getChatAugments(rawPos, '')
@@ -120,18 +105,12 @@ function setupCameraForm(player, target) {
         if (!facing)
           return ctx.error('Не указана ни одна позиция для наблюдения камерой')
 
-        /** @type {CameraDBModes | undefined} */
-        // @ts-expect-error
-        const mode = Object.entries(CAMERA.MODES).find(
-          ([, value]) => value === rawMode
-        )?.[0]
-
         if (!mode)
-          return ctx.error('Неизвестный режим камеры ' + util.inspect(rawMode))
+          return ctx.error('Неизвестный режим камеры ' + util.inspect(mode))
 
         data.camera = {
           type,
-          ease,
+          ease: EasingType[ease],
           easeTime,
           pos,
           facing,
@@ -177,7 +156,7 @@ function createCameraInteval(player) {
           if (step === 360) step = 1
 
           // Convert degree to radians
-          let radians = (step * Math.PI) / 180
+          const radians = (step * Math.PI) / 180
 
           // Calculate x and z coordinates using trigonometry
           const posTo = Vector.add(data.camera.pos, {
@@ -197,6 +176,12 @@ function createCameraInteval(player) {
           }`
           console.log(command)
           player.runCommand(command)
+          player.camera.setCamera(data.camera.type, {
+            easeOptions: {
+              easeTime: data.camera.easeTime,
+              easeType: data.camera.ease,
+            },
+          })
 
           save()
         }

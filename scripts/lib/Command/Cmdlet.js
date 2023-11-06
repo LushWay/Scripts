@@ -6,7 +6,7 @@ export class CmdLet {
   /**
    * @type {CmdLet[]}
    */
-  static ALL = []
+  static list = []
   /**
    *
    * @param {string[]} args
@@ -30,7 +30,7 @@ export class CmdLet {
       })
 
     const results = []
-    for (const cmdlet of CmdLet.ALL) {
+    for (const cmdlet of CmdLet.list) {
       const input = cmdlets.find(e => e[0] === cmdlet.data.name)
       if (input) {
         results.push(
@@ -49,7 +49,7 @@ export class CmdLet {
           many ? 'ы' : ''
         } §f${cmdlets.join(
           '§c, §f'
-        )}§c.\nДоступные командлеты: \n§f${CmdLet.ALL.map(
+        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(
           e => `\n  §f${e.data.name} §7§o- ${e.data.description}`
         )}\n `
       )
@@ -65,6 +65,6 @@ export class CmdLet {
   constructor({ name, callback, description }) {
     this.data = { name, callback, description }
 
-    CmdLet.ALL.push(this)
+    CmdLet.list.push(this)
   }
 }

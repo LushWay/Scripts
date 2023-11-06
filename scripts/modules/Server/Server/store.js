@@ -1,5 +1,5 @@
 import { ItemStack, Player, world } from '@minecraft/server'
-import { ActionForm, EventSignal, GameUtils, MessageForm } from 'xapi.js'
+import { ActionForm, EventSignal, GAME_UTILS, MessageForm } from 'xapi.js'
 import { SERVER } from './var.js'
 
 class Cost {
@@ -86,7 +86,7 @@ export class Store {
   /**
    * @type {Store[]}
    */
-  static STORES = []
+  static stores = []
 
   /**
    *
@@ -94,7 +94,7 @@ export class Store {
    * @param {Dimensions} dimensionId
    */
   static find(location, dimensionId) {
-    return this.STORES.find(
+    return this.stores.find(
       e =>
         e.dimensionId === dimensionId &&
         e.location.x === location.x &&
@@ -108,7 +108,7 @@ export class Store {
    */
   items = []
 
-  #EVENTS = {
+  #events = {
     /** @type {EventSignal<Player>} */
     open: new EventSignal(),
 
@@ -120,9 +120,9 @@ export class Store {
   }
 
   events = {
-    open: this.#EVENTS.open,
-    buy: this.#EVENTS.buy,
-    beforeBuy: this.#EVENTS.beforeBuy,
+    open: this.#events.open,
+    buy: this.#events.buy,
+    beforeBuy: this.#events.beforeBuy,
   }
 
   /**
@@ -149,7 +149,7 @@ export class Store {
       ...options,
     }
 
-    Store.STORES.push(this)
+    Store.stores.push(this)
   }
 
   /**
@@ -225,7 +225,7 @@ export class Store {
  * @param {ItemStack} item
  */
 function itemDescription(item, c = '§g') {
-  return `${item.nameTag ?? GameUtils.localizationName(item)}§r${
+  return `${item.nameTag ?? GAME_UTILS.localizationName(item)}§r${
     item.amount ? ` ${c}x${item.amount}` : ''
   }`
 }
@@ -241,19 +241,19 @@ world.afterEvents.entityHitBlock.subscribe(event => {
   store.open(event.damagingEntity)
 })
 
-/**
- *
- * @template {Object} F
- * @param {F} from
- * @template {keyof F} T
- * @param {T} name
- */
-function listen(from, name) {
-  // @ts-expect-error
-  from[name].subscribe(() => {
-    console.log(name)
-  })
-}
+// /**
+//  *
+//  * @template {Object} F
+//  * @param {F} from
+//  * @template {keyof F} T
+//  * @param {T} name
+//  */
+// function listen(from, name) {
+//   // @ts-expect-error
+//   from[name].subscribe(() => {
+//     console.log(name)
+//   })
+// }
 
 // listen(world.afterEvents, "entityHitBlock");
 // listen(world.afterEvents, "targetBlockHit");

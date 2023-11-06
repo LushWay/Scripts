@@ -6,8 +6,8 @@ import { MENU } from '../../Server/Menu/var.js'
 import { JOIN } from '../../Server/OnJoin/var.js'
 import { CubeRegion, Region } from '../../Server/Region/Region.js'
 import {
-  ClearRegion,
-  CreateRegion,
+  clearRegion,
+  createRegion,
   fillRegion,
   prompt,
   teleportToRegion,
@@ -93,7 +93,7 @@ JOIN.EVENTS.playerClosedGuide.subscribe(player => {
   player.playSound('random.levelup')
   player.tell('Приветствую на сервере')
   const oldRegion = DB[player.id]
-  if (!oldRegion) CreateRegion(player)
+  if (!oldRegion) createRegion(player)
 })
 
 MENU.OnOpen = player => {
@@ -103,7 +103,7 @@ MENU.OnOpen = player => {
     player.tell(
       '§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую.'
     )
-    CreateRegion(player)
+    createRegion(player)
     return false
   }
 
@@ -381,7 +381,7 @@ MENU.OnOpen = player => {
                   )
               }
 
-              CreateRegion(player, true)
+              createRegion(player, true)
               CD.update()
             },
             'Отмена',
@@ -397,7 +397,7 @@ MENU.OnOpen = player => {
             '§cВсе равно очистить§r',
             async () => {
               CD.update()
-              const end = await ClearRegion(player, playerRegion)
+              const end = await clearRegion(player, playerRegion)
               await util.catch(() =>
                 fillRegion(playerRegion.from, playerRegion.to)
               )
@@ -408,6 +408,7 @@ MENU.OnOpen = player => {
           )
       })
     } else if (currentRegion.permissions.owners.includes(player.id)) {
+      // A?
     } else if (currentRegion.permissions.owners[0]) {
       menu.addButton('Запросить разрешение', () => {
         const CD = new Cooldown(DB, 'REQ', player, 1000 * 60)
@@ -441,7 +442,7 @@ MENU.OnOpen = player => {
           `§cВы действительно хотите удалить площадку игрока §r§f${regionOwnerName}?`,
           '§cДа',
           async () => {
-            const end = await ClearRegion(player, currentRegion)
+            const end = await clearRegion(player, currentRegion)
             currentRegion.forEachOwner(player =>
               player.tell(
                 `§cРегион с владельцем §f${regionOwnerName}§r§c был удален`

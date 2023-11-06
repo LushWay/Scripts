@@ -15,7 +15,7 @@ root
       .getComponent('equippable')
       .getEquipmentSlot(EquipmentSlot.Mainhand)
     if (!item) return ctx.reply('§cВ руке нет предмета!')
-    let oldtag = item.getLore()
+    const oldtag = item.getLore()
     item.setLore(ctx.args)
     ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.getLore()}`)
   })
@@ -28,7 +28,7 @@ root
       .getComponent('equippable')
       .getEquipmentSlot(EquipmentSlot.Mainhand)
     if (!item) return ctx.reply('§cВ руке нет предмета!')
-    let oldtag = item.nameTag
+    const oldtag = item.nameTag
     item.nameTag = name
     ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.nameTag}`)
   })
@@ -44,7 +44,7 @@ root
       .getComponent('equippable')
       .getEquipmentSlot(EquipmentSlot.Mainhand)
     if (!item) return ctx.reply('§cВ руке нет предмета!')
-    let oldtag = item.amount
+    const oldtag = item.amount
     item.amount = count
     ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.amount}`)
   })

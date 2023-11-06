@@ -19,7 +19,7 @@ const OPTIONS = Options.world('chat', {
 
 /** @type {Record<string, string | undefined>} */
 const COOLDOWN_DB = DPDBProxy('chat', {
-  defaultValue(p) {
+  defaultValue(_p) {
     return undefined
   },
 })

@@ -1,4 +1,6 @@
+/* eslint-disable */
 // @ts-nocheck
+
 import { Player, world } from '@minecraft/server'
 
 import { util } from 'xapi.js'

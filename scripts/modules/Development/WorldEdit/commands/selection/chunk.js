@@ -1,6 +1,6 @@
 import { Entity, Vector } from '@minecraft/server'
 import { XCommand } from 'xapi.js'
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 
 /**
  * Gets the cuboid positions of a entitys chunk
@@ -27,8 +27,8 @@ new XCommand({
   role: 'moderator',
 }).executes(ctx => {
   const chunkBorder = getChunkCuboidPositions(ctx.sender)
-  WorldEditBuild.pos1 = chunkBorder.pos1
-  WorldEditBuild.pos2 = chunkBorder.pos2
+  WEBUILD.pos1 = chunkBorder.pos1
+  WEBUILD.pos2 = chunkBorder.pos2
   ctx.reply(
     `§b►§3Выделенна зона: §5Позиция 1§3: ${Vector.string(
       chunkBorder.pos1

@@ -5,7 +5,7 @@ import { system } from '@minecraft/server'
  * @returns {Promise<number>}
  */
 async function getServerTPS() {
-  let startTime = Date.now()
+  const startTime = Date.now()
   let ticks = 0
   return new Promise(resolve => {
     system.run(function tick() {
@@ -25,7 +25,7 @@ new XCommand({
   role: 'member',
 }).executes(async ctx => {
   ctx.reply('§b> §3Понг! Проверяем...')
-  let ticks = await getServerTPS()
+  const ticks = await getServerTPS()
   ctx.reply(
     `§b> §3TPS сервера ${
       ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'

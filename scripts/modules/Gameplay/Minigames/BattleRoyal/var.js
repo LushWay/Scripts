@@ -13,7 +13,7 @@ export const BATTLE_ROYAL_EVENTS = {
 /**
  * @type {Record<string, boolean>}
  */
-export const quene = {}
+export const BR_QUENE = {}
 
 export const BR_CONFIG = Options.world('BattleRoyal', {
   gamepos: { desc: 'x y', value: '', name: 'Центр игры' },

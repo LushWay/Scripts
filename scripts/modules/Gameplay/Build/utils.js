@@ -48,10 +48,10 @@ function getProgressBar(spining, percents) {
 /**
  *
  * @param {Player} player
- * @param {CubeRegion} Pregion
+ * @param {CubeRegion} playerRegion
  * @returns
  */
-export async function ClearRegion(player, Pregion) {
+export async function clearRegion(player, playerRegion) {
   let percents = 0
   let spining = ['/', '-', '\\', '|']
   let time = 0
@@ -67,8 +67,8 @@ export async function ClearRegion(player, Pregion) {
     'ResetSquare_ProgressActionbar',
     0
   )
-  const loc1 = { x: Pregion.from.x, y: -63, z: Pregion.from.z }
-  const loc2 = { x: Pregion.to.x, y: 100, z: Pregion.to.z }
+  const loc1 = { x: playerRegion.from.x, y: -63, z: playerRegion.from.z }
+  const loc2 = { x: playerRegion.to.x, y: 100, z: playerRegion.to.z }
   const blocks = Vector.size(loc1, loc2)
 
   let c = 0
@@ -89,11 +89,11 @@ export async function ClearRegion(player, Pregion) {
  *
  * @param {Player} player
  */
-export async function CreateRegion(player, tp = true) {
+export async function createRegion(player, tp = true) {
   const place = await findFreePlace()
 
   const region = new CubeRegion(place.from, place.to, 'overworld', {
-    ...Region.CONFIG.PERMISSIONS,
+    ...Region.config.permissions,
     owners: [player.id],
   })
   DB[player.id] = { id: region.key }

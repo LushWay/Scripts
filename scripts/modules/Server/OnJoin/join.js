@@ -68,14 +68,14 @@ system.runPlayerInterval(
 
     if (Array.isArray(pos)) {
       const rot = player.getRotation()
-      const not_moved =
+      const notMoved =
         player.location.x === pos[0] &&
         player.location.y === pos[1] &&
         player.location.z === pos[2] &&
         rot.x === pos[3] &&
         rot.y === pos[4]
 
-      if (not_moved) {
+      if (notMoved) {
         // Player still stays at joined position...
         if (player.isOnGround || player.isFlying) {
           // Player doesnt falling down, show animation

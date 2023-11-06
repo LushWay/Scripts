@@ -6,7 +6,7 @@ import './builders/WorldEditBuilder.js'
 // Lazy load to prevent script spike
 system.runTimeout(() => import('./commands/index.js'), 'command import', 40)
 
-export const WorldEditPlayerSettings = Options.player('Строитель мира', 'we', {
+export const WE_PLAYER_SETTINGS = Options.player('Строитель мира', 'we', {
   noBrushParticles: {
     name: 'Партиклы кисти',
     desc: 'Отключает партиклы у кисти',

@@ -2,7 +2,7 @@
  * @typedef {import("../../../../../tools/server/Net/routes.js").NODE_ROUTES} NODE_ROUTES
  */
 
-import { Module } from './OptionalModules.js'
+import { MODULE } from './OptionalModules.js'
 
 /**
  * Makes http request to node.js instance
@@ -14,8 +14,8 @@ import { Module } from './OptionalModules.js'
 export async function APIRequest(path, body) {
   const sbody = JSON.stringify(body)
   console.warn('REQ TO ', path, ' WITH BODY ', sbody)
-  if (Module.ServerNet) {
-    const { http, HttpRequest, HttpRequestMethod } = Module.ServerNet
+  if (MODULE.ServerNet) {
+    const { http, HttpRequest, HttpRequestMethod } = MODULE.ServerNet
     const response = await http.request(
       new HttpRequest('http://localhost:19000/' + path)
         .setMethod(HttpRequestMethod.Post)

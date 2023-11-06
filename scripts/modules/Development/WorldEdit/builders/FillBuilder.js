@@ -1,7 +1,7 @@
 import { system, world } from '@minecraft/server'
 import { util } from 'xapi.js'
 import { WE_CONFIG } from '../config.js'
-import { WorldEditBuild } from './WorldEditBuilder.js'
+import { WEBUILD } from './WorldEditBuilder.js'
 
 /**
  * Sets Pos1 To a new Block Location
@@ -13,10 +13,10 @@ import { WorldEditBuild } from './WorldEditBuilder.js'
  */
 export function FillFloor(pos1, pos2, blocks, rb = 'any') {
   util.catch(async () => {
-    WorldEditBuild.backup(pos1, pos2)
-    let replaceBlocks = []
+    WEBUILD.backup(pos1, pos2)
+    const replaceBlocks = []
     if (rb)
-      for (let block of rb.split(',')) {
+      for (const block of rb.split(',')) {
         replaceBlocks.push(block.replace('.', ' '))
       }
 
@@ -27,7 +27,7 @@ export function FillFloor(pos1, pos2, blocks, rb = 'any') {
           const block = blocks.randomElement().replace('.', ' ')
           if (rb !== 'any') {
             for (const replaceBlock of replaceBlocks) {
-              let replace = ` replace ${replaceBlock}`
+              const replace = ` replace ${replaceBlock}`
               world.overworld.runCommand(
                 `fill ${x} ${y} ${z} ${x} ${y} ${z} ${block} ${replace}`
               )

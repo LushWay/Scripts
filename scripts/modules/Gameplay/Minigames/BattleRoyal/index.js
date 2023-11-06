@@ -1,9 +1,9 @@
 import { Player, system, world } from '@minecraft/server'
 import { XCommand } from 'xapi.js'
 import { br } from './game.js'
-import { BATTLE_ROYAL_EVENTS, quene } from './var.js'
+import { BATTLE_ROYAL_EVENTS, BR_QUENE } from './var.js'
 
-let minpl = 2,
+const minpl = 2,
   fulltime = 5,
   shorttime = 3
 
@@ -14,10 +14,10 @@ let minpl = 2,
  */
 
 function forEveryQuenedPlayer(sound, text) {
-  for (const name in quene) {
+  for (const name in BR_QUENE) {
     const player = Player.fetch(name)
     if (!player) {
-      delete quene[name]
+      delete BR_QUENE[name]
       continue
     }
     player.tell(text)
@@ -40,14 +40,14 @@ BATTLE_ROYAL_EVENTS.join.subscribe(player => {
   if (br.players.map(e => e.name).includes(pl.name)) return
   if (br.game.started)
     return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`)
-  if (quene[pl.name])
+  if (BR_QUENE[pl.name])
     return pl.onScreenDisplay.setActionBar(
-      `§6${ks(quene).length}/${minpl} §g○ §6${br.quene.time}`
+      `§6${ks(BR_QUENE).length}/${minpl} §g○ §6${br.quene.time}`
     )
-  quene[pl.name] = true
+  BR_QUENE[pl.name] = true
   pl.tell(
     `§aВы успешно встали в очередь. §f(${
-      ks(quene).length
+      ks(BR_QUENE).length
     }/${minpl}). §aДля выхода пропишите §f-br quit`
   )
   pl.playSound('random.orb')
@@ -67,31 +67,31 @@ system.runInterval(
       br.end('specially', 'Перезагрузка')
     }
 
-    if (ks(quene).length >= minpl && ks(quene).length < 10) {
+    if (ks(BR_QUENE).length >= minpl && ks(BR_QUENE).length < 10) {
       if (!br.quene.open) {
         br.quene.open = true
         br.quene.time = fulltime
         forEveryQuenedPlayer(
           'random.levelup',
           `§7${
-            ks(quene).length
+            ks(BR_QUENE).length
           }/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
         )
       }
-      if (ks(quene).length >= 10) {
+      if (ks(BR_QUENE).length >= 10) {
         br.quene.open = true
         br.quene.time = 16
         forEveryQuenedPlayer(
           'random.levelup',
-          `§6Сервер заполнен! §7(${ks(quene).length}/${minpl}).`
+          `§6Сервер заполнен! §7(${ks(BR_QUENE).length}/${minpl}).`
         )
       }
       if (br.quene.open && br.quene.time > 0) {
         br.quene.time--
       }
       if (br.quene.time >= 1 && br.quene.time <= shorttime) {
-        let sec = 'секунд',
-          hrs = `${br.quene.time}`
+        let sec = 'секунд'
+        const hrs = `${br.quene.time}`
         if (hrs.endsWith('1') && hrs != '11') {
           sec = 'секунду'
         } else if (hrs == '2' || hrs == '3' || hrs == '4') {
@@ -103,19 +103,21 @@ system.runInterval(
         )
       }
       if (br.quene.open && br.quene.time == 0) {
-        br.start(ks(quene))
-        Object.assign({}, quene)
+        br.start(ks(BR_QUENE))
+        Object.assign({}, BR_QUENE)
       }
     }
-    ks(quene).forEach(e => {
-      if (!Player.fetch(e)) delete quene[e]
+    ks(BR_QUENE).forEach(e => {
+      if (!Player.fetch(e)) delete BR_QUENE[e]
     })
-    if (br.quene.open && ks(quene).length < minpl) {
+    if (br.quene.open && ks(BR_QUENE).length < minpl) {
       br.quene.open = false
       br.quene.time = 0
       forEveryQuenedPlayer(
         'note.bass',
-        `§7${ks(quene).length}/${minpl} §9Игроков в очереди. §cИгра отменена...`
+        `§7${
+          ks(BR_QUENE).length
+        }/${minpl} §9Игроков в очереди. §cИгра отменена...`
       )
     }
   },
@@ -131,8 +133,8 @@ const bbr = new XCommand({
 })
 
 bbr.literal({ name: 'quit', description: 'Выйти из очереди' }).executes(ctx => {
-  if (quene[ctx.sender.name]) {
-    delete quene[ctx.sender.name]
+  if (BR_QUENE[ctx.sender.name]) {
+    delete BR_QUENE[ctx.sender.name]
     ctx.reply('§aВы вышли из очереди.')
   } else {
     ctx.reply('§cВы не стоите в очереди.')
@@ -159,8 +161,8 @@ bbr
     role: 'admin',
   })
   .executes(() => {
-    br.start(ks(quene))
-    Object.assign({}, quene)
+    br.start(ks(BR_QUENE))
+    Object.assign({}, BR_QUENE)
   })
 
 bbr
@@ -171,7 +173,7 @@ bbr
   })
   .executes(() => {
     br.end('specially', 'Так надо')
-    Object.assign({}, quene)
+    Object.assign({}, BR_QUENE)
   })
 
 world.afterEvents.playerSpawn.subscribe(({ player }) => {

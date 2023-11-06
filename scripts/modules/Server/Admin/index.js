@@ -111,8 +111,8 @@ new XCommand({
 function poptions(player) {
   const form = new ActionForm('§dНастройки')
 
-  for (const groupName in Options.PLAYER) {
-    const name = Options.PLAYER[groupName][OPTIONS_NAME]
+  for (const groupName in Options.player) {
+    const name = Options.player[groupName][OPTIONS_NAME]
     if (name)
       form.addButton(name, null, () => {
         group(player, groupName, 'PLAYER')
@@ -136,9 +136,9 @@ new XCommand({
 function options(player) {
   const form = new ActionForm('§dНастройки мира')
 
-  for (const groupName in Options.WORLD) {
+  for (const groupName in Options.worldO) {
     const data = OPTIONS_DB[groupName]
-    const requires = Object.entries(Options.WORLD[groupName]).reduce(
+    const requires = Object.entries(Options.worldO[groupName]).reduce(
       (count, [key, option]) =>
         option.requires && typeof data[key] === 'undefined' ? count + 1 : count,
       0
@@ -166,7 +166,7 @@ const OPTIONS_DB = DPDBProxy('options')
  * @param {Record<string, string>} [errors]
  */
 function group(player, groupName, groupType, errors = {}) {
-  const source = groupType === 'PLAYER' ? Options.PLAYER : Options.WORLD
+  const source = groupType === 'PLAYER' ? Options.player : Options.worldO
   const config = source[groupName]
   const name = config[OPTIONS_NAME]
   const data = OPTIONS_DB[groupName]

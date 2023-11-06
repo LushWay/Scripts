@@ -53,7 +53,7 @@ export class Leaderboard {
   /**
    * @type {Record<string, Leaderboard>}
    */
-  static ALL = {}
+  static all = {}
   /**
    *
    * @param {string} objective
@@ -89,7 +89,7 @@ export class Leaderboard {
    * @param {LB} data
    */
   constructor(entity, data) {
-    if (entity.id in Leaderboard.ALL) return Leaderboard.ALL[entity.id]
+    if (entity.id in Leaderboard.all) return Leaderboard.all[entity.id]
 
     /**
      * @type {Entity}
@@ -99,7 +99,7 @@ export class Leaderboard {
      * @type {LB}
      */
     this.data = data
-    Leaderboard.ALL[entity.id] = this
+    Leaderboard.all[entity.id] = this
   }
   remove() {
     LB_DB.delete(this.entity.id)
@@ -134,7 +134,7 @@ export class Leaderboard {
 system.runInterval(
   () => {
     for (const [id, leaderboard] of LB_DB.entries()) {
-      const LB = Leaderboard.ALL[id]
+      const LB = Leaderboard.all[id]
 
       if (LB) {
         if (LB.entity.lifetimeState === EntityLifetimeState.Unloaded) continue

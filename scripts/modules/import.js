@@ -26,7 +26,7 @@ const modules = [
   './Development/WorldEdit/index.js',
 ]
 
-let enabled = 0
+const enabled = 0
 const strike = util.strikeTest()
 
 /**
@@ -34,19 +34,19 @@ const strike = util.strikeTest()
  * @param {string[]} [o.array]
  * @param {string} [o.message]
  * @param {(m: string) => Promise<any>} [o.fn]
- * @param {number} [o.st]
+ * @param {number} [o.striketest]
  */
 export default async function ({
   array = modules,
   message = 'X-API init and loading took',
   fn = module => import(module),
-  st = enabled,
+  striketest = enabled,
 } = {}) {
-  if (st) strike(message)
+  if (striketest) strike(message)
 
   for (const module of array) {
     await nextTick
     await fn(module)
-    if (st) strike(module)
+    if (striketest) strike(module)
   }
 }

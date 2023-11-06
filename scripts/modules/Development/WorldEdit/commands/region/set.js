@@ -1,7 +1,7 @@
 import { BlockTypes, Player } from '@minecraft/server'
 import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 import { Cuboid } from '../../utils/Cuboid.js'
 
 const set = new XCommand({
@@ -17,24 +17,24 @@ set
   .string('other', true)
   .int('otherData', true)
   .executes((ctx, block, blockData, mode, other, otherData) => {
-    if (!WorldEditBuild.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+    if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
 
     if (!blockIsAvaible(block, ctx.sender)) return
     if (other && !blockIsAvaible(other, ctx.sender)) return
 
-    const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2)
+    const time = timeCaculation(WEBUILD.pos1, WEBUILD.pos2)
     if (time >= 0.01)
       ctx.reply(
         `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
       )
 
-    WorldEditBuild.fillBetween(block, blockData, mode, other, otherData).then(
-      result => ctx.reply(result)
+    WEBUILD.fillBetween(block, blockData, mode, other, otherData).then(result =>
+      ctx.reply(result)
     )
   })
 
 set.executes(ctx => {
-  if (!WorldEditBuild.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
   ctx.reply('§b> §3Закрой чат!')
   new ModalForm('Заполнить')
     .addTextField('Блок', 'e.g. stone', '')
@@ -57,13 +57,13 @@ set.executes(ctx => {
       if (!blockIsAvaible(block, ctx.sender)) return
       if (other && !blockIsAvaible(other, ctx.sender)) return
 
-      const time = timeCaculation(WorldEditBuild.pos1, WorldEditBuild.pos2)
+      const time = timeCaculation(WEBUILD.pos1, WEBUILD.pos2)
       if (time >= 0.01)
         ctx.reply(
           `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
         )
 
-      WorldEditBuild.fillBetween(
+      WEBUILD.fillBetween(
         block,
         blockData,
         mode === 'Отключено' ? '' : mode,
@@ -115,7 +115,7 @@ function blockIsAvaible(block, player) {
     `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
   let suggestion = '§cВы имели ввиду ' + suggest(search[0])
-  let firstValue = search[0][1]
+  const firstValue = search[0][1]
   search = search
     .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
     .slice(1, options.maxSuggestionsCount)

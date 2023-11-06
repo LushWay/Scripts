@@ -24,7 +24,7 @@ function childrensToHelpText(command) {
  * @returns {[string, undefined | string]}
  */
 function getParentType(command, init = true) {
-  let curtype = getType(command)
+  const curtype = getType(command)
 
   let description
 
@@ -77,7 +77,7 @@ help
   .int('page', true)
   .int('commandsInPage', true)
   .executes((ctx, inputPage, commandsInPage) => {
-    const avaibleCommands = XCommand.COMMANDS.filter(e =>
+    const avaibleCommands = XCommand.commands.filter(e =>
       e.sys.data.requires(ctx.sender)
     )
     const cmds = commandsInPage || 15
@@ -91,7 +91,7 @@ help
 
     for (const command of path) {
       const q = '§f-'
-      let c = `${cv}§r ${q}${command.sys.data.name} §o§7- ${
+      const c = `${cv}§r ${q}${command.sys.data.name} §o§7- ${
         command.sys.data.description
           ? `${command.sys.data.description}`
           : ' Пусто' //§r
@@ -99,7 +99,7 @@ help
       ctx.reply('§ы' + c)
     }
     ctx.reply(
-      `${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${XCommand.COMMANDS.length} ${cv}═─═─═─═─`
+      `${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${XCommand.commands.length} ${cv}═─═─═─═─`
     )
   })
 
@@ -110,7 +110,7 @@ help
  * @returns
  */
 function helpForCommand(ctx, commandName) {
-  const cmd = XCommand.COMMANDS.find(
+  const cmd = XCommand.commands.find(
     e =>
       e.sys.data.name == commandName ||
       e.sys.data?.aliases?.includes(commandName)

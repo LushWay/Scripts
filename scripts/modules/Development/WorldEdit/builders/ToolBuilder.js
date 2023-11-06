@@ -8,7 +8,7 @@ import {
   world,
 } from '@minecraft/server'
 import { MessageForm, util } from 'xapi.js'
-import { WorldEditPlayerSettings } from '../index.js'
+import { WE_PLAYER_SETTINGS } from '../index.js'
 
 /**
  * @template {Record<string, any> & {version: number}} [LoreFormat=any]
@@ -17,7 +17,7 @@ export class WorldEditTool {
   /**
    * @type {WorldEditTool<any>[]}
    */
-  static TOOLS = []
+  static tools = []
   /**
    * @param {Object} o
    * @param {string} o.name
@@ -25,7 +25,7 @@ export class WorldEditTool {
    * @param {string} o.itemStackId
    * @param {WorldEditTool['editToolForm']} [o.editToolForm]
    * @param {LoreFormat} [o.loreFormat]
-   * @param {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WorldEditPlayerSettings>) => void} [o.interval]
+   * @param {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} [o.interval]
    * @param {(player: Player, item: ItemStack) => void} [o.onUse]
    */
   constructor({
@@ -37,7 +37,7 @@ export class WorldEditTool {
     interval,
     onUse,
   }) {
-    WorldEditTool.TOOLS.push(this)
+    WorldEditTool.tools.push(this)
     this.name = name
     this.displayName = displayName
     this.itemId = itemStackId
@@ -115,7 +115,9 @@ export class WorldEditTool {
           .join('')
           .replace(/§(.)/g, '$1')
       )
-    } catch (e) {}
+    } catch (e) {
+      e
+    }
     if (raw?.version !== this.loreFormat.version) {
       // @ts-expect-error yes
       return this.loreFormat
@@ -158,7 +160,7 @@ export class WorldEditTool {
 
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
   if (!(player instanceof Player)) return
-  const tool = WorldEditTool.TOOLS.find(e => e.itemId === item.typeId)
+  const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
   util.catch(() => tool && tool.onUse && tool.onUse(player, item))
 })
 
@@ -168,9 +170,9 @@ system.runPlayerInterval(
       .getComponent('equippable')
       .getEquipmentSlot(EquipmentSlot.Mainhand)
 
-    const tool = WorldEditTool.TOOLS.find(e => e.itemId === item.typeId)
+    const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
     if (tool && tool.interval)
-      tool.interval(player, item, WorldEditPlayerSettings(player)) //
+      tool.interval(player, item, WE_PLAYER_SETTINGS(player)) //
   },
   'we tool',
   10

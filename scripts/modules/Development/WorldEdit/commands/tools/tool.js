@@ -4,12 +4,13 @@ import {
   Vector,
   system,
 } from '@minecraft/server'
-import { ActionForm, ModalForm } from 'xapi.js'
+import { ActionForm, ModalForm, util } from 'xapi.js'
 import { ListParticles } from '../../../../../lib/List/particles.js'
 import { ListSounds } from '../../../../../lib/List/sounds.js'
 import { WorldEditTool } from '../../builders/ToolBuilder.js'
 
-const lists = {
+/** @type {Record<string, string[]>} */
+const actions = {
   Particle: ListParticles,
   Sound: ListSounds,
 }
@@ -19,7 +20,7 @@ new WorldEditTool({
   itemStackId: 'we:tool',
   displayName: 'инструмент',
   editToolForm(item, player) {
-    let lore = item.getLore()
+    const lore = item.getLore()
     new ActionForm(
       '§3Инструмент',
       'Настройте что будет происходить при использовании инструмента.'
@@ -101,22 +102,21 @@ new WorldEditTool({
     }
   },
   onUse(player, item) {
-    let lore = item.getLore()
+    const lore = item.getLore()
     if (!lore || !lore[0]) return
-    const act = lore[0]
+    const action = lore[0]
 
-    if (lore && act in lists) {
-      // @ts-expect-error
-      const list = lists[act]
+    if (action in actions) {
+      const list = actions[action]
       const num = Number(lore[2]) + (player.isSneaking ? 1 : -1)
       lore[1] = list[num] ?? lore[1]
       lore[2] = num.toString()
       item.setLore(lore)
     }
-    if (act === 'runCommand') {
+    if (action === 'runCommand') {
       player.runCommand(lore[1])
     }
-    if (act === 'teleportToView') {
+    if (action === 'teleportToView') {
       const dot = player.getBlockFromViewDirection()
       if (dot && dot.block) player.teleport(dot.block)
     }

@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 
 new XCommand({
   type: 'we',
@@ -10,6 +10,6 @@ new XCommand({
   const pos = ctx.sender.getBlockFromViewDirection()
   if (!pos) return ctx.reply('Неа!')
 
-  WorldEditBuild.pos2 = pos.block.location
-  ctx.reply(`§dПозиция§r 2 теперь ${Vector.string(WorldEditBuild.pos1)}`)
+  WEBUILD.pos2 = pos.block.location
+  ctx.reply(`§dПозиция§r 2 теперь ${Vector.string(WEBUILD.pos1)}`)
 })

@@ -6,26 +6,25 @@ import { DB, EventSignal, util } from 'xapi.js'
 const ON_LOAD = new EventSignal()
 const LOCATION = { x: 0, y: -10, z: 0 }
 
-export const Enchantments = {
+export class Enchantments {
   /**
    * @type {{[key: string]: { [key: number]: Enchantment }}}
    */
-  custom: {},
+  static custom = {}
 
   /**
    * @type {Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }>}
    */
-  // @ts-expect-error
-  typed: {},
+  // @ts-expect-error Type
+  static typed = {}
 
-  events: {
+  static events = {
     onLoad: ON_LOAD,
-  },
+  }
 }
 
 function load() {
-  let status
-  status = world.overworld.runCommand(
+  const status = world.overworld.runCommand(
     'structure load CustomEnchantments ' + Vector.string(LOCATION)
   )
 
@@ -37,7 +36,7 @@ function load() {
       )
     )
 
-  let entities = world.overworld.getEntities({
+  const entities = world.overworld.getEntities({
     type: DB.ENTITY_IDENTIFIER,
     location: LOCATION,
     maxDistance: 2,
@@ -46,7 +45,7 @@ function load() {
   const entity = entities[0]
 
   if (!entity)
-    return util.error(new Error('Unable to found CustomEnchantments entity'))
+    return util.error(new Error('Unable to find CustomEnchantments entity'))
 
   const inventory = entity.getComponent('inventory')
   const { container } = inventory
@@ -83,7 +82,7 @@ function load() {
     })
     .forEach(e => e.triggerEvent('minecraft:despawn'))
 
-  // @ts-expect-error
+  // @ts-expect-error Type
   Enchantments.typed = Enchantments.custom
 
   EventSignal.emit(ON_LOAD, null)

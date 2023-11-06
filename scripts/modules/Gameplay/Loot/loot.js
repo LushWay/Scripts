@@ -69,7 +69,7 @@ export class LootTable {
   /**
    * Randomises items and returns array with specified size
    * @param {number} size - Size of the array
-   * @param {percent} air
+   * @param {Percent} air
    * @returns {Array<ItemStack | null | undefined>}
    */
   generate(size, air = '70%') {

@@ -8,7 +8,7 @@ import { DB, DatabaseError } from './Default.js'
  * @param {string} key
  * @param {{defaultValue?: DynamicPropertyDB<Key, Value>["defaultValue"]}} [options]
  * @param {World | Player} [source=world]
- * @returns {Record<Key, Value>}
+ * @returns {any}
  */
 export function DPDBProxy(key, options, source) {
   return new DynamicPropertyDB(key, options, source).proxy()
@@ -143,6 +143,7 @@ class DynamicPropertyDB {
    * @returns {Record<string, any>}
    */
   subproxy(object, key, keys, initial = false) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const db = this
     return new Proxy(object, {
       get(target, p, reciever) {
@@ -202,5 +203,7 @@ class DynamicPropertyDB {
 Object.defineProperty(Player.prototype, 'database', {
   enumerable: true,
   configurable: false,
-  get() {},
+  get() {
+    return null
+  },
 })

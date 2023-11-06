@@ -1,4 +1,4 @@
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 
 new XCommand({
   type: 'we',
@@ -8,6 +8,6 @@ new XCommand({
 })
   .int('undoCount', true)
   .executes((ctx, r) => {
-    const status = WorldEditBuild.undo(!isNaN(r) ? r : 1)
+    const status = WEBUILD.undo(!isNaN(r) ? r : 1)
     ctx.reply(status)
   })

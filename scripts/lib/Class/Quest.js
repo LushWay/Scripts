@@ -1,11 +1,10 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { Anarchy, Spawn } from '../../modules/Gameplay/Survival/index.js'
+import { ANARCHY, SPAWN } from '../../modules/Gameplay/Survival/index.js'
 import { ActionForm } from '../Form/ActionForm.js'
 import { Place } from './Action.js'
 import { Sidebar } from './Sidebar.js'
-import { OverTakes } from '../Extensions/import.js'
 
-// @ts-expect-error
+// @ts-expect-error Bruh
 Set.prototype.toJSON = function () {
   return 'Set<size=' + this.size + '>'
 }
@@ -199,6 +198,7 @@ class PlayerQuest {
    * @param {QuestStepInput & ThisType<QuestStepThis>} options
    */
   dynamic(options) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const step = this
     const i = this.list.length
     /** @type {PlayerQuest["list"][number]} */
@@ -288,7 +288,7 @@ class PlayerQuest {
 
   /**
    * @typedef {QuestStepThis &
-   * { diff(this: QuestStepThis, m: number): void; } &
+   * { diff(this: QuestStepThis, m: number): void } &
    * QuestCounterInput
    * } QuestCounterThis
    */
@@ -366,9 +366,9 @@ class PlayerQuest {
   }
 }
 
-if (Anarchy.portal) {
+if (ANARCHY.portal) {
   const learning = new Quest('Обучение', q => {
-    if (!Anarchy.portal || !Anarchy.portal.from || !Anarchy.portal.to)
+    if (!ANARCHY.portal || !ANARCHY.portal.from || !ANARCHY.portal.to)
       return q.failed('§cСервер не настроен')
 
     q.start(function () {
@@ -376,7 +376,7 @@ if (Anarchy.portal) {
       this.player.playSound('note.pling')
     })
 
-    q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
+    q.place(ANARCHY.portal.from, ANARCHY.portal.to, '§6Зайди в портал анархии')
 
     q.counter({
       end: 5,
@@ -387,7 +387,7 @@ if (Anarchy.portal) {
         const blocksEvent = world.beforeEvents.playerBreakBlock.subscribe(
           ({ player, block }) => {
             if (player.id !== this.player.id) return
-            if (!Spawn.startAxeCanBreak.includes(block.type.id)) return
+            if (!SPAWN.startAxeCanBreak.includes(block.type.id)) return
 
             this.diff(1)
           }

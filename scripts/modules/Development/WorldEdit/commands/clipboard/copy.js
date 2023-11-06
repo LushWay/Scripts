@@ -1,4 +1,4 @@
-import { WorldEditBuild } from '../../builders/WorldEditBuilder.js'
+import { WEBUILD } from '../../builders/WorldEditBuilder.js'
 
 new XCommand({
   name: 'copy',
@@ -6,6 +6,6 @@ new XCommand({
   role: 'moderator',
   type: 'we',
 }).executes(ctx => {
-  const status = WorldEditBuild.copy()
+  const status = WEBUILD.copy()
   if (status) ctx.reply(status)
 })

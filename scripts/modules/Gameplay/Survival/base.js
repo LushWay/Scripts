@@ -24,18 +24,18 @@ function updateBases() {
   bases = RadiusRegion.getAllRegions().map(e => e.center)
 }
 
-export const baseItemStack = new ItemStack(MinecraftItemTypes.Barrel)
-baseItemStack.setLore(['Поставьте эту бочку и она', 'станет базой.'])
+export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel)
+BASE_ITEM_STACK.setLore(['Поставьте эту бочку и она', 'станет базой.'])
 
 new Store({ x: -234, y: 65, z: -74 }, 'overworld').addItem(
-  baseItemStack,
+  BASE_ITEM_STACK,
   new MoneyCost(10)
 )
 
 world.beforeEvents.itemUseOn.subscribe(data => {
   const { source, block, faceLocation, itemStack } = data
   if (
-    !itemStack.isStackableWith(baseItemStack) ||
+    !itemStack.isStackableWith(BASE_ITEM_STACK) ||
     !(source instanceof Player) ||
     LockAction.locked(source)
   )
@@ -65,10 +65,10 @@ world.beforeEvents.itemUseOn.subscribe(data => {
     } else {
       const from = {
         x: r.from.x,
-        y: Region.CONFIG.LOWEST_Y_VALUE,
+        y: Region.config.LOWEST_Y_VALUE,
         z: r.from.z,
       }
-      const to = { x: r.to.x, y: Region.CONFIG.HIGEST_Y_VALUE, z: r.to.z }
+      const to = { x: r.to.x, y: Region.config.HIGEST_Y_VALUE, z: r.to.z }
 
       const min = Vector.min(from, to)
       const max = Vector.max(from, to)

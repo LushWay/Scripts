@@ -33,5 +33,5 @@ load({
   array: commands,
   message: 'WorldEdit commands',
   fn: module => import(module),
-  st: 0,
+  striketest: 0,
 })

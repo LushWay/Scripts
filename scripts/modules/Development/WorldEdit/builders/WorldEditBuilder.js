@@ -289,11 +289,14 @@ export class WorldEditBuilder {
     return `§b► ${reply}`
   }
 }
-export const WorldEditBuild = new WorldEditBuilder()
+/**
+ * @deprecated Migrate to personal WEBUILD
+ */
+export const WEBUILD = new WorldEditBuilder()
 
 system.runInterval(
   () => {
-    WorldEditBuild.drawSelection()
+    WEBUILD.drawSelection()
   },
   'we Selection',
   20

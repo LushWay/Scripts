@@ -1,8 +1,8 @@
 import { Dimension, Entity, Player, Vector } from '@minecraft/server'
-import { DB } from 'lib/Database/Default.js'
 import { Database } from 'lib/Database/Rubedo.js'
 import { util } from 'xapi.js'
 import { DEFAULT_REGION_PERMISSIONS } from './config.js'
+import { DPDBProxy } from 'lib/Database/Properties.js'
 
 /**
  * The Lowest Y value in minecraft
@@ -36,13 +36,13 @@ const HIGEST_Y_VALUE = 320
  */
 
 /**
- * @type {Database<string, IRadiusRegion | ICubeRegion>}
+ * @type {Record<string, IRadiusRegion | ICubeRegion>}
  */
-const TABLE = new Database('region', {
+const TABLE = DPDBProxy('region', {
   defaultValue: key => {
     return {
       dimensionId: 'overworld',
-      permissions: Region.CONFIG.PERMISSIONS,
+      permissions: Region.config.permissions,
       key,
     }
   },
@@ -50,8 +50,8 @@ const TABLE = new Database('region', {
 
 export class Region {
   /** @private */
-  static PERMISSIONS = DEFAULT_REGION_PERMISSIONS
-  static CONFIG = {
+  static permissions = DEFAULT_REGION_PERMISSIONS
+  static config = {
     HIGEST_Y_VALUE,
     LOWEST_Y_VALUE,
 
@@ -59,20 +59,20 @@ export class Region {
     /**
      * The default permissions for all regions made
      */
-    get PERMISSIONS() {
+    get permissions() {
       if (!this.PERMS_SETTED) {
         throw new ReferenceError(
           'Cannot access Region.CONFIG.PERMISSIONS before setting.'
         )
       }
 
-      return Region.PERMISSIONS
+      return Region.permissions
     },
-    set PERMISSIONS(NEW) {
+    set permissions(update) {
       if (this.PERMS_SETTED)
         throw new ReferenceError('Already set Region.CONFIG.PERMISSIONS.')
 
-      Region.PERMISSIONS = NEW
+      Region.permissions = update
       this.PERMS_SETTED = true
     },
 
@@ -85,17 +85,17 @@ export class Region {
    * Holds all regions in memory so its not grabbing them so much
    * @type {Array<CubeRegion | RadiusRegion>}
    */
-  static REGIONS = []
+  static regions = []
   /**
    * Gets all regions
    * @returns {Array<CubeRegion | RadiusRegion>}
    */
   static getAllRegions() {
-    if (this.CONFIG.GRABBED) return this.REGIONS
+    if (this.config.GRABBED) return this.regions
 
-    this.REGIONS = []
-    TABLE.values().forEach(region => {
-      this.REGIONS.push(
+    this.regions = []
+    Object.values(TABLE).forEach(region => {
+      this.regions.push(
         region.t === 'c'
           ? new CubeRegion(
               region.from,
@@ -116,9 +116,9 @@ export class Region {
       )
     })
 
-    this.CONFIG.GRABBED = true
+    this.config.GRABBED = true
 
-    return this.REGIONS
+    return this.regions
   }
   /**
    * Checks if a block location is in region
@@ -147,7 +147,7 @@ export class Region {
    */
   constructor(dimensionId, permissions, key) {
     this.dimensionId = dimensionId
-    this.permissions = permissions ?? Region.CONFIG.PERMISSIONS
+    this.permissions = permissions ?? Region.config.permissions
     this.key = key ?? new Date(Date.now()).toISOString()
   }
   /**
@@ -166,8 +166,8 @@ export class Region {
    * Removes this region
    */
   delete() {
-    Region.REGIONS = Region.REGIONS.filter(e => e.key !== this.key)
-    TABLE.delete(this.key)
+    Region.regions = Region.regions.filter(e => e.key !== this.key)
+    delete TABLE[this.key]
   }
   /**
    * A function that will loop through all the owners
@@ -176,23 +176,16 @@ export class Region {
    * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback - Callback to run
    */
   forEachOwner(callback) {
-    this.permissions.owners
-      .map(Player.fetch)
-      .filter(e => e)
-      .forEach(
-        (player, i, owners) =>
-          player &&
-          util.catch(
-            () =>
-              callback(
-                player,
-                i,
-                // @ts-ignore
-                owners
-              ),
-            'Region.forEachOwner'
-          )
-      )
+    const onlineOwners = []
+    for (const ownerId of this.permissions.owners) {
+      const player = Player.fetch(ownerId)
+      if (player) onlineOwners.push(player)
+    }
+    onlineOwners.forEach(
+      (player, i, owners) =>
+        player &&
+        util.catch(() => callback(player, i, owners), 'Region.forEachOwner')
+    )
   }
 }
 
@@ -202,7 +195,7 @@ export class CubeRegion extends Region {
    * @returns {CubeRegion[]}
    */
   static getAllRegions() {
-    // @ts-expect-error
+    // @ts-expect-error Instance filtering
     return Region.getAllRegions().filter(e => e instanceof CubeRegion)
   }
   /**
@@ -239,7 +232,7 @@ export class CubeRegion extends Region {
 
     if (creating) {
       this.update()
-      Region.REGIONS.push(this)
+      Region.regions.push(this)
     }
   }
   /** @param {Vector3} vector */
@@ -251,14 +244,14 @@ export class CubeRegion extends Region {
     )
   }
   update() {
-    TABLE.set(this.key, {
+    TABLE[this.key] = {
       t: 'c',
       key: this.key,
       from: this.from,
       dimensionId: this.dimensionId,
       permissions: this.permissions,
       to: this.to,
-    })
+    }
   }
 }
 
@@ -268,7 +261,7 @@ export class RadiusRegion extends Region {
    * @returns {RadiusRegion[]}
    */
   static getAllRegions() {
-    // @ts-expect-error
+    // @ts-expect-error Instance filtering misstype
     return Region.getAllRegions().filter(e => e instanceof RadiusRegion)
   }
   /** @type {Vector3} */
@@ -291,7 +284,7 @@ export class RadiusRegion extends Region {
 
     if (creating) {
       this.update()
-      Region.REGIONS.push(this)
+      Region.regions.push(this)
     }
   }
   /**
@@ -306,14 +299,14 @@ export class RadiusRegion extends Region {
    * @returns {void}
    */
   update() {
-    TABLE.set(this.key, {
+    TABLE[this.key] = {
       t: 'r',
       key: this.key,
       center: this.center,
       dimensionId: this.dimensionId,
       permissions: this.permissions,
       radius: this.radius,
-    })
+    }
   }
 }
 

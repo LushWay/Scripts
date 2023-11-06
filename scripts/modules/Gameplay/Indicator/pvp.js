@@ -175,8 +175,7 @@ function onDamage(data, fatal = false) {
 
   if (data.hurtEntity instanceof Player) {
     // skip SimulatedPlayer because of error
-    // @ts-expect-error
-    if (data.hurtEntity.jump) return
+    if ('jump' in data.hurtEntity) return
 
     PVP.set(data.hurtEntity, options.cooldown)
     SERVER.stats.damageRecieve.add(data.hurtEntity, data.damage)

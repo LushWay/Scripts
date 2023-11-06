@@ -1,5 +1,5 @@
 import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
-import { GameUtils, Options, util } from 'xapi.js'
+import { GAME_UTILS, Options, util } from 'xapi.js'
 
 /**
  * @type {Array<"unknown" | "build" | "survival" | "disabled">}
@@ -47,7 +47,7 @@ export const SERVER = {
 SERVER.type =
   TYPES[
     (function getType() {
-      let num = Number(GameUtils.env('type'))
+      let num = Number(GAME_UTILS.env('type'))
       if (!num || isNaN(num)) num = SERVER.options.type
 
       if (!(num in TYPES) || num === 0) {

@@ -16,13 +16,13 @@ import { util } from './lib/util.js'
 import importModules from './modules/import.js'
 
 world.say('§9┌ §fLoading...')
-let loading = Date.now()
+const loading = Date.now()
 
 /**
  * Class because variable hoisting
  */
 export class XA {
-  static Lang = {
+  static lang = {
     lang: text,
     emoji: emoji,
   }
@@ -87,7 +87,7 @@ system.run(async function waiter() {
     return system.run(waiter)
   }
 
-  let errorName = 'LoadError'
+  const errorName = 'LoadError'
   try {
     console.log('Script initialized')
     EventLoader.load(XA.afterEvents.worldLoad)

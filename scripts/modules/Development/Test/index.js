@@ -16,7 +16,7 @@ import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { DB, GameUtils, Place, showForm, util } from 'xapi.js'
+import { DB, GAME_UTILS, Place, showForm, util } from 'xapi.js'
 import { ChestFormData } from '../../../chestui/forms.js'
 import { APIRequest } from '../../../lib/Class/Net.js'
 import { generateOre } from '../../Gameplay/Survival/ore.js'
@@ -56,7 +56,7 @@ const tests = {
     ctx.reply(util.inspect(ctx.sender.getComponents()))
   },
   21: ctx => {
-    for (let a of [
+    for (const a of [
       1000,
       1000 * 60,
       1000 * 60 * 60,
@@ -127,7 +127,7 @@ const tests = {
 
     for (const item of items) {
       const stack = new ItemStack(item)
-      ctx.reply(GameUtils.localizationName(stack))
+      ctx.reply(GAME_UTILS.localizationName(stack))
     }
   },
   48(ctx) {

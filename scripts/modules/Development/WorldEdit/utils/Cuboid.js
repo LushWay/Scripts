@@ -68,7 +68,7 @@ export class Cuboid {
 
     for (const entry of Object.entries(size)) {
       /** @type {[keyof Vector3, number]} */
-      // @ts-expect-error
+      // @ts-expect-error Type safe axis
       const [axis, value] = entry
 
       for (let coordinate = this.min[axis]; ; coordinate = coordinate + value) {
@@ -81,40 +81,40 @@ export class Cuboid {
       }
     }
 
-    breakpoints.x.forEach((x, x_index) => {
-      breakpoints.y.forEach((y, y_index) => {
-        breakpoints.z.forEach((z, z_index) => {
-          const CurCord = {
+    breakpoints.x.forEach((x, xi) => {
+      breakpoints.y.forEach((y, yi) => {
+        breakpoints.z.forEach((z, zi) => {
+          const current = {
             x: x,
             y: y,
             z: z,
           }
 
           const indexOf = {
-            x: x_index,
-            y: y_index,
-            z: z_index,
+            x: xi,
+            y: yi,
+            z: zi,
           }
 
           /** @type {Vector3} */
-          // @ts-expect-error
-          const NextCord = {}
+          // @ts-expect-error We will add values later
+          const nextCord = {}
 
           for (const key in breakpoints) {
             /** @type {keyof Vector3} */
-            // @ts-expect-error
+            // @ts-expect-error We are sure
             const axis = key
 
-            let nextValue = breakpoints[axis][indexOf[axis] + 1]
+            const nextValue = breakpoints[axis][indexOf[axis] + 1]
 
             if (!nextValue && breakpoints[axis].length > 1) return
 
-            NextCord[axis] = nextValue ?? CurCord[axis]
+            nextCord[axis] = nextValue ?? current[axis]
 
-            if (NextCord[axis] !== this.max[axis]) NextCord[axis]--
+            if (nextCord[axis] !== this.max[axis]) nextCord[axis]--
           }
 
-          cubes.push(new Cuboid(CurCord, NextCord))
+          cubes.push(new Cuboid(current, nextCord))
         })
       })
     })

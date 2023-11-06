@@ -16,9 +16,9 @@ import { MENU } from '../../Server/Menu/var.js'
 import { JOIN } from '../../Server/OnJoin/var.js'
 import { RadiusRegion, Region } from '../../Server/Region/Region.js'
 import { loadRegionsWithGuards } from '../../Server/Region/index.js'
-import { zone } from '../Minigames/BattleRoyal/zone.js'
+import { Zone } from '../Minigames/BattleRoyal/zone.js'
 import './base.js'
-import { baseItemStack } from './base.js'
+import { BASE_ITEM_STACK } from './base.js'
 import './bouncyTnt.js'
 import './fireworks.js'
 import { Portal } from './portals.js'
@@ -36,7 +36,7 @@ loadRegionsWithGuards(
       const heldItem = player
         .getComponent('equippable')
         .getEquipmentSlot(EquipmentSlot.Mainhand)
-      if (heldItem?.isStackableWith(baseItemStack)) return true
+      if (heldItem?.isStackableWith(BASE_ITEM_STACK)) return true
 
       if (context.type === 'break' && player.isGamemode('adventure'))
         return true
@@ -58,7 +58,7 @@ loadRegionsWithGuards(
   }
 )
 
-Region.CONFIG.PERMISSIONS = {
+Region.config.permissions = {
   allowedEntitys: 'all',
   doorsAndSwitches: false,
   openContainers: false,
@@ -82,7 +82,7 @@ JOIN.EVENTS.firstTime.subscribe(player => {
   player.getComponent('inventory').container.addItem(MENU.item)
 })
 
-export const Spawn = {
+export const SPAWN = {
   startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe),
   /** @type {string[]} */
   startAxeCanBreak: Object.entries(MinecraftBlockTypes)
@@ -101,9 +101,9 @@ export const Spawn = {
   region: void 0,
 }
 
-Spawn.startAxeItem.setCanDestroy(Spawn.startAxeCanBreak)
-Spawn.startAxeItem.nameTag = 'Начальный топор'
-Spawn.startAxeItem.setLore(['§r§7Начальный топор'])
+SPAWN.startAxeItem.setCanDestroy(SPAWN.startAxeCanBreak)
+SPAWN.startAxeItem.nameTag = 'Начальный топор'
+SPAWN.startAxeItem.setLore(['§r§7Начальный топор'])
 
 /**
  *
@@ -115,7 +115,7 @@ function spawnInventory(player) {
   let needSave = false
 
   if (data.inv === 'anarchy') {
-    Anarchy.inventory.saveFromEntity(player, {
+    ANARCHY.inventory.saveFromEntity(player, {
       rewrite: false,
       keepInventory: false,
     })
@@ -124,7 +124,7 @@ function spawnInventory(player) {
   }
 
   if (data.inv !== 'spawn') {
-    InventoryStore.load({ to: player, from: Spawn.inventory })
+    InventoryStore.load({ to: player, from: SPAWN.inventory })
     data.inv = 'spawn'
     needSave = true
   }
@@ -132,18 +132,18 @@ function spawnInventory(player) {
   if (needSave) save()
 }
 
-if (Spawn.location.valid) {
+if (SPAWN.location.valid) {
   new Portal('spawn', null, null, player => {
     if (!Portal.canTeleport(player)) return
     spawnInventory(player)
 
-    player.teleport(Spawn.location)
+    player.teleport(SPAWN.location)
   })
-  world.setDefaultSpawnLocation(Spawn.location)
-  Spawn.region = Region.locationInRegion(Spawn.location, 'overworld')
-  if (!Spawn.region || !(Spawn.region instanceof RadiusRegion)) {
-    Spawn.region = new RadiusRegion(
-      { x: Spawn.location.x, z: Spawn.location.z, y: Spawn.location.y },
+  world.setDefaultSpawnLocation(SPAWN.location)
+  SPAWN.region = Region.locationInRegion(SPAWN.location, 'overworld')
+  if (!SPAWN.region || !(SPAWN.region instanceof RadiusRegion)) {
+    SPAWN.region = new RadiusRegion(
+      { x: SPAWN.location.x, z: SPAWN.location.z, y: SPAWN.location.y },
       200,
       'overworld',
       {
@@ -157,7 +157,7 @@ if (Spawn.location.valid) {
   }
   system.runPlayerInterval(
     player => {
-      if (Spawn.region && Spawn.region.vectorInRegion(player.location)) {
+      if (SPAWN.region && SPAWN.region.vectorInRegion(player.location)) {
         spawnInventory(player)
 
         player.addEffect(MinecraftEffectTypes.Saturation, 1, {
@@ -171,29 +171,29 @@ if (Spawn.location.valid) {
   )
 }
 
-export const Anarchy = {
+export const ANARCHY = {
   centerLocation: new EditableLocation('anarchy_center'),
   portalLocation: new EditableLocation('anarchy'),
   inventory: new InventoryStore('anarchy'),
   /** @type {undefined | Portal} */
   portal: void 0,
 }
-if (Anarchy.centerLocation.valid) {
+if (ANARCHY.centerLocation.valid) {
   system.runInterval(
     () => {
       const players = world.getPlayers()
       const radius = players.length * 50
 
       const rmax = {
-        x: Anarchy.centerLocation.x + radius,
+        x: ANARCHY.centerLocation.x + radius,
         y: 0,
-        z: Anarchy.centerLocation.z + radius,
+        z: ANARCHY.centerLocation.z + radius,
       }
 
       const rmin = {
-        x: Anarchy.centerLocation.x - radius,
+        x: ANARCHY.centerLocation.x - radius,
         y: 0,
-        z: Anarchy.centerLocation.z - radius,
+        z: ANARCHY.centerLocation.z - radius,
       }
 
       for (const p of players) {
@@ -204,7 +204,7 @@ if (Anarchy.centerLocation.valid) {
           l.z <= rmax.z &&
           l.z >= rmin.z
         )
-          return zone.tp(p, true, rmax)
+          return Zone.tp(p, true, rmax)
 
         if (
           l.x >= rmax.x - 10 &&
@@ -212,7 +212,7 @@ if (Anarchy.centerLocation.valid) {
           l.z <= rmax.z &&
           l.z >= rmin.z
         )
-          return zone.warn(p, true, rmax)
+          return Zone.warn(p, true, rmax)
 
         if (
           l.z >= rmax.z &&
@@ -220,7 +220,7 @@ if (Anarchy.centerLocation.valid) {
           l.x <= rmax.x &&
           l.x >= rmin.x
         )
-          return zone.tp(p, false, rmax)
+          return Zone.tp(p, false, rmax)
 
         if (
           l.z >= rmax.z - 10 &&
@@ -228,7 +228,7 @@ if (Anarchy.centerLocation.valid) {
           l.x <= rmax.x &&
           l.x >= rmin.x
         )
-          return zone.warn(p, false, rmax)
+          return Zone.warn(p, false, rmax)
 
         if (
           l.x <= rmin.x &&
@@ -236,7 +236,7 @@ if (Anarchy.centerLocation.valid) {
           l.z <= rmax.z &&
           l.z >= rmin.z
         )
-          return zone.tp(p, true, rmin, true)
+          return Zone.tp(p, true, rmin, true)
 
         if (
           l.x <= rmin.x + 10 &&
@@ -244,7 +244,7 @@ if (Anarchy.centerLocation.valid) {
           l.z <= rmax.z &&
           l.z >= rmin.z
         )
-          return zone.warn(p, true, rmin)
+          return Zone.warn(p, true, rmin)
 
         if (
           l.z <= rmin.z &&
@@ -252,7 +252,7 @@ if (Anarchy.centerLocation.valid) {
           l.x <= rmax.x &&
           l.x >= rmin.x
         )
-          return zone.tp(p, false, rmin, true)
+          return Zone.tp(p, false, rmin, true)
 
         if (
           l.z <= rmin.z + 10 &&
@@ -260,7 +260,7 @@ if (Anarchy.centerLocation.valid) {
           l.x <= rmax.x &&
           l.x >= rmin.x
         )
-          return zone.warn(p, false, rmin)
+          return Zone.warn(p, false, rmin)
 
         // TODO detect if player in the zone
         // anarchyInventory(p, p.db());
@@ -278,10 +278,10 @@ if (Anarchy.centerLocation.valid) {
  */
 function anarchyInventory(player, { data, save }, ss = true) {
   if (data.inv !== 'anarchy') {
-    if (player.id in Anarchy.inventory._.STORES) {
+    if (player.id in ANARCHY.inventory._.STORES) {
       InventoryStore.load({
         to: player,
-        from: Anarchy.inventory.getEntityStore(player.id, true),
+        from: ANARCHY.inventory.getEntityStore(player.id, true),
       })
       data.inv = 'anarchy'
       if (ss) save()
@@ -293,11 +293,11 @@ function anarchyInventory(player, { data, save }, ss = true) {
  * @typedef {{anarchy?: Vector3, inv: "anarchy" | "spawn" | "mg"}} DB
  */
 
-if (Anarchy.portalLocation.valid) {
-  Anarchy.portal = new Portal(
+if (ANARCHY.portalLocation.valid) {
+  ANARCHY.portal = new Portal(
     'anarchy',
-    Vector.add(Anarchy.portalLocation, { x: 0, y: -1, z: -1 }),
-    Vector.add(Anarchy.portalLocation, { x: 0, y: 1, z: 1 }),
+    Vector.add(ANARCHY.portalLocation, { x: 0, y: -1, z: -1 }),
+    Vector.add(ANARCHY.portalLocation, { x: 0, y: 1, z: 1 }),
     player => {
       if (!Portal.canTeleport(player)) return
       /** @type {PlayerDB<DB>} */
@@ -309,7 +309,7 @@ if (Anarchy.portalLocation.valid) {
 
       system.run(() =>
         util.catch(() => {
-          if (!data.anarchy || !(player.id in Anarchy.inventory._.STORES)) {
+          if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
             randomTeleport(
               player,
               { x: 500, y: 0, z: 500 },
@@ -329,7 +329,7 @@ if (Anarchy.portalLocation.valid) {
                 equipment: {},
                 health: 20,
                 xp: 0,
-                slots: [Spawn.startAxeItem],
+                slots: [SPAWN.startAxeItem],
               },
               to: player,
               clearAll: true,

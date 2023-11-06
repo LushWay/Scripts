@@ -21,8 +21,8 @@ loadRegionsWithGuards(
     !region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)
 )
 
-Region.CONFIG.PERMS_SETTED = true
-Region.CONFIG.PERMISSIONS.allowedEntitys = GLOBAL_ALLOWED_ENTITIES
+Region.config.PERMS_SETTED = true
+Region.config.permissions.allowedEntitys = GLOBAL_ALLOWED_ENTITIES
 JOIN.CONFIG.title_animation = {
   stages: ['» $title «', '»  $title  «'],
   vars: {

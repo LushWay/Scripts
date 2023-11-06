@@ -46,7 +46,7 @@ export function commandNotFound(player, command) {
 
   const cmds = new Set()
 
-  for (const c of XCommand.COMMANDS.filter(
+  for (const c of XCommand.commands.filter(
     e => e.sys.data.requires && e.sys.data.requires(player)
   )) {
     cmds.add(c.sys.data.name)
@@ -69,7 +69,7 @@ export function commandNotFound(player, command) {
     `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
   let suggestion = '§cВы имели ввиду ' + suggest(search[0])
-  let firstValue = search[0][1]
+  const firstValue = search[0][1]
   search = search
     .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
     .slice(1, options.maxSuggestionsCount)

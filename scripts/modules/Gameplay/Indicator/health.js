@@ -172,8 +172,8 @@ function getIndicator(entity, damage = 0) {
   }
 
   if (entity && entity.id in HURT_ENTITIES) {
-    const indi_id = HURT_ENTITIES[entity.id].indicator
-    const indicator = getIndicators().find(e => e && e.id === indi_id)
+    const indicatorId = HURT_ENTITIES[entity.id].indicator
+    const indicator = getIndicators().find(e => e && e.id === indicatorId)
 
     return {
       indicator: indicator ?? createIndicator(entity),
