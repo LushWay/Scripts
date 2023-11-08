@@ -200,7 +200,7 @@ const tests = {
       {
         x: {
           data: {
-            itemName: '',
+            itemName: 'Пусто',
             itemDesc: [],
             enchanted: false,
             stackSize: 1,

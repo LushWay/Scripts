@@ -89,7 +89,7 @@ system.run(async function waiter() {
 
   const errorName = 'LoadError'
   try {
-    console.log('Script initialized')
+    console.log('§6Script working')
     EventLoader.load(XA.afterEvents.worldLoad)
 
     // errorName = "DatabaseError";

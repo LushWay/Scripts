@@ -88,4 +88,4 @@ function load() {
   EventSignal.emit(ON_LOAD, null)
 }
 
-load()
+world.afterEvents.worldInitialize.subscribe(load)

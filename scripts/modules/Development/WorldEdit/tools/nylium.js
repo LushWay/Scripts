@@ -26,7 +26,7 @@ const nylium = new WorldEditTool({
       )
       .show(player, (_, blocksSet) => {
         lore.blocksSet = blocksSet
-        slot.nameTag = '§3> §f' + blocksSet
+        slot.nameTag = '§r§3> §f' + blocksSet
         slot.setLore(nylium.stringifyLore(lore))
         player.tell('§3> §fНабор блоков сменен на ' + blocksSet)
       })

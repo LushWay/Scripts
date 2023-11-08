@@ -140,6 +140,7 @@ export class WorldEditTool {
     shape: 'Форма',
     size: 'Размер',
     height: 'Высота',
+    maxDistance: 'Макс. расстояние',
     blocksSet: 'Набор блоков',
   }
   /**

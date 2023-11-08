@@ -18,11 +18,11 @@ const brush = new WorldEditTool({
   displayName: 'кисть',
   itemStackId: 'we:brush',
   loreFormat: {
-    version: 1,
+    version: 2,
 
     blocksSet: 'DEFAULT',
     shape: 'sphere',
-    radius: 1,
+    size: 1,
     maxDistance: 300,
   },
   editToolForm(slot, player) {
@@ -35,7 +35,7 @@ const brush = new WorldEditTool({
         shapes,
         shapes.findIndex(e => e === lore.shape)
       )
-      .addSlider('Размер', 1, 10, 1, lore.radius)
+      .addSlider('Размер', 1, 10, 1, lore.size)
       .addDropdown(
         'Набор блоков',
         ...ModalForm.arrayAndDefault(
@@ -46,7 +46,7 @@ const brush = new WorldEditTool({
       .show(player, (ctx, shape, radius, blocksSet) => {
         if (!SHAPES[shape]) return ctx.error('§c' + shape)
         lore.shape = shape
-        lore.radius = radius
+        lore.size = radius
         lore.blocksSet = blocksSet
         slot.nameTag = '§r§3Кисть §6' + shape
         slot.setLore(brush.stringifyLore(lore))
@@ -97,7 +97,7 @@ const brush = new WorldEditTool({
         SHAPES[lore.shape],
         dot.block.location,
         getBlockSet(getBlockSets(player), lore.blocksSet),
-        lore.radius
+        lore.size
       )
     }
   },

@@ -9,6 +9,7 @@ class WandTool extends WorldEditTool {
     return this.getMenuButtonNameColor(player) + 'Получить топор'
   }
 }
+
 const wand = new WandTool({
   name: 'wand',
   displayName: 'топор',

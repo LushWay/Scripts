@@ -1,8 +1,6 @@
-import { Player } from '@minecraft/server'
-import {
-  MinecraftBlockTypes,
-  MinecraftItemTypes,
-} from '@minecraft/vanilla-data.js'
+import { EquipmentSlot, Player } from '@minecraft/server'
+import { ActionFormResponse } from '@minecraft/server-ui'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { DPDBProxy } from 'lib/Database/Properties.js'
 import { ActionForm, ModalForm, showForm } from 'xapi.js'
 import { ChestFormData } from '../../../../../chestui/forms.js'
@@ -63,32 +61,16 @@ new XCommand({
  * @param {Player} player
  */
 function WBMenu(player, body = '') {
-  const form = new ActionForm('§5World§6Edit', body).addButton(
-    'Наборы блоков',
-    () => {
-      const blockSets = getBlockSets(player)
-      const sets = new ActionForm('Наборы блоков')
-      sets.addButton('Назад', () => form.show(player))
-      sets.addButton('Новый набор блоков', 'textures/ui/sum.png', () => {
-        new ModalForm('§3Имя')
-          .addTextField(
-            `Существующие наборы:\n${Object.keys(blockSets).join(
-              '\n'
-            )}\n\nВведи новое имя набора`,
-            ''
-          )
-          .show(player, (ctx, name) => {
-            if (name in blockSets)
-              return ctx.error('Набор с именем ' + name + ' уже существует!')
+  const heldItem = player
+    .getComponent('equippable')
+    .getEquipmentSlot(EquipmentSlot.Mainhand)
+  if (heldItem.typeId) {
+    body = `Создание доступно только при пустой руке.` || body
+  }
 
-            editBlocksSet(player, name, blockSets)
-          })
-      })
-      for (const key of Object.keys(blockSets)) {
-        sets.addButton(key, () => editBlocksSet(player, key, blockSets))
-      }
-      sets.show(player)
-    }
+  const form = new ActionForm('§dWorld§6Edit', body).addButton(
+    'Наборы блоков',
+    () => WBBlocksSets(player)
   )
 
   for (const tool of WorldEditTool.tools) {
@@ -109,6 +91,34 @@ function WBMenu(player, body = '') {
 
 /**
  * @param {Player} player
+ */
+function WBBlocksSets(player) {
+  const blockSets = getBlockSets(player)
+  const sets = new ActionForm('Наборы блоков')
+  sets.addButton('Назад', () => WBMenu(player))
+  sets.addButton('Новый набор блоков', 'textures/ui/plus', () => {
+    new ModalForm('§3Имя')
+      .addTextField(
+        `Существующие наборы:\n${Object.keys(blockSets).join(
+          '\n'
+        )}\n\nВведи новое имя набора`,
+        ''
+      )
+      .show(player, (ctx, name) => {
+        if (name in blockSets)
+          return ctx.error('Набор с именем ' + name + ' уже существует!')
+
+        editBlocksSet(player, name, blockSets)
+      })
+  })
+  for (const key of Object.keys(blockSets)) {
+    sets.addButton(key, () => editBlocksSet(player, key, blockSets))
+  }
+  sets.show(player)
+}
+
+/**
+ * @param {Player} player
  * @param {string} setName
  * @param {BlocksSets} sets
  * @param {"inventory" | "see" | "edit"} mode
@@ -125,12 +135,11 @@ function editBlocksSet(player, setName, sets, mode = 'see') {
       '---------',
       '---------',
       '---------',
-      '---------',
       'xxxxxxxxx',
     ],
     {
-      x: { iconPath: MinecraftBlockTypes.WhiteStainedGlassPane, data: {} },
-      O: { iconPath: MinecraftItemTypes.Arrow, data: {} },
+      x: { iconPath: 'textures/blocks/glass', data: { itemName: 'Назад' } },
+      O: { iconPath: 'textures/items/arrow', data: {} },
     }
   )
 
@@ -148,10 +157,21 @@ function editBlocksSet(player, setName, sets, mode = 'see') {
         )
       }
     }
-  } else {
+  } else if (mode === 'see') {
+    const set = sets[setName]
+    for (const [i, item] of set.entries()) {
+      if (item) {
+        form.button(9 + i, item[0].replace('minecraft:', ''), [], item[0])
+      }
+    }
   }
 
   showForm(form, player).then(e => {
     console.debug(e)
+    if (e && !e.canceled && e instanceof ActionFormResponse) {
+      if (e.selection === 4) {
+        WBBlocksSets(player)
+      }
+    }
   })
 }
