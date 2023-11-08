@@ -1,15 +1,15 @@
 // @ts-check
-import { m, patchPackage } from "./utils.js";
+import { m, patchPackage } from './utils.js'
 
-patchPackage("@minecraft/server", {
-	classes: {
-		Dimension: m`
+patchPackage('@minecraft/server', {
+  classes: {
+    Dimension: m`
     /**
      * Dimension type shortcut (id without namespace, e.g. "minecraft:")
      */
     type: ShortcutDimensions;
     `,
-		Vector: m`
+    Vector: m`
     /**
      * Returns size between two vectors
      */
@@ -34,7 +34,7 @@ patchPackage("@minecraft/server", {
      */
     static string(a: Vector3): string;
     `,
-		World: m`
+    World: m`
     /**
      * See {@link World.sendMessage}
      */
@@ -55,7 +55,7 @@ patchPackage("@minecraft/server", {
     end: Dimension;
     nether: Dimension;
 `,
-		ItemStack: m`
+    ItemStack: m`
 		    /**
 		     * Alias to {@link ItemStack.getComponent}('cooldown')
 		     */
@@ -73,13 +73,13 @@ patchPackage("@minecraft/server", {
 		     */
 		    food: ItemFoodComponent;
 		`,
-		Entity: m`
+    Entity: m`
 		/**
 		 * Teleports entity to 0 300 0 and kills it
 		 */
 		despawn(): void;
 		`,
-		Player: m`
+    Player: m`
 		/**
 	 	* Finds a player by name or ID
 	 	* @param name - Player name or ID
@@ -119,7 +119,7 @@ patchPackage("@minecraft/server", {
      */
     closeChat(lowHealthMessage?: string): boolean;
     `,
-		System: m`
+    System: m`
     /**
      * Runs a set of code on an interval for each player.
      * @param callback Functional code that will run when this interval occurs.
@@ -135,48 +135,48 @@ patchPackage("@minecraft/server", {
      * @returns Promise that resolves after given ticks time
      */
     sleep(time: number): Promise<void>`,
-	},
-	replaces: [
-		{
-			find: "runCommand(commandString: string): CommandResult",
-			replace: m`runCommand(command: string, options?: CommandOptions): number`,
-		},
-		{
-			find: "runInterval(callback: () => void, tickInterval?: number): number;",
-			replace:
-				"runInterval(callback: () => void, name: string, tickInterval?: number): number;",
-		},
-		{
-			find: "runTimeout(callback: () => void, tickDelay?: number): number;",
-			replace:
-				"runTimeout(callback: () => void, name: string, tickDelay?: number): number;",
-		},
-		{
-			find: "getComponent(componentName: string): BlockComponent | undefined;",
-			replace: m`
+  },
+  replaces: [
+    {
+      find: 'runCommand(commandString: string): CommandResult',
+      replace: m`runCommand(command: string, options?: CommandOptions): number`,
+    },
+    {
+      find: 'runInterval(callback: () => void, tickInterval?: number): number;',
+      replace:
+        'runInterval(callback: () => void, name: string, tickInterval?: number): number;',
+    },
+    {
+      find: 'runTimeout(callback: () => void, tickDelay?: number): number;',
+      replace:
+        'runTimeout(callback: () => void, name: string, tickDelay?: number): number;',
+    },
+    {
+      find: 'getComponent(componentName: string): BlockComponent | undefined;',
+      replace: m`
 getComponent<N extends keyof BlockComponents>(
 	componentName: N
 ): BlockComponents[N];`,
-		},
-		{
-			find: "getComponent(componentId: string): EntityComponent | undefined;",
-			replace: m`
+    },
+    {
+      find: 'getComponent(componentId: string): EntityComponent | undefined;',
+      replace: m`
 getComponent<N extends keyof EntityComponents>(
   componentName: N
 ): EntityComponents[N]`,
-			all: true,
-		},
-		{
-			find: "getComponent(componentId: string): ItemComponent | undefined;",
-			replace: m`
+      all: true,
+    },
+    {
+      find: 'getComponent(componentId: string): ItemComponent | undefined;',
+      replace: m`
       getComponent<N extends keyof ItemComponents>(
         componentName: N
       ): ItemComponents[N]`,
-		},
-	],
-	additions: {
-		beginning: "",
-		afterImports: m`
+    },
+  ],
+  additions: {
+    beginning: '',
+    afterImports: m`
 /**
  * This file was automatically edited by 
  * leafs/patch-modules.js
@@ -358,7 +358,7 @@ type EntityComponents = {
 };
 
 `,
-		ending: m`
+    ending: m`
     
 /**
  * This file was automatically edited by 
@@ -367,12 +367,12 @@ type EntityComponents = {
  * New methods assigments can be finded in 
  * scripts/lib/Extensions
  */`,
-	},
-});
+  },
+})
 
-import fs from "fs";
+import fs from 'fs'
 
 fs.copyFileSync(
-	"./node_modules/@minecraft/vanilla-data/lib/index.js",
-	"./scripts/@minecraft/vanilla-data.js",
-);
+  './node_modules/@minecraft/vanilla-data/lib/index.js',
+  './scripts/@minecraft/vanilla-data.js'
+)
