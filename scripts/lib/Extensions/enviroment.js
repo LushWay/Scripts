@@ -1,6 +1,8 @@
 import { util } from '../util.js'
 import { OverTakes } from './import.js'
 
+Object.entriesT = Object.entries
+
 /**
  * Common JavaScript objects
  *

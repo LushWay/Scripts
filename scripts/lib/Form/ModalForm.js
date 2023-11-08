@@ -155,23 +155,23 @@ export class ModalForm {
    */
   async show(player, callback) {
     const response = await showForm(this.form, player)
-    if (
-      response === false ||
-      !(response instanceof ModalFormResponse) ||
-      !response.formValues
-    )
-      return
-    util.catch(
-      () =>
-        response.formValues &&
-        callback(
-          new FormCallback(this, player, callback),
-          ...response.formValues.map((v, i) =>
-            this.args[i].type === 'dropdown' && typeof v === 'number'
-              ? this.args[i].options?.[v]
-              : v
-          )
-        )
-    )
+    if (response === false || !(response instanceof ModalFormResponse)) return
+
+    util.catch(() => {
+      if (!response.formValues) return
+      const args = response.formValues.map((formValue, i) => {
+        const arg = this.args[i]
+
+        if (arg.type === 'dropdown' && typeof formValue === 'number') {
+          return arg.options?.[formValue]
+        } else return formValue
+      })
+      console.debug({
+        args,
+        formValues: response.formValues,
+        thisArgs: this.args,
+      })
+      callback(new FormCallback(this, player, callback), ...args)
+    })
   }
 }

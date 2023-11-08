@@ -54,25 +54,29 @@ R.executes(ctx => {
   const callback = (player, fakeChange = false) => {
     return () => {
       const role = getRole(player.id)
-      const ROLE = Object.keys(ROLES).map(
-        e => `${role === e ? '> ' : ''}` + ROLES[e]
+      const ROLE = Object.fromEntries(
+        Object.entriesT(ROLES).map(([key]) => [
+          key,
+          `${role === key ? '> ' : ''}${ROLES[key]}`,
+        ])
       )
       new ModalForm(player.name)
         .addToggle('Уведомлять', false)
         .addToggle('Показать Ваш ник в уведомлении', false)
-        .addDropdown(
-          'Роль',
-          ROLE,
-          ROLE.findIndex(e => e.startsWith('>'))
-        )
+        .addDropdownFromObject('Роль', ROLE)
         .addTextField('Причина смены роли', `Например, "космокс"`)
-        .show(ctx.sender, (formCtx, notify, showName, selected, message) => {
-          if (selected.startsWith('>')) return
-          const newrole = Object.keys(ROLES).find(e => e === selected)
-          if (!newrole) return formCtx.error('Unknown role: ' + newrole)
+        .show(ctx.sender, (formCtx, notify, showName, newrole, message) => {
+          if (newrole.startsWith('>')) return
+          if (!newrole)
+            return formCtx.error(
+              'Неизвестная роль: ' +
+                newrole +
+                '§r, допустимые: ' +
+                util.inspect(ROLES)
+            )
           if (notify)
             player.tell(
-              `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${selected}${
+              `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${newrole}${
                 showName ? `§3 игроком §r${ctx.sender.name}` : ''
               }${message ? `\n§r§3Причина: §r${message}` : ''}`
             )
@@ -111,8 +115,8 @@ new XCommand({
 function poptions(player) {
   const form = new ActionForm('§dНастройки')
 
-  for (const groupName in Options.player) {
-    const name = Options.player[groupName][OPTIONS_NAME]
+  for (const groupName in Options.playerO) {
+    const name = Options.playerO[groupName][OPTIONS_NAME]
     if (name)
       form.addButton(name, null, () => {
         group(player, groupName, 'PLAYER')
@@ -166,7 +170,7 @@ const OPTIONS_DB = DPDBProxy('options')
  * @param {Record<string, string>} [errors]
  */
 function group(player, groupName, groupType, errors = {}) {
-  const source = groupType === 'PLAYER' ? Options.player : Options.worldO
+  const source = groupType === 'PLAYER' ? Options.playerO : Options.worldO
   const config = source[groupName]
   const name = config[OPTIONS_NAME]
   const data = OPTIONS_DB[groupName]
