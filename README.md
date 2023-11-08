@@ -1,4 +1,4 @@
-# Server on X-API
+# Shp1nat Mine Server Script
 
 Script API pack for Minecraft PE anarchy server called Shp1natMine. 
 
