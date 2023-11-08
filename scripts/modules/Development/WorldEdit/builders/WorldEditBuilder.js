@@ -7,7 +7,7 @@ import {
 } from '@minecraft/server'
 import { Cooldown, util } from 'xapi.js'
 import { WE_CONFIG } from '../config.js'
-import { Cuboid } from '../utils/Cuboid.js'
+import { Cuboid } from '../utils/cuboid.js'
 import { get } from '../utils/utils.js'
 import { Structure } from './StructureBuilder.js'
 

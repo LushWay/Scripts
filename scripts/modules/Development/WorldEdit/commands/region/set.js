@@ -2,7 +2,7 @@ import { BlockTypes, Player } from '@minecraft/server'
 import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { WEBUILD } from '../../builders/WorldEditBuilder.js'
-import { Cuboid } from '../../utils/Cuboid.js'
+import { Cuboid } from '../../utils/cuboid.js'
 
 const set = new XCommand({
   name: 'set',

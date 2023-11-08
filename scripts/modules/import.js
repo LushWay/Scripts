@@ -38,7 +38,7 @@ const strike = util.strikeTest()
  */
 export default async function ({
   array = modules,
-  message = 'X-API init and loading took',
+  message = 'SM init and loading took',
   fn = module => import(module),
   striketest = enabled,
 } = {}) {

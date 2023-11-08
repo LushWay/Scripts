@@ -4,16 +4,14 @@ import { FillFloor } from '../builders/FillBuilder.js'
 import { WorldEditTool } from '../builders/ToolBuilder.js'
 import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
 
-class ShovelTool extends WorldEditTool {
-  /** @type {WorldEditTool["getMenuButtonName"]} */
-  getMenuButtonName(player) {
-    return super.getMenuButtonName(player).replace(/а$/, 'у')
-  }
-}
-
-const shovel = new ShovelTool({
+const shovel = new WorldEditTool({
   name: 'shovel',
   displayName: 'лопата',
+  overrides: {
+    getMenuButtonName(player) {
+      return super.getMenuButtonName(player).replace(/а$/, 'у')
+    },
+  },
   loreFormat: {
     version: 1,
 

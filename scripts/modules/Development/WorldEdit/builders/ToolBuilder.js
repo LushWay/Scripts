@@ -7,7 +7,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { util } from 'xapi.js'
+import { OverTakes, util } from 'xapi.js'
 import { WE_PLAYER_SETTINGS } from '../index.js'
 
 /**
@@ -28,6 +28,7 @@ export class WorldEditTool {
    * @param {LoreFormat} [o.loreFormat]
    * @param {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} [o.interval]
    * @param {(player: Player, item: ItemStack) => void} [o.onUse]
+   * @param {Partial<WorldEditTool<LoreFormat>> & ThisType<WorldEditTool<LoreFormat>>} [o.overrides]
    */
   constructor({
     name,
@@ -37,6 +38,7 @@ export class WorldEditTool {
     loreFormat,
     interval,
     onUse,
+    overrides,
   }) {
     WorldEditTool.tools.push(this)
     this.name = name
@@ -47,6 +49,8 @@ export class WorldEditTool {
     this.loreFormat.version ??= 0
     this.onUse = onUse
     this.interval = interval
+    if (overrides) OverTakes(this, overrides)
+
     this.command = new XCommand({
       name,
       description: `Создает${

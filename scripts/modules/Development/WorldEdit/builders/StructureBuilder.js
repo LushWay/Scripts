@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { WE_CONFIG } from '../config.js'
-import { Cuboid } from '../utils/Cuboid.js'
+import { Cuboid } from '../utils/cuboid.js'
 
 export class Structure {
   /**

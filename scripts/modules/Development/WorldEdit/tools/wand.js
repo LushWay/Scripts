@@ -2,18 +2,16 @@ import { Player, Vector, world } from '@minecraft/server'
 import { WorldEditTool } from '../builders/ToolBuilder.js'
 import { WEBUILD } from '../builders/WorldEditBuilder.js'
 
-class WandTool extends WorldEditTool {
-  /** @type {WorldEditTool["getMenuButtonName"]} */
-  getMenuButtonName(player) {
-    if (super.getMenuButtonName(player) === '') return ''
-    return this.getMenuButtonNameColor(player) + 'Получить топор'
-  }
-}
-
-const wand = new WandTool({
+const wand = new WorldEditTool({
   name: 'wand',
   displayName: 'топор',
   itemStackId: 'we:wand',
+  overrides: {
+    getMenuButtonName(player) {
+      if (super.getMenuButtonName(player) === '') return ''
+      return this.getMenuButtonNameColor(player) + 'Получить топор'
+    },
+  },
 })
 
 world.beforeEvents.itemUseOn.subscribe(event => {

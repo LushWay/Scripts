@@ -15,7 +15,7 @@ OverTakes(Player, {
     }
   },
   name(id) {
-    throw new ReferenceError('X-API is not fully loaded!')
+    throw new ReferenceError('SM is not fully loaded!')
   },
 })
 OverTakes(Entity.prototype, {

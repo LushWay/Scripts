@@ -1,7 +1,7 @@
 import { system, Vector } from '@minecraft/server'
 import { util } from 'xapi.js'
 import { WE_CONFIG } from '../config.js'
-import { Cuboid } from '../utils/Cuboid.js'
+import { Cuboid } from '../utils/cuboid.js'
 import { setblock } from '../utils/utils.js'
 import { WEBUILD } from './WorldEditBuilder.js'
 
