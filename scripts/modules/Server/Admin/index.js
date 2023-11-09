@@ -55,7 +55,7 @@ R.executes(ctx => {
     return () => {
       const role = getRole(player.id)
       const ROLE = Object.fromEntries(
-        Object.entriesT(ROLES).map(([key]) => [
+        Object.entriesStringKeys(ROLES).map(([key]) => [
           key,
           `${role === key ? '> ' : ''}${ROLES[key]}`,
         ])

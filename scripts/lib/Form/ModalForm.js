@@ -85,8 +85,8 @@ export class ModalForm {
         e => e === defaultValue
       )
     }
+    /** @typedef {keyof T} aa */
     /** @type {(string | null)[]} */
-    // @ts-expect-error Type
     let objectKeys = Object.keys(object)
     let visibleKeys = Object.values(object)
 
@@ -165,11 +165,6 @@ export class ModalForm {
         if (arg.type === 'dropdown' && typeof formValue === 'number') {
           return arg.options?.[formValue]
         } else return formValue
-      })
-      console.debug({
-        args,
-        formValues: response.formValues,
-        thisArgs: this.args,
       })
       callback(new FormCallback(this, player, callback), ...args)
     })

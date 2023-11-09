@@ -34,7 +34,7 @@ export const SERVER = {
     type: {
       name: 'Тип сервера',
       value: 0,
-      desc: `§eТОЛЬКО ДЛЯ ХОСТА МИРА, НА СЕРВЕРЕ ВЫСТАВЛЯЕТСЯ СКРИПТОМ\n\n§fДоступные значения:\n§f${util
+      desc: `§eТОЛЬКО ЕСЛИ МИР ХОСТИТСЯ ИЗ МАЙНА, НА СЕРВЕРЕ ВЫСТАВЛЯЕТСЯ СКРИПТОМ\n\n§fДоступные значения:\n§f${util
         .inspect(Object.fromEntries(Object.entries(TYPES)))
         .replace('{', '')
         .replace('}', '')}`,

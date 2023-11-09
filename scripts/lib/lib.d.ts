@@ -53,12 +53,16 @@ declare global {
   }
 
   interface ObjectConstructor {
-    entriesT<T, O extends Record<string, any>>(o: O): [keyof O, O[keyof O]][]
-    fromEntries<T = any, K extends string = string>(
-      entries: Iterable<readonly [K, T]>
-    ): Record<K, T>
+    entriesStringKeys<O extends Record<string, any>>(
+      o: O
+    ): [keyof O, O[keyof O]][]
+    fromEntries<V = any, K extends string = string>(
+      entries: Iterable<readonly [K, V]>
+    ): Record<K, V>
 
-    keys<T extends Record<string, any>>(o: T): (keyof T)[]
+    keys<T extends Record<string, any>>(
+      o: T
+    ): (keyof T extends string ? keyof T : never)[]
   }
 
   type Vector3 = mc.Vector3
