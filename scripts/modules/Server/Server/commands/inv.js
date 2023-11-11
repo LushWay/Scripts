@@ -1,16 +1,17 @@
-import { DPDBProxy } from 'lib/Database/Properties.js'
-import { ActionForm, Database, InventoryStore } from 'xapi.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { emoji } from 'lib/List/emoji.js'
+import { ActionForm, InventoryStore } from 'xapi.js'
 
-/**
- * @type {Record<string, {invs: Record<string, string>}>}
- */
-const DB = DPDBProxy('player', {
+const DB = new DynamicPropertyDB('player', {
+  /**
+   * @returns {{invs: Record<string, string>}}
+   */
   defaultValue() {
     return {
       invs: {},
     }
   },
-})
+}).proxy()
 
 const STORE = new InventoryStore('inventories')
 
@@ -29,7 +30,7 @@ new XCommand({
     const inv = STORE.getEntityStore(key, false)
     let label = key
     label += ' '
-    if (Object.keys(inv.equipment).length) label += XA.lang.emoji.armor
+    if (Object.keys(inv.equipment).length) label += emoji.armor
     if (inv.slots.length) label += `(${inv.slots.length})`
     form.addButton(label, null, () => {})
   }

@@ -257,6 +257,7 @@ export const util = {
     return JSON.stringify(target, (_, value) => rep(value), space)
       ?.replace(/"/g, cw)
       ?.replace(new RegExp(uniqueKey, 'g'), '"')
+      ?.slice(0, 1000)
   },
 
   /**

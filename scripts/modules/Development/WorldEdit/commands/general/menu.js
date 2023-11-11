@@ -1,7 +1,7 @@
 import { EquipmentSlot, Player } from '@minecraft/server'
 import { ActionFormResponse } from '@minecraft/server-ui'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { DPDBProxy } from 'lib/Database/Properties.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm, ModalForm, showForm } from 'xapi.js'
 import { ChestFormData } from '../../../../../chestui/forms.js'
 import { WorldEditTool } from '../../builders/ToolBuilder.js'
@@ -10,8 +10,9 @@ import { WorldEditTool } from '../../builders/ToolBuilder.js'
  * @typedef {Record<string, [string, number][]>} BlocksSets
  */
 
-/** @type {Record<string, BlocksSets | undefined>} */
-const DB = DPDBProxy('blockSets')
+/** @type {DynamicPropertyDB<string, BlocksSets | undefined>} */
+const PROPERTY = new DynamicPropertyDB('blockSets')
+const DB = PROPERTY.proxy()
 
 /** @type {BlocksSets} */
 const defaultBlockSets = {

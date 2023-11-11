@@ -11,15 +11,18 @@ import {
   MinecraftEffectTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
-import { Database, LockAction, util } from 'xapi.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { LockAction, util } from 'xapi.js'
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1)
 const lore = ['§r§7Элитра перелета, пропадает на земле']
 RTP_ELYTRA.setLore(lore)
 RTP_ELYTRA.nameTag = '§6Элитра перемещения'
 RTP_ELYTRA.lockMode = ItemLockMode.slot
-/** @type {Database<string, {elytra?: 1}>} */
-const DB = XA.tables.player
+const DB = new DynamicPropertyDB('player', {
+  /** @type {Record<string, {elytra?: 1}>} */
+  type: {},
+}).proxy()
 /**
  * @type {Set<string>}
  */
@@ -128,14 +131,12 @@ function giveElytra(player) {
   }
 
   slot.setItem(RTP_ELYTRA)
-  const { data, save } = DB.work(player.id)
-  data.elytra = 1
-  save()
+  DB[player.id].elytra = 1
 }
 
 system.runInterval(
   () => {
-    const elytred = DB.entries()
+    const elytred = Object.entries(DB)
       .filter(([key, data]) => data.elytra)
       .map(([key, data]) => key)
 
@@ -164,7 +165,5 @@ function clearElytra(player) {
     .getComponent('equippable')
     .getEquipmentSlot(EquipmentSlot.Chest)
   if (slot.nameTag === RTP_ELYTRA.nameTag) slot.setItem(undefined)
-  const { data, save } = DB.work(player.id)
-  delete data.elytra
-  save()
+  delete DB[player.id].elytra
 }

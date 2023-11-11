@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/Class/Events.js'
-import { Database } from 'lib/Database/Rubedo.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Options } from 'xapi.js'
 
 export const BATTLE_ROYAL_EVENTS = {
@@ -24,4 +24,4 @@ export const BR_CONFIG = Options.world('BattleRoyal', {
   },
 })
 
-export const BR_DB = new Database('BattleRoyal')
+export const BR_DB = new DynamicPropertyDB('BattleRoyal')

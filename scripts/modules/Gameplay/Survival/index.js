@@ -13,7 +13,7 @@ import {
 } from '@minecraft/vanilla-data.js'
 import { EditableLocation, InventoryStore, util } from '../../../xapi.js'
 import { MENU } from '../../Server/Menu/var.js'
-import { JOIN } from '../../Server/OnJoin/var.js'
+import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { RadiusRegion, Region } from '../../Server/Region/Region.js'
 import { loadRegionsWithGuards } from '../../Server/Region/index.js'
 import { Zone } from '../Minigames/BattleRoyal/zone.js'
@@ -110,9 +110,7 @@ SPAWN.startAxeItem.setLore(['§r§7Начальный топор'])
  * @param {Player} player
  */
 function spawnInventory(player) {
-  /** @type {PlayerDB<DB>} */
-  const { save, data } = player.db()
-  let needSave = false
+  const data = player.database.survival
 
   if (data.inv === 'anarchy') {
     ANARCHY.inventory.saveFromEntity(player, {
@@ -120,16 +118,12 @@ function spawnInventory(player) {
       keepInventory: false,
     })
     data.anarchy = Vector.floor(player.location)
-    needSave = true
   }
 
   if (data.inv !== 'spawn') {
     InventoryStore.load({ to: player, from: SPAWN.inventory })
     data.inv = 'spawn'
-    needSave = true
   }
-
-  if (needSave) save()
 }
 
 if (SPAWN.location.valid) {
@@ -274,17 +268,15 @@ if (ANARCHY.centerLocation.valid) {
 /**
  *
  * @param {Player} player
- * @param {PlayerDB<DB>} param1
  */
-function anarchyInventory(player, { data, save }, ss = true) {
-  if (data.inv !== 'anarchy') {
+function anarchyInventory(player) {
+  if (player.database.survival.inv !== 'anarchy') {
     if (player.id in ANARCHY.inventory._.STORES) {
       InventoryStore.load({
         to: player,
         from: ANARCHY.inventory.getEntityStore(player.id, true),
       })
-      data.inv = 'anarchy'
-      if (ss) save()
+      player.database.survival.inv = 'anarchy'
     }
   }
 }
@@ -300,8 +292,7 @@ if (ANARCHY.portalLocation.valid) {
     Vector.add(ANARCHY.portalLocation, { x: 0, y: 1, z: 1 }),
     player => {
       if (!Portal.canTeleport(player)) return
-      /** @type {PlayerDB<DB>} */
-      const { save, data } = player.db()
+      const data = player.database.survival
 
       if (data.inv === 'anarchy') {
         return player.tell('§cВы уже находитесь на анархии!')
@@ -335,13 +326,11 @@ if (ANARCHY.portalLocation.valid) {
               clearAll: true,
             })
             data.inv = 'anarchy'
-            save()
           } else {
-            anarchyInventory(player, { data, save }, false)
+            anarchyInventory(player)
 
             player.teleport(data.anarchy)
             delete data.anarchy
-            save()
           }
         })
       )

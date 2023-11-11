@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { DPDBProxy } from 'lib/Database/Properties.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Cooldown, Options, ROLES, getRole, util } from 'xapi.js'
 import { CONFIG } from '../../../config.js'
 
@@ -17,12 +17,9 @@ const OPTIONS = Options.world('chat', {
   ranks: { desc: 'Ранги в чате', value: false, name: 'Ранги' },
 })
 
-/** @type {Record<string, string | undefined>} */
-const COOLDOWN_DB = DPDBProxy('chat', {
-  defaultValue(_p) {
-    return undefined
-  },
-})
+/** @type {DynamicPropertyDB<string, string>} */
+const COOLDOWN_PROPERY = new DynamicPropertyDB('chat')
+const COOLDOWN_DB = COOLDOWN_PROPERY.proxy()
 
 const PLAYER_OPTIONS = Options.player('Чат', 'chat', {
   hightlightMessages: {

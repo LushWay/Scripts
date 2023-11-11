@@ -5,7 +5,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { Database } from 'lib/Database/Rubedo.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 /**
  * @typedef {{
@@ -16,10 +16,10 @@ import { Database } from 'lib/Database/Rubedo.js'
  * }} LB
  */
 
-/**
- * @type {Database<string, LB>}
- */
-const LB_DB = new Database('leaderboard')
+const LB_DB = new DynamicPropertyDB('leaderboard', {
+  /** @type {Record<string, LB>} */
+  type: {},
+}).proxy()
 const LEADERBOARD_TAG = 'LEADERBOARD'
 const LEADERBOARD_ID = 'f:t'
 const STYLES = {
@@ -77,7 +77,7 @@ export class Leaderboard {
       .getDimension(dimension)
       .spawnEntity(LEADERBOARD_ID, Vector.floor(location))
 
-    LB_DB.set(entity.id, data)
+    LB_DB[entity.id] = data
     entity.nameTag = 'Updating...'
     entity.addTag(LEADERBOARD_TAG)
 
@@ -102,12 +102,8 @@ export class Leaderboard {
     Leaderboard.all[entity.id] = this
   }
   remove() {
-    LB_DB.delete(this.entity.id)
-    this.entity.teleport({ x: 0, y: 0, z: 0 })
-    this.entity.triggerEvent('f:t:kill')
-  }
-  saveData() {
-    LB_DB.set(this.entity.id, this.data)
+    delete LB_DB[this.entity.id]
+    this.entity.remove()
   }
   updateLeaderboard() {
     const scoreboard =
@@ -133,7 +129,7 @@ export class Leaderboard {
 
 system.runInterval(
   () => {
-    for (const [id, leaderboard] of LB_DB.entries()) {
+    for (const [id, leaderboard] of Object.entries(LB_DB)) {
       const LB = Leaderboard.all[id]
 
       if (LB) {

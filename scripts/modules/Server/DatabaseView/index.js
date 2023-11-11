@@ -1,12 +1,8 @@
 import { Player, system, world } from '@minecraft/server'
-import { Database } from 'lib/Database/Rubedo.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { TIMERS_PATHES, util } from 'xapi.js'
-
-/**
- * @typedef {import("lib/Database/Rubedo.js").Database<string, any>} defDB
- */
 
 const db = new XCommand({
   name: 'db',
@@ -23,10 +19,9 @@ db.executes(ctx => selectTable(ctx.sender, true))
  */
 function selectTable(player, firstCall) {
   const form = new ActionForm('Таблицы данных')
-  for (const key in Database.tables) {
-    /** @type {defDB} */
-    const DB = Database.tables[key]
-    const name = `${key} §7${DB.keys().length} ${DB._.RAW_MEMORY.length}§r`
+  for (const key in DynamicPropertyDB.keys) {
+    const DB = DynamicPropertyDB.keys[key]
+    const name = `${key} §7${Object.keys(DB).length}§r`
     form.addButton(name, null, () => {
       showTable(player, key)
     })
@@ -41,8 +36,9 @@ function selectTable(player, firstCall) {
  * @param {string} table
  */
 function showTable(player, table) {
-  /** @type {defDB} */
-  const DB = Database.tables[table]
+  /** @type {DynamicPropertyDB<string, any>} */
+  const DB = DynamicPropertyDB.keys[table]
+  const proxy = DB.proxy()
 
   const menu = new ActionForm(`${table}`)
   menu.addButton('§b§l<§r§3 Назад§r', null, () => selectTable(player))
@@ -55,13 +51,21 @@ function showTable(player, table) {
     newform.show(player, (_, key, input, type) => {
       if (input)
         callback(input, type, newVal => {
-          DB.set(key, newVal)
+          proxy[key] = newVal
         })
       system.run(() => showTable(player, table))
     })
   })
   menu.addButton('§3Посмотреть в §fRAW', null, () => {
-    new ActionForm('§3RAW table §f' + table, DB._.RAW_MEMORY)
+    const raw = DB.source.getDynamicProperty(DB.key)
+    new ActionForm(
+      '§3RAW table §f' + table,
+      JSON.stringify(
+        JSON.parse(typeof raw === 'string' ? raw : '["KEY_IS_NOT_A_STRING"]'),
+        null,
+        2
+      )
+    )
       .addButton('Oк', null, () => {
         showTable(player, table)
       })
@@ -76,10 +80,10 @@ function showTable(player, table) {
     let failedToLoad = false
 
     try {
-      value = DB.get(key)
+      value = proxy[key]
     } catch (e) {
       util.error(e)
-      value = DB._.COLLECTION[key]
+      value = 'a'
       failedToLoad = true
     }
 
@@ -99,7 +103,7 @@ function showTable(player, table) {
       newform.show(player, (_, input, inputType) => {
         if (input)
           ncallback(input, inputType, newValue => {
-            DB.set(key, newValue)
+            proxy[key] = newValue
             player.tell(util.inspect(value) + '§r -> ' + util.inspect(newValue))
           })
 
@@ -108,7 +112,7 @@ function showTable(player, table) {
     })
 
     AForm.addButton('§cУдалить§r', null, () => {
-      DB.delete(key)
+      delete proxy[key]
       system.run(() => showTable(player, table))
     })
     AForm.addButton('< Назад', null, () =>
@@ -118,7 +122,7 @@ function showTable(player, table) {
     system.run(() => AForm.show(player))
   }
 
-  const keys = DB.keys()
+  const keys = Object.keys(proxy)
   for (const key of keys) {
     menu.addButton(key, null, () =>
       util.catch(() => propertyForm(key), 'FormBuilder')

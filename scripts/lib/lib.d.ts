@@ -1,4 +1,5 @@
 import * as mc from '@minecraft/server'
+import { ROLES } from './roles'
 declare global {
   interface Console {
     error(...data: any[]): void
@@ -99,15 +100,13 @@ declare global {
 }
 
 declare module '@minecraft/server' {
+  interface PlayerDatabase {
+    role?: keyof typeof ROLES
+    quest?: import('./Class/Quest').QuestDB
+  }
   type ScoreNames = 'money' | 'leafs'
   interface Player {
     scores: Record<ScoreNames, number>
-    database:
-      | {
-          key: {
-            value: number
-          }
-        }
-      | Record<string, JSONLike>
+    database: PlayerDatabase
   }
 }

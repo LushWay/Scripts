@@ -4,19 +4,17 @@ import { ActionForm } from '../Form/ActionForm.js'
 import { Place } from './Action.js'
 import { Sidebar } from './Sidebar.js'
 
-// @ts-expect-error Bruh
-Set.prototype.toJSON = function () {
-  return 'Set<size=' + this.size + '>'
-}
+// // @ts-expect-error Bruh
+// Set.prototype.toJSON = function () {
+//   return 'Set<size=' + this.size + '>'
+// }
 
 /**
  * @typedef {{
- *   quest?: {
- * 		active: string,
- * 		completed?: string[],
- * 		step?: number,
- * 		additional?: any
- *   }
+ * 	active: string,
+ * 	completed?: string[],
+ * 	step?: number,
+ * 	additional?: any
  * }} QuestDB
  */
 
@@ -89,8 +87,7 @@ export class Quest {
    * @param {number} stepNum
    */
   step(player, stepNum, clearAdditionalBeforeNextStep = true) {
-    /** @type {PlayerDB<QuestDB>} */
-    const { data, save } = player.db()
+    const data = player.database
     data.quest ??= {
       active: this.name,
     }
@@ -98,7 +95,6 @@ export class Quest {
 
     if (clearAdditionalBeforeNextStep) delete data.quest.additional
     data.quest.step = stepNum
-    save()
 
     const step = this.steps(player).list[stepNum]
     if (!step) return false
@@ -109,23 +105,19 @@ export class Quest {
    * @param {Player} player
    */
   exit(player) {
-    /** @type {PlayerDB<QuestDB>} */
-    const { data, save } = player.db()
+    const data = player.database
 
     data.quest = {
       active: '',
       completed: data.quest?.completed ?? [],
     }
-
-    save()
   }
 
   /**
    * @param {Player} player
    */
   static active(player) {
-    /** @type {PlayerDB<QuestDB>} */
-    const { data } = player.db()
+    const data = player.database
     if (!data.quest || typeof data.quest.active === 'undefined') return false
 
     const quest = Quest.instances[data.quest.active]
@@ -158,7 +150,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
 /**
  * @typedef {{
  *   text: QuestText,
- *   activate?(): { cleanup(): void },
+ *   activate?(): { cleanup(): void }
  * }} QuestStepInput
  */
 
@@ -305,10 +297,8 @@ class PlayerQuest {
 
       if (result < options.end) {
         // Saving value to db
-        /** @type {PlayerDB<QuestDB>} */
-        const { data, save } = this.player.db()
+        const data = this.player.database
         if (data.quest) data.quest.additional = result
-        save()
 
         // Updating interface
         options.value = result
@@ -321,8 +311,7 @@ class PlayerQuest {
     const inputedActivate = options.activate?.bind(options)
     options.activate = function () {
       if (!this.player) throw new Error('Wrong this!')
-      /** @type {PlayerDB<QuestDB>} */
-      const { data } = this.player.db()
+      const data = this.player.database
       if (typeof data.quest?.additional === 'number')
         options.value = data.quest?.additional
 
@@ -421,7 +410,7 @@ if (ANARCHY.portal) {
   const anarchySidebar = new Sidebar(
     { name: 'Anarchy' },
     player => {
-      return '§7Инвентарь: ' + player.db().data.inv
+      return '§7Инвентарь: ' + player.database.survival.inv
     },
     player => {
       return `§7Монеты: §6${player.scores.money}§7 | Листья: §2${player.scores.leafs}`

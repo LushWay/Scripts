@@ -1,8 +1,8 @@
-// @ts-check
 import * as fs from 'fs/promises'
 import path from 'path'
 
 const LAST_UPDATE_PATH = path.join(process.cwd(), 'tools', 'last-update')
+/** @type {string} */
 let LAST_UPDATE
 
 /**
@@ -33,10 +33,8 @@ export async function patchPackage(packageName, options) {
 
   // Apply the replacements
   for (const replace of options.replaces) {
-    const newCode = patchedCode[replace.all ? 'replaceAll' : 'replace'](
-      replace.find,
-      replace.replace
-    )
+    const replaceFN = replace.all ? patchedCode.replaceAll : patchedCode.replace
+    const newCode = replaceFN.call(patchedCode, replace.find, replace.replace)
 
     if (newCode !== patchedCode) {
       patchedCode = newCode

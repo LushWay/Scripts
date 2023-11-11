@@ -1,8 +1,7 @@
 import { Dimension, Entity, Player, Vector } from '@minecraft/server'
-import { Database } from 'lib/Database/Rubedo.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { util } from 'xapi.js'
 import { DEFAULT_REGION_PERMISSIONS } from './config.js'
-import { DPDBProxy } from 'lib/Database/Properties.js'
 
 /**
  * The Lowest Y value in minecraft
@@ -35,10 +34,11 @@ const HIGEST_Y_VALUE = 320
  * }} IRadiusRegion
  */
 
-/**
- * @type {Record<string, IRadiusRegion | ICubeRegion>}
- */
-const TABLE = DPDBProxy('region', {
+const PROPERTY = new DynamicPropertyDB('region', {
+  delayedInit: true,
+  /**
+   * @returns {Partial<IRadiusRegion | ICubeRegion>}
+   */
   defaultValue: key => {
     return {
       dimensionId: 'overworld',
@@ -48,6 +48,8 @@ const TABLE = DPDBProxy('region', {
   },
 })
 
+const TABLE = PROPERTY.proxy()
+
 export class Region {
   /** @private */
   static permissions = DEFAULT_REGION_PERMISSIONS
@@ -55,71 +57,54 @@ export class Region {
     HIGEST_Y_VALUE,
     LOWEST_Y_VALUE,
 
-    PERMS_SETTED: false,
+    SETTED: false,
     /**
      * The default permissions for all regions made
      */
     get permissions() {
-      if (!this.PERMS_SETTED) {
-        throw new ReferenceError(
-          'Cannot access Region.CONFIG.PERMISSIONS before setting.'
-        )
+      if (!this.SETTED) {
+        throw new ReferenceError('Region.CONFIG.PERMISSIONS are not loaded')
       }
 
       return Region.permissions
     },
     set permissions(update) {
-      if (this.PERMS_SETTED)
+      if (this.SETTED)
         throw new ReferenceError('Already set Region.CONFIG.PERMISSIONS.')
 
       Region.permissions = update
-      this.PERMS_SETTED = true
-    },
+      this.SETTED = true
+      PROPERTY.init()
 
-    /**
-     * If the regions have been grabbed if not it will grab them and set this to true
-     */
-    GRABBED: false,
+      Object.values(TABLE).forEach(region => {
+        Region.regions.push(
+          region.t === 'c'
+            ? new CubeRegion(
+                region.from,
+                region.to,
+                region.dimensionId,
+                region.permissions,
+                region.key,
+                false
+              )
+            : new RadiusRegion(
+                region.center,
+                region.radius,
+                region.dimensionId,
+                region.permissions,
+                region.key,
+                false
+              )
+        )
+      })
+    },
   }
   /**
-   * Holds all regions in memory so its not grabbing them so much
+   * Regions list
    * @type {Array<CubeRegion | RadiusRegion>}
    */
   static regions = []
-  /**
-   * Gets all regions
-   * @returns {Array<CubeRegion | RadiusRegion>}
-   */
-  static getAllRegions() {
-    if (this.config.GRABBED) return this.regions
 
-    this.regions = []
-    Object.values(TABLE).forEach(region => {
-      this.regions.push(
-        region.t === 'c'
-          ? new CubeRegion(
-              region.from,
-              region.to,
-              region.dimensionId,
-              region.permissions,
-              region.key,
-              false
-            )
-          : new RadiusRegion(
-              region.center,
-              region.radius,
-              region.dimensionId,
-              region.permissions,
-              region.key,
-              false
-            )
-      )
-    })
-
-    this.config.GRABBED = true
-
-    return this.regions
-  }
   /**
    * Checks if a block location is in region
    * @param {Vector3} blockLocation
@@ -127,7 +112,7 @@ export class Region {
    * @returns {CubeRegion | RadiusRegion | undefined}
    */
   static locationInRegion(blockLocation, dimensionId) {
-    return this.getAllRegions().find(
+    return this.regions.find(
       region =>
         region.dimensionId === dimensionId &&
         region.vectorInRegion(blockLocation)
@@ -194,9 +179,9 @@ export class CubeRegion extends Region {
    * Gets all cube regions
    * @returns {CubeRegion[]}
    */
-  static getAllRegions() {
+  static get regions() {
     // @ts-expect-error Instance filtering
-    return Region.getAllRegions().filter(e => e instanceof CubeRegion)
+    return Region.regions.filter(e => e instanceof CubeRegion)
   }
   /**
    * @param {Vector3} blockLocation
@@ -204,7 +189,7 @@ export class CubeRegion extends Region {
    * @returns {CubeRegion | undefined}
    */
   static blockLocationInRegion(blockLocation, dimensionId) {
-    const region = this.getAllRegions().find(
+    const region = this.regions.find(
       region =>
         region.dimensionId === dimensionId &&
         region.vectorInRegion(blockLocation)
@@ -260,9 +245,9 @@ export class RadiusRegion extends Region {
    * Gets all cube regions
    * @returns {RadiusRegion[]}
    */
-  static getAllRegions() {
+  static get regions() {
     // @ts-expect-error Instance filtering misstype
-    return Region.getAllRegions().filter(e => e instanceof RadiusRegion)
+    return Region.regions.filter(e => e instanceof RadiusRegion)
   }
   /** @type {Vector3} */
   center

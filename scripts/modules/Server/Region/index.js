@@ -123,7 +123,7 @@ export function loadRegionsWithGuards(
 
   system.runInterval(
     () => {
-      if (!Region.config.PERMS_SETTED) return
+      if (!Region.config.SETTED) return
 
       for (const player of world.getAllPlayers()) {
         const currentRegion = Region.locationInRegion(

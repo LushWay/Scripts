@@ -21,7 +21,7 @@ import { baseMenu } from './baseMenu.js'
 let bases = []
 
 function updateBases() {
-  bases = RadiusRegion.getAllRegions().map(e => e.center)
+  bases = RadiusRegion.regions.map(e => e.center)
 }
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel)
@@ -41,7 +41,7 @@ world.beforeEvents.itemUseOn.subscribe(data => {
   )
     return
 
-  const region = RadiusRegion.getAllRegions().find(e =>
+  const region = RadiusRegion.regions.find(e =>
     e.permissions.owners.includes(source.nameTag)
   )
 
@@ -59,7 +59,7 @@ world.beforeEvents.itemUseOn.subscribe(data => {
     )
   }
 
-  const nearRegion = Region.getAllRegions().find(r => {
+  const nearRegion = Region.regions.find(r => {
     if (r instanceof RadiusRegion) {
       return Vector.distance(r.center, block.location) < r.radius + 100
     } else {
@@ -114,7 +114,7 @@ const base = new XCommand({
 })
 base.executes(ctx => {
   if (LockAction.locked(ctx.sender)) return
-  const base = RadiusRegion.getAllRegions().find(e =>
+  const base = RadiusRegion.regions.find(e =>
     e.permissions.owners.includes(ctx.sender.id)
   )
 
@@ -132,7 +132,7 @@ system.runInterval(
       return { dimension: p.dimension.type, loc: p.location }
     })
 
-    for (const base of RadiusRegion.getAllRegions().filter(
+    for (const base of RadiusRegion.regions.filter(
       // Ensure that region is a base (enabled pvp)
       e => e.permissions.pvp
     )) {

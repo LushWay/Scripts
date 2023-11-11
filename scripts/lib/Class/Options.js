@@ -1,5 +1,5 @@
 import { Player, Vector } from '@minecraft/server'
-import { DPDBProxy } from 'lib/Database/Properties.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { util } from '../util.js'
 
 export const OPTIONS_NAME = Symbol('name')
@@ -20,20 +20,23 @@ export const OPTIONS_NAME = Symbol('name')
  */
 
 /** @typedef {Record<string, Record<string, OptionValue>>} OPTIONS_DB */
-/** @type {OPTIONS_DB} */
-const PLAYER_DB = DPDBProxy('player', {
+
+export const PLAYER_OPTIONS_DB = new DynamicPropertyDB('playerOptions', {
+  /** @type {OPTIONS_DB} */
+  type: {},
   defaultValue: () => {
     return {}
   },
-})
+}).proxy()
 
 /** @typedef {DefaultOptions<OptionValue> & Record<string, { requires?: boolean }>} WorldOptions */
-/** @type {OPTIONS_DB} */
-const WORLD_OPTIONS_DB = DPDBProxy('options', {
+export const WORLD_OPTIONS_DB = new DynamicPropertyDB('options', {
+  /** @type {OPTIONS_DB} */
+  type: {},
   defaultValue: () => {
     return {}
   },
-})
+}).proxy()
 
 export class Options {
   /** @type {Record<string, DefaultOptions<boolean>>} */
@@ -60,7 +63,12 @@ export class Options {
     }
     return player =>
       // @ts-expect-error Trust me, TS
-      generateOptionsProxy(PLAYER_DB, prefix, this.playerO[prefix], player)
+      generateOptionsProxy(
+        PLAYER_OPTIONS_DB,
+        prefix,
+        this.playerO[prefix],
+        player
+      )
   }
 
   /** @type {Record<string, WorldOptions>} */
@@ -144,7 +152,7 @@ export class EditableLocation {
         ? rawLocation.split(' ').map(Number)
         : void 0
 
-    if (!rawLocation) {
+    if (!location) {
       if (fallback === false) {
         console.warn(
           '§eSet location §f' + id + '§e used in\n' + util.error.stack.get()
@@ -153,6 +161,7 @@ export class EditableLocation {
         return
       } else {
         location = [fallback.x, fallback.y, fallback.z]
+        return
       }
     }
 

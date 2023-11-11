@@ -118,23 +118,6 @@ export class DB {
    * A function that returns an array of entities that have the same tableType and tableName.
    * @param {string} tableType
    * @param {string} tableName
-   * @returns
-   */
-  static getTableEntity(tableType, tableName) {
-    try {
-      return this.tables().find(
-        e => e.tableType === tableType && e.tableName === tableName
-      )?.entity
-    } catch (e) {
-      util.error(e)
-      return null
-    }
-  }
-  /**
-   * A function that returns an array of entities that have the same tableType and tableName.
-   * @param {string} tableType
-   * @param {string} tableName
-   * @returns
    */
   static getTableEntities(tableType, tableName) {
     try {
@@ -144,7 +127,6 @@ export class DB {
         .map(e => e.entity)
     } catch (e) {
       util.error(e)
-      return null
     }
   }
 
@@ -205,7 +187,7 @@ export class DB {
           } else {
             // If the original object doesn't have the property, add default value
             // And unlink properties...
-            COMPOSED[key] = this.setDefaults({}, defaultObject)
+            COMPOSED[key] = this.setDefaults({}, defaultValue)
           }
         }
       } else {

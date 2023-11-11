@@ -1,9 +1,9 @@
 import { Player, system, world } from '@minecraft/server'
 import { StoredRequest } from 'lib/Class/StoredRequest.js'
-import { DPDBProxy } from 'lib/Database/Properties.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm, Cooldown, MessageForm, is, util } from 'xapi.js'
 import { MENU } from '../../Server/Menu/var.js'
-import { JOIN } from '../../Server/OnJoin/var.js'
+import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { CubeRegion, Region } from '../../Server/Region/Region.js'
 import {
   clearRegion,
@@ -65,9 +65,14 @@ const Themes = {
 // МИНИИГРЫ: { "BATLLE ROYAL": { "постройки для": "" } },
 
 /**
- * @type {Record<string, {id?: string, theme?: string[], archiveOwners?: string[]}>}
+ * @type {DynamicPropertyDB<string, {id?: string, theme?: string[], archiveOwners?: string[]}>}
  */
-export const DB = DPDBProxy('buildRegion')
+const PROPERTY = new DynamicPropertyDB('buildRegion', {
+  defaultValue() {
+    return {}
+  },
+})
+export const DB = PROPERTY.proxy()
 
 system.runPlayerInterval(
   player => {
@@ -351,9 +356,7 @@ MENU.OnOpen = player => {
             '§cДа, перейти',
             () => {
               const oldRegionID = DB[player.id]?.id
-              const oldRegion = Region.getAllRegions().find(
-                e => e.key === oldRegionID
-              )
+              const oldRegion = Region.regions.find(e => e.key === oldRegionID)
 
               if (!oldRegion) return
 

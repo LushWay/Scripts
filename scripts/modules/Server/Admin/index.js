@@ -1,12 +1,19 @@
 import { Player, world } from '@minecraft/server'
-import { OPTIONS_NAME, Options } from 'lib/Class/Options.js'
-import { DPDBProxy } from 'lib/Database/Properties.js'
+import { OPTIONS_NAME, Options, WORLD_OPTIONS_DB } from 'lib/Class/Options.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { FormCallback, ROLES, getRole, setRole, util } from 'xapi.js'
 
-/** @type {Record<string, {role: keyof typeof ROLES, setter?: 1}>} */
-const DB = DPDBProxy('player')
+const DB = new DynamicPropertyDB('player', {
+  /** @type {Record<string, {role: keyof typeof ROLES, setter?: 1}>} */
+  type: {},
+  defaultValue: () => {
+    /** @type {{role: keyof typeof ROLES}} */
+    const con = { role: 'admin' }
+    return con
+  },
+}).proxy()
 
 const NAME = new XCommand({
   name: 'name',
@@ -141,7 +148,7 @@ function options(player) {
   const form = new ActionForm('§dНастройки мира')
 
   for (const groupName in Options.worldO) {
-    const data = OPTIONS_DB[groupName]
+    const data = WORLD_OPTIONS_DB[groupName]
     const requires = Object.entries(Options.worldO[groupName]).reduce(
       (count, [key, option]) =>
         option.requires && typeof data[key] === 'undefined' ? count + 1 : count,
@@ -159,9 +166,6 @@ function options(player) {
   form.show(player)
 }
 
-/** @type {import("lib/Class/Options.js").OPTIONS_DB} */
-const OPTIONS_DB = DPDBProxy('options')
-
 /**
  *
  * @param {Player} player
@@ -173,7 +177,7 @@ function group(player, groupName, groupType, errors = {}) {
   const source = groupType === 'PLAYER' ? Options.playerO : Options.worldO
   const config = source[groupName]
   const name = config[OPTIONS_NAME]
-  const data = OPTIONS_DB[groupName]
+  const data = WORLD_OPTIONS_DB[groupName]
 
   /** @type {[string, (input: string | boolean) => string][]} */
   const buttons = []
@@ -241,7 +245,7 @@ function group(player, groupName, groupType, errors = {}) {
 
           if (str(data[KEY]) === str(total)) return ''
           data[KEY] = total
-          OPTIONS_DB[groupName] = data
+          WORLD_OPTIONS_DB[groupName] = data
           return '§aСохранено!'
         } else return ''
       },

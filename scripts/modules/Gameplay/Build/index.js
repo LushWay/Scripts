@@ -2,7 +2,7 @@ import { system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
 import { is } from 'xapi.js'
 import { CONFIG } from '../../../config.js'
-import { JOIN } from '../../Server/OnJoin/var.js'
+import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { Region } from '../../Server/Region/Region.js'
 import { loadRegionsWithGuards } from '../../Server/Region/index.js'
 import './menu.js'
@@ -21,7 +21,7 @@ loadRegionsWithGuards(
     !region && GLOBAL_ALLOWED_ENTITIES.includes(data.entity.typeId)
 )
 
-Region.config.PERMS_SETTED = true
+Region.config.SETTED = true
 Region.config.permissions.allowedEntitys = GLOBAL_ALLOWED_ENTITIES
 JOIN.CONFIG.title_animation = {
   stages: ['» $title «', '»  $title  «'],

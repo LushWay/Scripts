@@ -1,4 +1,4 @@
-import { Player, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 
 // This need to be loaded before all another scripts
 import './lib/watchdog.js'
@@ -8,10 +8,6 @@ import './lib/Extensions/import.js'
 import { CONFIG } from './config.js'
 import { EventLoader } from './lib/Class/Events.js'
 import { XCommand } from './lib/Command/index.js'
-import { Database } from './lib/Database/Rubedo.js'
-import { OverTakes } from './lib/Extensions/import.js'
-import { emoji } from './lib/Lang/emoji.js'
-import { text } from './lib/Lang/text.js'
 import { util } from './lib/util.js'
 import importModules from './modules/import.js'
 
@@ -22,19 +18,6 @@ const loading = Date.now()
  * Class because variable hoisting
  */
 export class XA {
-  static lang = {
-    lang: text,
-    emoji: emoji,
-  }
-
-  static tables = {
-    /**
-     * Database to store any player data
-     * @type {Database<string, any>}
-     */
-    player: new Database('player'),
-  }
-
   static afterEvents = {
     modulesLoad: new EventLoader(),
     databaseInit: new EventLoader(),
@@ -56,7 +39,7 @@ export * from './lib/Command/index.js'
 // Database
 export * from './lib/Database/Default.js'
 export * from './lib/Database/Inventory.js'
-export * from './lib/Database/Rubedo.js'
+export * from './lib/Database/Player.js'
 export * from './lib/Database/Scoreboard.js'
 // Form
 export * from './lib/Form/ActionForm.js'
@@ -113,18 +96,4 @@ system.run(async function waiter() {
   } catch (e) {
     util.error(e, { errorName })
   }
-})
-
-XA.afterEvents.databaseInit.subscribe(() => {
-  OverTakes(Player.prototype, {
-    db() {
-      return XA.tables.player.work(super.id)
-    },
-  })
-
-  OverTakes(Player, {
-    name(id) {
-      return XA.tables.player.get(id)?.name
-    },
-  })
 })

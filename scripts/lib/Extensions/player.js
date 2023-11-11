@@ -1,6 +1,7 @@
 import {
   Entity,
   EntityDamageCause,
+  EquipmentSlot,
   GameMode,
   Player,
   world,
@@ -18,16 +19,7 @@ OverTakes(Player, {
     throw new ReferenceError('SM is not fully loaded!')
   },
 })
-OverTakes(Entity.prototype, {
-  despawn() {
-    this.teleport({ x: 0, y: -300, z: 0 }, { checkForBlocks: false })
-    this.kill()
-  },
-})
 OverTakes(Player.prototype, {
-  db() {
-    throw new ReferenceError("DB isn't loaded!")
-  },
   tell: Player.prototype.sendMessage,
   applyDash(target, horizontalStrength, verticalStrength) {
     const view = target.getViewDirection()
@@ -66,6 +58,11 @@ OverTakes(Player.prototype, {
     if (isCreative) this.runCommand('gamemode c')
 
     return true
+  },
+  mainhand() {
+    return this.getComponent('equippable').getEquipmentSlot(
+      EquipmentSlot.Mainhand
+    )
   },
 })
 

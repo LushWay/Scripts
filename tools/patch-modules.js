@@ -1,4 +1,3 @@
-// @ts-check
 import { m, patchPackage } from './utils.js'
 
 patchPackage('@minecraft/server', {
@@ -56,22 +55,22 @@ patchPackage('@minecraft/server', {
     nether: Dimension;
 `,
     ItemStack: m`
-		    /**
-		     * Alias to {@link ItemStack.getComponent}('cooldown')
-		     */
-		    cooldown: ItemCooldownComponent;
-		    /**
-		     * Alias to {@link ItemStack.getComponent}('enchantments')
-		     */
-		    enchantments: ItemEnchantsComponent;
-		    /**
-		     * Alias to {@link ItemStack.getComponent}('durability')
-		     */
-		    durability: ItemDurabilityComponent;
-		    /**
-		     * Alias to {@link ItemStack.getComponent}('food')
-		     */
-		    food: ItemFoodComponent;
+		/**
+		 * Alias to {@link ItemStack.getComponent}('cooldown')
+		 */
+		cooldown: ItemCooldownComponent;
+		/**
+		 * Alias to {@link ItemStack.getComponent}('enchantments')
+		 */
+		enchantments: ItemEnchantsComponent;
+		/**
+		 * Alias to {@link ItemStack.getComponent}('durability')
+		 */
+		durability: ItemDurabilityComponent;
+		/**
+		 * Alias to {@link ItemStack.getComponent}('food')
+		 */
+		food: ItemFoodComponent;
 		`,
     Entity: m`
 		/**
@@ -85,18 +84,17 @@ patchPackage('@minecraft/server', {
 	 	* @param name - Player name or ID
 	 	*/
 		static fetch(name: string): Player | undefined;
+
 		/**
 		 * Gets player name from database by id
 		 */
 		static name(id: string): string | undefined;
+
 		/**
-		 * Gets ItemStack from player mainhand
+		 * Gets ContainerSlot from player mainhand
 		 */
-		itemInHand(): ItemStack | undefined;
-		/**
-		 * Gets player data from database
-		 */
-		db(): { save(): void, data: any };
+		mainhand(): ContainerSlot | undefined;
+
     /**
      * See {@link Player.sendMessage}
      */

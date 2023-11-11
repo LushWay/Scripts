@@ -1,0 +1,11 @@
+{
+  "name": "eslint-plugin-scriptapi",
+  "main": "index.js",
+  "type": "commonjs",
+  "version": "0.0.0",
+  "eslintConfig": {
+    "rules": {
+      "@typescript-eslint/no-var-requires": "off"
+    }
+  }
+}

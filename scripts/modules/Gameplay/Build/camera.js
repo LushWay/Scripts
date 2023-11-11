@@ -1,4 +1,5 @@
 import { EasingType, Player, Vector, system, world } from '@minecraft/server'
+import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, ModalForm, util } from 'xapi.js'
 import {
   getChatAugments,
@@ -7,19 +8,6 @@ import {
 
 /**
  * @typedef {"spinAroundPos"} CameraDBModes
- *
- * @typedef {{
- *   camera?: {
- *     pos: Vector3;
- *     type: string;
- *     ease: EasingType;
- *     easeTime: number;
- *     facing: string | Vector3
- *     mode: CameraDBModes
- *     spinRadius: number
- *     modeStep?: number
- *   }
- * }} CameraDB
  */
 
 const CAMERA = {
@@ -39,8 +27,7 @@ const CAMERA = {
  * @param {Player} target
  */
 function setupCameraForm(player, target) {
-  /** @type {PlayerDB<CameraDB>} */
-  const { data, save } = target.db()
+  const data = target.database
 
   new ModalForm('§3Настройки камеры §f' + target.name)
     .addDropdownFromObject(
@@ -118,7 +105,6 @@ function setupCameraForm(player, target) {
           spinRadius,
         }
 
-        save()
         createCameraInteval(target)
         player.tell('§3§l> §rСохранено!')
       }
@@ -134,16 +120,12 @@ const intervales = {}
  * @param {Player} player
  */
 function createCameraInteval(player) {
-  /** @type {PlayerDB<CameraDB>} */
-  const { data } = player.db()
-
-  if (!data.camera) return
+  if (!player.database.camera) return
 
   if (intervales[player.id]) system.clearRun(intervales[player.id])
   intervales[player.id] = system.runInterval(
     () => {
-      /** @type {PlayerDB<CameraDB>} */
-      const { data, save } = player.db()
+      const data = player.database
 
       if (data.camera) {
         if (data.camera.mode === 'spinAroundPos') {
@@ -182,13 +164,11 @@ function createCameraInteval(player) {
               easeType: data.camera.ease,
             },
           })
-
-          save()
         }
       }
     },
     'camera',
-    data.camera.easeTime * 20
+    player.database.camera.easeTime * 20
   )
 }
 
@@ -206,11 +186,8 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 const cmd = new XCommand({ name: 'camera', role: 'admin' })
 cmd.executes(ctx => selectPlayerForm(ctx.sender))
 cmd.literal({ name: 'reset' }).executes(ctx => {
-  /** @type {PlayerDB<CameraDB>} */
-  const { data, save } = ctx.sender.db()
-  ctx.sender.runCommand(`camera @s set minecraft:first_person`)
-  delete data.camera
-  save()
+  ctx.sender.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+  delete ctx.sender.database.camera
 })
 
 /**

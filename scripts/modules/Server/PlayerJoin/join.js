@@ -1,42 +1,21 @@
 import { Player, system, world } from '@minecraft/server'
-import { Database, EventSignal, Options, util } from 'xapi.js'
+import { EventSignal, Options, PLAYER_DB, util } from 'xapi.js'
 import './subscribes.js'
 import { JOIN } from './var.js'
-
-/** @type {Database<string, IJoinData>} */
-const PDB = new Database('player', {
-  // events: {
-  // 	beforeGet(key, value) {
-  // 		return (
-  // 			value ?? {
-  // 				learning: 1,
-  // 				joined: Date.now(),
-  // 			}
-  // 		);
-  // 	},
-  // 	beforeSet(key, value) {
-  // 		return value;
-  // 	},
-  // },
-})
 
 // TODO Move stage/waiting and other to variables
 // TODO Add trigger to set joined score on join
 // TODO Remove unused events
 
 world.afterEvents.playerJoin.subscribe(({ playerId }) => {
-  const { data, save } = PDB.work(playerId)
-  data.waiting = 1
-  save()
+  PLAYER_DB[playerId].waiting = 1
 })
 
 system.runTimeout(
   () => {
-    if (!util.settings.firstLoad) return
+    if (!util.settings.firstLoad || util.settings.BDSMode) return
     const player = world.getAllPlayers()[0]
-    const { data, save } = PDB.work(player.id)
-    data.waiting = 1
-    save()
+    player.database.join.waiting = 1
   },
   'owner start screen',
   80
@@ -44,8 +23,7 @@ system.runTimeout(
 
 system.runPlayerInterval(
   player => {
-    const { data, save } = PDB.work(player.id)
-    let modified = false
+    const data = player.database.join
 
     if (data.waiting === 1) {
       // New player (player joined)
@@ -60,7 +38,6 @@ system.runPlayerInterval(
         rot.x,
         rot.y,
       ]
-      modified = true
     }
 
     // Pos where player joined
@@ -110,22 +87,18 @@ system.runPlayerInterval(
           })
         } else {
           // Player joined in air
-          join(player, data, 'air')
+          join(player, 'air')
         }
       } else if (data.message) {
         // Player moved on ground
-        join(player, data, 'ground')
+        join(player, 'ground')
       }
-      modified = true
     }
     if (data.learning && !data.message) {
       // Show first time join guide
       EventSignal.emit(JOIN.EVENTS.firstTime, player)
       delete data.learning
-      modified = true
     }
-
-    if (modified) save()
   },
   'joinInterval',
   20
@@ -143,10 +116,10 @@ const getSettings = Options.player('Вход', 'join', {
 /**
  *
  * @param {Player} player
- * @param {IJoinData} data
  * @param {"air" | "ground"} messageType
  */
-function join(player, data, messageType) {
+function join(player, messageType) {
+  const data = player.database.join
   delete data.at
   delete data.stage
   delete data.message
@@ -183,9 +156,7 @@ new XCommand({
   description: 'Открывает гайд',
   type: 'public',
 }).executes(ctx => {
-  const D = PDB.get(ctx.sender.id)
-  D.learning = 1
-  PDB.set(ctx.sender.id, D)
+  ctx.sender.database.join.learning = 1
 })
 
 new XCommand({
@@ -194,7 +165,5 @@ new XCommand({
   description: 'Имитирует вход',
   type: 'public',
 }).executes(ctx => {
-  const D = PDB.get(ctx.sender.id)
-  D.waiting = 1
-  PDB.set(ctx.sender.id, D)
+  ctx.sender.database.join.waiting = 1
 })

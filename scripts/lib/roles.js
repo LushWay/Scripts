@@ -1,11 +1,19 @@
 import { Player, system } from '@minecraft/server'
-import { DPDBProxy } from 'lib/Database/Properties.js'
-/** @type {Record<string, {role?: keyof typeof ROLES} | undefined>} */
-const DB = DPDBProxy('player', {
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+/**
+ * @typedef {{role?: keyof typeof ROLES}} DatabaseType
+ */
+
+const DB = new DynamicPropertyDB('player', {
+  /** @type {Record<string, DatabaseType>} */
+  type: {},
+  /**
+   * @returns {DatabaseType}
+   */
   defaultValue() {
     return { role: 'member' }
   },
-})
+}).proxy()
 
 system.afterEvents.scriptEventReceive.subscribe(event => {
   if (event.id === 'ROLE:ADMIN') {
