@@ -127,9 +127,7 @@ const variables = new MolangVariableMap()
 
 system.runPlayerInterval(
   player => {
-    const item = player
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
+    const item = player.mainhand()
 
     if (!item || item.typeId !== 'we:tool') return
 

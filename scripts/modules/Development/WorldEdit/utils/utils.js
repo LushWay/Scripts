@@ -1,6 +1,5 @@
 import {
   BlockPermutation,
-  BlockTypes,
   Player,
   Vector,
   system,
@@ -19,28 +18,25 @@ import { Cooldown, util } from 'xapi.js'
  * @param {number} rad size of sphere
  * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
-export async function Shape(player, shape, pos, blocks, rad) {
-  const loc1 = { x: -rad, y: -rad, z: -rad }
-  const loc2 = { x: rad, z: rad, y: rad }
-
-  WorldEdit.forPlayer(player).backup(
-    Vector.add(pos, loc1),
-    Vector.add(pos, loc2)
-  )
-
-  const cuboid = new Cuboid(loc1, loc2)
-  const conditionFunction = new Function(
-    'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xradius, yradius, zradius}, rad',
-    `return ${shape}`
-  )
-  /** @type {(...args: number[]) => boolean} */
-  const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, rad)
-  try {
-    let blocksSet = 0
-
+export function Shape(player, shape, pos, blocks, rad) {
+  util.catch(async () => {
     const loc1 = { x: -rad, y: -rad, z: -rad }
     const loc2 = { x: rad, z: rad, y: rad }
 
+    WorldEdit.forPlayer(player).backup(
+      Vector.add(pos, loc1),
+      Vector.add(pos, loc2)
+    )
+
+    const cuboid = new Cuboid(loc1, loc2)
+    const conditionFunction = new Function(
+      'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad',
+      `return ${shape}`
+    )
+    /** @type {(...args: number[]) => boolean} */
+    const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, rad)
+
+    let blocksSet = 0
     for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
       if (!condition(x, y, z)) continue
       const location = Vector.add(pos, { x, y, z })
@@ -52,9 +48,7 @@ export async function Shape(player, shape, pos, blocks, rad) {
         blocksSet = 0
       }
     }
-  } catch (e) {
-    util.error(e)
-  }
+  })
 }
 
 /**

@@ -1,19 +1,5 @@
 import { Player, system } from '@minecraft/server'
-import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-/**
- * @typedef {{role?: keyof typeof ROLES}} DatabaseType
- */
-
-const DB = new DynamicPropertyDB('player', {
-  /** @type {Record<string, DatabaseType>} */
-  type: {},
-  /**
-   * @returns {DatabaseType}
-   */
-  defaultValue() {
-    return { role: 'member' }
-  },
-}).proxy()
+import { PLAYER_DB } from 'xapi.js'
 
 system.afterEvents.scriptEventReceive.subscribe(event => {
   if (event.id === 'ROLE:ADMIN') {
@@ -45,9 +31,9 @@ export const ROLES = {
 export function getRole(playerID) {
   if (playerID instanceof Player) playerID = playerID.id
 
-  const role = DB[playerID]?.role
+  const role = PLAYER_DB[playerID]?.role
 
-  if (!role || !Object.keys(ROLES).includes(role)) return 'member'
+  if (!Object.keys(ROLES).includes(role)) return 'member'
   return role
 }
 
@@ -60,8 +46,7 @@ export function getRole(playerID) {
  */
 export function setRole(player, role) {
   if (player instanceof Player) player = player.id
-  DB[player] ??= {}
-  const obj = DB[player]
+  const obj = PLAYER_DB[player]
   if (obj) obj.role = role
 }
 

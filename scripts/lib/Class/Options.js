@@ -40,7 +40,7 @@ export const WORLD_OPTIONS_DB = new DynamicPropertyDB('options', {
 
 export class Options {
   /** @type {Record<string, DefaultOptions<boolean>>} */
-  static playerO = {}
+  static playerMap = {}
   /**
    * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
    * stored in a database
@@ -53,11 +53,11 @@ export class Options {
   static player(name, prefix, config) {
     config[OPTIONS_NAME] = name
 
-    if (!(prefix in this.playerO)) {
-      this.playerO[prefix] = config
+    if (!(prefix in this.playerMap)) {
+      this.playerMap[prefix] = config
     } else {
-      this.playerO[prefix] = {
-        ...this.playerO[prefix],
+      this.playerMap[prefix] = {
+        ...this.playerMap[prefix],
         ...config,
       }
     }
@@ -66,13 +66,13 @@ export class Options {
       generateOptionsProxy(
         PLAYER_OPTIONS_DB,
         prefix,
-        this.playerO[prefix],
+        this.playerMap[prefix],
         player
       )
   }
 
   /** @type {Record<string, WorldOptions>} */
-  static worldO = {}
+  static worldMap = {}
 
   /**
    * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
@@ -83,16 +83,16 @@ export class Options {
    * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
    */
   static world(prefix, config) {
-    if (!(prefix in this.worldO)) {
-      this.worldO[prefix] = config
+    if (!(prefix in this.worldMap)) {
+      this.worldMap[prefix] = config
     } else {
-      this.worldO[prefix] = {
-        ...this.worldO[prefix],
+      this.worldMap[prefix] = {
+        ...this.worldMap[prefix],
         ...config,
       }
     }
     // @ts-expect-error Trust me, TS
-    return generateOptionsProxy(WORLD_OPTIONS_DB, prefix, this.worldO[prefix])
+    return generateOptionsProxy(WORLD_OPTIONS_DB, prefix, this.worldMap[prefix])
   }
 }
 
@@ -140,19 +140,14 @@ export class EditableLocation {
    */
   constructor(id, { fallback = false } = {}) {
     this.id = id
-    const rawLocation = WORLD_OPTIONS_DB[EditableLocation.key][id]
-    Options.worldO[EditableLocation.key][id] = {
+    const raw = WORLD_OPTIONS_DB[EditableLocation.key][id]
+    Options.worldMap[EditableLocation.key][id] = {
       desc: `Позиция ${id}`,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
     }
 
-    let location =
-      typeof rawLocation === 'string'
-        ? rawLocation.split(' ').map(Number)
-        : void 0
-
-    if (!location) {
+    if (typeof raw !== 'string') {
       if (fallback === false) {
         console.warn(
           '§eEmpty location §f' + id + '\n§r' + util.error.stack.get(1)
@@ -160,14 +155,18 @@ export class EditableLocation {
         this.valid = false
         return
       } else {
-        location = [fallback.x, fallback.y, fallback.z]
+        this.x = fallback.x
+        this.y = fallback.y
+        this.z = fallback.z
         return
       }
     }
 
-    if (!location || location.length !== 3) {
+    const location = raw.split(' ').map(Number)
+
+    if (location.length !== 3) {
       util.error(new TypeError('Invalid location'))
-      console.error(util.inspect(rawLocation))
+      console.error(raw)
       this.valid = false
       return
     }
@@ -178,4 +177,4 @@ export class EditableLocation {
   }
 }
 
-Options.worldO[EditableLocation.key] = {}
+Options.worldMap[EditableLocation.key] = {}

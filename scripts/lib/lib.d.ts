@@ -101,7 +101,7 @@ declare global {
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
-    role?: keyof typeof ROLES
+    role: keyof typeof ROLES
     quest?: import('./Class/Quest').QuestDB
   }
 

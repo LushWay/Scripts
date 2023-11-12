@@ -28,13 +28,9 @@ OverTakes(Player.prototype, {
     target.applyKnockback(view.x, view.z, hStrength, vStrength)
   },
   isGamemode(mode) {
-    return !!this.dimension
-      .getPlayers({
-        location: this.location,
-        maxDistance: 1,
-        gameMode: GameMode[mode],
-      })
-      .find(e => e.id === this.id)
+    return this.matches({
+      gameMode: GameMode[mode],
+    })
   },
   closeChat(message) {
     const health = this.getComponent('health')

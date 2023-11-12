@@ -1,8 +1,5 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { ANARCHY, SPAWN } from '../../modules/Gameplay/Survival/index.js'
-import { ActionForm } from '../Form/ActionForm.js'
 import { Place } from './Action.js'
-import { Sidebar } from './Sidebar.js'
 
 // // @ts-expect-error Bruh
 // Set.prototype.toJSON = function () {
@@ -353,82 +350,4 @@ class PlayerQuest {
   end(action) {
     this._end = action
   }
-}
-
-if (ANARCHY.portal) {
-  const learning = new Quest('Обучение', q => {
-    if (!ANARCHY.portal || !ANARCHY.portal.from || !ANARCHY.portal.to)
-      return q.failed('§cСервер не настроен')
-
-    q.start(function () {
-      this.player.tell('§6Квест начался!')
-      this.player.playSound('note.pling')
-    })
-
-    q.place(ANARCHY.portal.from, ANARCHY.portal.to, '§6Зайди в портал анархии')
-
-    q.counter({
-      end: 5,
-      text(value) {
-        return `§6Наруби §f${value}/${this.end} §6блоков дерева`
-      },
-      activate() {
-        const blocksEvent = world.beforeEvents.playerBreakBlock.subscribe(
-          ({ player, block }) => {
-            if (player.id !== this.player.id) return
-            if (!SPAWN.startAxeCanBreak.includes(block.type.id)) return
-
-            this.diff(1)
-          }
-        )
-
-        return {
-          cleanup() {
-            world.beforeEvents.playerBreakBlock.unsubscribe(blocksEvent)
-          },
-        }
-      },
-    })
-
-    q.end(function () {
-      this.player.playSound('note.pling')
-      this.player.tell('§6Квест закончен!')
-    })
-  })
-
-  new XCommand({
-    name: 'q',
-    role: 'admin',
-  }).executes(ctx => {
-    const form = new ActionForm('Quests', 'Выбери')
-    form.addButton('Learning', () => {
-      learning.enter(ctx.sender)
-    })
-    form.show(ctx.sender)
-  })
-
-  const anarchySidebar = new Sidebar(
-    { name: 'Anarchy' },
-    player => {
-      return '§7Инвентарь: ' + player.database.survival.inv
-    },
-    player => {
-      return `§7Монеты: §6${player.scores.money}§7 | Листья: §2${player.scores.leafs}`
-    },
-    ' ',
-    Quest.sidebar,
-    ' ',
-    '§7shp1nat56655.portmap.io'
-  )
-  anarchySidebar.setUpdateInterval(20)
-
-  world.getAllPlayers().forEach(e => anarchySidebar.subscribe(e))
-
-  world.afterEvents.playerSpawn.subscribe(({ player }) => {
-    anarchySidebar.subscribe(player)
-  })
-
-  world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-    anarchySidebar.unsubscribe(playerId)
-  })
 }

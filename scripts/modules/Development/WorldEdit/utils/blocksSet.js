@@ -7,17 +7,18 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
  */
 
 /**
- * @typedef {Parameters<BlockPermutation.resolve>} BlockStateWeight
+ * @typedef {[...Parameters<BlockPermutation.resolve>, number?]} BlockStateWeight
  */
 
 /**
  * @template {keyof BlockStates} Name
  * @param {Name} name
  * @param {BlockStates[Name]} [states]
+ * @param {number} [weight]
  * @returns {BlockStateWeight}
  */
-export function withState(name, states) {
-  return [name, states]
+export function withState(name, states, weight = 1) {
+  return [name, states, weight]
 }
 
 /**
@@ -33,12 +34,12 @@ const defaultBlockSets = {
     [MinecraftBlockTypes.Cobblestone],
   ],
   'Каменная стена': [
-    [MinecraftBlockTypes.MudBricks],
+    [MinecraftBlockTypes.MudBricks, undefined, 2],
     [MinecraftBlockTypes.PackedMud],
     [MinecraftBlockTypes.BrickBlock],
     withState(MinecraftBlockTypes.CobblestoneWall, { wall_block_type: 'sand' }),
     [MinecraftBlockTypes.HardenedClay],
-    withState(MinecraftBlockTypes.Stone, { stone_type: 'sand' }),
+    withState(MinecraftBlockTypes.Stone, { stone_type: 'sand' }, 2),
   ],
 }
 
@@ -50,9 +51,21 @@ const DB = PROPERTY.proxy()
  * @param {Player} player
  * @returns {BlocksSets}
  */
-export function getBlockSets(player) {
+export function getAllBlockSets(player) {
   const playerBlockSets = DB[player.id] ?? {}
   return { ...defaultBlockSets, ...playerBlockSets }
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {string} setName
+ * @param {BlockStateWeight[]} set
+ */
+export function setBlockSet(player, setName, set) {
+  DB[player.id] ??= {}
+  const db = DB[player.id]
+  if (db) db[setName] = set
 }
 
 /**
@@ -60,9 +73,14 @@ export function getBlockSets(player) {
  * @param {string} name
  */
 export function getBlockSet(player, name) {
-  const blocks = getBlockSets(player)[name]
+  const blocks = getAllBlockSets(player)[name]
   if (!blocks) return []
-  return blocks.map(e => BlockPermutation.resolve(...e))
+  return blocks
+    .filter(e => (e[2] ?? 1) > 0)
+    .map(([type, states, weight]) =>
+      new Array(weight ?? 1).fill(BlockPermutation.resolve(type, states))
+    )
+    .flat()
 }
 
 /**
@@ -71,5 +89,5 @@ export function getBlockSet(player, name) {
  * @returns {[string[], {defaultValue: string}]}
  */
 export function blockSetDropdown(player, defaultSet) {
-  return [Object.keys(getBlockSets(player)), { defaultValue: defaultSet }]
+  return [Object.keys(getAllBlockSets(player)), { defaultValue: defaultSet }]
 }

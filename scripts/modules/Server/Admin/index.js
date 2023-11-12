@@ -1,19 +1,8 @@
 import { Player, world } from '@minecraft/server'
 import { OPTIONS_NAME, Options, WORLD_OPTIONS_DB } from 'lib/Class/Options.js'
-import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { FormCallback, ROLES, getRole, setRole, util } from 'xapi.js'
-
-const DB = new DynamicPropertyDB('player', {
-  /** @type {Record<string, {role: keyof typeof ROLES, setter?: 1}>} */
-  type: {},
-  defaultValue: () => {
-    /** @type {{role: keyof typeof ROLES}} */
-    const con = { role: 'admin' }
-    return con
-  },
-}).proxy()
+import { FormCallback, PLAYER_DB, ROLES, getRole, setRole, util } from 'xapi.js'
 
 const NAME = new XCommand({
   name: 'name',
@@ -38,16 +27,16 @@ const R = new XCommand({
 
 R.executes(ctx => {
   const role = getRole(ctx.sender.id)
-  const noAdmins = !Object.values(DB)
+  const noAdmins = !Object.values(PLAYER_DB)
     .map(e => e.role)
     .includes('admin')
   const isAdmin = role === 'admin'
   const needAdmin = ctx.args[0] === 'ACCESS'
-  const beenAdmin = DB[ctx.sender.id].setter && !isAdmin
+  const beenAdmin = PLAYER_DB[ctx.sender.id].roleSetter && !isAdmin
 
   if (noAdmins && ctx.sender.isOp() && (needAdmin || beenAdmin)) {
-    DB[ctx.sender.id].role = 'admin'
-    delete DB[ctx.sender.id].setter
+    PLAYER_DB[ctx.sender.id].role = 'admin'
+    delete PLAYER_DB[ctx.sender.id].roleSetter
     return ctx.reply('§b> §3Вы получили роль §r' + ROLES.admin)
   }
 
@@ -89,8 +78,8 @@ R.executes(ctx => {
             )
           setRole(player.id, newrole)
           if (fakeChange) {
-            DB[player.id].role = newrole
-            DB[player.id].setter = 1
+            PLAYER_DB[player.id].role = newrole
+            PLAYER_DB[player.id].roleSetter = 1
           }
         })
     }
@@ -122,8 +111,8 @@ new XCommand({
 function poptions(player) {
   const form = new ActionForm('§dНастройки')
 
-  for (const groupName in Options.playerO) {
-    const name = Options.playerO[groupName][OPTIONS_NAME]
+  for (const groupName in Options.playerMap) {
+    const name = Options.playerMap[groupName][OPTIONS_NAME]
     if (name)
       form.addButton(name, null, () => {
         group(player, groupName, 'PLAYER')
@@ -147,9 +136,9 @@ new XCommand({
 function options(player) {
   const form = new ActionForm('§dНастройки мира')
 
-  for (const groupName in Options.worldO) {
+  for (const groupName in Options.worldMap) {
     const data = WORLD_OPTIONS_DB[groupName]
-    const requires = Object.entries(Options.worldO[groupName]).reduce(
+    const requires = Object.entries(Options.worldMap[groupName]).reduce(
       (count, [key, option]) =>
         option.requires && typeof data[key] === 'undefined' ? count + 1 : count,
       0
@@ -174,7 +163,7 @@ function options(player) {
  * @param {Record<string, string>} [errors]
  */
 function group(player, groupName, groupType, errors = {}) {
-  const source = groupType === 'PLAYER' ? Options.playerO : Options.worldO
+  const source = groupType === 'PLAYER' ? Options.playerMap : Options.worldMap
   const config = source[groupName]
   const name = config[OPTIONS_NAME]
   const data = WORLD_OPTIONS_DB[groupName]

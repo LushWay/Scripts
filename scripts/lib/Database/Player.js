@@ -3,13 +3,14 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { OverTakes } from 'xapi.js'
 
 export const PLAYER_DB = new DynamicPropertyDB('player', {
-  /** @type {Record<string, any>} */
+  /** @type {Record<string, import("@minecraft/server").Player["database"]>} */
   type: {},
   /**
    * @returns {import("@minecraft/server").Player["database"]}
    */
   defaultValue: () => {
     return {
+      role: 'member',
       join: {
         joined: Date.now(),
       },
@@ -30,6 +31,6 @@ Object.defineProperty(Player.prototype, 'database', {
 
 OverTakes(Player, {
   name(id) {
-    return PLAYER_DB[id].name
+    return PLAYER_DB[id].join.name
   },
 })

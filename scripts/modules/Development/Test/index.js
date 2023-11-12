@@ -17,8 +17,7 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { BASE_ITEM_STACK } from 'modules/Gameplay/Survival/base.js'
-import { DB, GAME_UTILS, Place, showForm, util } from 'xapi.js'
-import { ChestFormData } from '../../../chestui/forms.js'
+import { DB, GAME_UTILS, Place, util } from 'xapi.js'
 import { APIRequest } from '../../../lib/Class/Net.js'
 import { generateOre } from '../../Gameplay/Survival/ore.js'
 import './enchant.js'
@@ -31,6 +30,73 @@ world.afterEvents.chatSend.subscribe(event => {
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  async bezier(ctx) {
+    /**
+     * @param {Vector3[]} vectors
+     * @param {number} numPoints
+     */
+    function generateCurve(vectors, numPoints) {
+      const curve = []
+      /**
+       *
+       * @param {keyof Vector3} axis
+       * @param {[Vector3, Vector3, Vector3, Vector3]} vs
+       * @param {number} t
+       * @returns
+       */
+      function calc(axis, vs, t) {
+        const [v0, v1, v2, v3] = vs
+        const t2 = t * t
+        const t3 = t2 * t
+        return (
+          0.5 *
+          (2 * v1[axis] +
+            (-v0[axis] + v2[axis]) * t +
+            (2 * v0[axis] - 5 * v1[axis] + 4 * v2[axis] - v3[axis]) * t2 +
+            (-v0[axis] + 3 * v1[axis] - 3 * v2[axis] + v3[axis]) * t3)
+        )
+      }
+      for (let i = 0; i < vectors.length - 1; i++) {
+        for (let j = 0; j < numPoints; j++) {
+          const t = j / numPoints
+          const t2 = t * t
+          const t3 = t2 * t
+          const v0 = vectors[i - 1] || vectors[i]
+          const v1 = vectors[i]
+          const v2 = vectors[i + 1] || vectors[i]
+          const v3 = vectors[i + 2] || vectors[i + 1] || vectors[i]
+
+          const x = calc('x', [v0, v1, v2, v3], t)
+          const y = calc('y', [v0, v1, v2, v3], t)
+          const z = calc('z', [v0, v1, v2, v3], t)
+          curve.push({ x, y, z })
+        }
+      }
+      return curve
+    }
+
+    const height = ctx.sender.location.y
+
+    const ps = [
+      { x: -96, y: height, z: 218 },
+      { x: -104, y: height, z: 224 },
+      { x: -111, y: height, z: 215 },
+      { x: -119, y: height, z: 224 },
+    ]
+
+    const dots = generateCurve(ps, 10)
+    let i = 0
+    const handle = system.runInterval(
+      () => {
+        const location = dots[i++]
+        if (!location) return system.clearRun(handle)
+        ctx.sender.dimension.spawnParticle('minecraft:endrod', location)
+      },
+      'aa',
+      2
+    )
+  },
+
   base(ctx) {
     ctx.sender.getComponent('inventory').container.addItem(BASE_ITEM_STACK)
   },
@@ -189,40 +255,6 @@ const tests = {
     })
 
     console.warn(util.inspect(res))
-  },
-  52(ctx) {
-    const form = new ChestFormData('large').pattern(
-      [0, 0],
-      [
-        'xxxxxxxxx',
-        'x_______x',
-        'x___a___x',
-        'x_______x',
-        'x_______x',
-        'xxxxxxxxx',
-      ],
-      {
-        x: {
-          data: {
-            itemName: 'Пусто',
-            itemDesc: [],
-            enchanted: false,
-            stackSize: 1,
-          },
-          iconPath: 'minecraft:stained_glass_pane',
-        },
-        a: {
-          data: {
-            itemName: '%item.anvil.name',
-            itemDesc: ['Click me!'],
-            enchanted: true,
-            stackSize: 1,
-          },
-          iconPath: 'minecraft:anvil',
-        },
-      }
-    )
-    showForm(form, ctx.sender)
   },
   53(ctx) {
     const rad = Number(ctx.args[1])

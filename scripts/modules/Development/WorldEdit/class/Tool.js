@@ -1,6 +1,5 @@
 import {
   ContainerSlot,
-  EquipmentSlot,
   ItemStack,
   ItemTypes,
   Player,
@@ -9,6 +8,10 @@ import {
 } from '@minecraft/server'
 import { OverTakes, util } from 'xapi.js'
 import { WE_PLAYER_SETTINGS } from '../index.js'
+
+/**
+ * @typedef {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} IntervalFunction
+ */
 
 /**
  * @template {Record<string, any> & {version: number}} [LoreFormat=any]
@@ -20,13 +23,20 @@ export class WorldEditTool {
   static tools = []
 
   /**
+   * @type {IntervalFunction[]}
+   */
+  static intervals = []
+
+  /**
    * @param {Object} o
    * @param {string} o.name
    * @param {string} o.displayName
    * @param {string} o.itemStackId
    * @param {(slot: ContainerSlot, player: Player) => void} [o.editToolForm]
    * @param {LoreFormat} [o.loreFormat]
-   * @param {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} [o.interval]
+   * @param {IntervalFunction} [o.interval0]
+   * @param {IntervalFunction} [o.interval10]
+   * @param {IntervalFunction} [o.interval20]
    * @param {(player: Player, item: ItemStack) => void} [o.onUse]
    * @param {Partial<WorldEditTool<LoreFormat>> & ThisType<WorldEditTool<LoreFormat>>} [o.overrides]
    */
@@ -36,7 +46,9 @@ export class WorldEditTool {
     itemStackId,
     editToolForm,
     loreFormat,
-    interval,
+    interval0,
+    interval10,
+    interval20,
     onUse,
     overrides,
   }) {
@@ -48,7 +60,9 @@ export class WorldEditTool {
     this.loreFormat = loreFormat ?? { version: 0 }
     this.loreFormat.version ??= 0
     this.onUse = onUse
-    this.interval = interval
+    this.interval0 = interval0
+    this.interval10 = interval10
+    this.interval20 = interval20
     if (overrides) OverTakes(this, overrides)
 
     this.command = new XCommand({
@@ -69,9 +83,7 @@ export class WorldEditTool {
    * @param {Player} player
    */
   getToolSlot(player) {
-    const slot = player
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
+    const slot = player.mainhand()
 
     if (!slot.typeId) {
       const item = ItemTypes.get(this.itemId)
@@ -169,18 +181,28 @@ export class WorldEditTool {
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
   if (!(player instanceof Player)) return
   const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
-  util.catch(() => tool && tool.onUse && tool.onUse(player, item))
+  util.catch(() => tool?.onUse?.(player, item))
 })
 
-system.runPlayerInterval(
-  player => {
-    const item = player.mainhand()
-    if (!item) return
+let ticks = 0
+system.runInterval(
+  () => {
+    for (const player of world.getAllPlayers()) {
+      const item = player.mainhand()
+      const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
+      const settings = WE_PLAYER_SETTINGS(player)
+      WorldEditTool.intervals.forEach(e => e(player, item, settings))
+      if (!tool) continue
+      /** @type {(undefined | IntervalFunction)[]} */
+      const fn = [tool.interval0]
+      if (ticks % 10 === 0) fn.push(tool.interval10)
+      if (ticks % 20 === 0) fn.push(tool.interval20)
 
-    const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
-    if (tool && tool.interval)
-      tool.interval(player, item, WE_PLAYER_SETTINGS(player))
+      fn.forEach(e => e?.(player, item, settings))
+    }
+    if (ticks >= 20) ticks = 0
+    else ticks++
   },
   'we tool',
-  10
+  0
 )

@@ -81,7 +81,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
         doorsAndSwitches: false,
         openContainers: false,
         pvp: true,
-        allowedEntitys: 'all',
+        allowedEntities: 'all',
         owners: [player.id],
       }
     )

@@ -8,15 +8,19 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
+import { ChestForm } from 'lib/Form/ChestForm.js'
 import { ActionForm } from './ActionForm.js'
 import { MessageForm } from './MessageForm.js'
 import { ModalForm } from './ModalForm.js'
 
-/** */
+/**
+ * @template {ActionForm | MessageForm | ModalForm<any> | ChestForm} Form
+ *
+ */
 export class FormCallback {
   /**
    * form that was used in this call
-   * @type {ActionForm | MessageForm | ModalForm<any>}
+   * @type {ActionForm | MessageForm | ModalForm<any> | ChestForm}
    * @private
    */
   form
@@ -28,16 +32,16 @@ export class FormCallback {
   player
   /**
    * the function that was called
-   * @type {Function}
+   * @type {Function | undefined}
    * @private
    */
   callback
   /**
    * Creates a new form callback instance that can be used by
    * buttons, and args to run various functions
-   * @param {ActionForm | MessageForm | ModalForm<any>} form form that is used in this call
+   * @param {Form} form form that is used in this call
    * @param {Player} player
-   * @param {Function} callback
+   * @param {Form extends ModalForm<any> ? Parameters<Form["show"]>[1] : never} [callback]
    */
   constructor(form, player, callback) {
     this.form = form
@@ -95,4 +99,12 @@ export async function showForm(form, player) {
       }
     } else return response
   }
+}
+
+export const BUTTON = {
+  '<': 'textures/ui/arrow_l_default',
+  '>': 'textures/ui/arrow_r_default',
+  '+': 'textures/ui/plus',
+  '-': 'textures/ui/minus',
+  '?': 'textures/ui/how_to_play_button_default_light',
 }

@@ -1,14 +1,14 @@
+interface IRegionCords {
+  x: number
+  z: number
+}
+
 interface IRegionDB {
   dimensionId: string
   from: IRegionCords
   to: IRegionCords
   key: string
   permissions: IRegionPermissions
-}
-
-interface IRegionCords {
-  x: number
-  z: number
 }
 
 interface IRegionPermissions {
@@ -27,11 +27,9 @@ interface IRegionPermissions {
   /**
    * the entitys allowed in this region
    */
-  allowedEntitys: Array<string> | 'all'
+  allowedEntities: string[] | 'all'
   /**
    * Owners of region
    */
-  owners: Array<string>
+  owners: string[]
 }
-
-type EX<T, EXT> = T extends EXT ? T : EXT

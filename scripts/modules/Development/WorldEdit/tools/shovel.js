@@ -4,8 +4,8 @@ import { ModalForm } from 'xapi.js'
 import { WorldEditTool } from '../class/Tool.js'
 import {
   blockSetDropdown,
+  getAllBlockSets,
   getBlockSet,
-  getBlockSets,
 } from '../utils/blocksSet.js'
 
 const shovel = new WorldEditTool({
@@ -34,8 +34,10 @@ const shovel = new WorldEditTool({
       .addDropdown('Набор блоков', ...blockSetDropdown(player, lore.blocksSet))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getBlockSets(player)).map(e => [e, e])),
-        { defaultValue: lore.replaceBlocksSet, none: true }
+        Object.fromEntries(
+          Object.keys(getAllBlockSets(player)).map(e => [e, e])
+        ),
+        { defaultValue: lore.replaceBlocksSet, none: true, noneText: 'Любой' }
       )
       .show(player, (_, radius, height, blocksSet, replaceBlocksSet) => {
         slot.nameTag = `§r§3Лопата §6${blocksSet}`
@@ -52,18 +54,19 @@ const shovel = new WorldEditTool({
         )
       })
   },
-  interval(player, slot) {
+  interval10(player, slot) {
     const lore = shovel.parseLore(slot.getLore())
     const blocks = getBlockSet(player, lore.blocksSet)
     const replaceBlocks = lore.replaceBlocksSet
       ? getBlockSet(player, lore.replaceBlocksSet)
       : [undefined]
     const loc = Vector.floor(player.location)
+    const offset = -1
     const pos1 = Vector.add(
       loc,
-      new Vector(-lore.radius, lore.height, -lore.radius)
+      new Vector(-lore.radius, offset - lore.height, -lore.radius)
     )
-    const pos2 = Vector.add(loc, new Vector(lore.radius, -1, lore.radius))
+    const pos2 = Vector.add(loc, new Vector(lore.radius, offset, lore.radius))
 
     WorldEdit.forPlayer(player).backup(pos1, pos2)
 

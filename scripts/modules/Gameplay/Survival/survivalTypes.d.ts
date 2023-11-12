@@ -3,6 +3,7 @@ declare module '@minecraft/server' {
     survival: {
       anarchy?: Vector3
       inv: 'anarchy' | 'spawn' | 'mg'
+      rtpElytra?: 1
     }
   }
 }

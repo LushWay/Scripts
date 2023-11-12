@@ -48,13 +48,12 @@ export function loadRegionsWithGuards(
   /**
    * Permissions for region
    */
-  world.beforeEvents.itemUseOn.subscribe(data => {
-    if (!(data.source instanceof Player)) return
+  world.beforeEvents.playerInteractWithBlock.subscribe(data => {
     const region = Region.locationInRegion(
       data.block,
-      data.source.dimension.type
+      data.player.dimension.type
     )
-    if (allowed(data.source, region, { type: 'useOn' })) return
+    if (allowed(data.player, region, { type: 'useOn' })) return
 
     if (
       DOORS_SWITCHES.includes(data.block.typeId) &&
@@ -112,9 +111,9 @@ export function loadRegionsWithGuards(
     if (spawnAllowed(region, { entity, cause })) return
     if (
       region &&
-      ((Array.isArray(region.permissions.allowedEntitys) &&
-        region.permissions.allowedEntitys.includes(typeId)) ||
-        region.permissions.allowedEntitys === 'all')
+      ((Array.isArray(region.permissions.allowedEntities) &&
+        region.permissions.allowedEntities.includes(typeId)) ||
+        region.permissions.allowedEntities === 'all')
     )
       return
 

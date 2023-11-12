@@ -62,6 +62,6 @@ export const DEFAULT_REGION_PERMISSIONS = {
   doorsAndSwitches: true,
   openContainers: true,
   pvp: false,
-  allowedEntitys: ['minecraft:player', 'minecraft:item', 'x:sit'],
+  allowedEntities: ['minecraft:player', 'minecraft:item', 'x:sit'],
   owners: [],
 }

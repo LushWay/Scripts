@@ -16,7 +16,7 @@ export class WorldEdit {
    * @param {Player} player
    */
   static forPlayer(player) {
-    if (player.id in this.instances[player.id]) return this.instances[player.id]
+    if (player.id in this.instances) return this.instances[player.id]
     return new WorldEdit(player)
   }
   /** @type {Record<string, WorldEdit>} */

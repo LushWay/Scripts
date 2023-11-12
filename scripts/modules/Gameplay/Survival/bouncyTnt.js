@@ -1,4 +1,4 @@
-import { EquipmentSlot, Player, system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import {
   MinecraftEntityTypes,
   MinecraftItemTypes,
@@ -16,9 +16,7 @@ world.beforeEvents.itemUse.subscribe(data => {
       MinecraftEntityTypes.Tnt,
       data.source.location
     )
-    const tntSlot = data.source
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
+    const tntSlot = data.source.mainhand()
 
     if (tntSlot.amount === 1) tntSlot.setItem(undefined)
     else tntSlot.amount--

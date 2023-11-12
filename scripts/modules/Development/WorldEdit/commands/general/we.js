@@ -1,8 +1,11 @@
-import { EquipmentSlot, Player } from '@minecraft/server'
-import { ActionFormResponse } from '@minecraft/server-ui'
-import { getBlockSets } from 'modules/Development/WorldEdit/utils/blocksSet.js'
-import { ActionForm, ModalForm, showForm } from 'xapi.js'
-import { ChestFormData } from '../../../../../chestui/forms.js'
+import { BlockTypes, Player } from '@minecraft/server'
+import { ChestForm } from 'lib/Form/ChestForm.js'
+import {
+  getAllBlockSets,
+  setBlockSet,
+} from 'modules/Development/WorldEdit/utils/blocksSet.js'
+import { prompt } from 'modules/Gameplay/Build/utils.js'
+import { ActionForm, BUTTON, FormCallback, ModalForm, util } from 'xapi.js'
 import { WorldEditTool } from '../../class/Tool.js'
 
 new XCommand({
@@ -10,12 +13,12 @@ new XCommand({
   aliases: ['wb', 'wa'],
   role: 'builder',
   description: 'Открывает меню редактора мира',
-}).executes(ctx => WBMenu(ctx.sender))
+}).executes(ctx => WEMenu(ctx.sender))
 
 /**
  * @param {Player} player
  */
-function WBMenu(player, body = '') {
+function WEMenu(player, body = '') {
   const heldItem = player.mainhand()
   if (heldItem.typeId) {
     body = `Создание доступно только при пустой руке.` || body
@@ -23,7 +26,7 @@ function WBMenu(player, body = '') {
 
   const form = new ActionForm('§dWorld§6Edit', body).addButton(
     'Наборы блоков',
-    () => WBBlocksSets(player)
+    () => WEBlocksSets(player)
   )
 
   for (const tool of WorldEditTool.tools) {
@@ -32,7 +35,7 @@ function WBMenu(player, body = '') {
     form.addButton(buttonName, () => {
       const slotOrError = tool.getToolSlot(player)
       if (typeof slotOrError === 'string') {
-        WBMenu(player, '§c' + slotOrError)
+        WEMenu(player, '§c' + slotOrError)
       } else {
         tool.editToolForm?.(slotOrError, player)
       }
@@ -45,10 +48,10 @@ function WBMenu(player, body = '') {
 /**
  * @param {Player} player
  */
-function WBBlocksSets(player) {
-  const blockSets = getBlockSets(player)
+function WEBlocksSets(player) {
+  const blockSets = getAllBlockSets(player)
   const sets = new ActionForm('Наборы блоков')
-  sets.addButton('Назад', () => WBMenu(player))
+  sets.addButton('Назад', () => WEMenu(player))
   sets.addButton('Новый набор блоков', 'textures/ui/plus', () => {
     new ModalForm('§3Имя')
       .addTextField(
@@ -70,61 +73,204 @@ function WBBlocksSets(player) {
   sets.show(player)
 }
 
+const split = /.{0,20}/g
+
 /**
  * @param {Player} player
  * @param {string} setName
  * @param {import('modules/Development/WorldEdit/utils/blocksSet.js').BlocksSets} sets
- * @param {"inventory" | "see" | "edit"} mode
+ * @param {boolean} canEdit
  */
-function editBlocksSet(player, setName, sets, mode = 'see') {
-  if (!(setName in sets)) mode = 'inventory'
+function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
+  const set = sets[setName] ?? []
+  if (!set) canEdit = true
 
-  const form = new ChestFormData('large')
+  const blockBelow = player.dimension.getBlock(player.location)?.below()
+  const form = new ChestForm('large')
+  /** @type {import('lib/Form/ChestForm.js').ChestButtonOptions} */
+  const empty = {
+    slot: 0,
+    icon: 'textures/blocks/glass',
+    nameTag: 'Пусто',
+  }
   form.pattern(
     [0, 0],
     [
-      'xxxxOxxxx',
-      '---------',
-      '---------',
-      '---------',
-      '---------',
-      'xxxxxxxxx',
+      '<xxx+xDx?', // row 0
+      '---------', // row 1
+      '---------', // row 2
+      canEdit ? 'xxx>B>xxx' : '---------', // row 3
+      '---------', // row 4
+      '---------', // row 5
     ],
     {
-      x: { iconPath: 'textures/blocks/glass', data: { itemName: 'Назад' } },
-      O: { iconPath: 'textures/items/arrow', data: {} },
+      '<': {
+        icon: BUTTON['<'],
+        nameTag: 'Назад',
+        callback() {
+          WEBlocksSets(player)
+        },
+      },
+      'x': empty,
+      '+': {
+        icon: add ? BUTTON['+'] : BUTTON['-'],
+        callback() {
+          editBlocksSet(player, setName, sets, canEdit, !add)
+        },
+      },
+      'D': {
+        icon: 'textures/ui/trash_light',
+        nameTag: '§cОчистить набор',
+        lore: ['§cот выключенных блоков'],
+        callback() {
+          const blocksToClear = set.filter(e => (e[2] ?? 1) < 1)
+
+          prompt(
+            player,
+            'Выключенные блоки будут очищены. Список:\n' +
+              blocksToClear.map(e => e[0].replace('minecraft:', '')).join('\n'),
+            '§cОчистить',
+            () => {
+              setBlockSet(
+                player,
+                setName,
+                set.filter(e => !blocksToClear.includes(e))
+              )
+              editBlocksSet(
+                player,
+                setName,
+                getAllBlockSets(player),
+                canEdit,
+                add
+              )
+            },
+            'Отмена',
+            () => editBlocksSet(player, setName, sets, canEdit, add)
+          )
+        },
+      },
+      '?': blockBelow
+        ? {
+            icon: BUTTON['?'],
+            nameTag: 'Редактирование набора',
+            lore:
+              'Чтобы убрать блок или уменьшить кол-во нажмите на блок сверху, чтобы добавить в набор - на блок из инвентаря, снизу.'.match(
+                split
+              ) || [],
+          }
+        : empty,
+
+      '>': {
+        icon: BUTTON['>'],
+        nameTag: 'Блок под ногами',
+        lore:
+          'Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.'.match(
+            split
+          ) || [],
+      },
+      'B': blockBelow
+        ? addBlock(
+            0,
+            blockBelow.typeId,
+            blockBelow.permutation.getAllStates(),
+            false
+          ) ?? empty
+        : empty,
     }
   )
 
-  if (mode === 'inventory') {
-    const { container } = player.getComponent('inventory')
+  /**
+   *
+   * @param {number} slot
+   * @param {string} typeId
+   * @param {Record<string, string | number | boolean> | undefined} states
+   */
+  function addBlock(slot, typeId, states, setButton = true) {
+    // Prevent from using {} state
+    if (states && Object.keys(states).length < 1) states = undefined
 
-    for (let i = 0; i < container.size; i++) {
-      const item = container.getItem(i)
-      if (item) {
-        form.button(
-          9 + i,
-          item.typeId.replace('minecraft:', ''),
-          [],
-          item.typeId
-        )
-      }
+    // If block is already in blocksSet
+    const blockInSet = set.find(
+      ([t, s]) => t === typeId && JSON.stringify(s) === JSON.stringify(states)
+    )
+
+    // Amount of block in blocksSet
+    const amount = blockInSet?.[2] ?? 0
+
+    /** @type {import('lib/Form/ChestForm.js').ChestButtonOptions} */
+    const button = {
+      slot: slot,
+      icon: typeId,
+      enchanted: amount > 0,
+      amount: amount || 1,
+      nameTag: typeId.replace('minecraft:', ''),
+      lore: [
+        '',
+        ...(states ? util.inspect(states).split('\n') : []),
+        '',
+        amount > 0
+          ? '§aВключен§f в наборе.'
+          : blockInSet
+          ? '§cВыключен§f в наборе, но остается тут.'
+          : '§7Не добавлен в набор.',
+        add
+          ? '§a[+] §rНажмите для добавления блока'
+          : // If no block in set or already disabled show nothing
+          blockInSet && amount > 0
+          ? '§c[-] §rНажмите для уменьшения кол-ва блока'
+          : '',
+      ],
+      callback() {
+        if (blockInSet) {
+          blockInSet[2] = add ? amount + 1 : amount - 1
+        } else if (add) {
+          if (set.length >= 18) {
+            new FormCallback(form, player).error(
+              'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.'
+            )
+          }
+          set.push([typeId, states])
+        }
+
+        for (const block of set) {
+          // Do not decrease below 0
+          if (typeof block[2] === 'number' && block[2] < 0) block[2] = 0
+        }
+
+        editBlocksSet(player, setName, getAllBlockSets(player), canEdit, add)
+      },
     }
-  } else if (mode === 'see') {
-    const set = sets[setName]
-    for (const [i, item] of set.entries()) {
-      if (item) {
-        form.button(9 + i, item[0].replace('minecraft:', ''), [], item[0])
-      }
+    if (setButton) form.button(button)
+    else return button
+  }
+
+  for (const [i, item] of set.entries()) {
+    if (item) {
+      const [typeId, states] = item
+      const base = 9 * 1 // 1 row
+      addBlock(base + i, typeId, states)
     }
   }
 
-  showForm(form, player).then(e => {
-    console.debug(e)
-    if (e && !e.canceled && e instanceof ActionFormResponse) {
-      if (e.selection === 4) {
-        WBBlocksSets(player)
-      }
+  if (canEdit) {
+    const { container } = player.getComponent('inventory')
+    /** @type {string[]} */
+    const blocks = []
+    for (let i = 0; i < container.size; i++) {
+      const item = container.getItem(i)
+      if (
+        !item ||
+        set.find(e => e[0] === item.typeId) ||
+        !BlockTypes.get(item.typeId) ||
+        blocks.includes(item.typeId)
+      )
+        continue
+
+      const base = 9 * 4 // 4 row
+      addBlock(base + blocks.length, item.typeId, undefined)
+      blocks.push(item.typeId)
     }
-  })
+  }
+
+  form.show(player)
 }

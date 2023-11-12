@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+import { LockAction } from 'xapi.js'
 
 export class Minigame {
   /** @type {Record<string, Minigame>} */
@@ -37,3 +38,8 @@ export class Minigame {
     Minigame.instances[name] = this
   }
 }
+
+new LockAction(
+  player => !!Minigame.getQuene(player),
+  `Вы находитесь в очереди миниигры. Выйти: §f-quit`
+)

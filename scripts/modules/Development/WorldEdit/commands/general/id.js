@@ -9,9 +9,7 @@ const root = new XCommand({
 })
 
 root.executes(ctx => {
-  const item = ctx.sender
-    .getComponent('equippable')
-    .getEquipmentSlot(EquipmentSlot.Mainhand)
+  const item = ctx.sender.mainhand()
   if (!item) return ctx.reply('§cВ руке нет предмета!')
 
   ctx.reply(

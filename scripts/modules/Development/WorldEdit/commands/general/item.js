@@ -11,9 +11,7 @@ root
   .literal({ name: 'lore', aliases: ['l'], description: 'Задает лор предмета' })
   .string('lore')
   .executes(ctx => {
-    const item = ctx.sender
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
+    const item = ctx.sender.mainhand()
     if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.getLore()
     item.setLore(ctx.args)
@@ -24,9 +22,7 @@ root
   .literal({ name: 'name', aliases: ['n'], description: 'Задает имя предмета' })
   .string('name')
   .executes((ctx, name) => {
-    const item = ctx.sender
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
+    const item = ctx.sender.mainhand()
     if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.nameTag
     item.nameTag = name

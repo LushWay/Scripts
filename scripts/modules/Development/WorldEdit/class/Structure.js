@@ -39,7 +39,7 @@ export class Structure {
       const pos1 = region.pos1
       const pos2 = region.pos2
       const result = world.overworld.runCommand(
-        `structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`,
+        `structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} false memory true`,
         { showError: true }
       )
       all++

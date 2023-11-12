@@ -103,7 +103,7 @@ JOIN.EVENTS.playerClosedGuide.subscribe(player => {
 
 MENU.OnOpen = player => {
   const regionID = DB[player.id]?.id
-  const playerRegion = CubeRegion.getAllRegions().find(e => e.key === regionID)
+  const playerRegion = CubeRegion.regions.find(e => e.key === regionID)
   if (!playerRegion) {
     player.tell(
       '§b> §3У вас не было ни одной незаархивированной площадки, поэтому мы создали вам новую.'
@@ -196,7 +196,7 @@ MENU.OnOpen = player => {
       })
     }
     toPlatform(playerRegion, '§aВаша площадка')
-    for (const reg of CubeRegion.getAllRegions().filter(
+    for (const reg of CubeRegion.regions.filter(
       e =>
         e.permissions.owners.includes(player.id) && e.key !== playerRegion.key
     )) {

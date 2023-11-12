@@ -22,7 +22,7 @@ loadRegionsWithGuards(
 )
 
 Region.config.SETTED = true
-Region.config.permissions.allowedEntitys = GLOBAL_ALLOWED_ENTITIES
+Region.config.permissions.allowedEntities = GLOBAL_ALLOWED_ENTITIES
 JOIN.CONFIG.title_animation = {
   stages: ['» $title «', '»  $title  «'],
   vars: {

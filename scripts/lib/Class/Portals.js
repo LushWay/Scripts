@@ -1,10 +1,9 @@
 import { Player, Vector } from '@minecraft/server'
 import { LockAction, Place } from 'xapi.js'
-import { Minigame } from '../Minigames/Builder.js'
 
 /**
- * @typedef {Object} TeleportOptions
- * @prop {string} [ignoreQueneName]
+ * @typedef {object} TeleportOptions
+ * @prop {Parameters<typeof LockAction['locked']>[1]} [lockActionOptions]
  * @prop {boolean} [fadeScreen=true]
  */
 
@@ -14,21 +13,8 @@ export class Portal {
    * @param {Player} player
    * @param {TeleportOptions} [options]
    */
-  static canTeleport(player, { ignoreQueneName, fadeScreen = true } = {}) {
-    /** @param {string} reason */
-    const fail = reason => {
-      player.tell('§c► ' + reason)
-      return false
-    }
-
-    const quene = Minigame.getQuene(player)?.name
-    if (quene && quene !== ignoreQueneName) {
-      return fail(
-        `Вы не можете телепортироваться, стоя в очереди. Выйти: §f-quit`
-      )
-    }
-
-    if (LockAction.locked(player)) return false
+  static canTeleport(player, { fadeScreen = true, lockActionOptions } = {}) {
+    if (LockAction.locked(player, lockActionOptions)) return false
 
     if (fadeScreen) {
       const inS = 0.5
