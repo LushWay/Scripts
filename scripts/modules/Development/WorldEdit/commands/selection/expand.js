@@ -1,11 +1,11 @@
 import { Vector } from '@minecraft/server'
-import { WEBUILD, WorldEditBuilder } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 export class SelectionManager {
   /**
    * Expands the selection area
    * @param {number} amount ammount to expand selection in all directions
-   * @param {WorldEditBuilder} builder
+   * @param {WorldEdit} builder
    * @returns {void}
    * @example expand(11);
    */
@@ -58,7 +58,7 @@ export class SelectionManager {
   /**
    * Expands the selection verticly
    * @param {number} amount ammount to expand selection in all directions
-   * @param {WorldEditBuilder} builder
+   * @param {WorldEdit} builder
    * @returns {void}
    * @example expandVert(11);
    */
@@ -75,12 +75,13 @@ const expand = new XCommand({
 })
 
 expand.int('size').executes((ctx, size) => {
-  if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
-  SelectionManager.expand(WEBUILD, size)
+  const we = WorldEdit.forPlayer(ctx.sender)
+  if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  SelectionManager.expand(we, size)
   ctx.reply(
     `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
-      WEBUILD.pos1
-    )}\n§3по \n§f${Vector.string(WEBUILD.pos2)}`
+      we.pos1
+    )}\n§3по \n§f${Vector.string(we.pos2)}`
   )
 })
 
@@ -91,11 +92,12 @@ expand
   })
   .int('size')
   .executes((ctx, size) => {
-    if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
-    SelectionManager.expandVert(WEBUILD, size)
+    const we = WorldEdit.forPlayer(ctx.sender)
+    if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+    SelectionManager.expandVert(we, size)
     ctx.reply(
       `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
-        WEBUILD.pos1
-      )}\n§3по \n§f${Vector.string(WEBUILD.pos2)}`
+        we.pos1
+      )}\n§3по \n§f${Vector.string(we.pos2)}`
     )
   })

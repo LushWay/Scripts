@@ -1,8 +1,12 @@
-import { Vector } from '@minecraft/server'
+import { Vector, world } from '@minecraft/server'
+import { WorldEdit } from 'modules/Development/WorldEdit/class/WorldEdit.js'
 import { ModalForm } from 'xapi.js'
-import { FillFloor } from '../builders/FillBuilder.js'
-import { WorldEditTool } from '../builders/ToolBuilder.js'
-import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
+import { WorldEditTool } from '../class/Tool.js'
+import {
+  blockSetDropdown,
+  getBlockSet,
+  getBlockSets,
+} from '../utils/blocksSet.js'
 
 const shovel = new WorldEditTool({
   name: 'shovel',
@@ -13,30 +17,32 @@ const shovel = new WorldEditTool({
     },
   },
   loreFormat: {
-    version: 1,
+    version: 2,
 
     blocksSet: '',
-    height: 1,
+    replaceBlocksSet: '',
     radius: 2,
+    height: 1,
+    zone: -1,
   },
   itemStackId: 'we:shovel',
   editToolForm(slot, player) {
     const lore = shovel.parseLore(slot.getLore())
     new ModalForm('§3Лопата')
       .addSlider('Радиус', 1, 10, 1, lore.radius ?? 1)
-      .addSlider('Высота', 1, 10, 1, lore.radius ?? 1)
-      .addDropdown(
-        'Набор блоков',
-        ...ModalForm.arrayAndDefault(
-          Object.keys(getBlockSets(player)),
-          lore.blocksSet
-        )
+      .addSlider('Высота', 1, 10, 1, lore.height ?? 1)
+      .addDropdown('Набор блоков', ...blockSetDropdown(player, lore.blocksSet))
+      .addDropdownFromObject(
+        'Заменяемый набор блоков',
+        Object.fromEntries(Object.keys(getBlockSets(player)).map(e => [e, e])),
+        { defaultValue: lore.replaceBlocksSet, none: true }
       )
-      .show(player, (_, radius, height, blocksSet) => {
+      .show(player, (_, radius, height, blocksSet, replaceBlocksSet) => {
         slot.nameTag = `§r§3Лопата §6${blocksSet}`
         lore.radius = radius
         lore.height = height
         lore.blocksSet = blocksSet
+        if (replaceBlocksSet) lore.replaceBlocksSet = replaceBlocksSet
         slot.setLore(shovel.stringifyLore(lore))
 
         player.tell(
@@ -48,24 +54,34 @@ const shovel = new WorldEditTool({
   },
   interval(player, slot) {
     const lore = shovel.parseLore(slot.getLore())
-    const blocks = getBlockSet(getBlockSets(player), lore.blocksSet)
-    const H = lore.height
-    const O = -1
-    const base = Vector.floor(player.location)
-
-    FillFloor(
-      Vector.add(base, new Vector(-lore.radius, H, -lore.radius)),
-      Vector.add(base, new Vector(lore.radius, O, lore.radius)),
-      blocks,
-      'any'
+    const blocks = getBlockSet(player, lore.blocksSet)
+    const replaceBlocks = lore.replaceBlocksSet
+      ? getBlockSet(player, lore.replaceBlocksSet)
+      : [undefined]
+    const loc = Vector.floor(player.location)
+    const pos1 = Vector.add(
+      loc,
+      new Vector(-lore.radius, lore.height, -lore.radius)
     )
+    const pos2 = Vector.add(loc, new Vector(lore.radius, -1, lore.radius))
+
+    WorldEdit.forPlayer(player).backup(pos1, pos2)
+
+    for (const loc of Vector.foreach(pos1, pos2)) {
+      for (const replaceBlock of replaceBlocks) {
+        world.overworld.fillBlocks(loc, loc, blocks.randomElement(), {
+          matchingBlock: replaceBlock,
+        })
+      }
+    }
   },
-  onUse(_, item) {
+  onUse(player, item) {
     const lore = item.getLore()
     if (lore[0] === '§aEnabled') {
       lore[0] = '§cDisabled'
     } else lore[0] = '§aEnabled'
 
+    player.onScreenDisplay.setActionBar(lore[0])
     item.setLore(lore)
   },
 })

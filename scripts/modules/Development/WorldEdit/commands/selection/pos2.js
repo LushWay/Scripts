@@ -1,16 +1,16 @@
 import { Vector } from '@minecraft/server'
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 new XCommand({
   name: 'pos2',
-  aliases: ['p2'],
   description: 'Устанавливает позицию 2 (использовать)',
   role: 'moderator',
 })
   .location('pos', true)
   .executes((ctx, pos) => {
-    pos = Vector.floor(pos)
+    const we = WorldEdit.forPlayer(ctx.sender)
 
-    WEBUILD.pos2 = pos
-    ctx.reply(`§d►§r (2) ${pos.x}, ${pos.y}, ${pos.z}`)
+    pos = Vector.floor(pos)
+    we.pos2 = pos
+    ctx.reply(`§d►§r (2) ${Vector.string(pos)}`)
   })

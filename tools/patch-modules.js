@@ -93,7 +93,7 @@ patchPackage('@minecraft/server', {
 		/**
 		 * Gets ContainerSlot from player mainhand
 		 */
-		mainhand(): ContainerSlot | undefined;
+		mainhand(): ContainerSlot;
 
     /**
      * See {@link Player.sendMessage}

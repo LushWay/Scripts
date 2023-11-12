@@ -90,10 +90,7 @@ export class WorldEditTool {
    * @returns {string}
    */
   getMenuButtonNameColor(player) {
-    const { typeId } = player
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
-
+    const { typeId } = player.mainhand()
     const edit = typeId === this.itemId
     const air = !typeId
     return edit ? '§2' : air ? '' : '§8'
@@ -103,10 +100,7 @@ export class WorldEditTool {
    * @returns {string}
    */
   getMenuButtonName(player) {
-    const { typeId } = player
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
-
+    const { typeId } = player.mainhand()
     const edit = typeId === this.itemId
 
     if (!this.editToolForm && edit) return ''
@@ -180,13 +174,12 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 
 system.runPlayerInterval(
   player => {
-    const item = player
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
+    const item = player.mainhand()
+    if (!item) return
 
     const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
     if (tool && tool.interval)
-      tool.interval(player, item, WE_PLAYER_SETTINGS(player)) //
+      tool.interval(player, item, WE_PLAYER_SETTINGS(player))
   },
   'we tool',
   10

@@ -1,55 +1,9 @@
 import { EquipmentSlot, Player } from '@minecraft/server'
 import { ActionFormResponse } from '@minecraft/server-ui'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { getBlockSets } from 'modules/Development/WorldEdit/utils/blocksSet.js'
 import { ActionForm, ModalForm, showForm } from 'xapi.js'
 import { ChestFormData } from '../../../../../chestui/forms.js'
-import { WorldEditTool } from '../../builders/ToolBuilder.js'
-
-/**
- * @typedef {Record<string, [string, number][]>} BlocksSets
- */
-
-/** @type {DynamicPropertyDB<string, BlocksSets | undefined>} */
-const PROPERTY = new DynamicPropertyDB('blockSets')
-const DB = PROPERTY.proxy()
-
-/** @type {BlocksSets} */
-const defaultBlockSets = {
-  'Земля': [[MinecraftBlockTypes.Grass, 0]],
-  'Воздух': [[MinecraftBlockTypes.Air, 0]],
-  'Пещерный камень': [
-    [MinecraftBlockTypes.Stone, 0],
-    [MinecraftBlockTypes.Cobblestone, 0],
-  ],
-  'Каменная стена': [
-    [MinecraftBlockTypes.MudBricks, 0],
-    [MinecraftBlockTypes.PackedMud, 0],
-    [MinecraftBlockTypes.BrickBlock, 0],
-    [MinecraftBlockTypes.CobblestoneWall, 2],
-    [MinecraftBlockTypes.HardenedClay, 0],
-    [MinecraftBlockTypes.Stone, 1],
-  ],
-}
-
-/**
- * @param {Player} player
- * @returns {BlocksSets}
- */
-export function getBlockSets(player) {
-  const playerBlockSets = DB[player.id] ?? {}
-  return { ...defaultBlockSets, ...playerBlockSets }
-}
-
-/**
- * @param {BlocksSets} sets
- * @param {string} name
- */
-export function getBlockSet(sets, name) {
-  const blocks = sets[name]
-  if (!blocks) return []
-  return blocks.map(e => e.join('.'))
-}
+import { WorldEditTool } from '../../class/Tool.js'
 
 new XCommand({
   name: 'we',
@@ -62,9 +16,7 @@ new XCommand({
  * @param {Player} player
  */
 function WBMenu(player, body = '') {
-  const heldItem = player
-    .getComponent('equippable')
-    .getEquipmentSlot(EquipmentSlot.Mainhand)
+  const heldItem = player.mainhand()
   if (heldItem.typeId) {
     body = `Создание доступно только при пустой руке.` || body
   }
@@ -121,7 +73,7 @@ function WBBlocksSets(player) {
 /**
  * @param {Player} player
  * @param {string} setName
- * @param {BlocksSets} sets
+ * @param {import('modules/Development/WorldEdit/utils/blocksSet.js').BlocksSets} sets
  * @param {"inventory" | "see" | "edit"} mode
  */
 function editBlocksSet(player, setName, sets, mode = 'see') {

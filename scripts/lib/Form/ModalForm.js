@@ -7,16 +7,6 @@ import { FormCallback, showForm } from './utils.js'
  * @template {Function} [Callback = (ctx: FormCallback) => void]
  */
 export class ModalForm {
-  /**
-   * @param {string[]} array
-   * @param {string} defaultValue
-   * @returns {[string[], number]}
-   */
-  static arrayAndDefault(array, defaultValue, none = false) {
-    if (none) array = [this.arrayDefaultNone, ...array]
-    const i = array.indexOf(defaultValue)
-    return [array, i ? i : 0]
-  }
   static arrayDefaultNone = 'Никакой'
 
   title = ''
@@ -48,10 +38,16 @@ export class ModalForm {
    * @template {string[]} T
    * @param {string} label  label to show on dropdown
    * @param {T} options  the availiabe options for this dropdown
-   * @param {number} defaultValueIndex  the default value index
+   * @param {object} [p]
+   * @param {number} [p.defaultValueIndex]  the default value index
+   * @param {T[number]} [p.defaultValue]
    * @returns {ModalForm<AppendFormField<Callback, T[number]>>} this
    */
-  addDropdown(label, options, defaultValueIndex = 0) {
+  addDropdown(label, options, { defaultValueIndex = 0, defaultValue } = {}) {
+    if (defaultValue) {
+      defaultValueIndex = options.findIndex(e => e === defaultValue)
+    }
+
     this.args.push({ type: 'dropdown', options: options })
     this.form.dropdown(label, options, defaultValueIndex)
     // @ts-expect-error This type
@@ -85,7 +81,6 @@ export class ModalForm {
         e => e === defaultValue
       )
     }
-    /** @typedef {keyof T} aa */
     /** @type {(string | null)[]} */
     let objectKeys = Object.keys(object)
     let visibleKeys = Object.values(object)

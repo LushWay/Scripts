@@ -7,7 +7,7 @@ import {
 } from '@minecraft/server'
 import { Options, XA } from 'xapi.js'
 import { SERVER } from '../../Server/Server/var.js'
-import { LOCKED_TITLES, NO_PVP_MODE, PVP } from './var.js'
+import { PVP } from './var.js'
 
 const options = Options.world('pvp', {
   enabled: {
@@ -34,15 +34,15 @@ const getPlayerSettings = Options.player('PvP', 'pvp', {
 system.runInterval(
   () => {
     if (options.enabled) {
-      for (const p of world.getPlayers({
-        scoreOptions: [{ objective: PVP.scoreboard.id }],
+      for (const player of world.getPlayers({
+        scoreOptions: [{ objective: 'pvp' }],
       })) {
-        PVP.add(p, -1)
+        player.scores.pvp--
       }
 
-      for (const e in LOCKED_TITLES) {
-        if (LOCKED_TITLES[e]) LOCKED_TITLES[e]--
-        else delete LOCKED_TITLES[e]
+      for (const e in PVP.lock_display) {
+        if (PVP.lock_display[e]) PVP.lock_display[e]--
+        else delete PVP.lock_display[e]
       }
     }
   },
@@ -54,9 +54,9 @@ XA.afterEvents.modulesLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
       if (!options.enabled) return
-      const score = PVP.get(player)
+      const score = player.scores.pvp
 
-      if (NO_PVP_MODE.includes(player.id) || score < 0) return
+      if (PVP.disabled.includes(player.id) || score < 0) return
 
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
@@ -64,7 +64,7 @@ XA.afterEvents.modulesLoad.subscribe(() => {
       const q = score === options.cooldown || score === 0
       const g = (/** @type {string} */ p) => (q ? `§4${p}` : '')
 
-      if (!LOCKED_TITLES[player.id]) {
+      if (!PVP.lock_display[player.id]) {
         ;-player.onScreenDisplay.setActionBar(
           `${g('»')} §6PvP: ${score} ${g('«')}`
         )
@@ -110,7 +110,7 @@ function onDamage(data, fatal = false) {
   if (
     !data.hurtEntity.typeId.startsWith('minecraft:') ||
     !options.enabled ||
-    NO_PVP_MODE.includes(data.hurtEntity.id)
+    PVP.disabled.includes(data.hurtEntity.id)
   )
     return
 
@@ -126,7 +126,7 @@ function onDamage(data, fatal = false) {
     data.hurtEntity.getComponent('minecraft:health')
 
   if (damage.damagingEntity instanceof Player) {
-    PVP.set(damage.damagingEntity, options.cooldown)
+    damage.damagingEntity.scores.pvp = options.cooldown
     SERVER.stats.damageGive.add(damage.damagingEntity, data.damage)
     if (fatal) SERVER.stats.kills.add(damage.damagingEntity, 1)
 
@@ -169,7 +169,7 @@ function onDamage(data, fatal = false) {
       }
       // }
 
-      LOCKED_TITLES[damage.damagingEntity.id] = 2
+      PVP.lock_display[damage.damagingEntity.id] = 2
     }
   }
 
@@ -177,7 +177,7 @@ function onDamage(data, fatal = false) {
     // skip SimulatedPlayer because of error
     if ('jump' in data.hurtEntity) return
 
-    PVP.set(data.hurtEntity, options.cooldown)
+    data.hurtEntity.scores.pvp = options.cooldown
     SERVER.stats.damageRecieve.add(data.hurtEntity, data.damage)
   }
 }

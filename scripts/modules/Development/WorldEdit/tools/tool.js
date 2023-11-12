@@ -7,7 +7,7 @@ import {
 import { ActionForm, ModalForm } from 'xapi.js'
 import { ListParticles } from '../../../../lib/List/particles.js'
 import { ListSounds } from '../../../../lib/List/sounds.js'
-import { WorldEditTool } from '../builders/ToolBuilder.js'
+import { WorldEditTool } from '../class/Tool.js'
 
 /** @type {Record<string, string[]>} */
 const actions = {
@@ -79,7 +79,7 @@ new WorldEditTool({
     function SelectFromArray(array, name, callback) {
       const none = 'Никакой'
       new ModalForm(name)
-        .addDropdown('Из списка', [none, ...array], 0)
+        .addDropdown('Из списка', [none, ...array])
         .addTextField('ID Текстом', 'Будет выбран из списка выше')
         .show(player, (ctx, list, text) => {
           let element

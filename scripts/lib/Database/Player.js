@@ -11,7 +11,6 @@ export const PLAYER_DB = new DynamicPropertyDB('player', {
   defaultValue: () => {
     return {
       join: {
-        learning: 1,
         joined: Date.now(),
       },
       survival: {

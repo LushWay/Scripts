@@ -11,13 +11,12 @@ import {
   MinecraftEffectTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore, util } from '../../../xapi.js'
+import { EditableLocation, InventoryStore, util } from 'xapi.js'
 import { MENU } from '../../Server/Menu/var.js'
 import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { RadiusRegion, Region } from '../../Server/Region/Region.js'
 import { loadRegionsWithGuards } from '../../Server/Region/index.js'
 import { Zone } from '../Minigames/BattleRoyal/zone.js'
-import './base.js'
 import { BASE_ITEM_STACK } from './base.js'
 import './bouncyTnt.js'
 import './fireworks.js'
@@ -25,23 +24,20 @@ import { Portal } from './portals.js'
 import './raid.js'
 import { randomTeleport } from './rtp.js'
 
-console.log('SURVIVAL LOADED')
+console.log('§6Gameplay mode: survival')
 
 loadRegionsWithGuards(
   // Common actions guard
   (player, region, context) => {
+    if (player.hasTag('modding')) return true
+
     if (region) {
       if (region.permissions.owners.includes(player.id)) return true
     } else {
-      const heldItem = player
-        .getComponent('equippable')
-        .getEquipmentSlot(EquipmentSlot.Mainhand)
-      if (heldItem?.isStackableWith(BASE_ITEM_STACK)) return true
+      if (player.mainhand()?.isStackableWith(BASE_ITEM_STACK)) return true
 
       if (context.type === 'break' && player.isGamemode('adventure'))
         return true
-
-      if (player.hasTag('modding')) return true
     }
   },
 
@@ -74,7 +70,7 @@ JOIN.CONFIG.title_animation = {
 }
 JOIN.CONFIG.subtitle = 'Добро пожаловать!'
 
-for (const key of Object.keys(JOIN.EVENT_DEFAULTS)) {
+for (const key of Object.keys(JOIN.EVENT_DEFAULTS).filter(e => e !== 'join')) {
   JOIN.EVENTS[key].unsubscribe(JOIN.EVENT_DEFAULTS[key])
 }
 
@@ -127,6 +123,7 @@ function spawnInventory(player) {
 }
 
 if (SPAWN.location.valid) {
+  world.setDefaultSpawnLocation(SPAWN.location)
   new Portal('spawn', null, null, player => {
     if (!Portal.canTeleport(player)) return
     spawnInventory(player)

@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { EventSignal, Options, PLAYER_DB, util } from 'xapi.js'
+import { EventSignal, Options } from 'xapi.js'
 import './subscribes.js'
 import { JOIN } from './var.js'
 
@@ -7,65 +7,45 @@ import { JOIN } from './var.js'
 // TODO Add trigger to set joined score on join
 // TODO Remove unused events
 
-world.afterEvents.playerJoin.subscribe(({ playerId }) => {
-  PLAYER_DB[playerId].waiting = 1
-})
+/**
+ * @param {Player} player
+ */
+function playerAt(player) {
+  const rotation = player.getRotation()
+  return [
+    player.location.x,
+    player.location.y,
+    player.location.z,
+    rotation.x,
+    rotation.y,
+  ]
+}
 
-system.runTimeout(
-  () => {
-    if (!util.settings.firstLoad || util.settings.BDSMode) return
-    const player = world.getAllPlayers()[0]
-    player.database.join.waiting = 1
-  },
-  'owner start screen',
-  80
-)
+world.afterEvents.playerSpawn.subscribe(({ player }) => {
+  player.database.join.position = playerAt(player)
+})
 
 system.runPlayerInterval(
   player => {
-    const data = player.database.join
+    const db = player.database.join
 
-    if (data.waiting === 1) {
-      // New player (player joined)
-      delete data.waiting
-      data.message = 1
-
-      const rot = player.getRotation()
-      data.at = [
-        player.location.x,
-        player.location.y,
-        player.location.z,
-        rot.x,
-        rot.y,
-      ]
-    }
-
-    // Pos where player joined
-    const pos = data.at
-
-    if (Array.isArray(pos)) {
-      const rot = player.getRotation()
-      const notMoved =
-        player.location.x === pos[0] &&
-        player.location.y === pos[1] &&
-        player.location.z === pos[2] &&
-        rot.x === pos[3] &&
-        rot.y === pos[4]
+    if (Array.isArray(db.position)) {
+      const notMoved = Array.equals(db.position, playerAt(player))
 
       if (notMoved) {
         // Player still stays at joined position...
         if (player.isOnGround || player.isFlying) {
-          // Player doesnt falling down, show animation
-          data.stage = data.stage ?? -1
-          data.stage++
+          // Player will not move, show animation
+          db.stage = db.stage ?? -1
+          db.stage++
           if (
-            typeof data.stage !== 'number' ||
-            data.stage >= JOIN.CONFIG.title_animation.stages.length
+            isNaN(db.stage) ||
+            db.stage >= JOIN.CONFIG.title_animation.stages.length
           )
-            data.stage = 0
+            db.stage = 0
 
           // Creating title
-          let title = JOIN.CONFIG.title_animation.stages[data.stage]
+          let title = JOIN.CONFIG.title_animation.stages[db.stage]
           for (const [key, value] of Object.entries(
             JOIN.CONFIG.title_animation.vars
           )) {
@@ -73,11 +53,9 @@ system.runPlayerInterval(
           }
 
           // Show actionBar
-          if (
-            'actionBar' in JOIN.CONFIG &&
-            typeof JOIN.CONFIG.actionBar === 'string'
-          )
+          if (JOIN.CONFIG.actionBar) {
             player.onScreenDisplay.setActionBar(JOIN.CONFIG.actionBar)
+          }
 
           player.onScreenDisplay.setTitle(title, {
             fadeInDuration: 0,
@@ -89,15 +67,10 @@ system.runPlayerInterval(
           // Player joined in air
           join(player, 'air')
         }
-      } else if (data.message) {
+      } else {
         // Player moved on ground
         join(player, 'ground')
       }
-    }
-    if (data.learning && !data.message) {
-      // Show first time join guide
-      EventSignal.emit(JOIN.EVENTS.firstTime, player)
-      delete data.learning
     }
   },
   'joinInterval',
@@ -119,51 +92,43 @@ const getSettings = Options.player('Вход', 'join', {
  * @param {"air" | "ground"} messageType
  */
 function join(player, messageType) {
-  const data = player.database.join
-  delete data.at
-  delete data.stage
-  delete data.message
+  const db = player.database.join
+  delete db.position
+  delete db.stage
 
-  data.times = (data.times ?? 0) + 1
+  db.times ??= 0
+  db.times++
 
-  for (const plr of world.getPlayers()) {
-    if (plr.id === player.id) continue
-    const settings = getSettings(plr)
-    if (settings.sound) plr.playSound(JOIN.CONFIG.messages.sound)
+  for (const other of world.getPlayers()) {
+    if (other.id === player.id) continue
+    const settings = getSettings(other)
+    if (settings.sound) other.playSound(JOIN.CONFIG.messages.sound)
     if (settings.message)
-      plr.tell(`§7${player.name} ${JOIN.CONFIG.messages[messageType]}`)
+      other.tell(`§7${player.name} ${JOIN.CONFIG.messages[messageType]}`)
   }
 
-  if (!data.learning) EventSignal.emit(JOIN.EVENTS.join, player)
   player.onScreenDisplay.setTitle('')
 
-  const oldTag = data.name
-
-  if (oldTag === player.name) return
-  if (oldTag && oldTag !== player.name) {
+  if (db.name && db.name !== player.name) {
     const message =
-      '§e> §3Игрок §f' + oldTag + ' §r§3сменил ник на §f' + player.name
+      '§e> §3Игрок §f' + db.name + ' §r§3сменил ник на §f' + player.name
 
     world.say(message)
     console.warn(message)
+    db.name = player.name
   }
 
-  data.name = player.name
+  if (db.times === 1) {
+    EventSignal.emit(JOIN.EVENTS.firstTime, player)
+  } else {
+    EventSignal.emit(JOIN.EVENTS.join, player)
+  }
 }
 
 new XCommand({
-  name: 'info',
-  description: 'Открывает гайд',
-  type: 'public',
-}).executes(ctx => {
-  ctx.sender.database.join.learning = 1
-})
-
-new XCommand({
   name: 'join',
-  role: 'admin',
-  description: 'Имитирует вход',
-  type: 'public',
+  description: 'Имитирует первый вход',
+  type: 'admin',
 }).executes(ctx => {
-  ctx.sender.database.join.waiting = 1
+  EventSignal.emit(JOIN.EVENTS.firstTime, ctx.sender)
 })

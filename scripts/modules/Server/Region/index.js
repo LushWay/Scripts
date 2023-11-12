@@ -8,7 +8,7 @@ import {
 import { GAME_UTILS } from 'xapi.js'
 import { Region } from './Region.js'
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from './config.js'
-console.log('regions loaded')
+
 let LOADED = false
 
 /**
@@ -137,4 +137,6 @@ export function loadRegionsWithGuards(
     'pvp region disable',
     20
   )
+
+  console.log('§6Regions settings loaded')
 }

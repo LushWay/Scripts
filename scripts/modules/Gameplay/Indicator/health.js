@@ -1,5 +1,5 @@
 import { Entity, system, Vector, world } from '@minecraft/server'
-import { NAME_MODIFIERS } from './var.js'
+import { PVP } from './var.js'
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {}
@@ -147,7 +147,8 @@ function getName(entity, hp = entity.getComponent('health')) {
 
   return (
     bar +
-    NAME_MODIFIERS.map(modifier => modifier(entity))
+    PVP.name_modifiers
+      .map(modifier => modifier(entity))
       .filter(result => result !== false)
       .join('')
   )

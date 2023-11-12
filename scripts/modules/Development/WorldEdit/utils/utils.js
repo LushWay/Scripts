@@ -1,29 +1,59 @@
-import { BlockTypes, world } from '@minecraft/server'
+import {
+  BlockPermutation,
+  BlockTypes,
+  Player,
+  Vector,
+  system,
+  world,
+} from '@minecraft/server'
+import { WorldEdit } from 'modules/Development/WorldEdit/class/WorldEdit.js'
+import { WE_CONFIG } from 'modules/Development/WorldEdit/config.js'
+import { Cuboid } from 'modules/Development/WorldEdit/utils/cuboid.js'
 import { Cooldown, util } from 'xapi.js'
 
 /**
- * @param {string} blockTypeID
- * @param {Vector3} location
+ * @param {Player} player
+ * @param {string} shape shape equation to caculate
+ * @param {Vector3} pos location to generate shape
+ * @param {BlockPermutation[]} blocks blocks to use to fill block
+ * @param {number} rad size of sphere
+ * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
-export function setblock(blockTypeID, location) {
-  if (blockTypeID.includes('.') || blockTypeID === 'air') {
-    // Block is written like "stone.3", so we need to get data and id
-    const [_, id, data] = /^(.+)\.(\d+)/g.exec(blockTypeID) ?? []
-    world.overworld.runCommand(
-      `setblock ${location.x} ${location.y} ${location.z} ${id} ${data}`,
-      { showError: true }
-    )
-  } else {
-    // Normal block type
-    const blockType = BlockTypes.get(
-      `minecraft:${blockTypeID.replace('minecraft:', '')}`
-    )
-    if (!blockType)
-      return util.error(
-        new TypeError(`BlockType ${blockTypeID} does not exist!`)
-      )
-    const block = world.overworld.getBlock(location)
-    block?.setType(blockType)
+export async function Shape(player, shape, pos, blocks, rad) {
+  const loc1 = { x: -rad, y: -rad, z: -rad }
+  const loc2 = { x: rad, z: rad, y: rad }
+
+  WorldEdit.forPlayer(player).backup(
+    Vector.add(pos, loc1),
+    Vector.add(pos, loc2)
+  )
+
+  const cuboid = new Cuboid(loc1, loc2)
+  const conditionFunction = new Function(
+    'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xradius, yradius, zradius}, rad',
+    `return ${shape}`
+  )
+  /** @type {(...args: number[]) => boolean} */
+  const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, rad)
+  try {
+    let blocksSet = 0
+
+    const loc1 = { x: -rad, y: -rad, z: -rad }
+    const loc2 = { x: rad, z: rad, y: rad }
+
+    for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
+      if (!condition(x, y, z)) continue
+      const location = Vector.add(pos, { x, y, z })
+      world.overworld.getBlock(location)?.setPermutation(blocks.randomElement())
+      blocksSet++
+
+      if (blocksSet >= WE_CONFIG.BLOCKS_BEFORE_AWAIT) {
+        await system.sleep(WE_CONFIG.TICKS_TO_SLEEP)
+        blocksSet = 0
+      }
+    }
+  } catch (e) {
+    util.error(e)
   }
 }
 

@@ -2,7 +2,7 @@ const commands = [
   './general/desel.js',
   './general/drawsel.js',
   './general/id.js',
-  './general/menu.js',
+  './general/we.js',
   './general/item.js',
   './general/redo.js',
   './general/undo.js',

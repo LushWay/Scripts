@@ -13,7 +13,7 @@ module.exports.rules = {
 
           if (rightModule) {
             context.report({
-              node,
+              node: node.source,
               messageId: 'useDotJs',
               fix(fixer) {
                 return fixer.replaceText(node.source, "'" + rightModule + "'")
@@ -29,7 +29,7 @@ module.exports.rules = {
       },
       messages: {
         useDotJs:
-          'This is not minecraft module, use .js extension for polyfill',
+          'This will cause error during runtime because it is not minecraft module, use .js extension to import polyfill',
       },
       fixable: 'code',
       type: 'problem',

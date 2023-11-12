@@ -16,6 +16,7 @@ import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
+import { BASE_ITEM_STACK } from 'modules/Gameplay/Survival/base.js'
 import { DB, GAME_UTILS, Place, showForm, util } from 'xapi.js'
 import { ChestFormData } from '../../../chestui/forms.js'
 import { APIRequest } from '../../../lib/Class/Net.js'
@@ -30,6 +31,9 @@ world.afterEvents.chatSend.subscribe(event => {
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  base(ctx) {
+    ctx.sender.getComponent('inventory').container.addItem(BASE_ITEM_STACK)
+  },
   0() {
     console.log('This is log §6color§r test §lbold')
     console.info('This is info test')

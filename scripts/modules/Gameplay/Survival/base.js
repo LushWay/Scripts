@@ -15,47 +15,34 @@ import { RadiusRegion, Region } from '../../Server/Region/Region.js'
 import { MoneyCost, Store } from '../../Server/Server/store.js'
 import { baseMenu } from './baseMenu.js'
 
-/**
- * @type {Vector3[]}
- */
-let bases = []
-
-function updateBases() {
-  bases = RadiusRegion.regions.map(e => e.center)
-}
-
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel)
-BASE_ITEM_STACK.setLore(['Поставьте эту бочку и она', 'станет базой.'])
+BASE_ITEM_STACK.setLore(['Поставьте эту бочку', 'и она станет базой.'])
 
 new Store({ x: -234, y: 65, z: -74 }, 'overworld').addItem(
   BASE_ITEM_STACK,
   new MoneyCost(10)
 )
 
-world.beforeEvents.itemUseOn.subscribe(data => {
-  const { source, block, faceLocation, itemStack } = data
-  if (
-    !itemStack.isStackableWith(BASE_ITEM_STACK) ||
-    !(source instanceof Player) ||
-    LockAction.locked(source)
-  )
+world.beforeEvents.playerPlaceBlock.subscribe(event => {
+  const { player, block, faceLocation, itemStack } = event
+  if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player))
     return
 
   const region = RadiusRegion.regions.find(e =>
-    e.permissions.owners.includes(source.nameTag)
+    e.permissions.owners.includes(player.id)
   )
 
   if (region) {
-    const isOwner = region.permissions.owners[0] === source.id
-    data.cancel = true
-    return source.tell(
+    const isOwner = region.permissions.owners[0] === player.id
+    event.cancel = true
+    return player.tell(
       `§cВы уже ${
         isOwner
           ? 'владеете базой'
           : `состоите в базе игрока '${Player.name(
               region.permissions.owners[0]
             )}'`
-      } !`
+      }!`
     )
   }
 
@@ -63,29 +50,26 @@ world.beforeEvents.itemUseOn.subscribe(data => {
     if (r instanceof RadiusRegion) {
       return Vector.distance(r.center, block.location) < r.radius + 100
     } else {
-      const from = {
-        x: r.from.x,
-        y: Region.config.LOWEST_Y_VALUE,
-        z: r.from.z,
-      }
-      const to = { x: r.to.x, y: Region.config.HIGEST_Y_VALUE, z: r.to.z }
+      const from = { x: r.from.x, y: 0, z: r.from.z }
+      const to = { x: r.to.x, y: 0, z: r.to.z }
 
       const min = Vector.min(from, to)
       const max = Vector.max(from, to)
 
       const size = 30
+      block.location.y
 
       return Vector.between(
         Vector.add(min, { x: -size, y: 0, z: -size }),
         Vector.add(max, { x: size, y: 0, z: size }),
-        block.location
+        { x: block.x, y: 0, z: block.z }
       )
     }
   })
 
   if (nearRegion) {
-    data.cancel = true
-    return source.tell('§cРядом есть другие регионы!')
+    event.cancel = true
+    return player.tell('§cРядом есть другие регионы!')
   }
 
   system.run(() => {
@@ -98,13 +82,13 @@ world.beforeEvents.itemUseOn.subscribe(data => {
         openContainers: false,
         pvp: true,
         allowedEntitys: 'all',
-        owners: [source.id],
+        owners: [player.id],
       }
     )
-    source.tell(
+    player.tell(
       '§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base'
     )
-    source.playSound('random.levelup')
+    player.playSound('random.levelup')
   })
 })
 
@@ -128,7 +112,7 @@ base.executes(ctx => {
 
 system.runInterval(
   () => {
-    const playersLocations = world.getPlayers().map(p => {
+    const playersLocations = world.getAllPlayers().map(p => {
       return { dimension: p.dimension.type, loc: p.location }
     })
 
@@ -162,8 +146,6 @@ system.runInterval(
       })
       base.delete()
     }
-
-    updateBases()
   },
   'baseInterval',
   10

@@ -1,5 +1,5 @@
 import { util } from 'xapi.js'
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 /** @type {( "none" | "x" | "xz" | "z")[]} */
 const rotTypes = ['none', 'x', 'xz', 'z']
@@ -29,8 +29,9 @@ new XCommand({
       if (!util.isKeyof(rotation, { 0: 0, 90: 90, 180: 180, 270: 270 }))
         return ctx.error('Неправильный градус: §f' + rotation)
 
+      const we = WorldEdit.forPlayer(ctx.sender)
       ctx.reply(
-        WEBUILD.paste(
+        we.paste(
           ctx.sender,
           rotation,
           mirror,

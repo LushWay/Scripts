@@ -1,10 +1,10 @@
 import { Vector, world } from '@minecraft/server'
 import { ModalForm } from 'xapi.js'
-import { Shape } from '../builders/ShapeBuilder.js'
-import { WorldEditTool } from '../builders/ToolBuilder.js'
-import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
+import { WorldEditTool } from '../class/Tool.js'
 import { WE_CONFIG } from '../config.js'
+import { blockSetDropdown, getBlockSet } from '../utils/blocksSet.js'
 import { SHAPES } from '../utils/shapes.js'
+import { Shape } from '../utils/utils.js'
 
 world.overworld
   .getEntities({
@@ -30,19 +30,9 @@ const brush = new WorldEditTool({
     const shapes = Object.keys(SHAPES)
 
     new ModalForm('§3Кисть')
-      .addDropdown(
-        'Форма',
-        shapes,
-        shapes.findIndex(e => e === lore.shape)
-      )
+      .addDropdown('Форма', shapes, { defaultValue: lore.shape })
       .addSlider('Размер', 1, 10, 1, lore.size)
-      .addDropdown(
-        'Набор блоков',
-        ...ModalForm.arrayAndDefault(
-          Object.keys(getBlockSets(player)),
-          lore.blocksSet
-        )
-      )
+      .addDropdown('Набор блоков', ...blockSetDropdown(player, lore.blocksSet))
       .show(player, (ctx, shape, radius, blocksSet) => {
         if (!SHAPES[shape]) return ctx.error('§c' + shape)
         lore.shape = shape
@@ -93,10 +83,11 @@ const brush = new WorldEditTool({
     })
 
     if (dot) {
-      new Shape(
+      Shape(
+        player,
         SHAPES[lore.shape],
         dot.block.location,
-        getBlockSet(getBlockSets(player), lore.blocksSet),
+        getBlockSet(player, lore.blocksSet),
         lore.size
       )
     }

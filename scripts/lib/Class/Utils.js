@@ -175,3 +175,18 @@ export const GAME_UTILS = {
     }
   },
 }
+
+export class Instance {
+  /**
+   * @type {Record<string, Instance>}
+   */
+  static instances = {}
+
+  /**
+   * @param {string} id
+   */
+  constructor(id) {
+    if (id in Instance.instances) return Instance.instances[id]
+    Instance.instances[id] = this
+  }
+}

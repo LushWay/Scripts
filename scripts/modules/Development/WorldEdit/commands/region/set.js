@@ -1,7 +1,7 @@
 import { BlockTypes, Player } from '@minecraft/server'
 import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 import { Cuboid } from '../../utils/cuboid.js'
 
 const set = new XCommand({
@@ -17,24 +17,26 @@ set
   .string('other', true)
   .int('otherData', true)
   .executes((ctx, block, blockData, mode, other, otherData) => {
-    if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+    const we = WorldEdit.forPlayer(ctx.sender)
+    if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
 
     if (!blockIsAvaible(block, ctx.sender)) return
     if (other && !blockIsAvaible(other, ctx.sender)) return
 
-    const time = timeCaculation(WEBUILD.pos1, WEBUILD.pos2)
+    const time = timeCaculation(we.pos1, we.pos2)
     if (time >= 0.01)
       ctx.reply(
         `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
       )
 
-    WEBUILD.fillBetween(block, blockData, mode, other, otherData).then(result =>
+    we.fillBetween(block, blockData, mode, other, otherData).then(result =>
       ctx.reply(result)
     )
   })
 
 set.executes(ctx => {
-  if (!WEBUILD.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  const we = WorldEdit.forPlayer(ctx.sender)
+  if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
   ctx.reply('§b> §3Закрой чат!')
   new ModalForm('Заполнить')
     .addTextField('Блок', 'e.g. stone', '')
@@ -57,13 +59,13 @@ set.executes(ctx => {
       if (!blockIsAvaible(block, ctx.sender)) return
       if (other && !blockIsAvaible(other, ctx.sender)) return
 
-      const time = timeCaculation(WEBUILD.pos1, WEBUILD.pos2)
+      const time = timeCaculation(we.pos1, we.pos2)
       if (time >= 0.01)
         ctx.reply(
           `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
         )
 
-      WEBUILD.fillBetween(
+      we.fillBetween(
         block,
         blockData,
         mode === 'Отключено' ? '' : mode,

@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 
@@ -81,7 +81,7 @@ export class Structure {
     let errors = 0
     let all = 0
     for (const file of this.files) {
-      const result = await world.overworld.runCommand(
+      const result = world.overworld.runCommand(
         `structure load "${file.name}" ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`,
         {
           showError: true,
@@ -105,7 +105,7 @@ export class Structure {
         // 	"structureLoad"
         // );
       }
-      await system.sleep(1)
+      await nextTick
     }
     if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не загружено.`)
   }

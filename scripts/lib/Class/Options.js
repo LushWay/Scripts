@@ -155,7 +155,7 @@ export class EditableLocation {
     if (!location) {
       if (fallback === false) {
         console.warn(
-          '§eSet location §f' + id + '§e used in\n' + util.error.stack.get()
+          '§eEmpty location §f' + id + '\n§r' + util.error.stack.get(1)
         )
         this.valid = false
         return

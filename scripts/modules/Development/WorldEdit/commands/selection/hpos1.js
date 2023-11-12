@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 new XCommand({
   type: 'we',
@@ -8,8 +8,9 @@ new XCommand({
   role: 'moderator',
 }).executes(ctx => {
   const pos = ctx.sender.getBlockFromViewDirection()
-  if (!pos) return ctx.reply('Неа!')
+  if (!pos) return ctx.error('Нет блока')
 
-  WEBUILD.pos1 = pos.block.location
-  ctx.reply(`§5Позиция§r 1 теперь ${Vector.string(WEBUILD.pos1)}`)
+  const we = WorldEdit.forPlayer(ctx.sender)
+  we.pos1 = pos.block.location
+  ctx.reply(`§5Позиция§r 1 теперь ${Vector.string(we.pos1)}`)
 })

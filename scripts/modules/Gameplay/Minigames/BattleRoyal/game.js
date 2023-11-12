@@ -9,7 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 import { EventSignal, XA } from 'xapi.js'
-import { NO_PVP_MODE } from '../../Indicator/var.js'
+import { PVP } from '../../Indicator/var.js'
 import { teleportToBR } from './index.js'
 import { rtp } from './rtp.js'
 import { BATTLE_ROYAL_EVENTS, BR_CONFIG, BR_DB } from './var.js'
@@ -125,7 +125,7 @@ class BattleRoyal {
         // Тэги
         const p = Player.fetch(e)
         this.tags.forEach(e => p.addTag(e))
-        NO_PVP_MODE.push(p.id)
+        PVP.disabled.push(p.id)
 
         // Список
         this.players.push(p)

@@ -1,7 +1,7 @@
 import { system, Vector, world } from '@minecraft/server'
 import { Options } from 'xapi.js'
-import './builders/ToolBuilder.js'
-import './builders/WorldEditBuilder.js'
+import './class/Tool.js'
+import './class/WorldEdit.js'
 
 // Lazy load to prevent script spike
 system.runTimeout(() => import('./commands/index.js'), 'command import', 40)

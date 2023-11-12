@@ -9,7 +9,6 @@ const modules = [
   './Server/PlayerJoin/join.js',
   './Server/Server/index.js',
   './Server/Leaderboards/index.js',
-  './Server/Objectives/index.js',
 
   /**
    * Gameplay modules

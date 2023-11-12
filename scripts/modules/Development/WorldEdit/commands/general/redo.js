@@ -1,4 +1,4 @@
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 new XCommand({
   type: 'we',
@@ -8,6 +8,8 @@ new XCommand({
 })
   .int('redoCount', true)
   .executes((ctx, r) => {
-    const status = WEBUILD.redo(!isNaN(r) ? r : 1)
+    const we = WorldEdit.forPlayer(ctx.sender)
+
+    const status = we.redo(!isNaN(r) ? r : 1)
     if (status) ctx.reply(status)
   })

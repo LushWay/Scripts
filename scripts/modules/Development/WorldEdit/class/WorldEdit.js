@@ -9,10 +9,25 @@ import { Cooldown, util } from 'xapi.js'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 import { get } from '../utils/utils.js'
-import { Structure } from './StructureBuilder.js'
+import { Structure } from './Structure.js'
 
-export class WorldEditBuilder {
+export class WorldEdit {
+  /**
+   * @param {Player} player
+   */
+  static forPlayer(player) {
+    if (player.id in this.instances[player.id]) return this.instances[player.id]
+    return new WorldEdit(player)
+  }
+  /** @type {Record<string, WorldEdit>} */
+  static instances = {}
+
   drawselection = WE_CONFIG.DRAW_SELECTION_DEFAULT
+
+  /**
+   * @type {Cuboid}
+   */
+  selectionCuboid
 
   /**
    * @type {Vector3}
@@ -22,11 +37,6 @@ export class WorldEditBuilder {
    * @type {Vector3}
    */
   #pos2 = Vector.one
-
-  /**
-   * @type {Cuboid}
-   */
-  selectionCuboid
 
   get pos1() {
     return this.#pos1
@@ -66,7 +76,26 @@ export class WorldEditBuilder {
     name: '',
   }
 
-  constructor() {}
+  /**
+   * @type {Player}
+   */
+  player
+
+  /**
+   * @param {Player} player
+   */
+  constructor(player) {
+    const id = player.id
+    if (id in WorldEdit.instances) return WorldEdit.instances[id]
+    WorldEdit.instances[id] = this
+    this.player = player
+    const event = world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+      if (playerId !== this.player.id) return
+
+      world.afterEvents.playerLeave.unsubscribe(event)
+      delete WorldEdit.instances[id]
+    })
+  }
 
   drawSelection() {
     if (!this.drawselection || !this.selectionCuboid) return
@@ -76,15 +105,10 @@ export class WorldEditBuilder {
     )
     if (selectedSize > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
     const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid
-    const gen = Vector.foreach(
+    for (const { x, y, z } of Vector.foreach(
       this.selectionCuboid.min,
       this.selectionCuboid.max
-    )
-    let step
-    while (!step?.done) {
-      step = gen.next()
-      if (!step.value) continue
-      const { x, y, z } = step.value
+    )) {
       const q =
         ((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
         ((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
@@ -289,14 +313,11 @@ export class WorldEditBuilder {
     return `§b► ${reply}`
   }
 }
-/**
- * @deprecated Migrate to personal WEBUILD
- */
-export const WEBUILD = new WorldEditBuilder()
 
 system.runInterval(
   () => {
-    WEBUILD.drawSelection()
+    for (const build of Object.values(WorldEdit.instances))
+      build.drawSelection()
   },
   'we Selection',
   20

@@ -104,7 +104,8 @@ declare module '@minecraft/server' {
     role?: keyof typeof ROLES
     quest?: import('./Class/Quest').QuestDB
   }
-  type ScoreNames = 'money' | 'leafs'
+
+  type ScoreNames = 'money' | 'leafs' | 'pvp'
   interface Player {
     scores: Record<ScoreNames, number>
     database: PlayerDatabase

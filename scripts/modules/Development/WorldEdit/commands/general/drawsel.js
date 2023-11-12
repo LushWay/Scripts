@@ -1,4 +1,4 @@
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 new XCommand({
   type: 'we',
@@ -6,10 +6,12 @@ new XCommand({
   description: 'Переключает отрисовку текущего выделения',
   role: 'moderator',
 }).executes(ctx => {
-  WEBUILD.drawselection = !WEBUILD.drawselection
+  const we = WorldEdit.forPlayer(ctx.sender)
+
+  we.drawselection = !we.drawselection
   ctx.reply(
     `§3► §fОтображение выделения: ${
-      WEBUILD.drawselection ? '§aвключено' : '§cвыключено'
+      we.drawselection ? '§aвключено' : '§cвыключено'
     }`
   )
 })

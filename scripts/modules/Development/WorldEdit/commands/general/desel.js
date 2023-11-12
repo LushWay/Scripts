@@ -1,4 +1,4 @@
-import { WEBUILD } from '../../builders/WorldEditBuilder.js'
+import { WorldEdit } from '../../class/WorldEdit.js'
 
 new XCommand({
   type: 'we',
@@ -6,6 +6,7 @@ new XCommand({
   description: 'Выключает отрисовку текущего выделения',
   role: 'moderator',
 }).executes(ctx => {
-  WEBUILD.pos1 = WEBUILD.pos2 = { x: 0, z: 0, y: 0 }
+  const we = WorldEdit.forPlayer(ctx.sender)
+  we.pos1 = we.pos2 = { x: 0, z: 0, y: 0 }
   ctx.reply(`§3► §fОчищено.`)
 })

@@ -1,19 +1,16 @@
 declare global {
-  interface IJoinData {
+  interface JoinProperty {
     name?: string | undefined
-    waiting?: 1 | undefined
-    at?: number[]
+    position?: number[]
     stage?: number
     times?: number
-    learning?: 1 | undefined
-    message?: 1 | undefined
     joined?: number
   }
 }
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
-    join: IJoinData
+    join: JoinProperty
   }
 }
 

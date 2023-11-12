@@ -1,9 +1,8 @@
 import { EquipmentSlot, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { ModalForm } from 'xapi.js'
-import { WorldEditTool } from '../builders/ToolBuilder.js'
-import { getBlockSet, getBlockSets } from '../commands/general/menu.js'
-import { setblock } from '../utils/utils.js'
+import { WorldEditTool } from '../class/Tool.js'
+import { blockSetDropdown, getBlockSet } from '../utils/blocksSet.js'
 
 const nylium = new WorldEditTool({
   name: 'nylium',
@@ -17,13 +16,7 @@ const nylium = new WorldEditTool({
   editToolForm(slot, player) {
     const lore = nylium.parseLore(slot.getLore())
     new ModalForm('§3' + this.displayName)
-      .addDropdown(
-        'Набор блоков',
-        ...ModalForm.arrayAndDefault(
-          Object.keys(getBlockSets(player)),
-          lore.blocksSet
-        )
-      )
+      .addDropdown('Набор блоков', ...blockSetDropdown(player, lore.blocksSet))
       .show(player, (_, blocksSet) => {
         lore.blocksSet = blocksSet
         slot.nameTag = '§r§3> §f' + blocksSet
@@ -42,16 +35,16 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
     return
 
   system.run(() => {
-    const slot = player
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
-    const blocksSets = getBlockSets(player)
+    const slot = player.mainhand()
     const name = nylium.parseLore(slot.getLore())?.blocksSet
+    const blocksSet = getBlockSet(player, name)
 
-    if (name in blocksSets) {
-      setblock(getBlockSet(blocksSets, name).randomElement(), block.location)
+    if (blocksSet.length) {
+      player.dimension
+        .getBlock(block.location)
+        ?.setPermutation(blocksSet.randomElement())
     } else {
-      player.tell('§cНеизвестный набор блоков! Выберите существующий из списка')
+      player.tell(`§cПустой набор блоков '§f${name}'§c! Выберите другой.`)
       nylium.editToolForm?.(slot, player)
     }
   })
