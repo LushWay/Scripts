@@ -1,5 +1,21 @@
 import * as fs from 'fs/promises'
 import path from 'path'
+import { pathInfo } from 'leafy-utils'
+import { existsSync } from 'fs'
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const { relative } = pathInfo(import.meta.url)
+
+/**
+ * @param {string} name
+ */
+export function resolve(name) {
+  const pathes = ['.', '../', '../../', '../../../', '../../../../']
+  for (const p of pathes) {
+    const base = relative(p, 'node_modules', name)
+    if (existsSync(base)) return base
+  }
+  throw new Error('Cannot find module folder: ' + name)
+}
 
 const LAST_UPDATE_PATH = path.join(process.cwd(), 'tools', 'last-update')
 /** @type {string} */
@@ -24,7 +40,7 @@ export async function patchPackage(packageName, options) {
   }
 
   // Get the path to the package's TypeScript definition file
-  const packagePath = path.join('node_modules', packageName, `index.d.ts`)
+  const packagePath = path.join(resolve(packageName), `index.d.ts`)
   const stat = await fs.stat(packagePath)
 
   if (stat.mtimeMs.toString() === LAST_UPDATE) return

@@ -18,11 +18,13 @@ new XCommand({
   description: 'Выдает/убирает меню из инвентаря',
   type: 'public',
 }).executes(async ctx => {
-  try {
-    ctx.sender.runCommand(`testfor @s[hasitem={item=${MENU.item.typeId}}]`)
+  const item = ctx.sender.runCommand(
+    `testfor @s[hasitem={item=${MENU.item.typeId}}]`
+  ).successCount
+  if (item) {
     ctx.sender.runCommand(`clear @s ${MENU.item.typeId}`)
     ctx.reply('§c- §3Меню')
-  } catch (e) {
+  } else {
     ctx.sender.getComponent('inventory').container.addItem(MENU.item)
     ctx.reply('§a+ §3Меню')
   }

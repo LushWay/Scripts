@@ -3,6 +3,7 @@ import { util } from '../xapi.js'
 const modules = [
   './Server/Admin/index.js',
   './Server/Chat/index.js',
+  './Server/Catscene/index.js',
   './Server/DatabaseView/index.js',
   './Server/HelpCommand/index.js',
   './Server/Menu/index.js',

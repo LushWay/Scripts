@@ -1,4 +1,5 @@
 node_modules
 yarn-error.log
+.yarn
 tools/last-update
 scripts/@minecraft/vanilla-data.js

@@ -38,7 +38,6 @@ export const SERVER = {
         .inspect(Object.fromEntries(Object.entries(TYPES)))
         .replace('{', '')
         .replace('}', '')}`,
-      requires: true,
     },
   }),
   type: 'unknown',

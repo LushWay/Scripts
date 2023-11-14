@@ -2,7 +2,7 @@
   "name": "eslint-plugin-scriptapi",
   "main": "index.js",
   "type": "commonjs",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "eslintConfig": {
     "rules": {
       "@typescript-eslint/no-var-requires": "off"

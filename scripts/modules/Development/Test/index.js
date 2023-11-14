@@ -17,6 +17,7 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { BASE_ITEM_STACK } from 'modules/Gameplay/Survival/base.js'
+import { Catscene } from 'modules/Server/Catscene/index.js'
 import { DB, GAME_UTILS, Place, util } from 'xapi.js'
 import { APIRequest } from '../../../lib/Class/Net.js'
 import { generateOre } from '../../Gameplay/Survival/ore.js'
@@ -32,35 +33,31 @@ world.afterEvents.chatSend.subscribe(event => {
 const tests = {
   async bezier(ctx) {
     /**
+     * @param {keyof Vector3} a - Axis
+     * @param {[Vector3, Vector3, Vector3, Vector3]} vectors - Vectors list
+     * @param {number} t
+     */
+    function calc(a, vectors, t) {
+      const [v0, v1, v2, v3] = vectors
+      const t2 = t * t
+      const t3 = t2 * t
+      return (
+        0.5 *
+        (2 * v1[a] +
+          (-v0[a] + v2[a]) * t +
+          (2 * v0[a] - 5 * v1[a] + 4 * v2[a] - v3[a]) * t2 +
+          (-v0[a] + 3 * v1[a] - 3 * v2[a] + v3[a]) * t3)
+      )
+    }
+    /**
      * @param {Vector3[]} vectors
      * @param {number} numPoints
      */
     function generateCurve(vectors, numPoints) {
       const curve = []
-      /**
-       *
-       * @param {keyof Vector3} axis
-       * @param {[Vector3, Vector3, Vector3, Vector3]} vs
-       * @param {number} t
-       * @returns
-       */
-      function calc(axis, vs, t) {
-        const [v0, v1, v2, v3] = vs
-        const t2 = t * t
-        const t3 = t2 * t
-        return (
-          0.5 *
-          (2 * v1[axis] +
-            (-v0[axis] + v2[axis]) * t +
-            (2 * v0[axis] - 5 * v1[axis] + 4 * v2[axis] - v3[axis]) * t2 +
-            (-v0[axis] + 3 * v1[axis] - 3 * v2[axis] + v3[axis]) * t3)
-        )
-      }
       for (let i = 0; i < vectors.length - 1; i++) {
         for (let j = 0; j < numPoints; j++) {
           const t = j / numPoints
-          const t2 = t * t
-          const t3 = t2 * t
           const v0 = vectors[i - 1] || vectors[i]
           const v1 = vectors[i]
           const v2 = vectors[i + 1] || vectors[i]
@@ -95,6 +92,17 @@ const tests = {
       'aa',
       2
     )
+  },
+
+  scene(ctx) {
+    const name = ctx.args[1]
+    if (!(name in Catscene.instances))
+      return ctx.error(Object.keys(Catscene.instances).join('\n'))
+    Catscene.instances[name].play(ctx.sender)
+  },
+
+  slot(ctx) {
+    ctx.reply(ctx.sender.selectedSlot)
   },
 
   base(ctx) {

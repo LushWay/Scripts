@@ -115,7 +115,7 @@ function poptions(player) {
     const name = Options.playerMap[groupName][OPTIONS_NAME]
     if (name)
       form.addButton(name, null, () => {
-        group(player, groupName, 'PLAYER')
+        optionsGroup(player, groupName, 'PLAYER')
       })
   }
 
@@ -147,7 +147,7 @@ function options(player) {
       `${groupName}${requires ? ` §c(${requires}!)` : ''}`,
       null,
       () => {
-        group(player, groupName, 'WORLD')
+        optionsGroup(player, groupName, 'WORLD')
       }
     )
   }
@@ -162,7 +162,7 @@ function options(player) {
  * @param {"PLAYER" | "WORLD"} groupType
  * @param {Record<string, string>} [errors]
  */
-function group(player, groupName, groupType, errors = {}) {
+export function optionsGroup(player, groupName, groupType, errors = {}) {
   const source = groupType === 'PLAYER' ? Options.playerMap : Options.worldMap
   const config = source[groupName]
   const name = config[OPTIONS_NAME]
@@ -170,7 +170,7 @@ function group(player, groupName, groupType, errors = {}) {
 
   /** @type {[string, (input: string | boolean) => string][]} */
   const buttons = []
-  /** @type {ModalForm<(ctx: FormCallback, ...options: any) => void>} */
+  /** @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>} */
   const form = new ModalForm(name ?? groupName)
 
   for (const KEY in config) {
@@ -251,7 +251,7 @@ function group(player, groupName, groupType, errors = {}) {
     }
 
     if (Object.keys(messages).length)
-      group(player, groupName, groupType, messages)
+      optionsGroup(player, groupName, groupType, messages)
     else {
       if (groupType === 'PLAYER') poptions(player)
       else options(player)

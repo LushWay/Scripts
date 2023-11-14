@@ -1,4 +1,6 @@
-import { m, patchPackage } from './utils.js'
+import fs from 'fs'
+import path from 'path'
+import { m, patchPackage, relative, resolve } from './utils.js'
 
 patchPackage('@minecraft/server', {
   classes: {
@@ -368,9 +370,7 @@ type EntityComponents = {
   },
 })
 
-import fs from 'fs'
-
 fs.copyFileSync(
-  './node_modules/@minecraft/vanilla-data/lib/index.js',
-  './scripts/@minecraft/vanilla-data.js'
+  path.join(resolve('@minecraft/vanilla-data'), 'lib/index.js'),
+  relative('../scripts/@minecraft/vanilla-data.js')
 )

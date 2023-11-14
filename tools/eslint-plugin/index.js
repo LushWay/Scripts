@@ -25,11 +25,11 @@ module.exports.rules = {
     },
     meta: {
       docs: {
-        description: "Don't use wrong modules",
+        description: "Don't use wrong modules.",
       },
       messages: {
         useDotJs:
-          'This will cause error during runtime because it is not minecraft module, use .js extension to import polyfill',
+          'This will cause error during runtime because it is not minecraft module, use .js extension to import polyfill.',
       },
       fixable: 'code',
       type: 'problem',
