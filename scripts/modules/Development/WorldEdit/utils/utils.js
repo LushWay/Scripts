@@ -5,10 +5,10 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { WorldEdit } from 'modules/Development/WorldEdit/class/WorldEdit.js'
-import { WE_CONFIG } from 'modules/Development/WorldEdit/config.js'
-import { Cuboid } from 'modules/Development/WorldEdit/utils/cuboid.js'
 import { Cooldown, util } from 'xapi.js'
+import { WorldEdit } from '../class/WorldEdit.js'
+import { WE_CONFIG } from '../config.js'
+import { Cuboid } from './cuboid.js'
 
 /**
  * @param {Player} player
