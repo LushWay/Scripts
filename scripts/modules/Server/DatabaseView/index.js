@@ -21,10 +21,10 @@ function selectTable(player, firstCall) {
   const form = new ActionForm('Таблицы данных')
   for (const key in DynamicPropertyDB.keys) {
     const DB = DynamicPropertyDB.keys[key]
-    const name = `${key} §7${Object.keys(DB).length}§r`
-    form.addButton(name, null, () => {
+    const name = `${key} §7${Object.keys(DB.proxy()).length}§r`
+    form.addButton(name, () => 
       showTable(player, key)
-    })
+    )
   }
   form.show(player)
   if (firstCall) player.tell('§l§b> §r§3Закрой чат!')
@@ -41,8 +41,8 @@ function showTable(player, table) {
   const proxy = DB.proxy()
 
   const menu = new ActionForm(`${table}`)
-  menu.addButton('§b§l<§r§3 Назад§r', null, () => selectTable(player))
-  menu.addButton('§3Новое значение§r', null, () => {
+  menu.addButton('§b§l<§r§3 Назад§r',() => selectTable(player))
+  menu.addButton('§3Новое значение§r', () => {
     const form = new ModalForm('§3+Значение в §f' + table).addTextField(
       'Ключ',
       ' '
@@ -56,17 +56,17 @@ function showTable(player, table) {
       system.run(() => showTable(player, table))
     })
   })
-  menu.addButton('§3Посмотреть в §fRAW', null, () => {
-    const raw = DB.source.getDynamicProperty(DB.key)
+  menu.addButton('§3Посмотреть в §fRAW', () => {
+    let raw = DB.source.getDynamicProperty(DB.key)
+    try {
+      if (typeof raw === 'string') raw = JSON.parse(raw)
+    } catch {}
+
     new ActionForm(
       '§3RAW table §f' + table,
-      JSON.stringify(
-        JSON.parse(typeof raw === 'string' ? raw : '["KEY_IS_NOT_A_STRING"]'),
-        null,
-        2
-      )
+      util.inspect(raw)
     )
-      .addButton('Oк', null, () => {
+      .addButton('Oк',  () => {
         showTable(player, table)
       })
       .show(player)
@@ -90,7 +90,7 @@ function showTable(player, table) {
     const AForm = new ActionForm(
       '§3Ключ ' + key,
       `§7Тип: §f${typeof value}\n ${
-        failedToLoad ? '\n§cОшибка [beforeGet] в таблице!§r\n\n' : ''
+        failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''
       }\n${util.inspect(value)}\n `
     )
 
@@ -111,11 +111,11 @@ function showTable(player, table) {
       })
     })
 
-    AForm.addButton('§cУдалить§r', null, () => {
+    AForm.addButton('§cУдалить§r', () => {
       delete proxy[key]
       system.run(() => showTable(player, table))
     })
-    AForm.addButton('< Назад', null, () =>
+    AForm.addButton('< Назад',  () =>
       system.run(() => showTable(player, table))
     )
 
@@ -124,7 +124,7 @@ function showTable(player, table) {
 
   const keys = Object.keys(proxy)
   for (const key of keys) {
-    menu.addButton(key, null, () =>
+    menu.addButton(key,  () =>
       util.catch(() => propertyForm(key), 'FormBuilder')
     )
   }

@@ -11,40 +11,40 @@ export const OPTIONS_NAME = Symbol('name')
  */
 
 /**
- * @typedef {string | boolean | number | JSONLike} OptionValue
+ * @typedef {string | boolean | number | JSONLike} SettingValue
  */
 
 /**
- * @template [T = boolean | string | number]
- * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OPTIONS_NAME]?: string}} DefaultOptions
+ * @template [T = boolean | string | number | JSONLike]
+ * @typedef {Record<string, { desc: string; value: T, name: string }> & {[OPTIONS_NAME]?: string}} DefaultSettings
  */
 
-/** @typedef {Record<string, Record<string, OptionValue>>} OPTIONS_DB */
+/** @typedef {Record<string, Record<string, SettingValue>>} SETTINGS_DB */
 
-export const PLAYER_OPTIONS_DB = new DynamicPropertyDB('playerOptions', {
-  /** @type {OPTIONS_DB} */
+export const PLAYER_SETTINGS_DB = new DynamicPropertyDB('playerOptions', {
+  /** @type {SETTINGS_DB} */
   type: {},
   defaultValue: () => {
     return {}
   },
 }).proxy()
 
-/** @typedef {DefaultOptions<OptionValue> & Record<string, { requires?: boolean }>} WorldOptions */
-export const WORLD_OPTIONS_DB = new DynamicPropertyDB('options', {
-  /** @type {OPTIONS_DB} */
+/** @typedef {DefaultSettings<SettingValue> & Record<string, { requires?: boolean }>} WorldSettings */
+export const WORLD_SETTINGS_DB = new DynamicPropertyDB('worldOptions', {
+  /** @type {SETTINGS_DB} */
   type: {},
   defaultValue: () => {
     return {}
   },
 }).proxy()
 
-export class Options {
-  /** @type {Record<string, DefaultOptions<boolean>>} */
+export class Settings {
+  /** @type {Record<string, DefaultSettings<boolean>>} */
   static playerMap = {}
   /**
    * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
    * stored in a database
-   * @template {DefaultOptions<boolean>} Config
+   * @template {DefaultSettings<boolean>} Config
    * @param {string} name - The name that shows to players
    * @param {string} prefix - The prefix for the database.
    * @param {Config} config - This is an object that contains the default values for each option.
@@ -63,21 +63,21 @@ export class Options {
     }
     return player =>
       // @ts-expect-error Trust me, TS
-      generateOptionsProxy(
-        PLAYER_OPTIONS_DB,
+      generateSettingsProxy(
+        PLAYER_SETTINGS_DB,
         prefix,
         this.playerMap[prefix],
         player
       )
   }
 
-  /** @type {Record<string, WorldOptions>} */
+  /** @type {Record<string, WorldSettings>} */
   static worldMap = {}
 
   /**
    * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
    * configuration object's properties in localStorage
-   * @template {WorldOptions} Config
+   * @template {WorldSettings} Config
    * @param {string} prefix - The prefix for the database.
    * @param {Config} config - The default values for the options.
    * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
@@ -92,21 +92,25 @@ export class Options {
       }
     }
     // @ts-expect-error Trust me, TS
-    return generateOptionsProxy(WORLD_OPTIONS_DB, prefix, this.worldMap[prefix])
+    return generateSettingsProxy(
+      WORLD_SETTINGS_DB,
+      prefix,
+      this.worldMap[prefix]
+    )
   }
 }
 
 /**
  * It creates a proxy object that allows you to access and modify the values of a given object, but the
  * values are stored in a database
- * @param {OPTIONS_DB} database - The prefix for the database.
+ * @param {SETTINGS_DB} database - The prefix for the database.
  * @param {string} prefix - The prefix for the database.
- * @param {DefaultOptions} config - This is the default configuration object. It's an object with the keys being the
+ * @param {DefaultSettings} config - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
  * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
  */
-function generateOptionsProxy(database, prefix, config, player = null) {
+function generateSettingsProxy(database, prefix, config, player = null) {
   const OptionsProxy = {}
   for (const prop in config) {
     const key = player ? player.id + ':' + prop : prop
@@ -140,14 +144,14 @@ export class EditableLocation {
    */
   constructor(id, { fallback = false } = {}) {
     this.id = id
-    const raw = WORLD_OPTIONS_DB[EditableLocation.key][id]
-    Options.worldMap[EditableLocation.key][id] = {
+    const raw = WORLD_SETTINGS_DB[EditableLocation.key][id]
+    Settings.worldMap[EditableLocation.key][id] = {
       desc: `Позиция ${id}`,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
     }
 
-    if (typeof raw !== 'string') {
+    if (typeof raw !== 'string' || raw === '') {
       if (fallback === false) {
         console.warn(
           '§eEmpty location §f' + id + '\n§r' + util.error.stack.get(1)
@@ -177,4 +181,4 @@ export class EditableLocation {
   }
 }
 
-Options.worldMap[EditableLocation.key] = {}
+Settings.worldMap[EditableLocation.key] = {}

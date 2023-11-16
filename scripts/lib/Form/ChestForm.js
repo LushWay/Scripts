@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { wordWrap } from 'lib/Extensions/itemstack.js'
 import { showForm, util } from 'xapi.js'
 import { typeIdToID } from '../../chestui/typeIds.js'
 
@@ -17,7 +18,7 @@ const SIZES = {
  * @typedef {{
  *  text: string;
  *  icon: string | undefined | number;
- *  callback?: () => void;
+ *  callback?: (p: Player) => void;
  * }} ChestButton
  */
 
@@ -26,10 +27,11 @@ const SIZES = {
  * @prop {number} slot The slot to display the item in.
  * @prop {string} icon The type id or the path to the texture of the item or block.
  * @prop {string} [nameTag] The name of the item to display.
+ * @prop {string} [description] The description that will be word-wrapped and passed to lore. Overrides lore value.
  * @prop {string[]} [lore] The item's lore to display.
  * @prop {number} [amount] The stack size for the item.
  * @prop {boolean} [enchanted] If the item is enchanted or not.
- * @prop {() => void} [callback]
+ * @prop {ChestButton["callback"]} [callback]
  */
 
 export class ChestForm {
@@ -71,11 +73,14 @@ export class ChestForm {
     icon,
     nameTag = '',
     lore = [],
+    description,
     amount = 1,
     enchanted = false,
     callback,
   }) {
     const ID = typeIdToID.get(icon.includes(':') ? icon : 'minecraft:' + icon)
+
+    if (description) lore = wordWrap(description)
 
     /** @type {ChestButton} */
     const slotData = {
@@ -87,7 +92,7 @@ export class ChestForm {
         ? (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536
         : icon,
 
-      callback,
+      callback: callback ?? (p => this.show(p)),
     }
 
     if (enchanted && typeof slotData.icon === 'number') {

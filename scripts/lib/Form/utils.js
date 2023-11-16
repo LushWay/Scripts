@@ -14,7 +14,7 @@ import { MessageForm } from './MessageForm.js'
 import { ModalForm } from './ModalForm.js'
 
 /**
- * @template {ActionForm | MessageForm | ModalForm<any> | ChestForm} Form
+ * @template {ActionForm | MessageForm | ModalForm<any> | ChestForm} [Form=any]
  *
  */
 export class FormCallback {

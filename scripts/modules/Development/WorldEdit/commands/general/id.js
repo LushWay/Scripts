@@ -1,4 +1,4 @@
-import { EquipmentSlot, Vector } from '@minecraft/server'
+import { Vector } from '@minecraft/server'
 import { util } from 'xapi.js'
 
 const root = new XCommand({
@@ -15,7 +15,7 @@ root.executes(ctx => {
   ctx.reply(
     `§b► §f${item?.typeId?.replace('minecraft:', '')} ${
       item?.nameTag ? `(${item?.nameTag}) ` : ''
-    }`
+    }`,
   )
 })
 
@@ -26,7 +26,11 @@ root
     const l = Vector.floor(location)
     const block = ctx.sender.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
-    ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}`)
+    ctx.reply(
+      `§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(
+        block.permutation.getAllStates(),
+      )}`,
+    )
   })
 
 root
@@ -43,6 +47,6 @@ root
   .literal({ name: 'r', description: 'Выдает наклон головы' })
   .executes(ctx => {
     ctx.reply(
-      `§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
+      `§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`,
     )
   })

@@ -1,5 +1,5 @@
 import { Player, world } from '@minecraft/server'
-import { OPTIONS_NAME, Options, WORLD_OPTIONS_DB } from 'lib/Class/Options.js'
+import { OPTIONS_NAME, Settings, WORLD_SETTINGS_DB } from 'lib/Class/Options.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { FormCallback, PLAYER_DB, ROLES, getRole, setRole, util } from 'xapi.js'
@@ -54,7 +54,7 @@ R.executes(ctx => {
         Object.entriesStringKeys(ROLES).map(([key]) => [
           key,
           `${role === key ? '> ' : ''}${ROLES[key]}`,
-        ])
+        ]),
       )
       new ModalForm(player.name)
         .addToggle('Уведомлять', false)
@@ -68,13 +68,13 @@ R.executes(ctx => {
               'Неизвестная роль: ' +
                 newrole +
                 '§r, допустимые: ' +
-                util.inspect(ROLES)
+                util.inspect(ROLES),
             )
           if (notify)
             player.tell(
               `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${newrole}${
                 showName ? `§3 игроком §r${ctx.sender.name}` : ''
-              }${message ? `\n§r§3Причина: §r${message}` : ''}`
+              }${message ? `\n§r§3Причина: §r${message}` : ''}`,
             )
           setRole(player.id, newrole)
           if (fakeChange) {
@@ -87,7 +87,7 @@ R.executes(ctx => {
   const form = new ActionForm('Roles', '§3Ваша роль: ' + ROLES[role]).addButton(
     'Сменить мою роль',
     null,
-    callback(ctx.sender, true)
+    callback(ctx.sender, true),
   )
 
   for (const player of world.getPlayers({ excludeNames: [ctx.sender.name] }))
@@ -111,8 +111,8 @@ new XCommand({
 function poptions(player) {
   const form = new ActionForm('§dНастройки')
 
-  for (const groupName in Options.playerMap) {
-    const name = Options.playerMap[groupName][OPTIONS_NAME]
+  for (const groupName in Settings.playerMap) {
+    const name = Settings.playerMap[groupName][OPTIONS_NAME]
     if (name)
       form.addButton(name, null, () => {
         optionsGroup(player, groupName, 'PLAYER')
@@ -136,19 +136,19 @@ new XCommand({
 function options(player) {
   const form = new ActionForm('§dНастройки мира')
 
-  for (const groupName in Options.worldMap) {
-    const data = WORLD_OPTIONS_DB[groupName]
-    const requires = Object.entries(Options.worldMap[groupName]).reduce(
+  for (const groupName in Settings.worldMap) {
+    const data = WORLD_SETTINGS_DB[groupName]
+    const requires = Object.entries(Settings.worldMap[groupName]).reduce(
       (count, [key, option]) =>
         option.requires && typeof data[key] === 'undefined' ? count + 1 : count,
-      0
+      0,
     )
     form.addButton(
       `${groupName}${requires ? ` §c(${requires}!)` : ''}`,
       null,
       () => {
         optionsGroup(player, groupName, 'WORLD')
-      }
+      },
     )
   }
 
@@ -163,10 +163,10 @@ function options(player) {
  * @param {Record<string, string>} [errors]
  */
 export function optionsGroup(player, groupName, groupType, errors = {}) {
-  const source = groupType === 'PLAYER' ? Options.playerMap : Options.worldMap
+  const source = groupType === 'PLAYER' ? Settings.playerMap : Settings.worldMap
   const config = source[groupName]
   const name = config[OPTIONS_NAME]
-  const data = WORLD_OPTIONS_DB[groupName]
+  const data = WORLD_SETTINGS_DB[groupName]
 
   /** @type {[string, (input: string | boolean) => string][]} */
   const buttons = []
@@ -194,7 +194,7 @@ export function optionsGroup(player, groupName, groupType, errors = {}) {
       if (isDef) label += `\n §8(По умолчанию)`
       label += '\n '
     } else {
-      label += `\n   §7Значение: ${str(dbValue ?? OPTION.value)}`
+      label += `\n   §7Значение: ${util.stringify(dbValue ?? OPTION.value)}`
       label += `${isDef ? ` §8(По умолчанию)` : ''}\n`
 
       label += `   §7Тип: §f${Types[typeof value] ?? typeof value}`
@@ -205,36 +205,38 @@ export function optionsGroup(player, groupName, groupType, errors = {}) {
       form.addTextField(
         label,
         'Настройка не изменится',
-        typeof value === 'string' ? value : JSON.stringify(value)
+        typeof value === 'string' ? value : JSON.stringify(value),
       )
 
     buttons.push([
       KEY,
       input => {
-        let total
-        if (typeof input !== 'undefined') {
-          if (typeof input === 'boolean') total = input
+        let result
+        if (typeof input !== 'undefined' && input !== '') {
+          if (typeof input === 'boolean') result = input
           else
             switch (typeof OPTION.value) {
               case 'string':
-                total = input
+                result = input
                 break
               case 'number':
-                total = Number(input)
-                if (isNaN(total)) return '§cВведите число!'
+                result = Number(input)
+                if (isNaN(result)) return '§cВведите число!'
                 break
               case 'object':
                 try {
-                  total = JSON.parse(input)
+                  result = JSON.parse(input)
                 } catch (error) {
                   return `§c${error.message}`
                 }
                 break
             }
 
-          if (str(data[KEY]) === str(total)) return ''
-          data[KEY] = total
-          WORLD_OPTIONS_DB[groupName] = data
+          const resultStr = util.stringify(result)
+          if (util.stringify(OPTION.value) === resultStr) return ''
+          if (util.stringify(data[KEY]) === resultStr) return ''
+          data[KEY] = result
+          WORLD_SETTINGS_DB[groupName] = data
           return '§aСохранено!'
         } else return ''
       },
@@ -277,24 +279,3 @@ const Types = {
   object: 'JSON-Объект',
   boolean: 'Переключатель',
 }
-
-/**
- * @param {any} value
- */
-function str(value) {
-  if (typeof value === 'string') return value
-  return util.inspect(value)
-}
-
-new XCommand({
-  name: 'speed',
-  description: 'Меняет скорость',
-  role: 'builder',
-}).executes(ctx => {
-  const speedc = ctx.sender.getComponent('flying_speed')
-  new ModalForm('Скорость')
-    .addSlider('Скросоть', 1, 100, 1, speedc.value)
-    .show(ctx.sender, (_, speed) => {
-      speedc.value = speed
-    })
-})

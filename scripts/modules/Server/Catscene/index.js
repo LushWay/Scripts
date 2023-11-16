@@ -1,8 +1,9 @@
 import { EasingType, Player, Vector, system } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import importModules from 'modules/importModules.js'
 import { EditableLocation, util } from 'xapi.js'
-import('./editMenu.js')
+importModules({ array: ['./editMenu.js'], fn: m => import(m) })
 
 /**
  * @typedef {[point: Vector3]} SceneDot
@@ -59,7 +60,7 @@ export class Catscene {
     }
     const curve = generateCurve(
       this.dots.map(e => e[0]),
-      this.dots.length * 2
+      this.dots.length * 2,
     )
     let i = 0
     console.debug({ loc: this.location, curv: curve[0] })
@@ -80,7 +81,7 @@ export class Catscene {
             return system.runTimeout(
               () => this.exit(player),
               'catscene exit anim',
-              2 * 20 + 5
+              2 * 20 + 5,
             )
           }
 
@@ -94,7 +95,7 @@ export class Catscene {
           })
         },
         'catscene ' + this.name,
-        5
+        5,
       ),
     }
   }

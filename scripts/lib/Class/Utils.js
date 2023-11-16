@@ -68,6 +68,21 @@ export const GAME_UTILS = {
   },
   /**
    *
+   * @param {string} string
+   */
+  toNameTag(string) {
+    // Format
+    string = string
+      .replace(/^minecraft:/, '')
+      .replace(/_(.)/, (_, m) => ' ' + m.toUpperCase())
+
+    // Capitalize first letter
+    string = string[0].toUpperCase() + string.slice(1)
+
+    return string
+  },
+  /**
+   *
    * @param {ItemStack} item
    */
   localizationName(item) {

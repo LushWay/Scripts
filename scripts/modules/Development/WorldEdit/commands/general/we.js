@@ -5,7 +5,14 @@ import {
   setBlockSet,
 } from 'modules/Development/WorldEdit/utils/blocksSet.js'
 import { prompt } from 'modules/Gameplay/Build/utils.js'
-import { ActionForm, BUTTON, FormCallback, ModalForm, util } from 'xapi.js'
+import {
+  ActionForm,
+  BUTTON,
+  FormCallback,
+  GAME_UTILS,
+  ModalForm,
+  util,
+} from 'xapi.js'
 import { WorldEditTool } from '../../class/Tool.js'
 
 new XCommand({
@@ -26,7 +33,7 @@ function WEMenu(player, body = '') {
 
   const form = new ActionForm('§dWorld§6Edit', body).addButton(
     'Наборы блоков',
-    () => WEBlocksSets(player)
+    () => WEBlocksSets(player),
   )
 
   for (const tool of WorldEditTool.tools) {
@@ -56,9 +63,9 @@ function WEBlocksSets(player) {
     new ModalForm('§3Имя')
       .addTextField(
         `Существующие наборы:\n${Object.keys(blockSets).join(
-          '\n'
+          '\n',
         )}\n\nВведи новое имя набора`,
-        ''
+        '',
       )
       .show(player, (ctx, name) => {
         if (name in blockSets)
@@ -72,8 +79,6 @@ function WEBlocksSets(player) {
   }
   sets.show(player)
 }
-
-const split = /.{0,20}/g
 
 /**
  * @param {Player} player
@@ -92,14 +97,21 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
     slot: 0,
     icon: 'textures/blocks/glass',
     nameTag: 'Пусто',
+    callback: () =>
+      editBlocksSet(
+        // @ts-expect-error We can pass them
+        ...arguments,
+      ),
   }
+
+  form.title(setName)
   form.pattern(
     [0, 0],
     [
-      '<xxx+xDx?', // row 0
+      'x<x+xDx?x', // row 0
       '---------', // row 1
       '---------', // row 2
-      canEdit ? 'xxx>B>xxx' : '---------', // row 3
+      canEdit ? 'xxx>Bxxxx' : '---------', // row 3
       '---------', // row 4
       '---------', // row 5
     ],
@@ -120,32 +132,36 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
       },
       'D': {
         icon: 'textures/ui/trash_light',
-        nameTag: '§cОчистить набор',
-        lore: ['§cот выключенных блоков'],
+        nameTag: '§4Очистить набор',
+        description: '§cото всех выключенных блоков',
         callback() {
           const blocksToClear = set.filter(e => (e[2] ?? 1) < 1)
 
           prompt(
             player,
             'Выключенные блоки будут очищены. Список:\n' +
-              blocksToClear.map(e => e[0].replace('minecraft:', '')).join('\n'),
+              blocksToClear.map(e => GAME_UTILS.toNameTag(e[0])).join('\n'),
             '§cОчистить',
             () => {
               setBlockSet(
                 player,
                 setName,
-                set.filter(e => !blocksToClear.includes(e))
+                set.filter(e => !blocksToClear.includes(e)),
               )
               editBlocksSet(
                 player,
                 setName,
                 getAllBlockSets(player),
                 canEdit,
-                add
+                add,
               )
             },
             'Отмена',
-            () => editBlocksSet(player, setName, sets, canEdit, add)
+            () =>
+              editBlocksSet(
+                // @ts-expect-error We can pass them
+                ...arguments,
+              ),
           )
         },
       },
@@ -153,30 +169,26 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
         ? {
             icon: BUTTON['?'],
             nameTag: 'Редактирование набора',
-            lore:
-              'Чтобы убрать блок или уменьшить кол-во нажмите на блок сверху, чтобы добавить в набор - на блок из инвентаря, снизу.'.match(
-                split
-              ) || [],
+            description:
+              'Чтобы убрать блок или уменьшить кол-во нажмите на блок сверху, чтобы добавить в набор - на блок из инвентаря, снизу.',
           }
         : empty,
 
       '>': {
         icon: BUTTON['>'],
         nameTag: 'Блок под ногами',
-        lore:
-          'Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.'.match(
-            split
-          ) || [],
+        description:
+          'Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.',
       },
       'B': blockBelow
         ? addBlock(
             0,
             blockBelow.typeId,
             blockBelow.permutation.getAllStates(),
-            false
+            false,
           ) ?? empty
         : empty,
-    }
+    },
   )
 
   /**
@@ -191,7 +203,7 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
 
     // If block is already in blocksSet
     const blockInSet = set.find(
-      ([t, s]) => t === typeId && JSON.stringify(s) === JSON.stringify(states)
+      ([t, s]) => t === typeId && JSON.stringify(s) === JSON.stringify(states),
     )
 
     // Amount of block in blocksSet
@@ -202,8 +214,8 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
       slot: slot,
       icon: typeId,
       enchanted: amount > 0,
-      amount: amount || 1,
-      nameTag: typeId.replace('minecraft:', ''),
+      amount: Math.max(amount, 1),
+      nameTag: GAME_UTILS.toNameTag(typeId),
       lore: [
         '',
         ...(states ? util.inspect(states).split('\n') : []),
@@ -211,14 +223,14 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
         amount > 0
           ? '§aВключен§f в наборе.'
           : blockInSet
-          ? '§cВыключен§f в наборе, но остается тут.'
-          : '§7Не добавлен в набор.',
+            ? '§cВыключен§f в наборе, но остается тут.'
+            : '§7Не добавлен в набор.',
         add
           ? '§a[+] §rНажмите для добавления блока'
           : // If no block in set or already disabled show nothing
-          blockInSet && amount > 0
-          ? '§c[-] §rНажмите для уменьшения кол-ва блока'
-          : '',
+            blockInSet && amount > 0
+            ? '§c[-] §rНажмите для уменьшения кол-ва блока'
+            : '',
       ],
       callback() {
         if (blockInSet) {
@@ -226,10 +238,10 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
         } else if (add) {
           if (set.length >= 18) {
             new FormCallback(form, player).error(
-              'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.'
+              'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.',
             )
           }
-          set.push([typeId, states])
+          set.push([typeId, states, 1])
         }
 
         for (const block of set) {

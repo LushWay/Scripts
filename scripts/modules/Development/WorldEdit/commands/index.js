@@ -27,11 +27,10 @@ const commands = [
   '../tools/tool.js',
 ]
 
-import load from '../../../import.js'
+import importModules from '../../../importModules.js'
 
-load({
+importModules({
   array: commands,
-  message: 'WorldEdit commands',
   fn: module => import(module),
-  striketest: 0,
+  strikeMessage: 'WorldEdit commands',
 })

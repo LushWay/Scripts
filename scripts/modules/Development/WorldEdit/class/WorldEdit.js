@@ -101,13 +101,13 @@ export class WorldEdit {
     if (!this.drawselection || !this.selectionCuboid) return
     const selectedSize = Vector.size(
       this.selectionCuboid.min,
-      this.selectionCuboid.max
+      this.selectionCuboid.max,
     )
     if (selectedSize > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
     const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid
     for (const { x, y, z } of Vector.foreach(
       this.selectionCuboid.min,
-      this.selectionCuboid.max
+      this.selectionCuboid.max,
     )) {
       const q =
         ((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
@@ -118,7 +118,7 @@ export class WorldEdit {
         world.overworld.spawnParticle(
           WE_CONFIG.DRAW_SELECTION_PARTICLE,
           { x: x + 0.5, y: y + 0.5, z: z + 0.5 },
-          new MolangVariableMap()
+          new MolangVariableMap(),
         )
     }
   }
@@ -150,7 +150,7 @@ export class WorldEdit {
         array.splice(array.indexOf(backup), 1)
       }
 
-      const e = Cooldown.getT(amount.toString(), [
+      const e = Cooldown.gettext(amount, [
         'сохранение',
         'сохранения',
         'сохранений',
@@ -190,7 +190,7 @@ export class WorldEdit {
         return '§4► §cЗона для копирования не выделена!'
 
       const result = world.overworld.runCommand(
-        `structure save ${WE_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
+        `structure save ${WE_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`,
       )
       if (!result)
         return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`
@@ -201,7 +201,7 @@ export class WorldEdit {
         name: WE_CONFIG.COPY_FILE_NAME,
       }
       return `§9► §fСкопированно из ${Vector.string(
-        this.pos1
+        this.pos1,
       )} в ${Vector.string(this.pos2)}`
     } catch (error) {
       util.error(error)
@@ -227,7 +227,7 @@ export class WorldEdit {
     includesEntites = false,
     includesBlocks = true,
     integrity = 100.0,
-    seed = ''
+    seed = '',
   ) {
     try {
       const dx = Math.abs(this.currentCopy.pos2.x - this.currentCopy.pos1.x)
@@ -241,13 +241,13 @@ export class WorldEdit {
 
       player.runCommand(
         `structure load ${WE_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(
-          rotation
+          rotation,
         ).replace(
           'NaN',
-          '0'
+          '0',
         )}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${
           integrity ? integrity : ''
-        } ${seed ? seed : ''}`
+        } ${seed ? seed : ''}`,
       )
 
       return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`
@@ -289,11 +289,11 @@ export class WorldEdit {
     for (const cube of Cube.split(WE_CONFIG.FILL_CHUNK_SIZE)) {
       const result = world.overworld.runCommand(
         `fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
-        { showError: true, showOutput: false }
+        { showError: true, showOutput: false },
       )
       if (result === 0) errors++
       all++
-      await system.sleep(1)
+      await nextTick
     }
 
     const endTime = get(Date.now() - startTime)
@@ -320,5 +320,5 @@ system.runInterval(
       build.drawSelection()
   },
   'we Selection',
-  20
+  20,
 )

@@ -7,7 +7,7 @@ import { ActionForm, EditableLocation, util } from 'xapi.js'
 new Catscene('test')
 
 new XCommand({
-  name: 'catscene',
+  name: 'scene',
   role: 'admin',
 }).executes(ctx => {
   selectCatscene(ctx.sender)
@@ -24,13 +24,17 @@ function selectCatscene(player) {
   form.show(player)
 }
 
-const editCatsceneItem = new ItemStack('we:tool')
-editCatsceneItem.nameTag = '§r§6> §fСоздать точку'
-editCatsceneItem.setLore(['используй предмет чтобы создать точку катсцены'])
+const editCatsceneItem = new ItemStack('we:tool').setInfo(
+  '§r§6> §fСоздать точку',
+  'используй предмет чтобы создать точку катсцены',
+)
 
-const editCatsceneItemDone = new ItemStack(MinecraftItemTypes.HoneyBottle)
-editCatsceneItemDone.nameTag = '§r§6> §fСохранить и выйти'
-editCatsceneItemDone.setLore(['используй предмет чтобы выйти из меню катсцены'])
+const editCatsceneItemDone = new ItemStack(
+  MinecraftItemTypes.HoneyBottle,
+).setInfo(
+  '§r§6> §fСохранить и выйти',
+  'используй предмет чтобы выйти из меню катсцены',
+)
 
 /**
  * @type {Record<string, (ItemStack | undefined)[]>}
@@ -95,7 +99,7 @@ function editCatscene(player, scene) {
           ])
           player.tell('§a> §fТочка добавлена.')
           player.playSound('note.pling')
-        })
+        }),
       )
     } else if (event.itemStack.isStackableWith(editCatsceneItemDone)) {
       event.cancel = true
@@ -106,7 +110,7 @@ function editCatscene(player, scene) {
           world.beforeEvents.itemUse.unsubscribe(handle)
           player.tell('§a> §fСохранено.')
           player.playSound('note.pling')
-        })
+        }),
       )
     }
   })

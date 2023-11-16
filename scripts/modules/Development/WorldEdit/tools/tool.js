@@ -1,9 +1,4 @@
-import {
-  EquipmentSlot,
-  MolangVariableMap,
-  Vector,
-  system,
-} from '@minecraft/server'
+import { MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import { ActionForm, ModalForm } from 'xapi.js'
 import { ListParticles } from '../../../../lib/List/particles.js'
 import { ListSounds } from '../../../../lib/List/sounds.js'
@@ -23,7 +18,7 @@ new WorldEditTool({
     const lore = item.getLore()
     new ActionForm(
       '§3Инструмент',
-      'Настройте что будет происходить при использовании инструмента.'
+      'Настройте что будет происходить при использовании инструмента.',
     )
       .addButton('Телепорт по взгляду', () => {
         item.nameTag = `§r§a► Телепорт по взгляду`
@@ -90,7 +85,7 @@ new WorldEditTool({
             index = array.indexOf(element)
             if (!index)
               return ctx.error(
-                'Неизвестный ID! Убедитесь что он начинается с minecraft:'
+                'Неизвестный ID! Убедитесь что он начинается с minecraft:',
               )
           } else {
             element = list
@@ -125,34 +120,36 @@ new WorldEditTool({
 
 const variables = new MolangVariableMap()
 
-system.runPlayerInterval(
-  player => {
-    const item = player.mainhand()
+system.runInterval(
+  () => {
+    for (const player of world.getAllPlayers()) {
+      const item = player.mainhand()
 
-    if (!item || item.typeId !== 'we:tool') return
+      if (!item || item.typeId !== 'we:tool') return
 
-    const lore = item.getLore()
+      const lore = item.getLore()
 
-    if (lore[0] === 'Particle') {
-      const hit = player.getBlockFromViewDirection({
-        includeLiquidBlocks: false,
-        includePassableBlocks: false,
-        maxDistance: 50,
-      })
+      if (lore[0] === 'Particle') {
+        const hit = player.getBlockFromViewDirection({
+          includeLiquidBlocks: false,
+          includePassableBlocks: false,
+          maxDistance: 50,
+        })
 
-      if (!hit) return
+        if (!hit) return
 
-      hit.block.dimension.spawnParticle(
-        lore[1],
-        Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-        variables
-      )
-    }
+        hit.block.dimension.spawnParticle(
+          lore[1],
+          Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+          variables,
+        )
+      }
 
-    if (lore[0] === 'Sound') {
-      player.playSound(lore[1])
+      if (lore[0] === 'Sound') {
+        player.playSound(lore[1])
+      }
     }
   },
   'we tool',
-  20
+  20,
 )

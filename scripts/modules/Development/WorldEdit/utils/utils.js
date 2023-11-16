@@ -16,22 +16,24 @@ import { Cuboid } from './cuboid.js'
  * @param {Vector3} pos location to generate shape
  * @param {BlockPermutation[]} blocks blocks to use to fill block
  * @param {number} rad size of sphere
+ * @returns {string | undefined}
  * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
 export function Shape(player, shape, pos, blocks, rad) {
+  if (blocks.length < 1) return '§cПустой набор блоков'
   util.catch(async () => {
     const loc1 = { x: -rad, y: -rad, z: -rad }
     const loc2 = { x: rad, z: rad, y: rad }
 
     WorldEdit.forPlayer(player).backup(
       Vector.add(pos, loc1),
-      Vector.add(pos, loc2)
+      Vector.add(pos, loc2),
     )
 
     const cuboid = new Cuboid(loc1, loc2)
     const conditionFunction = new Function(
       'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad',
-      `return ${shape}`
+      `return ${shape}`,
     )
     /** @type {(...args: number[]) => boolean} */
     const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, rad)
@@ -72,7 +74,7 @@ export function get(ms) {
         .replace(/(\.[1-9]*)0+$/m, '$1')
         .replace(/\.$/m, '')
 
-      type = Cooldown.getT(parsedTime, valueType)
+      type = Cooldown.gettext(Number(parsedTime), valueType)
     }
   }
 

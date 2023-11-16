@@ -54,6 +54,7 @@
       "prefer-const": "warn",
       "scriptapi/ensure-modules": "error",
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/naming-convention": [
         "warn",

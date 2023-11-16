@@ -9,7 +9,7 @@ import { CONFIG } from './config.js'
 import { EventLoader } from './lib/Class/Events.js'
 import { XCommand } from './lib/Command/index.js'
 import { util } from './lib/util.js'
-import importModules from './modules/import.js'
+import importModules from './modules/importModules.js'
 
 world.say('§9┌ §fLoading...')
 const loading = Date.now()
@@ -70,18 +70,9 @@ system.run(async function waiter() {
     return system.run(waiter)
   }
 
-  const errorName = 'LoadError'
   try {
     console.log('§6Script working')
     EventLoader.load(XA.afterEvents.worldLoad)
-
-    // errorName = "DatabaseError";
-    // await Database.initAllTables();
-    // EventLoader.load(XA.afterEvents.databaseInit);
-
-    // errorName = "ModuleError";
-    // await importModules();
-    // EventLoader.load(XA.afterEvents.modulesLoad);
 
     if (world.getAllPlayers().find(e => e.id === '-4294967285')) {
       util.settings.BDSMode = false
@@ -91,9 +82,9 @@ system.run(async function waiter() {
       `${util.settings.firstLoad ? '§fFirst loaded in ' : '§9└ §fDone in '}${(
         (Date.now() - loading) /
         1000
-      ).toFixed(2)}`
+      ).toFixed(2)}`,
     )
   } catch (e) {
-    util.error(e, { errorName })
+    util.error(e, { errorName: 'LoadError' })
   }
 })

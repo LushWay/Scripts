@@ -7,58 +7,51 @@ import { OverTakes } from './import.js'
  */
 export const TIMERS_PATHES = {}
 
+/**
+ * @param {string} type
+ * @param {(fn: () => void, ticks: number) => number} set
+ * @param {() => void} fn
+ * @param {string} name
+ * @param {number} ticks
+ */
+function Timer(type, set, fn, name, ticks = 0) {
+  const visualId = `${name} (${type} ${ticks} ticks)`
+  const path = util.error.stack.get()
+  TIMERS_PATHES[visualId] = path
+
+  return set(() => {
+    const end = util.benchmark(visualId, 'timers')
+
+    util.catch(fn, type[0].toUpperCase() + type.slice(1))
+
+    const tookTicks = ~~(end() / 20)
+    if (tookTicks > ticks) {
+      console.warn(`§6Slow ${type} (${tookTicks}/${ticks})§r\n${path}`)
+    }
+  }, ticks)
+}
+
 OverTakes(System.prototype, {
   sleep(time) {
     return new Promise(resolve => super.runInterval(resolve, time))
   },
-  runInterval(fn, name, ticks = 0) {
-    const visualId = `${name} (loop ${ticks} ticks)`
-    const path = util.error.stack.get()
-    TIMERS_PATHES[visualId] = path
-
-    return super.runInterval(() => {
-      const end = util.benchmark(visualId, 'timers')
-
-      util.catch(fn, 'Interval')
-
-      const tookTicks = ~~(end() / 20)
-      if (tookTicks > ticks)
-        console.warn(
-          `Found slow interval (${tookTicks}/${ticks})  at:\n${path}`
-        )
-    }, ticks)
+  runInterval(...args) {
+    return Timer('interval', super.runInterval.bind(this), ...args)
   },
-  runTimeout(fn, name, ticks = 0) {
-    const visualId = `${name} (loop ${ticks} ticks)`
-    const path = util.error.stack.get()
-    TIMERS_PATHES[visualId] = path
-
-    return super.runTimeout(() => {
-      const end = util.benchmark(visualId, 'timers')
-
-      util.catch(fn, 'Timeout')
-
-      const tookTicks = ~~(end() / 20)
-      if (tookTicks > ticks)
-        console.warn(`Found slow timeout (${tookTicks}/${ticks}) at:\n${path}`)
-    }, ticks)
+  runTimeout(...args) {
+    return Timer('timeout', super.runTimeout.bind(this), ...args)
   },
-  runPlayerInterval(fn, name, ticks = 0) {
-    const visualId = `${name} (loop ${ticks} ticks)`
-    const path = util.error.stack.get()
-    TIMERS_PATHES[visualId] = path
-    const forEach = () => {
-      for (const player of world.getPlayers()) fn(player)
-    }
-
-    return super.runInterval(() => {
-      const end = util.benchmark(visualId, 'timers')
-
-      util.catch(forEach, 'Player interval')
-
-      const tookTicks = ~~(end() / 20)
-      if (tookTicks > ticks)
-        console.warn(`Found slow players interval at:\n${path}`)
-    }, ticks)
+  runPlayerInterval(callback, ...args) {
+    return Timer(
+      'playerInterval',
+      super.runInterval.bind(this),
+      () => {
+        for (const player of world.getAllPlayers()) callback(player)
+      },
+      ...args,
+    )
+  },
+  delay(fn) {
+    this.run(() => util.catch(fn, 'system.delay'))
   },
 })

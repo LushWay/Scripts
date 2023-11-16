@@ -18,6 +18,13 @@ export class DynamicPropertyDB {
   static playerKeys = {}
 
   /**
+   * @param {DynamicPropertyDB<any, any>} db
+   */
+  static getValue(db) {
+    return db.value
+  }
+
+  /**
    * @private
    * @type {Record<any, any>}
    */

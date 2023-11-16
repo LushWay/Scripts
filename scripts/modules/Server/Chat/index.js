@@ -1,9 +1,9 @@
 import { world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { Cooldown, Options, ROLES, getRole, util } from 'xapi.js'
+import { Cooldown, ROLES, Settings, getRole, util } from 'xapi.js'
 import { CONFIG } from '../../../config.js'
 
-const OPTIONS = Options.world('chat', {
+const OPTIONS = Settings.world('chat', {
   cooldown: {
     name: 'Задержка',
     desc: '0 что бы отключить',
@@ -21,7 +21,7 @@ const OPTIONS = Options.world('chat', {
 const COOLDOWN_PROPERY = new DynamicPropertyDB('chat')
 const COOLDOWN_DB = COOLDOWN_PROPERY.proxy()
 
-const PLAYER_OPTIONS = Options.player('Чат', 'chat', {
+const PLAYER_OPTIONS = Settings.player('Чат', 'chat', {
   hightlightMessages: {
     name: 'Подсветка моих сообщений',
     desc: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',

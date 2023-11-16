@@ -1,5 +1,5 @@
 import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
-import { GAME_UTILS, Options, util } from 'xapi.js'
+import { GAME_UTILS, Settings, util } from 'xapi.js'
 
 /**
  * @type {Array<"unknown" | "build" | "survival" | "disabled">}
@@ -25,7 +25,7 @@ export const SERVER = {
     all: timer('all', 'всего'),
     day: timer('day', 'за день'),
   },
-  options: Options.world('server', {
+  options: Settings.world('server', {
     lockNether: {
       desc: 'Выключает незер',
       value: true,

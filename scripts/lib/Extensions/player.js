@@ -57,14 +57,7 @@ OverTakes(Player.prototype, {
   },
   mainhand() {
     return this.getComponent('equippable').getEquipmentSlot(
-      EquipmentSlot.Mainhand
+      EquipmentSlot.Mainhand,
     )
-  },
-})
-
-OverTakes(Entity.prototype, {
-  despawn() {
-    this.teleport({ x: 0, y: 300, z: 0 })
-    this.kill()
   },
 })

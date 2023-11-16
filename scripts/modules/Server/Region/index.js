@@ -40,7 +40,7 @@ let LOADED = false
 export function loadRegionsWithGuards(
   allowed,
   spawnAllowed,
-  regionCallback = () => void 0
+  regionCallback = () => void 0,
 ) {
   if (LOADED) throw new ReferenceError('Regions already loaded!')
   LOADED = true
@@ -51,7 +51,7 @@ export function loadRegionsWithGuards(
   world.beforeEvents.playerInteractWithBlock.subscribe(data => {
     const region = Region.locationInRegion(
       data.block,
-      data.player.dimension.type
+      data.player.dimension.type,
     )
     if (allowed(data.player, region, { type: 'useOn' })) return
 
@@ -76,7 +76,7 @@ export function loadRegionsWithGuards(
   world.beforeEvents.playerPlaceBlock.subscribe(event => {
     const region = Region.locationInRegion(
       event.block.location,
-      event.player.dimension.type
+      event.player.dimension.type,
     )
     if (!allowed(event.player, region, { type: 'place' })) event.cancel = true
   })
@@ -88,7 +88,7 @@ export function loadRegionsWithGuards(
   world.beforeEvents.playerBreakBlock.subscribe(event => {
     const region = Region.locationInRegion(
       event.block.location,
-      event.player.dimension.type
+      event.player.dimension.type,
     )
 
     if (
@@ -106,7 +106,7 @@ export function loadRegionsWithGuards(
     if (!typeId || typeId === 'rubedo:database') return
     const region = Region.locationInRegion(
       entity.location,
-      entity.dimension.type
+      entity.dimension.type,
     )
     if (spawnAllowed(region, { entity, cause })) return
     if (
@@ -117,7 +117,7 @@ export function loadRegionsWithGuards(
     )
       return
 
-    entity.despawn()
+    entity.remove()
   })
 
   system.runInterval(
@@ -127,14 +127,14 @@ export function loadRegionsWithGuards(
       for (const player of world.getAllPlayers()) {
         const currentRegion = Region.locationInRegion(
           player.location,
-          player.dimension.type
+          player.dimension.type,
         )
 
         regionCallback(player, currentRegion)
       }
     },
-    'pvp region disable',
-    20
+    'region callback',
+    20,
   )
 
   console.log('§6Regions settings loaded')

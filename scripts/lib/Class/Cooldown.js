@@ -30,7 +30,8 @@ export class Cooldown {
           .toFixed(fiction)
           .replace(/(\.[1-9]*)0+$/m, '$1')
           .replace(/\.$/m, '')
-        type = Cooldown.getT(parsedTime, valueType)
+
+        type = Cooldown.gettext(Number(parsedTime), valueType)
       }
     }
 
@@ -42,21 +43,19 @@ export class Cooldown {
     return { parsedTime, type }
   }
   /**
-   *
-   * @param {string} digit
+   * @param {number} n
    * @param {[string, string, string]} _ 1 секунда 2 секунды 5 секунд
-   * @returns
+   * @returns Plural form
    */
-  static getT(digit, [one = 'секунда', few = 'секунды', more = 'секунд']) {
-    const lastDigit = digit[digit.length - 1]
-
-    let o = more
-    if (lastDigit === '1' && !digit.endsWith('11')) {
-      o = one
-    } else if (['1', '2', '3', '4'].includes(lastDigit)) {
-      o = few
-    }
-    return o
+  static gettext(n, [one = 'секунда', few = 'секунды', more = 'секунд']) {
+    if (!Number.isInteger(n)) return one
+    return [one, few, more][
+      n % 10 == 1 && n % 100 != 11
+        ? 0
+        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+          ? 1
+          : 2
+    ]
   }
   /**
    * @type {Record<string, number>}
@@ -88,7 +87,7 @@ export class Cooldown {
     this.db = db
     this.key = Cooldown.genDBkey(
       prefix,
-      typeof source === 'string' ? source : source.id
+      typeof source === 'string' ? source : source.id,
     )
     if (typeof source !== 'string') this.player = source
     this.time = time

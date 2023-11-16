@@ -74,11 +74,11 @@ export class ModalForm {
       defaultValue,
       none,
       noneText = ModalForm.arrayDefaultNone,
-    } = {}
+    } = {},
   ) {
     if (defaultValue) {
       defaultValueIndex = Object.values(object).findIndex(
-        e => e === defaultValue
+        e => e === defaultValue,
       )
     }
     /** @type {(string | null)[]} */
@@ -109,7 +109,7 @@ export class ModalForm {
     minimumValue,
     maximumValue,
     valueStep = 1,
-    defaultValue = 0
+    defaultValue = 0,
   ) {
     this.args.push({ type: 'slider' })
     this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue)
@@ -161,7 +161,15 @@ export class ModalForm {
           return arg.options?.[formValue]
         } else return formValue
       })
-      callback(new FormCallback(this, player, callback), ...args)
+      callback(
+        new FormCallback(
+          this,
+          player,
+          // @ts-expect-error idk
+          callback,
+        ),
+        ...args,
+      )
     })
   }
 }

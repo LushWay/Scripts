@@ -1,4 +1,3 @@
-import { system } from '@minecraft/server'
 import { TerminalColors } from './List/terminal-colors.js'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -18,7 +17,7 @@ export const util = {
      */
     function error(
       error,
-      { deleteStack = 0, additionalStack = [], errorName } = {}
+      { deleteStack = 0, additionalStack = [], errorName } = {},
     ) {
       if (typeof error === 'string') {
         error = new Error(error)
@@ -27,7 +26,7 @@ export const util = {
       const stack = util.error.stack.get(
         deleteStack + 1,
         additionalStack,
-        error.stack
+        error.stack,
       )
       const message = util.error.message.get(error)
       const name = errorName ?? error?.name ?? 'Error'
@@ -120,11 +119,19 @@ export const util = {
           return message
         },
       },
-    }
+    },
   ),
 
   /**
-   * @param {Object} target
+   * @param {any} target
+   */
+  stringify(target) {
+    if (typeof target === 'string') return target
+    return this.inspect(target)
+  },
+
+  /**
+   * @param {any} target
    */
   inspect(target, space = '  ', cw = '', funcCode = false, depth = 0) {
     const c = {
@@ -147,7 +154,7 @@ export const util = {
     const visited = new WeakSet()
 
     if (depth > 10 || typeof target !== 'object')
-      return `${rep(target)}` ?? `${target}` ?? '{}'
+      return `${rep(target)}` || `${target}` || '{}'
 
     /**
      * @param {any} value
@@ -276,7 +283,7 @@ export const util = {
           name: type,
           stack: e?.stack,
         },
-        { additionalStack, deleteStack: 1 }
+        { additionalStack, deleteStack: 1 },
       )
     }
   },
@@ -290,7 +297,7 @@ export const util = {
     return async () => {
       count++
       if (count % c === 0) {
-        await system.sleep(1)
+        await nextTick
         return count
       }
     }
@@ -314,7 +321,7 @@ export const util = {
     {
       /** @type {Record<string, Record<string, number[]>>} */
       results: {},
-    }
+    },
   ),
 
   strikeTest() {
@@ -347,7 +354,7 @@ export const util = {
       return (
         text.replace(
           /§(.)/g,
-          (_, a) => this.terminalColors[a] ?? this.terminalColors.r
+          (_, a) => this.terminalColors[a] ?? this.terminalColors.r,
         ) + this.terminalColors.r
       )
 

@@ -1,12 +1,12 @@
-import { system, Vector, world } from '@minecraft/server'
-import { Options } from 'xapi.js'
+import { Vector, system, world } from '@minecraft/server'
+import { Settings } from 'xapi.js'
 import './class/Tool.js'
 import './class/WorldEdit.js'
 
 // Lazy load to prevent script spike
-system.runTimeout(() => import('./commands/index.js'), 'command import', 40)
+system.runTimeout(() => import('./commands/index.js'), 'we commands', 20)
 
-export const WE_PLAYER_SETTINGS = Options.player('Строитель мира', 'we', {
+export const WE_PLAYER_SETTINGS = Settings.player('Строитель мира', 'we', {
   noBrushParticles: {
     name: 'Партиклы кисти',
     desc: 'Отключает партиклы у кисти',
@@ -22,7 +22,10 @@ export const WE_PLAYER_SETTINGS = Options.player('Строитель мира', 
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
   if (itemStack.typeId === 'we:dash') {
     source.teleport(
-      Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5))
+      Vector.add(
+        source.location,
+        Vector.multiply(source.getViewDirection(), 5),
+      ),
     )
   }
 })

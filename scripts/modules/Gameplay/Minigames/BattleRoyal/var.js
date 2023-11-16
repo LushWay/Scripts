@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/Class/Events.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { Options } from 'xapi.js'
+import { Settings } from 'xapi.js'
 
 export const BATTLE_ROYAL_EVENTS = {
   /** @type {EventSignal<Player>} */
@@ -15,7 +15,7 @@ export const BATTLE_ROYAL_EVENTS = {
  */
 export const BR_QUENE = {}
 
-export const BR_CONFIG = Options.world('BattleRoyal', {
+export const BR_CONFIG = Settings.world('BattleRoyal', {
   gamepos: { desc: 'x y', value: '', name: 'Центр игры' },
   time: {
     desc: 'Время игры в формате MM:SS (15:00)',

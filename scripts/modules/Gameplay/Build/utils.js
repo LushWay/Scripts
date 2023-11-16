@@ -15,7 +15,7 @@ const squarePlace = -55
 export function teleportToRegion(player, region) {
   player.teleport(
     { x: region.from.x, y: squarePlace + 3, z: region.from.z },
-    { dimension: world.overworld }
+    { dimension: world.overworld },
   )
 }
 
@@ -65,7 +65,7 @@ export async function clearRegion(player, playerRegion) {
       }
     },
     'ResetSquare_ProgressActionbar',
-    0
+    0,
   )
   const loc1 = { x: playerRegion.from.x, y: -63, z: playerRegion.from.z }
   const loc2 = { x: playerRegion.to.x, y: 100, z: playerRegion.to.z }
@@ -113,7 +113,7 @@ export async function fillRegion(from, to) {
   const waiter = util.waitEach(10)
   for (const loc of Vector.foreach(
     Vector.add(firstLoc, Vector.up),
-    Vector.add(secondLoc, Vector.up)
+    Vector.add(secondLoc, Vector.up),
   )) {
     await waiter()
     const block = world.overworld.getBlock(loc)
@@ -164,11 +164,11 @@ export async function findFreePlace() {
 
   while (!from || !to) {
     tries++
-    if (tries >= 20) await system.sleep(1), (tries = 0)
+    if (tries >= 20) await nextTick, (tries = 0)
 
     const alreadyExist = Region.locationInRegion(
       { x: center.x, y: 0, z: center.z },
-      'overworld'
+      'overworld',
     )
 
     if (alreadyExist) {

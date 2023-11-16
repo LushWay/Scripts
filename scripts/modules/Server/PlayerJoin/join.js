@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { EventSignal, Options } from 'xapi.js'
+import { EventSignal, Settings } from 'xapi.js'
 import './subscribes.js'
 import { JOIN } from './var.js'
 
@@ -77,7 +77,7 @@ system.runPlayerInterval(
   20
 )
 
-const getSettings = Options.player('Вход', 'join', {
+const getSettings = Settings.player('Вход', 'join', {
   message: {
     desc: 'Сообщения о входе других игроков',
     value: true,

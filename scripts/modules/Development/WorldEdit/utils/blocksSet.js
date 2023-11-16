@@ -7,7 +7,7 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
  */
 
 /**
- * @typedef {[...Parameters<BlockPermutation.resolve>, number?]} BlockStateWeight
+ * @typedef {[...Parameters<BlockPermutation.resolve>, number]} BlockStateWeight
  */
 
 /**
@@ -27,19 +27,17 @@ export function withState(name, states, weight = 1) {
 
 /** @type {BlocksSets} */
 const defaultBlockSets = {
-  'Земля': [[MinecraftBlockTypes.Grass]],
-  'Воздух': [[MinecraftBlockTypes.Air]],
-  'Пещерный камень': [
-    [MinecraftBlockTypes.Stone],
-    [MinecraftBlockTypes.Cobblestone],
-  ],
+  'Земля': [[MinecraftBlockTypes.Grass, void 0, 1]],
+  'Воздух': [[MinecraftBlockTypes.Air, void 0, 1]],
   'Каменная стена': [
-    [MinecraftBlockTypes.MudBricks, undefined, 2],
-    [MinecraftBlockTypes.PackedMud],
-    [MinecraftBlockTypes.BrickBlock],
-    withState(MinecraftBlockTypes.CobblestoneWall, { wall_block_type: 'sand' }),
-    [MinecraftBlockTypes.HardenedClay],
-    withState(MinecraftBlockTypes.Stone, { stone_type: 'sand' }, 2),
+    [MinecraftBlockTypes.MudBricks, void 0, 2],
+    [MinecraftBlockTypes.PackedMud, void 0, 1],
+    [MinecraftBlockTypes.BrickBlock, void 0, 1],
+    withState(MinecraftBlockTypes.CobblestoneWall, {
+      wall_block_type: 'granite',
+    }),
+    [MinecraftBlockTypes.HardenedClay, void 0, 1],
+    withState(MinecraftBlockTypes.Stone, { stone_type: 'granite' }, 2),
   ],
 }
 
@@ -76,9 +74,9 @@ export function getBlockSet(player, name) {
   const blocks = getAllBlockSets(player)[name]
   if (!blocks) return []
   return blocks
-    .filter(e => (e[2] ?? 1) > 0)
+    .filter(e => e[2] > 0)
     .map(([type, states, weight]) =>
-      new Array(weight ?? 1).fill(BlockPermutation.resolve(type, states))
+      new Array(weight).fill(BlockPermutation.resolve(type, states)),
     )
     .flat()
 }

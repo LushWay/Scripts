@@ -25,15 +25,14 @@ export class Enchantments {
 
 function load() {
   const status = world.overworld.runCommand(
-    'structure load CustomEnchantments ' + Vector.string(LOCATION)
+    'structure load CustomEnchantments ' + Vector.string(LOCATION),
   )
 
   if (!status)
     return util.error(
       new Error(
-        'Unable to load CustomEnchantments structure. Status: ' +
-          util.inspect(status)
-      )
+        'Unable to load CustomEnchantments structure. Status: §6' + status,
+      ),
     )
 
   const entities = world.overworld.getEntities({
@@ -61,8 +60,8 @@ function load() {
           'Found unexpected enchantment type on slot ' +
             i +
             '. Enchantments: ' +
-            util.inspect(enchantments)
-        )
+            util.inspect(enchantments),
+        ),
       )
 
     for (const enchantment of enchantments.enchantments) {

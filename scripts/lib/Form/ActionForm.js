@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { util } from 'xapi.js'
 import { showForm } from './utils.js'
-/** */
+
 export class ActionForm {
   /**
    * The buttons this form has
@@ -28,13 +28,27 @@ export class ActionForm {
     this.title = title
     this.form.body(body)
   }
+
+  /**
+   * @overload
+   * Adds a button to this form
+   * @param {string} text - text to show on this button
+   * @param {ButtonCallback} callback  - what happens when this button is clicked
+   * @returns {ActionForm}
+   */
+  /**
+   * @overload
+   * Adds a button to this form
+   * @param {string} text - text to show on this button
+   * @param {string | null} iconPath - the path this button icon
+   * @param {ButtonCallback} [callback] - what happens when this button is clicked
+   * @returns {ActionForm}
+   */
   /**
    * Adds a button to this form
-   * @param {string} text  text to show on this button
-   * @param {string | null | ButtonCallback} iconPathOrCallback  the path this button shows or callback
-   * @param {ButtonCallback} [callback]  what happens when this button is clicked
-   * @example addButton("settings", "textures/items/sum", () => {})
-   * @example addButton("settings", () => {})
+   * @param {string} text - text to show on this button
+   * @param {string | null | ButtonCallback} iconPathOrCallback - the path this button icon
+   * @param {ButtonCallback} [callback] - what happens when this button is clicked
    * @returns {ActionForm}
    */
   addButton(text, iconPathOrCallback, callback) {

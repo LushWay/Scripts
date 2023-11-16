@@ -5,11 +5,11 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { Options, XA } from 'xapi.js'
+import { Settings, XA } from 'xapi.js'
 import { SERVER } from '../../Server/Server/var.js'
 import { PVP } from './var.js'
 
-const options = Options.world('pvp', {
+const options = Settings.world('pvp', {
   enabled: {
     value: SERVER.type === 'survival',
     desc: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
@@ -18,7 +18,7 @@ const options = Options.world('pvp', {
   cooldown: { value: 15, desc: 'Время блокировки в секундах', name: 'Время' },
 })
 
-const getPlayerSettings = Options.player('PvP', 'pvp', {
+const getPlayerSettings = Settings.player('PvP', 'pvp', {
   indicator: {
     name: 'Индикатор',
     desc: '§aВключает§7 индикатор попадания по энтити из лука',

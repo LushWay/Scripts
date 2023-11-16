@@ -32,21 +32,25 @@ const strike = util.strikeTest()
 /**
  * @param {Object} [o]
  * @param {string[]} [o.array]
- * @param {string} [o.message]
+ * @param {string} [o.strikeMessage]
  * @param {(m: string) => Promise<any>} [o.fn]
  * @param {number} [o.striketest]
  */
 export default async function ({
   array = modules,
-  message = 'SM init and loading took',
+  strikeMessage = 'SM init and loading took',
   fn = module => import(module),
   striketest = enabled,
 } = {}) {
-  if (striketest) strike(message)
+  if (striketest) strike(strikeMessage)
 
   for (const module of array) {
-    await nextTick
-    await fn(module)
+    try {
+      await fn(module)
+    } catch (e) {
+      util.error(e, { errorName: 'ModuleLoad' })
+      return
+    }
     if (striketest) strike(module)
   }
 }

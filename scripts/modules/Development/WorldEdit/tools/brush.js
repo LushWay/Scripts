@@ -1,8 +1,14 @@
-import { Entity, Vector, world } from '@minecraft/server'
+import {
+  Entity,
+  LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
+  Vector,
+  world,
+} from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { WE_PLAYER_SETTINGS } from 'modules/Development/WorldEdit/index.js'
 import { smoothVoxelData } from 'modules/Development/WorldEdit/tools/smooth.js'
-import { ModalForm } from 'xapi.js'
+import { ModalForm, util } from 'xapi.js'
 import { WorldEditTool } from '../class/Tool.js'
 import { WE_CONFIG } from '../config.js'
 import { blockSetDropdown, getBlockSet } from '../utils/blocksSet.js'
@@ -47,7 +53,7 @@ const brush = new WorldEditTool({
         player.tell(
           `§a► §r${
             lore.blocksSet ? 'Отредактирована' : 'Создана'
-          } кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`
+          } кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`,
         )
       })
   },
@@ -64,10 +70,21 @@ const brush = new WorldEditTool({
         z: 0.5,
       })
       if (!BRUSH_LOCATORS[player.id]) {
-        const entity = player.dimension.spawnEntity('f:t', location)
-        entity.addTag(player.name)
-        entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
-        BRUSH_LOCATORS[player.id] = entity
+        try {
+          const entity = player.dimension.spawnEntity('f:t', location)
+
+          entity.addTag(player.name)
+          entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
+          BRUSH_LOCATORS[player.id] = entity
+        } catch (error) {
+          if (
+            error instanceof LocationOutOfWorldBoundariesError ||
+            error instanceof LocationInUnloadedChunkError
+          )
+            return
+
+          util.error(error)
+        }
       } else BRUSH_LOCATORS[player.id].teleport(location)
     } else {
       BRUSH_LOCATORS[player.id]?.remove()
@@ -85,20 +102,34 @@ const brush = new WorldEditTool({
 
     if (!hit) return player.tell('§fКисть > §cБлок слишком далеко.')
 
-    if (lore.shape === smoother) {
-      smoothVoxelData(hit.block, lore.size).forEach(e => {
-        const block = world.overworld.getBlock(e.location)
-        if (e.permutation) block?.setPermutation(e.permutation)
-        else block?.setType(MinecraftBlockTypes.Air)
-      })
-    } else {
-      Shape(
-        player,
-        SHAPES[lore.shape],
-        hit.block.location,
-        getBlockSet(player, lore.blocksSet),
-        lore.size
-      )
+    try {
+      if (lore.shape === smoother) {
+        smoothVoxelData(hit.block, lore.size).forEach(e => {
+          const block = world.overworld.getBlock(e.location)
+          if (e.permutation) block?.setPermutation(e.permutation)
+          else block?.setType(MinecraftBlockTypes.Air)
+        })
+      } else {
+        const error = Shape(
+          player,
+          SHAPES[lore.shape],
+          hit.block.location,
+          getBlockSet(player, lore.blocksSet),
+          lore.size,
+        )
+
+        if (error) player.tell(error)
+      }
+    } catch (e) {
+      if (
+        e instanceof LocationInUnloadedChunkError ||
+        e instanceof LocationOutOfWorldBoundariesError
+      ) {
+        player.tell('§fКисть > §cБлок не прогружен')
+      } else {
+        util.error(e)
+        player.tell('§fКисть > §cОшибка ' + util.error.message.get(e))
+      }
     }
   },
 })
