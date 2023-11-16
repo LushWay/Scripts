@@ -8,15 +8,9 @@ This project uses many code from:
   [Smelly API](https://github.com/Smelly-API/Smelly-API)
   [Rubedo](https://github.com/smell-of-curry/rubedo)
 
-
-## Update dependencies:
-```bash
-git read-tree --prefix=scripts/chestui -u chestuib:BP/scripts/extensions
-```
-
 ## Folder overview
 
-### leafs 
+### tools
 
 Scripts used to help in development
 
@@ -37,3 +31,13 @@ Scripts used to help in development
 **Gameplay** - Выживание, строительство, миниигры и их общий код
 
 **Server** - Общеиспользуемые системы для модерирования и украшения игры не зависящие от типа сервера
+
+
+#### Rename branch
+
+```bash
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+```
