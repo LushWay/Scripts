@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { EventSignal } from 'lib/Class/Events.js'
+import { EventSignal } from 'lib/Class/EventSignal.js'
 
 /**
  * Выводит строку времени

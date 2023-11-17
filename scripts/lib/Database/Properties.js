@@ -117,8 +117,7 @@ export class DynamicPropertyDB {
   needSave() {
     if (this._needSaveRun) return
 
-    system.run(() =>
-      util.catch(() => {
+    system.delay(() => {
         this._needSaveRun = false
         this.source.setDynamicProperty(
           this.key,
@@ -140,8 +139,7 @@ export class DynamicPropertyDB {
             )
           )
         )
-      }, 'DynamicPropertySave')
-    )
+      })
   }
 
   /**

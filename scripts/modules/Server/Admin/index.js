@@ -1,5 +1,11 @@
 import { Player, world } from '@minecraft/server'
-import { OPTIONS_NAME, Settings, WORLD_SETTINGS_DB } from 'lib/Class/Options.js'
+import {
+  OPTIONS_NAME,
+  PLAYER_SETTINGS_DB,
+  Settings,
+  WORLD_SETTINGS_DB,
+  generateSettingsProxy,
+} from 'lib/Class/Settings.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { FormCallback, PLAYER_DB, ROLES, getRole, setRole, util } from 'xapi.js'
@@ -54,7 +60,7 @@ R.executes(ctx => {
         Object.entriesStringKeys(ROLES).map(([key]) => [
           key,
           `${role === key ? '> ' : ''}${ROLES[key]}`,
-        ]),
+        ])
       )
       new ModalForm(player.name)
         .addToggle('Уведомлять', false)
@@ -68,13 +74,13 @@ R.executes(ctx => {
               'Неизвестная роль: ' +
                 newrole +
                 '§r, допустимые: ' +
-                util.inspect(ROLES),
+                util.inspect(ROLES)
             )
           if (notify)
             player.tell(
               `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${newrole}${
                 showName ? `§3 игроком §r${ctx.sender.name}` : ''
-              }${message ? `\n§r§3Причина: §r${message}` : ''}`,
+              }${message ? `\n§r§3Причина: §r${message}` : ''}`
             )
           setRole(player.id, newrole)
           if (fakeChange) {
@@ -87,7 +93,7 @@ R.executes(ctx => {
   const form = new ActionForm('Roles', '§3Ваша роль: ' + ROLES[role]).addButton(
     'Сменить мою роль',
     null,
-    callback(ctx.sender, true),
+    callback(ctx.sender, true)
   )
 
   for (const player of world.getPlayers({ excludeNames: [ctx.sender.name] }))
@@ -141,14 +147,14 @@ function options(player) {
     const requires = Object.entries(Settings.worldMap[groupName]).reduce(
       (count, [key, option]) =>
         option.requires && typeof data[key] === 'undefined' ? count + 1 : count,
-      0,
+      0
     )
     form.addButton(
       `${groupName}${requires ? ` §c(${requires}!)` : ''}`,
       null,
       () => {
         optionsGroup(player, groupName, 'WORLD')
-      },
+      }
     )
   }
 
@@ -163,19 +169,23 @@ function options(player) {
  * @param {Record<string, string>} [errors]
  */
 export function optionsGroup(player, groupName, groupType, errors = {}) {
-  const source = groupType === 'PLAYER' ? Settings.playerMap : Settings.worldMap
-  const config = source[groupName]
-  const name = config[OPTIONS_NAME]
-  const data = WORLD_SETTINGS_DB[groupName]
+  const groups = groupType === 'PLAYER' ? Settings.playerMap : Settings.worldMap
+  const config = groups[groupName]
+  const db = generateSettingsProxy(
+    groupType === 'PLAYER' ? PLAYER_SETTINGS_DB : WORLD_SETTINGS_DB,
+    groupName,
+    config,
+    groupType === 'PLAYER' ? player : null
+  )
 
   /** @type {[string, (input: string | boolean) => string][]} */
   const buttons = []
   /** @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>} */
-  const form = new ModalForm(name ?? groupName)
+  const form = new ModalForm(config[OPTIONS_NAME] ?? groupName)
 
   for (const KEY in config) {
     const OPTION = config[KEY]
-    const dbValue = data[KEY]
+    const dbValue = db[KEY]
     const isDef = typeof dbValue === 'undefined'
     const message = errors[KEY] ? `${errors[KEY]}\n` : ''
     const requires =
@@ -205,7 +215,7 @@ export function optionsGroup(player, groupName, groupType, errors = {}) {
       form.addTextField(
         label,
         'Настройка не изменится',
-        typeof value === 'string' ? value : JSON.stringify(value),
+        typeof value === 'string' ? value : JSON.stringify(value)
       )
 
     buttons.push([
@@ -233,10 +243,8 @@ export function optionsGroup(player, groupName, groupType, errors = {}) {
             }
 
           const resultStr = util.stringify(result)
-          if (util.stringify(OPTION.value) === resultStr) return ''
-          if (util.stringify(data[KEY]) === resultStr) return ''
-          data[KEY] = result
-          WORLD_SETTINGS_DB[groupName] = data
+          if (util.stringify(db[KEY]) === resultStr) return ''
+          db[KEY] = result
           return '§aСохранено!'
         } else return ''
       },

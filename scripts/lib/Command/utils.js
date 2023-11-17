@@ -1,4 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
+import { Sounds } from 'lib/List/used-sounds.js'
 import { util } from 'xapi.js'
 import { CONFIG } from '../../config.js'
 import { inaccurateSearch } from '../Class/Search.js'
@@ -41,6 +42,7 @@ export function commandNotFound(player, command) {
       },
     ],
   })
+  player.playSound(Sounds.fail)
 
   if (!command) return
 
@@ -96,6 +98,7 @@ export function noPerm(player, command) {
       },
     ],
   })
+  player.playSound(Sounds.fail)
 }
 
 /**

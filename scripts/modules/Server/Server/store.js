@@ -1,6 +1,7 @@
 import { ItemStack, Player, world } from '@minecraft/server'
 import { ActionForm, EventSignal, GAME_UTILS, MessageForm } from 'xapi.js'
 import { SERVER } from './var.js'
+import { Sounds } from 'lib/List/used-sounds.js'
 
 class Cost {
   /**
@@ -23,7 +24,7 @@ class Cost {
    * @param {Player} player
    */
   buy(player) {
-    player.playSound('random.orb')
+    player.playSound(Sounds.action)
   }
   /**
    * Returns fail info for player
@@ -31,7 +32,7 @@ class Cost {
    * @returns {string}
    */
   failed(player) {
-    player.playSound('random.anvil_land')
+    player.playSound(Sounds.fail)
     return 'Недостаточно средств'
   }
 }

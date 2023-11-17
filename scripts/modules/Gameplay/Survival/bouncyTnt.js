@@ -9,7 +9,7 @@ world.beforeEvents.itemUse.subscribe(data => {
   if (!(data.source instanceof Player)) return
   data.cancel = true
 
-  system.run(() => {
+  system.delay(() => {
     if (!(data.source instanceof Player)) return
 
     const tnt = data.source.dimension.spawnEntity(

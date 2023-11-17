@@ -6,7 +6,7 @@ import './lib/watchdog.js'
 import './lib/Extensions/import.js'
 
 import { CONFIG } from './config.js'
-import { EventLoader } from './lib/Class/Events.js'
+import { EventLoader } from './lib/Class/EventSignal.js'
 import { XCommand } from './lib/Command/index.js'
 import { util } from './lib/util.js'
 import importModules from './modules/importModules.js'
@@ -31,8 +31,8 @@ globalThis.XCommand = XCommand
 // Class
 export * from './lib/Class/Action.js'
 export * from './lib/Class/Cooldown.js'
-export * from './lib/Class/Events.js'
-export * from './lib/Class/Options.js'
+export * from './lib/Class/EventSignal.js'
+export * from './lib/Class/Settings.js'
 export * from './lib/Class/Utils.js'
 // Command
 export * from './lib/Command/index.js'
@@ -82,7 +82,7 @@ system.run(async function waiter() {
       `${util.settings.firstLoad ? '§fFirst loaded in ' : '§9└ §fDone in '}${(
         (Date.now() - loading) /
         1000
-      ).toFixed(2)}`,
+      ).toFixed(2)}`
     )
   } catch (e) {
     util.error(e, { errorName: 'LoadError' })

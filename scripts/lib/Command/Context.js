@@ -1,4 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
+import { Sounds } from 'lib/List/used-sounds.js'
 import { XCommand } from './index.js'
 
 export class CommandContext {
@@ -51,5 +52,6 @@ export class CommandContext {
    */
   error(errorText) {
     this.sender.tell(`§c${errorText}`)
+    this.sender.playSound(Sounds.fail)
   }
 }

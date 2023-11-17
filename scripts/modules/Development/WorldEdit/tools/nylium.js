@@ -34,7 +34,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
   )
     return
 
-  system.run(() => {
+  system.delay(() => {
     const slot = player.mainhand()
     const name = nylium.parseLore(slot.getLore())?.blocksSet
     const blocksSet = getBlockSet(player, name)

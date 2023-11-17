@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { wordWrap } from 'lib/Extensions/itemstack.js'
+import { loreWordWrap } from 'lib/Extensions/itemstack.js'
 import { showForm, util } from 'xapi.js'
 import { typeIdToID } from '../../chestui/typeIds.js'
 
@@ -80,7 +80,7 @@ export class ChestForm {
   }) {
     const ID = typeIdToID.get(icon.includes(':') ? icon : 'minecraft:' + icon)
 
-    if (description) lore = wordWrap(description)
+    if (description) lore = loreWordWrap(description)
 
     /** @type {ChestButton} */
     const slotData = {

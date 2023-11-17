@@ -12,6 +12,7 @@ import {
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
 import 'lib/Class/Net.js'
+import { Temporary } from 'lib/Class/Temporary.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
@@ -92,6 +93,20 @@ const tests = {
       'aa',
       2
     )
+  },
+
+  temp(ctx) {
+    const player = ctx.sender
+
+    new Temporary(({ world, system, clear }) => {
+      let i = 0
+      world.afterEvents.playerBreakBlock.subscribe(data => {
+        if (data.player.id !== player.id) return
+        i++
+        console.log('i', i)
+        if (i === 4) return clear()
+      })
+    })
   },
 
   scene(ctx) {

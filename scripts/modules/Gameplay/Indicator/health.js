@@ -62,10 +62,7 @@ world.afterEvents.entityDie.subscribe(data => {
   delete HURT_ENTITIES[data.deadEntity.id]
 
   if (!entityNameTag) {
-    system.run(() => {
-      indicator.teleport({ x: 0, y: -64, z: 0 })
-      indicator.triggerEvent('f:t:kill')
-    })
+    system.delay(() => indicator.remove())
   }
 })
 

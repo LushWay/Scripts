@@ -1,5 +1,5 @@
 import { MolangVariableMap, Vector, system, world } from '@minecraft/server'
-import { ActionForm, ModalForm } from 'xapi.js'
+import { ActionForm, ModalForm, util } from 'xapi.js'
 import { ListParticles } from '../../../../lib/List/particles.js'
 import { ListSounds } from '../../../../lib/List/sounds.js'
 import { WorldEditTool } from '../class/Tool.js'
@@ -10,7 +10,7 @@ const actions = {
   Sound: ListSounds,
 }
 
-new WorldEditTool({
+const tool = new WorldEditTool({
   name: 'tool',
   itemStackId: 'we:tool',
   displayName: 'инструмент',
@@ -18,7 +18,7 @@ new WorldEditTool({
     const lore = item.getLore()
     new ActionForm(
       '§3Инструмент',
-      'Настройте что будет происходить при использовании инструмента.',
+      'Настройте что будет происходить при использовании инструмента.'
     )
       .addButton('Телепорт по взгляду', () => {
         item.nameTag = `§r§a► Телепорт по взгляду`
@@ -37,29 +37,29 @@ new WorldEditTool({
             lore[0] = 'runCommand'
             lore[1] = command
 
-            item.setLore()
+            item.setLore(lore)
             player.tell(`§aR► §fКоманда: §7${command}`)
           })
       })
       .addButton('Проверка звуков', () => {
         SelectFromArray(ListSounds, '§3Звук', (sound, index) => {
-          item.nameTag = `§3Звук`
+          item.nameTag = `§r§3Звук`
           lore[0] = 'Sound'
           lore[1] = sound
           lore[2] = index.toString()
 
-          item.setLore()
+          item.setLore(lore)
           player.tell(`§aR► §fЗвук: §7${index} ${sound}`)
         })
       })
       .addButton('Проверка партиклов', () => {
         SelectFromArray(ListParticles, '§3Партикл', (particle, index) => {
-          item.nameTag = `§3Партикл`
+          item.nameTag = `§r§3Партикл`
           lore[0] = 'Particle'
           lore[1] = particle
           lore[2] = index.toString()
 
-          item.setLore()
+          item.setLore(lore)
           player.tell(`§aR► §fПартикл: §7${index} ${particle}`)
         })
       })
@@ -72,40 +72,39 @@ new WorldEditTool({
      * @param {(element: string, index: number) => void} callback
      */
     function SelectFromArray(array, name, callback) {
-      const none = 'Никакой'
       new ModalForm(name)
-        .addDropdown('Из списка', [none, ...array])
-        .addTextField('ID Текстом', 'Будет выбран из списка выше')
-        .show(player, (ctx, list, text) => {
-          let element
-          let index
-          if (list === none) {
-            if (!element) return ctx.error('Выберите из списка или ввeдите ID!')
-            element = text
-            index = array.indexOf(element)
-            if (!index)
-              return ctx.error(
-                'Неизвестный ID! Убедитесь что он начинается с minecraft:',
-              )
+        .addTextField('ID Текстом', 'Будет выбран номер')
+        .addTextField('Номер', 'Будет выбран текст')
+        .show(player, (ctx, text, num) => {
+          const number = parseInt(num)
+          if (!isNaN(number) && array[number]) {
+            callback(array[number], number)
           } else {
-            element = list
-            index = array.indexOf(element)
-          }
+            const index = array.indexOf(text)
+            if (index === -1)
+              return ctx.error(
+                'Неизвестный ID или номер партикла! Убедитесь что ID начинается с minecraft: и партикл состоит только из цифр\n' +
+                  util.inspect({ text, num, parsedNum: number })
+              )
 
-          callback(element, index)
+            callback(text, index)
+          }
         })
     }
   },
-  onUse(player, item) {
+  onUse(player) {
+    const item = player.mainhand()
     const lore = item.getLore()
     if (!lore || !lore[0]) return
     const action = lore[0]
 
     if (action in actions) {
       const list = actions[action]
-      const num = Number(lore[2]) + (player.isSneaking ? 1 : -1)
-      lore[1] = list[num] ?? lore[1]
+      const num = Number(lore[2]) + (player.isSneaking ? -1 : 1)
+      if (!list[num]) return player.tell('§c> §fСписок кончился')
+      lore[1] = list[num]
       lore[2] = num.toString()
+      player.tell('§a> §7' + lore[2] + ' §f' + lore[1])
       item.setLore(lore)
     }
     if (action === 'runCommand') {
@@ -141,7 +140,7 @@ system.runInterval(
         hit.block.dimension.spawnParticle(
           lore[1],
           Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-          variables,
+          variables
         )
       }
 
@@ -151,5 +150,5 @@ system.runInterval(
     }
   },
   'we tool',
-  20,
+  20
 )

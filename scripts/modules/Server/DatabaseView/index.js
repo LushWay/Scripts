@@ -1,4 +1,4 @@
-import { Player, system, world } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
@@ -22,9 +22,7 @@ function selectTable(player, firstCall) {
   for (const key in DynamicPropertyDB.keys) {
     const DB = DynamicPropertyDB.keys[key]
     const name = `${key} §7${Object.keys(DB.proxy()).length}§r`
-    form.addButton(name, () => 
-      showTable(player, key)
-    )
+    form.addButton(name, () => showTable(player, key))
   }
   form.show(player)
   if (firstCall) player.tell('§l§b> §r§3Закрой чат!')
@@ -41,7 +39,7 @@ function showTable(player, table) {
   const proxy = DB.proxy()
 
   const menu = new ActionForm(`${table}`)
-  menu.addButton('§b§l<§r§3 Назад§r',() => selectTable(player))
+  menu.addButton('§b§l<§r§3 Назад§r', () => selectTable(player))
   menu.addButton('§3Новое значение§r', () => {
     const form = new ModalForm('§3+Значение в §f' + table).addTextField(
       'Ключ',
@@ -53,7 +51,7 @@ function showTable(player, table) {
         callback(input, type, newVal => {
           proxy[key] = newVal
         })
-      system.run(() => showTable(player, table))
+      showTable(player, table)
     })
   })
   menu.addButton('§3Посмотреть в §fRAW', () => {
@@ -62,11 +60,8 @@ function showTable(player, table) {
       if (typeof raw === 'string') raw = JSON.parse(raw)
     } catch {}
 
-    new ActionForm(
-      '§3RAW table §f' + table,
-      util.inspect(raw)
-    )
-      .addButton('Oк',  () => {
+    new ActionForm('§3RAW table §f' + table, util.inspect(raw))
+      .addButton('Oк', () => {
         showTable(player, table)
       })
       .show(player)
@@ -113,20 +108,16 @@ function showTable(player, table) {
 
     AForm.addButton('§cУдалить§r', () => {
       delete proxy[key]
-      system.run(() => showTable(player, table))
+      showTable(player, table)
     })
-    AForm.addButton('< Назад',  () =>
-      system.run(() => showTable(player, table))
-    )
+    AForm.addButton('< Назад', () => showTable(player, table))
 
-    system.run(() => AForm.show(player))
+    AForm.show(player)
   }
 
   const keys = Object.keys(proxy)
   for (const key of keys) {
-    menu.addButton(key,  () =>
-      util.catch(() => propertyForm(key), 'FormBuilder')
-    )
+    menu.addButton(key, () => propertyForm(key))
   }
 
   menu.show(player)

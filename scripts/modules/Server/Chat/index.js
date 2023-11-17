@@ -2,6 +2,7 @@ import { world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Cooldown, ROLES, Settings, getRole, util } from 'xapi.js'
 import { CONFIG } from '../../../config.js'
+import { Sounds } from 'lib/List/used-sounds.js'
 
 const OPTIONS = Settings.world('chat', {
   cooldown: {
@@ -78,7 +79,7 @@ world.afterEvents.chatSend.subscribe(data => {
     for (const n of nearPlayers) {
       n.tell(`${role}§7${data.sender.name}§r: ${data.message}`)
 
-      if (!PLAYER_OPTIONS(n).disableSound) n.playSound('note.hat')
+      if (!PLAYER_OPTIONS(n).disableSound) n.playSound(Sounds.click)
     }
 
     for (const o of otherPlayers)

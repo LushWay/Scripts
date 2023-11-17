@@ -1,10 +1,8 @@
-import { Vector, system, world } from '@minecraft/server'
+import { Vector, world } from '@minecraft/server'
 import { Settings } from 'xapi.js'
 import './class/Tool.js'
 import './class/WorldEdit.js'
-
-// Lazy load to prevent script spike
-system.runTimeout(() => import('./commands/index.js'), 'we commands', 20)
+import './commands/index.js'
 
 export const WE_PLAYER_SETTINGS = Settings.player('Строитель мира', 'we', {
   noBrushParticles: {
@@ -22,10 +20,7 @@ export const WE_PLAYER_SETTINGS = Settings.player('Строитель мира',
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
   if (itemStack.typeId === 'we:dash') {
     source.teleport(
-      Vector.add(
-        source.location,
-        Vector.multiply(source.getViewDirection(), 5),
-      ),
+      Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5))
     )
   }
 })

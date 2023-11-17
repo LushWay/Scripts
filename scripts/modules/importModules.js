@@ -1,3 +1,4 @@
+import { system } from '@minecraft/server'
 import { util } from '../xapi.js'
 
 const modules = [
@@ -44,13 +45,18 @@ export default async function ({
 } = {}) {
   if (striketest) strike(strikeMessage)
 
+  let stop = false
   for (const module of array) {
-    try {
-      await fn(module)
-    } catch (e) {
-      util.error(e, { errorName: 'ModuleLoad' })
-      return
-    }
-    if (striketest) strike(module)
+    system.run(async () => {
+      if (stop) return
+      try {
+        await fn(module)
+      } catch (e) {
+        util.error(e, { errorName: 'ModuleLoad' })
+        stop = true
+      }
+
+      if (striketest) strike(module)
+    })
   }
 }

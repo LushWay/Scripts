@@ -1,7 +1,9 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { Quest } from 'lib/Class/Quest.js'
 import { Sidebar } from 'lib/Class/Sidebar.js'
-import { ActionForm, EditableLocation, InventoryStore, util } from 'xapi.js'
+import { Temporary } from 'lib/Class/Temporary.js'
+import { Sounds } from 'lib/List/used-sounds.js'
+import { ActionForm, EditableLocation, InventoryStore } from 'xapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
 import { Zone } from '../Minigames/BattleRoyal/zone.js'
 import { randomTeleport } from './rtp.js'
@@ -134,42 +136,40 @@ if (ANARCHY.portalLocation.valid) {
         return player.tell('§cВы уже находитесь на анархии!')
       }
 
-      system.run(() =>
-        util.catch(() => {
-          if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
-            randomTeleport(
-              player,
-              { x: 500, y: 0, z: 500 },
-              { x: 1500, y: 0, z: 1500 },
-              {
-                elytra: true,
-                teleportCallback() {
-                  player.tell('§a> §fВы были перемещены.')
-                  player.playSound('note.pling')
-                },
-                keepInSkyTime: 20,
-              }
-            )
-
-            InventoryStore.load({
-              from: {
-                equipment: {},
-                health: 20,
-                xp: 0,
-                slots: [SPAWN.startAxeItem],
+      system.delay(() => {
+        if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
+          randomTeleport(
+            player,
+            { x: 500, y: 0, z: 500 },
+            { x: 1500, y: 0, z: 1500 },
+            {
+              elytra: true,
+              teleportCallback() {
+                player.tell('§a> §fВы были перемещены.')
+                player.playSound('note.pling')
               },
-              to: player,
-              clearAll: true,
-            })
-            data.inv = 'anarchy'
-          } else {
-            anarchyInventory(player)
+              keepInSkyTime: 20,
+            }
+          )
 
-            player.teleport(data.anarchy)
-            delete data.anarchy
-          }
-        })
-      )
+          InventoryStore.load({
+            from: {
+              equipment: {},
+              health: 20,
+              xp: 0,
+              slots: [SPAWN.startAxeItem],
+            },
+            to: player,
+            clearAll: true,
+          })
+          data.inv = 'anarchy'
+        } else {
+          anarchyInventory(player)
+
+          player.teleport(data.anarchy)
+          delete data.anarchy
+        }
+      })
     }
   )
 }
@@ -181,7 +181,7 @@ if (ANARCHY.portal) {
 
     q.start(function () {
       this.player.tell('§6Квест начался!')
-      this.player.playSound('note.pling')
+      this.player.playSound(Sounds.action)
     })
 
     q.place(ANARCHY.portal.from, ANARCHY.portal.to, '§6Зайди в портал анархии')
@@ -192,20 +192,14 @@ if (ANARCHY.portal) {
         return `§6Наруби §f${value}/${this.end} §6блоков дерева`
       },
       activate() {
-        const blocksEvent = world.beforeEvents.playerBreakBlock.subscribe(
-          ({ player, block }) => {
+        return new Temporary(({ world }) => {
+          world.beforeEvents.playerBreakBlock.subscribe(({ player, block }) => {
             if (player.id !== this.player.id) return
             if (!SPAWN.startAxeCanBreak.includes(block.type.id)) return
 
             this.diff(1)
-          }
-        )
-
-        return {
-          cleanup() {
-            world.beforeEvents.playerBreakBlock.unsubscribe(blocksEvent)
-          },
-        }
+          })
+        })
       },
     })
 
