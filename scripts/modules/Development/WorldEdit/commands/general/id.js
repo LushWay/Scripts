@@ -15,7 +15,7 @@ root.executes(ctx => {
   ctx.reply(
     `§b► §f${item?.typeId?.replace('minecraft:', '')} ${
       item?.nameTag ? `(${item?.nameTag}) ` : ''
-    }`,
+    }`
   )
 })
 
@@ -28,8 +28,8 @@ root
     if (!block) return ctx.reply('§cНет блока!')
     ctx.reply(
       `§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(
-        block.permutation.getAllStates(),
-      )}`,
+        block.permutation.getAllStates()
+      )}`
     )
   })
 
@@ -47,6 +47,6 @@ root
   .literal({ name: 'r', description: 'Выдает наклон головы' })
   .executes(ctx => {
     ctx.reply(
-      `§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`,
+      `§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
     )
   })

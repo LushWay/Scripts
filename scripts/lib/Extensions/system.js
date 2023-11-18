@@ -48,7 +48,7 @@ OverTakes(System.prototype, {
       () => {
         for (const player of world.getAllPlayers()) callback(player)
       },
-      ...args,
+      ...args
     )
   },
   delay(fn) {

@@ -76,7 +76,7 @@ export function getBlockSet(player, name) {
   return blocks
     .filter(e => e[2] > 0)
     .map(([type, states, weight]) =>
-      new Array(weight).fill(BlockPermutation.resolve(type, states)),
+      new Array(weight).fill(BlockPermutation.resolve(type, states))
     )
     .flat()
 }

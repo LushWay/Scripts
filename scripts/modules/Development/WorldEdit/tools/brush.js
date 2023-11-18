@@ -53,7 +53,7 @@ const brush = new WorldEditTool({
         player.tell(
           `§a► §r${
             lore.blocksSet ? 'Отредактирована' : 'Создана'
-          } кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`,
+          } кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`
         )
       })
   },
@@ -115,7 +115,7 @@ const brush = new WorldEditTool({
           SHAPES[lore.shape],
           hit.block.location,
           getBlockSet(player, lore.blocksSet),
-          lore.size,
+          lore.size
         )
 
         if (error) player.tell(error)

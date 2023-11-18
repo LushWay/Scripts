@@ -57,7 +57,7 @@ OverTakes(Player.prototype, {
   },
   mainhand() {
     return this.getComponent('equippable').getEquipmentSlot(
-      EquipmentSlot.Mainhand,
+      EquipmentSlot.Mainhand
     )
   },
 })

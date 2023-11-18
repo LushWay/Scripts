@@ -27,13 +27,13 @@ export function Shape(player, shape, pos, blocks, rad) {
 
     WorldEdit.forPlayer(player).backup(
       Vector.add(pos, loc1),
-      Vector.add(pos, loc2),
+      Vector.add(pos, loc2)
     )
 
     const cuboid = new Cuboid(loc1, loc2)
     const conditionFunction = new Function(
       'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad',
-      `return ${shape}`,
+      `return ${shape}`
     )
     /** @type {(...args: number[]) => boolean} */
     const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, rad)

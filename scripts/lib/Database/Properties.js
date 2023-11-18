@@ -118,28 +118,28 @@ export class DynamicPropertyDB {
     if (this._needSaveRun) return
 
     system.delay(() => {
-        this._needSaveRun = false
-        this.source.setDynamicProperty(
-          this.key,
-          JSON.stringify(
-            Object.fromEntries(
-              Object.entries(this.value).map(([key, value]) => {
-                const defaultv =
-                  typeof key !== 'symbol' && this.defaultValue?.(key)
-                return [
-                  key,
-                  typeof value === 'object' &&
-                  value !== null &&
-                  typeof defaultv === 'object' &&
-                  defaultv !== null
-                    ? DB.removeDefaults(value, defaultv)
-                    : value,
-                ]
-              })
-            )
+      this._needSaveRun = false
+      this.source.setDynamicProperty(
+        this.key,
+        JSON.stringify(
+          Object.fromEntries(
+            Object.entries(this.value).map(([key, value]) => {
+              const defaultv =
+                typeof key !== 'symbol' && this.defaultValue?.(key)
+              return [
+                key,
+                typeof value === 'object' &&
+                value !== null &&
+                typeof defaultv === 'object' &&
+                defaultv !== null
+                  ? DB.removeDefaults(value, defaultv)
+                  : value,
+              ]
+            })
           )
         )
-      })
+      )
+    })
   }
 
   /**
