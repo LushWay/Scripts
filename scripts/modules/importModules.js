@@ -2,8 +2,8 @@ import { system } from '@minecraft/server'
 import { util } from '../smapi.js'
 
 const modules = [
-  './DatabaseView/index.js',
-  './PlayerJoin/join.js',
+  './Server/DatabaseView/index.js',
+  './Server/PlayerJoin/join.js',
   './Server/index.js',
 
   './Gameplay/Build/camera.js',

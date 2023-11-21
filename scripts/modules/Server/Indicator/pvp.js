@@ -6,7 +6,7 @@ import {
   world,
 } from '@minecraft/server'
 import { Settings } from 'smapi.js'
-import { SERVER } from '../Server/var.js'
+import { SERVER } from '../var.js'
 import { PVP } from './var.js'
 
 const options = Settings.world('pvp', {

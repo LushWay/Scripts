@@ -8,7 +8,7 @@ import {
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config'
 import { Temporary } from 'lib/Class/Temporary.js'
-import { Catscene } from 'modules/Server/Class/Catscene/index.js'
+import { Catscene } from 'modules/Server/Catscene/index.js'
 import { settingsGroup } from 'modules/Server/Commands/settings.js'
 import { ActionForm, EditableLocation, is, util } from 'smapi.js'
 

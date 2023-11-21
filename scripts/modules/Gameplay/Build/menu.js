@@ -3,8 +3,8 @@ import { SOUNDS } from 'config.js'
 import { StoredRequest } from 'lib/Class/StoredRequest.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm, Cooldown, MessageForm, is, util } from 'smapi.js'
-import { JOIN } from '../../PlayerJoin/var.js'
 import { CubeRegion, Region } from '../../Region/Region.js'
+import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { MENU } from '../../Server/menuItem.js'
 import {
   clearRegion,

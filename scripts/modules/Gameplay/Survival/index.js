@@ -1,7 +1,7 @@
 import { is } from 'smapi.js'
-import { JOIN } from '../../PlayerJoin/var.js'
 import { Region } from '../../Region/Region.js'
 import { loadRegionsWithGuards } from '../../Region/index.js'
+import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { MENU } from '../../Server/menuItem.js'
 import './anarchy.js'
 import { BASE_ITEM_STACK } from './base.js'

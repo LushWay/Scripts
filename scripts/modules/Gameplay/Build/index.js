@@ -2,9 +2,9 @@ import { system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
 import { is } from 'smapi.js'
 import { SYSTEM_ENTITIES } from '../../../config.js'
-import { JOIN } from '../../PlayerJoin/var.js'
 import { Region } from '../../Region/Region.js'
 import { loadRegionsWithGuards } from '../../Region/index.js'
+import { JOIN } from '../../Server/PlayerJoin/var.js'
 import './menu.js'
 
 const GLOBAL_ALLOWED_ENTITIES = ['minecraft:player', 'minecraft:item'].concat(
