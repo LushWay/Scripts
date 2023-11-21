@@ -1,4 +1,5 @@
 import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
+import { util } from 'smapi.js'
 
 /**
  * @type {Record<string, {player: Player, proxy: any}>}
@@ -29,20 +30,22 @@ Reflect.defineProperty(Player.prototype, 'scores', {
           {
             set(_, p, newValue) {
               if (typeof p === 'symbol')
-                throw new Error('Symbol objectives are not accepted')
+                throw new Error(
+                  'Symbol objectives to set are not accepted, recieved ' +
+                    util.stringify(p)
+                )
 
-              if (!obj.player.scoreboardIdentity)
-                obj.player.runCommand(`scoreboard players set @s ${p} 0`)
-
-              ScoreboardDB.objective(p).setScore(obj.player, newValue)
+              ScoreboardDB.objective(p).setScore(obj.player.id, newValue)
               return true
             },
             get(_, p) {
               if (typeof p === 'symbol')
-                throw new Error('Symbol objectives are not accepted')
+                throw new Error(
+                  'Symbol objectives to get are not accepted, recieved ' +
+                    p.description
+                )
 
-              if (!obj.player.scoreboardIdentity) return 0
-              return ScoreboardDB.objective(p).getScore(obj.player) ?? 0
+              return ScoreboardDB.objective(p).getScore(obj.player.id) ?? 0
             },
           }
         ),
@@ -55,19 +58,11 @@ Reflect.defineProperty(Player.prototype, 'scores', {
 
 export class ScoreboardDB {
   /**
-   * Gets entity.scroebaordIdentity or creates if not exists
-   * @param {Entity} entity
+   * @type {Record<string, ScoreboardObjective>}
    */
-  static id(entity) {
-    return (
-      entity.scoreboardIdentity ??
-      (entity.runCommand(`scoreboard players set @s "${this.name}" 0`),
-      entity.scoreboardIdentity)
-    )
-  }
+  static objectives = {}
 
   /**
-   *
    * @param {string} name
    */
   static objective(name, displayName = name) {
@@ -77,11 +72,6 @@ export class ScoreboardDB {
       world.scoreboard.getObjective(name) ??
       world.scoreboard.addObjective(name, displayName))
   }
-
-  /**
-   * @type {Record<string, ScoreboardObjective>}
-   */
-  static objectives = {}
 
   /**
    * @param {string} name
@@ -94,39 +84,32 @@ export class ScoreboardDB {
     this.scoreboard = ScoreboardDB.objective(name, displayName)
   }
   /**
-   *
-   * @param {Entity} entity
+   * @param {Entity | string} id
    * @param {number} value
    */
-  set(entity, value) {
-    const id = ScoreboardDB.id(entity)
-    if (!id) return
-
+  set(id, value) {
+    if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, value)
   }
   /**
-   *
-   * @param {Entity} entity
+   * @param {Entity | string} id
    * @param {number} value
    */
-  add(entity, value) {
-    const id = ScoreboardDB.id(entity)
-    if (!id) return
-
-    this.scoreboard.setScore(id, this.get(entity) + value)
+  add(id, value) {
+    if (typeof id !== 'string') id = id.id
+    this.scoreboard.setScore(id, (this.scoreboard.getScore(id) ?? 0) + value)
   }
   /**
-   *
-   * @param {Entity} entity
+   * @param {Entity | string} id
    * @returns {number}
    */
-  get(entity) {
-    if (!entity.scoreboardIdentity) return 0
-    return this.scoreboard.getScore(entity.scoreboardIdentity) ?? 0
+  get(id) {
+    if (typeof id !== 'string') id = id.id
+    return this.scoreboard.getScore(id) ?? 0
   }
 
   reset() {
-    world.overworld.runCommand(`scoreboard players reset * ${this.name}`)
+    this.scoreboard.getParticipants().forEach(this.scoreboard.removeParticipant)
   }
 }
 

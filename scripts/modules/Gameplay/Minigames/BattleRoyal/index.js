@@ -1,5 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+// TODO Update
+
 import { Player, system, world } from '@minecraft/server'
-import { XCommand } from 'xapi.js'
+import { Command } from 'smapi.js'
 import { br } from './game.js'
 import { BATTLE_ROYAL_EVENTS, BR_QUENE } from './var.js'
 
@@ -125,7 +129,7 @@ system.runInterval(
   20
 )
 
-const bbr = new XCommand({
+const bbr = new Command({
   name: 'br',
   description: 'Телепортирует на спавн батл рояля',
 }).executes(ctx => {

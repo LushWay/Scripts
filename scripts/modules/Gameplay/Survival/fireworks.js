@@ -1,6 +1,6 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { GAME_UTILS } from 'xapi.js'
+import { GAME_UTILS } from 'smapi.js'
 /** @type {Record<string, [number, Entity]>} */
 const SPAWNED_FIREWORKS = {}
 

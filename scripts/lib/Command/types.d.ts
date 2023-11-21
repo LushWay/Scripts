@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
-import { ROLES } from 'xapi.js'
-import { XCommand } from './index.js'
+import { ROLES } from 'smapi.js'
+import { Command } from './index.js'
 
 export interface ICommandData {
   /**
@@ -54,7 +54,7 @@ type AppendArgument<Base, Next> = Base extends (
   ? (ctx: X, ...args: [...E, Next]) => R
   : never
 
-export type ArgReturn<Callback, Type> = XCommand<AppendArgument<Callback, Type>>
+export type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
 
 export type MSValueType =
   | 'years'

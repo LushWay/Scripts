@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/Class/EventSignal.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { Settings } from 'xapi.js'
+import { Settings } from 'smapi.js'
 
 export const BATTLE_ROYAL_EVENTS = {
   /** @type {EventSignal<Player>} */

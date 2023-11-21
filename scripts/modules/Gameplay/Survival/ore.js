@@ -1,35 +1,24 @@
-import { Vector } from '@minecraft/server'
-
 /**
- *
  * @param {Vector3} centerPos
- * @param {number} radius
- * @returns
+ * @param {number} minRadius
+ * @param {number} maxRadius
  */
-export function generateOre(centerPos, radius) {
+export function generateOre(centerPos, minRadius, maxRadius) {
   const orePositions = []
 
   // Generate a random number of ores within the specified radius of the center position
-  const numOres = Math.randomInt(0, radius)
-  console.debug({ numOres, radius })
+  const numOres = Math.randomInt(0, maxRadius)
+  console.debug({ numOres, maxRadius })
 
   for (let i = 0; i < numOres; i++) {
-    // Generate a random point within a unit sphere
-    let randomPoint = new Vector(
-      Math.randomInt(-10, 10), // x-coordinate [-1, 1]
-      Math.randomInt(-10, 10), // y-coordinate [-1, 1]
-      Math.randomInt(-10, 10) // z-coordinate [-1, 1]
-    )
+    const theta = 2 * Math.PI * Math.random()
+    const phi = Math.acos(2 * Math.random() - 1)
+    const r = Math.randomInt(minRadius, maxRadius)
+    const x = centerPos.x + r * Math.sin(phi) * Math.cos(theta)
+    const y = centerPos.y + r * Math.sin(phi) * Math.sin(theta)
+    const z = centerPos.z + r * Math.cos(phi)
 
-    // Scale the normalized random point by the specified radius
-    randomPoint = Vector.multiply(randomPoint, Math.randomInt(1, radius))
-    console.debug({ randomPoint })
-
-    // Calculate the position of the ore relative to the center
-    const orePosition = Vector.add(randomPoint, centerPos)
-
-    // Add the ore position to the array
-    orePositions.push(orePosition)
+    orePositions.push({ x, y, z })
   }
 
   return orePositions

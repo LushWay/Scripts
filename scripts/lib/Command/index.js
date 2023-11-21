@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, world } from '@minecraft/server'
-import { is } from 'xapi.js'
+import { is } from 'smapi.js'
 import { CONFIG } from '../../config.js'
 import {
   ArrayArgumentType,
@@ -28,7 +28,7 @@ import {
 /**
  *  @template {Function} [Callback = (ctx: CommandContext) => void]
  */
-export class XCommand {
+export class Command {
   /**
    * @param {ChatSendAfterEvent} data
    */
@@ -40,7 +40,7 @@ export class XCommand {
       return // This is not a command
 
     const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix)
-    const command = XCommand.commands.find(
+    const command = Command.commands.find(
       c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
     )
     if (!command) return commandNotFound(data.sender, cmd)
@@ -58,12 +58,12 @@ export class XCommand {
 
     /**
      * Check Args/SubCommands for errors
-     * @type {XCommand[]}
+     * @type {Command[]}
      */
     const verifiedCommands = []
 
     /**
-     * @param {XCommand<any>} start
+     * @param {Command<any>} start
      * @param {number} i
      * @returns {'fail' | 'success'}
      */
@@ -92,12 +92,12 @@ export class XCommand {
   }
   /**
    * An array of all active commands
-   * @type {XCommand<any>[]}
+   * @type {Command<any>[]}
    */
   static commands = []
 
   /**
-   * @param {XCommand} command
+   * @param {Command} command
    * @param {CommandContext} ctx
    */
   static getHelpForCommand(command, ctx) {
@@ -108,7 +108,7 @@ export class XCommand {
    * @param {ICommandData} data
    * @param {IArgumentType} [type]
    * @param {number} [depth]
-   * @param {XCommand<any> | null} [parent]
+   * @param {Command<any> | null} [parent]
    */
   constructor(data, type, depth = 0, parent = null) {
     if (data.role && data.role !== 'member') {
@@ -126,7 +126,7 @@ export class XCommand {
       type: type ?? new LiteralArgumentType(data.name),
       /**
        * The Arguments on this command
-       * @type {XCommand<any>[]}
+       * @type {Command<any>[]}
        */
       children: [],
       depth,
@@ -138,7 +138,7 @@ export class XCommand {
       callback: undefined,
     }
 
-    if (depth === 0) XCommand.commands.push(this)
+    if (depth === 0) Command.commands.push(this)
   }
 
   /**
@@ -149,7 +149,7 @@ export class XCommand {
    * @private
    */
   argument(type) {
-    const cmd = new XCommand(this.sys.data, type, this.sys.depth + 1, this)
+    const cmd = new Command(this.sys.data, type, this.sys.depth + 1, this)
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd
@@ -207,10 +207,10 @@ export class XCommand {
   /**
    * Adds a subCommand to this argument
    * @param {import("./types.js").ICommandData} data name this literal should have
-   * @returns {XCommand<Callback>} new branch to this command
+   * @returns {Command<Callback>} new branch to this command
    */
   literal(data, optional = false) {
-    const cmd = new XCommand(
+    const cmd = new Command(
       data,
       new LiteralArgumentType(data.name, optional),
       this.sys.depth + 1,
@@ -223,7 +223,7 @@ export class XCommand {
   /**
    * Registers this command and its apendending arguments
    * @param {Callback} callback what to run when this command gets called
-   * @returns {XCommand<Callback>}
+   * @returns {Command<Callback>}
    */
   executes(callback) {
     this.sys.callback = callback
@@ -235,4 +235,4 @@ world.beforeEvents.chatSend.subscribe(data => {
   data.sendToTargets = true
   data.setTargets([])
 })
-world.afterEvents.chatSend.subscribe(XCommand.chatListener)
+world.afterEvents.chatSend.subscribe(Command.chatListener)

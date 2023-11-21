@@ -1,6 +1,6 @@
 import { EasingType, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
-import { ActionForm, ModalForm, util } from 'xapi.js'
+import { ActionForm, ModalForm, util } from 'smapi.js'
 import {
   getChatAugments,
   parseLocationAugs,
@@ -183,7 +183,7 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   }
 })
 
-const cmd = new XCommand({ name: 'camera', role: 'admin' })
+const cmd = new Command({ name: 'camera', role: 'admin' })
 cmd.executes(ctx => selectPlayerForm(ctx.sender))
 cmd.literal({ name: 'reset' }).executes(ctx => {
   ctx.sender.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)

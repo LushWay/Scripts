@@ -1,6 +1,6 @@
 import { Player, Vector } from '@minecraft/server'
-import { ActionForm, ModalForm } from 'xapi.js'
-import { RadiusRegion } from '../../Server/Region/Region.js'
+import { ActionForm, ModalForm } from 'smapi.js'
+import { RadiusRegion } from '../../Region/Region.js'
 
 /**
  * @param {Player} player

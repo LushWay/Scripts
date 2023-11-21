@@ -10,11 +10,11 @@ import {
   MinecraftBlockTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
-import { LockAction, XCommand } from 'xapi.js'
-import { RadiusRegion, Region } from '../../Server/Region/Region.js'
-import { MoneyCost, Store } from '../../Server/Server/store.js'
+import { SOUNDS } from 'config.js'
+import { Command, LockAction } from 'smapi.js'
+import { RadiusRegion, Region } from '../../Region/Region.js'
+import { MoneyCost, Store } from '../../Server/Class/Store.js'
 import { baseMenu } from './baseMenu.js'
-import { Sounds } from 'lib/List/used-sounds.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel)
 BASE_ITEM_STACK.setLore(['Поставьте эту бочку', 'и она станет базой.'])
@@ -89,11 +89,11 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     player.tell(
       '§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base'
     )
-    player.playSound(Sounds.levelup)
+    player.playSound(SOUNDS.levelup)
   })
 })
 
-const base = new XCommand({
+const base = new Command({
   name: 'base',
   description: 'Меню базы',
 })

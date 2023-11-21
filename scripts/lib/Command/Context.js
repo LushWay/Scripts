@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { Sounds } from 'lib/List/used-sounds.js'
-import { XCommand } from './index.js'
+import { SOUNDS } from 'config.js'
+import { Command } from './index.js'
 
 export class CommandContext {
   /**
@@ -19,7 +19,7 @@ export class CommandContext {
   args
 
   /**
-   * @type {XCommand}
+   * @type {Command}
    */
   command
 
@@ -27,7 +27,7 @@ export class CommandContext {
    * Returns a commands callback
    * @param {ChatSendAfterEvent} data chat data that was used
    * @param {string[]} args
-   * @param {XCommand} command
+   * @param {Command} command
    * @param {string} rawInput
    */
   constructor(data, args, command, rawInput) {
@@ -52,6 +52,6 @@ export class CommandContext {
    */
   error(errorText) {
     this.sender.tell(`§c${errorText}`)
-    this.sender.playSound(Sounds.fail)
+    this.sender.playSound(SOUNDS.fail)
   }
 }

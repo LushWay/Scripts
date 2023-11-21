@@ -1,11 +1,11 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { Sounds } from 'lib/List/used-sounds.js'
-import { util } from 'xapi.js'
+import { SOUNDS } from 'config.js'
+import { util } from 'smapi.js'
 import { CONFIG } from '../../config.js'
 import { inaccurateSearch } from '../Class/Search.js'
 import { LiteralArgumentType, LocationArgumentType } from './ArgumentTypes.js'
 import { CommandContext } from './Context.js'
-import { XCommand } from './index.js'
+import { Command } from './index.js'
 
 /**
  * Returns a Before chat events augments
@@ -42,13 +42,13 @@ export function commandNotFound(player, command) {
       },
     ],
   })
-  player.playSound(Sounds.fail)
+  player.playSound(SOUNDS.fail)
 
   if (!command) return
 
   const cmds = new Set()
 
-  for (const c of XCommand.commands.filter(
+  for (const c of Command.commands.filter(
     e => e.sys.data.requires && e.sys.data.requires(player)
   )) {
     cmds.add(c.sys.data.name)
@@ -85,7 +85,7 @@ export function commandNotFound(player, command) {
 /**
  * Sends a command not found message to a player
  * @param {Player} player  player to send message to
- * @param {XCommand} command
+ * @param {Command} command
  * @returns {void}
  */
 export function noPerm(player, command) {
@@ -98,13 +98,13 @@ export function noPerm(player, command) {
       },
     ],
   })
-  player.playSound(Sounds.fail)
+  player.playSound(SOUNDS.fail)
 }
 
 /**
  * Sends a syntax failure message to player
  * @param {Player} player  undefined
- * @param {XCommand} command  undefined
+ * @param {Command} command  undefined
  * @param {string[]} args  undefined
  * @param {number} i  undefined
  * @returns {void}
@@ -161,9 +161,9 @@ export function parseLocationAugs([x, y, z], data) {
 /**
  * Sends a callback back to the command
  * @param {string[]} cmdArgs the args that the command used
- * @param {XCommand<any>[]} args args to use
+ * @param {Command<any>[]} args args to use
  * @param {ChatSendAfterEvent} event
- * @param {XCommand<any>} baseCommand
+ * @param {Command<any>} baseCommand
  * @param {string} rawInput
  */
 export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {

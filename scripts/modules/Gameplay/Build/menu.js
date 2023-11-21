@@ -1,11 +1,11 @@
 import { Player, system, world } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 import { StoredRequest } from 'lib/Class/StoredRequest.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { Sounds } from 'lib/List/used-sounds.js'
-import { ActionForm, Cooldown, MessageForm, is, util } from 'xapi.js'
-import { MENU } from '../../Server/Menu/var.js'
-import { JOIN } from '../../Server/PlayerJoin/var.js'
-import { CubeRegion, Region } from '../../Server/Region/Region.js'
+import { ActionForm, Cooldown, MessageForm, is, util } from 'smapi.js'
+import { JOIN } from '../../PlayerJoin/var.js'
+import { CubeRegion, Region } from '../../Region/Region.js'
+import { MENU } from '../../Server/menuItem.js'
 import {
   clearRegion,
   createRegion,
@@ -96,7 +96,7 @@ system.runPlayerInterval(
 )
 
 JOIN.EVENTS.playerClosedGuide.subscribe(player => {
-  player.playSound(Sounds.levelup)
+  player.playSound(SOUNDS.levelup)
   player.tell('Приветствую на сервере')
   const oldRegion = DB[player.id]
   if (!oldRegion) createRegion(player)

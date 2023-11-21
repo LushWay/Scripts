@@ -1,8 +1,8 @@
 import { Player, system, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
-import { util } from 'xapi.js'
-import { CubeRegion, Region } from '../../Server/Region/Region.js'
+import { util } from 'smapi.js'
+import { CubeRegion, Region } from '../../Region/Region.js'
 import { DB } from './menu.js'
 
 const squarePlace = -55

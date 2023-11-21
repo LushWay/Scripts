@@ -1,8 +1,8 @@
-import { is } from 'xapi.js'
-import { MENU } from '../../Server/Menu/var.js'
-import { JOIN } from '../../Server/PlayerJoin/var.js'
-import { Region } from '../../Server/Region/Region.js'
-import { loadRegionsWithGuards } from '../../Server/Region/index.js'
+import { is } from 'smapi.js'
+import { JOIN } from '../../PlayerJoin/var.js'
+import { Region } from '../../Region/Region.js'
+import { loadRegionsWithGuards } from '../../Region/index.js'
+import { MENU } from '../../Server/menuItem.js'
 import './anarchy.js'
 import { BASE_ITEM_STACK } from './base.js'
 import './bouncyTnt.js'
@@ -12,9 +12,8 @@ import './spawn.js'
 
 console.log('§6Gameplay mode: survival')
 
-loadRegionsWithGuards(
-  // Common actions guard
-  (player, region, context) => {
+loadRegionsWithGuards({
+  allowed(player, region, context) {
     if (player.hasTag('modding') || is(player.id, 'builder')) return true
 
     if (region) {
@@ -24,7 +23,7 @@ loadRegionsWithGuards(
         player
           .getComponent('inventory')
           .container.getItem(player.selectedSlot)
-          ?.isStackableWith(BASE_ITEM_STACK)
+          ?.is(BASE_ITEM_STACK)
       )
         return true
 
@@ -33,18 +32,20 @@ loadRegionsWithGuards(
     }
   },
 
-  // Spawn entity guard
-  (region, data) =>
-    !region ||
-    region.permissions.allowedEntities === 'all' ||
-    region.permissions.allowedEntities.includes(data.entity.typeId),
+  spawnAllowed(region, data) {
+    return (
+      !region ||
+      region.permissions.allowedEntities === 'all' ||
+      region.permissions.allowedEntities.includes(data.entity.typeId)
+    )
+  },
 
-  (player, currentRegion) => {
+  regionCallback(player, currentRegion) {
     if (currentRegion && !currentRegion?.permissions.pvp) {
       player.triggerEvent('player:spawn')
     }
-  }
-)
+  },
+})
 
 Region.config.permissions = {
   allowedEntities: 'all',

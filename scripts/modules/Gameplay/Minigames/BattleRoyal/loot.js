@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-nocheck
 import { ItemStack, MinecraftBlockTypes, world } from '@minecraft/server'
-import { rd } from '../../Loot/airdrop.js'
+import { rd } from '../../../Server/Class/Airdrop.js'
 
 /**
  * @type {Array<ItemStack>}

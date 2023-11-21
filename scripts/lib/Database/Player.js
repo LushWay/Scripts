@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { OverTakes } from 'xapi.js'
+import { OverTakes } from 'smapi.js'
 
 export const PLAYER_DB = new DynamicPropertyDB('player', {
   /** @type {Record<string, import("@minecraft/server").Player["database"]>} */

@@ -1,5 +1,5 @@
 import { Player, system } from '@minecraft/server'
-import { PLAYER_DB } from 'xapi.js'
+import { PLAYER_DB } from 'smapi.js'
 
 system.afterEvents.scriptEventReceive.subscribe(event => {
   if (event.id === 'ROLE:ADMIN') {

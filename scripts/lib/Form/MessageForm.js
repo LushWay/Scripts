@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
-import { util } from 'xapi.js'
+import { util } from 'smapi.js'
 import { showForm } from './utils.js'
 /** */
 export class MessageForm {

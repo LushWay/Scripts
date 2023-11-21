@@ -1,13 +1,38 @@
 export const CONFIG = {
   commandPrefix: '-',
   /**
-   * Time in ms to mark XA.state.first_load
+   * Time in ms to mark SM.state.first_load
    * @type {number}
    */
   firstPlayerJoinTime: 5000,
-  sounds: {
-    yes: 'minecraft:random.xp',
-    no: 'minecraft:random.anvil_place',
-  },
-  system_entities: ['x:sit', 'rubedo:database', 'f:t'],
+  singlePlayerHostId: '-4294967285',
+}
+
+export const CUSTOM_ITEMS = {
+  menu: 'sm:menu',
+  brush: 'we:brush',
+  dash: 'we:dash',
+  shovel: 'we:shovel',
+  tool: 'we:tool',
+  wand: 'we:wand',
+}
+
+export const CUSTOM_ENTITIES = {
+  database: 'rubedo:database',
+  sit: 'sm:sit',
+  floatingText: 'f:t',
+}
+
+export const SYSTEM_ENTITIES = [
+  CUSTOM_ENTITIES.database,
+  CUSTOM_ENTITIES.floatingText,
+  CUSTOM_ENTITIES.sit,
+]
+
+export const SOUNDS = {
+  levelup: 'random.levelup',
+  success: 'note.pling',
+  action: 'random.orb',
+  click: 'note.hat',
+  fail: 'block.false_permissions',
 }

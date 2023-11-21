@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
-import { util } from 'xapi.js'
+import { util } from 'smapi.js'
 import { FormCallback, showForm } from './utils.js'
 
 /**

@@ -1,3 +1,5 @@
+import { CompoundBlockVolume } from "@minecraft/server"
+
 export const MinecraftEnchantmentTypes = {
   aqua_affinity: 'aqua_affinity',
   bane_of_arthropods: 'bane_of_arthropods',
@@ -38,3 +40,5 @@ export const MinecraftEnchantmentTypes = {
   unbreaking: 'unbreaking',
   vanishing: 'vanishing',
 }
+
+CompoundBlockVolume

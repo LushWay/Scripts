@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
-import { LockAction, ScoreboardDB } from 'xapi.js'
-import { Region } from '../../Server/Region/Region.js'
+import { LockAction, ScoreboardDB } from 'smapi.js'
+import { Region } from '../../Region/Region.js'
 import { RAID_NOTIFY } from './var.js'
 
 world.beforeEvents.explosion.subscribe(data => {
@@ -30,7 +30,7 @@ system.runInterval(
           )
           player.playSound('mob.wolf.bark')
         }
-        RAID.set(player, RAID_NOTIFY[id])
+        RAID.set(player.id, RAID_NOTIFY[id])
         delete RAID_NOTIFY[id]
         continue
       }

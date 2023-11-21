@@ -4,10 +4,10 @@ import {
   MinecraftEffectTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore } from 'xapi.js'
+import { EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
-import { MENU } from '../../Server/Menu/var.js'
-import { RadiusRegion, Region } from '../../Server/Region/Region.js'
+import { RadiusRegion, Region } from '../../Region/Region.js'
+import { MENU } from '../../Server/menuItem.js'
 import { ANARCHY } from './anarchy.js'
 
 export const SPAWN = {

@@ -1,6 +1,5 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { util } from '../util.js'
 
 export const OPTIONS_NAME = Symbol('name')
 
@@ -35,7 +34,7 @@ export const PLAYER_SETTINGS_DB = new DynamicPropertyDB('playerOptions', {
   },
 }).proxy()
 
-/** @typedef {DefaultSettings<SettingValue> & Record<string, { requires?: boolean }>} WorldSettings */
+/** @typedef {DefaultSettings<SettingValue> & Record<string, { requires?: boolean, onChange?: () => void }>} WorldSettings */
 export const WORLD_SETTINGS_DB = new DynamicPropertyDB('worldOptions', {
   /** @type {SETTINGS_DB} */
   type: {},
@@ -132,7 +131,7 @@ export function generateSettingsProxy(
         return database[groupName]?.[key] ?? config[prop].value
       },
       set(v) {
-        const value = database[groupName] ?? {}
+        const value = database[groupName]
         value[key] = v
         database[groupName] = value
       },
@@ -140,62 +139,3 @@ export function generateSettingsProxy(
   }
   return OptionsProxy
 }
-
-export class EditableLocation {
-  static key = 'locations'
-  valid = true
-  x = 0
-  y = 0
-  z = 0
-  /**
-   *
-   * @param {string} id
-   * @param {Object} [options]
-   * @param {false | Vector3} [options.fallback]
-   */
-  constructor(id, { fallback = false } = {}) {
-    this.id = id
-    this.fallback = fallback
-    Settings.worldMap[EditableLocation.key][id] = {
-      desc: `Позиция ${id}`,
-      name: id,
-      value: fallback ? Vector.string(fallback) : '',
-    }
-
-    this.init()
-  }
-
-  init() {
-    const raw = WORLD_SETTINGS_DB[EditableLocation.key][this.id]
-
-    if (typeof raw !== 'string' || raw === '') {
-      if (this.fallback === false) {
-        console.warn(
-          '§eEmpty location §f' + this.id + '\n§r' + util.error.stack.get(1)
-        )
-        this.valid = false
-        return
-      } else {
-        this.x = this.fallback.x
-        this.y = this.fallback.y
-        this.z = this.fallback.z
-        return
-      }
-    }
-
-    const location = raw.split(' ').map(Number)
-
-    if (location.length !== 3) {
-      util.error(new TypeError('Invalid location'))
-      console.error(raw)
-      this.valid = false
-      return
-    }
-
-    this.x = location[0]
-    this.y = location[1]
-    this.z = location[2]
-  }
-}
-
-Settings.worldMap[EditableLocation.key] = {}

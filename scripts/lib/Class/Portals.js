@@ -1,5 +1,5 @@
 import { Player, Vector } from '@minecraft/server'
-import { LockAction, Place } from 'xapi.js'
+import { LockAction, Place } from 'smapi.js'
 
 /**
  * @typedef {object} TeleportOptions
@@ -67,7 +67,7 @@ export class Portal {
     } else this.place = place
 
     if (createCommand)
-      new XCommand({
+      new Command({
         name,
         aliases,
         description: commandDescription ?? `§bТелепорт на ${name}`,

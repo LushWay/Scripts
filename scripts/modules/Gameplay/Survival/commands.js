@@ -1,4 +1,4 @@
-import { SERVER } from '../../Server/Server/var.js'
+import { SERVER } from '../../Server/var.js'
 
 // new XCommand({
 // 	name: "resetpos",
@@ -9,7 +9,7 @@ import { SERVER } from '../../Server/Server/var.js'
 // 	ctx.reply(XA.tables.player.delete("POS:" + ctx.sender.id) + "");
 // });
 
-new XCommand({
+new Command({
   name: 'radius',
   description: 'Выдает радиус границы анархии сейчас',
   type: 'public',

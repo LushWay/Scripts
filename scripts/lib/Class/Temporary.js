@@ -12,6 +12,7 @@ export class Temporary {
    * @template {WorldAfterEvents | WorldBeforeEvents} Events
    * @param {Events} events
    * @returns {Events}
+   * @private
    */
   proxyEvents(events) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -52,6 +53,9 @@ export class Temporary {
       },
     })
   }
+  /**
+   * @private
+   */
   proxySystem() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const temp = this
@@ -80,14 +84,10 @@ export class Temporary {
       },
     })
   }
+
   /**
-   * List of functions that will be called on clear
-   * @private
-   * @type {(() => void)[]}
-   */
-  cleaner = []
-  /**
-   * @param {(arg: { system: System, world: World, clear: Temporary["clear"] }) => void} execute
+   * Creates new temporary system
+   * @param {(arg: { system: System, world: World, cleanup: Temporary["cleanup"], temp: Temporary }) => void} execute
    */
   constructor(execute) {
     execute({
@@ -99,17 +99,29 @@ export class Temporary {
         world
       ),
       system: this.proxySystem(),
-      clear: this.clear.bind(this),
+      cleanup: this.cleanup.bind(this),
+      temp: this,
     })
-  }
-  clear() {
-    console.log('Cleared')
-    this.cleaner.forEach(fn => fn())
-    this.cleaner = []
   }
 
   /**
-   * For quest compability
+   * List of functions that will be called on clear
+   * @private
+   * @type {(() => void)[]}
    */
-  cleanup = this.clear.bind(this)
+  cleaner = []
+  /**
+   * Unsubscribes all temporary events
+   * @type {(this: Temporary) => void}
+   */
+  cleanup = (() => {
+    this.cleaner.forEach(fn => fn())
+    this.cleaner = []
+    this.cleaned = true
+  }).bind(this)
+
+  /**
+   * Weather events are unsubscribed or not
+   */
+  cleaned = false
 }

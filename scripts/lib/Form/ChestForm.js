@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { loreWordWrap } from 'lib/Extensions/itemstack.js'
-import { showForm, util } from 'xapi.js'
+import { showForm, util } from 'smapi.js'
 import { typeIdToID } from '../../chestui/typeIds.js'
 
 const NUMBER_OF_1_16_100_ITEMS = 0

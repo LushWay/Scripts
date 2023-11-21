@@ -1,12 +1,12 @@
 import { Player, Vector, system, world } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 import { Quest } from 'lib/Class/Quest.js'
 import { Sidebar } from 'lib/Class/Sidebar.js'
 import { Temporary } from 'lib/Class/Temporary.js'
-import { Sounds } from 'lib/List/used-sounds.js'
-import { ActionForm, EditableLocation, InventoryStore } from 'xapi.js'
+import { Zone } from 'modules/Server/Class/Zone.js'
+import { ActionForm, EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
-import { Zone } from '../Minigames/BattleRoyal/zone.js'
-import { randomTeleport } from './rtp.js'
+import { randomTeleport } from './randomTeleport.js'
 import { SPAWN } from './spawn.js'
 
 export const ANARCHY = {
@@ -17,99 +17,10 @@ export const ANARCHY = {
   portal: void 0,
 }
 if (ANARCHY.centerLocation.valid) {
-  system.runInterval(
-    () => {
-      const players = world.getPlayers()
-      const radius = players.length * 50
-
-      const rmax = {
-        x: ANARCHY.centerLocation.x + radius,
-        y: 0,
-        z: ANARCHY.centerLocation.z + radius,
-      }
-
-      const rmin = {
-        x: ANARCHY.centerLocation.x - radius,
-        y: 0,
-        z: ANARCHY.centerLocation.z - radius,
-      }
-
-      for (const p of players) {
-        const l = Vector.floor(p.location)
-        if (
-          l.x >= rmax.x &&
-          l.x <= rmax.x + 10 &&
-          l.z <= rmax.z &&
-          l.z >= rmin.z
-        )
-          return Zone.tp(p, true, rmax)
-
-        if (
-          l.x >= rmax.x - 10 &&
-          l.x <= rmax.x &&
-          l.z <= rmax.z &&
-          l.z >= rmin.z
-        )
-          return Zone.warn(p, true, rmax)
-
-        if (
-          l.z >= rmax.z &&
-          l.z <= rmax.z + 10 &&
-          l.x <= rmax.x &&
-          l.x >= rmin.x
-        )
-          return Zone.tp(p, false, rmax)
-
-        if (
-          l.z >= rmax.z - 10 &&
-          l.z <= rmax.z &&
-          l.x <= rmax.x &&
-          l.x >= rmin.x
-        )
-          return Zone.warn(p, false, rmax)
-
-        if (
-          l.x <= rmin.x &&
-          l.x >= rmin.x - 10 &&
-          l.z <= rmax.z &&
-          l.z >= rmin.z
-        )
-          return Zone.tp(p, true, rmin, true)
-
-        if (
-          l.x <= rmin.x + 10 &&
-          l.x >= rmin.x &&
-          l.z <= rmax.z &&
-          l.z >= rmin.z
-        )
-          return Zone.warn(p, true, rmin)
-
-        if (
-          l.z <= rmin.z &&
-          l.z >= rmin.z - 10 &&
-          l.x <= rmax.x &&
-          l.x >= rmin.x
-        )
-          return Zone.tp(p, false, rmin, true)
-
-        if (
-          l.z <= rmin.z + 10 &&
-          l.z >= rmin.z &&
-          l.x <= rmax.x &&
-          l.x >= rmin.x
-        )
-          return Zone.warn(p, false, rmin)
-
-        // TODO detect if player in the zone
-        // anarchyInventory(p, p.db());
-      }
-    },
-    'zone',
-    10
-  )
+  new Zone(ANARCHY.centerLocation, ps => ps.length * 50)
 }
+
 /**
- *
  * @param {Player} player
  */
 function anarchyInventory(player) {
@@ -181,7 +92,7 @@ if (ANARCHY.portal) {
 
     q.start(function () {
       this.player.tell('§6Квест начался!')
-      this.player.playSound(Sounds.action)
+      this.player.playSound(SOUNDS.action)
     })
 
     q.place(ANARCHY.portal.from, ANARCHY.portal.to, '§6Зайди в портал анархии')
@@ -209,7 +120,7 @@ if (ANARCHY.portal) {
     })
   })
 
-  new XCommand({
+  new Command({
     name: 'q',
     role: 'admin',
   }).executes(ctx => {
