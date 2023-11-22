@@ -7,6 +7,7 @@ import './Commands/ping.js'
 import './Commands/role.js'
 import './Commands/settings.js'
 import './Commands/sit.js'
+import './Commands/tp.js'
 import { SERVER } from './var.js'
 
 let toImport = './disabled.js'
