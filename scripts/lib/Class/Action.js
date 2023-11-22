@@ -73,3 +73,9 @@ export class LockAction {
     return false
   }
 }
+
+export class LazyAction {
+  whenChunkLoaded() {}
+
+  whenBlockLoaded() {}
+}

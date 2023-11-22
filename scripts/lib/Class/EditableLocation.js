@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { EventSignal } from 'smapi.js'
+import { EventLoader } from 'smapi.js'
 import { util } from '../util.js'
 import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
 
@@ -59,9 +59,9 @@ export class EditableLocation {
     this.y = location[1]
     this.z = location[2]
     this.valid = true
-    EventSignal.emit(this.onValid, {})
+    EventLoader.load(this.onValid)
   }
 
-  onValid = new EventSignal()
+  onValid = new EventLoader()
 }
 Settings.worldMap[EditableLocation.key] = {}

@@ -1,7 +1,10 @@
 import { GameMode, system, Vector, world } from '@minecraft/server'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import * as GameTest from '@minecraft/server-gametest'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import {
+  MinecraftBlockTypes,
+  MinecraftEntityTypes,
+} from '@minecraft/vanilla-data.js'
 import { GAME_UTILS, util } from 'smapi.js'
 const time = 9999999
 
@@ -9,6 +12,8 @@ let name = 'Бот'
 /** @type {GameTest.SimulatedPlayer} */
 let player
 const testLoc = { x: 1000, y: -60, z: 1000 }
+
+
 
 GameTest.registerAsync('s', 's', async test => {
   const spawnLoc = { x: 0, y: 3, z: 0 }
@@ -25,7 +30,7 @@ GameTest.registerAsync('s', 's', async test => {
   test.succeed()
 })
   .maxTicks(time)
-  .structureName('Component:grass5x5')
+  .structureName('test:grass')
   .tag('sim')
 
 GameTest.registerAsync('s', 'test', async test => {
@@ -106,7 +111,7 @@ GameTest.registerAsync('s', 'test', async test => {
   player.stopBreakingBlock()
 })
   .maxTicks(time)
-  .structureName('Component:grass5x5')
+  .structureName('grass')
   .tag('sim')
 
 new Command({

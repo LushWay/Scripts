@@ -17,7 +17,7 @@ export const OPTIONS_NAME = Symbol('name')
 /**
  * @template [T = boolean | string | number | JSONLike]
  * @typedef {Record<string,
- *   { desc: string; value: T, name: string }
+ *   { desc: string; value: T, name: string, onChange?: () => void  }
  * > & {[OPTIONS_NAME]?: string}
  * } DefaultSettings
  */
@@ -34,7 +34,7 @@ export const PLAYER_SETTINGS_DB = new DynamicPropertyDB('playerOptions', {
   },
 }).proxy()
 
-/** @typedef {DefaultSettings<SettingValue> & Record<string, { requires?: boolean, onChange?: () => void }>} WorldSettings */
+/** @typedef {DefaultSettings<SettingValue> & Record<string, { requires?: boolean, }>} WorldSettings */
 export const WORLD_SETTINGS_DB = new DynamicPropertyDB('worldOptions', {
   /** @type {SETTINGS_DB} */
   type: {},
@@ -133,6 +133,7 @@ export function generateSettingsProxy(
       set(v) {
         const value = database[groupName]
         value[key] = v
+        config[prop].onChange?.()
         database[groupName] = value
       },
     })

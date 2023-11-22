@@ -1,8 +1,6 @@
 import {
-  EquipmentSlot,
   ItemStack,
   MolangVariableMap,
-  Player,
   Vector,
   system,
   world,
@@ -260,17 +258,6 @@ const tests = {
     }
   },
 }
-
-world.afterEvents.entityHitEntity.subscribe(event => {
-  if (event.damagingEntity instanceof Player) {
-    const axe = event.damagingEntity
-      .getComponent('equippable')
-      .getEquipmentSlot(EquipmentSlot.Mainhand)
-    if (axe && !axe.typeId?.includes('axe')) return
-
-    event.damagingEntity.startItemCooldown('axe', 10)
-  }
-})
 
 // const i = MinecraftItemTypes;
 // new Store({ x: -180, y: 69, z: -144 }, "minecraft:overworld", {

@@ -2,7 +2,7 @@ import { system } from '@minecraft/server'
 import { util } from '../smapi.js'
 
 const modules = [
-  './Server/DatabaseView/index.js',
+  './DatabaseView/index.js',
   './Server/PlayerJoin/join.js',
   './Server/index.js',
 
@@ -41,6 +41,7 @@ export default async function ({
         util.error(e, {
           errorName: 'ModuleLoad',
           additionalStack: [module],
+          deleteStack: 1,
         })
         stop = true
       }

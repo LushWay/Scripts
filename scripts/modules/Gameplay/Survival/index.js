@@ -1,3 +1,5 @@
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
+import { Boss } from 'modules/Gameplay/Survival/boss.js'
 import { is } from 'smapi.js'
 import { Region } from '../../Region/Region.js'
 import { loadRegionsWithGuards } from '../../Region/index.js'
@@ -69,4 +71,23 @@ for (const key of Object.keys(JOIN.EVENT_DEFAULTS).filter(e => e !== 'join')) {
 
 JOIN.EVENTS.firstTime.subscribe(player => {
   player.getComponent('inventory').container.addItem(MENU.item)
+})
+
+new Boss({
+  name: 'wither',
+  entityId: 'minecraft:' + MinecraftEntityTypes.Wither,
+  displayName: 'Камнедробилка',
+  bossEvent: false,
+
+  // 1 час
+  respawnTime: 1000 * 60 * 60,
+})
+
+new Boss({
+  name: 'slime',
+  entityId: 'minecraft:' + MinecraftEntityTypes.Slime,
+  displayName: 'Слайм',
+
+  // 10 минут
+  respawnTime: 1000 * 60 * 10,
 })

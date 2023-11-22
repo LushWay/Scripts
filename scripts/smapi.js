@@ -62,8 +62,6 @@ world.afterEvents.playerJoin.subscribe(player => {
   }
 })
 
-importModules()
-
 system.run(async function waiter() {
   const entities = await world.overworld.runCommandAsync(`testfor @e`)
   if (entities.successCount < 1) {
@@ -78,6 +76,10 @@ system.run(async function waiter() {
     if (world.getAllPlayers().find(e => e.id === CONFIG.singlePlayerHostId)) {
       util.settings.BDSMode = false
     }
+
+    await importModules()
+
+    EventLoader.load(SM.afterEvents.modulesLoad)
 
     world.say(
       `${util.settings.firstLoad ? '§fFirst loaded in ' : '§9└ §fDone in '}${(
