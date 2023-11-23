@@ -88,3 +88,19 @@ export class MessageForm {
     if (callback) util.catch(callback)
   }
 }
+
+/**
+ * @param {Player} player
+ * @param {string} text
+ * @param {string} yesText
+ * @param {() => void} onYesAction
+ * @param {string} noText
+ * @param {() => void} onNoAction
+ */
+
+export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
+  new MessageForm('Вы уверены?', text)
+    .setButton1(yesText, onYesAction)
+    .setButton2(noText, onNoAction)
+    .show(player)
+}

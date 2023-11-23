@@ -3,10 +3,6 @@ import { EventSignal, Settings } from 'smapi.js'
 import './subscribes.js'
 import { JOIN } from './var.js'
 
-// TODO Move stage/waiting and other to variables
-// TODO Add trigger to set joined score on join
-// TODO Remove unused events
-
 /**
  * @param {Player} player
  */
@@ -18,15 +14,18 @@ function playerAt(player) {
     player.location.z,
     rotation.x,
     rotation.y,
-  ]
+  ].map(Math.floor)
 }
 
-world.afterEvents.playerSpawn.subscribe(({ player }) => {
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+  if (initialSpawn) player.scores.joinDate = ~~(Date.now() / 1000)
+  player.database.join ??= {}
   player.database.join.position = playerAt(player)
 })
 
 system.runPlayerInterval(
   player => {
+    player.database.join ??= {}
     const db = player.database.join
 
     if (Array.isArray(db.position)) {
@@ -92,12 +91,13 @@ const getSettings = Settings.player('Вход', 'join', {
  * @param {"air" | "ground"} messageType
  */
 function join(player, messageType) {
+  player.database.join ??= {}
   const db = player.database.join
   delete db.position
   delete db.stage
 
-  db.times ??= 0
-  db.times++
+  player.scores.joinTimes ??= 0
+  player.scores.joinTimes++
 
   for (const other of world.getPlayers()) {
     if (other.id === player.id) continue
@@ -109,16 +109,7 @@ function join(player, messageType) {
 
   player.onScreenDisplay.setTitle('')
 
-  if (db.name && db.name !== player.name) {
-    const message =
-      '§e> §3Игрок §f' + db.name + ' §r§3сменил ник на §f' + player.name
-
-    world.say(message)
-    console.warn(message)
-    db.name = player.name
-  }
-
-  if (db.times === 1) {
+  if (player.scores.joinTimes === 1) {
     EventSignal.emit(JOIN.EVENTS.firstTime, player)
   } else {
     EventSignal.emit(JOIN.EVENTS.join, player)

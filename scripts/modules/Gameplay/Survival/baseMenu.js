@@ -39,7 +39,7 @@ function members(player, base) {
       : 'Вы можете только посмотреть их'
   )
 
-  form.addButton('< Назад', () => baseMenu(player, base))
+  form.addButton(ActionForm.backText, () => baseMenu(player, base))
 
   if (isOwner) form.addButton('Добавить!', 'textures/ui/plus', () => {})
   for (const member of base.permissions.owners) {

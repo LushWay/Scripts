@@ -18,10 +18,13 @@ const shovel = new WorldEditTool({
     },
   },
   loreFormat: {
-    version: 2,
+    version: 3,
 
-    blocksSet: '',
-    replaceBlocksSet: '',
+    /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
+    blocksSet: ['', ''],
+
+    /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
+    replaceBlocksSet: ['', ''],
     radius: 2,
     height: 1,
     zone: -1,
@@ -32,20 +35,25 @@ const shovel = new WorldEditTool({
     new ModalForm('§3Лопата')
       .addSlider('Радиус', 1, 10, 1, lore.radius ?? 1)
       .addSlider('Высота', 1, 10, 1, lore.height ?? 1)
-      .addDropdown('Набор блоков', ...blockSetDropdown(player, lore.blocksSet))
+      .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
         Object.fromEntries(
-          Object.keys(getAllBlockSets(player)).map(e => [e, e])
+          Object.keys(getAllBlockSets(player.id)).map(e => [e, e])
         ),
-        { defaultValue: lore.replaceBlocksSet, none: true, noneText: 'Любой' }
+        {
+          defaultValue: lore.replaceBlocksSet[1],
+          none: true,
+          noneText: 'Любой',
+        }
       )
       .show(player, (_, radius, height, blocksSet, replaceBlocksSet) => {
         slot.nameTag = `§r§3Лопата §6${blocksSet}`
         lore.radius = radius
         lore.height = height
-        lore.blocksSet = blocksSet
-        if (replaceBlocksSet) lore.replaceBlocksSet = replaceBlocksSet
+        lore.blocksSet = [player.id, blocksSet]
+        if (replaceBlocksSet)
+          lore.replaceBlocksSet = [player.id, replaceBlocksSet]
         slot.setLore(shovel.stringifyLore(lore))
 
         player.tell(
@@ -57,9 +65,9 @@ const shovel = new WorldEditTool({
   },
   interval10(player, slot) {
     const lore = shovel.parseLore(slot.getLore())
-    const blocks = getBlockSet(player, lore.blocksSet)
+    const blocks = getBlockSet(lore.blocksSet)
     const replaceBlocks = lore.replaceBlocksSet
-      ? getBlockSet(player, lore.replaceBlocksSet)
+      ? getBlockSet(lore.replaceBlocksSet)
       : [undefined]
     const loc = Vector.floor(player.location)
     const offset = -1

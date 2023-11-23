@@ -1,28 +1,15 @@
 import { Entity, system, Vector, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
-import { PVP } from './var.js'
+import { HEALTH_INDICATOR } from './var.js'
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {}
 const INDICATOR_TAG = 'HEALTH_INDICATOR'
 
 /**
- * Entities that have nameTag "always_show": true
+ * Entities that have nameTag "always_show": true and dont have boss_bar
  */
-const ALWAYS_SHOWS = [
-  //"minecraft:warden",
-  'minecraft:player',
-]
-
-/**
- * Families that are allowed
- */
-const FAMILIES = ['player', 'monster']
-
-/**
- * List of entity ids to skip (updates dynamically)
- */
-const NOT_SHOWN = []
+const ALWAYS_SHOWS = ['minecraft:player']
 
 // Kill previosly used entities
 getIndicators().forEach(e => e.remove())
@@ -142,7 +129,7 @@ function getName(entity, hp = entity.getComponent('health')) {
 
   return (
     bar +
-    PVP.name_modifiers
+    HEALTH_INDICATOR.name_modifiers
       .map(modifier => modifier(entity))
       .filter(result => result !== false)
       .join('')

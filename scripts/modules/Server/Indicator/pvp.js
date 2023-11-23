@@ -7,7 +7,7 @@ import {
 } from '@minecraft/server'
 import { Settings } from 'smapi.js'
 import { SERVER } from '../var.js'
-import { PVP } from './var.js'
+import { HEALTH_INDICATOR } from './var.js'
 
 const options = Settings.world('pvp', {
   enabled: {
@@ -40,9 +40,9 @@ system.runInterval(
         player.scores.pvp--
       }
 
-      for (const e in PVP.lock_display) {
-        if (PVP.lock_display[e]) PVP.lock_display[e]--
-        else delete PVP.lock_display[e]
+      for (const e in HEALTH_INDICATOR.lock_display) {
+        if (HEALTH_INDICATOR.lock_display[e]) HEALTH_INDICATOR.lock_display[e]--
+        else delete HEALTH_INDICATOR.lock_display[e]
       }
     }
   },
@@ -56,7 +56,7 @@ SM.afterEvents.modulesLoad.subscribe(() => {
       if (!options.enabled) return
       const score = player.scores.pvp
 
-      if (PVP.disabled.includes(player.id) || score < 0) return
+      if (HEALTH_INDICATOR.disabled.includes(player.id) || score < 0) return
 
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
@@ -64,8 +64,8 @@ SM.afterEvents.modulesLoad.subscribe(() => {
       const q = score === options.cooldown || score === 0
       const g = (/** @type {string} */ p) => (q ? `§4${p}` : '')
 
-      if (!PVP.lock_display[player.id]) {
-        ;-player.onScreenDisplay.setActionBar(
+      if (!HEALTH_INDICATOR.lock_display[player.id]) {
+        player.onScreenDisplay.setActionBar(
           `${g('»')} §6PvP: ${score} ${g('«')}`
         )
       }
@@ -110,7 +110,7 @@ function onDamage(data, fatal = false) {
   if (
     !data.hurtEntity.typeId.startsWith('minecraft:') ||
     !options.enabled ||
-    PVP.disabled.includes(data.hurtEntity.id)
+    HEALTH_INDICATOR.disabled.includes(data.hurtEntity.id)
   )
     return
 
@@ -138,7 +138,7 @@ function onDamage(data, fatal = false) {
     }
 
     if (setting.indicator && fatal) {
-      // remove fatal and uncomment code \/
+      // remove fatal        ^ and uncomment code \/
       // if (!fatal) {
       // 	damage.damagingEntity.onScreenDisplay.setActionBar(
       // 		`§c-${data.damage}♥`
@@ -169,7 +169,7 @@ function onDamage(data, fatal = false) {
       }
       // }
 
-      PVP.lock_display[damage.damagingEntity.id] = 2
+      HEALTH_INDICATOR.lock_display[damage.damagingEntity.id] = 2
     }
   }
 
@@ -196,6 +196,5 @@ function playHitSound(player, health, max) {
     pitch: Math.max(1, pitch),
     volume: 4,
   }
-  // world.debug({ pitch, max, health });
   player.playSound('note.bell', options)
 }

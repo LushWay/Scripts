@@ -65,10 +65,6 @@ JOIN.CONFIG.title_animation = {
 }
 JOIN.CONFIG.subtitle = 'Добро пожаловать!'
 
-for (const key of Object.keys(JOIN.EVENT_DEFAULTS).filter(e => e !== 'join')) {
-  JOIN.EVENTS[key].unsubscribe(JOIN.EVENT_DEFAULTS[key])
-}
-
 JOIN.EVENTS.firstTime.subscribe(player => {
   player.getComponent('inventory').container.addItem(MENU.item)
 })

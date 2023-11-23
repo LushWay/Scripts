@@ -1,8 +1,11 @@
 import { BlockTypes, Player } from '@minecraft/server'
 import { ChestForm } from 'lib/Form/ChestForm.js'
-import { prompt } from 'modules/Gameplay/Build/utils.js'
+import { prompt } from 'lib/Form/MessageForm.js'
 import {
+  DEFAULT_BLOCK_SETS,
+  SHARED_POSTFIX,
   getAllBlockSets,
+  getOtherPlayersBlockSets,
   setBlockSet,
 } from 'modules/WorldEdit/utils/blocksSet.js'
 import {
@@ -48,10 +51,10 @@ export function WEMenu(player, body = '') {
  * @param {Player} player
  */
 function WEBlocksSets(player) {
-  const blockSets = getAllBlockSets(player)
+  const blockSets = getAllBlockSets(player.id)
   const sets = new ActionForm('Наборы блоков')
-  sets.addButton('Назад', () => WEMenu(player))
-  sets.addButton('Новый набор блоков', 'textures/ui/plus', () => {
+  sets.addButton(ActionForm.backText, () => WEMenu(player))
+  sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
     new ModalForm('§3Имя')
       .addTextField(
         `Существующие наборы:\n${Object.keys(blockSets).join(
@@ -63,56 +66,147 @@ function WEBlocksSets(player) {
         if (name in blockSets)
           return ctx.error('Набор с именем ' + name + ' уже существует!')
 
-        editBlocksSet(player, name, blockSets)
+        editBlocksSet({ player, setName: name, sets: blockSets, ownsSet: true })
       })
   })
-  for (const key of Object.keys(blockSets)) {
-    sets.addButton(key, () => editBlocksSet(player, key, blockSets))
+
+  sets.addButton('§3Наборы других игроков...', () =>
+    otherPlayersBlockSets(player, () => WEBlocksSets(player))
+  )
+
+  for (const setName of Object.keys(blockSets)) {
+    const shared = Object.values(DEFAULT_BLOCK_SETS).find(
+      e => blockSets[setName] === e
+    )
+    sets.addButton(setName, () =>
+      editBlocksSet({
+        player,
+        setName,
+        sets: blockSets,
+        ownsSet: !shared,
+      })
+    )
   }
   sets.show(player)
 }
+
 /**
  * @param {Player} player
- * @param {string} setName
- * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} sets
- * @param {boolean} canEdit
+ * @param {() => void} onBack
  */
-function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
-  const set = sets[setName] ?? []
-  if (!set) canEdit = true
+function otherPlayersBlockSets(player, onBack) {
+  const form = new ActionForm('§3Наборы блоков других игроков')
+  form.addButton(ActionForm.backText, onBack)
+
+  for (const [otherPlayerId, blockSets] of getOtherPlayersBlockSets(
+    player.id
+  )) {
+    const name = Player.name(otherPlayerId) ?? otherPlayerId
+
+    form.addButton(name, () => {
+      playerBlockSet(player, otherPlayerId, blockSets, () =>
+        otherPlayersBlockSets(player, onBack)
+      )
+    })
+  }
+  form.show(player)
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {string} otherPlayerId
+ * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} blockSets
+ * @param {() => void} onBack
+ */
+function playerBlockSet(player, otherPlayerId, blockSets, onBack) {
+  const name = Player.name(otherPlayerId) ?? otherPlayerId
+
+  const pform = new ActionForm(name ?? otherPlayerId, '§3Наборы блоков:')
+  pform.addButton(ActionForm.backText, onBack)
+
+  for (const setName of Object.keys(blockSets)) {
+    pform.addButton(setName, () =>
+      editBlocksSet({
+        player,
+        setName,
+        sets: blockSets,
+        ownsSet: false,
+        back: () => pform.show(player),
+      })
+    )
+  }
+  pform.show(player)
+}
+
+/**
+ * @param {object} o
+ * @param {Player} o.player
+ * @param {string} o.setName
+ * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} [o.sets]
+ * @param {boolean} [o.ownsSet]
+ * @param {boolean} [o.add]
+ * @param {() => void} [o.back]
+ */
+function editBlocksSet(o) {
+  const {
+    player,
+    setName,
+    sets = getAllBlockSets(player.id),
+    ownsSet = true,
+    add = true,
+    back = () => WEBlocksSets(player),
+  } = o
+  let set = sets[setName]
+  if (!set) {
+    set = []
+    setBlockSet(player.id, setName, set)
+    sets[setName] = set
+  }
 
   const blockBelow = player.dimension.getBlock(player.location)?.below()
   const form = new ChestForm('large')
+
   /** @type {import('lib/Form/ChestForm.js').ChestButtonOptions} */
   const empty = {
     slot: 0,
     icon: 'textures/blocks/glass',
     nameTag: 'Пусто',
-    callback: () =>
-      editBlocksSet(
-        // @ts-expect-error We can pass them
-        ...arguments
-      ),
+    callback: () => editBlocksSet(o),
   }
 
   form.title(setName)
   form.pattern(
     [0, 0],
     [
-      'x<x+xDx?x', // row 0
+      ownsSet ? 'x<xx+xDR?' : 'x<xxxxxx?', // row 0
       '---------', // row 1
       '---------', // row 2
-      canEdit ? 'xxx>Bxxxx' : '---------', // row 3
+      ownsSet ? 'xxx>Bxxxx' : 'xxxxAxxxx', // row 3
       '---------', // row 4
       '---------', // row 5
     ],
     {
+      'A': {
+        icon: 'textures/ui/copy',
+        nameTag: 'Копировать набор',
+        description:
+          'Нажмите чтобы скопировать набор в свой список наборов. Вы сможете редактировать его.',
+        callback() {
+          const newName = setName.replace(SHARED_POSTFIX, '')
+          setBlockSet(player.id, newName, set)
+          editBlocksSet({
+            ...o,
+            setName: newName,
+            sets: undefined,
+            ownsSet: true,
+          })
+        },
+      },
       '<': {
         icon: BUTTON['<'],
-        nameTag: 'Назад',
-        callback() {
-          WEBlocksSets(player)
-        },
+        nameTag: ActionForm.backText,
+        callback: back,
       },
       'x': empty,
       '+': {
@@ -120,12 +214,13 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
         nameTag: add ? 'Режим добавления' : 'Режим удаления',
         description: 'Нажмите чтобы переключить',
         callback() {
-          editBlocksSet(player, setName, sets, canEdit, !add)
+          editBlocksSet({ ...o, add: !add })
         },
       },
       'D': {
         icon: 'textures/ui/trash_light',
-        description: '§cОчистить набор ото всех выключенных блоков',
+        nameTag: '§cОчистить',
+        description: '\n§cочищает набор ото всех выключенных блоков',
         callback() {
           const blocksToClear = set.filter(e => (e[2] ?? 1) < 1)
 
@@ -136,24 +231,32 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
             '§cОчистить',
             () => {
               setBlockSet(
-                player,
+                player.id,
                 setName,
                 set.filter(e => !blocksToClear.includes(e))
               )
-              editBlocksSet(
-                player,
-                setName,
-                getAllBlockSets(player),
-                canEdit,
-                add
-              )
+              editBlocksSet({ ...o, sets: undefined })
             },
             'Отмена',
-            () =>
-              editBlocksSet(
-                // @ts-expect-error We can pass them
-                ...arguments
-              )
+            () => editBlocksSet(o)
+          )
+        },
+      },
+      'R': {
+        icon: 'textures/ui/book_trash_default',
+        nameTag: '§4Удалить',
+        description: '\n§4безвозвратно удаляет набор',
+        callback() {
+          prompt(
+            player,
+            '§cУдалить набор? Это действие нельзя отменить',
+            '§cУдалить',
+            () => {
+              setBlockSet(player.id, setName, undefined)
+              back()
+            },
+            'Отмена',
+            () => editBlocksSet(o)
           )
         },
       },
@@ -217,14 +320,18 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
           : blockInSet
           ? '§cВыключен§f в наборе, но остается тут.'
           : '§7Не добавлен в набор.',
-        add
-          ? '§a[+] §rНажмите для добавления блока'
-          : // If no block in set or already disabled show nothing
-          blockInSet && amount > 0
-          ? '§c[-] §rНажмите для уменьшения кол-ва блока'
+        ownsSet
+          ? add
+            ? '§a[+] §rНажмите для добавления блока'
+            : // If no block in set or already disabled show nothing
+            blockInSet && amount > 0
+            ? '§c[-] §rНажмите для уменьшения кол-ва блока'
+            : ''
           : '',
       ],
       callback() {
+        if (!ownsSet) return editBlocksSet(o)
+
         if (blockInSet) {
           blockInSet[2] = add ? amount + 1 : amount - 1
         } else if (add) {
@@ -241,7 +348,7 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
           if (typeof block[2] === 'number' && block[2] < 0) block[2] = 0
         }
 
-        editBlocksSet(player, setName, getAllBlockSets(player), canEdit, add)
+        editBlocksSet({ ...o, sets: getAllBlockSets(player.id) })
       },
     }
     if (setButton) form.button(button)
@@ -256,7 +363,7 @@ function editBlocksSet(player, setName, sets, canEdit = true, add = true) {
     }
   }
 
-  if (canEdit) {
+  if (ownsSet) {
     const { container } = player.getComponent('inventory')
     /** @type {string[]} */
     const blocks = []

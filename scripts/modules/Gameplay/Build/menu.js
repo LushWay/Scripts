@@ -2,6 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { StoredRequest } from 'lib/Class/StoredRequest.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { prompt } from 'lib/Form/MessageForm.js'
 import { ActionForm, Cooldown, MessageForm, is, util } from 'smapi.js'
 import { CubeRegion, Region } from '../../Region/Region.js'
 import { JOIN } from '../../Server/PlayerJoin/var.js'
@@ -10,7 +11,6 @@ import {
   clearRegion,
   createRegion,
   fillRegion,
-  prompt,
   teleportToRegion,
 } from './utils.js'
 
@@ -170,13 +170,12 @@ MENU.OnOpen = player => {
   }
 
   const menu = new ActionForm('Меню площадки', body)
-  const backButton = '§l§b< §r§3Назад'
 
   /**
    * @param {ActionForm} form
    */
   function addBackButton(form) {
-    form.addButton(backButton, () => menu.show(player))
+    form.addButton(ActionForm.backText, () => menu.show(player))
     return form
   }
 
@@ -245,7 +244,7 @@ MENU.OnOpen = player => {
                       .concat([key])
                     player.tell(`Выбранная тема: ${path} ${key}`)
                   })
-                  .setButton2(backButton, () => form.show(player))
+                  .setButton2(ActionForm.backText, () => form.show(player))
                   .show(player)
               })
             } else {
@@ -259,7 +258,7 @@ MENU.OnOpen = player => {
             }
           }
 
-          form.addButton(backButton, () => parentForm.show(player))
+          form.addButton(ActionForm.backText, () => parentForm.show(player))
 
           form.show(player)
         }

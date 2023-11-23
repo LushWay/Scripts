@@ -26,10 +26,10 @@ export function withState(name, states, weight = 1) {
  */
 
 /** @type {BlocksSets} */
-const defaultBlockSets = {
+export const DEFAULT_BLOCK_SETS = {
   'Земля': [[MinecraftBlockTypes.Grass, void 0, 1]],
   'Воздух': [[MinecraftBlockTypes.Air, void 0, 1]],
-  'Каменная стена': [
+  'Стена каменоломни': [
     [MinecraftBlockTypes.MudBricks, void 0, 2],
     [MinecraftBlockTypes.PackedMud, void 0, 1],
     [MinecraftBlockTypes.BrickBlock, void 0, 1],
@@ -40,37 +40,54 @@ const defaultBlockSets = {
     withState(MinecraftBlockTypes.Stone, { stone_type: 'granite' }, 2),
   ],
 }
+export const SHARED_POSTFIX = '§7 (Общий)'
+
+Object.keys(DEFAULT_BLOCK_SETS).forEach(e => {
+  DEFAULT_BLOCK_SETS[e + SHARED_POSTFIX] = DEFAULT_BLOCK_SETS[e]
+  delete DEFAULT_BLOCK_SETS[e]
+})
 
 /** @type {DynamicPropertyDB<string, BlocksSets | undefined>} */
 const PROPERTY = new DynamicPropertyDB('blockSets')
 const DB = PROPERTY.proxy()
 
 /**
- * @param {Player} player
+ * @param {string} playerId
+ * @returns {[string, BlocksSets][]}
+ */
+export function getOtherPlayersBlockSets(playerId) {
+  // @ts-expect-error We checked it
+  return Object.entries(DB).filter(e => e[0] !== playerId && e[0])
+}
+
+/**
+ * @param {string} id
  * @returns {BlocksSets}
  */
-export function getAllBlockSets(player) {
-  const playerBlockSets = DB[player.id] ?? {}
-  return { ...defaultBlockSets, ...playerBlockSets }
+export function getAllBlockSets(id) {
+  const playerBlockSets = DB[id] ?? {}
+  return { ...playerBlockSets, ...DEFAULT_BLOCK_SETS }
 }
 
 /**
  *
- * @param {Player} player
+ * @param {string} id
  * @param {string} setName
- * @param {BlockStateWeight[]} set
+ * @param {BlockStateWeight[] | undefined} set
  */
-export function setBlockSet(player, setName, set) {
-  DB[player.id] ??= {}
-  const db = DB[player.id]
-  if (db) db[setName] = set
+export function setBlockSet(id, setName, set) {
+  DB[id] ??= {}
+  const db = DB[id]
+  if (db) {
+    if (set) db[setName] = set
+    else delete db[setName]
+  }
 }
 
 /**
- * @param {Player} player
- * @param {string} name
+ * @param {BlocksSetRef} set
  */
-export function getBlockSet(player, name) {
+export function getBlockSet([player, name]) {
   const blocks = getAllBlockSets(player)[name]
   if (!blocks) return []
   return blocks
@@ -82,10 +99,21 @@ export function getBlockSet(player, name) {
 }
 
 /**
+ * @typedef {[string, string]} BlocksSetRef
+ */
+
+/**
+ * @param {BlocksSetRef} info
  * @param {Player} player
- * @param {string} defaultSet
  * @returns {[string[], {defaultValue: string}]}
  */
-export function blockSetDropdown(player, defaultSet) {
-  return [Object.keys(getAllBlockSets(player)), { defaultValue: defaultSet }]
+export function blockSetDropdown([_, defaultSet], player) {
+  return [Object.keys(getAllBlockSets(player.id)), { defaultValue: defaultSet }]
+}
+
+/**
+ * @param {BlocksSetRef} ref
+ */
+export function stringifyBlocksSetRef(ref) {
+  return [Player.name(ref[0]) ?? '', ref[1]].join(' ')
 }

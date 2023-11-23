@@ -68,7 +68,7 @@ function manageCatscene(player, scene) {
         : '§8<Не установлена>'
     }`
   )
-    .addButton('Назад', () => selectCatscene(player))
+    .addButton(ActionForm.backText, () => selectCatscene(player))
     .addButton('Редактировать', () => editCatscene(player, scene))
     .addButton('Просмотреть', () => scene.play(player))
     .show(player)

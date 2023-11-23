@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { OverTakes } from 'smapi.js'
 
@@ -11,9 +11,6 @@ export const PLAYER_DB = new DynamicPropertyDB('player', {
   defaultValue: () => {
     return {
       role: 'member',
-      join: {
-        joined: Date.now(),
-      },
       survival: {
         inv: 'spawn',
       },
@@ -31,6 +28,23 @@ Object.defineProperty(Player.prototype, 'database', {
 
 OverTakes(Player, {
   name(id) {
-    return PLAYER_DB[id].join.name
+    return PLAYER_DB[id].name
   },
+})
+
+world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
+  if (initialSpawn) return
+
+  if (player.database.name && player.database.name !== player.name) {
+    const message =
+      '§e> §3Игрок §f' +
+      player.database.name +
+      ' §r§3сменил ник на §f' +
+      player.name
+
+    world.say(message)
+    console.warn(message)
+  }
+
+  player.database.name = player.name
 })

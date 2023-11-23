@@ -39,7 +39,7 @@ function showTable(player, table) {
   const proxy = DB.proxy()
 
   const menu = new ActionForm(`${table}`)
-  menu.addButton('§b§l<§r§3 Назад§r', () => selectTable(player))
+  menu.addButton(ActionForm.backText, () => selectTable(player))
   menu.addButton('§3Новое значение§r', () => {
     const form = new ModalForm('§3+Значение в §f' + table).addTextField(
       'Ключ',
@@ -110,7 +110,7 @@ function showTable(player, table) {
       delete proxy[key]
       showTable(player, table)
     })
-    AForm.addButton('< Назад', () => showTable(player, table))
+    AForm.addButton(ActionForm.backText, () => showTable(player, table))
 
     AForm.show(player)
   }

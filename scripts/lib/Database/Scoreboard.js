@@ -45,7 +45,11 @@ Reflect.defineProperty(Player.prototype, 'scores', {
                     p.description
                 )
 
-              return ScoreboardDB.objective(p).getScore(obj.player.id) ?? 0
+              try {
+                return ScoreboardDB.objective(p).getScore(obj.player.id) ?? 0
+              } catch (e) {
+                return 0
+              }
             },
           }
         ),

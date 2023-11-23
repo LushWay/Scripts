@@ -32,7 +32,10 @@ const brush = new WorldEditTool({
   loreFormat: {
     version: 2,
 
-    blocksSet: 'DEFAULT',
+    /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
+    blocksSet: ['', ''],
+    /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
+    replaceBlockSet: ['', ''],
     shape: 'Сфера',
     size: 1,
     maxDistance: 300,
@@ -44,11 +47,11 @@ const brush = new WorldEditTool({
     new ModalForm('§3Кисть')
       .addDropdown('Форма', shapes, { defaultValue: lore.shape })
       .addSlider('Размер', 1, 10, 1, lore.size)
-      .addDropdown('Набор блоков', ...blockSetDropdown(player, lore.blocksSet))
+      .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .show(player, (ctx, shape, radius, blocksSet) => {
         lore.shape = shape
         lore.size = radius
-        lore.blocksSet = blocksSet
+        lore.blocksSet = [player.id, blocksSet]
         slot.nameTag = '§r§3Кисть §f' + blocksSet + '§r §6' + shape
         slot.setLore(brush.stringifyLore(lore))
         player.tell(
@@ -118,7 +121,7 @@ const brush = new WorldEditTool({
           player,
           SHAPES[lore.shape],
           hit.block.location,
-          getBlockSet(player, lore.blocksSet),
+          getBlockSet(lore.blocksSet),
           lore.size
         )
 

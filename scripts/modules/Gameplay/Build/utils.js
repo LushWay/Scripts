@@ -1,6 +1,5 @@
 import { Player, system, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { MessageForm } from 'lib/Form/MessageForm.js'
 import { util } from 'smapi.js'
 import { CubeRegion, Region } from '../../Region/Region.js'
 import { DB } from './menu.js'
@@ -17,21 +16,6 @@ export function teleportToRegion(player, region) {
     { x: region.from.x, y: squarePlace + 3, z: region.from.z },
     { dimension: world.overworld }
   )
-}
-
-/**
- * @param {Player} player
- * @param {string} text
- * @param {string} yesText
- * @param {() => void} onYesAction
- * @param {string} noText
- * @param {() => void} onNoAction
- */
-export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
-  new MessageForm('Вы уверены?', text)
-    .setButton1(yesText, onYesAction)
-    .setButton2(noText, onNoAction)
-    .show(player)
 }
 
 /**

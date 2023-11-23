@@ -4,6 +4,8 @@ import { util } from '../smapi.js'
 const modules = [
   './DatabaseView/index.js',
   './Server/PlayerJoin/join.js',
+  './Server/Indicator/index.js',
+  './Server/chat.js',
   './Server/index.js',
 
   './Gameplay/Build/camera.js',

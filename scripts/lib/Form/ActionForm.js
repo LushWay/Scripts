@@ -4,6 +4,7 @@ import { util } from 'smapi.js'
 import { showForm } from './utils.js'
 
 export class ActionForm {
+  static backText = '§l§b< §r§3Назад'
   /**
    * The buttons this form has
    * @type {IActionFormButton[]}

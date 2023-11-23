@@ -105,7 +105,7 @@ declare module '@minecraft/server' {
     quest?: import('./Class/Quest').QuestDB
   }
 
-  type ScoreNames = 'money' | 'leafs' | 'pvp'
+  type ScoreNames = 'money' | 'leafs' | 'pvp' | 'joinDate' | 'joinTimes'
   interface Player {
     scores: Record<ScoreNames, number>
     database: PlayerDatabase
