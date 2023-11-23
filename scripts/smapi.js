@@ -91,3 +91,14 @@ system.run(async function waiter() {
     util.error(e, { errorName: 'LoadError' })
   }
 })
+
+system.afterEvents.scriptEventReceive.subscribe(
+  data => {
+    if (data.id === 'SERVER:SAY') {
+      world.say(decodeURI(data.message))
+    }
+  },
+  {
+    namespaces: ['SERVER'],
+  }
+)
