@@ -185,9 +185,10 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 })
 
 let ticks = 0
-system.runInterval(
+system.runPlayerInterval(
   () => {
     for (const player of world.getAllPlayers()) {
+      if (!player) continue
       const item = player.mainhand()
       const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
       const settings = WE_PLAYER_SETTINGS(player)

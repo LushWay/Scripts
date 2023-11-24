@@ -32,9 +32,7 @@ OverTakes(Player, {
   },
 })
 
-world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
-  if (initialSpawn) return
-
+world.afterEvents.playerSpawn.subscribe(({ player }) => {
   if (player.database.name && player.database.name !== player.name) {
     const message =
       '§e> §3Игрок §f' +

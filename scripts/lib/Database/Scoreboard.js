@@ -2,6 +2,20 @@ import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
 import { util } from 'smapi.js'
 
 /**
+ * @type {Record<import("@minecraft/server").ScoreNames, string>}
+ */
+const displayNames = {
+  joinDate: 'Дата входа',
+  joinTimes: 'Кол-во входов',
+  leafs: '§aЛистья',
+  money: '§6Монеты',
+  pvp: 'PVP',
+}
+
+/** @type {Record<string, string>} */
+const untypedDisplayNames = displayNames
+
+/**
  * @type {Record<string, {player: Player, proxy: any}>}
  */
 const players = {}
@@ -35,7 +49,10 @@ Reflect.defineProperty(Player.prototype, 'scores', {
                     util.stringify(p)
                 )
 
-              ScoreboardDB.objective(p).setScore(obj.player.id, newValue)
+              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(
+                obj.player.id,
+                newValue
+              )
               return true
             },
             get(_, p) {
@@ -46,7 +63,11 @@ Reflect.defineProperty(Player.prototype, 'scores', {
                 )
 
               try {
-                return ScoreboardDB.objective(p).getScore(obj.player.id) ?? 0
+                return (
+                  ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(
+                    obj.player.id
+                  ) ?? 0
+                )
               } catch (e) {
                 return 0
               }

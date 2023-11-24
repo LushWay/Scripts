@@ -17,8 +17,8 @@ function playerAt(player) {
   ].map(Math.floor)
 }
 
-world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
-  if (initialSpawn) player.scores.joinDate = ~~(Date.now() / 1000)
+world.afterEvents.playerSpawn.subscribe(({ player }) => {
+  player.scores.joinDate ??= ~~(Date.now() / 1000)
   player.database.join ??= {}
   player.database.join.position = playerAt(player)
 })
@@ -91,10 +91,7 @@ const getSettings = Settings.player('Вход', 'join', {
  * @param {"air" | "ground"} messageType
  */
 function join(player, messageType) {
-  player.database.join ??= {}
-  const db = player.database.join
-  delete db.position
-  delete db.stage
+  delete player.database.join
 
   player.scores.joinTimes ??= 0
   player.scores.joinTimes++

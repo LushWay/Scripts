@@ -46,7 +46,7 @@ OverTakes(System.prototype, {
       'playerInterval',
       super.runInterval.bind(this),
       () => {
-        for (const player of world.getAllPlayers()) callback(player)
+        for (const player of world.getAllPlayers()) player && callback(player)
       },
       ...args
     )
