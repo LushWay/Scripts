@@ -7,6 +7,7 @@ const modules = [
   './Server/Indicator/index.js',
   './Server/chat.js',
   './Server/index.js',
+  './Server/Catscene/index.js',
 
   './Gameplay/Build/camera.js',
 
