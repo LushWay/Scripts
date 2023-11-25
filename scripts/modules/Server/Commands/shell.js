@@ -12,6 +12,7 @@ new Command({
       const types = ['script', 'server', 'process']
       for (const type of types) {
         form.addButton(type, () => {
+          ctx.reply('§6> §rПринято.')
           APIRequest('gitPull', { restartType: type })
             .then(s => ctx.sender.tell(s.statusMessage))
             .catch(util.error)

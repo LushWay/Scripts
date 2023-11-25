@@ -12,7 +12,11 @@ import { smoothVoxelData } from 'modules/WorldEdit/tools/smooth.js'
 import { ModalForm, util } from 'smapi.js'
 import { WorldEditTool } from '../class/Tool.js'
 import { WE_CONFIG } from '../config.js'
-import { blockSetDropdown, getBlockSet } from '../utils/blocksSet.js'
+import {
+  SHARED_POSTFIX,
+  blockSetDropdown,
+  getBlockSet,
+} from '../utils/blocksSet.js'
 import { SHAPES } from '../utils/shapes.js'
 import { Shape } from '../utils/utils.js'
 
@@ -35,7 +39,7 @@ const brush = new WorldEditTool({
     /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
     blocksSet: ['', ''],
     /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
-    replaceBlockSet: ['', ''],
+    replaceBlocksSet: ['', ''],
     shape: 'Сфера',
     size: 1,
     maxDistance: 300,
@@ -52,7 +56,11 @@ const brush = new WorldEditTool({
         lore.shape = shape
         lore.size = radius
         lore.blocksSet = [player.id, blocksSet]
-        slot.nameTag = '§r§3Кисть §f' + blocksSet + '§r §6' + shape
+        slot.nameTag =
+          '§r§3Кисть §6' +
+          shape +
+          '§r §f' +
+          blocksSet.replace(SHARED_POSTFIX, '')
         slot.setLore(brush.stringifyLore(lore))
         player.tell(
           `§a► §r${

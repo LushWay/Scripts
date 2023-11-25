@@ -113,7 +113,10 @@ export function blockSetDropdown([_, defaultSet], player) {
 
 /**
  * @param {BlocksSetRef} ref
+ * @returns {string}
  */
 export function stringifyBlocksSetRef(ref) {
-  return [Player.name(ref[0]) ?? '', ref[1]].join(' ')
+  return ref[1] in DEFAULT_BLOCK_SETS
+    ? ref[1]
+    : [Player.name(ref[0]) ?? '', ref[1]].join(' ')
 }

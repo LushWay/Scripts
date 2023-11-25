@@ -257,6 +257,9 @@ const tests = {
         ?.setType(MinecraftBlockTypes.Stone)
     }
   },
+  52(ctx) {
+    ctx.sender.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])
+  },
 }
 
 // const i = MinecraftItemTypes;

@@ -6,6 +6,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
+import { stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { OverTakes, util } from 'smapi.js'
 import { WE_PLAYER_SETTINGS } from '../index.js'
 
@@ -14,9 +15,20 @@ import { WE_PLAYER_SETTINGS } from '../index.js'
  */
 
 /**
- * @template {Record<string, any> & {version: number}} [LoreFormat=any]
+ * @typedef {'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'} LoreStringName
+ */
+
+const LORE_SEPARATOR = '\u00a0'
+/** @type {(LoreStringName | string)[]} */
+
+const LORE_BLOCKS_SET_KEYS_T = ['blocksSet', 'replaceBlocksSet']
+
+/**
+ * @template {{ [P in LoreStringName]?: any; } & {version: number}} [LoreFormat=any]
  */
 export class WorldEditTool {
+  /** @type {string[]} */
+  static loreBlockSetKeys = LORE_BLOCKS_SET_KEYS_T
   /**
    * @type {WorldEditTool<any>[]}
    */
@@ -130,7 +142,7 @@ export class WorldEditTool {
     try {
       raw = JSON.parse(
         lore
-          .slice(lore.findIndex(e => e.includes('\x01')) + 1)
+          .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
           .join('')
           .replace(/§(.)/g, '$1')
       )
@@ -138,8 +150,7 @@ export class WorldEditTool {
       e
     }
     if (raw?.version !== this.loreFormat.version) {
-      // @ts-expect-error yes
-      return this.loreFormat
+      raw = JSON.parse(JSON.stringify(this.loreFormat))
     }
     delete raw.version
 
@@ -150,8 +161,9 @@ export class WorldEditTool {
     shape: 'Форма',
     size: 'Размер',
     height: 'Высота',
-    maxDistance: 'Макс. расстояние',
-    blocksSet: 'Набор блоков',
+    maxDistance: 'Расстояние',
+    blocksSet: 'Блоки',
+    replaceBlocksSet: 'Заменяет',
   }
   /**
    * @param {LoreFormat} format
@@ -162,12 +174,18 @@ export class WorldEditTool {
     return [
       ...Object.entries(format)
         .filter(([key]) => key !== 'version')
-        .map(
-          ([key, value]) =>
-            `§r§f${this.loreTranslation[key] ?? key}: ${util.inspect(value)}`
-        ),
+        .map(([key, value]) => {
+          const val = WorldEditTool.loreBlockSetKeys.includes(key)
+            ? stringifyBlocksSetRef(value)
+            : util.inspect(value)
+          const k = this.loreTranslation[key] ?? key
+          return `${k}: ${val}`.match(/.{0,48}/g) || []
+        })
+        .flat()
+        .filter(Boolean)
+        .map(e => '§r§f' + e),
 
-      '\x01',
+      LORE_SEPARATOR,
 
       ...(JSON.stringify(format)
         .split('')
