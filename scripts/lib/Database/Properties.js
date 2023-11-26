@@ -1,4 +1,4 @@
-import { Player, World, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 import { util } from '../util.js'
 import { DB, DatabaseError } from './Default.js'
 
@@ -13,32 +13,21 @@ export class DynamicPropertyDB {
   static keys = {}
 
   /**
-   * @type {Record<string, DynamicPropertyDB<any>>}
-   */
-  static playerKeys = {}
-
-  /**
-   * @param {DynamicPropertyDB<any, any>} db
-   */
-  static getValue(db) {
-    return db.value
-  }
-
-  /**
    * @private
    * @type {Record<any, any>}
    */
   value = {}
 
   /**
-   * @type {World | Player}
-   */
-  source
-
-  /**
    * @type {string}
    */
   key
+
+  /**
+   * @private
+   * @type {(p: string) => Partial<Value>}
+   */
+  defaultValue
 
   /**
    *
@@ -48,9 +37,8 @@ export class DynamicPropertyDB {
    *   defaultValue?: (p: string) => Partial<Value>
    *   delayedInit?: boolean
    * }} [options]
-   * @param {World | Player} [source]
    */
-  constructor(key, options = {}, source = world) {
+  constructor(key, options = {}) {
     if (key in DynamicPropertyDB.keys) {
       const source = DynamicPropertyDB.keys[key]
       return options?.defaultValue
@@ -63,7 +51,6 @@ export class DynamicPropertyDB {
         : source
     }
 
-    this.source = source
     this.key = key
     if (options.defaultValue) this.defaultValue = options.defaultValue
     DynamicPropertyDB.keys[key] = this
@@ -73,21 +60,16 @@ export class DynamicPropertyDB {
   init() {
     // Init
     try {
-      const value = this.source.getDynamicProperty(this.key) ?? '{}'
+      const value = world.getDynamicProperty(this.key) ?? '{}'
       if (typeof value !== 'string') {
-        throw new DatabaseError(
-          `Key ${this.key}, Source ${
-            this.source instanceof World
-              ? 'world'
-              : 'player::' + this.source.name
-          } Expected string, recieved ${typeof value}`
-        )
+        throw new DatabaseError(`Expected string, recieved ${typeof value}`)
       }
 
       this.value = Object.fromEntries(
         Object.entries(JSON.parse(value)).map(([key, value]) => {
           const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
           return [
+            // Add default value
             key,
             typeof value === 'object' &&
             value !== null &&
@@ -100,7 +82,7 @@ export class DynamicPropertyDB {
       )
     } catch (error) {
       util.error(
-        new DatabaseError(`Failed to parse init key '${this.key}': ${error}`)
+        new DatabaseError(`Failed to init key '${this.key}': ${error}`)
       )
     }
   }
@@ -119,14 +101,17 @@ export class DynamicPropertyDB {
 
     system.delay(() => {
       this._needSaveRun = false
-      this.source.setDynamicProperty(
+      world.setDynamicProperty(
         this.key,
         JSON.stringify(
+          // Modify all values
           Object.fromEntries(
             Object.entries(this.value).map(([key, value]) => {
               const defaultv =
                 typeof key !== 'symbol' && this.defaultValue?.(key)
+
               return [
+                // Remove default if defaultv and value are objects
                 key,
                 typeof value === 'object' &&
                 value !== null &&
@@ -143,12 +128,6 @@ export class DynamicPropertyDB {
   }
 
   /**
-   * @private
-   * @type {(p: string) => Partial<Value>}
-   */
-  defaultValue
-
-  /**
    *
    * @param {Record<string, any>} object
    * @param {string} key
@@ -158,24 +137,28 @@ export class DynamicPropertyDB {
   subproxy(object, key, keys, initial = false) {
     return new Proxy(object, {
       get: (target, p, reciever) => {
+        // Filter non db keys
         if (p === 'toJSON') return
         let value = Reflect.get(target, p, reciever)
         if (typeof p === 'symbol') return value
+
+        // Add default value
         if (initial && typeof value === 'undefined' && this.defaultValue) {
           value = this.defaultValue(p)
           Reflect.set(target, p, value, reciever)
         }
+
+        // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
           return this.subproxy(value, p, keys + '.' + key)
-        }
-
-        return value
+        } else return value
       },
       set: (target, p, value, reciever) => {
-        if (typeof p === 'symbol') {
+        // Filter non db keys
+        if (typeof p === 'symbol')
           return Reflect.set(target, p, value, reciever)
-        }
 
+        // Set value
         const setted = Reflect.set(target, p, value, reciever)
         if (setted) this.needSave()
         return setted
