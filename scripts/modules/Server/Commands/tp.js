@@ -1,3 +1,4 @@
+import { Player } from '@minecraft/server'
 import { ActionForm } from 'smapi.js'
 
 new Command({
@@ -5,18 +6,25 @@ new Command({
   role: 'builder',
   description: 'Открывает меню телепортации',
 }).executes(ctx => {
+  tpMenu(ctx.sender)
+})
+
+/**
+ * @param {Player} player
+ */
+export function tpMenu(player) {
   const form = new ActionForm('Выберите локацию')
 
   const locations = {
-    'Деревня шахтеров': '139 71 13460 140 -10',
-    'Деревня исследователей': '-26 65 13778 180 10',
+    'Деревня шахтеров': '136 71 13457 140 -10',
+    'Деревня исследователей': '-26 97 13663 20 30 13778 180 10',
     'Каменоломня': '-1300 76 14800 -90 5',
     'Техноград': '-1288 64 13626 90 -10',
   }
 
   for (const [name, location] of Object.entries(locations)) {
-    form.addButton(name, () => ctx.sender.runCommand('tp ' + location))
+    form.addButton(name, () => player.runCommand('tp ' + location))
   }
 
-  form.show(ctx.sender)
-})
+  form.show(player)
+}

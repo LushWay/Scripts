@@ -4,6 +4,7 @@ import { Quest } from 'lib/Class/Quest.js'
 import { Sidebar } from 'lib/Class/Sidebar.js'
 import { Temporary } from 'lib/Class/Temporary.js'
 import { Zone } from 'modules/Server/Class/Zone.js'
+import { tpMenu } from 'modules/Server/Commands/tp.js'
 import { ActionForm, EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
 import { randomTeleport } from './randomTeleport.js'
@@ -12,12 +13,24 @@ import { SPAWN } from './spawn.js'
 export const ANARCHY = {
   centerLocation: new EditableLocation('anarchy_center'),
   portalLocation: new EditableLocation('anarchy_portal'),
+  tpLocation: new EditableLocation('tp_portal'),
   inventory: new InventoryStore('anarchy'),
   /** @type {undefined | Portal} */
   portal: void 0,
 }
 if (ANARCHY.centerLocation.valid) {
   new Zone(ANARCHY.centerLocation, ps => ps.length * 50)
+}
+
+if (ANARCHY.tpLocation.valid) {
+  new Portal(
+    'tp',
+    Vector.add(ANARCHY.tpLocation, { x: 0, y: -1, z: -1 }),
+    Vector.add(ANARCHY.tpLocation, { x: 0, y: 1, z: 1 }),
+    player => {
+      tpMenu(player)
+    }
+  )
 }
 
 /**
