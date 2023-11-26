@@ -9,7 +9,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
 import { WE_PLAYER_SETTINGS } from 'modules/WorldEdit/index.js'
 import { smoothVoxelData } from 'modules/WorldEdit/tools/smooth.js'
-import { ModalForm, util } from 'smapi.js'
+import { ModalForm, getRole, util } from 'smapi.js'
 import { WorldEditTool } from '../class/Tool.js'
 import { WE_CONFIG } from '../config.js'
 import {
@@ -50,7 +50,13 @@ const brush = new WorldEditTool({
 
     new ModalForm('§3Кисть')
       .addDropdown('Форма', shapes, { defaultValue: lore.shape })
-      .addSlider('Размер', 1, 10, 1, lore.size)
+      .addSlider(
+        'Размер',
+        1,
+        getRole(player) === 'admin' ? 20 : 10,
+        1,
+        lore.size
+      )
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .show(player, (ctx, shape, radius, blocksSet) => {
         lore.shape = shape
