@@ -20,15 +20,27 @@ if (ANARCHY.centerLocation.valid) {
   new Zone(ANARCHY.centerLocation, ps => ps.length * 50)
 }
 
+/**
+ * @type {Set<string>}
+ */
+const sent = new Set()
 if (ANARCHY.tpLocation.valid) {
   new Portal(
     'tp',
     Vector.add(ANARCHY.tpLocation, { x: 0, y: -1, z: -1 }),
     Vector.add(ANARCHY.tpLocation, { x: 0, y: 1, z: 1 }),
-    player => {
-      tpMenu(player)
-    }
+    tpMenuOnce
   )
+}
+
+/**
+ * @param {Player} player
+ */
+function tpMenuOnce(player) {
+  if (!sent.has(player.id)) {
+    tpMenu(player, () => sent.delete(player.id))
+    sent.add(player.id)
+  }
 }
 
 /**
@@ -61,7 +73,7 @@ if (ANARCHY.portalLocation.valid) {
 
       system.delay(() => {
         if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
-          if (isBuilding(player)) return tpMenu(player)
+          if (isBuilding(player)) return tpMenuOnce(player)
 
           randomTeleport(
             player,
