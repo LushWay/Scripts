@@ -86,6 +86,7 @@ export function setBlockSet(id, setName, set) {
 
 /**
  * @param {BlocksSetRef} set
+ * @returns {BlockPermutation[]}
  */
 export function getBlockSet([player, name]) {
   const blocks = getAllBlockSets(player)[name]

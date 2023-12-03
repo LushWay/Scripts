@@ -1,5 +1,4 @@
 import {
-  Entity,
   EntityDamageCause,
   EquipmentSlot,
   GameMode,
@@ -19,6 +18,7 @@ OverTakes(Player, {
     throw new ReferenceError('SM is not fully loaded!')
   },
 })
+
 OverTakes(Player.prototype, {
   tell: Player.prototype.sendMessage,
   applyDash(target, horizontalStrength, verticalStrength) {

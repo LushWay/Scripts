@@ -1,8 +1,14 @@
-import { BlockTypes, Player } from '@minecraft/server'
+import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { inaccurateSearch } from 'lib/Class/Search.js'
-import { ModalForm } from 'lib/Form/ModalForm.js'
+import { ChestForm } from 'lib/Form/ChestForm.js'
+import {
+  getAllBlockSets,
+  getBlockSet,
+  stringifyBlocksSetRef,
+} from 'modules/WorldEdit/utils/blocksSet.js'
+import { ActionForm, BUTTON, GAME_UTILS, ModalForm } from 'smapi.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
-import { Cuboid } from '../../utils/cuboid.js'
 
 const set = new Command({
   name: 'set',
@@ -10,82 +16,245 @@ const set = new Command({
   role: 'moderator',
 })
 
-set
-  .string('block')
-  .int('data', true)
-  .array('mode', ['destroy', 'hollow', 'keep', 'outline', 'replace'], true)
-  .string('other', true)
-  .int('otherData', true)
-  .executes((ctx, block, blockData, mode, other, otherData) => {
-    const we = WorldEdit.forPlayer(ctx.sender)
-    if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+set.string('block').executes((ctx, block) => {
+  const we = WorldEdit.forPlayer(ctx.sender)
+  if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  if (!blockIsAvaible(block, ctx.sender)) return
 
-    if (!blockIsAvaible(block, ctx.sender)) return
-    if (other && !blockIsAvaible(other, ctx.sender)) return
-
-    const time = timeCaculation(we.pos1, we.pos2)
-    if (time >= 0.01)
-      ctx.reply(
-        `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
-      )
-
-    we.fillBetween(block, blockData, mode, other, otherData).then(result =>
-      ctx.reply(result)
-    )
-  })
+  we.fillBetween(ctx.sender, [BlockPermutation.resolve(block)])
+})
 
 set.executes(ctx => {
   const we = WorldEdit.forPlayer(ctx.sender)
   if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
   ctx.reply('§b> §3Закрой чат!')
-  new ModalForm('Заполнить')
-    .addTextField('Блок', 'e.g. stone', '')
-    .addSlider('Дата блока', 0, 15, 1, 0)
-    .addDropdown('Режим замены', [
-      'Отключено',
-      'replace',
-      'destroy',
-      'hollow',
-      'keep',
-      'outline',
-    ])
-    .addTextField(
-      'Заменяемый блок (только для режима replace!)',
-      'например, stone',
-      ''
-    )
-    .addSlider('Дата заменяемого блока', 0, 15, 1, 0)
-    .show(ctx.sender, (_, block, blockData, mode, other, otherData) => {
-      if (!blockIsAvaible(block, ctx.sender)) return
-      if (other && !blockIsAvaible(other, ctx.sender)) return
-
-      const time = timeCaculation(we.pos1, we.pos2)
-      if (time >= 0.01)
-        ctx.reply(
-          `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
-        )
-
-      we.fillBetween(
-        block,
-        blockData,
-        mode === 'Отключено' ? '' : mode,
-        other,
-        otherData
-      ).then(result => ctx.reply(result))
-    })
+  setSelection(ctx.sender)
 })
 
 /**
- * Caculates average time it will take to complete fill
- * @param {{x: number; y: number, z: number}} pos1
- * @param {{x: number; y: number, z: number}} pos2
- * @returns {number}
+ * @typedef {BlockPermutation | import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} SelectedBlock
  */
-function timeCaculation(pos1, pos2) {
-  const cube = new Cuboid(pos1, pos2)
-  const timeForEachFill = 3
-  const fillSize = 32768
-  return Math.round((cube.blocksBetween / fillSize) * timeForEachFill * 0.05)
+
+const selectedBlocks = {
+  /** @type {Record<string, SelectedBlock>} */
+  block: {},
+  /** @type {Record<string, SelectedBlock>} */
+  replaceBlock: {},
+}
+
+/**
+ * @param {Player} player
+ */
+export function setSelection(player) {
+  const [block, blockDisplay] = use(
+    player,
+    'block',
+    'Блок, которым будет заполнена область'
+  )
+  const [replaceBlock, replaceBlockDisplay] = use(
+    player,
+    'replaceBlock',
+    'Заменяемый блок'
+  )
+  new ChestForm('small')
+    .title('Заполнение')
+    .pattern(
+      [0, 0],
+      [
+        // A
+        '         ',
+        '  B R D  ',
+        '         ',
+      ],
+      {
+        ' ': {
+          icon: MinecraftBlockTypes.Air,
+        },
+        'B': blockDisplay,
+        'R': replaceBlockDisplay,
+        'D':
+          block && replaceBlock
+            ? {
+                icon: 'textures/ui/check',
+                nameTag: 'Заполнить!',
+                callback(p) {
+                  WorldEdit.forPlayer(player).fillBetween(
+                    p,
+                    block,
+                    replaceBlock
+                  )
+                },
+              }
+            : {
+                icon: MinecraftBlockTypes.Barrier,
+                nameTag: '§cВыбери блоки, чтобы заполнить!',
+              },
+      }
+    )
+    .show(player)
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {keyof typeof selectedBlocks} type
+ * @returns {[blocks: BlockPermutation[] | undefined, options: Omit<import('lib/Form/ChestForm.js').ChestButtonOptions, 'slot'>]}
+ */
+function use(player, type, desc = '', onSelect = setSelection) {
+  const block = selectedBlocks[type][player.id]
+
+  function btnCallback() {
+    selectBlockSource(player).then(e => {
+      selectedBlocks[type][player.id] = e
+      onSelect(player)
+    })
+  }
+
+  /** @type {ReturnType<use>} */
+  const empty = [
+    void 0,
+    {
+      icon: MinecraftBlockTypes.Barrier,
+      nameTag: 'Не выбран',
+      description: desc + '. Нажми чтобы выбрать ',
+      callback: btnCallback,
+    },
+  ]
+  if (!block) return empty
+
+  /**
+   * @type {BlockPermutation[]}
+   */
+  let result
+
+  /**
+   * @type {BlockPermutation}
+   */
+  let dispaySource
+
+  /**
+   * @type {Omit<import('lib/Form/ChestForm.js').ChestButtonOptions, 'slot'>}
+   */
+  let options = {}
+
+  if (block instanceof BlockPermutation) {
+    dispaySource = block
+    result = [block]
+  } else {
+    const set = getBlockSet(block)
+    if (!set[0]) return empty
+    result = set
+    dispaySource = set[0]
+    options.nameTag = 'Набор блоков ' + stringifyBlocksSetRef(block)
+  }
+  options = {
+    ...ChestForm.permutationToButton(dispaySource),
+    ...options,
+    callback: btnCallback,
+  }
+
+  options.lore = [desc, '', ...(options.lore ?? [])]
+
+  return [result, options]
+}
+
+/**
+ * @param {Player} player
+ * @returns {Promise<BlockPermutation | import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef>}
+ */
+function selectBlockSource(player) {
+  return new Promise(resolve => {
+    const base = new ActionForm('А')
+      .addButton('Выбрать набор блоков', () => {
+        const blocksSets = getAllBlockSets(player.id)
+        const form = new ActionForm('Наборы блоков').addButton(
+          ActionForm.backText,
+          () => base.show(player)
+        )
+
+        for (const blocksSet of Object.keys(blocksSets)) {
+          form.addButton(blocksSet, () => resolve([player.id, blocksSet]))
+        }
+
+        form.show(player)
+      })
+      .addButton('Выбрать из инвентаря/под ногами', () => {
+        const form = new ChestForm('large')
+        const blockBelow = player.dimension.getBlock(player.location)?.below()
+        form.pattern([0, 0], ['x<xxBxxxx'], {
+          '<': {
+            icon: BUTTON['<'],
+            callback: () => {
+              base.show(player)
+            },
+          },
+          'x': {
+            icon: 'textures/blocks/glass',
+            nameTag: 'Пусто',
+            callback: () => base.show(player),
+          },
+          'B': {
+            ...(blockBelow
+              ? ChestForm.permutationToButton(blockBelow.permutation)
+              : { icon: MinecraftBlockTypes.Air }),
+            description: 'Нажми чтобы выбрать',
+            callback: () =>
+              resolve(
+                blockBelow?.permutation ??
+                  BlockPermutation.resolve(MinecraftBlockTypes.Air)
+              ),
+          },
+        })
+        const { container } = player.getComponent('inventory')
+        /** @type {string[]} */
+        const blocks = []
+        for (let i = 0; i < container.size; i++) {
+          const item = container.getItem(i)
+          if (
+            !item ||
+            !BlockTypes.get(item.typeId) ||
+            blocks.includes(item.typeId)
+          )
+            continue
+
+          const base = 9 * 1 // 1 row
+
+          const typeId = item.typeId
+
+          form.button({
+            slot: base + blocks.length,
+            icon: typeId,
+            nameTag: GAME_UTILS.toNameTag(typeId),
+            description: 'Нажми чтобы выбрать',
+            callback() {
+              resolve(BlockPermutation.resolve(typeId))
+            },
+          })
+          blocks.push(typeId)
+        }
+
+        form.show(player)
+      })
+      .addButton('Ввести ID вручную', () => {
+        new ModalForm('Введи айди блока')
+          .addTextField('ID блока', 'например, stone')
+          .show(player, (ctx, id) => {
+            let text = ''
+            if (
+              !blockIsAvaible(id, {
+                tell(m) {
+                  text += m
+                },
+              })
+            )
+              return ctx.error(text)
+
+            resolve(BlockPermutation.resolve(id))
+          })
+      })
+
+    base.show(player)
+  })
 }
 
 const prefix = 'minecraft:'
@@ -94,7 +263,7 @@ const blocks = BlockTypes.getAll().map(e => e.id.substring(prefix.length))
 /**
  *
  * @param {string} block
- * @param {Player} player
+ * @param {{tell(s: string): void}} player
  * @returns {boolean}
  */
 function blockIsAvaible(block, player) {

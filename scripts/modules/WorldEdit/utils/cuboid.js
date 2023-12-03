@@ -42,7 +42,7 @@ export class Cuboid {
     this.zCenter = (this.zMax + this.zMin) / 2
   }
   /**
-   * Returns the ammount of blocks in this cuboid
+   * Returns the amount of blocks in this cuboid
    * @returns {number}
    */
   get blocksBetween() {

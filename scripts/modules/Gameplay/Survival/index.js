@@ -1,4 +1,6 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
+import { CUSTOM_ITEMS } from 'config.js'
+import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { Boss } from 'modules/Gameplay/Survival/boss.js'
 import { is } from 'smapi.js'
 import { Region } from '../../Region/Region.js'
@@ -32,6 +34,13 @@ loadRegionsWithGuards({
 
       if (context.type === 'break' && player.isGamemode('adventure'))
         return true
+
+      if (
+        isBuilding(player) &&
+        context.type === 'break' &&
+        context.event.itemStack?.typeId === CUSTOM_ITEMS.tool
+      )
+        return false
     }
   },
 

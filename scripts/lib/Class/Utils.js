@@ -72,9 +72,7 @@ export const GAME_UTILS = {
    */
   toNameTag(string) {
     // Format
-    string = string
-      .replace(/^minecraft:/, '')
-      .replace(/_(.)/, (_, m) => ' ' + m.toUpperCase())
+    string = string.replace(/^minecraft:/, '').replace(/_(.)/g, ' $1')
 
     // Capitalize first letter
     string = string[0].toUpperCase() + string.slice(1)

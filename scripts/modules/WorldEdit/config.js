@@ -27,6 +27,6 @@ export const WE_CONFIG = {
   TICKS_TO_SLEEP: 1,
 
   DRAW_SELECTION_DEFAULT: true,
-  DRAW_SELECTION_PARTICLE: 'minecraft:endrod',
+  DRAW_SELECTION_PARTICLE: 'minecraft:balloon_gas_particle',
   DRAW_SELECTION_MAX_SIZE: 5000,
 }

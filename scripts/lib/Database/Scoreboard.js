@@ -28,8 +28,11 @@ Reflect.defineProperty(Player.prototype, 'scores', {
     const player = this
 
     if (players[player.id]) {
-      if (!players[player.id].player.isValid())
-        players[player.id].player = player
+      let valid = false
+      try {
+        valid = players[player.id].player.isValid()
+      } catch {}
+      if (!valid) players[player.id].player = player
 
       return players[player.id].proxy
     } else {
@@ -76,7 +79,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
         ),
       }
 
-      return (players[player.id] = obj)
+      return (players[player.id] = obj).proxy
     }
   },
 })

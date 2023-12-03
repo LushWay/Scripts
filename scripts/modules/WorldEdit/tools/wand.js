@@ -1,7 +1,9 @@
-import { Player, Vector, world } from '@minecraft/server'
+import { Player, Vector, system, world } from '@minecraft/server'
+import { CUSTOM_ITEMS } from 'config.js'
+import { setSelection } from 'modules/WorldEdit/commands/region/set.js'
+import { ActionForm } from 'smapi.js'
 import { WorldEditTool } from '../class/Tool.js'
 import { WorldEdit } from '../class/WorldEdit.js'
-import { CUSTOM_ITEMS } from 'config.js'
 
 const wand = new WorldEditTool({
   name: 'wand',
@@ -10,8 +12,26 @@ const wand = new WorldEditTool({
   overrides: {
     getMenuButtonName(player) {
       if (super.getMenuButtonName(player) === '') return ''
-      return this.getMenuButtonNameColor(player) + 'Получить топор'
+      const tool = player.mainhand().typeId === this.itemId
+      const we = WorldEdit.forPlayer(player)
+      const selection = !!we.selectionCuboid
+      return (
+        this.getMenuButtonNameColor(player) +
+        (tool
+          ? selection
+            ? 'Действия с областью'
+            : '§cЗона не выделена!'
+          : 'Получить топор')
+      )
     },
+  },
+  editToolForm(slot, player, initial) {
+    if (initial) return
+    new ActionForm('Действия с областью')
+      .addButton('Заполнить/Заменить блоки', () => {
+        setSelection(player)
+      })
+      .show(player)
   },
 })
 
@@ -39,6 +59,7 @@ world.beforeEvents.itemUseOn.subscribe(event => {
 
 world.beforeEvents.playerBreakBlock.subscribe(event => {
   if (event.itemStack?.typeId !== wand.itemId) return
+  event.cancel = true
 
   const we = WorldEdit.forPlayer(event.player)
   const pos = we.pos1 ?? { x: 0, y: 0, z: 0 }
@@ -50,7 +71,7 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
     return
 
   we.pos1 = event.block.location
-  event.player.tell(`§5►1◄§r (break) ${Vector.string(we.pos1)}`)
-
-  event.cancel = true
+  system.delay(() => {
+    event.player.tell(`§5►1◄§r (break) ${Vector.string(we.pos1)}`)
+  })
 })

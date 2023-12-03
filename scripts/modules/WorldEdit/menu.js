@@ -40,7 +40,7 @@ export function WEMenu(player, body = '') {
       if (typeof slotOrError === 'string') {
         WEMenu(player, '§c' + slotOrError)
       } else {
-        tool.editToolForm?.(slotOrError, player)
+        tool.editToolForm?.(slotOrError, player, false)
       }
     })
   }

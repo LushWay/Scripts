@@ -44,7 +44,7 @@ export class WorldEditTool {
    * @param {string} o.name
    * @param {string} o.displayName
    * @param {string} o.itemStackId
-   * @param {(slot: ContainerSlot, player: Player) => void} [o.editToolForm]
+   * @param {(slot: ContainerSlot, player: Player, initial?: boolean) => void} [o.editToolForm]
    * @param {LoreFormat} [o.loreFormat]
    * @param {IntervalFunction} [o.interval0]
    * @param {IntervalFunction} [o.interval10]
@@ -88,7 +88,8 @@ export class WorldEditTool {
       const slotOrError = this.getToolSlot(ctx.sender)
 
       if (typeof slotOrError === 'string') ctx.error(slotOrError)
-      else if (this.editToolForm) this.editToolForm(slotOrError, ctx.sender)
+      else if (this.editToolForm)
+        this.editToolForm(slotOrError, ctx.sender, true)
     })
   }
   /**

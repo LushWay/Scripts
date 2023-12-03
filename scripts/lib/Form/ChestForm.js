@@ -1,7 +1,7 @@
-import { Player } from '@minecraft/server'
+import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { loreWordWrap } from 'lib/Extensions/itemstack.js'
-import { showForm, util } from 'smapi.js'
+import { GAME_UTILS, showForm, util } from 'smapi.js'
 import { typeIdToID } from '../../chestui/typeIds.js'
 
 const NUMBER_OF_1_16_100_ITEMS = 0
@@ -35,6 +35,20 @@ const SIZES = {
  */
 
 export class ChestForm {
+  /**
+   * @param {BlockPermutation} permutation
+   * @returns {Omit<ChestButtonOptions, 'slot'>}
+   */
+  static permutationToButton(permutation) {
+    const states = permutation.getAllStates()
+    return {
+      nameTag: GAME_UTILS.toNameTag(permutation.type.id),
+      icon: permutation.type.id,
+      lore: [
+        ...(Object.keys(states).length ? util.inspect(states).split('\n') : []),
+      ],
+    }
+  }
   /**
    * @private
    * @type {string}
@@ -142,7 +156,7 @@ export class ChestForm {
 
         const callback = this.buttons[response.selection].callback
         if (!callback) this.show(player)
-        else util.catch(callback)
+        else util.catch(() => callback(player))
       })
       .catch(util.error)
   }

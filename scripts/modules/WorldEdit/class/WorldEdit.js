@@ -1,4 +1,5 @@
 import {
+  BlockPermutation,
   MolangVariableMap,
   Player,
   Vector,
@@ -25,9 +26,22 @@ export class WorldEdit {
   drawselection = WE_CONFIG.DRAW_SELECTION_DEFAULT
 
   /**
-   * @type {Cuboid}
+   * @type {Cuboid | undefined}
    */
   selectionCuboid
+
+  /**
+   * @type {Cuboid | undefined}
+   */
+  visualSelectionCuboid
+
+  recreateCuboids() {
+    this.selectionCuboid = new Cuboid(this.#pos1, this.#pos2)
+    this.visualSelectionCuboid = new Cuboid(
+      this.selectionCuboid.min,
+      Vector.add(this.selectionCuboid.max, Vector.one)
+    )
+  }
 
   /**
    * @type {Vector3}
@@ -43,7 +57,7 @@ export class WorldEdit {
   }
   set pos1(value) {
     this.#pos1 = value
-    if (this.#pos2) this.selectionCuboid = new Cuboid(value, this.#pos2)
+    this.recreateCuboids()
   }
 
   get pos2() {
@@ -51,7 +65,7 @@ export class WorldEdit {
   }
   set pos2(value) {
     this.#pos2 = value
-    if (this.#pos1) this.selectionCuboid = new Cuboid(this.#pos1, value)
+    this.recreateCuboids()
   }
 
   /**
@@ -89,36 +103,48 @@ export class WorldEdit {
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
     WorldEdit.instances[id] = this
     this.player = player
-    const event = world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-      if (playerId !== this.player.id) return
+    system.delay(() => {
+      const event = world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+        if (playerId !== this.player.id) return
 
-      world.afterEvents.playerLeave.unsubscribe(event)
-      delete WorldEdit.instances[id]
+        world.afterEvents.playerLeave.unsubscribe(event)
+        delete WorldEdit.instances[id]
+      })
     })
   }
 
   drawSelection() {
-    if (!this.drawselection || !this.selectionCuboid) return
+    if (
+      !this.drawselection ||
+      !this.selectionCuboid ||
+      !this.visualSelectionCuboid
+    )
+      return
     const selectedSize = Vector.size(
       this.selectionCuboid.min,
       this.selectionCuboid.max
     )
-    if (selectedSize > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
-    const { xMax, xMin, zMax, zMin, yMax, yMin } = this.selectionCuboid
+    if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE)
+      return
+    const { xMax, xMin, zMax, zMin, yMax, yMin } = this.visualSelectionCuboid
     for (const { x, y, z } of Vector.foreach(
-      this.selectionCuboid.min,
-      this.selectionCuboid.max
+      this.visualSelectionCuboid.min,
+      this.visualSelectionCuboid.max
     )) {
       const q =
         ((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
         ((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
         ((z == zMin || z == zMax) && (x == xMin || x == xMax))
 
+      const SELECTION_PARTICLE = new MolangVariableMap()
+      SELECTION_PARTICLE.setFloat('x', 0.0)
+      SELECTION_PARTICLE.setFloat('y', 0.0)
+      SELECTION_PARTICLE.setFloat('z', 0.0)
       if (q)
         world.overworld.spawnParticle(
           WE_CONFIG.DRAW_SELECTION_PARTICLE,
-          { x: x + 0.5, y: y + 0.5, z: z + 0.5 },
-          new MolangVariableMap()
+          { x, y, z },
+          SELECTION_PARTICLE
         )
     }
   }
@@ -257,57 +283,66 @@ export class WorldEdit {
     }
   }
   /**
-   *
-   * @param {string} block
-   * @param {*} data
-   * @param {*} replaceMode
-   * @param {*} replaceBlock
-   * @param {*} rbData
-   * @returns
+   * @param {Player} player
+   * @param {BlockPermutation[]} blocks
+   * @param {(undefined | BlockPermutation)[]} replaceBlocks
+   * @returns {Promise<string>}
    */
-  async fillBetween(block, data = -1, replaceMode, replaceBlock, rbData) {
+  async fillBetween(player, blocks, replaceBlocks = [undefined]) {
+    if (!this.selectionCuboid) return 'Зона не выделена!'
+
+    const timeForEachFill = 3
+    const fillSize = 32768
+    const time = Math.round(
+      (this.selectionCuboid.blocksBetween / fillSize) * timeForEachFill * 0.05
+    )
+    if (time >= 0.01)
+      player.tell(
+        `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
+      )
     const startTime = Date.now()
     this.backup()
-    const Cube = new Cuboid(this.pos1, this.pos2)
-    const blocks = Cube.blocksBetween
     let errors = 0
     let all = 0
 
-    let fulldata = block
-    const add = (/** @type {string | number} */ s) => (fulldata += ` ${s}`)
+    // TODO use O(n) for blocks.length === 1
+    for (const cube of Vector.foreach(
+      this.selectionCuboid.min,
+      this.selectionCuboid.max
+    )) {
+      for (const replaceBlock of replaceBlocks) {
+        try {
+          world.overworld.fillBlocks(
+            cube,
+            cube,
+            blocks.randomElement(),
+            replaceBlock
+              ? {
+                  matchingBlock: replaceBlock,
+                }
+              : {}
+          )
+        } catch (e) {
+          errors++
+        }
 
-    if (!isNaN(data)) add(data)
-
-    if (replaceMode) {
-      add(replaceMode)
-      if (replaceMode === 'replace') {
-        if (replaceBlock) add(replaceBlock)
-        if (!isNaN(rbData)) add(rbData)
+        all++
+        await nextTick
       }
-    }
-
-    for (const cube of Cube.split(WE_CONFIG.FILL_CHUNK_SIZE)) {
-      const result = world.overworld.runCommand(
-        `fill ${cube.pos1.x} ${cube.pos1.y} ${cube.pos1.z} ${cube.pos2.x} ${cube.pos2.y} ${cube.pos2.z} ${fulldata}`,
-        { showError: true, showOutput: false }
-      )
-      if (result === 0) errors++
-      all++
-      await nextTick
     }
 
     const endTime = get(Date.now() - startTime)
 
-    let reply = `§3Заполненно §f${blocks} §3блоков`
+    let reply = `§3Заполнено §f${this.selectionCuboid.blocksBetween} §3блоков`
     if (endTime.parsedTime !== '0') {
       reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
     }
-    if (replaceMode) {
-      reply += ` §3Режим заполнения: §b${replaceMode}`
+    if (replaceBlocks) {
+      reply += `§3, заполняет: §f${replaceBlocks
+        .map(e => e?.type.id)
+        .join(', ')}`
     }
-    if (replaceMode === 'replace') {
-      reply += `§3, заполняемый блок: §f${replaceBlock} ${rbData ? rbData : ''}`
-    }
+
     if (errors)
       return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок при заполнении. ${reply}`
     return `§b► ${reply}`
