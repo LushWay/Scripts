@@ -12,7 +12,7 @@ new Command({
 /**
  * @param {Player} player
  */
-export function tpMenu(player, onEnd = () => {}) {
+export function tpMenu(player) {
   const form = new ActionForm('Выберите локацию')
 
   const locations = {
@@ -23,8 +23,8 @@ export function tpMenu(player, onEnd = () => {}) {
   }
 
   for (const [name, location] of Object.entries(locations)) {
-    form.addButton(name, () => (player.runCommand('tp ' + location), onEnd()))
+    form.addButton(name, () => player.runCommand('tp ' + location))
   }
 
-  form.show(player)
+  return form.show(player)
 }

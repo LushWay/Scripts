@@ -38,7 +38,7 @@ if (ANARCHY.tpLocation.valid) {
  */
 function tpMenuOnce(player) {
   if (!sent.has(player.id)) {
-    tpMenu(player, () => sent.delete(player.id))
+    tpMenu(player).then(() => sent.delete(player.id))
     sent.add(player.id)
   }
 }
@@ -64,7 +64,8 @@ if (ANARCHY.portalLocation.valid) {
     Vector.add(ANARCHY.portalLocation, { x: 0, y: -1, z: -1 }),
     Vector.add(ANARCHY.portalLocation, { x: 0, y: 1, z: 1 }),
     player => {
-      if (!Portal.canTeleport(player)) return
+      const building = isBuilding(player)
+      if (!Portal.canTeleport(player, { fadeScreen: !building })) return
       const data = player.database.survival
 
       if (data.inv === 'anarchy') {
@@ -73,7 +74,7 @@ if (ANARCHY.portalLocation.valid) {
 
       system.delay(() => {
         if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
-          if (isBuilding(player)) return tpMenuOnce(player)
+          if (building) return tpMenuOnce(player)
 
           randomTeleport(
             player,
@@ -101,7 +102,8 @@ if (ANARCHY.portalLocation.valid) {
           })
           data.inv = 'anarchy'
         } else {
-          if (!isBuilding(player)) anarchyInventory(player)
+          if (!building) anarchyInventory(player)
+          else Portal.canTeleport(player)
 
           player.teleport(data.anarchy)
           delete data.anarchy
