@@ -25,7 +25,7 @@ const settings = Settings.player('Боковое меню (сайдбар)', 'si
 const sidebar = new Sidebar(
   { name: 'Server' },
   player => {
-    if (isBuilding(player.id)) return '§fСтройка'
+    if (isBuilding(player)) return '§fСтройка'
     else return false
   },
   player => {

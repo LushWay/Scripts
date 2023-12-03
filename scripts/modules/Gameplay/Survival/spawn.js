@@ -39,7 +39,7 @@ SPAWN.startAxeItem.setLore(['§r§7Начальный топор'])
  * @param {Player} player
  */
 function spawnInventory(player) {
-  if (isBuilding(player.id)) return
+  if (isBuilding(player)) return
   const data = player.database.survival
 
   if (data.inv === 'anarchy') {

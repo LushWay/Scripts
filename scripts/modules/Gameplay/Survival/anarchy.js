@@ -61,7 +61,7 @@ if (ANARCHY.portalLocation.valid) {
 
       system.delay(() => {
         if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
-          if (isBuilding(player.id)) return tpMenu(player)
+          if (isBuilding(player)) return tpMenu(player)
 
           randomTeleport(
             player,
@@ -89,7 +89,7 @@ if (ANARCHY.portalLocation.valid) {
           })
           data.inv = 'anarchy'
         } else {
-          if (!isBuilding(player.id)) anarchyInventory(player)
+          if (!isBuilding(player)) anarchyInventory(player)
 
           player.teleport(data.anarchy)
           delete data.anarchy
@@ -110,7 +110,12 @@ const settings = Settings.player('Вход', 'join', {
 if (ANARCHY.portal && SPAWN.location.valid) {
   world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
     // Skip death respawns
-    if (!initialSpawn || !settings(player).teleportToSpawnOnJoin) return
+    if (
+      !initialSpawn ||
+      !settings(player).teleportToSpawnOnJoin ||
+      isBuilding(player, true)
+    )
+      return
 
     SPAWN.portal?.teleport(player)
   })

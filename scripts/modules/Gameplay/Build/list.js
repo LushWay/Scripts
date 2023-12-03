@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { InventoryStore, OverTakes } from 'smapi.js'
 
 const propname = 'onlineBuilderList'
@@ -34,10 +34,11 @@ OverTakes(onlineBuildersList, {
 })
 
 /**
- * @param {string} player
+ * @param {Player} player
  */
-export function isBuilding(player) {
-  return onlineBuildersList.has(player)
+export function isBuilding(player, uptodate = false) {
+  if (uptodate) return player.isGamemode('creative')
+  return onlineBuildersList.has(player.id)
 }
 
 const builderInventory = new InventoryStore('build')
