@@ -130,7 +130,11 @@ export class ScoreboardDB {
    */
   get(id) {
     if (typeof id !== 'string') id = id.id
-    return this.scoreboard.getScore(id) ?? 0
+    try {
+      return this.scoreboard.getScore(id) ?? 0
+    } catch (e) {
+      return 0
+    }
   }
 
   reset() {

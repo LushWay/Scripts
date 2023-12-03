@@ -1,4 +1,5 @@
 import {
+  BlockVolumeUtils,
   Entity,
   EquipmentSlot,
   ItemStack,

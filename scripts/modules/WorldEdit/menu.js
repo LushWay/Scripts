@@ -55,19 +55,12 @@ function WEBlocksSets(player) {
   const sets = new ActionForm('Наборы блоков')
   sets.addButton(ActionForm.backText, () => WEMenu(player))
   sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
-    new ModalForm('§3Имя')
-      .addTextField(
-        `Существующие наборы:\n${Object.keys(blockSets).join(
-          '\n'
-        )}\n\nВведи новое имя набора`,
-        ''
-      )
-      .show(player, (ctx, name) => {
-        if (name in blockSets)
-          return ctx.error('Набор с именем ' + name + ' уже существует!')
-
-        editBlocksSet({ player, setName: name, sets: blockSets, ownsSet: true })
-      })
+    manageBlockSet({
+      blockSets,
+      player,
+      action: 'Создать новый',
+      onFail: () => {},
+    })
   })
 
   sets.addButton('§3Наборы других игроков...', () =>
@@ -88,6 +81,49 @@ function WEBlocksSets(player) {
     )
   }
   sets.show(player)
+}
+
+/**
+ * @param {object} o
+ * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} o.blockSets
+ * @param {Player} o.player
+ * @param {string} o.action
+ * @param {string} [o.setName]
+ * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets[string]} [o.set]
+ * @param {boolean} [o.deletePrevious=false]
+ * @param {() => void} [o.onFail]
+ */
+function manageBlockSet({
+  blockSets,
+  player,
+  action,
+  setName,
+  set = setName ? blockSets[setName] : undefined,
+  deletePrevious = false,
+  onFail = () => {},
+}) {
+  new ModalForm(action)
+    .addTextField(
+      `Существующие наборы:\n${Object.keys(blockSets).join(
+        '\n'
+      )}\n\nИмя набора:`,
+      'Действие будет отменено.',
+      setName
+    )
+    .show(player, (ctx, name) => {
+      if (name in blockSets)
+        return ctx.error('Набор с именем ' + name + ' уже существует!')
+
+      if (!name || name === setName) return onFail()
+      if (deletePrevious && setName) setBlockSet(player.id, setName, undefined)
+      setBlockSet(player.id, name, set)
+      editBlocksSet({
+        player,
+        setName: name,
+        sets: undefined,
+        ownsSet: true,
+      })
+    })
 }
 
 /**
@@ -182,7 +218,7 @@ function editBlocksSet(o) {
       ownsSet ? 'x<xx+xDR?' : 'x<xxxxxx?', // row 0
       '---------', // row 1
       '---------', // row 2
-      ownsSet ? 'xxx>Bxxxx' : 'xxxxAxxxx', // row 3
+      ownsSet ? 'xNx>BxxCx' : 'xxxxAxxxx', // row 3
       '---------', // row 4
       '---------', // row 5
     ],
@@ -200,6 +236,38 @@ function editBlocksSet(o) {
             setName: newName,
             sets: undefined,
             ownsSet: true,
+          })
+        },
+      },
+      'C': {
+        icon: 'textures/ui/copy',
+        nameTag: 'Копировать набор',
+        description: 'Нажмите чтобы копировать набор.',
+        callback() {
+          manageBlockSet({
+            player,
+            setName,
+            set,
+            blockSets: sets,
+            action: 'Копировать набор',
+            deletePrevious: false,
+            onFail: () => editBlocksSet(o),
+          })
+        },
+      },
+      'N': {
+        icon: 'textures/ui/editIcon',
+        nameTag: 'Переименовать набор',
+        description: 'Нажмите чтобы переименовать набор.',
+        callback() {
+          manageBlockSet({
+            player,
+            setName,
+            set,
+            blockSets: sets,
+            action: 'Переименовать набор',
+            deletePrevious: true,
+            onFail: () => editBlocksSet(o),
           })
         },
       },
@@ -285,6 +353,22 @@ function editBlocksSet(o) {
         : empty,
     }
   )
+
+  function manage({ action = 'Переименовать', deletePrevious = true } = {}) {
+    new ModalForm('Переименовать набор')
+      .addTextField('Новое имя набора', 'Ничего не изменится', setName)
+      .show(player, (ctx, newName) => {
+        if (!newName || newName === setName) return editBlocksSet(o)
+        setBlockSet(player.id, setName, undefined)
+        if (deletePrevious) setBlockSet(player.id, newName, set)
+        editBlocksSet({
+          ...o,
+          setName: newName,
+          sets: undefined,
+          ownsSet: true,
+        })
+      })
+  }
 
   /**
    *
