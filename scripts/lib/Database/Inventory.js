@@ -17,7 +17,7 @@ const TABLE_TYPE = 'inventory'
 
 /**
  * @typedef {{
- *   slots: ItemStack[];
+ *   slots: Record<string, ItemStack>;
  *   equipment: Partial<Record<Equipment, ItemStack>>
  *   xp: number;
  *   health: number;
@@ -56,8 +56,8 @@ export class InventoryStore {
 
     const { container } = to.getComponent('inventory')
     if (clearAll) container.clearAll()
-    for (const [i, item] of from.slots.entries()) {
-      if (item) container.setItem(i, item)
+    for (const [i, item] of Object.entries(from.slots)) {
+      if (item) container.setItem(Number(i), item)
     }
   }
 
@@ -74,6 +74,15 @@ export class InventoryStore {
     const xp = from.getTotalXp()
     const health = from.getComponent('health').currentValue
 
+    /** @type {Inventory['slots']} */
+    const slots = {}
+
+    for (let i = 0; i < container.size; i++) {
+      const item = container.getItem(i)
+      if (!item) continue
+      slots[i] = item
+    }
+
     return {
       xp,
       health,
@@ -84,11 +93,7 @@ export class InventoryStore {
         Legs: equipment.getEquipment(EquipmentSlot.Legs),
         Feet: equipment.getEquipment(EquipmentSlot.Feet),
       },
-      // @ts-expect-error Filter misstype
-      slots: new Array(container.size)
-        .fill(undefined)
-        .map((_, i) => container.getItem(i))
-        .filter(e => typeof e !== 'undefined'),
+      slots: slots,
     }
   }
   _ = {
@@ -139,7 +144,7 @@ export class InventoryStore {
       xp: 0,
       health: 20,
       equipment: {},
-      slots: [],
+      slots: {},
     }
     /** @type {Record<number, {type: 'equipment' | 'slots', index: Equipment | number}>} */
     let slots = []
@@ -163,7 +168,7 @@ export class InventoryStore {
               xp: 0,
               health: 20,
               equipment: {},
-              slots: [],
+              slots: {},
             }
           }
 
@@ -229,9 +234,9 @@ export class InventoryStore {
         items[storeIndex + move] = eq
       }
 
-      for (const [key, stack] of store.slots.entries()) {
+      for (const [key, stack] of Object.entries(store.slots)) {
         if (!stack) continue
-        const move = manifest.slots.push(key)
+        const move = manifest.slots.push(Number(key))
         items[storeIndex + move] = stack
       }
 
@@ -282,7 +287,7 @@ export class InventoryStore {
    * @type {boolean}
    * @private
    */
-  saving = true
+  saving = false
   /** @private */
   requestSave() {
     if (this.saving) return
@@ -290,23 +295,29 @@ export class InventoryStore {
     system.runTimeout(
       () => {
         this.save()
+        console.debug('Saved')
         this.saving = false
       },
       'inventorySave',
-      40
+      20
     )
     this.saving = true
   }
   /**
    * Gets entity store from saved and removes to avoid bugs
    * @param {string} key - The ID of the entity whose store is being retrieved.
-   * @param {boolean} remove - A boolean parameter that determines whether the entity store should be
+   * @param {object} [o]
+   * @param {boolean} [o.remove] - A boolean parameter that determines whether the entity store should be
    * removed from the internal stores object after it has been retrieved. If set to true, the store will
    * be deleted from the object. If set to false, the store will remain in the object.
+   * @param {Inventory} [o.fallback] - Inventory to return if there is no inventory in store
    * @returns the entity store associated with the given entity ID.
    */
-  getEntityStore(key, remove = true) {
-    if (!(key in this._.STORES)) throw new DatabaseError('Not found inventory!')
+  getEntityStore(key, { remove = true, fallback } = {}) {
+    if (!(key in this._.STORES)) {
+      if (fallback) return fallback
+      else throw new DatabaseError('Not found inventory!')
+    }
 
     const store = this._.STORES[key]
     if (remove) delete this._.STORES[key]

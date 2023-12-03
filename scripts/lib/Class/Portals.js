@@ -18,8 +18,8 @@ export class Portal {
 
     if (fadeScreen) {
       const inS = 0.5
-      const stayS = 0.5
-      const outS = 0.7
+      const stayS = 1.0
+      const outS = 1.0
       // player.onScreenDisplay.setTitle("§aПеремещение...", {
       // 	fadeInDuration: inS * 20,
       // 	stayDuration: stayS * 20,

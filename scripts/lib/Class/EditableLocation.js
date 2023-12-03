@@ -19,7 +19,7 @@ export class EditableLocation {
     this.id = id
     this.fallback = fallback
     Settings.worldMap[EditableLocation.key][id] = {
-      desc: `Позиция ${id}`,
+      desc: `Позиция`,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
       onChange: () => this.init(),

@@ -3,7 +3,7 @@ import { ActionForm } from 'smapi.js'
 
 new Command({
   name: 'tp',
-  role: 'builder',
+  role: 'member', // TODO! on release change role to builder
   description: 'Открывает меню телепортации',
 }).executes(ctx => {
   tpMenu(ctx.sender)
@@ -17,7 +17,7 @@ export function tpMenu(player) {
 
   const locations = {
     'Деревня шахтеров': '136 71 13457 140 -10',
-    'Деревня исследователей': '-26 97 13663 20 30 13778 180 10',
+    'Деревня исследователей': '20 30 13778 180 10',
     'Каменоломня': '-1300 76 14800 -90 5',
     'Техноград': '-1288 64 13626 90 -10',
   }

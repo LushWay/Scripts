@@ -1,11 +1,9 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { Quest } from 'lib/Class/Quest.js'
-import { Sidebar } from 'lib/Class/Sidebar.js'
-import { Temporary } from 'lib/Class/Temporary.js'
+import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { Zone } from 'modules/Server/Class/Zone.js'
 import { tpMenu } from 'modules/Server/Commands/tp.js'
-import { ActionForm, EditableLocation, InventoryStore } from 'smapi.js'
+import { EditableLocation, InventoryStore, Settings } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
 import { randomTeleport } from './randomTeleport.js'
 import { SPAWN } from './spawn.js'
@@ -41,12 +39,13 @@ function anarchyInventory(player) {
     if (player.id in ANARCHY.inventory._.STORES) {
       InventoryStore.load({
         to: player,
-        from: ANARCHY.inventory.getEntityStore(player.id, true),
+        from: ANARCHY.inventory.getEntityStore(player.id, { remove: true }),
       })
       player.database.survival.inv = 'anarchy'
     }
   }
 }
+
 if (ANARCHY.portalLocation.valid) {
   ANARCHY.portal = new Portal(
     'anarchy',
@@ -62,6 +61,8 @@ if (ANARCHY.portalLocation.valid) {
 
       system.delay(() => {
         if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
+          if (isBuilding(player.id)) return tpMenu(player)
+
           randomTeleport(
             player,
             { x: 500, y: 0, z: 500 },
@@ -70,7 +71,7 @@ if (ANARCHY.portalLocation.valid) {
               elytra: true,
               teleportCallback() {
                 player.tell('§a> §fВы были перемещены.')
-                player.playSound('note.pling')
+                player.playSound(SOUNDS.success)
               },
               keepInSkyTime: 20,
             }
@@ -81,14 +82,14 @@ if (ANARCHY.portalLocation.valid) {
               equipment: {},
               health: 20,
               xp: 0,
-              slots: [SPAWN.startAxeItem],
+              slots: { 0: SPAWN.startAxeItem },
             },
             to: player,
             clearAll: true,
           })
           data.inv = 'anarchy'
         } else {
-          anarchyInventory(player)
+          if (!isBuilding(player.id)) anarchyInventory(player)
 
           player.teleport(data.anarchy)
           delete data.anarchy
@@ -98,74 +99,19 @@ if (ANARCHY.portalLocation.valid) {
   )
 }
 
-if (ANARCHY.portal) {
-  const learning = new Quest('Обучение', q => {
-    if (!ANARCHY.portal || !ANARCHY.portal.from || !ANARCHY.portal.to)
-      return q.failed('§cСервер не настроен')
+const settings = Settings.player('Вход', 'join', {
+  teleportToSpawnOnJoin: {
+    value: true,
+    name: 'Телепорт на спавн',
+    desc: 'Определяет, будете ли вы телепортироваться на спавн при входе',
+  },
+})
 
-    q.start(function () {
-      this.player.tell('§6Квест начался!')
-      this.player.playSound(SOUNDS.action)
-    })
+if (ANARCHY.portal && SPAWN.location.valid) {
+  world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+    // Skip death respawns
+    if (!initialSpawn || !settings(player).teleportToSpawnOnJoin) return
 
-    q.place(ANARCHY.portal.from, ANARCHY.portal.to, '§6Зайди в портал анархии')
-
-    q.counter({
-      end: 5,
-      text(value) {
-        return `§6Наруби §f${value}/${this.end} §6блоков дерева`
-      },
-      activate() {
-        return new Temporary(({ world }) => {
-          world.beforeEvents.playerBreakBlock.subscribe(({ player, block }) => {
-            if (player.id !== this.player.id) return
-            if (!SPAWN.startAxeCanBreak.includes(block.type.id)) return
-
-            this.diff(1)
-          })
-        })
-      },
-    })
-
-    q.end(function () {
-      this.player.playSound('note.pling')
-      this.player.tell('§6Квест закончен!')
-    })
-  })
-
-  new Command({
-    name: 'q',
-    role: 'admin',
-  }).executes(ctx => {
-    const form = new ActionForm('Quests', 'Выбери')
-    form.addButton('Learning', () => {
-      learning.enter(ctx.sender)
-    })
-    form.show(ctx.sender)
-  })
-
-  const anarchySidebar = new Sidebar(
-    { name: 'Anarchy' },
-    player => {
-      return '§7Инвентарь: ' + player.database.survival.inv
-    },
-    player => {
-      return `§7Монеты: §6${player.scores.money}§7 | Листья: §2${player.scores.leafs}`
-    },
-    ' ',
-    Quest.sidebar,
-    ' ',
-    '§7shp1nat56655.portmap.io'
-  )
-  anarchySidebar.setUpdateInterval(20)
-
-  world.getAllPlayers().forEach(e => anarchySidebar.subscribe(e))
-
-  world.afterEvents.playerSpawn.subscribe(({ player }) => {
-    anarchySidebar.subscribe(player)
-  })
-
-  world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-    anarchySidebar.unsubscribe(playerId)
+    SPAWN.portal?.teleport(player)
   })
 }

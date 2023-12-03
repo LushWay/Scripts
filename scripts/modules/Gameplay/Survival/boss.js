@@ -46,7 +46,8 @@ export class Boss {
     this.bossEvent = bossEvent
     this.location = new EditableLocation('boss_' + name + '_spawn_pos')
 
-    // Without delay any error causes module to stop loading
+    // Without delay any error during loading
+    // caused this file to stop loading
     // so none of intervals would work.
     system.delay(() => this.location.onValid.subscribe(() => this.check()))
 

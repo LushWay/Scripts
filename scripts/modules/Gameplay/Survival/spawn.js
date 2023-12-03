@@ -4,6 +4,7 @@ import {
   MinecraftEffectTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
+import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
 import { RadiusRegion, Region } from '../../Region/Region.js'
@@ -20,13 +21,15 @@ export const SPAWN = {
     xp: 0,
     health: 20,
     equipment: {},
-    slots: [MENU.item],
+    slots: { 0: MENU.item },
   },
   location: new EditableLocation('spawn', {
     fallback: new Vector(0, 200, 0),
   }),
   /** @type {undefined | Region} */
   region: void 0,
+  /** @type {undefined | Portal} */
+  portal: void 0,
 }
 SPAWN.startAxeItem.setCanDestroy(SPAWN.startAxeCanBreak)
 SPAWN.startAxeItem.nameTag = 'Начальный топор'
@@ -36,6 +39,7 @@ SPAWN.startAxeItem.setLore(['§r§7Начальный топор'])
  * @param {Player} player
  */
 function spawnInventory(player) {
+  if (isBuilding(player.id)) return
   const data = player.database.survival
 
   if (data.inv === 'anarchy') {
@@ -51,9 +55,10 @@ function spawnInventory(player) {
     data.inv = 'spawn'
   }
 }
+
 if (SPAWN.location.valid) {
   world.setDefaultSpawnLocation(SPAWN.location)
-  new Portal('spawn', null, null, player => {
+  SPAWN.portal = new Portal('spawn', null, null, player => {
     if (!Portal.canTeleport(player)) return
     spawnInventory(player)
 

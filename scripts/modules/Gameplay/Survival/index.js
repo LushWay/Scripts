@@ -4,12 +4,13 @@ import { is } from 'smapi.js'
 import { Region } from '../../Region/Region.js'
 import { loadRegionsWithGuards } from '../../Region/index.js'
 import { JOIN } from '../../Server/PlayerJoin/var.js'
-import { MENU } from '../../Server/menuItem.js'
 import './anarchy.js'
 import { BASE_ITEM_STACK } from './base.js'
 import './bouncyTnt.js'
 import './fireworks.js'
+import './quests/index.js'
 import './raid.js'
+import './sidebar.js'
 import './spawn.js'
 
 console.log('§6Gameplay mode: survival')
@@ -65,9 +66,9 @@ JOIN.CONFIG.title_animation = {
 }
 JOIN.CONFIG.subtitle = 'Добро пожаловать!'
 
-JOIN.EVENTS.firstTime.subscribe(player => {
-  player.getComponent('inventory').container.addItem(MENU.item)
-})
+// JOIN.EVENTS.firstTime.subscribe(player => {
+//   player.getComponent('inventory').container.addItem(MENU.item)
+// })
 
 new Boss({
   name: 'wither',

@@ -1,5 +1,6 @@
 import { Player, Vector, world } from '@minecraft/server'
 import { Place } from './Action.js'
+import { SOUNDS } from 'config.js'
 
 // // @ts-expect-error Bruh
 // Set.prototype.toJSON = function () {
@@ -333,6 +334,7 @@ class PlayerQuest {
   failed(reason) {
     this.dynamic({
       activate: () => {
+        this.player.playSound(SOUNDS.fail)
         this.player.tell(reason)
         this.quest.exit(this.player)
         return { cleanup() {} }

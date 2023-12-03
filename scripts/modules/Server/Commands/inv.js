@@ -18,7 +18,7 @@ new Command({
   ).addButton('Новый', null, () => {})
 
   for (const [key, value] of Object.entries(inventories)) {
-    const inv = STORE.getEntityStore(key, false)
+    const inv = STORE.getEntityStore(key, { remove: false })
     let label = key
     label += ' '
     if (Object.keys(inv.equipment).length) label += emoji.armor
