@@ -49,11 +49,9 @@ system.runPlayerInterval(
     const builder = onlineBuildersList.has(player.id)
 
     if (creative && !builder) {
-      console.debug({ creative, builder })
       switchInv()
       onlineBuildersList.add(player.id)
     } else if (!creative && builder) {
-      console.debug({ creative, builder })
       switchInv()
       onlineBuildersList.delete(player.id)
     }
@@ -62,8 +60,6 @@ system.runPlayerInterval(
       const invToLoad = builderInventory.getEntityStore(player.id, {
         fallback: { equipment: {}, health: 20, slots: {}, xp: 0 },
       })
-
-      console.debug({ invToLoad })
 
       builderInventory.saveFromEntity(player, {
         rewrite: true,

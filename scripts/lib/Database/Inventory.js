@@ -295,7 +295,6 @@ export class InventoryStore {
     system.runTimeout(
       () => {
         this.save()
-        console.debug('Saved')
         this.saving = false
       },
       'inventorySave',
