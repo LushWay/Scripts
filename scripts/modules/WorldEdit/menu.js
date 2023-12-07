@@ -1,4 +1,9 @@
-import { BlockTypes, Player } from '@minecraft/server'
+import {
+  BlockPermutation,
+  BlockStates,
+  BlockTypes,
+  Player,
+} from '@minecraft/server'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
 import {
@@ -182,6 +187,7 @@ function playerBlockSet(player, otherPlayerId, blockSets, onBack) {
  * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} [o.sets]
  * @param {boolean} [o.ownsSet]
  * @param {boolean} [o.add]
+ * @param {boolean} [o.editStates]
  * @param {() => void} [o.back]
  */
 function editBlocksSet(o) {
@@ -191,6 +197,7 @@ function editBlocksSet(o) {
     sets = getAllBlockSets(player.id),
     ownsSet = true,
     add = true,
+    editStates = false,
     back = () => WEBlocksSets(player),
   } = o
   let set = sets[setName]
@@ -201,6 +208,8 @@ function editBlocksSet(o) {
   }
 
   const blockBelow = player.dimension.getBlock(player.location)?.below()
+  const blockOnViewHit = player.getBlockFromViewDirection()
+  const blockOnView = blockOnViewHit && blockOnViewHit.block
   const form = new ChestForm('large')
 
   /** @type {import('lib/Form/ChestForm.js').ChestButtonOptions} */
@@ -215,10 +224,10 @@ function editBlocksSet(o) {
   form.pattern(
     [0, 0],
     [
-      ownsSet ? 'x<xx+xDR?' : 'x<xxxxxx?', // row 0
+      ownsSet ? 'x<x+xSxD?' : 'x<xxxxxx?', // row 0
       '---------', // row 1
       '---------', // row 2
-      ownsSet ? 'xNx>BxxCx' : 'xxxxAxxxx', // row 3
+      ownsSet ? 'xxY>BxNCR' : 'xxxxAxxxx', // row 3
       '---------', // row 4
       '---------', // row 5
     ],
@@ -277,12 +286,26 @@ function editBlocksSet(o) {
         callback: back,
       },
       'x': empty,
-      '+': {
-        icon: add ? BUTTON['+'] : BUTTON['-'],
-        nameTag: add ? 'Режим добавления' : 'Режим удаления',
+      '+': editStates
+        ? empty
+        : {
+            icon: add ? BUTTON['+'] : BUTTON['-'],
+            nameTag: add ? 'Режим добавления' : 'Режим удаления',
+            description: 'Нажмите чтобы переключить',
+            callback() {
+              editBlocksSet({ ...o, add: !add, editStates: false })
+            },
+          },
+      'S': {
+        icon: editStates
+          ? 'textures/ui/book_metatag_pressed'
+          : 'textures/ui/book_metatag_default',
+        nameTag: editStates
+          ? 'Вернутьс в режим добавления блоков'
+          : 'Вернуться в режим редактирования типов блоков',
         description: 'Нажмите чтобы переключить',
         callback() {
-          editBlocksSet({ ...o, add: !add })
+          editBlocksSet({ ...o, editStates: !editStates })
         },
       },
       'D': {
@@ -338,10 +361,10 @@ function editBlocksSet(o) {
         : empty,
 
       '>': {
-        icon: BUTTON['>'],
-        nameTag: 'Блок под ногами',
+        icon: BUTTON['?'],
+        nameTag: 'Блоки рядом',
         description:
-          'Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.',
+          'Блок под ногами и блок на который вы смотрите. Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.',
       },
       'B': blockBelow
         ? addBlock(
@@ -351,24 +374,16 @@ function editBlocksSet(o) {
             false
           ) ?? empty
         : empty,
+      'Y': blockOnView
+        ? addBlock(
+            0,
+            blockOnView.typeId,
+            blockOnView.permutation.getAllStates(),
+            false
+          ) ?? empty
+        : empty,
     }
   )
-
-  function manage({ action = 'Переименовать', deletePrevious = true } = {}) {
-    new ModalForm('Переименовать набор')
-      .addTextField('Новое имя набора', 'Ничего не изменится', setName)
-      .show(player, (ctx, newName) => {
-        if (!newName || newName === setName) return editBlocksSet(o)
-        setBlockSet(player.id, setName, undefined)
-        if (deletePrevious) setBlockSet(player.id, newName, set)
-        editBlocksSet({
-          ...o,
-          setName: newName,
-          sets: undefined,
-          ownsSet: true,
-        })
-      })
-  }
 
   /**
    *
@@ -405,33 +420,52 @@ function editBlocksSet(o) {
           ? '§cВыключен§f в наборе, но остается тут.'
           : '§7Не добавлен в набор.',
         ownsSet
-          ? add
+          ? editStates
+            ? 'Нажмите, чтобы редактировать значения выше'
+            : add
             ? '§a[+] §rНажмите для добавления блока'
-            : // If no block in set or already disabled show nothing
-            blockInSet && amount > 0
+            : blockInSet && amount > 0
             ? '§c[-] §rНажмите для уменьшения кол-ва блока'
-            : ''
+            : // If no block in set or already disabled show nothing
+              ''
           : '',
       ],
-      callback() {
+      async callback() {
         if (!ownsSet) return editBlocksSet(o)
 
-        if (blockInSet) {
-          blockInSet[2] = add ? amount + 1 : amount - 1
-        } else if (add) {
-          if (set.length >= 18) {
-            new FormCallback(form, player).error(
-              'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.'
-            )
+        if (!editStates) {
+          if (blockInSet) {
+            blockInSet[2] = add ? amount + 1 : amount - 1
+          } else if (add) {
+            if (set.length >= 18) {
+              new FormCallback(form, player).error(
+                'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.'
+              )
+            }
+            set.push([typeId, states, 1])
           }
-          set.push([typeId, states, 1])
+
+          for (const block of set) {
+            // Do not decrease below 0
+            if (typeof block[2] === 'number' && block[2] < 0) block[2] = 0
+          }
+        } else {
+          if (!blockInSet)
+            return new FormCallback(form, player).error(
+              'Невозможно редактировать свойства блока, не находящегося в наборе. Добавьте его в набор.'
+            )
+
+          blockInSet[1] = await editBlockStates(
+            player,
+            blockInSet[1] ?? {},
+            () => editBlocksSet(o)
+          )
         }
 
-        for (const block of set) {
-          // Do not decrease below 0
-          if (typeof block[2] === 'number' && block[2] < 0) block[2] = 0
-        }
+        // Save changes
+        setBlockSet(player.id, setName, set)
 
+        // Reopen to show them
         editBlocksSet({ ...o, sets: getAllBlockSets(player.id) })
       },
     }
@@ -468,4 +502,90 @@ function editBlocksSet(o) {
   }
 
   form.show(player)
+}
+
+const allStates = BlockStates.getAll()
+
+/**
+ * @param {Player} player
+ * @param {Record<string, string | boolean | number>} states
+ * @param {() => void} back
+ * @returns {Promise<Record<string, string | boolean | number>>}
+ */
+export function editBlockStates(player, states, back, edited = false) {
+  const promise = new Promise(resolve => {
+    const form = new ActionForm('Редактировать свойства блока')
+    form.addButton(ActionForm.backText, () => {
+      resolve(states)
+    })
+    if (edited) form.addButton(ActionForm.backText + ' без сохранения', back)
+    form.addButton('§cУдалить все свойства блока', () =>
+      prompt(
+        player,
+        'Точно удалить все свойства блока?',
+        'Да',
+        () => resolve({}),
+        'Отмена',
+        () => form.show(player)
+      )
+    )
+
+    for (const [stateName, stateValue] of Object.entries(states)) {
+      const stateDef = allStates.find(e => e.id === stateName)
+      if (!stateDef) continue
+
+      form.addButton(
+        `${stateName}: ${util.stringify(stateValue)}\n${
+          stateDef.validValues[0] === stateValue ? '§8По умолчанию' : ''
+        }`,
+        () => {
+          const editStateForm = new ActionForm(
+            stateName,
+            `Значение сейчас: ${util.stringify(stateValue)}`
+          )
+
+          editStateForm.addButton(ActionForm.backText, () => form.show(player))
+
+          editStateForm.addButton('§cУдалить значение', () => {
+            delete states[stateName]
+            resolve(editBlockStates(player, states, back))
+          })
+
+          for (const value of stateDef.validValues) {
+            editStateForm.addButton(
+              `${value === stateValue ? '> ' : ''}${util.stringify(value)}`,
+              () =>
+                resolve(
+                  editBlockStates(
+                    player,
+                    { ...states, [stateName]: value },
+                    back,
+                    edited
+                  )
+                )
+            )
+          }
+
+          editStateForm.show(player)
+        }
+      )
+    }
+
+    form.show(player)
+  })
+
+  promise.catch(util.catch)
+
+  return promise
+}
+/**
+ * @typedef {{typeId: string; states: Record<string, string | number | boolean>;}} ReplaceTarget
+ */
+/**
+ * @param {ReplaceTarget | BlockPermutation} target
+ */
+export function toPermutation(target) {
+  return target instanceof BlockPermutation
+    ? target
+    : BlockPermutation.resolve(target.typeId, target.states)
 }

@@ -7,6 +7,7 @@ import {
   blockSetDropdown,
   getAllBlockSets,
   getBlockSet,
+  getBlockSetForReplaceTarget,
 } from '../utils/blocksSet.js'
 
 const shovel = new WorldEditTool({
@@ -33,7 +34,7 @@ const shovel = new WorldEditTool({
   editToolForm(slot, player) {
     const lore = shovel.parseLore(slot.getLore())
     new ModalForm('§3Лопата')
-      .addSlider('Радиус', 1, 10, 1, lore.radius ?? 1)
+      .addSlider('Радиус', 0, 10, 1, lore.radius ?? 1)
       .addSlider('Высота', 1, 10, 1, lore.height ?? 1)
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
@@ -67,7 +68,7 @@ const shovel = new WorldEditTool({
     const lore = shovel.parseLore(slot.getLore())
     const blocks = getBlockSet(lore.blocksSet)
     const replaceBlocks = lore.replaceBlocksSet
-      ? getBlockSet(lore.replaceBlocksSet)
+      ? getBlockSetForReplaceTarget(lore.replaceBlocksSet)
       : [undefined]
     const loc = Vector.floor(player.location)
     const offset = -1
@@ -80,10 +81,16 @@ const shovel = new WorldEditTool({
     WorldEdit.forPlayer(player).backup(pos1, pos2)
 
     for (const loc of Vector.foreach(pos1, pos2)) {
+      const block = world.overworld.getBlock(loc)
+
       for (const replaceBlock of replaceBlocks) {
-        world.overworld.fillBlocks(loc, loc, blocks.randomElement(), {
-          matchingBlock: replaceBlock,
-        })
+        if (
+          replaceBlock &&
+          !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)
+        )
+          continue
+
+        block?.setPermutation(blocks.randomElement())
       }
     }
   },

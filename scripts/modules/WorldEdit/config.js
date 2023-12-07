@@ -1,3 +1,5 @@
+import { MolangVariableMap } from '@minecraft/server'
+
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
 
@@ -29,4 +31,11 @@ export const WE_CONFIG = {
   DRAW_SELECTION_DEFAULT: true,
   DRAW_SELECTION_PARTICLE: 'minecraft:balloon_gas_particle',
   DRAW_SELECTION_MAX_SIZE: 5000,
+  DRAW_SELECTION_PARTICLE_OPTIONS: new MolangVariableMap(),
 }
+
+WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
+  x: 0,
+  y: 0,
+  z: 0,
+})

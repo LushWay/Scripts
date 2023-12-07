@@ -25,6 +25,7 @@ const commands = [
   '../tools/nylium.js',
   '../tools/shovel.js',
   '../tools/tool.js',
+  '../tools/smooth.js',
 ]
 
 import importModules from '../../importModules.js'

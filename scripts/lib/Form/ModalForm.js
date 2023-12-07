@@ -70,24 +70,25 @@ export class ModalForm {
     label,
     object,
     {
-      defaultValueIndex = 0,
+      defaultValueIndex,
       defaultValue,
       none,
       noneText = ModalForm.arrayDefaultNone,
     } = {}
   ) {
-    if (defaultValue) {
-      defaultValueIndex = Object.values(object).findIndex(
-        e => e === defaultValue
-      )
-    }
     /** @type {(string | null)[]} */
     let objectKeys = Object.keys(object)
     let visibleKeys = Object.values(object)
 
+    if (defaultValue) {
+      defaultValueIndex = visibleKeys.findIndex(e => e === defaultValue)
+    }
+
+    // Prepend none to the start of the keys
     if (none) {
       visibleKeys = [noneText, ...visibleKeys]
       objectKeys = [null, ...objectKeys]
+      if (typeof defaultValueIndex === 'number') defaultValueIndex++
     }
 
     this.args.push({ type: 'dropdown', options: objectKeys })

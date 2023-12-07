@@ -199,8 +199,9 @@ export class WorldEditTool {
 
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
   if (!(player instanceof Player)) return
-  const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
-  util.catch(() => tool?.onUse?.(player, item))
+  WorldEditTool.tools
+    .filter(e => e.itemId === item.typeId)
+    .forEach(tool => util.catch(() => tool?.onUse?.(player, item)))
 })
 
 let ticks = 0

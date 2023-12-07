@@ -39,10 +39,11 @@ roleCommand.executes(ctx => {
       new ModalForm(player.name)
         .addToggle('Уведомлять', false)
         .addToggle('Показать Ваш ник в уведомлении', false)
-        .addDropdownFromObject('Роль', ROLE)
+        .addDropdownFromObject('Роль', ROLE, {
+          defaultValueIndex: Object.keys(ROLE).findIndex(e => e === role),
+        })
         .addTextField('Причина смены роли', `Например, "космокс"`)
         .show(ctx.sender, (formCtx, notify, showName, newrole, message) => {
-          if (newrole.startsWith('>')) return
           if (!newrole)
             return formCtx.error(
               'Неизвестная роль: ' +
@@ -66,12 +67,11 @@ roleCommand.executes(ctx => {
   }
   const form = new ActionForm('Roles', '§3Ваша роль: ' + ROLES[role]).addButton(
     'Сменить мою роль',
-    null,
     callback(ctx.sender, true)
   )
 
   for (const player of world.getPlayers({ excludeNames: [ctx.sender.name] }))
-    form.addButton(player.name, null, callback(player))
+    form.addButton(player.name, callback(player))
 
   form.show(ctx.sender)
 })

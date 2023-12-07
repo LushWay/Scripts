@@ -86,17 +86,34 @@ export function setBlockSet(id, setName, set) {
 
 /**
  * @param {BlocksSetRef} set
+ */
+function getBlockSetRaw([player, name]) {
+  const blocks = getAllBlockSets(player)[name]
+  if (!blocks) return []
+  return blocks.filter(e => e[2] > 0)
+}
+
+/**
+ * @param {BlocksSetRef} set
  * @returns {BlockPermutation[]}
  */
 export function getBlockSet([player, name]) {
-  const blocks = getAllBlockSets(player)[name]
-  if (!blocks) return []
-  return blocks
-    .filter(e => e[2] > 0)
+  return getBlockSetRaw([player, name])
     .map(([type, states, weight]) =>
       new Array(weight).fill(BlockPermutation.resolve(type, states))
     )
     .flat()
+}
+
+/**
+ * @param {BlocksSetRef} ref
+ */
+export function getBlockSetForReplaceTarget(ref) {
+  return getBlockSetRaw(ref)
+            .map(([typeId, states, weight]) =>
+              new Array(weight).fill({ typeId, states })
+            )
+            .flat()
 }
 
 /**

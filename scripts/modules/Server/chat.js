@@ -61,7 +61,9 @@ world.afterEvents.chatSend.subscribe(data => {
     const playerRole = getRole(data.sender)
 
     let role = ''
-    if (SETTINGS.ranks && playerRole !== 'member') role = ROLES[playerRole]
+    if (SETTINGS.ranks && playerRole !== 'member') {
+      role = ' ' + ROLES[playerRole]
+    }
 
     const allPlayers = world.getAllPlayers()
 

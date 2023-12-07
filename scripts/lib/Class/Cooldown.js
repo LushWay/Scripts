@@ -31,7 +31,7 @@ export class Cooldown {
           .replace(/(\.[1-9]*)0+$/m, '$1')
           .replace(/\.$/m, '')
 
-        type = Cooldown.gettext(Number(parsedTime), valueType)
+        type = Cooldown.ngettext(Number(parsedTime), valueType)
       }
     }
 
@@ -47,7 +47,7 @@ export class Cooldown {
    * @param {[string, string, string]} _ 1 секунда 2 секунды 5 секунд
    * @returns Plural form
    */
-  static gettext(n, [one = 'секунда', few = 'секунды', more = 'секунд']) {
+  static ngettext(n, [one = 'секунда', few = 'секунды', more = 'секунд']) {
     if (!Number.isInteger(n)) return one
     return [one, few, more][
       n % 10 == 1 && n % 100 != 11
@@ -95,9 +95,6 @@ export class Cooldown {
   update() {
     this.db[this.key] = Date.now()
   }
-  /**
-   * DB requred!
-   */
   get statusTime() {
     const data = this.db[this.key]
     if (typeof data === 'number' && Date.now() - data <= this.time)

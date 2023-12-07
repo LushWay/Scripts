@@ -2,25 +2,24 @@ import {
   Entity,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
+  Player,
   Vector,
   world,
 } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
-import { WE_PLAYER_SETTINGS } from 'modules/WorldEdit/index.js'
-import { smoothVoxelData } from 'modules/WorldEdit/tools/smooth.js'
 import { ModalForm, getRole, util } from 'smapi.js'
+import { BaseBrushTool } from '../class/BaseBrushTool.js'
 import { WorldEditTool } from '../class/Tool.js'
 import { WE_CONFIG } from '../config.js'
 import {
   SHARED_POSTFIX,
   blockSetDropdown,
+  getAllBlockSets,
   getBlockSet,
+  getBlockSetForReplaceTarget,
 } from '../utils/blocksSet.js'
 import { SHAPES } from '../utils/shapes.js'
 import { Shape } from '../utils/utils.js'
-
-const smoother = 'Сглаживание'
 
 world.overworld
   .getEntities({
@@ -29,7 +28,34 @@ world.overworld
   })
   .forEach(e => e.remove())
 
-const brush = new WorldEditTool({
+/**
+ * @extends {BaseBrushTool<{
+ *   shape: string
+ *   blocksSet: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef;
+ * }>}
+ */
+class BrushTool extends BaseBrushTool {
+  /**
+   *
+   * @param {Player} player
+   * @param {ReturnType<this["parseLore"]>} lore
+   * @param {import('@minecraft/server').BlockRaycastHit} hit
+   */
+  onBrushUse(player, lore, hit) {
+    const error = Shape(
+      player,
+      SHAPES[lore.shape],
+      hit.block.location,
+      lore.size,
+      getBlockSet(lore.blocksSet),
+      getBlockSetForReplaceTarget(lore.replaceBlocksSet)
+    )
+
+    if (error) player.tell(error)
+  }
+}
+
+const brush = new BrushTool({
   name: 'brush',
   displayName: 'кисть',
   itemStackId: CUSTOM_ITEMS.brush,
@@ -41,12 +67,13 @@ const brush = new WorldEditTool({
     /** @type {import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} */
     replaceBlocksSet: ['', ''],
     shape: 'Сфера',
+    type: 'brush',
     size: 1,
     maxDistance: 300,
   },
   editToolForm(slot, player) {
     const lore = brush.parseLore(slot.getLore())
-    const shapes = Object.keys(SHAPES).concat(smoother)
+    const shapes = Object.keys(SHAPES)
 
     new ModalForm('§3Кисть')
       .addDropdown('Форма', shapes, { defaultValue: lore.shape })
@@ -58,10 +85,24 @@ const brush = new WorldEditTool({
         lore.size
       )
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
-      .show(player, (ctx, shape, radius, blocksSet) => {
+      .addDropdownFromObject(
+        'Заменяемый набор блоков',
+        Object.fromEntries(
+          Object.keys(getAllBlockSets(player.id)).map(e => [e, e])
+        ),
+        {
+          defaultValue: lore.replaceBlocksSet[1],
+          none: true,
+          noneText: 'Любой',
+        }
+      )
+
+      .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet) => {
         lore.shape = shape
         lore.size = radius
         lore.blocksSet = [player.id, blocksSet]
+        if (replaceBlocksSet)
+          lore.replaceBlocksSet = [player.id, replaceBlocksSet]
         slot.nameTag =
           '§r§3Кисть §6' +
           shape +
@@ -70,8 +111,12 @@ const brush = new WorldEditTool({
         slot.setLore(brush.stringifyLore(lore))
         player.tell(
           `§a► §r${
-            lore.blocksSet ? 'Отредактирована' : 'Создана'
-          } кисть ${shape} с набором блоков ${blocksSet} и радиусом ${radius}`
+            lore.blocksSet[0] ? 'Отредактирована' : 'Создана'
+          } кисть ${shape} с набором блоков ${blocksSet}${
+            replaceBlocksSet
+              ? `, заменяемым набором блоков ${replaceBlocksSet}`
+              : ''
+          } и радиусом ${radius}`
         )
       })
   },
@@ -110,47 +155,6 @@ const brush = new WorldEditTool({
     } else {
       BRUSH_LOCATORS[player.id]?.remove()
       delete BRUSH_LOCATORS[player.id]
-    }
-  },
-  onUse(player, item) {
-    const settings = WE_PLAYER_SETTINGS(player)
-    if (settings.enableMobile) return
-
-    const lore = brush.parseLore(item.getLore())
-    const hit = player.getBlockFromViewDirection({
-      maxDistance: lore.maxDistance,
-    })
-
-    if (!hit) return player.tell('§fКисть > §cБлок слишком далеко.')
-
-    try {
-      if (lore.shape === smoother) {
-        smoothVoxelData(hit.block, lore.size).forEach(e => {
-          const block = world.overworld.getBlock(e.location)
-          if (e.permutation) block?.setPermutation(e.permutation)
-          else block?.setType(MinecraftBlockTypes.Air)
-        })
-      } else {
-        const error = Shape(
-          player,
-          SHAPES[lore.shape],
-          hit.block.location,
-          getBlockSet(lore.blocksSet),
-          lore.size
-        )
-
-        if (error) player.tell(error)
-      }
-    } catch (e) {
-      if (
-        e instanceof LocationInUnloadedChunkError ||
-        e instanceof LocationOutOfWorldBoundariesError
-      ) {
-        player.tell('§fКисть > §cБлок не прогружен')
-      } else {
-        util.error(e)
-        player.tell('§fКисть > §cОшибка ' + util.error.message.get(e))
-      }
     }
   },
 })

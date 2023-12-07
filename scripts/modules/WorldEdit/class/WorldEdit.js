@@ -1,12 +1,15 @@
 import {
   BlockPermutation,
-  MolangVariableMap,
+  LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
   Player,
   Vector,
   system,
   world,
 } from '@minecraft/server'
-import { Cooldown, util } from 'smapi.js'
+import { SOUNDS } from 'config.js'
+import { toPermutation } from 'modules/WorldEdit/menu.js'
+import { Cooldown, GAME_UTILS, util } from 'smapi.js'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 import { get } from '../utils/utils.js'
@@ -120,32 +123,27 @@ export class WorldEdit {
       !this.visualSelectionCuboid
     )
       return
-    const selectedSize = Vector.size(
-      this.selectionCuboid.min,
-      this.selectionCuboid.max
-    )
+
     if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE)
       return
+
     const { xMax, xMin, zMax, zMin, yMax, yMin } = this.visualSelectionCuboid
     for (const { x, y, z } of Vector.foreach(
       this.visualSelectionCuboid.min,
       this.visualSelectionCuboid.max
     )) {
-      const q =
+      const isEdge =
         ((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
         ((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
         ((z == zMin || z == zMax) && (x == xMin || x == xMax))
 
-      const SELECTION_PARTICLE = new MolangVariableMap()
-      SELECTION_PARTICLE.setFloat('x', 0.0)
-      SELECTION_PARTICLE.setFloat('y', 0.0)
-      SELECTION_PARTICLE.setFloat('z', 0.0)
-      if (q)
+      if (isEdge) {
         world.overworld.spawnParticle(
           WE_CONFIG.DRAW_SELECTION_PARTICLE,
           { x, y, z },
-          SELECTION_PARTICLE
+          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS
         )
+      }
     }
   }
   /**
@@ -176,7 +174,7 @@ export class WorldEdit {
         array.splice(array.indexOf(backup), 1)
       }
 
-      const e = Cooldown.gettext(amount, [
+      const e = Cooldown.ngettext(amount, [
         'сохранение',
         'сохранения',
         'сохранений',
@@ -284,9 +282,8 @@ export class WorldEdit {
   }
   /**
    * @param {Player} player
-   * @param {BlockPermutation[]} blocks
-   * @param {(undefined | BlockPermutation)[]} replaceBlocks
-   * @returns {Promise<string>}
+   * @param {(import('../menu.js').ReplaceTarget | BlockPermutation)[]} blocks
+   * @param {(undefined | import('../menu.js').ReplaceTarget | BlockPermutation)[]} replaceBlocks
    */
   async fillBetween(player, blocks, replaceBlocks = [undefined]) {
     if (!this.selectionCuboid) return 'Зона не выделена!'
@@ -305,24 +302,41 @@ export class WorldEdit {
     let errors = 0
     let all = 0
 
+    /** @type {(import('modules/WorldEdit/menu.js').ReplaceTarget | undefined)[]} */
+    const replaceTargets = replaceBlocks.map(e =>
+      e && e instanceof BlockPermutation
+        ? { typeId: e.type.id, states: e.getAllStates() }
+        : e
+    )
+
     // TODO use O(n) for blocks.length === 1
     for (const cube of Vector.foreach(
       this.selectionCuboid.min,
       this.selectionCuboid.max
     )) {
-      for (const replaceBlock of replaceBlocks) {
+      for (const replaceBlock of replaceTargets) {
         try {
-          world.overworld.fillBlocks(
-            cube,
-            cube,
-            blocks.randomElement(),
-            replaceBlock
-              ? {
-                  matchingBlock: replaceBlock,
-                }
-              : {}
+          const block = world.overworld.getBlock(cube)
+
+          if (
+            replaceBlock &&
+            !block?.permutation.matches(
+              replaceBlock.typeId,
+              replaceBlock.states
+            )
           )
+            continue
+
+          block?.setPermutation(toPermutation(blocks.randomElement()))
         } catch (e) {
+          if (
+            !(
+              e instanceof LocationInUnloadedChunkError ||
+              e instanceof LocationOutOfWorldBoundariesError
+            ) &&
+            errors < 3
+          )
+            util.error(e)
           errors++
         }
 
@@ -333,19 +347,31 @@ export class WorldEdit {
 
     const endTime = get(Date.now() - startTime)
 
-    let reply = `§3Заполнено §f${this.selectionCuboid.blocksBetween} §3блоков`
+    let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${
+      this.selectionCuboid.blocksBetween
+    } §3${Cooldown.ngettext(this.selectionCuboid.blocksBetween, [
+      'блок',
+      'блока',
+      'блоков',
+    ])}`
     if (endTime.parsedTime !== '0') {
       reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
     }
-    if (replaceBlocks) {
-      reply += `§3, заполняет: §f${replaceBlocks
-        .map(e => e?.type.id)
+    if (replaceTargets.filter(Boolean).length) {
+      reply += `§3, заполняет: §f${replaceTargets
+        .map(e => e?.typeId && GAME_UTILS.toNameTag(e.typeId))
+        .filter(Boolean)
         .join(', ')}`
     }
 
-    if (errors)
-      return `§4► §7[§c${errors}§7|§f${all}§7] §cОшибок при заполнении. ${reply}`
-    return `§b► ${reply}`
+    if (errors) {
+      player.playSound(SOUNDS.fail)
+      return player.tell(
+        `§4► §f${errors}/${all} §cошибок при заполнении, ${reply}`
+      )
+    }
+    player.playSound(SOUNDS.success)
+    player.tell(`§a► ${reply}`)
   }
 }
 
