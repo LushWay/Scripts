@@ -65,7 +65,7 @@ export class LockAction {
       if (ignore && ignore.includes(lock)) continue
       if (accept && !accept.includes(lock)) continue
       if (lock.fn(player)) {
-        if (tell) player.tell(lock.lockText)
+        if (tell && player.isValid()) player.tell(lock.lockText)
         return returnText ? lock.lockText : true
       }
     }
