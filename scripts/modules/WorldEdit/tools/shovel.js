@@ -67,9 +67,15 @@ const shovel = new WorldEditTool({
   interval10(player, slot) {
     const lore = shovel.parseLore(slot.getLore())
     const blocks = getBlockSet(lore.blocksSet)
-    const replaceBlocks = lore.replaceBlocksSet
-      ? getBlockSetForReplaceTarget(lore.replaceBlocksSet)
-      : [undefined]
+    if (blocks.length === 0)
+      return player.onScreenDisplay.setTitle('§cНабор блоков лопаты пустой!')
+
+    const replaceBlocks = getBlockSetForReplaceTarget(lore.replaceBlocksSet)
+    if (blocks.length === 0)
+      return player.onScreenDisplay.setTitle(
+        '§cЗаменяемый набор блоков лопаты пустой!'
+      )
+
     const loc = Vector.floor(player.location)
     const offset = -1
     const pos1 = Vector.add(

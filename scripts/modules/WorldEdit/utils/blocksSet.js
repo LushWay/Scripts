@@ -85,11 +85,25 @@ export function setBlockSet(id, setName, set) {
 }
 
 /**
+ * @overload
  * @param {BlocksSetRef} set
+ * @returns {BlocksSets[string]}
  */
-function getBlockSetRaw([player, name]) {
+
+/**
+ * @overload
+ * @param {BlocksSetRef} set
+ * @param {BlocksSets[string] | undefined[]} [noBlocks]
+ * @returns {BlocksSets[string] | undefined[]}
+ */
+
+/**
+ * @param {BlocksSetRef} set
+ * @param {BlocksSets[string]} [noBlocks]
+ */
+function getBlockSetRaw([player, name], noBlocks = []) {
   const blocks = getAllBlockSets(player)[name]
-  if (!blocks) return []
+  if (!blocks) return noBlocks
   return blocks.filter(e => e[2] > 0)
 }
 
@@ -107,13 +121,17 @@ export function getBlockSet([player, name]) {
 
 /**
  * @param {BlocksSetRef} ref
+ * @returns
  */
 export function getBlockSetForReplaceTarget(ref) {
-  return getBlockSetRaw(ref)
-            .map(([typeId, states, weight]) =>
-              new Array(weight).fill({ typeId, states })
-            )
-            .flat()
+  return getBlockSetRaw(ref, [undefined])
+    .map(e => {
+      if (Array.isArray(e)) {
+        const [typeId, states, weight] = e
+        return new Array(weight).fill({ typeId, states })
+      } else return e
+    })
+    .flat()
 }
 
 /**
