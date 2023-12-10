@@ -65,7 +65,9 @@ const shovel = new WorldEditTool({
       })
   },
   interval10(player, slot) {
-    const lore = shovel.parseLore(slot.getLore())
+    const lore = shovel.parseLore(slot.getLore(), true)
+    if (!lore) return
+
     const blocks = getBlockSet(lore.blocksSet)
     if (blocks.length === 0)
       return player.onScreenDisplay.setTitle('§cНабор блоков лопаты пустой!')

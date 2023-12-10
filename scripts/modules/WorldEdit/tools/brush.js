@@ -38,7 +38,7 @@ class BrushTool extends BaseBrushTool {
   /**
    *
    * @param {Player} player
-   * @param {ReturnType<this["parseLore"]>} lore
+   * @param {this["clearLoreFormat"]} lore
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {

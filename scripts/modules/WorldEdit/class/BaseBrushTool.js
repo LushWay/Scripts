@@ -23,6 +23,7 @@ import { WorldEditTool } from './Tool.js'
  * @extends {WorldEditTool<BrushLoreFormat & AdditionalLore>}
  */
 export class BaseBrushTool extends WorldEditTool {
+
   /**
    * @param {Player} player
    */
@@ -99,8 +100,13 @@ export class BaseBrushTool extends WorldEditTool {
 
   /**
    * @param {Player} player
-   * @param {ReturnType<this["parseLore"]>} lore
+   * @param {this["clearLoreFormat"]} lore
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {}
+
+  /**
+   * @type {BrushLoreFormat & AdditionalLore}
+   */
+  clearLoreFormat
 }

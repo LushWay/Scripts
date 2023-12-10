@@ -135,10 +135,23 @@ export class WorldEditTool {
     } ${this.displayName}`
   }
   /**
+   * @overload
    * @param {string[]} lore
+   * @param {false} [returnUndefined]
    * @returns {LoreFormat}
    */
-  parseLore(lore) {
+  /**
+   * @overload
+   * @param {string[]} lore
+   * @param {true} returnUndefined
+   * @returns {LoreFormat | undefined}
+   */
+  /**
+   * @param {string[]} lore
+   * @param {boolean} [returnUndefined]
+   * @returns {LoreFormat | undefined}
+   */
+  parseLore(lore, returnUndefined = false) {
     let raw
     try {
       raw = JSON.parse(
@@ -151,6 +164,7 @@ export class WorldEditTool {
       e
     }
     if (raw?.version !== this.loreFormat.version) {
+      if (returnUndefined) return undefined
       raw = JSON.parse(JSON.stringify(this.loreFormat))
     }
     delete raw.version

@@ -154,5 +154,5 @@ export function blockSetDropdown([_, defaultSet], player) {
 export function stringifyBlocksSetRef(ref) {
   return ref[1] in DEFAULT_BLOCK_SETS
     ? ref[1]
-    : [Player.name(ref[0]) ?? '', ref[1]].join(' ')
+    : [Player.name(ref[0]) ?? '', ref[1] || '§7Пустой'].filter(Boolean).join(' ')
 }
