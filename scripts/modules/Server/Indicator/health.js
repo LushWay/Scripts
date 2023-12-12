@@ -18,7 +18,7 @@ world.afterEvents.entityHurt.subscribe(data => {
   if (SYSTEM_ENTITIES.includes(data.hurtEntity.id)) return
 
   const hp = data.hurtEntity.getComponent('health')
-  if (!hp.currentValue) return
+  if (!hp || !hp.currentValue) return
 
   const { indicator, entityNameTag } = getIndicator(data.hurtEntity)
 

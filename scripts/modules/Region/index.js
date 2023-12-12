@@ -104,12 +104,19 @@ export function loadRegionsWithGuards({
   })
 
   world.afterEvents.entitySpawn.subscribe(({ entity, cause }) => {
-    const typeId = GAME_UTILS.safeGetTypeID(entity)
-    if (!typeId || SYSTEM_ENTITIES.includes(typeId)) return
-    const region = Region.locationInRegion(
-      entity.location,
-      entity.dimension.type
+    const typeId = GAME_UTILS.safeGet(entity, 'typeId')
+    const location = GAME_UTILS.safeGet(entity, 'location')
+    const dimension = GAME_UTILS.safeGet(entity, 'dimension')
+    if (
+      !typeId ||
+      !location ||
+      !dimension ||
+      SYSTEM_ENTITIES.includes(typeId) ||
+      !entity.isValid()
     )
+      return
+
+    const region = Region.locationInRegion(location, dimension.type)
     if (spawnAllowed(region, { entity, cause })) return
     if (
       region &&

@@ -9,10 +9,9 @@ import {
 } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { toPermutation } from 'modules/WorldEdit/menu.js'
-import { Cooldown, GAME_UTILS, util } from 'smapi.js'
+import { GAME_UTILS, util } from 'smapi.js'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
-import { get } from '../utils/utils.js'
 import { Structure } from './Structure.js'
 
 export class WorldEdit {
@@ -174,7 +173,7 @@ export class WorldEdit {
         array.splice(array.indexOf(backup), 1)
       }
 
-      const e = Cooldown.ngettext(amount, [
+      const e = util.ngettext(amount, [
         'сохранение',
         'сохранения',
         'сохранений',
@@ -345,11 +344,13 @@ export class WorldEdit {
       }
     }
 
-    const endTime = get(Date.now() - startTime)
+    const endTime = util.ms.remaining(Date.now() - startTime, {
+      timeTypes: ['ms', 'sec', 'min'],
+    })
 
     let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${
       this.selectionCuboid.blocksBetween
-    } §3${Cooldown.ngettext(this.selectionCuboid.blocksBetween, [
+    } §3${util.ngettext(this.selectionCuboid.blocksBetween, [
       'блок',
       'блока',
       'блоков',

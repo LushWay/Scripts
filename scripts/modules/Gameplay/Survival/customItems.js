@@ -1,11 +1,15 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import {
+  MinecraftEntityTypes,
+  MinecraftItemTypes,
+} from '@minecraft/vanilla-data.js'
 import { GAME_UTILS } from 'smapi.js'
 /** @type {Record<string, [number, Entity]>} */
 const SPAWNED_FIREWORKS = {}
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-  if (GAME_UTILS.safeGetTypeID(entity) !== 'minecraft:firework_rocket') return
+  if (GAME_UTILS.safeGet(entity, 'typeId') !== 'minecraft:firework_rocket')
+    return
   SPAWNED_FIREWORKS[entity.id] = [Date.now(), entity]
 })
 
@@ -55,3 +59,46 @@ system.runInterval(
   'firework boom',
   10
 )
+
+// Bouncy tnt
+world.beforeEvents.itemUse.subscribe(data => {
+  if (data.itemStack.typeId !== MinecraftItemTypes.Tnt) return
+  data.cancel = true
+
+  system.delay(() => {
+    if (!(data.source instanceof Player)) return
+
+    const tnt = data.source.dimension.spawnEntity(
+      MinecraftEntityTypes.Tnt,
+      data.source.location
+    )
+    const tntSlot = data.source.mainhand()
+
+    if (tntSlot.amount === 1) tntSlot.setItem(undefined)
+    else tntSlot.amount--
+
+    tnt.applyImpulse(data.source.getViewDirection())
+    data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
+  })
+})
+
+// Snow bomb / Fireball
+world.afterEvents.itemUse.subscribe(data => {
+  if (!['sm:ice_bomb', 'sm:fireball'].includes(data.itemStack.typeId)) return
+
+  system.delay(() => {
+    if (!(data.source instanceof Player)) return
+
+    const item = data.source.dimension.spawnEntity(
+      data.itemStack.typeId,
+      data.source.location
+    )
+    const itemSlot = data.source.mainhand()
+
+    if (itemSlot.amount === 1) itemSlot.setItem(undefined)
+    else itemSlot.amount--
+
+    item.applyImpulse(Vector.multiply(data.source.getViewDirection(), 1.5))
+    data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
+  })
+})

@@ -19,8 +19,8 @@ const SETTINGS = Settings.world('chat', {
 })
 
 /** @type {DynamicPropertyDB<string, string>} */
-const COOLDOWN_PROPERTY = new DynamicPropertyDB('chat')
-const COOLDOWN_DB = COOLDOWN_PROPERTY.proxy()
+const CHAT_PROP = new DynamicPropertyDB('chat')
+const CHAT_DB = CHAT_PROP.proxy()
 
 const PLAYER_OPTIONS = Settings.player('Чат', 'chat', {
   hightlightMessages: {
@@ -47,15 +47,10 @@ world.afterEvents.chatSend.subscribe(data => {
 
     // Is cooldown enabled?
     if (cooldown) {
-      const cool = new Cooldown(COOLDOWN_DB, 'CLDW', data.sender, cooldown)
+      const cool = new Cooldown(CHAT_DB, 'CD', data.sender, cooldown)
 
-      if (cool.statusTime !== 'EXPIRED') {
-        // Player is under chat cooldown, show error message
-        const time = Cooldown.getRemainingTime(cooldown - Date.now())
-        return data.sender.tell(
-          `§c► Подожди еще §b${time.parsedTime}§c ${time.type}`
-        )
-      }
+      // Player is under chat cooldown, show error message
+      if (cool.isExpired()) return
     }
 
     const playerRole = getRole(data.sender)
@@ -81,24 +76,21 @@ world.afterEvents.chatSend.subscribe(data => {
 
     // Outranged players
     const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
+    const messageText = data.message.replace(/\\n/g, '\n')
+    const message = `${role}§7${data.sender.name}§r: ${messageText}`
+    if (util.settings.BDSMode) console.info(message)
 
-    for (const n of nearPlayers) {
-      const message = `${role}§7${data.sender.name}§r: ${data.message}`
-      n.tell(message)
-      if (util.settings.BDSMode) console.info(message)
+    for (const near of nearPlayers) {
+      near.tell(message)
 
-      if (!PLAYER_OPTIONS(n).disableSound) n.playSound(SOUNDS.click)
+      if (!PLAYER_OPTIONS(near).disableSound) near.playSound(SOUNDS.click)
     }
 
-    for (const o of otherPlayers)
-      o.tell(`${role}§8${data.sender.name}§7: ${data.message}`)
+    for (const outranged of otherPlayers)
+      outranged.tell(`${role}§8${data.sender.name}§7: ${messageText}`)
 
     const hightlight = PLAYER_OPTIONS(data.sender).hightlightMessages
-    data.sender.tell(
-      !hightlight
-        ? `${role ? role + ' ' : ''}§7${data.sender.name}§r: ${data.message}`
-        : `§6§lЯ§r: §f${data.message.replace(/\\n/g, '\n')}`
-    )
+    data.sender.tell(hightlight ? `§6§lЯ§r: §f${messageText}` : message)
   } catch (error) {
     util.error(error)
   }

@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+import { util } from 'smapi.js'
 
 export class Cooldown {
   /**
@@ -9,53 +10,6 @@ export class Cooldown {
    */
   static genDBkey(name, id) {
     return 'COOLDOWN_' + name + ':' + id
-  }
-  /**
-   * Parses the remaining time in milliseconds into a more human-readable format
-   * @param {number} ms - Milliseconds to parse
-   * @returns {{ parsedTime: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
-   */
-  static getRemainingTime(ms) {
-    let parsedTime = '0'
-    let type = 'ошибок'
-
-    /**
-     * @param {number} value
-     * @param {[string, string, string]} valueType 1 секунда 2 секунды 5 секунд
-     */
-    const set = (value, valueType, fiction = 0) => {
-      if (parsedTime === '0' && ~~value > 1 && value < 100) {
-        // Replace all 234.0 values to 234
-        parsedTime = value
-          .toFixed(fiction)
-          .replace(/(\.[1-9]*)0+$/m, '$1')
-          .replace(/\.$/m, '')
-
-        type = Cooldown.ngettext(Number(parsedTime), valueType)
-      }
-    }
-
-    set(ms / (1000 * 60 * 60 * 60 * 24), ['день', 'дня', 'дней'], 2)
-    set(ms / (1000 * 60 * 60), ['час', 'часа', 'часов'], 1)
-    set(ms / (1000 * 60), ['минуту', 'минуты', 'минут'], 1)
-    set(ms / 1000, ['секунда', 'секунды', 'секунд'])
-
-    return { parsedTime, type }
-  }
-  /**
-   * @param {number} n
-   * @param {[string, string, string]} _ 1 секунда 2 секунды 5 секунд
-   * @returns Plural form
-   */
-  static ngettext(n, [one = 'секунда', few = 'секунды', more = 'секунд']) {
-    if (!Number.isInteger(n)) return one
-    return [one, few, more][
-      n % 10 == 1 && n % 100 != 11
-        ? 0
-        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
-        ? 1
-        : 2
-    ]
   }
   /**
    * @type {Record<string, number>}
@@ -105,7 +59,7 @@ export class Cooldown {
     const status = this.statusTime
     if (status === 'EXPIRED') return true
     if (this.player) {
-      const time = Cooldown.getRemainingTime(this.time - status)
+      const time = util.ms.remaining(this.time - status)
       this.player.tell(`§cПодожди еще §f${time.parsedTime} §c${time.type}`)
     }
     return false

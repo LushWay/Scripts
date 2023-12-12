@@ -176,13 +176,16 @@ export const GAME_UTILS = {
     return Array.isArray(textures) ? textures[0] : textures
   },
   /**
-   * Sometimes entity.typeId throws
-   * @param {Entity} entity
-   * @returns
+   * Sometimes some entity properties throws
+   * @template {Entity | Player} S
+   * @param {S} entity
+   * @template {keyof S} K
+   * @param {K} key
+   * @returns {S[K] | undefined}
    */
-  safeGetTypeID(entity) {
+  safeGet(entity, key) {
     try {
-      return entity.typeId
+      return entity[key]
     } catch (e) {
       return undefined
     }

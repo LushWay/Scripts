@@ -289,6 +289,89 @@ export const util = {
   },
 
   /**
+   * @typedef {[string, string, string]} Plurals
+   */
+
+  /**
+   * Gets plural form based on provided number
+   * @param {number} n - Number
+   * @param {Plurals} forms - Plurals forms in format `1 секунда 2 секунды 5 секунд`
+   * @returns Plural form. Currently only Russian supported
+   */
+  ngettext(n, [one = 'секунда', few = 'секунды', more = 'секунд']) {
+    if (!Number.isInteger(n)) return more
+    return [one, few, more][
+      n % 10 == 1 && n % 100 != 11
+        ? 0
+        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+        ? 1
+        : 2
+    ]
+  },
+
+  /**
+   * @typedef {'day' | 'hour' | 'min' | 'sec' | 'ms'} Time
+   */
+
+  ms: {
+    /**
+     * Parses the remaining time in milliseconds into a more human-readable format
+     * @param {number} ms - Milliseconds to parse
+     * @param {object} [options]
+     * @param {Time[]} [options.timeTypes]
+     * @returns {{ parsedTime: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
+     */
+    remaining(ms, { timeTypes = ['sec', 'min', 'hour', 'day'] } = {}) {
+      const currentConverters = timeTypes.map(e => util.ms.converters[e])
+      for (const { time, friction = 0, plurals } of currentConverters) {
+        const value = ms / time
+        if (~~value > 1 && value < 100) {
+          // Replace all 234.0 values to 234
+          const parsedTime = value
+            .toFixed(friction)
+            .replace(/(\.[1-9]*)0+$/m, '$1')
+            .replace(/\.$/m, '')
+
+          return {
+            parsedTime,
+            type: util.ngettext(Number(parsedTime), plurals),
+          }
+        }
+      }
+
+      return { parsedTime: ms.toString(), type: 'миллисекунд' }
+    },
+    /**
+     * @type {Record<Time, {time: number, friction?: number, plurals: Plurals}>}
+     */
+    converters: {
+      ms: {
+        time: 1,
+        plurals: ['миллисекунд', 'миллисекунды', 'миллисекунд'],
+      },
+      sec: {
+        time: 1000,
+        plurals: ['секунда', 'секунды', 'секунд'],
+      },
+      min: {
+        time: 1000,
+        plurals: ['минуту', 'минуты', 'минут'],
+        friction: 1,
+      },
+      hour: {
+        time: 1000 * 60 * 60,
+        plurals: ['час', 'часа', 'часов'],
+        friction: 1,
+      },
+      day: {
+        time: 1000 * 60 * 60 * 60 * 24,
+        plurals: ['день', 'дня', 'дней'],
+        friction: 2,
+      },
+    },
+  },
+
+  /**
    *
    * @param {number} c
    */

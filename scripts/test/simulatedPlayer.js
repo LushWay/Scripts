@@ -13,8 +13,6 @@ let name = 'Бот'
 let player
 const testLoc = { x: 1000, y: -60, z: 1000 }
 
-
-
 GameTest.registerAsync('s', 's', async test => {
   const spawnLoc = { x: 0, y: 3, z: 0 }
   player = test.spawnSimulatedPlayer(spawnLoc, name)
@@ -43,7 +41,7 @@ GameTest.registerAsync('s', 'test', async test => {
 
   const id = player.id
   const event = world.afterEvents.entityDie.subscribe(data => {
-    if (GAME_UTILS.safeGetTypeID(data.deadEntity) !== id) return
+    if (GAME_UTILS.safeGet(data.deadEntity, 'typeId') !== id) return
     test.succeed()
   })
 

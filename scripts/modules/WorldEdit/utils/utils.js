@@ -5,7 +5,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { Cooldown, util } from 'smapi.js'
+import { util } from 'smapi.js'
 import { WorldEdit } from '../class/WorldEdit.js'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from './cuboid.js'
@@ -58,7 +58,7 @@ export function Shape(
           !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)
         )
           continue
-          
+
         block?.setPermutation(blocks.randomElement())
 
         blocksSet++
@@ -70,36 +70,4 @@ export function Shape(
       }
     }
   })
-}
-
-/**
- *
- * @param {number} ms
- * @returns
- */
-export function get(ms) {
-  let parsedTime = '0'
-  let type = 'ошибок'
-
-  /**
-   * @param {number} value
-   * @param {[string, string, string]} valueType 1 секунда 2 секунды 5 секунд
-   */
-  const set = (value, valueType, fiction = 0) => {
-    if (parsedTime === '0' && ~~value > 1 && value < 100) {
-      // Replace all 234.0 values to 234
-      parsedTime = value
-        .toFixed(fiction)
-        .replace(/(\.[1-9]*)0+$/m, '$1')
-        .replace(/\.$/m, '')
-
-      type = Cooldown.ngettext(Number(parsedTime), valueType)
-    }
-  }
-
-  set(ms / (1000 * 60), ['минуту', 'минуты', 'минут'], 2)
-  set(ms / 1000, ['секунду', 'секунды', 'секунд'], 1)
-  set(ms, ['миллисекунду', 'миллисекунды', 'миллисекунд'], 1)
-
-  return { parsedTime, type }
 }
