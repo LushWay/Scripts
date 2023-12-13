@@ -7,7 +7,7 @@ import {
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
-import { RadiusRegion, Region } from '../../Region/Region.js'
+import { Region, SafeAreaRegion } from '../../Region/Region.js'
 import { MENU } from '../../Server/menuItem.js'
 import { ANARCHY } from './anarchy.js'
 
@@ -35,10 +35,8 @@ export const SPAWN = {
   portal: void 0,
 }
 SPAWN.startAxeItem.setCanDestroy(SPAWN.startAxeCanBreak)
-SPAWN.startAxeItem.nameTag = 'Начальный топор'
-SPAWN.startAxeItem.setLore(['§r§7Начальный топор'])
+
 /**
- *
  * @param {Player} player
  */
 function spawnInventory(player) {
@@ -67,22 +65,12 @@ if (SPAWN.location.valid) {
 
     player.teleport(SPAWN.location)
   })
-  world.setDefaultSpawnLocation(SPAWN.location)
-  SPAWN.region = Region.locationInRegion(SPAWN.location, 'overworld')
-  if (!SPAWN.region || !(SPAWN.region instanceof RadiusRegion)) {
-    SPAWN.region = new RadiusRegion(
-      { x: SPAWN.location.x, z: SPAWN.location.z, y: SPAWN.location.y },
-      200,
-      'overworld',
-      {
-        doorsAndSwitches: false,
-        openContainers: false,
-        pvp: false,
-        allowedEntities: 'all',
-        owners: [],
-      }
-    )
+
+  SPAWN.region = SafeAreaRegion.locationInRegion(SPAWN.location, 'overworld')
+  if (!SPAWN.region || !(SPAWN.region instanceof SafeAreaRegion)) {
+    SPAWN.region = new SafeAreaRegion(SPAWN.location, 200, 'overworld')
   }
+
   system.runPlayerInterval(
     player => {
       if (SPAWN.region && SPAWN.region.vectorInRegion(player.location)) {

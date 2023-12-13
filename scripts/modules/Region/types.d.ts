@@ -25,7 +25,7 @@ interface IRegionPermissions {
    */
   pvp: boolean
   /**
-   * the entitys allowed in this region
+   * the entities allowed to spawn in this region
    */
   allowedEntities: string[] | 'all'
   /**

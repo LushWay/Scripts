@@ -135,13 +135,26 @@ world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
   }
 )
 
+/**
+ * @type {Record<string, string>}
+ */
+const ICE_BOMB_TRANSOFORM = {
+  [MinecraftBlockTypes.Water]: MinecraftBlockTypes.Ice,
+  [MinecraftBlockTypes.FlowingWater]: MinecraftBlockTypes.Ice,
+  [MinecraftBlockTypes.Lava]: MinecraftBlockTypes.Obsidian,
+  [MinecraftBlockTypes.FlowingLava]: MinecraftBlockTypes.Stone,
+}
+
 system.runInterval(
   () => {
     world.overworld.getEntities({ type: 'sm:ice_bomb' }).forEach(entity => {
       const block = entity.dimension.getBlock(entity.location)
-      if (block?.typeId === MinecraftBlockTypes.Water) {
-        block.setType(MinecraftBlockTypes.Ice)
+      if (block) {
         entity.remove()
+
+        if (block.typeId in ICE_BOMB_TRANSOFORM) {
+          block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
+        }
       }
     })
   },

@@ -16,6 +16,7 @@ export const ANARCHY = {
   /** @type {undefined | Portal} */
   portal: void 0,
 }
+
 if (ANARCHY.centerLocation.valid) {
   new Zone(ANARCHY.centerLocation, ps => ps.length * 50)
 }
@@ -124,8 +125,8 @@ const settings = Settings.player('Вход', 'join', {
 
 if (ANARCHY.portal && SPAWN.location.valid) {
   world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
-    // Skip death respawns
     if (
+      // Skip death respawns
       !initialSpawn ||
       !settings(player).teleportToSpawnOnJoin ||
       isBuilding(player, true)

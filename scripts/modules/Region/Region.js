@@ -1,6 +1,6 @@
-import { Dimension, Entity, Player, Vector } from '@minecraft/server'
+import { Player, Vector } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { util } from 'smapi.js'
+import { DB, util } from 'smapi.js'
 import { DEFAULT_REGION_PERMISSIONS } from './config.js'
 
 /**
@@ -18,7 +18,7 @@ const HIGEST_Y_VALUE = 320
  *  key: string;
  *  from: IRegionCords;
  *  dimensionId: Dimensions;
- *  permissions: IRegionPermissions;
+ *  permissions: Partial<IRegionPermissions>;
  *  to: IRegionCords;
  * }} ICubeRegion
  */
@@ -26,11 +26,12 @@ const HIGEST_Y_VALUE = 320
 /**
  * @typedef {{
  *  t: "r"
+ *  st: string
  *  key: string;
  *  radius: number;
  *  center: Vector3;
  *  dimensionId: Dimensions;
- *  permissions: IRegionPermissions;
+ *  permissions: Partial<IRegionPermissions>;
  * }} IRadiusRegion
  */
 
@@ -77,25 +78,33 @@ export class Region {
       PROPERTY.init()
 
       Object.values(TABLE).forEach(region => {
-        Region.regions.push(
-          region.t === 'c'
-            ? new CubeRegion(
-                region.from,
-                region.to,
-                region.dimensionId,
-                region.permissions,
-                region.key,
-                false
-              )
-            : new RadiusRegion(
-                region.center,
-                region.radius,
-                region.dimensionId,
-                region.permissions,
-                region.key,
-                false
-              )
-        )
+        if (region.t === 'c')
+          Region.regions.push(
+            new CubeRegion(
+              region.from,
+              region.to,
+              region.dimensionId,
+              region.permissions,
+              region.key,
+              false
+            )
+          )
+        else {
+          const RadiusRegionSubtype =
+            RadiusRegionSubTypes.find(e => e.prototype.subtype === region.st) ??
+            RadiusRegion
+
+          Region.regions.push(
+            new RadiusRegionSubtype(
+              region.center,
+              region.radius,
+              region.dimensionId,
+              region.permissions,
+              region.key,
+              false
+            )
+          )
+        }
       })
     },
   }
@@ -124,15 +133,18 @@ export class Region {
   key
   /** @type {IRegionPermissions} */
   permissions
+
+  basePermissions = Region.config.permissions
+
   /**
    * Creates a new region
    * @param {Dimensions} dimensionId - The dimension ID of the region.
-   * @param {IRegionPermissions} [permissions] - An object containing the permissions for the region.
+   * @param {Partial<IRegionPermissions>} [permissions] - An object containing the permissions for the region.
    * @param {string} [key] - The key of the region. This is used to identify the region.
    */
   constructor(dimensionId, permissions, key) {
     this.dimensionId = dimensionId
-    this.permissions = permissions ?? Region.config.permissions
+    this.permissions = DB.setDefaults(permissions ?? {}, this.basePermissions)
     this.key = key ?? new Date(Date.now()).toISOString()
   }
   /**
@@ -146,7 +158,12 @@ export class Region {
   /**
    * Updates this region in the database
    */
-  update() {}
+  update() {
+    return {
+      permissions: DB.removeDefaults(this.permissions, this.basePermissions),
+      dimensionId: this.dimensionId,
+    }
+  }
   /**
    * Removes this region
    */
@@ -206,7 +223,7 @@ export class CubeRegion extends Region {
    * @param {IRegionCords} from - The position of the first block of the region.
    * @param {IRegionCords} to - The position of the region's end.
    * @param {Dimensions} dimensionId - The dimension ID of the region.
-   * @param {IRegionPermissions} [permissions] - An object containing the permissions for the region.
+   * @param {Partial<IRegionPermissions>} [permissions] - An object containing the permissions for the region.
    * @param {string} [key] - The key of the region. This is used to identify the region.
    * @param {boolean} [creating] - Whether or not the region is being created.
    */
@@ -229,25 +246,25 @@ export class CubeRegion extends Region {
     )
   }
   update() {
-    TABLE[this.key] = {
+    return (TABLE[this.key] = {
+      ...super.update(),
       t: 'c',
       key: this.key,
       from: this.from,
-      dimensionId: this.dimensionId,
-      permissions: this.permissions,
       to: this.to,
-    }
+    })
   }
 }
 
 export class RadiusRegion extends Region {
+  subtype = 'cm'
   /**
-   * Gets all cube regions
+   * Gets all radius regions
    * @returns {RadiusRegion[]}
    */
   static get regions() {
     // @ts-expect-error Instance filtering misstype
-    return Region.regions.filter(e => e instanceof RadiusRegion)
+    return Region.regions.filter(e => e instanceof this)
   }
   /** @type {Vector3} */
   center
@@ -258,7 +275,7 @@ export class RadiusRegion extends Region {
    * @param {Vector3} center - The position of the first block of the region.
    * @param {number} radius - The position of the region's end.
    * @param {Dimensions} dimensionId - The dimension ID of the region.
-   * @param {IRegionPermissions} [permissions] - An object containing the permissions for the region.
+   * @param {Partial<IRegionPermissions>} [permissions] - An object containing the permissions for the region.
    * @param {string} [key] - The key of the region. This is used to identify the region.
    * @param {boolean} [creating] - Whether or not the region is being created.
    */
@@ -281,36 +298,79 @@ export class RadiusRegion extends Region {
   }
   /**
    * Updates this region in the database
-   * @returns {void}
    */
   update() {
-    TABLE[this.key] = {
+    return (TABLE[this.key] = {
+      ...super.update(),
       t: 'r',
+      st: this.subtype,
       key: this.key,
       center: this.center,
-      dimensionId: this.dimensionId,
-      permissions: this.permissions,
       radius: this.radius,
-    }
+    })
   }
 }
 
-/**
- * Will get all the items within a 2 block radius of the given location and then call
- * the given callback function on each of them.
- * @param {Dimension} dimension - The dimension you want to work with.
- * @param {Vector3} location  - The location to search around.
- * @param {(e: Entity) => any} callback - The function to run on each item.
- */
-export function forEachItemAt(dimension, location, callback = e => e.kill()) {
-  dimension
-    .getEntities({
-      location: location,
-      maxDistance: 2,
-      type: 'minecraft:item',
-    })
-    .forEach(callback)
+export class MineshaftRegion extends RadiusRegion {
+  /** @type {IRegionPermissions} */
+  basePermissions = {
+    allowedEntities: 'all',
+    doorsAndSwitches: true,
+    pvp: true,
+    openContainers: true,
+    owners: [],
+  }
+  /**
+   * @type {MineshaftRegion[]}
+   */
+  static get regions() {
+    return super.regions
+  }
+  subtype = 'ms'
 }
+
+export class SafeAreaRegion extends RadiusRegion {
+  /** @type {IRegionPermissions} */
+  basePermissions = {
+    allowedEntities: 'all',
+    doorsAndSwitches: true,
+    pvp: true,
+    openContainers: true,
+    owners: [],
+  }
+  /**
+   * @type {SafeAreaRegion[]}
+   */
+  static get regions() {
+    return super.regions
+  }
+  subtype = 'sa'
+}
+
+export class BaseRegion extends RadiusRegion {
+  /** @type {IRegionPermissions} */
+  basePermissions = {
+    allowedEntities: 'all',
+    doorsAndSwitches: false,
+    pvp: true,
+    openContainers: false,
+    owners: [],
+  }
+  /**
+   * @type {BaseRegion[]}
+   */
+  static get regions() {
+    return super.regions
+  }
+  subtype = 'bs'
+}
+
+const RadiusRegionSubTypes = [
+  RadiusRegion,
+  MineshaftRegion,
+  SafeAreaRegion,
+  BaseRegion,
+]
 
 new Command({
   name: 'region',

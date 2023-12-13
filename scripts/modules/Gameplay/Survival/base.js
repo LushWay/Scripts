@@ -12,12 +12,14 @@ import {
 } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { Command, LockAction } from 'smapi.js'
-import { RadiusRegion, Region } from '../../Region/Region.js'
+import { BaseRegion, RadiusRegion, Region } from '../../Region/Region.js'
 import { MoneyCost, Store } from '../../Server/Class/Store.js'
 import { baseMenu } from './baseMenu.js'
 
-export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel)
-BASE_ITEM_STACK.setLore(['Поставьте эту бочку', 'и она станет базой.'])
+export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
+  '§6База',
+  '§7Поставьте эту бочку и она стане базой.'
+)
 
 new Store({ x: -234, y: 65, z: -74 }, 'overworld').addItem(
   BASE_ITEM_STACK,
@@ -74,7 +76,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   }
 
   system.delay(() => {
-    new RadiusRegion(
+    new BaseRegion(
       Vector.floor(Vector.add(block.location, faceLocation)),
       30,
       block.dimension.type,
@@ -117,7 +119,7 @@ system.runInterval(
       return { dimension: p.dimension.type, loc: p.location }
     })
 
-    for (const base of RadiusRegion.regions.filter(
+    for (const base of BaseRegion.regions.filter(
       // Ensure that region is a base (enabled pvp)
       e => e.permissions.pvp
     )) {
