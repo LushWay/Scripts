@@ -4,7 +4,7 @@ new Command({
   type: 'we',
   name: 'redo',
   description: 'Возвращает последнее действие (из памяти)',
-  role: 'moderator',
+  role: 'builder',
 })
   .int('redoCount', true)
   .executes((ctx, r) => {

@@ -1,5 +1,6 @@
 import { Entity, system, Vector, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
+import { GAME_UTILS } from 'smapi.js'
 import { HEALTH_INDICATOR } from './var.js'
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
@@ -11,11 +12,22 @@ const INDICATOR_TAG = 'HEALTH_INDICATOR'
  */
 const ALWAYS_SHOWS = ['minecraft:player']
 
+/**
+ * List of families to indicate health
+ */
+const ALLOWED_FAMILIES = ['mob']
+
 // Kill previosly used entities
 getIndicators().forEach(e => e.remove())
 
 world.afterEvents.entityHurt.subscribe(data => {
-  if (SYSTEM_ENTITIES.includes(data.hurtEntity.id)) return
+  const id = GAME_UTILS.safeGet(data.hurtEntity, 'id')
+  if (!id || SYSTEM_ENTITIES.includes(id)) return
+  if (
+    !data.hurtEntity.isValid() ||
+    !data.hurtEntity.matches({ families: ALLOWED_FAMILIES })
+  )
+    return
 
   const hp = data.hurtEntity.getComponent('health')
   if (!hp || !hp.currentValue) return
@@ -32,23 +44,13 @@ world.afterEvents.entityHurt.subscribe(data => {
 })
 
 world.afterEvents.entityDie.subscribe(data => {
-  let id
-  try {
-    id = data.deadEntity.id
-  } catch (e) {
-    return
-  }
+  const id = GAME_UTILS.safeGet(data.deadEntity, 'id')
 
-  if (id === 'f:t') return
-  if (!(data.deadEntity.id in HURT_ENTITIES)) return
-
+  if (!id || id === 'f:t' || !(id in HURT_ENTITIES)) return
   const { indicator, entityNameTag } = getIndicator(data.deadEntity)
+  delete HURT_ENTITIES[id]
 
-  delete HURT_ENTITIES[data.deadEntity.id]
-
-  if (!entityNameTag) {
-    system.delay(() => indicator.remove())
-  }
+  if (!entityNameTag) indicator.remove()
 })
 
 system.runInterval(

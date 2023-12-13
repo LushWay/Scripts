@@ -1,5 +1,6 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import {
+  MinecraftBlockTypes,
   MinecraftEntityTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
@@ -106,3 +107,44 @@ world.beforeEvents.itemUse.subscribe(data => {
 //     data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
 //   })
 // })
+
+world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
+  event => {
+    const typeId = GAME_UTILS.safeGet(event.entity, 'typeId')
+    if (typeId !== 'sm:fireball')
+      return system.delay(() => {
+        try {
+          event.entity.remove()
+        } catch {}
+      })
+    event.cancel = true
+
+    const location = event.entity.location
+    const dimension = event.entity.dimension
+    system.delay(() => {
+      event.entity.teleport(Vector.zero)
+      event.entity.remove()
+      dimension.createExplosion(location, 1, {
+        causesFire: true,
+        breaksBlocks: true,
+      })
+    })
+  },
+  {
+    eventTypes: ['sm:explode'],
+  }
+)
+
+system.runInterval(
+  () => {
+    world.overworld.getEntities({ type: 'sm:ice_bomb' }).forEach(entity => {
+      const block = entity.dimension.getBlock(entity.location)
+      if (block?.typeId === MinecraftBlockTypes.Water) {
+        block.setType(MinecraftBlockTypes.Ice)
+        entity.remove()
+      }
+    })
+  },
+  'ice bomb ice place',
+  0
+)

@@ -4,7 +4,7 @@ new Command({
   type: 'we',
   name: 'undo',
   description: 'Отменяет последнее действие (из памяти)',
-  role: 'moderator',
+  role: 'builder',
 })
   .int('undoCount', true)
   .executes((ctx, r) => {

@@ -4,7 +4,7 @@ new Command({
   type: 'we',
   name: 'drawsel',
   description: 'Переключает отрисовку текущего выделения',
-  role: 'moderator',
+  role: 'builder',
 }).executes(ctx => {
   const we = WorldEdit.forPlayer(ctx.sender)
 

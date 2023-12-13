@@ -14,12 +14,13 @@
       },
       "minecraft:projectile": {
         "on_hit": {
-          "freeze_on_hit": {
-            "size": 1,
-            "shape": "cube",
-            "snap_to_block": true
+          "definition_event": {
+            "affect_projectile": true,
+            "event_trigger": {
+              "event": "sm:explode",
+              "target": "self"
+            }
           },
-          "remove_on_hit": {},
           "particle_on_hit": {
             "particle_type": "snowballpoof",
             "num_particles": 6,
@@ -35,7 +36,18 @@
         "liquid_inertia": 1,
         "hit_water": true
       },
-      "minecraft:physics": {}
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      }
+    },
+    "events": {
+      "sm:explode": {
+        "add": {
+          "component_groups": ["sm:exploding"]
+        }
+      }
     }
   }
 }

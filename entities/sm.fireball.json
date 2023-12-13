@@ -7,21 +7,6 @@
       "is_summonable": true,
       "is_experimental": false
     },
-
-    "component_groups": {
-      "sm:exploding": {
-        "minecraft:explode": {
-          "fuse_length": 0,
-          "fuse_lit": true,
-          "power": 0.4,
-          "breaks_blocks": false,
-          "causes_fire": true,
-          "fire_affected_by_griefing": true,
-          "destroy_affected_by_griefing": true
-        }
-      }
-    },
-
     "components": {
       "minecraft:collision_box": {
         "width": 0.25,

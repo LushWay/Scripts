@@ -56,6 +56,9 @@ OverTakes(console, {
   warn(...args) {
     super.warn(format(args))
   },
+  info(...args) {
+    super.info(format(args))
+  },
   log(...args) {
     super.log(format(args))
   },
