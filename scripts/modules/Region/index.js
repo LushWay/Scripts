@@ -2,6 +2,7 @@ import {
   EntitySpawnAfterEvent,
   Player,
   PlayerBreakBlockBeforeEvent,
+  PlayerPlaceBlockBeforeEvent,
   system,
   world,
 } from '@minecraft/server'
@@ -16,7 +17,7 @@ let LOADED = false
  * @callback interactionAllowed
  * @param {Player} player
  * @param {Region} [region]
- * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place"} | {type: "useOn"}} context
+ * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "useOn"}} context
  */
 
 /**
@@ -80,7 +81,8 @@ export function loadRegionsWithGuards({
       event.block.location,
       event.player.dimension.type
     )
-    if (!allowed(event.player, region, { type: 'place' })) event.cancel = true
+    if (!allowed(event.player, region, { type: 'place', event }))
+      event.cancel = true
   })
 
   /**

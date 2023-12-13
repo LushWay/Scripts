@@ -20,6 +20,7 @@ new Command({
     if (!item) return ctx.error('No item!')
     const { enchantments } = item.getComponent('enchantments')
     enchantments.removeEnchantment(ench)
+    console.debug({ Enchantments: Enchantments.custom, ench, level })
     enchantments.addEnchantment(Enchantments.custom[ench][level])
 
     world.debug('enchants', [...enchantments])

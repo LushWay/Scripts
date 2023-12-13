@@ -1,19 +1,16 @@
-import { world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { Quest } from 'lib/Class/Quest.js'
-import { Sidebar } from 'lib/Class/Sidebar.js'
 import { Temporary } from 'lib/Class/Temporary.js'
-import { ActionForm } from 'smapi.js'
 import { ANARCHY } from '../anarchy.js'
 import { SPAWN } from '../spawn.js'
 
 if (ANARCHY.portal) {
-  const learning = new Quest('Обучение', q => {
+  new Quest({ displayName: 'Обучение', name: 'learning' }, q => {
     if (!ANARCHY.portal || !ANARCHY.portal.from || !ANARCHY.portal.to)
       return q.failed('§cСервер не настроен')
 
     q.start(function () {
-      this.player.tell('§6Квест начался!')
+      this.player.tell('§6Обучение!')
       this.player.playSound(SOUNDS.action)
     })
 
@@ -38,7 +35,7 @@ if (ANARCHY.portal) {
 
     q.end(function () {
       this.player.playSound(SOUNDS.success)
-      this.player.tell('§6Квест закончен!')
+      this.player.tell('§6Обучение закончено!')
     })
   })
 }

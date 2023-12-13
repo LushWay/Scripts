@@ -111,6 +111,7 @@ function join(player, messageType) {
   } else {
     EventSignal.emit(JOIN.EVENTS.join, player)
   }
+  EventSignal.emit(JOIN.EVENTS.anyJoin, player)
 }
 
 new Command({

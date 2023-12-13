@@ -1,39 +1,40 @@
+import { Player } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ITEMS } from 'config.js'
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { Boss } from 'modules/Gameplay/Survival/boss.js'
-import { is } from 'smapi.js'
+import { MENU } from 'modules/Server/menuItem.js'
+import { ActionForm } from 'smapi.js'
 import { Region } from '../../Region/Region.js'
 import { loadRegionsWithGuards } from '../../Region/index.js'
 import { JOIN } from '../../Server/PlayerJoin/var.js'
-import './anarchy.js'
+import { ANARCHY } from './anarchy.js'
 import { BASE_ITEM_STACK } from './base.js'
 import './customItems.js'
 import './quests/index.js'
 import './raid.js'
 import './sidebar.js'
-import './spawn.js'
+import { SPAWN } from './spawn.js'
 
 console.log('§6Gameplay mode: survival')
 
 loadRegionsWithGuards({
   allowed(player, region, context) {
-    if (player.hasTag('modding') || is(player.id, 'builder')) return true
+    if (isBuilding(player)) return true
 
     if (region) {
       if (region.permissions.owners.includes(player.id)) return true
     } else {
       if (
-        player
-          .getComponent('inventory')
-          .container.getItem(player.selectedSlot)
-          ?.is(BASE_ITEM_STACK)
+        context.type === 'place' &&
+        context.event.itemStack.is(BASE_ITEM_STACK)
       )
         return true
 
       if (context.type === 'break' && player.isGamemode('adventure'))
         return true
 
+      // WE wand
       if (
         isBuilding(player) &&
         context.type === 'break' &&
@@ -73,6 +74,31 @@ JOIN.CONFIG.title_animation = {
   },
 }
 JOIN.CONFIG.subtitle = 'Добро пожаловать!'
+
+/**
+ * @param {Player['database']['survival']['inv']} place
+ * @param {Player['database']['survival']['inv']} inv
+ */
+function placeButton(place, inv, color = '§9', text = 'Спавн') {
+  return `${inv === place ? '§7Вы тут ' : color}> ${
+    inv === place ? '§8' : '§f'
+  }${text}`
+}
+
+MENU.OnOpen = player => {
+  const inv = player.database.survival.inv
+  return new ActionForm('§aShp1nat§6Mine')
+    .addButton(placeButton('spawn', inv, '§9', 'Спавн'), () => {
+      SPAWN.portal?.teleport(player)
+    })
+    .addButton(placeButton('anarchy', inv, '§c', 'Анархия'), () => {
+      ANARCHY.portal?.teleport(player)
+    })
+    .addButton(placeButton('mg', inv, `§6`, `Миниигры\n§7СКОРО!`), () => {
+      const form = MENU.OnOpen(player)
+      if (form) form.show(player)
+    })
+}
 
 // JOIN.EVENTS.firstTime.subscribe(player => {
 //   player.getComponent('inventory').container.addItem(MENU.item)

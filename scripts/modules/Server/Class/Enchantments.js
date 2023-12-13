@@ -73,18 +73,11 @@ function load() {
     }
   }
 
-  world.overworld
-    .getEntities({
-      type: DB.ENTITY_IDENTIFIER,
-      location: LOCATION,
-      maxDistance: 2,
-    })
-    .forEach(e => e.remove())
+  entities.forEach(e => e.remove())
 
   // @ts-expect-error Type
   Enchantments.typed = Enchantments.custom
-
   EventSignal.emit(ON_LOAD, null)
 }
 
-world.afterEvents.worldInitialize.subscribe(load)
+SM.afterEvents.worldLoad.subscribe(load)

@@ -4,20 +4,21 @@ import {
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
 import { GAME_UTILS } from 'smapi.js'
-/** @type {Record<string, [number, Entity]>} */
+/** @type {Record<string, { date: number, entity: Entity }>} */
 const SPAWNED_FIREWORKS = {}
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-  if (GAME_UTILS.safeGet(entity, 'typeId') !== 'minecraft:firework_rocket')
-    return
-  SPAWNED_FIREWORKS[entity.id] = [Date.now(), entity]
+  const typeId = GAME_UTILS.safeGet(entity, 'typeId')
+  if (typeId !== `minecraft:fireworks_rocket`) return
+
+  SPAWNED_FIREWORKS[entity.id] = { date: Date.now(), entity }
 })
 
 world.afterEvents.itemUse.subscribe(data => {
   if (data.itemStack.typeId !== MinecraftItemTypes.Crossbow) return
   if (!(data.source instanceof Player)) return
 
-  for (const [id, [date, entity]] of Object.entries(SPAWNED_FIREWORKS)) {
+  for (const [id, { date, entity }] of Object.entries(SPAWNED_FIREWORKS)) {
     if (
       Date.now() - date < 5 &&
       Vector.distance(data.source.location, entity.location) < 2
@@ -29,26 +30,29 @@ world.afterEvents.itemUse.subscribe(data => {
   }
 })
 
-/** @type {Record<string, {source: Player, firework: Entity}>} */
+/** @type {Record<string, { source: Player, firework: Entity }>} */
 const FIREWORKS = {}
 
 system.runInterval(
   () => {
+    for (const [id, { date }] of Object.entries(SPAWNED_FIREWORKS)) {
+      if (Date.now() - date > 5) delete SPAWNED_FIREWORKS[id]
+    }
+
     for (const [id, { source, firework }] of Object.entries(FIREWORKS)) {
-      let velocity
-      try {
-        velocity = Vector.floor(firework.getVelocity())
-      } catch (e) {
+      const location = GAME_UTILS.safeGet(firework, 'location')
+      if (!location) {
+        console.debug({ location })
         delete FIREWORKS[id]
         continue
       }
 
       const block = firework.dimension.getBlock(
-        Vector.add(firework.location, firework.getViewDirection())
+        Vector.add(location, Vector.multiply(firework.getViewDirection(), 1.2))
       )
 
       if (block && !block.isAir) {
-        firework.dimension.createExplosion(firework.location, 0.8, {
+        firework.dimension.createExplosion(location, 0.8 * 2, {
           source,
           breaksBlocks: true,
         })
@@ -57,7 +61,7 @@ system.runInterval(
     }
   },
   'firework boom',
-  10
+  0
 )
 
 // Bouncy tnt
@@ -83,22 +87,22 @@ world.beforeEvents.itemUse.subscribe(data => {
 })
 
 // Snow bomb / Fireball
-world.afterEvents.itemUse.subscribe(data => {
-  if (!['sm:ice_bomb', 'sm:fireball'].includes(data.itemStack.typeId)) return
+// world.afterEvents.itemUse.subscribe(data => {
+//   if (!['sm:ice_bomb', 'sm:fireball'].includes(data.itemStack.typeId)) return
 
-  system.delay(() => {
-    if (!(data.source instanceof Player)) return
+//   system.delay(() => {
+//     if (!(data.source instanceof Player)) return
 
-    const item = data.source.dimension.spawnEntity(
-      data.itemStack.typeId,
-      data.source.location
-    )
-    const itemSlot = data.source.mainhand()
+//     const item = data.source.dimension.spawnEntity(
+//       data.itemStack.typeId,
+//       data.source.location
+//     )
+//     const itemSlot = data.source.mainhand()
 
-    if (itemSlot.amount === 1) itemSlot.setItem(undefined)
-    else itemSlot.amount--
+//     if (itemSlot.amount === 1) itemSlot.setItem(undefined)
+//     else itemSlot.amount--
 
-    item.applyImpulse(Vector.multiply(data.source.getViewDirection(), 1.5))
-    data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
-  })
-})
+//     item.applyImpulse(Vector.multiply(data.source.getViewDirection(), 1.5))
+//     data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
+//   })
+// })

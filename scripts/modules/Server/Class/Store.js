@@ -1,6 +1,12 @@
 import { ItemStack, Player, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { ActionForm, EventSignal, GAME_UTILS, MessageForm } from 'smapi.js'
+import {
+  ActionForm,
+  Cooldown,
+  EventSignal,
+  GAME_UTILS,
+  MessageForm,
+} from 'smapi.js'
 import { SERVER } from '../var.js'
 
 class Cost {
@@ -231,15 +237,20 @@ function itemDescription(item, c = '§g') {
   }`
 }
 
-world.afterEvents.entityHitBlock.subscribe(event => {
-  const store = Store.find(
-    event.hitBlock.location,
-    event.hitBlock.dimension.type
-  )
+/**
+ * We dont actually want to store that on disk
+ * @type {Record<string, any>}
+ */
+const STORE_CD_DB = {}
 
-  if (!store || !(event.damagingEntity instanceof Player)) return
-
-  store.open(event.damagingEntity)
+world.afterEvents.playerInteractWithBlock.subscribe(event => {
+  const store = Store.find(event.block.location, event.block.dimension.type)
+  if (!store) return
+  const cooldown = new Cooldown(STORE_CD_DB, 'store', event.player, 1000)
+  if (cooldown.statusTime === 'EXPIRED') {
+    cooldown.update()
+    store.open(event.player)
+  }
 })
 
 // /**

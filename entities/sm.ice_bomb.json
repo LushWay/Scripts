@@ -3,7 +3,7 @@
   "minecraft:entity": {
     "description": {
       "identifier": "sm:ice_bomb",
-      "is_spawnable": true,
+      "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false
     },
@@ -15,7 +15,7 @@
       "minecraft:projectile": {
         "on_hit": {
           "freeze_on_hit": {
-            "size": 0.5,
+            "size": 1,
             "shape": "cube",
             "snap_to_block": true
           },

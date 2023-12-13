@@ -1,22 +1,34 @@
 import { Player, system, world } from '@minecraft/server'
-import { LockAction, ScoreboardDB } from 'smapi.js'
+import { LockAction, ScoreboardDB, util } from 'smapi.js'
 import { Region } from '../../Region/Region.js'
 import { RAID_NOTIFY } from './var.js'
 
-world.beforeEvents.explosion.subscribe(data => {
-  for (const bl of data.getImpactedBlocks()) {
-    const region = Region.locationInRegion(bl, data.dimension.type)
-    if (!region) return
-    if (!region.permissions?.pvp) return (data.cancel = true)
-    for (const id of region.permissions.owners) RAID_NOTIFY[id] = 60
-  }
+world.beforeEvents.explosion.subscribe(event => {
+  const impactedBlocks = event.getImpactedBlocks().filter(block => {
+    const region = Region.locationInRegion(block, event.dimension.type)
+    if (region && region.permissions.pvp) {
+      for (const id of region.permissions.owners) RAID_NOTIFY[id] = 60
+      return true
+    }
+  })
+  if (event.source && impactedBlocks.length) RAID_NOTIFY[event.source.id] = 120
+  event.setImpactedBlocks(impactedBlocks)
 })
 
 const RAID = new ScoreboardDB('raid', 'Raid')
-new LockAction(
-  player => RAID.get(player) > 0,
-  'Вы находитесь в режиме рейдблока.'
-)
+const RAID_LOCKTEXT = 'Вы находитесь в режиме рейдблока.'
+new LockAction(player => {
+  const raidLockTime = RAID.get(player)
+
+  if (raidLockTime > 0) {
+    const { parsedTime, type } = util.ms.remaining(raidLockTime * 1000, {
+      timeTypes: ['sec', 'min', 'hour', 'day'],
+    })
+    return {
+      lockText: `${RAID_LOCKTEXT} Осталось ${parsedTime} ${type}`,
+    }
+  } else return false
+}, RAID_LOCKTEXT)
 
 system.runInterval(
   () => {
@@ -40,6 +52,15 @@ system.runInterval(
         // Время вышло, игрока не было
         delete RAID_NOTIFY[id]
         continue
+      }
+    }
+
+    for (const participiant of RAID.scoreboard.getParticipants()) {
+      const score = RAID.get(participiant.displayName)
+      if (score > 1) {
+        RAID.add(participiant.displayName, -1)
+      } else {
+        RAID.scoreboard.removeParticipant(participiant)
       }
     }
   },

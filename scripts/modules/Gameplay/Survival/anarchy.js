@@ -74,16 +74,17 @@ if (ANARCHY.portalLocation.valid) {
 
       system.delay(() => {
         if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
-          if (building) return tpMenuOnce(player)
+          if (building || !ANARCHY.centerLocation.valid)
+            return tpMenuOnce(player)
 
           randomTeleport(
             player,
-            { x: 500, y: 0, z: 500 },
-            { x: 1500, y: 0, z: 1500 },
+            Vector.add(ANARCHY.centerLocation, { x: 100, y: 0, z: 100 }),
+            Vector.add(ANARCHY.centerLocation, { x: -100, y: 0, z: -100 }),
             {
-              elytra: true,
+              elytra: false,
               teleportCallback() {
-                player.tell('§a> §fВы были перемещены.')
+                player.tell('§a> §fВы были перемещены на случайную локацию.')
                 player.playSound(SOUNDS.success)
               },
               keepInSkyTime: 20,

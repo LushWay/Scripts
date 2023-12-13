@@ -51,6 +51,7 @@ world.afterEvents.chatSend.subscribe(data => {
 
       // Player is under chat cooldown, show error message
       if (cool.isExpired()) return
+      cool.update()
     }
 
     const playerRole = getRole(data.sender)

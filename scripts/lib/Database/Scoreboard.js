@@ -125,7 +125,7 @@ export class ScoreboardDB {
    */
   add(id, value) {
     if (typeof id !== 'string') id = id.id
-    this.scoreboard.setScore(id, (this.scoreboard.getScore(id) ?? 0) + value)
+    this.scoreboard.setScore(id, this.get(id) + value)
   }
   /**
    * @param {Entity | string} id

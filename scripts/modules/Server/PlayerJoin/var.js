@@ -25,7 +25,7 @@ export function shortTime() {
 }
 
 /**
- * @typedef {"join" | "firstTime" | "playerClosedGuide"} JoinEvents
+ * @typedef {"join" | "firstTime" | "playerClosedGuide" | "anyJoin"} JoinEvents
  */
 
 export const JOIN = {
@@ -56,6 +56,7 @@ export const JOIN = {
   EVENTS: {
     join: new EventSignal(),
     firstTime: new EventSignal(),
+    anyJoin: new EventSignal(),
     playerClosedGuide: new EventSignal(),
   },
 }

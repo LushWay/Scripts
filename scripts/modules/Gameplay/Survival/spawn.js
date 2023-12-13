@@ -12,7 +12,10 @@ import { MENU } from '../../Server/menuItem.js'
 import { ANARCHY } from './anarchy.js'
 
 export const SPAWN = {
-  startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe),
+  startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(
+    'Начальный топор',
+    'Начальный топор'
+  ),
   /** @type {string[]} */
   startAxeCanBreak: Object.entries(MinecraftBlockTypes)
     .filter(e => e[0].match(/log/i))

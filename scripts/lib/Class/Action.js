@@ -1,4 +1,5 @@
 import { Player, Vector, system } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 
 export class Place {
   /**
@@ -32,7 +33,7 @@ system.runPlayerInterval(
 )
 
 /**
- * @typedef {(player: Player) => boolean} Fn
+ * @typedef {(player: Player) => boolean | {lockText: string}} LockActionChecker
  */
 
 export class LockAction {
@@ -41,11 +42,11 @@ export class LockAction {
 
   /**
    * Creates new locker that can lock other actions
-   * @param {Fn} fn - Fn that checks if player is locked
+   * @param {LockActionChecker} isLocked - Fn that checks if player is locked
    * @param {string} lockText - Text that returns when player is locked
    */
-  constructor(fn, lockText) {
-    this.fn = fn
+  constructor(isLocked, lockText) {
+    this.isLocked = isLocked
     this.lockText = lockText
 
     LockAction.instances.push(this)
@@ -60,13 +61,19 @@ export class LockAction {
    * @param {boolean} [o.tell]
    * @param {boolean} [o.returnText] - Return lock text instead of boolean
    */
-  static locked(player, { ignore, accept, tell, returnText } = {}) {
+  static locked(player, { ignore, accept, tell = true, returnText } = {}) {
     for (const lock of this.instances) {
       if (ignore && ignore.includes(lock)) continue
       if (accept && !accept.includes(lock)) continue
-      if (lock.fn(player)) {
-        if (tell && player.isValid()) player.tell(lock.lockText)
-        return returnText ? lock.lockText : true
+      const isLocked = lock.isLocked(player)
+      if (isLocked) {
+        const text =
+          typeof isLocked === 'object' ? isLocked.lockText : lock.lockText
+        if (tell && player.isValid()) {
+          player.playSound(SOUNDS.fail)
+          player.tell('§l§f>§r §c' + text)
+        }
+        return returnText ? text : true
       }
     }
 

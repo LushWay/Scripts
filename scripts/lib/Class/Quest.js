@@ -1,6 +1,6 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { Place } from './Action.js'
 import { SOUNDS } from 'config.js'
+import { Place } from './Action.js'
 
 // // @ts-expect-error Bruh
 // Set.prototype.toJSON = function () {
@@ -30,7 +30,7 @@ export class Quest {
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
         return `§6Квест: §f${
-          status.quest.name
+          status.quest.displayName
         }\n${status.step.text()}\n§6Подробнее: §f-q`
       }
     },
@@ -63,11 +63,14 @@ export class Quest {
   }
 
   /**
-   * @param {string} name
+   * @param {object} options
+   * @param {string} options.displayName
+   * @param {string} options.name
    * @param {(q: PlayerQuest, p: Player) => void} init
    */
-  constructor(name, init) {
+  constructor({ name, displayName }, init) {
     this.name = name
+    this.displayName = displayName
     this.init = init
     Quest.instances[this.name] = this
     world.getAllPlayers().forEach(setQuests)

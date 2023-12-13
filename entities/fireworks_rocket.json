@@ -2,51 +2,28 @@
   "format_version": "1.12.0",
   "minecraft:entity": {
     "description": {
-      "identifier": "sm:fireball",
+      "identifier": "minecraft:fireworks_rocket",
       "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false
     },
-
     "component_groups": {
       "sm:exploding": {
         "minecraft:explode": {
           "fuse_length": 0,
           "fuse_lit": true,
-          "power": 0.4,
-          "breaks_blocks": false,
+          "power": 0.8,
+          "breaks_blocks": true,
           "causes_fire": true,
           "fire_affected_by_griefing": true,
           "destroy_affected_by_griefing": true
         }
       }
     },
-
     "components": {
       "minecraft:collision_box": {
         "width": 0.25,
         "height": 0.25
-      },
-      "minecraft:projectile": {
-        "on_hit": {
-          "definition_event": {
-            "affect_projectile": true,
-            "event_trigger": {
-              "event": "sm:explode",
-              "target": "self"
-            }
-          }
-        },
-        "power": 1.5,
-        "gravity": 0.025,
-        "inertia": 1,
-        "liquid_inertia": 1,
-        "uncertainty_base": 0,
-        "uncertainty_multiplier": 0,
-        "anchor": 1,
-        "offset": [0, 0, 0],
-        "reflect_on_hurt": true,
-        "catch_fire": true
       },
       "minecraft:physics": {},
       "minecraft:pushable": {
