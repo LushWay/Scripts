@@ -97,6 +97,13 @@ declare global {
       ? (this: ThisArg, ...param: param) => ret
       : B[P]
   }
+
+  /**
+   * @remarks нет кого/чего, дам кому/чему, где
+   * @remarks базы, базу, на базе
+   * @remarks региона, региону, в регионе
+   */
+  type WordPluralForms = [one: string, more: string, aa: string]
 }
 
 declare module '@minecraft/server' {

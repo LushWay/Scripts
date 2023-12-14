@@ -1,6 +1,5 @@
 import { Player } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { CUSTOM_ITEMS } from 'config.js'
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { Boss } from 'modules/Gameplay/Survival/boss.js'
 import { MENU } from 'modules/Server/menuItem.js'
@@ -22,25 +21,32 @@ loadRegionsWithGuards({
   allowed(player, region, context) {
     if (isBuilding(player)) return true
 
-    if (region) {
-      if (region.permissions.owners.includes(player.id)) return true
-    } else {
-      if (
-        context.type === 'place' &&
-        context.event.itemStack.is(BASE_ITEM_STACK)
-      )
-        return true
+    if (
+      (context.type === 'interactWithBlock' || context.type === 'place') &&
+      context.event.itemStack?.is(BASE_ITEM_STACK)
+    )
+      return true
 
+    if (
+      context.type === 'break' &&
+      context.event.itemStack?.is(SPAWN.startAxeItem) &&
+      SPAWN.startAxeCanBreak.includes(context.event.block.typeId)
+    )
+      return true
+
+    if (region) {
+      if (region.regionMember(player.id)) return true
+    } else {
       if (context.type === 'break' && player.isGamemode('adventure'))
         return true
 
       // WE wand
-      if (
-        isBuilding(player) &&
-        context.type === 'break' &&
-        context.event.itemStack?.typeId === CUSTOM_ITEMS.tool
-      )
-        return false
+      // if (
+      //   isBuilding(player) &&
+      //   context.type === 'break' &&
+      //   context.event.itemStack?.typeId === CUSTOM_ITEMS.tool
+      // )
+      //   return false
     }
   },
 
@@ -106,7 +112,7 @@ MENU.OnOpen = player => {
 
 new Boss({
   name: 'wither',
-  entityId: 'minecraft:' + MinecraftEntityTypes.Wither,
+  entityTypeId: 'minecraft:' + MinecraftEntityTypes.Wither,
   displayName: 'Камнедробилка',
   bossEvent: false,
 
@@ -116,7 +122,7 @@ new Boss({
 
 new Boss({
   name: 'slime',
-  entityId: 'minecraft:' + MinecraftEntityTypes.Slime,
+  entityTypeId: 'minecraft:' + MinecraftEntityTypes.Slime,
   displayName: 'Слайм',
 
   // 10 минут

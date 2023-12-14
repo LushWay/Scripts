@@ -16,8 +16,8 @@ import './index.js'
 import {
   commandNotFound,
   commandSyntaxFail,
-  getChatAugments,
   noPerm,
+  parseChatArguments,
   sendCallback,
 } from './utils.js'
 
@@ -39,7 +39,10 @@ export class Command {
     )
       return // This is not a command
 
-    const [cmd, ...args] = getChatAugments(data.message, CONFIG.commandPrefix)
+    const [cmd, ...args] = parseChatArguments(
+      data.message,
+      CONFIG.commandPrefix
+    )
     const command = Command.commands.find(
       c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
     )

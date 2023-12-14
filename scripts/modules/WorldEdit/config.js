@@ -1,4 +1,4 @@
-import { MolangVariableMap } from '@minecraft/server'
+import { MolangVariableMap, Vector, world } from '@minecraft/server'
 
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
@@ -39,3 +39,32 @@ WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
   y: 0,
   z: 0,
 })
+
+/**
+ *
+ * @param {Vector3} pos1
+ * @param {Vector3} pos2
+ * @param {object} [param2]
+ * @param {Vector3} [param2.min]
+ * @param {Vector3} [param2.max]
+ */
+export function spawnParticlesInArea(
+  pos1,
+  pos2,
+  { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) } = {}
+) {
+  for (const { x, y, z } of Vector.foreach(min, max)) {
+    const isEdge =
+      ((x == min.x || x == max.x) && (y == min.y || y == max.y)) ||
+      ((y == min.y || y == max.y) && (z == min.z || z == max.z)) ||
+      ((z == min.z || z == max.z) && (x == min.x || x == max.x))
+
+    if (isEdge) {
+      world.overworld.spawnParticle(
+        WE_CONFIG.DRAW_SELECTION_PARTICLE,
+        { x, y, z },
+        WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS
+      )
+    }
+  }
+}

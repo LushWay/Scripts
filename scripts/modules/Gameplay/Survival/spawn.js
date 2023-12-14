@@ -13,7 +13,7 @@ import { ANARCHY } from './anarchy.js'
 
 export const SPAWN = {
   startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(
-    'Начальный топор',
+    '§r§6Начальный топор',
     'Начальный топор'
   ),
   /** @type {string[]} */
@@ -34,7 +34,6 @@ export const SPAWN = {
   /** @type {undefined | Portal} */
   portal: void 0,
 }
-SPAWN.startAxeItem.setCanDestroy(SPAWN.startAxeCanBreak)
 
 /**
  * @param {Player} player
@@ -45,7 +44,7 @@ function spawnInventory(player) {
 
   if (data.inv === 'anarchy') {
     ANARCHY.inventory.saveFromEntity(player, {
-      rewrite: false,
+      rewrite: true,
       keepInventory: false,
     })
     data.anarchy = Vector.floor(player.location)
@@ -68,7 +67,13 @@ if (SPAWN.location.valid) {
 
   SPAWN.region = SafeAreaRegion.locationInRegion(SPAWN.location, 'overworld')
   if (!SPAWN.region || !(SPAWN.region instanceof SafeAreaRegion)) {
-    SPAWN.region = new SafeAreaRegion(SPAWN.location, 200, 'overworld')
+    system.delay(() => {
+      SPAWN.region = new SafeAreaRegion({
+        center: SPAWN.location,
+        radius: 100,
+        dimensionId: 'overworld',
+      })
+    })
   }
 
   system.runPlayerInterval(

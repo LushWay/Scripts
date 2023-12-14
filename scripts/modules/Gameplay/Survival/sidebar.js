@@ -2,7 +2,7 @@ import { Player, world } from '@minecraft/server'
 import { Quest } from 'lib/Class/Quest.js'
 import { Sidebar } from 'lib/Class/Sidebar.js'
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
-import { Region } from 'modules/Region/Region.js'
+import { BaseRegion, Region } from 'modules/Region/Region.js'
 import { JOIN } from 'modules/Server/PlayerJoin/var.js'
 import { Settings } from 'smapi.js'
 
@@ -49,8 +49,8 @@ const sidebar = new Sidebar(
         player.dimension.type
       )
       if (region) {
-        if (!region.permissions.pvp) text = '§a, мирная зона'
-        if (region.permissions.owners.includes(player.id))
+        if (!region.permissions.pvp) text = ', §aмирная зона'
+        if (region instanceof BaseRegion && region.regionMember(player.id))
           text = ', §6ваша база'
       }
     }

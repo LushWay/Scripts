@@ -55,7 +55,7 @@ function showTable(player, table) {
     })
   })
   menu.addButton('§3Посмотреть в §fRAW', () => {
-    let raw = DB.source.getDynamicProperty(DB.key)
+    let raw = world.getDynamicProperty(DB.key)
     try {
       if (typeof raw === 'string') raw = JSON.parse(raw)
     } catch {}

@@ -10,7 +10,7 @@ import {
 import { SOUNDS } from 'config.js'
 import { toPermutation } from 'modules/WorldEdit/menu.js'
 import { GAME_UTILS, util } from 'smapi.js'
-import { WE_CONFIG } from '../config.js'
+import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 import { Structure } from './Structure.js'
 
@@ -126,25 +126,13 @@ export class WorldEdit {
     if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE)
       return
 
-    const { xMax, xMin, zMax, zMin, yMax, yMin } = this.visualSelectionCuboid
-    for (const { x, y, z } of Vector.foreach(
-      this.visualSelectionCuboid.min,
-      this.visualSelectionCuboid.max
-    )) {
-      const isEdge =
-        ((x == xMin || x == xMax) && (y == yMin || y == yMax)) ||
-        ((y == yMin || y == yMax) && (z == zMin || z == zMax)) ||
-        ((z == zMin || z == zMax) && (x == xMin || x == xMax))
-
-      if (isEdge) {
-        world.overworld.spawnParticle(
-          WE_CONFIG.DRAW_SELECTION_PARTICLE,
-          { x, y, z },
-          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS
-        )
-      }
-    }
+    spawnParticlesInArea(
+      this.selectionCuboid.pos1,
+      this.selectionCuboid.pos2,
+      this.selectionCuboid
+    )
   }
+
   /**
    * Backups a location
    * @param {Vector3} pos1 Position 1 of cuboid location

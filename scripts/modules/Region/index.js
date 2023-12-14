@@ -2,6 +2,7 @@ import {
   EntitySpawnAfterEvent,
   Player,
   PlayerBreakBlockBeforeEvent,
+  PlayerInteractWithBlockBeforeEvent,
   PlayerPlaceBlockBeforeEvent,
   system,
   world,
@@ -9,6 +10,7 @@ import {
 import { SYSTEM_ENTITIES } from 'config.js'
 import { GAME_UTILS } from 'smapi.js'
 import { Region } from './Region.js'
+import './command.js'
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from './config.js'
 
 let LOADED = false
@@ -17,7 +19,7 @@ let LOADED = false
  * @callback interactionAllowed
  * @param {Player} player
  * @param {Region} [region]
- * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "useOn"}} context
+ * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "interactWithBlock", event: PlayerInteractWithBlockBeforeEvent}} context
  */
 
 /**
@@ -51,26 +53,27 @@ export function loadRegionsWithGuards({
   /**
    * Permissions for region
    */
-  world.beforeEvents.playerInteractWithBlock.subscribe(data => {
+  world.beforeEvents.playerInteractWithBlock.subscribe(event => {
     const region = Region.locationInRegion(
-      data.block,
-      data.player.dimension.type
+      event.block,
+      event.player.dimension.type
     )
-    if (allowed(data.player, region, { type: 'useOn' })) return
+    if (allowed(event.player, region, { type: 'interactWithBlock', event }))
+      return
 
     if (
-      DOORS_SWITCHES.includes(data.block.typeId) &&
+      DOORS_SWITCHES.includes(event.block.typeId) &&
       region?.permissions?.doorsAndSwitches
     )
       return
 
     if (
-      BLOCK_CONTAINERS.includes(data.block.typeId) &&
+      BLOCK_CONTAINERS.includes(event.block.typeId) &&
       region?.permissions?.openContainers
     )
       return
 
-    data.cancel = true
+    event.cancel = true
   })
 
   /**

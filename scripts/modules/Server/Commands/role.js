@@ -9,14 +9,11 @@ const roleCommand = new Command({
 })
 roleCommand.executes(ctx => {
   const role = getRole(ctx.sender.id)
-  const noAdmins = !Object.values(PLAYER_DB)
-    .map(e => e.role)
-    .includes('admin')
   const isAdmin = role === 'admin'
   const needAdmin = ctx.args[0] === 'ACCESS'
   const beenAdmin = PLAYER_DB[ctx.sender.id].roleSetter && !isAdmin
 
-  if (noAdmins && ctx.sender.isOp() && (needAdmin || beenAdmin)) {
+  if (ctx.sender.isOp() && needAdmin && beenAdmin) {
     PLAYER_DB[ctx.sender.id].role = 'admin'
     delete PLAYER_DB[ctx.sender.id].roleSetter
     return ctx.reply('§b> §3Вы получили роль §r' + ROLES.admin)
@@ -37,8 +34,8 @@ roleCommand.executes(ctx => {
         ])
       )
       new ModalForm(player.name)
-        .addToggle('Уведомлять', false)
-        .addToggle('Показать Ваш ник в уведомлении', false)
+        .addToggle('Уведомлять', true)
+        .addToggle('Показать Ваш ник в уведомлении', true)
         .addDropdownFromObject('Роль', ROLE, {
           defaultValueIndex: Object.keys(ROLE).findIndex(e => e === role),
         })
@@ -53,7 +50,7 @@ roleCommand.executes(ctx => {
             )
           if (notify)
             player.tell(
-              `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${newrole}${
+              `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
                 showName ? `§3 игроком §r${ctx.sender.name}` : ''
               }${message ? `\n§r§3Причина: §r${message}` : ''}`
             )

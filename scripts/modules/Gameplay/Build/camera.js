@@ -2,8 +2,8 @@ import { EasingType, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, ModalForm, util } from 'smapi.js'
 import {
-  getChatAugments,
-  parseLocationAugs,
+  parseChatArguments,
+  parseLocationArguments,
 } from '../../../lib/Command/utils.js'
 
 /**
@@ -63,8 +63,8 @@ function setupCameraForm(player, target) {
         mode,
         spinRadius
       ) => {
-        const rawPosArray = getChatAugments(rawPos, '')
-        const pos = parseLocationAugs(
+        const rawPosArray = parseChatArguments(rawPos, '')
+        const pos = parseLocationArguments(
           [rawPosArray[0], rawPosArray[1], rawPosArray[2]],
           player
         )
@@ -77,8 +77,8 @@ function setupCameraForm(player, target) {
 
         let facing
         if (facingPosRaw) {
-          const rawPosArray = getChatAugments(facingPosRaw, '')
-          facing = parseLocationAugs(
+          const rawPosArray = parseChatArguments(facingPosRaw, '')
+          facing = parseLocationArguments(
             [rawPosArray[0], rawPosArray[1], rawPosArray[2]],
             player
           )

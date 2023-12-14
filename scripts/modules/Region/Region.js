@@ -35,7 +35,7 @@ const HIGEST_Y_VALUE = 320
  * }} IRadiusRegion
  */
 
-const PROPERTY = new DynamicPropertyDB('region', {
+const REGION_DB_PROPERTY = new DynamicPropertyDB('region', {
   delayedInit: true,
   /**
    * @returns {Partial<IRadiusRegion | ICubeRegion>}
@@ -49,7 +49,7 @@ const PROPERTY = new DynamicPropertyDB('region', {
   },
 })
 
-const TABLE = PROPERTY.proxy()
+export const REGION_DB = REGION_DB_PROPERTY.proxy()
 
 export class Region {
   /** @private */
@@ -75,19 +75,15 @@ export class Region {
 
       Region.permissions = update
       this.SETTED = true
-      PROPERTY.init()
+      REGION_DB_PROPERTY.init()
 
-      Object.values(TABLE).forEach(region => {
+      Object.values(REGION_DB).forEach(region => {
         if (region.t === 'c')
           Region.regions.push(
-            new CubeRegion(
-              region.from,
-              region.to,
-              region.dimensionId,
-              region.permissions,
-              region.key,
-              false
-            )
+            new CubeRegion({
+              ...region,
+              creating: false,
+            })
           )
         else {
           const RadiusRegionSubtype =
@@ -95,14 +91,10 @@ export class Region {
             RadiusRegion
 
           Region.regions.push(
-            new RadiusRegionSubtype(
-              region.center,
-              region.radius,
-              region.dimensionId,
-              region.permissions,
-              region.key,
-              false
-            )
+            new RadiusRegionSubtype({
+              ...region,
+              creating: false,
+            })
           )
         }
       })
@@ -138,21 +130,64 @@ export class Region {
 
   /**
    * Creates a new region
-   * @param {Dimensions} dimensionId - The dimension ID of the region.
-   * @param {Partial<IRegionPermissions>} [permissions] - An object containing the permissions for the region.
-   * @param {string} [key] - The key of the region. This is used to identify the region.
+   * @param {object} o
+   * @param {Dimensions} o.dimensionId - The dimension ID of the region.
+   * @param {Partial<IRegionPermissions>} [o.permissions] - An object containing the permissions for the region.
+   * @param {string} [o.key] - The key of the region. This is used to identify the region.
    */
-  constructor(dimensionId, permissions, key) {
+  constructor({ dimensionId, permissions, key }) {
     this.dimensionId = dimensionId
-    this.permissions = DB.setDefaults(permissions ?? {}, this.basePermissions)
     this.key = key ?? new Date(Date.now()).toISOString()
   }
+
+  /**
+   * @param {Partial<IRegionPermissions> | undefined} permissions
+   */
+  initPermissions(permissions) {
+    this.permissions = DB.setDefaults(permissions ?? {}, this.basePermissions)
+  }
+
   /**
    * Checks if vector is in region
    * @param {Vector3} vector
    */
   vectorInRegion(vector) {
     // Actual implementation in extended class
+    return false
+  }
+
+  /**
+   * Name of the region owner
+   */
+  get ownerName() {
+    return Player.name(this.permissions.owners[0])
+  }
+
+  /**
+   * Display name of the region
+   */
+  get name() {
+    return (
+      this.ownerName ??
+      new Date(this.key).toLocaleString([], {
+        hourCycle: 'h24',
+      })
+    )
+  }
+
+  /**
+   * @typedef {'owner' | 'member' | false} RegionPlayerRole
+   */
+
+  /**
+   * Returns role of specified player
+   * @param {string | Player} playerOrId
+   * @returns {RegionPlayerRole}
+   */
+  regionMember(playerOrId) {
+    const id = playerOrId instanceof Player ? playerOrId.id : playerOrId
+    if (this.permissions.owners[0] === id) return 'owner'
+    if (this.permissions.owners.includes(id)) return 'member'
     return false
   }
   /**
@@ -169,7 +204,7 @@ export class Region {
    */
   delete() {
     Region.regions = Region.regions.filter(e => e.key !== this.key)
-    delete TABLE[this.key]
+    delete REGION_DB[this.key]
   }
   /**
    * A function that will loop through all the owners
@@ -220,15 +255,17 @@ export class CubeRegion extends Region {
   to
   /**
    * Creates a new region
-   * @param {IRegionCords} from - The position of the first block of the region.
-   * @param {IRegionCords} to - The position of the region's end.
-   * @param {Dimensions} dimensionId - The dimension ID of the region.
-   * @param {Partial<IRegionPermissions>} [permissions] - An object containing the permissions for the region.
-   * @param {string} [key] - The key of the region. This is used to identify the region.
-   * @param {boolean} [creating] - Whether or not the region is being created.
+   * @param {object}o
+   * @param {IRegionCords} o.from - The position of the first block of the region.
+   * @param {IRegionCords} o.to - The position of the region's end.
+   * @param {Dimensions} o.dimensionId - The dimension ID of the region.
+   * @param {Partial<IRegionPermissions>} [o.permissions] - An object containing the permissions for the region.
+   * @param {string} [o.key] - The key of the region. This is used to identify the region.
+   * @param {boolean} [o.creating] - Whether or not the region is being created.
    */
-  constructor(from, to, dimensionId, permissions, key, creating = true) {
-    super(dimensionId, permissions, key)
+  constructor({ from, to, dimensionId, permissions, key, creating = true }) {
+    super({ dimensionId, permissions, key })
+    this.initPermissions(permissions)
     this.from = from
     this.to = to
 
@@ -246,7 +283,7 @@ export class CubeRegion extends Region {
     )
   }
   update() {
-    return (TABLE[this.key] = {
+    return (REGION_DB[this.key] = {
       ...super.update(),
       t: 'c',
       key: this.key,
@@ -272,15 +309,24 @@ export class RadiusRegion extends Region {
   radius
   /**
    * Creates a new region
-   * @param {Vector3} center - The position of the first block of the region.
-   * @param {number} radius - The position of the region's end.
-   * @param {Dimensions} dimensionId - The dimension ID of the region.
-   * @param {Partial<IRegionPermissions>} [permissions] - An object containing the permissions for the region.
-   * @param {string} [key] - The key of the region. This is used to identify the region.
-   * @param {boolean} [creating] - Whether or not the region is being created.
+   * @param {object} o
+   * @param {Vector3} o.center - The position of the first block of the region.
+   * @param {number} o.radius - The position of the region's end.
+   * @param {Dimensions} o.dimensionId - The dimension ID of the region.
+   * @param {Partial<IRegionPermissions>} [o.permissions] - An object containing the permissions for the region.
+   * @param {string} [o.key] - The key of the region. This is used to identify the region.
+   * @param {boolean} [o.creating] - Whether or not the region is being created.
    */
-  constructor(center, radius, dimensionId, permissions, key, creating = true) {
-    super(dimensionId, permissions, key)
+  constructor({
+    center,
+    radius,
+    dimensionId,
+    permissions,
+    key,
+    creating = true,
+  }) {
+    super({ dimensionId, permissions, key })
+    this.initPermissions(permissions)
     this.center = center
     this.radius = radius
 
@@ -300,7 +346,7 @@ export class RadiusRegion extends Region {
    * Updates this region in the database
    */
   update() {
-    return (TABLE[this.key] = {
+    return (REGION_DB[this.key] = {
       ...super.update(),
       t: 'r',
       st: this.subtype,
@@ -333,9 +379,9 @@ export class SafeAreaRegion extends RadiusRegion {
   /** @type {IRegionPermissions} */
   basePermissions = {
     allowedEntities: 'all',
-    doorsAndSwitches: true,
-    pvp: true,
-    openContainers: true,
+    doorsAndSwitches: false,
+    pvp: false,
+    openContainers: false,
     owners: [],
   }
   /**
@@ -345,6 +391,12 @@ export class SafeAreaRegion extends RadiusRegion {
     return super.regions
   }
   subtype = 'sa'
+
+  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  constructor(arg) {
+    super(arg)
+    this.initPermissions(arg.permissions)
+  }
 }
 
 export class BaseRegion extends RadiusRegion {
@@ -363,6 +415,61 @@ export class BaseRegion extends RadiusRegion {
     return super.regions
   }
   subtype = 'bs'
+
+  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  constructor(arg) {
+    super(arg)
+    this.initPermissions(arg.permissions)
+  }
+}
+
+/**
+ * Region that will not be saved on disk. (Session only)
+ */
+export class SessionRegion extends RadiusRegion {
+  /**
+   * @type {SessionRegion[]}
+   */
+  static get regions() {
+    return super.regions
+  }
+
+  // Actually not used
+  subtype = 'session'
+
+  update() {
+    // Do not save because its per session region
+    return Region.prototype.update.call(this)
+  }
+
+  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  constructor(arg) {
+    super(arg)
+    this.initPermissions(arg.permissions)
+  }
+}
+
+export class BossArenaRegion extends SessionRegion {
+  /** @type {IRegionPermissions} */
+  basePermissions = {
+    allowedEntities: 'all',
+    doorsAndSwitches: true,
+    pvp: true,
+    openContainers: true,
+    owners: [],
+  }
+  /**
+   * @type {BaseRegion[]}
+   */
+  static get regions() {
+    return super.regions
+  }
+
+  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  constructor(arg) {
+    super(arg)
+    this.initPermissions(arg.permissions)
+  }
 }
 
 const RadiusRegionSubTypes = [
@@ -371,20 +478,3 @@ const RadiusRegionSubTypes = [
   SafeAreaRegion,
   BaseRegion,
 ]
-
-new Command({
-  name: 'region',
-  role: 'admin',
-  type: 'server',
-})
-  .literal({ name: 'create' })
-  .int('radius')
-  .executes((ctx, radius) => {
-    const reg = new RadiusRegion(
-      Vector.floor(ctx.sender.location),
-      radius,
-      ctx.sender.dimension.type
-    )
-    reg.update()
-    ctx.reply('Created with radius ' + radius)
-  })

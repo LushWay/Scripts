@@ -1,4 +1,4 @@
-import { ItemStack, Player, world } from '@minecraft/server'
+import { ItemStack, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import {
   ActionForm,
@@ -243,14 +243,17 @@ function itemDescription(item, c = '§g') {
  */
 const STORE_CD_DB = {}
 
-world.afterEvents.playerInteractWithBlock.subscribe(event => {
+world.beforeEvents.playerInteractWithBlock.subscribe(event => {
   const store = Store.find(event.block.location, event.block.dimension.type)
   if (!store) return
-  const cooldown = new Cooldown(STORE_CD_DB, 'store', event.player, 1000)
-  if (cooldown.statusTime === 'EXPIRED') {
-    cooldown.update()
-    store.open(event.player)
-  }
+  event.cancel = true
+  system.delay(() => {
+    const cooldown = new Cooldown(STORE_CD_DB, 'store', event.player, 1000)
+    if (cooldown.statusTime === 'EXPIRED') {
+      cooldown.update()
+      store.open(event.player)
+    }
+  })
 })
 
 // /**

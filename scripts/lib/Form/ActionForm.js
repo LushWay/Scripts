@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { util } from 'smapi.js'
+import { prompt, util } from 'smapi.js'
 import { showForm } from './utils.js'
 
 export class ActionForm {
@@ -34,7 +34,7 @@ export class ActionForm {
    * @overload
    * Adds a button to this form
    * @param {string} text - text to show on this button
-   * @param {ButtonCallback} callback  - what happens when this button is clicked
+   * @param {PlayerButtonCallback} callback  - what happens when this button is clicked
    * @returns {ActionForm}
    */
   /**
@@ -42,14 +42,14 @@ export class ActionForm {
    * Adds a button to this form
    * @param {string} text - text to show on this button
    * @param {string | null} iconPath - the path this button icon
-   * @param {ButtonCallback} [callback] - what happens when this button is clicked
+   * @param {PlayerButtonCallback} [callback] - what happens when this button is clicked
    * @returns {ActionForm}
    */
   /**
    * Adds a button to this form
    * @param {string} text - text to show on this button
-   * @param {string | null | ButtonCallback} iconPathOrCallback - the path this button icon
-   * @param {ButtonCallback} [callback] - what happens when this button is clicked
+   * @param {string | null | PlayerButtonCallback} iconPathOrCallback - the path this button icon
+   * @param {PlayerButtonCallback} [callback] - what happens when this button is clicked
    * @returns {ActionForm}
    */
   addButton(text, iconPathOrCallback, callback) {
@@ -62,6 +62,30 @@ export class ActionForm {
     this.buttons.push({ text, iconPath, callback })
     this.form.button(text, iconPath ? iconPath : void 0)
     return this
+  }
+  /**
+   * @param {() => void} backFN
+   */
+  addButtonBack(backFN) {
+    return this.addButton(ActionForm.backText, backFN)
+  }
+  /**
+   * @param {string} text
+   * @param {string} yesText
+   * @param {string} noText
+   * @param {ButtonCallback} yesAction
+   */
+  addButtonPrompt(text, yesText, yesAction, noText = 'Отмена') {
+    return this.addButton(text, p =>
+      prompt(
+        p,
+        '§cВы уверены, что хотите ' + text + '?',
+        yesText,
+        yesAction,
+        noText,
+        () => this.show(p)
+      )
+    )
   }
   /**
    * Shows this form to the player
@@ -78,6 +102,6 @@ export class ActionForm {
       return
 
     const callback = this.buttons[response.selection]?.callback
-    if (typeof callback === 'function') util.catch(callback)
+    if (typeof callback === 'function') util.catch(() => callback(player))
   }
 }

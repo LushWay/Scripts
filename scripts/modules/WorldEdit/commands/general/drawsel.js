@@ -1,4 +1,4 @@
-import { WorldEdit } from '../../class/WorldEdit.js'
+import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 
 new Command({
   type: 'we',

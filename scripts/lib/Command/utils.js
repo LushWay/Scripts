@@ -14,7 +14,7 @@ import { Command } from './index.js'
  * @param {string} prefix
  * @returns {string[]}
  */
-export function getChatAugments(message, prefix) {
+export function parseChatArguments(message, prefix) {
   const augments = message
     .slice(prefix.length)
     .trim()
@@ -136,7 +136,7 @@ export function commandSyntaxFail(player, command, args, i) {
  * @param {{ location: Vector3; getViewDirection(): Vector3 }} data
  * @returns {{x: number, y: number, z: number} | null}
  */
-export function parseLocationAugs([x, y, z], data) {
+export function parseLocationArguments([x, y, z], data) {
   const { location } = data
   const viewVector = data.getViewDirection()
   if (typeof x !== 'string' || typeof y !== 'string' || typeof z !== 'string')
@@ -174,7 +174,7 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
     if (arg.sys.type.name.endsWith('*')) continue
     if (arg.sys.type instanceof LocationArgumentType) {
       argsToReturn.push(
-        parseLocationAugs(
+        parseLocationArguments(
           [cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]],
           event.sender
         ) ?? event.sender.location
