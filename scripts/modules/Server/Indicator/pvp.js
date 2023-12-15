@@ -1,10 +1,4 @@
-import {
-  Entity,
-  EntityDamageCause,
-  Player,
-  system,
-  world,
-} from '@minecraft/server'
+import { Entity, EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { Settings } from 'smapi.js'
 import { SERVER } from '../var.js'
 import { HEALTH_INDICATOR } from './var.js'
@@ -65,9 +59,7 @@ SM.afterEvents.modulesLoad.subscribe(() => {
       const g = (/** @type {string} */ p) => (q ? `§4${p}` : '')
 
       if (!HEALTH_INDICATOR.lock_display[player.id]) {
-        player.onScreenDisplay.setActionBar(
-          `${g('»')} §6PvP: ${score} ${g('«')}`
-        )
+        player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
       }
     },
     'PVP player',
@@ -115,15 +107,9 @@ function onDamage(data, fatal = false) {
     return
 
   // Its player.chatClose
-  if (
-    !damage.damagingEntity &&
-    data.hurtEntity &&
-    damage.cause === EntityDamageCause.entityAttack
-  )
-    return
+  if (!damage.damagingEntity && data.hurtEntity && damage.cause === EntityDamageCause.entityAttack) return
 
-  const { currentValue: current, defaultValue: value } =
-    data.hurtEntity.getComponent('minecraft:health')
+  const { currentValue: current, defaultValue: value } = data.hurtEntity.getComponent('minecraft:health')
 
   if (damage.damagingEntity instanceof Player) {
     damage.damagingEntity.scores.pvp = options.cooldown

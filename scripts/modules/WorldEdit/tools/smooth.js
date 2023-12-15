@@ -1,17 +1,8 @@
-import {
-  Block,
-  BlockPermutation,
-  Player,
-  Vector,
-  world,
-} from '@minecraft/server'
+import { Block, BlockPermutation, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ITEMS } from 'config.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
-import {
-  SHARED_POSTFIX,
-  getAllBlockSets,
-} from 'modules/WorldEdit/utils/blocksSet.js'
+import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksSet.js'
 import { ModalForm, getRole, util } from 'smapi.js'
 import { BaseBrushTool } from '../class/BaseBrushTool'
 
@@ -26,9 +17,7 @@ class SmoothTool extends BaseBrushTool {
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {
-    smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(
-      util.error
-    )
+    smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(util.error)
   }
 }
 
@@ -51,25 +40,11 @@ const smoother = new SmoothTool({
 
     new ModalForm('§3Сглаживание')
 
-      .addSlider(
-        'Размер',
-        1,
-        getRole(player) === 'admin' ? 20 : 10,
-        1,
-        lore.size
-      )
-      .addSlider(
-        'Сила сглаживания',
-        1,
-        getRole(player) === 'admin' ? 20 : 10,
-        1,
-        lore.smoothLevel
-      )
+      .addSlider('Размер', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.size)
+      .addSlider('Сила сглаживания', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.smoothLevel)
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(
-          Object.keys(getAllBlockSets(player.id)).map(e => [e, e])
-        ),
+        Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),
         {
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
@@ -81,19 +56,15 @@ const smoother = new SmoothTool({
         lore.size = size
         lore.smoothLevel = smoothLevel
 
-        if (replaceBlocksSet)
-          lore.replaceBlocksSet = [player.id, replaceBlocksSet]
+        if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
         slot.nameTag = '§r§3Сглаживание §6' + size
-        '§r §f' +
-          (replaceBlocksSet ? replaceBlocksSet.replace(SHARED_POSTFIX, '') : '')
+        '§r §f' + (replaceBlocksSet ? replaceBlocksSet.replace(SHARED_POSTFIX, '') : '')
         slot.setLore(smoother.stringifyLore(lore))
         player.tell(
           `§a► §r${
             lore.replaceBlocksSet[0] ? 'Отредактирована' : 'Создана'
           } сглаживатель размером ${size} и силой ${smoothLevel}${
-            replaceBlocksSet
-              ? `, заменяемым набором блоков ${replaceBlocksSet}`
-              : ''
+            replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${size}`
         )
       })
@@ -107,13 +78,7 @@ const smoother = new SmoothTool({
  * @param {number} smoothLevel
  * @param {(import('modules/WorldEdit/menu.js').ReplaceTarget | undefined)[]} [replaceBlocks]
  */
-export async function smoothVoxelData(
-  player,
-  baseBlock,
-  radius,
-  smoothLevel,
-  replaceBlocks = [undefined]
-) {
+export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, replaceBlocks = [undefined]) {
   const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
   const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
 
@@ -141,8 +106,7 @@ export async function smoothVoxelData(
           for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
               for (let dz = -1; dz <= 1; dz++) {
-                const { permutation, void: isVoid } =
-                  voxelDataCopy[x + dx][y + dy][z + dz]
+                const { permutation, void: isVoid } = voxelDataCopy[x + dx][y + dy][z + dz]
                 if (!isVoid) {
                   sum++
                   permutations.push(permutation)
@@ -164,8 +128,7 @@ export async function smoothVoxelData(
           if (sum !== 13) {
             setBlocks[cache.location.x] ??= {}
             setBlocks[cache.location.x][cache.location.y] ??= {}
-            setBlocks[cache.location.x][cache.location.y][cache.location.z] =
-              cache
+            setBlocks[cache.location.x][cache.location.y][cache.location.z] = cache
           }
         }
         operations++

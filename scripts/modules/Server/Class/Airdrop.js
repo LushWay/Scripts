@@ -62,7 +62,10 @@ export class Airdrop {
     console.debug('spawning airdrop at', Vector.string(Vector.floor(position)))
     this.chicken = world.overworld.spawnEntity('minecraft:chicken<chicken:drop>', position)
     console.debug('spawned chicken')
-    this.chestMinecart = world.overworld.spawnEntity('minecraft:chest_minecart<chest_minecart:drop>', Vector.add(position, Airdrop.chestOffset))
+    this.chestMinecart = world.overworld.spawnEntity(
+      'minecraft:chest_minecart<chest_minecart:drop>',
+      Vector.add(position, Airdrop.chestOffset)
+    )
     console.debug('spawned chest minecart')
     this.chestMinecart.addTag(Airdrop.minecartTag)
     AIRDROP_DB[this.key] = {

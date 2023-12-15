@@ -1,14 +1,5 @@
-import {
-  ItemStack,
-  LocationInUnloadedChunkError,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
-import {
-  MinecraftBlockTypes,
-  MinecraftItemTypes,
-} from '@minecraft/vanilla-data.js'
+import { ItemStack, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { SURVIVAL_INTERACTION } from 'modules/Gameplay/Survival/index.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
@@ -22,35 +13,24 @@ export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§7Поставьте эту бочку и она стане базой.'
 )
 
-new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(
-  BASE_ITEM_STACK,
-  new MoneyCost(10)
-)
+new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(BASE_ITEM_STACK, new MoneyCost(10))
 
 SURVIVAL_INTERACTION.subscribe((_, __, ctx) => {
-  if (
-    (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
-    ctx.event.itemStack?.is(BASE_ITEM_STACK)
-  )
+  if ((ctx.type === 'interactWithBlock' || ctx.type === 'place') && ctx.event.itemStack?.is(BASE_ITEM_STACK))
     return true
 })
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block, faceLocation, itemStack } = event
-  if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player))
-    return
+  if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
 
-  const region = RadiusRegion.regions.find(
-    e => e.regionMember(player) !== false
-  )
+  const region = RadiusRegion.regions.find(e => e.regionMember(player) !== false)
 
   if (region) {
     event.cancel = true
     return player.tell(
       `§cВы уже ${
-        region.regionMember(player) === 'owner'
-          ? 'владеете базой'
-          : `состоите в базе игрока '${region.ownerName}'`
+        region.regionMember(player) === 'owner' ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`
       }!`
     )
   }
@@ -71,7 +51,11 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
       return Vector.between(
         Vector.add(min, { x: -size, y: 0, z: -size }),
         Vector.add(max, { x: size, y: 0, z: size }),
-        { x: block.x, y: 0, z: block.z }
+        {
+          x: block.x,
+          y: 0,
+          z: block.z,
+        }
       )
     }
   })
@@ -94,9 +78,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
         owners: [player.id],
       },
     })
-    player.tell(
-      '§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base'
-    )
+    player.tell('§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base')
     player.playSound(SOUNDS.levelup)
   })
 })
@@ -109,10 +91,7 @@ base.executes(ctx => {
   if (LockAction.locked(ctx.sender)) return
   const base = BaseRegion.regions.find(r => r.regionMember(ctx.sender))
 
-  if (!base)
-    return ctx.reply(
-      '§cУ вас нет базы! Вступите в существующую или создайте свою.'
-    )
+  if (!base) return ctx.reply('§cУ вас нет базы! Вступите в существующую или создайте свою.')
 
   baseMenu(ctx.sender, base)
 })
@@ -134,13 +113,7 @@ system.runInterval(
 
       if (!block) continue
       if (block.typeId === MinecraftBlockTypes.Barrel) {
-        if (
-          playersLocations.find(
-            e =>
-              e.dimension === base.dimensionId &&
-              Vector.distance(base.center, e.loc) < 10
-          )
-        ) {
+        if (playersLocations.find(e => e.dimension === base.dimensionId && Vector.distance(base.center, e.loc) < 10)) {
           spawnParticlesInArea(base.center, Vector.add(base.center, Vector.one))
         }
       } else {

@@ -1,10 +1,4 @@
-import {
-  ItemStack,
-  LocationInUnloadedChunkError,
-  MolangVariableMap,
-  Player,
-  Vector,
-} from '@minecraft/server'
+import { ItemStack, LocationInUnloadedChunkError, MolangVariableMap, Player, Vector } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config'
 import { Temporary } from 'lib/Class/Temporary.js'
@@ -23,23 +17,18 @@ const scene = new Command({
   else Command.getHelpForCommand(scene, ctx)
 })
 
-scene
-  .literal({ name: 'exit', description: 'Выход из катсцены' })
-  .executes(ctx => {
-    const scene = Object.values(Catscene.instances).find(
-      e => ctx.sender.id in e.playing
-    )
-    if (!scene) return ctx.error('Вы не находитесь в катсцене!')
+scene.literal({ name: 'exit', description: 'Выход из катсцены' }).executes(ctx => {
+  const scene = Object.values(Catscene.instances).find(e => ctx.sender.id in e.playing)
+  if (!scene) return ctx.error('Вы не находитесь в катсцене!')
 
-    scene.exit(ctx.sender)
-  })
+  scene.exit(ctx.sender)
+})
 
 scene
   .literal({ name: 'play', role: 'admin' })
   .string('name', false)
   .executes((ctx, name) => {
-    if (!(name in Catscene.instances))
-      return ctx.error(Object.keys(Catscene.instances).join('\n'))
+    if (!(name in Catscene.instances)) return ctx.error(Object.keys(Catscene.instances).join('\n'))
     Catscene.instances[name].play(ctx.sender)
   })
 
@@ -62,11 +51,7 @@ function selectCatscene(player) {
 function manageCatscene(player, scene) {
   new ActionForm(
     scene.name,
-    `Точка катсцены: ${
-      scene.location.valid
-        ? Vector.string(scene.location)
-        : '§8<Не установлена>'
-    }`
+    `Точка катсцены: ${scene.location.valid ? Vector.string(scene.location) : '§8<Не установлена>'}`
   )
     .addButton(ActionForm.backText, () => selectCatscene(player))
     .addButton('Редактировать', () => editCatscene(player, scene))
@@ -79,9 +64,7 @@ const editCatsceneItem = new ItemStack('we:tool').setInfo(
   'используй предмет чтобы создать точку катсцены'
 )
 
-const editCatsceneItemDone = new ItemStack(
-  MinecraftItemTypes.HoneyBottle
-).setInfo(
+const editCatsceneItemDone = new ItemStack(MinecraftItemTypes.HoneyBottle).setInfo(
   '§r§6> §fСохранить и выйти',
   'используй предмет чтобы выйти из меню катсцены'
 )
@@ -154,11 +137,7 @@ function editCatscene(player, scene) {
     system.runInterval(
       () => {
         for (const dot of scene.dots) {
-          player.dimension.spawnParticle(
-            'minecraft:wax_particle',
-            Vector.add(scene.location, dot[0]),
-            blueParticle
-          )
+          player.dimension.spawnParticle('minecraft:wax_particle', Vector.add(scene.location, dot[0]), blueParticle)
         }
       },
       'scene particle',
@@ -167,11 +146,7 @@ function editCatscene(player, scene) {
 
     util.catch(async function visialize() {
       while (!temp.cleaned) {
-        const vectors = scene.dots
-          .map(e => e[0])
-          .concat(
-            Vector.subtract(Vector.floor(player.location), scene.location)
-          )
+        const vectors = scene.dots.map(e => e[0]).concat(Vector.subtract(Vector.floor(player.location), scene.location))
         for (const location of scene.curve({ vectors, step: 0.5 / 4 })) {
           if (temp.cleaned) return
           try {
@@ -203,9 +178,7 @@ function editCatscene(player, scene) {
       ) {
         event.cancel = true
         system.delay(() => {
-          scene.dots.push([
-            Vector.subtract(Vector.floor(player.location), scene.location),
-          ])
+          scene.dots.push([Vector.subtract(Vector.floor(player.location), scene.location)])
           player.tell('§a> §fТочка добавлена.')
           player.playSound(SOUNDS.click)
         })

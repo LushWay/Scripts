@@ -20,8 +20,6 @@ export const WE_PLAYER_SETTINGS = Settings.player('Строитель мира',
 
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
   if (itemStack.typeId === CUSTOM_ITEMS.dash) {
-    source.teleport(
-      Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5))
-    )
+    source.teleport(Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5)))
   }
 })

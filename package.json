@@ -33,7 +33,7 @@
     "singleQuote": true,
     "arrowParens": "avoid",
     "semi": false,
-    "printWidth": 150,
+    "printWidth": 120,
     "endOfLine": "crlf",
     "quoteProps": "consistent"
   },

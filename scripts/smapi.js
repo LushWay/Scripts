@@ -53,10 +53,7 @@ export * from './lib/roles.js'
 export * from './lib/util.js'
 
 world.afterEvents.playerJoin.subscribe(player => {
-  if (
-    Date.now() - loading < CONFIG.firstPlayerJoinTime &&
-    player.playerId === CONFIG.singlePlayerHostId
-  ) {
+  if (Date.now() - loading < CONFIG.firstPlayerJoinTime && player.playerId === CONFIG.singlePlayerHostId) {
     util.settings.firstLoad = true
   }
 })
@@ -81,10 +78,9 @@ system.run(async function waiter() {
     EventLoader.load(SM.afterEvents.modulesLoad)
 
     world.say(
-      `${util.settings.firstLoad ? '§fFirst loaded in ' : '§9└ §fDone in '}${(
-        (Date.now() - loading) /
-        1000
-      ).toFixed(2)}`
+      `${util.settings.firstLoad ? '§fFirst loaded in ' : '§9└ §fDone in '}${((Date.now() - loading) / 1000).toFixed(
+        2
+      )}`
     )
   } catch (e) {
     util.error(e, { errorName: 'LoadError' })

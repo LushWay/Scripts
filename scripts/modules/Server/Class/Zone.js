@@ -21,9 +21,7 @@ export class Zone {
       : [player.location.x, player.location.y, zone.z + (plus ? 1 : -1)]
 
     player.teleport({ x: loc[1], y: loc[2], z: loc[3] })
-    player.onScreenDisplay.setActionBar(
-      `§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? 'x' : 'z'}`
-    )
+    player.onScreenDisplay.setActionBar(`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? 'x' : 'z'}`)
   }
   /**
    *
@@ -36,8 +34,7 @@ export class Zone {
     this.interval = system.runInterval(
       () => {
         const players = world.getAllPlayers()
-        const rad =
-          typeof this.radius === 'function' ? this.radius(players) : this.radius
+        const rad = typeof this.radius === 'function' ? this.radius(players) : this.radius
         const center = this.center
 
         for (const p of players) {
@@ -48,14 +45,10 @@ export class Zone {
           const xtrue = inRange(x, rmin.x, rmax.x)
           const ztrue = inRange(z, rmin.z, rmax.z)
 
-          if (x >= rmax.x && x <= rmax.x + 10 && ztrue)
-            this.returnToZone(p, true, rmax)
-          if (z >= rmax.z && z <= rmax.z + 10 && xtrue)
-            this.returnToZone(p, false, rmax)
-          if (x <= rmin.x && x >= rmin.x - 10 && ztrue)
-            this.returnToZone(p, true, rmin, true)
-          if (z <= rmin.z && z >= rmin.z - 10 && xtrue)
-            this.returnToZone(p, false, rmin, true)
+          if (x >= rmax.x && x <= rmax.x + 10 && ztrue) this.returnToZone(p, true, rmax)
+          if (z >= rmax.z && z <= rmax.z + 10 && xtrue) this.returnToZone(p, false, rmax)
+          if (x <= rmin.x && x >= rmin.x - 10 && ztrue) this.returnToZone(p, true, rmin, true)
+          if (z <= rmin.z && z >= rmin.z - 10 && xtrue) this.returnToZone(p, false, rmin, true)
         }
       },
       'zone',

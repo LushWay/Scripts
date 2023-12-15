@@ -36,11 +36,7 @@ const PLAYER_OPTIONS = Settings.player('Чат', 'chat', {
 })
 
 world.afterEvents.chatSend.subscribe(data => {
-  if (
-    data.message.startsWith(CONFIG.commandPrefix) &&
-    data.message !== CONFIG.commandPrefix
-  )
-    return
+  if (data.message.startsWith(CONFIG.commandPrefix) && data.message !== CONFIG.commandPrefix) return
 
   try {
     const cooldown = SETTINGS.cooldown
@@ -87,8 +83,7 @@ world.afterEvents.chatSend.subscribe(data => {
       if (!PLAYER_OPTIONS(near).disableSound) near.playSound(SOUNDS.click)
     }
 
-    for (const outranged of otherPlayers)
-      outranged.tell(`${role}§8${data.sender.name}§7: ${messageText}`)
+    for (const outranged of otherPlayers) outranged.tell(`${role}§8${data.sender.name}§7: ${messageText}`)
 
     const hightlight = PLAYER_OPTIONS(data.sender).hightlightMessages
     data.sender.tell(hightlight ? `§6§lЯ§r: §f${messageText}` : message)

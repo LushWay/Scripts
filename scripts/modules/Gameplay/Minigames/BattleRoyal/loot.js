@@ -16,12 +16,7 @@ export class LootChest {
    * @param {number} loot_tier
    */
   constructor(posx, posz, loot_tier = 1, rdrad) {
-    this.pos = LootChest.summon(
-      posx,
-      posz,
-      LootChest.getTable(loot_tier),
-      rdrad
-    )
+    this.pos = LootChest.summon(posx, posz, LootChest.getTable(loot_tier), rdrad)
   }
   static getTable(t) {
     return drops
@@ -41,9 +36,7 @@ export class LootChest {
         includePassableBlocks: false,
         maxDistance: 100,
       }
-      const b = world
-        .getDimension('overworld')
-        .getBlockFromRay({ x: x, y: 320, z }, { x: 0, y: -1, z: 0 })
+      const b = world.getDimension('overworld').getBlockFromRay({ x: x, y: 320, z }, { x: 0, y: -1, z: 0 })
       if (b && b.location.y >= 50) {
         block = b.dimension.getBlock({
           x: b.location.x,

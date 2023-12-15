@@ -3,12 +3,7 @@ import { CUSTOM_ITEMS } from 'config.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 import { ModalForm } from 'smapi.js'
 import { WorldEditTool } from '../class/Tool.js'
-import {
-  blockSetDropdown,
-  getAllBlockSets,
-  getBlockSet,
-  getBlockSetForReplaceTarget,
-} from '../utils/blocksSet.js'
+import { blockSetDropdown, getAllBlockSets, getBlockSet, getBlockSetForReplaceTarget } from '../utils/blocksSet.js'
 
 const shovel = new WorldEditTool({
   name: 'shovel',
@@ -39,9 +34,7 @@ const shovel = new WorldEditTool({
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(
-          Object.keys(getAllBlockSets(player.id)).map(e => [e, e])
-        ),
+        Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),
         {
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
@@ -53,8 +46,7 @@ const shovel = new WorldEditTool({
         lore.radius = radius
         lore.height = height
         lore.blocksSet = [player.id, blocksSet]
-        if (replaceBlocksSet)
-          lore.replaceBlocksSet = [player.id, replaceBlocksSet]
+        if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
         slot.setLore(shovel.stringifyLore(lore))
 
         player.tell(
@@ -69,21 +61,14 @@ const shovel = new WorldEditTool({
     if (!lore) return
 
     const blocks = getBlockSet(lore.blocksSet)
-    if (blocks.length === 0)
-      return player.onScreenDisplay.setTitle('§cНабор блоков лопаты пустой!')
+    if (blocks.length === 0) return player.onScreenDisplay.setTitle('§cНабор блоков лопаты пустой!')
 
     const replaceBlocks = getBlockSetForReplaceTarget(lore.replaceBlocksSet)
-    if (blocks.length === 0)
-      return player.onScreenDisplay.setTitle(
-        '§cЗаменяемый набор блоков лопаты пустой!'
-      )
+    if (blocks.length === 0) return player.onScreenDisplay.setTitle('§cЗаменяемый набор блоков лопаты пустой!')
 
     const loc = Vector.floor(player.location)
     const offset = -1
-    const pos1 = Vector.add(
-      loc,
-      new Vector(-lore.radius, offset - lore.height, -lore.radius)
-    )
+    const pos1 = Vector.add(loc, new Vector(-lore.radius, offset - lore.height, -lore.radius))
     const pos2 = Vector.add(loc, new Vector(lore.radius, offset, lore.radius))
 
     WorldEdit.forPlayer(player).backup(pos1, pos2)
@@ -92,11 +77,7 @@ const shovel = new WorldEditTool({
       const block = world.overworld.getBlock(loc)
 
       for (const replaceBlock of replaceBlocks) {
-        if (
-          replaceBlock &&
-          !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)
-        )
-          continue
+        if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
         block?.setPermutation(blocks.randomElement())
       }

@@ -99,8 +99,5 @@ export class MessageForm {
  */
 
 export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
-  new MessageForm('Вы уверены?', text)
-    .setButton1(yesText, onYesAction)
-    .setButton2(noText, onNoAction)
-    .show(player)
+  new MessageForm('Вы уверены?', text).setButton1(yesText, onYesAction).setButton2(noText, onNoAction).show(player)
 }

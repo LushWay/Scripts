@@ -26,9 +26,7 @@ export class Sidebar {
   constructor({ name }, ...content) {
     this.name = name
     /** @type {(SidebarLineGenerator | string | boolean)[]} */
-    this.content = content.map(e =>
-      typeof e === 'object' ? ('preinit' in e ? e.preinit(this) : e) : e
-    )
+    this.content = content.map(e => (typeof e === 'object' ? ('preinit' in e ? e.preinit(this) : e) : e))
 
     Sidebar.instances.push(this)
   }
@@ -87,10 +85,6 @@ export class Sidebar {
    * @param {number} ticks
    */
   setUpdateInterval(ticks) {
-    system.runInterval(
-      () => this.updateAll(),
-      `Sidebar.${this.name}::update`,
-      ticks
-    )
+    system.runInterval(() => this.updateAll(), `Sidebar.${this.name}::update`, ticks)
   }
 }

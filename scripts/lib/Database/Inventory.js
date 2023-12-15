@@ -1,10 +1,4 @@
-import {
-  Entity,
-  EquipmentSlot,
-  ItemStack,
-  Player,
-  system,
-} from '@minecraft/server'
+import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
 import { DB, DatabaseError } from './Default.js'
@@ -121,10 +115,7 @@ export class InventoryStore {
   /** @private */
   init() {
     const entities = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME)
-    if (!entities)
-      throw new DatabaseError(
-        'Failed to get inventory entities in table ' + this._.TABLE_NAME
-      )
+    if (!entities) throw new DatabaseError('Failed to get inventory entities in table ' + this._.TABLE_NAME)
     this._.ENTITIES = entities
 
     const items = []
@@ -185,12 +176,9 @@ export class InventoryStore {
       }
 
       if (!slots)
-        return util.error(
-          new Error(
-            `Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`
-          ),
-          { errorName: 'LoadError' }
-        )
+        return util.error(new Error(`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`), {
+          errorName: 'LoadError',
+        })
 
       const { type, index } = slots[step]
       // @ts-expect-error Optimization cost...
@@ -224,10 +212,7 @@ export class InventoryStore {
         if (!store.equipment[key]) continue
         const move = manifest.slots.push(key)
         const eq = store.equipment[key]
-        if (!eq)
-          throw new DatabaseError(
-            'Failed to get equipment with key ' + util.inspect(key)
-          )
+        if (!eq) throw new DatabaseError('Failed to get equipment with key ' + util.inspect(key))
 
         items[storeIndex + move] = eq
       }
@@ -254,9 +239,7 @@ export class InventoryStore {
 
     if (entitiesToSpawn > 0) {
       for (let i = 0; i < entitiesToSpawn; i++) {
-        entities.push(
-          DB.createTableEntity(this._.TABLE_TYPE, this._.TABLE_NAME, i)
-        )
+        entities.push(DB.createTableEntity(this._.TABLE_TYPE, this._.TABLE_NAME, i))
       }
     } else if (entitiesToSpawn < 0) {
       // Check for unused entities and despawn them
@@ -331,14 +314,9 @@ export class InventoryStore {
    * @param {boolean} [options.keepInventory] - A boolean that determines keep entity's invetory or not
    * @param {string} [options.key] - Key to associate inventory with
    */
-  saveFromEntity(
-    entity,
-    { rewrite = false, keepInventory = false, key = entity.id } = {}
-  ) {
+  saveFromEntity(entity, { rewrite = false, keepInventory = false, key = entity.id } = {}) {
     if (key in this._.STORES && !rewrite)
-      throw new DatabaseError(
-        'Failed to rewrite entity store with disabled rewriting.'
-      )
+      throw new DatabaseError('Failed to rewrite entity store with disabled rewriting.')
     this._.STORES[key] = InventoryStore.get(entity)
     if (!keepInventory) entity.getComponent('inventory').container.clearAll()
 

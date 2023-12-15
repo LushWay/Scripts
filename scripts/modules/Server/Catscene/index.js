@@ -42,9 +42,7 @@ export class Catscene {
   }
 
   save() {
-    CATSCENE_DB[this.name] = this.dots.map(e => [
-      { x: e[0].x, y: e[0].y, z: e[0].z },
-    ])
+    CATSCENE_DB[this.name] = this.dots.map(e => [{ x: e[0].x, y: e[0].y, z: e[0].z }])
   }
 
   intervalTime = 5
@@ -86,11 +84,7 @@ export class Catscene {
                 easeType: EasingType.Linear,
               },
             })
-            return system.runTimeout(
-              () => this.exit(player),
-              'catscene exit anim',
-              2 * 20 + 5
-            )
+            return system.runTimeout(() => this.exit(player), 'catscene exit anim', 2 * 20 + 5)
           }
 
           player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {

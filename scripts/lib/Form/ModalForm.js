@@ -69,12 +69,7 @@ export class ModalForm {
   addDropdownFromObject(
     label,
     object,
-    {
-      defaultValueIndex,
-      defaultValue,
-      none,
-      noneText = ModalForm.arrayDefaultNone,
-    } = {}
+    { defaultValueIndex, defaultValue, none, noneText = ModalForm.arrayDefaultNone } = {}
   ) {
     /** @type {(string | null)[]} */
     let objectKeys = Object.keys(object)
@@ -105,13 +100,7 @@ export class ModalForm {
    * @param {number} defaultValue  the default value in slider
    * @returns {ModalForm<AppendFormField<Callback, number>>}
    */
-  addSlider(
-    label,
-    minimumValue,
-    maximumValue,
-    valueStep = 1,
-    defaultValue = 0
-  ) {
+  addSlider(label, minimumValue, maximumValue, valueStep = 1, defaultValue = 0) {
     this.args.push({ type: 'slider' })
     this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue)
     // @ts-expect-error This type

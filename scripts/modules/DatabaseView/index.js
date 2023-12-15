@@ -41,10 +41,7 @@ function showTable(player, table) {
   const menu = new ActionForm(`${table}`)
   menu.addButton(ActionForm.backText, () => selectTable(player))
   menu.addButton('§3Новое значение§r', () => {
-    const form = new ModalForm('§3+Значение в §f' + table).addTextField(
-      'Ключ',
-      ' '
-    )
+    const form = new ModalForm('§3+Значение в §f' + table).addTextField('Ключ', ' ')
     const { newform, callback } = changeValue(form, null)
     newform.show(player, (_, key, input, type) => {
       if (input)
@@ -90,10 +87,7 @@ function showTable(player, table) {
     )
 
     AForm.addButton('Изменить', null, () => {
-      const { newform, callback: ncallback } = changeValue(
-        new ModalForm(key),
-        value
-      )
+      const { newform, callback: ncallback } = changeValue(new ModalForm(key), value)
 
       newform.show(player, (_, input, inputType) => {
         if (input)
@@ -132,11 +126,7 @@ function changeValue(form, value) {
   let type = typeof value
   const typeDropdown = ['string', 'number', 'boolean', 'object']
   if (value) typeDropdown.unshift('Оставить прежний §7(' + type + ')')
-  const stringifiedValue = value
-    ? typeof value === 'object'
-      ? JSON.stringify(value)
-      : value + ''
-    : ''
+  const stringifiedValue = value ? (typeof value === 'object' ? JSON.stringify(value) : value + '') : ''
   const newform = form
     .addTextField('Значение', 'оставь пустым для отмены', stringifiedValue)
     .addDropdown('Тип', typeDropdown)
@@ -152,10 +142,7 @@ function changeValue(form, value) {
 
       if (
         !inputType.includes(type) &&
-        (inputType === 'string' ||
-          inputType === 'object' ||
-          inputType === 'boolean' ||
-          inputType === 'number')
+        (inputType === 'string' || inputType === 'object' || inputType === 'boolean' || inputType === 'number')
       ) {
         type = inputType
       }
@@ -188,10 +175,7 @@ function changeValue(form, value) {
  * format
  * @returns A string.
  */
-export function stringifyBenchmarkReult({
-  type = 'test',
-  timerPathes = false,
-} = {}) {
+export function stringifyBenchmarkReult({ type = 'test', timerPathes = false } = {}) {
   let output = ''
   let res = []
   for (const [key, val] of Object.entries(util.benchmark.results[type])) {
@@ -245,8 +229,7 @@ new Command({
   .executes((ctx, type, pathes) => {
     if (type && !(type in util.benchmark.results))
       return ctx.error(
-        'Неизвестный тип бенчмарка! Доступные типы: \n  §f' +
-          Object.keys(util.benchmark.results).join('\n  ')
+        'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  ')
       )
 
     function show() {

@@ -134,9 +134,7 @@ if (ANARCHY.portalLocation.valid) {
     .executes(ctx => {
       delete ctx.sender.database.survival.anarchy
       ctx.sender.playSound(SOUNDS.success)
-      ctx.reply(
-        '§a> §fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.'
-      )
+      ctx.reply('§a> §fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.')
     })
 }
 

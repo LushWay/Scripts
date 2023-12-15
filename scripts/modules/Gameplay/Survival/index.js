@@ -74,9 +74,7 @@ JOIN.CONFIG.subtitle = 'Добро пожаловать!'
  * @param {Player['database']['survival']['inv']} inv
  */
 function placeButton(place, inv, color = '§9', text = 'Спавн') {
-  return `${inv === place ? '§7Вы тут ' : color}> ${
-    inv === place ? '§8' : '§f'
-  }${text}`
+  return `${inv === place ? '§7Вы тут ' : color}> ${inv === place ? '§8' : '§f'}${text}`
 }
 
 MENU.OnOpen = player => {

@@ -17,10 +17,7 @@ new WorldEditTool({
   displayName: 'инструмент',
   editToolForm(item, player) {
     const lore = item.getLore()
-    new ActionForm(
-      '§3Инструмент',
-      'Настройте что будет происходить при использовании инструмента.'
-    )
+    new ActionForm('§3Инструмент', 'Настройте что будет происходить при использовании инструмента.')
       .addButton('Телепорт по взгляду', () => {
         item.nameTag = `§r§a► Телепорт по взгляду`
         lore[0] = 'teleportToView'
@@ -29,18 +26,16 @@ new WorldEditTool({
         player.tell(`§a► §rРежим инструмента изменен на телепорт по взгляду`)
       })
       .addButton('Выполнение команды', () => {
-        new ModalForm('§3Инструмент')
-          .addTextField('Команда', '/tp @s ^^^5')
-          .show(player, (_, command) => {
-            if (command.startsWith('/')) command = command.substring(1)
+        new ModalForm('§3Инструмент').addTextField('Команда', '/tp @s ^^^5').show(player, (_, command) => {
+          if (command.startsWith('/')) command = command.substring(1)
 
-            item.nameTag = `§r§aR► §f${command}`
-            lore[0] = 'runCommand'
-            lore[1] = command
+          item.nameTag = `§r§aR► §f${command}`
+          lore[0] = 'runCommand'
+          lore[1] = command
 
-            item.setLore(lore)
-            player.tell(`§aR► §fКоманда: §7${command}`)
-          })
+          item.setLore(lore)
+          player.tell(`§aR► §fКоманда: §7${command}`)
+        })
       })
       .addButton('Проверка звуков', () => {
         SelectFromArray(ListSounds, '§3Звук', (sound, index) => {

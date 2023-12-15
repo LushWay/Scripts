@@ -1,10 +1,4 @@
-import {
-  BlockPermutation,
-  Player,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
+import { BlockPermutation, Player, Vector, system, world } from '@minecraft/server'
 import { util } from 'smapi.js'
 import { WorldEdit } from '../class/WorldEdit.js'
 import { WE_CONFIG } from '../config.js'
@@ -20,24 +14,14 @@ import { Cuboid } from './cuboid.js'
  * @returns {string | undefined}
  * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
-export function Shape(
-  player,
-  shape,
-  pos,
-  rad,
-  blocks,
-  replaceBlocks = [undefined]
-) {
+export function Shape(player, shape, pos, rad, blocks, replaceBlocks = [undefined]) {
   if (replaceBlocks.length < 1) replaceBlocks.push(undefined)
   if (blocks.length < 1) return '§cПустой набор блоков'
   util.catch(async () => {
     const loc1 = { x: -rad, y: -rad, z: -rad }
     const loc2 = { x: rad, z: rad, y: rad }
 
-    WorldEdit.forPlayer(player).backup(
-      Vector.add(pos, loc1),
-      Vector.add(pos, loc2)
-    )
+    WorldEdit.forPlayer(player).backup(Vector.add(pos, loc1), Vector.add(pos, loc2))
 
     const cuboid = new Cuboid(loc1, loc2)
     const conditionFunction = new Function(
@@ -53,11 +37,7 @@ export function Shape(
       const location = Vector.add(pos, { x, y, z })
       const block = world.overworld.getBlock(location)
       for (const replaceBlock of replaceBlocks) {
-        if (
-          replaceBlock &&
-          !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)
-        )
-          continue
+        if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
         block?.setPermutation(blocks.randomElement())
 

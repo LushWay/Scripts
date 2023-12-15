@@ -12,11 +12,7 @@ const settings = Settings.player('Боковое меню (сайдбар)', 'si
     name: 'Сайдбар',
     desc: 'Определяет, включен ли сайдбар',
     onChange() {
-      world
-        .getAllPlayers()
-        .forEach(e =>
-          sidebar[settings(e).enabled ? 'subscribe' : 'unsubscribe'](e)
-        )
+      world.getAllPlayers().forEach(e => sidebar[settings(e).enabled ? 'subscribe' : 'unsubscribe'](e))
     },
   },
   moneyLeafs: {
@@ -44,14 +40,10 @@ const sidebar = new Sidebar(
   player => {
     let text = ''
     if (player.database.survival.inv === 'anarchy') {
-      const region = Region.locationInRegion(
-        player.location,
-        player.dimension.type
-      )
+      const region = Region.locationInRegion(player.location, player.dimension.type)
       if (region) {
         if (!region.permissions.pvp) text = ', §aмирная зона'
-        if (region instanceof BaseRegion && region.regionMember(player.id))
-          text = ', §6ваша база'
+        if (region instanceof BaseRegion && region.regionMember(player.id)) text = ', §6ваша база'
       }
     }
     return `§7${inventoryDisplay[player.database.survival.inv]}${text}`

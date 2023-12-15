@@ -34,11 +34,7 @@ OverTakes(Player, {
 
 world.afterEvents.playerSpawn.subscribe(({ player }) => {
   if (player.database.name && player.database.name !== player.name) {
-    const message =
-      '§e> §3Игрок §f' +
-      player.database.name +
-      ' §r§3сменил ник на §f' +
-      player.name
+    const message = '§e> §3Игрок §f' + player.database.name + ' §r§3сменил ник на §f' + player.name
 
     world.say(message)
     console.warn(message)

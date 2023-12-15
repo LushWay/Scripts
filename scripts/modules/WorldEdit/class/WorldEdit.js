@@ -39,10 +39,7 @@ export class WorldEdit {
 
   recreateCuboids() {
     this.selectionCuboid = new Cuboid(this.#pos1, this.#pos2)
-    this.visualSelectionCuboid = new Cuboid(
-      this.selectionCuboid.min,
-      Vector.add(this.selectionCuboid.max, Vector.one)
-    )
+    this.visualSelectionCuboid = new Cuboid(this.selectionCuboid.min, Vector.add(this.selectionCuboid.max, Vector.one))
   }
 
   /**
@@ -116,21 +113,11 @@ export class WorldEdit {
   }
 
   drawSelection() {
-    if (
-      !this.drawselection ||
-      !this.selectionCuboid ||
-      !this.visualSelectionCuboid
-    )
-      return
+    if (!this.drawselection || !this.selectionCuboid || !this.visualSelectionCuboid) return
 
-    if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE)
-      return
+    if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
 
-    spawnParticlesInArea(
-      this.selectionCuboid.pos1,
-      this.selectionCuboid.pos2,
-      this.selectionCuboid
-    )
+    spawnParticlesInArea(this.selectionCuboid.pos1, this.selectionCuboid.pos2, this.selectionCuboid)
   }
 
   /**
@@ -161,11 +148,7 @@ export class WorldEdit {
         array.splice(array.indexOf(backup), 1)
       }
 
-      const e = util.ngettext(amount, [
-        'сохранение',
-        'сохранения',
-        'сохранений',
-      ])
+      const e = util.ngettext(amount, ['сохранение', 'сохранения', 'сохранений'])
       const o = amount.toString().endsWith('1') ? '' : 'о'
 
       return `§b► §3Успешно отменен${o} §f${amount} §3${e}!`
@@ -197,23 +180,19 @@ export class WorldEdit {
    */
   copy() {
     try {
-      if (!this.selectionCuboid)
-        return '§4► §cЗона для копирования не выделена!'
+      if (!this.selectionCuboid) return '§4► §cЗона для копирования не выделена!'
 
       const result = world.overworld.runCommand(
         `structure save ${WE_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
       )
-      if (!result)
-        return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`
+      if (!result) return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`
 
       this.currentCopy = {
         pos1: this.pos1,
         pos2: this.pos2,
         name: WE_CONFIG.COPY_FILE_NAME,
       }
-      return `§9► §fСкопированно из ${Vector.string(
-        this.pos1
-      )} в ${Vector.string(this.pos2)}`
+      return `§9► §fСкопированно из ${Vector.string(this.pos1)} в ${Vector.string(this.pos2)}`
     } catch (error) {
       util.error(error)
       return `§4► §cНе удалось скорпировать: ${error.message}`
@@ -251,14 +230,10 @@ export class WorldEdit {
       this.backup(loc, pos2)
 
       player.runCommand(
-        `structure load ${WE_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(
-          rotation
-        ).replace(
+        `structure load ${WE_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(rotation).replace(
           'NaN',
           '0'
-        )}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${
-          integrity ? integrity : ''
-        } ${seed ? seed : ''}`
+        )}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${integrity ? integrity : ''} ${seed ? seed : ''}`
       )
 
       return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`
@@ -277,13 +252,8 @@ export class WorldEdit {
 
     const timeForEachFill = 3
     const fillSize = 32768
-    const time = Math.round(
-      (this.selectionCuboid.blocksBetween / fillSize) * timeForEachFill * 0.05
-    )
-    if (time >= 0.01)
-      player.tell(
-        `§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`
-      )
+    const time = Math.round((this.selectionCuboid.blocksBetween / fillSize) * timeForEachFill * 0.05)
+    if (time >= 0.01) player.tell(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`)
     const startTime = Date.now()
     this.backup()
     let errors = 0
@@ -291,36 +261,21 @@ export class WorldEdit {
 
     /** @type {(import('modules/WorldEdit/menu.js').ReplaceTarget | undefined)[]} */
     const replaceTargets = replaceBlocks.map(e =>
-      e && e instanceof BlockPermutation
-        ? { typeId: e.type.id, states: e.getAllStates() }
-        : e
+      e && e instanceof BlockPermutation ? { typeId: e.type.id, states: e.getAllStates() } : e
     )
 
     // TODO use O(n) for blocks.length === 1
-    for (const cube of Vector.foreach(
-      this.selectionCuboid.min,
-      this.selectionCuboid.max
-    )) {
+    for (const cube of Vector.foreach(this.selectionCuboid.min, this.selectionCuboid.max)) {
       for (const replaceBlock of replaceTargets) {
         try {
           const block = world.overworld.getBlock(cube)
 
-          if (
-            replaceBlock &&
-            !block?.permutation.matches(
-              replaceBlock.typeId,
-              replaceBlock.states
-            )
-          )
-            continue
+          if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
           block?.setPermutation(toPermutation(blocks.randomElement()))
         } catch (e) {
           if (
-            !(
-              e instanceof LocationInUnloadedChunkError ||
-              e instanceof LocationOutOfWorldBoundariesError
-            ) &&
+            !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
             errors < 3
           )
             util.error(e)
@@ -336,13 +291,10 @@ export class WorldEdit {
       timeTypes: ['ms', 'sec', 'min'],
     })
 
-    let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${
-      this.selectionCuboid.blocksBetween
-    } §3${util.ngettext(this.selectionCuboid.blocksBetween, [
-      'блок',
-      'блока',
-      'блоков',
-    ])}`
+    let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${this.selectionCuboid.blocksBetween} §3${util.ngettext(
+      this.selectionCuboid.blocksBetween,
+      ['блок', 'блока', 'блоков']
+    )}`
     if (endTime.parsedTime !== '0') {
       reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
     }
@@ -355,9 +307,7 @@ export class WorldEdit {
 
     if (errors) {
       player.playSound(SOUNDS.fail)
-      return player.tell(
-        `§4► §f${errors}/${all} §cошибок при заполнении, ${reply}`
-      )
+      return player.tell(`§4► §f${errors}/${all} §cошибок при заполнении, ${reply}`)
     }
     player.playSound(SOUNDS.success)
     player.tell(`§a► ${reply}`)
@@ -366,8 +316,7 @@ export class WorldEdit {
 
 system.runInterval(
   () => {
-    for (const build of Object.values(WorldEdit.instances))
-      build.drawSelection()
+    for (const build of Object.values(WorldEdit.instances)) build.drawSelection()
   },
   'we Selection',
   20

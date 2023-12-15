@@ -31,12 +31,7 @@ export class Temporary {
         if (typeof p === 'symbol') return value
 
         // Make sure its event signal...
-        if (
-          typeof value === 'object' &&
-          value !== null &&
-          'subscribe' in value &&
-          'unsubscribe' in value
-        ) {
+        if (typeof value === 'object' && value !== null && 'subscribe' in value && 'unsubscribe' in value) {
           // Patch it
           const eventSignal = {
             /**

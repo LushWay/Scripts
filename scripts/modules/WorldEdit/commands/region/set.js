@@ -3,11 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { editBlockStates, toPermutation } from 'modules/WorldEdit/menu.js'
-import {
-  getAllBlockSets,
-  getBlockSet,
-  stringifyBlocksSetRef,
-} from 'modules/WorldEdit/utils/blocksSet.js'
+import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'smapi.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
 
@@ -47,23 +43,13 @@ const selectedBlocks = {
  * @param {Player} player
  */
 export function setSelection(player) {
-  const [block, blockDisplay] = use(
-    player,
-    'block',
-    'Блок, которым будет заполнена область'
-  )
-  const [replaceBlock, replaceBlockDisplay] = use(
-    player,
-    'replaceBlock',
-    'Заменяемый блок',
-    {
-      notSelected: {
-        description:
-          'Будут заполнены все блоки. Нажми чтобы выбрать конкретные',
-        icon: 'textures/ui/magnifying_glass.png',
-      },
-    }
-  )
+  const [block, blockDisplay] = use(player, 'block', 'Блок, которым будет заполнена область')
+  const [replaceBlock, replaceBlockDisplay] = use(player, 'replaceBlock', 'Заменяемый блок', {
+    notSelected: {
+      description: 'Будут заполнены все блоки. Нажми чтобы выбрать конкретные',
+      icon: 'textures/ui/magnifying_glass.png',
+    },
+  })
   new ChestForm('small')
     .title('Заполнение')
     .pattern(
@@ -112,12 +98,7 @@ export function setSelection(player) {
  * @returns {[blocks: (BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[] | undefined, options: ButtonOptions]}
  *
  */
-function use(
-  player,
-  type,
-  desc = '',
-  { onSelect = setSelection, notSelected = {} } = {}
-) {
+function use(player, type, desc = '', { onSelect = setSelection, notSelected = {} } = {}) {
   const block = selectedBlocks[type][player.id]
 
   const callback = () => {
@@ -184,10 +165,7 @@ function use(
  * @returns {Promise<SelectedBlock>}
  */
 function selectBlockSource(player, back, currentSelection) {
-  const selectedBlocksSet =
-    currentSelection &&
-    'ref' in currentSelection &&
-    stringifyBlocksSetRef(currentSelection.ref)
+  const selectedBlocksSet = currentSelection && 'ref' in currentSelection && stringifyBlocksSetRef(currentSelection.ref)
 
   const selectedBlock =
     currentSelection &&
@@ -204,29 +182,20 @@ function selectBlockSource(player, back, currentSelection) {
     const base = new ActionForm('Выбери блок/набор блоков')
       .addButton(ActionForm.backText, back)
       .addButton(
-        selectedBlocksSet
-          ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}`
-          : 'Выбрать набор блоков',
+        selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков',
         () => {
           const blocksSets = getAllBlockSets(player.id)
-          const form = new ActionForm('Наборы блоков').addButton(
-            ActionForm.backText,
-            () => base.show(player)
-          )
+          const form = new ActionForm('Наборы блоков').addButton(ActionForm.backText, () => base.show(player))
 
           for (const blocksSet of Object.keys(blocksSets)) {
-            form.addButton(blocksSet, () =>
-              resolve({ ref: [player.id, blocksSet] })
-            )
+            form.addButton(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
           }
 
           form.show(player)
         }
       )
       .addButton(
-        selectedBlock
-          ? `§2Сменить выбранный блок: §f${selectedBlock}`
-          : 'Выбрать из инвентаря/под ногами',
+        selectedBlock ? `§2Сменить выбранный блок: §f${selectedBlock}` : 'Выбрать из инвентаря/под ногами',
         () => {
           const form = new ChestForm('large')
           const blockBelow = player.dimension.getBlock(player.location)?.below()
@@ -246,10 +215,7 @@ function selectBlockSource(player, back, currentSelection) {
               description: 'Нажми чтобы выбрать',
               callback: () =>
                 resolve({
-                  permutations: [
-                    blockBelow?.permutation ??
-                      BlockPermutation.resolve(MinecraftBlockTypes.Air),
-                  ],
+                  permutations: [blockBelow?.permutation ?? BlockPermutation.resolve(MinecraftBlockTypes.Air)],
                 }),
             },
           })
@@ -258,12 +224,7 @@ function selectBlockSource(player, back, currentSelection) {
           const blocks = []
           for (let i = 0; i < container.size; i++) {
             const item = container.getItem(i)
-            if (
-              !item ||
-              !BlockTypes.get(item.typeId) ||
-              blocks.includes(item.typeId)
-            )
-              continue
+            if (!item || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId)) continue
 
             const base = 9 * 1 // 1 row
 
@@ -285,19 +246,13 @@ function selectBlockSource(player, back, currentSelection) {
         }
       )
 
-    if (
-      currentSelection &&
-      'permutations' in currentSelection &&
-      currentSelection.permutations[0]
-    )
+    if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
       base.addButton('§2Редактировать свойства выбранного блока', async () => {
         const sel = currentSelection.permutations[0]
         currentSelection.permutations[0] = {
           typeId: sel instanceof BlockPermutation ? sel.type.id : sel.typeId,
-          states: await editBlockStates(
-            player,
-            sel instanceof BlockPermutation ? sel.getAllStates() : sel.states,
-            () => base.show(player)
+          states: await editBlockStates(player, sel instanceof BlockPermutation ? sel.getAllStates() : sel.states, () =>
+            base.show(player)
           ),
         }
 
@@ -326,21 +281,19 @@ function selectBlockSource(player, back, currentSelection) {
  * @param {(v: SelectedBlock) => void} resolve
  */
 function enterBlockId(player, resolve, error = '') {
-  new ModalForm('Введи айди блока')
-    .addTextField(error + 'ID блока', 'например, stone')
-    .show(player, (_, id) => {
-      let text = ''
-      if (
-        !blockIsAvaible(id, {
-          tell(m) {
-            text += m
-          },
-        })
-      )
-        return enterBlockId(player, resolve, text + '\n')
+  new ModalForm('Введи айди блока').addTextField(error + 'ID блока', 'например, stone').show(player, (_, id) => {
+    let text = ''
+    if (
+      !blockIsAvaible(id, {
+        tell(m) {
+          text += m
+        },
+      })
+    )
+      return enterBlockId(player, resolve, text + '\n')
 
-      resolve({ permutations: [BlockPermutation.resolve(id)] })
-    })
+    resolve({ permutations: [BlockPermutation.resolve(id)] })
+  })
 }
 
 const prefix = 'minecraft:'
@@ -366,11 +319,9 @@ function blockIsAvaible(block, player) {
     maxSuggestionsCount: 3,
   }
 
-  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue))
-    return false
+  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return false
 
-  const suggest = (/**@type {[string, number]}*/ a) =>
-    `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
+  const suggest = (/**@type {[string, number]}*/ a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
   let suggestion = '§cВы имели ввиду ' + suggest(search[0])
   const firstValue = search[0][1]
@@ -378,8 +329,7 @@ function blockIsAvaible(block, player) {
     .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
     .slice(1, options.maxSuggestionsCount)
 
-  for (const [i, e] of search.entries())
-    suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
+  for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
 
   player.tell(suggestion + '§c?')
   return false

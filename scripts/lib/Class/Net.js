@@ -23,12 +23,9 @@ export async function APIRequest(path, body) {
         .addHeader('content-length', sbody.length.toString())
         .setBody(sbody)
     )
-    const body = JSON.safeParse(response.body, void 0, err =>
-      console.warn('Error while parsing ', response.body, err)
-    )
+    const body = JSON.safeParse(response.body, void 0, err => console.warn('Error while parsing ', response.body, err))
 
-    if (!body || body.status === 404)
-      throw new Error(body?.message ?? 'Got unexpected body: ' + response.body)
+    if (!body || body.status === 404) throw new Error(body?.message ?? 'Got unexpected body: ' + response.body)
 
     return body
   } else console.error('NET MODULE ARE DISABLED, ABORTING')

@@ -4,8 +4,7 @@ import { PLAYER_DB } from 'smapi.js'
 system.afterEvents.scriptEventReceive.subscribe(event => {
   if (event.id === 'ROLE:ADMIN') {
     const player = Player.fetch(event.message)
-    if (!player)
-      return console.warn('(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND')
+    if (!player) return console.warn('(SCRIPTEVENT::ROLE:ADMIN) PLAYER NOT FOUND')
 
     setRole(player, 'admin')
     console.warn('(SCRIPTEVENT::ROLE:ADMIN) ROLE HAS BEEN SET')

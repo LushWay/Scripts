@@ -48,9 +48,7 @@ export function commandNotFound(player, command) {
 
   const cmds = new Set()
 
-  for (const c of Command.commands.filter(
-    e => e.sys.data.requires && e.sys.data.requires(player)
-  )) {
+  for (const c of Command.commands.filter(e => e.sys.data.requires && e.sys.data.requires(player))) {
     cmds.add(c.sys.data.name)
     if (c.sys.data.aliases && c.sys.data.aliases?.length > 0) {
       c.sys.data.aliases.forEach(e => cmds.add(e))
@@ -64,11 +62,9 @@ export function commandNotFound(player, command) {
     maxSuggestionsCount: 3,
   }
 
-  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue))
-    return
+  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return
 
-  const suggest = (/** @type {[string, number]} */ a) =>
-    `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
+  const suggest = (/** @type {[string, number]} */ a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
   let suggestion = '§cВы имели ввиду ' + suggest(search[0])
   const firstValue = search[0][1]
@@ -76,8 +72,7 @@ export function commandNotFound(player, command) {
     .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
     .slice(1, options.maxSuggestionsCount)
 
-  for (const [i, e] of search.entries())
-    suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
+  for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
 
   player.tell(suggestion + '§c?')
 }
@@ -118,9 +113,7 @@ export function commandSyntaxFail(player, command, args, i) {
       {
         translate: `commands.generic.syntax`,
         with: [
-          `${CONFIG.commandPrefix}${command.sys.data.name} ${args
-            .slice(0, i)
-            .join(' ')}`,
+          `${CONFIG.commandPrefix}${command.sys.data.name} ${args.slice(0, i).join(' ')}`,
           args[i] ?? ' ',
           args.slice(i + 1).join(' '),
         ],
@@ -139,8 +132,7 @@ export function commandSyntaxFail(player, command, args, i) {
 export function parseLocationArguments([x, y, z], data) {
   const { location } = data
   const viewVector = data.getViewDirection()
-  if (typeof x !== 'string' || typeof y !== 'string' || typeof z !== 'string')
-    return null
+  if (typeof x !== 'string' || typeof y !== 'string' || typeof z !== 'string') return null
 
   const locations = [location.x, location.y, location.z]
   const viewVectors = [viewVector.x, viewVector.y, viewVector.z]
@@ -174,25 +166,17 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
     if (arg.sys.type.name.endsWith('*')) continue
     if (arg.sys.type instanceof LocationArgumentType) {
       argsToReturn.push(
-        parseLocationArguments(
-          [cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]],
-          event.sender
-        ) ?? event.sender.location
+        parseLocationArguments([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender) ?? event.sender.location
       )
       continue
     }
     if (arg.sys.type instanceof LiteralArgumentType) continue
     argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
   }
-  if (typeof lastArg.sys.callback !== 'function')
-    return event.sender.tell('§6⚠ Упс, эта команда пока не работает.')
+  if (typeof lastArg.sys.callback !== 'function') return event.sender.tell('§6⚠ Упс, эта команда пока не работает.')
 
   util.catch(
-    () =>
-      lastArg.sys.callback(
-        new CommandContext(event, cmdArgs, baseCommand, rawInput),
-        ...argsToReturn
-      ),
+    () => lastArg.sys.callback(new CommandContext(event, cmdArgs, baseCommand, rawInput), ...argsToReturn),
     'Command'
   )
 }

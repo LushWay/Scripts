@@ -11,8 +11,7 @@ OverTakes(World.prototype, {
       return send(message)
     }
 
-    if (typeof message === 'string' && !message.startsWith('§9'))
-      message = '§9│ ' + message.replace(/\n/g, '\n§9│ §r')
+    if (typeof message === 'string' && !message.startsWith('§9')) message = '§9│ ' + message.replace(/\n/g, '\n§9│ §r')
 
     send(message)
   },
@@ -20,13 +19,7 @@ OverTakes(World.prototype, {
   nether: world.getDimension(MinecraftDimensionTypes.nether),
   end: world.getDimension(MinecraftDimensionTypes.theEnd),
   debug(...data) {
-    this.say(
-      data
-        .map((/**@type {*}*/ e) =>
-          typeof e === 'string' ? e : util.inspect(e)
-        )
-        .join(' ')
-    )
+    this.say(data.map((/**@type {*}*/ e) => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
   },
   logOnce(name, ...data) {
     if (LOGS.has(name)) return

@@ -53,13 +53,7 @@ export class Portal {
    * @param {boolean} [o.createCommand]
    * @param {string} [o.commandDescription]
    */
-  constructor(
-    name,
-    from,
-    to,
-    place,
-    { aliases = [], createCommand = true, commandDescription } = {}
-  ) {
+  constructor(name, from, to, place, { aliases = [], createCommand = true, commandDescription } = {}) {
     this.from = from
     this.to = to
     if (typeof place === 'function') {

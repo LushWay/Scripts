@@ -1,9 +1,5 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
-import {
-  MinecraftBlockTypes,
-  MinecraftEntityTypes,
-  MinecraftItemTypes,
-} from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { GAME_UTILS } from 'smapi.js'
 /** @type {Record<string, { date: number, entity: Entity }>} */
 const SPAWNED_FIREWORKS = {}
@@ -20,10 +16,7 @@ world.afterEvents.itemUse.subscribe(data => {
   if (!(data.source instanceof Player)) return
 
   for (const [id, { date, entity }] of Object.entries(SPAWNED_FIREWORKS)) {
-    if (
-      Date.now() - date < 5 &&
-      Vector.distance(data.source.location, entity.location) < 2
-    ) {
+    if (Date.now() - date < 5 && Vector.distance(data.source.location, entity.location) < 2) {
       delete SPAWNED_FIREWORKS[id]
       FIREWORKS[id] = { source: data.source, firework: entity }
       break
@@ -48,9 +41,7 @@ system.runInterval(
         continue
       }
 
-      const block = firework.dimension.getBlock(
-        Vector.add(location, Vector.multiply(firework.getViewDirection(), 1.2))
-      )
+      const block = firework.dimension.getBlock(Vector.add(location, Vector.multiply(firework.getViewDirection(), 1.2)))
 
       if (block && !block.isAir) {
         firework.dimension.createExplosion(location, 0.8 * 2, {
@@ -73,10 +64,7 @@ world.beforeEvents.itemUse.subscribe(data => {
   system.delay(() => {
     if (!(data.source instanceof Player)) return
 
-    const tnt = data.source.dimension.spawnEntity(
-      MinecraftEntityTypes.Tnt,
-      data.source.location
-    )
+    const tnt = data.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, data.source.location)
     const tntSlot = data.source.mainhand()
 
     if (tntSlot.amount === 1) tntSlot.setItem(undefined)

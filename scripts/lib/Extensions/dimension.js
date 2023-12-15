@@ -4,11 +4,7 @@ import { OverTakes } from './import.js'
 
 OverTakes(Dimension.prototype, {
   get type() {
-    return this.id === 'minecraft:overworld'
-      ? 'overworld'
-      : this.id === 'minecraft:nether'
-      ? 'nether'
-      : 'end'
+    return this.id === 'minecraft:overworld' ? 'overworld' : this.id === 'minecraft:nether' ? 'nether' : 'end'
   },
   runCommand(command, options = {}) {
     try {

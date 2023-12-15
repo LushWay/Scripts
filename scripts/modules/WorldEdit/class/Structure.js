@@ -28,9 +28,7 @@ export class Structure {
   }
 
   save() {
-    const regions = new Cuboid(this.pos1, this.pos2).split(
-      WE_CONFIG.STRUCTURE_CHUNK_SIZE
-    )
+    const regions = new Cuboid(this.pos1, this.pos2).split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
 
     let errors = 0
     let all = 0

@@ -17,11 +17,7 @@ const wand = new WorldEditTool({
       const selection = !!we.selectionCuboid
       return (
         this.getMenuButtonNameColor(player) +
-        (tool
-          ? selection
-            ? 'Действия с областью'
-            : '§cЗона не выделена!'
-          : 'Получить топор')
+        (tool ? (selection ? 'Действия с областью' : '§cЗона не выделена!') : 'Получить топор')
       )
     },
   },
@@ -36,21 +32,12 @@ const wand = new WorldEditTool({
 })
 
 world.beforeEvents.itemUseOn.subscribe(event => {
-  if (
-    event.itemStack.typeId !== wand.itemId ||
-    !(event.source instanceof Player)
-  )
-    return
+  if (event.itemStack.typeId !== wand.itemId || !(event.source instanceof Player)) return
 
   const we = WorldEdit.forPlayer(event.source)
   const blockLocation = event.block
   const pos = we.pos2 ?? { x: 0, y: 0, z: 0 }
-  if (
-    pos.x === blockLocation.x &&
-    pos.y === blockLocation.y &&
-    pos.z === blockLocation.z
-  )
-    return
+  if (pos.x === blockLocation.x && pos.y === blockLocation.y && pos.z === blockLocation.z) return
   we.pos2 = blockLocation
   event.source.tell(
     `§d►2◄§f (use) ${Vector.string(we.pos2)}` //§r
@@ -63,12 +50,7 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
 
   const we = WorldEdit.forPlayer(event.player)
   const pos = we.pos1 ?? { x: 0, y: 0, z: 0 }
-  if (
-    pos.x === event.block.location.x &&
-    pos.y === event.block.location.y &&
-    pos.z === event.block.location.z
-  )
-    return
+  if (pos.x === event.block.location.x && pos.y === event.block.location.y && pos.z === event.block.location.z) return
 
   we.pos1 = event.block.location
   system.delay(() => {

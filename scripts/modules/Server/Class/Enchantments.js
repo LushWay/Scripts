@@ -24,16 +24,9 @@ export class Enchantments {
 }
 
 function load() {
-  const status = world.overworld.runCommand(
-    'structure load CustomEnchantments ' + Vector.string(LOCATION)
-  )
+  const status = world.overworld.runCommand('structure load CustomEnchantments ' + Vector.string(LOCATION))
 
-  if (!status)
-    return util.error(
-      new Error(
-        'Unable to load CustomEnchantments structure. Status: §6' + status
-      )
-    )
+  if (!status) return util.error(new Error('Unable to load CustomEnchantments structure. Status: §6' + status))
 
   const entities = world.overworld.getEntities({
     type: DB.ENTITY_IDENTIFIER,
@@ -43,8 +36,7 @@ function load() {
 
   const entity = entities[0]
 
-  if (!entity)
-    return util.error(new Error('Unable to find CustomEnchantments entity'))
+  if (!entity) return util.error(new Error('Unable to find CustomEnchantments entity'))
 
   const inventory = entity.getComponent('inventory')
   const { container } = inventory
@@ -56,12 +48,7 @@ function load() {
     const enchantments = item.getComponent('enchantments')
     if (!enchantments?.enchantments)
       return util.error(
-        new Error(
-          'Found unexpected enchantment type on slot ' +
-            i +
-            '. Enchantments: ' +
-            util.inspect(enchantments)
-        )
+        new Error('Found unexpected enchantment type on slot ' + i + '. Enchantments: ' + util.inspect(enchantments))
       )
 
     for (const enchantment of enchantments.enchantments) {

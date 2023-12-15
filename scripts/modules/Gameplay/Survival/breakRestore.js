@@ -1,28 +1,17 @@
-import {
-  BlockPermutation,
-  LocationInUnloadedChunkError,
-  system,
-  world,
-} from '@minecraft/server'
+import { BlockPermutation, LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { MineshaftRegion } from 'modules/Region/Region.js'
 import { util } from 'smapi.js'
 
-export const DELAYED_BLOCK_PLACE_DB = new DynamicPropertyDB(
-  'delayedBlockPlace',
-  {
-    /**
-     * @type {Record<string, {typeId: string, states?: Record<string, string | number | boolean>, date: number}>}
-     */
-    type: {},
-  }
-).proxy()
+export const DELAYED_BLOCK_PLACE_DB = new DynamicPropertyDB('delayedBlockPlace', {
+  /**
+   * @type {Record<string, {typeId: string, states?: Record<string, string | number | boolean>, date: number}>}
+   */
+  type: {},
+}).proxy()
 
 world.beforeEvents.playerBreakBlock.subscribe(event => {
-  const mineshaftRegion = MineshaftRegion.locationInRegion(
-    event.block,
-    event.dimension.type
-  )
+  const mineshaftRegion = MineshaftRegion.locationInRegion(event.block, event.dimension.type)
   if (mineshaftRegion) {
     // TODO Add to break db to restore later
   }
@@ -47,9 +36,7 @@ system.runInterval(
           z: xyzN[2],
         })
 
-        block?.setPermutation(
-          BlockPermutation.resolve(data.typeId, data.states)
-        )
+        block?.setPermutation(BlockPermutation.resolve(data.typeId, data.states))
         end()
       } catch (e) {
         if (e instanceof LocationInUnloadedChunkError) continue

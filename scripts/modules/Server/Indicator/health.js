@@ -23,11 +23,7 @@ getIndicators().forEach(e => e.remove())
 world.afterEvents.entityHurt.subscribe(data => {
   const id = GAME_UTILS.safeGet(data.hurtEntity, 'id')
   if (!id || SYSTEM_ENTITIES.includes(id)) return
-  if (
-    !data.hurtEntity.isValid() ||
-    !data.hurtEntity.matches({ families: ALLOWED_FAMILIES })
-  )
-    return
+  if (!data.hurtEntity.isValid() || !data.hurtEntity.matches({ families: ALLOWED_FAMILIES })) return
 
   const hp = data.hurtEntity.getComponent('health')
   if (!hp || !hp.currentValue) return
@@ -37,10 +33,7 @@ world.afterEvents.entityHurt.subscribe(data => {
   HURT_ENTITIES[data.hurtEntity.id].damage += data.damage
   indicator.nameTag = getName(data.hurtEntity, hp)
 
-  if (!entityNameTag)
-    indicator.teleport(
-      Vector.add(data.hurtEntity.getHeadLocation(), { x: 0, y: 1, z: 0 })
-    )
+  if (!entityNameTag) indicator.teleport(Vector.add(data.hurtEntity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
 })
 
 world.afterEvents.entityDie.subscribe(data => {
@@ -74,10 +67,7 @@ system.runInterval(
       const { indicator, entityNameTag } = getIndicator(entity)
 
       indicator.nameTag = getName(entity)
-      if (!entityNameTag)
-        indicator.teleport(
-          Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 })
-        )
+      if (!entityNameTag) indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
     }
   },
   'hurt indicator',
@@ -174,10 +164,7 @@ function getIndicator(entity, damage = 0) {
  * @param {Entity} entity
  */
 function createIndicator(entity) {
-  const indicator = entity.dimension.spawnEntity(
-    'f:t',
-    entity.getHeadLocation()
-  )
+  const indicator = entity.dimension.spawnEntity('f:t', entity.getHeadLocation())
 
   indicator.nameTag = 'Loading...'
   indicator.addTag(INDICATOR_TAG)

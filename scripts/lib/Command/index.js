@@ -13,13 +13,7 @@ import {
 import { CmdLet } from './Cmdlet.js'
 import { CommandContext } from './Context.js'
 import './index.js'
-import {
-  commandNotFound,
-  commandSyntaxFail,
-  noPerm,
-  parseChatArguments,
-  sendCallback,
-} from './utils.js'
+import { commandNotFound, commandSyntaxFail, noPerm, parseChatArguments, sendCallback } from './utils.js'
 
 /**
  * @typedef {import("./types.js").ICommandData} ICommandData
@@ -33,30 +27,17 @@ export class Command {
    * @param {ChatSendAfterEvent} data
    */
   static chatListener(data) {
-    if (
-      !data.message.startsWith(CONFIG.commandPrefix) ||
-      data.message === CONFIG.commandPrefix
-    )
-      return // This is not a command
+    if (!data.message.startsWith(CONFIG.commandPrefix) || data.message === CONFIG.commandPrefix) return // This is not a command
 
-    const [cmd, ...args] = parseChatArguments(
-      data.message,
-      CONFIG.commandPrefix
-    )
-    const command = Command.commands.find(
-      c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd)
-    )
+    const [cmd, ...args] = parseChatArguments(data.message, CONFIG.commandPrefix)
+    const command = Command.commands.find(c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd))
     if (!command) return commandNotFound(data.sender, cmd)
-    if (!command.sys.data?.requires(data.sender))
-      return noPerm(data.sender, command)
+    if (!command.sys.data?.requires(data.sender)) return noPerm(data.sender, command)
 
     /**
      * Part after command (-help <rawInput>). Usefull for setters or any other stuff
      */
-    const rawInput = data.message.replace(
-      new RegExp(`^${CONFIG.commandPrefix}${cmd}\\s`),
-      ''
-    )
+    const rawInput = data.message.replace(new RegExp(`^${CONFIG.commandPrefix}${cmd}\\s`), '')
     if (CmdLet.workWithCmdlets(data, args, command, rawInput) === 'stop') return
 
     /**
@@ -74,15 +55,11 @@ export class Command {
       if (!command) return 'fail'
       if (start.sys.children.length > 0) {
         const arg = start.sys.children.find(
-          v =>
-            v.sys.type.matches(args[i]).success ||
-            (!args[i] && v.sys.type.optional)
+          v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional)
         )
         if (!arg && !args[i] && start.sys.callback) return 'success'
-        if (!arg)
-          return commandSyntaxFail(data.sender, command, args, i), 'fail'
-        if (!arg.sys.data?.requires(data.sender))
-          return noPerm(data.sender, arg), 'fail'
+        if (!arg) return commandSyntaxFail(data.sender, command, args, i), 'fail'
+        if (!arg.sys.data?.requires(data.sender)) return noPerm(data.sender, arg), 'fail'
         verifiedCommands.push(arg)
         return getArg(arg, i + 1)
       }
@@ -199,9 +176,7 @@ export class Command {
   location(name, optional = false) {
     const cmd = this.argument(new LocationArgumentType(name, optional))
     if (!name.endsWith('*')) {
-      const newArg = cmd
-        .location(name + '_y*', optional)
-        .location(name + '_z*', optional)
+      const newArg = cmd.location(name + '_y*', optional).location(name + '_z*', optional)
       // @ts-expect-error This mistype
       return newArg
     }
@@ -213,12 +188,7 @@ export class Command {
    * @returns {Command<Callback>} new branch to this command
    */
   literal(data, optional = false) {
-    const cmd = new Command(
-      data,
-      new LiteralArgumentType(data.name, optional),
-      this.sys.depth + 1,
-      this
-    )
+    const cmd = new Command(data, new LiteralArgumentType(data.name, optional), this.sys.depth + 1, this)
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd

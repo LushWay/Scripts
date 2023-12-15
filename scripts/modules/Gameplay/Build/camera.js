@@ -1,10 +1,7 @@
 import { EasingType, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, ModalForm, util } from 'smapi.js'
-import {
-  parseChatArguments,
-  parseLocationArguments,
-} from '../../../lib/Command/utils.js'
+import { parseChatArguments, parseLocationArguments } from '../../../lib/Command/utils.js'
 
 /**
  * @typedef {"spinAroundPos"} CameraDBModes
@@ -30,19 +27,13 @@ function setupCameraForm(player, target) {
   const data = target.database
 
   new ModalForm('§3Настройки камеры §f' + target.name)
-    .addDropdownFromObject(
-      'Тип',
-      Object.fromEntries(CAMERA.TYPES.map(e => [e, e]))
-    )
+    .addDropdownFromObject('Тип', Object.fromEntries(CAMERA.TYPES.map(e => [e, e])))
     .addDropdownFromObject('Переход', EasingType, {
       defaultValue: EasingType.Linear,
     })
     .addSlider('Длительность движения в секундах', 0, 100, 1, 1)
     .addTextField('Координаты центральной позиция (~ разрешены)', '0 ~1 0')
-    .addTextField(
-      'Позиция куда камера будет повернута (либо игрок в меню ниже)',
-      '0 ~1 0'
-    )
+    .addTextField('Позиция куда камера будет повернута (либо игрок в меню ниже)', '0 ~1 0')
     .addDropdownFromObject(
       'Игрок к которому камера будет повернута (либо позиция в меню выше)',
       Object.fromEntries(world.getAllPlayers().map(e => [e.name, e.name])),
@@ -50,65 +41,37 @@ function setupCameraForm(player, target) {
     )
     .addDropdownFromObject('Режим камеры', CAMERA.MODES)
     .addSlider('Радиус при прокрутке вокруг позиции', 0, 100)
-    .show(
-      target,
-      (
-        ctx,
-        type,
-        ease,
-        easeTime,
-        rawPos,
-        facingPosRaw,
-        facingPlayer,
-        mode,
-        spinRadius
-      ) => {
-        const rawPosArray = parseChatArguments(rawPos, '')
-        const pos = parseLocationArguments(
-          [rawPosArray[0], rawPosArray[1], rawPosArray[2]],
-          player
-        )
+    .show(target, (ctx, type, ease, easeTime, rawPos, facingPosRaw, facingPlayer, mode, spinRadius) => {
+      const rawPosArray = parseChatArguments(rawPos, '')
+      const pos = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
 
-        if (!pos)
-          return ctx.error(
-            'Неправильныe координаты центральной позиции камеры: ' +
-              util.inspect(rawPosArray)
-          )
+      if (!pos) return ctx.error('Неправильныe координаты центральной позиции камеры: ' + util.inspect(rawPosArray))
 
-        let facing
-        if (facingPosRaw) {
-          const rawPosArray = parseChatArguments(facingPosRaw, '')
-          facing = parseLocationArguments(
-            [rawPosArray[0], rawPosArray[1], rawPosArray[2]],
-            player
-          )
-        } else if (
-          facingPlayer &&
-          facingPlayer !== ModalForm.arrayDefaultNone
-        ) {
-          facing = facingPlayer
-        }
-
-        if (!facing)
-          return ctx.error('Не указана ни одна позиция для наблюдения камерой')
-
-        if (!mode)
-          return ctx.error('Неизвестный режим камеры ' + util.inspect(mode))
-
-        data.camera = {
-          type,
-          ease: EasingType[ease],
-          easeTime,
-          pos,
-          facing,
-          mode,
-          spinRadius,
-        }
-
-        createCameraInteval(target)
-        player.tell('§3§l> §rСохранено!')
+      let facing
+      if (facingPosRaw) {
+        const rawPosArray = parseChatArguments(facingPosRaw, '')
+        facing = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
+      } else if (facingPlayer && facingPlayer !== ModalForm.arrayDefaultNone) {
+        facing = facingPlayer
       }
-    )
+
+      if (!facing) return ctx.error('Не указана ни одна позиция для наблюдения камерой')
+
+      if (!mode) return ctx.error('Неизвестный режим камеры ' + util.inspect(mode))
+
+      data.camera = {
+        type,
+        ease: EasingType[ease],
+        easeTime,
+        pos,
+        facing,
+        mode,
+        spinRadius,
+      }
+
+      createCameraInteval(target)
+      player.tell('§3§l> §rСохранено!')
+    })
 }
 
 /**
@@ -149,12 +112,10 @@ function createCameraInteval(player) {
 
           data.camera.modeStep = step
 
-          const command = `camera @s set ${data.camera.type} ease ${
-            data.camera.easeTime
-          } ${data.camera.ease} pos ${Vector.string(posTo)} facing ${
-            typeof data.camera.facing === 'string'
-              ? data.camera.facing
-              : Vector.string(data.camera.facing)
+          const command = `camera @s set ${data.camera.type} ease ${data.camera.easeTime} ${
+            data.camera.ease
+          } pos ${Vector.string(posTo)} facing ${
+            typeof data.camera.facing === 'string' ? data.camera.facing : Vector.string(data.camera.facing)
           }`
           console.log(command)
           player.runCommand(command)
@@ -173,9 +134,7 @@ function createCameraInteval(player) {
 }
 
 for (const player of world.getAllPlayers()) createCameraInteval(player)
-world.afterEvents.playerSpawn.subscribe(({ player }) =>
-  createCameraInteval(player)
-)
+world.afterEvents.playerSpawn.subscribe(({ player }) => createCameraInteval(player))
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   if (playerId in intervales) {
     system.clearRun(intervales[playerId])

@@ -109,10 +109,7 @@ export class Boss {
   spawnEntity() {
     const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
     console.debug(`Boss(${this.name}).spawnEntity(${entityTypeId})`)
-    this.entity = world[this.dimensionId].spawnEntity(
-      entityTypeId,
-      this.location
-    )
+    this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
     BOSS_DB[this.name] = {
       id: this.entity.id,
       date: Date.now(),

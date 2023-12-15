@@ -1,9 +1,4 @@
-import {
-  BlockPermutation,
-  BlockStates,
-  BlockTypes,
-  Player,
-} from '@minecraft/server'
+import { BlockPermutation, BlockStates, BlockTypes, Player } from '@minecraft/server'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
 import {
@@ -13,14 +8,7 @@ import {
   getOtherPlayersBlockSets,
   setBlockSet,
 } from 'modules/WorldEdit/utils/blocksSet.js'
-import {
-  ActionForm,
-  BUTTON,
-  FormCallback,
-  GAME_UTILS,
-  ModalForm,
-  util,
-} from 'smapi.js'
+import { ActionForm, BUTTON, FormCallback, GAME_UTILS, ModalForm, util } from 'smapi.js'
 import { WorldEditTool } from './class/Tool.js'
 
 /**
@@ -32,10 +20,7 @@ export function WEMenu(player, body = '') {
     body = `Создание доступно только при пустой руке.` || body
   }
 
-  const form = new ActionForm('§dWorld§6Edit', body).addButton(
-    'Наборы блоков',
-    () => WEBlocksSets(player)
-  )
+  const form = new ActionForm('§dWorld§6Edit', body).addButton('Наборы блоков', () => WEBlocksSets(player))
 
   for (const tool of WorldEditTool.tools) {
     const buttonName = tool.getMenuButtonName(player)
@@ -68,14 +53,10 @@ function WEBlocksSets(player) {
     })
   })
 
-  sets.addButton('§3Наборы других игроков...', () =>
-    otherPlayersBlockSets(player, () => WEBlocksSets(player))
-  )
+  sets.addButton('§3Наборы других игроков...', () => otherPlayersBlockSets(player, () => WEBlocksSets(player)))
 
   for (const setName of Object.keys(blockSets)) {
-    const shared = Object.values(DEFAULT_BLOCK_SETS).find(
-      e => blockSets[setName] === e
-    )
+    const shared = Object.values(DEFAULT_BLOCK_SETS).find(e => blockSets[setName] === e)
     sets.addButton(setName, () =>
       editBlocksSet({
         player,
@@ -109,15 +90,12 @@ function manageBlockSet({
 }) {
   new ModalForm(action)
     .addTextField(
-      `Существующие наборы:\n${Object.keys(blockSets).join(
-        '\n'
-      )}\n\nИмя набора:`,
+      `Существующие наборы:\n${Object.keys(blockSets).join('\n')}\n\nИмя набора:`,
       'Действие будет отменено.',
       setName
     )
     .show(player, (ctx, name) => {
-      if (name in blockSets)
-        return ctx.error('Набор с именем ' + name + ' уже существует!')
+      if (name in blockSets) return ctx.error('Набор с именем ' + name + ' уже существует!')
 
       if (!name || name === setName) return onFail()
       if (deletePrevious && setName) setBlockSet(player.id, setName, undefined)
@@ -139,15 +117,11 @@ function otherPlayersBlockSets(player, onBack) {
   const form = new ActionForm('§3Наборы блоков других игроков')
   form.addButton(ActionForm.backText, onBack)
 
-  for (const [otherPlayerId, blockSets] of getOtherPlayersBlockSets(
-    player.id
-  )) {
+  for (const [otherPlayerId, blockSets] of getOtherPlayersBlockSets(player.id)) {
     const name = Player.name(otherPlayerId) ?? otherPlayerId
 
     form.addButton(name, () => {
-      playerBlockSet(player, otherPlayerId, blockSets, () =>
-        otherPlayersBlockSets(player, onBack)
-      )
+      playerBlockSet(player, otherPlayerId, blockSets, () => otherPlayersBlockSets(player, onBack))
     })
   }
   form.show(player)
@@ -235,8 +209,7 @@ function editBlocksSet(o) {
       'A': {
         icon: 'textures/ui/copy',
         nameTag: 'Копировать набор',
-        description:
-          'Нажмите чтобы скопировать набор в свой список наборов. Вы сможете редактировать его.',
+        description: 'Нажмите чтобы скопировать набор в свой список наборов. Вы сможете редактировать его.',
         callback() {
           const newName = setName.replace(SHARED_POSTFIX, '')
           setBlockSet(player.id, newName, set)
@@ -297,12 +270,8 @@ function editBlocksSet(o) {
             },
           },
       'S': {
-        icon: editStates
-          ? 'textures/ui/book_metatag_pressed'
-          : 'textures/ui/book_metatag_default',
-        nameTag: editStates
-          ? 'Вернутьс в режим добавления блоков'
-          : 'Вернуться в режим редактирования типов блоков',
+        icon: editStates ? 'textures/ui/book_metatag_pressed' : 'textures/ui/book_metatag_default',
+        nameTag: editStates ? 'Вернутьс в режим добавления блоков' : 'Вернуться в режим редактирования типов блоков',
         description: 'Нажмите чтобы переключить',
         callback() {
           editBlocksSet({ ...o, editStates: !editStates })
@@ -366,21 +335,9 @@ function editBlocksSet(o) {
         description:
           'Блок под ногами и блок на который вы смотрите. Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.',
       },
-      'B': blockBelow
-        ? addBlock(
-            0,
-            blockBelow.typeId,
-            blockBelow.permutation.getAllStates(),
-            false
-          ) ?? empty
-        : empty,
+      'B': blockBelow ? addBlock(0, blockBelow.typeId, blockBelow.permutation.getAllStates(), false) ?? empty : empty,
       'Y': blockOnView
-        ? addBlock(
-            0,
-            blockOnView.typeId,
-            blockOnView.permutation.getAllStates(),
-            false
-          ) ?? empty
+        ? addBlock(0, blockOnView.typeId, blockOnView.permutation.getAllStates(), false) ?? empty
         : empty,
     }
   )
@@ -396,9 +353,7 @@ function editBlocksSet(o) {
     if (states && Object.keys(states).length < 1) states = undefined
 
     // If block is already in blocksSet
-    const blockInSet = set.find(
-      ([t, s]) => t === typeId && JSON.stringify(s) === JSON.stringify(states)
-    )
+    const blockInSet = set.find(([t, s]) => t === typeId && JSON.stringify(s) === JSON.stringify(states))
 
     // Amount of block in blocksSet
     const amount = blockInSet?.[2] ?? 0
@@ -455,11 +410,7 @@ function editBlocksSet(o) {
               'Невозможно редактировать свойства блока, не находящегося в наборе. Добавьте его в набор.'
             )
 
-          blockInSet[1] = await editBlockStates(
-            player,
-            blockInSet[1] ?? {},
-            () => editBlocksSet(o)
-          )
+          blockInSet[1] = await editBlockStates(player, blockInSet[1] ?? {}, () => editBlocksSet(o))
         }
 
         // Save changes
@@ -487,12 +438,7 @@ function editBlocksSet(o) {
     const blocks = []
     for (let i = 0; i < container.size; i++) {
       const item = container.getItem(i)
-      if (
-        !item ||
-        set.find(e => e[0] === item.typeId) ||
-        !BlockTypes.get(item.typeId) ||
-        blocks.includes(item.typeId)
-      )
+      if (!item || set.find(e => e[0] === item.typeId) || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId))
         continue
 
       const base = 9 * 4 // 4 row
@@ -539,10 +485,7 @@ export function editBlockStates(player, states, back, edited = false) {
           stateDef.validValues[0] === stateValue ? '§8По умолчанию' : ''
         }`,
         () => {
-          const editStateForm = new ActionForm(
-            stateName,
-            `Значение сейчас: ${util.stringify(stateValue)}`
-          )
+          const editStateForm = new ActionForm(stateName, `Значение сейчас: ${util.stringify(stateValue)}`)
 
           editStateForm.addButton(ActionForm.backText, () => form.show(player))
 
@@ -552,17 +495,8 @@ export function editBlockStates(player, states, back, edited = false) {
           })
 
           for (const value of stateDef.validValues) {
-            editStateForm.addButton(
-              `${value === stateValue ? '> ' : ''}${util.stringify(value)}`,
-              () =>
-                resolve(
-                  editBlockStates(
-                    player,
-                    { ...states, [stateName]: value },
-                    back,
-                    edited
-                  )
-                )
+            editStateForm.addButton(`${value === stateValue ? '> ' : ''}${util.stringify(value)}`, () =>
+              resolve(editBlockStates(player, { ...states, [stateName]: value }, back, edited))
             )
           }
 
@@ -585,7 +519,5 @@ export function editBlockStates(player, states, back, edited = false) {
  * @param {ReplaceTarget | BlockPermutation} target
  */
 export function toPermutation(target) {
-  return target instanceof BlockPermutation
-    ? target
-    : BlockPermutation.resolve(target.typeId, target.states)
+  return target instanceof BlockPermutation ? target : BlockPermutation.resolve(target.typeId, target.states)
 }

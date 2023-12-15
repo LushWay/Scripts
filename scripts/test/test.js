@@ -1,14 +1,5 @@
-import {
-  ItemStack,
-  MolangVariableMap,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
-import {
-  MinecraftBlockTypes,
-  MinecraftItemTypes,
-} from '@minecraft/vanilla-data.js'
+import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import 'lib/Class/Net.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
@@ -175,15 +166,8 @@ const tests = {
     const texture = ctx.sender.getProperty('sm:marker.texture')
 
     if (typeof enabled !== 'boolean') return ctx.error('enabled ' + enabled)
-    if (
-      typeof x !== 'number' ||
-      typeof y !== 'number' ||
-      typeof scale !== 'number' ||
-      typeof texture !== 'number'
-    )
-      return ctx.error(
-        'Not a number:§r\n' + util.inspect({ x, y, scale, texture })
-      )
+    if (typeof x !== 'number' || typeof y !== 'number' || typeof scale !== 'number' || typeof texture !== 'number')
+      return ctx.error('Not a number:§r\n' + util.inspect({ x, y, scale, texture }))
 
     const player = ctx.sender
     new ModalForm('Marker settings')
@@ -252,9 +236,7 @@ const tests = {
     const orePositions = generateOre(ctx.sender.location, rad, rad2)
 
     for (const position of orePositions) {
-      ctx.sender.dimension
-        .getBlock(position)
-        ?.setType(MinecraftBlockTypes.Stone)
+      ctx.sender.dimension.getBlock(position)?.setType(MinecraftBlockTypes.Stone)
     }
   },
   52(ctx) {

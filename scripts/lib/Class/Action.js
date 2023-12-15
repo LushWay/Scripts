@@ -67,8 +67,7 @@ export class LockAction {
       if (accept && !accept.includes(lock)) continue
       const isLocked = lock.isLocked(player)
       if (isLocked) {
-        const text =
-          typeof isLocked === 'object' ? isLocked.lockText : lock.lockText
+        const text = typeof isLocked === 'object' ? isLocked.lockText : lock.lockText
         if (tell && player.isValid()) {
           player.playSound(SOUNDS.fail)
           player.tell('§l§f>§r §c' + text)

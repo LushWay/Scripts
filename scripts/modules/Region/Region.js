@@ -71,8 +71,7 @@ export class Region {
       return Region.permissions
     },
     set permissions(update) {
-      if (this.SETTED)
-        throw new ReferenceError('Already set Region.CONFIG.PERMISSIONS.')
+      if (this.SETTED) throw new ReferenceError('Already set Region.CONFIG.PERMISSIONS.')
 
       Region.permissions = update
       this.SETTED = true
@@ -87,9 +86,7 @@ export class Region {
             })
           )
         else {
-          const RadiusRegionSubtype =
-            RadiusRegionSubTypes.find(e => e.prototype.subtype === region.st) ??
-            RadiusRegion
+          const RadiusRegionSubtype = RadiusRegionSubTypes.find(e => e.prototype.subtype === region.st) ?? RadiusRegion
 
           Region.regions.push(
             new RadiusRegionSubtype({
@@ -116,11 +113,7 @@ export class Region {
    * @returns {CubeRegion | RadiusRegion | undefined}
    */
   static locationInRegion(blockLocation, dimensionId) {
-    return this.regions.find(
-      region =>
-        region.dimensionId === dimensionId &&
-        region.vectorInRegion(blockLocation)
-    )
+    return this.regions.find(region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation))
   }
   /** @type {Dimensions} */
   dimensionId
@@ -222,9 +215,7 @@ export class Region {
       if (player) onlineOwners.push(player)
     }
     onlineOwners.forEach(
-      (player, i, owners) =>
-        player &&
-        util.catch(() => callback(player, i, owners), 'Region.forEachOwner')
+      (player, i, owners) => player && util.catch(() => callback(player, i, owners), 'Region.forEachOwner')
     )
   }
 }
@@ -245,9 +236,7 @@ export class CubeRegion extends Region {
    */
   static blockLocationInRegion(blockLocation, dimensionId) {
     const region = this.regions.find(
-      region =>
-        region.dimensionId === dimensionId &&
-        region.vectorInRegion(blockLocation)
+      region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation)
     )
 
     if (region instanceof CubeRegion) return region
@@ -301,10 +290,7 @@ export class RadiusRegion extends Region {
    * @param {ConstructorParameters<typeof RadiusRegion>[0]} optionsToCreate
    */
   static ensureRegionInLocation(optionsToCreate) {
-    const region = this.locationInRegion(
-      optionsToCreate.center,
-      optionsToCreate.dimensionId
-    )
+    const region = this.locationInRegion(optionsToCreate.center, optionsToCreate.dimensionId)
     if (!region || !(region instanceof this)) {
       return new this(optionsToCreate)
     } else return region
@@ -332,14 +318,7 @@ export class RadiusRegion extends Region {
    * @param {string} [o.key] - The key of the region. This is used to identify the region.
    * @param {boolean} [o.creating] - Whether or not the region is being created.
    */
-  constructor({
-    center,
-    radius,
-    dimensionId,
-    permissions,
-    key,
-    creating = true,
-  }) {
+  constructor({ center, radius, dimensionId, permissions, key, creating = true }) {
     super({ dimensionId, permissions, key })
     this.initPermissions(permissions)
     this.center = center
@@ -494,9 +473,4 @@ export class BossArenaRegion extends SessionRegion {
   }
 }
 
-const RadiusRegionSubTypes = [
-  RadiusRegion,
-  MineshaftRegion,
-  SafeAreaRegion,
-  BaseRegion,
-]
+const RadiusRegionSubTypes = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion]

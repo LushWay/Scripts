@@ -10,8 +10,7 @@ new Command({
   .array('enchantName', Object.keys(MinecraftEnchantmentTypes), true)
   .int('level', true)
   .executes((ctx, enchant, level) => {
-    if (!enchant)
-      return ctx.reply(Object.keys(MinecraftEnchantmentTypes).join('\n'))
+    if (!enchant) return ctx.reply(Object.keys(MinecraftEnchantmentTypes).join('\n'))
     const ench = MinecraftEnchantmentTypes[enchant]
 
     const mainhand = ctx.sender.mainhand()

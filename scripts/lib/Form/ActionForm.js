@@ -77,14 +77,7 @@ export class ActionForm {
    */
   addButtonPrompt(text, yesText, yesAction, noText = 'Отмена') {
     return this.addButton(text, p =>
-      prompt(
-        p,
-        '§cВы уверены, что хотите ' + text + '?',
-        yesText,
-        yesAction,
-        noText,
-        () => this.show(p)
-      )
+      prompt(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p))
     )
   }
   /**
@@ -94,11 +87,7 @@ export class ActionForm {
    */
   async show(player) {
     const response = await showForm(this.form, player)
-    if (
-      response === false ||
-      !(response instanceof ActionFormResponse) ||
-      typeof response.selection === 'undefined'
-    )
+    if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
       return
 
     const callback = this.buttons[response.selection]?.callback

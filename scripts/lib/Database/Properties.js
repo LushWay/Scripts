@@ -71,19 +71,14 @@ export class DynamicPropertyDB {
           return [
             // Add default value
             key,
-            typeof value === 'object' &&
-            value !== null &&
-            typeof defaultv === 'object' &&
-            defaultv !== null
+            typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
               ? DB.setDefaults(value, defaultv)
               : value ?? defaultv,
           ]
         })
       )
     } catch (error) {
-      util.error(
-        new DatabaseError(`Failed to init key '${this.key}': ${error}`)
-      )
+      util.error(new DatabaseError(`Failed to init key '${this.key}': ${error}`))
     }
   }
   /**
@@ -107,16 +102,12 @@ export class DynamicPropertyDB {
           // Modify all values
           Object.fromEntries(
             Object.entries(this.value).map(([key, value]) => {
-              const defaultv =
-                typeof key !== 'symbol' && this.defaultValue?.(key)
+              const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
 
               return [
                 // Remove default if defaultv and value are objects
                 key,
-                typeof value === 'object' &&
-                value !== null &&
-                typeof defaultv === 'object' &&
-                defaultv !== null
+                typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
                   ? DB.removeDefaults(value, defaultv)
                   : value,
               ]
@@ -155,8 +146,7 @@ export class DynamicPropertyDB {
       },
       set: (target, p, value, reciever) => {
         // Filter non db keys
-        if (typeof p === 'symbol')
-          return Reflect.set(target, p, value, reciever)
+        if (typeof p === 'symbol') return Reflect.set(target, p, value, reciever)
 
         // Set value
         const setted = Reflect.set(target, p, value, reciever)

@@ -1,10 +1,7 @@
 import { GameMode, system, Vector, world } from '@minecraft/server'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import * as GameTest from '@minecraft/server-gametest'
-import {
-  MinecraftBlockTypes,
-  MinecraftEntityTypes,
-} from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { GAME_UTILS, util } from 'smapi.js'
 const time = 9999999
 
@@ -122,13 +119,9 @@ new Command({
   .executes(async (ctx, newname) => {
     if (newname) name = newname
 
-    world.overworld.runCommand(
-      `execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "s:s"`
-    )
+    world.overworld.runCommand(`execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "s:s"`)
 
-    world.overworld
-      .getBlock(Vector.add(testLoc, { x: 1, y: 0, z: 1 }))
-      ?.setType(MinecraftBlockTypes.RedstoneBlock)
+    world.overworld.getBlock(Vector.add(testLoc, { x: 1, y: 0, z: 1 }))?.setType(MinecraftBlockTypes.RedstoneBlock)
 
     await system.sleep(10)
 
@@ -139,11 +132,7 @@ new Command({
 GameTest.registerAsync('s', 'm', async test => {
   let succeed = false
   for (let e = 0; e < 5; e++) {
-    const player = test.spawnSimulatedPlayer(
-      { x: -1, y: 3, z: -1 },
-      'Tester (' + e + ')',
-      GameMode.adventure
-    )
+    const player = test.spawnSimulatedPlayer({ x: -1, y: 3, z: -1 }, 'Tester (' + e + ')', GameMode.adventure)
     player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) })
     await test.idle(Math.random() * 50)
     util.catch(async () => {

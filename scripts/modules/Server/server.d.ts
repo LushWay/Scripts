@@ -26,9 +26,7 @@ export namespace LootItem {
     /**
      * - Map in format { enchant: { level: percent } }
      */
-    enchantments?: Partial<
-      Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>
-    >
+    enchantments?: Partial<Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>>
     /**
      * - Damage of the item
      */

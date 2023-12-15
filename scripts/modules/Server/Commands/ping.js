@@ -26,9 +26,5 @@ new Command({
 }).executes(async ctx => {
   ctx.reply('§b> §3Понг! Проверяем...')
   const ticks = await getServerTPS()
-  ctx.reply(
-    `§b> §3TPS сервера ${
-      ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'
-    }§f: ${ticks}`
-  )
+  ctx.reply(`§b> §3TPS сервера ${ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'}§f: ${ticks}`)
 })

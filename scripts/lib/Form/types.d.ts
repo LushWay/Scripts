@@ -42,7 +42,5 @@ declare global {
     options?: (string | null)[]
   }
 
-  type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R
-    ? (...args: [...E, Next]) => R
-    : never
+  type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R ? (...args: [...E, Next]) => R : never
 }

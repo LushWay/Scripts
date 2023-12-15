@@ -48,11 +48,7 @@ WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
  * @param {Vector3} [param2.min]
  * @param {Vector3} [param2.max]
  */
-export function spawnParticlesInArea(
-  pos1,
-  pos2,
-  { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) } = {}
-) {
+export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) } = {}) {
   for (const { x, y, z } of Vector.foreach(min, max)) {
     const isEdge =
       ((x == min.x || x == max.x) && (y == min.y || y == max.y)) ||

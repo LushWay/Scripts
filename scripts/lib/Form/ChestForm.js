@@ -44,9 +44,7 @@ export class ChestForm {
     return {
       nameTag: GAME_UTILS.toNameTag(permutation.type.id),
       icon: permutation.type.id,
-      lore: [
-        ...(Object.keys(states).length ? util.inspect(states).split('\n') : []),
-      ],
+      lore: [...(Object.keys(states).length ? util.inspect(states).split('\n') : [])],
     }
   }
   /**
@@ -67,8 +65,7 @@ export class ChestForm {
   constructor(sizeType = 'small') {
     const [sizeName, size] = SIZES[sizeType]
     this.titleText = sizeName
-    for (let i = 0; i < size; i++)
-      this.buttons.push({ text: '', icon: undefined })
+    for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
   /**
    * @param {string} text
@@ -82,16 +79,7 @@ export class ChestForm {
    * Adds a button to this chest ui with an icon from a resource pack.
    * @param {ChestButtonOptions} o
    */
-  button({
-    slot,
-    icon,
-    nameTag = '',
-    lore = [],
-    description,
-    amount = 1,
-    enchanted = false,
-    callback,
-  }) {
+  button({ slot, icon, nameTag = '', lore = [], description, amount = 1, enchanted = false, callback }) {
     const ID = typeIdToID.get(icon.includes(':') ? icon : 'minecraft:' + icon)
 
     if (description) lore = loreWordWrap(description)
@@ -102,9 +90,7 @@ export class ChestForm {
         .toString()
         .padStart(2, '0')}§r${nameTag}§r${lore.map(e => '\n§r' + e).join('')}`,
 
-      icon: ID
-        ? (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536
-        : icon,
+      icon: ID ? (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536 : icon,
 
       callback: callback ?? (p => this.show(p)),
     }

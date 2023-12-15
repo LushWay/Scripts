@@ -1,9 +1,5 @@
 import { ItemStack, Player, Vector, system, world } from '@minecraft/server'
-import {
-  MinecraftBlockTypes,
-  MinecraftEffectTypes,
-  MinecraftItemTypes,
-} from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
@@ -12,10 +8,7 @@ import { MENU } from '../../Server/menuItem.js'
 import { ANARCHY } from './anarchy.js'
 
 export const SPAWN = {
-  startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(
-    '§r§6Начальный топор',
-    'Начальный топор'
-  ),
+  startAxeItem: new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор'),
   /** @type {string[]} */
   startAxeCanBreak: Object.entries(MinecraftBlockTypes)
     .filter(e => e[0].match(/log/i))

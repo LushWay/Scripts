@@ -3,9 +3,7 @@ import { Entity, Vector, system, world } from '@minecraft/server'
 import { util } from '../util.js'
 
 world.afterEvents.worldInitialize.subscribe(() => {
-  world.overworld.runCommandAsync(
-    'tickingarea add 0 -64 0 0 200 0 database true'
-  )
+  world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
 })
 
 /**
@@ -40,11 +38,7 @@ export class DB {
         const tableName = entity.getDynamicProperty('tableName')
         const index = entity.getDynamicProperty('index')
 
-        if (
-          typeof tableName !== 'string' ||
-          typeof tableType !== 'string' ||
-          typeof index !== 'number'
-        )
+        if (typeof tableName !== 'string' || typeof tableType !== 'string' || typeof index !== 'number')
           return { entity, tableName: 'NOTDB', tableType: 'NONE', index: 0 }
 
         if (Vector.distance(entity.location, DB.ENTITY_LOCATION) > 1) {
@@ -77,19 +71,13 @@ export class DB {
           maxDistance: 2,
         })
         .forEach(e => e.triggerEvent('minecraft:despawn'))
-      world.overworld.runCommand(
-        `structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`
-      )
+      world.overworld.runCommand(`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`)
       this.ALL_TABLE_ENTITIES = this.getEntities()
 
       if (this.ALL_TABLE_ENTITIES.length < 1) {
         console.warn('§cНе удалось загрузить базы данных из бэкапа.')
         return []
-      } else
-        console.warn(
-          'Бэкап успешно загружен! Всего баз данных: ' +
-            this.ALL_TABLE_ENTITIES.length
-        )
+      } else console.warn('Бэкап успешно загружен! Всего баз данных: ' + this.ALL_TABLE_ENTITIES.length)
     }
 
     return this.ALL_TABLE_ENTITIES
@@ -102,10 +90,7 @@ export class DB {
    * @returns {Entity}
    */
   static createTableEntity(tableType, tableName, index = 0) {
-    const entity = world.overworld.spawnEntity(
-      DB.ENTITY_IDENTIFIER,
-      DB.ENTITY_LOCATION
-    )
+    const entity = world.overworld.spawnEntity(DB.ENTITY_IDENTIFIER, DB.ENTITY_LOCATION)
 
     entity.setDynamicProperty('tableName', tableName)
     entity.setDynamicProperty('tableType', tableType)
@@ -225,11 +210,7 @@ export class DB {
 
       if (value === defaultValue) continue
 
-      if (
-        typeof defaultValue === 'object' &&
-        defaultValue !== null &&
-        typeof value === 'object'
-      ) {
+      if (typeof defaultValue === 'object' && defaultValue !== null && typeof value === 'object') {
         if (Array.isArray(defaultValue)) {
           //
           if (!value?.length || Array.equals(value, defaultValue)) continue

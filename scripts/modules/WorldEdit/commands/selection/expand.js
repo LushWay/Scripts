@@ -15,44 +15,20 @@ export class SelectionManager {
 
     if (dx < 0 && dz < 0) {
       //means u need to sub,  sub to get to pos1
-      builder.pos1 = Vector.add(
-        builder.pos1,
-        new Vector(amount, -amount, amount)
-      )
-      builder.pos2 = Vector.add(
-        builder.pos2,
-        new Vector(-amount, amount, -amount)
-      )
+      builder.pos1 = Vector.add(builder.pos1, new Vector(amount, -amount, amount))
+      builder.pos2 = Vector.add(builder.pos2, new Vector(-amount, amount, -amount))
     } else if (dx < 0 && dz >= 0) {
       //means u need to sub,  add to get to pos1
-      builder.pos1 = Vector.add(
-        builder.pos1,
-        new Vector(amount, -amount, -amount)
-      )
-      builder.pos2 = Vector.add(
-        builder.pos2,
-        new Vector(-amount, amount, amount)
-      )
+      builder.pos1 = Vector.add(builder.pos1, new Vector(amount, -amount, -amount))
+      builder.pos2 = Vector.add(builder.pos2, new Vector(-amount, amount, amount))
     } else if (dx >= 0 && dz >= 0) {
       //means u need to add,  add to get to pos1
-      builder.pos1 = Vector.add(
-        builder.pos1,
-        new Vector(-amount, -amount, -amount)
-      )
-      builder.pos2 = Vector.add(
-        builder.pos2,
-        new Vector(amount, amount, amount)
-      )
+      builder.pos1 = Vector.add(builder.pos1, new Vector(-amount, -amount, -amount))
+      builder.pos2 = Vector.add(builder.pos2, new Vector(amount, amount, amount))
     } else if (dx >= 0 && dz < 0) {
       //means u need to add, sub to get to pos1
-      builder.pos1 = Vector.add(
-        builder.pos1,
-        new Vector(-amount, -amount, amount)
-      )
-      builder.pos2 = Vector.add(
-        builder.pos2,
-        new Vector(amount, amount, -amount)
-      )
+      builder.pos1 = Vector.add(builder.pos1, new Vector(-amount, -amount, amount))
+      builder.pos2 = Vector.add(builder.pos2, new Vector(amount, amount, -amount))
     }
   }
   /**

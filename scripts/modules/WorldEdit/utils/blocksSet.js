@@ -113,9 +113,7 @@ function getBlockSetRaw([player, name], noBlocks = []) {
  */
 export function getBlockSet([player, name]) {
   return getBlockSetRaw([player, name])
-    .map(([type, states, weight]) =>
-      new Array(weight).fill(BlockPermutation.resolve(type, states))
-    )
+    .map(([type, states, weight]) => new Array(weight).fill(BlockPermutation.resolve(type, states)))
     .flat()
 }
 

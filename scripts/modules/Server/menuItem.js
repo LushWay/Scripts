@@ -25,8 +25,7 @@ export const MENU = {
 createPublicGiveItemCommand('menu', MENU.item)
 
 world.afterEvents.itemUse.subscribe(async ({ source: player, itemStack }) => {
-  if (itemStack.typeId !== MENU.item.typeId || !(player instanceof Player))
-    return
+  if (itemStack.typeId !== MENU.item.typeId || !(player instanceof Player)) return
 
   util.catch(() => {
     const menu = MENU.OnOpen(player)

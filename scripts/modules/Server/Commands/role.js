@@ -28,10 +28,7 @@ roleCommand.executes(ctx => {
     return () => {
       const role = getRole(player.id)
       const ROLE = Object.fromEntries(
-        Object.entriesStringKeys(ROLES).map(([key]) => [
-          key,
-          `${role === key ? '> ' : ''}${ROLES[key]}`,
-        ])
+        Object.entriesStringKeys(ROLES).map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`])
       )
       new ModalForm(player.name)
         .addToggle('Уведомлять', true)
@@ -41,13 +38,7 @@ roleCommand.executes(ctx => {
         })
         .addTextField('Причина смены роли', `Например, "космокс"`)
         .show(ctx.sender, (formCtx, notify, showName, newrole, message) => {
-          if (!newrole)
-            return formCtx.error(
-              'Неизвестная роль: ' +
-                newrole +
-                '§r, допустимые: ' +
-                util.inspect(ROLES)
-            )
+          if (!newrole) return formCtx.error('Неизвестная роль: ' + newrole + '§r, допустимые: ' + util.inspect(ROLES))
           if (notify)
             player.tell(
               `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${

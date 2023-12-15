@@ -7,10 +7,7 @@ new Command({
   type: 'public',
   role: 'member',
 }).executes(async ctx => {
-  const entity = ctx.sender.dimension.spawnEntity(
-    CUSTOM_ENTITIES.sit,
-    ctx.sender.location
-  )
+  const entity = ctx.sender.dimension.spawnEntity(CUSTOM_ENTITIES.sit, ctx.sender.location)
   ctx.sender.closeChat()
   // Rideable component doesnt works
   entity.runCommand('ride @p start_riding @s teleport_rider ')

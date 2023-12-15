@@ -12,8 +12,7 @@ export const SHAPES = {
   'cylindricalMountain': 'y <= Math.sin(2 * Math.sqrt((x * x) + (z * z)))',
   'ravine': 'y >= -Math.sqrt((x * x) + (z * z))',
   'customMountain': 'y <= 0.5 * Math.sin(x / 10) + 0.5 * Math.cos(z / 10)',
-  'tetrahedron':
-    'Math.abs(-x) + Math.abs(x) + Math.abs(y) + Math.abs(z) - yMin , zMin = 0',
+  'tetrahedron': 'Math.abs(-x) + Math.abs(x) + Math.abs(y) + Math.abs(z) - yMin , zMin = 0',
   'triangle_prism':
     'Math.abs(Math.abs(-x)/2 + Math.abs(x)/2 + Math.abs(y) - z) + Math.abs(Math.abs(-x)/2 + Math.abs(x)/2 + Math.abs(y) + z) - yMin = 0',
 
@@ -43,8 +42,7 @@ export const SHAPES = {
     'Math.pow(Math.abs(x / xRadius), 5) + Math.pow(Math.abs(y / yRadius), 5) + Math.pow(Math.abs(z / zRadius), 5) <= 1',
   'rounded_corner_2':
     'Math.pow(Math.abs(x / xRadius), 3) + Math.pow(Math.abs(y / yRadius), 3) + Math.pow(Math.abs(z / zRadius), 3) <= 1',
-  'ellipse':
-    'Math.pow(x / xRadius, 2) + Math.pow(y / yRadius, 2) + Math.pow(z / zRadius, 2) <= 1',
+  'ellipse': 'Math.pow(x / xRadius, 2) + Math.pow(y / yRadius, 2) + Math.pow(z / zRadius, 2) <= 1',
   'octahedron':
     'Math.pow(Math.abs(x / xRadius), 1) + Math.pow(Math.abs(y / yRadius), 1) + Math.pow(Math.abs(z / zRadius), 1) <= 1',
   'astroid_1':
@@ -74,12 +72,9 @@ export const SHAPES = {
   'astroid_3z':
     'Math.pow( Math.abs(x/xRadius) ,0.3) + Math.pow( Math.abs(y/yRadius) ,0.3) + Math.pow( z/zRadius ,0.3) <= 1',
 
-  'cylinder_x':
-    'Math.pow(y, 2)/(yRadius*yRadius) + Math.pow((z), 2)/(zRadius*zRadius) <= 1',
-  'cylinder_y':
-    'Math.pow(x, 2)/(xRadius*xRadius) + Math.pow((z), 2)/(zRadius*zRadius) <= 1',
-  'cylinder_z':
-    'Math.pow(x, 2)/(xRadius*xRadius) + Math.pow((y), 2)/(yRadius*yRadius) <= 1',
+  'cylinder_x': 'Math.pow(y, 2)/(yRadius*yRadius) + Math.pow((z), 2)/(zRadius*zRadius) <= 1',
+  'cylinder_y': 'Math.pow(x, 2)/(xRadius*xRadius) + Math.pow((z), 2)/(zRadius*zRadius) <= 1',
+  'cylinder_z': 'Math.pow(x, 2)/(xRadius*xRadius) + Math.pow((y), 2)/(yRadius*yRadius) <= 1',
 
   'torus_x':
     'Math.pow((  Math.min(yRadius, zRadius) /1.35) - Math.sqrt( (y*y) + (z*z) ), 2) + (x*x) <= Math.pow(  Math.min(yRadius, xRadius)  -(  Math.min(yRadius, zRadius)  /1.35),2)',
@@ -100,18 +95,12 @@ export const SHAPES = {
   'hour_glass_z':
     'Math.pow((x), 2)/(xRadius*xRadius) + Math.pow((y), 2)/(yRadius*yRadius) <= Math.pow((z), 2)/(zRadius*zRadius)',
 
-  'hour_glass_x_upper':
-    'Math.sqrt((yRadius*yRadius)*(y*y) + (zRadius*zRadius)*(z*z)) <= x',
-  'hour_glass_x_lower':
-    'Math.sqrt((yRadius*yRadius)*(y*y) + (zRadius*zRadius)*(z*z)) <= -x',
-  'hour_glass_y_upper':
-    'Math.sqrt((xRadius*xRadius)*(x*x) + (zRadius*zRadius)*(z*z)) <= y',
-  'hour_glass_y_lower':
-    'Math.sqrt((xRadius*xRadius)*(x*x) + (zRadius*zRadius)*(z*z)) <= -y',
-  'hour_glass_z_upper':
-    'Math.sqrt((xRadius*xRadius)*(x*x) + (yRadius*yRadius)*(y*y)) <= z',
-  'hour_glass_z_lower':
-    'Math.sqrt((xRadius*xRadius)*(x*x) + (yRadius*yRadius)*(y*y)) <= -z',
+  'hour_glass_x_upper': 'Math.sqrt((yRadius*yRadius)*(y*y) + (zRadius*zRadius)*(z*z)) <= x',
+  'hour_glass_x_lower': 'Math.sqrt((yRadius*yRadius)*(y*y) + (zRadius*zRadius)*(z*z)) <= -x',
+  'hour_glass_y_upper': 'Math.sqrt((xRadius*xRadius)*(x*x) + (zRadius*zRadius)*(z*z)) <= y',
+  'hour_glass_y_lower': 'Math.sqrt((xRadius*xRadius)*(x*x) + (zRadius*zRadius)*(z*z)) <= -y',
+  'hour_glass_z_upper': 'Math.sqrt((xRadius*xRadius)*(x*x) + (yRadius*yRadius)*(y*y)) <= z',
+  'hour_glass_z_lower': 'Math.sqrt((xRadius*xRadius)*(x*x) + (yRadius*yRadius)*(y*y)) <= -z',
 
   'hyperboloid_of_one_sheet_x':
     'Math.pow((y), 2)/(yRadius*yRadius) + Math.pow((z ), 2)/(zRadius*zRadius) - Math.pow((x ), 2)/(xRadius*xRadius) <= 1',
@@ -133,10 +122,7 @@ export const SHAPES = {
   'elliptic_paraboloid_z_inverted':
     'Math.pow((x - xCenter), 2)/(xRadius*xRadius) + Math.pow((y - yCenter), 2)/(yRadius*yRadius) <= z/-yRadius',
 
-  'hyperbolic_paraboloid_x':
-    'Math.pow((y) /(yRadius), 2) - Math.pow((z) /(zRadius), 2) <= x/xRadius',
-  'hyperbolic_paraboloid_y':
-    'Math.pow((x) /(xRadius), 2) - Math.pow((z) /(zRadius), 2) <= y/yRadius',
-  'hyperbolic_paraboloid_z':
-    'Math.pow((x) /(xRadius), 2) - Math.pow((y) /(yRadius), 2) <= z/zRadius',
+  'hyperbolic_paraboloid_x': 'Math.pow((y) /(yRadius), 2) - Math.pow((z) /(zRadius), 2) <= x/xRadius',
+  'hyperbolic_paraboloid_y': 'Math.pow((x) /(xRadius), 2) - Math.pow((z) /(zRadius), 2) <= y/yRadius',
+  'hyperbolic_paraboloid_z': 'Math.pow((x) /(xRadius), 2) - Math.pow((y) /(yRadius), 2) <= z/zRadius',
 }

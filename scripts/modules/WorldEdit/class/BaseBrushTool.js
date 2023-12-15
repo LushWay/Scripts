@@ -1,9 +1,4 @@
-import {
-  ItemStack,
-  LocationInUnloadedChunkError,
-  LocationOutOfWorldBoundariesError,
-  Player,
-} from '@minecraft/server'
+import { ItemStack, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, Player } from '@minecraft/server'
 import { WE_PLAYER_SETTINGS } from 'modules/WorldEdit/index.js'
 import { util } from 'smapi.js'
 import { WorldEditTool } from './Tool.js'
@@ -23,7 +18,6 @@ import { WorldEditTool } from './Tool.js'
  * @extends {WorldEditTool<BrushLoreFormat & AdditionalLore>}
  */
 export class BaseBrushTool extends WorldEditTool {
-
   /**
    * @param {Player} player
    */
@@ -33,11 +27,7 @@ export class BaseBrushTool extends WorldEditTool {
     if (typeof slot === 'string') return slot
 
     if (!this.isOurBrushType(slot))
-      return (
-        'Возьмите ' +
-        this.displayName +
-        'в руку, или выберите пустой слот, чтобы создать!'
-      )
+      return 'Возьмите ' + this.displayName + 'в руку, или выберите пустой слот, чтобы создать!'
 
     return slot
   }
@@ -55,12 +45,7 @@ export class BaseBrushTool extends WorldEditTool {
    */
   isOurBrushType(lore) {
     if ('getLore' in lore) lore = this.parseLore(lore.getLore())
-    if (
-      'type' in this.loreFormat &&
-      'type' in lore &&
-      lore.type !== this.loreFormat.type
-    )
-      return false
+    if ('type' in this.loreFormat && 'type' in lore && lore.type !== this.loreFormat.type) return false
 
     return true
   }
@@ -86,10 +71,7 @@ export class BaseBrushTool extends WorldEditTool {
     try {
       this.onBrushUse(player, lore, hit)
     } catch (e) {
-      if (
-        e instanceof LocationInUnloadedChunkError ||
-        e instanceof LocationOutOfWorldBoundariesError
-      ) {
+      if (e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) {
         player.tell('§fКисть > §cБлок не прогружен')
       } else {
         util.error(e)

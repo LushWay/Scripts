@@ -47,30 +47,17 @@ Reflect.defineProperty(Player.prototype, 'scores', {
           {
             set(_, p, newValue) {
               if (typeof p === 'symbol')
-                throw new Error(
-                  'Symbol objectives to set are not accepted, recieved ' +
-                    util.stringify(p)
-                )
+                throw new Error('Symbol objectives to set are not accepted, recieved ' + util.stringify(p))
 
-              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(
-                obj.player.id,
-                newValue
-              )
+              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(obj.player.id, newValue)
               return true
             },
             get(_, p) {
               if (typeof p === 'symbol')
-                throw new Error(
-                  'Symbol objectives to get are not accepted, recieved ' +
-                    p.description
-                )
+                throw new Error('Symbol objectives to get are not accepted, recieved ' + p.description)
 
               try {
-                return (
-                  ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(
-                    obj.player.id
-                  ) ?? 0
-                )
+                return ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(obj.player.id) ?? 0
               } catch (e) {
                 return 0
               }
@@ -97,8 +84,7 @@ export class ScoreboardDB {
     if (name in this.objectives) return this.objectives[name]
 
     return (this.objectives[name] =
-      world.scoreboard.getObjective(name) ??
-      world.scoreboard.addObjective(name, displayName))
+      world.scoreboard.getObjective(name) ?? world.scoreboard.addObjective(name, displayName))
   }
 
   /**

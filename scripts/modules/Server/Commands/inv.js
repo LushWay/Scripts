@@ -12,10 +12,7 @@ new Command({
     invs: {},
   }
   const inventories = ctx.sender.database.server?.invs
-  const form = new ActionForm(
-    'Inventories',
-    'Выбери слот для выгрузки:'
-  ).addButton('Новый', null, () => {})
+  const form = new ActionForm('Inventories', 'Выбери слот для выгрузки:').addButton('Новый', null, () => {})
 
   for (const [key, value] of Object.entries(inventories)) {
     const inv = STORE.getEntityStore(key, { remove: false })

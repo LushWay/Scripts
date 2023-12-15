@@ -42,11 +42,7 @@ Array.prototype.randomElement = function () {
  * @param  {any[]} args
  */
 function format(args) {
-  return args
-    .map(e =>
-      util.toTerminalColors(typeof e === 'string' ? e : util.inspect(e))
-    )
-    .join(' ')
+  return args.map(e => util.toTerminalColors(typeof e === 'string' ? e : util.inspect(e))).join(' ')
 }
 
 OverTakes(console, {

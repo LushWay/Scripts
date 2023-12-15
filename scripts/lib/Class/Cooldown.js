@@ -39,10 +39,7 @@ export class Cooldown {
    */
   constructor(db, prefix, source, time) {
     this.db = db
-    this.key = Cooldown.genDBkey(
-      prefix,
-      typeof source === 'string' ? source : source.id
-    )
+    this.key = Cooldown.genDBkey(prefix, typeof source === 'string' ? source : source.id)
     if (typeof source !== 'string') this.player = source
     this.time = time
   }
@@ -51,8 +48,7 @@ export class Cooldown {
   }
   get statusTime() {
     const data = this.db[this.key]
-    if (typeof data === 'number' && Date.now() - data <= this.time)
-      return Date.now() - data
+    if (typeof data === 'number' && Date.now() - data <= this.time) return Date.now() - data
     return 'EXPIRED'
   }
   isExpired() {

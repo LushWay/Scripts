@@ -77,19 +77,11 @@ const brush = new BrushTool({
 
     new ModalForm('§3Кисть')
       .addDropdown('Форма', shapes, { defaultValue: lore.shape })
-      .addSlider(
-        'Размер',
-        1,
-        getRole(player) === 'admin' ? 20 : 10,
-        1,
-        lore.size
-      )
+      .addSlider('Размер', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.size)
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(
-          Object.keys(getAllBlockSets(player.id)).map(e => [e, e])
-        ),
+        Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),
         {
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
@@ -101,21 +93,12 @@ const brush = new BrushTool({
         lore.shape = shape
         lore.size = radius
         lore.blocksSet = [player.id, blocksSet]
-        if (replaceBlocksSet)
-          lore.replaceBlocksSet = [player.id, replaceBlocksSet]
-        slot.nameTag =
-          '§r§3Кисть §6' +
-          shape +
-          '§r §f' +
-          blocksSet.replace(SHARED_POSTFIX, '')
+        if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
+        slot.nameTag = '§r§3Кисть §6' + shape + '§r §f' + blocksSet.replace(SHARED_POSTFIX, '')
         slot.setLore(brush.stringifyLore(lore))
         player.tell(
-          `§a► §r${
-            lore.blocksSet[0] ? 'Отредактирована' : 'Создана'
-          } кисть ${shape} с набором блоков ${blocksSet}${
-            replaceBlocksSet
-              ? `, заменяемым набором блоков ${replaceBlocksSet}`
-              : ''
+          `§a► §r${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
+            replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${radius}`
         )
       })
@@ -134,19 +117,13 @@ const brush = new BrushTool({
       })
       if (!BRUSH_LOCATORS[player.id]) {
         try {
-          const entity = player.dimension.spawnEntity(
-            CUSTOM_ENTITIES.floatingText,
-            location
-          )
+          const entity = player.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, location)
 
           entity.addTag(player.name)
           entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
           BRUSH_LOCATORS[player.id] = entity
         } catch (error) {
-          if (
-            error instanceof LocationOutOfWorldBoundariesError ||
-            error instanceof LocationInUnloadedChunkError
-          )
+          if (error instanceof LocationOutOfWorldBoundariesError || error instanceof LocationInUnloadedChunkError)
             return
 
           util.error(error)

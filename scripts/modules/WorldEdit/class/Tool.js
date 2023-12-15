@@ -1,11 +1,4 @@
-import {
-  ContainerSlot,
-  ItemStack,
-  ItemTypes,
-  Player,
-  system,
-  world,
-} from '@minecraft/server'
+import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
 import { stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { OverTakes, util } from 'smapi.js'
 import { WE_PLAYER_SETTINGS } from '../index.js'
@@ -79,17 +72,14 @@ export class WorldEditTool {
 
     this.command = new Command({
       name,
-      description: `Создает${
-        editToolForm ? ' или редактирует ' : ''
-      }${displayName}`,
+      description: `Создает${editToolForm ? ' или редактирует ' : ''}${displayName}`,
       role: 'builder',
       type: 'we',
     }).executes(ctx => {
       const slotOrError = this.getToolSlot(ctx.sender)
 
       if (typeof slotOrError === 'string') ctx.error(slotOrError)
-      else if (this.editToolForm)
-        this.editToolForm(slotOrError, ctx.sender, true)
+      else if (this.editToolForm) this.editToolForm(slotOrError, ctx.sender, true)
     })
   }
   /**
@@ -100,8 +90,7 @@ export class WorldEditTool {
 
     if (!slot.typeId) {
       const item = ItemTypes.get(this.itemId)
-      if (!item)
-        throw new TypeError(`ItemType '${this.itemId}' does not exists`)
+      if (!item) throw new TypeError(`ItemType '${this.itemId}' does not exists`)
       slot.setItem(new ItemStack(item))
       return slot
     } else if (slot.typeId === this.itemId) {
@@ -130,9 +119,7 @@ export class WorldEditTool {
 
     if (!this.editToolForm && edit) return ''
 
-    return `${this.getMenuButtonNameColor(player)}${
-      edit ? 'Редактировать' : 'Создать'
-    } ${this.displayName}`
+    return `${this.getMenuButtonNameColor(player)}${edit ? 'Редактировать' : 'Создать'} ${this.displayName}`
   }
   /**
    * @overload
@@ -190,9 +177,7 @@ export class WorldEditTool {
       ...Object.entries(format)
         .filter(([key]) => key !== 'version')
         .map(([key, value]) => {
-          const val = WorldEditTool.loreBlockSetKeys.includes(key)
-            ? stringifyBlocksSetRef(value)
-            : util.inspect(value)
+          const val = WorldEditTool.loreBlockSetKeys.includes(key) ? stringifyBlocksSetRef(value) : util.inspect(value)
           const k = this.loreTranslation[key] ?? key
           return `${k}: ${val}`.match(/.{0,48}/g) || []
         })

@@ -10,17 +10,12 @@ new Command({
   .executes((ctx, lootTableName) => {
     const lootTable = LootTable.instances[lootTableName]
     if (!lootTable)
-      return ctx.error(
-        lootTableName +
-          ' - unknown. Valid:\n' +
-          Object.keys(LootTable.instances).join('\n')
-      )
+      return ctx.error(lootTableName + ' - unknown. Valid:\n' + Object.keys(LootTable.instances).join('\n'))
 
     const block = ctx.sender.dimension.getBlock(ctx.sender.location)?.below()
     if (!block) return ctx.error('No block under feats')
     const inventory = block.getComponent('inventory')
-    if (!inventory || !inventory.container)
-      return ctx.error('No inventory in block')
+    if (!inventory || !inventory.container) return ctx.error('No inventory in block')
     inventory.container.clearAll()
     lootTable.fillContainer(inventory.container)
   })
@@ -73,16 +68,13 @@ export class LootTable {
 
       const chance = parseInt(item.chance)
       if (isNaN(chance)) {
-        throw new TypeError(
-          `Chance must be \`{number}%\`, got '${chance}' instead!`
-        )
+        throw new TypeError(`Chance must be \`{number}%\`, got '${chance}' instead!`)
       }
 
       if (chance !== 100) this.totalChance += chance
 
       if (item.options) {
-        const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } =
-          item.options
+        const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } = item.options
         if (canDestroy) itemStack.setCanDestroy(canDestroy)
         if (item.options.canPlaceOn) itemStack.setCanPlaceOn(canPlaceOn)
         if (lockMode) itemStack.lockMode = lockMode
@@ -132,10 +124,7 @@ export class LootTable {
         air--
         return
       }
-      air = Math.randomInt(
-        0,
-        stepMax - (explictItems.length + randomizableItems.length)
-      )
+      air = Math.randomInt(0, stepMax - (explictItems.length + randomizableItems.length))
 
       if (explictItems.length) {
         const item = explictItems.randomElement()
@@ -238,9 +227,7 @@ const RandomCost = {
 
         if (min > max) throw new RangeError('Min cannot be greater than max')
         if (min === max) {
-          throw new RangeError(
-            'Min cannot be equal to max. Use one number as key instead.'
-          )
+          throw new RangeError('Min cannot be equal to max. Use one number as key instead.')
         }
 
         for (let i = min; i <= max; i++) {

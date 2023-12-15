@@ -8,9 +8,7 @@ export class Minigame {
    * @param {Player} player
    */
   static getCurrent(player) {
-    return Object.values(this.instances).find(e =>
-      e.players.includes(player.id)
-    )
+    return Object.values(this.instances).find(e => e.players.includes(player.id))
   }
   /**
    * @param {Player} player
@@ -39,7 +37,4 @@ export class Minigame {
   }
 }
 
-new LockAction(
-  player => !!Minigame.getQuene(player),
-  `Вы находитесь в очереди миниигры. Выйти: §f-quit`
-)
+new LockAction(player => !!Minigame.getQuene(player), `Вы находитесь в очереди миниигры. Выйти: §f-quit`)

@@ -1,11 +1,4 @@
-import {
-  Container,
-  EntityDamageCause,
-  EquipmentSlot,
-  GameMode,
-  Player,
-  world,
-} from '@minecraft/server'
+import { Container, EntityDamageCause, EquipmentSlot, GameMode, Player, world } from '@minecraft/server'
 import { OverTakes } from './import.js'
 
 Player.prototype.tell = Player.prototype.sendMessage
@@ -57,9 +50,7 @@ OverTakes(Player.prototype, {
     return true
   },
   mainhand() {
-    return this.getComponent('equippable').getEquipmentSlot(
-      EquipmentSlot.Mainhand
-    )
+    return this.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Mainhand)
   },
 })
 

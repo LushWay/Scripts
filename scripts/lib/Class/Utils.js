@@ -32,8 +32,7 @@ const itemModifiers = [
     return `${type}.${color}`
   },
   darkOak => {
-    if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door')
-      return darkOak.replace('dark_oak', 'big_oak')
+    if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door') return darkOak.replace('dark_oak', 'big_oak')
   },
 ]
 /** @type {((s: string) => string)[]} */
@@ -153,12 +152,7 @@ export const GAME_UTILS = {
     }
 
     const result = await showForm(form, player)
-    if (
-      result === false ||
-      !(result instanceof ActionFormResponse) ||
-      !result.selection
-    )
-      return false
+    if (result === false || !(result instanceof ActionFormResponse) || !result.selection) return false
 
     const selectedBlock = blocks[result.selection]
 

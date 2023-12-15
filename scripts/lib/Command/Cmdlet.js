@@ -33,25 +33,16 @@ export class CmdLet {
     for (const cmdlet of CmdLet.list) {
       const input = cmdlets.find(e => e[0] === cmdlet.data.name)
       if (input) {
-        results.push(
-          cmdlet.data.callback(
-            new CommandContext(data, args, cmd, raw),
-            input[0]
-          )
-        )
+        results.push(cmdlet.data.callback(new CommandContext(data, args, cmd, raw), input[0]))
       }
     }
 
     if (cmdlets.length > 0 && results.length < 1) {
       const many = cmdlets.length > 1
       data.sender.tell(
-        `§cНеизвестны${many ? 'e' : 'й'} командлет${
-          many ? 'ы' : ''
-        } §f${cmdlets.join(
+        `§cНеизвестны${many ? 'e' : 'й'} командлет${many ? 'ы' : ''} §f${cmdlets.join(
           '§c, §f'
-        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(
-          e => `\n  §f${e.data.name} §7§o- ${e.data.description}`
-        )}\n `
+        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(e => `\n  §f${e.data.name} §7§o- ${e.data.description}`)}\n `
       )
       return 'stop'
     }

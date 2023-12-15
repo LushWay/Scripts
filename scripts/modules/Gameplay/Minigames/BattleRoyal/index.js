@@ -42,18 +42,11 @@ BATTLE_ROYAL_EVENTS.join.subscribe(player => {
    */
   const pl = player
   if (br.players.map(e => e.name).includes(pl.name)) return
-  if (br.game.started)
-    return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`)
+  if (br.game.started) return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`)
   if (BR_QUENE[pl.name])
-    return pl.onScreenDisplay.setActionBar(
-      `§6${ks(BR_QUENE).length}/${minpl} §g○ §6${br.quene.time}`
-    )
+    return pl.onScreenDisplay.setActionBar(`§6${ks(BR_QUENE).length}/${minpl} §g○ §6${br.quene.time}`)
   BR_QUENE[pl.name] = true
-  pl.tell(
-    `§aВы успешно встали в очередь. §f(${
-      ks(BR_QUENE).length
-    }/${minpl}). §aДля выхода пропишите §f-br quit`
-  )
+  pl.tell(`§aВы успешно встали в очередь. §f(${ks(BR_QUENE).length}/${minpl}). §aДля выхода пропишите §f-br quit`)
   pl.playSound('random.orb')
 })
 
@@ -64,10 +57,7 @@ BATTLE_ROYAL_EVENTS.death.subscribe(player => {
 
 system.runInterval(
   () => {
-    if (
-      !br.game.started &&
-      world.getPlayers().find(e => e.getTags().find(e => e.startsWith('br:')))
-    ) {
+    if (!br.game.started && world.getPlayers().find(e => e.getTags().find(e => e.startsWith('br:')))) {
       br.end('specially', 'Перезагрузка')
     }
 
@@ -77,18 +67,13 @@ system.runInterval(
         br.quene.time = fulltime
         forEveryQuenedPlayer(
           'random.levelup',
-          `§7${
-            ks(BR_QUENE).length
-          }/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
+          `§7${ks(BR_QUENE).length}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
         )
       }
       if (ks(BR_QUENE).length >= 10) {
         br.quene.open = true
         br.quene.time = 16
-        forEveryQuenedPlayer(
-          'random.levelup',
-          `§6Сервер заполнен! §7(${ks(BR_QUENE).length}/${minpl}).`
-        )
+        forEveryQuenedPlayer('random.levelup', `§6Сервер заполнен! §7(${ks(BR_QUENE).length}/${minpl}).`)
       }
       if (br.quene.open && br.quene.time > 0) {
         br.quene.time--
@@ -101,10 +86,7 @@ system.runInterval(
         } else if (hrs == '2' || hrs == '3' || hrs == '4') {
           sec = `секунды`
         }
-        forEveryQuenedPlayer(
-          'random.click',
-          `§9Игра начнется через §7${br.quene.time} ${sec}`
-        )
+        forEveryQuenedPlayer('random.click', `§9Игра начнется через §7${br.quene.time} ${sec}`)
       }
       if (br.quene.open && br.quene.time == 0) {
         br.start(ks(BR_QUENE))
@@ -117,12 +99,7 @@ system.runInterval(
     if (br.quene.open && ks(BR_QUENE).length < minpl) {
       br.quene.open = false
       br.quene.time = 0
-      forEveryQuenedPlayer(
-        'note.bass',
-        `§7${
-          ks(BR_QUENE).length
-        }/${minpl} §9Игроков в очереди. §cИгра отменена...`
-      )
+      forEveryQuenedPlayer('note.bass', `§7${ks(BR_QUENE).length}/${minpl} §9Игроков в очереди. §cИгра отменена...`)
     }
   },
   'battleRoyal',
@@ -145,18 +122,16 @@ bbr.literal({ name: 'quit', description: 'Выйти из очереди' }).exe
   }
 })
 
-bbr
-  .literal({ name: 'quitgame', description: 'Выйти из игры' })
-  .executes(ctx => {
-    if (ctx.sender.hasTag('locktp:Battle Royal')) {
-      delete br.players[br.players.findIndex(e => e.name == ctx.sender.name)]
-      br.tags.forEach(e => ctx.sender.removeTag(e))
-      ctx.reply('§aВы вышли из игры.')
-      teleportToBR(ctx.sender)
-    } else {
-      ctx.reply('§cВы не находитесь в игре.')
-    }
-  })
+bbr.literal({ name: 'quitgame', description: 'Выйти из игры' }).executes(ctx => {
+  if (ctx.sender.hasTag('locktp:Battle Royal')) {
+    delete br.players[br.players.findIndex(e => e.name == ctx.sender.name)]
+    br.tags.forEach(e => ctx.sender.removeTag(e))
+    ctx.reply('§aВы вышли из игры.')
+    teleportToBR(ctx.sender)
+  } else {
+    ctx.reply('§cВы не находитесь в игре.')
+  }
+})
 
 bbr
   .literal({

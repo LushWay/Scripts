@@ -12,11 +12,7 @@ root.executes(ctx => {
   const item = ctx.sender.mainhand()
   if (!item) return ctx.reply('§cВ руке нет предмета!')
 
-  ctx.reply(
-    `§b► §f${item?.typeId?.replace('minecraft:', '')} ${
-      item?.nameTag ? `(${item?.nameTag}) ` : ''
-    }`
-  )
+  ctx.reply(`§b► §f${item?.typeId?.replace('minecraft:', '')} ${item?.nameTag ? `(${item?.nameTag}) ` : ''}`)
 })
 
 root
@@ -26,11 +22,7 @@ root
     const l = Vector.floor(location)
     const block = ctx.sender.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
-    ctx.reply(
-      `§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(
-        block.permutation.getAllStates()
-      )}`
-    )
+    ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(block.permutation.getAllStates())}`)
   })
 
 root
@@ -43,10 +35,6 @@ root
     ctx.reply(util.inspect(block.permutation.getAllStates()))
   })
 
-root
-  .literal({ name: 'r', description: 'Выдает наклон головы' })
-  .executes(ctx => {
-    ctx.reply(
-      `§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`
-    )
-  })
+root.literal({ name: 'r', description: 'Выдает наклон головы' }).executes(ctx => {
+  ctx.reply(`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`)
+})

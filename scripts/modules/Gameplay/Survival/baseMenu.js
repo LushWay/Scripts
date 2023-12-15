@@ -1,8 +1,5 @@
 import { Player, Vector } from '@minecraft/server'
-import {
-  editRegionPermissions,
-  manageRegionMembers,
-} from 'modules/Region/command.js'
+import { editRegionPermissions, manageRegionMembers } from 'modules/Region/command.js'
 import { ActionForm } from 'smapi.js'
 import { RadiusRegion } from '../../Region/Region.js'
 
@@ -15,13 +12,9 @@ export function baseMenu(player, base) {
   const selfback = () => baseMenu(player, base)
   const form = new ActionForm(
     'Меню базы',
-    `${
-      isOwner ? 'Это ваша база.' : 'База игрока ' + base.ownerName
-    }\n\nКоординаты: ${Vector.string(base.center)}`
+    `${isOwner ? 'Это ваша база.' : 'База игрока ' + base.ownerName}\n\nКоординаты: ${Vector.string(base.center)}`
   )
-    .addButton('Телепорт!', () =>
-      player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 }))
-    )
+    .addButton('Телепорт!', () => player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 })))
     .addButton('Участники', () =>
       manageRegionMembers(player, base, {
         back: selfback,

@@ -56,16 +56,10 @@ declare global {
   }
 
   interface ObjectConstructor {
-    entriesStringKeys<O extends Record<string, any>>(
-      o: O
-    ): [keyof O, O[keyof O]][]
-    fromEntries<V = any, K extends string = string>(
-      entries: Iterable<readonly [K, V]>
-    ): Record<K, V>
+    entriesStringKeys<O extends Record<string, any>>(o: O): [keyof O, O[keyof O]][]
+    fromEntries<V = any, K extends string = string>(entries: Iterable<readonly [K, V]>): Record<K, V>
 
-    keys<T extends Record<string, any>>(
-      o: T
-    ): (keyof T extends string ? keyof T : never)[]
+    keys<T extends Record<string, any>>(o: T): (keyof T extends string ? keyof T : never)[]
   }
 
   type Vector3 = mc.Vector3
@@ -79,14 +73,9 @@ declare global {
     [key: `${number}...${number}` | number]: Percent
   }
 
-  type Range<F extends number, T extends number> =
-    | Exclude<Enumerate<T>, Enumerate<F>>
-    | T
+  type Range<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>> | T
 
-  type Enumerate<
-    N extends number,
-    Acc extends number[] = []
-  > = Acc['length'] extends N
+  type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
     ? Acc[number]
     : Enumerate<N, [...Acc, Acc['length']]>
 
@@ -95,9 +84,7 @@ declare global {
   type PlayerDB<Value = any> = { save(): void; data: Value }
 
   type PartialParts<B, ThisArg = B> = {
-    [P in keyof B]?: B[P] extends (...param: infer param) => infer ret
-      ? (this: ThisArg, ...param: param) => ret
-      : B[P]
+    [P in keyof B]?: B[P] extends (...param: infer param) => infer ret ? (this: ThisArg, ...param: param) => ret : B[P]
   }
 
   /**

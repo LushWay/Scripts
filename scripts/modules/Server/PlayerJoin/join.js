@@ -8,13 +8,7 @@ import { JOIN } from './var.js'
  */
 function playerAt(player) {
   const rotation = player.getRotation()
-  return [
-    player.location.x,
-    player.location.y,
-    player.location.z,
-    rotation.x,
-    rotation.y,
-  ].map(Math.floor)
+  return [player.location.x, player.location.y, player.location.z, rotation.x, rotation.y].map(Math.floor)
 }
 
 world.afterEvents.playerSpawn.subscribe(({ player }) => {
@@ -37,17 +31,11 @@ system.runPlayerInterval(
           // Player will not move, show animation
           db.stage = db.stage ?? -1
           db.stage++
-          if (
-            isNaN(db.stage) ||
-            db.stage >= JOIN.CONFIG.title_animation.stages.length
-          )
-            db.stage = 0
+          if (isNaN(db.stage) || db.stage >= JOIN.CONFIG.title_animation.stages.length) db.stage = 0
 
           // Creating title
           let title = JOIN.CONFIG.title_animation.stages[db.stage]
-          for (const [key, value] of Object.entries(
-            JOIN.CONFIG.title_animation.vars
-          )) {
+          for (const [key, value] of Object.entries(JOIN.CONFIG.title_animation.vars)) {
             title = title.replace('$' + key, value)
           }
 
@@ -100,8 +88,7 @@ function join(player, messageType) {
     if (other.id === player.id) continue
     const settings = getSettings(other)
     if (settings.sound) other.playSound(JOIN.CONFIG.messages.sound)
-    if (settings.message)
-      other.tell(`§7${player.name} ${JOIN.CONFIG.messages[messageType]}`)
+    if (settings.message) other.tell(`§7${player.name} ${JOIN.CONFIG.messages[messageType]}`)
   }
 
   player.onScreenDisplay.setTitle('')

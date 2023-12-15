@@ -68,12 +68,7 @@ export class Settings {
     }
     return player =>
       // @ts-expect-error Trust me, TS
-      generateSettingsProxy(
-        PLAYER_SETTINGS_DB,
-        groupName,
-        this.playerMap[groupName],
-        player
-      )
+      generateSettingsProxy(PLAYER_SETTINGS_DB, groupName, this.playerMap[groupName], player)
   }
 
   /** @type {Record<string, WorldSettings>} */
@@ -97,11 +92,7 @@ export class Settings {
       }
     }
     // @ts-expect-error Trust me, TS
-    return generateSettingsProxy(
-      WORLD_SETTINGS_DB,
-      groupName,
-      this.worldMap[groupName]
-    )
+    return generateSettingsProxy(WORLD_SETTINGS_DB, groupName, this.worldMap[groupName])
   }
 }
 
@@ -115,12 +106,7 @@ export class Settings {
  * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
  */
-export function generateSettingsProxy(
-  database,
-  groupName,
-  config,
-  player = null
-) {
+export function generateSettingsProxy(database, groupName, config, player = null) {
   const OptionsProxy = {}
   for (const prop in config) {
     const key = player ? player.id + ':' + prop : prop

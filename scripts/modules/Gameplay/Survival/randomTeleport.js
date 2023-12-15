@@ -1,16 +1,5 @@
-import {
-  EquipmentSlot,
-  ItemLockMode,
-  ItemStack,
-  Player,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
-import {
-  MinecraftEffectTypes,
-  MinecraftItemTypes,
-} from '@minecraft/vanilla-data.js'
+import { EquipmentSlot, ItemLockMode, ItemStack, Player, Vector, system, world } from '@minecraft/server'
+import { MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { LockAction, util } from 'smapi.js'
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
@@ -59,10 +48,7 @@ export function randomTeleport(
 
   try {
     // TODO Load by tickingarea
-    const hit = world[dimension].getBlockFromRay(
-      { x, y: y - 2, z },
-      Vector.down
-    )
+    const hit = world[dimension].getBlockFromRay({ x, y: y - 2, z }, Vector.down)
     if (hit) {
       const { block } = hit
       if ((y - block.y < fromYtoBlock || block.isLiquid) && c < 10) {
@@ -105,14 +91,10 @@ export function randomTeleport(
       if (elytra) {
         giveElytra(target, keepInSkyTime)
       } else {
-        target.addEffect(
-          MinecraftEffectTypes.SlowFalling,
-          ((y - fromYtoBlock) / 2 + keepInSkyTime) * 20,
-          {
-            amplifier: 1,
-            showParticles: false,
-          }
-        )
+        target.addEffect(MinecraftEffectTypes.SlowFalling, ((y - fromYtoBlock) / 2 + keepInSkyTime) * 20, {
+          amplifier: 1,
+          showParticles: false,
+        })
       }
     },
     'random teleport keep in sky',
@@ -127,9 +109,7 @@ export function randomTeleport(
  * @param {Player} player
  */
 function giveElytra(player, c = 5) {
-  const slot = player
-    .getComponent('equippable')
-    ?.getEquipmentSlot(EquipmentSlot.Chest)
+  const slot = player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Chest)
 
   // Item in slot
   const item = slot.getItem()
@@ -139,8 +119,7 @@ function giveElytra(player, c = 5) {
       container.addItem(item)
     } else {
       player.tell('§cСними нагрудник или свою элитру!')
-      if (c)
-        system.runTimeout(() => giveElytra(player, c--), 'giveElytra retry', 20)
+      if (c) system.runTimeout(() => giveElytra(player, c--), 'giveElytra retry', 20)
     }
   }
 
@@ -168,9 +147,7 @@ system.runInterval(
  * @param {Player} player
  */
 function clearElytra(player) {
-  const slot = player
-    .getComponent('equippable')
-    .getEquipmentSlot(EquipmentSlot.Chest)
+  const slot = player.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Chest)
   const item = slot.getItem()
   if (item && RTP_ELYTRA.is(item)) slot.setItem(undefined)
   delete player.database.survival.rtpElytra

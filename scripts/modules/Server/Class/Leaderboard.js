@@ -1,10 +1,4 @@
-import {
-  Entity,
-  EntityLifetimeState,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
+import { Entity, EntityLifetimeState, Vector, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 /**
@@ -61,21 +55,14 @@ export class Leaderboard {
    * @param {Dimensions} dimension
    * @param {keyof typeof STYLES} style
    */
-  static createLeaderboard(
-    objective,
-    location,
-    dimension = 'overworld',
-    style = 'green'
-  ) {
+  static createLeaderboard(objective, location, dimension = 'overworld', style = 'green') {
     const data = {
       style,
       objective,
       location,
       dimension,
     }
-    const entity = world
-      .getDimension(dimension)
-      .spawnEntity(LEADERBOARD_ID, Vector.floor(location))
+    const entity = world.getDimension(dimension).spawnEntity(LEADERBOARD_ID, Vector.floor(location))
 
     LB_DB[entity.id] = data
     entity.nameTag = 'Updating...'
@@ -144,8 +131,7 @@ system.runInterval(
           })
           .find(e => e.id === id)
 
-        if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded)
-          continue
+        if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded) continue
         new Leaderboard(entity, leaderboard).updateLeaderboard()
       }
     }

@@ -45,10 +45,7 @@ export function stringDistance(string1, string2) {
   })
 
   const jaro =
-    (matchesN / string1.length +
-      matchesN / string2.length +
-      (matchesN - ~~(transpositions / 2)) / matchesN) /
-    3.0
+    (matchesN / string1.length + matchesN / string2.length + (matchesN - ~~(transpositions / 2)) / matchesN) / 3.0
   return jaro + Math.min(prefix, 4) * 0.1 * (1 - jaro)
 }
 
@@ -71,11 +68,6 @@ function forEveryChar(string, callback) {
  */
 export function inaccurateSearch(search, array) {
   return array
-    .map(
-      /** @type {(v: string,) => [string, number]} */ element => [
-        element,
-        stringDistance(search, element),
-      ]
-    )
+    .map(/** @type {(v: string,) => [string, number]} */ element => [element, stringDistance(search, element)])
     .sort((a, b) => b[1] - a[1])
 }

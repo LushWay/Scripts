@@ -1,12 +1,6 @@
 import { ItemStack, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import {
-  ActionForm,
-  Cooldown,
-  EventSignal,
-  GAME_UTILS,
-  MessageForm,
-} from 'smapi.js'
+import { ActionForm, Cooldown, EventSignal, GAME_UTILS, MessageForm } from 'smapi.js'
 import { SERVER } from '../var.js'
 
 class Cost {
@@ -148,9 +142,7 @@ export class Store {
       title: 'Купить',
       body: p =>
         `${
-          this.options.prompt
-            ? 'Подтверждение перед покупкой §aесть.'
-            : 'Подтверждения перед покупкой §cнет.'
+          this.options.prompt ? 'Подтверждение перед покупкой §aесть.' : 'Подтверждения перед покупкой §cнет.'
         }\n§fБаланс: §6${SERVER.money.get(p)}M`,
       prompt: true,
       ...options,
@@ -183,23 +175,13 @@ export class Store {
       }
       cost.buy(player)
       player.getComponent('inventory').container.addItem(item)
-      this.open(
-        player,
-        `§aУспешная покупка §f${itemDescription(
-          item
-        )} §aза ${cost.string()}§a!\n \n§r`
-      )
+      this.open(player, `§aУспешная покупка §f${itemDescription(item)} §aза ${cost.string()}§a!\n \n§r`)
     }
 
     if (this.options.prompt) {
-      new MessageForm(
-        'Подтверждение',
-        `§fКупить ${itemDescription(item)} §fза ${cost.string()}?`
-      )
+      new MessageForm('Подтверждение', `§fКупить ${itemDescription(item)} §fза ${cost.string()}?`)
         .setButton1('§aКупить!', finalBuy)
-        .setButton2('§cОтмена', () =>
-          this.open(player, '§cПокупка отменена§r\n \n')
-        ) // §r
+        .setButton2('§cОтмена', () => this.open(player, '§cПокупка отменена§r\n \n')) // §r
         .show(player)
     } else finalBuy()
   }
@@ -208,17 +190,11 @@ export class Store {
    * @param {Player} player
    */
   open(player, message = '') {
-    const form = new ActionForm(
-      this.options.title,
-      message + this.options.body(player)
-    )
+    const form = new ActionForm(this.options.title, message + this.options.body(player))
     for (const { item, cost } of this.items) {
       const canBuy = cost.check(player)
       form.addButton(
-        `${canBuy ? '' : '§7'}${itemDescription(
-          item,
-          canBuy ? '§g' : '§7'
-        )}\n${cost.string(canBuy)}`,
+        `${canBuy ? '' : '§7'}${itemDescription(item, canBuy ? '§g' : '§7')}\n${cost.string(canBuy)}`,
         () => this.buy({ item, cost, player })
       )
     }
@@ -232,9 +208,7 @@ export class Store {
  * @param {ItemStack} item
  */
 function itemDescription(item, c = '§g') {
-  return `${item.nameTag ?? GAME_UTILS.localizationName(item)}§r${
-    item.amount ? ` ${c}x${item.amount}` : ''
-  }`
+  return `${item.nameTag ?? GAME_UTILS.localizationName(item)}§r${item.amount ? ` ${c}x${item.amount}` : ''}`
 }
 
 /**

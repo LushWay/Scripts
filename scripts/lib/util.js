@@ -15,19 +15,12 @@ export const util = {
      * @param {string[]} [arg2.additionalStack]
      * @param {string} [arg2.errorName]
      */
-    function error(
-      error,
-      { deleteStack = 0, additionalStack = [], errorName } = {}
-    ) {
+    function error(error, { deleteStack = 0, additionalStack = [], errorName } = {}) {
       if (typeof error === 'string') {
         error = new Error(error)
         error.name = 'StringError'
       }
-      const stack = util.error.stack.get(
-        deleteStack + 1,
-        additionalStack,
-        error.stack
-      )
+      const stack = util.error.stack.get(deleteStack + 1, additionalStack, error.stack)
       const message = util.error.message.get(error)
       const name = errorName ?? error?.name ?? 'Error'
       const text = `§4${name}: §c${message}\n§f${stack}`
@@ -46,16 +39,8 @@ export const util = {
           [/<> \((.+)\)/, '$1'],
           [/<input>/, '§7<eval>§r'],
           [/(.*)\(native\)(.*)/, '§8$1(native)$2§f'],
-          [
-            s =>
-              s.includes('lib') || s.includes('xapi.js')
-                ? `§7${s.replace(/§./g, '')}§f`
-                : s,
-          ],
-          [
-            s =>
-              s.startsWith('§7') ? s : s.replace(/\.js:(\d+)/, '.js:§6$1§f'),
-          ],
+          [s => (s.includes('lib') || s.includes('xapi.js') ? `§7${s.replace(/§./g, '')}§f` : s)],
+          [s => (s.startsWith('§7') ? s : s.replace(/\.js:(\d+)/, '.js:§6$1§f'))],
         ],
 
         /**
@@ -98,11 +83,7 @@ export const util = {
         /** @type {[RegExp | string, string, string?][]} */
         modifiers: [
           [/\n/g, ''],
-          [
-            /Module \[(.*)\] not found\. Native module error or file not found\./g,
-            '§cNot found: §6$1',
-            'LoadError',
-          ],
+          [/Module \[(.*)\] not found\. Native module error or file not found\./g, '§cNot found: §6$1', 'LoadError'],
         ],
 
         /**
@@ -153,8 +134,7 @@ export const util = {
     // avoid Circular structure error
     const visited = new WeakSet()
 
-    if (depth > 10 || typeof target !== 'object')
-      return `${rep(target)}` || `${target}` || '{}'
+    if (depth > 10 || typeof target !== 'object') return `${rep(target)}` || `${target}` || '{}'
 
     /**
      * @param {any} value
@@ -249,9 +229,7 @@ export const util = {
           break
 
         case 'string':
-          value = `${c.string}\`${value
-            .replace(/"/g, uniqueKey)
-            .replace(/§/g, '§§')}\`§r`
+          value = `${c.string}\`${value.replace(/"/g, uniqueKey).replace(/§/g, '§§')}\`§r`
           break
 
         default:
@@ -301,11 +279,7 @@ export const util = {
   ngettext(n, [one = 'секунда', few = 'секунды', more = 'секунд']) {
     if (!Number.isInteger(n)) return more
     return [one, few, more][
-      n % 10 == 1 && n % 100 != 11
-        ? 0
-        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
-        ? 1
-        : 2
+      n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2
     ]
   },
 
@@ -442,12 +416,7 @@ export const util = {
    */
   toTerminalColors(text) {
     if (this.settings.BDSMode)
-      return (
-        text.replace(
-          /§(.)/g,
-          (_, a) => this.terminalColors[a] ?? this.terminalColors.r
-        ) + this.terminalColors.r
-      )
+      return text.replace(/§(.)/g, (_, a) => this.terminalColors[a] ?? this.terminalColors.r) + this.terminalColors.r
 
     return text.replace(/§(.)/g, '')
   },

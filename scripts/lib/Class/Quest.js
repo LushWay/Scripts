@@ -31,9 +31,7 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return `§6Квест: §f${
-          status.quest.displayName
-        }\n${status.step.text()}\n§6Подробнее: §f-q`
+        return `§6Квест: §f${status.quest.displayName}\n${status.step.text()}\n§6Подробнее: §f-q`
       }
     },
   }
@@ -57,9 +55,7 @@ export class Quest {
     this.players[player.id] = new PlayerQuest(this, player)
     this.init(this.players[player.id], player)
 
-    world.afterEvents.playerLeave.subscribe(
-      ({ playerId }) => delete this.players[playerId]
-    )
+    world.afterEvents.playerLeave.subscribe(({ playerId }) => delete this.players[playerId])
 
     return this.players[player.id]
   }
@@ -210,8 +206,7 @@ class PlayerQuest {
     const ctx = {
       ...options,
       text: typeof text === 'string' ? () => text : text,
-      description:
-        typeof description === 'string' ? () => description : description,
+      description: typeof description === 'string' ? () => description : description,
 
       player: this.player,
       update: this.update.bind(this),
@@ -277,9 +272,7 @@ class PlayerQuest {
           )
         }
 
-        const temp = this.quest
-          .steps(this.player)
-          .createTargetMarkerInterval({ place: Vector.slerp(from, to, 0.5) })
+        const temp = this.quest.steps(this.player).createTargetMarkerInterval({ place: Vector.slerp(from, to, 0.5) })
 
         return {
           cleanup() {
@@ -337,8 +330,7 @@ class PlayerQuest {
     options.activate = function (firstTime) {
       if (!this.player) throw new Error('Wrong this!')
       const data = this.player.database
-      if (typeof data.quest?.additional === 'number')
-        options.value = data.quest?.additional
+      if (typeof data.quest?.additional === 'number') options.value = data.quest?.additional
 
       options.value ??= 0
 
@@ -459,10 +451,7 @@ class PlayerQuest {
           const distance = Vector.distance(Vector.zero, targetRelative)
           const relative = Vector.multiply(playerViewDirection, distance)
 
-          this.player.dimension.spawnParticle(
-            'minecraft:balloon_gas_particle',
-            Vector.add(head, relative)
-          )
+          this.player.dimension.spawnParticle('minecraft:balloon_gas_particle', Vector.add(head, relative))
         },
         'Quest place marker particle',
         20

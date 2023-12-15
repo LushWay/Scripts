@@ -9,9 +9,5 @@ new Command({
   const we = WorldEdit.forPlayer(ctx.sender)
 
   we.drawselection = !we.drawselection
-  ctx.reply(
-    `§3► §fОтображение выделения: ${
-      we.drawselection ? '§aвключено' : '§cвыключено'
-    }`
-  )
+  ctx.reply(`§3► §fОтображение выделения: ${we.drawselection ? '§aвключено' : '§cвыключено'}`)
 })

@@ -27,17 +27,12 @@ function worldSettings(player) {
   for (const groupName in Settings.worldMap) {
     const data = WORLD_SETTINGS_DB[groupName]
     const requires = Object.entries(Settings.worldMap[groupName]).reduce(
-      (count, [key, option]) =>
-        option.requires && typeof data[key] === 'undefined' ? count + 1 : count,
+      (count, [key, option]) => (option.requires && typeof data[key] === 'undefined' ? count + 1 : count),
       0
     )
-    form.addButton(
-      `${groupName}${requires ? ` §c(${requires}!)` : ''}`,
-      null,
-      () => {
-        settingsGroup(player, groupName, 'WORLD')
-      }
-    )
+    form.addButton(`${groupName}${requires ? ` §c(${requires}!)` : ''}`, null, () => {
+      settingsGroup(player, groupName, 'WORLD')
+    })
   }
 
   form.show(player)
@@ -70,8 +65,7 @@ export function settingsGroup(player, groupName, groupType, errors = {}) {
     const dbValue = db[KEY]
     const isDef = typeof dbValue === 'undefined'
     const message = errors[KEY] ? `${errors[KEY]}\n` : ''
-    const requires =
-      Reflect.get(config[KEY], 'requires') && typeof dbValue === 'undefined'
+    const requires = Reflect.get(config[KEY], 'requires') && typeof dbValue === 'undefined'
 
     const value = dbValue ?? OPTION.value
     const toggle = typeof value === 'boolean'
@@ -93,12 +87,7 @@ export function settingsGroup(player, groupName, groupType, errors = {}) {
     }
 
     if (toggle) form.addToggle(label, value)
-    else
-      form.addTextField(
-        label,
-        'Настройка не изменится',
-        typeof value === 'string' ? value : JSON.stringify(value)
-      )
+    else form.addTextField(label, 'Настройка не изменится', typeof value === 'string' ? value : JSON.stringify(value))
 
     buttons.push([
       KEY,
@@ -142,8 +131,7 @@ export function settingsGroup(player, groupName, groupType, errors = {}) {
       if (result) messages[KEY] = result
     }
 
-    if (Object.keys(messages).length)
-      settingsGroup(player, groupName, groupType, messages)
+    if (Object.keys(messages).length) settingsGroup(player, groupName, groupType, messages)
     else {
       if (groupType === 'PLAYER') playerSettings(player)
       else worldSettings(player)
