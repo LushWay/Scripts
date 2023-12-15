@@ -9,8 +9,8 @@ export const TIMERS_PATHES = {}
 
 /**
  * @param {string} type
- * @param {(fn: () => void, ticks: number) => number} set
- * @param {() => void} fn
+ * @param {(fn: VoidFunction, ticks: number) => number} set
+ * @param {VoidFunction} fn
  * @param {string} name
  * @param {number} ticks
  */

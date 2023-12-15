@@ -64,7 +64,7 @@ export class ActionForm {
     return this
   }
   /**
-   * @param {() => void} backFN
+   * @param {VoidFunction} backFN
    */
   addButtonBack(backFN) {
     return this.addButton(ActionForm.backText, backFN)

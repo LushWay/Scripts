@@ -17,7 +17,7 @@ export const OPTIONS_NAME = Symbol('name')
 /**
  * @template [T = boolean | string | number | JSONLike]
  * @typedef {Record<string,
- *   { desc: string; value: T, name: string, onChange?: () => void  }
+ *   { desc: string; value: T, name: string, onChange?: VoidFunction  }
  * > & {[OPTIONS_NAME]?: string}
  * } DefaultSettings
  */

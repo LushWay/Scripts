@@ -8,10 +8,13 @@ const qcmd = new Command({
   name: 'q',
   role: 'member',
 }).executes(ctx => {
-  const q = Object.values(Quest.instances).find(e => e.players[ctx.sender.id])
+  const q = Quest.active(ctx.sender)
   if (!q) return ctx.error('Вы не находитесь в квесте!')
-
-  return ctx.reply('Выйти: -q exit')
+  return ctx.reply(
+    `§6${q.quest.displayName}\n\nЗадание: §f${q.step.text()}§7${
+      q.step.description ? 'Описание: ' + q.step.description() + '\n' : ''
+    }§6Выйти из квеста: §f-q exit`
+  )
 })
 
 qcmd.literal({ name: 'enter', role: 'admin' }).executes(ctx => {

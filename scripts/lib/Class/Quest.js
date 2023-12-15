@@ -1,5 +1,7 @@
-import { Player, Vector, world } from '@minecraft/server'
+import { Entity, Player, Vector, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
+import { Temporary } from 'lib/Class/Temporary.js'
+import { GAME_UTILS } from 'smapi.js'
 import { Place } from './Action.js'
 
 // // @ts-expect-error Bruh
@@ -145,12 +147,13 @@ function setQuests(player) {
 world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
 
 /**
- * @typedef {() => string} QuestText
+ * @typedef {string | (() => string)} QuestText
  */
 
 /**
  * @typedef {{
  *   text: QuestText,
+ *   description?: QuestStepInput["text"]
  *   activate?(): { cleanup(): void }
  * }} QuestStepInput
  */
@@ -161,7 +164,9 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
  *   cleanup?(): void
  *   player: Player
  *   quest: Quest
- * } & QuestStepInput & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
+ *   text: () => string
+ *   description?: QuestStepThis['text']
+ * } & Omit<QuestStepInput, 'text' | 'description'> & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
  */
 
 class PlayerQuest {
@@ -193,10 +198,15 @@ class PlayerQuest {
   dynamic(options) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const step = this
+    const text = options.text
+    const description = options.description
     const i = this.list.length
     /** @type {PlayerQuest["list"][number]} */
     const ctx = {
       ...options,
+      text: typeof text === 'string' ? () => text : text,
+      description:
+        typeof description === 'string' ? () => description : description,
 
       player: this.player,
       update: this.update.bind(this),
@@ -227,11 +237,9 @@ class PlayerQuest {
    */
   start(action) {
     this.dynamic({
-      text() {
-        return ''
-      },
+      text: '',
       activate() {
-        action.bind(this)()
+        action.call(this)
         this.next()
         return { cleanup() {} }
       },
@@ -241,11 +249,12 @@ class PlayerQuest {
   /**
    * @param {Vector3} from
    * @param {Vector3} to
-   * @param {string} text
+   * @param {QuestText} text
    */
-  place(from, to, text) {
+  place(from, to, text, description = text) {
     this.dynamic({
-      text: () => text,
+      text,
+      description,
       activate() {
         /** @type {ReturnType<typeof Place.action>[]} */
         const actions = []
@@ -259,8 +268,13 @@ class PlayerQuest {
           )
         }
 
+        const temp = this.quest
+          .steps(this.player)
+          .createTargetMarkerInterval({ from, to })
+
         return {
           cleanup() {
+            temp.cleanup()
             actions.forEach(e => {
               Place.actions[e.id].delete(e.action)
             })
@@ -273,16 +287,17 @@ class PlayerQuest {
   /**
    * @typedef {{
    *   text(value: number): string,
+   *   description?: QuestCounterInput['text']
    *   end: number,
    *   value?: number,
-   * } & Omit<QuestStepInput, "text">
+   * } & Omit<QuestStepInput, "text" | "description">
    * } QuestCounterInput
    */
 
   /**
    * @typedef {QuestStepThis &
    * { diff(this: QuestStepThis, m: number): void } &
-   * QuestCounterInput
+   *   Omit<QuestCounterInput, 'text' | 'description'>
    * } QuestCounterThis
    */
 
@@ -323,13 +338,61 @@ class PlayerQuest {
     const inputedText = options.text.bind(options)
     options.text = () => inputedText(options.value)
 
+    const inputedDescription = options.description?.bind(options)
+    options.description = () =>
+      (inputedDescription ?? inputedText)(options.value)
+
     this.dynamic(options)
   }
 
   /**
-   * @param {QuestStepInput} o
+   * @typedef {{
+   *   npcEntity: Entity
+   *   placeText?: QuestStepInput["text"]
+   *   placeDescription?: QuestStepInput["text"]
+   *   talkText: QuestStepInput["text"]
+   *   talkDescription?: QuestStepInput["text"]
+   * } & QuestStepInput} QuestDialogueInput
    */
-  dialogue({ text }) {}
+
+  /**
+   * @typedef {QuestStepThis & QuestDialogueInput} QuestDialogueThis
+   */
+
+  /**
+   * @param {QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>} options
+   */
+  dialogue(options) {
+    const location = GAME_UTILS.safeGet(options.npcEntity, 'location')
+    if (!location) return this.failed('Неигровой персонаж недоступен')
+
+    options.placeText ??= () => 'Доберитесь до ' + options.npcEntity.nameTag
+
+    this.place(
+      Vector.add(location, Vector.multiply(Vector.one, -1)),
+      Vector.add(location, Vector.one),
+      options.placeText,
+      options.placeDescription
+    )
+    this.dynamic({
+      text: options.talkText,
+      description: options.talkDescription,
+      activate() {
+        return new Temporary(({ system }) => {
+          system.afterEvents.scriptEventReceive.subscribe(
+            event => {
+              if (event.id !== 'quest:dialogue.end' || !event.initiator) return
+              if (event.initiator.id !== this.player.id) return
+              this.next()
+            },
+            {
+              namespaces: ['quest'],
+            }
+          )
+        })
+      },
+    })
+  }
 
   /**
    * @param {string} reason
@@ -354,5 +417,49 @@ class PlayerQuest {
    */
   end(action) {
     this._end = action
+  }
+
+  /**
+   * @typedef {{
+   *   from: Vector3
+   *   to: Vector3
+   *   temporary?: Temporary
+   *   interval?: VoidFunction & ThisParameterType<MarkerOptions>
+   * }} MarkerOptions
+   */
+
+  /**
+   * @param {MarkerOptions} options
+   */
+  createTargetMarkerInterval(options) {
+    const temp = new Temporary(({ system }) => {
+      system.runInterval(
+        () => {
+          options.interval?.()
+
+          const head = this.player.getHeadLocation()
+          const playerViewDirection = this.player.getViewDirection()
+          const targetPosition = Vector.add(
+            Vector.slerp(options.from, options.to, 0.5),
+            {
+              x: 0.5,
+              y: 0.5,
+              z: 0.5,
+            }
+          )
+          const targetRelative = Vector.subtract(targetPosition, head)
+          const distance = Vector.distance(Vector.zero, targetRelative)
+          const relative = Vector.multiply(playerViewDirection, distance)
+
+          this.player.dimension.spawnParticle(
+            'minecraft:balloon_gas_particle',
+            Vector.add(head, relative)
+          )
+        },
+        'Quest place marker particle',
+        20
+      )
+    }, options.temporary)
+    return temp
   }
 }

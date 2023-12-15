@@ -1,8 +1,10 @@
-import { ItemStack, ItemTypes, world } from '@minecraft/server'
+import { Container, ItemStack, ItemTypes, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { Enchantments } from './Enchantments.js'
 
 export class LootTable {
+  /** @type {Record<string, LootTable>} */
+  static instances = {}
   /**
    * Stored items
    * @type {Array<import("../server.js").LootItem.Stored>}
@@ -13,9 +15,13 @@ export class LootTable {
 
   /**
    * Creates new LootTable with specified items
+   * @param {object} o
+   * @param {string} o.key
    * @param  {...import("../server.js").LootItem.Input} items - Items to randomise
    */
-  constructor(...items) {
+  constructor({ key }, ...items) {
+    this.key = key
+    LootTable.instances[key] = this
     this.items = items.map(item => {
       const id =
         'type' in item
@@ -141,6 +147,16 @@ export class LootTable {
       return stack
     })
   }
+
+  /**
+   * @param {Container} container
+   * @param {Percent} [air]
+   */
+  fillContainer(container, air) {
+    for (const [i, item] of this.generate(container.size, air).entries()) {
+      if (item) container.setItem(i, item)
+    }
+  }
 }
 
 const RandomCost = {
@@ -197,46 +213,3 @@ const RandomCost = {
     return finalMap
   },
 }
-
-const table = new LootTable(
-  {
-    id: 'minecraft:diamond_sword',
-    chance: '40%',
-    amount: {
-      0: '50%',
-      1: '50%',
-    },
-    enchantments: {
-      sharpness: {
-        '0': '40%',
-        '1...2': '50%',
-        '3...5': '10%',
-      },
-    },
-    options: {
-      damage: {
-        0: '20%',
-        40: '60%',
-      },
-    },
-  },
-  {
-    type: 'Apple',
-    amount: {
-      '1...40': '6%',
-      '41...64': '1%',
-    },
-    chance: '50%',
-  }
-)
-
-new Command({
-  name: 'loott',
-  role: 'admin',
-}).executes(ctx => {
-  const { container } = ctx.sender.getComponent('inventory')
-  const gen = table.generate(container.size, '30%')
-  for (const [i, item] of gen.entries()) {
-    if (item) container.setItem(i, item)
-  }
-})

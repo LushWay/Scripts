@@ -1,6 +1,8 @@
 import * as mc from '@minecraft/server'
 import { ROLES } from './roles'
 declare global {
+  type VoidFunction = () => void
+
   interface Console {
     error(...data: any[]): void
     info(...data: any[]): void

@@ -93,9 +93,9 @@ export class MessageForm {
  * @param {Player} player
  * @param {string} text
  * @param {string} yesText
- * @param {() => void} onYesAction
+ * @param {VoidFunction} onYesAction
  * @param {string} noText
- * @param {() => void} onNoAction
+ * @param {VoidFunction} onNoAction
  */
 
 export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {

@@ -269,7 +269,7 @@ export const util = {
 
   /**
    * Runs the given callback safly. If it throws any error it will be handled
-   * @param {Function | (() => void | Promise<any>)} func
+   * @param {() => void | Promise<void>} func
    * @param {string} [type]
    * @param {string[]} [additionalStack]
    */

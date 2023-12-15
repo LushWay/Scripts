@@ -1,5 +1,7 @@
 import {
   System,
+  SystemAfterEvents,
+  SystemBeforeEvents,
   World,
   WorldAfterEvents,
   WorldBeforeEvents,
@@ -7,9 +9,13 @@ import {
   world,
 } from '@minecraft/server'
 
+/**
+ * @typedef {{system: System;world: World;cleanup: VoidFunction;temp: Temporary;}} ProxiedSubscribers
+ */
+
 export class Temporary {
   /**
-   * @template {WorldAfterEvents | WorldBeforeEvents} Events
+   * @template {WorldAfterEvents | WorldBeforeEvents | SystemAfterEvents | SystemBeforeEvents} Events
    * @param {Events} events
    * @returns {Events}
    * @private
@@ -87,10 +93,17 @@ export class Temporary {
 
   /**
    * Creates new temporary system
-   * @param {(arg: { system: System, world: World, cleanup: Temporary["cleanup"], temp: Temporary }) => void} execute
+   * @param {(arg: ProxiedSubscribers) => void} execute
+   * @param {Temporary} [parent] 
    */
-  constructor(execute) {
-    execute({
+  constructor(execute, parent) {
+    if (parent) {
+      execute(parent.proxied)
+      return parent
+    }
+
+    /** @type {ProxiedSubscribers} */
+    this.proxied = {
       world: Object.setPrototypeOf(
         {
           afterEvents: this.proxyEvents(world.afterEvents),
@@ -98,18 +111,20 @@ export class Temporary {
         },
         world
       ),
-      system: this.proxySystem(),
-      cleanup: this.cleanup.bind(this),
+      system: Object.setPrototypeOf(
+        {
+          afterEvents: this.proxyEvents(system.afterEvents),
+          beforeEvents: this.proxyEvents(system.beforeEvents),
+        },
+        this.proxySystem()
+      ),
+      cleanup: this.cleanup,
       temp: this,
-    })
+    }
+
+    execute(this.proxied)
   }
 
-  /**
-   * List of functions that will be called on clear
-   * @private
-   * @type {(() => void)[]}
-   */
-  cleaner = []
   /**
    * Unsubscribes all temporary events
    * @type {(this: Temporary) => void}
@@ -119,6 +134,13 @@ export class Temporary {
     this.cleaner = []
     this.cleaned = true
   }).bind(this)
+
+  /**
+   * List of functions that will be called on clear
+   * @private
+   * @type {(VoidFunction)[]}
+   */
+  cleaner = []
 
   /**
    * Weather events are unsubscribed or not

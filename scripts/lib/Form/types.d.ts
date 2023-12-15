@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 
 declare global {
-  type ButtonCallback = () => void
+  type ButtonCallback = VoidFunction
   type PlayerButtonCallback = (player: Player) => void
 
   interface IActionFormButton {
