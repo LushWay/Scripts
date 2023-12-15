@@ -1,6 +1,6 @@
 import { Player, Vector } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { DB, util } from 'smapi.js'
+import { DB, EventLoader, util } from 'smapi.js'
 import { DEFAULT_REGION_PERMISSIONS } from './config.js'
 
 /**
@@ -59,6 +59,7 @@ export class Region {
     LOWEST_Y_VALUE,
 
     SETTED: false,
+    permissionLoad: new EventLoader(),
     /**
      * The default permissions for all regions made
      */
@@ -98,6 +99,8 @@ export class Region {
           )
         }
       })
+
+      EventLoader.emit(this.permissionLoad, {})
     },
   }
   /**
@@ -294,6 +297,18 @@ export class CubeRegion extends Region {
 }
 
 export class RadiusRegion extends Region {
+  /**
+   * @param {ConstructorParameters<typeof RadiusRegion>[0]} optionsToCreate
+   */
+  static ensureRegionInLocation(optionsToCreate) {
+    const region = this.locationInRegion(
+      optionsToCreate.center,
+      optionsToCreate.dimensionId
+    )
+    if (!region || !(region instanceof this)) {
+      return new this(optionsToCreate)
+    } else return region
+  }
   subtype = 'cm'
   /**
    * Gets all radius regions
@@ -376,6 +391,13 @@ export class MineshaftRegion extends RadiusRegion {
 }
 
 export class SafeAreaRegion extends RadiusRegion {
+  /**
+   * @param  {Parameters<typeof RadiusRegion['ensureRegionInLocation']>} args
+   * @returns {SafeAreaRegion}
+   */
+  static ensureRegionInLocation(...args) {
+    return super.ensureRegionInLocation(...args)
+  }
   /** @type {IRegionPermissions} */
   basePermissions = {
     allowedEntities: 'all',

@@ -65,16 +65,13 @@ if (SPAWN.location.valid) {
     player.teleport(SPAWN.location)
   })
 
-  SPAWN.region = SafeAreaRegion.locationInRegion(SPAWN.location, 'overworld')
-  if (!SPAWN.region || !(SPAWN.region instanceof SafeAreaRegion)) {
-    system.delay(() => {
-      SPAWN.region = new SafeAreaRegion({
-        center: SPAWN.location,
-        radius: 100,
-        dimensionId: 'overworld',
-      })
+  Region.config.permissionLoad.subscribe(() => {
+    SPAWN.region = SafeAreaRegion.ensureRegionInLocation({
+      center: SPAWN.location,
+      radius: 100,
+      dimensionId: 'overworld',
     })
-  }
+  })
 
   system.runPlayerInterval(
     player => {

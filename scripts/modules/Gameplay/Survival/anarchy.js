@@ -1,6 +1,7 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
+import { Region, SafeAreaRegion } from 'modules/Region/Region.js'
 import { Zone } from 'modules/Server/Class/Zone.js'
 import { tpMenu } from 'modules/Server/Commands/tp.js'
 import { EditableLocation, InventoryStore, Settings } from 'smapi.js'
@@ -15,10 +16,20 @@ export const ANARCHY = {
   inventory: new InventoryStore('anarchy'),
   /** @type {undefined | Portal} */
   portal: void 0,
+  /** @type {undefined | SafeAreaRegion} */
+  safeArea: void 0,
 }
 
 if (ANARCHY.centerLocation.valid) {
   new Zone(ANARCHY.centerLocation, ps => ps.length * 50)
+
+  Region.config.permissionLoad.subscribe(() => {
+    ANARCHY.safeArea = SafeAreaRegion.ensureRegionInLocation({
+      center: ANARCHY.centerLocation,
+      radius: 100,
+      dimensionId: 'overworld',
+    })
+  })
 }
 
 /**
@@ -74,10 +85,26 @@ if (ANARCHY.portalLocation.valid) {
       }
 
       system.delay(() => {
-        if (!data.anarchy || !(player.id in ANARCHY.inventory._.STORES)) {
-          if (building || !ANARCHY.centerLocation.valid)
-            return tpMenuOnce(player)
+        if (building || !ANARCHY.centerLocation.valid) return tpMenuOnce(player)
 
+        if (!(player.id in ANARCHY.inventory._.STORES)) {
+          InventoryStore.load({
+            from: {
+              equipment: {},
+              health: 20,
+              xp: 0,
+              slots: {},
+            },
+            to: player,
+            clearAll: true,
+          })
+        } else {
+          anarchyInventory(player)
+        }
+
+        data.inv = 'anarchy'
+
+        if (!data.anarchy) {
           randomTeleport(
             player,
             Vector.add(ANARCHY.centerLocation, { x: 100, y: 0, z: 100 }),
@@ -91,28 +118,26 @@ if (ANARCHY.portalLocation.valid) {
               keepInSkyTime: 20,
             }
           )
-
-          InventoryStore.load({
-            from: {
-              equipment: {},
-              health: 20,
-              xp: 0,
-              slots: { 0: SPAWN.startAxeItem },
-            },
-            to: player,
-            clearAll: true,
-          })
-          data.inv = 'anarchy'
         } else {
-          if (!building) anarchyInventory(player)
-          else Portal.canTeleport(player)
-
           player.teleport(data.anarchy)
           delete data.anarchy
         }
       })
     }
   )
+  ANARCHY.portal.command
+    ?.literal({
+      name: 'clearpos',
+      description:
+        'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
+    })
+    .executes(ctx => {
+      delete ctx.sender.database.survival.anarchy
+      ctx.sender.playSound(SOUNDS.success)
+      ctx.reply(
+        '§a> §fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.'
+      )
+    })
 }
 
 const settings = Settings.player('Вход', 'join', {

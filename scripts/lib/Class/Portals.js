@@ -67,7 +67,7 @@ export class Portal {
     } else this.place = place
 
     if (createCommand)
-      new Command({
+      this.command = new Command({
         name,
         aliases,
         description: commandDescription ?? `§bТелепорт на ${name}`,

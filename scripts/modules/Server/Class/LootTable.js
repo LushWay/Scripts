@@ -1,6 +1,29 @@
-import { Container, ItemStack, ItemTypes, world } from '@minecraft/server'
+import { Container, ItemStack, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { Enchantments } from './Enchantments.js'
+
+new Command({
+  name: 'loot',
+  role: 'admin',
+})
+  .string('lootTableName', true)
+  .executes((ctx, lootTableName) => {
+    const lootTable = LootTable.instances[lootTableName]
+    if (!lootTable)
+      return ctx.error(
+        lootTableName +
+          ' - unknown. Valid:\n' +
+          Object.keys(LootTable.instances).join('\n')
+      )
+
+    const block = ctx.sender.dimension.getBlock(ctx.sender.location)?.below()
+    if (!block) return ctx.error('No block under feats')
+    const inventory = block.getComponent('inventory')
+    if (!inventory || !inventory.container)
+      return ctx.error('No inventory in block')
+    inventory.container.clearAll()
+    lootTable.fillContainer(inventory.container)
+  })
 
 export class LootTable {
   /** @type {Record<string, LootTable>} */
@@ -14,24 +37,31 @@ export class LootTable {
   totalChance = 0
 
   /**
+   * @typedef {{ type: "itemsCount" } | { type: "airPercent", air: Percent }} LootTableFillType
+   */
+
+  /**
    * Creates new LootTable with specified items
    * @param {object} o
    * @param {string} o.key
+   * @param {LootTableFillType} [o.fill]
    * @param  {...import("../server.js").LootItem.Input} items - Items to randomise
    */
-  constructor({ key }, ...items) {
+  constructor({ key, fill = { type: 'airPercent', air: '50%' } }, ...items) {
     this.key = key
+    this.fill = fill
     LootTable.instances[key] = this
     this.items = items.map(item => {
-      const id =
-        'type' in item
-          ? MinecraftItemTypes[item.type]
-          : ItemTypes.get(item.id)?.id
+      /** @type {ItemStack} */
+      let itemStack
 
-      if (!id)
-        throw new TypeError(
-          'Unkown LootTable.item id: ' + ('type' in item ? item.type : item.id)
-        )
+      if ('itemStack' in item) {
+        itemStack = item.itemStack
+      } else {
+        if ('type' in item) {
+          itemStack = new ItemStack(MinecraftItemTypes[item.type])
+        } else itemStack = new ItemStack(item.typeId)
+      }
 
       /** @type {number[]} */
       const amount =
@@ -41,33 +71,36 @@ export class LootTable {
           ? RandomCost.toArray(item.amount)
           : [1]
 
-      /** @type {Record<string, number[]>} */
-      const enchantments = {}
-      for (const [key, value] of Object.entries(item.enchantments ?? {})) {
-        enchantments[key] = RandomCost.toArray(value)
-      }
-
       const chance = parseInt(item.chance)
-      if (isNaN(chance))
+      if (isNaN(chance)) {
         throw new TypeError(
           `Chance must be \`{number}%\`, got '${chance}' instead!`
         )
-      this.totalChance += chance
+      }
 
-      /** @type {import("../server.js").LootItem.Options<number[]>} */
-      const options = Object.assign(item?.options ?? {})
-      if (item.options?.damage) {
-        options.damage = RandomCost.toArray(item.options.damage)
+      if (chance !== 100) this.totalChance += chance
+
+      if (item.options) {
+        const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } =
+          item.options
+        if (canDestroy) itemStack.setCanDestroy(canDestroy)
+        if (item.options.canPlaceOn) itemStack.setCanPlaceOn(canPlaceOn)
+        if (lockMode) itemStack.lockMode = lockMode
+        if (keepOnDeath) itemStack.keepOnDeath = true
+        if (lore) itemStack.setLore(lore)
+        if (nameTag) itemStack.nameTag = nameTag
       }
 
       return {
-        id: id,
-        chance: chance,
-        nameTag: item.nameTag ?? '',
-        lore: item.lore ?? [],
-        enchantments: enchantments,
-        amount: amount,
-        options: options ?? {},
+        itemStack,
+        chance,
+        amount,
+        enchantments: Object.fromEntries(
+          Object.entries(item.enchantments ?? {}).map(([key, value]) => {
+            return [key, RandomCost.toArray(value)]
+          })
+        ),
+        damage: item.damage ? RandomCost.toArray(item.damage) : [],
       }
     })
   }
@@ -75,85 +108,109 @@ export class LootTable {
   /**
    * Randomises items and returns array with specified size
    * @param {number} size - Size of the array
-   * @param {Percent} air
-   * @returns {Array<ItemStack | null | undefined>}
+   * @returns {Array<ItemStack | void>}
    */
-  generate(size, air = '70%') {
-    let step = 0
-    const stepMax = ~~(size * (parseInt(air) / 100))
-    world.debug({ stepMax })
+  generate(size) {
+    let stepMax = 0
+    if (this.fill.type === 'airPercent') {
+      stepMax = ~~(size * (parseInt(this.fill.air) / 100))
+    } else {
+      size = Math.min(size, this.items.length - 1)
+    }
 
-    return new Array(size).fill(null).map(() => {
+    /** @type {NonNullable<ReturnType<this['generateItem']>>} */
+    // @ts-expect-error Filter mistype
+    const items = this.items.map(i => this.generateItem(i)).flat()
+
+    let explictItems = items.filter(e => e.chance === 100)
+    let randomizableItems = items.filter(e => !explictItems.includes(e))
+
+    let air = 0
+    return new Array(size).fill(null).map((_, i) => {
       // Select air between items
-      if (step > 0) {
-        step--
-        return null
+      if (air > 0) {
+        air--
+        return
       }
+      air = Math.randomInt(
+        0,
+        stepMax - (explictItems.length + randomizableItems.length)
+      )
 
-      step = Math.randomInt(0, stepMax)
+      if (explictItems.length) {
+        const item = explictItems.randomElement()
+        explictItems = explictItems.filter(e => e !== item)
+        return item.stack
+      } else {
+        // Get random item depends on chance
+        let random = Math.randomInt(0, this.totalChance)
+        const item = randomizableItems.find(e => {
+          random -= e.chance
+          return random < 0
+        })
 
-      // Get random item depends on chance
-      let random = Math.randomInt(0, this.totalChance)
-      /**
-       * @type {import("../server.js").LootItem.Stored}
-       */
-      let item
+        if (!item) return
 
-      for (const current of this.items) {
-        random -= current.chance
+        randomizableItems = randomizableItems.filter(e => e !== item)
 
-        if (0 > random) {
-          item = current
-          break
-        }
+        return item.stack
       }
-
-      item = this.items[0]
-
-      // Randomise item properties
-      const amount = item.amount.randomElement()
-      if (amount <= 0) return
-
-      const stack = new ItemStack(item.id, amount)
-
-      const { enchantments } = stack.enchantments
-      for (const [name, levels] of Object.entries(item.enchantments)) {
-        const level = levels.randomElement()
-        if (!level) continue
-        enchantments.addEnchantment(Enchantments.custom[name][level])
-      }
-      stack.enchantments.enchantments = enchantments
-
-      const {
-        canDestroy,
-        canPlaceOn,
-        damage: durability,
-        lockMode,
-        keepOnDeath,
-      } = item.options
-
-      if (item.nameTag) stack.nameTag = item.nameTag
-      if (item.lore.length) stack.setLore(item.lore)
-
-      if (keepOnDeath) stack.keepOnDeath = true
-      if (lockMode) stack.lockMode = lockMode
-      if (canDestroy?.length) stack.setCanDestroy(canDestroy)
-      if (canPlaceOn?.length) stack.setCanPlaceOn(canPlaceOn)
-      if (durability?.length) {
-        const damage = durability.randomElement()
-        if (damage) stack.durability.damage = damage
-      }
-
-      return stack
     })
   }
 
   /**
-   * @param {Container} container
-   * @param {Percent} [air]
+   * @param {import('modules/Server/server.js').LootItem.Stored} item
+   * @returns {{stack: ItemStack, chance: number}[]}
    */
-  fillContainer(container, air) {
-    for (const [i, item] of this.generate(container.size, air).entries()) {
+  generateItem(item) {
+    // Randomise item properties
+    const amount = item.amount.randomElement()
+    if (amount <= 0) return []
+
+    if (amount > item.itemStack.maxAmount) {
+      // TODO Splitting
+      const average = Math.floor(amount / item.itemStack.maxAmount)
+      const last = amount % item.itemStack.maxAmount
+      return new Array(average)
+        .fill(null)
+        .map((e, i, a) =>
+          this.generateItem({
+            ...e,
+            amount: i === a.length - 1 ? last : average,
+          })
+        )
+        .flat()
+    }
+
+    const stack = item.itemStack.clone()
+    stack.amount = amount
+
+    const { enchantments } = stack.enchantments
+    for (const [name, levels] of Object.entries(item.enchantments)) {
+      const level = levels.randomElement()
+      if (!level) continue
+      enchantments.addEnchantment(Enchantments.custom[name][level])
+    }
+    stack.enchantments.enchantments = enchantments
+
+    if (item.damage.length) {
+      const damage = item.damage.randomElement()
+      if (damage) stack.durability.damage = damage
+    }
+
+    return [
+      {
+        stack,
+        chance: item.chance,
+      },
+    ]
+  }
+
+  /**
+   * @param {Container} container
+   */
+  fillContainer(container) {
+    for (const [i, item] of this.generate(container.size).entries()) {
       if (item) container.setItem(i, item)
     }
   }

@@ -94,7 +94,7 @@ export class Temporary {
   /**
    * Creates new temporary system
    * @param {(arg: ProxiedSubscribers) => void} execute
-   * @param {Temporary} [parent] 
+   * @param {Temporary} [parent]
    */
   constructor(execute, parent) {
     if (parent) {
@@ -131,7 +131,6 @@ export class Temporary {
    */
   cleanup = (() => {
     this.cleaner.forEach(fn => fn())
-    this.cleaner = []
     this.cleaned = true
   }).bind(this)
 

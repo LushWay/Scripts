@@ -10,6 +10,7 @@ import {
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
+import { SURVIVAL_INTERACTION } from 'modules/Gameplay/Survival/index.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 import { Command, LockAction } from 'smapi.js'
 import { BaseRegion, RadiusRegion, Region } from '../../Region/Region.js'
@@ -25,6 +26,14 @@ new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(
   BASE_ITEM_STACK,
   new MoneyCost(10)
 )
+
+SURVIVAL_INTERACTION.subscribe((_, __, ctx) => {
+  if (
+    (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
+    ctx.event.itemStack?.is(BASE_ITEM_STACK)
+  )
+    return true
+})
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block, faceLocation, itemStack } = event

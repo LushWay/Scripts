@@ -1,4 +1,5 @@
 import {
+  Container,
   EntityDamageCause,
   EquipmentSlot,
   GameMode,
@@ -59,5 +60,16 @@ OverTakes(Player.prototype, {
     return this.getComponent('equippable').getEquipmentSlot(
       EquipmentSlot.Mainhand
     )
+  },
+})
+
+OverTakes(Container.prototype, {
+  entries() {
+    /** @type {ReturnType<Container['entries']>} */
+    const items = []
+    for (let i = 0; i < this.size; i++) {
+      items.push([i, this.getItem(i)])
+    }
+    return items
   },
 })

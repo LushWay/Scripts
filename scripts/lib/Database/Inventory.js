@@ -1,5 +1,4 @@
 import {
-  BlockVolumeUtils,
   Entity,
   EquipmentSlot,
   ItemStack,
@@ -132,9 +131,7 @@ export class InventoryStore {
 
     for (const entity of this._.ENTITIES) {
       const { container } = entity.getComponent('inventory')
-
-      for (let i = 0; i < container.size; i++) {
-        const item = container.getItem(i)
+      for (const [, item] of container.entries()) {
         if (!item) break
         items.push(item)
       }

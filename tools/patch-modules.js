@@ -379,5 +379,5 @@ type EntityComponents = {
 
 fs.copyFileSync(
   path.join(resolve('@minecraft/vanilla-data'), 'lib/index.js'),
-  relative('../scripts/@minecraft/vanilla-data.js'),
+  relative('../scripts/@minecraft/vanilla-data.js')
 )

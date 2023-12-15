@@ -20,7 +20,6 @@ const loading = Date.now()
 class SM {
   static afterEvents = {
     modulesLoad: new EventLoader(),
-    databaseInit: new EventLoader(),
     worldLoad: new EventLoader(),
   }
 }

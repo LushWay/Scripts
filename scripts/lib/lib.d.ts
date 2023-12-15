@@ -119,4 +119,8 @@ declare module '@minecraft/server' {
     scores: Record<ScoreNames, number>
     database: PlayerDatabase
   }
+
+  interface Container {
+    entries(): [number, ItemStack | undefined][]
+  }
 }

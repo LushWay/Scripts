@@ -3,12 +3,12 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Gameplay/Build/list.js'
 import { Boss } from 'modules/Gameplay/Survival/boss.js'
 import { MENU } from 'modules/Server/menuItem.js'
-import { ActionForm } from 'smapi.js'
+import { ActionForm, EventSignal } from 'smapi.js'
 import { Region } from '../../Region/Region.js'
 import { loadRegionsWithGuards } from '../../Region/index.js'
 import { JOIN } from '../../Server/PlayerJoin/var.js'
 import { ANARCHY } from './anarchy.js'
-import { BASE_ITEM_STACK } from './base.js'
+import './base.js'
 import './customItems.js'
 import './quests/index.js'
 import './raid.js'
@@ -17,36 +17,24 @@ import { SPAWN } from './spawn.js'
 
 console.log('§6Gameplay mode: survival')
 
+/**
+ * @type {EventSignal<Parameters<import('modules/Region/index.js').interactionAllowed>, boolean | undefined, import('modules/Region/index.js').interactionAllowed>}
+ */
+export const SURVIVAL_INTERACTION = new EventSignal()
+
+SURVIVAL_INTERACTION.subscribe(player => {
+  if (isBuilding(player)) return true
+}, 100)
+
+SURVIVAL_INTERACTION.subscribe((player, region) => {
+  if (region?.regionMember(player.id)) return true
+}, -100)
+
 loadRegionsWithGuards({
   allowed(player, region, context) {
-    if (isBuilding(player)) return true
-
-    if (
-      (context.type === 'interactWithBlock' || context.type === 'place') &&
-      context.event.itemStack?.is(BASE_ITEM_STACK)
-    )
-      return true
-
-    if (
-      context.type === 'break' &&
-      context.event.itemStack?.is(SPAWN.startAxeItem) &&
-      SPAWN.startAxeCanBreak.includes(context.event.block.typeId)
-    )
-      return true
-
-    if (region) {
-      if (region.regionMember(player.id)) return true
-    } else {
-      if (context.type === 'break' && player.isGamemode('adventure'))
-        return true
-
-      // WE wand
-      // if (
-      //   isBuilding(player) &&
-      //   context.type === 'break' &&
-      //   context.event.itemStack?.typeId === CUSTOM_ITEMS.tool
-      // )
-      //   return false
+    for (const [fn] of EventSignal.sortSubscribers(SURVIVAL_INTERACTION)) {
+      const result = fn(player, region, context)
+      if (typeof result !== 'undefined') return result
     }
   },
 

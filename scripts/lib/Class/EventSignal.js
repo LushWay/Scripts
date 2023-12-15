@@ -1,4 +1,5 @@
 const DATA_TYPE = Symbol('data_t')
+const CALLBACK_TYPE = Symbol('callback_t')
 const RETURN_TYPE = Symbol('return_t')
 
 /**
@@ -9,17 +10,22 @@ const RETURN_TYPE = Symbol('return_t')
  */
 export class EventSignal {
   /**
-   *
-   * @template {EventSignal<any>} Signal
+   * @template {EventSignal<any, any, any>} Signal
+   * @param {Signal} signal
+   * @returns {[Signal[CALLBACK_TYPE], number][]}
+   */
+  static sortSubscribers(signal) {
+    return [...signal.events.entries()].sort((a, b) => a[1] - b[1])
+  }
+  /**
+   * @template {EventSignal<any, any, any>} Signal
    * @param {Signal} signal
    * @param {Signal[DATA_TYPE]} data
    * @returns {Array<Signal[RETURN_TYPE]>}
    */
   static emit(signal, data) {
     const results = []
-    for (const [fn] of [...signal.events.entries()].sort((a, b) => a[1] - b[1]))
-      results.push(fn(data))
-
+    for (const [fn] of this.sortSubscribers(signal)) results.push(fn(data))
     return results
   }
 
@@ -32,6 +38,9 @@ export class EventSignal {
 
   /** @type {Data} */
   [DATA_TYPE];
+
+  /** @type {Callback} */
+  [CALLBACK_TYPE];
 
   /** @type {Return} */
   [RETURN_TYPE]

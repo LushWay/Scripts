@@ -1,4 +1,4 @@
-import { LootTable } from "modules/Server/Class/LootTable.js";
+import { LootTable } from 'modules/Server/Class/LootTable.js'
 
 export const LEARNING_L = new LootTable(
   { key: 'starter' },
@@ -14,7 +14,7 @@ export const LEARNING_L = new LootTable(
   },
   {
     type: 'LeatherBoots',
-    chance: '50%',
+    chance: '80%',
   },
   {
     type: 'LeatherLeggings',
@@ -38,14 +38,14 @@ export const LEARNING_L = new LootTable(
   },
   {
     type: 'LeatherHelmet',
-    chance: '50%',
+    chance: '80%',
   },
   {
     type: 'CookedBeef',
     chance: '100%',
     amount: {
       '10...30': '50%',
-      '30...64': '50%',
+      '31...64': '10%',
     },
   }
 )

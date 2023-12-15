@@ -342,6 +342,14 @@ export const util = {
       return { parsedTime: ms.toString(), type: 'миллисекунд' }
     },
     /**
+     * Converts provided time to ms depending on type
+     * @param {Time} type
+     * @param {number} num
+     */
+    from(type, num) {
+      return this.converters[type].time * num
+    },
+    /**
      * @type {Record<Time, {time: number, friction?: number, plurals: Plurals}>}
      */
     converters: {

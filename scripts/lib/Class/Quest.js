@@ -89,19 +89,19 @@ export class Quest {
    * @param {Player} player
    * @param {number} stepNum
    */
-  step(player, stepNum, clearAdditionalBeforeNextStep = true) {
+  step(player, stepNum, restore = false) {
     const data = player.database
     data.quest ??= {
       active: this.name,
     }
     data.quest.active = this.name
 
-    if (clearAdditionalBeforeNextStep) delete data.quest.additional
+    if (!restore) delete data.quest.additional
     data.quest.step = stepNum
 
     const step = this.steps(player).list[stepNum]
     if (!step) return false
-    step.cleanup = step.activate?.().cleanup
+    step.cleanup = step.activate?.(!restore).cleanup
   }
 
   /**
@@ -109,6 +109,10 @@ export class Quest {
    */
   exit(player) {
     const data = player.database
+    if (data.quest && typeof data.quest.step !== 'undefined') {
+      this.steps(player).list[data.quest?.step].cleanup?.()
+      delete this.players[player.id]
+    }
 
     data.quest = {
       active: '',
@@ -141,7 +145,7 @@ function setQuests(player) {
   const status = Quest.active(player)
   if (!status) return
 
-  status.quest.step(player, status.stepNum, false)
+  status.quest.step(player, status.stepNum, true)
 }
 
 world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
@@ -154,7 +158,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
  * @typedef {{
  *   text: QuestText,
  *   description?: QuestStepInput["text"]
- *   activate?(): { cleanup(): void }
+ *   activate?(firstTime: boolean): { cleanup(): void }
  * }} QuestStepInput
  */
 
@@ -165,6 +169,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
  *   player: Player
  *   quest: Quest
  *   text: () => string
+ *   error(text: string): ReturnType<NonNullable<QuestStepInput['activate']>>
  *   description?: QuestStepThis['text']
  * } & Omit<QuestStepInput, 'text' | 'description'> & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
  */
@@ -223,6 +228,10 @@ class PlayerQuest {
         this.update()
         step.updateListeners.clear()
       },
+      error(text) {
+        this.player.tell('§cУпс, квест сломался: ' + text)
+        return { cleanup() {} }
+      },
     }
 
     // Share properties between mixed objects
@@ -270,7 +279,7 @@ class PlayerQuest {
 
         const temp = this.quest
           .steps(this.player)
-          .createTargetMarkerInterval({ from, to })
+          .createTargetMarkerInterval({ place: Vector.slerp(from, to, 0.5) })
 
         return {
           cleanup() {
@@ -325,7 +334,7 @@ class PlayerQuest {
     }
 
     const inputedActivate = options.activate?.bind(options)
-    options.activate = function () {
+    options.activate = function (firstTime) {
       if (!this.player) throw new Error('Wrong this!')
       const data = this.player.database
       if (typeof data.quest?.additional === 'number')
@@ -333,14 +342,15 @@ class PlayerQuest {
 
       options.value ??= 0
 
-      return inputedActivate?.() ?? { cleanup() {} }
+      return inputedActivate?.(firstTime) ?? { cleanup() {} }
     }
     const inputedText = options.text.bind(options)
     options.text = () => inputedText(options.value)
 
-    const inputedDescription = options.description?.bind(options)
-    options.description = () =>
-      (inputedDescription ?? inputedText)(options.value)
+    if (options.description) {
+      const inputedDescription = options.description.bind(options)
+      options.description = () => inputedDescription(options.value)
+    }
 
     this.dynamic(options)
   }
@@ -421,8 +431,7 @@ class PlayerQuest {
 
   /**
    * @typedef {{
-   *   from: Vector3
-   *   to: Vector3
+   *   place: Vector3
    *   temporary?: Temporary
    *   interval?: VoidFunction & ThisParameterType<MarkerOptions>
    * }} MarkerOptions
@@ -437,16 +446,15 @@ class PlayerQuest {
         () => {
           options.interval?.()
 
+          if (!options.place) return
+
           const head = this.player.getHeadLocation()
           const playerViewDirection = this.player.getViewDirection()
-          const targetPosition = Vector.add(
-            Vector.slerp(options.from, options.to, 0.5),
-            {
-              x: 0.5,
-              y: 0.5,
-              z: 0.5,
-            }
-          )
+          const targetPosition = Vector.add(options.place, {
+            x: 0.5,
+            y: 0.5,
+            z: 0.5,
+          })
           const targetRelative = Vector.subtract(targetPosition, head)
           const distance = Vector.distance(Vector.zero, targetRelative)
           const relative = Vector.multiply(playerViewDirection, distance)

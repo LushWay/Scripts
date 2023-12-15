@@ -1,4 +1,4 @@
-import { ItemLockMode } from '@minecraft/server'
+import { ItemLockMode, ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { MinecraftEnchantmentTypes } from 'lib/List/enchantments'
 
@@ -14,66 +14,69 @@ declare module '@minecraft/server' {
 export namespace LootItem {
   interface Common {
     /**
-     * - Item amount in format amount: percent
+     * - Amount of the item
      * @default 1
      */
     amount?: RandomCostMapType | number
     /**
-     * - Cost of item. Items with higher cost will be generated more often
+     * - Cost of the item. Items with higher cost will be generated more often
      */
     chance: Percent
+
     /**
-     * - Custom nameTag
-     */
-    nameTag?: string
-    /**
-     * - Lore array
-     */
-    lore?: string[]
-    /**
-     * - Map in format enchant: { level: percent }
+     * - Map in format { enchant: { level: percent } }
      */
     enchantments?: Partial<
       Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>
     >
+    /**
+     * - Damage of the item
+     */
+    damage?: RandomCostMapType
 
     /**
-     * - Additional options for item like canPlaceOn, canDestroy, durability component etc
+     * - Additional options for the item like canPlaceOn, canDestroy, nameTag etc
      */
-    options?: Options<RandomCostMapType>
+    options?: Options
   }
 
-  interface Options<D> {
-    damage?: D
+  interface Options {
+    lore?: string[]
+    nameTag?: string
     keepOnDeath?: boolean
     canPlaceOn?: string[]
     canDestroy?: string[]
     lockMode?: ItemLockMode
   }
 
-  interface ID {
+  interface TypeIdInput {
     /**
-     * - Stringified id of item. May include namespace (e.g. "minecraft:")
+     * - Stringified id of the item. May include namespace (e.g. "minecraft:").
      */
-    id: string
+    typeId: string
   }
 
-  interface Type {
+  interface TypeInput {
     /**
-     * - Item type name. Its key of MinecraftItemTypes
+     * - Item type name. Its key of MinecraftItemTypes.
      */
     type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>
   }
 
-  type Input = (ID | Type) & Common
+  interface ItemStackInput {
+    /**
+     * - Item stack. Will be cloned.
+     */
+    itemStack: ItemStack
+  }
+
+  type Input = (TypeIdInput | TypeInput | ItemStackInput) & Common
 
   type Stored = {
-    id: string
-    nameTag: string
-    lore: string[]
-    chance: number
+    itemStack: ItemStack
     enchantments: Record<string, number[]>
+    chance: number
     amount: number[]
-    options: Options<number[]>
+    damage: number[]
   }
 }
