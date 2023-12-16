@@ -423,7 +423,5 @@ export const util = {
   /**
    * @type {Record<string, string>}
    */
-  terminalColors: {},
+  terminalColors: TerminalColors,
 }
-
-util.terminalColors = TerminalColors

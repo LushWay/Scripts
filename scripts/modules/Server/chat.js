@@ -4,90 +4,93 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Cooldown, ROLES, Settings, getRole, util } from 'smapi.js'
 import { CONFIG } from '../../config.js'
 
-const SETTINGS = Settings.world('chat', {
-  cooldown: {
-    name: 'Задержка',
-    desc: '0 что бы отключить',
-    value: 0,
-  },
-  range: {
-    name: 'Радиус',
-    desc: 'Радиус для затемнения сообщений дальних игроков',
-    value: 30,
-  },
-  ranks: { desc: 'Ранги в чате', value: true, name: 'Ранги' },
-})
+export class ChatBuilder {
+  db = new DynamicPropertyDB('chat', { /** @type {Record<string, string} */ type: {} }).proxy()
+  settings = Settings.world('chat', {
+    cooldown: {
+      name: 'Задержка',
+      desc: '0 что бы отключить',
+      value: 0,
+    },
+    range: {
+      name: 'Радиус',
+      desc: 'Радиус для затемнения сообщений дальних игроков',
+      value: 30,
+    },
+    ranks: { desc: 'Ранги в чате', value: true, name: 'Ранги' },
+  })
+  playerSettings = Settings.player('Чат', 'chat', {
+    hightlightMessages: {
+      name: 'Подсветка моих сообщений',
+      desc: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
+      value: true,
+    },
+    disableSound: {
+      name: 'Выключение звука',
+      desc: 'Выключение звука чужих сообщений',
+      value: false,
+    },
+  })
 
-/** @type {DynamicPropertyDB<string, string>} */
-const CHAT_PROP = new DynamicPropertyDB('chat')
-const CHAT_DB = CHAT_PROP.proxy()
+  constructor() {
+    world.afterEvents.chatSend.subscribe(data => {
+      if (data.message.startsWith(CONFIG.commandPrefix) && data.message !== CONFIG.commandPrefix) return
 
-const PLAYER_OPTIONS = Settings.player('Чат', 'chat', {
-  hightlightMessages: {
-    name: 'Подсветка моих сообщений',
-    desc: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
-    value: true,
-  },
-  disableSound: {
-    name: 'Выключение звука',
-    desc: 'Выключение звука чужих сообщений',
-    value: false,
-  },
-})
+      try {
+        const cooldown = this.settings.cooldown
 
-world.afterEvents.chatSend.subscribe(data => {
-  if (data.message.startsWith(CONFIG.commandPrefix) && data.message !== CONFIG.commandPrefix) return
+        // Is cooldown enabled?
+        if (cooldown) {
+          const cool = new Cooldown(this.db, 'CD', data.sender, cooldown)
 
-  try {
-    const cooldown = SETTINGS.cooldown
+          // Player is under chat cooldown, show error message
+          if (cool.isExpired()) return
+          cool.update()
+        }
 
-    // Is cooldown enabled?
-    if (cooldown) {
-      const cool = new Cooldown(CHAT_DB, 'CD', data.sender, cooldown)
+        const playerRole = getRole(data.sender)
 
-      // Player is under chat cooldown, show error message
-      if (cool.isExpired()) return
-      cool.update()
-    }
+        let role = ''
+        if (this.settings.ranks && playerRole !== 'member') {
+          role = ROLES[playerRole] + ' '
+        }
 
-    const playerRole = getRole(data.sender)
+        const allPlayers = world.getAllPlayers()
 
-    let role = ''
-    if (SETTINGS.ranks && playerRole !== 'member') {
-      role = ROLES[playerRole] + ' '
-    }
+        // Players that are near message sender
+        const nearPlayers = data.sender.dimension
+          .getPlayers({
+            location: data.sender.location,
+            maxDistance: this.settings.range,
+          })
+          .filter(e => e.id !== data.sender.id)
 
-    const allPlayers = world.getAllPlayers()
+        // Array with ranged players (include sender id)
+        const nID = nearPlayers.map(e => e.id)
+        nID.push(data.sender.id)
 
-    // Players that are near message sender
-    const nearPlayers = data.sender.dimension
-      .getPlayers({
-        location: data.sender.location,
-        maxDistance: SETTINGS.range,
-      })
-      .filter(e => e.id !== data.sender.id)
+        // Outranged players
+        const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
+        const messageText = data.message.replace(/\\n/g, '\n')
+        const message = `${role}§7${data.sender.name}§r: ${messageText}`
+        if (util.settings.BDSMode) console.info(message)
 
-    // Array with ranged players (include sender id)
-    const nID = nearPlayers.map(e => e.id)
-    nID.push(data.sender.id)
+        for (const near of nearPlayers) {
+          near.tell(message)
 
-    // Outranged players
-    const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
-    const messageText = data.message.replace(/\\n/g, '\n')
-    const message = `${role}§7${data.sender.name}§r: ${messageText}`
-    if (util.settings.BDSMode) console.info(message)
+          if (!this.playerSettings(near).disableSound) near.playSound(SOUNDS.click)
+        }
 
-    for (const near of nearPlayers) {
-      near.tell(message)
+        for (const outranged of otherPlayers) outranged.tell(`${role}§8${data.sender.name}§7: ${messageText}`)
 
-      if (!PLAYER_OPTIONS(near).disableSound) near.playSound(SOUNDS.click)
-    }
-
-    for (const outranged of otherPlayers) outranged.tell(`${role}§8${data.sender.name}§7: ${messageText}`)
-
-    const hightlight = PLAYER_OPTIONS(data.sender).hightlightMessages
-    data.sender.tell(hightlight ? `§6§lЯ§r: §f${messageText}` : message)
-  } catch (error) {
-    util.error(error)
+        const hightlight = this.playerSettings(data.sender).hightlightMessages
+        data.sender.tell(hightlight ? `§6§lЯ§r: §f${messageText}` : message)
+      } catch (error) {
+        util.error(error)
+      }
+    })
   }
-})
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Chat = new ChatBuilder()

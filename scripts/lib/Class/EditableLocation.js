@@ -3,65 +3,107 @@ import { EventLoader } from 'smapi.js'
 import { util } from '../util.js'
 import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
 
+/**
+ * @template {boolean} AllowRotation
+ * @typedef {(AllowRotation extends false ? Vector3 : (Vector3 & {xRot: number; yRot: number}))} Location
+ */
+
+/**
+ * @template {boolean} [AllowRotation=false]
+ */
 export class EditableLocation {
+  // TODO Migrate all locations to safe
+  /**
+   * @returns {({ valid: false } | ({ valid: true } & Location<AllowRotation>))}
+   */
+  get safe() {
+    return this
+  }
   static key = 'locations'
-  valid = false
+  /**
+   * @param {EditableLocation<any>} instance
+   * @param {Location<any>} location
+   */
+  static load(instance, location) {
+    instance.x = location.x
+    instance.y = location.y
+    instance.z = location.z
+    if (instance.allowRotation && 'xRot' in location) {
+      instance.xRot = location.xRot
+      instance.yRot = location.yRot
+    }
+    EventLoader.load(instance.onLoad)
+  }
+
+  get valid() {
+    return this.onLoad.loaded
+  }
+
+  onLoad = new EventLoader(this)
+
   x = 0
   y = 0
   z = 0
+  xRot = 0
+  yRot = 0
+
+  /**
+   * @private
+   * @type {false | Location<AllowRotation>}
+   */
+  fallback = false
+
   /**
    *
    * @param {string} id
    * @param {Object} [options]
-   * @param {false | Vector3} [options.fallback]
+   * @param {AllowRotation} [options.allowRotation]
+   * @param {EditableLocation<AllowRotation>["fallback"]} [options.fallback]
    */
-  constructor(id, { fallback = false } = {}) {
+  constructor(id, { fallback = false, allowRotation } = {}) {
     this.id = id
+    this.allowRotation = allowRotation
     this.fallback = fallback
+    this.format = `x y z${allowRotation ? ' xRot yRot' : ''}`
     Settings.worldMap[EditableLocation.key][id] = {
-      desc: `Позиция`,
+      desc: `Позиция ${this.format}`,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
-      onChange: () => this.init(),
+      onChange: () => this.load(),
     }
 
-    this.init()
+    this.load()
   }
 
-  init() {
+  /**
+   * @private
+   */
+  load() {
     const raw = WORLD_SETTINGS_DB[EditableLocation.key][this.id]
 
     if (typeof raw !== 'string' || raw === '') {
       if (this.fallback === false) {
+        // Currently disabled warning
         // console.warn(
         //   '§eEmpty location §f' + this.id + '\n§r' + util.error.stack.get(1)
         // )
-        this.valid = false
         return
       } else {
-        this.x = this.fallback.x
-        this.y = this.fallback.y
-        this.z = this.fallback.z
-        return
+        return EditableLocation.load(this, this.fallback)
       }
     }
 
     const location = raw.split(' ').map(Number)
 
-    if (location.length !== 3) {
-      util.error(new TypeError('Invalid location'))
-      console.error(raw)
-      this.valid = false
-      return
+    if (location.length !== this.format.split(' ').length) {
+      return util.error(
+        new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`)
+      )
     }
 
-    this.x = location[0]
-    this.y = location[1]
-    this.z = location[2]
-    this.valid = true
-    EventLoader.load(this.onValid)
+    const [x, y, z, xRot, yRot] = location
+    EditableLocation.load(this, { x, y, z, yRot, xRot })
   }
-
-  onValid = new EventLoader()
 }
+
 Settings.worldMap[EditableLocation.key] = {}

@@ -66,7 +66,11 @@ export class EventSignal {
 }
 
 /**
- * @extends {EventSignal<{}>}
+ * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
+ * @template [Data={}] The type of the data that the events will be emitted with.
+ * @template [Return=void] Return type of the subscriber
+ * @template [Callback = (arg: Data) => Return] The type of the callback function that will be used for the events.
+ * @extends {EventSignal<Data, Return, Callback>}
  */
 export class EventLoader extends EventSignal {
   /**
@@ -74,16 +78,25 @@ export class EventLoader extends EventSignal {
    */
   static load(loader) {
     loader.loaded = true
-    return super.emit(loader, {})
+    return super.emit(loader, loader.defaultValue)
+  }
+
+  /**
+   * @param {Data} [defaultValue]
+   */
+  constructor(defaultValue) {
+    super()
+    /** @private */
+    this.defaultValue = defaultValue
   }
 
   loaded = false
 
   /**
-   * @type {EventSignal<{}>["subscribe"]}
+   * @type {EventSignal<Data, Return, Callback>["subscribe"]}
    */
   subscribe(callback, position) {
-    if (this.loaded) callback({})
+    if (this.loaded && typeof callback === 'function') callback(this.defaultValue)
     else super.subscribe(callback, position)
     return callback
   }

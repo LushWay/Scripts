@@ -33,7 +33,7 @@ export * from './lib/Class/Cooldown.js'
 export * from './lib/Class/EditableLocation.js'
 export * from './lib/Class/EventSignal.js'
 export * from './lib/Class/Settings.js'
-export * from './lib/Class/Utils.js'
+export * from './lib/Class/GameUtils.js'
 // Command
 export * from './lib/Command/index.js'
 // Database

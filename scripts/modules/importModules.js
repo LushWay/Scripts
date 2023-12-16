@@ -2,14 +2,11 @@ import { system } from '@minecraft/server'
 import { util } from '../smapi.js'
 
 const modules = [
-  './DatabaseView/index.js',
-  './Server/PlayerJoin/join.js',
-  './Server/Indicator/index.js',
+  './PlayerJoin/playerJoin.js',
+  './Indicator/index.js',
   './Server/chat.js',
   './Server/index.js',
-  './Server/Catscene/index.js',
-
-  './Gameplay/Build/camera.js',
+  './Build/camera.js',
 
   '../lib/Class/Quest.js',
   '../test/test.js',
