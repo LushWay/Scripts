@@ -1,5 +1,5 @@
 import { system } from '@minecraft/server'
-import { util } from '../smapi.js'
+import { util } from 'lib/util.js'
 
 const modules = [
   './PlayerJoin/playerJoin.js',

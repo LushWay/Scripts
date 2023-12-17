@@ -53,7 +53,6 @@ export class DefaultPlaceWithSafeArea {
     this.location.onLoad.subscribe(location => {
       this.safeArea = new SafeAreaRegion({
         key: 'safeArea ' + name,
-        saveToDisk: false,
         dimensionId: 'overworld',
         center: location,
         radius: location.radius,

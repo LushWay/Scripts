@@ -1,5 +1,5 @@
 import { ItemStack } from '@minecraft/server'
-import { OverTakes } from 'smapi.js'
+import { OverTakes } from './OverTakes.js'
 
 Object.defineProperties(ItemStack.prototype, {
   enchantments: {

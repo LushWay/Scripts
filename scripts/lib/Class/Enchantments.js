@@ -1,7 +1,9 @@
 import { Enchantment, Vector, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { EventLoader } from 'lib/Class/EventSignal.js'
+import { DB } from 'lib/Database/Default.js'
 import { MinecraftEnchantmentTypes } from 'lib/List/enchantments.js'
-import { DB, EventLoader, util } from 'smapi.js'
+import { util } from 'lib/util.js'
 
 const LOCATION = { x: 0, y: -10, z: 0 }
 

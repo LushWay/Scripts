@@ -1,6 +1,5 @@
 import { ChatSendAfterEvent } from '@minecraft/server'
 import { CommandContext } from './Context.js'
-import { Command } from './index.js'
 
 export class CmdLet {
   /**
@@ -11,7 +10,7 @@ export class CmdLet {
    *
    * @param {string[]} args
    * @param {ChatSendAfterEvent} data
-   * @param {Command} cmd
+   * @param {import('./index.js').Command} cmd
    * @param {string} raw
    * @returns
    */

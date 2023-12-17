@@ -1,8 +1,10 @@
 import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { EventSignal, GAME_UTILS, util } from 'smapi.js'
+import { EventSignal } from './EventSignal.js'
+import { GAME_UTILS } from './GameUtils.js'
 import { LootTable } from './LootTable.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { util } from 'lib/util.js'
 
 const AIRDROP_DB = new DynamicPropertyDB('airdrop', {
   /**

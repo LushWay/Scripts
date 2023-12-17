@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { prompt, util } from 'smapi.js'
+import { prompt } from 'lib/Form/MessageForm.js'
+import { util } from 'lib/util.js'
 import { showForm } from './utils.js'
 
 export class ActionForm {

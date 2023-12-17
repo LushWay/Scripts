@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { util } from 'smapi.js'
+import { util } from '../util.js'
 
 export class Cooldown {
   /**

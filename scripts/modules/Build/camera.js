@@ -1,7 +1,7 @@
 import { EasingType, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, ModalForm, util } from 'smapi.js'
-import { parseChatArguments, parseLocationArguments } from '../../lib/Command/utils.js'
+import { parseArguments, parseLocationArguments } from '../../lib/Command/utils.js'
 
 /**
  * @typedef {"spinAroundPos"} CameraDBModes
@@ -42,14 +42,14 @@ function setupCameraForm(player, target) {
     .addDropdownFromObject('Режим камеры', CAMERA.MODES)
     .addSlider('Радиус при прокрутке вокруг позиции', 0, 100)
     .show(target, (ctx, type, ease, easeTime, rawPos, facingPosRaw, facingPlayer, mode, spinRadius) => {
-      const rawPosArray = parseChatArguments(rawPos, '')
+      const rawPosArray = parseArguments(rawPos, '')
       const pos = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
 
       if (!pos) return ctx.error('Неправильныe координаты центральной позиции камеры: ' + util.inspect(rawPosArray))
 
       let facing
       if (facingPosRaw) {
-        const rawPosArray = parseChatArguments(facingPosRaw, '')
+        const rawPosArray = parseArguments(facingPosRaw, '')
         facing = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
       } else if (facingPlayer && facingPlayer !== ModalForm.arrayDefaultNone) {
         facing = facingPlayer

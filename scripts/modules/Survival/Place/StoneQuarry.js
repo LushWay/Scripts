@@ -1,15 +1,17 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { Boss } from 'smapi.js'
+import { DefaultPlaceWithSafeArea } from 'modules/Survival/Place/Default.place.js'
+import { Boss, util } from 'smapi.js'
 
-class StoneQuarryBuilder {
+class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
+  constructor() {
+    super('StoneQuarry')
+  }
   witherBoss = new Boss({
     name: 'wither',
-    entityTypeId: 'minecraft:' + MinecraftEntityTypes.Wither,
     displayName: 'Камнедробилка',
+    entityTypeId: 'minecraft:' + MinecraftEntityTypes.Wither,
     bossEvent: false,
-
-    // 1 час
-    respawnTime: 1000 * 60 * 60,
+    respawnTime: util.ms.from('hour', 1),
   })
 }
 

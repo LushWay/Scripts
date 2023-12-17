@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { OverTakes } from './import.js'
+import { OverTakes } from './OverTakes.js'
 
 OverTakes(Vector, {
   string: a => `${a.x} ${a.y} ${a.z}`,

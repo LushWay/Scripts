@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent, world } from '@minecraft/server'
-import { is } from 'smapi.js'
 import { CONFIG } from '../../config.js'
+import { is } from '../roles.js'
 import {
   ArrayArgumentType,
   BooleanArgumentType,
@@ -13,7 +13,7 @@ import {
 import { CmdLet } from './Cmdlet.js'
 import { CommandContext } from './Context.js'
 import './index.js'
-import { commandNotFound, commandSyntaxFail, noPerm, parseChatArguments, sendCallback } from './utils.js'
+import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseArguments, sendCallback } from './utils.js'
 
 /**
  * @typedef {import("./types.js").ICommandData} ICommandData
@@ -29,10 +29,10 @@ export class Command {
   static chatListener(data) {
     if (!data.message.startsWith(CONFIG.commandPrefix) || data.message === CONFIG.commandPrefix) return // This is not a command
 
-    const [cmd, ...args] = parseChatArguments(data.message, CONFIG.commandPrefix)
+    const [cmd, ...args] = parseArguments(data.message, CONFIG.commandPrefix)
     const command = Command.commands.find(c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd))
     if (!command) return commandNotFound(data.sender, cmd)
-    if (!command.sys.data?.requires(data.sender)) return noPerm(data.sender, command)
+    if (!command.sys.data?.requires(data.sender)) return commandNoPermissions(data.sender, command)
 
     /**
      * Part after command (-help <rawInput>). Usefull for setters or any other stuff
@@ -59,7 +59,7 @@ export class Command {
         )
         if (!arg && !args[i] && start.sys.callback) return 'success'
         if (!arg) return commandSyntaxFail(data.sender, command, args, i), 'fail'
-        if (!arg.sys.data?.requires(data.sender)) return noPerm(data.sender, arg), 'fail'
+        if (!arg.sys.data?.requires(data.sender)) return commandNoPermissions(data.sender, arg), 'fail'
         verifiedCommands.push(arg)
         return getArg(arg, i + 1)
       }
@@ -203,6 +203,8 @@ export class Command {
     return this
   }
 }
+
+globalThis.Command = Command
 
 world.beforeEvents.chatSend.subscribe(data => {
   data.sendToTargets = true

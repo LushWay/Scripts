@@ -19,6 +19,8 @@
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-scriptapi": "file:tools/eslint-plugin",
     "leafy-utils": "^5.3.2",
     "typescript": "^5.3.3"
@@ -40,20 +42,36 @@
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
+      "plugin:import/recommended",
+      "plugin:import/typescript",
       "prettier"
     ],
     "plugins": [
       "@typescript-eslint",
+      "import",
       "scriptapi"
     ],
+    "settings": {
+      "import/parsers": {
+        "@typescript-eslint/parser": [
+          ".js"
+        ]
+      },
+      "import/resolver": {
+        "typescript": {
+          "alwaysTryTypes": true
+        }
+      }
+    },
     "parser": "@typescript-eslint/parser",
     "rules": {
       "no-empty": "off",
       "no-console": "off",
       "no-undef": "off",
       "prefer-const": "warn",
+      "scriptapi/no-cycle": "error",
       "scriptapi/ensure-modules": "error",
-      "scriptapi/warn-unsupported-features": "error",
+      "scriptapi/no-unsupported-features": "error",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",
@@ -115,6 +133,9 @@
         }
       ]
     },
+    "ignorePatterns": [
+      "tools/*"
+    ],
     "root": true
   },
   "workspaces": {

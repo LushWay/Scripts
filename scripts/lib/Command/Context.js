@@ -1,6 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { Command } from './index.js'
 
 export class CommandContext {
   /**
@@ -19,7 +18,7 @@ export class CommandContext {
   args
 
   /**
-   * @type {Command}
+   * @type {import('./index.js').Command}
    */
   command
 
@@ -27,7 +26,7 @@ export class CommandContext {
    * Returns a commands callback
    * @param {ChatSendAfterEvent} data chat data that was used
    * @param {string[]} args
-   * @param {Command} command
+   * @param {import('./index.js').Command} command
    * @param {string} rawInput
    */
   constructor(data, args, command, rawInput) {

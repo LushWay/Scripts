@@ -8,19 +8,17 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
-import { ChestForm } from 'lib/Form/ChestForm.js'
-import { ActionForm } from './ActionForm.js'
+// eslint-disable-next-line import/no-cycle
 import { MessageForm } from './MessageForm.js'
-import { ModalForm } from './ModalForm.js'
 
 /**
- * @template {ActionForm | MessageForm | ModalForm<any> | ChestForm} [Form=any]
+ * @template {import("./ActionForm.js").ActionForm | import("./MessageForm.js").MessageForm | import("./ModalForm.js").ModalForm<any> | import("./ChestForm.js").ChestForm} [Form=any]
  *
  */
 export class FormCallback {
   /**
    * form that was used in this call
-   * @type {ActionForm | MessageForm | ModalForm<any> | ChestForm}
+   * @type {Form}
    * @private
    */
   form
@@ -41,7 +39,7 @@ export class FormCallback {
    * buttons, and args to run various functions
    * @param {Form} form form that is used in this call
    * @param {Player} player
-   * @param {Form extends ModalForm<any> ? Parameters<Form["show"]>[1] : never} [callback]
+   * @param {Form extends import("./ModalForm.js").ModalForm<any> ? Parameters<Form["show"]>[1] : never} [callback]
    */
   constructor(form, player, callback) {
     this.form = form

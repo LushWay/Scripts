@@ -1,6 +1,6 @@
 import { Player, Vector } from '@minecraft/server'
-import { EventLoaderWithArg } from 'smapi.js'
 import { util } from '../util.js'
+import { EventLoaderWithArg } from './EventSignal.js'
 import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
 
 /**

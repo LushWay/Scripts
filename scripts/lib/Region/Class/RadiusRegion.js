@@ -1,5 +1,6 @@
 import { Vector } from '@minecraft/server'
-import { REGION_DB, Region } from '../index.js'
+import { Region } from 'lib/Region/Class/Region.js'
+import { REGION_DB } from 'lib/Region/DB.js'
 
 export class RadiusRegion extends Region {
   subtype = 'radius'

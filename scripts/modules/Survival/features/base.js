@@ -1,10 +1,11 @@
 import { ItemStack, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
+import { MoneyCost, Store } from 'lib/Class/Store.js'
 import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
 import { INTERACTION_GUARD } from 'modules/Survival/config.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
-import { BaseRegion, CubeRegion, LockAction, MoneyCost, RadiusRegion, Region, Store } from 'smapi.js'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region } from 'smapi.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§r§6База',

@@ -1,6 +1,10 @@
 import { ItemStack, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { ActionForm, Cooldown, EventSignal, GAME_UTILS, MessageForm } from 'smapi.js'
+import { Cooldown } from 'lib/Class/Cooldown.js'
+import { EventSignal } from 'lib/Class/EventSignal.js'
+import { GAME_UTILS } from 'lib/Class/GameUtils.js'
+import { ActionForm } from 'lib/Form/ActionForm.js'
+import { MessageForm } from 'lib/Form/MessageForm.js'
 import { Server } from '../../modules/Server/index.js'
 
 class Cost {

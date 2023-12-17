@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { CmdLet } from 'lib/Command/Cmdlet.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { Command } from 'lib/Command/index.js'
-import { commandNotFound, noPerm } from 'lib/Command/utils.js'
+import { commandNoPermissions, commandNotFound } from 'lib/Command/utils.js'
 import { ROLES, getRole } from 'smapi.js'
 
 /**
@@ -102,7 +102,7 @@ function helpForCommand(ctx, commandName) {
   const cmd = Command.commands.find(e => e.sys.data.name == commandName || e.sys.data?.aliases?.includes(commandName))
 
   if (!cmd) return commandNotFound(ctx.sender, commandName)
-  if (!cmd.sys.data?.requires(ctx.data.sender)) return noPerm(ctx.data.sender, cmd), 'fail'
+  if (!cmd.sys.data?.requires(ctx.data.sender)) return commandNoPermissions(ctx.data.sender, cmd), 'fail'
 
   const d = cmd.sys.data
   const aliases = d.aliases?.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''

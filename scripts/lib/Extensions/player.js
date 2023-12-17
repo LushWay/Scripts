@@ -1,5 +1,5 @@
 import { Container, EntityDamageCause, EquipmentSlot, GameMode, Player, world } from '@minecraft/server'
-import { OverTakes } from './import.js'
+import { OverTakes } from './OverTakes.js'
 
 Player.prototype.tell = Player.prototype.sendMessage
 OverTakes(Player, {

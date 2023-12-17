@@ -1,5 +1,4 @@
 import { EventLoader } from '../Class/EventSignal.js'
-import { Command } from '../Command/index.js'
 
 /**
  * Class because variable hoisting
@@ -11,4 +10,3 @@ class SM {
   }
 }
 globalThis.SM = SM
-globalThis.Command = Command

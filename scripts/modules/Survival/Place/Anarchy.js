@@ -1,4 +1,4 @@
-import { Player, Vector, system } from '@minecraft/server'
+import { Player, Vector } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
 
@@ -38,36 +38,33 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         Vector.add(portalLocation, { x: 0, y: -1, z: -1 }),
         Vector.add(portalLocation, { x: 0, y: 1, z: 1 }),
         player => {
-          const building = isBuilding(player)
-          if (!Portal.canTeleport(player, { fadeScreen: !building })) return
-          const data = player.database.survival
+          if (isBuilding(player)) return tpMenuOnce(player)
 
-          if (data.inv === this.inventoryName) {
+          if (!Portal.canTeleport(player)) return
+          const db = player.database.survival
+
+          if (db.inv === this.inventoryName) {
             return player.tell('§cВы уже находитесь на анархии!')
           }
 
-          system.delay(() => {
-            if (building) return tpMenuOnce(player)
+          if (!this.inventoryStore.has(player.id)) {
+            InventoryStore.load({
+              from: InventoryStore.emptyInventory,
+              to: player,
+              clearAll: true,
+            })
+          } else {
+            this.loadInventory(player)
+          }
 
-            if (!this.inventoryStore.has(player.id)) {
-              InventoryStore.load({
-                from: InventoryStore.emptyInventory,
-                to: player,
-                clearAll: true,
-              })
-            } else {
-              this.loadInventory(player)
-            }
+          db.inv = this.inventoryName
 
-            data.inv = this.inventoryName
-
-            if (!data.anarchy) {
-              randomTeleportPlayerToLearning(player)
-            } else {
-              player.teleport(data.anarchy)
-              delete data.anarchy
-            }
-          })
+          if (!db.anarchy) {
+            randomTeleportPlayerToLearning(player)
+          } else {
+            player.teleport(db.anarchy)
+            delete db.anarchy
+          }
         }
       )
 

@@ -8,9 +8,10 @@ import {
   world,
 } from '@minecraft/server'
 import { SYSTEM_ENTITIES } from 'config.js'
-import { GAME_UTILS } from 'smapi.js'
+import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { Region } from './Class/Region.js'
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from './config.js'
+import './init.js'
 export * from './Class/CubeRegion.js'
 export * from './Class/RadiusRegion.js'
 export * from './Class/Region.js'

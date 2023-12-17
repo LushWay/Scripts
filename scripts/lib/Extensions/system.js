@@ -1,6 +1,6 @@
 import { System, world } from '@minecraft/server'
 import { util } from '../util.js'
-import { OverTakes } from './import.js'
+import { OverTakes } from './OverTakes.js'
 
 /**
  * @type {Record<string, string>}

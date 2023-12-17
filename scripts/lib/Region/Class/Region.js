@@ -1,6 +1,8 @@
 import { Player } from '@minecraft/server'
-import { DB, util } from 'smapi.js'
-import { DEFAULT_REGION_PERMISSIONS, REGION_DB } from '../index.js'
+import { DB } from 'lib/Database/Default.js'
+import { REGION_DB } from 'lib/Region/DB.js'
+import { DEFAULT_REGION_PERMISSIONS } from 'lib/Region/config.js'
+import { util } from 'lib/util.js'
 /**
  * Main class that represents protected region in the world.
  */

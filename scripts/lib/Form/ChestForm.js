@@ -1,8 +1,9 @@
 import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { loreWordWrap } from 'lib/Extensions/itemstack.js'
-import { GAME_UTILS, showForm, util } from 'smapi.js'
+// eslint-disable-next-line import/no-cycle
+import { GAME_UTILS, loreWordWrap, util } from 'smapi.js'
 import { typeIdToID } from '../../chestui/typeIds.js'
+import { showForm } from './utils.js'
 
 const NUMBER_OF_1_16_100_ITEMS = 0
 

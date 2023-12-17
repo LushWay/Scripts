@@ -1,20 +1,16 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
-import { util } from 'smapi.js'
-import { CONFIG } from '../../config.js'
+import { CONFIG, SOUNDS } from 'config.js'
 import { inaccurateSearch } from '../Class/Search.js'
+import { util } from '../util.js'
 import { LiteralArgumentType, LocationArgumentType } from './ArgumentTypes.js'
 import { CommandContext } from './Context.js'
-import { Command } from './index.js'
 
 /**
- * Returns a Before chat events augments
- * @example this.getChatAugments(BeforeChatEvent)
  * @param {string} message
  * @param {string} prefix
  * @returns {string[]}
  */
-export function parseChatArguments(message, prefix) {
+export function parseArguments(message, prefix) {
   const augments = message
     .slice(prefix.length)
     .trim()
@@ -80,10 +76,10 @@ export function commandNotFound(player, command) {
 /**
  * Sends a command not found message to a player
  * @param {Player} player  player to send message to
- * @param {Command} command
+ * @param {import('./index.js').Command} command
  * @returns {void}
  */
-export function noPerm(player, command) {
+export function commandNoPermissions(player, command) {
   player.tell({
     rawtext: [
       {
@@ -99,7 +95,7 @@ export function noPerm(player, command) {
 /**
  * Sends a syntax failure message to player
  * @param {Player} player  undefined
- * @param {Command} command  undefined
+ * @param {import('./index.js').Command} command  undefined
  * @param {string[]} args  undefined
  * @param {number} i  undefined
  * @returns {void}
@@ -153,9 +149,9 @@ export function parseLocationArguments([x, y, z], data) {
 /**
  * Sends a callback back to the command
  * @param {string[]} cmdArgs the args that the command used
- * @param {Command<any>[]} args args to use
+ * @param {import('./index.js').Command[]} args args to use
  * @param {ChatSendAfterEvent} event
- * @param {Command<any>} baseCommand
+ * @param {import('./index.js').Command} baseCommand
  * @param {string} rawInput
  */
 export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
@@ -176,7 +172,12 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
   if (typeof lastArg.sys.callback !== 'function') return event.sender.tell('§6⚠ Упс, эта команда пока не работает.')
 
   util.catch(
-    () => lastArg.sys.callback(new CommandContext(event, cmdArgs, baseCommand, rawInput), ...argsToReturn),
+    () =>
+      lastArg.sys.callback?.(
+        new CommandContext(event, cmdArgs, baseCommand, rawInput),
+        // @ts-expect-error Huh
+        ...argsToReturn
+      ),
     'Command'
   )
 }

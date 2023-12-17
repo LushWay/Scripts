@@ -1,5 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
-import { LockAction, Region, ScoreboardDB, util } from 'smapi.js'
+import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
+import { LockAction, Region, util } from 'smapi.js'
 
 world.beforeEvents.explosion.subscribe(event => {
   const impactedBlocks = event.getImpactedBlocks().filter(block => {

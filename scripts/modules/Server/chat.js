@@ -1,8 +1,7 @@
 import { world } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
+import { CONFIG, SOUNDS } from 'config.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Cooldown, ROLES, Settings, getRole, util } from 'smapi.js'
-import { CONFIG } from '../../config.js'
 
 export class ChatBuilder {
   db = new DynamicPropertyDB('chat', { /** @type {Record<string, string} */ type: {} }).proxy()

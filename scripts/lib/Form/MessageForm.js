@@ -1,7 +1,9 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
-import { util } from 'smapi.js'
+import { util } from '../util.js'
+// eslint-disable-next-line import/no-cycle
 import { showForm } from './utils.js'
+
 /** */
 export class MessageForm {
   /**

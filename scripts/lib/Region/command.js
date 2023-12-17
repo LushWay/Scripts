@@ -1,8 +1,14 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { parseChatArguments, parseLocationArguments } from 'lib/Command/utils.js'
+import { parseArguments, parseLocationArguments } from 'lib/Command/utils.js'
+import { ActionForm } from 'lib/Form/ActionForm.js'
+import { prompt } from 'lib/Form/MessageForm.js'
+import { ModalForm } from 'lib/Form/ModalForm.js'
+import { BUTTON, FormCallback } from 'lib/Form/utils.js'
+import { CubeRegion } from 'lib/Region/Class/CubeRegion.js'
+import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from 'lib/Region/DB.js'
-import { ActionForm, BUTTON, FormCallback, ModalForm, prompt, util } from 'smapi.js'
-import { BaseRegion, CubeRegion, MineshaftRegion, RadiusRegion, Region, SafeAreaRegion } from './index.js'
+import { util } from 'lib/util.js'
+import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './Class/RadiusRegion.js'
 
 new Command({
   name: 'region',
@@ -118,7 +124,7 @@ function editRegion(player, region, back) {
  * @param {Player} player
  */
 function parseLocationFromForm(ctx, location, player) {
-  const [x, y, z] = parseChatArguments(location, '')
+  const [x, y, z] = parseArguments(location, '')
   if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + util.inspect(location))
 
   const parsed = parseLocationArguments([x, y, z], player)

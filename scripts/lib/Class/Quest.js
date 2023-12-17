@@ -1,9 +1,10 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { Airdrop } from 'lib/Class/Airdrop.js'
+import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { LootTable } from 'lib/Class/LootTable.js'
 import { Temporary } from 'lib/Class/Temporary.js'
-import { GAME_UTILS, util } from 'smapi.js'
+import { util } from 'lib/util.js'
 import { Place } from './Action.js'
 
 // // @ts-expect-error Bruh
@@ -73,7 +74,9 @@ export class Quest {
     this.displayName = displayName
     this.init = init
     Quest.instances[this.name] = this
-    world.getAllPlayers().forEach(setQuests)
+    SM.afterEvents.modulesLoad.subscribe(() => {
+      world.getAllPlayers().forEach(setQuests)
+    })
   }
 
   /**
