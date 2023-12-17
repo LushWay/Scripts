@@ -57,11 +57,11 @@ system.runPlayerInterval(
     }
 
     function switchInv() {
-      const invToLoad = builderInventory.getEntityStore(player.id, {
+      const invToLoad = builderInventory.get(player.id, {
         fallback: { equipment: {}, health: 20, slots: {}, xp: 0 },
       })
 
-      builderInventory.saveFromEntity(player, {
+      builderInventory.saveFrom(player, {
         rewrite: true,
         keepInventory: true,
       })

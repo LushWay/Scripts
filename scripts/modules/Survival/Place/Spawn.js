@@ -1,80 +1,98 @@
-import { Player, Vector, system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
-import { isBuilding } from 'modules/Build/list.js'
-import { EditableLocation, InventoryStore } from 'smapi.js'
-import { Portal } from '../../../lib/Class/Portals.js'
-import { Region, SafeAreaRegion } from '../../../lib/Region/Region.js'
-import { Menu } from '../../Server/menuItem.js'
-import { ANARCHY } from './Anarchy.js'
+import { EditableLocation, InventoryStore, Portal, SafeAreaRegion, Settings } from 'smapi.js'
 
-export const SPAWN = {
-  inventory: {
+import { isBuilding } from 'modules/Build/list.js'
+import { Menu } from 'modules/Server/menuItem.js'
+import { DefaultPlaceWithInventory } from 'modules/Survival/Place/Default.place.js'
+
+class SpawnBuilder extends DefaultPlaceWithInventory {
+  /**
+   * @type {InventoryTypeName}
+   */
+  inventoryName = 'spawn'
+  location = new EditableLocation('spawn', {
+    fallback: { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
+    type: 'vector3+rotation',
+  }).safe
+
+  /**
+   * @type {import('smapi.js').Inventory}
+   */
+  inventory = {
     xp: 0,
     health: 20,
     equipment: {},
     slots: { 0: Menu.item },
-  },
-  location: new EditableLocation('spawn', {
-    fallback: new Vector(0, 200, 0),
-  }),
-
-  /** @type {undefined | Region} */
-  region: void 0,
-
-  /** @type {undefined | Portal} */
-  portal: void 0,
-}
-
-/**
- * @param {Player} player
- */
-function spawnInventory(player) {
-  if (isBuilding(player)) return
-  const data = player.database.survival
-
-  if (data.inv === 'anarchy') {
-    ANARCHY.inventory.saveFromEntity(player, {
-      rewrite: true,
-      keepInventory: false,
-    })
-    data.anarchy = Vector.floor(player.location)
   }
 
-  if (data.inv !== 'spawn') {
-    InventoryStore.load({ to: player, from: SPAWN.inventory })
-    data.inv = 'spawn'
-  }
-}
-
-if (SPAWN.location.valid) {
-  world.setDefaultSpawnLocation(SPAWN.location)
-  SPAWN.portal = new Portal('spawn', null, null, player => {
-    if (!Portal.canTeleport(player)) return
-    spawnInventory(player)
-
-    player.teleport(SPAWN.location)
-  })
-
-  Region.config.permissionLoad.subscribe(() => {
-    SPAWN.region = SafeAreaRegion.ensureRegionInLocation({
-      center: SPAWN.location,
-      radius: 100,
-      dimensionId: 'overworld',
-    })
-  })
-
-  system.runPlayerInterval(
-    player => {
-      if (SPAWN.region && SPAWN.region.vectorInRegion(player.location)) {
-        spawnInventory(player)
-
-        player.addEffect(MinecraftEffectTypes.Saturation, 1, {
-          amplifier: 255,
-          showParticles: false,
-        })
-      }
+  settings = Settings.player('Вход', 'join', {
+    teleportToSpawnOnJoin: {
+      value: true,
+      name: 'Телепорт на спавн',
+      desc: 'Определяет, будете ли вы телепортироваться на спавн при входе',
     },
-    'SpawnRegion',
-    20
-  )
+  })
+
+  /**
+   * Loads spawn inventory to specified player
+   * @param {Player} player
+   */
+  loadInventory(player) {
+    super.loadInventory(player, () => {
+      InventoryStore.load({ to: player, from: this.inventory })
+      player.database.survival.inv = 'spawn'
+    })
+  }
+
+  constructor() {
+    super()
+    if (this.location.valid) {
+      const spawnLocation = this.location
+      world.setDefaultSpawnLocation(spawnLocation)
+      this.portal = new Portal('spawn', null, null, player => {
+        if (!Portal.canTeleport(player)) return
+
+        this.loadInventory(player)
+        spawnLocation.teleport(player)
+      })
+
+      world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+        // Skip death respawns
+        if (!initialSpawn) return
+
+        // Force know if player is building
+        if (isBuilding(player, true)) return
+
+        // Check settings
+        if (!this.settings(player).teleportToSpawnOnJoin) return
+
+        this.portal?.teleport(player)
+      })
+
+      this.region = new SafeAreaRegion({
+        center: spawnLocation,
+        radius: 100,
+        dimensionId: 'overworld',
+      })
+
+      system.runPlayerInterval(
+        player => {
+          if (!this.region) return
+          if (!this.region.vectorInRegion(player.location)) return
+
+          this.loadInventory(player)
+          player.addEffect(MinecraftEffectTypes.Saturation, 1, {
+            amplifier: 255,
+            showParticles: false,
+          })
+        },
+        'SpawnRegion',
+        20
+      )
+    }
+  }
 }
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Spawn = new SpawnBuilder()

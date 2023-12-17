@@ -1,7 +1,8 @@
 import { Player, Vector, world } from '@minecraft/server'
 import { parseChatArguments, parseLocationArguments } from 'lib/Command/utils.js'
+import { REGION_DB } from 'lib/Region/DB.js'
 import { ActionForm, BUTTON, FormCallback, ModalForm, prompt, util } from 'smapi.js'
-import { BaseRegion, CubeRegion, MineshaftRegion, REGION_DB, RadiusRegion, Region, SafeAreaRegion } from './Region.js'
+import { BaseRegion, CubeRegion, MineshaftRegion, RadiusRegion, Region, SafeAreaRegion } from './index.js'
 
 new Command({
   name: 'region',
@@ -70,7 +71,7 @@ function regionList(player, RegionType, back = () => regionForm(player)) {
       })
   })
 
-  for (const region of RegionType.regions) {
+  for (const region of Region.regionInstancesOf(RegionType)) {
     form.addButton(region.name, () => editRegion(player, region, () => regionList(player, RegionType, back)))
   }
   form.show(player)

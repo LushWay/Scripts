@@ -34,7 +34,7 @@ Object.defineProperties(ItemStack.prototype, {
 
 OverTakes(ItemStack.prototype, {
   setInfo(nameTag, description) {
-    this.nameTag = nameTag
+    this.nameTag = '§r' + nameTag
     this.setLore(loreWordWrap(description))
 
     return this

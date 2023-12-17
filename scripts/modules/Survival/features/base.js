@@ -1,12 +1,10 @@
 import { ItemStack, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
+import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
 import { INTERACTION_GUARD } from 'modules/Survival/config.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
-import { Command, LockAction } from 'smapi.js'
-import { MoneyCost, Store } from '../../../lib/Class/Store.js'
-import { BaseRegion, RadiusRegion, Region } from '../../../lib/Region/Region.js'
-import { baseMenu } from './baseMenu.js'
+import { BaseRegion, CubeRegion, LockAction, MoneyCost, RadiusRegion, Region, Store } from 'smapi.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§r§6База',
@@ -24,7 +22,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block, faceLocation, itemStack } = event
   if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
 
-  const region = RadiusRegion.regions.find(e => e.regionMember(player) !== false)
+  const region = Region.regionInstancesOf(RadiusRegion).find(e => e.regionMember(player) !== false)
 
   if (region) {
     event.cancel = true
@@ -38,7 +36,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const nearRegion = Region.regions.find(r => {
     if (r instanceof RadiusRegion) {
       return Vector.distance(r.center, block.location) < r.radius + 50
-    } else {
+    } else if (r instanceof CubeRegion) {
       const from = { x: r.from.x, y: 0, z: r.from.z }
       const to = { x: r.to.x, y: 0, z: r.to.z }
 
@@ -89,7 +87,7 @@ const base = new Command({
 })
 base.executes(ctx => {
   if (LockAction.locked(ctx.sender)) return
-  const base = BaseRegion.regions.find(r => r.regionMember(ctx.sender))
+  const base = Region.regionInstancesOf(BaseRegion).find(r => r.regionMember(ctx.sender))
 
   if (!base) return ctx.reply('§cУ вас нет базы! Вступите в существующую или создайте свою.')
 
@@ -102,7 +100,7 @@ system.runInterval(
       return { dimension: p.dimension.type, loc: p.location }
     })
 
-    for (const base of BaseRegion.regions) {
+    for (const base of Region.regionInstancesOf(BaseRegion)) {
       let block
       try {
         block = world[base.dimensionId].getBlock(Vector.floor(base.center))

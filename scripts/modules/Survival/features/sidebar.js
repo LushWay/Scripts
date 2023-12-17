@@ -1,10 +1,7 @@
 import { Player, world } from '@minecraft/server'
-import { Quest } from 'lib/Class/Quest.js'
-import { Sidebar } from 'lib/Class/Sidebar.js'
-import { BaseRegion, Region } from 'lib/Region/Region.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
-import { Settings } from 'smapi.js'
+import { BaseRegion, Quest, Region, Settings, Sidebar } from 'smapi.js'
 
 const settings = Settings.player('Боковое меню (сайдбар)', 'sidebar', {
   enabled: {

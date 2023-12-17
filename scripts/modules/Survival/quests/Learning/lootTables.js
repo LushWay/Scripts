@@ -1,4 +1,4 @@
-import { LootTable } from 'lib/Class/LootTable.js'
+import { LootTable } from 'smapi.js'
 
 export const LEARNING_L = new LootTable(
   { key: 'starter' },

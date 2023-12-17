@@ -158,8 +158,8 @@ const Types = {
   boolean: 'Переключатель',
 }
 new Command({
-  name: 'options',
-  aliases: ['settings', 's'],
+  name: 'settings',
+  aliases: ['options', 's'],
   role: 'member',
   description: 'Настройки',
 }).executes(ctx => {

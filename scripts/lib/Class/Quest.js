@@ -1,7 +1,9 @@
-import { Entity, Player, Vector, world } from '@minecraft/server'
+import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
+import { Airdrop } from 'lib/Class/Airdrop.js'
+import { LootTable } from 'lib/Class/LootTable.js'
 import { Temporary } from 'lib/Class/Temporary.js'
-import { GAME_UTILS } from 'smapi.js'
+import { GAME_UTILS, util } from 'smapi.js'
 import { Place } from './Action.js'
 
 // // @ts-expect-error Bruh
@@ -392,6 +394,96 @@ class PlayerQuest {
             }
           )
         })
+      },
+    })
+  }
+
+  /**
+   * @typedef {{
+   *   text?: (AirdropPos: string) => string
+   * } & ({
+   *   spawnAirdrop: (key: string) => Airdrop
+   * } | { lootTable: LootTable } & ({ location: Vector3 } | { abovePlayerY?: number })
+   * )} QuestAirdropInput
+   */
+
+  /**
+   * @typedef {Partial<QuestStepThis> & QuestAirdropInput} QuestAirdropThis
+   */
+
+  /**
+   * @param {QuestAirdropInput & ThisType<QuestAirdropThis>} options
+   */
+  airdrop(options) {
+    const spawnAirdrop =
+      'spawnAirdrop' in options
+        ? options.spawnAirdrop
+        : (/** @type {string} */ key) =>
+            new Airdrop(
+              {
+                position:
+                  'location' in options
+                    ? options.location
+                    : Vector.add(this.player.location, {
+                        x: 0,
+                        y: options.abovePlayerY ?? 50,
+                        z: 0,
+                      }),
+                loot: options.lootTable,
+              },
+              key
+            )
+
+    let airdroppos = ''
+    this.dynamic({
+      text: () => (options.text ? options.text(airdroppos) : '§6Залутай аирдроп' + airdroppos),
+      activate() {
+        // Saving/restoring value
+        const data = this.player.database
+        if (!data.quest) return this.error('База данных квестов недоступна')
+        const key = data.quest.additional
+        const airdrop = spawnAirdrop(key)
+
+        data.quest.additional = airdrop.key
+        if (!key && !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
+
+        const temporary = new Temporary(({ world }) => {
+          world.beforeEvents.playerInteractWithEntity.subscribe(event => {
+            const airdropEntity = airdrop.chestMinecart
+            if (!airdropEntity) return
+            if (event.target.id !== airdropEntity.id) return
+
+            if (this.player.id === event.player.id) {
+              system.delay(() => this.next())
+            } else event.cancel = true
+          })
+        })
+
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const qthis = this
+        this.quest.steps(this.player).createTargetMarkerInterval({
+          place: Vector.floor(this.player.location),
+          interval() {
+            const airdropEntity = airdrop.chestMinecart
+            if (!airdropEntity) return
+            this.place = Vector.floor(airdropEntity.location)
+            for (const vector of Vector.foreach(this.place, Vector.add(this.place, { x: 0, y: -10, z: 0 })))
+              try {
+                world.overworld.spawnParticle(
+                  'minecraft:balloon_gas_particle',
+                  Vector.add(vector, { x: 0.5, y: 0.5, z: 0.5 })
+                )
+              } catch (e) {
+                util.error(e)
+              }
+
+            airdroppos = ' на\n§f' + Vector.string(Vector.floor(this.place))
+            qthis.update()
+          },
+          temporary,
+        })
+
+        return temporary
       },
     })
   }

@@ -1,7 +1,7 @@
 import { GameMode, system, Vector, world } from '@minecraft/server'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import * as GameTest from '@minecraft/server-gametest'
-import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { GAME_UTILS, util } from 'smapi.js'
 const time = 9999999
 

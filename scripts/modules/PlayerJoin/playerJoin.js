@@ -97,13 +97,13 @@ class JoinBuilder {
     new Command({
       name: 'join',
       description: 'Имитирует первый вход',
-      type: 'admin',
+      role: 'admin',
     }).executes(ctx => {
       EventSignal.emit(this.onMoveAfterJoin, { player: ctx.sender, joinCounts: 1, firstJoin: true })
     })
   }
 
-  getSettings = Settings.player('Вход', 'join', {
+  settings = Settings.player('Вход', 'join', {
     message: {
       desc: 'Сообщения о входе других игроков',
       value: true,
@@ -125,7 +125,7 @@ class JoinBuilder {
 
     for (const other of world.getPlayers()) {
       if (other.id === player.id) continue
-      const settings = this.getSettings(other)
+      const settings = this.settings(other)
       if (settings.sound) other.playSound(Join.config.messages.sound)
       if (settings.message) other.tell(`§7${player.name} ${Join.config.messages[messageType]}`)
     }

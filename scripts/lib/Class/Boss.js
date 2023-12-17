@@ -8,7 +8,7 @@
 
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { BossArenaRegion } from 'lib/Region/Region.js'
+import { BossArenaRegion } from 'lib/Region/index.js'
 import { EditableLocation } from 'smapi.js'
 
 /**

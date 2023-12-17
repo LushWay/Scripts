@@ -5,7 +5,7 @@ import { ActionForm, MessageForm, util } from 'smapi.js'
 class MenuBuilder {
   constructor() {
     this.item = new ItemStack('sm:menu').setInfo(
-      '§b§lМеню\n§r(use)',
+      '§b§lМеню\n§r§f(use)',
       '§r§7Для открытия возьми в руку и зажми на телефоне, пкм на пк\n\nЧтобы убрать из инвентаря напиши в чат: §f-menu'
     )
 

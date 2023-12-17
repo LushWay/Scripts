@@ -9,9 +9,14 @@ import {
 } from '@minecraft/server'
 import { SYSTEM_ENTITIES } from 'config.js'
 import { GAME_UTILS } from 'smapi.js'
-import { Region } from './Region.js'
-import './command.js'
+import { Region } from './Class/Region.js'
 import { BLOCK_CONTAINERS, DOORS_SWITCHES } from './config.js'
+export * from './Class/CubeRegion.js'
+export * from './Class/RadiusRegion.js'
+export * from './Class/Region.js'
+export * from './DB.js'
+export * from './command.js'
+export * from './config.js'
 
 let LOADED = false
 
@@ -105,8 +110,6 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
 
   system.runInterval(
     () => {
-      if (!Region.config.SETTED) return
-
       for (const player of world.getAllPlayers()) {
         const currentRegion = Region.locationInRegion(player.location, player.dimension.type)
 

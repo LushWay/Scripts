@@ -1,3 +1,8 @@
+class MineshaftBuilder {}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Mineshaft = new MineshaftBuilder()
+
 /**
  * @param {Vector3} centerPos
  * @param {number} minRadius
@@ -23,3 +28,4 @@ export function generateOre(centerPos, minRadius, maxRadius) {
 
   return orePositions
 }
+

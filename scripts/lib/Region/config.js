@@ -1,41 +1,13 @@
+import { BlockTypes } from '@minecraft/server'
 import { SYSTEM_ENTITIES } from 'config'
 
 /**
  * All doors and switches in minecraft
  */
-export const DOORS_SWITCHES = [
-  'minecraft:acacia_door',
-  'minecraft:acacia_trapdoor',
-  'minecraft:acacia_button',
-  'minecraft:birch_door',
-  'minecraft:birch_trapdoor',
-  'minecraft:birch_button',
-  'minecraft:crimson_door',
-  'minecraft:crimson_trapdoor',
-  'minecraft:crimson_button',
-  'minecraft:dark_oak_door',
-  'minecraft:dark_oak_trapdoor',
-  'minecraft:dark_oak_button',
-  'minecraft:jungle_door',
-  'minecraft:jungle_trapdoor',
-  'minecraft:jungle_button',
-  'minecraft:mangrove_door',
-  'minecraft:mangrove_trapdoor',
-  'minecraft:mangrove_button',
-  'minecraft:spruce_door',
-  'minecraft:spruce_trapdoor',
-  'minecraft:spruce_button',
-  'minecraft:warped_door',
-  'minecraft:warped_trapdoor',
-  'minecraft:warped_button',
-  'minecraft:wooden_door',
-  'minecraft:wooden_button',
-  'minecraft:trapdoor',
-  'minecraft:iron_door',
-  'minecraft:iron_trapdoor',
-  'minecraft:polished_blackstone_button',
-  'minecraft:lever',
-]
+export const DOORS_SWITCHES = BlockTypes.getAll()
+  .filter(e => e.id.match(/door|trapdoor|button$/g))
+  .map(e => e.id)
+  .concat(['minecraft:lever'])
 
 /**
  * A List of all containers a item could be in
@@ -58,7 +30,7 @@ export const BLOCK_CONTAINERS = [
 
 /**
  * The default permissions for all regions made
- * @type {IRegionPermissions}
+ * @type {RegionPermissions}
  */
 export const DEFAULT_REGION_PERMISSIONS = {
   doorsAndSwitches: true,

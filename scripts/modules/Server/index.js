@@ -41,36 +41,40 @@ class ServerBuilder {
   })
   type = 'unknown'
   constructor() {
-    this.type =
-      TYPES[
-        (() => {
-          let num = Number(GAME_UTILS.env('type'))
-          if (!num || isNaN(num)) num = this.options.type
+    SM.afterEvents.modulesLoad.subscribe(() => {
+      this.type =
+        TYPES[
+          (() => {
+            let num = Number(GAME_UTILS.env('type'))
+            if (!num || isNaN(num)) num = this.options.type
 
-          if (!(num in TYPES) || num === 0) {
-            num = 0
-            console[util.settings.firstLoad ? 'warn' : 'log'](
-              `§cДля полноценной работы сервера используйте §f-wsettings§c, установите §fserver§c/§ftype§c и перезагрузите скрипты.`
-            )
-          }
+            if (!(num in TYPES) || num === 0) {
+              num = 0
+              console[util.settings.firstLoad ? 'warn' : 'log'](
+                `§cДля полноценной работы сервера используйте §f-wsettings§c, установите §fserver§c/§ftype§c и перезагрузите скрипты.`
+              )
+            }
 
-          return num
-        })()
-      ]
+            return num
+          })()
+        ]
+
+      let toImport = ''
+      if (this.type === 'build') toImport = '../Build/index.js'
+      if (this.type === 'survival') toImport = '../Survival/index.js'
+
+      if (toImport)
+        importModules({
+          array: [toImport],
+          fn: m => import(m),
+          deleteStack: 1,
+        })
+    })
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Server = new ServerBuilder()
-
-let toImport = './disabled.js'
-if (Server.type === 'build') toImport = '../Build/index.js'
-if (Server.type === 'survival') toImport = '../Survival/config.js'
-
-importModules({
-  array: [toImport],
-  fn: m => import(m),
-})
 
 /**
  *

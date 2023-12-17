@@ -7,10 +7,9 @@ const modules = [
   './Server/chat.js',
   './Server/index.js',
   './Build/camera.js',
-
-  '../lib/Class/Quest.js',
-  '../test/test.js',
   './WorldEdit/index.js',
+  './Commands/index.js',
+  '../test/test.js',
 ]
 
 const enabled = 0
@@ -22,12 +21,14 @@ const strike = util.strikeTest()
  * @param {string} [o.strikeMessage]
  * @param {(m: string) => Promise<any>} [o.fn]
  * @param {number} [o.striketest]
+ * @param {number} [o.deleteStack]
  */
 export default async function ({
   array = modules,
   strikeMessage = 'SM init and loading took',
   fn = module => import(module),
   striketest = enabled,
+  deleteStack = 1,
 } = {}) {
   if (striketest) strike(strikeMessage)
 
@@ -40,13 +41,13 @@ export default async function ({
       } catch (e) {
         util.error(e, {
           errorName: 'ModuleLoad',
-          additionalStack: [module],
-          deleteStack: 1,
+          deleteStack,
         })
         stop = true
       }
 
       if (striketest) strike(module)
+      await nextTick
     })
   }
 }

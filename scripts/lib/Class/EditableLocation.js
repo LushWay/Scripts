@@ -1,20 +1,33 @@
-import { Vector } from '@minecraft/server'
-import { EventLoader } from 'smapi.js'
+import { Player, Vector } from '@minecraft/server'
+import { EventLoaderWithArg } from 'smapi.js'
 import { util } from '../util.js'
 import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
 
 /**
- * @template {boolean} AllowRotation
- * @typedef {(AllowRotation extends false ? Vector3 : (Vector3 & {xRot: number; yRot: number}))} Location
+ * @typedef {'vector3' | 'vector3+rotation' | 'vector3+radius'} LocationTypeSuperset
  */
 
 /**
- * @template {boolean} [AllowRotation=false]
+ * @template {LocationTypeSuperset} LocationType
+ * @typedef {LocationType extends 'vector3'
+ *   ? Vector3
+ *   : LocationType extends 'vector3+rotation'
+ *     ? (Vector3 & { xRot: number; yRot: number })
+ *     : (Vector3 & { radius: number })
+ * } Location
+ */
+
+/**
+ * @template {LocationTypeSuperset} [LocationType='vector3']
  */
 export class EditableLocation {
   // TODO Migrate all locations to safe
   /**
-   * @returns {({ valid: false } | ({ valid: true } & Location<AllowRotation>))}
+   * @returns {(
+   *   { valid: false } |
+   *  ({ valid: true } & Location<LocationType>)
+   * ) & { onLoad: EditableLocation<LocationType>['onLoad'], teleport: EditableLocation<LocationType>['teleport'] }
+   * }
    */
   get safe() {
     return this
@@ -28,28 +41,34 @@ export class EditableLocation {
     instance.x = location.x
     instance.y = location.y
     instance.z = location.z
-    if (instance.allowRotation && 'xRot' in location) {
+    if ('xRot' in location) {
       instance.xRot = location.xRot
       instance.yRot = location.yRot
     }
-    EventLoader.load(instance.onLoad)
+    if ('radius' in location) {
+      instance.radius = location.radius
+    }
+    EventLoaderWithArg.load(instance.onLoad, Object.assign(instance, { firstLoad: !instance.valid }))
   }
 
   get valid() {
     return this.onLoad.loaded
   }
 
-  onLoad = new EventLoader(this)
+  /** @type {EventLoaderWithArg<{ firstLoad: boolean } & Location<LocationType>>} */
+  // @ts-expect-error Wtf
+  onLoad = new EventLoaderWithArg(Object.assign(this, { firstLoad: true }))
 
   x = 0
   y = 0
   z = 0
   xRot = 0
   yRot = 0
+  radius = 0
 
   /**
    * @private
-   * @type {false | Location<AllowRotation>}
+   * @type {false | Location<LocationType>}
    */
   fallback = false
 
@@ -57,14 +76,18 @@ export class EditableLocation {
    *
    * @param {string} id
    * @param {Object} [options]
-   * @param {AllowRotation} [options.allowRotation]
-   * @param {EditableLocation<AllowRotation>["fallback"]} [options.fallback]
+   * @param {LocationType} [options.type]
+   * @param {EditableLocation<LocationType>["fallback"]} [options.fallback]
    */
-  constructor(id, { fallback = false, allowRotation } = {}) {
+  constructor(id, { fallback = false, type } = {}) {
     this.id = id
-    this.allowRotation = allowRotation
+    /** @type {LocationType} */
+    // @ts-expect-error Default type support
+    this.type = type ?? 'vector3'
     this.fallback = fallback
-    this.format = `x y z${allowRotation ? ' xRot yRot' : ''}`
+    this.format = `x y z${
+      this.type === 'vector3+rotation' ? ' xRot yRot' : this.type === 'vector3+radius' ? ' radius' : ''
+    }`
     Settings.worldMap[EditableLocation.key][id] = {
       desc: `Позиция ${this.format}`,
       name: id,
@@ -101,8 +124,25 @@ export class EditableLocation {
       )
     }
 
-    const [x, y, z, xRot, yRot] = location
-    EditableLocation.load(this, { x, y, z, yRot, xRot })
+    const [x, y, z, loc3, loc4] = location
+    EditableLocation.load(
+      this,
+      this.type === 'vector3'
+        ? { x, y, z }
+        : this.type === 'vector3+rotation'
+        ? { x, y, z, yRot: loc4, xRot: loc3 }
+        : { x, y, z, radius: loc3 }
+    )
+  }
+
+  /**
+   * @param {Player} player
+   */
+  teleport(player) {
+    player.teleport(
+      Vector.add(this, { x: 0.5, y: 0, z: 0.5 }),
+      this.type === 'vector3+rotation' ? { rotation: { x: this.xRot, y: this.yRot } } : void 0
+    )
   }
 }
 

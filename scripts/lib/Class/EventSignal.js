@@ -3,7 +3,7 @@ const CALLBACK_TYPE = Symbol('callback_t')
 const RETURN_TYPE = Symbol('return_t')
 
 /**
- * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
+ * The EventSignall class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
  * @template Data The type of the data that the events will be emitted with.
  * @template [Return=void] Return type of the subscriber
  * @template [Callback = (arg: Data) => Return] The type of the callback function that will be used for the events.
@@ -66,11 +66,7 @@ export class EventSignal {
 }
 
 /**
- * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
- * @template [Data={}] The type of the data that the events will be emitted with.
- * @template [Return=void] Return type of the subscriber
- * @template [Callback = (arg: Data) => Return] The type of the callback function that will be used for the events.
- * @extends {EventSignal<Data, Return, Callback>}
+ * @extends {EventSignal<undefined>}
  */
 export class EventLoader extends EventSignal {
   /**
@@ -78,23 +74,48 @@ export class EventLoader extends EventSignal {
    */
   static load(loader) {
     loader.loaded = true
-    return super.emit(loader, loader.defaultValue)
+    return super.emit(loader, undefined)
   }
+  loaded = false
 
+  /** @type {EventSignal<undefined>["subscribe"]} */
+  subscribe(callback, position) {
+    if (this.loaded) callback(undefined)
+    else super.subscribe(callback, position)
+    return callback
+  }
+}
+
+/**
+ * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to all subscribers.
+ * @template [Data={}] The type of the data that the events will be emitted with.
+ * @template [Return=void] Return type of the subscriber
+ * @template [Callback = (arg: Data) => Return] The type of the callback function that will be used for the events.
+ * @extends {EventSignal<Data, Return, Callback>}
+ */
+export class EventLoaderWithArg extends EventSignal {
   /**
-   * @param {Data} [defaultValue]
+   * @template {EventLoaderWithArg<any, any, any>} Signal
+   * @param {Signal} signal
+   * @param {Signal[DATA_TYPE]} data
+   * @returns {Array<Signal[RETURN_TYPE]>}
    */
-  constructor(defaultValue) {
-    super()
-    /** @private */
-    this.defaultValue = defaultValue
+  static load(signal, data) {
+    signal.loaded = true
+    return super.emit(signal, data)
   }
 
   loaded = false
 
-  /**
-   * @type {EventSignal<Data, Return, Callback>["subscribe"]}
-   */
+  /** @param {Data} [defaultValue] */
+  constructor(defaultValue) {
+    super()
+
+    /** @private */
+    this.defaultValue = defaultValue
+  }
+
+  /** @type {EventSignal<Data, Return, Callback>["subscribe"]} */
   subscribe(callback, position) {
     if (this.loaded && typeof callback === 'function') callback(this.defaultValue)
     else super.subscribe(callback, position)

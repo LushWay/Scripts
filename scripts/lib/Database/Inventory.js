@@ -28,6 +28,13 @@ const TABLE_TYPE = 'inventory'
  */
 
 export class InventoryStore {
+  /** @type {Inventory} */
+  static emptyInventory = {
+    health: 20,
+    xp: 0,
+    slots: {},
+    equipment: {},
+  }
   /**
    * The function loads equipment and inventory items from inventory object to entity in a game.
    * @param {object} o
@@ -293,8 +300,8 @@ export class InventoryStore {
    * @param {Inventory} [o.fallback] - Inventory to return if there is no inventory in store
    * @returns the entity store associated with the given entity ID.
    */
-  getEntityStore(key, { remove = true, fallback } = {}) {
-    if (!(key in this._.STORES)) {
+  get(key, { remove = true, fallback } = {}) {
+    if (!this.has(key)) {
       if (fallback) return fallback
       else throw new DatabaseError('Not found inventory!')
     }
@@ -314,12 +321,19 @@ export class InventoryStore {
    * @param {boolean} [options.keepInventory] - A boolean that determines keep entity's invetory or not
    * @param {string} [options.key] - Key to associate inventory with
    */
-  saveFromEntity(entity, { rewrite = false, keepInventory = false, key = entity.id } = {}) {
+  saveFrom(entity, { rewrite = false, keepInventory = false, key = entity.id } = {}) {
     if (key in this._.STORES && !rewrite)
       throw new DatabaseError('Failed to rewrite entity store with disabled rewriting.')
     this._.STORES[key] = InventoryStore.get(entity)
     if (!keepInventory) entity.getComponent('inventory').container.clearAll()
 
     this.requestSave()
+  }
+  /**
+   * Checks if key was saved into this store
+   * @param {string} key - Entity ID to check
+   */
+  has(key) {
+    return key in this._.STORES
   }
 }

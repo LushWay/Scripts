@@ -3,10 +3,12 @@ import { Quest } from 'lib/Class/Quest.js'
 import importModules from 'modules/importModules.js'
 import { ActionForm } from 'smapi.js'
 
-importModules({ array: ['./learning.js'], fn: m => import(m) })
+importModules({ array: ['./Learning/index.js'], fn: m => import(m) })
 
 const qcmd = new Command({
   name: 'q',
+  aliases: ['quest'],
+  description: 'Меню квеста',
   role: 'member',
 }).executes(ctx => {
   const q = Quest.active(ctx.sender)

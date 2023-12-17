@@ -1,7 +1,5 @@
 import { Player, Vector } from '@minecraft/server'
-import { editRegionPermissions, manageRegionMembers } from 'lib/Region/command.js'
-import { ActionForm } from 'smapi.js'
-import { RadiusRegion } from '../../../lib/Region/Region.js'
+import { ActionForm, RadiusRegion, editRegionPermissions, manageRegionMembers } from 'smapi.js'
 
 /**
  * @param {Player} player

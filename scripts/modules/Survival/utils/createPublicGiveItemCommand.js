@@ -8,7 +8,7 @@ export function createPublicGiveItemCommand(name, stack) {
   const tag = stack.nameTag?.split('\n')[0]
   new Command({
     name,
-    description: `Выдает или убирает ${tag} из инвентаря`,
+    description: `Выдает или убирает ${tag}§r§7§o из инвентаря`,
     type: 'public',
   }).executes(async ctx => {
     const { container } = ctx.sender.getComponent('inventory')

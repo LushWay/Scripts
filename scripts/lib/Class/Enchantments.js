@@ -1,9 +1,8 @@
 import { Enchantment, Vector, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { MinecraftEnchantmentTypes } from 'lib/List/enchantments.js'
-import { DB, EventSignal, util } from 'smapi.js'
+import { DB, EventLoader, util } from 'smapi.js'
 
-const ON_LOAD = new EventSignal()
 const LOCATION = { x: 0, y: -10, z: 0 }
 
 export class Enchantments {
@@ -18,9 +17,7 @@ export class Enchantments {
   // @ts-expect-error Type
   static typed = {}
 
-  static events = {
-    onLoad: ON_LOAD,
-  }
+  static onLoad = new EventLoader()
 }
 
 function load() {
@@ -64,7 +61,7 @@ function load() {
 
   // @ts-expect-error Type
   Enchantments.typed = Enchantments.custom
-  EventSignal.emit(ON_LOAD, null)
+  EventLoader.load(Enchantments.onLoad)
 }
 
 SM.afterEvents.worldLoad.subscribe(load)

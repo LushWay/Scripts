@@ -7,35 +7,41 @@ import './lib/Extensions/import.js'
 
 import { CONFIG } from './config.js'
 import { EventLoader } from './lib/Class/EventSignal.js'
-import { Command } from './lib/Command/index.js'
 import { util } from './lib/util.js'
 import importModules from './modules/importModules.js'
 
 world.say('§9┌ §fLoading...')
 const loading = Date.now()
 
-/**
- * Class because variable hoisting
- */
-class SM {
-  static afterEvents = {
-    modulesLoad: new EventLoader(),
-    worldLoad: new EventLoader(),
-  }
-}
-
-globalThis.SM = SM
-globalThis.Command = Command
-
 // Class
 export * from './lib/Class/Action.js'
+export * from './lib/Class/Airdrop.js'
+export * from './lib/Class/Boss.js'
 export * from './lib/Class/Cooldown.js'
 export * from './lib/Class/EditableLocation.js'
+export * from './lib/Class/Enchantments.js'
 export * from './lib/Class/EventSignal.js'
-export * from './lib/Class/Settings.js'
 export * from './lib/Class/GameUtils.js'
+export * from './lib/Class/Leaderboard.js'
+export * from './lib/Class/LootTable.js'
+export * from './lib/Class/Net.js'
+export * from './lib/Class/OptionalModules.js'
+export * from './lib/Class/Portals.js'
+export * from './lib/Class/Quest.js'
+export * from './lib/Class/Search.js'
+export * from './lib/Class/Settings.js'
+export * from './lib/Class/Sidebar.js'
+export * from './lib/Class/Store.js'
+export * from './lib/Class/StoredRequest.js'
+export * from './lib/Class/Temporary.js'
+export * from './lib/Class/Zone.js'
+
+// Catscene
+export * from './lib/Catscene/Catscene.js'
 // Command
-export * from './lib/Command/index.js'
+export * from './lib/Class/Cooldown.js'
+// Region
+export * from './lib/Region/index.js'
 // Database
 export * from './lib/Database/Default.js'
 export * from './lib/Database/Inventory.js'

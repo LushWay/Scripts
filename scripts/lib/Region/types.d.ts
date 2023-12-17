@@ -1,17 +1,4 @@
-interface IRegionCords {
-  x: number
-  z: number
-}
-
-interface IRegionDB {
-  dimensionId: string
-  from: IRegionCords
-  to: IRegionCords
-  key: string
-  permissions: IRegionPermissions
-}
-
-interface IRegionPermissions {
+interface RegionPermissions {
   /**
    * if the player can use chests, defualt: true
    */

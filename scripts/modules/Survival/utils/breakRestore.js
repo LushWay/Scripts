@@ -1,6 +1,6 @@
 import { BlockPermutation, LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { MineshaftRegion } from 'lib/Region/Region.js'
+import { MineshaftRegion } from 'lib/Region/index.js'
 import { util } from 'smapi.js'
 
 export const DELAYED_BLOCK_PLACE_DB = new DynamicPropertyDB('delayedBlockPlace', {

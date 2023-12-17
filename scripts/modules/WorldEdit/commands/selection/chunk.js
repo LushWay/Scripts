@@ -1,5 +1,4 @@
 import { Entity, Vector } from '@minecraft/server'
-import { Command } from 'smapi.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
 
 /**
