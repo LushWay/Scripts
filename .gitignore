@@ -1,5 +1,14 @@
 node_modules
 yarn-error.log
-.yarn
+
+# Yarn
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 tools/last-update
 scripts/@minecraft/vanilla-data.js

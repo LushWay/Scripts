@@ -4,7 +4,6 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint ./scripts/ --fix",
-    "postinstall": "node tools/patch-modules.js",
     "patch-modules": "node tools/patch-modules.js"
   },
   "dependencies": {
@@ -16,13 +15,13 @@
     "@minecraft/vanilla-data": "1.20.40"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.12.0",
-    "@typescript-eslint/parser": "^6.12.0",
-    "eslint": "^8.54.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-scriptapi": "file:tools/eslint-plugin#tools/eslint-plugin::hash=54de9c&locator=sm-api%40workspace%3A.",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-scriptapi": "file:tools/eslint-plugin",
     "leafy-utils": "^5.3.2",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   },
   "resolutions": {
     "@minecraft/server-net/@minecraft/server-admin": "1.0.0-beta.1.20.40-stable"
@@ -54,6 +53,7 @@
       "no-undef": "off",
       "prefer-const": "warn",
       "scriptapi/ensure-modules": "error",
+      "scriptapi/warn-unsupported-features": "error",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",

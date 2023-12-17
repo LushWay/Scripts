@@ -7,7 +7,7 @@ import { tpMenu } from 'modules/Commands/tp.js'
 import { EditableLocation, InventoryStore, Settings } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
 import { randomTeleport } from '../features/randomTeleport.js'
-import { SPAWN } from './spawn.js'
+import { SPAWN } from './Spawn.js'
 
 export const ANARCHY = {
   centerLocation: new EditableLocation('anarchy_center'),

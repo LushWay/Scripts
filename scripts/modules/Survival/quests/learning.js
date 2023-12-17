@@ -9,7 +9,7 @@ import { INTERACTION_GUARD } from 'modules/Survival/config.js'
 import { LEARNING_L } from 'modules/Survival/lootTables/learning.js'
 import { DELAYED_BLOCK_PLACE_DB } from 'modules/Survival/utils/breakRestore.js'
 import { util } from 'smapi.js'
-import { ANARCHY } from '../places/anarchy.js'
+import { ANARCHY } from '../Place/Anarchy.js'
 import { createPublicGiveItemCommand } from '../utils/createPublicGiveItemCommand.js'
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {

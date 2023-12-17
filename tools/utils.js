@@ -1,7 +1,7 @@
-import * as fs from 'fs/promises'
-import path from 'path'
-import { pathInfo } from 'leafy-utils'
 import { existsSync } from 'fs'
+import * as fs from 'fs/promises'
+import { pathInfo } from 'leafy-utils'
+import path from 'path'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const { relative } = pathInfo(import.meta.url)
 
@@ -43,6 +43,10 @@ export async function patchPackage(packageName, options) {
   const packagePath = path.join(resolve(packageName), `index.d.ts`)
   const stat = await fs.stat(packagePath)
 
+  if (!LAST_UPDATE) {
+    await writeLastUpdate()
+  }
+
   if (stat.mtimeMs.toString() === LAST_UPDATE) return
 
   let patchedCode = await fs.readFile(packagePath, 'utf-8')
@@ -55,8 +59,7 @@ export async function patchPackage(packageName, options) {
     if (newCode !== patchedCode) {
       patchedCode = newCode
     } else {
-      if (replace.throw !== false)
-        throw new Error(`Unable to find replace for ${replace.find}`)
+      if (replace.throw !== false) throw new Error(`Unable to find replace for ${replace.find}`)
     }
   }
 
@@ -90,18 +93,16 @@ export async function patchPackage(packageName, options) {
       }
     }
 
-    newCode = addEls(lines, [
-      [lastImport, options.additions.afterImports],
-      ...newLines,
-    ]).join('\n')
+    newCode = addEls(lines, [[lastImport, options.additions.afterImports], ...newLines]).join('\n')
   }
 
   // Write the patched code back to the file
   await fs.writeFile(packagePath, newCode)
-  await fs.writeFile(
-    LAST_UPDATE_PATH,
-    (await fs.stat(packagePath)).mtimeMs.toString()
-  )
+  await writeLastUpdate()
+
+  async function writeLastUpdate() {
+    await fs.writeFile(LAST_UPDATE_PATH, (await fs.stat(packagePath)).mtimeMs.toString())
+  }
 }
 
 /**
@@ -115,10 +116,7 @@ function addEls(arr, additions) {
   const result = []
   let currentAdditionIndex = 0
   for (let i = 0; i < arr.length; i++) {
-    if (
-      currentAdditionIndex < additions.length &&
-      i === additions[currentAdditionIndex][0]
-    ) {
+    if (currentAdditionIndex < additions.length && i === additions[currentAdditionIndex][0]) {
       // If there's an addition for the current index, add it before the current element
       result.push(additions[currentAdditionIndex][1])
       currentAdditionIndex++

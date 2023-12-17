@@ -7,18 +7,13 @@
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
-    "lib": ["es2020"],
+    "lib": ["ES2019", "ES2020.Date", "ES2020.Number", "ES2020.Promise", "ES2020.String", "ES2020.Symbol.WellKnown"],
     "target": "es2020",
     "types": [],
     "module": "ES2020",
     "moduleResolution": "Bundler",
     "baseUrl": "scripts/"
   },
-  "include": ["scripts", "scripts/modules/HelpCommand/.js"],
-  "exclude": [
-    "scripts/chestui",
-    "scripts/@minecraft/",
-    "@minecraft/vanilla-data",
-    "node_modules"
-  ]
+  "include": ["scripts/"],
+  "exclude": ["scripts/chestui", "scripts/@minecraft/", "@minecraft/vanilla-data", "node_modules"]
 }

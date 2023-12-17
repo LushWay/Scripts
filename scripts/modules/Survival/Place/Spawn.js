@@ -5,7 +5,7 @@ import { EditableLocation, InventoryStore } from 'smapi.js'
 import { Portal } from '../../../lib/Class/Portals.js'
 import { Region, SafeAreaRegion } from '../../../lib/Region/Region.js'
 import { Menu } from '../../Server/menuItem.js'
-import { ANARCHY } from './anarchy.js'
+import { ANARCHY } from './Anarchy.js'
 
 export const SPAWN = {
   inventory: {

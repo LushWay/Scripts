@@ -8,7 +8,7 @@ import { ModalForm } from 'lib/Form/ModalForm.js'
 import { BASE_ITEM_STACK } from 'modules/Survival/features/base.js'
 import { DB, GAME_UTILS, util } from 'smapi.js'
 import { APIRequest } from '../lib/Class/Net.js'
-import { generateOre } from '../modules/Survival/places/mineshaft.js'
+import { generateOre } from '../modules/Survival/Place/Mineshaft.js'
 import './enchant.js'
 import './simulatedPlayer.js'
 
