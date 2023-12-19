@@ -1,8 +1,8 @@
-import { DefaultPlaceWithSafeArea } from 'modules/Survival/Place/Default.place.js'
+import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
 
 class TechCityBuilder extends DefaultPlaceWithSafeArea {
   constructor() {
-    super('TechCity')
+    super('Техноград')
   }
 }
 

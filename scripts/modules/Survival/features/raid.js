@@ -67,4 +67,4 @@ system.runInterval(
 /**
  * @type {Record<string, number>}
  */
-export const RAID_NOTIFY = {}
+const RAID_NOTIFY = {}

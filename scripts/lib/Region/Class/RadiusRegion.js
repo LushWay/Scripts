@@ -65,6 +65,10 @@ export class RadiusRegion extends Region {
   }
 }
 
+/**
+ * @typedef {Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>} RadiusRegionSubtypeArg
+ */
+
 export class MineshaftRegion extends RadiusRegion {
   subtype = 'mine'
 
@@ -77,7 +81,7 @@ export class MineshaftRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  /** @param {RadiusRegionSubtypeArg} arg */
   constructor(arg) {
     super({ ...arg, initPermissions: false })
     this.initPermissions(arg.permissions)
@@ -96,9 +100,14 @@ export class SafeAreaRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  get name() {
+    return 'Безопасная зона ' + this.safeAreaName ?? super.name
+  }
+
+  /** @param {RadiusRegionSubtypeArg & { name?: string }} arg */
   constructor(arg) {
     super({ saveToDisk: false, ...arg, initPermissions: false })
+    this.safeAreaName = arg.name
     this.initPermissions(arg.permissions)
   }
 }
@@ -115,7 +124,7 @@ export class BaseRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  /** @param {RadiusRegionSubtypeArg} arg */
   constructor(arg) {
     super({ ...arg, initPermissions: false })
     this.initPermissions(arg.permissions)
@@ -134,7 +143,7 @@ export class BossArenaRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {ConstructorParameters<typeof RadiusRegion>[0]} arg */
+  /** @param {RadiusRegionSubtypeArg} arg */
   constructor(arg) {
     super({
       ...arg,

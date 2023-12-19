@@ -1,12 +1,7 @@
-import { system } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { Quest } from 'lib/Class/Quest.js'
-import { AXE } from 'modules/Survival/Features/axe.js'
-import { Anarchy } from 'modules/Survival/Place/Anarchy.js'
-import { LEARNING } from 'modules/Survival/Quests/Learning/index.js'
-import { LEARNING_L } from 'modules/Survival/Quests/Learning/lootTables.js'
 import importModules from 'modules/importModules.js'
-import { ActionForm, Temporary } from 'smapi.js'
+import { ActionForm } from 'smapi.js'
 
 importModules({ array: ['./Learning/index.js'], fn: m => import(m) })
 

@@ -4,7 +4,7 @@ import { EditableLocation, InventoryStore, Portal, SafeAreaRegion, Settings } fr
 
 import { isBuilding } from 'modules/Build/list.js'
 import { Menu } from 'modules/Server/menuItem.js'
-import { DefaultPlaceWithInventory } from 'modules/Survival/Place/Default.place.js'
+import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
   /**
@@ -51,10 +51,10 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
       const spawnLocation = this.location
       world.setDefaultSpawnLocation(spawnLocation)
       this.portal = new Portal('spawn', null, null, player => {
-        if (!Portal.canTeleport(player)) return
+        if (!Portal.canTeleport(player, { name: '§9> §bSpawn §9<' })) return
 
         this.loadInventory(player)
-        spawnLocation.teleport(player)
+        system.delay(() => spawnLocation.teleport(player))
       })
 
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {

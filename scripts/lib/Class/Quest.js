@@ -34,7 +34,7 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return `§6Квест: §f${status.quest.displayName}\n${status.step.text()}\n§6Подробнее: §f-q`
+        return `§6Квест: §f${status.quest.displayName}\n${status.step?.text()}\n§6Подробнее: §f-q`
       }
     },
   }
@@ -75,7 +75,9 @@ export class Quest {
     this.init = init
     Quest.instances[this.name] = this
     SM.afterEvents.modulesLoad.subscribe(() => {
-      world.getAllPlayers().forEach(setQuests)
+      system.delay(() => {
+        world.getAllPlayers().forEach(setQuests)
+      })
     })
   }
 
@@ -100,7 +102,8 @@ export class Quest {
     if (!restore) delete data.quest.additional
     data.quest.step = stepNum
 
-    const step = this.steps(player).list[stepNum]
+    const steps = this.steps(player)
+    const step = steps.list[stepNum] ?? steps.list[0]
     if (!step) return false
     step.cleanup = step.activate?.(!restore).cleanup
   }
@@ -502,7 +505,7 @@ class PlayerQuest {
         this.quest.exit(this.player)
         return { cleanup() {} }
       },
-      text: () => '',
+      text: () => '§cКвест сломался: ' + reason,
     })
   }
 

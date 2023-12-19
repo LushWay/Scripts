@@ -1,15 +1,15 @@
 {
-	"version": "0.3.0",
-	"configurations": [
-		{
-			"type": "minecraft-js",
-			"request": "attach",
-			"name": "Minecraft debugger",
-			"mode": "listen",
-			"localRoot": "${workspaceFolder}/scripts/",
-			"port": 1000
-		}
-	]
+  "version": "0.3.0",
+  "configurations": [
+    {
+      "type": "minecraft-js",
+      "request": "attach",
+      "name": "Minecraft debugger",
+      "mode": "listen",
+      "localRoot": "${workspaceFolder}/scripts/",
+      "port": 1000
+    }
+  ]
 }
 
 /*

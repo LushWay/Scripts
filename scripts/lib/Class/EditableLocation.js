@@ -89,7 +89,7 @@ export class EditableLocation {
       this.type === 'vector3+rotation' ? ' xRot yRot' : this.type === 'vector3+radius' ? ' radius' : ''
     }`
     Settings.worldMap[EditableLocation.key][id] = {
-      desc: `Позиция ${this.format}`,
+      desc: this.format,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
       onChange: () => this.load(),

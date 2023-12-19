@@ -1,10 +1,10 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { DefaultPlaceWithSafeArea } from 'modules/Survival/Place/Default.place.js'
+import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
 import { Boss, util } from 'smapi.js'
 
 class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
   constructor() {
-    super('VillageOfExplorers')
+    super('Деревня исследователей')
   }
   slimeBoss = new Boss({
     name: 'slime',

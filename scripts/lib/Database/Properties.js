@@ -2,6 +2,9 @@ import { system, world } from '@minecraft/server'
 import { util } from '../util.js'
 import { DB, DatabaseError } from './Default.js'
 
+const IS_PROXIED = Symbol('is_proxied')
+const PROXY_TARGET = Symbol('proxy_target')
+
 /**
  * @template {string} [Key=string]
  * @template [Value=undefined]
@@ -81,8 +84,8 @@ export class DynamicPropertyDB {
       util.error(new DatabaseError(`Failed to init key '${this.key}': ${error}`))
     }
   }
+
   /**
-   *
    * @returns {Record<Key, Value>}
    */
   proxy() {
@@ -92,46 +95,61 @@ export class DynamicPropertyDB {
   /** @private */
   _needSaveRun = false
   needSave() {
-    if (this._needSaveRun) return
+    if (this._needSaveRun) return true
 
     system.delay(() => {
       this._needSaveRun = false
-      world.setDynamicProperty(
-        this.key,
-        JSON.stringify(
-          // Modify all values
-          Object.fromEntries(
-            Object.entries(this.value).map(([key, value]) => {
-              const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
+      const str = JSON.stringify(
+        // Modify all values
+        Object.fromEntries(
+          Object.entries(this.value).map(([key, value]) => {
+            const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
 
-              return [
-                // Remove default if defaultv and value are objects
-                key,
-                typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-                  ? DB.removeDefaults(value, defaultv)
-                  : value,
-              ]
-            })
-          )
+            return [
+              // Remove default if defaultv and value are objects
+              key,
+              typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
+                ? DB.removeDefaults(value, defaultv)
+                : value,
+            ]
+          })
         )
       )
+      world.setDynamicProperty(this.key, str)
     })
+
+    return (this._needSaveRun = true)
   }
 
   /**
-   *
-   * @param {Record<string, any>} object
+   * @type {WeakMap<object, object>}
+   */
+  subproxyMap = new WeakMap()
+
+  /**
+   * @param {Record<string, any> & {[IS_PROXIED]?: boolean}} object
    * @param {string} key
    * @param {string} keys
    * @returns {Record<string, any>}
+   * @private
    */
   subproxy(object, key, keys, initial = false) {
-    return new Proxy(object, {
+    if (object[IS_PROXIED]) return object
+    const oldProxy = this.subproxyMap.get(object)
+    if (oldProxy) return oldProxy
+
+    const proxy = new Proxy(object, {
       get: (target, p, reciever) => {
         // Filter non db keys
-        if (p === 'toJSON') return
         let value = Reflect.get(target, p, reciever)
-        if (typeof p === 'symbol') return value
+        if (typeof p === 'symbol' || p === 'toJSON') {
+          if (p === 'toJSON') return
+          if (p === IS_PROXIED) return true
+          if (p === PROXY_TARGET) return target
+          return value
+        }
+
+        if (value && value[IS_PROXIED]) value = value[PROXY_TARGET]
 
         // Add default value
         if (initial && typeof value === 'undefined' && this.defaultValue) {
@@ -141,7 +159,7 @@ export class DynamicPropertyDB {
 
         // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
-          return this.subproxy(value, p, keys + '.' + key)
+          return this.subproxy(value, p, keys + '.' + p)
         } else return value
       },
       set: (target, p, value, reciever) => {
@@ -149,10 +167,24 @@ export class DynamicPropertyDB {
         if (typeof p === 'symbol') return Reflect.set(target, p, value, reciever)
 
         // Set value
+        if (value[IS_PROXIED]) value = value[PROXY_TARGET]
+
         const setted = Reflect.set(target, p, value, reciever)
-        if (setted) this.needSave()
+        if (setted) return this.needSave()
         return setted
       },
+      deleteProperty: (target, p) => {
+        // Filter non db keys
+        if (typeof p === 'symbol') return Reflect.deleteProperty(target, p)
+
+        const deleted = Reflect.deleteProperty(target, p)
+        if (deleted) return this.needSave()
+        return deleted
+      },
     })
+
+    this.subproxyMap.set(object, proxy)
+
+    return proxy
   }
 }

@@ -39,7 +39,7 @@ export class DefaultPlaceWithInventory {
    */
   saveInventory(player) {}
 
-  /** @type {Player['database']['survival']['inv']} */
+  /** @type {InventoryTypeName} */
   inventoryName
 }
 
@@ -48,11 +48,15 @@ export class DefaultPlaceWithSafeArea {
    * @param {string} name
    */
   constructor(name) {
-    this.portalLocation = new EditableLocation('portal_' + name, { type: 'vector3+rotation' })
-    this.location = new EditableLocation(name, { type: 'vector3+radius' })
-    this.location.onLoad.subscribe(location => {
+    this.name = name
+    this.portalTeleportsTo = new EditableLocation(name + ' portal teleports to', { type: 'vector3+rotation' })
+    this.portalPos2 = new EditableLocation(name + ' portal pos1', { type: 'vector3' })
+    this.portalPos1 = new EditableLocation(name + ' portal pos2', { type: 'vector3' })
+    this.safeAreaLocation = new EditableLocation(name + ' мирная зона', { type: 'vector3+radius' })
+    this.safeAreaLocation.onLoad.subscribe(location => {
       this.safeArea = new SafeAreaRegion({
-        key: 'safeArea ' + name,
+        name,
+        key: name + ' мирная зона',
         dimensionId: 'overworld',
         center: location,
         radius: location.radius,

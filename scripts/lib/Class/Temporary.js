@@ -39,7 +39,7 @@ export class Temporary {
              * @param  {...object} args
              */
             subscribe(fn, ...args) {
-              console.log('Handled eventSignal', p)
+              // console.log('Handled eventSignal', p)
               // @ts-expect-error We checked it above
               temp.cleaner.push(() => value.unsubscribe(fn))
               // @ts-expect-error We checked it above
@@ -76,7 +76,7 @@ export class Temporary {
           return (...args) => {
             const handle = value.call(target, ...args)
             if (typeof handle === 'number') {
-              console.log('System handled', p)
+              // console.log('System handled', p)
               temp.cleaner.push(() => system.clearRun(handle))
             }
             return handle

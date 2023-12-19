@@ -1,7 +1,7 @@
-import { Vector, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { INTERACTION_GUARD } from 'modules/Survival/config.js'
-import { DELAYED_BLOCK_PLACE_DB } from 'modules/Survival/utils/breakRestore.js'
+import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { Region, util } from 'smapi.js'
 
 export const AXE = {
@@ -9,6 +9,7 @@ export const AXE = {
   BREAKS: Object.entries(MinecraftBlockTypes)
     .filter(e => e[0].match(/log/i))
     .map(e => e[1]),
+
   /**
    * @type {Region[]}
    */
@@ -18,7 +19,7 @@ export const AXE = {
 INTERACTION_GUARD.subscribe((_, region, ctx) => {
   if (
     ctx.type === 'break' &&
-    ctx.event.itemStack?.typeId.endsWith('axe') &&
+    // ctx.event.itemStack?.typeId.endsWith('axe') &&
     AXE.BREAKS.includes(ctx.event.block.typeId)
   ) {
     if (region) {
@@ -27,12 +28,16 @@ INTERACTION_GUARD.subscribe((_, region, ctx) => {
   }
 })
 
-world.afterEvents.playerBreakBlock.subscribe(event => {
-  if (AXE.BREAKS.includes(event.brokenBlockPermutation.type.id)) {
-    event.block.setType(event.brokenBlockPermutation.type.id.replace(/^stripped_/, '').replace(/_log$/, '_fence'))
-    DELAYED_BLOCK_PLACE_DB[Vector.string(event.block.location)] = {
-      typeId: event.brokenBlockPermutation.type.id,
-      date: Date.now() + util.ms.from('min', 10),
-    }
+world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: broken, dimension }) => {
+  if (AXE.BREAKS.includes(broken.type.id)) {
+    block.setType(broken.type.id.replace(/^stripped_/, '').replace(/_log$/, '_fence'))
+
+    scheduleBlockPlace({
+      dimension: dimension.type,
+      location: block.location,
+      typeId: broken.type.id,
+      states: broken.getAllStates(),
+      restoreTime: util.ms.from('min', 10),
+    })
   }
 })

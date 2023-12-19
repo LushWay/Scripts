@@ -7,7 +7,7 @@ import { ModalForm } from 'lib/Form/ModalForm.js'
 import { BASE_ITEM_STACK } from 'modules/Survival/Features/base.js'
 import { DB, GAME_UTILS, util } from 'smapi.js'
 import { APIRequest } from '../lib/Class/Net.js'
-import { generateOre } from '../modules/Survival/Place/Mineshaft.js'
+import { Mineshaft } from '../modules/Survival/Place/Mineshaft.js'
 import './enchant.js'
 import './simulatedPlayer.js'
 
@@ -232,7 +232,7 @@ const tests = {
     if (isNaN(rad2)) return ctx.error(ctx.args[2] + ' should be number!')
     // new Shape(SHAPES.sphere, ctx.sender.location, ["air"], rad);
 
-    const orePositions = generateOre(ctx.sender.location, rad, rad2)
+    const orePositions = Mineshaft.generateOre({ center: ctx.sender.location, minRadius: rad, maxRadius: rad2 })
 
     for (const position of orePositions) {
       ctx.sender.dimension.getBlock(position)?.setType(MinecraftBlockTypes.Stone)

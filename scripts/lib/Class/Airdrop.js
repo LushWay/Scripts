@@ -1,10 +1,10 @@
 import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { util } from 'lib/util.js'
 import { EventSignal } from './EventSignal.js'
 import { GAME_UTILS } from './GameUtils.js'
 import { LootTable } from './LootTable.js'
-import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { util } from 'lib/util.js'
 
 const AIRDROP_DB = new DynamicPropertyDB('airdrop', {
   /**
@@ -132,8 +132,9 @@ system.runInterval(
       } else if (airdrop.status === 'falling') {
         airdrop.teleport()
       } else if (airdrop.status === 'being looted' && airdrop.chestMinecart) {
-        const { container } = airdrop.chestMinecart.getComponent('inventory')
-        if (container.emptySlotsCount === container.size) airdrop.chestMinecart.remove()
+        const inventory = airdrop.chestMinecart.getComponent('inventory')
+        const { container } = inventory
+        if (!inventory || container.emptySlotsCount === container.size) airdrop.chestMinecart.remove()
       }
     }
 

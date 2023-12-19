@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { isBuilding } from 'modules/Build/list.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
-import { BaseRegion, Quest, Region, Settings, Sidebar } from 'smapi.js'
+import { BaseRegion, Quest, Region, SafeAreaRegion, Settings, Sidebar } from 'smapi.js'
 
 const settings = Settings.player('Боковое меню (сайдбар)', 'sidebar', {
   enabled: {
@@ -40,6 +40,7 @@ const sidebar = new Sidebar(
       const region = Region.locationInRegion(player.location, player.dimension.type)
       if (region) {
         if (!region.permissions.pvp) text = ', §aмирная зона'
+        if (region instanceof SafeAreaRegion && region.safeAreaName) text += '\n' + region.safeAreaName
         if (region instanceof BaseRegion && region.regionMember(player.id)) text = ', §6ваша база'
       }
     }

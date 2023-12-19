@@ -64,10 +64,9 @@ system.runInterval(
     world.overworld.getEntities({ type: 'sm:ice_bomb' }).forEach(entity => {
       const block = entity.dimension.getBlock(entity.location)
       if (block) {
-        entity.remove()
-
         if (block.typeId in ICE_BOMB_TRANSOFORM) {
           block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
+          entity.remove()
         }
       }
     })

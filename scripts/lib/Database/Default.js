@@ -146,7 +146,9 @@ export class DB {
    * @returns {O & D}
    */
   static setDefaults(sourceObject, defaultObject) {
-    if (Array.isArray(sourceObject)) return sourceObject
+    if (Array.isArray(sourceObject)) {
+      return sourceObject
+    } else if (Array.isArray(defaultObject)) return defaultObject
 
     // Create a new object to avoid modifying the original object
     /** @type {JSONLike}*/
@@ -200,6 +202,8 @@ export class DB {
    * @returns {S}
    */
   static removeDefaults(sourceObject, defaultObject) {
+    if (Array.isArray(sourceObject)) return sourceObject
+
     // Create a new object to avoid modifying the original object
     /** @type {JSONLike} */
     const COMPOSED = {}
@@ -210,10 +214,10 @@ export class DB {
 
       if (value === defaultValue) continue
 
-      if (typeof defaultValue === 'object' && defaultValue !== null && typeof value === 'object') {
+      if (typeof defaultValue === 'object' && defaultValue !== null && typeof value === 'object' && value !== null) {
         if (Array.isArray(defaultValue)) {
           //
-          if (!value?.length || Array.equals(value, defaultValue)) continue
+          if (Array.isArray(value) || Array.equals(value, defaultValue)) continue
 
           COMPOSED[key] = value
         } else {

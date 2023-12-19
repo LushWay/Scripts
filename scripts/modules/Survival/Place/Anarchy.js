@@ -1,13 +1,15 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player, Vector, system } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
-
 import { isBuilding } from 'modules/Build/list.js'
-import { DefaultPlaceWithInventory } from 'modules/Survival/Place/Default.place.js'
-import { randomTeleportPlayerToLearning } from 'modules/Survival/Quests/Learning/index.js'
+import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
+import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
 import { tpMenuOnce } from '../Features/builderTeleport'
 
 class AnarchyBuilder extends DefaultPlaceWithInventory {
+  /**
+   * @param {Player} player
+   */
+  learningRTP(player) {}
   /**
    * @type {InventoryTypeName}
    */
@@ -40,12 +42,13 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         player => {
           if (isBuilding(player)) return tpMenuOnce(player)
 
-          if (!Portal.canTeleport(player)) return
           const db = player.database.survival
 
           if (db.inv === this.inventoryName) {
             return player.tell('§cВы уже находитесь на анархии!')
           }
+
+          if (!Portal.canTeleport(player, { name: '§c> §6Anarchy §c<' })) return
 
           if (!this.inventoryStore.has(player.id)) {
             InventoryStore.load({
@@ -59,12 +62,14 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
           db.inv = this.inventoryName
 
-          if (!db.anarchy) {
-            randomTeleportPlayerToLearning(player)
-          } else {
-            player.teleport(db.anarchy)
-            delete db.anarchy
-          }
+          system.delay(() => {
+            if (!db.anarchy) {
+              this.learningRTP(player)
+            } else {
+              player.teleport(db.anarchy)
+              delete db.anarchy
+            }
+          })
         }
       )
 
