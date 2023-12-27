@@ -38,17 +38,17 @@ class MineshaftBuilder extends DefaultPlaceWithSafeArea {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Mineshaft = new MineshaftBuilder()
 
-INTERACTION_GUARD.subscribe((player, region, context) => {
-  if (region === Mineshaft.safeArea && context.type === 'break') {
-    const { block, dimension } = context.event
-    scheduleBlockPlace({
-      dimension: dimension.type,
-      location: block.location,
-      restoreTime: util.ms.from('sec', Math.randomInt(10, 30)),
-      typeId: block.type.id,
-      states: block.permutation.getAllStates(),
-    })
+// INTERACTION_GUARD.subscribe((player, region, context) => {
+//   if (region === Mineshaft.safeArea && context.type === 'break') {
+//     const { block, dimension } = context.event
+//     scheduleBlockPlace({
+//       dimension: dimension.type,
+//       location: block.location,
+//       restoreTime: util.ms.from('sec', Math.randomInt(10, 30)),
+//       typeId: block.type.id,
+//       states: block.permutation.getAllStates(),
+//     })
 
-    return true
-  }
-})
+//     return true
+//   }
+// })

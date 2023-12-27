@@ -30,8 +30,8 @@
       "throw": {
         "shoot": {
           "projectile": "sm:ice_bomb",
-          "launch_power": 0.4,
-          "angle_offset": 1
+          "launch_power": 1.5,
+          "angle_offset": 0.0
         },
         "swing": {},
         "decrement_stack": {},

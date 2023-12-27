@@ -61,7 +61,7 @@ const ICE_BOMB_TRANSOFORM = {
 
 system.runInterval(
   () => {
-    world.overworld.getEntities({ type: 'sm:ice_bomb' }).forEach(entity => {
+    world.overworld.getEntities({ type: 'minecraft:snowball' }).forEach(entity => {
       const block = entity.dimension.getBlock(entity.location)
       if (block) {
         if (block.typeId in ICE_BOMB_TRANSOFORM) {

@@ -29,11 +29,10 @@
           }
         },
         "hit_sound": "icebomb.hit",
-        "power": 1.5,
-        "gravity": 0.025,
-        "angle_offset": 0.0,
-        "inertia": 1,
-        "liquid_inertia": 1,
+        "power": 0.7,
+        "gravity": 0.3,
+        "angle_offset": -20.0,
+        "liquid_inertia": 0.1,
         "hit_water": true
       },
       "minecraft:physics": {},
