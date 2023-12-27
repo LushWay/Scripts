@@ -78,7 +78,8 @@ const editingSceneInvs = {}
  * @param {Player} player
  */
 function setInv(player) {
-  const { container } = player.getComponent('inventory')
+  const { container } = player
+  if (!container) return
   const arr = []
   for (let i = 0; i < 9; i++) {
     arr[i] = container.getItem(i)
@@ -93,7 +94,8 @@ function setInv(player) {
  * @param {Player} player
  */
 function backInv(player) {
-  const { container } = player.getComponent('inventory')
+  const { container } = player
+  if (!container) return
   const arr = editingSceneInvs[player.id]
   for (let i = 0; i < 9; i++) {
     container.setItem(i, undefined)

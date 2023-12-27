@@ -109,7 +109,9 @@ function onDamage(data, fatal = false) {
   // Its player.chatClose
   if (!damage.damagingEntity && data.hurtEntity && damage.cause === EntityDamageCause.entityAttack) return
 
-  const { currentValue: current, defaultValue: value } = data.hurtEntity.getComponent('minecraft:health')
+  const healthComponent = data.hurtEntity.getComponent('minecraft:health')
+  if (!healthComponent) return
+  const { currentValue: current, defaultValue: value } = healthComponent
 
   if (damage.damagingEntity instanceof Player) {
     damage.damagingEntity.scores.pvp = options.cooldown

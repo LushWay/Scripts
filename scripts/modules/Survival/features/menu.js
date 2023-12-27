@@ -27,5 +27,5 @@ Menu.open = player => {
     })
 }
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-  if (firstJoin) player.getComponent('inventory').container.addItem(Menu.item)
+  if (firstJoin) player.container?.addItem(Menu.item)
 })

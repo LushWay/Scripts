@@ -1,4 +1,4 @@
-import { Container, EntityDamageCause, EquipmentSlot, GameMode, Player, world } from '@minecraft/server'
+import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, world } from '@minecraft/server'
 import { OverTakes } from './OverTakes.js'
 
 Player.prototype.tell = Player.prototype.sendMessage
@@ -27,12 +27,12 @@ OverTakes(Player.prototype, {
     })
   },
   closeChat(message) {
+    const fail = () => (message && this.tell(message), false)
     const health = this.getComponent('health')
-    const { currentValue: current } = health
-    if (current <= 1) {
-      if (message) this.tell(message)
-      return false
-    }
+    if (!health) return fail()
+
+    const current = health.currentValue
+    if (current <= 1) fail()
 
     // We need to switch player to gamemode where we can apply damage to them
     const isCreative = this.isGamemode('creative')
@@ -50,7 +50,16 @@ OverTakes(Player.prototype, {
     return true
   },
   mainhand() {
-    return this.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Mainhand)
+    const equippable = this.getComponent('equippable')
+    if (!equippable) throw new TypeError(`Player '${this.name}' doesn't have equippable component (probably died).`)
+    return equippable.getEquipmentSlot(EquipmentSlot.Mainhand)
+  },
+})
+
+OverTakes(Entity.prototype, {
+  get container() {
+    if (!this || !this.getComponent) throw new TypeError('Bound prototype object does not exists')
+    return this.getComponent('inventory').container
   },
 })
 

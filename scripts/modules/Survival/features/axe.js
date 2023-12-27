@@ -30,7 +30,7 @@ INTERACTION_GUARD.subscribe((_, region, ctx) => {
 
 world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: broken, dimension }) => {
   if (AXE.BREAKS.includes(broken.type.id)) {
-    block.setType(broken.type.id.replace(/^stripped_/, '').replace(/_log$/, '_fence'))
+    block.setType(broken.type.id.replace(/stripped_/, '').replace(/_log$/, '_fence'))
 
     scheduleBlockPlace({
       dimension: dimension.type,

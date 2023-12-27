@@ -37,8 +37,8 @@ function load() {
 
   if (!entity) return util.error(new Error('Unable to find CustomEnchantments entity'))
 
-  const inventory = entity.getComponent('inventory')
-  const { container } = inventory
+  const { container } = entity
+  if (!container) return
 
   for (let i = 0; i < container.size; i++) {
     const item = container.getItem(i)

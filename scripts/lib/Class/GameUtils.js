@@ -93,7 +93,8 @@ export const GAME_UTILS = {
 
     form.buffer('Инвентарь')
 
-    const inventory = player.getComponent('inventory').container
+    const inventory = player.container
+    if (!inventory) throw new TypeError('No container')
     for (let i = 0; i < inventory.size; i++) {
       const item = inventory.getItem(i)
       if (!item || !BlockTypes.get(item.typeId)) continue

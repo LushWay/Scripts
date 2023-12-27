@@ -1,4 +1,4 @@
-import { EquipmentSlot, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { ModalForm } from 'smapi.js'
 import { WorldEditTool } from '../class/Tool.js'
@@ -29,7 +29,7 @@ const nylium = new WorldEditTool({
 
 /* Replaces the block with a random block from the lore of the item. */
 world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
-  if (player.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Mainhand).typeId !== nylium.itemId) return
+  if (player.mainhand().typeId !== nylium.itemId) return
 
   system.delay(() => {
     const slot = player.mainhand()

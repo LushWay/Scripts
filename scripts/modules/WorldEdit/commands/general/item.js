@@ -1,5 +1,3 @@
-import { EquipmentSlot } from '@minecraft/server'
-
 const root = new Command({
   name: 'item',
   description: 'Управляет предметом в руке',
@@ -36,7 +34,7 @@ root
   })
   .int('count')
   .executes((ctx, count) => {
-    const item = ctx.sender.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Mainhand)
+    const item = ctx.sender.mainhand()
     if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.amount
     item.amount = count

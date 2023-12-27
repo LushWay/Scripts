@@ -44,6 +44,7 @@ export class InventoryStore {
    */
   static load({ to, from, clearAll = true }) {
     const equipment = to.getComponent('equippable')
+    if (!equipment) return
     equipment.setEquipment(EquipmentSlot.Offhand, from.equipment.Offhand)
     equipment.setEquipment(EquipmentSlot.Head, from.equipment.Head)
     equipment.setEquipment(EquipmentSlot.Chest, from.equipment.Chest)
@@ -53,9 +54,11 @@ export class InventoryStore {
     to.resetLevel()
     to.addExperience(from.xp)
 
-    to.getComponent('health').setCurrentValue(from.health)
+    const health = to.getComponent('health')
+    if (health) health.setCurrentValue(from.health)
 
-    const { container } = to.getComponent('inventory')
+    const { container } = to
+    if (!container) return
     if (clearAll) container.clearAll()
     for (const [i, item] of Object.entries(from.slots)) {
       if (item) container.setItem(Number(i), item)
@@ -71,9 +74,17 @@ export class InventoryStore {
    */
   static get(from) {
     const equipment = from.getComponent('equippable')
-    const { container } = from.getComponent('inventory')
+    if (!equipment) throw new TypeError('Equippable component does not exists')
+
+    const { container } = from
+    if (!container) throw new TypeError('Container does not exists')
+
     const xp = from.getTotalXp()
-    const health = from.getComponent('health').currentValue
+
+    const healthComponent = from.getComponent('health')
+    if (!healthComponent) throw new TypeError('Health component does not exists')
+
+    const health = healthComponent.currentValue
 
     /** @type {Inventory['slots']} */
     const slots = {}
@@ -128,7 +139,8 @@ export class InventoryStore {
     const items = []
 
     for (const entity of this._.ENTITIES) {
-      const { container } = entity.getComponent('inventory')
+      const { container } = entity
+      if (!container) return
       for (const [, item] of container.entries()) {
         if (!item) break
         items.push(item)
@@ -257,7 +269,8 @@ export class InventoryStore {
 
     let itemIndex = 0
     for (const [i, entity] of entities.entries()) {
-      const { container } = entity.getComponent('inventory')
+      const { container } = entity
+      if (!container) throw new TypeError('No container')
       container.clearAll()
 
       for (let i = 0; i < container.size; i++) {
@@ -325,7 +338,7 @@ export class InventoryStore {
     if (key in this._.STORES && !rewrite)
       throw new DatabaseError('Failed to rewrite entity store with disabled rewriting.')
     this._.STORES[key] = InventoryStore.get(entity)
-    if (!keepInventory) entity.getComponent('inventory').container.clearAll()
+    if (!keepInventory) entity.container?.clearAll()
 
     this.requestSave()
   }

@@ -178,7 +178,7 @@ export class Store {
         return this.open(player, `${cost.failed(player)}§r\n \n`)
       }
       cost.buy(player)
-      player.getComponent('inventory').container.addItem(item)
+      player.container?.addItem(item)
       this.open(player, `§aУспешная покупка §f${itemDescription(item)} §aза ${cost.string()}§a!\n \n§r`)
     }
 

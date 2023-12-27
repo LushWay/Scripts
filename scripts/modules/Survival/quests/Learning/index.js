@@ -33,7 +33,7 @@ export const LEARNING = {
           // in spawn inventory that will be replaced with
           // anarchy
           system.delay(() => {
-            this.player.getComponent('inventory').container.addItem(LEARNING.START_AXE)
+            this.player.container?.addItem(LEARNING.START_AXE)
           })
         }
 

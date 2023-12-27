@@ -23,7 +23,9 @@ export class Airdrop {
    * @param {Airdrop} [airdrop]
    */
   static minecartIsEmpty(minecart, airdrop) {
-    const { container } = minecart.getComponent('inventory')
+    const inventory = minecart.getComponent('inventory')
+    if (!inventory || !inventory.container) return
+    const { container } = inventory
     if (container.size === container.emptySlotsCount) {
       minecart.remove()
       if (airdrop) {
@@ -95,7 +97,7 @@ export class Airdrop {
     this.chestMinecart.teleport(Vector.add(location, Airdrop.chestOffset))
     if (!this.chestMinecart.dimension.getBlock(this.chestMinecart.location)?.below()?.isAir) {
       this.chestMinecart.triggerEvent('chest_minecart:ground')
-      this.lootTable.fillContainer(this.chestMinecart.getComponent('inventory').container)
+      if (this.chestMinecart.container) this.lootTable.fillContainer(this.chestMinecart.container)
       this.chicken.remove()
       this.status = 'being looted'
     }
@@ -132,9 +134,9 @@ system.runInterval(
       } else if (airdrop.status === 'falling') {
         airdrop.teleport()
       } else if (airdrop.status === 'being looted' && airdrop.chestMinecart) {
-        const inventory = airdrop.chestMinecart.getComponent('inventory')
-        const { container } = inventory
-        if (!inventory || container.emptySlotsCount === container.size) airdrop.chestMinecart.remove()
+        const { container } = airdrop.chestMinecart
+        if (!container) continue
+        if (container.emptySlotsCount === container.size) airdrop.chestMinecart.remove()
       }
     }
 
@@ -144,7 +146,8 @@ system.runInterval(
       // any item inside and its how it should work
       e => !Airdrop.instances.find(i => i.chestMinecart?.id !== e.id)
     )) {
-      const { container } = chestMinecart.getComponent('inventory')
+      const { container } = chestMinecart
+      if (!container) continue
       if (container.emptySlotsCount === container.size) chestMinecart.remove()
     }
   },

@@ -83,7 +83,7 @@ const tests = {
   },
 
   base(ctx) {
-    ctx.sender.getComponent('inventory').container.addItem(BASE_ITEM_STACK)
+    ctx.sender.container?.addItem(BASE_ITEM_STACK)
   },
   0() {
     console.log('This is log §6color§r test §lbold')
@@ -119,7 +119,8 @@ const tests = {
         const { nameTag, location } = e
         const type = e.getDynamicProperty('tableType')
         let data = ''
-        const a = e.getComponent('inventory').container
+        const a = e.container
+        if (!a) return
         for (let i = 0; i < 2; i++) {
           if (a.getItem(i)) data += a.getItem(i)?.getLore().join('')
         }

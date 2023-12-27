@@ -107,6 +107,10 @@ declare module '@minecraft/server' {
     database: PlayerDatabase
   }
 
+  interface Entity {
+    readonly container?: Container
+  }
+
   interface Container {
     entries(): [number, ItemStack | undefined][]
   }

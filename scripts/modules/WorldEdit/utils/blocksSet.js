@@ -37,7 +37,7 @@ export const DEFAULT_BLOCK_SETS = {
       wall_block_type: 'granite',
     }),
     [MinecraftBlockTypes.HardenedClay, void 0, 1],
-    withState(MinecraftBlockTypes.Stone, { stone_type: 'granite' }, 2),
+    [MinecraftBlockTypes.Granite, void 0, 2],
   ],
 }
 export const SHARED_POSTFIX = '§7 (Общий)'

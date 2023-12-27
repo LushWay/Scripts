@@ -433,7 +433,8 @@ function editBlocksSet(o) {
   }
 
   if (ownsSet) {
-    const { container } = player.getComponent('inventory')
+    const { container } = player
+    if (!container) return
     /** @type {string[]} */
     const blocks = []
     for (let i = 0; i < container.size; i++) {

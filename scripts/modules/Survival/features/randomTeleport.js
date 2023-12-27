@@ -111,10 +111,13 @@ export function randomTeleport(
 function giveElytra(player, c = 5) {
   const slot = player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Chest)
 
+  if (!slot) return
+
   // Item in slot
   const item = slot.getItem()
   if (item) {
-    const { container } = player.getComponent('inventory')
+    const { container } = player
+    if (!container) return
     if (container.emptySlotsCount) {
       container.addItem(item)
     } else {
@@ -147,7 +150,9 @@ system.runInterval(
  * @param {Player} player
  */
 function clearElytra(player) {
-  const slot = player.getComponent('equippable').getEquipmentSlot(EquipmentSlot.Chest)
+  const equippable = player.getComponent('equippable')
+  if (!equippable) return
+  const slot = equippable.getEquipmentSlot(EquipmentSlot.Chest)
   const item = slot.getItem()
   if (item && RTP_ELYTRA.is(item)) slot.setItem(undefined)
   delete player.database.survival.rtpElytra

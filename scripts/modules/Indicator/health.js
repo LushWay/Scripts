@@ -94,6 +94,7 @@ new Command({ name: 'dmgstat', role: 'admin' }).executes(() => (stat = true))
  * @returns {string}
  */
 function getName(entity, hp = entity.getComponent('health')) {
+  if (!hp) return ''
   const maxHP = hp.defaultValue
 
   const s = 50
