@@ -1,5 +1,6 @@
 import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { isBuilding } from 'modules/Build/list.js'
 import { INTERACTION_GUARD } from 'modules/Survival/config.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { Region, util } from 'smapi.js'
@@ -28,8 +29,9 @@ INTERACTION_GUARD.subscribe((_, region, ctx) => {
   }
 })
 
-world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: broken, dimension }) => {
+world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: broken, dimension, player }) => {
   if (AXE.BREAKS.includes(broken.type.id)) {
+    if (isBuilding(player)) return
     block.setType(broken.type.id.replace(/stripped_/, '').replace(/_log$/, '_fence'))
 
     scheduleBlockPlace({
