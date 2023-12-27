@@ -50,10 +50,11 @@ const sidebar = new Sidebar(
     if (!settings(player).moneyLeafs) return false
     return `§7Монеты: §6${player.scores.money}§7 | Листья: §2${player.scores.leafs}`
   },
+  () => `Онлайн: ${world.getAllPlayers().length}/55`,
   ' ',
   Quest.sidebar,
   ' ',
-  '§7shp1nat56655.portmap.io'
+  '§7shp1nat-59955.portmap.io'
 )
 
 sidebar.setUpdateInterval(20)
