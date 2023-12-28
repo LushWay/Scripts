@@ -19,7 +19,7 @@ export const OPTIONS_NAME = Symbol('name')
  * @typedef {Record<string,
  *   { desc: string; value: T, name: string, onChange?: VoidFunction  }
  * > & {[OPTIONS_NAME]?: string}
- * } DefaultSettings
+ * } SettingsConfig
  */
 
 /**
@@ -34,7 +34,7 @@ export const PLAYER_SETTINGS_DB = new DynamicPropertyDB('playerOptions', {
   },
 }).proxy()
 
-/** @typedef {DefaultSettings<SettingValue> & Record<string, { requires?: boolean, }>} WorldSettings */
+/** @typedef {SettingsConfig<SettingValue> & Record<string, { requires?: boolean, }>} WorldSettings */
 export const WORLD_SETTINGS_DB = new DynamicPropertyDB('worldOptions', {
   /** @type {SETTINGS_DB} */
   type: {},
@@ -44,14 +44,14 @@ export const WORLD_SETTINGS_DB = new DynamicPropertyDB('worldOptions', {
 }).proxy()
 
 export class Settings {
-  /** @type {Record<string, DefaultSettings<boolean>>} */
+  /** @type {Record<string, SettingsConfig<boolean | string>>} */
   static playerMap = {}
   /**
    * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
    * stored in a database
-   * @template {DefaultSettings<boolean>} Config
    * @param {string} name - The name that shows to players
    * @param {string} groupName - The prefix for the database.
+   * @template {SettingsConfig<boolean | string>} Config
    * @param {Config} config - This is an object that contains the default values for each option.
    * @returns {(player: Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
    */
@@ -101,7 +101,7 @@ export class Settings {
  * values are stored in a database
  * @param {SETTINGS_DB} database - The prefix for the database.
  * @param {string} groupName - The group name of the settings
- * @param {DefaultSettings} config - This is the default configuration object. It's an object with the keys being the
+ * @param {SettingsConfig} config - This is the default configuration object. It's an object with the keys being the
  * option names and the values being the default values.
  * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters

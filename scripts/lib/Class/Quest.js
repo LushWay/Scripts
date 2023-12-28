@@ -25,7 +25,7 @@ export class Quest {
   /** @type {import("./Sidebar.js").SidebarLinePreinit} */
   static sidebar = {
     preinit(sidebar) {
-      const onquestupdate = sidebar.update.bind(sidebar)
+      const onquestupdate = sidebar.show.bind(sidebar)
 
       return function (player) {
         const status = Quest.active(player)

@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { LockAction } from 'smapi.js'
+import { LockAction, Sidebar } from 'smapi.js'
 
 export class Minigame {
   /** @type {Record<string, Minigame>} */
@@ -28,10 +28,12 @@ export class Minigame {
    * @param {string} name - Name of the minigame. Needs to stay unique.
    * @param {object} o - Options.
    * @param {Vector3} o.spawn - Minigame spawn
+   * @param {Sidebar} o.sidebar
    */
-  constructor(name, { spawn }) {
+  constructor(name, { spawn, sidebar }) {
     this.name = name
     this.spawn = spawn
+    this.sidebar = sidebar
 
     Minigame.instances[name] = this
   }

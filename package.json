@@ -1,156 +1,1 @@
-{
-  "name": "sm-api",
-  "version": "0.16.30",
-  "license": "MIT",
-  "scripts": {
-    "lint": "eslint ./scripts/ --fix",
-    "patch-modules": "node tools/patch-modules.js"
-  },
-  "dependencies": {
-    "@minecraft/common": "1.1.0",
-    "@minecraft/server": "1.8.0-beta.1.20.50-stable",
-    "@minecraft/server-admin": "1.0.0-beta.1.20.50-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.20.50-stable",
-    "@minecraft/server-net": "1.0.0-beta.1.20.50-stable",
-    "@minecraft/server-ui": "1.2.0-beta.1.20.50-stable",
-    "@minecraft/vanilla-data": "1.20.50"
-  },
-  "resolutions": {
-    "@minecraft/common": "1.1.0",
-    "@minecraft/server": "1.8.0-beta.1.20.50-stable",
-    "@minecraft/server-admin": "1.0.0-beta.1.20.50-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.20.50-stable",
-    "@minecraft/server-net": "1.0.0-beta.1.20.50-stable",
-    "@minecraft/server-ui": "1.2.0-beta.1.20.50-stable",
-    "@minecraft/vanilla-data": "1.20.50"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-scriptapi": "file:tools/eslint-plugin",
-    "leafy-utils": "^5.3.2",
-    "typescript": "^5.3.3"
-  },
-  "private": true,
-  "type": "module",
-  "prettier": {
-    "singleQuote": true,
-    "arrowParens": "avoid",
-    "semi": false,
-    "printWidth": 120,
-    "endOfLine": "crlf",
-    "quoteProps": "consistent"
-  },
-  "eslintConfig": {
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:import/recommended",
-      "plugin:import/typescript",
-      "prettier"
-    ],
-    "plugins": [
-      "@typescript-eslint",
-      "import",
-      "scriptapi"
-    ],
-    "settings": {
-      "import/parsers": {
-        "@typescript-eslint/parser": [
-          ".js"
-        ]
-      },
-      "import/resolver": {
-        "typescript": {
-          "alwaysTryTypes": true
-        }
-      },
-      "scriptapi/no-cycle": {
-        "maxDepth": 20
-      }
-    },
-    "parser": "@typescript-eslint/parser",
-    "rules": {
-      "no-empty": "off",
-      "no-console": "off",
-      "no-undef": "off",
-      "prefer-const": "warn",
-      "scriptapi/no-cycle": "error",
-      "scriptapi/ensure-modules": "error",
-      "scriptapi/no-unsupported-features": "error",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/ban-types": "warn",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/naming-convention": [
-        "warn",
-        {
-          "selector": "default",
-          "format": [
-            "camelCase"
-          ],
-          "leadingUnderscore": "allow",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": [
-            "objectLiteralMethod",
-            "objectLiteralProperty"
-          ],
-          "format": null,
-          "leadingUnderscore": "allow",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": "function",
-          "format": [
-            "camelCase",
-            "PascalCase"
-          ],
-          "leadingUnderscore": "allow",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": "variable",
-          "format": [
-            "camelCase",
-            "PascalCase",
-            "UPPER_CASE"
-          ],
-          "leadingUnderscore": "allow",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": "variable",
-          "modifiers": [
-            "exported",
-            "const"
-          ],
-          "format": [
-            "UPPER_CASE"
-          ],
-          "leadingUnderscore": "allow",
-          "trailingUnderscore": "allow"
-        },
-        {
-          "selector": "typeLike",
-          "format": [
-            "PascalCase"
-          ]
-        }
-      ]
-    },
-    "ignorePatterns": [
-      "tools/*"
-    ],
-    "root": true
-  },
-  "workspaces": {
-    "packages": [
-      "tools/eslint-plugin"
-    ]
-  }
-}
+{  "name": "sm-api",  "version": "0.16.31",  "license": "MIT",  "scripts": {    "lint": "eslint ./scripts/ --fix",    "patch-modules": "node tools/patch-modules.js"  },  "dependencies": {    "@minecraft/common": "1.1.0",    "@minecraft/server": "1.8.0-beta.1.20.50-stable",    "@minecraft/server-admin": "1.0.0-beta.1.20.50-stable",    "@minecraft/server-gametest": "1.0.0-beta.1.20.50-stable",    "@minecraft/server-net": "1.0.0-beta.1.20.50-stable",    "@minecraft/server-ui": "1.2.0-beta.1.20.50-stable",    "@minecraft/vanilla-data": "1.20.50"  },  "resolutions": {    "@minecraft/common": "1.1.0",    "@minecraft/server": "1.8.0-beta.1.20.50-stable",    "@minecraft/server-admin": "1.0.0-beta.1.20.50-stable",    "@minecraft/server-gametest": "1.0.0-beta.1.20.50-stable",    "@minecraft/server-net": "1.0.0-beta.1.20.50-stable",    "@minecraft/server-ui": "1.2.0-beta.1.20.50-stable",    "@minecraft/vanilla-data": "1.20.50"  },  "devDependencies": {    "@typescript-eslint/eslint-plugin": "^6.14.0",    "@typescript-eslint/parser": "^6.14.0",    "eslint": "^8.56.0",    "eslint-config-prettier": "^9.1.0",    "eslint-import-resolver-typescript": "^3.6.1",    "eslint-plugin-import": "^2.29.1",    "eslint-plugin-scriptapi": "file:tools/eslint-plugin",    "leafy-utils": "^5.3.2",    "typescript": "^5.3.3"  },  "private": true,  "type": "module",  "prettier": {    "singleQuote": true,    "arrowParens": "avoid",    "semi": false,    "printWidth": 120,    "endOfLine": "crlf",    "quoteProps": "consistent"  },  "eslintConfig": {    "extends": [      "eslint:recommended",      "plugin:@typescript-eslint/recommended",      "plugin:import/recommended",      "plugin:import/typescript",      "prettier"    ],    "plugins": [      "@typescript-eslint",      "import",      "scriptapi"    ],    "settings": {      "import/parsers": {        "@typescript-eslint/parser": [          ".js"        ]      },      "import/resolver": {        "typescript": {          "alwaysTryTypes": true        }      },      "scriptapi/no-cycle": {        "maxDepth": 20      }    },    "parser": "@typescript-eslint/parser",    "rules": {      "no-empty": "off",      "no-console": "off",      "no-undef": "off",      "prefer-const": "warn",      "scriptapi/no-cycle": "error",      "scriptapi/ensure-modules": "error",      "scriptapi/no-unsupported-features": "error",      "@typescript-eslint/no-explicit-any": "off",      "@typescript-eslint/ban-types": "warn",      "@typescript-eslint/no-unused-vars": "off",      "@typescript-eslint/naming-convention": [        "warn",        {          "selector": "default",          "format": [            "camelCase"          ],          "leadingUnderscore": "allow",          "trailingUnderscore": "allow"        },        {          "selector": [            "objectLiteralMethod",            "objectLiteralProperty"          ],          "format": null,          "leadingUnderscore": "allow",          "trailingUnderscore": "allow"        },        {          "selector": "function",          "format": [            "camelCase",            "PascalCase"          ],          "leadingUnderscore": "allow",          "trailingUnderscore": "allow"        },        {          "selector": "variable",          "format": [            "camelCase",            "PascalCase",            "UPPER_CASE"          ],          "leadingUnderscore": "allow",          "trailingUnderscore": "allow"        },        {          "selector": "variable",          "modifiers": [            "exported",            "const"          ],          "format": [            "UPPER_CASE"          ],          "leadingUnderscore": "allow",          "trailingUnderscore": "allow"        },        {          "selector": "typeLike",          "format": [            "PascalCase"          ]        }      ]    },    "ignorePatterns": [      "tools/*"    ],    "root": true  },  "workspaces": {    "packages": [      "tools/eslint-plugin"    ]  }}

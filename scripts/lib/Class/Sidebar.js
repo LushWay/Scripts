@@ -1,15 +1,24 @@
-import { Player, system, world } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 
 /**
  * @typedef {string | false} SidebarLine
  */
 
 /**
- * @typedef {(player: Player) => SidebarLine} SidebarLineGenerator
+ * @typedef {(player: Player) => SidebarLine} DynamicLine
  */
 
 /**
- * @typedef {{ preinit(sidebar: Sidebar): SidebarLineGenerator }} SidebarLinePreinit
+ * @typedef {{ preinit(sidebar: Sidebar): DynamicLine }} SidebarLinePreinit
+ */
+
+/**
+ * @template [V=DynamicLine]
+ * @typedef {Record<string, V | string>} SidebarVariables
+ */
+
+/**
+ * @typedef {SidebarVariables<SidebarLinePreinit | DynamicLine>} SidebarInputedVariables
  */
 
 export class Sidebar {
@@ -21,70 +30,44 @@ export class Sidebar {
   /**
    * @param {object} o
    * @param {string} o.name
-   * @param  {...(SidebarLineGenerator  | SidebarLinePreinit | string)} content
+   * @param {(p: Player) => string} o.getFormat
+   * @param  {SidebarInputedVariables} content
    */
-  constructor({ name }, ...content) {
+  constructor({ name, getFormat }, content) {
     this.name = name
-    /** @type {(SidebarLineGenerator | string | boolean)[]} */
-    this.content = content.map(e => (typeof e === 'object' ? ('preinit' in e ? e.preinit(this) : e) : e))
+    this.getFormat = getFormat
+    this.content = this.preinit(content)
 
     Sidebar.instances.push(this)
   }
 
   /**
-   * @type {Set<string>}
+   * @param {SidebarInputedVariables} content
+   * @returns {SidebarVariables}
    */
-  players = new Set()
-
-  /**
-   *
-   * @param {Player} player
-   */
-  subscribe(player) {
-    Sidebar.instances.forEach(e => e.unsubscribe(player))
-    this.players.add(player.id)
-    this.update(player)
-  }
-
-  /**
-   *
-   * @param {Player | string} player
-   */
-  unsubscribe(player) {
-    this.players.delete(typeof player === 'string' ? player : player.id)
+  preinit(content) {
+    return Object.entries(content).reduce((prev, [key, e]) => {
+      if (typeof e === 'object' && 'preinit' in e) {
+        content[key] = e.preinit(this)
+      } else content[key] = e
+      return prev
+    }, {})
   }
 
   /**
    * @param {Player} player
    */
-  update(player) {
-    let content = ''
-    for (let line of this.content) {
-      if (typeof line === 'function') line = line(player)
-      if (line === false) continue
-      content += line
-      content += '§r\n'
+  show(player) {
+    let content = this.getFormat(player)
+    for (const [key, line] of Object.entries(this.content)) {
+      /** @type {string | boolean} */
+      let value = ''
+      if (typeof line === 'function') value = line(player)
+      else value = line
+      if (value === false) continue
+
+      content = content.replaceAll('$' + key, value)
     }
     player.onScreenDisplay.setActionBar(content)
-  }
-
-  updateAll() {
-    const players = world.getAllPlayers()
-    for (const playerId of this.players) {
-      const player = players.find(e => e.id === playerId)
-      if (!player) {
-        this.players.delete(playerId)
-        continue
-      }
-
-      this.update(player)
-    }
-  }
-
-  /**
-   * @param {number} ticks
-   */
-  setUpdateInterval(ticks) {
-    system.runInterval(() => this.updateAll(), `Sidebar.${this.name}::update`, ticks)
   }
 }
