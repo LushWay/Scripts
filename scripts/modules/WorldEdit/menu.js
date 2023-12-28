@@ -99,7 +99,7 @@ function manageBlockSet({
 
       if (!name || name === setName) return onFail()
       if (deletePrevious && setName) setBlockSet(player.id, setName, undefined)
-      setBlockSet(player.id, name, set)
+      setBlockSet(player.id, name, JSON.parse(JSON.stringify(set)))
       editBlocksSet({
         player,
         setName: name,
@@ -488,8 +488,7 @@ export function editBlockStates(player, states, back, edited = false) {
         () => {
           const editStateForm = new ActionForm(stateName, `Значение сейчас: ${util.stringify(stateValue)}`)
 
-          editStateForm.addButton(ActionForm.backText, () => form.show(player))
-
+          editStateForm.addButtonBack(() => form.show(player))
           editStateForm.addButton('§cУдалить значение', () => {
             delete states[stateName]
             resolve(editBlockStates(player, states, back))
