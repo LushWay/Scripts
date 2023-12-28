@@ -1,5 +1,5 @@
 import { APIRequest } from 'lib/Class/Net.js'
-import { ActionForm, util } from 'smapi.js'
+import { ActionForm, ModalForm, util } from 'smapi.js'
 
 new Command({
   name: 'shell',
@@ -19,6 +19,16 @@ new Command({
         })
       }
       form.show(ctx.sender)
+    })
+    .addButton('backup', () => {
+      new ModalForm('Backup')
+        .addTextField('Backup commit name\nЛучше всего то, что значимого было изменено', 'ничего не произойдет')
+        .show(ctx.sender, (_, backupname) => {
+          ctx.reply('§6> §rПринято.')
+          APIRequest('backup', { name: backupname })
+            .then(s => ctx.sender.tell(s.statusMessage))
+            .catch(util.error)
+        })
     })
     .show(ctx.sender)
 })

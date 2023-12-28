@@ -1,6 +1,6 @@
 {
   "name": "sm-api",
-  "version": "0.16.32",
+  "version": "0.16.33",
   "license": "MIT",
   "scripts": {
     "lint": "eslint ./scripts/ --fix",
@@ -32,7 +32,7 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-scriptapi": "file:tools/eslint-plugin",
-    "leafy-utils": "^6.0.2",
+    "leafy-utils": "^6.0.8",
     "typescript": "^5.3.3"
   },
   "private": true,
