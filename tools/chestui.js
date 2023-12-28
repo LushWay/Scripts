@@ -1,4 +1,3 @@
-// @ts-check
 import { defineGitDependency } from 'leafy-utils'
 
 export default defineGitDependency({

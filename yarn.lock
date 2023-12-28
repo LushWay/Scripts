@@ -1511,13 +1511,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leafy-utils@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "leafy-utils@npm:5.3.2"
+"leafy-utils@npm:^6.0.2":
+  version: 6.0.5
+  resolution: "leafy-utils@npm:6.0.5"
   bin:
-    commit: bin/commit.js
-    publish: bin/publish.js
-  checksum: 0649cd4c30d228526c42b98804e1331b8af9a55d1d006200cd5626ff3bca5db2299a8febb5c3066f2acd3c915f4156517d3846bcc6801f73d361264ff1e8994c
+    commit: ./bin/commit.js
+    publish: ./bin/publish.js
+  checksum: 1f8f7122d8b9be5ed1c9b64ccececc023dfce97f4f5a39af20f8d2435808619ec06c7015d07a506479f22c503406c57a9eedbf7e5bded9abdbe1edd719dce14a
   languageName: node
   linkType: hard
 
@@ -1979,7 +1979,7 @@ __metadata:
     eslint-import-resolver-typescript: "npm:^3.6.1"
     eslint-plugin-import: "npm:^2.29.1"
     eslint-plugin-scriptapi: "file:tools/eslint-plugin"
-    leafy-utils: "npm:^5.3.2"
+    leafy-utils: "npm:^6.0.2"
     typescript: "npm:^5.3.3"
   languageName: unknown
   linkType: soft
