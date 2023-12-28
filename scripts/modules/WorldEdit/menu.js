@@ -477,7 +477,7 @@ export function editBlockStates(player, states, back, edited = false) {
       )
     )
 
-    for (const [stateName, stateValue] of Object.entries(states)) {
+    for (let [stateName, stateValue] of Object.entries(states)) {
       const stateDef = allStates.find(e => e.id === stateName)
       if (!stateDef) continue
 
@@ -486,21 +486,34 @@ export function editBlockStates(player, states, back, edited = false) {
           stateDef.validValues[0] === stateValue ? '§8По умолчанию' : ''
         }`,
         () => {
-          const editStateForm = new ActionForm(stateName, `Значение сейчас: ${util.stringify(stateValue)}`)
+          update()
 
-          editStateForm.addButtonBack(() => form.show(player))
-          editStateForm.addButton('§cУдалить значение', () => {
-            delete states[stateName]
-            resolve(editBlockStates(player, states, back))
-          })
+          function update() {
+            const editStateForm = new ActionForm(stateName, `Значение сейчас: ${util.stringify(stateValue)}`)
 
-          for (const value of stateDef.validValues) {
-            editStateForm.addButton(`${value === stateValue ? '> ' : ''}${util.stringify(value)}`, () =>
-              resolve(editBlockStates(player, { ...states, [stateName]: value }, back, edited))
-            )
+            editStateForm.addButtonBack(() => {
+              resolve(editBlockStates(player, states, back))
+            })
+            editStateForm.addButton('§cУдалить значение', () => {
+              delete states[stateName]
+              resolve(editBlockStates(player, states, back))
+            })
+
+            try {
+              if (!stateDef) return
+              for (const validValue of Array.from(stateDef.validValues)) {
+                editStateForm.addButton(`${validValue === stateValue ? '> ' : ''}${util.stringify(validValue)}`, () => {
+                  states[stateName] = validValue
+                  stateValue = validValue
+                  update()
+                })
+              }
+            } catch (e) {
+              util.error(e)
+            }
+
+            editStateForm.show(player)
           }
-
-          editStateForm.show(player)
         }
       )
     }

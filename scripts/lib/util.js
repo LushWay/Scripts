@@ -28,7 +28,9 @@ export const util = {
       try {
         // if (onWorldLoad.loaded()) world.say(text);
         console.error(text)
-      } catch (e) {}
+      } catch (e) {
+        console.error(text, e)
+      }
     },
     {
       stack: {

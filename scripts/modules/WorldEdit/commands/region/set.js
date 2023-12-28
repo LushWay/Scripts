@@ -2,7 +2,7 @@ import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
-import { editBlockStates, toPermutation } from 'modules/WorldEdit/menu.js'
+import { editBlockStates } from 'modules/WorldEdit/menu.js'
 import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'smapi.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
@@ -127,7 +127,7 @@ function use(player, type, desc = '', { onSelect = setSelection, notSelected = {
   let result
 
   /**
-   * @type {BlockPermutation}
+   * @type {Pick<BlockPermutation, 'getAllStates' | 'type'>}
    */
   let dispaySource
 
@@ -137,7 +137,26 @@ function use(player, type, desc = '', { onSelect = setSelection, notSelected = {
   let options = {}
 
   if ('permutations' in block) {
-    dispaySource = toPermutation(block.permutations[0])
+    const type =
+      block.permutations[0] instanceof BlockPermutation
+        ? block.permutations[0].type
+        : BlockTypes.get(block.permutations[0].typeId)
+
+    if (!type) {
+      player.tell('AAAAAAAAAAA ВСЕ СЛОМАЛОСЬ')
+      throw new Error('AAAAAAAAAAAAAAAAAA')
+    }
+
+    dispaySource =
+      block.permutations[0] instanceof BlockPermutation
+        ? block.permutations[0]
+        : {
+            getAllStates() {
+              if (block.permutations[0] instanceof BlockPermutation) return block.permutations[0].getAllStates()
+              return block.permutations[0].states
+            },
+            type: type,
+          }
     result = block.permutations
   } else {
     const set = getBlockSet(block.ref)

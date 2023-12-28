@@ -46,12 +46,14 @@ export class Sidebar {
    * @returns {SidebarVariables}
    */
   preinit(content) {
+    /** @type {SidebarVariables} */
+    const base = {}
     return Object.entries(content).reduce((prev, [key, e]) => {
-      if (typeof e === 'object' && 'preinit' in e) {
-        content[key] = e.preinit(this)
-      } else content[key] = e
+      if (typeof e === 'object') {
+        prev[key] = e.preinit(this)
+      } else prev[key] = e
       return prev
-    }, {})
+    }, base)
   }
 
   /**
@@ -60,11 +62,8 @@ export class Sidebar {
   show(player) {
     let content = this.getFormat(player)
     for (const [key, line] of Object.entries(this.content)) {
-      /** @type {string | boolean} */
-      let value = ''
-      if (typeof line === 'function') value = line(player)
-      else value = line
-      if (value === false) continue
+      let value = typeof line === 'function' ? line(player) : line
+      if (value === false) value = ''
 
       content = content.replaceAll('$' + key, value)
     }

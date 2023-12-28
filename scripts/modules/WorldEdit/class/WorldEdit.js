@@ -117,7 +117,7 @@ export class WorldEdit {
 
     if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
 
-    spawnParticlesInArea(this.selectionCuboid.pos1, this.selectionCuboid.pos2, this.selectionCuboid)
+    spawnParticlesInArea(this.visualSelectionCuboid.pos1, this.visualSelectionCuboid.pos2, this.visualSelectionCuboid)
   }
 
   /**

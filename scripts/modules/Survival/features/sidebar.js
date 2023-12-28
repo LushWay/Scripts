@@ -17,11 +17,10 @@ $регион - ', мирная зона' / ', ваша база' / <имя бе
 $монеты - число монет
 $листья - число листьев
 $онлайн - всего игроков на сервере
-$онлайнРежим - всего игроков на режиме
 $квест - информация о квесте`,
     value: `$режим$регион
 §7Монеты: §6$монеты§7 | Листья: §2$листья
-§7Онлайн: §f$онлайн§7 ($онлайнРежим)
+§7Онлайн: §f$онлайн/55§7
 
 $квест`,
   },
@@ -37,10 +36,19 @@ const inventoryDisplay = {
 }
 
 const sidebar = new Sidebar(
-  { name: 'Server', getFormat: player => sidebarSettings(player).format },
+  {
+    name: 'Server',
+    getFormat: player =>
+      `$режимСтройки$режим$регион
+§7Монеты: §6$монеты§7 | Листья: §2$листья
+§7Онлайн: §f$онлайн/55§7
+  
+$квест
+$айпи`,
+  },
   {
     режимСтройки: player => {
-      if (isBuilding(player)) return '§fРежим стройки'
+      if (isBuilding(player)) return '§fРежим стройки\n'
       else return false
     },
     режим: player => inventoryDisplay[player.database.survival.inv],
@@ -58,11 +66,7 @@ const sidebar = new Sidebar(
     },
     монеты: player => player.scores.money + '',
     листья: player => player.scores.leafs + '',
-    онлайн: () => {
-      const players = world.getAllPlayers()
-
-      return `§7Онлайн: §f${players.length}/55`
-    },
+    онлайн: () => world.getAllPlayers().length.toString(),
     квест: Quest.sidebar,
     айпи: '§7shp1nat-59955.portmap.io',
   }

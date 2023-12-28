@@ -37,7 +37,7 @@ const SIZES = {
 
 export class ChestForm {
   /**
-   * @param {BlockPermutation} permutation
+   * @param {Pick<BlockPermutation, 'getAllStates'|'type'>} permutation
    * @returns {Omit<ChestButtonOptions, 'slot'>}
    */
   static permutationToButton(permutation) {

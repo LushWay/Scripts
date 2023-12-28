@@ -109,7 +109,7 @@ export class Settings {
 export function generateSettingsProxy(database, groupName, config, player = null) {
   const OptionsProxy = {}
   for (const prop in config) {
-    const key = player ? player.id + ':' + prop : prop
+    const key = player ? `${player.id}:${prop}` : prop
     Object.defineProperty(OptionsProxy, prop, {
       configurable: false,
       enumerable: true,
