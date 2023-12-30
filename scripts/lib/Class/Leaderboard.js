@@ -1,10 +1,11 @@
-import { Entity, EntityLifetimeState, Vector, system, world } from '@minecraft/server'
+import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 /**
  * @typedef {{
  *   style: keyof typeof STYLES;
  *   objective: string;
+ *   displayName: string
  *   location: Vector3;
  *   dimension: Dimensions
  * }} LB
@@ -14,61 +15,58 @@ const LB_DB = new DynamicPropertyDB('leaderboard', {
   /** @type {Record<string, LB>} */
   type: {},
 }).proxy()
+
 const LEADERBOARD_TAG = 'LEADERBOARD'
 const LEADERBOARD_ID = 'f:t'
 const STYLES = {
   gray: {
+    objName: '7',
     fill1: '7',
     fill2: 'f',
     pos: '7',
     nick: 'f',
     score: '7',
-    name: '7',
   },
-  orange: {
+  white: {
+    objName: 'ф',
     fill1: 'ф',
     fill2: 'ф',
     pos: 'ф',
     nick: 'ф',
     score: 'ф',
-    name: 'ф',
   },
   green: {
-    fill1: '7',
-    fill2: 'f',
-    pos: '7',
+    objName: 'a',
+    fill1: '2',
+    fill2: '3',
+    pos: 'a',
     nick: 'f',
-    score: '7',
-    name: '7',
+    score: 'a',
   },
 }
 
 export class Leaderboard {
+  static styles = STYLES
   /**
    * @type {Record<string, Leaderboard>}
    */
   static all = {}
   /**
    *
-   * @param {string} objective
-   * @param {Vector3} location
-   * @param {Dimensions} dimension
-   * @param {keyof typeof STYLES} style
+   * @param {LB} data
    */
-  static createLeaderboard(objective, location, dimension = 'overworld', style = 'green') {
-    const data = {
+  static createLeaderboard({ objective, location, dimension = 'overworld', style = 'green', displayName = objective }) {
+    const entity = world.getDimension(dimension).spawnEntity(LEADERBOARD_ID, Vector.floor(location))
+    entity.nameTag = 'Updating...'
+    entity.addTag(LEADERBOARD_TAG)
+
+    return new Leaderboard(entity, {
       style,
       objective,
       location,
       dimension,
-    }
-    const entity = world.getDimension(dimension).spawnEntity(LEADERBOARD_ID, Vector.floor(location))
-
-    LB_DB[entity.id] = data
-    entity.nameTag = 'Updating...'
-    entity.addTag(LEADERBOARD_TAG)
-
-    return new Leaderboard(entity, data)
+      displayName,
+    })
   }
   /**
    * Creates manager of Leaderboard
@@ -78,39 +76,54 @@ export class Leaderboard {
   constructor(entity, data) {
     if (entity.id in Leaderboard.all) return Leaderboard.all[entity.id]
 
-    /**
-     * @type {Entity}
-     */
+    /** @type {Entity} */
     this.entity = entity
-    /**
-     * @type {LB}
-     */
+    /** @type {LB} */
     this.data = data
+    this.update()
     Leaderboard.all[entity.id] = this
   }
   remove() {
     delete LB_DB[this.entity.id]
+    delete Leaderboard.all[this.entity.id]
     this.entity.remove()
   }
+  update() {
+    LB_DB[this.entity.id] = this.data
+  }
+
+  /** @type {ScoreboardObjective | undefined} */
+  #scoreboard
+  set scoreboard(v) {
+    this.#scoreboard = v
+  }
+  get scoreboard() {
+    return (
+      this.#scoreboard ??
+      (this.#scoreboard =
+        world.scoreboard.getObjective(this.data.objective) ??
+        world.scoreboard.addObjective(this.data.objective, this.data.displayName))
+    )
+  }
   updateLeaderboard() {
-    const scoreboard =
-      world.scoreboard.getObjective(this.data.objective) ??
-      world.scoreboard.addObjective(this.data.objective, this.data.objective)
+    const scoreboard = this.scoreboard
     const dname = scoreboard.displayName
     const name = dname.charAt(0).toUpperCase() + dname.slice(1)
-    const style = STYLES[this.data.style]
-    const filler = `§${style.fill1}-§${style.fill2}`.repeat(20)
+    const style = STYLES[this.data.style] ?? STYLES.gray
+    const filler = `§${style.fill1}-§${style.fill2}-`.repeat(10)
 
     let leaderboard = ``
     for (const [i, scoreInfo] of scoreboard.getScores().entries()) {
       const { pos: t, nick: n, score: s } = style
 
+      const name = Player.name(scoreInfo.participant.displayName) ?? scoreInfo.participant.displayName
+
       leaderboard += `§${t}#${i + 1}§r `
-      leaderboard += `§${n}${scoreInfo.participant.displayName}§r `
+      leaderboard += `§${n}${name}§r `
       leaderboard += `§${s}${toMetricNumbers(scoreInfo.score)}§r\n`
     }
 
-    this.entity.nameTag = `§l§${style.name}${name}\n§l${filler}§r\n${leaderboard}`
+    this.entity.nameTag = `§l§${style.objName}${name}\n§l${filler}§r\n${leaderboard}`
   }
 }
 

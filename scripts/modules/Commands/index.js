@@ -13,6 +13,8 @@ importModules({
     'settings',
     'shell',
     'sit',
+    'leaderboard',
+    'scores',
     'tp',
   ].map(e => `./${e}.js`),
   fn: m => import(m),
