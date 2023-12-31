@@ -20,7 +20,7 @@ if (typeof list === 'string') {
 function saveList() {
   world.setDynamicProperty(propname, JSON.stringify([...onlineBuildersList]))
 }
-
+//SS
 OverTakes(onlineBuildersList, {
   add(...args) {
     super.add(...args)
