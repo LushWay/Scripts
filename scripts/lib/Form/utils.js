@@ -1,4 +1,4 @@
-import { Player, system } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import {
   ActionFormData,
   ActionFormResponse,
@@ -70,13 +70,17 @@ const { UserBusy, UserClosed } = FormCancelationReason
  * @returns  The response from the form.
  */
 export async function showForm(form, player) {
-  const hold = 100
+  const hold = 5
 
   for (let i = 0; i <= hold; i++) {
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
     const response = await form.show(player)
     if (response.canceled) {
-      await system.sleep(5)
+      await nextTick
+      await nextTick
+      await nextTick
+      await nextTick
+
       if (response.cancelationReason === UserClosed) return false
 
       if (response.cancelationReason === UserBusy) {
