@@ -20,7 +20,7 @@ OverTakes(JSON, {
 
 OverTakes(Math, {
   randomInt(min, max) {
-    return ~~(min + Math.random() * (max - min))
+    return Math.round(min + Math.random() * (max + 1 - min))
   },
   randomFloat(min, max) {
     return min + Math.random() * (max - min)
@@ -34,7 +34,7 @@ OverTakes(Array, {
 })
 
 Array.prototype.randomElement = function () {
-  return this[~~(Math.random() * (this.length - 1))]
+  return this[Math.round(Math.random() * this.length)]
 }
 
 /**
