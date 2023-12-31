@@ -1,4 +1,5 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
 import { GAME_UTILS, util } from 'smapi.js'
@@ -11,7 +12,7 @@ const INDICATOR_TAG = 'HEALTH_INDICATOR'
  * Entities that have nameTag "always_show": true and dont have boss_bar
  * @type {string[]}
  */
-const ALWAYS_SHOWS = []
+const ALWAYS_SHOWS = [MinecraftEntityTypes.Player]
 
 /**
  * List of families to indicate health
@@ -97,7 +98,7 @@ function getBar(entity, hp = entity.getComponent('health')) {
   if (!hp || !(entity.id in HURT_ENTITIES)) return ''
   const maxHP = hp.defaultValue
 
-  const s = 10
+  const s = 50
   const scale = maxHP <= s ? 1 : maxHP / s
 
   const full = ~~(maxHP / scale)
