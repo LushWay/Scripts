@@ -41,6 +41,11 @@ export class Zone {
         for (const p of players) {
           const rmax = { x: center.x + rad, z: center.x + rad }
           const rmin = { x: center.z - rad, z: center.z - rad }
+          if (!p) {
+            if (!reloadSent) world.overworld.runCommand('function reload')
+            reloadSent = true
+            return
+          }
           const { x, z } = Vector.floor(p.location)
 
           const xtrue = inRange(x, rmin.x, rmax.x)
@@ -57,3 +62,5 @@ export class Zone {
     )
   }
 }
+
+let reloadSent = false

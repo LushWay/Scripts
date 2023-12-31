@@ -1,9 +1,9 @@
-import { Entity, system, Vector, world } from '@minecraft/server'
+import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
-import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag.js'
-import { GAME_UTILS } from 'smapi.js'
+import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
+import { GAME_UTILS, util } from 'smapi.js'
 
-/** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
+/** @type {Record<string, {indicator?: string, damage: number, expires: number}>} */
 const HURT_ENTITIES = {}
 const INDICATOR_TAG = 'HEALTH_INDICATOR'
 
@@ -16,75 +16,77 @@ const ALWAYS_SHOWS = []
 /**
  * List of families to indicate health
  */
-const ALLOWED_FAMILIES = ['monster', 'player']
+const ALLOWED_FAMILIES = ['monster']
 
-// Kill previosly used entities
-getIndicators().forEach(e => e.remove())
-
+// Show indicator on hurt
 world.afterEvents.entityHurt.subscribe(data => {
+  // Validate entity
   const id = GAME_UTILS.safeGet(data.hurtEntity, 'id')
   if (!id || SYSTEM_ENTITIES.includes(id)) return
-  if (!data.hurtEntity.isValid() || !data.hurtEntity.matches({ families: ALLOWED_FAMILIES })) return
+  if (
+    !data.hurtEntity.isValid() ||
+    !(data.hurtEntity.matches({ families: ALLOWED_FAMILIES }) || data.hurtEntity instanceof Player)
+  )
+    return
 
   const hp = data.hurtEntity.getComponent('health')
   if (!hp || !hp.currentValue) return
 
-  const { indicator, entityNameTag } = getIndicator(data.hurtEntity)
-
-  HURT_ENTITIES[data.hurtEntity.id].damage += data.damage
-  indicator.nameTag = getBar(data.hurtEntity, hp)
-
-  if (!entityNameTag) indicator.teleport(Vector.add(data.hurtEntity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+  updateIndicator({ entity: data.hurtEntity, damage: data.damage })
 })
 
+// Remove indicator
 world.afterEvents.entityDie.subscribe(data => {
   const id = GAME_UTILS.safeGet(data.deadEntity, 'id')
+  if (!id || !(id in HURT_ENTITIES)) return
 
-  if (!id || id === CUSTOM_ENTITIES.floatingText || !(id in HURT_ENTITIES)) return
-  const { indicator, entityNameTag } = getIndicator(data.deadEntity)
+  const typeId = GAME_UTILS.safeGet(data.deadEntity, 'typeId')
+  const sameEntity = typeId && ALWAYS_SHOWS.includes(typeId)
+
+  if (!sameEntity) {
+    const indicator = getIndicators().find(e => e.id === HURT_ENTITIES[id].indicator)
+    if (indicator) indicator.remove()
+  }
+
   delete HURT_ENTITIES[id]
-
-  if (!entityNameTag) indicator.remove()
 })
 
 system.runInterval(
   () => {
-    for (const [id, info] of Object.entries(HURT_ENTITIES)) {
-      const entity = world.overworld
-        .getEntities({
-          type: info.hurt_type,
-        })
-        .find(e => e.id === id)
+    const entities = getIDs(world.overworld.getEntities())
+    const indicators = getIDs(getIndicators())
+    const usedIndicators = new Set()
+    const now = Date.now()
 
-      if (!entity) {
-        getIndicators()
-          .find(e => e.id === info.indicator)
-          ?.remove()
+    for (const [id, info] of Object.entries(HURT_ENTITIES)) {
+      const entity = entities.find(e => e.id === id)?.entity
+
+      if (!entity || (info.damage === 0 && info.expires < now)) {
+        try {
+          indicators.find(e => e.id === info.indicator)?.entity.remove()
+        } catch {}
 
         delete HURT_ENTITIES[id]
         continue
       }
 
-      const { indicator, entityNameTag } = getIndicator(entity)
+      usedIndicators.add(info.indicator)
+      updateIndicator({ entity, indicators, damage: info.damage - info.damage / 2 })
+    }
 
-      indicator.nameTag = getBar(entity)
-      if (!entityNameTag) indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+    for (const indicator of indicators) {
+      if (!usedIndicators.has(indicator.id)) {
+        try {
+          indicator.entity.remove()
+        } catch {}
+      }
     }
   },
-  'hurt indicator',
-  0
-)
-
-system.runInterval(
-  () => {
-    for (const id in HURT_ENTITIES) {
-      const damage = HURT_ENTITIES[id].damage
-      if (damage) HURT_ENTITIES[id].damage -= damage / 2
-    }
-  },
-  'damage counter',
+  'health indicator, damage reducer',
   20
 )
+
+const BAR_SYMBOL = '█'
 
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied
@@ -92,10 +94,10 @@ system.runInterval(
  * @returns {string}
  */
 function getBar(entity, hp = entity.getComponent('health')) {
-  if (!hp) return ''
+  if (!hp || !(entity.id in HURT_ENTITIES)) return ''
   const maxHP = hp.defaultValue
 
-  const s = 50
+  const s = 10
   const scale = maxHP <= s ? 1 : maxHP / s
 
   const full = ~~(maxHP / scale)
@@ -104,65 +106,61 @@ function getBar(entity, hp = entity.getComponent('health')) {
 
   let bar = ''
   for (let i = 1; i <= full; i++) {
-    if (i <= current) bar += '§c|'
-    if (i > current && i <= current + damage) bar += '§e|'
-    if (i > current + damage) bar += '§7|'
+    if (i <= current) bar += '§c' + BAR_SYMBOL
+    if (i > current && i <= current + damage) bar += '§e' + BAR_SYMBOL
+    if (i > current + damage) bar += '§7' + BAR_SYMBOL
   }
 
   return bar
 }
 
-PLAYER_NAME_TAG_MODIFIERS.push(getBar)
+PLAYER_NAME_TAG_MODIFIERS.push(p => {
+  const bar = getBar(p)
+  if (bar) return '\n' + bar
+  else return false
+})
 
 /**
- *
- * @param {Entity} entity
- * @param {number} damage
- * @returns {{indicator: Entity, entityNameTag: boolean}}
+ * @param {{entity: Entity, indicators?: ReturnType<typeof getIDs>, damage?: number, entityId?: string}} param0
  */
-function getIndicator(entity, damage = 0) {
-  if (ALWAYS_SHOWS.includes(entity.typeId)) {
-    HURT_ENTITIES[entity.id] ??= {
-      damage,
-      hurt_entity: entity.id,
-      hurt_type: entity.typeId,
-      indicator: 'NULL',
+function updateIndicator({
+  entity,
+  indicators = getIDs(getIndicators()),
+  damage = 0,
+  entityId = GAME_UTILS.safeGet(entity, 'id'),
+}) {
+  if (!entityId) return
+
+  const sameEntity = ALWAYS_SHOWS.includes(entity.typeId)
+  let indicator
+
+  if (sameEntity) {
+    HURT_ENTITIES[entityId] ??= {
+      damage: 0,
+      expires: Date.now() + util.ms.from('sec', 10),
+    }
+    HURT_ENTITIES[entityId].damage += damage
+
+    indicator = entity
+  } else {
+    if (entityId in HURT_ENTITIES) {
+      indicator = indicators.find(e => e.id === HURT_ENTITIES[entityId].indicator)?.entity
     }
 
-    return { indicator: entity, entityNameTag: true }
-  }
+    if (!indicator) {
+      indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
+      indicator.addTag(INDICATOR_TAG)
 
-  if (entity && entity.id in HURT_ENTITIES) {
-    const indicatorId = HURT_ENTITIES[entity.id].indicator
-    const indicator = getIndicators().find(e => e && e.id === indicatorId)
-
-    return {
-      indicator: indicator ?? createIndicator(entity),
-      entityNameTag: false,
+      HURT_ENTITIES[entityId] = {
+        indicator: indicator.id,
+        expires: Date.now() + util.ms.from('sec', 10),
+        damage: 0,
+      }
     }
   }
 
-  return { indicator: createIndicator(entity), entityNameTag: false }
-}
-
-/**
- *
- * @param {Entity} entity
- */
-function createIndicator(entity) {
-  const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
-
-  indicator.nameTag = 'Loading...'
-  indicator.addTag(INDICATOR_TAG)
-
-  HURT_ENTITIES[entity.id] = {
-    hurt_entity: entity.id,
-    damage: 100,
-    hurt_type: entity.typeId,
-    indicator: indicator.id,
-  }
-
-  return indicator
+  setNameTag(indicator, () => getBar(entity))
+  if (!sameEntity) indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
 }
 
 function getIndicators() {
@@ -170,4 +168,17 @@ function getIndicators() {
     type: CUSTOM_ENTITIES.floatingText,
     tags: [INDICATOR_TAG],
   })
+}
+
+/**
+ * @param {Entity[]} entities
+ */
+function getIDs(entities) {
+  return entities.map(
+    entity =>
+      /** @type {{id: string, entity: Entity}} */ ({
+        id: GAME_UTILS.safeGet(entity, 'id'),
+        entity,
+      })
+  )
 }

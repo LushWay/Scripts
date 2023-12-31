@@ -4,6 +4,8 @@ const name = new Command({
   name: 'name',
   description: 'Меняет имя',
   role: 'admin',
+}).executes(ctx => {
+  ctx.reply(ctx.sender.nameTag)
 })
 
 name

@@ -20,7 +20,7 @@ if (typeof list === 'string') {
 function saveList() {
   world.setDynamicProperty(propname, JSON.stringify([...onlineBuildersList]))
 }
-//SS
+
 OverTakes(onlineBuildersList, {
   add(...args) {
     super.add(...args)
@@ -78,4 +78,4 @@ system.runPlayerInterval(
   10
 )
 
-PLAYER_NAME_TAG_MODIFIERS.push(p => isBuilding(p) && ROLES[getRole(p.id)])
+PLAYER_NAME_TAG_MODIFIERS.push(p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
