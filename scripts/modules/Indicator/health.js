@@ -1,7 +1,7 @@
 import { Entity, system, Vector, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
+import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag.js'
 import { GAME_UTILS } from 'smapi.js'
-import { HEALTH_INDICATOR } from './var.js'
 
 /** @type {Record<string, {hurt_entity: string, hurt_type: string, indicator: string, damage: number}>} */
 const HURT_ENTITIES = {}
@@ -9,13 +9,14 @@ const INDICATOR_TAG = 'HEALTH_INDICATOR'
 
 /**
  * Entities that have nameTag "always_show": true and dont have boss_bar
+ * @type {string[]}
  */
-const ALWAYS_SHOWS = ['minecraft:player']
+const ALWAYS_SHOWS = []
 
 /**
  * List of families to indicate health
  */
-const ALLOWED_FAMILIES = ['mob']
+const ALLOWED_FAMILIES = ['monster', 'player']
 
 // Kill previosly used entities
 getIndicators().forEach(e => e.remove())
@@ -31,7 +32,7 @@ world.afterEvents.entityHurt.subscribe(data => {
   const { indicator, entityNameTag } = getIndicator(data.hurtEntity)
 
   HURT_ENTITIES[data.hurtEntity.id].damage += data.damage
-  indicator.nameTag = getName(data.hurtEntity, hp)
+  indicator.nameTag = getBar(data.hurtEntity, hp)
 
   if (!entityNameTag) indicator.teleport(Vector.add(data.hurtEntity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
 })
@@ -39,7 +40,7 @@ world.afterEvents.entityHurt.subscribe(data => {
 world.afterEvents.entityDie.subscribe(data => {
   const id = GAME_UTILS.safeGet(data.deadEntity, 'id')
 
-  if (!id || id === 'f:t' || !(id in HURT_ENTITIES)) return
+  if (!id || id === CUSTOM_ENTITIES.floatingText || !(id in HURT_ENTITIES)) return
   const { indicator, entityNameTag } = getIndicator(data.deadEntity)
   delete HURT_ENTITIES[id]
 
@@ -66,7 +67,7 @@ system.runInterval(
 
       const { indicator, entityNameTag } = getIndicator(entity)
 
-      indicator.nameTag = getName(entity)
+      indicator.nameTag = getBar(entity)
       if (!entityNameTag) indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
     }
   },
@@ -85,15 +86,12 @@ system.runInterval(
   20
 )
 
-let stat = false
-new Command({ name: 'dmgstat', role: 'admin' }).executes(() => (stat = true))
-
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied
  * @param {Entity} entity
  * @returns {string}
  */
-function getName(entity, hp = entity.getComponent('health')) {
+function getBar(entity, hp = entity.getComponent('health')) {
   if (!hp) return ''
   const maxHP = hp.defaultValue
 
@@ -111,23 +109,10 @@ function getName(entity, hp = entity.getComponent('health')) {
     if (i > current + damage) bar += '§7|'
   }
 
-  if (stat)
-    world.debug({
-      current,
-      emit: current + 1,
-      emitTo: current + damage + 1,
-      empty: current + damage + 2,
-      full,
-    })
-
-  return (
-    bar +
-    HEALTH_INDICATOR.name_modifiers
-      .map(modifier => modifier(entity))
-      .filter(result => result !== false)
-      .join('')
-  )
+  return bar
 }
+
+PLAYER_NAME_TAG_MODIFIERS.push(getBar)
 
 /**
  *
@@ -165,7 +150,7 @@ function getIndicator(entity, damage = 0) {
  * @param {Entity} entity
  */
 function createIndicator(entity) {
-  const indicator = entity.dimension.spawnEntity('f:t', entity.getHeadLocation())
+  const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
 
   indicator.nameTag = 'Loading...'
   indicator.addTag(INDICATOR_TAG)

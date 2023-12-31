@@ -1,5 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
-import { InventoryStore, OverTakes } from 'smapi.js'
+import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag.js'
+import { InventoryStore, OverTakes, ROLES, getRole } from 'smapi.js'
 
 const propname = 'onlineBuilderList'
 const list = world.getDynamicProperty(propname)
@@ -76,3 +77,5 @@ system.runPlayerInterval(
   'builder list update',
   10
 )
+
+PLAYER_NAME_TAG_MODIFIERS.push(p => isBuilding(p) && ROLES[getRole(p.id)])
