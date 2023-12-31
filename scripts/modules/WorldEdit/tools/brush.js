@@ -94,7 +94,7 @@ const brush = new BrushTool({
         lore.size = radius
         lore.blocksSet = [player.id, blocksSet]
         if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
-        slot.nameTag = '§r§3Кисть §6' + shape + '§r §f' + blocksSet.replace(SHARED_POSTFIX, '')
+        slot.nameTag = ('§r§3Кисть §6' + shape + '§r §f' + blocksSet.replace(SHARED_POSTFIX, '')).slice(0, 254)
         slot.setLore(brush.stringifyLore(lore))
         player.tell(
           `§a► §r${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${

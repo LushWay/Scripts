@@ -113,7 +113,10 @@ export class Leaderboard {
     const filler = `§${style.fill1}-§${style.fill2}-`.repeat(10)
 
     let leaderboard = ``
-    for (const [i, scoreInfo] of scoreboard.getScores().entries()) {
+    for (const [i, scoreInfo] of scoreboard
+      .getScores()
+      .sort((a, b) => a.score - b.score)
+      .entries()) {
       const { pos: t, nick: n, score: s } = style
 
       const name = Player.name(scoreInfo.participant.displayName) ?? scoreInfo.participant.displayName
