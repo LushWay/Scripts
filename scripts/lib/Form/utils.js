@@ -70,16 +70,16 @@ const { UserBusy, UserClosed } = FormCancelationReason
  * @returns  The response from the form.
  */
 export async function showForm(form, player) {
-  const hold = 5
+  const hold = 3
 
   for (let i = 0; i <= hold; i++) {
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
     const response = await form.show(player)
     if (response.canceled) {
       await nextTick
-      await nextTick
-      await nextTick
-      await nextTick
+      // await nextTick
+      // await nextTick
+      // await nextTick
 
       if (response.cancelationReason === UserClosed) return false
 
@@ -90,13 +90,13 @@ export async function showForm(form, player) {
         }
 
         // 10 Attempt, tell player to manually close chat...
-        if (i === 10) {
+        if (i === 2) {
           player.tell('§b> §3Закрой чат!')
         }
 
         // Last attempt, we cant do anything
         if (i === hold) {
-          player.tell(`§cНе удалось открыть форму. Закрой чат и попробуй снова`)
+          player.tell(`§cНе удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
           return false
         }
       }
