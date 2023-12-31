@@ -115,7 +115,8 @@ export class Leaderboard {
     let leaderboard = ``
     for (const [i, scoreInfo] of scoreboard
       .getScores()
-      .sort((a, b) => a.score - b.score)
+      .sort((a, b) => b.score - a.score)
+      .filter((_, i) => i < 20)
       .entries()) {
       const { pos: t, nick: n, score: s } = style
 

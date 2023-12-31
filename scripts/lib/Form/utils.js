@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
 import {
   ActionFormData,
   ActionFormResponse,
@@ -76,6 +76,7 @@ export async function showForm(form, player) {
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
     const response = await form.show(player)
     if (response.canceled) {
+      await system.sleep(5)
       if (response.cancelationReason === UserClosed) return false
 
       if (response.cancelationReason === UserBusy) {
