@@ -99,7 +99,7 @@ function manageBlockSet({
 
       if (!name || name === setName) return onFail()
       if (deletePrevious && setName) setBlockSet(player.id, setName, undefined)
-      setBlockSet(player.id, name, JSON.parse(JSON.stringify(set)))
+      setBlockSet(player.id, name, set ? JSON.parse(JSON.stringify(set)) : set)
       editBlocksSet({
         player,
         setName: name,
