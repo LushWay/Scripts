@@ -34,7 +34,7 @@ OverTakes(Array, {
 })
 
 Array.prototype.randomElement = function () {
-  return this[Math.round(Math.random() * this.length)]
+  return this[~~(Math.random() * this.length)]
 }
 
 /**
