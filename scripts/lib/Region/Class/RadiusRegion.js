@@ -1,4 +1,6 @@
 import { Vector } from '@minecraft/server'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
+import { SYSTEM_ENTITIES } from 'config.js'
 import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 
@@ -93,7 +95,7 @@ export class SafeAreaRegion extends RadiusRegion {
 
   /** @type {RegionPermissions} */
   defaultPermissions = {
-    allowedEntities: 'all',
+    allowedEntities: [MinecraftEntityTypes.Player, MinecraftEntityTypes.Npc, 'minecraft:item', ...SYSTEM_ENTITIES],
     doorsAndSwitches: false,
     openContainers: false,
     pvp: false,

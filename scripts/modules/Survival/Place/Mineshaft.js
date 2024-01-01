@@ -1,9 +1,4 @@
-import { INTERACTION_GUARD } from 'modules/Survival/config.js'
-import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
-import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
-import { util } from 'smapi.js'
-
-class MineshaftBuilder extends DefaultPlaceWithSafeArea {
+class MineshaftBuilder {
   /**
    * @param {object} o
    * @param {Vector3} o.center
@@ -30,9 +25,7 @@ class MineshaftBuilder extends DefaultPlaceWithSafeArea {
 
     return orePositions
   }
-  constructor() {
-    super('Шахта')
-  }
+  constructor() {}
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
