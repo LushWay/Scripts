@@ -1,4 +1,4 @@
-import { BlockPermutation, Player } from '@minecraft/server'
+import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
@@ -21,6 +21,11 @@ export function withState(name, states, weight = 1) {
   return [name, states, weight]
 }
 
+/** @type {BlockStateWeight[]} */
+const Trees = BlockTypes.getAll()
+  .filter(e => e.id.endsWith('_log') || e.id.includes('leaves') || e.id.includes('mangrove_roots'))
+  .map(e => [e.id, void 0, 1])
+
 /**
  * @typedef {Record<string, BlockStateWeight[]>} BlocksSets
  */
@@ -29,17 +34,9 @@ export function withState(name, states, weight = 1) {
 export const DEFAULT_BLOCK_SETS = {
   'Земля': [[MinecraftBlockTypes.Grass, void 0, 1]],
   'Воздух': [[MinecraftBlockTypes.Air, void 0, 1]],
-  'Стена каменоломни': [
-    [MinecraftBlockTypes.MudBricks, void 0, 2],
-    [MinecraftBlockTypes.PackedMud, void 0, 1],
-    [MinecraftBlockTypes.BrickBlock, void 0, 1],
-    withState(MinecraftBlockTypes.CobblestoneWall, {
-      wall_block_type: 'granite',
-    }),
-    [MinecraftBlockTypes.HardenedClay, void 0, 1],
-    [MinecraftBlockTypes.Granite, void 0, 2],
-  ],
+  'Деревья заполняемые': [...Trees],
 }
+
 export const SHARED_POSTFIX = '§7 (Общий)'
 
 Object.keys(DEFAULT_BLOCK_SETS).forEach(e => {
