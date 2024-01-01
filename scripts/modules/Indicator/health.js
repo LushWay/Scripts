@@ -30,9 +30,6 @@ world.afterEvents.entityHurt.subscribe(data => {
   )
     return
 
-  const hp = data.hurtEntity.getComponent('health')
-  if (!hp || !hp.currentValue) return
-
   updateIndicator({ entity: data.hurtEntity, damage: data.damage })
 })
 
@@ -87,7 +84,7 @@ system.runInterval(
   20
 )
 
-const BAR_SYMBOL = '█'
+const BAR_SYMBOL = '|'
 
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied
@@ -137,10 +134,10 @@ function updateIndicator({
 
   if (sameEntity) {
     HURT_ENTITIES[entityId] ??= {
-      damage: 0,
+      indicator: entityId,
       expires: Date.now() + util.ms.from('sec', 10),
+      damage: 0,
     }
-    HURT_ENTITIES[entityId].damage += damage
 
     indicator = entity
   } else {
@@ -159,6 +156,8 @@ function updateIndicator({
       }
     }
   }
+
+  HURT_ENTITIES[entityId].damage += damage
 
   setNameTag(indicator, () => getBar(entity))
   if (!sameEntity) indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
