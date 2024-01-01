@@ -4,7 +4,7 @@ import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
 import { GAME_UTILS, util } from 'smapi.js'
 
-/** @type {Record<string, {indicator?: string, damage: number, expires: number}>} */
+/** @type {Record<string, {indicator: Entity, hurtEntity: Entity, damage: number, expires: number}>} */
 const HURT_ENTITIES = {}
 const INDICATOR_TAG = 'HEALTH_INDICATOR'
 
@@ -42,7 +42,7 @@ world.afterEvents.entityDie.subscribe(data => {
   const sameEntity = typeId && ALWAYS_SHOWS.includes(typeId)
 
   if (!sameEntity) {
-    const indicator = getIndicators().find(e => e.id === HURT_ENTITIES[id].indicator)
+    const indicator = HURT_ENTITIES[id].indicator
     if (indicator) indicator.remove()
   }
 
@@ -51,25 +51,24 @@ world.afterEvents.entityDie.subscribe(data => {
 
 system.runInterval(
   () => {
-    const entities = getIDs(world.overworld.getEntities())
     const indicators = getIDs(getIndicators())
     const usedIndicators = new Set()
     const now = Date.now()
 
     for (const [id, info] of Object.entries(HURT_ENTITIES)) {
-      const entity = entities.find(e => e.id === id)?.entity
+      const entity = info.hurtEntity
 
       if (!entity || (info.damage === 0 && info.expires < now)) {
         try {
-          indicators.find(e => e.id === info.indicator)?.entity.remove()
+          info.indicator.remove()
         } catch {}
 
         delete HURT_ENTITIES[id]
         continue
       }
 
-      usedIndicators.add(info.indicator)
-      updateIndicator({ entity, indicators, damage: info.damage - info.damage / 2 })
+      usedIndicators.add(info.indicator.id)
+      updateIndicator({ entity, damage: info.damage - info.damage / 2 })
     }
 
     for (const indicator of indicators) {
@@ -119,14 +118,9 @@ PLAYER_NAME_TAG_MODIFIERS.push(p => {
 })
 
 /**
- * @param {{entity: Entity, indicators?: ReturnType<typeof getIDs>, damage?: number, entityId?: string}} param0
+ * @param {{entity: Entity, damage?: number, entityId?: string}} param0
  */
-function updateIndicator({
-  entity,
-  indicators = getIDs(getIndicators()),
-  damage = 0,
-  entityId = GAME_UTILS.safeGet(entity, 'id'),
-}) {
+function updateIndicator({ entity, damage = 0, entityId = GAME_UTILS.safeGet(entity, 'id') }) {
   if (!entityId) return
 
   const sameEntity = ALWAYS_SHOWS.includes(entity.typeId)
@@ -134,26 +128,21 @@ function updateIndicator({
 
   if (sameEntity) {
     HURT_ENTITIES[entityId] ??= {
-      indicator: entityId,
+      indicator: entity,
+      hurtEntity: entity,
       expires: Date.now() + util.ms.from('sec', 10),
       damage: 0,
     }
 
     indicator = entity
   } else {
-    if (entityId in HURT_ENTITIES) {
-      indicator = indicators.find(e => e.id === HURT_ENTITIES[entityId].indicator)?.entity
-    }
+    indicator = HURT_ENTITIES[entityId]?.indicator ?? spawnIndicator(entity)
 
-    if (!indicator) {
-      indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
-      indicator.addTag(INDICATOR_TAG)
-
-      HURT_ENTITIES[entityId] = {
-        indicator: indicator.id,
-        expires: Date.now() + util.ms.from('sec', 10),
-        damage: 0,
-      }
+    HURT_ENTITIES[entityId] ??= {
+      indicator,
+      hurtEntity: entity,
+      expires: Date.now() + util.ms.from('sec', 10),
+      damage: 0,
     }
   }
 
@@ -161,6 +150,15 @@ function updateIndicator({
 
   setNameTag(indicator, () => getBar(entity))
   if (!sameEntity) indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+}
+
+/**
+ * @param {Entity} entity
+ */
+function spawnIndicator(entity) {
+  const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
+  indicator.addTag(INDICATOR_TAG)
+  return indicator
 }
 
 function getIndicators() {
