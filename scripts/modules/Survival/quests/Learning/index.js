@@ -68,6 +68,7 @@ export const LEARNING = {
 
 LEARNING.RTP_LOCATION.onLoad.subscribe(location => {
   LEARNING.SAFE_AREA = new SafeAreaRegion({
+    permissions: { allowedEntities: 'all' },
     center: location,
     radius: location.radius,
     dimensionId: 'overworld',

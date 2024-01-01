@@ -95,7 +95,13 @@ export class SafeAreaRegion extends RadiusRegion {
 
   /** @type {RegionPermissions} */
   defaultPermissions = {
-    allowedEntities: [MinecraftEntityTypes.Player, MinecraftEntityTypes.Npc, 'minecraft:item', ...SYSTEM_ENTITIES],
+    allowedEntities: [
+      MinecraftEntityTypes.Player,
+      MinecraftEntityTypes.Npc,
+      'minecraft:painting',
+      'minecraft:item',
+      ...SYSTEM_ENTITIES,
+    ],
     doorsAndSwitches: false,
     openContainers: false,
     pvp: false,
