@@ -32,6 +32,7 @@ const ALLOWED_FAMILIES = ['monster']
 
 // Show indicator on hurt
 world.afterEvents.entityHurt.subscribe(data => {
+  if (data.damage === 0) return
   // Validate entity
   const id = GAME_UTILS.safeGet(data.hurtEntity, 'id')
   if (!id || SYSTEM_ENTITIES.includes(id)) return
