@@ -1,4 +1,5 @@
 import { Entity, Player, system } from '@minecraft/server'
+import { GAME_UTILS } from 'smapi.js'
 
 /**
  * @type {((player: Player) => string | false)[]}
@@ -24,5 +25,6 @@ export function parsePlayerNameTagModifiers(player) {
 export function setNameTag(entity, nameTag) {
   if (entity instanceof Player) nameTag = parsePlayerNameTagModifiers(entity)
   if (typeof nameTag === 'function') nameTag = nameTag()
-  if (entity.nameTag !== nameTag) entity.nameTag = nameTag
+  const entityNameTag = GAME_UTILS.safeGet(entity, 'nameTag')
+  if (entityNameTag !== nameTag) entity.nameTag = nameTag
 }

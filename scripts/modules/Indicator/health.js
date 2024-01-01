@@ -81,7 +81,7 @@ system.runInterval(
       }
 
       if (info.separated) usedIndicators.add(info.indicator.id)
-      updateIndicator({ entity, damage: info.damage - info.damage / 2 })
+      updateIndicator({ entity, damage: -(info.damage / 2) })
     }
 
     for (const indicator of indicators) {

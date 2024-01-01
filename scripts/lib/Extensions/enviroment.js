@@ -1,3 +1,4 @@
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
 import { OverTakes } from './OverTakes.js'
 
@@ -70,3 +71,8 @@ OverTakes(console, {
 globalThis.nextTick = null
 // @ts-expect-error Assign
 globalThis.verbose = false
+
+Object.entriesStringKeys(MinecraftEntityTypes).forEach(([k, v]) => {
+  // @ts-expect-error Allow
+  MinecraftEntityTypes[k] = 'minecraft:' + v
+})
