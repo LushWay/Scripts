@@ -67,6 +67,6 @@ export class Sidebar {
 
       content = content.replaceAll('$' + key, value)
     }
-    player.onScreenDisplay.setActionBar(content)
+    player.onScreenDisplay.setTitle('§t§i§psidebar' + content)
   }
 }

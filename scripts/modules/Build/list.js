@@ -1,5 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag.js'
+import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { InventoryStore, OverTakes, ROLES, getRole } from 'smapi.js'
 
 const propname = 'onlineBuilderList'
@@ -44,6 +45,13 @@ export function isBuilding(player, uptodate = false) {
 
 const builderInventory = new InventoryStore('build')
 
+Join.onMoveAfterJoin.subscribe(({ player }) => {
+  // First time set
+  system.delay(() => {
+    setBuildingTip(player, onlineBuildersList.has(player.id))
+  })
+})
+
 system.runPlayerInterval(
   player => {
     const creative = player.isGamemode('creative')
@@ -51,9 +59,11 @@ system.runPlayerInterval(
 
     if (creative && !builder) {
       switchInv()
+      setBuildingTip(player, true)
       onlineBuildersList.add(player.id)
     } else if (!creative && builder) {
       switchInv()
+      setBuildingTip(player, false)
       onlineBuildersList.delete(player.id)
     }
 
@@ -79,3 +89,10 @@ system.runPlayerInterval(
 )
 
 PLAYER_NAME_TAG_MODIFIERS.push(p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
+
+/**
+ * @param {Player} player
+ */
+function setBuildingTip(player, value = true) {
+  player.onScreenDisplay.setTitle('§t§i§p1' + (value ? 'Режим стройки' : ''))
+}

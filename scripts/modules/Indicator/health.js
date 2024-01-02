@@ -117,9 +117,16 @@ function getBar(entity, hp = entity.getComponent('health')) {
 
   let bar = ''
   for (let i = 1; i <= full; i++) {
-    if (i <= current) bar += '§c' + BAR_SYMBOL
-    if (i > current && i <= current + damage) bar += '§e' + BAR_SYMBOL
-    if (i > current + damage) bar += '§7' + BAR_SYMBOL
+    if (i <= current) {
+      bar += '§c' + BAR_SYMBOL
+      continue
+    }
+    if (i > current && i <= current + damage) {
+      bar += '§e' + BAR_SYMBOL
+      continue
+    }
+
+    bar += '§7' + BAR_SYMBOL
   }
 
   return bar
