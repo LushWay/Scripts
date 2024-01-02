@@ -4,7 +4,13 @@ import { GAME_UTILS } from 'smapi.js'
 /**
  * @type {((player: Player) => string | false)[]}
  */
-export const PLAYER_NAME_TAG_MODIFIERS = [player => player.name]
+export const PLAYER_NAME_TAG_MODIFIERS = [
+  player => {
+    const name = GAME_UTILS.safeGet(player, 'name')
+    if (name) return name
+    return false
+  },
+]
 
 system.runPlayerInterval(player => setNameTag(player, ''), 'player.nameTag modifiers', 40)
 
