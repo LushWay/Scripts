@@ -1,5 +1,4 @@
 import { Player, system, world } from '@minecraft/server'
-import { isBuilding } from 'modules/Build/list.js'
 import { Minigame } from 'modules/Minigames/Builder.js'
 import { BaseRegion, Quest, Region, SafeAreaRegion, Settings, Sidebar } from 'smapi.js'
 
@@ -42,9 +41,8 @@ const sidebar = new Sidebar(
       `$режим$регион
 §7Монеты: §6$монеты§7 | Листья: §2$листья
 §7Онлайн: §f$онлайн/55§7
-  
-$квест
-$айпи`,
+
+$квест`,
   },
   {
     режим: player => inventoryDisplay[player.database.survival.inv],
@@ -64,7 +62,6 @@ $айпи`,
     листья: player => player.scores.leafs + '',
     онлайн: () => world.getAllPlayers().length.toString(),
     квест: Quest.sidebar,
-    айпи: '§7shp1nat-59955.portmap.io',
   }
 )
 
@@ -73,6 +70,7 @@ system.runPlayerInterval(
     const minigame = Minigame.getCurrent(player)
     if (minigame) return minigame.sidebar.show(player)
     if (sidebarSettings(player).enabled) sidebar.show(player)
+    system.delay(() => player.onScreenDisplay.setTitle('§t§i§p5' + '§7shp1nat-59955.portmap.io'))
   },
   'Survival sidebar',
   20
