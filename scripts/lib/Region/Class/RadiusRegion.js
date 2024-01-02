@@ -98,6 +98,7 @@ export class SafeAreaRegion extends RadiusRegion {
     allowedEntities: [
       MinecraftEntityTypes.Player,
       MinecraftEntityTypes.Npc,
+      MinecraftEntityTypes.ArmorStand,
       'minecraft:painting',
       'minecraft:item',
       ...SYSTEM_ENTITIES,
