@@ -3,6 +3,7 @@ import {
   Player,
   PlayerBreakBlockBeforeEvent,
   PlayerInteractWithBlockBeforeEvent,
+  PlayerInteractWithEntityBeforeEvent,
   PlayerPlaceBlockBeforeEvent,
   system,
   world,
@@ -25,7 +26,7 @@ let LOADED = false
  * @callback interactionAllowed
  * @param {Player} player
  * @param {Region} [region]
- * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "interactWithBlock", event: PlayerInteractWithBlockBeforeEvent}} context
+ * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "interactWithBlock", event: PlayerInteractWithBlockBeforeEvent} | {type: "interactWithEntity", event: PlayerInteractWithEntityBeforeEvent}} context
  */
 
 /**
@@ -60,8 +61,17 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
     if (allowed(event.player, region, { type: 'interactWithBlock', event })) return
 
     if (DOORS_SWITCHES.includes(event.block.typeId) && region?.permissions?.doorsAndSwitches) return
-
     if (BLOCK_CONTAINERS.includes(event.block.typeId) && region?.permissions?.openContainers) return
+
+    event.cancel = true
+  })
+
+  /**
+   * Permissions for region
+   */
+  world.beforeEvents.playerInteractWithEntity.subscribe(event => {
+    const region = Region.locationInRegion(event.target.location, event.player.dimension.type)
+    if (allowed(event.player, region, { type: 'interactWithEntity', event })) return
 
     event.cancel = true
   })
@@ -71,7 +81,9 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
    */
   world.beforeEvents.playerPlaceBlock.subscribe(event => {
     const region = Region.locationInRegion(event.block.location, event.player.dimension.type)
-    if (!allowed(event.player, region, { type: 'place', event })) event.cancel = true
+    if (allowed(event.player, region, { type: 'place', event })) return
+
+    event.cancel = true
   })
 
   /**
@@ -80,15 +92,9 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
 
   world.beforeEvents.playerBreakBlock.subscribe(event => {
     const region = Region.locationInRegion(event.block.location, event.player.dimension.type)
+    if (allowed(event.player, region, { type: 'break', event })) return
 
-    if (
-      !allowed(event.player, region, {
-        type: 'break',
-        event,
-      })
-    ) {
-      event.cancel = true
-    }
+    event.cancel = true
   })
 
   world.afterEvents.entitySpawn.subscribe(({ entity, cause }) => {
@@ -99,12 +105,6 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
 
     const region = Region.locationInRegion(location, dimension.type)
     if (spawnAllowed(region, { entity, cause })) return
-    if (
-      region &&
-      ((Array.isArray(region.permissions.allowedEntities) && region.permissions.allowedEntities.includes(typeId)) ||
-        region.permissions.allowedEntities === 'all')
-    )
-      return
 
     entity.remove()
   })
