@@ -1,6 +1,7 @@
 import { Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { GAME_UTILS } from 'smapi.js'
+import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
+import { GAME_UTILS, util } from 'smapi.js'
 // Snow bomb / Fireball
 // world.afterEvents.itemUse.subscribe(data => {
 //   if (!['sm:ice_bomb', 'sm:fireball'].includes(data.itemStack.typeId)) return
@@ -65,6 +66,14 @@ system.runInterval(
       const block = entity.dimension.getBlock(entity.location)
       if (block) {
         if (block.typeId in ICE_BOMB_TRANSOFORM) {
+          scheduleBlockPlace({
+            dimension: entity.dimension.type,
+            location: block.location,
+            typeId: block.typeId,
+            states: block.permutation.getAllStates(),
+            restoreTime: util.ms.from('min', 1),
+          })
+
           block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
           entity.remove()
         }
