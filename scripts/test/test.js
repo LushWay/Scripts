@@ -13,7 +13,7 @@ import './simulatedPlayer.js'
 
 // const player = world.getAllPlayers()[0]
 // const targetPosition = { x: 10, y: 10, z: 10 }
-
+// test
 // /**
 //  * @param {Vector3} a
 //  * @param {Vector3} b
