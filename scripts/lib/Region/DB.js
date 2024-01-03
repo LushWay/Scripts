@@ -1,6 +1,5 @@
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { DEFAULT_REGION_PERMISSIONS } from './config.js'
-// eslint-disable-next-line scriptapi/no-cycle
 
 /**
  * @typedef {{
