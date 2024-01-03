@@ -76,8 +76,6 @@ export async function showForm(form, player) {
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
     const response = await form.show(player)
     if (response.canceled) {
-      await system.sleep(20)
-
       if (response.cancelationReason === UserClosed) return false
 
       if (response.cancelationReason === UserBusy) {
@@ -89,6 +87,7 @@ export async function showForm(form, player) {
         // 10 Attempt, tell player to manually close chat...
         if (i === 2) {
           player.tell('§b> §3Закрой чат!')
+          await system.sleep(40)
         }
 
         // Last attempt, we cant do anything
