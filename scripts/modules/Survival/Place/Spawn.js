@@ -72,7 +72,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
       this.region = new SafeAreaRegion({
         center: spawnLocation,
-        radius: 100,
+        radius: 30,
         dimensionId: 'overworld',
       })
 

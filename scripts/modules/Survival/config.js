@@ -1,9 +1,10 @@
 import { loadRegionsWithGuards } from 'lib/Region/index.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
+import { Spawn } from 'modules/Survival/Place/Spawn.js'
 import { EventSignal } from 'smapi.js'
 
-console.log('§6Gameplay mode: survival')
+console.log('§9Survival setup')
 
 /**
  * @type {EventSignal<Parameters<import('lib/Region/index.js').interactionAllowed>, boolean | undefined, import('lib/Region/index.js').interactionAllowed>}
@@ -35,8 +36,14 @@ loadRegionsWithGuards({
   },
 
   regionCallback(player, currentRegion) {
-    if (currentRegion && !currentRegion?.permissions.pvp && !isBuilding(player)) {
-      player.triggerEvent('player:spawn')
+    if (currentRegion) {
+      if (!currentRegion?.permissions.pvp && !isBuilding(player)) {
+        player.triggerEvent('player:spawn')
+      }
+    } else {
+      if (player.database.survival.inv === 'spawn' && !isBuilding(player)) {
+        Spawn.portal?.teleport(player)
+      }
     }
   },
 })

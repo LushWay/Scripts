@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { INTERACTION_GUARD } from 'modules/Survival/config.js'
@@ -67,13 +67,15 @@ export class DefaultPlaceWithSafeArea {
   }
 }
 
-INTERACTION_GUARD.subscribe((_, region, ctx) => {
-  if (
-    ctx.type === 'interactWithBlock' &&
-    ctx.event.block.typeId === MinecraftBlockTypes.CraftingTable &&
-    region instanceof SafeAreaRegion &&
-    region.allowUsageOfCraftingTable
-  ) {
-    return true
-  }
+system.delay(() => {
+  INTERACTION_GUARD.subscribe((_, region, ctx) => {
+    if (
+      ctx.type === 'interactWithBlock' &&
+      ctx.event.block.typeId === MinecraftBlockTypes.CraftingTable &&
+      region instanceof SafeAreaRegion &&
+      region.allowUsageOfCraftingTable
+    ) {
+      return true
+    }
+  })
 })

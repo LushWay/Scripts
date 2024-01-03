@@ -1,15 +1,18 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { GAME_UTILS } from 'smapi.js'
 
-/** @type {Record<string, { date: number, entity: Entity }>} */
+/**
+ * @type {Record<string, { date: number, entity: Entity }>}
+ */
 const SPAWNED_FIREWORKS = {}
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   const typeId = GAME_UTILS.safeGet(entity, 'typeId')
-  if (typeId !== `minecraft:fireworks_rocket`) return
+  if (typeId !== MinecraftEntityTypes.FireworksRocket) return
 
   SPAWNED_FIREWORKS[entity.id] = { date: Date.now(), entity }
 })
+
 world.afterEvents.itemUse.subscribe(data => {
   if (data.itemStack.typeId !== MinecraftItemTypes.Crossbow) return
   if (!(data.source instanceof Player)) return
@@ -22,8 +25,12 @@ world.afterEvents.itemUse.subscribe(data => {
     }
   }
 })
-/** @type {Record<string, { source: Player, firework: Entity }>} */
+
+/**
+ * @type {Record<string, { source: Player, firework: Entity }>}
+ */
 const FIREWORKS = {}
+
 system.runInterval(
   () => {
     for (const [id, { date }] of Object.entries(SPAWNED_FIREWORKS)) {
