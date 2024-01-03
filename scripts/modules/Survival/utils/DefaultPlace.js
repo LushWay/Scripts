@@ -1,5 +1,7 @@
 import { Player } from '@minecraft/server'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Build/list.js'
+import { INTERACTION_GUARD } from 'modules/Survival/config.js'
 import { EditableLocation, SafeAreaRegion } from 'smapi.js'
 
 export class DefaultPlaceWithInventory {
@@ -49,9 +51,9 @@ export class DefaultPlaceWithSafeArea {
    */
   constructor(name) {
     this.name = name
-    this.portalTeleportsTo = new EditableLocation(name + ' portal teleports to', { type: 'vector3+rotation' })
-    this.portalPos2 = new EditableLocation(name + ' portal pos1', { type: 'vector3' })
-    this.portalPos1 = new EditableLocation(name + ' portal pos2', { type: 'vector3' })
+    this.portalTeleportsTo = new EditableLocation(name + ' портал телепортирует на', { type: 'vector3+rotation' })
+    this.portalPos2 = new EditableLocation(name + ' портал от', { type: 'vector3' })
+    this.portalPos1 = new EditableLocation(name + ' портал до', { type: 'vector3' })
     this.safeAreaLocation = new EditableLocation(name + ' мирная зона', { type: 'vector3+radius' })
     this.safeAreaLocation.onLoad.subscribe(location => {
       this.safeArea = new SafeAreaRegion({
@@ -64,3 +66,14 @@ export class DefaultPlaceWithSafeArea {
     })
   }
 }
+
+INTERACTION_GUARD.subscribe((_, region, ctx) => {
+  if (
+    ctx.type === 'interactWithBlock' &&
+    ctx.event.block.typeId === MinecraftBlockTypes.CraftingTable &&
+    region instanceof SafeAreaRegion &&
+    region.allowUsageOfCraftingTable
+  ) {
+    return true
+  }
+})

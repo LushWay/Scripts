@@ -51,7 +51,7 @@ $квест`,
       if (player.database.survival.inv === 'anarchy') {
         const region = Region.locationInRegion(player.location, player.dimension.type)
         if (region) {
-          if (!region.permissions.pvp) text = ', §aмирная зона'
+          if (!region.permissions.pvp) text = ', мирная зона'
           if (region instanceof SafeAreaRegion && region.safeAreaName) text += '\n' + region.safeAreaName
           if (region instanceof BaseRegion && region.regionMember(player.id)) text = ', §6ваша база'
         }
@@ -60,7 +60,16 @@ $квест`,
     },
     монеты: player => player.scores.money + '',
     листья: player => player.scores.leafs + '',
-    онлайн: () => world.getAllPlayers().length.toString(),
+    онлайн: {
+      preinit() {
+        let online = world.getAllPlayers().length
+
+        world.afterEvents.playerLeave.subscribe(() => online--)
+        world.afterEvents.playerJoin.subscribe(() => online++)
+
+        return () => online.toString()
+      },
+    },
     квест: Quest.sidebar,
   }
 )

@@ -1,6 +1,5 @@
 import { Vector } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { SYSTEM_ENTITIES } from 'config.js'
 import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 
@@ -101,7 +100,6 @@ export class SafeAreaRegion extends RadiusRegion {
       MinecraftEntityTypes.ArmorStand,
       'minecraft:painting',
       'minecraft:item',
-      ...SYSTEM_ENTITIES,
     ],
     doorsAndSwitches: false,
     openContainers: false,
@@ -113,10 +111,13 @@ export class SafeAreaRegion extends RadiusRegion {
     return 'Безопасная зона ' + this.safeAreaName ?? super.name
   }
 
-  /** @param {RadiusRegionSubtypeArg & { name?: string }} arg */
+  allowUsageOfCraftingTable = false
+
+  /** @param {RadiusRegionSubtypeArg & { name?: string, allowUsageOfCraftingTable?: boolean }} arg */
   constructor(arg) {
     super({ saveToDisk: false, ...arg, initPermissions: false })
     this.safeAreaName = arg.name
+    this.allowUsageOfCraftingTable = arg.allowUsageOfCraftingTable ?? false
     this.initPermissions(arg.permissions)
   }
 }

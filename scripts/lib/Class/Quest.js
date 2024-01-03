@@ -477,7 +477,7 @@ class PlayerQuest {
               try {
                 world.overworld.spawnParticle(
                   'minecraft:balloon_gas_particle',
-                  Vector.add(vector, { x: 0.5, y: 0.5, z: 0.5 })
+                  Vector.add(vector, { x: 1, y: 0.5, z: 1 })
                 )
               } catch (e) {
                 util.error(e)

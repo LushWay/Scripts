@@ -2,7 +2,6 @@ import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { util } from 'lib/util.js'
-import { EventSignal } from './EventSignal.js'
 import { GAME_UTILS } from './GameUtils.js'
 import { LootTable } from './LootTable.js'
 
@@ -14,27 +13,8 @@ const AIRDROP_DB = new DynamicPropertyDB('airdrop', {
 }).proxy()
 
 export class Airdrop {
-  /**
-   * @type {EventSignal<{minecart: Entity, airdrop: Airdrop}>}
-   */
-  static emptyMinecartRemove = new EventSignal()
-  /**
-   * @param {Entity} minecart
-   * @param {Airdrop} [airdrop]
-   */
-  static minecartIsEmpty(minecart, airdrop) {
-    const inventory = minecart.getComponent('inventory')
-    if (!inventory || !inventory.container) return
-    const { container } = inventory
-    if (container.size === container.emptySlotsCount) {
-      minecart.remove()
-      if (airdrop) {
-        EventSignal.emit(this.emptyMinecartRemove, { minecart, airdrop })
-      }
-    }
-  }
   static minecartTag = 'chest_minecart:loot'
-  static chestOffset = { x: 0, y: -2, z: 0 }
+  static chestOffset = { x: 0, y: -4, z: 0 }
 
   /** @type {Airdrop[]} */
   static instances = []
@@ -105,7 +85,19 @@ export class Airdrop {
   delete() {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
     Reflect.deleteProperty(AIRDROP_DB, this.key)
+
+    if (this.chestMinecart)
+      try {
+        this.chestMinecart.remove()
+      } catch {}
+
     delete this.chestMinecart
+
+    if (this.chicken)
+      try {
+        this.chicken.remove()
+      } catch {}
+
     delete this.chicken
   }
 }
@@ -136,7 +128,9 @@ system.runInterval(
       } else if (airdrop.status === 'being looted' && airdrop.chestMinecart) {
         const { container } = airdrop.chestMinecart
         if (!container) continue
-        if (container.emptySlotsCount === container.size) airdrop.chestMinecart.remove()
+        if (container.emptySlotsCount === container.size) {
+          airdrop.delete()
+        }
       }
     }
 

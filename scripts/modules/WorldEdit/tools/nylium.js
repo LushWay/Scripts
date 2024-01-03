@@ -1,5 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { isBuilding } from 'modules/Build/list.js'
 import { ModalForm } from 'smapi.js'
 import { WorldEditTool } from '../class/Tool.js'
 import { blockSetDropdown, getBlockSet, stringifyBlocksSetRef } from '../utils/blocksSet.js'
@@ -29,7 +30,7 @@ const nylium = new WorldEditTool({
 
 /* Replaces the block with a random block from the lore of the item. */
 world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
-  if (player.mainhand().typeId !== nylium.itemId) return
+  if (player.mainhand().typeId !== nylium.itemId || !isBuilding(player)) return
 
   system.delay(() => {
     const slot = player.mainhand()
@@ -37,7 +38,13 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
     const blocksSet = getBlockSet(lore.blocksSet)
 
     if (blocksSet.length) {
-      player.dimension.getBlock(block.location)?.setPermutation(blocksSet.randomElement())
+      system.runTimeout(
+        () => {
+          player.dimension.getBlock(block.location)?.setPermutation(blocksSet.randomElement())
+        },
+        'nylium place',
+        20
+      )
     } else {
       player.tell(`§cПустой набор блоков '§f${stringifyBlocksSetRef(lore.blocksSet)}'§c! Выберите другой.`)
       nylium.editToolForm?.(slot, player)
