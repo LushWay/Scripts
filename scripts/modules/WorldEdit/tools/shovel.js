@@ -61,10 +61,10 @@ const shovel = new WorldEditTool({
     if (!lore) return
 
     const blocks = getBlockSet(lore.blocksSet)
-    if (blocks.length === 0) return player.onScreenDisplay.setTitle('§cНабор блоков лопаты пустой!')
+    if (blocks.length === 0) return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!')
 
     const replaceBlocks = getBlockSetForReplaceTarget(lore.replaceBlocksSet)
-    if (blocks.length === 0) return player.onScreenDisplay.setTitle('§cЗаменяемый набор блоков лопаты пустой!')
+    if (blocks.length === 0) return player.onScreenDisplay.setActionBar('§cЗаменяемый набор блоков лопаты пустой!')
 
     const loc = Vector.floor(player.location)
     const offset = -1

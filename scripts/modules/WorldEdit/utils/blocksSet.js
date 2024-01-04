@@ -21,10 +21,15 @@ export function withState(name, states, weight = 1) {
   return [name, states, weight]
 }
 
+/** @type {BlockStateWeight} */
+const mangroove = [MinecraftBlockTypes.MangroveRoots, void 0, 1]
+
 /** @type {BlockStateWeight[]} */
 const Trees = BlockTypes.getAll()
-  .filter(e => e.id.endsWith('_log') || e.id.includes('leaves') || e.id.includes('mangrove_roots'))
+  .filter(e => e.id.endsWith('_log') || e.id.includes('leaves'))
   .map(e => [e.id, void 0, 1])
+
+Trees.push(mangroove)
 
 /**
  * @typedef {Record<string, BlockStateWeight[]>} BlocksSets
@@ -34,7 +39,7 @@ const Trees = BlockTypes.getAll()
 export const DEFAULT_BLOCK_SETS = {
   'Земля': [[MinecraftBlockTypes.Grass, void 0, 1]],
   'Воздух': [[MinecraftBlockTypes.Air, void 0, 1]],
-  'Деревья заполняемые': [...Trees],
+  'Деревья заполняемые': Trees,
 }
 
 export const SHARED_POSTFIX = '§7 (Общий)'

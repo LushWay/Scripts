@@ -75,7 +75,7 @@ class JoinBuilder {
                 player.onScreenDisplay.setActionBar(Join.config.actionBar)
               }
 
-              player.onScreenDisplay.setTitle(title, {
+              player.onScreenDisplay.setTitle('title' + title, {
                 fadeInDuration: 0,
                 fadeOutDuration: 20,
                 stayDuration: 40,
