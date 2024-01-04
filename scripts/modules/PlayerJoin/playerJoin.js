@@ -131,7 +131,7 @@ class JoinBuilder {
       if (settings.message) other.tell(`§7${player.name} ${Join.config.messages[messageType]}`)
     }
 
-    player.onScreenDisplay.setTitle('')
+    player.onScreenDisplay.setTitle('title')
 
     EventSignal.emit(this.onMoveAfterJoin, {
       player,
