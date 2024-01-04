@@ -172,7 +172,16 @@ function updateIndicator({ entity, damage = 0, entityId = GAME_UTILS.safeGet(ent
 
   info.damage += damage
 
-  setNameTag(info.separated ? info.indicator : info.hurtEntity, () => getBar(entity))
+  try {
+    setNameTag(info.separated ? info.indicator : info.hurtEntity, () => getBar(entity))
+  } catch (e) {
+    if (e instanceof Error && e.message.match(/Failed to (set|get) property/)) {
+      delete HURT_ENTITIES[entityId]
+      return
+    }
+
+    throw e
+  }
   if (info.separated) info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
 }
 

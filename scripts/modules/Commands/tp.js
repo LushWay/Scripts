@@ -41,7 +41,9 @@ export function tpMenu(player) {
  */
 function location(place, fallback) {
   if (place.portalTeleportsTo.valid) {
-    return Vector.string(place.portalTeleportsTo) + ' ' + place.portalTeleportsTo.xRot + place.portalTeleportsTo.yRot
+    return (
+      Vector.string(place.portalTeleportsTo) + ' ' + place.portalTeleportsTo.xRot + ' ' + place.portalTeleportsTo.yRot
+    )
   }
 
   return fallback
