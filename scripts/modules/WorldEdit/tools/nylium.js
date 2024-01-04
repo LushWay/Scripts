@@ -43,7 +43,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
           player.dimension.getBlock(block.location)?.setPermutation(blocksSet.randomElement())
         },
         'nylium place',
-        20
+        0
       )
     } else {
       player.tell(`§cПустой набор блоков '§f${stringifyBlocksSetRef(lore.blocksSet)}'§c! Выберите другой.`)
