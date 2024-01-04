@@ -1,4 +1,4 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player, Vector, system } from '@minecraft/server'
 import { LockAction, Place } from 'lib/Class/Action.js'
 
 /**
@@ -21,12 +21,13 @@ export class Portal {
       const inS = 0
       const stayS = 1.0
       const outS = 1.0
-      player.onScreenDisplay.setTitle('title'+ name ?? '§aShp1nat§6Mine', {
+      player.onScreenDisplay.setTitle('title' + name ?? '§aShp1nat§6Mine', {
         fadeInDuration: inS * 20,
         subtitle: '§2Перемещение...',
         stayDuration: stayS * 20,
         fadeOutDuration: outS * 20,
       })
+      system.runTimeout(() => player.onScreenDisplay.setTitle('title'), 'title unset', ~~((inS + stayS + outS) * 20))
       player.runCommand(
         //                                              red green blue
         `camera @s fade time ${inS} ${stayS} ${outS} color 1 20 10`
