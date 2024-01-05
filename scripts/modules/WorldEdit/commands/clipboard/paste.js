@@ -17,6 +17,7 @@ new Command({
   .int('integrity', true)
   .string('seed', true)
   .executes((ctx, rotation, mirror, includeEntites, includeBlocks, integrity, seed) => {
+    if (isNaN(rotation)) rotation = 0
     let blocks, entities
     if (!includeEntites && !includeBlocks) {
       entities = false
