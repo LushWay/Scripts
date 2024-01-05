@@ -127,11 +127,11 @@ export function getBlockSetForReplaceTarget(ref) {
   return getBlockSetRaw(ref, [undefined])
     .map(e => {
       if (Array.isArray(e)) {
-        const [typeId, states, weight] = e
-        return new Array(weight).fill({ typeId, states })
+        const [typeId, states] = e
+        return { typeId, states }
       } else return e
     })
-    .flat()
+    .filter(Boolean)
 }
 
 /**

@@ -20,6 +20,20 @@ new Command({
       }
       form.show(ctx.sender)
     })
+    .addButton('git status', () => {
+      const form = new ActionForm('Type')
+      /** @type {("sm-api" | "root")[]} */
+      const cwds = ['sm-api', 'root']
+      for (const type of cwds) {
+        form.addButton(type, () => {
+          ctx.reply('§6> §rПринято.')
+          APIRequest('gitStatus', { cwd: type })
+            .then(s => ctx.sender.tell(s.statusMessage))
+            .catch(util.error)
+        })
+      }
+      form.show(ctx.sender)
+    })
     .addButton('backup', () => {
       new ModalForm('Backup')
         .addTextField('Backup commit name\nЛучше всего то, что значимого было изменено', 'ничего не произойдет')
@@ -30,5 +44,6 @@ new Command({
             .catch(util.error)
         })
     })
+
     .show(ctx.sender)
 })
