@@ -1,5 +1,6 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { migration } from 'lib/Database/Migrations.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 /**
@@ -81,10 +82,20 @@ export function setBlockSet(id, setName, set) {
   DB[id] ??= {}
   const db = DB[id]
   if (db) {
-    if (set) db[setName] = set
-    else delete db[setName]
+    if (set) {
+      // Append new set onto start
+      DB[id] = { [setName]: set, ...db }
+    } else {
+      delete db[setName]
+    }
   }
 }
+
+migration('blocks set order', () => {
+  for (const [player, blocksSets] of Object.entries(DB)) {
+    if (blocksSets) DB[player] = Object.fromEntries(Object.entries(blocksSets).reverse())
+  }
+})
 
 /**
  * @overload
