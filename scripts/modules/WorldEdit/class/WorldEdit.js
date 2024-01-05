@@ -9,7 +9,7 @@ import {
 } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { toPermutation } from 'modules/WorldEdit/menu.js'
-import { GAME_UTILS, util } from 'smapi.js'
+import { GAME_UTILS, is, util } from 'smapi.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 import { Structure } from './Structure.js'
@@ -249,6 +249,9 @@ export class WorldEdit {
    */
   async fillBetween(player, blocks, replaceBlocks = [undefined]) {
     if (!this.selectionCuboid) return 'Зона не выделена!'
+    const limit = is(player.id, 'admin') ? 100000 : 1000
+    if (this.selectionCuboid.blocksBetween > limit)
+      return `Размер выделенной области превышает лимит §c(${this.selectionCuboid.blocksBetween}/§f${limit}§c)`
 
     const timeForEachFill = 3
     const fillSize = 32768
