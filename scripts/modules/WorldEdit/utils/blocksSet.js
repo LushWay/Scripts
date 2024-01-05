@@ -121,17 +121,14 @@ export function getBlockSet([player, name]) {
 
 /**
  * @param {BlocksSetRef} ref
- * @returns
  */
 export function getBlockSetForReplaceTarget(ref) {
-  return getBlockSetRaw(ref, [undefined])
-    .map(e => {
-      if (Array.isArray(e)) {
-        const [typeId, states] = e
-        return { typeId, states }
-      } else return e
-    })
-    .filter(Boolean)
+  return getBlockSetRaw(ref, [undefined]).map(e => {
+    if (Array.isArray(e)) {
+      const [typeId, states] = e
+      return { typeId, states: states ?? {} }
+    } else return e
+  })
 }
 
 /**

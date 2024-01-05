@@ -477,6 +477,7 @@ export function editBlockStates(player, states, back, edited = false) {
       )
     )
 
+    // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {
       const stateDef = allStates.find(e => e.id === stateName)
       if (!stateDef) continue
