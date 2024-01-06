@@ -3,7 +3,7 @@ import { SOUNDS } from 'config.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
-import { tpMenuOnce } from '../Features/builderTeleport'
+import { tpMenuOnce } from '../Featuress/builderTeleport'
 
 class AnarchyBuilder extends DefaultPlaceWithInventory {
   /**

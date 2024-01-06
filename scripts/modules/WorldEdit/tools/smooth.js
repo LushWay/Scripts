@@ -38,7 +38,7 @@ const smoother = new SmoothTool({
   editToolForm(slot, player) {
     const lore = smoother.parseLore(slot.getLore())
 
-    new ModalForm('§3Сглаживание')
+    void new ModalForm('§3Сглаживание')
 
       .addSlider('Размер', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.size)
       .addSlider('Сила сглаживания', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.smoothLevel)
