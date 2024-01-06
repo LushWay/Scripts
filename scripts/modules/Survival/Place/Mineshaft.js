@@ -1,3 +1,5 @@
+// TODO Actually generate ore
+
 class MineshaftBuilder {
   /**
    * @param {object} o

@@ -5,6 +5,9 @@ import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.j
 import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
 import { tpMenuOnce } from '../Features/builderTeleport'
 
+// TODO Not set anarchy pos when on spawn
+// TODO TP even if there is no pos
+
 class AnarchyBuilder extends DefaultPlaceWithInventory {
   /**
    * @param {Player} player

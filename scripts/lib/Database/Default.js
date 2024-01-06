@@ -64,13 +64,15 @@ export class DB {
 
     if (this.ALL_TABLE_ENTITIES.length < 1) {
       console.warn('§6Не удалось найти базы данных. Попытка загрузить бэкап...')
+
       world.overworld
         .getEntities({
           location: DB.ENTITY_LOCATION,
           type: DB.ENTITY_IDENTIFIER,
           maxDistance: 2,
         })
-        .forEach(e => e.triggerEvent('minecraft:despawn'))
+        .forEach(e => e.remove())
+
       world.overworld.runCommand(`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`)
       this.ALL_TABLE_ENTITIES = this.getEntities()
 

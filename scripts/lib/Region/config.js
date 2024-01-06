@@ -1,5 +1,4 @@
 import { BlockTypes } from '@minecraft/server'
-import { SYSTEM_ENTITIES } from 'config'
 
 /**
  * All doors and switches in minecraft

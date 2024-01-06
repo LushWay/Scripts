@@ -267,21 +267,22 @@ export class WorldEdit {
       e && e instanceof BlockPermutation ? { typeId: e.type.id, states: e.getAllStates() } : e
     )
 
-    // TODO use O(n) for blocks.length === 1
-    for (const cube of Vector.foreach(this.selectionCuboid.min, this.selectionCuboid.max)) {
+    nextBlock: for (const position of Vector.foreach(this.selectionCuboid.min, this.selectionCuboid.max)) {
       for (const replaceBlock of replaceTargets) {
         try {
-          const block = world.overworld.getBlock(cube)
+          const block = world.overworld.getBlock(position)
 
           if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
           block?.setPermutation(toPermutation(blocks.randomElement()))
+          continue nextBlock
         } catch (e) {
           if (
             !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
             errors < 3
           )
             util.error(e)
+
           errors++
         }
 
@@ -302,7 +303,7 @@ export class WorldEdit {
       reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
     }
     if (replaceTargets.filter(Boolean).length) {
-      reply += `§3, заполняет: §f${replaceTargets
+      reply += `§3, заполняемые блоки: §f${replaceTargets
         .map(e => e?.typeId && GAME_UTILS.toNameTag(e.typeId))
         .filter(Boolean)
         .join(', ')}`
@@ -310,7 +311,7 @@ export class WorldEdit {
 
     if (errors) {
       player.playSound(SOUNDS.fail)
-      return player.tell(`§4► §f${errors}/${all} §cошибок при заполнении, ${reply}`)
+      return player.tell(`§4► §c${errors}/§f${all}§c §cошибок при заполнении, ${reply}`)
     }
     player.playSound(SOUNDS.success)
     player.tell(`§a► ${reply}`)

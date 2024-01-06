@@ -47,7 +47,7 @@ system.runInterval(
         // we calculate if there is near broken block and swap
         // their restore date, so they will restore in reversed order
         const nearBlock = schedules.find(
-          e => Vector.distance(e.location, schedule.location) <= 3 && e.date > schedule.date
+          e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > schedule.date
         )
         if (nearBlock) continue
 
@@ -55,12 +55,13 @@ system.runInterval(
           const block = world.overworld.getBlock(schedule.location)
 
           block?.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
+          // console.debug('Placed', schedule.typeId, schedule.location)
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) continue
           util.error(e)
-        } finally {
-          SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
         }
+
+        SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
       }
     }
   },

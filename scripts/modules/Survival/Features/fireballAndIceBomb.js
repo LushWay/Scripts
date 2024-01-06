@@ -1,7 +1,10 @@
 import { Vector, system, world } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { GAME_UTILS, util } from 'smapi.js'
+// TODO Make custom items and throw effects work properly
+// may use projectileComponent in 1.9.0-beta
+
 // Snow bomb / Fireball
 // world.afterEvents.itemUse.subscribe(data => {
 //   if (!['sm:ice_bomb', 'sm:fireball'].includes(data.itemStack.typeId)) return
@@ -62,7 +65,7 @@ const ICE_BOMB_TRANSOFORM = {
 
 system.runInterval(
   () => {
-    world.overworld.getEntities({ type: 'minecraft:snowball' }).forEach(entity => {
+    world.overworld.getEntities({ type: MinecraftEntityTypes.Snowball }).forEach(entity => {
       const block = entity.dimension.getBlock(entity.location)
       if (block) {
         if (block.typeId in ICE_BOMB_TRANSOFORM) {

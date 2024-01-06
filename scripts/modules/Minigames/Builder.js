@@ -1,6 +1,8 @@
 import { Player } from '@minecraft/server'
 import { LockAction, Sidebar } from 'smapi.js'
 
+// TODO Add minigame place
+
 export class Minigame {
   /** @type {Record<string, Minigame>} */
   static instances = {}

@@ -9,7 +9,7 @@ class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
   slimeBoss = new Boss({
     name: 'slime',
     displayName: 'Слайм',
-    entityTypeId: 'minecraft:' + MinecraftEntityTypes.Slime,
+    entityTypeId: MinecraftEntityTypes.Slime,
     respawnTime: util.ms.from('min', 10),
   })
 }

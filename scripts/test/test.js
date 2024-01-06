@@ -244,14 +244,6 @@ const tests = {
   },
 }
 
-// const i = MinecraftItemTypes;
-// new Store({ x: -180, y: 69, z: -144 }, "minecraft:overworld", {
-// 	prompt: true,
-// })
-// 	.addItem(new ItemStack(i.chest, 5), new MoneyCost(30))
-// 	.addItem(new ItemStack(i.boat), new MoneyCost(10))
-// 	.addItem(new ItemStack(i.apple), new MoneyCost(1));
-
 const c = new Command({
   name: 'test',
   role: 'admin',

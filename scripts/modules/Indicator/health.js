@@ -99,6 +99,9 @@ system.runInterval(
 
 const BAR_SYMBOL = '|'
 
+// TODO Remove when unused
+// TODO Not trigger by closeChat
+
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied
  * @param {Entity} entity
@@ -182,7 +185,17 @@ function updateIndicator({ entity, damage = 0, entityId = GAME_UTILS.safeGet(ent
 
     throw e
   }
-  if (info.separated) info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+  if (info.separated)
+    try {
+      info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+    } catch (e) {
+      if (e instanceof Error && e.message.includes("Failed to call function 'getHeadLocation'")) {
+        try {
+          info.indicator.remove()
+        } catch {}
+        delete HURT_ENTITIES[entityId]
+      }
+    }
 }
 
 /**

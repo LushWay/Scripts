@@ -338,7 +338,7 @@ export const util = {
         plurals: ['секунда', 'секунды', 'секунд'],
       },
       min: {
-        time: 1000,
+        time: 1000 * 60,
         plurals: ['минуту', 'минуты', 'минут'],
         friction: 1,
       },

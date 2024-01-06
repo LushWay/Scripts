@@ -6,6 +6,9 @@ import { isBuilding } from 'modules/Build/list.js'
 import { Menu } from 'modules/Server/menuItem.js'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 
+// TODO Migrate player inv to root db and set it to anarchy
+// TODO TP to spawn when region is not same ===
+
 class SpawnBuilder extends DefaultPlaceWithInventory {
   /**
    * @type {InventoryTypeName}

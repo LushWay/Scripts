@@ -24,6 +24,11 @@ export class Region {
   }
 
   /**
+   * @type {Map<string, Region>}
+   */
+  static locationInRegionCacheMap = new Map()
+
+  /**
    * Checks if a block location is in region
    * @param {Vector3} blockLocation
    * @param {Dimensions} dimensionId
