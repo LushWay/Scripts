@@ -249,9 +249,12 @@ export class WorldEdit {
    */
   async fillBetween(player, blocks, replaceBlocks = [undefined]) {
     if (!this.selectionCuboid) return 'Зона не выделена!'
-    const limit = is(player.id, 'admin') ? 100000 : 1000
-    if (this.selectionCuboid.blocksBetween > limit)
-      return `Размер выделенной области превышает лимит §c(${this.selectionCuboid.blocksBetween}/§f${limit}§c)`
+    const limit = is(player.id, 'admin') ? 100000 : is(player.id, 'moderator') ? 10000 : 1000
+    if (this.selectionCuboid.blocksBetween > limit) {
+      return player.tell(
+        `§cРазмер выделенной области превышает лимит §c(${this.selectionCuboid.blocksBetween}/§f${limit}§c)`
+      )
+    }
 
     const timeForEachFill = 3
     const fillSize = 32768
