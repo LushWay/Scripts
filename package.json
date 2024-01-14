@@ -1,6 +1,6 @@
 {
   "name": "sm-api",
-  "version": "0.17.19",
+  "version": "0.17.20",
   "license": "MIT",
   "scripts": {
     "lint": "eslint ./scripts/ --fix",
