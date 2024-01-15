@@ -136,6 +136,21 @@ const brush = new BrushTool({
   },
 })
 
+brush.command
+  .literal({ name: 'extrasize' })
+  .int('Size')
+  .executes((ctx, size) => {
+    if (isNaN(size)) return ctx.error('Размер не является числом')
+
+    const tool = brush.getToolSlot(ctx.sender)
+    if (typeof tool === 'string') return ctx.error(tool)
+
+    const lore = brush.parseLore(tool.getLore())
+    lore.size = size
+    tool.setLore(brush.stringifyLore(lore))
+    ctx.reply('Успешно')
+  })
+
 WorldEditTool.intervals.push((player, slot) => {
   if (slot.typeId !== brush.itemId && BRUSH_LOCATORS[player.id]) {
     BRUSH_LOCATORS[player.id]?.remove()
