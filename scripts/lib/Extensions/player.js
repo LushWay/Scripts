@@ -27,21 +27,13 @@ OverTakes(Player.prototype, {
     })
   },
   closeChat(message) {
-    const fail = () => (message && this.tell(message), false)
-    const health = this.getComponent('health')
-    if (!health) return fail()
-
-    const current = health.currentValue
-    if (current <= 1) fail()
-
     // We need to switch player to gamemode where we can apply damage to them
     const isCreative = this.isGamemode('creative')
     if (isCreative) this.runCommand('gamemode s')
 
-    this.applyDamage(1, {
+    this.applyDamage(0, {
       cause: EntityDamageCause.entityAttack,
     })
-    health.setCurrentValue(current)
     this.runCommand('stopsound @s game.player.hurt')
 
     // Return player back to creative mode

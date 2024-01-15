@@ -80,14 +80,14 @@ export async function showForm(form, player) {
 
       if (response.cancelationReason === UserBusy) {
         // First attempt, maybe chat closed...
-        if (i === 1) {
+        if (i === 0) {
           player.closeChat()
         }
 
-        // 10 Attempt, tell player to manually close chat...
-        if (i === 2) {
+        // Second attempt, tell player to manually close chat...
+        if (i === 1) {
           player.tell('§b> §3Закрой чат!')
-          await system.sleep(40)
+          await system.sleep(30)
         }
 
         // Last attempt, we cant do anything
