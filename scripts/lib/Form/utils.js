@@ -62,6 +62,8 @@ export class FormCallback {
 }
 const { UserBusy, UserClosed } = FormCancelationReason
 
+
+
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it
  * succeeds or the maximum number of attempts is reached.
@@ -80,14 +82,14 @@ export async function showForm(form, player) {
 
       if (response.cancelationReason === UserBusy) {
         // First attempt, maybe chat closed...
-        if (i === 0) {
+        if (i === 1) {
           player.closeChat()
         }
 
         // Second attempt, tell player to manually close chat...
-        if (i === 1) {
+        if (i === 2) {
           player.tell('§b> §3Закрой чат!')
-          await system.sleep(30)
+          await system.sleep(60)
         }
 
         // Last attempt, we cant do anything
