@@ -4,6 +4,7 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { TIMERS_PATHES, util } from 'smapi.js'
 
+// TODO Show player nicknames below to ids in player db
 const db = new Command({
   name: 'db',
   description: 'Просматривает базу данных',

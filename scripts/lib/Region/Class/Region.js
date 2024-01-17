@@ -3,6 +3,7 @@ import { DB } from 'lib/Database/Default.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 import { DEFAULT_REGION_PERMISSIONS } from 'lib/Region/config.js'
 import { util } from 'lib/util.js'
+
 /**
  * Main class that represents protected region in the world.
  */
@@ -54,7 +55,7 @@ export class Region {
    * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
    * @param {string} [o.key] - The key of the region. This is used to identify the region.
    */
-  constructor({ dimensionId, permissions, key }) {
+  constructor({ dimensionId, key }) {
     this.dimensionId = dimensionId
     this.key = key ?? new Date(Date.now()).toISOString()
   }

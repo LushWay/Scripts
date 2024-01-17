@@ -45,7 +45,7 @@ export class Cuboid {
    * Returns the amount of blocks in this cuboid
    * @returns {number}
    */
-  get blocksBetween() {
+  get size() {
     const x = this.xMax - this.xMin + 1
     const y = this.yMax - this.yMin + 1
     const z = this.zMax - this.zMin + 1

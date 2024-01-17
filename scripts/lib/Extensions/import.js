@@ -1,6 +1,7 @@
 import './dimension.js'
 import './enviroment.js'
 import './itemstack.js'
+import './onScreenDisplay.js'
 import './player.js'
 import './sm.js'
 import './system.js'

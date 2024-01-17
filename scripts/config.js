@@ -23,8 +23,6 @@ export const CUSTOM_ENTITIES = {
   floatingText: 'f:t',
 }
 
-export const SYSTEM_ENTITIES = [CUSTOM_ENTITIES.database, CUSTOM_ENTITIES.floatingText, CUSTOM_ENTITIES.sit]
-
 export const SOUNDS = {
   levelup: 'random.levelup',
   success: 'note.pling',

@@ -1,10 +1,14 @@
-import { Block, BlockTypes, Entity, ItemStack, Player } from '@minecraft/server'
+import { Block, BlockTypes, Entity, ItemStack, LocationInUnloadedChunkError, Player, world } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { showForm } from '../Form/utils.js'
 import { untyped_terrain_textures } from '../List/terrain-textures.js'
 import { MODULE } from './OptionalModules.js'
 import { inaccurateSearch } from './Search.js'
+
+// TODO Split into each separate function
+// TODO Add docs
+// TODO Remove unused functions
 
 export const GAME_UTILS = {
   /**
@@ -136,6 +140,31 @@ export const GAME_UTILS = {
       return undefined
     }
   },
+}
+
+/**
+ * Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it)
+ * and returns it
+ * @param {object} o - Options
+ * @param {Vector3} o.location - Location to check
+ * @param {Dimensions} o.dimensionId - Dimensions to check
+ * @returns - Block on location
+ */
+export function blockStatus({ location, dimensionId }) {
+  try {
+    return world[dimensionId].getBlock(location)
+  } catch (e) {
+    if (e instanceof LocationInUnloadedChunkError) return 'unloaded'
+    throw e
+  }
+}
+
+/**
+ * Checks if chunks is loaded (e.g. we can operate with blocks/entities on it)
+ * @param {Parameters<typeof blockStatus>[0]} options
+ */
+export function chunkIsUnloaded(options) {
+  return blockStatus(options) !== 'unloaded'
 }
 
 /** @type {string[]} */

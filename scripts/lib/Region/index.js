@@ -8,10 +8,9 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { SYSTEM_ENTITIES } from 'config.js'
 import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { Region } from './Class/Region.js'
-import { BLOCK_CONTAINERS, DOORS_SWITCHES } from './config.js'
+import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES } from './config.js'
 import './init.js'
 export * from './Class/CubeRegion.js'
 export * from './Class/RadiusRegion.js'
@@ -19,8 +18,6 @@ export * from './Class/Region.js'
 export * from './DB.js'
 export * from './command.js'
 export * from './config.js'
-
-let LOADED = false
 
 /**
  * @callback interactionAllowed
@@ -41,6 +38,8 @@ let LOADED = false
  * @param {EntitySpawnAfterEvent} data
  */
 
+let LOADED = false
+
 /**
  * Loads regions with specified guards.
  * WARNING! Loads only one time
@@ -60,7 +59,7 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
     const region = Region.locationInRegion(event.block, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithBlock', event })) return
 
-    if (DOORS_SWITCHES.includes(event.block.typeId) && region?.permissions?.doorsAndSwitches) return
+    if (DOORS_AND_SWITCHES.includes(event.block.typeId) && region?.permissions?.doorsAndSwitches) return
     if (BLOCK_CONTAINERS.includes(event.block.typeId) && region?.permissions?.openContainers) return
 
     event.cancel = true
@@ -72,6 +71,9 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
   world.beforeEvents.playerInteractWithEntity.subscribe(event => {
     const region = Region.locationInRegion(event.target.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithEntity', event })) return
+
+    // Allow npc etc
+    if (INTERACTABLE_ENTITIES.includes(event.target.typeId)) return
 
     event.cancel = true
   })
@@ -101,7 +103,7 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
     const typeId = GAME_UTILS.safeGet(entity, 'typeId')
     const location = GAME_UTILS.safeGet(entity, 'location')
     const dimension = GAME_UTILS.safeGet(entity, 'dimension')
-    if (!typeId || !location || !dimension || SYSTEM_ENTITIES.includes(typeId) || !entity.isValid()) return
+    if (!typeId || !location || !dimension || NOT_MOB_ENTITIES.includes(typeId) || !entity.isValid()) return
 
     const region = Region.locationInRegion(location, dimension.type)
     if (spawnAllowed(region, { entity, cause })) return

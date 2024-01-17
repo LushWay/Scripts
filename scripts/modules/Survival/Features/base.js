@@ -1,11 +1,11 @@
-import { ItemStack, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
+import { ItemStack, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { MoneyCost, Store } from 'lib/Class/Store.js'
 import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
 import { INTERACTION_GUARD } from 'modules/Survival/config.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region } from 'smapi.js'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus } from 'smapi.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§r§6База',
@@ -102,15 +102,8 @@ system.runInterval(
     })
 
     for (const base of Region.regionInstancesOf(BaseRegion)) {
-      let block
-      try {
-        block = world[base.dimensionId].getBlock(Vector.floor(base.center))
-      } catch (e) {
-        if (e instanceof LocationInUnloadedChunkError) continue
-        else throw e
-      }
-
-      if (!block) continue
+      const block = blockStatus({ location: base.center, dimensionId: base.dimensionId })
+      if (!block || block === 'unloaded') continue
       if (block.typeId === MinecraftBlockTypes.Barrel) {
         if (playersLocations.find(e => e.dimension === base.dimensionId && Vector.distance(base.center, e.loc) < 10)) {
           spawnParticlesInArea(base.center, Vector.add(base.center, Vector.one))

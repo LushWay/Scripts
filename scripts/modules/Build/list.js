@@ -94,5 +94,5 @@ PLAYER_NAME_TAG_MODIFIERS.push(p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`
  * @param {Player} player
  */
 function setBuildingTip(player, value = true) {
-  player.onScreenDisplay.setTitle('§t§i§p1' + (value ? 'Режим стройки' : ''))
+  player.onScreenDisplay.setTip(1, value ? 'Режим стройки' : '')
 }

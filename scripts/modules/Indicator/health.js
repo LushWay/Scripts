@@ -1,6 +1,7 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { CUSTOM_ENTITIES, SYSTEM_ENTITIES } from 'config.js'
+import { CUSTOM_ENTITIES } from 'config.js'
+import { NOT_MOB_ENTITIES } from 'lib/Region/config'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
 import { GAME_UTILS, util } from 'smapi.js'
 
@@ -35,7 +36,7 @@ world.afterEvents.entityHurt.subscribe(data => {
   if (data.damage === 0) return
   // Validate entity
   const id = GAME_UTILS.safeGet(data.hurtEntity, 'id')
-  if (!id || SYSTEM_ENTITIES.includes(id)) return
+  if (!id || NOT_MOB_ENTITIES.includes(id)) return
   if (
     !data.hurtEntity.isValid() ||
     !(data.hurtEntity.matches({ families: ALLOWED_FAMILIES }) || data.hurtEntity instanceof Player)

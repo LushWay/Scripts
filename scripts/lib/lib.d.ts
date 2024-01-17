@@ -107,6 +107,21 @@ declare module '@minecraft/server' {
     database: PlayerDatabase
   }
 
+  interface ScreenDisplay {
+    /**
+     * Sets player sidebar
+     * @param text Text to set
+     */
+    setSidebar(text: string): void
+
+    /**
+     * Sets player tip
+     * @param n Tip position
+     * @param text Tip text
+     */
+    setTip(n: 1 | 2 | 3 | 4 | 5, text: string): void
+  }
+
   interface Entity {
     readonly container?: Container
   }

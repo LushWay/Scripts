@@ -14,6 +14,9 @@ import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 import { Structure } from './Structure.js'
 
+// TODO Undo/redo manage menu
+// TODO Undo redo menu for any player
+// TODO Force set when selection is big
 export class WorldEdit {
   /**
    * @param {Player} player
@@ -80,14 +83,10 @@ export class WorldEdit {
   undos = []
 
   /**
-   * @type {{pos1:Vector3; pos2:Vector3; name:string}}
+   * @type {Structure | undefined}
    * @private
    */
-  currentCopy = {
-    pos1: Vector.one,
-    pos2: Vector.one,
-    name: '',
-  }
+  currentCopy
 
   /**
    * @type {Player}
@@ -115,7 +114,7 @@ export class WorldEdit {
   drawSelection() {
     if (!this.drawselection || !this.selectionCuboid || !this.visualSelectionCuboid) return
 
-    if (this.selectionCuboid.blocksBetween > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
+    if (this.selectionCuboid.size > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
 
     spawnParticlesInArea(this.visualSelectionCuboid.pos1, this.visualSelectionCuboid.pos2, this.visualSelectionCuboid)
   }
@@ -182,17 +181,10 @@ export class WorldEdit {
     try {
       if (!this.selectionCuboid) return '§4► §cЗона для копирования не выделена!'
 
-      const result = world.overworld.runCommand(
-        `structure save ${WE_CONFIG.COPY_FILE_NAME} ${this.pos1.x} ${this.pos1.y} ${this.pos1.z} ${this.pos2.x} ${this.pos2.y} ${this.pos2.z} false memory`
-      )
-      if (!result) return `§4► §cНе удалось скопировать, вызов команды возвратил ошибку.`
-
-      this.currentCopy = {
-        pos1: this.pos1,
-        pos2: this.pos2,
-        name: WE_CONFIG.COPY_FILE_NAME,
-      }
-      return `§9► §fСкопированно из ${Vector.string(this.pos1)} в ${Vector.string(this.pos2)}`
+      this.currentCopy = new Structure(WE_CONFIG.COPY_FILE_NAME + this.player.id, this.pos1, this.pos2)
+      return `§9► §fСкопирована область ${Vector.string(this.pos1)} - ${Vector.string(this.pos2)} размером ${
+        this.selectionCuboid.size
+      }`
     } catch (error) {
       util.error(error)
       return `§4► §cНе удалось скорпировать: ${error.message}`
@@ -220,23 +212,29 @@ export class WorldEdit {
     seed = ''
   ) {
     try {
+      if (!this.currentCopy) return '§4► §cВы ничего не копировали!'
       const dx = Math.abs(this.currentCopy.pos2.x - this.currentCopy.pos1.x)
       const dy = Math.abs(this.currentCopy.pos2.y - this.currentCopy.pos1.y)
       const dz = Math.abs(this.currentCopy.pos2.z - this.currentCopy.pos1.z)
-      const pos2 = Vector.add(player.location, new Vector(dx, dy, dz))
+      const pastePos1 = Vector.floor(player.location)
+      const pastePos2 = Vector.add(player.location, { x: dx, y: dy, z: dz })
 
-      const loc = Vector.floor(player.location)
+      this.backup(pastePos1, pastePos2)
 
-      this.backup(loc, pos2)
+      try {
+        this.currentCopy.load(
+          pastePos1,
+          `${String(rotation).replace('NaN', '0')}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${
+            integrity ? integrity : ''
+          } ${seed ? seed : ''}`
+        )
+      } catch (e) {
+        if (e instanceof Error) {
+          return e.message
+        } else throw new Error(e)
+      }
 
-      player.runCommand(
-        `structure load ${WE_CONFIG.COPY_FILE_NAME} ~ ~ ~ ${String(rotation).replace(
-          'NaN',
-          '0'
-        )}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${integrity ? integrity : ''} ${seed ? seed : ''}`
-      )
-
-      return `§a► §rВставлено в ${loc.x} ${loc.y} ${loc.z}`
+      return `§a► §rУспешно вставлено в ${Vector.string(pastePos1)}`
     } catch (error) {
       util.error(error)
       return `§4► §cНе удалось вставить: ${error.message}`
@@ -250,15 +248,13 @@ export class WorldEdit {
   async fillBetween(player, blocks, replaceBlocks = [undefined]) {
     if (!this.selectionCuboid) return 'Зона не выделена!'
     const limit = is(player.id, 'admin') ? 100000 : is(player.id, 'moderator') ? 10000 : 1000
-    if (this.selectionCuboid.blocksBetween > limit) {
-      return player.tell(
-        `§cРазмер выделенной области превышает лимит §c(${this.selectionCuboid.blocksBetween}/§f${limit}§c)`
-      )
+    if (this.selectionCuboid.size > limit) {
+      return player.tell(`§cРазмер выделенной области превышает лимит §c(${this.selectionCuboid.size}/§f${limit}§c)`)
     }
 
     const timeForEachFill = 3
     const fillSize = 32768
-    const time = Math.round((this.selectionCuboid.blocksBetween / fillSize) * timeForEachFill * 0.05)
+    const time = Math.round((this.selectionCuboid.size / fillSize) * timeForEachFill * 0.05)
     if (time >= 0.01) player.tell(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`)
     const startTime = Date.now()
     this.backup()
@@ -298,8 +294,8 @@ export class WorldEdit {
       timeTypes: ['ms', 'sec', 'min'],
     })
 
-    let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${this.selectionCuboid.blocksBetween} §3${util.ngettext(
-      this.selectionCuboid.blocksBetween,
+    let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${this.selectionCuboid.size} §3${util.ngettext(
+      this.selectionCuboid.size,
       ['блок', 'блока', 'блоков']
     )}`
     if (endTime.parsedTime !== '0') {

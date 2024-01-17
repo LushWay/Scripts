@@ -3,6 +3,8 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { PLAYER_DB, ROLES, getRole, setRole, util } from 'smapi.js'
 
+// TODO In edit role menu show current roles
+// TODO Show offline players too
 const roleCommand = new Command({
   name: 'role',
   description: 'Показывает вашу роль',

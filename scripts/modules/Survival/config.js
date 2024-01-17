@@ -20,6 +20,10 @@ INTERACTION_GUARD.subscribe(player => {
 }, 100)
 
 INTERACTION_GUARD.subscribe((player, region, ctx) => {
+  // Allow interacting with any npc by default
+  if (ctx.type === 'interactWithEntity' && !region?.permissions.pvp) {
+    return true
+  }
   if (!region) {
     // TODO Maybe move somewhere
     // TODO allow on enemy base to disable detecting enemy base

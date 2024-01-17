@@ -2,15 +2,18 @@ import { world } from '@minecraft/server'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 
+// TODO Loading using tickingareas
+
 export class Structure {
   /**
+   * @private
    * @type {{
    *		name: string,
    *		pos1: Vector3,
    *		pos2: Vector3,
    *	}[]}
    */
-  files = []
+  structures = []
 
   /**
    * Creates a new structure save
@@ -18,8 +21,8 @@ export class Structure {
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
-  constructor(prefix, pos1, pos2) {
-    this.id = Date.now().toString(32)
+  constructor(prefix, pos1, pos2, id = Date.now().toString(32)) {
+    this.id = id
     this.prefix = `${prefix}|${this.id}`
     this.pos1 = pos1
     this.pos2 = pos2
@@ -28,21 +31,21 @@ export class Structure {
   }
 
   save() {
-    const regions = new Cuboid(this.pos1, this.pos2).split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
+    const cubes = new Cuboid(this.pos1, this.pos2).split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
 
     let errors = 0
     let all = 0
-    for (const region of regions) {
-      const name = `${this.prefix}|${regions.indexOf(region)}`
-      const pos1 = region.pos1
-      const pos2 = region.pos2
+    for (const [i, cube] of cubes.entries()) {
+      const name = `${this.prefix}|${i}`
+      const pos1 = cube.pos1
+      const pos2 = cube.pos2
       const result = world.overworld.runCommand(
         `structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} false memory true`,
         { showError: true }
       )
       all++
       if (result > 0) {
-        this.files.push({
+        this.structures.push({
           name,
           pos1,
           pos2,
@@ -72,15 +75,18 @@ export class Structure {
         */
       }
     }
-    if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не сохранено.`)
+    if (errors > 0)
+      throw new Error(
+        `§c${errors}§f/§a${all}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+      )
   }
 
-  async load() {
+  async load(pos = this.pos1, additional = '') {
     let errors = 0
     let all = 0
-    for (const file of this.files) {
+    for (const file of this.structures) {
       const result = world.overworld.runCommand(
-        `structure load "${file.name}" ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`,
+        `structure load "${file.name}" ${pos.x} ${pos.y} ${pos.z}${additional}`,
         {
           showError: true,
         }
@@ -105,6 +111,9 @@ export class Structure {
       }
       await nextTick
     }
-    if (errors > 0) throw new Error(`§c${errors}§f/§a${all}§f не загружено.`)
+    if (errors > 0)
+      throw new Error(
+        `§c${errors}§f/§2${all}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+      )
   }
 }

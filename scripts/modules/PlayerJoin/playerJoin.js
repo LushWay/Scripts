@@ -75,7 +75,7 @@ class JoinBuilder {
                 player.onScreenDisplay.setActionBar(Join.config.actionBar)
               }
 
-              player.onScreenDisplay.setTitle('title' + title, {
+              player.onScreenDisplay.setTitle(title, {
                 fadeInDuration: 0,
                 fadeOutDuration: 20,
                 stayDuration: 40,
@@ -130,8 +130,6 @@ class JoinBuilder {
       if (settings.sound) other.playSound(Join.config.messages.sound)
       if (settings.message) other.tell(`§7${player.name} ${Join.config.messages[messageType]}`)
     }
-
-    player.onScreenDisplay.setTitle('title')
 
     EventSignal.emit(this.onMoveAfterJoin, {
       player,

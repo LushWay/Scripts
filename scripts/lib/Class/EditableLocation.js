@@ -2,6 +2,9 @@ import { Player, Vector } from '@minecraft/server'
 import { util } from '../util.js'
 import { EventLoaderWithArg } from './EventSignal.js'
 import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
+// TODO Location edit form
+// from command -locations
+// location grouping
 
 /**
  * @typedef {'vector3' | 'vector3+rotation' | 'vector3+radius'} LocationTypeSuperset

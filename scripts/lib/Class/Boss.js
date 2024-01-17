@@ -6,10 +6,11 @@
 }
  */
 
-import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 import { EditableLocation } from 'lib/Class/EditableLocation.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { BossArenaRegion } from 'lib/Region/index.js'
+import { chunkIsUnloaded } from 'smapi.js'
 
 /**
  * @typedef {{
@@ -75,15 +76,7 @@ export class Boss {
   }
 
   check() {
-    // Make sure that the location is loaded
-    try {
-      const block = world[this.dimensionId].getBlock(this.location)
-      if (!block) return
-    } catch (error) {
-      if (error instanceof LocationInUnloadedChunkError) {
-        return
-      } else throw error
-    }
+    if (chunkIsUnloaded(this)) return
 
     const db = BOSS_DB[this.name]
     if (db) {

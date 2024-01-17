@@ -79,7 +79,7 @@ system.runPlayerInterval(
     const minigame = Minigame.getCurrent(player)
     if (minigame) return minigame.sidebar.show(player)
     if (sidebarSettings(player).enabled) sidebar.show(player)
-    system.delay(() => player.onScreenDisplay.setTitle('§t§i§p5' + '§7shp1nat-59955.portmap.io'))
+    system.delay(() => player.onScreenDisplay.setTip(5, '§7shp1nat-59955.portmap.io'))
   },
   'Survival sidebar',
   20
