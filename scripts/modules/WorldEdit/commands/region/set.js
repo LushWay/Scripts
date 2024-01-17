@@ -10,7 +10,7 @@ import { WorldEdit } from '../../class/WorldEdit.js'
 const set = new Command({
   name: 'set',
   description: 'Частично или полностью заполняет блоки в выделенной области',
-  role: 'moderator',
+  role: 'builder',
 })
 
 set.string('block').executes((ctx, block) => {
