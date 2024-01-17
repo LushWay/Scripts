@@ -51,10 +51,10 @@ export class DefaultPlaceWithSafeArea {
    */
   constructor(name) {
     this.name = name
-    this.portalTeleportsTo = new EditableLocation(name + ' портал телепортирует на', { type: 'vector3+rotation' })
-    this.portalPos2 = new EditableLocation(name + ' портал от', { type: 'vector3' })
-    this.portalPos1 = new EditableLocation(name + ' портал до', { type: 'vector3' })
-    this.safeAreaLocation = new EditableLocation(name + ' мирная зона', { type: 'vector3+radius' })
+    this.portalTeleportsTo = new EditableLocation(name + ' портал телепортирует на', { type: 'vector3+rotation' }).safe
+    this.portalPos2 = new EditableLocation(name + ' портал от', { type: 'vector3' }).safe
+    this.portalPos1 = new EditableLocation(name + ' портал до', { type: 'vector3' }).safe
+    this.safeAreaLocation = new EditableLocation(name + ' мирная зона', { type: 'vector3+radius' }).safe
     this.safeAreaLocation.onLoad.subscribe(location => {
       this.safeArea = new SafeAreaRegion({
         name,

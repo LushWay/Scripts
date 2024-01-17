@@ -1,10 +1,11 @@
 import { Player, Vector, world } from '@minecraft/server'
+import { Spawn } from 'modules/Survival/Place/Spawn.js'
 import { StoneQuarry } from 'modules/Survival/Place/StoneQuarry.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'
 import { VillageOfExplorers } from 'modules/Survival/Place/VillafeOfExplorers.js'
 import { VillageOfMiners } from 'modules/Survival/Place/VillageOfMiners.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
-import { ActionForm, ROLES, getRole } from 'smapi.js'
+import { ActionForm, ROLES, getRole, util } from 'smapi.js'
 
 new Command({
   name: 'tp',
@@ -21,6 +22,10 @@ export function tpMenu(player) {
   const form = new ActionForm('Выберите локацию', 'также доступна из команды -tp')
 
   const players = world.getAllPlayers().map(e => ({ player, location: e.location }))
+
+  /**
+   * @type {Record<string, ReturnType<typeof location>>}
+   */
   const locations = {
     'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10', players),
     'Деревня исследователей': location(VillageOfExplorers, '-35 75 13661 0 20', players),
@@ -28,8 +33,13 @@ export function tpMenu(player) {
     'Техноград': location(TechCity, '-1288 64 13626 90 -10', players),
   }
 
+  if (Spawn.region)
+    locations['Спавн'] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
+
   for (const [name, { location, players }] of Object.entries(locations)) {
-    form.addButton(name + '(' + players + ')', () => player.runCommand('tp ' + location))
+    form.addButton(`${name} (${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () =>
+      player.runCommand('tp ' + location)
+    )
   }
 
   form.addButton('Телепорт к игроку', () => tpToPlayer(player))
@@ -46,7 +56,7 @@ function tpToPlayer(player) {
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    form.addButton(`${ROLES[getRole(p.id)]} ${p.name}`, () => player.teleport(p.location))
+    form.addButton(`${ROLES[getRole(p.id)]} §f${p.name}`, () => player.teleport(p.location))
   }
 
   form.show(player)
@@ -54,7 +64,7 @@ function tpToPlayer(player) {
 
 /**
  *
- * @param {DefaultPlaceWithSafeArea} place
+ * @param {Pick<DefaultPlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>} place
  * @param {string} fallback
  * @param {{player: Player, location: Vector3}[]} players
  */
