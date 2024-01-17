@@ -2,7 +2,7 @@ import { Player, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { TIMERS_PATHES, util } from 'smapi.js'
+import { PLAYER_DB, ROLES, TIMERS_PATHES, getRole, util } from 'smapi.js'
 
 // TODO Show player nicknames below to ids in player db
 const db = new Command({
@@ -111,7 +111,12 @@ function showTable(player, table) {
   }
 
   const keys = Object.keys(proxy)
-  for (const key of keys) {
+  for (let key of keys) {
+    if (table === 'players') {
+      /** @type {typeof PLAYER_DB} */
+      const p = proxy
+      key += `${p[key].name} (${ROLES[getRole(key)] ?? 'Без роли'})`
+    }
     menu.addButton(key, () => propertyForm(key))
   }
 
