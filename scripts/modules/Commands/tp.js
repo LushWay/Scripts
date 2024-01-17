@@ -19,7 +19,7 @@ new Command({
  * @param {Player} player
  */
 export function tpMenu(player) {
-  const form = new ActionForm('Выберите локацию', 'также доступна из команды -tp')
+  const form = new ActionForm('Выберите локацию', 'Также доступна из команды -tp')
 
   const players = world.getAllPlayers().map(e => ({ player, location: e.location }))
 
@@ -42,7 +42,7 @@ export function tpMenu(player) {
     )
   }
 
-  form.addButton('Телепорт к игроку', () => tpToPlayer(player))
+  form.addButton('Телепорт к игроку...', () => tpToPlayer(player))
 
   return form.show(player)
 }
@@ -51,12 +51,12 @@ export function tpMenu(player) {
  * @param {Player} player
  */
 function tpToPlayer(player) {
-  const form = new ActionForm('Телепорт к игроку')
+  const form = new ActionForm('Телепорт к игроку...')
 
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    form.addButton(`${ROLES[getRole(p.id)]} §f${p.name}`, () => player.teleport(p.location))
+    form.addButton(`${ROLES[getRole(p.id)]} §r${p.name}`, () => player.teleport(p.location))
   }
 
   form.show(player)
