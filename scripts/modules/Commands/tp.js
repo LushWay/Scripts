@@ -1,10 +1,10 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player, Vector, world } from '@minecraft/server'
 import { StoneQuarry } from 'modules/Survival/Place/StoneQuarry.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'
 import { VillageOfExplorers } from 'modules/Survival/Place/VillafeOfExplorers.js'
 import { VillageOfMiners } from 'modules/Survival/Place/VillageOfMiners.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
-import { ActionForm } from 'smapi.js'
+import { ActionForm, ROLES, getRole } from 'smapi.js'
 
 new Command({
   name: 'tp',
@@ -18,7 +18,7 @@ new Command({
  * @param {Player} player
  */
 export function tpMenu(player) {
-  const form = new ActionForm('Выберите локацию')
+  const form = new ActionForm('Выберите локацию', 'также доступна из команды -tp')
 
   const locations = {
     'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10'),
@@ -31,7 +31,22 @@ export function tpMenu(player) {
     form.addButton(name, () => player.runCommand('tp ' + location))
   }
 
+  form.addButton('Телепорт к игроку', () => tpToPlayer(player))
+
   return form.show(player)
+}
+
+/**
+ * @param {Player} player
+ */
+function tpToPlayer(player) {
+  const form = new ActionForm('Телепорт к игроку')
+
+  form.addButtonBack(() => tpMenu(player))
+
+  for (const p of world.getAllPlayers()) {
+    form.addButton(`${ROLES[getRole(p.id)]} ${p.name}`, () => player.teleport(p.location))
+  }
 }
 
 /**
