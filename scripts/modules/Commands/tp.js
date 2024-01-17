@@ -20,15 +20,16 @@ new Command({
 export function tpMenu(player) {
   const form = new ActionForm('Выберите локацию', 'также доступна из команды -tp')
 
+  const players = world.getAllPlayers().map(e => ({ player, location: e.location }))
   const locations = {
-    'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10'),
-    'Деревня исследователей': location(VillageOfExplorers, '-35 75 13661 0 20'),
-    'Каменоломня': location(StoneQuarry, '-1300 76 14800 -90 5'),
-    'Техноград': location(TechCity, '-1288 64 13626 90 -10'),
+    'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10', players),
+    'Деревня исследователей': location(VillageOfExplorers, '-35 75 13661 0 20', players),
+    'Каменоломня': location(StoneQuarry, '-1300 76 14800 -90 5', players),
+    'Техноград': location(TechCity, '-1288 64 13626 90 -10', players),
   }
 
-  for (const [name, location] of Object.entries(locations)) {
-    form.addButton(name, () => player.runCommand('tp ' + location))
+  for (const [name, { location, players }] of Object.entries(locations)) {
+    form.addButton(name + '(' + players + ')', () => player.runCommand('tp ' + location))
   }
 
   form.addButton('Телепорт к игроку', () => tpToPlayer(player))
@@ -47,19 +48,30 @@ function tpToPlayer(player) {
   for (const p of world.getAllPlayers()) {
     form.addButton(`${ROLES[getRole(p.id)]} ${p.name}`, () => player.teleport(p.location))
   }
+
+  form.show(player)
 }
 
 /**
  *
  * @param {DefaultPlaceWithSafeArea} place
  * @param {string} fallback
+ * @param {{player: Player, location: Vector3}[]} players
  */
-function location(place, fallback) {
+function location(place, fallback, players) {
+  const playersC = players.filter(e => place.safeArea.vectorInRegion(e.location)).length
+
   if (place.portalTeleportsTo.valid) {
-    return (
-      Vector.string(place.portalTeleportsTo) + ' ' + place.portalTeleportsTo.xRot + ' ' + place.portalTeleportsTo.yRot
-    )
+    return {
+      players: playersC,
+      location:
+        Vector.string(place.portalTeleportsTo) +
+        ' ' +
+        place.portalTeleportsTo.xRot +
+        ' ' +
+        place.portalTeleportsTo.yRot,
+    }
   }
 
-  return fallback
+  return { location: fallback, players: playersC }
 }
