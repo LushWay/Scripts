@@ -30,5 +30,5 @@ new Command({
       return ctx.error('Неправильный градус: §f' + rotation)
 
     const we = WorldEdit.forPlayer(ctx.sender)
-    ctx.reply(we.paste(ctx.sender, rotation, mirror, entities, blocks, integrity, seed))
+    we.paste(ctx.sender, rotation, mirror, entities, blocks, integrity, seed)
   })

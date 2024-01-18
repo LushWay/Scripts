@@ -2,7 +2,10 @@
  * @typedef {import("../../../../../tools/server/Net/routes.js").NODE_ROUTES} NODE_ROUTES
  */
 
+import { util } from 'lib/util.js'
 import { MODULE } from './OptionalModules.js'
+
+class APIError extends Error {}
 
 /**
  * Makes http request to node.js instance
@@ -13,7 +16,8 @@ import { MODULE } from './OptionalModules.js'
  */
 export async function APIRequest(path, body) {
   const sbody = JSON.stringify(body)
-  console.warn('REQ TO ', path, ' WITH BODY ', sbody)
+  const prefix = `APIRequest('${path}'`
+  console.warn(`${prefix},`, body, '§r)')
   if (MODULE.ServerNet) {
     const { http, HttpRequest, HttpRequestMethod } = MODULE.ServerNet
     const response = await http.request(
@@ -23,9 +27,18 @@ export async function APIRequest(path, body) {
         .addHeader('content-length', sbody.length.toString())
         .setBody(sbody)
     )
-    const body = JSON.safeParse(response.body, void 0, err => console.warn('Error while parsing ', response.body, err))
 
-    if (!body || body.status === 404) throw new Error(body?.message ?? 'Got unexpected body: ' + response.body)
+    let body
+    try {
+      body = JSON.parse(response.body)
+    } catch (e) {
+      const error = util.error(e, { returnText: true })
+      throw new APIError('Failed to parse NodeServer response.body: ' + util.inspect(response.body) + '\n' + error)
+    }
+
+    if (body.status === 404) {
+      throw new APIError(`${prefix}: Unkown path!`)
+    }
 
     return body
   } else console.error('NET MODULE ARE DISABLED, ABORTING')

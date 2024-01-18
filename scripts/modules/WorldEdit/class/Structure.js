@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server'
+import { Vector, world } from '@minecraft/server'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from '../utils/cuboid.js'
 
@@ -21,8 +21,8 @@ export class Structure {
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
-  constructor(prefix, pos1, pos2, id = Date.now().toString(32)) {
-    this.id = id
+  constructor(prefix, pos1, pos2) {
+    this.id = Date.now().toString(32)
     this.prefix = `${prefix}|${this.id}`
     this.pos1 = pos1
     this.pos2 = pos2
@@ -40,7 +40,7 @@ export class Structure {
       const pos1 = cube.pos1
       const pos2 = cube.pos2
       const result = world.overworld.runCommand(
-        `structure save "${name}" ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} false memory true`,
+        `structure save "${name}" ${Vector.string(pos1)} ${Vector.string(pos2)} false memory true`,
         { showError: true }
       )
       all++
@@ -85,12 +85,17 @@ export class Structure {
     let errors = 0
     let all = 0
     for (const file of this.structures) {
-      const result = world.overworld.runCommand(
-        `structure load "${file.name}" ${pos.x} ${pos.y} ${pos.z}${additional}`,
-        {
-          showError: true,
-        }
-      )
+      let to
+      if (pos === this.pos1) {
+        to = file.pos1
+      } else {
+        const offset = Vector.subtract(this.pos1, file.pos1)
+        to = Vector.add(pos, offset)
+      }
+
+      const result = world.overworld.runCommand(`structure load "${file.name}" ${Vector.string(to)}${additional}`, {
+        showError: true,
+      })
       all++
       if (result === 0) {
         errors++

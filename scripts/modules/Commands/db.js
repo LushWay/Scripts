@@ -4,7 +4,6 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { PLAYER_DB, ROLES, TIMERS_PATHES, getRole, util } from 'smapi.js'
 
-// TODO Show player nicknames below to ids in player db
 const db = new Command({
   name: 'db',
   description: 'Просматривает базу данных',
@@ -112,7 +111,7 @@ function showTable(player, table) {
 
   const keys = Object.keys(proxy)
   for (let key of keys) {
-    if (table === 'players') {
+    if (table === 'player') {
       /** @type {typeof PLAYER_DB} */
       const p = proxy
       key += `${p[key].name} (${ROLES[getRole(key)] ?? 'Без роли'})`

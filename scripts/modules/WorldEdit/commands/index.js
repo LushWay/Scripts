@@ -21,6 +21,7 @@ const commands = [
   './clipboard/paste.js',
 
   '../tools/brush.js',
+  '../tools/clipboard.js',
   '../tools/wand.js',
   '../tools/nylium.js',
   '../tools/shovel.js',

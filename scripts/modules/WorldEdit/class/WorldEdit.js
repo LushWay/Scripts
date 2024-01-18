@@ -84,7 +84,6 @@ export class WorldEdit {
 
   /**
    * @type {Structure | undefined}
-   * @private
    */
   currentCopy
 
@@ -191,6 +190,23 @@ export class WorldEdit {
     }
   }
   /**
+   *
+   * @param {Player} player
+   * @param  {Parameters<WorldEdit['paste']>[1]} rotation
+   * @param {NonNullable<WorldEdit['currentCopy']>} currentCopy
+   */
+  pastePositions(player, rotation, currentCopy) {
+    let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
+    const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
+    let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
+    if (rotation === 270 || rotation === 90) [dx, dz] = [dz, dx]
+
+    const pastePos1 = Vector.floor(player.location)
+    const pastePos2 = Vector.add(pastePos1, { x: dx, y: dy, z: dz })
+
+    return { pastePos1, pastePos2 }
+  }
+  /**
    * Pastes a copy from memory
    * @param {Player} player player to execute on
    * @param {0 | 90 | 180 | 270} rotation Specifies the rotation when loading a structure
@@ -199,10 +215,9 @@ export class WorldEdit {
    * @param {boolean} includesBlocks Specifies whether including blocks or not
    * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in the structure are loaded.
    * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity. If unspecified, a random seed is taken.
-   * @returns {string}
    * @example paste(Player, 0, "none", false, true, 100.0, "");
    */
-  paste(
+  async paste(
     player,
     rotation = 0,
     mirror = 'none',
@@ -213,24 +228,21 @@ export class WorldEdit {
   ) {
     try {
       if (!this.currentCopy) return '§4► §cВы ничего не копировали!'
-      const dx = Math.abs(this.currentCopy.pos2.x - this.currentCopy.pos1.x)
-      const dy = Math.abs(this.currentCopy.pos2.y - this.currentCopy.pos1.y)
-      const dz = Math.abs(this.currentCopy.pos2.z - this.currentCopy.pos1.z)
-      const pastePos1 = Vector.floor(player.location)
-      const pastePos2 = Vector.add(player.location, { x: dx, y: dy, z: dz })
+
+      const { pastePos1, pastePos2 } = this.pastePositions(player, rotation, this.currentCopy)
 
       this.backup(pastePos1, pastePos2)
 
       try {
-        this.currentCopy.load(
+        await this.currentCopy.load(
           pastePos1,
-          `${String(rotation).replace('NaN', '0')}_degrees ${mirror} ${includesEntites} ${includesBlocks} ${
+          ` ${String(rotation).replace('NaN', '0')}_degrees ${mirror} ${includesEntites} ${includesBlocks} true ${
             integrity ? integrity : ''
           } ${seed ? seed : ''}`
         )
       } catch (e) {
         if (e instanceof Error) {
-          return e.message
+          player.tell(e.message)
         } else throw new Error(e)
       }
 

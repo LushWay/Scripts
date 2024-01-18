@@ -14,8 +14,9 @@ export const util = {
      * @param {number} [arg2.deleteStack]
      * @param {string[]} [arg2.additionalStack]
      * @param {string} [arg2.errorName]
+     * @param {boolean} [arg2.returnText]
      */
-    function error(error, { deleteStack = 0, additionalStack = [], errorName } = {}) {
+    function error(error, { deleteStack = 0, additionalStack = [], errorName, returnText } = {}) {
       if (typeof error === 'string') {
         error = new Error(error)
         error.name = 'StringError'
@@ -25,12 +26,14 @@ export const util = {
       const name = errorName ?? error?.name ?? 'Error'
       const text = `§4${name}: §c${message}\n§f${stack}`
 
-      try {
-        // if (onWorldLoad.loaded()) world.say(text);
-        console.error(text)
-      } catch (e) {
-        console.error(text, e)
-      }
+      if (!returnText) {
+        try {
+          // if (onWorldLoad.loaded()) world.say(text);
+          console.error(text)
+        } catch (e) {
+          console.error(text, e)
+        }
+      } else return text
     },
     {
       stack: {
@@ -84,7 +87,7 @@ export const util = {
       message: {
         /** @type {[RegExp | string, string, string?][]} */
         modifiers: [
-          [/\n/g, ''],
+          // [/\n/g, ''],
           [/Module \[(.*)\] not found\. Native module error or file not found\./g, '§cNot found: §6$1', 'LoadError'],
         ],
 

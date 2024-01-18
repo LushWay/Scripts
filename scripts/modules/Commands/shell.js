@@ -1,3 +1,4 @@
+import { Player } from '@minecraft/server'
 import { APIRequest } from 'lib/Class/Net.js'
 import { ActionForm, ModalForm, util } from 'smapi.js'
 
@@ -5,7 +6,7 @@ new Command({
   name: 'shell',
   role: 'admin',
 }).executes(ctx => {
-  new ActionForm('Shell')
+  const form = new ActionForm('Shell')
     .addButton('git pull', () => {
       const form = new ActionForm('Type')
       /** @type {("script" | "server" | "process")[]} */
@@ -34,7 +35,7 @@ new Command({
       }
       form.show(ctx.sender)
     })
-    .addButton('backup', () => {
+    .addButton('Backup', () => {
       new ModalForm('Backup')
         .addTextField('Backup commit name\nЛучше всего то, что значимого было изменено', 'ничего не произойдет')
         .show(ctx.sender, (_, backupname) => {
@@ -45,5 +46,29 @@ new Command({
         })
     })
 
-    .show(ctx.sender)
+  form.addButton('Console', () => showConsole(ctx.sender, pages[ctx.sender.id], () => form.show(ctx.sender)))
+
+  form.show(ctx.sender)
 })
+
+/** @type {Record<string, number>} */
+const pages = {}
+const eachPage = 150
+
+/**
+ * @param {Player} player
+ * @param {number} page
+ */
+async function showConsole(player, page, back = () => {}) {
+  player.tell('Загрузка консоли...')
+
+  if (typeof page === 'undefined') page = 0
+  pages[player.id] = page
+
+  const { text } = await APIRequest('console', { offset: eachPage * page, size: eachPage })
+
+  new ActionForm('Console', text)
+    .addButton('< Prev', () => showConsole(player, page - 1))
+    .addButton('Back', () => showConsole(player, page - 1))
+    .addButton('Next >', () => showConsole(player, page + 1))
+}
