@@ -110,13 +110,14 @@ function showTable(player, table) {
   }
 
   const keys = Object.keys(proxy)
-  for (let key of keys) {
+  for (const key of keys) {
+    let name = key
     if (table === 'player') {
       /** @type {typeof PLAYER_DB} */
       const p = proxy
-      key += `${p[key].name} (${ROLES[getRole(key)] ?? 'Без роли'})`
+      name = `${p[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'} §8(${key})`
     }
-    menu.addButton(key, () => propertyForm(key))
+    menu.addButton(name, () => propertyForm(key))
   }
 
   menu.show(player)
