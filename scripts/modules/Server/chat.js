@@ -4,7 +4,7 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Cooldown, ROLES, Settings, getRole, util } from 'smapi.js'
 
 export class ChatBuilder {
-  db = new DynamicPropertyDB('chat', { /** @type {Record<string, string} */ type: {} }).proxy()
+  db = new DynamicPropertyDB('chatCD', { /** @type {Record<string, string} */ type: {} }).proxy()
   settings = Settings.world('chat', {
     cooldown: {
       name: 'Задержка',

@@ -1,18 +1,21 @@
 import { Player, world } from '@minecraft/server'
+import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { PLAYER_DB, ROLES, getRole, setRole, util } from 'smapi.js'
 
 /** @type {Role[]} */
 const HIERARCHY = ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin']
+const FULL_HIERARCHY = util.dedupe([...HIERARCHY, ...Object.keys(ROLES)])
+
 /**
  *
  * @param {Role} who
  * @param {Role} target
  */
 function canChange(who, target) {
-  const targetI = HIERARCHY.indexOf(target)
-  return HIERARCHY.indexOf(who) < (targetI === -1 ? 100 : targetI)
+  if (who === 'creator') return true
+  return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
 
 const roleCommand = new Command({
@@ -34,7 +37,12 @@ roleCommand
     ctx.sender.tell(`§b> §3Вы вернули роль §r${ROLES[prevRole]}`)
   })
 
-roleCommand.executes(ctx => {
+roleCommand.executes(roleForm)
+
+/**
+ * @param {CommandContext} ctx
+ */
+function roleForm(ctx, sort = true) {
   const prole = getRole(ctx.sender.id)
   if (!HIERARCHY.includes(prole)) return ctx.reply(`§b> §r${ROLES[prole]}`)
 
@@ -88,17 +96,20 @@ roleCommand.executes(ctx => {
     callback(ctx.sender, true).fn
   )
 
-  const onlinePlayers = world.getPlayers().filter(e => e.id !== ctx.sender.id)
-  const onlineIds = onlinePlayers.map(e => e.id)
-  for (const player of onlinePlayers) {
-    const { text, fn } = callback(player)
-    form.addButton(text, fn)
-  }
+  form.addButton(`§3Сортировка по: ${sort ? '§aролям' : '§6дате входа'}`, () => roleForm(ctx, !sort))
 
-  for (const id of Object.keys(PLAYER_DB).filter(key => key !== ctx.sender.id && !onlineIds.includes(key))) {
-    const { text, fn } = callback(id)
+  const keys = Object.entries(PLAYER_DB)
+  if (sort) keys.sort((a, b) => FULL_HIERARCHY.indexOf(a[1].role) - FULL_HIERARCHY.indexOf(b[1].role))
+  else keys.reverse()
+
+  const ids = keys.map(e => e[0]).filter(key => key !== ctx.sender.id)
+
+  const players = world.getAllPlayers()
+  for (const id of ids) {
+    const player = players.find(e => e.id === id)
+    const { text, fn } = callback(player ?? id)
     form.addButton(text, fn)
   }
 
   form.show(ctx.sender)
-})
+}

@@ -135,7 +135,7 @@ export class WorldEdit {
       if (amount > history.length) amount = history.length
 
       const historyToLoadNow = history.slice(-amount)
-      for (const backup of historyToLoadNow.reverse()) {
+      for (const backup of historyToLoadNow.slice().reverse()) {
         this.loadBackup(history, backup)
       }
 

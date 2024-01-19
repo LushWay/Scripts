@@ -602,7 +602,7 @@ export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo
   const we = WorldEdit.instances[source]
   const actions = mode === 'undo' ? we.history : we.undos
   // TODO Maybe group similiar actions
-  for (const action of actions.reverse()) {
+  for (const action of actions.slice().reverse()) {
     form.addButton(action.name, () => {
       we.loadBackup(actions, action)
       player.playSound(SOUNDS.success)

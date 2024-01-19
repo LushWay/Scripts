@@ -416,6 +416,15 @@ export const util = {
   },
 
   /**
+   * @template T
+   * @param {T[]} array
+   * @returns {T[]}
+   */
+  dedupe(array) {
+    return [...new Set(array)]
+  },
+
+  /**
    * Replaces each §<color> to its terminal eqiuvalent
    * @param {string} text
    */

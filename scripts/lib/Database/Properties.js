@@ -15,6 +15,8 @@ export class DynamicPropertyDB {
    */
   static keys = {}
 
+  static separator = '|'
+
   /**
    * @private
    * @type {Record<any, any>}
@@ -63,9 +65,35 @@ export class DynamicPropertyDB {
   init() {
     // Init
     try {
-      const value = world.getDynamicProperty(this.key) ?? '{}'
-      if (typeof value !== 'string') {
-        throw new DatabaseError(`Expected string, recieved ${typeof value}`)
+      let value = '{}'
+      let length = world.getDynamicProperty(this.key) ?? 0
+      if (typeof length === 'string') {
+        // Old way load
+        value = length
+        length = 1
+      } else {
+        // New way load
+        if (typeof length !== 'number') {
+          util.error(
+            new DatabaseError(`Expected index in type of number, recieved ${typeof value}, table '${this.key}'`)
+          )
+
+          length = 1
+        }
+
+        for (let i = 0; i < length; i++) {
+          const prop = world.getDynamicProperty(this.key + DynamicPropertyDB.separator + i)
+          if (typeof prop !== 'string') {
+            util.error(
+              new DatabaseError(
+                `Corrupted database table '${this.key}', index ${i}, expected string, recieved '${util.inspect(prop)}'`
+              )
+            )
+            console.error('Loaded part of database:', value)
+            return
+          }
+          value += prop
+        }
       }
 
       this.value = Object.fromEntries(
@@ -115,7 +143,12 @@ export class DynamicPropertyDB {
           })
         )
       )
-      world.setDynamicProperty(this.key, str)
+      const strings = str.match(DB.PROPERTY_CHUNK_REGEXP)
+      if (!strings) throw new DatabaseError('Failed to save db: cannot split')
+      world.setDynamicProperty(this.key, strings.length)
+      for (const [i, string] of strings.entries()) {
+        world.setDynamicProperty(this.key + DynamicPropertyDB.separator + i, string)
+      }
     })
 
     return (this._needSaveRun = true)

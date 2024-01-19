@@ -106,6 +106,28 @@ declare module '@minecraft/server' {
   interface Player {
     scores: Record<ScoreNames, number>
     database: PlayerDatabase
+
+    // TODO Implement and migrate all code to those methods
+    /**
+     * Sends message prefixed with §c> §f
+     * and plays SOUNDS.fail
+     */
+    fail(message: string): void
+    /**
+     * Sends message prefixed with §e> §f
+     * and plays SOUNDS.fail
+     */
+    warn(message: string): void
+    /**
+     * Sends message prefixed with §a> §f
+     * and plays SOUNDS.success
+     */
+    success(message: string): void
+    /**
+     * Sends message prefixed with §b> §3
+     * and plays SOUNDS.action
+     */
+    info(message: string): void
   }
 
   interface ScreenDisplay {

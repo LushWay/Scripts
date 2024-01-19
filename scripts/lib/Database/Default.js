@@ -20,6 +20,8 @@ export class DB {
   static ENTITY_LOCATION = { x: 0, y: -64, z: 0 }
   static INVENTORY_SIZE = 96
   static CHUNK_REGEXP = /.{1,50}/g
+  static PROPERTY_CHUNK_REGEXP = /.{1,32767}/g
+
   static MAX_LORE_SIZE = 50
   /**
    * @type {TABLE[]}
