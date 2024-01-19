@@ -13,7 +13,7 @@ const scene = new Command({
   description: 'Катсцена',
   role: 'member',
 }).executes(ctx => {
-  if (is(ctx.sender.id, 'admin')) selectCatscene(ctx.sender)
+  if (is(ctx.sender.id, 'curator')) selectCatscene(ctx.sender)
   else Command.getHelpForCommand(scene, ctx)
 })
 
@@ -25,7 +25,7 @@ scene.literal({ name: 'exit', description: 'Выход из катсцены' })
 })
 
 scene
-  .literal({ name: 'play', role: 'admin' })
+  .literal({ name: 'play', role: 'techAdmin' })
   .string('name', false)
   .executes((ctx, name) => {
     if (!(name in Catscene.instances)) return ctx.error(Object.keys(Catscene.instances).join('\n'))

@@ -112,7 +112,7 @@ GameTest.registerAsync('s', 'test', async test => {
 new Command({
   name: 'player',
   description: 'Спавнит фэйкового игрока',
-  role: 'admin',
+  role: 'techAdmin',
   type: 'test',
 })
   .string('new name', true)

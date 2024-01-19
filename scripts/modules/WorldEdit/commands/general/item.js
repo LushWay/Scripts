@@ -1,7 +1,7 @@
 const root = new Command({
   name: 'item',
   description: 'Управляет предметом в руке',
-  role: 'moderator',
+  role: 'admin',
   type: 'test',
 })
 

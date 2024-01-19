@@ -1,5 +1,4 @@
 import { Player } from '@minecraft/server'
-import { ROLES } from 'smapi.js'
 import { Command } from './index.js'
 
 export interface ICommandData {
@@ -32,7 +31,7 @@ export interface ICommandData {
   /**
    * Specify this to generate ```requires: (p) => IS(player, require)```
    */
-  role?: keyof typeof ROLES
+  role?: Role
   /**
    * The message that will be send if a player doest have permission to use this command
    * Its good to explain why this failed here

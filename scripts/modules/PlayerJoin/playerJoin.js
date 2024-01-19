@@ -98,7 +98,7 @@ class JoinBuilder {
     new Command({
       name: 'join',
       description: 'Имитирует первый вход',
-      role: 'admin',
+      role: 'techAdmin',
     }).executes(ctx => {
       EventSignal.emit(this.onMoveAfterJoin, { player: ctx.sender, joinCounts: 1, firstJoin: true })
     })

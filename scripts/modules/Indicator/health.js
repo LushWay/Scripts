@@ -72,7 +72,7 @@ system.runInterval(
     for (const [id, info] of Object.entries(HURT_ENTITIES)) {
       const entity = info.hurtEntity
 
-      if (!entity || (info.damage === 0 && info.expires < now)) {
+      if (!entity || (info.damage === 0 && info.expires > now)) {
         if (info.separated)
           try {
             info.indicator.remove()

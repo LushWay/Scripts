@@ -28,7 +28,7 @@ qcmd.literal({ name: 'exit', description: 'Выйти' }).executes(ctx => {
   ctx.reply('§6> §fУспешно')
 })
 
-qcmd.literal({ name: 'enter', role: 'admin' }).executes(ctx => {
+qcmd.literal({ name: 'enter', role: 'techAdmin' }).executes(ctx => {
   const form = new ActionForm('Quests', 'Выбери')
   for (const [name, q] of Object.entries(Quest.instances)) {
     form.addButton(name, () => {

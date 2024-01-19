@@ -12,7 +12,7 @@ import { FormCallback, util } from 'smapi.js'
 
 new Command({
   name: 'wsettings',
-  role: 'admin',
+  role: 'techAdmin',
   description: 'Настройки мира',
 }).executes(ctx => {
   worldSettings(ctx.sender)

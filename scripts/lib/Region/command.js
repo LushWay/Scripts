@@ -12,7 +12,7 @@ import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './Cla
 
 new Command({
   name: 'region',
-  role: 'admin',
+  role: 'techAdmin',
   type: 'server',
 }).executes(ctx => {
   regionForm(ctx.sender)

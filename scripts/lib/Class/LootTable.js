@@ -4,7 +4,7 @@ import { Enchantments } from './Enchantments.js'
 
 new Command({
   name: 'loot',
-  role: 'admin',
+  role: 'curator',
 })
   .string('lootTableName', true)
   .executes((ctx, lootTableName) => {

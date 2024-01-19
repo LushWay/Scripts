@@ -137,7 +137,7 @@ bbr
   .literal({
     name: 'start',
     description: '',
-    role: 'admin',
+    role: 'techAdmin',
   })
   .executes(() => {
     br.start(ks(BR_QUENE))
@@ -148,7 +148,7 @@ bbr
   .literal({
     name: 'stop',
     description: '',
-    role: 'admin',
+    role: 'techAdmin',
   })
   .executes(() => {
     br.end('specially', 'Так надо')

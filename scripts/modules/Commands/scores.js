@@ -5,7 +5,7 @@ import { ActionForm, BUTTON, ModalForm, PLAYER_DB } from 'smapi.js'
 new Command({
   name: 'scores',
   description: 'Управляет счетом игроков (монеты, листья)',
-  role: 'admin',
+  role: 'chefAdmin',
 }).executes(ctx => {
   scoreManagerMenu(ctx.sender)
 })

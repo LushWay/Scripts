@@ -7,7 +7,7 @@ declare module '@minecraft/server' {
     server?: {
       invs: Record<string, string>
     }
-    roleSetter?: 1
+    prevRole?: Role
   }
 }
 

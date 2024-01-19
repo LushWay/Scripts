@@ -246,7 +246,7 @@ const tests = {
 
 const c = new Command({
   name: 'test',
-  role: 'admin',
+  role: 'techAdmin',
 })
 
 c.string('number', true).executes(async (ctx, n) => {

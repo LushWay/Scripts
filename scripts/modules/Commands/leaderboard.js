@@ -5,7 +5,7 @@ new Command({
   name: 'leaderboard',
   aliases: ['leaderboards', 'lb'],
   description: 'Управляет таблицами лидеров',
-  role: 'admin',
+  role: 'techAdmin',
 }).executes(ctx => {
   leaderboardMenu(ctx.sender)
 })

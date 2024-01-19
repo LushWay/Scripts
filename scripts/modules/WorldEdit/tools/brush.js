@@ -138,7 +138,7 @@ const brush = new BrushTool({
 })
 
 brush.command
-  .literal({ name: 'extrasize', description: 'Устанавливает размер кисти больше чем лимит в форме', role: 'admin' })
+  .literal({ name: 'extrasize', description: 'Устанавливает размер кисти больше чем лимит в форме', role: 'techAdmin' })
   .int('Size')
   .executes((ctx, size) => {
     if (isNaN(size)) return ctx.error('Размер не является числом')

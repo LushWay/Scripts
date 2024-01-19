@@ -60,13 +60,9 @@ const help = new Command({
   aliases: ['?', 'h'],
 })
 
-/** @type {Record<keyof typeof ROLES, string>}} */
-const colors = {
-  admin: '§c',
-  builder: '§3',
-  member: '§2',
-  moderator: '§5', //§r
-}
+/** @type {Record<Role, string>}} */
+const colors = Object.fromEntries(Object.entriesStringKeys(ROLES).map(e => [e[0], e[1][0] + e[1][1]]))
+colors.member = '§2'
 
 help
   .int('page', true)

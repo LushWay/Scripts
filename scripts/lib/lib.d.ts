@@ -1,6 +1,7 @@
 import * as mc from '@minecraft/server'
-import { ROLES } from './roles'
+import { ROLES } from 'smapi'
 declare global {
+  type Role = keyof typeof ROLES
   type VoidFunction = () => void
 
   interface Console {
@@ -97,7 +98,7 @@ declare global {
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
-    role: keyof typeof ROLES
+    role: Role
     quest?: import('./Class/Quest').QuestDB
   }
 

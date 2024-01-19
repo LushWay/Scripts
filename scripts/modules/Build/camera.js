@@ -142,7 +142,7 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   }
 })
 
-const cmd = new Command({ name: 'camera', role: 'admin' })
+const cmd = new Command({ name: 'camera', role: 'techAdmin' })
 cmd.executes(ctx => selectPlayerForm(ctx.sender))
 cmd.literal({ name: 'reset' }).executes(ctx => {
   ctx.sender.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)

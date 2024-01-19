@@ -9,7 +9,7 @@ import {
 } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
-import { ROLES, getRole, prompt, util } from 'smapi.js'
+import { getRole, prompt, util } from 'smapi.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'
@@ -268,10 +268,12 @@ export class WorldEdit {
   async ensureSelection() {
     const player = this.player
     if (!this.selection) return player.tell('§cЗона не выделена!')
-    /** @type {Partial<Record<keyof typeof ROLES, number>>} */
+    /** @type {Partial<Record<Role, number>>} */
     const limits = {
-      member: 0, // Not allowed
       builder: 10000,
+      admin: 10000,
+      chefAdmin: 100000,
+      techAdmin: 1000000,
     }
 
     const limit = limits[getRole(player.id)]

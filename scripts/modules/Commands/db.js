@@ -7,7 +7,7 @@ import { PLAYER_DB, ROLES, TIMERS_PATHES, getRole, util } from 'smapi.js'
 const db = new Command({
   name: 'db',
   description: 'Просматривает базу данных',
-  role: 'admin',
+  role: 'techAdmin',
 })
 
 db.executes(ctx => selectTable(ctx.sender, true))
@@ -227,7 +227,7 @@ function getPath(key) {
 new Command({
   name: 'benchmark',
   description: 'Показывает время работы серверных систем',
-  role: 'admin',
+  role: 'techAdmin',
 })
   .string('type', true)
   .boolean('pathes', true)

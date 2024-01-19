@@ -4,7 +4,7 @@ import { ActionForm, ModalForm, util } from 'smapi.js'
 
 new Command({
   name: 'shell',
-  role: 'admin',
+  role: 'techAdmin',
 }).executes(ctx => {
   const form = new ActionForm('Shell')
     .addButton('git pull', () => {

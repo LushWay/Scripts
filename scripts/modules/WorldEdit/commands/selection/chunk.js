@@ -22,8 +22,8 @@ function getChunkCuboidPositions(entity) {
 new Command({
   type: 'we',
   name: 'chunk',
-  description: 'Set the selection to your current chunk.',
-  role: 'moderator',
+  description: 'Выбрать чанк',
+  role: 'builder',
 }).executes(ctx => {
   const we = WorldEdit.forPlayer(ctx.sender)
   const chunkBorder = getChunkCuboidPositions(ctx.sender)
