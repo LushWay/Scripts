@@ -1,8 +1,8 @@
 import { Vector, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { Settings } from 'smapi.js'
-import './class/Tool.js'
 import './class/WorldEdit.js'
+import './class/WorldEditTool.js'
 import './commands/index.js'
 
 export const WE_PLAYER_SETTINGS = Settings.player('Строитель мира', 'we', {

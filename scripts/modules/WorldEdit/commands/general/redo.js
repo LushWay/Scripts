@@ -8,8 +8,5 @@ new Command({
 })
   .int('redoCount', true)
   .executes((ctx, r) => {
-    const we = WorldEdit.forPlayer(ctx.sender)
-
-    const status = we.redo(!isNaN(r) ? r : 1)
-    if (status) ctx.reply(status)
+    WorldEdit.forPlayer(ctx.sender).redo(!isNaN(r) ? r : 1)
   })

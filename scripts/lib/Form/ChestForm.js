@@ -3,7 +3,7 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 // eslint-disable-next-line import/no-cycle
 import { GAME_UTILS, loreWordWrap, util } from 'smapi.js'
 import { typeIdToID } from '../../chestui/typeIds.js'
-import { showForm } from './utils.js'
+import { BUTTON, showForm } from './utils.js'
 
 const NUMBER_OF_1_16_100_ITEMS = 0
 
@@ -82,7 +82,7 @@ export class ChestForm {
    */
   button({ slot, icon, nameTag = '', lore = [], description, amount = 1, enchanted = false, callback }) {
     const ID = typeIdToID.get(icon.includes(':') ? icon : 'minecraft:' + icon)
-
+    if (typeof ID === 'undefined' && icon.includes('minecraft:')) icon = BUTTON['?']
     if (description) lore = loreWordWrap(description)
 
     /** @type {ChestButton} */
@@ -91,7 +91,7 @@ export class ChestForm {
         .toString()
         .padStart(2, '0')}§r${nameTag}§r${lore.map(e => '\n§r' + e).join('')}`,
 
-      icon: ID ? (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536 : icon,
+      icon: typeof ID === 'number' ? (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536 : icon,
 
       callback: callback ?? (p => this.show(p)),
     }

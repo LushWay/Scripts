@@ -1,6 +1,6 @@
 import { Vector, world } from '@minecraft/server'
 import { WE_CONFIG } from '../config.js'
-import { Cuboid } from '../utils/cuboid.js'
+import { Cuboid } from './Cuboid.js'
 
 // TODO Loading using tickingareas
 
@@ -21,8 +21,9 @@ export class Structure {
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
-  constructor(prefix, pos1, pos2) {
+  constructor(prefix, pos1, pos2, name = '') {
     this.id = Date.now().toString(32)
+    this.name = name
     this.prefix = `${prefix}|${this.id}`
     this.pos1 = pos1
     this.pos2 = pos2

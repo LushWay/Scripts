@@ -2,7 +2,7 @@ import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
-import { editBlockStates } from 'modules/WorldEdit/menu.js'
+import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu.js'
 import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'smapi.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
@@ -15,15 +15,15 @@ const set = new Command({
 
 set.string('block').executes((ctx, block) => {
   const we = WorldEdit.forPlayer(ctx.sender)
-  if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  if (!we.selection) return ctx.reply('§cЗона не выделена!')
   if (!blockIsAvaible(block, ctx.sender)) return
 
-  we.fillBetween(ctx.sender, [BlockPermutation.resolve(block)])
+  we.fillBetween([BlockPermutation.resolve(block)])
 })
 
 set.executes(ctx => {
   const we = WorldEdit.forPlayer(ctx.sender)
-  if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  if (!we.selection) return ctx.reply('§cЗона не выделена!')
   ctx.reply('§b> §3Закрой чат!')
   setSelection(ctx.sender)
 })
@@ -70,8 +70,8 @@ export function setSelection(player) {
           ? {
               icon: 'textures/ui/check',
               nameTag: 'Заполнить!',
-              callback(p) {
-                WorldEdit.forPlayer(player).fillBetween(p, block, replaceBlock)
+              callback() {
+                WorldEdit.forPlayer(player).fillBetween(block, replaceBlock)
               },
             }
           : {
@@ -218,7 +218,12 @@ function selectBlockSource(player, back, currentSelection) {
         () => {
           const form = new ChestForm('large')
           const blockBelow = player.dimension.getBlock(player.location)?.below()
-          form.pattern([0, 0], ['x<xxBxxxx'], {
+          const blockFromView = player.getBlockFromViewDirection({
+            includeLiquidBlocks: true,
+            includePassableBlocks: true,
+            maxDistance: 120,
+          })
+          form.pattern([0, 0], ['x<xxBxxGx'], {
             '<': {
               icon: BUTTON['<'],
               callback: () => base.show(player),
@@ -232,6 +237,16 @@ function selectBlockSource(player, back, currentSelection) {
                 ? ChestForm.permutationToButton(blockBelow.permutation)
                 : { icon: MinecraftBlockTypes.Air }),
               description: 'Нажми чтобы выбрать',
+              callback: () =>
+                resolve({
+                  permutations: [blockBelow?.permutation ?? BlockPermutation.resolve(MinecraftBlockTypes.Air)],
+                }),
+            },
+            'G': {
+              ...(blockFromView?.block
+                ? ChestForm.permutationToButton(blockFromView?.block.permutation)
+                : { icon: MinecraftBlockTypes.Air }),
+              description: 'Нажми чтобы выбрать блок на который смотришь',
               callback: () =>
                 resolve({
                   permutations: [blockBelow?.permutation ?? BlockPermutation.resolve(MinecraftBlockTypes.Air)],
@@ -271,8 +286,10 @@ function selectBlockSource(player, back, currentSelection) {
         const sel = currentSelection.permutations[0]
         currentSelection.permutations[0] = {
           typeId: sel instanceof BlockPermutation ? sel.type.id : sel.typeId,
-          states: await editBlockStates(player, sel instanceof BlockPermutation ? sel.getAllStates() : sel.states, () =>
-            base.show(player)
+          states: await WEeditBlockStatesMenu(
+            player,
+            sel instanceof BlockPermutation ? sel.getAllStates() : sel.states,
+            () => base.show(player)
           ),
         }
 

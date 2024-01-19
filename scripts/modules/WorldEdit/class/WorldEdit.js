@@ -8,15 +8,14 @@ import {
   world,
 } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { toPermutation } from 'modules/WorldEdit/menu.js'
-import { GAME_UTILS, is, util } from 'smapi.js'
+import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
+import { ROLES, getRole, prompt, util } from 'smapi.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
-import { Cuboid } from '../utils/cuboid.js'
+import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'
 
 // TODO Undo/redo manage menu
 // TODO Undo redo menu for any player
-// TODO Force set when selection is big
 export class WorldEdit {
   /**
    * @param {Player} player
@@ -28,21 +27,20 @@ export class WorldEdit {
   /** @type {Record<string, WorldEdit>} */
   static instances = {}
 
-  drawselection = WE_CONFIG.DRAW_SELECTION_DEFAULT
-
   /**
    * @type {Cuboid | undefined}
    */
-  selectionCuboid
+  selection
 
   /**
    * @type {Cuboid | undefined}
    */
   visualSelectionCuboid
 
+  /** @private */
   recreateCuboids() {
-    this.selectionCuboid = new Cuboid(this.#pos1, this.#pos2)
-    this.visualSelectionCuboid = new Cuboid(this.selectionCuboid.min, Vector.add(this.selectionCuboid.max, Vector.one))
+    this.selection = new Cuboid(this.#pos1, this.#pos2)
+    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
   }
 
   /**
@@ -72,13 +70,11 @@ export class WorldEdit {
 
   /**
    * @type {Structure[]}
-   * @private
    */
   history = []
 
   /**
    * @type {Structure[]}
-   * @private
    */
   undos = []
 
@@ -100,56 +96,54 @@ export class WorldEdit {
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
     WorldEdit.instances[id] = this
     this.player = player
-    system.delay(() => {
-      const event = world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-        if (playerId !== this.player.id) return
+    // Do not delete on exit so we can restore something
+    // system.delay(() => {
+    //   const event = world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+    //     if (playerId !== this.player.id) return
 
-        world.afterEvents.playerLeave.unsubscribe(event)
-        delete WorldEdit.instances[id]
-      })
-    })
+    //     world.afterEvents.playerLeave.unsubscribe(event)
+    //     delete WorldEdit.instances[id]
+    //   })
+    // })
   }
 
   drawSelection() {
-    if (!this.drawselection || !this.selectionCuboid || !this.visualSelectionCuboid) return
-
-    if (this.selectionCuboid.size > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
+    if (!this.selection || !this.visualSelectionCuboid) return
+    if (this.selection.size > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
 
     spawnParticlesInArea(this.visualSelectionCuboid.pos1, this.visualSelectionCuboid.pos2, this.visualSelectionCuboid)
   }
 
   /**
    * Backups a location
+   * @param {string} name - Name of the backup. Used by undo/redo
    * @param {Vector3} pos1 Position 1 of cuboid location
    * @param {Vector3} pos2 Position 2 of cuboid location
-   * @param {Structure[]} saveLocation Save location where you want the data to store your backup
-   * @example backup(pos1, pos2, history);
+   * @param {Structure[]} history Save location where you want the to store your backup
    */
-  backup(pos1 = this.pos1, pos2 = this.pos2, saveLocation = this.history) {
-    saveLocation.push(new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2))
+  backup(name, pos1 = this.pos1, pos2 = this.pos2, history = this.history) {
+    history.push(new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, name))
   }
 
   /**
+   * Loads specified amount of backups from history array
    * @private
    */
-  loadFromArray(amount = 1, array = this.history) {
+  loadFromArray(amount = 1, history = this.history) {
     try {
       // Max allowed amount is array length
-      if (amount > array.length) amount = array.length
+      if (amount > history.length) amount = history.length
 
-      const backups = array.slice(-amount)
-      for (const backup of backups.reverse()) {
-        this.backup(backup.pos1, backup.pos2, this.undos)
-        backup.load()
-
-        // Remove backup from history
-        array.splice(array.indexOf(backup), 1)
+      const historyToLoadNow = history.slice(-amount)
+      for (const backup of historyToLoadNow.reverse()) {
+        this.loadBackup(history, backup)
       }
 
-      const e = util.ngettext(amount, ['сохранение', 'сохранения', 'сохранений'])
-      const o = amount.toString().endsWith('1') ? '' : 'о'
-
-      return `§b► §3Успешно отменен${o} §f${amount} §3${e}!`
+      return `§b► §3Успешно отменено §f${amount} §3${util.ngettext(amount, [
+        'сохранение',
+        'сохранения',
+        'сохранений',
+      ])}!`
     } catch (error) {
       util.error(error)
       return `§4► §cНе удалось отменить: ${error.message}`
@@ -157,51 +151,67 @@ export class WorldEdit {
   }
 
   /**
+   * Loads backup and removes it from history
+   * @param {Structure[]} history
+   * @param {Structure} backup
+   */
+  loadBackup(history, backup) {
+    this.backup(
+      history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
+      backup.pos1,
+      backup.pos2,
+      this.undos
+    )
+
+    backup.load()
+
+    // Remove backup from history
+    history.splice(history.indexOf(backup), 1)
+  }
+
+  /**
    * Undoes the latest history save
    * @param {number} amount times you want to undo
-   * @returns {string}
    */
   undo(amount = 1) {
-    return this.loadFromArray(amount, this.history)
+    this.loadFromArray(amount, this.history)
   }
   /**
    * Redoes the latest history save
    * @param {number} amount times you want to redo
-   * @returns {string}
    */
   redo(amount = 1) {
-    return this.loadFromArray(amount, this.undos)
+    this.loadFromArray(amount, this.undos)
   }
   /**
-   * Copys from the curret positions
-   * @returns {string}
+   * Copies from the current selected positions
    */
-  copy() {
+  async copy() {
     try {
-      if (!this.selectionCuboid) return '§4► §cЗона для копирования не выделена!'
+      const selection = await this.ensureSelection()
+      if (!selection) return
 
       this.currentCopy = new Structure(WE_CONFIG.COPY_FILE_NAME + this.player.id, this.pos1, this.pos2)
-      return `§9► §fСкопирована область ${Vector.string(this.pos1)} - ${Vector.string(this.pos2)} размером ${
-        this.selectionCuboid.size
-      }`
+      this.player.tell(
+        `§9► §fСкопирована область ${Vector.string(this.pos1)} - ${Vector.string(this.pos2)} размером ${selection.size}`
+      )
     } catch (error) {
       util.error(error)
-      return `§4► §cНе удалось скорпировать: ${error.message}`
+      this.player.tell(`§4► §cНе удалось скорпировать: ${error.message}`)
     }
   }
   /**
-   *
-   * @param {Player} player
+   * Parses paste positions, used by this.paste and by draw paste selection
    * @param  {Parameters<WorldEdit['paste']>[1]} rotation
    * @param {NonNullable<WorldEdit['currentCopy']>} currentCopy
    */
-  pastePositions(player, rotation, currentCopy) {
+  pastePositions(rotation, currentCopy) {
     let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
     const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
     let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
     if (rotation === 270 || rotation === 90) [dx, dz] = [dz, dx]
 
-    const pastePos1 = Vector.floor(player.location)
+    const pastePos1 = Vector.floor(this.player.location)
     const pastePos2 = Vector.add(pastePos1, { x: dx, y: dy, z: dz })
 
     return { pastePos1, pastePos2 }
@@ -229,9 +239,9 @@ export class WorldEdit {
     try {
       if (!this.currentCopy) return '§4► §cВы ничего не копировали!'
 
-      const { pastePos1, pastePos2 } = this.pastePositions(player, rotation, this.currentCopy)
+      const { pastePos1, pastePos2 } = this.pastePositions(rotation, this.currentCopy)
 
-      this.backup(pastePos1, pastePos2)
+      this.backup('Вставка (paste)', pastePos1, pastePos2)
 
       try {
         await this.currentCopy.load(
@@ -246,86 +256,128 @@ export class WorldEdit {
         } else throw new Error(e)
       }
 
-      return `§a► §rУспешно вставлено в ${Vector.string(pastePos1)}`
+      this.player.tell(`§a► §rУспешно вставлено в ${Vector.string(pastePos1)}`)
     } catch (error) {
       util.error(error)
-      return `§4► §cНе удалось вставить: ${error.message}`
+      this.player.tell(`§4► §cНе удалось вставить: ${error.message}`)
     }
   }
   /**
-   * @param {Player} player
-   * @param {(import('../menu.js').ReplaceTarget | BlockPermutation)[]} blocks
-   * @param {(undefined | import('../menu.js').ReplaceTarget | BlockPermutation)[]} replaceBlocks
+   * Ensures that selection matches max allow size
    */
-  async fillBetween(player, blocks, replaceBlocks = [undefined]) {
-    if (!this.selectionCuboid) return 'Зона не выделена!'
-    const limit = is(player.id, 'admin') ? 100000 : is(player.id, 'moderator') ? 10000 : 1000
-    if (this.selectionCuboid.size > limit) {
-      return player.tell(`§cРазмер выделенной области превышает лимит §c(${this.selectionCuboid.size}/§f${limit}§c)`)
+  async ensureSelection() {
+    const player = this.player
+    if (!this.selection) return player.tell('§cЗона не выделена!')
+    /** @type {Partial<Record<keyof typeof ROLES, number>>} */
+    const limits = {
+      member: 0, // Not allowed
+      builder: 10000,
     }
 
-    const timeForEachFill = 3
-    const fillSize = 32768
-    const time = Math.round((this.selectionCuboid.size / fillSize) * timeForEachFill * 0.05)
-    if (time >= 0.01) player.tell(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`)
-    const startTime = Date.now()
-    this.backup()
-    let errors = 0
-    let all = 0
+    const limit = limits[getRole(player.id)]
+    if (typeof limit === 'number') {
+      if (this.selection.size > limit) {
+        return player.tell(`§cРазмер выделенной области превышает лимит §c(${this.selection.size}/§f${limit}§c)`)
+      }
+    } else {
+      if (this.selection.size > 10000) {
+        const result = await prompt(
+          player,
+          `§6Внимание! §cВы уверены что хотите использовать выделенную область размером §f${this.selection.size}§c?`,
+          'Да',
+          () => {},
+          'Отмена',
+          () => {}
+        )
 
-    /** @type {(import('modules/WorldEdit/menu.js').ReplaceTarget | undefined)[]} */
-    const replaceTargets = replaceBlocks.map(e =>
-      e && e instanceof BlockPermutation ? { typeId: e.type.id, states: e.getAllStates() } : e
-    )
-
-    nextBlock: for (const position of Vector.foreach(this.selectionCuboid.min, this.selectionCuboid.max)) {
-      for (const replaceBlock of replaceTargets) {
-        try {
-          const block = world.overworld.getBlock(position)
-
-          if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
-
-          block?.setPermutation(toPermutation(blocks.randomElement()))
-          continue nextBlock
-        } catch (e) {
-          if (
-            !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
-            errors < 3
-          )
-            util.error(e)
-
-          errors++
-        }
-
-        all++
-        await nextTick
+        if (!result) return player.tell('§cОтменяем...')
       }
     }
 
-    const endTime = util.ms.remaining(Date.now() - startTime, {
-      timeTypes: ['ms', 'sec', 'min'],
-    })
+    return this.selection
+  }
+  /**
+   * @param {(import('../menu.js').ReplaceTarget | BlockPermutation)[]} blocks
+   * @param {(undefined | import('../menu.js').ReplaceTarget | BlockPermutation)[]} replaceBlocks
+   */
+  async fillBetween(blocks, replaceBlocks = [undefined]) {
+    try {
+      const selection = await this.ensureSelection()
+      if (!selection) return
 
-    let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${this.selectionCuboid.size} §3${util.ngettext(
-      this.selectionCuboid.size,
-      ['блок', 'блока', 'блоков']
-    )}`
-    if (endTime.parsedTime !== '0') {
-      reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
-    }
-    if (replaceTargets.filter(Boolean).length) {
-      reply += `§3, заполняемые блоки: §f${replaceTargets
-        .map(e => e?.typeId && GAME_UTILS.toNameTag(e.typeId))
-        .filter(Boolean)
-        .join(', ')}`
-    }
+      const timeForEachFill = 1.5
+      const fillSize = 32768
+      const time = Math.round((selection.size / fillSize) * timeForEachFill)
+      if (time >= 0.01) {
+        this.player.tell(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`)
+      }
 
-    if (errors) {
-      player.playSound(SOUNDS.fail)
-      return player.tell(`§4► §c${errors}/§f${all}§c §cошибок при заполнении, ${reply}`)
+      const startTime = Date.now()
+      this.backup(
+        `§3Заполнение области размером §f${selection.size} §3блоками §f${stringifyReplaceTargets(
+          blocks.map(toReplaceTarget)
+        )}`
+      )
+      let errors = 0
+      let all = 0
+
+      const replaceTargets = replaceBlocks.map(toReplaceTarget)
+
+      nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
+        for (const replaceBlock of replaceTargets) {
+          try {
+            const block = world.overworld.getBlock(position)
+
+            if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
+
+            block?.setPermutation(toPermutation(blocks.randomElement()))
+            continue nextBlock
+          } catch (e) {
+            if (errors < 3 && e instanceof Error) {
+              this.player.tell(`§cОшибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
+            }
+
+            if (
+              !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
+              errors < 3
+            )
+              util.error(e)
+
+            errors++
+          }
+
+          all++
+          await nextTick
+        }
+      }
+
+      const endTime = util.ms.remaining(Date.now() - startTime, {
+        timeTypes: ['ms', 'sec', 'min'],
+      })
+
+      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3${util.ngettext(selection.size, [
+        'блок',
+        'блока',
+        'блоков',
+      ])}`
+      if (endTime.parsedTime !== '0') {
+        reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
+      }
+      if (replaceTargets.filter(Boolean).length) {
+        reply += `§3, заполняемые блоки: §f${stringifyReplaceTargets(replaceTargets)}`
+      }
+
+      if (errors) {
+        this.player.playSound(SOUNDS.fail)
+        this.player.tell(`§4► §c${errors}/§f${all}§c §cошибок при заполнении, ${reply}`)
+      } else {
+        this.player.playSound(SOUNDS.success)
+        this.player.tell(`§a► ${reply}`)
+      }
+    } catch (e) {
+      util.error(e)
+      if (e instanceof Error) this.player.tell(e.message)
     }
-    player.playSound(SOUNDS.success)
-    player.tell(`§a► ${reply}`)
   }
 }
 

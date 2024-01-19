@@ -1,9 +1,15 @@
-import { MolangVariableMap, Vector, world } from '@minecraft/server'
+import {
+  LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
+  MolangVariableMap,
+  Vector,
+  world,
+} from '@minecraft/server'
 
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
 
-  STRUCTURE_CHUNK_SIZE: { x: 64, y: 64, z: 64 },
+  STRUCTURE_CHUNK_SIZE: { x: 64, y: 128, z: 64 },
   FILL_CHUNK_SIZE: { x: 32, y: 32, z: 32 },
   COPY_FILE_NAME: 'copy',
   BACKUP_PREFIX: 'backup',
@@ -56,11 +62,16 @@ export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2),
       ((z == min.z || z == max.z) && (x == min.x || x == max.x))
 
     if (isEdge) {
-      world.overworld.spawnParticle(
-        WE_CONFIG.DRAW_SELECTION_PARTICLE,
-        { x, y, z },
-        WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS
-      )
+      try {
+        world.overworld.spawnParticle(
+          WE_CONFIG.DRAW_SELECTION_PARTICLE,
+          { x, y, z },
+          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS
+        )
+      } catch (e) {
+        if (e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) continue
+        throw e
+      }
     }
   }
 }

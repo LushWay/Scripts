@@ -8,8 +8,5 @@ new Command({
 })
   .int('undoCount', true)
   .executes((ctx, r) => {
-    const we = WorldEdit.forPlayer(ctx.sender)
-
-    const status = we.undo(!isNaN(r) ? r : 1)
-    ctx.reply(status)
+    WorldEdit.forPlayer(ctx.sender).undo(!isNaN(r) ? r : 1)
   })

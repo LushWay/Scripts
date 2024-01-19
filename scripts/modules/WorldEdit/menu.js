@@ -1,6 +1,8 @@
 import { BlockPermutation, BlockStates, BlockTypes, Player } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
+import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 import {
   DEFAULT_BLOCK_SETS,
   SHARED_POSTFIX,
@@ -8,27 +10,31 @@ import {
   getOtherPlayersBlockSets,
   setBlockSet,
 } from 'modules/WorldEdit/utils/blocksSet.js'
-import { ActionForm, BUTTON, FormCallback, GAME_UTILS, ModalForm, util } from 'smapi.js'
-import { WorldEditTool } from './class/Tool.js'
+import { ActionForm, BUTTON, FormCallback, GAME_UTILS, ModalForm, is, util } from 'smapi.js'
+import { WorldEditTool } from './class/WorldEditTool.js'
 
 /**
+ * Main we menu
  * @param {Player} player
  */
-export function WEMenu(player, body = '') {
+export function WEmenu(player, body = '') {
   const heldItem = player.mainhand()
   if (heldItem.typeId) {
     body = `Создание доступно только при пустой руке.` || body
   }
 
-  const form = new ActionForm('§dWorld§6Edit', body).addButton('Наборы блоков', () => WEBlocksSets(player))
+  const form = new ActionForm('§dWorld§6Edit', body)
+  form.addButton('§3Наборы блоков', () => WEblocksSetsMenu(player))
+  form.addButton('§3Отмена/Восстановление', () => WEundoRedoMenu(player))
 
   for (const tool of WorldEditTool.tools) {
     const buttonName = tool.getMenuButtonName(player)
     if (!buttonName) continue
+
     form.addButton(buttonName, () => {
       const slotOrError = tool.getToolSlot(player)
       if (typeof slotOrError === 'string') {
-        WEMenu(player, '§c' + slotOrError)
+        WEmenu(player, '§c' + slotOrError)
       } else {
         tool.editToolForm?.(slotOrError, player, false)
       }
@@ -37,15 +43,16 @@ export function WEMenu(player, body = '') {
 
   form.show(player)
 }
+
 /**
  * @param {Player} player
  */
-function WEBlocksSets(player) {
+function WEblocksSetsMenu(player) {
   const blockSets = getAllBlockSets(player.id)
   const sets = new ActionForm('Наборы блоков')
-  sets.addButton(ActionForm.backText, () => WEMenu(player))
+  sets.addButton(ActionForm.backText, () => WEmenu(player))
   sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
-    manageBlockSet({
+    WEmanageBlocksSetMenu({
       blockSets,
       player,
       action: 'Создать новый',
@@ -53,12 +60,14 @@ function WEBlocksSets(player) {
     })
   })
 
-  sets.addButton('§3Наборы других игроков...', () => otherPlayersBlockSets(player, () => WEBlocksSets(player)))
+  sets.addButton('§3Наборы других игроков...', () =>
+    WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player))
+  )
 
   for (const setName of Object.keys(blockSets)) {
     const shared = Object.values(DEFAULT_BLOCK_SETS).find(e => blockSets[setName] === e)
     sets.addButton(setName, () =>
-      editBlocksSet({
+      WEeditBlocksSetMenu({
         player,
         setName,
         sets: blockSets,
@@ -79,7 +88,7 @@ function WEBlocksSets(player) {
  * @param {boolean} [o.deletePrevious=false]
  * @param {() => void} [o.onFail]
  */
-function manageBlockSet({
+function WEmanageBlocksSetMenu({
   blockSets,
   player,
   action,
@@ -100,7 +109,7 @@ function manageBlockSet({
       if (!name || name === setName) return onFail()
       if (deletePrevious && setName) setBlockSet(player.id, setName, undefined)
       setBlockSet(player.id, name, set ? JSON.parse(JSON.stringify(set)) : set)
-      editBlocksSet({
+      WEeditBlocksSetMenu({
         player,
         setName: name,
         sets: undefined,
@@ -113,7 +122,7 @@ function manageBlockSet({
  * @param {Player} player
  * @param {() => void} onBack
  */
-function otherPlayersBlockSets(player, onBack) {
+function WEotherPlayersBlockSetsMenu(player, onBack) {
   const form = new ActionForm('§3Наборы блоков других игроков')
   form.addButton(ActionForm.backText, onBack)
 
@@ -121,7 +130,7 @@ function otherPlayersBlockSets(player, onBack) {
     const name = Player.name(otherPlayerId) ?? otherPlayerId
 
     form.addButton(name, () => {
-      playerBlockSet(player, otherPlayerId, blockSets, () => otherPlayersBlockSets(player, onBack))
+      WEplayerBlockSetMenu(player, otherPlayerId, blockSets, () => WEotherPlayersBlockSetsMenu(player, onBack))
     })
   }
   form.show(player)
@@ -134,7 +143,7 @@ function otherPlayersBlockSets(player, onBack) {
  * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} blockSets
  * @param {() => void} onBack
  */
-function playerBlockSet(player, otherPlayerId, blockSets, onBack) {
+function WEplayerBlockSetMenu(player, otherPlayerId, blockSets, onBack) {
   const name = Player.name(otherPlayerId) ?? otherPlayerId
 
   const pform = new ActionForm(name ?? otherPlayerId, '§3Наборы блоков:')
@@ -142,7 +151,7 @@ function playerBlockSet(player, otherPlayerId, blockSets, onBack) {
 
   for (const setName of Object.keys(blockSets)) {
     pform.addButton(setName, () =>
-      editBlocksSet({
+      WEeditBlocksSetMenu({
         player,
         setName,
         sets: blockSets,
@@ -164,7 +173,7 @@ function playerBlockSet(player, otherPlayerId, blockSets, onBack) {
  * @param {boolean} [o.editStates]
  * @param {() => void} [o.back]
  */
-function editBlocksSet(o) {
+function WEeditBlocksSetMenu(o) {
   const {
     player,
     setName,
@@ -172,7 +181,7 @@ function editBlocksSet(o) {
     ownsSet = true,
     add = true,
     editStates = false,
-    back = () => WEBlocksSets(player),
+    back = () => WEblocksSetsMenu(player),
   } = o
   let set = sets[setName]
   if (!set) {
@@ -191,7 +200,7 @@ function editBlocksSet(o) {
     slot: 0,
     icon: 'textures/blocks/glass',
     nameTag: 'Пусто',
-    callback: () => editBlocksSet(o),
+    callback: () => WEeditBlocksSetMenu(o),
   }
 
   form.title(setName)
@@ -213,7 +222,7 @@ function editBlocksSet(o) {
         callback() {
           const newName = setName.replace(SHARED_POSTFIX, '')
           setBlockSet(player.id, newName, set)
-          editBlocksSet({
+          WEeditBlocksSetMenu({
             ...o,
             setName: newName,
             sets: undefined,
@@ -226,14 +235,14 @@ function editBlocksSet(o) {
         nameTag: 'Копировать набор',
         description: 'Нажмите чтобы копировать набор.',
         callback() {
-          manageBlockSet({
+          WEmanageBlocksSetMenu({
             player,
             setName,
             set,
             blockSets: sets,
             action: 'Копировать набор',
             deletePrevious: false,
-            onFail: () => editBlocksSet(o),
+            onFail: () => WEeditBlocksSetMenu(o),
           })
         },
       },
@@ -242,14 +251,14 @@ function editBlocksSet(o) {
         nameTag: 'Переименовать набор',
         description: 'Нажмите чтобы переименовать набор.',
         callback() {
-          manageBlockSet({
+          WEmanageBlocksSetMenu({
             player,
             setName,
             set,
             blockSets: sets,
             action: 'Переименовать набор',
             deletePrevious: true,
-            onFail: () => editBlocksSet(o),
+            onFail: () => WEeditBlocksSetMenu(o),
           })
         },
       },
@@ -266,7 +275,7 @@ function editBlocksSet(o) {
             nameTag: add ? 'Режим добавления' : 'Режим удаления',
             description: 'Нажмите чтобы переключить',
             callback() {
-              editBlocksSet({ ...o, add: !add, editStates: false })
+              WEeditBlocksSetMenu({ ...o, add: !add, editStates: false })
             },
           },
       'S': {
@@ -274,7 +283,7 @@ function editBlocksSet(o) {
         nameTag: editStates ? 'Вернутьс в режим добавления блоков' : 'Вернуться в режим редактирования типов блоков',
         description: 'Нажмите чтобы переключить',
         callback() {
-          editBlocksSet({ ...o, editStates: !editStates })
+          WEeditBlocksSetMenu({ ...o, editStates: !editStates })
         },
       },
       'D': {
@@ -295,10 +304,10 @@ function editBlocksSet(o) {
                 setName,
                 set.filter(e => !blocksToClear.includes(e))
               )
-              editBlocksSet({ ...o, sets: undefined })
+              WEeditBlocksSetMenu({ ...o, sets: undefined })
             },
             'Отмена',
-            () => editBlocksSet(o)
+            () => WEeditBlocksSetMenu(o)
           )
         },
       },
@@ -316,7 +325,7 @@ function editBlocksSet(o) {
               back()
             },
             'Отмена',
-            () => editBlocksSet(o)
+            () => WEeditBlocksSetMenu(o)
           )
         },
       },
@@ -386,7 +395,7 @@ function editBlocksSet(o) {
           : '',
       ],
       async callback() {
-        if (!ownsSet) return editBlocksSet(o)
+        if (!ownsSet) return WEeditBlocksSetMenu(o)
 
         if (!editStates) {
           if (blockInSet) {
@@ -410,14 +419,14 @@ function editBlocksSet(o) {
               'Невозможно редактировать свойства блока, не находящегося в наборе. Добавьте его в набор.'
             )
 
-          blockInSet[1] = await editBlockStates(player, blockInSet[1] ?? {}, () => editBlocksSet(o))
+          blockInSet[1] = await WEeditBlockStatesMenu(player, blockInSet[1] ?? {}, () => WEeditBlocksSetMenu(o))
         }
 
         // Save changes
         setBlockSet(player.id, setName, set)
 
         // Reopen to show them
-        editBlocksSet({ ...o, sets: getAllBlockSets(player.id) })
+        WEeditBlocksSetMenu({ ...o, sets: getAllBlockSets(player.id) })
       },
     }
     if (setButton) form.button(button)
@@ -459,7 +468,7 @@ const allStates = BlockStates.getAll()
  * @param {() => void} back
  * @returns {Promise<Record<string, string | boolean | number>>}
  */
-export function editBlockStates(player, states, back, edited = false) {
+export function WEeditBlockStatesMenu(player, states, back, edited = false) {
   const promise = new Promise(resolve => {
     const form = new ActionForm('Редактировать свойства блока')
     form.addButton(ActionForm.backText, () => {
@@ -493,11 +502,11 @@ export function editBlockStates(player, states, back, edited = false) {
             const editStateForm = new ActionForm(stateName, `Значение сейчас: ${util.stringify(stateValue)}`)
 
             editStateForm.addButtonBack(() => {
-              resolve(editBlockStates(player, states, back))
+              resolve(WEeditBlockStatesMenu(player, states, back))
             })
             editStateForm.addButton('§cУдалить значение', () => {
               delete states[stateName]
-              resolve(editBlockStates(player, states, back))
+              resolve(WEeditBlockStatesMenu(player, states, back))
             })
 
             try {
@@ -526,12 +535,98 @@ export function editBlockStates(player, states, back, edited = false) {
 
   return promise
 }
+
 /**
- * @typedef {{typeId: string; states: Record<string, string | number | boolean>;}} ReplaceTarget
+ * Reference to block that can be replaced
+ * @typedef {{
+ *   typeId: string;
+ *   states: Record<string, string | number | boolean>;
+ * }} ReplaceTarget
  */
+
 /**
+ * Converts replace target or block permutation to permutation. Usefull when need to make code cleaner
  * @param {ReplaceTarget | BlockPermutation} target
  */
 export function toPermutation(target) {
   return target instanceof BlockPermutation ? target : BlockPermutation.resolve(target.typeId, target.states)
+}
+
+/**
+ * Converts replace target or block permutation to replace target. Usefull when need to make code cleaner
+ * @param {ReplaceTarget | BlockPermutation | undefined} permutation
+ */
+export function toReplaceTarget(permutation) {
+  return permutation && permutation instanceof BlockPermutation
+    ? { typeId: permutation.type.id, states: permutation.getAllStates() }
+    : permutation
+}
+
+/**
+ * Stringifies replace targets to like "Wooden Slab, Stone"
+ * @param {(undefined | ReplaceTarget)[]} targets
+ */
+export function stringifyReplaceTargets(targets) {
+  return targets
+    .map(e => e?.typeId && GAME_UTILS.toNameTag(e.typeId))
+    .filter(Boolean)
+    .join(', ')
+}
+
+/**
+ * Show undo/redo (manage history) menu to player
+ * @param {Player} player - Player to show to
+ * @param {VoidFunction} [back] - Function that gets called when player press back
+ * @param {'undo' | 'redo'} [mode] - Either to show undoed or redoed action
+ * @param {string} [source] - Player whos history will be shown
+ */
+export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo', source = player.id, body = '') {
+  const form = new ActionForm(
+    'Отмена/Восстановление',
+    body +
+      `§3Нажмите на одно из последних действий ниже чтобы ${mode === 'undo' ? 'отменить (undo)' : 'вернуть (redo)'}${
+        player.id !== source ? `\n§3Показаны действия игрока §f§l${Player.name(source) ?? '<Без имени>'}` : ''
+      }`
+  )
+  form.addButtonBack(back)
+  form.addButton(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
+    WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', source)
+  )
+
+  if (is(player.id, 'admin')) {
+    form.addButton('§3Действия других игроков', () => {
+      WEundoRedoOtherPlayersMenu(player, () => form.show(player))
+    })
+  }
+
+  const we = WorldEdit.instances[source]
+  const actions = mode === 'undo' ? we.history : we.undos
+  // TODO Maybe group similiar actions
+  for (const action of actions.reverse()) {
+    form.addButton(action.name, () => {
+      we.loadBackup(actions, action)
+      player.playSound(SOUNDS.success)
+      WEundoRedoMenu(player, back, mode, source, '§aУспешно загружено!\n\n')
+    })
+  }
+
+  form.show(player)
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {VoidFunction} back
+ */
+function WEundoRedoOtherPlayersMenu(player, back) {
+  const form = new ActionForm('Выбрать игрока...').addButtonBack(back)
+
+  for (const playerId of Object.keys(WorldEdit.instances)) {
+    const name = Player.name(playerId) ?? '<Без имени>'
+    form.addButton(name, () => {
+      WEundoRedoMenu(player, () => WEundoRedoOtherPlayersMenu(player, back), 'undo', playerId)
+    })
+  }
+
+  form.show(player)
 }

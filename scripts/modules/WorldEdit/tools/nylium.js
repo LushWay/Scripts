@@ -2,7 +2,7 @@ import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { ModalForm } from 'smapi.js'
-import { WorldEditTool } from '../class/Tool.js'
+import { WorldEditTool } from '../class/WorldEditTool.js'
 import { blockSetDropdown, getBlockSet, stringifyBlocksSetRef } from '../utils/blocksSet.js'
 
 const nylium = new WorldEditTool({

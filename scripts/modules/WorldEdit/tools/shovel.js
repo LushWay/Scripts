@@ -1,8 +1,9 @@
 import { Vector, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
+import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 import { ModalForm } from 'smapi.js'
-import { WorldEditTool } from '../class/Tool.js'
+import { WorldEditTool } from '../class/WorldEditTool.js'
 import { blockSetDropdown, getAllBlockSets, getBlockSet, getBlockSetForReplaceTarget } from '../utils/blocksSet.js'
 
 const shovel = new WorldEditTool({
@@ -31,6 +32,7 @@ const shovel = new WorldEditTool({
     new ModalForm('§3Лопата')
       .addSlider('Радиус', 0, 10, 1, lore.radius ?? 1)
       .addSlider('Высота', 1, 10, 1, lore.height ?? 1)
+      .addSlider('Сдвиг (-1 под ногами, 2 над головой)', -10, 10, 1, lore.zone ?? 1)
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
@@ -41,12 +43,14 @@ const shovel = new WorldEditTool({
           noneText: 'Любой',
         }
       )
-      .show(player, (_, radius, height, blocksSet, replaceBlocksSet) => {
-        slot.nameTag = `§r§3Лопата §6${blocksSet}`
+      .show(player, (_, radius, height, zone, blocksSet, replaceBlocksSet) => {
+        slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
         lore.radius = radius
         lore.height = height
+        lore.zone = zone
         lore.blocksSet = [player.id, blocksSet]
         if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
+        else lore.replaceBlocksSet = ['', '']
         slot.setLore(shovel.stringifyLore(lore))
 
         player.tell(
@@ -67,11 +71,17 @@ const shovel = new WorldEditTool({
     if (!replaceBlocks.length) return player.onScreenDisplay.setActionBar('§cЗаменяемый набор блоков лопаты пустой!')
 
     const loc = Vector.floor(player.location)
-    const offset = -1
+    const offset = lore.zone
     const pos1 = Vector.add(loc, new Vector(-lore.radius, offset - lore.height, -lore.radius))
     const pos2 = Vector.add(loc, new Vector(lore.radius, offset, lore.radius))
 
-    WorldEdit.forPlayer(player).backup(pos1, pos2)
+    WorldEdit.forPlayer(player).backup(
+      `§eЛопата §7радиус §f${lore.radius} §7высота §f${lore.height} §7сдвиг §f${
+        lore.zone
+      }\n§7блоки: §f${stringifyReplaceTargets(blocks.map(toReplaceTarget))}`,
+      pos1,
+      pos2
+    )
 
     for (const loc of Vector.foreach(pos1, pos2)) {
       const block = world.overworld.getBlock(loc)

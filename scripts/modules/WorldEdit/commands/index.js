@@ -1,6 +1,5 @@
 const commands = [
   './general/desel.js',
-  './general/drawsel.js',
   './general/id.js',
   './general/we.js',
   './general/item.js',

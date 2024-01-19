@@ -9,7 +9,7 @@ import {
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
 import { ModalForm, getRole, util } from 'smapi.js'
 import { BaseBrushTool } from '../class/BaseBrushTool.js'
-import { WorldEditTool } from '../class/Tool.js'
+import { WorldEditTool } from '../class/WorldEditTool.js'
 import { WE_CONFIG } from '../config.js'
 import {
   SHARED_POSTFIX,
@@ -18,8 +18,8 @@ import {
   getBlockSet,
   getBlockSetForReplaceTarget,
 } from '../utils/blocksSet.js'
+import { Shape } from '../utils/shape.js'
 import { SHAPES } from '../utils/shapes.js'
-import { Shape } from '../utils/utils.js'
 
 world.overworld
   .getEntities({
@@ -94,7 +94,8 @@ const brush = new BrushTool({
         lore.size = radius
         lore.blocksSet = [player.id, blocksSet]
         if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
-        slot.nameTag = ('§r§3Кисть §6' + shape + '§r §f' + blocksSet.replace(SHARED_POSTFIX, '')).slice(0, 254)
+        else lore.replaceBlocksSet = ['', '']
+        slot.nameTag = `§r§3Кисть §6${shape}§r §f${blocksSet.replace(SHARED_POSTFIX, '')}`.slice(0, 254)
         slot.setLore(brush.stringifyLore(lore))
         player.tell(
           `§a► §r${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
@@ -137,7 +138,7 @@ const brush = new BrushTool({
 })
 
 brush.command
-  .literal({ name: 'extrasize' })
+  .literal({ name: 'extrasize', description: 'Устанавливает размер кисти больше чем лимит в форме', role: 'admin' })
   .int('Size')
   .executes((ctx, size) => {
     if (isNaN(size)) return ctx.error('Размер не является числом')

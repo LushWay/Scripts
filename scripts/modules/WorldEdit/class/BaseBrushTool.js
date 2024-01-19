@@ -1,7 +1,7 @@
 import { ItemStack, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, Player } from '@minecraft/server'
 import { WE_PLAYER_SETTINGS } from 'modules/WorldEdit/index.js'
 import { util } from 'smapi.js'
-import { WorldEditTool } from './Tool.js'
+import { WorldEditTool } from './WorldEditTool.js'
 
 /**
  * @typedef {{

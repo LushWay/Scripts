@@ -7,7 +7,7 @@ const rotTypes = ['none', 'x', 'xz', 'z']
 new Command({
   name: 'paste',
   description: 'Вставляет заранее скопированную зону',
-  role: 'moderator',
+  role: 'builder',
   type: 'we',
 })
   .int('rotation', true)

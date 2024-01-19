@@ -2,8 +2,8 @@ import { Player, Vector, system, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { setSelection } from 'modules/WorldEdit/commands/region/set.js'
 import { ActionForm } from 'smapi.js'
-import { WorldEditTool } from '../class/Tool.js'
 import { WorldEdit } from '../class/WorldEdit.js'
+import { WorldEditTool } from '../class/WorldEditTool.js'
 
 const wand = new WorldEditTool({
   name: 'wand',
@@ -14,7 +14,7 @@ const wand = new WorldEditTool({
       if (super.getMenuButtonName(player) === '') return ''
       const tool = player.mainhand().typeId === this.itemId
       const we = WorldEdit.forPlayer(player)
-      const selection = !!we.selectionCuboid
+      const selection = !!we.selection
       return (
         this.getMenuButtonNameColor(player) +
         (tool ? (selection ? 'Действия с областью' : '§cЗона не выделена!') : 'Получить топор')

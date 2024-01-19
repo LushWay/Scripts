@@ -6,6 +6,8 @@ import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksS
 import { ModalForm, getRole, util } from 'smapi.js'
 import { BaseBrushTool } from '../class/BaseBrushTool'
 
+// TODO Cache invalidation
+
 /**
  * @extends {BaseBrushTool<{smoothLevel: number}>}
  */
@@ -82,9 +84,9 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
   const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
 
-  WorldEdit.forPlayer(player).backup(pos1, pos2)
+  WorldEdit.forPlayer(player).backup('Сглаживание', pos1, pos2)
 
-  player.tell('Вычисление...')
+  player.tell('§3(Сглаживание)§f Вычисление...')
   // Create a copy of the voxel data
   const voxelDataCopy = getBlocksAreasData(baseBlock, radius)
 
@@ -144,7 +146,9 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
     .map(e => Object.values(e).map(e => Object.values(e)))
     .flat(2)
 
-  player.tell('Будет заполнено ' + toFill.length)
+  player.tell(
+    `§3(Сглаживание)§f Будет заполнено §6${toFill.length}§f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
+  )
   for (const e of toFill) {
     if (!e.location) continue
     const block = world.overworld.getBlock(e.location)
@@ -152,6 +156,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
     else block?.setType(MinecraftBlockTypes.Air)
     await nextTick
   }
+  player.tell('§3(Сглаживание)§f Готово')
 }
 
 /**

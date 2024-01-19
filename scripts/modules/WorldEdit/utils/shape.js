@@ -1,8 +1,9 @@
 import { BlockPermutation, Player, Vector, system, world } from '@minecraft/server'
 import { util } from 'smapi.js'
+import { Cuboid } from '../class/Cuboid.js'
 import { WorldEdit } from '../class/WorldEdit.js'
 import { WE_CONFIG } from '../config.js'
-import { Cuboid } from './cuboid.js'
+import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 
 /**
  * @param {Player} player
@@ -10,18 +11,22 @@ import { Cuboid } from './cuboid.js'
  * @param {Vector3} pos location to generate shape
  * @param {BlockPermutation[]} blocks blocks to use to fill block
  * @param {(import('modules/WorldEdit/menu.js').ReplaceTarget | undefined)[]} replaceBlocks
- * @param {number} rad size of sphere
+ * @param {number} size size of sphere
  * @returns {string | undefined}
  * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
-export function Shape(player, shape, pos, rad, blocks, replaceBlocks = [undefined]) {
+export function Shape(player, shape, pos, size, blocks, replaceBlocks = [undefined]) {
   if (replaceBlocks.length < 1) replaceBlocks.push(undefined)
   if (blocks.length < 1) return '§cПустой набор блоков'
   util.catch(async () => {
-    const loc1 = { x: -rad, y: -rad, z: -rad }
-    const loc2 = { x: rad, z: rad, y: rad }
+    const loc1 = { x: -size, y: -size, z: -size }
+    const loc2 = { x: size, z: size, y: size }
 
-    WorldEdit.forPlayer(player).backup(Vector.add(pos, loc1), Vector.add(pos, loc2))
+    WorldEdit.forPlayer(player).backup(
+      `§3Кисть §6${shape}§3, размер §f${size}§3, блоки: §f${stringifyReplaceTargets(blocks.map(toReplaceTarget))}`,
+      Vector.add(pos, loc1),
+      Vector.add(pos, loc2)
+    )
 
     const cuboid = new Cuboid(loc1, loc2)
     const conditionFunction = new Function(
@@ -29,7 +34,7 @@ export function Shape(player, shape, pos, rad, blocks, replaceBlocks = [undefine
       `return ${shape}`
     )
     /** @type {(...args: number[]) => boolean} */
-    const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, rad)
+    const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, size)
 
     let blocksSet = 0
     for (const { x, y, z } of Vector.foreach(loc1, loc2)) {

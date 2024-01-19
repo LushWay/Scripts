@@ -52,7 +52,7 @@ const expand = new Command({
 
 expand.int('size').executes((ctx, size) => {
   const we = WorldEdit.forPlayer(ctx.sender)
-  if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+  if (!we.selection) return ctx.reply('§cЗона не выделена!')
   SelectionManager.expand(we, size)
   ctx.reply(
     `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
@@ -69,7 +69,7 @@ expand
   .int('size')
   .executes((ctx, size) => {
     const we = WorldEdit.forPlayer(ctx.sender)
-    if (!we.selectionCuboid) return ctx.reply('§cЗона не выделена!')
+    if (!we.selection) return ctx.reply('§cЗона не выделена!')
     SelectionManager.expandVert(we, size)
     ctx.reply(
       `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(

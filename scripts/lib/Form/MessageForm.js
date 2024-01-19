@@ -92,14 +92,25 @@ export class MessageForm {
 }
 
 /**
+ * Asks player
  * @param {Player} player
  * @param {string} text
  * @param {string} yesText
- * @param {VoidFunction} onYesAction
+ * @param {VoidFunction} yesAction
  * @param {string} noText
- * @param {VoidFunction} onNoAction
+ * @param {VoidFunction} noAction
  */
-
-export function prompt(player, text, yesText, onYesAction, noText, onNoAction) {
-  new MessageForm('Вы уверены?', text).setButton1(yesText, onYesAction).setButton2(noText, onNoAction).show(player)
+export function prompt(player, text, yesText, yesAction, noText, noAction) {
+  return new Promise(resolve => {
+    new MessageForm('Вы уверены?', text)
+      .setButton1(yesText, () => {
+        yesAction()
+        resolve(true)
+      })
+      .setButton2(noText, () => {
+        noAction()
+        resolve(false)
+      })
+      .show(player)
+  })
 }

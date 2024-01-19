@@ -1,6 +1,7 @@
+import { system } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
-import { WorldEditTool } from 'modules/WorldEdit/class/Tool.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
+import { WorldEditTool } from 'modules/WorldEdit/class/WorldEditTool.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 
 const clipboard = new WorldEditTool({
@@ -13,6 +14,7 @@ const clipboard = new WorldEditTool({
   },
   editToolForm(slot, player) {
     slot.setLore(clipboard.stringifyLore({ version: 0, mode: 'paste' }))
+    slot.nameTag = 'Копировать/Вставить/Отменить (шифт)'
   },
   onUse(player, item) {
     if (clipboard.parseLore(item.getLore(), true)?.mode !== 'paste') return
@@ -32,8 +34,15 @@ const clipboard = new WorldEditTool({
     const we = WorldEdit.forPlayer(player)
 
     if (we.currentCopy) {
-      const { pastePos1, pastePos2 } = we.pastePositions(player, 0, we.currentCopy)
-      spawnParticlesInArea(pastePos1, pastePos2)
+      const { pastePos1, pastePos2 } = we.pastePositions(0, we.currentCopy)
+      system.delay(() => spawnParticlesInArea(pastePos1, pastePos2))
+      player.onScreenDisplay.setActionBar(
+        `Используйте предмет чтобы\n${
+          player.isSneaking ? '<Отменить последнее действие>' : '<Вставить скопированную область>'
+        }`
+      )
+    } else {
+      player.onScreenDisplay.setActionBar('§cВы ничего не копировали!')
     }
   },
 })
