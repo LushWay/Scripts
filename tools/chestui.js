@@ -8,6 +8,7 @@ export default defineGitDependency({
   },
   path: 'scripts/',
   dependencies: {
+    // 'extensions/typeIds.js': { localPath: 'lib/list/item-aux-ids.js', file: true },
     extensions: 'chestui',
   },
 })
