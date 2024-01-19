@@ -11,7 +11,7 @@ const HIERARCHY = ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin']
  * @param {Role} target
  */
 function canChange(who, target) {
-  return HIERARCHY.indexOf(who) > HIERARCHY.indexOf(target)
+  return HIERARCHY.indexOf(who) < HIERARCHY.indexOf(target)
 }
 
 const roleCommand = new Command({
