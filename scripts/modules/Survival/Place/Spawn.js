@@ -1,13 +1,20 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore, Portal, SafeAreaRegion, Settings } from 'smapi.js'
+import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings } from 'smapi.js'
 
+import { migration } from 'lib/Database/Migrations.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { Menu } from 'modules/Server/menuItem.js'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 
 // TODO Migrate player inv to root db and set it to anarchy
 // TODO TP to spawn when region is not same ===
+
+migration('move player inv', () => {
+  Object.values(PLAYER_DB).forEach(e => {
+    delete e.inv
+  })
+})
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
   /**
@@ -44,7 +51,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
   loadInventory(player) {
     super.loadInventory(player, () => {
       InventoryStore.load({ to: player, from: this.inventory })
-      player.database.survival.inv = 'spawn'
+      player.database.inv = 'spawn'
     })
   }
 

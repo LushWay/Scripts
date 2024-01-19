@@ -25,7 +25,13 @@ export const CUSTOM_ENTITIES = {
 
 export const SOUNDS = {
   levelup: 'random.levelup',
+  /**
+   * note.pling
+   */
   success: 'note.pling',
+  /**
+   * random.orb
+   */
   action: 'random.orb',
   click: 'note.hat',
   fail: 'block.false_permissions',

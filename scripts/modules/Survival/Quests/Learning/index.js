@@ -85,6 +85,7 @@ createPublicGiveItemCommand('startwand', LEARNING.START_AXE)
 
 Anarchy.learningRTP = player => {
   if (!LEARNING.RTP_LOCATION.valid) {
+    player.fail('Рандомная телепортация не настроена')
     return tpMenuOnce(player)
   }
 

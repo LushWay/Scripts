@@ -45,9 +45,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         player => {
           if (isBuilding(player)) return tpMenuOnce(player)
 
-          const db = player.database.survival
-
-          if (db.inv === this.inventoryName) {
+          if (player.database.inv === this.inventoryName) {
             return player.tell('§cВы уже находитесь на анархии!')
           }
 
@@ -63,14 +61,14 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
             this.loadInventory(player)
           }
 
-          db.inv = this.inventoryName
+          player.database.inv = this.inventoryName
 
           system.delay(() => {
-            if (!db.anarchy) {
+            if (!player.database.survival.anarchy) {
               this.learningRTP(player)
             } else {
-              player.teleport(db.anarchy)
-              delete db.anarchy
+              player.teleport(player.database.survival.anarchy)
+              delete player.database.survival.anarchy
             }
           })
         }
@@ -101,7 +99,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           to: player,
           from: this.inventoryStore.get(player.id, { remove: true }),
         })
-        player.database.survival.inv = 'anarchy'
+        player.database.inv = 'anarchy'
       }
     })
   }

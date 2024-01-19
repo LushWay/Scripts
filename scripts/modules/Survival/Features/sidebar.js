@@ -45,10 +45,10 @@ const sidebar = new Sidebar(
 $квест`,
   },
   {
-    режим: player => inventoryDisplay[player.database.survival.inv],
+    режим: player => inventoryDisplay[player.database.inv],
     регион: player => {
       let text = ''
-      if (player.database.survival.inv === 'anarchy') {
+      if (player.database.inv === 'anarchy') {
         const region = Region.locationInRegion(player.location, player.dimension.type)
         if (region) {
           if (!region.permissions.pvp) text = ', мирная зона'

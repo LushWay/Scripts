@@ -90,6 +90,7 @@ export class Structure {
       if (pos === this.pos1) {
         to = file.pos1
       } else {
+        // TODO Fix
         const offset = Vector.subtract(this.pos1, file.pos1)
         to = Vector.add(pos, offset)
       }

@@ -11,9 +11,8 @@ export const PLAYER_DB = new DynamicPropertyDB('player', {
   defaultValue: () => {
     return {
       role: 'member',
-      survival: {
-        inv: 'spawn',
-      },
+      inv: 'spawn',
+      survival: {},
     }
   },
 }).proxy()
@@ -32,7 +31,8 @@ OverTakes(Player, {
   },
 })
 
-world.afterEvents.playerSpawn.subscribe(({ player }) => {
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+  if (!initialSpawn) return
   if (player.database.name && player.database.name !== player.name) {
     const message = '§e> §3Игрок §f' + player.database.name + ' §r§3сменил ник на §f' + player.name
 

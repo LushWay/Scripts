@@ -1,7 +1,7 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, world } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 import { OverTakes } from './OverTakes.js'
 
-Player.prototype.tell = Player.prototype.sendMessage
 OverTakes(Player, {
   fetch(name) {
     for (const p of world.getPlayers()) {
@@ -13,7 +13,24 @@ OverTakes(Player, {
   },
 })
 
+/**
+ * @param {string} pref
+ * @param {string} sound
+ * @returns {(this: Player, message: string) => void}
+ */
+function prefix(pref, sound) {
+  return function (message) {
+    this.playSound(sound)
+    this.tell(pref + message)
+  }
+}
+
 OverTakes(Player.prototype, {
+  fail: prefix('§c', SOUNDS.fail),
+  warn: prefix('§e⚠ §6', SOUNDS.fail),
+  success: prefix('§a', SOUNDS.success),
+  info: prefix('', SOUNDS.action),
+
   tell: Player.prototype.sendMessage,
   applyDash(target, horizontalStrength, verticalStrength) {
     const view = target.getViewDirection()

@@ -13,7 +13,7 @@ function placeButton(place, inv, color = '§9', text = 'Спавн') {
 }
 
 Menu.open = player => {
-  const inv = player.database.survival.inv
+  const inv = player.database.inv
   return new ActionForm('§aShp1nat§6Mine')
     .addButton(placeButton('spawn', inv, '§9', 'Спавн'), () => {
       Spawn.portal?.teleport(player)

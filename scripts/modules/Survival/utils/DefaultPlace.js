@@ -22,7 +22,7 @@ export class DefaultPlaceWithInventory {
   loadInventory(player, callback) {
     if (isBuilding(player)) return
 
-    const currentInventory = player.database.survival.inv
+    const currentInventory = player.database.inv
     if (currentInventory === this.inventoryName) return
 
     DefaultPlaceWithInventory.places.forEach(place => {

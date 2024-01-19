@@ -101,7 +101,7 @@ loadRegionsWithGuards({
         player.triggerEvent('player:spawn')
       }
     } else {
-      if (player.database.survival.inv === 'spawn' && !isBuilding(player)) {
+      if (player.database.inv === 'spawn' && !isBuilding(player)) {
         Spawn.portal?.teleport(player)
       }
     }

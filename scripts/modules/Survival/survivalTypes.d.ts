@@ -1,8 +1,8 @@
 declare module '@minecraft/server' {
   interface PlayerDatabase {
+    inv: InventoryTypeName
     survival: {
       anarchy?: Vector3
-      inv: InventoryTypeName
       rtpElytra?: 1
       /**
        * Notice about placing/breaking blocks outside of region will be restored
