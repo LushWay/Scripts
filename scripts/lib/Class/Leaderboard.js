@@ -1,5 +1,6 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { util } from 'smapi.js'
 
 /**
  * @typedef {{
@@ -46,6 +47,23 @@ const STYLES = {
 }
 
 export class Leaderboard {
+  /**
+   *
+   * @param {string} scoreboardId
+   * @param {number} score
+   */
+  static parseCustomScore(scoreboardId, score, convertToMetricNumbers = false) {
+    if (scoreboardId.endsWith('Time')) {
+      const time = util.ms.remaining(score, { converters: ['ms', 'sec', 'hour'] })
+      return `${time.value} ${time.type}`
+    } else if (scoreboardId.endsWith('Date')) {
+      return new Date(score).toLocaleString()
+    }
+
+    if (convertToMetricNumbers) {
+      return toMetricNumbers(score)
+    }
+  }
   static styles = STYLES
   /**
    * @type {Record<string, Leaderboard>}
@@ -124,7 +142,7 @@ export class Leaderboard {
 
       leaderboard += `§${t}#${i + 1}§r `
       leaderboard += `§${n}${name}§r `
-      leaderboard += `§${s}${toMetricNumbers(scoreInfo.score)}§r\n`
+      leaderboard += `§${s}${Leaderboard.parseCustomScore(this.scoreboard.id, scoreInfo.score, true)}§r\n`
     }
 
     this.entity.nameTag = `§l§${style.objName}${name}\n§l${filler}§r\n${leaderboard}`

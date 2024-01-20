@@ -4,7 +4,7 @@ import { util } from 'lib/util.js'
 import { chunkIsUnloaded } from 'smapi.js'
 import { EditableLocation } from './EditableLocation.js'
 
-class EditableNpc {
+export class EditableNpc {
   static type = MinecraftEntityTypes.Npc
   static propertyName = 'type'
   /**
@@ -12,7 +12,9 @@ class EditableNpc {
    */
   static onInteract(event) {
     const npc = EditableNpc.npcs.find(e => e.entity?.id === event.target.id)
-    if (!npc) return event.player.tell(`§f${event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`)
+    if (!npc) return event.player.fail(`§f${event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`)
+
+    npc.onInteract(event)
   }
 
   /**
@@ -27,34 +29,32 @@ class EditableNpc {
   /**
    * Creates new dynamically loadable npc
    * @param {object} o - Options
-   * @param {string} o.name - Type name of the npc. Used to restore npc pointer after script reload
-   * @param {VoidFunction} o.onInteract - Function that gets called on interact
-   * @param {Dimensions} o.dimensionId - Dimension id
-   * @param {string} o.displayName - NameTag of the npc
-   * @param {number} o.skinVariant - Skin variant (Номер скина нпс в редактировании, начинается с 0)
+   * @param {string} o.id - Type name of the npc. Used to restore npc pointer after script reload
+   * @param {(event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void} o.onInteract - Function that gets called on interact
+   * @param {string} o.name - NameTag of the npc
+   * @param {Dimensions} [o.dimensionId] - Dimension id
    */
-  constructor({ name, onInteract, dimensionId = 'overworld', displayName, skinVariant }) {
+  constructor({ id, name, onInteract, dimensionId = 'overworld' }) {
     this.location = new EditableLocation(name + ' NPC')
+    this.id = id
     this.name = name
     this.onInteract = onInteract
     this.dimensionId = dimensionId
-    this.displayName = displayName
-    this.skinVariant = skinVariant
     EditableNpc.npcs.push(this)
   }
 
   spawn() {
     if (!this.location.valid) {
-      throw new TypeError(`§cNpc(§r${this.name}§r§c): Location is not valid, spawn is impossible. Set location first`)
+      throw new TypeError(`§cNpc(§r${this.id}§r§c): Location is not valid, spawn is impossible. Set location first`)
     }
 
     this.entity = world[this.dimensionId].spawnEntity(EditableNpc.type, this.location)
-    this.entity.nameTag = this.displayName
-    const variant = this.entity.getComponent('variant')
-    if (variant) {
-      // TODO Test how to set skin
-      variant.value = this.skinVariant
-    }
+    this.entity.nameTag = this.name
+    // const variant = this.entity.getComponent('variant')
+    // if (variant) {
+    //   // TODO Test how to set skin
+    //   variant.value = this.skinVariant
+    // }
   }
 }
 
@@ -66,7 +66,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
     try {
       EditableNpc.onInteract(event)
     } catch (e) {
-      event.player.tell('§cНе удалось открыть диалог. Сообщите об этом администрации.')
+      event.player.fail('Не удалось открыть диалог. Сообщите об этом администрации.')
       util.error(e)
     }
   })
@@ -96,7 +96,7 @@ system.runInterval(
           npc: e.getDynamicProperty(EditableNpc.propertyName),
         })))
 
-      const filteredNpcs = npcs.filter(e => e.npc === npc.name)
+      const filteredNpcs = npcs.filter(e => e.npc === npc.id)
       if (filteredNpcs.length > 1) {
         // More then one? Save only first one, kill others
         npc.entity = filteredNpcs.shift()?.entity

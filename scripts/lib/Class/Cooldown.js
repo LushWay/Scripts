@@ -37,8 +37,9 @@ export class Cooldown {
    * @param {string | Player} source id or player that used for generate key and tell messages
    * @param {number} time Time in ms
    */
-  constructor(db, prefix, source, time) {
+  constructor(db, prefix, source, time, tell = true) {
     this.db = db
+    this.tell = true
     this.key = Cooldown.genDBkey(prefix, typeof source === 'string' ? source : source.id)
     if (typeof source !== 'string') this.player = source
     this.time = time
@@ -54,9 +55,9 @@ export class Cooldown {
   isExpired() {
     const status = this.statusTime
     if (status === 'EXPIRED') return true
-    if (this.player) {
+    if (this.player && this.tell) {
       const time = util.ms.remaining(this.time - status)
-      this.player.tell(`§cПодожди еще §f${time.parsedTime} §c${time.type}`)
+      this.player.tell(`§cПодожди еще §f${time.value} §c${time.type}`)
     }
     return false
   }

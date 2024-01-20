@@ -33,9 +33,9 @@ class MineshaftBuilder {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Mineshaft = new MineshaftBuilder()
 
-// INTERACTION_GUARD.subscribe((player, region, context) => {
-//   if (region === Mineshaft.safeArea && context.type === 'break') {
-//     const { block, dimension } = context.event
+// actionGuard((player, region, ctx) => {
+//   if (region === Mineshaft.safeArea && ctx.type === 'break') {
+//     const { block, dimension } = ctx.event
 //     scheduleBlockPlace({
 //       dimension: dimension.type,
 //       location: block.location,

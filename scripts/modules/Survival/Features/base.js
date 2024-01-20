@@ -1,9 +1,8 @@
 import { ItemStack, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
-import { MoneyCost, Store } from 'lib/Class/Store.js'
 import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
-import { INTERACTION_GUARD } from 'modules/Survival/config.js'
+import { actionGuard } from 'modules/Survival/guard.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus } from 'smapi.js'
 
@@ -12,9 +11,9 @@ export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§7Поставьте эту бочку и она стане базой.'
 )
 
-new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(BASE_ITEM_STACK, new MoneyCost(10))
+// new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(BASE_ITEM_STACK, new ScoreboardCost(10))
 
-INTERACTION_GUARD.subscribe((_, __, ctx) => {
+actionGuard((_, __, ctx) => {
   if ((ctx.type === 'interactWithBlock' || ctx.type === 'place') && ctx.event.itemStack?.is(BASE_ITEM_STACK))
     return true
 })

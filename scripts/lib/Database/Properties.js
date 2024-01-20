@@ -65,7 +65,7 @@ export class DynamicPropertyDB {
   init() {
     // Init
     try {
-      let value = '{}'
+      let value = ''
       let length = world.getDynamicProperty(this.key) ?? 0
       if (typeof length === 'string') {
         // Old way load
@@ -97,7 +97,7 @@ export class DynamicPropertyDB {
       }
 
       this.value = Object.fromEntries(
-        Object.entries(JSON.parse(value)).map(([key, value]) => {
+        Object.entries(JSON.parse(value || '{}')).map(([key, value]) => {
           const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
           return [
             // Add default value
@@ -109,7 +109,7 @@ export class DynamicPropertyDB {
         })
       )
     } catch (error) {
-      util.error(new DatabaseError(`Failed to init key '${this.key}': ${error}`))
+      util.error(new DatabaseError(`Failed to init table '${this.key}': ${util.error(error, { returnText: true })}`))
     }
   }
 

@@ -13,9 +13,6 @@ import { getRole, prompt, util } from 'smapi.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'
-
-// TODO Undo/redo manage menu
-// TODO Undo redo menu for any player
 export class WorldEdit {
   /**
    * @param {Player} player
@@ -354,7 +351,7 @@ export class WorldEdit {
       }
 
       const endTime = util.ms.remaining(Date.now() - startTime, {
-        timeTypes: ['ms', 'sec', 'min'],
+        converters: ['ms', 'sec', 'min'],
       })
 
       let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3${util.ngettext(selection.size, [
@@ -362,8 +359,8 @@ export class WorldEdit {
         'блока',
         'блоков',
       ])}`
-      if (endTime.parsedTime !== '0') {
-        reply += ` за §f${endTime.parsedTime} §3${endTime.type}.`
+      if (endTime.value !== '0') {
+        reply += ` за §f${endTime.value} §3${endTime.type}.`
       }
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyReplaceTargets(replaceTargets)}`

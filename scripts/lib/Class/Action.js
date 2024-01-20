@@ -1,36 +1,95 @@
-import { Player, Vector, system } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
+import { Player, Vector, system, world } from '@minecraft/server'
 
-export class Place {
+/**
+ * @typedef {'enters' | 'interactions'} PlaceType
+ */
+
+/**
+ * @typedef {(player: Player) => void} PlayerCallback
+ */
+
+export class PlaceAction {
   /**
-   * Creates action that triggers function when any player gets this place.
    * @param {Vector3} place
-   * @param {(player: Player) => void} action
+   * @param {Dimensions} dimension
    */
-  static action(place, action) {
-    const id = Vector.string(place)
-    this.actions[id] ??= new Set()
-    this.actions[id].add(action)
+  static placeId(place, dimension) {
+    return Vector.string(place) + dimension
+  }
+  /**
+   * @param {PlaceType} to
+   * @param {Vector3} place
+   * @param {PlayerCallback} action
+   * @param {Dimensions} [dimension]
+   */
+  static subscribe(to, place, action, dimension = 'overworld') {
+    const id = this.placeId(place, dimension)
+    this[to][id] ??= new Set()
+    this[to][id].add(action)
 
     return { id, action }
   }
-  /** @type {Record<string, Set<(player: Player) => void>>} */
-  static actions = {}
+  /**
+   * @param {PlaceType} to
+   * @param {Vector3} place
+   * @param {Player} player
+   * @param {Dimensions} dimension
+   */
+  static emit(to, place, player, dimension) {
+    const actions = this[to][this.placeId(place, dimension)]
+    if (!actions) return false
+
+    actions.forEach(action => action(player))
+    return true
+  }
+  /**
+   * Creates action that triggers function when any player walks into this place.
+   * @param {Vector3} place
+   * @param {PlayerCallback} action
+   * @param {Dimensions} [dimension]
+   */
+  static onEnter(place, action, dimension) {
+    return this.subscribe('enters', place, action, dimension)
+  }
+  /**
+   * @type {Record<string, Set<PlayerCallback>>}
+   */
+  static enters = {}
+
+  /**
+   * Creates action that triggers function when any player interacts with block on this place.
+   * @param {Vector3} place
+   * @param {PlayerCallback} action
+   * @param {Dimensions} [dimension]
+   */
+  static onInteract(place, action, dimension) {
+    return this.subscribe('interactions', place, action, dimension)
+  }
+
+  /**
+   * @type {Record<string, Set<PlayerCallback>>}
+   */
+  static interactions = {}
+
+  /** @private */
+  static init() {
+    world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+      if (this.emit('interactions', event.block, event.player, event.player.dimension.type)) event.cancel = true
+    })
+
+    system.runPlayerInterval(
+      player => this.emit('enters', Vector.floor(player.location), player, player.dimension.type),
+      'Action.onEnterPlace',
+      10
+    )
+  }
 
   /** @protected */
   constructor() {}
 }
 
-system.runPlayerInterval(
-  player => {
-    const location = Vector.string(Vector.floor(player.location))
-    if (Place.actions[location]) {
-      Place.actions[location].forEach(a => a(player))
-    }
-  },
-  'Place.action',
-  10
-)
+// @ts-expect-error Private not actually private
+PlaceAction.init()
 
 /**
  * @typedef {(player: Player) => boolean | {lockText: string}} LockActionChecker
@@ -68,10 +127,7 @@ export class LockAction {
       const isLocked = lock.isLocked(player)
       if (isLocked) {
         const text = typeof isLocked === 'object' ? isLocked.lockText : lock.lockText
-        if (tell && player.isValid()) {
-          player.playSound(SOUNDS.fail)
-          player.tell('§l§f>§r §c' + text)
-        }
+        if (tell && player.isValid()) player.fail(text)
         return returnText ? text : true
       }
     }

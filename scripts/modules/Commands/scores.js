@@ -1,6 +1,6 @@
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
 import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
-import { ActionForm, BUTTON, ModalForm, PLAYER_DB } from 'smapi.js'
+import { ActionForm, BUTTON, Leaderboard, ModalForm, PLAYER_DB } from 'smapi.js'
 
 new Command({
   name: 'scores',
@@ -57,11 +57,13 @@ function scoreboardMenu(player, scoreboard) {
     form.show(player)
   })
 
+  const manager = new ScoreboardDB(scoreboard.id)
+
   for (const p of scoreboard.getParticipants()) {
     if (p.type === ScoreboardIdentityType.FakePlayer) {
       const name = Player.name(p.displayName)
       if (!name) continue
-      form.addButton(name + '§r §6' + scoreboard.getScore(p.displayName), () => {
+      form.addButton(`${name}§r §6${Leaderboard.parseCustomScore(scoreboard.id, manager.get(p.displayName))}`, () => {
         editPlayerScore(player, scoreboard, p.displayName, name)
       })
     }
@@ -79,7 +81,13 @@ function scoreboardMenu(player, scoreboard) {
  */
 function editPlayerScore(player, scoreboard, id, name, back = () => scoreboardMenu(player, scoreboard)) {
   const manager = new ScoreboardDB(scoreboard.id)
-  new ActionForm('Редактировать счет', `Игрок: ${name}\nСчет: ${manager.get(id)}`)
+  new ActionForm(
+    'Редактировать счет',
+    `Игрок: ${name}\nСчет: ${manager.get(id)}\nКонвертированный счет: ${Leaderboard.parseCustomScore(
+      scoreboard.id,
+      manager.get(id)
+    )}`
+  )
     .addButtonBack(back)
     .addButton('Добавить', () => {
       new ModalForm('Значение').addTextField('Значение', 'Ничего не произойдет').show(player, (ctx, value) => {

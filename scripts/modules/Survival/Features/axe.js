@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Build/list.js'
-import { INTERACTION_GUARD } from 'modules/Survival/config.js'
+import { actionGuard } from 'modules/Survival/guard.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { Region, util } from 'smapi.js'
 
@@ -17,7 +17,7 @@ export const AXE = {
   ALLOW_BREAK_IN_REGIONS: [],
 }
 
-INTERACTION_GUARD.subscribe((_, region, ctx) => {
+actionGuard((_, region, ctx) => {
   if (
     ctx.type === 'break' &&
     // ctx.event.itemStack?.typeId.endsWith('axe') &&

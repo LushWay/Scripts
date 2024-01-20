@@ -1,5 +1,5 @@
 import { Player, Vector } from '@minecraft/server'
-import { LockAction, Place } from 'lib/Class/Action.js'
+import { LockAction, PlaceAction } from 'lib/Class/Action.js'
 
 /**
  * @typedef {object} TeleportOptions
@@ -74,7 +74,7 @@ export class Portal {
 
     if (from && to) {
       for (const pos of Vector.foreach(from, to)) {
-        Place.action(pos, p => this.teleport(p))
+        PlaceAction.onEnter(pos, p => this.teleport(p))
       }
     }
   }

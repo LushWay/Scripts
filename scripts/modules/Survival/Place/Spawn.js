@@ -7,12 +7,12 @@ import { isBuilding } from 'modules/Build/list.js'
 import { Menu } from 'modules/Server/menuItem.js'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 
-// TODO Migrate player inv to root db and set it to anarchy
 // TODO TP to spawn when region is not same ===
 
 migration('move player inv', () => {
   Object.values(PLAYER_DB).forEach(e => {
-    delete e.inv
+    // @ts-expect-error migration
+    delete e.survival.inv
   })
 })
 

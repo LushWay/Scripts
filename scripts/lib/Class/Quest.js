@@ -5,7 +5,7 @@ import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { LootTable } from 'lib/Class/LootTable.js'
 import { Temporary } from 'lib/Class/Temporary.js'
 import { util } from 'lib/util.js'
-import { Place } from './Action.js'
+import { PlaceAction } from './Action.js'
 
 // // @ts-expect-error Bruh
 // Set.prototype.toJSON = function () {
@@ -268,11 +268,11 @@ class PlayerQuest {
       text,
       description,
       activate() {
-        /** @type {ReturnType<typeof Place.action>[]} */
+        /** @type {ReturnType<typeof PlaceAction.onEnter>[]} */
         const actions = []
         for (const pos of Vector.foreach(from, to)) {
           actions.push(
-            Place.action(pos, player => {
+            PlaceAction.onEnter(pos, player => {
               if (player.id !== this.player.id) return
 
               this.next()
@@ -286,7 +286,7 @@ class PlayerQuest {
           cleanup() {
             temp.cleanup()
             actions.forEach(e => {
-              Place.actions[e.id].delete(e.action)
+              PlaceAction.enters[e.id].delete(e.action)
             })
           },
         }

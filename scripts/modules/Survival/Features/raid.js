@@ -20,8 +20,8 @@ new LockAction(player => {
   const raidLockTime = RAID.get(player)
 
   if (raidLockTime > 0) {
-    const { parsedTime, type } = util.ms.remaining(raidLockTime * 1000, {
-      timeTypes: ['sec', 'min', 'hour', 'day'],
+    const { value: parsedTime, type } = util.ms.remaining(raidLockTime * 1000, {
+      converters: ['sec', 'min', 'hour', 'day'],
     })
     return {
       lockText: `${RAID_LOCKTEXT} Осталось ${parsedTime} ${type}`,

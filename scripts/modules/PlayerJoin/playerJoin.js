@@ -43,7 +43,7 @@ class JoinBuilder {
   constructor() {
     world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       if (!initialSpawn) return
-      player.scores.joinDate ??= ~~(Date.now() / 1000)
+      player.scores.joinDate ??= Date.now()
       player.database.join ??= {}
       player.database.join.position = this.playerAt(player)
     })

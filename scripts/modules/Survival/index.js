@@ -1,5 +1,6 @@
 import './Features/base.js'
 import './Features/baseMenu.js'
+import './Features/breakPlaceOutsideOfRegion.js'
 import './Features/explosibleFireworks.js'
 import './Features/fireballAndIceBomb.js'
 import './Features/menu.js'
@@ -19,4 +20,4 @@ import './Place/VillageOfMiners.js'
 
 import './Quests/index.js'
 
-import './config.js'
+import './guard.js'

@@ -289,7 +289,7 @@ export const util = {
   },
 
   /**
-   * @typedef {'day' | 'hour' | 'min' | 'sec' | 'ms'} Time
+   * @typedef {'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'} Time
    */
 
   ms: {
@@ -297,12 +297,12 @@ export const util = {
      * Parses the remaining time in milliseconds into a more human-readable format
      * @param {number} ms - Milliseconds to parse
      * @param {object} [options]
-     * @param {Time[]} [options.timeTypes]
-     * @returns {{ parsedTime: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
+     * @param {Time[]} [options.converters]
+     * @returns {{ value: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
      */
-    remaining(ms, { timeTypes = ['sec', 'min', 'hour', 'day'] } = {}) {
-      const currentConverters = timeTypes.map(e => util.ms.converters[e])
-      for (const { time, friction = 0, plurals } of currentConverters) {
+    remaining(ms, { converters: converterTypes = ['sec', 'min', 'hour', 'day'] } = {}) {
+      const converters = converterTypes.map(type => util.ms.converters[type])
+      for (const { time, friction = 0, plurals } of converters) {
         const value = ms / time
         if (~~value > 1 && value < 100) {
           // Replace all 234.0 values to 234
@@ -312,13 +312,13 @@ export const util = {
             .replace(/\.$/m, '')
 
           return {
-            parsedTime,
+            value: parsedTime,
             type: util.ngettext(Number(parsedTime), plurals),
           }
         }
       }
 
-      return { parsedTime: ms.toString(), type: 'миллисекунд' }
+      return { value: ms.toString(), type: 'миллисекунд' }
     },
     /**
      * Converts provided time to ms depending on type
@@ -354,6 +354,16 @@ export const util = {
         time: 1000 * 60 * 60 * 60 * 24,
         plurals: ['день', 'дня', 'дней'],
         friction: 2,
+      },
+      month: {
+        time: 1000 * 60 * 60 * 60 * 24 * 30,
+        plurals: ['месяц', 'месяца', 'месяцев'],
+        friction: 2,
+      },
+      year: {
+        time: 1000 * 60 * 60 * 60 * 24 * 30 * 12,
+        plurals: ['год', 'года', 'лет'],
+        friction: 3,
       },
     },
   },

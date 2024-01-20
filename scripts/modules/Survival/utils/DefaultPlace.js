@@ -1,7 +1,7 @@
 import { Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Build/list.js'
-import { INTERACTION_GUARD } from 'modules/Survival/config.js'
+import { actionGuard } from 'modules/Survival/guard.js'
 import { EditableLocation, SafeAreaRegion } from 'smapi.js'
 
 export class DefaultPlaceWithInventory {
@@ -68,7 +68,7 @@ export class DefaultPlaceWithSafeArea {
 }
 
 system.delay(() => {
-  INTERACTION_GUARD.subscribe((_, region, ctx) => {
+  actionGuard((_, region, ctx) => {
     if (
       ctx.type === 'interactWithBlock' &&
       ctx.event.block.typeId === MinecraftBlockTypes.CraftingTable &&

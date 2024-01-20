@@ -2,11 +2,14 @@ import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
 import { util } from 'smapi.js'
 
 /**
- * @type {Record<import("@minecraft/server").ScoreNames, string>}
+ * @type {Record<import("@minecraft/server").ScoreName, string>}
  */
 const displayNames = {
-  joinDate: 'Дата входа',
-  joinTimes: 'Кол-во входов',
+  lastSeenDate: 'Последний раз онлайн',
+  totalOnlineTime: 'Онлайн всего',
+  anarchyOnlineTime: 'Онлайн на анархии',
+  joinDate: 'Время первого входа',
+  joinTimes: 'Всего входов на сервер',
   leafs: '§aЛистья',
   money: '§6Монеты',
   pvp: 'PVP',
@@ -83,8 +86,10 @@ export class ScoreboardDB {
   static objective(name, displayName = name) {
     if (name in this.objectives) return this.objectives[name]
 
-    return (this.objectives[name] =
+    const objective = (this.objectives[name] =
       world.scoreboard.getObjective(name) ?? world.scoreboard.addObjective(name, displayName))
+
+    return objective
   }
 
   /**

@@ -102,14 +102,22 @@ declare module '@minecraft/server' {
     quest?: import('./Class/Quest').QuestDB
   }
 
-  type ScoreNames = 'money' | 'leafs' | 'pvp' | 'joinDate' | 'joinTimes'
+  type ScoreName =
+    | 'money'
+    | 'leafs'
+    | 'pvp'
+    | 'joinDate'
+    | 'joinTimes'
+    | 'lastSeenDate'
+    | 'totalOnlineTime'
+    | 'anarchyOnlineTime'
   interface Player {
-    scores: Record<ScoreNames, number>
+    scores: Record<ScoreName, number>
     database: PlayerDatabase
 
     // TODO Implement and migrate all code to those methods
     /**
-     * Sends message prefixed with §c> §f
+     * Sends message prefixed with §4> §c
      * and plays SOUNDS.fail
      */
     fail(message: string): void

@@ -1,7 +1,7 @@
 import { ItemStack, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'
-import { INTERACTION_GUARD } from 'modules/Survival/config.js'
+import { actionGuard } from 'modules/Survival/guard.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { withState } from 'modules/WorldEdit/utils/blocksSet.js'
 import { util } from 'smapi.js'
@@ -38,8 +38,8 @@ system.runPlayerInterval(
   2
 )
 
-INTERACTION_GUARD.subscribe((player, region, ctx) => {
-  // TODO Maybe allow breaking outside of the region
+actionGuard((player, region, ctx) => {
+  // TODO Maybe allow breaking quartz outside of the region
   if (
     ctx.type !== 'break' ||
     region !== TechCity.safeArea ||

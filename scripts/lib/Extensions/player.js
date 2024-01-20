@@ -26,10 +26,10 @@ function prefix(pref, sound) {
 }
 
 OverTakes(Player.prototype, {
-  fail: prefix('§c', SOUNDS.fail),
-  warn: prefix('§e⚠ §6', SOUNDS.fail),
-  success: prefix('§a', SOUNDS.success),
-  info: prefix('', SOUNDS.action),
+  fail: prefix('§4§l> §r§c', SOUNDS.fail),
+  warn: prefix('§l§e⚠ §6', SOUNDS.fail),
+  success: prefix('§a§l> §r', SOUNDS.success),
+  info: prefix('§b§l> §r§3', SOUNDS.action),
 
   tell: Player.prototype.sendMessage,
   applyDash(target, horizontalStrength, verticalStrength) {
