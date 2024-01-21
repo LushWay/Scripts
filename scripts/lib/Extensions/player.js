@@ -64,7 +64,7 @@ OverTakes(Player.prototype, {
     })
     CLOSING_CHAT.delete(this.id)
     health.setCurrentValue(current)
-    this.runCommand('stopsound @s game.player.hurt')
+    this.runCommand('stopsound @a[r=5] game.player.hurt')
 
     // Return player back to creative mode
     if (isCreative) this.runCommand('gamemode c')
