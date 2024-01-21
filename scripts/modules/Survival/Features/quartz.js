@@ -20,8 +20,6 @@ const HoeEffectLevels = {
   [MinecraftItemTypes.NetheriteHoe]: 3,
 }
 
-// TODO Maybe add function allowed(player, region)
-
 system.runPlayerInterval(
   player => {
     const { typeId } = player.mainhand()

@@ -8,7 +8,7 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
-// eslint-disable-next-line import/no-cycle
+import { util } from 'lib/util.js'
 import { MessageForm } from './MessageForm.js'
 
 /**
@@ -62,8 +62,7 @@ export class FormCallback {
 }
 const { UserBusy, UserClosed } = FormCancelationReason
 
-
-
+// TODO Debug
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it
  * succeeds or the maximum number of attempts is reached.
@@ -72,30 +71,39 @@ const { UserBusy, UserClosed } = FormCancelationReason
  * @returns  The response from the form.
  */
 export async function showForm(form, player) {
-  const hold = 3
-
-  for (let i = 0; i <= hold; i++) {
+  const hold = 5
+  console.debug('\n\nSHOWING FORM')
+  const time = util.benchmark('form show')
+  for (let i = 1; i <= hold; i++) {
+    time('send ' + i)
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
     const response = await form.show(player)
+    time(`recieve ${i}, status ${response.canceled ? response.cancelationReason : ''}`)
+
     if (response.canceled) {
       if (response.cancelationReason === UserClosed) return false
-
       if (response.cancelationReason === UserBusy) {
-        // First attempt, maybe chat closed...
-        if (i === 1) {
-          player.closeChat()
-        }
+        switch (i) {
+          case 1:
+            // First attempt failed, maybe chat closed...
+            console.debug('closing chat')
+            player.closeChat()
+            continue
 
-        // Second attempt, tell player to manually close chat...
-        if (i === 2) {
-          player.tell('§b> §3Закрой чат!')
-          await system.sleep(60)
-        }
+          case 2:
+            // Second attempt, tell player to manually close chat...
+            player.tell('§b> §3Закрой чат!')
+            await system.sleep(20)
+            continue
 
-        // Last attempt, we cant do anything
-        if (i === hold) {
-          player.tell(`§cНе удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
-          return false
+          default:
+            await nextTick
+            break
+
+          case hold:
+            // Last attempt, we cant do anything
+            player.tell(`§cНе удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
+            return false
         }
       }
     } else return response

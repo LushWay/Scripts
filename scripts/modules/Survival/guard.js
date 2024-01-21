@@ -64,11 +64,9 @@ loadRegionsWithGuards({
       if (!currentRegion?.permissions.pvp && !isBuilding(player)) {
         player.triggerEvent('player:spawn')
       }
-    } else {
-      if (player.database.inv === 'spawn' && !isBuilding(player)) {
-        Spawn.portal?.teleport(player)
-      }
     }
+
+    Spawn.regionCallback(player, currentRegion)
   },
 })
 

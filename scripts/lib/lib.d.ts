@@ -4,6 +4,26 @@ declare global {
   type Role = keyof typeof ROLES
   type VoidFunction = () => void
 
+  interface Date {
+    /**
+     * Converts date to format
+     * DD-MM-YYYY HH:MM:SS
+     * @param seconds Adds :SS to format
+     */
+    format(seconds?: boolean): string
+    /**
+     * Converts date to format
+     * DD-MM-YYYY
+     */
+    toYYYYMMDD(): string
+    /**
+     * Converts date to format
+     * HH:MM
+     * @param seconds Adds :SS to format
+     */
+    toHHMM(seconds?: boolean): string
+  }
+
   interface Console {
     error(...data: any[]): void
     info(...data: any[]): void
@@ -102,20 +122,29 @@ declare module '@minecraft/server' {
     quest?: import('./Class/Quest').QuestDB
   }
 
-  type ScoreName =
-    | 'money'
-    | 'leafs'
-    | 'pvp'
-    | 'joinDate'
-    | 'joinTimes'
-    | 'lastSeenDate'
-    | 'totalOnlineTime'
-    | 'anarchyOnlineTime'
+  type GameplayStatScoreName =
+    | 'blocksPlaced'
+    | 'blocksBroke'
+    | 'fireworksLaunched'
+    | 'fireworksExpoded'
+    | 'damageRecieve'
+    | 'damageGive'
+    | 'kills'
+    | 'deaths'
+
+  type TimeStatScoreName = `${'total' | 'anarchy'}OnlineTime`
+
+  type DateStatScoreName = `${'lastSeen' | 'join'}Date`
+
+  type StatScoreName = GameplayStatScoreName | TimeStatScoreName | DateStatScoreName
+
+  type ScoreName = 'money' | 'leafs' | 'pvp' | 'joinTimes' | StatScoreName
+
   interface Player {
     scores: Record<ScoreName, number>
     database: PlayerDatabase
 
-    // TODO Implement and migrate all code to those methods
+    // TODO Migrate all code to those methods
     /**
      * Sends message prefixed with §4> §c
      * and plays SOUNDS.fail
@@ -139,6 +168,7 @@ declare module '@minecraft/server' {
   }
 
   interface ScreenDisplay {
+    // TODO Add priorities
     /**
      * Sets player sidebar
      * @param text Text to set

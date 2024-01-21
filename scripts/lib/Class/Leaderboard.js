@@ -57,12 +57,12 @@ export class Leaderboard {
       const time = util.ms.remaining(score, { converters: ['ms', 'sec', 'hour'] })
       return `${time.value} ${time.type}`
     } else if (scoreboardId.endsWith('Date')) {
-      return new Date(score).toLocaleString()
+      return new Date(score * 1000).format()
     }
 
     if (convertToMetricNumbers) {
       return toMetricNumbers(score)
-    }
+    } else return score
   }
   static styles = STYLES
   /**

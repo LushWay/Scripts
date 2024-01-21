@@ -1,22 +1,36 @@
-import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
-import { util } from 'smapi.js'
+import { Entity, Player, Scoreboard, ScoreboardObjective, world } from '@minecraft/server'
+import { OverTakes, util } from 'smapi.js'
 
 /**
  * @type {Record<import("@minecraft/server").ScoreName, string>}
  */
 const displayNames = {
-  lastSeenDate: 'Последний раз онлайн',
-  totalOnlineTime: 'Онлайн всего',
-  anarchyOnlineTime: 'Онлайн на анархии',
-  joinDate: 'Время первого входа',
-  joinTimes: 'Всего входов на сервер',
   leafs: '§aЛистья',
   money: '§6Монеты',
+  kills: 'Убийств',
+  deaths: 'Смертей',
+  totalOnlineTime: 'Онлайн всего',
+  anarchyOnlineTime: 'Онлайн на анархии',
+  blocksPlaced: 'Блоков поставлено',
+  blocksBroke: 'Блоков сломано',
+  fireworksLaunched: 'Фейрверков запущено',
+  fireworksExpoded: 'Фейрвереов взорвано',
+  damageRecieve: 'Урона получено',
+  damageGive: 'Урона нанесено',
+  joinTimes: 'Всего входов на сервер',
+  joinDate: 'Время первого входа',
+
+  lastSeenDate: 'Последний раз онлайн',
   pvp: 'PVP',
 }
 
 /** @type {Record<string, string>} */
 const untypedDisplayNames = displayNames
+OverTakes(ScoreboardObjective.prototype, {
+  get displayName() {
+    return untypedDisplayNames[this.id] ?? super.displayName
+  },
+})
 
 /**
  * @type {Record<string, {player: Player, proxy: any}>}

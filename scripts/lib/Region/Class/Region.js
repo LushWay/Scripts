@@ -87,12 +87,7 @@ export class Region {
    * Display name of the region
    */
   get name() {
-    return (
-      this.ownerName ??
-      new Date(this.key).toLocaleString([], {
-        hourCycle: 'h24',
-      })
-    )
+    return this.ownerName ?? new Date(this.key).format()
   }
 
   /**

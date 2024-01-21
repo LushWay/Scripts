@@ -1,4 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
+import { APIRequest } from 'smapi.js'
 
 /**
  * @param {number} value
@@ -42,7 +43,7 @@ export class Zone {
           const rmax = { x: center.x + rad, z: center.x + rad }
           const rmin = { x: center.z - rad, z: center.z - rad }
           if (!p) {
-            if (!reloadSent) world.overworld.runCommand('function reload')
+            if (!reloadSent) APIRequest('reload', { status: 300 })
             reloadSent = true
             return
           }

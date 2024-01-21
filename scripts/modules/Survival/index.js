@@ -21,3 +21,4 @@ import './Place/VillageOfMiners.js'
 import './Quests/index.js'
 
 import './guard.js'
+import './stats.js'

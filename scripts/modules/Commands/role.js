@@ -65,6 +65,7 @@ function roleForm(ctx, sort = true) {
         const filteredRoles = Object.fromEntries(
           Object.entriesStringKeys(ROLES)
             .filter(([key]) => canChange(prole, key))
+            .reverse()
             .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`])
         )
         new ModalForm(name)

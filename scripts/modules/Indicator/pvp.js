@@ -12,15 +12,15 @@ const options = Settings.world('pvp', {
   cooldown: { value: 15, desc: 'Время блокировки в секундах', name: 'Время' },
 })
 
-const getPlayerSettings = Settings.player('PvP', 'pvp', {
+const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   indicator: {
     name: 'Индикатор',
-    desc: '§aВключает§7 индикатор попадания по энтити из лука',
+    desc: 'Индикатор попадания по существу из лука',
     value: true,
   },
-  bow_sound: {
+  bowSound: {
     name: 'Звук лука',
-    desc: '§aВключает§7 звук попадания по энтити из лука',
+    desc: 'Звук попадания по существо из лука',
     value: true,
   },
 })
@@ -66,29 +66,29 @@ SM.afterEvents.modulesLoad.subscribe(() => {
     0
   )
 
-  world.afterEvents.entityDie.subscribe(data => {
+  world.afterEvents.entityDie.subscribe(event => {
     onDamage(
       {
         damage: 999999,
-        damageSource: data.damageSource,
-        hurtEntity: data.deadEntity,
+        damageSource: event.damageSource,
+        hurtEntity: event.deadEntity,
       },
       true
     )
   })
-  world.afterEvents.entityHurt.subscribe(data => {
-    onDamage(data, false)
+  world.afterEvents.entityHurt.subscribe(event => {
+    onDamage(event, false)
   })
 })
 
 /**
  *
- * @param {{damageSource: import("@minecraft/server").EntityDamageSource, hurtEntity: Entity, damage: number}} data
+ * @param {{damageSource: import("@minecraft/server").EntityDamageSource, hurtEntity: Entity, damage: number}} event
  * @param {boolean} fatal
  * @returns
  */
-function onDamage(data, fatal = false) {
-  const damage = data.damageSource
+function onDamage(event, fatal = false) {
+  const damage = event.damageSource
   if (
     ![
       EntityDamageCause.fireTick,
@@ -100,28 +100,28 @@ function onDamage(data, fatal = false) {
     return
 
   if (
-    !data.hurtEntity.typeId.startsWith('minecraft:') ||
+    !event.hurtEntity.typeId.startsWith('minecraft:') ||
     !options.enabled ||
-    HEALTH_INDICATOR.disabled.includes(data.hurtEntity.id)
+    HEALTH_INDICATOR.disabled.includes(event.hurtEntity.id)
   )
     return
 
   // Its player.chatClose
-  if (!damage.damagingEntity && data.hurtEntity && damage.cause === EntityDamageCause.entityAttack) return
+  if (!damage.damagingEntity && event.hurtEntity && damage.cause === EntityDamageCause.entityAttack) return
 
-  const healthComponent = data.hurtEntity.getComponent('minecraft:health')
+  const healthComponent = event.hurtEntity.getComponent('minecraft:health')
   if (!healthComponent) return
   const { currentValue: current, defaultValue: value } = healthComponent
 
   if (damage.damagingEntity instanceof Player) {
     damage.damagingEntity.scores.pvp = options.cooldown
-    Server.stats.damageGive.add(damage.damagingEntity, data.damage)
-    if (fatal) Server.stats.kills.add(damage.damagingEntity, 1)
+    damage.damagingEntity.scores.damageGive += event.damage
+    if (fatal) damage.damagingEntity.scores.kills++
 
     const setting = getPlayerSettings(damage.damagingEntity)
 
     const isBow = damage.cause === EntityDamageCause.projectile
-    if (isBow && setting.bow_sound) {
+    if (isBow && setting.bowSound) {
       playHitSound(damage.damagingEntity, current, value)
     }
 
@@ -133,15 +133,15 @@ function onDamage(data, fatal = false) {
       // 	);
       // } else {
       // Kill
-      if (data?.hurtEntity instanceof Player) {
+      if (event?.hurtEntity instanceof Player) {
         // Player
         damage.damagingEntity.onScreenDisplay.setActionBar(
-          `§gВы ${isBow ? 'застрелили' : 'убили'} §6${data.hurtEntity.name}`
+          `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`
         )
       } else {
         // Entity
 
-        const entityName = data.hurtEntity.typeId.replace('minecraft:', '')
+        const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
         damage.damagingEntity.runCommand(
           'titleraw @s actionbar ' +
             JSON.stringify({
@@ -161,12 +161,13 @@ function onDamage(data, fatal = false) {
     }
   }
 
-  if (data.hurtEntity instanceof Player) {
+  if (event.hurtEntity instanceof Player) {
     // skip SimulatedPlayer because of error
-    if ('jump' in data.hurtEntity) return
+    if ('jump' in event.hurtEntity) return
 
-    data.hurtEntity.scores.pvp = options.cooldown
-    Server.stats.damageRecieve.add(data.hurtEntity, data.damage)
+    event.hurtEntity.scores.pvp = options.cooldown
+    event.hurtEntity.scores.damageRecieve += event.damage
+    if (fatal) event.hurtEntity.scores.deaths++
   }
 }
 

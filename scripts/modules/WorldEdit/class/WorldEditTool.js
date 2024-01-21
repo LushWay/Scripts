@@ -204,7 +204,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 })
 
 let ticks = 0
-system.runPlayerInterval(
+system.runInterval(
   () => {
     for (const player of world.getAllPlayers()) {
       if (!player) continue

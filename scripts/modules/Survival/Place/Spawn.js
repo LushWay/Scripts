@@ -1,13 +1,11 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings } from 'smapi.js'
+import { EditableLocation, InventoryStore, PLAYER_DB, Portal, Region, SafeAreaRegion, Settings } from 'smapi.js'
 
 import { migration } from 'lib/Database/Migrations.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { Menu } from 'modules/Server/menuItem.js'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
-
-// TODO TP to spawn when region is not same ===
 
 migration('move player inv', () => {
   Object.values(PLAYER_DB).forEach(e => {
@@ -85,21 +83,20 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         radius: 30,
         dimensionId: 'overworld',
       })
-
-      system.runPlayerInterval(
-        player => {
-          if (!this.region) return
-          if (!this.region.vectorInRegion(player.location)) return
-
-          this.loadInventory(player)
-          player.addEffect(MinecraftEffectTypes.Saturation, 1, {
-            amplifier: 255,
-            showParticles: false,
-          })
-        },
-        'SpawnRegion',
-        20
-      )
+    }
+  }
+  /** @type {import('smapi.js').regionCallback} */
+  regionCallback(player, region) {
+    if (region === this.region) {
+      this.loadInventory(player)
+      player.addEffect(MinecraftEffectTypes.Saturation, 1, {
+        amplifier: 255,
+        showParticles: false,
+      })
+    } else {
+      if (player.database.inv === 'spawn' && !isBuilding(player)) {
+        // this.portal?.teleport(player)
+      }
     }
   }
 }

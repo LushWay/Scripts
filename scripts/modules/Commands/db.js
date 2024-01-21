@@ -115,7 +115,7 @@ function showTable(player, table) {
     if (table === 'player') {
       /** @type {typeof PLAYER_DB} */
       const p = proxy
-      name = `${p[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'} §8(${key})`
+      name = `${p[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'}\n§8(${key})`
     }
     menu.addButton(name, () => propertyForm(key))
   }
@@ -225,18 +225,25 @@ function getPath(key) {
   return `\n${TIMERS_PATHES[key]}`.replace(/\n/g, '\n§3| §r')
 }
 
-new Command({
+const cmd = new Command({
   name: 'benchmark',
   description: 'Показывает время работы серверных систем',
   role: 'techAdmin',
 })
+
+cmd
   .string('type', true)
   .boolean('pathes', true)
-  .executes((ctx, type, pathes) => {
+  .boolean('useChat', true)
+  .executes((ctx, type, pathes, useChat) => {
     if (type && !(type in util.benchmark.results))
       return ctx.error(
         'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  ')
       )
+
+    if (useChat) {
+      return ctx.reply(stringifyBenchmarkReult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
+    }
 
     function show() {
       new ActionForm(

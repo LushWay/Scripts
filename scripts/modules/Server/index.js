@@ -11,23 +11,16 @@ const TYPES = ['unknown', 'build', 'survival', 'disabled']
 const db = (id, name) => new ScoreboardDB(id, name)
 
 class ServerBuilder {
-  money = db('money', 'Монеты')
-  leafs = db('leafs', 'Листы')
   radius = 200
   stats = {
-    blocksPlaced: db('blockPlace', 'Поставлено блок'),
-    blocksBreaked: db('blockBreak', 'Сломано блоков'),
-    fireworksLaunched: db('FVlaunch', 'Фв запущено'),
-    fireworksExpoded: db('FVboom', 'Фв взорвано'),
+    blocksPlaced: db('blockPlace', 'Блоков поставлено'),
+    blocksBreaked: db('blockBreak', 'Блоков сломано'),
+    fireworksLaunched: db('FVlaunch', 'Фейерверков запущено'),
+    fireworksExpoded: db('FVboom', 'Фейерверков взорвано'),
     damageRecieve: db('Hget', 'Урона получено'),
     damageGive: db('Hgive', 'Урона нанесено'),
     kills: db('kills', 'Убийств'),
     deaths: db('deaths', 'Смертей'),
-  }
-  time = {
-    anarchy: timer('anarchy', 'на анархии'),
-    all: timer('all', 'всего'),
-    day: timer('day', 'за день'),
   }
   options = Settings.world('server', {
     type: {
@@ -75,16 +68,3 @@ class ServerBuilder {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Server = new ServerBuilder()
-
-/**
- *
- * @param {string} name
- * @param {string} displayName
- */
-function timer(name, displayName) {
-  return {
-    hours: db(name + '_hours', 'Часов ' + displayName),
-    minutes: db(name + '_mins', 'Минут ' + displayName),
-    seconds: db(name + '_secs', 'Секунд ' + displayName),
-  }
-}

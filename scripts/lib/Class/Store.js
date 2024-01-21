@@ -7,7 +7,6 @@ import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { EditableLocation, PlaceAction } from 'smapi.js'
-import { Server } from '../../modules/Server/index.js'
 
 class Cost {
   /**
@@ -184,7 +183,7 @@ export class Store {
       body: p =>
         `${
           this.options.prompt ? 'Подтверждение перед покупкой §aесть.' : 'Подтверждения перед покупкой §cнет.'
-        }\n§fБаланс: §6${Server.money.get(p)}M`,
+        }\n§fБаланс: §6${p.scores.money}M`,
       prompt: true,
     }
   }

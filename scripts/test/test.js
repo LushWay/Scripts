@@ -10,6 +10,7 @@ import { APIRequest } from '../lib/Class/Net.js'
 import { Mineshaft } from '../modules/Survival/Place/Mineshaft.js'
 import './enchant.js'
 import './simulatedPlayer.js'
+import './lib/Form/util.test.js'
 
 // const player = world.getAllPlayers()[0]
 // const targetPosition = { x: 10, y: 10, z: 10 }

@@ -50,11 +50,6 @@ export class EditableNpc {
 
     this.entity = world[this.dimensionId].spawnEntity(EditableNpc.type, this.location)
     this.entity.nameTag = this.name
-    // const variant = this.entity.getComponent('variant')
-    // if (variant) {
-    //   // TODO Test how to set skin
-    //   variant.value = this.skinVariant
-    // }
   }
 }
 

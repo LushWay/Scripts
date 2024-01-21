@@ -19,6 +19,22 @@ OverTakes(JSON, {
   },
 })
 
+Date.prototype.toYYYYMMDD = function () {
+  const date = new Date(this)
+  date.setHours(date.getHours() + 3)
+  return date.toLocaleDateString([], { dateStyle: 'medium' }).split('.').reverse().join('-')
+}
+
+Date.prototype.toHHMM = function () {
+  const date = new Date(this)
+  date.setHours(date.getHours() + 3)
+  return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0')
+}
+
+Date.prototype.format = function () {
+  return this.toHHMM() + ' ' + this.toYYYYMMDD()
+}
+
 OverTakes(Math, {
   randomInt(min, max) {
     return Math.round(min + Math.random() * (max + 1 - min))
