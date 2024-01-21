@@ -301,7 +301,7 @@ export const util = {
      * @returns {{ value: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
      */
     remaining(ms, { converters: converterTypes = ['sec', 'min', 'hour', 'day'] } = {}) {
-      const converters = converterTypes.map(type => util.ms.converters[type])
+      const converters = converterTypes.reverse().map(type => util.ms.converters[type])
       for (const { time, friction = 0, plurals } of converters) {
         const value = ms / time
         if (~~value > 1) {
