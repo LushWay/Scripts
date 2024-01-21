@@ -304,7 +304,7 @@ export const util = {
       const converters = converterTypes.map(type => util.ms.converters[type])
       for (const { time, friction = 0, plurals } of converters) {
         const value = ms / time
-        if (~~value > 1 && value < 100) {
+        if (~~value > 1) {
           // Replace all 234.0 values to 234
           const parsedTime = value
             .toFixed(friction)
