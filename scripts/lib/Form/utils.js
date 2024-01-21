@@ -72,13 +72,9 @@ const { UserBusy, UserClosed } = FormCancelationReason
  */
 export async function showForm(form, player) {
   const hold = 5
-  console.debug('\n\nSHOWING FORM')
-  const time = util.benchmark('form show')
   for (let i = 1; i <= hold; i++) {
-    time('send ' + i)
     /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
     const response = await form.show(player)
-    time(`recieve ${i}, status ${response.canceled ? response.cancelationReason : ''}`)
 
     if (response.canceled) {
       if (response.cancelationReason === UserClosed) return false
@@ -86,7 +82,6 @@ export async function showForm(form, player) {
         switch (i) {
           case 1:
             // First attempt failed, maybe chat closed...
-            console.debug('closing chat')
             player.closeChat()
             continue
 

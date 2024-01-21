@@ -88,7 +88,8 @@ system.runPlayerInterval(
   10
 )
 
-PLAYER_NAME_TAG_MODIFIERS.push(p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
+// Insert role value right after name
+PLAYER_NAME_TAG_MODIFIERS.splice(1, 0, p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
 
 /**
  * @param {Player} player

@@ -1,7 +1,9 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ENTITIES } from 'config.js'
+import { CLOSING_CHAT } from 'lib/Extensions/player.js'
 import { NOT_MOB_ENTITIES } from 'lib/Region/config'
+import { isBuilding } from 'modules/Build/list.js'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
 import { GAME_UTILS, util } from 'smapi.js'
 
@@ -43,7 +45,10 @@ world.afterEvents.entityHurt.subscribe(data => {
   )
     return
 
-  updateIndicator({ entity: data.hurtEntity, damage: data.damage })
+  // Not trigget by close chat
+  if (CLOSING_CHAT.has(data.hurtEntity.id)) return
+
+  updateIndicator({ entity: data.hurtEntity, damage: Math.floor(data.damage) })
 })
 
 // Remove indicator
@@ -72,7 +77,8 @@ system.runInterval(
     for (const [id, info] of Object.entries(HURT_ENTITIES)) {
       const entity = info.hurtEntity
 
-      if (!entity || (info.damage === 0 && info.expires > now)) {
+      if (!entity || (info.damage === 0 && info.expires < now)) {
+        console.debug('Expired')
         if (info.separated)
           try {
             info.indicator.remove()
@@ -83,7 +89,7 @@ system.runInterval(
       }
 
       if (info.separated) usedIndicators.add(info.indicator.id)
-      updateIndicator({ entity, damage: -(info.damage / 2) })
+      updateIndicator({ entity, damage: -info.damage })
     }
 
     for (const indicator of indicators) {
@@ -95,13 +101,10 @@ system.runInterval(
     }
   },
   'health indicator, damage reducer',
-  20
+  10
 )
 
 const BAR_SYMBOL = '|'
-
-// TODO Remove when unused
-// TODO Not trigger by closeChat
 
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied
@@ -109,6 +112,7 @@ const BAR_SYMBOL = '|'
  * @returns {string}
  */
 function getBar(entity, hp = entity.getComponent('health')) {
+  if (entity instanceof Player && isBuilding(entity)) return ''
   if (!hp || !(entity.id in HURT_ENTITIES)) return ''
   const maxHP = hp.defaultValue
 
@@ -154,7 +158,7 @@ function updateIndicator({ entity, damage = 0, entityId = GAME_UTILS.safeGet(ent
     const separated = !ALWAYS_SHOWS.includes(entity.typeId)
     const base = {
       hurtEntity: entity,
-      expires: Date.now() + util.ms.from('sec', 10),
+      expires: Date.now(),
       damage: 0,
     }
 
@@ -174,7 +178,13 @@ function updateIndicator({ entity, damage = 0, entityId = GAME_UTILS.safeGet(ent
     HURT_ENTITIES[entityId] = info
   }
 
+  if (damage > 0) {
+    info.expires = Date.now() + util.ms.from('sec', 10)
+  }
+
   info.damage += damage
+  // Do not allow values below 0
+  info.damage = Math.max(0, info.damage)
 
   try {
     setNameTag(info.separated ? info.indicator : info.hurtEntity, () => getBar(entity))

@@ -25,6 +25,9 @@ function prefix(pref, sound) {
   }
 }
 
+/** @type {Set<string>} */
+export const CLOSING_CHAT = new Set()
+
 OverTakes(Player.prototype, {
   fail: prefix('§4§l> §r§c', SOUNDS.fail),
   warn: prefix('§l§e⚠ §6', SOUNDS.fail),
@@ -55,9 +58,11 @@ OverTakes(Player.prototype, {
     const isCreative = this.isGamemode('creative')
     if (isCreative) this.runCommand('gamemode s')
 
+    CLOSING_CHAT.add(this.id)
     this.applyDamage(1, {
       cause: EntityDamageCause.entityAttack,
     })
+    CLOSING_CHAT.delete(this.id)
     health.setCurrentValue(current)
     this.runCommand('stopsound @s game.player.hurt')
 
