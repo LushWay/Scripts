@@ -153,7 +153,7 @@ export class Store {
   static stores = []
 
   /**
-   * @type {Array<{cost: Cost, item: ItemStack}>}
+   * @type {Array<{cost: Cost, item: ItemStack | ((p: Player) => ItemStack)}>}
    */
   items = []
 
@@ -190,7 +190,7 @@ export class Store {
 
   /**
    * Adds item to menu
-   * @param {ItemStack} item
+   * @param {ItemStack | ((p: Player) => ItemStack)} item
    * @param {Cost} cost
    */
   addItem(item, cost) {
@@ -231,9 +231,10 @@ export class Store {
     const form = new ActionForm(this.options.name, message + this.options.body(player))
     for (const { item, cost } of this.items) {
       const canBuy = cost.check(player)
+      const itemStack = typeof item === 'function' ? item(player) : item
       form.addButton(
-        `${canBuy ? '' : '§7'}${itemDescription(item, canBuy ? '§g' : '§7')}\n${cost.string(canBuy)}`,
-        () => this.buy({ item, cost, player })
+        `${canBuy ? '' : '§7'}${itemDescription(itemStack, canBuy ? '§g' : '§7')}\n${cost.string(canBuy)}`,
+        () => this.buy({ item: itemStack, cost, player })
       )
     }
 

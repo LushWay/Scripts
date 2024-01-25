@@ -53,7 +53,7 @@ new Command({
 
 /** @type {Record<string, number>} */
 const pages = {}
-const eachPage = 150
+const eachPage = 500
 
 /**
  * @param {Player} player
@@ -69,6 +69,7 @@ async function showConsole(player, page, back = () => {}) {
 
   new ActionForm('Console', text)
     .addButton('< Prev', () => showConsole(player, page - 1))
-    .addButton('Back', () => showConsole(player, page - 1))
+    .addButton('Back', back)
     .addButton('Next >', () => showConsole(player, page + 1))
+    .show(player)
 }

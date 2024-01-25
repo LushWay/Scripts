@@ -152,7 +152,9 @@ export const GAME_UTILS = {
  */
 export function blockStatus({ location, dimensionId }) {
   try {
-    return world[dimensionId].getBlock(location)
+    const block = world[dimensionId].getBlock(location)
+    if (!block || !block.isValid()) return 'unloaded'
+    return block
   } catch (e) {
     if (e instanceof LocationInUnloadedChunkError) return 'unloaded'
     throw e
@@ -164,7 +166,7 @@ export function blockStatus({ location, dimensionId }) {
  * @param {Parameters<typeof blockStatus>[0]} options
  */
 export function chunkIsUnloaded(options) {
-  return blockStatus(options) !== 'unloaded'
+  return blockStatus(options) === 'unloaded'
 }
 
 /** @type {string[]} */

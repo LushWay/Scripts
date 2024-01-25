@@ -1,21 +1,17 @@
 import { Entity, PlayerInteractWithEntityBeforeEvent, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { util } from 'lib/util.js'
-import { chunkIsUnloaded } from 'smapi.js'
+import { isBuilding } from 'modules/Build/list.js'
+import { Temporary, chunkIsUnloaded } from 'smapi.js'
 import { EditableLocation } from './EditableLocation.js'
+
+/**
+ * @typedef {ConstructorParameters<typeof EditableNpc>[0]} EditableNpcProps
+ */
 
 export class EditableNpc {
   static type = MinecraftEntityTypes.Npc
   static propertyName = 'type'
-  /**
-   * @param {Pick<PlayerInteractWithEntityBeforeEvent, 'target' | 'player'>} event
-   */
-  static onInteract(event) {
-    const npc = EditableNpc.npcs.find(e => e.entity?.id === event.target.id)
-    if (!npc) return event.player.fail(`§f${event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`)
-
-    npc.onInteract(event)
-  }
 
   /**
    * @type {EditableNpc[]}
@@ -33,13 +29,20 @@ export class EditableNpc {
    * @param {(event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void} o.onInteract - Function that gets called on interact
    * @param {string} o.name - NameTag of the npc
    * @param {Dimensions} [o.dimensionId] - Dimension id
+   * @param {number} [o.skin] - Index of the npc skin
    */
-  constructor({ id, name, onInteract, dimensionId = 'overworld' }) {
-    this.location = new EditableLocation(name + ' NPC')
+  constructor({ id, name, onInteract, dimensionId = 'overworld', skin }) {
     this.id = id
     this.name = name
     this.onInteract = onInteract
     this.dimensionId = dimensionId
+    this.skinIndex = skin
+
+    this.location = new EditableLocation(id + ' NPC')
+    this.location.onLoad.subscribe(location => {
+      if (this.entity) this.entity.teleport(location)
+    })
+
     EditableNpc.npcs.push(this)
   }
 
@@ -49,17 +52,45 @@ export class EditableNpc {
     }
 
     this.entity = world[this.dimensionId].spawnEntity(EditableNpc.type, this.location)
-    this.entity.nameTag = this.name
+
+    new Temporary(({ world, cleanup }) => {
+      world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+        if (entity.id !== this.entity?.id) return
+
+        this.setupNpc(entity)
+        cleanup()
+      })
+    })
+  }
+
+  /**
+   * @param {Entity} entity
+   */
+  setupNpc(entity) {
+    const npc = entity.getComponent('npc')
+    if (!npc) return
+
+    entity.setDynamicProperty(EditableNpc.propertyName, this.id)
+    npc.name = this.name
+    if (typeof this.skinIndex === 'number') npc.skinIndex = this.skinIndex
   }
 }
 
 world.beforeEvents.playerInteractWithEntity.subscribe(event => {
   if (event.target.typeId !== MinecraftEntityTypes.Npc) return
+  if (isBuilding(event.player) && event.player.isSneaking) return
 
   event.cancel = true
   system.run(() => {
     try {
-      EditableNpc.onInteract(event)
+      const npc = EditableNpc.npcs.find(e => e.entity?.id === event.target.id)
+      const comp = event.target.getComponent('npc')
+      if (!npc)
+        return event.player.fail(
+          `§f${comp ? comp.name : event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`
+        )
+
+      npc.onInteract(event)
     } catch (e) {
       event.player.fail('Не удалось открыть диалог. Сообщите об этом администрации.')
       util.error(e)
@@ -103,6 +134,8 @@ system.runInterval(
 
       // Cannot find, spawn
       if (!npc.entity) npc.spawn()
+      // Apply nameTag etc
+      else npc.setupNpc(npc.entity)
     })
   },
   'npc loading',

@@ -78,7 +78,6 @@ system.runInterval(
       const entity = info.hurtEntity
 
       if (!entity || (info.damage === 0 && info.expires < now)) {
-        console.debug('Expired')
         if (info.separated)
           try {
             info.indicator.remove()

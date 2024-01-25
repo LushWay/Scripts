@@ -1,16 +1,9 @@
-import { Player } from '@minecraft/server'
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { EditableNpc } from 'lib/Class/EditableNpc.js'
-import { Store } from 'lib/Class/Store.js'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
-import { ActionForm, Boss, util } from 'smapi.js'
-
-// TODO Сделать платные печки
+import { Boss, util } from 'smapi.js'
+import { Ovener } from '../Features/Oven'
 
 class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
-  constructor() {
-    super('Каменоломня')
-  }
   witherBoss = new Boss({
     name: 'wither',
     displayName: 'Камнедробилка',
@@ -19,26 +12,32 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
     respawnTime: util.ms.from('hour', 1),
   })
 
-  ovener = new EditableNpc({
-    name: 'Печкин',
-    id: 'ovener',
-    onInteract: ({ player }) => this.openOvenerMenu(player),
+  commonOvener = new Ovener({
+    npc: {
+      id: 'ovener',
+      name: '§6Печкин',
+    },
+
+    furnaceTypeIds: [
+      MinecraftBlockTypes.BlastFurnace,
+      MinecraftBlockTypes.LitBlastFurnace,
+      MinecraftBlockTypes.Furnace,
+      MinecraftBlockTypes.LitFurnace,
+    ],
+    onlyInStoneQuarry: true,
   })
 
-  ovenStore = Store.npc({
-    id: 'ovener',
-    name: 'Печкин',
-    body: p => 'У меня ты можешь купить доступ к печкам\n\n' + this.ovenStore.store.defaultOptions.body(p),
-    prompt: true,
+  foodOvener = new Ovener({
+    furnaceTypeIds: [MinecraftBlockTypes.LitBlastFurnace],
+    npc: {
+      id: 'foodOvener',
+      name: 'Хавка',
+    },
+    onlyInStoneQuarry: false,
   })
 
-  /**
-   * @param {Player} player
-   */
-  openOvenerMenu(player) {
-    const form = new ActionForm('Печки', 'У меня вы можете купить доступ к печкам')
-
-    form.show(player)
+  constructor() {
+    super('Каменоломня')
   }
 }
 
