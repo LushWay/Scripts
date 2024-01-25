@@ -2,17 +2,26 @@ import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 // eslint-disable-next-line import/no-cycle
 import { GAME_UTILS, loreWordWrap, util } from 'smapi.js'
-import { typeIdToID } from '../../chestui/typeIds.js'
+import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds.js'
 import { BUTTON, showForm } from './utils.js'
 
 const NUMBER_OF_1_16_100_ITEMS = 0
 
 /**
- * @type {Record<'small' | 'large', [string, number]>}
+ * @satisfies {Record<string, [string, number]>}
  */
 const SIZES = {
-  small: [`§c§h§e§s§t§s§m§a§l§l§r`, 27],
-  large: [`§c§h§e§s§t§l§a§r§g§e§r`, 54],
+  5: ['§c§h§e§s§t§0§5§r', 5],
+  9: ['§c§h§e§s§t§0§9§r', 9],
+  18: ['§c§h§e§s§t§1§8§r', 18],
+  27: ['§c§h§e§s§t§2§7§r', 27],
+  36: ['§c§h§e§s§t§3§6§r', 36],
+  45: ['§c§h§e§s§t§4§5§r', 45],
+  54: ['§c§h§e§s§t§5§4§r', 54],
+  single: ['§c§h§e§s§t§2§7§r', 27],
+  small: ['§c§h§e§s§t§2§7§r', 27],
+  double: ['§c§h§e§s§t§5§4§r', 54],
+  large: ['§c§h§e§s§t§5§4§r', 54],
 }
 
 /**
@@ -81,7 +90,8 @@ export class ChestForm {
    * @param {ChestButtonOptions} o
    */
   button({ slot, icon, nameTag = '', lore = [], description, amount = 1, enchanted = false, callback }) {
-    const ID = typeIdToID.get(icon.includes(':') ? icon : 'minecraft:' + icon)
+    const id = icon.includes(':') ? icon : 'minecraft:' + icon
+    const ID = typeIdToID.get(id) ?? typeIdToDataId.get(id)
     if (typeof ID === 'undefined' && icon.includes('minecraft:')) icon = BUTTON['?']
     if (description) lore = loreWordWrap(description)
 
