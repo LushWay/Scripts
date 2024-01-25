@@ -1,7 +1,8 @@
 import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-// eslint-disable-next-line import/no-cycle
-import { GAME_UTILS, loreWordWrap, util } from 'smapi.js'
+import { GAME_UTILS } from 'lib/Class/GameUtils.js'
+import { loreWordWrap } from 'lib/Extensions/itemstack.js'
+import { util } from 'lib/util.js'
 import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds.js'
 import { BUTTON, showForm } from './utils.js'
 
