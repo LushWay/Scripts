@@ -1,5 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
-import { APIRequest } from 'smapi.js'
+import { APIRequest } from './Net.js'
 
 /**
  * @param {number} value

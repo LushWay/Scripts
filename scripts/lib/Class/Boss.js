@@ -7,10 +7,10 @@
  */
 
 import { system, world } from '@minecraft/server'
-import { EditableLocation } from 'lib/Class/EditableLocation.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { BossArenaRegion } from 'lib/Region/index.js'
-import { chunkIsUnloaded } from 'smapi.js'
+import { EditableLocation } from './EditableLocation.js'
+import { chunkIsUnloaded } from './GameUtils.js'
 
 /**
  * @typedef {{

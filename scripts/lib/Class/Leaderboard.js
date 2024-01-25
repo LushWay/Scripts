@@ -1,6 +1,6 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { util } from 'smapi.js'
+import { util } from 'lib/util.js'
 
 /**
  * @typedef {{
