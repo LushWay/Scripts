@@ -21,7 +21,7 @@ export class Portal {
       const inS = 0
       const stayS = 1.0
       const outS = 1.0
-      player.onScreenDisplay.setTitle(name ?? '§aShp1nat§6Mine', {
+      player.onScreenDisplay.setHudTitle(name ?? '§aShp1nat§6Mine', {
         fadeInDuration: inS * 20,
         subtitle: '§2Перемещение...',
         stayDuration: stayS * 20,

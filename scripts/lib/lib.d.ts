@@ -1,5 +1,7 @@
 import * as mc from '@minecraft/server'
+import { SOUNDS } from 'config'
 import { ROLES } from 'smapi'
+
 declare global {
   type Role = keyof typeof ROLES
   type VoidFunction = () => void
@@ -109,11 +111,13 @@ declare global {
   }
 
   /**
-   * @remarks нет кого/чего, дам кому/чему, где
+   * @remarks нет кого/чего, вижу кого/что, где
    * @remarks базы, базу, на базе
    * @remarks региона, региону, в регионе
    */
   type WordPluralForms = [one: string, more: string, aa: string]
+
+  type McText = (mc.RawMessage | string)[] | mc.RawMessage | string
 }
 
 declare module '@minecraft/server' {
@@ -146,41 +150,78 @@ declare module '@minecraft/server' {
 
     // TODO Migrate all code to those methods
     /**
-     * Sends message prefixed with §4> §c
-     * and plays SOUNDS.fail
+     * Sends message prefixed with
+     * ```js
+     * '§4§l> §r§c'
+     * ```
+     * and plays {@link SOUNDS}.fail
+     *
+     * Other message types: warn success info
      */
     fail(message: string): void
     /**
-     * Sends message prefixed with §e> §f
-     * and plays SOUNDS.fail
+     * Sends message prefixed with
+     * ```js
+     * '§l§e⚠ §6'
+     * ```
+     * and plays {@link SOUNDS}.fail
+     *
+     * Other message types: **fail success info**
      */
     warn(message: string): void
     /**
-     * Sends message prefixed with §a> §f
-     * and plays SOUNDS.success
+     * Sends message prefixed with
+     * ```js
+     * '§a§l> §r'
+     * ```
+     * and plays {@link SOUNDS}.success
+     *
+     * Other message types: **fail warn info**
      */
     success(message: string): void
     /**
-     * Sends message prefixed with §b> §3
-     * and plays SOUNDS.action
+     * Sends message prefixed with
+     * ```js
+     * '§b§l> §r§3'
+     * ```
+     * and plays {@link SOUNDS}.action
+     *
+     * Other message types: **fail warn success**
      */
     info(message: string): void
   }
+  interface HudTitleDisplayOptions {
+    /**
+     * Priority of the displayed information
+     */
+    priority?: number
+  }
 
   interface ScreenDisplay {
-    // TODO Add priorities
+    /**
+     * Player attached to this screen display
+     */
+    player: Player
+
+    /**
+     * Sets player title
+     * @param text Text to set
+     */
+    setHudTitle(text: string, options: TitleDisplayOptions & HudTitleDisplayOptions, prefix?: string, n?: number): void
     /**
      * Sets player sidebar
      * @param text Text to set
+     * @param priority Priority of the displayed information
      */
-    setSidebar(text: string): void
+    setSidebar(text: string, priority?: number): void
 
     /**
      * Sets player tip
      * @param n Tip position
      * @param text Tip text
+     * @param priority Priority of the displayed information
      */
-    setTip(n: 1 | 2 | 3 | 4 | 5, text: string): void
+    setTip(n: 1 | 2 | 3 | 4 | 5, text: string, priority?: number): void
   }
 
   interface Entity {

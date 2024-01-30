@@ -443,7 +443,8 @@ export const util = {
     if (this.settings.BDSMode)
       return text.replace(/§(.)/g, (_, a) => this.terminalColors[a] ?? this.terminalColors.r) + this.terminalColors.r
 
-    return text.replace(/§(.)/g, '')
+    return text
+    // return text.replace(/§(.)/g, '')
   },
   /**
    * @type {Record<string, string>}

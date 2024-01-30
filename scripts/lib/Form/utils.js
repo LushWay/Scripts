@@ -8,7 +8,6 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
-import { util } from 'lib/util.js'
 import { MessageForm } from './MessageForm.js'
 
 /**

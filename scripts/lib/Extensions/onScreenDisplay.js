@@ -1,48 +1,121 @@
-import { ScreenDisplay, system } from '@minecraft/server'
+import { Player, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
+import { SCREEN_DISPLAY } from 'lib/Extensions/player.js'
+import { util } from 'smapi.js'
 import { OverTakes } from './OverTakes.js'
 
-const $sidebar = '§t§i§psidebar',
-  $title = 'title',
-  $tipPrefix = '§t§i§p'
+const $sidebar = '§t§i§psidebar'
+const $title = 'title'
+const $tipPrefix = '§t§i§p'
 
-/** @type {Set<VoidFunction>} */
-const titleSet = new Set()
+/**
+ * @typedef {'title' | 'sidebar' | `tip${1|2|3|4|5}`} TitleType
+ */
+
+/**
+ * @type {Record<string, {
+ *   actions: ((p: Player) => void)[]
+ *   title?: {
+ *      expires?: number
+ *      subtitle?: McText
+ *   }
+ * } & {
+ *   [K in TitleType]?: {
+ *     value: McText,
+ *     priority: number
+ *   } | undefined
+ * }>}
+ */
+const TITLES = {}
 
 OverTakes(ScreenDisplay.prototype, {
-  setTitle(message, options) {
-    if (typeof message === 'string') {
-      if (!(message.startsWith($sidebar) || message.startsWith($tipPrefix))) {
-        message = $title + message
-      }
+  setHudTitle(message, options, prefix = $title, n = 0) {
+    const PLAYER_SD = (TITLES[this.player.id] ??= { actions: [] })
 
-      if (message.startsWith($title) && options) {
-        const duration = options.fadeInDuration + options.fadeOutDuration + options.stayDuration
+    /** @type {TitleType} */
+    let SD_TYPE = 'title'
 
-        system.runTimeout(() => this.setTitle(''), 'title unset', duration)
+    if (prefix === $tipPrefix) {
+      if (n === 1 || n === 2 || n === 3 || n === 4 || n === 5) {
+        SD_TYPE = `tip${n}`
       }
+    } else if (prefix === $sidebar) {
+      SD_TYPE = 'sidebar'
     }
 
-    titleSet.add(() => super.setTitle(message, options))
+    const SD = (PLAYER_SD[SD_TYPE] ??= {
+      value: '',
+      priority: 0,
+    })
+
+    const priority = options?.priority ?? 0
+    if (SD.priority > priority) return
+    else SD.priority = priority
+
+    if (options && SD_TYPE === 'title') {
+      const totalTicks = options.fadeInDuration + options.fadeOutDuration + options.stayDuration
+      if (totalTicks !== -1) {
+        SD.expires = Date.now() + totalTicks * TicksPerSecond
+      } else options.stayDuration = 0
+    }
+
+    // Do not update same text
+    if (SD.value === message) {
+      if (SD_TYPE === 'title') {
+        if (SD.subtitle === options?.subtitle) return
+      } else return
+    }
+
+    PLAYER_SD.actions.push(player => {
+      if (!player.isValid()) return
+
+      try {
+        const title = `${prefix === $tipPrefix ? prefix + n : prefix}${message}`
+        options ??= { ...defaultTitleOptions }
+        // @ts-expect-error Supercall
+        player[SCREEN_DISPLAY].setTitle(title, options)
+      } catch (e) {
+        util.error(e)
+      }
+
+      // Update references
+      SD.value = message
+      if (SD_TYPE === 'title') {
+        SD.subtitle = options?.subtitle
+      }
+    })
   },
-  setSidebar(text = '') {
-    this.setTitle($sidebar + text)
+  setSidebar(text = '', priority) {
+    this.setHudTitle(text, { priority, ...defaultOptions }, $sidebar)
   },
-  setTip(n, text = '') {
-    this.setTitle($tipPrefix + n + text)
+  setTip(n, text = '', priority) {
+    this.setHudTitle(text, { priority, ...defaultOptions }, $tipPrefix, n)
   },
 })
+
+const defaultOptions = { fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 0 }
+const defaultTitleOptions = { ...defaultOptions, stayDuration: -1 }
 
 system.run(() => {
   system.runInterval(
     () => {
-      // Grab first title, set and delete
-      const fn = titleSet.values().next()
-      if (!fn.done) {
-        fn.value()
-        titleSet.delete(fn.value)
+      const players = world.getAllPlayers()
+      for (const [id, data] of Object.entries(TITLES)) {
+        const player = players.find(e => e.id === id)
+        if (data.title?.expires && data.title.expires < Date.now()) {
+          player?.onScreenDisplay.setHudTitle('', {
+            ...defaultTitleOptions,
+            priority: data.title.priority ?? 0,
+          })
+          delete TITLES[id]
+        }
+
+        if (player) {
+          // Take first action and execute it
+          data.actions.shift()?.(player)
+        }
       }
     },
     'title set',
-    0
+    1
   )
 })

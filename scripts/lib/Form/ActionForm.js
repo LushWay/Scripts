@@ -5,6 +5,9 @@ import { util } from 'lib/util.js'
 import { showForm } from './utils.js'
 
 export class ActionForm {
+  /**
+   * Text used by back button
+   */
   static backText = '§l§b< §r§3Назад'
   /**
    * The buttons this form has
@@ -18,16 +21,17 @@ export class ActionForm {
    * @private
    */
   form
-  title = ''
+
   /**
    * Creates a new form to be shown to a player
-   * @param {string} title the title that this form should have
-   * @param {string} [body] extra text that should be displayed in the form
+   * @param {string} title - The title that this form should have
+   * @param {string} [body] - Extra text that should be displayed in the form
+   * @param {string} [prefix] - Prefix used by ui side to determine which type of form to render (e.g. it can be
+   * chestui or npc)
    */
-  constructor(title, body = '') {
+  constructor(title, body = '', prefix = '§c§o§m§m§o§n§r') {
     this.form = new ActionFormData()
-    this.form.title(title)
-    this.title = title
+    this.form.title(prefix + title)
     this.form.body(body)
   }
 

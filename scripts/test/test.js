@@ -5,12 +5,12 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { BASE_ITEM_STACK } from 'modules/Survival/Features/base.js'
-import { DB, GAME_UTILS, util } from 'smapi.js'
+import { ChestForm, DB, GAME_UTILS, NpcForm, util } from 'smapi.js'
 import { APIRequest } from '../lib/Class/Net.js'
 import { Mineshaft } from '../modules/Survival/Place/Mineshaft.js'
 import './enchant.js'
-import './simulatedPlayer.js'
 import './lib/Form/util.test.js'
+import './simulatedPlayer.js'
 
 // const player = world.getAllPlayers()[0]
 // const targetPosition = { x: 10, y: 10, z: 10 }
@@ -242,6 +242,33 @@ const tests = {
   },
   52(ctx) {
     ctx.sender.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])
+  },
+
+  form(ctx) {
+    new ActionForm('Common action form', 'Common action form body')
+      .addButton('NpcForm', () => {
+        const form = new NpcForm(
+          'title',
+          'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs'
+        )
+
+        form.addButton('Кнопка 1', () => ctx.sender.success('Ура'))
+        form.addButton('Кнопка 2', () => ctx.sender.success('Ура'))
+        form.addButton('Кнопка 3', () => ctx.sender.success('Ура'))
+
+        form.show(ctx.sender)
+      })
+      .addButton('ChestForm', () => {
+        new ChestForm('9')
+          .title('9 slots chest ui')
+          .pattern([0, 0], ['xxxxxx'], {
+            x: {
+              icon: MinecraftBlockTypes.Diorite,
+            },
+          })
+          .show(ctx.sender)
+      })
+      .show(ctx.sender)
   },
 }
 

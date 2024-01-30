@@ -28,7 +28,23 @@ function prefix(pref, sound) {
 /** @type {Set<string>} */
 export const CLOSING_CHAT = new Set()
 
+export const SCREEN_DISPLAY = Symbol('screen_display')
+
 OverTakes(Player.prototype, {
+  // @ts-expect-error Проброс
+  get [SCREEN_DISPLAY]() {
+    return super.onScreenDisplay
+  },
+
+  get onScreenDisplay() {
+    return Object.setPrototypeOf(
+      {
+        player: this,
+      },
+      super.onScreenDisplay
+    )
+  },
+
   fail: prefix('§4§l> §r§c', SOUNDS.fail),
   warn: prefix('§l§e⚠ §6', SOUNDS.fail),
   success: prefix('§a§l> §r', SOUNDS.success),

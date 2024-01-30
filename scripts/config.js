@@ -5,7 +5,7 @@ export const CONFIG = {
    * @type {number}
    */
   firstPlayerJoinTime: 5000,
-  singlePlayerHostId: '-4294967285',
+  singlePlayerHostId: '-4294967295',
 }
 
 export const CUSTOM_ITEMS = {

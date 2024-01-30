@@ -108,6 +108,16 @@
           "trailingUnderscore": "allow"
         },
         {
+          "selector": [
+            "enumMember"
+          ],
+          "format": [
+            "PascalCase"
+          ],
+          "leadingUnderscore": "allow",
+          "trailingUnderscore": "allow"
+        },
+        {
           "selector": "function",
           "format": [
             "camelCase",
