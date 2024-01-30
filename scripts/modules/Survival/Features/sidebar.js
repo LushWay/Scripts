@@ -26,7 +26,7 @@ const sidebarSettings = Settings.player('Боковое меню (сайдбар
 })
 
 /**
- * @type {Record<Player['database']['survival']['inv'], string>}
+ * @type {Record<Player['database']['inv'], string>}
  */
 const inventoryDisplay = {
   anarchy: 'Анархия',
