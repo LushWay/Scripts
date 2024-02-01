@@ -1,4 +1,3 @@
-import { Player } from '@minecraft/server'
 import { APIRequest } from 'lib/Class/Net.js'
 import { ActionForm, ModalForm, util } from 'smapi.js'
 
@@ -46,30 +45,5 @@ new Command({
         })
     })
 
-  form.addButton('Console', () => showConsole(ctx.sender, pages[ctx.sender.id], () => form.show(ctx.sender)))
-
   form.show(ctx.sender)
 })
-
-/** @type {Record<string, number>} */
-const pages = {}
-const eachPage = 500
-
-/**
- * @param {Player} player
- * @param {number} page
- */
-async function showConsole(player, page, back = () => {}) {
-  player.tell('Загрузка консоли...')
-
-  if (typeof page === 'undefined') page = 0
-  pages[player.id] = page
-
-  const { text } = await APIRequest('console', { offset: eachPage * page, size: eachPage })
-
-  new ActionForm('Console', text)
-    .addButton('< Prev', () => showConsole(player, page - 1))
-    .addButton('Back', back)
-    .addButton('Next >', () => showConsole(player, page + 1))
-    .show(player)
-}
