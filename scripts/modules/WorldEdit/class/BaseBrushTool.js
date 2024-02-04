@@ -66,16 +66,19 @@ export class BaseBrushTool extends WorldEditTool {
       maxDistance: lore.maxDistance,
     })
 
-    if (!hit) return player.tell('§fКисть > §cБлок слишком далеко.')
+    /** @param {string} reason */
+    const fail = reason => player.fail('§7Кисть§f: §c' + reason)
+
+    if (!hit) return fail('Блок слишком далеко.')
 
     try {
       this.onBrushUse(player, lore, hit)
     } catch (e) {
       if (e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) {
-        player.tell('§fКисть > §cБлок не прогружен')
+        fail('Блок не прогружен.')
       } else {
         util.error(e)
-        player.tell('§fКисть > §cОшибка ' + util.error.message.get(e))
+        fail('Ошибка ' + util.error.message.get(e))
       }
     }
   }

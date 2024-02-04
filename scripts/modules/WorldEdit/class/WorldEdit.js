@@ -55,6 +55,7 @@ export class WorldEdit {
   set pos1(value) {
     this.#pos1 = value
     this.recreateCuboids()
+    this.notifyPosChange(1)
   }
 
   get pos2() {
@@ -63,6 +64,19 @@ export class WorldEdit {
   set pos2(value) {
     this.#pos2 = value
     this.recreateCuboids()
+    this.notifyPosChange(2)
+  }
+
+  /**
+   * @param {1 | 2} pos
+   */
+  notifyPosChange(pos) {
+    system.delay(() => {
+      const action = { 1: 'break', 2: 'use' }[pos]
+      const color = { 1: '§5', 2: '§d' }[pos]
+      this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
+      this.player.playSound(SOUNDS.action)
+    })
   }
 
   /**
@@ -132,18 +146,20 @@ export class WorldEdit {
       if (amount > history.length) amount = history.length
 
       const historyToLoadNow = history.slice(-amount)
+      if (historyToLoadNow.length < 1) {
+        return this.player.fail('Нечего отменять!')
+      }
+
       for (const backup of historyToLoadNow.slice().reverse()) {
         this.loadBackup(history, backup)
       }
 
-      return `§b► §3Успешно отменено §f${amount} §3${util.ngettext(amount, [
-        'сохранение',
-        'сохранения',
-        'сохранений',
-      ])}!`
+      this.player.info(
+        `§3Успешно отменено §f${amount} §3${util.ngettext(amount, ['сохранение', 'сохранения', 'сохранений'])}!`
+      )
     } catch (error) {
       util.error(error)
-      return `§4► §cНе удалось отменить: ${error.message}`
+      this.player.fail(`Не удалось отменить: ${error.message}`)
     }
   }
 
@@ -189,12 +205,12 @@ export class WorldEdit {
       if (!selection) return
 
       this.currentCopy = new Structure(WE_CONFIG.COPY_FILE_NAME + this.player.id, this.pos1, this.pos2)
-      this.player.tell(
-        `§9► §fСкопирована область ${Vector.string(this.pos1)} - ${Vector.string(this.pos2)} размером ${selection.size}`
+      this.player.info(
+        `Скопирована область ${Vector.string(this.pos1)} - ${Vector.string(this.pos2)} размером ${selection.size}`
       )
     } catch (error) {
       util.error(error)
-      this.player.tell(`§4► §cНе удалось скорпировать: ${error.message}`)
+      this.player.fail(`Не удалось скорпировать: ${error.message}`)
     }
   }
   /**
@@ -249,14 +265,14 @@ export class WorldEdit {
         )
       } catch (e) {
         if (e instanceof Error) {
-          player.tell(e.message)
+          player.fail(e.message)
         } else throw new Error(e)
       }
 
-      this.player.tell(`§a► §rУспешно вставлено в ${Vector.string(pastePos1)}`)
+      this.player.success(`Успешно вставлено в ${Vector.string(pastePos1)}`)
     } catch (error) {
       util.error(error)
-      this.player.tell(`§4► §cНе удалось вставить: ${error.message}`)
+      this.player.fail(`Не удалось вставить: ${error.message}`)
     }
   }
   /**
@@ -264,7 +280,7 @@ export class WorldEdit {
    */
   async ensureSelection() {
     const player = this.player
-    if (!this.selection) return player.tell('§cЗона не выделена!')
+    if (!this.selection) return player.fail('§cЗона не выделена!')
     /** @type {Partial<Record<Role, number>>} */
     const limits = {
       builder: 10000,
@@ -276,7 +292,7 @@ export class WorldEdit {
     const limit = limits[getRole(player.id)]
     if (typeof limit === 'number') {
       if (this.selection.size > limit) {
-        return player.tell(`§cРазмер выделенной области превышает лимит §c(${this.selection.size}/§f${limit}§c)`)
+        return player.fail(`§cРазмер выделенной области превышает лимит §c(${this.selection.size}/§f${limit}§c)`)
       }
     } else {
       if (this.selection.size > 10000) {
@@ -289,7 +305,7 @@ export class WorldEdit {
           () => {}
         )
 
-        if (!result) return player.tell('§cОтменяем...')
+        if (!result) return player.fail('§cОтменяем...')
       }
     }
 
@@ -308,7 +324,7 @@ export class WorldEdit {
       const fillSize = 32768
       const time = Math.round((selection.size / fillSize) * timeForEachFill)
       if (time >= 0.01) {
-        this.player.tell(`§9► §rНачато заполнение, которое будет закончено приблизительно через ${time} сек`)
+        this.player.info(`Начато заполнение, которое будет закончено приблизительно через ${time} сек`)
       }
 
       const startTime = Date.now()
@@ -333,7 +349,7 @@ export class WorldEdit {
             continue nextBlock
           } catch (e) {
             if (errors < 3 && e instanceof Error) {
-              this.player.tell(`§cОшибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
+              this.player.fail(`Ошибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
             }
 
             if (
@@ -367,15 +383,13 @@ export class WorldEdit {
       }
 
       if (errors) {
-        this.player.playSound(SOUNDS.fail)
-        this.player.tell(`§4► §c${errors}/§f${all}§c §cошибок при заполнении, ${reply}`)
+        this.player.fail(`§c${errors}/§f${all}§c §cошибок при заполнении, ${reply}`)
       } else {
-        this.player.playSound(SOUNDS.success)
-        this.player.tell(`§a► ${reply}`)
+        this.player.success(reply)
       }
     } catch (e) {
       util.error(e)
-      if (e instanceof Error) this.player.tell(e.message)
+      if (e instanceof Error) this.player.fail(e.message)
     }
   }
 }

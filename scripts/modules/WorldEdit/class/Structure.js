@@ -32,6 +32,7 @@ export class Structure {
   }
 
   save() {
+    this.structures = []
     const cubes = new Cuboid(this.pos1, this.pos2).split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
 
     let errors = 0
@@ -78,7 +79,7 @@ export class Structure {
     }
     if (errors > 0)
       throw new Error(
-        `§c${errors}§f/§a${all}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+        `§c${errors}§f/${all}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
       )
   }
 
@@ -120,7 +121,7 @@ export class Structure {
     }
     if (errors > 0)
       throw new Error(
-        `§c${errors}§f/§2${all}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+        `§c${errors}§f/${all}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
       )
   }
 }

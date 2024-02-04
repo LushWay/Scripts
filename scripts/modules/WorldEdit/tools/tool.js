@@ -23,7 +23,7 @@ new WorldEditTool({
         lore[0] = 'teleportToView'
 
         item.setLore(lore)
-        player.tell(`§a► §rРежим инструмента изменен на телепорт по взгляду`)
+        player.success(`Режим инструмента изменен на телепорт по взгляду`)
       })
       .addButton('Выполнение команды', () => {
         new ModalForm('§3Инструмент').addTextField('Команда', '/tp @s ^^^5').show(player, (_, command) => {
@@ -34,7 +34,7 @@ new WorldEditTool({
           lore[1] = command
 
           item.setLore(lore)
-          player.tell(`§aR► §fКоманда: §7${command}`)
+          player.success(`Команда: §7${command}`)
         })
       })
       .addButton('Проверка звуков', () => {
@@ -45,7 +45,7 @@ new WorldEditTool({
           lore[2] = index.toString()
 
           item.setLore(lore)
-          player.tell(`§aR► §fЗвук: §7${index} ${sound}`)
+          player.success(`Звук: §7${index} ${sound}`)
         })
       })
       .addButton('Проверка партиклов', () => {
@@ -56,7 +56,7 @@ new WorldEditTool({
           lore[2] = index.toString()
 
           item.setLore(lore)
-          player.tell(`§aR► §fПартикл: §7${index} ${particle}`)
+          player.success(`Партикл: §7${index} ${particle}`)
         })
       })
       .show(player)
@@ -97,10 +97,10 @@ new WorldEditTool({
     if (action in actions) {
       const list = actions[action]
       const num = Number(lore[2]) + (player.isSneaking ? -1 : 1)
-      if (!list[num]) return player.tell('§c> §fСписок кончился')
+      if (!list[num]) return player.fail('Список кончился')
       lore[1] = list[num]
       lore[2] = num.toString()
-      player.tell('§a> §7' + lore[2] + ' §f' + lore[1])
+      player.success(`§7${lore[2]} §f${lore[1]}`)
       item.setLore(lore)
     }
     if (action === 'runCommand') {

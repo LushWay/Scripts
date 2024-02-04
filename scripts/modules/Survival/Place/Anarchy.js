@@ -45,8 +45,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         player => {
           if (isBuilding(player)) return tpMenuOnce(player)
 
+          // TODO Make sure all things works fine
           if (player.database.inv === this.inventoryName) {
-            return player.tell('§cВы уже находитесь на анархии!')
+            return player.fail('§cВы уже находитесь на анархии!')
           }
 
           if (!Portal.canTeleport(player, { name: '§c> §6Anarchy §c<' })) return

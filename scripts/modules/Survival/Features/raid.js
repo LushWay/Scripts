@@ -36,7 +36,7 @@ system.runInterval(
       const player = Player.fetch(id)
       if (player) {
         if (RAID.get(player) === 0) {
-          player.tell('§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны.')
+          player.tell('§4§l> §r§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны.')
           player.playSound('mob.wolf.bark')
         }
         RAID.set(player.id, RAID_NOTIFY[id])

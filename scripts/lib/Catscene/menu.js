@@ -1,6 +1,5 @@
 import { ItemStack, LocationInUnloadedChunkError, MolangVariableMap, Player, Vector } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { SOUNDS } from 'config'
 import { Catscene } from 'lib/Catscene/Catscene.js'
 import { Temporary } from 'lib/Class/Temporary.js'
 import { settingsGroup } from 'modules/Commands/settings.js'
@@ -181,8 +180,7 @@ function editCatscene(player, scene) {
         event.cancel = true
         system.delay(() => {
           scene.dots.push([Vector.subtract(Vector.floor(player.location), scene.location)])
-          player.tell('§a> §fТочка добавлена.')
-          player.playSound(SOUNDS.click)
+          player.info('Точка добавлена.')
         })
       } else if (event.itemStack.isStackableWith(editCatsceneItemDone)) {
         event.cancel = true
@@ -190,8 +188,7 @@ function editCatscene(player, scene) {
           backInv(player)
           scene.save()
           temp.cleanup()
-          player.tell(`§6> §fСохранено. Проверить: §7-scene play ${scene.name}`)
-          player.playSound(SOUNDS.click)
+          player.success(`Сохранено. Проверить: §7-scene play ${scene.name}`)
         })
       }
     })

@@ -75,3 +75,30 @@ export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2),
     }
   }
 }
+
+/**
+ * 
+ * @param {Vector3} min 
+ * @param {Vector3} max
+ 
+ */
+export function* iterateThroughtEdges(min, max) {
+  for (let coord = min.x; coord++; coord < max.x) {
+    for (const y of [min.y, max.y]) {
+      yield { x: coord, y, z: min.z }
+      yield { x: coord, y, z: max.z }
+    }
+  }
+  for (let coord = min.y; coord++; coord < max.y) {
+    for (const x of [min.x, max.x]) {
+      yield { x, y: coord, z: min.z }
+      yield { x, y: coord, z: max.z }
+    }
+  }
+  for (let coord = min.z; coord++; coord < max.z) {
+    for (const x of [min.x, max.x]) {
+      yield { x, y: min.y, z: coord }
+      yield { x, y: max.y, z: coord }
+    }
+  }
+}

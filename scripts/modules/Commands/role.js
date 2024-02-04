@@ -22,7 +22,8 @@ const roleCommand = new Command({
   name: 'role',
   description: 'Показывает вашу роль',
 })
-roleCommand
+
+const restoreRole = roleCommand
   .literal({
     description: 'Восстанавливает вашу роль',
     name: 'restore',
@@ -34,7 +35,7 @@ roleCommand
 
     setRole(ctx.sender, prevRole)
     delete ctx.sender.database.prevRole
-    ctx.sender.tell(`§b> §3Вы вернули роль §r${ROLES[prevRole]}`)
+    ctx.sender.info(`Вы вернули роль §r${ROLES[prevRole]}`)
   })
 
 roleCommand.executes(roleForm)
@@ -44,7 +45,12 @@ roleCommand.executes(roleForm)
  */
 function roleForm(ctx, sort = true) {
   const prole = getRole(ctx.sender.id)
-  if (!HIERARCHY.includes(prole)) return ctx.reply(`§b> §r${ROLES[prole]}`)
+  if (!HIERARCHY.includes(prole))
+    return ctx.sender.info(
+      `Ваша роль: ${ROLES[prole]}${
+        restoreRole.sys.data.requires(ctx.sender) ? '\n\nВосстановить прошлую роль: §f-role restore' : ''
+      }`
+    )
 
   /**
    * @param {Player | string} player
@@ -79,8 +85,8 @@ function roleForm(ctx, sort = true) {
             if (!newrole)
               return formCtx.error('Неизвестная роль: ' + newrole + '§r, допустимые: ' + util.inspect(ROLES))
             if (notify && player instanceof Player)
-              player.tell(
-                `§b> §3Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
+              player.info(
+                `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
                   showName ? `§3 игроком §r${ctx.sender.name}` : ''
                 }${message ? `\n§r§3Причина: §r${message}` : ''}`
               )

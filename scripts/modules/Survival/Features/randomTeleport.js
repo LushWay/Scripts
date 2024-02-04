@@ -121,7 +121,7 @@ function giveElytra(player, c = 5) {
     if (container.emptySlotsCount) {
       container.addItem(item)
     } else {
-      player.tell('§cСними нагрудник или свою элитру!')
+      player.fail('§cСними нагрудник или свою элитру!')
       if (c) system.runTimeout(() => giveElytra(player, c--), 'giveElytra retry', 20)
     }
   }

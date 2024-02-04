@@ -70,7 +70,7 @@ function setupCameraForm(player, target) {
       }
 
       createCameraInteval(target)
-      player.tell('§3§l> §rСохранено!')
+      player.success('Сохранено!')
     })
 }
 

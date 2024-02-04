@@ -25,7 +25,7 @@ function selectTable(player, firstCall) {
     form.addButton(name, () => showTable(player, key))
   }
   form.show(player)
-  if (firstCall) player.tell('§l§b> §r§3Закрой чат!')
+  if (firstCall) player.info('Закрой чат!')
 }
 
 /**

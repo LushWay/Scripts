@@ -62,8 +62,8 @@ const smoother = new SmoothTool({
         slot.nameTag = '§r§3Сглаживание §6' + size
         '§r §f' + (replaceBlocksSet ? replaceBlocksSet.replace(SHARED_POSTFIX, '') : '')
         slot.setLore(smoother.stringifyLore(lore))
-        player.tell(
-          `§a► §r${
+        player.success(
+          `${
             lore.replaceBlocksSet[0] ? 'Отредактирована' : 'Создана'
           } сглаживатель размером ${size} и силой ${smoothLevel}${
             replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
@@ -86,7 +86,9 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
 
   WorldEdit.forPlayer(player).backup('Сглаживание', pos1, pos2)
 
-  player.tell('§3(Сглаживание)§f Вычисление...')
+  const prefix = '§7Сглаживание: §f '
+
+  player.info(prefix + 'Вычисление...')
   // Create a copy of the voxel data
   const voxelDataCopy = getBlocksAreasData(baseBlock, radius)
 
@@ -146,8 +148,8 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
     .map(e => Object.values(e).map(e => Object.values(e)))
     .flat(2)
 
-  player.tell(
-    `§3(Сглаживание)§f Будет заполнено §6${toFill.length}§f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
+  player.info(
+    prefix + `Будет заполнено §6${toFill.length}§f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
   )
   for (const e of toFill) {
     if (!e.location) continue
@@ -156,7 +158,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
     else block?.setType(MinecraftBlockTypes.Air)
     await nextTick
   }
-  player.tell('§3(Сглаживание)§f Готово')
+  player.success(prefix + 'Готово')
 }
 
 /**

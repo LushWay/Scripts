@@ -53,10 +53,8 @@ const shovel = new WorldEditTool({
         else lore.replaceBlocksSet = ['', '']
         slot.setLore(shovel.stringifyLore(lore))
 
-        player.tell(
-          `§a► §r${
-            lore.blocksSet ? 'Отредактирована' : 'Создана'
-          } лопата с ${blocksSet} набором блоков и радиусом ${radius}`
+        player.success(
+          `${lore.blocksSet ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`
         )
       })
   },

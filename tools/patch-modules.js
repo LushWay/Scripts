@@ -32,8 +32,9 @@ patchPackage('@minecraft/server', {
     static between(a: Vector3, b: Vector3, c: Vector3): boolean;
     /**
      * Returns string representation of vector ('x y z')
+     * @param color Whenether to color vector args or not
      */
-    static string(a: Vector3): string;
+    static string(a: Vector3, color?: boolean): string;
     `,
     World: m`
     /**

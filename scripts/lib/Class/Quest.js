@@ -1,5 +1,4 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 import { Airdrop } from 'lib/Class/Airdrop.js'
 import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { LootTable } from 'lib/Class/LootTable.js'
@@ -232,7 +231,7 @@ class PlayerQuest {
         step.updateListeners.clear()
       },
       error(text) {
-        this.player.tell('§cУпс, квест сломался: ' + text)
+        this.player.fail('§cУпс, квест сломался: ' + text)
         return { cleanup() {} }
       },
     }
@@ -500,8 +499,7 @@ class PlayerQuest {
   failed(reason) {
     this.dynamic({
       activate: () => {
-        this.player.playSound(SOUNDS.fail)
-        this.player.tell(reason)
+        this.player.fail(reason)
         this.quest.exit(this.player)
         return { cleanup() {} }
       },

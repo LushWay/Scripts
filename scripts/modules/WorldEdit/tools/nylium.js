@@ -23,7 +23,7 @@ const nylium = new WorldEditTool({
         lore.blocksSet = [player.id, blocksSet]
         slot.nameTag = '§r§3> §f' + blocksSet
         slot.setLore(nylium.stringifyLore(lore))
-        player.tell('§3> §fНабор блоков сменен на ' + blocksSet)
+        player.info('Набор блоков сменен на ' + blocksSet)
       })
   },
 })
@@ -46,7 +46,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
         0
       )
     } else {
-      player.tell(`§cПустой набор блоков '§f${stringifyBlocksSetRef(lore.blocksSet)}'§c! Выберите другой.`)
+      player.fail(`Пустой набор блоков '§f${stringifyBlocksSetRef(lore.blocksSet)}'§c! Выберите другой.`)
       nylium.editToolForm?.(slot, player)
     }
   })

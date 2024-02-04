@@ -1,5 +1,4 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 
 export class CommandContext {
   /**
@@ -46,11 +45,9 @@ export class CommandContext {
   }
   /**
    * Replys to the sender of a command callback
-   * @param {any} errorText Message or a lang code
-   * @example ctx.reply('Hello World!');
+   * @param {*} errorText - Text to send
    */
   error(errorText) {
-    this.sender.tell(`§c${errorText}`)
-    this.sender.playSound(SOUNDS.fail)
+    this.sender.fail(errorText)
   }
 }

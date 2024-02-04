@@ -1,4 +1,4 @@
-import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, world } from '@minecraft/server'
+import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { OverTakes } from './OverTakes.js'
 
@@ -20,8 +20,10 @@ OverTakes(Player, {
  */
 function prefix(pref, sound) {
   return function (message) {
-    this.playSound(sound)
-    this.tell(pref + message)
+    system.delay(() => {
+      this.playSound(sound)
+      this.tell(pref + message)
+    })
   }
 }
 

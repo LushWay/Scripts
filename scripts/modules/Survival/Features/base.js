@@ -1,6 +1,5 @@
 import { ItemStack, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { SOUNDS } from 'config.js'
 import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
 import { actionGuard } from 'modules/Survival/guard.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
@@ -26,7 +25,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 
   if (region) {
     event.cancel = true
-    return player.tell(
+    return player.fail(
       `§cВы уже ${
         region.regionMember(player) === 'owner' ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`
       }!`
@@ -60,7 +59,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 
   if (nearRegion) {
     event.cancel = true
-    return player.tell('§cРядом есть другие регионы!')
+    return player.fail('§cРядом есть другие регионы!')
   }
 
   system.delay(() => {
@@ -76,8 +75,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
         owners: [player.id],
       },
     })
-    player.tell('§a► §fБаза успешно создана! Чтобы открыть меню базы используйте команду §6-base')
-    player.playSound(SOUNDS.levelup)
+    player.success('База успешно создана! Чтобы открыть меню базы используйте команду §6-base')
   })
 })
 
@@ -109,7 +107,7 @@ system.runInterval(
         }
       } else {
         base.forEachOwner(player => {
-          player.tell(`§cБаза с владельцем §f${base.ownerName}§c разрушена.`)
+          player.fail(`§cБаза с владельцем §f${base.ownerName}§c разрушена.`)
         })
         base.delete()
       }

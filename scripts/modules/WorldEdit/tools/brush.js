@@ -51,7 +51,7 @@ class BrushTool extends BaseBrushTool {
       getBlockSetForReplaceTarget(lore.replaceBlocksSet)
     )
 
-    if (error) player.tell(error)
+    if (error) player.fail(error)
   }
 }
 
@@ -97,8 +97,8 @@ const brush = new BrushTool({
         else lore.replaceBlocksSet = ['', '']
         slot.nameTag = `§r§3Кисть §6${shape}§r §f${blocksSet.replace(SHARED_POSTFIX, '')}`.slice(0, 254)
         slot.setLore(brush.stringifyLore(lore))
-        player.tell(
-          `§a► §r${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
+        player.success(
+          `${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
             replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${radius}`
         )

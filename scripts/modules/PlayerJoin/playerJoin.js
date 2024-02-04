@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/Class/EventSignal.js'
-import { Settings } from 'smapi.js'
+import { ROLES, Settings, getRole } from 'smapi.js'
 
 class JoinBuilder {
   config = {
@@ -124,11 +124,19 @@ class JoinBuilder {
     player.scores.joinTimes ??= 0
     player.scores.joinTimes++
 
+    let role = ''
+    const playerRole = getRole(player.id)
+    if (playerRole !== 'member') role += `${ROLES[playerRole]} `
+
+    const message = Join.config.messages[messageType]
+
+    console.info(`${role}§7${player.name} ${message}`)
+
     for (const other of world.getPlayers()) {
       if (other.id === player.id) continue
       const settings = this.settings(other)
       if (settings.sound) other.playSound(Join.config.messages.sound)
-      if (settings.message) other.tell(`§7${player.name} ${Join.config.messages[messageType]}`)
+      if (settings.message) other.tell(`§7${player.name} ${message}`)
     }
 
     EventSignal.emit(this.onMoveAfterJoin, {

@@ -59,7 +59,7 @@ export class Catscene {
     if (!this.location.valid) {
       const err = this.name + ' катсцена еще не настроена'
       util.error(new Error(err))
-      return player.tell(err)
+      return player.fail(err)
     }
     // TODO Use generator
     const curve = this.generateCurve(void 0, player.location)

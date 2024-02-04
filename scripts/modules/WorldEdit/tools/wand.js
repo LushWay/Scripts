@@ -39,9 +39,6 @@ world.beforeEvents.itemUseOn.subscribe(event => {
   const pos = we.pos2 ?? { x: 0, y: 0, z: 0 }
   if (pos.x === blockLocation.x && pos.y === blockLocation.y && pos.z === blockLocation.z) return
   we.pos2 = blockLocation
-  event.source.tell(
-    `§d►2◄§f (use) ${Vector.string(we.pos2)}` //§r
-  )
 })
 
 world.beforeEvents.playerBreakBlock.subscribe(event => {
@@ -53,7 +50,4 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
   if (pos.x === event.block.location.x && pos.y === event.block.location.y && pos.z === event.block.location.z) return
 
   we.pos1 = event.block.location
-  system.delay(() => {
-    event.player.tell(`§5►1◄§r (break) ${Vector.string(we.pos1)}`)
-  })
 })

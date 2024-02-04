@@ -57,7 +57,7 @@ export class Cooldown {
     if (status === 'EXPIRED') return true
     if (this.player && this.tell) {
       const time = util.ms.remaining(this.time - status)
-      this.player.tell(`§cПодожди еще §f${time.value} §c${time.type}`)
+      this.player.fail(`§cПодожди еще §f${time.value} §c${time.type}`)
     }
     return false
   }

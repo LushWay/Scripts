@@ -86,7 +86,7 @@ export async function showForm(form, player) {
 
           case 2:
             // Second attempt, tell player to manually close chat...
-            player.tell('§b> §3Закрой чат!')
+            player.info('Закрой чат!')
             await system.sleep(20)
             continue
 
@@ -96,7 +96,7 @@ export async function showForm(form, player) {
 
           case hold:
             // Last attempt, we cant do anything
-            player.tell(`§cНе удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
+            player.fail(`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
             return false
         }
       }

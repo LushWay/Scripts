@@ -16,8 +16,7 @@ export const LEARNING = {
       return q.failed('§cСервер не настроен')
 
     q.start(function () {
-      this.player.tell('§6Обучение!')
-      this.player.playSound(SOUNDS.action)
+      this.player.info('§6Обучение!')
     })
 
     q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
@@ -54,8 +53,7 @@ export const LEARNING = {
     })
 
     q.end(function () {
-      this.player.playSound(SOUNDS.success)
-      this.player.tell('§6Обучение закончено!')
+      this.player.success('§6Обучение закончено!')
     })
   }),
   LOOT_TABLE: LEARNING_L,
@@ -85,7 +83,7 @@ createPublicGiveItemCommand('startwand', LEARNING.START_AXE)
 
 Anarchy.learningRTP = player => {
   if (!LEARNING.RTP_LOCATION.valid) {
-    player.fail('Рандомная телепортация не настроена')
+    player.fail('Случайное перемещение не настроено')
     return tpMenuOnce(player)
   }
 
@@ -99,8 +97,7 @@ Anarchy.learningRTP = player => {
     {
       elytra: false,
       teleportCallback() {
-        player.tell('§a> §fВы были перемещены на случайную локацию.')
-        player.playSound(SOUNDS.success)
+        player.success('Вы были перемещены на случайную локацию.')
       },
       keepInSkyTime: 20,
     }
