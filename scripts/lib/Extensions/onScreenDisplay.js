@@ -1,7 +1,6 @@
 import { Player, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
 import { SCREEN_DISPLAY } from 'lib/Extensions/player.js'
 import { util } from 'smapi.js'
-import { OverTakes } from './OverTakes.js'
 
 const $sidebar = '§t§i§psidebar'
 const $title = 'title'
@@ -27,7 +26,11 @@ const $tipPrefix = '§t§i§p'
  */
 const TITLES = {}
 
-OverTakes(ScreenDisplay.prototype, {
+/** @type {Omit<typeof ScreenDisplay['prototype'], 'player'> & ThisType<{player: Player & {[SCREEN_DISPLAY]: ScreenDisplay}} & Omit<ScreenDisplay, 'player'>>} */
+export const SCREEN_DISPLAY_OVERRIDE = {
+  isValid() {
+    return this.player[SCREEN_DISPLAY].isValid()
+  },
   setHudTitle(message, options, prefix = $title, n = 0) {
     const PLAYER_SD = (TITLES[this.player.id] ??= { actions: [] })
 
@@ -90,7 +93,16 @@ OverTakes(ScreenDisplay.prototype, {
   setTip(n, text = '', priority) {
     this.setHudTitle(text, { priority, ...defaultOptions }, $tipPrefix, n)
   },
-})
+  setActionBar(text) {
+    return this.player[SCREEN_DISPLAY].setActionBar(text)
+  },
+  updateSubtitle(subtitle) {
+    return this.player[SCREEN_DISPLAY].updateSubtitle(subtitle)
+  },
+  setTitle(title, options) {
+    return this.player[SCREEN_DISPLAY].setTitle(title, options)
+  },
+}
 
 const defaultOptions = { fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 0 }
 const defaultTitleOptions = { ...defaultOptions, stayDuration: -1 }

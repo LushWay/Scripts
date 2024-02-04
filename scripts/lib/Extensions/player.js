@@ -1,6 +1,7 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { OverTakes } from './OverTakes.js'
+import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
 
 OverTakes(Player, {
   fetch(name) {
@@ -39,12 +40,10 @@ OverTakes(Player.prototype, {
   },
 
   get onScreenDisplay() {
-    return Object.setPrototypeOf(
-      {
-        player: this,
-      },
-      super.onScreenDisplay
-    )
+    return {
+      player: this,
+      ...SCREEN_DISPLAY_OVERRIDE,
+    }
   },
 
   fail: prefix('§4§l> §r§c', SOUNDS.fail),

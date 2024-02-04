@@ -4,7 +4,7 @@ import { Cuboid } from './Cuboid.js'
 
 // TODO Loading using tickingareas
 
-export class Structure {
+export class Structure extends Cuboid {
   /**
    * @private
    * @type {{
@@ -22,18 +22,17 @@ export class Structure {
    * @param {Vector3} pos2
    */
   constructor(prefix, pos1, pos2, name = '') {
+    super(pos1, pos2)
     this.id = Date.now().toString(32)
     this.name = name
     this.prefix = `${prefix}|${this.id}`
-    this.pos1 = pos1
-    this.pos2 = pos2
 
     this.save()
   }
 
   save() {
     this.structures = []
-    const cubes = new Cuboid(this.pos1, this.pos2).split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
+    const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
 
     let errors = 0
     let all = 0
@@ -41,10 +40,8 @@ export class Structure {
       const name = `${this.prefix}|${i}`
       const pos1 = cube.pos1
       const pos2 = cube.pos2
-      const result = world.overworld.runCommand(
-        `structure save "${name}" ${Vector.string(pos1)} ${Vector.string(pos2)} false memory true`,
-        { showError: true }
-      )
+      const command = `structure save "${name}" ${Vector.string(pos1)} ${Vector.string(pos2)} false memory true`
+      const result = world.overworld.runCommand(command, { showError: true })
       all++
       if (result > 0) {
         this.structures.push({
@@ -83,16 +80,16 @@ export class Structure {
       )
   }
 
-  async load(pos = this.pos1, additional = '') {
+  async load(pos = this.min, additional = '') {
     let errors = 0
     let all = 0
     for (const file of this.structures) {
       let to
-      if (pos === this.pos1) {
+      if (pos === this.min) {
         to = file.pos1
       } else {
         // TODO Fix
-        const offset = Vector.subtract(this.pos1, file.pos1)
+        const offset = Vector.subtract(this.min, file.pos1)
         to = Vector.add(pos, offset)
       }
 

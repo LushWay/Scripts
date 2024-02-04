@@ -107,15 +107,20 @@ export class WorldEdit {
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
     WorldEdit.instances[id] = this
     this.player = player
-    // Do not delete on exit so we can restore something
-    // system.delay(() => {
-    //   const event = world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-    //     if (playerId !== this.player.id) return
+  }
 
-    //     world.afterEvents.playerLeave.unsubscribe(event)
-    //     delete WorldEdit.instances[id]
-    //   })
-    // })
+  /**
+   * Logs an error message and tells the error to the player
+   * @param {string} action - The `action` parameter represents the action that failed. It is a string that
+   * describes the action that was attempted but failed.
+   * @param {any} error - The `error` parameter is the error object or error message that occurred during the
+   * action. It can be either an Error object or a string representing the error message.
+   */
+  failedTo(action, error) {
+    const text = util.error(error, { returnText: true })
+    if (!text) return
+    console.error(text)
+    this.player.fail(`Не удалось ${action}§f: ${error}`)
   }
 
   drawSelection() {
@@ -155,11 +160,10 @@ export class WorldEdit {
       }
 
       this.player.info(
-        `§3Успешно отменено §f${amount} §3${util.ngettext(amount, ['сохранение', 'сохранения', 'сохранений'])}!`
+        `§3Успешно отменено §f${amount} §3${util.ngettext(amount, ['действие', 'действия', 'действий'])}!`
       )
     } catch (error) {
-      util.error(error)
-      this.player.fail(`Не удалось отменить: ${error.message}`)
+      this.failedTo('отменить', error)
     }
   }
 
@@ -206,11 +210,13 @@ export class WorldEdit {
 
       this.currentCopy = new Structure(WE_CONFIG.COPY_FILE_NAME + this.player.id, this.pos1, this.pos2)
       this.player.info(
-        `Скопирована область ${Vector.string(this.pos1)} - ${Vector.string(this.pos2)} размером ${selection.size}`
+        `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
+          this.pos2,
+          true
+        )}`
       )
     } catch (error) {
-      util.error(error)
-      this.player.fail(`Не удалось скорпировать: ${error.message}`)
+      this.failedTo('скопировать', error)
     }
   }
   /**
@@ -250,7 +256,7 @@ export class WorldEdit {
     seed = ''
   ) {
     try {
-      if (!this.currentCopy) return '§4► §cВы ничего не копировали!'
+      if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')
 
       const { pastePos1, pastePos2 } = this.pastePositions(rotation, this.currentCopy)
 
@@ -271,8 +277,7 @@ export class WorldEdit {
 
       this.player.success(`Успешно вставлено в ${Vector.string(pastePos1)}`)
     } catch (error) {
-      util.error(error)
-      this.player.fail(`Не удалось вставить: ${error.message}`)
+      this.failedTo('вставить', error)
     }
   }
   /**
@@ -387,9 +392,8 @@ export class WorldEdit {
       } else {
         this.player.success(reply)
       }
-    } catch (e) {
-      util.error(e)
-      if (e instanceof Error) this.player.fail(e.message)
+    } catch (error) {
+      this.failedTo('заполнить', error)
     }
   }
 }

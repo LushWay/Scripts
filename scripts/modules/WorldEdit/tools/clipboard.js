@@ -14,7 +14,7 @@ const clipboard = new WorldEditTool({
   },
   editToolForm(slot, player) {
     slot.setLore(clipboard.stringifyLore({ version: 0, mode: 'paste' }))
-    slot.nameTag = 'Копировать/Вставить/Отменить (шифт)'
+    slot.nameTag = '§r§b> §fКопировать/Вставить/Отменить\n(крадитесь чтобы сменить действие)'
   },
   onUse(player, item) {
     if (clipboard.parseLore(item.getLore(), true)?.mode !== 'paste') return
