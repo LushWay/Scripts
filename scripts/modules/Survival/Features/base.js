@@ -3,7 +3,7 @@ import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data
 import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
 import { actionGuard } from 'modules/Survival/guard.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus } from 'smapi.js'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus, util } from 'smapi.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§r§6База',
@@ -19,7 +19,12 @@ actionGuard((_, __, ctx) => {
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block, faceLocation, itemStack } = event
-  if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
+  try {
+    if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
+  } catch (e) {
+    if (e instanceof TypeError && e.message.match(/native handle/)) return
+    return util.error(e)
+  }
 
   const region = Region.regionInstancesOf(RadiusRegion).find(e => e.regionMember(player) !== false)
 
