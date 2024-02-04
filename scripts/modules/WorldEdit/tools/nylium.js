@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { ContainerSlot, ItemStack, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { isBuilding } from 'modules/Build/list.js'
 import { ModalForm } from 'smapi.js'
@@ -20,13 +20,23 @@ const nylium = new WorldEditTool({
     new ModalForm('§3' + this.displayName)
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .show(player, (_, blocksSet) => {
-        lore.blocksSet = [player.id, blocksSet]
-        slot.nameTag = '§r§3> §f' + blocksSet
-        slot.setLore(nylium.stringifyLore(lore))
+        createNylium(slot, player, blocksSet, lore)
         player.info('Набор блоков сменен на ' + blocksSet)
       })
   },
 })
+
+/**
+ *
+ * @param {ItemStack | ContainerSlot} slot
+ * @param {Player} player
+ * @param {string} blocksSet
+ */
+export function createNylium(slot, player, blocksSet, lore = nylium.parseLore(slot.getLore())) {
+  lore.blocksSet = [player.id, blocksSet]
+  slot.nameTag = '§r§3> §f' + blocksSet
+  slot.setLore(nylium.stringifyLore(lore))
+}
 
 /* Replaces the block with a random block from the lore of the item. */
 world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {

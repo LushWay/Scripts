@@ -1,12 +1,16 @@
-import { BlockPermutation, BlockStates, BlockTypes, Player } from '@minecraft/server'
+import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector } from '@minecraft/server'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
+import { createNylium } from 'modules/WorldEdit/tools/nylium.js'
 import {
   DEFAULT_BLOCK_SETS,
   SHARED_POSTFIX,
+  blockSetDropdown,
   getAllBlockSets,
+  getBlockSetForReplaceTarget,
   getOtherPlayersBlockSets,
   setBlockSet,
 } from 'modules/WorldEdit/utils/blocksSet.js'
@@ -40,6 +44,34 @@ export function WEmenu(player, body = '') {
       }
     })
   }
+
+  form.addButton('Создать раздатчик блоков из набора', () => {
+    new ModalForm('Выбери набор блоков...')
+      .addDropdown('Набор блоков', ...blockSetDropdown(['', ''], player))
+      .show(player, (ctx, blockset) => {
+        /** @type {ReplaceTarget[]} */
+        // @ts-expect-error Filter misstype
+        const blocks = getBlockSetForReplaceTarget([player.id, blockset]).filter(e => e !== undefined)
+        const pos1 = Vector.floor(player.location)
+        const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
+        WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
+
+        const block = player.dimension.getBlock(player.location)
+        const nylium = new ItemStack(MinecraftBlockTypes.WarpedNylium)
+        createNylium(nylium, player, blockset)
+        nylium.amount = 64
+        block?.setType(MinecraftBlockTypes.Chest)
+        const container = block?.getComponent('inventory')?.container
+
+        for (const [i] of container?.entries() ?? []) {
+          container?.setItem(i, nylium.clone())
+        }
+
+        for (const [i, block] of blocks.entries()) {
+          player.dimension.getBlock(Vector.add(pos1, { x: 0, z: 0, y: -i - 1 }))?.setPermutation(toPermutation(block))
+        }
+      })
+  })
 
   form.show(player)
 }
