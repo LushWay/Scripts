@@ -39,7 +39,7 @@ OverTakes(onlineBuildersList, {
  * @param {Player} player
  */
 export function isBuilding(player, uptodate = false) {
-  if (uptodate) return player.isGamemode('creative')
+  if (uptodate) return player.isGamemode('creative') && getRole(player) !== 'member'
   return onlineBuildersList.has(player.id)
 }
 
@@ -54,14 +54,14 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
 
 system.runPlayerInterval(
   player => {
-    const creative = player.isGamemode('creative')
-    const builder = onlineBuildersList.has(player.id)
+    const isBuilder = isBuilding(player, true)
+    const onList = onlineBuildersList.has(player.id)
 
-    if (creative && !builder) {
+    if (isBuilder && !onList) {
       switchInv()
       setBuildingTip(player, true)
       onlineBuildersList.add(player.id)
-    } else if (!creative && builder) {
+    } else if (!isBuilder && onList) {
       switchInv()
       setBuildingTip(player, false)
       onlineBuildersList.delete(player.id)
