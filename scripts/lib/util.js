@@ -419,8 +419,9 @@ export const util = {
 
   /**
    * @param {string | symbol | number} str
-   * @param {{[]: any}} obj
-   * @returns {str is keyof obj}
+   * @template {Record<string | symbol | number, any>} O
+   * @param {O} obj
+   * @returns {str is keyof O}
    */
   isKeyof(str, obj) {
     return str in obj
