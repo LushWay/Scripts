@@ -12,6 +12,7 @@ import './enchant.js'
 import './lib/Form/util.test.js'
 import './simulatedPlayer.js'
 
+console.error(new TypeError('Testing!'))
 // const player = world.getAllPlayers()[0]
 // const targetPosition = { x: 10, y: 10, z: 10 }
 // test
