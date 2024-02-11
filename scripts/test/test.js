@@ -12,69 +12,6 @@ import './enchant.js'
 import './lib/Form/util.test.js'
 import './simulatedPlayer.js'
 
-// const player = world.getAllPlayers()[0]
-// const targetPosition = { x: 10, y: 10, z: 10 }
-// test
-// /**
-//  * @param {Vector3} a
-//  * @param {Vector3} b
-//  */
-// const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z
-
-// const xMax = 300
-// const yMax = 50
-// let i = 0
-// system.runInterval(() => {
-//   const head = player.getHeadLocation()
-//   const playerViewDirection = player.getViewDirection()
-//   const target = Vector.subtract(
-//     Vector.add(targetPosition, { x: 0.5, y: 0.5, z: 0.5 }),
-//     head
-//   )
-
-//   const distance = Vector.distance(Vector.zero, target)
-
-//   const direction = target.normalized()
-//   const relative = Vector.multiply(playerViewDirection, distance)
-//   const local = Vector.subtract(relative, target)
-
-//   i++
-//   if (i % 20 === 0) {
-//     player.dimension.spawnParticle(
-//       'minecraft:balloon_gas_particle',
-//       Vector.add(head, relative)
-//     )
-//   }
-
-//   const focalLength = 2 // Assuming a specific distance for screen projection
-//   const x = (focalLength * local.x) / (focalLength + local.z)
-//   const y = (focalLength * local.y) / (focalLength + local.z)
-
-//   player.onScreenDisplay.setActionBar(
-//     util.inspect({
-//       target: str(target),
-//       distance,
-//       direction: str(direction),
-//       relative: str(relative),
-//       playerViewDirection: str(playerViewDirection),
-//       local: str(local),
-//       // localX: str(localX),
-//       // localY: str(localY),
-//       x: x.toFixed(2),
-//       // y: y.toFixed(2),
-//     })
-//   )
-
-//   player.setProperty('sm:marker.x', Math.max(-yMax, Math.min(xMax, x)))
-//   player.setProperty('sm:marker.y', Math.max(-yMax, Math.min(yMax, y)))
-// }, 'v')
-// /**
-//  * @param {Vector3} v
-//  */
-// function str(v) {
-//   return `${v.x.toFixed(2)} ${v.y.toFixed(2)} ${v.z.toFixed(2)}`
-// }
-
 /**
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
@@ -86,13 +23,13 @@ const tests = {
   base(ctx) {
     ctx.sender.container?.addItem(BASE_ITEM_STACK)
   },
-  0() {
+  logs() {
     console.log('This is log §6color§r test §lbold')
     console.info('This is info test')
     console.warn('This is warn test')
     util.error(new TypeError('This is error test'))
   },
-  1: ctx => {
+  forms: ctx => {
     const menu = new ActionForm('Action', 'body').addButton('button', () => {
       new ModalForm('ModalForm')
         .addDropdown('drdown', ['op', 'op2'])
@@ -108,11 +45,11 @@ const tests = {
     })
     menu.show(ctx.sender)
   },
-  13: ctx => {
+  components: ctx => {
     ctx.reply(util.inspect(ctx.sender.getComponents()))
   },
 
-  41(ctx) {
+  dbinspect(ctx) {
     world.debug(
       'test41',
       { DB },
@@ -137,7 +74,7 @@ const tests = {
       })
     )
   },
-  45(ctx) {
+  localization(ctx) {
     const i = MinecraftItemTypes
 
     const items = [
@@ -158,32 +95,6 @@ const tests = {
       const stack = new ItemStack(item)
       ctx.reply(GAME_UTILS.localizationName(stack))
     }
-  },
-  marker(ctx) {
-    const enabled = ctx.sender.getProperty('sm:marker.enabled')
-    const x = ctx.sender.getProperty('sm:marker.x')
-    const y = ctx.sender.getProperty('sm:marker.y')
-    const scale = ctx.sender.getProperty('sm:marker.scale')
-    const texture = ctx.sender.getProperty('sm:marker.texture')
-
-    if (typeof enabled !== 'boolean') return ctx.error('enabled ' + enabled)
-    if (typeof x !== 'number' || typeof y !== 'number' || typeof scale !== 'number' || typeof texture !== 'number')
-      return ctx.error('Not a number:§r\n' + util.inspect({ x, y, scale, texture }))
-
-    const player = ctx.sender
-    new ModalForm('Marker settings')
-      .addToggle('Enabled', enabled)
-      .addSlider('x', -150, 150, 1, x)
-      .addSlider('y', -150, 150, 1, y)
-      .addSlider('scale (0.<value>)', 0, 15, 1, scale * 10)
-      .addSlider('texture', 0, 1, 1, texture)
-      .show(ctx.sender, (ctx, enabled, x, y, scale, texture) => {
-        player.setProperty('sm:marker.enabled', enabled)
-        player.setProperty('sm:marker.x', x)
-        player.setProperty('sm:marker.y', y)
-        player.setProperty('sm:marker.scale', scale / 10)
-        player.setProperty('sm:marker.texture', texture)
-      })
   },
   particle(ctx) {
     const block = ctx.sender.getBlockFromViewDirection({
@@ -220,7 +131,7 @@ const tests = {
       10
     )
   },
-  async 51(ctx) {
+  async api(ctx) {
     const res = await APIRequest('playerPlatform', {
       playerName: ctx.sender.name,
     })
@@ -240,7 +151,7 @@ const tests = {
       ctx.sender.dimension.getBlock(position)?.setType(MinecraftBlockTypes.Stone)
     }
   },
-  52(ctx) {
+  lore(ctx) {
     ctx.sender.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])
   },
 
