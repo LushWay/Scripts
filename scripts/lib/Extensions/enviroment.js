@@ -59,7 +59,17 @@ Array.prototype.randomElement = function () {
  * @param  {any[]} args
  */
 function format(args) {
-  return args.map(e => util.toTerminalColors(typeof e === 'string' ? e : util.inspect(e))).join(' ')
+  return args
+    .map(e =>
+      util.toTerminalColors(
+        typeof e === 'string'
+          ? e
+          : typeof e === 'object' && e !== null && e instanceof Error
+          ? util.error(e, { returnText: true }) ?? 'Empty error (check lib/Extensions/enviroment.js for more detail.)'
+          : util.inspect(e)
+      )
+    )
+    .join(' ')
 }
 
 OverTakes(console, {
