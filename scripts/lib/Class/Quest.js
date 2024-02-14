@@ -1,9 +1,18 @@
-import { Entity, Player, Vector, system, world } from '@minecraft/server'
+import {
+  Entity,
+  LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
+  Player,
+  Vector,
+  system,
+  world,
+} from '@minecraft/server'
 import { Airdrop } from 'lib/Class/Airdrop.js'
 import { GAME_UTILS } from 'lib/Class/GameUtils.js'
 import { LootTable } from 'lib/Class/LootTable.js'
 import { Temporary } from 'lib/Class/Temporary.js'
 import { util } from 'lib/util.js'
+import { isBuilding } from 'modules/Build/isBuilding.js'
 import { PlaceAction } from './Action.js'
 
 // // @ts-expect-error Bruh
@@ -262,7 +271,7 @@ class PlayerQuest {
    * @param {Vector3} to
    * @param {QuestText} text
    */
-  place(from, to, text, description = text) {
+  place(from, to, text, description = text, doNotAllowBuilders = true) {
     this.dynamic({
       text,
       description,
@@ -273,13 +282,14 @@ class PlayerQuest {
           actions.push(
             PlaceAction.onEnter(pos, player => {
               if (player.id !== this.player.id) return
+              if (isBuilding(player)) return
 
               this.next()
             })
           )
         }
 
-        const temp = this.quest.steps(this.player).createTargetMarkerInterval({ place: Vector.slerp(from, to, 0.5) })
+        const temp = this.quest.steps(this.player).createTargetMarkerInterval({ place: Vector.lerp(from, to, 0.5) })
 
         return {
           cleanup() {
@@ -435,6 +445,7 @@ class PlayerQuest {
                         z: 0,
                       }),
                 loot: options.lootTable,
+                for: this.player.id,
               },
               key
             )
@@ -532,9 +543,10 @@ class PlayerQuest {
     const temp = new Temporary(({ system }) => {
       system.runInterval(
         () => {
-          options.interval?.()
-
+          if (!this.player.isValid()) return temp.cleanup()
           if (!options.place) return
+
+          options.interval?.()
 
           const head = this.player.getHeadLocation()
           const playerViewDirection = this.player.getViewDirection()
@@ -547,7 +559,12 @@ class PlayerQuest {
           const distance = Vector.distance(Vector.zero, targetRelative)
           const relative = Vector.multiply(playerViewDirection, distance)
 
-          this.player.dimension.spawnParticle('minecraft:balloon_gas_particle', Vector.add(head, relative))
+          try {
+            this.player.dimension.spawnParticle('minecraft:balloon_gas_particle', Vector.add(head, relative))
+          } catch (e) {
+            if (e instanceof LocationOutOfWorldBoundariesError || e instanceof LocationInUnloadedChunkError) return
+            util.catch(e, 'Quest place marker particle')
+          }
         },
         'Quest place marker particle',
         20

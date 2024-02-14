@@ -98,6 +98,8 @@ export class SafeAreaRegion extends RadiusRegion {
       MinecraftEntityTypes.Player,
       MinecraftEntityTypes.Npc,
       MinecraftEntityTypes.ArmorStand,
+      MinecraftEntityTypes.Chicken,
+      MinecraftEntityTypes.ChestMinecart,
       'minecraft:painting',
       'minecraft:item',
     ],
@@ -117,11 +119,12 @@ export class SafeAreaRegion extends RadiusRegion {
   constructor(arg) {
     super({ saveToDisk: false, ...arg, initPermissions: false })
     this.safeAreaName = arg.name
-    this.allowUsageOfCraftingTable = arg.allowUsageOfCraftingTable ?? false
+    this.allowUsageOfCraftingTable = arg.allowUsageOfCraftingTable ?? true
     this.initPermissions(arg.permissions)
   }
 }
 
+// TODO Levels, save place on creation, shadow regions etc
 export class BaseRegion extends RadiusRegion {
   subtype = 'base'
 

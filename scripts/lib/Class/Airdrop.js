@@ -7,7 +7,7 @@ import { LootTable } from './LootTable.js'
 
 const AIRDROP_DB = new DynamicPropertyDB('airdrop', {
   /**
-   * @type {Record<string, { chicken: string, chest: string, loot: string }>}
+   * @type {Record<string, { chicken: string, chest: string, loot: string, for?: string }>}
    */
   type: {},
 }).proxy()
@@ -25,11 +25,12 @@ export class Airdrop {
   status = 'restoring'
 
   /**
-   * @param {{ position?: Vector3, loot: LootTable }} options
+   * @param {{ position?: Vector3, loot: LootTable, for?: string }} options
    * @param {string} [key]
    */
   constructor(options, key) {
     this.lootTable = options.loot
+    this.for = options.for
     this.key = key
 
     if (!this.key) {
@@ -53,6 +54,7 @@ export class Airdrop {
     console.debug('spawned chest minecart')
     this.chestMinecart.addTag(Airdrop.minecartTag)
     AIRDROP_DB[this.key] = {
+      for: this.for,
       chest: this.chestMinecart.id,
       chicken: this.chicken.id,
       loot: this.lootTable.key,
@@ -63,10 +65,10 @@ export class Airdrop {
    * @param {{chestMinecarts: Entity[], chickens: Entity[]}} param0
    */
   restore({ chestMinecarts, chickens }) {
-    const data = AIRDROP_DB[this.key]
-    if (!data) return this.delete()
-    this.chestMinecart = chestMinecarts.find(e => e.id === data.chest)
-    this.chicken = chickens.find(e => e.id === data.chicken)
+    const saved = AIRDROP_DB[this.key]
+    if (!saved) return this.delete()
+    this.chestMinecart = chestMinecarts.find(e => e?.id === saved.chest)
+    this.chicken = chickens.find(e => e?.id === saved.chicken)
     this.active = 'falling'
   }
   teleport() {

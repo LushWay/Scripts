@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { isBuilding } from 'modules/Build/list.js'
+import { isBuilding } from 'modules/Build/isBuilding.js'
 import { ModalForm } from 'smapi.js'
 import { WorldEditTool } from '../class/WorldEditTool.js'
 import { blockSetDropdown, getBlockSet, stringifyBlocksSetRef } from '../utils/blocksSet.js'

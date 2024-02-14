@@ -1,5 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
-import { isBuilding } from 'modules/Build/list.js'
+import { isBuilding } from 'modules/Build/isBuilding'
 import { Spawn } from 'modules/Survival/Place/Spawn.js'
 import { StoneQuarry } from 'modules/Survival/Place/StoneQuarry.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'

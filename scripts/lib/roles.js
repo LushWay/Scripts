@@ -47,7 +47,7 @@ const PERMISSIONS = {
   moderator: ['creator', 'curator', 'chefAdmin', 'admin', 'moderator'],
   helper: ['creator', 'curator', 'chefAdmin', 'admin', 'moderator', 'helper'],
 
-  builder: ['creator', 'curator', 'builder', 'chefAdmin', 'techAdmin', 'admin'],
+  builder: ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'builder'],
   member: [], // Any
 }
 
@@ -94,9 +94,9 @@ export function getRoleAndName(
   let display = ''
 
   if (useRole) {
-    const role = ROLES[getRole(playerID)]
+    const role = getRole(playerID)
     if (role !== 'member') {
-      display += role
+      display += ROLES[role]
       if (name) display += ' '
     }
   }

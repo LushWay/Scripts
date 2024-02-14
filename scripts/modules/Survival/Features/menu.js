@@ -26,6 +26,7 @@ Menu.open = player => {
       if (form) form.show(player)
     })
 }
+
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-  if (firstJoin) player.container?.addItem(Menu.item)
+  if (firstJoin) Menu.give(player, { mode: 'ensure' })
 })

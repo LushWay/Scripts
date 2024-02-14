@@ -13,6 +13,7 @@ importModules({
     'sit',
     'leaderboard',
     'scores',
+    'wipe',
     'tp',
   ].map(e => `./${e}.js`),
   fn: m => import(m),

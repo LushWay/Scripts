@@ -1,70 +1,32 @@
-import { Player, system, world } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
+import { InventoryStore } from 'lib/Database/Inventory.js'
+import { ROLES, getRole } from 'lib/roles.js'
 import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
-import { InventoryStore, OverTakes, ROLES, getRole } from 'smapi.js'
-
-const propname = 'onlineBuilderList'
-const list = world.getDynamicProperty(propname)
-
-/**
- * @type {Set<string>}
- */
-const onlineBuildersList = new Set()
-
-if (typeof list === 'string') {
-  /** @type {string[]} */
-  const arr = JSON.parse(list)
-
-  arr.forEach(onlineBuildersList.add.bind(onlineBuildersList))
-}
-
-function saveList() {
-  world.setDynamicProperty(propname, JSON.stringify([...onlineBuildersList]))
-}
-
-OverTakes(onlineBuildersList, {
-  add(...args) {
-    super.add(...args)
-    saveList()
-    return this
-  },
-  delete(...args) {
-    const r = super.delete(...args)
-    saveList()
-    return r
-  },
-})
-
-/**
- * @param {Player} player
- */
-export function isBuilding(player, uptodate = false) {
-  if (uptodate) return player.isGamemode('creative') && getRole(player) !== 'member'
-  return onlineBuildersList.has(player.id)
-}
+import { CURRENT_BUILDERS, isBuilding } from './isBuilding'
 
 const builderInventory = new InventoryStore('build')
 
 Join.onMoveAfterJoin.subscribe(({ player }) => {
   // First time set
   system.delay(() => {
-    setBuildingTip(player, onlineBuildersList.has(player.id))
+    setBuildingTip(player, CURRENT_BUILDERS.has(player.id))
   })
 })
 
 system.runPlayerInterval(
   player => {
     const isBuilder = isBuilding(player, true)
-    const onList = onlineBuildersList.has(player.id)
+    const onList = CURRENT_BUILDERS.has(player.id)
 
     if (isBuilder && !onList) {
       switchInv()
       setBuildingTip(player, true)
-      onlineBuildersList.add(player.id)
+      CURRENT_BUILDERS.add(player.id)
     } else if (!isBuilder && onList) {
       switchInv()
       setBuildingTip(player, false)
-      onlineBuildersList.delete(player.id)
+      CURRENT_BUILDERS.delete(player.id)
     }
 
     function switchInv() {

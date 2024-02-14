@@ -3,7 +3,7 @@ import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
 import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings } from 'smapi.js'
 
 import { migration } from 'lib/Database/Migrations.js'
-import { isBuilding } from 'modules/Build/list.js'
+import { isBuilding } from 'modules/Build/isBuilding'
 import { Menu } from 'modules/Server/menuItem.js'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 

@@ -39,17 +39,31 @@ export class Region {
     const regions = this === Region ? this.regions : this.regionInstancesOf(this)
     return regions.find(region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation))
   }
-  /** @type {Dimensions} */
+
+  /**
+   * Region dimension
+   * @type {Dimensions}
+   */
   dimensionId
-  /** @type {string} */
+
+  /**
+   * Unique region key
+   * @type {string}
+   */
   key
-  /** @type {RegionPermissions} */
+  /**
+   * Region permissions
+   * @type {RegionPermissions}
+   */
   permissions
 
+  /**
+   * Permissions used by default
+   */
   defaultPermissions = DEFAULT_REGION_PERMISSIONS
 
   /**
-   * Creates a new region
+   * Creates the region
    * @param {object} o
    * @param {Dimensions} o.dimensionId - The dimension ID of the region.
    * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
@@ -61,6 +75,7 @@ export class Region {
   }
 
   /**
+   * Sets region permissions based on permissions and default permissions
    * @param {Partial<RegionPermissions> | undefined} permissions
    */
   initPermissions(permissions) {
@@ -68,16 +83,16 @@ export class Region {
   }
 
   /**
-   * Checks if vector is in region
+   * Checks if vector is in the region
    * @param {Vector3} vector
    */
   vectorInRegion(vector) {
-    // Actual implementation in extended class
+    // Actual implementation in extended classes
     return false
   }
 
   /**
-   * Name of the region owner
+   * Region owner name
    */
   get ownerName() {
     return Player.name(this.permissions.owners[0])
@@ -95,7 +110,7 @@ export class Region {
    */
 
   /**
-   * Returns role of specified player
+   * Returns region role of specified player
    * @param {string | Player} playerOrId
    * @returns {RegionPlayerRole}
    */
@@ -105,6 +120,7 @@ export class Region {
     if (this.permissions.owners.includes(id)) return 'member'
     return false
   }
+
   /**
    * Updates this region in the database
    */
@@ -114,6 +130,7 @@ export class Region {
       dimensionId: this.dimensionId,
     }
   }
+
   /**
    * Removes this region
    */
@@ -123,9 +140,8 @@ export class Region {
   }
   /**
    * A function that will loop through all the owners
-   * of a region and call the callback function on each
-   * of them.
-   * @param {(player: Player, index: number, array: Player[]) => void | Promise<void>} callback - Callback to run
+   * of a region and call the callback function on each of them.
+   * @param {Parameters<Array<Player>['forEach']>[0]} callback - Callback to run
    */
   forEachOwner(callback) {
     const onlineOwners = []

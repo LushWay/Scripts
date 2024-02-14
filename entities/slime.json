@@ -26,6 +26,9 @@
         },
         "minecraft:scale": {
           "value": 4
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/entities/empty.json"
         }
       },
 
@@ -203,11 +206,7 @@
       },
       "sm:boss": {
         "add": {
-          "component_groups": [
-            "minecraft:slime_aggressive",
-            "minecraft:slime_large",
-            "sm:boss"
-          ]
+          "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_large", "sm:boss"]
         }
       }
     }

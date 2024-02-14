@@ -65,6 +65,9 @@
         "minecraft:pushable": {
           "is_pushable": false,
           "is_pushable_by_piston": false
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/entities/empty.json"
         }
       }
     },

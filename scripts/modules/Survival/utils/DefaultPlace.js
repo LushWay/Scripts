@@ -1,6 +1,6 @@
 import { Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { isBuilding } from 'modules/Build/list.js'
+import { isBuilding } from 'modules/Build/isBuilding'
 import { actionGuard } from 'modules/Survival/guard.js'
 import { EditableLocation, SafeAreaRegion } from 'smapi.js'
 

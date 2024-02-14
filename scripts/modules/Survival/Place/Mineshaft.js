@@ -1,4 +1,5 @@
 // TODO Actually generate ore
+// TODO Make shaft to be proiritet above other regions
 
 class MineshaftBuilder {
   /**

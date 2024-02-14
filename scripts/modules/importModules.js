@@ -7,6 +7,7 @@ const modules = [
   './Server/chat.js',
   './Server/index.js',
   './Build/camera.js',
+  './Build/visual.js',
   './WorldEdit/index.js',
   './Commands/index.js',
   '../test/test.js',

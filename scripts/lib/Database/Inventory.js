@@ -285,6 +285,16 @@ export class InventoryStore {
     DB.backup()
   }
   /**
+   *
+   * @param {string} id
+   */
+  remove(id) {
+    delete this._.STORES[id]
+
+    this.save()
+  }
+  
+  /**
    * @type {boolean}
    * @private
    */

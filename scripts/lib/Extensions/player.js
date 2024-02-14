@@ -1,7 +1,7 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { OverTakes } from './OverTakes.js'
 import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
+import { OverTakes } from './OverTakes.js'
 
 OverTakes(Player, {
   fetch(name) {
@@ -98,7 +98,7 @@ OverTakes(Player.prototype, {
 OverTakes(Entity.prototype, {
   get container() {
     if (!this || !this.getComponent) throw new TypeError('Bound prototype object does not exists')
-    return this.getComponent('inventory').container
+    return this.getComponent('inventory')?.container
   },
 })
 

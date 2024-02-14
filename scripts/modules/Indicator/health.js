@@ -3,7 +3,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ENTITIES } from 'config.js'
 import { CLOSING_CHAT } from 'lib/Extensions/player.js'
 import { NOT_MOB_ENTITIES } from 'lib/Region/config'
-import { isBuilding } from 'modules/Build/list.js'
+import { isBuilding } from 'modules/Build/isBuilding'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
 import { GAME_UTILS, util } from 'smapi.js'
 

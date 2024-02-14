@@ -48,7 +48,7 @@ function roleForm(ctx, sort = true) {
   if (!HIERARCHY.includes(prole))
     return ctx.sender.info(
       `Ваша роль: ${ROLES[prole]}${
-        restoreRole.sys.meta.requires(ctx.sender) ? '\n\nВосстановить прошлую роль: §f-role restore' : ''
+        restoreRole.sys.meta.requires(ctx.sender) ? '\n\n§3Восстановить прошлую роль: §f-role restore' : ''
       }`
     )
 
@@ -84,12 +84,17 @@ function roleForm(ctx, sort = true) {
           .show(ctx.sender, (formCtx, notify, showName, newrole, message) => {
             if (!newrole)
               return formCtx.error('Неизвестная роль: ' + newrole + '§r, допустимые: ' + util.inspect(ROLES))
-            if (notify && player instanceof Player)
-              player.info(
-                `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
-                  showName ? `§3 игроком §r${ctx.sender.name}` : ''
-                }${message ? `\n§r§3Причина: §r${message}` : ''}`
-              )
+
+            if (player instanceof Player) {
+              if (notify && player instanceof Player)
+                player.info(
+                  `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
+                    showName ? `§3 игроком §r${ctx.sender.name}` : ''
+                  }${message ? `\n§r§3Причина: §r${message}` : ''}`
+                )
+
+              ctx.sender.success(`Роль игрока ${player.name} сменена успешно`)
+            } else ctx.sender.success('Роль сменена успешно')
             setRole(id, newrole)
             if (fakeChange) {
               ctx.sender.database.prevRole = role

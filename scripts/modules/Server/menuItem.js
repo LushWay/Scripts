@@ -11,7 +11,10 @@ class MenuBuilder {
 
     this.item.lockMode = ItemLockMode.inventory
 
-    createPublicGiveItemCommand('menu', this.item)
+    const { give, command } = createPublicGiveItemCommand('menu', this.item)
+
+    this.give = give
+    this.command = command
 
     world.afterEvents.itemUse.subscribe(async ({ source: player, itemStack }) => {
       if (itemStack.typeId !== this.item.typeId || !(player instanceof Player)) return

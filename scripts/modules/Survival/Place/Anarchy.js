@@ -1,6 +1,6 @@
 import { Player, Vector, system } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { isBuilding } from 'modules/Build/list.js'
+import { isBuilding } from 'modules/Build/isBuilding'
 import { tpMenuOnce } from 'modules/Commands/tp'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
@@ -50,21 +50,21 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
             return player.fail('§cВы уже находитесь на анархии!')
           }
 
-          if (!Portal.canTeleport(player, { place: '§c> §6Anarchy §c<' })) return
-
-          if (!this.inventoryStore.has(player.id)) {
-            InventoryStore.load({
-              from: InventoryStore.emptyInventory,
-              to: player,
-              clearAll: true,
-            })
-          } else {
-            this.loadInventory(player)
-          }
-
-          player.database.inv = this.inventoryName
-
           system.delay(() => {
+            if (!Portal.canTeleport(player, { place: '§c> §6Anarchy §c<' })) return
+
+            if (!this.inventoryStore.has(player.id)) {
+              InventoryStore.load({
+                from: InventoryStore.emptyInventory,
+                to: player,
+                clearAll: true,
+              })
+            } else {
+              this.loadInventory(player)
+            }
+
+            player.database.inv = this.inventoryName
+
             if (!player.database.survival.anarchy) {
               this.learningRTP(player)
             } else {

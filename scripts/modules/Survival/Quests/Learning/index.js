@@ -10,6 +10,10 @@ import { createPublicGiveItemCommand } from 'modules/Survival/utils/createPublic
 import { EditableLocation, Quest, SafeAreaRegion, Temporary } from 'smapi.js'
 import { LEARNING_L } from './lootTables.js'
 
+// TODO! Ensure that no dupes happening
+// TODO Rewrite quest, include new steps
+// TODO Rewrite as a class
+
 export const LEARNING = {
   QUEST: new Quest({ displayName: 'Обучение', name: 'learning' }, q => {
     if (!Anarchy.portal || !Anarchy.portal.from || !Anarchy.portal.to || !LEARNING.RTP_LOCATION.valid)
@@ -32,7 +36,7 @@ export const LEARNING = {
           // in spawn inventory that will be replaced with
           // anarchy
           system.delay(() => {
-            this.player.container?.addItem(LEARNING.START_AXE)
+            LEARNING.GIVE_AXE_COMMAND?.ensure(this.player)
           })
         }
 
@@ -62,6 +66,8 @@ export const LEARNING = {
   START_AXE: new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор'),
   /** @type {SafeAreaRegion | undefined} */
   SAFE_AREA: void 0,
+  /** @type {ReturnType<typeof createPublicGiveItemCommand> | undefined} */
+  GIVE_AXE_COMMAND: void 0,
 }
 
 LEARNING.RTP_LOCATION.onLoad.subscribe(location => {
@@ -79,7 +85,7 @@ Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
   if (firstJoin) LEARNING.QUEST.enter(player)
 })
 
-createPublicGiveItemCommand('startwand', LEARNING.START_AXE)
+LEARNING.GIVE_AXE_COMMAND = createPublicGiveItemCommand('startwand', LEARNING.START_AXE)
 
 Anarchy.learningRTP = player => {
   if (!LEARNING.RTP_LOCATION.valid) {

@@ -81,7 +81,7 @@ export class ChatBuilder {
         }
 
         for (const outranged of otherPlayers) {
-          outranged.tell(`${getRoleAndName(event.sender, { nameColor: '§8' })}}§7: ${messageText}`)
+          outranged.tell(`${getRoleAndName(event.sender, { nameColor: '§8' })}§7: ${messageText}`)
         }
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages

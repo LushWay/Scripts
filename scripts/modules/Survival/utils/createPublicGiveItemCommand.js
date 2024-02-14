@@ -1,26 +1,53 @@
-import { ItemStack } from '@minecraft/server'
+import { ItemStack, Player } from '@minecraft/server'
 
 /**
  * @param {string} name
- * @param {ItemStack} stack
+ * @param {ItemStack} itemStack
  */
-export function createPublicGiveItemCommand(name, stack) {
-  const tag = stack.nameTag?.split('\n')[0]
-  new Command({
+export function createPublicGiveItemCommand(name, itemStack) {
+  const itemNameTag = itemStack.nameTag?.split('\n')[0]
+
+  /**
+   * Gives player an item
+   * @param {Player} player
+   * @param {object} [o]
+   * @param {'tell' | 'ensure'} [o.mode]
+   */
+  function give(player, { mode = 'tell' } = {}) {
+    const { container } = player
+    if (!container) return
+    const items = container.entries().filter(([_, item]) => item && item.is(itemStack))
+
+    if (mode === 'tell') {
+      if (items.length) {
+        for (const [i] of items) container.setItem(i, void 0)
+        player.info('§c- ' + itemNameTag)
+      } else {
+        container.addItem(itemStack)
+        player.info('§a+ ' + itemNameTag)
+      }
+    } else if (mode === 'ensure') {
+      if (!items.length) {
+        container.addItem(itemStack)
+      }
+    }
+  }
+
+  const command = new Command({
     name,
-    description: `Выдает или убирает ${tag}§r§7§o из инвентаря`,
+    description: `Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`,
     type: 'public',
   }).executes(async ctx => {
-    const { container } = ctx.sender
-    if (!container) return
-    const item = container.entries().find(e => e[1]?.is(stack))
-
-    if (item) {
-      container.setItem(item[0], undefined)
-      ctx.reply('§c- ' + tag)
-    } else {
-      container.addItem(stack)
-      ctx.reply('§a+ ' + tag)
-    }
+    give(ctx.sender)
   })
+
+  return {
+    give,
+    command,
+    /**
+     * Alias to {@link give}(player, { mode: 'ensure' })
+     * @param {Player} player
+     */
+    ensure: player => give(player, { mode: 'ensure' }),
+  }
 }
