@@ -4,7 +4,7 @@ import { LockAction, PlaceAction } from 'lib/Class/Action.js'
 /**
  * @typedef {object} TeleportOptions
  * @prop {Parameters<typeof LockAction['locked']>[1]} [lockActionOptions]
- * @prop {string} [name]
+ * @prop {string} [place]
  * @prop {boolean} [fadeScreen=true]
  */
 
@@ -14,23 +14,25 @@ export class Portal {
    * @param {Player} player
    * @param {TeleportOptions} [options]
    */
-  static canTeleport(player, { fadeScreen = true, lockActionOptions, name } = {}) {
+  static canTeleport(player, { fadeScreen = true, lockActionOptions, place } = {}) {
     if (LockAction.locked(player, lockActionOptions)) return false
 
     if (fadeScreen) {
       const inS = 0
       const stayS = 1.0
       const outS = 1.0
-      player.onScreenDisplay.setHudTitle(name ?? '§aShp1nat§6Mine', {
+      player.onScreenDisplay.setHudTitle(place ?? '§aShp1nat§6Mine', {
         fadeInDuration: inS * 20,
-        subtitle: '§2Перемещение...',
         stayDuration: stayS * 20,
         fadeOutDuration: outS * 20,
+        subtitle: '§2Перемещение...',
       })
-      player.runCommand(
-        //                                              red green blue
-        `camera @s fade time ${inS} ${stayS} ${outS} color 1 20 10`
-      )
+      const red = 10
+      const green = 20
+      const blue = 10
+      // #102010
+
+      player.runCommand(`camera @s fade time ${inS} ${stayS} ${outS} color ${red} ${green} ${blue}`)
     }
 
     return true

@@ -12,7 +12,7 @@ import { ROLES, getRole } from 'smapi.js'
  */
 function childrensToHelpText(player, command) {
   const childrens = []
-  for (const children of command.sys.children.filter(e => e.sys.data.requires(player))) {
+  for (const children of command.sys.children.filter(e => e.sys.meta.requires(player))) {
     if (children.sys.children.length < 1) childrens.push(children)
     else childrens.push(...childrensToHelpText(player, children))
   }
@@ -29,8 +29,8 @@ function getParentType(command, init = true) {
 
   let description
 
-  if (init && command.sys.data.description) {
-    description = command.sys.data.description
+  if (init && command.sys.meta.description) {
+    description = command.sys.meta.description
     init = false
   }
 
@@ -68,7 +68,7 @@ help
   .int('page', true)
   .int('commandsInPage', true)
   .executes((ctx, inputPage, commandsInPage) => {
-    const avaibleCommands = Command.commands.filter(e => e.sys.data.requires(ctx.sender))
+    const avaibleCommands = Command.commands.filter(e => e.sys.meta.requires(ctx.sender))
     const cmds = commandsInPage || 15
     const maxPages = Math.ceil(avaibleCommands.length / cmds)
     const page = Math.min(inputPage || 1, maxPages)
@@ -80,8 +80,8 @@ help
 
     for (const command of path) {
       const q = '§f-'
-      const c = `${cv}§r ${q}${command.sys.data.name} §o§7- ${
-        command.sys.data.description ? `${command.sys.data.description}` : ' Пусто' //§r
+      const c = `${cv}§r ${q}${command.sys.meta.name} §o§7- ${
+        command.sys.meta.description ? `${command.sys.meta.description}` : ' Пусто' //§r
       }`
       ctx.reply('§ы' + c)
     }
@@ -95,12 +95,12 @@ help
  * @returns
  */
 function helpForCommand(ctx, commandName) {
-  const cmd = Command.commands.find(e => e.sys.data.name == commandName || e.sys.data?.aliases?.includes(commandName))
+  const cmd = Command.commands.find(e => e.sys.meta.name == commandName || e.sys.meta?.aliases?.includes(commandName))
 
   if (!cmd) return commandNotFound(ctx.sender, commandName)
-  if (!cmd.sys.data?.requires(ctx.data.sender)) return commandNoPermissions(ctx.data.sender, cmd), 'fail'
+  if (!cmd.sys.meta?.requires(ctx.data.sender)) return commandNoPermissions(ctx.data.sender, cmd), 'fail'
 
-  const d = cmd.sys.data
+  const d = cmd.sys.meta
   const aliases = d.aliases?.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
   const str = `   §fКоманда §6-${d.name} ${aliases}`
 
@@ -121,7 +121,7 @@ function helpForCommand(ctx, commandName) {
   return
 }
 
-Command.getHelpForCommand = (command, ctx) => helpForCommand(ctx, command.sys.data.name)
+Command.getHelpForCommand = (command, ctx) => helpForCommand(ctx, command.sys.meta.name)
 
 help.string('commandName').executes(helpForCommand)
 
@@ -129,7 +129,7 @@ new CmdLet({
   name: 'help',
   description: 'Выводит справку о команде',
   callback(ctx) {
-    helpForCommand(ctx, ctx.command.sys.data.name)
+    helpForCommand(ctx, ctx.command.sys.meta.name)
     return 'stop'
   },
 })

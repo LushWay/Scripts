@@ -1,4 +1,4 @@
-import { Vector, system, world } from '@minecraft/server'
+import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { GAME_UTILS, util } from 'smapi.js'
@@ -63,25 +63,33 @@ const ICE_BOMB_TRANSOFORM = {
   [MinecraftBlockTypes.FlowingLava]: MinecraftBlockTypes.Stone,
 }
 
+/** @type {Entity[]} */
+let entities = []
 system.runInterval(
   () => {
-    world.overworld.getEntities({ type: MinecraftEntityTypes.Snowball }).forEach(entity => {
-      const block = entity.dimension.getBlock(entity.location)
-      if (block) {
-        if (block.typeId in ICE_BOMB_TRANSOFORM) {
-          scheduleBlockPlace({
-            dimension: entity.dimension.type,
-            location: block.location,
-            typeId: block.typeId,
-            states: block.permutation.getAllStates(),
-            restoreTime: util.ms.from('min', 1),
-          })
+    entities = world.overworld.getEntities({ type: MinecraftEntityTypes.Snowball })
+  },
+  'ice bomb update cached entities',
+  10
+)
 
-          block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
-          entity.remove()
-        }
+system.runInterval(
+  () => {
+    for (const entity of entities) {
+      const block = entity.dimension.getBlock(entity.location)
+      if (block && block.typeId in ICE_BOMB_TRANSOFORM) {
+        scheduleBlockPlace({
+          dimension: entity.dimension.type,
+          location: block.location,
+          typeId: block.typeId,
+          states: block.permutation.getAllStates(),
+          restoreTime: util.ms.from('min', 1),
+        })
+
+        block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
+        entity.remove()
       }
-    })
+    }
   },
   'ice bomb ice place',
   0

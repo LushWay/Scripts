@@ -42,14 +42,14 @@ function setupCameraForm(player, target) {
     .addDropdownFromObject('Режим камеры', CAMERA.MODES)
     .addSlider('Радиус при прокрутке вокруг позиции', 0, 100)
     .show(target, (ctx, type, ease, easeTime, rawPos, facingPosRaw, facingPlayer, mode, spinRadius) => {
-      const rawPosArray = parseArguments(rawPos, '')
+      const rawPosArray = parseArguments(rawPos)
       const pos = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
 
       if (!pos) return ctx.error('Неправильныe координаты центральной позиции камеры: ' + util.inspect(rawPosArray))
 
       let facing
       if (facingPosRaw) {
-        const rawPosArray = parseArguments(facingPosRaw, '')
+        const rawPosArray = parseArguments(facingPosRaw)
         facing = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
       } else if (facingPlayer && facingPlayer !== ModalForm.arrayDefaultNone) {
         facing = facingPlayer

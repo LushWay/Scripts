@@ -1,9 +1,9 @@
 import { Player, Vector, system } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { isBuilding } from 'modules/Build/list.js'
+import { tpMenuOnce } from 'modules/Commands/tp'
 import { DefaultPlaceWithInventory } from 'modules/Survival/utils/DefaultPlace.js'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'smapi.js'
-import { tpMenuOnce } from '../Features/builderTeleport'
 
 // TODO Not set anarchy pos when on spawn
 // TODO TP even if there is no pos
@@ -33,7 +33,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           type: 'public',
           role: 'member',
         }).executes(ctx => {
-          ctx.reply(`☺ ${this.zone.lastRadius}`)
+          ctx.sender.info(`Радиус границы анархии сейчас: ${this.zone.lastRadius}`)
         })
     })
 
@@ -50,7 +50,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
             return player.fail('§cВы уже находитесь на анархии!')
           }
 
-          if (!Portal.canTeleport(player, { name: '§c> §6Anarchy §c<' })) return
+          if (!Portal.canTeleport(player, { place: '§c> §6Anarchy §c<' })) return
 
           if (!this.inventoryStore.has(player.id)) {
             InventoryStore.load({

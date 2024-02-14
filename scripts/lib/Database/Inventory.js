@@ -61,7 +61,7 @@ export class InventoryStore {
     if (!container) return
     if (clearAll) container.clearAll()
     for (const [i, item] of Object.entries(from.slots)) {
-      if (item) container.setItem(Number(i), item)
+      if (item && item instanceof ItemStack) container.setItem(Number(i), item)
     }
   }
 

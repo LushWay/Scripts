@@ -119,7 +119,7 @@ export class Store {
         player => {
           system.delay(() => {
             const cooldown = new Cooldown(cooldownDatabase, 'store', player, 1000, false)
-            if (cooldown.isExpired()) {
+            if (cooldown.tellIfExpired()) {
               cooldown.update()
               store.open(player)
             }

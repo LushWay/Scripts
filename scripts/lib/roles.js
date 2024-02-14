@@ -52,9 +52,9 @@ const PERMISSIONS = {
 }
 
 /**
- * Checks if player role included in given array
- * @param {string} playerID
- * @param {Role} role
+ * Checks if player has permissions for role. (e.g. if player role is above or equal)
+ * @param {string} playerID -  ID of the player  to get role from
+ * @param {Role} role - Role to check
  */
 export function is(playerID, role) {
   if (role === 'member') return true
@@ -63,9 +63,9 @@ export function is(playerID, role) {
 
 /**
  * Gets the role of this player
- * @param  {Player | string} playerID player or his id to get role from
+ * @param  {Player | string} playerID - Player or his id to get role from
  * @returns {Role}
- * @example getRole("23529890")
+ * @example getRole(player.id)
  */
 export function getRole(playerID) {
   if (playerID instanceof Player) playerID = playerID.id
@@ -77,8 +77,48 @@ export function getRole(playerID) {
 }
 
 /**
+ * Gets displayable the role of this player
+ * @param  {Player | string} playerID - Player or his id to get role from
+ * @param {object} [o] - Options
+ * @param {boolean} [o.role=true] - Whenther to include role or not
+ * @param {boolean} [o.name=true] - Whenether to include player name or not
+ * @param {string} [o.noName='Unknown'] - Name to display if no name was found
+ * @param {string} [o.nameColor='§r§f'] - String used between role and name
+ * @param {boolean} [o.clearColorAfter] - Whenether to add §r at the end of the string or not
+ * @example getDisplayRole(player.id, { name: true }) // §aРуководство XilLeR228
+ */
+export function getRoleAndName(
+  playerID,
+  { role: useRole = true, name = true, noName = 'Unknown', nameColor = '§r§f', clearColorAfter = true } = {}
+) {
+  let display = ''
+
+  if (useRole) {
+    const role = ROLES[getRole(playerID)]
+    if (role !== 'member') {
+      display += role
+      if (name) display += ' '
+    }
+  }
+
+  if (name) {
+    display += nameColor
+    if (playerID instanceof Player) {
+      display += playerID.name
+    } else {
+      const name = Player.name(playerID)
+      display += name ? name : noName
+    }
+  }
+
+  if (clearColorAfter) display += '§r'
+
+  return display
+}
+
+/**
  * Sets the role of this player
- * @example setRole("342423452", "admin")
+ * @example setRole(player.id, "admin")
  * @param {Player | string} player
  * @param {Role} role
  * @returns {void}

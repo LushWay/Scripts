@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
-import { CONFIG, SOUNDS } from 'config.js'
+import { SOUNDS } from 'config.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { Cooldown, ROLES, Settings, getRole, util } from 'smapi.js'
+import { Cooldown, Settings, getRoleAndName, util } from 'smapi.js'
 
 export class ChatBuilder {
   db = new DynamicPropertyDB('chatCD', { /** @type {Record<string, string} */ type: {} }).proxy()
@@ -33,25 +33,16 @@ export class ChatBuilder {
 
   constructor() {
     world.afterEvents.chatSend.subscribe(event => {
-      if (event.message.startsWith(CONFIG.commandPrefix) && event.message !== CONFIG.commandPrefix) return
+      if (Command.isCommand(event.message)) return
 
       try {
-        const cooldown = this.settings.cooldown
-
-        // Is cooldown enabled?
-        if (cooldown) {
-          const cool = new Cooldown(this.db, 'CD', event.sender, cooldown)
+        const cooldownTime = this.settings.cooldown
+        if (cooldownTime > 0) {
+          const cooldown = new Cooldown(this.db, 'CD', event.sender, this.settings.cooldown)
 
           // Player is under chat cooldown, show error message
-          if (cool.isExpired()) return
-          cool.update()
-        }
-
-        const playerRole = getRole(event.sender)
-
-        let role = ''
-        if (this.settings.ranks && playerRole !== 'member') {
-          role = ROLES[playerRole] + ' '
+          if (cooldown.tellIfExpired()) return
+          cooldown.update()
         }
 
         const allPlayers = world.getAllPlayers()
@@ -71,24 +62,30 @@ export class ChatBuilder {
         // Outranged players
         const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
         const messageText = event.message.replace(/\\n/g, '\n')
-        const message = `${role}§7${event.sender.name}§r: ${messageText}`
+        const message = `${getRoleAndName(event.sender, { nameColor: '§7' })}§r: ${messageText}`
 
         if (util.settings.BDSMode) {
           // This is handled/parsed by ServerCore
           // Dont really want to do APICall each time here
-          console.info('[Chat] ' + JSON.stringify({ from: event.sender.name, role, messageText, message }))
+          util.sendPacketToStdout('chatMessage', {
+            name: event.sender.name,
+            role: getRoleAndName(event.sender, { name: false }),
+            print: message,
+            message: messageText,
+          })
         }
 
         for (const near of nearPlayers) {
           near.tell(message)
-
           if (!this.playerSettings(near).disableSound) near.playSound(SOUNDS.click)
         }
 
-        for (const outranged of otherPlayers) outranged.tell(`${role}§8${event.sender.name}§7: ${messageText}`)
+        for (const outranged of otherPlayers) {
+          outranged.tell(`${getRoleAndName(event.sender, { nameColor: '§8' })}}§7: ${messageText}`)
+        }
 
-        const hightlight = this.playerSettings(event.sender).hightlightMessages
-        event.sender.tell(hightlight ? `§6§lЯ§r: §f${messageText}` : message)
+        const doHightlight = this.playerSettings(event.sender).hightlightMessages
+        event.sender.tell(doHightlight ? `§6§lЯ§r: §f${messageText}` : message)
       } catch (error) {
         util.error(error)
       }

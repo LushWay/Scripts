@@ -13,62 +13,70 @@ import {
 import { CmdLet } from './Cmdlet.js'
 import { CommandContext } from './Context.js'
 import './index.js'
-import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseArguments, sendCallback } from './utils.js'
+import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand, sendCallback } from './utils.js'
 
 /**
- * @typedef {import("./types.js").ICommandData} ICommandData
+ * @typedef {import("./types.js").CommandMetadata} CommandMetadata
  */
 
 /**
- *  @template {Function} [Callback = (ctx: CommandContext) => void]
+ *  @template {Function} [Callback = (ctx: CommandContext) => (void | Promise<void>)]
  */
 export class Command {
   /**
-   * @param {ChatSendAfterEvent} data
+   * @param {string} message
    */
-  static chatListener(data) {
-    if (!data.message.startsWith(CONFIG.commandPrefix) || data.message === CONFIG.commandPrefix) return // This is not a command
+  static isCommand(message) {
+    return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
+  }
+  /**
+   * @param {ChatSendAfterEvent} event
+   */
+  static chatListener(event) {
+    if (!this.isCommand(event.message)) return
 
-    const [cmd, ...args] = parseArguments(data.message, CONFIG.commandPrefix)
-    const command = Command.commands.find(c => c.sys.data.name === cmd || c.sys.data.aliases?.includes(cmd))
-    if (!command) return commandNotFound(data.sender, cmd)
-    if (!command.sys.data?.requires(data.sender)) return commandNoPermissions(data.sender, command)
+    const parsed = parseCommand(event.message, 1)
+    if (!parsed) {
+      console.error(`Unable to parse command '${event.message}', user: '${event.sender.name}§r'`)
+      return event.sender.fail('Не удалось обработать команду.')
+    }
 
-    /**
-     * Part after command (-help <rawInput>). Usefull for setters or any other stuff
-     */
-    const rawInput = data.message.replace(new RegExp(`^${CONFIG.commandPrefix}${cmd}\\s`), '')
-    if (CmdLet.workWithCmdlets(data, args, command, rawInput) === 'stop') return
+    const { cmd, args, input } = parsed
+    const command = Command.commands.find(c => c.sys.meta.name === cmd || c.sys.meta.aliases?.includes(cmd))
+    if (!command) return commandNotFound(event.sender, cmd)
+    if (!command.sys.meta?.requires(event.sender)) return commandNoPermissions(event.sender, command)
+
+    if (CmdLet.workWithCmdlets(event, args, command, input) === 'stop') return
 
     /**
      * Check Args/SubCommands for errors
      * @type {Command[]}
      */
-    const verifiedCommands = []
+    const childs = []
 
     /**
      * @param {Command<any>} start
      * @param {number} i
      * @returns {'fail' | 'success'}
      */
-    function getArg(start, i) {
+    function getChilds(start, i) {
       if (!command) return 'fail'
       if (start.sys.children.length > 0) {
-        const arg = start.sys.children.find(
+        const child = start.sys.children.find(
           v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional)
         )
-        if (!arg && !args[i] && start.sys.callback) return 'success'
-        if (!arg) return commandSyntaxFail(data.sender, command, args, i), 'fail'
-        if (!arg.sys.data?.requires(data.sender)) return commandNoPermissions(data.sender, arg), 'fail'
-        verifiedCommands.push(arg)
-        return getArg(arg, i + 1)
+        if (!child && !args[i] && start.sys.callback) return 'success'
+        if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
+        if (!child.sys.meta?.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
+        childs.push(child)
+        return getChilds(child, i + 1)
       }
       return 'success'
     }
 
-    if (getArg(command, 0) === 'fail') return
+    if (getChilds(command, 0) === 'fail') return
 
-    sendCallback(args, verifiedCommands, data, command, rawInput)
+    sendCallback(args, childs, event, command, input)
   }
   /**
    * An array of all active commands
@@ -85,7 +93,7 @@ export class Command {
   }
   /**
    *
-   * @param {ICommandData} data
+   * @param {CommandMetadata} data
    * @param {IArgumentType} [type]
    * @param {number} [depth]
    * @param {Command<any> | null} [parent]
@@ -96,8 +104,8 @@ export class Command {
     }
 
     this.sys = {
-      /** @type {ICommandData & Required<Pick<ICommandData, "requires" | "aliases" | "type">>} */
-      data: {
+      /** @type {CommandMetadata & Required<Pick<CommandMetadata, "requires" | "aliases" | "type">>} */
+      meta: {
         requires: () => true,
         aliases: [],
         type: 'test',
@@ -129,7 +137,7 @@ export class Command {
    * @private
    */
   argument(type) {
-    const cmd = new Command(this.sys.data, type, this.sys.depth + 1, this)
+    const cmd = new Command(this.sys.meta, type, this.sys.depth + 1, this)
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd
@@ -184,7 +192,7 @@ export class Command {
   }
   /**
    * Adds a subCommand to this argument
-   * @param {import("./types.js").ICommandData} data name this literal should have
+   * @param {import("./types.js").CommandMetadata} data name this literal should have
    * @returns {Command<Callback>} new branch to this command
    */
   literal(data, optional = false) {
@@ -206,8 +214,9 @@ export class Command {
 
 globalThis.Command = Command
 
-world.beforeEvents.chatSend.subscribe(data => {
-  data.sendToTargets = true
-  data.setTargets([])
+// TODO! REPLACE WITH PACK ON 1.20.70
+world.beforeEvents.chatSend.subscribe(event => {
+  event.sendToTargets = true
+  event.setTargets([])
 })
-world.afterEvents.chatSend.subscribe(Command.chatListener)
+world.afterEvents.chatSend.subscribe(event => Command.chatListener(event))

@@ -1,18 +1,37 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { CONFIG, SOUNDS } from 'config.js'
+import { GAME_UTILS } from 'lib/Class/GameUtils.js'
+import { ROLES } from 'lib/roles.js'
 import { inaccurateSearch } from '../Class/Search.js'
 import { util } from '../util.js'
 import { LiteralArgumentType, LocationArgumentType } from './ArgumentTypes.js'
 import { CommandContext } from './Context.js'
 
 /**
+ *
  * @param {string} message
- * @param {string} prefix
+ * @param {number} prefixSize
+ * @returns
+ */
+export function parseCommand(message, prefixSize = 1) {
+  const command = message.slice(prefixSize).trim()
+
+  const match = command.match(/^(?<command>[^\s]+)\s?(?<input>.+)?$/)
+  if (!match || !match.groups || !match.groups.command) return false
+
+  const cmd = match.groups.command
+  const input = match.groups.input ?? ''
+  const args = parseArguments(input)
+
+  return { cmd, args, input }
+}
+
+/**
+ * @param {string} message
  * @returns {string[]}
  */
-export function parseArguments(message, prefix) {
+export function parseArguments(message) {
   const augments = message
-    .slice(prefix.length)
     .trim()
     .replace(/([~^][^~^\s]*)/g, '$1 ')
     .match(/"[^"]+"|[^\s]+/g)
@@ -40,14 +59,25 @@ export function commandNotFound(player, command) {
   })
   player.playSound(SOUNDS.fail)
 
+  suggestCommand(player, command)
+  player.tell('§cСписок всех доступных вам команд: §f.help')
+}
+
+/**
+ * Sends a command not found message to a player
+ * @param {Player} player  player to send message to
+ * @param {string} command
+ * @returns {void}
+ */
+function suggestCommand(player, command) {
   if (!command) return
 
   const cmds = new Set()
 
-  for (const c of Command.commands.filter(e => e.sys.data.requires && e.sys.data.requires(player))) {
-    cmds.add(c.sys.data.name)
-    if (c.sys.data.aliases && c.sys.data.aliases?.length > 0) {
-      c.sys.data.aliases.forEach(e => cmds.add(e))
+  for (const c of Command.commands.filter(e => e.sys.meta.requires && e.sys.meta.requires(player))) {
+    cmds.add(c.sys.meta.name)
+    if (c.sys.meta.aliases && c.sys.meta.aliases?.length > 0) {
+      c.sys.meta.aliases.forEach(e => cmds.add(e))
     }
   }
   let search = inaccurateSearch(command, [...cmds.values()])
@@ -80,16 +110,15 @@ export function commandNotFound(player, command) {
  * @returns {void}
  */
 export function commandNoPermissions(player, command) {
-  player.tell({
-    rawtext: [
-      {
-        text: command.sys.data.invaildPermission
-          ? command.sys.data.invaildPermission
-          : `§cУ вас нет разрешения для использования команды §f${command.sys.data.name}`,
-      },
-    ],
-  })
-  player.playSound(SOUNDS.fail)
+  let additional = ''
+  if (!GAME_UTILS.env('production') && command.sys.meta.role) {
+    additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.meta.role]}§c`
+  }
+  player.fail(
+    command.sys.meta.invaildPermission
+      ? command.sys.meta.invaildPermission
+      : `§cУ вас нет разрешения для использования команды §f${command.sys.meta.name}${additional}\n§cСписок всех доступных вам команд: §f.help`
+  )
 }
 
 /**
@@ -109,7 +138,7 @@ export function commandSyntaxFail(player, command, args, i) {
       {
         translate: `commands.generic.syntax`,
         with: [
-          `${CONFIG.commandPrefix}${command.sys.data.name} ${args.slice(0, i).join(' ')}`,
+          `${CONFIG.commandPrefixes[0]}${command.sys.meta.name} ${args.slice(0, i).join(' ')}`,
           args[i] ?? ' ',
           args.slice(i + 1).join(' '),
         ],
@@ -169,15 +198,23 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
     if (arg.sys.type instanceof LiteralArgumentType) continue
     argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
   }
-  if (typeof lastArg.sys.callback !== 'function') return event.sender.warn('Упс, эта команда пока не работает.')
+  if (typeof lastArg.sys.callback !== 'function') {
+    console.warn('Not implemented: ')
+    return event.sender.warn('Упс, эта команда пока не работает.')
+  }
 
-  util.catch(
-    () =>
-      lastArg.sys.callback?.(
+  ;(async () => {
+    try {
+      await lastArg.sys.callback?.(
         new CommandContext(event, cmdArgs, baseCommand, rawInput),
-        // @ts-expect-error Huh
+        // @ts-expect-error Typescript is bad at understanding generics
         ...argsToReturn
-      ),
-    'Command'
-  )
+      )
+    } catch (e) {
+      event.sender.warn(
+        'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.'
+      )
+      util.error(e)
+    }
+  })().catch(error => util.error(error))
 }

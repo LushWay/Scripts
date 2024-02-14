@@ -450,4 +450,19 @@ export const util = {
    * @type {Record<string, string>}
    */
   terminalColors: TerminalColors,
+
+  /**
+   * Import type declarations into global if available
+   * @typedef {import('../../../../tools/monitoring/src/routes.d.ts')} _
+   *
+   */
+
+  /**
+   * @template {keyof Monitor.StdoutPackets} T
+   * @param {T} type
+   * @param {Monitor.Packet<T>} packet
+   */
+  sendPacketToStdout(type, packet) {
+    console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
+  },
 }

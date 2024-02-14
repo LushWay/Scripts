@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore, PLAYER_DB, Portal, Region, SafeAreaRegion, Settings } from 'smapi.js'
+import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings } from 'smapi.js'
 
 import { migration } from 'lib/Database/Migrations.js'
 import { isBuilding } from 'modules/Build/list.js'
@@ -59,7 +59,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
       const spawnLocation = this.location
       world.setDefaultSpawnLocation(spawnLocation)
       this.portal = new Portal('spawn', null, null, player => {
-        if (!Portal.canTeleport(player, { name: '§9> §bSpawn §9<' })) return
+        if (!Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })) return
 
         this.loadInventory(player)
         system.delay(() => spawnLocation.teleport(player))
@@ -95,7 +95,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
       })
     } else {
       if (player.database.inv === 'spawn' && !isBuilding(player)) {
-        // this.portal?.teleport(player)
+        this.portal?.teleport(player)
       }
     }
   }

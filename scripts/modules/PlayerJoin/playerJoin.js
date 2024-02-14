@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/Class/EventSignal.js'
-import { ROLES, Settings, getRole } from 'smapi.js'
+import { Settings, getRoleAndName, util } from 'smapi.js'
 
 class JoinBuilder {
   config = {
@@ -115,25 +115,28 @@ class JoinBuilder {
 
   /**
    * @param {Player} player
-   * @param {"air" | "ground"} messageType
+   * @param {"air" | "ground"} where
    * @private
    */
-  join(player, messageType) {
+  join(player, where) {
     delete player.database.join
 
     player.scores.joinTimes ??= 0
     player.scores.joinTimes++
 
-    let role = ''
-    const playerRole = getRole(player.id)
-    if (playerRole !== 'member') role += `${ROLES[playerRole]} `
+    const message = Join.config.messages[where]
 
-    const message = Join.config.messages[messageType]
-
-    console.info(`${role}§7${player.name} ${message}`)
+    util.sendPacketToStdout('joinOrLeave', {
+      name: player.name,
+      role: getRoleAndName(player, { name: false }),
+      status: 'move',
+      where,
+      print: `${getRoleAndName(player)} ${message}`,
+    })
 
     for (const other of world.getPlayers()) {
       if (other.id === player.id) continue
+
       const settings = this.settings(other)
       if (settings.sound) other.playSound(Join.config.messages.sound)
       if (settings.message) other.tell(`§7${player.name} ${message}`)

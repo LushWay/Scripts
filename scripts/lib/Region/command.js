@@ -124,7 +124,7 @@ function editRegion(player, region, back) {
  * @param {Player} player
  */
 function parseLocationFromForm(ctx, location, player) {
-  const [x, y, z] = parseArguments(location, '')
+  const [x, y, z] = parseArguments(location)
   if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + util.inspect(location))
 
   const parsed = parseLocationArguments([x, y, z], player)

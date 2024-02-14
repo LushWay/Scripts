@@ -48,7 +48,7 @@ function roleForm(ctx, sort = true) {
   if (!HIERARCHY.includes(prole))
     return ctx.sender.info(
       `Ваша роль: ${ROLES[prole]}${
-        restoreRole.sys.data.requires(ctx.sender) ? '\n\nВосстановить прошлую роль: §f-role restore' : ''
+        restoreRole.sys.meta.requires(ctx.sender) ? '\n\nВосстановить прошлую роль: §f-role restore' : ''
       }`
     )
 

@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { Command } from './index.js'
 
-export interface ICommandData {
+export interface CommandMetadata {
   /**
    * The name of the command
    * @example "ban"
@@ -52,22 +52,7 @@ type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) 
 
 export type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
 
-export type MSValueType =
-  | 'years'
-  | 'yrs'
-  | 'weeks'
-  | 'days'
-  | 'hours'
-  | 'hrs'
-  | 'minutes'
-  | 'mins'
-  | 'seconds'
-  | 'secs'
-  | 'milliseconds'
-  | 'msecs'
-  | 'ms'
-
-export interface IArgumentReturnData<T> {
+export interface MatchesArgumentReturn<T> {
   /**
    * If this argument matches the value
    */

@@ -1,11 +1,11 @@
-import { Player, Vector, world } from '@minecraft/server'
+import { Player, Vector, system, world } from '@minecraft/server'
 import { Spawn } from 'modules/Survival/Place/Spawn.js'
 import { StoneQuarry } from 'modules/Survival/Place/StoneQuarry.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'
 import { VillageOfExplorers } from 'modules/Survival/Place/VillafeOfExplorers.js'
 import { VillageOfMiners } from 'modules/Survival/Place/VillageOfMiners.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
-import { ActionForm, ROLES, getRole, util } from 'smapi.js'
+import { ActionForm, getRoleAndName, util } from 'smapi.js'
 
 new Command({
   name: 'tp',
@@ -18,7 +18,7 @@ new Command({
 /**
  * @param {Player} player
  */
-export function tpMenu(player) {
+function tpMenu(player) {
   const form = new ActionForm('Выберите локацию', 'Также доступна из команды -tp')
 
   const players = world.getAllPlayers().map(e => ({ player, location: e.location }))
@@ -56,7 +56,7 @@ function tpToPlayer(player) {
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    form.addButton(`${ROLES[getRole(p.id)]} §r${p.name}`, () => player.teleport(p.location))
+    form.addButton(`${getRoleAndName(p)}`, () => player.teleport(p.location))
   }
 
   form.show(player)
@@ -84,4 +84,26 @@ function location(place, fallback, players) {
   }
 
   return { location: fallback, players: playersC }
+}
+/**
+ * @type {Set<string>}
+ */
+const SENT = new Set()
+
+/**
+ * @param {Player} player
+ */
+export function tpMenuOnce(player) {
+  if (!SENT.has(player.id)) {
+    tpMenu(player).then(() =>
+      system.runTimeout(
+        () => {
+          SENT.delete(player.id)
+        },
+        'tp menu sent reset',
+        40
+      )
+    )
+    SENT.add(player.id)
+  }
 }

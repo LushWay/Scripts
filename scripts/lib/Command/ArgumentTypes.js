@@ -1,6 +1,5 @@
 /**
  * @abstract
- *
  */
 export class IArgumentType {
   /**
@@ -32,7 +31,7 @@ export class IArgumentType {
    * Checks if a value matches this argument type, also
    * returns the corridsponding type
    * @param {string} value
-   * @returns {import("./types.js").IArgumentReturnData<any>}
+   * @returns {import("./types.js").MatchesArgumentReturn<any>}
    */
   matches(value) {
     return {
