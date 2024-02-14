@@ -138,7 +138,7 @@ export class Leaderboard {
       .entries()) {
       const { pos: t, nick: n, score: s } = style
 
-      const name = Player.name(scoreInfo.participant.displayName) ?? scoreInfo.participant.displayName
+      const name = Player.name(scoreInfo.participant?.displayName) ?? scoreInfo.participant.displayName
 
       leaderboard += `§${t}#${i + 1}§r `
       leaderboard += `§${n}${name}§r `

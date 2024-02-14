@@ -9,6 +9,7 @@ new Command({
 
 new Command({
   name: 'c',
+  aliases: ['с', 'gm1'],
   description: 'Креатив',
   role: 'builder',
 }).executes(ctx => {

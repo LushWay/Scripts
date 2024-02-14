@@ -27,6 +27,7 @@ Object.defineProperty(Player.prototype, 'database', {
 
 OverTakes(Player, {
   name(id) {
+    if (!id) return void 0
     return PLAYER_DB[id].name
   },
 })

@@ -1,11 +1,11 @@
 import { ItemStack, Vector, system } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
-import { tpMenuOnce } from 'modules/Commands/tp.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { AXE } from 'modules/Survival/Features/axe.js'
 import { randomTeleport } from 'modules/Survival/Features/randomTeleport.js'
 import { Anarchy } from 'modules/Survival/Place/Anarchy.js'
+import { Spawn } from 'modules/Survival/Place/Spawn.js'
 import { createPublicGiveItemCommand } from 'modules/Survival/utils/createPublicGiveItemCommand.js'
 import { EditableLocation, Quest, SafeAreaRegion, Temporary } from 'smapi.js'
 import { LEARNING_L } from './lootTables.js'
@@ -84,7 +84,9 @@ createPublicGiveItemCommand('startwand', LEARNING.START_AXE)
 Anarchy.learningRTP = player => {
   if (!LEARNING.RTP_LOCATION.valid) {
     player.fail('Случайное перемещение не настроено')
-    return tpMenuOnce(player)
+    Spawn.portal?.teleport(player)
+    delete player.database.survival.anarchy
+    return
   }
 
   const location = LEARNING.RTP_LOCATION
