@@ -1,4 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
+import { isBuilding } from 'modules/Build/list.js'
 import { Spawn } from 'modules/Survival/Place/Spawn.js'
 import { StoneQuarry } from 'modules/Survival/Place/StoneQuarry.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'
@@ -37,9 +38,14 @@ function tpMenu(player) {
     locations['Спавн'] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    form.addButton(`${name} (${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () =>
+    form.addButton(`${name} (${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
+      if (player.database.inv !== 'anarchy' && !isBuilding(player)) {
+        return player.fail(
+          'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.'
+        )
+      }
       player.runCommand('tp ' + location)
-    )
+    })
   }
 
   form.addButton('Телепорт к игроку...', () => tpToPlayer(player))
