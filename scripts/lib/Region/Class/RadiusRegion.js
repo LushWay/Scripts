@@ -4,12 +4,22 @@ import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 
 export class RadiusRegion extends Region {
+  /**
+   * Subtype id of the RadiusRegion
+   */
   subtype = 'radius'
 
-  /** @type {Vector3} */
+  /**
+   * Center of the base region
+   * @type {Vector3}
+   */
   center
-  /** @type {number} */
+  /**
+   * Radius of the base region
+   * @type {number}
+   */
   radius
+
   /**
    * Creates a new region
    * @param {object} o
@@ -67,7 +77,7 @@ export class RadiusRegion extends Region {
 }
 
 /**
- * @typedef {Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>} RadiusRegionSubtypeArg
+ * @typedef {Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>} RadiusRegionSubclassArgument
  */
 
 export class MineshaftRegion extends RadiusRegion {
@@ -82,7 +92,7 @@ export class MineshaftRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {RadiusRegionSubtypeArg} arg */
+  /** @param {RadiusRegionSubclassArgument} arg */
   constructor(arg) {
     super({ ...arg, initPermissions: false })
     this.initPermissions(arg.permissions)
@@ -115,7 +125,7 @@ export class SafeAreaRegion extends RadiusRegion {
 
   allowUsageOfCraftingTable = false
 
-  /** @param {RadiusRegionSubtypeArg & { name?: string, allowUsageOfCraftingTable?: boolean }} arg */
+  /** @param {RadiusRegionSubclassArgument & { name?: string, allowUsageOfCraftingTable?: boolean }} arg */
   constructor(arg) {
     super({ saveToDisk: false, ...arg, initPermissions: false })
     this.safeAreaName = arg.name
@@ -124,7 +134,7 @@ export class SafeAreaRegion extends RadiusRegion {
   }
 }
 
-// TODO Levels, save place on creation, shadow regions etc
+// TODO Base levels, save structure of inital place on creation, shadow regions after removing etc
 export class BaseRegion extends RadiusRegion {
   subtype = 'base'
 
@@ -137,7 +147,7 @@ export class BaseRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {RadiusRegionSubtypeArg} arg */
+  /** @param {RadiusRegionSubclassArgument} arg */
   constructor(arg) {
     super({ ...arg, initPermissions: false })
     this.initPermissions(arg.permissions)
@@ -156,7 +166,7 @@ export class BossArenaRegion extends RadiusRegion {
     owners: [],
   }
 
-  /** @param {RadiusRegionSubtypeArg} arg */
+  /** @param {RadiusRegionSubclassArgument} arg */
   constructor(arg) {
     super({
       ...arg,
