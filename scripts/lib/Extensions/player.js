@@ -1,5 +1,6 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
+import { APIRequest } from 'lib/Class/Net.js'
 import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
 import { OverTakes } from './OverTakes.js'
 
@@ -90,7 +91,10 @@ OverTakes(Player.prototype, {
   },
   mainhand() {
     const equippable = this.getComponent('equippable')
-    if (!equippable) throw new TypeError(`Player '${this.name}' doesn't have equippable component (probably died).`)
+    if (!equippable) {
+      APIRequest('reload', { status: 100 })
+      throw new TypeError(`Player '${this.name}' doesn't have equippable component (probably died).`)
+    }
     return equippable.getEquipmentSlot(EquipmentSlot.Mainhand)
   },
 })
