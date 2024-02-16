@@ -1,6 +1,7 @@
 import { Container, ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { Enchantments } from './Enchantments.js'
+import { EventSignal } from './EventSignal.js'
 
 new Command({
   name: 'loot',
@@ -24,6 +25,10 @@ export class LootTable {
   /** @type {Record<string, LootTable>} */
   static instances = {}
   /**
+   * @type {EventSignal<LootTable>}
+   */
+  static onNew = new EventSignal()
+  /**
    * Stored items
    * @type {Array<import("../../modules/Server/server.js").LootItem.Stored>}
    */
@@ -46,6 +51,7 @@ export class LootTable {
     this.key = key
     this.fill = fill
     LootTable.instances[key] = this
+    EventSignal.emit(LootTable.onNew, this)
     this.items = items.map(item => {
       /** @type {ItemStack} */
       let itemStack

@@ -1,4 +1,4 @@
-import { Player, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
@@ -102,7 +102,9 @@ function showTable(player, table) {
 
     AForm.addButton('§cУдалить§r', () => {
       delete proxy[key]
-      showTable(player, table)
+      system.delay(() => {
+        showTable(player, table)
+      })
     })
     AForm.addButton(ActionForm.backText, () => showTable(player, table))
 

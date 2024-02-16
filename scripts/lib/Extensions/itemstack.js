@@ -40,13 +40,19 @@ OverTakes(ItemStack.prototype, {
     return this
   },
   is(another) {
-    if (this.isStackable && this.isStackableWith(another)) return true
-    const anotherLore = another.getLore()
-    return (
-      this.typeId === another.typeId &&
-      this.nameTag === another.nameTag &&
-      this.getLore().every((a, i) => a === anotherLore[i])
-    )
+    try {
+      if (this.isStackable && this.isStackableWith(another)) return true
+      const anotherLore = another.getLore()
+      return (
+        this.typeId === another.typeId &&
+        this.nameTag === another.nameTag &&
+        this.getLore().every((a, i) => a === anotherLore[i])
+      )
+    } catch (error) {
+      if (error instanceof ReferenceError && error.message.includes('Native object')) {
+        return false
+      } else throw error
+    }
   },
 })
 

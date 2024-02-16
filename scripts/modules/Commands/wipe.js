@@ -2,7 +2,7 @@ import { system } from '@minecraft/server'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { Anarchy } from 'modules/Survival/Place/Anarchy.js'
 import { Spawn } from 'modules/Survival/Place/Spawn.js'
-import { EventSignal, prompt } from 'smapi.js'
+import { Airdrop, EventSignal, prompt } from 'smapi.js'
 
 new Command({
   name: 'wipe',
@@ -20,6 +20,7 @@ new Command({
       delete ctx.sender.database.quest
       Spawn.portal?.teleport(ctx.sender)
       Anarchy.inventoryStore.remove(ctx.sender.id)
+      Airdrop.instances.filter(a => a.for === ctx.sender.id).forEach(a => a.delete())
       system.runTimeout(
         () => {
           delete ctx.sender.database.survival.anarchy

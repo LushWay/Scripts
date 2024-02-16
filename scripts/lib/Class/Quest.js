@@ -452,7 +452,7 @@ class PlayerQuest {
 
     let airdroppos = ''
     this.dynamic({
-      text: () => (options.text ? options.text(airdroppos) : '§6Залутай аирдроп' + airdroppos),
+      text: () => (options.text ? options.text(airdroppos) : '§6Забери аирдроп' + airdroppos),
       activate() {
         // Saving/restoring value
         const data = this.player.database
@@ -481,19 +481,12 @@ class PlayerQuest {
           place: Vector.floor(this.player.location),
           interval() {
             const airdropEntity = airdrop.chestMinecart
-            if (!airdropEntity) return
-            this.place = Vector.floor(airdropEntity.location)
-            for (const vector of Vector.foreach(this.place, Vector.add(this.place, { x: 0, y: -10, z: 0 })))
-              try {
-                world.overworld.spawnParticle(
-                  'minecraft:balloon_gas_particle',
-                  Vector.add(vector, { x: 1, y: 0.5, z: 1 })
-                )
-              } catch (e) {
-                util.error(e)
-              }
+            if (!airdropEntity || !airdropEntity.isValid()) return
 
-            airdroppos = ' на\n§f' + Vector.string(Vector.floor(this.place))
+            this.place = Vector.floor(airdropEntity.location)
+            airdrop.showParticleTrace(this.place)
+
+            airdroppos = ` на\n§f${Vector.string(this.place, true)}`
             qthis.update()
           },
           temporary,

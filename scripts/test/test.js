@@ -5,7 +5,7 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { BASE_ITEM_STACK } from 'modules/Survival/Features/base.js'
-import { ChestForm, DB, GAME_UTILS, NpcForm, util } from 'smapi.js'
+import { Airdrop, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, util } from 'smapi.js'
 import { APIRequest } from '../lib/Class/Net.js'
 import { Mineshaft } from '../modules/Survival/Place/Mineshaft.js'
 import './enchant.js'
@@ -16,6 +16,33 @@ import './simulatedPlayer.js'
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  airdrop(ctx) {
+    if (ctx.args[1]) ctx.reply('Аирдроп для')
+    const airdrop = new Airdrop({
+      position: Vector.add(Vector.floor(ctx.sender.location), { x: 0, z: 0, y: 30 }),
+      loot: Object.values(LootTable.instances)[0],
+      for: ctx.args[1] ? ctx.sender.id : undefined,
+    })
+
+    system.runTimeout(
+      () => {
+        const a = system.runInterval(
+          () => {
+            if (!airdrop.chestMinecart || !airdrop.chestMinecart.isValid()) {
+              //|| airdrop.status === 'being looted'
+              return system.clearRun(a)
+            }
+
+            airdrop.showParticleTrace()
+          },
+          'test airdrop',
+          20
+        )
+      },
+      'test airdrop',
+      20
+    )
+  },
   slot(ctx) {
     ctx.reply(ctx.sender.selectedSlot)
   },
