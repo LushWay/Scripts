@@ -31,7 +31,8 @@ export const SHEDULED_DB = new DynamicPropertyDB('ScheduledBlockPlace', {
  * }} options
  */
 export function scheduleBlockPlace({ dimension, restoreTime, ...options }) {
-  SHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
+  const other = SHEDULED_DB[dimension].find(e => Vector.string(e.location) === Vector.string(options.location))
+  if (!other) SHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
 
 system.runInterval(

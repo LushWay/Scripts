@@ -1,5 +1,5 @@
 import { ItemStack, Vector, system } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { AXE } from 'modules/Survival/Features/axe.js'
@@ -16,8 +16,14 @@ import { LEARNING_L } from './lootTables.js'
 
 export const LEARNING = {
   QUEST: new Quest({ displayName: 'Обучение', name: 'learning' }, q => {
-    if (!Anarchy.portal || !Anarchy.portal.from || !Anarchy.portal.to || !LEARNING.RTP_LOCATION.valid)
-      return q.failed('§cСервер не настроен')
+    if (
+      !Anarchy.portal ||
+      !Anarchy.portal.from ||
+      !Anarchy.portal.to ||
+      !LEARNING.RTP_LOCATION.valid ||
+      !LEARNING.CRAFTING_TABLE_LOCATION.valid
+    )
+      return q.failed('§cОбучение или сервер не настроены')
 
     q.start(function () {
       this.player.info('§6Обучение!')
@@ -52,8 +58,84 @@ export const LEARNING = {
       },
     })
 
+    q.dynamic({
+      text: '§6Выйди под открытое небо',
+      description: 'Деревья могут помешать. Выйди туда, где над тобой будет чистое небо',
+      activate() {
+        return new Temporary(({ system }) => {
+          system.runInterval(
+            () => {
+              const hit = this.player.dimension.getBlockFromRay(
+                this.player.location,
+                { x: 0, y: 1, z: 0 },
+                { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 }
+              )
+
+              if (hit) {
+                this.player.onScreenDisplay.setActionBar('§6Выйди на открытую местность!')
+              } else {
+                this.player.onScreenDisplay.setActionBar('')
+                this.player.success('Посмотри наверх!')
+                this.next()
+              }
+            },
+            'learning quest, free space detecter',
+            20
+          )
+        })
+      },
+    })
+
     q.airdrop({
       lootTable: LEARNING_L,
+    })
+
+    q.place(
+      Vector.add(LEARNING.CRAFTING_TABLE_LOCATION, { x: 10, y: 10, z: 10 }),
+      Vector.add(LEARNING.CRAFTING_TABLE_LOCATION, { x: -10, y: -10, z: -10 }),
+      '§6Доберитесь до верстака на\n' + Vector.string(LEARNING.CRAFTING_TABLE_LOCATION, true),
+      'Нужно же где-то скрафтить кирку, верно?'
+    )
+
+    q.dynamic({
+      text: () => '§6Скрафтите деревянную кирку',
+      description: 'Чтобы пойти в шахту, нужна кирка. Сделайте ее!',
+      activate() {
+        return new Temporary(({ system }) => {
+          system.runInterval(
+            () => {
+              const { container } = this.player
+              if (!container) return
+              for (const [, item] of container.entries()) {
+                if (item?.typeId === MinecraftItemTypes.WoodenPickaxe) {
+                  this.next()
+                }
+              }
+            },
+            'inv check learning',
+            20
+          )
+        })
+      },
+    })
+
+    q.counter({
+      end: 10,
+      text(i) {
+        return `§6Накопайте §f${i}/${this.end}§6 камня`
+      },
+      description: () => 'Отправляйтесь в шахту и накопайте камня!',
+      activate() {
+        return new Temporary(({ world }) => {
+          world.afterEvents.playerBreakBlock.subscribe(event => {
+            if (event.player.id !== this.player.id) return
+            if (event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.Stone) return
+
+            this.player.playSound(SOUNDS.action)
+            this.diff(1)
+          })
+        })
+      },
     })
 
     q.end(function () {
@@ -62,6 +144,7 @@ export const LEARNING = {
   }),
   LOOT_TABLE: LEARNING_L,
   RTP_LOCATION: new EditableLocation('learning_quest_rtp', { type: 'vector3+radius' }).safe,
+  CRAFTING_TABLE_LOCATION: new EditableLocation('learning_quest_crafting_table').safe,
 
   START_AXE: new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор'),
   /** @type {SafeAreaRegion | undefined} */

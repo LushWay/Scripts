@@ -34,9 +34,9 @@ export function randomTeleport(
   from,
   to,
   {
-    y = 200,
+    y = 150,
     dimension = 'overworld',
-    fromYtoBlock = 60,
+    fromYtoBlock = 40,
     elytra = true,
     c = 0,
     teleportCallback = () => {},

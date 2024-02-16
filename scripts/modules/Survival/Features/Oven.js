@@ -2,7 +2,7 @@ import { ItemStack, Player, TicksPerSecond, Vector, system, world } from '@minec
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { MoneyCost, Store } from 'lib/Class/Store.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { actionGuard } from 'modules/Survival/guard.js'
+import { actionGuard } from 'lib/Region/index.js'
 import { loreWordWrap, util } from 'smapi.js'
 import { StoneQuarry } from '../Place/StoneQuarry'
 

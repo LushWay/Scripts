@@ -31,7 +31,7 @@ export class CubeRegion extends Region {
    */
   constructor({ from, to, dimensionId, permissions, key, creating = true }) {
     super({ dimensionId, permissions, key })
-    this.initPermissions(permissions)
+    this.init(permissions)
     this.from = from
     this.to = to
 

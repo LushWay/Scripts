@@ -1,4 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
+import { actionGuard } from 'lib/Region/index.js'
 
 /**
  * @typedef {'enters' | 'interactions'} PlaceType
@@ -79,9 +80,18 @@ export class PlaceAction {
 
     system.runPlayerInterval(
       player => this.emit('enters', Vector.floor(player.location), player, player.dimension.type),
-      'Action.onEnterPlace',
+      'PlaceAction.enters',
       10
     )
+
+    actionGuard((_player, _region, ctx) => {
+      // Allow using any block specified by interaction
+      if (
+        ctx.type === 'interactWithBlock' &&
+        this.placeId(ctx.event.block, ctx.event.block.dimension.type) in this.interactions
+      )
+        return true
+    }, -2)
   }
 
   /** @protected */
@@ -134,10 +144,4 @@ export class LockAction {
 
     return false
   }
-}
-
-export class LazyAction {
-  whenChunkLoaded() {}
-
-  whenBlockLoaded() {}
 }

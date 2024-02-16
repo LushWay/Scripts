@@ -1,6 +1,6 @@
 import { Vector, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { actionGuard } from 'modules/Survival/guard.js'
+import { actionGuard } from 'lib/Region/index.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { util } from 'smapi.js'
 

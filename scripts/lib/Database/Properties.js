@@ -11,6 +11,16 @@ const PROXY_TARGET = Symbol('proxy_target')
  */
 export class DynamicPropertyDB {
   /**
+   * @template  T
+   * @param {T} value
+   * @returns {T}
+   */
+  static unwrap(value) {
+    // @ts-expect-error Huh
+    if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET]
+    return value
+  }
+  /**
    * @type {Record<string, DynamicPropertyDB<any, any>>}
    */
   static keys = {}

@@ -36,9 +36,12 @@ function regionForm(player) {
   const currentRegion = Region.locationInRegion(player.location, player.dimension.type)
 
   if (currentRegion instanceof RadiusRegion) {
-    form.addButton('Регион на ' + Vector.string(currentRegion.center) + '\n' + currentRegion.name, () => {
-      editRegion(player, currentRegion, () => regionForm(player))
-    })
+    form.addButton(
+      'Регион на ' + Vector.string(Vector.floor(currentRegion.center), true) + '§f\n' + currentRegion.name,
+      () => {
+        editRegion(player, currentRegion, () => regionForm(player))
+      }
+    )
   }
 
   form
@@ -62,8 +65,9 @@ function regionList(player, RegionType, back = () => regionForm(player)) {
       .addTextField('Центр', '~~~', '~~~')
       .addSlider('Радиус', 1, 100, 1)
       .show(player, (ctx, rawCenter, radius) => {
-        const center = parseLocationFromForm(ctx, rawCenter, player)
+        let center = parseLocationFromForm(ctx, rawCenter, player)
         if (!center) return
+        center = Vector.floor(center)
 
         editRegion(
           player,

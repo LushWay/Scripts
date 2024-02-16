@@ -1,7 +1,7 @@
 import { ItemStack, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { actionGuard } from 'lib/Region/index.js'
 import { baseMenu } from 'modules/Survival/Features/baseMenu.js'
-import { actionGuard } from 'modules/Survival/guard.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus, util } from 'smapi.js'
 

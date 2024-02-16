@@ -9,6 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 import { GAME_UTILS } from 'lib/Class/GameUtils.js'
+import { EventSignal } from '../Class/EventSignal.js'
 import { Region } from './Class/Region.js'
 import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES } from './config.js'
 import './init.js'
@@ -20,11 +21,33 @@ export * from './command.js'
 export * from './config.js'
 
 /**
+ * @type {EventSignal<Parameters<interactionAllowed>, boolean | undefined, interactionAllowed>}
+ */
+export const ACTION_GUARD = new EventSignal()
+
+/**
+ *
+ * @param {Parameters<typeof ACTION_GUARD['subscribe']>[0]} fn
+ * @param {number} [position]
+ */
+export function actionGuard(fn, position) {
+  ACTION_GUARD.subscribe(fn, position)
+}
+
+/**
  * @callback interactionAllowed
  * @param {Player} player
  * @param {Region} [region]
  * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "interactWithBlock", event: PlayerInteractWithBlockBeforeEvent} | {type: "interactWithEntity", event: PlayerInteractWithEntityBeforeEvent}} context
  */
+
+/** @type {interactionAllowed} */
+function allowed(player, region, context) {
+  for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
+    const result = fn(player, region, context)
+    if (typeof result !== 'undefined') return result
+  }
+}
 
 /**
  * @callback regionCallback
@@ -44,12 +67,11 @@ let LOADED = false
  * Loads regions with specified guards.
  * WARNING! Loads only one time
  * @param {object} o
- * @param {interactionAllowed} o.allowed
  * @param {spawnAllowed} o.spawnAllowed
  * @param {regionCallback} [o.regionCallback]
  */
-export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = () => void 0 }) {
-  if (LOADED) throw new ReferenceError('Regions already loaded!')
+export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => void 0 }) {
+  if (LOADED) throw new Error('Regions are already loaded!')
   LOADED = true
 
   /**
@@ -71,9 +93,6 @@ export function loadRegionsWithGuards({ allowed, spawnAllowed, regionCallback = 
   world.beforeEvents.playerInteractWithEntity.subscribe(event => {
     const region = Region.locationInRegion(event.target.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithEntity', event })) return
-
-    // Allow npc etc
-    if (INTERACTABLE_ENTITIES.includes(event.target.typeId)) return
 
     event.cancel = true
   })

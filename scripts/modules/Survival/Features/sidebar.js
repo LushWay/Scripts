@@ -51,7 +51,7 @@ $квест`,
       if (player.database.inv === 'anarchy') {
         const region = Region.locationInRegion(player.location, player.dimension.type)
         if (region) {
-          if (!region.permissions.pvp) text = ', мирная зона'
+          if (!region.permissions.pvp) text = ', §aмирная зона§f'
           if (region instanceof SafeAreaRegion && region.safeAreaName) text += '\n' + region.safeAreaName
           if (region instanceof BaseRegion && region.regionMember(player.id)) text = ', §6ваша база'
         }

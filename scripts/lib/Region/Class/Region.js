@@ -37,8 +37,14 @@ export class Region {
    */
   static locationInRegion(blockLocation, dimensionId) {
     const regions = this === Region ? this.regions : this.regionInstancesOf(this)
-    return regions.find(region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation))
+    const c1 = regions.filter(region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation))
+
+    const c2 = c1.sort((a, b) => b.priority - a.priority)
+
+    return c2[0]
   }
+
+  priority = 0
 
   /**
    * Region dimension
@@ -76,10 +82,14 @@ export class Region {
 
   /**
    * Sets region permissions based on permissions and default permissions
-   * @param {Partial<RegionPermissions> | undefined} permissions
+   * @param {object} o
+   * @param {Partial<RegionPermissions> | undefined} [o.permissions]
+   * @param {boolean} [o.creating]
+   * @param {typeof Region} region
    */
-  initPermissions(permissions) {
+  init({ permissions, creating = true }, region) {
     this.permissions = DB.setDefaults(permissions ?? {}, this.defaultPermissions)
+    if (creating) this.update(region)
   }
 
   /**
@@ -124,7 +134,7 @@ export class Region {
   /**
    * Updates this region in the database
    */
-  update() {
+  update(region = Region) {
     return {
       permissions: DB.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,

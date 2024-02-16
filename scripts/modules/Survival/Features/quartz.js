@@ -1,7 +1,7 @@
 import { ItemStack, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { actionGuard } from 'lib/Region/index.js'
 import { TechCity } from 'modules/Survival/Place/TechCity.js'
-import { actionGuard } from 'modules/Survival/guard.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { withState } from 'modules/WorldEdit/utils/blocksSet.js'
 import { util } from 'smapi.js'

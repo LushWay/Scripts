@@ -1,5 +1,6 @@
 import { Vector } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 
@@ -7,7 +8,7 @@ export class RadiusRegion extends Region {
   /**
    * Subtype id of the RadiusRegion
    */
-  subtype = 'radius'
+  static subtype = 'radius'
 
   /**
    * Center of the base region
@@ -29,8 +30,8 @@ export class RadiusRegion extends Region {
    * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
    * @param {string} [o.key] - The key of the region. This is used to identify the region.
    * @param {boolean} [o.creating] - Whether or not the region is being created as new or restored from memory.
-   * @param {boolean} [o.initPermissions] - Whether or not the permissions will be inited.
    * @param {boolean} [o.saveToDisk] - Whether or not region will be saved to disk or not
+   * @param {boolean} [o.subclassing] - Whether or not the permissions will be inited.
    */
   constructor({
     center,
@@ -39,17 +40,18 @@ export class RadiusRegion extends Region {
     permissions,
     key,
     creating = true,
-    initPermissions = true,
     saveToDisk = true,
+    subclassing = false,
   }) {
+    permissions = DynamicPropertyDB.unwrap(permissions)
+
     super({ dimensionId, permissions, key })
-    if (initPermissions) this.initPermissions(permissions)
-    this.center = center
+    this.center = DynamicPropertyDB.unwrap(center)
     this.radius = radius
     this.saveToDisk = saveToDisk
 
+    if (!subclassing) this.init({ permissions, creating }, RadiusRegion)
     if (creating) {
-      this.update()
       Region.regions.push(this)
     }
   }
@@ -63,12 +65,12 @@ export class RadiusRegion extends Region {
   /**
    * Updates this region in the database
    */
-  update() {
+  update(region = RadiusRegion) {
     if (!this.saveToDisk) return super.update()
     return (REGION_DB[this.key] = {
       ...super.update(),
       t: 'r',
-      st: this.subtype,
+      st: region.subtype,
       key: this.key,
       center: this.center,
       radius: this.radius,
@@ -81,7 +83,12 @@ export class RadiusRegion extends Region {
  */
 
 export class MineshaftRegion extends RadiusRegion {
-  subtype = 'mine'
+  static subtype = 'mine'
+
+  /**
+   * More prior then other regions
+   */
+  priority = 1
 
   /** @type {RegionPermissions} */
   defaultPermissions = {
@@ -94,13 +101,13 @@ export class MineshaftRegion extends RadiusRegion {
 
   /** @param {RadiusRegionSubclassArgument} arg */
   constructor(arg) {
-    super({ ...arg, initPermissions: false })
-    this.initPermissions(arg.permissions)
+    super({ ...arg, subclassing: true })
+    this.init(arg, MineshaftRegion)
   }
 }
 
 export class SafeAreaRegion extends RadiusRegion {
-  subtype = 'safe'
+  static subtype = 'safe'
 
   /** @type {RegionPermissions} */
   defaultPermissions = {
@@ -127,16 +134,16 @@ export class SafeAreaRegion extends RadiusRegion {
 
   /** @param {RadiusRegionSubclassArgument & { name?: string, allowUsageOfCraftingTable?: boolean }} arg */
   constructor(arg) {
-    super({ saveToDisk: false, ...arg, initPermissions: false })
+    super({ saveToDisk: false, ...arg, subclassing: true })
     this.safeAreaName = arg.name
     this.allowUsageOfCraftingTable = arg.allowUsageOfCraftingTable ?? true
-    this.initPermissions(arg.permissions)
+    this.init(arg, SafeAreaRegion)
   }
 }
 
 // TODO Base levels, save structure of inital place on creation, shadow regions after removing etc
 export class BaseRegion extends RadiusRegion {
-  subtype = 'base'
+  static subtype = 'base'
 
   /** @type {RegionPermissions} */
   defaultPermissions = {
@@ -149,13 +156,13 @@ export class BaseRegion extends RadiusRegion {
 
   /** @param {RadiusRegionSubclassArgument} arg */
   constructor(arg) {
-    super({ ...arg, initPermissions: false })
-    this.initPermissions(arg.permissions)
+    super({ ...arg, subclassing: true })
+    this.init(arg, BaseRegion)
   }
 }
 
 export class BossArenaRegion extends RadiusRegion {
-  subtype = 'boss'
+  static subtype = 'boss'
 
   /** @type {RegionPermissions} */
   defaultPermissions = {
@@ -171,8 +178,8 @@ export class BossArenaRegion extends RadiusRegion {
     super({
       ...arg,
       saveToDisk: false,
-      initPermissions: false,
+      subclassing: true,
     })
-    this.initPermissions(arg.permissions)
+    this.init(arg, BossArenaRegion)
   }
 }

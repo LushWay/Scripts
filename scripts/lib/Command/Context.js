@@ -1,4 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 
 export class CommandContext {
   /**
@@ -42,6 +43,7 @@ export class CommandContext {
    */
   reply(text) {
     this.sender.tell(text + '')
+    this.sender.playSound(SOUNDS.click)
   }
   /**
    * Replys to the sender of a command callback

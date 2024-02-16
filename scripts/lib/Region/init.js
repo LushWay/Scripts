@@ -16,7 +16,11 @@ Object.values(REGION_DB).forEach(region => {
       })
     )
   else {
-    const RadiusRegionSubtype = RadiusRegionSubTypes.find(e => e.prototype.subtype === region.st) ?? RadiusRegion
+    const RadiusRegionSubtype =
+      RadiusRegionSubTypes.find(e => {
+        const subtype = e.subtype
+        return subtype === region.st
+      }) ?? RadiusRegion
 
     Region.regions.push(
       new RadiusRegionSubtype({

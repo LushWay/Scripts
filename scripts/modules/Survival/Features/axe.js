@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { actionGuard } from 'lib/Region/index.js'
 import { isBuilding } from 'modules/Build/isBuilding'
-import { actionGuard } from 'modules/Survival/guard.js'
 import { scheduleBlockPlace } from 'modules/Survival/utils/scheduledBlockPlace.js'
 import { Region, util } from 'smapi.js'
 

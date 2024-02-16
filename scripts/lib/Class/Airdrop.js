@@ -9,18 +9,18 @@ import {
 } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { actionGuard } from 'lib/Region/index.js'
 import { util } from 'lib/util.js'
 import { LootTable } from './LootTable.js'
 import { Temporary } from './Temporary.js'
 
-const AIRDROP_DB = new DynamicPropertyDB('airdrop', {
-  /**
-   * @type {Record<string, { chicken: string, chest: string, loot: string, for?: string, looted?: true }>}
-   */
-  type: {},
-}).proxy()
-
 export class Airdrop {
+  static db = new DynamicPropertyDB('airdrop', {
+    /**
+     * @type {Record<string, { chicken: string, chest: string, loot: string, for?: string, looted?: true }>}
+     */
+    type: {},
+  }).proxy()
   static minecartTag = 'chest_minecart:loot'
   static chickenTag = 'chicken:loot'
   static chestOffset = { x: 0, y: -2, z: 0 }
@@ -50,7 +50,8 @@ export class Airdrop {
     Airdrop.instances.push(this)
   }
   /**
-   * @param {Vector3} position
+   * Spawns airdrop at the given position
+   * @param {Vector3} position - Position to spawn airdrop on
    */
   spawn(position) {
     console.debug('spawning airdrop at', Vector.string(Vector.floor(position), true))
@@ -112,7 +113,7 @@ export class Airdrop {
   save() {
     if (!this.chestMinecart || !this.chicken) return
 
-    AIRDROP_DB[this.key] = {
+    Airdrop.db[this.key] = {
       for: this.for,
       chest: this.chestMinecart.id,
       chicken: this.chicken.id,
@@ -151,7 +152,7 @@ export class Airdrop {
 
   delete() {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
-    Reflect.deleteProperty(AIRDROP_DB, this.key)
+    Reflect.deleteProperty(Airdrop.db, this.key)
 
     /** @param {'chestMinecart' | 'chicken'} key  */
     const kill = key => {
@@ -198,7 +199,7 @@ system.runInterval(
 
       if (airdrop.status === 'restoring') {
         try {
-          const saved = AIRDROP_DB[airdrop.key]
+          const saved = Airdrop.db[airdrop.key]
           if (!saved) return airdrop.delete()
 
           airdrop.chestMinecart = findAndRemove(chestMinecarts, saved.chest)
@@ -267,11 +268,11 @@ const findAndRemove = (arr, id) => {
 }
 
 SM.afterEvents.worldLoad.subscribe(() => {
-  for (const [key, saved] of Object.entries(AIRDROP_DB)) {
+  for (const [key, saved] of Object.entries(Airdrop.db)) {
     const loot = LootTable.instances[saved.loot]
 
     /** @param {LootTable} loot */
-    const restore = loot => new Airdrop({ loot }, key)
+    const restore = loot => new Airdrop({ loot, for: saved.for }, key)
 
     if (!loot) {
       LootTable.onNew.subscribe(lootTable => {
@@ -319,3 +320,19 @@ world.afterEvents.entityDie.subscribe(
   },
   { entityTypes: [MinecraftEntityTypes.ChestMinecart] }
 )
+
+actionGuard((player, _region, ctx) => {
+  if (ctx.type === 'interactWithEntity') {
+    if (ctx.event.target.typeId === MinecraftEntityTypes.ChestMinecart) {
+      const airdrop = Airdrop.instances.find(e => e.chestMinecart?.id === ctx.event.target.id)
+      if (airdrop?.for) {
+        // Check if airdrop is for specific user
+        if (player.id !== airdrop.for) return false
+        return true
+      } else {
+        // Allow interacting with any airdrop by default
+        return true
+      }
+    }
+  }
+}, -1)

@@ -25,7 +25,7 @@ import { PlaceAction } from './Action.js'
  * 	active: string,
  * 	completed?: string[],
  * 	step?: number,
- * 	additional?: any
+ * 	additional?: unknown
  * }} QuestDB
  */
 
@@ -42,7 +42,7 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return `§6Квест: §f${status.quest.displayName}\n${status.step?.text()}\n§6Подробнее: §f-q`
+        return `§6Квест: §f${status.quest.displayName}\n${status.step?.text()}\n§6Подробнее: §f.q`
       }
     },
   }
@@ -113,6 +113,11 @@ export class Quest {
     const steps = this.steps(player)
     const step = steps.list[stepNum] ?? steps.list[0]
     if (!step) return false
+    player.success(
+      `§f${restore ? 'Квест: ' : ''}${step.text()}${step.description ? '\n' : ''}${
+        step.description ? '§6' + step.description() : ''
+      }`
+    )
     step.cleanup = step.activate?.(!restore).cleanup
   }
 
@@ -270,8 +275,9 @@ class PlayerQuest {
    * @param {Vector3} from
    * @param {Vector3} to
    * @param {QuestText} text
+   * @param {QuestText} [description]
    */
-  place(from, to, text, description = text, doNotAllowBuilders = true) {
+  place(from, to, text, description, doNotAllowBuilders = true) {
     this.dynamic({
       text,
       description,
@@ -282,14 +288,15 @@ class PlayerQuest {
           actions.push(
             PlaceAction.onEnter(pos, player => {
               if (player.id !== this.player.id) return
-              if (isBuilding(player)) return
+              if (doNotAllowBuilders && isBuilding(player)) return
 
               this.next()
             })
           )
         }
 
-        const temp = this.quest.steps(this.player).createTargetMarkerInterval({ place: Vector.lerp(from, to, 0.5) })
+        const { x, y, z } = Vector.lerp(from, to, 0.5)
+        const temp = this.quest.steps(this.player).createTargetMarkerInterval({ place: { x, y, z } })
 
         return {
           cleanup() {
@@ -417,7 +424,7 @@ class PlayerQuest {
    * @typedef {{
    *   text?: (AirdropPos: string) => string
    * } & ({
-   *   spawnAirdrop: (key: string) => Airdrop
+   *   spawnAirdrop: (key: string | undefined) => Airdrop
    * } | { lootTable: LootTable } & ({ location: Vector3 } | { abovePlayerY?: number })
    * )} QuestAirdropInput
    */
@@ -433,7 +440,7 @@ class PlayerQuest {
     const spawnAirdrop =
       'spawnAirdrop' in options
         ? options.spawnAirdrop
-        : (/** @type {string} */ key) =>
+        : (/** @type {string | undefined} */ key) =>
             new Airdrop(
               {
                 position:
@@ -454,24 +461,38 @@ class PlayerQuest {
     this.dynamic({
       text: () => (options.text ? options.text(airdroppos) : '§6Забери аирдроп' + airdroppos),
       activate() {
-        // Saving/restoring value
-        const data = this.player.database
-        if (!data.quest) return this.error('База данных квестов недоступна')
-        const key = data.quest.additional
-        const airdrop = spawnAirdrop(key)
+        // Saving/restoring airdrop
+        const db = this.player.database
+        if (!db.quest) return this.error('База данных квестов недоступна')
 
-        data.quest.additional = airdrop.key
+        /** @type {Airdrop} */
+        let airdrop
+        const key = db.quest.additional
+
+        if (typeof key === 'string') {
+          if (key in Airdrop.db) {
+            airdrop = spawnAirdrop(key)
+          } else {
+            this.player.info('Аирдроп не найден, переходим к следующему этапу...')
+            system.delay(() => this.next())
+            return { cleanup() {} }
+          }
+        } else {
+          airdrop = spawnAirdrop()
+        }
+
+        db.quest.additional = airdrop.key
         if (!key && !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
 
         const temporary = new Temporary(({ world }) => {
-          world.beforeEvents.playerInteractWithEntity.subscribe(event => {
+          world.afterEvents.playerInteractWithEntity.subscribe(event => {
             const airdropEntity = airdrop.chestMinecart
             if (!airdropEntity) return
             if (event.target.id !== airdropEntity.id) return
 
             if (this.player.id === event.player.id) {
               system.delay(() => this.next())
-            } else event.cancel = true
+            }
           })
         })
 
@@ -537,7 +558,13 @@ class PlayerQuest {
       system.runInterval(
         () => {
           if (!this.player.isValid()) return temp.cleanup()
-          if (!options.place) return
+          if (
+            !options.place ||
+            typeof options.place.x !== 'number' ||
+            typeof options.place.y !== 'number' ||
+            typeof options.place.z !== 'number'
+          )
+            return
 
           options.interval?.()
 

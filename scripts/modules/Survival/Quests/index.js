@@ -16,7 +16,7 @@ const qcmd = new Command({
   return ctx.reply(
     `§7Квест: §6${q.quest.displayName}\n\n§7Задание: §f${q.step.text()}\n${
       q.step.description ? `§7Описание: ${q.step.description()}\n` : ''
-    }\n§6Выйти из квеста: §f-q exit`
+    }\n§6Выйти из квеста: §f.q exit`
   )
 })
 
