@@ -1,6 +1,6 @@
 import { ItemLockMode, ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { MinecraftEnchantmentTypes } from 'lib/List/enchantments'
+import { MinecraftEnchantmentTypes } from 'lib/Assets/enchantments'
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {

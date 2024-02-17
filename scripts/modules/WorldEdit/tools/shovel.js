@@ -1,8 +1,8 @@
 import { Vector, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
+import { ModalForm } from 'lib.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
-import { ModalForm } from 'smapi.js'
 import { WorldEditTool } from '../class/WorldEditTool.js'
 import { blockSetDropdown, getAllBlockSets, getBlockSet, getBlockSetForReplaceTarget } from '../utils/blocksSet.js'
 

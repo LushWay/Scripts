@@ -1,6 +1,6 @@
 import * as mc from '@minecraft/server'
 import { SOUNDS } from 'config'
-import { ROLES } from 'smapi'
+import { ROLES } from 'lib'
 
 declare global {
   type Role = keyof typeof ROLES
@@ -38,17 +38,6 @@ declare global {
   let console: Console
   let nextTick: Promise<void>
   let verbose: boolean
-
-  interface JSON {
-    /**
-     * Parses string and catches any error. If callback param is specified, it will be called with catched error. For more info see {@link JSON.parse}
-     */
-    safeParse(
-      text: string,
-      reciever?: (this: any, key: string, value: any) => any,
-      errorCallback?: (error: Error) => any
-    ): any
-  }
 
   interface ArrayConstructor {
     /**
@@ -96,15 +85,7 @@ declare global {
     [key: `${number}...${number}` | number]: Percent
   }
 
-  type Range<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>> | T
-
-  type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
-    ? Acc[number]
-    : Enumerate<N, [...Acc, Acc['length']]>
-
   type Percent = `${number}%`
-
-  type PlayerDB<Value = any> = { save(): void; data: Value }
 
   type PartialParts<B, ThisArg = B> = {
     [P in keyof B]?: B[P] extends (...param: infer param) => infer ret ? (this: ThisArg, ...param: param) => ret : B[P]
@@ -148,7 +129,6 @@ declare module '@minecraft/server' {
     scores: Record<ScoreName, number>
     database: PlayerDatabase
 
-    // TODO Migrate all code to those methods
     /**
      * Sends message prefixed with
      * ```js
@@ -190,6 +170,7 @@ declare module '@minecraft/server' {
      */
     info(message: string): void
   }
+
   interface HudTitleDisplayOptions {
     /**
      * Priority of the displayed information

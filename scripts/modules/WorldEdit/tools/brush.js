@@ -7,7 +7,7 @@ import {
   world,
 } from '@minecraft/server'
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
-import { ModalForm, getRole, util } from 'smapi.js'
+import { ModalForm, getRole, util } from 'lib.js'
 import { BaseBrushTool } from '../class/BaseBrushTool.js'
 import { WorldEditTool } from '../class/WorldEditTool.js'
 import { WE_CONFIG } from '../config.js'

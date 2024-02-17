@@ -1,5 +1,5 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'smapi.js'
+import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib.js'
 
 new Command({
   name: 'leaderboard',
@@ -37,7 +37,7 @@ function info(lb) {
  *
  * @param {Player} player
  * @param {Leaderboard} [lb]
- * @param {Partial<import('smapi.js').LB>} data
+ * @param {Partial<import('lib.js').LB>} data
  */
 function editLeaderboard(player, lb, data = lb?.data ?? {}) {
   const action = lb ? 'Изменить ' : 'Выбрать '
@@ -140,8 +140,8 @@ function editLeaderboard(player, lb, data = lb?.data ?? {}) {
 }
 
 /**
- * @param {Partial<import('smapi.js').LB>} data
- * @returns {data is import('smapi.js').LB}
+ * @param {Partial<import('lib.js').LB>} data
+ * @returns {data is import('lib.js').LB}
  */
 function isRequired(data) {
   return !!data.dimension && !!data.displayName && !!data.location && !!data.objective && !!data.style

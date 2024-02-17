@@ -1,12 +1,12 @@
 import { Player, Vector, system, world } from '@minecraft/server'
+import { ActionForm, getRoleAndName, util } from 'lib.js'
 import { isBuilding } from 'modules/Build/isBuilding'
-import { Spawn } from 'modules/Survival/Place/Spawn.js'
-import { StoneQuarry } from 'modules/Survival/Place/StoneQuarry.js'
-import { TechCity } from 'modules/Survival/Place/TechCity.js'
-import { VillageOfExplorers } from 'modules/Survival/Place/VillafeOfExplorers.js'
-import { VillageOfMiners } from 'modules/Survival/Place/VillageOfMiners.js'
-import { DefaultPlaceWithSafeArea } from 'modules/Survival/utils/DefaultPlace.js'
-import { ActionForm, getRoleAndName, util } from 'smapi.js'
+import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
+import { Spawn } from 'modules/Places/Spawn.js'
+import { StoneQuarry } from 'modules/Places/StoneQuarry.js'
+import { TechCity } from 'modules/Places/TechCity.js'
+import { VillageOfExplorers } from 'modules/Places/VillafeOfExplorers.js'
+import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
 
 new Command({
   name: 'tp',

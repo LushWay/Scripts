@@ -1,11 +1,10 @@
 import { Entity, EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { Settings } from 'smapi.js'
-import { Server } from '../Server/index.js'
+import { Settings } from 'lib.js'
 import { HEALTH_INDICATOR } from './var.js'
 
 const options = Settings.world('pvp', {
   enabled: {
-    value: Server.type === 'survival',
+    value: true,
     desc: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
     name: 'Включено',
   },
@@ -44,7 +43,7 @@ system.runInterval(
   20
 )
 
-SM.afterEvents.modulesLoad.subscribe(() => {
+SM.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
       if (!options.enabled) return

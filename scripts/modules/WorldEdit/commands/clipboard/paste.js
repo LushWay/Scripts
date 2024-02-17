@@ -1,4 +1,4 @@
-import { util } from 'smapi.js'
+import { util } from 'lib.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
 
 /** @type {( "none" | "x" | "xz" | "z")[]} */

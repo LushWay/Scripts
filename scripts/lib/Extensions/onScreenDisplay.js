@@ -1,6 +1,6 @@
 import { Player, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
+import { util } from 'lib.js'
 import { SCREEN_DISPLAY } from 'lib/Extensions/player.js'
-import { util } from 'smapi.js'
 
 const $sidebar = '§t§i§psidebar'
 const $title = 'title'

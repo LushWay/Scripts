@@ -1,4 +1,4 @@
 scripts/@minecraft
 scripts/chestui
-scripts/Lib/List
-scripts/Lib/Lang
+scripts/lib/Assets
+scripts/lib/Lang

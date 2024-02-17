@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
+import { MinecraftEnchantmentTypes } from '../lib/Assets/enchantments.js'
 import { Enchantments } from '../lib/Enchantments.js'
-import { MinecraftEnchantmentTypes } from '../lib/List/enchantments.js'
 
 new Command({
   name: 'enchant',

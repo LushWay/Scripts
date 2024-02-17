@@ -8,8 +8,8 @@ import {
   world,
 } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
+import { getRole, prompt, util } from 'lib.js'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
-import { getRole, prompt, util } from 'smapi.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'

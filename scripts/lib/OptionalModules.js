@@ -20,8 +20,6 @@ dynamicImport('@minecraft/server-net', 'ServerNet')
  */
 function dynamicImport(module, key) {
   import(module)
-    .then(module => {
-      MODULE[key] = module
-    })
-    .catch(e => console.warn(`§eDisabled§r: ${module}, ${e}`))
+    .then(module => (MODULE[key] = module))
+    .catch(() => console.warn(`§7Not available§r: ${module}`))
 }

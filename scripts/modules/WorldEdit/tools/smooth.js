@@ -1,9 +1,9 @@
 import { Block, BlockPermutation, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ITEMS } from 'config.js'
+import { ModalForm, getRole, util } from 'lib.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksSet.js'
-import { ModalForm, getRole, util } from 'smapi.js'
 import { BaseBrushTool } from '../class/BaseBrushTool'
 
 // TODO Cache invalidation

@@ -16,7 +16,7 @@ export const TIMERS_PATHES = {}
  */
 function Timer(type, set, fn, name, ticks = 0) {
   const visualId = `${name} (${type} ${ticks} ticks)`
-  const path = util.error.stack.get()
+  const path = util.error.stack.get(1)
   TIMERS_PATHES[visualId] = path
 
   return set(() => {
@@ -24,9 +24,9 @@ function Timer(type, set, fn, name, ticks = 0) {
 
     util.catch(fn, type[0].toUpperCase() + type.slice(1))
 
-    const tookTicks = ~~(end() / 20)
-    if (tookTicks > ticks) {
-      console.warn(`§6Slow ${type} (${tookTicks}/${ticks})§r\n${path}`)
+    const tookTicks = end() / 20
+    if (tookTicks > ticks + 1) {
+      console.warn(`§6Slow ${type} (${tookTicks.toFixed(2)}/${ticks})§r\n${path}`)
     }
   }, ticks)
 }

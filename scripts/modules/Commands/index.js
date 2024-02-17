@@ -1,20 +1,14 @@
-import importModules from 'modules/importModules.js'
-
-importModules({
-  array: [
-    'gamemode',
-    'db',
-    'help',
-    'name',
-    'ping',
-    'role',
-    'settings',
-    'shell',
-    'sit',
-    'leaderboard',
-    'scores',
-    'wipe',
-    'tp',
-  ].map(e => `./${e}.js`),
-  fn: m => import(m),
-})
+import './db.js'
+import './gamemode.js'
+import './help.js'
+import './leaderboard.js'
+import './name.js'
+import './ping.js'
+import './role.js'
+import './scene.js'
+import './scores.js'
+import './settings.js'
+import './shell.js'
+import './sit.js'
+import './tp.js'
+import './wipe.js'

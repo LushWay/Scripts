@@ -6,7 +6,7 @@ const send = world.sendMessage.bind(world)
 
 OverTakes(World.prototype, {
   say(message) {
-    if (globalThis.SM?.afterEvents?.modulesLoad?.loaded) {
+    if (globalThis.SM?.afterEvents?.worldLoad?.loaded) {
       this.say = send
       return send(message)
     }

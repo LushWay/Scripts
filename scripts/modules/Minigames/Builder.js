@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { LockAction, Sidebar } from 'smapi.js'
+import { LockAction, Sidebar } from 'lib.js'
 
 // TODO Add minigame place
 

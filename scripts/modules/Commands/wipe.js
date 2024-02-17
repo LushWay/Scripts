@@ -1,8 +1,8 @@
 import { system } from '@minecraft/server'
+import { Airdrop, EventSignal, prompt } from 'lib.js'
+import { Anarchy } from 'modules/Places/Anarchy.js'
+import { Spawn } from 'modules/Places/Spawn.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
-import { Anarchy } from 'modules/Survival/Place/Anarchy.js'
-import { Spawn } from 'modules/Survival/Place/Spawn.js'
-import { Airdrop, EventSignal, prompt } from 'smapi.js'
 
 new Command({
   name: 'wipe',

@@ -3,7 +3,7 @@
  * @param {string} string2
  * Code by {@link https://github.com/zdyn/jaro-winkler-js Zdyn}
  */
-export function stringDistance(string1, string2) {
+function stringDistance(string1, string2) {
   if (string1.length > string2.length) [string1, string2] = [string2, string1]
 
   const matchWindow = ~~Math.max(0, string2.length / 2 - 1)

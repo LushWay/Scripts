@@ -1,4 +1,4 @@
-import { TerminalColors } from './List/terminal-colors.js'
+import { TerminalColors } from './Assets/terminal-colors.js'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const util = {
@@ -248,6 +248,21 @@ export const util = {
       ?.replace(/"/g, cw)
       ?.replace(new RegExp(uniqueKey, 'g'), '"')
       ?.slice(0, 1000)
+  },
+
+  /**
+   * Runs given function safly. If it throws any error it will be catched and returned as
+   * second element in array
+   * @template {() => any} T
+   * @param {T} func
+   * @returns {[result: ReturnType<T>, error: undefined] | [result: undefined, error: unknown]}
+   */
+  run(func) {
+    try {
+      return [func(), void 0]
+    } catch (error) {
+      return [void 0, error]
+    }
   },
 
   /**

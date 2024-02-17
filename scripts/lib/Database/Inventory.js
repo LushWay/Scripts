@@ -128,7 +128,9 @@ export class InventoryStore {
    */
   constructor(tableName) {
     this._.TABLE_NAME = tableName
-    this.init()
+
+    // Init database only when entities are loaded
+    SM.afterEvents.worldLoad.subscribe(() => this.init())
   }
   /** @private */
   init() {
@@ -164,8 +166,8 @@ export class InventoryStore {
 
       // Finding manifest
       if (raw && raw[0] === '{' && raw[raw.length - 1] === '}') {
-        /** @type {StoreManifest} */
-        const manifest = JSON.safeParse(raw)
+        /** @type {[StoreManifest | undefined, unknown]} */
+        const [manifest] = util.run(() => JSON.parse(raw))
 
         // No data means that this isnt manifest, do nothing
         if (manifest) {
@@ -194,10 +196,9 @@ export class InventoryStore {
         }
       }
 
-      if (!slots)
-        return util.error(new Error(`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`), {
-          errorName: 'LoadError',
-        })
+      if (!slots) {
+        return util.error(new DatabaseError(`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`))
+      }
 
       const { type, index } = slots[step]
       // @ts-expect-error Optimization cost...
@@ -270,7 +271,7 @@ export class InventoryStore {
     let itemIndex = 0
     for (const [i, entity] of entities.entries()) {
       const { container } = entity
-      if (!container) throw new TypeError('No container')
+      if (!container) throw new ReferenceError('No container found on entity while saving inventory')
       container.clearAll()
 
       for (let i = 0; i < container.size; i++) {
@@ -293,7 +294,7 @@ export class InventoryStore {
 
     this.save()
   }
-  
+
   /**
    * @type {boolean}
    * @private

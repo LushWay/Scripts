@@ -1,8 +1,8 @@
 import { Enchantment, Vector, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { MinecraftEnchantmentTypes } from 'lib/Assets/enchantments.js'
 import { DB } from 'lib/Database/Default.js'
 import { EventLoader } from 'lib/EventSignal.js'
-import { MinecraftEnchantmentTypes } from 'lib/List/enchantments.js'
 import { util } from 'lib/util.js'
 
 const LOCATION = { x: 0, y: -10, z: 0 }

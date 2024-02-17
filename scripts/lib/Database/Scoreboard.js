@@ -1,5 +1,6 @@
-import { Entity, Player, Scoreboard, ScoreboardObjective, world } from '@minecraft/server'
-import { OverTakes, util } from 'smapi.js'
+import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
+import { OverTakes } from 'lib/Extensions/OverTakes.js'
+import { util } from 'lib/util.js'
 
 /**
  * @type {Record<import("@minecraft/server").ScoreName, string>}
@@ -33,7 +34,7 @@ OverTakes(ScoreboardObjective.prototype, {
 })
 
 /**
- * @type {Record<string, {player: Player, proxy: any}>}
+ * @type {Record<string, { player: Player, proxy: any }>}
  */
 const players = {}
 Reflect.defineProperty(Player.prototype, 'scores', {

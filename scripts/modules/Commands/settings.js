@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
+import { FormCallback, util } from 'lib.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { OPTIONS_NAME, PLAYER_SETTINGS_DB, Settings, WORLD_SETTINGS_DB, generateSettingsProxy } from 'lib/Settings.js'
-import { FormCallback, util } from 'smapi.js'
 
 new Command({
   name: 'wsettings',

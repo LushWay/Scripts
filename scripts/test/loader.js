@@ -1,6 +1,6 @@
-import 'lib/watchdog.js'
+import 'lib/Load/watchdog.js'
 
-import 'lib/Extensions/import.js'
+import 'lib/Load/extensions.js'
 
 import { world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'

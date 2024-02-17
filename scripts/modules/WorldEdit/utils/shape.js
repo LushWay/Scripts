@@ -1,9 +1,9 @@
 import { BlockPermutation, Player, Vector, system, world } from '@minecraft/server'
-import { util } from 'smapi.js'
+import { util } from 'lib.js'
+import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 import { Cuboid } from '../class/Cuboid.js'
 import { WorldEdit } from '../class/WorldEdit.js'
 import { WE_CONFIG } from '../config.js'
-import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 
 /**
  * @param {Player} player

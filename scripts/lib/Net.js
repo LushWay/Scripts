@@ -7,6 +7,8 @@ import { MODULE } from './OptionalModules.js'
 
 class APIError extends Error {}
 
+// TODO Move import of shared types into shared repo
+
 /**
  * Makes http request to node.js instance
  * @template {keyof NODE_ROUTES} Path
@@ -33,7 +35,7 @@ export async function APIRequest(path, body) {
       body = JSON.parse(response.body)
     } catch (e) {
       const error = util.error(e, { returnText: true })
-      throw new APIError('Failed to parse NodeServer response.body: ' + util.inspect(response.body) + '\n' + error)
+      throw new APIError(`Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`)
     }
 
     if (body.status === 404) {
@@ -41,5 +43,5 @@ export async function APIRequest(path, body) {
     }
 
     return body
-  } else console.error('NET MODULE ARE DISABLED, ABORTING')
+  } else console.error('NET MODULE IS DISABLED, ABORTING')
 }

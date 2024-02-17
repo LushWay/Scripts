@@ -1,8 +1,8 @@
 import { Block, BlockTypes, Entity, ItemStack, LocationInUnloadedChunkError, Player, world } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { untyped_terrain_textures } from './Assets/terrain-textures.js'
 import { showForm } from './Form/utils.js'
-import { untyped_terrain_textures } from './List/terrain-textures.js'
 import { MODULE } from './OptionalModules.js'
 import { inaccurateSearch } from './Search.js'
 

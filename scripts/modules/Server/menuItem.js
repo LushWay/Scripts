@@ -1,6 +1,6 @@
 import { ItemLockMode, ItemStack, Player, world } from '@minecraft/server'
-import { createPublicGiveItemCommand } from 'modules/Survival/utils/createPublicGiveItemCommand.js'
-import { ActionForm, MessageForm, util } from 'smapi.js'
+import { ActionForm, MessageForm, util } from 'lib.js'
+import { createPublicGiveItemCommand } from 'modules/Survival/createPublicGiveItemCommand.js'
 
 class MenuBuilder {
   constructor() {

@@ -1,6 +1,6 @@
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
+import { ActionForm, BUTTON, Leaderboard, ModalForm, PLAYER_DB } from 'lib.js'
 import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
-import { ActionForm, BUTTON, Leaderboard, ModalForm, PLAYER_DB } from 'smapi.js'
 
 new Command({
   name: 'scores',

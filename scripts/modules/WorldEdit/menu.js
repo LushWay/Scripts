@@ -1,6 +1,7 @@
 import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
+import { ActionForm, BUTTON, FormCallback, GAME_UTILS, ModalForm, is, util } from 'lib.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
@@ -14,7 +15,6 @@ import {
   getOtherPlayersBlockSets,
   setBlockSet,
 } from 'modules/WorldEdit/utils/blocksSet.js'
-import { ActionForm, BUTTON, FormCallback, GAME_UTILS, ModalForm, is, util } from 'smapi.js'
 import { WorldEditTool } from './class/WorldEditTool.js'
 
 /**

@@ -2,22 +2,12 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
 import { OverTakes } from './OverTakes.js'
 
-Object.entriesStringKeys = Object.entries
-
 /**
  * Common JavaScript objects
  *
  *
  */
-OverTakes(JSON, {
-  safeParse(str, reciever, onError) {
-    try {
-      return JSON.parse(str, reciever)
-    } catch (e) {
-      onError && onError(e)
-    }
-  },
-})
+Object.entriesStringKeys = Object.entries
 
 Date.prototype.toYYYYMMDD = function () {
   const date = new Date(this)
@@ -55,10 +45,10 @@ Array.prototype.randomElement = function () {
 }
 
 /**
- *
- * @param  {any[]} args
+ * @param {unknown[]} args
  */
 function format(args) {
+  if (!globalThis?.SM?.afterEvents?.worldLoad?.loaded) prefixFormat(args)
   return args
     .map(e =>
       util.toTerminalColors(
@@ -70,6 +60,20 @@ function format(args) {
       )
     )
     .join(' ')
+}
+
+/**
+ * @param {unknown[]} args
+ */
+function prefixFormat(args) {
+  if (typeof args[0] === 'string' && args[0].startsWith('§9')) return
+
+  args.forEach((e, i) => {
+    if (typeof e === 'string') {
+      args[i] = e.replace(/\n/g, '\n§9│ §r')
+    }
+  })
+  args.unshift('§9│ §r')
 }
 
 OverTakes(console, {

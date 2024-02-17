@@ -82,7 +82,7 @@ export class Quest {
     this.displayName = displayName
     this.init = init
     Quest.instances[this.name] = this
-    SM.afterEvents.modulesLoad.subscribe(() => {
+    SM.afterEvents.worldLoad.subscribe(() => {
       system.delay(() => {
         world.getAllPlayers().forEach(setQuests)
       })

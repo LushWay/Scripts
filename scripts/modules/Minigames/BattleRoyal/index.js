@@ -3,7 +3,7 @@
 // TODO Update
 
 import { Player, system, world } from '@minecraft/server'
-import { Command } from 'smapi.js'
+import { Command } from 'lib.js'
 import { br } from './game.js'
 import { BATTLE_ROYAL_EVENTS, BR_QUENE } from './var.js'
 

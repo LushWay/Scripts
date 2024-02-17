@@ -1,8 +1,8 @@
 import { Player, world } from '@minecraft/server'
+import { PLAYER_DB, ROLES, getRole, setRole, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { PLAYER_DB, ROLES, getRole, setRole, util } from 'smapi.js'
 
 /** @type {Role[]} */
 const HIERARCHY = ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin']

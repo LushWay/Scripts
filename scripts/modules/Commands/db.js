@@ -1,8 +1,8 @@
 import { Player, system, world } from '@minecraft/server'
+import { PLAYER_DB, ROLES, TIMERS_PATHES, getRole, util } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { PLAYER_DB, ROLES, TIMERS_PATHES, getRole, util } from 'smapi.js'
 
 const db = new Command({
   name: 'db',

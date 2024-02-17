@@ -1,10 +1,10 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'lib.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { inaccurateSearch } from 'lib/Search.js'
 import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu.js'
 import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
-import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'smapi.js'
 import { WorldEdit } from '../../class/WorldEdit.js'
 
 const set = new Command({

@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
+import { Settings, getRoleAndName, util } from 'lib.js'
 import { EventSignal } from 'lib/EventSignal.js'
-import { Settings, getRoleAndName, util } from 'smapi.js'
 
 class JoinBuilder {
   config = {

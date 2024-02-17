@@ -142,5 +142,5 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
     20
   )
 
-  console.log('§6Regions settings loaded')
+  console.log('§7Regions and guards are loaded')
 }

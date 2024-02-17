@@ -1,5 +1,5 @@
+import { ActionForm, ModalForm, util } from 'lib.js'
 import { APIRequest } from 'lib/Net.js'
-import { ActionForm, ModalForm, util } from 'smapi.js'
 
 new Command({
   name: 'shell',

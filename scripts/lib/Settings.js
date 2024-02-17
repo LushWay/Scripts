@@ -6,7 +6,7 @@ export const OPTIONS_NAME = Symbol('name')
 /**
  * Сonverting true and false to boolean
  * @template T
- * @typedef {T extends true | false ? boolean : T} Normalize
+ * @typedef {T extends true | false ? boolean : T} TrueFalseToBoolean
  */
 
 /**
@@ -53,7 +53,7 @@ export class Settings {
    * @param {string} groupName - The prefix for the database.
    * @template {SettingsConfig<boolean | string>} Config
    * @param {Config} config - This is an object that contains the default values for each option.
-   * @returns {(player: Player) => { [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
+   * @returns {(player: Player) => { [Prop in keyof Config]: TrueFalseToBoolean<Config[Prop]["value"]> }} An object with properties that are getters and setters.
    */
   static player(name, groupName, config) {
     config[OPTIONS_NAME] = name
@@ -80,7 +80,7 @@ export class Settings {
    * @template {WorldSettings} Config
    * @param {string} groupName - The prefix for the database.
    * @param {Config} config - The default values for the options.
-   * @returns {{ [Prop in keyof Config]: Normalize<Config[Prop]["value"]> }} An object with properties that are getters and setters.
+   * @returns {{ [Prop in keyof Config]: TrueFalseToBoolean<Config[Prop]["value"]> }} An object with properties that are getters and setters.
    */
   static world(groupName, config) {
     if (!(groupName in this.worldMap)) {

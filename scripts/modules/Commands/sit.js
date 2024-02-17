@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES } from 'config'
-import { LockAction } from 'smapi.js'
+import { LockAction } from 'lib.js'
 
 new Command({
   name: 'sit',

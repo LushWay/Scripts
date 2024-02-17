@@ -1,9 +1,9 @@
 import { INTERACTABLE_ENTITIES, actionGuard, loadRegionsWithGuards } from 'lib/Region/index.js'
 import { isBuilding } from 'modules/Build/isBuilding'
+import { Spawn } from 'modules/Places/Spawn.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
-import { Spawn } from 'modules/Survival/Place/Spawn.js'
 
-console.log('§6Server mode: Survival')
+console.log('§7Mode is survival')
 
 actionGuard((player, region) => {
   // Allow any action to player in creative

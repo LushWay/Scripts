@@ -1,8 +1,8 @@
 import { MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
-import { ListParticles } from 'lib/List/particles.js'
-import { ListSounds } from 'lib/List/sounds.js'
-import { ActionForm, ModalForm, util } from 'smapi.js'
+import { ActionForm, ModalForm, util } from 'lib.js'
+import { ListParticles } from 'lib/Assets/particles.js'
+import { ListSounds } from 'lib/Assets/sounds.js'
 import { WorldEditTool } from '../class/WorldEditTool.js'
 
 /** @type {Record<string, string[]>} */
@@ -17,7 +17,7 @@ new WorldEditTool({
   displayName: 'инструмент',
   editToolForm(item, player) {
     const lore = item.getLore()
-    new ActionForm('§3Инструмент', 'Настройте что будет происходить при использовании инструмента.')
+    new ActionForm('§3Инструмент', 'Настройте, что будет происходить при использовании инструмента.')
       .addButton('Телепорт по взгляду', () => {
         item.nameTag = `§r§a► Телепорт по взгляду`
         lore[0] = 'teleportToView'

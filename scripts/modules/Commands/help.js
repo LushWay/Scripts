@@ -1,9 +1,9 @@
 import { Player } from '@minecraft/server'
+import { ROLES, getRole } from 'lib.js'
 import { CmdLet } from 'lib/Command/Cmdlet.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { Command } from 'lib/Command/index.js'
 import { commandNoPermissions, commandNotFound } from 'lib/Command/utils.js'
-import { ROLES, getRole } from 'smapi.js'
 
 /**
  * @param {Player} player
@@ -79,7 +79,7 @@ help
     ctx.reply(`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
 
     for (const command of path) {
-      const q = '§f-'
+      const q = '§f.'
       const c = `${cv}§r ${q}${command.sys.meta.name} §o§7- ${
         command.sys.meta.description ? `${command.sys.meta.description}` : ' Пусто' //§r
       }`
@@ -98,7 +98,7 @@ function helpForCommand(ctx, commandName) {
   const cmd = Command.commands.find(e => e.sys.meta.name == commandName || e.sys.meta?.aliases?.includes(commandName))
 
   if (!cmd) return commandNotFound(ctx.sender, commandName)
-  if (!cmd.sys.meta?.requires(ctx.data.sender)) return commandNoPermissions(ctx.data.sender, cmd), 'fail'
+  if (!cmd.sys.meta?.requires(ctx.data.sender)) return commandNoPermissions(ctx.data.sender, cmd)
 
   const d = cmd.sys.meta
   const aliases = d.aliases?.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''

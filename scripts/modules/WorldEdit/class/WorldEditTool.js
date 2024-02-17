@@ -1,7 +1,7 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
+import { OverTakes, util } from 'lib.js'
 import { stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
-import { OverTakes, util } from 'smapi.js'
-import { WE_PLAYER_SETTINGS } from '../index.js'
+import { WE_PLAYER_SETTINGS } from '../settings.js'
 
 /**
  * @typedef {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} IntervalFunction
