@@ -1,4 +1,4 @@
-import { APIRequest } from 'lib/Class/Net.js'
+import { APIRequest } from 'lib/Net.js'
 import { ActionForm, ModalForm, util } from 'smapi.js'
 
 new Command({

@@ -1,7 +1,7 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { APIRequest } from 'lib/Class/Net.js'
 import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
+import { APIRequest } from 'lib/Net.js'
 import { OverTakes } from './OverTakes.js'
 
 OverTakes(Player, {

@@ -7,10 +7,10 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { Airdrop } from 'lib/Class/Airdrop.js'
-import { GAME_UTILS } from 'lib/Class/GameUtils.js'
-import { LootTable } from 'lib/Class/LootTable.js'
-import { Temporary } from 'lib/Class/Temporary.js'
+import { Airdrop } from 'lib/Airdrop.js'
+import { GAME_UTILS } from 'lib/GameUtils.js'
+import { LootTable } from 'lib/LootTable.js'
+import { Temporary } from 'lib/Temporary.js'
 import { util } from 'lib/util.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
 import { PlaceAction } from './Action.js'

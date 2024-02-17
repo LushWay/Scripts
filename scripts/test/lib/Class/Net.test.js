@@ -1,5 +1,5 @@
 import { Tags, registerAsync } from '@minecraft/server-gametest'
-import { APIRequest } from '../../../lib/Class/Net.js'
+import { APIRequest } from '../../../lib/Net.js'
 
 registerAsync('class', 'net', async test => {
   const res = await APIRequest('ping', '')

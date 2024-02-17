@@ -8,10 +8,10 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { GAME_UTILS } from 'lib/Class/GameUtils.js'
-import { EventSignal } from '../Class/EventSignal.js'
+import { GAME_UTILS } from 'lib/GameUtils.js'
+import { EventSignal } from '../EventSignal.js'
 import { Region } from './Class/Region.js'
-import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES } from './config.js'
+import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config.js'
 import './init.js'
 export * from './Class/CubeRegion.js'
 export * from './Class/RadiusRegion.js'

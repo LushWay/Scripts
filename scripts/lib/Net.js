@@ -1,5 +1,5 @@
 /**
- * @typedef {import("../../../../../tools/server/routes.js").NODE_ROUTES} NODE_ROUTES
+ * @typedef {import("../../../../tools/server/routes.js").NODE_ROUTES} NODE_ROUTES
  */
 
 import { util } from 'lib/util.js'

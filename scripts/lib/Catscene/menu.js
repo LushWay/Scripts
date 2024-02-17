@@ -1,7 +1,7 @@
 import { ItemStack, LocationInUnloadedChunkError, MolangVariableMap, Player, Vector } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { Catscene } from 'lib/Catscene/Catscene.js'
-import { Temporary } from 'lib/Class/Temporary.js'
+import { Temporary } from 'lib/Temporary.js'
 import { settingsGroup } from 'modules/Commands/settings.js'
 import { ActionForm, EditableLocation, is, util } from 'smapi.js'
 

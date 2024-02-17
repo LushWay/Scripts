@@ -1,5 +1,5 @@
 import { Entity, Player, system } from '@minecraft/server'
-import { GAME_UTILS } from 'lib/Class/GameUtils.js'
+import { GAME_UTILS } from 'lib/GameUtils.js'
 
 /**
  * @type {((player: Player) => string | false)[]}

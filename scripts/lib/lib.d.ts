@@ -123,7 +123,7 @@ declare global {
 declare module '@minecraft/server' {
   interface PlayerDatabase {
     role: Role
-    quest?: import('./Class/Quest').QuestDB
+    quest?: import('./Quest').QuestDB
   }
 
   type GameplayStatScoreName =

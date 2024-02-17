@@ -1,4 +1,4 @@
-import { EventLoader } from '../Class/EventSignal.js'
+import { EventLoader } from '../EventSignal.js'
 
 /**
  * Class because variable hoisting

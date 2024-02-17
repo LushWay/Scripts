@@ -30,7 +30,7 @@ export class LootTable {
   static onNew = new EventSignal()
   /**
    * Stored items
-   * @type {Array<import("../../modules/Server/server.js").LootItem.Stored>}
+   * @type {Array<import("../modules/Server/server.js").LootItem.Stored>}
    */
   items
 
@@ -45,7 +45,7 @@ export class LootTable {
    * @param {object} o
    * @param {string} o.key
    * @param {LootTableFillType} [o.fill]
-   * @param  {...import("../../modules/Server/server.js").LootItem.Input} items - Items to randomise
+   * @param  {...import("../modules/Server/server.js").LootItem.Input} items - Items to randomise
    */
   constructor({ key, fill = { type: 'airPercent', air: '50%' } }, ...items) {
     this.key = key

@@ -1,11 +1,11 @@
 import { ItemStack, Player, system } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { Cooldown } from 'lib/Class/Cooldown.js'
-import { EditableNpc } from 'lib/Class/EditableNpc.js'
-import { EventSignal } from 'lib/Class/EventSignal.js'
-import { GAME_UTILS } from 'lib/Class/GameUtils.js'
+import { Cooldown } from 'lib/Cooldown.js'
+import { EditableNpc } from 'lib/EditableNpc.js'
+import { EventSignal } from 'lib/EventSignal.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
+import { GAME_UTILS } from 'lib/GameUtils.js'
 import { EditableLocation, PlaceAction } from 'smapi.js'
 
 class Cost {

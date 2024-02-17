@@ -1,6 +1,6 @@
 import { ItemStack, Player, TicksPerSecond, Vector, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { MoneyCost, Store } from 'lib/Class/Store.js'
+import { MoneyCost, Store } from 'lib/Store.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { actionGuard } from 'lib/Region/index.js'
 import { loreWordWrap, util } from 'smapi.js'
@@ -108,7 +108,7 @@ export class Ovener {
   /**
    * Creates new Ovener npc store
    * @param {object} options - Options
-   * @param {Omit<import('lib/Class/EditableNpc.js').EditableNpcProps, 'onInteract'>} options.npc
+   * @param {Omit<import('lib/EditableNpc.js').EditableNpcProps, 'onInteract'>} options.npc
    * @param {string[]} options.furnaceTypeIds - Type ids of the furnace blocks
    * @param {boolean} options.onlyInStoneQuarry - Whenether to allow using this type of oven outside Stone quarry
    */

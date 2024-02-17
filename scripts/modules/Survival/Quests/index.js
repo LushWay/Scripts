@@ -1,5 +1,5 @@
 import { SOUNDS } from 'config.js'
-import { Quest } from 'lib/Class/Quest.js'
+import { Quest } from 'lib/Quest.js'
 import importModules from 'modules/importModules.js'
 import { ActionForm } from 'smapi.js'
 

@@ -1,7 +1,7 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { inaccurateSearch } from 'lib/Class/Search.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
+import { inaccurateSearch } from 'lib/Search.js'
 import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu.js'
 import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'smapi.js'

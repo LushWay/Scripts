@@ -1,5 +1,5 @@
 import { Player, Vector } from '@minecraft/server'
-import { LockAction, PlaceAction } from 'lib/Class/Action.js'
+import { LockAction, PlaceAction } from 'lib/Action.js'
 
 /**
  * @typedef {object} TeleportOptions
