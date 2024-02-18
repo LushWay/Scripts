@@ -30,6 +30,7 @@ import { PlaceAction } from './Action.js'
  */
 
 export class Quest {
+  static error = class QuestError extends Error {}
   /** @type {import("./Sidebar.js").SidebarLinePreinit} */
   static sidebar = {
     preinit(sidebar) {
@@ -352,7 +353,7 @@ class PlayerQuest {
 
     const inputedActivate = options.activate?.bind(options)
     options.activate = function (firstTime) {
-      if (!this.player) throw new Error('Wrong this!')
+      if (!this.player) throw new ReferenceError('Quest::this.player is undefined!')
       const data = this.player.database
       if (typeof data.quest?.additional === 'number') options.value = data.quest?.additional
 
@@ -473,7 +474,9 @@ class PlayerQuest {
           if (key in Airdrop.db) {
             airdrop = spawnAirdrop(key)
           } else {
-            this.player.info('Аирдроп не найден, переходим к следующему этапу...')
+            console.error(
+              new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.name}`)
+            )
             system.delay(() => this.next())
             return { cleanup() {} }
           }

@@ -304,11 +304,21 @@ export class InventoryStore {
   /** @private */
   requestSave() {
     if (this.saving) return
+    const { stack } = new Error()
 
     system.runTimeout(
       () => {
-        this.save()
-        this.saving = false
+        try {
+          this.save()
+          this.saving = false
+        } catch (error) {
+          console.error(
+            'Unable to save InventoryStore, error:',
+            error,
+            '\nSaving request by:',
+            util.error.stack.get(2, [], stack)
+          )
+        }
       },
       'inventorySave',
       20

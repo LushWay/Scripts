@@ -11,7 +11,7 @@ OverTakes(Player, {
     }
   },
   name(id) {
-    throw new ReferenceError('SM is not fully loaded!')
+    throw new Error('Cannot use Player.name before player database initialization!')
   },
 })
 
@@ -48,7 +48,7 @@ OverTakes(Player.prototype, {
   },
 
   fail: prefix('§4§l> §r§c', SOUNDS.fail),
-  warn: prefix('§l§e⚠ §6', SOUNDS.fail),
+  warn: prefix('§e⚠ §6', SOUNDS.fail),
   success: prefix('§a§l> §r', SOUNDS.success),
   info: prefix('§b§l> §r§3', SOUNDS.action),
 
@@ -93,7 +93,7 @@ OverTakes(Player.prototype, {
     const equippable = this.getComponent('equippable')
     if (!equippable) {
       APIRequest('reload', { status: 100 })
-      throw new TypeError(`Player '${this.name}' doesn't have equippable component (probably died).`)
+      throw new ReferenceError(`Player '${this.name}' doesn't have equippable component (probably died).`)
     }
     return equippable.getEquipmentSlot(EquipmentSlot.Mainhand)
   },
@@ -101,7 +101,8 @@ OverTakes(Player.prototype, {
 
 OverTakes(Entity.prototype, {
   get container() {
-    if (!this || !this.getComponent) throw new TypeError('Bound prototype object does not exists')
+    if (!this || !this.getComponent) throw new ReferenceError('Bound prototype object does not exists')
+    if (!super.isValid()) throw new ReferenceError('Entity is invalid')
     return this.getComponent('inventory')?.container
   },
 })

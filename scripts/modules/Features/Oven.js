@@ -13,6 +13,7 @@ class OvenKey {
      *   expires: number;
      *   code: string;
      *   lastPlayerId: string
+     *   warnedAboutExpire?: 1
      * }>}
      */
     type: {},
@@ -204,7 +205,9 @@ system.runInterval(
   () => {
     let players
     for (const [key, furnace] of Object.entries(OvenKey.db)) {
-      const untilExpire = Date.now() - furnace.expires
+      if (furnace.warnedAboutExpire) continue
+
+      const untilExpire = furnace.expires - Date.now()
       if (untilExpire < util.ms.from('min', 5)) {
         players ??= world.getAllPlayers()
         const player = players.find(e => e.id === furnace.lastPlayerId)
@@ -212,6 +215,7 @@ system.runInterval(
           player.warn(
             `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`
           )
+          furnace.warnedAboutExpire = 1
         }
       } else if (untilExpire < 0) {
         delete OvenKey.db[key]
