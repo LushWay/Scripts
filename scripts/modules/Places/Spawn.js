@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings } from 'lib.js'
+import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings, util } from 'lib.js'
 
 import { migration } from 'lib/Database/Migrations.js'
 import { isBuilding } from 'modules/Build/isBuilding'
@@ -75,7 +75,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         // Check settings
         if (!this.settings(player).teleportToSpawnOnJoin) return
 
-        this.portal?.teleport(player)
+        util.catch(() => this.portal?.teleport(player))
       })
 
       this.region = new SafeAreaRegion({

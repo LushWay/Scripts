@@ -26,7 +26,7 @@ function Timer(type, set, fn, name, ticks = 0) {
 
     const tookTicks = end() / 20
     if (tookTicks > ticks + 1) {
-      console.warn(`§6Slow ${type} (${tookTicks.toFixed(2)}/${ticks})§r\n${path}`)
+      console.warn(`§6Spike on ${type} §f${name}:§6 took §c${tookTicks.toFixed(2)}§f/${ticks}§6 ticks§r\n${path}`)
     }
   }, ticks)
 }

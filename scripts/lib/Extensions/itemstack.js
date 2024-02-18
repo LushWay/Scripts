@@ -37,15 +37,17 @@ OverTakes(ItemStack.prototype, {
     this.nameTag = '§r' + nameTag
     this.setLore(loreWordWrap(description))
 
-    return this
+    return this.clone()
   },
-  is(another) {
+  is(item) {
     try {
-      if (this.isStackable && this.isStackableWith(another)) return true
-      const anotherLore = another.getLore()
+      if (!item || !(item instanceof ItemStack)) return false
+      if (this.isStackable && this.isStackableWith(item)) return true
+
+      const anotherLore = item.getLore()
       return (
-        this.typeId === another.typeId &&
-        this.nameTag === another.nameTag &&
+        this.typeId === item.typeId &&
+        this.nameTag === item.nameTag &&
         this.getLore().every((a, i) => a === anotherLore[i])
       )
     } catch (error) {

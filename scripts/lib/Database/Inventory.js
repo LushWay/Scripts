@@ -3,7 +3,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
 import { DB, DatabaseError } from './Default.js'
 
-const TABLE_TYPE = 'inventory'
+const tableType = 'inventory'
 
 /**
  * @typedef {Exclude<keyof typeof EquipmentSlot, 'mainhand'>} Equipment
@@ -61,7 +61,7 @@ export class InventoryStore {
     if (!container) return
     if (clearAll) container.clearAll()
     for (const [i, item] of Object.entries(from.slots)) {
-      if (item && item instanceof ItemStack) container.setItem(Number(i), item)
+      if (item) container.setItem(Number(i), item)
     }
   }
 
@@ -74,15 +74,15 @@ export class InventoryStore {
    */
   static get(from) {
     const equipment = from.getComponent('equippable')
-    if (!equipment) throw new TypeError('Equippable component does not exists')
+    if (!equipment) throw new ReferenceError('Equippable component does not exists')
 
     const { container } = from
-    if (!container) throw new TypeError('Container does not exists')
+    if (!container) throw new ReferenceError('Container does not exists')
 
     const xp = from.getTotalXp()
 
     const healthComponent = from.getComponent('health')
-    if (!healthComponent) throw new TypeError('Health component does not exists')
+    if (!healthComponent) throw new ReferenceError('Health component does not exists')
 
     const health = healthComponent.currentValue
 
@@ -98,6 +98,7 @@ export class InventoryStore {
     return {
       xp,
       health,
+      slots,
       equipment: {
         Offhand: equipment.getEquipment(EquipmentSlot.Offhand),
         Head: equipment.getEquipment(EquipmentSlot.Head),
@@ -105,42 +106,42 @@ export class InventoryStore {
         Legs: equipment.getEquipment(EquipmentSlot.Legs),
         Feet: equipment.getEquipment(EquipmentSlot.Feet),
       },
-      slots: slots,
     }
   }
   _ = {
-    TABLE_TYPE,
-    TABLE_NAME: '',
+    tableType,
+    tableName: '',
     /**
      * List of all loaded entities
      * @type {Entity[]}
      */
-    ENTITIES: [],
+    entities: [],
     /**
      * List of all loaded stores
      * @type {Record<string, Inventory>}
      */
-    STORES: {},
+    inventories: {},
   }
   /**
    * Creates new inventory store manager
    * @param {string} tableName
    */
   constructor(tableName) {
-    this._.TABLE_NAME = tableName
+    this._.tableName = tableName
 
     // Init database only when entities are loaded
     SM.afterEvents.worldLoad.subscribe(() => this.init())
   }
+
   /** @private */
   init() {
-    const entities = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME)
-    if (!entities) throw new DatabaseError('Failed to get inventory entities in table ' + this._.TABLE_NAME)
-    this._.ENTITIES = entities
+    const entities = DB.getTableEntities(this._.tableType, this._.tableName)
+    if (!entities) throw new DatabaseError('Failed to get inventory entities in table ' + this._.tableName)
+    this._.entities = entities
 
     const items = []
 
-    for (const entity of this._.ENTITIES) {
+    for (const entity of this._.entities) {
       const { container } = entity
       if (!container) return
       for (const [, item] of container.entries()) {
@@ -173,7 +174,7 @@ export class InventoryStore {
         if (manifest) {
           // Saving previosly parsed inventory if exists
           if (owner) {
-            this._.STORES[owner] = store
+            this._.inventories[owner] = store
             store = {
               xp: 0,
               health: 20,
@@ -197,7 +198,7 @@ export class InventoryStore {
       }
 
       if (!slots) {
-        return util.error(new DatabaseError(`Failed to load InventoryStore(${this._.TABLE_NAME}): No manifest found!`))
+        return util.error(new DatabaseError(`Failed to load InventoryStore(${this._.tableName}): No manifest found!`))
       }
 
       const { type, index } = slots[step]
@@ -208,7 +209,7 @@ export class InventoryStore {
     }
 
     if (owner) {
-      this._.STORES[owner] = store
+      this._.inventories[owner] = store
     }
   }
   /** @private */
@@ -216,8 +217,8 @@ export class InventoryStore {
     /** @type {ItemStack[]} */
     const items = []
 
-    for (const owner in this._.STORES) {
-      const store = this._.STORES[owner]
+    for (const owner in this._.inventories) {
+      const store = this._.inventories[owner]
       const storeIndex = items.length
 
       /** @type {StoreManifest} */
@@ -251,7 +252,7 @@ export class InventoryStore {
     }
 
     const totalEntities = Math.ceil(items.length / DB.INVENTORY_SIZE)
-    const entities = DB.getTableEntities(this._.TABLE_TYPE, this._.TABLE_NAME)
+    const entities = DB.getTableEntities(this._.tableType, this._.tableName)
 
     if (!entities) throw new DatabaseError('Failed to get entities')
 
@@ -259,7 +260,7 @@ export class InventoryStore {
 
     if (entitiesToSpawn > 0) {
       for (let i = 0; i < entitiesToSpawn; i++) {
-        entities.push(DB.createTableEntity(this._.TABLE_TYPE, this._.TABLE_NAME, i))
+        entities.push(DB.createTableEntity(this._.tableType, this._.tableName, i))
       }
     } else if (entitiesToSpawn < 0) {
       // Check for unused entities and despawn them
@@ -281,7 +282,7 @@ export class InventoryStore {
       entity.setDynamicProperty('index', i)
     }
 
-    this._.ENTITIES = entities
+    this._.entities = entities
 
     DB.backup()
   }
@@ -290,7 +291,7 @@ export class InventoryStore {
    * @param {string} id
    */
   remove(id) {
-    delete this._.STORES[id]
+    delete this._.inventories[id]
 
     this.save()
   }
@@ -330,8 +331,8 @@ export class InventoryStore {
       else throw new DatabaseError('Not found inventory!')
     }
 
-    const store = this._.STORES[key]
-    if (remove) delete this._.STORES[key]
+    const store = this._.inventories[key]
+    if (remove) delete this._.inventories[key]
     return store
   }
   /**
@@ -346,9 +347,9 @@ export class InventoryStore {
    * @param {string} [options.key] - Key to associate inventory with
    */
   saveFrom(entity, { rewrite = false, keepInventory = false, key = entity.id } = {}) {
-    if (key in this._.STORES && !rewrite)
+    if (key in this._.inventories && !rewrite)
       throw new DatabaseError('Failed to rewrite entity store with disabled rewriting.')
-    this._.STORES[key] = InventoryStore.get(entity)
+    this._.inventories[key] = InventoryStore.get(entity)
     if (!keepInventory) entity.container?.clearAll()
 
     this.requestSave()
@@ -358,6 +359,6 @@ export class InventoryStore {
    * @param {string} key - Entity ID to check
    */
   has(key) {
-    return key in this._.STORES
+    return key in this._.inventories
   }
 }
