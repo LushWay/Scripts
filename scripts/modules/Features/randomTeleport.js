@@ -64,7 +64,7 @@ export function randomTeleport(
       }
     }
   } catch (e) {
-    util.error(e)
+    console.error('Random teleport location check failed, skipping', e)
   }
 
   target.teleport(

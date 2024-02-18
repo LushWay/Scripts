@@ -3,6 +3,7 @@ import { SOUNDS } from 'config.js'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'lib.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
 import { tpMenuOnce } from 'modules/Commands/tp.js'
+import { Spawn } from 'modules/Places/Spawn.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
 // TODO Not set anarchy pos when on spawn
@@ -45,7 +46,6 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         player => {
           if (isBuilding(player)) return tpMenuOnce(player)
 
-          // TODO Make sure all things works fine
           if (player.database.inv === this.inventoryName) {
             return player.fail('§cВы уже находитесь на анархии!')
           }
@@ -75,7 +75,8 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         }
       )
 
-      if (portalLocation.firstLoad)
+      // TODO Support proper rtp
+      if (portalLocation.firstLoad) {
         this.portal.command
           ?.literal({
             name: 'clearpos',
@@ -87,6 +88,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
             ctx.sender.playSound(SOUNDS.success)
             ctx.reply('§a> §fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.')
           })
+      }
     })
   }
 
@@ -107,6 +109,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
   /** @type {DefaultPlaceWithInventory['saveInventory']} */
   saveInventory(player) {
+    // Do not save location if on spawn
+    if (Spawn.region?.vectorInRegion(player.location)) return
+
     this.inventoryStore.saveFrom(player, {
       rewrite: true,
       keepInventory: false,
@@ -114,6 +119,10 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     player.database.survival.anarchy = Vector.floor(player.location)
   }
 }
+
+// TODO Newbie savemode
+// TODO Help players on kill
+// TODO Death stones with loot which can be looted only by player who dead
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Anarchy = new AnarchyBuilder()
