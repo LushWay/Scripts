@@ -10,9 +10,9 @@ import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { createPublicGiveItemCommand } from 'modules/Survival/createPublicGiveItemCommand.js'
 import { LEARNING_L } from './airdrop.js'
 
-// TODO! Ensure that no dupes happening
-// TODO Rewrite quest, include new steps
-// TODO Rewrite as a class
+// TODO Add even more steps,
+// TODO Write second quests for investigating other places
+// TODO Add catscenes
 
 export class Learning {
   static quest = new Quest({ displayName: 'Обучение', name: 'learning' }, q => {

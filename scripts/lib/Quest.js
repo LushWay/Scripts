@@ -192,6 +192,11 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
  * } & Omit<QuestStepInput, 'text' | 'description'> & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
  */
 
+// TODO Move quest info getting somewhere
+// TODO Test quest switching
+// TODO Support multiple quest at the same time
+// TODO Change quest status placement (also show steps/enters on the onScreenDisplay)
+
 class PlayerQuest {
   /**
    * @param {Quest} parent
