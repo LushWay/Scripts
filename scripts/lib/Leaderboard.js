@@ -1,52 +1,25 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
+import { CUSTOM_ENTITIES } from 'config.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { util } from 'lib/util.js'
 
 /**
  * @typedef {{
- *   style: keyof typeof STYLES;
+ *   style: keyof typeof Leaderboard.styles;
  *   objective: string;
  *   displayName: string
  *   location: Vector3;
  *   dimension: Dimensions
- * }} LB
+ * }} LeaderboardInfo
  */
 
-const LB_DB = new DynamicPropertyDB('leaderboard', {
-  /** @type {Record<string, LB>} */
-  type: {},
-}).proxy()
-
-const LEADERBOARD_TAG = 'LEADERBOARD'
-const LEADERBOARD_ID = 'f:t'
-const STYLES = {
-  gray: {
-    objName: '7',
-    fill1: '7',
-    fill2: 'f',
-    pos: '7',
-    nick: 'f',
-    score: '7',
-  },
-  white: {
-    objName: 'ф',
-    fill1: 'ф',
-    fill2: 'ф',
-    pos: 'ф',
-    nick: 'ф',
-    score: 'ф',
-  },
-  green: {
-    objName: 'a',
-    fill1: '2',
-    fill2: '3',
-    pos: 'a',
-    nick: 'f',
-    score: 'a',
-  },
-}
-
 export class Leaderboard {
+  static db = new DynamicPropertyDB('leaderboard', {
+    /** @type {Record<string, LeaderboardInfo>} */
+    type: {},
+  }).proxy()
+  static tag = 'LEADERBOARD'
+  static entityId = CUSTOM_ENTITIES.floatingText
   /**
    *
    * @param {string} scoreboardId
@@ -64,19 +37,44 @@ export class Leaderboard {
       return toMetricNumbers(score)
     } else return score
   }
-  static styles = STYLES
+  static styles = {
+    gray: {
+      objName: '7',
+      fill1: '7',
+      fill2: 'f',
+      pos: '7',
+      nick: 'f',
+      score: '7',
+    },
+    white: {
+      objName: 'ф',
+      fill1: 'ф',
+      fill2: 'ф',
+      pos: 'ф',
+      nick: 'ф',
+      score: 'ф',
+    },
+    green: {
+      objName: 'a',
+      fill1: '2',
+      fill2: '3',
+      pos: 'a',
+      nick: 'f',
+      score: 'a',
+    },
+  }
   /**
    * @type {Record<string, Leaderboard>}
    */
   static all = {}
   /**
    *
-   * @param {LB} data
+   * @param {LeaderboardInfo} data
    */
   static createLeaderboard({ objective, location, dimension = 'overworld', style = 'green', displayName = objective }) {
-    const entity = world.getDimension(dimension).spawnEntity(LEADERBOARD_ID, Vector.floor(location))
+    const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vector.floor(location))
     entity.nameTag = 'Updating...'
-    entity.addTag(LEADERBOARD_TAG)
+    entity.addTag(Leaderboard.tag)
 
     return new Leaderboard(entity, {
       style,
@@ -89,25 +87,25 @@ export class Leaderboard {
   /**
    * Creates manager of Leaderboard
    * @param {Entity} entity
-   * @param {LB} data
+   * @param {LeaderboardInfo} data
    */
   constructor(entity, data) {
     if (entity.id in Leaderboard.all) return Leaderboard.all[entity.id]
 
     /** @type {Entity} */
     this.entity = entity
-    /** @type {LB} */
+    /** @type {LeaderboardInfo} */
     this.data = data
     this.update()
     Leaderboard.all[entity.id] = this
   }
   remove() {
-    delete LB_DB[this.entity.id]
+    delete Leaderboard.db[this.entity.id]
     delete Leaderboard.all[this.entity.id]
     this.entity.remove()
   }
   update() {
-    LB_DB[this.entity.id] = this.data
+    Leaderboard.db[this.entity.id] = this.data
   }
 
   /** @type {ScoreboardObjective | undefined} */
@@ -127,7 +125,7 @@ export class Leaderboard {
     const scoreboard = this.scoreboard
     const dname = scoreboard.displayName
     const name = dname.charAt(0).toUpperCase() + dname.slice(1)
-    const style = STYLES[this.data.style] ?? STYLES.gray
+    const style = Leaderboard.styles[this.data.style] ?? Leaderboard.styles.gray
     const filler = `§${style.fill1}-§${style.fill2}-`.repeat(10)
 
     let leaderboard = ``
@@ -139,20 +137,20 @@ export class Leaderboard {
       const { pos: t, nick: n, score: s } = style
 
       const name =
-        Player.name(scoreInfo.participant?.displayName) ?? scoreInfo.participant?.displayName ?? 'Unknown scoreboard'
+        Player.name(scoreInfo.participant?.displayName) ?? scoreInfo.participant?.displayName ?? '§8<Unknown player>'
 
-      leaderboard += `§${t}#${i + 1}§r `
+      leaderboard += `§ы§${t}#${i + 1}§r `
       leaderboard += `§${n}${name}§r `
       leaderboard += `§${s}${Leaderboard.parseCustomScore(this.scoreboard.id, scoreInfo.score, true)}§r\n`
     }
 
-    this.entity.nameTag = `§l§${style.objName}${name}\n§l${filler}§r\n${leaderboard}`
+    this.entity.nameTag = `§ы§l§${style.objName}${name}\n§ы§l${filler}§r\n${leaderboard}`
   }
 }
 
 system.runInterval(
   () => {
-    for (const [id, leaderboard] of Object.entries(LB_DB)) {
+    for (const [id, leaderboard] of Object.entries(Leaderboard.db)) {
       const LB = Leaderboard.all[id]
 
       if (LB) {
@@ -162,8 +160,8 @@ system.runInterval(
         const entity = world[leaderboard.dimension]
           .getEntities({
             location: leaderboard.location,
-            tags: [LEADERBOARD_TAG],
-            type: LEADERBOARD_ID,
+            tags: [Leaderboard.tag],
+            type: Leaderboard.entityId,
           })
           .find(e => e.id === id)
 

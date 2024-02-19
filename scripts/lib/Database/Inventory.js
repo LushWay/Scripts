@@ -61,7 +61,12 @@ export class InventoryStore {
     if (!container) return
     if (clearAll) container.clearAll()
     for (const [i, item] of Object.entries(from.slots)) {
-      if (item) container.setItem(Number(i), item)
+      try {
+        if (item) container.setItem(Number(i), item)
+      } catch (e) {
+        to.fail('Не удалось загрузить инвентарь.')
+        util.error(e)
+      }
     }
   }
 
