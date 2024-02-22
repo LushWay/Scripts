@@ -189,7 +189,7 @@ Anarchy.learningRTP = player => {
       teleportCallback() {
         // player.success('Вы были перемещены на случайную локацию.')
       },
-      keepInSkyTime: 5,
+      keepInSkyTime: 20,
     }
   )
 }
