@@ -137,8 +137,10 @@ export class WorldEdit {
    * @param {Vector3} pos2 Position 2 of cuboid location
    * @param {Structure[]} history Save location where you want the to store your backup
    */
-  backup(name, pos1 = this.pos1, pos2 = this.pos2, history = this.history) {
-    history.push(new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, name))
+  async backup(name, pos1 = this.pos1, pos2 = this.pos2, history = this.history) {
+    const structrure = new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, name)
+    history.push(structrure)
+    await structrure.savePromise
   }
 
   /**
@@ -209,6 +211,7 @@ export class WorldEdit {
       if (!selection) return
 
       this.currentCopy = new Structure(WE_CONFIG.COPY_FILE_NAME + this.player.id, this.pos1, this.pos2)
+      await this.currentCopy.savePromise
       this.player.info(
         `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
           this.pos2,
@@ -260,9 +263,8 @@ export class WorldEdit {
 
       const { pastePos1, pastePos2 } = this.pastePositions(rotation, this.currentCopy)
 
-      this.backup('Вставка (paste)', pastePos1, pastePos2)
-
       try {
+        await this.backup('Вставка (paste)', pastePos1, pastePos2)
         await this.currentCopy.load(
           pastePos1,
           ` ${String(rotation).replace('NaN', '0')}_degrees ${mirror} ${includesEntites} ${includesBlocks} true ${

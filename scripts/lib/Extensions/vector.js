@@ -3,6 +3,7 @@ import { OverTakes } from './OverTakes.js'
 
 OverTakes(Vector, {
   string: (a, color) => (!color ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`),
+  dot: (a, b) => a.x * b.x + a.y * b.y + a.z * b.z,
   *foreach(a, b) {
     const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x]
     const [ymin, ymax] = a.y < b.y ? [a.y, b.y] : [b.y, a.y]

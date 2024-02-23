@@ -15,6 +15,7 @@ export const CUSTOM_ITEMS = {
   shovel: 'we:shovel',
   tool: 'we:tool',
   wand: 'we:wand',
+  compassPrefix: 'sm:compass',
 }
 
 export const CUSTOM_ENTITIES = {

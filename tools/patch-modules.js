@@ -35,6 +35,10 @@ patchPackage('@minecraft/server', {
      * @param color Whenether to color vector args or not
      */
     static string(a: Vector3, color?: boolean): string;
+    /**
+     * Returns dot product of two vectors
+     */
+    static dot(a: Vector3, b: Vector3): number;
     `,
     World: m`
     /**

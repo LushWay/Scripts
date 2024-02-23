@@ -12,6 +12,17 @@ export class EventSignal {
   /**
    * @template {EventSignal<any, any, any>} Signal
    * @param {Signal} signal
+   * @returns {Pick<Signal, 'subscribe' | 'unsubscribe'>}
+   */
+  static bound(signal) {
+    return {
+      subscribe: signal.subscribe.bind(signal),
+      unsubscribe: signal.unsubscribe.bind(signal),
+    }
+  }
+  /**
+   * @template {EventSignal<any, any, any>} Signal
+   * @param {Signal} signal
    * @returns {[Signal[CALLBACK_TYPE], number][]}
    */
   static sortSubscribers(signal) {

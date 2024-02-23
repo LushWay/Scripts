@@ -3,8 +3,9 @@ import { ItemStack, Player } from '@minecraft/server'
 /**
  * @param {string} name
  * @param {ItemStack} itemStack
+ * @param {ItemStack['is']} [is]
  */
-export function createPublicGiveItemCommand(name, itemStack) {
+export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.bind(itemStack)) {
   const itemNameTag = itemStack.nameTag?.split('\n')[0]
 
   /**
@@ -16,7 +17,7 @@ export function createPublicGiveItemCommand(name, itemStack) {
   function give(player, { mode = 'tell' } = {}) {
     const { container } = player
     if (!container) return
-    const items = container.entries().filter(([_, item]) => item && item.is(itemStack))
+    const items = container.entries().filter(([_, item]) => item && is(item))
 
     if (mode === 'tell') {
       if (items.length) {

@@ -63,7 +63,7 @@ export function WEmenu(player, body = '') {
         block?.setType(MinecraftBlockTypes.Chest)
         const container = block?.getComponent('inventory')?.container
 
-        for (const [i] of container?.entries() ?? []) {
+        for (const [i, slot] of container?.slotEntries() ?? []) {
           container?.setItem(i, nylium.clone())
         }
 

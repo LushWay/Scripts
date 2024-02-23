@@ -1,6 +1,6 @@
 import { ActionForm } from 'lib.js'
+import { Menu } from 'lib/Menu.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
-import { Menu } from 'modules/Server/menuItem.js'
 import { Anarchy } from '../Places/Anarchy.js'
 import { Spawn } from '../Places/Spawn.js'
 

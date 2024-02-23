@@ -126,21 +126,21 @@ export class Airdrop {
    * Shows particle trace under chest minecart
    * @param {Vector3} [from]
    */
-  async showParticleTrace(from) {
-    if (!from && this.chestMinecart && this.chestMinecart.isValid()) {
-      from = Vector.floor(this.chestMinecart.location)
+  async showParticleTrace(from, minecart = this.chestMinecart) {
+    if (!from && minecart && minecart.isValid()) {
+      from = minecart.location
     }
 
     if (from) {
       let { x, z } = from
-      x -= 0.4
-      z -= 0.3
+      x -= 0
+      z -= 0
 
       // eslint-disable-next-line for-direction
       for (let y = from.y; y > from.y - 10; y--) {
         try {
           world.overworld.spawnParticle('minecraft:balloon_gas_particle', { x, y, z })
-          await nextTick
+          await system.sleep(3)
         } catch (error) {
           if (error instanceof LocationInUnloadedChunkError || error instanceof LocationOutOfWorldBoundariesError)
             continue

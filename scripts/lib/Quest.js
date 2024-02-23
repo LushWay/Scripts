@@ -1,17 +1,8 @@
-import {
-  Entity,
-  LocationInUnloadedChunkError,
-  LocationOutOfWorldBoundariesError,
-  Player,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
+import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { Airdrop } from 'lib/Airdrop.js'
-import { GAME_UTILS } from 'lib/GameUtils.js'
 import { LootTable } from 'lib/LootTable.js'
+import { Compass } from 'lib/Menu.js'
 import { Temporary } from 'lib/Temporary.js'
-import { util } from 'lib/util.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
 import { PlaceAction } from './Action.js'
 
@@ -302,14 +293,12 @@ class PlayerQuest {
         }
 
         const { x, y, z } = Vector.lerp(from, to, 0.5)
-        const temp = this.quest.steps(this.player).createTargetMarkerInterval({ place: { x, y, z } })
+        const temp = this.quest.steps(this.player).createTargetCompassInterval({ place: { x, y, z } })
 
         return {
           cleanup() {
             temp.cleanup()
-            actions.forEach(e => {
-              PlaceAction.enters[e.id].delete(e.action)
-            })
+            actions.forEach(a => a.unsubscribe())
           },
         }
       },
@@ -395,8 +384,8 @@ class PlayerQuest {
    * @param {QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>} options
    */
   dialogue(options) {
-    const location = GAME_UTILS.safeGet(options.npcEntity, 'location')
-    if (!location) return this.failed('Неигровой персонаж недоступен')
+    if (!options.npcEntity.isValid()) return this.failed('Неигровой персонаж недоступен')
+    const location = options.npcEntity.location
 
     options.placeText ??= () => 'Доберитесь до ' + options.npcEntity.nameTag
 
@@ -502,18 +491,31 @@ class PlayerQuest {
               system.delay(() => this.next())
             }
           })
+
+          world.afterEvents.entityDie.subscribe(event => {
+            if (event.deadEntity.id !== airdrop.chestMinecart?.id) return
+
+            system.delay(() => this.next())
+          })
         })
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const qthis = this
-        this.quest.steps(this.player).createTargetMarkerInterval({
+        let i = 0
+        this.quest.steps(this.player).createTargetCompassInterval({
           place: Vector.floor(this.player.location),
           interval() {
             const airdropEntity = airdrop.chestMinecart
             if (!airdropEntity || !airdropEntity.isValid()) return
 
             this.place = Vector.floor(airdropEntity.location)
-            airdrop.showParticleTrace(this.place)
+
+            if (i === 1) {
+              i = 0
+              airdrop.showParticleTrace(this.place)
+            } else {
+              i++
+            }
 
             airdroppos = ` на\n§f${Vector.string(this.place, true)}`
             qthis.update()
@@ -554,14 +556,14 @@ class PlayerQuest {
    * @typedef {{
    *   place: Vector3
    *   temporary?: Temporary
-   *   interval?: VoidFunction & ThisParameterType<MarkerOptions>
-   * }} MarkerOptions
+   *   interval?: VoidFunction & ThisParameterType<CompassOptions>
+   * }} CompassOptions
    */
 
   /**
-   * @param {MarkerOptions} options
+   * @param {CompassOptions} options
    */
-  createTargetMarkerInterval(options) {
+  createTargetCompassInterval(options) {
     const temp = new Temporary(({ system }) => {
       system.runInterval(
         () => {
@@ -576,23 +578,8 @@ class PlayerQuest {
 
           options.interval?.()
 
-          const head = this.player.getHeadLocation()
-          const playerViewDirection = this.player.getViewDirection()
-          const targetPosition = Vector.add(options.place, {
-            x: 0.5,
-            y: 0.5,
-            z: 0.5,
-          })
-          const targetRelative = Vector.subtract(targetPosition, head)
-          const distance = Vector.distance(Vector.zero, targetRelative)
-          const relative = Vector.multiply(playerViewDirection, distance)
-
-          try {
-            this.player.dimension.spawnParticle('minecraft:balloon_gas_particle', Vector.add(head, relative))
-          } catch (e) {
-            if (e instanceof LocationOutOfWorldBoundariesError || e instanceof LocationInUnloadedChunkError) return
-            util.catch(e, 'Quest place marker particle')
-          }
+          // TODO Cleanup
+          Compass.setFor(this.player, options.place)
         },
         'Quest place marker particle',
         20

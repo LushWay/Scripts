@@ -1,4 +1,5 @@
-import { Player, Vector, system, world } from '@minecraft/server'
+import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
+import { EventSignal } from 'lib/EventSignal.js'
 import { actionGuard } from 'lib/Region/index.js'
 
 /**
@@ -11,6 +12,7 @@ import { actionGuard } from 'lib/Region/index.js'
 
 export class PlaceAction {
   /**
+   * @private
    * @param {Vector3} place
    * @param {Dimensions} dimension
    */
@@ -18,19 +20,27 @@ export class PlaceAction {
     return Vector.string(place) + dimension
   }
   /**
-   * @param {PlaceType} to
+   * @param {PlaceType} type
    * @param {Vector3} place
    * @param {PlayerCallback} action
    * @param {Dimensions} [dimension]
    */
-  static subscribe(to, place, action, dimension = 'overworld') {
+  static subscribe(type, place, action, dimension = 'overworld') {
     const id = this.placeId(place, dimension)
-    this[to][id] ??= new Set()
-    this[to][id].add(action)
+    this[type][id] ??= new Set()
+    this[type][id].add(action)
 
-    return { id, action }
+    return {
+      id,
+      action,
+      unsubscribe() {
+        PlaceAction[type][id].delete(action)
+        if (PlaceAction[type][id].size === 0) delete PlaceAction[type][id]
+      },
+    }
   }
   /**
+   * @private
    * @param {PlaceType} to
    * @param {Vector3} place
    * @param {Player} player
@@ -53,6 +63,7 @@ export class PlaceAction {
     return this.subscribe('enters', place, action, dimension)
   }
   /**
+   * @private
    * @type {Record<string, Set<PlayerCallback>>}
    */
   static enters = {}
@@ -68,6 +79,7 @@ export class PlaceAction {
   }
 
   /**
+   * @private
    * @type {Record<string, Set<PlayerCallback>>}
    */
   static interactions = {}
@@ -98,28 +110,17 @@ export class PlaceAction {
   constructor() {}
 }
 
-// @ts-expect-error Private not actually private
-PlaceAction.init()
-
 /**
  * @typedef {(player: Player) => boolean | {lockText: string}} LockActionChecker
  */
 
 export class LockAction {
-  /** @type {LockAction[]} */
-  static instances = []
-
   /**
-   * Creates new locker that can lock other actions
-   * @param {LockActionChecker} isLocked - Fn that checks if player is locked
-   * @param {string} lockText - Text that returns when player is locked
+   * List of all existing lock actions
+   * @private
+   * @type {LockAction[]}
    */
-  constructor(isLocked, lockText) {
-    this.isLocked = isLocked
-    this.lockText = lockText
-
-    LockAction.instances.push(this)
-  }
+  static instances = []
 
   /**
    * Checks if player is locked by any LockerAction and returns first lockText from it
@@ -144,4 +145,69 @@ export class LockAction {
 
     return false
   }
+
+  /**
+   * Creates new locker that can lock other actions
+   * @param {LockActionChecker} isLocked - Fn that checks if player is locked
+   * @param {string} lockText - Text that returns when player is locked
+   */
+  constructor(isLocked, lockText) {
+    this.isLocked = isLocked
+    this.lockText = lockText
+
+    LockAction.instances.push(this)
+  }
+}
+
+export class InventoryIntervalAction {
+  /**
+   * @private
+   * @type {EventSignal<{ player: Player, slot: ContainerSlot, i: number }>}
+   */
+  static signal = new EventSignal()
+
+  static subscribe = EventSignal.bound(this.signal).subscribe
+  static unsubscribe = EventSignal.bound(this.signal).subscribe
+
+  /** @private */
+  static init() {
+    system.runPlayerInterval(
+      player => {
+        const { container } = player
+        if (!container) return
+
+        for (const [i, slot] of container.slotEntries()) {
+          EventSignal.emit(this.signal, { player, slot, i })
+        }
+      },
+      'InventoryIntervalAction',
+      1
+    )
+  }
+}
+
+export class MainhandIntervalAction {
+  /**
+   * @private
+   * @type {EventSignal<{ player: Player, slot: ContainerSlot }>}
+   */
+  static signal = new EventSignal()
+
+  static subscribe = EventSignal.bound(this.signal).subscribe
+  static unsubscribe = EventSignal.bound(this.signal).subscribe
+
+  /** @private */
+  static init() {
+    InventoryIntervalAction.subscribe(({ player, i, slot }) => {
+      if (i === player.selectedSlot) EventSignal.emit(this.signal, { player, slot })
+    })
+  }
+}
+
+const toInitialize = [PlaceAction, InventoryIntervalAction, MainhandIntervalAction]
+
+for (const cls of toInitialize) {
+  // @ts-expect-error Since static init blocks are not supported
+  // we're using private init method
+  cls.init()
 }

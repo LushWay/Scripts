@@ -1,0 +1,25 @@
+{
+  "format_version": "1.18.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "sm:compass26"
+    },
+    "components": {
+      "minecraft:max_stack_size": 1,
+      "minecraft:foil": true,
+      "minecraft:icon": {
+        "texture": "compass26"
+      },
+      "minecraft:display_name": {
+        "value": "Трекер"
+      },
+      "minecraft:cooldown": {
+        "duration": 0.5,
+        "category": "sm:compass"
+      },
+      "minecraft:creative_category": {
+        "category": "commands"
+      }
+    }
+  }
+}

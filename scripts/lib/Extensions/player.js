@@ -35,6 +35,9 @@ export const CLOSING_CHAT = new Set()
 export const SCREEN_DISPLAY = Symbol('screen_display')
 
 OverTakes(Player.prototype, {
+  isSimulated() {
+    return 'jump' in this
+  },
   // @ts-expect-error Проброс
   get [SCREEN_DISPLAY]() {
     return super.onScreenDisplay
@@ -113,6 +116,15 @@ OverTakes(Container.prototype, {
     const items = []
     for (let i = 0; i < this.size; i++) {
       items.push([i, this.getItem(i)])
+    }
+    return items
+  },
+
+  slotEntries() {
+    /** @type {ReturnType<Container['slotEntries']>} */
+    const items = []
+    for (let i = 0; i < this.size; i++) {
+      items.push([i, this.getSlot(i)])
     }
     return items
   },

@@ -3,8 +3,8 @@ import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
 import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings, util } from 'lib.js'
 
 import { migration } from 'lib/Database/Migrations.js'
+import { Menu } from 'lib/Menu.js'
 import { isBuilding } from 'modules/Build/isBuilding'
-import { Menu } from 'modules/Server/menuItem.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
 migration('move player inv', () => {

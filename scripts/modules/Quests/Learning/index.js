@@ -2,6 +2,7 @@ import { ItemStack, Vector, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { EditableLocation, Quest, SafeAreaRegion, Temporary } from 'lib.js'
+import { Menu } from 'lib/Menu.js'
 import { Axe } from 'modules/Features/axe.js'
 import { randomTeleport } from 'modules/Features/randomTeleport.js'
 import { Anarchy } from 'modules/Places/Anarchy.js'
@@ -42,6 +43,7 @@ export class Learning {
           // in spawn inventory that will be replaced with
           // anarchy
           system.delay(() => {
+            Menu.give?.(this.player, { mode: 'ensure' })
             Learning.startAxeGiveCommand?.ensure(this.player)
           })
         }
@@ -88,14 +90,21 @@ export class Learning {
 
     q.airdrop({
       lootTable: LEARNING_L,
+      abovePlayerY: 20,
     })
 
-    q.place(
-      Vector.add(Learning.craftingTableLocation, { x: 10, y: 10, z: 10 }),
-      Vector.add(Learning.craftingTableLocation, { x: -10, y: -10, z: -10 }),
-      '§6Доберитесь до верстака на\n' + Vector.string(Learning.craftingTableLocation, true),
-      'Нужно же где-то скрафтить кирку, верно?'
-    )
+    /** @param {string} text */
+    const craftingTable = text =>
+      Learning.craftingTableLocation.valid &&
+      q.place(
+        Vector.add(Learning.craftingTableLocation, { x: 10, y: 10, z: 10 }),
+        Vector.add(Learning.craftingTableLocation, { x: -10, y: -10, z: -10 }),
+        '§6Доберитесь до верстака на\n' + Vector.string(Learning.craftingTableLocation, true),
+        text
+      )
+
+    // TODO Bugfixes
+    craftingTable('Нужно же где-то скрафтить кирку, верно?')
 
     q.dynamic({
       text: () => '§6Скрафтите деревянную кирку',
@@ -138,8 +147,35 @@ export class Learning {
       },
     })
 
+    craftingTable('Скрафтите каменную кирку.')
+
+    q.counter({
+      end: 5,
+      text(i) {
+        return `§6Накопайте §f${i}/${this.end}§6 железа`
+      },
+      description: () => 'Отправляйтесь в шахту и накопайте железа!',
+      activate() {
+        return new Temporary(({ world }) => {
+          world.afterEvents.playerBreakBlock.subscribe(event => {
+            if (event.player.id !== this.player.id) return
+            if (
+              event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.IronOre &&
+              event.brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
+            )
+              return
+
+            this.player.playSound(SOUNDS.action)
+            this.diff(1)
+          })
+        })
+      },
+    })
+
     q.end(function () {
-      this.player.success('§6Обучение закончено!')
+      this.player.success(
+        '§6Обучение закончено!\nВы можете пойти в каменоломню чтобы переплавить железо или продолжить добывавать новые ресурсы в шахте.'
+      )
     })
   })
   static lootTable = LEARNING_L

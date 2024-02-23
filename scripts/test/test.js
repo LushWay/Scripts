@@ -1,10 +1,11 @@
 import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
-import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
+import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { Airdrop, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
+import { Compass } from 'lib/Menu.js'
 import { BASE_ITEM_STACK } from 'modules/Features/base.js'
 import { APIRequest } from '../lib/Net.js'
 import { Mineshaft } from '../modules/Places/Mineshaft.js'
@@ -16,6 +17,37 @@ import './simulatedPlayer.js'
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  compass(ctx) {
+    const [entity] = ctx.sender.dimension.getEntities({ type: MinecraftEntityTypes.Cow, closest: 1 })
+    if (!entity) return ctx.error('No entity!')
+    ctx.sender.teleport(entity.location)
+
+    system.runInterval(
+      () => {
+        Compass.setFor(ctx.sender, entity.location)
+      },
+      'compass',
+      2
+    )
+  },
+  chest(ctx) {
+    util.catch(() => {
+      system.runInterval(
+        () => {
+          const minecarts = ctx.sender.dimension.getEntities({
+            type: MinecraftEntityTypes.ChestMinecart,
+            maxDistance: 20,
+            location: ctx.sender.location,
+          })
+          for (const minecart of minecarts) {
+            Airdrop.prototype.showParticleTrace(minecart.location, minecart)
+          }
+        },
+        'minecart test',
+        40
+      )
+    })
+  },
   airdrop(ctx) {
     if (ctx.args[1]) ctx.reply('Аирдроп для')
     const airdrop = new Airdrop({
@@ -215,9 +247,9 @@ const c = new Command({
   role: 'techAdmin',
 })
 
-c.string('number', true).executes(async (ctx, n) => {
+c.string('id', true).executes(async (ctx, id) => {
   const keys = Object.keys(tests)
-  const i = n && keys.includes(n) ? n : 0
-  ctx.reply(i)
-  util.catch(() => tests[i](ctx), 'Test')
+  if (!keys.includes(id)) return ctx.error('Unknown test ' + id)
+  ctx.reply('Test ' + id)
+  util.catch(() => tests[id](ctx), 'Test')
 })

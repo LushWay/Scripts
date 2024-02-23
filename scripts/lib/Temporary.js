@@ -39,9 +39,12 @@ export class Temporary {
              * @param  {...object} args
              */
             subscribe(fn, ...args) {
-              // console.log('Handled eventSignal', p)
-              // @ts-expect-error We checked it above
-              temp.cleaner.push(() => value.unsubscribe(fn))
+              console.log('Handled eventSignal', p)
+              temp.cleaner.push(() => {
+                console.log('§6Unsubscribe')
+                // @ts-expect-error We checked it above
+                value.unsubscribe(fn)
+              })
               // @ts-expect-error We checked it above
               value.subscribe(fn, ...args)
             },

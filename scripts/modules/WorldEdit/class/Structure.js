@@ -1,8 +1,6 @@
-import { Vector, world } from '@minecraft/server'
+import { Vector, system, world } from '@minecraft/server'
 import { WE_CONFIG } from '../config.js'
 import { Cuboid } from './Cuboid.js'
-
-// TODO Loading using tickingareas
 
 export class Structure extends Cuboid {
   /**
@@ -27,98 +25,109 @@ export class Structure extends Cuboid {
     this.name = name
     this.prefix = `${prefix}|${this.id}`
 
-    this.save()
+    this.savePromise = this.save()
   }
 
-  save() {
+  async save() {
     this.structures = []
     const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
+    console.debug({ cubes: cubes.map(e => Vector.string(Vector.subtract(e.max, e.min)), true) })
 
-    let errors = 0
-    let all = 0
+    const options = { errors: 0, total: 0 }
+
     for (const [i, cube] of cubes.entries()) {
       const name = `${this.prefix}|${i}`
       const pos1 = cube.pos1
       const pos2 = cube.pos2
-      const command = `structure save "${name}" ${Vector.string(pos1)} ${Vector.string(pos2)} false memory true`
-      const result = world.overworld.runCommand(command, { showError: true })
-      all++
+      const result = await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
+        `structure save "${name}" ${Vector.string(pos1)} ${Vector.string(pos2)} false memory true`,
+        pos1,
+        pos2,
+        options
+      )
+
       if (result > 0) {
         this.structures.push({
           name,
           pos1,
           pos2,
         })
-      } else {
-        errors++
-
-        /*
-        world.say(
-          "§c► §fЧанки будут подгружены с помощью игрока"
-        );
-        world.overworld.runCommandAsync(`tickingarea remove safezone`);
-        world.overworld.runCommandAsync(
-          `tickingarea add ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} safezone`
-        );
-        setTickTimeout(() => {
-            world.overworld.runCommandAsync(
-            `structure save ${name} ${pos1.x} ${pos1.y} ${pos1.z} ${pos2.x} ${pos2.y} ${pos2.z} memory`
-          )
-          this.files.push({
-            name: name,
-            pos1: pos1,
-            pos2: pos2,
-          });
-          world.say("§9► §fСохранено.");
-        }, 80);
-        */
       }
     }
-    if (errors > 0)
+
+    console.debug(options.total, this.structures.length)
+
+    if (options.errors > 0)
       throw new Error(
-        `§c${errors}§f/${all}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+        `§c${options.errors}§f/${options.total}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
       )
   }
 
   async load(pos = this.min, additional = '') {
-    let errors = 0
-    let all = 0
+    const options = { errors: 0, total: 0 }
+
     for (const file of this.structures) {
       let to
+      let from
+
       if (pos === this.min) {
         to = file.pos1
+        from = file.pos2
       } else {
-        // TODO Fix
         const offset = Vector.subtract(this.min, file.pos1)
         to = Vector.add(pos, offset)
+        from = Vector.add(pos, Vector.subtract(this.min, file.pos2))
       }
 
-      const result = world.overworld.runCommand(`structure load "${file.name}" ${Vector.string(to)}${additional}`, {
-        showError: true,
-      })
-      all++
-      if (result === 0) {
-        errors++
-        // world.say("§c► §fЧанки будут подгружены с помощью области");
-        // world.overworld.runCommand(`tickingarea remove safezone`);
-        // world.overworld.runCommand(
-        // 	`tickingarea add ${file.pos1.x} ${file.pos1.y} ${file.pos1.z} ${file.pos2.x} ${file.pos2.y} ${file.pos2.z} safezone`
-        // );
-        // setTickTimeout(
-        // 	() => {
-        // 		world.say("§9►");
-        // 		world.overworld.runCommand(`structure load ${file.name} ${file.pos1.x} ${file.pos1.y} ${file.pos1.z}`);
-        // 		world.say("§9► §fЗагружено.");
-        // 	},
-        // 	40,
-        // 	"structureLoad"
-        // );
-      }
+      await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
+        `structure load "${file.name}" ${Vector.string(to)}${additional}`,
+        from,
+        to,
+        options,
+        false
+      )
+
       await nextTick
     }
-    if (errors > 0)
+
+    if (options.errors > 0)
       throw new Error(
-        `§c${errors}§f/${all}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+        `§c${options.errors}§f/${options.total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
       )
   }
+}
+
+/**
+ * @param {string} command
+ * @param {Vector3} vector1
+ * @param {Vector3} vector2
+ * @param {{errors: number, total: number}} options
+ */
+async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, second = true) {
+  const result = world.overworld.runCommand(command)
+  console.debug(command, result)
+  options.total++
+
+  if (!result) {
+    world.say('Область будет прогружена с помощью тикингареи (' + options.total + ')')
+
+    // world.overworld.runCommand(`tickingarea remove safezone`)
+    // await nextTick
+
+    world.getAllPlayers()[0].teleport(Vector.divide(Vector.add(vector1, vector2), 2))
+
+    // world.overworld.runCommand(`tickingarea add ${Vector.string(vector1)} ${Vector.string(vector2)} safezone`)
+    await system.sleep(60)
+
+    if (second) {
+      const result = world.overworld.runCommand(command)
+
+      if (!result) world.say('§cFFFFFFFFF' + options.total)
+      if (!result) {
+        options.errors++
+        return 0
+      }
+    } else return 1
+  }
+  return 1
 }
