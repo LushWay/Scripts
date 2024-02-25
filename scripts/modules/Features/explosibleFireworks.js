@@ -38,13 +38,12 @@ system.runInterval(
     }
 
     for (const [id, { source, firework }] of Object.entries(FIREWORKS)) {
-      const location = GAME_UTILS.safeGet(firework, 'location')
-      if (!location) {
-        console.debug({ location })
+      if (!firework.isValid()) {
         delete FIREWORKS[id]
         continue
       }
 
+      const location = firework.location
       const block = firework.dimension.getBlock(Vector.add(location, Vector.multiply(firework.getViewDirection(), 1.2)))
 
       if (block && !block.isAir) {

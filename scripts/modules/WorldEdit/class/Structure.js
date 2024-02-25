@@ -31,7 +31,7 @@ export class Structure extends Cuboid {
   async save() {
     this.structures = []
     const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
-    console.debug({ cubes: cubes.map(e => Vector.string(Vector.subtract(e.max, e.min)), true) })
+    // console.debug({ cubes: cubes.map(e => Vector.string(Vector.subtract(e.max, e.min)), true) })
 
     const options = { errors: 0, total: 0 }
 
@@ -55,7 +55,7 @@ export class Structure extends Cuboid {
       }
     }
 
-    console.debug(options.total, this.structures.length)
+    // console.debug(options.total, this.structures.length)
 
     if (options.errors > 0)
       throw new Error(
@@ -105,7 +105,7 @@ export class Structure extends Cuboid {
  */
 async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, second = true) {
   const result = world.overworld.runCommand(command)
-  console.debug(command, result)
+  // console.debug(command, result)
   options.total++
 
   if (!result) {
