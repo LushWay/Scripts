@@ -185,25 +185,18 @@ function changeValue(form, value) {
  */
 export function stringifyBenchmarkReult({ type = 'test', timerPathes = false } = {}) {
   let output = ''
-  let res = []
-  for (const [key, val] of Object.entries(util.benchmark.results[type])) {
-    const totalCount = val.length
-    const totalTime = val.reduce((p, c) => p + c)
-    const average = totalTime / totalCount
+  let res = Object.entries(util.benchmark.results[type])
 
-    res.push({ key, totalCount, totalTime, average })
-  }
+  res = res.sort((a, b) => a[1] - b[1])
 
-  res = res.sort((a, b) => a.average - b.average)
-
-  for (const { key, totalCount, totalTime, average } of res) {
+  for (const [key, average] of res) {
     const color = colors.find(e => e[0] > average)?.[1] ?? '§4'
     const isPath = timerPathes && key in TIMERS_PATHES
 
     output += `§3Label §f${key}§r\n`
     output += `§3| §7average: ${color}${average.toFixed(2)}ms\n`
-    output += `§3| §7total time: §f${totalTime}ms\n`
-    output += `§3| §7call count: §f${totalCount}\n`
+    // output += `§3| §7total time: §f${totalTime}ms\n`
+    // output += `§3| §7call count: §f${totalCount}\n`
     if (isPath) output += `§3| §7path: §f${getPath(key)}\n`
     output += '\n\n'
   }

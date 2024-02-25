@@ -409,13 +409,15 @@ export const util = {
 
       return function end(string) {
         const tookTime = Date.now() - startTime
-        ;((util.benchmark.results[type] ??= {})[label] ??= []).push(tookTime)
+        const typeresults = (util.benchmark.results[type] ??= {})
+        typeresults[label] ??= 0
+        typeresults[label] = (typeresults[label] + tookTime) / 2
         if (string) console.debug(`${string}§r §6+${tookTime}ms`)
         return tookTime
       }
     },
     {
-      /** @type {Record<string, Record<string, number[]>>} */
+      /** @type {Record<string, Record<string, number>>} */
       results: {},
     }
   ),
