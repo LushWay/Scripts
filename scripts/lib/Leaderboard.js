@@ -171,7 +171,7 @@ system.runInterval(
     }
   },
   'leaderboardsInterval',
-  10
+  40
 )
 
 /**

@@ -1,5 +1,4 @@
 import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
-import { util } from 'lib.js'
 import { EventSignal } from 'lib/EventSignal.js'
 import { actionGuard } from 'lib/Region/index.js'
 
@@ -174,24 +173,20 @@ export class InventoryIntervalAction {
   static init() {
     system.runPlayerInterval(
       player => {
-        util.catch(async () => {
-          if (!player.isValid()) return
+        if (!player.isValid()) return
 
-          const { container } = player
-          if (!container) return
+        const { container } = player
+        if (!container) return
 
-          const selectedSlot = player.selectedSlot
+        const selectedSlot = player.selectedSlot
 
-          for (const [i, slot] of container.slotEntries()) {
-            if (i === selectedSlot) EventSignal.emit(MainhandIntervalAction.signal, { player, slot })
-            EventSignal.emit(this.signal, { player, slot, i })
-          }
-
-          await nextTick
-        })
+        for (const [i, slot] of container.slotEntries()) {
+          if (i === selectedSlot) EventSignal.emit(MainhandIntervalAction.signal, { player, slot })
+          EventSignal.emit(this.signal, { player, slot, i })
+        }
       },
       'InventoryIntervalAction',
-      10
+      15
     )
   }
 }
