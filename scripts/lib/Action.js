@@ -1,4 +1,5 @@
 import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
+import { util } from 'lib.js'
 import { EventSignal } from 'lib/EventSignal.js'
 import { actionGuard } from 'lib/Region/index.js'
 
@@ -167,18 +168,27 @@ export class InventoryIntervalAction {
   static signal = new EventSignal()
 
   static subscribe = EventSignal.bound(this.signal).subscribe
-  static unsubscribe = EventSignal.bound(this.signal).subscribe
+  static unsubscribe = EventSignal.bound(this.signal).unsubscribe
 
   /** @private */
   static init() {
     system.runPlayerInterval(
       player => {
-        const { container } = player
-        if (!container) return
+        util.catch(async () => {
+          if (!player.isValid()) return
 
-        for (const [i, slot] of container.slotEntries()) {
-          EventSignal.emit(this.signal, { player, slot, i })
-        }
+          const { container } = player
+          if (!container) return
+
+          const selectedSlot = player.selectedSlot
+
+          for (const [i, slot] of container.slotEntries()) {
+            if (i === selectedSlot) EventSignal.emit(MainhandIntervalAction.signal, { player, slot })
+            EventSignal.emit(this.signal, { player, slot, i })
+          }
+
+          await nextTick
+        })
       },
       'InventoryIntervalAction',
       1
@@ -188,23 +198,15 @@ export class InventoryIntervalAction {
 
 export class MainhandIntervalAction {
   /**
-   * @private
    * @type {EventSignal<{ player: Player, slot: ContainerSlot }>}
    */
   static signal = new EventSignal()
 
   static subscribe = EventSignal.bound(this.signal).subscribe
   static unsubscribe = EventSignal.bound(this.signal).subscribe
-
-  /** @private */
-  static init() {
-    InventoryIntervalAction.subscribe(({ player, i, slot }) => {
-      if (i === player.selectedSlot) EventSignal.emit(this.signal, { player, slot })
-    })
-  }
 }
 
-const toInitialize = [PlaceAction, InventoryIntervalAction, MainhandIntervalAction]
+const toInitialize = [PlaceAction, InventoryIntervalAction]
 
 for (const cls of toInitialize) {
   // @ts-expect-error Since static init blocks are not supported

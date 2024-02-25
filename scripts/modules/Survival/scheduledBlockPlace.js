@@ -37,7 +37,7 @@ export function scheduleBlockPlace({ dimension, restoreTime, ...options }) {
 
 system.runInterval(
   () => {
-    for (const [dimension, schedules] of Object.entriesStringKeys(SHEDULED_DB)) {
+    for (const schedules of Object.values(SHEDULED_DB)) {
       if (!Array.isArray(schedules)) continue
 
       for (const [i, schedule] of schedules.entries()) {
@@ -54,15 +54,17 @@ system.runInterval(
 
         try {
           const block = world.overworld.getBlock(schedule.location)
+          if (!block?.isValid()) continue
 
           block?.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
-          // console.debug('Placed', schedule.typeId, schedule.location)
+          // console.debug('schedule place', schedule.typeId, schedule.location)
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) continue
           util.error(e)
         }
 
-        SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
+        // Remove successfully placed block from the schedule array
+        schedules.splice(i, 1)
       }
     }
   },

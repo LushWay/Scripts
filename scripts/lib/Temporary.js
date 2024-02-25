@@ -91,36 +91,42 @@ export class Temporary {
 
   /**
    * Creates new temporary system
-   * @param {(arg: ProxiedSubscribers) => void} execute
+   * @param {(arg: ProxiedSubscribers) => void | { cleanup(): void }} execute
    * @param {Temporary} [parent]
    */
   constructor(execute, parent) {
+    /** @type {Temporary} */
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let target = this
+
     if (parent) {
-      execute(parent.proxied)
-      return parent
+      target = parent
+    } else {
+      /** @type {ProxiedSubscribers} */
+      this.proxied = {
+        world: Object.setPrototypeOf(
+          {
+            afterEvents: this.proxyEvents(world.afterEvents),
+            beforeEvents: this.proxyEvents(world.beforeEvents),
+          },
+          world
+        ),
+        system: Object.setPrototypeOf(
+          {
+            afterEvents: this.proxyEvents(system.afterEvents),
+            beforeEvents: this.proxyEvents(system.beforeEvents),
+          },
+          this.proxySystem()
+        ),
+        cleanup: this.cleanup,
+        temp: this,
+      }
     }
 
-    /** @type {ProxiedSubscribers} */
-    this.proxied = {
-      world: Object.setPrototypeOf(
-        {
-          afterEvents: this.proxyEvents(world.afterEvents),
-          beforeEvents: this.proxyEvents(world.beforeEvents),
-        },
-        world
-      ),
-      system: Object.setPrototypeOf(
-        {
-          afterEvents: this.proxyEvents(system.afterEvents),
-          beforeEvents: this.proxyEvents(system.beforeEvents),
-        },
-        this.proxySystem()
-      ),
-      cleanup: this.cleanup,
-      temp: this,
-    }
+    const result = execute(target.proxied)
+    if (result) target.cleaner.push(result.cleanup)
 
-    execute(this.proxied)
+    return target
   }
 
   /**

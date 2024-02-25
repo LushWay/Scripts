@@ -2,7 +2,7 @@ import { ItemStack, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus, util } from 'lib.js'
 import { actionGuard } from 'lib/Region/index.js'
-import { baseMenu } from 'modules/Features/baseMenu.js'
+import { openBaseMenu } from 'modules/Features/baseMenu.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
@@ -89,12 +89,7 @@ const base = new Command({
   description: 'Меню базы',
 })
 base.executes(ctx => {
-  if (LockAction.locked(ctx.sender)) return
-  const base = Region.regionInstancesOf(BaseRegion).find(r => r.regionMember(ctx.sender))
-
-  if (!base) return ctx.reply('§cУ вас нет базы! Вступите в существующую или создайте свою.')
-
-  baseMenu(ctx.sender, base)
+  openBaseMenu(ctx.sender)
 })
 
 system.runInterval(

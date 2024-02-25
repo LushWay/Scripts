@@ -1,10 +1,20 @@
-import { Entity, Player, Vector, system, world } from '@minecraft/server'
+import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
+import { SOUNDS } from 'config.js'
 import { Airdrop } from 'lib/Airdrop.js'
 import { LootTable } from 'lib/LootTable.js'
 import { Compass } from 'lib/Menu.js'
+import { Settings } from 'lib/Settings.js'
 import { Temporary } from 'lib/Temporary.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
-import { PlaceAction } from './Action.js'
+import { InventoryIntervalAction, PlaceAction } from './Action.js'
+
+const playerSettings = Settings.player('quest', 'Квесты', {
+  messageForEachStep: {
+    value: true,
+    name: 'Сообщение в чат при каждом шаге',
+    desc: 'Отправлять ли сообщение в чат при каждом новом шаге квеста',
+  },
+})
 
 // // @ts-expect-error Bruh
 // Set.prototype.toJSON = function () {
@@ -13,10 +23,12 @@ import { PlaceAction } from './Action.js'
 
 /**
  * @typedef {{
- * 	active: string,
- * 	completed?: string[],
- * 	step?: number,
- * 	additional?: unknown
+ * 	active: {
+ *    id: string
+ * 	  step: number,
+ * 	  db?: unknown
+ *  }[],
+ * 	completed: string[]
  * }} QuestDB
  */
 
@@ -34,7 +46,7 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return `§6Квест: §f${status.quest.displayName}\n${status.step?.text()}\n§6Подробнее: §f.q`
+        return `§7Квест: §f${status.quest.name}\n${status.step?.text()}\n§7Подробнее: §f.q`
       }
     },
   }
@@ -45,9 +57,48 @@ export class Quest {
   static instances = {}
 
   /**
+   * @param {Player} player
+   * @param {Quest} [quest]
+   */
+  static active(player, quest) {
+    const db = player.database
+    const dbquest = quest ? db.quests?.active.find(q => q.id === quest?.id) : db.quests?.active[0]
+    if (!dbquest) return false
+
+    quest ??= Quest.instances[dbquest.id]
+    if (!quest) return false
+
+    return {
+      quest,
+      stepIndex: dbquest.step,
+      step: quest.steps(player).list[dbquest.step],
+    }
+  }
+
+  /**
    * @type {Record<string, PlayerQuest>}
    */
   players = {}
+
+  /**
+   * @param {object} options
+   * @param {string} options.name
+   * @param {string} options.id
+   * @param {string} options.desc
+   * @param {(q: PlayerQuest, p: Player) => void} init
+   */
+  constructor({ id, name, desc }, init) {
+    this.id = id
+    this.name = name
+    this.init = init
+    this.description = desc
+    Quest.instances[this.id] = this
+    SM.afterEvents.worldLoad.subscribe(() => {
+      system.delay(() => {
+        world.getAllPlayers().forEach(setQuests)
+      })
+    })
+  }
 
   /**
    * @param {Player} player
@@ -64,86 +115,90 @@ export class Quest {
   }
 
   /**
-   * @param {object} options
-   * @param {string} options.displayName
-   * @param {string} options.name
-   * @param {(q: PlayerQuest, p: Player) => void} init
-   */
-  constructor({ name, displayName }, init) {
-    this.name = name
-    this.displayName = displayName
-    this.init = init
-    Quest.instances[this.name] = this
-    SM.afterEvents.worldLoad.subscribe(() => {
-      system.delay(() => {
-        world.getAllPlayers().forEach(setQuests)
-      })
-    })
-  }
-
-  /**
    * @param {Player} player
    */
   enter(player) {
-    this.step(player, 0)
+    this.toStep(player, 0)
   }
 
   /**
    * @param {Player} player
-   * @param {number} stepNum
+   * @param {number} stepIndex
    */
-  step(player, stepNum, restore = false) {
-    const data = player.database
-    data.quest ??= {
-      active: this.name,
-    }
-    data.quest.active = this.name
+  toStep(player, stepIndex, restore = false) {
+    const quests = (player.database.quests ??= {
+      active: [],
+      completed: [],
+    })
 
-    if (!restore) delete data.quest.additional
-    data.quest.step = stepNum
+    let active = quests.active.find(e => e.id === this.id)
+    if (!active) {
+      active = { id: this.id, step: stepIndex }
+      quests.active.unshift(active)
+    }
+
+    // Next step, clean previous db
+    if (!restore) delete active.db
+
+    active.step = stepIndex
 
     const steps = this.steps(player)
-    const step = steps.list[stepNum] ?? steps.list[0]
+    const step = steps.list[stepIndex] ?? steps.list[0]
     if (!step) return false
-    player.success(
-      `§f${restore ? 'Квест: ' : ''}${step.text()}${step.description ? '\n' : ''}${
-        step.description ? '§6' + step.description() : ''
-      }`
-    )
+
+    if (playerSettings(player).messageForEachStep) {
+      const text = step.text()
+      if (text)
+        player.success(
+          `§f${this.name}: ${text}${step.description ? '\n' : ''}${step.description ? '§6' + step.description() : ''}`
+        )
+    }
+
+    // First time, show title
+    if (stepIndex === 0 && !restore) {
+      system.runTimeout(
+        () => {
+          player.onScreenDisplay.setHudTitle('§6' + this.name, {
+            subtitle: this.description,
+            fadeInDuration: 0,
+            stayDuration: 20 * 4,
+            fadeOutDuration: 20,
+          })
+          player.playSound(SOUNDS.levelup)
+        },
+        'quest title',
+        20
+      )
+    }
+
     step.cleanup = step.activate?.(!restore).cleanup
   }
 
   /**
    * @param {Player} player
    */
-  exit(player) {
-    const data = player.database
-    if (data.quest && typeof data.quest.step !== 'undefined') {
-      this.steps(player).list[data.quest?.step].cleanup?.()
-      delete this.players[player.id]
-    }
+  current(player) {
+    const steps = Quest.active(player, this)
+    if (!steps) return false
 
-    data.quest = {
-      active: '',
-      completed: data.quest?.completed ?? [],
-    }
+    return steps.step
   }
 
   /**
    * @param {Player} player
    */
-  static active(player) {
-    const data = player.database
-    if (!data.quest || typeof data.quest.active === 'undefined') return false
+  exit(player, end = false) {
+    const db = player.database
+    if (!db.quests) return
 
-    const quest = Quest.instances[data.quest.active]
-    if (!quest || typeof data.quest.step === 'undefined') return false
-
-    return {
-      quest,
-      stepNum: data.quest.step,
-      step: quest.steps(player).list[data.quest.step],
+    const active = db.quests.active.find(q => q.id === this.id)
+    if (active) {
+      this.steps(player).list[active.step].cleanup?.()
+      delete this.players[player.id]
     }
+
+    db.quests.active = db.quests.active.filter(q => q !== active)
+    if (end) db.quests.completed.push(this.id)
   }
 }
 
@@ -154,38 +209,42 @@ function setQuests(player) {
   const status = Quest.active(player)
   if (!status) return
 
-  status.quest.step(player, status.stepNum, true)
+  status.quest.toStep(player, status.stepIndex, true)
 }
 
-world.afterEvents.playerSpawn.subscribe(({ player }) => setQuests(player))
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => initialSpawn && setQuests(player))
 
 /**
- * @typedef {string | (() => string)} QuestText
+ * @typedef {() => string} DynamicQuestText
+ */
+
+/**
+ * @typedef {string | DynamicQuestText} QuestText
  */
 
 /**
  * @typedef {{
  *   text: QuestText,
- *   description?: QuestStepInput["text"]
+ *   description?: QuestText
  *   activate?(firstTime: boolean): { cleanup(): void }
  * }} QuestStepInput
  */
 
 /**
+ * @template [DB=unknown]
  * @typedef {{
  *   next(): void
  *   cleanup?(): void
  *   player: Player
  *   quest: Quest
- *   text: () => string
+ *   text: DynamicQuestText
+ *   description?: DynamicQuestText
  *   error(text: string): ReturnType<NonNullable<QuestStepInput['activate']>>
- *   description?: QuestStepThis['text']
+ *   db: DB | undefined
  * } & Omit<QuestStepInput, 'text' | 'description'> & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
  */
 
-// TODO Move quest info getting somewhere
 // TODO Test quest switching
-// TODO Support multiple quest at the same time
 // TODO Change quest status placement (also show steps/enters on the onScreenDisplay)
 
 class PlayerQuest {
@@ -226,13 +285,20 @@ class PlayerQuest {
       text: typeof text === 'string' ? () => text : text,
       description: typeof description === 'string' ? () => description : description,
 
+      get db() {
+        return this.player.database.quests?.active.find(e => e.id === this.quest.id)?.db
+      },
+      set db(value) {
+        const active = this.player.database.quests?.active.find(e => e.id === this.quest.id)
+        if (active) active.db = value
+      },
       player: this.player,
       update: this.update.bind(this),
       quest: this.quest,
       next() {
         this.cleanup?.()
         if (step.list[i + 1]) {
-          this.quest.step(this.player, i + 1)
+          this.quest.toStep(this.player, i + 1)
         } else {
           this.quest.exit(this.player)
           step._end()
@@ -254,12 +320,36 @@ class PlayerQuest {
   }
 
   /**
-   *
+   * Waits for item in the inventory
+   * @param {Omit<QuestStepInput, 'activate'> & { isItem: (item: ContainerSlot) => boolean } & ThisType<QuestStepThis>} options
+   */
+  item({ isItem, ...options }) {
+    this.dynamic({
+      ...options,
+      activate() {
+        return new Temporary(() => {
+          const action = InventoryIntervalAction.subscribe(({ player, slot }) => {
+            if (player.id !== this.player.id) return
+            if (isItem(slot)) this.next()
+          })
+
+          return {
+            cleanup() {
+              InventoryIntervalAction.unsubscribe(action)
+            },
+          }
+        })
+      },
+    })
+  }
+
+  /**
+   * Runs callback on quest start (when player enters it)
    * @param {(this: QuestStepThis) => void} action
    */
   start(action) {
     this.dynamic({
-      text: '',
+      text: () => '',
       activate() {
         action.call(this)
         this.next()
@@ -275,32 +365,40 @@ class PlayerQuest {
    * @param {QuestText} [description]
    */
   place(from, to, text, description, doNotAllowBuilders = true) {
+    // Unwrap vectors to not loose reference. For some reason, that happens
+    from = { x: from.x, y: from.y, z: from.z }
+    to = { x: to.x, y: to.y, z: to.z }
     this.dynamic({
       text,
       description,
       activate() {
-        /** @type {ReturnType<typeof PlaceAction.onEnter>[]} */
-        const actions = []
-        for (const pos of Vector.foreach(from, to)) {
-          actions.push(
-            PlaceAction.onEnter(pos, player => {
-              if (player.id !== this.player.id) return
-              if (doNotAllowBuilders && isBuilding(player)) return
+        const temporary = new Temporary(() => {
+          /** @type {ReturnType<typeof PlaceAction.onEnter>[]} */
+          const actions = []
+          for (const pos of Vector.foreach(from, to)) {
+            actions.push(
+              PlaceAction.onEnter(pos, player => {
+                if (player.id !== this.player.id) return
+                if (doNotAllowBuilders && isBuilding(player)) return
 
-              this.next()
-            })
-          )
-        }
+                this.next()
+              })
+            )
+          }
 
+          return {
+            cleanup() {
+              actions.forEach(a => a.unsubscribe())
+            },
+          }
+        })
+
+        console.log('q.place', { from: Vector.string(from), to: Vector.string(to) })
         const { x, y, z } = Vector.lerp(from, to, 0.5)
-        const temp = this.quest.steps(this.player).createTargetCompassInterval({ place: { x, y, z } })
 
-        return {
-          cleanup() {
-            temp.cleanup()
-            actions.forEach(a => a.unsubscribe())
-          },
-        }
+        this.quest.steps(this.player).targetCompassTo({ place: { x, y, z }, temporary })
+
+        return temporary
       },
     })
   }
@@ -334,8 +432,7 @@ class PlayerQuest {
 
       if (result < options.end) {
         // Saving value to db
-        const data = this.player.database
-        if (data.quest) data.quest.additional = result
+        this.db = result
 
         // Updating interface
         options.value = result
@@ -347,10 +444,9 @@ class PlayerQuest {
 
     const inputedActivate = options.activate?.bind(options)
     options.activate = function (firstTime) {
-      if (!this.player) throw new ReferenceError('Quest::this.player is undefined!')
-      const data = this.player.database
-      if (typeof data.quest?.additional === 'number') options.value = data.quest?.additional
+      if (!this.player) throw new ReferenceError('Quest: this.player is undefined!')
 
+      if (typeof this.db === 'number') options.value = this.db
       options.value ??= 0
 
       return inputedActivate?.(firstTime) ?? { cleanup() {} }
@@ -457,20 +553,16 @@ class PlayerQuest {
       text: () => (options.text ? options.text(airdroppos) : '§6Забери аирдроп' + airdroppos),
       activate() {
         // Saving/restoring airdrop
-        const db = this.player.database
-        if (!db.quest) return this.error('База данных квестов недоступна')
 
         /** @type {Airdrop} */
         let airdrop
-        const key = db.quest.additional
+        const key = this.db
 
         if (typeof key === 'string') {
           if (key in Airdrop.db) {
             airdrop = spawnAirdrop(key)
           } else {
-            console.error(
-              new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.name}`)
-            )
+            console.error(new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.id}`))
             system.delay(() => this.next())
             return { cleanup() {} }
           }
@@ -478,7 +570,7 @@ class PlayerQuest {
           airdrop = spawnAirdrop()
         }
 
-        db.quest.additional = airdrop.key
+        this.db = airdrop.key
         if (!key && !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
 
         const temporary = new Temporary(({ world }) => {
@@ -502,7 +594,7 @@ class PlayerQuest {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const qthis = this
         let i = 0
-        this.quest.steps(this.player).createTargetCompassInterval({
+        this.quest.steps(this.player).targetCompassTo({
           place: Vector.floor(this.player.location),
           interval() {
             const airdropEntity = airdrop.chestMinecart
@@ -556,18 +648,18 @@ class PlayerQuest {
    * @typedef {{
    *   place: Vector3
    *   temporary?: Temporary
-   *   interval?: VoidFunction & ThisParameterType<CompassOptions>
+   *   interval?: VoidFunction & ThisType<CompassOptions>
    * }} CompassOptions
    */
 
   /**
    * @param {CompassOptions} options
    */
-  createTargetCompassInterval(options) {
-    const temp = new Temporary(({ system }) => {
+  targetCompassTo(options) {
+    return new Temporary(({ system }) => {
       system.runInterval(
         () => {
-          if (!this.player.isValid()) return temp.cleanup()
+          if (!this.player.isValid()) return
           if (
             !options.place ||
             typeof options.place.x !== 'number' ||
@@ -578,13 +670,17 @@ class PlayerQuest {
 
           options.interval?.()
 
-          // TODO Cleanup
           Compass.setFor(this.player, options.place)
         },
-        'Quest place marker particle',
+        'Quest place compasss',
         20
       )
+
+      return {
+        cleanup: () => {
+          Compass.setFor(this.player, undefined)
+        },
+      }
     }, options.temporary)
-    return temp
   }
 }

@@ -48,7 +48,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
    */
   loadInventory(player) {
     super.loadInventory(player, () => {
-      InventoryStore.load({ to: player, from: this.inventory })
+      InventoryStore.load({ to: player, from: this.inventory, clearAll: true })
       player.database.inv = 'spawn'
     })
   }
@@ -88,13 +88,13 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
   /** @type {import('lib.js').regionCallback} */
   regionCallback(player, region) {
     if (region === this.region) {
-      this.loadInventory(player)
       player.addEffect(MinecraftEffectTypes.Saturation, 1, {
         amplifier: 255,
         showParticles: false,
       })
     } else {
       if (player.database.inv === 'spawn' && !isBuilding(player)) {
+        this.loadInventory(player)
         this.portal?.teleport(player)
       }
     }

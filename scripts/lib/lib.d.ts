@@ -109,7 +109,7 @@ declare module '@minecraft/server' {
   interface PlayerDatabase {
     role: Role
     prevRole?: Role
-    quest?: import('./Quest').QuestDB
+    quests?: import('./Quest').QuestDB
   }
 
   type GameplayStatScoreName =

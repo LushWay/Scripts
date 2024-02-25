@@ -19,7 +19,7 @@ export class Portal {
 
     if (fadeScreen) {
       const inS = 0
-      const stayS = 1.0
+      const stayS = 2.0
       const outS = 1.0
       player.onScreenDisplay.setHudTitle(place ?? '§aShp1nat§6Mine', {
         fadeInDuration: inS * 20,
@@ -58,6 +58,7 @@ export class Portal {
    * @param {string} [o.commandDescription]
    */
   constructor(name, from, to, place, { aliases = [], createCommand = true, commandDescription } = {}) {
+    // console.debug('Portal init', name, { from: from ? Vector.string(from) : from, to: to ? Vector.string(to) : to })
     this.from = from
     this.to = to
     if (typeof place === 'function') {

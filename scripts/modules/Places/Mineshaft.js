@@ -1,5 +1,8 @@
 // TODO Actually generate ore
 
+import { MineshaftRegion, actionGuard, util } from 'lib.js'
+import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace.js'
+
 class MineshaftBuilder {
   /**
    * @param {object} o
@@ -33,17 +36,17 @@ class MineshaftBuilder {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Mineshaft = new MineshaftBuilder()
 
-// actionGuard((player, region, ctx) => {
-//   if (region === Mineshaft.safeArea && ctx.type === 'break') {
-//     const { block, dimension } = ctx.event
-//     scheduleBlockPlace({
-//       dimension: dimension.type,
-//       location: block.location,
-//       restoreTime: util.ms.from('sec', Math.randomInt(10, 30)),
-//       typeId: block.type.id,
-//       states: block.permutation.getAllStates(),
-//     })
+actionGuard((player, region, ctx) => {
+  if (region instanceof MineshaftRegion && ctx.type === 'break') {
+    const { block, dimension } = ctx.event
+    scheduleBlockPlace({
+      dimension: dimension.type,
+      location: block.location,
+      restoreTime: util.ms.from('sec', Math.randomInt(10, 30)),
+      typeId: block.type.id,
+      states: block.permutation.getAllStates(),
+    })
 
-//     return true
-//   }
-// })
+    return true
+  }
+})

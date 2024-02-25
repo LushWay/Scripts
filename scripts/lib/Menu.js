@@ -1,4 +1,4 @@
-import { ItemLockMode, ItemStack, Player, Vector, world } from '@minecraft/server'
+import { ItemLockMode, ItemStack, ItemTypes, Player, Vector, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { InventoryIntervalAction } from 'lib/Action.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
@@ -9,6 +9,7 @@ import { createPublicGiveItemCommand } from 'modules/Survival/createPublicGiveIt
 
 export class Menu {
   static createItem(typeId = CUSTOM_ITEMS.menu, name = '§b§lМеню\n§r§f(use)') {
+    if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
       '§r§7Возьми в руку и используй §r§7предмет\n\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu'
@@ -16,7 +17,7 @@ export class Menu {
     item.lockMode = ItemLockMode.inventory
     item.keepOnDeath = true
 
-    return item
+    return item.clone()
   }
   static item = this.createItem()
 
@@ -31,7 +32,8 @@ export class Menu {
     this.command = command
 
     world.afterEvents.itemUse.subscribe(async ({ source: player, itemStack }) => {
-      if (itemStack.typeId !== this.item.typeId || !(player instanceof Player)) return
+      if (!(player instanceof Player)) return
+      if (itemStack.typeId !== this.item.typeId && !itemStack.typeId.startsWith(CUSTOM_ITEMS.compassPrefix)) return
 
       util.catch(() => {
         const menu = this.open(player)
@@ -84,17 +86,24 @@ export class Compass {
    */
   static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
     if (!this.players.has(player)) return
-    if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && slot.typeId !== CUSTOM_ITEMS.menu) return
+    const isMenu = slot.typeId === CUSTOM_ITEMS.menu
+    if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && !isMenu) return
 
     const target = this.players.get(player)
-    if (!target) return
+    if (!target) {
+      if (isMenu) return
 
-    const direction = this.getCompassIndex(player.getViewDirection(), player.location, target)
+      return slot.setItem(Menu.item)
+    }
+
+    const direction = this.getCompassIndex(player.getViewDirection(), player.location, target.value)
     const typeId = CUSTOM_ITEMS.compassPrefix + direction
     if (slot.typeId === typeId) return
 
-    // TODO Make sure item exists lol
-    slot.setItem(this.items[direction])
+    const item = this.items[direction]
+    try {
+      if (item) slot.setItem(item)
+    } catch (e) {}
   })
 
   /**

@@ -5,7 +5,7 @@ const name = new Command({
   description: 'Меняет имя',
   role: 'admin',
 }).executes(ctx => {
-  ctx.reply(ctx.sender.nameTag)
+  ctx.sender.info(ctx.sender.nameTag)
 })
 
 name
@@ -13,6 +13,7 @@ name
   .string('new name')
   .executes((ctx, newname) => {
     ctx.sender.nameTag = newname
+    ctx.sender.success('Изменено на ' + newname)
   })
 
 const reset = name.literal({ name: 'reset' }).executes(ctx => {

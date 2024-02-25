@@ -1,5 +1,4 @@
 import { Player, Vector, system } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'lib.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
 import { tpMenuOnce } from 'modules/Commands/tp.js'
@@ -38,7 +37,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         })
     })
 
+    console.debug('Anarchy init')
     this.portalLocation.onLoad.subscribe(portalLocation => {
+      // console.debug('Portal load', Vector.string(portalLocation))
       this.portal = new Portal(
         'anarchy',
         Vector.add(portalLocation, { x: 0, y: -1, z: -1 }),
@@ -85,8 +86,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           })
           .executes(ctx => {
             delete ctx.sender.database.survival.anarchy
-            ctx.sender.playSound(SOUNDS.success)
-            ctx.reply('§a> §fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.')
+            ctx.sender.success(
+              '§fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.'
+            )
           })
       }
     })

@@ -1,4 +1,6 @@
+import { Player } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
+import { MessageForm } from 'lib.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { Quest } from 'lib/Quest.js'
 
@@ -8,13 +10,7 @@ const quest = new Command({
   description: 'Меню квеста',
   role: 'member',
 }).executes(ctx => {
-  const q = Quest.active(ctx.sender)
-  if (!q) return ctx.error('У вас нет активных квестов')
-  return ctx.reply(
-    `§7Квест: §6${q.quest.displayName}\n\n§7Квест: §f${q.step.text()}\n${
-      q.step.description ? `§7Описание: ${q.step.description()}\n` : ''
-    }\n§6Выйти из квеста: §f.q exit`
-  )
+  questsMenu(ctx.sender)
 })
 
 quest.literal({ name: 'exit', description: 'Выйти' }).executes(ctx => {
@@ -34,3 +30,42 @@ quest.literal({ name: 'enter', role: 'techAdmin' }).executes(ctx => {
   }
   form.show(ctx.sender)
 })
+
+/**
+ * @param {Player} player
+ * @param {VoidFunction} [back]
+ */
+export function questsMenu(player, back) {
+  const form = new ActionForm('Квесты')
+  if (back) form.addButtonBack(back)
+
+  if (player.database.quests) {
+    for (const dbquest of player.database.quests.active) {
+      const quest = Quest.instances[dbquest.id]
+      if (quest) {
+        form.addButton(`${quest.name}\n${quest.steps(player)?.list[dbquest.step]?.text() ?? ''}`, () =>
+          questMenu(player, quest, () => questsMenu(player, back))
+        )
+      }
+    }
+  } else form.addButton('§cНет активных квестов.', () => questsMenu(player, back))
+
+  form.show(player)
+}
+
+/**
+ * @param {Player} player
+ * @param {Quest} quest
+ */
+function questMenu(player, quest, back = () => {}) {
+  const current = quest.current(player)
+  if (!current) return new MessageForm('§cНет квеста', '§4Нет активного квеста').setButton1('Назад', back).show(player)
+
+  const form = new ActionForm(
+    'Квест ' + quest.name,
+    `${quest.description}\n\n${current.text()}\n\n${current.description?.() ?? ''}`
+  )
+  form.addButtonBack(back)
+  form.addButtonPrompt('§cОтказаться от квеста', '§cОтказаться', () => quest.exit(player), 'Назад')
+  form.show(player)
+}

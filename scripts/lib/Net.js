@@ -1,3 +1,4 @@
+// TODO Move import of shared types into shared repo
 /**
  * @typedef {import("../../../../tools/server/routes.js").NODE_ROUTES} NODE_ROUTES
  */
@@ -6,8 +7,6 @@ import { util } from 'lib/util.js'
 import { MODULE } from './OptionalModules.js'
 
 class APIError extends Error {}
-
-// TODO Move import of shared types into shared repo
 
 /**
  * Makes http request to node.js instance
@@ -22,8 +21,9 @@ export async function APIRequest(path, body) {
   console.warn(`${prefix},`, body, '§r)')
   if (MODULE.ServerNet) {
     const { http, HttpRequest, HttpRequestMethod } = MODULE.ServerNet
+    // TODO Use secrets to get port
     const response = await http.request(
-      new HttpRequest('http://localhost:19000/' + path)
+      new HttpRequest('http://localhost:19514/' + path)
         .setMethod(HttpRequestMethod.Post)
         .addHeader('content-type', 'text/plain')
         .addHeader('content-length', sbody.length.toString())
@@ -35,11 +35,13 @@ export async function APIRequest(path, body) {
       body = JSON.parse(response.body)
     } catch (e) {
       const error = util.error(e, { returnText: true })
-      throw new APIError(`Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`)
+      throw new APIError(
+        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`
+      )
     }
 
     if (body.status === 404) {
-      throw new APIError(`${prefix}: Unkown path!`)
+      throw new APIError(`${prefix}): Unkown path!`)
     }
 
     return body

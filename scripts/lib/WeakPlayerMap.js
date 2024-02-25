@@ -1,6 +1,11 @@
 import { Player, world } from '@minecraft/server'
 
 /**
+ * @param {Player | string} player
+ */
+const id = player => (player instanceof Player ? player.id : player)
+
+/**
  * @type {Pick<Map<string, unknown>, 'has' | 'delete'>[]}
  */
 const removePlayerFromMapsOnLeave = []
@@ -22,18 +27,10 @@ export class WeakPlayerMap extends Map {
   }
 
   /**
-   * @private
-   * @param {Player | string} player
-   */
-  key(player) {
-    return player instanceof Player ? player.id : player
-  }
-
-  /**
    * @param {Player | string} player
    */
   get(player) {
-    return super.get(this.key(player))
+    return super.get(id(player))
   }
 
   /**
@@ -41,7 +38,7 @@ export class WeakPlayerMap extends Map {
    * @param {T} value
    */
   set(player, value) {
-    super.set(this.key(player), value)
+    super.set(id(player), value)
     return this
   }
 
@@ -49,14 +46,14 @@ export class WeakPlayerMap extends Map {
    * @param {Player | string} player
    */
   has(player) {
-    return super.has(this.key(player))
+    return super.has(id(player))
   }
 
   /**
    * @param {Player | string} player
    */
   delete(player) {
-    return super.delete(this.key(player))
+    return super.delete(id(player))
   }
 }
 
@@ -66,7 +63,7 @@ export class WeakPlayerMap extends Map {
  * The downtake for this is that map will always remove references when player
  * leaves from world.
  * @template T
- * @extends {Map<Player, T>}
+ * @extends {Map<string, { value: T, player: Player }>}
  */
 export class WeakOnlinePlayerMap extends Map {
   constructor() {
@@ -75,31 +72,42 @@ export class WeakOnlinePlayerMap extends Map {
   }
 
   /**
-   * @private
    * @param {Player | string} player
    */
-  key(player) {
-    if (player instanceof Player) return player
-    for (const key of this.keys()) if (key.id === player) return key
-    return false
+  get(player) {
+    return super.get(id(player))
+  }
+
+  /**
+   * @param {Player | string} key
+   * @param {T | { value: T, player: Player }} value
+   */
+  set(key, value) {
+    if (!(typeof value === 'object' && value && 'value' in value)) {
+      // Converting T to { value: T, player: Player }
+      // Convert `id | Player` to Player
+      const player = typeof key === 'string' ? Player.fetch(key, true) : key
+
+      if (!player) return this // No player found, do nothing because its online only map
+
+      value = { player, value }
+    }
+
+    return super.set(id(key), value)
   }
 
   /**
    * @param {Player | string} player
    */
   has(player) {
-    const key = this.key(player)
-    if (!key) return false
-    return super.has(key)
+    return super.has(id(player))
   }
 
   /**
    * @param {Player | string} player
    */
   delete(player) {
-    const key = this.key(player)
-    if (!key) return false
-    return super.delete(key)
+    return super.delete(id(player))
   }
 }
 

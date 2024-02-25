@@ -5,9 +5,13 @@ import { APIRequest } from 'lib/Net.js'
 import { OverTakes } from './OverTakes.js'
 
 OverTakes(Player, {
-  fetch(name) {
-    for (const p of world.getPlayers()) {
-      if (p.name === name || p.id === name) return p
+  fetch(name, idOnly = true) {
+    for (const player of world.getPlayers()) {
+      if (player.id === name) return player
+
+      if (!idOnly) {
+        if (player.isValid() && player.name === name) return player
+      }
     }
   },
   name(id) {

@@ -32,14 +32,14 @@ actionGuard((_, region, ctx) => {
 world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: broken, dimension, player }) => {
   if (Axe.breaks.includes(broken.type.id)) {
     if (isBuilding(player)) return
-    block.setType(broken.type.id.replace(/stripped_/, '').replace(/_log$/, '_fence'))
+    // block.setType(broken.type.id.replace(/stripped_/, '').replace(/_log$/, '_fence'))
 
     scheduleBlockPlace({
       dimension: dimension.type,
       location: block.location,
       typeId: broken.type.id,
       states: broken.getAllStates(),
-      restoreTime: util.ms.from('min', 10),
+      restoreTime: util.ms.from('min', 1),
     })
   }
 })

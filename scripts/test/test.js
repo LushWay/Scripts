@@ -17,6 +17,17 @@ import './simulatedPlayer.js'
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  cc(ctx) {
+    console.debug(Compass.players.get(ctx.sender)?.value)
+  },
+  title(ctx) {
+    ctx.sender.onScreenDisplay.setHudTitle('FFf', {
+      subtitle: 'AAAA',
+      fadeInDuration: 0,
+      stayDuration: 20 * 4,
+      fadeOutDuration: 20,
+    })
+  },
   compass(ctx) {
     const [entity] = ctx.sender.dimension.getEntities({ type: MinecraftEntityTypes.Cow, closest: 1 })
     if (!entity) return ctx.error('No entity!')

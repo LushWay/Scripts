@@ -138,7 +138,11 @@ function editCatscene(player, scene) {
     system.runInterval(
       () => {
         for (const dot of scene.dots) {
-          player.dimension.spawnParticle('minecraft:wax_particle', Vector.add(scene.location, dot[0]), blueParticle)
+          try {
+            player.dimension.spawnParticle('minecraft:wax_particle', Vector.add(scene.location, dot[0]), blueParticle)
+          } catch (e) {
+            if (e instanceof LocationInUnloadedChunkError) continue
+          }
         }
       },
       'scene particle',
@@ -147,6 +151,7 @@ function editCatscene(player, scene) {
 
     util.catch(async function visialize() {
       while (!temp.cleaned) {
+        await nextTick
         const vectors = scene.dots.map(e => e[0]).concat(Vector.subtract(Vector.floor(player.location), scene.location))
         for (const location of scene.curve({ vectors, step: 0.5 / 4 })) {
           if (temp.cleaned) return

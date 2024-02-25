@@ -71,10 +71,10 @@ export class Scene {
               location: player.location,
               facingLocation: Vector.add(
                 player.getHeadLocation(),
-                Vector.multiply(player.getViewDirection(), {
-                  x: 1,
+                Vector.add(player.getViewDirection(), {
+                  x: 0,
                   y: 10,
-                  z: 1,
+                  z: 0,
                 })
               ),
               easeOptions: {
@@ -89,7 +89,7 @@ export class Scene {
             location: Vector.add(this.location, location),
             facingLocation: this.location,
             easeOptions: {
-              easeTime: 5 / 20,
+              easeTime: 1,
               easeType: EasingType.Linear,
             },
           })
@@ -104,7 +104,7 @@ export class Scene {
    * @param {number} numPoints
    * @param {Vector3 | null} playerLocation
    */
-  generateCurve(numPoints = this.dots.length * 2, playerLocation = null) {
+  generateCurve(numPoints = this.dots.length, playerLocation = null) {
     const vectors = this.dots.map(e => e[0])
     if (playerLocation) vectors.push(playerLocation)
     const curve = []

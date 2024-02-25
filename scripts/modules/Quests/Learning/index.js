@@ -1,12 +1,13 @@
 import { ItemStack, Vector, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
-import { EditableLocation, Quest, SafeAreaRegion, Temporary } from 'lib.js'
+import { EditableLocation, Quest, SafeAreaRegion, Temporary, actionGuard } from 'lib.js'
 import { Menu } from 'lib/Menu.js'
 import { Axe } from 'modules/Features/axe.js'
 import { randomTeleport } from 'modules/Features/randomTeleport.js'
 import { Anarchy } from 'modules/Places/Anarchy.js'
 import { Spawn } from 'modules/Places/Spawn.js'
+import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
 import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { createPublicGiveItemCommand } from 'modules/Survival/createPublicGiveItemCommand.js'
 import { LEARNING_L } from './airdrop.js'
@@ -16,7 +17,7 @@ import { LEARNING_L } from './airdrop.js'
 // TODO Add catscenes
 
 export class Learning {
-  static quest = new Quest({ displayName: 'Обучение', name: 'learning' }, q => {
+  static quest = new Quest({ name: 'Обучение', desc: 'Обучение базовым механикам сервера', id: 'learning' }, q => {
     if (
       !Anarchy.portal ||
       !Anarchy.portal.from ||
@@ -27,7 +28,7 @@ export class Learning {
       return q.failed('§cОбучение или сервер не настроены')
 
     q.start(function () {
-      this.player.info('§6Обучение!')
+      // this.player.info('§6Обучение!')
     })
 
     q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
@@ -43,8 +44,12 @@ export class Learning {
           // in spawn inventory that will be replaced with
           // anarchy
           system.delay(() => {
-            Menu.give?.(this.player, { mode: 'ensure' })
             Learning.startAxeGiveCommand?.ensure(this.player)
+            const { container } = this.player
+            if (!container) return
+
+            const slot = container.getSlot(8)
+            slot.setItem(Menu.item)
           })
         }
 
@@ -74,7 +79,7 @@ export class Learning {
               )
 
               if (hit) {
-                this.player.onScreenDisplay.setActionBar('§6Выйди на открытую местность!')
+                this.player.onScreenDisplay.setActionBar('§6Выйди под открытое небо!')
               } else {
                 this.player.onScreenDisplay.setActionBar('')
                 this.player.success('Посмотри наверх!')
@@ -99,33 +104,16 @@ export class Learning {
       q.place(
         Vector.add(Learning.craftingTableLocation, { x: 10, y: 10, z: 10 }),
         Vector.add(Learning.craftingTableLocation, { x: -10, y: -10, z: -10 }),
-        '§6Доберитесь до верстака на\n' + Vector.string(Learning.craftingTableLocation, true),
+        '§6Доберись до верстака на\n' + Vector.string(Learning.craftingTableLocation, true),
         text
       )
 
-    // TODO Bugfixes
-    craftingTable('Нужно же где-то скрафтить кирку, верно?')
+    craftingTable('Нужно где-то скрафтить кирку.')
 
-    q.dynamic({
-      text: () => '§6Скрафтите деревянную кирку',
-      description: 'Чтобы пойти в шахту, нужна кирка. Сделайте ее!',
-      activate() {
-        return new Temporary(({ system }) => {
-          system.runInterval(
-            () => {
-              const { container } = this.player
-              if (!container) return
-              for (const [, item] of container.entries()) {
-                if (item?.typeId === MinecraftItemTypes.WoodenPickaxe) {
-                  this.next()
-                }
-              }
-            },
-            'inv check learning',
-            20
-          )
-        })
-      },
+    q.item({
+      text: () => '§6Сделай деревянную кирку',
+      description: 'Чтобы пойти в шахту, нужна кирка. Сделай ее!',
+      isItem: item => item.typeId === MinecraftItemTypes.WoodenPickaxe,
     })
 
     q.counter({
@@ -133,7 +121,7 @@ export class Learning {
       text(i) {
         return `§6Накопайте §f${i}/${this.end}§6 камня`
       },
-      description: () => 'Отправляйтесь в шахту и накопайте камня!',
+      description: () => 'Отправляйтесь в шахту, найдите и накопайте камня!',
       activate() {
         return new Temporary(({ world }) => {
           world.afterEvents.playerBreakBlock.subscribe(event => {
@@ -147,14 +135,20 @@ export class Learning {
       },
     })
 
-    craftingTable('Скрафтите каменную кирку.')
+    craftingTable('Чтобы сделать каменную кирку.')
+
+    q.item({
+      text: () => '§6Сделай каменную кирку',
+      description: 'Время улучшить инструмент!',
+      isItem: item => item.typeId === MinecraftItemTypes.StonePickaxe,
+    })
 
     q.counter({
       end: 5,
       text(i) {
         return `§6Накопайте §f${i}/${this.end}§6 железа`
       },
-      description: () => 'Отправляйтесь в шахту и накопайте железа!',
+      description: () => 'Отправляйтесь в шахту, найдите и накопайте железа!',
       activate() {
         return new Temporary(({ world }) => {
           world.afterEvents.playerBreakBlock.subscribe(event => {
@@ -190,11 +184,21 @@ export class Learning {
   static safeArea = void 0
 }
 
+actionGuard((player, region, ctx) => {
+  if (ctx.type !== 'break') return
+  if (region !== VillageOfMiners.safeArea) return
+  if (Learning.quest.current(player)) {
+    system.delay(() => {
+      player.fail('Блоки можно ломать только глубже в шахте!')
+    })
+  }
+})
+
 Learning.randomTeleportLocation.onLoad.subscribe(location => {
   Learning.safeArea = new SafeAreaRegion({
     permissions: { allowedEntities: 'all' },
     center: location,
-    radius: location.radius,
+    radius: location.radius * 5,
     dimensionId: 'overworld',
   })
 

@@ -4,7 +4,7 @@ new Command({
   role: 'builder',
 }).executes(ctx => {
   ctx.sender.runCommand('gamemode s')
-  ctx.reply('§a► S')
+  ctx.sender.success('§aS')
 })
 
 new Command({

@@ -10,17 +10,23 @@ new Command({
 }).executes(ctx => {
   prompt(
     ctx.sender,
-    'Вы уверены, что хотите очистить инвентарь анархии и ваше место?',
-    'ДА',
+    'Вы уверены, что хотите очистить инвентарь анархии и ваше место? Полезно для тестов обучения.',
+    '§cДа',
     () => {
       ctx.sender.runCommand('gamemode s')
 
       delete ctx.sender.database.survival.bn
       delete ctx.sender.database.survival.rtpElytra
-      delete ctx.sender.database.quest
+      delete ctx.sender.database.quests
+
+      ctx.sender.database.inv = 'anarchy'
+      Spawn.loadInventory(ctx.sender)
       Spawn.portal?.teleport(ctx.sender)
+
       Anarchy.inventoryStore.remove(ctx.sender.id)
+
       Airdrop.instances.filter(a => a.for === ctx.sender.id).forEach(a => a.delete())
+
       system.runTimeout(
         () => {
           delete ctx.sender.database.survival.anarchy
@@ -30,7 +36,7 @@ new Command({
         30
       )
     },
-    'Нет',
+    'Отмена',
     () => {}
   )
 })
