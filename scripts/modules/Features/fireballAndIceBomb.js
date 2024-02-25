@@ -76,6 +76,8 @@ system.runInterval(
 system.runInterval(
   () => {
     for (const entity of entities) {
+      if (!entity.isValid()) continue
+
       const block = entity.dimension.getBlock(entity.location)
       if (block && block.typeId in ICE_BOMB_TRANSOFORM) {
         scheduleBlockPlace({

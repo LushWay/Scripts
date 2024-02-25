@@ -1,14 +1,13 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { GAME_UTILS } from 'lib.js'
 
 /**
  * @type {Record<string, { date: number, entity: Entity }>}
  */
 const SPAWNED_FIREWORKS = {}
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-  const typeId = GAME_UTILS.safeGet(entity, 'typeId')
-  if (typeId !== MinecraftEntityTypes.FireworksRocket) return
+  if (!entity.isValid()) return
+  if (entity.typeId !== MinecraftEntityTypes.FireworksRocket) return
 
   SPAWNED_FIREWORKS[entity.id] = { date: Date.now(), entity }
 })
