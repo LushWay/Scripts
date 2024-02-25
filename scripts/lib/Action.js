@@ -191,7 +191,7 @@ export class InventoryIntervalAction {
         })
       },
       'InventoryIntervalAction',
-      1
+      10
     )
   }
 }
