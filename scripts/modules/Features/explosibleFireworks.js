@@ -12,14 +12,15 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   SPAWNED_FIREWORKS[entity.id] = { date: Date.now(), entity }
 })
 
-world.afterEvents.itemUse.subscribe(data => {
-  if (data.itemStack.typeId !== MinecraftItemTypes.Crossbow) return
-  if (!(data.source instanceof Player)) return
+world.afterEvents.itemUse.subscribe(event => {
+  if (event.itemStack.typeId !== MinecraftItemTypes.Crossbow) return
+  if (!(event.source instanceof Player) || !event.source.isValid()) return
 
   for (const [id, { date, entity }] of Object.entries(SPAWNED_FIREWORKS)) {
-    if (Date.now() - date < 5 && Vector.distance(data.source.location, entity.location) < 2) {
+    if (!entity.isValid()) continue
+    if (Date.now() - date < 5 && Vector.distance(event.source.location, entity.location) < 2) {
       delete SPAWNED_FIREWORKS[id]
-      FIREWORKS[id] = { source: data.source, firework: entity }
+      FIREWORKS[id] = { source: event.source, firework: entity }
       break
     }
   }
