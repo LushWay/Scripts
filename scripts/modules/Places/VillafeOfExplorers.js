@@ -1,5 +1,5 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { Boss, util } from 'lib.js'
+import { Boss, LootTable, util } from 'lib.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 
 class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
@@ -11,6 +11,17 @@ class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
     displayName: 'Слайм',
     entityTypeId: MinecraftEntityTypes.Slime,
     respawnTime: util.ms.from('min', 10),
+    loot: new LootTable(
+      { id: 'slime boss', fill: { type: 'itemsCount' } },
+      {
+        type: 'SlimeBall',
+        chance: '100%',
+        amount: {
+          '40...64': '2%',
+          '65...128': '1%',
+        },
+      }
+    ),
   })
 }
 

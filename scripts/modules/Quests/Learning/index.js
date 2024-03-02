@@ -101,12 +101,29 @@ export class Learning {
     /** @param {string} text */
     const craftingTable = text =>
       Learning.craftingTableLocation.valid &&
-      q.place(
-        Vector.add(Learning.craftingTableLocation, { x: 10, y: 10, z: 10 }),
-        Vector.add(Learning.craftingTableLocation, { x: -10, y: -10, z: -10 }),
-        '§6Доберись до верстака на\n' + Vector.string(Learning.craftingTableLocation, true),
-        text
-      )
+      q.dynamic({
+        text: '§6Используй верстак на\n' + Vector.string(Learning.craftingTableLocation, true),
+        description: text,
+        activate() {
+          return new Temporary(({ temp, world }) => {
+            if (!Learning.craftingTableLocation.valid) return
+            Learning.quest
+              .steps(this.player)
+              .targetCompassTo({
+                place: Vector.add(Learning.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 }),
+                temporary: temp,
+              })
+
+            world.afterEvents.playerInteractWithBlock.subscribe(event => {
+              if (event.player.id !== this.player.id) return
+              if (!Learning.craftingTableLocation.valid) return
+              if (Vector.string(event.block.location) !== Vector.string(Learning.craftingTableLocation)) return
+
+              this.next()
+            })
+          })
+        },
+      })
 
     craftingTable('Нужно где-то скрафтить кирку.')
 

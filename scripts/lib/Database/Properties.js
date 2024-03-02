@@ -119,7 +119,7 @@ export class DynamicPropertyDB {
         })
       )
     } catch (error) {
-      util.error(new DatabaseError(`Failed to init table '${this.key}': ${util.error(error, { returnText: true })}`))
+      util.error(new DatabaseError(`Failed to init table '${this.key}': ${util.error(error, { parseOnly: true })}`))
     }
   }
 

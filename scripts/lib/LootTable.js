@@ -21,6 +21,10 @@ new Command({
     lootTable.fillContainer(inventory.container)
   })
 
+/**
+ * @typedef {{stack: ItemStack;chance: number;}[]} LootItems
+ */
+
 export class LootTable {
   /** @type {Record<string, LootTable>} */
   static instances = {}
@@ -30,10 +34,14 @@ export class LootTable {
   static onNew = new EventSignal()
   /**
    * Stored items
-   * @type {Array<import("../modules/Chat/server.js").LootItem.Stored>}
+   * @private
+   * @type {Array<LootItem.Stored>}
    */
   items
 
+  /**
+   * @private
+   */
   totalChance = 0
 
   /**
@@ -43,15 +51,17 @@ export class LootTable {
   /**
    * Creates new LootTable with specified items
    * @param {object} o
-   * @param {string} o.key
+   * @param {string} o.id
    * @param {LootTableFillType} [o.fill]
-   * @param  {...import("../modules/Chat/server.js").LootItem.Input} items - Items to randomise
+   * @param  {...LootItem.Input} items - Items to randomise
    */
-  constructor({ key, fill = { type: 'airPercent', air: '50%' } }, ...items) {
-    this.key = key
+  constructor({ id, fill = { type: 'airPercent', air: '50%' } }, ...items) {
+    this.id = id
+
+    /** @private */
     this.fill = fill
-    LootTable.instances[key] = this
-    EventSignal.emit(LootTable.onNew, this)
+
+    /** @private */
     this.items = items.map(item => {
       /** @type {ItemStack} */
       let itemStack
@@ -101,6 +111,9 @@ export class LootTable {
         damage: item.damage ? RandomCost.toArray(item.damage) : [],
       }
     })
+
+    LootTable.instances[id] = this
+    EventSignal.emit(LootTable.onNew, this)
   }
 
   /**
@@ -108,7 +121,7 @@ export class LootTable {
    * @param {number} size - Size of the array
    * @returns {Array<ItemStack | void>}
    */
-  generate(size) {
+  generate(size = this.items.length - 1) {
     let stepMax = 0
     if (this.fill.type === 'airPercent') {
       stepMax = ~~(size * (parseInt(this.fill.air) / 100))
@@ -116,9 +129,8 @@ export class LootTable {
       size = Math.min(size, this.items.length - 1)
     }
 
-    /** @type {NonNullable<ReturnType<this['generateItem']>>} */
-    // @ts-expect-error Filter mistype
-    const items = this.items.map(i => this.generateItem(i)).flat()
+    /** @type {NonNullable<LootItems>} */
+    const items = this.items.map(i => this.generateItems(i)).flat()
 
     let explictItems = items.filter(e => e.chance === 100)
     let randomizableItems = items.filter(e => !explictItems.includes(e))
@@ -154,10 +166,11 @@ export class LootTable {
   }
 
   /**
-   * @param {import('modules/Server/server.js').LootItem.Stored} item
-   * @returns {{stack: ItemStack, chance: number}[]}
+   * @param {LootItem.Stored} item
+   * @returns {LootItems}
+   * @private
    */
-  generateItem(item) {
+  generateItems(item) {
     // Randomise item properties
     const amount = item.amount.randomElement()
     if (amount <= 0) return []
@@ -169,7 +182,7 @@ export class LootTable {
       return new Array(average)
         .fill(null)
         .map((e, i, a) =>
-          this.generateItem({
+          this.generateItems({
             ...e,
             amount: i === a.length - 1 ? last : average,
           })

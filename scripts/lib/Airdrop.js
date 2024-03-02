@@ -35,15 +35,15 @@ export class Airdrop {
 
   /**
    * @param {{ position?: Vector3, loot: LootTable, for?: string }} options
-   * @param {string} [key]
+   * @param {string} [id]
    */
-  constructor(options, key) {
+  constructor(options, id) {
     this.lootTable = options.loot
     this.for = options.for
-    this.key = key
+    this.id = id
 
-    if (!this.key) {
-      this.key = new Date().toISOString()
+    if (!this.id) {
+      this.id = new Date().toISOString()
       if (options.position) this.spawn(options.position)
     }
 
@@ -99,7 +99,7 @@ export class Airdrop {
 
     this.chestMinecart.triggerEvent('chest_minecart:ground')
     try {
-      console.debug('Loading loot table', this.lootTable ? this.lootTable.key : 'NO NAME')
+      console.debug('Loading loot table', this.lootTable ? this.lootTable.id : 'NO NAME')
       if (this.chestMinecart.container) this.lootTable.fillContainer(this.chestMinecart.container)
     } catch (e) {
       console.error('Failed to load loot table into airdrop:', e)
@@ -113,11 +113,11 @@ export class Airdrop {
   save() {
     if (!this.chestMinecart || !this.chicken) return
 
-    Airdrop.db[this.key] = {
+    Airdrop.db[this.id] = {
       for: this.for,
       chest: this.chestMinecart.id,
       chicken: this.chicken.id,
-      loot: this.lootTable.key,
+      loot: this.lootTable.id,
       ...(this.status === 'being looted' ? { looted: true } : {}),
     }
   }
@@ -152,7 +152,7 @@ export class Airdrop {
 
   delete() {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
-    Reflect.deleteProperty(Airdrop.db, this.key)
+    Reflect.deleteProperty(Airdrop.db, this.id)
 
     /** @param {'chestMinecart' | 'chicken'} key  */
     const kill = key => {
@@ -199,7 +199,7 @@ system.runInterval(
 
       if (airdrop.status === 'restoring') {
         try {
-          const saved = Airdrop.db[airdrop.key]
+          const saved = Airdrop.db[airdrop.id]
           if (!saved) return airdrop.delete()
 
           airdrop.chestMinecart = findAndRemove(chestMinecarts, saved.chest)
@@ -276,7 +276,7 @@ SM.afterEvents.worldLoad.subscribe(() => {
 
     if (!loot) {
       LootTable.onNew.subscribe(lootTable => {
-        if (lootTable.key === saved.loot) {
+        if (lootTable.id === saved.loot) {
           restore(loot)
         }
       })

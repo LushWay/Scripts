@@ -1,8 +1,9 @@
 import { Player, system, world } from '@minecraft/server'
-import { PLAYER_DB, ROLES, TIMERS_PATHES, getRole, util } from 'lib.js'
+import { PLAYER_DB, ROLES, getRole, util } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
+import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
 const db = new Command({
   name: 'db',
@@ -178,48 +179,6 @@ function changeValue(form, value) {
   }
 }
 
-/**
- * It takes the benchmark results and sorts them by average time, then it prints them out in a nice
- * format
- * @returns A string.
- */
-export function stringifyBenchmarkReult({ type = 'test', timerPathes = false } = {}) {
-  let output = ''
-  let res = Object.entries(util.benchmark.results[type])
-
-  res = res.sort((a, b) => a[1] - b[1])
-
-  for (const [key, average] of res) {
-    const color = colors.find(e => e[0] > average)?.[1] ?? '§4'
-    const isPath = timerPathes && key in TIMERS_PATHES
-
-    output += `§3Label §f${key}§r\n`
-    output += `§3| §7average: ${color}${average.toFixed(2)}ms\n`
-    // output += `§3| §7total time: §f${totalTime}ms\n`
-    // output += `§3| §7call count: §f${totalCount}\n`
-    if (isPath) output += `§3| §7path: §f${getPath(key)}\n`
-    output += '\n\n'
-  }
-  return output
-}
-
-/** @type {[number, string][]} */
-const colors = [
-  [0.1, '§a'],
-  [0.3, '§2'],
-  [0.5, '§g'],
-  [0.65, '§6'],
-  [0.8, '§c'],
-]
-
-/**
- *
- * @param {string} key
- */
-function getPath(key) {
-  return `\n${TIMERS_PATHES[key]}`.replace(/\n/g, '\n§3| §r')
-}
-
 const cmd = new Command({
   name: 'benchmark',
   description: 'Показывает время работы серверных систем',
@@ -237,13 +196,13 @@ cmd
       )
 
     if (useChat) {
-      return ctx.reply(stringifyBenchmarkReult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
+      return ctx.reply(stringifyBenchmarkResult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
     }
 
     function show() {
       new ActionForm(
         'Benchmark',
-        stringifyBenchmarkReult({
+        stringifyBenchmarkResult({
           type: type ?? 'timers',
           timerPathes: pathes ?? false,
         })

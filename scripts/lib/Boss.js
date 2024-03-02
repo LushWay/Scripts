@@ -8,6 +8,7 @@
 
 import { system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { LootTable } from 'lib/LootTable.js'
 import { BossArenaRegion } from 'lib/Region/index.js'
 import { EditableLocation } from './EditableLocation.js'
 import { chunkIsUnloaded } from './GameUtils.js'
@@ -20,14 +21,13 @@ import { chunkIsUnloaded } from './GameUtils.js'
  *}} BossDB
  */
 
-const BOSS_DB = new DynamicPropertyDB('boss', {
-  /**
-   * @type {Record<string, BossDB | undefined>}
-   */
-  type: {},
-}).proxy()
-
 export class Boss {
+  static db = new DynamicPropertyDB('boss', {
+    /**
+     * @type {Record<string, BossDB | undefined>}
+     */
+    type: {},
+  }).proxy()
   /**
    * @type {Boss[]}
    */
@@ -40,6 +40,7 @@ export class Boss {
    * @param {number} o.respawnTime In ms
    * @param {boolean} [o.bossEvent]
    * @param {number} [o.arenaRadius]
+   * @param {LootTable} o.loot
    * @param {Dimensions} [o.dimensionId]
    */
   constructor({
@@ -50,6 +51,7 @@ export class Boss {
     bossEvent = true,
     arenaRadius = 10,
     dimensionId = 'overworld',
+    loot,
   }) {
     this.name = name
     this.dimensionId = dimensionId
@@ -57,7 +59,8 @@ export class Boss {
     this.displayName = displayName
     this.respawnTime = respawnTime
     this.bossEvent = bossEvent
-    this.location = new EditableLocation('boss_' + name + '_spawn_pos')
+    this.loot = loot
+    this.location = new EditableLocation('Босс ' + name)
     this.arenaRadius = arenaRadius
 
     // Without delay any error during loading
@@ -78,7 +81,7 @@ export class Boss {
   check() {
     if (chunkIsUnloaded(this)) return
 
-    const db = BOSS_DB[this.name]
+    const db = Boss.db[this.name]
     if (db) {
       if (db.dead) {
         // After death interval
@@ -103,7 +106,7 @@ export class Boss {
     const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
     console.debug(`Boss(${this.name}).spawnEntity(${entityTypeId})`)
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
-    BOSS_DB[this.name] = {
+    Boss.db[this.name] = {
       id: this.entity.id,
       date: Date.now(),
       dead: false,
@@ -131,16 +134,18 @@ export class Boss {
 
   onDie({ dropLoot = true } = {}) {
     console.debug(`Boss(${this.name}).onDie()`)
+    const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
-    BOSS_DB[this.name] = {
+    Boss.db[this.name] = {
       id: '',
       date: Date.now(),
       dead: true,
     }
 
     if (dropLoot) {
-      world.say('Убит босс ' + this.displayName)
-      // Do nothing rn
+      world.say('§6Убит босс §f' + this.displayName + '!')
+      this.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
+      // TODO Give money depending on how many hits etc
     }
   }
 }

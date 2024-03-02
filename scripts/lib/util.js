@@ -8,64 +8,64 @@ export const util = {
   },
   error: Object.assign(
     /**
-     * Parse and show error in chat
-     * @param {{ message: string; stack?: string; name?: string} | string} error
-     * @param {object} [arg2]
-     * @param {number} [arg2.deleteStack]
-     * @param {string[]} [arg2.additionalStack]
-     * @param {string} [arg2.errorName]
-     * @param {boolean} [arg2.returnText]
+     * Stringify and show error in console
+     * @param {{ message: string; stack?: string; name?: string } | string } error
+     * @param {object} [options]
+     * @param {number} [options.omitStackLines]
+     * @param {string} [options.errorName] - Overrides error name
+     * @param {boolean} [options.parseOnly] - Whenever to log error to console or not.
+     * @param {string} [options.subtype]
      */
-    function error(error, { deleteStack = 0, additionalStack = [], errorName, returnText } = {}) {
+    function error(error, { omitStackLines = 0, errorName, parseOnly, subtype } = {}) {
       if (typeof error === 'string') {
         error = new Error(error)
         error.name = 'StringError'
       }
-      const stack = util.error.stack.get(deleteStack + 1, additionalStack, error.stack)
-      const message = util.error.message.get(error)
-      const name = errorName ?? error?.name ?? 'Error'
-      const text = `§4${name}: §c${message}\n§f${stack}`
 
-      if (!returnText) {
+      const stack = util.error.stack.get(omitStackLines + 1, error.stack)
+      const message = util.error.message.get(error)
+      const name = errorName ?? error.name ?? 'Error'
+      const text = `${subtype ? `§6${subtype}: ` : ''}§4${name}: §c${message}\n§f${stack}`
+
+      if (!parseOnly) {
         try {
-          // if (onWorldLoad.loaded()) world.say(text);
           console.error(text)
         } catch (e) {
           console.error(text, e)
         }
-      } else return text
+      }
+
+      return text
     },
     {
       stack: {
         /** @type {[RegExp | ((s: string) => string), string?][]} */
         modifiers: [
           [/\\/g, '/'],
-          [/<anonymous>/, '<>'],
-          [/<> \((.+)\)/, '$1'],
-          [/<input>/, '§7<eval>§r'],
+          [/<anonymous>/, 'ƒ'],
+          [/ƒ \((.+)\)/, 'ƒ $1'],
           [/(.*)\(native\)(.*)/, '§8$1(native)$2§f'],
-          [s => (s.includes('lib') || s.includes('xapi.js') ? `§7${s.replace(/§./g, '')}§f` : s)],
+          [s => (s.includes('lib') ? `§7${s.replace(/§./g, '')}§f` : s)],
           [s => (s.startsWith('§7') ? s : s.replace(/\.js:(\d+)/, '.js:§6$1§f'))],
         ],
 
         /**
-         * Parse stack
-         * @param {string[]} additionalStack
-         * @param {number} deleteStack
+         * Parses stack
+         * @param {number} omitLines
          * @param {string} [stack]
          * @returns {string}
          */
-        get(deleteStack = 0, additionalStack = [], stack) {
+        get(omitLines = 0, stack) {
           if (!stack) {
             stack = new Error().stack
             if (!stack) return 'Null stack'
             stack = stack
               .split('\n')
-              .slice(deleteStack + 1)
+              .slice(omitLines + 1)
               .join('\n')
           }
 
-          const stackArray = additionalStack.concat(stack.split('\n'))
+          const stackArray = stack.split('\n')
 
           const mappedStack = stackArray
             .map(e => e?.replace(/\s+at\s/g, '')?.replace(/\n/g, ''))
@@ -92,7 +92,7 @@ export const util = {
         ],
 
         /**
-         * @param {{message?: string, name?: string}} error
+         * @param {{ message?: string, name?: string }} error
          */
         get(error) {
           let message = error.message ?? ''
@@ -198,7 +198,7 @@ export const util = {
             }
             const cl = c.function
             // function
-            r = `${isArrow ? '' : `${cl.function}function `}`
+            r = `${isArrow ? '' : `${cl.function} ƒ `}`
             // "name"
             r += `${cl.name}${name}`
             // "(arg, arg)"
@@ -251,15 +251,16 @@ export const util = {
   },
 
   /**
-   * Runs given function safly. If it throws any error it will be catched and returned as
-   * second element in array
+   * Runs given function safly. If it throws synhronous error it will be catched and returned as
+   * second element in the array
    * @template {() => any} T
-   * @param {T} func
-   * @returns {[result: ReturnType<T>, error: undefined] | [result: undefined, error: unknown]}
+   * @param {T} fn
+   * @returns {[ result: ReturnType<T>, error: undefined ] |
+   *           [ result: undefined, error: unknown ] }
    */
-  run(func) {
+  run(fn) {
     try {
-      return [func(), void 0]
+      return [fn(), void 0]
     } catch (error) {
       return [void 0, error]
     }
@@ -267,22 +268,15 @@ export const util = {
 
   /**
    * Runs the given callback safly. If it throws any error it will be handled
-   * @param {() => void | Promise<void>} func
-   * @param {string} [type]
-   * @param {string[]} [additionalStack]
+   * @param {() => void | Promise<void>} fn
+   * @param {string} [subtype]
    */
-  async catch(func, type = 'Handled', additionalStack) {
+  catch(fn, subtype = 'Handled') {
     try {
-      await func()
+      const promise = fn()
+      if (promise instanceof Promise) promise.catch(e => this.error(e, { omitStackLines: 1, subtype }))
     } catch (e) {
-      this.error(
-        {
-          message: `${e.name ? `${e.name}: §f` : ''}${e.message ?? e}`,
-          name: type,
-          stack: e?.stack,
-        },
-        { additionalStack, deleteStack: 1 }
-      )
+      this.error(e, { omitStackLines: 1, subtype })
     }
   },
 
@@ -470,6 +464,7 @@ export const util = {
 
   /**
    * Import type declarations into global if available
+  // TODO Use monitor from shared types
    * @typedef {import('../../../../tools/monitoring/src/routes.d.ts')} _
    *
    */

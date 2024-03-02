@@ -55,7 +55,7 @@ function format(args) {
         typeof e === 'string'
           ? e
           : typeof e === 'object' && e !== null && e instanceof Error
-          ? util.error(e, { returnText: true }) ?? 'Empty error (check lib/Extensions/enviroment.js for more detail.)'
+          ? util.error(e, { parseOnly: true }) ?? 'Empty error (check lib/Extensions/enviroment.js for more detail.)'
           : util.inspect(e)
       )
     )

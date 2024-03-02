@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { Boss, util } from 'lib.js'
+import { Boss, LootTable, util } from 'lib.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 import { Ovener } from '../Features/Oven.js'
 
@@ -10,6 +10,7 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
     entityTypeId: MinecraftEntityTypes.Wither,
     bossEvent: false,
     respawnTime: util.ms.from('hour', 1),
+    loot: new LootTable({ id: 'wither drop', fill: { type: 'itemsCount' } }, { type: 'NetherStar', chance: '100%' }),
   })
 
   commonOvener = new Ovener({

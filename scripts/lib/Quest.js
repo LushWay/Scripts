@@ -245,7 +245,6 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => initialSpa
  */
 
 // TODO Test quest switching
-// TODO Change quest status placement (also show steps/enters on the onScreenDisplay)
 
 class PlayerQuest {
   /**
@@ -276,9 +275,9 @@ class PlayerQuest {
   dynamic(options) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const step = this
-    const text = options.text
-    const description = options.description
     const i = this.list.length
+    const { text, description } = options
+
     /** @type {PlayerQuest["list"][number]} */
     const ctx = {
       ...options,
@@ -296,6 +295,7 @@ class PlayerQuest {
       update: this.update.bind(this),
       quest: this.quest,
       next() {
+        if (isBuilding(this.player)) return
         this.cleanup?.()
         if (step.list[i + 1]) {
           this.quest.toStep(this.player, i + 1)
@@ -364,7 +364,7 @@ class PlayerQuest {
    * @param {QuestText} text
    * @param {QuestText} [description]
    */
-  place(from, to, text, description, doNotAllowBuilders = true) {
+  place(from, to, text, description) {
     // Unwrap vectors to not loose reference. For some reason, that happens
     from = { x: from.x, y: from.y, z: from.z }
     to = { x: to.x, y: to.y, z: to.z }
@@ -379,7 +379,6 @@ class PlayerQuest {
             actions.push(
               PlaceAction.onEnter(pos, player => {
                 if (player.id !== this.player.id) return
-                if (doNotAllowBuilders && isBuilding(player)) return
 
                 this.next()
               })
@@ -393,7 +392,7 @@ class PlayerQuest {
           }
         })
 
-        console.log('q.place', { from: Vector.string(from), to: Vector.string(to) })
+        // console.log('q.place', { from: Vector.string(from), to: Vector.string(to) })
         const { x, y, z } = Vector.lerp(from, to, 0.5)
 
         this.quest.steps(this.player).targetCompassTo({ place: { x, y, z }, temporary })
@@ -552,29 +551,37 @@ class PlayerQuest {
     this.dynamic({
       text: () => (options.text ? options.text(airdroppos) : '§6Забери аирдроп' + airdroppos),
       activate() {
-        // Saving/restoring airdrop
-
-        /** @type {Airdrop} */
+        /** @type {Airdrop | undefined} */
         let airdrop
-        const key = this.db
 
-        if (typeof key === 'string') {
-          if (key in Airdrop.db) {
-            airdrop = spawnAirdrop(key)
+        // Saving/restoring/debugging airdrop
+        const debugAirdrop = () => {
+          if (typeof this.db === 'string') {
+            if (this.db in Airdrop.db) {
+              airdrop = spawnAirdrop(this.db)
+            } else {
+              console.error(
+                new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.id}`)
+              )
+              system.delay(() => this.next())
+              return { cleanup() {} }
+            }
           } else {
-            console.error(new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.id}`))
-            system.delay(() => this.next())
-            return { cleanup() {} }
+            airdrop = spawnAirdrop()
           }
-        } else {
-          airdrop = spawnAirdrop()
+
+          this.db = airdrop.id
         }
 
-        this.db = airdrop.key
-        if (!key && !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
+        debugAirdrop()
+        if (!airdrop || !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
 
-        const temporary = new Temporary(({ world }) => {
+        const temporary = new Temporary(({ world, system, cleanup }) => {
+          system.runInterval(() => debugAirdrop(), 'PlayerQuest.airdrop debug', 20)
+
           world.afterEvents.playerInteractWithEntity.subscribe(event => {
+            if (!airdrop) return cleanup()
+
             const airdropEntity = airdrop.chestMinecart
             if (!airdropEntity) return
             if (event.target.id !== airdropEntity.id) return
@@ -585,6 +592,8 @@ class PlayerQuest {
           })
 
           world.afterEvents.entityDie.subscribe(event => {
+            if (!airdrop) return cleanup()
+
             if (event.deadEntity.id !== airdrop.chestMinecart?.id) return
 
             system.delay(() => this.next())
@@ -597,10 +606,12 @@ class PlayerQuest {
         this.quest.steps(this.player).targetCompassTo({
           place: Vector.floor(this.player.location),
           interval() {
+            if (!airdrop) return temporary.cleanup()
+
             const airdropEntity = airdrop.chestMinecart
             if (!airdropEntity || !airdropEntity.isValid()) return
 
-            this.place = Vector.floor(airdropEntity.location)
+            this.place = airdropEntity.location
 
             if (i === 1) {
               i = 0
@@ -656,7 +667,7 @@ class PlayerQuest {
    * @param {CompassOptions} options
    */
   targetCompassTo(options) {
-    return new Temporary(({ system }) => {
+    options.temporary = new Temporary(({ system }) => {
       system.runInterval(
         () => {
           if (!this.player.isValid()) return
@@ -682,5 +693,7 @@ class PlayerQuest {
         },
       }
     }, options.temporary)
+
+    return options
   }
 }

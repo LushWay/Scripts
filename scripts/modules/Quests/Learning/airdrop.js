@@ -1,7 +1,7 @@
 import { LootTable } from 'lib.js'
 
 export const LEARNING_L = new LootTable(
-  { key: 'starter' },
+  { id: 'starter' },
   {
     type: 'WoodenSword',
     chance: '100%',

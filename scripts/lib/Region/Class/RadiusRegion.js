@@ -4,6 +4,11 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 
+// Note for future
+// Currently subclassing RadiusRegion is just a pain, so instead
+// of doing this may be better to use subtype to permission map
+// instead of creating subclasses.
+
 export class RadiusRegion extends Region {
   /**
    * Subtype id of the RadiusRegion

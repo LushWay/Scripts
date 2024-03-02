@@ -98,7 +98,7 @@ patchPackage('@minecraft/server', {
      * @param name - Player name or ID
      * @param idOnly - Whenether to search only by id. Defaults to true
      */
-    static fetch(name: string, idOnly: boolean): Player | undefined;
+    static fetch(name: string, idOnly?: boolean): Player | undefined;
 
     /**
      * Gets player name from database by id

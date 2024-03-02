@@ -18,6 +18,7 @@ import './simulatedPlayer.js'
  */
 const tests = {
   cc(ctx) {
+    // @ts-expect-error Testing
     console.debug(Compass.players.get(ctx.sender)?.value)
   },
   title(ctx) {

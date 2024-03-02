@@ -117,7 +117,7 @@ export class WorldEdit {
    * action. It can be either an Error object or a string representing the error message.
    */
   failedTo(action, error) {
-    const text = util.error(error, { returnText: true })
+    const text = util.error(error, { parseOnly: true })
     if (!text) return
     console.error(text)
     this.player.fail(`Не удалось ${action}§f: ${error}`)

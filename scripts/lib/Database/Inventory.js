@@ -321,7 +321,7 @@ export class InventoryStore {
             'Unable to save InventoryStore, error:',
             error,
             '\nSaving request by:',
-            util.error.stack.get(2, [], stack)
+            util.error.stack.get(2, stack)
           )
         }
       },

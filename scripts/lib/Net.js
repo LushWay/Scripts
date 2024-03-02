@@ -34,7 +34,7 @@ export async function APIRequest(path, body) {
     try {
       body = JSON.parse(response.body)
     } catch (e) {
-      const error = util.error(e, { returnText: true })
+      const error = util.error(e, { parseOnly: true })
       throw new APIError(
         `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`
       )
