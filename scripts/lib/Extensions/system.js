@@ -19,7 +19,7 @@ function Timer(type, set, fn, name, ticks = 0) {
   const path = util.error.stack.get(1)
   TIMERS_PATHES[visualId] = path
 
-  return set(() => {
+  return set(function timer() {
     const end = util.benchmark(visualId, 'timers')
 
     util.catch(fn, type[0].toUpperCase() + type.slice(1))
@@ -45,13 +45,15 @@ OverTakes(System.prototype, {
     return Timer(
       'playerInterval',
       super.runInterval.bind(this),
-      () => {
+      function playersInterval() {
         for (const player of world.getAllPlayers()) player && callback(player)
       },
       ...args
     )
   },
   delay(fn) {
-    this.run(() => util.catch(fn, 'system.delay'))
+    this.run(function delay() {
+      util.catch(fn, 'system.delay')
+    })
   },
 })
