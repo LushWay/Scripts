@@ -27,7 +27,7 @@ const SHEDULED = new DynamicPropertyDB('ScheduledBlockPlace', {
 })
 const SHEDULED_DB = SHEDULED.proxy()
 
-console.debug(world.getDynamicProperty(SHEDULED.key))
+console.debug(world.getDynamicProperty(SHEDULED.tableId))
 
 console.debug({ SHEDULED_DB })
 
@@ -35,7 +35,7 @@ SHEDULED_DB.x.push('dbproxied push')
 
 console.debug({ arr, proxied, proxied2, SHEDULED_DB })
 
-console.debug(world.getDynamicProperty(SHEDULED.key))
+console.debug(world.getDynamicProperty(SHEDULED.tableId))
 
 /**
  * @template {object} T

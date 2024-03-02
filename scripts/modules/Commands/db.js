@@ -20,8 +20,8 @@ db.executes(ctx => selectTable(ctx.sender, true))
  */
 function selectTable(player, firstCall) {
   const form = new ActionForm('Таблицы данных')
-  for (const key in DynamicPropertyDB.keys) {
-    const DB = DynamicPropertyDB.keys[key]
+  for (const key in DynamicPropertyDB.tables) {
+    const DB = DynamicPropertyDB.tables[key]
     const name = `${key} §7${Object.keys(DB.proxy()).length}§r`
     form.addButton(name, () => showTable(player, key))
   }
@@ -36,7 +36,7 @@ function selectTable(player, firstCall) {
  */
 function showTable(player, table) {
   /** @type {DynamicPropertyDB<string, any>} */
-  const DB = DynamicPropertyDB.keys[table]
+  const DB = DynamicPropertyDB.tables[table]
   const proxy = DB.proxy()
 
   const menu = new ActionForm(`${table}`)
@@ -53,7 +53,7 @@ function showTable(player, table) {
     })
   })
   menu.addButton('§3Посмотреть в §fRAW', () => {
-    let raw = world.getDynamicProperty(DB.key)
+    let raw = world.getDynamicProperty(DB.tableId)
     try {
       if (typeof raw === 'string') raw = JSON.parse(raw)
     } catch {}

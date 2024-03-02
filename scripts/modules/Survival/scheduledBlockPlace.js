@@ -36,18 +36,24 @@ export function scheduleBlockPlace({ dimension, restoreTime, ...options }) {
 }
 
 system.runInterval(
-  () => {
+  function scheduledBlockPlaceInterval() {
     for (const schedules of Object.values(SHEDULED_DB)) {
       if (!Array.isArray(schedules)) continue
 
-      for (const [i, schedule] of schedules.entries()) {
+      // If we will not use immutable unproxied value,
+      // proxy wrapper will convert all values into subproxies
+      // which is too expensive when arrays are very big
+      const immutableSchedules = DynamicPropertyDB.immutableUnproxy(schedules)
+
+      for (const [i, schedule] of immutableSchedules.entries()) {
         if (!schedule) continue
+
         if (Date.now() < schedule.date) continue
 
         // To prevent blocks from restoring randomly in air
         // we calculate if there is near broken block and swap
         // their restore date, so they will restore in reversed order
-        const nearBlock = schedules.find(
+        const nearBlock = immutableSchedules.find(
           e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > schedule.date
         )
         if (nearBlock) continue
@@ -68,6 +74,6 @@ system.runInterval(
       }
     }
   },
-  'delayed block place',
+  'scheduled block place',
   10
 )

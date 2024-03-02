@@ -11,19 +11,32 @@ const PROXY_TARGET = Symbol('proxy_target')
  */
 export class DynamicPropertyDB {
   /**
-   * @template  T
+   * Usefull when a lot of data is being read from object, taken from database.
+   *
+   * **Caution**: Mutating unproxied value can cause data leaks.
+   * Consider using immutableUnproxy instead.
+   * @template T
    * @param {T} value
    * @returns {T}
    */
-  static unwrap(value) {
-    // @ts-expect-error Huh
+  static unproxy(value) {
+    // @ts-expect-error Generics
     if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET]
     return value
   }
   /**
+   * @template {object} T
+   * @param {T} value
+   * @returns {Immutable<T>}
+   */
+  static immutableUnproxy(value) {
+    // @ts-expect-error Generics
+    return this.unproxy(value)
+  }
+  /**
    * @type {Record<string, DynamicPropertyDB<any, any>>}
    */
-  static keys = {}
+  static tables = {}
 
   static separator = '|'
 
@@ -34,28 +47,28 @@ export class DynamicPropertyDB {
   value = {}
 
   /**
-   * @type {string}
-   */
-  key
-
-  /**
    * @private
    * @type {(p: string) => Partial<Value>}
    */
   defaultValue
 
   /**
+   * @type {string}
+   */
+  tableId
+
+  /**
    *
-   * @param {string} key
+   * @param {string} tableId
    * @param {{
    *   type?: Record<Key, Value>
    *   defaultValue?: (p: string) => Partial<Value>
    *   delayedInit?: boolean
    * }} [options]
    */
-  constructor(key, options = {}) {
-    if (key in DynamicPropertyDB.keys) {
-      const source = DynamicPropertyDB.keys[key]
+  constructor(tableId, options = {}) {
+    if (tableId in DynamicPropertyDB.tables) {
+      const source = DynamicPropertyDB.tables[tableId]
       return options?.defaultValue
         ? Object.setPrototypeOf(
             {
@@ -66,9 +79,9 @@ export class DynamicPropertyDB {
         : source
     }
 
-    this.key = key
+    this.tableId = tableId
     if (options.defaultValue) this.defaultValue = options.defaultValue
-    DynamicPropertyDB.keys[key] = this
+    DynamicPropertyDB.tables[tableId] = this
 
     if (!options.delayedInit) this.init()
   }
@@ -76,7 +89,7 @@ export class DynamicPropertyDB {
     // Init
     try {
       let value = ''
-      let length = world.getDynamicProperty(this.key) ?? 0
+      let length = world.getDynamicProperty(this.tableId) ?? 0
       if (typeof length === 'string') {
         // Old way load
         value = length
@@ -85,18 +98,20 @@ export class DynamicPropertyDB {
         // New way load
         if (typeof length !== 'number') {
           util.error(
-            new DatabaseError(`Expected index in type of number, recieved ${typeof value}, table '${this.key}'`)
+            new DatabaseError(`Expected index in type of number, recieved ${typeof value}, table '${this.tableId}'`)
           )
 
           length = 1
         }
 
         for (let i = 0; i < length; i++) {
-          const prop = world.getDynamicProperty(this.key + DynamicPropertyDB.separator + i)
+          const prop = world.getDynamicProperty(this.tableId + DynamicPropertyDB.separator + i)
           if (typeof prop !== 'string') {
             util.error(
               new DatabaseError(
-                `Corrupted database table '${this.key}', index ${i}, expected string, recieved '${util.inspect(prop)}'`
+                `Corrupted database table '${this.tableId}', index ${i}, expected string, recieved '${util.inspect(
+                  prop
+                )}'`
               )
             )
             console.error('Loaded part of database:', value)
@@ -119,7 +134,7 @@ export class DynamicPropertyDB {
         })
       )
     } catch (error) {
-      util.error(new DatabaseError(`Failed to init table '${this.key}': ${util.error(error, { parseOnly: true })}`))
+      util.error(new DatabaseError(`Failed to init table '${this.tableId}': ${util.error(error, { parseOnly: true })}`))
     }
   }
 
@@ -155,9 +170,9 @@ export class DynamicPropertyDB {
       )
       const strings = str.match(DB.PROPERTY_CHUNK_REGEXP)
       if (!strings) throw new DatabaseError('Failed to save db: cannot split')
-      world.setDynamicProperty(this.key, strings.length)
+      world.setDynamicProperty(this.tableId, strings.length)
       for (const [i, string] of strings.entries()) {
-        world.setDynamicProperty(this.key + DynamicPropertyDB.separator + i, string)
+        world.setDynamicProperty(this.tableId + DynamicPropertyDB.separator + i, string)
       }
     })
 

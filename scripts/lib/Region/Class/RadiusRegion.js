@@ -48,10 +48,10 @@ export class RadiusRegion extends Region {
     saveToDisk = true,
     subclassing = false,
   }) {
-    permissions = DynamicPropertyDB.unwrap(permissions)
+    permissions = DynamicPropertyDB.unproxy(permissions)
 
     super({ dimensionId, permissions, key })
-    this.center = DynamicPropertyDB.unwrap(center)
+    this.center = DynamicPropertyDB.unproxy(center)
     this.radius = radius
     this.saveToDisk = saveToDisk
 
