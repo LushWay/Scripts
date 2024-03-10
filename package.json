@@ -1,9 +1,10 @@
 {
-  "name": "sm-api",
-  "version": "0.17.62",
+  "name": "scripts",
+  "version": "0.17.63",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "lint": "eslint ./scripts/ --fix",
+    "lint": "eslint ./scripts/ --fix --plugin file-progress --rule 'file-progress/activate: 1'",
     "patch-modules": "node tools/patch-modules.js"
   },
   "dependencies": {
@@ -25,19 +26,18 @@
     "@minecraft/vanilla-data": "1.20.50"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.17.0",
-    "@typescript-eslint/parser": "^6.17.0",
-    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-file-progress": "^1.3.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-scriptapi": "file:tools/eslint-plugin#tools/eslint-plugin::hash=db6995&locator=sm-api%40workspace%3A.",
-    "leafy-utils": "^6.1.3",
-    "typescript": "^5.3.3"
+    "eslint-plugin-scriptapi": "file:tools/eslint-plugin",
+    "leafy-utils": "^6.6.4",
+    "typescript": "5.3",
+    "typescript-plugin-import-filter": "^0.2.0"
   },
-  "private": true,
-  "type": "module",
   "prettier": {
     "singleQuote": true,
     "arrowParens": "avoid",
@@ -50,27 +50,13 @@
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
-      "plugin:import/recommended",
-      "plugin:import/typescript",
       "prettier"
     ],
     "plugins": [
       "@typescript-eslint",
-      "import",
-      "scriptapi",
-      "file-progress"
+      "scriptapi"
     ],
     "settings": {
-      "import/parsers": {
-        "@typescript-eslint/parser": [
-          ".js"
-        ]
-      },
-      "import/resolver": {
-        "typescript": {
-          "alwaysTryTypes": true
-        }
-      },
       "scriptapi/no-cycle": {
         "maxDepth": 20
       }
@@ -85,7 +71,6 @@
       "scriptapi/ensure-modules": "error",
       "scriptapi/no-unsupported-features": "error",
       "@typescript-eslint/no-explicit-any": "off",
-      "file-progress/activate": 1,
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/naming-convention": [
@@ -161,6 +146,8 @@
     ],
     "root": true
   },
+  "packageManager": "yarn@4.0.2",
+  "private": "true",
   "workspaces": {
     "packages": [
       "tools/eslint-plugin"

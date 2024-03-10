@@ -9,11 +9,20 @@ import {
 } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { getRole, prompt, util } from 'lib.js'
+import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'
+/**
+ * @typedef {{pos1: Vector3;pos2: Vector3;}} WeDB
+ */
+
 export class WorldEdit {
+  static db = new DynamicPropertyDB('worldEdit', {
+    /** @type {Record<string, WeDB | undefined>} */
+    type: {},
+  }).proxy()
   /**
    * @param {Player} player
    */
@@ -34,49 +43,46 @@ export class WorldEdit {
    */
   visualSelectionCuboid
 
-  /** @private */
-  recreateCuboids() {
-    this.selection = new Cuboid(this.#pos1, this.#pos2)
-    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
-  }
-
-  /**
-   * @type {Vector3}
-   */
-  #pos1 = Vector.one
-  /**
-   * @type {Vector3}
-   */
-  #pos2 = Vector.one
+  /** @type {WeDB} */
+  db
 
   get pos1() {
-    return this.#pos1
+    return this.db.pos1
   }
   set pos1(value) {
-    this.#pos1 = value
-    this.recreateCuboids()
-    this.notifyPosChange(1)
+    this.db.pos1 = { x: value.x, y: value.y, z: value.z }
+    this.onPosChange(1)
   }
 
   get pos2() {
-    return this.#pos2
+    return this.db.pos2
   }
   set pos2(value) {
-    this.#pos2 = value
-    this.recreateCuboids()
-    this.notifyPosChange(2)
+    this.db.pos2 = { x: value.x, y: value.y, z: value.z }
+    this.onPosChange(2)
   }
 
   /**
    * @param {1 | 2} pos
+   * @private
    */
-  notifyPosChange(pos) {
+  onPosChange(pos) {
     system.delay(() => {
       const action = { 1: 'break', 2: 'use' }[pos]
       const color = { 1: '§5', 2: '§d' }[pos]
       this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
       this.player.playSound(SOUNDS.action)
+      this.updateSelectionCuboids()
     })
+  }
+
+  /** @private */
+  updateSelectionCuboids() {
+    if (DynamicPropertyDB.immutableUnproxy(this.pos1) === Vector.one) return console.debug('AAA')
+    if (DynamicPropertyDB.immutableUnproxy(this.pos2) === Vector.one) return console.debug('AAAB')
+
+    this.selection = new Cuboid(this.pos1, this.pos2)
+    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
   }
 
   /**
@@ -107,6 +113,14 @@ export class WorldEdit {
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
     WorldEdit.instances[id] = this
     this.player = player
+    let db = WorldEdit.db[this.player.id]
+    if (!db) {
+      db = { pos1: Vector.one, pos2: Vector.one }
+      WorldEdit.db[this.player.id] = db
+    }
+
+    this.db = db
+    this.updateSelectionCuboids()
   }
 
   /**

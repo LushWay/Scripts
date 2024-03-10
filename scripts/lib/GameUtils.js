@@ -2,8 +2,8 @@ import { Block, BlockTypes, Entity, ItemStack, LocationInUnloadedChunkError, Pla
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { untyped_terrain_textures } from './Assets/terrain-textures.js'
+import { BDS } from './BDS/modules.js'
 import { showForm } from './Form/utils.js'
-import { MODULE } from './OptionalModules.js'
 import { inaccurateSearch } from './Search.js'
 
 // TODO Split into each separate function
@@ -16,8 +16,8 @@ export const GAME_UTILS = {
    * @returns {undefined | string}
    */
   env(name) {
-    if (MODULE.ServerAdmin) {
-      return MODULE.ServerAdmin.variables.get(name)
+    if (BDS.ServerAdmin) {
+      return BDS.ServerAdmin.variables.get(name)
     }
   },
   /**
@@ -124,21 +124,6 @@ export const GAME_UTILS = {
     const textures = untyped_terrain_textures[search[0][0]].textures
 
     return Array.isArray(textures) ? textures[0] : textures
-  },
-  /**
-   * Sometimes some entity properties throws
-   * @template {Entity | Player} S
-   * @param {S} entity
-   * @template {keyof S} K
-   * @param {K} key
-   * @returns {S[K] | undefined}
-   */
-  safeGet(entity, key) {
-    try {
-      return entity[key]
-    } catch (e) {
-      return undefined
-    }
   },
 }
 

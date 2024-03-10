@@ -38,7 +38,8 @@ GameTest.registerAsync('s', 'test', async test => {
 
   const id = player.id
   const event = world.afterEvents.entityDie.subscribe(data => {
-    if (GAME_UTILS.safeGet(data.deadEntity, 'typeId') !== id) return
+    if (!data.deadEntity.isValid()) return
+    if (data.deadEntity.typeId !== id) return
     test.succeed()
   })
 

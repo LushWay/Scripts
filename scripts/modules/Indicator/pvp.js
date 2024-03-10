@@ -43,7 +43,7 @@ system.runInterval(
   20
 )
 
-SM.afterEvents.worldLoad.subscribe(() => {
+Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
       if (!options.enabled) return

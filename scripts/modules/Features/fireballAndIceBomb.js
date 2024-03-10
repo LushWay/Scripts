@@ -1,6 +1,6 @@
 import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { GAME_UTILS, util } from 'lib.js'
+import { util } from 'lib.js'
 import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace.js'
 // TODO Make custom items and throw effects work properly
 // may use projectileComponent in 1.9.0-beta
@@ -28,13 +28,15 @@ import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace.js'
 
 world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
   event => {
-    const typeId = GAME_UTILS.safeGet(event.entity, 'typeId')
-    if (typeId !== 'sm:fireball')
+    if (!event.entity.isValid()) return
+    if (event.entity.typeId !== 'sm:fireball') {
       return system.delay(() => {
         try {
           event.entity.remove()
         } catch {}
       })
+    }
+
     event.cancel = true
 
     const location = event.entity.location

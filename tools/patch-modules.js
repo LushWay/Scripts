@@ -1,5 +1,4 @@
 import fs from 'fs'
-import path from 'path'
 import { m, patchPackage, relative, resolve } from './utils.js'
 
 patchPackage('@minecraft/server', {
@@ -203,7 +202,4 @@ interface CommandOptions {
   },
 })
 
-fs.copyFileSync(
-  path.join(resolve('@minecraft/vanilla-data'), 'lib/index.js'),
-  relative('../scripts/@minecraft/vanilla-data.js')
-)
+fs.copyFileSync(resolve('@minecraft/vanilla-data'), relative('../scripts/@minecraft/vanilla-data.js'))

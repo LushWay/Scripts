@@ -3,24 +3,32 @@ import { util } from 'lib/util.js'
 import { EventLoader } from '../EventSignal.js'
 
 /**
- * Class because variable hoisting
+ * Core server features
  */
-class SM {
+class Core {
+  /**
+   * Core server events
+   */
   static afterEvents = {
+    /**
+     * Event that gets fired when server
+     * detects any entity
+     */
     worldLoad: new EventLoader(),
   }
 }
-globalThis.SM = SM
 
-system.run(async function waiter() {
-  const entities = await world.overworld.runCommandAsync(`testfor @e`)
-  if (entities.successCount < 1) {
-    // No entity found, we need to re-run this...
+globalThis.Core = Core
+
+system.run(function waiter() {
+  const entities = world.overworld.getEntities()
+  if (entities.length < 1) {
+    // No entity found, re-run waiter
     return system.run(waiter)
   }
 
   try {
-    EventLoader.load(SM.afterEvents.worldLoad)
+    EventLoader.load(Core.afterEvents.worldLoad)
   } catch (e) {
     util.error(e, { errorName: 'LoadError' })
   }

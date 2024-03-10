@@ -76,6 +76,7 @@ $квест`,
 
 system.runPlayerInterval(
   player => {
+    if (player.database.join) return // Do not show sidebar until player actually joins the world
     const minigame = Minigame.getCurrent(player)
     if (minigame) return minigame.sidebar.show(player)
     if (sidebarSettings(player).enabled) sidebar.show(player)

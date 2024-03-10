@@ -140,7 +140,7 @@ export class InventoryStore {
     this._.tableName = tableName
 
     // Init database only when entities are loaded
-    SM.afterEvents.worldLoad.subscribe(() => this.init())
+    Core.afterEvents.worldLoad.subscribe(() => this.init())
   }
 
   /** @private */

@@ -6,7 +6,7 @@ import './Build/visual.js'
 import './Chat/chat.js'
 import './Commands/index.js'
 // import './Indicator/index.js'
-import './PlayerJoin/playerJoin.js'
+import '../lib/PlayerJoin.js'
 import './Survival/index.js'
 import './WorldEdit/import.js'
 

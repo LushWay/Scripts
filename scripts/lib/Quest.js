@@ -1,8 +1,10 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
+import { util } from 'lib.js'
 import { Airdrop } from 'lib/Airdrop.js'
 import { LootTable } from 'lib/LootTable.js'
 import { Compass } from 'lib/Menu.js'
+import { Join } from 'lib/PlayerJoin.js'
 import { Settings } from 'lib/Settings.js'
 import { Temporary } from 'lib/Temporary.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
@@ -93,7 +95,7 @@ export class Quest {
     this.init = init
     this.description = desc
     Quest.instances[this.id] = this
-    SM.afterEvents.worldLoad.subscribe(() => {
+    Core.afterEvents.worldLoad.subscribe(() => {
       system.delay(() => {
         world.getAllPlayers().forEach(setQuests)
       })
@@ -206,13 +208,17 @@ export class Quest {
  * @param {Player} player
  */
 function setQuests(player) {
-  const status = Quest.active(player)
-  if (!status) return
+  system.delay(() => {
+    const time = util.benchmark('quest', 'join')
+    const status = Quest.active(player)
+    if (!status) return
 
-  status.quest.toStep(player, status.stepIndex, true)
+    status.quest.toStep(player, status.stepIndex, true)
+    time()
+  })
 }
 
-world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => initialSpawn && setQuests(player))
+Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
 
 /**
  * @typedef {() => string} DynamicQuestText

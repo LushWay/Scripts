@@ -267,7 +267,7 @@ const findAndRemove = (arr, id) => {
   if (i !== -1) return arr.splice(i, 1)[0]
 }
 
-SM.afterEvents.worldLoad.subscribe(() => {
+Core.afterEvents.worldLoad.subscribe(() => {
   for (const [key, saved] of Object.entries(Airdrop.db)) {
     const loot = LootTable.instances[saved.loot]
 

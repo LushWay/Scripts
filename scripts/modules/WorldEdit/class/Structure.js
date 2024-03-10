@@ -83,8 +83,7 @@ export class Structure extends Cuboid {
         `structure load "${file.name}" ${Vector.string(to)}${additional}`,
         from,
         to,
-        options,
-        false
+        options
       )
 
       await nextTick
@@ -103,13 +102,16 @@ export class Structure extends Cuboid {
  * @param {Vector3} vector2
  * @param {{errors: number, total: number}} options
  */
-async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, second = true) {
-  const result = world.overworld.runCommand(command)
-  // console.debug(command, result)
+async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, forceTp = false) {
+  let result = 0
+  if (!forceTp) {
+    result = world.overworld.runCommand(command)
+  }
+  console.debug(command, result)
   options.total++
 
   if (!result) {
-    world.say('Область будет прогружена с помощью тикингареи (' + options.total + ')')
+    world.say('Область будет прогружена (' + options.total + ')')
 
     // world.overworld.runCommand(`tickingarea remove safezone`)
     // await nextTick
@@ -119,15 +121,13 @@ async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector
     // world.overworld.runCommand(`tickingarea add ${Vector.string(vector1)} ${Vector.string(vector2)} safezone`)
     await system.sleep(60)
 
-    if (second) {
-      const result = world.overworld.runCommand(command)
+    const result = world.overworld.runCommand(command)
 
-      if (!result) world.say('§cFFFFFFFFF' + options.total)
-      if (!result) {
-        options.errors++
-        return 0
-      }
-    } else return 1
+    if (!result) world.say('§cFFFFFFFFF' + options.total)
+    if (!result) {
+      options.errors++
+      return 0
+    }
   }
   return 1
 }

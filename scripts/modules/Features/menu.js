@@ -1,7 +1,7 @@
 import { ActionForm } from 'lib.js'
 import { Menu } from 'lib/Menu.js'
+import { Join } from 'lib/PlayerJoin.js'
 import { openBaseMenu } from 'modules/Features/baseMenu.js'
-import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { questsMenu } from 'modules/Quests/command.js'
 import { Anarchy } from '../Places/Anarchy.js'
 import { Spawn } from '../Places/Spawn.js'

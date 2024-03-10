@@ -66,4 +66,4 @@ function load() {
   EventLoader.load(Enchantments.onLoad)
 }
 
-SM.afterEvents.worldLoad.subscribe(load)
+Core.afterEvents.worldLoad.subscribe(load)

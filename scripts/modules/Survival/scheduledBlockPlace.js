@@ -35,17 +35,22 @@ export function scheduleBlockPlace({ dimension, restoreTime, ...options }) {
   if (!other) SHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
 
+// If we will not use immutable unproxied value,
+// proxy wrapper will convert all values into subproxies
+// which is too expensive when arrays are very big
+const IMMUTABLE_DB = DynamicPropertyDB.immutableUnproxy(SHEDULED_DB)
+
+/** @type {['overworld', 'nether', 'end']} */
+const DIMENSIONS = ['overworld', 'nether', 'end']
+
 system.runInterval(
   function scheduledBlockPlaceInterval() {
-    for (const schedules of Object.values(SHEDULED_DB)) {
-      if (!Array.isArray(schedules)) continue
+    for (const dimension of DIMENSIONS) {
+      const schedules = IMMUTABLE_DB[dimension]
+      if (!Array.isArray(schedules) || !schedules.length) continue
 
-      // If we will not use immutable unproxied value,
-      // proxy wrapper will convert all values into subproxies
-      // which is too expensive when arrays are very big
-      const immutableSchedules = DynamicPropertyDB.immutableUnproxy(schedules)
-
-      for (const [i, schedule] of immutableSchedules.entries()) {
+      const time = util.benchmark('dimension', 'sc')
+      for (const schedule of schedules) {
         if (!schedule) continue
 
         if (Date.now() < schedule.date) continue
@@ -53,7 +58,7 @@ system.runInterval(
         // To prevent blocks from restoring randomly in air
         // we calculate if there is near broken block and swap
         // their restore date, so they will restore in reversed order
-        const nearBlock = immutableSchedules.find(
+        const nearBlock = schedules.find(
           e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > schedule.date
         )
         if (nearBlock) continue
@@ -63,15 +68,16 @@ system.runInterval(
           if (!block?.isValid()) continue
 
           block?.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
-          // console.debug('schedule place', schedule.typeId, schedule.location)
+          console.debug('schedule place', schedule.typeId, schedule.location)
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) continue
           util.error(e)
         }
 
         // Remove successfully placed block from the schedule array
-        schedules.splice(i, 1)
+        SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
       }
+      time()
     }
   },
   'scheduled block place',

@@ -1,5 +1,5 @@
 import { ActionForm, ModalForm, util } from 'lib.js'
-import { APIRequest } from 'lib/Net.js'
+import { request } from 'lib/BDS/api.js'
 
 new Command({
   name: 'shell',
@@ -13,7 +13,7 @@ new Command({
       for (const type of types) {
         form.addButton(type, () => {
           ctx.reply('§6> §rПринято.')
-          APIRequest('gitPull', { restartType: type })
+          request('gitPull', { restartType: type })
             .then(s => ctx.sender.tell(s.statusMessage))
             .catch(util.error)
         })
@@ -27,7 +27,7 @@ new Command({
       for (const type of cwds) {
         form.addButton(type, () => {
           ctx.reply('§6> §rПринято.')
-          APIRequest('gitStatus', { cwd: type })
+          request('gitStatus', { cwd: type })
             .then(s => ctx.sender.tell(s.statusMessage))
             .catch(util.error)
         })
@@ -39,7 +39,7 @@ new Command({
         .addTextField('Backup commit name\nЛучше всего то, что значимого было изменено', 'ничего не произойдет')
         .show(ctx.sender, (_, backupname) => {
           ctx.reply('§6> §rПринято.')
-          APIRequest('backup', { name: backupname })
+          request('backup', { name: backupname })
             .then(s => ctx.sender.tell(s.statusMessage))
             .catch(util.error)
         })

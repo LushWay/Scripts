@@ -1,5 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
-import { APIRequest } from './Net.js'
+import { request } from './BDS/api.js'
 
 /**
  * @param {number} value
@@ -43,7 +43,7 @@ export class Zone {
           const rmax = { x: center.x + rad, z: center.x + rad }
           const rmin = { x: center.z - rad, z: center.z - rad }
           if (!p) {
-            if (!reloadSent) APIRequest('reload', { status: 300 })
+            if (!reloadSent) request('reload', { status: 300 })
             reloadSent = true
             return
           }

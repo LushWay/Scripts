@@ -142,7 +142,7 @@ export class DynamicPropertyDB {
    * @returns {Record<Key, Value>}
    */
   proxy() {
-    return this.subproxy(this.value, '', '', true)
+    return this.subproxy(this.value, '', true)
   }
 
   /** @private */
@@ -186,15 +186,15 @@ export class DynamicPropertyDB {
 
   /**
    * @param {Record<string, any> & {[IS_PROXIED]?: boolean}} object
-   * @param {string} key
    * @param {string} keys
    * @returns {Record<string, any>}
    * @private
    */
-  subproxy(object, key, keys, initial = false) {
+  subproxy(object, keys, initial = false) {
     if (object[IS_PROXIED]) return object
-    const oldProxy = this.subproxyMap.get(object)
-    if (oldProxy) return oldProxy
+
+    const proxied = this.subproxyMap.get(object)
+    if (proxied) return proxied
 
     const proxy = new Proxy(object, {
       get: (target, p, reciever) => {
@@ -217,7 +217,7 @@ export class DynamicPropertyDB {
 
         // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
-          return this.subproxy(value, p, keys + '.' + p)
+          return this.subproxy(value, keys + '.' + p)
         } else return value
       },
       set: (target, p, value, reciever) => {
@@ -241,6 +241,7 @@ export class DynamicPropertyDB {
       },
     })
 
+    Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
     this.subproxyMap.set(object, proxy)
 
     return proxy

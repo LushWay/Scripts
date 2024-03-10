@@ -27,11 +27,21 @@
       "ES2020.Symbol.WellKnown",
       "ES2021.String"
     ],
-    "target": "es2020",
     "types": [],
+    "target": "ES2020",
     "module": "ES2020",
     "moduleResolution": "Bundler",
-    "baseUrl": "scripts/"
+    "baseUrl": "scripts/",
+    "plugins": [
+      {
+        "name": "typescript-plugin-import-filter",
+        "excludes": [
+          { "module": "leafy-utils" },
+          { "module": "@minecraft/vanilla-data" },
+          { "module": "scripts/chestui/**" }
+        ]
+      }
+    ]
   },
   "include": ["scripts/"],
   "exclude": ["scripts/chestui", "scripts/@minecraft/", "@minecraft/vanilla-data", "node_modules"]

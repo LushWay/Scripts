@@ -7,7 +7,7 @@ import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { Compass } from 'lib/Menu.js'
 import { BASE_ITEM_STACK } from 'modules/Features/base.js'
-import { APIRequest } from '../lib/Net.js'
+import { request } from '../lib/BDS/api.js'
 import { Mineshaft } from '../modules/Places/Mineshaft.js'
 import './enchant.js'
 import './lib/Form/util.test.js'
@@ -203,7 +203,7 @@ const tests = {
     )
   },
   async api(ctx) {
-    const res = await APIRequest('playerPlatform', {
+    const res = await request('playerPlatform', {
       playerName: ctx.sender.name,
     })
 

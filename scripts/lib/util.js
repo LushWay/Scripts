@@ -404,8 +404,7 @@ export const util = {
       return function end(string) {
         const tookTime = Date.now() - startTime
         const typeresults = (util.benchmark.results[type] ??= {})
-        typeresults[label] ??= 0
-        typeresults[label] = (typeresults[label] + tookTime) / 2
+        typeresults[label] = ((typeresults[label] ?? 0) + tookTime) / 2
         if (string) console.debug(`${string}§r §6+${tookTime}ms`)
         return tookTime
       }

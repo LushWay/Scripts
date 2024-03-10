@@ -3,12 +3,12 @@ import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data
 import { SOUNDS } from 'config.js'
 import { EditableLocation, Quest, SafeAreaRegion, Temporary, actionGuard } from 'lib.js'
 import { Menu } from 'lib/Menu.js'
+import { Join } from 'lib/PlayerJoin.js'
 import { Axe } from 'modules/Features/axe.js'
 import { randomTeleport } from 'modules/Features/randomTeleport.js'
 import { Anarchy } from 'modules/Places/Anarchy.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
-import { Join } from 'modules/PlayerJoin/playerJoin.js'
 import { createPublicGiveItemCommand } from 'modules/Survival/createPublicGiveItemCommand.js'
 import { LEARNING_L } from './airdrop.js'
 
@@ -107,12 +107,10 @@ export class Learning {
         activate() {
           return new Temporary(({ temp, world }) => {
             if (!Learning.craftingTableLocation.valid) return
-            Learning.quest
-              .steps(this.player)
-              .targetCompassTo({
-                place: Vector.add(Learning.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 }),
-                temporary: temp,
-              })
+            Learning.quest.steps(this.player).targetCompassTo({
+              place: Vector.add(Learning.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 }),
+              temporary: temp,
+            })
 
             world.afterEvents.playerInteractWithBlock.subscribe(event => {
               if (event.player.id !== this.player.id) return

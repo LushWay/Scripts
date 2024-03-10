@@ -8,7 +8,6 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { GAME_UTILS } from 'lib/GameUtils.js'
 import { EventSignal } from '../EventSignal.js'
 import { Region } from './Class/Region.js'
 import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config.js'
@@ -119,12 +118,9 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
   })
 
   world.afterEvents.entitySpawn.subscribe(({ entity, cause }) => {
-    const typeId = GAME_UTILS.safeGet(entity, 'typeId')
-    const location = GAME_UTILS.safeGet(entity, 'location')
-    const dimension = GAME_UTILS.safeGet(entity, 'dimension')
-    if (!typeId || !location || !dimension || NOT_MOB_ENTITIES.includes(typeId) || !entity.isValid()) return
+    if (NOT_MOB_ENTITIES.includes(entity.typeId) || !entity.isValid()) return
 
-    const region = Region.locationInRegion(location, dimension.type)
+    const region = Region.locationInRegion(entity.location, entity.dimension.type)
     if (spawnAllowed(region, { entity, cause })) return
 
     entity.remove()

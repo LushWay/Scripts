@@ -148,9 +148,10 @@ export class Leaderboard {
   }
 }
 
+const immutable = DynamicPropertyDB.immutableUnproxy(Leaderboard.db)
 system.runInterval(
   () => {
-    for (const [id, leaderboard] of Object.entries(Leaderboard.db)) {
+    for (const [id, leaderboard] of Object.entries(immutable)) {
       const LB = Leaderboard.all[id]
 
       if (LB) {

@@ -1,6 +1,7 @@
 import { world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { Cooldown, Settings, getRoleAndName, util } from 'lib.js'
+import { sendPacketToStdout } from 'lib/BDS/api.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 export class ChatBuilder {
@@ -67,7 +68,7 @@ export class ChatBuilder {
         if (util.settings.BDSMode) {
           // This is handled/parsed by ServerCore
           // Dont really want to do APICall each time here
-          util.sendPacketToStdout('chatMessage', {
+          sendPacketToStdout('chatMessage', {
             name: event.sender.name,
             role: getRoleAndName(event.sender, { name: false }),
             print: message,

@@ -120,9 +120,14 @@ declare global {
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
+    name?: string | undefined
     role: Role
     prevRole?: Role
     quests?: import('./Quest').QuestDB
+    join?: {
+      position?: number[]
+      stage?: number
+    }
   }
 
   type GameplayStatScoreName =

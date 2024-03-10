@@ -1,8 +1,8 @@
 import { system } from '@minecraft/server'
 import { Airdrop, EventSignal, prompt } from 'lib.js'
+import { Join } from 'lib/PlayerJoin.js'
 import { Anarchy } from 'modules/Places/Anarchy.js'
 import { Spawn } from 'modules/Places/Spawn.js'
-import { Join } from 'modules/PlayerJoin/playerJoin.js'
 
 new Command({
   name: 'wipe',
@@ -30,7 +30,7 @@ new Command({
       system.runTimeout(
         () => {
           delete ctx.sender.database.survival.anarchy
-          EventSignal.emit(Join.onMoveAfterJoin, { player: ctx.sender, joinCounts: 1, firstJoin: true })
+          EventSignal.emit(Join.onMoveAfterJoin, { player: ctx.sender, joinTimes: 1, firstJoin: true })
         },
         'clear',
         30

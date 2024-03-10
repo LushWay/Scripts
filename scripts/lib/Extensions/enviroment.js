@@ -48,7 +48,7 @@ Array.prototype.randomElement = function () {
  * @param {unknown[]} args
  */
 function format(args) {
-  if (!globalThis?.SM?.afterEvents?.worldLoad?.loaded) prefixFormat(args)
+  if (!globalThis?.Core?.afterEvents?.worldLoad?.loaded) prefixFormat(args)
   return args
     .map(e =>
       util.toTerminalColors(

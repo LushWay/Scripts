@@ -1,6 +1,9 @@
 import { Player, system, world } from '@minecraft/server'
-import { Settings, getRoleAndName, util } from 'lib.js'
+import { sendPacketToStdout } from 'lib/BDS/api.js'
 import { EventSignal } from 'lib/EventSignal.js'
+import { Settings } from 'lib/Settings.js'
+import { getRoleAndName } from 'lib/roles.js'
+import { util } from 'lib/util.js'
 
 class JoinBuilder {
   config = {
@@ -21,7 +24,7 @@ class JoinBuilder {
     },
   }
   /**
-   * @type {EventSignal<{ player: Player, joinCounts: number, firstJoin: boolean }>}
+   * @type {EventSignal<{ player: Player, joinTimes: number, firstJoin: boolean }>}
    */
   onMoveAfterJoin = new EventSignal()
 
@@ -29,31 +32,41 @@ class JoinBuilder {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (!firstJoin) player.tell(`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
     }, -1),
+    playerSpawn: world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+      if (!initialSpawn) return
+      if (player.scores.joinDate === 0) player.scores.joinDate = ~~(Date.now() / 1000)
+      this.setPlayerJoinPosition(player)
+    }),
+  }
+
+  /**
+   * @private
+   * @param {Player} player
+   */
+  playerAt(player) {
+    const rotation = player.getRotation()
+    const { location } = player
+    return [location.x, location.y, location.z, rotation.x, rotation.y].map(Math.floor)
   }
 
   /**
    * @param {Player} player
-   * @private
    */
-  playerAt(player) {
-    const rotation = player.getRotation()
-    return [player.location.x, player.location.y, player.location.z, rotation.x, rotation.y].map(Math.floor)
+  setPlayerJoinPosition(player) {
+    player.database.join ??= {}
+    player.database.join.position = this.playerAt(player)
+    console.log('Player join set position', player.database.join.position.join(' '))
   }
 
   constructor() {
-    world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
-      if (!initialSpawn) return
-      if (player.scores.joinDate === 0) player.scores.joinDate = ~~(Date.now() / 1000)
-      player.database.join ??= {}
-      player.database.join.position = this.playerAt(player)
-    })
-
     system.runPlayerInterval(
       player => {
-        player.database.join ??= {}
+        player.database.join
         const db = player.database.join
 
-        if (Array.isArray(db.position)) {
+        if (Array.isArray(db?.position)) {
+          console.log('Player join interval', db.position.join(' '), this.playerAt(player).join(' '))
+          const time = util.benchmark('joinInterval', 'join')
           const notMoved = Array.equals(db.position, this.playerAt(player))
 
           if (notMoved) {
@@ -89,6 +102,7 @@ class JoinBuilder {
             // Player moved on ground
             this.join(player, 'ground')
           }
+          time()
         }
       },
       'joinInterval',
@@ -100,7 +114,7 @@ class JoinBuilder {
       description: 'Имитирует первый вход',
       role: 'member',
     }).executes(ctx => {
-      EventSignal.emit(this.onMoveAfterJoin, { player: ctx.sender, joinCounts: 1, firstJoin: true })
+      EventSignal.emit(this.onMoveAfterJoin, { player: ctx.sender, joinTimes: 0, firstJoin: true })
     })
   }
 
@@ -126,7 +140,7 @@ class JoinBuilder {
 
     const message = Join.config.messages[where]
 
-    util.sendPacketToStdout('joinOrLeave', {
+    sendPacketToStdout('joinOrLeave', {
       name: player.name,
       role: getRoleAndName(player, { name: false }),
       status: 'move',
@@ -144,8 +158,8 @@ class JoinBuilder {
 
     EventSignal.emit(this.onMoveAfterJoin, {
       player,
-      joinCounts: player.scores.joinTimes,
-      firstJoin: player.scores.joinTimes === 0,
+      joinTimes: player.scores.joinTimes,
+      firstJoin: player.scores.joinTimes === 1,
     })
   }
 }
@@ -157,7 +171,7 @@ export const Join = new JoinBuilder()
  * Выводит строку времени
  * @returns {string}
  */
-export function timeNow() {
+function timeNow() {
   const time = new Date(Date()).getHours() + 3
   if (time < 6) return '§9Доброй ночи'
   if (time < 12) return '§6Доброе утро'
@@ -169,7 +183,7 @@ export function timeNow() {
  * Выводит время в формате 00:00
  * @returns {string}
  */
-export function shortTime() {
+function shortTime() {
   const time = new Date(Date())
   time.setHours(time.getHours() + 3)
   const min = String(time.getMinutes())

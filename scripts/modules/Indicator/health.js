@@ -1,7 +1,7 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ENTITIES } from 'config.js'
-import { GAME_UTILS, util } from 'lib.js'
+import { util } from 'lib.js'
 import { CLOSING_CHAT } from 'lib/Extensions/player.js'
 import { NOT_MOB_ENTITIES } from 'lib/Region/config'
 import { isBuilding } from 'modules/Build/isBuilding'
@@ -34,26 +34,31 @@ const ALWAYS_SHOWS = [MinecraftEntityTypes.Player]
 const ALLOWED_FAMILIES = ['monster']
 
 // Show indicator on hurt
-world.afterEvents.entityHurt.subscribe(data => {
-  if (data.damage === 0) return
+world.afterEvents.entityHurt.subscribe(event => {
+  if (event.damage === 0) return
+
   // Validate entity
-  const id = GAME_UTILS.safeGet(data.hurtEntity, 'id')
+  if (!event.hurtEntity.isValid()) return
+
+  const { id } = event.hurtEntity
   if (!id || NOT_MOB_ENTITIES.includes(id)) return
   if (
-    !data.hurtEntity.isValid() ||
-    !(data.hurtEntity.matches({ families: ALLOWED_FAMILIES }) || data.hurtEntity instanceof Player)
+    !event.hurtEntity.isValid() ||
+    !(event.hurtEntity.matches({ families: ALLOWED_FAMILIES }) || event.hurtEntity instanceof Player)
   )
     return
 
   // Not trigget by close chat
-  if (CLOSING_CHAT.has(data.hurtEntity.id)) return
+  if (CLOSING_CHAT.has(event.hurtEntity.id)) return
 
-  updateIndicator({ entity: data.hurtEntity, damage: Math.floor(data.damage) })
+  updateIndicator({ entity: event.hurtEntity, damage: Math.floor(event.damage) })
 })
 
 // Remove indicator
-world.afterEvents.entityDie.subscribe(data => {
-  const id = GAME_UTILS.safeGet(data.deadEntity, 'id')
+world.afterEvents.entityDie.subscribe(event => {
+  if (!event.deadEntity.isValid()) return
+
+  const { id } = event.deadEntity
   if (!id) return
 
   const info = HURT_ENTITIES[id]
@@ -148,8 +153,9 @@ PLAYER_NAME_TAG_MODIFIERS.push(p => {
 /**
  * @param {{entity: Entity, damage?: number, entityId?: string}} param0
  */
-function updateIndicator({ entity, damage = 0, entityId = GAME_UTILS.safeGet(entity, 'id') }) {
-  if (!entityId) return
+function updateIndicator({ entity, damage = 0, entityId }) {
+  if (entity.isValid()) return
+  entityId ??= entity.id
 
   let info = HURT_ENTITIES[entityId]
 
@@ -228,11 +234,8 @@ function getIndicators() {
  * @param {Entity[]} entities
  */
 function getIDs(entities) {
-  return entities.map(
-    entity =>
-      /** @type {{id: string, entity: Entity}} */ ({
-        id: GAME_UTILS.safeGet(entity, 'id'),
-        entity,
-      })
-  )
+  return entities.map(entity => ({
+    id: util.run(() => entity.id)[0],
+    entity,
+  }))
 }

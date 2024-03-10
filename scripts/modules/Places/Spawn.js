@@ -4,6 +4,7 @@ import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Se
 
 import { migration } from 'lib/Database/Migrations.js'
 import { Menu } from 'lib/Menu.js'
+import { Join } from 'lib/PlayerJoin.js'
 import { isBuilding } from 'modules/Build/isBuilding'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
@@ -65,6 +66,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         system.delay(() => spawnLocation.teleport(player))
       })
 
+      world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
         // Skip death respawns
         if (!initialSpawn) return
@@ -75,7 +77,10 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         // Check settings
         if (!this.settings(player).teleportToSpawnOnJoin) return
 
-        util.catch(() => this.portal?.teleport(player))
+        util.catch(() => {
+          this.portal?.teleport(player)
+          system.runTimeout(() => Join.setPlayerJoinPosition(player), 'Spawn set player position after join', 10)
+        })
       })
 
       this.region = new SafeAreaRegion({

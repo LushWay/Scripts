@@ -1,21 +1,12 @@
-import { existsSync } from 'fs'
-import * as fs from 'fs/promises'
-import { pathInfo } from 'leafy-utils'
+import fs from 'fs/promises'
 import path from 'path'
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const { relative } = pathInfo(import.meta.url)
 
-/**
- * @param {string} name
- */
-export function resolve(name) {
-  const pathes = ['.', '../', '../../', '../../../', '../../../../']
-  for (const p of pathes) {
-    const base = relative(p, 'node_modules', name)
-    if (existsSync(base)) return base
-  }
-  throw new Error('Cannot find module folder: ' + name)
-}
+import { pathInfo } from 'leafy-utils'
+import { createRequire } from 'module'
+
+export const { relative } = pathInfo(import.meta.url)
+const require = createRequire(import.meta.url)
+export const resolve = require.resolve
 
 const LAST_UPDATE_PATH = path.join(process.cwd(), 'tools', 'last-update')
 /** @type {string} */
@@ -39,9 +30,9 @@ export async function patchPackage(packageName, options) {
     } catch {}
   }
 
-  // Get the path to the package's TypeScript definition file
-  const packagePath = path.join(resolve(packageName), `index.d.ts`)
-  const stat = await fs.stat(packagePath)
+  // Get path to the package's TypeScript definition file
+  const indexDts = path.join(resolve(path.join(packageName, 'package.json')), '..', 'index.d.ts')
+  const stat = await fs.stat(indexDts)
 
   if (!LAST_UPDATE) {
     await writeLastUpdate()
@@ -49,7 +40,7 @@ export async function patchPackage(packageName, options) {
 
   if (stat.mtimeMs.toString() === LAST_UPDATE) return
 
-  let patchedCode = await fs.readFile(packagePath, 'utf-8')
+  let patchedCode = await fs.readFile(indexDts, 'utf-8')
 
   // Apply the replacements
   for (const replace of options.replaces) {
@@ -97,11 +88,11 @@ export async function patchPackage(packageName, options) {
   }
 
   // Write the patched code back to the file
-  await fs.writeFile(packagePath, newCode)
+  await fs.writeFile(indexDts, newCode)
   await writeLastUpdate()
 
   async function writeLastUpdate() {
-    await fs.writeFile(LAST_UPDATE_PATH, (await fs.stat(packagePath)).mtimeMs.toString())
+    await fs.writeFile(LAST_UPDATE_PATH, (await fs.stat(indexDts)).mtimeMs.toString())
   }
 }
 
