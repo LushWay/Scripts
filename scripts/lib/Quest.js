@@ -426,6 +426,7 @@ class PlayerQuest {
     options.value ??= 0
 
     options.diff = function (diff) {
+      if (isBuilding(this.player)) return
       options.value ??= 0
       const result = options.value + diff
 

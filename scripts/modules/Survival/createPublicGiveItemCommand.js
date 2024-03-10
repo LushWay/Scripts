@@ -38,7 +38,7 @@ export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.b
     name,
     description: `Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`,
     type: 'public',
-  }).executes(async ctx => {
+  }).executes(ctx => {
     give(ctx.sender)
   })
 

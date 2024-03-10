@@ -31,7 +31,7 @@ export class Menu {
     this.give = give
     this.command = command
 
-    world.afterEvents.itemUse.subscribe(async ({ source: player, itemStack }) => {
+    world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
       if (!(player instanceof Player)) return
       if (itemStack.typeId !== this.item.typeId && !itemStack.typeId.startsWith(CUSTOM_ITEMS.compassPrefix)) return
 

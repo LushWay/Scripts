@@ -64,8 +64,13 @@ export class InventoryStore {
       try {
         if (item) container.setItem(Number(i), item)
       } catch (e) {
-        to.fail('Не удалось загрузить инвентарь.')
-        util.error(e)
+        to.fail(`Не удалось загрузить предмет в слот ${i}.`)
+        console.error(
+          `§cFailed to load inventory slot §f${i}§c for player §f${to.name}§r§c, item: `,
+          item,
+          '§r§cerror:',
+          e
+        )
       }
     }
   }

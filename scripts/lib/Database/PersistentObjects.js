@@ -21,7 +21,7 @@ export class PersistentSet extends Set {
       if (typeof saved === 'string') {
         const parsed = JSON.parse(saved)
         if (!Array.isArray(parsed)) {
-          console.warn(`PersistentSet<${id}> is not array:`, parsed)
+          console.warn(`PersistentSet<${id}>: Dynamic property is not array, it is:`, parsed)
           return
         }
 
