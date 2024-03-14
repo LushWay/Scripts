@@ -1,6 +1,6 @@
 import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { Airdrop, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, util } from 'lib.js'
+import { Airdrop, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, is, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
@@ -12,6 +12,15 @@ import { Mineshaft } from '../modules/Places/Mineshaft.js'
 import './enchant.js'
 import './lib/Form/util.test.js'
 import './simulatedPlayer.js'
+
+/**
+ * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
+ */
+const publicTests = {
+  death(ctx) {
+    ctx.sender.kill()
+  },
+}
 
 /**
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
@@ -256,12 +265,13 @@ const tests = {
 
 const c = new Command({
   name: 'test',
-  role: 'techAdmin',
+  description: 'Разные тесты',
 })
 
 c.string('id', true).executes(async (ctx, id) => {
-  const keys = Object.keys(tests)
-  if (!keys.includes(id)) return ctx.error('Unknown test ' + id)
-  ctx.reply('Test ' + id)
-  util.catch(() => tests[id](ctx), 'Test')
+  const source = is(ctx.sender.id, 'techAdmin') ? { ...publicTests, ...tests } : tests
+  const keys = Object.keys(source)
+  if (!keys.includes(id)) return ctx.error('Неизвестный тест ' + id + ', доступные:\n§f' + keys.join('\n'))
+  ctx.reply('Tест ' + id)
+  util.catch(() => source[id](ctx), 'Test')
 })

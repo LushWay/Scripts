@@ -51,7 +51,8 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   if (nearestPlace && nearestPlace.portalTeleportsTo.valid) {
     player.teleport(nearestPlace.portalTeleportsTo)
   } else {
-    Spawn.loadInventory(player)
+    delete player.database.survival.anarchy
+    Spawn.setInventory(player)
   }
 
   if (settings(player).restoreInvQuest) quest.enter(player)
