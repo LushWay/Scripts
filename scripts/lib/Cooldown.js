@@ -3,6 +3,14 @@ import { util } from './util.js'
 
 export class Cooldown {
   /**
+   *
+   * @param {number} timestamp
+   * @param {number} cooldown
+   */
+  static expired(timestamp, cooldown) {
+    return Date.now() - timestamp <= cooldown
+  }
+  /**
    * Generates a unique key for the cooldown in the database
    * @param {string} name - The name of the cooldown
    * @param {string} id - The ID of the player or source related to the cooldown

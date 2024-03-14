@@ -1,6 +1,17 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { PLAYER_DB, Quest, Region, SafeAreaRegion, Settings, Temporary, actionGuard, inventoryIsEmpty } from 'lib.js'
+import {
+  Cooldown,
+  PLAYER_DB,
+  Quest,
+  Region,
+  SafeAreaRegion,
+  Settings,
+  Temporary,
+  actionGuard,
+  inventoryIsEmpty,
+  util,
+} from 'lib.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { ALLOW_SPAWN_PROP } from 'modules/Survival/guard.js'
@@ -8,6 +19,8 @@ import { ALLOW_SPAWN_PROP } from 'modules/Survival/guard.js'
 const gravestoneOwnerKey = 'owner'
 const gravestoneEntity = MinecraftEntityTypes.HopperMinecart
 const gravestoneTag = 'gravestone'
+const gravestoneSpawnedAt = 'gravestoneAt'
+const gravestoneCleanupAfter = util.ms.from('sec', 5)
 
 world.afterEvents.entityDie.subscribe(event => {
   if (event.deadEntity instanceof Player) {
@@ -18,6 +31,7 @@ world.afterEvents.entityDie.subscribe(event => {
     const gravestone = dimension.spawnEntity(gravestoneEntity + '<loot>', head)
     gravestone.setDynamicProperty(ALLOW_SPAWN_PROP, true)
     gravestone.setDynamicProperty(gravestoneOwnerKey, playerId)
+    gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
     gravestone.addTag(gravestoneTag)
     gravestone.nameTag = `§6Могила §f${name}`
 
@@ -55,13 +69,25 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
     Spawn.setInventory(player)
   }
 
-  if (settings(player).restoreInvQuest) quest.enter(player)
+  if (settings(player).restoreInvQuest) {
+    // Exit previous death quest
+    quest.exit(player)
+    quest.enter(player)
+  }
 })
 
 system.runInterval(
   () => {
     for (const entity of world.overworld.getEntities({ type: gravestoneEntity, tags: [gravestoneTag] })) {
-      if (inventoryIsEmpty(entity)) entity.remove()
+      const at = entity.getDynamicProperty(gravestoneSpawnedAt)
+      if (typeof at !== 'number') {
+        entity.remove()
+        continue
+      }
+
+      if (Cooldown.expired(at, gravestoneCleanupAfter)) {
+        if (inventoryIsEmpty(entity)) entity.remove()
+      }
     }
   },
   'gravestones cleanup',
