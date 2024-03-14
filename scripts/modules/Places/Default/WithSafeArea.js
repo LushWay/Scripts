@@ -4,6 +4,8 @@ import { EditableLocation, SafeAreaRegion } from 'lib.js'
 import { actionGuard } from 'lib/Region/index.js'
 
 export class DefaultPlaceWithSafeArea {
+  /** @type {DefaultPlaceWithSafeArea[]} */
+  static places = []
   /**
    * @param {string} name
    */
@@ -22,6 +24,7 @@ export class DefaultPlaceWithSafeArea {
         radius: location.radius,
       })
     })
+    DefaultPlaceWithSafeArea.places.push(this)
   }
 }
 

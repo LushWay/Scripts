@@ -48,7 +48,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           if (isBuilding(player)) return tpMenuOnce(player)
 
           if (player.database.inv === this.inventoryName) {
-            return player.fail('§cВы уже находитесь на анархии!')
+            return player.fail(
+              '§cВы уже находитесь на анархии! Если это не так, используйте §f.anarchy clearpos §cчтобы очистить позицию на анархии'
+            )
           }
 
           system.delay(() => {
@@ -111,13 +113,13 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
   /** @type {DefaultPlaceWithInventory['saveInventory']} */
   saveInventory(player) {
-    // Do not save location if on spawn
-    if (Spawn.region?.vectorInRegion(player.location)) return
-
     this.inventoryStore.saveFrom(player, {
       rewrite: true,
       keepInventory: false,
     })
+
+    // Do not save location if on spawn
+    if (Spawn.region?.vectorInRegion(player.location)) return
     player.database.survival.anarchy = Vector.floor(player.location)
   }
 }

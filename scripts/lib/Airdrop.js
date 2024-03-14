@@ -1,5 +1,4 @@
 import {
-  Dimension,
   Entity,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
@@ -221,31 +220,11 @@ system.runInterval(
         }
       } else if (airdrop.status === 'being looted') {
         if (airdrop.chestMinecart) findAndRemove(chestMinecarts, airdrop.chestMinecart.id)
-        if (airdrop.chestMinecart?.isValid()) {
-          // Clear empty looted airdrops
-          const { container } = airdrop.chestMinecart
-          if (!container) continue // Skip unloaded
-          if (container.emptySlotsCount === container.size) {
-            airdrop.delete()
-          }
-        }
 
-        if (airdrop.chicken) {
-          findAndRemove(chickens, airdrop.chicken.id)
-        }
-      }
-
-      // Cleanup
-      /**
-       * @param {Entity[]} arr
-       * @param {'chestMinecart' | 'chicken'} type
-       */
-      const cleanup = (arr, type) => {
-        for (const chest of arr) {
-          if (!chest.isValid()) continue
-          if (!Airdrop.instances.find(e => e[type]?.id === chest.id)) {
-            chest.remove()
-          }
+        // Clear empty looted airdrops
+        if (inventoryIsEmpty(airdrop.chestMinecart)) {
+          if (airdrop.chicken) findAndRemove(chickens, airdrop.chicken.id)
+          airdrop.delete()
         }
       }
 
@@ -258,7 +237,32 @@ system.runInterval(
 )
 
 /**
- * Finds entity in entity array by id and removes it
+ * @param {Entity | undefined} entity
+ */
+export function inventoryIsEmpty(entity) {
+  if (!entity?.isValid()) return false
+
+  const { container } = entity
+  if (!container) return false // Skip unloaded
+
+  if (container.emptySlotsCount === container.size) return true
+}
+
+/**
+ * @param {Entity[]} arr
+ * @param {'chestMinecart' | 'chicken'} type
+ */
+function cleanup(arr, type) {
+  for (const entity of arr) {
+    if (!entity.isValid()) continue
+    if (!Airdrop.instances.find(e => e[type]?.id === entity.id)) {
+      entity.remove()
+    }
+  }
+}
+
+/**
+ * Finds entity in entity array by id and removes it from array
  * @param {Entity[]} arr
  * @param {string} id
  */
@@ -285,41 +289,6 @@ Core.afterEvents.worldLoad.subscribe(() => {
     }
   }
 })
-
-/** @type {Set<{dimension: Dimension, id: string, location: Vector3}>} */
-const removedEntities = new Set()
-
-world.beforeEvents.entityRemove.subscribe(event => {
-  if (
-    event.removedEntity.hasTag(Airdrop.minecartTag) &&
-    event.removedEntity.typeId === MinecraftEntityTypes.ChestMinecart
-  ) {
-    removedEntities.add({
-      dimension: event.removedEntity.dimension,
-      location: event.removedEntity.location,
-      id: event.removedEntity.id,
-    })
-  }
-})
-
-world.afterEvents.entityDie.subscribe(
-  event => {
-    for (const entity of removedEntities) {
-      if (entity.id === event.deadEntity.id) {
-        entity.dimension
-          .getEntities({
-            location: entity.location,
-            maxDistance: 2,
-            type: 'minecraft:item',
-          })
-          .forEach(e => e.isValid() && e.remove())
-
-        removedEntities.delete(entity)
-      }
-    }
-  },
-  { entityTypes: [MinecraftEntityTypes.ChestMinecart] }
-)
 
 actionGuard((player, _region, ctx) => {
   if (ctx.type === 'interactWithEntity') {

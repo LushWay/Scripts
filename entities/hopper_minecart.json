@@ -1,98 +1,141 @@
 {
-  "format_version": "1.17.0",
+  "format_version": "1.16.0",
   "minecraft:entity": {
     "description": {
-      "identifier": "sm:loot",
+      "identifier": "minecraft:hopper_minecart",
       "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false
     },
+
     "component_groups": {
-      "active": {
-        "minecraft:item_hopper": {}
+      "minecraft:hopper_active": {
+        "minecraft:item_hopper": {},
+        "minecraft:rail_sensor": {
+          "on_activate": {
+            "event": "minecraft:hopper_deactivate"
+          }
+        }
+      },
+      "minecraft:hopper_inactive": {
+        "minecraft:rail_sensor": {
+          "on_deactivate": {
+            "event": "minecraft:hopper_activate"
+          }
+        }
+      },
+      "loot": {
+        "minecraft:inventory": {
+          "container_type": "inventory",
+          "inventory_size": 54
+        },
+        "minecraft:nameable": {
+          "allow_name_tag_renaming": true,
+          "always_show": true
+        },
+        "minecraft:item_hopper": {},
+        "minecraft:pushable": {
+          "is_pushable": false,
+          "is_pushable_by_piston": false
+        },
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "on_damage": {
+                "filters": {
+                  "all_of": [
+                    {
+                      "test": "has_damage",
+                      "value": "entity_explosion"
+                    }
+                  ]
+                },
+                "deals_damage": false
+              }
+            },
+            {
+              "on_damage": {
+                "filters": {
+                  "all_of": [
+                    {
+                      "test": "has_damage",
+                      "value": "block_explosion"
+                    }
+                  ]
+                },
+                "deals_damage": false
+              }
+            },
+            {
+              "on_damage": {
+                "filters": {
+                  "all_of": [
+                    {
+                      "test": "has_damage",
+                      "value": "attack"
+                    },
+                    {
+                      "test": "is_family",
+                      "subject": "other",
+                      "value": "player"
+                    }
+                  ]
+                },
+                "deals_damage": false
+              }
+            }
+          ]
+        }
       }
     },
+
     "components": {
-      "minecraft:inventory": {
-        "container_type": "inventory",
-        "inventory_size": 54
-      },
-      "minecraft:nameable": {
-        "allow_name_tag_renaming": true,
-        "always_show": true
+      "minecraft:type_family": {
+        "family": ["minecart", "inanimate"]
       },
       "minecraft:collision_box": {
-        "width": 1,
-        "height": 1
+        "width": 0.98,
+        "height": 0.7
       },
-      "minecraft:health": {
-        "value": 1,
-        "max": 1
+      "minecraft:rail_movement": {},
+      "minecraft:inventory": {
+        "container_type": "minecart_hopper",
+        "inventory_size": 5,
+        "can_be_siphoned_from": true
       },
       "minecraft:is_stackable": {},
       "minecraft:physics": {},
       "minecraft:pushable": {
-        "is_pushable": false,
-        "is_pushable_by_piston": false
-      },
-      "minecraft:damage_sensor": {
-        "triggers": [
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "has_damage",
-                    "value": "entity_explosion"
-                  }
-                ]
-              },
-              "deals_damage": false
-            }
-          },
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "has_damage",
-                    "value": "block_explosion"
-                  }
-                ]
-              },
-              "deals_damage": false
-            }
-          },
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "has_damage",
-                    "value": "attack"
-                  },
-                  {
-                    "test": "is_family",
-                    "subject": "other",
-                    "value": "player"
-                  }
-                ]
-              },
-              "deals_damage": true
-            }
-          }
-        ]
+        "is_pushable": true,
+        "is_pushable_by_piston": true
       }
     },
+
     "events": {
       "minecraft:entity_spawned": {
         "add": {
-          "component_groups": ["active"]
+          "component_groups": ["minecraft:hopper_active"]
         }
       },
-      "hopper_minecart:not_active": {
+      "minecraft:hopper_activate": {
         "remove": {
-          "component_groups": ["active"]
+          "component_groups": ["minecraft:hopper_inactive"]
+        },
+        "add": {
+          "component_groups": ["minecraft:hopper_active"]
+        }
+      },
+      "minecraft:hopper_deactivate": {
+        "remove": {
+          "component_groups": ["minecraft:hopper_active"]
+        },
+        "add": {
+          "component_groups": ["minecraft:hopper_inactive"]
+        }
+      },
+      "loot": {
+        "add": {
+          "component_groups": ["loot"]
         }
       }
     }

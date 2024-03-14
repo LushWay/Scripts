@@ -1,6 +1,5 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { util } from 'lib.js'
 import { Airdrop } from 'lib/Airdrop.js'
 import { LootTable } from 'lib/LootTable.js'
 import { Compass } from 'lib/Menu.js'
@@ -96,9 +95,7 @@ export class Quest {
     this.description = desc
     Quest.instances[this.id] = this
     Core.afterEvents.worldLoad.subscribe(() => {
-      system.delay(() => {
-        world.getAllPlayers().forEach(setQuests)
-      })
+      world.getAllPlayers().forEach(e => setQuest(e, this))
     })
   }
 
@@ -152,7 +149,7 @@ export class Quest {
       const text = step.text()
       if (text)
         player.success(
-          `§f${this.name}: ${text}${step.description ? '\n' : ''}${step.description ? '§6' + step.description() : ''}`
+          `§f${this.name}: ${text}${step.description ? '\n' : ''}` //${step.description ? '§6' + step.description() : ''}
         )
     }
 
@@ -209,13 +206,22 @@ export class Quest {
  */
 function setQuests(player) {
   system.delay(() => {
-    const time = util.benchmark('quest', 'join')
-    const status = Quest.active(player)
-    if (!status) return
+    player.database.quests?.active.forEach(db => {
+      const quest = Quest.instances[db.id]
+      if (!quest) return
 
-    status.quest.toStep(player, status.stepIndex, true)
-    time()
+      setQuest(player, quest, db)
+    })
   })
+}
+
+/**
+ * @param {Player} player
+ * @param {Quest} quest
+ * @param {NonNullable<import('@minecraft/server').PlayerDatabase['quests']>['active'][number] | undefined} db
+ */
+function setQuest(player, quest, db = player.database.quests?.active.find(e => e.id === quest.id)) {
+  if (db) quest.toStep(player, db.step, true)
 }
 
 Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))

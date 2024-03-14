@@ -72,7 +72,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         if (!initialSpawn) return
 
         // Force know if player is building
-        if (isBuilding(player, true)) return
+        if (isBuilding(player, true)) return Join.setPlayerJoinPosition(player)
 
         // Check settings
         if (!this.settings(player).teleportToSpawnOnJoin) return

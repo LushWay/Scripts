@@ -55,7 +55,6 @@ class JoinBuilder {
   setPlayerJoinPosition(player) {
     player.database.join ??= {}
     player.database.join.position = this.playerAt(player)
-    console.log('Player join set position', player.database.join.position.join(' '))
   }
 
   constructor() {
@@ -65,7 +64,6 @@ class JoinBuilder {
         const db = player.database.join
 
         if (Array.isArray(db?.position)) {
-          console.log('Player join interval', db.position.join(' '), this.playerAt(player).join(' '))
           const time = util.benchmark('joinInterval', 'join')
           const notMoved = Array.equals(db.position, this.playerAt(player))
 

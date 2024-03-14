@@ -4,6 +4,7 @@ import { isBuilding } from 'modules/Build/isBuilding'
 import { Spawn } from 'modules/Places/Spawn.js'
 
 console.log('§7Mode is survival')
+export const ALLOW_SPAWN_PROP = 'allowSpawn'
 
 actionGuard((player, region) => {
   // Allow any action to player in creative
@@ -25,11 +26,12 @@ actionGuard((player, region, ctx) => {
 }, -100)
 
 loadRegionsWithGuards({
-  spawnAllowed(region, data) {
+  spawnAllowed(region, event) {
+    if (event.entity.getDynamicProperty(ALLOW_SPAWN_PROP)) return true
     return (
       !region ||
       region.permissions.allowedEntities === 'all' ||
-      region.permissions.allowedEntities.includes(data.entity.typeId)
+      region.permissions.allowedEntities.includes(event.entity.typeId)
     )
   },
 

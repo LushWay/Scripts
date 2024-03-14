@@ -30,18 +30,26 @@ export class Region {
   static locationInRegionCacheMap = new Map()
 
   /**
-   * Checks if a block location is in region
+   * Returns nearest and more prioritizet region
    * @param {Vector3} blockLocation
    * @param {Dimensions} dimensionId
    * @returns {Region | undefined}
    */
   static locationInRegion(blockLocation, dimensionId) {
+    return this.nearestRegions(blockLocation, dimensionId)[0]
+  }
+
+  /**
+   * Returns regions that location is in and sorts them by priority
+   * @param {Vector3} blockLocation
+   * @param {Dimensions} dimensionId
+   */
+  static nearestRegions(blockLocation, dimensionId) {
     const regions = this === Region ? this.regions : this.regionInstancesOf(this)
     const c1 = regions.filter(region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation))
-
     const c2 = c1.sort((a, b) => b.priority - a.priority)
 
-    return c2[0]
+    return c2
   }
 
   priority = 0

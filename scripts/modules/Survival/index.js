@@ -1,6 +1,7 @@
 import '../Features/base.js'
 import '../Features/baseMenu.js'
 import '../Features/breakPlaceOutsideOfRegion.js'
+import '../Features/death.js'
 import '../Features/explosibleFireworks.js'
 import '../Features/fireballAndIceBomb.js'
 import '../Features/menu.js'
