@@ -625,7 +625,7 @@ export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo
     WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', source)
   )
 
-  if (is(player.id, 'admin')) {
+  if (is(player.id, 'grandBuilder')) {
     form.addButton('§3Действия других игроков', () => {
       WEundoRedoOtherPlayersMenu(player, () => form.show(player))
     })

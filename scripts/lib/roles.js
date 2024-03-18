@@ -32,6 +32,7 @@ export const ROLES = {
   admin: '§5Админ',
   moderator: '§6Модератор',
   helper: '§eПомошник',
+  grandBuilder: '§9Рук. Строитель',
   builder: '§3Строитель',
   member: '§fУчастник',
 }
@@ -47,9 +48,13 @@ const PERMISSIONS = {
   moderator: ['creator', 'curator', 'chefAdmin', 'admin', 'moderator'],
   helper: ['creator', 'curator', 'chefAdmin', 'admin', 'moderator', 'helper'],
 
+  grandBuilder: ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'grandBuilder'],
   builder: ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'builder'],
   member: [], // Any
 }
+
+/** @type {Role[]} */
+export const WHO_CAN_CHANGE = ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'grandBuilder']
 
 /**
  * Checks if player has permissions for role. (e.g. if player role is above or equal)

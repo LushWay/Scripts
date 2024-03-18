@@ -1,19 +1,19 @@
 import { Player, world } from '@minecraft/server'
-import { PLAYER_DB, ROLES, getRole, setRole, util } from 'lib.js'
+import { FormCallback, PLAYER_DB, ROLES, getRole, setRole, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
+import { WHO_CAN_CHANGE } from 'lib/roles'
 
-/** @type {Role[]} */
-const HIERARCHY = ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin']
-const FULL_HIERARCHY = util.dedupe([...HIERARCHY, ...Object.keys(ROLES)])
+const FULL_HIERARCHY = Object.keys(ROLES)
 
 /**
  *
  * @param {Role} who
  * @param {Role} target
  */
-function canChange(who, target) {
+function canChange(who, target, allowSame = false) {
+  if (allowSame && who === target) return true
   if (who === 'creator') return true
   return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
@@ -45,7 +45,7 @@ roleCommand.executes(roleForm)
  */
 function roleForm(ctx, sort = true) {
   const prole = getRole(ctx.sender.id)
-  if (!HIERARCHY.includes(prole))
+  if (!WHO_CAN_CHANGE.includes(prole) && prole !== 'grandBuilder')
     return ctx.sender.info(
       `Ваша роль: ${ROLES[prole]}${
         restoreRole.sys.meta.requires(ctx.sender) ? '\n\n§3Восстановить прошлую роль: §f-role restore' : ''
@@ -65,12 +65,15 @@ function roleForm(ctx, sort = true) {
         canChange(prole, role) ? '' : ' §4Не сменить'
       }`,
       fn: () => {
-        if (!canChange(prole, role)) {
-          return ctx.error('§4У игрока §f' + name + '§4 роль выше или такая же как у вас, вы не можете ее сменить.')
+        const self = ctx.sender.id === id
+        if (!canChange(prole, role, self)) {
+          return new FormCallback(form, ctx.sender).error(
+            '§4У игрока §f' + name + '§4 роль выше или такая же как у вас, вы не можете ее сменить.'
+          )
         }
         const filteredRoles = Object.fromEntries(
           Object.entriesStringKeys(ROLES)
-            .filter(([key]) => canChange(prole, key))
+            .filter(([key]) => canChange(prole, key, self))
             .reverse()
             .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`])
         )
@@ -97,7 +100,7 @@ function roleForm(ctx, sort = true) {
             } else ctx.sender.success('Роль сменена успешно')
             setRole(id, newrole)
             if (fakeChange) {
-              ctx.sender.database.prevRole = role
+              ctx.sender.database.prevRole ??= role
             }
           })
       },

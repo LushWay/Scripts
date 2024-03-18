@@ -7,8 +7,8 @@ export class Structure extends Cuboid {
    * @private
    * @type {{
    *		name: string,
-   *		pos1: Vector3,
-   *		pos2: Vector3,
+   *		min: Vector3,
+   *		max: Vector3,
    *	}[]}
    */
   structures = []
@@ -37,20 +37,20 @@ export class Structure extends Cuboid {
 
     for (const [i, cube] of cubes.entries()) {
       const name = `${this.prefix}|${i}`
-      const pos1 = cube.pos1
-      const pos2 = cube.pos2
+      const min = cube.pos1
+      const max = cube.pos2
       const result = await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-        `structure save "${name}" ${Vector.string(pos1)} ${Vector.string(pos2)} false memory true`,
-        pos1,
-        pos2,
+        `structure save "${name}" ${Vector.string(min)} ${Vector.string(max)} false memory true`,
+        min,
+        max,
         options
       )
 
       if (result > 0) {
         this.structures.push({
           name,
-          pos1,
-          pos2,
+          min,
+          max,
         })
       }
     }
@@ -71,12 +71,13 @@ export class Structure extends Cuboid {
       let from
 
       if (pos === this.min) {
-        to = file.pos1
-        from = file.pos2
+        to = file.min
+        from = file.max
       } else {
-        const offset = Vector.subtract(this.min, file.pos1)
-        to = Vector.add(pos, offset)
-        from = Vector.add(pos, Vector.subtract(this.min, file.pos2))
+        const offsetFrom = Vector.subtract(file.max, this.min)
+        const offsetTo = Vector.subtract(file.min, this.min)
+        from = Vector.add(pos, offsetFrom)
+        to = Vector.add(pos, offsetTo)
       }
 
       await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
@@ -123,7 +124,7 @@ async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector
 
     const result = world.overworld.runCommand(command)
 
-    if (!result) world.say('§cFFFFFFFFF' + options.total)
+    if (!result) world.say('§cНеуспешно' + options.total)
     if (!result) {
       options.errors++
       return 0

@@ -1,7 +1,7 @@
 import { Block, BlockPermutation, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ITEMS } from 'config.js'
-import { ModalForm, getRole, util } from 'lib.js'
+import { ModalForm, getRole, is, util } from 'lib.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksSet.js'
 import { BaseBrushTool } from '../class/BaseBrushTool'
@@ -42,8 +42,8 @@ const smoother = new SmoothTool({
 
     void new ModalForm('§3Сглаживание')
 
-      .addSlider('Размер', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.size)
-      .addSlider('Сила сглаживания', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.smoothLevel)
+      .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
+      .addSlider('Сила сглаживания', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.smoothLevel)
       .addDropdownFromObject(
         'Заменяемый набор блоков',
         Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),

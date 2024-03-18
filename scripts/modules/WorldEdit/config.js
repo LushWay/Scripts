@@ -9,17 +9,10 @@ import {
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
 
-  STRUCTURE_CHUNK_SIZE: { x: 64, y: 128, z: 64 },
+  STRUCTURE_CHUNK_SIZE: { x: 64, y: 384, z: 64 },
   FILL_CHUNK_SIZE: { x: 32, y: 32, z: 32 },
   COPY_FILE_NAME: 'copy',
   BACKUP_PREFIX: 'backup',
-
-  /**
-   * The max ammount of times it will save
-   * your history and will remove the oldest
-   * backup when a new one is added
-   */
-  MAX_HISTORY_LIMIT: 25,
 
   /**
    * The ammout of blocks in a generation

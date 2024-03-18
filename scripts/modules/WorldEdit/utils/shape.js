@@ -1,4 +1,4 @@
-import { BlockPermutation, Player, Vector, system, world } from '@minecraft/server'
+import { BlockPermutation, Player, Vector, system } from '@minecraft/server'
 import { util } from 'lib.js'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 import { Cuboid } from '../class/Cuboid.js'
@@ -15,7 +15,7 @@ import { WE_CONFIG } from '../config.js'
  * @returns {string | undefined}
  * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
-export function Shape(player, shape, pos, size, blocks, replaceBlocks = [undefined]) {
+export function placeShape(player, shape, pos, size, blocks, replaceBlocks = [undefined]) {
   if (replaceBlocks.length < 1) replaceBlocks.push(undefined)
   if (blocks.length < 1) return '§cПустой набор блоков'
   util.catch(async () => {
@@ -40,7 +40,7 @@ export function Shape(player, shape, pos, size, blocks, replaceBlocks = [undefin
     for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
       if (!condition(x, y, z)) continue
       const location = Vector.add(pos, { x, y, z })
-      const block = world.overworld.getBlock(location)
+      const block = player.dimension.getBlock(location)
       for (const replaceBlock of replaceBlocks) {
         if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 

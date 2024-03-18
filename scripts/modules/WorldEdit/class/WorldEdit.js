@@ -78,8 +78,8 @@ export class WorldEdit {
 
   /** @private */
   updateSelectionCuboids() {
-    if (DynamicPropertyDB.immutableUnproxy(this.pos1) === Vector.one) return console.debug('AAA')
-    if (DynamicPropertyDB.immutableUnproxy(this.pos2) === Vector.one) return console.debug('AAAB')
+    if (DynamicPropertyDB.immutableUnproxy(this.pos1) === Vector.one) return
+    if (DynamicPropertyDB.immutableUnproxy(this.pos2) === Vector.one) return
 
     this.selection = new Cuboid(this.pos1, this.pos2)
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
@@ -306,6 +306,7 @@ export class WorldEdit {
     const limits = {
       builder: 10000,
       admin: 10000,
+      grandBuilder: 100000,
       chefAdmin: 100000,
       techAdmin: 1000000,
     }

@@ -98,7 +98,7 @@ export class Compass {
 
     const direction = this.getCompassIndex(player.getViewDirection(), player.location, target.value)
     const typeId = CUSTOM_ITEMS.compassPrefix + direction
-    if (slot.typeId === typeId) return
+    if (slot.typeId === typeId || typeof direction !== 'number') return
 
     const item = this.items[direction]
     try {
@@ -113,6 +113,7 @@ export class Compass {
    * @param {Vector3} target
    */
   static getCompassIndex(view, origin, target) {
+    if (!Vector.valid(view)) return
     const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
     const ot = Vector.multiply(Vector.subtract(target, origin), { x: 1, y: 0, z: 1 }).normalized()
     const cos = Vector.dot(v, ot)

@@ -7,7 +7,7 @@ import {
   world,
 } from '@minecraft/server'
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
-import { ModalForm, getRole, util } from 'lib.js'
+import { ModalForm, getRole, is, util } from 'lib.js'
 import { BaseBrushTool } from '../class/BaseBrushTool.js'
 import { WorldEditTool } from '../class/WorldEditTool.js'
 import { WE_CONFIG } from '../config.js'
@@ -18,7 +18,7 @@ import {
   getBlockSet,
   getBlockSetForReplaceTarget,
 } from '../utils/blocksSet.js'
-import { Shape } from '../utils/shape.js'
+import { placeShape } from '../utils/shape.js'
 import { SHAPES } from '../utils/shapes.js'
 
 world.overworld
@@ -42,7 +42,7 @@ class BrushTool extends BaseBrushTool {
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {
-    const error = Shape(
+    const error = placeShape(
       player,
       SHAPES[lore.shape],
       hit.block.location,
@@ -77,7 +77,7 @@ const brush = new BrushTool({
 
     new ModalForm('§3Кисть')
       .addDropdown('Форма', shapes, { defaultValue: lore.shape })
-      .addSlider('Размер', 1, getRole(player) === 'admin' ? 20 : 10, 1, lore.size)
+      .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
       .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',

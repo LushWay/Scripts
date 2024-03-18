@@ -38,6 +38,11 @@ patchPackage('@minecraft/server', {
      * Returns dot product of two vectors
      */
     static dot(a: Vector3, b: Vector3): number;
+    /**
+     * Returns whenether vector is valid or not
+     * Valid vector don't uses NaN values
+     */
+    static valid(a: Vector3): boolean
     `,
     World: m`
     /**
