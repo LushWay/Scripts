@@ -49,7 +49,7 @@ const PERMISSIONS = {
   helper: ['creator', 'curator', 'chefAdmin', 'admin', 'moderator', 'helper'],
 
   grandBuilder: ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'grandBuilder'],
-  builder: ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'builder'],
+  builder: ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'builder', 'grandBuilder'],
   member: [], // Any
 }
 
