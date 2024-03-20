@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { Region, util } from 'lib.js'
 import { actionGuard } from 'lib/Region/index.js'
@@ -30,16 +30,18 @@ actionGuard((_, region, ctx) => {
 })
 
 world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: broken, dimension, player }) => {
-  if (Axe.breaks.includes(broken.type.id)) {
-    if (isBuilding(player)) return
-    // block.setType(broken.type.id.replace(/stripped_/, '').replace(/_log$/, '_fence'))
+  if (!Axe.breaks.includes(broken.type.id)) return
+  if (isBuilding(player)) return
+  // block.setType(broken.type.id.replace(/stripped_/, '').replace(/_log$/, '_fence'))
 
-    scheduleBlockPlace({
-      dimension: dimension.type,
-      location: block.location,
-      typeId: broken.type.id,
-      states: broken.getAllStates(),
-      restoreTime: util.ms.from('min', 1),
-    })
-  }
+  scheduleBlockPlace({
+    dimension: dimension.type,
+    location: block.location,
+    typeId: broken.type.id,
+    states: broken.getAllStates(),
+    restoreTime: util.ms.from('min', 1),
+  })
+
+  player.container
+  player.getComponent('inventory')?.container
 })
