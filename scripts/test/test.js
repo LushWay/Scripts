@@ -1,6 +1,6 @@
 import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { Airdrop, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, is, util } from 'lib.js'
+import { Airdrop, BUTTON, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, is, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
@@ -26,6 +26,15 @@ const publicTests = {
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  f(ctx) {
+    const form = new ActionForm('MENUS', 'Menu body', '§c§u§s§r§f')
+    form.addButton('Test!', BUTTON['?'], () => {})
+    form.addButton('Test!', BUTTON['?'], () => {})
+    form.addButton('Test!', BUTTON['?'], () => {})
+    form.addButton('Test!', BUTTON['?'], () => {})
+    form.addButton('Test!', BUTTON['?'], () => {})
+    form.show(ctx.sender)
+  },
   cc(ctx) {
     // @ts-expect-error Testing
     console.debug(Compass.players.get(ctx.sender)?.value)

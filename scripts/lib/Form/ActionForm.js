@@ -46,7 +46,7 @@ export class ActionForm {
    * @overload
    * Adds a button to this form
    * @param {string} text - text to show on this button
-   * @param {string | null} iconPath - the path this button icon
+   * @param {string | null} iconPath - textures/ui/plus
    * @param {PlayerButtonCallback} [callback] - what happens when this button is clicked
    * @returns {ActionForm}
    */

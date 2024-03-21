@@ -3,7 +3,7 @@ import { TerminalColors } from './Assets/terminal-colors.js'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const util = {
   settings: {
-    BDSMode: true,
+    BDSMode: false,
     firstLoad: false,
   },
   error: Object.assign(
@@ -460,20 +460,4 @@ export const util = {
    * @type {Record<string, string>}
    */
   terminalColors: TerminalColors,
-
-  /**
-   * Import type declarations into global if available
-  // TODO Use monitor from shared types
-   * @typedef {import('../../../../tools/monitoring/src/routes.d.ts')} _
-   *
-   */
-
-  /**
-   * @template {keyof Monitor.StdoutPackets} T
-   * @param {T} type
-   * @param {Monitor.Packet<T>} packet
-   */
-  sendPacketToStdout(type, packet) {
-    console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
-  },
 }

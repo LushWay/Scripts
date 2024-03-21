@@ -22,17 +22,17 @@ Menu.open = player => {
     if (form) form.show(player)
   }
 
-  return new ActionForm('§aShp1nat§6Mine')
-    .addButton(tp('spawn', inv, '§9', 'Спавн'), () => {
+  return new ActionForm('§aLush§6Way', '', '§c§u§s§r')
+    .addButton(tp('spawn', inv, '§9', 'Спавн'), 'textures/ui/worldsIcon', () => {
       Spawn.portal?.teleport(player)
     })
-    .addButton(tp('anarchy', inv, '§c', 'Анархия'), () => {
+    .addButton(tp('anarchy', inv, '§c', 'Анархия'), 'textures/blocks/tnt_side', () => {
       Anarchy.portal?.teleport(player)
     })
-    .addButton(tp('mg', inv, `§6`, `Миниигры`, `\n§7СКОРО!`), soon)
-    .addButton('Квесты', () => questsMenu(player, () => Menu.open(player)))
-    .addButton('База', () => openBaseMenu(player, () => Menu.open(player)))
-    .addButton('§6Донат\n§7СКОРО!', soon)
+    .addButton(tp('mg', inv, `§6`, `Миниигры`, `\n§7СКОРО!`), 'textures/blocks/bedrock', soon)
+    .addButton('Квесты', 'textures/ui/sidebar_icons/genre', () => questsMenu(player, () => Menu.open(player)))
+    .addButton('База', 'textures/blocks/barrel_side', () => openBaseMenu(player, () => Menu.open(player)))
+    .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', soon)
 }
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
