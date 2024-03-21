@@ -540,6 +540,7 @@ class PlayerQuest {
    * @param {QuestAirdropInput & ThisType<QuestAirdropThis>} options
    */
   airdrop(options) {
+    if (!this.player.isValid()) return
     const spawnAirdrop =
       'spawnAirdrop' in options
         ? options.spawnAirdrop
