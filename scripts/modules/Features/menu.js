@@ -12,7 +12,10 @@ import { Spawn } from '../Places/Spawn.js'
  */
 function tp(place, inv, color = '§9', text = 'Спавн', extra = '') {
   const here = inv === place
-  return `${here ? '§7Вы тут ' : color}> ${inv === place ? '§8' : '§f'}${text} ${here ? '§7' : color}<${extra}`
+  if (here) extra = `${extra ? extra + ' ' : ''}§7Вы тут`
+  if (extra) extra = '\n' + extra
+  const prefix = here ? '§7' : color
+  return `${prefix}> ${inv === place ? '§8' : '§f'}${text} ${prefix}<${extra}`
 }
 
 Menu.open = player => {
@@ -29,7 +32,7 @@ Menu.open = player => {
     .addButton(tp('anarchy', inv, '§c', 'Анархия'), 'textures/blocks/tnt_side', () => {
       Anarchy.portal?.teleport(player)
     })
-    .addButton(tp('mg', inv, `§6`, `Миниигры`, `\n§7СКОРО!`), 'textures/blocks/bedrock', soon)
+    .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', soon)
     .addButton('Квесты', 'textures/ui/sidebar_icons/genre', () => questsMenu(player, () => Menu.open(player)))
     .addButton('База', 'textures/blocks/barrel_side', () => openBaseMenu(player, () => Menu.open(player)))
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', soon)
