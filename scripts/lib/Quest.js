@@ -1,6 +1,7 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { Airdrop } from 'lib/Airdrop.js'
+import { wordWrap } from 'lib/Extensions/itemstack.js'
 import { LootTable } from 'lib/LootTable.js'
 import { Compass } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
@@ -9,11 +10,11 @@ import { Temporary } from 'lib/Temporary.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
 import { InventoryIntervalAction, PlaceAction } from './Action.js'
 
-const playerSettings = Settings.player('quest', 'Квесты', {
+const playerSettings = Settings.player('Задания', 'quest', {
   messageForEachStep: {
     value: true,
     name: 'Сообщение в чат при каждом шаге',
-    desc: 'Отправлять ли сообщение в чат при каждом новом шаге квеста',
+    desc: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
   },
 })
 
@@ -47,7 +48,7 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return `§7Квест: §f${status.quest.name}\n${status.step?.text()}\n§7Подробнее: §f.q`
+        return wordWrap(`§f§l${status.quest.name}:§r ${status.step?.text()}`, 30).join('\n')
       }
     },
   }
@@ -147,10 +148,8 @@ export class Quest {
 
     if (playerSettings(player).messageForEachStep) {
       const text = step.text()
-      if (text)
-        player.success(
-          `§f${this.name}: ${text}${step.description ? '\n' : ''}` //${step.description ? '§6' + step.description() : ''}
-        )
+
+      if (text) player.success(`§f§l${this.name}: §r§6${text}${step.description ? '\n§f' + step.description() : ''}`)
     }
 
     // First time, show title
@@ -201,6 +200,8 @@ export class Quest {
   }
 }
 
+Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
+
 /**
  * @param {Player} player
  */
@@ -223,8 +224,6 @@ function setQuests(player) {
 function setQuest(player, quest, db = player.database.quests?.active.find(e => e.id === quest.id)) {
   if (db) quest.toStep(player, db.step, true)
 }
-
-Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
 
 /**
  * @typedef {() => string} DynamicQuestText
@@ -256,7 +255,7 @@ Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
  * } & Omit<QuestStepInput, 'text' | 'description'> & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
  */
 
-// TODO Test quest switching
+// TODO Add main quest switching
 
 class PlayerQuest {
   /**
@@ -320,7 +319,7 @@ class PlayerQuest {
         step.updateListeners.clear()
       },
       error(text) {
-        this.player.fail('§cУпс, квест сломался: ' + text)
+        this.player.fail('§cУпс, задание сломалось: ' + text)
         return { cleanup() {} }
       },
     }
@@ -356,21 +355,6 @@ class PlayerQuest {
   }
 
   /**
-   * Runs callback on quest start (when player enters it)
-   * @param {(this: QuestStepThis) => void} action
-   */
-  start(action) {
-    this.dynamic({
-      text: () => '',
-      activate() {
-        action.call(this)
-        this.next()
-        return { cleanup() {} }
-      },
-    })
-  }
-
-  /**
    * @param {Vector3} from
    * @param {Vector3} to
    * @param {QuestText} text
@@ -380,6 +364,8 @@ class PlayerQuest {
     // Unwrap vectors to not loose reference. For some reason, that happens
     from = { x: from.x, y: from.y, z: from.z }
     to = { x: to.x, y: to.y, z: to.z }
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this
     this.dynamic({
       text,
       description,
@@ -407,8 +393,7 @@ class PlayerQuest {
         // console.log('q.place', { from: Vector.string(from), to: Vector.string(to) })
         const { x, y, z } = Vector.lerp(from, to, 0.5)
 
-        this.quest.steps(this.player).targetCompassTo({ place: { x, y, z }, temporary })
-
+        self.targetCompassTo({ place: { x, y, z }, temporary })
         return temporary
       },
     })
@@ -634,7 +619,7 @@ class PlayerQuest {
               i++
             }
 
-            airdroppos = ` на\n§f${Vector.string(this.place, true)}`
+            airdroppos = ` на\n§f${Vector.string(Vector.floor(this.place), true)}`
             qthis.update()
           },
           temporary,
@@ -655,7 +640,7 @@ class PlayerQuest {
         this.quest.exit(this.player)
         return { cleanup() {} }
       },
-      text: () => '§cКвест сломался: ' + reason,
+      text: () => '§cЗадание сломалось: ' + reason,
     })
   }
 

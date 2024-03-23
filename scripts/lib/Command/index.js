@@ -99,7 +99,11 @@ export class Command {
    * @param {Command<any> | null} [parent]
    */
   constructor(data, type, depth = 0, parent = null) {
-    if (data.role && data.role !== 'member') {
+    if (!data.requires && !data.role) {
+      data.role = 'member'
+    }
+
+    if (data.role) {
       data.requires = p => is(p.id, data.role ?? 'admin')
     }
 

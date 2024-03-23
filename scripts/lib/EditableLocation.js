@@ -2,9 +2,8 @@ import { Player, Vector } from '@minecraft/server'
 import { EventLoaderWithArg } from './EventSignal.js'
 import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
 import { util } from './util.js'
-// TODO Location edit form
-// from command -locations
-// location grouping
+// TODO Location edit form from command -locations
+// TODO location grouping
 
 /**
  * @typedef {'vector3' | 'vector3+rotation' | 'vector3+radius'} LocationTypeSuperset
@@ -24,7 +23,6 @@ import { util } from './util.js'
  * @template {LocationTypeSuperset} [LocationType='vector3']
  */
 export class EditableLocation {
-  // TODO Migrate all locations to safe
   /**
    * @returns {(
    *   { valid: false } |

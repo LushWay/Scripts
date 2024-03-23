@@ -38,7 +38,7 @@ export class EditableNpc {
     this.dimensionId = dimensionId
     this.skinIndex = skin
 
-    this.location = new EditableLocation(id + ' NPC')
+    this.location = new EditableLocation(id + ' NPC').safe
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
     })

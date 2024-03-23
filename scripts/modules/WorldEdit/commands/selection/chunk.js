@@ -30,8 +30,9 @@ new Command({
   we.pos1 = chunkBorder.pos1
   we.pos2 = chunkBorder.pos2
   ctx.reply(
-    `§b►§3Выделенна зона: §5Позиция 1§3: ${Vector.string(chunkBorder.pos1)}, §dПозиция 2§3: ${Vector.string(
-      chunkBorder.pos2
+    `§b►§3Выделенна зона: §5Позиция 1§3: ${Vector.string(chunkBorder.pos1, true)}, §dПозиция 2§3: ${Vector.string(
+      chunkBorder.pos2,
+      true
     )}`
   )
 })

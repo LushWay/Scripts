@@ -98,19 +98,23 @@ patchPackage('@minecraft/server', {
   `,
     Player: m`
     /**
-     * Finds a player by name or ID
-     * @param name - Player name or ID
-     * @param idOnly - Whenether to search only by id. Defaults to true
+     * Searches online player by ID
+     * @param id - Player ID
      */
-    static fetch(name: string, idOnly?: boolean): Player | undefined;
+    static byId(id: string): Player | undefined;
+    /**
+     * Searches online player by name
+     * @param name - Player name
+     */
+    static byName(name: string): Player | undefined;
 
     /**
-     * Gets player name from database by id
+     * Gets player name from the database by id
      */
     static name(id: string): string | undefined;
 
     /**
-     * Gets ContainerSlot from player mainhand
+     * Gets ContainerSlot from the player mainhand
      */
     mainhand(): ContainerSlot;
 

@@ -86,7 +86,11 @@ export class ChatBuilder {
         }
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages
-        event.sender.tell(doHightlight ? `§6§lЯ§r: §f${messageText}` : message)
+        event.sender.tell(
+          doHightlight
+            ? `${getRoleAndName(event.sender, { name: false, nameSpacing: true })}§6§lЯ§r: §f${messageText}`
+            : message
+        )
       } catch (error) {
         util.error(error)
       }

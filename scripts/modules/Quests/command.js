@@ -7,7 +7,7 @@ import { Quest } from 'lib/Quest.js'
 const quest = new Command({
   name: 'q',
   aliases: ['quest'],
-  description: 'Меню квеста',
+  description: 'Меню заданий',
   role: 'member',
 }).executes(ctx => {
   questsMenu(ctx.sender)
@@ -15,7 +15,7 @@ const quest = new Command({
 
 quest.literal({ name: 'exit', description: 'Выйти' }).executes(ctx => {
   const q = Quest.active(ctx.sender)
-  if (!q) return ctx.error('У вас нет активных квестов!')
+  if (!q) return ctx.error('У вас нет активных заданий!')
   q.quest.exit(ctx.sender)
   ctx.sender.playSound(SOUNDS.success)
   ctx.reply('§6> §fУспешно')
@@ -36,7 +36,7 @@ quest.literal({ name: 'enter', role: 'techAdmin' }).executes(ctx => {
  * @param {VoidFunction} [back]
  */
 export function questsMenu(player, back) {
-  const form = new ActionForm('Квесты')
+  const form = new ActionForm('Задания')
   if (back) form.addButtonBack(back)
 
   if (player.database.quests) {
@@ -48,7 +48,7 @@ export function questsMenu(player, back) {
         )
       }
     }
-  } else form.addButton('§cНет активных квестов.', () => questsMenu(player, back))
+  } else form.addButton('§cНет активных заданий.', () => questsMenu(player, back))
 
   form.show(player)
 }
@@ -59,13 +59,14 @@ export function questsMenu(player, back) {
  */
 function questMenu(player, quest, back = () => {}) {
   const current = quest.current(player)
-  if (!current) return new MessageForm('§cНет квеста', '§4Нет активного квеста').setButton1('Назад', back).show(player)
+  if (!current)
+    return new MessageForm('§cНет задания', '§4Нет активного задания').setButton1('Назад', back).show(player)
 
   const form = new ActionForm(
-    'Квест ' + quest.name,
-    `${quest.description}\n\n${current.text()}\n\n${current.description?.() ?? ''}`
+    quest.name,
+    `${quest.description}§r\n\n${current.text()}§r\n${current.description?.() ?? ''}`
   )
   form.addButtonBack(back)
-  form.addButtonPrompt('§cОтказаться от квеста', '§cОтказаться', () => quest.exit(player), 'Назад')
+  form.addButtonPrompt('§cОтказаться от задания', '§cОтказаться', () => quest.exit(player), 'Назад')
   form.show(player)
 }

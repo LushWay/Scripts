@@ -21,6 +21,7 @@ function canChange(who, target, allowSame = false) {
 const roleCommand = new Command({
   name: 'role',
   description: 'Показывает вашу роль',
+  requires: () => true,
 })
 
 const restoreRole = roleCommand

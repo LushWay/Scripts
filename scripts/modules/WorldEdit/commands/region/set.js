@@ -1,6 +1,6 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { ActionForm, BUTTON, GAME_UTILS, ModalForm, util } from 'lib.js'
+import { ActionForm, BUTTON, ModalForm, typeIdToReadable, util } from 'lib.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { inaccurateSearch } from 'lib/Search.js'
 import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu.js'
@@ -191,7 +191,7 @@ function selectBlockSource(player, back, currentSelection) {
     'permutations' in currentSelection &&
     currentSelection.permutations &&
     currentSelection.permutations[0] &&
-    GAME_UTILS.toNameTag(
+    typeIdToReadable(
       currentSelection.permutations[0] instanceof BlockPermutation
         ? currentSelection.permutations[0].type.id
         : currentSelection.permutations[0].typeId
@@ -268,7 +268,7 @@ function selectBlockSource(player, back, currentSelection) {
             form.button({
               slot: base + blocks.length,
               icon: typeId,
-              nameTag: GAME_UTILS.toNameTag(typeId),
+              nameTag: typeIdToReadable(typeId),
               description: 'Нажми чтобы выбрать',
               callback() {
                 resolve({ permutations: [BlockPermutation.resolve(typeId)] })

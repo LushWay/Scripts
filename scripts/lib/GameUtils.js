@@ -1,130 +1,19 @@
-import { Block, BlockTypes, Entity, ItemStack, LocationInUnloadedChunkError, Player, world } from '@minecraft/server'
-import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { ItemStack, LocationInUnloadedChunkError, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { untyped_terrain_textures } from './Assets/terrain-textures.js'
 import { BDS } from './BDS/modules.js'
-import { showForm } from './Form/utils.js'
-import { inaccurateSearch } from './Search.js'
 
-// TODO Split into each separate function
-// TODO Add docs
-// TODO Remove unused functions
+/**
+ * @param {string} name
+ * @returns {undefined | string}
+ */
+export function env(name) {
+  if (BDS.ServerAdmin) {
+    return BDS.ServerAdmin.variables.get(name)
+  }
+}
 
-export const GAME_UTILS = {
-  /**
-   * @param {string} name
-   * @returns {undefined | string}
-   */
-  env(name) {
-    if (BDS.ServerAdmin) {
-      return BDS.ServerAdmin.variables.get(name)
-    }
-  },
-  /**
-   *
-   * @param {string} string
-   */
-  toNameTag(string) {
-    // Format
-    string = string.replace(/^minecraft:/, '').replace(/_(.)/g, ' $1')
-
-    // Capitalize first letter
-    string = string[0].toUpperCase() + string.slice(1)
-
-    return string
-  },
-  /**
-   *
-   * @param {ItemStack} item
-   */
-  localizationName(item) {
-    let id = item.typeId.replace('minecraft:', '')
-    if (blocks.includes(item.typeId)) {
-      for (const fn of blockModifiers) {
-        const result = fn(id)
-        id = result ?? id
-      }
-
-      return `%tile.${id}.name`
-    }
-
-    for (const fn of itemModifiers) {
-      const result = fn(id)
-      id = result ?? id
-    }
-
-    let name = `%item.${id}.name`
-    for (const fn of afterItems) name = fn(name) ?? name
-
-    return name
-  },
-  /**
-   * @param {Player} player
-   * @returns {Promise<Block | ItemStack | false>}
-   */
-  async selectBlock(player) {
-    /** @type {Array<Block | ItemStack | 'buffer'>} */
-    const blocks = []
-
-    /**
-     * @type {ActionFormData & { buffer?: ActionFormData["button"]; }}
-     */
-    const form = new ActionFormData()
-
-    const nativeAddButton = form.button.bind(form)
-    form.buffer = (text, iconPath) => {
-      blocks.push('buffer')
-      nativeAddButton(text, iconPath)
-      return form
-    }
-    form.button = (text, iconPath) => {
-      nativeAddButton(text, iconPath)
-      return form
-    }
-
-    form.title('Выбери блок')
-    const underfeat = player.location
-    underfeat.y--
-    const underfeatBlock = player.dimension.getBlock(underfeat)
-
-    if (underfeatBlock && underfeatBlock.typeId !== 'minecraft:air') {
-      const id = underfeatBlock.typeId.replace(/^minecraft:/, '')
-      form.buffer('Блок под ногами')
-
-      form.button(id, this.getBlockTexture(id))
-      blocks.push(underfeatBlock)
-    }
-
-    form.buffer('Инвентарь')
-
-    const inventory = player.container
-    if (!inventory) throw new TypeError('No container')
-    for (let i = 0; i < inventory.size; i++) {
-      const item = inventory.getItem(i)
-      if (!item || !BlockTypes.get(item.typeId)) continue
-      const id = item.typeId.replace(/^minecraft:/, '')
-      form.button(id, this.getBlockTexture(id))
-      blocks.push(item)
-    }
-
-    const result = await showForm(form, player)
-    if (result === false || !(result instanceof ActionFormResponse) || !result.selection) return false
-
-    const selectedBlock = blocks[result.selection]
-
-    if (selectedBlock === 'buffer') return await this.selectBlock(player)
-    return selectedBlock
-  },
-  /**
-   * @param {string} id
-   */
-  getBlockTexture(id) {
-    id = id.replace(/^minecraft:/, '')
-    const search = inaccurateSearch(id, Object.keys(untyped_terrain_textures))
-    const textures = untyped_terrain_textures[search[0][0]].textures
-
-    return Array.isArray(textures) ? textures[0] : textures
-  },
+export function isProduction() {
+  return env('production')
 }
 
 /**
@@ -152,6 +41,52 @@ export function blockStatus({ location, dimensionId }) {
  */
 export function chunkIsUnloaded(options) {
   return blockStatus(options) === 'unloaded'
+}
+
+/**
+ * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and capitalizes first letter
+ * @example typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
+ * @example typeIdToReadable('minecraft:cobblestone') // Cobblestone
+ * @param {string} typeId
+ */
+export function typeIdToReadable(typeId) {
+  // Format
+  typeId = typeId.replace(/^minecraft:/, '').replace(/_(.)/g, ' $1')
+
+  // Capitalize first letter
+  typeId = typeId[0].toUpperCase() + typeId.slice(1)
+
+  return typeId
+}
+
+/**
+ * Gets localization name of the ItemStack
+ * @example ```js
+ * const apple = new ItemStack(MinecraftItemTypes.Apple)
+ * itemLocaleName(apple) // %item.apple.name
+ * ```
+ * @param {ItemStack} item
+ */
+export function itemLocaleName(item) {
+  let id = item.typeId.replace('minecraft:', '')
+  if (blocks.includes(item.typeId)) {
+    for (const fn of blockModifiers) {
+      const result = fn(id)
+      id = result ?? id
+    }
+
+    return `%tile.${id}.name`
+  }
+
+  for (const fn of itemModifiers) {
+    const result = fn(id)
+    id = result ?? id
+  }
+
+  let name = `%item.${id}.name`
+  for (const fn of afterItems) name = fn(name) ?? name
+
+  return name
 }
 
 /** @type {string[]} */

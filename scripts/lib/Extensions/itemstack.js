@@ -64,29 +64,39 @@ const loreLimit = 30
  * @param {string} description
  */
 export function loreWordWrap(description) {
+  let color = '§7'
+  return wordWrap(description, loreLimit).map(e => {
+    const match = e.match(/^§./)
+    if (match) color = match[0]
+    return '§r' + color + e
+  })
+}
+
+/**
+ * @param {string} description
+ * @param {number} maxLenght
+ */
+export function wordWrap(description, maxLenght) {
   /** @type {string[]} */
   const lore = []
 
   for (const word of description.split(' ')) {
     if (!word) continue
 
+    // TODO Cut long words
     const last = lore.length - 1
     if (!lore[last]) {
+      // No words at the string
       lore.push(word)
       continue
     }
 
-    if (1 + word.length + lore[last].length > loreLimit) {
+    if (1 + word.length + lore[last].length > maxLenght) {
       lore.push(word)
     } else {
       lore[last] += ' ' + word
     }
   }
 
-  let color = '§7'
-  return lore.map(e => {
-    const match = e.match(/^§./)
-    if (match) color = match[0]
-    return '§r' + color + e
-  })
+  return lore
 }

@@ -1,12 +1,11 @@
 import { ItemStack, Player, system } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { EditableLocation, PlaceAction } from 'lib.js'
+import { EditableLocation, PlaceAction, itemLocaleName } from 'lib.js'
 import { Cooldown } from 'lib/Cooldown.js'
 import { EditableNpc } from 'lib/EditableNpc.js'
 import { EventSignal } from 'lib/EventSignal.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
-import { GAME_UTILS } from 'lib/GameUtils.js'
 
 class Cost {
   /**
@@ -247,5 +246,5 @@ export class Store {
  * @param {ItemStack} item
  */
 function itemDescription(item, c = '§g') {
-  return `${item.nameTag ?? GAME_UTILS.localizationName(item)}§r${item.amount ? ` ${c}x${item.amount}` : ''}`
+  return `${item.nameTag ?? itemLocaleName(item)}§r${item.amount ? ` ${c}x${item.amount}` : ''}`
 }

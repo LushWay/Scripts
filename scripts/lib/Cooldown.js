@@ -8,7 +8,7 @@ export class Cooldown {
    * @param {number} cooldown
    */
   static expired(timestamp, cooldown) {
-    return Date.now() - timestamp <= cooldown
+    return Date.now() - timestamp >= cooldown
   }
   /**
    * Generates a unique key for the cooldown in the database

@@ -29,7 +29,7 @@ export class Scene {
   constructor(name) {
     Scene.instances[name] = this
     this.name = name
-    this.location = new EditableLocation('catscene ' + name)
+    this.location = new EditableLocation('catscene ' + name).safe
     if (this.location.valid) {
       this.dots = Scene.db[this.name]
     } else

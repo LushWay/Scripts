@@ -48,15 +48,10 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
    * @param {Player} player
    */
   loadInventory(player) {
-    super.loadInventory(player, () => this.setInventory(player))
-  }
-
-  /**
-   * @param {Player} player
-   */
-  setInventory(player) {
-    InventoryStore.load({ to: player, from: this.inventory, clearAll: true })
-    player.database.inv = 'spawn'
+    super.loadInventory(player, () => {
+      InventoryStore.load({ to: player, from: this.inventory, clearAll: true })
+      player.database.inv = 'spawn'
+    })
   }
 
   constructor() {
@@ -99,6 +94,9 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
   /** @type {import('lib.js').regionCallback} */
   regionCallback(player, region) {
     if (region === this.region) {
+      if (player.isGamemode('survival')) {
+        player.runCommand('gamemode adventure')
+      }
       player.addEffect(MinecraftEffectTypes.Saturation, 1, {
         amplifier: 255,
         showParticles: false,

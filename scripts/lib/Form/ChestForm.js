@@ -1,7 +1,7 @@
 import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { typeIdToReadable } from 'lib.js'
 import { loreWordWrap } from 'lib/Extensions/itemstack.js'
-import { GAME_UTILS } from 'lib/GameUtils.js'
 import { util } from 'lib/util.js'
 import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds.js'
 import { BUTTON, showForm } from './utils.js'
@@ -53,7 +53,7 @@ export class ChestForm {
   static permutationToButton(permutation) {
     const states = permutation.getAllStates()
     return {
-      nameTag: GAME_UTILS.toNameTag(permutation.type.id),
+      nameTag: typeIdToReadable(permutation.type.id),
       icon: permutation.type.id,
       lore: [...(Object.keys(states).length ? util.inspect(states).split('\n') : [])],
     }

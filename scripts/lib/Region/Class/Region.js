@@ -164,7 +164,7 @@ export class Region {
   forEachOwner(callback) {
     const onlineOwners = []
     for (const ownerId of this.permissions.owners) {
-      const player = Player.fetch(ownerId)
+      const player = Player.byId(ownerId)
       if (player) onlineOwners.push(player)
     }
     onlineOwners.forEach(

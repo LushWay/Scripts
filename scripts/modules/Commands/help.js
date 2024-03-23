@@ -58,6 +58,7 @@ const help = new Command({
   name: 'help',
   description: 'Выводит список команд',
   aliases: ['?', 'h'],
+  requires: () => true,
 })
 
 /** @type {Record<Role, string>}} */

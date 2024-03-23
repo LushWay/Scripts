@@ -60,26 +60,29 @@ export class Boss {
     this.respawnTime = respawnTime
     this.bossEvent = bossEvent
     this.loot = loot
-    this.location = new EditableLocation('Босс ' + name)
+    this.location = new EditableLocation('Босс ' + name).safe
     this.arenaRadius = arenaRadius
 
     // Without delay any error during loading
     // caused this file to stop loading
     // so none of intervals would work.
     system.delay(() => {
-      this.region = new BossArenaRegion({
-        center: this.location,
-        radius: this.arenaRadius,
-        dimensionId: this.dimensionId,
+      this.location.onLoad.subscribe(center => {
+        this.check()
+        this.region = new BossArenaRegion({
+          center,
+          radius: this.arenaRadius,
+          dimensionId: this.dimensionId,
+        })
       })
-      this.location.onLoad.subscribe(() => this.check())
     })
 
     Boss.instances.push(this)
   }
 
   check() {
-    if (chunkIsUnloaded(this)) return
+    if (!this.location.valid) return
+    if (chunkIsUnloaded({ dimensionId: this.dimensionId, location: this.location })) return
 
     const db = Boss.db[this.name]
     if (db) {
@@ -103,6 +106,7 @@ export class Boss {
   }
 
   spawnEntity() {
+    if (!this.location.valid) return
     const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
     console.debug(`Boss(${this.name}).spawnEntity(${entityTypeId})`)
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
@@ -133,6 +137,7 @@ export class Boss {
   }
 
   onDie({ dropLoot = true } = {}) {
+    if (!this.location.valid) return
     console.debug(`Boss(${this.name}).onDie()`)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
@@ -156,7 +161,7 @@ world.afterEvents.entityDie.subscribe(data => {
 
 system.runInterval(
   () => {
-    Boss.instances.forEach(e => e.location.valid && e.check())
+    Boss.instances.forEach(e => e.check())
   },
   'boss respawn',
   40

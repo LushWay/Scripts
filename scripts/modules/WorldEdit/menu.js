@@ -1,7 +1,7 @@
 import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
-import { ActionForm, BUTTON, FormCallback, GAME_UTILS, ModalForm, is, util } from 'lib.js'
+import { ActionForm, BUTTON, FormCallback, ModalForm, is, typeIdToReadable, util } from 'lib.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
@@ -327,8 +327,7 @@ function WEeditBlocksSetMenu(o) {
 
           prompt(
             player,
-            'Выключенные блоки будут очищены. Список:\n' +
-              blocksToClear.map(e => GAME_UTILS.toNameTag(e[0])).join('\n'),
+            'Выключенные блоки будут очищены. Список:\n' + blocksToClear.map(e => typeIdToReadable(e[0])).join('\n'),
             '§cОчистить',
             () => {
               setBlockSet(
@@ -405,7 +404,7 @@ function WEeditBlocksSetMenu(o) {
       icon: typeId,
       enchanted: amount > 0,
       amount: Math.max(amount, 1),
-      nameTag: GAME_UTILS.toNameTag(typeId),
+      nameTag: typeIdToReadable(typeId),
       lore: [
         '',
         ...(states ? util.inspect(states).split('\n') : []),
@@ -600,7 +599,7 @@ export function toReplaceTarget(permutation) {
  */
 export function stringifyReplaceTargets(targets) {
   return targets
-    .map(e => e?.typeId && GAME_UTILS.toNameTag(e.typeId))
+    .map(e => e?.typeId && typeIdToReadable(e.typeId))
     .filter(Boolean)
     .join(', ')
 }

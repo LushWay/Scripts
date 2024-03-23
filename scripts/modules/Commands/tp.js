@@ -1,5 +1,5 @@
 import { Player, Vector, system, world } from '@minecraft/server'
-import { ActionForm, getRoleAndName, util } from 'lib.js'
+import { ActionForm, getRoleAndName, isProduction, util } from 'lib.js'
 import { isBuilding } from 'modules/Build/isBuilding'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 import { Spawn } from 'modules/Places/Spawn.js'
@@ -10,9 +10,11 @@ import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
 
 new Command({
   name: 'tp',
-  role: 'member', // TODO! on release change role to builder
+  role: isProduction() ? 'techAdmin' : 'spectator',
   description: 'Открывает меню телепортации',
 }).executes(ctx => {
+  if (ctx.sender.database.role === 'member')
+    return ctx.error('Команда доступна только тестерам, наблюдателям и администраторам.')
   tpMenu(ctx.sender)
 })
 
@@ -20,7 +22,10 @@ new Command({
  * @param {Player} player
  */
 function tpMenu(player) {
-  const form = new ActionForm('Выберите локацию', 'Также доступна из команды -tp')
+  const form = new ActionForm(
+    'Выберите локацию',
+    'Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!'
+  )
 
   const players = world.getAllPlayers().map(e => ({ player, location: e.location }))
 
@@ -38,7 +43,7 @@ function tpMenu(player) {
     locations['Спавн'] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    form.addButton(`${name} (${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
+    form.addButton(`${name} §7(${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
       if (player.database.inv !== 'anarchy' && !isBuilding(player)) {
         return player.fail(
           'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.'

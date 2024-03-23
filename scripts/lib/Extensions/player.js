@@ -5,13 +5,14 @@ import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
 import { OverTakes } from './OverTakes.js'
 
 OverTakes(Player, {
-  fetch(name, idOnly = true) {
+  byId(name) {
     for (const player of world.getPlayers()) {
       if (player.id === name) return player
-
-      if (!idOnly) {
-        if (player.isValid() && player.name === name) return player
-      }
+    }
+  },
+  byName(name) {
+    for (const player of world.getPlayers()) {
+      if (player.isValid() && player.name === name) return player
     }
   },
   name(id) {

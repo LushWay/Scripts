@@ -52,7 +52,7 @@ export class FormCallback {
    */
   error(message) {
     new MessageForm('§cОшибка', message)
-      .setButton1('Вернуться к форме', () => {
+      .setButton1('Назад', () => {
         this.form.show(this.player, this.callback)
       })
       .setButton2('§cЗакрыть', () => {})
@@ -61,7 +61,6 @@ export class FormCallback {
 }
 const { UserBusy, UserClosed } = FormCancelationReason
 
-// TODO Debug
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it
  * succeeds or the maximum number of attempts is reached.

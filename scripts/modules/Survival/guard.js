@@ -49,7 +49,7 @@ loadRegionsWithGuards({
 Join.config.title_animation = {
   stages: ['» $title «', '»  $title  «'],
   vars: {
-    title: '§aLush§6Way§r§f',
+    title: `${Core.name}§r§f`,
   },
 }
 Join.config.subtitle = 'Добро пожаловать!'

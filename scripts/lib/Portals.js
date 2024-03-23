@@ -21,7 +21,7 @@ export class Portal {
       const inS = 0
       const stayS = 2.0
       const outS = 1.0
-      player.onScreenDisplay.setHudTitle(place ?? '§aLush§6Way', {
+      player.onScreenDisplay.setHudTitle(place ?? Core.name, {
         fadeInDuration: inS * 20,
         stayDuration: stayS * 20,
         fadeOutDuration: outS * 20,

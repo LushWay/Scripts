@@ -19,7 +19,7 @@ const minpl = 2,
 
 function forEveryQuenedPlayer(sound, text) {
   for (const name in BR_QUENE) {
-    const player = Player.fetch(name)
+    const player = Player.byId(name)
     if (!player) {
       delete BR_QUENE[name]
       continue
@@ -94,7 +94,7 @@ system.runInterval(
       }
     }
     ks(BR_QUENE).forEach(e => {
-      if (!Player.fetch(e)) delete BR_QUENE[e]
+      if (!Player.byId(e)) delete BR_QUENE[e]
     })
     if (br.quene.open && ks(BR_QUENE).length < minpl) {
       br.quene.open = false

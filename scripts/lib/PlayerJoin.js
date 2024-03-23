@@ -106,24 +106,7 @@ class JoinBuilder {
       'joinInterval',
       20
     )
-
-    new Command({
-      name: 'join',
-      description: 'Имитирует первый вход',
-      role: 'member',
-    }).executes(ctx => {
-      EventSignal.emit(this.onMoveAfterJoin, { player: ctx.sender, joinTimes: 0, firstJoin: true })
-    })
   }
-
-  settings = Settings.player('Вход', 'join', {
-    message: {
-      desc: 'Сообщения о входе других игроков',
-      value: true,
-      name: 'Сообщение',
-    },
-    sound: { desc: 'Звук входа других игроков', value: true, name: 'Звук' },
-  })
 
   /**
    * @param {Player} player
@@ -159,6 +142,42 @@ class JoinBuilder {
       joinTimes: player.scores.joinTimes,
       firstJoin: player.scores.joinTimes === 1,
     })
+  }
+
+  /** @private */
+  command = new Command({
+    name: 'join',
+    description: 'Имитирует первый вход',
+    role: 'member',
+  }).executes(ctx => {
+    const player = ctx.sender
+    this.emitFirstJoin(player)
+  })
+
+  settings = Settings.player('Вход', 'join', {
+    message: {
+      name: 'Сообщение',
+      desc: 'о входе других игроков',
+      value: true,
+    },
+    sound: {
+      name: 'Звук',
+      desc: 'при входе игроков',
+      value: true,
+    },
+    time: {
+      desc: 'Время',
+      name: 'при входе',
+      value: true,
+    },
+  })
+
+  /**
+   *
+   * @param {Player} player
+   */
+  emitFirstJoin(player) {
+    EventSignal.emit(this.onMoveAfterJoin, { player, joinTimes: 1, firstJoin: true })
   }
 }
 

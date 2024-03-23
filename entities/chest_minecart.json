@@ -56,17 +56,10 @@
           "has_gravity": false,
           "has_collision": false
         },
-        "minecraft:damage_sensor": {
-          "triggers": {
-            "on_damage": {
-              "filters": {
-                "test": "is_family",
-                "subject": "other",
-                "value": "player"
-              }
-            },
-            "deals_damage": false
-          }
+        "minecraft:health": {
+          "value": 1,
+          "max": 1,
+          "min": 1
         }
       },
       "ground": {
@@ -81,6 +74,11 @@
         "minecraft:knockback_resistance": {
           "value": 100,
           "max": 100
+        },
+        "minecraft:health": {
+          "value": 1,
+          "max": 1,
+          "min": 1
         }
       }
     },
@@ -92,9 +90,6 @@
         "container_type": "minecart_chest",
         "inventory_size": 27,
         "can_be_siphoned_from": true
-      },
-      "minecraft:is_stackable": {
-        "value": true
       },
       "minecraft:physics": {}
     },

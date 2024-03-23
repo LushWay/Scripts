@@ -24,6 +24,13 @@ const gravestoneCleanupAfter = util.ms.from('sec', 5)
 
 world.afterEvents.entityDie.subscribe(event => {
   if (event.deadEntity instanceof Player) {
+    const settings = getSettings(event.deadEntity)
+    const playerContainer = event.deadEntity.container
+
+    if (playerContainer?.emptySlotsCount === playerContainer?.size && settings.noInvMessage) {
+      return event.deadEntity.warn('Вы умерли без вещей!')
+    }
+
     const { dimension, id: playerId, location, name } = event.deadEntity
     event.deadEntity.database.survival.deadAt = Vector.floor(location)
     const head = event.deadEntity.getHeadLocation()
@@ -35,16 +42,33 @@ world.afterEvents.entityDie.subscribe(event => {
     gravestone.addTag(gravestoneTag)
     gravestone.nameTag = `§6Могила §f${name}`
 
+    const gravestoneContainer = gravestone.container
+
+    if (playerContainer && gravestoneContainer) {
+      for (const [i, item] of playerContainer.entries()) {
+        if (item?.keepOnDeath) continue
+        gravestoneContainer.setItem(i, item)
+        playerContainer.setItem(i, undefined)
+      }
+    }
+
     system.delay(() => {
       dimension.getEntities({ location: head, type: 'minecraft:item', maxDistance: 2 }).forEach(e => e.teleport(head))
     })
   }
 })
 
-const settings = Settings.player('Смерть', 'death', {
+// TODO Clear minecarts from inventory/world
+
+const getSettings = Settings.player('Задания', 'quest', {
   restoreInvQuest: {
-    name: 'Квест восстановления инвентаря',
-    desc: 'Включать ли квест восстановления инвентаря после смерти',
+    name: 'Задание Вернуть вещи',
+    desc: 'Включать ли задание по восстановлению инвентаря после смерти',
+    value: true,
+  },
+  noInvMessage: {
+    name: 'Сообщение при смерти с пустым инвентарём',
+    desc: 'Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов',
     value: true,
   },
 })
@@ -66,10 +90,10 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
     player.teleport(nearestPlace.portalTeleportsTo)
   } else {
     delete player.database.survival.anarchy
-    Spawn.setInventory(player)
+    Spawn.loadInventory(player)
   }
 
-  if (settings(player).restoreInvQuest) {
+  if (getSettings(player).restoreInvQuest) {
     // Exit previous death quest
     quest.exit(player)
     quest.enter(player)
@@ -111,8 +135,10 @@ const quest = new Quest(
     const { deadAt } = player.database.survival
     if (!deadAt) return q.failed('Ваше место смерти потерялось!')
     q.dynamic({
-      text: `§dВерните свои вещи!\n${Vector.string(deadAt, true)}`,
-      description: `Верните вещи после смерти!`,
+      text: `§dВы умерли на\n${Vector.string(deadAt, true)}`,
+      description: `Верните свои вещи${
+        player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
+      }, они ждут вас!`,
       activate() {
         return new Temporary(({ world, temp }) => {
           q.targetCompassTo({ place: deadAt, temporary: temp })

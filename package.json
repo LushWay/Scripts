@@ -1,6 +1,6 @@
 {
   "name": "scripts",
-  "version": "0.17.77",
+  "version": "0.17.78",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -142,7 +142,8 @@
       ]
     },
     "ignorePatterns": [
-      "tools/*"
+      "tools/*",
+      "scripts/lib/Assets/*"
     ],
     "root": true
   },

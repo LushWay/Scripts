@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { CONFIG, SOUNDS } from 'config.js'
-import { GAME_UTILS } from 'lib/GameUtils.js'
+import { isProduction } from 'lib/GameUtils.js'
 import { ROLES } from 'lib/roles.js'
 import { inaccurateSearch } from '../Search.js'
 import { util } from '../util.js'
@@ -111,7 +111,7 @@ function suggestCommand(player, command) {
  */
 export function commandNoPermissions(player, command) {
   let additional = ''
-  if (!GAME_UTILS.env('production') && command.sys.meta.role) {
+  if (!isProduction() && command.sys.meta.role) {
     additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.meta.role]}§c`
   }
   player.fail(

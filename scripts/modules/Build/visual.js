@@ -9,9 +9,7 @@ const builderInventory = new InventoryStore('build')
 
 Join.onMoveAfterJoin.subscribe(({ player }) => {
   // First time set
-  system.delay(() => {
-    setBuildingTip(player, CURRENT_BUILDERS.has(player.id))
-  })
+  setBuildingTip(player, CURRENT_BUILDERS.has(player.id))
 })
 
 system.runPlayerInterval(

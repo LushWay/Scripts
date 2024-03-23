@@ -3,7 +3,7 @@ import { TerminalColors } from './Assets/terminal-colors.js'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const util = {
   settings: {
-    BDSMode: false,
+    BDSMode: true,
     firstLoad: false,
   },
   error: Object.assign(

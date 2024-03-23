@@ -1,5 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { BaseRegion, Quest, Region, SafeAreaRegion, Settings, Sidebar } from 'lib.js'
+import { emoji } from 'lib/Assets/emoji.js'
 import { Minigame } from 'modules/Minigames/Builder.js'
 
 const sidebarSettings = Settings.player('Боковое меню (сайдбар)', 'sidebar', {
@@ -38,9 +39,9 @@ const sidebar = new Sidebar(
   {
     name: 'Server',
     getFormat: player =>
-      `$режим$регион
-§7Монеты: §6$монеты§7 | Листья: §2$листья
-§7Онлайн: §f$онлайн/55§7
+      `§l$режим§r§f$регион
+§7${emoji.money} §6$монеты§7 | ${emoji.leaf} §2$листья 
+§7${emoji.online} §f$онлайн§7/55
 
 $квест`,
   },
@@ -54,6 +55,9 @@ $квест`,
           if (!region.permissions.pvp) text = ', §aмирная зона§f'
           if (region instanceof SafeAreaRegion && region.safeAreaName) text += '\n' + region.safeAreaName
           if (region instanceof BaseRegion && region.regionMember(player.id)) text = ', §6ваша база'
+        }
+        if (text) {
+          text += '\n§r§f'
         }
       }
       return text

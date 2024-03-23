@@ -2,7 +2,7 @@ import { GameMode, system, Vector, world } from '@minecraft/server'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import * as GameTest from '@minecraft/server-gametest'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { GAME_UTILS, util } from 'lib.js'
+import { util } from 'lib.js'
 const time = 9999999
 
 let name = 'Бот'

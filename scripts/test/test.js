@@ -1,6 +1,6 @@
 import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { Airdrop, BUTTON, ChestForm, DB, GAME_UTILS, LootTable, NpcForm, is, util } from 'lib.js'
+import { Airdrop, BUTTON, ChestForm, DB, LootTable, NpcForm, is, itemLocaleName, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
@@ -182,7 +182,7 @@ const tests = {
 
     for (const item of items) {
       const stack = new ItemStack(item)
-      ctx.reply(GAME_UTILS.localizationName(stack))
+      ctx.reply(itemLocaleName(stack))
     }
   },
   particle(ctx) {

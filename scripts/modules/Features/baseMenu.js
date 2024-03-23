@@ -12,12 +12,13 @@ import {
 /**
  * @param {Player} player
  * @param {VoidFunction} [back]
+ * @param {(message: string) => void} [onFail]
  */
-export function openBaseMenu(player, back) {
+export function openBaseMenu(player, back, onFail = message => player.fail(message)) {
   if (LockAction.locked(player)) return
   const base = Region.regionInstancesOf(BaseRegion).find(r => r.regionMember(player))
 
-  if (!base) return player.fail('§cУ вас нет базы! Вступите в существующую или создайте свою.')
+  if (!base) return onFail('§cУ вас нет базы! Вступите в существующую или создайте свою.')
 
   baseMenu(player, base, back)
 }

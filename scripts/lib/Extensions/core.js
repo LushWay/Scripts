@@ -1,21 +1,29 @@
-import { system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { util } from 'lib/util.js'
-import { EventLoader } from '../EventSignal.js'
+import { EventLoader, EventSignal } from '../EventSignal.js'
 
 /**
  * Core server features
  */
-class Core {
+const Core = {
+  name: '§aLush§bWay',
+  beforeEvents: {
+    /**
+     * Fires when player role changes
+     * @type {EventSignal<{ id: string, player?: Player, newRole: Role, oldRole: Role }>}
+     */
+    roleChange: new EventSignal(),
+  },
   /**
    * Core server events
    */
-  static afterEvents = {
+  afterEvents: {
     /**
      * Event that gets fired when server
      * detects any entity
      */
     worldLoad: new EventLoader(),
-  }
+  },
 }
 
 globalThis.Core = Core

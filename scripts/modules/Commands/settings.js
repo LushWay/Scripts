@@ -161,9 +161,11 @@ new Command({
 })
 /**
  * @param {Player} player
+ * @param {VoidFunction} [back]
  */
-export function playerSettings(player) {
+export function playerSettings(player, back) {
   const form = new ActionForm('§dНастройки')
+  if (back) form.addButtonBack(back)
 
   for (const groupName in Settings.playerMap) {
     const name = Settings.playerMap[groupName][OPTIONS_NAME]

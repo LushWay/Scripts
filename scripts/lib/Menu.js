@@ -71,7 +71,7 @@ export class Compass {
    * @private
    */
   static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель')
+    return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель\n§7§r(use)')
   })
 
   /**

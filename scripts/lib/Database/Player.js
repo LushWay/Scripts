@@ -1,6 +1,9 @@
 import { Player, world } from '@minecraft/server'
+import { isProduction } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { OverTakes } from 'lib/Extensions/OverTakes'
+
+const prod = isProduction()
 
 export const PLAYER_DB = new DynamicPropertyDB('player', {
   /** @type {Record<string, import("@minecraft/server").Player["database"]>} */
@@ -10,7 +13,7 @@ export const PLAYER_DB = new DynamicPropertyDB('player', {
    */
   defaultValue: () => {
     return {
-      role: 'member',
+      role: prod ? 'member' : 'spectator',
       inv: 'spawn',
       survival: {},
     }

@@ -5,9 +5,6 @@ import { tpMenuOnce } from 'modules/Commands/tp.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
-// TODO Not set anarchy pos when on spawn
-// TODO TP even if there is no pos
-
 class AnarchyBuilder extends DefaultPlaceWithInventory {
   /**
    * @param {Player} player
@@ -49,24 +46,14 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
           if (player.database.inv === this.inventoryName) {
             return player.fail(
-              '§cВы уже находитесь на анархии! Если это не так, используйте §f.anarchy clearpos §cчтобы очистить позицию на анархии'
+              '§cВы уже находитесь на анархии! Если это не так, используйте §f.anarchy clearpos §cчтобы очистить позицию на анархии и §f.spawn§c для перемещения на спавн.'
             )
           }
 
           system.delay(() => {
-            if (!Portal.canTeleport(player, { place: '§c> §6Anarchy §c<' })) return
+            if (!Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })) return
 
-            if (!this.inventoryStore.has(player.id)) {
-              InventoryStore.load({
-                from: InventoryStore.emptyInventory,
-                to: player,
-                clearAll: true,
-              })
-            } else {
-              this.loadInventory(player)
-            }
-
-            player.database.inv = this.inventoryName
+            this.loadInventory(player)
 
             if (!player.database.survival.anarchy) {
               this.learningRTP(player)
@@ -106,8 +93,10 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           to: player,
           from: this.inventoryStore.get(player.id, { remove: true }),
         })
-        player.database.inv = 'anarchy'
-      }
+      } else InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
+
+      if (player.isGamemode('adventure')) player.runCommand('gamemode survival')
+      player.database.inv = this.inventoryName
     })
   }
 
@@ -117,6 +106,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
       rewrite: true,
       keepInventory: false,
     })
+    console.log('Saved inv', this.inventoryStore.get(player.id))
 
     // Do not save location if on spawn
     if (Spawn.region?.vectorInRegion(player.location)) return
@@ -125,8 +115,6 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 }
 
 // TODO Newbie savemode
-// TODO Help players on kill
-// TODO Death stones with loot which can be looted only by player who dead
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Anarchy = new AnarchyBuilder()

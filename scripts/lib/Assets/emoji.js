@@ -1,4 +1,7 @@
 export const emoji = {
+  money: '',
+  leaf: '',
+  online: '',
   food: '',
   armor: '',
   minecoin: '',
