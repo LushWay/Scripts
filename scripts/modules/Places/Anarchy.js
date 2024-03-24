@@ -1,7 +1,8 @@
-import { Player, Vector, system } from '@minecraft/server'
+import { Player, Vector } from '@minecraft/server'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'lib.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
 import { tpMenuOnce } from 'modules/Commands/tp.js'
+import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
@@ -50,18 +51,20 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
             )
           }
 
-          system.delay(() => {
-            if (!Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })) return
+          const title = Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })
+          if (!title) return
 
-            this.loadInventory(player)
+          this.loadInventory(player)
 
-            if (!player.database.survival.anarchy) {
-              this.learningRTP(player)
-            } else {
-              player.teleport(player.database.survival.anarchy)
-              delete player.database.survival.anarchy
-            }
-          })
+          if (!player.database.survival.anarchy) {
+            this.learningRTP(player)
+          } else {
+            player.teleport(player.database.survival.anarchy)
+            delete player.database.survival.anarchy
+          }
+
+          SURVIVAL_SIDEBAR.show(player)
+          title()
         }
       )
 
@@ -89,11 +92,15 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
   loadInventory(player) {
     super.loadInventory(player, () => {
       if (this.inventoryStore.has(player.id)) {
+        console.log('loading saved inv for', player.name)
         InventoryStore.load({
           to: player,
           from: this.inventoryStore.get(player.id, { remove: true }),
         })
-      } else InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
+      } else {
+        console.log('loading empty inventory for', player.name)
+        InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
+      }
 
       if (player.isGamemode('adventure')) player.runCommand('gamemode survival')
       player.database.inv = this.inventoryName
@@ -106,11 +113,15 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
       rewrite: true,
       keepInventory: false,
     })
-    console.log('Saved inv', this.inventoryStore.get(player.id))
+    console.log('Saved inv', this.inventoryStore.get(player.id, { remove: false }))
 
     // Do not save location if on spawn
     if (Spawn.region?.vectorInRegion(player.location)) return
-    player.database.survival.anarchy = Vector.floor(player.location)
+    player.database.survival.anarchy = {
+      x: Math.round(player.location.x),
+      z: Math.round(player.location.z),
+      y: Math.round(player.location.y),
+    }
   }
 }
 

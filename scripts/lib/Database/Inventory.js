@@ -303,7 +303,7 @@ export class InventoryStore {
   remove(id) {
     delete this._.inventories[id]
 
-    this.save()
+    this.requestSave()
   }
 
   /**

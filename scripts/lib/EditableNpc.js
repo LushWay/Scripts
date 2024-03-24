@@ -47,6 +47,7 @@ export class EditableNpc {
   }
 
   spawn() {
+    console.debug('Spawning npc')
     if (!this.location.valid) {
       throw new TypeError(`§cNpc(§r${this.id}§r§c): Location is not valid, spawn is impossible. Set location first`)
     }
@@ -123,11 +124,14 @@ system.runInterval(
         })))
 
       const filteredNpcs = npcs.filter(e => e.npc === npc.id)
+      console.debug({ filteredNpcs: filteredNpcs.length, npcs: npcs.length })
       if (filteredNpcs.length > 1) {
+        console.debug('More then one')
         // More then one? Save only first one, kill others
         npc.entity = filteredNpcs.shift()?.entity
         filteredNpcs.forEach(e => e.entity.remove())
       } else {
+        console.debug('Found one')
         //
         npc.entity = filteredNpcs[0]?.entity
       }

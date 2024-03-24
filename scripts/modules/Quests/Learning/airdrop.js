@@ -2,8 +2,6 @@ import { ItemStack } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { LootTable } from 'lib.js'
 
-const money = new ItemStack(CUSTOM_ITEMS.money)
-
 export const LEARNING_L = new LootTable(
   { id: 'starter' },
   {

@@ -6,6 +6,7 @@ import { migration } from 'lib/Database/Migrations.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { isBuilding } from 'modules/Build/isBuilding'
+import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
 migration('move player inv', () => {
@@ -60,10 +61,14 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
       const spawnLocation = this.location
       world.setDefaultSpawnLocation(spawnLocation)
       this.portal = new Portal('spawn', null, null, player => {
-        if (!Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })) return
+        const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
+        if (!title) return
 
         this.loadInventory(player)
-        system.delay(() => spawnLocation.teleport(player))
+        spawnLocation.teleport(player)
+
+        SURVIVAL_SIDEBAR.show(player)
+        title()
       })
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)

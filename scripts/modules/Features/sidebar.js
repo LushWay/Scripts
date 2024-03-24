@@ -35,7 +35,7 @@ const inventoryDisplay = {
   spawn: 'Спавн',
 }
 
-const sidebar = new Sidebar(
+export const SURVIVAL_SIDEBAR = new Sidebar(
   {
     name: 'Server',
     getFormat: player =>
@@ -83,7 +83,7 @@ system.runPlayerInterval(
     if (player.database.join) return // Do not show sidebar until player actually joins the world
     const minigame = Minigame.getCurrent(player)
     if (minigame) return minigame.sidebar.show(player)
-    if (sidebarSettings(player).enabled) sidebar.show(player)
+    if (sidebarSettings(player).enabled) SURVIVAL_SIDEBAR.show(player)
     system.delay(() => player.onScreenDisplay.setTip(5, '§7158.255.5.29'))
   },
   'Survival sidebar',

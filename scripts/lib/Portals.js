@@ -1,4 +1,4 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player, Vector, system } from '@minecraft/server'
 import { LockAction, PlaceAction } from 'lib/Action.js'
 
 /**
@@ -17,25 +17,30 @@ export class Portal {
   static canTeleport(player, { fadeScreen = true, lockActionOptions, place } = {}) {
     if (LockAction.locked(player, lockActionOptions)) return false
 
+    // TODO Timeouts etc
     if (fadeScreen) {
-      const inS = 0
+      const inS = 0.2
       const stayS = 2.0
-      const outS = 1.0
-      player.onScreenDisplay.setHudTitle(place ?? Core.name, {
-        fadeInDuration: inS * 20,
-        stayDuration: stayS * 20,
-        fadeOutDuration: outS * 20,
-        subtitle: '§2Перемещение...',
-      })
-      const red = 10
-      const green = 20
-      const blue = 10
+      const outS = 2.0
+      const red = 10 / 256
+      const green = 20 / 256
+      const blue = 10 / 256
       // #102010
 
-      player.runCommand(`camera @s fade time ${inS} ${stayS} ${outS} color ${red} ${green} ${blue}`)
+      player.camera.fade({
+        fadeTime: { fadeInTime: inS, holdTime: stayS, fadeOutTime: outS },
+        fadeColor: { red, green, blue },
+      })
     }
 
-    return true
+    return () => {
+      player.onScreenDisplay.setHudTitle(place ?? Core.name, {
+        fadeInDuration: 0,
+        stayDuration: 100,
+        fadeOutDuration: 0,
+        subtitle: '§2Перемещение...',
+      })
+    }
   }
   /**
    *
