@@ -16,6 +16,7 @@ export const CUSTOM_ITEMS = {
   tool: 'we:tool',
   wand: 'we:wand',
   compassPrefix: 'sm:compass',
+  money: 'sm:money',
 }
 
 export const CUSTOM_ENTITIES = {

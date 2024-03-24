@@ -149,7 +149,7 @@ export class Quest {
     if (playerSettings(player).messageForEachStep) {
       const text = step.text()
 
-      if (text) player.success(`§f§l${this.name}: §r§6${text}${step.description ? '\n§f' + step.description() : ''}`)
+      if (text) player.success(`§f§l${this.name}: §r§6${step.description ? step.description() : step.text()}`)
     }
 
     // First time, show title

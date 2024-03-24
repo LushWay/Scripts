@@ -1,4 +1,8 @@
+import { ItemStack } from '@minecraft/server'
+import { CUSTOM_ITEMS } from 'config.js'
 import { LootTable } from 'lib.js'
+
+const money = new ItemStack(CUSTOM_ITEMS.money)
 
 export const LEARNING_L = new LootTable(
   { id: 'starter' },
@@ -7,8 +11,8 @@ export const LEARNING_L = new LootTable(
     chance: '100%',
     enchantments: {
       unbreaking: {
-        '0...2': '50%',
-        '3': '50%',
+        '0...2': '40%',
+        '3': '60%',
       },
     },
   },
@@ -46,6 +50,13 @@ export const LEARNING_L = new LootTable(
     amount: {
       '10...30': '50%',
       '31...64': '10%',
+    },
+  },
+  {
+    typeId: CUSTOM_ITEMS.money,
+    chance: '100%',
+    amount: {
+      '90...100': '1%',
     },
   }
 )

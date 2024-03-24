@@ -171,47 +171,52 @@ export class LootTable {
    * @private
    */
   generateItems(item) {
-    // Randomise item properties
-    const amount = item.amount.randomElement()
-    if (amount <= 0) return []
+    try {
+      // Randomise item properties
+      const amount = item.amount.randomElement()
+      if (amount <= 0) return []
 
-    if (amount > item.itemStack.maxAmount) {
-      // TODO Splitting
-      const average = Math.floor(amount / item.itemStack.maxAmount)
-      const last = amount % item.itemStack.maxAmount
-      return new Array(average)
-        .fill(null)
-        .map((e, i, a) =>
-          this.generateItems({
-            ...e,
-            amount: i === a.length - 1 ? last : average,
-          })
-        )
-        .flat()
+      if (amount > item.itemStack.maxAmount) {
+        // TODO Splitting
+        const average = Math.floor(amount / item.itemStack.maxAmount)
+        const last = amount % item.itemStack.maxAmount
+        return new Array(average)
+          .fill(null)
+          .map((e, i, a) =>
+            this.generateItems({
+              ...e,
+              amount: i === a.length - 1 ? last : average,
+            })
+          )
+          .flat()
+      }
+
+      const stack = item.itemStack.clone()
+      stack.amount = amount
+
+      const { enchantments } = stack.enchantments
+      for (const [name, levels] of Object.entries(item.enchantments)) {
+        const level = levels.randomElement()
+        if (!level) continue
+        enchantments.addEnchantment(Enchantments.custom[name][level])
+      }
+      stack.enchantments.enchantments = enchantments
+
+      if (item.damage.length) {
+        const damage = item.damage.randomElement()
+        if (damage) stack.durability.damage = damage
+      }
+
+      return [
+        {
+          stack,
+          chance: item.chance,
+        },
+      ]
+    } catch (err) {
+      console.error('Failed to generate loot item for', item, 'error:', err)
+      return []
     }
-
-    const stack = item.itemStack.clone()
-    stack.amount = amount
-
-    const { enchantments } = stack.enchantments
-    for (const [name, levels] of Object.entries(item.enchantments)) {
-      const level = levels.randomElement()
-      if (!level) continue
-      enchantments.addEnchantment(Enchantments.custom[name][level])
-    }
-    stack.enchantments.enchantments = enchantments
-
-    if (item.damage.length) {
-      const damage = item.damage.randomElement()
-      if (damage) stack.durability.damage = damage
-    }
-
-    return [
-      {
-        stack,
-        chance: item.chance,
-      },
-    ]
   }
 
   /**
