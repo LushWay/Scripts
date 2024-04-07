@@ -16,5 +16,5 @@ export function isBuilding(player, uptodate = false) {
  * @param {Player} player
  */
 export function isNotPlaying(player) {
-  return isBuilding(player) || player.database.role === 'spectator'
+  return isBuilding(player, true) || player.isGamemode('spectator')
 }
