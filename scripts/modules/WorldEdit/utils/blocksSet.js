@@ -133,7 +133,7 @@ export function getBlockSet([player, name]) {
         permutation = BlockPermutation.resolve(type)
         if (states)
           for (const [state, value] of Object.entries(states)) {
-            permutation.withState(state, value)
+            permutation = permutation.withState(state, value)
           }
       } catch (e) {
         console.error(
