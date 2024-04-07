@@ -1,7 +1,7 @@
 import { Block, BlockPermutation, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { CUSTOM_ITEMS } from 'config.js'
-import { ModalForm, getRole, is, util } from 'lib.js'
+import { ModalForm, is, util } from 'lib.js'
 import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
 import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksSet.js'
 import { BaseBrushTool } from '../class/BaseBrushTool'
@@ -151,12 +151,19 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   player.info(
     prefix + `Будет заполнено §6${toFill.length}§f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
   )
+
+  operations = 0
+
   for (const e of toFill) {
     if (!e.location) continue
     const block = world.overworld.getBlock(e.location)
     if (e.permutation) block?.setPermutation(e.permutation)
     else block?.setType(MinecraftBlockTypes.Air)
-    await nextTick
+    operations++
+
+    if (operations % 100 === 0) {
+      await nextTick
+    }
   }
   player.success(prefix + 'Готово')
 }
