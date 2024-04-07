@@ -5,7 +5,7 @@ import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Se
 import { migration } from 'lib/Database/Migrations.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
-import { isBuilding } from 'modules/Build/isBuilding'
+import { isBuilding, isNotPlaying } from 'modules/Build/isBuilding'
 import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
@@ -107,7 +107,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         showParticles: false,
       })
     } else {
-      if (player.database.inv === 'spawn' && !isBuilding(player)) {
+      if (player.database.inv === 'spawn' && !isNotPlaying(player)) {
         this.loadInventory(player)
         this.portal?.teleport(player)
       }

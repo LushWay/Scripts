@@ -11,3 +11,10 @@ export function isBuilding(player, uptodate = false) {
   if (uptodate) return player.isGamemode('creative') && getRole(player) !== 'member'
   return CURRENT_BUILDERS.has(player.id)
 }
+
+/**
+ * @param {Player} player
+ */
+export function isNotPlaying(player) {
+  return isBuilding(player) || player.database.role === 'spectator'
+}

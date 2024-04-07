@@ -1,6 +1,6 @@
 import { Player, Vector } from '@minecraft/server'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'lib.js'
-import { isBuilding } from 'modules/Build/isBuilding.js'
+import { isBuilding, isNotPlaying } from 'modules/Build/isBuilding.js'
 import { tpMenuOnce } from 'modules/Commands/tp.js'
 import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
 import { Spawn } from 'modules/Places/Spawn.js'
@@ -43,7 +43,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         Vector.add(portalLocation, { x: 0, y: -1, z: -1 }),
         Vector.add(portalLocation, { x: 0, y: 1, z: 1 }),
         player => {
-          if (isBuilding(player)) return tpMenuOnce(player)
+          if (isNotPlaying(player)) return tpMenuOnce(player)
 
           if (player.database.inv === this.inventoryName) {
             return player.fail(
