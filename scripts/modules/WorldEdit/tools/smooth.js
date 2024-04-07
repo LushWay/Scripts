@@ -206,18 +206,19 @@ function getBlocksAreasData(block, radius) {
 
         let permutation,
           isAir = true,
-          isLiquid = false
+          isLiquid = false,
+          isSolid = true
 
         try {
           const b = block.offset({ x, y, z })
-          if (b) ({ permutation, isAir, isLiquid } = b)
+          if (b) ({ permutation, isAir, isLiquid, isSolid } = b)
         } catch (error) {
           util.error(error)
         }
         const newBlockData = {
           permutation,
           location,
-          void: isAir || isLiquid,
+          void: isAir || isLiquid || !isSolid,
         }
         dataz.push(newBlockData)
         BLOCK_CACHE[location.x] ??= {}
