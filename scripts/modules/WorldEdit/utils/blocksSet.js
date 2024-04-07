@@ -52,7 +52,7 @@ Object.keys(DEFAULT_BLOCK_SETS).forEach(e => {
 
 /** @type {DynamicPropertyDB<string, BlocksSets | undefined>} */
 const PROPERTY = new DynamicPropertyDB('blockSets')
-const DB = PROPERTY.proxy()
+const blockSets = PROPERTY.proxy()
 
 /**
  * @param {string} playerId
@@ -60,7 +60,7 @@ const DB = PROPERTY.proxy()
  */
 export function getOtherPlayersBlockSets(playerId) {
   // @ts-expect-error We checked it
-  return Object.entries(DB).filter(e => e[0] !== playerId && e[0])
+  return Object.entries(blockSets).filter(e => e[0] !== playerId && e[0])
 }
 
 /**
@@ -68,7 +68,7 @@ export function getOtherPlayersBlockSets(playerId) {
  * @returns {BlocksSets}
  */
 export function getAllBlockSets(id) {
-  const playerBlockSets = DB[id] ?? {}
+  const playerBlockSets = blockSets[id] ?? {}
   return { ...playerBlockSets, ...DEFAULT_BLOCK_SETS }
 }
 
@@ -79,12 +79,12 @@ export function getAllBlockSets(id) {
  * @param {BlockStateWeight[] | undefined} set
  */
 export function setBlockSet(id, setName, set) {
-  DB[id] ??= {}
-  const db = DB[id]
+  blockSets[id] ??= {}
+  const db = blockSets[id]
   if (db) {
     if (set) {
       // Append new set onto start
-      DB[id] = { [setName]: set, ...db }
+      blockSets[id] = { [setName]: set, ...db }
     } else {
       delete db[setName]
     }
@@ -92,8 +92,8 @@ export function setBlockSet(id, setName, set) {
 }
 
 migration('blocks set order', () => {
-  for (const [player, blocksSets] of Object.entries(DB)) {
-    if (blocksSets) DB[player] = Object.fromEntries(Object.entries(blocksSets).reverse())
+  for (const [player, blocksSets] of Object.entries(blockSets)) {
+    if (blocksSets) blockSets[player] = Object.fromEntries(Object.entries(blocksSets).reverse())
   }
 })
 
@@ -130,7 +130,11 @@ export function getBlockSet([player, name]) {
       let permutation
 
       try {
-        permutation = BlockPermutation.resolve(type, states)
+        permutation = BlockPermutation.resolve(type)
+        if (states)
+          for (const [state, value] of Object.entries(states)) {
+            permutation.withState(state, value)
+          }
       } catch (e) {
         console.error(
           'Failed to resolve permutation for',
