@@ -149,7 +149,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
     .flat(2)
 
   player.info(
-    prefix + `Будет заполнено §6${toFill.length}§f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
+    prefix + `Будет заполнено §6${toFill.length} §f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
   )
 
   operations = 0

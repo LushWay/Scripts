@@ -126,7 +126,24 @@ function getBlockSetRaw([player, name], noBlocks = []) {
  */
 export function getBlockSet([player, name]) {
   return getBlockSetRaw([player, name])
-    .map(([type, states, weight]) => new Array(weight).fill(BlockPermutation.resolve(type, states)))
+    .map(([type, states, weight]) => {
+      let permutation
+
+      try {
+        permutation = BlockPermutation.resolve(type, states)
+      } catch (e) {
+        console.error(
+          'Failed to resolve permutation for',
+          type,
+          'with states',
+          states,
+          'block set',
+          stringifyBlocksSetRef([player, name])
+        )
+      }
+      return new Array(weight).fill(permutation)
+    })
+    .filter(e => e.length)
     .flat()
 }
 
