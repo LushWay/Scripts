@@ -8,11 +8,13 @@ new Command({
   type: 'public',
   role: 'member',
 }).executes(async ctx => {
+  if (ctx.sender.getVelocity().y !== 0) return ctx.error('Вы не можете сесть в падении!')
   if (LockAction.locked(ctx.sender)) return
   const entity = ctx.sender.dimension.spawnEntity(CUSTOM_ENTITIES.sit, ctx.sender.location)
   ctx.sender.closeChat()
   // Rideable component doesnt works
   entity.runCommand('ride @p start_riding @s teleport_rider ')
+  entity.setRotation(ctx.sender.getRotation())
 
   await nextTick
   ctx.sender.onScreenDisplay.setActionBar('§3> §fВы сели. Чтобы встать, крадитесь')
