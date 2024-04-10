@@ -35,6 +35,10 @@ const inventoryDisplay = {
   spawn: 'Спавн',
 }
 
+function format(n = 0) {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
+
 export const SURVIVAL_SIDEBAR = new Sidebar(
   {
     name: 'Server',
@@ -62,8 +66,8 @@ $квест`,
       }
       return text
     },
-    монеты: player => player.scores.money + '',
-    листья: player => player.scores.leafs + '',
+    монеты: player => format(player.scores.money),
+    листья: player => format(player.scores.leafs),
     онлайн: {
       preinit() {
         let online = world.getAllPlayers().length
