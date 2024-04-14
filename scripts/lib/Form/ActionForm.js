@@ -29,7 +29,7 @@ export class ActionForm {
    * @param {string} [prefix] - Prefix used by ui side to determine which type of form to render (e.g. it can be
    * chestui or npc)
    */
-  constructor(title, body = '', prefix = '§c§o§m§m§o§n§r') {
+  constructor(title, body = '', prefix = '§c§o§m§m§o§n§r§f') {
     this.form = new ActionFormData()
     this.form.title(prefix + title)
     this.form.body(body)
