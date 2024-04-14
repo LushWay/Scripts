@@ -58,17 +58,17 @@ world.afterEvents.entityDie.subscribe(event => {
   }
 })
 
-// TODO Clear minecarts from inventory/world
+// TODO Clear minecart items from inventory/world
 
 const getSettings = Settings.player('Задания', 'quest', {
   restoreInvQuest: {
     name: 'Задание Вернуть вещи',
-    desc: 'Включать ли задание по восстановлению инвентаря после смерти',
+    description: 'Включать ли задание по восстановлению инвентаря после смерти',
     value: true,
   },
   noInvMessage: {
     name: 'Сообщение при смерти с пустым инвентарём',
-    desc: 'Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов',
+    description: 'Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов',
     value: true,
   },
 })

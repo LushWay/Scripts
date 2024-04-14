@@ -30,12 +30,9 @@ export class Scene {
     Scene.instances[name] = this
     this.name = name
     this.location = new EditableLocation('catscene ' + name).safe
-    if (this.location.valid) {
+    this.location.onLoad.subscribe(() => {
       this.dots = Scene.db[this.name]
-    } else
-      this.location.onLoad.subscribe(() => {
-        this.dots = Scene.db[this.name]
-      })
+    })
   }
 
   save() {
@@ -85,14 +82,15 @@ export class Scene {
             return system.runTimeout(() => this.exit(player), 'catscene exit anim', 2 * 20 + 5)
           }
 
-          player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-            location: Vector.add(this.location, location),
-            facingLocation: this.location,
-            easeOptions: {
-              easeTime: 1,
-              easeType: EasingType.Linear,
-            },
-          })
+          if (this.location.valid)
+            player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
+              location: Vector.add(this.location, location),
+              facingLocation: this.location,
+              easeOptions: {
+                easeTime: 1,
+                easeType: EasingType.Linear,
+              },
+            })
         },
         'catscene ' + this.name,
         this.intervalTime

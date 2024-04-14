@@ -14,6 +14,7 @@ actionGuard((player, region, ctx) => {
         dimension: dimension.type,
         restoreTime: util.ms.from('sec', 10),
       }
+
       if (ctx.type === 'place') {
         scheduleBlockPlace({
           ...base,
@@ -30,7 +31,7 @@ actionGuard((player, region, ctx) => {
         })
       }
 
-      // Interaction goes before place, so allow but not trigger
+      // Interaction goes before place, so do not warn twice
       if (ctx.type !== 'interactWithBlock') {
         system.delay(() => {
           if (!player.database.survival.bn) {
@@ -39,6 +40,7 @@ actionGuard((player, region, ctx) => {
             )
             player.database.survival.bn = 1
           }
+
           dimension
             .getEntities({
               type: 'minecraft:item',
@@ -46,9 +48,7 @@ actionGuard((player, region, ctx) => {
               maxDistance: 2,
             })
             .forEach(e => {
-              try {
-                e?.remove()
-              } catch {}
+              if (e?.isValid()) e.remove()
             })
         })
       }

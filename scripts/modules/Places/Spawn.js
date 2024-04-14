@@ -40,7 +40,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
     teleportToSpawnOnJoin: {
       value: true,
       name: 'Телепорт на спавн',
-      desc: 'Определяет, будете ли вы телепортироваться на спавн при входе',
+      description: 'Определяет, будете ли вы телепортироваться на спавн при входе',
     },
   })
 

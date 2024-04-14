@@ -1,61 +1,47 @@
 /**
- * @param {string} string1
- * @param {string} string2
- * Code by {@link https://github.com/zdyn/jaro-winkler-js Zdyn}
+ * Compares the similarity between two strings using an n-gram comparison method.
+ * The grams default to length 2.
+ * Code by {@link https://stackoverflow.com/a/62216738/23560013 MgSam}
+ * @param {string} str1 The first string to compare.
+ * @param {string} str2 The second string to compare.
+ * @param {number} gramSize The size of the grams. Defaults to length 2.
  */
-function stringDistance(string1, string2) {
-  if (string1.length > string2.length) [string1, string2] = [string2, string1]
-
-  const matchWindow = ~~Math.max(0, string2.length / 2 - 1)
-
-  /** @type {string[]} */
-  const str1Matches = []
-  /** @type {string[]} */
-  const str2Matches = []
-
-  forEveryChar(string1, (i, char) => {
-    const start = Math.max(0, i - matchWindow)
-    const end = Math.min(i + matchWindow + 1, string2.length)
-
-    const windowStart = Math.min(start, end)
-    const windowEnd = Math.max(start, end)
-
-    for (let l = windowStart; l < windowEnd; ++l)
-      if (!str2Matches[l] && char === string2[l]) {
-        str1Matches[i] = char
-        str2Matches[l] = string2[l]
-        break
-      }
-  })
-
-  const matchesN = str1Matches.length
-  if (!matchesN) {
-    return 0
-  }
-  // Count transpositions
-  let transpositions = 0
-  for (const [i, char] of str1Matches.entries()) {
-    if (char !== str2Matches[i]) transpositions++
+export function stringSimilarity(str1, str2, gramSize = 2) {
+  /**
+   * @param {string} s
+   * @param {number} len
+   */
+  function getNGrams(s, len) {
+    s = ' '.repeat(len - 1) + s.toLowerCase() + ' '.repeat(len - 1)
+    const v = new Array(s.length - len + 1)
+    for (let i = 0; i < v.length; i++) {
+      v[i] = s.slice(i, i + len)
+    }
+    return v
   }
 
-  // Count prefix matches
-  let prefix = 0
-  forEveryChar(string1, (i, char) => {
-    if (char !== string2[i]) prefix++
-  })
+  if (!str1?.length || !str2?.length) {
+    return 0.0
+  }
 
-  const jaro =
-    (matchesN / string1.length + matchesN / string2.length + (matchesN - ~~(transpositions / 2)) / matchesN) / 3.0
-  return jaro + Math.min(prefix, 4) * 0.1 * (1 - jaro)
-}
+  //Order the strings by length so the order they're passed in doesn't matter
+  //and so the smaller string's ngrams are always the ones in the set
+  const s1 = str1.length < str2.length ? str1 : str2
+  const s2 = str1.length < str2.length ? str2 : str1
 
-/**
- *
- * @param {string} string
- * @param {function(number, string): void} callback
- */
-function forEveryChar(string, callback) {
-  for (const [i, char] of string.split('').entries()) callback(i, char)
+  const pairs1 = getNGrams(s1, gramSize)
+  const pairs2 = getNGrams(s2, gramSize)
+  const set = new Set(pairs1)
+
+  const total = pairs2.length
+  let hits = 0
+  for (const item of pairs2) {
+    if (set.delete(item)) {
+      hits++
+    }
+  }
+
+  return hits / total
 }
 
 /**
@@ -68,6 +54,6 @@ function forEveryChar(string, callback) {
  */
 export function inaccurateSearch(search, array) {
   return array
-    .map(/** @type {(v: string,) => [string, number]} */ element => [element, stringDistance(search, element)])
+    .map(/** @type {(v: string,) => [string, number]} */ element => [element, stringSimilarity(search, element)])
     .sort((a, b) => b[1] - a[1])
 }

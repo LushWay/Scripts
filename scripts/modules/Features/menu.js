@@ -3,7 +3,7 @@ import { Mail } from 'lib/Mail.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { mailMenu } from 'modules/Commands/mail.js'
-import { playerSettings } from 'modules/Commands/settings.js'
+import { playerSettingsMenu } from 'modules/Commands/settings.js'
 import { openBaseMenu } from 'modules/Features/baseMenu.js'
 import { questsMenu } from 'modules/Quests/command.js'
 import { Anarchy } from '../Places/Anarchy.js'
@@ -65,7 +65,7 @@ Menu.open = player => {
   form
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
     .addButton(`§fПочта${Mail.unread(player.id)}`, 'textures/ui/gear', () => mailMenu(player, back))
-    .addButton('§7Настройки', 'textures/ui/gear', () => playerSettings(player, back))
+    .addButton('§7Настройки', 'textures/ui/gear', () => playerSettingsMenu(player, back))
 
   return form
 }

@@ -20,7 +20,7 @@ function realTimeToMinecraftTicks(date = new Date()) {
 const settings = Settings.world('server', {
   syncRealTime: {
     name: 'Синхронизировать время',
-    desc: 'Синхронизировать время в майнкрафте с реальным',
+    description: 'Синхронизировать время в майнкрафте с реальным',
     value: true,
   },
 })

@@ -5,21 +5,21 @@ import { HEALTH_INDICATOR } from './var.js'
 const options = Settings.world('pvp', {
   enabled: {
     value: true,
-    desc: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
+    description: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
     name: 'Включено',
   },
-  cooldown: { value: 15, desc: 'Время блокировки в секундах', name: 'Время' },
+  cooldown: { value: 15, description: 'Время блокировки в секундах', name: 'Время' },
 })
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   indicator: {
     name: 'Индикатор',
-    desc: 'Индикатор попадания по существу из лука',
+    description: 'Индикатор попадания по существу из лука',
     value: true,
   },
   bowSound: {
     name: 'Звук лука',
-    desc: 'Звук попадания по существо из лука',
+    description: 'Звук попадания по существо из лука',
     value: true,
   },
 })

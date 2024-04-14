@@ -3,7 +3,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, EditableLocation, is, util } from 'lib.js'
 import { Scene } from 'lib/Scene/scene.js'
 import { Temporary } from 'lib/Temporary.js'
-import { settingsGroup } from 'modules/Commands/settings.js'
+import { settingsGroupMenu } from 'modules/Commands/settings.js'
 
 new Scene('test')
 
@@ -109,7 +109,7 @@ function backInv(player) {
  */
 function editCatscene(player, scene) {
   if (!scene.location.valid) {
-    return settingsGroup(player, EditableLocation.key, 'WORLD', {
+    return settingsGroupMenu(player, EditableLocation.key, false, {
       [scene.location.id]: '§6Установите базовую точку катсцены.',
     })
   }
@@ -137,6 +137,7 @@ function editCatscene(player, scene) {
 
     system.runInterval(
       () => {
+        if (!scene.location.valid) return
         for (const dot of scene.dots) {
           try {
             player.dimension.spawnParticle('minecraft:wax_particle', Vector.add(scene.location, dot[0]), blueParticle)
@@ -150,6 +151,7 @@ function editCatscene(player, scene) {
     )
 
     util.catch(async function visialize() {
+      if (!scene.location.valid) return
       while (!temp.cleaned) {
         await nextTick
         const vectors = scene.dots.map(e => e[0]).concat(Vector.subtract(Vector.floor(player.location), scene.location))
@@ -184,6 +186,8 @@ function editCatscene(player, scene) {
       ) {
         event.cancel = true
         system.delay(() => {
+          if (!scene.location.valid) return
+
           scene.dots.push([Vector.subtract(Vector.floor(player.location), scene.location)])
           player.info('Точка добавлена.')
         })

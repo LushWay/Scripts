@@ -14,7 +14,7 @@ const playerSettings = Settings.player('Задания', 'quest', {
   messageForEachStep: {
     value: true,
     name: 'Сообщение в чат при каждом шаге',
-    desc: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
+    description: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
   },
 })
 

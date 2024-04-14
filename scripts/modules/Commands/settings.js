@@ -2,136 +2,14 @@ import { Player } from '@minecraft/server'
 import { FormCallback, util } from 'lib.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { OPTIONS_NAME, PLAYER_SETTINGS_DB, Settings, WORLD_SETTINGS_DB, generateSettingsProxy } from 'lib/Settings.js'
-
-new Command({
-  name: 'wsettings',
-  role: 'techAdmin',
-  description: 'Настройки мира',
-}).executes(ctx => {
-  worldSettings(ctx.sender)
-})
-
-/**
- * @param {Player} player
- */
-function worldSettings(player) {
-  const form = new ActionForm('§dНастройки мира')
-
-  for (const groupName in Settings.worldMap) {
-    const data = WORLD_SETTINGS_DB[groupName]
-    const requires = Object.entries(Settings.worldMap[groupName]).reduce(
-      (count, [key, option]) => (option.requires && typeof data[key] === 'undefined' ? count + 1 : count),
-      0
-    )
-    form.addButton(`${groupName}${requires ? ` §c(${requires}!)` : ''}`, null, () => {
-      settingsGroup(player, groupName, 'WORLD')
-    })
-  }
-
-  form.show(player)
-}
-
-/**
- *
- * @param {Player} player
- * @param {string} groupName
- * @param {"PLAYER" | "WORLD"} groupType
- * @param {Record<string, string>} [errors]
- */
-export function settingsGroup(player, groupName, groupType, errors = {}) {
-  const groups = groupType === 'PLAYER' ? Settings.playerMap : Settings.worldMap
-  const config = groups[groupName]
-  const db = generateSettingsProxy(
-    groupType === 'PLAYER' ? PLAYER_SETTINGS_DB : WORLD_SETTINGS_DB,
-    groupName,
-    config,
-    groupType === 'PLAYER' ? player : null
-  )
-
-  /** @type {[string, (input: string | boolean) => string][]} */
-  const buttons = []
-  /** @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>} */
-  const form = new ModalForm(config[OPTIONS_NAME] ?? groupName)
-
-  for (const KEY in config) {
-    const OPTION = config[KEY]
-    const dbValue = db[KEY]
-    const isDef = typeof dbValue === 'undefined'
-    const message = errors[KEY] ? `${errors[KEY]}\n` : ''
-    const requires = Reflect.get(config[KEY], 'requires') && typeof dbValue === 'undefined'
-
-    const value = dbValue ?? OPTION.value
-    const toggle = typeof value === 'boolean'
-
-    let label = toggle ? '' : '\n'
-    label += message
-    if (requires) label += '§c(!) '
-    label += `§f${OPTION.name}` //§r
-    if (OPTION.desc) label += `§i - ${OPTION.desc}`
-
-    if (toggle) {
-      if (isDef) label += `\n §8(По умолчанию)`
-      label += '\n '
-    } else {
-      label += `\n   §7Значение: ${util.stringify(dbValue ?? OPTION.value)}`
-      label += `${isDef ? ` §8(По умолчанию)` : ''}\n`
-
-      label += `   §7Тип: §f${Types[typeof value] ?? typeof value}`
-    }
-
-    if (toggle) form.addToggle(label, value)
-    else form.addTextField(label, 'Настройка не изменится', typeof value === 'string' ? value : JSON.stringify(value))
-
-    buttons.push([
-      KEY,
-      input => {
-        let result
-        if (typeof input !== 'undefined' && input !== '') {
-          if (typeof input === 'boolean') result = input
-          else
-            switch (typeof OPTION.value) {
-              case 'string':
-                result = input
-                break
-              case 'number':
-                result = Number(input)
-                if (isNaN(result)) return '§cВведите число!'
-                break
-              case 'object':
-                try {
-                  result = JSON.parse(input)
-                } catch (error) {
-                  return `§c${error.message}`
-                }
-                break
-            }
-
-          const resultStr = util.stringify(result)
-          if (util.stringify(db[KEY]) === resultStr) return ''
-          db[KEY] = result
-          return '§aСохранено!'
-        } else return ''
-      },
-    ])
-  }
-
-  form.show(player, (ctx, ...opts) => {
-    /** @type {Record<string, string>} */
-    const messages = {}
-    for (const [i, option] of opts.entries()) {
-      const [KEY, callback] = buttons[i]
-      const result = callback(option)
-      if (result) messages[KEY] = result
-    }
-
-    if (Object.keys(messages).length) settingsGroup(player, groupName, groupType, messages)
-    else {
-      if (groupType === 'PLAYER') playerSettings(player)
-      else worldSettings(player)
-    }
-  })
-}
+import { isDropdown } from 'lib/Settings'
+import {
+  PLAYER_SETTINGS_DB,
+  SETTINGS_GROUP_NAME,
+  Settings,
+  WORLD_SETTINGS_DB,
+  createSettingsObject,
+} from 'lib/Settings.js'
 
 /**
  * @typedef {"string"
@@ -151,29 +29,185 @@ const Types = {
   object: 'JSON-Объект',
   boolean: 'Переключатель',
 }
+
 new Command({
   name: 'settings',
   aliases: ['options', 's'],
   role: 'member',
   description: 'Настройки',
 }).executes(ctx => {
-  playerSettings(ctx.sender)
+  playerSettingsMenu(ctx.sender)
 })
+
 /**
+ * Opens player settings menu
  * @param {Player} player
  * @param {VoidFunction} [back]
  */
-export function playerSettings(player, back) {
+export function playerSettingsMenu(player, back) {
   const form = new ActionForm('§dНастройки')
   if (back) form.addButtonBack(back)
 
   for (const groupName in Settings.playerMap) {
-    const name = Settings.playerMap[groupName][OPTIONS_NAME]
-    if (name)
-      form.addButton(name, null, () => {
-        settingsGroup(player, groupName, 'PLAYER')
-      })
+    const name = Settings.playerMap[groupName][SETTINGS_GROUP_NAME]
+    if (name) form.addButton(name, () => settingsGroupMenu(player, groupName, true))
   }
 
   form.show(player)
+}
+
+new Command({
+  name: 'wsettings',
+  role: 'techAdmin',
+  description: 'Настройки мира',
+}).executes(ctx => {
+  worldSettingsMenu(ctx.sender)
+})
+
+/**
+ * @param {Player} player
+ */
+function worldSettingsMenu(player) {
+  const form = new ActionForm('§dНастройки мира')
+
+  for (const groupName in Settings.worldMap) {
+    const db = WORLD_SETTINGS_DB[groupName]
+
+    let requiresCount = 0
+    for (const [key, option] of Object.entries(Settings.worldMap[groupName])) {
+      const requiredButNotDefined = option.requires && typeof db[key] === 'undefined'
+      if (requiredButNotDefined) requiresCount++
+    }
+
+    form.addButton(`${groupName}${requiresCount ? ` §c(${requiresCount}!)` : ''}`, null, () => {
+      settingsGroupMenu(player, groupName, false)
+    })
+  }
+
+  form.show(player)
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {string} groupName
+ * @param {boolean} forRegularPlayer
+ * @param {Record<string, string>} [hints]
+ */
+export function settingsGroupMenu(
+  player,
+  groupName,
+  forRegularPlayer,
+  hints = {},
+  storeSource = forRegularPlayer ? PLAYER_SETTINGS_DB : WORLD_SETTINGS_DB,
+  configSource = forRegularPlayer ? Settings.playerMap : Settings.worldMap,
+  back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
+  showSavedHint = true
+) {
+  const config = configSource[groupName]
+  const store = createSettingsObject(storeSource, groupName, config, forRegularPlayer ? player : null)
+
+  /**
+   * @type {[string, (input: string | boolean) => string][]}
+   */
+  const buttons = []
+
+  /**
+   * @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>}
+   */
+  const form = new ModalForm(config[SETTINGS_GROUP_NAME] ?? groupName)
+
+  for (const key in config) {
+    const saved = store[key]
+    const setting = config[key]
+    const value = saved ?? setting.value
+
+    const isUnset = typeof saved === 'undefined'
+    const isRequired = Reflect.get(config[key], 'requires') && isUnset
+
+    const isToggle = typeof value === 'boolean'
+
+    let label = ''
+    label += hints[key] ? `${hints[key]}\n` : ''
+
+    if (isRequired) label += '§c(!) '
+    label += `§f§l${setting.name}§r§f` //§r
+
+    if (setting.description) label += `§i - ${setting.description}`
+    if (isUnset) label += `§8(По умолчанию)\n`
+
+    if (isToggle) {
+      form.addToggle(label, value)
+    } else if (isDropdown(setting.value)) {
+      form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValue: value })
+    } else {
+      const isString = typeof value === 'string'
+
+      if (!isString) {
+        label += `\n§7§lЗначение:§r ${util.stringify(value)}`
+        label += `\n§7§lТип: §r§f${Types[typeof value] ?? typeof value}`
+      }
+
+      form.addTextField(label, 'Настройка не изменится', isString ? value : JSON.stringify(value))
+    }
+
+    buttons.push([
+      key,
+      input => {
+        if (typeof input === 'undefined' || input === '') return ''
+
+        let result
+        if (typeof input === 'boolean' || isDropdown(setting.value)) {
+          result = input
+        } else {
+          switch (typeof setting.value) {
+            case 'string':
+              result = input
+              break
+            case 'number':
+              result = Number(input)
+              if (isNaN(result)) return '§cВведите число!'
+              break
+            case 'object':
+              try {
+                result = JSON.parse(input)
+              } catch (error) {
+                return `§c${error.message}`
+              }
+              break
+          }
+        }
+
+        if (util.stringify(store[key]) === util.stringify(result)) return ''
+
+        store[key] = result
+        return showSavedHint ? '§aСохранено!' : ''
+      },
+    ])
+  }
+
+  form.show(player, (_, ...settings) => {
+    /**
+     * @type {Record<string, string>}
+     */
+    const hints = {}
+
+    for (const [i, setting] of settings.entries()) {
+      const [key, callback] = buttons[i]
+      const hint = callback(setting)
+      if (hint) hints[key] = hint
+    }
+
+    if (Object.keys(hints).length) {
+      // Show current menu with hints
+      self()
+    } else {
+      // No hints, go back to previous menu
+      back(player)
+    }
+
+    function self() {
+      settingsGroupMenu(player, groupName, forRegularPlayer, hints, storeSource, configSource, back)
+    }
+  })
 }

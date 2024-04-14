@@ -157,16 +157,16 @@ class JoinBuilder {
   settings = Settings.player('Вход', 'join', {
     message: {
       name: 'Сообщение',
-      desc: 'о входе других игроков',
+      description: 'о входе других игроков',
       value: true,
     },
     sound: {
       name: 'Звук',
-      desc: 'при входе игроков',
+      description: 'при входе игроков',
       value: true,
     },
     time: {
-      desc: 'Время',
+      description: 'Время',
       name: 'при входе',
       value: true,
     },

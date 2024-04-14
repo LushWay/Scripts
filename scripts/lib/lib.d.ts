@@ -243,7 +243,23 @@ declare module '@minecraft/server' {
   }
 }
 
+/**
+ * Describes types that can be narrowed
+ */
+type Narrowable = string | number | bigint | boolean
+
 declare global {
+  /**
+   * Narrows type. Source: ts-toolbelt
+   */
+  type Narrow<T> =
+    | (T extends [] ? [] : never)
+    | (T extends Narrowable ? T : never)
+    | {
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        [K in keyof T]: T[K] extends Function ? T[K] : Narrow<T[K]>
+      }
+
   namespace LootItem {
     interface Common {
       /**

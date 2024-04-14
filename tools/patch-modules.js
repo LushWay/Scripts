@@ -42,7 +42,20 @@ patchPackage('@minecraft/server', {
      * Returns whenether vector is valid or not
      * Valid vector don't uses NaN values
      */
-    static valid(a: Vector3): boolean
+    static valid(a: Vector3): boolean;
+    /**
+     * Alias to
+     * \`\`\`js
+     * [
+     *   Vector.add(a, { x: x, y: y, z: z }),
+     *   Vector.add(a, { x: -x, y: -y, z: -z })
+     * ]
+     * \`\`\`
+     * @param x Number to increase vector on x axis.
+     * @param y Number to increase vector on y axis. Defaults to x
+     * @param z Number to increase vector on z axis. Defaults to x
+     */
+    static around(a: Vector3, x: number, y?: number, z?: number): [Vector3, Vector3];
     `,
     World: m`
     /**

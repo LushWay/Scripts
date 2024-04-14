@@ -6,7 +6,7 @@ import { Minigame } from 'modules/Minigames/Builder.js'
 const sidebarSettings = Settings.player('Боковое меню (сайдбар)', 'sidebar', {
   enabled: {
     name: 'Сайдбар',
-    desc: 'Определяет, включен ли сайдбар',
+    description: 'Определяет, включен ли сайдбар',
     value: true,
   },
   //   format: {

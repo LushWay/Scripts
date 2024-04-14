@@ -5,6 +5,9 @@ const Static = {
   string: (a, color) => (!color ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`),
   valid: a => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z)),
   dot: (a, b) => a.x * b.x + a.y * b.y + a.z * b.z,
+  around(a, x, y = x, z = y) {
+    return [Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
+  },
   *foreach(a, b) {
     const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x]
     const [ymin, ymax] = a.y < b.y ? [a.y, b.y] : [b.y, a.y]

@@ -1,6 +1,6 @@
 import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { Airdrop, BUTTON, ChestForm, DB, LootTable, NpcForm, is, itemLocaleName, util } from 'lib.js'
+import { Airdrop, BUTTON, ChestForm, DB, LootTable, NpcForm, Settings, is, itemLocaleName, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
@@ -26,6 +26,23 @@ const publicTests = {
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  settings(ctx) {
+    const getSettings = Settings.player('test', 'Test', {
+      dropdown: {
+        name: 'Name',
+        description: 'Description',
+        value: [
+          ['A', 'a'],
+          ['B', 'b'],
+          ['C', 'c'],
+        ],
+      },
+      toggle: { name: 'Toggle', description: 'Desc', value: true },
+      string: { name: 'String', description: 'Desc', value: '' },
+    })
+
+    console.log(getSettings(ctx.sender))
+  },
   f(ctx) {
     const form = new ActionForm('MENUS', 'Menu body', '§c§u§s§r§f')
     form.addButton('Test!', BUTTON['?'], () => {})

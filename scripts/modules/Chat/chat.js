@@ -9,25 +9,25 @@ export class ChatBuilder {
   settings = Settings.world('chat', {
     cooldown: {
       name: 'Задержка',
-      desc: '0 что бы отключить',
+      description: '0 что бы отключить',
       value: 0,
     },
     range: {
       name: 'Радиус',
-      desc: 'Радиус для затемнения сообщений дальних игроков',
+      description: 'Радиус для затемнения сообщений дальних игроков',
       value: 30,
     },
-    ranks: { desc: 'Ранги в чате', value: true, name: 'Ранги' },
+    ranks: { description: 'Ранги в чате', value: true, name: 'Ранги' },
   })
   playerSettings = Settings.player('Чат', 'chat', {
     hightlightMessages: {
       name: 'Подсветка моих сообщений',
-      desc: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
+      description: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
       value: true,
     },
     disableSound: {
       name: 'Выключение звука',
-      desc: 'Выключение звука чужих сообщений',
+      description: 'Выключение звука чужих сообщений',
       value: false,
     },
   })

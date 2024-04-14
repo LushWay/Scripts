@@ -196,14 +196,14 @@ function WEplayerBlockSetMenu(player, otherPlayerId, blockSets, onBack) {
 }
 
 /**
- * @param {object} o
- * @param {Player} o.player
- * @param {string} o.setName
- * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} [o.sets]
- * @param {boolean} [o.ownsSet]
- * @param {boolean} [o.add]
- * @param {boolean} [o.editStates]
- * @param {() => void} [o.back]
+ * @param {object} options
+ * @param {Player} options.player
+ * @param {string} options.setName
+ * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} [options.sets]
+ * @param {boolean} [options.ownsSet]
+ * @param {boolean} [options.add]
+ * @param {boolean} [options.editStates]
+ * @param {() => void} [options.back]
  */
 function WEeditBlocksSetMenu(o) {
   const {

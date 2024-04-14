@@ -26,9 +26,12 @@ export class EditableLocation {
   /**
    * @returns {(
    *   { valid: false } |
-   *  ({ valid: true } & Location<LocationType>)
-   * ) & { onLoad: EditableLocation<LocationType>['onLoad'], teleport: EditableLocation<LocationType>['teleport'] }
-   * }
+   *   ({ valid: true } & Location<LocationType>)
+   * ) & { 
+   *   onLoad: EditableLocation<LocationType>['onLoad'], 
+   *   teleport: EditableLocation<LocationType>['teleport'], 
+   *   id: string 
+   * }}
    */
   get safe() {
     return this
@@ -90,7 +93,7 @@ export class EditableLocation {
       this.type === 'vector3+rotation' ? ' xRot yRot' : this.type === 'vector3+radius' ? ' radius' : ''
     }`
     Settings.worldMap[EditableLocation.key][id] = {
-      desc: this.format,
+      description: this.format,
       name: id,
       value: fallback ? Vector.string(fallback) : '',
       onChange: () => this.load(),

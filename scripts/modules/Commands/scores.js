@@ -1,6 +1,7 @@
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm, PLAYER_DB } from 'lib.js'
 import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
+import { ArrayForm } from 'lib/Form/ArrayForm.js'
 
 new Command({
   name: 'scores',
@@ -9,6 +10,20 @@ new Command({
 }).executes(ctx => {
   scoreManagerMenu(ctx.sender)
 })
+
+alias('leafs')
+alias('money')
+
+function alias(name = 'leafs') {
+  new Command({
+    name,
+    description: 'Управляет счетом игроков (' + name + ')',
+    role: 'chefAdmin',
+  }).executes(ctx => {
+    const obj = world.scoreboard.getObjective(name)
+    if (obj) scoreboardMenu(ctx.sender, obj)
+  })
+}
 
 /**
  * @param {Player} player
@@ -37,45 +52,82 @@ function scoreManagerMenu(player) {
  * @param {ScoreboardObjective} scoreboard
  */
 function scoreboardMenu(player, scoreboard) {
-  const form = new ActionForm(scoreboard.displayName)
-  form.addButtonBack(() => scoreManagerMenu(player))
-
-  form.addButton('§3Добавить', BUTTON['+'], () => {
-    const players = world.getAllPlayers()
-    let arr = []
-    for (const [id, data] of Object.entries(PLAYER_DB)) {
-      const player = players.find(e => e.id === id)
-      const name = player?.name ?? data.name ?? id
-      arr.push({ online: !!player, name, id })
-    }
-
-    arr = arr.sort((a, b) => (!a.online && b.online ? -1 : a.online ? 0 : 1))
-
-    const form = new ActionForm('Выберите игрока')
-    form.addButtonBack(() => scoreboardMenu(player, scoreboard))
-
-    for (const { id, name } of arr) {
-      form.addButton(name, () => {
-        editPlayerScore(player, scoreboard, id, name, () => form.show(player))
-      })
-    }
-
-    form.show(player)
-  })
-
   const manager = new ScoreboardDB(scoreboard.id)
 
-  for (const p of scoreboard.getParticipants()) {
-    if (p.type === ScoreboardIdentityType.FakePlayer) {
-      const name = Player.name(p.displayName)
-      if (!name) continue
-      form.addButton(`${name}§r §6${Leaderboard.parseCustomScore(scoreboard.id, manager.get(p.displayName))}`, () => {
-        editPlayerScore(player, scoreboard, p.displayName, name)
-      })
-    }
+  new ArrayForm(scoreboard.displayName + ' $page/$max', '', scoreboard.getParticipants(), {
+    filters: {
+      online: {
+        name: 'Онлайн',
+        description: 'Показывать только игроков онлайн',
+        value: false,
+      },
+    },
+    sort(array, filters) {
+      if (!filters.online) return array
+      const online = world.getAllPlayers().map(e => e.id)
+      return array.filter(e => online.includes(e.displayName))
+    },
+    button(p) {
+      if (p.type === ScoreboardIdentityType.FakePlayer) {
+        const name = Player.name(p.displayName)
+        if (!name) return false
+        return [
+          `${name}§r §6${Leaderboard.parseCustomScore(scoreboard.id, manager.get(p.displayName))}`,
+          null,
+          () => editPlayerScore(player, scoreboard, p.displayName, name),
+        ]
+      } else return false
+    },
+    back: () => scoreManagerMenu(player),
+    addCustomButtonBeforeArray(form) {
+      form.addButton('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, scoreboard))
+    },
+  }).show(player)
+}
+
+/**
+ *
+ * @param {Player} player
+ * @param {ScoreboardObjective} scoreboard
+ * @returns
+ */
+function addTargetToScoreboardMenu(player, scoreboard) {
+  const onlinePlayers = world.getAllPlayers()
+  const players = []
+  for (const [id, data] of Object.entries(PLAYER_DB)) {
+    const player = onlinePlayers.find(e => e.id === id)
+    const name = player?.name ?? data.name ?? id
+    players.push({ online: !!player, name, id })
   }
 
-  form.show(player)
+  new ArrayForm('§3Выберите игрока', '', players, {
+    filters: {
+      sort: {
+        name: 'Сортировать по',
+        value: [
+          ['online', 'Онлайну'],
+          ['date', 'Дате входа'],
+        ],
+      },
+    },
+    sort(players, filters) {
+      if (filters.sort) {
+        return players.sort((a, b) => (!a.online && b.online ? -1 : a.online ? 0 : 1))
+      }
+
+      return players
+    },
+    button({ id, name }) {
+      return [
+        name,
+        null,
+        () => {
+          editPlayerScore(player, scoreboard, id, name, () => addTargetToScoreboardMenu(player, scoreboard))
+        },
+      ]
+    },
+    back: () => scoreboardMenu(player, scoreboard),
+  }).show(player)
 }
 
 /**
