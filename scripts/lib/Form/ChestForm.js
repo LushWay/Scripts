@@ -12,17 +12,17 @@ const NUMBER_OF_1_16_100_ITEMS = 0
  * @satisfies {Record<string, [string, number]>}
  */
 const SIZES = {
-  '5 ': ['§c§h§e§s§t§0§5§r', 5],
-  '9': ['§c§h§e§s§t§0§9§r', 9],
-  '18': ['§c§h§e§s§t§1§8§r', 18],
-  '27': ['§c§h§e§s§t§2§7§r', 27],
-  '36': ['§c§h§e§s§t§3§6§r', 36],
-  '45': ['§c§h§e§s§t§4§5§r', 45],
-  '54': ['§c§h§e§s§t§5§4§r', 54],
-  'single': ['§c§h§e§s§t§2§7§r', 27],
-  'small': ['§c§h§e§s§t§2§7§r', 27],
-  'double': ['§c§h§e§s§t§5§4§r', 54],
-  'large': ['§c§h§e§s§t§5§4§r', 54],
+  '5 ': ['§c§h§e§s§t§0§5§r§f', 5],
+  '9': ['§c§h§e§s§t§0§9§r§f', 9],
+  '18': ['§c§h§e§s§t§1§8§r§f', 18],
+  '27': ['§c§h§e§s§t§2§7§r§f', 27],
+  '36': ['§c§h§e§s§t§3§6§r§f', 36],
+  '45': ['§c§h§e§s§t§4§5§r§f', 45],
+  '54': ['§c§h§e§s§t§5§4§r§f', 54],
+  'single': ['§c§h§e§s§t§2§7§r§f', 27],
+  'small': ['§c§h§e§s§t§2§7§r§f', 27],
+  'double': ['§c§h§e§s§t§5§4§r§f', 54],
+  'large': ['§c§h§e§s§t§5§4§r§f', 54],
 }
 
 /**
