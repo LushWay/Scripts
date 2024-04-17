@@ -22,16 +22,31 @@ import { chunkIsUnloaded } from './GameUtils.js'
  */
 
 export class Boss {
+  /**
+   * Boss Database. Contains meta information about spawned boss entities
+   */
   static db = new DynamicPropertyDB('boss', {
     /**
      * @type {Record<string, BossDB | undefined>}
      */
     type: {},
   }).proxy()
+
   /**
+   * List of all registered boss types
    * @type {Boss[]}
    */
-  static instances = []
+  static types = []
+
+  /** @private */
+  static init() {
+    world.afterEvents.entityDie.subscribe(data => {
+      Boss.types.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
+    })
+
+    system.runInterval(() => Boss.types.forEach(e => e.check()), 'boss respawn', 40)
+  }
+
   /**
    * @param {object} o
    * @param {string} o.name Script id used for location
@@ -65,7 +80,7 @@ export class Boss {
 
     // Without delay any error during loading
     // caused this file to stop loading
-    // so none of intervals would work.
+    // so none of intervals would register.
     system.delay(() => {
       this.location.onLoad.subscribe(center => {
         this.check()
@@ -77,7 +92,7 @@ export class Boss {
       })
     })
 
-    Boss.instances.push(this)
+    Boss.types.push(this)
   }
 
   check() {
@@ -107,9 +122,17 @@ export class Boss {
 
   spawnEntity() {
     if (!this.location.valid) return
+
+    // Get type id
     const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
+
+    // Log
     console.debug(`Boss(${this.name}).spawnEntity(${entityTypeId})`)
+
+    // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
+
+    // Save to database
     Boss.db[this.name] = {
       id: this.entity.id,
       date: Date.now(),
@@ -118,6 +141,7 @@ export class Boss {
   }
 
   /**
+   * Ensures that entity exists and if not calls onDie method
    * @param {BossDB} db
    */
   ensureEntity(db) {
@@ -155,14 +179,5 @@ export class Boss {
   }
 }
 
-world.afterEvents.entityDie.subscribe(data => {
-  Boss.instances.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
-})
-
-system.runInterval(
-  () => {
-    Boss.instances.forEach(e => e.check())
-  },
-  'boss respawn',
-  40
-)
+// @ts-expect-error Initialzation allowed
+Boss.init()

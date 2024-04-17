@@ -1,27 +1,17 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import { Airdrop } from 'lib/Airdrop.js'
-import { wordWrap } from 'lib/Extensions/itemstack.js'
-import { LootTable } from 'lib/LootTable.js'
-import { Compass } from 'lib/Menu.js'
-import { Join } from 'lib/PlayerJoin.js'
-import { Settings } from 'lib/Settings.js'
-import { Temporary } from 'lib/Temporary.js'
+import {
+  Airdrop,
+  Compass,
+  InventoryIntervalAction,
+  Join,
+  LootTable,
+  PlaceAction,
+  Settings,
+  Temporary,
+  wordWrap,
+} from 'lib.js'
 import { isBuilding } from 'modules/Build/isBuilding.js'
-import { InventoryIntervalAction, PlaceAction } from './Action.js'
-
-const playerSettings = Settings.player('Задания', 'quest', {
-  messageForEachStep: {
-    value: true,
-    name: 'Сообщение в чат при каждом шаге',
-    description: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
-  },
-})
-
-// // @ts-expect-error Bruh
-// Set.prototype.toJSON = function () {
-//   return 'Set<size=' + this.size + '>'
-// }
 
 /**
  * @typedef {{
@@ -36,7 +26,21 @@ const playerSettings = Settings.player('Задания', 'quest', {
 
 export class Quest {
   static error = class QuestError extends Error {}
-  /** @type {import("./Sidebar.js").SidebarLinePreinit} */
+
+  /**
+   * @type {[displayName: string, id: string]}
+   */
+  static playerSettingsName = ['Задания', 'quest']
+
+  static playerSettings = Settings.player(...this.playerSettingsName, {
+    messageForEachStep: {
+      value: true,
+      name: 'Сообщение в чат при каждом шаге',
+      description: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
+    },
+  })
+
+  /** @type {import("../../lib/Sidebar.js").SidebarLinePreinit} */
   static sidebar = {
     preinit(sidebar) {
       const onquestupdate = sidebar.show.bind(sidebar)
@@ -146,7 +150,7 @@ export class Quest {
     const step = steps.list[stepIndex] ?? steps.list[0]
     if (!step) return false
 
-    if (playerSettings(player).messageForEachStep) {
+    if (Quest.playerSettings(player).messageForEachStep) {
       const text = step.text()
 
       if (text) player.success(`§f§l${this.name}: §r§6${step.description ? step.description() : step.text()}`)

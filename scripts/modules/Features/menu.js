@@ -15,10 +15,10 @@ import { Spawn } from '../Places/Spawn.js'
  */
 function tp(place, inv, color = '§9', text = 'Спавн', extra = '') {
   const here = inv === place
-  if (here) extra = `${extra ? extra + ' ' : ''}§7Вы тут`
+  if (here) extra = `${extra ? extra + ' ' : ''}§8Вы тут`
   if (extra) extra = '\n' + extra
   const prefix = here ? '§7' : color
-  return `${prefix}> ${inv === place ? '§8' : '§f'}${text} ${prefix}<${extra}`
+  return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
 }
 
 /**
@@ -50,7 +50,7 @@ Menu.open = player => {
     })
     .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', back)
     .addButton(
-      `§lЗадания ${greaterThenZero(player.database.quests?.active.length ?? 0, '§r§7')}`,
+      `Задания${greaterThenZero(player.database.quests?.active.length ?? 0, ' §r§7')}`,
       'textures/ui/sidebar_icons/genre',
       () => questsMenu(player, back)
     )

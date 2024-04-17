@@ -1,15 +1,15 @@
 import { ItemStack, Vector, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
-import { EditableLocation, Quest, SafeAreaRegion, Temporary, actionGuard } from 'lib.js'
-import { Menu } from 'lib/Menu.js'
+import { EditableLocation, SafeAreaRegion, Temporary, actionGuard } from 'lib.js'
+import { Menu, createPublicGiveItemCommand } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { Axe } from 'modules/Features/axe.js'
 import { randomTeleport } from 'modules/Features/randomTeleport.js'
 import { Anarchy } from 'modules/Places/Anarchy.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
-import { createPublicGiveItemCommand } from 'modules/Survival/createPublicGiveItemCommand.js'
+import { Quest } from 'modules/Quests/Quest.js'
 import { LEARNING_L } from './airdrop.js'
 
 // TODO Add even more steps,
@@ -56,7 +56,7 @@ export class Learning {
               if (player.id !== this.player.id) return
               if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
 
-              console.debug('BROCK ')
+              console.debug(`${player.name} brocke ${brokenBlockPermutation.type.id}`)
 
               this.player.playSound(SOUNDS.action)
               this.diff(1)
@@ -123,11 +123,11 @@ export class Learning {
           },
         })
 
-      craftingTable('Нужно где-то скрафтить кирку.')
+      craftingTable('Доберитемь до верстака, чтобы скрафтить кирку!.')
 
       q.item({
-        text: () => '§6Сделай деревянную кирку',
-        description: 'Чтобы пойти в шахту, нужна кирка. Сделай ее!',
+        text: () => '§6Сделайте деревянную кирку',
+        description: 'Чтобы пойти в шахту, нужна кирка. Сделайте ее!',
         isItem: item => item.typeId === MinecraftItemTypes.WoodenPickaxe,
       })
 
@@ -153,7 +153,7 @@ export class Learning {
       craftingTable('Чтобы сделать каменную кирку.')
 
       q.item({
-        text: () => '§6Сделай каменную кирку',
+        text: () => '§6Сделайте каменную кирку',
         description: 'Время улучшить инструмент!',
         isItem: item => item.typeId === MinecraftItemTypes.StonePickaxe,
       })

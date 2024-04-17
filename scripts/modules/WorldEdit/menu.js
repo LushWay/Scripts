@@ -27,7 +27,7 @@ export function WEmenu(player, body = '') {
     body = `Создание доступно только при пустой руке.` || body
   }
 
-  const form = new ActionForm('§dWorld§6Edit', body)
+  const form = new ActionForm('§dWorld§6Edit', body, '§c§u§s§r')
   form.addButton('§3Наборы блоков', () => WEblocksSetsMenu(player))
   form.addButton('§3Отмена/Восстановление', () => WEundoRedoMenu(player))
 
@@ -35,7 +35,7 @@ export function WEmenu(player, body = '') {
     const buttonName = tool.getMenuButtonName(player)
     if (!buttonName) continue
 
-    form.addButton(buttonName, () => {
+    form.addButton(buttonName, 'textures/ui/worldsIcon', () => {
       const slotOrError = tool.getToolSlot(player)
       if (typeof slotOrError === 'string') {
         WEmenu(player, '§c' + slotOrError)
@@ -196,14 +196,14 @@ function WEplayerBlockSetMenu(player, otherPlayerId, blockSets, onBack) {
 }
 
 /**
- * @param {object} options
- * @param {Player} options.player
- * @param {string} options.setName
- * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} [options.sets]
- * @param {boolean} [options.ownsSet]
- * @param {boolean} [options.add]
- * @param {boolean} [options.editStates]
- * @param {() => void} [options.back]
+ * @param {object} o
+ * @param {Player} o.player
+ * @param {string} o.setName
+ * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} [o.sets]
+ * @param {boolean} [o.ownsSet]
+ * @param {boolean} [o.add]
+ * @param {boolean} [o.editStates]
+ * @param {() => void} [o.back]
  */
 function WEeditBlocksSetMenu(o) {
   const {

@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
 import { MessageForm } from 'lib.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
-import { Quest } from 'lib/Quest.js'
+import { Quest } from 'modules/Quests/Quest.js'
 
 const quest = new Command({
   name: 'q',
@@ -33,22 +33,26 @@ quest.literal({ name: 'enter', role: 'techAdmin' }).executes(ctx => {
 
 /**
  * @param {Player} player
- * @param {VoidFunction} [back]
+ * @param {VoidFunction} [backButton]
  */
-export function questsMenu(player, back) {
-  const form = new ActionForm('Задания')
-  if (back) form.addButtonBack(back)
+export function questsMenu(player, backButton) {
+  const quests = player.database.quests
 
-  if (player.database.quests) {
-    for (const dbquest of player.database.quests.active) {
+  // Action form cannot contain no buttons
+  // So if there is no back button show no quests as button
+  const form = new ActionForm('Задания', !quests ? '§cНет активных заданий.' : '')
+  if (backButton) form.addButtonBack(backButton)
+
+  if (quests) {
+    for (const dbquest of quests.active) {
       const quest = Quest.instances[dbquest.id]
       if (quest) {
         form.addButton(`${quest.name}\n${quest.steps(player)?.list[dbquest.step]?.text() ?? ''}`, () =>
-          questMenu(player, quest, () => questsMenu(player, back))
+          questMenu(player, quest, () => questsMenu(player, backButton))
         )
       }
     }
-  } else form.addButton('§cНет активных заданий.', () => questsMenu(player, back))
+  }
 
   form.show(player)
 }

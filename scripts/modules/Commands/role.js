@@ -3,7 +3,7 @@ import { FormCallback, PLAYER_DB, ROLES, getRole, setRole, util } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ArrayForm } from 'lib/Form/ArrayForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
-import { WHO_CAN_CHANGE } from 'lib/roles'
+import { WHO_CAN_CHANGE } from 'lib/roles.js'
 
 const FULL_HIERARCHY = Object.keys(ROLES)
 
@@ -18,13 +18,13 @@ function canChange(who, target, allowSame = false) {
   return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
 
-const roleCommand = new Command({
+const command = new Command({
   name: 'role',
   description: 'Показывает вашу роль',
   requires: () => true,
 })
 
-const restoreRole = roleCommand
+const restoreRole = command
   .literal({
     description: 'Восстанавливает вашу роль',
     name: 'restore',
@@ -39,14 +39,14 @@ const restoreRole = roleCommand
     ctx.sender.info(`Вы вернули роль §r${ROLES[prevRole]}`)
   })
 
-roleCommand.executes(roleForm)
+command.executes(roleForm)
 
 /**
  * @param {CommandContext} ctx
  */
 function roleForm(ctx) {
   const prole = getRole(ctx.sender.id)
-  if (!WHO_CAN_CHANGE.includes(prole) && prole !== 'grandBuilder')
+  if (!WHO_CAN_CHANGE.includes(prole))
     return ctx.sender.info(
       `Ваша роль: ${ROLES[prole]}${
         restoreRole.sys.meta.requires(ctx.sender) ? '\n\n§3Восстановить прошлую роль: §f.role restore' : ''

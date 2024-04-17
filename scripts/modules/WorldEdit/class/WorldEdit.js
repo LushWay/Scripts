@@ -15,7 +15,10 @@ import { WE_CONFIG, spawnParticlesInArea } from '../config.js'
 import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'
 /**
- * @typedef {{pos1: Vector3;pos2: Vector3;}} WeDB
+ * @typedef {{
+ *   pos1: Vector3;
+ *   pos2: Vector3;
+ * }} WeDB
  */
 
 export class WorldEdit {
@@ -78,8 +81,7 @@ export class WorldEdit {
 
   /** @private */
   updateSelectionCuboids() {
-    if (DynamicPropertyDB.immutableUnproxy(this.pos1) === Vector.one) return
-    if (DynamicPropertyDB.immutableUnproxy(this.pos2) === Vector.one) return
+    if (!Vector.valid(this.pos1) || !Vector.valid(this.pos2)) return
 
     this.selection = new Cuboid(this.pos1, this.pos2)
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))

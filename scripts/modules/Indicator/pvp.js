@@ -1,6 +1,8 @@
 import { Entity, EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { Settings } from 'lib.js'
-import { HEALTH_INDICATOR } from './var.js'
+import { HealthIndicatorConfig } from './config.js'
+
+// █
 
 const options = Settings.world('pvp', {
   enabled: {
@@ -33,9 +35,9 @@ system.runInterval(
         player.scores.pvp--
       }
 
-      for (const e in HEALTH_INDICATOR.lock_display) {
-        if (HEALTH_INDICATOR.lock_display[e]) HEALTH_INDICATOR.lock_display[e]--
-        else delete HEALTH_INDICATOR.lock_display[e]
+      for (const e in HealthIndicatorConfig.lockDisplay) {
+        if (HealthIndicatorConfig.lockDisplay[e]) HealthIndicatorConfig.lockDisplay[e]--
+        else delete HealthIndicatorConfig.lockDisplay[e]
       }
     }
   },
@@ -49,7 +51,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
       if (!options.enabled) return
       const score = player.scores.pvp
 
-      if (HEALTH_INDICATOR.disabled.includes(player.id) || score < 0) return
+      if (HealthIndicatorConfig.disabled.includes(player.id) || score < 0) return
 
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
@@ -57,7 +59,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
       const q = score === options.cooldown || score === 0
       const g = (/** @type {string} */ p) => (q ? `§4${p}` : '')
 
-      if (!HEALTH_INDICATOR.lock_display[player.id]) {
+      if (!HealthIndicatorConfig.lockDisplay[player.id]) {
         player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
       }
     },
@@ -101,7 +103,7 @@ function onDamage(event, fatal = false) {
   if (
     !event.hurtEntity.typeId.startsWith('minecraft:') ||
     !options.enabled ||
-    HEALTH_INDICATOR.disabled.includes(event.hurtEntity.id)
+    HealthIndicatorConfig.disabled.includes(event.hurtEntity.id)
   )
     return
 
@@ -156,7 +158,7 @@ function onDamage(event, fatal = false) {
       }
       // }
 
-      HEALTH_INDICATOR.lock_display[damage.damagingEntity.id] = 2
+      HealthIndicatorConfig.lockDisplay[damage.damagingEntity.id] = 2
     }
   }
 

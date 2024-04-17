@@ -1,11 +1,11 @@
-export const HEALTH_INDICATOR = {
+export class HealthIndicatorConfig {
   /**
    * Array of player ids who wouldn't get pvp lock
    * @type {string[]}
    */
-  disabled: [],
+  static disabled = []
   /**
    * @type {Record<string, number>}
    */
-  lock_display: {},
+  static lockDisplay = {}
 }

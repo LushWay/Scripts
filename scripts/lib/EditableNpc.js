@@ -11,7 +11,7 @@ import { EditableLocation } from './EditableLocation.js'
 
 export class EditableNpc {
   static type = MinecraftEntityTypes.Npc
-  static propertyName = 'type'
+  static dynamicPropertyName = 'type'
 
   /**
    * @type {EditableNpc[]}
@@ -71,7 +71,7 @@ export class EditableNpc {
     const npc = entity.getComponent('npc')
     if (!npc) return
 
-    entity.setDynamicProperty(EditableNpc.propertyName, this.id)
+    entity.setDynamicProperty(EditableNpc.dynamicPropertyName, this.id)
     npc.name = this.name
     if (typeof this.skinIndex === 'number') npc.skinIndex = this.skinIndex
   }
@@ -120,7 +120,7 @@ system.runInterval(
         })
         .map(e => ({
           entity: e,
-          npc: e.getDynamicProperty(EditableNpc.propertyName),
+          npc: e.getDynamicProperty(EditableNpc.dynamicPropertyName),
         })))
 
       const filteredNpcs = npcs.filter(e => e.npc === npc.id)

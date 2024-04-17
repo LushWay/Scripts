@@ -27,10 +27,10 @@ export class EditableLocation {
    * @returns {(
    *   { valid: false } |
    *   ({ valid: true } & Location<LocationType>)
-   * ) & { 
-   *   onLoad: EditableLocation<LocationType>['onLoad'], 
-   *   teleport: EditableLocation<LocationType>['teleport'], 
-   *   id: string 
+   * ) & {
+   *   onLoad: EditableLocation<LocationType>['onLoad'],
+   *   teleport: EditableLocation<LocationType>['teleport'],
+   *   id: string
    * }}
    */
   get safe() {
@@ -120,9 +120,9 @@ export class EditableLocation {
       }
     }
 
-    const location = raw.split(' ').map(Number)
+    const location = raw.trim().split(' ').map(Number)
 
-    if (location.length !== this.format.split(' ').length) {
+    if (location.length !== this.format.trim().split(' ').length) {
       return util.error(
         new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`)
       )
