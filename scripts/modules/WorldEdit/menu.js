@@ -27,7 +27,7 @@ export function WEmenu(player, body = '') {
     body = `Создание доступно только при пустой руке.` || body
   }
 
-  const form = new ActionForm('§dWorld§6Edit', body, '§c§u§s§r')
+  const form = new ActionForm('§dWorld§6Edit', body)
   form.addButton('§3Наборы блоков', () => WEblocksSetsMenu(player))
   form.addButton('§3Отмена/Восстановление', () => WEundoRedoMenu(player))
 
@@ -35,7 +35,7 @@ export function WEmenu(player, body = '') {
     const buttonName = tool.getMenuButtonName(player)
     if (!buttonName) continue
 
-    form.addButton(buttonName, 'textures/ui/worldsIcon', () => {
+    form.addButton(buttonName, () => {
       const slotOrError = tool.getToolSlot(player)
       if (typeof slotOrError === 'string') {
         WEmenu(player, '§c' + slotOrError)
