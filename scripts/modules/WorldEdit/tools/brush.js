@@ -7,10 +7,10 @@ import {
   world,
 } from '@minecraft/server'
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
-import { ModalForm, getRole, is, util } from 'lib.js'
-import { BaseBrushTool } from '../class/BaseBrushTool.js'
-import { WorldEditTool } from '../class/WorldEditTool.js'
+import { ModalForm, is, util } from 'lib.js'
 import { WE_CONFIG } from '../config.js'
+import { BaseBrushTool } from '../lib/BaseBrushTool.js'
+import { WorldEditTool } from '../lib/WorldEditTool.js'
 import {
   SHARED_POSTFIX,
   blockSetDropdown,

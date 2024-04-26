@@ -1,9 +1,9 @@
-import { system, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { Region, util } from 'lib.js'
 import { actionGuard } from 'lib/Region/index.js'
-import { isBuilding } from 'modules/Build/isBuilding'
 import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace.js'
+import { isBuilding } from 'modules/WorldEdit/isBuilding'
 
 export class Axe {
   /** @type {string[]} */

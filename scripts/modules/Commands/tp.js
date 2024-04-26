@@ -1,12 +1,12 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { ActionForm, getRoleAndName, isProduction, util } from 'lib.js'
-import { isBuilding } from 'modules/Build/isBuilding'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { StoneQuarry } from 'modules/Places/StoneQuarry.js'
 import { TechCity } from 'modules/Places/TechCity.js'
 import { VillageOfExplorers } from 'modules/Places/VillafeOfExplorers.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
+import { isBuilding } from 'modules/WorldEdit/isBuilding'
 
 new Command({
   name: 'tp',

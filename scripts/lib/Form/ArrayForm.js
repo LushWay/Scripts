@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ModalForm, stringSimilarity } from 'lib.js'
+import { ModalForm, stringSimilarity, util } from 'lib.js'
 import { settingsGroupMenu } from 'modules/Commands/settings.js'
 import { SETTINGS_GROUP_NAME, createSettingsObject, isDropdown } from '../Settings.js'
 import { ActionForm } from './ActionForm.js'
@@ -11,15 +11,16 @@ import { ActionForm } from './ActionForm.js'
  */
 export class ArrayForm {
   /**
-   * @param {string} title Can contain $page
-   * @param {string} description
-   * @param {T[]} array
-   * @param {object} options
+   * @param {string} title Can contain $page and $max
+   * @param {string} description - Description of the form
+   * @param {T[]} array - Array of items to render
+   * @param {object} options - Options
    * @param {Narrow<Filters>} options.filters
    * @param {(item: NoInfer<T>, filters: NoInfer<ParsedFilters>, form: ActionForm) => Parameters<ActionForm['addButton']> | false} options.button
    * @param {(array: NoInfer<T>[], filters: NoInfer<ParsedFilters>) => NoInfer<T>[]} [options.sort]
    * @param {(form: ActionForm) => void} [options.addCustomButtonBeforeArray]
    * @param {number} [options.itemsPerPage]
+   * @param {number} [options.minItemsForFilters] - Minimal items count, when to add filters & search & pagination buttons
    * @param {VoidFunction} [options.back]
    */
   constructor(title, description, array, options) {
@@ -57,33 +58,39 @@ export class ArrayForm {
     searchQuery = ''
   ) {
     const args = [filtersDatabase, filters]
-    const page = paginate(this.getSorted(filters, searchQuery), this.options.itemsPerPage, fromPage)
-    const form = this.createForm(fromPage, page)
+    const paginator = util.paginate(
+      this.getSorted(filters, searchQuery),
+      this.options.itemsPerPage,
+      fromPage,
+      this.options.minItemsForFilters
+    )
+    const form = this.createForm(fromPage, paginator)
 
-    this.addFilterButton(form, filters, player, filtersDatabase, () => this.show(player, fromPage, ...args))
-    this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
+    if (Array.isArray(paginator)) {
+      this.addButtons(paginator, form, filters)
+    } else {
+      this.addFilterButton(form, filters, player, filtersDatabase, () => this.show(player, fromPage, ...args))
+      this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
 
-    this.options.addCustomButtonBeforeArray?.(form)
+      this.options.addCustomButtonBeforeArray?.(form)
 
-    if (page.canGoBack) form.addButton('§l§b< §r§3Предыдущая', () => this.show(player, fromPage - 1, ...args))
-    this.addButtons(page, form, filters)
-    if (page.canGoNext) form.addButton('§3Следующая §l§b>', () => this.show(player, fromPage + 1, ...args))
+      if (paginator.canGoBack) form.addButton('§l§b< §r§3Предыдущая', () => this.show(player, fromPage - 1, ...args))
+      this.addButtons(paginator.array, form, filters)
+      if (paginator.canGoNext) form.addButton('§3Следующая §l§b>', () => this.show(player, fromPage + 1, ...args))
+    }
 
     return form.show(player)
   }
 
   /**
-   * @typedef {ReturnType<typeof paginate<T>>} Page
-   */
-
-  /**
    * @private
    * @param {number} fromPage
-   * @param {Page} page
+   * @param {import('lib.js').Paginator} paginator
    */
-  createForm(fromPage, page) {
+  createForm(fromPage, paginator) {
+    const maxPages = Array.isArray(paginator) ? 0 : paginator.maxPages
     const form = new ActionForm(
-      this.title.replace('$page', fromPage.toString()).replace('$max', page.maxPages.toString()),
+      this.title.replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
       this.description
     )
     if (this.options.back) form.addButtonBack(this.options.back)
@@ -173,35 +180,15 @@ export class ArrayForm {
 
   /**
    * @private
-   * @param {Page} page
+   * @param {T[]} array
    * @param {ActionForm} form
    * @param {ParsedFilters} filters
    */
-  addButtons(page, form, filters) {
-    for (const item of page.array) {
+  addButtons(array, form, filters) {
+    for (const item of array) {
       const button = this.options.button(item, filters, form)
 
       if (button) form.addButton(...button)
     }
-  }
-}
-
-/**
- *
- * @template T
- * @param {T[]} array
- * @param {number} [onPage]
- * @param {number} [startPage]
- */
-function paginate(array, onPage = 10, startPage) {
-  const maxPages = Math.ceil(array.length / onPage)
-  const page = Math.min(Math.max(startPage || 1, 1), maxPages)
-
-  return {
-    array: /** @type {T[]} */ array.slice(page * onPage - onPage, page * onPage),
-    maxPages,
-    page,
-    canGoNext: page < maxPages,
-    canGoBack: page > 1,
   }
 }

@@ -11,7 +11,7 @@ import {
   Temporary,
   wordWrap,
 } from 'lib.js'
-import { isBuilding } from 'modules/Build/isBuilding.js'
+import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 
 /**
  * @typedef {{

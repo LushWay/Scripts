@@ -1,9 +1,9 @@
 import { Vector, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { ModalForm } from 'lib.js'
-import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
+import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
-import { WorldEditTool } from '../class/WorldEditTool.js'
+import { WorldEditTool } from '../lib/WorldEditTool.js'
 import { blockSetDropdown, getAllBlockSets, getBlockSet, getBlockSetForReplaceTarget } from '../utils/blocksSet.js'
 
 const shovel = new WorldEditTool({

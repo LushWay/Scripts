@@ -5,7 +5,7 @@ import { ChestForm } from 'lib/Form/ChestForm.js'
 import { inaccurateSearch } from 'lib/Search.js'
 import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu.js'
 import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
-import { WorldEdit } from '../../class/WorldEdit.js'
+import { WorldEdit } from '../../lib/WorldEdit.js'
 
 const set = new Command({
   name: 'set',

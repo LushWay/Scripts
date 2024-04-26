@@ -1,7 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 import { BaseRegion, Region, SafeAreaRegion, Settings, Sidebar } from 'lib.js'
 import { emoji } from 'lib/Assets/emoji.js'
-import { Minigame } from 'modules/Minigames/Builder.js'
+import { Minigame } from 'minigames/Builder.js'
 import { Quest } from 'modules/Quests/Quest.js'
 
 const sidebarSettings = Settings.player('Боковое меню (сайдбар)', 'sidebar', {

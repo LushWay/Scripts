@@ -1,10 +1,9 @@
 import 'lib.js'
 
 // import '../test/test.js'
-// import './Build/camera.js'
-import './Build/visual.js'
 import './Chat/chat.js'
 import './Commands/index.js'
+import './WorldEdit/commands/camera/visual.js'
 // import './Indicator/index.js'
 import '../lib/PlayerJoin.js'
 import '../test/test.js'

@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
+import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
 
 new Command({
   type: 'we',

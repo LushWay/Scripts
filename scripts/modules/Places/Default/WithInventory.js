@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { isBuilding } from 'modules/Build/isBuilding.js'
+import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 
 export class DefaultPlaceWithInventory {
   /**

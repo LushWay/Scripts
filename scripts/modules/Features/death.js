@@ -60,9 +60,9 @@ world.afterEvents.entityDie.subscribe(event => {
 
 // TODO Clear minecart items from inventory/world
 
-const getSettings = Settings.player('Задания', 'quest', {
+const getSettings = Settings.player(...Quest.playerSettingsName, {
   restoreInvQuest: {
-    name: 'Задание Вернуть вещи',
+    name: 'Задание "Вернуть вещи"',
     description: 'Включать ли задание по восстановлению инвентаря после смерти',
     value: true,
   },

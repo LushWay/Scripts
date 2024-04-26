@@ -1,21 +1,23 @@
-import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector } from '@minecraft/server'
+import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { SOUNDS } from 'config.js'
 import { ActionForm, BUTTON, FormCallback, ModalForm, is, typeIdToReadable, util } from 'lib.js'
+import { ArrayForm } from 'lib/Form/ArrayForm.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'
-import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
-import { createNylium } from 'modules/WorldEdit/tools/nylium.js'
+import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
+import { configureNylium } from 'modules/WorldEdit/tools/nylium.js'
 import {
   DEFAULT_BLOCK_SETS,
   SHARED_POSTFIX,
   blockSetDropdown,
   getAllBlockSets,
   getBlockSetForReplaceTarget,
-  getOtherPlayersBlockSets,
+  getOtherPlayerBlocksSets,
+  getOwnBlockSetsCount,
   setBlockSet,
 } from 'modules/WorldEdit/utils/blocksSet.js'
-import { WorldEditTool } from './class/WorldEditTool.js'
+import { WorldEditTool } from './lib/WorldEditTool.js'
 
 /**
  * Main we menu
@@ -27,9 +29,10 @@ export function WEmenu(player, body = '') {
     body = `Создание доступно только при пустой руке.` || body
   }
 
+  const we = WorldEdit.forPlayer(player)
+
   const form = new ActionForm('§dWorld§6Edit', body)
-  form.addButton('§3Наборы блоков', () => WEblocksSetsMenu(player))
-  form.addButton('§3Отмена/Восстановление', () => WEundoRedoMenu(player))
+  form.addButton(util.badge(`§3Наборы блоков`, getOwnBlockSetsCount(player.id)), () => WEblocksSetsMenu(player))
 
   for (const tool of WorldEditTool.tools) {
     const buttonName = tool.getMenuButtonName(player)
@@ -45,33 +48,8 @@ export function WEmenu(player, body = '') {
     })
   }
 
-  form.addButton('Создать раздатчик блоков из набора', () => {
-    new ModalForm('Выбери набор блоков...')
-      .addDropdown('Набор блоков', ...blockSetDropdown(['', ''], player))
-      .show(player, (ctx, blockset) => {
-        /** @type {ReplaceTarget[]} */
-        // @ts-expect-error Filter misstype
-        const blocks = getBlockSetForReplaceTarget([player.id, blockset]).filter(e => e !== undefined)
-        const pos1 = Vector.floor(player.location)
-        const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
-        WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
-
-        const block = player.dimension.getBlock(player.location)
-        const nylium = new ItemStack(MinecraftBlockTypes.WarpedNylium)
-        createNylium(nylium, player, blockset)
-        nylium.amount = 64
-        block?.setType(MinecraftBlockTypes.Chest)
-        const container = block?.getComponent('inventory')?.container
-
-        for (const [i, slot] of container?.slotEntries() ?? []) {
-          container?.setItem(i, nylium.clone())
-        }
-
-        for (const [i, block] of blocks.entries()) {
-          player.dimension.getBlock(Vector.add(pos1, { x: 0, z: 0, y: -i - 1 }))?.setPermutation(toPermutation(block))
-        }
-      })
-  })
+  form.addButton(util.badge('§3Отмена действий', we.history.length), () => WEundoRedoMenu(player))
+  form.addButton('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
 
   form.show(player)
 }
@@ -79,35 +57,75 @@ export function WEmenu(player, body = '') {
 /**
  * @param {Player} player
  */
+function WEChestFromBlocksSet(player) {
+  new ModalForm('Выбери набор блоков...')
+    .addDropdown('Набор блоков', ...blockSetDropdown(['', ''], player))
+    .show(player, (ctx, blockset) => {
+      /** @type {ReplaceTarget[]} */
+      // @ts-expect-error Filter misstype
+      const blocks = getBlockSetForReplaceTarget([player.id, blockset]).filter(e => e !== undefined)
+      const pos1 = Vector.floor(player.location)
+      const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
+      WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
+
+      const nylium = new ItemStack(MinecraftBlockTypes.WarpedNylium, 64)
+      configureNylium(nylium, player, blockset)
+
+      const block = player.dimension.getBlock(player.location)
+      if (!block) return ctx.error('Не удалось поместить блок')
+
+      block.setType(MinecraftBlockTypes.Chest)
+
+      const container = block.getComponent('inventory')?.container
+      for (const [i] of container?.slotEntries() ?? []) {
+        container?.setItem(i, nylium.clone())
+      }
+
+      for (const [i, block] of blocks.entries()) {
+        const pos = Vector.add(pos1, { x: 0, z: 0, y: -i - 1 })
+        player.dimension.getBlock(pos)?.setPermutation(toPermutation(block))
+      }
+    })
+}
+
+/**
+ * @param {Player} player
+ */
 function WEblocksSetsMenu(player) {
   const blockSets = getAllBlockSets(player.id)
-  const sets = new ActionForm('Наборы блоков')
-  sets.addButton(ActionForm.backText, () => WEmenu(player))
-  sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
-    WEmanageBlocksSetMenu({
-      blockSets,
-      player,
-      action: 'Создать новый',
-      onFail: () => {},
-    })
-  })
 
-  sets.addButton('§3Наборы других игроков...', () =>
-    WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player))
-  )
-
-  for (const setName of Object.keys(blockSets)) {
-    const shared = Object.values(DEFAULT_BLOCK_SETS).find(e => blockSets[setName] === e)
-    sets.addButton(setName, () =>
-      WEeditBlocksSetMenu({
-        player,
-        setName,
-        sets: blockSets,
-        ownsSet: !shared,
+  new ArrayForm('Наборы блоков §l$page/$max', '', Object.keys(blockSets), {
+    filters: {},
+    back: () => WEmenu(player),
+    addCustomButtonBeforeArray(sets) {
+      sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
+        WEmanageBlocksSetMenu({
+          blockSets,
+          player,
+          action: 'Создать новый',
+          onFail: () => {},
+        })
       })
-    )
-  }
-  sets.show(player)
+
+      sets.addButton('§3Наборы других игроков...', () =>
+        WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player))
+      )
+    },
+    button(setName, filters) {
+      const shared = Object.values(DEFAULT_BLOCK_SETS).find(e => blockSets[setName] === e)
+      return [
+        setName,
+        null,
+        () =>
+          WEeditBlocksSetMenu({
+            player,
+            setName,
+            sets: blockSets,
+            ownsSet: !shared,
+          }),
+      ]
+    },
+  }).show(player)
 }
 
 /**
@@ -152,20 +170,53 @@ function WEmanageBlocksSetMenu({
 
 /**
  * @param {Player} player
- * @param {() => void} onBack
+ * @param {() => void} back
  */
-function WEotherPlayersBlockSetsMenu(player, onBack) {
-  const form = new ActionForm('§3Наборы блоков других игроков')
-  form.addButton(ActionForm.backText, onBack)
+function WEotherPlayersBlockSetsMenu(player, back) {
+  new ArrayForm('§3Наборы блоков других игроков §f$page/$max', '', getOtherPlayerBlocksSets(player.id), {
+    filters: {
+      online: {
+        name: 'Онлайн',
+        description: 'Показывать только игроков онлайн',
+        value: false,
+      },
+      blockCount: {
+        name: 'Кол-во наборов',
+        description: 'Показывать кол-во наборов блоков',
+        value: true,
+      },
+      sort: {
+        name: 'Сортировать по',
+        value: [
+          ['date', 'Дате создания первого набора'],
+          ['count', 'Кол-ву наборов блоков'],
+          ['name', 'Имени'],
+        ],
+      },
+    },
+    back,
+    button([otherPlayerId, blocksSets], filters) {
+      const name = Player.name(otherPlayerId) ?? otherPlayerId
 
-  for (const [otherPlayerId, blockSets] of getOtherPlayersBlockSets(player.id)) {
-    const name = Player.name(otherPlayerId) ?? otherPlayerId
+      return [
+        filters.blockCount ? util.badge(name, Object.keys(blocksSets).length, { color: '§7' }) : name,
+        null,
+        () => {
+          WEplayerBlockSetMenu(player, otherPlayerId, blocksSets, () => WEotherPlayersBlockSetsMenu(player, back))
+        },
+      ]
+    },
+    sort(array, filters) {
+      if (filters.online) {
+        const players = world.getAllPlayers().map(e => e.id)
+        array = array.filter(p => players.includes(p[0]))
+      }
 
-    form.addButton(name, () => {
-      WEplayerBlockSetMenu(player, otherPlayerId, blockSets, () => WEotherPlayersBlockSetsMenu(player, onBack))
-    })
-  }
-  form.show(player)
+      if (filters.sort === 'date') return array.reverse()
+      if (filters.sort === 'name') return array.sort((a, b) => a[0].localeCompare(b[0]))
+      return array.sort((a, b) => Object.keys(b[1]).length - Object.keys(a[1]).length)
+    },
+  }).show(player)
 }
 
 /**

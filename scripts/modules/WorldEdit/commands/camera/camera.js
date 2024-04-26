@@ -1,7 +1,7 @@
 import { EasingType, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, ModalForm, util } from 'lib.js'
-import { parseArguments, parseLocationArguments } from '../../lib/Command/utils.js'
+import { parseArguments, parseLocationArguments } from '../../../../lib/Command/utils.js'
 
 /**
  * @typedef {"spinAroundPos"} CameraDBModes

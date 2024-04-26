@@ -3,7 +3,7 @@ import { CUSTOM_ITEMS } from 'config.js'
 import { ActionForm, ModalForm, util } from 'lib.js'
 import { ListParticles } from 'lib/Assets/particles.js'
 import { ListSounds } from 'lib/Assets/sounds.js'
-import { WorldEditTool } from '../class/WorldEditTool.js'
+import { WorldEditTool } from '../lib/WorldEditTool.js'
 
 /** @type {Record<string, string[]>} */
 const actions = {

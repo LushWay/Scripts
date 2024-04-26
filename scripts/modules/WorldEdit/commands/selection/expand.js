@@ -1,5 +1,5 @@
 import { Vector } from '@minecraft/server'
-import { WorldEdit } from '../../class/WorldEdit.js'
+import { WorldEdit } from '../../lib/WorldEdit.js'
 
 export class SelectionManager {
   /**

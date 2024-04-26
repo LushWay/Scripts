@@ -16,7 +16,6 @@ const minpl = 2,
  * @param {string} sound - The sound to play.
  * @param {string} text - The text that will be displayed to the player.
  */
-
 function forEveryQuenedPlayer(sound, text) {
   for (const name in BR_QUENE) {
     const player = Player.byId(name)

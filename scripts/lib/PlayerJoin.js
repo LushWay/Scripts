@@ -166,8 +166,8 @@ class JoinBuilder {
       value: true,
     },
     time: {
-      description: 'Время',
-      name: 'при входе',
+      name: 'Время',
+      description: 'при входе',
       value: true,
     },
   })

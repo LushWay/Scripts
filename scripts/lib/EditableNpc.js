@@ -2,7 +2,7 @@ import { Entity, PlayerInteractWithEntityBeforeEvent, system, world } from '@min
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { Temporary, chunkIsUnloaded } from 'lib.js'
 import { util } from 'lib/util.js'
-import { isBuilding } from 'modules/Build/isBuilding.js'
+import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 import { EditableLocation } from './EditableLocation.js'
 
 /**

@@ -13,7 +13,7 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 export const SETTINGS_GROUP_NAME = Symbol('name')
 
 /**
- * @typedef {{ [SETTINGS_GROUP_NAME]?: string }} GroupName
+ * @typedef {{ [SETTINGS_GROUP_NAME]?: string }} GroupNameObject
  */
 
 /**
@@ -25,20 +25,23 @@ export const SETTINGS_GROUP_NAME = Symbol('name')
  *     value: T,
  *     onChange?: VoidFunction
  *   }
- * > & GroupName
+ * > & GroupNameObject
  * } SettingsConfig
  */
 
 /**
- * Сonverting true and false to boolean and string[] to string
+ * Сonverting true and false to boolean and string[] to string and string literal to plain string
  * @template T
- * @typedef {T extends true | false ? boolean : T extends string ? string : T extends DropdownSetting[] ? T[number][0] : T } PlainSetting
+ * @typedef {T extends true | false ? boolean :
+ *   T extends string ? string :
+ *     T extends DropdownSetting[] ? T[number][0] : T
+ * } toPlain
  */
 
 /**
- * @template {SettingsConfig} Config
+ * @template {SettingsConfig} T
  * @typedef {{
- *  [Prop in keyof Config]: PlainSetting<Config[Prop]["value"]>;
+ *  [K in keyof T]: toPlain<T[K]["value"]>;
  * }} ParsedSettingsConfig
  */
 
@@ -46,39 +49,42 @@ export const SETTINGS_GROUP_NAME = Symbol('name')
  * @typedef {Record<string, Record<string, SettingValue>>} SettingsDatabase
  */
 
-export const PLAYER_SETTINGS_DB = new DynamicPropertyDB('playerOptions', {
-  /** @type {SettingsDatabase} */
-  type: {},
-  defaultValue: () => {
-    return {}
-  },
-}).proxy()
-
-/** @typedef {SettingsConfig<SettingValue> & Record<string, { requires?: boolean, }>} WorldSettings */
-export const WORLD_SETTINGS_DB = new DynamicPropertyDB('worldOptions', {
-  /** @type {SettingsDatabase} */
-  type: {},
-  defaultValue: () => {
-    return {}
-  },
-}).proxy()
+/**
+ * @typedef {boolean | string | DropdownSetting[]} PlayerSettingValues
+ */
 
 export class Settings {
   /**
-   * @typedef {boolean | string | DropdownSetting[]} PlayerSettingTypes
+   * Creates typical settings database
+   * @param {string} name
+   * @private
    */
+  static createDatabase(name) {
+    const db = new DynamicPropertyDB(name, {
+      /** @type {SettingsDatabase} */
+      type: {},
+      defaultValue: () => {
+        return {}
+      },
+    })
+
+    return db.proxy()
+  }
+
+  static playerDatabase = this.createDatabase('playerOptions')
 
   /**
-   * @type {Record<string, SettingsConfig<PlayerSettingTypes>>}
+   * @type {Record<string, SettingsConfig<PlayerSettingValues>>}
    */
   static playerMap = {}
+
   /**
    * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
    * stored in a database
    * @param {string} name - The name that shows to players
    * @param {string} groupName - The prefix for the database.
-   * @template {SettingsConfig<PlayerSettingTypes>} Config
-   * @param {Narrow<Config> & GroupName} config - This is an object that contains the default values for each option.
+   * @template {SettingsConfig<PlayerSettingValues>} Config
+   * @param {Narrow<Config> & GroupNameObject} config - This is an object that contains the default values for each option.
    * @returns {(player: Player) => ParsedSettingsConfig<Config>} An object with properties that are getters and setters.
    */
   static player(name, groupName, config) {
@@ -93,20 +99,27 @@ export class Settings {
 
     return player =>
       // @ts-expect-error Trust me, TS
-      createSettingsObject(PLAYER_SETTINGS_DB, groupName, this.playerMap[groupName], player)
+      createSettingsObject(Settings.playerDatabase, groupName, this.playerMap[groupName], player)
   }
 
+  static worldDatabase = this.createDatabase('worldOptions')
+
   /**
-   * @type {Record<string, WorldSettings>}
+   * @typedef {SettingsConfig<SettingValue> &
+   *   Record<string, { requires?: boolean, }>
+   * } WorldSettingsConfig */
+
+  /**
+   * @type {Record<string, WorldSettingsConfig>}
    */
   static worldMap = {}
 
   /**
    * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
    * configuration object's properties in localStorage
-   * @template {WorldSettings} Config
+   * @template {WorldSettingsConfig} Config
    * @param {string} groupName - The prefix for the database.
-   * @param {Narrow<Config> & GroupName} config - The default values for the options.
+   * @param {Narrow<Config> & GroupNameObject} config - The default values for the options.
    * @returns {ParsedSettingsConfig<Config>} An object with properties that are getters and setters.
    */
   static world(groupName, config) {
@@ -118,7 +131,7 @@ export class Settings {
     )
 
     // @ts-expect-error Trust me, TS
-    return createSettingsObject(WORLD_SETTINGS_DB, groupName, this.worldMap[groupName])
+    return createSettingsObject(Settings.worldDatabase, groupName, this.worldMap[groupName])
   }
 
   /**
@@ -127,6 +140,7 @@ export class Settings {
    * @param {'worldMap' | 'playerMap'} to
    * @param {string} groupName
    * @param {Config} config
+   * @private
    */
   static insertGroup(to, groupName, config) {
     if (!(groupName in this[to])) {
@@ -175,7 +189,7 @@ export function createSettingsObject(database, groupName, config, player = null)
 }
 
 /**
- * @param {import('lib.js').SettingValue} v
+ * @param {SettingValue} v
  * @returns {v is DropdownSetting[]}
  */
 export function isDropdown(v) {

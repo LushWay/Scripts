@@ -447,6 +447,51 @@ export const util = {
   },
 
   /**
+   * Creates paginator object for array
+   * @template T - Item type
+   * @param {T[]} array - Array of items to display
+   * @param {number} [perPage] - Items per page
+   * @param {number} [startPage] - Page to start from
+   * @param {number} [minLength=perPage] - Minimal items count to paginate. If array has less then this count, array is returned
+   */
+  paginate(array, perPage = 10, startPage = 1, minLength = perPage) {
+    if (array.length <= minLength) return array
+
+    const maxPages = Math.ceil(array.length / perPage)
+    const page = Math.min(Math.max(startPage, 1), maxPages)
+
+    return {
+      array: array.slice(page * perPage - perPage, page * perPage),
+      canGoNext: page < maxPages,
+      canGoBack: page > 1,
+      maxPages,
+      page,
+    }
+  },
+
+  /**
+   * Adds unread count badge to the string
+   * @param {string} string
+   * @param {number} number
+   * @param {object} [options]
+   * @param {boolean} [options.showZero=false]
+   * @param {string} [options.color='§f']
+   * @param {boolean} [options.brackets=true]
+   * @param {string} [options.bracketColor=color]
+   */
+  badge(string, number, { showZero = false, color = '§f', brackets = true, bracketColor = color } = {}) {
+    if (!showZero && number === 0) return string
+
+    string += ' '
+    if (brackets) string += bracketColor + '('
+    string += color
+    string += number
+    if (brackets) string += bracketColor + ')§r'
+
+    return string
+  },
+
+  /**
    * Replaces each §<color> to its terminal eqiuvalent
    * @param {string} text
    */
@@ -461,3 +506,7 @@ export const util = {
    */
   terminalColors: TerminalColors,
 }
+
+/**
+ * @typedef {ReturnType<util['paginate']>} Paginator
+ */

@@ -64,7 +64,7 @@ Menu.open = player => {
 
   form
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
-    .addButton(`§fПочта${Mail.unread(player.id)}`, 'textures/ui/gear', () => mailMenu(player, back))
+    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/gear', () => mailMenu(player, back))
     .addButton('§7Настройки', 'textures/ui/gear', () => playerSettingsMenu(player, back))
 
   return form

@@ -1,6 +1,6 @@
 import { Player, Vector } from '@minecraft/server'
 import { EventLoaderWithArg } from './EventSignal.js'
-import { Settings, WORLD_SETTINGS_DB } from './Settings.js'
+import { Settings } from './Settings.js'
 import { util } from './util.js'
 // TODO Location edit form from command -locations
 // TODO location grouping
@@ -106,7 +106,7 @@ export class EditableLocation {
    * @private
    */
   load() {
-    const raw = WORLD_SETTINGS_DB[EditableLocation.key][this.id]
+    const raw = Settings.worldDatabase[EditableLocation.key][this.id]
 
     if (typeof raw !== 'string' || raw === '') {
       if (this.fallback === false) {

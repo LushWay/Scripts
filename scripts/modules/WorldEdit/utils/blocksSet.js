@@ -58,7 +58,7 @@ const blockSets = PROPERTY.proxy()
  * @param {string} playerId
  * @returns {[string, BlocksSets][]}
  */
-export function getOtherPlayersBlockSets(playerId) {
+export function getOtherPlayerBlocksSets(playerId) {
   // @ts-expect-error We checked it
   return Object.entries(blockSets).filter(e => e[0] !== playerId && e[0])
 }
@@ -70,6 +70,13 @@ export function getOtherPlayersBlockSets(playerId) {
 export function getAllBlockSets(id) {
   const playerBlockSets = blockSets[id] ?? {}
   return { ...playerBlockSets, ...DEFAULT_BLOCK_SETS }
+}
+
+/**
+ * @param {string} id
+ */
+export function getOwnBlockSetsCount(id) {
+  return Object.keys(blockSets[id] ?? {}).length
 }
 
 /**

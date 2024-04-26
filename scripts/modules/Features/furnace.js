@@ -39,7 +39,6 @@ export class Furnacer {
     this.onlyInStoneQuarry = onlyInStoneQuarry
     this.npc = Store.npc({
       body: p => 'У меня ты можешь купить доступ к печкам\n\n' + this.npc.store.defaultOptions.body(p),
-      prompt: true,
       ...npcOptions,
     })
 

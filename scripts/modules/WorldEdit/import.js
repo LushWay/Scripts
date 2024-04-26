@@ -1,11 +1,11 @@
-import './class/WorldEdit.js'
-import './class/WorldEditTool.js'
 import './commands/general/desel.js'
 import './commands/general/id.js'
 import './commands/general/item.js'
 import './commands/general/redo.js'
 import './commands/general/undo.js'
 import './commands/general/we.js'
+import './lib/WorldEdit.js'
+import './lib/WorldEditTool.js'
 
 import './commands/selection/chunk.js'
 import './commands/selection/expand.js'

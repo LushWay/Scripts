@@ -1,8 +1,8 @@
 import { system } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
-import { WorldEdit } from 'modules/WorldEdit/class/WorldEdit.js'
-import { WorldEditTool } from 'modules/WorldEdit/class/WorldEditTool.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
+import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
+import { WorldEditTool } from 'modules/WorldEdit/lib/WorldEditTool.js'
 
 const clipboard = new WorldEditTool({
   name: 'clipboard',

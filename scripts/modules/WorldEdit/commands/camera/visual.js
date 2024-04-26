@@ -3,7 +3,7 @@ import { InventoryStore } from 'lib/Database/Inventory.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { ROLES, getRole } from 'lib/roles.js'
 import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag.js'
-import { CURRENT_BUILDERS, isBuilding } from './isBuilding'
+import { CURRENT_BUILDERS, isBuilding } from '../../isBuilding'
 
 const builderInventory = new InventoryStore('build')
 

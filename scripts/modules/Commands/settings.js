@@ -3,13 +3,7 @@ import { FormCallback, util } from 'lib.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { isDropdown } from 'lib/Settings'
-import {
-  PLAYER_SETTINGS_DB,
-  SETTINGS_GROUP_NAME,
-  Settings,
-  WORLD_SETTINGS_DB,
-  createSettingsObject,
-} from 'lib/Settings.js'
+import { SETTINGS_GROUP_NAME, Settings, createSettingsObject } from 'lib/Settings.js'
 
 /**
  * @typedef {"string"
@@ -71,7 +65,7 @@ function worldSettingsMenu(player) {
   const form = new ActionForm('§dНастройки мира')
 
   for (const groupName in Settings.worldMap) {
-    const db = WORLD_SETTINGS_DB[groupName]
+    const db = Settings.worldDatabase[groupName]
 
     let requiresCount = 0
     for (const [key, option] of Object.entries(Settings.worldMap[groupName])) {
@@ -99,7 +93,7 @@ export function settingsGroupMenu(
   groupName,
   forRegularPlayer,
   hints = {},
-  storeSource = forRegularPlayer ? PLAYER_SETTINGS_DB : WORLD_SETTINGS_DB,
+  storeSource = forRegularPlayer ? Settings.playerDatabase : Settings.worldDatabase,
   configSource = forRegularPlayer ? Settings.playerMap : Settings.worldMap,
   back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
   showSavedHint = true

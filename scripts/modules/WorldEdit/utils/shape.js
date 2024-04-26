@@ -1,9 +1,9 @@
 import { BlockPermutation, Player, Vector, system } from '@minecraft/server'
 import { util } from 'lib.js'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
-import { Cuboid } from '../class/Cuboid.js'
-import { WorldEdit } from '../class/WorldEdit.js'
 import { WE_CONFIG } from '../config.js'
+import { Cuboid } from '../lib/Cuboid.js'
+import { WorldEdit } from '../lib/WorldEdit.js'
 
 /**
  * @param {Player} player

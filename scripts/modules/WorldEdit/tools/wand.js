@@ -2,8 +2,8 @@ import { Player, world } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'config.js'
 import { ActionForm } from 'lib.js'
 import { setSelection } from 'modules/WorldEdit/commands/region/set.js'
-import { WorldEdit } from '../class/WorldEdit.js'
-import { WorldEditTool } from '../class/WorldEditTool.js'
+import { WorldEdit } from '../lib/WorldEdit.js'
+import { WorldEditTool } from '../lib/WorldEditTool.js'
 
 const wand = new WorldEditTool({
   name: 'wand',

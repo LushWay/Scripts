@@ -5,8 +5,8 @@ import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Se
 import { migration } from 'lib/Database/Migrations.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
-import { isBuilding, isNotPlaying } from 'modules/Build/isBuilding'
 import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
+import { isBuilding, isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
 migration('move player inv', () => {
@@ -73,11 +73,11 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
-        // Skip death respawns
+        // Skip after death respawns
         if (!initialSpawn) return
 
-        // Force know if player is building
-        if (isBuilding(player, true)) return Join.setPlayerJoinPosition(player)
+        // Force know if player is not playing
+        if (isNotPlaying(player)) return Join.setPlayerJoinPosition(player)
 
         // Check settings
         if (!this.settings(player).teleportToSpawnOnJoin) return

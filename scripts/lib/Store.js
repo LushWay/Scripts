@@ -1,5 +1,6 @@
 import { ItemStack, Player, system } from '@minecraft/server'
-import { EditableLocation, PlaceAction, itemLocaleName } from 'lib.js'
+import { EditableLocation, PlaceAction, Settings, itemLocaleName } from 'lib.js'
+import { emoji } from 'lib/Assets/emoji.js'
 import { Cooldown } from 'lib/Cooldown.js'
 import { Cost } from 'lib/Cost.js'
 import { EditableNpc } from 'lib/EditableNpc.js'
@@ -11,7 +12,6 @@ import { MessageForm } from 'lib/Form/MessageForm.js'
  * @typedef {object} StoreOptions
  * @prop {string} name - Title of the store form.
  * @prop {(p: Player) => string} body - Body of the store form.
- * @prop {boolean} prompt - Whenever ask user before buy or not.
  */
 
 export class Store {
@@ -61,6 +61,15 @@ export class Store {
 
     return { store, entity }
   }
+
+  static getPlayerSettings = Settings.player('Магазин', 'market', {
+    prompt: {
+      name: 'Подтверждение покупки',
+      description: 'Определяет, включено ли подтверждение перед покупкой.',
+      value: true,
+    },
+  })
+
   /**
    * @type {Store[]}
    */
@@ -68,6 +77,7 @@ export class Store {
 
   /**
    * @type {Array<{cost: Cost, item: ItemStack | ((p: Player) => ItemStack)}>}
+   * @private
    */
   items = []
 
@@ -95,10 +105,9 @@ export class Store {
     return {
       name: 'Купить',
       body: p =>
-        `${
-          this.options.prompt ? 'Подтверждение перед покупкой §aесть.' : 'Подтверждения перед покупкой §cнет.'
-        }\n§fБаланс: §6${p.scores.money}M`,
-      prompt: true,
+        `§f§lПодтверждение перед покупкой: §r${
+          Store.getPlayerSettings(p).prompt ? '§aвключено.' : '§cвыключено.'
+        }\n§f§lВаш баланс: §r§6${p.scores.money}${emoji.money}`,
     }
   }
 
@@ -112,8 +121,8 @@ export class Store {
     return this
   }
   /**
-   *
-   * @param {{cost: Cost, item: ItemStack, player: Player}} data
+   * @param {{cost: Cost, item: ItemStack, player: Player}} options
+   * @private
    */
   buy({ item, cost, player }) {
     if (!cost.check(player)) {
@@ -129,8 +138,7 @@ export class Store {
       this.open(player, `§aУспешная покупка §f${itemDescription(item)} §aза ${cost.string()}§a!\n \n§r`)
     }
 
-    // TODO Move to player options
-    if (this.options.prompt) {
+    if (Store.getPlayerSettings(player).prompt) {
       new MessageForm('Подтверждение', `§fКупить ${itemDescription(item)} §fза ${cost.string()}?`)
         .setButton1('§aКупить!', finalBuy)
         .setButton2('§cОтмена', () => this.open(player, '§cПокупка отменена§r\n \n')) // §r
@@ -147,7 +155,7 @@ export class Store {
       const canBuy = cost.check(player)
       const itemStack = typeof item === 'function' ? item(player) : item
       form.addButton(
-        `${canBuy ? '' : '§7'}${itemDescription(itemStack, canBuy ? '§g' : '§7')}\n${cost.string(canBuy)}`,
+        `${canBuy ? '' : '§7'}${itemDescription(itemStack, canBuy ? '§g' : '§7', true)}${cost.string(canBuy)}`,
         () => this.buy({ item: itemStack, cost, player })
       )
     }
@@ -157,9 +165,11 @@ export class Store {
 }
 
 /**
- * Returns <item name> x<count>
+ * Returns <item name>\nx<count>
  * @param {ItemStack} item
  */
-function itemDescription(item, c = '§g') {
-  return `${item.nameTag ?? itemLocaleName(item)}§r${item.amount ? ` ${c}x${item.amount}` : ''}`
+function itemDescription(item, c = '§g', newline = false) {
+  return `${item.nameTag ?? itemLocaleName(item)}§r${newline ? '\n' : ''}${
+    item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''
+  }`
 }
