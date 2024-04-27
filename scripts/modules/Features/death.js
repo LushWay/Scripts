@@ -13,7 +13,7 @@ import {
 } from 'lib.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 import { Spawn } from 'modules/Places/Spawn.js'
-import { Quest } from 'modules/Quests/Quest.js'
+import { Quest } from 'modules/Quests/lib/Quest.js'
 import { ALLOW_SPAWN_PROP } from 'modules/Survival/guard.js'
 
 const gravestoneOwnerKey = 'owner'

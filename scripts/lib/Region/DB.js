@@ -5,8 +5,8 @@ import { DEFAULT_REGION_PERMISSIONS } from './config.js'
  * @typedef {{
  *  t: 'c'
  *  key: string;
- *  from: Point;
- *  to: Point;
+ *  from: VectorXZ;
+ *  to: VectorXZ;
  *  dimensionId: Dimensions;
  *  permissions: Partial<RegionPermissions>;
  * }} DB_CubeRegion

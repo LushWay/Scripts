@@ -96,7 +96,7 @@ export function settingsGroupMenu(
   storeSource = forRegularPlayer ? Settings.playerDatabase : Settings.worldDatabase,
   configSource = forRegularPlayer ? Settings.playerMap : Settings.worldMap,
   back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
-  showSavedHint = true
+  showHintAboutSavedStatus = true
 ) {
   const config = configSource[groupName]
   const store = createSettingsObject(storeSource, groupName, config, forRegularPlayer ? player : null)
@@ -175,7 +175,7 @@ export function settingsGroupMenu(
         if (util.stringify(store[key]) === util.stringify(result)) return ''
 
         store[key] = result
-        return showSavedHint ? '§aСохранено!' : ''
+        return showHintAboutSavedStatus ? '§aСохранено!' : ''
       },
     ])
   }

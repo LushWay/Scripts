@@ -9,7 +9,7 @@ import { randomTeleport } from 'modules/Features/randomTeleport.js'
 import { Anarchy } from 'modules/Places/Anarchy.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
-import { Quest } from 'modules/Quests/Quest.js'
+import { Quest } from 'modules/Quests/lib/Quest.js'
 import { LEARNING_L } from './airdrop.js'
 
 // TODO Add even more steps,

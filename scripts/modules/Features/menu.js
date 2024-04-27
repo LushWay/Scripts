@@ -1,11 +1,11 @@
-import { ActionForm, FormCallback } from 'lib.js'
+import { ActionForm, FormCallback, util } from 'lib.js'
 import { Mail } from 'lib/Mail.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { mailMenu } from 'modules/Commands/mail.js'
 import { playerSettingsMenu } from 'modules/Commands/settings.js'
 import { openBaseMenu } from 'modules/Features/baseMenu.js'
-import { questsMenu } from 'modules/Quests/command.js'
+import { questsMenu } from 'modules/Quests/questMenu.js'
 import { Anarchy } from '../Places/Anarchy.js'
 import { Spawn } from '../Places/Spawn.js'
 
@@ -19,18 +19,6 @@ function tp(place, inv, color = '§9', text = 'Спавн', extra = '') {
   if (extra) extra = '\n' + extra
   const prefix = here ? '§7' : color
   return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
-}
-
-/**
- *
- * @param {number} num
- */
-function greaterThenZero(num, color = `§c`) {
-  if (num > 0) {
-    return `${color} (${num})`
-  }
-
-  return ''
 }
 
 Menu.open = player => {
@@ -50,7 +38,7 @@ Menu.open = player => {
     })
     .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', back)
     .addButton(
-      `Задания${greaterThenZero(player.database.quests?.active.length ?? 0, ' §r§7')}`,
+      util.badge('Задания', player.database.quests?.active.length ?? 0),
       'textures/ui/sidebar_icons/genre',
       () => questsMenu(player, back)
     )

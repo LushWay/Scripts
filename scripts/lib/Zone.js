@@ -26,7 +26,7 @@ export class Zone {
   }
   /**
    *
-   * @param {Point} center
+   * @param {VectorXZ} center
    * @param {number | ((players: Player[]) => number)} radius
    */
   constructor(center, radius) {

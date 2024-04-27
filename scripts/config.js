@@ -1,5 +1,5 @@
 export const CONFIG = {
-  commandPrefixes: ['-', '.'],
+  commandPrefixes: ['.', '-'],
   /**
    * Time in ms to mark SM.state.first_load
    * @type {number}

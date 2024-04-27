@@ -7,6 +7,9 @@ export class DefaultPlaceWithInventory {
    */
   static places = []
 
+  /** @type {InventoryTypeName} */
+  inventoryName
+
   constructor() {
     DefaultPlaceWithInventory.places.push(this)
   }
@@ -37,7 +40,4 @@ export class DefaultPlaceWithInventory {
    * @param {Player} player
    */
   saveInventory(player) {}
-
-  /** @type {InventoryTypeName} */
-  inventoryName
 }

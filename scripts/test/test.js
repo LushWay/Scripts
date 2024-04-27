@@ -1,6 +1,23 @@
 import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
-import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { Airdrop, BUTTON, ChestForm, DB, LootTable, NpcForm, Settings, is, itemLocaleName, util } from 'lib.js'
+import {
+  MinecraftBlockTypes,
+  MinecraftCameraPresetsTypes,
+  MinecraftEntityTypes,
+  MinecraftItemTypes,
+} from '@minecraft/vanilla-data.js'
+import {
+  Airdrop,
+  BUTTON,
+  ChestForm,
+  DB,
+  LootTable,
+  NpcForm,
+  Settings,
+  is,
+  itemLocaleName,
+  restorePlayerCamera,
+  util,
+} from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
@@ -26,6 +43,21 @@ const publicTests = {
  * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
  */
 const tests = {
+  scen(ctx) {
+    const player = ctx.sender
+
+    player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
+      location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 20)),
+    })
+
+    system.runTimeout(
+      () => {
+        restorePlayerCamera(player)
+      },
+      'test',
+      20
+    )
+  },
   settings(ctx) {
     const getSettings = Settings.player('test', 'Test', {
       dropdown: {

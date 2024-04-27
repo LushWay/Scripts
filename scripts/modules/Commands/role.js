@@ -78,11 +78,11 @@ function roleForm(ctx) {
       if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', null, button[2])
     },
     button([id, { role, name: dbname }], _, form) {
-      const player = players.find(e => e.id === id) ?? id
-      const name = typeof player === 'string' ? dbname ?? 'Без имени' : player.name
+      const target = players.find(e => e.id === id) ?? id
+      const name = typeof target === 'string' ? dbname ?? 'Без имени' : target.name
 
       return [
-        `${name}§r§f - ${ROLES[role]} ${typeof player === 'string' ? '§c(offline)' : ''}${
+        `${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${
           canChange(prole, role) ? '' : ' §4Не сменить'
         }`,
         null,
@@ -110,18 +110,18 @@ function roleForm(ctx) {
               if (!newrole)
                 return formCtx.error('Неизвестная роль: ' + newrole + '§r, допустимые: ' + util.inspect(ROLES))
 
-              if (player instanceof Player) {
-                if (notify && player instanceof Player)
-                  player.info(
+              if (target instanceof Player) {
+                if (notify && target instanceof Player)
+                  target.info(
                     `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
                       showName ? `§3 игроком §r${ctx.sender.name}` : ''
                     }${message ? `\n§r§3Причина: §r${message}` : ''}`
                   )
 
-                ctx.sender.success(`Роль игрока ${player.name} сменена успешно`)
+                ctx.sender.success(`Роль игрока ${target.name} сменена успешно`)
               } else ctx.sender.success('Роль сменена успешно')
 
-              setRole(id, newrole)
+              setRole(target, newrole)
               if (self) {
                 ctx.sender.database.prevRole ??= role
               }

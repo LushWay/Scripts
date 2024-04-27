@@ -38,7 +38,8 @@
         "excludes": [
           { "module": "leafy-utils" },
           { "module": "@minecraft/vanilla-data" },
-          { "module": "scripts/chestui/**" }
+          { "module": "scripts/chestui/**" },
+          { "module": "@sentry/**" }
         ]
       }
     ]

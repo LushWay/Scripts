@@ -130,7 +130,7 @@ export function setRole(player, role) {
   if (DB) {
     EventSignal.emit(Core.beforeEvents.roleChange, {
       id,
-      player: player instanceof Player ? player : undefined,
+      player: player instanceof Player ? player : Player.byId(player),
       newRole: role,
       oldRole: DB.role,
     })
@@ -145,7 +145,7 @@ Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
   if (!player) return
   if (newRole === 'spectator') {
     player.runCommand('gamemode spectator')
-  } else if (oldRole !== 'spectator') {
+  } else if (oldRole === 'spectator') {
     player.runCommand('gamemode s')
   }
 })
@@ -163,11 +163,12 @@ system.afterEvents.scriptEventReceive.subscribe(event => {
     const role = event.id.toLowerCase().replace('role:', '')
     if (!util.isKeyof(role, ROLES)) {
       console.error('Unkown role:', role)
-      return console.warn(
+      console.warn(
         `Allowed roles:\n${Object.entries(ROLES)
           .map(e => e[0] + ': ' + e[1])
           .join('\n')}`
       )
+      return
     }
     const player = Player.byName(event.message)
     if (!player) return console.warn(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)

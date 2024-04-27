@@ -1,5 +1,14 @@
-import { ItemStack, LocationInUnloadedChunkError, world } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
+import {
+  EasingType,
+  ItemStack,
+  LocationInUnloadedChunkError,
+  Player,
+  TicksPerSecond,
+  Vector,
+  system,
+  world,
+} from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { BDS } from './BDS/modules.js'
 
 /**
@@ -41,6 +50,26 @@ export function blockStatus({ location, dimensionId }) {
  */
 export function chunkIsUnloaded(options) {
   return blockStatus(options) === 'unloaded'
+}
+
+/**
+ * @param {Player} player
+ */
+export function restorePlayerCamera(player, animTime = 1) {
+  player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
+    location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 0.3)),
+    facingLocation: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 10)),
+    easeOptions: {
+      easeTime: animTime,
+      easeType: EasingType.OutCubic,
+    },
+  })
+
+  system.runTimeout(
+    () => player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson),
+    restorePlayerCamera.name,
+    animTime * TicksPerSecond
+  )
 }
 
 /**

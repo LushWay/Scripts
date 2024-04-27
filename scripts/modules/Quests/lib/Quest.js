@@ -40,7 +40,7 @@ export class Quest {
     },
   })
 
-  /** @type {import("../../lib/Sidebar.js").SidebarLinePreinit} */
+  /** @type {import("../../../lib/Sidebar.js").SidebarLinePreinit} */
   static sidebar = {
     preinit(sidebar) {
       const onquestupdate = sidebar.show.bind(sidebar)
@@ -60,7 +60,7 @@ export class Quest {
   /**
    * @type {Record<string, Quest>}
    */
-  static instances = {}
+  static list = {}
 
   /**
    * @param {Player} player
@@ -71,7 +71,7 @@ export class Quest {
     const dbquest = quest ? db.quests?.active.find(q => q.id === quest?.id) : db.quests?.active[0]
     if (!dbquest) return false
 
-    quest ??= Quest.instances[dbquest.id]
+    quest ??= Quest.list[dbquest.id]
     if (!quest) return false
 
     return {
@@ -98,7 +98,7 @@ export class Quest {
     this.name = name
     this.init = init
     this.description = desc
-    Quest.instances[this.id] = this
+    Quest.list[this.id] = this
     Core.afterEvents.worldLoad.subscribe(() => {
       world.getAllPlayers().forEach(e => setQuest(e, this))
     })
@@ -212,7 +212,7 @@ Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
 function setQuests(player) {
   system.delay(() => {
     player.database.quests?.active.forEach(db => {
-      const quest = Quest.instances[db.id]
+      const quest = Quest.list[db.id]
       if (!quest) return
 
       setQuest(player, quest, db)
@@ -315,7 +315,7 @@ class PlayerQuest {
         if (step.list[i + 1]) {
           this.quest.toStep(this.player, i + 1)
         } else {
-          this.quest.exit(this.player)
+          this.quest.exit(this.player, true)
           step._end()
           delete this.quest.players[this.player.id]
         }

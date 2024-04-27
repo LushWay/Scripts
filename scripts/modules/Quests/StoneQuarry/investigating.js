@@ -1,4 +1,4 @@
-import { Quest } from 'modules/Quests/Quest.js'
+import { Quest } from 'modules/Quests/lib/Quest.js'
 
 export class StoneQuarryInvestigating {
   static quest = new Quest(

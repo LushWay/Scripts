@@ -80,7 +80,9 @@ declare global {
 
   type Vector3 = mc.Vector3
   type Vector2 = mc.Vector2
-  type Point = { x: number; z: number }
+  type VectorXZ = { x: number; z: number }
+  type Vector5 = { x: number; y: number; z: number; rx: number; ry: number }
+
   type Dimensions = mc.ShortcutDimensions
 
   type JSONLike = Record<string | symbol | number, any>
@@ -123,7 +125,7 @@ declare module '@minecraft/server' {
     name?: string | undefined
     readonly role: Role
     prevRole?: Role
-    quests?: import('../modules/Quests/Quest').QuestDB
+    quests?: import('../modules/Quests/lib/Quest').QuestDB
     join?: {
       position?: number[]
       stage?: number

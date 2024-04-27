@@ -15,15 +15,15 @@ export class CubeRegion extends Region {
 
     if (region instanceof CubeRegion) return region
   }
-  /** @type {Point} */
+  /** @type {VectorXZ} */
   from
-  /** @type {Point} */
+  /** @type {VectorXZ} */
   to
   /**
    * Creates a new region
    * @param {object}o
-   * @param {Point} o.from - The position of the first block of the region.
-   * @param {Point} o.to - The position of the region's end.
+   * @param {VectorXZ} o.from - The position of the first block of the region.
+   * @param {VectorXZ} o.to - The position of the region's end.
    * @param {Dimensions} o.dimensionId - The dimension ID of the region.
    * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
    * @param {string} [o.key] - The key of the region. This is used to identify the region.
