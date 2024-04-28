@@ -183,13 +183,13 @@ export function editRegionPermissions(player, region, { pluralForms, back, exten
  * @param {() => void} o.back
  * @param {WordPluralForms} o.pluralForms
  * @param {boolean} [o.isOwner]
- * @param {ReturnType<Region['regionMember']>} [o.member]
+ * @param {ReturnType<Region['getMemberRole']>} [o.member]
  */
 
 export function manageRegionMembers(
   player,
   region,
-  { back, member = region.regionMember(player.id), isOwner = member === 'owner', pluralForms }
+  { back, member = region.getMemberRole(player.id), isOwner = member === 'owner', pluralForms }
 ) {
   const form = new ActionForm(
     'Участники ' + pluralForms[0],
@@ -226,7 +226,7 @@ export function manageRegionMembers(
     form.addButton(`${i === 0 ? '§7Владелец > §f' : ''}${name}`, () => {
       const form = new ActionForm(name, `Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
 
-      if (region.regionMember(memberId) !== 'owner')
+      if (region.getMemberRole(memberId) !== 'owner')
         form.addButtonPrompt(
           isOwner ? `Передать права владельца ${pluralForms[0]}` : `Назначить владельцем ${pluralForms[0]}`,
           'Передать',

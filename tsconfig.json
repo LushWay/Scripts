@@ -6,6 +6,7 @@
     "noEmit": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitThis": true,
     "noImplicitAny": true,
     "lib": [
       "ES2016",

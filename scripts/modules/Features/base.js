@@ -26,13 +26,13 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     return util.error(e)
   }
 
-  const region = Region.regionInstancesOf(RadiusRegion).find(e => e.regionMember(player) !== false)
+  const region = Region.regionInstancesOf(RadiusRegion).find(e => e.getMemberRole(player) !== false)
 
   if (region) {
     event.cancel = true
     return player.fail(
       `§cВы уже ${
-        region.regionMember(player) === 'owner' ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`
+        region.getMemberRole(player) === 'owner' ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`
       }!`
     )
   }

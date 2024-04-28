@@ -1,16 +1,6 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { SOUNDS } from 'config.js'
-import {
-  Airdrop,
-  Compass,
-  InventoryIntervalAction,
-  Join,
-  LootTable,
-  PlaceAction,
-  Settings,
-  Temporary,
-  wordWrap,
-} from 'lib.js'
+import { Airdrop, Compass, InventoryIntervalAction, Join, LootTable, PlaceAction, Settings, Temporary } from 'lib.js'
 import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 
 /**
@@ -40,9 +30,9 @@ export class Quest {
     },
   })
 
-  /** @type {import("../../../lib/Sidebar.js").SidebarLinePreinit} */
+  /** @type {import("lib/Sidebar.js").SidebarLineInit} */
   static sidebar = {
-    preinit(sidebar) {
+    init(sidebar) {
       const onquestupdate = sidebar.show.bind(sidebar)
 
       return function (player) {
@@ -52,7 +42,7 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return wordWrap(`§f§l${status.quest.name}:§r ${status.step?.text()}`, 30).join('\n')
+        return `§f§l${status.quest.name}:§r§6 ${status.step?.text()}`
       }
     },
   }
@@ -338,14 +328,14 @@ class PlayerQuest {
    * Waits for item in the inventory
    * @param {Omit<QuestStepInput, 'activate'> & { isItem: (item: ContainerSlot) => boolean } & ThisType<QuestStepThis>} options
    */
-  item({ isItem, ...options }) {
+  item({ isItem: isRequestedItem, ...options }) {
     this.dynamic({
       ...options,
       activate() {
         return new Temporary(() => {
           const action = InventoryIntervalAction.subscribe(({ player, slot }) => {
             if (player.id !== this.player.id) return
-            if (isItem(slot)) this.next()
+            if (isRequestedItem(slot)) this.next()
           })
 
           return {
@@ -375,17 +365,13 @@ class PlayerQuest {
       description,
       activate() {
         const temporary = new Temporary(() => {
-          /** @type {ReturnType<typeof PlaceAction.onEnter>[]} */
-          const actions = []
-          for (const pos of Vector.foreach(from, to)) {
-            actions.push(
-              PlaceAction.onEnter(pos, player => {
-                if (player.id !== this.player.id) return
+          const actions = [...Vector.foreach(from, to)].map(pos =>
+            PlaceAction.onEnter(pos, player => {
+              if (player.id !== this.player.id) return
 
-                this.next()
-              })
-            )
-          }
+              this.next()
+            })
+          )
 
           return {
             cleanup() {

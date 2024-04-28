@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { WeakPlayerMap } from 'lib/WeakPlayerMap.js'
 
 /**
  * @typedef {[value: string, displayText: string]} DropdownSetting
@@ -50,7 +51,7 @@ export const SETTINGS_GROUP_NAME = Symbol('name')
  */
 
 /**
- * @typedef {boolean | string | DropdownSetting[]} PlayerSettingValues
+ * @typedef {boolean | string | number | DropdownSetting[]} PlayerSettingValues
  */
 
 export class Settings {
@@ -85,7 +86,7 @@ export class Settings {
    * @param {string} groupName - The prefix for the database.
    * @template {SettingsConfig<PlayerSettingValues>} Config
    * @param {Narrow<Config> & GroupNameObject} config - This is an object that contains the default values for each option.
-   * @returns {(player: Player) => ParsedSettingsConfig<Config>} An object with properties that are getters and setters.
+   * @returns {(player: Player) => ParsedSettingsConfig<Config>} An function that returns object with properties that are getters and setters.
    */
   static player(name, groupName, config) {
     config[SETTINGS_GROUP_NAME] = name
@@ -97,9 +98,18 @@ export class Settings {
       config
     )
 
-    return player =>
-      // @ts-expect-error Trust me, TS
-      createSettingsObject(Settings.playerDatabase, groupName, this.playerMap[groupName], player)
+    const cache = new WeakPlayerMap({ removeOnLeave: true })
+
+    return player => {
+      const cached = cache.get(player)
+      if (cached) {
+        return cached
+      } else {
+        const settings = createSettingsObject(Settings.playerDatabase, groupName, this.playerMap[groupName], player)
+        cache.set(player, settings)
+        return settings
+      }
+    }
   }
 
   static worldDatabase = this.createDatabase('worldOptions')
@@ -107,7 +117,8 @@ export class Settings {
   /**
    * @typedef {SettingsConfig<SettingValue> &
    *   Record<string, { requires?: boolean, }>
-   * } WorldSettingsConfig */
+   * } WorldSettingsConfig
+   */
 
   /**
    * @type {Record<string, WorldSettingsConfig>}

@@ -56,7 +56,7 @@ export class Learning {
               if (player.id !== this.player.id) return
               if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
 
-              console.debug(`${player.name} brocke ${brokenBlockPermutation.type.id}`)
+              console.debug(`${player.name} brock ${brokenBlockPermutation.type.id}`)
 
               this.player.playSound(SOUNDS.action)
               this.diff(1)
@@ -67,7 +67,7 @@ export class Learning {
 
       q.dynamic({
         text: '§6Выйди под открытое небо',
-        description: 'Деревья могут помешать. Выйди туда, где над тобой будет чистое небо',
+        description: 'Деревья могут помешать. Выйди туда, где над тобой будет только небо',
         activate() {
           return new Temporary(({ system }) => {
             system.runInterval(
@@ -123,7 +123,7 @@ export class Learning {
           },
         })
 
-      craftingTable('Доберитемь до верстака, чтобы скрафтить кирку!.')
+      craftingTable('Доберитеcь до верстака, чтобы скрафтить кирку.')
 
       q.item({
         text: () => '§6Сделайте деревянную кирку',
@@ -136,7 +136,7 @@ export class Learning {
         text(i) {
           return `§6Накопайте §f${i}/${this.end}§6 камня`
         },
-        description: () => 'Отправляйтесь в шахту, найдите и накопайте камня!',
+        description: () => 'Отправляйтесь в шахту, найдите и накопайте камня.',
         activate() {
           return new Temporary(({ world }) => {
             world.afterEvents.playerBreakBlock.subscribe(event => {
@@ -150,11 +150,11 @@ export class Learning {
         },
       })
 
-      craftingTable('Чтобы сделать каменную кирку.')
+      craftingTable('Доберитеcь до верстака, чтобы сделать каменную кирку.')
 
       q.item({
         text: () => '§6Сделайте каменную кирку',
-        description: 'Время улучшить инструмент!',
+        description: 'Сделайте каменную кирку. Время улучшить инструмент!',
         isItem: item => item.typeId === MinecraftItemTypes.StonePickaxe,
       })
 

@@ -1,7 +1,9 @@
 import { Player } from '@minecraft/server'
 import { DB } from 'lib/Database/Default.js'
+import { EventSignal } from 'lib/EventSignal.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 import { DEFAULT_REGION_PERMISSIONS } from 'lib/Region/config.js'
+import { WeakPlayerMap } from 'lib/WeakPlayerMap.js'
 import { util } from 'lib/util.js'
 
 /**
@@ -25,9 +27,26 @@ export class Region {
   }
 
   /**
-   * @type {Map<string, Region>}
+   * @type {WeakPlayerMap<Region[]>}
    */
-  static locationInRegionCacheMap = new Map()
+  static playerInRegionsCache = new WeakPlayerMap({ removeOnLeave: true })
+
+  /**
+   * Event that triggers when player regions have changed. Interval 1 second
+   * @type {EventSignal<{player: Player, previous: Region[], newest: Region[]}>}
+   */
+  static onPlayerRegionsChange = new EventSignal()
+
+  /**
+   * Triggers a callback when a player enters a specific region.
+   * @param {Region} region - Specific region that the player can enter.
+   * @param {import("lib.js").PlayerCallback} callback - Function that will be called when a player enters the specified `region`.
+   */
+  static onEnter(region, callback) {
+    this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
+      if (!previous.includes(region) && newest.includes(region)) callback(player)
+    })
+  }
 
   /**
    * Returns nearest and more prioritizet region
@@ -65,6 +84,7 @@ export class Region {
    * @type {string}
    */
   key
+
   /**
    * Region permissions
    * @type {RegionPermissions}
@@ -89,7 +109,7 @@ export class Region {
   }
 
   /**
-   * Sets region permissions based on permissions and default permissions
+   * Sets the region permissions based on the permissions and the default permissions
    * @param {object} o
    * @param {Partial<RegionPermissions> | undefined} [o.permissions]
    * @param {boolean} [o.creating]
@@ -101,11 +121,11 @@ export class Region {
   }
 
   /**
-   * Checks if vector is in the region
+   * Checks if the vector is in the region
    * @param {Vector3} vector
    */
   vectorInRegion(vector) {
-    // Actual implementation in extended classes
+    // See the implementation in the sub class
     return false
   }
 
@@ -132,11 +152,35 @@ export class Region {
    * @param {string | Player} playerOrId
    * @returns {RegionPlayerRole}
    */
-  regionMember(playerOrId) {
+  getMemberRole(playerOrId) {
     const id = playerOrId instanceof Player ? playerOrId.id : playerOrId
     if (this.permissions.owners[0] === id) return 'owner'
     if (this.permissions.owners.includes(id)) return 'member'
     return false
+  }
+
+  /**
+   * Checks if a player with a given `playerId` is a member of the region
+   * @param {string} playerId - The id of the player
+   */
+  isMember(playerId) {
+    return !!this.getMemberRole(playerId)
+  }
+
+  /**
+   * A function that will loop through all the owners
+   * of a region and call the callback function on each of them.
+   * @param {Parameters<Array<Player>['forEach']>[0]} callback - Callback to run
+   */
+  forEachOwner(callback) {
+    const onlineOwners = []
+    for (const ownerId of this.permissions.owners) {
+      const player = Player.byId(ownerId)
+      if (player) onlineOwners.push(player)
+    }
+    onlineOwners.forEach(
+      (player, i, owners) => player && util.catch(() => callback(player, i, owners), 'Region.forEachOwner')
+    )
   }
 
   /**
@@ -155,20 +199,5 @@ export class Region {
   delete() {
     Region.regions = Region.regions.filter(e => e.key !== this.key)
     delete REGION_DB[this.key]
-  }
-  /**
-   * A function that will loop through all the owners
-   * of a region and call the callback function on each of them.
-   * @param {Parameters<Array<Player>['forEach']>[0]} callback - Callback to run
-   */
-  forEachOwner(callback) {
-    const onlineOwners = []
-    for (const ownerId of this.permissions.owners) {
-      const player = Player.byId(ownerId)
-      if (player) onlineOwners.push(player)
-    }
-    onlineOwners.forEach(
-      (player, i, owners) => player && util.catch(() => callback(player, i, owners), 'Region.forEachOwner')
-    )
   }
 }

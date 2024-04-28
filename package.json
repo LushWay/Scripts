@@ -1,6 +1,6 @@
 {
   "name": "scripts",
-  "version": "0.17.99",
+  "version": "0.17.100",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -44,7 +44,10 @@
     "semi": false,
     "printWidth": 120,
     "endOfLine": "crlf",
-    "quoteProps": "consistent"
+    "quoteProps": "consistent",
+    "plugins": [
+      "prettier-plugin-jsdoc"
+    ]
   },
   "eslintConfig": {
     "extends": [

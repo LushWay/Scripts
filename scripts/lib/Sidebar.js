@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+import { util } from 'lib.js'
 
 /**
  * @typedef {string | false} SidebarLine
@@ -9,7 +10,7 @@ import { Player } from '@minecraft/server'
  */
 
 /**
- * @typedef {{ preinit(sidebar: Sidebar): DynamicLine }} SidebarLinePreinit
+ * @typedef {{ init(sidebar: Sidebar): DynamicLine }} SidebarLineInit
  */
 
 /**
@@ -18,7 +19,7 @@ import { Player } from '@minecraft/server'
  */
 
 /**
- * @typedef {SidebarVariables<SidebarLinePreinit | DynamicLine>} SidebarInputedVariables
+ * @typedef {SidebarVariables<SidebarLineInit | DynamicLine>} SidebarRawVariables
  */
 
 export class Sidebar {
@@ -30,43 +31,53 @@ export class Sidebar {
   /**
    * @param {object} o
    * @param {string} o.name
-   * @param {(p: Player) => string} o.getFormat
-   * @param  {SidebarInputedVariables} content
+   * @param {(p: Player) => {format: string, maxWordCount: number}} o.getOptions
+   * @param  {SidebarRawVariables} content
    */
-  constructor({ name, getFormat }, content) {
+  constructor({ name, getOptions: getFormat }, content) {
     this.name = name
-    this.getFormat = getFormat
-    this.content = this.preinit(content)
+    this.getOptions = getFormat
+    this.content = this.init(content)
 
     Sidebar.instances.push(this)
   }
 
   /**
-   * @param {SidebarInputedVariables} content
+   * @param {SidebarRawVariables} content
    * @returns {SidebarVariables}
+   * @private
    */
-  preinit(content) {
-    /** @type {SidebarVariables} */
+  init(content) {
+    /**
+     * @type {SidebarVariables}
+     */
     const base = {}
-    return Object.entries(content).reduce((prev, [key, e]) => {
+
+    for (const [key, e] of Object.entries(content)) {
       if (typeof e === 'object') {
-        prev[key] = e.preinit(this)
-      } else prev[key] = e
-      return prev
-    }, base)
+        base[key] = e.init(this)
+      } else base[key] = e
+    }
+
+    return base
   }
 
   /**
    * @param {Player} player
    */
   show(player) {
-    let content = this.getFormat(player)
+    const options = this.getOptions(player)
+    let content = options.format
+
     for (const [key, line] of Object.entries(this.content)) {
       let value = typeof line === 'function' ? line(player) : line
       if (value === false) value = ''
 
       content = content.replaceAll('$' + key, value)
     }
+
+    content = util.wrap(content, { width: options.maxWordCount })
+
     player.onScreenDisplay.setSidebar(content)
   }
 }

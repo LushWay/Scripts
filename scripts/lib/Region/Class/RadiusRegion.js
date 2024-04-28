@@ -56,19 +56,19 @@ export class RadiusRegion extends Region {
     this.saveToDisk = saveToDisk
 
     if (!subclassing) this.init({ permissions, creating }, RadiusRegion)
-    if (creating) {
-      Region.regions.push(this)
-    }
+    if (creating) Region.regions.push(this)
   }
+
   /**
-   *
+   * @inheritdoc
    * @param {Vector3} vector
    */
   vectorInRegion(vector) {
     return Vector.distance(this.center, vector) < this.radius
   }
+
   /**
-   * Updates this region in the database
+   * @inheritdoc
    */
   update(region = RadiusRegion) {
     if (!this.saveToDisk) return super.update()

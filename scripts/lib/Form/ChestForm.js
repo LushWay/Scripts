@@ -1,7 +1,7 @@
 import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { typeIdToReadable } from 'lib.js'
 import { loreWordWrap } from 'lib/Extensions/itemstack.js'
+import { typeIdToReadable } from 'lib/GameUtils.js'
 import { util } from 'lib/util.js'
 import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds.js'
 import { BUTTON, showForm } from './utils.js'

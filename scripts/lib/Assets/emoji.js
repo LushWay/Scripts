@@ -4,6 +4,7 @@ export const emoji = {
   online: '',
   food: '',
   armor: '',
+  pickaxe: '',
   minecoin: '',
   token: '',
   buttons: {

@@ -11,7 +11,7 @@ actionGuard((player, region) => {
   if (isBuilding(player)) return true
 
   // Allow any action to region member
-  if (region?.regionMember(player.id)) return true
+  if (region?.getMemberRole(player.id)) return true
 }, 100)
 
 actionGuard((player, region, ctx) => {

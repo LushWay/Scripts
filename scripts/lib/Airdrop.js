@@ -1,15 +1,9 @@
-import {
-  Entity,
-  LocationInUnloadedChunkError,
-  LocationOutOfWorldBoundariesError,
-  Vector,
-  system,
-  world,
-} from '@minecraft/server'
+import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { actionGuard } from 'lib/Region/index.js'
 import { util } from 'lib/util.js'
+import { invalidLocation } from './GameUtils.js'
 import { LootTable } from './LootTable.js'
 import { Temporary } from './Temporary.js'
 
@@ -141,8 +135,7 @@ export class Airdrop {
           world.overworld.spawnParticle('minecraft:balloon_gas_particle', { x, y, z })
           await system.sleep(3)
         } catch (error) {
-          if (error instanceof LocationInUnloadedChunkError || error instanceof LocationOutOfWorldBoundariesError)
-            continue
+          if (invalidLocation(error)) continue
           util.error(error)
         }
       }

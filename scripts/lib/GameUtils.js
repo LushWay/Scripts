@@ -2,6 +2,7 @@ import {
   EasingType,
   ItemStack,
   LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
   Player,
   TicksPerSecond,
   Vector,
@@ -50,6 +51,15 @@ export function blockStatus({ location, dimensionId }) {
  */
 export function chunkIsUnloaded(options) {
   return blockStatus(options) === 'unloaded'
+}
+
+/**
+ * Checks if provided error is location in unloaded chunk or out of world bounds error
+ * @param {unknown} error
+ * @returns {error is LocationInUnloadedChunkError | LocationOutOfWorldBoundariesError}
+ */
+export function invalidLocation(error) {
+  return error instanceof LocationInUnloadedChunkError || error instanceof LocationOutOfWorldBoundariesError
 }
 
 /**

@@ -129,9 +129,16 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
   system.runInterval(
     () => {
       for (const player of world.getAllPlayers()) {
-        const currentRegion = Region.locationInRegion(player.location, player.dimension.type)
+        const previous = Region.playerInRegionsCache.get(player) ?? []
+        const newest = Region.nearestRegions(player.location, player.dimension.type)
 
-        regionCallback(player, currentRegion)
+        if (newest.length !== previous.length || previous.some((region, i) => region !== newest[i])) {
+          EventSignal.emit(Region.onPlayerRegionsChange, { player, previous, newest })
+        }
+
+        Region.playerInRegionsCache.set(player, newest)
+
+        regionCallback(player, newest[0])
       }
     },
     'region callback',

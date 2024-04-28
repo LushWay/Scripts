@@ -1,4 +1,5 @@
 import { ItemStack } from '@minecraft/server'
+import { util } from 'lib/util.js'
 import { OverTakes } from './OverTakes.js'
 
 Object.defineProperties(ItemStack.prototype, {
@@ -65,38 +66,12 @@ const loreLimit = 30
  */
 export function loreWordWrap(description) {
   let color = '§7'
-  return wordWrap(description, loreLimit).map(e => {
-    const match = e.match(/^§./)
-    if (match) color = match[0]
-    return '§r' + color + e
-  })
-}
-
-/**
- * @param {string} description
- * @param {number} maxLenght
- */
-export function wordWrap(description, maxLenght) {
-  /** @type {string[]} */
-  const lore = []
-
-  for (const word of description.split(' ')) {
-    if (!word) continue
-
-    // TODO Cut long words
-    const last = lore.length - 1
-    if (!lore[last]) {
-      // No words at the string
-      lore.push(word)
-      continue
-    }
-
-    if (1 + word.length + lore[last].length > maxLenght) {
-      lore.push(word)
-    } else {
-      lore[last] += ' ' + word
-    }
-  }
-
-  return lore
+  return util
+    .wrap(description, { width: loreLimit })
+    .split('\n')
+    .map(e => {
+      const match = e.match(/^§./)
+      if (match) color = match[0]
+      return '§r' + color + e
+    })
 }

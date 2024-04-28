@@ -26,6 +26,7 @@ Object.values(REGION_DB).forEach(region => {
       new RadiusRegionSubtype({
         ...region,
         creating: false,
+        subclassing: RadiusRegionSubtype !== RadiusRegion,
       })
     )
   }

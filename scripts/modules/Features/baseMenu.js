@@ -16,7 +16,7 @@ import {
  */
 export function openBaseMenu(player, back, onFail = message => player.fail(message)) {
   if (LockAction.locked(player)) return
-  const base = Region.regionInstancesOf(BaseRegion).find(r => r.regionMember(player))
+  const base = Region.regionInstancesOf(BaseRegion).find(r => r.getMemberRole(player))
 
   if (!base) return onFail('§cУ вас нет базы! Вступите в существующую или создайте свою.')
 
@@ -29,7 +29,7 @@ export function openBaseMenu(player, back, onFail = message => player.fail(messa
  * @param {VoidFunction} [back]
  */
 function baseMenu(player, base, back) {
-  const isOwner = base.regionMember(player) === 'owner'
+  const isOwner = base.getMemberRole(player) === 'owner'
   const baseBack = () => baseMenu(player, base, back)
   const form = new ActionForm(
     'Меню базы',

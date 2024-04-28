@@ -492,6 +492,55 @@ export const util = {
   },
 
   /**
+   * word-wrap <https://github.com/jonschlinkert/word-wrap>
+   * Released under the MIT License.
+   *
+   * @author Copyright (c) 2014-2023, Jon Schlinkert.
+   * @param {string} string
+   * @param {{ width?: number, indent?: string, newline?: string, trim?: boolean, escape?: (s: string) => string, cut?: boolean, countColorCodes: boolean }} [options]
+   */
+  wrap(string, { width = 50, indent = '', newline = '\n' + indent, escape, trim, cut, countColorCodes = false } = {}) {
+    const char = countColorCodes ? '.' : '[^§.]'
+    let regexString = char + '{1,' + width + '}'
+
+    if (cut) {
+      regexString += '([\\s\u200B]+|$)|[^\\s\u200B]+?([\\s\u200B]+|$)'
+    }
+
+    const regexp = new RegExp(regexString, 'g')
+    const lines = string.match(regexp) ?? []
+
+    let result =
+      indent +
+      lines
+        .map(line => {
+          if (line.slice(-1) === '\n') {
+            line = line.slice(0, line.length - 1)
+          }
+
+          return escape?.(line) ?? line
+        })
+        .join(newline)
+
+    if (trim === true) {
+      const lines = string.split('\n')
+      const trimmedLines = lines.map(line => line.trimEnd())
+      result = trimmedLines.join('\n')
+    }
+
+    return result
+  },
+
+  /**
+   * Formats big number and adds . separator, e.g. 15000 -> 15.000
+   * @param {number} n
+   * @returns Formatted string
+   */
+  numseparate(n = 0, separator = '.') {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
+  },
+
+  /**
    * Replaces each §<color> to its terminal eqiuvalent
    * @param {string} text
    */

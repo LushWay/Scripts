@@ -5,7 +5,7 @@ import { MoneyCost } from 'lib/Cost'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { actionGuard } from 'lib/Region/index.js'
 import { Store } from 'lib/Store.js'
-import { StoneQuarry } from '../Places/StoneQuarry'
+import { StoneQuarry } from '../Places/StoneQuarry/StoneQuarry'
 
 export class Furnacer {
   /**
