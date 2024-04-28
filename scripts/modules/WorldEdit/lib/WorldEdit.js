@@ -26,11 +26,13 @@ export class WorldEdit {
     /** @type {Record<string, WeDB | undefined>} */
     type: {},
   }).proxy()
+
   /** @param {Player} player */
   static forPlayer(player) {
     if (player.id in this.instances) return this.instances[player.id]
     return new WorldEdit(player)
   }
+
   /** @type {Record<string, WorldEdit>} */
   static instances = {}
 
@@ -46,6 +48,7 @@ export class WorldEdit {
   get pos1() {
     return this.db.pos1
   }
+
   set pos1(value) {
     this.db.pos1 = { x: value.x, y: value.y, z: value.z }
     this.onPosChange(1)
@@ -54,6 +57,7 @@ export class WorldEdit {
   get pos2() {
     return this.db.pos2
   }
+
   set pos2(value) {
     this.db.pos2 = { x: value.x, y: value.y, z: value.z }
     this.onPosChange(2)
@@ -200,6 +204,7 @@ export class WorldEdit {
   undo(amount = 1) {
     this.loadFromArray(amount, this.history)
   }
+
   /**
    * Redoes the latest history save
    *
@@ -208,6 +213,7 @@ export class WorldEdit {
   redo(amount = 1) {
     this.loadFromArray(amount, this.undos)
   }
+
   /** Copies from the current selected positions */
   async copy() {
     try {
@@ -226,6 +232,7 @@ export class WorldEdit {
       this.failedTo('скопировать', error)
     }
   }
+
   /**
    * Parses paste positions, used by this.paste and by draw paste selection
    *
@@ -243,6 +250,7 @@ export class WorldEdit {
 
     return { pastePos1, pastePos2 }
   }
+
   /**
    * Pastes a copy from memory
    *
@@ -292,6 +300,7 @@ export class WorldEdit {
       this.failedTo('вставить', error)
     }
   }
+
   /** Ensures that selection matches max allow size */
   async ensureSelection() {
     const player = this.player
@@ -327,6 +336,7 @@ export class WorldEdit {
 
     return this.selection
   }
+
   /**
    * @param {(import('../menu.js').ReplaceTarget | BlockPermutation)[]} blocks
    * @param {(undefined | import('../menu.js').ReplaceTarget | BlockPermutation)[]} replaceBlocks

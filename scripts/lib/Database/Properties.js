@@ -24,6 +24,7 @@ export class DynamicPropertyDB {
     if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET]
     return value
   }
+
   /**
    * @template {object} T
    * @param {T} value
@@ -33,6 +34,7 @@ export class DynamicPropertyDB {
     // @ts-expect-error Generics
     return this.unproxy(value)
   }
+
   /** @type {Record<string, DynamicPropertyDB<any, any>>} */
   static tables = {}
 
@@ -80,6 +82,7 @@ export class DynamicPropertyDB {
 
     if (!options.delayedInit) this.init()
   }
+
   init() {
     // Init
     try {
@@ -140,6 +143,7 @@ export class DynamicPropertyDB {
 
   /** @private */
   _needSaveRun = false
+
   needSave() {
     if (this._needSaveRun) return true
 

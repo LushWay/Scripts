@@ -40,6 +40,7 @@ export class Cuboid {
     this.yCenter = (this.yMax + this.yMin) / 2
     this.zCenter = (this.zMax + this.zMin) / 2
   }
+
   /**
    * Returns the amount of blocks in this cuboid
    *
@@ -51,6 +52,7 @@ export class Cuboid {
     const z = this.zMax - this.zMin + 1
     return x * y * z
   }
+
   /**
    * Splits a cuboid into mulitple cuboid of a chunk size
    *

@@ -17,18 +17,25 @@ world.afterEvents.worldInitialize.subscribe(() => {
 
 export class DB {
   static ENTITY_IDENTIFIER = 'rubedo:database'
+
   static ENTITY_LOCATION = { x: 0, y: -64, z: 0 }
+
   static INVENTORY_SIZE = 96
+
   static CHUNK_REGEXP = /.{1,50}/g
+
   static PROPERTY_CHUNK_REGEXP = /.{1,32767}/g
 
   static MAX_LORE_SIZE = 50
+
   /**
    * @private
    * @type {TABLE[]}
    */
   static ALL_TABLE_ENTITIES
+
   static LOAD_TRY = 0
+
   /** @private */
   static getEntities() {
     return world.overworld
@@ -54,6 +61,7 @@ export class DB {
       })
       .filter(e => e.tableName !== 'NOTDB')
   }
+
   /**
    * @private
    * @returns {TABLE[]}
@@ -84,6 +92,7 @@ export class DB {
 
     return this.ALL_TABLE_ENTITIES
   }
+
   /**
    * Creates a table entity that is used for data storage
    *
@@ -102,6 +111,7 @@ export class DB {
 
     return entity
   }
+
   /**
    * A function that returns an array of entities that have the same tableType and tableName.
    *
@@ -120,10 +130,14 @@ export class DB {
   }
 
   static BACKUP_NAME = 'database'
+
   static BACKUP_LOCATION = Vector.string(this.ENTITY_LOCATION)
+
   static BACKUP_COMMAND = `structure save ${this.BACKUP_NAME} ${this.BACKUP_LOCATION} ${this.BACKUP_LOCATION} true disk false`
+
   /** @private */
   static WAITING_FOR_BACKUP = false
+
   static backup() {
     if (this.WAITING_FOR_BACKUP) return
 

@@ -25,6 +25,7 @@ export class FormCallback {
    * @type {Form}
    */
   form
+
   /**
    * Player that this form used
    *
@@ -32,6 +33,7 @@ export class FormCallback {
    * @type {Player}
    */
   player
+
   /**
    * The function that was called
    *
@@ -39,6 +41,7 @@ export class FormCallback {
    * @type {Function | undefined}
    */
   callback
+
   /**
    * Creates a new form callback instance that can be used by buttons, and args to run various functions
    *
@@ -51,6 +54,7 @@ export class FormCallback {
     this.player = player
     this.callback = callback
   }
+
   /**
    * Reshows the form and shows the user a error message
    *

@@ -5,6 +5,7 @@ export class HealthIndicatorConfig {
    * @type {string[]}
    */
   static disabled = []
+
   /** @type {Record<string, number>} */
   static lockDisplay = {}
 }

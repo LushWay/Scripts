@@ -9,6 +9,7 @@ export class Cooldown {
   static expired(timestamp, cooldown) {
     return Date.now() - timestamp >= cooldown
   }
+
   /**
    * Generates a unique key for the cooldown in the database
    *
@@ -19,23 +20,28 @@ export class Cooldown {
   static genDBkey(name, id) {
     return 'COOLDOWN_' + name + ':' + id
   }
+
   /**
    * @private
    * @type {Record<string, number>}
    */
   db
+
   /**
    * @private
    * @type {string}
    */
   key
+
   /**
    * @private
    * @type {number}
    */
   time
+
   /** @type {Player | undefined} */
   player
+
   /**
    * Create class for manage player cooldowns
    *
@@ -52,29 +58,39 @@ export class Cooldown {
     this.key = Cooldown.genDBkey(prefix, typeof source === 'string' ? source : source.id)
     if (typeof source !== 'string') this.player = source
   }
-  update() {
+
+  start() {
     this.db[this.key] = Date.now()
   }
-  get status() {
-    const startTime = this.db[this.key]
-    if (typeof startTime === 'number') {
-      const elapsed = Date.now() - startTime
 
-      // Not expired, return time
-      if (elapsed <= this.time) return elapsed
-    }
-    return 'EXPIRED'
-  }
-  tellIfExpired() {
-    const status = this.status
-    if (status === 'EXPIRED') return true
-    if (this.player && this.tell) {
-      const time = util.ms.remaining(this.time - status)
-      this.player.fail(`§cПодожди еще §f${time.value} §c${time.type}`)
-    }
-    return false
-  }
   expire() {
     delete this.db[this.key]
+  }
+
+  /** @private */
+  get elapsed() {
+    const start = this.db[this.key]
+    if (typeof start !== 'number') return 0
+
+    const elapsed = Date.now() - start
+    if (elapsed <= this.time) return elapsed
+
+    return 0
+  }
+
+  get isExpired() {
+    return this.elapsed === 0
+  }
+
+  tellIfExpired() {
+    const elapsed = this.elapsed
+    if (!elapsed) return true
+
+    if (this.player && this.tell) {
+      const time = util.ms.remaining(this.time - elapsed)
+      this.player.fail(`§cПодожди еще §f${time.value} §c${time.type}`)
+    }
+
+    return false
   }
 }

@@ -12,8 +12,11 @@ export class Airdrop {
     /** @type {Record<string, { chicken: string; chest: string; loot: string; for?: string; looted?: true }>} */
     type: {},
   }).proxy()
+
   static minecartTag = 'chest_minecart:loot'
+
   static chickenTag = 'chicken:loot'
+
   static chestOffset = { x: 0, y: -2, z: 0 }
 
   /** @type {Airdrop[]} */
@@ -38,6 +41,7 @@ export class Airdrop {
 
     Airdrop.instances.push(this)
   }
+
   /**
    * Spawns airdrop at the given position
    *
@@ -75,6 +79,7 @@ export class Airdrop {
     this.status = 'falling'
     this.save()
   }
+
   teleport() {
     if (!this.chestMinecart || !this.chicken || !this.chicken.isValid() || !this.chestMinecart.isValid()) return
 

@@ -26,8 +26,10 @@ new Command({
 export class LootTable {
   /** @type {Record<string, LootTable>} */
   static instances = {}
+
   /** @type {EventSignal<LootTable>} */
   static onNew = new EventSignal()
+
   /**
    * Stored items
    *

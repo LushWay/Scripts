@@ -482,51 +482,54 @@ export const util = {
   },
 
   /**
-   * Word-wrap [https://github.com/jonschlinkert/word-wrap](https://github.com/jonschlinkert/word-wrap) Released under
-   * the MIT License.
+   * Wraps the line
    *
-   * @author Copyright (c) 2014-2023, Jon Schlinkert.
    * @param {string} string
-   * @param {{
-   *   width?: number
-   *   indent?: string
-   *   newline?: string
-   *   trim?: boolean
-   *   escape?: (s: string) => string
-   *   cut?: boolean
-   *   countColorCodes: boolean
-   * }} [options]
+   * @param {number} maxLength
    */
-  wrap(string, { width = 50, indent = '', newline = '\n' + indent, escape, trim, cut, countColorCodes = false } = {}) {
-    const char = countColorCodes ? '.' : '[^§.]'
-    let regexString = char + '{1,' + width + '}'
+  wrap(string, maxLength) {
+    /** @type {string[]} */
+    const lines = []
+    const rawlines = string.split('')
 
-    if (cut) {
-      regexString += '([\\s\u200B]+|$)|[^\\s\u200B]+?([\\s\u200B]+|$)'
+    for (const char of rawlines) {
+      if (!char) continue
+
+      // Empty lines, add first char
+      if (!lines.length) {
+        lines.push(char)
+        continue
+      }
+
+      // Last element index
+      const i = lines.length - 1
+      const line = lines[i]
+      const lastLineChar = line?.[line.length - 1]
+
+      if (lastLineChar === '§' || char === '§') {
+        // Ignore limit for invisible chars
+        lines[i] += char
+      } else if ((char + line).replace(/§./g, '').length > maxLength) {
+        // Limit exceeded, newline
+        char.trim() && lines.push(char)
+      } else {
+        // No limit, add char to the line
+        lines[i] += char
+      }
     }
 
-    const regexp = new RegExp(regexString, 'g')
-    const lines = string.match(regexp) ?? []
+    return lines
+  },
 
-    let result =
-      indent +
-      lines
-        .map(line => {
-          if (line.slice(-1) === '\n') {
-            line = line.slice(0, line.length - 1)
-          }
-
-          return escape?.(line) ?? line
-        })
-        .join(newline)
-
-    if (trim === true) {
-      const lines = string.split('\n')
-      const trimmedLines = lines.map(line => line.trimEnd())
-      result = trimmedLines.join('\n')
-    }
-
-    return result
+  /** @param {string} lore */
+  wrapLore(lore) {
+    let color = '§7'
+    return this.wrap(lore, 30).map(e => {
+      // Get latest color from the string
+      const match = e.match(/^.*(§.)/)
+      if (match) color = match[1]
+      return '§r' + color + e
+    })
   },
 
   /**

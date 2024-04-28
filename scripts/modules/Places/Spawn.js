@@ -19,6 +19,7 @@ migration('move player inv', () => {
 class SpawnBuilder extends DefaultPlaceWithInventory {
   /** @type {InventoryTypeName} */
   inventoryName = 'spawn'
+
   location = new EditableLocation('spawn', {
     fallback: { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
     type: 'vector3+rotation',

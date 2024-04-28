@@ -33,7 +33,7 @@ export class Store {
           system.delay(() => {
             const cooldown = new Cooldown(cooldownDatabase, 'store', player, 1000, false)
             if (cooldown.tellIfExpired()) {
-              cooldown.update()
+              cooldown.start()
               store.open(player)
             }
           })
@@ -114,6 +114,7 @@ export class Store {
     this.items.push({ item, cost })
     return this
   }
+
   /**
    * @private
    * @param {{ cost: Cost; item: ItemStack; player: Player }} options
@@ -139,6 +140,7 @@ export class Store {
         .show(player)
     } else finalBuy()
   }
+
   /**
    * Opens store menu to player
    *

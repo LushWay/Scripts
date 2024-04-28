@@ -11,6 +11,7 @@ export class Cost {
   string(canBuy = true) {
     return ''
   }
+
   /**
    * If the player have this cost returns true, otherwise false
    *
@@ -20,6 +21,7 @@ export class Cost {
   check(player) {
     return false
   }
+
   /**
    * Removes this cost from player
    *
@@ -28,6 +30,7 @@ export class Cost {
   buy(player) {
     player.playSound(SOUNDS.action)
   }
+
   /**
    * Returns fail info for player
    *
@@ -57,6 +60,7 @@ class ScoreboardCost extends Cost {
   string(canBuy = true) {
     return `${canBuy ? this.color : '§c'}${this.cost}${this.postfix}`
   }
+
   /** @param {Player} player */
   check(player) {
     return player.scores[this.scoreboard] >= this.cost
@@ -79,14 +83,18 @@ class ScoreboardCost extends Cost {
 export class MoneyCost extends ScoreboardCost {
   /** @type {import('@minecraft/server').ScoreName} */
   scoreboard = 'money'
+
   postfix = emoji.money
+
   color = '§6'
 }
 
 export class LeafyCost extends ScoreboardCost {
   /** @type {import('@minecraft/server').ScoreName} */
   scoreboard = 'leafs'
+
   postfix = emoji.leaf
+
   color = '§a'
 }
 

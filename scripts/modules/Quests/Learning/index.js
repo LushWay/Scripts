@@ -188,8 +188,11 @@ export class Learning {
       })
     },
   )
+
   static lootTable = LEARNING_L
+
   static randomTeleportLocation = new EditableLocation('learning_quest_rtp', { type: 'vector3+radius' }).safe
+
   static craftingTableLocation = new EditableLocation('learning_quest_crafting_table').safe
 
   static startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')

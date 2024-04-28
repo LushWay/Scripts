@@ -36,7 +36,7 @@ Object.defineProperties(ItemStack.prototype, {
 OverTakes(ItemStack.prototype, {
   setInfo(nameTag, description) {
     this.nameTag = '§r' + nameTag
-    this.setLore(loreWordWrap(description))
+    this.setLore(util.wrapLore(description))
 
     return this.clone()
   },
@@ -58,18 +58,3 @@ OverTakes(ItemStack.prototype, {
     }
   },
 })
-
-const loreLimit = 30
-
-/** @param {string} description */
-export function loreWordWrap(description) {
-  let color = '§7'
-  return util
-    .wrap(description, { width: loreLimit })
-    .split('\n')
-    .map(e => {
-      const match = e.match(/^§./)
-      if (match) color = match[0]
-      return '§r' + color + e
-    })
-}

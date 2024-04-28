@@ -1,6 +1,6 @@
 import { ItemStack, Player, TicksPerSecond, Vector, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { loreWordWrap, util } from 'lib.js'
+import { util } from 'lib.js'
 import { MoneyCost } from 'lib/Cost'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { actionGuard } from 'lib/Region/index.js'
@@ -191,7 +191,7 @@ class FurnaceKeyItem {
   static stringifyLore(key) {
     const name = key.lastPlayerName || (key.lastPlayerId ? Player.name(key.lastPlayerId) : undefined)
     return [
-      ...loreWordWrap('§7Ключ от печки в технограде. Используйте его чтобы открыть печку'),
+      ...util.wrapLore('§7Ключ от печки в технограде. Используйте его чтобы открыть печку'),
       ' ',
       this.strings.number + key.code,
       key.location ? this.strings.location + key.location : ' ',

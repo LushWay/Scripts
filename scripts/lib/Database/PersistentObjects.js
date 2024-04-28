@@ -29,6 +29,7 @@ export class PersistentSet extends Set {
       util.error(error)
     }
   }
+
   save() {
     world.setDynamicProperty(this.id, JSON.stringify([...this]))
   }

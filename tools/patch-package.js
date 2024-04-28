@@ -4,19 +4,26 @@ import path from 'path'
 import { pathInfo } from 'leafy-utils'
 import { createRequire } from 'module'
 
+const Notice = '* This file was automatically patched by'
+export const notice = `/**
+${Notice}
+* tools/patch-package.js
+*
+* New methods assigments can be founded in
+* scripts/lib/Extensions
+*/`
+
 export const { relative } = pathInfo(import.meta.url)
 const require = createRequire(import.meta.url)
 export const resolve = require.resolve
 
-const LAST_UPDATE_PATH = path.join(process.cwd(), 'tools', 'last-update')
-/** @type {string} */
-let LAST_UPDATE
-
 /**
  * Replaces and adds code to a package's TypeScript definition file.
+ *
  * @param {string} packageName - The name of the package to patch.
  * @param {object} options - The patching options.
- * @param {{find: RegExp | string, replace: string, all?: boolean; throw?: boolean}[]} options.replaces - The replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
+ * @param {{ find: RegExp | string; replace: string; all?: boolean; throw?: boolean }[]} options.replaces - The
+ *   replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
  * @param {Record<string, string> | undefined} options.classes Pairs of class name and method to add.
  * @param {object} options.additions
  * @param {string} options.additions.beginning - The code to add to the beginning of the file.
@@ -24,23 +31,11 @@ let LAST_UPDATE
  * @param {string} options.additions.ending - The code to add to the end of the file.
  */
 export async function patchPackage(packageName, options) {
-  if (!LAST_UPDATE) {
-    try {
-      LAST_UPDATE = await fs.readFile(LAST_UPDATE_PATH, 'utf-8')
-    } catch {}
-  }
-
   // Get path to the package's TypeScript definition file
   const indexDts = path.join(resolve(path.join(packageName, 'package.json')), '..', 'index.d.ts')
-  const stat = await fs.stat(indexDts)
-
-  if (!LAST_UPDATE) {
-    await writeLastUpdate()
-  }
-
-  if (stat.mtimeMs.toString() === LAST_UPDATE) return
 
   let patchedCode = await fs.readFile(indexDts, 'utf-8')
+  if (patchedCode.includes(Notice)) return console.log('\x1B[94m➤\x1B[39m \x1B[90mYN0000\x1B[39m: Already patched')
 
   // Apply the replacements
   for (const replace of options.replaces) {
@@ -89,17 +84,11 @@ export async function patchPackage(packageName, options) {
 
   // Write the patched code back to the file
   await fs.writeFile(indexDts, newCode)
-  await writeLastUpdate()
-
-  async function writeLastUpdate() {
-    await fs.writeFile(LAST_UPDATE_PATH, (await fs.stat(indexDts)).mtimeMs.toString())
-  }
 }
 
 /**
- *
  * @template T
- * @param {Array<T>} arr
+ * @param {T[]} arr
  * @param {[number, T][]} additions
  * @returns
  */
@@ -124,6 +113,7 @@ function addEls(arr, additions) {
 
 /**
  * Multi-line function
+ *
  * @param {TemplateStringsArray} strings
  * @param {...any} values
  */

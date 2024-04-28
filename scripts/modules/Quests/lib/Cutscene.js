@@ -36,7 +36,7 @@ export class Cutscene {
 
   /** Database containing Cutscene trail points */
   static db = new DynamicPropertyDB('cutscene', {
-    /** @type {Record<string, Sections} */
+    /** @type {Record<string, Sections>} */
     type: {},
     defaultValue: () => [],
   }).proxy()
@@ -67,30 +67,6 @@ export class Cutscene {
   restoreCameraTime = 2
 
   /**
-   * @private
-   * @type {Section}
-   */
-  get defaultSection() {
-    return {
-      points: [],
-      step: 0.15,
-      easeTime: 1,
-      easeType: EasingType.Linear,
-    }
-  }
-
-  /**
-   * @private
-   * @type {Partial<Section>}
-   */
-  get switchSection() {
-    return {
-      easeTime: 0.05,
-      easeType: EasingType.Linear,
-    }
-  }
-
-  /**
    * List of players that currently see cutscene play
    *
    * @private
@@ -119,6 +95,30 @@ export class Cutscene {
   }
 
   /**
+   * @private
+   * @type {Section}
+   */
+  get defaultSection() {
+    return {
+      points: [],
+      step: 0.15,
+      easeTime: 1,
+      easeType: EasingType.Linear,
+    }
+  }
+
+  /**
+   * @private
+   * @type {Partial<Section>}
+   */
+  get switchSection() {
+    return {
+      easeTime: 0.05,
+      easeType: EasingType.Linear,
+    }
+  }
+
+  /**
    * Plays the Cutscene for the provided player
    *
    * @param {Player} player - Player to play cutscene for
@@ -126,7 +126,7 @@ export class Cutscene {
   play(player) {
     if (!this.sections[0]?.points[0]) {
       console.error(`${this.id}: cutscene is not ready.`)
-      player.fail(`${this.id}: катсцена еще не настроена`)
+      player.fail(`${this.displayName}: cцена еще не настроена`)
       return
     }
 
@@ -229,16 +229,20 @@ export class Cutscene {
 
   /**
    * @param {Player} source
-   * @param {Sections} sections
-   * @param {number} sectionIndex
+   * @param {Object} [options]
+   * @param {Sections} [options.sections] Default is `this.sections.slice()`
+   * @param {number} [options.sectionIndex] Default is `sections.length - 1`
+   * @param {boolean} [options.warn]
    */
-  addPoint(source, sections = this.sections.slice(), sectionIndex = sections.length - 1) {
+  withNewPoint(source, { sections = this.sections.slice(), sectionIndex = sections.length - 1, warn = false } = {}) {
     const section = sections[sectionIndex]
 
     if (section) {
       section.points.push(getVector5(source))
     } else {
-      source.warn(`Не удалось найти секцию. Позиция секции: ${sectionIndex}, всего секций: ${sections.length}`)
+      warn && source.warn(`Не удалось найти секцию. Позиция секции: ${sectionIndex}, всего секций: ${sections.length}`)
+
+      return false
     }
 
     return sections
@@ -248,7 +252,7 @@ export class Cutscene {
    * @param {Sections} sections
    * @param {Partial<Section>} section
    */
-  addSection(sections = this.sections.slice(), section) {
+  withNewSection(sections = this.sections.slice(), section) {
     sections.push(Object.assign(section, this.defaultSection))
 
     return sections
@@ -283,6 +287,7 @@ function bezier(vectors, axis, t) {
       (-v0[axis] + 3 * v1[axis] - 3 * v2[axis] + v3[axis]) * t3)
   )
 }
+
 /**
  * @param {Player} player
  * @returns {Vector5}

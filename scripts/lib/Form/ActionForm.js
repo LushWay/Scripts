@@ -7,6 +7,7 @@ import { showForm } from './utils.js'
 export class ActionForm {
   /** Text used by back button */
   static backText = '§l§b< §r§3Назад'
+
   /**
    * The buttons this form has
    *
@@ -14,6 +15,7 @@ export class ActionForm {
    * @type {IActionFormButton[]}
    */
   buttons = []
+
   /**
    * The default minecraft form this form is based on
    *
@@ -68,10 +70,12 @@ export class ActionForm {
     this.form.button(text, iconPath ? iconPath : void 0)
     return this
   }
+
   /** @param {VoidFunction} backFN */
   addButtonBack(backFN) {
     return this.addButton(ActionForm.backText, backFN)
   }
+
   /**
    * @param {string} text
    * @param {string} yesText
@@ -83,6 +87,7 @@ export class ActionForm {
       prompt(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p)),
     )
   }
+
   /**
    * Shows this form to the player
    *

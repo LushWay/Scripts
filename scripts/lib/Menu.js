@@ -18,6 +18,7 @@ export class Menu {
 
     return item.clone()
   }
+
   static item = this.createItem()
 
   /** @private */
@@ -40,6 +41,7 @@ export class Menu {
       })
     })
   }
+
   /**
    * Function that gets called when menu item is used
    *
@@ -70,7 +72,7 @@ export class Compass {
 
   /** @private */
   static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель\n§7§r(use)')
+    return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель\n§r§7(use)')
   })
 
   /**
@@ -83,7 +85,6 @@ export class Compass {
 
   /** @private */
   static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
-    if (!this.players.has(player)) return
     const isMenu = slot.typeId === CUSTOM_ITEMS.menu
     if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && !isMenu) return
 
@@ -93,6 +94,8 @@ export class Compass {
 
       return slot.setItem(Menu.item)
     }
+
+    if (!Vector.valid(target.value)) return
 
     const direction = this.getCompassIndex(player.getViewDirection(), player.location, target.value)
     const typeId = CUSTOM_ITEMS.compassPrefix + direction

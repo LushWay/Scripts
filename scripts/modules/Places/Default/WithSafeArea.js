@@ -6,6 +6,7 @@ import { actionGuard } from 'lib/Region/index.js'
 export class DefaultPlaceWithSafeArea {
   /** @type {DefaultPlaceWithSafeArea[]} */
   static places = []
+
   /** @param {string} name */
   constructor(name) {
     this.name = name

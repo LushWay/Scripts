@@ -1,6 +1,5 @@
 import { BlockPermutation, Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { loreWordWrap } from 'lib/Extensions/itemstack.js'
 import { typeIdToReadable } from 'lib/GameUtils.js'
 import { util } from 'lib/util.js'
 import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds.js'
@@ -56,6 +55,7 @@ export class ChestForm {
       lore: [...(Object.keys(states).length ? util.inspect(states).split('\n') : [])],
     }
   }
+
   /**
    * @private
    * @type {string}
@@ -74,6 +74,7 @@ export class ChestForm {
     this.titleText = sizeName
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
+
   /** @param {string} text */
   title(text) {
     this.titleText += text
@@ -89,7 +90,7 @@ export class ChestForm {
     const id = icon.includes(':') ? icon : 'minecraft:' + icon
     const ID = typeIdToID.get(id) ?? typeIdToDataId.get(id)
     if (typeof ID === 'undefined' && icon.includes('minecraft:')) icon = BUTTON['?']
-    if (description) lore = loreWordWrap(description)
+    if (description) lore = util.wrapLore(description)
 
     /** @type {ChestButton} */
     const slotData = {
@@ -109,6 +110,7 @@ export class ChestForm {
     this.buttons[slot] = slotData
     return this
   }
+
   /**
    * @remarks
    *   Fills slots based off of strings and a key, with the first slot being the cordinate that the pattern starts at.
@@ -133,6 +135,7 @@ export class ChestForm {
     }
     return this
   }
+
   /** @param {Player} player */
   show(player) {
     const form = new ActionFormData().title(this.titleText)

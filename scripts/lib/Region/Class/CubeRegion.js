@@ -15,10 +15,13 @@ export class CubeRegion extends Region {
 
     if (region instanceof CubeRegion) return region
   }
+
   /** @type {VectorXZ} */
   from
+
   /** @type {VectorXZ} */
   to
+
   /**
    * Creates a new region
    *
@@ -41,6 +44,7 @@ export class CubeRegion extends Region {
       Region.regions.push(this)
     }
   }
+
   /** @param {Vector3} vector */
   vectorInRegion(vector, dimension = world.overworld) {
     return Vector.between(
@@ -49,6 +53,7 @@ export class CubeRegion extends Region {
       vector,
     )
   }
+
   update() {
     return (REGION_DB[this.key] = {
       ...super.update(),

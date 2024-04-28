@@ -29,6 +29,7 @@ export class CommandContext {
     this.args = args
     this.input = rawInput
   }
+
   /**
    * Replys to the sender of a command callback
    *
@@ -41,6 +42,7 @@ export class CommandContext {
     this.sender.tell(text + '')
     this.sender.playSound(SOUNDS.click)
   }
+
   /**
    * Replys to the sender of a command callback
    *

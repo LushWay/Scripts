@@ -1,7 +1,7 @@
 import { Container, ItemStack, MolangVariableMap, Player, Vector } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { CONFIG } from 'config.js'
-import { Temporary, invalidLocation, util } from 'lib.js'
+import { Cooldown, Temporary, invalidLocation, util } from 'lib.js'
 import { Cutscene } from './Cutscene.js'
 
 /**
@@ -17,7 +17,9 @@ const controls = {
     3,
     new ItemStack('we:tool').setInfo('§r§6> §fСоздать точку', 'используй предмет, чтобы создать точку катсцены.'),
     (player, cutscene) => {
-      cutscene.addPoint(player, cutscene.sections)
+      if (!cutscene.sections[0]) cutscene.withNewSection(cutscene.sections, {})
+
+      cutscene.withNewPoint(player, { sections: cutscene.sections, warn: true })
       player.info(
         `Точка добавлена. Точек в секции: §f${cutscene.sections[cutscene.sections.length - 1]?.points.length}`,
       )
@@ -30,7 +32,7 @@ const controls = {
       'используй предмет, чтобы создать секцию катсцены (множество точек).',
     ),
     (player, cutscene) => {
-      cutscene.addSection(cutscene.sections, {})
+      cutscene.withNewSection(cutscene.sections, {})
       player.info(`Секция добавлена. Секций всего: §f${cutscene.sections.length}`)
     },
   ],
@@ -91,18 +93,26 @@ export function editCatcutscene(player, cutscene) {
     util.catch(async function visualize() {
       while (!temp.cleaned) {
         await nextTick
+
+        const sections = cutscene.withNewPoint(player)
+        if (!sections) return
+
         await cutscene.forEachPoint(
           point => {
             if (!Vector.valid(point)) return
             particle(point, whiteParticle)
           },
-          { controller, sections: cutscene.addPoint(player), intervalTime: 1 },
+          { controller, sections, intervalTime: 1 },
         )
       }
     })
 
+    const cooldown = new Cooldown({}, '', player, 1000, false)
     world.beforeEvents.itemUse.subscribe(event => {
       if (event.source.id !== player.id) return
+
+      if (!cooldown.isExpired) return
+      cooldown.start()
 
       for (const [, control, onUse] of Object.values(controls)) {
         if (control.is(event.itemStack)) {

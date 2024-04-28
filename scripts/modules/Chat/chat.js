@@ -6,6 +6,7 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 export class ChatBuilder {
   db = new DynamicPropertyDB('chatCD', { /** @type {Record<string, string} */ type: {} }).proxy()
+
   settings = Settings.world('chat', {
     cooldown: {
       name: 'Задержка',
@@ -19,6 +20,7 @@ export class ChatBuilder {
     },
     ranks: { description: 'Ранги в чате', value: true, name: 'Ранги' },
   })
+
   playerSettings = Settings.player('Чат', 'chat', {
     hightlightMessages: {
       name: 'Подсветка моих сообщений',
@@ -43,7 +45,7 @@ export class ChatBuilder {
 
           // Player is under chat cooldown, show error message
           if (cooldown.tellIfExpired()) return
-          cooldown.update()
+          cooldown.start()
         }
 
         const allPlayers = world.getAllPlayers()

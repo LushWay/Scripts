@@ -33,6 +33,7 @@ export class InventoryStore {
     slots: {},
     equipment: {},
   }
+
   /**
    * The function loads equipment and inventory items from inventory object to entity in a game.
    *
@@ -117,6 +118,7 @@ export class InventoryStore {
       },
     }
   }
+
   _ = {
     tableType,
     tableName: '',
@@ -133,6 +135,7 @@ export class InventoryStore {
      */
     inventories: {},
   }
+
   /**
    * Creates new inventory store manager
    *
@@ -224,6 +227,7 @@ export class InventoryStore {
       this._.inventories[owner] = store
     }
   }
+
   /** @private */
   save() {
     /** @type {ItemStack[]} */
@@ -298,6 +302,7 @@ export class InventoryStore {
 
     DB.backup()
   }
+
   /** @param {string} id */
   remove(id) {
     delete this._.inventories[id]
@@ -310,6 +315,7 @@ export class InventoryStore {
    * @type {boolean}
    */
   saving = false
+
   /** @private */
   requestSave() {
     if (this.saving) return
@@ -334,6 +340,7 @@ export class InventoryStore {
     )
     this.saving = true
   }
+
   /**
    * Gets entity store from saved and removes to avoid bugs
    *
@@ -355,6 +362,7 @@ export class InventoryStore {
     if (remove) delete this._.inventories[key]
     return store
   }
+
   /**
    * Saves an player inventory to a store and requests a save.
    *
@@ -374,6 +382,7 @@ export class InventoryStore {
 
     this.requestSave()
   }
+
   /**
    * Checks if key was saved into this store
    *

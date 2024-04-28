@@ -41,6 +41,7 @@ export class Portal {
       })
     }
   }
+
   /**
    * @param {Player} player
    * @param {Vector3} to
@@ -49,6 +50,7 @@ export class Portal {
   static teleport(player, to, options = {}) {
     if (this.canTeleport(player, options)) player.teleport(to)
   }
+
   /**
    * Creates new portal.
    *
@@ -85,6 +87,7 @@ export class Portal {
       }
     }
   }
+
   /** @param {Player} player */
   teleport(player) {
     if (this.place) Portal.teleport(player, this.place)

@@ -4,6 +4,7 @@ import { CommandContext } from './Context.js'
 export class CmdLet {
   /** @type {CmdLet[]} */
   static list = []
+
   /**
    * @param {string[]} args
    * @param {ChatSendAfterEvent} data
@@ -45,6 +46,7 @@ export class CmdLet {
 
     if (results.includes('stop')) return 'stop'
   }
+
   /**
    * Creates a new cmdlet to use it in command like 'name --help'
    *

@@ -247,6 +247,7 @@ class PlayerQuest {
 
   /** @type {Set<(p: Player) => void>} */
   updateListeners = new Set()
+
   update() {
     this.updateListeners.forEach(e => e(this.player))
   }

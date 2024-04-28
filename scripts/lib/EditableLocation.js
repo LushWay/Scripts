@@ -28,7 +28,9 @@ export class EditableLocation {
   get safe() {
     return this
   }
+
   static key = 'locations'
+
   /**
    * @param {EditableLocation<any>} instance
    * @param {Location<any>} location
@@ -56,10 +58,15 @@ export class EditableLocation {
   onLoad = new EventLoaderWithArg(Object.assign(this, { firstLoad: true }))
 
   x = 0
+
   y = 0
+
   z = 0
+
   xRot = 0
+
   yRot = 0
+
   radius = 0
 
   /**

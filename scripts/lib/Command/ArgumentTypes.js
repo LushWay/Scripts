@@ -6,6 +6,7 @@ export class IArgumentType {
    * @type {any}
    */
   type
+
   /**
    * The name that the help for this command will see
    *
@@ -27,18 +28,21 @@ export class IArgumentType {
    * @type {string}
    */
   typeName
+
   /**
    * The name this argument is
    *
    * @type {string}
    */
   name = 'name'
+
   /**
    * Argument optionality
    *
    * @type {boolean}
    */
   optional = false
+
   /**
    * Checks if a value matches this argument type, also returns the corridsponding type
    *
@@ -50,6 +54,7 @@ export class IArgumentType {
       success: false,
     }
   }
+
   constructor(name = 'any', optional = false) {}
 }
 
@@ -57,8 +62,11 @@ export class IArgumentType {
 export class LiteralArgumentType {
   /** @type {null} */
   type
+
   typeName = 'literal'
+
   optional
+
   /**
    * @param {string} value
    * @returns
@@ -68,6 +76,7 @@ export class LiteralArgumentType {
       success: this.name === value,
     }
   }
+
   /**
    * @param {string} name
    * @param {boolean} optional
@@ -82,7 +91,9 @@ export class LiteralArgumentType {
 export class StringArgumentType {
   /** @type {string} */
   type
+
   typeName = '§3string'
+
   /**
    * @param {string} value
    * @returns
@@ -93,6 +104,7 @@ export class StringArgumentType {
       value: value,
     }
   }
+
   /**
    * @param {string} name
    * @param {boolean} optional
@@ -107,8 +119,11 @@ export class StringArgumentType {
 export class IntegerArgumentType {
   /** @type {number} */
   type
+
   optional
+
   typeName = 'int'
+
   /**
    * @param {string} value
    * @returns
@@ -120,6 +135,7 @@ export class IntegerArgumentType {
       value: val,
     }
   }
+
   /**
    * @param {string} name
    * @param {boolean} optional
@@ -134,8 +150,11 @@ export class IntegerArgumentType {
 export class LocationArgumentType {
   /** @type {Vector3} */
   type
+
   optional
+
   typeName = 'location'
+
   /**
    * @param {string} value
    * @returns
@@ -148,6 +167,7 @@ export class LocationArgumentType {
       value: value,
     }
   }
+
   /**
    * @param {string} name
    * @param {boolean} optional
@@ -162,8 +182,11 @@ export class LocationArgumentType {
 export class BooleanArgumentType {
   /** @type {boolean} */
   type
+
   optional
+
   typeName = 'boolean'
+
   /**
    * @param {string} value
    * @returns
@@ -188,8 +211,11 @@ export class BooleanArgumentType {
 export class ArrayArgumentType {
   /** @type {T[number]} */
   type
+
   optional
+
   typeName = 'string'
+
   /**
    * @param {string} value
    * @returns
@@ -200,6 +226,7 @@ export class ArrayArgumentType {
       value: value,
     }
   }
+
   /**
    * @param {string} name
    * @param {T} types

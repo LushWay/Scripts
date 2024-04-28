@@ -109,6 +109,7 @@ export class ScoreboardDB {
     this.name = name
     this.scoreboard = ScoreboardDB.objective(name, displayName)
   }
+
   /**
    * @param {Entity | string} id
    * @param {number} value
@@ -117,6 +118,7 @@ export class ScoreboardDB {
     if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, value)
   }
+
   /**
    * @param {Entity | string} id
    * @param {number} value
@@ -125,6 +127,7 @@ export class ScoreboardDB {
     if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, this.get(id) + value)
   }
+
   /**
    * @param {Entity | string} id
    * @returns {number}

@@ -34,6 +34,7 @@ export class SelectionManager {
       builder.pos2 = Vector.add(builder.pos2, new Vector(amount, amount, -amount))
     }
   }
+
   /**
    * Expands the selection verticly
    *

@@ -10,12 +10,14 @@ export class MessageForm {
    * @type {string}
    */
   title
+
   /**
    * Extra text that should be displayed in the form
    *
    * @type {string}
    */
   body
+
   /**
    * The default minecraft form this form is based on
    *
@@ -23,6 +25,7 @@ export class MessageForm {
    * @type {MessageFormData}
    */
   form
+
   /**
    * The first button of the dialog.
    *
@@ -30,6 +33,7 @@ export class MessageForm {
    * @type {IMessageFormButton}
    */
   button1
+
   /**
    * The seccond button of the dialog.
    *
@@ -37,6 +41,7 @@ export class MessageForm {
    * @type {IMessageFormButton}
    */
   button2
+
   /**
    * Creates a new form to be shown to a player
    *
@@ -53,6 +58,7 @@ export class MessageForm {
     this.setButton1('', () => 0)
     this.triedToShow = 0
   }
+
   /**
    * Method that sets the text for the first button of the dialog.
    *
@@ -70,6 +76,7 @@ export class MessageForm {
     this.form.button2(text)
     return this
   }
+
   /**
    * Method that sets the text for the second button of the dialog.
    *
@@ -87,6 +94,7 @@ export class MessageForm {
     this.form.button1(text)
     return this
   }
+
   /**
    * Shows this form to the player
    *

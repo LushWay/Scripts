@@ -30,6 +30,7 @@ class MineshaftBuilder {
 
     return orePositions
   }
+
   constructor() {}
 }
 

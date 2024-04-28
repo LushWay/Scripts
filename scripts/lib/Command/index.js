@@ -26,6 +26,7 @@ export class Command {
   static isCommand(message) {
     return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
+
   /** @param {ChatSendAfterEvent} event */
   static chatListener(event) {
     if (!this.isCommand(event.message)) return
@@ -74,6 +75,7 @@ export class Command {
 
     sendCallback(args, childs, event, command, input)
   }
+
   /**
    * An array of all active commands
    *
@@ -88,6 +90,7 @@ export class Command {
   static getHelpForCommand(command, ctx) {
     return ctx.error('Генератор справки для команд выключен!')
   }
+
   /**
    * @param {CommandMetadata} data
    * @param {IArgumentType} [type]
@@ -145,6 +148,7 @@ export class Command {
     // @ts-expect-error This mistype
     return cmd
   }
+
   /**
    * Adds a branch to this command of type string
    *
@@ -154,6 +158,7 @@ export class Command {
   string(name, optional = false) {
     return this.argument(new StringArgumentType(name, optional))
   }
+
   /**
    * Adds a branch to this command of type string
    *
@@ -163,6 +168,7 @@ export class Command {
   int(name, optional = false) {
     return this.argument(new IntegerArgumentType(name, optional))
   }
+
   /**
    * Adds a branch to this command of type string
    *
@@ -174,6 +180,7 @@ export class Command {
   array(name, types, optional = false) {
     return this.argument(new ArrayArgumentType(name, types, optional))
   }
+
   /**
    * Adds a branch to this command of type string
    *
@@ -183,6 +190,7 @@ export class Command {
   boolean(name, optional = false) {
     return this.argument(new BooleanArgumentType(name, optional))
   }
+
   /**
    * Adds a branch to this command of type string
    *
@@ -198,6 +206,7 @@ export class Command {
     }
     return cmd
   }
+
   /**
    * Adds a subCommand to this argument
    *
@@ -210,6 +219,7 @@ export class Command {
     // @ts-expect-error This mistype
     return cmd
   }
+
   /**
    * Registers this command and its apendending arguments
    *

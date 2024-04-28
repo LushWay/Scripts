@@ -9,10 +9,12 @@ import { EditableLocation } from './EditableLocation.js'
 
 export class EditableNpc {
   static type = MinecraftEntityTypes.Npc
+
   static dynamicPropertyName = 'type'
 
   /** @type {EditableNpc[]} */
   static npcs = []
+
   /** @type {Entity | undefined} */
   entity
 

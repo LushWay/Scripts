@@ -9,10 +9,14 @@ import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 class AnarchyBuilder extends DefaultPlaceWithInventory {
   /** @param {Player} player */
   learningRTP(player) {}
+
   /** @type {InventoryTypeName} */
   inventoryName = 'anarchy'
+
   centerLocation = new EditableLocation('anarchy_center').safe
+
   portalLocation = new EditableLocation('anarchy_spawn_portal').safe
+
   inventoryStore = new InventoryStore('anarchy')
 
   constructor() {

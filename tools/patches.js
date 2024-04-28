@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { m, patchPackage, relative, resolve } from './utils.js'
+import { m, notice, patchPackage, relative, resolve } from './patch-package.js'
 
 patchPackage('@minecraft/server', {
   classes: {
@@ -191,13 +191,7 @@ patchPackage('@minecraft/server', {
   additions: {
     beginning: '',
     afterImports: m`
-/**
- * This file was automatically patched by
- * tools/patch-modules.js
- *
- * New methods assigments can be founded in
- * scripts/lib/Extensions
- */
+${notice}
 
 /**
  * Dimension names. Used in {@link Dimension.type}
@@ -212,15 +206,7 @@ interface CommandOptions {
   showError?: boolean
 }
 `,
-    ending: m`
-    
-/**
- * This file was automatically patched by 
- * tools/patch-modules.js
- * 
- * New methods assigments can be founded in 
- * scripts/lib/Extensions
- */`,
+    ending: notice,
   },
 })
 

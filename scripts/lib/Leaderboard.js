@@ -18,8 +18,11 @@ export class Leaderboard {
     /** @type {Record<string, LeaderboardInfo>} */
     type: {},
   }).proxy()
+
   static tag = 'LEADERBOARD'
+
   static entityId = CUSTOM_ENTITIES.floatingText
+
   /**
    * @param {string} scoreboardId
    * @param {number} score
@@ -36,6 +39,7 @@ export class Leaderboard {
       return toMetricNumbers(score)
     } else return score
   }
+
   static styles = {
     gray: {
       objName: '7',
@@ -62,8 +66,10 @@ export class Leaderboard {
       score: 'a',
     },
   }
+
   /** @type {Record<string, Leaderboard>} */
   static all = {}
+
   /** @param {LeaderboardInfo} data */
   static createLeaderboard({ objective, location, dimension = 'overworld', style = 'green', displayName = objective }) {
     const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vector.floor(location))
@@ -78,6 +84,7 @@ export class Leaderboard {
       displayName,
     })
   }
+
   /**
    * Creates manager of Leaderboard
    *
@@ -94,20 +101,24 @@ export class Leaderboard {
     this.update()
     Leaderboard.all[entity.id] = this
   }
+
   remove() {
     delete Leaderboard.db[this.entity.id]
     delete Leaderboard.all[this.entity.id]
     this.entity.remove()
   }
+
   update() {
     Leaderboard.db[this.entity.id] = this.data
   }
 
   /** @type {ScoreboardObjective | undefined} */
   #scoreboard
+
   set scoreboard(v) {
     this.#scoreboard = v
   }
+
   get scoreboard() {
     return (
       this.#scoreboard ??
@@ -116,6 +127,7 @@ export class Leaderboard {
         world.scoreboard.addObjective(this.data.objective, this.data.displayName))
     )
   }
+
   updateLeaderboard() {
     const scoreboard = this.scoreboard
     const dname = scoreboard.displayName

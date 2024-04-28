@@ -23,6 +23,7 @@ class JoinBuilder {
       sound: 'break.amethyst_cluster',
     },
   }
+
   /** @type {EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>} */
   onMoveAfterJoin = new EventSignal()
 

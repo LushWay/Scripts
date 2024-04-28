@@ -23,6 +23,7 @@ export class Zone {
     player.teleport({ x: loc[1], y: loc[2], z: loc[3] })
     player.onScreenDisplay.setActionBar(`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? 'x' : 'z'}`)
   }
+
   /**
    * @param {VectorXZ} center
    * @param {number | ((players: Player[]) => number)} radius

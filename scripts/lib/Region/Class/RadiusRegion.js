@@ -19,6 +19,7 @@ export class RadiusRegion extends Region {
    * @type {Vector3}
    */
   center
+
   /**
    * Radius of the base region
    *

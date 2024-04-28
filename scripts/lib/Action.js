@@ -15,6 +15,7 @@ export class PlaceAction {
   static placeId(place, dimension) {
     return Vector.string(place) + dimension
   }
+
   /**
    * @param {PlaceType} type
    * @param {Vector3} place
@@ -35,6 +36,7 @@ export class PlaceAction {
       },
     }
   }
+
   /**
    * @private
    * @param {PlaceType} to
@@ -49,6 +51,7 @@ export class PlaceAction {
     actions.forEach(action => action(player))
     return true
   }
+
   /**
    * Creates action that triggers function when any player walks into this place.
    *
@@ -59,6 +62,7 @@ export class PlaceAction {
   static onEnter(place, action, dimension) {
     return this.subscribe('enters', place, action, dimension)
   }
+
   /**
    * @private
    * @type {Record<string, Set<PlayerCallback>>}
@@ -166,6 +170,7 @@ export class InventoryIntervalAction {
   static signal = new EventSignal()
 
   static subscribe = EventSignal.bound(this.signal).subscribe
+
   static unsubscribe = EventSignal.bound(this.signal).unsubscribe
 
   /** @private */
@@ -195,6 +200,7 @@ export class MainhandIntervalAction {
   static signal = new EventSignal()
 
   static subscribe = EventSignal.bound(this.signal).subscribe
+
   static unsubscribe = EventSignal.bound(this.signal).subscribe
 }
 

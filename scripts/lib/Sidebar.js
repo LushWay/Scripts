@@ -62,8 +62,14 @@ export class Sidebar {
       content = content.replaceAll('$' + key, value)
     }
 
-    content = util.wrap(content, { width: options.maxWordCount })
-
-    player.onScreenDisplay.setSidebar(content)
+    player.onScreenDisplay.setSidebar(
+      content
+        .split('\n')
+        .map(e => util.wrap(e, options.maxWordCount))
+        .flat()
+        .join('\n'),
+    )
   }
 }
+
+verbose = true

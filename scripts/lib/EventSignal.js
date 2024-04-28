@@ -23,6 +23,7 @@ export class EventSignal {
       unsubscribe: signal.unsubscribe.bind(signal),
     }
   }
+
   /**
    * @template {EventSignal<any, any, any>} Signal
    * @param {Signal} signal
@@ -31,6 +32,7 @@ export class EventSignal {
   static sortSubscribers(signal) {
     return [...signal.events.entries()].sort((a, b) => b[1] - a[1])
   }
+
   /**
    * @template {EventSignal<any, any, any>} Signal
    * @param {Signal} signal
@@ -72,6 +74,7 @@ export class EventSignal {
     this.events.set(callback, position)
     return callback
   }
+
   /**
    * Unsubscribes a callback function from the events.
    *
@@ -90,6 +93,7 @@ export class EventLoader extends EventSignal {
     loader.loaded = true
     return super.emit(loader, undefined)
   }
+
   loaded = false
 
   /** @type {EventSignal<undefined>['subscribe']} */

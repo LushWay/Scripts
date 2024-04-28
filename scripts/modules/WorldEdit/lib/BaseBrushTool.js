@@ -36,6 +36,7 @@ export class BaseBrushTool extends WorldEditTool {
     if (!this.isOurBrushType(slot)) return '§8'
     return super.getMenuButtonNameColor(player)
   }
+
   /** @param {this['loreFormat'] | Pick<ItemStack, 'getLore'>} lore */
   isOurBrushType(lore) {
     if ('getLore' in lore) lore = this.parseLore(lore.getLore())
@@ -43,6 +44,7 @@ export class BaseBrushTool extends WorldEditTool {
 
     return true
   }
+
   /**
    * @param {Player} player
    * @param {ItemStack} item

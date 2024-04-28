@@ -25,6 +25,7 @@ export class Mail {
     // TODO Implement
     return 1
   }
+
   /**
    * Helper function that returns count surrounded by §c() if it is above 0
    *

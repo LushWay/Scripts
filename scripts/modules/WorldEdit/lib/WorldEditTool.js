@@ -16,6 +16,7 @@ const LORE_BLOCKS_SET_KEYS_T = ['blocksSet', 'replaceBlocksSet']
 export class WorldEditTool {
   /** @type {string[]} */
   static loreBlockSetKeys = LORE_BLOCKS_SET_KEYS_T
+
   /** @type {WorldEditTool<any>[]} */
   static tools = []
 
@@ -72,6 +73,7 @@ export class WorldEditTool {
       else if (this.editToolForm) this.editToolForm(slotOrError, ctx.sender, true)
     })
   }
+
   /** @param {Player} player */
   getToolSlot(player) {
     const slot = player.mainhand()
@@ -87,6 +89,7 @@ export class WorldEditTool {
       return `Выбери пустой слот чтобы создать ${this.displayName} или возьми для настройки!`
     }
   }
+
   /**
    * @param {Player} player
    * @returns {string}
@@ -97,6 +100,7 @@ export class WorldEditTool {
     const air = !typeId
     return edit ? '§2' : air ? '' : '§8'
   }
+
   /**
    * @param {Player} player
    * @returns {string}
@@ -109,6 +113,7 @@ export class WorldEditTool {
 
     return `${this.getMenuButtonNameColor(player)}${edit ? 'Редактировать' : 'Создать'} ${this.displayName}`
   }
+
   /**
    * @overload
    * @param {string[]} lore
@@ -146,6 +151,7 @@ export class WorldEditTool {
 
     return raw
   }
+
   /** @type {Record<string, string>} */
   loreTranslation = {
     shape: 'Форма',
@@ -155,6 +161,7 @@ export class WorldEditTool {
     blocksSet: 'Блоки',
     replaceBlocksSet: 'Заменяет',
   }
+
   /**
    * @param {LoreFormat} format
    * @returns {string[]}

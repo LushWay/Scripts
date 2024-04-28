@@ -8,6 +8,7 @@ export class ModalForm {
   static arrayDefaultNone = 'Никакой'
 
   title = ''
+
   /**
    * The default minecraft form this form is based on
    *
@@ -15,6 +16,7 @@ export class ModalForm {
    * @type {ModalFormData}
    */
   form
+
   /**
    * The arguments this form has
    *
@@ -22,6 +24,7 @@ export class ModalForm {
    * @type {IModalFormArg[]}
    */
   args
+
   /**
    * Creates a new form to be shown to a player
    *
@@ -34,6 +37,7 @@ export class ModalForm {
     this.args = []
     this.triedToShow = 0
   }
+
   /**
    * Adds a dropdown to this form
    *
@@ -55,6 +59,7 @@ export class ModalForm {
     // @ts-expect-error This type
     return this
   }
+
   /**
    * Adds a dropdown to this form
    *
@@ -95,6 +100,7 @@ export class ModalForm {
     // @ts-expect-error This type
     return this
   }
+
   /**
    * Adds a slider to this form
    *
@@ -111,6 +117,7 @@ export class ModalForm {
     // @ts-expect-error This type
     return this
   }
+
   /**
    * Adds a toggle to this form
    *
@@ -124,6 +131,7 @@ export class ModalForm {
     // @ts-expect-error This type
     return this
   }
+
   /**
    * Adds a text field to this form
    *

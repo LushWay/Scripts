@@ -6,6 +6,7 @@ class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
   constructor() {
     super('Деревня исследователей')
   }
+
   slimeBoss = new Boss({
     name: 'slime',
     displayName: 'Слайм',
