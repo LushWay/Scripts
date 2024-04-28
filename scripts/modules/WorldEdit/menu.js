@@ -21,6 +21,7 @@ import { WorldEditTool } from './lib/WorldEditTool.js'
 
 /**
  * Main we menu
+ *
  * @param {Player} player
  */
 export function WEmenu(player, body = '') {
@@ -54,9 +55,7 @@ export function WEmenu(player, body = '') {
   form.show(player)
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function WEChestFromBlocksSet(player) {
   new ModalForm('Выбери набор блоков...')
     .addDropdown('Набор блоков', ...blockSetDropdown(['', ''], player))
@@ -88,9 +87,7 @@ function WEChestFromBlocksSet(player) {
     })
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function WEblocksSetsMenu(player) {
   const blockSets = getAllBlockSets(player.id)
 
@@ -108,7 +105,7 @@ function WEblocksSetsMenu(player) {
       })
 
       sets.addButton('§3Наборы других игроков...', () =>
-        WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player))
+        WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player)),
       )
     },
     button(setName, filters) {
@@ -135,7 +132,7 @@ function WEblocksSetsMenu(player) {
  * @param {string} o.action
  * @param {string} [o.setName]
  * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets[string]} [o.set]
- * @param {boolean} [o.deletePrevious=false]
+ * @param {boolean} [o.deletePrevious=false] Default is `false`
  * @param {() => void} [o.onFail]
  */
 function WEmanageBlocksSetMenu({
@@ -151,7 +148,7 @@ function WEmanageBlocksSetMenu({
     .addTextField(
       `Существующие наборы:\n${Object.keys(blockSets).join('\n')}\n\nИмя набора:`,
       'Действие будет отменено.',
-      setName
+      setName,
     )
     .show(player, (ctx, name) => {
       if (name in blockSets) return ctx.error('Набор с именем ' + name + ' уже существует!')
@@ -220,7 +217,6 @@ function WEotherPlayersBlockSetsMenu(player, back) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {string} otherPlayerId
  * @param {import('modules/WorldEdit/utils/blocksSet.js').BlocksSets} blockSets
@@ -240,7 +236,7 @@ function WEplayerBlockSetMenu(player, otherPlayerId, blockSets, onBack) {
         sets: blockSets,
         ownsSet: false,
         back: () => pform.show(player),
-      })
+      }),
     )
   }
   pform.show(player)
@@ -384,12 +380,12 @@ function WEeditBlocksSetMenu(o) {
               setBlockSet(
                 player.id,
                 setName,
-                set.filter(e => !blocksToClear.includes(e))
+                set.filter(e => !blocksToClear.includes(e)),
               )
               WEeditBlocksSetMenu({ ...o, sets: undefined })
             },
             'Отмена',
-            () => WEeditBlocksSetMenu(o)
+            () => WEeditBlocksSetMenu(o),
           )
         },
       },
@@ -407,7 +403,7 @@ function WEeditBlocksSetMenu(o) {
               back()
             },
             'Отмена',
-            () => WEeditBlocksSetMenu(o)
+            () => WEeditBlocksSetMenu(o),
           )
         },
       },
@@ -430,11 +426,10 @@ function WEeditBlocksSetMenu(o) {
       'Y': blockOnView
         ? addBlock(0, blockOnView.typeId, blockOnView.permutation.getAllStates(), false) ?? empty
         : empty,
-    }
+    },
   )
 
   /**
-   *
    * @param {number} slot
    * @param {string} typeId
    * @param {Record<string, string | number | boolean> | undefined} states
@@ -463,17 +458,17 @@ function WEeditBlocksSetMenu(o) {
         amount > 0
           ? '§aВключен§f в наборе.'
           : blockInSet
-          ? '§cВыключен§f в наборе, но остается тут.'
-          : '§7Не добавлен в набор.',
+            ? '§cВыключен§f в наборе, но остается тут.'
+            : '§7Не добавлен в набор.',
         ownsSet
           ? editStates
             ? 'Нажмите, чтобы редактировать значения выше'
             : add
-            ? '§a[+] §rНажмите для добавления блока'
-            : blockInSet && amount > 0
-            ? '§c[-] §rНажмите для уменьшения кол-ва блока'
-            : // If no block in set or already disabled show nothing
-              ''
+              ? '§a[+] §rНажмите для добавления блока'
+              : blockInSet && amount > 0
+                ? '§c[-] §rНажмите для уменьшения кол-ва блока'
+                : // If no block in set or already disabled show nothing
+                  ''
           : '',
       ],
       async callback() {
@@ -485,7 +480,7 @@ function WEeditBlocksSetMenu(o) {
           } else if (add) {
             if (set.length >= 18) {
               new FormCallback(form, player).error(
-                'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.'
+                'Максимальный размер набора блоков - 18. Выключите ненужные блоки и очистите набор от них прежде чем добавить новые.',
               )
             }
             set.push([typeId, states, 1])
@@ -498,7 +493,7 @@ function WEeditBlocksSetMenu(o) {
         } else {
           if (!blockInSet)
             return new FormCallback(form, player).error(
-              'Невозможно редактировать свойства блока, не находящегося в наборе. Добавьте его в набор.'
+              'Невозможно редактировать свойства блока, не находящегося в наборе. Добавьте его в набор.',
             )
 
           blockInSet[1] = await WEeditBlockStatesMenu(player, blockInSet[1] ?? {}, () => WEeditBlocksSetMenu(o))
@@ -564,8 +559,8 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
         'Да',
         () => resolve({}),
         'Отмена',
-        () => form.show(player)
-      )
+        () => form.show(player),
+      ),
     )
 
     // eslint-disable-next-line prefer-const
@@ -606,7 +601,7 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
 
             editStateForm.show(player)
           }
-        }
+        },
       )
     }
 
@@ -620,14 +615,16 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
 
 /**
  * Reference to block that can be replaced
+ *
  * @typedef {{
- *   typeId: string;
- *   states: Record<string, string | number | boolean>;
+ *   typeId: string
+ *   states: Record<string, string | number | boolean>
  * }} ReplaceTarget
  */
 
 /**
  * Converts replace target or block permutation to permutation. Usefull when need to make code cleaner
+ *
  * @param {ReplaceTarget | BlockPermutation} target
  */
 export function toPermutation(target) {
@@ -636,6 +633,7 @@ export function toPermutation(target) {
 
 /**
  * Converts replace target or block permutation to replace target. Usefull when need to make code cleaner
+ *
  * @param {ReplaceTarget | BlockPermutation | undefined} permutation
  */
 export function toReplaceTarget(permutation) {
@@ -646,6 +644,7 @@ export function toReplaceTarget(permutation) {
 
 /**
  * Stringifies replace targets to like "Wooden Slab, Stone"
+ *
  * @param {(undefined | ReplaceTarget)[]} targets
  */
 export function stringifyReplaceTargets(targets) {
@@ -657,6 +656,7 @@ export function stringifyReplaceTargets(targets) {
 
 /**
  * Show undo/redo (manage history) menu to player
+ *
  * @param {Player} player - Player to show to
  * @param {VoidFunction} [back] - Function that gets called when player press back
  * @param {'undo' | 'redo'} [mode] - Either to show undoed or redoed action
@@ -668,11 +668,11 @@ export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo
     body +
       `§3Нажмите на одно из последних действий ниже чтобы ${mode === 'undo' ? 'отменить (undo)' : 'вернуть (redo)'}${
         player.id !== source ? `\n§3Показаны действия игрока §f§l${Player.name(source) ?? '<Без имени>'}` : ''
-      }`
+      }`,
   )
   form.addButtonBack(back)
   form.addButton(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
-    WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', source)
+    WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', source),
   )
 
   if (is(player.id, 'grandBuilder')) {
@@ -696,7 +696,6 @@ export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo
 }
 
 /**
- *
  * @param {Player} player
  * @param {VoidFunction} back
  */

@@ -21,39 +21,33 @@ new Command({
     lootTable.fillContainer(inventory.container)
   })
 
-/**
- * @typedef {{stack: ItemStack;chance: number;}[]} LootItems
- */
+/** @typedef {{ stack: ItemStack; chance: number }[]} LootItems */
 
 export class LootTable {
   /** @type {Record<string, LootTable>} */
   static instances = {}
-  /**
-   * @type {EventSignal<LootTable>}
-   */
+  /** @type {EventSignal<LootTable>} */
   static onNew = new EventSignal()
   /**
    * Stored items
+   *
    * @private
-   * @type {Array<LootItem.Stored>}
+   * @type {LootItem.Stored[]}
    */
   items
 
-  /**
-   * @private
-   */
+  /** @private */
   totalChance = 0
 
-  /**
-   * @typedef {{ type: "itemsCount" } | { type: "airPercent", air: Percent }} LootTableFillType
-   */
+  /** @typedef {{ type: 'itemsCount' } | { type: 'airPercent'; air: Percent }} LootTableFillType */
 
   /**
    * Creates new LootTable with specified items
+   *
    * @param {object} o
    * @param {string} o.id
    * @param {LootTableFillType} [o.fill]
-   * @param  {...LootItem.Input} items - Items to randomise
+   * @param {...LootItem.Input} items - Items to randomise
    */
   constructor({ id, fill = { type: 'airPercent', air: '50%' } }, ...items) {
     this.id = id
@@ -79,8 +73,8 @@ export class LootTable {
         typeof item.amount === 'number'
           ? [item.amount]
           : typeof item.amount === 'object'
-          ? RandomCost.toArray(item.amount)
-          : [1]
+            ? RandomCost.toArray(item.amount)
+            : [1]
 
       const chance = parseInt(item.chance)
       if (isNaN(chance)) {
@@ -106,7 +100,7 @@ export class LootTable {
         enchantments: Object.fromEntries(
           Object.entries(item.enchantments ?? {}).map(([key, value]) => {
             return [key, RandomCost.toArray(value)]
-          })
+          }),
         ),
         damage: item.damage ? RandomCost.toArray(item.damage) : [],
       }
@@ -118,8 +112,9 @@ export class LootTable {
 
   /**
    * Randomises items and returns array with specified size
+   *
    * @param {number} size - Size of the array
-   * @returns {Array<ItemStack | void>}
+   * @returns {(ItemStack | void)[]}
    */
   generate(size = this.items.length - 1) {
     let stepMax = 0
@@ -166,9 +161,9 @@ export class LootTable {
   }
 
   /**
+   * @private
    * @param {LootItem.Stored} item
    * @returns {LootItems}
-   * @private
    */
   generateItems(item) {
     try {
@@ -186,7 +181,7 @@ export class LootTable {
             this.generateItems({
               ...e,
               amount: i === a.length - 1 ? last : average,
-            })
+            }),
           )
           .flat()
       }
@@ -219,9 +214,7 @@ export class LootTable {
     }
   }
 
-  /**
-   * @param {Container} container
-   */
+  /** @param {Container} container */
   fillContainer(container) {
     for (const [i, item] of this.generate(container.size).entries()) {
       if (item) container.setItem(i, item)
@@ -230,9 +223,7 @@ export class LootTable {
 }
 
 const RandomCost = {
-  /**
-   * @param {RandomCostMapType} inputMap
-   */
+  /** @param {RandomCostMapType} inputMap */
   toArray(inputMap) {
     /** @type {Record<number, number>} */
     const newMap = {}
@@ -257,7 +248,7 @@ const RandomCost = {
         for (let i = min; i <= max; i++) {
           if (newMap[i]) {
             throw new RangeError(
-              `Key '${i}' already exists and has value of ${newMap[i]}%. (Affected range: '${range}')`
+              `Key '${i}' already exists and has value of ${newMap[i]}%. (Affected range: '${range}')`,
             )
           }
           newMap[i] = value

@@ -24,14 +24,10 @@ export function mailMenu(player, back) {
   form.show(player)
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function mailLetterMenu(player) {}
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function mailLetterFilters(player) {}
 
 Join.onMoveAfterJoin.subscribe(({ player }) => {

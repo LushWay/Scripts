@@ -20,7 +20,7 @@ class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
           '40...64': '2%',
           '65...128': '1%',
         },
-      }
+      },
     ),
   })
 }

@@ -62,7 +62,6 @@ new WorldEditTool({
       .show(player)
 
     /**
-     *
      * @param {string[]} array
      * @param {string} name
      * @param {(element: string, index: number) => void} callback
@@ -80,7 +79,7 @@ new WorldEditTool({
             if (index === -1)
               return ctx.error(
                 'Неизвестный ID или номер партикла! Убедитесь что ID начинается с minecraft: и партикл состоит только из цифр\n' +
-                  util.inspect({ text, num, parsedNum: number })
+                  util.inspect({ text, num, parsedNum: number }),
               )
 
             callback(text, index)
@@ -136,7 +135,7 @@ system.runInterval(
         hit.block.dimension.spawnParticle(
           lore[1],
           Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-          variables
+          variables,
         )
       }
 
@@ -146,5 +145,5 @@ system.runInterval(
     }
   },
   'we tool',
-  20
+  20,
 )

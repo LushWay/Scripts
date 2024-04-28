@@ -10,18 +10,17 @@ import { MessageForm } from 'lib/Form/MessageForm.js'
 
 /**
  * @typedef {object} StoreOptions
- * @prop {string} name - Title of the store form.
- * @prop {(p: Player) => string} body - Body of the store form.
+ * @property {string} name - Title of the store form.
+ * @property {(p: Player) => string} body - Body of the store form.
  */
 
 export class Store {
-  /**
-   * @param {StoreOptions & { dimensionId?: Dimensions }} options
-   */
+  /** @param {StoreOptions & { dimensionId?: Dimensions }} options */
   static block(options) {
     const location = new EditableLocation(options.name + ' магазин').safe
     /**
      * We dont actually want to store that on disk
+     *
      * @type {Record<string, any>}
      */
     const cooldownDatabase = {}
@@ -40,16 +39,14 @@ export class Store {
           })
           return true
         },
-        options.dimensionId
+        options.dimensionId,
       )
     })
 
     return store
   }
 
-  /**
-   * @param {StoreOptions & { dimensionId?: Dimensions, id: string }} options
-   */
+  /** @param {StoreOptions & { dimensionId?: Dimensions; id: string }} options */
   static npc(options) {
     const store = new Store(options)
     const entity = new EditableNpc({
@@ -70,14 +67,12 @@ export class Store {
     },
   })
 
-  /**
-   * @type {Store[]}
-   */
+  /** @type {Store[]} */
   static stores = []
 
   /**
-   * @type {Array<{cost: Cost, item: ItemStack | ((p: Player) => ItemStack)}>}
    * @private
+   * @type {{ cost: Cost; item: ItemStack | ((p: Player) => ItemStack) }[]}
    */
   items = []
 
@@ -92,9 +87,7 @@ export class Store {
     beforeBuy: new EventSignal(),
   }
 
-  /**
-   * @param {Partial<StoreOptions>} [options]
-   */
+  /** @param {Partial<StoreOptions>} [options] */
   constructor(options) {
     this.options = { ...this.defaultOptions, ...options }
     Store.stores.push(this)
@@ -113,6 +106,7 @@ export class Store {
 
   /**
    * Adds item to menu
+   *
    * @param {ItemStack | ((p: Player) => ItemStack)} item
    * @param {Cost} cost
    */
@@ -121,8 +115,8 @@ export class Store {
     return this
   }
   /**
-   * @param {{cost: Cost, item: ItemStack, player: Player}} options
    * @private
+   * @param {{ cost: Cost; item: ItemStack; player: Player }} options
    */
   buy({ item, cost, player }) {
     if (!cost.check(player)) {
@@ -147,6 +141,7 @@ export class Store {
   }
   /**
    * Opens store menu to player
+   *
    * @param {Player} player
    */
   open(player, message = '') {
@@ -156,7 +151,7 @@ export class Store {
       const itemStack = typeof item === 'function' ? item(player) : item
       form.addButton(
         `${canBuy ? '' : '§7'}${itemDescription(itemStack, canBuy ? '§g' : '§7', true)}${cost.string(canBuy)}`,
-        () => this.buy({ item: itemStack, cost, player })
+        () => this.buy({ item: itemStack, cost, player }),
       )
     }
 
@@ -166,6 +161,7 @@ export class Store {
 
 /**
  * Returns <item name>\nx<count>
+ *
  * @param {ItemStack} item
  */
 function itemDescription(item, c = '§g', newline = false) {

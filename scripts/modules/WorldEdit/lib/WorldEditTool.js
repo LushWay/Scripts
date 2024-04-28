@@ -3,33 +3,23 @@ import { OverTakes, util } from 'lib.js'
 import { stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { WE_PLAYER_SETTINGS } from '../settings.js'
 
-/**
- * @typedef {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} IntervalFunction
- */
+/** @typedef {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} IntervalFunction */
 
-/**
- * @typedef {'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'} LoreStringName
- */
+/** @typedef {'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'} LoreStringName */
 
 const LORE_SEPARATOR = '\u00a0'
 /** @type {(LoreStringName | string)[]} */
 
 const LORE_BLOCKS_SET_KEYS_T = ['blocksSet', 'replaceBlocksSet']
 
-/**
- * @template {{ [P in LoreStringName]?: any; } & {version: number}} [LoreFormat=any]
- */
+/** @template {{ [P in LoreStringName]?: any } & { version: number }} [LoreFormat=any] Default is `any` */
 export class WorldEditTool {
   /** @type {string[]} */
   static loreBlockSetKeys = LORE_BLOCKS_SET_KEYS_T
-  /**
-   * @type {WorldEditTool<any>[]}
-   */
+  /** @type {WorldEditTool<any>[]} */
   static tools = []
 
-  /**
-   * @type {IntervalFunction[]}
-   */
+  /** @type {IntervalFunction[]} */
   static intervals = []
 
   /**
@@ -82,9 +72,7 @@ export class WorldEditTool {
       else if (this.editToolForm) this.editToolForm(slotOrError, ctx.sender, true)
     })
   }
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   getToolSlot(player) {
     const slot = player.mainhand()
 
@@ -145,7 +133,7 @@ export class WorldEditTool {
         lore
           .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
           .join('')
-          .replace(/§(.)/g, '$1')
+          .replace(/§(.)/g, '$1'),
       )
     } catch (e) {
       e
@@ -224,5 +212,5 @@ system.runInterval(
     else ticks++
   },
   'we tool',
-  0
+  0,
 )

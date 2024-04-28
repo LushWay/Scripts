@@ -9,9 +9,7 @@ import { Temporary } from './Temporary.js'
 
 export class Airdrop {
   static db = new DynamicPropertyDB('airdrop', {
-    /**
-     * @type {Record<string, { chicken: string, chest: string, loot: string, for?: string, looted?: true }>}
-     */
+    /** @type {Record<string, { chicken: string; chest: string; loot: string; for?: string; looted?: true }>} */
     type: {},
   }).proxy()
   static minecartTag = 'chest_minecart:loot'
@@ -21,13 +19,11 @@ export class Airdrop {
   /** @type {Airdrop[]} */
   static instances = []
 
-  /**
-   * @type {'restoring' | 'falling' | 'being looted'}
-   */
+  /** @type {'restoring' | 'falling' | 'being looted'} */
   status = 'restoring'
 
   /**
-   * @param {{ position?: Vector3, loot: LootTable, for?: string }} options
+   * @param {{ position?: Vector3; loot: LootTable; for?: string }} options
    * @param {string} [id]
    */
   constructor(options, id) {
@@ -44,6 +40,7 @@ export class Airdrop {
   }
   /**
    * Spawns airdrop at the given position
+   *
    * @param {Vector3} position - Position to spawn airdrop on
    */
   spawn(position) {
@@ -52,7 +49,7 @@ export class Airdrop {
     this.chicken = world.overworld.spawnEntity('minecraft:chicken<chicken:drop>', position)
     this.chestMinecart = world.overworld.spawnEntity(
       'minecraft:chest_minecart<chest_minecart:drop>',
-      Vector.add(position, Airdrop.chestOffset)
+      Vector.add(position, Airdrop.chestOffset),
     )
 
     let chest = false
@@ -117,6 +114,7 @@ export class Airdrop {
 
   /**
    * Shows particle trace under chest minecart
+   *
    * @param {Vector3} [from]
    */
   async showParticleTrace(from, minecart = this.chestMinecart) {
@@ -146,7 +144,7 @@ export class Airdrop {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
     Reflect.deleteProperty(Airdrop.db, this.id)
 
-    /** @param {'chestMinecart' | 'chicken'} key  */
+    /** @param {'chestMinecart' | 'chicken'} key */
     const kill = key => {
       try {
         this[key]?.remove()
@@ -226,12 +224,10 @@ system.runInterval(
     }
   },
   'airdrop tp/restore',
-  interval
+  interval,
 )
 
-/**
- * @param {Entity | undefined} entity
- */
+/** @param {Entity | undefined} entity */
 export function inventoryIsEmpty(entity) {
   if (!entity?.isValid()) return false
 
@@ -256,6 +252,7 @@ function cleanup(arr, type) {
 
 /**
  * Finds entity in entity array by id and removes it from array
+ *
  * @param {Entity[]} arr
  * @param {string} id
  */

@@ -1,37 +1,49 @@
-/**
- * @abstract
- */
+/** @abstract */
 export class IArgumentType {
   /**
    * The return type
+   *
    * @type {any}
    */
   type
   /**
    * The name that the help for this command will see
-   * @example "string"
-   * @example "Location"
-   * @example "int"
-   * @example "number"
-   * @example "UnitType"
+   *
+   * @example
+   *   string
+   *
+   * @example
+   *   Location
+   *
+   * @example
+   *   int
+   *
+   * @example
+   *   number
+   *
+   * @example
+   *   UnitType
+   *
    * @type {string}
    */
   typeName
   /**
    * The name this argument is
+   *
    * @type {string}
    */
   name = 'name'
   /**
    * Argument optionality
+   *
    * @type {boolean}
    */
   optional = false
   /**
-   * Checks if a value matches this argument type, also
-   * returns the corridsponding type
+   * Checks if a value matches this argument type, also returns the corridsponding type
+   *
    * @param {string} value
-   * @returns {import("./types.js").MatchesArgumentReturn<any>}
+   * @returns {import('./types.js').MatchesArgumentReturn<any>}
    */
   matches(value) {
     return {
@@ -41,18 +53,13 @@ export class IArgumentType {
   constructor(name = 'any', optional = false) {}
 }
 
-/**
- * @implements {IArgumentType}
- */
+/** @implements {IArgumentType} */
 export class LiteralArgumentType {
-  /**
-   * @type {null}
-   */
+  /** @type {null} */
   type
   typeName = 'literal'
   optional
   /**
-   *
    * @param {string} value
    * @returns
    */
@@ -62,7 +69,6 @@ export class LiteralArgumentType {
     }
   }
   /**
-   *
    * @param {string} name
    * @param {boolean} optional
    */
@@ -72,17 +78,12 @@ export class LiteralArgumentType {
   }
 }
 
-/**
- * @implements {IArgumentType}
- */
+/** @implements {IArgumentType} */
 export class StringArgumentType {
-  /**
-   * @type {string}
-   */
+  /** @type {string} */
   type
   typeName = '§3string'
   /**
-   *
    * @param {string} value
    * @returns
    */
@@ -93,7 +94,6 @@ export class StringArgumentType {
     }
   }
   /**
-   *
    * @param {string} name
    * @param {boolean} optional
    */
@@ -103,16 +103,13 @@ export class StringArgumentType {
   }
 }
 
-/**
- * @implements {IArgumentType}
- */
+/** @implements {IArgumentType} */
 export class IntegerArgumentType {
   /** @type {number} */
   type
   optional
   typeName = 'int'
   /**
-   *
    * @param {string} value
    * @returns
    */
@@ -124,7 +121,6 @@ export class IntegerArgumentType {
     }
   }
   /**
-   *
    * @param {string} name
    * @param {boolean} optional
    */
@@ -134,16 +130,13 @@ export class IntegerArgumentType {
   }
 }
 
-/**
- * @implements {IArgumentType}
- */
+/** @implements {IArgumentType} */
 export class LocationArgumentType {
   /** @type {Vector3} */
   type
   optional
   typeName = 'location'
   /**
-   *
    * @param {string} value
    * @returns
    */
@@ -156,7 +149,6 @@ export class LocationArgumentType {
     }
   }
   /**
-   *
    * @param {string} name
    * @param {boolean} optional
    */
@@ -166,16 +158,13 @@ export class LocationArgumentType {
   }
 }
 
-/**
- * @implements {IArgumentType}
- */
+/** @implements {IArgumentType} */
 export class BooleanArgumentType {
   /** @type {boolean} */
   type
   optional
   typeName = 'boolean'
   /**
-   *
    * @param {string} value
    * @returns
    */
@@ -193,8 +182,8 @@ export class BooleanArgumentType {
 }
 
 /**
- * @implements {IArgumentType}
  * @template {ReadonlyArray<string>} T
+ * @implements {IArgumentType}
  */
 export class ArrayArgumentType {
   /** @type {T[number]} */
@@ -202,7 +191,6 @@ export class ArrayArgumentType {
   optional
   typeName = 'string'
   /**
-   *
    * @param {string} value
    * @returns
    */
@@ -213,7 +201,6 @@ export class ArrayArgumentType {
     }
   }
   /**
-   *
    * @param {string} name
    * @param {T} types
    * @param {boolean} optional

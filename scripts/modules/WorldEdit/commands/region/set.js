@@ -29,7 +29,9 @@ set.executes(ctx => {
 })
 
 /**
- * @typedef {{permutations: (BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[]} | {ref: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef} | undefined} SelectedBlock
+ * @typedef {{ permutations: (BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[] }
+ *   | { ref: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef }
+ *   | undefined} SelectedBlock
  */
 
 const selectedBlocks = {
@@ -39,9 +41,7 @@ const selectedBlocks = {
   replaceBlock: {},
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 export function setSelection(player) {
   const [block, blockDisplay] = use(player, 'block', 'Блок, которым будет заполнена область')
   const [replaceBlock, replaceBlockDisplay] = use(player, 'replaceBlock', 'Заменяемый блок', {
@@ -78,25 +78,24 @@ export function setSelection(player) {
               icon: MinecraftBlockTypes.Barrier,
               nameTag: '§cВыбери блок, чтобы заполнить!',
             },
-      }
+      },
     )
     .show(player)
 }
 
-/**
- * @typedef {Omit<import('lib/Form/ChestForm.js').ChestButtonOptions, 'slot'>} ButtonOptions
- */
+/** @typedef {Omit<import('lib/Form/ChestForm.js').ChestButtonOptions, 'slot'>} ButtonOptions */
 
 /**
- *
  * @param {Player} player
  * @param {keyof typeof selectedBlocks} type
- * @param {string} [desc='']
- * @param {object} [param3={}]
- * @param {(player: Player) => void} [param3.onSelect=setSelection]
+ * @param {string} [desc=''] Default is `''`
+ * @param {object} [param3={}] Default is `{}`
+ * @param {(player: Player) => void} [param3.onSelect=setSelection] Default is `setSelection`
  * @param {Partial<ButtonOptions>} [param3.notSelected]
- * @returns {[blocks: (BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[] | undefined, options: ButtonOptions]}
- *
+ * @returns {[
+ *   blocks: (BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[] | undefined,
+ *   options: ButtonOptions,
+ * ]}
  */
 function use(player, type, desc = '', { onSelect = setSelection, notSelected = {} } = {}) {
   const block = selectedBlocks[type][player.id]
@@ -121,19 +120,13 @@ function use(player, type, desc = '', { onSelect = setSelection, notSelected = {
   ]
   if (!block) return empty
 
-  /**
-   * @type {(BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[]}
-   */
+  /** @type {(BlockPermutation | import('modules/WorldEdit/menu.js').ReplaceTarget)[]} */
   let result
 
-  /**
-   * @type {Pick<BlockPermutation, 'getAllStates' | 'type'>}
-   */
+  /** @type {Pick<BlockPermutation, 'getAllStates' | 'type'>} */
   let dispaySource
 
-  /**
-   * @type {Omit<import('lib/Form/ChestForm.js').ChestButtonOptions, 'slot'>}
-   */
+  /** @type {Omit<import('lib/Form/ChestForm.js').ChestButtonOptions, 'slot'>} */
   let options = {}
 
   if ('permutations' in block) {
@@ -194,7 +187,7 @@ function selectBlockSource(player, back, currentSelection) {
     typeIdToReadable(
       currentSelection.permutations[0] instanceof BlockPermutation
         ? currentSelection.permutations[0].type.id
-        : currentSelection.permutations[0].typeId
+        : currentSelection.permutations[0].typeId,
     )
 
   const promise = new Promise(resolve => {
@@ -211,7 +204,7 @@ function selectBlockSource(player, back, currentSelection) {
           }
 
           form.show(player)
-        }
+        },
       )
       .addButton(
         selectedBlock ? `§2Сменить выбранный блок: §f${selectedBlock}` : 'Выбрать из инвентаря/под ногами',
@@ -278,7 +271,7 @@ function selectBlockSource(player, back, currentSelection) {
           }
 
           form.show(player)
-        }
+        },
       )
 
     if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
@@ -289,7 +282,7 @@ function selectBlockSource(player, back, currentSelection) {
           states: await WEeditBlockStatesMenu(
             player,
             sel instanceof BlockPermutation ? sel.getAllStates() : sel.states,
-            () => base.show(player)
+            () => base.show(player),
           ),
         }
 
@@ -313,7 +306,6 @@ function selectBlockSource(player, back, currentSelection) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {(v: SelectedBlock) => void} resolve
  */
@@ -338,9 +330,8 @@ const prefix = 'minecraft:'
 const blocks = BlockTypes.getAll().map(e => e.id.substring(prefix.length))
 
 /**
- *
  * @param {string} block
- * @param {{tell(s: string): void}} player
+ * @param {{ tell(s: string): void }} player
  * @returns {boolean}
  */
 function blockIsAvaible(block, player) {
@@ -358,7 +349,7 @@ function blockIsAvaible(block, player) {
 
   if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return false
 
-  const suggest = (/**@type {[string, number]}*/ a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
+  const suggest = (/** @type {[string, number]} */ a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
   let suggestion = '§cВы имели ввиду ' + suggest(search[0])
   const firstValue = search[0][1]

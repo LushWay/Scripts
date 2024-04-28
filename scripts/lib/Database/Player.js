@@ -6,11 +6,9 @@ import { OverTakes } from 'lib/Extensions/OverTakes'
 const prod = isProduction()
 
 export const PLAYER_DB = new DynamicPropertyDB('player', {
-  /** @type {Record<string, import("@minecraft/server").Player["database"]>} */
+  /** @type {Record<string, import('@minecraft/server').Player['database']>} */
   type: {},
-  /**
-   * @returns {import("@minecraft/server").Player["database"]}
-   */
+  /** @returns {import('@minecraft/server').Player['database']} */
   defaultValue: () => {
     return {
       role: prod ? 'member' : 'spectator',

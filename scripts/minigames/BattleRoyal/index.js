@@ -13,6 +13,7 @@ const minpl = 2,
 
 /**
  * It plays a sound and sends a message to every player in the quene.
+ *
  * @param {string} sound - The sound to play.
  * @param {string} text - The text that will be displayed to the player.
  */
@@ -28,17 +29,12 @@ function forEveryQuenedPlayer(sound, text) {
   }
 }
 
-/**
- *
- * @param {Player} player
- */
+/** @param {Player} player */
 export function teleportToBR(player) {}
 
 const ks = Object.keys
 BATTLE_ROYAL_EVENTS.join.subscribe(player => {
-  /**
-   * @type {Player}
-   */
+  /** @type {Player} */
   const pl = player
   if (br.players.map(e => e.name).includes(pl.name)) return
   if (br.game.started) return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`)
@@ -66,7 +62,7 @@ system.runInterval(
         br.quene.time = fulltime
         forEveryQuenedPlayer(
           'random.levelup',
-          `§7${ks(BR_QUENE).length}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`
+          `§7${ks(BR_QUENE).length}/${minpl} §9Игроков в очереди! Игра начнется через §7${fulltime}§9 секунд.`,
         )
       }
       if (ks(BR_QUENE).length >= 10) {
@@ -102,7 +98,7 @@ system.runInterval(
     }
   },
   'battleRoyal',
-  20
+  20,
 )
 
 const bbr = new Command({

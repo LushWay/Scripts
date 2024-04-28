@@ -9,5 +9,5 @@ system.runPlayerInterval(
     if (player.database.inv === 'anarchy') player.scores.anarchyOnlineTime += time
   },
   'player stats',
-  interval
+  interval,
 )

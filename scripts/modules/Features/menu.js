@@ -40,13 +40,13 @@ Menu.open = player => {
     .addButton(
       util.badge('Задания', player.database.quests?.active.length ?? 0),
       'textures/ui/sidebar_icons/genre',
-      () => questsMenu(player, back)
+      () => questsMenu(player, back),
     )
 
   if (player.database.inv === 'anarchy')
     form
       .addButton('База', 'textures/blocks/barrel_side', () =>
-        openBaseMenu(player, back, message => new FormCallback(form, player).error(message))
+        openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
       )
       .addButton('§6Кланы\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
 

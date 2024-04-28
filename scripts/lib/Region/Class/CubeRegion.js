@@ -10,7 +10,7 @@ export class CubeRegion extends Region {
    */
   static blockLocationInRegion(blockLocation, dimensionId) {
     const region = Region.regionInstancesOf(this).find(
-      region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation)
+      region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation),
     )
 
     if (region instanceof CubeRegion) return region
@@ -21,7 +21,8 @@ export class CubeRegion extends Region {
   to
   /**
    * Creates a new region
-   * @param {object}o
+   *
+   * @param {object} o
    * @param {VectorXZ} o.from - The position of the first block of the region.
    * @param {VectorXZ} o.to - The position of the region's end.
    * @param {Dimensions} o.dimensionId - The dimension ID of the region.
@@ -45,7 +46,7 @@ export class CubeRegion extends Region {
     return Vector.between(
       { x: this.from.x, y: dimension.heightRange.max, z: this.from.z },
       { x: this.to.x, y: dimension.heightRange.min, z: this.to.z },
-      vector
+      vector,
     )
   }
   update() {

@@ -3,7 +3,6 @@ import { util } from './util.js'
 
 export class Cooldown {
   /**
-   *
    * @param {number} timestamp
    * @param {number} cooldown
    */
@@ -12,6 +11,7 @@ export class Cooldown {
   }
   /**
    * Generates a unique key for the cooldown in the database
+   *
    * @param {string} name - The name of the cooldown
    * @param {string} id - The ID of the player or source related to the cooldown
    * @returns {string} - The generated key
@@ -20,31 +20,30 @@ export class Cooldown {
     return 'COOLDOWN_' + name + ':' + id
   }
   /**
-   * @type {Record<string, number>}
    * @private
+   * @type {Record<string, number>}
    */
   db
   /**
-   * @type {string}
    * @private
+   * @type {string}
    */
   key
   /**
-   * @type {number}
    * @private
+   * @type {number}
    */
   time
-  /**
-   * @type {Player | undefined}
-   */
+  /** @type {Player | undefined} */
   player
   /**
-   * create class for manage player cooldowns
+   * Create class for manage player cooldowns
+   *
    * @param {Record<string, any>} db Database to store cooldowns
    * @param {string} prefix Preifx of the cooldown
-   * @param {string | Player} source id or player that used for generate key and tell messages
+   * @param {string | Player} source Id or player that used for generate key and tell messages
    * @param {number} time Time in ms
-   * @param {boolean} [tell=true] - Whenther to tell player cooldown status or not
+   * @param {boolean} [tell=true] - Whenther to tell player cooldown status or not. Default is `true`
    */
   constructor(db, prefix, source, time, tell = true) {
     this.db = db

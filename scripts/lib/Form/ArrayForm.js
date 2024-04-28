@@ -16,11 +16,16 @@ export class ArrayForm {
    * @param {T[]} array - Array of items to render
    * @param {object} options - Options
    * @param {Narrow<Filters>} options.filters
-   * @param {(item: NoInfer<T>, filters: NoInfer<ParsedFilters>, form: ActionForm) => Parameters<ActionForm['addButton']> | false} options.button
+   * @param {(
+   *   item: NoInfer<T>,
+   *   filters: NoInfer<ParsedFilters>,
+   *   form: ActionForm,
+   * ) => Parameters<ActionForm['addButton']> | false} options.button
    * @param {(array: NoInfer<T>[], filters: NoInfer<ParsedFilters>) => NoInfer<T>[]} [options.sort]
    * @param {(form: ActionForm) => void} [options.addCustomButtonBeforeArray]
    * @param {number} [options.itemsPerPage]
-   * @param {number} [options.minItemsForFilters] - Minimal items count, when to add filters & search & pagination buttons
+   * @param {number} [options.minItemsForFilters] - Minimal items count, when to add filters & search & pagination
+   *   buttons
    * @param {VoidFunction} [options.back]
    */
   constructor(title, description, array, options) {
@@ -35,17 +40,16 @@ export class ArrayForm {
     this.options = options
 
     /**
-     * @type {Filters}
      * @private
+     * @type {Filters}
      */
     // @ts-expect-error huh
     this.filtersConfig = { [SETTINGS_GROUP_NAME]: 'Фильтры', ...options.filters }
   }
 
   /**
-   *
    * @param {Player} player
-   * @param {number} [fromPage=1]
+   * @param {number} [fromPage=1] Default is `1`
    * @param {JSONLike} [filtersDatabase]
    * @param {ParsedFilters} [filters]
    */
@@ -55,14 +59,14 @@ export class ArrayForm {
     filtersDatabase = {},
     // @ts-expect-error Huh
     filters = createSettingsObject(filtersDatabase, 'filters', this.options.filters),
-    searchQuery = ''
+    searchQuery = '',
   ) {
     const args = [filtersDatabase, filters]
     const paginator = util.paginate(
       this.getSorted(filters, searchQuery),
       this.options.itemsPerPage,
       fromPage,
-      this.options.minItemsForFilters
+      this.options.minItemsForFilters,
     )
     const form = this.createForm(fromPage, paginator)
 
@@ -91,7 +95,7 @@ export class ArrayForm {
     const maxPages = Array.isArray(paginator) ? 0 : paginator.maxPages
     const form = new ActionForm(
       this.title.replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
-      this.description
+      this.description,
     )
     if (this.options.back) form.addButtonBack(this.options.back)
 
@@ -115,7 +119,7 @@ export class ArrayForm {
         new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
           this.show(player, fromPage, filtersDatabase, parsedFilters, query)
         })
-      }
+      },
     )
   }
 
@@ -150,7 +154,7 @@ export class ArrayForm {
     } else {
       const applied = Object.keys(database).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, 'textures/ui/gear', () =>
-        settingsGroupMenu(player, 'filters', false, {}, database, { filters: this.filtersConfig }, back, false)
+        settingsGroupMenu(player, 'filters', false, {}, database, { filters: this.filtersConfig }, back, false),
       )
     }
   }

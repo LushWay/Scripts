@@ -2,13 +2,9 @@ import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/EventSignal.js'
 import { actionGuard } from 'lib/Region/index.js'
 
-/**
- * @typedef {'enters' | 'interactions'} PlaceType
- */
+/** @typedef {'enters' | 'interactions'} PlaceType */
 
-/**
- * @typedef {(player: Player) => void} PlayerCallback
- */
+/** @typedef {(player: Player) => void} PlayerCallback */
 
 export class PlaceAction {
   /**
@@ -55,6 +51,7 @@ export class PlaceAction {
   }
   /**
    * Creates action that triggers function when any player walks into this place.
+   *
    * @param {Vector3} place
    * @param {PlayerCallback} action
    * @param {Dimensions} [dimension]
@@ -70,6 +67,7 @@ export class PlaceAction {
 
   /**
    * Creates action that triggers function when any player interacts with block on this place.
+   *
    * @param {Vector3} place
    * @param {PlayerCallback} action
    * @param {Dimensions} [dimension]
@@ -93,7 +91,7 @@ export class PlaceAction {
     system.runPlayerInterval(
       player => this.emit('enters', Vector.floor(player.location), player, player.dimension.type),
       'PlaceAction.enters',
-      10
+      10,
     )
 
     actionGuard((_player, _region, ctx) => {
@@ -110,13 +108,12 @@ export class PlaceAction {
   constructor() {}
 }
 
-/**
- * @typedef {(player: Player) => boolean | {lockText: string}} LockActionChecker
- */
+/** @typedef {(player: Player) => boolean | { lockText: string }} LockActionChecker */
 
 export class LockAction {
   /**
    * List of all existing lock actions
+   *
    * @private
    * @type {LockAction[]}
    */
@@ -124,6 +121,7 @@ export class LockAction {
 
   /**
    * Checks if player is locked by any LockerAction and returns first lockText from it
+   *
    * @param {Player} player - Player to check
    * @param {object} o
    * @param {LockAction[]} [o.ignore] - Which LockerActions ignore
@@ -148,6 +146,7 @@ export class LockAction {
 
   /**
    * Creates new locker that can lock other actions
+   *
    * @param {LockActionChecker} isLocked - Fn that checks if player is locked
    * @param {string} lockText - Text that returns when player is locked
    */
@@ -162,7 +161,7 @@ export class LockAction {
 export class InventoryIntervalAction {
   /**
    * @private
-   * @type {EventSignal<{ player: Player, slot: ContainerSlot, i: number }>}
+   * @type {EventSignal<{ player: Player; slot: ContainerSlot; i: number }>}
    */
   static signal = new EventSignal()
 
@@ -186,15 +185,13 @@ export class InventoryIntervalAction {
         }
       },
       'InventoryIntervalAction',
-      5
+      5,
     )
   }
 }
 
 export class MainhandIntervalAction {
-  /**
-   * @type {EventSignal<{ player: Player, slot: ContainerSlot }>}
-   */
+  /** @type {EventSignal<{ player: Player; slot: ContainerSlot }>} */
   static signal = new EventSignal()
 
   static subscribe = EventSignal.bound(this.signal).subscribe

@@ -1,38 +1,28 @@
 import { Player } from '@minecraft/server'
 import { util } from 'lib.js'
 
-/**
- * @typedef {string | false} SidebarLine
- */
+/** @typedef {string | false} SidebarLine */
+
+/** @typedef {(player: Player) => SidebarLine} DynamicLine */
+
+/** @typedef {{ init(sidebar: Sidebar): DynamicLine }} SidebarLineInit */
 
 /**
- * @typedef {(player: Player) => SidebarLine} DynamicLine
- */
-
-/**
- * @typedef {{ init(sidebar: Sidebar): DynamicLine }} SidebarLineInit
- */
-
-/**
- * @template [V=DynamicLine]
+ * @template [V=DynamicLine] Default is `DynamicLine`
  * @typedef {Record<string, V | string>} SidebarVariables
  */
 
-/**
- * @typedef {SidebarVariables<SidebarLineInit | DynamicLine>} SidebarRawVariables
- */
+/** @typedef {SidebarVariables<SidebarLineInit | DynamicLine>} SidebarRawVariables */
 
 export class Sidebar {
-  /**
-   * @type {Sidebar[]}
-   */
+  /** @type {Sidebar[]} */
   static instances = []
 
   /**
    * @param {object} o
    * @param {string} o.name
-   * @param {(p: Player) => {format: string, maxWordCount: number}} o.getOptions
-   * @param  {SidebarRawVariables} content
+   * @param {(p: Player) => { format: string; maxWordCount: number }} o.getOptions
+   * @param {SidebarRawVariables} content
    */
   constructor({ name, getOptions: getFormat }, content) {
     this.name = name
@@ -43,14 +33,12 @@ export class Sidebar {
   }
 
   /**
+   * @private
    * @param {SidebarRawVariables} content
    * @returns {SidebarVariables}
-   * @private
    */
   init(content) {
-    /**
-     * @type {SidebarVariables}
-     */
+    /** @type {SidebarVariables} */
     const base = {}
 
     for (const [key, e] of Object.entries(content)) {
@@ -62,9 +50,7 @@ export class Sidebar {
     return base
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   show(player) {
     const options = this.getOptions(player)
     let content = options.format

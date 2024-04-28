@@ -8,7 +8,7 @@ world.afterEvents.worldInitialize.subscribe(() => {
 
 /**
  * @typedef {{
- *   entity: Entity;
+ *   entity: Entity
  *   tableName: string
  *   tableType: string
  *   index: number
@@ -24,14 +24,12 @@ export class DB {
 
   static MAX_LORE_SIZE = 50
   /**
-   * @type {TABLE[]}
    * @private
+   * @type {TABLE[]}
    */
   static ALL_TABLE_ENTITIES
   static LOAD_TRY = 0
-  /**
-   * @private
-   */
+  /** @private */
   static getEntities() {
     return world.overworld
       .getEntities({ type: DB.ENTITY_IDENTIFIER })
@@ -88,6 +86,7 @@ export class DB {
   }
   /**
    * Creates a table entity that is used for data storage
+   *
    * @param {string} tableType
    * @param {string} tableName
    * @param {number} index
@@ -105,6 +104,7 @@ export class DB {
   }
   /**
    * A function that returns an array of entities that have the same tableType and tableName.
+   *
    * @param {string} tableType
    * @param {string} tableName
    */
@@ -122,9 +122,7 @@ export class DB {
   static BACKUP_NAME = 'database'
   static BACKUP_LOCATION = Vector.string(this.ENTITY_LOCATION)
   static BACKUP_COMMAND = `structure save ${this.BACKUP_NAME} ${this.BACKUP_LOCATION} ${this.BACKUP_LOCATION} true disk false`
-  /**
-   * @private
-   */
+  /** @private */
   static WAITING_FOR_BACKUP = false
   static backup() {
     if (this.WAITING_FOR_BACKUP) return
@@ -135,7 +133,7 @@ export class DB {
         world.overworld.runCommand(this.BACKUP_COMMAND)
       },
       'database backup',
-      200
+      200,
     )
     this.WAITING_FOR_BACKUP = true
   }
@@ -155,7 +153,7 @@ export class DB {
     } else if (Array.isArray(defaultObject)) return defaultObject
 
     // Create a new object to avoid modifying the original object
-    /** @type {JSONLike}*/
+    /** @type {JSONLike} */
     const COMPOSED = {}
 
     // Copy properties from the defaults object
@@ -199,7 +197,6 @@ export class DB {
   }
 
   /**
-   *
    * @template {JSONLike} S
    * @param {S} sourceObject
    * @param {JSONLike} defaultObject
@@ -245,10 +242,7 @@ export class DB {
 }
 
 export class DatabaseError extends Error {
-  /**
-   *
-   * @param {string} message
-   */
+  /** @param {string} message */
   constructor(message) {
     super(message)
   }

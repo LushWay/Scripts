@@ -3,17 +3,13 @@ import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data.js'
 import { ActionForm, ModalForm, util } from 'lib.js'
 import { parseArguments, parseLocationArguments } from '../../../../lib/Command/utils.js'
 
-/**
- * @typedef {"spinAroundPos"} CameraDBModes
- */
+/** @typedef {'spinAroundPos'} CameraDBModes */
 
 const CAMERA = {
   TYPES: ['minecraft:free'],
   /** @type {EasingType[]} */
   EASE: [EasingType.Linear],
-  /**
-   * @type {Record<CameraDBModes, string>}
-   */
+  /** @type {Record<CameraDBModes, string>} */
   MODES: {
     spinAroundPos: 'Крутится вокруг позиции',
   },
@@ -37,7 +33,7 @@ function setupCameraForm(player, target) {
     .addDropdownFromObject(
       'Игрок к которому камера будет повернута (либо позиция в меню выше)',
       Object.fromEntries(world.getAllPlayers().map(e => [e.name, e.name])),
-      { none: true }
+      { none: true },
     )
     .addDropdownFromObject('Режим камеры', CAMERA.MODES)
     .addSlider('Радиус при прокрутке вокруг позиции', 0, 100)
@@ -74,14 +70,10 @@ function setupCameraForm(player, target) {
     })
 }
 
-/**
- * @type {Record<string, number>}
- */
+/** @type {Record<string, number>} */
 const intervales = {}
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function createCameraInteval(player) {
   if (!player.database.camera) return
 
@@ -129,7 +121,7 @@ function createCameraInteval(player) {
       }
     },
     'camera',
-    player.database.camera.easeTime * 20
+    player.database.camera.easeTime * 20,
   )
 }
 
@@ -149,9 +141,7 @@ cmd.literal({ name: 'reset' }).executes(ctx => {
   delete ctx.sender.database.camera
 })
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function selectPlayerForm(player) {
   const form = new ActionForm('§3Выбери игрока')
   form.addButton('§3' + player.name, () => setupCameraForm(player, player))

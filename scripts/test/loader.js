@@ -17,9 +17,7 @@ const proxied2 = deepproxy(proxied)
 proxied2.x.push(4)
 
 const SHEDULED = new DynamicPropertyDB('ScheduledBlockPlace', {
-  /**
-   * @type {Record<'x', (number | string)[]>}
-   */
+  /** @type {Record<'x', (number | string)[]>} */
   type: {
     x: [],
   },

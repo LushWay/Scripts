@@ -2,11 +2,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
 import { OverTakes } from './OverTakes.js'
 
-/**
- * Common JavaScript objects
- *
- *
- */
+/** Common JavaScript objects */
 Object.entriesStringKeys = Object.entries
 
 Date.prototype.toYYYYMMDD = function () {
@@ -44,9 +40,7 @@ Array.prototype.randomElement = function () {
   return this[~~(Math.random() * this.length)]
 }
 
-/**
- * @param {unknown[]} args
- */
+/** @param {unknown[]} args */
 function format(args) {
   if (!globalThis?.Core?.afterEvents?.worldLoad?.loaded) prefixFormat(args)
   return args
@@ -55,16 +49,14 @@ function format(args) {
         typeof e === 'string'
           ? e
           : typeof e === 'object' && e !== null && e instanceof Error
-          ? util.error(e, { parseOnly: true }) ?? 'Empty error (check lib/Extensions/enviroment.js for more detail.)'
-          : util.inspect(e)
-      )
+            ? util.error(e, { parseOnly: true }) ?? 'Empty error (check lib/Extensions/enviroment.js for more detail.)'
+            : util.inspect(e),
+      ),
     )
     .join(' ')
 }
 
-/**
- * @param {unknown[]} args
- */
+/** @param {unknown[]} args */
 function prefixFormat(args) {
   if (typeof args[0] === 'string' && args[0].startsWith('§9')) return
 

@@ -5,21 +5,19 @@ import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 
 /**
  * @typedef {{
- * 	active: {
- *    id: string
- * 	  step: number,
- * 	  db?: unknown
- *  }[],
- * 	completed: string[]
+ *   active: {
+ *     id: string
+ *     step: number
+ *     db?: unknown
+ *   }[]
+ *   completed: string[]
  * }} QuestDB
  */
 
 export class Quest {
   static error = class QuestError extends Error {}
 
-  /**
-   * @type {[displayName: string, id: string]}
-   */
+  /** @type {[displayName: string, id: string]} */
   static playerSettingsName = ['Задания', 'quest']
 
   static playerSettings = Settings.player(...this.playerSettingsName, {
@@ -30,7 +28,7 @@ export class Quest {
     },
   })
 
-  /** @type {import("lib/Sidebar.js").SidebarLineInit} */
+  /** @type {import('lib/Sidebar.js').SidebarLineInit} */
   static sidebar = {
     init(sidebar) {
       const onquestupdate = sidebar.show.bind(sidebar)
@@ -47,9 +45,7 @@ export class Quest {
     },
   }
 
-  /**
-   * @type {Record<string, Quest>}
-   */
+  /** @type {Record<string, Quest>} */
   static list = {}
 
   /**
@@ -71,9 +67,7 @@ export class Quest {
     }
   }
 
-  /**
-   * @type {Record<string, PlayerQuest>}
-   */
+  /** @type {Record<string, PlayerQuest>} */
   players = {}
 
   /**
@@ -94,9 +88,7 @@ export class Quest {
     })
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   steps(player) {
     if (this.players[player.id]) return this.players[player.id]
 
@@ -108,9 +100,7 @@ export class Quest {
     return this.players[player.id]
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   enter(player) {
     this.toStep(player, 0)
   }
@@ -159,16 +149,14 @@ export class Quest {
           player.playSound(SOUNDS.levelup)
         },
         'quest title',
-        20
+        20,
       )
     }
 
     step.cleanup = step.activate?.(!restore).cleanup
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   current(player) {
     const steps = Quest.active(player, this)
     if (!steps) return false
@@ -176,9 +164,7 @@ export class Quest {
     return steps.step
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   exit(player, end = false) {
     const db = player.database
     if (!db.quests) return
@@ -196,9 +182,7 @@ export class Quest {
 
 Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function setQuests(player) {
   system.delay(() => {
     player.database.quests?.active.forEach(db => {
@@ -219,24 +203,20 @@ function setQuest(player, quest, db = player.database.quests?.active.find(e => e
   if (db) quest.toStep(player, db.step, true)
 }
 
-/**
- * @typedef {() => string} DynamicQuestText
- */
+/** @typedef {() => string} DynamicQuestText */
 
-/**
- * @typedef {string | DynamicQuestText} QuestText
- */
+/** @typedef {string | DynamicQuestText} QuestText */
 
 /**
  * @typedef {{
- *   text: QuestText,
+ *   text: QuestText
  *   description?: QuestText
  *   activate?(firstTime: boolean): { cleanup(): void }
  * }} QuestStepInput
  */
 
 /**
- * @template [DB=unknown]
+ * @template [DB=unknown] Default is `unknown`
  * @typedef {{
  *   next(): void
  *   cleanup?(): void
@@ -246,7 +226,8 @@ function setQuest(player, quest, db = player.database.quests?.active.find(e => e
  *   description?: DynamicQuestText
  *   error(text: string): ReturnType<NonNullable<QuestStepInput['activate']>>
  *   db: DB | undefined
- * } & Omit<QuestStepInput, 'text' | 'description'> & Pick<PlayerQuest, "quest" | "player" | "update">} QuestStepThis
+ * } & Omit<QuestStepInput, 'text' | 'description'> &
+ *   Pick<PlayerQuest, 'quest' | 'player' | 'update'>} QuestStepThis
  */
 
 // TODO Add main quest switching
@@ -261,29 +242,23 @@ class PlayerQuest {
     this.player = player
   }
 
-  /**
-   * @type {(QuestStepThis)[]}
-   */
+  /** @type {QuestStepThis[]} */
   list = []
 
-  /**
-   * @type {Set<(p: Player) => void>}
-   */
+  /** @type {Set<(p: Player) => void>} */
   updateListeners = new Set()
   update() {
     this.updateListeners.forEach(e => e(this.player))
   }
 
-  /**
-   * @param {QuestStepInput & ThisType<QuestStepThis>} options
-   */
+  /** @param {QuestStepInput & ThisType<QuestStepThis>} options */
   dynamic(options) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const step = this
     const i = this.list.length
     const { text, description } = options
 
-    /** @type {PlayerQuest["list"][number]} */
+    /** @type {PlayerQuest['list'][number]} */
     const ctx = {
       ...options,
       text: typeof text === 'string' ? () => text : text,
@@ -326,7 +301,10 @@ class PlayerQuest {
 
   /**
    * Waits for item in the inventory
-   * @param {Omit<QuestStepInput, 'activate'> & { isItem: (item: ContainerSlot) => boolean } & ThisType<QuestStepThis>} options
+   *
+   * @param {Omit<QuestStepInput, 'activate'> & {
+   *   isItem: (item: ContainerSlot) => boolean
+   * } & ThisType<QuestStepThis>} options
    */
   item({ isItem: isRequestedItem, ...options }) {
     this.dynamic({
@@ -370,7 +348,7 @@ class PlayerQuest {
               if (player.id !== this.player.id) return
 
               this.next()
-            })
+            }),
           )
 
           return {
@@ -391,24 +369,21 @@ class PlayerQuest {
 
   /**
    * @typedef {{
-   *   text(value: number): string,
+   *   text(value: number): string
    *   description?: QuestCounterInput['text']
-   *   end: number,
-   *   value?: number,
-   * } & Omit<QuestStepInput, "text" | "description">
-   * } QuestCounterInput
+   *   end: number
+   *   value?: number
+   * } & Omit<QuestStepInput, 'text' | 'description'>} QuestCounterInput
    */
 
   /**
-   * @typedef {QuestStepThis &
-   * { diff(this: QuestStepThis, m: number): void } &
-   *   Omit<QuestCounterInput, 'text' | 'description'>
-   * } QuestCounterThis
+   * @typedef {QuestStepThis & { diff(this: QuestStepThis, m: number): void } & Omit<
+   *     QuestCounterInput,
+   *     'text' | 'description'
+   *   >} QuestCounterThis
    */
 
-  /**
-   * @param {QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>} options
-   */
+  /** @param {QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>} options */
   counter(options) {
     options.value ??= 0
 
@@ -452,20 +427,16 @@ class PlayerQuest {
   /**
    * @typedef {{
    *   npcEntity: Entity
-   *   placeText?: QuestStepInput["text"]
-   *   placeDescription?: QuestStepInput["text"]
-   *   talkText: QuestStepInput["text"]
-   *   talkDescription?: QuestStepInput["text"]
+   *   placeText?: QuestStepInput['text']
+   *   placeDescription?: QuestStepInput['text']
+   *   talkText: QuestStepInput['text']
+   *   talkDescription?: QuestStepInput['text']
    * } & QuestStepInput} QuestDialogueInput
    */
 
-  /**
-   * @typedef {QuestStepThis & QuestDialogueInput} QuestDialogueThis
-   */
+  /** @typedef {QuestStepThis & QuestDialogueInput} QuestDialogueThis */
 
-  /**
-   * @param {QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>} options
-   */
+  /** @param {QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>} options */
   dialogue(options) {
     if (!options.npcEntity.isValid()) return this.failed('Неигровой персонаж недоступен')
     const location = options.npcEntity.location
@@ -476,7 +447,7 @@ class PlayerQuest {
       Vector.add(location, Vector.multiply(Vector.one, -1)),
       Vector.add(location, Vector.one),
       options.placeText,
-      options.placeDescription
+      options.placeDescription,
     )
     this.dynamic({
       text: options.talkText,
@@ -491,7 +462,7 @@ class PlayerQuest {
             },
             {
               namespaces: ['quest'],
-            }
+            },
           )
         })
       },
@@ -501,19 +472,17 @@ class PlayerQuest {
   /**
    * @typedef {{
    *   text?: (AirdropPos: string) => string
-   * } & ({
-   *   spawnAirdrop: (key: string | undefined) => Airdrop
-   * } | { lootTable: LootTable } & ({ location: Vector3 } | { abovePlayerY?: number })
+   * } & (
+   *   | {
+   *       spawnAirdrop: (key: string | undefined) => Airdrop
+   *     }
+   *   | ({ lootTable: LootTable } & ({ location: Vector3 } | { abovePlayerY?: number }))
    * )} QuestAirdropInput
    */
 
-  /**
-   * @typedef {Partial<QuestStepThis> & QuestAirdropInput} QuestAirdropThis
-   */
+  /** @typedef {Partial<QuestStepThis> & QuestAirdropInput} QuestAirdropThis */
 
-  /**
-   * @param {QuestAirdropInput & ThisType<QuestAirdropThis>} options
-   */
+  /** @param {QuestAirdropInput & ThisType<QuestAirdropThis>} options */
   airdrop(options) {
     if (!this.player.isValid()) return
     const spawnAirdrop =
@@ -533,7 +502,7 @@ class PlayerQuest {
                 loot: options.lootTable,
                 for: this.player.id,
               },
-              key
+              key,
             )
 
     let airdroppos = ''
@@ -550,7 +519,7 @@ class PlayerQuest {
               airdrop = spawnAirdrop(this.db)
             } else {
               console.error(
-                new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.id}`)
+                new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.id}`),
               )
               system.delay(() => this.next())
               return { cleanup() {} }
@@ -620,9 +589,7 @@ class PlayerQuest {
     })
   }
 
-  /**
-   * @param {string} reason
-   */
+  /** @param {string} reason */
   failed(reason) {
     this.dynamic({
       activate: () => {
@@ -637,9 +604,7 @@ class PlayerQuest {
   /** @private */
   _end = () => {}
 
-  /**
-   * @param {(this: PlayerQuest) => void} action
-   */
+  /** @param {(this: PlayerQuest) => void} action */
   end(action) {
     this._end = action
   }
@@ -652,9 +617,7 @@ class PlayerQuest {
    * }} CompassOptions
    */
 
-  /**
-   * @param {CompassOptions} options
-   */
+  /** @param {CompassOptions} options */
   targetCompassTo(options) {
     options.temporary = new Temporary(({ system }) => {
       system.runInterval(
@@ -673,7 +636,7 @@ class PlayerQuest {
           Compass.setFor(this.player, options.place)
         },
         'Quest place compasss',
-        20
+        20,
       )
 
       return {

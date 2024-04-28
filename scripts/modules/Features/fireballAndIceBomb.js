@@ -52,12 +52,10 @@ world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
   },
   {
     eventTypes: ['sm:explode'],
-  }
+  },
 )
 
-/**
- * @type {Record<string, string>}
- */
+/** @type {Record<string, string>} */
 const ICE_BOMB_TRANSOFORM = {
   [MinecraftBlockTypes.Water]: MinecraftBlockTypes.Ice,
   [MinecraftBlockTypes.FlowingWater]: MinecraftBlockTypes.Ice,
@@ -72,7 +70,7 @@ system.runInterval(
     entities = world.overworld.getEntities({ type: MinecraftEntityTypes.Snowball })
   },
   'ice bomb update cached entities',
-  10
+  10,
 )
 
 system.runInterval(
@@ -96,5 +94,5 @@ system.runInterval(
     }
   },
   'ice bomb ice place',
-  0
+  0,
 )

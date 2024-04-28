@@ -33,7 +33,7 @@ system.runPlayerInterval(
     }
   },
   'quartz feature, hoe haste effect',
-  2
+  2,
 )
 
 actionGuard((player, region, ctx) => {

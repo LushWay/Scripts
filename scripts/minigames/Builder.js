@@ -6,15 +6,11 @@ import { LockAction, Sidebar } from 'lib.js'
 export class Minigame {
   /** @type {Record<string, Minigame>} */
   static instances = {}
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   static getCurrent(player) {
     return Object.values(this.instances).find(e => e.players.includes(player.id))
   }
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   static getQuene(player) {
     return Object.values(this.instances).find(e => e.quene.has(player.id))
   }
@@ -27,6 +23,7 @@ export class Minigame {
 
   /**
    * Creates new Minigame manager.
+   *
    * @param {string} name - Name of the minigame. Needs to stay unique.
    * @param {object} o - Options.
    * @param {Vector3} o.spawn - Minigame spawn

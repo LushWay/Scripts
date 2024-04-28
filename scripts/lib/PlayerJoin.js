@@ -7,7 +7,7 @@ import { util } from 'lib/util.js'
 
 class JoinBuilder {
   config = {
-    /** Array with strings to show on join. They will change every second. You can use $<var name> from animation.vars  */
+    /** Array with strings to show on join. They will change every second. You can use $<var name> from animation.vars */
     title_animation: {
       stages: ['» $title «', '»  $title  «'],
       /** @type {Record<string, string>} */
@@ -23,9 +23,7 @@ class JoinBuilder {
       sound: 'break.amethyst_cluster',
     },
   }
-  /**
-   * @type {EventSignal<{ player: Player, joinTimes: number, firstJoin: boolean }>}
-   */
+  /** @type {EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>} */
   onMoveAfterJoin = new EventSignal()
 
   eventsDefaultSubscribers = {
@@ -49,9 +47,7 @@ class JoinBuilder {
     return [location.x, location.y, location.z, rotation.x, rotation.y].map(Math.floor)
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   setPlayerJoinPosition(player) {
     player.database.join ??= {}
     player.database.join.position = this.playerAt(player)
@@ -104,14 +100,14 @@ class JoinBuilder {
         }
       },
       'joinInterval',
-      20
+      20,
     )
   }
 
   /**
-   * @param {Player} player
-   * @param {"air" | "ground"} where
    * @private
+   * @param {Player} player
+   * @param {'air' | 'ground'} where
    */
   join(player, where) {
     delete player.database.join
@@ -172,10 +168,7 @@ class JoinBuilder {
     },
   })
 
-  /**
-   *
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   emitFirstJoin(player) {
     EventSignal.emit(this.onMoveAfterJoin, { player, joinTimes: 1, firstJoin: true })
   }
@@ -186,6 +179,7 @@ export const Join = new JoinBuilder()
 
 /**
  * Выводит строку времени
+ *
  * @returns {string}
  */
 function timeNow() {
@@ -198,6 +192,7 @@ function timeNow() {
 
 /**
  * Выводит время в формате 00:00
+ *
  * @returns {string}
  */
 function shortTime() {

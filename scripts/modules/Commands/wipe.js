@@ -34,10 +34,10 @@ new Command({
           Join.emitFirstJoin(ctx.sender)
         },
         'clear',
-        30
+        30,
       )
     },
     'Отмена',
-    () => {}
+    () => {},
   )
 })

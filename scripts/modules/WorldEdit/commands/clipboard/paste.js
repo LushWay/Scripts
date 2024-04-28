@@ -1,7 +1,7 @@
 import { util } from 'lib.js'
 import { WorldEdit } from '../../lib/WorldEdit.js'
 
-/** @type {( "none" | "x" | "xz" | "z")[]} */
+/** @type {('none' | 'x' | 'xz' | 'z')[]} */
 const rotTypes = ['none', 'x', 'xz', 'z']
 
 new Command({

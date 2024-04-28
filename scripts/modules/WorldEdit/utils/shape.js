@@ -6,14 +6,16 @@ import { Cuboid } from '../lib/Cuboid.js'
 import { WorldEdit } from '../lib/WorldEdit.js'
 
 /**
+ * @example
+ *   Shape(DefaultModes.sphere, Location, ['stone', 'wood'], 10)
+ *
  * @param {Player} player
- * @param {string} shape shape equation to caculate
- * @param {Vector3} pos location to generate shape
- * @param {BlockPermutation[]} blocks blocks to use to fill block
+ * @param {string} shape Shape equation to caculate
+ * @param {Vector3} pos Location to generate shape
+ * @param {BlockPermutation[]} blocks Blocks to use to fill block
  * @param {(import('modules/WorldEdit/menu.js').ReplaceTarget | undefined)[]} replaceBlocks
- * @param {number} size size of sphere
+ * @param {number} size Size of sphere
  * @returns {string | undefined}
- * @example Shape(DefaultModes.sphere, Location, ["stone", "wood"], 10);
  */
 export function placeShape(player, shape, pos, size, blocks, replaceBlocks = [undefined]) {
   if (replaceBlocks.length < 1) replaceBlocks.push(undefined)
@@ -25,13 +27,13 @@ export function placeShape(player, shape, pos, size, blocks, replaceBlocks = [un
     WorldEdit.forPlayer(player).backup(
       `§3Кисть §6${shape}§3, размер §f${size}§3, блоки: §f${stringifyReplaceTargets(blocks.map(toReplaceTarget))}`,
       Vector.add(pos, loc1),
-      Vector.add(pos, loc2)
+      Vector.add(pos, loc2),
     )
 
     const cuboid = new Cuboid(loc1, loc2)
     const conditionFunction = new Function(
       'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad',
-      `return ${shape}`
+      `return ${shape}`,
     )
     /** @type {(...args: number[]) => boolean} */
     const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, size)

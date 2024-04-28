@@ -5,10 +5,10 @@ import { util } from 'lib/util.js'
 
 /**
  * @typedef {{
- *   style: keyof typeof Leaderboard.styles;
- *   objective: string;
+ *   style: keyof typeof Leaderboard.styles
+ *   objective: string
  *   displayName: string
- *   location: Vector3;
+ *   location: Vector3
  *   dimension: Dimensions
  * }} LeaderboardInfo
  */
@@ -21,7 +21,6 @@ export class Leaderboard {
   static tag = 'LEADERBOARD'
   static entityId = CUSTOM_ENTITIES.floatingText
   /**
-   *
    * @param {string} scoreboardId
    * @param {number} score
    */
@@ -63,14 +62,9 @@ export class Leaderboard {
       score: 'a',
     },
   }
-  /**
-   * @type {Record<string, Leaderboard>}
-   */
+  /** @type {Record<string, Leaderboard>} */
   static all = {}
-  /**
-   *
-   * @param {LeaderboardInfo} data
-   */
+  /** @param {LeaderboardInfo} data */
   static createLeaderboard({ objective, location, dimension = 'overworld', style = 'green', displayName = objective }) {
     const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vector.floor(location))
     entity.nameTag = 'Updating...'
@@ -86,6 +80,7 @@ export class Leaderboard {
   }
   /**
    * Creates manager of Leaderboard
+   *
    * @param {Entity} entity
    * @param {LeaderboardInfo} data
    */
@@ -172,14 +167,17 @@ system.runInterval(
     }
   },
   'leaderboardsInterval',
-  40
+  40,
 )
 
 /**
  * This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc...
+ *
+ * @example
+ *   metricNumbers(15000)
+ *
  * @param {number} value The number you want to convert
  * @returns {string}
- * @example metricNumbers(15000);
  */
 function toMetricNumbers(value) {
   const types = ['', 'к', 'млн', 'млрд', 'трлн']

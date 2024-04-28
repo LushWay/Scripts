@@ -82,7 +82,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   /** @type {Region[]} */
   const safeAreas = DefaultPlaceWithSafeArea.places.map(e => e.safeArea)
   const nearestSafeAreas = SafeAreaRegion.nearestRegions(deadAt, player.dimension.type).filter(e =>
-    safeAreas.includes(e)
+    safeAreas.includes(e),
   )
   const nearestPlace = DefaultPlaceWithSafeArea.places.find(e => e.safeArea === nearestSafeAreas[0])
 
@@ -115,7 +115,7 @@ system.runInterval(
     }
   },
   'gravestones cleanup',
-  20
+  20,
 )
 
 actionGuard((player, _, ctx) => {
@@ -157,5 +157,5 @@ const quest = new Quest(
     q.end(() => {
       player.success('Поздравляем! В будущем постарайтесь быть осторожнее.')
     })
-  }
+  },
 )

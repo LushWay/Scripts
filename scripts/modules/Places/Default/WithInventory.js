@@ -2,9 +2,7 @@ import { Player } from '@minecraft/server'
 import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 
 export class DefaultPlaceWithInventory {
-  /**
-   * @type {DefaultPlaceWithInventory[]}
-   */
+  /** @type {DefaultPlaceWithInventory[]} */
   static places = []
 
   /** @type {InventoryTypeName} */
@@ -16,6 +14,7 @@ export class DefaultPlaceWithInventory {
 
   /**
    * Loads and saves player inventory
+   *
    * @param {Player} player - Player to load
    * @param {VoidFunction} callback - Function that gets executed when inventory actually needs to be loaded
    */
@@ -36,8 +35,6 @@ export class DefaultPlaceWithInventory {
     callback()
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   saveInventory(player) {}
 }

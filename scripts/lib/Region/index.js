@@ -19,14 +19,11 @@ export * from './DB.js'
 export * from './command.js'
 export * from './config.js'
 
-/**
- * @type {EventSignal<Parameters<interactionAllowed>, boolean | undefined, interactionAllowed>}
- */
+/** @type {EventSignal<Parameters<interactionAllowed>, boolean | undefined, interactionAllowed>} */
 export const ACTION_GUARD = new EventSignal()
 
 /**
- *
- * @param {Parameters<typeof ACTION_GUARD['subscribe']>[0]} fn
+ * @param {Parameters<(typeof ACTION_GUARD)['subscribe']>[0]} fn
  * @param {number} [position]
  */
 export function actionGuard(fn, position) {
@@ -37,7 +34,10 @@ export function actionGuard(fn, position) {
  * @callback interactionAllowed
  * @param {Player} player
  * @param {Region} [region]
- * @param {{type: "break", event: PlayerBreakBlockBeforeEvent} | {type: "place", event: PlayerPlaceBlockBeforeEvent} | {type: "interactWithBlock", event: PlayerInteractWithBlockBeforeEvent} | {type: "interactWithEntity", event: PlayerInteractWithEntityBeforeEvent}} context
+ * @param {{ type: 'break'; event: PlayerBreakBlockBeforeEvent }
+ *   | { type: 'place'; event: PlayerPlaceBlockBeforeEvent }
+ *   | { type: 'interactWithBlock'; event: PlayerInteractWithBlockBeforeEvent }
+ *   | { type: 'interactWithEntity'; event: PlayerInteractWithEntityBeforeEvent }} context
  */
 
 /** @type {interactionAllowed} */
@@ -63,8 +63,8 @@ function allowed(player, region, context) {
 let LOADED = false
 
 /**
- * Loads regions with specified guards.
- * WARNING! Loads only one time
+ * Loads regions with specified guards. WARNING! Loads only one time
+ *
  * @param {object} o
  * @param {spawnAllowed} o.spawnAllowed
  * @param {regionCallback} [o.regionCallback]
@@ -73,9 +73,7 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
   if (LOADED) throw new Error('Regions are already loaded!')
   LOADED = true
 
-  /**
-   * Permissions for region
-   */
+  /** Permissions for region */
   world.beforeEvents.playerInteractWithBlock.subscribe(event => {
     const region = Region.locationInRegion(event.block, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithBlock', event })) return
@@ -86,9 +84,7 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
     event.cancel = true
   })
 
-  /**
-   * Permissions for region
-   */
+  /** Permissions for region */
   world.beforeEvents.playerInteractWithEntity.subscribe(event => {
     const region = Region.locationInRegion(event.target.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithEntity', event })) return
@@ -96,9 +92,7 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
     event.cancel = true
   })
 
-  /**
-   * Permissions for region
-   */
+  /** Permissions for region */
   world.beforeEvents.playerPlaceBlock.subscribe(event => {
     const region = Region.locationInRegion(event.block.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'place', event })) return
@@ -106,9 +100,7 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
     event.cancel = true
   })
 
-  /**
-   * Permissions for region
-   */
+  /** Permissions for region */
 
   world.beforeEvents.playerBreakBlock.subscribe(event => {
     const region = Region.locationInRegion(event.block.location, event.player.dimension.type)
@@ -142,7 +134,7 @@ export function loadRegionsWithGuards({ spawnAllowed, regionCallback = () => voi
       }
     },
     'region callback',
-    20
+    20,
   )
 
   console.log('§7Regions and guards are loaded')

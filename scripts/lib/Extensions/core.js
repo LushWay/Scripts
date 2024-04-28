@@ -2,26 +2,20 @@ import { Player, system, world } from '@minecraft/server'
 import { util } from 'lib/util.js'
 import { EventLoader, EventSignal } from '../EventSignal.js'
 
-/**
- * Core server features
- */
+/** Core server features */
 const Core = {
   name: '§aLush§bWay',
   beforeEvents: {
     /**
      * Fires when player role changes
-     * @type {EventSignal<{ id: string, player?: Player, newRole: Role, oldRole: Role }>}
+     *
+     * @type {EventSignal<{ id: string; player?: Player; newRole: Role; oldRole: Role }>}
      */
     roleChange: new EventSignal(),
   },
-  /**
-   * Core server events
-   */
+  /** Core server events */
   afterEvents: {
-    /**
-     * Event that gets fired when server
-     * detects any entity
-     */
+    /** Event that gets fired when server detects any entity */
     worldLoad: new EventLoader(),
   },
 }
@@ -50,5 +44,5 @@ system.afterEvents.scriptEventReceive.subscribe(
   },
   {
     namespaces: ['SERVER'],
-  }
+  },
 )

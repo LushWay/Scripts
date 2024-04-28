@@ -23,7 +23,7 @@ class StoneQuarryInvestigating {
           return new Temporary(() => {})
         },
       })
-    }
+    },
   )
 
   static init() {

@@ -8,9 +8,7 @@ import { BUTTON, showForm } from './utils.js'
 
 const NUMBER_OF_1_16_100_ITEMS = 0
 
-/**
- * @satisfies {Record<string, [string, number]>}
- */
+/** @satisfies {Record<string, [string, number]>} */
 const SIZES = {
   '5 ': ['§c§h§e§s§t§0§5§r§f', 5],
   '9': ['§c§h§e§s§t§0§9§r§f', 9],
@@ -27,27 +25,27 @@ const SIZES = {
 
 /**
  * @typedef {{
- *  text: string;
- *  icon: string | undefined | number;
- *  callback?: (p: Player) => void;
+ *   text: string
+ *   icon: string | undefined | number
+ *   callback?: (p: Player) => void
  * }} ChestButton
  */
 
 /**
  * @typedef {object} ChestButtonOptions
- * @prop {number} slot The slot to display the item in.
- * @prop {string} icon The type id or the path to the texture of the item or block.
- * @prop {string} [nameTag] The name of the item to display.
- * @prop {string} [description] The description that will be word-wrapped and passed to lore. Overrides lore value.
- * @prop {string[]} [lore] The item's lore to display.
- * @prop {number} [amount] The stack size for the item.
- * @prop {boolean} [enchanted] If the item is enchanted or not.
- * @prop {ChestButton["callback"]} [callback]
+ * @property {number} slot The slot to display the item in.
+ * @property {string} icon The type id or the path to the texture of the item or block.
+ * @property {string} [nameTag] The name of the item to display.
+ * @property {string} [description] The description that will be word-wrapped and passed to lore. Overrides lore value.
+ * @property {string[]} [lore] The item's lore to display.
+ * @property {number} [amount] The stack size for the item.
+ * @property {boolean} [enchanted] If the item is enchanted or not.
+ * @property {ChestButton['callback']} [callback]
  */
 
 export class ChestForm {
   /**
-   * @param {Pick<BlockPermutation, 'getAllStates'|'type'>} permutation
+   * @param {Pick<BlockPermutation, 'getAllStates' | 'type'>} permutation
    * @returns {Omit<ChestButtonOptions, 'slot'>}
    */
   static permutationToButton(permutation) {
@@ -70,17 +68,13 @@ export class ChestForm {
    */
   buttons = []
 
-  /**
-   * @param {keyof typeof SIZES} sizeType
-   */
+  /** @param {keyof typeof SIZES} sizeType */
   constructor(sizeType = 'small') {
     const [sizeName, size] = SIZES[sizeType]
     this.titleText = sizeName
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
-  /**
-   * @param {string} text
-   */
+  /** @param {string} text */
   title(text) {
     this.titleText += text
     return this
@@ -88,6 +82,7 @@ export class ChestForm {
 
   /**
    * Adds a button to this chest ui with an icon from a resource pack.
+   *
    * @param {ChestButtonOptions} o
    */
   button({ slot, icon, nameTag = '', lore = [], description, amount = 1, enchanted = false, callback }) {
@@ -115,10 +110,13 @@ export class ChestForm {
     return this
   }
   /**
-   * @remarks Fills slots based off of strings and a key, with the first slot being the cordinate that the pattern starts at.
-   * @param {[number, number]} from The starting coordinates of the pattern, in [row, column] format, starting from [0, 0] in the top left corner.
+   * @remarks
+   *   Fills slots based off of strings and a key, with the first slot being the cordinate that the pattern starts at.
+   * @param {[number, number]} from The starting coordinates of the pattern, in [row, column] format, starting from [0,
+   *   0] in the top left corner.
    * @param {string[]} pattern The pattern to use, with characters not defined in key being left empty.
-   * @param {Record<string, Omit<ChestButtonOptions, "slot">>} key The data to display for each character in the pattern.
+   * @param {Record<string, Omit<ChestButtonOptions, 'slot'>>} key The data to display for each character in the
+   *   pattern.
    */
   pattern(from, pattern, key) {
     for (let y = 0; y < pattern.length; y++) {
@@ -135,9 +133,7 @@ export class ChestForm {
     }
     return this
   }
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   show(player) {
     const form = new ActionFormData().title(this.titleText)
     for (const button of this.buttons) {

@@ -5,25 +5,23 @@ import { DB, DatabaseError } from './Default.js'
 
 const tableType = 'inventory'
 
-/**
- * @typedef {Exclude<keyof typeof EquipmentSlot, 'mainhand'>} Equipment
- */
+/** @typedef {Exclude<keyof typeof EquipmentSlot, 'mainhand'>} Equipment */
 
 /**
  * @typedef {{
- *   slots: Record<string, ItemStack>;
+ *   slots: Record<string, ItemStack>
  *   equipment: Partial<Record<Equipment, ItemStack>>
- *   xp: number;
- *   health: number;
+ *   xp: number
+ *   health: number
  * }} Inventory
  */
 
 /**
  * @typedef {{
- *   owner: string,
- *   slots: Array<number | Equipment>
- *   xp: number;
- *   health: number;
+ *   owner: string
+ *   slots: (number | Equipment)[]
+ *   xp: number
+ *   health: number
  * }} StoreManifest
  */
 
@@ -37,6 +35,7 @@ export class InventoryStore {
   }
   /**
    * The function loads equipment and inventory items from inventory object to entity in a game.
+   *
    * @param {object} o
    * @param {Player} o.to - The entity that is receiving the equipment and inventory items being loaded.
    * @param {Inventory} o.from - The object from which the equipment and inventory items are being loaded.
@@ -69,7 +68,7 @@ export class InventoryStore {
           `§cFailed to load inventory slot §f${i}§c for player §f${to.name}§r§c, item: `,
           item,
           '§r§cerror:',
-          e
+          e,
         )
       }
     }
@@ -77,9 +76,9 @@ export class InventoryStore {
 
   /**
    * The function returns an object containing the equipment and inventory slots of a game entity.
-   * @param {Player} from - The entity  from which we are retrieving the
-   * equipment and inventory information. It is used to access the "equippable" and "inventory"
-   * components of the entity.
+   *
+   * @param {Player} from - The entity from which we are retrieving the equipment and inventory information. It is used
+   *   to access the "equippable" and "inventory" components of the entity.
    * @returns {Inventory}
    */
   static get(from) {
@@ -123,17 +122,20 @@ export class InventoryStore {
     tableName: '',
     /**
      * List of all loaded entities
+     *
      * @type {Entity[]}
      */
     entities: [],
     /**
      * List of all loaded stores
+     *
      * @type {Record<string, Inventory>}
      */
     inventories: {},
   }
   /**
    * Creates new inventory store manager
+   *
    * @param {string} tableName
    */
   constructor(tableName) {
@@ -167,7 +169,7 @@ export class InventoryStore {
       equipment: {},
       slots: {},
     }
-    /** @type {Record<number, {type: 'equipment' | 'slots', index: Equipment | number}>} */
+    /** @type {Record<number, { type: 'equipment' | 'slots'; index: Equipment | number }>} */
     let slots = []
     let step = 0
     let owner = ''
@@ -296,10 +298,7 @@ export class InventoryStore {
 
     DB.backup()
   }
-  /**
-   *
-   * @param {string} id
-   */
+  /** @param {string} id */
   remove(id) {
     delete this._.inventories[id]
 
@@ -307,8 +306,8 @@ export class InventoryStore {
   }
 
   /**
-   * @type {boolean}
    * @private
+   * @type {boolean}
    */
   saving = false
   /** @private */
@@ -326,24 +325,25 @@ export class InventoryStore {
             'Unable to save InventoryStore, error:',
             error,
             '\nSaving request by:',
-            util.error.stack.get(2, stack)
+            util.error.stack.get(2, stack),
           )
         }
       },
       'inventorySave',
-      20
+      20,
     )
     this.saving = true
   }
   /**
    * Gets entity store from saved and removes to avoid bugs
+   *
    * @param {string} key - The ID of the entity whose store is being retrieved.
    * @param {object} [o]
-   * @param {boolean} [o.remove] - A boolean parameter that determines whether the entity store should be
-   * removed from the internal stores object after it has been retrieved. If set to true, the store will
-   * be deleted from the object. If set to false, the store will remain in the object.
+   * @param {boolean} [o.remove] - A boolean parameter that determines whether the entity store should be removed from
+   *   the internal stores object after it has been retrieved. If set to true, the store will be deleted from the
+   *   object. If set to false, the store will remain in the object.
    * @param {Inventory} [o.fallback] - Inventory to return if there is no inventory in store
-   * @returns the entity store associated with the given entity ID.
+   * @returns The entity store associated with the given entity ID.
    */
   get(key, { remove = true, fallback } = {}) {
     if (!this.has(key)) {
@@ -357,12 +357,12 @@ export class InventoryStore {
   }
   /**
    * Saves an player inventory to a store and requests a save.
+   *
    * @param {Player} entity - The entity object that needs to be saved in the store.
    * @param {object} options - Options
    * @param {boolean} [options.rewrite] - A boolean parameter that determines whether or not to allow rewriting of an
-   * existing entity in the store. If set to false and the entity already exists in the store, a
-   * DatabaseError will be thrown. If set to true, the existing entity will be overwritten with the new
-   * entity.
+   *   existing entity in the store. If set to false and the entity already exists in the store, a DatabaseError will be
+   *   thrown. If set to true, the existing entity will be overwritten with the new entity.
    * @param {boolean} [options.keepInventory] - A boolean that determines keep entity's invetory or not
    * @param {string} [options.key] - Key to associate inventory with
    */
@@ -376,6 +376,7 @@ export class InventoryStore {
   }
   /**
    * Checks if key was saved into this store
+   *
    * @param {string} key - Entity ID to check
    */
   has(key) {

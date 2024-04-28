@@ -2,63 +2,62 @@ import { Player } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { WeakPlayerMap } from 'lib/WeakPlayerMap.js'
 
-/**
- * @typedef {[value: string, displayText: string]} DropdownSetting
- */
+/** @typedef {[value: string, displayText: string]} DropdownSetting */
 
 /**
  * Any setting value type
+ *
  * @typedef {string | boolean | number | DropdownSetting[]} SettingValue
  */
 
 export const SETTINGS_GROUP_NAME = Symbol('name')
 
-/**
- * @typedef {{ [SETTINGS_GROUP_NAME]?: string }} GroupNameObject
- */
+/** @typedef {{ [SETTINGS_GROUP_NAME]?: string }} GroupNameObject */
 
 /**
- * @template {SettingValue} [T = SettingValue]
- * @typedef {Record<string,
+ * @template {SettingValue} [T=SettingValue] Default is `SettingValue`
+ * @typedef {Record<
+ *   string,
  *   {
- *     name: string,
- *     description?: string;
- *     value: T,
+ *     name: string
+ *     description?: string
+ *     value: T
  *     onChange?: VoidFunction
  *   }
- * > & GroupNameObject
- * } SettingsConfig
+ * > &
+ *   GroupNameObject} SettingsConfig
  */
 
 /**
  * Сonverting true and false to boolean and string[] to string and string literal to plain string
+ *
  * @template T
- * @typedef {T extends true | false ? boolean :
- *   T extends string ? string :
- *     T extends DropdownSetting[] ? T[number][0] : T
- * } toPlain
+ * @typedef {T extends true | false
+ *   ? boolean
+ *   : T extends string
+ *     ? string
+ *     : T extends DropdownSetting[]
+ *       ? T[number][0]
+ *       : T} toPlain
  */
 
 /**
  * @template {SettingsConfig} T
  * @typedef {{
- *  [K in keyof T]: toPlain<T[K]["value"]>;
+ *   [K in keyof T]: toPlain<T[K]['value']>
  * }} ParsedSettingsConfig
  */
 
-/**
- * @typedef {Record<string, Record<string, SettingValue>>} SettingsDatabase
- */
+/** @typedef {Record<string, Record<string, SettingValue>>} SettingsDatabase */
 
-/**
- * @typedef {boolean | string | number | DropdownSetting[]} PlayerSettingValues
- */
+/** @typedef {boolean | string | number | DropdownSetting[]} PlayerSettingValues */
 
 export class Settings {
   /**
    * Creates typical settings database
-   * @param {string} name
+   *
    * @private
+   * @param {string} name
    */
   static createDatabase(name) {
     const db = new DynamicPropertyDB(name, {
@@ -74,19 +73,20 @@ export class Settings {
 
   static playerDatabase = this.createDatabase('playerOptions')
 
-  /**
-   * @type {Record<string, SettingsConfig<PlayerSettingValues>>}
-   */
+  /** @type {Record<string, SettingsConfig<PlayerSettingValues>>} */
   static playerMap = {}
 
   /**
-   * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are
-   * stored in a database
+   * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are stored in a
+   * database
+   *
+   * @template {SettingsConfig<PlayerSettingValues>} Config
    * @param {string} name - The name that shows to players
    * @param {string} groupName - The prefix for the database.
-   * @template {SettingsConfig<PlayerSettingValues>} Config
-   * @param {Narrow<Config> & GroupNameObject} config - This is an object that contains the default values for each option.
-   * @returns {(player: Player) => ParsedSettingsConfig<Config>} An function that returns object with properties that are getters and setters.
+   * @param {Narrow<Config> & GroupNameObject} config - This is an object that contains the default values for each
+   *   option.
+   * @returns {(player: Player) => ParsedSettingsConfig<Config>} An function that returns object with properties that
+   *   are getters and setters.
    */
   static player(name, groupName, config) {
     config[SETTINGS_GROUP_NAME] = name
@@ -95,7 +95,7 @@ export class Settings {
       'playerMap',
       groupName,
       // @ts-expect-error Config narrowing
-      config
+      config,
     )
 
     const cache = new WeakPlayerMap({ removeOnLeave: true })
@@ -114,20 +114,15 @@ export class Settings {
 
   static worldDatabase = this.createDatabase('worldOptions')
 
-  /**
-   * @typedef {SettingsConfig<SettingValue> &
-   *   Record<string, { requires?: boolean, }>
-   * } WorldSettingsConfig
-   */
+  /** @typedef {SettingsConfig<SettingValue> & Record<string, { requires?: boolean }>} WorldSettingsConfig */
 
-  /**
-   * @type {Record<string, WorldSettingsConfig>}
-   */
+  /** @type {Record<string, WorldSettingsConfig>} */
   static worldMap = {}
 
   /**
-   * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the
-   * configuration object's properties in localStorage
+   * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the configuration
+   * object's properties in localStorage
+   *
    * @template {WorldSettingsConfig} Config
    * @param {string} groupName - The prefix for the database.
    * @param {Narrow<Config> & GroupNameObject} config - The default values for the options.
@@ -138,7 +133,7 @@ export class Settings {
       'worldMap',
       groupName,
       // @ts-expect-error Config narrowing
-      config
+      config,
     )
 
     // @ts-expect-error Trust me, TS
@@ -146,12 +141,11 @@ export class Settings {
   }
 
   /**
+   * @private
    * @template {SettingsConfig} Config
-   *
    * @param {'worldMap' | 'playerMap'} to
    * @param {string} groupName
    * @param {Config} config
-   * @private
    */
   static insertGroup(to, groupName, config) {
     if (!(groupName in this[to])) {
@@ -166,12 +160,13 @@ export class Settings {
 }
 
 /**
- * It creates a proxy object that allows you to access and modify the values of a given object, but the
- * values are stored in a database
+ * It creates a proxy object that allows you to access and modify the values of a given object, but the values are
+ * stored in a database
+ *
  * @param {SettingsDatabase} database - The prefix for the database.
  * @param {string} groupName - The group name of the settings
  * @param {SettingsConfig} config - This is the default configuration object. It's an object with the keys being the
- * option names and the values being the default values.
+ *   option names and the values being the default values.
  * @param {Player | null} [player] - The player object.
  * @returns {Record<string, any>} An object with getters and setters
  */

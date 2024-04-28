@@ -3,14 +3,13 @@ import { LockAction, PlaceAction } from 'lib/Action.js'
 
 /**
  * @typedef {object} TeleportOptions
- * @prop {Parameters<typeof LockAction['locked']>[1]} [lockActionOptions]
- * @prop {string} [place]
- * @prop {boolean} [fadeScreen=true]
+ * @property {Parameters<(typeof LockAction)['locked']>[1]} [lockActionOptions]
+ * @property {string} [place]
+ * @property {boolean} [fadeScreen=true] Default is `true`
  */
 
 export class Portal {
   /**
-   *
    * @param {Player} player
    * @param {TeleportOptions} [options]
    */
@@ -43,7 +42,6 @@ export class Portal {
     }
   }
   /**
-   *
    * @param {Player} player
    * @param {Vector3} to
    * @param {TeleportOptions} [options]
@@ -53,6 +51,7 @@ export class Portal {
   }
   /**
    * Creates new portal.
+   *
    * @param {string} name
    * @param {Vector3 | null} from
    * @param {Vector3 | null} to
@@ -86,9 +85,7 @@ export class Portal {
       }
     }
   }
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   teleport(player) {
     if (this.place) Portal.teleport(player, this.place)
   }

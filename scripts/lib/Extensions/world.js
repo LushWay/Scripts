@@ -19,7 +19,7 @@ OverTakes(World.prototype, {
   nether: world.getDimension(MinecraftDimensionTypes.nether),
   end: world.getDimension(MinecraftDimensionTypes.theEnd),
   debug(...data) {
-    this.say(data.map((/**@type {*}*/ e) => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
+    this.say(data.map((/** @type {any} */ e) => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
   },
   logOnce(name, ...data) {
     if (LOGS.has(name)) return

@@ -5,12 +5,12 @@ import { WorldEditTool } from './WorldEditTool.js'
 
 /**
  * @typedef {{
- *  version: number;
- *  replaceBlocksSet: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef;
- *  size: number;
- *  maxDistance: number;
- *  type: 'brush' | 'smoother'
- *}} BrushLoreFormat
+ *   version: number
+ *   replaceBlocksSet: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef
+ *   size: number
+ *   maxDistance: number
+ *   type: 'brush' | 'smoother'
+ * }} BrushLoreFormat
  */
 
 /**
@@ -18,9 +18,7 @@ import { WorldEditTool } from './WorldEditTool.js'
  * @extends {WorldEditTool<BrushLoreFormat & AdditionalLore>}
  */
 export class BaseBrushTool extends WorldEditTool {
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   getToolSlot(player) {
     const slot = super.getToolSlot(player)
 
@@ -32,17 +30,13 @@ export class BaseBrushTool extends WorldEditTool {
     return slot
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   getMenuButtonNameColor(player) {
     const slot = player.mainhand()
     if (!this.isOurBrushType(slot)) return '§8'
     return super.getMenuButtonNameColor(player)
   }
-  /**
-   * @param {this['loreFormat'] | Pick<ItemStack, 'getLore'>} lore
-   */
+  /** @param {this['loreFormat'] | Pick<ItemStack, 'getLore'>} lore */
   isOurBrushType(lore) {
     if ('getLore' in lore) lore = this.parseLore(lore.getLore())
     if ('type' in this.loreFormat && 'type' in lore && lore.type !== this.loreFormat.type) return false
@@ -50,11 +44,10 @@ export class BaseBrushTool extends WorldEditTool {
     return true
   }
   /**
-   *
-   * @this {BaseBrushTool<AdditionalLore>}
    * @param {Player} player
    * @param {ItemStack} item
    * @returns
+   * @this {BaseBrushTool<AdditionalLore>}
    */
   onUse = function onUse(player, item) {
     const settings = WE_PLAYER_SETTINGS(player)
@@ -85,13 +78,11 @@ export class BaseBrushTool extends WorldEditTool {
 
   /**
    * @param {Player} player
-   * @param {this["clearLoreFormat"]} lore
+   * @param {this['clearLoreFormat']} lore
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {}
 
-  /**
-   * @type {BrushLoreFormat & AdditionalLore}
-   */
+  /** @type {BrushLoreFormat & AdditionalLore} */
   clearLoreFormat
 }

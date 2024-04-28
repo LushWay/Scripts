@@ -3,40 +3,45 @@ import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
 import { util } from '../util.js'
 import { showForm } from './utils.js'
 
-/** */
 export class MessageForm {
   /**
-   *  the title that this form should have
+   * The title that this form should have
+   *
    * @type {string}
    */
   title
   /**
-   * extra text that should be displayed in the form
+   * Extra text that should be displayed in the form
+   *
    * @type {string}
    */
   body
   /**
    * The default minecraft form this form is based on
-   * @type {MessageFormData}
+   *
    * @private
+   * @type {MessageFormData}
    */
   form
   /**
-   * the first button of the dialog.
-   * @type {IMessageFormButton}
+   * The first button of the dialog.
+   *
    * @private
+   * @type {IMessageFormButton}
    */
   button1
   /**
-   * the seccond button of the dialog.
-   * @type {IMessageFormButton}
+   * The seccond button of the dialog.
+   *
    * @private
+   * @type {IMessageFormButton}
    */
   button2
   /**
    * Creates a new form to be shown to a player
-   * @param {string} title the title that this form should have
-   * @param {string} body extra text that should be displayed in the form
+   *
+   * @param {string} title The title that this form should have
+   * @param {string} body Extra text that should be displayed in the form
    */
   constructor(title, body) {
     this.title = title
@@ -50,11 +55,14 @@ export class MessageForm {
   }
   /**
    * Method that sets the text for the first button of the dialog.
-   * @param {string} text  text to show on this button
-   * @param {ButtonCallback} callback  what happens when this button is clicked
-   * @example ```
-   * setButton1("settings", () => {})
-   * ```
+   *
+   * @example
+   *   ;```
+   *   setButton1("settings", () => {})
+   *   ```
+   *
+   * @param {string} text Text to show on this button
+   * @param {ButtonCallback} callback What happens when this button is clicked
    * @returns {MessageForm}
    */
   setButton1(text, callback) {
@@ -64,11 +72,14 @@ export class MessageForm {
   }
   /**
    * Method that sets the text for the second button of the dialog.
-   * @param {string} text  text to show on this button
-   * @param {ButtonCallback} callback  what happens when this button is clicked
-   * @example ```
-   * setButton2("settings", () => {})
-   * ```
+   *
+   * @example
+   *   ;```
+   *   setButton2("settings", () => {})
+   *   ```
+   *
+   * @param {string} text Text to show on this button
+   * @param {ButtonCallback} callback What happens when this button is clicked
    * @returns {MessageForm}
    */
   setButton2(text, callback) {
@@ -78,7 +89,8 @@ export class MessageForm {
   }
   /**
    * Shows this form to the player
-   * @param {Player} player  player to show to
+   *
+   * @param {Player} player Player to show to
    * @returns {Promise<void>}
    */
   async show(player) {
@@ -92,6 +104,7 @@ export class MessageForm {
 
 /**
  * Asks player
+ *
  * @param {Player} player
  * @param {string} text
  * @param {string} yesText

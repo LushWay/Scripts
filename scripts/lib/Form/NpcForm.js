@@ -2,7 +2,6 @@ import { ActionForm } from './ActionForm.js'
 
 export class NpcForm extends ActionForm {
   /**
-   *
    * @param {string} title
    * @param {string} body
    */

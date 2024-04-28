@@ -15,23 +15,18 @@ import { CommandContext } from './Context.js'
 import './index.js'
 import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand, sendCallback } from './utils.js'
 
-/**
- * @typedef {import("./types.js").CommandMetadata} CommandMetadata
- */
+/** @typedef {import('./types.js').CommandMetadata} CommandMetadata */
 
 /**
- *  @template {Function} [Callback = (ctx: CommandContext) => (void | Promise<void>)]
+ * @template {Function} [Callback=(ctx: CommandContext) => (void | Promise<void>)] . Default is `(ctx: CommandContext)
+ *   => (void | Promise<void>)`
  */
 export class Command {
-  /**
-   * @param {string} message
-   */
+  /** @param {string} message */
   static isCommand(message) {
     return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
-  /**
-   * @param {ChatSendAfterEvent} event
-   */
+  /** @param {ChatSendAfterEvent} event */
   static chatListener(event) {
     if (!this.isCommand(event.message)) return
 
@@ -50,6 +45,7 @@ export class Command {
 
     /**
      * Check Args/SubCommands for errors
+     *
      * @type {Command[]}
      */
     const childs = []
@@ -63,7 +59,7 @@ export class Command {
       if (!command) return 'fail'
       if (start.sys.children.length > 0) {
         const child = start.sys.children.find(
-          v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional)
+          v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional),
         )
         if (!child && !args[i] && start.sys.callback) return 'success'
         if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
@@ -80,6 +76,7 @@ export class Command {
   }
   /**
    * An array of all active commands
+   *
    * @type {Command<any>[]}
    */
   static commands = []
@@ -92,7 +89,6 @@ export class Command {
     return ctx.error('Генератор справки для команд выключен!')
   }
   /**
-   *
    * @param {CommandMetadata} data
    * @param {IArgumentType} [type]
    * @param {number} [depth]
@@ -108,7 +104,7 @@ export class Command {
     }
 
     this.sys = {
-      /** @type {CommandMetadata & Required<Pick<CommandMetadata, "requires" | "aliases" | "type">>} */
+      /** @type {CommandMetadata & Required<Pick<CommandMetadata, 'requires' | 'aliases' | 'type'>>} */
       meta: {
         requires: () => true,
         aliases: [],
@@ -118,6 +114,7 @@ export class Command {
       type: type ?? new LiteralArgumentType(data.name),
       /**
        * The Arguments on this command
+       *
        * @type {Command<any>[]}
        */
       children: [],
@@ -125,6 +122,7 @@ export class Command {
       parent,
       /**
        * Function to run when this command is called
+       *
        * @type {Callback | undefined}
        */
       callback: undefined,
@@ -135,10 +133,11 @@ export class Command {
 
   /**
    * Adds a ranch to this command of your own type
-   * @template {IArgumentType} T
-   * @param {T} type a special type to be added
-   * @returns {import("./types.js").ArgReturn<Callback, T['type']>} new branch to this command
+   *
    * @private
+   * @template {IArgumentType} T
+   * @param {T} type A special type to be added
+   * @returns {import('./types.js').ArgReturn<Callback, T['type']>} New branch to this command
    */
   argument(type) {
     const cmd = new Command(this.sys.meta, type, this.sys.depth + 1, this)
@@ -148,42 +147,47 @@ export class Command {
   }
   /**
    * Adds a branch to this command of type string
-   * @param {string} name name this argument should have
-   * @returns new branch to this command
+   *
+   * @param {string} name Name this argument should have
+   * @returns New branch to this command
    */
   string(name, optional = false) {
     return this.argument(new StringArgumentType(name, optional))
   }
   /**
    * Adds a branch to this command of type string
-   * @param {string} name name this argument should have
-   * @returns new branch to this command
+   *
+   * @param {string} name Name this argument should have
+   * @returns New branch to this command
    */
   int(name, optional = false) {
     return this.argument(new IntegerArgumentType(name, optional))
   }
   /**
    * Adds a branch to this command of type string
-   * @param {string} name name this argument should have
-   * @param {T} types
-   * @returns {import("./types.js").ArgReturn<Callback, T[number]>} new branch to this command
+   *
    * @template {ReadonlyArray<string>} T
+   * @param {string} name Name this argument should have
+   * @param {T} types
+   * @returns {import('./types.js').ArgReturn<Callback, T[number]>} New branch to this command
    */
   array(name, types, optional = false) {
     return this.argument(new ArrayArgumentType(name, types, optional))
   }
   /**
    * Adds a branch to this command of type string
-   * @param {string} name name this argument should have
-   * @returns new branch to this command
+   *
+   * @param {string} name Name this argument should have
+   * @returns New branch to this command
    */
   boolean(name, optional = false) {
     return this.argument(new BooleanArgumentType(name, optional))
   }
   /**
    * Adds a branch to this command of type string
-   * @param {string} name name this argument should have
-   * @returns {import("./types.js").ArgReturn<Callback, Vector3>} new branch to this command
+   *
+   * @param {string} name Name this argument should have
+   * @returns {import('./types.js').ArgReturn<Callback, Vector3>} New branch to this command
    */
   location(name, optional = false) {
     const cmd = this.argument(new LocationArgumentType(name, optional))
@@ -196,8 +200,9 @@ export class Command {
   }
   /**
    * Adds a subCommand to this argument
-   * @param {import("./types.js").CommandMetadata} data name this literal should have
-   * @returns {Command<Callback>} new branch to this command
+   *
+   * @param {import('./types.js').CommandMetadata} data Name this literal should have
+   * @returns {Command<Callback>} New branch to this command
    */
   literal(data, optional = false) {
     const cmd = new Command(data, new LiteralArgumentType(data.name, optional), this.sys.depth + 1, this)
@@ -207,7 +212,8 @@ export class Command {
   }
   /**
    * Registers this command and its apendending arguments
-   * @param {Callback} callback what to run when this command gets called
+   *
+   * @param {Callback} callback What to run when this command gets called
    * @returns {Command<Callback>}
    */
   executes(callback) {

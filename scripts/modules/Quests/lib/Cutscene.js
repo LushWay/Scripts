@@ -5,33 +5,36 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 export class Cutscene {
   /**
-   * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for rotation y)
+   * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
+   * rotation y)
+   *
    * @typedef {Vector5} Point
    */
 
   /**
    * Single cutscene section that contains points and information about easing/animation time
+   *
    * @typedef {{
-   *   points: Point[],
-   *   step: number,
-   *   easeType?: EasingType,
+   *   points: Point[]
+   *   step: number
+   *   easeType?: EasingType
    *   easeTime?: number
    * }} Section
    */
 
   /**
    * Section list
+   *
    * @typedef {(undefined | Section)[]} Sections
    */
 
   /**
    * Controller used to abort playing cutscene animation
+   *
    * @typedef {{ cancel: boolean }} AbortController
    */
 
-  /**
-   * Database containing Cutscene trail points
-   */
+  /** Database containing Cutscene trail points */
   static db = new DynamicPropertyDB('cutscene', {
     /** @type {Record<string, Sections} */
     type: {},
@@ -40,36 +43,32 @@ export class Cutscene {
 
   /**
    * List of all cutscenes
+   *
    * @type {Record<string, Cutscene>}
    */
   static list = {}
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   static getCurrent(player) {
     return Object.values(this.list).find(e => e.current[player.id])
   }
 
   /**
    * List of cutscene sections
+   *
    * @type {Sections}
    */
   sections = []
 
-  /**
-   * @private
-   */
+  /** @private */
   intervalTime = 5
 
-  /**
-   * @private
-   */
+  /** @private */
   restoreCameraTime = 2
 
   /**
-   * @type {Section}
    * @private
+   * @type {Section}
    */
   get defaultSection() {
     return {
@@ -81,8 +80,8 @@ export class Cutscene {
   }
 
   /**
-   * @type {Partial<Section>}
    * @private
+   * @type {Partial<Section>}
    */
   get switchSection() {
     return {
@@ -93,16 +92,21 @@ export class Cutscene {
 
   /**
    * List of players that currently see cutscene play
-   * @type {Record<string, {
-   *   player: Player;
-   *   controller: AbortController
-   * }>}
+   *
    * @private
+   * @type {Record<
+   *   string,
+   *   {
+   *     player: Player
+   *     controller: AbortController
+   *   }
+   * >}
    */
   current = {}
 
   /**
    * Creates a new Cutscene.
+   *
    * @param {string} id
    * @param {string} displayName
    */
@@ -116,6 +120,7 @@ export class Cutscene {
 
   /**
    * Plays the Cutscene for the provided player
+   *
    * @param {Player} player - Player to play cutscene for
    */
   play(player) {
@@ -134,7 +139,7 @@ export class Cutscene {
           easeOptions: Object.assign(this.defaultSection, pointIndex === 0 ? this.switchSection : section),
         })
       },
-      { controller, exit: () => this.exit(player) }
+      { controller, exit: () => this.exit(player) },
     )
 
     this.current[player.id] = {
@@ -145,7 +150,9 @@ export class Cutscene {
 
   /**
    * Asynchronuosly runs callback for each point in the cutscene. Callback has access to the current point section
-   * @param {(point: Point, pointIndex: number, section: Section, sectionIndex: number) => void} callback - Function that runs on every point
+   *
+   * @param {(point: Point, pointIndex: number, section: Section, sectionIndex: number) => void} callback - Function
+   *   that runs on every point
    * @param {object} options
    * @param {AbortController} options.controller - Controller used to abort operation
    * @param {Sections} [options.sections] - Section list
@@ -174,8 +181,9 @@ export class Cutscene {
 
   /**
    * Uses bezier curves to interpolate points along a section.
-   * @param {Section} section
+   *
    * @private
+   * @param {Section} section
    */
   *pointIterator({ step = 0.5, points }) {
     let index = 0
@@ -202,8 +210,8 @@ export class Cutscene {
   }
 
   /**
-   * Stops a player's cutscene animation, removes them from the list of active players,
-   * and restores their camera.
+   * Stops a player's cutscene animation, removes them from the list of active players, and restores their camera.
+   *
    * @param {Player} player - The player to stop cutscene on
    */
   exit(player) {
@@ -246,9 +254,7 @@ export class Cutscene {
     return sections
   }
 
-  /**
-   * Saves cutscene sections to the database
-   */
+  /** Saves cutscene sections to the database */
   save() {
     Cutscene.db[this.id] = this.sections
   }
@@ -256,14 +262,14 @@ export class Cutscene {
 
 /**
  * Calculates the value of a point on a cubic Bezier curve.
+ *
  * @template {Record<string, number>} T - Vector type
- * @param {[T, T, T, T]} vectors - Array of four
- * control points that define a cubic Bezier curve. Each control point is a Record that have the provided axis
- * @param {keyof T} axis - Axis along which the Bezier curve is being calculated. It specifies whether the calculation is for the x-axis, y-axis, or
- * z-axis of the provided vectors.
- * @param {number} t - Interpolation value between two
- * points on a Bezier curve. It is typically a value between 0 and 1, where 0 corresponds to the
- * starting point of the curve and 1 corresponds to the ending point of the curve.
+ * @param {[T, T, T, T]} vectors - Array of four control points that define a cubic Bezier curve. Each control point is
+ *   a Record that have the provided axis
+ * @param {keyof T} axis - Axis along which the Bezier curve is being calculated. It specifies whether the calculation
+ *   is for the x-axis, y-axis, or z-axis of the provided vectors.
+ * @param {number} t - Interpolation value between two points on a Bezier curve. It is typically a value between 0 and
+ *   1, where 0 corresponds to the starting point of the curve and 1 corresponds to the ending point of the curve.
  */
 function bezier(vectors, axis, t) {
   const [v0, v1, v2, v3] = vectors

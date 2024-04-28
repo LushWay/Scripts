@@ -61,9 +61,7 @@ OverTakes(ItemStack.prototype, {
 
 const loreLimit = 30
 
-/**
- * @param {string} description
- */
+/** @param {string} description */
 export function loreWordWrap(description) {
   let color = '§7'
   return util

@@ -32,9 +32,7 @@ cutscene
     cutscene.play(ctx.sender)
   })
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function selectCutsceneMenu(player) {
   new ArrayForm('Катсцены', 'Список доступных для редактирования катсцен:', Object.values(Cutscene.list), {
     filters: {},
@@ -53,8 +51,8 @@ function manageCutsceneMenu(player, cutscene) {
     cutscene.id,
     `Секций: ${cutscene.sections.length}\nТочек: ${cutscene.sections.reduce(
       (count, section) => (section ? count + section?.points.length : count),
-      0
-    )}`
+      0,
+    )}`,
   )
     .addButton(ActionForm.backText, () => selectCutsceneMenu(player))
     .addButton('Редактировать', () => editCatcutscene(player, cutscene))

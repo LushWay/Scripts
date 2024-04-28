@@ -17,18 +17,14 @@ migration('move player inv', () => {
 })
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
-  /**
-   * @type {InventoryTypeName}
-   */
+  /** @type {InventoryTypeName} */
   inventoryName = 'spawn'
   location = new EditableLocation('spawn', {
     fallback: { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
     type: 'vector3+rotation',
   }).safe
 
-  /**
-   * @type {import('lib.js').Inventory}
-   */
+  /** @type {import('lib.js').Inventory} */
   inventory = {
     xp: 0,
     health: 20,
@@ -46,6 +42,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
   /**
    * Loads spawn inventory to specified player
+   *
    * @param {Player} player
    */
   loadInventory(player) {

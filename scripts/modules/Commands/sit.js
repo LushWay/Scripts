@@ -35,5 +35,5 @@ system.runInterval(
     }
   },
   'sit entity clear',
-  40
+  40,
 )

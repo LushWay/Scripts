@@ -14,17 +14,10 @@ export const WE_CONFIG = {
   COPY_FILE_NAME: 'copy',
   BACKUP_PREFIX: 'backup',
 
-  /**
-   * The ammout of blocks in a generation
-   * before it will check servers speed to delay
-   * the loading of a generation
-   */
+  /** The ammout of blocks in a generation before it will check servers speed to delay the loading of a generation */
   BLOCKS_BEFORE_AWAIT: 10000,
 
-  /**
-   * The ammout of ticks to delay during
-   * a heavy proccess generation
-   */
+  /** The ammout of ticks to delay during a heavy proccess generation */
   TICKS_TO_SLEEP: 1,
 
   DRAW_SELECTION_DEFAULT: true,
@@ -40,7 +33,6 @@ WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
 })
 
 /**
- *
  * @param {Vector3} pos1
  * @param {Vector3} pos2
  * @param {object} [param2]
@@ -61,7 +53,7 @@ export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2),
         world.overworld.spawnParticle(
           WE_CONFIG.DRAW_SELECTION_PARTICLE,
           { x, y, z },
-          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS
+          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS,
         )
       } catch (e) {
         if (e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) continue
@@ -72,10 +64,8 @@ export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2),
 }
 
 /**
- * 
- * @param {Vector3} min 
+ * @param {Vector3} min
  * @param {Vector3} max
- 
  */
 export function* iterateThroughtEdges(min, max) {
   for (let coord = min.x; coord++; coord < max.x) {

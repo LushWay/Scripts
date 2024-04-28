@@ -8,29 +8,34 @@ import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerN
 import { isBuilding } from 'modules/WorldEdit/isBuilding'
 
 /**
- * @type {Record<string, ({
- *   separated: false
- * } | {
- *   separated: true
- *   indicator: Entity,
- * }) & {
- *   hurtEntity: Entity,
- *   damage: number,
- *   expires: number
- * }>}
+ * @type {Record<
+ *   string,
+ *   (
+ *     | {
+ *         separated: false
+ *       }
+ *     | {
+ *         separated: true
+ *         indicator: Entity
+ *       }
+ *   ) & {
+ *     hurtEntity: Entity
+ *     damage: number
+ *     expires: number
+ *   }
+ * >}
  */
 const HURT_ENTITIES = {}
 const INDICATOR_TAG = 'HEALTH_INDICATOR'
 
 /**
  * Entities that have nameTag "always_show": true and dont have boss_bar
+ *
  * @type {string[]}
  */
 const ALWAYS_SHOWS = [MinecraftEntityTypes.Player]
 
-/**
- * List of families to indicate health
- */
+/** List of families to indicate health */
 const ALLOWED_FAMILIES = ['monster']
 
 // Show indicator on hurt
@@ -105,13 +110,14 @@ system.runInterval(
     }
   },
   'health indicator, damage reducer',
-  10
+  10,
 )
 
 const BAR_SYMBOL = '|'
 
 /**
  * Gets damage indicator name depending on entity's currnet heart and damage applied
+ *
  * @param {Entity} entity
  * @returns {string}
  */
@@ -150,9 +156,7 @@ PLAYER_NAME_TAG_MODIFIERS.push(p => {
   else return false
 })
 
-/**
- * @param {{entity: Entity, damage?: number, entityId?: string}} param0
- */
+/** @param {{ entity: Entity; damage?: number; entityId?: string }} param0 */
 function updateIndicator({ entity, damage = 0, entityId }) {
   if (entity.isValid()) return
   entityId ??= entity.id
@@ -214,9 +218,7 @@ function updateIndicator({ entity, damage = 0, entityId }) {
     }
 }
 
-/**
- * @param {Entity} entity
- */
+/** @param {Entity} entity */
 function spawnIndicator(entity) {
   const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
   indicator.addTag(INDICATOR_TAG)
@@ -230,9 +232,7 @@ function getIndicators() {
   })
 }
 
-/**
- * @param {Entity[]} entities
- */
+/** @param {Entity[]} entities */
 function getIDs(entities) {
   return entities.map(entity => ({
     id: util.run(() => entity.id)[0],

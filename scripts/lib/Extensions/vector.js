@@ -1,6 +1,11 @@
 import { Vector } from '@minecraft/server'
 
-/** @type {Omit<typeof Vector, keyof Function | 'back' | 'down' | 'forward' | 'left' | 'up' | 'one' | 'right' | 'zero'>} */
+/**
+ * @type {Omit<
+ *   typeof Vector,
+ *   keyof Function | 'back' | 'down' | 'forward' | 'left' | 'up' | 'one' | 'right' | 'zero'
+ * >}
+ */
 const Static = {
   string: (a, color) => (!color ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`),
   valid: a => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z)),
@@ -120,9 +125,7 @@ const Static = {
   },
 
   slerp(a, b, s) {
-    /**
-     * @typedef {[number, number, number]} Vector3Array
-     */
+    /** @typedef {[number, number, number]} Vector3Array */
     /**
      * @param {Vector3Array} a
      * @param {Vector3Array} b
@@ -147,9 +150,7 @@ const Static = {
   },
 }
 
-/**
- * @type {PartialParts<Vector>}
- */
+/** @type {PartialParts<Vector>} */
 const Prototype = {
   length() {
     return Math.hypot(this.x, this.y, this.z)

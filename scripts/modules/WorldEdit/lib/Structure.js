@@ -6,15 +6,16 @@ export class Structure extends Cuboid {
   /**
    * @private
    * @type {{
-   *		name: string,
-   *		min: Vector3,
-   *		max: Vector3,
-   *	}[]}
+   *   name: string
+   *   min: Vector3
+   *   max: Vector3
+   * }[]}
    */
   structures = []
 
   /**
    * Creates a new structure save
+   *
    * @param {string} prefix
    * @param {Vector3} pos1
    * @param {Vector3} pos2
@@ -43,7 +44,7 @@ export class Structure extends Cuboid {
         `structure save "${name}" ${Vector.string(min)} ${Vector.string(max)} false memory true`,
         min,
         max,
-        options
+        options,
       )
 
       if (result > 0) {
@@ -59,7 +60,7 @@ export class Structure extends Cuboid {
 
     if (options.errors > 0)
       throw new Error(
-        `§c${options.errors}§f/${options.total}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+        `§c${options.errors}§f/${options.total}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
       )
   }
 
@@ -84,7 +85,7 @@ export class Structure extends Cuboid {
         `structure load "${file.name}" ${Vector.string(to)}${additional}`,
         from,
         to,
-        options
+        options,
       )
 
       await nextTick
@@ -92,7 +93,7 @@ export class Structure extends Cuboid {
 
     if (options.errors > 0)
       throw new Error(
-        `§c${options.errors}§f/${options.total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`
+        `§c${options.errors}§f/${options.total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
       )
   }
 }
@@ -101,7 +102,7 @@ export class Structure extends Cuboid {
  * @param {string} command
  * @param {Vector3} vector1
  * @param {Vector3} vector2
- * @param {{errors: number, total: number}} options
+ * @param {{ errors: number; total: number }} options
  */
 async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, forceTp = false) {
   let result = 0

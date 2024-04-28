@@ -27,7 +27,6 @@ const nylium = new WorldEditTool({
 })
 
 /**
- *
  * @param {ItemStack | ContainerSlot} item
  * @param {Player} player
  * @param {string} blocksSet
@@ -53,7 +52,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
           player.dimension.getBlock(block.location)?.setPermutation(blocksSet.randomElement())
         },
         'nylium place',
-        0
+        0,
       )
     } else {
       player.fail(`Пустой набор блоков '§f${stringifyBlocksSetRef(lore.blocksSet)}'§c! Выберите другой.`)

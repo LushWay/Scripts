@@ -8,14 +8,10 @@ import { util } from 'lib/util.js'
 const LOCATION = { x: 0, y: -10, z: 0 }
 
 export class Enchantments {
-  /**
-   * @type {{[key: string]: { [key: number]: Enchantment }}}
-   */
+  /** @type {{ [key: string]: { [key: number]: Enchantment } }} */
   static custom = {}
 
-  /**
-   * @type {Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }>}
-   */
+  /** @type {Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }>} */
   // @ts-expect-error Type
   static typed = {}
 
@@ -47,7 +43,7 @@ function load() {
     const enchantments = item.getComponent('enchantments')
     if (!enchantments?.enchantments)
       return util.error(
-        new Error('Found unexpected enchantment type on slot ' + i + '. Enchantments: ' + util.inspect(enchantments))
+        new Error('Found unexpected enchantment type on slot ' + i + '. Enchantments: ' + util.inspect(enchantments)),
       )
 
     for (const enchantment of enchantments.enchantments) {

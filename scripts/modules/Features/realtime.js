@@ -31,5 +31,5 @@ system.runInterval(
   },
   'syncRealTime',
   // One minute
-  5
+  5,
 )

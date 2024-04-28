@@ -1,6 +1,6 @@
 /**
- * It takes the benchmark results and sorts them by average time, then it prints them out in a nice
- * format
+ * It takes the benchmark results and sorts them by average time, then it prints them out in a nice format
+ *
  * @returns A string.
  */
 
@@ -34,10 +34,7 @@ const colors = [
   [0.65, '§6'],
   [0.8, '§c'],
 ]
-/**
- *
- * @param {string} key
- */
+/** @param {string} key */
 
 export function getPath(key) {
   return `\n${TIMERS_PATHES[key]}`.replace(/\n/g, '\n§3| §r')

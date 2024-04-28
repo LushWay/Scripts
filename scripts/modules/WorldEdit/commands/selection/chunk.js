@@ -3,8 +3,11 @@ import { WorldEdit } from '../../lib/WorldEdit.js'
 
 /**
  * Gets the cuboid positions of a entitys chunk
- * @param {Entity} entity entity to check
- * @example getChunkCuboidPositions(Entity);
+ *
+ * @example
+ *   getChunkCuboidPositions(Entity)
+ *
+ * @param {Entity} entity Entity to check
  */
 function getChunkCuboidPositions(entity) {
   const chunk = {
@@ -32,7 +35,7 @@ new Command({
   ctx.reply(
     `§b►§3Выделенна зона: §5Позиция 1§3: ${Vector.string(chunkBorder.pos1, true)}, §dПозиция 2§3: ${Vector.string(
       chunkBorder.pos2,
-      true
-    )}`
+      true,
+    )}`,
   )
 })

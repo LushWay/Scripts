@@ -10,23 +10,24 @@ import { StoneQuarry } from '../Places/StoneQuarry/StoneQuarry'
 export class Furnacer {
   /**
    * List of all Furnacers npc
+   *
    * @type {Furnacer[]}
    */
   static npcs = []
 
-  /**
-   * Item representing key for using furnace
-   */
+  /** Item representing key for using furnace */
   keyItem = new ItemStack(MinecraftItemTypes.TripwireHook).setInfo('§6Ключ от печки', '§7Ключ от печки в технограде')
 
   /**
-   // TODO Add multiple key levels
+   * // TODO Add multiple key levels
+   *
    * @type {ItemStack[]}
    */
   keyItemLevels = []
 
   /**
    * Creates new Furnaceer npc store
+   *
    * @param {object} options - Options
    * @param {Omit<import('lib/EditableNpc.js').EditableNpcProps, 'onInteract'>} options.npc
    * @param {string[]} options.furnaceTypeIds - Type ids of the furnace blocks
@@ -49,7 +50,7 @@ export class Furnacer {
           status: 'notUsed',
           code: (Date.now() - 1_700_000_000_000).toString(32).toUpperCase(),
           lastPlayerId: player.id,
-        })
+        }),
       )
       return item
     }, new MoneyCost(5))
@@ -93,7 +94,7 @@ actionGuard((player, region, ctx) => {
       } else {
         const remaining = util.ms.remaining(furnace.expires - Date.now())
         return notAllowed(
-          `Эта печка уже занята. Печка освободится через §f${remaining.value} §c${remaining.type}, ключ: §f${furnace.code}`
+          `Эта печка уже занята. Печка освободится через §f${remaining.value} §c${remaining.type}, ключ: §f${furnace.code}`,
         )
       }
     }
@@ -107,7 +108,7 @@ actionGuard((player, region, ctx) => {
       }
       player.success('Ключ теперь привязан к этой печке! Не забудьте забрать из нее ресурсы через час!')
       ctx.event.itemStack?.setLore(
-        FurnaceKeyItem.stringifyLore({ ...lore, status: 'inUse', location: Vector.string(ctx.event.block.location) })
+        FurnaceKeyItem.stringifyLore({ ...lore, status: 'inUse', location: Vector.string(ctx.event.block.location) }),
       )
       player.mainhand().setItem(ctx.event.itemStack)
     })
@@ -129,7 +130,7 @@ system.runInterval(
         const player = players.find(e => e.id === furnace.lastPlayerId)
         if (player) {
           player.warn(
-            `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`
+            `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`,
           )
           furnace.warnedAboutExpire = 1
         }
@@ -139,18 +140,21 @@ system.runInterval(
     }
   },
   'FurnaceKey.db expired entries cleanup',
-  TicksPerSecond * 5
+  TicksPerSecond * 5,
 )
 
 class FurnaceKeyItem {
   static db = new DynamicPropertyDB('furnaceKeys', {
     /**
-     * @type {Record<string, {
-     *   expires: number;
-     *   code: string;
-     *   lastPlayerId: string
-     *   warnedAboutExpire?: 1
-     * }>}
+     * @type {Record<
+     *   string,
+     *   {
+     *     expires: number
+     *     code: string
+     *     lastPlayerId: string
+     *     warnedAboutExpire?: 1
+     *   }
+     * >}
      */
     type: {},
   }).proxy()
@@ -171,7 +175,7 @@ class FurnaceKeyItem {
   /**
    * @typedef {{
    *   code: string
-   *   status: keyof typeof FurnaceKeyItem['status']
+   *   status: keyof (typeof FurnaceKeyItem)['status']
    *   location?: string
    *   lastPlayerId?: string
    *   lastPlayerName?: string
@@ -179,8 +183,9 @@ class FurnaceKeyItem {
    */
 
   /**
-   * Stringifies info into an array of strings that represent information about a key,
-   * including its code, location, and status.
+   * Stringifies info into an array of strings that represent information about a key, including its code, location, and
+   * status.
+   *
    * @param {FurnaceKeyInfo} key - Key info
    */
   static stringifyLore(key) {
@@ -197,12 +202,13 @@ class FurnaceKeyItem {
 
   /**
    * Parses provided item lore into key object
+   *
    * @param {string[]} lore - Lore to parse
    * @returns {FurnaceKeyInfo | false} - False if lore is invalid and key object otherwise
    */
   static parseLore(lore) {
     let code = ''
-    /** @type {undefined | keyof typeof FurnaceKeyItem['status']} */
+    /** @type {undefined | keyof (typeof FurnaceKeyItem)['status']} */
     let status
     let location
     let lastPlayerName

@@ -1,7 +1,7 @@
 /**
- * Compares the similarity between two strings using an n-gram comparison method.
- * The grams default to length 2.
- * Code by {@link https://stackoverflow.com/a/62216738/23560013 MgSam}
+ * Compares the similarity between two strings using an n-gram comparison method. The grams default to length 2. Code by
+ * {@link https://stackoverflow.com/a/62216738/23560013 MgSam}
+ *
  * @param {string} str1 The first string to compare.
  * @param {string} str2 The second string to compare.
  * @param {number} gramSize The size of the grams. Defaults to length 2.
@@ -45,15 +45,15 @@ export function stringSimilarity(str1, str2, gramSize = 2) {
 }
 
 /**
- * It takes a string and an array of strings, and returns an array of arrays, where each sub-array
- * contains a string from the array and the Levenshtein distance between that string and the search
- * string
+ * It takes a string and an array of strings, and returns an array of arrays, where each sub-array contains a string
+ * from the array and the Levenshtein distance between that string and the search string
+ *
  * @param {string} search - The string you're searching for
- * @param {string[]} array - an array of strings
+ * @param {string[]} array - An array of strings
  * @returns {[string, number][]} An array of arrays. Each sub-array contains the element and the distance.
  */
 export function inaccurateSearch(search, array) {
   return array
-    .map(/** @type {(v: string,) => [string, number]} */ element => [element, stringSimilarity(search, element)])
+    .map(/** @type {(v: string) => [string, number]} */ element => [element, stringSimilarity(search, element)])
     .sort((a, b) => b[1] - a[1])
 }

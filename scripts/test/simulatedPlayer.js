@@ -165,7 +165,6 @@ GameTest.registerAsync('s', 'm', async test => {
   .tag('sim')
 
 /**
- *
  * @param {number} max
  * @param {number} min
  * @param {boolean} msg

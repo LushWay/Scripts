@@ -1,13 +1,9 @@
 import { Player, world } from '@minecraft/server'
 
-/**
- * @param {Player | string} player
- */
+/** @param {Player | string} player */
 const id = player => (player instanceof Player ? player.id : player)
 
-/**
- * @type {Pick<Map<string, unknown>, 'has' | 'delete'>[]}
- */
+/** @type {Pick<Map<string, unknown>, 'has' | 'delete'>[]} */
 const removePlayerFromMapsOnLeave = []
 
 /**
@@ -17,6 +13,7 @@ const removePlayerFromMapsOnLeave = []
 export class WeakPlayerMap extends Map {
   /**
    * Creates new WeakPlayerMap
+   *
    * @param {object} options - Options
    * @param {boolean} options.removeOnLeave - Whenether to remove player from map when it leavs
    */
@@ -26,9 +23,7 @@ export class WeakPlayerMap extends Map {
     if (options.removeOnLeave) removePlayerFromMapsOnLeave.push(this)
   }
 
-  /**
-   * @param {Player | string} player
-   */
+  /** @param {Player | string} player */
   get(player) {
     return super.get(id(player))
   }
@@ -42,28 +37,24 @@ export class WeakPlayerMap extends Map {
     return this
   }
 
-  /**
-   * @param {Player | string} player
-   */
+  /** @param {Player | string} player */
   has(player) {
     return super.has(id(player))
   }
 
-  /**
-   * @param {Player | string} player
-   */
+  /** @param {Player | string} player */
   delete(player) {
     return super.delete(id(player))
   }
 }
 
 /**
- * The main difference between WeakPlayerMap and WeakOnlinePlayer map is that
- * WeakOnlinePlayerMap uses Player as key, so you can iterate throught them.
- * The downtake for this is that map will always remove references when player
- * leaves from world.
+ * The main difference between WeakPlayerMap and WeakOnlinePlayer map is that WeakOnlinePlayerMap uses Player as key, so
+ * you can iterate throught them. The downtake for this is that map will always remove references when player leaves
+ * from world.
+ *
  * @template T
- * @extends {Map<string, { value: T, player: Player }>}
+ * @extends {Map<string, { value: T; player: Player }>}
  */
 export class WeakOnlinePlayerMap extends Map {
   constructor() {
@@ -71,16 +62,14 @@ export class WeakOnlinePlayerMap extends Map {
     removePlayerFromMapsOnLeave.push(this)
   }
 
-  /**
-   * @param {Player | string} player
-   */
+  /** @param {Player | string} player */
   get(player) {
     return super.get(id(player))
   }
 
   /**
    * @param {Player | string} key
-   * @param {T | { value: T, player: Player }} value
+   * @param {T | { value: T; player: Player }} value
    */
   set(key, value) {
     if (!(typeof value === 'object' && value && 'value' in value)) {
@@ -96,16 +85,12 @@ export class WeakOnlinePlayerMap extends Map {
     return super.set(id(key), value)
   }
 
-  /**
-   * @param {Player | string} player
-   */
+  /** @param {Player | string} player */
   has(player) {
     return super.has(id(player))
   }
 
-  /**
-   * @param {Player | string} player
-   */
+  /** @param {Player | string} player */
   delete(player) {
     return super.delete(id(player))
   }

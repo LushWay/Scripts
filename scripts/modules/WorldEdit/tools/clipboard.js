@@ -39,7 +39,7 @@ const clipboard = new WorldEditTool({
       player.onScreenDisplay.setActionBar(
         `Используйте предмет чтобы\n${
           player.isSneaking ? '<Отменить последнее действие>' : '<Вставить скопированную область>'
-        }`
+        }`,
       )
     } else {
       player.onScreenDisplay.setActionBar('§cВы ничего не копировали!')

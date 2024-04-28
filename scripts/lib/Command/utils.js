@@ -8,7 +8,6 @@ import { LiteralArgumentType, LocationArgumentType } from './ArgumentTypes.js'
 import { CommandContext } from './Context.js'
 
 /**
- *
  * @param {string} message
  * @param {number} prefixSize
  * @returns
@@ -41,7 +40,8 @@ export function parseArguments(message) {
 
 /**
  * Sends a command not found message to a player
- * @param {Player} player  player to send message to
+ *
+ * @param {Player} player Player to send message to
  * @param {string} command
  * @returns {void}
  */
@@ -65,7 +65,8 @@ export function commandNotFound(player, command) {
 
 /**
  * Sends a command not found message to a player
- * @param {Player} player  player to send message to
+ *
+ * @param {Player} player Player to send message to
  * @param {string} command
  * @returns {void}
  */
@@ -105,7 +106,8 @@ function suggestCommand(player, command) {
 
 /**
  * Sends a command not found message to a player
- * @param {Player} player  player to send message to
+ *
+ * @param {Player} player Player to send message to
  * @param {import('./index.js').Command} command
  * @returns {void}
  */
@@ -117,16 +119,17 @@ export function commandNoPermissions(player, command) {
   player.fail(
     command.sys.meta.invaildPermission
       ? command.sys.meta.invaildPermission
-      : `§cУ вас нет разрешения для использования команды §f${command.sys.meta.name}${additional}\n§cСписок всех доступных вам команд: §f.help`
+      : `§cУ вас нет разрешения для использования команды §f${command.sys.meta.name}${additional}\n§cСписок всех доступных вам команд: §f.help`,
   )
 }
 
 /**
  * Sends a syntax failure message to player
- * @param {Player} player  undefined
- * @param {import('./index.js').Command} command  undefined
- * @param {string[]} args  undefined
- * @param {number} i  undefined
+ *
+ * @param {Player} player Undefined
+ * @param {import('./index.js').Command} command Undefined
+ * @param {string[]} args Undefined
+ * @param {number} i Undefined
  * @returns {void}
  */
 export function commandSyntaxFail(player, command, args, i) {
@@ -149,10 +152,13 @@ export function commandSyntaxFail(player, command, args, i) {
 
 /**
  * Returns a location of the inputed aguments
- * @example parseLocationAugs(["~1", "3", "^7"], { location: [1,2,3] , viewVector: [1,2,3] })
+ *
+ * @example
+ *   parseLocationAugs(['~1', '3', '^7'], { location: [1, 2, 3], viewVector: [1, 2, 3] })
+ *
  * @param {[x: string, y: string, z: string]} a0
  * @param {{ location: Vector3; getViewDirection(): Vector3 }} data
- * @returns {{x: number, y: number, z: number} | null}
+ * @returns {{ x: number; y: number; z: number } | null}
  */
 export function parseLocationArguments([x, y, z], data) {
   const { location } = data
@@ -169,16 +175,17 @@ export function parseLocationArguments([x, y, z], data) {
     return arg.includes('~')
       ? a[index] + locations[index]
       : arg.includes('^')
-      ? a[index] + viewVectors[index]
-      : a[index]
+        ? a[index] + viewVectors[index]
+        : a[index]
   })
   return { x: b[0], y: b[1], z: b[2] }
 }
 
 /**
  * Sends a callback back to the command
- * @param {string[]} cmdArgs the args that the command used
- * @param {import('./index.js').Command[]} args args to use
+ *
+ * @param {string[]} cmdArgs The args that the command used
+ * @param {import('./index.js').Command[]} args Args to use
  * @param {ChatSendAfterEvent} event
  * @param {import('./index.js').Command} baseCommand
  * @param {string} rawInput
@@ -191,7 +198,7 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
     if (arg.sys.type.name.endsWith('*')) continue
     if (arg.sys.type instanceof LocationArgumentType) {
       argsToReturn.push(
-        parseLocationArguments([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender) ?? event.sender.location
+        parseLocationArguments([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender) ?? event.sender.location,
       )
       continue
     }
@@ -208,11 +215,11 @@ export function sendCallback(cmdArgs, args, event, baseCommand, rawInput) {
       await lastArg.sys.callback?.(
         new CommandContext(event, cmdArgs, baseCommand, rawInput),
         // @ts-expect-error Typescript is bad at understanding generics
-        ...argsToReturn
+        ...argsToReturn,
       )
     } catch (e) {
       event.sender.warn(
-        'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.'
+        'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.',
       )
       util.error(e)
     }

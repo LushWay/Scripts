@@ -7,13 +7,9 @@ import { isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
 class AnarchyBuilder extends DefaultPlaceWithInventory {
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   learningRTP(player) {}
-  /**
-   * @type {InventoryTypeName}
-   */
+  /** @type {InventoryTypeName} */
   inventoryName = 'anarchy'
   centerLocation = new EditableLocation('anarchy_center').safe
   portalLocation = new EditableLocation('anarchy_spawn_portal').safe
@@ -47,7 +43,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
           if (player.database.inv === this.inventoryName) {
             return player.fail(
-              '§cВы уже находитесь на анархии! Если это не так, используйте §f.anarchy clearpos §cчтобы очистить позицию на анархии и §f.spawn§c для перемещения на спавн.'
+              '§cВы уже находитесь на анархии! Если это не так, используйте §f.anarchy clearpos §cчтобы очистить позицию на анархии и §f.spawn§c для перемещения на спавн.',
             )
           }
 
@@ -65,7 +61,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
           SURVIVAL_SIDEBAR.show(player)
           title()
-        }
+        },
       )
 
       // TODO Support proper rtp
@@ -79,16 +75,14 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           .executes(ctx => {
             delete ctx.sender.database.survival.anarchy
             ctx.sender.success(
-              '§fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.'
+              '§fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.',
             )
           })
       }
     })
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   loadInventory(player) {
     super.loadInventory(player, () => {
       if (this.inventoryStore.has(player.id)) {

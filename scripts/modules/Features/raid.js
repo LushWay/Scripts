@@ -62,9 +62,7 @@ system.runInterval(
     }
   },
   'raid notify',
-  20
+  20,
 )
-/**
- * @type {Record<string, number>}
- */
+/** @type {Record<string, number>} */
 const RAID_NOTIFY = {}

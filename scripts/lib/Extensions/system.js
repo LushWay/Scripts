@@ -2,9 +2,7 @@ import { System, world } from '@minecraft/server'
 import { util } from '../util.js'
 import { OverTakes } from './OverTakes.js'
 
-/**
- * @type {Record<string, string>}
- */
+/** @type {Record<string, string>} */
 export const TIMERS_PATHES = {}
 
 /**
@@ -48,7 +46,7 @@ OverTakes(System.prototype, {
       function playersInterval() {
         for (const player of world.getAllPlayers()) player && callback(player)
       },
-      ...args
+      ...args,
     )
   },
   delay(fn) {

@@ -3,9 +3,7 @@ import { EventSignal } from 'lib.js'
 import { util } from 'lib/util.js'
 import { PLAYER_DB } from './Database/Player.js'
 
-/**
- * The roles that are in this server
- */
+/** The roles that are in this server */
 export const ROLES = {
   creator: '§aРуководство',
   curator: '§6Куратор',
@@ -44,10 +42,15 @@ export const WHO_CAN_CHANGE = ['creator', 'curator', 'techAdmin', 'chefAdmin', '
 
 /**
  * Checks if player has permissions for performing role actions. (e.g. if player role is above or equal)
+ *
+ * @example
+ *   is(player.id, 'admin') // Player is admin, grandAdmin or any role above
+ *
+ * @example
+ *   is(player.id, 'grandBuilder') // Player is grandBuilder, chefAdmin, techAdmin or any role above
+ *
  * @param {string} playerID ID of the player to get role from
  * @param {Role} role Role to check
- * @example is(player.id, 'admin') // Player is admin, grandAdmin or any role above
- * @example is(player.id, 'grandBuilder') // Player is grandBuilder, chefAdmin, techAdmin or any role above
  */
 export function is(playerID, role) {
   if (!PERMISSIONS[role].length) return true
@@ -56,9 +59,12 @@ export function is(playerID, role) {
 
 /**
  * Gets the role of this player
- * @param  {Player | string} playerID Player or his id to get role from
+ *
+ * @example
+ *   getRole(player.id)
+ *
+ * @param {Player | string} playerID Player or his id to get role from
  * @returns {Role} Player role
- * @example getRole(player.id)
  */
 export function getRole(playerID) {
   if (playerID instanceof Player) playerID = playerID.id
@@ -71,15 +77,18 @@ export function getRole(playerID) {
 
 /**
  * Gets displayable the role of this player
- * @param  {Player | string} playerID - Player or his id to get role from
+ *
+ * @example
+ *   getDisplayRole(player.id, { name: true }) // §aРуководство XilLeR228
+ *
+ * @param {Player | string} playerID - Player or his id to get role from
  * @param {object} [o] - Options
- * @param {boolean} [o.role=true] - Whenther to include role or not
- * @param {boolean} [o.name=true] - Whenether to include player name or not
- * @param {string} [o.noName='Unknown'] - Name to display if no name was found
- * @param {string} [o.nameColor='§r§f'] - String used between role and name
+ * @param {boolean} [o.role=true] - Whenther to include role or not. Default is `true`
+ * @param {boolean} [o.name=true] - Whenether to include player name or not. Default is `true`
+ * @param {string} [o.noName='Unknown'] - Name to display if no name was found. Default is `'Unknown'`
+ * @param {string} [o.nameColor='§r§f'] - String used between role and name. Default is `'§r§f'`
  * @param {boolean} [o.clearColorAfter] - Whenether to add §r at the end of the string or not
  * @param {boolean} [o.nameSpacing] - Add spacing after role. Defaults to !!name
- * @example getDisplayRole(player.id, { name: true }) // §aРуководство XilLeR228
  */
 export function getRoleAndName(
   playerID,
@@ -90,7 +99,7 @@ export function getRoleAndName(
     noName = 'Unknown',
     nameColor = '§r§f',
     clearColorAfter = true,
-  } = {}
+  } = {},
 ) {
   let display = ''
 
@@ -119,7 +128,10 @@ export function getRoleAndName(
 
 /**
  * Sets the role of this player
- * @example setRole(player.id, "admin")
+ *
+ * @example
+ *   setRole(player.id, 'admin')
+ *
  * @param {Player | string} player
  * @param {Role} role
  * @returns {void}
@@ -166,7 +178,7 @@ system.afterEvents.scriptEventReceive.subscribe(event => {
       console.warn(
         `Allowed roles:\n${Object.entries(ROLES)
           .map(e => e[0] + ': ' + e[1])
-          .join('\n')}`
+          .join('\n')}`,
       )
       return
     }

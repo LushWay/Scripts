@@ -18,19 +18,15 @@ new Command({
   regionForm(ctx.sender)
 })
 
-/**
- * @typedef {CubeRegion | RadiusRegion} AnyRegion
- */
+/** @typedef {CubeRegion | RadiusRegion} AnyRegion */
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function regionForm(player) {
   const reg = (/** @type {Parameters<typeof regionList>[1]} */ region) => () => regionList(player, region)
 
   const form = new ActionForm(
     'Управление регионами',
-    '§7Чтобы создать регион, перейдите в список определенных регионов'
+    '§7Чтобы создать регион, перейдите в список определенных регионов',
   )
 
   const currentRegion = Region.locationInRegion(player.location, player.dimension.type)
@@ -40,7 +36,7 @@ function regionForm(player) {
       'Регион на ' + Vector.string(Vector.floor(currentRegion.center), true) + '§f\n' + currentRegion.name,
       () => {
         editRegion(player, currentRegion, () => regionForm(player))
-      }
+      },
     )
   }
 
@@ -53,7 +49,7 @@ function regionForm(player) {
 
 /**
  * @param {Player} player
- * @param {typeof RadiusRegion } RegionType
+ * @param {typeof RadiusRegion} RegionType
  */
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function regionList(player, RegionType, back = () => regionForm(player)) {
@@ -76,7 +72,7 @@ function regionList(player, RegionType, back = () => regionForm(player)) {
             radius,
             dimensionId: player.dimension.type,
           }),
-          () => regionList(player, RegionType, back)
+          () => regionList(player, RegionType, back),
         )
       })
   })
@@ -87,9 +83,7 @@ function regionList(player, RegionType, back = () => regionForm(player)) {
   form.show(player)
 }
 
-/**
- * @type {WordPluralForms}
- */
+/** @type {WordPluralForms} */
 const pluralForms = ['региона', 'регион', 'в регионе']
 
 /**
@@ -107,17 +101,17 @@ function editRegion(player, region, back) {
         isOwner: true,
         back: selfback,
         pluralForms,
-      })
+      }),
     )
     .addButton('Разрешения', () =>
       editRegionPermissions(player, region, {
         pluralForms,
         back: selfback,
         extendedEditPermissions: true,
-      })
+      }),
     )
     .addButton('§cУдалить регион', () =>
-      prompt(player, '§cТочно удалить регион?', '§cДА', () => delete REGION_DB[region.key], '§aНе удалять', selfback)
+      prompt(player, '§cТочно удалить регион?', '§cДА', () => delete REGION_DB[region.key], '§aНе удалять', selfback),
     )
     .show(player)
 }
@@ -146,15 +140,26 @@ function parseLocationFromForm(ctx, location, player) {
  */
 
 export function editRegionPermissions(player, region, { pluralForms, back, extendedEditPermissions = false }) {
-  /** @type {ModalForm<(ctx: FormCallback<any>, toggles: boolean, containers: boolean, pvp?: boolean, radius?: number, center?: string) => void>} */
+  /**
+   * @type {ModalForm<
+   *   (
+   *     ctx: FormCallback<any>,
+   *     toggles: boolean,
+   *     containers: boolean,
+   *     pvp?: boolean,
+   *     radius?: number,
+   *     center?: string,
+   *   ) => void
+   * >}
+   */
   let form = new ModalForm('Разрешения ' + pluralForms[0])
     .addToggle(
       `Двери и переключатели\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери и переключатели.`,
-      region.permissions.doorsAndSwitches
+      region.permissions.doorsAndSwitches,
     )
     .addToggle(
       `Контейнеры\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки открывать контейнеры (сундуки, шалкеры и тд)`,
-      region.permissions.openContainers
+      region.permissions.openContainers,
     )
 
   if (extendedEditPermissions) {
@@ -189,11 +194,11 @@ export function editRegionPermissions(player, region, { pluralForms, back, exten
 export function manageRegionMembers(
   player,
   region,
-  { back, member = region.getMemberRole(player.id), isOwner = member === 'owner', pluralForms }
+  { back, member = region.getMemberRole(player.id), isOwner = member === 'owner', pluralForms },
 ) {
   const form = new ActionForm(
     'Участники ' + pluralForms[0],
-    isOwner ? 'Для управления участником нажмите на кнопку с его ником' : 'Вы можете только посмотреть их'
+    isOwner ? 'Для управления участником нажмите на кнопку с его ником' : 'Вы можете только посмотреть их',
   )
 
   const selfback = () =>
@@ -233,7 +238,7 @@ export function manageRegionMembers(
           () => {
             region.permissions.owners = region.permissions.owners.sort(a => (a === memberId ? 1 : -1))
             applyAction()
-          }
+          },
         )
 
       form

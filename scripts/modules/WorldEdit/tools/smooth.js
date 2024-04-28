@@ -8,14 +8,11 @@ import { BaseBrushTool } from '../lib/BaseBrushTool'
 
 // TODO Cache invalidation
 
-/**
- * @extends {BaseBrushTool<{smoothLevel: number}>}
- */
+/** @extends {BaseBrushTool<{ smoothLevel: number }>} */
 class SmoothTool extends BaseBrushTool {
   /**
-   *
    * @param {Player} player
-   * @param {this["clearLoreFormat"]} lore
+   * @param {this['clearLoreFormat']} lore
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {
@@ -51,7 +48,7 @@ const smoother = new SmoothTool({
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
           noneText: 'Любой',
-        }
+        },
       )
 
       .show(player, (ctx, size, smoothLevel, replaceBlocksSet) => {
@@ -67,7 +64,7 @@ const smoother = new SmoothTool({
             lore.replaceBlocksSet[0] ? 'Отредактирована' : 'Создана'
           } сглаживатель размером ${size} и силой ${smoothLevel}${
             replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
-          } и радиусом ${size}`
+          } и радиусом ${size}`,
         )
       })
   },
@@ -92,7 +89,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   // Create a copy of the voxel data
   const voxelDataCopy = getBlocksAreasData(baseBlock, radius)
 
-  /**@type {BlockCacheMatrix<Pick<BlockCache, 'location' | 'permutation'>>} */
+  /** @type {BlockCacheMatrix<Pick<BlockCache, 'location' | 'permutation'>>} */
   const setBlocks = {}
 
   const sizeX = voxelDataCopy.length
@@ -149,7 +146,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
     .flat(2)
 
   player.info(
-    prefix + `Будет заполнено §6${toFill.length} §f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`
+    prefix + `Будет заполнено §6${toFill.length} §f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
   )
 
   operations = 0
@@ -170,20 +167,18 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
 
 /**
  * @typedef {{
- *  permutation: BlockPermutation | undefined;
- *  location: Vector3;
- *  void: boolean;
- *}} BlockCache
+ *   permutation: BlockPermutation | undefined
+ *   location: Vector3
+ *   void: boolean
+ * }} BlockCache
  */
 
 /**
- * @template {object} [MatrixValue=BlockCache]
+ * @template {object} [MatrixValue=BlockCache] Default is `BlockCache`
  * @typedef {Record<string, Record<string, Record<string, MatrixValue>>>} BlockCacheMatrix
  */
 
-/**
- * @type {BlockCacheMatrix}
- */
+/** @type {BlockCacheMatrix} */
 const BLOCK_CACHE = {}
 
 /**

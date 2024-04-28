@@ -10,9 +10,7 @@ export const BATTLE_ROYAL_EVENTS = {
   death: new EventSignal(),
 }
 
-/**
- * @type {Record<string, boolean>}
- */
+/** @type {Record<string, boolean>} */
 export const BR_QUENE = {}
 
 export const BR_CONFIG = Settings.world('BattleRoyal', {

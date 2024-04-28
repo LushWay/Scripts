@@ -12,19 +12,16 @@ declare global {
 
   interface Date {
     /**
-     * Converts date to format
-     * DD-MM-YYYY HH:MM:SS
+     * Converts date to format DD-MM-YYYY HH:MM:SS
+     *
      * @param seconds Adds :SS to format
      */
     format(seconds?: boolean): string
-    /**
-     * Converts date to format
-     * DD-MM-YYYY
-     */
+    /** Converts date to format DD-MM-YYYY */
     toYYYYMMDD(): string
     /**
-     * Converts date to format
-     * HH:MM
+     * Converts date to format HH:MM
+     *
      * @param seconds Adds :SS to format
      */
     toHHMM(seconds?: boolean): string
@@ -46,6 +43,7 @@ declare global {
   interface ArrayConstructor {
     /**
      * Checks if two arrays are the same
+     *
      * @param one
      * @param two
      */
@@ -59,6 +57,7 @@ declare global {
   interface Array<T> {
     /**
      * Returns random array element. Alias to
+     *
      * ```js
      * array[Math.randomInt(0, array.length - 1)]
      * ```
@@ -98,9 +97,12 @@ declare global {
   }
 
   /**
-   * @remarks нет кого/чего, вижу кого/что, где
-   * @remarks базы, базу, на базе
-   * @remarks региона, региону, в регионе
+   * @remarks
+   *   Нет кого/чего, вижу кого/что, где
+   * @remarks
+   *   Базы, базу, на базе
+   * @remarks
+   *   Региона, региону, в регионе
    */
   type WordPluralForms = [one: string, more: string, aa: string]
 
@@ -112,12 +114,12 @@ declare global {
     T extends Function | boolean | number | string | null | undefined
       ? T
       : T extends Array<infer U>
-      ? ReadonlyArray<Immutable<U>>
-      : T extends Map<infer K, infer V>
-      ? ReadonlyMap<Immutable<K>, Immutable<V>>
-      : T extends Set<infer S>
-      ? ReadonlySet<Immutable<S>>
-      : { readonly [P in keyof T]: Immutable<T[P]> }
+        ? ReadonlyArray<Immutable<U>>
+        : T extends Map<infer K, infer V>
+          ? ReadonlyMap<Immutable<K>, Immutable<V>>
+          : T extends Set<infer S>
+            ? ReadonlySet<Immutable<S>>
+            : { readonly [P in keyof T]: Immutable<T[P]> }
 }
 
 declare module '@minecraft/server' {
@@ -151,9 +153,7 @@ declare module '@minecraft/server' {
   type ScoreName = 'money' | 'leafs' | 'pvp' | 'joinTimes' | StatScoreName
 
   interface Player {
-    /**
-     * Whenether player is simulated or not
-     */
+    /** Whenether player is simulated or not */
     isSimulated(): this is SimulatedPlayer
 
     scores: Record<ScoreName, number>
@@ -161,40 +161,48 @@ declare module '@minecraft/server' {
 
     /**
      * Sends message prefixed with
+     *
      * ```js
      * '§4§l> §r§c'
      * ```
-     * and plays {@link SOUNDS}.fail
+     *
+     * And plays {@link SOUNDS}.fail
      *
      * Other message types: warn success info
      */
     fail(message: string): void
     /**
      * Sends message prefixed with
+     *
      * ```js
      * '§l§e⚠ §6'
      * ```
-     * and plays {@link SOUNDS}.fail
+     *
+     * And plays {@link SOUNDS}.fail
      *
      * Other message types: **fail success info**
      */
     warn(message: string): void
     /**
      * Sends message prefixed with
+     *
      * ```js
      * '§a§l> §r'
      * ```
-     * and plays {@link SOUNDS}.success
+     *
+     * And plays {@link SOUNDS}.success
      *
      * Other message types: **fail warn info**
      */
     success(message: string): void
     /**
      * Sends message prefixed with
+     *
      * ```js
      * '§b§l> §r§3'
      * ```
-     * and plays {@link SOUNDS}.action
+     *
+     * And plays {@link SOUNDS}.action
      *
      * Other message types: **fail warn success**
      */
@@ -202,25 +210,23 @@ declare module '@minecraft/server' {
   }
 
   interface HudTitleDisplayOptions {
-    /**
-     * Priority of the displayed information
-     */
+    /** Priority of the displayed information */
     priority?: number
   }
 
   interface ScreenDisplay {
-    /**
-     * Player attached to this screen display
-     */
+    /** Player attached to this screen display */
     player: Player
 
     /**
      * Sets player title
+     *
      * @param text Text to set
      */
     setHudTitle(text: string, options: TitleDisplayOptions & HudTitleDisplayOptions, prefix?: string, n?: number): void
     /**
      * Sets player sidebar
+     *
      * @param text Text to set
      * @param priority Priority of the displayed information
      */
@@ -228,6 +234,7 @@ declare module '@minecraft/server' {
 
     /**
      * Sets player tip
+     *
      * @param n Tip position
      * @param text Tip text
      * @param priority Priority of the displayed information
@@ -245,15 +252,11 @@ declare module '@minecraft/server' {
   }
 }
 
-/**
- * Describes types that can be narrowed
- */
+/** Describes types that can be narrowed */
 type Narrowable = string | number | bigint | boolean
 
 declare global {
-  /**
-   * Narrows type. Source: ts-toolbelt
-   */
+  /** Narrows type. Source: ts-toolbelt */
   type Narrow<T> =
     | (T extends [] ? [] : never)
     | (T extends Narrowable ? T : never)
@@ -266,26 +269,19 @@ declare global {
     interface Common {
       /**
        * - Amount of the item
+       *
        * @default 1
        */
       amount?: RandomCostMapType | number
-      /**
-       * - Cost of the item. Items with higher cost will be generated more often
-       */
+      /** - Cost of the item. Items with higher cost will be generated more often */
       chance: Percent
 
-      /**
-       * - Map in format { enchant: { level: percent } }
-       */
+      /** - Map in format { enchant: { level: percent } } */
       enchantments?: Partial<Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>>
-      /**
-       * - Damage of the item
-       */
+      /** - Damage of the item */
       damage?: RandomCostMapType
 
-      /**
-       * - Additional options for the item like canPlaceOn, canDestroy, nameTag etc
-       */
+      /** - Additional options for the item like canPlaceOn, canDestroy, nameTag etc */
       options?: Options
     }
 
@@ -299,23 +295,17 @@ declare global {
     }
 
     interface TypeIdInput {
-      /**
-       * - Stringified id of the item. May include namespace (e.g. "minecraft:").
-       */
+      /** - Stringified id of the item. May include namespace (e.g. "minecraft:"). */
       typeId: string
     }
 
     interface TypeInput {
-      /**
-       * - Item type name. Its key of MinecraftItemTypes.
-       */
+      /** - Item type name. Its key of MinecraftItemTypes. */
       type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>
     }
 
     interface ItemStackInput {
-      /**
-       * - Item stack. Will be cloned.
-       */
+      /** - Item stack. Will be cloned. */
       itemStack: ItemStack
     }
 

@@ -4,10 +4,13 @@ import { WorldEdit } from '../../lib/WorldEdit.js'
 export class SelectionManager {
   /**
    * Expands the selection area
-   * @param {number} amount ammount to expand selection in all directions
+   *
+   * @example
+   *   expand(11)
+   *
+   * @param {number} amount Ammount to expand selection in all directions
    * @param {WorldEdit} builder
    * @returns {void}
-   * @example expand(11);
    */
   static expand(builder, amount) {
     const dx = builder.pos2.x - builder.pos1.x
@@ -33,10 +36,13 @@ export class SelectionManager {
   }
   /**
    * Expands the selection verticly
-   * @param {number} amount ammount to expand selection in all directions
+   *
+   * @example
+   *   expandVert(11)
+   *
+   * @param {number} amount Ammount to expand selection in all directions
    * @param {WorldEdit} builder
    * @returns {void}
-   * @example expandVert(11);
    */
   static expandVert(builder, amount) {
     builder.pos2 = Vector.add(builder.pos2, new Vector(0, amount, 0))
@@ -56,8 +62,8 @@ expand.int('size').executes((ctx, size) => {
   SelectionManager.expand(we, size)
   ctx.reply(
     `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
-      we.pos1
-    )}\n§3по \n§f${Vector.string(we.pos2)}`
+      we.pos1,
+    )}\n§3по \n§f${Vector.string(we.pos2)}`,
   )
 })
 
@@ -73,7 +79,7 @@ expand
     SelectionManager.expandVert(we, size)
     ctx.reply(
       `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
-        we.pos1
-      )}\n§3по \n§f${Vector.string(we.pos2)}`
+        we.pos1,
+      )}\n§3по \n§f${Vector.string(we.pos2)}`,
     )
   })

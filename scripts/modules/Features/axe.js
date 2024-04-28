@@ -11,9 +11,7 @@ export class Axe {
     .filter(e => e[0].match(/log/i))
     .map(e => e[1])
 
-  /**
-   * @type {Region[]}
-   */
+  /** @type {Region[]} */
   static allowBreakInRegions = []
 }
 

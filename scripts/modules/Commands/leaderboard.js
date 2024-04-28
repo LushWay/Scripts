@@ -10,9 +10,7 @@ new Command({
   leaderboardMenu(ctx.sender)
 })
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function leaderboardMenu(player) {
   const form = new ActionForm('Таблицы лидеров')
   form.addButton('§3Добавить', BUTTON['+'], editLeaderboard)
@@ -26,15 +24,12 @@ function leaderboardMenu(player) {
   form.show(player)
 }
 
-/**
- * @param {Leaderboard} lb
- */
+/** @param {Leaderboard} lb */
 function info(lb) {
   return lb.data.displayName + '\n' + Vector.string(Vector.floor(lb.data.location))
 }
 
 /**
- *
  * @param {Player} player
  * @param {Leaderboard} [lb]
  * @param {Partial<import('lib.js').LeaderboardInfo>} data
@@ -53,9 +48,7 @@ function editLeaderboard(player, lb, data = lb?.data ?? {}) {
     editLeaderboard(player, lb, lb ? void 0 : data)
   }
 
-  /**
-   * @param {(keyof typeof data)[]} keys
-   */
+  /** @param {(keyof typeof data)[]} keys */
   function warn(...keys) {
     if (keys.find(k => typeof data[k] === 'undefined')) return ' §e(!)'
     return ''
@@ -68,7 +61,7 @@ function editLeaderboard(player, lb, data = lb?.data ?? {}) {
         .addDropdownFromObject(
           'Выбрать из списка',
           Object.fromEntries(world.scoreboard.getObjectives().map(e => [e.id, e.displayName])),
-          { defaultValue: data.displayName }
+          { defaultValue: data.displayName },
         )
         // .addTextField(
         //   'Отображаемое имя',
@@ -79,7 +72,7 @@ function editLeaderboard(player, lb, data = lb?.data ?? {}) {
           player,
           (
             ctx,
-            id
+            id,
 
             // displayName
           ) => {
@@ -92,7 +85,7 @@ function editLeaderboard(player, lb, data = lb?.data ?? {}) {
             // if (!data.displayName) displayName = scoreboard.displayName
             // if (displayName) data.displayName = displayName
             update()
-          }
+          },
         )
     })
     .addButton(action + 'позицию' + warn('location', 'dimension'), () => {

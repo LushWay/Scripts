@@ -18,20 +18,16 @@ new Command({
   tpMenu(ctx.sender)
 })
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function tpMenu(player) {
   const form = new ActionForm(
     'Выберите локацию',
-    'Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!'
+    'Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!',
   )
 
   const players = world.getAllPlayers().map(e => ({ player, location: e.location }))
 
-  /**
-   * @type {Record<string, ReturnType<typeof location>>}
-   */
+  /** @type {Record<string, ReturnType<typeof location>>} */
   const locations = {
     'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10', players),
     'Деревня исследователей': location(VillageOfExplorers, '-35 75 13661 0 20', players),
@@ -46,7 +42,7 @@ function tpMenu(player) {
     form.addButton(`${name} §7(${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
       if (player.database.inv !== 'anarchy' && !isBuilding(player)) {
         return player.fail(
-          'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.'
+          'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.',
         )
       }
       player.runCommand('tp ' + location)
@@ -58,9 +54,7 @@ function tpMenu(player) {
   return form.show(player)
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function tpToPlayer(player) {
   const form = new ActionForm('Телепорт к игроку...')
 
@@ -74,10 +68,9 @@ function tpToPlayer(player) {
 }
 
 /**
- *
  * @param {Pick<DefaultPlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>} place
  * @param {string} fallback
- * @param {{player: Player, location: Vector3}[]} players
+ * @param {{ player: Player; location: Vector3 }[]} players
  */
 function location(place, fallback, players) {
   const playersC = players.filter(e => place.safeArea.vectorInRegion(e.location)).length
@@ -96,14 +89,10 @@ function location(place, fallback, players) {
 
   return { location: fallback, players: playersC }
 }
-/**
- * @type {Set<string>}
- */
+/** @type {Set<string>} */
 const SENT = new Set()
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 export function tpMenuOnce(player) {
   if (!SENT.has(player.id)) {
     tpMenu(player).then(() =>
@@ -112,8 +101,8 @@ export function tpMenuOnce(player) {
           SENT.delete(player.id)
         },
         'tp menu sent reset',
-        40
-      )
+        40,
+      ),
     )
     SENT.add(player.id)
   }

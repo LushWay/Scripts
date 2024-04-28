@@ -9,7 +9,8 @@ export const util = {
   error: Object.assign(
     /**
      * Stringify and show error in console
-     * @param {{ message: string; stack?: string; name?: string } | string } error
+     *
+     * @param {{ message: string; stack?: string; name?: string } | string} error
      * @param {object} [options]
      * @param {number} [options.omitStackLines]
      * @param {string} [options.errorName] - Overrides error name
@@ -51,6 +52,7 @@ export const util = {
 
         /**
          * Parses stack
+         *
          * @param {number} omitLines
          * @param {string} [stack]
          * @returns {string}
@@ -91,9 +93,7 @@ export const util = {
           [/Module \[(.*)\] not found\. Native module error or file not found\./g, '§cNot found: §6$1', 'LoadError'],
         ],
 
-        /**
-         * @param {{ message?: string, name?: string }} error
-         */
+        /** @param {{ message?: string; name?: string }} error */
         get(error) {
           let message = error.message ?? ''
           for (const [find, replace, newname] of this.modifiers) {
@@ -105,20 +105,16 @@ export const util = {
           return message
         },
       },
-    }
+    },
   ),
 
-  /**
-   * @param {any} target
-   */
+  /** @param {any} target */
   stringify(target) {
     if (typeof target === 'string') return target
     return this.inspect(target)
   },
 
-  /**
-   * @param {any} target
-   */
+  /** @param {any} target */
   inspect(target, space = '  ', cw = '', funcCode = false, depth = 0) {
     const c = {
       function: {
@@ -141,9 +137,7 @@ export const util = {
 
     if (depth > 10 || typeof target !== 'object') return `${rep(target)}` || `${target}` || '{}'
 
-    /**
-     * @param {any} value
-     */
+    /** @param {any} value */
     function rep(value) {
       if (visited.has(value)) {
         // Circular structure detected
@@ -156,9 +150,7 @@ export const util = {
 
       switch (typeof value) {
         case 'function': {
-          /**
-           * @type {string}
-           */
+          /** @type {string} */
           let r = value.toString().replace(/[\n\r]/g, '')
 
           if (!funcCode) {
@@ -251,12 +243,12 @@ export const util = {
   },
 
   /**
-   * Runs given function safly. If it throws synhronous error it will be catched and returned as
-   * second element in the array
+   * Runs given function safly. If it throws synhronous error it will be catched and returned as second element in the
+   * array
+   *
    * @template {() => any} T
    * @param {T} fn
-   * @returns {[ result: ReturnType<T>, error: undefined ] |
-   *           [ result: undefined, error: unknown ] }
+   * @returns {[result: ReturnType<T>, error: undefined] | [result: undefined, error: unknown]}
    */
   run(fn) {
     try {
@@ -268,6 +260,7 @@ export const util = {
 
   /**
    * Runs the given callback safly. If it throws any error it will be handled
+   *
    * @param {() => void | Promise<void>} fn
    * @param {string} [subtype]
    */
@@ -280,12 +273,11 @@ export const util = {
     }
   },
 
-  /**
-   * @typedef {[string, string, string]} Plurals
-   */
+  /** @typedef {[string, string, string]} Plurals */
 
   /**
    * Gets plural form based on provided number
+   *
    * @param {number} n - Number
    * @param {Plurals} forms - Plurals forms in format `1 секунда 2 секунды 5 секунд`
    * @returns Plural form. Currently only Russian supported
@@ -297,17 +289,17 @@ export const util = {
     ]
   },
 
-  /**
-   * @typedef {'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'} Time
-   */
+  /** @typedef {'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'} Time */
 
   ms: {
     /**
      * Parses the remaining time in milliseconds into a more human-readable format
+     *
      * @param {number} ms - Milliseconds to parse
      * @param {object} [options]
      * @param {Time[]} [options.converters]
-     * @returns {{ value: string, type: string }} - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
+     * @returns {{ value: string; type: string }} - An object containing the parsed time and the type of time (e.g.
+     *   "days", "hours", etc.)
      */
     remaining(ms, { converters: converterTypes = ['sec', 'min', 'hour', 'day'] } = {}) {
       const converters = converterTypes.map(type => util.ms.converters[type]).sort((a, b) => b.time - a.time)
@@ -331,15 +323,14 @@ export const util = {
     },
     /**
      * Converts provided time to ms depending on type
+     *
      * @param {Time} type
      * @param {number} num
      */
     from(type, num) {
       return this.converters[type].time * num
     },
-    /**
-     * @type {Record<Time, {time: number, friction?: number, plurals: Plurals}>}
-     */
+    /** @type {Record<Time, { time: number; friction?: number; plurals: Plurals }>} */
     converters: {
       ms: {
         time: 1,
@@ -377,10 +368,7 @@ export const util = {
     },
   },
 
-  /**
-   *
-   * @param {number} c
-   */
+  /** @param {number} c */
   waitEach(c) {
     let count = 0
     return async () => {
@@ -395,6 +383,7 @@ export const util = {
   benchmark: Object.assign(
     /**
      * It returns a function that when called, returns the time it took to call the function and records result to const
+     *
      * @param {string} label - The name of the benchmark.
      * @returns {(label?: string) => number} A function that returns the time it took to run the function.
      */
@@ -412,14 +401,12 @@ export const util = {
     {
       /** @type {Record<string, Record<string, number>>} */
       results: {},
-    }
+    },
   ),
 
   strikeTest() {
     let start = Date.now()
-    /**
-     * @param {string} label
-     */
+    /** @param {string} label */
     return label => {
       const date = Date.now()
       console.log(label, '§e' + (date - start) + 'ms')
@@ -428,8 +415,8 @@ export const util = {
   },
 
   /**
-   * @param {string | symbol | number} str
    * @template {Record<string | symbol | number, any>} O
+   * @param {string | symbol | number} str
    * @param {O} obj
    * @returns {str is keyof O}
    */
@@ -448,11 +435,13 @@ export const util = {
 
   /**
    * Creates paginator object for array
+   *
    * @template T - Item type
    * @param {T[]} array - Array of items to display
    * @param {number} [perPage] - Items per page
    * @param {number} [startPage] - Page to start from
-   * @param {number} [minLength=perPage] - Minimal items count to paginate. If array has less then this count, array is returned
+   * @param {number} [minLength=perPage] - Minimal items count to paginate. If array has less then this count, array is
+   *   returned. Default is `perPage`
    */
   paginate(array, perPage = 10, startPage = 1, minLength = perPage) {
     if (array.length <= minLength) return array
@@ -471,13 +460,14 @@ export const util = {
 
   /**
    * Adds unread count badge to the string
+   *
    * @param {string} string
    * @param {number} number
    * @param {object} [options]
-   * @param {boolean} [options.showZero=false]
-   * @param {string} [options.color='§f']
-   * @param {boolean} [options.brackets=true]
-   * @param {string} [options.bracketColor=color]
+   * @param {boolean} [options.showZero=false] Default is `false`
+   * @param {string} [options.color='§f'] Default is `'§f'`
+   * @param {boolean} [options.brackets=true] Default is `true`
+   * @param {string} [options.bracketColor=color] Default is `color`
    */
   badge(string, number, { showZero = false, color = '§f', brackets = true, bracketColor = color } = {}) {
     if (!showZero && number === 0) return string
@@ -492,12 +482,20 @@ export const util = {
   },
 
   /**
-   * word-wrap <https://github.com/jonschlinkert/word-wrap>
-   * Released under the MIT License.
+   * Word-wrap [https://github.com/jonschlinkert/word-wrap](https://github.com/jonschlinkert/word-wrap) Released under
+   * the MIT License.
    *
    * @author Copyright (c) 2014-2023, Jon Schlinkert.
    * @param {string} string
-   * @param {{ width?: number, indent?: string, newline?: string, trim?: boolean, escape?: (s: string) => string, cut?: boolean, countColorCodes: boolean }} [options]
+   * @param {{
+   *   width?: number
+   *   indent?: string
+   *   newline?: string
+   *   trim?: boolean
+   *   escape?: (s: string) => string
+   *   cut?: boolean
+   *   countColorCodes: boolean
+   * }} [options]
    */
   wrap(string, { width = 50, indent = '', newline = '\n' + indent, escape, trim, cut, countColorCodes = false } = {}) {
     const char = countColorCodes ? '.' : '[^§.]'
@@ -533,6 +531,7 @@ export const util = {
 
   /**
    * Formats big number and adds . separator, e.g. 15000 -> 15.000
+   *
    * @param {number} n
    * @returns Formatted string
    */
@@ -542,6 +541,7 @@ export const util = {
 
   /**
    * Replaces each §<color> to its terminal eqiuvalent
+   *
    * @param {string} text
    */
   toTerminalColors(text) {
@@ -550,12 +550,8 @@ export const util = {
 
     return text.replace(/§(.)/g, '')
   },
-  /**
-   * @type {Record<string, string>}
-   */
+  /** @type {Record<string, string>} */
   terminalColors: TerminalColors,
 }
 
-/**
- * @typedef {ReturnType<util['paginate']>} Paginator
- */
+/** @typedef {ReturnType<util['paginate']>} Paginator */

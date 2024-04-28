@@ -41,7 +41,7 @@ const shovel = new WorldEditTool({
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
           noneText: 'Любой',
-        }
+        },
       )
       .show(player, (_, radius, height, zone, blocksSet, replaceBlocksSet) => {
         slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
@@ -54,7 +54,7 @@ const shovel = new WorldEditTool({
         slot.setLore(shovel.stringifyLore(lore))
 
         player.success(
-          `${lore.blocksSet ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`
+          `${lore.blocksSet ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
         )
       })
   },
@@ -78,7 +78,7 @@ const shovel = new WorldEditTool({
         lore.zone
       }\n§7блоки: §f${stringifyReplaceTargets(blocks.map(toReplaceTarget))}`,
       pos1,
-      pos2
+      pos2,
     )
 
     for (const loc of Vector.foreach(pos1, pos2)) {

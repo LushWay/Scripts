@@ -89,7 +89,7 @@ export class ChatBuilder {
         event.sender.tell(
           doHightlight
             ? `${getRoleAndName(event.sender, { name: false, nameSpacing: true })}§6§lЯ§r: §f${messageText}`
-            : message
+            : message,
         )
       } catch (error) {
         util.error(error)

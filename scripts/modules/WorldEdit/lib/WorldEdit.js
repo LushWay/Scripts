@@ -16,8 +16,8 @@ import { Cuboid } from './Cuboid.js'
 import { Structure } from './Structure.js'
 /**
  * @typedef {{
- *   pos1: Vector3;
- *   pos2: Vector3;
+ *   pos1: Vector3
+ *   pos2: Vector3
  * }} WeDB
  */
 
@@ -26,9 +26,7 @@ export class WorldEdit {
     /** @type {Record<string, WeDB | undefined>} */
     type: {},
   }).proxy()
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   static forPlayer(player) {
     if (player.id in this.instances) return this.instances[player.id]
     return new WorldEdit(player)
@@ -36,14 +34,10 @@ export class WorldEdit {
   /** @type {Record<string, WorldEdit>} */
   static instances = {}
 
-  /**
-   * @type {Cuboid | undefined}
-   */
+  /** @type {Cuboid | undefined} */
   selection
 
-  /**
-   * @type {Cuboid | undefined}
-   */
+  /** @type {Cuboid | undefined} */
   visualSelectionCuboid
 
   /** @type {WeDB} */
@@ -66,8 +60,8 @@ export class WorldEdit {
   }
 
   /**
-   * @param {1 | 2} pos
    * @private
+   * @param {1 | 2} pos
    */
   onPosChange(pos) {
     system.delay(() => {
@@ -87,29 +81,19 @@ export class WorldEdit {
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
   }
 
-  /**
-   * @type {Structure[]}
-   */
+  /** @type {Structure[]} */
   history = []
 
-  /**
-   * @type {Structure[]}
-   */
+  /** @type {Structure[]} */
   undos = []
 
-  /**
-   * @type {Structure | undefined}
-   */
+  /** @type {Structure | undefined} */
   currentCopy
 
-  /**
-   * @type {Player}
-   */
+  /** @type {Player} */
   player
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   constructor(player) {
     const id = player.id
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
@@ -127,10 +111,11 @@ export class WorldEdit {
 
   /**
    * Logs an error message and tells the error to the player
-   * @param {string} action - The `action` parameter represents the action that failed. It is a string that
-   * describes the action that was attempted but failed.
-   * @param {any} error - The `error` parameter is the error object or error message that occurred during the
-   * action. It can be either an Error object or a string representing the error message.
+   *
+   * @param {string} action - The `action` parameter represents the action that failed. It is a string that describes
+   *   the action that was attempted but failed.
+   * @param {any} error - The `error` parameter is the error object or error message that occurred during the action. It
+   *   can be either an Error object or a string representing the error message.
    */
   failedTo(action, error) {
     const text = util.error(error, { parseOnly: true })
@@ -148,6 +133,7 @@ export class WorldEdit {
 
   /**
    * Backups a location
+   *
    * @param {string} name - Name of the backup. Used by undo/redo
    * @param {Vector3} pos1 Position 1 of cuboid location
    * @param {Vector3} pos2 Position 2 of cuboid location
@@ -161,6 +147,7 @@ export class WorldEdit {
 
   /**
    * Loads specified amount of backups from history array
+   *
    * @private
    */
   loadFromArray(amount = 1, history = this.history) {
@@ -178,7 +165,7 @@ export class WorldEdit {
       }
 
       this.player.info(
-        `§3Успешно отменено §f${amount} §3${util.ngettext(amount, ['действие', 'действия', 'действий'])}!`
+        `§3Успешно отменено §f${amount} §3${util.ngettext(amount, ['действие', 'действия', 'действий'])}!`,
       )
     } catch (error) {
       this.failedTo('отменить', error)
@@ -187,6 +174,7 @@ export class WorldEdit {
 
   /**
    * Loads backup and removes it from history
+   *
    * @param {Structure[]} history
    * @param {Structure} backup
    */
@@ -195,7 +183,7 @@ export class WorldEdit {
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
       backup.pos1,
       backup.pos2,
-      this.undos
+      this.undos,
     )
 
     backup.load()
@@ -206,21 +194,21 @@ export class WorldEdit {
 
   /**
    * Undoes the latest history save
-   * @param {number} amount times you want to undo
+   *
+   * @param {number} amount Times you want to undo
    */
   undo(amount = 1) {
     this.loadFromArray(amount, this.history)
   }
   /**
    * Redoes the latest history save
-   * @param {number} amount times you want to redo
+   *
+   * @param {number} amount Times you want to redo
    */
   redo(amount = 1) {
     this.loadFromArray(amount, this.undos)
   }
-  /**
-   * Copies from the current selected positions
-   */
+  /** Copies from the current selected positions */
   async copy() {
     try {
       const selection = await this.ensureSelection()
@@ -231,8 +219,8 @@ export class WorldEdit {
       this.player.info(
         `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
           this.pos2,
-          true
-        )}`
+          true,
+        )}`,
       )
     } catch (error) {
       this.failedTo('скопировать', error)
@@ -240,7 +228,8 @@ export class WorldEdit {
   }
   /**
    * Parses paste positions, used by this.paste and by draw paste selection
-   * @param  {Parameters<WorldEdit['paste']>[1]} rotation
+   *
+   * @param {Parameters<WorldEdit['paste']>[1]} rotation
    * @param {NonNullable<WorldEdit['currentCopy']>} currentCopy
    */
   pastePositions(rotation, currentCopy) {
@@ -256,14 +245,19 @@ export class WorldEdit {
   }
   /**
    * Pastes a copy from memory
-   * @param {Player} player player to execute on
+   *
+   * @example
+   *   paste(Player, 0, 'none', false, true, 100.0, '')
+   *
+   * @param {Player} player Player to execute on
    * @param {0 | 90 | 180 | 270} rotation Specifies the rotation when loading a structure
-   * @param {"none" | "x" | "xz" | "z"} mirror Specifies the axis of mirror flip when loading a structure
+   * @param {'none' | 'x' | 'xz' | 'z'} mirror Specifies the axis of mirror flip when loading a structure
    * @param {boolean} includesEntites Specifies whether including entites or not
    * @param {boolean} includesBlocks Specifies whether including blocks or not
-   * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in the structure are loaded.
-   * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity. If unspecified, a random seed is taken.
-   * @example paste(Player, 0, "none", false, true, 100.0, "");
+   * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in
+   *   the structure are loaded.
+   * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity.
+   *   If unspecified, a random seed is taken.
    */
   async paste(
     player,
@@ -272,7 +266,7 @@ export class WorldEdit {
     includesEntites = false,
     includesBlocks = true,
     integrity = 100.0,
-    seed = ''
+    seed = '',
   ) {
     try {
       if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')
@@ -285,7 +279,7 @@ export class WorldEdit {
           pastePos1,
           ` ${String(rotation).replace('NaN', '0')}_degrees ${mirror} ${includesEntites} ${includesBlocks} true ${
             integrity ? integrity : ''
-          } ${seed ? seed : ''}`
+          } ${seed ? seed : ''}`,
         )
       } catch (e) {
         if (e instanceof Error) {
@@ -298,9 +292,7 @@ export class WorldEdit {
       this.failedTo('вставить', error)
     }
   }
-  /**
-   * Ensures that selection matches max allow size
-   */
+  /** Ensures that selection matches max allow size */
   async ensureSelection() {
     const player = this.player
     if (!this.selection) return player.fail('§cЗона не выделена!')
@@ -326,7 +318,7 @@ export class WorldEdit {
           'Да',
           () => {},
           'Отмена',
-          () => {}
+          () => {},
         )
 
         if (!result) return player.fail('§cОтменяем...')
@@ -354,8 +346,8 @@ export class WorldEdit {
       const startTime = Date.now()
       this.backup(
         `§3Заполнение области размером §f${selection.size} §3блоками §f${stringifyReplaceTargets(
-          blocks.map(toReplaceTarget)
-        )}`
+          blocks.map(toReplaceTarget),
+        )}`,
       )
       let errors = 0
       let all = 0
@@ -422,5 +414,5 @@ system.runInterval(
     for (const build of Object.values(WorldEdit.instances)) build.drawSelection()
   },
   'we Selection',
-  20
+  20,
 )

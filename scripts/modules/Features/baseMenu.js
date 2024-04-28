@@ -33,7 +33,7 @@ function baseMenu(player, base, back) {
   const baseBack = () => baseMenu(player, base, back)
   const form = new ActionForm(
     'Меню базы',
-    `${isOwner ? 'Это ваша база.' : 'База игрока ' + base.ownerName}\n\nКоординаты: ${Vector.string(base.center, true)}`
+    `${isOwner ? 'Это ваша база.' : 'База игрока ' + base.ownerName}\n\nКоординаты: ${Vector.string(base.center, true)}`,
   )
 
   if (back) form.addButtonBack(back)
@@ -44,7 +44,7 @@ function baseMenu(player, base, back) {
       manageRegionMembers(player, base, {
         back: baseBack,
         pluralForms: basePluralForms,
-      })
+      }),
     )
 
   if (isOwner)
@@ -52,7 +52,7 @@ function baseMenu(player, base, back) {
       editRegionPermissions(player, base, {
         back: baseBack,
         pluralForms: basePluralForms,
-      })
+      }),
     )
 
   form.show(player)

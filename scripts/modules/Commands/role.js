@@ -8,7 +8,6 @@ import { WHO_CAN_CHANGE } from 'lib/roles.js'
 const FULL_HIERARCHY = Object.keys(ROLES)
 
 /**
- *
  * @param {Role} who
  * @param {Role} target
  */
@@ -41,16 +40,14 @@ const restoreRole = command
 
 command.executes(roleForm)
 
-/**
- * @param {CommandContext} ctx
- */
+/** @param {CommandContext} ctx */
 function roleForm(ctx) {
   const prole = getRole(ctx.sender.id)
   if (!WHO_CAN_CHANGE.includes(prole))
     return ctx.sender.info(
       `Ваша роль: ${ROLES[prole]}${
         restoreRole.sys.meta.requires(ctx.sender) ? '\n\n§3Восстановить прошлую роль: §f.role restore' : ''
-      }`
+      }`,
     )
 
   const players = world.getAllPlayers()
@@ -90,14 +87,14 @@ function roleForm(ctx) {
           const self = ctx.sender.id === id
           if (!canChange(prole, role, self)) {
             return new FormCallback(form, ctx.sender).error(
-              '§4У игрока §f' + name + '§4 роль выше или такая же как у вас, вы не можете ее сменить.'
+              '§4У игрока §f' + name + '§4 роль выше или такая же как у вас, вы не можете ее сменить.',
             )
           }
           const filteredRoles = Object.fromEntries(
             Object.entriesStringKeys(ROLES)
               .filter(([key]) => canChange(prole, key, self))
               .reverse()
-              .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`])
+              .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`]),
           )
           new ModalForm(name)
             .addToggle('Уведомлять', true)
@@ -115,7 +112,7 @@ function roleForm(ctx) {
                   target.info(
                     `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
                       showName ? `§3 игроком §r${ctx.sender.name}` : ''
-                    }${message ? `\n§r§3Причина: §r${message}` : ''}`
+                    }${message ? `\n§r§3Причина: §r${message}` : ''}`,
                   )
 
                 ctx.sender.success(`Роль игрока ${target.name} сменена успешно`)

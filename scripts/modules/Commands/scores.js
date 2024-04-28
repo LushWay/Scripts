@@ -25,9 +25,7 @@ function alias(name = 'leafs') {
   })
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function scoreManagerMenu(player) {
   const form = new ActionForm('Выберите счет')
 
@@ -47,7 +45,6 @@ function scoreManagerMenu(player) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {ScoreboardObjective} scoreboard
  */
@@ -86,7 +83,6 @@ function scoreboardMenu(player, scoreboard) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {ScoreboardObjective} scoreboard
  * @returns
@@ -131,7 +127,6 @@ function addTargetToScoreboardMenu(player, scoreboard) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {ScoreboardObjective} scoreboard
  * @param {string} targetId
@@ -149,8 +144,8 @@ function editPlayerScore(player, scoreboard, targetId, targetName, back = () => 
 }
 
 /**
- * @param {string} targetName
  * @param {string} targetId
+ * @param {string} targetName
  * @param {ScoreboardDB} manager
  */
 function getScoreDescription(targetId, targetName, manager) {
@@ -163,7 +158,6 @@ ${converted !== raw ? `§l§7Конвертированный счет: §r§f${
 }
 
 /**
- *
  * @param {Player} player
  * @param {string} targetId
  * @param {string} targetName
@@ -177,7 +171,7 @@ function addOrSetPlayerScore(player, targetId, targetName, manager, back, mode =
     .addTextField(
       `${getScoreDescription(targetId, targetName, manager)}\n§l§7${action}:§r`,
       'Ничего не произойдет',
-      mode === 'set' ? manager.get(targetId).toString() : undefined
+      mode === 'set' ? manager.get(targetId).toString() : undefined,
     )
     .show(player, (ctx, value) => {
       if (value) {
@@ -188,7 +182,7 @@ function addOrSetPlayerScore(player, targetId, targetName, manager, back, mode =
         Player.byId(targetId)?.info(
           `§7Игрок §f${player.name}§r§7 ${mode === 'add' ? 'начислил вам' : 'установил значение счета'} §f${
             manager.scoreboard.displayName
-          }§r§7 ${mode === 'set' ? 'на ' : ''}§f§l${value}`
+          }§r§7 ${mode === 'set' ? 'на ' : ''}§f§l${value}`,
         )
       } // If no value then do nothing
 

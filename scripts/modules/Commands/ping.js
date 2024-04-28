@@ -1,9 +1,6 @@
 import { system } from '@minecraft/server'
 
-/**
- *
- * @returns {Promise<number>}
- */
+/** @returns {Promise<number>} */
 async function getServerTPS() {
   const startTime = Date.now()
   let ticks = 0

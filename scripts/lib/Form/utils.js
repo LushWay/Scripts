@@ -11,34 +11,40 @@ import {
 import { MessageForm } from './MessageForm.js'
 
 /**
- * @template {import("./ActionForm.js").ActionForm | import("./MessageForm.js").MessageForm | import("./ModalForm.js").ModalForm<any> | import("./ChestForm.js").ChestForm} [Form=any]
- *
+ * @template {import('./ActionForm.js').ActionForm
+ *   | import('./MessageForm.js').MessageForm
+ *   | import('./ModalForm.js').ModalForm<any>
+ *   | import('./ChestForm.js').ChestForm} [Form=any]
+ *   Default is `any`
  */
 export class FormCallback {
   /**
-   * form that was used in this call
-   * @type {Form}
+   * Form that was used in this call
+   *
    * @private
+   * @type {Form}
    */
   form
   /**
-   * player that this form used
-   * @type {Player}
+   * Player that this form used
+   *
    * @private
+   * @type {Player}
    */
   player
   /**
-   * the function that was called
-   * @type {Function | undefined}
+   * The function that was called
+   *
    * @private
+   * @type {Function | undefined}
    */
   callback
   /**
-   * Creates a new form callback instance that can be used by
-   * buttons, and args to run various functions
-   * @param {Form} form form that is used in this call
+   * Creates a new form callback instance that can be used by buttons, and args to run various functions
+   *
+   * @param {Form} form Form that is used in this call
    * @param {Player} player
-   * @param {Form extends import("./ModalForm.js").ModalForm<any> ? Parameters<Form["show"]>[1] : never} [callback]
+   * @param {Form extends import('./ModalForm.js').ModalForm<any> ? Parameters<Form['show']>[1] : never} [callback]
    */
   constructor(form, player, callback) {
     this.form = form
@@ -47,7 +53,8 @@ export class FormCallback {
   }
   /**
    * Reshows the form and shows the user a error message
-   * @param {string} message  error message to show
+   *
+   * @param {string} message Error message to show
    * @returns {void}
    */
   error(message) {
@@ -62,11 +69,13 @@ export class FormCallback {
 const { UserBusy, UserClosed } = FormCancelationReason
 
 /**
- * It shows a form to a player and if the player is busy, it will try to show the form again until it
- * succeeds or the maximum number of attempts is reached.
- * @param {Pick<ActionFormData, "show"> | Pick<ModalFormData, "show"> | Pick<MessageFormData, "show">} form - The form you want to show.
+ * It shows a form to a player and if the player is busy, it will try to show the form again until it succeeds or the
+ * maximum number of attempts is reached.
+ *
+ * @param {Pick<ActionFormData, 'show'> | Pick<ModalFormData, 'show'> | Pick<MessageFormData, 'show'>} form - The form
+ *   you want to show.
  * @param {Player} player - The player who will receive the form.
- * @returns  The response from the form.
+ * @returns The response from the form.
  */
 export async function showForm(form, player) {
   const hold = 5

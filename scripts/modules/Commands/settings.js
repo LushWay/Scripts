@@ -5,16 +5,7 @@ import { ModalForm } from 'lib/Form/ModalForm.js'
 import { isDropdown } from 'lib/Settings'
 import { SETTINGS_GROUP_NAME, Settings, createSettingsObject } from 'lib/Settings.js'
 
-/**
- * @typedef {"string"
- * 	| "number"
- * 	| "object"
- * 	| "boolean"
- * 	| "symbol"
- * 	| "bigint"
- * 	| "undefined"
- * 	| "function"} AllTypes
- */
+/** @typedef {'string' | 'number' | 'object' | 'boolean' | 'symbol' | 'bigint' | 'undefined' | 'function'} AllTypes */
 
 /** @type {Partial<Record<AllTypes, string>>} */
 const Types = {
@@ -35,6 +26,7 @@ new Command({
 
 /**
  * Opens player settings menu
+ *
  * @param {Player} player
  * @param {VoidFunction} [back]
  */
@@ -58,9 +50,7 @@ new Command({
   worldSettingsMenu(ctx.sender)
 })
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function worldSettingsMenu(player) {
   const form = new ActionForm('§dНастройки мира')
 
@@ -82,7 +72,6 @@ function worldSettingsMenu(player) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {string} groupName
  * @param {boolean} forRegularPlayer
@@ -96,19 +85,15 @@ export function settingsGroupMenu(
   storeSource = forRegularPlayer ? Settings.playerDatabase : Settings.worldDatabase,
   configSource = forRegularPlayer ? Settings.playerMap : Settings.worldMap,
   back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
-  showHintAboutSavedStatus = true
+  showHintAboutSavedStatus = true,
 ) {
   const config = configSource[groupName]
   const store = createSettingsObject(storeSource, groupName, config, forRegularPlayer ? player : null)
 
-  /**
-   * @type {[string, (input: string | boolean) => string][]}
-   */
+  /** @type {[string, (input: string | boolean) => string][]} */
   const buttons = []
 
-  /**
-   * @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>}
-   */
+  /** @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>} */
   const form = new ModalForm(config[SETTINGS_GROUP_NAME] ?? groupName)
 
   for (const key in config) {
@@ -181,9 +166,7 @@ export function settingsGroupMenu(
   }
 
   form.show(player, (_, ...settings) => {
-    /**
-     * @type {Record<string, string>}
-     */
+    /** @type {Record<string, string>} */
     const hints = {}
 
     for (const [i, setting] of settings.entries()) {

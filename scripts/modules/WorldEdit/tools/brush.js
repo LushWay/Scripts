@@ -31,14 +31,13 @@ world.overworld
 /**
  * @extends {BaseBrushTool<{
  *   shape: string
- *   blocksSet: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef;
+ *   blocksSet: import('modules/WorldEdit/utils/blocksSet.js').BlocksSetRef
  * }>}
  */
 class BrushTool extends BaseBrushTool {
   /**
-   *
    * @param {Player} player
-   * @param {this["clearLoreFormat"]} lore
+   * @param {this['clearLoreFormat']} lore
    * @param {import('@minecraft/server').BlockRaycastHit} hit
    */
   onBrushUse(player, lore, hit) {
@@ -48,7 +47,7 @@ class BrushTool extends BaseBrushTool {
       hit.block.location,
       lore.size,
       getBlockSet(lore.blocksSet),
-      getBlockSetForReplaceTarget(lore.replaceBlocksSet)
+      getBlockSetForReplaceTarget(lore.replaceBlocksSet),
     )
 
     if (error) player.fail(error)
@@ -86,7 +85,7 @@ const brush = new BrushTool({
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
           noneText: 'Любой',
-        }
+        },
       )
 
       .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet) => {
@@ -100,7 +99,7 @@ const brush = new BrushTool({
         player.success(
           `${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
             replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
-          } и радиусом ${radius}`
+          } и радиусом ${radius}`,
         )
       })
   },

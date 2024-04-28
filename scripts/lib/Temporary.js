@@ -9,16 +9,14 @@ import {
   world,
 } from '@minecraft/server'
 
-/**
- * @typedef {{system: System;world: World;cleanup: VoidFunction;temp: Temporary;}} ProxiedSubscribers
- */
+/** @typedef {{ system: System; world: World; cleanup: VoidFunction; temp: Temporary }} ProxiedSubscribers */
 
 export class Temporary {
   /**
+   * @private
    * @template {WorldAfterEvents | WorldBeforeEvents | SystemAfterEvents | SystemBeforeEvents} Events
    * @param {Events} events
    * @returns {Events}
-   * @private
    */
   proxyEvents(events) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -36,7 +34,7 @@ export class Temporary {
           const eventSignal = {
             /**
              * @param {(arg: object) => void} fn
-             * @param  {...object} args
+             * @param {...object} args
              */
             subscribe(fn, ...args) {
               // console.log('Subscribing eventSignal', p)
@@ -57,9 +55,7 @@ export class Temporary {
       },
     })
   }
-  /**
-   * @private
-   */
+  /** @private */
   proxySystem() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const temp = this
@@ -67,15 +63,11 @@ export class Temporary {
       get(target, p, reciever) {
         if (p === 'toJSON') return Reflect.get(target, p, reciever)
         if (typeof p === 'symbol') return Reflect.get(target, p, reciever)
-        /**
-         * @type {System[keyof System]}
-         */
+        /** @type {System[keyof System]} */
         const value = Reflect.get(target, p, reciever)
 
         if (typeof value === 'function') {
-          /**
-           * @param {object[]} args
-           */
+          /** @param {object[]} args */
           return (...args) => {
             const handle = value.call(target, ...args)
             if (typeof handle === 'number') {
@@ -91,6 +83,7 @@ export class Temporary {
 
   /**
    * Creates new temporary system
+   *
    * @param {(arg: ProxiedSubscribers) => void | { cleanup(): void }} execute
    * @param {Temporary} [parent]
    */
@@ -109,14 +102,14 @@ export class Temporary {
             afterEvents: this.proxyEvents(world.afterEvents),
             beforeEvents: this.proxyEvents(world.beforeEvents),
           },
-          world
+          world,
         ),
         system: Object.setPrototypeOf(
           {
             afterEvents: this.proxyEvents(system.afterEvents),
             beforeEvents: this.proxyEvents(system.beforeEvents),
           },
-          this.proxySystem()
+          this.proxySystem(),
         ),
         cleanup: this.cleanup,
         temp: this,
@@ -131,6 +124,7 @@ export class Temporary {
 
   /**
    * Unsubscribes all temporary events
+   *
    * @type {(this: Temporary) => void}
    */
   cleanup = (() => {
@@ -140,13 +134,12 @@ export class Temporary {
 
   /**
    * List of functions that will be called on clear
+   *
    * @private
-   * @type {(VoidFunction)[]}
+   * @type {VoidFunction[]}
    */
   cleaner = []
 
-  /**
-   * Weather events are unsubscribed or not
-   */
+  /** Weather events are unsubscribed or not */
   cleaned = false
 }

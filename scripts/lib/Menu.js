@@ -11,7 +11,7 @@ export class Menu {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
-      '§r§7Возьми в руку и используй §r§7предмет\n\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu'
+      '§r§7Возьми в руку и используй §r§7предмет\n\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu',
     )
     item.lockMode = ItemLockMode.inventory
     item.keepOnDeath = true
@@ -42,7 +42,8 @@ export class Menu {
   }
   /**
    * Function that gets called when menu item is used
-   * @param {import("@minecraft/server").Player} player
+   *
+   * @param {import('@minecraft/server').Player} player
    * @returns {false | ActionForm}
    */
   static open(player) {
@@ -58,6 +59,7 @@ Menu.init()
 export class Compass {
   /**
    * Sets compass target for player to provided location
+   *
    * @param {Player} player - Player to set compass for
    * @param {Vector3 | undefined} location - Compass target location. Use undefined to remove
    */
@@ -66,23 +68,20 @@ export class Compass {
     else this.players.delete(player)
   }
 
-  /**
-   * @private
-   */
+  /** @private */
   static items = new Array(32).fill(null).map((_, i) => {
     return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель\n§7§r(use)')
   })
 
   /**
    * Map of player as key and compass target as value
-   * @type {WeakOnlinePlayerMap<Vector3>}
+   *
    * @private
+   * @type {WeakOnlinePlayerMap<Vector3>}
    */
   static players = new WeakOnlinePlayerMap()
 
-  /**
-   * @private
-   */
+  /** @private */
   static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
     if (!this.players.has(player)) return
     const isMenu = slot.typeId === CUSTOM_ITEMS.menu
@@ -133,6 +132,7 @@ export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.b
 
   /**
    * Gives player an item
+   *
    * @param {Player} player
    * @param {object} [o]
    * @param {'tell' | 'ensure'} [o.mode]
@@ -170,6 +170,7 @@ export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.b
     command,
     /**
      * Alias to {@link give}(player, { mode: 'ensure' })
+     *
      * @param {Player} player
      */
     ensure: player => give(player, { mode: 'ensure' }),

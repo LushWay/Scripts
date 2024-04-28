@@ -2,6 +2,7 @@ export const CONFIG = {
   commandPrefixes: ['.', '-'],
   /**
    * Time in ms to mark SM.state.first_load
+   *
    * @type {number}
    */
   firstPlayerJoinTime: 5000,
@@ -27,13 +28,9 @@ export const CUSTOM_ENTITIES = {
 
 export const SOUNDS = {
   levelup: 'random.levelup',
-  /**
-   * note.pling
-   */
+  /** Note.pling */
   success: 'note.pling',
-  /**
-   * random.orb
-   */
+  /** Random.orb */
   action: 'random.orb',
   click: 'note.hat',
   fail: 'block.false_permissions',

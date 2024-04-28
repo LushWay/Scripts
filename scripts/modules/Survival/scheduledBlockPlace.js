@@ -4,17 +4,15 @@ import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
 /**
  * @typedef {{
- *   typeId: string;
- *   states?: Record<string, string | number | boolean>;
- *   date: number;
- *   location: Vector3;
+ *   typeId: string
+ *   states?: Record<string, string | number | boolean>
+ *   date: number
+ *   location: Vector3
  * }} ScheduledBlockPlace
  */
 
 export const SHEDULED_DB = new DynamicPropertyDB('ScheduledBlockPlace', {
-  /**
-   * @type {Record<Dimensions, ScheduledBlockPlace[]>}
-   */
+  /** @type {Record<Dimensions, ScheduledBlockPlace[]>} */
   type: {
     end: [],
     nether: [],
@@ -24,7 +22,6 @@ export const SHEDULED_DB = new DynamicPropertyDB('ScheduledBlockPlace', {
 }).proxy()
 
 /**
- *
  * @param {Omit<ScheduledBlockPlace, 'date'> & {
  *   dimension: Dimensions
  *   restoreTime: number
@@ -59,7 +56,7 @@ system.runInterval(
         // we calculate if there is near broken block and swap
         // their restore date, so they will restore in reversed order
         const nearBlock = schedules.find(
-          e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > schedule.date
+          e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > schedule.date,
         )
         if (nearBlock) continue
 
@@ -81,5 +78,5 @@ system.runInterval(
     }
   },
   'scheduled block place',
-  10
+  10,
 )

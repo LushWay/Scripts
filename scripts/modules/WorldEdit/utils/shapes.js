@@ -1,6 +1,4 @@
-/**
- * @type {Record<string, string>}
- */
+/** @type {Record<string, string>} */
 export const SHAPES = {
   // Variables ( x, y, z, xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius, minRadius )
   'Сфера': 'x * x + y * y + z * z <= rad * rad',

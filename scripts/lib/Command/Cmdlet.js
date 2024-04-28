@@ -2,12 +2,9 @@ import { ChatSendAfterEvent } from '@minecraft/server'
 import { CommandContext } from './Context.js'
 
 export class CmdLet {
-  /**
-   * @type {CmdLet[]}
-   */
+  /** @type {CmdLet[]} */
   static list = []
   /**
-   *
    * @param {string[]} args
    * @param {ChatSendAfterEvent} data
    * @param {import('./index.js').Command} cmd
@@ -40,8 +37,8 @@ export class CmdLet {
       const many = cmdlets.length > 1
       data.sender.fail(
         `§cНеизвестны${many ? 'e' : 'й'} командлет${many ? 'ы' : ''} §f${cmdlets.join(
-          '§c, §f'
-        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(e => `\n  §f${e.data.name} §7§o- ${e.data.description}`)}\n `
+          '§c, §f',
+        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(e => `\n  §f${e.data.name} §7§o- ${e.data.description}`)}\n `,
       )
       return 'stop'
     }
@@ -50,7 +47,8 @@ export class CmdLet {
   }
   /**
    * Creates a new cmdlet to use it in command like 'name --help'
-   * @param {{name: string, callback(ctx: CommandContext, param: string): 'stop' | void, description: string}} info
+   *
+   * @param {{ name: string; callback(ctx: CommandContext, param: string): 'stop' | void; description: string }} info
    */
   constructor({ name, callback, description }) {
     this.data = { name, callback, description }

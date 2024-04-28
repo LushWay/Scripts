@@ -56,5 +56,5 @@ export const LEARNING_L = new LootTable(
     amount: {
       '90...100': '1%',
     },
-  }
+  },
 )

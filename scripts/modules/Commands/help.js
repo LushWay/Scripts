@@ -20,7 +20,6 @@ function childrensToHelpText(player, command) {
 }
 
 /**
- *
  * @param {Command} command
  * @returns {[string, undefined | string]}
  */
@@ -42,7 +41,6 @@ function getParentType(command, init = true) {
 }
 
 /**
- *
  * @param {Command} o
  * @returns
  */
@@ -61,7 +59,7 @@ const help = new Command({
   requires: () => true,
 })
 
-/** @type {Record<Role, string>}} */
+/** @type {Record<Role, string>} } */
 const colors = Object.fromEntries(Object.entriesStringKeys(ROLES).map(e => [e[0], e[1][0] + e[1][1]]))
 colors.member = '§2'
 
@@ -90,7 +88,6 @@ help
   })
 
 /**
- *
  * @param {CommandContext} ctx
  * @param {string} commandName
  * @returns

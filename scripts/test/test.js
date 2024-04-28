@@ -30,18 +30,14 @@ import './enchant.js'
 import './lib/Form/util.test.js'
 import './simulatedPlayer.js'
 
-/**
- * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
- */
+/** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
 const publicTests = {
   death(ctx) {
     ctx.sender.kill()
   },
 }
 
-/**
- * @type {Record<string, (ctx: CommandContext) => void | Promise<any>>}
- */
+/** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
 const tests = {
   scen(ctx) {
     const player = ctx.sender
@@ -55,7 +51,7 @@ const tests = {
         restorePlayerCamera(player)
       },
       'test',
-      20
+      20,
     )
   },
   settings(ctx) {
@@ -106,7 +102,7 @@ const tests = {
         Compass.setFor(ctx.sender, entity.location)
       },
       'compass',
-      2
+      2,
     )
   },
   chest(ctx) {
@@ -123,7 +119,7 @@ const tests = {
           }
         },
         'minecart test',
-        40
+        40,
       )
     })
   },
@@ -147,11 +143,11 @@ const tests = {
             airdrop.showParticleTrace()
           },
           'test airdrop',
-          20
+          20,
         )
       },
       'test airdrop',
-      20
+      20,
     )
   },
   slot(ctx) {
@@ -209,7 +205,7 @@ const tests = {
           index: e.getDynamicProperty('index'),
           data,
         }
-      })
+      }),
     )
   },
   localization(ctx) {
@@ -260,13 +256,13 @@ const tests = {
         block.dimension.spawnParticle(
           'minecraft:wax_particle',
           Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-          variables
+          variables,
         )
 
         if (c >= 6) system.clearRun(id)
       },
       'test',
-      10
+      10,
     )
   },
   async api(ctx) {
@@ -298,7 +294,7 @@ const tests = {
       .addButton('NpcForm', () => {
         const form = new NpcForm(
           'title',
-          'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs'
+          'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs',
         )
 
         form.addButton('Кнопка 1', () => ctx.sender.success('Ура'))

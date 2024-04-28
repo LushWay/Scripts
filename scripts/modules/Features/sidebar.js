@@ -32,9 +32,7 @@ const sidebarSettings = Settings.player('Меню\nРазные настройк
   //   },
 })
 
-/**
- * @type {Record<Player['database']['inv'], string>}
- */
+/** @type {Record<Player['database']['inv'], string>} */
 const inventoryDisplay = {
   anarchy: 'Анархия',
   mg: 'Миниигра',
@@ -83,7 +81,7 @@ $квест`,
       },
     },
     квест: Quest.sidebar,
-  }
+  },
 )
 
 system.runPlayerInterval(
@@ -95,5 +93,5 @@ system.runPlayerInterval(
     // system.delay(() => player.onScreenDisplay.setTip(5, '§7158.255.5.29'))
   },
   'Survival sidebar',
-  20
+  20,
 )

@@ -4,29 +4,33 @@ import { LockAction, util } from 'lib.js'
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
   '§6Элитра перемещения',
-  'Элитра перелета, пропадает на земле'
+  'Элитра перелета, пропадает на земле',
 )
 RTP_ELYTRA.lockMode = ItemLockMode.slot
 
-/**
- * @type {Set<string>}
- */
+/** @type {Set<string>} */
 const IN_SKY = new Set()
 new LockAction(player => IN_SKY.has(player.id), '§cВ начале коснитесь земли!')
 
 /**
  * Teleports a player randomly within a specified range
+ *
  * @param {Player} target - The player to teleport randomly
  * @param {Vector3} from - The starting position of the random teleportation
  * @param {Vector3} to - The ending position of the random teleportation
  * @param {object} options - An object containing optional parameters
- * @param {number} [options.y=200] - The height at which to teleport the player
- * @param {number} [options.fromYtoBlock=60] - The minimum distance between the player and the ground for the teleportation to be valid
- * @param {Dimensions} [options.dimension='overworld'] - The dimension in which to teleport the player
- * @param {boolean} [options.elytra=true] - Whether or not to give the player an elytra after teleportation
- * @param {number} [options.c=0] - A counter to prevent infinite recursion in case of invalid teleportation
+ * @param {number} [options.y=200] - The height at which to teleport the player. Default is `200`
+ * @param {number} [options.fromYtoBlock=60] - The minimum distance between the player and the ground for the
+ *   teleportation to be valid. Default is `60`
+ * @param {Dimensions} [options.dimension='overworld'] - The dimension in which to teleport the player. Default is
+ *   `'overworld'`
+ * @param {boolean} [options.elytra=true] - Whether or not to give the player an elytra after teleportation. Default is
+ *   `true`
+ * @param {number} [options.c=0] - A counter to prevent infinite recursion in case of invalid teleportation. Default is
+ *   `0`
  * @param {(location: Vector3) => void} [options.teleportCallback] - Function that calls after player teleport
- * @param {number} [options.keepInSkyTime=5] - The amount of time (in seconds) to keep the player in the air after teleportation
+ * @param {number} [options.keepInSkyTime=5] - The amount of time (in seconds) to keep the player in the air after
+ *   teleportation. Default is `5`
  * @returns {Vector3}
  */
 export function randomTeleport(
@@ -41,7 +45,7 @@ export function randomTeleport(
     c = 0,
     teleportCallback = () => {},
     keepInSkyTime = 5,
-  }
+  },
 ) {
   const x = Math.randomInt(from.x, to.x)
   const z = Math.randomInt(from.z, to.z)
@@ -73,7 +77,7 @@ export function randomTeleport(
       facingLocation: { x, y: y - 10, z },
       keepVelocity: false,
       dimension: world[dimension],
-    }
+    },
   )
 
   util.catch(() => teleportCallback({ x, y, z }))
@@ -101,16 +105,13 @@ export function randomTeleport(
       }
     },
     'random teleport keep in sky',
-    keepInSkyTime
+    keepInSkyTime,
   )
 
   return { x, y, z }
 }
 
-/**
- *
- * @param {Player} player
- */
+/** @param {Player} player */
 function giveElytra(player, c = 5) {
   const slot = player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Chest)
 
@@ -145,13 +146,10 @@ system.runInterval(
     }
   },
   'clear rtp elytra',
-  20
+  20,
 )
 
-/**
- *
- * @param {Player} player
- */
+/** @param {Player} player */
 function clearElytra(player) {
   const equippable = player.getComponent('equippable')
   if (!equippable) return

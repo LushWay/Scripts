@@ -14,7 +14,6 @@ const db = new Command({
 db.executes(ctx => selectTable(ctx.sender, true))
 
 /**
- *
  * @param {Player} player
  * @param {true} [firstCall]
  */
@@ -30,7 +29,6 @@ function selectTable(player, firstCall) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {string} table
  */
@@ -84,7 +82,7 @@ function showTable(player, table) {
       '§3Ключ ' + key,
       `§7Тип: §f${typeof value}\n ${
         failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''
-      }\n${util.inspect(value)}\n `
+      }\n${util.inspect(value)}\n `,
     )
 
     AForm.addButton('Изменить', null, () => {
@@ -127,9 +125,8 @@ function showTable(player, table) {
 }
 
 /**
- *
  * @param {ModalForm<(args_0: any, args_1: string) => void>} form
- * @param {*} value
+ * @param {any} value
  */
 function changeValue(form, value) {
   let type = typeof value
@@ -143,9 +140,9 @@ function changeValue(form, value) {
   return {
     newform,
     callback: (
-      /** @type {*} */ input,
+      /** @type {any} */ input,
       /** @type {string} */ inputType,
-      /** @type {(newValue: any) => void} */ onChange
+      /** @type {(newValue: any) => void} */ onChange,
     ) => {
       let newValue = input
 
@@ -192,7 +189,7 @@ cmd
   .executes((ctx, type, pathes, useChat) => {
     if (type && !(type in util.benchmark.results))
       return ctx.error(
-        'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  ')
+        'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  '),
       )
 
     if (useChat) {
@@ -205,7 +202,7 @@ cmd
         stringifyBenchmarkResult({
           type: type ?? 'timers',
           timerPathes: pathes ?? false,
-        })
+        }),
       )
         .addButton('Refresh', null, show)
         .addButton('Exit', null, () => void 0)

@@ -8,7 +8,7 @@ new Command({
   const form = new ActionForm('Shell')
     .addButton('git pull', () => {
       const form = new ActionForm('Type')
-      /** @type {("script" | "server" | "process")[]} */
+      /** @type {('script' | 'server' | 'process')[]} */
       const types = ['script', 'server', 'process']
       for (const type of types) {
         form.addButton(type, () => {
@@ -22,7 +22,7 @@ new Command({
     })
     .addButton('git status', () => {
       const form = new ActionForm('Type')
-      /** @type {("sm-api" | "root")[]} */
+      /** @type {('sm-api' | 'root')[]} */
       const cwds = ['sm-api', 'root']
       for (const type of cwds) {
         form.addButton(type, () => {

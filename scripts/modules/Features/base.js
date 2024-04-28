@@ -7,7 +7,7 @@ import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§r§6База',
-  '§7Поставьте эту бочку и она стане базой.'
+  '§7Поставьте эту бочку и она стане базой.',
 )
 
 // new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(BASE_ITEM_STACK, new ScoreboardCost(10))
@@ -33,7 +33,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     return player.fail(
       `§cВы уже ${
         region.getMemberRole(player) === 'owner' ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`
-      }!`
+      }!`,
     )
   }
 
@@ -57,7 +57,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
           x: block.x,
           y: 0,
           z: block.z,
-        }
+        },
       )
     }
   })
@@ -114,5 +114,5 @@ system.runInterval(
     }
   },
   'baseInterval',
-  10
+  10,
 )

@@ -10,10 +10,9 @@ const inRange = (value, min, max) => value <= max && value >= min
 
 export class Zone {
   /**
-   *
    * @param {Player} player
    * @param {boolean} isX
-   * @param {{x: number, z: number}} zone
+   * @param {{ x: number; z: number }} zone
    * @param {boolean} [plus]
    */
   returnToZone(player, isX, zone, plus) {
@@ -25,7 +24,6 @@ export class Zone {
     player.onScreenDisplay.setActionBar(`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? 'x' : 'z'}`)
   }
   /**
-   *
    * @param {VectorXZ} center
    * @param {number | ((players: Player[]) => number)} radius
    */
@@ -59,7 +57,7 @@ export class Zone {
         }
       },
       'zone',
-      0
+      0,
     )
   }
 }

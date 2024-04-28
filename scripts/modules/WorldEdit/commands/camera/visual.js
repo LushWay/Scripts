@@ -45,15 +45,13 @@ system.runPlayerInterval(
     }
   },
   'builder list update',
-  10
+  10,
 )
 
 // Insert role value right after name
 PLAYER_NAME_TAG_MODIFIERS.splice(1, 0, p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function setBuildingTip(player, value = true) {
   player.onScreenDisplay.setTip(1, value ? 'Режим стройки' : '')
 }

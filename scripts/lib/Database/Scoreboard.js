@@ -2,9 +2,7 @@ import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
 import { OverTakes } from 'lib/Extensions/OverTakes.js'
 import { util } from 'lib/util.js'
 
-/**
- * @type {Record<import("@minecraft/server").ScoreName, string>}
- */
+/** @type {Record<import('@minecraft/server').ScoreName, string>} */
 const displayNames = {
   leafs: '§aЛистья',
   money: '§6Монеты',
@@ -33,9 +31,7 @@ OverTakes(ScoreboardObjective.prototype, {
   },
 })
 
-/**
- * @type {Record<string, { player: Player, proxy: any }>}
- */
+/** @type {Record<string, { player: Player; proxy: any }>} */
 const players = {}
 Reflect.defineProperty(Player.prototype, 'scores', {
   configurable: false,
@@ -80,7 +76,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
                 return 0
               }
             },
-          }
+          },
         ),
       }
 
@@ -90,14 +86,10 @@ Reflect.defineProperty(Player.prototype, 'scores', {
 })
 
 export class ScoreboardDB {
-  /**
-   * @type {Record<string, ScoreboardObjective>}
-   */
+  /** @type {Record<string, ScoreboardObjective>} */
   static objectives = {}
 
-  /**
-   * @param {string} name
-   */
+  /** @param {string} name */
   static objective(name, displayName = name) {
     if (name in this.objectives) return this.objectives[name]
 

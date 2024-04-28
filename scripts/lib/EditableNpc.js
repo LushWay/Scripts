@@ -5,28 +5,24 @@ import { util } from 'lib/util.js'
 import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 import { EditableLocation } from './EditableLocation.js'
 
-/**
- * @typedef {ConstructorParameters<typeof EditableNpc>[0]} EditableNpcProps
- */
+/** @typedef {ConstructorParameters<typeof EditableNpc>[0]} EditableNpcProps */
 
 export class EditableNpc {
   static type = MinecraftEntityTypes.Npc
   static dynamicPropertyName = 'type'
 
-  /**
-   * @type {EditableNpc[]}
-   */
+  /** @type {EditableNpc[]} */
   static npcs = []
-  /**
-   * @type {Entity | undefined}
-   */
+  /** @type {Entity | undefined} */
   entity
 
   /**
    * Creates new dynamically loadable npc
+   *
    * @param {object} o - Options
    * @param {string} o.id - Type name of the npc. Used to restore npc pointer after script reload
-   * @param {(event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void} o.onInteract - Function that gets called on interact
+   * @param {(event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void} o.onInteract - Function that gets
+   *   called on interact
    * @param {string} o.name - NameTag of the npc
    * @param {Dimensions} [o.dimensionId] - Dimension id
    * @param {number} [o.skin] - Index of the npc skin
@@ -64,9 +60,7 @@ export class EditableNpc {
     })
   }
 
-  /**
-   * @param {Entity} entity
-   */
+  /** @param {Entity} entity */
   setupNpc(entity) {
     const npc = entity.getComponent('npc')
     if (!npc) return
@@ -88,7 +82,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
       const comp = event.target.getComponent('npc')
       if (!npc)
         return event.player.fail(
-          `§f${comp ? comp.name : event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`
+          `§f${comp ? comp.name : event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`,
         )
 
       npc.onInteract(event)
@@ -103,7 +97,8 @@ system.runInterval(
   () => {
     /**
      * Store entities from each dimension so we are not grabbing them much
-     * @type {Partial<Record<Dimensions, { npc: any, entity: Entity }[]>>}
+     *
+     * @type {Partial<Record<Dimensions, { npc: any; entity: Entity }[]>>}
      */
     const cache = {}
 
@@ -143,5 +138,5 @@ system.runInterval(
     })
   },
   'npc loading',
-  20
+  20,
 )

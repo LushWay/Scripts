@@ -7,7 +7,6 @@
 
 export class Cuboid {
   /**
-   *
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
@@ -43,6 +42,7 @@ export class Cuboid {
   }
   /**
    * Returns the amount of blocks in this cuboid
+   *
    * @returns {number}
    */
   get size() {
@@ -53,6 +53,7 @@ export class Cuboid {
   }
   /**
    * Splits a cuboid into mulitple cuboid of a chunk size
+   *
    * @param {Vector3} size
    * @returns {Cuboid[]}
    */

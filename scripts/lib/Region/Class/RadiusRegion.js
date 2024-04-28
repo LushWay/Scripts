@@ -10,24 +10,25 @@ import { REGION_DB } from 'lib/Region/DB.js'
 // instead of creating subclasses.
 
 export class RadiusRegion extends Region {
-  /**
-   * Subtype id of the RadiusRegion
-   */
+  /** Subtype id of the RadiusRegion */
   static subtype = 'radius'
 
   /**
    * Center of the base region
+   *
    * @type {Vector3}
    */
   center
   /**
    * Radius of the base region
+   *
    * @type {number}
    */
   radius
 
   /**
    * Creates a new region
+   *
    * @param {object} o
    * @param {Vector3} o.center - The position of the first block of the region.
    * @param {number} o.radius - The position of the region's end.
@@ -60,16 +61,14 @@ export class RadiusRegion extends Region {
   }
 
   /**
-   * @inheritdoc
    * @param {Vector3} vector
+   * @inheritdoc
    */
   vectorInRegion(vector) {
     return Vector.distance(this.center, vector) < this.radius
   }
 
-  /**
-   * @inheritdoc
-   */
+  /** @inheritdoc */
   update(region = RadiusRegion) {
     if (!this.saveToDisk) return super.update()
     return (REGION_DB[this.key] = {
@@ -83,16 +82,12 @@ export class RadiusRegion extends Region {
   }
 }
 
-/**
- * @typedef {Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>} RadiusRegionSubclassArgument
- */
+/** @typedef {Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>} RadiusRegionSubclassArgument */
 
 export class MineshaftRegion extends RadiusRegion {
   static subtype = 'mine'
 
-  /**
-   * More prior then other regions
-   */
+  /** More prior then other regions */
   priority = 1
 
   /** @type {RegionPermissions} */
@@ -137,7 +132,7 @@ export class SafeAreaRegion extends RadiusRegion {
 
   allowUsageOfCraftingTable = false
 
-  /** @param {RadiusRegionSubclassArgument & { name?: string, allowUsageOfCraftingTable?: boolean }} arg */
+  /** @param {RadiusRegionSubclassArgument & { name?: string; allowUsageOfCraftingTable?: boolean }} arg */
   constructor(arg) {
     super({ saveToDisk: false, ...arg, subclassing: true })
     this.safeAreaName = arg.name

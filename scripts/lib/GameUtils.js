@@ -27,8 +27,8 @@ export function isProduction() {
 }
 
 /**
- * Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it)
- * and returns it
+ * Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it
+ *
  * @param {object} o - Options
  * @param {Vector3} o.location - Location to check
  * @param {Dimensions} o.dimensionId - Dimensions to check
@@ -47,6 +47,7 @@ export function blockStatus({ location, dimensionId }) {
 
 /**
  * Checks if chunks is loaded (e.g. we can operate with blocks/entities on it)
+ *
  * @param {Parameters<typeof blockStatus>[0]} options
  */
 export function chunkIsUnloaded(options) {
@@ -55,6 +56,7 @@ export function chunkIsUnloaded(options) {
 
 /**
  * Checks if provided error is location in unloaded chunk or out of world bounds error
+ *
  * @param {unknown} error
  * @returns {error is LocationInUnloadedChunkError | LocationOutOfWorldBoundariesError}
  */
@@ -62,9 +64,7 @@ export function invalidLocation(error) {
   return error instanceof LocationInUnloadedChunkError || error instanceof LocationOutOfWorldBoundariesError
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 export function restorePlayerCamera(player, animTime = 1) {
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
     location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 0.3)),
@@ -78,14 +78,20 @@ export function restorePlayerCamera(player, animTime = 1) {
   system.runTimeout(
     () => player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson),
     restorePlayerCamera.name,
-    animTime * TicksPerSecond
+    animTime * TicksPerSecond,
   )
 }
 
 /**
- * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and capitalizes first letter
- * @example typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
- * @example typeIdToReadable('minecraft:cobblestone') // Cobblestone
+ * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
+ * capitalizes first letter
+ *
+ * @example
+ *   typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
+ *
+ * @example
+ *   typeIdToReadable('minecraft:cobblestone') // Cobblestone
+ *
  * @param {string} typeId
  */
 export function typeIdToReadable(typeId) {
@@ -100,10 +106,13 @@ export function typeIdToReadable(typeId) {
 
 /**
  * Gets localization name of the ItemStack
- * @example ```js
- * const apple = new ItemStack(MinecraftItemTypes.Apple)
- * itemLocaleName(apple) // %item.apple.name
- * ```
+ *
+ * @example
+ *   ;```js
+ *   const apple = new ItemStack(MinecraftItemTypes.Apple)
+ *   itemLocaleName(apple) // %item.apple.name
+ *   ```
+ *
  * @param {ItemStack} item
  */
 export function itemLocaleName(item) {

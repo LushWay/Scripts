@@ -6,13 +6,12 @@ import { DEFAULT_REGION_PERMISSIONS } from 'lib/Region/config.js'
 import { WeakPlayerMap } from 'lib/WeakPlayerMap.js'
 import { util } from 'lib/util.js'
 
-/**
- * Main class that represents protected region in the world.
- */
+/** Main class that represents protected region in the world. */
 export class Region {
   /**
    * Regions list
-   * @type {Array<Region>}
+   *
+   * @type {Region[]}
    */
   static regions = []
 
@@ -26,21 +25,22 @@ export class Region {
     return this.regions.filter(e => e instanceof type)
   }
 
-  /**
-   * @type {WeakPlayerMap<Region[]>}
-   */
+  /** @type {WeakPlayerMap<Region[]>} */
   static playerInRegionsCache = new WeakPlayerMap({ removeOnLeave: true })
 
   /**
    * Event that triggers when player regions have changed. Interval 1 second
-   * @type {EventSignal<{player: Player, previous: Region[], newest: Region[]}>}
+   *
+   * @type {EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>}
    */
   static onPlayerRegionsChange = new EventSignal()
 
   /**
    * Triggers a callback when a player enters a specific region.
+   *
    * @param {Region} region - Specific region that the player can enter.
-   * @param {import("lib.js").PlayerCallback} callback - Function that will be called when a player enters the specified `region`.
+   * @param {import('lib.js').PlayerCallback} callback - Function that will be called when a player enters the specified
+   *   `region`.
    */
   static onEnter(region, callback) {
     this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
@@ -50,6 +50,7 @@ export class Region {
 
   /**
    * Returns nearest and more prioritizet region
+   *
    * @param {Vector3} blockLocation
    * @param {Dimensions} dimensionId
    * @returns {Region | undefined}
@@ -60,6 +61,7 @@ export class Region {
 
   /**
    * Returns regions that location is in and sorts them by priority
+   *
    * @param {Vector3} blockLocation
    * @param {Dimensions} dimensionId
    */
@@ -75,29 +77,31 @@ export class Region {
 
   /**
    * Region dimension
+   *
    * @type {Dimensions}
    */
   dimensionId
 
   /**
    * Unique region key
+   *
    * @type {string}
    */
   key
 
   /**
    * Region permissions
+   *
    * @type {RegionPermissions}
    */
   permissions
 
-  /**
-   * Permissions used by default
-   */
+  /** Permissions used by default */
   defaultPermissions = DEFAULT_REGION_PERMISSIONS
 
   /**
    * Creates the region
+   *
    * @param {object} o
    * @param {Dimensions} o.dimensionId - The dimension ID of the region.
    * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
@@ -110,6 +114,7 @@ export class Region {
 
   /**
    * Sets the region permissions based on the permissions and the default permissions
+   *
    * @param {object} o
    * @param {Partial<RegionPermissions> | undefined} [o.permissions]
    * @param {boolean} [o.creating]
@@ -122,6 +127,7 @@ export class Region {
 
   /**
    * Checks if the vector is in the region
+   *
    * @param {Vector3} vector
    */
   vectorInRegion(vector) {
@@ -129,26 +135,21 @@ export class Region {
     return false
   }
 
-  /**
-   * Region owner name
-   */
+  /** Region owner name */
   get ownerName() {
     return Player.name(this.permissions.owners[0])
   }
 
-  /**
-   * Display name of the region
-   */
+  /** Display name of the region */
   get name() {
     return this.ownerName ?? new Date(this.key).format()
   }
 
-  /**
-   * @typedef {'owner' | 'member' | false} RegionPlayerRole
-   */
+  /** @typedef {'owner' | 'member' | false} RegionPlayerRole */
 
   /**
    * Returns region role of specified player
+   *
    * @param {string | Player} playerOrId
    * @returns {RegionPlayerRole}
    */
@@ -161,6 +162,7 @@ export class Region {
 
   /**
    * Checks if a player with a given `playerId` is a member of the region
+   *
    * @param {string} playerId - The id of the player
    */
   isMember(playerId) {
@@ -168,9 +170,9 @@ export class Region {
   }
 
   /**
-   * A function that will loop through all the owners
-   * of a region and call the callback function on each of them.
-   * @param {Parameters<Array<Player>['forEach']>[0]} callback - Callback to run
+   * A function that will loop through all the owners of a region and call the callback function on each of them.
+   *
+   * @param {Parameters<Player[]['forEach']>[0]} callback - Callback to run
    */
   forEachOwner(callback) {
     const onlineOwners = []
@@ -179,13 +181,11 @@ export class Region {
       if (player) onlineOwners.push(player)
     }
     onlineOwners.forEach(
-      (player, i, owners) => player && util.catch(() => callback(player, i, owners), 'Region.forEachOwner')
+      (player, i, owners) => player && util.catch(() => callback(player, i, owners), 'Region.forEachOwner'),
     )
   }
 
-  /**
-   * Updates this region in the database
-   */
+  /** Updates this region in the database */
   update(region = Region) {
     return {
       permissions: DB.removeDefaults(this.permissions, this.defaultPermissions),
@@ -193,9 +193,7 @@ export class Region {
     }
   }
 
-  /**
-   * Removes this region
-   */
+  /** Removes this region */
   delete() {
     Region.regions = Region.regions.filter(e => e.key !== this.key)
     delete REGION_DB[this.key]

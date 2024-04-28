@@ -6,12 +6,10 @@ import { Cutscene } from './Cutscene.js'
 
 /**
  * List of items that controls the editing process
- * @type {Record<string,
- *   [
- *     slot: number,
- *     item: ItemStack,
- *     onUse: (player: Player, cutscene: Cutscene, temp: Temporary) => void
- *   ]
+ *
+ * @type {Record<
+ *   string,
+ *   [slot: number, item: ItemStack, onUse: (player: Player, cutscene: Cutscene, temp: Temporary) => void]
  * >}
  */
 const controls = {
@@ -21,7 +19,7 @@ const controls = {
     (player, cutscene) => {
       cutscene.addPoint(player, cutscene.sections)
       player.info(
-        `Точка добавлена. Точек в секции: §f${cutscene.sections[cutscene.sections.length - 1]?.points.length}`
+        `Точка добавлена. Точек в секции: §f${cutscene.sections[cutscene.sections.length - 1]?.points.length}`,
       )
     },
   ],
@@ -29,7 +27,7 @@ const controls = {
     4,
     new ItemStack(MinecraftItemTypes.ChainCommandBlock).setInfo(
       '§r§3> §fСоздать секцию',
-      'используй предмет, чтобы создать секцию катсцены (множество точек).'
+      'используй предмет, чтобы создать секцию катсцены (множество точек).',
     ),
     (player, cutscene) => {
       cutscene.addSection(cutscene.sections, {})
@@ -40,7 +38,7 @@ const controls = {
     7,
     new ItemStack(MinecraftItemTypes.Barrier).setInfo(
       '§r§c> §fОтмена',
-      'используйте предмет, чтобы отменить редактироание катсцены и вернуть все в исходное состояние.'
+      'используйте предмет, чтобы отменить редактироание катсцены и вернуть все в исходное состояние.',
     ),
     (player, cutscene, temp) => {
       // Restore bakcup
@@ -55,7 +53,7 @@ const controls = {
     8,
     new ItemStack(MinecraftItemTypes.HoneyBottle).setInfo(
       '§r§6> §fСохранить и выйти',
-      'используй предмет, чтобы выйти из меню катсцены.'
+      'используй предмет, чтобы выйти из меню катсцены.',
     ),
     (player, cutscene, temp) => {
       temp.cleanup()
@@ -65,8 +63,9 @@ const controls = {
 }
 
 /**
- * Checks if the cutscene location is valid, then teleports the player to that
- * location and backs up player inventory and cutscene data.
+ * Checks if the cutscene location is valid, then teleports the player to that location and backs up player inventory
+ * and cutscene data.
+ *
  * @param {Player} player - The player who is editing the cutscene.
  * @param {Cutscene} cutscene - The cutscene cene to be edited
  */
@@ -85,7 +84,7 @@ export function editCatcutscene(player, cutscene) {
         }
       },
       'cutscene section edges particles',
-      30
+      30,
     )
 
     const controller = { cancel: false }
@@ -97,7 +96,7 @@ export function editCatcutscene(player, cutscene) {
             if (!Vector.valid(point)) return
             particle(point, whiteParticle)
           },
-          { controller, sections: cutscene.addPoint(player), intervalTime: 1 }
+          { controller, sections: cutscene.addPoint(player), intervalTime: 1 },
         )
       }
     })
@@ -170,14 +169,15 @@ whiteParticle.setColorRGBA('color', {
 
 /**
  * @typedef {{
- *  hotbarSlots: (ItemStack | undefined)[];
- *  position: Vector3;
- *  cutsceneSectionsBackup: Cutscene['sections'];
+ *   hotbarSlots: (ItemStack | undefined)[]
+ *   position: Vector3
+ *   cutsceneSectionsBackup: Cutscene['sections']
  * }} EditingCutscenePlayer
  */
 
 /**
  * Map of player id to player editing cutscene
+ *
  * @type {Record<string, EditingCutscenePlayer>}
  */
 const EDITING_CUTSCENE = {}
@@ -196,9 +196,7 @@ function backupPlayerInventoryAndCutscene(player, cutscene) {
   cutscene.sections = []
 }
 
-/**
- * @param {Player} player
- */
+/** @param {Player} player */
 function backupPlayerInventory(player) {
   /** @type {EditingCutscenePlayer['hotbarSlots']} */
   const hotbarSlots = []
@@ -215,12 +213,12 @@ function backupPlayerInventory(player) {
 }
 
 /**
- * Iterates over the player's hotbar slots and performs a specified
- * action on each slot.
+ * Iterates over the player's hotbar slots and performs a specified action on each slot.
+ *
  * @param {Player} player - Target player to get hotbar from
- * @param {(i: number, container: Container) => void} callback - Callback function
- * that will be called for each hotbar slot. It takes two arguments: the index of the current slot
- * (from 0 to 8) and the container` object belonging to the player.
+ * @param {(i: number, container: Container) => void} callback - Callback function that will be called for each hotbar
+ *   slot. It takes two arguments: the index of the current slot (from 0 to 8) and the container` object belonging to
+ *   the player.
  */
 function forEachHotbarSlot(player, callback) {
   const { container } = player

@@ -42,7 +42,7 @@ system.runInterval(
     }
   },
   'PVP',
-  20
+  20,
 )
 
 Core.afterEvents.worldLoad.subscribe(() => {
@@ -64,7 +64,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
       }
     },
     'PVP player',
-    0
+    0,
   )
 
   world.afterEvents.entityDie.subscribe(event => {
@@ -74,7 +74,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
         damageSource: event.damageSource,
         hurtEntity: event.deadEntity,
       },
-      true
+      true,
     )
   })
   world.afterEvents.entityHurt.subscribe(event => {
@@ -83,8 +83,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
 })
 
 /**
- *
- * @param {{damageSource: import("@minecraft/server").EntityDamageSource, hurtEntity: Entity, damage: number}} event
+ * @param {{ damageSource: import('@minecraft/server').EntityDamageSource; hurtEntity: Entity; damage: number }} event
  * @param {boolean} fatal
  * @returns
  */
@@ -137,7 +136,7 @@ function onDamage(event, fatal = false) {
       if (event?.hurtEntity instanceof Player) {
         // Player
         damage.damagingEntity.onScreenDisplay.setActionBar(
-          `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`
+          `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`,
         )
       } else {
         // Entity
@@ -153,7 +152,7 @@ function onDamage(event, fatal = false) {
                 },
                 { text: isBow ? ' §gзастрелен' : ' §gубит' },
               ],
-            })
+            }),
         )
       }
       // }
@@ -173,7 +172,6 @@ function onDamage(event, fatal = false) {
 }
 
 /**
- *
  * @param {Player} player
  * @param {number} health
  * @param {number} max

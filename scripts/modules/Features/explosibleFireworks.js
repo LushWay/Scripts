@@ -1,9 +1,7 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 
-/**
- * @type {Record<string, { date: number, entity: Entity }>}
- */
+/** @type {Record<string, { date: number; entity: Entity }>} */
 const SPAWNED_FIREWORKS = {}
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   if (!entity.isValid()) return
@@ -26,9 +24,7 @@ world.afterEvents.itemUse.subscribe(event => {
   }
 })
 
-/**
- * @type {Record<string, { source: Player, firework: Entity }>}
- */
+/** @type {Record<string, { source: Player; firework: Entity }>} */
 const FIREWORKS = {}
 
 system.runInterval(
@@ -56,5 +52,5 @@ system.runInterval(
     }
   },
   'firework boom',
-  0
+  0,
 )

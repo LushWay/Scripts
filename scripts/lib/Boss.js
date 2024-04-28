@@ -1,10 +1,4 @@
-/**
- * To add boss
- * "minecraft:boss": {
-    "should_darken_sky": false,
-    "hud_range": 25
-}
- */
+/** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
 import { system, world } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
@@ -15,25 +9,22 @@ import { chunkIsUnloaded } from './GameUtils.js'
 
 /**
  * @typedef {{
- *  id: string;
- *  date: number;
- *  dead: boolean;
- *}} BossDB
+ *   id: string
+ *   date: number
+ *   dead: boolean
+ * }} BossDB
  */
 
 export class Boss {
-  /**
-   * Boss Database. Contains meta information about spawned boss entities
-   */
+  /** Boss Database. Contains meta information about spawned boss entities */
   static db = new DynamicPropertyDB('boss', {
-    /**
-     * @type {Record<string, BossDB | undefined>}
-     */
+    /** @type {Record<string, BossDB | undefined>} */
     type: {},
   }).proxy()
 
   /**
    * List of all registered boss types
+   *
    * @type {Boss[]}
    */
   static types = []
@@ -113,9 +104,7 @@ export class Boss {
     }
   }
 
-  /**
-   * @param {BossDB} db
-   */
+  /** @param {BossDB} db */
   checkRespawnTime(db) {
     if (Date.now() > db.date + this.respawnTime) this.spawnEntity()
   }
@@ -142,6 +131,7 @@ export class Boss {
 
   /**
    * Ensures that entity exists and if not calls onDie method
+   *
    * @param {BossDB} db
    */
   ensureEntity(db) {

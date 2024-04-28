@@ -5,10 +5,11 @@ class RequestError extends Error {}
 
 /**
  * Makes http request to node.js instance
+ *
  * @template {keyof BDS.Routes} Path
  * @param {Path} path
- * @param {BDS.Routes[Path]["req"]} body
- * @returns {Promise<BDS.Routes[Path]["res"]>}
+ * @param {BDS.Routes[Path]['req']} body
+ * @returns {Promise<BDS.Routes[Path]['res']>}
  */
 export async function request(path, body) {
   const sbody = JSON.stringify(body)
@@ -22,7 +23,7 @@ export async function request(path, body) {
         .setMethod(HttpRequestMethod.Post)
         .addHeader('content-type', 'text/plain')
         .addHeader('content-length', sbody.length.toString())
-        .setBody(sbody)
+        .setBody(sbody),
     )
 
     let body
@@ -31,7 +32,7 @@ export async function request(path, body) {
     } catch (e) {
       const error = util.error(e, { parseOnly: true })
       throw new RequestError(
-        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`
+        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`,
       )
     }
 
@@ -44,9 +45,9 @@ export async function request(path, body) {
 }
 
 /**
- * Sends packet message to the core nodejs process running BDS.
- * Used mostly for console/chat logging purposes, when data must
- * be sent but the response is not needed.
+ * Sends packet message to the core nodejs process running BDS. Used mostly for console/chat logging purposes, when data
+ * must be sent but the response is not needed.
+ *
  * @template {keyof BDS.StdoutPackets} T
  * @param {T} type - Packet type
  * @param {BDS.StdoutPackets[T]} packet - Packet content
@@ -55,6 +56,4 @@ export function sendPacketToStdout(type, packet) {
   console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
 }
 
-/**
- * @typedef {import("./routes.js")} I
- */
+/** @typedef {import('./routes.js')} I */

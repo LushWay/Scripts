@@ -3,13 +3,9 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { migration } from 'lib/Database/Migrations.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 
-/**
- * @typedef {import('@minecraft/vanilla-data').BlockStateMapping} BlockStates
- */
+/** @typedef {import('@minecraft/vanilla-data').BlockStateMapping} BlockStates */
 
-/**
- * @typedef {[...Parameters<BlockPermutation.resolve>, number]} BlockStateWeight
- */
+/** @typedef {[...Parameters<BlockPermutation.resolve>, number]} BlockStateWeight */
 
 /**
  * @template {keyof BlockStates} Name
@@ -32,9 +28,7 @@ const Trees = BlockTypes.getAll()
 
 Trees.push(mangroove)
 
-/**
- * @typedef {Record<string, BlockStateWeight[]>} BlocksSets
- */
+/** @typedef {Record<string, BlockStateWeight[]>} BlocksSets */
 
 /** @type {BlocksSets} */
 export const DEFAULT_BLOCK_SETS = {
@@ -72,15 +66,12 @@ export function getAllBlockSets(id) {
   return { ...playerBlockSets, ...DEFAULT_BLOCK_SETS }
 }
 
-/**
- * @param {string} id
- */
+/** @param {string} id */
 export function getOwnBlockSetsCount(id) {
   return Object.keys(blockSets[id] ?? {}).length
 }
 
 /**
- *
  * @param {string} id
  * @param {string} setName
  * @param {BlockStateWeight[] | undefined} set
@@ -149,7 +140,7 @@ export function getBlockSet([player, name]) {
           'with states',
           states,
           'block set',
-          stringifyBlocksSetRef([player, name])
+          stringifyBlocksSetRef([player, name]),
         )
       }
       return new Array(weight).fill(permutation)
@@ -158,9 +149,7 @@ export function getBlockSet([player, name]) {
     .flat()
 }
 
-/**
- * @param {BlocksSetRef} ref
- */
+/** @param {BlocksSetRef} ref */
 export function getBlockSetForReplaceTarget(ref) {
   return getBlockSetRaw(ref, [undefined]).map(e => {
     if (Array.isArray(e)) {
@@ -170,14 +159,12 @@ export function getBlockSetForReplaceTarget(ref) {
   })
 }
 
-/**
- * @typedef {[string, string]} BlocksSetRef
- */
+/** @typedef {[string, string]} BlocksSetRef */
 
 /**
  * @param {BlocksSetRef} info
  * @param {Player} player
- * @returns {[string[], {defaultValue: string}]}
+ * @returns {[string[], { defaultValue: string }]}
  */
 export function blockSetDropdown([_, defaultSet], player) {
   return [Object.keys(getAllBlockSets(player.id)), { defaultValue: defaultSet }]

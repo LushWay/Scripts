@@ -75,7 +75,7 @@ export class Learning {
                 const hit = this.player.dimension.getBlockFromRay(
                   this.player.location,
                   { x: 0, y: 1, z: 0 },
-                  { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 }
+                  { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 },
                 )
 
                 if (hit) {
@@ -87,7 +87,7 @@ export class Learning {
                 }
               },
               'learning quest, free space detecter',
-              20
+              20,
             )
           })
         },
@@ -183,10 +183,10 @@ export class Learning {
 
       q.end(function () {
         this.player.success(
-          '§6Обучение закончено!\nВы можете пойти в каменоломню чтобы переплавить железо или продолжить добывавать новые ресурсы в шахте.'
+          '§6Обучение закончено!\nВы можете пойти в каменоломню чтобы переплавить железо или продолжить добывавать новые ресурсы в шахте.',
         )
       })
-    }
+    },
   )
   static lootTable = LEARNING_L
   static randomTeleportLocation = new EditableLocation('learning_quest_rtp', { type: 'vector3+radius' }).safe
@@ -224,7 +224,7 @@ Learning.randomTeleportLocation.onLoad.subscribe(location => {
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
   if (player.database.role === 'spectator') {
     player.info(
-      '§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.'
+      '§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.',
     )
   } else if (firstJoin) Learning.quest.enter(player)
 })
@@ -250,6 +250,6 @@ Anarchy.learningRTP = player => {
         // player.success('Вы были перемещены на случайную локацию.')
       },
       keepInSkyTime: 20,
-    }
+    },
   )
 }

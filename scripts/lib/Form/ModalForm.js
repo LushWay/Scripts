@@ -3,28 +3,29 @@ import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
 import { FormCallback, showForm } from './utils.js'
 import { util } from 'lib/util.js'
 
-/**
- * @template {Function} [Callback = (ctx: FormCallback) => void]
- */
+/** @template {Function} [Callback=(ctx: FormCallback) => void] Default is `(ctx: FormCallback) => void` */
 export class ModalForm {
   static arrayDefaultNone = 'Никакой'
 
   title = ''
   /**
    * The default minecraft form this form is based on
-   * @type {ModalFormData}
+   *
    * @private
+   * @type {ModalFormData}
    */
   form
   /**
    * The arguments this form has
-   * @type {IModalFormArg[]}
+   *
    * @private
+   * @type {IModalFormArg[]}
    */
   args
   /**
    * Creates a new form to be shown to a player
-   * @param {string} title the title that this form should have
+   *
+   * @param {string} title The title that this form should have
    */
   constructor(title) {
     this.form = new ModalFormData()
@@ -35,13 +36,14 @@ export class ModalForm {
   }
   /**
    * Adds a dropdown to this form
+   *
    * @template {string[]} T
-   * @param {string} label  label to show on dropdown
-   * @param {T} options  the availiabe options for this dropdown
+   * @param {string} label Label to show on dropdown
+   * @param {T} options The availiabe options for this dropdown
    * @param {object} [p]
-   * @param {number} [p.defaultValueIndex]  the default value index
+   * @param {number} [p.defaultValueIndex] The default value index
    * @param {T[number]} [p.defaultValue]
-   * @returns {ModalForm<AppendFormField<Callback, T[number]>>} this
+   * @returns {ModalForm<AppendFormField<Callback, T[number]>>} This
    */
   addDropdown(label, options, { defaultValueIndex = 0, defaultValue } = {}) {
     if (defaultValue) {
@@ -55,21 +57,23 @@ export class ModalForm {
   }
   /**
    * Adds a dropdown to this form
-   * @template {Record<string, string>} [T=Record<string, string>]
-   * @template {false | true} [None=false]
-   * @param {string} label  label to show on dropdown
-   * @param {T} object  the availiabe options for this dropdown
+   *
+   * @template {Record<string, string>} [T=Record<string, string>] Default is `Record<string, string>`
+   * @template {false | true} [None=false] Default is `false`
+   * @param {string} label Label to show on dropdown
+   * @param {T} object The availiabe options for this dropdown
    * @param {object} [options]
-   * @param {number} [options.defaultValueIndex]  the default value index
-   * @param {T[keyof T]} [options.defaultValue]  the default value
+   * @param {number} [options.defaultValueIndex] The default value index
+   * @param {T[keyof T]} [options.defaultValue] The default value
    * @param {None} [options.none]
    * @param {string} [options.noneText]
-   * @returns {ModalForm<AppendFormField<Callback, Exclude<None extends false ? keyof T : keyof T | null, number>>>} this
+   * @returns {ModalForm<AppendFormField<Callback, Exclude<None extends false ? keyof T : keyof T | null, number>>>}
+   *   This
    */
   addDropdownFromObject(
     label,
     object,
-    { defaultValueIndex, defaultValue, none, noneText = ModalForm.arrayDefaultNone } = {}
+    { defaultValueIndex, defaultValue, none, noneText = ModalForm.arrayDefaultNone } = {},
   ) {
     /** @type {(string | null)[]} */
     let objectKeys = Object.keys(object)
@@ -93,11 +97,12 @@ export class ModalForm {
   }
   /**
    * Adds a slider to this form
-   * @param {string} label  label to be shown on this slider
-   * @param {number} minimumValue  the smallest value this can be
-   * @param {number} maximumValue  the maximum value this can be
-   * @param {number} valueStep  how this slider increments
-   * @param {number} defaultValue  the default value in slider
+   *
+   * @param {string} label Label to be shown on this slider
+   * @param {number} minimumValue The smallest value this can be
+   * @param {number} maximumValue The maximum value this can be
+   * @param {number} valueStep How this slider increments
+   * @param {number} defaultValue The default value in slider
    * @returns {ModalForm<AppendFormField<Callback, number>>}
    */
   addSlider(label, minimumValue, maximumValue, valueStep = 1, defaultValue = 0) {
@@ -108,8 +113,9 @@ export class ModalForm {
   }
   /**
    * Adds a toggle to this form
-   * @param {string} label  the name of this toggle
-   * @param {boolean} defaultValue  the default toggle value could be true or false
+   *
+   * @param {string} label The name of this toggle
+   * @param {boolean} defaultValue The default toggle value could be true or false
    * @returns {ModalForm<AppendFormField<Callback, boolean>>}
    */
   addToggle(label, defaultValue) {
@@ -120,9 +126,10 @@ export class ModalForm {
   }
   /**
    * Adds a text field to this form
-   * @param {string} label  label for this textField
-   * @param {string} placeholderText  the text that shows on this field
-   * @param {string} [defaultValue]  the default value that this field has
+   *
+   * @param {string} label Label for this textField
+   * @param {string} placeholderText The text that shows on this field
+   * @param {string} [defaultValue] The default value that this field has
    * @returns {ModalForm<AppendFormField<Callback, string>>}
    */
   addTextField(label, placeholderText, defaultValue) {
@@ -134,8 +141,9 @@ export class ModalForm {
 
   /**
    * Shows this form to a player
-   * @param {Player} player  player to show to
-   * @param {Callback} callback  sends a callback when this form is submited
+   *
+   * @param {Player} player Player to show to
+   * @param {Callback} callback Sends a callback when this form is submited
    * @returns {Promise<void>}
    */
   async show(player, callback) {
@@ -156,9 +164,9 @@ export class ModalForm {
           this,
           player,
           // @ts-expect-error idk
-          callback
+          callback,
         ),
-        ...args
+        ...args,
       )
     })
   }

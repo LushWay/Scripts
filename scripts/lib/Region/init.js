@@ -3,9 +3,7 @@ import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from 'lib/R
 import { Region } from 'lib/Region/Class/Region.js'
 import { REGION_DB } from './DB'
 
-/**
- * RadiusRegions that can be restored from db
- */
+/** RadiusRegions that can be restored from db */
 const RadiusRegionSubTypes = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion]
 Object.values(REGION_DB).forEach(region => {
   if (region.t === 'c')
@@ -13,7 +11,7 @@ Object.values(REGION_DB).forEach(region => {
       new CubeRegion({
         ...region,
         creating: false,
-      })
+      }),
     )
   else {
     const RadiusRegionSubtype =
@@ -27,7 +25,7 @@ Object.values(REGION_DB).forEach(region => {
         ...region,
         creating: false,
         subclassing: RadiusRegionSubtype !== RadiusRegion,
-      })
+      }),
     )
   }
 })

@@ -6,27 +6,33 @@ const $sidebar = '§t§i§psidebar'
 const $title = 'title'
 const $tipPrefix = '§t§i§p'
 
-/**
- * @typedef {'title' | 'sidebar' | `tip${1|2|3|4|5}`} TitleType
- */
+/** @typedef {'title' | 'sidebar' | `tip${1 | 2 | 3 | 4 | 5}`} TitleType */
 
 /**
- * @type {Record<string, {
- *   actions: ((p: Player) => void)[]
- *   title?: {
- *      expires?: number
- *      subtitle?: McText
+ * @type {Record<
+ *   string,
+ *   {
+ *     actions: ((p: Player) => void)[]
+ *     title?: {
+ *       expires?: number
+ *       subtitle?: McText
+ *     }
+ *   } & {
+ *     [K in TitleType]?:
+ *       | {
+ *           value: McText
+ *           priority: number
+ *         }
+ *       | undefined
  *   }
- * } & {
- *   [K in TitleType]?: {
- *     value: McText,
- *     priority: number
- *   } | undefined
- * }>}
+ * >}
  */
 const TITLES = {}
 
-/** @type {Omit<typeof ScreenDisplay['prototype'], 'player'> & ThisType<{player: Player & {[SCREEN_DISPLAY]: ScreenDisplay}} & Omit<ScreenDisplay, 'player'>>} */
+/**
+ * @type {Omit<(typeof ScreenDisplay)['prototype'], 'player'> &
+ *   ThisType<{ player: Player & { [SCREEN_DISPLAY]: ScreenDisplay } } & Omit<ScreenDisplay, 'player'>>}
+ */
 export const SCREEN_DISPLAY_OVERRIDE = {
   isValid() {
     return this.player[SCREEN_DISPLAY].isValid()
@@ -128,6 +134,6 @@ system.run(() => {
       }
     },
     'title set',
-    1
+    1,
   )
 })

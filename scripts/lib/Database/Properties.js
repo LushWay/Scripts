@@ -6,15 +6,15 @@ const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
 
 /**
- * @template {string} [Key=string]
- * @template [Value=undefined]
+ * @template {string} [Key=string] Default is `string`
+ * @template [Value=undefined] Default is `undefined`
  */
 export class DynamicPropertyDB {
   /**
    * Usefull when a lot of data is being read from object, taken from database.
    *
-   * **Caution**: Mutating unproxied value can cause data leaks.
-   * Consider using immutableUnproxy instead.
+   * **Caution**: Mutating unproxied value can cause data leaks. Consider using immutableUnproxy instead.
+   *
    * @template T
    * @param {T} value
    * @returns {T}
@@ -33,9 +33,7 @@ export class DynamicPropertyDB {
     // @ts-expect-error Generics
     return this.unproxy(value)
   }
-  /**
-   * @type {Record<string, DynamicPropertyDB<any, any>>}
-   */
+  /** @type {Record<string, DynamicPropertyDB<any, any>>} */
   static tables = {}
 
   static separator = '|'
@@ -52,13 +50,10 @@ export class DynamicPropertyDB {
    */
   defaultValue
 
-  /**
-   * @type {string}
-   */
+  /** @type {string} */
   tableId
 
   /**
-   *
    * @param {string} tableId
    * @param {{
    *   type?: Record<Key, Value>
@@ -74,7 +69,7 @@ export class DynamicPropertyDB {
             {
               defaultValue: options.defaultValue,
             },
-            source
+            source,
           )
         : source
     }
@@ -98,7 +93,7 @@ export class DynamicPropertyDB {
         // New way load
         if (typeof length !== 'number') {
           util.error(
-            new DatabaseError(`Expected index in type of number, recieved ${typeof value}, table '${this.tableId}'`)
+            new DatabaseError(`Expected index in type of number, recieved ${typeof value}, table '${this.tableId}'`),
           )
 
           length = 1
@@ -110,9 +105,9 @@ export class DynamicPropertyDB {
             util.error(
               new DatabaseError(
                 `Corrupted database table '${this.tableId}', index ${i}, expected string, recieved '${util.inspect(
-                  prop
-                )}'`
-              )
+                  prop,
+                )}'`,
+              ),
             )
             console.error('Loaded part of database:', value)
             return
@@ -131,16 +126,14 @@ export class DynamicPropertyDB {
               ? DB.setDefaults(value, defaultv)
               : value ?? defaultv,
           ]
-        })
+        }),
       )
     } catch (error) {
       util.error(new DatabaseError(`Failed to init table '${this.tableId}': ${util.error(error, { parseOnly: true })}`))
     }
   }
 
-  /**
-   * @returns {Record<Key, Value>}
-   */
+  /** @returns {Record<Key, Value>} */
   proxy() {
     return this.subproxy(this.value, '', true)
   }
@@ -165,8 +158,8 @@ export class DynamicPropertyDB {
                 ? DB.removeDefaults(value, defaultv)
                 : value,
             ]
-          })
-        )
+          }),
+        ),
       )
       const strings = str.match(DB.PROPERTY_CHUNK_REGEXP)
       if (!strings) throw new DatabaseError('Failed to save db: cannot split')
@@ -179,16 +172,14 @@ export class DynamicPropertyDB {
     return (this._needSaveRun = true)
   }
 
-  /**
-   * @type {WeakMap<object, object>}
-   */
+  /** @type {WeakMap<object, object>} */
   subproxyMap = new WeakMap()
 
   /**
-   * @param {Record<string, any> & {[IS_PROXIED]?: boolean}} object
+   * @private
+   * @param {Record<string, any> & { [IS_PROXIED]?: boolean }} object
    * @param {string} keys
    * @returns {Record<string, any>}
-   * @private
    */
   subproxy(object, keys, initial = false) {
     if (object[IS_PROXIED]) return object

@@ -8,10 +8,7 @@ import { DatabaseError } from './Default.js'
  * @extends {Set<T>}
  */
 export class PersistentSet extends Set {
-  /**
-   *
-   * @param {string} id
-   */
+  /** @param {string} id */
   constructor(id) {
     super()
     this.id = id

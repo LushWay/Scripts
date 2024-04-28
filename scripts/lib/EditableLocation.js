@@ -5,31 +5,23 @@ import { util } from './util.js'
 // TODO Location edit form from command -locations
 // TODO location grouping
 
-/**
- * @typedef {'vector3' | 'vector3+rotation' | 'vector3+radius'} LocationTypeSuperset
- */
+/** @typedef {'vector3' | 'vector3+rotation' | 'vector3+radius'} LocationTypeSuperset */
 
 /**
  * @template {LocationTypeSuperset} LocationType
  * @typedef {LocationType extends 'vector3'
  *   ? Vector3
  *   : LocationType extends 'vector3+rotation'
- *     ? (Vector3 & { xRot: number; yRot: number })
- *     : (Vector3 & { radius: number })
- * } Location
+ *     ? Vector3 & { xRot: number; yRot: number }
+ *     : Vector3 & { radius: number }} Location
  */
 
-/**
- * @template {LocationTypeSuperset} [LocationType='vector3']
- */
+/** @template {LocationTypeSuperset} [LocationType='vector3'] Default is `'vector3'` */
 export class EditableLocation {
   /**
-   * @returns {(
-   *   { valid: false } |
-   *   ({ valid: true } & Location<LocationType>)
-   * ) & {
-   *   onLoad: EditableLocation<LocationType>['onLoad'],
-   *   teleport: EditableLocation<LocationType>['teleport'],
+   * @returns {({ valid: false } | ({ valid: true } & Location<LocationType>)) & {
+   *   onLoad: EditableLocation<LocationType>['onLoad']
+   *   teleport: EditableLocation<LocationType>['teleport']
    *   id: string
    * }}
    */
@@ -77,11 +69,10 @@ export class EditableLocation {
   fallback = false
 
   /**
-   *
    * @param {string} id
    * @param {Object} [options]
    * @param {LocationType} [options.type]
-   * @param {EditableLocation<LocationType>["fallback"]} [options.fallback]
+   * @param {EditableLocation<LocationType>['fallback']} [options.fallback]
    */
   constructor(id, { fallback = false, type } = {}) {
     this.id = id
@@ -102,9 +93,7 @@ export class EditableLocation {
     this.load()
   }
 
-  /**
-   * @private
-   */
+  /** @private */
   load() {
     const raw = Settings.worldDatabase[EditableLocation.key][this.id]
 
@@ -124,7 +113,7 @@ export class EditableLocation {
 
     if (location.length !== this.format.trim().split(' ').length) {
       return util.error(
-        new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`)
+        new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`),
       )
     }
 
@@ -134,18 +123,16 @@ export class EditableLocation {
       this.type === 'vector3'
         ? { x, y, z }
         : this.type === 'vector3+rotation'
-        ? { x, y, z, yRot: loc4, xRot: loc3 }
-        : { x, y, z, radius: loc3 }
+          ? { x, y, z, yRot: loc4, xRot: loc3 }
+          : { x, y, z, radius: loc3 },
     )
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   teleport(player) {
     player.teleport(
       Vector.add(this, { x: 0.5, y: 0, z: 0.5 }),
-      this.type === 'vector3+rotation' ? { rotation: { x: this.xRot, y: this.yRot } } : void 0
+      this.type === 'vector3+rotation' ? { rotation: { x: this.xRot, y: this.yRot } } : void 0,
     )
   }
 }

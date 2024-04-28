@@ -49,7 +49,7 @@ export function questsMenu(player, back) {
     filters: {},
     addCustomButtonBeforeArray(form) {
       form.addButton(util.badge('§3Завершенные задания', quests.completed.length), () =>
-        completeQuestsMenu(player, self)
+        completeQuestsMenu(player, self),
       )
     },
     button(dbquest) {
@@ -86,7 +86,7 @@ function completeQuestsMenu(player, back) {
         return [quest.name, null, () => questMenu(player, quest, self)]
       },
       back,
-    }
+    },
   ).show(player)
 }
 

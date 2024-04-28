@@ -5,6 +5,7 @@ import { emoji } from 'lib/Assets/emoji.js'
 export class Cost {
   /**
    * Returns string representation of cost
+   *
    * @returns {string}
    */
   string(canBuy = true) {
@@ -12,6 +13,7 @@ export class Cost {
   }
   /**
    * If the player have this cost returns true, otherwise false
+   *
    * @param {Player} player
    * @returns {boolean}
    */
@@ -20,6 +22,7 @@ export class Cost {
   }
   /**
    * Removes this cost from player
+   *
    * @param {Player} player
    */
   buy(player) {
@@ -27,6 +30,7 @@ export class Cost {
   }
   /**
    * Returns fail info for player
+   *
    * @param {Player} player
    * @returns {string}
    */
@@ -43,9 +47,7 @@ class ScoreboardCost extends Cost {
     this.cost = cost
   }
 
-  /**
-   * @type {import('@minecraft/server').ScoreName}
-   */
+  /** @type {import('@minecraft/server').ScoreName} */
   scoreboard = 'money'
 
   postfix = 'N'
@@ -55,24 +57,18 @@ class ScoreboardCost extends Cost {
   string(canBuy = true) {
     return `${canBuy ? this.color : '§c'}${this.cost}${this.postfix}`
   }
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   check(player) {
     return player.scores[this.scoreboard] >= this.cost
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   buy(player) {
     player.scores[this.scoreboard] -= this.cost
     super.buy(player)
   }
 
-  /**
-   * @param {Player} player
-   */
+  /** @param {Player} player */
   failed(player) {
     super.failed(player)
     const have = player.scores[this.scoreboard]
