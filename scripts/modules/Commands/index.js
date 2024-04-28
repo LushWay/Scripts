@@ -1,3 +1,4 @@
+import './camera.js'
 import './db.js'
 import './gamemode.js'
 import './help.js'

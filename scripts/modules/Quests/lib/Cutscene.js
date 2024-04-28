@@ -108,17 +108,6 @@ export class Cutscene {
   }
 
   /**
-   * @private
-   * @type {Partial<Section>}
-   */
-  get switchSection() {
-    return {
-      easeTime: 0.05,
-      easeType: EasingType.Linear,
-    }
-  }
-
-  /**
    * Plays the Cutscene for the provided player
    *
    * @param {Player} player - Player to play cutscene for
@@ -132,15 +121,25 @@ export class Cutscene {
 
     const controller = { cancel: false }
     this.forEachPoint(
-      (point, pointIndex, section) => {
-        player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-          location: point,
-          rotation: { x: point.rx, y: point.ry },
-          easeOptions: Object.assign(this.defaultSection, pointIndex === 0 ? this.switchSection : section),
-        })
+      async (point, pointNum, section, sectionNum) => {
+        const sectionSwitch = pointNum === 0 && sectionNum !== 0
+        if (!sectionSwitch) {
+          player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
+            location: point,
+            rotation: { x: point.rx, y: point.ry },
+            easeOptions: Object.assign(this.defaultSection, section),
+          })
+        } else {
+          await system.sleep(10)
+
+          // There is no way to set a camera without easing using pure script
+          player.runCommand(
+            `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vector.string(point)} rot ${point.rx} ${point.ry}`,
+          )
+        }
       },
       { controller, exit: () => this.exit(player) },
-    )
+    ).catch(console.error)
 
     this.current[player.id] = {
       player,
@@ -151,8 +150,9 @@ export class Cutscene {
   /**
    * Asynchronuosly runs callback for each point in the cutscene. Callback has access to the current point section
    *
-   * @param {(point: Point, pointIndex: number, section: Section, sectionIndex: number) => void} callback - Function
-   *   that runs on every point
+   * @param {(point: Point, pointIndex: number, section: Section, sectionIndex: number) => void | Promise<void>} callback
+   *   - Function that runs on every point
+   *
    * @param {object} options
    * @param {AbortController} options.controller - Controller used to abort operation
    * @param {Sections} [options.sections] - Section list
@@ -167,7 +167,7 @@ export class Cutscene {
         for (const { index: pointIndex, ...point } of this.pointIterator(section)) {
           if (controller.cancel) throw 0
 
-          callback(point, pointIndex, section, sectionIndex)
+          await callback(point, pointIndex, section, sectionIndex)
           await system.sleep(intervalTime)
         }
       }
@@ -188,8 +188,6 @@ export class Cutscene {
   *pointIterator({ step = 0.5, points }) {
     let index = 0
     for (let point = 0; point <= points.length; point += step) {
-      index++
-
       if (!points[0]) yield { x: 0, y: 0, z: 0, rx: 0, ry: 0, index }
       const i = Math.floor(point)
       const t = point - i
@@ -206,6 +204,7 @@ export class Cutscene {
       const ry = bezier([v0, v1, v2, v3], 'ry', t)
 
       yield { x, y, z, rx, ry, index }
+      index++
     }
   }
 
