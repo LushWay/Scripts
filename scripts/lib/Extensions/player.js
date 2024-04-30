@@ -2,9 +2,9 @@ import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, 
 import { SOUNDS } from 'lib/Assets/config.js'
 import { request } from 'lib/BDS/api.js'
 import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
-import { OverTakes } from './OverTakes.js'
+import { extend } from './extend.js'
 
-OverTakes(Player, {
+extend(Player, {
   getById(name) {
     for (const player of world.getPlayers()) {
       if (player.id === name) return player
@@ -39,7 +39,7 @@ export const CLOSING_CHAT = new Set()
 
 export const SCREEN_DISPLAY = Symbol('screen_display')
 
-OverTakes(Player.prototype, {
+extend(Player.prototype, {
   isSimulated() {
     return 'jump' in this
   },
@@ -107,7 +107,7 @@ OverTakes(Player.prototype, {
   },
 })
 
-OverTakes(Entity.prototype, {
+extend(Entity.prototype, {
   get container() {
     if (!this || !this.getComponent) throw new ReferenceError('Bound prototype object does not exists')
     if (!super.isValid()) throw new ReferenceError('Entity is invalid')
@@ -115,7 +115,7 @@ OverTakes(Entity.prototype, {
   },
 })
 
-OverTakes(Container.prototype, {
+extend(Container.prototype, {
   entries() {
     /** @type {ReturnType<Container['entries']>} */
     const items = []

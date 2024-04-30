@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { OverTakes } from 'lib/Extensions/OverTakes.js'
+import { extend } from 'lib/Extensions/extend.js'
 import { util } from 'lib/util.js'
 import { DatabaseError } from './Abstract.js'
 
@@ -35,7 +35,7 @@ export class PersistentSet extends Set {
   }
 }
 
-OverTakes(PersistentSet.prototype, {
+extend(PersistentSet.prototype, {
   add(...args) {
     super.add(...args)
     this.save()

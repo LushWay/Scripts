@@ -1,5 +1,5 @@
 import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
-import { OverTakes } from 'lib/Extensions/OverTakes.js'
+import { extend } from 'lib/Extensions/extend.js'
 import { util } from 'lib/util.js'
 
 /** @type {Record<import('@minecraft/server').ScoreName, string>} */
@@ -25,7 +25,7 @@ const displayNames = {
 
 /** @type {Record<string, string>} */
 const untypedDisplayNames = displayNames
-OverTakes(ScoreboardObjective.prototype, {
+extend(ScoreboardObjective.prototype, {
   get displayName() {
     return untypedDisplayNames[this.id] ?? super.displayName
   },

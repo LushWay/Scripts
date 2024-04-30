@@ -1,8 +1,8 @@
 import { Dimension, world } from '@minecraft/server'
 import { util } from '../util.js'
-import { OverTakes } from './OverTakes.js'
+import { extend } from './extend.js'
 
-OverTakes(Dimension.prototype, {
+extend(Dimension.prototype, {
   get type() {
     return this.id === 'minecraft:overworld' ? 'overworld' : this.id === 'minecraft:nether' ? 'nether' : 'end'
   },

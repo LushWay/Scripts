@@ -1,10 +1,10 @@
 import { MinecraftDimensionTypes, World, world } from '@minecraft/server'
 import { util } from '../util.js'
-import { OverTakes } from './OverTakes.js'
+import { extend } from './extend.js'
 
 const send = world.sendMessage.bind(world)
 
-OverTakes(World.prototype, {
+extend(World.prototype, {
   say(message) {
     if (globalThis.Core?.afterEvents?.worldLoad?.loaded) {
       this.say = send

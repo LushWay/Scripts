@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { isProduction } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
-import { OverTakes } from 'lib/Extensions/OverTakes'
+import { extend } from 'lib/Extensions/extend'
 
 const prod = isProduction()
 
@@ -26,7 +26,7 @@ Object.defineProperty(Player.prototype, 'database', {
   },
 })
 
-OverTakes(Player, {
+extend(Player, {
   name(id) {
     if (!id) return void 0
     return PLAYER_DB[id].name

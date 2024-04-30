@@ -1,6 +1,6 @@
 import { System, world } from '@minecraft/server'
 import { util } from '../util.js'
-import { OverTakes } from './OverTakes.js'
+import { extend } from './extend.js'
 
 /** @type {Record<string, string>} */
 export const TIMERS_PATHES = {}
@@ -29,7 +29,7 @@ function Timer(type, set, fn, name, ticks = 0) {
   }, ticks)
 }
 
-OverTakes(System.prototype, {
+extend(System.prototype, {
   sleep(time) {
     return new Promise(resolve => super.runInterval(resolve, time))
   },

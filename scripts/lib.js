@@ -46,7 +46,7 @@ export * from 'lib/Form/NpcForm.js'
 export * from 'lib/Form/utils.js'
 
 // Extension exports
-export * from 'lib/Extensions/OverTakes.js'
+export * from 'lib/Extensions/extend.js'
 export * from 'lib/Extensions/itemstack.js'
 export * from 'lib/Extensions/system.js'
 export * from 'lib/Load/extensions.js'

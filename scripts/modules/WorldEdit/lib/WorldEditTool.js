@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
-import { OverTakes, util } from 'lib.js'
+import { extend, util } from 'lib.js'
 import { stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { WE_PLAYER_SETTINGS } from '../settings.js'
 
@@ -12,7 +12,10 @@ const LORE_SEPARATOR = '\u00a0'
 
 const LORE_BLOCKS_SET_KEYS_T = ['blocksSet', 'replaceBlocksSet']
 
-/** @template {{ [P in LoreStringName]?: any } & { version: number }} [LoreFormat=any] Default is `any` */
+/**
+ * @template {{ [P in LoreStringName]?: any } & { version: number }} [LoreFormat=any] Default is `any` . Default is
+ *   `any`
+ */
 export class WorldEditTool {
   /** @type {string[]} */
   static loreBlockSetKeys = LORE_BLOCKS_SET_KEYS_T
@@ -59,7 +62,7 @@ export class WorldEditTool {
     this.interval0 = interval0
     this.interval10 = interval10
     this.interval20 = interval20
-    if (overrides) OverTakes(this, overrides)
+    if (overrides) extend(this, overrides)
 
     this.command = new Command({
       name,

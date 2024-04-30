@@ -1,6 +1,6 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
-import { OverTakes } from './OverTakes.js'
+import { extend } from './extend.js'
 
 /** Common JavaScript objects */
 Object.entriesStringKeys = Object.entries
@@ -21,7 +21,7 @@ Date.prototype.format = function () {
   return this.toHHMM() + ' ' + this.toYYYYMMDD()
 }
 
-OverTakes(Math, {
+extend(Math, {
   randomInt(min, max) {
     return Math.round(min + Math.random() * (max + 1 - min))
   },
@@ -30,7 +30,7 @@ OverTakes(Math, {
   },
 })
 
-OverTakes(Array, {
+extend(Array, {
   equals(one, two) {
     return one.every((e, i) => e === two[i])
   },
@@ -68,7 +68,7 @@ function prefixFormat(args) {
   args.unshift('§9│ §r')
 }
 
-OverTakes(console, {
+extend(console, {
   error(...args) {
     super.error(format(args))
   },

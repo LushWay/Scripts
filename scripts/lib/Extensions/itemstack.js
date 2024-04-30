@@ -1,6 +1,6 @@
 import { ItemStack } from '@minecraft/server'
 import { util } from 'lib/util.js'
-import { OverTakes } from './OverTakes.js'
+import { extend } from './extend.js'
 
 Object.defineProperties(ItemStack.prototype, {
   enchantments: {
@@ -33,7 +33,7 @@ Object.defineProperties(ItemStack.prototype, {
   },
 })
 
-OverTakes(ItemStack.prototype, {
+extend(ItemStack.prototype, {
   setInfo(nameTag, description) {
     this.nameTag = '§r' + nameTag
     this.setLore(util.wrapLore(description))
