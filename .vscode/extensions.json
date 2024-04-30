@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "hookyqr.jsdoctagcomplete",
+    "mojang-studios.minecraft-debugger",
+    "nobuwu.mc-color",
+    "zz5840.minecraft-lang-colorizer",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
+  ]
+}
