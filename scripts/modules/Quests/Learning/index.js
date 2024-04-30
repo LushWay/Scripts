@@ -1,7 +1,7 @@
 import { ItemStack, Vector, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { SOUNDS } from 'config.js'
 import { EditableLocation, SafeAreaRegion, Temporary, actionGuard } from 'lib.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { Menu, createPublicGiveItemCommand } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { Axe } from 'modules/Features/axe.js'

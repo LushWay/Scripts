@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { OverTakes } from 'lib/Extensions/OverTakes.js'
 import { util } from 'lib/util.js'
-import { DatabaseError } from './Default.js'
+import { DatabaseError } from './Abstract.js'
 
 /**
  * @template T

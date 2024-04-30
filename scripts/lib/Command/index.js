@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, world } from '@minecraft/server'
-import { CONFIG } from '../../config.js'
+import { CONFIG } from '../Assets/config.js'
 import { is } from '../roles.js'
 import {
   ArrayArgumentType,
@@ -19,7 +19,7 @@ import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand,
 
 /**
  * @template {Function} [Callback=(ctx: CommandContext) => (void | Promise<void>)] . Default is `(ctx: CommandContext)
- *   => (void | Promise<void>)`
+ *   => (void | Promise<void>)`. Default is `(ctx: CommandContext) => (void | Promise<void>)`
  */
 export class Command {
   /** @param {string} message */

@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'config.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { emoji } from 'lib/Assets/emoji.js'
 
 world.afterEvents.itemUse.subscribe(event => {

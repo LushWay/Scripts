@@ -1,6 +1,6 @@
 import { BlockTypes } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { CUSTOM_ENTITIES } from 'config'
+import { CUSTOM_ENTITIES } from 'lib/Assets/config'
 
 /** All doors and switches in minecraft */
 export const DOORS_AND_SWITCHES = BlockTypes.getAll()

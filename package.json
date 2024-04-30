@@ -1,6 +1,6 @@
 {
   "name": "scripts",
-  "version": "0.17.105",
+  "version": "0.17.106",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -151,7 +151,7 @@
     ],
     "root": true
   },
-  "packageManager": "yarn@4.0.2",
+  "packageManager": "yarn@4.1.1",
   "workspaces": {
     "packages": [
       "tools/eslint-plugin"

@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
-import { CUSTOM_ENTITIES } from 'config'
 import { LockAction } from 'lib.js'
+import { CUSTOM_ENTITIES } from 'lib/Assets/config'
 
 new Command({
   name: 'sit',

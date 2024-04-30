@@ -179,7 +179,7 @@ function addOrSetPlayerScore(player, targetId, targetName, manager, back, mode =
 
         manager[mode](targetId, parseInt(value))
 
-        Player.byId(targetId)?.info(
+        Player.getById(targetId)?.info(
           `§7Игрок §f${player.name}§r§7 ${mode === 'add' ? 'начислил вам' : 'установил значение счета'} §f${
             manager.scoreboard.displayName
           }§r§7 ${mode === 'set' ? 'на ' : ''}§f§l${value}`,

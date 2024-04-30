@@ -9,7 +9,7 @@ import {
   Airdrop,
   BUTTON,
   ChestForm,
-  DB,
+  DatabaseUtils,
   LootTable,
   NpcForm,
   Settings,
@@ -186,8 +186,8 @@ const tests = {
   dbinspect(ctx) {
     world.debug(
       'test41',
-      { DB },
-      world.overworld.getEntities({ type: DB.ENTITY_IDENTIFIER }).map(e => {
+      { DatabaseUtils },
+      world.overworld.getEntities({ type: DatabaseUtils.entityTypeId }).map(e => {
         const { nameTag, location } = e
         const type = e.getDynamicProperty('tableType')
         let data = ''

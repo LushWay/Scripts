@@ -1,7 +1,7 @@
 import { Container, ItemStack, MolangVariableMap, Player, Vector } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { CONFIG } from 'config.js'
 import { Cooldown, Temporary, invalidLocation, util } from 'lib.js'
+import { CONFIG } from 'lib/Assets/config.js'
 import { Cutscene } from './Cutscene.js'
 
 /**

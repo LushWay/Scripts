@@ -1,16 +1,16 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { request } from 'lib/BDS/api.js'
 import { SCREEN_DISPLAY_OVERRIDE } from 'lib/Extensions/onScreenDisplay.js'
 import { OverTakes } from './OverTakes.js'
 
 OverTakes(Player, {
-  byId(name) {
+  getById(name) {
     for (const player of world.getPlayers()) {
       if (player.id === name) return player
     }
   },
-  byName(name) {
+  getByName(name) {
     for (const player of world.getPlayers()) {
       if (player.isValid() && player.name === name) return player
     }

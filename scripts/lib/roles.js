@@ -142,7 +142,7 @@ export function setRole(player, role) {
   if (DB) {
     EventSignal.emit(Core.beforeEvents.roleChange, {
       id,
-      player: player instanceof Player ? player : Player.byId(player),
+      player: player instanceof Player ? player : Player.getById(player),
       newRole: role,
       oldRole: DB.role,
     })
@@ -182,7 +182,7 @@ system.afterEvents.scriptEventReceive.subscribe(event => {
       )
       return
     }
-    const player = Player.byName(event.message)
+    const player = Player.getByName(event.message)
     if (!player) return console.warn(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)
 
     setRole(player, role)

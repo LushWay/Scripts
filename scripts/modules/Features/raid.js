@@ -33,7 +33,7 @@ system.runInterval(
   () => {
     for (const id in RAID_NOTIFY) {
       // Ищем игрока...
-      const player = Player.byId(id)
+      const player = Player.getById(id)
       if (player) {
         if (RAID.get(player) === 0) {
           player.tell('§4§l> §r§cВы вошли в режим рейдблока. Некоторые функции могут быть недоступны.')

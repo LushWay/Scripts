@@ -1,5 +1,5 @@
 import { system, world } from '@minecraft/server'
-import { CONFIG } from 'config.js'
+import { CONFIG } from 'lib/Assets/config.js'
 import { util } from 'lib/util.js'
 
 world.afterEvents.worldInitialize.subscribe(() => {

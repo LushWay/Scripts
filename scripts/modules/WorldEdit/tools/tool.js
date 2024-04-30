@@ -1,6 +1,6 @@
 import { MolangVariableMap, Vector, system, world } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'config.js'
 import { ActionForm, ModalForm, util } from 'lib.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { ListParticles } from 'lib/Assets/particles.js'
 import { ListSounds } from 'lib/Assets/sounds.js'
 import { WorldEditTool } from '../lib/WorldEditTool.js'

@@ -1,7 +1,7 @@
 import { Entity, Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import { CUSTOM_ENTITIES } from 'config.js'
 import { util } from 'lib.js'
+import { CUSTOM_ENTITIES } from 'lib/Assets/config.js'
 import { CLOSING_CHAT } from 'lib/Extensions/player.js'
 import { NOT_MOB_ENTITIES } from 'lib/Region/config'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'

@@ -1,6 +1,6 @@
 import { Player, world } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'config.js'
 import { ActionForm } from 'lib.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { setSelection } from 'modules/WorldEdit/commands/region/set.js'
 import { WorldEdit } from '../lib/WorldEdit.js'
 import { WorldEditTool } from '../lib/WorldEditTool.js'

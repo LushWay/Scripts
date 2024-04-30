@@ -1,10 +1,20 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Entity, Vector, system, world } from '@minecraft/server'
 import { util } from '../util.js'
 
-world.afterEvents.worldInitialize.subscribe(() => {
-  world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
-})
+/**
+ * Creates proxy-based database
+ *
+ * @template Key
+ * @template Value
+ * @param {string} name
+ * @param {(key: Key) => Value} defaultValue
+ * @returns {Record<Key, Value>}
+ */
+export function database(name, defaultValue) {
+  if (!DatabaseUtils.databaseProvider) throw new DatabaseError('No database provider was specified!')
+
+  return DatabaseUtils.databaseProvider(name, defaultValue)
+}
 
 /**
  * @typedef {{
@@ -12,34 +22,33 @@ world.afterEvents.worldInitialize.subscribe(() => {
  *   tableName: string
  *   tableType: string
  *   index: number
- * }} TABLE
+ * }} Table
  */
 
-export class DB {
-  static ENTITY_IDENTIFIER = 'rubedo:database'
+export class DatabaseUtils {
+  /** @type {typeof database} */
+  static databaseProvider
 
-  static ENTITY_LOCATION = { x: 0, y: -64, z: 0 }
+  static entityTypeId = 'rubedo:database'
 
-  static INVENTORY_SIZE = 96
+  static entityLocation = { x: 0, y: -64, z: 0 }
 
-  static CHUNK_REGEXP = /.{1,50}/g
+  static inventorySize = 96
 
-  static PROPERTY_CHUNK_REGEXP = /.{1,32767}/g
+  static chunkRegexp = /.{1,50}/g
 
-  static MAX_LORE_SIZE = 50
+  static propertyChunkRegexp = /.{1,32767}/g
 
   /**
    * @private
-   * @type {TABLE[]}
+   * @type {Table[]}
    */
-  static ALL_TABLE_ENTITIES
-
-  static LOAD_TRY = 0
+  static allEntities
 
   /** @private */
   static getEntities() {
     return world.overworld
-      .getEntities({ type: DB.ENTITY_IDENTIFIER })
+      .getEntities({ type: DatabaseUtils.entityTypeId })
       .map(entity => {
         const tableType = entity.getDynamicProperty('tableType')
         const tableName = entity.getDynamicProperty('tableName')
@@ -48,8 +57,8 @@ export class DB {
         if (typeof tableName !== 'string' || typeof tableType !== 'string' || typeof index !== 'number')
           return { entity, tableName: 'NOTDB', tableType: 'NONE', index: 0 }
 
-        if (Vector.distance(entity.location, DB.ENTITY_LOCATION) > 1) {
-          entity.teleport(DB.ENTITY_LOCATION)
+        if (Vector.distance(entity.location, DatabaseUtils.entityLocation) > 1) {
+          entity.teleport(DatabaseUtils.entityLocation)
         }
 
         return {
@@ -64,33 +73,35 @@ export class DB {
 
   /**
    * @private
-   * @returns {TABLE[]}
+   * @returns {Table[]}
    */
   static tables() {
-    if (this.ALL_TABLE_ENTITIES) return this.ALL_TABLE_ENTITIES
-    this.ALL_TABLE_ENTITIES = this.getEntities()
+    if (this.allEntities) return this.allEntities
+    this.allEntities = this.getEntities()
 
-    if (this.ALL_TABLE_ENTITIES.length < 1) {
+    if (this.allEntities.length < 1) {
       console.warn('§6Не удалось найти базы данных. Попытка загрузить бэкап...')
 
       world.overworld
         .getEntities({
-          location: DB.ENTITY_LOCATION,
-          type: DB.ENTITY_IDENTIFIER,
+          location: DatabaseUtils.entityLocation,
+          type: DatabaseUtils.entityTypeId,
           maxDistance: 2,
         })
         .forEach(e => e.remove())
 
-      world.overworld.runCommand(`structure load ${DB.BACKUP_NAME} ${Vector.string(DB.ENTITY_LOCATION)}`)
-      this.ALL_TABLE_ENTITIES = this.getEntities()
+      world.overworld.runCommand(
+        `structure load ${DatabaseUtils.backupName} ${Vector.string(DatabaseUtils.entityLocation)}`,
+      )
+      this.allEntities = this.getEntities()
 
-      if (this.ALL_TABLE_ENTITIES.length < 1) {
+      if (this.allEntities.length < 1) {
         console.warn('§cНе удалось загрузить базы данных из бэкапа.')
         return []
-      } else console.warn('Бэкап успешно загружен! Всего баз данных: ' + this.ALL_TABLE_ENTITIES.length)
+      } else console.warn('Бэкап успешно загружен! Всего баз данных: ' + this.allEntities.length)
     }
 
-    return this.ALL_TABLE_ENTITIES
+    return this.allEntities
   }
 
   /**
@@ -102,7 +113,7 @@ export class DB {
    * @returns {Entity}
    */
   static createTableEntity(tableType, tableName, index = 0) {
-    const entity = world.overworld.spawnEntity(DB.ENTITY_IDENTIFIER, DB.ENTITY_LOCATION)
+    const entity = world.overworld.spawnEntity(DatabaseUtils.entityTypeId, DatabaseUtils.entityLocation)
 
     entity.setDynamicProperty('tableName', tableName)
     entity.setDynamicProperty('tableType', tableType)
@@ -129,30 +140,28 @@ export class DB {
     }
   }
 
-  static BACKUP_NAME = 'database'
+  static backupName = 'database'
 
-  static BACKUP_LOCATION = Vector.string(this.ENTITY_LOCATION)
+  static backupLocation = Vector.string(this.entityLocation)
 
-  static BACKUP_COMMAND = `structure save ${this.BACKUP_NAME} ${this.BACKUP_LOCATION} ${this.BACKUP_LOCATION} true disk false`
+  static backupCommand = `structure save ${this.backupName} ${this.backupLocation} ${this.backupLocation} true disk false`
 
   /** @private */
-  static WAITING_FOR_BACKUP = false
+  static waitingForBackup = false
 
   static backup() {
-    if (this.WAITING_FOR_BACKUP) return
+    if (this.waitingForBackup) return
 
     system.runTimeout(
       () => {
-        this.WAITING_FOR_BACKUP = false
-        world.overworld.runCommand(this.BACKUP_COMMAND)
+        this.waitingForBackup = false
+        world.overworld.runCommand(this.backupCommand)
       },
       'database backup',
       200,
     )
-    this.WAITING_FOR_BACKUP = true
+    this.waitingForBackup = true
   }
-
-  static defaultKeyReplacerSymbol = Symbol('defaultKeyReplacer')
 
   /**
    * @template {JSONLike} O
@@ -261,3 +270,7 @@ export class DatabaseError extends Error {
     super(message)
   }
 }
+
+world.afterEvents.worldInitialize.subscribe(() => {
+  world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
+})

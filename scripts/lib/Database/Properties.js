@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { util } from '../util.js'
-import { DB, DatabaseError } from './Default.js'
+import { DatabaseError, DatabaseUtils } from './Abstract.js'
 
 const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
@@ -126,7 +126,7 @@ export class DynamicPropertyDB {
             // Add default value
             key,
             typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-              ? DB.setDefaults(value, defaultv)
+              ? DatabaseUtils.setDefaults(value, defaultv)
               : value ?? defaultv,
           ]
         }),
@@ -159,13 +159,13 @@ export class DynamicPropertyDB {
               // Remove default if defaultv and value are objects
               key,
               typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-                ? DB.removeDefaults(value, defaultv)
+                ? DatabaseUtils.removeDefaults(value, defaultv)
                 : value,
             ]
           }),
         ),
       )
-      const strings = str.match(DB.PROPERTY_CHUNK_REGEXP)
+      const strings = str.match(DatabaseUtils.propertyChunkRegexp)
       if (!strings) throw new DatabaseError('Failed to save db: cannot split')
       world.setDynamicProperty(this.tableId, strings.length)
       for (const [i, string] of strings.entries()) {
@@ -242,3 +242,6 @@ export class DynamicPropertyDB {
     return proxy
   }
 }
+
+// TODO make all system use database provider
+// DatabaseUtils.databaseProvider = (name, defaultValue) => new DynamicPropertyDB(name, { defaultValue }).proxy()

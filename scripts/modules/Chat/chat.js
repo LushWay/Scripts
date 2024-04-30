@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 import { Cooldown, Settings, getRoleAndName, util } from 'lib.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { sendPacketToStdout } from 'lib/BDS/api.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 

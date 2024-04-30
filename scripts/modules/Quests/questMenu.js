@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 import { MessageForm, util } from 'lib.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ArrayForm } from 'lib/Form/ArrayForm.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'

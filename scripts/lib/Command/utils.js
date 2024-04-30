@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { CONFIG, SOUNDS } from 'config.js'
+import { CONFIG, SOUNDS } from 'lib/Assets/config.js'
 import { isProduction } from 'lib/GameUtils.js'
 import { ROLES } from 'lib/roles.js'
 import { inaccurateSearch } from '../Search.js'

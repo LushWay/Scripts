@@ -2,8 +2,8 @@ import * as mc from '@minecraft/server'
 import { ItemLockMode, ItemStack } from '@minecraft/server'
 import { SimulatedPlayer } from '@minecraft/server-gametest'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
-import { SOUNDS } from 'config'
 import { ROLES } from 'lib'
+import { SOUNDS } from 'lib/Assets/config'
 import { MinecraftEnchantmentTypes } from 'lib/Assets/enchantments'
 
 declare global {
@@ -123,6 +123,26 @@ declare global {
 }
 
 declare module '@minecraft/server' {
+  namespace Player {
+    const database: Record<string, PlayerDatabase>
+
+    /**
+     * Searches online player by ID
+     *
+     * @param id - Player ID
+     */
+    function getById(id: string): Player | undefined
+    /**
+     * Searches online player by name
+     *
+     * @param name - Player name
+     */
+    function getByName(name: string): Player | undefined
+
+    /** Gets player name from the database by id */
+    function name(id: string): string | undefined
+  }
+
   interface PlayerDatabase {
     name?: string | undefined
     readonly role: Role
@@ -153,11 +173,11 @@ declare module '@minecraft/server' {
   type ScoreName = 'money' | 'leafs' | 'pvp' | 'joinTimes' | StatScoreName
 
   interface Player {
-    /** Whenether player is simulated or not */
-    isSimulated(): this is SimulatedPlayer
-
     scores: Record<ScoreName, number>
     database: PlayerDatabase
+
+    /** Whenether player is simulated or not */
+    isSimulated(): this is SimulatedPlayer
 
     /**
      * Sends message prefixed with
@@ -207,6 +227,29 @@ declare module '@minecraft/server' {
      * Other message types: **fail warn success**
      */
     info(message: string): void
+
+    /** Gets ContainerSlot from the player mainhand */
+    mainhand(): ContainerSlot
+
+    /** See {@link Player.sendMessage} */
+    tell(message: (RawMessage | string)[] | RawMessage | string): void
+
+    /**
+     * Applies a knock-back to a player in the direction they are facing, like dashing forward
+     *
+     * @author @wuw.sh
+     */
+    applyDash(target: Player | Entity, horizontalStrength: number, verticalStrength: number): void
+
+    /** Determines player gamemode */
+    isGamemode(mode: keyof typeof GameMode): boolean
+
+    /**
+     * Turns player into survival, damages (if hp < 1 shows lowHealthMessage), and then returns to previous gamemode
+     *
+     * @returns True if damaged, false if not and lowHealthMessage was shown
+     */
+    closeChat(lowHealthMessage?: string): boolean
   }
 
   interface HudTitleDisplayOptions {
@@ -249,6 +292,125 @@ declare module '@minecraft/server' {
   interface Container {
     entries(): [number, ItemStack | undefined][]
     slotEntries(): [number, ContainerSlot][]
+  }
+
+  /** Dimension names. Used in {@link Dimension.type} */
+  type ShortcutDimensions = 'nether' | 'overworld' | 'end'
+
+  interface Dimension {
+    /** Dimension type shortcut ({@link Dimension.id} but without the namespace "minecraft:") */
+    type: ShortcutDimensions
+  }
+
+  namespace Vector {
+    /** Returns size between two vectors */
+    function size(a: Vector3, b: Vector3): number
+
+    /** Floors each vector axis using Math.floor */
+    function floor(a: Vector3): Vector3
+    /**
+     * Generates a generator of Vector3 objects between two provided Vector3 objects
+     *
+     * @param a - Starting Vector3 point
+     * @param b - Ending Vector3 point
+     * @returns - Generator of Vector3 objects
+     */
+    function foreach(a: Vector3, b: Vector3): Generator<Vector3, void, unknown>
+
+    /** Checks if vector c is between a and b */
+    function between(a: Vector3, b: Vector3, c: Vector3): boolean
+
+    /**
+     * Returns string representation of vector ('x y z')
+     *
+     * @param color Whenether to color vector args or not
+     */
+    function string(a: Vector3, color?: boolean): string
+
+    /** Returns dot product of two vectors */
+    function dot(a: Vector3, b: Vector3): number
+
+    /** Returns whenether vector is valid or not Valid vector don't uses NaN values */
+    function valid(a: Vector3): boolean
+
+    /**
+     * Alias to
+     *
+     * ```js
+     * ;[Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
+     * ```
+     *
+     * @param x Number to increase vector on x axis.
+     * @param y Number to increase vector on y axis. Defaults to x
+     * @param z Number to increase vector on z axis. Defaults to x
+     */
+    function around(a: Vector3, x: number, y?: number, z?: number): [Vector3, Vector3]
+  }
+
+  interface World {
+    /** See {@link World.sendMessage} */
+    say(message: (RawMessage | string)[] | RawMessage | string): void
+
+    /**
+     * Logs given message once
+     *
+     * @param type Type of log
+     * @param messages Data to log using world.debug()
+     */
+    logOnce(type: string, ...messages: any): void
+
+    /** Prints data using world.say() and parses any object to string using toStr method. */
+    debug(...data: any): void
+    overworld: Dimension
+    end: Dimension
+    nether: Dimension
+  }
+
+  interface ItemStack {
+    /** Alias to {@link ItemStack.getComponent}('cooldown') */
+    cooldown: ItemCooldownComponent
+
+    /** Alias to {@link ItemStack.getComponent}('enchantments') */
+    enchantments: ItemEnchantsComponent
+
+    /** Alias to {@link ItemStack.getComponent}('durability') */
+    durability: ItemDurabilityComponent
+
+    /** Alias to {@link ItemStack.getComponent}('food') */
+    food: ItemFoodComponent
+
+    /** Checks if one item stack properties are fully equal to another (nameTag and lore) */
+    is(another: ItemStack): boolean
+
+    /** Sets nameTag and lore */
+    setInfo(nameTag: string, description: string): ItemStack
+  }
+
+  interface System {
+    /**
+     * Runs a set of code on an interval for each player.
+     *
+     * @param callback Functional code that will run when this interval occurs.
+     * @param tickInterval An interval of every N ticks that the callback will be called upon.
+     * @returns An opaque handle that can be used with the clearRun method to stop the run of this function on an
+     *   interval.
+     */
+    runPlayerInterval(callback: (player: Player) => void, name: string, tickInterval?: number): number
+    /** Same as {@link System.run} except for auto handling errors */
+    delay(callback: () => void): void
+    /**
+     * Returns a promise that resolves after given ticks time
+     *
+     * @param time Time in ticks
+     * @returns Promise that resolves after given ticks time
+     */
+    sleep(time: number): Promise<void>
+  }
+
+  /** Used in {@link Dimension.runCommand} */
+  interface CommandOptions {
+    showOutput?: boolean
+    showError?: boolean
   }
 }
 

@@ -1,5 +1,5 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
-import { CUSTOM_ENTITIES } from 'config.js'
+import { CUSTOM_ENTITIES } from 'lib/Assets/config.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { util } from 'lib/util.js'
 

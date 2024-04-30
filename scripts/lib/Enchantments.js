@@ -1,11 +1,11 @@
 import { Enchantment, Vector, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { MinecraftEnchantmentTypes } from 'lib/Assets/enchantments.js'
-import { DB } from 'lib/Database/Default.js'
+import { DatabaseUtils } from 'lib/Database/Abstract.js'
 import { EventLoader } from 'lib/EventSignal.js'
 import { util } from 'lib/util.js'
 
-const LOCATION = { x: 0, y: -10, z: 0 }
+const location = { x: 0, y: -10, z: 0 }
 
 export class Enchantments {
   /** @type {{ [key: string]: { [key: number]: Enchantment } }} */
@@ -19,13 +19,13 @@ export class Enchantments {
 }
 
 function load() {
-  const status = world.overworld.runCommand('structure load CustomEnchantments ' + Vector.string(LOCATION))
+  const status = world.overworld.runCommand('structure load CustomEnchantments ' + Vector.string(location))
 
   if (!status) return util.error(new Error('Unable to load CustomEnchantments structure. Status: §6' + status))
 
   const entities = world.overworld.getEntities({
-    type: DB.ENTITY_IDENTIFIER,
-    location: LOCATION,
+    type: DatabaseUtils.entityTypeId,
+    location: location,
     maxDistance: 2,
   })
 

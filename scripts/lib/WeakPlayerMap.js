@@ -75,7 +75,7 @@ export class WeakOnlinePlayerMap extends Map {
     if (!(typeof value === 'object' && value && 'value' in value)) {
       // Converting T to { value: T, player: Player }
       // Convert `id | Player` to Player
-      const player = typeof key === 'string' ? Player.byId(key) : key
+      const player = typeof key === 'string' ? Player.getById(key) : key
 
       if (!player) return this // No player found, do nothing because its online only map
 

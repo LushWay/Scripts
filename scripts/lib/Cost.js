@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { emoji } from 'lib/Assets/emoji.js'
 
 export class Cost {

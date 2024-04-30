@@ -1,7 +1,7 @@
 import { Block, BlockPermutation, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { CUSTOM_ITEMS } from 'config.js'
 import { ModalForm, is, util } from 'lib.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
 import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksSet.js'
 import { BaseBrushTool } from '../lib/BaseBrushTool'

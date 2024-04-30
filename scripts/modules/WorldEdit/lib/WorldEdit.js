@@ -7,8 +7,8 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 import { getRole, prompt, util } from 'lib.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 import { WE_CONFIG, spawnParticlesInArea } from '../config.js'

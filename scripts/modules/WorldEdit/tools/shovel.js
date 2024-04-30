@@ -1,6 +1,6 @@
 import { Vector, world } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'config.js'
 import { ModalForm } from 'lib.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu.js'
 import { WorldEditTool } from '../lib/WorldEditTool.js'

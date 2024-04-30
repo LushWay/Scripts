@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { DB } from 'lib/Database/Default.js'
+import { DatabaseUtils } from 'lib/Database/Abstract.js'
 import { EventSignal } from 'lib/EventSignal.js'
 import { REGION_DB } from 'lib/Region/DB.js'
 import { DEFAULT_REGION_PERMISSIONS } from 'lib/Region/config.js'
@@ -121,7 +121,7 @@ export class Region {
    * @param {typeof Region} region
    */
   init({ permissions, creating = true }, region) {
-    this.permissions = DB.setDefaults(permissions ?? {}, this.defaultPermissions)
+    this.permissions = DatabaseUtils.setDefaults(permissions ?? {}, this.defaultPermissions)
     if (creating) this.update(region)
   }
 
@@ -177,7 +177,7 @@ export class Region {
   forEachOwner(callback) {
     const onlineOwners = []
     for (const ownerId of this.permissions.owners) {
-      const player = Player.byId(ownerId)
+      const player = Player.getById(ownerId)
       if (player) onlineOwners.push(player)
     }
     onlineOwners.forEach(
@@ -188,7 +188,7 @@ export class Region {
   /** Updates this region in the database */
   update(region = Region) {
     return {
-      permissions: DB.removeDefaults(this.permissions, this.defaultPermissions),
+      permissions: DatabaseUtils.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,
     }
   }

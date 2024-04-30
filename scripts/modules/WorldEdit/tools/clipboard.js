@@ -1,5 +1,5 @@
 import { system } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'config.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config.js'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit.js'
 import { WorldEditTool } from 'modules/WorldEdit/lib/WorldEditTool.js'

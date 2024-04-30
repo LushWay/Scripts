@@ -1,7 +1,7 @@
 import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { util } from '../util.js'
-import { DB, DatabaseError } from './Default.js'
+import { DatabaseError, DatabaseUtils } from './Abstract.js'
 
 const tableType = 'inventory'
 
@@ -150,7 +150,7 @@ export class InventoryStore {
 
   /** @private */
   init() {
-    const entities = DB.getTableEntities(this._.tableType, this._.tableName)
+    const entities = DatabaseUtils.getTableEntities(this._.tableType, this._.tableName)
     if (!entities) throw new DatabaseError('Failed to get inventory entities in table ' + this._.tableName)
     this._.entities = entities
 
@@ -261,14 +261,14 @@ export class InventoryStore {
       }
 
       const item = new ItemStack(MinecraftItemTypes.AcaciaBoat)
-      const save = JSON.stringify(manifest).match(DB.CHUNK_REGEXP)
+      const save = JSON.stringify(manifest).match(DatabaseUtils.chunkRegexp)
       if (!save) throw new DatabaseError('Failed to split save to chunks')
       item.setLore(save)
       items[storeIndex] = item
     }
 
-    const totalEntities = Math.ceil(items.length / DB.INVENTORY_SIZE)
-    const entities = DB.getTableEntities(this._.tableType, this._.tableName)
+    const totalEntities = Math.ceil(items.length / DatabaseUtils.inventorySize)
+    const entities = DatabaseUtils.getTableEntities(this._.tableType, this._.tableName)
 
     if (!entities) throw new DatabaseError('Failed to get entities')
 
@@ -276,7 +276,7 @@ export class InventoryStore {
 
     if (entitiesToSpawn > 0) {
       for (let i = 0; i < entitiesToSpawn; i++) {
-        entities.push(DB.createTableEntity(this._.tableType, this._.tableName, i))
+        entities.push(DatabaseUtils.createTableEntity(this._.tableType, this._.tableName, i))
       }
     } else if (entitiesToSpawn < 0) {
       // Check for unused entities and despawn them
@@ -300,7 +300,7 @@ export class InventoryStore {
 
     this._.entities = entities
 
-    DB.backup()
+    DatabaseUtils.backup()
   }
 
   /** @param {string} id */

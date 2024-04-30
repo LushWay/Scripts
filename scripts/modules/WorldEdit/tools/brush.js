@@ -6,8 +6,8 @@ import {
   Vector,
   world,
 } from '@minecraft/server'
-import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'config.js'
 import { ModalForm, is, util } from 'lib.js'
+import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { WE_CONFIG } from '../config.js'
 import { BaseBrushTool } from '../lib/BaseBrushTool.js'
 import { WorldEditTool } from '../lib/WorldEditTool.js'

@@ -1,6 +1,6 @@
 import { ItemLockMode, ItemStack, ItemTypes, Player, Vector, world } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'config.js'
 import { InventoryIntervalAction } from 'lib/Action.js'
+import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { WeakOnlinePlayerMap } from 'lib/WeakPlayerMap.js'

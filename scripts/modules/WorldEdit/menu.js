@@ -1,7 +1,7 @@
 import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
-import { SOUNDS } from 'config.js'
 import { ActionForm, BUTTON, FormCallback, ModalForm, is, typeIdToReadable, util } from 'lib.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { ArrayForm } from 'lib/Form/ArrayForm.js'
 import { ChestForm } from 'lib/Form/ChestForm.js'
 import { prompt } from 'lib/Form/MessageForm.js'

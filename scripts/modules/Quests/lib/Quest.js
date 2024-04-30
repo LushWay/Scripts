@@ -1,6 +1,6 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
-import { SOUNDS } from 'config.js'
 import { Airdrop, Compass, InventoryIntervalAction, Join, LootTable, PlaceAction, Settings, Temporary } from 'lib.js'
+import { SOUNDS } from 'lib/Assets/config.js'
 import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 
 /**

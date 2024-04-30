@@ -3,6 +3,11 @@ import 'lib/Load/watchdog.js'
 import 'lib/Load/extensions.js'
 import 'lib/Load/message1.js'
 
+// Database
+export * from 'lib/Database/Abstract.js'
+export * from 'lib/Database/Inventory.js'
+export * from 'lib/Database/Player.js'
+
 // Command
 export * from 'lib/Command/index.js'
 
@@ -31,11 +36,6 @@ export * from 'lib/Zone.js'
 
 // Region
 export * from 'lib/Region/index.js'
-
-// Database
-export * from 'lib/Database/Default.js'
-export * from 'lib/Database/Inventory.js'
-export * from 'lib/Database/Player.js'
 
 // Form
 export * from 'lib/Form/ActionForm.js'
