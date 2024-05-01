@@ -1,7 +1,7 @@
 import { LootTable } from 'lib.js'
 import { CUSTOM_ITEMS } from 'lib/Assets/config.js'
 
-export const LEARNING_L = new LootTable(
+export default new LootTable(
   { id: 'starter' },
   {
     type: 'WoodenSword',

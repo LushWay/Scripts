@@ -10,7 +10,7 @@ import { Anarchy } from 'modules/Places/Anarchy.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'
-import { LEARNING_L } from './airdrop.js'
+import airdropTable from './airdrop.js'
 
 // TODO Add even more steps,
 // TODO Write second quests for investigating other places
@@ -94,7 +94,7 @@ export class Learning {
       })
 
       q.airdrop({
-        lootTable: LEARNING_L,
+        lootTable: airdropTable,
         abovePlayerY: 20,
       })
 
@@ -188,8 +188,6 @@ export class Learning {
       })
     },
   )
-
-  static lootTable = LEARNING_L
 
   static randomTeleportLocation = new EditableLocation('learning_quest_rtp', { type: 'vector3+radius' }).safe
 
