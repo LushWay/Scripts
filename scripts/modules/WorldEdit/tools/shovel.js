@@ -84,10 +84,20 @@ const shovel = new WorldEditTool({
     for (const loc of Vector.foreach(pos1, pos2)) {
       const block = world.overworld.getBlock(loc)
 
-      for (const replaceBlock of replaceBlocks) {
-        if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
+      if (!block) continue
 
-        block?.setPermutation(blocks.randomElement())
+      for (const replaceBlock of replaceBlocks) {
+        if (replaceBlock) {
+          if (!block.permutation.matches(replaceBlock.typeId)) continue
+          if (replaceBlock.states) {
+            const states = block.permutation.getAllStates()
+            for (const [name, value] of Object.entries(replaceBlock.states)) {
+              if (states[name] !== value) continue
+            }
+          }
+        }
+
+        block.setPermutation(blocks.randomElement())
       }
     }
   },

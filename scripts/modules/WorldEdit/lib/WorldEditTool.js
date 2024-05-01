@@ -8,8 +8,8 @@ import { WE_PLAYER_SETTINGS } from '../settings.js'
 /** @typedef {'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'} LoreStringName */
 
 const LORE_SEPARATOR = '\u00a0'
-/** @type {(LoreStringName | string)[]} */
 
+/** @type {(LoreStringName | string)[]} */
 const LORE_BLOCKS_SET_KEYS_T = ['blocksSet', 'replaceBlocksSet']
 
 /**
@@ -163,6 +163,8 @@ export class WorldEditTool {
     maxDistance: 'Расстояние',
     blocksSet: 'Блоки',
     replaceBlocksSet: 'Заменяет',
+    radius: 'Радиус',
+    zone: 'Отступ',
   }
 
   /**

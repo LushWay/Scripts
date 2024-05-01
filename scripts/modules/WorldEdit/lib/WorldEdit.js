@@ -97,6 +97,11 @@ export class WorldEdit {
   /** @type {Player} */
   player
 
+  /** @private */
+  historyLimit = 100
+
+  hasWarnAboutHistoryLimit = false
+
   /** @param {Player} player */
   constructor(player) {
     const id = player.id
@@ -144,6 +149,19 @@ export class WorldEdit {
    * @param {Structure[]} history Save location where you want the to store your backup
    */
   async backup(name, pos1 = this.pos1, pos2 = this.pos2, history = this.history) {
+    if (this.history.length === this.historyLimit) {
+      console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
+      if (this.hasWarnAboutHistoryLimit) {
+        this.player.warn(
+          `Вы превысили лимит отменяемых действий WorldEdit'а. Вы сможете восстановить лишь последние ${this.historyLimit} действий.`,
+        )
+        this.hasWarnAboutHistoryLimit = true
+      }
+
+      this.player.runCommand(`structure delete ${history[0].id}`)
+      history.splice(0, 1)
+    }
+
     const structrure = new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, name)
     history.push(structrure)
     await structrure.savePromise
