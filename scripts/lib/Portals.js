@@ -1,4 +1,4 @@
-import { Player, Vector, system } from '@minecraft/server'
+import { Player, Vector } from '@minecraft/server'
 import { LockAction, PlaceAction } from 'lib/Action.js'
 
 /**
@@ -62,8 +62,15 @@ export class Portal {
    * @param {string[]} [o.aliases]
    * @param {boolean} [o.createCommand]
    * @param {string} [o.commandDescription]
+   * @param {boolean} [o.allowAnybody]
    */
-  constructor(name, from, to, place, { aliases = [], createCommand = true, commandDescription } = {}) {
+  constructor(
+    name,
+    from,
+    to,
+    place,
+    { aliases = [], createCommand = true, commandDescription, allowAnybody = false } = {},
+  ) {
     // console.debug('Portal init', name, { from: from ? Vector.string(from) : from, to: to ? Vector.string(to) : to })
     this.from = from
     this.to = to
@@ -77,6 +84,7 @@ export class Portal {
         aliases,
         description: commandDescription ?? `§bТелепорт на ${name}`,
         type: 'public',
+        requires: allowAnybody ? () => true : undefined,
       }).executes(ctx => {
         this.teleport(ctx.sender)
       })

@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
+import { isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 
 export class DefaultPlaceWithInventory {
   /** @type {DefaultPlaceWithInventory[]} */
@@ -19,7 +19,7 @@ export class DefaultPlaceWithInventory {
    * @param {VoidFunction} callback - Function that gets executed when inventory actually needs to be loaded
    */
   loadInventory(player, callback) {
-    if (isBuilding(player)) return
+    if (isNotPlaying(player)) return
 
     const currentInventory = player.database.inv
     if (currentInventory === this.inventoryName) return

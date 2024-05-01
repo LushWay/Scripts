@@ -6,7 +6,7 @@ import { StoneQuarry } from 'modules/Places/StoneQuarry/StoneQuarry.js'
 import { TechCity } from 'modules/Places/TechCity.js'
 import { VillageOfExplorers } from 'modules/Places/VillafeOfExplorers.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
-import { isBuilding } from 'modules/WorldEdit/isBuilding'
+import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 
 new Command({
   name: 'tp',
@@ -40,7 +40,7 @@ function tpMenu(player) {
 
   for (const [name, { location, players }] of Object.entries(locations)) {
     form.addButton(`${name} §7(${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
-      if (player.database.inv !== 'anarchy' && !isBuilding(player)) {
+      if (player.database.inv !== 'anarchy' && !isNotPlaying(player)) {
         return player.fail(
           'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.',
         )

@@ -43,6 +43,12 @@
           "client_sync": true
         }
         // ADD MARKER END
+      },
+      "scripts": {
+        "animate": ["minimap"]
+      },
+      "animations": {
+        "minimap": "controller.animation.player.minimap"
       }
     },
     "component_groups": {
@@ -102,13 +108,7 @@
       },
       "not_in_spawn": {
         "minecraft:spell_effects": {
-          "remove_effects": [
-            "instant_health",
-            "weakness",
-            "resistance",
-            "saturation",
-            "fire_resistance"
-          ]
+          "remove_effects": ["instant_health", "weakness", "resistance", "saturation", "fire_resistance"]
         }
       },
       "kick": {

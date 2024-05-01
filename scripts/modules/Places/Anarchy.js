@@ -1,7 +1,7 @@
 import { Player, Vector } from '@minecraft/server'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'lib.js'
 import { tpMenuOnce } from 'modules/Commands/tp.js'
-import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
+import { showSurvivalHud } from 'modules/Features/sidebar.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
@@ -63,7 +63,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
             delete player.database.survival.anarchy
           }
 
-          SURVIVAL_SIDEBAR.show(player)
+          showSurvivalHud(player)
           title()
         },
       )

@@ -5,7 +5,7 @@ import { CUSTOM_ENTITIES } from 'lib/Assets/config.js'
 import { CLOSING_CHAT } from 'lib/Extensions/player.js'
 import { NOT_MOB_ENTITIES } from 'lib/Region/config'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag.js'
-import { isBuilding } from 'modules/WorldEdit/isBuilding'
+import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 
 /**
  * @type {Record<
@@ -122,7 +122,7 @@ const BAR_SYMBOL = '|'
  * @returns {string}
  */
 function getBar(entity, hp = entity.getComponent('health')) {
-  if (entity instanceof Player && isBuilding(entity)) return ''
+  if (entity instanceof Player && isNotPlaying(entity)) return ''
   if (!hp || !(entity.id in HURT_ENTITIES)) return ''
   const maxHP = hp.defaultValue
 

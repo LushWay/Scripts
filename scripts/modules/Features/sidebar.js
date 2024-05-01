@@ -1,19 +1,27 @@
 import { Player, system, world } from '@minecraft/server'
 import { BaseRegion, MineshaftRegion, Region, SafeAreaRegion, Settings, Sidebar, util } from 'lib.js'
 import { emoji } from 'lib/Assets/emoji.js'
-import { Minigame } from 'minigames/Builder.js'
+import { Minigame } from 'modules/Minigames/Builder.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'
 
-const sidebarSettings = Settings.player('Меню\nРазные настройки интерфейсов и меню в игре', 'sidebar', {
+const sidebarSettings = Settings.player('Меню\n§7Разные настройки интерфейсов и меню в игре', 'sidebar', {
   enabled: {
-    name: 'Боковое меню',
-    description: 'Определяет, включено ли боковое меню (Sidebar)',
+    name: 'Использовать меню',
+    description: 'Определяет, включено ли внутриигровое меню',
     value: true,
   },
   sidebarMaxWordLength: {
     name: 'Максимальный размер бокового меню',
     description: 'Максимально допустимое кол-во символов, при достижении которого слова будут переноситься',
     value: 20,
+  },
+  mode: {
+    name: 'Режим отображения',
+    description: 'Определяет, где будет меню',
+    value: [
+      ['tips', 'Разделенные подсказки'],
+      ['sidebar', 'Боковое меню'],
+    ],
   },
   //   format: {
   //     name: 'Формат сайдбара',
@@ -39,21 +47,41 @@ const inventoryDisplay = {
   spawn: 'Спавн',
 }
 
-export const SURVIVAL_SIDEBAR = new Sidebar(
+const names = {
+  mode: 'режим',
+  region: 'регион',
+  money: 'монеты',
+  leafs: 'листья',
+  online: 'онлайн',
+  quest: 'квест',
+}
+
+// $режим§l§7$регион
+
+/** @type {Sidebar<ReturnType<typeof sidebarSettings>>} */
+const survivalSidebar = new Sidebar(
   {
     name: 'Server',
-    getOptions: player => ({
-      format: `§l$режим§r§f$регион
-§7${emoji.money} §6$монеты§7 | ${emoji.leaf} §2$листья 
-§7${emoji.online} §f$онлайн§7/55
-      
-$квест`,
-      maxWordCount: sidebarSettings(player).sidebarMaxWordLength,
-    }),
+    getOptions(player, settings) {
+      const main = `§l$${names.mode}§r§f$${names.region}`
+
+      const scores = `§6$${names.money}${emoji.money} §2$${names.leafs}${emoji.leaf}`
+      const online = `${emoji.online} §f$${names.online}§7/55`
+      const second = `${scores}\n${online}${settings.mode === 'sidebar' ? '\n \n' : ''}`
+
+      return {
+        format:
+          settings.mode === 'sidebar'
+            ? `${main}\n${second}\n$${names.quest}`
+            : [main, second, `$${names.quest}`, undefined, undefined],
+
+        maxWordCount: sidebarSettings(player).sidebarMaxWordLength,
+      }
+    },
   },
   {
-    режим: player => inventoryDisplay[player.database.inv],
-    регион: player => {
+    [names.mode]: player => inventoryDisplay[player.database.inv],
+    [names.region]: (player, settings) => {
       let text = ''
       if (player.database.inv === 'anarchy') {
         const region = Region.locationInRegion(player.location, player.dimension.type)
@@ -65,12 +93,13 @@ $квест`,
         }
       }
 
-      text += '\n§r§f'
+      if (settings.mode === 'sidebar') text += '\n§r§f'
+
       return text
     },
-    монеты: player => util.numseparate(player.scores.money),
-    листья: player => util.numseparate(player.scores.leafs),
-    онлайн: {
+    [names.money]: player => util.numseparate(player.scores.money),
+    [names.leafs]: player => util.numseparate(player.scores.leafs),
+    [names.online]: {
       init() {
         let online = world.getAllPlayers().length
 
@@ -80,16 +109,29 @@ $квест`,
         return () => online.toString()
       },
     },
-    квест: Quest.sidebar,
+    [names.quest]: Quest.sidebar,
   },
 )
+
+/** @param {Player} player */
+export function showSurvivalHud(player, settings = sidebarSettings(player)) {
+  survivalSidebar.show(player, settings)
+}
 
 system.runPlayerInterval(
   player => {
     if (player.database.join) return // Do not show sidebar until player actually joins the world
+
+    const settings = sidebarSettings(player)
+
+    if (!settings.enabled) return
+
     const minigame = Minigame.getCurrent(player)
-    if (minigame) return minigame.sidebar.show(player)
-    if (sidebarSettings(player).enabled) SURVIVAL_SIDEBAR.show(player)
+    if (minigame) {
+      minigame.showHud(player)
+    } else {
+      showSurvivalHud(player, settings)
+    }
     // system.delay(() => player.onScreenDisplay.setTip(5, '§7158.255.5.29'))
   },
   'Survival sidebar',

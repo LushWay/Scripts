@@ -38,6 +38,9 @@ export class Minigame {
 
     Minigame.instances[name] = this
   }
+
+  /** @param {Player} player */
+  showHud(player) {}
 }
 
 new LockAction(player => !!Minigame.getQuene(player), `Вы находитесь в очереди миниигры. Выйти: §f.quit`)

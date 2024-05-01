@@ -1,7 +1,7 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { Airdrop, Compass, InventoryIntervalAction, Join, LootTable, PlaceAction, Settings, Temporary } from 'lib.js'
 import { SOUNDS } from 'lib/Assets/config.js'
-import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
+import { isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 
 /**
  * @typedef {{
@@ -28,7 +28,7 @@ export class Quest {
     },
   })
 
-  /** @type {import('lib/Sidebar.js').SidebarLineInit} */
+  /** @type {import('lib/Sidebar.js').SidebarLineInit<unknown>} */
   static sidebar = {
     init(sidebar) {
       const onquestupdate = sidebar.show.bind(sidebar)
@@ -276,7 +276,7 @@ class PlayerQuest {
       update: this.update.bind(this),
       quest: this.quest,
       next() {
-        if (isBuilding(this.player)) return
+        if (isNotPlaying(this.player)) return
         this.cleanup?.()
         if (step.list[i + 1]) {
           this.quest.toStep(this.player, i + 1)
@@ -389,7 +389,7 @@ class PlayerQuest {
     options.value ??= 0
 
     options.diff = function (diff) {
-      if (isBuilding(this.player)) return
+      if (isNotPlaying(this.player)) return
       options.value ??= 0
       const result = options.value + diff
 

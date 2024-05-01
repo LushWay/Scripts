@@ -1,9 +1,12 @@
 import { Player } from '@minecraft/server'
 import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
-import { FormCallback, showForm } from './utils.js'
 import { util } from 'lib/util.js'
+import { FormCallback, showForm } from './utils.js'
 
-/** @template {Function} [Callback=(ctx: FormCallback) => void] Default is `(ctx: FormCallback) => void` */
+/**
+ * @template {Function} [Callback=(ctx: FormCallback) => void] Default is `(ctx: FormCallback) => void` . Default is
+ *   `(ctx: FormCallback) => void`
+ */
 export class ModalForm {
   static arrayDefaultNone = 'Никакой'
 
@@ -78,15 +81,25 @@ export class ModalForm {
   addDropdownFromObject(
     label,
     object,
-    { defaultValueIndex, defaultValue, none, noneText = ModalForm.arrayDefaultNone } = {},
+    { defaultValueIndex: defaultValueIndexInput, defaultValue, none, noneText = ModalForm.arrayDefaultNone } = {},
   ) {
     /** @type {(string | null)[]} */
     let objectKeys = Object.keys(object)
     let visibleKeys = Object.values(object)
 
-    if (defaultValue) {
-      defaultValueIndex = visibleKeys.findIndex(e => e === defaultValue)
+    let defaultValueIndex = 0
+    if (typeof defaultValueIndexInput === 'string') {
+      // Index is the keyof object
+      defaultValueIndex = objectKeys.indexOf(defaultValueIndexInput)
+    } else if (typeof defaultValueIndexInput === 'number') {
+      // Index is the number, the actual index
+      defaultValueIndex = defaultValueIndexInput
+    } else if (defaultValue) {
+      // No index provided, search it by ourselfes
+      defaultValueIndex = visibleKeys.indexOf(defaultValue)
     }
+
+    if (defaultValueIndex === -1) defaultValueIndex = 0
 
     // Prepend none to the start of the keys
     if (none) {

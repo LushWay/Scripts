@@ -5,8 +5,8 @@ import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Se
 import { migration } from 'lib/Database/Migrations.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
-import { SURVIVAL_SIDEBAR } from 'modules/Features/sidebar.js'
-import { isBuilding, isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
+import { showSurvivalHud } from 'modules/Features/sidebar.js'
+import { isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
 migration('move player inv', () => {
@@ -58,16 +58,22 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
     if (this.location.valid) {
       const spawnLocation = this.location
       world.setDefaultSpawnLocation(spawnLocation)
-      this.portal = new Portal('spawn', null, null, player => {
-        const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
-        if (!title) return
+      this.portal = new Portal(
+        'spawn',
+        null,
+        null,
+        player => {
+          const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
+          if (!title) return
 
-        this.loadInventory(player)
-        spawnLocation.teleport(player)
+          this.loadInventory(player)
+          spawnLocation.teleport(player)
 
-        SURVIVAL_SIDEBAR.show(player)
-        title()
-      })
+          showSurvivalHud(player)
+          title()
+        },
+        { allowAnybody: true },
+      )
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {

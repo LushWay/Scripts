@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
-import { isProduction } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { extend } from 'lib/Extensions/extend'
+import { isProduction } from 'lib/GameUtils.js'
 
 const prod = isProduction()
 

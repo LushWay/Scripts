@@ -118,7 +118,7 @@ export function settingsGroupMenu(
     if (isToggle) {
       form.addToggle(label, value)
     } else if (isDropdown(setting.value)) {
-      form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValue: value })
+      form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValueIndex: value })
     } else {
       const isString = typeof value === 'string'
 
