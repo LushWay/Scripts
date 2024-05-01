@@ -130,6 +130,16 @@ export class Cutscene {
             easeOptions: Object.assign(this.defaultSection, section),
           })
         } else {
+          const red = 10 / 256
+          const green = 20 / 256
+          const blue = 10 / 256
+          // #102010
+
+          player.camera.fade({
+            fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
+            fadeColor: { red, green, blue },
+          })
+
           await system.sleep(10)
 
           // There is no way to set a camera without easing using pure script

@@ -444,7 +444,7 @@ export const util = {
    *   returned. Default is `perPage`
    */
   paginate(array, perPage = 10, startPage = 1, minLength = perPage) {
-    if (array.length <= minLength) return array
+    if (array.length <= minLength) return { array, canGoNext: false, canGoBack: false, maxPages: 1, page: 1 }
 
     const maxPages = Math.ceil(array.length / perPage)
     const page = Math.min(Math.max(startPage, 1), maxPages)

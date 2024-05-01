@@ -1,8 +1,11 @@
 import { Player } from '@minecraft/server'
-import { ModalForm, stringSimilarity, util } from 'lib.js'
 import { settingsGroupMenu } from 'modules/Commands/settings.js'
+import { stringSimilarity } from '../Search.js'
 import { SETTINGS_GROUP_NAME, createSettingsObject, isDropdown } from '../Settings.js'
+import { util } from '../util.js'
 import { ActionForm } from './ActionForm.js'
+import { ModalForm } from './ModalForm.js'
+import { BUTTON } from './utils.js'
 
 /**
  * @template T
@@ -68,20 +71,24 @@ export class ArrayForm {
       fromPage,
       this.options.minItemsForFilters,
     )
-    const form = this.createForm(fromPage, paginator)
 
-    if (Array.isArray(paginator)) {
-      this.addButtons(paginator, form, filters)
-    } else {
+    const form = this.createForm(fromPage, paginator.maxPages)
+
+    // Helper buttons
+    if (paginator.maxPages !== 1) {
       this.addFilterButton(form, filters, player, filtersDatabase, () => this.show(player, fromPage, ...args))
       this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
-
-      this.options.addCustomButtonBeforeArray?.(form)
-
-      if (paginator.canGoBack) form.addButton('§l§b< §r§3Предыдущая', () => this.show(player, fromPage - 1, ...args))
-      this.addButtons(paginator.array, form, filters)
-      if (paginator.canGoNext) form.addButton('§3Следующая §l§b>', () => this.show(player, fromPage + 1, ...args))
     }
+
+    this.options.addCustomButtonBeforeArray?.(form)
+
+    // Array item buttons & navigation
+    if (paginator.canGoBack)
+      form.addButton('§r§3Предыдущая', BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
+
+    this.addButtons(paginator.array, form, filters)
+
+    if (paginator.canGoNext) form.addButton('§3Следующая', BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
 
     return form.show(player)
   }
@@ -89,10 +96,9 @@ export class ArrayForm {
   /**
    * @private
    * @param {number} fromPage
-   * @param {import('lib.js').Paginator} paginator
+   * @param {number} maxPages
    */
-  createForm(fromPage, paginator) {
-    const maxPages = Array.isArray(paginator) ? 0 : paginator.maxPages
+  createForm(fromPage, maxPages) {
     const form = new ActionForm(
       this.title.replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
       this.description,

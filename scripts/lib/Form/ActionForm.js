@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { prompt } from 'lib/Form/MessageForm.js'
 import { util } from 'lib/util.js'
-import { showForm } from './utils.js'
+import { BUTTON, showForm } from './utils.js'
 
 export class ActionForm {
   /** Text used by back button */
@@ -73,7 +73,7 @@ export class ActionForm {
 
   /** @param {VoidFunction} backFN */
   addButtonBack(backFN) {
-    return this.addButton(ActionForm.backText, backFN)
+    return this.addButton('§r§3Назад', BUTTON['<'], backFN)
   }
 
   /**
@@ -82,8 +82,8 @@ export class ActionForm {
    * @param {string} noText
    * @param {ButtonCallback} yesAction
    */
-  addButtonPrompt(text, yesText, yesAction, noText = 'Отмена') {
-    return this.addButton(text, p =>
+  addButtonPrompt(text, yesText, yesAction, noText = 'Отмена', texture = '') {
+    return this.addButton(text, texture ? texture : null, p =>
       prompt(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p)),
     )
   }

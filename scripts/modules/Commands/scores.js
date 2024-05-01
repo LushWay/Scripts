@@ -51,7 +51,7 @@ function scoreManagerMenu(player) {
 function scoreboardMenu(player, scoreboard) {
   const manager = new ScoreboardDB(scoreboard.id)
 
-  new ArrayForm(scoreboard.displayName + ' $page/$max', '', scoreboard.getParticipants(), {
+  new ArrayForm(scoreboard.displayName + '§r§f $page/$max', '', scoreboard.getParticipants(), {
     filters: {
       online: {
         name: 'Онлайн',
@@ -78,6 +78,13 @@ function scoreboardMenu(player, scoreboard) {
     back: () => scoreManagerMenu(player),
     addCustomButtonBeforeArray(form) {
       form.addButton('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, scoreboard))
+      form.addButtonPrompt(
+        '§cУдалить таблицу',
+        '§cУдалить',
+        () => world.scoreboard.removeObjective(scoreboard.id),
+        undefined,
+        'textures/ui/trash_light',
+      )
     },
   }).show(player)
 }
