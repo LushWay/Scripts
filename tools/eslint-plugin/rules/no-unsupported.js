@@ -1,21 +1,7 @@
 const { ESLintUtils } = require('@typescript-eslint/utils')
-const { ensureScriptsDirectory } = require('..')
+const { isScriptsDirectory } = require('..')
 
 module.exports = ESLintUtils.RuleCreator.withoutDocs({
-  create(context) {
-    if (!ensureScriptsDirectory(context)) return {}
-    return {
-      StaticBlock(node) {
-        context.report({
-          node,
-          messageId: 'staticBlock',
-          fix(fixer) {
-            return fixer.replaceText(node, '')
-          },
-        })
-      },
-    }
-  },
   meta: {
     docs: {
       description: 'Dissallow unsupported features.',
@@ -28,4 +14,18 @@ module.exports = ESLintUtils.RuleCreator.withoutDocs({
     schema: [],
   },
   defaultOptions: [],
+  create(context) {
+    if (!isScriptsDirectory(context)) return {}
+    return {
+      StaticBlock(node) {
+        context.report({
+          node,
+          messageId: 'staticBlock',
+          fix(fixer) {
+            return fixer.replaceText(node, '')
+          },
+        })
+      },
+    }
+  },
 })

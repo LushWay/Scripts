@@ -89,12 +89,6 @@ export function setBlockSet(id, setName, set) {
   }
 }
 
-migration('blocks set order', () => {
-  for (const [player, blocksSets] of Object.entries(blockSets)) {
-    if (blocksSets) blockSets[player] = Object.fromEntries(Object.entries(blocksSets).reverse())
-  }
-})
-
 /**
  * @overload
  * @param {BlocksSetRef} set

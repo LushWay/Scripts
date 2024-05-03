@@ -1,6 +1,6 @@
 {
   "name": "scripts",
-  "version": "0.17.114",
+  "version": "0.17.115",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -65,6 +65,11 @@
     "settings": {
       "scriptapi/no-cycle": {
         "maxDepth": 20
+      },
+      "import/resolver": {
+        "typescript": {
+          "alwaysTryTypes": true
+        }
       }
     },
     "parser": "@typescript-eslint/parser",
@@ -77,6 +82,7 @@
       "scriptapi/no-cycle": "error",
       "scriptapi/ensure-modules": "error",
       "scriptapi/no-unsupported-features": "error",
+      "scriptapi/ensure-export-boundaries": "error",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",

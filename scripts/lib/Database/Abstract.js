@@ -2,21 +2,6 @@ import { Entity, Vector, system, world } from '@minecraft/server'
 import { util } from '../util.js'
 
 /**
- * Creates proxy-based database
- *
- * @template Key
- * @template Value
- * @param {string} name
- * @param {(key: Key) => Value} defaultValue
- * @returns {Record<Key, Value>}
- */
-export function database(name, defaultValue) {
-  if (!DatabaseUtils.databaseProvider) throw new DatabaseError('No database provider was specified!')
-
-  return DatabaseUtils.databaseProvider(name, defaultValue)
-}
-
-/**
  * @typedef {{
  *   entity: Entity
  *   tableName: string
@@ -26,7 +11,7 @@ export function database(name, defaultValue) {
  */
 
 export class DatabaseUtils {
-  /** @type {typeof database} */
+  /** @type {<V>(name: string, defaultValue?: (key: string) => V) => Record<string, V | undefined>} */
   static databaseProvider
 
   static entityTypeId = 'rubedo:database'
