@@ -2,6 +2,7 @@
 
 import { util } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { Rewards } from './Rewards'
 
 export class Mail {
   static db = new DynamicPropertyDB('mail', {
@@ -15,8 +16,7 @@ export class Mail {
    * @param {string} playerId
    * @param {string} title
    * @param {string} content
-   * @param {[]} rewards // example [{type: 'leafs', count: 10}, {type: 'money', count: 1000}, {type: 'item', id:
-   *   'customItemIdStoreSomewhere'}]
+   * @param {Rewards} rewards
    */
   static send(playerId, title, content, rewards) {}
 
