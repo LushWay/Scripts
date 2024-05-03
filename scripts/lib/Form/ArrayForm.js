@@ -1,5 +1,4 @@
 import { Player } from '@minecraft/server'
-import 'modules/Chat/chat.js'
 import { settingsGroupMenu } from 'modules/Commands/settings.js'
 import { stringSimilarity } from '../Search.js'
 import { SETTINGS_GROUP_NAME, createSettingsObject, isDropdown } from '../Settings.js'
