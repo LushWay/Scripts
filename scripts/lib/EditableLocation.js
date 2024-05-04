@@ -16,7 +16,10 @@ import { util } from './util.js'
  *     : Vector3 & { radius: number }} Location
  */
 
-/** @template {LocationTypeSuperset} [LocationType='vector3'] Default is `'vector3'` */
+/**
+ * @template {LocationTypeSuperset} [LocationType='vector3'] Default is `'vector3'` . Default is `'vector3'` . Default
+ *   is `'vector3'`
+ */
 export class EditableLocation {
   /**
    * @returns {({ valid: false } | ({ valid: true } & Location<LocationType>)) & {

@@ -1,6 +1,10 @@
 import { Player } from '@minecraft/server'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
+import { ActionForm } from 'lib/Form/ActionForm.js'
+import { ModalForm } from 'lib/Form/ModalForm.js'
+import { FormCallback } from 'lib/Form/utils.js'
 import { WeakPlayerMap } from 'lib/WeakPlayerMap.js'
+import { util } from 'lib/util.js'
 
 /** @typedef {[value: string, displayText: string]} DropdownSetting */
 
@@ -45,7 +49,7 @@ export const SETTINGS_GROUP_NAME = Symbol('name')
  * @template {SettingsConfig} T
  * @typedef {{
  *   [K in keyof T]: toPlain<T[K]['value']>
- * }} ParsedSettingsConfig
+ * }} SettingsConfigParsed
  */
 
 /** @typedef {Record<string, Record<string, SettingValue>>} SettingsDatabase */
@@ -85,7 +89,7 @@ export class Settings {
    * @param {string} groupName - The prefix for the database.
    * @param {Narrow<Config> & GroupNameObject} config - This is an object that contains the default values for each
    *   option.
-   * @returns {(player: Player) => ParsedSettingsConfig<Config>} An function that returns object with properties that
+   * @returns {(player: Player) => SettingsConfigParsed<Config>} An function that returns object with properties that
    *   are getters and setters.
    */
   static player(name, groupName, config) {
@@ -105,7 +109,7 @@ export class Settings {
       if (cached) {
         return cached
       } else {
-        const settings = createSettingsObject(Settings.playerDatabase, groupName, this.playerMap[groupName], player)
+        const settings = this.parseConfig(Settings.playerDatabase, groupName, this.playerMap[groupName], player)
         cache.set(player, settings)
         return settings
       }
@@ -126,7 +130,7 @@ export class Settings {
    * @template {WorldSettingsConfig} Config
    * @param {string} groupName - The prefix for the database.
    * @param {Narrow<Config> & GroupNameObject} config - The default values for the options.
-   * @returns {ParsedSettingsConfig<Config>} An object with properties that are getters and setters.
+   * @returns {SettingsConfigParsed<Config>} An object with properties that are getters and setters.
    */
   static world(groupName, config) {
     this.insertGroup(
@@ -137,7 +141,7 @@ export class Settings {
     )
 
     // @ts-expect-error Trust me, TS
-    return createSettingsObject(Settings.worldDatabase, groupName, this.worldMap[groupName])
+    return this.parseConfig(Settings.worldDatabase, groupName, this.worldMap[groupName])
   }
 
   /**
@@ -157,51 +161,219 @@ export class Settings {
       }
     }
   }
+
+  /**
+   * It creates a proxy object that allows you to access and modify the values of a given object, but the values are
+   * stored in a database
+   *
+   * @param {SettingsDatabase} database - The prefix for the database.
+   * @param {string} groupName - The group name of the settings
+   * @param {SettingsConfig} config - This is the default configuration object. It's an object with the keys being the
+   *   option names and the values being the default values.
+   * @param {Player | null} [player] - The player object.
+   * @returns {Record<string, any>} An object with getters and setters
+   */
+  static parseConfig(database, groupName, config, player = null) {
+    const settings = {}
+
+    for (const prop in config) {
+      const key = player ? `${player.id}:${prop}` : prop
+      Object.defineProperty(settings, prop, {
+        configurable: false,
+        enumerable: true,
+        get() {
+          const value = config[prop].value
+          return database[groupName]?.[key] ?? (Settings.isDropdown(value) ? value[0][0] : value)
+        },
+        set(v) {
+          const value = (database[groupName] ??= {})
+          value[key] = v
+          config[prop].onChange?.()
+          database[groupName] = value
+        },
+      })
+    }
+
+    return settings
+  }
+
+  /**
+   * @param {SettingValue} v
+   * @returns {v is DropdownSetting[]}
+   */
+  static isDropdown(v) {
+    return (
+      Array.isArray(v) &&
+      v.length > 0 &&
+      v.every(e => Array.isArray(e) && typeof e[1] === 'string' && typeof e[0] === 'string')
+    )
+  }
 }
 
 /**
- * It creates a proxy object that allows you to access and modify the values of a given object, but the values are
- * stored in a database
- *
- * @param {SettingsDatabase} database - The prefix for the database.
- * @param {string} groupName - The group name of the settings
- * @param {SettingsConfig} config - This is the default configuration object. It's an object with the keys being the
- *   option names and the values being the default values.
- * @param {Player | null} [player] - The player object.
- * @returns {Record<string, any>} An object with getters and setters
+ * @param {Player} player
+ * @param {string} groupName
+ * @param {boolean} forRegularPlayer
+ * @param {Record<string, string>} [hints]
  */
-export function createSettingsObject(database, groupName, config, player = null) {
-  const settings = {}
 
-  for (const prop in config) {
-    const key = player ? `${player.id}:${prop}` : prop
-    Object.defineProperty(settings, prop, {
-      configurable: false,
-      enumerable: true,
-      get() {
-        const value = config[prop].value
-        return database[groupName]?.[key] ?? (isDropdown(value) ? value[0][0] : value)
+export function settingsGroupMenu(
+  player,
+  groupName,
+  forRegularPlayer,
+  hints = {},
+  storeSource = forRegularPlayer ? Settings.playerDatabase : Settings.worldDatabase,
+  configSource = forRegularPlayer ? Settings.playerMap : Settings.worldMap,
+  back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
+  showHintAboutSavedStatus = true,
+) {
+  const config = configSource[groupName]
+  const store = Settings.parseConfig(storeSource, groupName, config, forRegularPlayer ? player : null)
+
+  /** @type {[string, (input: string | boolean) => string][]} */
+  const buttons = []
+
+  /** @type {ModalForm<(ctx: FormCallback<ModalForm>, ...options: any) => void>} */
+  const form = new ModalForm(config[SETTINGS_GROUP_NAME] ?? groupName)
+
+  for (const key in config) {
+    const saved = store[key]
+    const setting = config[key]
+    const value = saved ?? setting.value
+
+    const isUnset = typeof saved === 'undefined'
+    const isRequired = Reflect.get(config[key], 'requires') && isUnset
+
+    const isToggle = typeof value === 'boolean'
+
+    let label = ''
+    label += hints[key] ? `${hints[key]}\n` : ''
+
+    if (isRequired) label += '§c(!) '
+    label += `§f§l${setting.name}§r§f` //§r
+
+    if (setting.description) label += `§i - ${setting.description}`
+    if (isUnset) label += `§8(По умолчанию)\n`
+
+    if (isToggle) {
+      form.addToggle(label, value)
+    } else if (Settings.isDropdown(setting.value)) {
+      form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValueIndex: value })
+    } else {
+      const isString = typeof value === 'string'
+
+      if (!isString) {
+        label += `\n§7§lЗначение:§r ${util.stringify(value)}`
+        label += `\n§7§lТип: §r§f${Types[typeof value] ?? typeof value}`
+      }
+
+      form.addTextField(label, 'Настройка не изменится', isString ? value : JSON.stringify(value))
+    }
+
+    buttons.push([
+      key,
+      input => {
+        if (typeof input === 'undefined' || input === '') return ''
+
+        let result
+        if (typeof input === 'boolean' || Settings.isDropdown(setting.value)) {
+          result = input
+        } else {
+          switch (typeof setting.value) {
+            case 'string':
+              result = input
+              break
+            case 'number':
+              result = Number(input)
+              if (isNaN(result)) return '§cВведите число!'
+              break
+            case 'object':
+              try {
+                result = JSON.parse(input)
+              } catch (error) {
+                return `§c${error.message}`
+              }
+              break
+          }
+        }
+
+        if (util.stringify(store[key]) === util.stringify(result)) return ''
+
+        store[key] = result
+        return showHintAboutSavedStatus ? '§aСохранено!' : ''
       },
-      set(v) {
-        const value = (database[groupName] ??= {})
-        value[key] = v
-        config[prop].onChange?.()
-        database[groupName] = value
-      },
+    ])
+  }
+
+  form.show(player, (_, ...settings) => {
+    /** @type {Record<string, string>} */
+    const hints = {}
+
+    for (const [i, setting] of settings.entries()) {
+      const [key, callback] = buttons[i]
+      const hint = callback(setting)
+      if (hint) hints[key] = hint
+    }
+
+    if (Object.keys(hints).length) {
+      // Show current menu with hints
+      self()
+    } else {
+      // No hints, go back to previous menu
+      back(player)
+    }
+
+    function self() {
+      settingsGroupMenu(player, groupName, forRegularPlayer, hints, storeSource, configSource, back)
+    }
+  })
+}
+
+/** @typedef {'string' | 'number' | 'object' | 'boolean' | 'symbol' | 'bigint' | 'undefined' | 'function'} AllTypes */
+
+/** @type {Partial<Record<AllTypes, string>>} */
+const Types = {
+  string: 'Строка',
+  number: 'Число',
+  object: 'JSON-Объект',
+  boolean: 'Переключатель',
+}
+
+/**
+ * Opens player settings menu
+ *
+ * @param {Player} player
+ * @param {VoidFunction} [back]
+ */
+export function playerSettingsMenu(player, back) {
+  const form = new ActionForm('§dНастройки')
+  if (back) form.addButtonBack(back)
+
+  for (const groupName in Settings.playerMap) {
+    const name = Settings.playerMap[groupName][SETTINGS_GROUP_NAME]
+    if (name) form.addButton(name, () => settingsGroupMenu(player, groupName, true))
+  }
+
+  form.show(player)
+}
+
+/** @param {Player} player */
+export function worldSettingsMenu(player) {
+  const form = new ActionForm('§dНастройки мира')
+
+  for (const groupName in Settings.worldMap) {
+    const db = Settings.worldDatabase[groupName]
+
+    let requiresCount = 0
+    for (const [key, option] of Object.entries(Settings.worldMap[groupName])) {
+      const requiredButNotDefined = option.requires && typeof db[key] === 'undefined'
+      if (requiredButNotDefined) requiresCount++
+    }
+
+    form.addButton(`${groupName}${requiresCount ? ` §c(${requiresCount}!)` : ''}`, null, () => {
+      settingsGroupMenu(player, groupName, false)
     })
   }
 
-  return settings
-}
-
-/**
- * @param {SettingValue} v
- * @returns {v is DropdownSetting[]}
- */
-export function isDropdown(v) {
-  return (
-    Array.isArray(v) &&
-    v.length > 0 &&
-    v.every(e => Array.isArray(e) && typeof e[1] === 'string' && typeof e[0] === 'string')
-  )
+  form.show(player)
 }

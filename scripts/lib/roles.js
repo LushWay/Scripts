@@ -1,7 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
-import { EventSignal } from 'lib.js'
+import { PLAYER_DB } from 'lib/Database/Player.js'
+import { EventSignal } from 'lib/EventSignal.js'
 import { util } from 'lib/util.js'
-import { PLAYER_DB } from './Database/Player.js'
 
 /** The roles that are in this server */
 export const ROLES = {

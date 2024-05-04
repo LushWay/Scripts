@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { util } from 'lib.js'
+import { util } from 'lib/util.js'
 
 /**
  * @typedef {string
