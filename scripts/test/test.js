@@ -1,4 +1,4 @@
-import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
+import { ItemStack, MolangVariableMap, Vector, system, world, Player } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
@@ -17,6 +17,7 @@ import {
   itemLocaleName,
   restorePlayerCamera,
   util,
+  Mail,
 } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
@@ -29,6 +30,7 @@ import { Mineshaft } from '../modules/Places/Mineshaft.js'
 import './enchant.js'
 import './lib/Form/util.test.js'
 import './simulatedPlayer.js'
+import { Rewards } from 'lib/Rewards.js'
 
 /** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
 const publicTests = {
@@ -315,6 +317,21 @@ const tests = {
       })
       .show(ctx.sender)
   },
+
+  mail() {
+    const pid = Player.getByName('MilkCooler')?.id ?? ''
+    Mail.send(typeof pid == 'string' ? pid : '', 'Zolkin', 'Привет, мир!', new Rewards())
+  },
+  mailr() {
+    // r = rewards
+    const pid = Player.getByName('MilkCooler')?.id ?? ''
+    Mail.send(
+      typeof pid == 'string' ? pid : '',
+      'Bugrock',
+      'это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст',
+      new Rewards().scores('money', 50).scores('leafs', 100).item(MinecraftItemTypes.Diamond, 'Алмаз', 12),
+    )
+  },
 }
 
 const c = new Command({
@@ -329,3 +346,4 @@ c.string('id', true).executes(async (ctx, id) => {
   ctx.reply('Tест ' + id)
   util.catch(() => source[id](ctx), 'Test')
 })
+

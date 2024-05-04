@@ -1053,8 +1053,8 @@ __metadata:
 
 "eslint-plugin-scriptapi@file:tools/eslint-plugin::locator=scripts%40workspace%3A.":
   version: 0.0.2
-  resolution: "eslint-plugin-scriptapi@file:tools/eslint-plugin#tools/eslint-plugin::hash=841c91&locator=scripts%40workspace%3A."
-  checksum: 10c0/7ac4e763dbf8eb40339c5b3e17a4d1ba24e02f2e6aafe2588a0aab04b3f0551442dc1f084482f49cc639c7321ddea1a393c1496d6386a658f30f0499a04c07b4
+  resolution: "eslint-plugin-scriptapi@file:tools/eslint-plugin#tools/eslint-plugin::hash=9d758e&locator=scripts%40workspace%3A."
+  checksum: 10c0/f92939e17733f023467a88e5e0c7704cdd516fdec0705f7132844ea14e3053f26099028e3c2bf7358585b26de530985a964597bfb2e9e6347a3e5d75e3fd873c
   languageName: node
   linkType: hard
 
