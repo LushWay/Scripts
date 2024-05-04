@@ -1,5 +1,5 @@
 /**
- * @fileOverview Ensures that no imported module imports the linted module.
+ * @file Ensures that no imported module imports the linted module.
  * @author Ben Mosher
  */
 // @ts-nocheck
@@ -100,20 +100,16 @@ module.exports = ESLintUtils.RuleCreator.withoutDocs({
         return // no-self-import territory
       }
 
-      if (importer.type === 'ImportDeclaration' &&
-        !importer.specifiers.find(
-          e => isValueUsed(e.local.name)
-        )
-      ) {
+      if (importer.type === 'ImportDeclaration' && !importer.specifiers.find(e => isValueUsed(e.local.name))) {
         return // Imported value not used at the top level
       }
       function isValueUsed(identifierName) {
-        const scopeManager = context.getScope()
+        const scopeManager = context.sourceCode.getScope(sourceNode)
         let isUsed = false
-      
+
         // Find the variable that the identifier refers to
         const variable = scopeManager.set.get(identifierName)
-      
+
         // If the variable is found and is a defined variable
         if (variable.isValueVariable && variable.defs.length) {
           for (const reference of variable.references) {
@@ -129,7 +125,7 @@ module.exports = ESLintUtils.RuleCreator.withoutDocs({
         }
 
         // console.debug({file: myPath, identifierName, isUsed})
-      
+
         return isUsed
       }
 
@@ -152,7 +148,7 @@ module.exports = ESLintUtils.RuleCreator.withoutDocs({
             ({ source, isOnlyImportingTypes }) =>
               !ignoreModule(source.value) &&
               // Ignore only type imports
-              !isOnlyImportingTypes
+              !isOnlyImportingTypes,
           )
 
           /*

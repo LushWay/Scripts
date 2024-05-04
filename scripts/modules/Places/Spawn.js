@@ -9,13 +9,6 @@ import { showSurvivalHud } from 'modules/Features/sidebar.js'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding.js'
 import { DefaultPlaceWithInventory } from './Default/WithInventory.js'
 
-migration('move player inv', () => {
-  Object.values(PLAYER_DB).forEach(e => {
-    // @ts-expect-error migration
-    delete e.survival.inv
-  })
-})
-
 class SpawnBuilder extends DefaultPlaceWithInventory {
   /** @type {InventoryTypeName} */
   inventoryName = 'spawn'

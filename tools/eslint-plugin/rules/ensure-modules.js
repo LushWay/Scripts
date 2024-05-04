@@ -1,14 +1,12 @@
 const { ESLintUtils } = require('@typescript-eslint/utils')
-const { ensureScriptsDirectory } = require('..')
+const { isScriptsDirectory } = require('..')
 
-/**
- * @type {Record<string, string>}
- */
+/** @type {Record<string, string>} */
 const WRONG_MODULES = { '@minecraft/vanilla-data': '@minecraft/vanilla-data.js' }
 
 module.exports = ESLintUtils.RuleCreator.withoutDocs({
   create(context) {
-    if (!ensureScriptsDirectory(context)) return {}
+    if (!isScriptsDirectory(context)) return {}
     return {
       ImportDeclaration(node) {
         const importedModuleName = node.source.value

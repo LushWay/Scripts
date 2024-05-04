@@ -2,7 +2,6 @@ import { Entity, PlayerInteractWithEntityBeforeEvent, system, world } from '@min
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
 import { Temporary, chunkIsUnloaded } from 'lib.js'
 import { util } from 'lib/util.js'
-import { isBuilding } from 'modules/WorldEdit/isBuilding.js'
 import { EditableLocation } from './EditableLocation.js'
 
 /** @typedef {ConstructorParameters<typeof EditableNpc>[0]} EditableNpcProps */
@@ -75,7 +74,7 @@ export class EditableNpc {
 
 world.beforeEvents.playerInteractWithEntity.subscribe(event => {
   if (event.target.typeId !== MinecraftEntityTypes.Npc) return
-  if (isBuilding(event.player) && event.player.isSneaking) return
+  if (event.player.isGamemode('creative') && event.player.isSneaking) return
 
   event.cancel = true
   system.run(() => {
