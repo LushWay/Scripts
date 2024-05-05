@@ -11,7 +11,7 @@ const displayNames = {
   totalOnlineTime: 'Онлайн всего',
   anarchyOnlineTime: 'Онлайн на анархии',
   blocksPlaced: 'Блоков поставлено',
-  blocksBroke: 'Блоков сломано',
+  blocksBroken: 'Блоков сломано',
   fireworksLaunched: 'Фейрверков запущено',
   fireworksExpoded: 'Фейрвереов взорвано',
   damageRecieve: 'Урона получено',

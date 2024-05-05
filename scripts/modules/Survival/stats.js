@@ -17,7 +17,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ player }) => {
 })
 
 world.afterEvents.playerBreakBlock.subscribe(({ player }) => {
-  player.scores.blocksBroke++
+  player.scores.blocksBroken++
 })
 
 world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
@@ -32,7 +32,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
 
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {
   if (hurtEntity instanceof Player) {
-    // when player is healing it is reciveng -2142941984 damage
+    // when player is being healed by effect with 255 strength it is recieving -2142941984 damage
     if (damage < 0) return
 
     // closeChat uses entityAttack but has no entity and projectile

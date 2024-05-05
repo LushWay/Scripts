@@ -156,7 +156,7 @@ declare module '@minecraft/server' {
 
   type GameplayStatScoreName =
     | 'blocksPlaced'
-    | 'blocksBroke'
+    | 'blocksBroken'
     | 'fireworksLaunched'
     | 'fireworksExpoded'
     | 'damageRecieve'
