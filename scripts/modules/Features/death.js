@@ -1,16 +1,6 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data.js'
-import {
-  Cooldown,
-  PLAYER_DB,
-  Region,
-  SafeAreaRegion,
-  Settings,
-  Temporary,
-  actionGuard,
-  inventoryIsEmpty,
-  util,
-} from 'lib.js'
+import { Cooldown, PLAYER_DB, Settings, Temporary, actionGuard, inventoryIsEmpty, util } from 'lib.js'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea.js'
 import { Spawn } from 'modules/Places/Spawn.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'
@@ -79,12 +69,14 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   const deadAt = player.database.survival.deadAt
   if (!deadAt) return
 
-  /** @type {Region[]} */
-  const safeAreas = DefaultPlaceWithSafeArea.places.map(e => e.safeArea)
-  const nearestSafeAreas = SafeAreaRegion.nearestRegions(deadAt, player.dimension.type).filter(e =>
-    safeAreas.includes(e),
-  )
-  const nearestPlace = DefaultPlaceWithSafeArea.places.find(e => e.safeArea === nearestSafeAreas[0])
+  const places = DefaultPlaceWithSafeArea.places
+    .map(place => ({
+      distance: Vector.distance(place.safeArea.center, deadAt) - place.safeArea.radius,
+      place,
+    }))
+    .sort((a, b) => a.distance - b.distance)
+
+  const nearestPlace = places[0].place
 
   if (nearestPlace && nearestPlace.portalTeleportsTo.valid) {
     player.teleport(nearestPlace.portalTeleportsTo)
