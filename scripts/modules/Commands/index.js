@@ -12,5 +12,7 @@ import './settings.js'
 import './shell.js'
 import './sit.js'
 import './socials.js'
+import './stats.js'
 import './tp.js'
 import './wipe.js'
+
