@@ -156,8 +156,8 @@ export class Settings {
       this[to][groupName] = config
     } else {
       this[to][groupName] = {
-        ...this[to][groupName],
         ...config,
+        ...this[to][groupName],
       }
     }
   }

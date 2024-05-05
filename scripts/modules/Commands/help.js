@@ -9,14 +9,6 @@ const help = new Command('help')
   .setAliases('?', 'h')
   .setPermissions('everybody')
 
-Command.getHelpForCommand = (command, ctx) => helpForCommand(ctx.player, command.sys.name)
-help.string('commandName').executes((ctx, command) => helpForCommand(ctx.player, command))
-
-new CmdLet('help').setDescription('Выводит справку о команде').executes(ctx => {
-  helpForCommand(ctx.player, ctx.command.sys.name)
-  return 'stop'
-})
-
 help
   .int('page', true)
   .int('commandsInPage', true)
@@ -72,6 +64,14 @@ function helpForCommand(player, commandName) {
   // ctx.reply(`${new Array(l).join(" ")}§7§ы──┘`);
   return
 }
+
+Command.getHelpForCommand = (command, ctx) => helpForCommand(ctx.player, command.sys.name)
+help.string('commandName').executes((ctx, command) => helpForCommand(ctx.player, command))
+
+new CmdLet('help').setDescription('Выводит справку о команде').executes(ctx => {
+  helpForCommand(ctx.player, ctx.command.sys.name)
+  return 'stop'
+})
 
 /**
  * @param {Player} player

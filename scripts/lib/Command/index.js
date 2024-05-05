@@ -309,7 +309,13 @@ export class Command {
    */
   argument(type) {
     const cmd = new Command(this.sys.name, type, this.sys.depth + 1, this)
-    cmd.sys = this.sys
+    cmd.sys.name = this.sys.name
+    cmd.sys.description = this.sys.description
+    cmd.sys.aliases = this.sys.aliases
+    cmd.sys.requires = this.sys.requires
+    cmd.sys.role = this.sys.role
+    cmd.sys.group = this.sys.group
+
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd

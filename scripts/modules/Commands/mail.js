@@ -7,21 +7,21 @@ new Command('mail').setDescription('Посмотреть входящие соо
 
 const getSettings = Settings.player(...Menu.settings, {
   mailReadOnOpen: {
-    name: '',
-    description: '',
+    name: 'Читать письмо при открытии',
+    description: 'Помечать ли письмо прочитанным при открытии',
     value: true,
   },
   mailClaimOnDelete: {
-    name: 'd',
-    description: '',
+    name: 'Собирать награды при удалении',
+    description: 'Собирать ли награды при удалении письма',
     value: true,
   },
 })
 
 const getJoinSettings = Settings.player(...Join.settingsName, {
   unreadMails: {
-    name: '',
-    description: '',
+    name: 'Почта',
+    description: 'Показывать ли при входе сообщение с кол-вом непрочитанных',
     value: true,
   },
 })
