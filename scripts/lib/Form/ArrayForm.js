@@ -1,7 +1,6 @@
 import { Player } from '@minecraft/server'
-import { settingsGroupMenu } from 'modules/Commands/settings.js'
+import { SETTINGS_GROUP_NAME, Settings, settingsGroupMenu } from 'lib/Settings.js'
 import { stringSimilarity } from '../Search.js'
-import { SETTINGS_GROUP_NAME, createSettingsObject, isDropdown } from '../Settings.js'
 import { util } from '../util.js'
 import { ActionForm } from './ActionForm.js'
 import { ModalForm } from './ModalForm.js'
@@ -10,7 +9,7 @@ import { BUTTON } from './utils.js'
 /**
  * @template T
  * @template {import('lib.js').SettingsConfig} Filters
- * @template {import('lib.js').ParsedSettingsConfig<Filters>} ParsedFilters
+ * @template {import('lib.js').SettingsConfigParsed<Filters>} ParsedFilters
  */
 export class ArrayForm {
   /**
@@ -46,7 +45,7 @@ export class ArrayForm {
      * @private
      * @type {Filters}
      */
-    // @ts-expect-error huh
+    // @ts-expect-error Object type
     this.filtersConfig = { [SETTINGS_GROUP_NAME]: 'Фильтры', ...options.filters }
   }
 
@@ -61,7 +60,7 @@ export class ArrayForm {
     fromPage = 1,
     filtersDatabase = {},
     // @ts-expect-error Huh
-    filters = createSettingsObject(filtersDatabase, 'filters', this.options.filters),
+    filters = Settings.parseConfig(filtersDatabase, 'filters', this.options.filters),
     searchQuery = '',
   ) {
     const args = [filtersDatabase, filters]
@@ -74,8 +73,11 @@ export class ArrayForm {
 
     const form = this.createForm(fromPage, paginator.maxPages)
 
-    // Helper buttons
-    if (paginator.maxPages !== 1) {
+    // Force show helper buttons when array is filtered
+    // this is needed because when filters are applied and button count
+    // is less then min items for filtes there is no way to
+    // disable filters
+    if (paginator.array.length !== this.array.length || paginator.maxPages !== 1) {
       this.addFilterButton(form, filters, player, filtersDatabase, () => this.show(player, fromPage, ...args))
       this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
     }
@@ -145,7 +147,7 @@ export class ArrayForm {
     const firstFilterConfig = this.filtersConfig[key]
 
     if (size === 0) return
-    if (size === 1 && isDropdown(firstFilterConfig?.value)) {
+    if (size === 1 && Settings.isDropdown(firstFilterConfig?.value)) {
       const values = firstFilterConfig.value
       let i = values.findIndex(e => filters[key] === e[0])
       form.addButton('§3' + firstFilterConfig.name + ':§f ' + values[i][1], () => {
@@ -158,9 +160,10 @@ export class ArrayForm {
         back()
       })
     } else {
-      const applied = Object.keys(database).length
+      const propertName = 'filters'
+      const applied = Object.keys(database[propertName] ?? {}).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, 'textures/ui/gear', () =>
-        settingsGroupMenu(player, 'filters', false, {}, database, { filters: this.filtersConfig }, back, false),
+        settingsGroupMenu(player, propertName, false, {}, database, { [propertName]: this.filtersConfig }, back, false),
       )
     }
   }

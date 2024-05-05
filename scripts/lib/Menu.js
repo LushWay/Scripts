@@ -7,6 +7,9 @@ import { WeakOnlinePlayerMap } from 'lib/WeakPlayerMap.js'
 import { util } from 'lib/util.js'
 
 export class Menu {
+  /** @type {[string, string]} */
+  static settings = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
+
   static createItem(typeId = CUSTOM_ITEMS.menu, name = '§b§lМеню\n§r§f(use)') {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(

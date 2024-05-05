@@ -1,31 +1,37 @@
-// TODO(milkcool) Remaining implementation
-
 import { Player } from '@minecraft/server'
 import { util } from 'lib.js'
 import { DynamicPropertyDB } from 'lib/Database/Properties.js'
 import { Rewards } from './Rewards'
 
-// A local letter is either a letter sent to a specific player or a "pointer" to a global letter
 /**
+ * A global letter is a letter sent to multiple players
+ *
  * @typedef {{
- *   read: boolean
- *   title?: string
- *   content?: string
- *   rewards?: import('./Rewards').Reward[]
- *   rewardsClaimed: boolean
- *   id?: string
- * }} LocalLetter
+ *   title: string
+ *   content: string
+ *   rewards: import('./Rewards').Reward[]
+ * }} GlobalLetter
  */
-/** @typedef {{ letter: LocalLetter; index: number }} LocalLetterIndex */
-// A global letter is a letter sent to multiple players
-/** @typedef {{ title: string; content: string; rewards: import('./Rewards').Reward[] }} GlobalLetter */
+
+/** @typedef {{ read: boolean; rewardsClaimed: boolean }} LocalLetterMetadata */
+
+/**
+ * "pointer" to a global letter
+ *
+ * @typedef {LocalLetterMetadata & { id: string }} LetterLink
+ */
+
+/**
+ * A local letter is a letter sent to a specific player
+ *
+ * @typedef {GlobalLetter & LocalLetterMetadata} LocalLetter
+ */
+
 export class Mail {
   static dbPlayers = new DynamicPropertyDB('mailPlayers', {
-    /** @type {Record<string, LocalLetter[]>} } */
+    /** @type {Record<string, (LocalLetter | LetterLink)[]>} } */
     type: {},
-    defaultValue: name => {
-      return []
-    },
+    defaultValue: () => [],
   }).proxy()
 
   /** @type {Record<string, GlobalLetter | undefined>} } */
@@ -47,53 +53,45 @@ export class Mail {
    * @param {Rewards} rewards The attached rewards
    */
   static send(playerId, title, content, rewards) {
-    /** @type {LocalLetter} */
-    const letter = {
+    this.dbPlayers[playerId].push({
       read: false,
       title,
       content,
       rewards: rewards.serialize(),
       rewardsClaimed: false,
-    }
-    this.dbPlayers[playerId].push(letter)
-  }
-
-  /**
-   * Sends a letter "pointing" at a global message to a player
-   *
-   * @private
-   * @param {string} playerId The reciever
-   * @param {string} id The message id to point to
-   */
-  static sendLink(playerId, id) {
-    const letter = {
-      read: false,
-      id: id,
-      rewardsClaimed: false,
-    }
-    this.dbPlayers[playerId].push(letter)
+    })
   }
 
   /**
    * Sends a mail to multiple players
    *
-   * @param {string[]} playerIds The reciever
+   * @param {string[]} playerIds The recievers
    * @param {string} title The letter title
    * @param {string} content The letter content
    * @param {Rewards} rewards The attached rewards
    */
   static sendMultiple(playerIds, title, content, rewards) {
-    const letter = {
+    let id = new Date().toISOString()
+
+    if (id in this.dbGlobal) {
+      let postfix = 0
+      while (id + postfix.toString() in this.dbGlobal) postfix++
+      id = id + postfix.toString()
+    }
+
+    this.dbGlobal[id] = {
       title,
       content,
       rewards: rewards.serialize(),
     }
-    const initialId = new Date().toISOString()
-    let postfix = 0
-    while (initialId + postfix.toString() in this.dbGlobal) postfix++
-    const finalId = initialId + postfix.toString()
-    this.dbGlobal[finalId] = letter
-    for (const playerId of playerIds) this.sendLink(playerId, finalId)
+
+    for (const playerId of playerIds) {
+      this.dbPlayers[playerId].push({
+        read: false,
+        rewardsClaimed: false,
+        id,
+      })
+    }
   }
 
   /**
@@ -116,41 +114,52 @@ export class Mail {
   }
 
   /**
-   * Get the GlobalLettet that the LocalLetter is pointing to
+   * Converts letter pointer or local letter to the LocalLetter
    *
-   * @param {LocalLetter} letter
-   * @returns {GlobalLetter}
+   * @param {LetterLink | LocalLetter} letter - Letter pointer or the local letter
    */
-  static followLetter(letter) {
-    if (!letter.id) return this.globalNotFound
-    return this.dbGlobal[letter.id] ?? this.globalNotFound
+  static toLocalLetter(letter) {
+    if ('id' in letter) {
+      const global = Mail.dbGlobal[letter.id]
+      if (global) {
+        return {
+          ...global,
+          ...letter,
+        }
+      }
+    } else return letter
   }
 
   /**
-   * This function returns the letters array for a player (with indexes)
+   * Returns the letters array for a player (with indexes)
    *
    * @param {string} playerId The player ID
-   * @returns {LocalLetterIndex[]}
    */
   static getLetters(playerId) {
-    return this.dbPlayers[playerId].map((letter, index) => ({
-      letter,
-      index,
-    }))
+    const letters = []
+
+    for (const [index, letter] of this.dbPlayers[playerId].entries()) {
+      const localLetter = this.toLocalLetter(letter)
+      if (localLetter) {
+        letters.push({ letter: localLetter, index })
+      }
+    }
+
+    return letters
   }
 
   /**
-   * Claim the rewards attached to a letter
+   * Claims the rewards attached to a letter
    *
    * @param {Player} player The player to give out the rewards to
    * @param {number} index The index of the message in the player's mailbox
    */
   static claimRewards(player, index) {
-    const letter = this.dbPlayers[player.id][index]
-    if (letter.rewardsClaimed) return
-    new Rewards().restore(letter.rewards ?? []).give(player)
+    const letter = this.toLocalLetter(this.dbPlayers[player.id][index])
+    if (!letter || letter.rewardsClaimed) return
+
+    Rewards.restore(letter.rewards).give(player)
     letter.rewardsClaimed = true
-    this.dbPlayers[player.id][index] = letter
   }
 
   /**
@@ -162,6 +171,7 @@ export class Mail {
   static readMessage(playerId, index) {
     const letter = this.dbPlayers[playerId][index]
     if (letter.read) return
+
     letter.read = true
   }
 
@@ -172,9 +182,6 @@ export class Mail {
    * @param {number} index The index of the message in the player's mailbox
    */
   static deleteMessage(player, index) {
-    // We want to make sure that our players don't lose any rewards!
-    this.claimRewards(player, index)
     this.dbPlayers[player.id].splice(index, 1)
   }
 }
-

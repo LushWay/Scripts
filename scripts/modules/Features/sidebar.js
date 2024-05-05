@@ -1,10 +1,10 @@
 import { Player, system, world } from '@minecraft/server'
-import { BaseRegion, MineshaftRegion, Region, SafeAreaRegion, Settings, Sidebar, util } from 'lib.js'
+import { BaseRegion, Menu, MineshaftRegion, Region, SafeAreaRegion, Settings, Sidebar, util } from 'lib.js'
 import { emoji } from 'lib/Assets/emoji.js'
 import { Minigame } from 'modules/Minigames/Builder.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'
 
-const sidebarSettings = Settings.player('Меню\n§7Разные настройки интерфейсов и меню в игре', 'sidebar', {
+const sidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
     name: 'Использовать меню',
     description: 'Определяет, включено ли внутриигровое меню',

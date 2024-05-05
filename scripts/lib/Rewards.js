@@ -1,6 +1,5 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { emoji } from 'lib/Assets/emoji.js'
-import { itemLocaleName } from './GameUtils'
 
 /**
  * @typedef {{
@@ -12,6 +11,19 @@ import { itemLocaleName } from './GameUtils'
  * }} Reward
  */
 export class Rewards {
+  /**
+   * Restores the object from an array
+   *
+   * @param {Reward[]} entries The array of reward entries
+   * @returns {Rewards}
+   */
+  static restore(entries) {
+    const rewards = new Rewards()
+    rewards.entries = entries
+
+    return rewards
+  }
+
   /**
    * @private
    * @type {Reward[]}
@@ -82,17 +94,6 @@ export class Rewards {
   }
 
   /**
-   * Restores the object from an array
-   *
-   * @param {Reward[]} rewards The array of rewards
-   * @returns {Rewards}
-   */
-  restore(rewards) {
-    this.entries = rewards
-    return this
-  }
-
-  /**
    * Returns the rewards as a human-readable string
    *
    * @returns {string}
@@ -110,4 +111,3 @@ export class Rewards {
     return rewardsAsStrings.join('\n')
   }
 }
-

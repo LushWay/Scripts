@@ -151,7 +151,10 @@ class JoinBuilder {
     this.emitFirstJoin(player)
   })
 
-  settings = Settings.player('Вход', 'join', {
+  /** @type {[string, string]} */
+  settingsName = ['Вход\n§7Все действия, связанные со входом', 'join']
+
+  settings = Settings.player(...this.settingsName, {
     message: {
       name: 'Сообщение',
       description: 'о входе других игроков',

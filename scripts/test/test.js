@@ -1,4 +1,4 @@
-import { ItemStack, MolangVariableMap, Vector, system, world, Player } from '@minecraft/server'
+import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
@@ -11,33 +11,36 @@ import {
   ChestForm,
   DatabaseUtils,
   LootTable,
+  Mail,
   NpcForm,
   Settings,
   is,
   itemLocaleName,
   restorePlayerCamera,
   util,
-  Mail,
 } from 'lib.js'
 import { CommandContext } from 'lib/Command/Context.js'
 import { ActionForm } from 'lib/Form/ActionForm.js'
 import { MessageForm } from 'lib/Form/MessageForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { Compass } from 'lib/Menu.js'
+import { Rewards } from 'lib/Rewards.js'
 import { BASE_ITEM_STACK } from 'modules/Features/base.js'
 import { request } from '../lib/BDS/api.js'
 import { Mineshaft } from '../modules/Places/Mineshaft.js'
 import './enchant.js'
 import './lib/Form/util.test.js'
 import './simulatedPlayer.js'
-import { Rewards } from 'lib/Rewards.js'
 
-/** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
-const publicTests = {
-  death(ctx) {
-    ctx.sender.kill()
-  },
-}
+// There you can create simple one time tests taht will be run using .test <name> command
+//
+// also note that each test function recieves command context as argument, so if your test
+// interacts with a player, use ctx.sender
+//
+// please add new test on the top
+//
+// use public tests with caution, they're available to the all players!
+// other tests are available only for tech admins and above
 
 /** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
 const tests = {
@@ -318,19 +321,24 @@ const tests = {
       .show(ctx.sender)
   },
 
-  mail() {
-    const pid = Player.getByName('MilkCooler')?.id ?? ''
-    Mail.send(typeof pid == 'string' ? pid : '', 'Zolkin', 'Привет, мир!', new Rewards())
+  mail(ctx) {
+    Mail.send(ctx.sender.id, 'Zolkin', 'Привет, мир!', new Rewards())
   },
-  mailr() {
-    // r = rewards
-    const pid = Player.getByName('MilkCooler')?.id ?? ''
+  mailr(ctx) {
+    ctx.sender.id
     Mail.send(
-      typeof pid == 'string' ? pid : '',
+      ctx.sender.id,
       'Bugrock',
       'это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст',
       new Rewards().scores('money', 50).scores('leafs', 100).item(MinecraftItemTypes.Diamond, 'Алмаз', 12),
     )
+  },
+}
+
+/** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
+const publicTests = {
+  death(ctx) {
+    ctx.sender.kill()
   },
 }
 
@@ -346,4 +354,3 @@ c.string('id', true).executes(async (ctx, id) => {
   ctx.reply('Tест ' + id)
   util.catch(() => source[id](ctx), 'Test')
 })
-
