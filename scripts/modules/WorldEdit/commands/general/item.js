@@ -1,40 +1,37 @@
-const root = new Command({
-  name: 'item',
-  description: 'Управляет предметом в руке',
-  role: 'admin',
-  type: 'test',
-})
+const root = new Command('item').setDescription('Управляет предметом в руке').setPermissions('admin').setGroup('test')
 
 root
-  .literal({ name: 'lore', aliases: ['l'], description: 'Задает лор предмета' })
+  .overload('lore')
+  .setAliases('l')
+  .setDescription('Задает лор предмета')
   .string('lore')
   .executes(ctx => {
-    const item = ctx.sender.mainhand()
+    const item = ctx.player.mainhand()
     if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.getLore()
-    item.setLore(ctx.args)
+    item.setLore(ctx.arguments)
     ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.getLore()}`)
   })
 
 root
-  .literal({ name: 'name', aliases: ['n'], description: 'Задает имя предмета' })
+  .overload('name')
+  .setAliases('n')
+  .setDescription('Задает имя предмета')
   .string('name')
   .executes((ctx, name) => {
-    const item = ctx.sender.mainhand()
+    const item = ctx.player.mainhand()
     if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.nameTag
     item.nameTag = name
     ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.nameTag}`)
   })
 root
-  .literal({
-    name: 'count',
-    aliases: ['c'],
-    description: 'Задает количество предметов',
-  })
+  .overload('count')
+  .setAliases('c')
+  .setDescription('Задает количество предметов')
   .int('count')
   .executes((ctx, count) => {
-    const item = ctx.sender.mainhand()
+    const item = ctx.player.mainhand()
     if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.amount
     item.amount = count

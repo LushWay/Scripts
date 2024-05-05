@@ -3,10 +3,7 @@ import { ActionForm, ArrayForm, Mail, Menu, Settings } from 'lib.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { Rewards } from 'lib/Rewards.js'
 
-new Command({
-  name: 'mail',
-  description: 'Посмотреть входящие сообщения почты',
-}).executes(ctx => mailMenu(ctx.sender))
+new Command('mail').setDescription('Посмотреть входящие сообщения почты').executes(ctx => mailMenu(ctx.player))
 
 const getSettings = Settings.player(...Menu.settings, {
   mailReadOnOpen: {

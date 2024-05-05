@@ -1,7 +1,6 @@
-new Command({
-  name: 'discord',
-  description: '§9Discord§7 сервер: §bdsc.gg/lushway',
-  requires: () => true,
-}).executes(ctx => {
-  ctx.reply('§9Discord§7 сервер: §bdsc.gg/lushway')
-})
+new Command('discord')
+  .setDescription('§9Discord§7 сервер: §bdsc.gg/lushway')
+  .setPermissions('everybody')
+  .executes(ctx => {
+    ctx.reply('§9Discord§7 сервер: §bdsc.gg/lushway')
+  })

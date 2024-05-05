@@ -50,15 +50,13 @@ export class SelectionManager {
   }
 }
 
-const expand = new Command({
-  type: 'we',
-  name: 'expand',
-  description: 'Расширить выделенную зону во все стороны или вертикально',
-  role: 'builder',
-})
+const expand = new Command('expand')
+  .setGroup('we')
+  .setDescription('Расширить выделенную зону во все стороны или вертикально')
+  .setPermissions('builder')
 
 expand.int('size').executes((ctx, size) => {
-  const we = WorldEdit.forPlayer(ctx.sender)
+  const we = WorldEdit.forPlayer(ctx.player)
   if (!we.selection) return ctx.reply('§cЗона не выделена!')
   SelectionManager.expand(we, size)
   ctx.reply(
@@ -69,13 +67,11 @@ expand.int('size').executes((ctx, size) => {
 })
 
 expand
-  .literal({
-    name: 'vert',
-    description: 'Поднять выделенную зону',
-  })
+  .overload('vert')
+  .setDescription('Поднять выделенную зону')
   .int('size')
   .executes((ctx, size) => {
-    const we = WorldEdit.forPlayer(ctx.sender)
+    const we = WorldEdit.forPlayer(ctx.player)
     if (!we.selection) return ctx.reply('§cЗона не выделена!')
     SelectionManager.expandVert(we, size)
     ctx.reply(

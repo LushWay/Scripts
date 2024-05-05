@@ -2,18 +2,16 @@ import { world } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '../lib/Assets/enchantments.js'
 import { Enchantments } from '../lib/Enchantments.js'
 
-new Command({
-  name: 'enchant',
-  description: 'Зачаровывает предмет',
-  role: 'admin',
-})
+new Command('enchant')
+  .setDescription('Зачаровывает предмет')
+  .setPermissions('admin')
   .array('enchantName', Object.keys(MinecraftEnchantmentTypes), true)
   .int('level', true)
   .executes((ctx, enchant, level) => {
     if (!enchant) return ctx.reply(Object.keys(MinecraftEnchantmentTypes).join('\n'))
     const ench = MinecraftEnchantmentTypes[enchant]
 
-    const mainhand = ctx.sender.mainhand()
+    const mainhand = ctx.player.mainhand()
 
     const item = mainhand.getItem()
     if (!item) return ctx.error('No item!')

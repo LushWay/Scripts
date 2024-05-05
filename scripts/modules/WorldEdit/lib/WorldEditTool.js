@@ -64,17 +64,16 @@ export class WorldEditTool {
     this.interval20 = interval20
     if (overrides) extend(this, overrides)
 
-    this.command = new Command({
-      name,
-      description: `Создает${editToolForm ? ' или редактирует ' : ''}${displayName}`,
-      role: 'builder',
-      type: 'we',
-    }).executes(ctx => {
-      const slotOrError = this.getToolSlot(ctx.sender)
+    this.command = new Command(name)
+      .setDescription(`Создает${editToolForm ? ' или редактирует ' : ''}${displayName}`)
+      .setPermissions('builder')
+      .setGroup('we')
+      .executes(ctx => {
+        const slotOrError = this.getToolSlot(ctx.player)
 
-      if (typeof slotOrError === 'string') ctx.error(slotOrError)
-      else if (this.editToolForm) this.editToolForm(slotOrError, ctx.sender, true)
-    })
+        if (typeof slotOrError === 'string') ctx.error(slotOrError)
+        else if (this.editToolForm) this.editToolForm(slotOrError, ctx.player, true)
+      })
   }
 
   /** @param {Player} player */

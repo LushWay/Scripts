@@ -45,7 +45,7 @@ import './simulatedPlayer.js'
 /** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
 const tests = {
   scen(ctx) {
-    const player = ctx.sender
+    const player = ctx.player
 
     player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
       location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 20)),
@@ -74,7 +74,7 @@ const tests = {
       string: { name: 'String', description: 'Desc', value: '' },
     })
 
-    console.log(getSettings(ctx.sender))
+    console.log(getSettings(ctx.player))
   },
   f(ctx) {
     const form = new ActionForm('MENUS', 'Menu body', '§c§u§s§r§f')
@@ -83,14 +83,14 @@ const tests = {
     form.addButton('Test!', BUTTON['?'], () => {})
     form.addButton('Test!', BUTTON['?'], () => {})
     form.addButton('Test!', BUTTON['?'], () => {})
-    form.show(ctx.sender)
+    form.show(ctx.player)
   },
   cc(ctx) {
     // @ts-expect-error Testing
-    console.debug(Compass.players.get(ctx.sender)?.value)
+    console.debug(Compass.players.get(ctx.player)?.value)
   },
   title(ctx) {
-    ctx.sender.onScreenDisplay.setHudTitle('FFf', {
+    ctx.player.onScreenDisplay.setHudTitle('FFf', {
       subtitle: 'AAAA',
       fadeInDuration: 0,
       stayDuration: 20 * 4,
@@ -98,13 +98,13 @@ const tests = {
     })
   },
   compass(ctx) {
-    const [entity] = ctx.sender.dimension.getEntities({ type: MinecraftEntityTypes.Cow, closest: 1 })
+    const [entity] = ctx.player.dimension.getEntities({ type: MinecraftEntityTypes.Cow, closest: 1 })
     if (!entity) return ctx.error('No entity!')
-    ctx.sender.teleport(entity.location)
+    ctx.player.teleport(entity.location)
 
     system.runInterval(
       () => {
-        Compass.setFor(ctx.sender, entity.location)
+        Compass.setFor(ctx.player, entity.location)
       },
       'compass',
       2,
@@ -114,10 +114,10 @@ const tests = {
     util.catch(() => {
       system.runInterval(
         () => {
-          const minecarts = ctx.sender.dimension.getEntities({
+          const minecarts = ctx.player.dimension.getEntities({
             type: MinecraftEntityTypes.ChestMinecart,
             maxDistance: 20,
-            location: ctx.sender.location,
+            location: ctx.player.location,
           })
           for (const minecart of minecarts) {
             Airdrop.prototype.showParticleTrace(minecart.location, minecart)
@@ -129,11 +129,11 @@ const tests = {
     })
   },
   airdrop(ctx) {
-    if (ctx.args[1]) ctx.reply('Аирдроп для')
+    if (ctx.arguments[1]) ctx.reply('Аирдроп для')
     const airdrop = new Airdrop({
-      position: Vector.add(Vector.floor(ctx.sender.location), { x: 0, z: 0, y: 30 }),
+      position: Vector.add(Vector.floor(ctx.player.location), { x: 0, z: 0, y: 30 }),
       loot: Object.values(LootTable.instances)[0],
-      for: ctx.args[1] ? ctx.sender.id : undefined,
+      for: ctx.arguments[1] ? ctx.player.id : undefined,
     })
 
     system.runTimeout(
@@ -156,11 +156,11 @@ const tests = {
     )
   },
   slot(ctx) {
-    ctx.reply(ctx.sender.selectedSlot)
+    ctx.reply(ctx.player.selectedSlot)
   },
 
   base(ctx) {
-    ctx.sender.container?.addItem(BASE_ITEM_STACK)
+    ctx.player.container?.addItem(BASE_ITEM_STACK)
   },
   logs() {
     console.log('This is log §6color§r test §lbold')
@@ -175,17 +175,17 @@ const tests = {
         .addSlider('slider', 0, 5, 1)
         .addTextField('textField', 'placeholder', 'defval')
         .addToggle('toggle', false)
-        .show(ctx.sender, () => {
+        .show(ctx.player, () => {
           new MessageForm('MessageForm', 'body')
             .setButton1('b1', () => void 0)
             .setButton2('b2', () => void 0)
-            .show(ctx.sender)
+            .show(ctx.player)
         })
     })
-    menu.show(ctx.sender)
+    menu.show(ctx.player)
   },
   components: ctx => {
-    ctx.reply(util.inspect(ctx.sender.getComponents()))
+    ctx.reply(util.inspect(ctx.player.getComponents()))
   },
 
   dbinspect(ctx) {
@@ -236,7 +236,7 @@ const tests = {
     }
   },
   particle(ctx) {
-    const block = ctx.sender.getBlockFromViewDirection({
+    const block = ctx.player.getBlockFromViewDirection({
       includeLiquidBlocks: false,
       includePassableBlocks: false,
       maxDistance: 50,
@@ -272,26 +272,26 @@ const tests = {
   },
   async api(ctx) {
     const res = await request('playerPlatform', {
-      playerName: ctx.sender.name,
+      playerName: ctx.player.name,
     })
 
     console.warn(util.inspect(res))
   },
   ore(ctx) {
-    const rad = Number(ctx.args[1])
-    const rad2 = Number(ctx.args[2])
-    if (isNaN(rad)) return ctx.error(ctx.args[1] + ' should be number!')
-    if (isNaN(rad2)) return ctx.error(ctx.args[2] + ' should be number!')
+    const rad = Number(ctx.arguments[1])
+    const rad2 = Number(ctx.arguments[2])
+    if (isNaN(rad)) return ctx.error(ctx.arguments[1] + ' should be number!')
+    if (isNaN(rad2)) return ctx.error(ctx.arguments[2] + ' should be number!')
     // new Shape(SHAPES.sphere, ctx.sender.location, ["air"], rad);
 
-    const orePositions = Mineshaft.generateOre({ center: ctx.sender.location, minRadius: rad, maxRadius: rad2 })
+    const orePositions = Mineshaft.generateOre({ center: ctx.player.location, minRadius: rad, maxRadius: rad2 })
 
     for (const position of orePositions) {
-      ctx.sender.dimension.getBlock(position)?.setType(MinecraftBlockTypes.Stone)
+      ctx.player.dimension.getBlock(position)?.setType(MinecraftBlockTypes.Stone)
     }
   },
   lore(ctx) {
-    ctx.sender.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])
+    ctx.player.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])
   },
 
   form(ctx) {
@@ -302,11 +302,11 @@ const tests = {
           'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs',
         )
 
-        form.addButton('Кнопка 1', () => ctx.sender.success('Ура'))
-        form.addButton('Кнопка 2', () => ctx.sender.success('Ура'))
-        form.addButton('Кнопка 3', () => ctx.sender.success('Ура'))
+        form.addButton('Кнопка 1', () => ctx.player.success('Ура'))
+        form.addButton('Кнопка 2', () => ctx.player.success('Ура'))
+        form.addButton('Кнопка 3', () => ctx.player.success('Ура'))
 
-        form.show(ctx.sender)
+        form.show(ctx.player)
       })
       .addButton('ChestForm', () => {
         new ChestForm('9')
@@ -316,18 +316,18 @@ const tests = {
               icon: MinecraftBlockTypes.Diorite,
             },
           })
-          .show(ctx.sender)
+          .show(ctx.player)
       })
-      .show(ctx.sender)
+      .show(ctx.player)
   },
 
   mail(ctx) {
-    Mail.send(ctx.sender.id, 'Zolkin', 'Привет, мир!', new Rewards())
+    Mail.send(ctx.player.id, 'Zolkin', 'Привет, мир!', new Rewards())
   },
   mailr(ctx) {
-    ctx.sender.id
+    ctx.player.id
     Mail.send(
-      ctx.sender.id,
+      ctx.player.id,
       'Bugrock',
       'это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст',
       new Rewards().scores('money', 50).scores('leafs', 100).item(MinecraftItemTypes.Diamond, 'Алмаз', 12),
@@ -338,17 +338,14 @@ const tests = {
 /** @type {Record<string, (ctx: CommandContext) => void | Promise<any>>} */
 const publicTests = {
   death(ctx) {
-    ctx.sender.kill()
+    ctx.player.kill()
   },
 }
 
-const c = new Command({
-  name: 'test',
-  description: 'Разные тесты',
-})
+const c = new Command('test').setDescription('Разные тесты')
 
 c.string('id', true).executes(async (ctx, id) => {
-  const source = is(ctx.sender.id, 'techAdmin') ? { ...publicTests, ...tests } : tests
+  const source = is(ctx.player.id, 'techAdmin') ? { ...publicTests, ...tests } : tests
   const keys = Object.keys(source)
   if (!keys.includes(id)) return ctx.error('Неизвестный тест ' + id + ', доступные:\n§f' + keys.join('\n'))
   ctx.reply('Tест ' + id)

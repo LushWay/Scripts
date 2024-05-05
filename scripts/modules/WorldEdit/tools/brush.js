@@ -137,12 +137,14 @@ const brush = new BrushTool({
 })
 
 brush.command
-  .literal({ name: 'extrasize', description: 'Устанавливает размер кисти больше чем лимит в форме', role: 'techAdmin' })
+  .overload('extrasize')
+  .setDescription('Устанавливает размер кисти больше чем лимит в форме')
+  .setPermissions('techAdmin')
   .int('Size')
   .executes((ctx, size) => {
     if (isNaN(size)) return ctx.error('Размер не является числом')
 
-    const tool = brush.getToolSlot(ctx.sender)
+    const tool = brush.getToolSlot(ctx.player)
     if (typeof tool === 'string') return ctx.error(tool)
 
     const lore = brush.parseLore(tool.getLore())

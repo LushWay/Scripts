@@ -3,26 +3,24 @@ import { ActionForm, BUTTON, Leaderboard, ModalForm, PLAYER_DB } from 'lib.js'
 import { ScoreboardDB } from 'lib/Database/Scoreboard.js'
 import { ArrayForm } from 'lib/Form/ArrayForm.js'
 
-new Command({
-  name: 'scores',
-  description: 'Управляет счетом игроков (монеты, листья)',
-  role: 'chefAdmin',
-}).executes(ctx => {
-  scoreManagerMenu(ctx.sender)
-})
+new Command('scores')
+  .setDescription('Управляет счетом игроков (монеты, листья)')
+  .setPermissions('chefAdmin')
+  .executes(ctx => {
+    scoreManagerMenu(ctx.player)
+  })
 
 alias('leafs')
 alias('money')
 
 function alias(name = 'leafs') {
-  new Command({
-    name,
-    description: 'Управляет счетом игроков (' + name + ')',
-    role: 'chefAdmin',
-  }).executes(ctx => {
-    const obj = world.scoreboard.getObjective(name)
-    if (obj) scoreboardMenu(ctx.sender, obj)
-  })
+  new Command(name)
+    .setDescription('Управляет счетом игроков (' + name + ')')
+    .setPermissions('chefAdmin')
+    .executes(ctx => {
+      const obj = world.scoreboard.getObjective(name)
+      if (obj) scoreboardMenu(ctx.player, obj)
+    })
 }
 
 /** @param {Player} player */

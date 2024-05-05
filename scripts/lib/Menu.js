@@ -163,13 +163,12 @@ export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.b
     }
   }
 
-  const command = new Command({
-    name,
-    description: `Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`,
-    type: 'public',
-  }).executes(ctx => {
-    give(ctx.sender)
-  })
+  const command = new Command(name)
+    .setDescription(`Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`)
+    .setGroup('public')
+    .executes(ctx => {
+      give(ctx.player)
+    })
 
   return {
     give,

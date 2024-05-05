@@ -8,15 +8,14 @@ import { VillageOfExplorers } from 'modules/Places/VillafeOfExplorers.js'
 import { VillageOfMiners } from 'modules/Places/VillageOfMiners.js'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 
-new Command({
-  name: 'tp',
-  role: isProduction() ? 'techAdmin' : 'spectator',
-  description: 'Открывает меню телепортации',
-}).executes(ctx => {
-  if (ctx.sender.database.role === 'member')
-    return ctx.error('Команда доступна только тестерам, наблюдателям и администраторам.')
-  tpMenu(ctx.sender)
-})
+new Command('tp')
+  .setPermissions(isProduction() ? 'techAdmin' : 'everybody')
+  .setDescription('Открывает меню телепортации')
+  .executes(ctx => {
+    if (ctx.player.database.role === 'member')
+      return ctx.error('Команда доступна только тестерам, наблюдателям и администраторам.')
+    tpMenu(ctx.player)
+  })
 
 /** @param {Player} player */
 function tpMenu(player) {

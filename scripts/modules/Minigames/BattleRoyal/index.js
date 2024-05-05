@@ -101,50 +101,49 @@ system.runInterval(
   20,
 )
 
-const bbr = new Command({
-  name: 'br',
-  description: 'Телепортирует на спавн батл рояля',
-}).executes(ctx => {
-  teleportToBR(ctx.sender)
-})
-
-bbr.literal({ name: 'quit', description: 'Выйти из очереди' }).executes(ctx => {
-  if (BR_QUENE[ctx.sender.name]) {
-    delete BR_QUENE[ctx.sender.name]
-    ctx.reply('§aВы вышли из очереди.')
-  } else {
-    ctx.reply('§cВы не стоите в очереди.')
-  }
-})
-
-bbr.literal({ name: 'quitgame', description: 'Выйти из игры' }).executes(ctx => {
-  if (ctx.sender.hasTag('locktp:Battle Royal')) {
-    delete br.players[br.players.findIndex(e => e.name == ctx.sender.name)]
-    br.tags.forEach(e => ctx.sender.removeTag(e))
-    ctx.reply('§aВы вышли из игры.')
-    teleportToBR(ctx.sender)
-  } else {
-    ctx.reply('§cВы не находитесь в игре.')
-  }
+const bbr = new Command('br').setDescription('Телепортирует на спавн батл рояля').executes(ctx => {
+  teleportToBR(ctx.player)
 })
 
 bbr
-  .literal({
-    name: 'start',
-    description: '',
-    role: 'techAdmin',
+  .overload('quit')
+  .setDescription('Выйти из очереди')
+  .executes(ctx => {
+    if (BR_QUENE[ctx.player.name]) {
+      delete BR_QUENE[ctx.player.name]
+      ctx.reply('§aВы вышли из очереди.')
+    } else {
+      ctx.reply('§cВы не стоите в очереди.')
+    }
   })
+
+bbr
+  .overload('quitgame')
+  .setDescription('Выйти из игры')
+  .executes(ctx => {
+    if (ctx.player.hasTag('locktp:Battle Royal')) {
+      delete br.players[br.players.findIndex(e => e.name == ctx.player.name)]
+      br.tags.forEach(e => ctx.player.removeTag(e))
+      ctx.reply('§aВы вышли из игры.')
+      teleportToBR(ctx.player)
+    } else {
+      ctx.reply('§cВы не находитесь в игре.')
+    }
+  })
+
+bbr
+  .overload('start')
+  .setDescription('')
+  .setPermissions('techAdmin')
   .executes(() => {
     br.start(ks(BR_QUENE))
     Object.assign({}, BR_QUENE)
   })
 
 bbr
-  .literal({
-    name: 'stop',
-    description: '',
-    role: 'techAdmin',
-  })
+  .overload('stop')
+  .setDescription('')
+  .setPermissions('techAdmin')
   .executes(() => {
     br.end('specially', 'Так надо')
     Object.assign({}, BR_QUENE)

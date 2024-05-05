@@ -6,30 +6,33 @@ import { editCatcutscene } from './CutsceneEdit.js'
 
 new Cutscene('test', 'Test')
 
-const cutscene = new Command({
-  name: 'cutscene',
-  description: 'Катсцена',
-  role: 'member',
-}).executes(ctx => {
-  if (is(ctx.sender.id, 'curator')) selectCutsceneMenu(ctx.sender)
-  else Command.getHelpForCommand(cutscene, ctx)
-})
-
-cutscene.literal({ name: 'exit', description: 'Выход из катсцены' }).executes(ctx => {
-  const cutscene = Cutscene.getCurrent(ctx.sender)
-  if (!cutscene) return ctx.error('Вы не находитесь в катсцене!')
-
-  cutscene.exit(ctx.sender)
-})
+const cutscene = new Command('cutscene')
+  .setDescription('Катсцена')
+  .setPermissions('member')
+  .executes(ctx => {
+    if (is(ctx.player.id, 'curator')) selectCutsceneMenu(ctx.player)
+    else Command.getHelpForCommand(cutscene, ctx)
+  })
 
 cutscene
-  .literal({ name: 'play', role: 'techAdmin' })
+  .overload('exit')
+  .setDescription('Выход из катсцены')
+  .executes(ctx => {
+    const cutscene = Cutscene.getCurrent(ctx.player)
+    if (!cutscene) return ctx.error('Вы не находитесь в катсцене!')
+
+    cutscene.exit(ctx.player)
+  })
+
+cutscene
+  .overload('play')
+  .setPermissions('techAdmin')
   .string('name', false)
   .executes((ctx, name) => {
     const cutscene = Cutscene.list[name]
     if (!cutscene) return ctx.error(Object.keys(Cutscene.list).join('\n'))
 
-    cutscene.play(ctx.sender)
+    cutscene.play(ctx.player)
   })
 
 /** @param {Player} player */

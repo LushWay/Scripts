@@ -3,13 +3,13 @@ import { SOUNDS } from 'lib/Assets/config.js'
 
 export class CommandContext {
   /** @type {ChatSendAfterEvent} */
-  data
+  event
 
   /** @type {Player} */
-  sender
+  player
 
   /** @type {string[]} */
-  args
+  arguments
 
   /** @type {import('./index.js').Command} */
   command
@@ -17,16 +17,16 @@ export class CommandContext {
   /**
    * Returns a commands callback
    *
-   * @param {ChatSendAfterEvent} data Chat data that was used
+   * @param {ChatSendAfterEvent} event Chat data that was used
    * @param {string[]} args
    * @param {import('./index.js').Command} command
    * @param {string} rawInput
    */
-  constructor(data, args, command, rawInput) {
-    this.data = data
-    this.sender = data.sender
+  constructor(event, args, command, rawInput) {
+    this.event = event
+    this.player = event.sender
     this.command = command
-    this.args = args
+    this.arguments = args
     this.input = rawInput
   }
 
@@ -39,8 +39,8 @@ export class CommandContext {
    * @param {any} text Message or a lang code
    */
   reply(text) {
-    this.sender.tell(text + '')
-    this.sender.playSound(SOUNDS.click)
+    this.player.tell(text + '')
+    this.player.playSound(SOUNDS.click)
   }
 
   /**
@@ -49,6 +49,6 @@ export class CommandContext {
    * @param {any} errorText - Text to send
    */
   error(errorText) {
-    this.sender.fail(errorText)
+    this.player.fail(errorText)
   }
 }

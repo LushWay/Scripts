@@ -1,40 +1,40 @@
 import { Vector } from '@minecraft/server'
 import { util } from 'lib.js'
 
-const root = new Command({
-  name: 'id',
-  description: 'Выдает айди',
-  role: 'builder',
-  type: 'we',
-})
+const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
 
 root.executes(ctx => {
-  const item = ctx.sender.mainhand()
+  const item = ctx.player.mainhand()
   if (!item) return ctx.reply('§cВ руке нет предмета!')
 
   ctx.reply(`§b► §f${item?.typeId?.replace('minecraft:', '')} ${item?.nameTag ? `(${item?.nameTag}) ` : ''}`)
 })
 
 root
-  .literal({ name: 'l', description: 'Выдает id блока по локации' })
+  .overload('l')
+  .setDescription('Выдает id блока по локации')
   .location('location', true)
   .executes((ctx, location) => {
     const l = Vector.floor(location)
-    const block = ctx.sender.dimension.getBlock(l)
+    const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
     ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(block.permutation.getAllStates())}`)
   })
 
 root
-  .literal({ name: 'p', description: 'Выдает все states блока по локации' })
+  .overload('p')
+  .setDescription('Выдает все states блока по локации')
   .location('location', true)
   .executes((ctx, location) => {
     const l = Vector.floor(location)
-    const block = ctx.sender.dimension.getBlock(l)
+    const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
     ctx.reply(util.inspect(block.permutation.getAllStates()))
   })
 
-root.literal({ name: 'r', description: 'Выдает наклон головы' }).executes(ctx => {
-  ctx.reply(`§a► §f${ctx.sender.getRotation().x} ${ctx.sender.getRotation().y}`)
-})
+root
+  .overload('r')
+  .setDescription('Выдает наклон головы')
+  .executes(ctx => {
+    ctx.reply(`§a► §f${ctx.player.getRotation().x} ${ctx.player.getRotation().y}`)
+  })

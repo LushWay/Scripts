@@ -1,10 +1,7 @@
 import { ActionForm, ModalForm, util } from 'lib.js'
 import { request } from 'lib/BDS/api.js'
 
-new Command({
-  name: 'shell',
-  role: 'techAdmin',
-}).executes(ctx => {
+new Command('shell').setPermissions('techAdmin').executes(ctx => {
   const form = new ActionForm('Shell')
     .addButton('git pull', () => {
       const form = new ActionForm('Type')
@@ -14,11 +11,11 @@ new Command({
         form.addButton(type, () => {
           ctx.reply('§6> §rПринято.')
           request('gitPull', { restartType: type })
-            .then(s => ctx.sender.tell(s.statusMessage))
+            .then(s => ctx.player.tell(s.statusMessage))
             .catch(util.error)
         })
       }
-      form.show(ctx.sender)
+      form.show(ctx.player)
     })
     .addButton('git status', () => {
       const form = new ActionForm('Type')
@@ -28,22 +25,22 @@ new Command({
         form.addButton(type, () => {
           ctx.reply('§6> §rПринято.')
           request('gitStatus', { cwd: type })
-            .then(s => ctx.sender.tell(s.statusMessage))
+            .then(s => ctx.player.tell(s.statusMessage))
             .catch(util.error)
         })
       }
-      form.show(ctx.sender)
+      form.show(ctx.player)
     })
     .addButton('Backup', () => {
       new ModalForm('Backup')
         .addTextField('Backup commit name\nЛучше всего то, что значимого было изменено', 'ничего не произойдет')
-        .show(ctx.sender, (_, backupname) => {
+        .show(ctx.player, (_, backupname) => {
           ctx.reply('§6> §rПринято.')
           request('backup', { name: backupname })
-            .then(s => ctx.sender.tell(s.statusMessage))
+            .then(s => ctx.player.tell(s.statusMessage))
             .catch(util.error)
         })
     })
 
-  form.show(ctx.sender)
+  form.show(ctx.player)
 })

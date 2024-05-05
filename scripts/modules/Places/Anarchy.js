@@ -25,14 +25,13 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
       this.zone = new Zone(centerLocation, players => players.length * 50)
 
       if (centerLocation.firstLoad)
-        new Command({
-          name: 'radius',
-          description: 'Выдает радиус границы анархии сейчас',
-          type: 'public',
-          role: 'member',
-        }).executes(ctx => {
-          ctx.sender.info(`Радиус границы анархии сейчас: ${this.zone.lastRadius}`)
-        })
+        new Command('radius')
+          .setDescription('Выдает радиус границы анархии сейчас')
+          .setGroup('public')
+          .setPermissions('member')
+          .executes(ctx => {
+            ctx.player.info(`Радиус границы анархии сейчас: ${this.zone.lastRadius}`)
+          })
     })
 
     console.debug('Anarchy init')
@@ -71,14 +70,13 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
       // TODO Support proper rtp
       if (portalLocation.firstLoad) {
         this.portal.command
-          ?.literal({
-            name: 'clearpos',
-            description:
-              'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
-          })
+          ?.overload('clearpos')
+          .setDescription(
+            'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
+          )
           .executes(ctx => {
-            delete ctx.sender.database.survival.anarchy
-            ctx.sender.success(
+            delete ctx.player.database.survival.anarchy
+            ctx.player.success(
               '§fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.',
             )
           })

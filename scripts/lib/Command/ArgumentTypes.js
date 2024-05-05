@@ -3,7 +3,7 @@ export class IArgumentType {
   /**
    * The return type
    *
-   * @type {any}
+   * @type {unknown}
    */
   type
 
@@ -21,9 +21,6 @@ export class IArgumentType {
    *
    * @example
    *   number
-   *
-   * @example
-   *   UnitType
    *
    * @type {string}
    */
@@ -47,7 +44,10 @@ export class IArgumentType {
    * Checks if a value matches this argument type, also returns the corridsponding type
    *
    * @param {string} value
-   * @returns {import('./types.js').MatchesArgumentReturn<any>}
+   * @returns {{
+   *   success: boolean
+   *   value?: unknown
+   * }}
    */
   matches(value) {
     return {

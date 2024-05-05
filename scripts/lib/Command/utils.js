@@ -75,10 +75,10 @@ function suggestCommand(player, command) {
 
   const cmds = new Set()
 
-  for (const c of Command.commands.filter(e => e.sys.meta.requires && e.sys.meta.requires(player))) {
-    cmds.add(c.sys.meta.name)
-    if (c.sys.meta.aliases && c.sys.meta.aliases?.length > 0) {
-      c.sys.meta.aliases.forEach(e => cmds.add(e))
+  for (const c of Command.commands.filter(e => e.sys.requires && e.sys.requires(player))) {
+    cmds.add(c.sys.name)
+    if (c.sys.aliases && c.sys.aliases?.length > 0) {
+      c.sys.aliases.forEach(e => cmds.add(e))
     }
   }
   let search = inaccurateSearch(command, [...cmds.values()])
@@ -113,13 +113,11 @@ function suggestCommand(player, command) {
  */
 export function commandNoPermissions(player, command) {
   let additional = ''
-  if (!isProduction() && command.sys.meta.role) {
-    additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.meta.role]}§c`
+  if (!isProduction() && command.sys.role) {
+    additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.role]}§c`
   }
   player.fail(
-    command.sys.meta.invaildPermission
-      ? command.sys.meta.invaildPermission
-      : `§cУ вас нет разрешения для использования команды §f${command.sys.meta.name}${additional}\n§cСписок всех доступных вам команд: §f.help`,
+    `§cУ вас нет разрешения для использования команды §f${command.sys.name}${additional}\n§cСписок всех доступных вам команд: §f.help`,
   )
 }
 
@@ -141,7 +139,7 @@ export function commandSyntaxFail(player, command, args, i) {
       {
         translate: `commands.generic.syntax`,
         with: [
-          `${CONFIG.commandPrefixes[0]}${command.sys.meta.name} ${args.slice(0, i).join(' ')}`,
+          `${CONFIG.commandPrefixes[0]}${command.sys.name} ${args.slice(0, i).join(' ')}`,
           args[i] ?? ' ',
           args.slice(i + 1).join(' '),
         ],

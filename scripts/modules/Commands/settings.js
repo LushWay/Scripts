@@ -1,18 +1,16 @@
 import { playerSettingsMenu, worldSettingsMenu } from 'lib/Settings'
 
-new Command({
-  name: 'settings',
-  aliases: ['options', 's'],
-  role: 'member',
-  description: 'Настройки',
-}).executes(ctx => {
-  playerSettingsMenu(ctx.sender)
-})
+new Command('settings')
+  .setAliases('options', 's')
+  .setPermissions('member')
+  .setDescription('Настройки')
+  .executes(ctx => {
+    playerSettingsMenu(ctx.player)
+  })
 
-new Command({
-  name: 'wsettings',
-  role: 'techAdmin',
-  description: 'Настройки мира',
-}).executes(ctx => {
-  worldSettingsMenu(ctx.sender)
-})
+new Command('wsettings')
+  .setPermissions('techAdmin')
+  .setDescription('Настройки мира')
+  .executes(ctx => {
+    worldSettingsMenu(ctx.player)
+  })

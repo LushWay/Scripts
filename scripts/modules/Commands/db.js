@@ -5,13 +5,9 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
-const db = new Command({
-  name: 'db',
-  description: 'Просматривает базу данных',
-  role: 'techAdmin',
-})
+const db = new Command('db').setDescription('Просматривает базу данных').setPermissions('techAdmin')
 
-db.executes(ctx => selectTable(ctx.sender, true))
+db.executes(ctx => selectTable(ctx.player, true))
 
 /**
  * @param {Player} player
@@ -176,11 +172,9 @@ function changeValue(form, value) {
   }
 }
 
-const cmd = new Command({
-  name: 'benchmark',
-  description: 'Показывает время работы серверных систем',
-  role: 'techAdmin',
-})
+const cmd = new Command('benchmark')
+  .setDescription('Показывает время работы серверных систем')
+  .setPermissions('techAdmin')
 
 cmd
   .string('type', true)
@@ -206,7 +200,7 @@ cmd
       )
         .addButton('Refresh', null, show)
         .addButton('Exit', null, () => void 0)
-        .show(ctx.sender)
+        .show(ctx.player)
     }
     show()
   })

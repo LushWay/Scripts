@@ -1,6 +1,5 @@
 import { Player, world } from '@minecraft/server'
 import { FormCallback, PLAYER_DB, ROLES, getRole, setRole, util } from 'lib.js'
-import { CommandContext } from 'lib/Command/Context.js'
 import { ArrayForm } from 'lib/Form/ArrayForm.js'
 import { ModalForm } from 'lib/Form/ModalForm.js'
 import { WHO_CAN_CHANGE } from 'lib/roles.js'
@@ -17,36 +16,31 @@ function canChange(who, target, allowSame = false) {
   return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
 
-const command = new Command({
-  name: 'role',
-  description: 'Показывает вашу роль',
-  requires: () => true,
-})
+const command = new Command('role')
+  .setDescription('Показывает вашу роль')
+  .setPermissions('everybody')
+  .executes(ctx => roleMenu(ctx.player))
 
 const restoreRole = command
-  .literal({
-    description: 'Восстанавливает вашу роль',
-    name: 'restore',
-    requires: p => !!p.database.prevRole,
-  })
+  .overload('restore')
+  .setDescription('Восстанавливает вашу роль')
+  .setPermissions(p => !!p.database.prevRole)
   .executes(ctx => {
-    const prevRole = ctx.sender.database.prevRole
+    const prevRole = ctx.player.database.prevRole
     if (!prevRole) return
 
-    setRole(ctx.sender, prevRole)
-    delete ctx.sender.database.prevRole
-    ctx.sender.info(`Вы вернули роль §r${ROLES[prevRole]}`)
+    setRole(ctx.player, prevRole)
+    delete ctx.player.database.prevRole
+    ctx.player.info(`Вы вернули роль §r${ROLES[prevRole]}`)
   })
 
-command.executes(roleForm)
-
-/** @param {CommandContext} ctx */
-function roleForm(ctx) {
-  const prole = getRole(ctx.sender.id)
+/** @param {Player} player */
+function roleMenu(player) {
+  const prole = getRole(player.id)
   if (!WHO_CAN_CHANGE.includes(prole))
-    return ctx.sender.info(
+    return player.info(
       `Ваша роль: ${ROLES[prole]}${
-        restoreRole.sys.meta.requires(ctx.sender) ? '\n\n§3Восстановить прошлую роль: §f.role restore' : ''
+        restoreRole.sys.requires(player) ? '\n\n§3Восстановить прошлую роль: §f.role restore' : ''
       }`,
     )
 
@@ -66,11 +60,11 @@ function roleForm(ctx) {
       if (filters.sort === 'role') {
         return keys
           .sort((a, b) => FULL_HIERARCHY.indexOf(a[1].role) - FULL_HIERARCHY.indexOf(b[1].role))
-          .filter(key => key[0] !== ctx.sender.id)
+          .filter(key => key[0] !== player.id)
       } else return keys
     },
     addCustomButtonBeforeArray(form) {
-      const button = this.button([ctx.sender.id, ctx.sender.database], { sort: 'role' }, form)
+      const button = this.button([player.id, player.database], { sort: 'role' }, form)
 
       if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', null, button[2])
     },
@@ -84,9 +78,9 @@ function roleForm(ctx) {
         }`,
         null,
         () => {
-          const self = ctx.sender.id === id
+          const self = player.id === id
           if (!canChange(prole, role, self)) {
-            return new FormCallback(form, ctx.sender).error(
+            return new FormCallback(form, player).error(
               '§4У игрока §f' + name + '§4 роль выше или такая же как у вас, вы не можете ее сменить.',
             )
           }
@@ -103,7 +97,7 @@ function roleForm(ctx) {
               defaultValueIndex: Object.keys(filteredRoles).findIndex(e => e === role),
             })
             .addTextField('Причина смены роли', `Например, "чел дурной, пол технограда снес"`)
-            .show(ctx.sender, (formCtx, notify, showName, newrole, message) => {
+            .show(player, (formCtx, notify, showName, newrole, message) => {
               if (!newrole)
                 return formCtx.error('Неизвестная роль: ' + newrole + '§r, допустимые: ' + util.inspect(ROLES))
 
@@ -111,20 +105,20 @@ function roleForm(ctx) {
                 if (notify && target instanceof Player)
                   target.info(
                     `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
-                      showName ? `§3 игроком §r${ctx.sender.name}` : ''
+                      showName ? `§3 игроком §r${player.name}` : ''
                     }${message ? `\n§r§3Причина: §r${message}` : ''}`,
                   )
 
-                ctx.sender.success(`Роль игрока ${target.name} сменена успешно`)
-              } else ctx.sender.success('Роль сменена успешно')
+                player.success(`Роль игрока ${target.name} сменена успешно`)
+              } else player.success('Роль сменена успешно')
 
               setRole(target, newrole)
               if (self) {
-                ctx.sender.database.prevRole ??= role
+                player.database.prevRole ??= role
               }
             })
         },
       ]
     },
-  }).show(ctx.sender)
+  }).show(player)
 }

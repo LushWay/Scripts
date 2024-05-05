@@ -79,15 +79,14 @@ export class Portal {
     } else this.place = place
 
     if (createCommand)
-      this.command = new Command({
-        name,
-        aliases,
-        description: commandDescription ?? `§bТелепорт на ${name}`,
-        type: 'public',
-        requires: allowAnybody ? () => true : undefined,
-      }).executes(ctx => {
-        this.teleport(ctx.sender)
-      })
+      this.command = new Command(name)
+        .setAliases(...aliases)
+        .setDescription(commandDescription ?? `§bТелепорт на ${name}`)
+        .setGroup('public')
+        .setPermissions(allowAnybody ? 'everybody' : undefined)
+        .executes(ctx => {
+          this.teleport(ctx.player)
+        })
 
     if (from && to) {
       for (const pos of Vector.foreach(from, to)) {

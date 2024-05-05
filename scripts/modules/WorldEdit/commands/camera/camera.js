@@ -134,11 +134,11 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   }
 })
 
-const cmd = new Command({ name: 'camera', role: 'techAdmin' })
-cmd.executes(ctx => selectPlayerForm(ctx.sender))
-cmd.literal({ name: 'reset' }).executes(ctx => {
-  ctx.sender.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
-  delete ctx.sender.database.camera
+const cmd = new Command('camera').setPermissions('techAdmin')
+cmd.executes(ctx => selectPlayerForm(ctx.player))
+cmd.overload('reset').executes(ctx => {
+  ctx.player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+  delete ctx.player.database.camera
 })
 
 /** @param {Player} player */

@@ -5,32 +5,37 @@ import { ActionForm } from 'lib/Form/ActionForm.js'
 import { ArrayForm } from 'lib/Form/ArrayForm.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'
 
-const quest = new Command({
-  name: 'q',
-  aliases: ['quest'],
-  description: 'Меню заданий',
-  role: 'member',
-}).executes(ctx => {
-  questsMenu(ctx.sender)
-})
+const quest = new Command('q')
+  .setAliases('quest')
+  .setDescription('Меню заданий')
+  .setPermissions('member')
+  .executes(ctx => {
+    questsMenu(ctx.player)
+  })
 
-quest.literal({ name: 'exit', description: 'Выйти' }).executes(ctx => {
-  const q = Quest.active(ctx.sender)
-  if (!q) return ctx.error('У вас нет активных заданий!')
-  q.quest.exit(ctx.sender)
-  ctx.sender.playSound(SOUNDS.success)
-  ctx.reply('§6> §fУспешно')
-})
+quest
+  .overload('exit')
+  .setDescription('Выйти')
+  .executes(ctx => {
+    const q = Quest.active(ctx.player)
+    if (!q) return ctx.error('У вас нет активных заданий!')
+    q.quest.exit(ctx.player)
+    ctx.player.playSound(SOUNDS.success)
+    ctx.reply('§6> §fУспешно')
+  })
 
-quest.literal({ name: 'enter', role: 'techAdmin' }).executes(ctx => {
-  const form = new ActionForm('Quests', 'Выбери')
-  for (const [name, q] of Object.entries(Quest.list)) {
-    form.addButton(name, () => {
-      q.enter(ctx.sender)
-    })
-  }
-  form.show(ctx.sender)
-})
+quest
+  .overload('enter')
+  .setPermissions('techAdmin')
+  .executes(ctx => {
+    const form = new ActionForm('Quests', 'Выбери')
+    for (const [name, q] of Object.entries(Quest.list)) {
+      form.addButton(name, () => {
+        q.enter(ctx.player)
+      })
+    }
+    form.show(ctx.player)
+  })
 
 /**
  * @param {Player} player

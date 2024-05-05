@@ -10,13 +10,12 @@ import { REGION_DB } from 'lib/Region/DB.js'
 import { util } from 'lib/util.js'
 import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './Class/RadiusRegion.js'
 
-new Command({
-  name: 'region',
-  role: 'techAdmin',
-  type: 'server',
-}).executes(ctx => {
-  regionForm(ctx.sender)
-})
+new Command('region')
+  .setPermissions('techAdmin')
+  .setGroup('public')
+  .executes(ctx => {
+    regionForm(ctx.player)
+  })
 
 /** @typedef {CubeRegion | RadiusRegion} AnyRegion */
 

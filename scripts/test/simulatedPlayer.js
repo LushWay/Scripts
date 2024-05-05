@@ -110,12 +110,10 @@ GameTest.registerAsync('s', 'test', async test => {
   .structureName('grass')
   .tag('sim')
 
-new Command({
-  name: 'player',
-  description: 'Спавнит фэйкового игрока',
-  role: 'techAdmin',
-  type: 'test',
-})
+new Command('player')
+  .setDescription('Спавнит фэйкового игрока')
+  .setPermissions('techAdmin')
+  .setGroup('test')
   .string('new name', true)
   .executes(async (ctx, newname) => {
     if (newname) name = newname
@@ -126,7 +124,7 @@ new Command({
 
     await system.sleep(10)
 
-    player.teleport(ctx.sender.location)
+    player.teleport(ctx.player.location)
   })
 
 // Many players

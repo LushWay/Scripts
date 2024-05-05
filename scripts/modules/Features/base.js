@@ -84,12 +84,9 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   })
 })
 
-const base = new Command({
-  name: 'base',
-  description: 'Меню базы',
-})
+const base = new Command('base').setDescription('Меню базы')
 base.executes(ctx => {
-  openBaseMenu(ctx.sender)
+  openBaseMenu(ctx.player)
 })
 
 system.runInterval(

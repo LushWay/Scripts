@@ -1,14 +1,13 @@
 import { Player, Vector, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib.js'
 
-new Command({
-  name: 'leaderboard',
-  aliases: ['leaderboards', 'lb'],
-  description: 'Управляет таблицами лидеров',
-  role: 'techAdmin',
-}).executes(ctx => {
-  leaderboardMenu(ctx.sender)
-})
+new Command('leaderboard')
+  .setAliases('leaderboards', 'lb')
+  .setDescription('Управляет таблицами лидеров')
+  .setPermissions('techAdmin')
+  .executes(ctx => {
+    leaderboardMenu(ctx.player)
+  })
 
 /** @param {Player} player */
 function leaderboardMenu(player) {

@@ -1,12 +1,10 @@
 import { Vector } from '@minecraft/server'
 import { WorldEdit } from '../../lib/WorldEdit.js'
 
-new Command({
-  name: 'pos2',
-  description: 'Устанавливает позицию 2 (использовать)',
-  role: 'builder',
-})
+new Command('pos2')
+  .setDescription('Устанавливает позицию 2 (использовать)')
+  .setPermissions('builder')
   .location('pos', true)
   .executes((ctx, pos) => {
-    WorldEdit.forPlayer(ctx.sender).pos2 = Vector.floor(pos)
+    WorldEdit.forPlayer(ctx.player).pos2 = Vector.floor(pos)
   })

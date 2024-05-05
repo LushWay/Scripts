@@ -1,12 +1,10 @@
 import { WorldEdit } from '../../lib/WorldEdit.js'
 
-new Command({
-  type: 'we',
-  name: 'undo',
-  description: 'Отменяет последнее действие (из памяти)',
-  role: 'builder',
-})
+new Command('undo')
+  .setGroup('we')
+  .setDescription('Отменяет последнее действие (из памяти)')
+  .setPermissions('builder')
   .int('undoCount', true)
   .executes((ctx, r) => {
-    WorldEdit.forPlayer(ctx.sender).undo(!isNaN(r) ? r : 1)
+    WorldEdit.forPlayer(ctx.player).undo(!isNaN(r) ? r : 1)
   })

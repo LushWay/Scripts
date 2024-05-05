@@ -1,14 +1,13 @@
 import { WorldEdit } from '../../lib/WorldEdit.js'
 
-new Command({
-  type: 'we',
-  name: 'hpos1',
-  description: 'Установить позицию точки 1 из взгляда (ломать)',
-  role: 'builder',
-}).executes(ctx => {
-  const pos = ctx.sender.getBlockFromViewDirection()
-  if (!pos) return ctx.error('Нет блока')
+new Command('hpos1')
+  .setGroup('we')
+  .setDescription('Установить позицию точки 1 из взгляда (ломать)')
+  .setPermissions('builder')
+  .executes(ctx => {
+    const pos = ctx.player.getBlockFromViewDirection()
+    if (!pos) return ctx.error('Нет блока')
 
-  const we = WorldEdit.forPlayer(ctx.sender)
-  we.pos1 = pos.block.location
-})
+    const we = WorldEdit.forPlayer(ctx.player)
+    we.pos1 = pos.block.location
+  })

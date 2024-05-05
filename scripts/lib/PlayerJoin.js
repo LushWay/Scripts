@@ -142,14 +142,13 @@ class JoinBuilder {
   }
 
   /** @private */
-  command = new Command({
-    name: 'join',
-    description: 'Имитирует первый вход',
-    role: 'member',
-  }).executes(ctx => {
-    const player = ctx.sender
-    this.emitFirstJoin(player)
-  })
+  command = new Command('join')
+    .setDescription('Имитирует первый вход')
+    .setPermissions('member')
+    .executes(ctx => {
+      const player = ctx.player
+      this.emitFirstJoin(player)
+    })
 
   /** @type {[string, string]} */
   settingsName = ['Вход\n§7Все действия, связанные со входом', 'join']

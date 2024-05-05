@@ -39,8 +39,8 @@ declare class ChestFormData {
    *   Fills slots based off of strings and a key, with the first slot being the cordinate that the pattern starts at.
    * @example
    *   gui.pattern(['xxxxxxxxx', 'x_______x', 'x___a___x', 'x_______x', 'x_______x', 'xxxxxxxxx'], {
-   *     x: { itemName: '', itemDesc: [], enchanted: false, stackAmount: 1, texture: 'minecraft:stained_glass_pane' },
-   *     a: { itemName: 'Anvil', itemDesc: [], enchanted: true, stackAmount: 16, texture: 'minecraft:anvil' },
+   *   x: { itemName: '', itemDesc: [], enchanted: false, stackAmount: 1, texture: 'minecraft:stained_glass_pane' },
+   *   a: { itemName: 'Anvil', itemDesc: [], enchanted: true, stackAmount: 16, texture: 'minecraft:anvil' },
    *   })
    *
    * @param pattern The pattern to use, with characters not defined in key being left empty.

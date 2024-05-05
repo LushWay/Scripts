@@ -16,12 +16,11 @@ async function getServerTPS() {
   })
 }
 
-new Command({
-  name: 'ping',
-  description: 'Показывает пинг сервера',
-  role: 'member',
-}).executes(async ctx => {
-  ctx.reply('§b> §3Понг! Проверяем...')
-  const ticks = await getServerTPS()
-  ctx.reply(`§b> §3TPS сервера ${ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'}§f: ${ticks}`)
-})
+new Command('ping')
+  .setDescription('Показывает пинг сервера')
+  .setPermissions('member')
+  .executes(async ctx => {
+    ctx.reply('§b> §3Понг! Проверяем...')
+    const ticks = await getServerTPS()
+    ctx.reply(`§b> §3TPS сервера ${ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'}§f: ${ticks}`)
+  })

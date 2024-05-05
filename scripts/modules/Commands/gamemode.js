@@ -1,17 +1,15 @@
-new Command({
-  name: 's',
-  description: 'Выживание',
-  role: 'builder',
-}).executes(ctx => {
-  ctx.sender.runCommand('gamemode s')
-  ctx.sender.success('§aS')
-})
+new Command('s')
+  .setDescription('Выживание')
+  .setPermissions('builder')
+  .executes(ctx => {
+    ctx.player.runCommand('gamemode s')
+    ctx.player.success('§aS')
+  })
 
-new Command({
-  name: 'c',
-  aliases: ['с', 'gm1'],
-  description: 'Креатив',
-  role: 'builder',
-}).executes(ctx => {
-  ctx.sender.runCommand('gamemode c')
-})
+new Command('c')
+  .setAliases('с', 'gm1')
+  .setDescription('Креатив')
+  .setPermissions('builder')
+  .executes(ctx => {
+    ctx.player.runCommand('gamemode c')
+  })

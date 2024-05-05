@@ -1,8 +1,5 @@
 import { restorePlayerCamera } from 'lib.js'
 
-new Command({
-  name: 'camera',
-  description: 'Возвращает камеру в исходное состояние',
-}).executes(ctx => {
-  restorePlayerCamera(ctx.sender, 1)
+new Command('camera').setDescription('Возвращает камеру в исходное состояние').executes(ctx => {
+  restorePlayerCamera(ctx.player, 1)
 })

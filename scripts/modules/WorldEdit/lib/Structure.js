@@ -107,7 +107,7 @@ export class Structure extends Cuboid {
 async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, forceTp = false) {
   let result = 0
   if (!forceTp) {
-    result = world.overworld.runCommand(command)
+    result = world.overworld.runCommand(command).successCount
   }
   console.debug(command, result)
   options.total++

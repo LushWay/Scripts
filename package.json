@@ -14,7 +14,8 @@
     "@minecraft/server-gametest": "1.0.0-beta.1.20.50-stable",
     "@minecraft/server-net": "1.0.0-beta.1.20.50-stable",
     "@minecraft/server-ui": "1.2.0-beta.1.20.50-stable",
-    "@minecraft/vanilla-data": "1.20.50"
+    "@minecraft/vanilla-data": "1.20.50",
+    "jscodeshift": "^0.15.2"
   },
   "resolutions": {
     "@minecraft/common": "1.1.0",
@@ -26,6 +27,7 @@
     "@minecraft/vanilla-data": "1.20.50"
   },
   "devDependencies": {
+    "@types/jscodeshift": "^0",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "eslint": "8.57.0",

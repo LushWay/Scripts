@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, world } from '@minecraft/server'
+import { ChatSendAfterEvent, Player, world } from '@minecraft/server'
 import { CONFIG } from '../Assets/config.js'
 import { is } from '../roles.js'
 import {
@@ -15,11 +15,21 @@ import { CommandContext } from './Context.js'
 import './index.js'
 import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand, sendCallback } from './utils.js'
 
-/** @typedef {import('./types.js').CommandMetadata} CommandMetadata */
+/**
+ * @template Base
+ * @template Next
+ * @typedef {Base extends (ctx: infer X, ...args: infer E) => infer R ? (ctx: X, ...args: [...E, Next]) => R : never} AppendArgument
+ */
 
 /**
- * @template {Function} [Callback=(ctx: CommandContext) => (void | Promise<void>)] . Default is `(ctx: CommandContext)
- *   => (void | Promise<void>)`. Default is `(ctx: CommandContext) => (void | Promise<void>)`
+ * @template Callback
+ * @template Type
+ * @typedef {Command<AppendArgument<Callback, Type>>} ArgReturn
+ */
+
+/**
+ * @template {(ctx: CommandContext, ...args: any) => unknown} [Callback=(ctx: CommandContext) => unknown] Default is
+ *   `(ctx: CommandContext) => unknown`
  */
 export class Command {
   /** @param {string} message */
@@ -38,9 +48,9 @@ export class Command {
     }
 
     const { cmd, args, input } = parsed
-    const command = Command.commands.find(c => c.sys.meta.name === cmd || c.sys.meta.aliases?.includes(cmd))
+    const command = Command.commands.find(c => c.sys.name === cmd || c.sys.aliases?.includes(cmd))
     if (!command) return commandNotFound(event.sender, cmd)
-    if (!command.sys.meta?.requires(event.sender)) return commandNoPermissions(event.sender, command)
+    if (!command.sys.requires(event.sender)) return commandNoPermissions(event.sender, command)
 
     if (CmdLet.workWithCmdlets(event, args, command, input) === 'stop') return
 
@@ -64,7 +74,7 @@ export class Command {
         )
         if (!child && !args[i] && start.sys.callback) return 'success'
         if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
-        if (!child.sys.meta?.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
+        if (!child.sys?.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
         childs.push(child)
         return getChilds(child, i + 1)
       }
@@ -91,59 +101,215 @@ export class Command {
     return ctx.error('Генератор справки для команд выключен!')
   }
 
+  sys = {
+    /**
+     * The name of the command
+     *
+     * @example
+     *   ban
+     */
+    name: 'command',
+    description: '',
+    /**
+     * A function that will determine if a player has permission to use this command
+     *
+     * @example
+     *   ;```
+     *   (player) => player.hasTag("admin")
+     *   ```
+     *
+     * @param {Player} player This will return the player that uses this command
+     * @returns If this player has permission to use this command
+     */
+    requires: player => is(player.id, 'admin'),
+    /**
+     * Alias to `requires: (p) => is(player, role)`
+     *
+     * @type {Role}
+     */
+
+    role: 'member',
+    /**
+     * Other names that can call this command
+     *
+     * @example
+     *   ;```["f", "s"]```
+     *
+     * @example
+     *   ;```["f"]```
+     *
+     * @type {string[]}
+     */
+    aliases: [],
+    /** @type {'test' | 'we' | 'public'} */
+    group: 'test',
+
+    /** @type {IArgumentType} */
+    type: new LiteralArgumentType('command'),
+
+    /**
+     * The Arguments of this command
+     *
+     * @type {Command<any>[]}
+     */
+    children: [],
+
+    /**
+     * Depth of this command
+     *
+     * @type {number}
+     */
+    depth: 0,
+
+    /**
+     * Parent command
+     *
+     * @type {Command | null}
+     */
+    parent: null,
+
+    /**
+     * Function to run when this command is called
+     *
+     * @type {Callback | null}
+     */
+    callback: null,
+  }
+
   /**
-   * @param {CommandMetadata} data
+   * @param {string} name
    * @param {IArgumentType} [type]
    * @param {number} [depth]
    * @param {Command<any> | null} [parent]
    */
-  constructor(data, type, depth = 0, parent = null) {
-    if (!data.requires && !data.role) {
-      data.role = 'member'
-    }
+  constructor(name, type, depth = 0, parent = null) {
+    this.sys.name = name
 
-    if (data.role) {
-      data.requires = p => is(p.id, data.role ?? 'admin')
-    }
-
-    this.sys = {
-      /** @type {CommandMetadata & Required<Pick<CommandMetadata, 'requires' | 'aliases' | 'type'>>} */
-      meta: {
-        requires: () => true,
-        aliases: [],
-        type: 'test',
-        ...data,
-      },
-      type: type ?? new LiteralArgumentType(data.name),
-      /**
-       * The Arguments on this command
-       *
-       * @type {Command<any>[]}
-       */
-      children: [],
-      depth,
-      parent,
-      /**
-       * Function to run when this command is called
-       *
-       * @type {Callback | undefined}
-       */
-      callback: undefined,
-    }
-
+    if (type) this.sys.type = type
+    if (parent) this.sys.parent = parent
     if (depth === 0) Command.commands.push(this)
   }
 
   /**
-   * Adds a ranch to this command of your own type
+   * How this command works
+   *
+   * @example
+   *   Bans a player
+   *
+   * @param {string} string
+   */
+  setDescription(string) {
+    this.sys.description = string
+    return this
+  }
+
+  /**
+   * Other names that can call this command
+   *
+   * @example
+   *   ```"s", "sc"```
+   *
+   * @example
+   *   ```"f"```
+   *
+   * @param {...string} aliases
+   */
+  setAliases(...aliases) {
+    this.sys.aliases = aliases
+    return this
+  }
+
+  /**
+   * Sets minimal role that allows player to execute the command Default allowed role is admin.
+   *
+   * Alias to `requires(p => is(p, role))`
+   *
+   * @overload
+   * @param {Role} role
+   * @returns {this}
+   */
+
+  /**
+   * @overload
+   * @param {'everybody'} [arg]
+   * @returns {this}
+   */
+
+  /**
+   * A function that will determine if a player has permission to use this command
+   *
+   * @example
+   *   ```
+   *   (player) => is(player, "admin")
+   *   ```
+   *
+   * @overload
+   * @param {(player: Player) => boolean} [arg]
+   * @returns {this}
+   */
+
+  /**
+   * A function that will determine if a player has permission to use this command
+   *
+   * @example
+   *   ```
+   *   (player) => is(player, "admin")
+   *   ```
+   *
+   * @overload
+   * @param {Role | ((player: Player) => boolean) | 'everybody'} [arg]
+   * @returns {this}
+   */
+
+  /**
+   * A function that will determine if a player has permission to use this command
+   *
+   * @example
+   *   ```
+   *   (player) => is(player, "admin")
+   *   ```
+   *
+   * @param {Role | ((player: Player) => boolean) | 'everybody'} [arg]
+   */
+  setPermissions(arg) {
+    if (!arg) return this
+
+    if (arg === 'everybody') {
+      // Everybody
+      this.sys.requires = () => true
+    } else if (typeof arg === 'function') {
+      // Custom permissions function
+      this.sys.requires = arg
+    } else {
+      // Role
+      this.sys.role = arg
+      this.sys.requires = p => is(p.id, arg)
+    }
+
+    return this
+  }
+
+  /**
+   * Sets command group to disaply in help command
+   *
+   * @param {'test' | 'we' | 'public'} group
+   */
+  setGroup(group) {
+    this.sys.group = group
+    return this
+  }
+
+  /**
+   * Adds a new branch to this command of your own type
    *
    * @private
    * @template {IArgumentType} T
    * @param {T} type A special type to be added
-   * @returns {import('./types.js').ArgReturn<Callback, T['type']>} New branch to this command
+   * @returns {ArgReturn<Callback, T['type']>} New branch to this command
    */
   argument(type) {
-    const cmd = new Command(this.sys.meta, type, this.sys.depth + 1, this)
+    const cmd = new Command(this.sys.name, type, this.sys.depth + 1, this)
+    cmd.sys = this.sys
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd
@@ -175,7 +341,7 @@ export class Command {
    * @template {ReadonlyArray<string>} T
    * @param {string} name Name this argument should have
    * @param {T} types
-   * @returns {import('./types.js').ArgReturn<Callback, T[number]>} New branch to this command
+   * @returns {ArgReturn<Callback, T[number]>} New branch to this command
    */
   array(name, types, optional = false) {
     return this.argument(new ArrayArgumentType(name, types, optional))
@@ -195,7 +361,7 @@ export class Command {
    * Adds a branch to this command of type string
    *
    * @param {string} name Name this argument should have
-   * @returns {import('./types.js').ArgReturn<Callback, Vector3>} New branch to this command
+   * @returns {ArgReturn<Callback, Vector3>} New branch to this command
    */
   location(name, optional = false) {
     const cmd = this.argument(new LocationArgumentType(name, optional))
@@ -208,13 +374,13 @@ export class Command {
   }
 
   /**
-   * Adds a subCommand to this argument
+   * Adds a subCommand to the command
    *
-   * @param {import('./types.js').CommandMetadata} data Name this literal should have
+   * @param {string} name Name this literal should have
    * @returns {Command<Callback>} New branch to this command
    */
-  literal(data, optional = false) {
-    const cmd = new Command(data, new LiteralArgumentType(data.name, optional), this.sys.depth + 1, this)
+  overload(name, optional = false) {
+    const cmd = new Command(name, new LiteralArgumentType(name, optional), this.sys.depth + 1, this)
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd

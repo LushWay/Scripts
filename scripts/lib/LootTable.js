@@ -3,17 +3,15 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data.js'
 import { Enchantments } from './Enchantments.js'
 import { EventSignal } from './EventSignal.js'
 
-new Command({
-  name: 'loot',
-  role: 'curator',
-})
+new Command('loot')
+  .setPermissions('curator')
   .string('lootTableName', true)
   .executes((ctx, lootTableName) => {
     const lootTable = LootTable.instances[lootTableName]
     if (!lootTable)
       return ctx.error(lootTableName + ' - unknown. Valid:\n' + Object.keys(LootTable.instances).join('\n'))
 
-    const block = ctx.sender.dimension.getBlock(ctx.sender.location)?.below()
+    const block = ctx.player.dimension.getBlock(ctx.player.location)?.below()
     if (!block) return ctx.error('No block under feats')
     const inventory = block.getComponent('inventory')
     if (!inventory || !inventory.container) return ctx.error('No inventory in block')

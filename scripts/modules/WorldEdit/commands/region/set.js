@@ -7,25 +7,23 @@ import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu.js'
 import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet.js'
 import { WorldEdit } from '../../lib/WorldEdit.js'
 
-const set = new Command({
-  name: 'set',
-  description: 'Частично или полностью заполняет блоки в выделенной области',
-  role: 'builder',
-})
+const set = new Command('set')
+  .setDescription('Частично или полностью заполняет блоки в выделенной области')
+  .setPermissions('builder')
 
 set.string('block').executes((ctx, block) => {
-  const we = WorldEdit.forPlayer(ctx.sender)
+  const we = WorldEdit.forPlayer(ctx.player)
   if (!we.selection) return ctx.reply('§cЗона не выделена!')
-  if (!blockIsAvaible(block, ctx.sender)) return
+  if (!blockIsAvaible(block, ctx.player)) return
 
   we.fillBetween([BlockPermutation.resolve(block)])
 })
 
 set.executes(ctx => {
-  const we = WorldEdit.forPlayer(ctx.sender)
+  const we = WorldEdit.forPlayer(ctx.player)
   if (!we.selection) return ctx.reply('§cЗона не выделена!')
   ctx.reply('§b> §3Закрой чат!')
-  setSelection(ctx.sender)
+  setSelection(ctx.player)
 })
 
 /**

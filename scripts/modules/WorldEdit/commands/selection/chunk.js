@@ -22,20 +22,19 @@ function getChunkCuboidPositions(entity) {
   }
 }
 
-new Command({
-  type: 'we',
-  name: 'chunk',
-  description: 'Выбрать чанк',
-  role: 'builder',
-}).executes(ctx => {
-  const we = WorldEdit.forPlayer(ctx.sender)
-  const chunkBorder = getChunkCuboidPositions(ctx.sender)
-  we.pos1 = chunkBorder.pos1
-  we.pos2 = chunkBorder.pos2
-  ctx.reply(
-    `§b►§3Выделенна зона: §5Позиция 1§3: ${Vector.string(chunkBorder.pos1, true)}, §dПозиция 2§3: ${Vector.string(
-      chunkBorder.pos2,
-      true,
-    )}`,
-  )
-})
+new Command('chunk')
+  .setGroup('we')
+  .setDescription('Выбрать чанк')
+  .setPermissions('builder')
+  .executes(ctx => {
+    const we = WorldEdit.forPlayer(ctx.player)
+    const chunkBorder = getChunkCuboidPositions(ctx.player)
+    we.pos1 = chunkBorder.pos1
+    we.pos2 = chunkBorder.pos2
+    ctx.reply(
+      `§b►§3Выделенна зона: §5Позиция 1§3: ${Vector.string(chunkBorder.pos1, true)}, §dПозиция 2§3: ${Vector.string(
+        chunkBorder.pos2,
+        true,
+      )}`,
+    )
+  })
