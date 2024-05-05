@@ -63,7 +63,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
               if (typeof p === 'symbol')
                 throw new Error('Symbol objectives to set are not accepted, recieved ' + util.stringify(p))
 
-              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(obj.player.id, newValue)
+              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(obj.player.id, Math.round(newValue))
               return true
             },
             get(_, p) {

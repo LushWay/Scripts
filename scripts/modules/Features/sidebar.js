@@ -63,19 +63,21 @@ const survivalSidebar = new Sidebar(
   {
     name: 'Server',
     getOptions(player, settings) {
+      settings ??= sidebarSettings(player)
+
       const main = `§l$${names.mode}§r§f$${names.region}`
 
       const scores = `§6$${names.money}${emoji.money} §2$${names.leafs}${emoji.leaf}`
       const online = `${emoji.online} §f$${names.online}§7/55`
-      const second = `${scores}\n${online}${settings.mode === 'sidebar' ? '\n \n' : ''}`
+      const second = `${scores}\n${online}${settings?.mode === 'sidebar' ? '\n \n' : ''}`
 
       return {
         format:
-          settings.mode === 'sidebar'
+          settings?.mode === 'sidebar'
             ? `${main}\n${second}\n$${names.quest}`
             : [main, second, `$${names.quest}`, undefined, undefined],
 
-        maxWordCount: sidebarSettings(player).sidebarMaxWordLength,
+        maxWordCount: settings?.sidebarMaxWordLength ?? 20,
       }
     },
   },
