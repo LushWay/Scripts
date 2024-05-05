@@ -164,6 +164,8 @@ const Prototype = {
   },
   normalized() {
     const magnitude = this.length()
+    if (magnitude === 0) return this
+
     const DirectionX = this.x / magnitude
     const DirectionY = this.y / magnitude
     const DirectionZ = this.z / magnitude
