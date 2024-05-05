@@ -109,7 +109,8 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
       rewrite: true,
       keepInventory: false,
     })
-    console.log('Saved inv', this.inventoryStore.get(player.id, { remove: false }))
+    const inv = this.inventoryStore.get(player.id, { remove: false })
+    console.log('Saved inv', inv ? Object.entries(inv.slots).map(e => e[1] && e[0] + ' ' + e[1].typeId) : inv)
 
     // Do not save location if on spawn
     if (Spawn.region?.vectorInRegion(player.location)) return
