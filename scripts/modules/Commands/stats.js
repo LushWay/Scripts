@@ -1,39 +1,53 @@
 import { Player } from '@minecraft/server'
-import { ActionForm } from 'lib'
+import { ActionForm, Menu, Settings, util } from 'lib'
 
-const stats = new Command('stats').setDescription('Показывает статистику по игре')
+new Command('stats').setDescription('Показывает статистику по игре').executes(ctx => showStats(ctx.player))
 
-stats.executes(ctx => showStats(ctx.player))
+const getSettings = Settings.player(...Menu.settings, {
+  statsRelative: {
+    name: 'Показывать относительную дату',
+    description: 'Показывать относительную дату на экране статистики',
+    value: true,
+  },
+})
 
-/** @param {Player} player */
-function showStats(player) {
-  const secsOnlineAnarchy = Math.floor(player.scores.anarchyOnlineTime / 1000)
-  const daysOnlineStrAnarchy = `${Math.floor(secsOnlineAnarchy / 86400)} дней`
-  const hoursOnlineStrAnarchy = `${Math.floor(secsOnlineAnarchy / 3600) % 24} часов`
-  const minsOnlineStrAnarchy = `${Math.floor(secsOnlineAnarchy / 60) % 60} минут`
-  const secsOnlineStrAnarchy = `${secsOnlineAnarchy % 60} секунд`
-  const timeOnlineAnarchy = `${daysOnlineStrAnarchy} ${hoursOnlineStrAnarchy} ${minsOnlineStrAnarchy} ${secsOnlineStrAnarchy}`
+/**
+ * @param {Player} player
+ * @param {Player} target
+ * @param {VoidFunction} [back]
+ */
+function showStats(player, target = player, back) {
+  const settings = getSettings(player)
 
-  const secsOnline = Math.floor(player.scores.totalOnlineTime / 1000)
-  const daysOnlineStr = `${Math.floor(secsOnline / 86400)} дней`
-  const hoursOnlineStr = `${Math.floor(secsOnline / 3600) % 24} часов`
-  const minsOnlineStr = `${Math.floor(secsOnline / 60) % 60} минут`
-  const secsOnlineStr = `${secsOnline % 60} секунд`
-  const timeOnline = `${daysOnlineStr} ${hoursOnlineStr} ${minsOnlineStr} ${secsOnlineStr}`
+  /** @param {number} date */
+  function formatDate(date) {
+    if (settings.statsRelative) {
+      const { type, value } = util.ms.remaining(date)
+      return `${value} ${type}`
+    } else {
+      const secsTotal = Math.floor(date / 1000)
+
+      const days = `${Math.floor(secsTotal / 86400)} дней`
+      const hours = `${Math.floor(secsTotal / 3600) % 24} часов`
+      const mins = `${Math.floor(secsTotal / 60) % 60} минут`
+      const secs = `${secsTotal % 60} секунд`
+      return `${days} ${hours} ${mins} ${secs}`
+    }
+  }
 
   const form = new ActionForm(
     'Статистика',
-    `§f§lСтатистика игрока§r
-§cВремени на анархии:§r ${timeOnlineAnarchy}
-§6Времени на сервере§r: ${timeOnline}
-§eБлоков сломано§r: ${player.scores.blocksBroken}
-§aБлоков поставлено§r: ${player.scores.blocksPlaced}
-§bСмертей§r: ${player.scores.deaths}
-§9Убийств§r: ${player.scores.kills}
-§5Урона получено§r: ${player.scores.damageRecieve}
-§dУрона нанесено§r: ${player.scores.damageGive}`,
+    `§f§lСтатистика игрока §r§f${target.name}§r
+§cВремени на анархии:§r ${formatDate(target.scores.anarchyOnlineTime)}
+§6Времени на сервере§r: ${formatDate(target.scores.totalOnlineTime)}
+§eБлоков сломано§r: ${target.scores.blocksBroken}
+§aБлоков поставлено§r: ${target.scores.blocksPlaced}
+§bСмертей§r: ${target.scores.deaths}
+§9Убийств§r: ${target.scores.kills}
+§5Урона получено§r: ${target.scores.damageRecieve}
+§dУрона нанесено§r: ${target.scores.damageGive}`,
   )
   form.addButton('OK', () => null)
+  if (back) form.addButtonBack(back)
   form.show(player)
 }
-
