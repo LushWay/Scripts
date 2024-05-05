@@ -4,7 +4,7 @@ import { emoji } from 'lib/Assets/emoji.js'
 import { Minigame } from 'modules/Minigames/Builder.js'
 import { Quest } from 'modules/Quests/lib/Quest.js'
 
-const sidebarSettings = Settings.player(...Menu.settings, {
+const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
     name: 'Использовать меню',
     description: 'Определяет, включено ли внутриигровое меню',
@@ -58,13 +58,11 @@ const names = {
 
 // $режим§l§7$регион
 
-/** @type {Sidebar<ReturnType<typeof sidebarSettings>>} */
 const survivalSidebar = new Sidebar(
   {
     name: 'Server',
+    getExtra: player => getSidebarSettings(player),
     getOptions(player, settings) {
-      settings ??= sidebarSettings(player)
-
       const main = `§l$${names.mode}§r§f$${names.region}`
 
       const scores = `§6$${names.money}${emoji.money} §2$${names.leafs}${emoji.leaf}`
@@ -116,15 +114,15 @@ const survivalSidebar = new Sidebar(
 )
 
 /** @param {Player} player */
-export function showSurvivalHud(player, settings = sidebarSettings(player)) {
-  survivalSidebar.show(player, settings)
+export function showSurvivalHud(player) {
+  survivalSidebar.show(player)
 }
 
 system.runPlayerInterval(
   player => {
     if (player.database.join) return // Do not show sidebar until player actually joins the world
 
-    const settings = sidebarSettings(player)
+    const settings = getSidebarSettings(player)
 
     if (!settings.enabled) return
 
@@ -132,9 +130,8 @@ system.runPlayerInterval(
     if (minigame) {
       minigame.showHud(player)
     } else {
-      showSurvivalHud(player, settings)
+      showSurvivalHud(player)
     }
-    // system.delay(() => player.onScreenDisplay.setTip(5, '§7158.255.5.29'))
   },
   'Survival sidebar',
   20,

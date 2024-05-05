@@ -48,11 +48,13 @@ export class Sidebar {
    *   format: Format
    *   maxWordCount: number
    * }} o.getOptions
+   * @param {(p: Player) => E} o.getExtra
    * @param {SidebarRawVariables<E>} content
    */
-  constructor({ name, getOptions: getFormat }, content) {
+  constructor({ name, getOptions, getExtra }, content) {
     this.name = name
-    this.getOptions = getFormat
+    this.getExtra = getExtra
+    this.getOptions = getOptions
     this.content = this.init(content)
 
     Sidebar.instances.push(this)
@@ -76,11 +78,9 @@ export class Sidebar {
     return base
   }
 
-  /**
-   * @param {Player} player
-   * @param {E} extra
-   */
-  show(player, extra) {
+  /** @param {Player} player */
+  show(player) {
+    const extra = this.getExtra(player)
     const options = this.getOptions(player, extra)
     let content = options.format
 
