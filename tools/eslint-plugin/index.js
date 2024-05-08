@@ -4,6 +4,8 @@ const path = require('path')
 
 /** @param {Context} context */
 function toRelative(context, filename = context.filename) {
+  if (!filename) return ''
+
   return filename.replace(context.cwd, '').replaceAll(path.sep, '/')
 }
 

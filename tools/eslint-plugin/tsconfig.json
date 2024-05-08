@@ -10,7 +10,7 @@
     "lib": ["ES2022"],
     "target": "ES2022",
     "types": [],
-    "module": "CommonJS"
+    "moduleResolution": "NodeNext"
   },
   "include": ["."]
 }
