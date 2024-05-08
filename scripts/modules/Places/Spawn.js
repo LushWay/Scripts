@@ -1,8 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data.js'
-import { EditableLocation, InventoryStore, PLAYER_DB, Portal, SafeAreaRegion, Settings, util } from 'lib.js'
+import { EditableLocation, InventoryStore, Portal, SafeAreaRegion, Settings, util } from 'lib.js'
 
-import { migration } from 'lib/Database/Migrations.js'
 import { Menu } from 'lib/Menu.js'
 import { Join } from 'lib/PlayerJoin.js'
 import { showSurvivalHud } from 'modules/Features/sidebar.js'
@@ -73,6 +72,8 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         // Skip after death respawns
         if (!initialSpawn) return
 
+        if (player.isSimulated()) return
+
         // Force know if player is not playing
         if (isNotPlaying(player)) return Join.setPlayerJoinPosition(player)
 
@@ -95,6 +96,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
   /** @type {import('lib.js').regionCallback} */
   regionCallback(player, region) {
+    if (player.isSimulated()) return
     if (region === this.region) {
       if (player.isGamemode('survival')) {
         player.runCommand('gamemode adventure')

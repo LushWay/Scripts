@@ -128,7 +128,7 @@ export class Command {
      * @type {Role}
      */
 
-    role: 'member',
+    role: 'admin',
     /**
      * Other names that can call this command
      *
@@ -315,6 +315,7 @@ export class Command {
     cmd.sys.requires = this.sys.requires
     cmd.sys.role = this.sys.role
     cmd.sys.group = this.sys.group
+    cmd.sys.requires = this.sys.requires
 
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
@@ -387,6 +388,9 @@ export class Command {
    */
   overload(name, optional = false) {
     const cmd = new Command(name, new LiteralArgumentType(name, optional), this.sys.depth + 1, this)
+    cmd.sys.description = this.sys.description
+    cmd.sys.requires = this.sys.requires
+    cmd.sys.role = this.sys.role
     this.sys.children.push(cmd)
     // @ts-expect-error This mistype
     return cmd

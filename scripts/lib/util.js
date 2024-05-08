@@ -39,6 +39,15 @@ export const util = {
       return text
     },
     {
+      /**
+       * Checks if provided argument is instanceof Error
+       *
+       * @param {unknown} object
+       * @returns {object is Error}
+       */
+      isError(object) {
+        return typeof object === 'object' && object !== null && object instanceof Error
+      },
       stack: {
         /** @type {[RegExp | ((s: string) => string), string?][]} */
         modifiers: [

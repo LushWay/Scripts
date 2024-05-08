@@ -1,7 +1,7 @@
 {
   "format_version": 2,
   "header": {
-    "name": "SM-API",
+    "name": "LushWayScripts",
     "description": "Server Plugin",
     "uuid": "8198b306-bfbb-48c9-874d-217cd4cef1ae",
     "version": [3, 0, 4],
@@ -9,7 +9,7 @@
   },
   "modules": [
     {
-      "description": "Data Module",
+      "description": "Behavior Packs Module",
       "type": "data",
       "uuid": "786cb1e6-e840-40d7-a986-9fb9e348634a",
       "version": [0, 0, 0]

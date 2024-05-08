@@ -3,6 +3,7 @@ import { GameMode, system, Vector, world } from '@minecraft/server'
 import * as GameTest from '@minecraft/server-gametest'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data.js'
 import { util } from 'lib.js'
+import { TestStructures } from 'test/constants.js'
 const time = 9999999
 
 let name = 'Бот'
@@ -10,7 +11,9 @@ let name = 'Бот'
 let player
 const testLoc = { x: 1000, y: -60, z: 1000 }
 
-GameTest.registerAsync('s', 's', async test => {
+const simulatedPlayer = 'simulated_player'
+
+GameTest.registerAsync(simulatedPlayer, 'spawn_one', async test => {
   const spawnLoc = { x: 0, y: 3, z: 0 }
   player = test.spawnSimulatedPlayer(spawnLoc, name)
   const id = player.id
@@ -25,10 +28,10 @@ GameTest.registerAsync('s', 's', async test => {
   test.succeed()
 })
   .maxTicks(time)
-  .structureName('test:grass')
-  .tag('sim')
+  .structureName(TestStructures.empty)
+  .tag(GameTest.Tags.suiteDisabled)
 
-GameTest.registerAsync('s', 'test', async test => {
+GameTest.registerAsync(simulatedPlayer, 'base', async test => {
   const spawnLoc = { x: 0, y: 3, z: 0 }
 
   test.setBlockType(MinecraftBlockTypes.Grass, { x: -1, z: 0, y: 1 })
@@ -107,8 +110,8 @@ GameTest.registerAsync('s', 'test', async test => {
   player.stopBreakingBlock()
 })
   .maxTicks(time)
-  .structureName('grass')
-  .tag('sim')
+  .structureName(TestStructures.empty)
+  .tag(GameTest.Tags.suiteDisabled)
 
 new Command('player')
   .setDescription('Спавнит фэйкового игрока')
@@ -118,7 +121,9 @@ new Command('player')
   .executes(async (ctx, newname) => {
     if (newname) name = newname
 
-    world.overworld.runCommand(`execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "s:s"`)
+    world.overworld.runCommand(
+      `execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "${simulatedPlayer}:spawn_one"`,
+    )
 
     world.overworld.getBlock(Vector.add(testLoc, { x: 1, y: 0, z: 1 }))?.setType(MinecraftBlockTypes.RedstoneBlock)
 
@@ -128,7 +133,7 @@ new Command('player')
   })
 
 // Many players
-GameTest.registerAsync('s', 'm', async test => {
+GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
   let succeed = false
   for (let e = 0; e < 5; e++) {
     const player = test.spawnSimulatedPlayer({ x: -1, y: 3, z: -1 }, 'Tester (' + e + ')', GameMode.adventure)
@@ -159,8 +164,8 @@ GameTest.registerAsync('s', 'm', async test => {
   test.succeed()
 })
   .maxTicks(1500)
-  .structureName('Component:grass5x5')
-  .tag('sim')
+  .structureName(TestStructures.empty)
+  .tag(GameTest.Tags.suiteDisabled)
 
 /**
  * @param {number} max

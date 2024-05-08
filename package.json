@@ -137,18 +137,6 @@
           "trailingUnderscore": "allow"
         },
         {
-          "selector": "variable",
-          "modifiers": [
-            "exported",
-            "const"
-          ],
-          "format": [
-            "UPPER_CASE"
-          ],
-          "leadingUnderscore": "allow",
-          "trailingUnderscore": "allow"
-        },
-        {
           "selector": "typeLike",
           "format": [
             "PascalCase"

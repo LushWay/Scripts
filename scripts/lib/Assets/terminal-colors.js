@@ -32,4 +32,10 @@ export const TerminalColors = {
   b: '\x1B[38;2;85;255;255m',
   n: '\x1B[38;2;185;100;75m',
   m: '\x1B[38;2;150;20;5m',
+
+  // Extra (not minecraft color)
+  // bgRed
+  'X': '\x1B[41m',
+  // bgYellowBright
+  'Y': '\x1B[103m'
 }

@@ -163,6 +163,7 @@ Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
 })
 
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+  if (player.isSimulated()) return
   if (initialSpawn) {
     if (player.database.role === 'spectator') {
       player.runCommand('gamemode spectator')

@@ -29,7 +29,7 @@ import { BASE_ITEM_STACK } from 'modules/Features/base.js'
 import { request } from '../lib/BDS/api.js'
 import { Mineshaft } from '../modules/Places/Mineshaft.js'
 import './enchant.js'
-import './lib/Form/util.test.js'
+import './loader.js'
 import './simulatedPlayer.js'
 
 // There you can create simple one time tests taht will be run using .test <name> command
