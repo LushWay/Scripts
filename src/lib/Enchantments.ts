@@ -1,7 +1,6 @@
 import { Enchantment, Vector, world } from '@minecraft/server'
 
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { MinecraftEnchantmentTypes } from 'lib/assets/enchantments'
+import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { DatabaseUtils } from 'lib/database/utils'
 import { EventLoader } from 'lib/event-signal'
 import { util } from 'lib/util'
@@ -11,7 +10,7 @@ const location = { x: 0, y: -10, z: 0 }
 export class Enchantments {
   static custom: { [key: string]: { [key: number]: Enchantment } } = {}
 
-  static typed = {} as Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }>
+  static typed = {} as Record<MinecraftEnchantmentTypes, { [key: number]: Enchantment }>
 
   static onLoad = new EventLoader()
 }

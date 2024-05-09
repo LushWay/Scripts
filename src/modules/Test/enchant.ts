@@ -1,16 +1,14 @@
 import { world } from '@minecraft/server'
-import { MinecraftEnchantmentTypes } from '../../lib/assets/enchantments'
+import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { Enchantments } from '../../lib/enchantments'
 
 new Command('enchant')
   .setDescription('Зачаровывает предмет')
   .setPermissions('admin')
-  .array('enchantName', Object.keys(MinecraftEnchantmentTypes), true)
+  .array('enchantName', Object.values(MinecraftEnchantmentTypes), true)
   .int('level', true)
   .executes((ctx, enchant, level) => {
-    if (!enchant) return ctx.reply(Object.keys(MinecraftEnchantmentTypes).join('\n'))
-
-    const ench = MinecraftEnchantmentTypes[enchant]
+    if (!enchant) return ctx.reply(Object.values(MinecraftEnchantmentTypes).join('\n'))
 
     const mainhand = ctx.player.mainhand()
 
@@ -19,10 +17,10 @@ new Command('enchant')
     const enchs = item.getComponent('enchantments')
     if (!enchs) return ctx.error('A')
     const { enchantments } = enchs
-    enchantments.removeEnchantment(ench)
-    console.debug({ Enchantments: Enchantments.custom, ench, level })
+    enchantments.removeEnchantment(enchant)
+    console.debug({ Enchantments: Enchantments.custom, enchant, level })
 
-    enchantments.addEnchantment(Enchantments.custom[ench][level])
+    enchantments.addEnchantment(Enchantments.custom[enchant][level])
 
     world.debug('enchants', [...enchantments])
     enchs.enchantments = enchantments
