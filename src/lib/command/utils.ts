@@ -196,7 +196,6 @@ export function sendCallback(
   rawInput: string,
 ) {
   const lastArg = args[args.length - 1] ?? baseCommand
-  /** @type {any[]} */
   const argsToReturn: any[] = []
   for (const [i, arg] of args.entries()) {
     if (arg.sys.type.name.endsWith('*')) continue
@@ -210,7 +209,7 @@ export function sendCallback(
     argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
   }
   if (typeof lastArg.sys.callback !== 'function') {
-    console.warn('Not implemented: ')
+    console.warn('Command not implemented: ', lastArg)
     return event.sender.warn('Упс, эта команда пока не работает.')
   }
 

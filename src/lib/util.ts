@@ -372,7 +372,6 @@ export const util = {
     } as Record<Time, { time: number; friction?: number; plurals: Plurals }>,
   },
 
-  /** @param {number} c */
   waitEach(c: number) {
     let count = 0
     return async () => {

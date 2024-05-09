@@ -166,8 +166,7 @@ expand(console, {
   },
 })
 
-// @ts-expect-error Yes
-globalThis.nextTick = null
+globalThis.nextTick = null as unknown as Promise<void>
 globalThis.verbose = false
 
 Object.entriesStringKeys(MinecraftEntityTypes).forEach(([k, v]) => {

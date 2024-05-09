@@ -9,15 +9,15 @@ import {
   world,
 } from '@minecraft/server'
 import { EventSignal } from '../event-signal'
-import { Region } from './Class/Region'
 import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config'
 import './init'
-export * from './Class/CubeRegion'
-export * from './Class/RadiusRegion'
-export * from './Class/Region'
-export * from './DB'
+import { Region } from './kinds/Region'
 export * from './command'
 export * from './config'
+export * from './database'
+export * from './kinds/CubeRegion'
+export * from './kinds/RadiusRegion'
+export * from './kinds/Region'
 
 export const ACTION_GUARD: EventSignal<
   Parameters<InteractionAllowed>,
@@ -70,7 +70,7 @@ export function loadRegionsWithGuards({
 
   /** Permissions for region */
   world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-    const region = Region.locationInRegion(event.block, event.player.dimension.type)
+    const region = Region.nearestRegion(event.block, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithBlock', event })) return
 
     if (DOORS_AND_SWITCHES.includes(event.block.typeId) && region?.permissions?.doorsAndSwitches) return
@@ -81,7 +81,7 @@ export function loadRegionsWithGuards({
 
   /** Permissions for region */
   world.beforeEvents.playerInteractWithEntity.subscribe(event => {
-    const region = Region.locationInRegion(event.target.location, event.player.dimension.type)
+    const region = Region.nearestRegion(event.target.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithEntity', event })) return
 
     event.cancel = true
@@ -89,7 +89,7 @@ export function loadRegionsWithGuards({
 
   /** Permissions for region */
   world.beforeEvents.playerPlaceBlock.subscribe(event => {
-    const region = Region.locationInRegion(event.block.location, event.player.dimension.type)
+    const region = Region.nearestRegion(event.block.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'place', event })) return
 
     event.cancel = true
@@ -97,7 +97,7 @@ export function loadRegionsWithGuards({
 
   /** Permissions for region */
   world.beforeEvents.playerBreakBlock.subscribe(event => {
-    const region = Region.locationInRegion(event.block.location, event.player.dimension.type)
+    const region = Region.nearestRegion(event.block.location, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'break', event })) return
 
     event.cancel = true
@@ -106,7 +106,7 @@ export function loadRegionsWithGuards({
   world.afterEvents.entitySpawn.subscribe(({ entity, cause }) => {
     if (NOT_MOB_ENTITIES.includes(entity.typeId) || !entity.isValid()) return
 
-    const region = Region.locationInRegion(entity.location, entity.dimension.type)
+    const region = Region.nearestRegion(entity.location, entity.dimension.type)
     if (spawnAllowed(region, { entity, cause })) return
 
     entity.remove()

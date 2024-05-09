@@ -1,6 +1,7 @@
 import { table } from 'lib/database/abstract'
+import { RegionPermissions } from './kinds/Region'
 
-type CubeRegion = {
+type CubeRegionSave = {
   t: 'c'
   key: string
   from: VectorXZ
@@ -9,7 +10,7 @@ type CubeRegion = {
   permissions: Partial<RegionPermissions>
 }
 
-type RadiusRegion = {
+type RadiusRegionSave = {
   t: 'r'
   st: string
   key: string
@@ -19,4 +20,4 @@ type RadiusRegion = {
   permissions: Partial<RegionPermissions>
 }
 
-export const REGION_DB = table<CubeRegion | RadiusRegion>('region')
+export const RegionDatabase = table<CubeRegionSave | RadiusRegionSave>('region')

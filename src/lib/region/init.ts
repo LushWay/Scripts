@@ -1,10 +1,10 @@
-import { CubeRegion } from 'lib/region/Class/CubeRegion'
-import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from 'lib/region/Class/RadiusRegion'
-import { Region } from 'lib/region/Class/Region'
-import { REGION_DB } from './DB'
+import { RegionDatabase } from './database'
+import { CubeRegion } from './kinds/CubeRegion'
+import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './kinds/RadiusRegion'
+import { Region } from './kinds/Region'
 
 const RadiusRegionSubTypes = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion]
-Object.values(REGION_DB).forEach(region => {
+Object.values(RegionDatabase).forEach(region => {
   if (!region) return
   if (region.t === 'c')
     Region.regions.push(

@@ -2,8 +2,8 @@ import { Vector } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { ProxyDatabase } from 'lib/database/proxy'
-import { Region } from 'lib/region/Class/Region'
-import { REGION_DB } from 'lib/region/DB'
+import { RegionDatabase } from 'lib/region/database'
+import { Region, type RegionPermissions } from 'lib/region/kinds/Region'
 
 // Note for future
 // Currently subclassing RadiusRegion is just a pain, so instead
@@ -75,14 +75,14 @@ export class RadiusRegion extends Region {
   }
 
   /** @inheritdoc */
-  vectorInRegion(vector: Vector3) {
+  isVectorInRegion(vector: Vector3) {
     return Vector.distance(this.center, vector) < this.radius
   }
 
   /** @inheritdoc */
   update(region = RadiusRegion) {
     if (!this.saveToDisk) return super.update()
-    return (REGION_DB[this.key] = {
+    return (RegionDatabase[this.key] = {
       ...super.update(),
 
       t: 'r',

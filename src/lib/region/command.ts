@@ -3,10 +3,10 @@ import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
-import { Region } from 'lib/region/Class/Region'
-import { REGION_DB } from 'lib/region/DB'
+import { RegionDatabase } from 'lib/region/database'
+import { Region } from 'lib/region/kinds/Region'
 import { util } from 'lib/util'
-import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './Class/RadiusRegion'
+import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './kinds/RadiusRegion'
 
 new Command('region')
   .setPermissions('techAdmin')
@@ -23,7 +23,7 @@ function regionForm(player: Player) {
     '§7Чтобы создать регион, перейдите в список определенных регионов',
   )
 
-  const currentRegion = Region.locationInRegion(player.location, player.dimension.type)
+  const currentRegion = Region.nearestRegion(player.location, player.dimension.type)
 
   if (currentRegion instanceof RadiusRegion) {
     form.addButton(
@@ -94,7 +94,7 @@ function editRegion(player: Player, region: RadiusRegion, back: () => void): Pro
         extendedEditPermissions: true,
       }),
     )
-    .addButtonPrompt('§cУдалить регион', '§cУдалить', () => delete REGION_DB[region.key], '§aНе удалять')
+    .addButtonPrompt('§cУдалить регион', '§cУдалить', () => delete RegionDatabase[region.key], '§aНе удалять')
     .show(player)
 }
 

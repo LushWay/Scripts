@@ -4,7 +4,7 @@ import { ScoreboardDB } from 'lib/database/scoreboard'
 
 world.beforeEvents.explosion.subscribe(event => {
   const impactedBlocks = event.getImpactedBlocks().filter(block => {
-    const region = Region.locationInRegion(block, event.dimension.type)
+    const region = Region.nearestRegion(block, event.dimension.type)
 
     if (region && region.permissions.pvp) {
       for (const id of region.permissions.owners) RAID_NOTIFY[id] = 60

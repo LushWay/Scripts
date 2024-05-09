@@ -84,7 +84,7 @@ const survivalSidebar = new Sidebar(
     [names.region]: (player, settings) => {
       let text = ''
       if (player.database.inv === 'anarchy') {
-        const region = Region.locationInRegion(player.location, player.dimension.type)
+        const region = Region.nearestRegion(player.location, player.dimension.type)
         if (region) {
           if (!region.permissions.pvp) text = ' §aмирная зона§f'
 

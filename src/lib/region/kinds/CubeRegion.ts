@@ -1,25 +1,19 @@
 import { Vector, world } from '@minecraft/server'
-import { Region } from 'lib/region/Class/Region'
-import { REGION_DB } from 'lib/region/DB'
+import { RegionDatabase } from 'lib/region/database'
+import { Region, type RegionPermissions } from 'lib/region/kinds/Region'
 
 export class CubeRegion extends Region {
-  /**
-   * @param {Vector3} blockLocation
-   * @param {Dimensions} dimensionId
-   * @returns {CubeRegion | undefined}
-   */
+  /** @inheritdoc */
   static blockLocationInRegion(blockLocation: Vector3, dimensionId: Dimensions): CubeRegion | undefined {
     const region = Region.regionInstancesOf(this).find(
-      region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation),
+      region => region.dimensionId === dimensionId && region.isVectorInRegion(blockLocation),
     )
 
     if (region instanceof CubeRegion) return region
   }
 
-  /** @type {VectorXZ} */
   from: VectorXZ
 
-  /** @type {VectorXZ} */
   to: VectorXZ
 
   /**
@@ -60,7 +54,7 @@ export class CubeRegion extends Region {
     }
   }
 
-  vectorInRegion(vector: Vector3, dimension = world.overworld) {
+  isVectorInRegion(vector: Vector3, dimension = world.overworld) {
     return Vector.between(
       { x: this.from.x, y: dimension.heightRange.max, z: this.from.z },
       { x: this.to.x, y: dimension.heightRange.min, z: this.to.z },
@@ -69,7 +63,7 @@ export class CubeRegion extends Region {
   }
 
   update() {
-    return (REGION_DB[this.key] = {
+    return (RegionDatabase[this.key] = {
       ...super.update(),
       t: 'c',
       key: this.key,
