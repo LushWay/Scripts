@@ -1,0 +1,377 @@
+import { ChatSendAfterEvent, Player, world } from '@minecraft/server'
+import { CONFIG } from '../assets/config'
+import { is } from '../roles'
+import {
+  ArrayArgumentType,
+  BooleanArgumentType,
+  IArgumentType,
+  IntegerArgumentType,
+  LiteralArgumentType,
+  LocationArgumentType,
+  StringArgumentType,
+} from './argument-types'
+import { CmdLet } from './cmdlet'
+import { CommandContext } from './context'
+import './index'
+import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand, sendCallback } from './utils'
+
+type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
+  ? (ctx: X, ...args: [...E, Next]) => R
+  : never
+
+type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
+
+export class Command<
+  Callback extends (ctx: CommandContext, ...args: any[]) => unknown = (ctx: CommandContext) => unknown,
+> {
+  /** @param {string} message */
+  static isCommand(message: string) {
+    return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
+  }
+
+  /** @param {ChatSendAfterEvent} event */
+  static chatListener(event: ChatSendAfterEvent) {
+    if (!this.isCommand(event.message)) return
+
+    const parsed = parseCommand(event.message, 1)
+    if (!parsed) {
+      console.error(`Unable to parse command '${event.message}', user: '${event.sender.name}§r'`)
+      return event.sender.fail('Не удалось обработать команду.')
+    }
+
+    const { cmd, args, input } = parsed
+
+    const command = Command.commands.find(c => c.sys.name === cmd || c.sys.aliases?.includes(cmd))
+    if (!command) return commandNotFound(event.sender, cmd)
+
+    if (!command.sys.requires(event.sender)) return commandNoPermissions(event.sender, command)
+
+    if (CmdLet.workWithCmdlets(event, args, command, input) === 'stop') return
+
+    /** Check Args/SubCommands for errors */
+    const childs: Command[] = []
+
+    function getChilds(start: Command<any>, i: number): 'fail' | 'success' {
+      if (!command) return 'fail'
+      if (start.sys.children.length > 0) {
+        const child = start.sys.children.find(
+          v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional),
+        )
+        if (!child && !args[i] && start.sys.callback) return 'success'
+        if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
+        if (!child.sys?.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
+        childs.push(child)
+        return getChilds(child, i + 1)
+      }
+      return 'success'
+    }
+
+    if (getChilds(command, 0) === 'fail') return
+
+    sendCallback(args, childs, event, command, input)
+  }
+
+  /** An array of all active commands */
+  static commands: Command<any>[] = []
+
+  static getHelpForCommand(command: Command, ctx: CommandContext) {
+    return ctx.error('Генератор справки для команд выключен!')
+  }
+
+  sys = {
+    /**
+     * The name of the command
+     *
+     * @example
+     *   'ban'
+     */
+    name: 'command',
+
+    /**
+     * The description of the command
+     *
+     * @example
+     *   'Bans the player'
+     */
+    description: '',
+
+    /**
+     * A function that will determine if a player has permission to use this command
+     *
+     * @example
+     *   (player) => player.hasTag('special')
+     *
+     * @param player This will return the player that uses this command
+     * @returns If this player has permission to use this command
+     */
+    requires: (player: Player) => is(player.id, 'admin'),
+
+    /**
+     * Minimal role required to run this command.
+     *
+     * This is an alias to `requires: (p) => is(player, role)`
+     */
+    role: 'admin' as Role,
+    /**
+     * Other names that can call this command
+     *
+     * @example
+     *   ;```["f", "s"]```
+     *
+     * @example
+     *   ;```["f"]```
+     */
+    aliases: [] as string[],
+
+    /** Group of the command. Used in help. */
+    group: 'test' as 'test' | 'we' | 'public',
+
+    /** Argument type of the command */
+    type: new LiteralArgumentType('command') as IArgumentType,
+
+    /** The Arguments of this command */
+    children: [] as Command<any>[],
+
+    /** Depth of this command */
+    depth: 0,
+
+    /** Parent command */
+    parent: null as Command | null,
+
+    /** Function to run when this command is called */
+    callback: null as Callback | null,
+  }
+
+  /**
+   * Creates new custom command that will be accesible in the chat by using .<cmd>
+   *
+   * @param {string} name - Name of the new command
+   */
+  constructor(name: string, type?: IArgumentType, depth = 0, parent: Command<any> | null = null) {
+    this.sys.name = name
+
+    if (type) this.sys.type = type
+    if (parent) this.sys.parent = parent
+
+    if (depth === 0) Command.commands.push(this)
+  }
+
+  /**
+   * How this command works
+   *
+   * @example
+   *   'Bans a player'
+   */
+  setDescription(string: string) {
+    this.sys.description = string
+    return this
+  }
+
+  /**
+   * Other names that can call this command
+   *
+   * @example
+   *   setAliases('s', 'sc')
+   *
+   * @example
+   *   setAliases('f')
+   *
+   * @example
+   *   new Command('command') // .command
+   *   .setAliases('c') // Command now will be available as .c too!
+   */
+  setAliases(...aliases: string[]) {
+    this.sys.aliases = aliases
+    return this
+  }
+
+  /**
+   * Sets condition that will determine if a player has permission to use this command
+   *
+   * @example
+   *   (player) => is(player, "admin")
+   *
+   * @example
+   *   "admin"
+   */
+  setPermissions(arg?: Role | ((player: Player) => boolean) | 'everybody'): this
+
+  /**
+   * Sets minimal role that allows player to execute the command. Default allowed role is admin.
+   *
+   * Alias to `setPermissions(p => is(p, role))`
+   *
+   * @example
+   *   'admin'
+   *
+   * @example
+   *   'curator'
+   */
+  setPermissions(arg?: Role): this
+
+  /** Allows this command to be used by any player. */
+  setPermissions(arg?: 'everybody'): this
+
+  /**
+   * Adds a function that will determine if a player has permission to use this command
+   *
+   * @example
+   *   (player) => player.hasTag('special)
+   */
+  setPermissions(arg?: (player: Player) => boolean): this
+
+  /** Sets condition that will determine if a player has permission to use this command */
+  setPermissions(arg?: Role | ((player: Player) => boolean) | 'everybody'): this {
+    if (!arg) return this
+
+    if (arg === 'everybody') {
+      // Everybody
+      this.sys.requires = () => true
+    } else if (typeof arg === 'function') {
+      // Custom permissions function
+      this.sys.requires = arg
+    } else {
+      // Role
+      this.sys.role = arg
+      this.sys.requires = p => is(p.id, arg)
+    }
+
+    return this
+  }
+
+  /**
+   * Sets command group to disaply in help command
+   *
+   * @param {'test' | 'we' | 'public'} group
+   */
+  setGroup(group: 'test' | 'we' | 'public') {
+    this.sys.group = group
+    return this
+  }
+
+  /**
+   * Adds a new branch to this command of your own type
+   *
+   * @param type A special type to be added
+   * @returns New branch to this command
+   */
+  private argument<T extends IArgumentType>(type: T): ArgReturn<Callback, T['type']> {
+    const cmd = new Command(this.sys.name, type, this.sys.depth + 1, this)
+    cmd.sys.name = this.sys.name
+    cmd.sys.description = this.sys.description
+    cmd.sys.aliases = this.sys.aliases
+    cmd.sys.requires = this.sys.requires
+    cmd.sys.role = this.sys.role
+    cmd.sys.group = this.sys.group
+    cmd.sys.requires = this.sys.requires
+
+    this.sys.children.push(cmd)
+
+    // @ts-expect-error Huhh
+    return cmd
+  }
+
+  /**
+   * Adds a branch to this command of type string
+   *
+   * @param {string} name Name this argument should have
+   * @returns New branch to this command
+   */
+  string(name: string, optional = false) {
+    return this.argument(new StringArgumentType(name, optional))
+  }
+
+  /**
+   * Adds a branch to this command of type string
+   *
+   * @param {string} name Name this argument should have
+   * @returns New branch to this command
+   */
+  int(name: string, optional = false) {
+    return this.argument(new IntegerArgumentType(name, optional))
+  }
+
+  /**
+   * Adds a branch to this command of type string
+   *
+   * @param name Name this argument should have
+   * @param types
+   * @returns New branch to this command
+   */
+  array<T extends ReadonlyArray<string>>(name: string, types: T, optional = false): ArgReturn<Callback, T[number]> {
+    return this.argument(new ArrayArgumentType(name, types, optional))
+  }
+
+  /**
+   * Adds a branch to this command of type string
+   *
+   * @param name Name this argument should have
+   * @returns New branch to this command
+   */
+  boolean(name: string, optional = false) {
+    return this.argument(new BooleanArgumentType(name, optional))
+  }
+
+  /**
+   * Adds a branch to this command of type string
+   *
+   * @param name Name this argument should have
+   * @returns New branch to this command
+   */
+
+  location(name: string, optional = false): ArgReturn<Callback, Vector3> {
+    const cmd = this.argument(new LocationArgumentType(name, optional))
+    if (!name.endsWith('*')) {
+      const newArg = cmd.location(name + '_y*', optional).location(name + '_z*', optional)
+
+      // @ts-expect-error Magic
+      return newArg
+    }
+    return cmd
+  }
+
+  /**
+   * Adds a subCommand to the command
+   *
+   * @param name Name this literal should have
+   * @returns New branch to this command
+   */
+  overload(name: string, optional = false): Command<Callback> {
+    const cmd = new Command(name, new LiteralArgumentType(name, optional), this.sys.depth + 1, this)
+    cmd.sys.description = this.sys.description
+    cmd.sys.requires = this.sys.requires
+    cmd.sys.role = this.sys.role
+
+    this.sys.children.push(cmd)
+
+    // @ts-expect-error Magic
+    return cmd
+  }
+
+  /**
+   * Registers this command and its apendending arguments
+   *
+   * @param {Callback} callback What to run when this command gets called
+   * @returns {Command<Callback>}
+   */
+  executes(callback: Callback): Command<Callback> {
+    this.sys.callback = callback
+    return this
+  }
+}
+
+type CommandModule = typeof Command
+
+declare global {
+  // eslint-disable-next-line no-var
+  var Command: CommandModule
+}
+
+globalThis.Command = Command
+
+// TODO! REPLACE WITH PACK ON 1.20.70
+world.beforeEvents.chatSend.subscribe(event => {
+  event.sendToTargets = true
+  event.setTargets([])
+})
+world.afterEvents.chatSend.subscribe(event => Command.chatListener(event))

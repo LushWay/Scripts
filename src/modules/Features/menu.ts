@@ -1,0 +1,69 @@
+import { ActionForm, FormCallback, util } from 'lib'
+import { Mail } from 'lib/Mail'
+import { Menu } from 'lib/Menu'
+import { Join } from 'lib/PlayerJoin'
+import { playerSettingsMenu } from 'lib/Settings'
+import { mailMenu } from 'modules/Commands/mail'
+import { openBaseMenu } from 'modules/Features/baseMenu'
+import { questsMenu } from 'modules/Quests/questMenu'
+import { Anarchy } from '../Places/Anarchy'
+import { Spawn } from '../Places/Spawn'
+
+/**
+ * @param {InventoryTypeName} place
+ * @param {InventoryTypeName} inv
+ */
+function tp(place, inv, color = '§9', text = 'Спавн', extra = '') {
+  const here = inv === place
+  if (here) extra = `${extra ? extra + ' ' : ''}§8Вы тут`
+  if (extra) extra = '\n' + extra
+  const prefix = here ? '§7' : color
+  return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
+}
+
+// @ts-expect-error TS(2322) FIXME: Type '(player) => ActionForm' is not assignab... Remove this comment to see the full error message
+Menu.open = player => {
+  const inv = player.database.inv
+  const back = () => {
+    const menu = Menu.open(player)
+
+    // @ts-expect-error TS(2339) FIXME: Property 'show' does not exist on type 'true'.
+    if (menu) menu.show(player)
+  }
+
+  /** @type {ActionForm} */
+
+  // @ts-expect-error TS(2304) FIXME: Cannot find name 'Core'.
+  const form = new ActionForm(Core.name, '', '§c§u§s§r')
+    .addButton(tp('spawn', inv, '§9', 'Спавн'), 'textures/ui/worldsIcon', () => {
+      Spawn.portal?.teleport(player)
+    })
+    .addButton(tp('anarchy', inv, '§c', 'Анархия'), 'textures/blocks/tnt_side', () => {
+      Anarchy.portal?.teleport(player)
+    })
+    .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', back)
+    .addButton(
+      util.badge('Задания', player.database.quests?.active.length ?? 0),
+      'textures/ui/sidebar_icons/genre',
+      () => questsMenu(player, back),
+    )
+
+  if (player.database.inv === 'anarchy')
+    form
+      .addButton('База', 'textures/blocks/barrel_side', () =>
+        openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
+      )
+      .addButton('§6Кланы\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
+
+  form
+    .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
+    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/gear', () => mailMenu(player, back))
+    .addButton('§7Настройки', 'textures/ui/gear', () => playerSettingsMenu(player, back))
+
+  return form
+}
+
+Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
+  // @ts-expect-error TS(2339) FIXME: Property 'give' does not exist on type 'typeof Men... Remove this comment to see the full error message
+  if (firstJoin) Menu.give?.(player, { mode: 'ensure' })
+})
