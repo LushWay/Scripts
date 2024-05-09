@@ -1,9 +1,9 @@
 import { Player } from '@minecraft/server'
-
 import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
 import { util } from 'lib/util'
 import { FormCallback, showForm } from './utils'
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> {
   static arrayDefaultNone = 'Никакой'
 
@@ -52,7 +52,7 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
     this.args.push({ type: 'dropdown', options: options })
     this.form.dropdown(label, options, defaultValueIndex)
 
-    // @ts-expect-error huh
+    // @ts-expect-error AAAAAAAAAAAA
     return this
   }
 
@@ -107,7 +107,7 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
     this.args.push({ type: 'dropdown', options: objectKeys })
     this.form.dropdown(label, visibleKeys, defaultValueIndex)
 
-    // @ts-expect-error huh
+    // @ts-expect-error AAAAAAAAAAAA
     return this
   }
 
@@ -130,7 +130,7 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
     this.args.push({ type: 'slider' })
     this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue)
 
-    // @ts-expect-error huh
+    // @ts-expect-error AAAAAAAAAAAA
     return this
   }
 
@@ -144,7 +144,7 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
     this.args.push({ type: 'toggle' })
     this.form.toggle(label, defaultValue)
 
-    // @ts-expect-error huh
+    // @ts-expect-error AAAAAAAAAAAA
     return this
   }
 
@@ -158,12 +158,12 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
   addTextField(
     label: string,
     placeholderText: string,
-    defaultValue: string,
+    defaultValue?: string,
   ): ModalForm<AppendFormField<Callback, string>> {
     this.args.push({ type: 'textField' })
     this.form.textField(label, placeholderText, defaultValue)
 
-    // @ts-expect-error huh
+    // @ts-expect-error AAAAAAAAAAAA
     return this
   }
 

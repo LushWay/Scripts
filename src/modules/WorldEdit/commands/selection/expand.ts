@@ -12,7 +12,8 @@ export class SelectionManager {
    * @param {WorldEdit} builder
    * @returns {void}
    */
-  static expand(builder, amount) {
+
+  static expand(builder: WorldEdit, amount: number): void {
     const dx = builder.pos2.x - builder.pos1.x
     const dz = builder.pos2.z - builder.pos1.z
 
@@ -45,12 +46,12 @@ export class SelectionManager {
    * @param {WorldEdit} builder
    * @returns {void}
    */
-  static expandVert(builder, amount) {
+
+  static expandVert(builder: WorldEdit, amount: number): void {
     builder.pos2 = Vector.add(builder.pos2, new Vector(0, amount, 0))
   }
 }
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const expand = new Command('expand')
   .setGroup('we')
   .setDescription('Расширить выделенную зону во все стороны или вертикально')

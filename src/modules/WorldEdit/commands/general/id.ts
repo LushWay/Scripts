@@ -1,7 +1,6 @@
 import { Vector } from '@minecraft/server'
 import { util } from 'lib'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
 
 root.executes(ctx => {

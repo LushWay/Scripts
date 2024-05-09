@@ -4,10 +4,10 @@ import { WeakOnlinePlayerMap } from 'lib/WeakPlayerMap'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
+import { ActionForm } from './form/action'
 
 export class Menu {
-  /** @type {[string, string]} */
-  static settings = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
+  static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
 
   static createItem(typeId = CUSTOM_ITEMS.menu, name = '§b§lМеню\n§r§f(use)') {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
@@ -23,21 +23,18 @@ export class Menu {
 
   static item = this.createItem()
 
-  command
+  static command
 
-  give
+  static give
 
-  /** @private */
-  static init() {
+  static {
     const { give, command } = createPublicGiveItemCommand('menu', this.item, another => {
       if (another.typeId === this.item.typeId || another.typeId.startsWith('sm:compass')) return true
       return false
     })
 
-    // @ts-expect-error TS(2339) FIXME: Property 'give' does not exist on type 'typeof Men... Remove this comment to see the full error message
     this.give = give
 
-    // @ts-expect-error TS(2339) FIXME: Property 'command' does not exist on type 'typeof ... Remove this comment to see the full error message
     this.command = command
 
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -47,48 +44,38 @@ export class Menu {
       util.catch(() => {
         const menu = this.open(player)
 
-        // @ts-expect-error TS(2339) FIXME: Property 'show' does not exist on type 'true'.
         if (menu) menu.show(player)
       })
     })
   }
 
-  static open(player) {
+  static open(player: Player): ActionForm | false {
     new MessageForm('Меню выключено', 'Все еще в разработке').show(player)
 
     return false
   }
 }
 
-Menu.init()
-
 export class Compass {
   /**
    * Sets compass target for player to provided location
    *
-   * @param {Player} player - Player to set compass for
-   * @param {Vector3 | undefined} location - Compass target location. Use undefined to remove
+   * @param player - Player to set compass for
+   * @param location - Compass target location. Use undefined to remove
    */
-  static setFor(player, location) {
+  static setFor(player: Player, location: Vector3 | undefined) {
     if (location) this.players.set(player, location)
     else this.players.delete(player)
   }
 
-  /** @private */
-  static items = new Array(32).fill(null).map((_, i) => {
+  private static items = new Array(32).fill(null).map((_, i) => {
     return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель\n§r§7(use)')
   })
 
-  /**
-   * Map of player as key and compass target as value
-   *
-   * @private
-   * @type {WeakOnlinePlayerMap<Vector3>}
-   */
-  static players = new WeakOnlinePlayerMap()
+  /** Map of player as key and compass target as value */
+  private static players: WeakOnlinePlayerMap<Vector3> = new WeakOnlinePlayerMap()
 
-  /** @private */
-  static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
+  private static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
     const isMenu = slot.typeId === CUSTOM_ITEMS.menu
     if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && !isMenu) return
 
@@ -111,13 +98,7 @@ export class Compass {
     } catch (e) {}
   })
 
-  /**
-   * @private
-   * @param {Vector3} view
-   * @param {Vector3} origin
-   * @param {Vector3} target
-   */
-  static getCompassIndex(view, origin, target) {
+  private static getCompassIndex(view: Vector3, origin: Vector3, target: Vector3) {
     if (!Vector.valid(view)) return
     const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
     const ot = Vector.multiply(Vector.subtract(target, origin), { x: 1, y: 0, z: 1 }).normalized()
@@ -128,27 +109,18 @@ export class Compass {
   }
 }
 
-/**
- * @param {string} name
- * @param {ItemStack} itemStack
- * @param {ItemStack['is']} [is]
- */
-
-export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.bind(itemStack)) {
+export function createPublicGiveItemCommand(
+  name: string,
+  itemStack: ItemStack,
+  is: ItemStack['is'] = itemStack.is.bind(itemStack),
+) {
   const itemNameTag = itemStack.nameTag?.split('\n')[0]
 
-  /**
-   * Gives player an item
-   *
-   * @param {Player} player
-   * @param {object} [o]
-   * @param {'tell' | 'ensure'} [o.mode]
-   */
-  function give(player, { mode = 'tell' } = {}) {
+  /** Gives player an item */
+  function give(player: Player, { mode = 'tell' }: { mode?: 'tell' | 'ensure' } = {}) {
     const { container } = player
     if (!container) return
 
-    // @ts-expect-error TS(7031) FIXME: Binding element '_' implicitly has an 'any' type.
     const items = container.entries().filter(([_, item]) => item && is(item))
 
     if (mode === 'tell') {
@@ -166,7 +138,6 @@ export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.b
     }
   }
 
-  // @ts-expect-error TS(2552) FIXME: Cannot find name 'Command'. Did you mean 'command'... Remove this comment to see the full error message
   const command = new Command(name)
     .setDescription(`Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`)
     .setGroup('public')
@@ -177,11 +148,7 @@ export function createPublicGiveItemCommand(name, itemStack, is = itemStack.is.b
   return {
     give,
     command,
-    /**
-     * Alias to {@link give}(player, { mode: 'ensure' })
-     *
-     * @param {Player} player
-     */
-    ensure: player => give(player, { mode: 'ensure' }),
+    /** Alias to {@link give}(player, { mode: 'ensure' }) */
+    ensure: (player: Player) => give(player, { mode: 'ensure' }),
   }
 }

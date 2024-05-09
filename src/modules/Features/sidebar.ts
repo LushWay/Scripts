@@ -4,7 +4,6 @@ import { emoji } from 'lib/assets/emoji'
 import { Minigame } from 'modules/Minigames/Builder'
 import { Quest } from 'modules/Quests/lib/Quest'
 
-// @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
 const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
     name: 'Использовать меню',
@@ -41,8 +40,7 @@ const getSidebarSettings = Settings.player(...Menu.settings, {
   //   },
 })
 
-/** @type {Record<Player['database']['inv'], string>} */
-const inventoryDisplay = {
+const inventoryDisplay: Record<Player['database']['inv'], string> = {
   anarchy: 'Анархия',
   mg: 'Миниигра',
   spawn: 'Спавн',
@@ -63,6 +61,7 @@ const survivalSidebar = new Sidebar(
   {
     name: 'Server',
     getExtra: player => getSidebarSettings(player),
+
     getOptions(player, settings) {
       const main = `§l$${names.mode}§r§f$${names.region}`
 
@@ -81,23 +80,18 @@ const survivalSidebar = new Sidebar(
     },
   },
   {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     [names.mode]: player => inventoryDisplay[player.database.inv],
     [names.region]: (player, settings) => {
       let text = ''
       if (player.database.inv === 'anarchy') {
         const region = Region.locationInRegion(player.location, player.dimension.type)
         if (region) {
-          // @ts-expect-error TS(2339) FIXME: Property 'permissions' does not exist on type 'nev... Remove this comment to see the full error message
           if (!region.permissions.pvp) text = ' §aмирная зона§f'
 
-          // @ts-expect-error TS(2358) FIXME: The left-hand side of an 'instanceof' expression m... Remove this comment to see the full error message
           if (region instanceof SafeAreaRegion && region.safeAreaName) text += ' ' + region.safeAreaName
 
-          // @ts-expect-error TS(2358) FIXME: The left-hand side of an 'instanceof' expression m... Remove this comment to see the full error message
           if (region instanceof MineshaftRegion) text += ' шахта'
 
-          // @ts-expect-error TS(2358) FIXME: The left-hand side of an 'instanceof' expression m... Remove this comment to see the full error message
           if (region instanceof BaseRegion && region.getMemberRole(player.id)) text = ' §6ваша база'
         }
       }
@@ -122,8 +116,7 @@ const survivalSidebar = new Sidebar(
   },
 )
 
-/** @param {Player} player */
-export function showSurvivalHud(player) {
+export function showSurvivalHud(player: Player) {
   survivalSidebar.show(player)
 }
 
@@ -137,7 +130,6 @@ system.runPlayerInterval(
 
     const minigame = Minigame.getCurrent(player)
     if (minigame) {
-      // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
       minigame.showHud(player)
     } else {
       showSurvivalHud(player)

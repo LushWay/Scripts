@@ -40,7 +40,6 @@ function tpMenu(player: Player) {
     locations['Спавн'] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(`${name} §7(${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
       if (player.database.inv !== 'anarchy' && !isNotPlaying(player)) {
         return player.fail(
@@ -51,7 +50,6 @@ function tpMenu(player: Player) {
     })
   }
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   form.addButton('Телепорт к игроку...', () => tpToPlayer(player))
 
   return form.show(player)
@@ -64,7 +62,6 @@ function tpToPlayer(player: Player) {
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(`${getRoleAndName(p)}`, () => player.teleport(p.location))
   }
 

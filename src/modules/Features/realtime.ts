@@ -27,7 +27,6 @@ const settings = Settings.world('server', {
 
 system.runInterval(
   function syncRealTime() {
-    // @ts-expect-error TS(2339) FIXME: Property 'syncRealTime' does not exist on type '{}... Remove this comment to see the full error message
     if (settings.syncRealTime) world.setTimeOfDay(realTimeToMinecraftTicks())
   },
   'syncRealTime',

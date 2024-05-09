@@ -2,21 +2,18 @@ import { world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Region, util } from 'lib'
-import { actionGuard } from 'lib/Region/index'
+import { actionGuard } from 'lib/region/index'
 import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
 import { isBuilding } from 'modules/WorldEdit/isBuilding'
 
 export class Axe {
-  /** @type {string[]} */
-  static breaks = Object.entries(MinecraftBlockTypes)
+  static breaks: string[] = Object.entries(MinecraftBlockTypes)
     .filter(e => e[0].match(/log/i))
     .map(e => e[1])
 
-  /** @type {Region[]} */
-  static allowBreakInRegions = []
+  static allowBreakInRegions: Region[] = []
 }
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 actionGuard((_, region, ctx) => {
   if (
     ctx.type === 'break' &&
@@ -24,7 +21,6 @@ actionGuard((_, region, ctx) => {
     Axe.breaks.includes(ctx.event.block.typeId)
   ) {
     if (region) {
-      // @ts-expect-error TS(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
       if (Axe.allowBreakInRegions.includes(region)) return true
     } else return true
   }

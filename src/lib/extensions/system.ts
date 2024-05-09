@@ -33,12 +33,15 @@ expand(System.prototype, {
   sleep(time) {
     return new Promise(resolve => super.runInterval(resolve, time))
   },
+
   runInterval(...args) {
     return Timer('interval', super.runInterval.bind(this), ...args)
   },
+
   runTimeout(...args) {
     return Timer('timeout', super.runTimeout.bind(this), ...args)
   },
+
   runPlayerInterval(callback, ...args) {
     return Timer(
       'playerInterval',
@@ -50,6 +53,7 @@ expand(System.prototype, {
       ...args,
     )
   },
+
   delay(fn) {
     this.run(function delay() {
       util.catch(fn, 'system.delay')

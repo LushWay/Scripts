@@ -40,6 +40,7 @@ expand(ItemStack.prototype, {
 
     return this.clone()
   },
+
   is(item) {
     try {
       if (!item || !(item instanceof ItemStack)) return false

@@ -10,5 +10,5 @@ yarn-error.log
 !.yarn/sdks
 !.yarn/versions
 
-tools/last-update
-scripts/@minecraft/vanilla-data.js
+manifest.json
+scripts

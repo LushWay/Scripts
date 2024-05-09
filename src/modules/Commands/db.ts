@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { ROLES, getRole, util } from 'lib'
+import { FormCallback, ROLES, getRole, util } from 'lib'
 import { DynamicPropertyDB } from 'lib/database/properties'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
@@ -9,43 +9,26 @@ const db = new Command('db').setDescription('Просматривает базу
 
 db.executes(ctx => selectTable(ctx.player, true))
 
-/**
- * @param {Player} player
- * @param {true} [firstCall]
- */
-function selectTable(player, firstCall) {
+function selectTable(player: Player, firstCall?: true) {
   const form = new ActionForm('Таблицы данных')
   for (const key in DynamicPropertyDB.tables) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const DB = DynamicPropertyDB.tables[key]
     const name = `${key} §7${Object.keys(DB.proxy()).length}§r`
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(name, () => showTable(player, key))
   }
   form.show(player)
   if (firstCall) player.info('Закрой чат!')
 }
 
-/**
- * @param {Player} player
- * @param {string} table
- */
-function showTable(player, table) {
-  /** @type {DynamicPropertyDB<string, any>} */
-
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-  const DB = DynamicPropertyDB.tables[table]
+function showTable(player: Player, table: string) {
+  const DB: DynamicPropertyDB<string, any> = DynamicPropertyDB.tables[table]
   const proxy = DB.proxy()
 
   const menu = new ActionForm(`${table}`)
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   menu.addButton(ActionForm.backText, () => selectTable(player))
-
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   menu.addButton('§3Новое значение§r', () => {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     const form = new ModalForm('§3+Значение в §f' + table).addTextField('Ключ', ' ')
     const { newform, callback } = changeValue(form, null)
     newform.show(player, (_, key, input, type) => {
@@ -57,7 +40,6 @@ function showTable(player, table) {
     })
   })
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   menu.addButton('§3Посмотреть в §fRAW', () => {
     let raw = world.getDynamicProperty(DB.tableId)
     try {
@@ -65,18 +47,16 @@ function showTable(player, table) {
     } catch {}
 
     new ActionForm('§3RAW table §f' + table, util.inspect(raw))
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Oк', () => {
         showTable(player, table)
       })
       .show(player)
   })
 
-  /** @param {string} key */
-  const propertyForm = key => {
+  const propertyForm = (key: string) => {
     key = key + ''
     /** @type {any} */
-    let value
+    let value: any
     let failedToLoad = false
 
     try {
@@ -108,7 +88,6 @@ function showTable(player, table) {
       })
     })
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     AForm.addButton('§cУдалить§r', () => {
       delete proxy[key]
       system.delay(() => {
@@ -116,7 +95,6 @@ function showTable(player, table) {
       })
     })
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     AForm.addButton(ActionForm.backText, () => showTable(player, table))
 
     AForm.show(player)
@@ -127,24 +105,18 @@ function showTable(player, table) {
     let name = key
     if (table === 'player') {
       /** @type {typeof Player.database} */
-      const p = proxy
+      const p: typeof Player.database = proxy
 
-      // @ts-expect-error TS(2322) FIXME: Type 'string' is not assignable to type 'never'.
       name = `${p[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'}\n§8(${key})`
     }
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     menu.addButton(name, () => propertyForm(key))
   }
 
   menu.show(player)
 }
 
-/**
- * @param {ModalForm<(args_0, args_1: string) => void>} form
- * @param {any} value
- */
-function changeValue(form, value) {
+function changeValue(form: ModalForm<(ctx: FormCallback, args_0: string, args_1: string) => void>, value: any) {
   let type = typeof value
   const typeDropdown = ['string', 'number', 'boolean', 'object']
   if (value) typeDropdown.unshift('Оставить прежний §7(' + type + ')')
@@ -155,11 +127,7 @@ function changeValue(form, value) {
 
   return {
     newform,
-    callback: (
-      /** @type {any} */ input,
-      /** @type {string} */ inputType,
-      /** @type {(newValue) => void} */ onChange,
-    ) => {
+    callback: (input: any, inputType: string, onChange: (newValue: unknown) => void) => {
       let newValue = input
 
       if (
@@ -192,7 +160,6 @@ function changeValue(form, value) {
   }
 }
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const cmd = new Command('benchmark')
   .setDescription('Показывает время работы серверных систем')
   .setPermissions('techAdmin')

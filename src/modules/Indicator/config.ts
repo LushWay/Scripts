@@ -1,11 +1,6 @@
 export class HealthIndicatorConfig {
-  /**
-   * Array of player ids who wouldn't get pvp lock
-   *
-   * @type {string[]}
-   */
-  static disabled = []
+  /** Array of player ids who wouldn't get pvp lock */
+  static disabled: string[] = []
 
-  /** @type {Record<string, number>} */
-  static lockDisplay = {}
+  static lockDisplay: Record<string, number> = {}
 }

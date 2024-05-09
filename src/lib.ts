@@ -11,7 +11,7 @@ export * from 'lib/database/utils'
 // Command
 export * from 'lib/command/index'
 
-// Class
+// Lib
 export * from 'lib/roles'
 export * from 'lib/util'
 
@@ -36,15 +36,15 @@ export * from 'lib/Temporary'
 export * from 'lib/Zone'
 
 // Region
-export * from 'lib/Region/index'
+export * from 'lib/region/index'
 
 // Form
-export * from 'lib/form/npc'
 export * from 'lib/form/action'
 export * from 'lib/form/array'
 export * from 'lib/form/chest'
 export * from 'lib/form/message'
 export * from 'lib/form/modal'
+export * from 'lib/form/npc'
 export * from 'lib/form/utils'
 
 // Extension exports

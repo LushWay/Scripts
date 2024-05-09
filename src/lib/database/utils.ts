@@ -27,6 +27,7 @@ export class DatabaseUtils {
   private static getEntities() {
     return world.overworld
       .getEntities({ type: DatabaseUtils.entityTypeId })
+
       .map(entity => {
         const tableType = entity.getDynamicProperty('tableType')
         const tableName = entity.getDynamicProperty('tableName')
@@ -46,6 +47,7 @@ export class DatabaseUtils {
           index,
         }
       })
+
       .filter(e => e.tableName !== 'NOTDB')
   }
 
@@ -62,6 +64,7 @@ export class DatabaseUtils {
           type: DatabaseUtils.entityTypeId,
           maxDistance: 2,
         })
+
         .forEach(e => e.remove())
 
       world.overworld.runCommand(

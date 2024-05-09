@@ -6,6 +6,7 @@ export type Reward =
   | {
       type: 'scores'
       count: number
+
       score: import('@minecraft/server').ScoreName
     }
   | {

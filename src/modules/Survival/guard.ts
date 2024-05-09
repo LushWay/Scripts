@@ -1,5 +1,5 @@
 import { Join } from 'lib/PlayerJoin'
-import { INTERACTABLE_ENTITIES, actionGuard, loadRegionsWithGuards } from 'lib/Region/index'
+import { INTERACTABLE_ENTITIES, actionGuard, loadRegionsWithGuards } from 'lib/region/index'
 import { Spawn } from 'modules/Places/Spawn'
 import { isBuilding } from 'modules/WorldEdit/isBuilding'
 
@@ -49,7 +49,6 @@ loadRegionsWithGuards({
 Join.config.title_animation = {
   stages: ['» $title «', '»  $title  «'],
   vars: {
-    // @ts-expect-error TS(2304) FIXME: Cannot find name 'Core'.
     title: `${Core.name}§r§f`,
   },
 }

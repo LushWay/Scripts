@@ -1,6 +1,6 @@
 import { WorldEdit } from '../../lib/WorldEdit'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
+
 new Command('redo')
   .setGroup('we')
   .setDescription('Возвращает последнее действие (из памяти)')

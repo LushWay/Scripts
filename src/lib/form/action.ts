@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { prompt } from 'lib/form/message'
 import { util } from 'lib/util'

@@ -4,7 +4,7 @@ import { DynamicPropertyDB } from 'lib/database/properties'
 import { util } from 'lib/util'
 import { table } from './database/abstract'
 
-type LeaderboardInfo = {
+export type LeaderboardInfo = {
   style: keyof typeof Leaderboard.styles
   objective: string
   displayName: string
@@ -128,7 +128,9 @@ export class Leaderboard {
     let leaderboard = ``
     for (const [i, scoreInfo] of scoreboard
       .getScores()
+
       .sort((a, b) => b.score - a.score)
+
       .filter((_, i) => i < 10)
       .entries()) {
       const { pos: t, nick: n, score: s } = style
@@ -149,20 +151,20 @@ const immutable = DynamicPropertyDB.immutableUnproxy(Leaderboard.db)
 system.runInterval(
   () => {
     for (const [id, leaderboard] of Object.entries(immutable)) {
+      if (!leaderboard) continue
       const LB = Leaderboard.all[id]
 
       if (LB) {
         if (LB.entity.lifetimeState === EntityLifetimeState.Unloaded) continue
         LB.updateLeaderboard()
       } else {
-        // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
         const entity = world[leaderboard.dimension]
           .getEntities({
-            // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
             location: leaderboard.location,
             tags: [Leaderboard.tag],
             type: Leaderboard.entityId,
           })
+
           .find(e => e.id === id)
 
         if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded || !leaderboard) continue

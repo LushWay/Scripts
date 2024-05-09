@@ -5,8 +5,7 @@ import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
 import { WorldEditTool } from '../lib/WorldEditTool'
 
-/** @type {Record<string, string[]>} */
-const actions = {
+const actions: Record<string, string[]> = {
   Particle: ListParticles,
   Sound: ListSounds,
 }
@@ -15,10 +14,10 @@ new WorldEditTool({
   name: 'tool',
   itemStackId: CUSTOM_ITEMS.tool,
   displayName: 'инструмент',
+
   editToolForm(item, player) {
     const lore = item.getLore()
     new ActionForm('§3Инструмент', 'Настройте, что будет происходить при использовании инструмента.')
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Телепорт по взгляду', () => {
         item.nameTag = `§r§a► Телепорт по взгляду`
         lore[0] = 'teleportToView'
@@ -26,9 +25,7 @@ new WorldEditTool({
         item.setLore(lore)
         player.success(`Режим инструмента изменен на телепорт по взгляду`)
       })
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Выполнение команды', () => {
-        // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
         new ModalForm('§3Инструмент').addTextField('Команда', '/tp @s ^^^5').show(player, (_, command) => {
           if (command.startsWith('/')) command = command.substring(1)
 
@@ -40,7 +37,6 @@ new WorldEditTool({
           player.success(`Команда: §7${command}`)
         })
       })
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Проверка звуков', () => {
         SelectFromArray(ListSounds, '§3Звук', (sound, index) => {
           item.nameTag = `§r§3Звук`
@@ -52,7 +48,6 @@ new WorldEditTool({
           player.success(`Звук: §7${index} ${sound}`)
         })
       })
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Проверка партиклов', () => {
         SelectFromArray(ListParticles, '§3Партикл', (particle, index) => {
           item.nameTag = `§r§3Партикл`
@@ -71,11 +66,12 @@ new WorldEditTool({
      * @param {string} name
      * @param {(element: string, index: number) => void} callback
      */
-    function SelectFromArray(array, name, callback) {
+
+    function SelectFromArray(array: string[], name: string, callback: (element: string, index: number) => void) {
       new ModalForm(name)
-        // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
         .addTextField('ID Текстом', 'Будет выбран номер')
-        // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
         .addTextField('Номер', 'Будет выбран текст')
         .show(player, (ctx, text, num) => {
           const number = parseInt(num)
@@ -94,6 +90,7 @@ new WorldEditTool({
         })
     }
   },
+
   onUse(player) {
     const item = player.mainhand()
     const lore = item.getLore()
@@ -101,7 +98,6 @@ new WorldEditTool({
     const action = lore[0]
 
     if (action in actions) {
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       const list = actions[action]
       const num = Number(lore[2]) + (player.isSneaking ? -1 : 1)
       if (!list[num]) return player.fail('Список кончился')

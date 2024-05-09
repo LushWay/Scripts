@@ -1,4 +1,4 @@
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
+
 new Command('s')
   .setDescription('Выживание')
   .setPermissions('builder')
@@ -7,7 +7,7 @@ new Command('s')
     ctx.player.success('§aS')
   })
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
+
 new Command('c')
   .setAliases('с', 'gm1')
   .setDescription('Креатив')

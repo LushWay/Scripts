@@ -15,7 +15,7 @@ export const SETTINGS_GROUP_NAME = Symbol('name')
 
 type GroupNameObject = { [SETTINGS_GROUP_NAME]?: string }
 
-type SettingsConfig<T extends SettingValue = SettingValue> = Record<
+export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
   string,
   {
     name: string
@@ -76,13 +76,13 @@ export class Settings {
     this.insertGroup(
       'playerMap',
       groupName,
-      // @ts-expect-error Eeeeeee
+      // @ts-expect-error aaaaaaaaaa
       config,
     )
 
     const cache = new WeakPlayerMap({ removeOnLeave: true })
 
-    // @ts-expect-error AAAAAAAAAAAAAAA
+    // @ts-expect-error aaaaaaaaaa
     return player => {
       const cached = cache.get(player)
       if (cached) {
@@ -115,11 +115,11 @@ export class Settings {
     this.insertGroup(
       'worldMap',
       groupName,
-      // @ts-expect-error Gug
+      // @ts-expect-error aaaaaaaaaa
       config,
     )
 
-    // @ts-expect-error Eeeeeee
+    // @ts-expect-error aaaaaaaaaaaaaaaaa
     return this.parseConfig(Settings.worldDatabase, groupName, this.worldMap[groupName])
   }
 

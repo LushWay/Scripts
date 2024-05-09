@@ -2,7 +2,7 @@ import { ItemStack, system } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
-import { actionGuard } from 'lib/Region/index'
+import { actionGuard } from 'lib/region/index'
 import { TechCity } from 'modules/Places/TechCity'
 import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
 import { withState } from 'modules/WorldEdit/utils/blocksSet'
@@ -11,8 +11,7 @@ const [quartzTypeId, states] = withState(MinecraftBlockTypes.QuartzBlock, {
   chisel_type: 'smooth',
 })
 
-/** @type {Record<string, number>} */
-const HoeEffectLevels = {
+const HoeEffectLevels: Record<string, number> = {
   [MinecraftItemTypes.WoodenHoe]: 1,
   [MinecraftItemTypes.StoneHoe]: 1,
   [MinecraftItemTypes.IronHoe]: 2,
@@ -26,7 +25,7 @@ system.runPlayerInterval(
     const { typeId } = player.mainhand()
 
     // TODO Maybe check for region or inv type
-    if (typeId && typeId in HoeEffectLevels) {
+    if (typeId && util.isKeyof(typeId, HoeEffectLevels)) {
       player.addEffect(MinecraftEffectTypes.Haste, 2, {
         amplifier: HoeEffectLevels[typeId],
         showParticles: false,
@@ -37,16 +36,17 @@ system.runPlayerInterval(
   2,
 )
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 actionGuard((player, region, ctx) => {
   // TODO Maybe allow breaking quartz outside of the region
   if (
     ctx.type !== 'break' ||
     region !== TechCity.safeArea ||
     // Check block
+
     ctx.event.block.typeId !== quartzTypeId ||
     ctx.event.block.permutation.getState('chisel_type') !== 'smooth' ||
     // Check item
+
     !ctx.event.itemStack?.typeId ||
     !(ctx.event.itemStack?.typeId in HoeEffectLevels)
   )
@@ -54,8 +54,11 @@ actionGuard((player, region, ctx) => {
 
   scheduleBlockPlace({
     dimension: ctx.event.dimension.type,
+
     location: ctx.event.block.location,
+
     typeId: ctx.event.block.typeId,
+
     states: ctx.event.block.permutation.getAllStates(),
     restoreTime: util.ms.from('min', 2),
   })

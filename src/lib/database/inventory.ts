@@ -8,7 +8,7 @@ const tableType = 'inventory'
 
 type Equipment = Exclude<keyof typeof EquipmentSlot, 'mainhand'>
 
-type Inventory = {
+export type Inventory = {
   slots: Record<string, ItemStack>
   equipment: Partial<Record<Equipment, ItemStack>>
   xp: number
@@ -196,7 +196,7 @@ export class InventoryStore {
       }
 
       const { type, index } = slots[step]
-      // @ts-expect-error GGGGG
+      // @ts-expect-error AAAAAAAAAAAAAAAA
       store[type][index] = item
 
       step++

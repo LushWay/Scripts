@@ -2,11 +2,10 @@ import { system } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { EditableLocation, SafeAreaRegion } from 'lib'
-import { actionGuard } from 'lib/Region/index'
+import { actionGuard } from 'lib/region/index'
 
 export class DefaultPlaceWithSafeArea {
-  /** @type {DefaultPlaceWithSafeArea[]} */
-  static places = []
+  static places: DefaultPlaceWithSafeArea[] = []
 
   name
 
@@ -16,12 +15,11 @@ export class DefaultPlaceWithSafeArea {
 
   portalTeleportsTo
 
-  safeArea
+  safeArea: SafeAreaRegion
 
   safeAreaLocation
 
-  /** @param {string} name */
-  constructor(name) {
+  constructor(name: string) {
     this.name = name
     this.portalTeleportsTo = new EditableLocation(name + ' портал телепортирует на', { type: 'vector3+rotation' }).safe
     this.portalPos2 = new EditableLocation(name + ' портал от', { type: 'vector3' }).safe
@@ -37,13 +35,11 @@ export class DefaultPlaceWithSafeArea {
       })
     })
 
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'this' is not assignable to param... Remove this comment to see the full error message
     DefaultPlaceWithSafeArea.places.push(this)
   }
 }
 
 system.delay(() => {
-  // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
   actionGuard((_, region, ctx) => {
     if (
       ctx.type === 'interactWithBlock' &&

@@ -3,9 +3,9 @@ import { ItemStack, Player, TicksPerSecond, Vector, system, world } from '@minec
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
 import { MoneyCost } from 'lib/Cost'
-import { actionGuard } from 'lib/Region/index'
 import { Store } from 'lib/Store'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { table } from 'lib/database/abstract'
+import { actionGuard } from 'lib/region/index'
 import { StoneQuarry } from '../Places/StoneQuarry/StoneQuarry'
 
 export class Furnacer {
@@ -14,7 +14,7 @@ export class Furnacer {
    *
    * @type {Furnacer[]}
    */
-  static npcs = []
+  static npcs: Furnacer[] = []
 
   furnaceTypeIds
 
@@ -30,7 +30,7 @@ export class Furnacer {
    *
    * @type {ItemStack[]}
    */
-  keyItemLevels = []
+  keyItemLevels: ItemStack[] = []
 
   /**
    * Creates new Furnaceer npc store
@@ -40,8 +40,16 @@ export class Furnacer {
    * @param {string[]} options.furnaceTypeIds - Type ids of the furnace blocks
    * @param {boolean} options.onlyInStoneQuarry - Whenether to allow using this type of furnace outside Stone quarry
    */
-  constructor({ furnaceTypeIds, onlyInStoneQuarry, npc: npcOptions }) {
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'this' is not assignable to param... Remove this comment to see the full error message
+
+  constructor({
+    furnaceTypeIds,
+    onlyInStoneQuarry,
+    npc: npcOptions,
+  }: {
+    npc: Omit<import('lib/EditableNpc').EditableNpcProps, 'onInteract'>
+    furnaceTypeIds: string[]
+    onlyInStoneQuarry: boolean
+  }) {
     Furnacer.npcs.push(this)
 
     this.furnaceTypeIds = furnaceTypeIds
@@ -65,12 +73,11 @@ export class Furnacer {
   }
 }
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 actionGuard((player, region, ctx) => {
   // Not our event
+
   if (ctx.type !== 'interactWithBlock') return
 
-  // @ts-expect-error TS(2339) FIXME: Property 'furnaceTypeIds' does not exist on type '... Remove this comment to see the full error message
   const furnaceer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))
   if (!furnaceer) return
 
@@ -85,12 +92,13 @@ actionGuard((player, region, ctx) => {
 
   if (!ctx.event.itemStack) return notAllowed()
 
-  // @ts-expect-error TS(2339) FIXME: Property 'keyItem' does not exist on type 'never'.
   if (ctx.event.itemStack.typeId !== furnaceer.keyItem.typeId) return notAllowed()
+
   const lore = FurnaceKeyItem.parseLore(ctx.event.itemStack.getLore())
   if (!lore) return notAllowed()
 
   const blockId = Vector.string(ctx.event.block)
+
   const furnace = FurnaceKeyItem.db[blockId]
 
   // Access allowed
@@ -120,9 +128,11 @@ actionGuard((player, region, ctx) => {
         lastPlayerId: player.id,
       }
       player.success('Ключ теперь привязан к этой печке! Не забудьте забрать из нее ресурсы через час!')
+
       ctx.event.itemStack?.setLore(
         FurnaceKeyItem.stringifyLore({ ...lore, status: 'inUse', location: Vector.string(ctx.event.block.location) }),
       )
+
       player.mainhand().setItem(ctx.event.itemStack)
     })
 
@@ -135,23 +145,19 @@ system.runInterval(
   () => {
     let players
     for (const [key, furnace] of Object.entries(FurnaceKeyItem.db)) {
-      // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
+      if (!furnace) continue
       if (furnace.warnedAboutExpire) continue
 
-      // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
       const untilExpire = furnace.expires - Date.now()
       if (untilExpire < util.ms.from('min', 5)) {
         players ??= world.getAllPlayers()
 
-        // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
         const player = players.find(e => e.id === furnace.lastPlayerId)
         if (player) {
           player.warn(
-            // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
             `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`,
           )
 
-          // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
           furnace.warnedAboutExpire = 1
         }
       } else if (untilExpire < 0) {
@@ -163,21 +169,21 @@ system.runInterval(
   TicksPerSecond * 5,
 )
 
+type FurnaceKeyInfo = {
+  code: string
+  status: keyof (typeof FurnaceKeyItem)['status']
+  location?: string
+  lastPlayerId?: string
+  lastPlayerName?: string
+}
+
 class FurnaceKeyItem {
-  static db = new DynamicPropertyDB('furnaceKeys', {
-    /**
-     * @type {Record<
-     *   string,
-     *   {
-     *     expires: number
-     *     code: string
-     *     lastPlayerId: string
-     *     warnedAboutExpire?: 1
-     *   }
-     * >}
-     */
-    type: {},
-  }).proxy()
+  static db = table<{
+    expires: number
+    code: string
+    lastPlayerId: string
+    warnedAboutExpire?: 1
+  }>('furnaceKeys')
 
   static status = {
     notUsed: '§r§aНе использован',
@@ -193,22 +199,13 @@ class FurnaceKeyItem {
   }
 
   /**
-   * @typedef {{
-   *   code: string
-   *   status: keyof (typeof FurnaceKeyItem)['status']
-   *   location?: string
-   *   lastPlayerId?: string
-   *   lastPlayerName?: string
-   * }} FurnaceKeyInfo
-   */
-
-  /**
    * Stringifies info into an array of strings that represent information about a key, including its code, location, and
    * status.
    *
-   * @param {FurnaceKeyInfo} key - Key info
+   * @param key - Key info
    */
-  static stringifyLore(key) {
+
+  static stringifyLore(key: FurnaceKeyInfo) {
     const name = key.lastPlayerName || (key.lastPlayerId ? Player.name(key.lastPlayerId) : undefined)
     return [
       ...util.wrapLore('§7Ключ от печки в технограде. Используйте его чтобы открыть печку'),
@@ -217,7 +214,6 @@ class FurnaceKeyItem {
       key.location ? this.strings.location + key.location : ' ',
       name ? this.strings.player + name : '',
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       this.status[key.status],
     ].filter(e => e !== '')
   }
@@ -225,13 +221,13 @@ class FurnaceKeyItem {
   /**
    * Parses provided item lore into key object
    *
-   * @param {string[]} lore - Lore to parse
-   * @returns {FurnaceKeyInfo | false} - False if lore is invalid and key object otherwise
+   * @param lore - Lore to parse
+   * @returns - False if lore is invalid and key object otherwise
    */
-  static parseLore(lore) {
+
+  static parseLore(lore: string[]): FurnaceKeyInfo | false {
     let code = ''
-    /** @type {undefined | keyof (typeof FurnaceKeyItem)['status']} */
-    let status
+    let status: undefined | keyof (typeof FurnaceKeyItem)['status']
     let location
     let lastPlayerName
     for (const line of lore) {

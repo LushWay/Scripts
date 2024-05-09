@@ -1,70 +1,44 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/EventSignal'
-import { REGION_DB } from 'lib/Region/DB'
-import { DEFAULT_REGION_PERMISSIONS } from 'lib/Region/config'
 import { WeakPlayerMap } from 'lib/WeakPlayerMap'
 import { DatabaseUtils } from 'lib/database/utils'
+import { REGION_DB } from 'lib/region/DB'
+import { DEFAULT_REGION_PERMISSIONS } from 'lib/region/config'
 import { util } from 'lib/util'
+
+export type RegionPlayerRole = 'owner' | 'member' | false
 
 /** Main class that represents protected region in the world. */
 export class Region {
-  /**
-   * Regions list
-   *
-   * @type {Region[]}
-   */
-  static regions = []
+  /** Regions list */
+  static regions: Region[] = []
 
-  /**
-   * @template {typeof Region} R
-   * @param {R} type
-   * @returns {InstanceType<R>[]}
-   */
-  static regionInstancesOf(type) {
-    // @ts-expect-error TS(2358) FIXME: The left-hand side of an 'instanceof' expression m... Remove this comment to see the full error message
-    return this.regions.filter(e => e instanceof type)
+  static regionInstancesOf<R extends typeof Region>(type: R): InstanceType<R>[] {
+    return this.regions.filter((e => e instanceof type) as (e: Region) => e is InstanceType<R>)
   }
 
-  /** @type {WeakPlayerMap<Region[]>} */
-  static playerInRegionsCache = new WeakPlayerMap({ removeOnLeave: true })
+  static playerInRegionsCache: WeakPlayerMap<Region[]> = new WeakPlayerMap({ removeOnLeave: true })
 
-  /**
-   * Event that triggers when player regions have changed. Interval 1 second
-   *
-   * @type {EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>}
-   */
-  static onPlayerRegionsChange = new EventSignal()
+  /** Event that triggers when player regions have changed. Interval 1 second */
+  static onPlayerRegionsChange: EventSignal<{ player: Player; previous: Region[]; newest: Region[] }> =
+    new EventSignal()
 
-  static onEnter(region, callback) {
+  static onEnter(region: Region, callback: PlayerCallback) {
     this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
       if (!previous.includes(region) && newest.includes(region)) callback(player)
     })
   }
 
-  /**
-   * Returns nearest and more prioritizet region
-   *
-   * @param {Vector3} blockLocation
-   * @param {Dimensions} dimensionId
-   * @returns {Region | undefined}
-   */
-  static locationInRegion(blockLocation, dimensionId) {
+  /** Returns nearest and more prioritizet region */
+  static locationInRegion(blockLocation: Vector3, dimensionId: Dimensions): Region | undefined {
     return this.nearestRegions(blockLocation, dimensionId)[0]
   }
 
-  /**
-   * Returns regions that location is in and sorts them by priority
-   *
-   * @param {Vector3} blockLocation
-   * @param {Dimensions} dimensionId
-   */
-  static nearestRegions(blockLocation, dimensionId) {
+  /** Returns regions that location is in and sorts them by priority */
+  static nearestRegions(blockLocation: Vector3, dimensionId: Dimensions) {
     const regions = this === Region ? this.regions : this.regionInstancesOf(this)
 
-    // @ts-expect-error TS(2339) FIXME: Property 'dimensionId' does not exist on type 'nev... Remove this comment to see the full error message
     const c1 = regions.filter(region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation))
-
-    // @ts-expect-error TS(2339) FIXME: Property 'priority' does not exist on type 'never'... Remove this comment to see the full error message
     const c2 = c1.sort((a, b) => b.priority - a.priority)
 
     return c2
@@ -72,26 +46,14 @@ export class Region {
 
   priority = 0
 
-  /**
-   * Region dimension
-   *
-   * @type {Dimensions}
-   */
-  dimensionId
+  /** Region dimension */
+  dimensionId: Dimensions
 
-  /**
-   * Unique region key
-   *
-   * @type {string}
-   */
-  key
+  /** Unique region key */
+  key: string
 
-  /**
-   * Region permissions
-   *
-   * @type {RegionPermissions}
-   */
-  permissions
+  /** Region permissions */
+  permissions: RegionPermissions
 
   /** Permissions used by default */
   defaultPermissions = DEFAULT_REGION_PERMISSIONS
@@ -104,30 +66,29 @@ export class Region {
    * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
    * @param {string} [o.key] - The key of the region. This is used to identify the region.
    */
-  constructor({ dimensionId, key }) {
+  constructor({
+    dimensionId,
+    key,
+  }: {
+    dimensionId: Dimensions
+    permissions?: Partial<RegionPermissions>
+    key?: string
+  }) {
     this.dimensionId = dimensionId
     this.key = key ?? new Date(Date.now()).toISOString()
   }
 
-  /**
-   * Sets the region permissions based on the permissions and the default permissions
-   *
-   * @param {object} o
-   * @param {Partial<RegionPermissions> | undefined} [o.permissions]
-   * @param {boolean} [o.creating]
-   * @param {typeof Region} region
-   */
-  init({ permissions, creating = true }, region) {
+  /** Sets the region permissions based on the permissions and the default permissions */
+  init(
+    { permissions, creating = true }: { permissions?: Partial<RegionPermissions> | undefined; creating?: boolean },
+    region: typeof Region,
+  ) {
     this.permissions = DatabaseUtils.setDefaults(permissions ?? {}, this.defaultPermissions)
     if (creating) this.update(region)
   }
 
-  /**
-   * Checks if the vector is in the region
-   *
-   * @param {Vector3} vector
-   */
-  vectorInRegion(vector) {
+  /** Checks if the vector is in the region */
+  vectorInRegion(vector: Vector3) {
     // See the implementation in the sub class
     return false
   }
@@ -142,15 +103,12 @@ export class Region {
     return this.ownerName ?? new Date(this.key).format()
   }
 
-  /** @typedef {'owner' | 'member' | false} RegionPlayerRole */
-
   /**
    * Returns region role of specified player
    *
-   * @param {string | Player} playerOrId
-   * @returns {RegionPlayerRole}
+   * @param playerOrId
    */
-  getMemberRole(playerOrId) {
+  getMemberRole(playerOrId: string | Player): RegionPlayerRole {
     const id = playerOrId instanceof Player ? playerOrId.id : playerOrId
     if (this.permissions.owners[0] === id) return 'owner'
     if (this.permissions.owners.includes(id)) return 'member'
@@ -160,18 +118,18 @@ export class Region {
   /**
    * Checks if a player with a given `playerId` is a member of the region
    *
-   * @param {string} playerId - The id of the player
+   * @param playerId - The id of the player
    */
-  isMember(playerId) {
+  isMember(playerId: string) {
     return !!this.getMemberRole(playerId)
   }
 
   /**
    * A function that will loop through all the owners of a region and call the callback function on each of them.
    *
-   * @param {Parameters<Player[]['forEach']>[0]} callback - Callback to run
+   * @param callback - Callback to run
    */
-  forEachOwner(callback) {
+  forEachOwner(callback: Parameters<Player[]['forEach']>[0]) {
     const onlineOwners = []
     for (const ownerId of this.permissions.owners) {
       const player = Player.getById(ownerId)
@@ -192,7 +150,6 @@ export class Region {
 
   /** Removes this region */
   delete() {
-    // @ts-expect-error TS(2339) FIXME: Property 'key' does not exist on type 'never'.
     Region.regions = Region.regions.filter(e => e.key !== this.key)
     delete REGION_DB[this.key]
   }

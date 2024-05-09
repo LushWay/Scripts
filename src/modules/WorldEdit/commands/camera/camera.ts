@@ -4,23 +4,17 @@ import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { ActionForm, ModalForm, util } from 'lib'
 import { parseArguments, parseLocationArguments } from '../../../../lib/command/utils'
 
-/** @typedef {'spinAroundPos'} CameraDBModes */
+export type CameraDBModes = 'spinAroundPos'
 
 const CAMERA = {
   TYPES: ['minecraft:free'],
-  /** @type {EasingType[]} */
-  EASE: [EasingType.Linear],
-  /** @type {Record<CameraDBModes, string>} */
+  EASE: [EasingType.Linear] as EasingType[],
   MODES: {
     spinAroundPos: 'Крутится вокруг позиции',
-  },
+  } as Record<CameraDBModes, string>,
 }
 
-/**
- * @param {Player} player
- * @param {Player} target
- */
-function setupCameraForm(player, target) {
+function setupCameraForm(player: Player, target: Player) {
   const data = target.database
 
   new ModalForm('§3Настройки камеры §f' + target.name)
@@ -29,12 +23,13 @@ function setupCameraForm(player, target) {
       defaultValue: EasingType.Linear,
     })
     .addSlider('Длительность движения в секундах', 0, 100, 1, 1)
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
     .addTextField('Координаты центральной позиция (~ разрешены)', '0 ~1 0')
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
     .addTextField('Позиция куда камера будет повернута (либо игрок в меню ниже)', '0 ~1 0')
     .addDropdownFromObject(
       'Игрок к которому камера будет повернута (либо позиция в меню выше)',
+
       Object.fromEntries(world.getAllPlayers().map(e => [e.name, e.name])),
       { none: true },
     )
@@ -74,16 +69,14 @@ function setupCameraForm(player, target) {
 }
 
 /** @type {Record<string, number>} */
-const intervales = {}
+const intervales: Record<string, number> = {}
 
 /** @param {Player} player */
-function createCameraInteval(player) {
+function createCameraInteval(player: Player) {
   if (!player.database.camera) return
 
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   if (intervales[player.id]) system.clearRun(intervales[player.id])
 
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   intervales[player.id] = system.runInterval(
     () => {
       const data = player.database
@@ -135,13 +128,11 @@ for (const player of world.getAllPlayers()) createCameraInteval(player)
 world.afterEvents.playerSpawn.subscribe(({ player }) => createCameraInteval(player))
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   if (playerId in intervales) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     system.clearRun(intervales[playerId])
     Reflect.deleteProperty(intervales, playerId)
   }
 })
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const cmd = new Command('camera').setPermissions('techAdmin')
 cmd.executes(ctx => selectPlayerForm(ctx.player))
 cmd.overload('reset').executes(ctx => {
@@ -149,15 +140,12 @@ cmd.overload('reset').executes(ctx => {
   delete ctx.player.database.camera
 })
 
-/** @param {Player} player */
-function selectPlayerForm(player) {
+function selectPlayerForm(player: Player) {
   const form = new ActionForm('§3Выбери игрока')
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   form.addButton('§3' + player.name, () => setupCameraForm(player, player))
 
   for (const target of world.getAllPlayers().filter(e => e.id !== player.id)) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(target.name, () => setupCameraForm(player, target))
   }
   form.show(player)

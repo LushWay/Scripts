@@ -401,7 +401,6 @@ export const util = {
       return function end(string) {
         const tookTime = Date.now() - startTime
 
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         const typeresults = (util.benchmark.results[type] ??= {})
         typeresults[label] = ((typeresults[label] ?? 0) + tookTime) / 2
         if (string) console.debug(`${string}§r §6+${tookTime}ms`)
@@ -409,8 +408,7 @@ export const util = {
       }
     },
     {
-      /** @type {Record<string, Record<string, number>>} */
-      results: {},
+      results: {} as Record<string, Record<string, number>>,
     },
   ),
 
@@ -426,6 +424,10 @@ export const util = {
 
   isKeyof<O extends Record<string | symbol | number, any>>(str: string | symbol | number, obj: O): str is keyof O {
     return str in obj
+  },
+
+  nonNullable<T>(value: T): value is NonNullable<T> {
+    return typeof value !== 'undefined' && value !== null
   },
 
   /**

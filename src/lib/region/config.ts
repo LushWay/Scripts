@@ -1,5 +1,4 @@
 import { BlockTypes } from '@minecraft/server'
-
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 
@@ -29,10 +28,8 @@ export const BLOCK_CONTAINERS = [
 /**
  * The default permissions for all regions made To edit each region type permissions, e.g. MineshaftRegion or
  * SafeAreaRegion permissions - edit defaultPermissions property in the class directly
- *
- * @type {RegionPermissions}
  */
-export const DEFAULT_REGION_PERMISSIONS = {
+export const DEFAULT_REGION_PERMISSIONS: RegionPermissions = {
   doorsAndSwitches: true,
   openContainers: true,
   pvp: false,
@@ -40,12 +37,8 @@ export const DEFAULT_REGION_PERMISSIONS = {
   owners: [],
 }
 
-/**
- * With this entities player can interact (e.g. npc, custom buttons, etc)
- *
- * @type {string[]}
- */
-export const INTERACTABLE_ENTITIES = [MinecraftEntityTypes.Npc]
+/** With this entities player can interact (e.g. npc, custom buttons, etc) */
+export const INTERACTABLE_ENTITIES: string[] = [MinecraftEntityTypes.Npc]
 
 /**
  * System entities like database, floating text, sit and other which are not affected by health bar display, region

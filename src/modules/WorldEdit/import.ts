@@ -17,8 +17,8 @@ import './commands/selection/size'
 
 import './commands/region/set'
 
-import './commands/clipboard/copy'
-import './commands/clipboard/paste'
+import './commands/region/clipboard/copy'
+import './commands/region/clipboard/paste'
 
 import './tools/brush'
 import './tools/clipboard'

@@ -1,33 +1,28 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
-import { system, world } from '@minecraft/server'
+import { Entity, system, world } from '@minecraft/server'
 import { LootTable } from 'lib/LootTable'
-import { BossArenaRegion } from 'lib/Region/index'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { BossArenaRegion, Region } from 'lib/region/index'
 import { EditableLocation } from './EditableLocation'
 import { chunkIsUnloaded } from './GameUtils'
+import { table } from './database/abstract'
 
-/**
- * @typedef {{
- *   id: string
- *   date: number
- *   dead: boolean
- * }} BossDB
- */
+type BossDB = {
+  id: string
+  date: number
+  dead: boolean
+}
 
 export class Boss {
   /** Boss Database. Contains meta information about spawned boss entities */
-  static db = new DynamicPropertyDB('boss', {
-    /** @type {Record<string, BossDB | undefined>} */
-    type: {},
-  }).proxy()
+  static db = table<BossDB>('boss')
 
   /**
    * List of all registered boss types
    *
    * @type {Boss[]}
    */
-  static types = []
+  static types: Boss[] = []
 
   arenaRadius
 
@@ -37,7 +32,7 @@ export class Boss {
 
   displayName
 
-  entity
+  entity: Entity | undefined
 
   entityTypeId
 
@@ -47,18 +42,15 @@ export class Boss {
 
   name
 
-  region
+  region: Region
 
   respawnTime
 
-  /** @private */
-  static init() {
+  static {
     world.afterEvents.entityDie.subscribe(data => {
-      // @ts-expect-error TS(2339) FIXME: Property 'entity' does not exist on type 'never'.
       Boss.types.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
     })
 
-    // @ts-expect-error TS(2339) FIXME: Property 'check' does not exist on type 'never'.
     system.runInterval(() => Boss.types.forEach(e => e.check()), 'boss respawn', 40)
   }
 
@@ -82,6 +74,15 @@ export class Boss {
     arenaRadius = 10,
     dimensionId = 'overworld',
     loot,
+  }: {
+    name: string
+    entityTypeId: string
+    displayName: string
+    respawnTime: number
+    bossEvent?: boolean
+    arenaRadius?: number
+    loot: LootTable
+    dimensionId?: Dimensions
   }) {
     this.name = name
     this.dimensionId = dimensionId
@@ -107,7 +108,6 @@ export class Boss {
       })
     })
 
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'this' is not assignable to param... Remove this comment to see the full error message
     Boss.types.push(this)
   }
 
@@ -130,7 +130,8 @@ export class Boss {
   }
 
   /** @param {BossDB} db */
-  checkRespawnTime(db) {
+
+  checkRespawnTime(db: BossDB) {
     if (Date.now() > db.date + this.respawnTime) this.spawnEntity()
   }
 
@@ -147,6 +148,7 @@ export class Boss {
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
 
     // Save to database
+
     Boss.db[this.name] = {
       id: this.entity.id,
       date: Date.now(),
@@ -159,13 +161,15 @@ export class Boss {
    *
    * @param {BossDB} db
    */
-  ensureEntity(db) {
+
+  ensureEntity(db: BossDB) {
     const entity = world[this.dimensionId]
       .getEntities({
         type: this.entityTypeId,
         // location: this.location,
         // maxDistance: this.areaRadius,
       })
+
       .find(e => e.id === db.id)
 
     if (!entity) {
@@ -180,6 +184,7 @@ export class Boss {
     console.debug(`Boss(${this.name}).onDie()`)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
+
     Boss.db[this.name] = {
       id: '',
       date: Date.now(),
@@ -188,10 +193,9 @@ export class Boss {
 
     if (dropLoot) {
       world.say('§6Убит босс §f' + this.displayName + '!')
+
       this.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
       // TODO Give money depending on how many hits etc
     }
   }
 }
-
-Boss.init()

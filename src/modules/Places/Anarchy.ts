@@ -7,15 +7,13 @@ import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 import { DefaultPlaceWithInventory } from './Default/WithInventory'
 
 class AnarchyBuilder extends DefaultPlaceWithInventory {
-  portal
+  portal: Portal | undefined
 
-  zone
+  zone: Zone | undefined
 
-  /** @param {Player} player */
-  learningRTP(player) {}
+  learningRTP(player: Player) {}
 
-  /** @type {InventoryTypeName} */
-  inventoryName = 'anarchy'
+  inventoryName: InventoryTypeName = 'anarchy'
 
   centerLocation = new EditableLocation('anarchy_center').safe
 
@@ -26,30 +24,28 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
   constructor() {
     super()
 
-    // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
     this.centerLocation.onLoad.subscribe(centerLocation => {
       this.zone = new Zone(centerLocation, players => players.length * 50)
 
       if (centerLocation.firstLoad)
-        // @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
         new Command('radius')
           .setDescription('Выдает радиус границы анархии сейчас')
           .setGroup('public')
           .setPermissions('member')
           .executes(ctx => {
-            ctx.player.info(`Радиус границы анархии сейчас: ${this.zone.lastRadius}`)
+            ctx.player.info(`Радиус границы анархии сейчас: ${this.zone!.lastRadius}`)
           })
     })
 
     console.debug('Anarchy init')
 
-    // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
     this.portalLocation.onLoad.subscribe(portalLocation => {
       // console.debug('Portal load', Vector.string(portalLocation))
       this.portal = new Portal(
         'anarchy',
         Vector.add(portalLocation, { x: 0, y: -1, z: -1 }),
         Vector.add(portalLocation, { x: 0, y: 1, z: 1 }),
+
         player => {
           if (isNotPlaying(player)) return tpMenuOnce(player)
 
@@ -93,8 +89,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     })
   }
 
-  /** @param {Player} player */
-  loadInventory(player) {
+  loadInventory(player: Player) {
     super.loadInventory(player, () => {
       if (this.inventoryStore.has(player.id)) {
         console.log('loading saved inv for', player.name)
@@ -112,15 +107,13 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     })
   }
 
-  /** @type {DefaultPlaceWithInventory['saveInventory']} */
-  saveInventory(player) {
+  saveInventory: DefaultPlaceWithInventory['saveInventory'] = player => {
     this.inventoryStore.saveFrom(player, {
       rewrite: true,
       keepInventory: false,
     })
     const inv = this.inventoryStore.get(player.id, { remove: false })
 
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     console.log('Saved inv', inv ? Object.entries(inv.slots).map(e => e[1] && e[0] + ' ' + e[1].typeId) : inv)
 
     // Do not save location if on spawn
@@ -134,6 +127,4 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 }
 
 // TODO Newbie savemode
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Anarchy = new AnarchyBuilder()

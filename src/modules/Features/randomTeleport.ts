@@ -10,7 +10,7 @@ const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
 RTP_ELYTRA.lockMode = ItemLockMode.slot
 
 /** @type {Set<string>} */
-const IN_SKY = new Set()
+const IN_SKY: Set<string> = new Set()
 new LockAction(player => IN_SKY.has(player.id), '§cВ начале коснитесь земли!')
 
 /**
@@ -35,11 +35,12 @@ new LockAction(player => IN_SKY.has(player.id), '§cВ начале коснит
  * @returns {Vector3}
  */
 
-// @ts-expect-error TS(7023) FIXME: 'randomTeleport' implicitly has return type 'any' ... Remove this comment to see the full error message
 export function randomTeleport(
-  target,
-  from,
-  to,
+  target: Player,
+
+  from: Vector3,
+
+  to: Vector3,
   {
     y = 150,
     dimension = 'overworld',
@@ -48,8 +49,16 @@ export function randomTeleport(
     c = 0,
     teleportCallback = () => {},
     keepInSkyTime = 5,
+  }: {
+    y?: number
+    fromYtoBlock?: number
+    dimension?: Dimensions
+    elytra?: boolean
+    c?: number
+    teleportCallback?: (location: Vector3) => void
+    keepInSkyTime?: number
   },
-) {
+): Vector3 {
   const x = Math.randomInt(from.x, to.x)
   const z = Math.randomInt(from.z, to.z)
 
@@ -83,7 +92,6 @@ export function randomTeleport(
     },
   )
 
-  // @ts-expect-error TS(2554) FIXME: Expected 0 arguments, but got 1.
   util.catch(() => teleportCallback({ x, y, z }))
   IN_SKY.add(target.id)
 
@@ -115,8 +123,7 @@ export function randomTeleport(
   return { x, y, z }
 }
 
-/** @param {Player} player */
-function giveElytra(player, c = 5) {
+function giveElytra(player: Player, c = 5) {
   const slot = player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Chest)
 
   if (!slot) return
@@ -154,7 +161,8 @@ system.runInterval(
 )
 
 /** @param {Player} player */
-function clearElytra(player) {
+
+function clearElytra(player: Player) {
   const equippable = player.getComponent('equippable')
   if (!equippable) return
   const slot = equippable.getEquipmentSlot(EquipmentSlot.Chest)

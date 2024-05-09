@@ -1,22 +1,16 @@
 import { Entity, Player, system } from '@minecraft/server'
 
-/** @type {((player: Player) => string | false)[]} */
-export const PLAYER_NAME_TAG_MODIFIERS = [player => player.name]
+export const PLAYER_NAME_TAG_MODIFIERS: ((player: Player) => string | false)[] = [player => player.name]
 
 system.runPlayerInterval(player => setNameTag(player, ''), 'player.nameTag modifiers', 40)
 
-/** @param {Player} player */
-function parsePlayerNameTagModifiers(player) {
+function parsePlayerNameTagModifiers(player: Player) {
   return PLAYER_NAME_TAG_MODIFIERS.map(modifier => modifier(player))
     .filter(result => result !== false)
     .join('')
 }
 
-/**
- * @param {Entity} entity
- * @param {string | (() => string)} nameTag
- */
-export function setNameTag(entity, nameTag) {
+export function setNameTag(entity: Entity, nameTag: string | (() => string)) {
   if (!entity.isValid()) return
   if (entity instanceof Player) nameTag = parsePlayerNameTagModifiers(entity)
   if (typeof nameTag === 'function') nameTag = nameTag()

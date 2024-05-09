@@ -34,9 +34,11 @@ export class Learning {
 
       q.counter({
         end: 5,
+
         text(value) {
           return `§6Наруби §f${value}/${this.end} §6блоков дерева`
         },
+
         activate(firstTime) {
           if (firstTime) {
             // Delay code by one tick to prevent giving item
@@ -52,7 +54,6 @@ export class Learning {
             })
           }
 
-          // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
           return new Temporary(({ world }) => {
             world.afterEvents.playerBreakBlock.subscribe(({ player, brokenBlockPermutation }) => {
               if (player.id !== this.player.id) return
@@ -71,7 +72,6 @@ export class Learning {
         text: '§6Выйди под открытое небо',
         description: 'Деревья могут помешать. Выйди туда, где над тобой будет только небо',
         activate() {
-          // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
           return new Temporary(({ system }) => {
             system.runInterval(
               () => {
@@ -102,13 +102,13 @@ export class Learning {
       })
 
       /** @param {string} text */
-      const craftingTable = text =>
+
+      const craftingTable = (text: string) =>
         Learning.craftingTableLocation.valid &&
         q.dynamic({
           text: '§6Используй верстак на\n' + Vector.string(Learning.craftingTableLocation, true),
           description: text,
           activate() {
-            // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
             return new Temporary(({ temp, world }) => {
               if (!Learning.craftingTableLocation.valid) return
               Learning.quest.steps(this.player).targetCompassTo({
@@ -137,12 +137,12 @@ export class Learning {
 
       q.counter({
         end: 10,
+
         text(i) {
           return `§6Накопайте §f${i}/${this.end}§6 камня`
         },
         description: () => 'Отправляйтесь в шахту, найдите и накопайте камня.',
         activate() {
-          // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
           return new Temporary(({ world }) => {
             world.afterEvents.playerBreakBlock.subscribe(event => {
               if (event.player.id !== this.player.id) return
@@ -170,7 +170,6 @@ export class Learning {
         },
         description: () => 'Отправляйтесь в шахту, найдите и накопайте железа!',
         activate() {
-          // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
           return new Temporary(({ world }) => {
             world.afterEvents.playerBreakBlock.subscribe(event => {
               if (event.player.id !== this.player.id) return
@@ -203,11 +202,9 @@ export class Learning {
 
   static startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
 
-  /** @type {SafeAreaRegion | undefined} */
-  static safeArea = void 0
+  static safeArea: SafeAreaRegion | undefined = void 0
 }
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 actionGuard((player, region, ctx) => {
   if (ctx.type !== 'break') return
   if (region !== VillageOfMiners.safeArea) return
@@ -218,9 +215,7 @@ actionGuard((player, region, ctx) => {
   }
 })
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 Learning.randomTeleportLocation.onLoad.subscribe(location => {
-  // @ts-expect-error TS(2322) FIXME: Type 'SafeAreaRegion' is not assignable to type 'u... Remove this comment to see the full error message
   Learning.safeArea = new SafeAreaRegion({
     permissions: { allowedEntities: 'all' },
     center: location,
@@ -228,7 +223,6 @@ Learning.randomTeleportLocation.onLoad.subscribe(location => {
     dimensionId: 'overworld',
   })
 
-  // @ts-expect-error TS(2345) FIXME: Argument of type 'undefined' is not assignable to ... Remove this comment to see the full error message
   Axe.allowBreakInRegions.push(Learning.safeArea)
 })
 

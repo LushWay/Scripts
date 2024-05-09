@@ -11,11 +11,12 @@ import { WE_CONFIG } from '../config'
 import { BaseBrushTool } from '../lib/BaseBrushTool'
 import { WorldEditTool } from '../lib/WorldEditTool'
 import {
+  BlocksSetRef,
   SHARED_POSTFIX,
-  blockSetDropdown,
-  getAllBlockSets,
-  getBlockSet,
-  getBlockSetForReplaceTarget,
+  blocksSetDropdown,
+  getAllBlocksSets,
+  getBlocksSetByRef,
+  getBlocksSetForReplaceTarget,
 } from '../utils/blocksSet'
 import { placeShape } from '../utils/shape'
 import { SHAPES } from '../utils/shapes'
@@ -25,21 +26,20 @@ world.overworld
     type: CUSTOM_ENTITIES.floatingText,
     name: WE_CONFIG.BRUSH_LOCATOR,
   })
+
   .forEach(e => e.remove())
 
-class BrushTool extends BaseBrushTool {
-  onBrushUse(player, lore, hit) {
+class BrushTool extends BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }> {
+  onBrushUse: BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }>['onBrushUse'] = (player, lore, hit) => {
     const error = placeShape(
       player,
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       SHAPES[lore.shape],
       hit.block.location,
       lore.size,
 
-      getBlockSet(lore.blocksSet),
-
-      getBlockSetForReplaceTarget(lore.replaceBlocksSet),
+      getBlocksSetByRef(lore.blocksSet),
+      getBlocksSetForReplaceTarget(lore.replaceBlocksSet),
     )
 
     if (error) player.fail(error)
@@ -53,16 +53,14 @@ const brush = new BrushTool({
   loreFormat: {
     version: 2,
 
-    /** @type {import('modules/WorldEdit/utils/blocksSet').BlocksSetRef} */
-
-    blocksSet: ['', ''],
-    /** @type {import('modules/WorldEdit/utils/blocksSet').BlocksSetRef} */
-    replaceBlocksSet: ['', ''],
+    blocksSet: ['', ''] as BlocksSetRef,
+    replaceBlocksSet: ['', ''] as BlocksSetRef,
     shape: 'Сфера',
     type: 'brush',
     size: 1,
     maxDistance: 300,
   },
+
   editToolForm(slot, player) {
     const lore = brush.parseLore(slot.getLore())
     const shapes = Object.keys(SHAPES)
@@ -70,11 +68,11 @@ const brush = new BrushTool({
     new ModalForm('§3Кисть')
       .addDropdown('Форма', shapes, { defaultValue: lore.shape })
       .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
-      // @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
-      .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
+
+      .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),
+        Object.fromEntries(Object.keys(getAllBlocksSets(player.id)).map(e => [e, e])),
         {
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
@@ -101,6 +99,7 @@ const brush = new BrushTool({
         )
       })
   },
+
   interval0(player, slot, settings) {
     const lore = brush.parseLore(slot.getLore())
     const hit = player.getBlockFromViewDirection({
@@ -114,7 +113,6 @@ const brush = new BrushTool({
         z: 0.5,
       })
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       if (!BRUSH_LOCATORS[player.id]) {
         try {
           const entity = player.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, location)
@@ -122,7 +120,6 @@ const brush = new BrushTool({
           entity.addTag(player.name)
           entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
 
-          // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           BRUSH_LOCATORS[player.id] = entity
         } catch (error) {
           if (error instanceof LocationOutOfWorldBoundariesError || error instanceof LocationInUnloadedChunkError)
@@ -130,13 +127,10 @@ const brush = new BrushTool({
 
           util.error(error)
         }
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       } else BRUSH_LOCATORS[player.id].teleport(location)
     } else {
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       BRUSH_LOCATORS[player.id]?.remove()
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       delete BRUSH_LOCATORS[player.id]
     }
   },
@@ -161,17 +155,12 @@ brush.command
     ctx.reply('Успешно')
   })
 
-// @ts-expect-error TS(2345) FIXME: Argument of type '(player, slot) => void... Remove this comment to see the full error message
 WorldEditTool.intervals.push((player, slot) => {
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   if (slot.typeId !== brush.itemId && BRUSH_LOCATORS[player.id]) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     BRUSH_LOCATORS[player.id]?.remove()
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     delete BRUSH_LOCATORS[player.id]
   }
 })
 
-/** @type {Record<string, Entity>} */
-const BRUSH_LOCATORS = {}
+const BRUSH_LOCATORS: Record<string, Entity> = {}

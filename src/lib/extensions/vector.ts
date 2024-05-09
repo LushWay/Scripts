@@ -6,11 +6,15 @@ const Static: Omit<
   keyof Function | 'back' | 'down' | 'forward' | 'left' | 'up' | 'one' | 'right' | 'zero'
 > = {
   string: (a, color) => (!color ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`),
+
   valid: a => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z)),
+
   dot: (a, b) => a.x * b.x + a.y * b.y + a.z * b.z,
+
   around(a, x, y = x, z = y) {
     return [Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
   },
+
   *foreach(a, b) {
     const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x]
     const [ymin, ymax] = a.y < b.y ? [a.y, b.y] : [b.y, a.y]
@@ -23,6 +27,7 @@ const Static: Omit<
       }
     }
   },
+
   size(a, b) {
     // Each "max vector axis" - "min vector axis" + 1 * other axises
     return (
@@ -31,9 +36,11 @@ const Static: Omit<
       ((b.z > a.z ? b.z - a.z : a.z - b.z) + 1)
     )
   },
+
   floor(loc) {
     return { x: Math.floor(loc.x), y: Math.floor(loc.y), z: Math.floor(loc.z) }
   },
+
   between(a, b, c) {
     return (
       c.x >= (a.x < b.x ? a.x : b.x) &&
@@ -48,6 +55,7 @@ const Static: Omit<
   // Polyfill, a lot faster then native (0.11ms vs 0.54ms) avg
   // Author: Jayly <https://github.com/JaylyDev>
   // Project: https://github.com/JaylyDev/ScriptAPI
+
   add(a, b) {
     const vector = new Vector(a.x, a.y, a.z)
     vector.x += b.x
@@ -55,9 +63,11 @@ const Static: Omit<
     vector.z += b.z
     return vector
   },
+
   cross(a, b) {
     return new Vector(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
   },
+
   distance(a, b) {
     const dx = b.x - a.x
     const dy = b.y - a.y
@@ -66,6 +76,7 @@ const Static: Omit<
 
     return distance
   },
+
   divide(a, b) {
     const vector = new Vector(a.x, a.y, a.z)
 
@@ -81,6 +92,7 @@ const Static: Omit<
 
     return vector
   },
+
   lerp(a, b, t) {
     const dest = new Vector(a.x, a.y, a.z)
     dest.x += (b.x - a.x) * t
@@ -88,6 +100,7 @@ const Static: Omit<
     dest.z += (b.z - a.z) * t
     return dest
   },
+
   max(a, b) {
     const vectors = [a, b]
     const arr = vectors.map(({ x, y, z }) => new Vector(x, y, z).length())
@@ -97,6 +110,7 @@ const Static: Omit<
 
     return new Vector(vector3.x, vector3.y, vector3.z)
   },
+
   min(a, b) {
     const vectors = [a, b]
     const arr = vectors.map(({ x, y, z }) => new Vector(x, y, z).length())
@@ -106,6 +120,7 @@ const Static: Omit<
 
     return new Vector(vector3.x, vector3.y, vector3.z)
   },
+
   multiply(a, b) {
     const vector = new Vector(a.x, a.y, a.z)
 
@@ -134,6 +149,7 @@ const Static: Omit<
 
     return new Vector(a.x * factor1 + b.x * factor2, a.y * factor1 + b.y * factor2, a.z * factor1 + b.z * factor2)
   },
+
   subtract(a, b) {
     const vector = new Vector(a.x, a.y, a.z)
     vector.x -= b.x
@@ -147,6 +163,7 @@ const Prototype: PartialParts<Vector> = {
   length() {
     return Math.hypot(this.x, this.y, this.z)
   },
+
   equals(other) {
     if (this.x === other.x && this.y === other.y && this.z === other.z) return true
     else return false

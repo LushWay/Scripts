@@ -1,5 +1,4 @@
 import { Container, ItemStack } from '@minecraft/server'
-
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Enchantments } from './Enchantments'
 import { EventSignal } from './EventSignal'
@@ -25,15 +24,13 @@ type LootTableFillType = { type: 'itemsCount' } | { type: 'airPercent'; air: Per
 type LootItems = { stack: ItemStack; chance: number }[]
 
 export class LootTable {
-  /** @type {Record<string, LootTable>} */
   static instances: Record<string, LootTable> = {}
 
-  /** @type {EventSignal<LootTable>} */
   static onNew: EventSignal<LootTable> = new EventSignal()
 
   private fill
 
-  private id
+  public id
 
   /** Stored items */
   private items: LootItem.Stored[]

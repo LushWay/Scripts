@@ -24,8 +24,7 @@ class JoinBuilder {
     },
   }
 
-  /** @type {EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>} */
-  onMoveAfterJoin = new EventSignal()
+  onMoveAfterJoin: EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }> = new EventSignal()
 
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
@@ -38,18 +37,13 @@ class JoinBuilder {
     }),
   }
 
-  /**
-   * @private
-   * @param {Player} player
-   */
-  playerAt(player) {
+  private playerAt(player: Player) {
     const rotation = player.getRotation()
     const { location } = player
     return [location.x, location.y, location.z, rotation.x, rotation.y].map(Math.floor)
   }
 
-  /** @param {Player} player */
-  setPlayerJoinPosition(player) {
+  setPlayerJoinPosition(player: Player) {
     player.database.join ??= {}
     player.database.join.position = this.playerAt(player)
   }
@@ -98,7 +92,6 @@ class JoinBuilder {
             this.join(player, 'ground')
           }
 
-          // @ts-expect-error TS(2554) FIXME: Expected 1 arguments, but got 0.
           time()
         }
       },
@@ -107,18 +100,12 @@ class JoinBuilder {
     )
   }
 
-  /**
-   * @private
-   * @param {Player} player
-   * @param {'air' | 'ground'} where
-   */
-  join(player, where) {
+  private join(player: Player, where: 'air' | 'ground') {
     delete player.database.join
 
     player.scores.joinTimes ??= 0
     player.scores.joinTimes++
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const message = Join.config.messages[where]
 
     sendPacketToStdout('joinOrLeave', {
@@ -144,10 +131,7 @@ class JoinBuilder {
     })
   }
 
-  /** @private */
-
-  // @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
-  command = new Command('join')
+  private command = new Command('join')
     .setDescription('Имитирует первый вход')
     .setPermissions('member')
     .executes(ctx => {
@@ -155,10 +139,8 @@ class JoinBuilder {
       this.emitFirstJoin(player)
     })
 
-  /** @type {[string, string]} */
-  settingsName = ['Вход\n§7Все действия, связанные со входом', 'join']
+  settingsName: [string, string] = ['Вход\n§7Все действия, связанные со входом', 'join']
 
-  // @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
   settings = Settings.player(...this.settingsName, {
     message: {
       name: 'Сообщение',
@@ -177,8 +159,7 @@ class JoinBuilder {
     },
   })
 
-  /** @param {Player} player */
-  emitFirstJoin(player) {
+  emitFirstJoin(player: Player) {
     EventSignal.emit(this.onMoveAfterJoin, { player, joinTimes: 1, firstJoin: true })
   }
 }
@@ -191,7 +172,7 @@ export const Join = new JoinBuilder()
  *
  * @returns {string}
  */
-function timeNow() {
+function timeNow(): string {
   const time = new Date(Date()).getHours() + 3
   if (time < 6) return '§9Доброй ночи'
   if (time < 12) return '§6Доброе утро'
@@ -204,7 +185,7 @@ function timeNow() {
  *
  * @returns {string}
  */
-function shortTime() {
+function shortTime(): string {
   const time = new Date(Date())
   time.setHours(time.getHours() + 3)
   const min = String(time.getMinutes())

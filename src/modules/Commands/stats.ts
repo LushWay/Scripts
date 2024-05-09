@@ -1,10 +1,8 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, Menu, Settings, util } from 'lib'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('stats').setDescription('Показывает статистику по игре').executes(ctx => showStats(ctx.player))
 
-// @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
 const getSettings = Settings.player(...Menu.settings, {
   statsRelative: {
     name: 'Показывать относительную дату',
@@ -13,16 +11,10 @@ const getSettings = Settings.player(...Menu.settings, {
   },
 })
 
-/**
- * @param {Player} player
- * @param {Player} target
- * @param {VoidFunction} [back]
- */
-function showStats(player, target = player, back) {
+function showStats(player: Player, target: Player = player, back?: VoidFunction) {
   const settings = getSettings(player)
 
-  /** @param {number} date */
-  function formatDate(date) {
+  function formatDate(date: number) {
     if (settings.statsRelative) {
       const { type, value } = util.ms.remaining(date)
       return `${value} ${type}`
@@ -50,7 +42,6 @@ function showStats(player, target = player, back) {
 §dУрона нанесено§r: ${target.scores.damageGive}`,
   )
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   form.addButton('OK', () => null)
   if (back) form.addButtonBack(back)
   form.show(player)

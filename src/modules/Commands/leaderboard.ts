@@ -1,7 +1,6 @@
 import { Player, Vector, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('leaderboard')
   .setAliases('leaderboards', 'lb')
   .setDescription('Управляет таблицами лидеров')
@@ -10,13 +9,12 @@ new Command('leaderboard')
     leaderboardMenu(ctx.player)
   })
 
-/** @param {Player} player */
 function leaderboardMenu(player: Player) {
   const form = new ActionForm('Таблицы лидеров')
+
   form.addButton('§3Добавить', BUTTON['+'], editLeaderboard)
 
   for (const lb of Object.values(Leaderboard.all)) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(info(lb), () => {
       editLeaderboard(player, lb)
     })
@@ -31,7 +29,7 @@ function info(lb: Leaderboard) {
 
 function editLeaderboard(
   player: Player,
-  lb: Leaderboard,
+  lb?: Leaderboard,
   data: Partial<import('lib').LeaderboardInfo> = lb?.info ?? {},
 ) {
   const action = lb ? 'Изменить ' : 'Выбрать '
@@ -47,15 +45,13 @@ function editLeaderboard(
     editLeaderboard(player, lb, lb ? void 0 : data)
   }
 
-  /** @param {(keyof typeof data)[]} keys */
-  function warn(...keys: unknown[]) {
+  function warn(...keys: (keyof typeof data)[]) {
     if (keys.find(k => typeof data[k] === 'undefined')) return ' §e(!)'
     return ''
   }
 
   const form = new ActionForm('Таблица лидеров', lb ? info(lb) : '')
     .addButtonBack(() => leaderboardMenu(player))
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton(action + 'целевую таблицу' + warn('displayName', 'objective'), () => {
       new ModalForm('Изменение целевой таблицы')
         .addDropdownFromObject(
@@ -88,9 +84,9 @@ function editLeaderboard(
           },
         )
     })
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton(action + 'позицию' + warn('location', 'dimension'), () => {
       /** @type {Record<import('@minecraft/server').ShortcutDimensions, string>} */
+
       const dimensions: Record<import('@minecraft/server').ShortcutDimensions, string> = {
         overworld: 'Верхний мир',
         nether: 'Нижний мир',
@@ -115,7 +111,6 @@ function editLeaderboard(
           update()
         })
     })
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton(action + 'стиль' + warn('style'), () => {
       /** @type {Record<keyof (typeof Leaderboard)['styles'], string>} */
       const styles: Record<keyof (typeof Leaderboard)['styles'], string> = {

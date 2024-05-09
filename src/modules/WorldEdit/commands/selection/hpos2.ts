@@ -1,6 +1,6 @@
 import { WorldEdit } from '../../lib/WorldEdit'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
+
 new Command('hpos2')
   .setGroup('we')
   .setDescription('Установить позицию точки 2 из взгляда (использовать)')

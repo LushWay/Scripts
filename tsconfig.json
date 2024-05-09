@@ -32,19 +32,17 @@
     "target": "ES2020",
     "module": "ES2020",
     "moduleResolution": "Bundler",
-    "baseUrl": "scripts/",
+    "baseUrl": "src/",
     "plugins": [
       {
         "name": "typescript-plugin-import-filter",
-        "excludes": [
-          { "module": "leafy-utils" },
-          { "module": "@minecraft/vanilla-data" },
-          { "module": "scripts/chestui/**" },
-          { "module": "@sentry/**" }
-        ]
+        "excludes": [{ "module": "leafy-utils" }, { "module": "src/chestui/**" }, { "module": "@sentry/**" }]
       }
     ]
   },
-  "include": ["scripts/"],
-  "exclude": ["scripts/chestui", "scripts/@minecraft/", "@minecraft/vanilla-data", "node_modules"]
+  "include": ["src/"],
+  "exclude": ["node_modules", "scr/chestui", "test/*"]
+
+  // Pollutes global
+  //"references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
 }

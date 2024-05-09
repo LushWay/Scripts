@@ -3,10 +3,8 @@ import { ActionForm, ArrayForm, Mail, Menu, Settings } from 'lib'
 import { Join } from 'lib/PlayerJoin'
 import { Rewards } from 'lib/Rewards'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('mail').setDescription('Посмотреть входящие сообщения почты').executes(ctx => mailMenu(ctx.player))
 
-// @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
 const getSettings = Settings.player(...Menu.settings, {
   mailReadOnOpen: {
     name: 'Читать письмо при открытии',
@@ -20,7 +18,6 @@ const getSettings = Settings.player(...Menu.settings, {
   },
 })
 
-// @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
 const getJoinSettings = Settings.player(...Join.settingsName, {
   unreadMails: {
     name: 'Почта',
@@ -29,11 +26,7 @@ const getJoinSettings = Settings.player(...Join.settingsName, {
   },
 })
 
-/**
- * @param {Player} player
- * @param {VoidFunction} [back]
- */
-export function mailMenu(player, back) {
+export function mailMenu(player: Player, back?: VoidFunction) {
   new ArrayForm(`Почта${Mail.unreadBadge(player.id)}`, 'Входящие', Mail.getLetters(player.id), {
     filters: {
       unread: {
@@ -81,17 +74,9 @@ export function mailMenu(player, back) {
   }).show(player)
 }
 
-/**
- * @param {ReturnType<(typeof Mail)['getLetters']>[number]} item
- * @param {Player} player
- */
 function letterDetails(
-  {
-    letter,
-    index,
-    // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
-  },
-  player,
+  { letter, index }: ReturnType<(typeof Mail)['getLetters']>[number],
+  player: Player,
   back = () => mailMenu(player),
   message = '',
 ) {
@@ -101,7 +86,6 @@ function letterDetails(
   ).addButtonBack(back)
 
   if (!letter.rewardsClaimed && letter.rewards?.length)
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton('Забрать награду', () => {
       Mail.claimRewards(player, index)
 
@@ -112,7 +96,6 @@ function letterDetails(
     })
 
   if (!letter.read)
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton('Пометить как прочитанное', () => {
       Mail.readMessage(player.id, index)
       back()

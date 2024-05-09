@@ -7,17 +7,23 @@ import { WorldEdit } from '../lib/WorldEdit'
 
 /**
  * @example
- *   Shape(DefaultModes.sphere, Location, ['stone', 'wood'], 10)
+ *   placeShape(DefaultModes.sphere, Location, ['stone', 'wood'], 10)
  *
- * @param {Player} player
- * @param {string} shape Shape equation to caculate
- * @param {Vector3} pos Location to generate shape
- * @param {BlockPermutation[]} blocks Blocks to use to fill block
- * @param {(import('modules/WorldEdit/menu').ReplaceTarget | undefined)[]} replaceBlocks
- * @param {number} size Size of sphere
- * @returns {string | undefined}
+ * @param player
+ * @param shape Shape equation to caculate
+ * @param pos Location to generate shape
+ * @param blocks Blocks to use to fill block
+ * @param replaceBlocks
+ * @param size Size of sphere
  */
-export function placeShape(player, shape, pos, size, blocks, replaceBlocks = [undefined]) {
+export function placeShape(
+  player: Player,
+  shape: string,
+  pos: Vector3,
+  size: number,
+  blocks: BlockPermutation[],
+  replaceBlocks: (import('modules/WorldEdit/menu').ReplaceTarget | undefined)[] = [undefined],
+): string | undefined {
   if (replaceBlocks.length < 1) replaceBlocks.push(undefined)
   if (blocks.length < 1) return '§cПустой набор блоков'
   util.catch(async () => {
@@ -35,8 +41,8 @@ export function placeShape(player, shape, pos, size, blocks, replaceBlocks = [un
       'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad',
       `return ${shape}`,
     )
-    /** @type {(...args: number[]) => boolean} */
-    const condition = (x, y, z) => conditionFunction(x, y, z, cuboid, size)
+
+    const condition: (...args: number[]) => boolean = (x, y, z): boolean => conditionFunction(x, y, z, cuboid, size)
 
     let blocksSet = 0
     for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
@@ -44,7 +50,6 @@ export function placeShape(player, shape, pos, size, blocks, replaceBlocks = [un
       const location = Vector.add(pos, { x, y, z })
       const block = player.dimension.getBlock(location)
       for (const replaceBlock of replaceBlocks) {
-        // @ts-expect-error TS(2339) FIXME: Property 'typeId' does not exist on type 'never'.
         if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
         block?.setPermutation(blocks.randomElement())

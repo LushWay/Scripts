@@ -4,15 +4,17 @@ import { MineshaftRegion, actionGuard, util } from 'lib'
 import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
 
 class MineshaftBuilder {
-  /**
-   * @param {object} o
-   * @param {Vector3} o.center
-   * @param {number} o.minRadius
-   * @param {number} o.maxRadius
-   * @param {number} [o.numOres]
-   * @returns {Vector3[]}
-   */
-  generateOre({ center, minRadius, maxRadius, numOres = Math.randomInt(0, maxRadius) }) {
+  generateOre({
+    center,
+    minRadius,
+    maxRadius,
+    numOres = Math.randomInt(0, maxRadius),
+  }: {
+    center: Vector3
+    minRadius: number
+    maxRadius: number
+    numOres?: number
+  }): Vector3[] {
     const orePositions = []
 
     console.debug({ numOres, maxRadius })
@@ -34,10 +36,8 @@ class MineshaftBuilder {
   constructor() {}
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Mineshaft = new MineshaftBuilder()
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 actionGuard((player, region, ctx) => {
   if (region instanceof MineshaftRegion && ctx.type === 'break') {
     const { block, dimension } = ctx.event

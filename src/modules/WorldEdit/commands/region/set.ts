@@ -5,10 +5,9 @@ import { ActionForm, BUTTON, ModalForm, typeIdToReadable, util } from 'lib'
 import { inaccurateSearch } from 'lib/Search'
 import { ChestForm } from 'lib/form/chest'
 import { WEeditBlockStatesMenu } from 'modules/WorldEdit/menu'
-import { getAllBlockSets, getBlockSet, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet'
+import { getAllBlocksSets, getBlocksSetByRef, stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet'
 import { WorldEdit } from '../../lib/WorldEdit'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const set = new Command('set')
   .setDescription('Частично или полностью заполняет блоки в выделенной области')
   .setPermissions('builder')
@@ -28,21 +27,17 @@ set.executes(ctx => {
   setSelection(ctx.player)
 })
 
-/**
- * @typedef {{ permutations: (BlockPermutation | import('modules/WorldEdit/menu').ReplaceTarget)[] }
- *   | { ref: import('modules/WorldEdit/utils/blocksSet').BlocksSetRef }
- *   | undefined} SelectedBlock
- */
+type SelectedBlock =
+  | { permutations: (BlockPermutation | import('modules/WorldEdit/menu').ReplaceTarget)[] }
+  | { ref: import('modules/WorldEdit/utils/blocksSet').BlocksSetRef }
+  | undefined
 
 const selectedBlocks = {
-  /** @type {Record<string, SelectedBlock>} */
-  block: {},
-  /** @type {Record<string, SelectedBlock>} */
-  replaceBlock: {},
+  block: {} as Record<string, SelectedBlock>,
+  replaceBlock: {} as Record<string, SelectedBlock>,
 }
 
-/** @param {Player} player */
-export function setSelection(player) {
+export function setSelection(player: Player) {
   const [block, blockDisplay] = use(player, 'block', 'Блок, которым будет заполнена область')
   const [replaceBlock, replaceBlockDisplay] = use(player, 'replaceBlock', 'Заменяемый блок', {
     notSelected: {
@@ -83,7 +78,7 @@ export function setSelection(player) {
     .show(player)
 }
 
-/** @typedef {Omit<import('lib/Form/ChestForm').ChestButtonOptions, 'slot'>} ButtonOptions */
+type ButtonOptions = Omit<import('lib/form/chest').ChestButtonOptions, 'slot'>
 
 /**
  * @param {Player} player
@@ -97,20 +92,26 @@ export function setSelection(player) {
  *   options: ButtonOptions,
  * ]}
  */
-function use(player, type, desc = '', { onSelect = setSelection, notSelected = {} } = {}) {
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+
+function use(
+  player: Player,
+  type: keyof typeof selectedBlocks,
+  desc: string = '',
+  {
+    onSelect = setSelection,
+    notSelected = {},
+  }: { onSelect?: (player: Player) => void; notSelected?: Partial<ButtonOptions> } = {},
+): [blocks: (BlockPermutation | import('modules/WorldEdit/menu').ReplaceTarget)[] | undefined, options: ButtonOptions] {
   const block = selectedBlocks[type][player.id]
 
   const callback = () => {
     selectBlockSource(player, () => onSelect(player), block).then(e => {
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       selectedBlocks[type][player.id] = e
       onSelect(player)
     })
   }
 
-  /** @type {ReturnType<use>} */
-  const empty = [
+  const empty: ReturnType<typeof use> = [
     void 0,
     {
       callback,
@@ -122,14 +123,9 @@ function use(player, type, desc = '', { onSelect = setSelection, notSelected = {
   ]
   if (!block) return empty
 
-  /** @type {(BlockPermutation | import('modules/WorldEdit/menu').ReplaceTarget)[]} */
-  let result
-
-  /** @type {Pick<BlockPermutation, 'getAllStates' | 'type'>} */
-  let dispaySource
-
-  /** @type {Omit<import('lib/Form/ChestForm').ChestButtonOptions, 'slot'>} */
-  let options = {}
+  let result: (BlockPermutation | import('modules/WorldEdit/menu').ReplaceTarget)[]
+  let dispaySource: Pick<BlockPermutation, 'getAllStates' | 'type'>
+  let options = {} as ButtonOptions
 
   if ('permutations' in block) {
     const type =
@@ -154,12 +150,11 @@ function use(player, type, desc = '', { onSelect = setSelection, notSelected = {
           }
     result = block.permutations
   } else {
-    const set = getBlockSet(block.ref)
+    const set = getBlocksSetByRef(block.ref)
     if (!set[0]) return empty
     result = set
     dispaySource = set[0]
 
-    // @ts-expect-error TS(2339) FIXME: Property 'nameTag' does not exist on type '{}'.
     options.nameTag = desc
     desc = 'Набор блоков ' + stringifyBlocksSetRef(block.ref)
   }
@@ -169,19 +164,12 @@ function use(player, type, desc = '', { onSelect = setSelection, notSelected = {
     callback,
   }
 
-  // @ts-expect-error TS(2339) FIXME: Property 'lore' does not exist on type '{}'.
   options.lore = [desc, '', ...(options.lore ?? [])]
 
   return [result, options]
 }
 
-/**
- * @param {Player} player
- * @param {() => void} back
- * @param {SelectedBlock} [currentSelection]
- * @returns {Promise<SelectedBlock>}
- */
-function selectBlockSource(player, back, currentSelection) {
+function selectBlockSource(player: Player, back: () => void, currentSelection: SelectedBlock) {
   const selectedBlocksSet = currentSelection && 'ref' in currentSelection && stringifyBlocksSetRef(currentSelection.ref)
 
   const selectedBlock =
@@ -195,28 +183,23 @@ function selectBlockSource(player, back, currentSelection) {
         : currentSelection.permutations[0].typeId,
     )
 
-  const promise = new Promise(resolve => {
+  const promise = new Promise<SelectedBlock>(resolve => {
     const base = new ActionForm('Выбери блок/набор блоков')
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton(ActionForm.backText, back)
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton(
         selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков',
         () => {
-          const blocksSets = getAllBlockSets(player.id)
+          const blocksSets = getAllBlocksSets(player.id)
 
-          // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
           const form = new ActionForm('Наборы блоков').addButton(ActionForm.backText, () => base.show(player))
 
           for (const blocksSet of Object.keys(blocksSets)) {
-            // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
             form.addButton(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
           }
 
           form.show(player)
         },
       )
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton(
         selectedBlock ? `§2Сменить выбранный блок: §f${selectedBlock}` : 'Выбрать из инвентаря/под ногами',
         () => {
@@ -260,9 +243,11 @@ function selectBlockSource(player, back, currentSelection) {
           const { container } = player
           if (!container) return
           /** @type {string[]} */
-          const blocks = []
+
+          const blocks: string[] = []
           for (let i = 0; i < container.size; i++) {
             const item = container.getItem(i)
+
             if (!item || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId)) continue
 
             const base = 9 * 1 // 1 row
@@ -286,7 +271,6 @@ function selectBlockSource(player, back, currentSelection) {
       )
 
     if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       base.addButton('§2Редактировать свойства выбранного блока', async () => {
         const sel = currentSelection.permutations[0]
         currentSelection.permutations[0] = {
@@ -302,11 +286,9 @@ function selectBlockSource(player, back, currentSelection) {
       })
 
     base
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Ввести ID вручную', () => {
         enterBlockId(player, resolve)
       })
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('§cОчистить выделение', () => {
         resolve(undefined)
       })
@@ -323,8 +305,8 @@ function selectBlockSource(player, back, currentSelection) {
  * @param {Player} player
  * @param {(v: SelectedBlock) => void} resolve
  */
-function enterBlockId(player, resolve, error = '') {
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
+function enterBlockId(player: Player, resolve: (v: SelectedBlock) => void, error = '') {
   new ModalForm('Введи айди блока').addTextField(error + 'ID блока', 'например, stone').show(player, (_, id) => {
     let text = ''
     if (
@@ -349,7 +331,8 @@ const blocks = BlockTypes.getAll().map(e => e.id.substring(prefix.length))
  * @param {{ tell(s: string): void }} player
  * @returns {boolean}
  */
-function blockIsAvaible(block, player) {
+
+function blockIsAvaible(block: string, player: { tell(s: string): void }): boolean {
   if (blocks.includes(block)) return true
 
   player.tell('§cБлока §f' + block + '§c не существует.')
@@ -364,7 +347,7 @@ function blockIsAvaible(block, player) {
 
   if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return false
 
-  const suggest = (/** @type {[string, number]} */ a) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
+  const suggest = (a: [string, number]) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
   let suggestion = '§cВы имели ввиду ' + suggest(search[0])
   const firstValue = search[0][1]

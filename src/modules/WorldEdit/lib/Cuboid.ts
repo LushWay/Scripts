@@ -42,7 +42,8 @@ export class Cuboid {
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
-  constructor(pos1, pos2) {
+
+  constructor(pos1: Vector3, pos2: Vector3) {
     this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z }
     this.pos2 = { x: pos2.x, y: pos2.y, z: pos2.z }
 
@@ -78,7 +79,7 @@ export class Cuboid {
    *
    * @returns {number}
    */
-  get size() {
+  get size(): number {
     const x = this.xMax - this.xMin + 1
     const y = this.yMax - this.yMin + 1
     const z = this.zMax - this.zMin + 1
@@ -91,27 +92,22 @@ export class Cuboid {
    * @param {Vector3} size
    * @returns {Cuboid[]}
    */
-  split(size = { x: 1, y: 1, z: 1 }) {
-    /** @type {Record<string, number[]>} */
-    const breakpoints = {
+  split(size: Vector3 = { x: 1, y: 1, z: 1 }): Cuboid[] {
+    const breakpoints: Record<string, number[]> = {
       x: [],
       y: [],
       z: [],
     }
-    /** @type {Cuboid[]} */
-    const cubes = []
+
+    const cubes: Cuboid[] = []
 
     for (const entry of Object.entries(size)) {
-      /** @type {[keyof Vector3, number]} */
-
-      const [axis, value] = entry
+      const [axis, value] = entry as [keyof Vector3, number]
 
       for (let coordinate = this.min[axis]; ; coordinate = coordinate + value) {
         if (coordinate < this.max[axis]) {
-          // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           breakpoints[axis].push(coordinate)
         } else {
-          // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           breakpoints[axis].push(this.max[axis])
           break
         }
@@ -133,25 +129,17 @@ export class Cuboid {
             z: zi,
           }
 
-          /** @type {Vector3} */
-
-          const nextCord = {}
+          const nextCord: Vector3 = {} as Vector3
 
           for (const key in breakpoints) {
-            /** @type {keyof Vector3} */
+            const axis: keyof Vector3 = key as keyof Vector3
 
-            const axis = key
-
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             const nextValue = breakpoints[axis][indexOf[axis] + 1]
 
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             if (!nextValue && breakpoints[axis].length > 1) return
 
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             nextCord[axis] = nextValue ?? current[axis]
 
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             if (nextCord[axis] !== this.max[axis]) nextCord[axis]--
           }
 

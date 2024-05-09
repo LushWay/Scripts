@@ -20,7 +20,6 @@ class StoneQuarryInvestigating {
         text: 'поговорите с горожанами',
         description: 'Лучше всего узнавать о городе у местных, поговорите с ними!',
         activate() {
-          // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
           return new Temporary(() => {})
         },
       })

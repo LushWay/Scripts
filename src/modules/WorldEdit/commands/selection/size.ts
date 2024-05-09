@@ -1,7 +1,6 @@
 import { Vector } from '@minecraft/server'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('size')
   .setGroup('we')
   .setDescription('Размер выделенной зоны')

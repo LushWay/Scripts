@@ -4,7 +4,13 @@ import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/WorldEdit/menu'
 import { WorldEditTool } from '../lib/WorldEditTool'
-import { blockSetDropdown, getAllBlockSets, getBlockSet, getBlockSetForReplaceTarget } from '../utils/blocksSet'
+import {
+  BlocksSetRef,
+  blocksSetDropdown,
+  getAllBlocksSets,
+  getBlocksSetByRef,
+  getBlocksSetForReplaceTarget,
+} from '../utils/blocksSet'
 
 const shovel = new WorldEditTool({
   name: 'shovel',
@@ -17,27 +23,25 @@ const shovel = new WorldEditTool({
   loreFormat: {
     version: 3,
 
-    /** @type {import('modules/WorldEdit/utils/blocksSet').BlocksSetRef} */
-    blocksSet: ['', ''],
-
-    /** @type {import('modules/WorldEdit/utils/blocksSet').BlocksSetRef} */
-    replaceBlocksSet: ['', ''],
+    blocksSet: ['', ''] as BlocksSetRef,
+    replaceBlocksSet: ['', ''] as BlocksSetRef,
     radius: 2,
     height: 1,
     zone: -1,
   },
   itemStackId: CUSTOM_ITEMS.shovel,
+
   editToolForm(slot, player) {
     const lore = shovel.parseLore(slot.getLore())
     new ModalForm('§3Лопата')
       .addSlider('Радиус', 0, 10, 1, lore.radius ?? 1)
       .addSlider('Высота', 1, 10, 1, lore.height ?? 1)
       .addSlider('Сдвиг (-1 под ногами, 2 над головой)', -10, 10, 1, lore.zone ?? 1)
-      // @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
-      .addDropdown('Набор блоков', ...blockSetDropdown(lore.blocksSet, player))
+
+      .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),
+        Object.fromEntries(Object.keys(getAllBlocksSets(player.id)).map(e => [e, e])),
         {
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
@@ -65,14 +69,15 @@ const shovel = new WorldEditTool({
         )
       })
   },
+
   interval10(player, slot) {
     const lore = shovel.parseLore(slot.getLore(), true)
     if (!lore) return
 
-    const blocks = getBlockSet(lore.blocksSet)
+    const blocks = getBlocksSetByRef(lore.blocksSet)
     if (!blocks.length) return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!')
 
-    const replaceBlocks = getBlockSetForReplaceTarget(lore.replaceBlocksSet)
+    const replaceBlocks = getBlocksSetForReplaceTarget(lore.replaceBlocksSet)
     if (!replaceBlocks.length) return player.onScreenDisplay.setActionBar('§cЗаменяемый набор блоков лопаты пустой!')
 
     const loc = Vector.floor(player.location)
@@ -109,6 +114,7 @@ const shovel = new WorldEditTool({
       }
     }
   },
+
   onUse(player, item) {
     const lore = item.getLore()
     if (lore[0] === '§aEnabled') {

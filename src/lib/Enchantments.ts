@@ -11,8 +11,7 @@ const location = { x: 0, y: -10, z: 0 }
 export class Enchantments {
   static custom: { [key: string]: { [key: number]: Enchantment } } = {}
 
-  // @ts-expect-error Eee
-  static typed: Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }> = {}
+  static typed = {} as Record<keyof typeof MinecraftEnchantmentTypes, { [key: number]: Enchantment }>
 
   static onLoad = new EventLoader()
 }
@@ -56,7 +55,7 @@ function load() {
   }
 
   entities.forEach(e => e.remove())
-  // @ts-expect-error AAA
+  // @ts-expect-error Aaa
   Enchantments.typed = Enchantments.custom
   EventLoader.load(Enchantments.onLoad)
 }

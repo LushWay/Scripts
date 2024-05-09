@@ -1,4 +1,4 @@
-import { EntityDamageCause, Player, system, world } from '@minecraft/server'
+import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
 import { Settings } from 'lib'
 import { HealthIndicatorConfig } from './config'
 
@@ -28,7 +28,6 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
 
 system.runInterval(
   () => {
-    // @ts-expect-error TS(2339) FIXME: Property 'enabled' does not exist on type '{}'.
     if (options.enabled) {
       for (const player of world.getPlayers({
         scoreOptions: [{ objective: 'pvp' }],
@@ -37,9 +36,7 @@ system.runInterval(
       }
 
       for (const e in HealthIndicatorConfig.lockDisplay) {
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         if (HealthIndicatorConfig.lockDisplay[e]) HealthIndicatorConfig.lockDisplay[e]--
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         else delete HealthIndicatorConfig.lockDisplay[e]
       }
     }
@@ -48,25 +45,21 @@ system.runInterval(
   20,
 )
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Core'.
 Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
-      // @ts-expect-error TS(2339) FIXME: Property 'enabled' does not exist on type '{}'.
       if (!options.enabled) return
       const score = player.scores.pvp
 
-      // @ts-expect-error TS(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
       if (HealthIndicatorConfig.disabled.includes(player.id) || score < 0) return
 
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
 
-      // @ts-expect-error TS(2339) FIXME: Property 'cooldown' does not exist on type '{}'.
       const q = score === options.cooldown || score === 0
-      const g = (/** @type {string} */ p) => (q ? `§4${p}` : '')
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+      const g = (/** @type {string} */ p: string) => (q ? `§4${p}` : '')
+
       if (!HealthIndicatorConfig.lockDisplay[player.id]) {
         player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
       }
@@ -85,12 +78,13 @@ Core.afterEvents.worldLoad.subscribe(() => {
       true,
     )
   })
+
   world.afterEvents.entityHurt.subscribe(event => {
     onDamage(event, false)
   })
 })
 
-function onDamage(event, fatal = false) {
+function onDamage(event: EntityHurtAfterEvent, fatal = false) {
   const damage = event.damageSource
   if (
     ![
@@ -104,9 +98,7 @@ function onDamage(event, fatal = false) {
 
   if (
     !event.hurtEntity.typeId.startsWith('minecraft:') ||
-    // @ts-expect-error TS(2339) FIXME: Property 'enabled' does not exist on type '{}'.
     !options.enabled ||
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
     HealthIndicatorConfig.disabled.includes(event.hurtEntity.id)
   )
     return
@@ -119,7 +111,6 @@ function onDamage(event, fatal = false) {
   const { currentValue: current, defaultValue: value } = healthComponent
 
   if (damage.damagingEntity instanceof Player) {
-    // @ts-expect-error TS(2339) FIXME: Property 'cooldown' does not exist on type '{}'.
     damage.damagingEntity.scores.pvp = options.cooldown
     damage.damagingEntity.scores.damageGive += event.damage
     if (fatal) damage.damagingEntity.scores.kills++
@@ -163,7 +154,6 @@ function onDamage(event, fatal = false) {
       }
       // }
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       HealthIndicatorConfig.lockDisplay[damage.damagingEntity.id] = 2
     }
   }
@@ -172,19 +162,13 @@ function onDamage(event, fatal = false) {
     // skip SimulatedPlayer because of error
     if ('jump' in event.hurtEntity) return
 
-    // @ts-expect-error TS(2339) FIXME: Property 'cooldown' does not exist on type '{}'.
     event.hurtEntity.scores.pvp = options.cooldown
     event.hurtEntity.scores.damageRecieve += event.damage
     if (fatal) event.hurtEntity.scores.deaths++
   }
 }
 
-/**
- * @param {Player} player
- * @param {number} health
- * @param {number} max
- */
-function playHitSound(player, health, max) {
+function playHitSound(player: Player, health: number, max: number) {
   health = ~~health
   max = ~~max
   const pitch = 2 + health / (max / 3)

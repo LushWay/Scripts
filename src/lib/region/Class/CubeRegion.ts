@@ -1,6 +1,6 @@
 import { Vector, world } from '@minecraft/server'
-import { Region } from 'lib/Region/Class/Region'
-import { REGION_DB } from 'lib/Region/DB'
+import { Region } from 'lib/region/Class/Region'
+import { REGION_DB } from 'lib/region/DB'
 
 export class CubeRegion extends Region {
   /**
@@ -8,21 +8,19 @@ export class CubeRegion extends Region {
    * @param {Dimensions} dimensionId
    * @returns {CubeRegion | undefined}
    */
-  static blockLocationInRegion(blockLocation, dimensionId) {
+  static blockLocationInRegion(blockLocation: Vector3, dimensionId: Dimensions): CubeRegion | undefined {
     const region = Region.regionInstancesOf(this).find(
-      // @ts-expect-error TS(2339) FIXME: Property 'dimensionId' does not exist on type 'nev... Remove this comment to see the full error message
       region => region.dimensionId === dimensionId && region.vectorInRegion(blockLocation),
     )
 
-    // @ts-expect-error TS(2358) FIXME: The left-hand side of an 'instanceof' expression m... Remove this comment to see the full error message
     if (region instanceof CubeRegion) return region
   }
 
   /** @type {VectorXZ} */
-  from
+  from: VectorXZ
 
   /** @type {VectorXZ} */
-  to
+  to: VectorXZ
 
   /**
    * Creates a new region
@@ -35,7 +33,21 @@ export class CubeRegion extends Region {
    * @param {string} [o.key] - The key of the region. This is used to identify the region.
    * @param {boolean} [o.creating] - Whether or not the region is being created.
    */
-  constructor({ from, to, dimensionId, permissions, key, creating = true }) {
+  constructor({
+    from,
+    to,
+    dimensionId,
+    permissions,
+    key,
+    creating = true,
+  }: {
+    from: VectorXZ
+    to: VectorXZ
+    dimensionId: Dimensions
+    permissions?: Partial<RegionPermissions>
+    key?: string
+    creating?: boolean
+  }) {
     super({ dimensionId, permissions, key })
     this.init({ permissions, creating }, CubeRegion)
     this.from = from
@@ -44,13 +56,11 @@ export class CubeRegion extends Region {
     if (creating) {
       this.update()
 
-      // @ts-expect-error TS(2345) FIXME: Argument of type 'this' is not assignable to param... Remove this comment to see the full error message
       Region.regions.push(this)
     }
   }
 
-  /** @param {Vector3} vector */
-  vectorInRegion(vector, dimension = world.overworld) {
+  vectorInRegion(vector: Vector3, dimension = world.overworld) {
     return Vector.between(
       { x: this.from.x, y: dimension.heightRange.max, z: this.from.z },
       { x: this.to.x, y: dimension.heightRange.min, z: this.to.z },

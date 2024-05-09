@@ -1,7 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { EditableLocation, InventoryStore, Portal, SafeAreaRegion, Settings, util } from 'lib'
+import { EditableLocation, InventoryStore, Portal, RegionCallback, SafeAreaRegion, Settings, util } from 'lib'
 
 import { Menu } from 'lib/Menu'
 import { Join } from 'lib/PlayerJoin'
@@ -14,16 +14,14 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
   region
 
-  /** @type {InventoryTypeName} */
-  inventoryName = 'spawn'
+  inventoryName: InventoryTypeName = 'spawn'
 
   location = new EditableLocation('spawn', {
     fallback: { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
     type: 'vector3+rotation',
   }).safe
 
-  /** @type {import('lib').Inventory} */
-  inventory = {
+  inventory: import('lib').Inventory = {
     xp: 0,
     health: 20,
     equipment: {},
@@ -38,12 +36,9 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
     },
   })
 
-  /**
-   * Loads spawn inventory to specified player
-   *
-   * @param {Player} player
-   */
-  loadInventory(player) {
+  /** Loads spawn inventory to specified player */
+
+  loadInventory(player: Player) {
     super.loadInventory(player, () => {
       InventoryStore.load({ to: player, from: this.inventory, clearAll: true })
       player.database.inv = 'spawn'
@@ -59,6 +54,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         'spawn',
         null,
         null,
+
         player => {
           const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
           if (!title) return
@@ -69,10 +65,12 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
           showSurvivalHud(player)
           title()
         },
+
         { allowAnybody: true },
       )
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
+
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
         // Skip after death respawns
         if (!initialSpawn) return
@@ -99,8 +97,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
     }
   }
 
-  /** @type {import('lib').regionCallback} */
-  regionCallback(player, region) {
+  regionCallback: RegionCallback = (player, region) => {
     if (player.isSimulated()) return
     if (region === this.region) {
       if (player.isGamemode('survival')) {

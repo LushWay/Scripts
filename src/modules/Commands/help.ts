@@ -4,7 +4,6 @@ import { CmdLet } from 'lib/command/cmdlet'
 import { Command } from 'lib/command/index'
 import { commandNoPermissions, commandNotFound } from 'lib/command/utils'
 
-// @ts-expect-error TS(2554) FIXME: Expected 2-4 arguments, but got 1.
 const help = new Command('help')
   .setDescription('Выводит список команд')
   .setAliases('?', 'h')
@@ -14,14 +13,12 @@ help
   .int('page', true)
   .int('commandsInPage', true)
   .executes((ctx, inputPage, commandsInPage) => {
-    // @ts-expect-error TS(2339) FIXME: Property 'sys' does not exist on type 'never'.
     const avaibleCommands = Command.commands.filter(e => e.sys.requires(ctx.player))
     const cmds = commandsInPage || 15
     const maxPages = Math.ceil(avaibleCommands.length / cmds)
     const page = Math.min(inputPage || 1, maxPages)
     const path = avaibleCommands.slice(page * cmds - cmds, page * cmds)
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const cv = colors[getRole(ctx.player.id)]
 
     ctx.reply(`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
@@ -29,9 +26,7 @@ help
     for (const command of path) {
       const q = '§f.'
 
-      // @ts-expect-error TS(2339) FIXME: Property 'sys' does not exist on type 'never'.
       const c = `${cv}§r ${q}${command.sys.name} §o§7- ${
-        // @ts-expect-error TS(2339) FIXME: Property 'sys' does not exist on type 'never'.
         command.sys.description ? `${command.sys.description}` : ' Пусто' //§r
       }`
       ctx.reply('§ы' + c)
@@ -44,16 +39,14 @@ help
  * @param {string} commandName
  * @returns
  */
-function helpForCommand(player, commandName) {
-  // @ts-expect-error TS(2339) FIXME: Property 'sys' does not exist on type 'never'.
+
+function helpForCommand(player: Player, commandName: string) {
   const cmd = Command.commands.find(e => e.sys.name == commandName || e.sys?.aliases?.includes(commandName))
 
   if (!cmd) return commandNotFound(player, commandName)
 
-  // @ts-expect-error TS(2339) FIXME: Property 'sys' does not exist on type 'never'.
   if (!cmd.sys?.requires(player)) return commandNoPermissions(player, cmd)
 
-  // @ts-expect-error TS(2339) FIXME: Property 'sys' does not exist on type 'never'.
   const d = cmd.sys
   const aliases = d.aliases?.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
   const str = `   §fКоманда §6-${d.name} ${aliases}`
@@ -89,9 +82,9 @@ new CmdLet('help').setDescription('Выводит справку о команд
  * @returns {Command<any>[]}
  */
 
-// @ts-expect-error TS(7023) FIXME: 'childrensToHelpText' implicitly has return type '... Remove this comment to see the full error message
-function childrensToHelpText(player, command) {
+function childrensToHelpText(player: Player, command: Command): Command<any>[] {
   const childrens = []
+
   for (const children of command.sys.children.filter(e => e.sys.requires(player))) {
     if (children.sys.children.length < 1) childrens.push(children)
     else childrens.push(...childrensToHelpText(player, children))
@@ -99,13 +92,7 @@ function childrensToHelpText(player, command) {
   return childrens
 }
 
-/**
- * @param {Command} command
- * @returns {[string, undefined | string]}
- */
-
-// @ts-expect-error TS(7023) FIXME: 'getParentType' implicitly has return type 'any' b... Remove this comment to see the full error message
-function getParentType(command, init = true) {
+function getParentType(command: Command, init = true): [string, undefined | string] {
   const curtype = getType(command)
 
   let description
@@ -117,17 +104,12 @@ function getParentType(command, init = true) {
 
   if (command.sys.depth === 0 || !command.sys.parent) return [curtype, description]
   else {
-    // @ts-expect-error TS(7022) FIXME: 'parents' implicitly has type 'any' because it doe... Remove this comment to see the full error message
     const parents = getParentType(command.sys.parent, init)
     return [`${parents[0]}§f ${curtype}`, description ?? parents[1] ?? '<нет описания>']
   }
 }
 
-/**
- * @param {Command} o
- * @returns
- */
-function getType(o) {
+function getType(o: Command) {
   const t = o.sys.type
   const q = t.optional
 
@@ -135,6 +117,7 @@ function getType(o) {
   return `${q ? `§7[${t.name}: §7${t.typeName}§7]` : `§6<${t.name}: §6${t.typeName}§6>`}`
 }
 
-/** @type {Record<Role, string>} } */
-const colors = Object.fromEntries(Object.entriesStringKeys(ROLES).map(e => [e[0], e[1][0] + e[1][1]]))
+const colors: Record<Role, string> = Object.fromEntries(
+  Object.entriesStringKeys(ROLES).map(e => [e[0], e[1][0] + e[1][1]]),
+)
 colors.member = '§2'

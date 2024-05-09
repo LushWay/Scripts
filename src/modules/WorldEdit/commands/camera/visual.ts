@@ -49,11 +49,8 @@ system.runPlayerInterval(
 )
 
 // Insert role value right after name
-
-// @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
 PLAYER_NAME_TAG_MODIFIERS.splice(1, 0, p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
 
-/** @param {Player} player */
-function setBuildingTip(player, value = true) {
+function setBuildingTip(player: Player, value = true) {
   player.onScreenDisplay.setTip(1, value ? 'Режим стройки' : '')
 }

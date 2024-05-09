@@ -9,11 +9,7 @@ import { questsMenu } from 'modules/Quests/questMenu'
 import { Anarchy } from '../Places/Anarchy'
 import { Spawn } from '../Places/Spawn'
 
-/**
- * @param {InventoryTypeName} place
- * @param {InventoryTypeName} inv
- */
-function tp(place, inv, color = '§9', text = 'Спавн', extra = '') {
+function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = 'Спавн', extra = '') {
   const here = inv === place
   if (here) extra = `${extra ? extra + ' ' : ''}§8Вы тут`
   if (extra) extra = '\n' + extra
@@ -21,20 +17,15 @@ function tp(place, inv, color = '§9', text = 'Спавн', extra = '') {
   return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
 }
 
-// @ts-expect-error TS(2322) FIXME: Type '(player) => ActionForm' is not assignab... Remove this comment to see the full error message
 Menu.open = player => {
   const inv = player.database.inv
   const back = () => {
     const menu = Menu.open(player)
 
-    // @ts-expect-error TS(2339) FIXME: Property 'show' does not exist on type 'true'.
     if (menu) menu.show(player)
   }
 
-  /** @type {ActionForm} */
-
-  // @ts-expect-error TS(2304) FIXME: Cannot find name 'Core'.
-  const form = new ActionForm(Core.name, '', '§c§u§s§r')
+  const form: ActionForm = new ActionForm(Core.name, '', '§c§u§s§r')
     .addButton(tp('spawn', inv, '§9', 'Спавн'), 'textures/ui/worldsIcon', () => {
       Spawn.portal?.teleport(player)
     })
@@ -64,6 +55,5 @@ Menu.open = player => {
 }
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-  // @ts-expect-error TS(2339) FIXME: Property 'give' does not exist on type 'typeof Men... Remove this comment to see the full error message
   if (firstJoin) Menu.give?.(player, { mode: 'ensure' })
 })

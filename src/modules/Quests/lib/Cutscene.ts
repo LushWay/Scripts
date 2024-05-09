@@ -2,110 +2,67 @@ import { EasingType, Player, Vector, system } from '@minecraft/server'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { restorePlayerCamera } from 'lib'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { table } from 'lib/database/abstract'
+
+/**
+ * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
+ * rotation y)
+ */
+type Point = Vector5
+
+/** Single cutscene section that contains points and information about easing/animation time */
+type Section = {
+  points: Point[]
+  step: number
+  easeType?: EasingType
+  easeTime?: number
+}
+
+/** Section list */
+type Sections = (undefined | Section)[]
+
+/** Controller used to abort playing cutscene animation */
+type AbortController = { cancel: boolean }
 
 export class Cutscene {
-  /**
-   * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
-   * rotation y)
-   *
-   * @typedef {Vector5} Point
-   */
-
-  /**
-   * Single cutscene section that contains points and information about easing/animation time
-   *
-   * @typedef {{
-   *   points: Point[]
-   *   step: number
-   *   easeType?: EasingType
-   *   easeTime?: number
-   * }} Section
-   */
-
-  /**
-   * Section list
-   *
-   * @typedef {(undefined | Section)[]} Sections
-   */
-
-  /**
-   * Controller used to abort playing cutscene animation
-   *
-   * @typedef {{ cancel: boolean }} AbortController
-   */
-
   /** Database containing Cutscene trail points */
-  static db = new DynamicPropertyDB('cutscene', {
-    /** @type {Record<string, Sections>} */
-    type: {},
-    defaultValue: () => [],
-  }).proxy()
+  static db = table<Sections>('cutscene', () => [])
 
-  /**
-   * List of all cutscenes
-   *
-   * @type {Record<string, Cutscene>}
-   */
-  static list = {}
+  /** List of all cutscenes */
+  static list: Record<string, Cutscene> = {}
 
-  displayName
-
-  id
-
-  /** @param {Player} player */
-  static getCurrent(player) {
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
+  static getCurrent(player: Player) {
     return Object.values(this.list).find(e => e.current[player.id])
   }
 
-  /**
-   * List of cutscene sections
-   *
-   * @type {Sections}
-   */
-  sections = []
+  /** List of cutscene sections */
+  sections: Sections = []
 
-  /** @private */
-  intervalTime = 5
+  private intervalTime = 5
 
-  /** @private */
-  restoreCameraTime = 2
+  private restoreCameraTime = 2
 
-  /**
-   * List of players that currently see cutscene play
-   *
-   * @private
-   * @type {Record<
-   *   string,
-   *   {
-   *     player: Player
-   *     controller: AbortController
-   *   }
-   * >}
-   */
-  current = {}
+  /** List of players that currently see cutscene play */
+  private current: Record<
+    string,
+    {
+      player: Player
+      controller: AbortController
+    }
+  > = {}
 
-  /**
-   * Creates a new Cutscene.
-   *
-   * @param {string} id
-   * @param {string} displayName
-   */
-  constructor(id, displayName) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+  /** Creates a new Cutscene. */
+
+  constructor(
+    public id: string,
+    public displayName: string,
+  ) {
     Cutscene.list[id] = this
 
-    this.id = id
-    this.displayName = displayName
     this.sections = Cutscene.db[this.id].slice()
   }
 
-  /**
-   * @private
-   * @type {Section}
-   */
-  get defaultSection() {
+  private get defaultSection() {
     return {
       points: [],
       step: 0.15,
@@ -117,10 +74,10 @@ export class Cutscene {
   /**
    * Plays the Cutscene for the provided player
    *
-   * @param {Player} player - Player to play cutscene for
+   * @param player - Player to play cutscene for
    */
-  play(player) {
-    // @ts-expect-error TS(2339) FIXME: Property 'points' does not exist on type 'never'.
+
+  play(player: Player) {
     if (!this.sections[0]?.points[0]) {
       console.error(`${this.id}: cutscene is not ready.`)
       player.fail(`${this.displayName}: cцена еще не настроена`)
@@ -159,7 +116,6 @@ export class Cutscene {
       { controller, exit: () => this.exit(player) },
     ).catch(console.error)
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     this.current[player.id] = {
       player,
       controller,
@@ -169,16 +125,23 @@ export class Cutscene {
   /**
    * Asynchronuosly runs callback for each point in the cutscene. Callback has access to the current point section
    *
-   * @param {(point: Point, pointIndex: number, section: Section, sectionIndex: number) => void | Promise<void>} callback
-   *   - Function that runs on every point
-   *
-   * @param {object} options
-   * @param {AbortController} options.controller - Controller used to abort operation
-   * @param {Sections} [options.sections] - Section list
-   * @param {VoidFunction} [options.exit] - Cleanup function used when there is no points or error happened
-   * @param {number} [options.intervalTime]
+   * @param callback - Function that runs on every point
+   * @param options
+   * @param options.controller - Controller used to abort operation
+   * @param options.sections - Section list
+   * @param options.exit - Cleanup function used when there is no points or error happened
+   * @param options.intervalTime
    */
-  async forEachPoint(callback, { controller, sections = this.sections, exit, intervalTime = this.intervalTime }) {
+
+  async forEachPoint(
+    callback: (point: Point, pointIndex: number, section: Section, sectionIndex: number) => void | Promise<void>,
+    {
+      controller,
+      sections = this.sections,
+      exit,
+      intervalTime = this.intervalTime,
+    }: { controller: AbortController; sections?: Sections; exit?: VoidFunction; intervalTime?: number },
+  ) {
     try {
       for (const [sectionIndex, section] of sections.entries()) {
         if (!section) throw 0
@@ -198,13 +161,8 @@ export class Cutscene {
     }
   }
 
-  /**
-   * Uses bezier curves to interpolate points along a section.
-   *
-   * @private
-   * @param {Section} section
-   */
-  *pointIterator({ step = 0.5, points }) {
+  /** Uses bezier curves to interpolate points along a section. */
+  private *pointIterator({ step = 0.5, points }: Section) {
     let index = 0
     for (let point = 0; point <= points.length; point += step) {
       if (!points[0]) yield { x: 0, y: 0, z: 0, rx: 0, ry: 0, index }
@@ -230,36 +188,29 @@ export class Cutscene {
   /**
    * Stops a player's cutscene animation, removes them from the list of active players, and restores their camera.
    *
-   * @param {Player} player - The player to stop cutscene on
+   * @param player - The player to stop cutscene on
    */
-  exit(player) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+  exit(player: Player) {
     if (!this.current[player.id]) return false
 
     // Cancel animation
-
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     this.current[player.id].controller.cancel = true
 
     // Cleanup and restore to the previous state
-
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     delete this.current[player.id]
     restorePlayerCamera(player, this.restoreCameraTime)
 
     return true
   }
 
-  /**
-   * @param {Player} source
-   * @param {Object} [options]
-   * @param {Sections} [options.sections] Default is `this.sections.slice()`
-   * @param {number} [options.sectionIndex] Default is `sections.length - 1`
-   * @param {boolean} [options.warn]
-   */
-
-  // @ts-expect-error TS(7022) FIXME: 'sections' implicitly has type 'any' because it do... Remove this comment to see the full error message
-  withNewPoint(source, { sections = this.sections.slice(), sectionIndex = sections.length - 1, warn = false } = {}) {
+  withNewPoint(
+    source: Player,
+    {
+      sections = this.sections.slice(),
+      sectionIndex = sections.length - 1,
+      warn = false,
+    }: { sections?: Sections; sectionIndex?: number; warn?: boolean } = {},
+  ) {
     const section = sections[sectionIndex]
 
     if (section) {
@@ -273,12 +224,7 @@ export class Cutscene {
     return sections
   }
 
-  /**
-   * @param {Sections} sections
-   * @param {Partial<Section>} section
-   */
-  withNewSection(sections = this.sections.slice(), section) {
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
+  withNewSection(sections: Sections = this.sections.slice(), section: Partial<Section>) {
     sections.push(Object.assign(section, this.defaultSection))
 
     return sections
@@ -293,15 +239,15 @@ export class Cutscene {
 /**
  * Calculates the value of a point on a cubic Bezier curve.
  *
- * @template {Record<string, number>} T - Vector type
- * @param {[T, T, T, T]} vectors - Array of four control points that define a cubic Bezier curve. Each control point is
- *   a Record that have the provided axis
- * @param {keyof T} axis - Axis along which the Bezier curve is being calculated. It specifies whether the calculation
- *   is for the x-axis, y-axis, or z-axis of the provided vectors.
- * @param {number} t - Interpolation value between two points on a Bezier curve. It is typically a value between 0 and
- *   1, where 0 corresponds to the starting point of the curve and 1 corresponds to the ending point of the curve.
+ * @template T - Vector type
+ * @param vectors - Array of four control points that define a cubic Bezier curve. Each control point is a Record that
+ *   have the provided axis
+ * @param axis - Axis along which the Bezier curve is being calculated. It specifies whether the calculation is for the
+ *   x-axis, y-axis, or z-axis of the provided vectors.
+ * @param t - Interpolation value between two points on a Bezier curve. It is typically a value between 0 and 1, where 0
+ *   corresponds to the starting point of the curve and 1 corresponds to the ending point of the curve.
  */
-function bezier(vectors, axis, t) {
+function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: keyof T, t: number) {
   const [v0, v1, v2, v3] = vectors
   const t2 = t * t
   const t3 = t2 * t
@@ -314,12 +260,7 @@ function bezier(vectors, axis, t) {
   )
 }
 
-/**
- * @param {Player} player
- * @returns {Vector5}
- */
-
-function getVector5(player) {
+function getVector5(player: Player): Vector5 {
   const { x: rx, y: ry } = player.getRotation()
   const { x, y, z } = Vector.floor(player.getHeadLocation())
   return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }

@@ -8,7 +8,7 @@ export class Cost {
    *
    * @returns {string}
    */
-  string(canBuy = true) {
+  string(canBuy = true): string {
     return ''
   }
 
@@ -18,7 +18,8 @@ export class Cost {
    * @param {Player} player
    * @returns {boolean}
    */
-  check(player) {
+
+  check(player: Player): boolean {
     return false
   }
 
@@ -27,7 +28,8 @@ export class Cost {
    *
    * @param {Player} player
    */
-  buy(player) {
+
+  buy(player: Player) {
     player.playSound(SOUNDS.action)
   }
 
@@ -37,7 +39,8 @@ export class Cost {
    * @param {Player} player
    * @returns {string}
    */
-  failed(player) {
+
+  failed(player: Player): string {
     player.playSound(SOUNDS.fail)
     return 'Недостаточно средств'
   }
@@ -52,8 +55,7 @@ class ScoreboardCost extends Cost {
     this.cost = cost
   }
 
-  /** @type {import('@minecraft/server').ScoreName} */
-  scoreboard = 'money'
+  scoreboard: import('@minecraft/server').ScoreName = 'money'
 
   postfix = 'N'
 
@@ -63,19 +65,16 @@ class ScoreboardCost extends Cost {
     return `${canBuy ? this.color : '§c'}${this.cost}${this.postfix}`
   }
 
-  /** @param {Player} player */
-  check(player) {
+  check(player: Player) {
     return player.scores[this.scoreboard] >= this.cost
   }
 
-  /** @param {Player} player */
-  buy(player) {
+  buy(player: Player) {
     player.scores[this.scoreboard] -= this.cost
     super.buy(player)
   }
 
-  /** @param {Player} player */
-  failed(player) {
+  failed(player: Player) {
     super.failed(player)
     const have = player.scores[this.scoreboard]
     return `§cНедостаточно средств (§4${have}/${this.cost}§c). Нужно еще ${this.color}${this.cost - have}`
@@ -83,8 +82,7 @@ class ScoreboardCost extends Cost {
 }
 
 export class MoneyCost extends ScoreboardCost {
-  /** @type {import('@minecraft/server').ScoreName} */
-  scoreboard = 'money'
+  scoreboard: import('@minecraft/server').ScoreName = 'money'
 
   postfix = emoji.money
 
@@ -92,8 +90,7 @@ export class MoneyCost extends ScoreboardCost {
 }
 
 export class LeafyCost extends ScoreboardCost {
-  /** @type {import('@minecraft/server').ScoreName} */
-  scoreboard = 'leafs'
+  scoreboard: import('@minecraft/server').ScoreName = 'leafs'
 
   postfix = emoji.leaf
 

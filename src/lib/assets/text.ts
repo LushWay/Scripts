@@ -1,20 +1,38 @@
-/**
- * @type {Record<string, (...args[]) => string>}
- */
-export const text = {
+export const text: Record<string, (...args: (string | number)[]) => string> = {
   'api.name': () => 'Smelly API',
   'api.error.unknown': () => 'An unknown error has occured.',
 
   'br.start': (a, b, c) =>
     `§7│----------------\n│§6  Игра началась!\n§7│----------------\n│  §eНаграда за победу: §f${a} §a(S)\n§7│  §e►§f ${b}\n§7│§e  Зона:§f ${c}\n§7│`,
-  'br.end.time': (a) => `§7│----------------\n│§6  Время вышло!\n§7│----------------\n│  §e►§f ${a}\n§7│`,
-  'br.end.spec': (a) => `§7│----------------\n│§6  Игра остановлена.\n§7│----------------\n│  §eПричина: §f${a}\n§7│`,
-  'br.end.winner': (a) => `§7│----------------\n│§6  Ты победил!\n§7│----------------\n│  §eНаграда: §f${a} §a(S)\n§7│`,
+
+  'br.end.time': a => `§7│----------------\n│§6  Время вышло!\n§7│----------------\n│  §e►§f ${a}\n§7│`,
+
+  'br.end.spec': a => `§7│----------------\n│§6  Игра остановлена.\n§7│----------------\n│  §eПричина: §f${a}\n§7│`,
+
+  'br.end.winner': a => `§7│----------------\n│§6  Ты победил!\n§7│----------------\n│  §eНаграда: §f${a} §a(S)\n§7│`,
+
   'br.end.looser': (a, b) =>
     `§7│----------------\n│§c  Ты проиграл!\n§7│----------------\n│  §eПобедил:§f ${a}, §eзабрав награду в §f${b} §a(S)\n§7│`,
   'br.end.draw': () => `§7│----------------\n│  §eНичья!\n§7│----------------`,
 
-  'stats': (hrs, min, sec, ahrs, amin, asec, dhrs, dmin, dsec, kills, deaths, hget, hgive, bplace, Bbreak, fla) =>
+  'stats': (
+    hrs,
+    min,
+    sec,
+    ahrs,
+    amin,
+    asec,
+    dhrs,
+    dmin,
+    dsec,
+    kills: number,
+    deaths: number,
+    hget: number,
+    hgive: number,
+    bplace,
+    Bbreak,
+    fla,
+  ) =>
     `§8-----------------------------
   §7Время всего: §f${hrs}:${min}:${sec}
   §7Время на анархии: §f${ahrs}:${amin}:${asec}

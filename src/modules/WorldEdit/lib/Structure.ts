@@ -19,7 +19,11 @@ export class Structure extends Cuboid {
    *   max: Vector3
    * }[]}
    */
-  structures = []
+  structures: {
+    name: string
+    min: Vector3
+    max: Vector3
+  }[] = []
 
   /**
    * Creates a new structure save
@@ -28,7 +32,8 @@ export class Structure extends Cuboid {
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
-  constructor(prefix, pos1, pos2, name = '') {
+
+  constructor(prefix: string, pos1: Vector3, pos2: Vector3, name = '') {
     super(pos1, pos2)
     this.id = Date.now().toString(32)
     this.name = name
@@ -57,13 +62,10 @@ export class Structure extends Cuboid {
 
       if (result > 0) {
         this.structures.push({
-          // @ts-expect-error TS(2322) FIXME: Type 'string' is not assignable to type 'never'.
           name,
 
-          // @ts-expect-error TS(2322) FIXME: Type 'any' is not assignable to type 'never'.
           min,
 
-          // @ts-expect-error TS(2322) FIXME: Type 'any' is not assignable to type 'never'.
           max,
         })
       }
@@ -85,23 +87,18 @@ export class Structure extends Cuboid {
       let from
 
       if (pos === this.min) {
-        // @ts-expect-error TS(2339) FIXME: Property 'min' does not exist on type 'never'.
         to = file.min
 
-        // @ts-expect-error TS(2339) FIXME: Property 'max' does not exist on type 'never'.
         from = file.max
       } else {
-        // @ts-expect-error TS(2339) FIXME: Property 'max' does not exist on type 'never'.
         const offsetFrom = Vector.subtract(file.max, this.min)
 
-        // @ts-expect-error TS(2339) FIXME: Property 'min' does not exist on type 'never'.
         const offsetTo = Vector.subtract(file.min, this.min)
         from = Vector.add(pos, offsetFrom)
         to = Vector.add(pos, offsetTo)
       }
 
       await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-        // @ts-expect-error TS(2339) FIXME: Property 'name' does not exist on type 'never'.
         `structure load "${file.name}" ${Vector.string(to)}${additional}`,
         from,
         to,
@@ -118,13 +115,13 @@ export class Structure extends Cuboid {
   }
 }
 
-/**
- * @param {string} command
- * @param {Vector3} vector1
- * @param {Vector3} vector2
- * @param {{ errors: number; total: number }} options
- */
-async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(command, vector1, vector2, options, forceTp = false) {
+async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(
+  command: string,
+  vector1: Vector3,
+  vector2: Vector3,
+  options: { errors: number; total: number },
+  forceTp = false,
+) {
   let result = 0
   if (!forceTp) {
     result = world.overworld.runCommand(command).successCount

@@ -3,6 +3,7 @@ import { Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 
 // Bouncy tnt
+
 world.beforeEvents.itemUse.subscribe(data => {
   if (data.itemStack.typeId !== MinecraftItemTypes.Tnt) return
   data.cancel = true

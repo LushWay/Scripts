@@ -9,15 +9,13 @@ import {
   manageRegionMembers,
 } from 'lib'
 
-/**
- * @param {Player} player
- * @param {VoidFunction} [back]
- * @param {(message: string) => void} [onFail]
- */
-export function openBaseMenu(player, back, onFail = message => player.fail(message)) {
+export function openBaseMenu(
+  player: Player,
+  back?: VoidFunction,
+  onFail: (message: string) => void = message => player.fail(message),
+) {
   if (LockAction.locked(player)) return
 
-  // @ts-expect-error TS(2339) FIXME: Property 'getMemberRole' does not exist on type 'n... Remove this comment to see the full error message
   const base = Region.regionInstancesOf(BaseRegion).find(r => r.getMemberRole(player))
 
   if (!base) return onFail('§cУ вас нет базы! Вступите в существующую или создайте свою.')
@@ -25,12 +23,7 @@ export function openBaseMenu(player, back, onFail = message => player.fail(messa
   baseMenu(player, base, back)
 }
 
-/**
- * @param {Player} player
- * @param {RadiusRegion} base
- * @param {VoidFunction} [back]
- */
-function baseMenu(player, base, back) {
+function baseMenu(player: Player, base: RadiusRegion, back?: VoidFunction) {
   const isOwner = base.getMemberRole(player) === 'owner'
   const baseBack = () => baseMenu(player, base, back)
   const form = new ActionForm(
@@ -41,9 +34,7 @@ function baseMenu(player, base, back) {
   if (back) form.addButtonBack(back)
 
   form
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton('Телепорт!', () => player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 })))
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton(`Участники§7 (${base.permissions.owners.length})`, () =>
       manageRegionMembers(player, base, {
         back: baseBack,
@@ -52,7 +43,6 @@ function baseMenu(player, base, back) {
     )
 
   if (isOwner)
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton('Разрешения', () =>
       editRegionPermissions(player, base, {
         back: baseBack,
@@ -63,5 +53,4 @@ function baseMenu(player, base, back) {
   form.show(player)
 }
 
-/** @type {WordPluralForms} */
-const basePluralForms = ['базы', 'базу', 'на базе']
+const basePluralForms: WordPluralForms = ['базы', 'базу', 'на базе']

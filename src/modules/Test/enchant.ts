@@ -22,7 +22,6 @@ new Command('enchant')
     enchantments.removeEnchantment(ench)
     console.debug({ Enchantments: Enchantments.custom, ench, level })
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     enchantments.addEnchantment(Enchantments.custom[ench][level])
 
     world.debug('enchants', [...enchantments])

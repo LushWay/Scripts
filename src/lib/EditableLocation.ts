@@ -5,46 +5,26 @@ import { util } from './util'
 // TODO Location edit form from command -locations
 // TODO location grouping
 
-/** @typedef {'vector3' | 'vector3+rotation' | 'vector3+radius'} LocationTypeSuperset */
+type LocationTypeSuperset = 'vector3' | 'vector3+rotation' | 'vector3+radius'
 
-/**
- * @template {LocationTypeSuperset} LocationType
- * @typedef {LocationType extends 'vector3'
- *   ? Vector3
- *   : LocationType extends 'vector3+rotation'
- *     ? Vector3 & { xRot: number; yRot: number }
- *     : Vector3 & { radius: number }} Location
- */
+export type Location<LocationType extends LocationTypeSuperset> = LocationType extends 'vector3'
+  ? Vector3
+  : LocationType extends 'vector3+rotation'
+    ? Vector3 & { xRot: number; yRot: number }
+    : Vector3 & { radius: number }
 
-/**
- * @template {LocationTypeSuperset} [LocationType='vector3'] Default is `'vector3'` . Default is `'vector3'` . Default
- *   is `'vector3'`
- */
-export class EditableLocation {
-  /**
-   * @returns {({ valid: false } | ({ valid: true } & Location<LocationType>)) & {
-   *   onLoad: EditableLocation<LocationType>['onLoad']
-   *   teleport: EditableLocation<LocationType>['teleport']
-   *   id: string
-   * }}
-   */
-  get safe() {
+export class EditableLocation<LocationType extends LocationTypeSuperset = 'vector3'> {
+  get safe(): ({ valid: false } | ({ valid: true } & Location<LocationType>)) & {
+    onLoad: EditableLocation<LocationType>['onLoad']
+    teleport: EditableLocation<LocationType>['teleport']
+    id: string
+  } {
     return this
   }
 
   static key = 'locations'
 
-  format
-
-  id
-
-  type
-
-  /**
-   * @param {EditableLocation<any>} instance
-   * @param {Location<any>} location
-   */
-  static load(instance, location) {
+  static load(instance: EditableLocation<any>, location: Location<any>) {
     instance.x = location.x
     instance.y = location.y
     instance.z = location.z
@@ -62,9 +42,13 @@ export class EditableLocation {
     return this.onLoad.loaded
   }
 
-  /** @type {EventLoaderWithArg<{ firstLoad: boolean } & Location<LocationType>>} */
+  format
 
-  onLoad = new EventLoaderWithArg(Object.assign(this, { firstLoad: true }))
+  type: LocationType
+
+  onLoad = new EventLoaderWithArg<{ firstLoad: boolean } & Location<LocationType>, void>(
+    Object.assign(this, { firstLoad: true }) as unknown as { firstLoad: boolean } & Location<LocationType>,
+  )
 
   x = 0
 
@@ -78,29 +62,19 @@ export class EditableLocation {
 
   radius = 0
 
-  /**
-   * @private
-   * @type {false | Location<LocationType>}
-   */
-  fallback = false
+  private fallback: false | Location<LocationType> = false
 
-  /**
-   * @param {string} id
-   * @param {Object} [options]
-   * @param {LocationType} [options.type]
-   * @param {EditableLocation<LocationType>['fallback']} [options.fallback]
-   */
-  constructor(id, { fallback = false, type } = {}) {
-    this.id = id
-    /** @type {LocationType} */
-
+  constructor(
+    public id: string,
+    { fallback = false, type }: { type?: LocationType; fallback?: EditableLocation<LocationType>['fallback'] } = {},
+  ) {
+    // @ts-expect-error AAaa
     this.type = type ?? 'vector3'
     this.fallback = fallback
     this.format = `x y z${
       this.type === 'vector3+rotation' ? ' xRot yRot' : this.type === 'vector3+radius' ? ' radius' : ''
     }`
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     Settings.worldMap[EditableLocation.key][id] = {
       description: this.format,
       name: id,
@@ -111,9 +85,7 @@ export class EditableLocation {
     this.load()
   }
 
-  /** @private */
-
-  load() {
+  private load() {
     const raw = Settings.worldDatabase[EditableLocation.key][this.id]
 
     if (typeof raw !== 'string' || raw === '') {
@@ -147,8 +119,7 @@ export class EditableLocation {
     )
   }
 
-  /** @param {Player} player */
-  teleport(player) {
+  teleport(player: Player) {
     player.teleport(
       Vector.add(this, { x: 0.5, y: 0, z: 0.5 }),
       this.type === 'vector3+rotation' ? { rotation: { x: this.xRot, y: this.yRot } } : void 0,
@@ -156,5 +127,4 @@ export class EditableLocation {
   }
 }
 
-// @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
 Settings.worldMap[EditableLocation.key] = {}

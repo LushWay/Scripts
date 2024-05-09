@@ -1,5 +1,4 @@
 import { Player, Vector, system, world } from '@minecraft/server'
-
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Settings, Temporary, actionGuard, inventoryIsEmpty, util } from 'lib'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea'
@@ -51,7 +50,6 @@ world.afterEvents.entityDie.subscribe(event => {
 
 // TODO Clear minecart items from inventory/world
 
-// @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
 const getSettings = Settings.player(...Quest.playerSettingsName, {
   restoreInvQuest: {
     name: 'Задание "Вернуть вещи"',
@@ -73,7 +71,6 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
 
   const places = DefaultPlaceWithSafeArea.places
     .map(place => ({
-      // @ts-expect-error TS(2339) FIXME: Property 'safeArea' does not exist on type 'never'... Remove this comment to see the full error message
       distance: Vector.distance(place.safeArea.center, deadAt) - place.safeArea.radius,
       place,
     }))
@@ -81,9 +78,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
 
   const nearestPlace = places[0].place
 
-  // @ts-expect-error TS(2339) FIXME: Property 'portalTeleportsTo' does not exist on typ... Remove this comment to see the full error message
   if (nearestPlace && nearestPlace.portalTeleportsTo.valid) {
-    // @ts-expect-error TS(2339) FIXME: Property 'portalTeleportsTo' does not exist on typ... Remove this comment to see the full error message
     player.teleport(nearestPlace.portalTeleportsTo)
   } else {
     delete player.database.survival.anarchy
@@ -115,7 +110,6 @@ system.runInterval(
   20,
 )
 
-// @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
 actionGuard((player, _, ctx) => {
   if (ctx.type !== 'interactWithEntity') return
   if (ctx.event.target.typeId !== gravestoneEntity) return
@@ -138,7 +132,6 @@ const quest = new Quest(
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
       }, они ждут вас!`,
       activate() {
-        // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
         return new Temporary(({ world, temp }) => {
           q.targetCompassTo({ place: deadAt, temporary: temp })
 

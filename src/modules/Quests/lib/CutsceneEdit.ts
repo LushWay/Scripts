@@ -5,15 +5,11 @@ import { Cooldown, Temporary, invalidLocation, util } from 'lib'
 import { CONFIG } from 'lib/assets/config'
 import { Cutscene } from './Cutscene'
 
-/**
- * List of items that controls the editing process
- *
- * @type {Record<
- *   string,
- *   [slot: number, item: ItemStack, onUse: (player: Player, cutscene: Cutscene, temp: Temporary) => void]
- * >}
- */
-const controls = {
+/** List of items that controls the editing process */
+const controls: Record<
+  string,
+  [slot: number, item: ItemStack, onUse: (player: Player, cutscene: Cutscene, temp: Temporary) => void]
+> = {
   create: [
     3,
     new ItemStack('we:tool').setInfo('§r§6> §fСоздать точку', 'используй предмет, чтобы создать точку катсцены.'),
@@ -45,8 +41,6 @@ const controls = {
     ),
     (player, cutscene, temp) => {
       // Restore bakcup
-
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       const backup = EDITING_CUTSCENE[player.id]
       cutscene.sections = backup.cutsceneSectionsBackup
 
@@ -71,13 +65,12 @@ const controls = {
  * Checks if the cutscene location is valid, then teleports the player to that location and backs up player inventory
  * and cutscene data.
  *
- * @param {Player} player - The player who is editing the cutscene.
- * @param {Cutscene} cutscene - The cutscene cene to be edited
+ * @param player - The player who is editing the cutscene.
+ * @param cutscene - The cutscene cene to be edited
  */
-export function editCatcutscene(player, cutscene) {
+export function editCatcutscene(player: Player, cutscene: Cutscene) {
   backupPlayerInventoryAndCutscene(player, cutscene)
 
-  // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
   new Temporary(({ world, system, temp }) => {
     system.runInterval(
       () => {
@@ -112,6 +105,7 @@ export function editCatcutscene(player, cutscene) {
     })
 
     const cooldown = new Cooldown({}, '', player, 1000, false)
+
     world.beforeEvents.itemUse.subscribe(event => {
       if (event.source.id !== player.id) return
 
@@ -130,11 +124,7 @@ export function editCatcutscene(player, cutscene) {
       if (event.player.id === player.id) temp.cleanup()
     })
 
-    /**
-     * @param {Vector3 | undefined} point
-     * @param {MolangVariableMap} vars
-     */
-    function particle(point, vars) {
+    function particle(point: Vector3 | undefined, vars: MolangVariableMap) {
       if (!point) return
       try {
         player.dimension.spawnParticle('minecraft:wax_particle', point, vars)
@@ -148,7 +138,6 @@ export function editCatcutscene(player, cutscene) {
 
     return {
       cleanup() {
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         const { hotbarSlots: slots, position } = EDITING_CUTSCENE[player.id]
 
         if (player.isValid()) {
@@ -160,7 +149,6 @@ export function editCatcutscene(player, cutscene) {
           player.teleport(position)
         }
 
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         delete EDITING_CUTSCENE[player.id]
         cutscene.save()
       },
@@ -184,27 +172,16 @@ whiteParticle.setColorRGBA('color', {
   alpha: 0,
 })
 
-/**
- * @typedef {{
- *   hotbarSlots: (ItemStack | undefined)[]
- *   position: Vector3
- *   cutsceneSectionsBackup: Cutscene['sections']
- * }} EditingCutscenePlayer
- */
+type EditingCutscenePlayer = {
+  hotbarSlots: (ItemStack | undefined)[]
+  position: Vector3
+  cutsceneSectionsBackup: Cutscene['sections']
+}
 
-/**
- * Map of player id to player editing cutscene
- *
- * @type {Record<string, EditingCutscenePlayer>}
- */
-const EDITING_CUTSCENE = {}
+/** Map of player id to player editing cutscene */
+const EDITING_CUTSCENE: Record<string, EditingCutscenePlayer> = {}
 
-/**
- * @param {Player} player
- * @param {Cutscene} cutscene
- */
-function backupPlayerInventoryAndCutscene(player, cutscene) {
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+function backupPlayerInventoryAndCutscene(player: Player, cutscene: Cutscene) {
   EDITING_CUTSCENE[player.id] = {
     hotbarSlots: backupPlayerInventory(player),
     position: Vector.floor(player.location),
@@ -214,10 +191,8 @@ function backupPlayerInventoryAndCutscene(player, cutscene) {
   cutscene.sections = []
 }
 
-/** @param {Player} player */
-function backupPlayerInventory(player) {
-  /** @type {EditingCutscenePlayer['hotbarSlots']} */
-  const hotbarSlots = []
+function backupPlayerInventory(player: Player) {
+  const hotbarSlots: EditingCutscenePlayer['hotbarSlots'] = []
   const container = forEachHotbarSlot(player, (i, container) => {
     hotbarSlots[i] = container.getItem(i)
     container.setItem(i, undefined)
@@ -233,12 +208,11 @@ function backupPlayerInventory(player) {
 /**
  * Iterates over the player's hotbar slots and performs a specified action on each slot.
  *
- * @param {Player} player - Target player to get hotbar from
- * @param {(i: number, container: Container) => void} callback - Callback function that will be called for each hotbar
- *   slot. It takes two arguments: the index of the current slot (from 0 to 8) and the container` object belonging to
- *   the player.
+ * @param player - Target player to get hotbar from
+ * @param callback - Callback function that will be called for each hotbar slot. It takes two arguments: the index of
+ *   the current slot (from 0 to 8) and the container` object belonging to the player.
  */
-function forEachHotbarSlot(player, callback) {
+function forEachHotbarSlot(player: Player, callback: (i: number, container: Container) => void) {
   const { container } = player
   if (!container) throw new ReferenceError('Player has no container!')
 

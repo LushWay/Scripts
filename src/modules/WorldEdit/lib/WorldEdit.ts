@@ -9,42 +9,32 @@ import {
 } from '@minecraft/server'
 import { getRole, prompt, util } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { table } from 'lib/database/abstract'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/WorldEdit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { Cuboid } from './Cuboid'
 import { Structure } from './Structure'
-/**
- * @typedef {{
- *   pos1: Vector3
- *   pos2: Vector3
- * }} WeDB
- */
+
+type WeDB = {
+  pos1: Vector3
+  pos2: Vector3
+}
 
 export class WorldEdit {
-  static db = new DynamicPropertyDB('worldEdit', {
-    /** @type {Record<string, WeDB | undefined>} */
-    type: {},
-  }).proxy()
+  static db = table<WeDB>('worldEdit')
 
-  /** @param {Player} player */
-  static forPlayer(player) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+  static forPlayer(player: Player) {
     if (player.id in this.instances) return this.instances[player.id]
     return new WorldEdit(player)
   }
 
-  /** @type {Record<string, WorldEdit>} */
-  static instances = {}
+  static instances: Record<string, WorldEdit> = {}
 
-  /** @type {Cuboid | undefined} */
-  selection
+  selection: Cuboid | undefined
 
-  /** @type {Cuboid | undefined} */
-  visualSelectionCuboid
+  visualSelectionCuboid: Cuboid | undefined
 
-  /** @type {WeDB} */
-  db
+  db: WeDB
 
   get pos1() {
     return this.db.pos1
@@ -68,15 +58,13 @@ export class WorldEdit {
    * @private
    * @param {1 | 2} pos
    */
-  onPosChange(pos) {
+
+  onPosChange(pos: 1 | 2) {
     system.delay(() => {
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       const action = { 1: 'break', 2: 'use' }[pos]
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       const color = { 1: '§5', 2: '§d' }[pos]
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
       this.player.playSound(SOUNDS.action)
       this.updateSelectionCuboids()
@@ -92,16 +80,17 @@ export class WorldEdit {
   }
 
   /** @type {Structure[]} */
-  history = []
+  history: Structure[] = []
 
   /** @type {Structure[]} */
-  undos = []
+  undos: Structure[] = []
 
   /** @type {Structure | undefined} */
-  currentCopy
+
+  currentCopy: Structure | undefined
 
   /** @type {Player} */
-  player
+  player: Player
 
   /** @private */
   historyLimit = 100
@@ -109,18 +98,19 @@ export class WorldEdit {
   hasWarnAboutHistoryLimit = false
 
   /** @param {Player} player */
-  constructor(player) {
+
+  constructor(player: Player) {
     const id = player.id
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     WorldEdit.instances[id] = this
     this.player = player
+
     let db = WorldEdit.db[this.player.id]
     if (!db) {
       db = { pos1: Vector.one, pos2: Vector.one }
+
       WorldEdit.db[this.player.id] = db
     }
 
@@ -136,7 +126,8 @@ export class WorldEdit {
    * @param {any} error - The `error` parameter is the error object or error message that occurred during the action. It
    *   can be either an Error object or a string representing the error message.
    */
-  failedTo(action, error) {
+
+  failedTo(action: string, error: any) {
     const text = util.error(error, { parseOnly: true })
     if (!text) return
     console.error(text)
@@ -158,7 +149,13 @@ export class WorldEdit {
    * @param {Vector3} pos2 Position 2 of cuboid location
    * @param {Structure[]} history Save location where you want the to store your backup
    */
-  async backup(name, pos1 = this.pos1, pos2 = this.pos2, history = this.history) {
+
+  async backup(
+    name: string,
+    pos1: Vector3 = this.pos1,
+    pos2: Vector3 = this.pos2,
+    history: Structure[] = this.history,
+  ) {
     if (this.history.length === this.historyLimit) {
       console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
       if (this.hasWarnAboutHistoryLimit) {
@@ -168,14 +165,12 @@ export class WorldEdit {
         this.hasWarnAboutHistoryLimit = true
       }
 
-      // @ts-expect-error TS(2339) FIXME: Property 'id' does not exist on type 'never'.
       this.player.runCommand(`structure delete ${history[0].id}`)
       history.splice(0, 1)
     }
 
     const structrure = new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, name)
 
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'Structure' is not assignable to ... Remove this comment to see the full error message
     history.push(structrure)
     await structrure.savePromise
   }
@@ -213,7 +208,8 @@ export class WorldEdit {
    * @param {Structure[]} history
    * @param {Structure} backup
    */
-  loadBackup(history, backup) {
+
+  loadBackup(history: Structure[], backup: Structure) {
     this.backup(
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
       backup.pos1,
@@ -232,7 +228,7 @@ export class WorldEdit {
    *
    * @param {number} amount Times you want to undo
    */
-  undo(amount = 1) {
+  undo(amount: number = 1) {
     this.loadFromArray(amount, this.history)
   }
 
@@ -241,7 +237,7 @@ export class WorldEdit {
    *
    * @param {number} amount Times you want to redo
    */
-  redo(amount = 1) {
+  redo(amount: number = 1) {
     this.loadFromArray(amount, this.undos)
   }
 
@@ -270,7 +266,8 @@ export class WorldEdit {
    * @param {Parameters<WorldEdit['paste']>[1]} rotation
    * @param {NonNullable<WorldEdit['currentCopy']>} currentCopy
    */
-  pastePositions(rotation, currentCopy) {
+
+  pastePositions(rotation: Parameters<WorldEdit['paste']>[1], currentCopy: NonNullable<WorldEdit['currentCopy']>) {
     let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
     const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
     let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
@@ -299,13 +296,13 @@ export class WorldEdit {
    *   If unspecified, a random seed is taken.
    */
   async paste(
-    player,
-    rotation = 0,
-    mirror = 'none',
-    includesEntites = false,
-    includesBlocks = true,
-    integrity = 100.0,
-    seed = '',
+    player: Player,
+    rotation: 0 | 90 | 180 | 270 = 0,
+    mirror: 'none' | 'x' | 'xz' | 'z' = 'none',
+    includesEntites: boolean = false,
+    includesBlocks: boolean = true,
+    integrity: number = 100.0,
+    seed: string = '',
   ) {
     try {
       if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')
@@ -337,7 +334,7 @@ export class WorldEdit {
     const player = this.player
     if (!this.selection) return player.fail('§cЗона не выделена!')
     /** @type {Partial<Record<Role, number>>} */
-    const limits = {
+    const limits: Partial<Record<Role, number>> = {
       builder: 10000,
       admin: 10000,
       grandBuilder: 100000,
@@ -345,7 +342,6 @@ export class WorldEdit {
       techAdmin: 1000000,
     }
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const limit = limits[getRole(player.id)]
     if (typeof limit === 'number') {
       if (this.selection.size > limit) {
@@ -373,7 +369,11 @@ export class WorldEdit {
    * @param {(import('../menu').ReplaceTarget | BlockPermutation)[]} blocks
    * @param {(undefined | import('../menu').ReplaceTarget | BlockPermutation)[]} replaceBlocks
    */
-  async fillBetween(blocks, replaceBlocks = [undefined]) {
+
+  async fillBetween(
+    blocks: (import('../menu').ReplaceTarget | BlockPermutation)[],
+    replaceBlocks: (undefined | import('../menu').ReplaceTarget | BlockPermutation)[] = [undefined],
+  ) {
     try {
       const selection = await this.ensureSelection()
       if (!selection) return
@@ -453,7 +453,6 @@ export class WorldEdit {
 
 system.runInterval(
   () => {
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     for (const build of Object.values(WorldEdit.instances)) build.drawSelection()
   },
   'we Selection',

@@ -154,8 +154,8 @@ export function setRole(player: Player | string, role: Role): void {
       oldRole: DB.role,
     })
 
-    // @ts-expect-error setting role here is allowed
     // it is marked readonly so no other functions will change that
+    // @ts-expect-error Huuuuh
     DB.role = role
   }
 }

@@ -3,6 +3,11 @@ import { BDS } from './modules'
 
 class RequestError extends Error {}
 
+declare global {
+  // eslint-disable-next-line no-var, @typescript-eslint/naming-convention
+  var __PORT__: string
+}
+
 /** Makes http request to node instance */
 export async function request<Path extends keyof BDS.Routes>(
   path: Path,
@@ -11,11 +16,12 @@ export async function request<Path extends keyof BDS.Routes>(
   const sbody = JSON.stringify(body)
   const prefix = `request('${path}'`
   console.warn(`${prefix},`, body, '§r)')
+
   if (BDS.ServerNet) {
     const { http, HttpRequest, HttpRequestMethod } = BDS.ServerNet
-    // TODO Use secrets to get port
+
     const response = await http.request(
-      new HttpRequest('http://localhost:19514/' + path)
+      new HttpRequest(`http://localhost:${__PORT__}/` + path)
         .setMethod(HttpRequestMethod.Post)
         .addHeader('content-type', 'text/plain')
         .addHeader('content-length', sbody.length.toString())
@@ -50,5 +56,3 @@ export async function request<Path extends keyof BDS.Routes>(
 export function sendPacketToStdout<T extends keyof BDS.StdoutPackets>(type: T, packet: BDS.StdoutPackets[T]) {
   console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
 }
-
-/** @typedef {import('./routes')} I */

@@ -1,6 +1,6 @@
 import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/EventSignal'
-import { actionGuard } from 'lib/Region/index'
+import { actionGuard } from 'lib/region/index'
 
 type PlaceType = 'enters' | 'interactions'
 
@@ -37,7 +37,7 @@ export class PlaceAction {
   }
 
   /** Creates action that triggers function when any player walks into this place. */
-  static onEnter(place: Vector3, action: PlayerCallback, dimension: Dimensions) {
+  static onEnter(place: Vector3, action: PlayerCallback, dimension?: Dimensions) {
     return this.subscribe('enters', place, action, dimension)
   }
 

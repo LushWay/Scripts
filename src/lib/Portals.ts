@@ -1,12 +1,13 @@
 import { Player, Vector } from '@minecraft/server'
 import { LockAction, PlaceAction } from 'lib/Action'
 
-/**
- * @typedef {object} TeleportOptions
- * @property {Parameters<(typeof LockAction)['locked']>[1]} [lockActionOptions]
- * @property {string} [place]
- * @property {boolean} [fadeScreen=true] Default is `true`
- */
+// TODO Builder style
+
+interface TeleportOptions {
+  lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]
+  place?: string
+  fadeScreen?: boolean
+}
 
 export class Portal {
   command
@@ -17,14 +18,8 @@ export class Portal {
 
   to
 
-  /**
-   * @param {Player} player
-   * @param {TeleportOptions} [options]
-   */
-  static canTeleport(player, { fadeScreen = true, lockActionOptions, place } = {}) {
+  static canTeleport(player: Player, { fadeScreen = true, lockActionOptions, place }: TeleportOptions = {}) {
     if (LockAction.locked(player, lockActionOptions)) return false
-
-    // TODO Timeouts etc
     if (fadeScreen) {
       const inS = 0.2
       const stayS = 2.0
@@ -41,7 +36,6 @@ export class Portal {
     }
 
     return () => {
-      // @ts-expect-error TS(2304) FIXME: Cannot find name 'Core'.
       player.onScreenDisplay.setHudTitle(place ?? Core.name, {
         fadeInDuration: 0,
         stayDuration: 100,
@@ -51,12 +45,7 @@ export class Portal {
     }
   }
 
-  /**
-   * @param {Player} player
-   * @param {Vector3} to
-   * @param {TeleportOptions} [options]
-   */
-  static teleport(player, to, options = {}) {
+  static teleport(player: Player, to: Vector3, options: TeleportOptions = {}) {
     if (this.canTeleport(player, options)) player.teleport(to)
   }
 
@@ -74,11 +63,16 @@ export class Portal {
    * @param {boolean} [o.allowAnybody]
    */
   constructor(
-    name,
-    from,
-    to,
-    place,
-    { aliases = [], createCommand = true, commandDescription, allowAnybody = false } = {},
+    name: string,
+    from: Vector3 | null,
+    to: Vector3 | null,
+    place: Vector3 | ((player: Player) => void),
+    {
+      aliases = [],
+      createCommand = true,
+      commandDescription,
+      allowAnybody = false,
+    }: { aliases?: string[]; createCommand?: boolean; commandDescription?: string; allowAnybody?: boolean } = {},
   ) {
     // console.debug('Portal init', name, { from: from ? Vector.string(from) : from, to: to ? Vector.string(to) : to })
     this.from = from
@@ -88,7 +82,6 @@ export class Portal {
     } else this.place = place
 
     if (createCommand)
-      // @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
       this.command = new Command(name)
         .setAliases(...aliases)
         .setDescription(commandDescription ?? `§bТелепорт на ${name}`)
@@ -100,14 +93,12 @@ export class Portal {
 
     if (from && to) {
       for (const pos of Vector.foreach(from, to)) {
-        // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
         PlaceAction.onEnter(pos, p => this.teleport(p))
       }
     }
   }
 
-  /** @param {Player} player */
-  teleport(player) {
+  teleport(player: Player) {
     if (this.place) Portal.teleport(player, this.place)
   }
 }

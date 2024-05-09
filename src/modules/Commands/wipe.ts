@@ -4,7 +4,6 @@ import { Join } from 'lib/PlayerJoin'
 import { Anarchy } from 'modules/Places/Anarchy'
 import { Spawn } from 'modules/Places/Spawn'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('wipe')
   .setDescription('Очищает все данные (для тестов)')
   .setPermissions('tester')
@@ -26,7 +25,6 @@ new Command('wipe')
         Spawn.portal?.teleport(ctx.player)
         Anarchy.inventoryStore.remove(ctx.player.id)
 
-        // @ts-expect-error TS(2339) FIXME: Property 'for' does not exist on type 'never'.
         Airdrop.instances.filter(a => a.for === ctx.player.id).forEach(a => a.delete())
 
         system.runTimeout(

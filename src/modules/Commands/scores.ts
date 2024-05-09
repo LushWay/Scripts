@@ -3,7 +3,6 @@ import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('scores')
   .setDescription('Управляет счетом игроков (монеты, листья)')
   .setPermissions('chefAdmin')
@@ -15,7 +14,6 @@ alias('leafs')
 alias('money')
 
 function alias(name = 'leafs') {
-  // @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
   new Command(name)
     .setDescription('Управляет счетом игроков (' + name + ')')
     .setPermissions('chefAdmin')
@@ -26,7 +24,8 @@ function alias(name = 'leafs') {
 }
 
 /** @param {Player} player */
-function scoreManagerMenu(player) {
+
+function scoreManagerMenu(player: Player) {
   const form = new ActionForm('Выберите счет')
 
   for (const scoreboard of world.scoreboard.getObjectives().sort((a, b) => {
@@ -36,7 +35,6 @@ function scoreManagerMenu(player) {
     if (a1) return -1
     return 1
   })) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(scoreboard.displayName, () => {
       scoreboardMenu(player, scoreboard)
     })
@@ -49,7 +47,8 @@ function scoreManagerMenu(player) {
  * @param {Player} player
  * @param {ScoreboardObjective} scoreboard
  */
-function scoreboardMenu(player, scoreboard) {
+
+function scoreboardMenu(player: Player, scoreboard: ScoreboardObjective) {
   const manager = new ScoreboardDB(scoreboard.id)
 
   new ArrayForm(scoreboard.displayName + '§r§f $page/$max', '', scoreboard.getParticipants(), {
@@ -63,6 +62,7 @@ function scoreboardMenu(player, scoreboard) {
 
     sort(array, filters) {
       if (!filters.online) return array
+
       const online = world.getAllPlayers().map(e => e.id)
 
       return array.filter(e => online.includes(e.displayName))
@@ -98,7 +98,8 @@ function scoreboardMenu(player, scoreboard) {
  * @param {ScoreboardObjective} scoreboard
  * @returns
  */
-function addTargetToScoreboardMenu(player, scoreboard) {
+
+function addTargetToScoreboardMenu(player: Player, scoreboard: ScoreboardObjective) {
   const onlinePlayers = world.getAllPlayers()
   const players = []
   for (const [id, data] of Object.entries(Player.database)) {
@@ -145,25 +146,25 @@ function addTargetToScoreboardMenu(player, scoreboard) {
  * @param {string} targetId
  * @param {string} targetName
  */
-function editPlayerScore(player, scoreboard, targetId, targetName, back = () => scoreboardMenu(player, scoreboard)) {
+
+function editPlayerScore(
+  player: Player,
+  scoreboard: ScoreboardObjective,
+  targetId: string,
+  targetName: string,
+  back = () => scoreboardMenu(player, scoreboard),
+) {
   const manager = new ScoreboardDB(scoreboard.id)
   const self = () => editPlayerScore(player, scoreboard, targetId, targetName, back)
   const description = getScoreDescription(targetId, targetName, manager)
   new ActionForm(scoreboard.displayName, description)
     .addButtonBack(back)
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton('Добавить к счету', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'add'))
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     .addButton('Установить значение', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'set'))
     .show(player)
 }
 
-/**
- * @param {string} targetId
- * @param {string} targetName
- * @param {ScoreboardDB} manager
- */
-function getScoreDescription(targetId, targetName, manager) {
+function getScoreDescription(targetId: string, targetName: string, manager: ScoreboardDB) {
   const converted = Leaderboard.parseCustomScore(manager.scoreboard.id, manager.get(targetId))
   const raw = manager.get(targetId)
   return `
@@ -172,15 +173,14 @@ function getScoreDescription(targetId, targetName, manager) {
 ${converted !== raw ? `§l§7Конвертированный счет: §r§f${converted}` : ''}`.trim()
 }
 
-/**
- * @param {Player} player
- * @param {string} targetId
- * @param {string} targetName
- * @param {ScoreboardDB} manager
- * @param {VoidFunction} back
- * @param {'add' | 'set'} [mode]
- */
-function addOrSetPlayerScore(player, targetId, targetName, manager, back, mode = 'add') {
+function addOrSetPlayerScore(
+  player: Player,
+  targetId: string,
+  targetName: string,
+  manager: ScoreboardDB,
+  back: VoidFunction,
+  mode: 'add' | 'set' = 'add',
+) {
   const action = mode === 'add' ? 'Добавить' : 'Установить'
   new ModalForm(manager.scoreboard.displayName + '§r§7 / §f' + action)
     .addTextField(

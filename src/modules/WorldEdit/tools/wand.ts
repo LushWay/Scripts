@@ -10,25 +10,22 @@ const wand = new WorldEditTool({
   displayName: 'топор',
   itemStackId: CUSTOM_ITEMS.wand,
   overrides: {
-    // @ts-expect-error TS(7023) FIXME: 'getMenuButtonName' implicitly has return type 'an... Remove this comment to see the full error message
     getMenuButtonName(player) {
       if (super.getMenuButtonName(player) === '') return ''
 
-      // @ts-expect-error TS(7022) FIXME: 'tool' implicitly has type 'any' because it does n... Remove this comment to see the full error message
       const tool = player.mainhand().typeId === this.itemId
       const we = WorldEdit.forPlayer(player)
       const selection = !!we.selection
       return (
-        // @ts-expect-error TS(2339) FIXME: Property 'getMenuButtonNameColor' does not exist o... Remove this comment to see the full error message
         this.getMenuButtonNameColor(player) +
         (tool ? (selection ? 'Действия с областью' : '§cЗона не выделена!') : 'Получить топор')
       )
     },
   },
+
   editToolForm(slot, player, initial) {
     if (initial) return
     new ActionForm('Действия с областью')
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       .addButton('Заполнить/Заменить блоки', () => {
         setSelection(player)
       })

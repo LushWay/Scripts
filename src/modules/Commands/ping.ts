@@ -1,7 +1,6 @@
 import { system } from '@minecraft/server'
 
-/** @returns {Promise<number>} */
-async function getServerTPS() {
+async function getServerTPS(): Promise<number> {
   const startTime = Date.now()
   let ticks = 0
   return new Promise(resolve => {
@@ -16,7 +15,6 @@ async function getServerTPS() {
   })
 }
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('ping')
   .setDescription('Показывает пинг сервера')
   .setPermissions('member')
@@ -24,6 +22,5 @@ new Command('ping')
     ctx.reply('§b> §3Понг! Проверяем...')
     const ticks = await getServerTPS()
 
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     ctx.reply(`§b> §3TPS сервера ${ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'}§f: ${ticks}`)
   })

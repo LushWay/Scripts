@@ -24,26 +24,25 @@ export class ArrayForm<
         filters: NoInfer<ParsedFilters>,
         form: ActionForm,
       ) => Parameters<ActionForm['addButton']> | false
-      sort: (array: NoInfer<T>[], filters: NoInfer<ParsedFilters>) => NoInfer<T>[]
-      addCustomButtonBeforeArray: (form: ActionForm) => void
-      itemsPerPage: number
-      minItemsForFilters: number
-      back: VoidFunction
+      sort?: (array: NoInfer<T>[], filters: NoInfer<ParsedFilters>) => NoInfer<T>[]
+      addCustomButtonBeforeArray?: (form: ActionForm) => void
+      itemsPerPage?: number
+      minItemsForFilters?: number
+      back?: VoidFunction
     },
   ) {
-    this.filtersConfig = { [SETTINGS_GROUP_NAME]: 'Фильтры', ...options.filters }
+    this.filtersConfig = {
+      [SETTINGS_GROUP_NAME]: 'Фильтры',
+      // @ts-expect-error Gaaa
+      ...options.filters,
+    }
   }
 
-  /**
-   * @param {Player} player
-   * @param {number} [fromPage=1] Default is `1`
-   * @param {JSONLike} [filtersDatabase]
-   * @param {ParsedFilters} [filters]
-   */
   show(
     player: Player,
     fromPage: number = 1,
     filtersDatabase: JSONLike = {},
+    // @ts-expect-error Haa
     filters: ParsedFilters = Settings.parseConfig(filtersDatabase, 'filters', this.options.filters),
     searchQuery = '',
   ) {
@@ -79,12 +78,7 @@ export class ArrayForm<
     return form.show(player)
   }
 
-  /**
-   * @private
-   * @param {number} fromPage
-   * @param {number} maxPages
-   */
-  createForm(fromPage: number, maxPages: number) {
+  private createForm(fromPage: number, maxPages: number) {
     const form = new ActionForm(
       this.title.replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
       this.description,
@@ -94,16 +88,7 @@ export class ArrayForm<
     return form
   }
 
-  /**
-   * @private
-   * @param {ActionForm} form
-   * @param {string} searchQuery
-   * @param {Player} player
-   * @param {number} fromPage
-   * @param {JSONLike} filtersDatabase
-   * @param {ParsedFilters} parsedFilters
-   */
-  addSearchButton(
+  private addSearchButton(
     form: ActionForm,
     searchQuery: string,
     player: Player,
@@ -115,7 +100,6 @@ export class ArrayForm<
       !searchQuery ? '§3Поиск' : `§3Результаты поиска по запросу\n§f${searchQuery}`,
       'textures/ui/magnifying_glass',
       () => {
-        // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
         new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
           this.show(player, fromPage, filtersDatabase, parsedFilters, query)
         })
@@ -123,15 +107,13 @@ export class ArrayForm<
     )
   }
 
-  /**
-   * @private
-   * @param {ActionForm} form
-   * @param {ParsedFilters} filters
-   * @param {Player} player
-   * @param {JSONLike} database
-   * @param {VoidFunction} back
-   */
-  addFilterButton(form: ActionForm, filters: ParsedFilters, player: Player, database: JSONLike, back: VoidFunction) {
+  private addFilterButton(
+    form: ActionForm,
+    filters: ParsedFilters,
+    player: Player,
+    database: JSONLike,
+    back: VoidFunction,
+  ) {
     const keys = Object.keys(this.filtersConfig)
     const size = keys.length
 
@@ -146,6 +128,7 @@ export class ArrayForm<
         if (i >= values.length - 1) i = 0
         else i++
 
+        // @ts-expect-error AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         filters[key] = values[i][0]
 
         back()
@@ -159,11 +142,7 @@ export class ArrayForm<
     }
   }
 
-  /**
-   * @private
-   * @param {ParsedFilters} filters
-   */
-  getSorted(filters: ParsedFilters, searchQuery = '') {
+  private getSorted(filters: ParsedFilters, searchQuery = '') {
     if (searchQuery) {
       // Search query overrides sort option
       const sorted = []

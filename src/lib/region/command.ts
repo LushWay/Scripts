@@ -1,7 +1,7 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { CubeRegion } from 'lib/Region/Class/CubeRegion'
-import { Region } from 'lib/Region/Class/Region'
-import { REGION_DB } from 'lib/Region/DB'
+import { CubeRegion } from 'lib/region/Class/CubeRegion'
+import { Region } from 'lib/region/Class/Region'
+import { REGION_DB } from 'lib/region/DB'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
@@ -16,7 +16,7 @@ new Command('region')
     regionForm(ctx.player)
   })
 
-type AnyRegion = CubeRegion | RadiusRegion
+export type AnyRegion = CubeRegion | RadiusRegion
 
 function regionForm(player: Player) {
   const reg = (region: Parameters<typeof regionList>[1]) => () => regionList(player, region)
@@ -231,7 +231,7 @@ export function manageRegionMembers(
   if (isOwner)
     form.addButton('§3Добавить!', BUTTON['+'], () => {
       const form = new ActionForm('Добавить участника ' + pluralForms[2])
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
       for (const player of world.getAllPlayers())
         form.addButton(player.name, () => {
           region.permissions.owners.push(player.id)
@@ -242,7 +242,6 @@ export function manageRegionMembers(
   for (const [i, memberId] of region.permissions.owners.entries()) {
     const name = Player.name(memberId) ?? '§7<Имя неизвестно>'
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(`${i === 0 ? '§7Владелец > §f' : ''}${name}`, () => {
       const form = new ActionForm(name, `Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
 

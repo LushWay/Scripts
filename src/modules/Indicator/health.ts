@@ -2,9 +2,10 @@ import { Entity, Player, Vector, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
-import { NOT_MOB_ENTITIES } from 'lib/Region/config'
+
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 import { CLOSING_CHAT } from 'lib/extensions/player'
+import { NOT_MOB_ENTITIES } from 'lib/region/config'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 
@@ -39,6 +40,7 @@ const ALWAYS_SHOWS: string[] = [MinecraftEntityTypes.Player]
 const ALLOWED_FAMILIES = ['monster']
 
 // Show indicator on hurt
+
 world.afterEvents.entityHurt.subscribe(event => {
   if (event.damage === 0) return
 
@@ -60,6 +62,7 @@ world.afterEvents.entityHurt.subscribe(event => {
 })
 
 // Remove indicator
+
 world.afterEvents.entityDie.subscribe(event => {
   if (!event.deadEntity.isValid()) return
 

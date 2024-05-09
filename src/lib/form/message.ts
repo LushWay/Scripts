@@ -1,6 +1,5 @@
 import { Player } from '@minecraft/server'
 
-// @ts-expect-error TS(2792) FIXME: Cannot find module '@minecraft/server-ui'. Did you... Remove this comment to see the full error message
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
 import { util } from '../util'
 import { showForm } from './utils'
@@ -13,14 +12,14 @@ export class MessageForm {
    *
    * @type {string}
    */
-  title
+  title: string
 
   /**
    * Extra text that should be displayed in the form
    *
    * @type {string}
    */
-  body
+  body: string
 
   /**
    * The default minecraft form this form is based on
@@ -28,7 +27,7 @@ export class MessageForm {
    * @private
    * @type {MessageFormData}
    */
-  form
+  form: MessageFormData
 
   /**
    * The first button of the dialog.
@@ -36,7 +35,8 @@ export class MessageForm {
    * @private
    * @type {IMessageFormButton}
    */
-  button1
+
+  button1: IMessageFormButton
 
   /**
    * The seccond button of the dialog.
@@ -44,7 +44,8 @@ export class MessageForm {
    * @private
    * @type {IMessageFormButton}
    */
-  button2
+
+  button2: IMessageFormButton
 
   /**
    * Creates a new form to be shown to a player
@@ -52,7 +53,8 @@ export class MessageForm {
    * @param {string} title The title that this form should have
    * @param {string} body Extra text that should be displayed in the form
    */
-  constructor(title, body) {
+
+  constructor(title: string, body: string) {
     this.title = title
     this.body = body
     this.form = new MessageFormData()
@@ -75,7 +77,8 @@ export class MessageForm {
    * @param {ButtonCallback} callback What happens when this button is clicked
    * @returns {MessageForm}
    */
-  setButton1(text, callback) {
+
+  setButton1(text: string, callback: ButtonCallback): MessageForm {
     this.button1 = { text: text, callback: callback }
     this.form.button2(text)
     return this
@@ -93,7 +96,8 @@ export class MessageForm {
    * @param {ButtonCallback} callback What happens when this button is clicked
    * @returns {MessageForm}
    */
-  setButton2(text, callback) {
+
+  setButton2(text: string, callback: ButtonCallback): MessageForm {
     this.button2 = { text: text, callback: callback }
     this.form.button1(text)
     return this
@@ -105,7 +109,8 @@ export class MessageForm {
    * @param {Player} player Player to show to
    * @returns {Promise<void>}
    */
-  async show(player) {
+
+  async show(player: Player): Promise<void> {
     const response = await showForm(this.form, player)
     if (response === false || !(response instanceof MessageFormResponse)) return
 
@@ -114,17 +119,15 @@ export class MessageForm {
   }
 }
 
-/**
- * Asks player
- *
- * @param {Player} player
- * @param {string} text
- * @param {string} yesText
- * @param {VoidFunction} yesAction
- * @param {string} noText
- * @param {VoidFunction} noAction
- */
-export function prompt(player, text, yesText, yesAction, noText, noAction) {
+/** Asks player */
+export function prompt(
+  player: Player,
+  text: string,
+  yesText: string,
+  yesAction: VoidFunction,
+  noText: string,
+  noAction: VoidFunction,
+) {
   return new Promise(resolve => {
     new MessageForm('Вы уверены?', text)
       .setButton1(yesText, () => {

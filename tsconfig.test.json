@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "types": ["./src/test/framework/framework.test.d.ts"],
+    "rootDir": "src/"
+  },
+  "include": ["./src/**/*.test.ts"],
+  "exclude": ["./src/**/*.spec.ts"]
+}

@@ -1,29 +1,22 @@
-import { ItemStack, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, Player } from '@minecraft/server'
-import { util } from 'lib'
+import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
+import { invalidLocation, util } from 'lib'
 import { WE_PLAYER_SETTINGS } from 'modules/WorldEdit/settings'
 import { WorldEditTool } from './WorldEditTool'
 
-/**
- * @typedef {{
- *   version: number
- *   replaceBlocksSet: import('modules/WorldEdit/utils/blocksSet').BlocksSetRef
- *   size: number
- *   maxDistance: number
- *   type: 'brush' | 'smoother'
- * }} BrushLoreFormat
- */
+type BrushLoreFormat = {
+  version: number
+  replaceBlocksSet: import('modules/WorldEdit/utils/blocksSet').BlocksSetRef
+  size: number
+  maxDistance: number
+  type: 'brush' | 'smoother'
+}
 
-/**
- * @template {object} AdditionalLore
- * @extends {WorldEditTool<BrushLoreFormat & AdditionalLore>}
- */
-export class BaseBrushTool extends WorldEditTool {
-  displayName
+export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<BrushLoreFormat & AdditionalLore> {
+  displayName: string
 
-  loreFormat
+  loreFormat: BrushLoreFormat & AdditionalLore
 
-  /** @param {Player} player */
-  getToolSlot(player) {
+  getToolSlot(player: Player) {
     const slot = super.getToolSlot(player)
 
     if (typeof slot === 'string') return slot
@@ -34,28 +27,20 @@ export class BaseBrushTool extends WorldEditTool {
     return slot
   }
 
-  /** @param {Player} player */
-  getMenuButtonNameColor(player) {
+  getMenuButtonNameColor(player: Player) {
     const slot = player.mainhand()
     if (!this.isOurBrushType(slot)) return '§8'
     return super.getMenuButtonNameColor(player)
   }
 
-  /** @param {this['loreFormat'] | Pick<ItemStack, 'getLore'>} lore */
-  isOurBrushType(lore) {
+  isOurBrushType(lore: this['loreFormat'] | Pick<ItemStack, 'getLore'>) {
     if ('getLore' in lore) lore = this.parseLore(lore.getLore())
     if ('type' in this.loreFormat && 'type' in lore && lore.type !== this.loreFormat.type) return false
 
     return true
   }
 
-  /**
-   * @param {Player} player
-   * @param {ItemStack} item
-   * @returns
-   * @this {BaseBrushTool<AdditionalLore>}
-   */
-  onUse = function onUse(this, player, item) {
+  onUse = function onUse(this: BaseBrushTool<AdditionalLore>, player: Player, item: ItemStack) {
     const settings = WE_PLAYER_SETTINGS(player)
     if (settings.enableMobile) return
 
@@ -67,14 +52,15 @@ export class BaseBrushTool extends WorldEditTool {
     })
 
     /** @param {string} reason */
-    const fail = reason => player.fail('§7Кисть§f: §c' + reason)
+
+    const fail = (reason: string) => player.fail('§7Кисть§f: §c' + reason)
 
     if (!hit) return fail('Блок слишком далеко.')
 
     try {
       this.onBrushUse(player, lore, hit)
     } catch (e) {
-      if (e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) {
+      if (invalidLocation(e)) {
         fail('Блок не прогружен.')
       } else {
         util.error(e)
@@ -83,8 +69,7 @@ export class BaseBrushTool extends WorldEditTool {
     }
   }
 
-  onBrushUse(player, lore, hit) {}
+  onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit) {}
 
-  /** @type {BrushLoreFormat & AdditionalLore} */
-  clearLoreFormat
+  clearLoreFormat: BrushLoreFormat & AdditionalLore
 }

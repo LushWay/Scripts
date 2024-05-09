@@ -2,7 +2,6 @@ import { system, world } from '@minecraft/server'
 import { LockAction } from 'lib'
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('sit')
   .setDescription('Присаживает вас')
   .setGroup('public')

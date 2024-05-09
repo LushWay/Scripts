@@ -218,7 +218,7 @@ export function sendCallback(
     try {
       await lastArg.sys.callback?.(
         new CommandContext(event, cmdArgs, baseCommand, rawInput),
-        // @ts-expect-error Huh generics
+        // @ts-expect-error AAAAAAA
         ...argsToReturn,
       )
     } catch (e) {

@@ -6,18 +6,13 @@ import { WHO_CAN_CHANGE } from 'lib/roles'
 
 const FULL_HIERARCHY = Object.keys(ROLES)
 
-/**
- * @param {Role} who
- * @param {Role} target
- */
-function canChange(who, target, allowSame = false) {
+function canChange(who: Role, target: Role, allowSame = false) {
   if (allowSame && who === target) return true
   if (who === 'creator') return true
 
   return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
 
-// @ts-expect-error TS(2552) FIXME: Cannot find name 'Command'. Did you mean 'command'... Remove this comment to see the full error message
 const command = new Command('role')
   .setDescription('Показывает вашу роль')
   .setPermissions('everybody')
@@ -34,16 +29,13 @@ const restoreRole = command
     setRole(ctx.player, prevRole)
     delete ctx.player.database.prevRole
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     ctx.player.info(`Вы вернули роль §r${ROLES[prevRole]}`)
   })
 
-/** @param {Player} player */
-function roleMenu(player) {
+function roleMenu(player: Player) {
   const prole = getRole(player.id)
   if (!WHO_CAN_CHANGE.includes(prole))
     return player.info(
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       `Ваша роль: ${ROLES[prole]}${
         restoreRole.sys.requires(player) ? '\n\n§3Восстановить прошлую роль: §f.role restore' : ''
       }`,
@@ -78,13 +70,10 @@ function roleMenu(player) {
 
     button(
       [
-        // @ts-expect-error TS(7031) FIXME: Binding element 'id' implicitly has an 'any' type.
         id,
         {
-          // @ts-expect-error TS(7031) FIXME: Binding element 'role' implicitly has an 'any' typ... Remove this comment to see the full error message
           role,
 
-          // @ts-expect-error TS(7031) FIXME: Binding element 'dbname' implicitly has an 'any' t... Remove this comment to see the full error message
           name: dbname,
         },
       ],
@@ -95,7 +84,6 @@ function roleMenu(player) {
       const name = typeof target === 'string' ? dbname ?? 'Без имени' : target.name
 
       return [
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         `${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${
           canChange(prole, role) ? '' : ' §4Не сменить'
         }`,
@@ -119,7 +107,7 @@ function roleMenu(player) {
             .addDropdownFromObject('Роль', filteredRoles, {
               defaultValueIndex: Object.keys(filteredRoles).findIndex(e => e === role),
             })
-            // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
+
             .addTextField('Причина смены роли', `Например, "чел дурной, пол технограда снес"`)
             .show(player, (formCtx, notify, showName, newrole, message) => {
               if (!newrole)
@@ -128,7 +116,6 @@ function roleMenu(player) {
               if (target instanceof Player) {
                 if (notify && target instanceof Player)
                   target.info(
-                    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                     `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
                       showName ? `§3 игроком §r${player.name}` : ''
                     }${message ? `\n§r§3Причина: §r${message}` : ''}`,

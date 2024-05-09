@@ -2,8 +2,8 @@ import { Vector } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { DynamicPropertyDB } from 'lib/database/properties'
-import { Region } from 'lib/Region/Class/Region'
-import { REGION_DB } from 'lib/Region/DB'
+import { Region } from 'lib/region/Class/Region'
+import { REGION_DB } from 'lib/region/DB'
 
 // Note for future
 // Currently subclassing RadiusRegion is just a pain, so instead
@@ -62,7 +62,7 @@ export class RadiusRegion extends Region {
     saveToDisk?: boolean
     subclassing?: boolean
   }) {
-    permissions = DynamicPropertyDB.unproxy(permissions)
+    if (permissions) permissions = DynamicPropertyDB.unproxy(permissions)
 
     super({ dimensionId, permissions, key })
     this.center = DynamicPropertyDB.unproxy(center)
@@ -70,6 +70,7 @@ export class RadiusRegion extends Region {
     this.saveToDisk = saveToDisk
 
     if (!subclassing) this.init({ permissions, creating }, RadiusRegion)
+
     if (creating) Region.regions.push(this)
   }
 
@@ -79,10 +80,12 @@ export class RadiusRegion extends Region {
   }
 
   /** @inheritdoc */
+
   update(region = RadiusRegion) {
     if (!this.saveToDisk) return super.update()
     return (REGION_DB[this.key] = {
       ...super.update(),
+
       t: 'r',
       st: region.subtype,
       key: this.key,
@@ -92,7 +95,7 @@ export class RadiusRegion extends Region {
   }
 }
 
-/** @typedef {Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>} RadiusRegionSubclassArgument */
+type RadiusRegionSubclassArgument = Omit<ConstructorParameters<typeof RadiusRegion>[0], 'initPermissions'>
 
 export class MineshaftRegion extends RadiusRegion {
   static subtype = 'mine'

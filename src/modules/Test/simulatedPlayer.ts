@@ -9,8 +9,7 @@ import { TestStructures } from 'test/constants'
 const time = 9999999
 
 let name = 'Бот'
-/** @type {GameTest.SimulatedPlayer} */
-let player
+let player: GameTest.SimulatedPlayer
 const testLoc = { x: 1000, y: -60, z: 1000 }
 
 const simulatedPlayer = 'simulated_player'
@@ -115,7 +114,6 @@ GameTest.registerAsync(simulatedPlayer, 'base', async test => {
   .structureName(TestStructures.empty)
   .tag(GameTest.Tags.suiteDisabled)
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('player')
   .setDescription('Спавнит фэйкового игрока')
   .setPermissions('techAdmin')
@@ -176,7 +174,8 @@ GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
  * @param {boolean} msg
  * @returns
  */
-function rd(max, min = 0, msg = false) {
+
+function rd(max: number, min: number = 0, msg: boolean = false) {
   if (max == min || max < min) return max
 
   const rd = Math.round(min + Math.random() * (max - min))

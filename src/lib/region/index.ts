@@ -31,13 +31,13 @@ export function actionGuard(fn: InteractionAllowed, position?: number) {
 
 type InteractionAllowed = (
   player: Player,
-  region?: Region,
-  context?:
+  region: Region | undefined,
+  context:
     | { type: 'break'; event: PlayerBreakBlockBeforeEvent }
     | { type: 'place'; event: PlayerPlaceBlockBeforeEvent }
     | { type: 'interactWithBlock'; event: PlayerInteractWithBlockBeforeEvent }
     | { type: 'interactWithEntity'; event: PlayerInteractWithEntityBeforeEvent },
-) => boolean | undefined
+) => boolean | void
 
 const allowed: InteractionAllowed = (player, region, context) => {
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
@@ -46,8 +46,8 @@ const allowed: InteractionAllowed = (player, region, context) => {
   }
 }
 
-type SpawnAllowed = (region: Region, data: EntitySpawnAfterEvent) => boolean | undefined
-type RegionCallback = (player: Player, region: Region) => boolean | undefined
+type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
+export type RegionCallback = (player: Player, region: Region) => void
 
 let LOADED = false
 

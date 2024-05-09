@@ -21,13 +21,13 @@ import {
 } from 'lib'
 import { Compass } from 'lib/Menu'
 import { Rewards } from 'lib/Rewards'
+import { request } from 'lib/bds/api'
 import { CommandContext } from 'lib/command/context'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { BASE_ITEM_STACK } from 'modules/Features/base'
-import { request } from '../../lib/bds/api'
-import { Mineshaft } from '../Places/Mineshaft'
+import { Mineshaft } from 'modules/Places/Mineshaft'
 import './enchant'
 import './simulatedPlayer'
 
@@ -82,9 +82,6 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
     form.addButton('Test!', BUTTON['?'], () => {})
     form.addButton('Test!', BUTTON['?'], () => {})
     form.show(ctx.player)
-  },
-  cc(ctx) {
-    console.debug(Compass.players.get(ctx.player)?.value)
   },
   title(ctx) {
     ctx.player.onScreenDisplay.setHudTitle('FFf', {

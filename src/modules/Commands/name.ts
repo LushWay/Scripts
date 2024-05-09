@@ -1,6 +1,5 @@
 import { world } from '@minecraft/server'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const name = new Command('name')
   .setDescription('Меняет имя')
   .setPermissions('admin')

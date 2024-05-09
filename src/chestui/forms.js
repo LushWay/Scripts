@@ -1,3 +1,6 @@
+/* eslint-disable */
+// @ts-nocheck AAAAAAA
+
 import { ActionFormData } from '@minecraft/server-ui'
 import { typeIdToDataId, typeIdToID } from './typeIds'
 
@@ -41,6 +44,7 @@ class ChestFormData {
       `stack#${Math.min(Math.max(stackSize, 1) || 1, 99)
         .toString()
         .padStart(2, '0')}§r${itemName ?? ''}§r${itemDesc?.length ? `\n§r${itemDesc.join('\n§r')}` : ''}`,
+
       (ID + (ID < 256 ? 0 : number_of_1_16_100_items)) * 65536 + !!enchanted * 32768 || texture,
     ])
     return this
@@ -62,6 +66,7 @@ class ChestFormData {
                 2,
                 '0',
               )}§r${data?.itemName ?? ''}§r${data?.itemDesc?.length ? `\n§r${data?.itemDesc.join('\n§r')}` : ''}`,
+
             (ID + (ID < 256 ? 0 : number_of_1_16_100_items)) * 65536 + !!data?.enchanted * 32768 || data.texture,
           ])
         }

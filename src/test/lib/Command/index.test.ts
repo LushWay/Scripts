@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck GOO AWAY
+
 import { CommandContext } from 'lib/command/context'
+import '../../framework/framework.test'
 
 const success = 'success'
 const addsSuccessTag = (ctx: CommandContext) => ctx.player.addTag(success)

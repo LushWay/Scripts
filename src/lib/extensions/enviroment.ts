@@ -1,4 +1,5 @@
 /* eslint-disable no-var */
+
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { util } from '../util'
 import { expand } from './extend'
@@ -166,14 +167,13 @@ expand(console, {
     if (verbose) super.log(format(args))
   },
 })
-
-// @ts-expect-error Yes.
+// @ts-expect-error Yes
 globalThis.nextTick = null
 globalThis.verbose = false
 
 Object.entriesStringKeys(MinecraftEntityTypes).forEach(([k, v]) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore We can edit enum properties acutally
+  // @ts-expect-error
   MinecraftEntityTypes[k] = 'minecraft:' + v
 })
 

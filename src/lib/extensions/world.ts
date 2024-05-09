@@ -6,7 +6,6 @@ const send = world.sendMessage.bind(world)
 
 expand(World.prototype, {
   say(message) {
-    // @ts-expect-error TS(7017) FIXME: Element implicitly has an 'any' type because type ... Remove this comment to see the full error message
     if (globalThis.Core?.afterEvents?.worldLoad?.loaded) {
       this.say = send
       return send(message)
@@ -22,6 +21,7 @@ expand(World.prototype, {
   debug(...data: unknown[]) {
     this.say(data.map((/** @type {any} */ e) => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
   },
+
   logOnce(name, ...data: unknown[]) {
     if (LOGS.has(name)) return
     world.debug(...data)

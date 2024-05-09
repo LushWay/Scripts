@@ -4,28 +4,25 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, BUTTON, FormCallback, ModalForm, is, typeIdToReadable, util } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { ArrayForm } from 'lib/form/array'
-import { ChestForm } from 'lib/form/chest'
+import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { prompt } from 'lib/form/message'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit'
 import { configureNylium } from 'modules/WorldEdit/tools/nylium'
 import {
+  BlocksSets,
   DEFAULT_BLOCK_SETS,
   SHARED_POSTFIX,
-  blockSetDropdown,
-  getAllBlockSets,
-  getBlockSetForReplaceTarget,
+  blocksSetDropdown,
+  getAllBlocksSets,
+  getBlocksSetForReplaceTarget,
   getOtherPlayerBlocksSets,
-  getOwnBlockSetsCount,
-  setBlockSet,
+  getOwnBlocksSetsCount,
+  setBlocksSet,
 } from 'modules/WorldEdit/utils/blocksSet'
 import { WorldEditTool } from './lib/WorldEditTool'
 
-/**
- * Main we menu
- *
- * @param {Player} player
- */
-export function WEmenu(player, body = '') {
+/** Main we menu */
+export function WEmenu(player: Player, body = '') {
   const heldItem = player.mainhand()
   if (heldItem.typeId) {
     body = `Создание доступно только при пустой руке.` || body
@@ -35,45 +32,32 @@ export function WEmenu(player, body = '') {
 
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
-  form.addButton(util.badge(`§3Наборы блоков`, getOwnBlockSetsCount(player.id)), () => WEblocksSetsMenu(player))
+  form.addButton(util.badge(`§3Наборы блоков`, getOwnBlocksSetsCount(player.id)), () => WEblocksSetsMenu(player))
 
   for (const tool of WorldEditTool.tools) {
-    // @ts-expect-error TS(2339) FIXME: Property 'getMenuButtonName' does not exist on typ... Remove this comment to see the full error message
     const buttonName = tool.getMenuButtonName(player)
     if (!buttonName) continue
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(buttonName, () => {
-      // @ts-expect-error TS(2339) FIXME: Property 'getToolSlot' does not exist on type 'nev... Remove this comment to see the full error message
       const slotOrError = tool.getToolSlot(player)
       if (typeof slotOrError === 'string') {
         WEmenu(player, '§c' + slotOrError)
       } else {
-        // @ts-expect-error TS(2339) FIXME: Property 'editToolForm' does not exist on type 'ne... Remove this comment to see the full error message
         tool.editToolForm?.(slotOrError, player, false)
       }
     })
   }
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   form.addButton(util.badge('§3Отмена действий', we.history.length), () => WEundoRedoMenu(player))
-
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   form.addButton('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
-
   form.show(player)
 }
 
-/** @param {Player} player */
-function WEChestFromBlocksSet(player) {
+function WEChestFromBlocksSet(player: Player) {
   new ModalForm('Выбери набор блоков...')
-    // @ts-expect-error TS(2556) FIXME: A spread argument must either have a tuple type or... Remove this comment to see the full error message
-    .addDropdown('Набор блоков', ...blockSetDropdown(['', ''], player))
+    .addDropdown('Набор блоков', ...blocksSetDropdown(['', ''], player))
     .show(player, (ctx, blockset) => {
-      /** @type {ReplaceTarget[]} */
-
-      const blocks = getBlockSetForReplaceTarget([player.id, blockset]).filter(e => e !== undefined)
+      const blocks: ReplaceTarget[] = getBlocksSetForReplaceTarget([player.id, blockset]).filter(util.nonNullable)
       const pos1 = Vector.floor(player.location)
       const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
       WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
@@ -99,8 +83,9 @@ function WEChestFromBlocksSet(player) {
 }
 
 /** @param {Player} player */
-function WEblocksSetsMenu(player) {
-  const blockSets = getAllBlockSets(player.id)
+
+function WEblocksSetsMenu(player: Player) {
+  const blockSets = getAllBlocksSets(player.id)
 
   new ArrayForm('Наборы блоков §l$page/$max', '', Object.keys(blockSets), {
     filters: {},
@@ -150,12 +135,23 @@ function WEblocksSetsMenu(player) {
  */
 function WEmanageBlocksSetMenu({
   blockSets,
+
   player,
+
   action,
+
   setName,
   set = setName ? blockSets[setName] : undefined,
   deletePrevious = false,
   onFail = () => {},
+}: {
+  blockSets: import('modules/WorldEdit/utils/blocksSet').BlocksSets
+  player: Player
+  action: string
+  setName?: string
+  set?: import('modules/WorldEdit/utils/blocksSet').BlocksSets[string]
+  deletePrevious?: boolean
+  onFail?: () => void
 }) {
   new ModalForm(action)
     .addTextField(
@@ -167,8 +163,8 @@ function WEmanageBlocksSetMenu({
       if (name in blockSets) return ctx.error('Набор с именем ' + name + ' уже существует!')
 
       if (!name || name === setName) return onFail()
-      if (deletePrevious && setName) setBlockSet(player.id, setName, undefined)
-      setBlockSet(player.id, name, set ? JSON.parse(JSON.stringify(set)) : set)
+      if (deletePrevious && setName) setBlocksSet(player.id, setName, undefined)
+      setBlocksSet(player.id, name, set ? JSON.parse(JSON.stringify(set)) : set)
       WEeditBlocksSetMenu({
         player,
         setName: name,
@@ -182,7 +178,8 @@ function WEmanageBlocksSetMenu({
  * @param {Player} player
  * @param {() => void} back
  */
-function WEotherPlayersBlockSetsMenu(player, back) {
+
+function WEotherPlayersBlockSetsMenu(player: Player, back: () => void) {
   new ArrayForm('§3Наборы блоков других игроков §f$page/$max', '', getOtherPlayerBlocksSets(player.id), {
     filters: {
       online: {
@@ -207,7 +204,6 @@ function WEotherPlayersBlockSetsMenu(player, back) {
 
     back,
 
-    // @ts-expect-error TS(7031) FIXME: Binding element 'otherPlayerId' implicitly has an ... Remove this comment to see the full error message
     button([otherPlayerId, blocksSets], filters) {
       const name = Player.name(otherPlayerId) ?? otherPlayerId
 
@@ -242,16 +238,20 @@ function WEotherPlayersBlockSetsMenu(player, back) {
  * @param {import('modules/WorldEdit/utils/blocksSet').BlocksSets} blockSets
  * @param {() => void} onBack
  */
-function WEplayerBlockSetMenu(player, otherPlayerId, blockSets, onBack) {
+
+function WEplayerBlockSetMenu(
+  player: Player,
+  otherPlayerId: string,
+  blockSets: import('modules/WorldEdit/utils/blocksSet').BlocksSets,
+  onBack: () => void,
+) {
   const name = Player.name(otherPlayerId) ?? otherPlayerId
 
   const pform = new ActionForm(name ?? otherPlayerId, '§3Наборы блоков:')
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   pform.addButton(ActionForm.backText, onBack)
 
   for (const setName of Object.keys(blockSets)) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     pform.addButton(setName, () =>
       WEeditBlocksSetMenu({
         player,
@@ -275,11 +275,20 @@ function WEplayerBlockSetMenu(player, otherPlayerId, blockSets, onBack) {
  * @param {boolean} [o.editStates]
  * @param {() => void} [o.back]
  */
-function WEeditBlocksSetMenu(o) {
+
+function WEeditBlocksSetMenu(o: {
+  player: Player
+  setName: string
+  sets?: BlocksSets
+  ownsSet?: boolean
+  add?: boolean
+  editStates?: boolean
+  back?: () => void
+}) {
   const {
     player,
     setName,
-    sets = getAllBlockSets(player.id),
+    sets = getAllBlocksSets(player.id),
     ownsSet = true,
     add = true,
     editStates = false,
@@ -288,7 +297,7 @@ function WEeditBlocksSetMenu(o) {
   let set = sets[setName]
   if (!set) {
     set = []
-    setBlockSet(player.id, setName, set)
+    setBlocksSet(player.id, setName, set)
     sets[setName] = set
   }
 
@@ -297,8 +306,7 @@ function WEeditBlocksSetMenu(o) {
   const blockOnView = blockOnViewHit && blockOnViewHit.block
   const form = new ChestForm('large')
 
-  /** @type {import('lib/Form/ChestForm').ChestButtonOptions} */
-  const empty = {
+  const empty: ChestButtonOptions = {
     slot: 0,
     icon: 'textures/blocks/glass',
     nameTag: 'Пусто',
@@ -323,7 +331,7 @@ function WEeditBlocksSetMenu(o) {
         description: 'Нажмите чтобы скопировать набор в свой список наборов. Вы сможете редактировать его.',
         callback() {
           const newName = setName.replace(SHARED_POSTFIX, '')
-          setBlockSet(player.id, newName, set)
+          setBlocksSet(player.id, newName, set)
           WEeditBlocksSetMenu({
             ...o,
             setName: newName,
@@ -401,9 +409,10 @@ function WEeditBlocksSetMenu(o) {
             'Выключенные блоки будут очищены. Список:\n' + blocksToClear.map(e => typeIdToReadable(e[0])).join('\n'),
             '§cОчистить',
             () => {
-              setBlockSet(
+              setBlocksSet(
                 player.id,
                 setName,
+
                 set.filter(e => !blocksToClear.includes(e)),
               )
               WEeditBlocksSetMenu({ ...o, sets: undefined })
@@ -423,7 +432,7 @@ function WEeditBlocksSetMenu(o) {
             '§cУдалить набор? Это действие нельзя отменить',
             '§cУдалить',
             () => {
-              setBlockSet(player.id, setName, undefined)
+              setBlocksSet(player.id, setName, undefined)
               back()
             },
             'Отмена',
@@ -458,20 +467,23 @@ function WEeditBlocksSetMenu(o) {
    * @param {string} typeId
    * @param {Record<string, string | number | boolean> | undefined} states
    */
-  function addBlock(slot, typeId, states, setButton = true) {
+
+  function addBlock(
+    slot: number,
+    typeId: string,
+    states: Record<string, string | number | boolean> | undefined,
+    setButton = true,
+  ) {
     // Prevent from using {} state
     if (states && Object.keys(states).length < 1) states = undefined
 
     // If block is already in blocksSet
-
-    // @ts-expect-error TS(7031) FIXME: Binding element 't' implicitly has an 'any' type.
     const blockInSet = set.find(([t, s]) => t === typeId && JSON.stringify(s) === JSON.stringify(states))
 
     // Amount of block in blocksSet
     const amount = blockInSet?.[2] ?? 0
 
-    /** @type {import('lib/Form/ChestForm').ChestButtonOptions} */
-    const button = {
+    const button: ChestButtonOptions = {
       slot: slot,
       icon: typeId,
 
@@ -529,12 +541,13 @@ function WEeditBlocksSetMenu(o) {
         }
 
         // Save changes
-        setBlockSet(player.id, setName, set)
+        setBlocksSet(player.id, setName, set)
 
         // Reopen to show them
-        WEeditBlocksSetMenu({ ...o, sets: getAllBlockSets(player.id) })
+        WEeditBlocksSetMenu({ ...o, sets: getAllBlocksSets(player.id) })
       },
     }
+
     if (setButton) form.button(button)
     else return button
   }
@@ -551,10 +564,11 @@ function WEeditBlocksSetMenu(o) {
   if (ownsSet) {
     const { container } = player
     if (!container) return
-    /** @type {string[]} */
-    const blocks = []
+
+    const blocks: string[] = []
     for (let i = 0; i < container.size; i++) {
       const item = container.getItem(i)
+
       if (!item || set.find(e => e[0] === item.typeId) || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId))
         continue
 
@@ -569,25 +583,21 @@ function WEeditBlocksSetMenu(o) {
 
 const allStates = BlockStates.getAll()
 
-/**
- * @param {Player} player
- * @param {Record<string, string | boolean | number>} states
- * @param {() => void} back
- * @returns {Promise<Record<string, string | boolean | number>>}
- */
-export function WEeditBlockStatesMenu(player, states, back, edited = false) {
-  const promise = new Promise(resolve => {
+export function WEeditBlockStatesMenu(
+  player: Player,
+  states: Record<string, string | boolean | number>,
+  back: () => void,
+  edited = false,
+) {
+  const promise = new Promise<Record<string, string | boolean | number>>(resolve => {
     const form = new ActionForm('Редактировать свойства блока')
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(ActionForm.backText, () => {
       resolve(states)
     })
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     if (edited) form.addButton(ActionForm.backText + ' без сохранения', back)
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton('§cУдалить все свойства блока', () =>
       prompt(
         player,
@@ -604,7 +614,6 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
       const stateDef = allStates.find(e => e.id === stateName)
       if (!stateDef) continue
 
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       form.addButton(
         `${stateName}: ${util.stringify(stateValue)}\n${
           stateDef.validValues[0] === stateValue ? '§8По умолчанию' : ''
@@ -619,7 +628,6 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
               resolve(WEeditBlockStatesMenu(player, states, back))
             })
 
-            // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
             editStateForm.addButton('§cУдалить значение', () => {
               delete states[stateName]
               resolve(WEeditBlockStatesMenu(player, states, back))
@@ -628,7 +636,6 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
             try {
               if (!stateDef) return
               for (const validValue of Array.from(stateDef.validValues)) {
-                // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
                 editStateForm.addButton(`${validValue === stateValue ? '> ' : ''}${util.stringify(validValue)}`, () => {
                   states[stateName] = validValue
                   stateValue = validValue
@@ -653,42 +660,28 @@ export function WEeditBlockStatesMenu(player, states, back, edited = false) {
   return promise
 }
 
-/**
- * Reference to block that can be replaced
- *
- * @typedef {{
- *   typeId: string
- *   states: Record<string, string | number | boolean>
- * }} ReplaceTarget
- */
+/** Reference to block that can be replaced */
+export type ReplaceTarget = {
+  typeId: string
+  states: Record<string, string | number | boolean>
+}
 
-/**
- * Converts replace target or block permutation to permutation. Usefull when need to make code cleaner
- *
- * @param {ReplaceTarget | BlockPermutation} target
- */
-export function toPermutation(target) {
+/** Converts replace target or block permutation to permutation. Usefull when need to make code cleaner */
+export function toPermutation(target: ReplaceTarget | BlockPermutation) {
   return target instanceof BlockPermutation ? target : BlockPermutation.resolve(target.typeId, target.states)
 }
 
-/**
- * Converts replace target or block permutation to replace target. Usefull when need to make code cleaner
- *
- * @param {ReplaceTarget | BlockPermutation | undefined} permutation
- */
-export function toReplaceTarget(permutation) {
+/** Converts replace target or block permutation to replace target. Usefull when need to make code cleaner */
+export function toReplaceTarget(permutation: ReplaceTarget | BlockPermutation | undefined) {
   return permutation && permutation instanceof BlockPermutation
     ? { typeId: permutation.type.id, states: permutation.getAllStates() }
     : permutation
 }
 
-/**
- * Stringifies replace targets to like "Wooden Slab, Stone"
- *
- * @param {(undefined | ReplaceTarget)[]} targets
- */
-export function stringifyReplaceTargets(targets) {
+/** Stringifies replace targets to like "Wooden Slab, Stone" */
+export function stringifyReplaceTargets(targets: (undefined | ReplaceTarget)[]) {
   return targets
+
     .map(e => e?.typeId && typeIdToReadable(e.typeId))
     .filter(Boolean)
     .join(', ')
@@ -702,7 +695,13 @@ export function stringifyReplaceTargets(targets) {
  * @param {'undo' | 'redo'} [mode] - Either to show undoed or redoed action
  * @param {string} [source] - Player whos history will be shown
  */
-export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo', source = player.id, body = '') {
+export function WEundoRedoMenu(
+  player: Player,
+  back: VoidFunction = () => WEmenu(player),
+  mode: 'undo' | 'redo' = 'undo',
+  source: string = player.id,
+  body = '',
+) {
   const form = new ActionForm(
     'Отмена/Восстановление',
     body +
@@ -712,24 +711,20 @@ export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo
   )
   form.addButtonBack(back)
 
-  // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
   form.addButton(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
     WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', source),
   )
 
   if (is(player.id, 'grandBuilder')) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton('§3Действия других игроков', () => {
       WEundoRedoOtherPlayersMenu(player, () => form.show(player))
     })
   }
 
-  // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
   const we = WorldEdit.instances[source]
   const actions = mode === 'undo' ? we.history : we.undos
   // TODO Maybe group similiar actions
   for (const action of actions.slice().reverse()) {
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(action.name, () => {
       we.loadBackup(actions, action)
       player.playSound(SOUNDS.success)
@@ -740,17 +735,12 @@ export function WEundoRedoMenu(player, back = () => WEmenu(player), mode = 'undo
   form.show(player)
 }
 
-/**
- * @param {Player} player
- * @param {VoidFunction} back
- */
-function WEundoRedoOtherPlayersMenu(player, back) {
+function WEundoRedoOtherPlayersMenu(player: Player, back: VoidFunction) {
   const form = new ActionForm('Выбрать игрока...').addButtonBack(back)
 
   for (const playerId of Object.keys(WorldEdit.instances)) {
     const name = Player.name(playerId) ?? '<Без имени>'
 
-    // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
     form.addButton(name, () => {
       WEundoRedoMenu(player, () => WEundoRedoOtherPlayersMenu(player, back), 'undo', playerId)
     })

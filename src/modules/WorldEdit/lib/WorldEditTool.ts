@@ -3,28 +3,18 @@ import { expand, util } from 'lib'
 import { stringifyBlocksSetRef } from 'modules/WorldEdit/utils/blocksSet'
 import { WE_PLAYER_SETTINGS } from '../settings'
 
-/** @typedef {(player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void} IntervalFunction */
-
-/** @typedef {'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'} LoreStringName */
+type IntervalFunction = (player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void
+type LoreStringName = 'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'
 
 const LORE_SEPARATOR = '\u00a0'
+const LORE_BLOCKS_SET_KEYS_T: (LoreStringName | string)[] = ['blocksSet', 'replaceBlocksSet']
 
-/** @type {(LoreStringName | string)[]} */
-const LORE_BLOCKS_SET_KEYS_T = ['blocksSet', 'replaceBlocksSet']
+export class WorldEditTool<LoreFormat extends { [P in LoreStringName]?: any } & { version: number } = any> {
+  static loreBlockSetKeys: string[] = LORE_BLOCKS_SET_KEYS_T
 
-/**
- * @template {{ [P in LoreStringName]? } & { version: number }} [LoreFormat=any] Default is `any` . Default is `any` .
- *   Default is `any`
- */
-export class WorldEditTool {
-  /** @type {string[]} */
-  static loreBlockSetKeys = LORE_BLOCKS_SET_KEYS_T
+  static tools: WorldEditTool<any>[] = []
 
-  /** @type {WorldEditTool<any>[]} */
-  static tools = []
-
-  /** @type {IntervalFunction[]} */
-  static intervals = []
+  static intervals: IntervalFunction[] = []
 
   command
 
@@ -61,17 +51,36 @@ export class WorldEditTool {
    */
   constructor({
     name,
+
     displayName,
+
     itemStackId,
+
     editToolForm,
+
     loreFormat,
+
     interval0,
+
     interval10,
+
     interval20,
+
     onUse,
+
     overrides,
+  }: {
+    name: string
+    displayName: string
+    itemStackId: string
+    editToolForm?: (slot: ContainerSlot, player: Player, initial?: boolean) => void
+    loreFormat?: LoreFormat
+    interval0?: IntervalFunction
+    interval10?: IntervalFunction
+    interval20?: IntervalFunction
+    onUse?: (player: Player, item: ItemStack) => void
+    overrides?: Partial<WorldEditTool<LoreFormat>> & ThisType<WorldEditTool<LoreFormat>>
   }) {
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'this' is not assignable to param... Remove this comment to see the full error message
     WorldEditTool.tools.push(this)
     this.name = name
     this.displayName = displayName
@@ -85,7 +94,6 @@ export class WorldEditTool {
     this.interval20 = interval20
     if (overrides) expand(this, overrides)
 
-    // @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
     this.command = new Command(name)
       .setDescription(`Создает${editToolForm ? ' или редактирует ' : ''}${displayName}`)
       .setPermissions('builder')
@@ -99,7 +107,8 @@ export class WorldEditTool {
   }
 
   /** @param {Player} player */
-  getToolSlot(player) {
+
+  getToolSlot(player: Player) {
     const slot = player.mainhand()
 
     if (!slot.typeId) {
@@ -118,7 +127,8 @@ export class WorldEditTool {
    * @param {Player} player
    * @returns {string}
    */
-  getMenuButtonNameColor(player) {
+
+  getMenuButtonNameColor(player: Player): string {
     const { typeId } = player.mainhand()
     const edit = typeId === this.itemId
     const air = !typeId
@@ -129,7 +139,8 @@ export class WorldEditTool {
    * @param {Player} player
    * @returns {string}
    */
-  getMenuButtonName(player) {
+
+  getMenuButtonName(player: Player): string {
     const { typeId } = player.mainhand()
     const edit = typeId === this.itemId
 
@@ -138,28 +149,16 @@ export class WorldEditTool {
     return `${this.getMenuButtonNameColor(player)}${edit ? 'Редактировать' : 'Создать'} ${this.displayName}`
   }
 
-  /**
-   * @overload
-   * @param {string[]} lore
-   * @param {false} [returnUndefined]
-   * @returns {LoreFormat}
-   */
-  /**
-   * @overload
-   * @param {string[]} lore
-   * @param {true} returnUndefined
-   * @returns {LoreFormat | undefined}
-   */
-  /**
-   * @param {string[]} lore
-   * @param {boolean} [returnUndefined]
-   * @returns {LoreFormat | undefined}
-   */
-  parseLore(lore, returnUndefined = false) {
+  parseLore(lore: string[], returnUndefined?: false): LoreFormat
+
+  parseLore(lore: string[], returnUndefined?: true): LoreFormat | undefined
+
+  parseLore(lore: string[], returnUndefined: boolean = false): LoreFormat | undefined {
     let raw
     try {
       raw = JSON.parse(
         lore
+
           .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
           .join('')
           .replace(/§(.)/g, '$1'),
@@ -177,7 +176,7 @@ export class WorldEditTool {
   }
 
   /** @type {Record<string, string>} */
-  loreTranslation = {
+  loreTranslation: Record<string, string> = {
     shape: 'Форма',
     size: 'Размер',
     height: 'Высота',
@@ -192,7 +191,8 @@ export class WorldEditTool {
    * @param {LoreFormat} format
    * @returns {string[]}
    */
-  stringifyLore(format) {
+
+  stringifyLore(format: LoreFormat): string[] {
     format.version ??= this.loreFormat.version
     return [
       ...Object.entries(format)
@@ -200,7 +200,6 @@ export class WorldEditTool {
         .map(([key, value]) => {
           const val = WorldEditTool.loreBlockSetKeys.includes(key) ? stringifyBlocksSetRef(value) : util.inspect(value)
 
-          // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           const k = this.loreTranslation[key] ?? key
           return `${k}: ${val}`.match(/.{0,48}/g) || []
         })
@@ -219,13 +218,12 @@ export class WorldEditTool {
   }
 }
 
-// @ts-expect-error TS(7031) FIXME: Binding element 'player' implicitly has an 'any' t... Remove this comment to see the full error message
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
   if (!(player instanceof Player)) return
   WorldEditTool.tools
-    // @ts-expect-error TS(2339) FIXME: Property 'itemId' does not exist on type 'never'.
+
     .filter(e => e.itemId === item.typeId)
-    // @ts-expect-error TS(2339) FIXME: Property 'onUse' does not exist on type 'never'.
+
     .forEach(tool => util.catch(() => tool?.onUse?.(player, item)))
 })
 
@@ -236,22 +234,17 @@ system.runInterval(
       if (!player) continue
       const item = player.mainhand()
 
-      // @ts-expect-error TS(2339) FIXME: Property 'itemId' does not exist on type 'never'.
       const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
       const settings = WE_PLAYER_SETTINGS(player)
 
-      // @ts-expect-error TS(2349) FIXME: This expression is not callable.
       WorldEditTool.intervals.forEach(e => e(player, item, settings))
       if (!tool) continue
       /** @type {(undefined | IntervalFunction)[]} */
 
-      // @ts-expect-error TS(2339) FIXME: Property 'interval0' does not exist on type 'never... Remove this comment to see the full error message
-      const fn = [tool.interval0]
+      const fn: (undefined | IntervalFunction)[] = [tool.interval0]
 
-      // @ts-expect-error TS(2339) FIXME: Property 'interval10' does not exist on type 'neve... Remove this comment to see the full error message
       if (ticks % 10 === 0) fn.push(tool.interval10)
 
-      // @ts-expect-error TS(2339) FIXME: Property 'interval20' does not exist on type 'neve... Remove this comment to see the full error message
       if (ticks % 20 === 0) fn.push(tool.interval20)
 
       fn.forEach(e => e?.(player, item, settings))

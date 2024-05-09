@@ -10,11 +10,13 @@ expand(Player, {
       if (player.id === name) return player
     }
   },
+
   getByName(name) {
     for (const player of world.getPlayers()) {
       if (player.isValid() && player.name === name) return player
     }
   },
+
   name(id) {
     throw new Error('Cannot use Player.name before player database initialization!')
   },
@@ -25,7 +27,8 @@ expand(Player, {
  * @param {string} sound
  * @returns {(this: Player, message: string) => void}
  */
-function prefix(pref, sound) {
+
+function prefix(pref: string, sound: string): (this: Player, message: string) => void {
   return function (this, message) {
     system.delay(() => {
       this.playSound(sound)
@@ -35,7 +38,7 @@ function prefix(pref, sound) {
 }
 
 /** @type {Set<string>} */
-export const CLOSING_CHAT = new Set()
+export const CLOSING_CHAT: Set<string> = new Set()
 
 export const SCREEN_DISPLAY = Symbol('screen_display')
 
@@ -44,6 +47,7 @@ expand(Player.prototype, {
     return 'jump' in this
   },
 
+  // @ts-expect-error AAAAAAAAAAAAAAA
   get [SCREEN_DISPLAY]() {
     return super.onScreenDisplay
   },
@@ -61,17 +65,20 @@ expand(Player.prototype, {
   info: prefix('§b§l> §r§3', SOUNDS.action),
 
   tell: Player.prototype.sendMessage,
+
   applyDash(target, horizontalStrength, verticalStrength) {
     const view = target.getViewDirection()
     const hStrength = Math.sqrt(view.x ** 2 + view.z ** 2) * horizontalStrength
     const vStrength = view.y * verticalStrength
     target.applyKnockback(view.x, view.z, hStrength, vStrength)
   },
+
   isGamemode(mode) {
     return this.matches({
       gameMode: GameMode[mode],
     })
   },
+
   closeChat(message) {
     const fail = () => (message && this.tell(message), false)
     const health = this.getComponent('health')
@@ -117,8 +124,7 @@ expand(Entity.prototype, {
 
 expand(Container.prototype, {
   entries() {
-    /** @type {ReturnType<Container['entries']>} */
-    const items = []
+    const items: ReturnType<Container['entries']> = []
     for (let i = 0; i < this.size; i++) {
       items.push([i, this.getItem(i)])
     }
@@ -126,8 +132,7 @@ expand(Container.prototype, {
   },
 
   slotEntries() {
-    /** @type {ReturnType<Container['slotEntries']>} */
-    const items = []
+    const items: ReturnType<Container['slotEntries']> = []
     for (let i = 0; i < this.size; i++) {
       items.push([i, this.getSlot(i)])
     }

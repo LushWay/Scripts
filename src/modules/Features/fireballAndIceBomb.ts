@@ -56,16 +56,14 @@ world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
   },
 )
 
-/** @type {Record<string, string>} */
-const ICE_BOMB_TRANSOFORM = {
+const ICE_BOMB_TRANSOFORM: Record<string, string> = {
   [MinecraftBlockTypes.Water]: MinecraftBlockTypes.Ice,
   [MinecraftBlockTypes.FlowingWater]: MinecraftBlockTypes.Ice,
   [MinecraftBlockTypes.Lava]: MinecraftBlockTypes.Obsidian,
   [MinecraftBlockTypes.FlowingLava]: MinecraftBlockTypes.Stone,
 }
 
-/** @type {Entity[]} */
-let entities = []
+let entities: Entity[] = []
 system.runInterval(
   () => {
     entities = world.overworld.getEntities({ type: MinecraftEntityTypes.Snowball })

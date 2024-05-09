@@ -30,7 +30,6 @@ export class Quest {
       const onquestupdate = sidebar.show.bind(sidebar)
 
       return function (player: Player) {
-        // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
         const status = Quest.active(player)
         if (!status) return false
 
@@ -42,27 +41,13 @@ export class Quest {
     },
   }
 
-  /** @type {Record<string, Quest>} */
   static list: Record<string, Quest> = {}
 
-  description
-
-  id
-
-  init
-
-  name
-
-  /**
-   * @param {Player} player
-   * @param {Quest} [quest]
-   */
-  static active(player: Player, quest: Quest) {
+  static active(player: Player, quest?: Quest) {
     const db = player.database
     const dbquest = quest ? db.quests?.active.find((q: { id: string }) => q.id === quest?.id) : db.quests?.active[0]
     if (!dbquest) return false
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     quest ??= Quest.list[dbquest.id]
     if (!quest) return false
 
@@ -73,65 +58,45 @@ export class Quest {
     }
   }
 
-  /** @type {Record<string, PlayerQuest>} */
+  description
+
+  id
+
+  name
+
   players: Record<string, PlayerQuest> = {}
 
-  /**
-   * @param {object} options
-   * @param {string} options.name
-   * @param {string} options.id
-   * @param {string} options.desc
-   * @param {(q: PlayerQuest, p: Player) => void} init
-   */
   constructor(
     { id, name, desc }: { name: string; id: string; desc: string },
-    init: (q: PlayerQuest, p: Player) => void,
+    public init: (q: PlayerQuest, p: Player) => void,
   ) {
     this.id = id
     this.name = name
-    this.init = init
     this.description = desc
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     Quest.list[this.id] = this
 
-    // @ts-expect-error TS(2304) FIXME: Cannot find name 'Core'.
     Core.afterEvents.worldLoad.subscribe(() => {
       world.getAllPlayers().forEach(e => setQuest(e, this))
     })
   }
 
-  /** @param {Player} player */
   steps(player: Player) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     if (this.players[player.id]) return this.players[player.id]
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     this.players[player.id] = new PlayerQuest(this, player)
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     this.init(this.players[player.id], player)
 
-    world.afterEvents.playerLeave.subscribe(
-      ({
-        playerId,
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-      }) => delete this.players[playerId],
-    )
+    world.afterEvents.playerLeave.subscribe(({ playerId }) => delete this.players[playerId])
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return this.players[player.id]
   }
 
-  /** @param {Player} player */
   enter(player: Player) {
     this.toStep(player, 0)
   }
 
-  /**
-   * @param {Player} player
-   * @param {number} stepIndex
-   */
   toStep(player: Player, stepIndex: number, restore = false) {
     const quests = (player.database.quests ??= {
       active: [],
@@ -179,7 +144,6 @@ export class Quest {
     step.cleanup = step.activate?.(!restore).cleanup
   }
 
-  /** @param {Player} player */
   current(player: Player) {
     const steps = Quest.active(player, this)
     if (!steps) return false
@@ -187,7 +151,6 @@ export class Quest {
     return steps.step
   }
 
-  /** @param {Player} player */
   exit(player: Player, end = false) {
     const db = player.database
     if (!db.quests) return
@@ -196,7 +159,6 @@ export class Quest {
     if (active) {
       this.steps(player).list[active.step].cleanup?.()
 
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       delete this.players[player.id]
     }
 
@@ -207,11 +169,9 @@ export class Quest {
 
 Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
 
-/** @param {Player} player */
 function setQuests(player: Player) {
   system.delay(() => {
-    player.database.quests?.active.forEach((db: { id: string | number }) => {
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+    player.database.quests?.active.forEach(db => {
       const quest = Quest.list[db.id]
       if (!quest) return
 
@@ -220,28 +180,21 @@ function setQuests(player: Player) {
   })
 }
 
-function setQuest(
-  player: Player,
-  quest: Quest,
-  db = player.database.quests?.active.find((e: { id: any }) => e.id === quest.id),
-) {
+function setQuest(player: Player, quest: Quest, db = player.database.quests?.active.find(e => e.id === quest.id)) {
   if (db) quest.toStep(player, db.step, true)
 }
 
-/** @typedef {() => string} DynamicQuestText */
+type DynamicQuestText = () => string
 
-/** @typedef {string | DynamicQuestText} QuestText */
+type QuestText = string | DynamicQuestText
 
-/**
- * @typedef {{
- *   text: QuestText
- *   description?: QuestText
- *   activate?(firstTime: boolean): { cleanup(): void }
- * }} QuestStepInput
- */
+type QuestStepInput = {
+  text: QuestText
+  description?: QuestText
+  activate?(firstTime: boolean): { cleanup(): void }
+}
 
-/** @template [DB=unknown] Default is `unknown` . Default is `unknown` */
-type QuestStepThis = {
+type QuestStepThis<DB = unknown> = {
   next(): void
   cleanup?(): void
   player: Player
@@ -256,31 +209,19 @@ type QuestStepThis = {
 // TODO Add main quest switching
 
 class PlayerQuest {
-  player
+  constructor(
+    public quest: Quest,
+    public player: Player,
+  ) {}
 
-  quest
-
-  /**
-   * @param {Quest} parent
-   * @param {Player} player
-   */
-  constructor(parent: Quest, player: Player) {
-    this.quest = parent
-    this.player = player
-  }
-
-  /** @type {QuestStepThis[]} */
   list: QuestStepThis[] = []
 
-  /** @type {Set<(p: Player) => void>} */
   updateListeners: Set<(p: Player) => void> = new Set()
 
   update() {
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     this.updateListeners.forEach(e => e(this.player))
   }
 
-  /** @param {QuestStepInput & ThisType<QuestStepThis>} options */
   dynamic(options: QuestStepInput & ThisType<QuestStepThis>) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const step = this
@@ -325,20 +266,11 @@ class PlayerQuest {
     // Share properties between mixed objects
     Object.setPrototypeOf(options, ctx)
 
-    // @ts-expect-error TS(2345) FIXME: Argument of type 'any' is not assignable to parame... Remove this comment to see the full error message
     this.list.push(ctx)
     return ctx
   }
 
-  /**
-   * Waits for item in the inventory
-   *
-   * @param {Omit<QuestStepInput, 'activate'> & {
-   *   isItem: (item: ContainerSlot) => boolean
-   * } & ThisType<QuestStepThis>} options
-   */
-
-  // @ts-expect-error TS(7031) FIXME: Binding element 'isRequestedItem' implicitly has a... Remove this comment to see the full error message
+  /** Waits for item in the inventory */
   item({
     isItem: isRequestedItem,
     ...options
@@ -348,7 +280,6 @@ class PlayerQuest {
     this.dynamic({
       ...options,
       activate() {
-        // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
         return new Temporary(() => {
           const action = InventoryIntervalAction.subscribe(({ player, slot }) => {
             if (player.id !== this.player.id) return
@@ -365,13 +296,7 @@ class PlayerQuest {
     })
   }
 
-  /**
-   * @param {Vector3} from
-   * @param {Vector3} to
-   * @param {QuestText} text
-   * @param {QuestText} [description]
-   */
-  place(from: Vector3, to: Vector3, text: QuestText, description: QuestText) {
+  place(from: Vector3, to: Vector3, text: QuestText, description?: QuestText) {
     // Unwrap vectors to not loose reference. For some reason, that happens
     from = { x: from.x, y: from.y, z: from.z }
     to = { x: to.x, y: to.y, z: to.z }
@@ -381,10 +306,8 @@ class PlayerQuest {
       text,
       description,
       activate() {
-        // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
         const temporary = new Temporary(() => {
           const actions = [...Vector.foreach(from, to)].map(pos =>
-            // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
             PlaceAction.onEnter(pos, player => {
               if (player.id !== this.player.id) return
 
@@ -408,23 +331,6 @@ class PlayerQuest {
     })
   }
 
-  /**
-   * @typedef {{
-   *   text(value: number): string
-   *   description?: QuestCounterInput['text']
-   *   end: number
-   *   value?: number
-   * } & Omit<QuestStepInput, 'text' | 'description'>} QuestCounterInput
-   */
-
-  /**
-   * @typedef {QuestStepThis & { diff(this: QuestStepThis, m: number): void } & Omit<
-   *     QuestCounterInput,
-   *     'text' | 'description'
-   *   >} QuestCounterThis
-   */
-
-  /** @param {QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>} options */
   counter(options: QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>) {
     options.value ??= 0
 
@@ -462,22 +368,9 @@ class PlayerQuest {
       options.description = () => inputedDescription(options.value)
     }
 
-    this.dynamic(options)
+    this.dynamic(options as unknown as QuestStepThis)
   }
 
-  /**
-   * @typedef {{
-   *   npcEntity: Entity
-   *   placeText?: QuestStepInput['text']
-   *   placeDescription?: QuestStepInput['text']
-   *   talkText: QuestStepInput['text']
-   *   talkDescription?: QuestStepInput['text']
-   * } & QuestStepInput} QuestDialogueInput
-   */
-
-  /** @typedef {QuestStepThis & QuestDialogueInput} QuestDialogueThis */
-
-  /** @param {QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>} options */
   dialogue(options: QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>) {
     if (!options.npcEntity.isValid()) return this.failed('Неигровой персонаж недоступен')
     const location = options.npcEntity.location
@@ -494,10 +387,9 @@ class PlayerQuest {
       text: options.talkText,
       description: options.talkDescription,
       activate() {
-        // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
         return new Temporary(({ system }) => {
           system.afterEvents.scriptEventReceive.subscribe(
-            (event: { id: string; initiator: { id: any } }) => {
+            event => {
               if (event.id !== 'quest:dialogue.end' || !event.initiator) return
               if (event.initiator.id !== this.player.id) return
               this.next()
@@ -511,26 +403,12 @@ class PlayerQuest {
     })
   }
 
-  /**
-   * @typedef {{
-   *   text?: (AirdropPos: string) => string
-   * } & (
-   *   | {
-   *       spawnAirdrop: (key: string | undefined) => Airdrop
-   *     }
-   *   | ({ lootTable: LootTable } & ({ location: Vector3 } | { abovePlayerY?: number }))
-   * )} QuestAirdropInput
-   */
-
-  /** @typedef {Partial<QuestStepThis> & QuestAirdropInput} QuestAirdropThis */
-
-  /** @param {QuestAirdropInput & ThisType<QuestAirdropThis>} options */
   airdrop(options: QuestAirdropInput & ThisType<QuestAirdropThis>) {
     if (!this.player.isValid()) return
     const spawnAirdrop =
       'spawnAirdrop' in options
         ? options.spawnAirdrop
-        : (/** @type {string | undefined} */ key: string | undefined) =>
+        : (key?: string) =>
             new Airdrop(
               {
                 position:
@@ -551,7 +429,6 @@ class PlayerQuest {
     this.dynamic({
       text: () => (options.text ? options.text(airdroppos) : '§6Забери аирдроп' + airdroppos),
       activate() {
-        /** @type {Airdrop | undefined} */
         let airdrop: Airdrop | undefined
 
         // Saving/restoring/debugging airdrop
@@ -576,7 +453,6 @@ class PlayerQuest {
         debugAirdrop()
         if (!airdrop || !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
 
-        // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
         const temporary = new Temporary(({ world, system, cleanup }) => {
           system.runInterval(() => debugAirdrop(), 'PlayerQuest.airdrop debug', 20)
 
@@ -692,3 +568,34 @@ type CompassOptions = {
   temporary?: Temporary
   interval?: VoidFunction & ThisType<CompassOptions>
 }
+type QuestCounterInput = {
+  text(value: number): string
+  description?: QuestCounterInput['text']
+  end: number
+  value?: number
+} & Omit<QuestStepInput, 'text' | 'description'>
+
+type QuestCounterThis = Omit<QuestStepThis, 'text'> & {
+  diff(this: Omit<QuestStepThis, 'text'>, m: number): void
+} & Omit<QuestCounterInput, 'text' | 'description'>
+
+type QuestDialogueInput = {
+  npcEntity: Entity
+  placeText?: QuestStepInput['text']
+  placeDescription?: QuestStepInput['text']
+  talkText: QuestStepInput['text']
+  talkDescription?: QuestStepInput['text']
+} & QuestStepInput
+
+type QuestDialogueThis = QuestStepThis & QuestDialogueInput
+
+type QuestAirdropInput = {
+  text?: (AirdropPos: string) => string
+} & (
+  | {
+      spawnAirdrop: (key: string | undefined) => Airdrop
+    }
+  | ({ lootTable: LootTable } & ({ location: Vector3 } | { abovePlayerY?: number }))
+)
+
+type QuestAirdropThis = Partial<QuestStepThis> & QuestAirdropInput

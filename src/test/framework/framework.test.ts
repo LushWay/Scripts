@@ -1,9 +1,12 @@
-import { RawMessage } from '@minecraft/server'
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck GOO AWAY
 
+import { RawMessage } from '@minecraft/server'
 import * as gametest from '@minecraft/server-gametest'
 import { expand } from 'lib/extensions/extend'
 import { util } from 'lib/util'
 import { TestStructures } from 'test/constants'
+import './framework.test'
 
 expand(gametest.SimulatedPlayer.prototype, {
   get name() {
@@ -29,6 +32,7 @@ expand(gametest.SimulatedPlayer.prototype, {
   tell(message) {
     return this.sendMessage(message)
   },
+
   sendMessage(message) {
     let string = ''
     if (Array.isArray(message)) {
@@ -49,6 +53,7 @@ expand(gametest.Test.prototype, {
   player() {
     return this.spawnSimulatedPlayer({ x: 0, y: 0, z: 0 })
   },
+
   spawnSimulatedPlayer(location, name, gameMode) {
     const player = super.spawnSimulatedPlayer(location, name, gameMode)
 
@@ -58,6 +63,7 @@ expand(gametest.Test.prototype, {
   },
 
   _history: [],
+
   print(text) {
     this._history.push(text)
 
@@ -89,8 +95,10 @@ globalThis.it = (should: string, testFunction: (test: gametest.Test) => Promise<
 
         const history = test._history
           .concat(util.error(error, { parseOnly: true }))
+
           .map(e => e.split('\n'))
           .flat()
+
           .map(line => '§r§f\n  ' + line)
           .join('')
 

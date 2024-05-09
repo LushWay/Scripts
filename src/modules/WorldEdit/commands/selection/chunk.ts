@@ -1,4 +1,4 @@
-import { Entity, Vector } from '@minecraft/server'
+import { Entity, Player, Vector } from '@minecraft/server'
 import { WorldEdit } from '../../lib/WorldEdit'
 
 /**
@@ -9,7 +9,8 @@ import { WorldEdit } from '../../lib/WorldEdit'
  *
  * @param {Entity} entity Entity to check
  */
-function getChunkCuboidPositions(entity) {
+
+function getChunkCuboidPositions(entity: Player) {
   const chunk = {
     x: Math.floor(entity.location.x / 16),
     z: Math.floor(entity.location.z / 16),
@@ -22,7 +23,6 @@ function getChunkCuboidPositions(entity) {
   }
 }
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 new Command('chunk')
   .setGroup('we')
   .setDescription('Выбрать чанк')

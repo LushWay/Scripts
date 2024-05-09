@@ -267,7 +267,7 @@ export class Command<
 
     this.sys.children.push(cmd)
 
-    // @ts-expect-error Huhh
+    // @ts-expect-error Command this type i hate ts
     return cmd
   }
 
@@ -323,8 +323,7 @@ export class Command<
     const cmd = this.argument(new LocationArgumentType(name, optional))
     if (!name.endsWith('*')) {
       const newArg = cmd.location(name + '_y*', optional).location(name + '_z*', optional)
-
-      // @ts-expect-error Magic
+      // @ts-expect-error Command this type i hate ts
       return newArg
     }
     return cmd
@@ -344,7 +343,7 @@ export class Command<
 
     this.sys.children.push(cmd)
 
-    // @ts-expect-error Magic
+    // @ts-expect-error Command this type i hate ts
     return cmd
   }
 
@@ -370,8 +369,10 @@ declare global {
 globalThis.Command = Command
 
 // TODO! REPLACE WITH PACK ON 1.20.70
+
 world.beforeEvents.chatSend.subscribe(event => {
   event.sendToTargets = true
   event.setTargets([])
 })
+
 world.afterEvents.chatSend.subscribe(event => Command.chatListener(event))

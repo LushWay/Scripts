@@ -1,4 +1,5 @@
 import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } from '@minecraft/server'
+
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, chunkIsUnloaded } from 'lib'
 import { util } from 'lib/util'
@@ -132,6 +133,7 @@ system.runInterval(
         .getEntities({
           type: EditableNpc.type,
         })
+
         .map(e => ({
           entity: e,
           npc: e.getDynamicProperty(EditableNpc.dynamicPropertyName),
@@ -144,6 +146,7 @@ system.runInterval(
         // More then one? Save only first one, kill others
 
         npc.entity = filteredNpcs.shift()?.entity
+
         filteredNpcs.forEach(e => e.entity.remove())
       } else {
         console.debug('Found one')

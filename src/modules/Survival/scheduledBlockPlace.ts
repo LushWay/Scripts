@@ -1,34 +1,30 @@
 import { BlockPermutation, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
 import { util } from 'lib'
+import { table } from 'lib/database/abstract'
 import { DynamicPropertyDB } from 'lib/database/properties'
 
-/**
- * @typedef {{
- *   typeId: string
- *   states?: Record<string, string | number | boolean>
- *   date: number
- *   location: Vector3
- * }} ScheduledBlockPlace
- */
+type ScheduledBlockPlace = {
+  typeId: string
+  states?: Record<string, string | number | boolean>
+  date: number
+  location: Vector3
+}
 
-export const SHEDULED_DB = new DynamicPropertyDB('ScheduledBlockPlace', {
-  /** @type {Record<Dimensions, ScheduledBlockPlace[]>} */
-  type: {
-    end: [],
-    nether: [],
-    overworld: [],
-  },
-  defaultValue: () => [],
-}).proxy()
+export const SHEDULED_DB = table<ScheduledBlockPlace[]>('ScheduledBlockPlace', () => []) as Record<
+  Dimensions,
+  ScheduledBlockPlace[]
+>
 
-/**
- * @param {Omit<ScheduledBlockPlace, 'date'> & {
- *   dimension: Dimensions
- *   restoreTime: number
- * }} options
- */
-export function scheduleBlockPlace({ dimension, restoreTime, ...options }) {
+export function scheduleBlockPlace({
+  dimension,
+  restoreTime,
+  ...options
+}: Omit<ScheduledBlockPlace, 'date'> & {
+  dimension: Dimensions
+  restoreTime: number
+}) {
   const other = SHEDULED_DB[dimension].find(e => Vector.string(e.location) === Vector.string(options.location))
+
   if (!other) SHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
 
@@ -38,7 +34,7 @@ export function scheduleBlockPlace({ dimension, restoreTime, ...options }) {
 const IMMUTABLE_DB = DynamicPropertyDB.immutableUnproxy(SHEDULED_DB)
 
 /** @type {['overworld', 'nether', 'end']} */
-const DIMENSIONS = ['overworld', 'nether', 'end']
+const DIMENSIONS: ['overworld', 'nether', 'end'] = ['overworld', 'nether', 'end']
 
 system.runInterval(
   function scheduledBlockPlaceInterval() {
@@ -72,10 +68,10 @@ system.runInterval(
         }
 
         // Remove successfully placed block from the schedule array
+
         SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
       }
 
-      // @ts-expect-error TS(2554) FIXME: Expected 1 arguments, but got 0.
       time()
     }
   },

@@ -6,45 +6,37 @@ const $sidebar = '§t§i§psidebar'
 const $title = 'title'
 const $tipPrefix = '§t§i§p'
 
-/** @typedef {'title' | 'sidebar' | `tip${1 | 2 | 3 | 4 | 5}`} TitleType */
+type TitleType = 'title' | 'sidebar' | `tip${1 | 2 | 3 | 4 | 5}`
 
-/**
- * @type {Record<
- *   string,
- *   {
- *     actions: ((p: Player) => void)[]
- *     title?: {
- *       expires?: number
- *       subtitle?: McText
- *     }
- *   } & {
- *     [K in TitleType]?:
- *       | {
- *           value: McText
- *           priority: number
- *         }
- *       | undefined
- *   }
- * >}
- */
-const TITLES = {}
+const TITLES: Record<
+  string,
+  {
+    actions: ((p: Player) => void)[]
+    title?: {
+      expires?: number
+      subtitle?: McText
+    }
+  } & {
+    [K in TitleType]?:
+      | {
+          value: McText
+          priority: number
+        }
+      | undefined
+  }
+> = {}
 
-/**
- * @type {Omit<(typeof ScreenDisplay)['prototype'], 'player'> &
- *   ThisType<{ player: Player & { [SCREEN_DISPLAY]: ScreenDisplay } } & Omit<ScreenDisplay, 'player'>>}
- */
-export const SCREEN_DISPLAY_OVERRIDE = {
-  // @ts-expect-error TS(7023) FIXME: 'isValid' implicitly has return type 'any' because... Remove this comment to see the full error message
+export const SCREEN_DISPLAY_OVERRIDE: Omit<(typeof ScreenDisplay)['prototype'], 'player'> &
+  ThisType<{ player: Player & { [SCREEN_DISPLAY]: ScreenDisplay } } & Omit<ScreenDisplay, 'player'>> = {
   isValid() {
-    // @ts-expect-error TS(2339) FIXME: Property 'player' does not exist on type '{ isVali... Remove this comment to see the full error message
     return this.player[SCREEN_DISPLAY].isValid()
   },
+
   setHudTitle(message, options, prefix = $title, n = 0) {
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     const PLAYER_SD = (TITLES[this.player.id] ??= { actions: [] })
 
     /** @type {TitleType} */
-    let SD_TYPE = 'title'
+    let SD_TYPE: TitleType = 'title'
 
     if (prefix === $tipPrefix) {
       if (n === 1 || n === 2 || n === 3 || n === 4 || n === 5) {
@@ -84,6 +76,7 @@ export const SCREEN_DISPLAY_OVERRIDE = {
         const title = `${prefix === $tipPrefix ? prefix + n : prefix}${message}`
         options ??= { ...defaultTitleOptions }
 
+        // @ts-expect-error AAAAAAAAAAAAAAA
         player[SCREEN_DISPLAY].setTitle(title, options)
       } catch (e) {
         util.error(e)
@@ -96,28 +89,24 @@ export const SCREEN_DISPLAY_OVERRIDE = {
       }
     })
   },
+
   setSidebar(text = '', priority) {
     this.setHudTitle(text, { priority, ...defaultOptions }, $sidebar)
   },
+
   setTip(n, text = '', priority) {
     this.setHudTitle(text, { priority, ...defaultOptions }, $tipPrefix, n)
   },
 
-  // @ts-expect-error TS(7023) FIXME: 'setActionBar' implicitly has return type 'any' be... Remove this comment to see the full error message
   setActionBar(text) {
-    // @ts-expect-error TS(2339) FIXME: Property 'player' does not exist on type '{ isVali... Remove this comment to see the full error message
     return this.player[SCREEN_DISPLAY].setActionBar(text)
   },
 
-  // @ts-expect-error TS(7023) FIXME: 'updateSubtitle' implicitly has return type 'any' ... Remove this comment to see the full error message
   updateSubtitle(subtitle) {
-    // @ts-expect-error TS(2339) FIXME: Property 'player' does not exist on type '{ isVali... Remove this comment to see the full error message
     return this.player[SCREEN_DISPLAY].updateSubtitle(subtitle)
   },
 
-  // @ts-expect-error TS(7023) FIXME: 'setTitle' implicitly has return type 'any' becaus... Remove this comment to see the full error message
   setTitle(title, options) {
-    // @ts-expect-error TS(2339) FIXME: Property 'player' does not exist on type '{ isVali... Remove this comment to see the full error message
     return this.player[SCREEN_DISPLAY].setTitle(title, options)
   },
 }
@@ -129,27 +118,23 @@ system.run(() => {
   system.runInterval(
     () => {
       const players = world.getAllPlayers()
-      for (const [id, data] of Object.entries(TITLES)) {
+      for (const [id, event] of Object.entries(TITLES)) {
         const player = players.find(e => e.id === id)
 
-        // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
-        if (data.title?.expires && data.title.expires < Date.now()) {
+        if (event.title?.expires && event.title.expires < Date.now()) {
           player?.onScreenDisplay.setHudTitle('', {
             ...defaultTitleOptions,
 
-            // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
-            priority: data.title.priority ?? 0,
+            priority: event.title.priority ?? 0,
           })
 
-          // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           delete TITLES[id]
         }
 
         if (player) {
           // Take first action and execute it
 
-          // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
-          data.actions.shift()?.(player)
+          event.actions.shift()?.(player)
         }
       }
     },

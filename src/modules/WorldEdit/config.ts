@@ -32,14 +32,11 @@ WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
   z: 0,
 })
 
-/**
- * @param {Vector3} pos1
- * @param {Vector3} pos2
- * @param {object} [param2]
- * @param {Vector3} [param2.min]
- * @param {Vector3} [param2.max]
- */
-export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) } = {}) {
+export function spawnParticlesInArea(
+  pos1: Vector3,
+  pos2: Vector3,
+  { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) }: { min?: Vector3; max?: Vector3 } = {},
+) {
   const size = Vector.size(min, max)
   if (size > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
   for (const { x, y, z } of Vector.foreach(min, max)) {
@@ -63,11 +60,7 @@ export function spawnParticlesInArea(pos1, pos2, { min = Vector.min(pos1, pos2),
   }
 }
 
-/**
- * @param {Vector3} min
- * @param {Vector3} max
- */
-export function* iterateThroughtEdges(min, max) {
+export function* iterateThroughtEdges(min: Vector3, max: Vector3) {
   for (let coord = min.x; coord++; coord < max.x) {
     for (const y of [min.y, max.y]) {
       yield { x: coord, y, z: min.z }

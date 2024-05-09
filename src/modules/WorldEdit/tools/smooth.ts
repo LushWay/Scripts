@@ -4,14 +4,17 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm, is, util } from 'lib'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { WorldEdit } from 'modules/WorldEdit/lib/WorldEdit'
-import { SHARED_POSTFIX, getAllBlockSets } from 'modules/WorldEdit/utils/blocksSet'
+import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/WorldEdit/utils/blocksSet'
 import { BaseBrushTool } from '../lib/BaseBrushTool'
+
+type SmoothProps = {
+  smoothLevel: number
+}
 
 // TODO Cache invalidation
 
-/** @extends {BaseBrushTool<{ smoothLevel: number }>} */
-class SmoothTool extends BaseBrushTool {
-  onBrushUse(player, lore, hit) {
+class SmoothTool extends BaseBrushTool<SmoothProps> {
+  onBrushUse: BaseBrushTool<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
     smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(util.error)
   }
 }
@@ -23,13 +26,13 @@ const smoother = new SmoothTool({
   loreFormat: {
     version: 2,
 
-    /** @type {import('modules/WorldEdit/utils/blocksSet').BlocksSetRef} */
-    replaceBlocksSet: ['', ''],
+    replaceBlocksSet: ['', ''] as BlocksSetRef,
     type: 'smoother',
     smoothLevel: 1,
     size: 1,
     maxDistance: 300,
   },
+
   editToolForm(slot, player) {
     const lore = smoother.parseLore(slot.getLore())
 
@@ -39,7 +42,7 @@ const smoother = new SmoothTool({
       .addSlider('Сила сглаживания', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.smoothLevel)
       .addDropdownFromObject(
         'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getAllBlockSets(player.id)).map(e => [e, e])),
+        Object.fromEntries(Object.keys(getAllBlocksSets(player.id)).map(e => [e, e])),
         {
           defaultValue: lore.replaceBlocksSet[1],
           none: true,
@@ -68,14 +71,13 @@ const smoother = new SmoothTool({
   },
 })
 
-/**
- * @param {Block} baseBlock
- * @param {number} radius
- * @param {Player} player
- * @param {number} smoothLevel
- * @param {(import('modules/WorldEdit/menu').ReplaceTarget | undefined)[]} [replaceBlocks]
- */
-export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, replaceBlocks = [undefined]) {
+export async function smoothVoxelData(
+  player: Player,
+  baseBlock: Block,
+  radius: number,
+  smoothLevel: number,
+  replaceBlocks: (import('modules/WorldEdit/menu').ReplaceTarget | undefined)[] = [undefined],
+) {
   const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
   const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
 
@@ -88,7 +90,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   const voxelDataCopy = getBlocksAreasData(baseBlock, radius)
 
   /** @type {BlockCacheMatrix<Pick<BlockCache, 'location' | 'permutation'>>} */
-  const setBlocks = {}
+  const setBlocks: BlockCacheMatrix<Pick<BlockCache, 'location' | 'permutation'>> = {}
 
   const sizeX = voxelDataCopy.length
   const sizeY = voxelDataCopy[0].length
@@ -125,13 +127,10 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
           }
 
           if (sum !== 13) {
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             setBlocks[cache.location.x] ??= {}
 
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             setBlocks[cache.location.x][cache.location.y] ??= {}
 
-            // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             setBlocks[cache.location.x][cache.location.y][cache.location.z] = cache
           }
         }
@@ -145,7 +144,7 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   }
 
   const toFill = Object.values(setBlocks)
-    // @ts-expect-error TS(2769) FIXME: No overload matches this call.
+
     .map(e => Object.values(e).map(e => Object.values(e)))
     .flat(2)
 
@@ -156,13 +155,10 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   operations = 0
 
   for (const e of toFill) {
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     if (!e.location) continue
 
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     const block = world.overworld.getBlock(e.location)
 
-    // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
     if (e.permutation) block?.setPermutation(e.permutation)
     else block?.setType(MinecraftBlockTypes.Air)
     operations++
@@ -174,29 +170,26 @@ export async function smoothVoxelData(player, baseBlock, radius, smoothLevel, re
   player.success(prefix + 'Готово')
 }
 
-/**
- * @typedef {{
- *   permutation: BlockPermutation | undefined
- *   location: Vector3
- *   void: boolean
- * }} BlockCache
- */
+type BlockCache = {
+  permutation: BlockPermutation | undefined
+  location: Vector3
+  void: boolean
+}
 
-/**
- * @template {object} [MatrixValue=BlockCache] Default is `BlockCache`
- * @typedef {Record<string, Record<string, Record<string, MatrixValue>>>} BlockCacheMatrix
- */
+type BlockCacheMatrix<MatrixValue extends object = BlockCache> = Record<
+  string,
+  Record<string, Record<string, MatrixValue>>
+>
 
-/** @type {BlockCacheMatrix} */
-const BLOCK_CACHE = {}
+const BLOCK_CACHE: BlockCacheMatrix = {}
 
 /**
  * @param {Block} block
  * @param {number} radius
  */
-function getBlocksAreasData(block, radius) {
-  /** @type {BlockCache[][][]} */
-  const datax = []
+
+function getBlocksAreasData(block: Block, radius: number) {
+  const datax: BlockCache[][][] = []
   for (let y = -radius, y2 = 0; y < radius; y++, y2++) {
     const datay = []
     for (let x = -radius, x2 = 0; x < radius; x++, x2++) {
@@ -204,9 +197,7 @@ function getBlocksAreasData(block, radius) {
       for (let z = -radius; z < radius; z++) {
         const location = Vector.add(block.location, { x, y, z })
 
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         if (BLOCK_CACHE[location.x]?.[location.y]?.[location.z]) {
-          // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           dataz.push(BLOCK_CACHE[location.x]?.[location.y]?.[location.z])
           continue
         }
@@ -229,13 +220,10 @@ function getBlocksAreasData(block, radius) {
         }
         dataz.push(newBlockData)
 
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         BLOCK_CACHE[location.x] ??= {}
 
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         BLOCK_CACHE[location.x][location.y] ??= {}
 
-        // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         BLOCK_CACHE[location.x][location.y][location.z] = newBlockData
       }
       datay.push(dataz)

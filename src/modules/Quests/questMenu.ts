@@ -5,13 +5,11 @@ import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { Quest } from 'modules/Quests/lib/Quest'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
 const quest = new Command('q')
   .setAliases('quest')
   .setDescription('Меню заданий')
   .setPermissions('member')
   .executes(ctx => {
-    // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
     questsMenu(ctx.player)
   })
 
@@ -19,7 +17,6 @@ quest
   .overload('exit')
   .setDescription('Выйти')
   .executes(ctx => {
-    // @ts-expect-error TS(2554) FIXME: Expected 2 arguments, but got 1.
     const q = Quest.active(ctx.player)
     if (!q) return ctx.error('У вас нет активных заданий!')
     q.quest.exit(ctx.player)
@@ -33,20 +30,14 @@ quest
   .executes(ctx => {
     const form = new ActionForm('Quests', 'Выбери')
     for (const [name, q] of Object.entries(Quest.list)) {
-      // @ts-expect-error TS(2554) FIXME: Expected 3 arguments, but got 2.
       form.addButton(name, () => {
-        // @ts-expect-error TS(2571) FIXME: Object is of type 'unknown'.
         q.enter(ctx.player)
       })
     }
     form.show(ctx.player)
   })
 
-/**
- * @param {Player} player
- * @param {VoidFunction} [back]
- */
-export function questsMenu(player, back) {
+export function questsMenu(player: Player, back?: VoidFunction) {
   const { quests } = player.database
   if (!quests)
     return new MessageForm('§3Задания', '§cНет заданий')
@@ -64,7 +55,6 @@ export function questsMenu(player, back) {
       )
     },
     button(dbquest) {
-      // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       const quest = Quest.list[dbquest.id]
       if (!quest) return false
 
@@ -82,7 +72,8 @@ export function questsMenu(player, back) {
  * @param {Player} player
  * @param {VoidFunction} back
  */
-function completeQuestsMenu(player, back) {
+
+function completeQuestsMenu(player: Player, back: VoidFunction) {
   const self = () => completeQuestsMenu(player, back)
 
   const { quests } = player.database
@@ -92,8 +83,8 @@ function completeQuestsMenu(player, back) {
     'Завершенные задания',
     'Список завершенных заданий',
 
-    // @ts-expect-error TS(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     quests.completed.map(e => Quest.list[e]).filter(Boolean),
+
     {
       filters: {},
       button(quest, filters) {
@@ -109,7 +100,8 @@ function completeQuestsMenu(player, back) {
  * @param {Player} player
  * @param {Quest} quest
  */
-function questMenu(player, quest, back = () => {}) {
+
+function questMenu(player: Player, quest: Quest, back = () => {}) {
   const current = quest.current(player)
   let currentDescription = ''
   if (current) {

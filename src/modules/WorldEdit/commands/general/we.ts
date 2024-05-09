@@ -1,6 +1,6 @@
 import { WEmenu } from '../../menu'
 
-// @ts-expect-error TS(2304) FIXME: Cannot find name 'Command'.
+
 new Command('we')
   .setAliases('wb', 'wa')
   .setPermissions('builder')
