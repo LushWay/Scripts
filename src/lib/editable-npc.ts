@@ -3,7 +3,7 @@ import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } fro
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, chunkIsUnloaded } from 'lib'
 import { util } from 'lib/util'
-import { EditableLocation } from './EditableLocation'
+import { EditableLocation } from './editable-location'
 
 export type EditableNpcProps = ConstructorParameters<typeof EditableNpc>[0]
 

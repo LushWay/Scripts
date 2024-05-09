@@ -2,7 +2,7 @@ import { Entity, Vector, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
-import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
+import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
 // TODO Make custom items and throw effects work properly
 // may use projectileComponent in 1.9.0-beta
 

@@ -1,8 +1,87 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { SOUNDS } from 'lib/assets/config'
 import { request } from 'lib/bds/api'
-import { SCREEN_DISPLAY_OVERRIDE } from 'lib/extensions/onScreenDisplay'
+import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { expand } from './extend'
+
+declare module '@minecraft/server' {
+  interface Player {
+    /** Whenether player is simulated or not */
+    isSimulated(): this is import('@minecraft/server-gametest').SimulatedPlayer
+
+    /**
+     * Sends message prefixed with
+     *
+     * ```js
+     * '§4§l> §r§c'
+     * ```
+     *
+     * And plays {@link SOUNDS}.fail
+     *
+     * Other message types: warn success info
+     */
+    fail(message: string): void
+    /**
+     * Sends message prefixed with
+     *
+     * ```js
+     * '§l§e⚠ §6'
+     * ```
+     *
+     * And plays {@link SOUNDS}.fail
+     *
+     * Other message types: **fail success info**
+     */
+    warn(message: string): void
+    /**
+     * Sends message prefixed with
+     *
+     * ```js
+     * '§a§l> §r'
+     * ```
+     *
+     * And plays {@link SOUNDS}.success
+     *
+     * Other message types: **fail warn info**
+     */
+    success(message: string): void
+    /**
+     * Sends message prefixed with
+     *
+     * ```js
+     * '§b§l> §r§3'
+     * ```
+     *
+     * And plays {@link SOUNDS}.action
+     *
+     * Other message types: **fail warn success**
+     */
+    info(message: string): void
+
+    /** Gets ContainerSlot from the player mainhand */
+    mainhand(): ContainerSlot
+
+    /** See {@link Player.sendMessage} */
+    tell(message: (RawMessage | string)[] | RawMessage | string): void
+
+    /**
+     * Applies a knock-back to a player in the direction they are facing, like dashing forward
+     *
+     * @author @wuw.sh
+     */
+    applyDash(target: Player | Entity, horizontalStrength: number, verticalStrength: number): void
+
+    /** Determines player gamemode */
+    isGamemode(mode: keyof typeof GameMode): boolean
+
+    /**
+     * Turns player into survival, damages (if hp < 1 shows lowHealthMessage), and then returns to previous gamemode
+     *
+     * @returns True if damaged, false if not and lowHealthMessage was shown
+     */
+    closeChat(lowHealthMessage?: string): boolean
+  }
+}
 
 expand(Player, {
   getById(name) {
@@ -22,12 +101,6 @@ expand(Player, {
   },
 })
 
-/**
- * @param {string} pref
- * @param {string} sound
- * @returns {(this: Player, message: string) => void}
- */
-
 function prefix(pref: string, sound: string): (this: Player, message: string) => void {
   return function (this, message) {
     system.delay(() => {
@@ -37,10 +110,8 @@ function prefix(pref: string, sound: string): (this: Player, message: string) =>
   }
 }
 
-/** @type {Set<string>} */
-export const CLOSING_CHAT: Set<string> = new Set()
-
-export const SCREEN_DISPLAY = Symbol('screen_display')
+export const ClosingChatSet = new Set<string>()
+export const ScreenDisplaySymbol = Symbol('screen_display')
 
 expand(Player.prototype, {
   isSimulated() {
@@ -48,14 +119,14 @@ expand(Player.prototype, {
   },
 
   // @ts-expect-error AAAAAAAAAAAAAAA
-  get [SCREEN_DISPLAY]() {
+  get [ScreenDisplaySymbol]() {
     return super.onScreenDisplay
   },
 
   get onScreenDisplay() {
     return {
       player: this,
-      ...SCREEN_DISPLAY_OVERRIDE,
+      ...ScreenDisplayOverride,
     }
   },
 
@@ -91,11 +162,11 @@ expand(Player.prototype, {
     const isCreative = this.isGamemode('creative')
     if (isCreative) this.runCommand('gamemode s')
 
-    CLOSING_CHAT.add(this.id)
+    ClosingChatSet.add(this.id)
     this.applyDamage(1, {
       cause: EntityDamageCause.entityAttack,
     })
-    CLOSING_CHAT.delete(this.id)
+    ClosingChatSet.delete(this.id)
     health.setCurrentValue(current)
     this.runCommand('stopsound @a[r=5] game.player.hurt')
 
@@ -113,6 +184,17 @@ expand(Player.prototype, {
     return equippable.getEquipmentSlot(EquipmentSlot.Mainhand)
   },
 })
+
+declare module '@minecraft/server' {
+  interface Entity {
+    readonly container?: Container
+  }
+
+  interface Container {
+    entries(): [number, ItemStack | undefined][]
+    slotEntries(): [number, ContainerSlot][]
+  }
+}
 
 expand(Entity.prototype, {
   get container() {

@@ -3,7 +3,7 @@ import { Enchantment, Vector, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { MinecraftEnchantmentTypes } from 'lib/assets/enchantments'
 import { DatabaseUtils } from 'lib/database/utils'
-import { EventLoader } from 'lib/EventSignal'
+import { EventLoader } from 'lib/event-signal'
 import { util } from 'lib/util'
 
 const location = { x: 0, y: -10, z: 0 }

@@ -2,31 +2,29 @@ import { System, world } from '@minecraft/server'
 import { util } from '../util'
 import { expand } from './extend'
 
-export const TIMERS_PATHES: Record<string, string> = {}
+declare module '@minecraft/server' {
+  interface System {
+    /**
+     * Runs a set of code on an interval for each player.
+     *
+     * @param callback Functional code that will run when this interval occurs.
+     * @param tickInterval An interval of every N ticks that the callback will be called upon.
+     * @returns An opaque handle that can be used with the clearRun method to stop the run of this function on an
+     *   interval.
+     */
+    runPlayerInterval(callback: (player: Player) => void, name: string, tickInterval?: number): number
 
-function Timer(
-  type: string,
-  set: (fn: VoidFunction, ticks: number) => number,
-  fn: VoidFunction,
-  name: string,
-  ticks: number = 0,
-) {
-  const visualId = `${name} (${type} ${ticks} ticks)`
+    /** Same as {@link System.run} except for auto handling errors */
+    delay(callback: () => void): void
 
-  const path = util.error.stack.get(1)
-
-  TIMERS_PATHES[visualId] = path
-
-  return set(function timer() {
-    const end = util.benchmark(visualId, 'timers')
-
-    util.catch(fn, type[0].toUpperCase() + type.slice(1))
-
-    const tookTicks = end() / 20
-    if (tookTicks > ticks + 1) {
-      console.warn(`§6Spike on ${type} §f${name}:§6 took §c${tookTicks.toFixed(2)}§f/${ticks}§6 ticks§r\n${path}`)
-    }
-  }, ticks)
+    /**
+     * Returns a promise that resolves after given ticks time
+     *
+     * @param time Time in ticks
+     * @returns Promise that resolves after given ticks time
+     */
+    sleep(time: number): Promise<void>
+  }
 }
 
 expand(System.prototype, {
@@ -60,3 +58,33 @@ expand(System.prototype, {
     })
   },
 })
+
+export const TIMERS_PATHES: Record<string, string> = {}
+
+function Timer(
+  type: string,
+  set: (fn: VoidFunction, ticks: number) => number,
+  fn: VoidFunction,
+  name: string,
+  ticks: number = 0,
+) {
+  const visualId = `${name} (${type} ${ticks} ticks)`
+
+  const path = util.error.stack.get(1)
+
+  TIMERS_PATHES[visualId] = path
+
+  return set(function timer() {
+    let end
+    __DEV__ && (end = util.benchmark(visualId, 'timers'))
+
+    util.catch(fn, type[0].toUpperCase() + type.slice(1))
+
+    if (__DEV__) {
+      const tookTicks = end!() / 20
+      if (tookTicks > ticks + 1) {
+        console.warn(`§6Spike on ${type} §f${name}:§6 took §c${tookTicks.toFixed(2)}§f/${ticks}§6 ticks§r\n${path}`)
+      }
+    }
+  }, ticks)
+}

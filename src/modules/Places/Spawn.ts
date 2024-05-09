@@ -3,10 +3,10 @@ import { Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { EditableLocation, InventoryStore, Portal, RegionCallback, SafeAreaRegion, Settings, util } from 'lib'
 
-import { Menu } from 'lib/Menu'
-import { Join } from 'lib/PlayerJoin'
-import { showSurvivalHud } from 'modules/Features/sidebar'
+import { Menu } from 'lib/menu'
+import { Join } from 'lib/player-join'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
+import { showSurvivalHud } from 'modules/features/sidebar'
 import { DefaultPlaceWithInventory } from './Default/WithInventory'
 
 class SpawnBuilder extends DefaultPlaceWithInventory {

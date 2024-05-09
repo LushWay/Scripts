@@ -1,20 +1,98 @@
 import { Vector } from '@minecraft/server'
 
+// TODO Move to lib/vector when migrating to 1.20.60
+
+declare module '@minecraft/server' {
+  namespace Vector {
+    /** Returns size between two vectors */
+    function size(a: Vector3, b: Vector3): number
+
+    /** Floors each vector axis using Math.floor */
+    function floor(a: Vector3): Vector3
+    /**
+     * Generates a generator of Vector3 objects between two provided Vector3 objects
+     *
+     * @param a - Starting Vector3 point
+     * @param b - Ending Vector3 point
+     * @returns - Generator of Vector3 objects
+     */
+    function foreach(a: Vector3, b: Vector3): Generator<Vector3, void, unknown>
+
+    /** Checks if vector c is between a and b */
+    function between(a: Vector3, b: Vector3, c: Vector3): boolean
+
+    /**
+     * Returns string representation of vector ('x y z')
+     *
+     * @param color Whenether to color vector args or not
+     */
+    function string(a: Vector3, color?: boolean): string
+
+    /** Returns dot product of two vectors */
+    function dot(a: Vector3, b: Vector3): number
+
+    /** Returns whenether vector is valid or not Valid vector don't uses NaN values */
+    function valid(a: Vector3): boolean
+
+    /**
+     * Alias to
+     *
+     * ```js
+     * ;[Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
+     * ```
+     *
+     * @param x Number to increase vector on x axis.
+     * @param y Number to increase vector on y axis. Defaults to x
+     * @param z Number to increase vector on z axis. Defaults to x
+     */
+    function around(a: Vector3, x: number, y?: number, z?: number): [Vector3, Vector3]
+  }
+}
+
 const Static: Omit<
   typeof Vector,
   // eslint-disable-next-line @typescript-eslint/ban-types
   keyof Function | 'back' | 'down' | 'forward' | 'left' | 'up' | 'one' | 'right' | 'zero'
 > = {
+  /**
+   * Returns string representation of vector ('x y z')
+   *
+   * @param color Whenether to color vector args or not
+   */
   string: (a, color) => (!color ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`),
 
+  /**
+   * Returns whenether vector is valid or not
+   *
+   * Valid vector don't uses NaN values
+   */
   valid: a => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z)),
 
+  /** Returns dot product of two vectors */
   dot: (a, b) => a.x * b.x + a.y * b.y + a.z * b.z,
 
+  /**
+   * Returns two dots around vector
+   *
+   * Alias to
+   *
+   *       Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
+   *
+   * @param x Number to increase vector on x axis.
+   * @param y Number to increase vector on y axis. Defaults to x
+   * @param z Number to increase vector on z axis. Defaults to x
+   */
   around(a, x, y = x, z = y) {
     return [Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
   },
 
+  /**
+   * Returns a generator of Vector3 objects between two provided Vector3 objects
+   *
+   * @param a - Starting Vector3 point
+   * @param b - Ending Vector3 point
+   * @returns - Generator of Vector3 objects
+   */
   *foreach(a, b) {
     const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x]
     const [ymin, ymax] = a.y < b.y ? [a.y, b.y] : [b.y, a.y]
@@ -37,10 +115,12 @@ const Static: Omit<
     )
   },
 
+  /** Floors each vector axis using Math.floor */
   floor(loc) {
     return { x: Math.floor(loc.x), y: Math.floor(loc.y), z: Math.floor(loc.z) }
   },
 
+  /** Checks if vector c is between a and b */
   between(a, b, c) {
     return (
       c.x >= (a.x < b.x ? a.x : b.x) &&

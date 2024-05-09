@@ -1,9 +1,9 @@
 import { ItemLockMode, ItemStack, ItemTypes, Player, Vector, world } from '@minecraft/server'
-import { InventoryIntervalAction } from 'lib/Action'
-import { WeakOnlinePlayerMap } from 'lib/WeakPlayerMap'
+import { InventoryIntervalAction } from 'lib/action'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
+import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
 import { ActionForm } from './form/action'
 
 export class Menu {

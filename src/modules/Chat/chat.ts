@@ -2,10 +2,10 @@ import { world } from '@minecraft/server'
 import { Cooldown, Settings, getRoleAndName, util } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { sendPacketToStdout } from 'lib/bds/api'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { table } from 'lib/database/abstract'
 
 export class ChatBuilder {
-  db = new DynamicPropertyDB('chatCD', { /** @type {Record<string, string} */ type: {} }).proxy()
+  db = table<string>('chatCooldown')
 
   settings = Settings.world('chat', {
     cooldown: {
@@ -67,7 +67,7 @@ export class ChatBuilder {
         const messageText = event.message.replace(/\\n/g, '\n')
         const message = `${getRoleAndName(event.sender, { nameColor: '§7' })}§r: ${messageText}`
 
-        if (util.settings.BDSMode) {
+        if (__SERVER__) {
           // This is handled/parsed by ServerCore
           // Dont really want to do APICall each time here
           sendPacketToStdout('chatMessage', {

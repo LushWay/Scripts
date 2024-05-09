@@ -42,16 +42,10 @@ export const terrain_textures = {
     ],
   },
   azalea_leaves: {
-    textures: [
-      'textures/blocks/azalea_leaves',
-      'textures/blocks/azalea_leaves_opaque',
-    ],
+    textures: ['textures/blocks/azalea_leaves', 'textures/blocks/azalea_leaves_opaque'],
   },
   azalea_leaves_flowered: {
-    textures: [
-      'textures/blocks/azalea_leaves_flowers',
-      'textures/blocks/azalea_leaves_flowers_opaque',
-    ],
+    textures: ['textures/blocks/azalea_leaves_flowers', 'textures/blocks/azalea_leaves_flowers_opaque'],
   },
   azalea_plant: {
     textures: 'textures/blocks/azalea_plant',
@@ -81,10 +75,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/bamboo_stem',
   },
   barrel_bottom: {
-    textures: [
-      'textures/blocks/barrel_bottom',
-      'textures/blocks/barrel_bottom',
-    ],
+    textures: ['textures/blocks/barrel_bottom', 'textures/blocks/barrel_bottom'],
   },
   barrel_side: {
     textures: ['textures/blocks/barrel_side', 'textures/blocks/barrel_side'],
@@ -123,10 +114,7 @@ export const terrain_textures = {
     textures: ['textures/blocks/bee_nest_bottom'],
   },
   bee_nest_front: {
-    textures: [
-      'textures/blocks/bee_nest_front',
-      'textures/blocks/bee_nest_front_honey',
-    ],
+    textures: ['textures/blocks/bee_nest_front', 'textures/blocks/bee_nest_front_honey'],
   },
   bee_nest_side: {
     textures: ['textures/blocks/bee_nest_side'],
@@ -135,10 +123,7 @@ export const terrain_textures = {
     textures: ['textures/blocks/bee_nest_top'],
   },
   beehive_front: {
-    textures: [
-      'textures/blocks/beehive_front',
-      'textures/blocks/beehive_front_honey',
-    ],
+    textures: ['textures/blocks/beehive_front', 'textures/blocks/beehive_front_honey'],
   },
   beehive_side: {
     textures: ['textures/blocks/beehive_side'],
@@ -191,10 +176,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/birch_trapdoor',
   },
   black_candle: {
-    textures: [
-      'textures/blocks/candles/black_candle',
-      'textures/blocks/candles/black_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/black_candle', 'textures/blocks/candles/black_candle_lit'],
   },
   black_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -220,10 +202,7 @@ export const terrain_textures = {
     ],
   },
   blast_furnace_front: {
-    textures: [
-      'textures/blocks/blast_furnace_front_off',
-      'textures/blocks/blast_furnace_front_on',
-    ],
+    textures: ['textures/blocks/blast_furnace_front_off', 'textures/blocks/blast_furnace_front_on'],
   },
   blast_furnace_front_off: {
     textures: 'textures/blocks/blast_furnace_front_off',
@@ -232,22 +211,13 @@ export const terrain_textures = {
     textures: 'textures/blocks/blast_furnace_front_on',
   },
   blast_furnace_side: {
-    textures: [
-      'textures/blocks/blast_furnace_side',
-      'textures/blocks/blast_furnace_side',
-    ],
+    textures: ['textures/blocks/blast_furnace_side', 'textures/blocks/blast_furnace_side'],
   },
   blast_furnace_top: {
-    textures: [
-      'textures/blocks/blast_furnace_top',
-      'textures/blocks/blast_furnace_top',
-    ],
+    textures: ['textures/blocks/blast_furnace_top', 'textures/blocks/blast_furnace_top'],
   },
   blue_candle: {
-    textures: [
-      'textures/blocks/candles/blue_candle',
-      'textures/blocks/candles/blue_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/blue_candle', 'textures/blocks/candles/blue_candle_lit'],
   },
   blue_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -286,10 +256,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/brick',
   },
   brown_candle: {
-    textures: [
-      'textures/blocks/candles/brown_candle',
-      'textures/blocks/candles/brown_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/brown_candle', 'textures/blocks/candles/brown_candle_lit'],
   },
   brown_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -309,10 +276,7 @@ export const terrain_textures = {
     ],
   },
   bubble_column_mid: {
-    textures: [
-      'textures/blocks/bubble_column_inner_a',
-      'textures/blocks/bubble_column_inner_b',
-    ],
+    textures: ['textures/blocks/bubble_column_inner_a', 'textures/blocks/bubble_column_inner_b'],
   },
   bubble_column_outer: {
     textures: [
@@ -389,10 +353,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/campfire_log_lit',
   },
   candle: {
-    textures: [
-      'textures/blocks/candles/candle',
-      'textures/blocks/candles/candle_lit',
-    ],
+    textures: ['textures/blocks/candles/candle', 'textures/blocks/candles/candle_lit'],
   },
   candle_cake: {
     textures: 'textures/blocks/cake',
@@ -439,16 +400,10 @@ export const terrain_textures = {
     textures: 'textures/blocks/cauldron_water',
   },
   cave_vines_body: {
-    textures: [
-      'textures/blocks/cave_vines_body',
-      'textures/blocks/cave_vines_body_berries',
-    ],
+    textures: ['textures/blocks/cave_vines_body', 'textures/blocks/cave_vines_body_berries'],
   },
   cave_vines_head: {
-    textures: [
-      'textures/blocks/cave_vines_head',
-      'textures/blocks/cave_vines_head_berries',
-    ],
+    textures: ['textures/blocks/cave_vines_head', 'textures/blocks/cave_vines_head_berries'],
   },
   chain1: {
     textures: 'textures/blocks/chain1',
@@ -457,11 +412,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/chain2',
   },
   chest: {
-    textures: [
-      'textures/blocks/chest_top',
-      'textures/blocks/chest_side',
-      'textures/blocks/chest_front',
-    ],
+    textures: ['textures/blocks/chest_top', 'textures/blocks/chest_side', 'textures/blocks/chest_front'],
   },
   chiseled_deepslate: {
     textures: 'textures/blocks/deepslate/chiseled_deepslate',
@@ -473,10 +424,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/chiseled_polished_blackstone',
   },
   chorus_flower: {
-    textures: [
-      'textures/blocks/chorus_flower',
-      'textures/blocks/chorus_flower_dead',
-    ],
+    textures: ['textures/blocks/chorus_flower', 'textures/blocks/chorus_flower_dead'],
   },
   chorus_plant: {
     textures: 'textures/blocks/chorus_plant',
@@ -518,11 +466,7 @@ export const terrain_textures = {
     ],
   },
   cocoa: {
-    textures: [
-      'textures/blocks/cocoa_stage_0',
-      'textures/blocks/cocoa_stage_1',
-      'textures/blocks/cocoa_stage_2',
-    ],
+    textures: ['textures/blocks/cocoa_stage_0', 'textures/blocks/cocoa_stage_1', 'textures/blocks/cocoa_stage_2'],
   },
   command_block: {
     textures: 'textures/blocks/command_block',
@@ -567,16 +511,10 @@ export const terrain_textures = {
     textures: 'textures/blocks/stone_slab_top',
   },
   comparator_torch: {
-    textures: [
-      'textures/blocks/redstone_torch_off',
-      'textures/blocks/redstone_torch_on',
-    ],
+    textures: ['textures/blocks/redstone_torch_off', 'textures/blocks/redstone_torch_on'],
   },
   comparator_up: {
-    textures: [
-      'textures/blocks/comparator_off',
-      'textures/blocks/comparator_on',
-    ],
+    textures: ['textures/blocks/comparator_off', 'textures/blocks/comparator_on'],
   },
   composter_bottom: {
     textures: 'textures/blocks/composter_bottom',
@@ -585,11 +523,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/composter_side',
   },
   composter_top: {
-    textures: [
-      'textures/blocks/composter_top',
-      'textures/blocks/compost',
-      'textures/blocks/compost_ready',
-    ],
+    textures: ['textures/blocks/composter_top', 'textures/blocks/compost', 'textures/blocks/compost_ready'],
   },
   concrete: {
     textures: [
@@ -774,10 +708,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/cut_copper',
   },
   cyan_candle: {
-    textures: [
-      'textures/blocks/candles/cyan_candle',
-      'textures/blocks/candles/cyan_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/cyan_candle', 'textures/blocks/candles/cyan_candle_lit'],
   },
   cyan_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -801,16 +732,10 @@ export const terrain_textures = {
     textures: 'textures/blocks/planks_big_oak',
   },
   daylight_detector_side: {
-    textures: [
-      'textures/blocks/daylight_detector_side',
-      'textures/blocks/daylight_detector_side',
-    ],
+    textures: ['textures/blocks/daylight_detector_side', 'textures/blocks/daylight_detector_side'],
   },
   daylight_detector_top: {
-    textures: [
-      'textures/blocks/daylight_detector_top',
-      'textures/blocks/daylight_detector_inverted_top',
-    ],
+    textures: ['textures/blocks/daylight_detector_top', 'textures/blocks/daylight_detector_inverted_top'],
   },
   deadbush: {
     textures: 'textures/blocks/deadbush',
@@ -1099,10 +1024,7 @@ export const terrain_textures = {
     ],
   },
   furnace_front: {
-    textures: [
-      'textures/blocks/furnace_front_off',
-      'textures/blocks/furnace_front_on',
-    ],
+    textures: ['textures/blocks/furnace_front_off', 'textures/blocks/furnace_front_on'],
   },
   furnace_front_off: {
     textures: 'textures/blocks/furnace_front_off',
@@ -1159,10 +1081,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/gravel',
   },
   gray_candle: {
-    textures: [
-      'textures/blocks/candles/gray_candle',
-      'textures/blocks/candles/gray_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/gray_candle', 'textures/blocks/candles/gray_candle_lit'],
   },
   gray_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -1174,10 +1093,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/glazed_terracotta_gray',
   },
   green_candle: {
-    textures: [
-      'textures/blocks/candles/green_candle',
-      'textures/blocks/candles/green_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/green_candle', 'textures/blocks/candles/green_candle_lit'],
   },
   green_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -1402,10 +1318,7 @@ export const terrain_textures = {
     ],
   },
   light_blue_candle: {
-    textures: [
-      'textures/blocks/candles/light_blue_candle',
-      'textures/blocks/candles/light_blue_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/light_blue_candle', 'textures/blocks/candles/light_blue_candle_lit'],
   },
   light_blue_candle_carried: {
     textures: 'textures/items/candles/light_blue_candle',
@@ -1414,10 +1327,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/glazed_terracotta_light_blue',
   },
   light_gray_candle: {
-    textures: [
-      'textures/blocks/candles/light_gray_candle',
-      'textures/blocks/candles/light_gray_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/light_gray_candle', 'textures/blocks/candles/light_gray_candle_lit'],
   },
   light_gray_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -1429,10 +1339,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/lightning_rod',
   },
   lime_candle: {
-    textures: [
-      'textures/blocks/candles/lime_candle',
-      'textures/blocks/candles/lime_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/lime_candle', 'textures/blocks/candles/lime_candle_lit'],
   },
   lime_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -1477,10 +1384,7 @@ export const terrain_textures = {
     ],
   },
   log_top2: {
-    textures: [
-      'textures/blocks/log_acacia_top',
-      'textures/blocks/log_big_oak_top',
-    ],
+    textures: ['textures/blocks/log_acacia_top', 'textures/blocks/log_big_oak_top'],
   },
   loom_bottom: {
     textures: 'textures/blocks/loom_bottom',
@@ -1495,10 +1399,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/loom_top',
   },
   magenta_candle: {
-    textures: [
-      'textures/blocks/candles/magenta_candle',
-      'textures/blocks/candles/magenta_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/magenta_candle', 'textures/blocks/candles/magenta_candle_lit'],
   },
   magenta_candle_carried: {
     textures: 'textures/items/candles/magenta_candle',
@@ -1531,10 +1432,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/mangrove_planks',
   },
   mangrove_propagule: {
-    textures: [
-      'textures/blocks/mangrove_propagule',
-      'textures/blocks/mangrove_propagule_hanging',
-    ],
+    textures: ['textures/blocks/mangrove_propagule', 'textures/blocks/mangrove_propagule_hanging'],
   },
   mangrove_propagule_item: {
     textures: 'textures/items/mangrove_propagule',
@@ -1558,10 +1456,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/melon_side',
   },
   melon_stem: {
-    textures: [
-      'textures/blocks/melon_stem_disconnected',
-      'textures/blocks/melon_stem_connected',
-    ],
+    textures: ['textures/blocks/melon_stem_disconnected', 'textures/blocks/melon_stem_connected'],
   },
   melon_top: {
     textures: 'textures/blocks/melon_top',
@@ -1861,10 +1756,7 @@ export const terrain_textures = {
     textures: ['textures/blocks/dirt', 'textures/blocks/dirt'],
   },
   mycelium_side: {
-    textures: [
-      'textures/blocks/mycelium_side',
-      'textures/blocks/grass_side_snowed',
-    ],
+    textures: ['textures/blocks/mycelium_side', 'textures/blocks/grass_side_snowed'],
   },
   mycelium_top: {
     textures: ['textures/blocks/mycelium_top', 'textures/blocks/mycelium_top'],
@@ -1908,31 +1800,19 @@ export const terrain_textures = {
     textures: ['textures/blocks/observer_top', 'textures/blocks/observer_top'],
   },
   observer_east: {
-    textures: [
-      'textures/blocks/observer_side',
-      'textures/blocks/observer_side',
-    ],
+    textures: ['textures/blocks/observer_side', 'textures/blocks/observer_side'],
   },
   observer_north: {
-    textures: [
-      'textures/blocks/observer_front',
-      'textures/blocks/observer_front',
-    ],
+    textures: ['textures/blocks/observer_front', 'textures/blocks/observer_front'],
   },
   observer_south: {
-    textures: [
-      'textures/blocks/observer_back',
-      'textures/blocks/observer_back_lit',
-    ],
+    textures: ['textures/blocks/observer_back', 'textures/blocks/observer_back_lit'],
   },
   observer_top: {
     textures: ['textures/blocks/observer_top', 'textures/blocks/observer_top'],
   },
   observer_west: {
-    textures: [
-      'textures/blocks/observer_side',
-      'textures/blocks/observer_side',
-    ],
+    textures: ['textures/blocks/observer_side', 'textures/blocks/observer_side'],
   },
   obsidian: {
     textures: 'textures/blocks/obsidian',
@@ -1944,10 +1824,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/ochre_froglight_top',
   },
   orange_candle: {
-    textures: [
-      'textures/blocks/candles/orange_candle',
-      'textures/blocks/candles/orange_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/orange_candle', 'textures/blocks/candles/orange_candle_lit'],
   },
   orange_candle_carried: {
     textures: 'textures/items/candles/orange_candle',
@@ -1971,10 +1848,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/pearlescent_froglight_top',
   },
   pink_candle: {
-    textures: [
-      'textures/blocks/candles/pink_candle',
-      'textures/blocks/candles/pink_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/pink_candle', 'textures/blocks/candles/pink_candle_lit'],
   },
   pink_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -2011,34 +1885,19 @@ export const terrain_textures = {
     ],
   },
   pointed_dripstone_base: {
-    textures: [
-      'textures/blocks/pointed_dripstone_down_base',
-      'textures/blocks/pointed_dripstone_up_base',
-    ],
+    textures: ['textures/blocks/pointed_dripstone_down_base', 'textures/blocks/pointed_dripstone_up_base'],
   },
   pointed_dripstone_frustum: {
-    textures: [
-      'textures/blocks/pointed_dripstone_down_frustum',
-      'textures/blocks/pointed_dripstone_up_frustum',
-    ],
+    textures: ['textures/blocks/pointed_dripstone_down_frustum', 'textures/blocks/pointed_dripstone_up_frustum'],
   },
   pointed_dripstone_merge: {
-    textures: [
-      'textures/blocks/pointed_dripstone_down_merge',
-      'textures/blocks/pointed_dripstone_up_merge',
-    ],
+    textures: ['textures/blocks/pointed_dripstone_down_merge', 'textures/blocks/pointed_dripstone_up_merge'],
   },
   pointed_dripstone_middle: {
-    textures: [
-      'textures/blocks/pointed_dripstone_down_middle',
-      'textures/blocks/pointed_dripstone_up_middle',
-    ],
+    textures: ['textures/blocks/pointed_dripstone_down_middle', 'textures/blocks/pointed_dripstone_up_middle'],
   },
   pointed_dripstone_tip: {
-    textures: [
-      'textures/blocks/pointed_dripstone_down_tip',
-      'textures/blocks/pointed_dripstone_up_tip',
-    ],
+    textures: ['textures/blocks/pointed_dripstone_down_tip', 'textures/blocks/pointed_dripstone_up_tip'],
   },
   polished_andesite: {
     textures: 'textures/blocks/stone_andesite_smooth',
@@ -2107,37 +1966,19 @@ export const terrain_textures = {
     textures: ['textures/blocks/prismarine_bricks'],
   },
   pumpkin_face: {
-    textures: [
-      'textures/blocks/pumpkin_face_off',
-      'textures/blocks/pumpkin_face_on',
-      'textures/blocks/pumpkin_side',
-    ],
+    textures: ['textures/blocks/pumpkin_face_off', 'textures/blocks/pumpkin_face_on', 'textures/blocks/pumpkin_side'],
   },
   pumpkin_side: {
-    textures: [
-      'textures/blocks/pumpkin_side',
-      'textures/blocks/pumpkin_side',
-      'textures/blocks/pumpkin_side',
-    ],
+    textures: ['textures/blocks/pumpkin_side', 'textures/blocks/pumpkin_side', 'textures/blocks/pumpkin_side'],
   },
   pumpkin_stem: {
-    textures: [
-      'textures/blocks/pumpkin_stem_disconnected',
-      'textures/blocks/pumpkin_stem_connected',
-    ],
+    textures: ['textures/blocks/pumpkin_stem_disconnected', 'textures/blocks/pumpkin_stem_connected'],
   },
   pumpkin_top: {
-    textures: [
-      'textures/blocks/pumpkin_top',
-      'textures/blocks/pumpkin_top',
-      'textures/blocks/pumpkin_top',
-    ],
+    textures: ['textures/blocks/pumpkin_top', 'textures/blocks/pumpkin_top', 'textures/blocks/pumpkin_top'],
   },
   purple_candle: {
-    textures: [
-      'textures/blocks/candles/purple_candle',
-      'textures/blocks/candles/purple_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/purple_candle', 'textures/blocks/candles/purple_candle_lit'],
   },
   purple_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -2149,25 +1990,13 @@ export const terrain_textures = {
     textures: 'textures/blocks/glazed_terracotta_purple',
   },
   purpur_block_bottom: {
-    textures: [
-      'textures/blocks/purpur_block',
-      'textures/blocks/purpur_block',
-      'textures/blocks/purpur_pillar_top',
-    ],
+    textures: ['textures/blocks/purpur_block', 'textures/blocks/purpur_block', 'textures/blocks/purpur_pillar_top'],
   },
   purpur_block_side: {
-    textures: [
-      'textures/blocks/purpur_block',
-      'textures/blocks/purpur_block',
-      'textures/blocks/purpur_pillar',
-    ],
+    textures: ['textures/blocks/purpur_block', 'textures/blocks/purpur_block', 'textures/blocks/purpur_pillar'],
   },
   purpur_block_top: {
-    textures: [
-      'textures/blocks/purpur_block',
-      'textures/blocks/purpur_block',
-      'textures/blocks/purpur_pillar_top',
-    ],
+    textures: ['textures/blocks/purpur_block', 'textures/blocks/purpur_block', 'textures/blocks/purpur_pillar_top'],
   },
   quartz_block_bottom: {
     textures: [
@@ -2240,10 +2069,7 @@ export const terrain_textures = {
     ],
   },
   red_candle: {
-    textures: [
-      'textures/blocks/candles/red_candle',
-      'textures/blocks/candles/red_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/red_candle', 'textures/blocks/candles/red_candle_lit'],
   },
   red_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -2336,16 +2162,10 @@ export const terrain_textures = {
     textures: 'textures/blocks/reinforced_deepslate_top',
   },
   repeater_floor: {
-    textures: [
-      'textures/blocks/stone_slab_top',
-      'textures/blocks/stone_slab_top',
-    ],
+    textures: ['textures/blocks/stone_slab_top', 'textures/blocks/stone_slab_top'],
   },
   repeater_torch: {
-    textures: [
-      'textures/blocks/redstone_torch_off',
-      'textures/blocks/redstone_torch_on',
-    ],
+    textures: ['textures/blocks/redstone_torch_off', 'textures/blocks/redstone_torch_on'],
   },
   repeater_up: {
     textures: ['textures/blocks/repeater_off', 'textures/blocks/repeater_on'],
@@ -2427,22 +2247,13 @@ export const terrain_textures = {
     textures: 'textures/blocks/sculk',
   },
   sculk_catalyst_bottom: {
-    textures: [
-      'textures/blocks/sculk_catalyst_bottom',
-      'textures/blocks/sculk_catalyst_bottom',
-    ],
+    textures: ['textures/blocks/sculk_catalyst_bottom', 'textures/blocks/sculk_catalyst_bottom'],
   },
   sculk_catalyst_side: {
-    textures: [
-      'textures/blocks/sculk_catalyst_side',
-      'textures/blocks/sculk_catalyst_side_bloom',
-    ],
+    textures: ['textures/blocks/sculk_catalyst_side', 'textures/blocks/sculk_catalyst_side_bloom'],
   },
   sculk_catalyst_top: {
-    textures: [
-      'textures/blocks/sculk_catalyst_top',
-      'textures/blocks/sculk_catalyst_top_bloom',
-    ],
+    textures: ['textures/blocks/sculk_catalyst_top', 'textures/blocks/sculk_catalyst_top_bloom'],
   },
   sculk_sensor_bottom: {
     textures: 'textures/blocks/sculk_sensor_bottom',
@@ -2463,10 +2274,7 @@ export const terrain_textures = {
     textures: 'textures/blocks/sculk_shrieker_bottom',
   },
   sculk_shrieker_inner_top: {
-    textures: [
-      'textures/blocks/sculk_shrieker_inner_top',
-      'textures/blocks/sculk_shrieker_can_summon_inner_top',
-    ],
+    textures: ['textures/blocks/sculk_shrieker_inner_top', 'textures/blocks/sculk_shrieker_can_summon_inner_top'],
   },
   sculk_shrieker_side: {
     textures: 'textures/blocks/sculk_shrieker_side',
@@ -2576,10 +2384,7 @@ export const terrain_textures = {
     ],
   },
   smoker_bottom: {
-    textures: [
-      'textures/blocks/smoker_bottom',
-      'textures/blocks/smoker_bottom',
-    ],
+    textures: ['textures/blocks/smoker_bottom', 'textures/blocks/smoker_bottom'],
   },
   smoker_front_off: {
     textures: 'textures/blocks/smoker_front_off',
@@ -2749,10 +2554,7 @@ export const terrain_textures = {
     ],
   },
   stone_slab: {
-    textures: [
-      'textures/blocks/stone_slab_top',
-      'textures/blocks/stone_slab_side',
-    ],
+    textures: ['textures/blocks/stone_slab_top', 'textures/blocks/stone_slab_side'],
   },
   stone_slab_bottom: {
     textures: [
@@ -2986,16 +2788,10 @@ export const terrain_textures = {
     ],
   },
   structure_void: {
-    textures: [
-      'textures/blocks/structure_void',
-      'textures/blocks/structure_air',
-    ],
+    textures: ['textures/blocks/structure_void', 'textures/blocks/structure_air'],
   },
   sunflower_additional: {
-    textures: [
-      'textures/blocks/double_plant_sunflower_front',
-      'textures/blocks/double_plant_sunflower_back',
-    ],
+    textures: ['textures/blocks/double_plant_sunflower_front', 'textures/blocks/double_plant_sunflower_back'],
   },
   sweet_berry_bush_0: {
     textures: 'textures/blocks/sweet_berry_bush_stage0',
@@ -3168,10 +2964,7 @@ export const terrain_textures = {
     ],
   },
   white_candle: {
-    textures: [
-      'textures/blocks/candles/white_candle',
-      'textures/blocks/candles/white_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/white_candle', 'textures/blocks/candles/white_candle_lit'],
   },
   white_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -3240,10 +3033,7 @@ export const terrain_textures = {
     ],
   },
   yellow_candle: {
-    textures: [
-      'textures/blocks/candles/yellow_candle',
-      'textures/blocks/candles/yellow_candle_lit',
-    ],
+    textures: ['textures/blocks/candles/yellow_candle', 'textures/blocks/candles/yellow_candle_lit'],
   },
   yellow_candle_cake: {
     textures: 'textures/blocks/cake',
@@ -3259,5 +3049,5 @@ export const terrain_textures = {
   },
 }
 
-/** @type {Record<string, {textures: string | string[]}>} */
+/** @type {Record<string, { textures: string | string[] }>} */
 export const untyped_terrain_textures = terrain_textures

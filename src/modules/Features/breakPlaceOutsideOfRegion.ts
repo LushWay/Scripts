@@ -2,7 +2,7 @@ import { Vector, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
 import { actionGuard } from 'lib/region/index'
-import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
+import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
 
 actionGuard((player, region, ctx) => {
   if (!region) {

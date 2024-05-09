@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
-import { SETTINGS_GROUP_NAME, Settings, settingsGroupMenu } from 'lib/Settings'
-import { stringSimilarity } from '../Search'
+import { SETTINGS_GROUP_NAME, Settings, settingsGroupMenu } from 'lib/settings'
+import { stringSimilarity } from '../search'
 import { util } from '../util'
 import { ActionForm } from './action'
 import { ModalForm } from './modal'

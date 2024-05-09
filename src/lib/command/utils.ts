@@ -1,7 +1,7 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { CONFIG, SOUNDS } from 'lib/assets/config'
 import { ROLES } from 'lib/roles'
-import { inaccurateSearch } from '../Search'
+import { inaccurateSearch } from '../search'
 import { util } from '../util'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'

@@ -4,7 +4,7 @@ import { Cooldown, Settings, Temporary, actionGuard, inventoryIsEmpty, util } fr
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea'
 import { Spawn } from 'modules/Places/Spawn'
 import { Quest } from 'modules/Quests/lib/Quest'
-import { ALLOW_SPAWN_PROP } from 'modules/Survival/guard'
+import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
 const gravestoneOwnerKey = 'owner'
 const gravestoneEntity = MinecraftEntityTypes.HopperMinecart

@@ -1,7 +1,7 @@
 import { BlockPermutation, Player } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { typeIdToReadable } from 'lib/GameUtils'
+import { typeIdToReadable } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds'
 import { BUTTON, showForm } from './utils'

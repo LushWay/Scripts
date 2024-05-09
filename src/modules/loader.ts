@@ -1,13 +1,12 @@
 import 'lib'
 
 // import '../test/test'
-import './Chat/chat'
-import './Commands/index'
+import './chat/chat'
+import './commands/index'
 import './WorldEdit/commands/camera/visual'
-// import './Indicator/index'
-import '../lib/PlayerJoin'
-import './Survival/index'
-import './Test/test'
+// import './indicator/index'
+import './survival/index'
+import './test/test'
 import './WorldEdit/import'
 
 import 'lib/load/message2'

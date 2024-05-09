@@ -4,7 +4,7 @@ import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@
 import { util } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { TechCity } from 'modules/Places/TechCity'
-import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
+import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
 import { withState } from 'modules/WorldEdit/utils/blocksSet'
 
 const [quartzTypeId, states] = withState(MinecraftBlockTypes.QuartzBlock, {

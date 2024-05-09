@@ -1,9 +1,9 @@
 import { Player } from '@minecraft/server'
-import { WeakPlayerMap } from 'lib/WeakPlayerMap'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { FormCallback } from 'lib/form/utils'
 import { util } from 'lib/util'
+import { WeakPlayerMap } from 'lib/weak-player-map'
 import { table } from './database/abstract'
 
 type DropdownSetting = [value: string, displayText: string]

@@ -1,10 +1,6 @@
 import { TerminalColors } from './assets/terminal-colors'
 
 export const util = {
-  settings: {
-    BDSMode: true,
-    firstLoad: false,
-  },
   error: Object.assign(
     /**
      * Stringify and show error in console
@@ -558,18 +554,13 @@ export const util = {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
   },
 
-  /**
-   * Replaces each §<color> to its terminal eqiuvalent
-   *
-   * @param {string} text
-   */
+  /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
-    if (this.settings.BDSMode)
+    if (__SERVER__)
       return text.replace(/§(.)/g, (_, a) => this.terminalColors[a] ?? this.terminalColors.r) + this.terminalColors.r
 
     return text.replace(/§(.)/g, '')
   },
-  /** @type {Record<string, string>} */
   terminalColors: TerminalColors,
 }
 

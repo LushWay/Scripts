@@ -1,8 +1,8 @@
 import { Player, system, world } from '@minecraft/server'
-import { EventSignal } from 'lib/EventSignal'
-import { Settings } from 'lib/Settings'
 import { sendPacketToStdout } from 'lib/bds/api'
+import { EventSignal } from 'lib/event-signal'
 import { getRoleAndName } from 'lib/roles'
+import { Settings } from 'lib/settings'
 import { util } from 'lib/util'
 
 class JoinBuilder {
@@ -164,7 +164,6 @@ class JoinBuilder {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Join = new JoinBuilder()
 
 /**

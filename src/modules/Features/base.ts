@@ -3,8 +3,8 @@ import { ItemStack, Vector, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
-import { openBaseMenu } from 'modules/Features/baseMenu'
 import { spawnParticlesInArea } from 'modules/WorldEdit/config'
+import { openBaseMenu } from 'modules/features/baseMenu'
 
 export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
   '§r§6База',

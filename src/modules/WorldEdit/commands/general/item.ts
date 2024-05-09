@@ -1,4 +1,3 @@
-
 const root = new Command('item').setDescription('Управляет предметом в руке').setPermissions('admin').setGroup('test')
 
 root

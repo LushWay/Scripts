@@ -1,6 +1,5 @@
 import { WorldEdit } from '../../lib/WorldEdit'
 
-
 new Command('hpos2')
   .setGroup('we')
   .setDescription('Установить позицию точки 2 из взгляда (использовать)')

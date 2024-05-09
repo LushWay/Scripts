@@ -1,7 +1,7 @@
 import { BlockPermutation, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
 import { util } from 'lib'
 import { table } from 'lib/database/abstract'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { ProxyDatabase } from 'lib/database/proxy'
 
 type ScheduledBlockPlace = {
   typeId: string
@@ -31,7 +31,7 @@ export function scheduleBlockPlace({
 // If we will not use immutable unproxied value,
 // proxy wrapper will convert all values into subproxies
 // which is too expensive when arrays are very big
-const IMMUTABLE_DB = DynamicPropertyDB.immutableUnproxy(SHEDULED_DB)
+const IMMUTABLE_DB = ProxyDatabase.immutableUnproxy(SHEDULED_DB)
 
 /** @type {['overworld', 'nether', 'end']} */
 const DIMENSIONS: ['overworld', 'nether', 'end'] = ['overworld', 'nether', 'end']

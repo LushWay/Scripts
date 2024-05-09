@@ -1,6 +1,11 @@
 import { Player, system, world } from '@minecraft/server'
-import { EventSignal } from 'lib/EventSignal'
+import { EventSignal } from 'lib/event-signal'
 import { util } from 'lib/util'
+
+declare global {
+  /** Any known role */
+  type Role = keyof typeof ROLES
+}
 
 /** The roles that are in this server */
 export const ROLES = {
@@ -18,7 +23,7 @@ export const ROLES = {
   tester: '§9Тестер',
 }
 
-/** @type {Record<Role, Role[]>} */
+/** List of role permissions */
 const PERMISSIONS: Record<Role, Role[]> = {
   creator: ['creator'],
   curator: ['creator', 'curator'],
@@ -36,7 +41,11 @@ const PERMISSIONS: Record<Role, Role[]> = {
   tester: Object.keys(ROLES).filter(e => e !== 'spectator' && e !== 'member'),
 }
 
-/** @type {Role[]} */
+/**
+ * List of roles who can change role that goes after their position
+ *
+ * Also known as role hierarchy
+ */
 export const WHO_CAN_CHANGE: Role[] = ['creator', 'curator', 'techAdmin', 'chefAdmin', 'admin', 'grandBuilder']
 
 /**
@@ -48,8 +57,8 @@ export const WHO_CAN_CHANGE: Role[] = ['creator', 'curator', 'techAdmin', 'chefA
  * @example
  *   is(player.id, 'grandBuilder') // Player is grandBuilder, chefAdmin, techAdmin or any role above
  *
- * @param {string} playerID ID of the player to get role from
- * @param {Role} role Role to check
+ * @param playerID ID of the player to get role from
+ * @param role Role to check
  */
 export function is(playerID: string, role: Role) {
   if (!PERMISSIONS[role].length) return true
@@ -63,8 +72,11 @@ export function is(playerID: string, role: Role) {
  * @example
  *   getRole(player.id)
  *
- * @param {Player | string} playerID Player or his id to get role from
- * @returns {Role} Player role
+ * @example
+ *   getRole(player)
+ *
+ * @param playerID Player or his id to get role from
+ * @returns Player role
  */
 export function getRole(playerID: Player | string): Role {
   if (playerID instanceof Player) playerID = playerID.id
@@ -79,16 +91,19 @@ export function getRole(playerID: Player | string): Role {
  * Gets displayable the role of this player
  *
  * @example
- *   getDisplayRole(player.id, { name: true }) // §aРуководство XilLeR228
+ *   getDisplayRole(player.id) === '§aРуководство §r§fXilLeR228§r'
  *
- * @param {Player | string} playerID - Player or his id to get role from
- * @param {object} [o] - Options
- * @param {boolean} [o.role=true] - Whenther to include role or not. Default is `true`
- * @param {boolean} [o.name=true] - Whenether to include player name or not. Default is `true`
- * @param {string} [o.noName='Unknown'] - Name to display if no name was found. Default is `'Unknown'`
- * @param {string} [o.nameColor='§r§f'] - String used between role and name. Default is `'§r§f'`
- * @param {boolean} [o.clearColorAfter] - Whenether to add §r at the end of the string or not
- * @param {boolean} [o.nameSpacing] - Add spacing after role. Defaults to !!name
+ * @example
+ *   getDisplayRole(player.id, { name: false }) === '§aРуководство§r'
+ *
+ * @param playerID - Player or his id to get role from
+ * @param o - Options
+ * @param o.role - Whenther to include role or not. Default is `true`
+ * @param o.name - Whenether to include player name or not. Default is `true`
+ * @param o.noName - Name to display if no name was found. Default is `'Unknown'`
+ * @param o.nameColor - String used between role and name. Default is `'§r§f'`
+ * @param o.clearColorAfter - Whenether to add §r at the end of the string or not
+ * @param o.nameSpacing - Add spacing after role. Defaults to !!name
  */
 export function getRoleAndName(
   playerID: Player | string,
@@ -139,27 +154,30 @@ export function getRoleAndName(
  * @example
  *   setRole(player.id, 'admin')
  *
- * @param {Player | string} player
- * @param {Role} role
- * @returns {void}
+ * @example
+ *   setRole(player, 'member')
+ *
+ * @param player - Player to set role one
+ * @param role - Role to set
  */
 export function setRole(player: Player | string, role: Role): void {
   const id = player instanceof Player ? player.id : player
-  const DB = Player.database[id]
-  if (DB) {
+  const database = Player.database[id]
+  if (database) {
     EventSignal.emit(Core.beforeEvents.roleChange, {
       id,
       player: player instanceof Player ? player : Player.getById(player),
       newRole: role,
-      oldRole: DB.role,
+      oldRole: database.role,
     })
 
-    // it is marked readonly so no other functions will change that
-    // @ts-expect-error Huuuuh
-    DB.role = role
+    // @ts-expect-error settings role in setRole function is allowed
+    // role property is marked readonly so no other functions will change that
+    database.role = role
   }
 }
 
+// Set spectator gamemode to the spectator role
 Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
   if (!player) return
   if (newRole === 'spectator') {
@@ -169,6 +187,7 @@ Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
   }
 })
 
+// Set spectator gamemode on join with spectator role
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   if (player.isSimulated()) return
   if (initialSpawn) {
@@ -178,6 +197,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   }
 })
 
+// Allow recieving roles from scriptevent function run by console
 system.afterEvents.scriptEventReceive.subscribe(event => {
   if (event.id.toLowerCase().startsWith('role:')) {
     const role = event.id.toLowerCase().replace('role:', '')
@@ -190,6 +210,7 @@ system.afterEvents.scriptEventReceive.subscribe(event => {
       )
       return
     }
+
     const player = Player.getByName(event.message)
     if (!player) return console.warn(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)
 

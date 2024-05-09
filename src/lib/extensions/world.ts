@@ -2,6 +2,33 @@ import { MinecraftDimensionTypes, World, world } from '@minecraft/server'
 import { util } from '../util'
 import { expand } from './extend'
 
+declare module '@minecraft/server' {
+  interface World {
+    /** See {@link World.sendMessage} */
+    say(message: (RawMessage | string)[] | RawMessage | string): void
+
+    /**
+     * Logs given message once
+     *
+     * @param type Type of log
+     * @param messages Data to log using world.debug()
+     */
+    logOnce(type: string, ...messages: unknown[]): void
+
+    /** Prints data using world.say() and parses any object to string using toStr method. */
+    debug(...data: unknown[]): void
+    overworld: Dimension
+    end: Dimension
+    nether: Dimension
+  }
+
+  /** Used in {@link Dimension.runCommand} */
+  interface CommandOptions {
+    showOutput?: boolean
+    showError?: boolean
+  }
+}
+
 const send = world.sendMessage.bind(world)
 
 expand(World.prototype, {
@@ -19,14 +46,14 @@ expand(World.prototype, {
   nether: world.getDimension(MinecraftDimensionTypes.nether),
   end: world.getDimension(MinecraftDimensionTypes.theEnd),
   debug(...data: unknown[]) {
-    this.say(data.map((/** @type {any} */ e) => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
+    this.say(data.map(e => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
   },
 
   logOnce(name, ...data: unknown[]) {
-    if (LOGS.has(name)) return
+    if (logs.has(name)) return
     world.debug(...data)
-    LOGS.add(name)
+    logs.add(name)
   },
 })
 
-const LOGS = new Set()
+const logs = new Set()

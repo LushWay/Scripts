@@ -1,11 +1,11 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
 import { Entity, system, world } from '@minecraft/server'
-import { LootTable } from 'lib/LootTable'
+import { LootTable } from 'lib/loot-table'
 import { BossArenaRegion, Region } from 'lib/region/index'
-import { EditableLocation } from './EditableLocation'
-import { chunkIsUnloaded } from './GameUtils'
 import { table } from './database/abstract'
+import { EditableLocation } from './editable-location'
+import { chunkIsUnloaded } from './game-utils'
 
 type BossDB = {
   id: string

@@ -1,6 +1,6 @@
 import { Player, Vector } from '@minecraft/server'
-import { EventLoaderWithArg } from './EventSignal'
-import { Settings } from './Settings'
+import { EventLoaderWithArg } from './event-signal'
+import { Settings } from './settings'
 import { util } from './util'
 // TODO Location edit form from command -locations
 // TODO location grouping

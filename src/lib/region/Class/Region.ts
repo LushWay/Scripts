@@ -1,10 +1,11 @@
 import { Player } from '@minecraft/server'
-import { EventSignal } from 'lib/EventSignal'
-import { WeakPlayerMap } from 'lib/WeakPlayerMap'
+import { ProxyDatabase } from 'lib/database/proxy'
 import { DatabaseUtils } from 'lib/database/utils'
+import { EventSignal } from 'lib/event-signal'
 import { REGION_DB } from 'lib/region/DB'
 import { DEFAULT_REGION_PERMISSIONS } from 'lib/region/config'
 import { util } from 'lib/util'
+import { WeakPlayerMap } from 'lib/weak-player-map'
 
 export type RegionPlayerRole = 'owner' | 'member' | false
 
@@ -83,7 +84,7 @@ export class Region {
     { permissions, creating = true }: { permissions?: Partial<RegionPermissions> | undefined; creating?: boolean },
     region: typeof Region,
   ) {
-    this.permissions = DatabaseUtils.setDefaults(permissions ?? {}, this.defaultPermissions)
+    this.permissions = ProxyDatabase.setDefaults(permissions ?? {}, this.defaultPermissions)
     if (creating) this.update(region)
   }
 

@@ -2,6 +2,28 @@ import { ItemStack } from '@minecraft/server'
 import { util } from 'lib/util'
 import { expand } from './extend'
 
+declare module '@minecraft/server' {
+  interface ItemStack {
+    /** Alias to {@link ItemStack.getComponent}('cooldown') */
+    cooldown: ItemCooldownComponent
+
+    /** Alias to {@link ItemStack.getComponent}('enchantments') */
+    enchantments: ItemEnchantsComponent
+
+    /** Alias to {@link ItemStack.getComponent}('durability') */
+    durability: ItemDurabilityComponent
+
+    /** Alias to {@link ItemStack.getComponent}('food') */
+    food: ItemFoodComponent
+
+    /** Checks if one item stack properties are fully equal to another (nameTag and lore) */
+    is(another: ItemStack): boolean
+
+    /** Sets nameTag and lore */
+    setInfo(nameTag: string, description: string): ItemStack
+  }
+}
+
 Object.defineProperties(ItemStack.prototype, {
   enchantments: {
     get() {

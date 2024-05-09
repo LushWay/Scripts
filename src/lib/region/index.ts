@@ -8,7 +8,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { EventSignal } from '../EventSignal'
+import { EventSignal } from '../event-signal'
 import { Region } from './Class/Region'
 import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config'
 import './init'

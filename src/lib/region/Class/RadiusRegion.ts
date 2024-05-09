@@ -1,7 +1,7 @@
 import { Vector } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { ProxyDatabase } from 'lib/database/proxy'
 import { Region } from 'lib/region/Class/Region'
 import { REGION_DB } from 'lib/region/DB'
 
@@ -62,10 +62,10 @@ export class RadiusRegion extends Region {
     saveToDisk?: boolean
     subclassing?: boolean
   }) {
-    if (permissions) permissions = DynamicPropertyDB.unproxy(permissions)
+    if (permissions) permissions = ProxyDatabase.unproxy(permissions)
 
     super({ dimensionId, permissions, key })
-    this.center = DynamicPropertyDB.unproxy(center)
+    this.center = ProxyDatabase.unproxy(center)
     this.radius = radius
     this.saveToDisk = saveToDisk
 
@@ -80,7 +80,6 @@ export class RadiusRegion extends Region {
   }
 
   /** @inheritdoc */
-
   update(region = RadiusRegion) {
     if (!this.saveToDisk) return super.update()
     return (REGION_DB[this.key] = {

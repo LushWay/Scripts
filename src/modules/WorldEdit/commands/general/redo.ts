@@ -1,6 +1,5 @@
 import { WorldEdit } from '../../lib/WorldEdit'
 
-
 new Command('redo')
   .setGroup('we')
   .setDescription('Возвращает последнее действие (из памяти)')

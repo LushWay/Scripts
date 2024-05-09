@@ -3,7 +3,7 @@ import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Region, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
-import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
+import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
 import { isBuilding } from 'modules/WorldEdit/isBuilding'
 
 export class Axe {

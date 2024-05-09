@@ -1,7 +1,67 @@
-import { Container, ItemStack } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Enchantments } from './Enchantments'
-import { EventSignal } from './EventSignal'
+import { Container, ItemLockMode, ItemStack } from '@minecraft/server'
+import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Enchantments } from './enchantments'
+import { EventSignal } from './event-signal'
+
+declare namespace LootItem {
+  type RandomCostMapType = {
+    [key: `${number}...${number}` | number]: Percent
+  }
+
+  type Percent = `${number}%`
+  interface Common {
+    /**
+     * - Amount of the item
+     *
+     * @default 1
+     */
+    amount?: RandomCostMapType | number
+    /** - Cost of the item. Items with higher cost will be generated more often */
+    chance: Percent
+
+    /** - Map in format { enchant: { level: percent } } */
+    enchantments?: Partial<Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>>
+    /** - Damage of the item */
+    damage?: RandomCostMapType
+
+    /** - Additional options for the item like canPlaceOn, canDestroy, nameTag etc */
+    options?: Options
+  }
+
+  interface Options {
+    lore?: string[]
+    nameTag?: string
+    keepOnDeath?: boolean
+    canPlaceOn?: string[]
+    canDestroy?: string[]
+    lockMode?: ItemLockMode
+  }
+
+  interface TypeIdInput {
+    /** - Stringified id of the item. May include namespace (e.g. "minecraft:"). */
+    typeId: string
+  }
+
+  interface TypeInput {
+    /** - Item type name. Its key of MinecraftItemTypes. */
+    type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>
+  }
+
+  interface ItemStackInput {
+    /** - Item stack. Will be cloned. */
+    itemStack: ItemStack
+  }
+
+  type Input = (TypeIdInput | TypeInput | ItemStackInput) & Common
+
+  type Stored = {
+    itemStack: ItemStack
+    enchantments: Record<string, number[]>
+    chance: number
+    amount: number[]
+    damage: number[]
+  }
+}
 
 new Command('loot')
   .setPermissions('curator')
@@ -19,7 +79,7 @@ new Command('loot')
     lootTable.fillContainer(inventory.container)
   })
 
-type LootTableFillType = { type: 'itemsCount' } | { type: 'airPercent'; air: Percent }
+type LootTableFillType = { type: 'itemsCount' } | { type: 'airPercent'; air: LootItem.Percent }
 
 type LootItems = { stack: ItemStack; chance: number }[]
 
@@ -219,9 +279,7 @@ export class LootTable {
 }
 
 const RandomCost = {
-  /** @param {RandomCostMapType} inputMap */
-  toArray(inputMap: RandomCostMapType) {
-    /** @type {Record<number, number>} */
+  toArray(inputMap: LootItem.RandomCostMapType) {
     const newMap: Record<number, number> = {}
 
     for (const [range, rawValue] of Object.entries(inputMap)) {

@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { util } from 'lib/util'
-import { EventLoader, EventSignal } from '../EventSignal'
+import { EventLoader, EventSignal } from '../event-signal'
 
 /** Core server features */
 const Core = {

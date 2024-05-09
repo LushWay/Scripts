@@ -1,6 +1,6 @@
 import { Player, Vector, system, world } from '@minecraft/server'
-import { Location } from './EditableLocation'
 import { request } from './bds/api'
+import { Location } from './editable-location'
 
 /**
  * @param {number} value

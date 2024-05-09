@@ -1,4 +1,3 @@
-
 new Command('s')
   .setDescription('Выживание')
   .setPermissions('builder')
@@ -6,7 +5,6 @@ new Command('s')
     ctx.player.runCommand('gamemode s')
     ctx.player.success('§aS')
   })
-
 
 new Command('c')
   .setAliases('с', 'gm1')

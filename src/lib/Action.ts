@@ -1,5 +1,5 @@
 import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
-import { EventSignal } from 'lib/EventSignal'
+import { EventSignal } from 'lib/event-signal'
 import { actionGuard } from 'lib/region/index'
 
 type PlaceType = 'enters' | 'interactions'

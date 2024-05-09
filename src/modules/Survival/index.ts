@@ -6,7 +6,7 @@ import '../Places/TechCity'
 import '../Places/VillafeOfExplorers'
 import '../Places/VillageOfMiners'
 
-import '../Features/import'
+import '../features/import'
 
 import '../Quests/index'
 

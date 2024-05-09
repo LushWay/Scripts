@@ -1,6 +1,5 @@
 import { WorldEdit } from '../../lib/WorldEdit'
 
-
 new Command('undo')
   .setGroup('we')
   .setDescription('Отменяет последнее действие (из памяти)')

@@ -1,7 +1,12 @@
+// Anti crash
 import 'lib/load/watchdog'
 
+// Extended native classes
 import 'lib/load/extensions'
 import 'lib/load/message1'
+
+// Database provider
+import 'lib/database/properties'
 
 // Database
 export * from 'lib/database/inventory'
@@ -15,25 +20,25 @@ export * from 'lib/command/index'
 export * from 'lib/roles'
 export * from 'lib/util'
 
-export * from 'lib/Action'
-export * from 'lib/Airdrop'
-export * from 'lib/Boss'
-export * from 'lib/Cooldown'
-export * from 'lib/EditableLocation'
-export * from 'lib/Enchantments'
-export * from 'lib/EventSignal'
-export * from 'lib/GameUtils'
-export * from 'lib/Leaderboard'
-export * from 'lib/LootTable'
-export * from 'lib/Mail'
-export * from 'lib/Menu'
-export * from 'lib/PlayerJoin'
-export * from 'lib/Portals'
-export * from 'lib/Search'
-export * from 'lib/Settings'
-export * from 'lib/Sidebar'
-export * from 'lib/Temporary'
-export * from 'lib/Zone'
+export * from 'lib/action'
+export * from 'lib/airdrop'
+export * from 'lib/boss'
+export * from 'lib/cooldown'
+export * from 'lib/editable-location'
+export * from 'lib/enchantments'
+export * from 'lib/event-signal'
+export * from 'lib/game-utils'
+export * from 'lib/leaderboard'
+export * from 'lib/loot-table'
+export * from 'lib/mail'
+export * from 'lib/menu'
+export * from 'lib/player-join'
+export * from 'lib/portals'
+export * from 'lib/search'
+export * from 'lib/settings'
+export * from 'lib/sidebar'
+export * from 'lib/temporary'
+export * from 'lib/zone'
 
 // Region
 export * from 'lib/region/index'
@@ -49,6 +54,6 @@ export * from 'lib/form/utils'
 
 // Extension exports
 export * from 'lib/extensions/extend'
-export * from 'lib/extensions/itemstack'
+export * from 'lib/extensions/item-stack'
 export * from 'lib/extensions/system'
 export * from 'lib/load/extensions'

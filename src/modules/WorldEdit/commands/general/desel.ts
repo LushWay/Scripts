@@ -1,6 +1,5 @@
 import { WorldEdit } from '../../lib/WorldEdit'
 
-
 new Command('desel')
   .setGroup('we')
   .setAliases('deselect', 'delselect', 'delsel')

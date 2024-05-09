@@ -1,6 +1,5 @@
 import { WEmenu } from '../../menu'
 
-
 new Command('we')
   .setAliases('wb', 'wa')
   .setPermissions('builder')

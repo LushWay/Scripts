@@ -17,16 +17,31 @@ export function table<Value>(
 ): Record<string, Value | undefined> {
   if (!provider) throw new DatabaseError('No database provider was specified!')
 
-  return provider(name, defaultValue as DatabaseDefaultValue<Value>)
+  return provider.createTable(name, defaultValue as DatabaseDefaultValue<Value>)
 }
 
-let provider: typeof table
+export type DatabaseTable = Record<string, unknown>
+
+/** Describes unified database provider */
+type DatabaseProvider = {
+  createTable: typeof table
+  tables: Record<string, DatabaseTable>
+  getRawTableData: (tableId: string) => string
+}
+
+/** Stores database provider */
+let provider: DatabaseProvider
 
 /**
  * Setups database table generator function
  *
- * @param provider - Function that generates table
+ * @param config - Function that generates table
  */
-export function configureDatabase(provider: typeof table) {
-  provider = provider as typeof table
+export function configureDatabase(config: DatabaseProvider) {
+  provider = config
+}
+
+/** Returns current database provider */
+export function getProvider() {
+  return provider
 }

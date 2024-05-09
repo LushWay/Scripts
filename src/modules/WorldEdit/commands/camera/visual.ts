@@ -1,8 +1,8 @@
 import { Player, system } from '@minecraft/server'
-import { Join } from 'lib/PlayerJoin'
 import { InventoryStore } from 'lib/database/inventory'
+import { Join } from 'lib/player-join'
 import { ROLES, getRole } from 'lib/roles'
-import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/Indicator/playerNameTag'
+import { PLAYER_NAME_TAG_MODIFIERS } from 'modules/indicator/playerNameTag'
 import { CURRENT_BUILDERS, isBuilding } from '../../isBuilding'
 
 const builderInventory = new InventoryStore('build')

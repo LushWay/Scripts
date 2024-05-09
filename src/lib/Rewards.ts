@@ -1,6 +1,6 @@
 import { ItemStack, Player, ScoreName } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
-import { itemDescription } from './Store'
+import { itemDescription } from './store'
 
 export type Reward =
   | {

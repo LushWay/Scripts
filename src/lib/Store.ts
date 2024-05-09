@@ -1,11 +1,11 @@
 import { ItemStack, Player, system } from '@minecraft/server'
 
 import { EditableLocation, PlaceAction, Settings, itemLocaleName } from 'lib'
-import { Cooldown } from 'lib/Cooldown'
-import { Cost } from 'lib/Cost'
-import { EditableNpc } from 'lib/EditableNpc'
-import { EventSignal } from 'lib/EventSignal'
 import { emoji } from 'lib/assets/emoji'
+import { Cooldown } from 'lib/cooldown'
+import { Cost } from 'lib/cost'
+import { EditableNpc } from 'lib/editable-npc'
+import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 

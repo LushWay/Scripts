@@ -10,9 +10,14 @@ const test = process.argv[2] === 'test'
 const port = process.argv[3] ?? '19514'
 const outdir = 'scripts'
 const outfile = path.join(outdir, 'index.js')
+const logger = new LeafyLogger({ prefix: 'build' })
 
-fs.rmSync(outdir, { force: true, recursive: true })
-fs.mkdirSync(outdir)
+try {
+  fs.rmSync(outdir, { force: true, recursive: true })
+  fs.mkdirSync(outdir)
+} catch (e) {
+  logger.warn(e)
+}
 
 /** @type {esbuild.BuildOptions} */
 const config = {
@@ -22,12 +27,14 @@ const config = {
   outfile: outfile,
   platform: 'neutral',
   target: 'es2020',
+  sourcemap: 'linked',
 
   define: {
-    __DEV__: development + '',
-    __PRODUСTION__: !development + '',
-    __TEST__: test + '',
-    __SERVER__: true + '',
+    __DEV__: `${development}`,
+    __PRODUCTION__: `${!development}`,
+    __RELEASE__: 'false',
+    __TEST__: `${test}`,
+    __SERVER__: `${true}`,
     __SERVER_PORT__: port,
   },
 
@@ -41,7 +48,6 @@ const config = {
   legalComments: 'none',
 }
 
-const logger = new LeafyLogger({ prefix: 'build' })
 let start = Date.now()
 
 if (development) {
@@ -69,7 +75,7 @@ async function writeManifestJson() {
     .map(([name, version]) => {
       const match = version.match(/\d+\.\d+\.\d+-(?:beta|stable)/)
 
-      if (!match) {
+      if (!match && name !== '@minecraft/vanilla-data') {
         logger.warn(
           "Version of the package '" +
             name +
@@ -80,6 +86,8 @@ async function writeManifestJson() {
       return [name, match?.[0] ?? '']
     })
     .filter(e => !!e[1])
+
+  packagejson.content.devDependencies = packagejson.content.dependencies
 
   const base = {
     format_version: 2,
@@ -132,7 +140,6 @@ async function writeManifestJson() {
     version: e[1],
   }))
 
-  console.log(base.dependencies)
-
-  writeJSON('./manifest.json', base).catch(e => logger.error('Failed writing manifest.json file:', e))
+  await writeJSON('./manifest.json', base).catch(e => logger.error('Failed writing manifest.json file:', e))
+  await packagejson.write()
 }

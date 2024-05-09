@@ -1,7 +1,7 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, LootTable, util } from 'lib'
 import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea'
-import { Furnacer } from '../../Features/furnace'
+import { Furnacer } from '../../features/furnace'
 
 class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
   witherBoss = new Boss({

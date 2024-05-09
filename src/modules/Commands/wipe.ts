@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import { Airdrop, prompt } from 'lib'
-import { Join } from 'lib/PlayerJoin'
+import { Join } from 'lib/player-join'
 import { Anarchy } from 'modules/Places/Anarchy'
 import { Spawn } from 'modules/Places/Spawn'
 

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { EventLoader, EventLoaderWithArg, EventSignal } from '../../lib/EventSignal'
+import { EventLoader, EventLoaderWithArg, EventSignal } from '../../lib/event-signal'
 
 describe('EventSignal', () => {
   let signal: EventSignal<string>

@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
-import { Enchantments } from '../../lib/Enchantments'
 import { MinecraftEnchantmentTypes } from '../../lib/assets/enchantments'
+import { Enchantments } from '../../lib/enchantments'
 
 new Command('enchant')
   .setDescription('Зачаровывает предмет')

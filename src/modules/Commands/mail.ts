@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings } from 'lib'
-import { Join } from 'lib/PlayerJoin'
-import { Rewards } from 'lib/Rewards'
+import { Join } from 'lib/player-join'
+import { Rewards } from 'lib/rewards'
 
 new Command('mail').setDescription('Посмотреть входящие сообщения почты').executes(ctx => mailMenu(ctx.player))
 

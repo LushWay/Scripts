@@ -25,7 +25,7 @@ export class Quest {
     },
   })
 
-  static sidebar: import('lib/Sidebar').SidebarLineInit<unknown> = {
+  static sidebar: import('lib/sidebar').SidebarLineInit<unknown> = {
     init(sidebar) {
       const onquestupdate = sidebar.show.bind(sidebar)
 

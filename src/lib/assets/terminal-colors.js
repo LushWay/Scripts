@@ -1,6 +1,5 @@
-
-
-export const TerminalColors: Record<string, string> = {
+/** @type {Record<string, string>} */
+export const TerminalColors = {
   0: '\x1B[30m',
   1: '\x1B[38;2;0;0;175m',
   2: '\x1B[38;2;0;175;0m',

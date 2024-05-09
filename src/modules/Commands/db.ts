@@ -1,142 +1,130 @@
 import { Player, system, world } from '@minecraft/server'
-import { FormCallback, ROLES, getRole, util } from 'lib'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { ROLES, getRole, util } from 'lib'
+import { DatabaseTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
-const db = new Command('db').setDescription('Просматривает базу данных').setPermissions('techAdmin')
-
-db.executes(ctx => selectTable(ctx.player, true))
+new Command('db')
+  .setDescription('Просматривает базу данных')
+  .setPermissions('techAdmin')
+  .executes(ctx => selectTable(ctx.player, true))
 
 function selectTable(player: Player, firstCall?: true) {
   const form = new ActionForm('Таблицы данных')
-  for (const key in DynamicPropertyDB.tables) {
-    const DB = DynamicPropertyDB.tables[key]
-    const name = `${key} §7${Object.keys(DB.proxy()).length}§r`
+  for (const [tableId, table] of Object.entries(getProvider().tables)) {
+    const name = `${tableId} §7${Object.keys(table).length}§r`
 
-    form.addButton(name, () => showTable(player, key))
+    form.addButton(name, () => showTable(player, tableId, table))
   }
   form.show(player)
   if (firstCall) player.info('Закрой чат!')
 }
 
-function showTable(player: Player, table: string) {
-  const DB: DynamicPropertyDB<string, any> = DynamicPropertyDB.tables[table]
-  const proxy = DB.proxy()
-
+function showTable(player: Player, tableId: string, table: DatabaseTable) {
+  const selfback = () => showTable(player, tableId, table)
   const menu = new ActionForm(`${table}`)
 
   menu.addButton(ActionForm.backText, () => selectTable(player))
   menu.addButton('§3Новое значение§r', () => {
-    const form = new ModalForm('§3+Значение в §f' + table).addTextField('Ключ', ' ')
-    const { newform, callback } = changeValue(form, null)
-    newform.show(player, (_, key, input, type) => {
-      if (input)
-        callback(input, type, newVal => {
-          proxy[key] = newVal
-        })
-      showTable(player, table)
-    })
+    changeValue(
+      player,
+      null,
+      (newVal, key) => {
+        table[key] = newVal
+      },
+      selfback,
+    )
   })
 
   menu.addButton('§3Посмотреть в §fRAW', () => {
-    let raw = world.getDynamicProperty(DB.tableId)
+    let raw = getProvider().getRawTableData(tableId)
     try {
       if (typeof raw === 'string') raw = JSON.parse(raw)
     } catch {}
 
-    new ActionForm('§3RAW table §f' + table, util.inspect(raw))
-      .addButton('Oк', () => {
-        showTable(player, table)
-      })
-      .show(player)
+    new ActionForm('§3RAW table §f' + table, util.inspect(raw)).addButton('Oк', selectTable).show(player)
   })
 
-  const propertyForm = (key: string) => {
-    key = key + ''
-    /** @type {any} */
-    let value: any
-    let failedToLoad = false
-
-    try {
-      value = proxy[key]
-    } catch (e) {
-      util.error(e)
-      value = 'a'
-      failedToLoad = true
-    }
-
-    const AForm = new ActionForm(
-      '§3Ключ ' + key,
-      `§7Тип: §f${typeof value}\n ${
-        failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''
-      }\n${util.inspect(value)}\n `,
-    )
-
-    AForm.addButton('Изменить', null, () => {
-      const { newform, callback: ncallback } = changeValue(new ModalForm(key), value)
-
-      newform.show(player, (_, input, inputType) => {
-        if (input)
-          ncallback(input, inputType, newValue => {
-            proxy[key] = newValue
-            player.tell(util.inspect(value) + '§r -> ' + util.inspect(newValue))
-          })
-
-        propertyForm(key)
-      })
-    })
-
-    AForm.addButton('§cУдалить§r', () => {
-      delete proxy[key]
-      system.delay(() => {
-        showTable(player, table)
-      })
-    })
-
-    AForm.addButton(ActionForm.backText, () => showTable(player, table))
-
-    AForm.show(player)
-  }
-
-  const keys = Object.keys(proxy)
+  const keys = Object.keys(table)
   for (const key of keys) {
     let name = key
-    if (table === 'player') {
-      /** @type {typeof Player.database} */
-      const p: typeof Player.database = proxy
+    if (tableId === 'player') {
+      const playerDatabase = table as typeof Player.database
 
-      name = `${p[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'}\n§8(${key})`
+      name = `${playerDatabase[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'}\n§8(${key})`
     }
 
-    menu.addButton(name, () => propertyForm(key))
+    menu.addButton(name, () => tableProperty(key, table, player, selfback))
   }
 
   menu.show(player)
 }
 
-function changeValue(form: ModalForm<(ctx: FormCallback, args_0: string, args_1: string) => void>, value: any) {
-  let type = typeof value
+function tableProperty(key: string, table: DatabaseTable, player: Player, back: VoidFunction) {
+  key = key + ''
+  let value: unknown
+  let failedToLoad = false
+
+  try {
+    value = table[key]
+  } catch (e) {
+    util.error(e)
+    value = 'a'
+    failedToLoad = true
+  }
+
+  new ActionForm(
+    '§3Ключ ' + key,
+    `§7Тип: §f${typeof value}\n ${failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''}\n${util.inspect(value)}\n `,
+  )
+    .addButton('Изменить', () =>
+      changeValue(
+        player,
+        value,
+        newValue => {
+          table[key] = newValue
+          player.tell(util.inspect(value) + '§r -> ' + util.inspect(newValue))
+        },
+        () => tableProperty(key, table, player, back),
+        key,
+      ),
+    )
+    .addButton('§cУдалить§r', () => {
+      delete table[key]
+      system.delay(back)
+    })
+    .addButtonBack(back)
+    .show(player)
+}
+
+function changeValue(
+  player: Player,
+  value: unknown,
+  onChange: (value: unknown, key: string) => void,
+  back: VoidFunction,
+  key?: string,
+) {
+  let valueType = typeof value
   const typeDropdown = ['string', 'number', 'boolean', 'object']
-  if (value) typeDropdown.unshift('Оставить прежний §7(' + type + ')')
+  if (value) typeDropdown.unshift('Оставить прежний §7(' + valueType + ')')
   const stringifiedValue = value ? (typeof value === 'object' ? JSON.stringify(value) : value + '') : ''
-  const newform = form
+
+  new ModalForm('§3+Значение ')
+    .addTextField('Ключ', ' ', key)
     .addTextField('Значение', 'оставь пустым для отмены', stringifiedValue)
     .addDropdown('Тип', typeDropdown)
-
-  return {
-    newform,
-    callback: (input: any, inputType: string, onChange: (newValue: unknown) => void) => {
+    .show(player, (ctx, key, input: any, type: string) => {
+      if (!input) back()
       let newValue = input
 
       if (
-        !inputType.includes(type) &&
-        (inputType === 'string' || inputType === 'object' || inputType === 'boolean' || inputType === 'number')
+        !type.includes(valueType) &&
+        (type === 'string' || type === 'object' || type === 'boolean' || type === 'number')
       ) {
-        type = inputType
+        valueType = type
       }
-      switch (type) {
+      switch (valueType) {
         case 'number':
           newValue = Number(input)
           break
@@ -155,9 +143,8 @@ function changeValue(form: ModalForm<(ctx: FormCallback, args_0: string, args_1:
 
           break
       }
-      onChange(newValue)
-    },
-  }
+      onChange(newValue, key)
+    })
 }
 
 const cmd = new Command('benchmark')

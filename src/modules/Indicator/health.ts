@@ -4,10 +4,10 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
 
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
-import { CLOSING_CHAT } from 'lib/extensions/player'
+import { ClosingChatSet } from 'lib/extensions/player'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
-import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/Indicator/playerNameTag'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
+import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/indicator/playerNameTag'
 
 // TODO Rewrite in class
 
@@ -56,7 +56,7 @@ world.afterEvents.entityHurt.subscribe(event => {
     return
 
   // Not trigget by close chat
-  if (CLOSING_CHAT.has(event.hurtEntity.id)) return
+  if (ClosingChatSet.has(event.hurtEntity.id)) return
 
   updateIndicator({ entity: event.hurtEntity, damage: Math.floor(event.damage) })
 })

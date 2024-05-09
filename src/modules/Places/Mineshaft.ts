@@ -1,7 +1,7 @@
 // TODO Actually generate ore
 
 import { MineshaftRegion, actionGuard, util } from 'lib'
-import { scheduleBlockPlace } from 'modules/Survival/scheduledBlockPlace'
+import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
 
 class MineshaftBuilder {
   generateOre({

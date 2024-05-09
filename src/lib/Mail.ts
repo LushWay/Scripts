@@ -1,14 +1,14 @@
 import { Player } from '@minecraft/server'
 
 import { util } from 'lib'
-import { Rewards } from './Rewards'
 import { table } from './database/abstract'
+import { Rewards } from './rewards'
 
 /** A global letter is a letter sent to multiple players */
 type GlobalLetter = {
   title: string
   content: string
-  rewards: import('./Rewards').Reward[]
+  rewards: import('./rewards').Reward[]
 }
 
 type LocalLetterMetadata = { read: boolean; rewardsClaimed: boolean }

@@ -2,10 +2,10 @@ import { ItemStack, Player, TicksPerSecond, Vector, system, world } from '@minec
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
-import { MoneyCost } from 'lib/Cost'
-import { Store } from 'lib/Store'
+import { MoneyCost } from 'lib/cost'
 import { table } from 'lib/database/abstract'
 import { actionGuard } from 'lib/region/index'
+import { Store } from 'lib/store'
 import { StoneQuarry } from '../Places/StoneQuarry/StoneQuarry'
 
 export class Furnacer {
@@ -46,7 +46,7 @@ export class Furnacer {
     onlyInStoneQuarry,
     npc: npcOptions,
   }: {
-    npc: Omit<import('lib/EditableNpc').EditableNpcProps, 'onInteract'>
+    npc: Omit<import('lib/editable-npc').EditableNpcProps, 'onInteract'>
     furnaceTypeIds: string[]
     onlyInStoneQuarry: boolean
   }) {

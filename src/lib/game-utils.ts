@@ -22,7 +22,7 @@ import { MinecraftBlockTypes, MinecraftCameraPresetsTypes } from '@minecraft/van
  */
 export function blockStatus({ location, dimensionId }: { location: Vector3; dimensionId: Dimensions }) {
   try {
-    const block = world[dimensionId].getBlock(location)
+    const block = world[dimensionId]?.getBlock(location)
     if (!block || !block.isValid()) return 'unloaded'
     return block
   } catch (e) {

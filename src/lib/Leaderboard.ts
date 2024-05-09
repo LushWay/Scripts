@@ -1,6 +1,6 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
-import { DynamicPropertyDB } from 'lib/database/properties'
+import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { table } from './database/abstract'
 
@@ -147,7 +147,7 @@ export class Leaderboard {
   }
 }
 
-const immutable = DynamicPropertyDB.immutableUnproxy(Leaderboard.db)
+const immutable = ProxyDatabase.immutableUnproxy(Leaderboard.db)
 system.runInterval(
   () => {
     for (const [id, leaderboard] of Object.entries(immutable)) {

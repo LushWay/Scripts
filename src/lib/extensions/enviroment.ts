@@ -119,7 +119,6 @@ String.prototype.at ??= function at<T>(this: T[], n: number) {
   return String.prototype.charAt.call(this, n)
 }
 
-/** @param {unknown[]} args */
 function format(args: unknown[]) {
   if (!globalThis?.Core?.afterEvents?.worldLoad?.loaded) prefixFormat(args)
   return args
@@ -135,7 +134,6 @@ function format(args: unknown[]) {
     .join(' ')
 }
 
-/** @param {unknown[]} args */
 function prefixFormat(args: unknown[]) {
   if (typeof args[0] === 'string' && args[0].startsWith('§9')) return
 
@@ -167,6 +165,7 @@ expand(console, {
     if (verbose) super.log(format(args))
   },
 })
+
 // @ts-expect-error Yes
 globalThis.nextTick = null
 globalThis.verbose = false

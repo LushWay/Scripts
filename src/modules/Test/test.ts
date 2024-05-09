@@ -19,15 +19,15 @@ import {
   restorePlayerCamera,
   util,
 } from 'lib'
-import { Compass } from 'lib/Menu'
-import { Rewards } from 'lib/Rewards'
 import { request } from 'lib/bds/api'
 import { CommandContext } from 'lib/command/context'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
-import { BASE_ITEM_STACK } from 'modules/Features/base'
+import { Compass } from 'lib/menu'
+import { Rewards } from 'lib/rewards'
 import { Mineshaft } from 'modules/Places/Mineshaft'
+import { BASE_ITEM_STACK } from 'modules/features/base'
 import './enchant'
 import './simulatedPlayer'
 

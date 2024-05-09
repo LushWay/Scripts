@@ -1,16 +1,42 @@
-const DATA_TYPE = Symbol('data_t')
-const CALLBACK_TYPE = Symbol('callback_t')
-const RETURN_TYPE = Symbol('return_t')
+const ARGUMENT_T = Symbol('data_t')
+const CALLBACK_T = Symbol('callback_t')
+const RETURN_T = Symbol('return_t')
 
 /**
  * The EventSignall class is a utility class that allows subscribing and unsubscribing to events, and emitting events to
  * all subscribers.
  *
- * @template Data The type of the data that the events will be emitted with.
+ * @template Argument The type of the data that the events will be emitted with.
  * @template Return Return type of the subscriber. Default is `void`
  * @template Callback The type of the callback function that will be used for the events.
  */
-export class EventSignal<Data, Return = void, Callback = (arg: Data) => Return> {
+export class EventSignal<Argument, Return = void, Callback = (arg: Argument) => Return> {
+  /**
+   * Takes an event signal and returns only the "subscribe" and "unsubscribe" methods bound to the signal.
+   *
+   * Usefull for hiding ability to emit events from outsource
+   *
+   * ```js
+   * // lib.ts
+   * const someEvent = new EventSignal()
+   *
+   * const afterEvents = {
+   *   someEvent: EventSignal.bound(someEvent)
+   * }
+   *
+   * EventSignal.emit(someEvent) // insource emitting works!
+   *
+   * // reciever.ts
+   * afterEvents.someEvent.subscribe(() => {}) // Only subscribe/unsubscribe methods are exported!
+   *
+   * EventSignal.emit(afterEvents.someEvent) // TypeError, no way to emit events from outsource
+   *
+   * ```
+   *
+   * @param {Signal} signal - The `signal` parameter is expected to be an object that implements the `EventSignal`
+   *   interface with three type parameters.
+   * @returns Object with two properties: `subscribe` and `unsubscribe`.
+   */
   static bound<Signal extends EventSignal<unknown, unknown, unknown>>(
     signal: Signal,
   ): Pick<Signal, 'subscribe' | 'unsubscribe'> {
@@ -20,16 +46,23 @@ export class EventSignal<Data, Return = void, Callback = (arg: Data) => Return> 
     }
   }
 
+  /**
+   * Sorts subscribers of a given signal based on their priority levels.
+   *
+   * @param signal - The `signal` parameter is a event signal that we should take callbacks from
+   * @returns Array of tuples where each tuple contains the callback function and the number associated with it. The
+   *   array is sorted based on the numbers in descending order.
+   */
   static sortSubscribers<Signal extends EventSignal<unknown, unknown, unknown>>(
     signal: Signal,
-  ): [Signal[typeof CALLBACK_TYPE], number][] {
+  ): [Signal[typeof CALLBACK_T], number][] {
     return [...signal.events.entries()].sort((a, b) => b[1] - a[1])
   }
 
   static emit<Signal extends EventSignal<unknown>>(
     signal: Signal,
-    data: Signal[typeof DATA_TYPE],
-  ): Signal[typeof RETURN_TYPE][] {
+    data: Signal[typeof ARGUMENT_T],
+  ): Signal[typeof RETURN_T][] {
     const results = []
     for (const [fn] of this.sortSubscribers(signal)) results.push(fn(data))
     return results
@@ -41,11 +74,11 @@ export class EventSignal<Data, Return = void, Callback = (arg: Data) => Return> 
    */
   private events: Map<Callback, number> = new Map();
 
-  [DATA_TYPE]: Data;
+  [ARGUMENT_T]: Argument;
 
-  [CALLBACK_TYPE]: Callback;
+  [CALLBACK_T]: Callback;
 
-  [RETURN_TYPE]: Return
+  [RETURN_T]: Return
 
   /**
    * Subscribes a callback function to the events with the specified position.
@@ -100,8 +133,8 @@ export class EventLoaderWithArg<Data, Return = void, Callback = (arg: Data) => R
 > {
   static load<Signal extends EventLoaderWithArg<unknown>>(
     signal: Signal,
-    data: Signal[typeof DATA_TYPE],
-  ): Signal[typeof RETURN_TYPE][] {
+    data: Signal[typeof ARGUMENT_T],
+  ): Signal[typeof RETURN_T][] {
     signal.loaded = true
     return super.emit(signal, data)
   }

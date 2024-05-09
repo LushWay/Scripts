@@ -1,4 +1,4 @@
-import { Join } from 'lib/PlayerJoin'
+import { Join } from 'lib/player-join'
 import { INTERACTABLE_ENTITIES, actionGuard, loadRegionsWithGuards } from 'lib/region/index'
 import { Spawn } from 'modules/Places/Spawn'
 import { isBuilding } from 'modules/WorldEdit/isBuilding'
