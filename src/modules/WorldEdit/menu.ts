@@ -598,16 +598,7 @@ export function WEeditBlockStatesMenu(
 
     if (edited) form.addButton(ActionForm.backText + ' без сохранения', back)
 
-    form.addButton('§cУдалить все свойства блока', () =>
-      prompt(
-        player,
-        'Точно удалить все свойства блока?',
-        'Да',
-        () => resolve({}),
-        'Отмена',
-        () => form.show(player),
-      ),
-    )
+    form.addButtonPrompt('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
 
     // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {

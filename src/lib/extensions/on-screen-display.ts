@@ -1,4 +1,4 @@
-import { Player, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
+import { Player, RawMessage, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
 import { util } from 'lib/util'
 
@@ -41,6 +41,8 @@ declare module '@minecraft/server' {
 const $sidebar = '§t§i§psidebar'
 const $title = 'title'
 const $tipPrefix = '§t§i§p'
+
+type McText = (RawMessage | string)[] | RawMessage | string
 
 type CommonTitleTypes = {
   actions: ((p: Player) => void)[]

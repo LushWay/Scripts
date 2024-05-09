@@ -1,11 +1,10 @@
 import { Player, Vector, world } from '@minecraft/server'
-import { CubeRegion } from 'lib/region/Class/CubeRegion'
-import { Region } from 'lib/region/Class/Region'
-import { REGION_DB } from 'lib/region/DB'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
+import { Region } from 'lib/region/Class/Region'
+import { REGION_DB } from 'lib/region/DB'
 import { util } from 'lib/util'
 import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './Class/RadiusRegion'
 
@@ -15,8 +14,6 @@ new Command('region')
   .executes(ctx => {
     regionForm(ctx.player)
   })
-
-export type AnyRegion = CubeRegion | RadiusRegion
 
 function regionForm(player: Player) {
   const reg = (region: Parameters<typeof regionList>[1]) => () => regionList(player, region)
@@ -101,11 +98,6 @@ function editRegion(player: Player, region: RadiusRegion, back: () => void): Pro
     .show(player)
 }
 
-/**
- * @param {FormCallback<ModalForm>} ctx
- * @param {string} location
- * @param {Player} player
- */
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
   const [x, y, z] = parseArguments(location)
   if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + util.inspect(location))
@@ -115,14 +107,6 @@ function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, p
 
   return parsed
 }
-/**
- * @param {Player} player
- * @param {RadiusRegion} region
- * @param {object} param2
- * @param {WordPluralForms} param2.pluralForms
- * @param {boolean} [param2.extendedEditPermissions]
- * @param {() => void} param2.back
- */
 
 export function editRegionPermissions(
   player: Player,
@@ -133,18 +117,6 @@ export function editRegionPermissions(
     extendedEditPermissions = false,
   }: { pluralForms: WordPluralForms; extendedEditPermissions?: boolean; back: () => void },
 ) {
-  /**
-   * @type {ModalForm<
-   *   (
-   *     ctx: FormCallback<any>,
-   *     toggles: boolean,
-   *     containers: boolean,
-   *     pvp?: boolean,
-   *     radius?: number,
-   *     center?: string,
-   *   ) => void
-   * >}
-   */
   let form: ModalForm<
     (
       ctx: FormCallback<any>,
@@ -183,15 +155,6 @@ export function editRegionPermissions(
     back()
   })
 }
-/**
- * @param {Player} player
- * @param {RadiusRegion} region
- * @param {object} o
- * @param {() => void} o.back
- * @param {WordPluralForms} o.pluralForms
- * @param {boolean} [o.isOwner]
- * @param {ReturnType<Region['getMemberRole']>} [o.member]
- */
 
 export function manageRegionMembers(
   player: Player,

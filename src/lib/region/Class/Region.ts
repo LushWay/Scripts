@@ -1,6 +1,5 @@
 import { Player } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { DatabaseUtils } from 'lib/database/utils'
 import { EventSignal } from 'lib/event-signal'
 import { REGION_DB } from 'lib/region/DB'
 import { DEFAULT_REGION_PERMISSIONS } from 'lib/region/config'
@@ -144,7 +143,7 @@ export class Region {
   /** Updates this region in the database */
   update(region = Region) {
     return {
-      permissions: DatabaseUtils.removeDefaults(this.permissions, this.defaultPermissions),
+      permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,
     }
   }

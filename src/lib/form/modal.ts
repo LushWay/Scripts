@@ -3,6 +3,15 @@ import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
 import { util } from 'lib/util'
 import { FormCallback, showForm } from './utils'
 
+interface IModalFormArg {
+  /** What this form arg is */
+  type: 'dropdown' | 'slider' | 'textField' | 'toggle'
+  /** If this option is a dropdown this is the Values that this dropdown can have */
+  options?: (string | null)[]
+}
+
+type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R ? (...args: [...E, Next]) => R : never
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> {
   static arrayDefaultNone = 'Никакой'

@@ -1,5 +1,10 @@
 import * as mc from '@minecraft/server'
 
+type JsonPrimative = string | number | boolean | null
+type JsonArray = Json[]
+type JsonComposite = JsonArray | JsonObject
+type Json = JsonPrimative | JsonComposite
+
 declare global {
   // Global variables injected via esbuild
 
@@ -15,6 +20,7 @@ declare global {
   const __RELEASE__: boolean
 
   type VoidFunction = () => void
+
   type Vector3 = mc.Vector3
   type Vector2 = mc.Vector2
   type VectorXZ = { x: number; z: number }
@@ -22,7 +28,9 @@ declare global {
 
   type Dimensions = mc.ShortcutDimensions
 
+  /** Represents JSON-compatible object type */
   type JSONLike = Record<string | symbol | number, any>
+  type JsonObject = { [key: string]: Json }
 
   type PartialParts<B, ThisArg = B> = {
     [P in keyof B]?: B[P] extends (...param: infer param) => infer ret ? (this: ThisArg, ...param: param) => ret : B[P]
@@ -40,7 +48,8 @@ declare global {
    */
   type WordPluralForms = [one: string, more: string, aa: string]
 
-  type McText = (mc.RawMessage | string)[] | mc.RawMessage | string
+  /** Text that can be displayed on player screen and should support translation */
+  type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
 
   // Custom immutable type
   // source: https://github.com/Microsoft/TypeScript/issues/13923#issuecomment-653675557

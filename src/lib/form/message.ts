@@ -1,59 +1,41 @@
 import { Player } from '@minecraft/server'
-
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
 import { util } from '../util'
 import { showForm } from './utils'
 
+interface IMessageFormButton {
+  /** Text that gets displayed on the button */
+  text: string
+  /** What gets called when this gets clicked */
+  callback?: VoidFunction
+}
+
 export class MessageForm {
   triedToShow
 
-  /**
-   * The title that this form should have
-   *
-   * @type {string}
-   */
+  /** The title that this form should have */
   title: string
 
-  /**
-   * Extra text that should be displayed in the form
-   *
-   * @type {string}
-   */
+  /** Extra text that should be displayed in the form */
   body: string
 
-  /**
-   * The default minecraft form this form is based on
-   *
-   * @private
-   * @type {MessageFormData}
-   */
-  form: MessageFormData
+  /** The default minecraft form this form is based on */
+  private form: MessageFormData
 
-  /**
-   * The first button of the dialog.
-   *
-   * @private
-   * @type {IMessageFormButton}
-   */
+  /** The first button of the dialog. */
 
-  button1: IMessageFormButton
+  private button1: IMessageFormButton
 
-  /**
-   * The seccond button of the dialog.
-   *
-   * @private
-   * @type {IMessageFormButton}
-   */
+  /** The seccond button of the dialog. */
 
-  button2: IMessageFormButton
+  private button2: IMessageFormButton
 
   /**
    * Creates a new form to be shown to a player
    *
-   * @param {string} title The title that this form should have
-   * @param {string} body Extra text that should be displayed in the form
+   * @param title The title that this form should have
+   * @param body Extra text that should be displayed in the form
    */
-
   constructor(title: string, body: string) {
     this.title = title
     this.body = body
@@ -73,12 +55,10 @@ export class MessageForm {
    *   setButton1("settings", () => {})
    *   ```
    *
-   * @param {string} text Text to show on this button
-   * @param {ButtonCallback} callback What happens when this button is clicked
-   * @returns {MessageForm}
+   * @param text Text to show on this button
+   * @param callback What happens when this button is clicked
    */
-
-  setButton1(text: string, callback: ButtonCallback): MessageForm {
+  setButton1(text: string, callback: VoidFunction): MessageForm {
     this.button1 = { text: text, callback: callback }
     this.form.button2(text)
     return this
@@ -92,12 +72,10 @@ export class MessageForm {
    *   setButton2("settings", () => {})
    *   ```
    *
-   * @param {string} text Text to show on this button
-   * @param {ButtonCallback} callback What happens when this button is clicked
-   * @returns {MessageForm}
+   * @param text Text to show on this button
+   * @param callback What happens when this button is clicked
    */
-
-  setButton2(text: string, callback: ButtonCallback): MessageForm {
+  setButton2(text: string, callback: VoidFunction): MessageForm {
     this.button2 = { text: text, callback: callback }
     this.form.button1(text)
     return this
@@ -106,10 +84,8 @@ export class MessageForm {
   /**
    * Shows this form to the player
    *
-   * @param {Player} player Player to show to
-   * @returns {Promise<void>}
+   * @param player Player to show to
    */
-
   async show(player: Player): Promise<void> {
     const response = await showForm(this.form, player)
     if (response === false || !(response instanceof MessageFormResponse)) return
@@ -119,14 +95,14 @@ export class MessageForm {
   }
 }
 
-/** Asks player */
+/** Shows MessageForm to the player */
 export function prompt(
   player: Player,
   text: string,
   yesText: string,
   yesAction: VoidFunction,
-  noText: string,
-  noAction: VoidFunction,
+  noText: string = 'Отмена',
+  noAction: VoidFunction = () => {},
 ) {
   return new Promise(resolve => {
     new MessageForm('Вы уверены?', text)

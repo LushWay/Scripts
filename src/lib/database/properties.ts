@@ -75,7 +75,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
             // Add default value
             key,
             typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-              ? DatabaseUtils.setDefaults(value, defaultv)
+              ? ProxyDatabase.setDefaults(value, defaultv)
               : value ?? defaultv,
           ]
         }),

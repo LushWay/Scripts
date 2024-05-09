@@ -1,9 +1,17 @@
 import { Player } from '@minecraft/server'
-
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { prompt } from 'lib/form/message'
 import { util } from 'lib/util'
 import { BUTTON, showForm } from './utils'
+
+interface IActionFormButton {
+  /** Text that gets displayed on the button */
+  text: string
+  /** The icon that is showed with this button */
+  iconPath?: string | null
+  /** What gets called when this gets clicked */
+  callback?: PlayerCallback
+}
 
 export class ActionForm {
   /** Text used by back button */
@@ -34,7 +42,7 @@ export class ActionForm {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string, callback: PlayerButtonCallback): ActionForm
+  addButton(text: string, callback: PlayerCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -43,7 +51,7 @@ export class ActionForm {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string, iconPath: string | null, callback: PlayerButtonCallback): ActionForm
+  addButton(text: string, iconPath: string | null, callback: PlayerCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -52,11 +60,7 @@ export class ActionForm {
    * @param iconPathOrCallback - The path this button icon
    * @param callback - What happens when this button is clicked
    */
-  addButton(
-    text: string,
-    iconPathOrCallback: string | null | PlayerButtonCallback,
-    callback?: PlayerButtonCallback,
-  ): ActionForm {
+  addButton(text: string, iconPathOrCallback: string | null | PlayerCallback, callback?: PlayerCallback): ActionForm {
     let iconPath
     if (typeof iconPathOrCallback === 'function') {
       callback = iconPathOrCallback
@@ -96,7 +100,7 @@ export class ActionForm {
   addButtonPrompt(
     text: string,
     yesText: string,
-    yesAction: ButtonCallback,
+    yesAction: VoidFunction,
     noText: string = 'Отмена',
     texture: string | null = null,
   ) {

@@ -121,8 +121,8 @@ export class LockAction {
   /**
    * Creates new locker that can lock other actions
    *
-   * @param {LockActionChecker} isLocked - Fn that checks if player is locked
-   * @param {string} lockText - Text that returns when player is locked
+   * @param isLocked - Fn that checks if player is locked
+   * @param lockText - Text that returns when player is locked
    */
   constructor(isLocked: LockActionChecker, lockText: string) {
     this.isLocked = isLocked

@@ -354,8 +354,6 @@ export class WorldEdit {
           `§6Внимание! §cВы уверены что хотите использовать выделенную область размером §f${this.selection.size}§c?`,
           'Да',
           () => {},
-          'Отмена',
-          () => {},
         )
 
         if (!result) return player.fail('§cОтменяем...')
