@@ -510,7 +510,6 @@ class PlayerQuest {
     })
   }
 
-  /** @param {string} reason */
   failed(reason: string) {
     this.dynamic({
       activate: () => {
@@ -522,15 +521,12 @@ class PlayerQuest {
     })
   }
 
-  /** @private */
-  _end = () => {}
+  private _end = () => {}
 
-  /** @param {(this: PlayerQuest) => void} action */
   end(action: (this: PlayerQuest) => void) {
     this._end = action
   }
 
-  /** @param {CompassOptions} options */
   targetCompassTo(options: CompassOptions) {
     options.temporary = new Temporary(({ system }) => {
       system.runInterval(

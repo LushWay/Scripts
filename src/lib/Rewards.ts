@@ -53,11 +53,10 @@ export class Rewards {
   /**
    * Gives a reward to the player
    *
-   * @private
-   * @param {Player} player The player to give out the rewards to
-   * @param {Reward} reward
+   * @param player - The player to give out the rewards to
+   * @param reward - The Reward to give
    */
-  static giveOne(player: any, reward: any) {
+  private static giveOne(player: any, reward: any) {
     if (reward.type == 'item' && reward.id) {
       if (!player.container) return
       player.container.addItem(new ItemStack(reward.id, reward.count))

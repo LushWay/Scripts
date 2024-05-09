@@ -214,13 +214,7 @@ export class LootTable {
     })
   }
 
-  /**
-   * @private
-   * @param {LootItem.Stored} item
-   * @returns {LootItems}
-   */
-
-  generateItems(item: LootItem.Stored): LootItems {
+  private generateItems(item: LootItem.Stored): LootItems {
     try {
       // Randomise item properties
       const amount = item.amount.randomElement()

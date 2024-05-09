@@ -54,12 +54,7 @@ export class WorldEdit {
     this.onPosChange(2)
   }
 
-  /**
-   * @private
-   * @param {1 | 2} pos
-   */
-
-  onPosChange(pos: 1 | 2) {
+  private onPosChange(pos: 1 | 2) {
     system.delay(() => {
       const action = { 1: 'break', 2: 'use' }[pos]
 
@@ -71,41 +66,29 @@ export class WorldEdit {
     })
   }
 
-  /** @private */
-  updateSelectionCuboids() {
+  private updateSelectionCuboids() {
     if (!Vector.valid(this.pos1) || !Vector.valid(this.pos2)) return
 
     this.selection = new Cuboid(this.pos1, this.pos2)
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
   }
 
-  /** @type {Structure[]} */
   history: Structure[] = []
 
-  /** @type {Structure[]} */
   undos: Structure[] = []
-
-  /** @type {Structure | undefined} */
 
   currentCopy: Structure | undefined
 
-  /** @type {Player} */
-  player: Player
+  private hasWarnAboutHistoryLimit = false
 
-  /** @private */
-  historyLimit = 100
+  private historyLimit = 100
 
-  hasWarnAboutHistoryLimit = false
-
-  /** @param {Player} player */
-
-  constructor(player: Player) {
+  constructor(private player: Player) {
     const id = player.id
 
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
 
     WorldEdit.instances[id] = this
-    this.player = player
 
     let db = WorldEdit.db[this.player.id]
     if (!db) {
@@ -175,12 +158,8 @@ export class WorldEdit {
     await structrure.savePromise
   }
 
-  /**
-   * Loads specified amount of backups from history array
-   *
-   * @private
-   */
-  loadFromArray(amount = 1, history = this.history) {
+  /** Loads specified amount of backups from history array */
+  private loadFromArray(amount = 1, history = this.history) {
     try {
       // Max allowed amount is array length
       if (amount > history.length) amount = history.length

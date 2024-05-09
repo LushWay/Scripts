@@ -161,13 +161,7 @@ export class ArrayForm<
     } else return this.array
   }
 
-  /**
-   * @private
-   * @param {T[]} array
-   * @param {ActionForm} form
-   * @param {ParsedFilters} filters
-   */
-  addButtons(array: T[], form: ActionForm, filters: ParsedFilters) {
+  private addButtons(array: T[], form: ActionForm, filters: ParsedFilters) {
     for (const item of array) {
       const button = this.options.button(item, filters, form)
 

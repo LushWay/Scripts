@@ -11,15 +11,7 @@ export class Structure extends Cuboid {
 
   savePromise
 
-  /**
-   * @private
-   * @type {{
-   *   name: string
-   *   min: Vector3
-   *   max: Vector3
-   * }[]}
-   */
-  structures: {
+  private structures: {
     name: string
     min: Vector3
     max: Vector3

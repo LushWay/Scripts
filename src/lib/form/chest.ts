@@ -51,19 +51,10 @@ export class ChestForm {
     }
   }
 
-  /**
-   * @private
-   * @type {string}
-   */
-  titleText: string
+  private titleText: string
 
-  /**
-   * @private
-   * @type {ChestButton[]}
-   */
-  buttons: ChestButton[] = []
+  private buttons: ChestButton[] = []
 
-  /** @param {keyof typeof SIZES} sizeType */
   constructor(sizeType: keyof typeof SIZES = 'small') {
     const [sizeName, size] = SIZES[sizeType]
 
@@ -72,18 +63,12 @@ export class ChestForm {
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
 
-  /** @param {string} text */
-
   title(text: string) {
     this.titleText += text
     return this
   }
 
-  /**
-   * Adds a button to this chest ui with an icon from a resource pack.
-   *
-   * @param {ChestButtonOptions} o
-   */
+  /** Adds a button to this chest ui with an icon from a resource pack. */
   button({
     slot,
     icon,

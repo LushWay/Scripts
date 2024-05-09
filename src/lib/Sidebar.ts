@@ -27,19 +27,6 @@ export class Sidebar<E = unknown> {
 
   name
 
-  /**
-   * @param {object} o
-   * @param {string} o.name
-   * @param {(
-   *   p: Player,
-   *   e: E,
-   * ) => {
-   *   format: Format
-   *   maxWordCount: number
-   * }} o.getOptions
-   * @param {(p: Player) => E} o.getExtra
-   * @param {SidebarRawVariables<E>} content
-   */
   constructor(
     {
       name,
@@ -65,13 +52,7 @@ export class Sidebar<E = unknown> {
     Sidebar.instances.push(this)
   }
 
-  /**
-   * @private
-   * @param {SidebarRawVariables<E>} content
-   * @returns {SidebarVariables<E>}
-   */
-  init(content: SidebarRawVariables<E>): SidebarVariables<E> {
-    /** @type {SidebarVariables<E>} */
+  private init(content: SidebarRawVariables<E>): SidebarVariables<E> {
     const base: SidebarVariables<E> = {}
 
     for (const [key, e] of Object.entries(content)) {

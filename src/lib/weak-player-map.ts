@@ -7,8 +7,8 @@ export class WeakPlayerMap<T> extends Map<string, T> {
   /**
    * Creates new WeakPlayerMap
    *
-   * @param {object} options - Options
-   * @param {boolean} options.removeOnLeave - Whenether to remove player from map when it leavs
+   * @param options - Options
+   * @param options.removeOnLeave - Whenether to remove player from map when it leavs
    */
   constructor(private options: { removeOnLeave: boolean }) {
     super()
