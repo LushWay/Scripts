@@ -1,32 +1,27 @@
 import { RegionDatabase } from './database'
+import { BaseRegion } from './kinds/BaseRegion'
 import { CubeRegion } from './kinds/CubeRegion'
-import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './kinds/RadiusRegion'
-import { Region } from './kinds/Region'
+import { MineshaftRegion } from './kinds/MineshaftRegion'
+import { RadiusRegion } from './kinds/RadiusRegion'
+import { SafeAreaRegion } from './kinds/SafeAreaRegion'
 
-const RadiusRegionSubTypes = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion]
-Object.values(RegionDatabase).forEach(region => {
+const RadiusRegionKinds = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion]
+Object.entries(RegionDatabase).forEach(restoreRegionFromJSON)
+
+export function restoreRegionFromJSON([key, region]: [string, (typeof RegionDatabase)[string]]) {
+  let created
   if (!region) return
-  if (region.t === 'c')
-    Region.regions.push(
-      new CubeRegion({
-        ...region,
-        creating: false,
-      }),
-    )
+  if (region.t === 'c') created = CubeRegion.create(region, key, false)
   else {
-    const RadiusRegionSubtype =
-      RadiusRegionSubTypes.find(e => {
-        const subtype = e.subtype
+    const RadiusRegionKind =
+      RadiusRegionKinds.find(e => {
+        const subtype = e.kind
 
         return subtype === region.st
       }) ?? RadiusRegion
 
-    Region.regions.push(
-      new RadiusRegionSubtype({
-        ...region,
-        creating: false,
-        subclassing: RadiusRegionSubtype !== RadiusRegion,
-      }),
-    )
+    created = RadiusRegionKind.create(region, key, false)
   }
-})
+
+  return created
+}

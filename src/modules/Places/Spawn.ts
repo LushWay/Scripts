@@ -1,18 +1,19 @@
 import { Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { EditableLocation, InventoryStore, Portal, RegionCallback, SafeAreaRegion, Settings, util } from 'lib'
+import { EditableLocation, InventoryStore, Portal, RegionCallback, Settings, util } from 'lib'
 
 import { Menu } from 'lib/menu'
 import { Join } from 'lib/player-join'
+import { SafeAreaRegion } from 'lib/region/kinds/SafeAreaRegion'
 import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 import { showSurvivalHud } from 'modules/features/sidebar'
 import { DefaultPlaceWithInventory } from './Default/WithInventory'
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
-  portal
+  portal: Portal | undefined
 
-  region
+  region: SafeAreaRegion | undefined
 
   inventoryName: InventoryTypeName = 'spawn'
 
@@ -89,7 +90,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         })
       })
 
-      this.region = new SafeAreaRegion({
+      this.region = SafeAreaRegion.create({
         center: spawnLocation,
         radius: 30,
         dimensionId: 'overworld',

@@ -42,15 +42,12 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     if (r instanceof RadiusRegion) {
       return Vector.distance(r.center, block.location) < r.radius + 50
     } else if (r instanceof CubeRegion) {
-      const from = { x: r.from.x, y: 0, z: r.from.z }
-
-      const to = { x: r.to.x, y: 0, z: r.to.z }
+      const { from, to } = r.edges
 
       const min = Vector.min(from, to)
       const max = Vector.max(from, to)
 
       const size = 30
-      block.location.y
 
       return Vector.between(
         Vector.add(min, { x: -size, y: 0, z: -size }),

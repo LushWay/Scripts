@@ -26,13 +26,15 @@ export class DefaultPlaceWithSafeArea {
     this.portalPos1 = new EditableLocation(name + ' портал до', { type: 'vector3' }).safe
     this.safeAreaLocation = new EditableLocation(name + ' мирная зона', { type: 'vector3+radius' }).safe
     this.safeAreaLocation.onLoad.subscribe(location => {
-      this.safeArea = new SafeAreaRegion({
-        name,
-        key: name + ' мирная зона',
-        dimensionId: 'overworld',
-        center: location,
-        radius: location.radius,
-      })
+      this.safeArea = SafeAreaRegion.create(
+        {
+          safeAreaName: name,
+          dimensionId: 'overworld',
+          center: location,
+          radius: location.radius,
+        },
+        name + ' мирная зона',
+      )
     })
 
     DefaultPlaceWithSafeArea.places.push(this)

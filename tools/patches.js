@@ -1,5 +1,4 @@
-import fs from 'fs'
-import { notice, patchPackage, relative, resolve } from './patch-package.js'
+import { notice, patchPackage } from './patch-package.js'
 
 // TODO Remove all patch scripts
 patchPackage('@minecraft/server', {
@@ -22,5 +21,3 @@ patchPackage('@minecraft/server', {
   },
 })
 
-// migrate to custom bundler (bapi) when its done to exclude need in this
-fs.copyFileSync(resolve('@minecraft/vanilla-data'), relative('../scripts/@minecraft/vanilla-data.js'))

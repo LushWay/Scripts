@@ -107,7 +107,7 @@ export class DatabaseUtils {
 
   static backupName = 'database'
 
-  static backupLocation = Vector.string(this.entityLocation)
+  static backupLocation = __TEST__ ? '' : Vector.string(this.entityLocation)
 
   static backupCommand = `structure save ${this.backupName} ${this.backupLocation} ${this.backupLocation} true disk false`
 
@@ -132,6 +132,8 @@ export class DatabaseUtils {
 
 export class DatabaseError extends Error {}
 
-world.afterEvents.worldInitialize.subscribe(() => {
-  world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
-})
+if (!__TEST__) {
+  world.afterEvents.worldInitialize.subscribe(() => {
+    world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
+  })
+}

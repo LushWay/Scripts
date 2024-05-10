@@ -41,8 +41,8 @@
     ]
   },
   "include": ["src/"],
-  "exclude": ["node_modules", "scr/chestui", "src/test/*"]
+  "exclude": ["node_modules", "scr/chestui", "src/test/*"],
 
   // Pollutes global
-  //"references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
+  "references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
 }

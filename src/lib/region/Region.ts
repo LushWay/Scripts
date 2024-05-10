@@ -1,10 +1,8 @@
 import { Player } from '@minecraft/server'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { EventSignal } from 'lib/event-signal'
-import { DEFAULT_REGION_PERMISSIONS } from 'lib/region/config'
-import { RegionDatabase } from 'lib/region/database'
 import { util } from 'lib/util'
-import { WeakPlayerMap } from 'lib/weak-player-map'
+import { RegionDatabase } from './database'
 
 export type RegionPlayerRole = 'owner' | 'member' | false
 
@@ -21,8 +19,28 @@ export interface RegionPermissions {
   owners: string[]
 }
 
+export interface RegionCreationOptions {
+  dimensionId: Dimensions
+  permissions?: Partial<RegionPermissions>
+}
+
 /** Main class that represents protected region in the world. */
 export class Region {
+  /** Creates a new region */
+  static create<T extends typeof Region>(
+    this: T,
+    options: ConstructorParameters<T>[0],
+    key = new Date(Date.now()).toISOString(),
+    save = true,
+  ): InstanceType<T> {
+    const region = new this(options, key)
+
+    region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
+    if (save) region.save()
+
+    return region as unknown as InstanceType<T>
+  }
+
   /** Regions list */
   static regions: Region[] = []
 
@@ -37,105 +55,71 @@ export class Region {
   }
 
   /**
-   * Player map that contains region list that player is currently in. Updated each second by region interval. Used to
-   * emit events such as {@link Region.onPlayerRegionsChange}
-   */
-  static playerInRegionsCache: WeakPlayerMap<Region[]> = new WeakPlayerMap({ removeOnLeave: true })
-
-  /**
-   * Event that triggers when player regions have changed. Updated each second by region interval. Uses
-   * {@link Region.playerInRegionsCache} under the hood
-   */
-  static onPlayerRegionsChange: EventSignal<{ player: Player; previous: Region[]; newest: Region[] }> =
-    new EventSignal()
-
-  /**
-   * Listens for player region changes and triggers a callback when a player enters a specific region.
-   *
-   * @param region - Represents a specific Region.
-   * @param callback - Fnction that will be called when a player enters the specified region.
-   */
-  static onEnter(region: Region, callback: PlayerCallback) {
-    this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
-      if (!previous.includes(region) && newest.includes(region)) callback(player)
-    })
-  }
-
-  /**
    * Returns the nearest region based on a block location and dimension ID.
    *
-   * @param {Vector3} blockLocation - Representing the location of a block in the world
+   * @param {Vector3} location - Representing the location of a block in the world
    * @param {Dimensions} dimensionId - Specific dimension in the world. It is used to specify the dimension in which the
    *   block location is located.
    */
-  static nearestRegion(blockLocation: Vector3, dimensionId: Dimensions): Region | undefined {
-    return this.nearestRegions(blockLocation, dimensionId)[0]
+  static nearestRegion(location: Vector3, dimensionId: Dimensions): Region | undefined {
+    return this.nearestRegions(location, dimensionId)[0]
   }
 
   /**
    * Returns the nearest regions based on a block location and dimension ID.
    *
-   * @param {Vector3} blockLocation - Representing the location of a block in the world
+   * @param {Vector3} location - Representing the location of a block in the world
    * @param {Dimensions} dimensionId - Specific dimension in the world. It is used to specify the dimension in which the
    *   block location is located.
    */
-  static nearestRegions(blockLocation: Vector3, dimensionId: Dimensions) {
+  static nearestRegions(location: Vector3, dimensionId: Dimensions) {
     const regions = this === Region ? this.regions : this.regionInstancesOf(this)
 
-    const c1 = regions.filter(region => region.dimensionId === dimensionId && region.isVectorInRegion(blockLocation))
-    const c2 = c1.sort((a, b) => b.priority - a.priority)
-
-    return c2
+    return regions
+      .filter(region => region.isVectorInRegion(location, dimensionId))
+      .sort((a, b) => b.priority - a.priority)
   }
 
   /** Region priority. Used in {@link Region.nearestRegion} */
-  priority = 0
+  protected readonly priority: number = 0
 
   /** Region dimension */
   dimensionId: Dimensions
-
-  /** Unique region key */
-  key: string
 
   /** Region permissions */
   permissions: RegionPermissions
 
   /** Permissions used by default */
-  defaultPermissions = DEFAULT_REGION_PERMISSIONS
+  protected readonly defaultPermissions: RegionPermissions = {
+    doorsAndSwitches: true,
+    openContainers: true,
+    pvp: false,
+    allowedEntities: [MinecraftEntityTypes.Player, 'minecraft:item'],
+    owners: [],
+  }
 
   /**
    * Creates the region
    *
-   * @param {object} o - Region creation options
-   * @param {Dimensions} o.dimensionId - The dimension ID of the region.
-   * @param {Partial<RegionPermissions>} [o.permissions] - An object containing the permissions for the region.
-   * @param {string} [o.key] - The key of the region. This is used to identify the region.
+   * @param o - Region creation options
+   * @param o.dimensionId - The dimension ID of the region.
+   * @param o.permissions - An object containing the permissions for the region.
+   * @param o.key - The key of the region. This is used to identify the region.
    */
-  constructor({
-    dimensionId,
-    key,
-  }: {
-    dimensionId: Dimensions
-    permissions?: Partial<RegionPermissions>
-    key?: string
-  }) {
-    this.dimensionId = dimensionId
-    this.key = key ?? new Date(Date.now()).toISOString()
-  }
-
-  /** Sets the region permissions based on the permissions and the default permissions */
-  init(
-    { permissions, creating = true }: { permissions?: Partial<RegionPermissions> | undefined; creating?: boolean },
-    region: typeof Region,
+  constructor(
+    { dimensionId }: RegionCreationOptions,
+    protected key: string,
   ) {
-    this.permissions = ProxyDatabase.setDefaults(permissions ?? {}, this.defaultPermissions)
-    if (creating) this.update(region)
+    this.dimensionId = dimensionId
+    Region.regions.push(this)
   }
 
   /** Checks if the vector is in the region */
-  isVectorInRegion(vector: Vector3) {
+  isVectorInRegion(vector: Vector3, dimensionId: Dimensions) {
+    if (this.dimensionId !== dimensionId) return false
+
     // See the implementation in the sub class
-    return false
+    return true
   }
 
   /** Region owner name */
@@ -185,12 +169,22 @@ export class Region {
     )
   }
 
-  /** Updates this region in the database */
-  update(region = Region) {
+  /** Prepares region instance to be saved into the database */
+  protected toJSON() {
     return {
       permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,
     }
+  }
+
+  /** Whenether region should be saved into the database or if its runtime-only, e.g. BossRegion */
+  protected readonly saveable: boolean = true
+
+  /** Updates this region in the database */
+  save() {
+    if (!this.saveable) return false
+
+    this.toJSON()
   }
 
   /** Removes this region */

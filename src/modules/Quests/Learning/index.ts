@@ -216,7 +216,7 @@ actionGuard((player, region, ctx) => {
 })
 
 Learning.randomTeleportLocation.onLoad.subscribe(location => {
-  Learning.safeArea = new SafeAreaRegion({
+  Learning.safeArea = SafeAreaRegion.create({
     permissions: { allowedEntities: 'all' },
     center: location,
     radius: location.radius * 5,

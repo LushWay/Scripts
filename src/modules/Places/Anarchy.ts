@@ -117,7 +117,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     console.log('Saved inv', inv ? Object.entries(inv.slots).map(e => e[1] && e[0] + ' ' + e[1].typeId) : inv)
 
     // Do not save location if on spawn
-    if (Spawn.region?.isVectorInRegion(player.location)) return
+    if (Spawn.region?.isVectorInRegion(player.location, player.dimension.type)) return
     player.database.survival.anarchy = {
       x: Math.round(player.location.x),
       z: Math.round(player.location.z),

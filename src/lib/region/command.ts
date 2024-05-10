@@ -3,10 +3,12 @@ import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
-import { RegionDatabase } from 'lib/region/database'
-import { Region } from 'lib/region/kinds/Region'
+import { Region } from 'lib/region/Region'
 import { util } from 'lib/util'
-import { BaseRegion, MineshaftRegion, RadiusRegion, SafeAreaRegion } from './kinds/RadiusRegion'
+import { BaseRegion } from './kinds/BaseRegion'
+import { MineshaftRegion } from './kinds/MineshaftRegion'
+import { RadiusRegion } from './kinds/RadiusRegion'
+import { SafeAreaRegion } from './kinds/SafeAreaRegion'
 
 new Command('region')
   .setPermissions('techAdmin')
@@ -58,7 +60,7 @@ function regionList(player: Player, RegionType: typeof RadiusRegion, back = () =
 
         editRegion(
           player,
-          new RegionType({
+          RegionType.create({
             center,
             radius,
             dimensionId: player.dimension.type,
@@ -94,7 +96,7 @@ function editRegion(player: Player, region: RadiusRegion, back: () => void): Pro
         extendedEditPermissions: true,
       }),
     )
-    .addButtonPrompt('§cУдалить регион', '§cУдалить', () => delete RegionDatabase[region.key], '§aНе удалять')
+    .addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять')
     .show(player)
 }
 
@@ -151,7 +153,7 @@ export function editRegionPermissions(
       const center = parseLocationFromForm(ctx, rawCenter, player)
       if (center) region.center = center
     }
-    region.update()
+    region.save()
     back()
   })
 }
@@ -185,7 +187,7 @@ export function manageRegionMembers(
     })
 
   const applyAction = () => {
-    region.update()
+    region.save()
     selfback()
   }
 

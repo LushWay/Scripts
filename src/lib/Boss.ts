@@ -2,10 +2,11 @@
 
 import { Entity, system, world } from '@minecraft/server'
 import { LootTable } from 'lib/loot-table'
-import { BossArenaRegion, Region } from 'lib/region/index'
+import { Region } from 'lib/region/index'
 import { table } from './database/abstract'
 import { EditableLocation } from './editable-location'
 import { chunkIsUnloaded } from './game-utils'
+import { BossArenaRegion } from './region/kinds/BossArenaRegion'
 
 type BossDB = {
   id: string
@@ -100,7 +101,7 @@ export class Boss {
     system.delay(() => {
       this.location.onLoad.subscribe(center => {
         this.check()
-        this.region = new BossArenaRegion({
+        this.region = BossArenaRegion.create({
           center,
           radius: this.arenaRadius,
           dimensionId: this.dimensionId,

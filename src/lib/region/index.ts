@@ -9,25 +9,20 @@ import {
   world,
 } from '@minecraft/server'
 import { EventSignal } from '../event-signal'
+import { Region } from './Region'
 import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config'
+import { RegionEvents } from './events'
 import './init'
-import { Region } from './kinds/Region'
+export * from './Region'
 export * from './command'
 export * from './config'
 export * from './database'
+export * from './kinds/BaseRegion'
+export * from './kinds/BossArenaRegion'
 export * from './kinds/CubeRegion'
+export * from './kinds/MineshaftRegion'
 export * from './kinds/RadiusRegion'
-export * from './kinds/Region'
-
-export const ACTION_GUARD: EventSignal<
-  Parameters<InteractionAllowed>,
-  boolean | undefined,
-  InteractionAllowed
-> = new EventSignal()
-
-export function actionGuard(fn: InteractionAllowed, position?: number) {
-  ACTION_GUARD.subscribe(fn, position)
-}
+export * from './kinds/SafeAreaRegion'
 
 type InteractionAllowed = (
   player: Player,
@@ -39,15 +34,21 @@ type InteractionAllowed = (
     | { type: 'interactWithEntity'; event: PlayerInteractWithEntityBeforeEvent },
 ) => boolean | void
 
+type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
+export type RegionCallback = (player: Player, region: Region) => void
+
+const ACTION_GUARD = new EventSignal<Parameters<InteractionAllowed>, boolean | undefined, InteractionAllowed>()
+
+export function actionGuard(fn: InteractionAllowed, position?: number) {
+  ACTION_GUARD.subscribe(fn, position)
+}
+
 const allowed: InteractionAllowed = (player, region, context) => {
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context)
     if (typeof result !== 'undefined') return result
   }
 }
-
-type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
-export type RegionCallback = (player: Player, region: Region) => void
 
 let LOADED = false
 
@@ -115,14 +116,14 @@ export function loadRegionsWithGuards({
   system.runInterval(
     () => {
       for (const player of world.getAllPlayers()) {
-        const previous = Region.playerInRegionsCache.get(player) ?? []
+        const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
         const newest = Region.nearestRegions(player.location, player.dimension.type)
 
         if (newest.length !== previous.length || previous.some((region, i) => region !== newest[i])) {
-          EventSignal.emit(Region.onPlayerRegionsChange, { player, previous, newest })
+          EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })
         }
 
-        Region.playerInRegionsCache.set(player, newest)
+        RegionEvents.playerInRegionsCache.set(player, newest)
 
         regionCallback(player, newest[0])
       }

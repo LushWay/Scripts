@@ -1,9 +1,8 @@
 import { table } from 'lib/database/abstract'
-import { RegionPermissions } from './kinds/Region'
+import { RegionPermissions } from './Region'
 
 type CubeRegionSave = {
   t: 'c'
-  key: string
   from: VectorXZ
   to: VectorXZ
   dimensionId: Dimensions
@@ -13,7 +12,6 @@ type CubeRegionSave = {
 type RadiusRegionSave = {
   t: 'r'
   st: string
-  key: string
   radius: number
   center: Vector3
   dimensionId: Dimensions

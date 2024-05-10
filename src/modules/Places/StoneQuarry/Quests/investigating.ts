@@ -1,4 +1,5 @@
 import { Region, Temporary } from 'lib'
+import { RegionEvents } from 'lib/region/events'
 import { StoneQuarry } from 'modules/Places/StoneQuarry/StoneQuarry'
 import { Cutscene } from 'modules/Quests/lib/Cutscene'
 import { Quest } from 'modules/Quests/lib/Quest'
@@ -27,7 +28,7 @@ class StoneQuarryInvestigating {
   )
 
   static init() {
-    Region.onEnter(this.place.safeArea, player => {
+    RegionEvents.onEnter(this.place.safeArea, player => {
       if (isNotPlaying(player)) return
 
       this.quest.enter(player)
