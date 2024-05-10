@@ -6,10 +6,14 @@ export default defineConfig({
     __TEST__: 'true',
   },
   test: {
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['html'],
+    },
     alias: {
       '@minecraft/server': 'test/__mocks__/minecraft_server.ts',
     },
-    exclude: ['**/*.test.ts'],
+    exclude: ['**/*.test.ts', 'node_modules/**'],
   },
   plugins: [path()],
 })
