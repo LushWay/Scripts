@@ -4,3 +4,15 @@ export class Player {
     return ''
   }
 }
+
+export class System {
+  delay(fn: VoidFunction) {
+    return this.run(fn)
+  }
+  run(fn: VoidFunction) {
+    setImmediate(fn)
+    return 0
+  }
+}
+
+export const system = new System()

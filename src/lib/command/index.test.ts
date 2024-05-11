@@ -1,16 +1,13 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck GOO AWAY
-
 import { CommandContext } from 'lib/command/context'
-import '../../framework/framework.test'
+import { suite, test } from '../../test/framework'
 
 const success = 'success'
 const addsSuccessTag = (ctx: CommandContext) => ctx.player.addTag(success)
 
 const command = new Command('cmd').setPermissions('everybody').executes(addsSuccessTag)
 
-describe('lib.command', () => {
-  it('inputs', async test => {
+suite('lib.command', () => {
+  test('inputs', async test => {
     const player = test.spawnSimulatedPlayer({ x: 0, y: 0, z: 0 })
 
     player.chat('.cmd')
@@ -20,7 +17,7 @@ describe('lib.command', () => {
     test.succeed()
   })
 
-  it('overloads', async test => {
+  test('overloads', async test => {
     const player = test.player()
 
     command.overload('overload').executes(addsSuccessTag)
@@ -31,7 +28,7 @@ describe('lib.command', () => {
     test.succeed()
   })
 
-  it('alias', async test => {
+  test('alias', async test => {
     const player = test.player()
 
     command.setAliases('alias1', 'alias2')
@@ -44,7 +41,7 @@ describe('lib.command', () => {
     test.succeed()
   })
 
-  it('permission', async test => {
+  test('permission', async test => {
     const player = test.player()
 
     new Command('cmdw').setPermissions(() => false).executes(addsSuccessTag)

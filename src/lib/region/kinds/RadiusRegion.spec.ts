@@ -8,7 +8,7 @@ describe('RadiusRegion', () => {
       'mineshaft',
     )
 
-    // @ts-expect-error Because is a test
+    // @ts-expect-error Because it is a test
     const kind = region.kind
     expect(kind).toBe(MineshaftRegion.kind)
   })

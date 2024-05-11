@@ -130,8 +130,6 @@ export class DatabaseUtils {
   protected constructor() {}
 }
 
-export class DatabaseError extends Error {}
-
 if (!__TEST__) {
   world.afterEvents.worldInitialize.subscribe(() => {
     world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')

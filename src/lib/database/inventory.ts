@@ -2,7 +2,8 @@ import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/ser
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { util } from '../util'
-import { DatabaseError, DatabaseUtils } from './utils'
+import { DatabaseError } from './abstract'
+import { DatabaseUtils } from './utils'
 
 const tableType = 'inventory'
 

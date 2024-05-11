@@ -1,21 +1,27 @@
+import { system } from '@minecraft/server'
+
 const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
 
 export class ProxyDatabase<Key extends string = string, Value = undefined> {
-  static delay = (fn: VoidFunction) => fn()
-
-  /**
-   * Usefull when a lot of data is being read from object, taken from database.
-   *
-   * **Caution**: Mutating unproxied value can cause data leaks. Consider using immutableUnproxy instead.
-   */
-  static unproxy<T extends object>(value: T): T {
+  private static getUnproxied<T extends object>(value: T): T {
     if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET] as T
     return value
   }
 
+  /**
+   * Usefull when a lot of data is being read from object, taken from database.
+   *
+   * **Caution**: This creates new object on every use, consider using {@link ProxyDatabase.immutableUnproxy} instead
+   */
+  static unproxy<T extends object>(value: T): T {
+    if (typeof value === 'object' && value !== null) return this.setDefaults({}, this.getUnproxied(value))
+    return value
+  }
+
+  /** Usefull when a lot of data is being read from object, taken from database. */
   static immutableUnproxy<T extends object>(value: T): Immutable<T> {
-    return this.unproxy(value) as Immutable<T>
+    return this.getUnproxied(value) as Immutable<T>
   }
 
   static setDefaults<O extends JSONLike, D extends JSONLike>(sourceObject: O, defaultObject: D): O & D {
@@ -102,6 +108,15 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
     return COMPOSED
   }
 
+  static tables: Record<string, import('./abstract').DatabaseTable> = {}
+
+  constructor(
+    protected id: string,
+    protected defaultValue?: import('./abstract').DatabaseDefaultValue<Value>,
+  ) {
+    ProxyDatabase.tables[id] = this.proxy()
+  }
+
   proxy(): Record<Key, Value> {
     return this.subproxy(this.value, '', true)
   }
@@ -113,10 +128,18 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
   ): Record<string, any> {
     if (object[IS_PROXIED]) return object
 
-    const proxied = this.subproxyMap.get(object)
-    if (proxied) return proxied
+    const cache = this.proxyCache.get(object)
+    if (cache) return cache
 
-    const proxy = new Proxy(object, {
+    const proxy = new Proxy(object, this.createProxy(initial, keys))
+    Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
+
+    this.proxyCache.set(object, proxy)
+    return proxy
+  }
+
+  private createProxy(initial: boolean, keys: string): ProxyHandler<Record<string, any> & { [IS_PROXIED]?: boolean }> {
+    return {
       get: (target, p, reciever) => {
         // Filter non db keys
         let value = Reflect.get(target, p, reciever)
@@ -159,26 +182,19 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
         if (deleted) return this.needSave()
         return deleted
       },
-    })
-
-    Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
-    this.subproxyMap.set(object, proxy)
-
-    return proxy
+    }
   }
-
-  protected defaultValue: (p: string) => Partial<Value>
 
   protected value: Record<any, any> = {}
 
-  private subproxyMap = new WeakMap<object, object>()
+  private proxyCache = new WeakMap<object, object>()
 
   private needSaveHadRun = false
 
-  protected needSave() {
+  private needSave() {
     if (this.needSaveHadRun) return true
 
-    ProxyDatabase.delay(() => {
+    system.delay(() => {
       this.needSaveHadRun = false
       const databaseData = JSON.stringify(
         // Modify all values

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-// @ts-ignore AAAAAA
 import { restoreRegionFromJSON } from './init'
 import { MineshaftRegion } from './kinds/MineshaftRegion'
 

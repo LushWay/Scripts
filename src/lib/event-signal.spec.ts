@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-// @ts-ignore AAAAAAAAA
 import { EventLoader, EventLoaderWithArg, EventSignal } from './event-signal'
 
 describe('EventSignal', () => {

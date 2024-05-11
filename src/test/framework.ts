@@ -6,7 +6,21 @@ import * as gametest from '@minecraft/server-gametest'
 import { expand } from 'lib/extensions/extend'
 import { util } from 'lib/util'
 import { TestStructures } from 'test/constants'
-import './framework.test'
+import './framework'
+
+declare module '@minecraft/server-gametest' {
+  interface Test {
+    /** Spawns player at the test relative 0 0 0. Alias to {@link gametest.Test.spawnSimulatedPlayer} */
+    player(): SimulatedPlayer
+    _history: string[]
+  }
+
+  interface SimulatedPlayer {
+    /** The test that simulated player attached to */
+    test: Test
+    _test: null | Test
+  }
+}
 
 expand(gametest.SimulatedPlayer.prototype, {
   get name() {
@@ -73,13 +87,13 @@ expand(gametest.Test.prototype, {
 
 let classNameGlobal = ''
 
-globalThis.describe = (className: string, callback: VoidFunction) => {
+export function suite(className: string, callback: VoidFunction) {
   classNameGlobal = className
   callback()
   classNameGlobal = ''
 }
 
-globalThis.it = (should: string, testFunction: (test: gametest.Test) => Promise<void>) => {
+export function test(should: string, testFunction: (test: gametest.Test) => Promise<void>) {
   if (!classNameGlobal) throw new Error('You can call it() only inside of the top-level describe() callback!')
 
   const className = classNameGlobal

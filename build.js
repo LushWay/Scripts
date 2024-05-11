@@ -87,7 +87,7 @@ async function writeManifestJson() {
     })
     .filter(e => !!e[1])
 
-  packagejson.content.devDependencies = packagejson.content.dependencies
+  packagejson.content.resolutions = packagejson.content.dependencies
 
   const base = {
     format_version: 2,

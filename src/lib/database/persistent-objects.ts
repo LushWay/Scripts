@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
-import { DatabaseError } from './utils'
+import { DatabaseError } from './abstract'
 
 export class PersistentSet<T> extends Set<T> {
   constructor(public id: string) {

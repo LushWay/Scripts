@@ -1,8 +1,11 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "baseUrl": "src/"
+    "noEmit": false,
+    "outDir": "scripts"
   },
-  "include": ["./src/**/*.spec.ts"],
-  "exclude": ["./src/**/*.test.ts"]
+  "include": ["./src", "./src/**/*.spec.ts"],
+  "exclude": ["./src/**/*.test.ts", "./src/test/framework.ts", "./src/test/loader.ts", "node_modules"],
+  "references": []
 }

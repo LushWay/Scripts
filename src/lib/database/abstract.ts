@@ -1,5 +1,4 @@
 import { ProxyDatabase } from './proxy'
-import { DatabaseError } from './utils'
 
 export type DatabaseDefaultValue<Value> = (key: string) => NoInfer<Value>
 
@@ -48,24 +47,15 @@ export function getProvider() {
 }
 
 if (__TEST__) {
-  class TestDatabase<Key extends string, Value> extends ProxyDatabase<Key, Value> {
-    static tables = {} as Record<string, DatabaseTable>
-    constructor(
-      private name: string,
-      defaultValue?: DatabaseDefaultValue<Partial<Value>>,
-    ) {
-      super()
-      TestDatabase.tables[name] = this.proxy()
-      if (defaultValue) this.defaultValue = defaultValue
-    }
-  }
+  class TestDatabase<Key extends string, Value> extends ProxyDatabase<Key, Value> {}
 
   configureDatabase({
-    createTable: (name, defaultValue?: DatabaseDefaultValue<Partial<any>>) =>
-      new TestDatabase<string, any>(name, defaultValue).proxy(),
     tables: TestDatabase.tables,
-    getRawTableData(tableId) {
-      return ''
-    },
+
+    createTable: (name, defaultValue?: DatabaseDefaultValue<unknown>) =>
+      new TestDatabase<string, any>(name, defaultValue).proxy(),
+
+    getRawTableData: tableId => JSON.stringify(TestDatabase.tables[tableId]),
   })
 }
+export class DatabaseError extends Error {}
