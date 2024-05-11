@@ -27,4 +27,24 @@ describe('mail', () => {
       ]
     `)
   })
+
+  it('should show milan what snapshot is', () => {
+    class Example {
+      method() {}
+      value = 'string'
+    }
+
+    class Test extends Example {}
+
+    expect(new Test()).toMatchInlineSnapshot(`
+      Test {
+        "value": "string",
+      }
+    `)
+    expect(new Example()).toMatchInlineSnapshot(`
+      Example {
+        "value": "string",
+      }
+    `)
+  })
 })
