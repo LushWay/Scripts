@@ -1,8 +1,8 @@
-import './questMenu'
+import './quest-menu'
 
-import './Learning/index'
+import './learning/index'
 
-import './lib/Cutscene'
-import './lib/CutsceneMenu'
+import './lib/cutscene'
+import './lib/cutscene-menu'
 
-import '../Places/StoneQuarry/Quests/investigating'
+import '../places/StoneQuarry/Quests/investigating'

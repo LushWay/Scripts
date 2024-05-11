@@ -6,8 +6,8 @@ import { util } from 'lib'
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
-import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/indicator/playerNameTag'
+import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 // TODO Rewrite in class
 

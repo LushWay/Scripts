@@ -1,26 +1,22 @@
+import { BaseRegion } from '../../modules/places/base/BaseRegion'
+import { MineshaftRegion } from '../../modules/places/mineshaft/MineshaftRegion'
 import { RegionDatabase } from './database'
-import { BaseRegion } from './kinds/BaseRegion'
 import { CubeRegion } from './kinds/CubeRegion'
-import { MineshaftRegion } from './kinds/MineshaftRegion'
 import { RadiusRegion } from './kinds/RadiusRegion'
 import { SafeAreaRegion } from './kinds/SafeAreaRegion'
 
-const RadiusRegionKinds = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion]
-Object.entries(RegionDatabase).forEach(restoreRegionFromJSON)
+Object.entries(RegionDatabase).forEach(r => restoreRegionFromJSON(r))
 
-export function restoreRegionFromJSON([key, region]: [string, (typeof RegionDatabase)[string]]) {
+export function restoreRegionFromJSON(
+  [key, region]: [string, (typeof RegionDatabase)[string]],
+  kinds = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion],
+) {
   let created
   if (!region) return
-  if (region.t === 'c') created = CubeRegion.create(region, key, false)
+  if (region.t === 'c') created = CubeRegion.create(region, key)
   else {
-    const RadiusRegionKind =
-      RadiusRegionKinds.find(e => {
-        const subtype = e.kind
-
-        return subtype === region.st
-      }) ?? RadiusRegion
-
-    created = RadiusRegionKind.create(region, key, false)
+    const RadiusRegionKind = kinds.find(e => e.kind === region.st) ?? RadiusRegion
+    created = RadiusRegionKind.create(region, key)
   }
 
   return created

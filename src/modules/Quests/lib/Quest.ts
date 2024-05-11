@@ -1,7 +1,7 @@
 import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
 import { Airdrop, Compass, InventoryIntervalAction, Join, LootTable, PlaceAction, Settings, Temporary } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
-import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
+import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 export type QuestDB = {
   active: {

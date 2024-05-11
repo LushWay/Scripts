@@ -73,6 +73,10 @@ declare global {
         // eslint-disable-next-line @typescript-eslint/ban-types
         [K in keyof T]: T[K] extends Function ? T[K] : Narrow<T[K]>
       }
+
+  // Vite compability
+  interface WebSocket {}
+  interface Worker {}
 }
 
 /** Describes types that can be narrowed */
@@ -83,7 +87,7 @@ declare module '@minecraft/server' {
     name?: string | undefined
     readonly role: Role
     prevRole?: Role
-    quests?: import('../modules/Quests/lib/Quest').QuestDB
+    quests?: import('../modules/quests/lib/quest').QuestDB
     join?: {
       position?: number[]
       stage?: number

@@ -1,8 +1,8 @@
 import { system } from '@minecraft/server'
 import { Airdrop, prompt } from 'lib'
 import { Join } from 'lib/player-join'
-import { Anarchy } from 'modules/Places/Anarchy'
-import { Spawn } from 'modules/Places/Spawn'
+import { Anarchy } from 'modules/places/anarchy'
+import { Spawn } from 'modules/places/spawn'
 
 new Command('wipe')
   .setDescription('Очищает все данные (для тестов)')

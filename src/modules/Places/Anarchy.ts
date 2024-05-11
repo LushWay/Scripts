@@ -1,10 +1,10 @@
 import { Player, Vector } from '@minecraft/server'
 import { EditableLocation, InventoryStore, Portal, Zone } from 'lib'
-import { Spawn } from 'modules/Places/Spawn'
-import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
 import { tpMenuOnce } from 'modules/commands/tp'
-import { showSurvivalHud } from 'modules/features/sidebar'
-import { DefaultPlaceWithInventory } from './Default/WithInventory'
+import { Spawn } from 'modules/places/spawn'
+import { showSurvivalHud } from 'modules/survival/sidebar'
+import { isNotPlaying } from 'modules/world-edit/isBuilding'
+import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
 
 class AnarchyBuilder extends DefaultPlaceWithInventory {
   portal: Portal | undefined

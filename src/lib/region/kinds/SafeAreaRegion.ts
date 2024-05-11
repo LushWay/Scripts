@@ -11,7 +11,7 @@ export class SafeAreaRegion extends RadiusRegion {
 
   protected readonly saveable = false
 
-  private readonly safeAreaName
+  readonly safeAreaName
 
   protected readonly defaultPermissions = {
     allowedEntities: [

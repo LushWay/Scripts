@@ -16,13 +16,8 @@ export class RadiusRegion extends Region implements RadiusRegionOptions {
   static readonly kind: string = 'radius'
 
   /** @inheritdoc */
-  static create<T extends typeof Region>(
-    this: T,
-    options: ConstructorParameters<T>[0],
-    key?: string,
-    save?: boolean,
-  ): InstanceType<T> {
-    const region = super.create(options, key, save)
+  static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
+    const region = super.create(options, key)
 
     // Set radius region kind
     if (region instanceof RadiusRegion) {

@@ -3,8 +3,8 @@ import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Region, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
-import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
-import { isBuilding } from 'modules/WorldEdit/isBuilding'
+import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
+import { isBuilding } from 'modules/world-edit/isBuilding'
 
 export class Axe {
   static breaks: string[] = Object.entries(MinecraftBlockTypes)

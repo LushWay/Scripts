@@ -20,7 +20,7 @@ declare namespace LootItem {
     chance: Percent
 
     /** - Map in format { enchant: { level: percent } } */
-    enchantments?: Partial<Record<keyof typeof MinecraftEnchantmentTypes, RandomCostMapType>>
+    enchantments?: Partial<Record<MinecraftEnchantmentTypes, RandomCostMapType>>
     /** - Damage of the item */
     damage?: RandomCostMapType
 

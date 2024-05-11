@@ -10,6 +10,7 @@ export class System {
     return this.run(fn)
   }
   run(fn: VoidFunction) {
+    // @ts-ignore
     setImmediate(fn)
     return 0
   }

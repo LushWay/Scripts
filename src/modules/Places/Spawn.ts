@@ -6,9 +6,9 @@ import { EditableLocation, InventoryStore, Portal, RegionCallback, Settings, uti
 import { Menu } from 'lib/menu'
 import { Join } from 'lib/player-join'
 import { SafeAreaRegion } from 'lib/region/kinds/SafeAreaRegion'
-import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
-import { showSurvivalHud } from 'modules/features/sidebar'
-import { DefaultPlaceWithInventory } from './Default/WithInventory'
+import { showSurvivalHud } from 'modules/survival/sidebar'
+import { isNotPlaying } from 'modules/world-edit/isBuilding'
+import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
   portal: Portal | undefined

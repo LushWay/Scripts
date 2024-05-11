@@ -2,8 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "noEmit": false,
-    "outDir": "scripts"
+    "noEmit": false
   },
   "include": ["./src", "./src/**/*.spec.ts"],
   "exclude": ["./src/**/*.test.ts", "./src/test/framework.ts", "./src/test/loader.ts", "node_modules"],

@@ -1,12 +1,12 @@
 import { Player, Vector, system, world } from '@minecraft/server'
 import { ActionForm, getRoleAndName, util } from 'lib'
-import { DefaultPlaceWithSafeArea } from 'modules/Places/Default/WithSafeArea'
-import { Spawn } from 'modules/Places/Spawn'
-import { StoneQuarry } from 'modules/Places/StoneQuarry/StoneQuarry'
-import { TechCity } from 'modules/Places/TechCity'
-import { VillageOfExplorers } from 'modules/Places/VillafeOfExplorers'
-import { VillageOfMiners } from 'modules/Places/VillageOfMiners'
-import { isNotPlaying } from 'modules/WorldEdit/isBuilding'
+import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
+import { Spawn } from 'modules/places/spawn'
+import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
+import { TechCity } from 'modules/places/tech-city'
+import { VillageOfExplorers } from 'modules/places/village-of-explorers'
+import { VillageOfMiners } from 'modules/places/village-of-miners'
+import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 new Command('tp')
   .setPermissions(__PRODUCTION__ ? 'techAdmin' : 'everybody')
@@ -24,11 +24,10 @@ function tpMenu(player: Player) {
   )
 
   const players = world.getAllPlayers().map(e => ({
-    player,
     location: e.location,
+    dimension: e.dimension.type,
   }))
 
-  /** @type {Record<string, ReturnType<typeof location>>} */
   const locations: Record<string, ReturnType<typeof location>> = {
     'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10', players),
     'Деревня исследователей': location(VillageOfExplorers, '-35 75 13661 0 20', players),
@@ -55,7 +54,6 @@ function tpMenu(player: Player) {
   return form.show(player)
 }
 
-/** @param {Player} player */
 function tpToPlayer(player: Player) {
   const form = new ActionForm('Телепорт к игроку...')
 
@@ -68,17 +66,12 @@ function tpToPlayer(player: Player) {
   form.show(player)
 }
 
-/**
- * @param {Pick<DefaultPlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>} place
- * @param {string} fallback
- * @param {{ player: Player; location: Vector3 }[]} players
- */
 function location(
   place: Pick<DefaultPlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>,
   fallback: string,
-  players: { player: Player; location: Vector3 }[],
+  players: { location: Vector3; dimension: Dimensions }[],
 ) {
-  const playersC = players.filter(e => place.safeArea.isVectorInRegion(e.location)).length
+  const playersC = players.filter(e => place.safeArea.isVectorInRegion(e.location, e.dimension)).length
 
   if (place.portalTeleportsTo.valid) {
     return {
@@ -94,10 +87,9 @@ function location(
 
   return { location: fallback, players: playersC }
 }
-/** @type {Set<string>} */
-const SENT: Set<string> = new Set()
 
-/** @param {Player} player */
+const SENT = new Set<string>()
+
 export function tpMenuOnce(player: Player) {
   if (!SENT.has(player.id)) {
     tpMenu(player).then(() =>

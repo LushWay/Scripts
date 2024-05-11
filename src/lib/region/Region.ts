@@ -4,8 +4,10 @@ import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { RegionDatabase } from './database'
 
+/** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
 
+/** Permissions of the region */
 export interface RegionPermissions {
   /** If the player can use chests, defualt: true */
   doorsAndSwitches: boolean
@@ -19,24 +21,25 @@ export interface RegionPermissions {
   owners: string[]
 }
 
+/** Options used in {@link Region.create} */
 export interface RegionCreationOptions {
   dimensionId: Dimensions
   permissions?: Partial<RegionPermissions>
 }
 
-/** Main class that represents protected region in the world. */
+/** Represents protected region in the world. */
 export class Region {
   /** Creates a new region */
-  static create<T extends typeof Region>(
-    this: T,
-    options: ConstructorParameters<T>[0],
-    key = new Date(Date.now()).toISOString(),
-    save = true,
-  ): InstanceType<T> {
-    const region = new this(options, key)
+  static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
+    const region = new this(options, key ?? new Date(Date.now()).toISOString())
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
-    if (save) region.save()
+    if (!key) {
+      // When generating new key we are creating new region and should save it
+      region.save()
+    } else {
+      // When restoring with existing key, we should not save region
+    }
 
     return region as unknown as InstanceType<T>
   }

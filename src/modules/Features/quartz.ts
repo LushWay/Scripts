@@ -3,9 +3,9 @@ import { ItemStack, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { util } from 'lib'
 import { actionGuard } from 'lib/region/index'
-import { TechCity } from 'modules/Places/TechCity'
-import { scheduleBlockPlace } from 'modules/survival/scheduledBlockPlace'
-import { withState } from 'modules/WorldEdit/utils/blocksSet'
+import { TechCity } from 'modules/places/tech-city'
+import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
+import { withState } from 'modules/world-edit/utils/blocksSet'
 
 const [quartzTypeId, states] = withState(MinecraftBlockTypes.QuartzBlock, {
   chisel_type: 'smooth',
