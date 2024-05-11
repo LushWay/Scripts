@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 
-import { util } from 'lib'
+import { util } from 'lib/util'
 import { table } from './database/abstract'
 import { Rewards } from './rewards'
 

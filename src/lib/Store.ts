@@ -1,6 +1,6 @@
 import { ItemStack, Player, system } from '@minecraft/server'
 
-import { EditableLocation, PlaceAction, Settings, itemLocaleName } from 'lib'
+import { EditableLocation, PlaceAction, Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Cooldown } from 'lib/cooldown'
 import { Cost } from 'lib/cost'
@@ -8,6 +8,7 @@ import { EditableNpc } from 'lib/editable-npc'
 import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
+import { itemDescription } from './rewards'
 
 interface StoreOptions {
   name: string
@@ -148,15 +149,4 @@ export class Store {
 
     form.show(player)
   }
-}
-
-/**
- * Returns <item name>\nx<count>
- *
- * @param {ItemStack} item
- */
-export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§g', newline = false) {
-  return `${item.nameTag ?? itemLocaleName(item)}§r${newline ? '\n' : ''}${
-    item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''
-  }`
 }

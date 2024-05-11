@@ -1,6 +1,6 @@
 import { ItemStack, Player, ScoreName } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
-import { itemDescription } from './store'
+import { itemLocaleName } from './game-utils'
 
 export type Reward =
   | {
@@ -105,4 +105,14 @@ export class Rewards {
     }
     return rewardsAsStrings.join('\n')
   }
+}
+
+/**
+ * Returns <item name>\nx<count>
+ *
+ * @param {ItemStack} item
+ */
+
+export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§g', newline = false) {
+  return `${item.nameTag ?? itemLocaleName(item)}§r${newline ? '\n' : ''}${item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''}`
 }
