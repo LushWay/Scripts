@@ -70,11 +70,11 @@ export async function showForm(
           case 2:
             // Second attempt, tell player to manually close chat...
             player.info('Закрой чат!')
-            await system.sleep(20)
+            await system.sleep(10)
             continue
 
           default:
-            await nextTick
+            await system.sleep(10)
             break
 
           case hold:

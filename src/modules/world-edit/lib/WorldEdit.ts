@@ -342,11 +342,6 @@ export class WorldEdit {
     return this.selection
   }
 
-  /**
-   * @param {(import('../menu').ReplaceTarget | BlockPermutation)[]} blocks
-   * @param {(undefined | import('../menu').ReplaceTarget | BlockPermutation)[]} replaceBlocks
-   */
-
   async fillBetween(
     blocks: (import('../menu').ReplaceTarget | BlockPermutation)[],
     replaceBlocks: (undefined | import('../menu').ReplaceTarget | BlockPermutation)[] = [undefined],
@@ -373,33 +368,37 @@ export class WorldEdit {
 
       const replaceTargets = replaceBlocks.map(toReplaceTarget)
 
-      nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
-        for (const replaceBlock of replaceTargets) {
-          try {
-            const block = world.overworld.getBlock(position)
+      const player = this.player
+      function* fillBetweenJob() {
+        nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
+          for (const replaceBlock of replaceTargets) {
+            try {
+              const block = world.overworld.getBlock(position)
 
-            if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
+              if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
-            block?.setPermutation(toPermutation(blocks.randomElement()))
-            continue nextBlock
-          } catch (e) {
-            if (errors < 3 && e instanceof Error) {
-              this.player.fail(`Ошибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
+              block?.setPermutation(toPermutation(blocks.randomElement()))
+              continue nextBlock
+            } catch (e) {
+              if (errors < 3 && e instanceof Error) {
+                player.fail(`Ошибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
+              }
+
+              if (
+                !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
+                errors < 3
+              )
+                util.error(e)
+
+              errors++
             }
 
-            if (
-              !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
-              errors < 3
-            )
-              util.error(e)
-
-            errors++
+            all++
+            yield
           }
-
-          all++
-          await nextTick
         }
       }
+      system.runJob(fillBetweenJob())
 
       const endTime = util.ms.remaining(Date.now() - startTime, {
         converters: ['ms', 'sec', 'min'],

@@ -97,7 +97,7 @@ export class Structure extends Cuboid {
         options,
       )
 
-      await nextTick
+      await system.sleep(1)
     }
 
     if (options.errors > 0)
@@ -125,7 +125,6 @@ async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(
     world.say('Область будет прогружена (' + options.total + ')')
 
     // world.overworld.runCommand(`tickingarea remove safezone`)
-    // await nextTick
 
     world.getAllPlayers()[0].teleport(Vector.divide(Vector.add(vector1, vector2), 2))
 

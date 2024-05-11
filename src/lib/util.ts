@@ -372,17 +372,6 @@ export const util = {
     } as Record<Time, { time: number; friction?: number; plurals: Plurals }>,
   },
 
-  waitEach(c: number) {
-    let count = 0
-    return async () => {
-      count++
-      if (count % c === 0) {
-        await nextTick
-        return count
-      }
-    }
-  },
-
   benchmark: Object.assign(
     /**
      * It returns a function that when called, returns the time it took to call the function and records result to const

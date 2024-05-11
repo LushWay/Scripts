@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world } from '@minecraft/server'
+import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
 import { CONFIG } from '../assets/config'
 import { is } from '../roles'
 import {
@@ -29,9 +29,10 @@ export class Command<
     return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
 
-  /** @param {ChatSendAfterEvent} event */
+  static chatSendListener(event: ChatSendAfterEvent) {}
+
   static chatListener(event: ChatSendAfterEvent) {
-    if (!this.isCommand(event.message)) return
+    if (!this.isCommand(event.message)) return this.chatSendListener(event)
 
     const parsed = parseCommand(event.message, 1)
     if (!parsed) {
@@ -368,11 +369,9 @@ declare global {
 
 globalThis.Command = Command
 
-// TODO! REPLACE WITH PACK ON 1.20.70
-
 world.beforeEvents.chatSend.subscribe(event => {
-  event.sendToTargets = true
-  event.setTargets([])
+  event.cancel = true
+  system.delay(() => {
+    Command.chatListener(event)
+  })
 })
-
-world.afterEvents.chatSend.subscribe(event => Command.chatListener(event))

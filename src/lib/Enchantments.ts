@@ -1,6 +1,6 @@
 import { Enchantment, Vector, world } from '@minecraft/server'
 
-import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { DatabaseUtils } from 'lib/database/utils'
 import { EventLoader } from 'lib/event-signal'
 import { util } from 'lib/util'
@@ -33,25 +33,25 @@ function load() {
   const { container } = entity
   if (!container) return
 
-  for (let i = 0; i < container.size; i++) {
-    const item = container.getItem(i)
-    if (item?.typeId !== MinecraftItemTypes.EnchantedBook) break
+  // for (let i = 0; i < container.size; i++) {
+  //   const item = container.getItem(i)
+  //   if (item?.typeId !== MinecraftItemTypes.EnchantedBook) break
 
-    const enchantments = item.getComponent('enchantments')
-    if (!enchantments?.enchantments)
-      return util.error(
-        new Error('Found unexpected enchantment type on slot ' + i + '. Enchantments: ' + util.inspect(enchantments)),
-      )
+  //   const enchantments = item.getComponent('enchantments')
+  //   if (!enchantments?.enchantments)
+  //     return util.error(
+  //       new Error('Found unexpected enchantment type on slot ' + i + '. Enchantments: ' + util.inspect(enchantments)),
+  //     )
 
-    for (const enchantment of enchantments.enchantments) {
-      Enchantments.custom[enchantment.type.id] ??= [
-        new Enchantment(enchantment.type, 1),
-        new Enchantment(enchantment.type, 1),
-      ]
+  //   for (const enchantment of enchantments.enchantments) {
+  //     Enchantments.custom[enchantment.type.id] ??= [
+  //       new Enchantment(enchantment.type, 1),
+  //       new Enchantment(enchantment.type, 1),
+  //     ]
 
-      Enchantments.custom[enchantment.type.id][enchantment.level] = enchantment
-    }
-  }
+  //     Enchantments.custom[enchantment.type.id][enchantment.level] = enchantment
+  //   }
+  // }
 
   entities.forEach(e => e.remove())
   // @ts-expect-error Aaa

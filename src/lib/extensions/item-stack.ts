@@ -7,8 +7,8 @@ declare module '@minecraft/server' {
     /** Alias to {@link ItemStack.getComponent}('cooldown') */
     cooldown: ItemCooldownComponent
 
-    /** Alias to {@link ItemStack.getComponent}('enchantments') */
-    enchantments: ItemEnchantsComponent
+    /** Alias to {@link ItemStack.getComponent}('enchantable') */
+    enchantable: ItemEnchantableComponent
 
     /** Alias to {@link ItemStack.getComponent}('durability') */
     durability: ItemDurabilityComponent
@@ -27,7 +27,7 @@ declare module '@minecraft/server' {
 Object.defineProperties(ItemStack.prototype, {
   enchantments: {
     get() {
-      return this.getComponent('enchantments')
+      return this.getComponent('enchantable')
     },
     configurable: false,
     enumerable: true,

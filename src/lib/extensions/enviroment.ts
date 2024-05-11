@@ -15,7 +15,6 @@ declare global {
   }
 
   var console: Console
-  var nextTick: Promise<void>
   var verbose: boolean
 
   interface Function {
@@ -166,7 +165,6 @@ expand(console, {
   },
 })
 
-globalThis.nextTick = null as unknown as Promise<void>
 globalThis.verbose = false
 
 Object.entriesStringKeys(MinecraftEntityTypes).forEach(([k, v]) => {

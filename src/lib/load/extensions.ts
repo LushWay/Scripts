@@ -1,3 +1,4 @@
+import '../extensions/container-slot'
 import '../extensions/core'
 import '../extensions/dimension'
 import '../extensions/enviroment'

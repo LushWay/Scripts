@@ -1,6 +1,5 @@
 import { Container, ItemLockMode, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Enchantments } from './enchantments'
 import { EventSignal } from './event-signal'
 
 declare namespace LootItem {
@@ -238,14 +237,13 @@ export class LootTable {
       const stack = item.itemStack.clone()
       stack.amount = amount
 
-      const { enchantments } = stack.enchantments
-      for (const [name, levels] of Object.entries(item.enchantments)) {
+      const { enchantable } = stack
+      for (const [type, levels] of Object.entries(item.enchantments)) {
         const level = levels.randomElement()
         if (!level) continue
 
-        enchantments.addEnchantment(Enchantments.custom[name][level])
+        enchantable.addEnchantment({ type, level })
       }
-      stack.enchantments.enchantments = enchantments
 
       if (item.damage.length) {
         const damage = item.damage.randomElement()
@@ -264,7 +262,6 @@ export class LootTable {
     }
   }
 
-  /** @param {Container} container */
   fillContainer(container: Container) {
     for (const [i, item] of this.generate(container.size).entries()) {
       if (item) container.setItem(i, item)

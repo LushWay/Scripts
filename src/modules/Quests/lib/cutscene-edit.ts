@@ -89,7 +89,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
     const controller = { cancel: false }
     util.catch(async function visualize() {
       while (!temp.cleaned) {
-        await nextTick
+        await system.sleep(10)
 
         const sections = cutscene.withNewPoint(player)
         if (!sections) return

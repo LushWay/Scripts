@@ -14,12 +14,16 @@ export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
 // new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(BASE_ITEM_STACK, new ScoreboardCost(10))
 
 actionGuard((_, __, ctx) => {
-  if ((ctx.type === 'interactWithBlock' || ctx.type === 'place') && ctx.event.itemStack?.is(BASE_ITEM_STACK))
+  if (
+    (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
+    ctx.event.player.mainhand().isStackableWith(BASE_ITEM_STACK)
+  )
     return true
 })
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
-  const { player, block, faceLocation, itemStack } = event
+  const { player, block, faceLocation } = event
+  const itemStack = player.mainhand()
   try {
     if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
   } catch (e) {

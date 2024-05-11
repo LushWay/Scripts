@@ -14,16 +14,14 @@ new Command('enchant')
 
     const item = mainhand.getItem()
     if (!item) return ctx.error('No item!')
-    const enchs = item.getComponent('enchantments')
-    if (!enchs) return ctx.error('A')
-    const { enchantments } = enchs
+    const enchantments = item.getComponent('enchantable')
+    if (!enchantments) return ctx.error('A')
     enchantments.removeEnchantment(enchant)
     console.debug({ Enchantments: Enchantments.custom, enchant, level })
 
     enchantments.addEnchantment(Enchantments.custom[enchant][level])
 
-    world.debug('enchants', [...enchantments])
-    enchs.enchantments = enchantments
+    world.debug('enchants', [...enchantments.getEnchantments()])
 
     mainhand.setItem(item)
   })

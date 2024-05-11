@@ -35,7 +35,7 @@ export class ChatBuilder {
   })
 
   constructor() {
-    world.afterEvents.chatSend.subscribe(event => {
+    Command.chatSendListener = event => {
       if (Command.isCommand(event.message)) return
 
       try {
@@ -96,7 +96,7 @@ export class ChatBuilder {
       } catch (error) {
         util.error(error)
       }
-    })
+    }
   }
 }
 
