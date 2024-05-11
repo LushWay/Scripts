@@ -5,4 +5,4 @@ import './learning/index'
 import './lib/cutscene'
 import './lib/cutscene-menu'
 
-import '../places/StoneQuarry/Quests/investigating'
+import '../places/stone-quarry/quests/investigating'

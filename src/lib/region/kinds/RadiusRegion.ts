@@ -1,6 +1,5 @@
 import { Vector } from '@minecraft/server'
 
-import { ProxyDatabase } from 'lib/database/proxy'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
 import { RegionDatabase } from '../database'
 
@@ -17,12 +16,14 @@ export class RadiusRegion extends Region implements RadiusRegionOptions {
 
   /** @inheritdoc */
   static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
-    const region = super.create(options, key)
+    const region = super.create(options, key ?? this.generateRegionKey())
 
     // Set radius region kind
     if (region instanceof RadiusRegion) {
       region.kind = (this as unknown as RadiusRegion).kind
     }
+
+    if (!key) region.save()
 
     return region as unknown as InstanceType<T>
   }
@@ -39,7 +40,7 @@ export class RadiusRegion extends Region implements RadiusRegionOptions {
 
   constructor(options: RadiusRegionOptions, key: string) {
     super(options, key)
-    this.center = ProxyDatabase.unproxy(options.center)
+    this.center = options.center
     this.radius = options.radius
   }
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { RegionDatabase } from './database'
 import { restoreRegionFromJSON } from './init'
 import { RadiusRegion } from './kinds/RadiusRegion'
 
@@ -12,6 +13,10 @@ class TestRegion extends RadiusRegion {
   get json() {
     return this.toJSON()
   }
+
+  get regionKey() {
+    return this.key
+  }
 }
 
 describe('region initialization', () => {
@@ -24,6 +29,16 @@ describe('region initialization', () => {
 
     expect(restoreRegionFromJSON(['test', json], [RadiusRegion, TestRegion])).toBeInstanceOf(TestRegion)
     expect(restoreRegionFromJSON(['test', json], [RadiusRegion, TestRegion])).toEqual(region)
+  })
+
+  it('should restore region from database', () => {
+    const region = TestRegion.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
+    const regionJSON = RegionDatabase[region.regionKey]
+
+    expect(regionJSON).toEqual(region.json)
+
+    region.delete()
+    expect(restoreRegionFromJSON(['test 2', regionJSON], [RadiusRegion, TestRegion])).toBeInstanceOf(TestRegion)
   })
 })
 

@@ -1,3 +1,4 @@
+import { ProxyDatabase } from 'lib/database/proxy'
 import { BaseRegion } from '../../modules/places/base/BaseRegion'
 import { MineshaftRegion } from '../../modules/places/mineshaft/MineshaftRegion'
 import { RegionDatabase } from './database'
@@ -11,8 +12,11 @@ export function restoreRegionFromJSON(
   [key, region]: [string, (typeof RegionDatabase)[string]],
   kinds = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion],
 ) {
-  let created
   if (!region) return
+
+  let created
+  region = ProxyDatabase.unproxy(region)
+
   if (region.t === 'c') created = CubeRegion.create(region, key)
   else {
     const RadiusRegionKind = kinds.find(e => e.kind === region.st) ?? RadiusRegion

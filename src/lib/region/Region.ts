@@ -29,9 +29,13 @@ export interface RegionCreationOptions {
 
 /** Represents protected region in the world. */
 export class Region {
+  protected static generateRegionKey() {
+    return new Date(Date.now()).toISOString()
+  }
+
   /** Creates a new region */
   static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
-    const region = new this(options, key ?? new Date(Date.now()).toISOString())
+    const region = new this(options, key ?? this.generateRegionKey())
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     if (!key) {
