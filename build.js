@@ -46,24 +46,45 @@ const config = {
     '@minecraft/server-gametest',
   ],
   legalComments: 'none',
+  plugins: [
+    {
+      name: 'start/stop',
+      setup(build) {
+        build.onStart(() => {
+          start = Date.now()
+        })
+        build.onEnd(message)
+      },
+    },
+  ],
 }
 
 let start = Date.now()
 
 if (development) {
-  esbuild
-    .context(config)
-    .then(ctx => ctx.watch())
-    .then(message)
+  esbuild.context(config).then(ctx => ctx.watch())
 } else {
   esbuild.build(config).then(message)
 }
 
+let firstBuild = true
 function message() {
-  logger.info(
-    `${development ? 'Started watching for development' : test ? 'Build for test' : 'Built for production'} in ${Date.now() - start}ms`,
-  )
-  start = Date.now()
+  const mode = development ? 'development' : test ? 'test' : 'production'
+  const time = `in ${Date.now() - start}ms`
+  if (firstBuild) {
+    if (development) {
+      logger.success('Started esbuild in dev mode! Edit src and it will autobuild and reload!')
+    } else {
+      logger.info(`Built for ${mode} ${time}`)
+    }
+
+    firstBuild = false
+  } else {
+    logger.info(`Rebuild for ${mode} ${time}`)
+    if (development && process.send) {
+      process.send('reload')
+    }
+  }
 }
 
 writeManifestJson()

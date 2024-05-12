@@ -1,8 +1,6 @@
 import { Entity, Vector, system, world } from '@minecraft/server'
-
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib/region/index'
-import { util } from 'lib/util'
 import { table } from './database/abstract'
 import { invalidLocation } from './game-utils'
 import { LootTable } from './loot-table'
