@@ -1,4 +1,4 @@
-import { Player, system, world } from '@minecraft/server'
+import { Player, ScriptEventSource, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { util } from 'lib/util'
 
@@ -200,19 +200,25 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
 // Allow recieving roles from scriptevent function run by console
 system.afterEvents.scriptEventReceive.subscribe(event => {
   if (event.id.toLowerCase().startsWith('role:')) {
+    if (event.sourceType === ScriptEventSource.Server) {
+      // Allow
+    } else {
+      if (Object.values(Player.database).find(e => WHO_CAN_CHANGE.includes(e.role))) {
+        return console.error(`(SCRIPTEVENT::${event.id}) Admin already set.`)
+      }
+    }
+
     const role = event.id.toLowerCase().replace('role:', '')
     if (!util.isKeyof(role, ROLES)) {
-      console.error('Unkown role:', role)
-      console.warn(
-        `Allowed roles:\n${Object.entries(ROLES)
+      return console.error(
+        `(SCRIPTEVENT::${event.id}) Unkown role: ${role}, allowed roles:\n${Object.entries(ROLES)
           .map(e => e[0] + ': ' + e[1])
           .join('\n')}`,
       )
-      return
     }
 
     const player = Player.getByName(event.message)
-    if (!player) return console.warn(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)
+    if (!player) return console.error(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)
 
     setRole(player, role)
     console.warn(`(SCRIPTEVENT::${event.id}) ROLE HAS BEEN SET`)
