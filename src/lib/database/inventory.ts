@@ -193,7 +193,7 @@ export class InventoryStore {
       }
 
       if (!slots) {
-        return util.error(new DatabaseError(`Failed to load InventoryStore(${this.tableName}): No manifest found!`))
+        return console.error(new DatabaseError(`Failed to load InventoryStore(${this.tableName}): No manifest found!`))
       }
 
       const slot = slots[step]

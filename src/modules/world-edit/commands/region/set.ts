@@ -299,7 +299,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
     base.show(player)
   })
 
-  promise.catch(util.error)
+  promise.catch(console.error)
 
   return promise
 }

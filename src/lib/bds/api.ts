@@ -31,10 +31,9 @@ export async function request<Path extends keyof BDS.Routes>(
     let body
     try {
       body = JSON.parse(response.body)
-    } catch (e) {
-      const error = util.error(e, { parseOnly: true })
+    } catch (error) {
       throw new RequestError(
-        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${error}`,
+        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${util.error(error)}`,
       )
     }
 

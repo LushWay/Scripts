@@ -31,7 +31,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
       } else {
         // New way load
         if (typeof length !== 'number') {
-          util.error(
+          console.error(
             new DatabaseError(`Expected index in type of number, recieved ${typeof value}, table '${this.id}'`),
           )
 
@@ -41,7 +41,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
         for (let i = 0; i < length; i++) {
           const prop = world.getDynamicProperty(this.id + DynamicPropertyDB.separator + i)
           if (typeof prop !== 'string') {
-            util.error(
+            console.error(
               new DatabaseError(
                 `Corrupted database table '${this.id}', index ${i}, expected string, recieved '${util.inspect(prop)}'`,
               ),
@@ -66,7 +66,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
         }),
       )
     } catch (error) {
-      util.error(new DatabaseError(`Failed to init table '${this.id}': ${util.error(error, { parseOnly: true })}`))
+      console.error(new DatabaseError(`Failed to init table '${this.id}': ${util.error(error)}`))
     }
   }
 

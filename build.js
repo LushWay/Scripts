@@ -5,8 +5,8 @@ import fs from 'fs'
 import { LeafyLogger, PackageJSON, writeJSON } from 'leafy-utils'
 import path from 'path'
 
-const development = process.argv[2] === 'dev'
-const test = process.argv[2] === 'test'
+const development = !!process.argv.find(e => e === 'dev')
+const test = !!process.argv.find(e => e === 'test')
 const port = process.argv[3] ?? '19514'
 const outdir = 'scripts'
 const outfile = path.join(outdir, 'index.js')

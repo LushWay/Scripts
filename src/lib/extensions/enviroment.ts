@@ -126,7 +126,7 @@ function format(args: unknown[]) {
         typeof e === 'string'
           ? e
           : typeof e === 'object' && e !== null && e instanceof Error
-            ? util.error(e, { parseOnly: true }) ?? 'Empty error (check lib/Extensions/enviroment for more detail.)'
+            ? util.error(e)
             : util.inspect(e),
       ),
     )

@@ -161,7 +161,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
     console.log('This is log §6color§r test §lbold')
     console.info('This is info test')
     console.warn('This is warn test')
-    util.error(new TypeError('This is error test'))
+    console.error(new TypeError('This is error test'))
   },
   forms: ctx => {
     const menu = new ActionForm('Action', 'body').addButton('button', () => {

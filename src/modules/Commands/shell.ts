@@ -12,7 +12,7 @@ new Command('shell').setPermissions('techAdmin').executes(ctx => {
 
           request('gitPull', { restartType: type })
             .then(s => ctx.player.tell(s.statusMessage))
-            .catch(util.error)
+            .catch(console.error)
         })
       }
       form.show(ctx.player)
@@ -26,7 +26,7 @@ new Command('shell').setPermissions('techAdmin').executes(ctx => {
 
           request('gitStatus', { cwd: type })
             .then(s => ctx.player.tell(s.statusMessage))
-            .catch(util.error)
+            .catch(console.error)
         })
       }
       form.show(ctx.player)
@@ -39,7 +39,7 @@ new Command('shell').setPermissions('techAdmin').executes(ctx => {
           ctx.reply('§6> §rПринято.')
           request('backup', { name: backupname })
             .then(s => ctx.player.tell(s.statusMessage))
-            .catch(util.error)
+            .catch(console.error)
         })
     })
 

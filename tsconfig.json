@@ -41,7 +41,7 @@
       }
     ]
   },
-  "include": ["src/"],
+  "include": ["src"],
   "exclude": ["node_modules", "src/chestui", "src/test/*"],
 
   // Pollutes global

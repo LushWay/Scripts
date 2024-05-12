@@ -5,21 +5,14 @@ export const util = {
     /**
      * Stringify and show error in console
      *
-     * @param {{ message: string; stack?: string; name?: string } | string} error
-     * @param {object} [options]
-     * @param {number} [options.omitStackLines]
-     * @param {string} [options.errorName] - Overrides error name
-     * @param {boolean} [options.parseOnly] - Whenever to log error to console or not.
-     * @param {string} [options.subtype]
+     * @param error
+     * @param options
+     * @param options.errorName - Overrides error name
+     * @param options.parseOnly - Whenever to log error to console or not.
      */
     function error(
       error: { message: string; stack?: string; name?: string } | string,
-      {
-        omitStackLines = 0,
-        errorName,
-        parseOnly,
-        subtype,
-      }: { omitStackLines?: number; errorName?: string; parseOnly?: boolean; subtype?: string } = {},
+      { omitStackLines = 0 }: { omitStackLines?: number } = {},
     ) {
       if (typeof error === 'string') {
         error = new Error(error)
@@ -28,26 +21,13 @@ export const util = {
 
       const stack = util.error.stack.get(omitStackLines + 1, error.stack)
       const message = util.error.message.get(error)
-      const name = errorName ?? error.name ?? 'Error'
-      const text = `${subtype ? `§6${subtype}: ` : ''}§4${name}: §c${message}\n§f${stack}`
-
-      if (!parseOnly) {
-        try {
-          console.error(text)
-        } catch (e) {
-          console.error(text, e)
-        }
-      }
+      const name = error.name ?? 'Error'
+      const text = `§4${name}: §c${message}\n§f${stack}`
 
       return text
     },
     {
-      /**
-       * Checks if provided argument is instanceof Error
-       *
-       * @param {unknown} object
-       * @returns {object is Error}
-       */
+      /** Checks if provided argument is instanceof Error */
       isError(object: unknown): object is Error {
         return typeof object === 'object' && object !== null && object instanceof Error
       },
@@ -112,26 +92,25 @@ export const util = {
     },
   ),
 
-  /** @param {any} target */
   stringify(target: any) {
     if (typeof target === 'string') return target
     return this.inspect(target)
   },
 
-  /** @param {any} target */
   inspect(target: any, space = '  ', cw = '', funcCode = false, depth = 0) {
     const c = {
       function: {
         function: '§5',
-        name: '§9',
+        name: '§d',
         arguments: '§f',
         code: '§8',
         brackets: '§7',
       },
 
       nonstring: '§6',
-      symbol: '§7',
-      string: '§3',
+      undefined: '§7',
+      symbol: '§2',
+      string: '§2',
     }
 
     const uniqueKey = Date.now().toString()
@@ -141,11 +120,10 @@ export const util = {
 
     if (depth > 10 || typeof target !== 'object') return `${rep(target)}` || `${target}` || '{}'
 
-    /** @param {any} value */
     function rep(value: any) {
       if (visited.has(value)) {
         // Circular structure detected
-        return '§b<Circular>§r'
+        return '§b<ref *>§r'
       } else {
         try {
           visited.add(value)
@@ -154,7 +132,6 @@ export const util = {
 
       switch (typeof value) {
         case 'function': {
-          /** @type {string} */
           let r: string = value.toString().replace(/[\n\r]/g, '')
 
           if (!funcCode) {
@@ -213,7 +190,6 @@ export const util = {
         case 'object': {
           if (Array.isArray(value)) break
 
-          /** @type {any} */
           const allInherits: any = {}
 
           for (const key in value)
@@ -226,11 +202,15 @@ export const util = {
           break
         }
         case 'symbol':
-          value = `${c.symbol}[Symbol.${value.description}]§r`
+          value = `${c.symbol}Symbol(${value.description})§r`
           break
 
         case 'string':
           value = `${c.string}\`${value.replace(/"/g, uniqueKey).replace(/§/g, '§§')}\`§r`
+          break
+
+        case 'undefined':
+          value = c.undefined + value + '§r'
           break
 
         default:
@@ -264,11 +244,12 @@ export const util = {
 
   /** Runs the given callback safly. If it throws any error it will be handled */
   catch(fn: () => void | Promise<void>, subtype = 'Handled') {
+    const prefix = `§6${subtype}: `
     try {
       const promise = fn()
-      if (promise instanceof Promise) promise.catch(e => this.error(e, { omitStackLines: 1, subtype }))
+      if (promise instanceof Promise) promise.catch(e => console.error(prefix + this.error(e, { omitStackLines: 1 })))
     } catch (e) {
-      this.error(e, { omitStackLines: 1, subtype })
+      console.error(prefix + this.error(e, { omitStackLines: 1 }))
     }
   },
 
@@ -395,16 +376,6 @@ export const util = {
       results: {} as Record<string, Record<string, number>>,
     },
   ),
-
-  strikeTest() {
-    let start = Date.now()
-    /** @param {string} label */
-    return (label: string) => {
-      const date = Date.now()
-      console.log(label, '§e' + (date - start) + 'ms')
-      start = date
-    }
-  },
 
   isKeyof<O extends Record<string | symbol | number, any>>(str: string | symbol | number, obj: O): str is keyof O {
     return str in obj

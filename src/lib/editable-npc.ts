@@ -111,7 +111,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
       npc.onInteract(event)
     } catch (e) {
       event.player.fail('Не удалось открыть диалог. Сообщите об этом администрации.')
-      util.error(e)
+      console.error(e)
     }
   })
 })

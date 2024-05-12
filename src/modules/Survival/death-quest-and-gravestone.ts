@@ -7,7 +7,7 @@ import { Quest } from 'modules/quests/lib/quest'
 import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
 const gravestoneOwnerKey = 'owner'
-const gravestoneEntity = MinecraftEntityTypes.HopperMinecart
+export const gravestoneEntity = MinecraftEntityTypes.HopperMinecart
 const gravestoneTag = 'gravestone'
 const gravestoneSpawnedAt = 'gravestoneAt'
 const gravestoneCleanupAfter = util.ms.from('sec', 5)

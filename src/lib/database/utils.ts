@@ -101,7 +101,7 @@ export class DatabaseUtils {
         .sort((a, b) => a.index - b.index)
         .map(e => e.entity)
     } catch (e) {
-      util.error(e)
+      console.error(e)
     }
   }
 

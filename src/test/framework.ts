@@ -60,7 +60,7 @@ expand(gametest.SimulatedPlayer.prototype, {
 })
 
 function formatRawText(e: RawMessage | string) {
-  return typeof e === 'string' ? e : util.error.isError(e) ? util.error(e, { parseOnly: true }) : util.inspect(e)
+  return typeof e === 'string' ? e : util.error.isError(e) ? util.error(e) : util.inspect(e)
 }
 
 expand(gametest.Test.prototype, {
@@ -81,7 +81,7 @@ expand(gametest.Test.prototype, {
   print(text) {
     this._history.push(text)
 
-    return super.print(text)
+    return super.print(this.fullname ? this.fullname + text : 'testname > ' + text)
   },
 })
 
@@ -98,9 +98,9 @@ export function test(should: string, testFunction: (test: gametest.Test) => Prom
 
   const className = classNameGlobal
   const fullname = className + ':' + should
-  gametest
+  return gametest
     .registerAsync(className, should, async test => {
-      expand(test, { _history: [] })
+      expand(test, { _history: [], fullname })
 
       try {
         await testFunction(test)
@@ -108,16 +108,13 @@ export function test(should: string, testFunction: (test: gametest.Test) => Prom
         let info = `\n§f§l§X FAILED §r §f§l${fullname}\n`
 
         const history = test._history
-          .concat(util.error(error, { parseOnly: true }))
-
+          .concat(util.error(error))
           .map(e => e.split('\n'))
           .flat()
-
           .map(line => '§r§f\n  ' + line)
           .join('')
 
         info += `${history}\n  ` // \n §r§l§Y OUTPUT §r
-
         console.log(info)
       }
     })

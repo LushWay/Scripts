@@ -1,5 +1,6 @@
 import { CommandContext } from 'lib/command/context'
-import { suite, test } from '../../test/framework'
+import { suite, test } from 'test/framework'
+import './index'
 
 const success = 'success'
 const addsSuccessTag = (ctx: CommandContext) => ctx.player.addTag(success)

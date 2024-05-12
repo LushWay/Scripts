@@ -1,8 +1,4 @@
-// Anti crash
-import 'lib/load/watchdog'
-
-// Extended native classes
-import 'lib/load/extensions'
+import 'lib/load/enviroment'
 import 'lib/load/message1'
 
 // Database provider
@@ -11,6 +7,7 @@ import 'lib/database/properties'
 // Database
 export * from 'lib/database/inventory'
 export * from 'lib/database/player'
+export * from 'lib/database/scoreboard'
 export * from 'lib/database/utils'
 
 // Command

@@ -64,11 +64,10 @@ system.runInterval(
           console.debug('schedule place', schedule.typeId, schedule.location)
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) continue
-          util.error(e)
+          console.error(e)
         }
 
         // Remove successfully placed block from the schedule array
-
         SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
       }
 

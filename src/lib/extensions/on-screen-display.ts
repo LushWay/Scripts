@@ -126,7 +126,7 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
         // @ts-expect-error AAAAAAAAAAAAAAA
         player[ScreenDisplaySymbol].setTitle(title, options)
       } catch (e) {
-        util.error(e)
+        console.error(e)
       }
 
       // Update references

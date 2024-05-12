@@ -15,7 +15,7 @@ type SmoothProps = {
 
 class SmoothTool extends BaseBrushTool<SmoothProps> {
   onBrushUse: BaseBrushTool<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
-    smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(util.error)
+    smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(console.error)
   }
 }
 
@@ -211,7 +211,7 @@ function* getBlocksAreasData(block: Block, radius: number) {
           const b = block.offset({ x, y, z })
           if (b) ({ permutation, isAir, isLiquid, isSolid } = b)
         } catch (error) {
-          util.error(error)
+          console.error(error)
         }
         const newBlockData = {
           permutation,

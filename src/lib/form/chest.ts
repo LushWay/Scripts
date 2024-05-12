@@ -130,8 +130,6 @@ export class ChestForm {
     return this
   }
 
-  /** @param {Player} player */
-
   show(player: Player) {
     const form = new ActionFormData().title(this.titleText)
     for (const button of this.buttons) {
@@ -150,6 +148,6 @@ export class ChestForm {
         if (!callback) this.show(player)
         else util.catch(() => callback(player))
       })
-      .catch(util.error)
+      .catch(console.error)
   }
 }

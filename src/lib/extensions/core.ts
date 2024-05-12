@@ -1,5 +1,4 @@
 import { Player, system, world } from '@minecraft/server'
-import { util } from 'lib/util'
 import { EventLoader, EventSignal } from '../event-signal'
 
 /** Core server features */
@@ -38,7 +37,7 @@ system.run(function waiter() {
   try {
     EventLoader.load(Core.afterEvents.worldLoad)
   } catch (e) {
-    util.error(e, { errorName: 'LoadError' })
+    console.error(e)
   }
 })
 

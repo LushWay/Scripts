@@ -63,7 +63,7 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
       if (invalidLocation(e)) {
         fail('Блок не прогружен.')
       } else {
-        util.error(e)
+        console.error(e)
         fail('Ошибка ' + util.error.message.get(e))
       }
     }

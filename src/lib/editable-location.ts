@@ -103,7 +103,7 @@ export class EditableLocation<LocationType extends LocationTypeSuperset = 'vecto
     const location = raw.trim().split(' ').map(Number)
 
     if (location.length !== this.format.trim().split(' ').length) {
-      return util.error(
+      return console.error(
         new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`),
       )
     }

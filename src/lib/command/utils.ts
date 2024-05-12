@@ -224,7 +224,7 @@ export function sendCallback(
       event.sender.warn(
         'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.',
       )
-      util.error(e)
+      console.error(e)
     }
-  })().catch(error => util.error(error))
+  })().catch(console.error)
 }

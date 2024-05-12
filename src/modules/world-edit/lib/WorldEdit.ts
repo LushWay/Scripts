@@ -111,7 +111,7 @@ export class WorldEdit {
    */
 
   failedTo(action: string, error: any) {
-    const text = util.error(error, { parseOnly: true })
+    const text = util.error(error)
     if (!text) return
     console.error(text)
     this.player.fail(`Не удалось ${action}§f: ${error}`)
@@ -388,7 +388,7 @@ export class WorldEdit {
                 !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
                 errors < 3
               )
-                util.error(e)
+                console.error(e)
 
               errors++
             }

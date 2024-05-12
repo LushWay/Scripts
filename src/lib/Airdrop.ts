@@ -137,7 +137,7 @@ export class Airdrop {
           await system.sleep(3)
         } catch (error) {
           if (invalidLocation(error)) continue
-          util.error(error)
+          console.error(error)
         }
       }
     }
@@ -212,8 +212,7 @@ system.runInterval(
             }
           }
         } catch (error) {
-          console.error('Failed to restore airdrop')
-          util.error(error)
+          console.error('Failed to restore airdrop', error)
         }
       } else if (airdrop.status === 'being looted') {
         if (airdrop.chestMinecart) findAndRemove(chestMinecarts, airdrop.chestMinecart.id)

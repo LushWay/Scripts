@@ -1,8 +1,17 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { Mail } from './mail'
 import { Rewards } from './rewards'
 
 describe('mail', () => {
+  beforeEach(() => {
+    function clear(database: Record<string, unknown>) {
+      Object.keys(database).forEach(e => Reflect.deleteProperty(database, e))
+    }
+
+    clear(Mail.dbGlobal)
+    clear(Mail.dbPlayers)
+  })
+
   it('should send mail', () => {
     Mail.send('playerId', 'Some mail', 'Content', new Rewards())
 
@@ -25,26 +34,6 @@ describe('mail', () => {
           },
         },
       ]
-    `)
-  })
-
-  it('should show milan what snapshot is', () => {
-    class Example {
-      method() {}
-      value = 'string'
-    }
-
-    class Test extends Example {}
-
-    expect(new Test()).toMatchInlineSnapshot(`
-      Test {
-        "value": "string",
-      }
-    `)
-    expect(new Example()).toMatchInlineSnapshot(`
-      Example {
-        "value": "string",
-      }
     `)
   })
 })

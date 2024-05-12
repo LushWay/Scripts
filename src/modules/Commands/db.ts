@@ -69,7 +69,7 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
   try {
     value = table[key]
   } catch (e) {
-    util.error(e)
+    console.error(e)
     value = 'a'
     failedToLoad = true
   }

@@ -13,7 +13,7 @@ import '../quests/index'
 import './guard'
 import './stats'
 
-import './death'
+import './death-quest-and-gravestone'
 import './menu'
 import './random-teleport'
 import './realtime'

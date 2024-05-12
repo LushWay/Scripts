@@ -634,7 +634,7 @@ export function WEeditBlockStatesMenu(
                 })
               }
             } catch (e) {
-              util.error(e)
+              console.error(e)
             }
 
             editStateForm.show(player)

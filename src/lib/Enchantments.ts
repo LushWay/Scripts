@@ -18,7 +18,7 @@ export class Enchantments {
 function load() {
   const status = world.overworld.runCommand('structure load CustomEnchantments ' + Vector.string(location))
 
-  if (!status) return util.error(new Error('Unable to load CustomEnchantments structure. Status: §6' + status))
+  if (!status) return console.error(new Error('Unable to load CustomEnchantments structure. Status: §6' + status))
 
   const entities = world.overworld.getEntities({
     type: DatabaseUtils.entityTypeId,
@@ -28,7 +28,7 @@ function load() {
 
   const entity = entities[0]
 
-  if (!entity) return util.error(new Error('Unable to find CustomEnchantments entity'))
+  if (!entity) return console.error(new Error('Unable to find CustomEnchantments entity'))
 
   const { container } = entity
   if (!container) return

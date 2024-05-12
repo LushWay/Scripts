@@ -125,7 +125,7 @@ const brush = new BrushTool({
           if (error instanceof LocationOutOfWorldBoundariesError || error instanceof LocationInUnloadedChunkError)
             return
 
-          util.error(error)
+          console.error(error)
         }
       } else BRUSH_LOCATORS[player.id].teleport(location)
     } else {

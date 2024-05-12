@@ -28,7 +28,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
   } catch (e) {
     if (e instanceof TypeError && e.message.match(/native handle/)) return
-    return util.error(e)
+    return console.error(e)
   }
 
   const region = Region.regionInstancesOf(RadiusRegion).find(e => e.getMemberRole(player) !== false)

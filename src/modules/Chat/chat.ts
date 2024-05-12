@@ -94,7 +94,7 @@ export class ChatBuilder {
             : message,
         )
       } catch (error) {
-        util.error(error)
+        console.error(error)
       }
     }
   }
