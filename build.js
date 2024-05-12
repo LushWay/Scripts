@@ -7,6 +7,7 @@ import path from 'path'
 
 const development = !!process.argv.find(e => e === 'dev')
 const test = !!process.argv.find(e => e === 'test')
+const world = !process.argv.find(e => e === 'world')
 const port = process.argv[3] ?? '19514'
 const outdir = 'scripts'
 const outfile = path.join(outdir, 'index.js')
@@ -29,14 +30,16 @@ const config = {
   target: 'es2020',
   sourcemap: 'linked',
 
-  define: {
-    __DEV__: `${development}`,
-    __PRODUCTION__: `${!development}`,
-    __RELEASE__: 'false',
-    __TEST__: `${test}`,
-    __SERVER__: `${true}`,
-    __SERVER_PORT__: port,
-  },
+  define: Object.fromEntries(
+    Object.entries({
+      __DEV__: development,
+      __PRODUCTION__: !development,
+      __RELEASE__: false,
+      __TEST__: test,
+      __SERVER__: !world,
+      __SERVER_PORT__: port,
+    }).map(([key, value]) => [key, typeof value === 'string' ? value : JSON.stringify(value)]),
+  ),
 
   external: [
     '@minecraft/server',
@@ -64,7 +67,7 @@ let start = Date.now()
 if (development) {
   esbuild.context(config).then(ctx => ctx.watch())
 } else {
-  esbuild.build(config).then(message)
+  esbuild.build(config)
 }
 
 let firstBuild = true
@@ -156,10 +159,18 @@ async function writeManifestJson() {
     capabilities: development || test ? ['script_eval'] : [],
   }
 
-  base.dependencies = dependencies.map(e => ({
-    module_name: e[0],
-    version: e[1],
-  }))
+  base.dependencies = dependencies
+    .filter(e => {
+      if (!!world) {
+        // net is not available on common worlds
+        if (e[0] === '@minecraft/server-net') return false
+      }
+      return true
+    })
+    .map(e => ({
+      module_name: e[0],
+      version: e[1],
+    }))
 
   await writeJSON('./manifest.json', base).catch(e => logger.error('Failed writing manifest.json file:', e))
   await packagejson.write()
