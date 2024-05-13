@@ -4,7 +4,7 @@
     "composite": true,
     "noEmit": false
   },
-  "include": ["./src", "./src/**/*.spec.ts"],
-  "exclude": ["./src/**/*.test.ts", "./src/test/framework.ts", "./src/test/loader.ts", "node_modules"],
+  "include": ["./src", "./src/test/framework.ts", "./src/test/loader.ts", "./src/**/*.test.ts"],
+  "exclude": ["./src/**/*.spec.ts", "node_modules"],
   "references": []
 }

@@ -13,7 +13,7 @@ export default defineConfig({
     alias: {
       '@minecraft/server': 'test/__mocks__/minecraft_server.ts',
     },
-    exclude: ['**/*.test.ts', 'node_modules/**'],
+    exclude: ['**/*.spec.ts', 'node_modules/**'],
   },
   plugins: [tsconfig()],
 })
