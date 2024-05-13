@@ -1,12 +1,12 @@
 import { ItemStack, Vector, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus, util } from 'lib'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 
-export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
+export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel, 1).setInfo(
   '§r§6База',
   '§7Поставьте эту бочку и она стане базой.',
 )
@@ -16,7 +16,7 @@ export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel).setInfo(
 actionGuard((_, __, ctx) => {
   if (
     (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
-    ctx.event.player.mainhand().isStackableWith(BASE_ITEM_STACK)
+    ctx.event.player.mainhand().getItem()?.is(BASE_ITEM_STACK)
   )
     return true
 })
@@ -25,7 +25,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block, faceLocation } = event
   const itemStack = player.mainhand()
   try {
-    if (!itemStack.isStackableWith(BASE_ITEM_STACK) || LockAction.locked(player)) return
+    if (!itemStack.getItem()?.is(BASE_ITEM_STACK) || LockAction.locked(player)) return
   } catch (e) {
     if (e instanceof TypeError && e.message.match(/native handle/)) return
     return console.error(e)
@@ -71,8 +71,10 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   }
 
   system.delay(() => {
+    const center = Vector.floor(block.location)
+    if (!player.isSimulated) console.log(player.name + ' created a base on ' + Vector.string(center, true))
     BaseRegion.create({
-      center: Vector.floor(Vector.add(block.location, faceLocation)),
+      center: center,
       radius: 30,
       dimensionId: block.dimension.type,
       permissions: {
@@ -83,14 +85,22 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
         owners: [player.id],
       },
     })
-    player.success('База успешно создана! Чтобы открыть меню базы используйте команду §6-base')
+    player.success('База успешно создана! Чтобы открыть меню базы используйте команду §6.base')
   })
 })
 
-const base = new Command('base').setDescription('Меню базы')
-base.executes(ctx => {
+const base = new Command('base').setDescription('Меню базы').executes(ctx => {
   openBaseMenu(ctx.player)
 })
+
+base
+  .overload('getitem')
+  .setPermissions('techAdmin')
+  .setDescription('Выдает предмет базы')
+  .executes(ctx => {
+    ctx.player.container?.addItem(BASE_ITEM_STACK)
+    ctx.reply('База выдана')
+  })
 
 system.runInterval(
   () => {
@@ -106,10 +116,7 @@ system.runInterval(
           spawnParticlesInArea(base.center, Vector.add(base.center, Vector.one))
         }
       } else {
-        base.forEachOwner(player => {
-          player.fail(`§cБаза с владельцем §f${base.ownerName}§c разрушена.`)
-        })
-
+        base.forEachOwner(player => player.fail(`§cБаза с владельцем §f${base.ownerName}§c разрушена.`))
         base.delete()
       }
     }

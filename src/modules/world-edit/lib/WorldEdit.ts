@@ -370,7 +370,7 @@ export class WorldEdit {
 
       const player = this.player
       function* fillBetweenJob() {
-        nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
+        nextBlock: for (const position of Vector.foreach(selection!.min, selection!.max)) {
           for (const replaceBlock of replaceTargets) {
             try {
               const block = world.overworld.getBlock(position)

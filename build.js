@@ -4,14 +4,33 @@ import * as esbuild from 'esbuild'
 import fs from 'fs'
 import { LeafyLogger, PackageJSON, writeJSON } from 'leafy-utils'
 import path from 'path'
+import util from 'util'
+const logger = new LeafyLogger({ prefix: 'build' })
 
-const development = !!process.argv.find(e => e === 'dev')
-const test = !!process.argv.find(e => e === 'test')
-const world = !process.argv.find(e => e === 'world')
-const port = process.argv[3] ?? '19514'
+let dev, test, world, port
+
+try {
+  const { values } = util.parseArgs({
+    args: process.argv.slice(2),
+    options: {
+      dev: { type: 'boolean' },
+      test: { type: 'boolean' },
+      world: { type: 'boolean' },
+      port: { type: 'string', default: '19514' },
+    },
+  })
+  ;({ dev, test, world, port = '19514' } = values)
+
+  if (isNaN(parseInt(port))) {
+    throw `Port must be a number, recieved '${port}'`
+  }
+} catch (e) {
+  logger.error(e instanceof Error ? e.message : e)
+  process.exit(1)
+}
+
 const outdir = 'scripts'
 const outfile = path.join(outdir, 'index.js')
-const logger = new LeafyLogger({ prefix: 'build' })
 
 try {
   fs.rmSync(outdir, { force: true, recursive: true })
@@ -32,12 +51,12 @@ const config = {
 
   define: Object.fromEntries(
     Object.entries({
-      __DEV__: development,
-      __PRODUCTION__: !development,
+      __DEV__: dev,
+      __PRODUCTION__: !dev,
       __RELEASE__: false,
       __TEST__: test,
       __SERVER__: !world,
-      __SERVER_PORT__: port,
+      __SERVER_PORT__: Number(port),
     }).map(([key, value]) => [key, typeof value === 'string' ? value : JSON.stringify(value)]),
   ),
 
@@ -64,7 +83,7 @@ const config = {
 
 let start = Date.now()
 
-if (development) {
+if (dev) {
   esbuild.context(config).then(ctx => ctx.watch())
 } else {
   esbuild.build(config)
@@ -72,11 +91,13 @@ if (development) {
 
 let firstBuild = true
 function message() {
-  const mode = development ? 'development' : test ? 'test' : 'production'
+  const mode = dev ? 'development' : test ? 'test' : 'production'
   const time = `in ${Date.now() - start}ms`
   if (firstBuild) {
-    if (development) {
-      logger.success('Started esbuild in dev mode! Edit src and it will autobuild and reload!')
+    if (dev) {
+      logger.success(
+        `Started esbuild in dev mode! Edit src and it will autobuild and reload!${test ? ' Test build is enabled.' : ''} HTTP port: ${port}`,
+      )
     } else {
       logger.info(`Built for ${mode} ${time}`)
     }
@@ -84,7 +105,7 @@ function message() {
     firstBuild = false
   } else {
     logger.info(`Rebuild for ${mode} ${time}`)
-    if (development && process.send) {
+    if (dev && process.send) {
       process.send('reload')
     }
   }
@@ -156,7 +177,7 @@ async function writeManifestJson() {
         version: '1.0.0-beta',
       },
     ],
-    capabilities: development || test ? ['script_eval'] : [],
+    capabilities: dev || test ? ['script_eval'] : [],
   }
 
   base.dependencies = dependencies

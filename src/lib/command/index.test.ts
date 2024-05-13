@@ -12,21 +12,15 @@ suite('lib.command', () => {
     const player = test.spawnSimulatedPlayer({ x: 0, y: 0, z: 0 })
 
     player.chat('.cmd')
-    await test.idle(10)
-
-    test.assert(player.hasTag(success), 'executing the command failed')
-    test.succeed()
+    test.succeedWhen(() => test.assert(player.hasTag(success), 'command was not executed'))
   })
 
   test('overloads', async test => {
     const player = test.player()
 
     command.overload('overload').executes(addsSuccessTag)
-    player.chat('.cmd overloadf')
-    await test.idle(10)
-
-    test.assert(player.hasTag(success), 'executing the command failed')
-    test.succeed()
+    player.chat('.cmd overload')
+    test.succeedWhen(() => test.assert(player.hasTag(success), 'command was not executed'))
   })
 
   test('alias', async test => {
@@ -34,12 +28,7 @@ suite('lib.command', () => {
 
     command.setAliases('alias1', 'alias2')
     player.chat('.alias1')
-    await test.idle(10)
-
-    test.print('Test print')
-
-    test.assert(player.hasTag(success), 'executing the command failed')
-    test.succeed()
+    test.succeedWhen(() => test.assert(player.hasTag(success), 'command was not executed'))
   })
 
   test('permission', async test => {
@@ -47,9 +36,6 @@ suite('lib.command', () => {
 
     new Command('cmdw').setPermissions(() => false).executes(addsSuccessTag)
     player.chat('.cmdw')
-    await test.idle(10)
-
-    test.assert(!player.hasTag(success), 'executing the command failed')
-    test.succeed()
+    test.succeedWhen(() => test.assert(!player.hasTag(success), 'command was executed even with wrong permissions'))
   })
 })

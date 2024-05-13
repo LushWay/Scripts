@@ -29,7 +29,7 @@ import { Rewards } from 'lib/rewards'
 import { BASE_ITEM_STACK } from 'modules/places/base/base'
 import { Mineshaft } from 'modules/places/mineshaft/mineshaft'
 import './enchant'
-import './simulatedPlayer'
+// import './simulatedPlayer'
 
 // There you can create simple one time tests taht will be run using .test <name> command
 //

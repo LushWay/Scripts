@@ -5,7 +5,7 @@ class RequestError extends Error {}
 
 declare global {
   // eslint-disable-next-line no-var, @typescript-eslint/naming-convention
-  var __PORT__: string
+  var __SERVER_PORT__: string
 }
 
 /** Makes http request to node instance */
@@ -21,7 +21,7 @@ export async function request<Path extends keyof BDS.Routes>(
     const { http, HttpRequest, HttpRequestMethod } = BDS.ServerNet
 
     const response = await http.request(
-      new HttpRequest(`http://localhost:${__PORT__}/` + path)
+      new HttpRequest(`http://localhost:${__SERVER_PORT__}/` + path)
         .setMethod(HttpRequestMethod.Post)
         .addHeader('content-type', 'text/plain')
         .addHeader('content-length', sbody.length.toString())
