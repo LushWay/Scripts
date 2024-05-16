@@ -1,7 +1,13 @@
 import { Player, world } from '@minecraft/server'
 
 const id = (player: Player | string) => (player instanceof Player ? player.id : player)
-const removePlayerFromMapsOnLeave: Pick<Map<string, unknown>, 'has' | 'delete'>[] = []
+const onlineWeakMaps: Pick<Map<string, unknown>, 'has' | 'delete'>[] = []
+
+world.afterEvents.playerLeave.subscribe(({ playerId }) => {
+  for (const map of onlineWeakMaps) {
+    if (map.has(playerId)) map.delete(playerId)
+  }
+})
 
 export class WeakPlayerMap<T> extends Map<string, T> {
   /**
@@ -10,9 +16,9 @@ export class WeakPlayerMap<T> extends Map<string, T> {
    * @param options - Options
    * @param options.removeOnLeave - Whenether to remove player from map when it leavs
    */
-  constructor(private options: { removeOnLeave: boolean }) {
+  constructor(options: { removeOnLeave: boolean }) {
     super()
-    if (options.removeOnLeave) removePlayerFromMapsOnLeave.push(this)
+    if (options.removeOnLeave) onlineWeakMaps.push(this)
   }
 
   get(player: Player | string) {
@@ -41,7 +47,7 @@ export class WeakPlayerMap<T> extends Map<string, T> {
 export class WeakOnlinePlayerMap<T> extends Map<string, { value: T; player: Player }> {
   constructor() {
     super()
-    removePlayerFromMapsOnLeave.push(this)
+    onlineWeakMaps.push(this)
   }
 
   get(player: Player | string) {
@@ -70,9 +76,3 @@ export class WeakOnlinePlayerMap<T> extends Map<string, { value: T; player: Play
     return super.delete(id(player))
   }
 }
-
-world.afterEvents.playerLeave.subscribe(({ playerId }) => {
-  for (const map of removePlayerFromMapsOnLeave) {
-    if (map.has(playerId)) map.delete(playerId)
-  }
-})

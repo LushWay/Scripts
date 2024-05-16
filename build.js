@@ -13,14 +13,15 @@ try {
   const { values } = util.parseArgs({
     args: process.argv.slice(2),
     options: {
-      dev: { type: 'boolean' },
-      test: { type: 'boolean' },
-      world: { type: 'boolean' },
-      port: { type: 'string', default: '19514' },
+      dev: { type: 'boolean', default: false },
+      test: { type: 'boolean', default: false },
+      world: { type: 'boolean', default: false },
+      port: { type: 'string' },
     },
   })
-  ;({ dev, test, world, port = '19514' } = values)
+  ;({ dev, test, world, port } = values)
 
+  if (!port) port = '19514'
   if (isNaN(parseInt(port))) {
     throw `Port must be a number, recieved '${port}'`
   }
@@ -56,7 +57,7 @@ const config = {
       __RELEASE__: false,
       __TEST__: test,
       __SERVER__: !world,
-      __SERVER_PORT__: Number(port),
+      __SERVER_PORT__: port,
     }).map(([key, value]) => [key, typeof value === 'string' ? value : JSON.stringify(value)]),
   ),
 
@@ -96,7 +97,7 @@ function message() {
   if (firstBuild) {
     if (dev) {
       logger.success(
-        `Started esbuild in dev mode! Edit src and it will autobuild and reload!${test ? ' Test build is enabled.' : ''} HTTP port: ${port}`,
+        `Started esbuild in dev mode! Edit src and it will autobuild and reload!${test ? ' Test build is enabled.' : ''}`,
       )
     } else {
       logger.info(`Built for ${mode} ${time}`)

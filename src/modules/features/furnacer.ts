@@ -25,11 +25,8 @@ export class Furnacer {
   /** Item representing key for using furnace */
   keyItem = new ItemStack(MinecraftItemTypes.TripwireHook).setInfo('§6Ключ от печки', '§7Ключ от печки в технограде')
 
-  /**
-   * // TODO Add multiple key levels
-   *
-   * @type {ItemStack[]}
-   */
+  // TODO Add multiple key levels
+  /** @type {ItemStack[]} */
   keyItemLevels: ItemStack[] = []
 
   /**
@@ -75,14 +72,11 @@ export class Furnacer {
 
 actionGuard((player, region, ctx) => {
   // Not our event
-
   if (ctx.type !== 'interactWithBlock') return
+  if (region !== StoneQuarry.safeArea) return
 
-  const furnaceer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))
-  if (!furnaceer) return
-
-  if (region !== StoneQuarry.safeArea) {
-  }
+  const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))
+  if (!furnacer) return
 
   // Restrictions
   const notAllowed = (message = 'Для использования печек вам нужно купить ключ у печкина или взять его в руки!') => {
@@ -92,7 +86,7 @@ actionGuard((player, region, ctx) => {
 
   if (!ctx.event.itemStack) return notAllowed()
 
-  if (ctx.event.itemStack.typeId !== furnaceer.keyItem.typeId) return notAllowed()
+  if (ctx.event.itemStack.typeId !== furnacer.keyItem.typeId) return notAllowed()
 
   const lore = FurnaceKeyItem.parseLore(ctx.event.itemStack.getLore())
   if (!lore) return notAllowed()

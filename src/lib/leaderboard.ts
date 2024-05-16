@@ -22,6 +22,7 @@ export class Leaderboard {
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
     if (scoreboardId.endsWith('Time')) {
       const time = util.ms.remaining(score, { converters: ['ms', 'sec', 'min', 'hour'] })
+
       return `${time.value} ${time.type}`
     } else if (scoreboardId.endsWith('Date')) {
       return new Date(score * 1000).format()

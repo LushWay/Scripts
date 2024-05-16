@@ -5,7 +5,7 @@ import { LootTable } from 'lib/loot-table'
 import { Region } from 'lib/region/index'
 import { table } from './database/abstract'
 import { EditableLocation } from './editable-location'
-import { chunkIsUnloaded } from './game-utils'
+import { isChunkUnloaded } from './game-utils'
 import { BossArenaRegion } from './region/kinds/BossArenaRegion'
 
 type BossDB = {
@@ -114,7 +114,7 @@ export class Boss {
 
   check() {
     if (!this.location.valid) return
-    if (chunkIsUnloaded({ dimensionId: this.dimensionId, location: this.location })) return
+    if (isChunkUnloaded({ dimensionId: this.dimensionId, location: this.location })) return
 
     const db = Boss.db[this.name]
     if (db) {

@@ -1,8 +1,7 @@
 import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Temporary, chunkIsUnloaded } from 'lib'
-import { util } from 'lib/util'
+import { Temporary, isChunkUnloaded } from 'lib'
 import { EditableLocation } from './editable-location'
 
 export type EditableNpcProps = ConstructorParameters<typeof EditableNpc>[0]
@@ -127,7 +126,7 @@ system.runInterval(
       const location = npc.location
       if (!location.valid) return
 
-      if (chunkIsUnloaded({ dimensionId: npc.dimensionId, location })) return
+      if (isChunkUnloaded({ dimensionId: npc.dimensionId, location })) return
 
       const npcs = (cache[npc.dimensionId] ??= world[npc.dimensionId]
         .getEntities({

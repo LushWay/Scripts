@@ -12,18 +12,20 @@ import {
 
 import { MinecraftBlockTypes, MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 
-/**
- * Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it
- *
- * @param {object} o - Options
- * @param {Vector3} o.location - Location to check
- * @param {Dimensions} o.dimensionId - Dimensions to check
- * @returns - Block on location
- */
-export function blockStatus({ location, dimensionId }: { location: Vector3; dimensionId: Dimensions }) {
+/** Represents location in the specific dimension */
+interface LocationInDimension {
+  /** Location of the place */
+  location: Vector3
+  /** Dimension of the location */
+  dimensionId: Dimensions
+}
+
+/** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
+export function getBlockStatus({ location, dimensionId }: LocationInDimension) {
   try {
     const block = world[dimensionId]?.getBlock(location)
     if (!block || !block.isValid()) return 'unloaded'
+
     return block
   } catch (e) {
     if (e instanceof LocationInUnloadedChunkError) return 'unloaded'
@@ -31,28 +33,21 @@ export function blockStatus({ location, dimensionId }: { location: Vector3; dime
   }
 }
 
-/**
- * Checks if chunks is loaded (e.g. we can operate with blocks/entities on it)
- *
- * @param {Parameters<typeof blockStatus>[0]} options
- */
-export function chunkIsUnloaded(options: Parameters<typeof blockStatus>[0]) {
-  return blockStatus(options) === 'unloaded'
+/** Checks if chunks is loaded (e.g. we can operate with blocks/entities on it) */
+export function isChunkUnloaded(options: LocationInDimension) {
+  return getBlockStatus(options) === 'unloaded'
 }
 
 /**
- * Checks if provided error is location in unloaded chunk or out of world bounds error
- *
- * @param {unknown} error
- * @returns {error is LocationInUnloadedChunkError | LocationOutOfWorldBoundariesError}
+ * Checks if provided object is instance of {@link LocationInUnloadedChunkError} or
+ * {@link LocationOutOfWorldBoundariesError}
  */
-export function invalidLocation(
+export function isInvalidLocation(
   error: unknown,
 ): error is LocationInUnloadedChunkError | LocationOutOfWorldBoundariesError {
   return error instanceof LocationInUnloadedChunkError || error instanceof LocationOutOfWorldBoundariesError
 }
 
-/** @param {Player} player */
 export function restorePlayerCamera(player: Player, animTime = 1) {
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
     location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 0.3)),
@@ -96,10 +91,8 @@ export function typeIdToReadable(typeId: string) {
  * Gets localization name of the ItemStack
  *
  * @example
- *   ;```js
  *   const apple = new ItemStack(MinecraftItemTypes.Apple)
  *   itemLocaleName(apple) // %item.apple.name
- *   ```
  */
 export function itemLocaleName(item: Pick<ItemStack, 'typeId'>) {
   let id = item.typeId.replace('minecraft:', '')

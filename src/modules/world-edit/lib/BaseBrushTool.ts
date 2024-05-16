@@ -1,5 +1,5 @@
 import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
-import { invalidLocation, util } from 'lib'
+import { isInvalidLocation, util } from 'lib'
 import { WE_PLAYER_SETTINGS } from 'modules/world-edit/settings'
 import { WorldEditTool } from './WorldEditTool'
 
@@ -60,7 +60,7 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
     try {
       this.onBrushUse(player, lore, hit)
     } catch (e) {
-      if (invalidLocation(e)) {
+      if (isInvalidLocation(e)) {
         fail('Блок не прогружен.')
       } else {
         console.error(e)

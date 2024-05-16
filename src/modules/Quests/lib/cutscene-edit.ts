@@ -1,7 +1,7 @@
 import { Container, ItemStack, MolangVariableMap, Player, Vector } from '@minecraft/server'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Temporary, invalidLocation, util } from 'lib'
+import { Cooldown, Temporary, isInvalidLocation, util } from 'lib'
 import { CONFIG } from 'lib/assets/config'
 import { Cutscene } from './cutscene'
 
@@ -129,7 +129,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
       try {
         player.dimension.spawnParticle('minecraft:wax_particle', point, vars)
       } catch (e) {
-        if (invalidLocation(e)) return
+        if (isInvalidLocation(e)) return
 
         if (e instanceof TypeError && e.message.includes('Native optional type conversion')) return
         console.error(e)

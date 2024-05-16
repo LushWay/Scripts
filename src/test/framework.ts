@@ -31,19 +31,19 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
 
   const className = classNameGlobal
   const fullname = className + ':' + should
+  const filename = util.error.stack.get(1)?.split('\n')?.[0]?.trim() ?? 'unknown file'
   return gametest
     .registerAsync(className, should, async test => {
       const history: string[] = []
       try {
         const Etest = expandTest(test, history, fullname)
         await testFunction(Etest)
-        console.log(`§f§l§G PASS §r ${util.error.stack.get(2).split('\n')[1]} > §f${fullname}`)
-
+        console.log(`§f§l§G PASS §r ${filename} > §f${fullname}`)
         try {
-          Etest.succeed()
+          // Etest.succeed()
         } catch {}
       } catch (error) {
-        let info = `§f§l§R FAIL §r ${util.error.stack.get(2).split('\n')[1]} > §f${fullname}\n`
+        let info = `§f§l§R FAIL §r ${filename} > §f${fullname}\n`
 
         const stringHistory = history
           .concat(util.error(error))
@@ -55,7 +55,7 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
         console.log(info)
         test.print(`§c§lFAIL§r §f${fullname}\n` + stringHistory)
 
-        test.fail(util.error(error).replaceAll('§f', '§0'))
+        test.fail(util.error(error).replaceAll('§f', '§7'))
       }
     })
     .structureName(TestStructures.empty)

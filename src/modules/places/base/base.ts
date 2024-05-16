@@ -1,7 +1,7 @@
 import { ItemStack, Vector, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, blockStatus } from 'lib'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, getBlockStatus } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
@@ -109,8 +109,9 @@ system.runInterval(
     })
 
     for (const base of Region.regionInstancesOf(BaseRegion)) {
-      const block = blockStatus({ location: base.center, dimensionId: base.dimensionId })
-      if (!block || block === 'unloaded') continue
+      const block = getBlockStatus({ location: base.center, dimensionId: base.dimensionId })
+      if (block === 'unloaded') continue
+
       if (block.typeId === MinecraftBlockTypes.Barrel) {
         if (playersLocations.find(e => e.dimension === base.dimensionId && Vector.distance(base.center, e.loc) < 10)) {
           spawnParticlesInArea(base.center, Vector.add(base.center, Vector.one))

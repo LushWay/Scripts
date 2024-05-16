@@ -2,7 +2,7 @@ import { Entity, Vector, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib/region/index'
 import { table } from './database/abstract'
-import { invalidLocation } from './game-utils'
+import { isInvalidLocation } from './game-utils'
 import { LootTable } from './loot-table'
 import { Temporary } from './temporary'
 
@@ -134,7 +134,7 @@ export class Airdrop {
           world.overworld.spawnParticle('minecraft:balloon_gas_particle', { x, y, z })
           await system.sleep(3)
         } catch (error) {
-          if (invalidLocation(error)) continue
+          if (isInvalidLocation(error)) continue
           console.error(error)
         }
       }

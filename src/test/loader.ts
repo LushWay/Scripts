@@ -1,9 +1,10 @@
 import 'modules/loader'
 import './framework'
 
-import 'lib/bds/api.test'
-import 'lib/command/index.test'
-import 'modules/places/base/base.test'
-import 'modules/survival/death-quest-and-gravestone.test'
+import 'lib/bds/api.spec'
+import 'lib/command/index.spec'
+import 'lib/temporary.spec'
+import 'modules/places/base/base.spec'
+import 'modules/survival/death-quest-and-gravestone.spec'
 
 import 'lib/load/message2'

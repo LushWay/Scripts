@@ -3,7 +3,7 @@ import { suite, test } from 'test/framework'
 import './index'
 
 const success = 'success'
-const addsSuccessTag = (ctx: CommandContext) => ctx.player.addTag(success)
+const addsSuccessTag = (ctx: CommandContext) => ctx.player.isValid() && ctx.player.addTag(success)
 
 const command = new Command('cmd').setPermissions('everybody').executes(addsSuccessTag)
 
