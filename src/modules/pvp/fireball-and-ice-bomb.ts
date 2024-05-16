@@ -1,7 +1,7 @@
-import { Entity, Vector, system, world } from '@minecraft/server'
+import { Entity, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { Vector, util } from 'lib'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 // TODO Make custom items and throw effects work properly
 // may use projectileComponent in 1.9.0-beta
@@ -27,7 +27,7 @@ import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 //   })
 // })
 
-world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
+world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
     if (!event.entity.isValid()) return
     if (event.entity.typeId !== 'sm:fireball') {
@@ -37,8 +37,6 @@ world.beforeEvents.dataDrivenEntityTriggerEvent.subscribe(
         } catch {}
       })
     }
-
-    event.cancel = true
 
     const location = event.entity.location
     const dimension = event.entity.dimension

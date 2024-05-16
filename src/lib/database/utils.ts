@@ -1,7 +1,7 @@
-import { Entity, Vector, system, world } from '@minecraft/server'
-import { util } from '../util'
+import { BlockVolume, Entity, StructureSaveMode, system, world } from '@minecraft/server'
+import { Vector } from 'lib/vector'
 
-type TableEntity = {
+interface TableEntity {
   entity: Entity
   tableName: string
   tableType: string
@@ -51,6 +51,8 @@ export class DatabaseUtils {
       .filter(e => e.tableName !== 'NOTDB')
   }
 
+  private static readonly tablesDimension = world.overworld
+
   private static tables(): TableEntity[] {
     if (this.allEntities) return this.allEntities
     this.allEntities = this.getEntities()
@@ -67,9 +69,7 @@ export class DatabaseUtils {
 
         .forEach(e => e.remove())
 
-      world.overworld.runCommand(
-        `structure load ${DatabaseUtils.backupName} ${Vector.string(DatabaseUtils.entityLocation)}`,
-      )
+      world.structureManager.place(this.backupName, this.tablesDimension, this.entityLocation)
       this.allEntities = this.getEntities()
 
       if (this.allEntities.length < 1) {
@@ -82,7 +82,7 @@ export class DatabaseUtils {
   }
 
   /** Creates a table entity that is used for data storage */
-  static createTableEntity(tableType: string, tableName: string, index: number = 0): Entity {
+  static createTableEntity(tableType: string, tableName: string, index = 0): Entity {
     const entity = world.overworld.spawnEntity(DatabaseUtils.entityTypeId, DatabaseUtils.entityLocation)
 
     entity.setDynamicProperty('tableName', tableName)
@@ -105,11 +105,7 @@ export class DatabaseUtils {
     }
   }
 
-  static backupName = 'database'
-
-  static backupLocation = __TEST__ ? '' : Vector.string(this.entityLocation)
-
-  static backupCommand = `structure save ${this.backupName} ${this.backupLocation} ${this.backupLocation} true disk false`
+  static backupName = 'mystructure:database'
 
   private static waitingForBackup = false
 
@@ -119,7 +115,13 @@ export class DatabaseUtils {
     system.runTimeout(
       () => {
         this.waitingForBackup = false
-        world.overworld.runCommand(this.backupCommand)
+        world.structureManager.delete(this.backupName)
+        world.structureManager.createFromWorld(
+          this.backupName,
+          this.tablesDimension,
+          new BlockVolume(this.entityLocation, this.entityLocation),
+          { includeBlocks: false, includeEntities: true, saveMode: StructureSaveMode.World },
+        )
       },
       'database backup',
       200,

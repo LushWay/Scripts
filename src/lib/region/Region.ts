@@ -8,7 +8,7 @@ import { RegionDatabase } from './database'
 export type RegionPlayerRole = 'owner' | 'member' | false
 
 /** Permissions of the region */
-export interface RegionPermissions {
+export interface RegionPermissions extends JsonObject {
   /** If the player can use chests, defualt: true */
   doorsAndSwitches: boolean
   /** If the player can use doors, default: true */

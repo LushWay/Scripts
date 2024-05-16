@@ -1,4 +1,5 @@
-import { EasingType, Player, Vector, system } from '@minecraft/server'
+import { EasingType, Player, system } from '@minecraft/server'
+import { Vector } from 'lib'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { restorePlayerCamera } from 'lib'
@@ -11,7 +12,7 @@ import { table } from 'lib/database/abstract'
 type Point = Vector5
 
 /** Single cutscene section that contains points and information about easing/animation time */
-type Section = {
+interface Section {
   points: Point[]
   step: number
   easeType?: EasingType
@@ -22,7 +23,7 @@ type Section = {
 type Sections = (undefined | Section)[]
 
 /** Controller used to abort playing cutscene animation */
-type AbortController = { cancel: boolean }
+interface AbortController { cancel: boolean }
 
 export class Cutscene {
   /** Database containing Cutscene trail points */

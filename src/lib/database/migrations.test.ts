@@ -6,7 +6,7 @@ import { migration } from './migrations'
 describe('migrations', () => {
   it('should rename database keys after delay', () => {
     const database = table<{ newkey: string }>('testdatabase', () => ({ newkey: '' }))
-    ;(database['key1'] as any).oldkey = 'some value'
+    ;(database['key1'] as { newkey: string; oldkey: string }).oldkey = 'some value'
 
     migration('test migration', () => {
       Object.entries(database as Record<string, { newkey: string; oldkey?: string }>).forEach(([key, value]) => {

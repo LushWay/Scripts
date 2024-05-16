@@ -133,8 +133,8 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
     label: string,
     minimumValue: number,
     maximumValue: number,
-    valueStep: number = 1,
-    defaultValue: number = 0,
+    valueStep = 1,
+    defaultValue = 0,
   ): ModalForm<AppendFormField<Callback, number>> {
     this.args.push({ type: 'slider' })
     this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue)

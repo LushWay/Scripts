@@ -13,7 +13,7 @@ type SettingValue = string | boolean | number | DropdownSetting[]
 
 export const SETTINGS_GROUP_NAME = Symbol('name')
 
-type GroupNameObject = { [SETTINGS_GROUP_NAME]?: string }
+interface GroupNameObject { [SETTINGS_GROUP_NAME]?: string }
 
 export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
   string,
@@ -40,7 +40,8 @@ export type SettingsConfigParsed<T extends SettingsConfig> = {
   [K in keyof T]: toPlain<T[K]['value']>
 }
 
-export type SettingsDatabase = Record<string, Record<string, SettingValue>>
+export type SettingsDatabaseValue = Record<string, SettingValue>
+export type SettingsDatabase = Record<string, SettingsDatabaseValue>
 
 export type PlayerSettingValues = boolean | string | number | DropdownSetting[]
 
@@ -49,7 +50,7 @@ type WorldSettingsConfig = SettingsConfig<SettingValue> & Record<string, { requi
 export class Settings {
   /** Creates typical settings database */
   private static createDatabase(name: string) {
-    return table<Record<string, SettingValue>>(name, () => ({}))
+    return table<SettingsDatabaseValue>(name, () => ({}))
   }
 
   static playerDatabase = this.createDatabase('playerOptions')
@@ -73,22 +74,21 @@ export class Settings {
   ): (player: Player) => SettingsConfigParsed<Config> {
     config[SETTINGS_GROUP_NAME] = name
 
-    this.insertGroup(
-      'playerMap',
-      groupName,
-      // @ts-expect-error aaaaaaaaaa
-      config,
-    )
+    this.insertGroup('playerMap', groupName, config as Config)
 
     const cache = new WeakPlayerMap({ removeOnLeave: true })
 
-    // @ts-expect-error aaaaaaaaaa
     return player => {
       const cached = cache.get(player)
       if (cached) {
-        return cached
+        return cached as SettingsConfigParsed<Config>
       } else {
-        const settings = this.parseConfig(Settings.playerDatabase, groupName, this.playerMap[groupName], player)
+        const settings = this.parseConfig(
+          Settings.playerDatabase,
+          groupName,
+          this.playerMap[groupName] as Config,
+          player,
+        )
         cache.set(player, settings)
         return settings
       }
@@ -112,15 +112,8 @@ export class Settings {
     groupName: string,
     config: Narrow<Config> & GroupNameObject,
   ): SettingsConfigParsed<Config> {
-    this.insertGroup(
-      'worldMap',
-      groupName,
-      // @ts-expect-error aaaaaaaaaa
-      config,
-    )
-
-    // @ts-expect-error aaaaaaaaaaaaaaaaa
-    return this.parseConfig(Settings.worldDatabase, groupName, this.worldMap[groupName])
+    this.insertGroup('worldMap', groupName, config as Config)
+    return this.parseConfig(Settings.worldDatabase, groupName, this.worldMap[groupName] as Config)
   }
 
   private static insertGroup<Config extends SettingsConfig>(
@@ -149,12 +142,12 @@ export class Settings {
    * @param player - The player object.
    * @returns An object with getters and setters
    */
-  static parseConfig(
+  static parseConfig<T extends SettingsConfig>(
     database: SettingsDatabase,
     groupName: string,
-    config: SettingsConfig,
+    config: T,
     player: Player | null = null,
-  ): Record<string, any> {
+  ) {
     const settings = {}
 
     for (const prop in config) {
@@ -175,13 +168,9 @@ export class Settings {
       })
     }
 
-    return settings
+    return settings as SettingsConfigParsed<T>
   }
 
-  /**
-   * @param {SettingValue} v
-   * @returns {v is DropdownSetting[]}
-   */
   static isDropdown(v: SettingValue): v is DropdownSetting[] {
     return (
       Array.isArray(v) &&
@@ -237,7 +226,7 @@ export function settingsGroupMenu(
 
     if (isToggle) {
       form.addToggle(label, value)
-    } else if (Settings.isDropdown(setting.value)) {
+    } else if (Settings.isDropdown(setting.value) && typeof value === 'number') {
       form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValueIndex: value })
     } else {
       const isString = typeof value === 'string'

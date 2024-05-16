@@ -1,4 +1,4 @@
-import { system } from '@minecraft/server'
+import { StructureRotation, system } from '@minecraft/server'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
@@ -36,7 +36,7 @@ const clipboard = new WorldEditTool({
     const we = WorldEdit.forPlayer(player)
 
     if (we.currentCopy) {
-      const { pastePos1, pastePos2 } = we.pastePositions(0, we.currentCopy)
+      const { pastePos1, pastePos2 } = we.pastePositions(StructureRotation.None, we.currentCopy)
       system.delay(() => spawnParticlesInArea(pastePos1, pastePos2))
       player.onScreenDisplay.setActionBar(
         `Используйте предмет чтобы\n${

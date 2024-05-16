@@ -11,7 +11,7 @@ declare module '@minecraft/server-gametest' {
     player(): ExtendedSimulatedPlayer
   }
 
-  interface ExtendedSimulatedPlayer extends SimulatedPlayer {}
+  type ExtendedSimulatedPlayer = SimulatedPlayer
 }
 
 function formatRawText(e: RawMessage | string) {
@@ -70,9 +70,7 @@ function expandTest(test: gametest.Test, history: string[], fullname: string) {
 
     spawnSimulatedPlayer(location, name, gameMode) {
       const player = super.spawnSimulatedPlayer(location, name, gameMode)
-      const test = this
-
-      expandPlayer(player, test)
+      expandPlayer(player, this)
 
       return player
     },

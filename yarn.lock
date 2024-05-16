@@ -709,56 +709,56 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@minecraft/server-admin@npm:^1.0.0-beta.1.20.60-stable":
+"@minecraft/server-admin@npm:^1.0.0-beta.1.20.80-stable":
   version: 1.0.0-beta.release.1.19.50
   resolution: "@minecraft/server-admin@npm:1.0.0-beta.release.1.19.50"
   checksum: 10c0/81e3b467411c086e21ed29bbc7b73c03db15dd7072aaa344fa4f936a6f1fc7cbce1dcadc68dea8df4e48028367f5d885b3d2ec3904ecab397be404c5ff9ecc51
   languageName: node
   linkType: hard
 
-"@minecraft/server-gametest@npm:1.0.0-beta.1.20.60-stable":
-  version: 1.0.0-beta.1.20.60-stable
-  resolution: "@minecraft/server-gametest@npm:1.0.0-beta.1.20.60-stable"
+"@minecraft/server-gametest@npm:1.0.0-beta.1.20.80-stable":
+  version: 1.0.0-beta.1.20.80-stable
+  resolution: "@minecraft/server-gametest@npm:1.0.0-beta.1.20.80-stable"
   dependencies:
     "@minecraft/common": "npm:^1.0.0"
     "@minecraft/server": "npm:^1.8.0"
-  checksum: 10c0/02b4d82b280a6a75ec63367c7779fdf93a66c3511630943d4d10ae689ba2a7cc569fc6968b75f97285ac1d87f63cc061dfd92a13eb799af155c7ca8a2278f96f
+  checksum: 10c0/2e64b996bc63ef5857adfc498dc922d342473c4a9d6e70e03a5b30f03b1c6ed96a1dba1910f6158a20052240be3689735dd266442a254c97aa23fde5a8f0a892
   languageName: node
   linkType: hard
 
-"@minecraft/server-net@npm:1.0.0-beta.1.20.60-stable":
-  version: 1.0.0-beta.1.20.60-stable
-  resolution: "@minecraft/server-net@npm:1.0.0-beta.1.20.60-stable"
+"@minecraft/server-net@npm:1.0.0-beta.1.20.80-stable":
+  version: 1.0.0-beta.1.20.80-stable
+  resolution: "@minecraft/server-net@npm:1.0.0-beta.1.20.80-stable"
   dependencies:
     "@minecraft/common": "npm:^1.0.0"
-    "@minecraft/server-admin": "npm:^1.0.0-beta.1.20.60-stable"
-  checksum: 10c0/5b601629c833eca8acfb207b3c07322878dc85507c28ad093c66416b7612704a2dfa74e0bc21c5faa5ce2508470280a39f35715324afc3408169f97d7451161a
+    "@minecraft/server-admin": "npm:^1.0.0-beta.1.20.80-stable"
+  checksum: 10c0/08cfa885d42aae5771514fdb7a6610708af1bff30680efb8eafe460f6b83fff17da1d70259cfb3b30268749af4da246c2573cc9620d95801fdbfd1cfee39663e
   languageName: node
   linkType: hard
 
-"@minecraft/server-ui@npm:1.2.0-beta.1.20.60-stable":
-  version: 1.2.0-beta.1.20.60-stable
-  resolution: "@minecraft/server-ui@npm:1.2.0-beta.1.20.60-stable"
+"@minecraft/server-ui@npm:1.2.0-beta.1.20.80-stable":
+  version: 1.2.0-beta.1.20.80-stable
+  resolution: "@minecraft/server-ui@npm:1.2.0-beta.1.20.80-stable"
   dependencies:
     "@minecraft/common": "npm:^1.0.0"
     "@minecraft/server": "npm:^1.8.0"
-  checksum: 10c0/ea53c14443a6a4b8a2c17a0f7b4899e7e49dcb8699f830f8c0724aadb9f363f02961279ab213c15c9b6c304485c3330b3b559734e26877a876c5c48d2888db09
+  checksum: 10c0/387df48e4136ce8f141ce64a3bb7b298dc4506edad814d2b02319b065055835570dfaec29256fea2ed66cd75522f4ddaa2c987b9f5dd5d81892efea3e4c9ce90
   languageName: node
   linkType: hard
 
-"@minecraft/server@npm:1.9.0-beta.1.20.60-stable":
-  version: 1.9.0-beta.1.20.60-stable
-  resolution: "@minecraft/server@npm:1.9.0-beta.1.20.60-stable"
+"@minecraft/server@npm:1.11.0-beta.1.20.80-stable":
+  version: 1.11.0-beta.1.20.80-stable
+  resolution: "@minecraft/server@npm:1.11.0-beta.1.20.80-stable"
   dependencies:
     "@minecraft/common": "npm:^1.1.0"
-  checksum: 10c0/64f4dd1f4f2c338086afc62d05ab5be318d815a24ccbf4e50e78cd3a51edc84fb779244939b857e74673e368e9416f38da7e3bfe7622761aadb4c8d4c8ae7198
+  checksum: 10c0/d88a4d5e950218193e627f1e905f016b2cfa38356cafb90807c70c82226a11b6d1ee456d1da40f6c5cfd779c10c4bb86b57ae4edc6a082105eb5d45e8330c90c
   languageName: node
   linkType: hard
 
-"@minecraft/vanilla-data@npm:1.20.60":
-  version: 1.20.60
-  resolution: "@minecraft/vanilla-data@npm:1.20.60"
-  checksum: 10c0/510fe7459666dbfc2d59467616600917fc196a3f4b7ecf0a2c742c70466ab9d8ddc2bfd761e194b632729566853874017a25dd0e1b51785553063f7cf7cdee85
+"@minecraft/vanilla-data@npm:1.20.80":
+  version: 1.20.80
+  resolution: "@minecraft/vanilla-data@npm:1.20.80"
+  checksum: 10c0/e9b5df6b38d176385b759a61910af499492b67a34b589ddea5a4b335ab76aae91d6f0aa3f446a745b6fadd00a61c4d0c5c09f3280b74c6cace727cf45749d8e4
   languageName: node
   linkType: hard
 
@@ -3986,11 +3986,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "scripts@workspace:."
   dependencies:
-    "@minecraft/server": "npm:1.9.0-beta.1.20.60-stable"
-    "@minecraft/server-gametest": "npm:1.0.0-beta.1.20.60-stable"
-    "@minecraft/server-net": "npm:1.0.0-beta.1.20.60-stable"
-    "@minecraft/server-ui": "npm:1.2.0-beta.1.20.60-stable"
-    "@minecraft/vanilla-data": "npm:1.20.60"
+    "@minecraft/server": "npm:1.11.0-beta.1.20.80-stable"
+    "@minecraft/server-gametest": "npm:1.0.0-beta.1.20.80-stable"
+    "@minecraft/server-net": "npm:1.0.0-beta.1.20.80-stable"
+    "@minecraft/server-ui": "npm:1.2.0-beta.1.20.80-stable"
+    "@minecraft/vanilla-data": "npm:1.20.80"
     "@typescript-eslint/eslint-plugin": "npm:^7.1.1"
     "@typescript-eslint/parser": "npm:^7.1.1"
     "@vitest/coverage-istanbul": "npm:^1.6.0"
@@ -4005,6 +4005,7 @@ __metadata:
     leafy-utils: "npm:^7.1.2"
     prettier: "npm:^3.2.5"
     prettier-plugin-jsdoc: "npm:^1.3.0"
+    tslib: "npm:^2.6.2"
     typescript: "npm:5.4.5"
     typescript-plugin-import-filter: "npm:^0.2.0"
     vite-tsconfig-paths: "npm:^4.3.2"
@@ -4350,6 +4351,13 @@ __metadata:
   bin:
     tsconfck: bin/tsconfck.js
   checksum: 10c0/d45009230c4caa5fc765bdded96f3b8703a7cdd44a1d63024914b0fb1c4dabf9e94d28cc9f9edccaef9baa7b99adc963502d34943d82fcb07b92e1161ee03c56
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.6.2":
+  version: 2.6.2
+  resolution: "tslib@npm:2.6.2"
+  checksum: 10c0/e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb
   languageName: node
   linkType: hard
 

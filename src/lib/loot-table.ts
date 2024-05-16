@@ -1,11 +1,10 @@
-import { Container, ItemLockMode, ItemStack } from '@minecraft/server'
+import { Container, EnchantmentType, ItemLockMode, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { util } from 'lib/util'
 import { EventSignal } from './event-signal'
 
 declare namespace LootItem {
-  type RandomCostMapType = {
-    [key: `${number}...${number}` | number]: Percent
-  }
+  type RandomCostMapType = Record<`${number}...${number}` | number, Percent>;
 
   type Percent = `${number}%`
   interface Common {
@@ -53,9 +52,9 @@ declare namespace LootItem {
 
   type Input = (TypeIdInput | TypeInput | ItemStackInput) & Common
 
-  type Stored = {
+  interface Stored {
     itemStack: ItemStack
-    enchantments: Record<string, number[]>
+    enchantments: Record<MinecraftEnchantmentTypes, number[]>
     chance: number
     amount: number[]
     damage: number[]
@@ -85,7 +84,7 @@ type LootItems = { stack: ItemStack; chance: number }[]
 export class LootTable {
   static instances: Record<string, LootTable> = {}
 
-  static onNew: EventSignal<LootTable> = new EventSignal()
+  static onNew = new EventSignal<LootTable>()
 
   private fill
 
@@ -131,7 +130,7 @@ export class LootTable {
 
       const chance = parseInt(item.chance)
       if (isNaN(chance)) {
-        throw new TypeError(`Chance must be \`{number}%\`, got '${chance}' instead!`)
+        throw new TypeError(`Chance must be \`{number}%\`, got '${util.inspect(chance)}' instead!`)
       }
 
       if (chance !== 100) this.totalChance += chance
@@ -227,8 +226,8 @@ export class LootTable {
           .fill(null)
           .map((e, i, a) =>
             this.generateItems({
-              ...e,
-              amount: i === a.length - 1 ? last : average,
+              ...item,
+              amount: e === a.at(-1) ? [last] : [average],
             }),
           )
           .flat()
@@ -238,11 +237,11 @@ export class LootTable {
       stack.amount = amount
 
       const { enchantable } = stack
-      for (const [type, levels] of Object.entries(item.enchantments)) {
+      for (const [type, levels] of Object.entriesStringKeys(item.enchantments)) {
         const level = levels.randomElement()
         if (!level) continue
 
-        enchantable.addEnchantment({ type, level })
+        enchantable.addEnchantment({ type: new EnchantmentType(type), level })
       }
 
       if (item.damage.length) {

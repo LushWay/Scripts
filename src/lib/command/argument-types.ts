@@ -34,8 +34,8 @@ export interface IArgumentType {
 
 export class LiteralArgumentType implements IArgumentType {
   constructor(
-    public name: string = 'literal',
-    public optional: boolean = false,
+    public name = 'literal',
+    public optional = false,
   ) {}
 
   type: null
@@ -51,8 +51,8 @@ export class LiteralArgumentType implements IArgumentType {
 
 export class StringArgumentType implements IArgumentType {
   constructor(
-    public name: string = 'string',
-    public optional: boolean = false,
+    public name = 'string',
+    public optional = false,
   ) {}
 
   type: string
@@ -69,8 +69,8 @@ export class StringArgumentType implements IArgumentType {
 
 export class IntegerArgumentType implements IArgumentType {
   constructor(
-    public name: string = 'integer',
-    public optional: boolean = false,
+    public name = 'integer',
+    public optional = false,
   ) {}
 
   type: number
@@ -88,8 +88,8 @@ export class IntegerArgumentType implements IArgumentType {
 
 export class LocationArgumentType implements IArgumentType {
   constructor(
-    public name: string = 'location',
-    public optional: boolean = false,
+    public name = 'location',
+    public optional = false,
   ) {}
 
   type: Vector3
@@ -124,11 +124,11 @@ export class BooleanArgumentType implements IArgumentType {
   }
 }
 
-export class ArrayArgumentType<T extends ReadonlyArray<string>> implements IArgumentType {
+export class ArrayArgumentType<T extends readonly string[]> implements IArgumentType {
   constructor(
-    public name: string = 'array',
+    public name = 'array',
     public types: T,
-    public optional: boolean = false,
+    public optional = false,
   ) {
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
   }

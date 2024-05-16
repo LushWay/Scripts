@@ -1,5 +1,5 @@
-import { MolangVariableMap, Vector, system, world } from '@minecraft/server'
-import { ActionForm, ModalForm, util } from 'lib'
+import { MolangVariableMap, system, world } from '@minecraft/server'
+import { ActionForm, ModalForm, Vector, util } from 'lib'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'

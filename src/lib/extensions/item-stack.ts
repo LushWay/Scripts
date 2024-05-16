@@ -1,4 +1,10 @@
-import { ItemStack } from '@minecraft/server'
+import {
+  ItemCooldownComponent,
+  ItemDurabilityComponent,
+  ItemEnchantableComponent,
+  ItemFoodComponent,
+  ItemStack,
+} from '@minecraft/server'
 import { util } from 'lib/util'
 import { expand } from './extend'
 
@@ -25,30 +31,30 @@ declare module '@minecraft/server' {
 }
 
 Object.defineProperties(ItemStack.prototype, {
-  enchantments: {
+  enchantable: {
     get() {
-      return this.getComponent('enchantable')
+      return this.getComponent(ItemEnchantableComponent.componentId)
     },
     configurable: false,
     enumerable: true,
   },
   food: {
     get() {
-      return this.getComponent('food')
+      return this.getComponent(ItemFoodComponent.componentId)
     },
     configurable: false,
     enumerable: true,
   },
   durability: {
     get() {
-      return this.getComponent('durability')
+      return this.getComponent(ItemDurabilityComponent.componentId)
     },
     configurable: false,
     enumerable: true,
   },
   cooldown: {
     get() {
-      return this.getComponent('cooldown')
+      return this.getComponent(ItemCooldownComponent.componentId)
     },
     configurable: false,
     enumerable: true,

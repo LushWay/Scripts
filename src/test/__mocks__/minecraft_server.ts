@@ -9,8 +9,9 @@ export class System {
   delay(fn: VoidFunction) {
     return this.run(fn)
   }
+
   run(fn: VoidFunction) {
-    // @ts-ignore
+    // @ts-expect-error
     setImmediate(fn)
     return 0
   }

@@ -76,13 +76,7 @@ new CmdLet('help').setDescription('Выводит справку о команд
   return 'stop'
 })
 
-/**
- * @param {Player} player
- * @param {Command} command
- * @returns {Command<any>[]}
- */
-
-function childrensToHelpText(player: Player, command: Command): Command<any>[] {
+function childrensToHelpText(player: Player, command: Command): Command[] {
   const childrens = []
 
   for (const children of command.sys.children.filter(e => e.sys.requires(player))) {

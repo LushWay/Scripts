@@ -1,4 +1,5 @@
-import { Container, ItemStack, MolangVariableMap, Player, Vector } from '@minecraft/server'
+import { Container, ItemStack, MolangVariableMap, Player } from '@minecraft/server'
+import { Vector } from 'lib'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Temporary, isInvalidLocation, util } from 'lib'
@@ -172,7 +173,7 @@ whiteParticle.setColorRGBA('color', {
   alpha: 0,
 })
 
-type EditingCutscenePlayer = {
+interface EditingCutscenePlayer {
   hotbarSlots: (ItemStack | undefined)[]
   position: Vector3
   cutsceneSectionsBackup: Cutscene['sections']

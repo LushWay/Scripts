@@ -42,7 +42,7 @@ export const util = {
         ] as [RegExp | ((s: string) => string), string?][],
 
         /** Parses stack */
-        get(omitLines: number = 0, stack?: string): string {
+        get(omitLines = 0, stack?: string): string {
           if (!stack) {
             stack = new Error().stack
             if (!stack) return 'Null stack'
@@ -92,12 +92,12 @@ export const util = {
     },
   ),
 
-  stringify(target: any) {
+  stringify(target: unknown) {
     if (typeof target === 'string') return target
     return this.inspect(target)
   },
 
-  inspect(target: any, space = '  ', cw = '', funcCode = false, depth = 0) {
+  inspect(target: unknown, space = '  ', cw = '', funcCode = false, depth = 0) {
     const c = {
       function: {
         function: '§5',
@@ -120,14 +120,16 @@ export const util = {
 
     if (depth > 10 || typeof target !== 'object') return `${rep(target)}` || `${target}` || '{}'
 
-    function rep(value: any) {
-      if (visited.has(value)) {
-        // Circular structure detected
-        return '§b<ref *>§r'
-      } else {
-        try {
-          visited.add(value)
-        } catch (e) {}
+    function rep(value: unknown) {
+      if (typeof value === 'object' && value !== null) {
+        if (visited.has(value)) {
+          // Circular structure detected
+          return '§b<ref *>§r'
+        } else {
+          try {
+            visited.add(value)
+          } catch (e) {}
+        }
       }
 
       switch (typeof value) {
@@ -189,13 +191,14 @@ export const util = {
 
         case 'object': {
           if (Array.isArray(value)) break
+          if (value === null) return 'null'
 
-          const allInherits: any = {}
+          const allInherits: JsonObject = {}
 
           for (const key in value)
             try {
               // value[key] can be ungettable
-              allInherits[key] = value[key]
+              allInherits[key] = (value as JsonObject)[key]
             } catch (e) {}
 
           value = allInherits
@@ -377,7 +380,7 @@ export const util = {
     },
   ),
 
-  isKeyof<O extends Record<string | symbol | number, any>>(str: string | symbol | number, obj: O): str is keyof O {
+  isKeyof<O extends Record<string | symbol | number, unknown>>(str: string | symbol | number, obj: O): str is keyof O {
     return str in obj
   },
 
@@ -404,7 +407,7 @@ export const util = {
    * @param {number} [minLength=perPage] - Minimal items count to paginate. If array has less then this count, array is
    *   returned. Default is `perPage`
    */
-  paginate<T>(array: T[], perPage: number = 10, startPage: number = 1, minLength: number = perPage) {
+  paginate<T>(array: T[], perPage = 10, startPage = 1, minLength: number = perPage) {
     if (array.length <= minLength) return { array, canGoNext: false, canGoBack: false, maxPages: 1, page: 1 }
 
     const maxPages = Math.ceil(array.length / perPage)
@@ -509,7 +512,7 @@ export const util = {
    * @param {number} n
    * @returns Formatted string
    */
-  numseparate(n: number = 0, separator = '.') {
+  numseparate(n = 0, separator = '.') {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
   },
 

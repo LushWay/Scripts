@@ -5,12 +5,8 @@ import { EventLoader, EventSignal } from '../event-signal'
 const Core = {
   name: '§aLush§bWay',
   beforeEvents: {
-    /**
-     * Fires when player role changes
-     *
-     * @type {EventSignal<{ id: string; player?: Player; newRole: Role; oldRole: Role }>}
-     */
-    roleChange: new EventSignal(),
+    /** Fires when player role changes */
+    roleChange: new EventSignal<{ id: string; player?: Player; newRole: Role; oldRole: Role }>(),
   },
   /** Core server events */
   afterEvents: {

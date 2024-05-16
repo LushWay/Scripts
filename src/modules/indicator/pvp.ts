@@ -139,18 +139,15 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
         // Entity
 
         const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
-        damage.damagingEntity.runCommand(
-          'titleraw @s actionbar ' +
-            JSON.stringify({
-              rawtext: [
-                { text: '§6' },
-                {
-                  translate: `entity.${entityName}.name`,
-                },
-                { text: isBow ? ' §gзастрелен' : ' §gубит' },
-              ],
-            }),
-        )
+        damage.damagingEntity.onScreenDisplay.setActionBar({
+          rawtext: [
+            { text: '§6' },
+            {
+              translate: `entity.${entityName}.name`,
+            },
+            { text: isBow ? ' §gзастрелен' : ' §gубит' },
+          ],
+        })
       }
       // }
 

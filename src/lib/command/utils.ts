@@ -2,7 +2,6 @@ import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { CONFIG, SOUNDS } from 'lib/assets/config'
 import { ROLES } from 'lib/roles'
 import { inaccurateSearch } from '../search'
-import { util } from '../util'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
 
@@ -11,7 +10,7 @@ import { CommandContext } from './context'
  * @param {number} prefixSize
  * @returns
  */
-export function parseCommand(message: string, prefixSize: number = 1) {
+export function parseCommand(message: string, prefixSize = 1) {
   const command = message.slice(prefixSize).trim()
 
   const match = command.match(/^(?<command>[^\s]+)\s?(?<input>.+)?$/)
@@ -196,7 +195,7 @@ export function sendCallback(
   rawInput: string,
 ) {
   const lastArg = args[args.length - 1] ?? baseCommand
-  const argsToReturn: any[] = []
+  const argsToReturn: unknown[] = []
   for (const [i, arg] of args.entries()) {
     if (arg.sys.type.name.endsWith('*')) continue
     if (arg.sys.type instanceof LocationArgumentType) {

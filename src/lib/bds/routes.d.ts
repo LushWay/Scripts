@@ -1,7 +1,7 @@
 declare global {
   namespace BDS {
     interface Routes {
-      ping: { req: any; res: { status: number } }
+      ping: { req: unknown; res: { status: number } }
       playerPlatform: {
         req: { playerName: string }
         res: { platform: 'win10' | 'android' | 'console' }
@@ -22,8 +22,8 @@ declare global {
         req: { status: number }
         res: { status: number }
       }
-      command: { req: { command: string }; res: any }
-      say: { req: { message: string }; res: any }
+      command: { req: { command: string }; res: unknown }
+      say: { req: { message: string }; res: unknown }
     }
 
     interface StdoutPackets {

@@ -1,37 +1,32 @@
-import { Enchantment, Vector, world } from '@minecraft/server'
-
+import { Enchantment, world } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
-import { DatabaseUtils } from 'lib/database/utils'
 import { EventLoader } from 'lib/event-signal'
-import { util } from 'lib/util'
 
 const location = { x: 0, y: -10, z: 0 }
+const dimension = world.overworld
 
 export class Enchantments {
-  static custom: { [key: string]: { [key: number]: Enchantment } } = {}
+  static custom: Record<string, Record<number, Enchantment>> = {}
 
-  static typed = {} as Record<MinecraftEnchantmentTypes, { [key: number]: Enchantment }>
+  static typed = {} as Record<MinecraftEnchantmentTypes, Record<number, Enchantment>>
 
   static onLoad = new EventLoader()
 }
 
 function load() {
-  const status = world.overworld.runCommand('structure load CustomEnchantments ' + Vector.string(location))
+  // world.structureManager.place('CustomEnchantments', dimension, location)
+  // const entities = dimension.getEntities({
+  //   type: DatabaseUtils.entityTypeId,
+  //   location: location,
+  //   maxDistance: 2,
+  // })
 
-  if (!status) return console.error(new Error('Unable to load CustomEnchantments structure. Status: §6' + status))
+  // const entity = entities[0]
 
-  const entities = world.overworld.getEntities({
-    type: DatabaseUtils.entityTypeId,
-    location: location,
-    maxDistance: 2,
-  })
+  // if (!entity) return console.error(new Error('Unable to find CustomEnchantments entity'))
 
-  const entity = entities[0]
-
-  if (!entity) return console.error(new Error('Unable to find CustomEnchantments entity'))
-
-  const { container } = entity
-  if (!container) return
+  // const { container } = entity
+  // if (!container) return
 
   // for (let i = 0; i < container.size; i++) {
   //   const item = container.getItem(i)
@@ -53,7 +48,7 @@ function load() {
   //   }
   // }
 
-  entities.forEach(e => e.remove())
+  // entities.forEach(e => e.remove())
   // @ts-expect-error Aaa
   Enchantments.typed = Enchantments.custom
   EventLoader.load(Enchantments.onLoad)

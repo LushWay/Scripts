@@ -100,18 +100,18 @@ export function prompt(
   player: Player,
   text: string,
   yesText: string,
-  yesAction: VoidFunction,
-  noText: string = 'Отмена',
-  noAction: VoidFunction = () => {},
+  yesAction?: VoidFunction,
+  noText = 'Отмена',
+  noAction?: VoidFunction,
 ) {
-  return new Promise(resolve => {
+  return new Promise<boolean>(resolve => {
     new MessageForm('Вы уверены?', text)
       .setButton1(yesText, () => {
-        yesAction()
+        yesAction?.()
         resolve(true)
       })
       .setButton2(noText, () => {
-        noAction()
+        noAction?.()
         resolve(false)
       })
       .show(player)

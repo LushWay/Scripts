@@ -122,7 +122,6 @@ export class Cuboid {
             y: y,
             z: z,
           }
-
           const indexOf = {
             x: xi,
             y: yi,
@@ -130,16 +129,12 @@ export class Cuboid {
           }
 
           const nextCord: Vector3 = {} as Vector3
-
           for (const key in breakpoints) {
             const axis: keyof Vector3 = key as keyof Vector3
-
             const nextValue = breakpoints[axis][indexOf[axis] + 1]
-
             if (!nextValue && breakpoints[axis].length > 1) return
 
             nextCord[axis] = nextValue ?? current[axis]
-
             if (nextCord[axis] !== this.max[axis]) nextCord[axis]--
           }
 

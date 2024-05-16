@@ -1,12 +1,7 @@
-import {
-  Entity,
-  LocationInUnloadedChunkError,
-  LocationOutOfWorldBoundariesError,
-  Vector,
-  world,
-} from '@minecraft/server'
-import { ModalForm, is, util } from 'lib'
+import { Entity, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, world } from '@minecraft/server'
+import { ModalForm, Vector, is } from 'lib'
 import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'lib/assets/config'
+import { WeakPlayerMap } from 'lib/weak-player-map'
 import { WE_CONFIG } from '../config'
 import { BaseBrushTool } from '../lib/BaseBrushTool'
 import { WorldEditTool } from '../lib/WorldEditTool'
@@ -113,25 +108,24 @@ const brush = new BrushTool({
         z: 0.5,
       })
 
-      if (!BRUSH_LOCATORS[player.id]) {
+      if (!BRUSH_LOCATORS.has(player.id)) {
         try {
           const entity = player.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, location)
 
           entity.addTag(player.name)
           entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
 
-          BRUSH_LOCATORS[player.id] = entity
+          BRUSH_LOCATORS.set(player.id, entity)
         } catch (error) {
           if (error instanceof LocationOutOfWorldBoundariesError || error instanceof LocationInUnloadedChunkError)
             return
 
           console.error(error)
         }
-      } else BRUSH_LOCATORS[player.id].teleport(location)
+      } else BRUSH_LOCATORS.get(player.id)?.teleport(location)
     } else {
-      BRUSH_LOCATORS[player.id]?.remove()
-
-      delete BRUSH_LOCATORS[player.id]
+      BRUSH_LOCATORS.get(player.id)?.remove()
+      BRUSH_LOCATORS.delete(player.id)
     }
   },
 })
@@ -156,11 +150,10 @@ brush.command
   })
 
 WorldEditTool.intervals.push((player, slot) => {
-  if (slot.typeId !== brush.itemId && BRUSH_LOCATORS[player.id]) {
-    BRUSH_LOCATORS[player.id]?.remove()
-
-    delete BRUSH_LOCATORS[player.id]
+  if (slot.typeId !== brush.itemId && BRUSH_LOCATORS.has(player.id)) {
+    BRUSH_LOCATORS.get(player.id)?.remove()
+    BRUSH_LOCATORS.delete(player.id)
   }
 })
 
-const BRUSH_LOCATORS: Record<string, Entity> = {}
+const BRUSH_LOCATORS = new WeakPlayerMap<Entity>({ removeOnLeave: false })

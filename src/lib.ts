@@ -16,6 +16,7 @@ export * from 'lib/command/index'
 // Lib
 export * from 'lib/roles'
 export * from 'lib/util'
+export * from 'lib/vector'
 
 export * from 'lib/action'
 export * from 'lib/airdrop'

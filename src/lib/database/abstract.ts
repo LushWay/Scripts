@@ -23,7 +23,7 @@ export function table<Value>(
 export type DatabaseTable = Record<string, unknown>
 
 /** Describes unified database provider */
-type DatabaseProvider = {
+export interface DatabaseProvider {
   createTable: typeof table
   tables: Record<string, DatabaseTable>
   getRawTableData: (tableId: string) => string
@@ -53,7 +53,7 @@ if (__TEST__) {
     tables: TestDatabase.tables,
 
     createTable: (name, defaultValue?: DatabaseDefaultValue<unknown>) =>
-      new TestDatabase<string, any>(name, defaultValue).proxy(),
+      new TestDatabase<string, unknown>(name, defaultValue).proxy(),
 
     getRawTableData: tableId => JSON.stringify(TestDatabase.tables[tableId]),
   })

@@ -2,9 +2,9 @@ import {
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   MolangVariableMap,
-  Vector,
   world,
 } from '@minecraft/server'
+import { Vector } from 'lib'
 
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',

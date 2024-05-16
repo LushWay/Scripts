@@ -96,7 +96,7 @@ type ButtonOptions = Omit<import('lib/form/chest').ChestButtonOptions, 'slot'>
 function use(
   player: Player,
   type: keyof typeof selectedBlocks,
-  desc: string = '',
+  desc = '',
   {
     onSelect = setSelection,
     notSelected = {},

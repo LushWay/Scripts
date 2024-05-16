@@ -1,5 +1,6 @@
-import { Player, Vector, world } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
+import { Vector } from 'lib/vector'
 
 new Command('leaderboard')
   .setAliases('leaderboards', 'lb')

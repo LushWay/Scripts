@@ -1,6 +1,6 @@
-import { Entity, Player, Vector, system, world } from '@minecraft/server'
-
+import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Vector } from 'lib'
 
 /** @type {Record<string, { date: number; entity: Entity }>} */
 const SPAWNED_FIREWORKS: Record<string, { date: number; entity: Entity }> = {}

@@ -1,6 +1,6 @@
-import { Player, Vector, system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Settings, Temporary, actionGuard, inventoryIsEmpty, util } from 'lib'
+import { Cooldown, Settings, Temporary, Vector, actionGuard, inventoryIsEmpty, util } from 'lib'
 import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
 import { Spawn } from 'modules/places/spawn'
 import { Quest } from 'modules/quests/lib/quest'

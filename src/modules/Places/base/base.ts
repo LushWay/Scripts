@@ -1,7 +1,7 @@
-import { ItemStack, Vector, system, world } from '@minecraft/server'
+import { ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, getBlockStatus } from 'lib'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, getBlockStatus, Vector } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'

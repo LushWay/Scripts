@@ -1,8 +1,9 @@
-import { ItemLockMode, ItemStack, ItemTypes, Player, Vector, world } from '@minecraft/server'
+import { ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
 import { InventoryIntervalAction } from 'lib/action'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
+import { Vector } from 'lib/vector'
 import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
 import { ActionForm } from './form/action'
 
@@ -73,7 +74,7 @@ export class Compass {
   })
 
   /** Map of player as key and compass target as value */
-  private static players: WeakOnlinePlayerMap<Vector3> = new WeakOnlinePlayerMap()
+  private static players = new WeakOnlinePlayerMap<Vector3>()
 
   private static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
     const isMenu = slot.typeId === CUSTOM_ITEMS.menu

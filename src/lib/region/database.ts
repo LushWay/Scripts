@@ -1,7 +1,7 @@
 import { table } from 'lib/database/abstract'
 import { RegionPermissions } from './Region'
 
-type CubeRegionSave = {
+interface CubeRegionSave {
   t: 'c'
   from: VectorXZ
   to: VectorXZ
@@ -9,7 +9,7 @@ type CubeRegionSave = {
   permissions: Partial<RegionPermissions>
 }
 
-type RadiusRegionSave = {
+interface RadiusRegionSave {
   t: 'r'
   st: string
   radius: number

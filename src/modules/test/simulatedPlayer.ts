@@ -1,10 +1,9 @@
-import { GameMode, system, Vector, world } from '@minecraft/server'
-
+import { GameMode, system, world } from '@minecraft/server'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import * as GameTest from '@minecraft/server-gametest'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { Vector, util } from 'lib'
 import { TestStructures } from 'test/constants'
 const time = 9999999
 
@@ -35,8 +34,8 @@ GameTest.registerAsync(simulatedPlayer, 'spawn_one', async test => {
 GameTest.registerAsync(simulatedPlayer, 'base', async test => {
   const spawnLoc = { x: 0, y: 3, z: 0 }
 
-  test.setBlockType(MinecraftBlockTypes.Grass, { x: -1, z: 0, y: 1 })
-  test.setBlockType(MinecraftBlockTypes.Grass, { x: -2, z: 0, y: 1 })
+  test.setBlockType(MinecraftBlockTypes.GrassBlock, { x: -1, z: 0, y: 1 })
+  test.setBlockType(MinecraftBlockTypes.GrassBlock, { x: -2, z: 0, y: 1 })
 
   player = test.spawnSimulatedPlayer(spawnLoc, name)
 
@@ -175,7 +174,7 @@ GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
  * @returns
  */
 
-function rd(max: number, min: number = 0, msg: boolean = false) {
+function rd(max: number, min = 0, msg = false) {
   if (max == min || max < min) return max
 
   const rd = Math.round(min + Math.random() * (max - min))

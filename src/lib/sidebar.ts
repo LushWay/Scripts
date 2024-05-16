@@ -9,7 +9,7 @@ type SidebarLine = string | false
 
 export type DynamicLine<E> = (player: Player, extra: E) => SidebarLine
 
-export type SidebarLineInit<E> = { init(sidebar: Sidebar): DynamicLine<E> }
+export interface SidebarLineInit<E> { init(sidebar: Sidebar): DynamicLine<E> }
 
 export type SidebarVariables<E, V = DynamicLine<E>> = Record<string, V | string>
 

@@ -1,5 +1,4 @@
-import { Vector } from '@minecraft/server'
-
+import { Vector } from 'lib/vector'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
 import { RegionDatabase } from '../database'
 

@@ -1,5 +1,5 @@
-import { Vector } from '@minecraft/server'
-import { util } from 'lib'
+import {} from '@minecraft/server'
+import { Vector, util } from 'lib'
 
 const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
 

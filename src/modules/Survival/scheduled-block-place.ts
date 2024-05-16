@@ -1,9 +1,9 @@
-import { BlockPermutation, LocationInUnloadedChunkError, Vector, system, world } from '@minecraft/server'
-import { util } from 'lib'
+import { BlockPermutation, LocationInUnloadedChunkError, system, world } from '@minecraft/server'
+import { Vector, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
 
-type ScheduledBlockPlace = {
+interface ScheduledBlockPlace {
   typeId: string
   states?: Record<string, string | number | boolean>
   date: number

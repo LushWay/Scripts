@@ -1,7 +1,7 @@
-import { Entity, Player, Vector, system, world } from '@minecraft/server'
+import { Entity, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { util, Vector } from 'lib'
 
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'

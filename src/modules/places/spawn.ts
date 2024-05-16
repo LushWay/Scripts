@@ -1,4 +1,4 @@
-import { Player, system, world } from '@minecraft/server'
+import { GameMode, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { EditableLocation, InventoryStore, Portal, RegionCallback, Settings, util } from 'lib'
@@ -101,8 +101,8 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
   regionCallback: RegionCallback = (player, region) => {
     if (player.isSimulated()) return
     if (region === this.region) {
-      if (player.isGamemode('survival')) {
-        player.runCommand('gamemode adventure')
+      if (player.getGameMode() === GameMode.survival) {
+        player.setGameMode(GameMode.adventure)
       }
       player.addEffect(MinecraftEffectTypes.Saturation, 1, {
         amplifier: 255,

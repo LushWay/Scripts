@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { SETTINGS_GROUP_NAME, Settings, settingsGroupMenu } from 'lib/settings'
+import { SETTINGS_GROUP_NAME, Settings, SettingsDatabase, settingsGroupMenu } from 'lib/settings'
 import { stringSimilarity } from '../search'
 import { util } from '../util'
 import { ActionForm } from './action'
@@ -40,13 +40,16 @@ export class ArrayForm<
 
   show(
     player: Player,
-    fromPage: number = 1,
-    filtersDatabase: JSONLike = {},
-    // @ts-expect-error Haa
-    filters: ParsedFilters = Settings.parseConfig(filtersDatabase, 'filters', this.options.filters),
+    fromPage = 1,
+    filtersDatabase: SettingsDatabase = {},
+    filters: ParsedFilters = Settings.parseConfig(
+      filtersDatabase,
+      'filters',
+      this.options.filters as Filters,
+    ) as ParsedFilters,
     searchQuery = '',
   ) {
-    const args = [filtersDatabase, filters]
+    const args = [filtersDatabase, filters] as const
     const paginator = util.paginate(
       this.getSorted(filters, searchQuery),
       this.options.itemsPerPage,
@@ -93,7 +96,7 @@ export class ArrayForm<
     searchQuery: string,
     player: Player,
     fromPage: number,
-    filtersDatabase: JSONLike,
+    filtersDatabase: SettingsDatabase,
     parsedFilters: ParsedFilters,
   ) {
     form.addButton(
@@ -111,7 +114,7 @@ export class ArrayForm<
     form: ActionForm,
     filters: ParsedFilters,
     player: Player,
-    database: JSONLike,
+    database: SettingsDatabase,
     back: VoidFunction,
   ) {
     const keys = Object.keys(this.filtersConfig)

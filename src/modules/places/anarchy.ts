@@ -1,5 +1,5 @@
-import { Player, Vector } from '@minecraft/server'
-import { EditableLocation, InventoryStore, Portal, Zone } from 'lib'
+import { GameMode, Player } from '@minecraft/server'
+import { EditableLocation, InventoryStore, Portal, Vector, Zone } from 'lib'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
@@ -102,7 +102,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
         InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
       }
 
-      if (player.isGamemode('adventure')) player.runCommand('gamemode survival')
+      if (player.getGameMode() === GameMode.adventure) player.setGameMode(GameMode.survival)
       player.database.inv = this.inventoryName
     })
   }

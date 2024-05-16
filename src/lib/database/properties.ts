@@ -60,7 +60,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
             // Add default value
             key,
             typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-              ? ProxyDatabase.setDefaults(value, defaultv)
+              ? ProxyDatabase.setDefaults(value as JsonObject, defaultv as JsonObject)
               : value ?? defaultv,
           ]
         }),
@@ -81,8 +81,8 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
 }
 
 configureDatabase({
-  createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<Partial<any>>) =>
-    new DynamicPropertyDB<string, any>(name, defaultValue).proxy(),
+  createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
+    new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
   tables: DynamicPropertyDB.tables,
   getRawTableData(tableId) {
     return world.getDynamicProperty(tableId) + ''

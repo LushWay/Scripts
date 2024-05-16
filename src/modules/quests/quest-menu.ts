@@ -41,7 +41,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
   const { quests } = player.database
   if (!quests)
     return new MessageForm('§3Задания', '§cНет заданий')
-      .setButton1(back ? ActionForm.backText : '§3Закрыть', back ?? (() => {}))
+      .setButton1(back ? ActionForm.backText : '§3Закрыть', back ?? (() => false))
       .show(player)
 
   const self = () => questsMenu(player, back)
@@ -101,7 +101,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
  * @param {Quest} quest
  */
 
-function questMenu(player: Player, quest: Quest, back = () => {}) {
+function questMenu(player: Player, quest: Quest, back: VoidFunction) {
   const current = quest.current(player)
   let currentDescription = ''
   if (current) {

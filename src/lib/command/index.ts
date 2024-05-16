@@ -22,7 +22,7 @@ type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) 
 type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
 
 export class Command<
-  Callback extends (ctx: CommandContext, ...args: any[]) => unknown = (ctx: CommandContext) => unknown,
+  Callback extends (ctx: CommandContext, ...args: unknown[]) => unknown = (ctx: CommandContext) => unknown,
 > {
   /** @param {string} message */
   static isCommand(message: string) {
@@ -52,7 +52,7 @@ export class Command<
     /** Check Args/SubCommands for errors */
     const childs: Command[] = []
 
-    function getChilds(start: Command<any>, i: number): 'fail' | 'success' {
+    function getChilds(start: Command, i: number): 'fail' | 'success' {
       if (!command) return 'fail'
       if (start.sys.children.length > 0) {
         const child = start.sys.children.find(
@@ -73,7 +73,7 @@ export class Command<
   }
 
   /** An array of all active commands */
-  static commands: Command<any>[] = []
+  static commands: Command[] = []
 
   static getHelpForCommand(command: Command, ctx: CommandContext) {
     return ctx.error('Генератор справки для команд выключен!')
@@ -131,7 +131,7 @@ export class Command<
     type: new LiteralArgumentType('command') as IArgumentType,
 
     /** The Arguments of this command */
-    children: [] as Command<any>[],
+    children: [] as Command[],
 
     /** Depth of this command */
     depth: 0,
@@ -148,7 +148,7 @@ export class Command<
    *
    * @param {string} name - Name of the new command
    */
-  constructor(name: string, type?: IArgumentType, depth = 0, parent: Command<any> | null = null) {
+  constructor(name: string, type?: IArgumentType, depth = 0, parent: Command | null = null) {
     this.sys.name = name
 
     if (type) this.sys.type = type
@@ -299,7 +299,7 @@ export class Command<
    * @param types
    * @returns New branch to this command
    */
-  array<T extends ReadonlyArray<string>>(name: string, types: T, optional = false): ArgReturn<Callback, T[number]> {
+  array<T extends readonly string[]>(name: string, types: T, optional = false): ArgReturn<Callback, T[number]> {
     return this.argument(new ArrayArgumentType(name, types, optional))
   }
 

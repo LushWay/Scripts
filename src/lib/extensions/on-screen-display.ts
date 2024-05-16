@@ -1,6 +1,5 @@
 import { Player, RawMessage, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
-import { util } from 'lib/util'
 
 declare module '@minecraft/server' {
   interface HudTitleDisplayOptions {
@@ -44,7 +43,7 @@ const $tipPrefix = '§t§i§p'
 
 type McText = (RawMessage | string)[] | RawMessage | string
 
-type CommonTitleTypes = {
+interface CommonTitleTypes {
   actions: ((p: Player) => void)[]
   title?: {
     expires?: number
@@ -155,6 +154,26 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
 
   setTitle(title, options) {
     return this.player[ScreenDisplaySymbol].setTitle(title, options)
+  },
+
+  getHiddenHudElements() {
+    return this.player[ScreenDisplaySymbol].getHiddenHudElements()
+  },
+
+  hideAllExcept(hudElements) {
+    return this.player[ScreenDisplaySymbol].hideAllExcept(hudElements)
+  },
+
+  resetHudElements() {
+    return this.player[ScreenDisplaySymbol].resetHudElements()
+  },
+
+  setHudVisibility(visible, hudElements) {
+    return this.player[ScreenDisplaySymbol].setHudVisibility(visible, hudElements)
+  },
+
+  isForcedHidden(hudElement) {
+    return this.player[ScreenDisplaySymbol].isForcedHidden(hudElement)
   },
 }
 

@@ -5,12 +5,11 @@ import {
   LocationOutOfWorldBoundariesError,
   Player,
   TicksPerSecond,
-  Vector,
   system,
   world,
 } from '@minecraft/server'
-
 import { MinecraftBlockTypes, MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
+import { Vector } from 'lib/vector'
 
 /** Represents location in the specific dimension */
 interface LocationInDimension {

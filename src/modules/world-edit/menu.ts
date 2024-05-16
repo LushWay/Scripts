@@ -1,7 +1,7 @@
-import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, Vector, world } from '@minecraft/server'
+import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, FormCallback, ModalForm, is, typeIdToReadable, util } from 'lib'
+import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, is, typeIdToReadable, util } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
@@ -98,7 +98,6 @@ function WEblocksSetsMenu(player: Player) {
           blockSets,
           player,
           action: 'Создать новый',
-          onFail: () => {},
         })
       })
 
@@ -123,27 +122,14 @@ function WEblocksSetsMenu(player: Player) {
   }).show(player)
 }
 
-/**
- * @param {object} o
- * @param {import('modules/world-edit/utils/blocksSet').BlocksSets} o.blockSets
- * @param {Player} o.player
- * @param {string} o.action
- * @param {string} [o.setName]
- * @param {import('modules/world-edit/utils/blocksSet').BlocksSets[string]} [o.set]
- * @param {boolean} [o.deletePrevious=false] Default is `false`
- * @param {() => void} [o.onFail]
- */
 function WEmanageBlocksSetMenu({
   blockSets,
-
   player,
-
   action,
-
   setName,
   set = setName ? blockSets[setName] : undefined,
   deletePrevious = false,
-  onFail = () => {},
+  onFail,
 }: {
   blockSets: import('modules/world-edit/utils/blocksSet').BlocksSets
   player: Player
@@ -162,7 +148,7 @@ function WEmanageBlocksSetMenu({
     .show(player, (ctx, name) => {
       if (name in blockSets) return ctx.error('Набор с именем ' + name + ' уже существует!')
 
-      if (!name || name === setName) return onFail()
+      if (!name || name === setName) return onFail?.()
       if (deletePrevious && setName) setBlocksSet(player.id, setName, undefined)
       setBlocksSet(player.id, name, set ? JSON.parse(JSON.stringify(set)) : set)
       WEeditBlocksSetMenu({
@@ -620,7 +606,7 @@ export function WEeditBlockStatesMenu(
             })
 
             editStateForm.addButton('§cУдалить значение', () => {
-              delete states[stateName]
+              Reflect.deleteProperty(states, stateName)
               resolve(WEeditBlockStatesMenu(player, states, back))
             })
 
@@ -652,7 +638,7 @@ export function WEeditBlockStatesMenu(
 }
 
 /** Reference to block that can be replaced */
-export type ReplaceTarget = {
+export interface ReplaceTarget {
   typeId: string
   states: Record<string, string | number | boolean>
 }

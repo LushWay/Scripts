@@ -24,7 +24,7 @@ class JoinBuilder {
     },
   }
 
-  onMoveAfterJoin: EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }> = new EventSignal()
+  onMoveAfterJoin = new EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>()
 
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {

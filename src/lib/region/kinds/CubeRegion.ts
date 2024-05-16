@@ -1,6 +1,7 @@
-import { Vector, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
 import { RegionDatabase } from '../database'
+import { Vector } from 'lib/vector'
 
 interface CubeRegionOptions extends RegionCreationOptions {
   /** The position of the first block of the region. */

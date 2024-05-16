@@ -1,4 +1,5 @@
-import { Vector } from '@minecraft/server'
+import {} from '@minecraft/server'
+import { Vector } from 'lib'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 
 new Command('size')

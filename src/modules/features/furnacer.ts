@@ -1,7 +1,6 @@
-import { ItemStack, Player, TicksPerSecond, Vector, system, world } from '@minecraft/server'
-
+import { ItemStack, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { Vector, util } from 'lib'
 import { MoneyCost } from 'lib/cost'
 import { table } from 'lib/database/abstract'
 import { actionGuard } from 'lib/region/index'
@@ -163,7 +162,7 @@ system.runInterval(
   TicksPerSecond * 5,
 )
 
-type FurnaceKeyInfo = {
+interface FurnaceKeyInfo {
   code: string
   status: keyof (typeof FurnaceKeyItem)['status']
   location?: string

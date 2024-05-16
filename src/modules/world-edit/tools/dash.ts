@@ -1,4 +1,5 @@
-import { Vector, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
+import { Vector } from 'lib'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {

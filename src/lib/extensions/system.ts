@@ -66,7 +66,7 @@ function Timer(
   set: (fn: VoidFunction, ticks: number) => number,
   fn: VoidFunction,
   name: string,
-  ticks: number = 0,
+  ticks = 0,
 ) {
   const visualId = `${name} (${type} ${ticks} ticks)`
 

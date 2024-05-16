@@ -1,4 +1,5 @@
-import { Entity, Player, Vector } from '@minecraft/server'
+import { Entity, Player } from '@minecraft/server'
+import { Vector } from 'lib'
 import { WorldEdit } from '../../lib/WorldEdit'
 
 /**

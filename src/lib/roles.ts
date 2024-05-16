@@ -1,4 +1,4 @@
-import { Player, ScriptEventSource, system, world } from '@minecraft/server'
+import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { util } from 'lib/util'
 
@@ -181,9 +181,9 @@ export function setRole(player: Player | string, role: Role): void {
 Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
   if (!player) return
   if (newRole === 'spectator') {
-    player.runCommand('gamemode spectator')
+    player.setGameMode(GameMode.spectator)
   } else if (oldRole === 'spectator') {
-    player.runCommand('gamemode s')
+    player.setGameMode(GameMode.survival)
   }
 })
 
@@ -192,7 +192,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   if (player.isSimulated()) return
   if (initialSpawn) {
     if (player.database.role === 'spectator') {
-      player.runCommand('gamemode spectator')
+      player.setGameMode(GameMode.spectator)
     }
   }
 })

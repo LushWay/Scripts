@@ -1,6 +1,7 @@
-import { ContainerSlot, Player, Vector, system, world } from '@minecraft/server'
+import { ContainerSlot, Player, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard } from 'lib/region/index'
+import { Vector } from 'lib/vector'
 
 type PlaceType = 'enters' | 'interactions'
 
@@ -133,7 +134,7 @@ export class LockAction {
 }
 
 export class InventoryIntervalAction {
-  private static signal: EventSignal<{ player: Player; slot: ContainerSlot; i: number }> = new EventSignal()
+  private static signal = new EventSignal<{ player: Player; slot: ContainerSlot; i: number }>()
 
   static subscribe = EventSignal.bound(this.signal).subscribe
 
@@ -161,7 +162,7 @@ export class InventoryIntervalAction {
 }
 
 export class MainhandIntervalAction {
-  static signal: EventSignal<{ player: Player; slot: ContainerSlot }> = new EventSignal()
+  static signal = new EventSignal<{ player: Player; slot: ContainerSlot }>()
 
   static subscribe = EventSignal.bound(this.signal).subscribe
 

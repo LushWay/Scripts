@@ -1,75 +1,21 @@
-import { Vector } from '@minecraft/server'
-
-// TODO Move to lib/vector when migrating to 1.20.60
-
-declare module '@minecraft/server' {
-  namespace Vector {
-    /** Returns size between two vectors */
-    function size(a: Vector3, b: Vector3): number
-
-    /** Floors each vector axis using Math.floor */
-    function floor(a: Vector3): Vector3
-    /**
-     * Generates a generator of Vector3 objects between two provided Vector3 objects
-     *
-     * @param a - Starting Vector3 point
-     * @param b - Ending Vector3 point
-     * @returns - Generator of Vector3 objects
-     */
-    function foreach(a: Vector3, b: Vector3): Generator<Vector3, void, unknown>
-
-    /** Checks if vector c is between a and b */
-    function between(a: Vector3, b: Vector3, c: Vector3): boolean
-
-    /**
-     * Returns string representation of vector ('x y z')
-     *
-     * @param color Whenether to color vector args or not
-     */
-    function string(a: Vector3, color?: boolean): string
-
-    /** Returns dot product of two vectors */
-    function dot(a: Vector3, b: Vector3): number
-
-    /** Returns whenether vector is valid or not Valid vector don't uses NaN values */
-    function valid(a: Vector3): boolean
-
-    /**
-     * Alias to
-     *
-     * ```js
-     * ;[Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
-     * ```
-     *
-     * @param x Number to increase vector on x axis.
-     * @param y Number to increase vector on y axis. Defaults to x
-     * @param z Number to increase vector on z axis. Defaults to x
-     */
-    function around(a: Vector3, x: number, y?: number, z?: number): [Vector3, Vector3]
-  }
-}
-
-const Static: Omit<
-  typeof Vector,
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  keyof Function | 'back' | 'down' | 'forward' | 'left' | 'up' | 'one' | 'right' | 'zero'
-> = {
+export class Vector {
   /**
    * Returns string representation of vector ('x y z')
    *
-   * @param color Whenether to color vector args or not
+   * @param colorize Whenether to color vector args or not
    */
-  string: (a, color) => (!color ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`),
+  static string = (a: Vector3, colorize?: boolean) =>
+    !colorize ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`
 
   /**
    * Returns whenether vector is valid or not
    *
    * Valid vector don't uses NaN values
    */
-  valid: a => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z)),
+  static valid = (a: Vector3) => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z))
 
   /** Returns dot product of two vectors */
-  dot: (a, b) => a.x * b.x + a.y * b.y + a.z * b.z,
+  static dot = (a: Vector3, b: Vector3) => a.x * b.x + a.y * b.y + a.z * b.z
 
   /**
    * Returns two dots around vector
@@ -82,9 +28,9 @@ const Static: Omit<
    * @param y Number to increase vector on y axis. Defaults to x
    * @param z Number to increase vector on z axis. Defaults to x
    */
-  around(a, x, y = x, z = y) {
+  static around(a: Vector3, x: number, y = x, z = y) {
     return [Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
-  },
+  }
 
   /**
    * Returns a generator of Vector3 objects between two provided Vector3 objects
@@ -93,7 +39,7 @@ const Static: Omit<
    * @param b - Ending Vector3 point
    * @returns - Generator of Vector3 objects
    */
-  *foreach(a, b) {
+  static *foreach(a: Vector3, b: Vector3) {
     const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x]
     const [ymin, ymax] = a.y < b.y ? [a.y, b.y] : [b.y, a.y]
     const [zmin, zmax] = a.z < b.z ? [a.z, b.z] : [b.z, a.z]
@@ -104,24 +50,29 @@ const Static: Omit<
         }
       }
     }
-  },
+  }
 
-  size(a, b) {
+  /**
+   * @param a
+   * @param b
+   * @returns
+   */
+  static size(a: Vector3, b: Vector3) {
     // Each "max vector axis" - "min vector axis" + 1 * other axises
     return (
       ((b.x > a.x ? b.x - a.x : a.x - b.x) + 1) *
       ((b.y > a.y ? b.y - a.y : a.y - b.y) + 1) *
       ((b.z > a.z ? b.z - a.z : a.z - b.z) + 1)
     )
-  },
+  }
 
   /** Floors each vector axis using Math.floor */
-  floor(loc) {
-    return { x: Math.floor(loc.x), y: Math.floor(loc.y), z: Math.floor(loc.z) }
-  },
+  static floor(x: Vector3) {
+    return { x: Math.floor(x.x), y: Math.floor(x.y), z: Math.floor(x.z) }
+  }
 
   /** Checks if vector c is between a and b */
-  between(a, b, c) {
+  static between(a: Vector3, b: Vector3, c: Vector3) {
     return (
       c.x >= (a.x < b.x ? a.x : b.x) &&
       c.x <= (a.x > b.x ? a.x : b.x) &&
@@ -130,34 +81,51 @@ const Static: Omit<
       c.z >= (a.z < b.z ? a.z : b.z) &&
       c.z <= (a.z > b.z ? a.z : b.z)
     )
-  },
+  }
 
   // Polyfill, a lot faster then native (0.11ms vs 0.54ms) avg
   // Author: Jayly <https://github.com/JaylyDev>
   // Project: https://github.com/JaylyDev/ScriptAPI
 
-  add(a, b) {
+  /**
+   * @remarks
+   *   Returns the addition of these vectors.
+   */
+  static add(a: Vector3, b: Vector3): Vector {
     const vector = new Vector(a.x, a.y, a.z)
     vector.x += b.x
     vector.y += b.y
     vector.z += b.z
     return vector
-  },
+  }
 
-  cross(a, b) {
+  /**
+   * @remarks
+   *   Returns the cross product of these two vectors.
+   */
+  static cross(a: Vector3, b: Vector3) {
     return new Vector(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
-  },
+  }
 
-  distance(a, b) {
+  /**
+   * @remarks
+   *   Returns the distance between two vectors.
+   */
+  static distance(a: Vector3, b: Vector3) {
     const dx = b.x - a.x
     const dy = b.y - a.y
     const dz = b.z - a.z
     const distance = Math.hypot(dx, dy, dz)
 
     return distance
-  },
+  }
 
-  divide(a, b) {
+  /**
+   * @remarks
+   *   Returns the component-wise division of these vectors.
+   * @throws This function can throw errors.
+   */
+  static divide(a: Vector3, b: number | Vector3) {
     const vector = new Vector(a.x, a.y, a.z)
 
     if (typeof b === 'number') {
@@ -171,17 +139,25 @@ const Static: Omit<
     }
 
     return vector
-  },
+  }
 
-  lerp(a, b, t) {
+  /**
+   * @remarks
+   *   Returns the linear interpolation between a and b using t as the control.
+   */
+  static lerp(a: Vector3, b: Vector3, t: number) {
     const dest = new Vector(a.x, a.y, a.z)
     dest.x += (b.x - a.x) * t
     dest.y += (b.y - a.y) * t
     dest.z += (b.z - a.z) * t
     return dest
-  },
+  }
 
-  max(a, b) {
+  /**
+   * @remarks
+   *   Returns a vector that is made from the largest components of two vectors.
+   */
+  static max(a: Vector3, b: Vector3) {
     const vectors = [a, b]
     const arr = vectors.map(({ x, y, z }) => new Vector(x, y, z).length())
     const max = Math.max(...arr)
@@ -189,9 +165,13 @@ const Static: Omit<
     const vector3 = vectors[index]
 
     return new Vector(vector3.x, vector3.y, vector3.z)
-  },
+  }
 
-  min(a, b) {
+  /**
+   * @remarks
+   *   Returns a vector that is made from the smallest components of two vectors.
+   */
+  static min(a: Vector3, b: Vector3) {
     const vectors = [a, b]
     const arr = vectors.map(({ x, y, z }) => new Vector(x, y, z).length())
     const min = Math.min(...arr)
@@ -199,9 +179,13 @@ const Static: Omit<
     const vector3 = vectors[index]
 
     return new Vector(vector3.x, vector3.y, vector3.z)
-  },
+  }
 
-  multiply(a, b) {
+  /**
+   * @remarks
+   *   Returns the component-wise product of these vectors.
+   */
+  static multiply(a: Vector3, b: number | Vector3) {
     const vector = new Vector(a.x, a.y, a.z)
 
     if (typeof b === 'number') {
@@ -215,9 +199,13 @@ const Static: Omit<
     }
 
     return vector
-  },
+  }
 
-  slerp(a, b, s) {
+  /**
+   * @remarks
+   *   Returns the spherical linear interpolation between a and b using s as the control.
+   */
+  static slerp(a: Vector3, b: Vector3, s: number) {
     type Vector3Array = [number, number, number]
     function MathDot(a: Vector3Array, b: Vector3Array): number {
       return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n)
@@ -228,31 +216,124 @@ const Static: Omit<
     const factor2 = Math.sin(θ * s) / Math.sin(θ)
 
     return new Vector(a.x * factor1 + b.x * factor2, a.y * factor1 + b.y * factor2, a.z * factor1 + b.z * factor2)
-  },
+  }
 
-  subtract(a, b) {
+  /**
+   * @remarks
+   *   Returns the subtraction of these vectors.
+   */
+  static subtract(a: Vector3, b: Vector3) {
     const vector = new Vector(a.x, a.y, a.z)
     vector.x -= b.x
     vector.y -= b.y
     vector.z -= b.z
     return vector
-  },
-}
+  }
 
-const Prototype: PartialParts<Vector> = {
+  /**
+   * @remarks
+   *   A constant vector that represents (0, 0, -1).
+   */
+  static readonly back = new Vector(0, 0, -1)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (0, -1, 0).
+   */
+  static readonly down = new Vector(0, -1, 0)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (0, 0, 1).
+   */
+  static readonly forward = new Vector(0, 0, 1)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (-1, 0, 0).
+   */
+  static readonly left = new Vector(-1, 0, 0)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (1, 1, 1).
+   */
+  static readonly one = new Vector(1, 1, 1)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (1, 0, 0).
+   */
+  static readonly right = new Vector(1, 0, 0)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (0, 1, 0).
+   */
+  static readonly up = new Vector(0, 1, 0)
+
+  /**
+   * @remarks
+   *   A constant vector that represents (0, 0, 0).
+   */
+  static readonly zero = new Vector(0, 0, 0)
+
+  /**
+   * @remarks
+   *   Creates a new instance of an abstract vector.
+   * @param x X component of the vector.
+   * @param y Y component of the vector.
+   * @param z Z component of the vector.
+   */
+  constructor(
+    /**
+     * @remarks
+     *   X component of this vector.
+     */
+    public x: number,
+    /**
+     * @remarks
+     *   Y component of this vector.
+     */
+    public y: number,
+    /**
+     * @remarks
+     *   Z component of this vector.
+     */
+    public z: number,
+  ) {}
+
+  /**
+   * @remarks
+   *   Returns the length of this vector.
+   */
   length() {
     return Math.hypot(this.x, this.y, this.z)
-  },
+  }
 
-  equals(other) {
+  /**
+   * @remarks
+   *   Compares this vector and another vector to one another.
+   * @param other Other vector to compare this vector to.
+   * @returns True if the two vectors are equal.
+   */
+  equals(other: Vector3) {
     if (this.x === other.x && this.y === other.y && this.z === other.z) return true
     else return false
-  },
+  }
 
+  /**
+   * @remarks
+   *   Returns the squared length of this vector.
+   */
   lengthSquared() {
     return this.x ** 2 + this.y ** 2 + this.z ** 2
-  },
+  }
 
+  /**
+   * @remarks
+   *   Returns this vector as a normalized vector.
+   */
   normalized() {
     const magnitude = this.length()
     if (magnitude === 0) return this
@@ -263,12 +344,5 @@ const Prototype: PartialParts<Vector> = {
 
     const DirectionZ = this.z / magnitude
     return new Vector(DirectionX, DirectionY, DirectionZ)
-  },
-}
-
-for (const key of Object.keys(Static)) {
-  Reflect.set(Vector, key, Static[key])
-}
-for (const key of Object.keys(Prototype)) {
-  Reflect.set(Vector.prototype, key, Prototype[key])
+  }
 }

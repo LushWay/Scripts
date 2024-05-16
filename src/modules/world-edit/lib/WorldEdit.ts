@@ -3,19 +3,20 @@ import {
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
-  Vector,
+  StructureMirrorAxis,
+  StructureRotation,
   system,
   world,
 } from '@minecraft/server'
-import { getRole, prompt, util } from 'lib'
+import { Vector, getRole, prompt, util } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { table } from 'lib/database/abstract'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { Cuboid } from './Cuboid'
-import { Structure } from './Structure'
+import { BigStructure } from './Structure'
 
-type WeDB = {
+interface WeDB {
   pos1: Vector3
   pos2: Vector3
 }
@@ -73,11 +74,11 @@ export class WorldEdit {
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
   }
 
-  history: Structure[] = []
+  history: BigStructure[] = []
 
-  undos: Structure[] = []
+  undos: BigStructure[] = []
 
-  currentCopy: Structure | undefined
+  currentCopy: BigStructure | undefined
 
   private hasWarnAboutHistoryLimit = false
 
@@ -104,14 +105,14 @@ export class WorldEdit {
   /**
    * Logs an error message and tells the error to the player
    *
-   * @param {string} action - The `action` parameter represents the action that failed. It is a string that describes
-   *   the action that was attempted but failed.
-   * @param {any} error - The `error` parameter is the error object or error message that occurred during the action. It
-   *   can be either an Error object or a string representing the error message.
+   * @param action - The `action` parameter represents the action that failed. It is a string that describes the action
+   *   that was attempted but failed.
+   * @param error - The `error` parameter is the error object or error message that occurred during the action. It can
+   *   be either an Error object or a string representing the error message.
    */
 
-  failedTo(action: string, error: any) {
-    const text = util.error(error)
+  failedTo(action: string, error: unknown) {
+    const text = util.error.isError(error) ? util.error(error) : util.inspect(error)
     if (!text) return
     console.error(text)
     this.player.fail(`Не удалось ${action}§f: ${error}`)
@@ -130,14 +131,14 @@ export class WorldEdit {
    * @param {string} name - Name of the backup. Used by undo/redo
    * @param {Vector3} pos1 Position 1 of cuboid location
    * @param {Vector3} pos2 Position 2 of cuboid location
-   * @param {Structure[]} history Save location where you want the to store your backup
+   * @param {BigStructure[]} history Save location where you want the to store your backup
    */
 
   async backup(
     name: string,
     pos1: Vector3 = this.pos1,
     pos2: Vector3 = this.pos2,
-    history: Structure[] = this.history,
+    history: BigStructure[] = this.history,
   ) {
     if (this.history.length === this.historyLimit) {
       console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
@@ -148,11 +149,11 @@ export class WorldEdit {
         this.hasWarnAboutHistoryLimit = true
       }
 
-      this.player.runCommand(`structure delete ${history[0].id}`)
+      world.structureManager.delete(history[0].id)
       history.splice(0, 1)
     }
 
-    const structrure = new Structure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, name)
+    const structrure = new BigStructure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, this.player.dimension, name)
 
     history.push(structrure)
     await structrure.savePromise
@@ -184,11 +185,11 @@ export class WorldEdit {
   /**
    * Loads backup and removes it from history
    *
-   * @param {Structure[]} history
-   * @param {Structure} backup
+   * @param {BigStructure[]} history
+   * @param {BigStructure} backup
    */
 
-  loadBackup(history: Structure[], backup: Structure) {
+  loadBackup(history: BigStructure[], backup: BigStructure) {
     this.backup(
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
       backup.pos1,
@@ -207,7 +208,7 @@ export class WorldEdit {
    *
    * @param {number} amount Times you want to undo
    */
-  undo(amount: number = 1) {
+  undo(amount = 1) {
     this.loadFromArray(amount, this.history)
   }
 
@@ -216,7 +217,7 @@ export class WorldEdit {
    *
    * @param {number} amount Times you want to redo
    */
-  redo(amount: number = 1) {
+  redo(amount = 1) {
     this.loadFromArray(amount, this.undos)
   }
 
@@ -226,7 +227,12 @@ export class WorldEdit {
       const selection = await this.ensureSelection()
       if (!selection) return
 
-      this.currentCopy = new Structure(WE_CONFIG.COPY_FILE_NAME + this.player.id, this.pos1, this.pos2)
+      this.currentCopy = new BigStructure(
+        WE_CONFIG.COPY_FILE_NAME + this.player.id,
+        this.pos1,
+        this.pos2,
+        this.player.dimension,
+      )
       await this.currentCopy.savePromise
       this.player.info(
         `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
@@ -245,12 +251,11 @@ export class WorldEdit {
    * @param {Parameters<WorldEdit['paste']>[1]} rotation
    * @param {NonNullable<WorldEdit['currentCopy']>} currentCopy
    */
-
   pastePositions(rotation: Parameters<WorldEdit['paste']>[1], currentCopy: NonNullable<WorldEdit['currentCopy']>) {
     let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
     const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
     let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
-    if (rotation === 270 || rotation === 90) [dx, dz] = [dz, dx]
+    if (rotation === StructureRotation.Rotate270 || rotation === StructureRotation.Rotate90) [dx, dz] = [dz, dx]
 
     const pastePos1 = Vector.floor(this.player.location)
     const pastePos2 = Vector.add(pastePos1, { x: dx, y: dy, z: dz })
@@ -267,21 +272,21 @@ export class WorldEdit {
    * @param {Player} player Player to execute on
    * @param {0 | 90 | 180 | 270} rotation Specifies the rotation when loading a structure
    * @param {'none' | 'x' | 'xz' | 'z'} mirror Specifies the axis of mirror flip when loading a structure
-   * @param {boolean} includesEntites Specifies whether including entites or not
-   * @param {boolean} includesBlocks Specifies whether including blocks or not
+   * @param {boolean} includeEntities Specifies whether including entites or not
+   * @param {boolean} includeBlocks Specifies whether including blocks or not
    * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in
    *   the structure are loaded.
-   * @param {string} seed Specifies the seed when calculating whether a block should be loaded according to integrity.
-   *   If unspecified, a random seed is taken.
+   * @param {string} integritySeed Specifies the seed when calculating whether a block should be loaded according to
+   *   integrity. If unspecified, a random seed is taken.
    */
   async paste(
     player: Player,
-    rotation: 0 | 90 | 180 | 270 = 0,
-    mirror: 'none' | 'x' | 'xz' | 'z' = 'none',
-    includesEntites: boolean = false,
-    includesBlocks: boolean = true,
-    integrity: number = 100.0,
-    seed: string = '',
+    rotation: StructureRotation = StructureRotation.None,
+    mirror: StructureMirrorAxis = StructureMirrorAxis.None,
+    includeEntities = false,
+    includeBlocks = true,
+    integrity = 100.0,
+    integritySeed = '',
   ) {
     try {
       if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')
@@ -290,12 +295,14 @@ export class WorldEdit {
 
       try {
         await this.backup('Вставка (paste)', pastePos1, pastePos2)
-        await this.currentCopy.load(
-          pastePos1,
-          ` ${String(rotation).replace('NaN', '0')}_degrees ${mirror} ${includesEntites} ${includesBlocks} true ${
-            integrity ? integrity : ''
-          } ${seed ? seed : ''}`,
-        )
+        await this.currentCopy.load(pastePos1, undefined, {
+          rotation,
+          mirror,
+          includeEntities,
+          includeBlocks,
+          integrity,
+          integritySeed,
+        })
       } catch (e) {
         if (e instanceof Error) {
           player.fail(e.message)
@@ -332,7 +339,7 @@ export class WorldEdit {
           player,
           `§6Внимание! §cВы уверены что хотите использовать выделенную область размером §f${this.selection.size}§c?`,
           'Да',
-          () => {},
+          () => true,
         )
 
         if (!result) return player.fail('§cОтменяем...')
@@ -369,36 +376,37 @@ export class WorldEdit {
       const replaceTargets = replaceBlocks.map(toReplaceTarget)
 
       const player = this.player
-      function* fillBetweenJob() {
-        nextBlock: for (const position of Vector.foreach(selection!.min, selection!.max)) {
-          for (const replaceBlock of replaceTargets) {
-            try {
-              const block = world.overworld.getBlock(position)
+      system.runJob(
+        (function* fillBetweenJob() {
+          nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
+            for (const replaceBlock of replaceTargets) {
+              try {
+                const block = world.overworld.getBlock(position)
 
-              if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
+                if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
-              block?.setPermutation(toPermutation(blocks.randomElement()))
-              continue nextBlock
-            } catch (e) {
-              if (errors < 3 && e instanceof Error) {
-                player.fail(`Ошибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
+                block?.setPermutation(toPermutation(blocks.randomElement()))
+                continue nextBlock
+              } catch (e) {
+                if (errors < 3 && e instanceof Error) {
+                  player.fail(`Ошибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
+                }
+
+                if (
+                  !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
+                  errors < 3
+                )
+                  console.error(e)
+
+                errors++
               }
 
-              if (
-                !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
-                errors < 3
-              )
-                console.error(e)
-
-              errors++
+              all++
+              yield
             }
-
-            all++
-            yield
           }
-        }
-      }
-      system.runJob(fillBetweenJob())
+        })(),
+      )
 
       const endTime = util.ms.remaining(Date.now() - startTime, {
         converters: ['ms', 'sec', 'min'],

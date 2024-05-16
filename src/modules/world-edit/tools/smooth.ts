@@ -1,13 +1,13 @@
-import { Block, BlockPermutation, Player, Vector, system, world } from '@minecraft/server'
+import { Block, BlockPermutation, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ModalForm, is, util } from 'lib'
+import { ModalForm, Vector, is, util } from 'lib'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/world-edit/utils/blocksSet'
 import { BaseBrushTool } from '../lib/BaseBrushTool'
 
-type SmoothProps = {
+interface SmoothProps {
   smoothLevel: number
 }
 
@@ -174,7 +174,7 @@ export async function smoothVoxelData(
   system.runJob(smootherJob())
 }
 
-type BlockCache = {
+interface BlockCache {
   permutation: BlockPermutation | undefined
   location: Vector3
   void: boolean

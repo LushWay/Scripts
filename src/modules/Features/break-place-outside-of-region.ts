@@ -1,6 +1,6 @@
-import { Vector, system } from '@minecraft/server'
+import { system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { Vector, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 

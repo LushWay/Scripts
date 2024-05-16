@@ -1,4 +1,5 @@
-import { Player, Vector, system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
+import { Vector } from 'lib/vector'
 import { request } from './bds/api'
 import { Location } from './editable-location'
 
@@ -14,11 +15,11 @@ export class Zone {
 
   interval
 
-  lastRadius: any
+  lastRadius: number
 
   radius
 
-  returnToZone(player: Player, isX: boolean, zone: { x: any; z: any }, plus?: boolean) {
+  returnToZone(player: Player, isX: boolean, zone: VectorXZ, plus?: boolean) {
     const loc = isX
       ? [zone.x + (plus ? 1 : -1), player.location.y, player.location.z]
       : [player.location.x, player.location.y, zone.z + (plus ? 1 : -1)]
@@ -27,7 +28,7 @@ export class Zone {
     player.onScreenDisplay.setActionBar(`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? 'x' : 'z'}`)
   }
 
-  constructor(center: Location<'vector3'>, radius: (players: any) => number) {
+  constructor(center: Location<'vector3'>, radius: (players: Player[]) => number) {
     this.center = center
     this.radius = radius
     this.interval = system.runInterval(

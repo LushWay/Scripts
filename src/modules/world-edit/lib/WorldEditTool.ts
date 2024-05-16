@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
 import { expand, util } from 'lib'
-import { stringifyBlocksSetRef } from 'modules/world-edit/utils/blocksSet'
+import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocksSet'
 import { WE_PLAYER_SETTINGS } from '../settings'
 
 type IntervalFunction = (player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void
@@ -9,10 +9,16 @@ type LoreStringName = 'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'sh
 const LORE_SEPARATOR = '\u00a0'
 const LORE_BLOCKS_SET_KEYS_T: (LoreStringName | string)[] = ['blocksSet', 'replaceBlocksSet']
 
-export class WorldEditTool<LoreFormat extends { [P in LoreStringName]?: any } & { version: number } = any> {
+type LoreFormatType = {
+  [P in LoreStringName]?: unknown
+} & {
+  version: number
+}
+
+export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
   static loreBlockSetKeys: string[] = LORE_BLOCKS_SET_KEYS_T
 
-  static tools: WorldEditTool<any>[] = []
+  static tools: WorldEditTool[] = []
 
   static intervals: IntervalFunction[] = []
 
@@ -153,7 +159,7 @@ export class WorldEditTool<LoreFormat extends { [P in LoreStringName]?: any } & 
 
   parseLore(lore: string[], returnUndefined?: true): LoreFormat | undefined
 
-  parseLore(lore: string[], returnUndefined: boolean = false): LoreFormat | undefined {
+  parseLore(lore: string[], returnUndefined = false): LoreFormat | undefined {
     let raw
     try {
       raw = JSON.parse(
@@ -191,14 +197,15 @@ export class WorldEditTool<LoreFormat extends { [P in LoreStringName]?: any } & 
    * @param {LoreFormat} format
    * @returns {string[]}
    */
-
   stringifyLore(format: LoreFormat): string[] {
     format.version ??= this.loreFormat.version
     return [
       ...Object.entries(format)
         .filter(([key]) => key !== 'version')
         .map(([key, value]) => {
-          const val = WorldEditTool.loreBlockSetKeys.includes(key) ? stringifyBlocksSetRef(value) : util.inspect(value)
+          const val = WorldEditTool.loreBlockSetKeys.includes(key)
+            ? stringifyBlocksSetRef(value as BlocksSetRef)
+            : util.inspect(value)
 
           const k = this.loreTranslation[key] ?? key
           return `${k}: ${val}`.match(/.{0,48}/g) || []

@@ -9,14 +9,14 @@ const tableType = 'inventory'
 
 type Equipment = Exclude<keyof typeof EquipmentSlot, 'mainhand'>
 
-export type Inventory = {
+export interface Inventory {
   slots: Record<string, ItemStack>
   equipment: Partial<Record<Equipment, ItemStack>>
   xp: number
   health: number
 }
 
-type StoreManifest = {
+interface StoreManifest {
   owner: string
   slots: (number | Equipment)[]
   xp: number

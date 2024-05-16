@@ -1,9 +1,19 @@
-import { ContainerSlot, Entity, Player, Vector, system, world } from '@minecraft/server'
-import { Airdrop, Compass, InventoryIntervalAction, Join, LootTable, PlaceAction, Settings, Temporary } from 'lib'
+import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
+import {
+  Airdrop,
+  Compass,
+  InventoryIntervalAction,
+  Join,
+  LootTable,
+  PlaceAction,
+  Settings,
+  Temporary,
+  Vector,
+} from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
-export type QuestDB = {
+export interface QuestDB {
   active: {
     id: string
     step: number
@@ -64,6 +74,7 @@ export class Quest {
 
   name
 
+  // TODO Replace with weak player map
   players: Record<string, PlayerQuest> = {}
 
   constructor(
@@ -85,10 +96,8 @@ export class Quest {
     if (this.players[player.id]) return this.players[player.id]
 
     this.players[player.id] = new PlayerQuest(this, player)
-
     this.init(this.players[player.id], player)
-
-    world.afterEvents.playerLeave.subscribe(({ playerId }) => delete this.players[playerId])
+    world.afterEvents.playerLeave.subscribe(({ playerId }) => Reflect.deleteProperty(this.players, playerId))
 
     return this.players[player.id]
   }
@@ -155,14 +164,14 @@ export class Quest {
     const db = player.database
     if (!db.quests) return
 
-    const active = db.quests.active.find((q: { id: string }) => q.id === this.id)
+    const active = db.quests.active.find(q => q.id === this.id)
     if (active) {
       this.steps(player).list[active.step].cleanup?.()
 
-      delete this.players[player.id]
+      Reflect.deleteProperty(this.players, player.id)
     }
 
-    db.quests.active = db.quests.active.filter((q: any) => q !== active)
+    db.quests.active = db.quests.active.filter(q => q !== active)
     if (end) db.quests.completed.push(this.id)
   }
 }
@@ -188,7 +197,7 @@ type DynamicQuestText = () => string
 
 type QuestText = string | DynamicQuestText
 
-type QuestStepInput = {
+interface QuestStepInput {
   text: QuestText
   description?: QuestText
   activate?(firstTime: boolean): { cleanup(): void }
@@ -216,7 +225,7 @@ class PlayerQuest {
 
   list: QuestStepThis[] = []
 
-  updateListeners: Set<(p: Player) => void> = new Set()
+  updateListeners = new Set<(p: Player) => void>()
 
   update() {
     this.updateListeners.forEach(e => e(this.player))
@@ -228,17 +237,16 @@ class PlayerQuest {
     const i = this.list.length
     const { text, description } = options
 
-    /** @type {PlayerQuest['list'][number]} */
     const ctx: PlayerQuest['list'][number] = {
       ...options,
       text: typeof text === 'string' ? () => text : text,
       description: typeof description === 'string' ? () => description : description,
 
       get db() {
-        return this.player.database.quests?.active.find((e: { id: any }) => e.id === this.quest.id)?.db
+        return this.player.database.quests?.active.find(e => e.id === this.quest.id)?.db
       },
       set db(value) {
-        const active = this.player.database.quests?.active.find((e: { id: any }) => e.id === this.quest.id)
+        const active = this.player.database.quests?.active.find(e => e.id === this.quest.id)
         if (active) active.db = value
       },
       player: this.player,
@@ -252,14 +260,14 @@ class PlayerQuest {
         } else {
           this.quest.exit(this.player, true)
           step._end()
-          delete this.quest.players[this.player.id]
+          Reflect.deleteProperty(this.quest.players, this.player.id)
         }
         this.update()
         step.updateListeners.clear()
       },
       error(text: string) {
         this.player.fail('§cУпс, задание сломалось: ' + text)
-        return { cleanup() {} }
+        return noCleanup
       },
     }
 
@@ -334,7 +342,7 @@ class PlayerQuest {
   counter(options: QuestCounterInput & Partial<QuestCounterThis> & ThisType<QuestCounterThis>) {
     options.value ??= 0
 
-    options.diff = function (diff: any) {
+    options.diff = function (diff) {
       if (isNotPlaying(this.player)) return
       options.value ??= 0
       const result = options.value + diff
@@ -352,13 +360,13 @@ class PlayerQuest {
     }
 
     const inputedActivate = options.activate?.bind(options)
-    options.activate = function (firstTime: any) {
+    options.activate = function (firstTime) {
       if (!this.player) throw new ReferenceError('Quest: this.player is undefined!')
 
       if (typeof this.db === 'number') options.value = this.db
       options.value ??= 0
 
-      return inputedActivate?.(firstTime) ?? { cleanup() {} }
+      return inputedActivate?.(firstTime) ?? noCleanup
     }
     const inputedText = options.text.bind(options)
     options.text = () => inputedText(options.value)
@@ -408,22 +416,30 @@ class PlayerQuest {
     const spawnAirdrop =
       'spawnAirdrop' in options
         ? options.spawnAirdrop
-        : (key?: string) =>
-            new Airdrop(
+        : (key?: string) => {
+            const airdrop = new Airdrop(
               {
-                position:
-                  'location' in options
-                    ? options.location
-                    : Vector.add(this.player.location, {
-                        x: 0,
-                        y: options.abovePlayerY ?? 50,
-                        z: 0,
-                      }),
                 loot: options.lootTable,
-                for: this.player.id,
+                forPlayerId: this.player.id,
               },
               key,
             )
+
+            if (!key) {
+              const position =
+                'location' in options
+                  ? options.location
+                  : Vector.add(this.player.location, {
+                      x: 0,
+                      y: options.abovePlayerY ?? 50,
+                      z: 0,
+                    })
+
+              airdrop.spawn(position)
+            }
+
+            return airdrop
+          }
 
     let airdroppos = ''
     this.dynamic({
@@ -441,7 +457,7 @@ class PlayerQuest {
                 new Quest.error(`No airdrop found, player '${this.player.name}§r', quest: ${this.quest.id}`),
               )
               system.delay(() => this.next())
-              return { cleanup() {} }
+              return noCleanup
             }
           } else {
             airdrop = spawnAirdrop()
@@ -456,21 +472,19 @@ class PlayerQuest {
         const temporary = new Temporary(({ world, system, cleanup }) => {
           system.runInterval(() => debugAirdrop(), 'PlayerQuest.airdrop debug', 20)
 
-          world.afterEvents.playerInteractWithEntity.subscribe(
-            (event: { target: { id: any }; player: { id: any } }) => {
-              if (!airdrop) return cleanup()
+          world.afterEvents.playerInteractWithEntity.subscribe(event => {
+            if (!airdrop) return cleanup()
 
-              const airdropEntity = airdrop.chestMinecart
-              if (!airdropEntity) return
-              if (event.target.id !== airdropEntity.id) return
+            const airdropEntity = airdrop.chestMinecart
+            if (!airdropEntity) return
+            if (event.target.id !== airdropEntity.id) return
 
-              if (this.player.id === event.player.id) {
-                system.delay(() => this.next())
-              }
-            },
-          )
+            if (this.player.id === event.player.id) {
+              system.delay(() => this.next())
+            }
+          })
 
-          world.afterEvents.entityDie.subscribe((event: { deadEntity: { id: any } }) => {
+          world.afterEvents.entityDie.subscribe(event => {
             if (!airdrop) return cleanup()
 
             if (event.deadEntity.id !== airdrop.chestMinecart?.id) return
@@ -515,13 +529,13 @@ class PlayerQuest {
       activate: () => {
         this.player.fail(reason)
         this.quest.exit(this.player)
-        return { cleanup() {} }
+        return noCleanup
       },
       text: () => '§cЗадание сломалось: ' + reason,
     })
   }
 
-  private _end = () => {}
+  private _end: VoidFunction = () => false
 
   end(action: (this: PlayerQuest) => void) {
     this._end = action
@@ -559,7 +573,7 @@ class PlayerQuest {
   }
 }
 
-type CompassOptions = {
+interface CompassOptions {
   place: Vector3
   temporary?: Temporary
   interval?: VoidFunction & ThisType<CompassOptions>
@@ -595,3 +609,6 @@ type QuestAirdropInput = {
 )
 
 type QuestAirdropThis = Partial<QuestStepThis> & QuestAirdropInput
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noCleanup = { cleanup() {} }

@@ -21,12 +21,6 @@ declare module '@minecraft/server' {
     end: Dimension
     nether: Dimension
   }
-
-  /** Used in {@link Dimension.runCommand} */
-  interface CommandOptions {
-    showOutput?: boolean
-    showError?: boolean
-  }
 }
 
 const send = world.sendMessage.bind(world)

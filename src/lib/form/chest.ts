@@ -22,7 +22,7 @@ const SIZES = {
   'large': ['§c§h§e§s§t§5§4§r§f', 54],
 } satisfies Record<string, [string, number]>
 
-type ChestButton = {
+interface ChestButton {
   text: string
   icon: string | undefined | number
   callback?: (p: Player) => void

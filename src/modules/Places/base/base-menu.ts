@@ -1,10 +1,11 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import {
   ActionForm,
   BaseRegion,
   LockAction,
   RadiusRegion,
   Region,
+  Vector,
   editRegionPermissions,
   manageRegionMembers,
 } from 'lib'

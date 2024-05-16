@@ -1,4 +1,5 @@
-import { ItemStack, Vector, system } from '@minecraft/server'
+import { ItemStack, system } from '@minecraft/server'
+import { Vector } from 'lib'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { EditableLocation, SafeAreaRegion, Temporary, actionGuard } from 'lib'
@@ -21,6 +22,7 @@ export class Learning {
   static quest = new Quest(
     { name: 'Обучение', desc: 'Обучение базовым механикам сервера', id: 'learning' },
     (q, player) => {
+      console.log(player.database.quests)
       if (
         !Anarchy.portal ||
         !Anarchy.portal.from ||

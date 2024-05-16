@@ -9,7 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 
-type ProxiedSubscribers = { system: System; world: World; cleanup: VoidFunction; temp: Temporary }
+interface ProxiedSubscribers { system: System; world: World; cleanup: VoidFunction; temp: Temporary }
 
 export class Temporary {
   /** List of functions that will be called on clear */

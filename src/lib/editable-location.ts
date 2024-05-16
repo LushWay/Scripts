@@ -1,4 +1,5 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player } from '@minecraft/server'
+import { Vector } from 'lib'
 import { EventLoaderWithArg } from './event-signal'
 import { Settings } from './settings'
 import { util } from './util'
@@ -24,7 +25,7 @@ export class EditableLocation<LocationType extends LocationTypeSuperset = 'vecto
 
   static key = 'locations'
 
-  static load(instance: EditableLocation<any>, location: Location<any>) {
+  private static load(instance: EditableLocation<LocationTypeSuperset>, location: Location<LocationTypeSuperset>) {
     instance.x = location.x
     instance.y = location.y
     instance.z = location.z

@@ -72,7 +72,7 @@ export class EventSignal<Argument, Return = void, Callback = (arg: Argument) => 
    * A private Map that stores the event subscribers, with the key being the callback function and the value being the
    * position of the subscriber.
    */
-  private events: Map<Callback, number> = new Map();
+  private events = new Map<Callback, number>();
 
   [ARGUMENT_T]: Argument;
 

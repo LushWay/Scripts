@@ -33,11 +33,11 @@ export class Cooldown {
    */
 
   constructor(
-    private db: Record<string, any>,
+    private db: Record<string, unknown>,
     prefix: string,
     source: string | Player,
     private time: number,
-    public tell: boolean = true,
+    public tell = true,
   ) {
     this.db = db
     this.key = Cooldown.genDBkey(prefix, typeof source === 'string' ? source : source.id)

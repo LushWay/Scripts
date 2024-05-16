@@ -159,8 +159,9 @@ expand(Player.prototype, {
     if (current <= 1) fail()
 
     // We need to switch player to gamemode where we can apply damage to them
-    const isCreative = this.isGamemode('creative')
-    if (isCreative) this.runCommand('gamemode s')
+    const been = this.getGameMode()
+    const damageable = been === GameMode.survival || been === GameMode.adventure
+    if (!damageable) this.setGameMode(GameMode.survival)
 
     ClosingChatSet.add(this.id)
     this.applyDamage(1, {
@@ -171,7 +172,7 @@ expand(Player.prototype, {
     this.runCommand('stopsound @a[r=5] game.player.hurt')
 
     // Return player back to creative mode
-    if (isCreative) this.runCommand('gamemode c')
+    if (!damageable) this.setGameMode(been)
 
     return true
   },

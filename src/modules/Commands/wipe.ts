@@ -1,4 +1,4 @@
-import { system } from '@minecraft/server'
+import { GameMode, system } from '@minecraft/server'
 import { Airdrop, prompt } from 'lib'
 import { Join } from 'lib/player-join'
 import { Anarchy } from 'modules/places/anarchy'
@@ -13,7 +13,7 @@ new Command('wipe')
       'Вы уверены, что хотите очистить инвентарь анархии и ваше место? Полезно для тестирования обучения.',
       '§cДа',
       () => {
-        ctx.player.runCommand('gamemode s')
+        ctx.player.setGameMode(GameMode.survival)
 
         delete ctx.player.database.survival.bn
         delete ctx.player.database.survival.rtpElytra

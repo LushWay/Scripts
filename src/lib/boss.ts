@@ -8,7 +8,7 @@ import { EditableLocation } from './editable-location'
 import { isChunkUnloaded } from './game-utils'
 import { BossArenaRegion } from './region/kinds/BossArenaRegion'
 
-type BossDB = {
+interface BossDB {
   id: string
   date: number
   dead: boolean

@@ -1,4 +1,4 @@
-import { ItemStack, MolangVariableMap, Vector, system, world } from '@minecraft/server'
+import { ItemStack, MolangVariableMap, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
@@ -14,6 +14,7 @@ import {
   Mail,
   NpcForm,
   Settings,
+  Vector,
   is,
   itemLocaleName,
   restorePlayerCamera,
@@ -41,7 +42,7 @@ import './enchant'
 // use public tests with caution, they're available to the all players!
 // other tests are available only for tech admins and above
 
-const tests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
+const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   scen(ctx) {
     const player = ctx.player
 
@@ -76,11 +77,11 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
   },
   f(ctx) {
     const form = new ActionForm('MENUS', 'Menu body', '§c§u§s§r§f')
-    form.addButton('Test!', BUTTON['?'], () => {})
-    form.addButton('Test!', BUTTON['?'], () => {})
-    form.addButton('Test!', BUTTON['?'], () => {})
-    form.addButton('Test!', BUTTON['?'], () => {})
-    form.addButton('Test!', BUTTON['?'], () => {})
+    form.addButton('Test!', BUTTON['?'], () => false)
+    form.addButton('Test!', BUTTON['?'], () => false)
+    form.addButton('Test!', BUTTON['?'], () => false)
+    form.addButton('Test!', BUTTON['?'], () => false)
+    form.addButton('Test!', BUTTON['?'], () => false)
     form.show(ctx.player)
   },
   title(ctx) {
@@ -126,10 +127,11 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
     if (ctx.arguments[1]) ctx.reply('Аирдроп для')
 
     const airdrop = new Airdrop({
-      position: Vector.add(Vector.floor(ctx.player.location), { x: 0, z: 0, y: 30 }),
       loot: Object.values(LootTable.instances)[0],
-      for: ctx.arguments[1] ? ctx.player.id : undefined,
+      forPlayerId: ctx.arguments[1] ? ctx.player.id : undefined,
     })
+
+    airdrop.spawn(Vector.add(Vector.floor(ctx.player.location), { x: 0, z: 0, y: 30 }))
 
     system.runTimeout(
       () => {
@@ -332,7 +334,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
   },
 }
 
-const publicTests: Record<string, (ctx: CommandContext) => void | Promise<any>> = {
+const publicTests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   death(ctx) {
     ctx.player.kill()
   },

@@ -1,7 +1,7 @@
-import { EquipmentSlot, ItemLockMode, ItemStack, Player, Vector, system, world } from '@minecraft/server'
+import { EquipmentSlot, ItemLockMode, ItemStack, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { LockAction, util } from 'lib'
+import { LockAction, Vector, util } from 'lib'
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
   '§6Элитра перемещения',
@@ -9,8 +9,7 @@ const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
 )
 RTP_ELYTRA.lockMode = ItemLockMode.slot
 
-/** @type {Set<string>} */
-const IN_SKY: Set<string> = new Set()
+const IN_SKY = new Set<string>()
 new LockAction(player => IN_SKY.has(player.id), '§cВ начале коснитесь земли!')
 
 /**
@@ -47,7 +46,7 @@ export function randomTeleport(
     fromYtoBlock = 40,
     elytra = true,
     c = 0,
-    teleportCallback = () => {},
+    teleportCallback,
     keepInSkyTime = 5,
   }: {
     y?: number
@@ -92,7 +91,7 @@ export function randomTeleport(
     },
   )
 
-  util.catch(() => teleportCallback({ x, y, z }))
+  util.catch(() => teleportCallback?.({ x, y, z }))
   IN_SKY.add(target.id)
 
   if (keepInSkyTime) {

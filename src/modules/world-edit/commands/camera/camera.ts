@@ -1,8 +1,8 @@
-import { EasingType, Player, Vector, system, world } from '@minecraft/server'
+import { EasingType, Player, system, world } from '@minecraft/server'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
-import { ActionForm, ModalForm, util } from 'lib'
-import { parseArguments, parseLocationArguments } from '../../../../lib/command/utils'
+import { ActionForm, ModalForm, Vector, util } from 'lib'
+import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 
 export type CameraDBModes = 'spinAroundPos'
 
@@ -68,6 +68,7 @@ function setupCameraForm(player: Player, target: Player) {
     })
 }
 
+// TODO Replace with map
 /** @type {Record<string, number>} */
 const intervales: Record<string, number> = {}
 

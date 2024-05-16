@@ -1,10 +1,11 @@
-import { Entity, EntityLifetimeState, Player, ScoreboardObjective, Vector, system, world } from '@minecraft/server'
+import { Entity, EntityLifetimeState, Player, ScoreboardObjective, system, world } from '@minecraft/server'
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { table } from './database/abstract'
+import { Vector } from 'lib/vector'
 
-export type LeaderboardInfo = {
+export interface LeaderboardInfo {
   style: keyof typeof Leaderboard.styles
   objective: string
   displayName: string

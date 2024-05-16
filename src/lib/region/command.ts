@@ -1,10 +1,11 @@
-import { Player, Vector, world } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/Region'
 import { util } from 'lib/util'
+import { Vector } from 'lib/vector'
 import { BaseRegion } from '../../modules/places/base/BaseRegion'
 import { MineshaftRegion } from '../../modules/places/mineshaft/MineshaftRegion'
 import { RadiusRegion } from './kinds/RadiusRegion'
@@ -120,14 +121,7 @@ export function editRegionPermissions(
   }: { pluralForms: WordPluralForms; extendedEditPermissions?: boolean; back: () => void },
 ) {
   let form: ModalForm<
-    (
-      ctx: FormCallback<any>,
-      toggles: boolean,
-      containers: boolean,
-      pvp?: boolean,
-      radius?: number,
-      center?: string,
-    ) => void
+    (ctx: FormCallback, toggles: boolean, containers: boolean, pvp?: boolean, radius?: number, center?: string) => void
   > = new ModalForm('Разрешения ' + pluralForms[0])
     .addToggle(
       `Двери и переключатели\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери и переключатели.`,

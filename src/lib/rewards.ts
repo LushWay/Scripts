@@ -1,6 +1,7 @@
 import { ItemStack, Player, ScoreName } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
 import { itemLocaleName } from './game-utils'
+import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 
 export type Reward =
   | {
@@ -20,10 +21,10 @@ export class Rewards {
   /**
    * Restores the object from an array
    *
-   * @param {Reward[]} entries The array of reward entries
+   * @param entries The array of reward entries
    * @returns {Rewards}
    */
-  static restore(entries: any): Rewards {
+  static restore(entries: Reward[]): Rewards {
     const rewards = new Rewards()
     rewards.entries = entries
 
@@ -40,12 +41,11 @@ export class Rewards {
   /**
    * Adds a reward entry of items
    *
-   * @param {string} id The item ID
-   * @param {string} name The item name
-   * @param {number} count The item count
-   * @returns {Rewards}
+   * @param id The item ID
+   * @param name The item name
+   * @param count The item count
    */
-  item(id: any, name: any, count: any): Rewards {
+  item(id: MinecraftItemTypes | string, name: string, count: number): Rewards {
     this.entries.push({ type: 'item', id, name, count })
     return this
   }
@@ -56,11 +56,11 @@ export class Rewards {
    * @param player - The player to give out the rewards to
    * @param reward - The Reward to give
    */
-  private static giveOne(player: any, reward: any) {
-    if (reward.type == 'item' && reward.id) {
+  private static giveOne(player: Player, reward: Reward) {
+    if (reward.type === 'item' && reward.id) {
       if (!player.container) return
       player.container.addItem(new ItemStack(reward.id, reward.count))
-    } else if (reward.type == 'scores') {
+    } else if (reward.type === 'scores') {
       if (!reward.score) return
       player.scores[reward.score] += reward.count
     }
@@ -69,12 +69,11 @@ export class Rewards {
   /**
    * Gives out the rewards to a player
    *
-   * @param {Player} player The player to give out the rewards to
-   * @returns {Rewards}
+   * @param player The player to give out the rewards to
    */
-  give(player: any): Rewards {
+  give(player: Player): Rewards {
     for (const reward of this.entries) Rewards.giveOne(player, reward)
-    player.sendMessage('§l§eВы получили награды!')
+    player.success('Вы получили награды!')
     return this
   }
 

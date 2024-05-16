@@ -16,7 +16,7 @@ export class Minigame {
 
   players: string[] = []
 
-  quene: Set<string> = new Set()
+  quene = new Set<string>()
 
   name
 

@@ -8,7 +8,7 @@ expand(ContainerSlot.prototype, {
     return super.getItem()
   },
   get typeId() {
-    if (!(this as any).hasItem?.()) return undefined
+    if (!(this as ContainerSlot).hasItem?.()) return undefined
 
     return super.typeId
   },

@@ -1,13 +1,10 @@
-import { Vector, system, world } from '@minecraft/server'
+import { BlockVolume, Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
+import { Vector } from 'lib'
 import { WE_CONFIG } from '../config'
 import { Cuboid } from './Cuboid'
 
-export class Structure extends Cuboid {
+export class BigStructure extends Cuboid {
   id
-
-  name
-
-  prefix
 
   savePromise
 
@@ -24,17 +21,21 @@ export class Structure extends Cuboid {
    * @param {Vector3} pos1
    * @param {Vector3} pos2
    */
-
-  constructor(prefix: string, pos1: Vector3, pos2: Vector3, name = '') {
+  constructor(
+    public prefix: string,
+    pos1: Vector3,
+    pos2: Vector3,
+    public dimension: Dimension,
+    public name = '',
+  ) {
     super(pos1, pos2)
     this.id = Date.now().toString(32)
-    this.name = name
     this.prefix = `${prefix}|${this.id}`
 
     this.savePromise = this.save()
   }
 
-  async save() {
+  private async save() {
     this.structures = []
     const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
     // console.debug({ cubes: cubes.map(e => Vector.string(Vector.subtract(e.max, e.min)), true) })
@@ -42,43 +43,47 @@ export class Structure extends Cuboid {
     const options = { errors: 0, total: 0 }
 
     for (const [i, cube] of cubes.entries()) {
-      const name = `${this.prefix}|${i}`
+      const name = `mystructure:${this.prefix}|${i}`
       const min = cube.pos1
       const max = cube.pos2
-      const result = await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-        `structure save "${name}" ${Vector.string(min)} ${Vector.string(max)} false memory true`,
+      try {
+        world.structureManager.delete(name)
+      } catch {}
+      world.structureManager.createFromWorld(name, this.dimension, new BlockVolume(min, max), {
+        includeEntities: false,
+        includeBlocks: true,
+        saveMode: StructureSaveMode.Memory,
+      })
+
+      // const result = await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
+      //   `structure save "${name}" ${Vector.string(min)} ${Vector.string(max)} false memory true`,
+      //   min,
+      //   max,
+      //   options,
+      // )
+
+      this.structures.push({
+        name,
         min,
         max,
-        options,
-      )
-
-      if (result > 0) {
-        this.structures.push({
-          name,
-
-          min,
-
-          max,
-        })
-      }
+      })
     }
 
     // console.debug(options.total, this.structures.length)
-
     if (options.errors > 0)
       throw new Error(
         `§c${options.errors}§f/${options.total}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
       )
   }
 
-  async load(pos = this.min, additional = '') {
+  async load(position = this.min, dimension = this.dimension, placeOptions?: StructurePlaceOptions) {
     const options = { errors: 0, total: 0 }
 
     for (const file of this.structures) {
       let to
       let from
 
-      if (pos === this.min) {
+      if (position === this.min) {
         to = file.min
 
         from = file.max
@@ -86,16 +91,17 @@ export class Structure extends Cuboid {
         const offsetFrom = Vector.subtract(file.max, this.min)
 
         const offsetTo = Vector.subtract(file.min, this.min)
-        from = Vector.add(pos, offsetFrom)
-        to = Vector.add(pos, offsetTo)
+        from = Vector.add(position, offsetFrom)
+        to = Vector.add(position, offsetTo)
       }
 
-      await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-        `structure load "${file.name}" ${Vector.string(to)}${additional}`,
-        from,
-        to,
-        options,
-      )
+      world.structureManager.place(file.name, dimension, to, placeOptions)
+      // await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
+      //   `structure load "${file.name}" ${Vector.string(to)}${additional}`,
+      //   from,
+      //   to,
+      //   options,
+      // )
 
       await system.sleep(1)
     }

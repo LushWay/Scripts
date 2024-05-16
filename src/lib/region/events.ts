@@ -8,14 +8,14 @@ export class RegionEvents {
    * Player map that contains region list that player is currently in. Updated each second by region interval. Used to
    * emit events such as {@link Region.onPlayerRegionsChange}
    */
-  static playerInRegionsCache: WeakPlayerMap<Region[]> = new WeakPlayerMap({ removeOnLeave: true })
+  static playerInRegionsCache = new WeakPlayerMap<Region[]>({ removeOnLeave: true })
 
   /**
    * Event that triggers when player regions have changed. Updated each second by region interval. Uses
    * {@link Region.playerInRegionsCache} under the hood
    */
-  static onPlayerRegionsChange: EventSignal<{ player: Player; previous: Region[]; newest: Region[] }> =
-    new EventSignal()
+  static onPlayerRegionsChange =
+    new EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>()
 
   /**
    * Listens for player region changes and triggers a callback when a player enters a specific region.

@@ -1,5 +1,5 @@
-import { Vector, world } from '@minecraft/server'
-import { ModalForm } from 'lib'
+import { world } from '@minecraft/server'
+import { ModalForm, Vector } from 'lib'
 import { CUSTOM_ITEMS } from 'lib/assets/config'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'

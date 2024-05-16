@@ -5,13 +5,13 @@ import { table } from './database/abstract'
 import { Rewards } from './rewards'
 
 /** A global letter is a letter sent to multiple players */
-type GlobalLetter = {
+interface GlobalLetter {
   title: string
   content: string
   rewards: import('./rewards').Reward[]
 }
 
-type LocalLetterMetadata = { read: boolean; rewardsClaimed: boolean }
+interface LocalLetterMetadata { read: boolean; rewardsClaimed: boolean }
 
 /** "pointer" to a global letter */
 type LetterLink = LocalLetterMetadata & { id: string }

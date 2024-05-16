@@ -114,9 +114,9 @@ function changeValue(
     .addTextField('Ключ', ' ', key)
     .addTextField('Значение', 'оставь пустым для отмены', stringifiedValue)
     .addDropdown('Тип', typeDropdown)
-    .show(player, (ctx, key, input: any, type: string) => {
+    .show(player, (ctx, key, input: string, type: string) => {
       if (!input) back()
-      let newValue = input
+      let newValue: unknown = input
 
       if (
         !type.includes(valueType) &&

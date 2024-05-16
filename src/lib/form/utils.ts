@@ -10,7 +10,7 @@ import {
 } from '@minecraft/server-ui'
 import { MessageForm } from './message'
 
-type BaseForm = {
+interface BaseForm {
   show(player: Player, ...args: unknown[]): void
 }
 

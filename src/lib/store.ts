@@ -18,7 +18,7 @@ interface StoreOptions {
 export class Store {
   static block(options: StoreOptions & { dimensionId: Dimensions }) {
     /** We dont actually want to store that on disk */
-    const cooldownDatabase: Record<string, any> = {}
+    const cooldownDatabase: JsonObject = {}
     const store = new Store(options)
     const location = new EditableLocation(options.name + ' магазин').safe
 

@@ -23,13 +23,22 @@ declare global {
 
   type Vector3 = mc.Vector3
   type Vector2 = mc.Vector2
-  type VectorXZ = { x: number; z: number }
-  type Vector5 = { x: number; y: number; z: number; rx: number; ry: number }
+  interface VectorXZ {
+    x: number
+    z: number
+  }
+  interface Vector5 {
+    x: number
+    y: number
+    z: number
+    rx: number
+    ry: number
+  }
 
   type Dimensions = mc.ShortcutDimensions
 
   /** Represents JSON-compatible object type */
-  type JSONLike = Record<string | symbol | number, any>
+  // eslint-disable-next-line
   type JsonObject = { [key: string]: Json }
 
   type PartialParts<B, ThisArg = B> = {
@@ -57,8 +66,8 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/ban-types
     T extends Function | boolean | number | string | null | undefined
       ? T
-      : T extends Array<infer U>
-        ? ReadonlyArray<Immutable<U>>
+      : T extends (infer U)[]
+        ? readonly Immutable<U>[]
         : T extends Map<infer K, infer V>
           ? ReadonlyMap<Immutable<K>, Immutable<V>>
           : T extends Set<infer S>

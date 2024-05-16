@@ -30,7 +30,7 @@ export class ActionForm {
    * @param body - Extra text that should be displayed in the form
    * @param prefix - Prefix used by ui side to determine which type of form to render (e.g. it can be chestui or npc)
    */
-  constructor(title: string, body: string = '', prefix: string = '§c§o§m§m§o§n§r§f') {
+  constructor(title: string, body = '', prefix = '§c§o§m§m§o§n§r§f') {
     this.form = new ActionFormData()
     this.form.title(prefix + title)
     this.form.body(body)
@@ -101,7 +101,7 @@ export class ActionForm {
     text: string,
     yesText: string,
     yesAction: VoidFunction,
-    noText: string = 'Отмена',
+    noText = 'Отмена',
     texture: string | null = null,
   ) {
     return this.addButton(text, texture, p =>

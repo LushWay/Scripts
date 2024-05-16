@@ -1,5 +1,6 @@
-import { Player, Vector } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import { LockAction, PlaceAction } from 'lib/action'
+import { Vector } from 'lib/vector'
 
 // TODO Builder style
 

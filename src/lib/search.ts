@@ -6,7 +6,7 @@
  * @param str2 The second string to compare.
  * @param gramSize The size of the grams. Defaults to length 2.
  */
-export function stringSimilarity(str1: string, str2: string, gramSize: number = 2) {
+export function stringSimilarity(str1: string, str2: string, gramSize = 2) {
   if (!str1?.length || !str2?.length) {
     return 0.0
   }

@@ -1,6 +1,7 @@
-import { Entity, Vector, system, world } from '@minecraft/server'
+import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib/region/index'
+import { Vector } from 'lib/vector'
 import { table } from './database/abstract'
 import { isInvalidLocation } from './game-utils'
 import { LootTable } from './loot-table'
@@ -23,19 +24,20 @@ export class Airdrop {
 
   for
 
-  lootTable
-
   id
+
+  lootTable
 
   status: 'restoring' | 'falling' | 'being looted' = 'restoring'
 
-  constructor(options: { position?: Vector3; loot: LootTable; for?: string }, id?: string) {
+  constructor(options: { loot: LootTable; forPlayerId?: string }, id?: string) {
     this.lootTable = options.loot
-    this.for = options.for
+    this.for = options.forPlayerId
 
-    if (!this.id) {
+    if (!id) {
       this.id = new Date().toISOString()
-      if (options.position) this.spawn(options.position)
+    } else {
+      this.id = id
     }
 
     Airdrop.instances.push(this)
@@ -150,8 +152,6 @@ export class Airdrop {
       try {
         this[key]?.remove()
       } catch {}
-
-      delete this[key]
     }
 
     kill('chestMinecart')
@@ -272,7 +272,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
     if (!saved) continue
     const loot = LootTable.instances[saved.loot]
 
-    const restore = (loot: LootTable) => new Airdrop({ loot, for: saved.for }, key)
+    const restore = (loot: LootTable) => new Airdrop({ loot, forPlayerId: saved.for }, key)
 
     if (!loot) {
       LootTable.onNew.subscribe(lootTable => {

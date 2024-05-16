@@ -1,8 +1,10 @@
+import { GameMode } from '@minecraft/server'
+
 new Command('s')
   .setDescription('Выживание')
   .setPermissions('builder')
   .executes(ctx => {
-    ctx.player.runCommand('gamemode s')
+    ctx.player.setGameMode(GameMode.survival)
     ctx.player.success('§aS')
   })
 
@@ -11,5 +13,5 @@ new Command('c')
   .setDescription('Креатив')
   .setPermissions('builder')
   .executes(ctx => {
-    ctx.player.runCommand('gamemode c')
+    ctx.player.setGameMode(GameMode.creative)
   })

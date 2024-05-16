@@ -3,7 +3,7 @@ import { isInvalidLocation, util } from 'lib'
 import { WE_PLAYER_SETTINGS } from 'modules/world-edit/settings'
 import { WorldEditTool } from './WorldEditTool'
 
-type BrushLoreFormat = {
+interface BrushLoreFormat {
   version: number
   replaceBlocksSet: import('modules/world-edit/utils/blocksSet').BlocksSetRef
   size: number

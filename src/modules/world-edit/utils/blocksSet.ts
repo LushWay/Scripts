@@ -37,7 +37,7 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
 
       blocksSets[id] = { [setName]: set, ...db }
     } else {
-      delete db[setName]
+      Reflect.deleteProperty(db, setName)
     }
   }
 }
@@ -99,7 +99,7 @@ export function stringifyBlocksSetRef(ref: BlocksSetRef): string {
 export function withState<Name extends keyof BlockStateMapping>(
   name: Name,
   states: BlockStateMapping[Name],
-  weight: number = 1,
+  weight = 1,
 ): BlockStateWeight {
   return [name, states, weight]
 }
@@ -111,7 +111,7 @@ const trees: BlockStateWeight[] = BlockTypes.getAll()
 trees.push([MinecraftBlockTypes.MangroveRoots, void 0, 1])
 
 export const DEFAULT_BLOCK_SETS: BlocksSets = {
-  'Земля': [[MinecraftBlockTypes.Grass, void 0, 1]],
+  'Земля': [[MinecraftBlockTypes.GrassBlock, void 0, 1]],
   'Воздух': [[MinecraftBlockTypes.Air, void 0, 1]],
   'Деревья заполняемые': trees,
 }
@@ -120,5 +120,5 @@ export const SHARED_POSTFIX = '§7 (Общий)'
 
 Object.keys(DEFAULT_BLOCK_SETS).forEach(e => {
   DEFAULT_BLOCK_SETS[e + SHARED_POSTFIX] = DEFAULT_BLOCK_SETS[e]
-  delete DEFAULT_BLOCK_SETS[e]
+  Reflect.deleteProperty(DEFAULT_BLOCK_SETS, e)
 })

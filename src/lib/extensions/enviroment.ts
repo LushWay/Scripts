@@ -6,8 +6,8 @@ import { expand } from './extend'
 
 declare global {
   interface Console {
-    error(...data: any[]): void
-    info(...data: any[]): void
+    error(...data: unknown[]): void
+    info(...data: unknown[]): void
     log(...data: unknown[]): void
     warn(...data: unknown[]): void
     debug(...data: unknown[]): void
@@ -22,10 +22,10 @@ declare global {
   }
 
   interface ObjectConstructor {
-    entriesStringKeys<O extends Record<string, any>>(o: O): [keyof O, O[keyof O]][]
-    fromEntries<V = any, K extends string = string>(entries: Iterable<readonly [K, V]>): Record<K, V>
+    entriesStringKeys<O extends Record<string, unknown>>(o: O): [keyof O, O[keyof O]][]
+    fromEntries<V = unknown, K extends string = string>(entries: Iterable<readonly [K, V]>): Record<K, V>
 
-    keys<T extends Record<string, any>>(o: T): (keyof T extends string ? keyof T : never)[]
+    keys<T extends Record<string, unknown>>(o: T): (keyof T extends string ? keyof T : never)[]
   }
 }
 
