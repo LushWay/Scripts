@@ -1,6 +1,8 @@
-# Shp1nat Mine Server Script
+# LushWay Server Script
 
-Script API pack for Minecraft PE anarchy server called Shp1natMine. 
+[![Maintainability](https://api.codeclimate.com/v1/badges/5ebbef5256d1206adaf4/maintainability)](https://codeclimate.com/github/LushWay/Scripts/maintainability)
+
+Script API pack for Minecraft PE anarchy server @LushWay. 
 
 This project uses many code from:
   [Bedrock Scripting API](https://discord.gg/wMSBmuBB)
