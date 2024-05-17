@@ -3,7 +3,7 @@ import { system } from '@minecraft/server'
 const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
 
-type DynamicObject = Record<string, unknown>
+type DynamicObject = Record<string | number | symbol, unknown>
 type ProxiedDynamicObject = DynamicObject & {
   [IS_PROXIED]?: boolean
 }
@@ -19,14 +19,16 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
    *
    * **Caution**: This creates new object on every use, consider using {@link ProxyDatabase.immutableUnproxy} instead
    */
-  static unproxy<T extends DynamicObject>(value: T): T {
-    if (typeof value === 'object' && value !== null) return this.setDefaults({}, this.getUnproxied(value))
+  static unproxy<T extends object>(value: T): T {
+    if (typeof value === 'object' && value !== null)
+      return this.setDefaults({}, this.getUnproxied(value as DynamicObject)) as T
+
     return value
   }
 
   /** Usefull when a lot of data is being read from object, taken from database. */
-  static immutableUnproxy<T extends DynamicObject>(value: T): Immutable<T> {
-    return this.getUnproxied(value) as Immutable<T>
+  static immutableUnproxy<T extends object>(value: T): Immutable<T> {
+    return this.getUnproxied(value as DynamicObject) as Immutable<T>
   }
 
   static setDefaults<D extends DynamicObject>(sourceObject: DynamicObject, defaultObject: D): D {
@@ -151,7 +153,7 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
           return value
         }
 
-        if (value && value[IS_PROXIED]) value = value[PROXY_TARGET]
+        if (value && (value as ProxiedDynamicObject)[IS_PROXIED]) value = (value as ProxiedDynamicObject)[PROXY_TARGET]
 
         // Add default value
         if (initial && typeof value === 'undefined' && this.defaultValue) {
@@ -161,7 +163,7 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
 
         // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
-          return this.subproxy(value, keys + '.' + p)
+          return this.subproxy(value as DynamicObject, keys + '.' + p)
         } else return value
       },
       set: (target, p, value, reciever) => {

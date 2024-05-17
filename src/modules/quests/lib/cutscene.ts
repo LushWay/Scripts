@@ -23,7 +23,9 @@ interface Section {
 type Sections = (undefined | Section)[]
 
 /** Controller used to abort playing cutscene animation */
-interface AbortController { cancel: boolean }
+interface AbortController {
+  cancel: boolean
+}
 
 export class Cutscene {
   /** Database containing Cutscene trail points */
@@ -43,6 +45,7 @@ export class Cutscene {
 
   private restoreCameraTime = 2
 
+  // TODO Refactor using WeakPlayerMap
   /** List of players that currently see cutscene play */
   private current: Record<
     string,

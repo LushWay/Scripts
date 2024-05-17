@@ -28,7 +28,7 @@ export class Vector {
    * @param y Number to increase vector on y axis. Defaults to x
    * @param z Number to increase vector on z axis. Defaults to x
    */
-  static around(a: Vector3, x: number, y = x, z = y) {
+  static around(a: Vector3, x: number, y = x, z = y): [Vector, Vector] {
     return [Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
   }
 

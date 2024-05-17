@@ -5,12 +5,12 @@ import { EventLoader } from 'lib/event-signal'
 const location = { x: 0, y: -10, z: 0 }
 const dimension = world.overworld
 
-export class Enchantments {
-  static custom: Record<string, Record<number, Enchantment>> = {}
+export const Enchantments = {
+  custom: {} as Record<string, Record<number, Enchantment>>,
 
-  static typed = {} as Record<MinecraftEnchantmentTypes, Record<number, Enchantment>>
+  typed: {} as Record<MinecraftEnchantmentTypes, Record<number, Enchantment>>,
 
-  static onLoad = new EventLoader()
+  onLoad: new EventLoader(),
 }
 
 function load() {
@@ -49,7 +49,6 @@ function load() {
   // }
 
   // entities.forEach(e => e.remove())
-  // @ts-expect-error Aaa
   Enchantments.typed = Enchantments.custom
   EventLoader.load(Enchantments.onLoad)
 }

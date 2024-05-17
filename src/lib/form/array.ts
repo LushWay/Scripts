@@ -33,8 +33,7 @@ export class ArrayForm<
   ) {
     this.filtersConfig = {
       [SETTINGS_GROUP_NAME]: 'Фильтры',
-      // @ts-expect-error Gaaa
-      ...options.filters,
+      ...(options.filters as Filters),
     }
   }
 

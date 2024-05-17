@@ -13,8 +13,7 @@
     "@minecraft/server-gametest": "1.0.0-beta.1.20.80-stable",
     "@minecraft/server-net": "1.0.0-beta.1.20.80-stable",
     "@minecraft/server-ui": "1.2.0-beta.1.20.80-stable",
-    "@minecraft/vanilla-data": "1.20.80",
-    "tslib": "^2.6.2"
+    "@minecraft/vanilla-data": "1.20.80"
   },
   "resolutions": {
     "@minecraft/server": "1.11.0-beta.1.20.80-stable",
@@ -24,6 +23,7 @@
     "@minecraft/vanilla-data": "1.20.80"
   },
   "devDependencies": {
+    "tslib": "^2.6.2",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitest/coverage-istanbul": "^1.6.0",
@@ -58,8 +58,7 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended",
-      "plugin:@typescript-eslint/strict",
-      "plugin:@typescript-eslint/stylistic",
+      "plugin:@typescript-eslint/recommended",
       "prettier"
     ],
     "plugins": [

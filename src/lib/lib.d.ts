@@ -23,17 +23,8 @@ declare global {
 
   type Vector3 = mc.Vector3
   type Vector2 = mc.Vector2
-  interface VectorXZ {
-    x: number
-    z: number
-  }
-  interface Vector5 {
-    x: number
-    y: number
-    z: number
-    rx: number
-    ry: number
-  }
+  type VectorXZ = Record<'x' | 'z', number>
+  type Vector5 = Record<'x' | 'y' | 'z' | 'rx' | 'ry', number>
 
   type Dimensions = mc.ShortcutDimensions
 
@@ -84,7 +75,9 @@ declare global {
       }
 
   // Vite compability
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface WebSocket {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Worker {}
 }
 
