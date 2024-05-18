@@ -3,16 +3,11 @@ import { BDS } from './modules'
 
 class RequestError extends Error {}
 
-declare global {
-  // eslint-disable-next-line no-var, @typescript-eslint/naming-convention
-  var __SERVER_PORT__: string
-}
-
 /** Makes http request to node instance */
-export async function request<Path extends keyof BDS.Routes>(
+export async function request<Path extends keyof Scripts.Routes>(
   path: Path,
-  body: BDS.Routes[Path]['req'],
-): Promise<BDS.Routes[Path]['res']> {
+  body: Scripts.Routes[Path]['req'],
+): Promise<Scripts.Routes[Path]['res']> {
   const sbody = JSON.stringify(body)
   const prefix = `request('${path}'`
   console.warn(`${prefix},`, body, '§r)')
@@ -52,6 +47,6 @@ export async function request<Path extends keyof BDS.Routes>(
  * @param type - Packet type
  * @param packet - Packet content
  */
-export function sendPacketToStdout<T extends keyof BDS.StdoutPackets>(type: T, packet: BDS.StdoutPackets[T]) {
+export function sendPacketToStdout<T extends keyof Scripts.StdoutPackets>(type: T, packet: Scripts.StdoutPackets[T]) {
   console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
 }

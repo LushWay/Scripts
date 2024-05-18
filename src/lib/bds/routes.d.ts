@@ -1,5 +1,5 @@
 declare global {
-  namespace BDS {
+  namespace Scripts {
     interface Routes {
       ping: { req: unknown; res: { status: number } }
       playerPlatform: {
@@ -38,6 +38,11 @@ declare global {
         name: string
         print: string
       } & ({ status: 'joined' | 'spawned' | 'left' } | { status: 'move'; where: 'air' | 'ground' })
+      error: {
+        name: string
+        message: string
+        stack: string
+      }
     }
   }
 }

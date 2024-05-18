@@ -1,4 +1,5 @@
 import { TerminalColors } from './assets/terminal-colors'
+import { sendPacketToStdout } from './bds/api'
 
 export const util = {
   error: Object.assign(
@@ -18,6 +19,13 @@ export const util = {
         error = new Error(error)
         error.name = 'StringError'
       }
+
+      if (__PRODUCTION__)
+        sendPacketToStdout('error', {
+          name: error.name ?? 'Error',
+          stack: error.stack ?? '',
+          message: error.message ?? '',
+        })
 
       const stack = util.error.stack.get(omitStackLines + 1, error.stack)
       const message = util.error.message.get(error)
@@ -388,11 +396,6 @@ export const util = {
     return typeof value !== 'undefined' && value !== null
   },
 
-  /**
-   * @template T
-   * @param {T[]} array
-   * @returns {T[]}
-   */
   dedupe<T>(array: T[]): T[] {
     return [...new Set(array)]
   },
@@ -458,8 +461,8 @@ export const util = {
   /**
    * Wraps the line
    *
-   * @param {string} string
-   * @param {number} maxLength
+   * @param string
+   * @param maxLength
    */
   wrap(string: string, maxLength: number) {
     /** @type {string[]} */
@@ -495,7 +498,6 @@ export const util = {
     return lines
   },
 
-  /** @param {string} lore */
   wrapLore(lore: string) {
     let color = '§7'
     return this.wrap(lore, 30).map(e => {
@@ -509,7 +511,7 @@ export const util = {
   /**
    * Formats big number and adds . separator, e.g. 15000 -> 15.000
    *
-   * @param {number} n
+   * @param n
    * @returns Formatted string
    */
   numseparate(n = 0, separator = '.') {

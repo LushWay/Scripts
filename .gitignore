@@ -1,8 +1,11 @@
-node_modules
-yarn-error.log
 coverage
+.env.sentry-build-plugin
+manifest.json
+scripts
 
 # Yarn
+node_modules
+yarn-error.log
 .yarn/*
 !.yarn/cache
 !.yarn/patches
@@ -10,6 +13,3 @@ coverage
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-manifest.json
-scripts

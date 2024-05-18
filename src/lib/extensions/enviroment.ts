@@ -119,7 +119,8 @@ String.prototype.at ??= function at<T>(this: T[], n: number) {
 }
 
 function format(args: unknown[]) {
-  if (!globalThis?.Core?.afterEvents?.worldLoad?.loaded) prefixFormat(args)
+  const isPacket = typeof args[0] === 'string' && args[0].startsWith('[Packet]')
+  if (globalThis.loaded !== 0 && !isPacket) prefixFormat(args)
   return args
     .map(e =>
       util.toTerminalColors(

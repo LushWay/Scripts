@@ -4,5 +4,6 @@ const message = `§9└ §fDone in ${((Date.now() - globalThis.loaded) / 1000).t
 
 system.delay(() => {
   console.log(message)
-  world.say(message)
+  if (!__RELEASE__) world.say(message)
+  globalThis.loaded = 0
 })

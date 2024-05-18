@@ -1,10 +1,9 @@
 import tsconfig from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
+import { generateDefine } from './tools/build/generateDefine'
 
 export default defineConfig({
-  define: {
-    __TEST__: 'true',
-  },
+  define: generateDefine({ dev: true, test: true, world: false, port: '0000' }),
   test: {
     coverage: {
       provider: 'istanbul',

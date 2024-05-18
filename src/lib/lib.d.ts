@@ -1,4 +1,5 @@
 import * as mc from '@minecraft/server'
+import '../../tools/definedGlobals'
 
 type JsonPrimative = string | number | boolean | null
 type JsonArray = Json[]
@@ -6,19 +7,6 @@ type JsonComposite = JsonArray | JsonObject
 type Json = JsonPrimative | JsonComposite
 
 declare global {
-  // Global variables injected via esbuild
-
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const __DEV__: boolean
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const __PRODUCTION__: boolean
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const __SERVER__: boolean
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const __TEST__: boolean
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const __RELEASE__: boolean
-
   type VoidFunction = () => void
 
   type Vector3 = mc.Vector3

@@ -41,7 +41,7 @@
       }
     ]
   },
-  "include": ["src"],
+  "include": ["src", "tools/definedGlobals.d.ts"],
   "exclude": ["node_modules", "src/chestui", "src/test/*"],
 
   // Pollutes global
