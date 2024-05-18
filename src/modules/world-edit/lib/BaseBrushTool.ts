@@ -69,7 +69,9 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
     }
   }
 
-  onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit) {}
+  onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit) {
+    // See implementation in subclass
+  }
 
   clearLoreFormat: BrushLoreFormat & AdditionalLore
 }

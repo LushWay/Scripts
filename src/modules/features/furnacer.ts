@@ -134,34 +134,6 @@ actionGuard((player, region, ctx) => {
   } else return notAllowed('Вы уже использовали этот ключ для другой печки.')
 })
 
-system.runInterval(
-  () => {
-    let players
-    for (const [key, furnace] of Object.entries(FurnaceKeyItem.db)) {
-      if (!furnace) continue
-      if (furnace.warnedAboutExpire) continue
-
-      const untilExpire = furnace.expires - Date.now()
-      if (untilExpire < util.ms.from('min', 5)) {
-        players ??= world.getAllPlayers()
-
-        const player = players.find(e => e.id === furnace.lastPlayerId)
-        if (player) {
-          player.warn(
-            `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`,
-          )
-
-          furnace.warnedAboutExpire = 1
-        }
-      } else if (untilExpire < 0) {
-        delete FurnaceKeyItem.db[key]
-      }
-    }
-  },
-  'FurnaceKey.db expired entries cleanup',
-  TicksPerSecond * 5,
-)
-
 interface FurnaceKeyInfo {
   code: string
   status: keyof (typeof FurnaceKeyItem)['status']
@@ -170,6 +142,7 @@ interface FurnaceKeyInfo {
   lastPlayerName?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class FurnaceKeyItem {
   static db = table<{
     expires: number
@@ -242,5 +215,35 @@ class FurnaceKeyItem {
 
     if (!code || !status) return false
     return { code, status, location, lastPlayerName }
+  }
+
+  static {
+    system.runInterval(
+      () => {
+        let players
+        for (const [key, furnace] of Object.entries(FurnaceKeyItem.db)) {
+          if (!furnace) continue
+          if (furnace.warnedAboutExpire) continue
+
+          const untilExpire = furnace.expires - Date.now()
+          if (untilExpire < util.ms.from('min', 5)) {
+            players ??= world.getAllPlayers()
+
+            const player = players.find(e => e.id === furnace.lastPlayerId)
+            if (player) {
+              player.warn(
+                `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`,
+              )
+
+              furnace.warnedAboutExpire = 1
+            }
+          } else if (untilExpire < 0) {
+            Reflect.deleteProperty(FurnaceKeyItem.db, key)
+          }
+        }
+      },
+      'FurnaceKey.db expired entries cleanup',
+      TicksPerSecond * 5,
+    )
   }
 }

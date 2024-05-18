@@ -4,6 +4,8 @@ import { HealthIndicatorConfig } from './config'
 
 // █
 
+const { lockDisplay } = HealthIndicatorConfig
+
 const options = Settings.world('pvp', {
   enabled: {
     value: true,
@@ -35,9 +37,9 @@ system.runInterval(
         player.scores.pvp--
       }
 
-      for (const e in HealthIndicatorConfig.lockDisplay) {
-        if (HealthIndicatorConfig.lockDisplay[e]) HealthIndicatorConfig.lockDisplay[e]--
-        else delete HealthIndicatorConfig.lockDisplay[e]
+      for (const [key, value] of lockDisplay.entries()) {
+        if (value) lockDisplay.set(key, value - 1)
+        else lockDisplay.delete(key)
       }
     }
   },
@@ -57,12 +59,9 @@ Core.afterEvents.worldLoad.subscribe(() => {
       if (!settings.indicator) return
 
       const q = score === options.cooldown || score === 0
+      const g = (p: string) => (q ? `§4${p}` : '')
 
-      const g = (/** @type {string} */ p: string) => (q ? `§4${p}` : '')
-
-      if (!HealthIndicatorConfig.lockDisplay[player.id]) {
-        player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
-      }
+      if (!lockDisplay.has(player.id)) player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
     },
     'PVP player',
     0,
@@ -151,7 +150,7 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
       }
       // }
 
-      HealthIndicatorConfig.lockDisplay[damage.damagingEntity.id] = 2
+      lockDisplay.set(damage.damagingEntity.id, 2)
     }
   }
 

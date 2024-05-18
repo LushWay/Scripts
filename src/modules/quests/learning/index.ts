@@ -18,6 +18,7 @@ import airdropTable from './airdrop'
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Learning {
   static quest = new Quest(
     { name: 'Обучение', desc: 'Обучение базовым механикам сервера', id: 'learning' },

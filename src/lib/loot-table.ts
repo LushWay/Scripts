@@ -4,7 +4,7 @@ import { util } from 'lib/util'
 import { EventSignal } from './event-signal'
 
 declare namespace LootItem {
-  type RandomCostMapType = Record<`${number}...${number}` | number, Percent>;
+  type RandomCostMapType = Record<`${number}...${number}` | number, Percent>
 
   type Percent = `${number}%`
   interface Common {
@@ -165,10 +165,9 @@ export class LootTable {
   /**
    * Randomises items and returns array with specified size
    *
-   * @param {number} size - Size of the array
-   * @returns {(ItemStack | void)[]}
+   * @param size - Size of the array
    */
-  generate(size: number = this.items.length - 1): (ItemStack | void)[] {
+  generate(size: number = this.items.length - 1): (ItemStack | undefined)[] {
     let stepMax = 0
     if (this.fill.type === 'airPercent') {
       stepMax = ~~(size * (parseInt(this.fill.air) / 100))

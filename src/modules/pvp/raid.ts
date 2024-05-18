@@ -2,37 +2,35 @@ import { Player, system, world } from '@minecraft/server'
 import { LockAction, Region, util } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 
+const notify = new Map<string, number>()
+const targetLockTime = util.ms.from('min', 8) / 20
+const raiderLockTime = util.ms.from('min', 10) / 20
+
 world.beforeEvents.explosion.subscribe(event => {
   const impactedBlocks = event.getImpactedBlocks().filter(block => {
     const region = Region.nearestRegion(block, event.dimension.type)
-
     if (region && region.permissions.pvp) {
-      for (const id of region.permissions.owners) RAID_NOTIFY[id] = 60
+      for (const id of region.permissions.owners) notify.set(id, targetLockTime)
       return true
     }
   })
 
-  if (event.source && impactedBlocks.length) RAID_NOTIFY[event.source.id] = 120
+  if (event.source && impactedBlocks.length) notify.set(event.source.id, raiderLockTime)
   event.setImpactedBlocks(impactedBlocks)
 })
 
-const RAID_LOCKTEXT = 'Вы находитесь в режиме рейдблока.'
+const locktext = 'Вы находитесь в режиме рейдблока.'
 new LockAction(player => {
   const raidLockTime = player.scores.raid
-
   if (raidLockTime > 0) {
-    const { value: parsedTime, type } = util.ms.remaining(raidLockTime * 1000, {
-      converters: ['sec', 'min', 'hour', 'day'],
-    })
-    return {
-      lockText: `${RAID_LOCKTEXT} Осталось ${parsedTime} ${type}`,
-    }
+    const { value, type } = util.ms.remaining(raidLockTime * 1000, { converters: ['sec', 'min', 'hour', 'day'] })
+    return { lockText: `${locktext} Осталось ${value} ${type}` }
   } else return false
-}, RAID_LOCKTEXT)
+}, locktext)
 
 system.runInterval(
   () => {
-    for (const id in RAID_NOTIFY) {
+    for (const [id, num] of notify) {
       // Ищем игрока...
       const player = Player.getById(id)
       if (player) {
@@ -41,18 +39,17 @@ system.runInterval(
           player.playSound('mob.wolf.bark')
         }
 
-        player.scores.raid = RAID_NOTIFY[id]
-
-        delete RAID_NOTIFY[id]
+        player.scores.raid = num
+        notify.delete(id)
         continue
       }
 
-      RAID_NOTIFY[id]--
-
-      if (RAID_NOTIFY[id] <= 0) {
+      notify.set(id, num - 1)
+      if (num - 1 <= 0) {
         // Время вышло, игрока не было
 
-        delete RAID_NOTIFY[id]
+        notify.delete(id)
+
         continue
       }
     }
@@ -69,4 +66,3 @@ system.runInterval(
   'raid notify',
   20,
 )
-const RAID_NOTIFY: Record<string, number> = {}

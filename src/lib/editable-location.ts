@@ -69,8 +69,7 @@ export class EditableLocation<LocationType extends LocationTypeSuperset = 'vecto
     public id: string,
     { fallback = false, type }: { type?: LocationType; fallback?: EditableLocation<LocationType>['fallback'] } = {},
   ) {
-    // @ts-expect-error AAaa
-    this.type = type ?? 'vector3'
+    this.type = (type ?? 'vector3') as LocationType
     this.fallback = fallback
     this.format = `x y z${
       this.type === 'vector3+rotation' ? ' xRot yRot' : this.type === 'vector3+radius' ? ' radius' : ''

@@ -81,7 +81,7 @@ function Timer(
     util.catch(fn, type[0].toUpperCase() + type.slice(1))
 
     if (__DEV__) {
-      const tookTicks = end!() / 20
+      const tookTicks = (end?.() ?? 1) / 20
       if (tookTicks > ticks + 1) {
         console.warn(`§6Spike on ${type} §f${name}:§6 took §c${tookTicks.toFixed(2)}§f/${ticks}§6 ticks§r\n${path}`)
       }

@@ -197,6 +197,6 @@ export class Region {
   /** Removes this region */
   delete() {
     Region.regions = Region.regions.filter(e => e.key !== this.key)
-    delete RegionDatabase[this.key]
+    Reflect.deleteProperty(RegionDatabase, this.key)
   }
 }

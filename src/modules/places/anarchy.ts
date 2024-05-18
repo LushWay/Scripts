@@ -11,7 +11,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
   zone: Zone | undefined
 
-  learningRTP(player: Player) {}
+  learningRTP(player: Player) {
+    // Hook function
+  }
 
   inventoryName: InventoryTypeName = 'anarchy'
 
@@ -33,7 +35,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
           .setGroup('public')
           .setPermissions('member')
           .executes(ctx => {
-            ctx.player.info(`Радиус границы анархии сейчас: ${this.zone!.lastRadius}`)
+            ctx.player.info(`Радиус границы анархии сейчас: ${this.zone?.lastRadius}`)
           })
     })
 

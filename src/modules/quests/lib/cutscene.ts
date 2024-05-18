@@ -4,6 +4,7 @@ import { Vector } from 'lib'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { restorePlayerCamera } from 'lib'
 import { table } from 'lib/database/abstract'
+import { WeakPlayerMap } from 'lib/weak-player-map'
 
 /**
  * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
@@ -35,7 +36,7 @@ export class Cutscene {
   static list: Record<string, Cutscene> = {}
 
   static getCurrent(player: Player) {
-    return Object.values(this.list).find(e => e.current[player.id])
+    return Object.values(this.list).find(e => e.current.get(player.id))
   }
 
   /** List of cutscene sections */
@@ -45,15 +46,14 @@ export class Cutscene {
 
   private restoreCameraTime = 2
 
-  // TODO Refactor using WeakPlayerMap
   /** List of players that currently see cutscene play */
-  private current: Record<
-    string,
-    {
-      player: Player
-      controller: AbortController
-    }
-  > = {}
+  private current = new WeakPlayerMap<{
+    player: Player
+    controller: AbortController
+  }>({
+    removeOnLeave: true,
+    onLeave: playerId => this.exit(playerId),
+  })
 
   /** Creates a new Cutscene. */
 
@@ -120,10 +120,10 @@ export class Cutscene {
       { controller, exit: () => this.exit(player) },
     ).catch(console.error)
 
-    this.current[player.id] = {
+    this.current.set(player.id, {
       player,
       controller,
-    }
+    })
   }
 
   /**
@@ -194,15 +194,17 @@ export class Cutscene {
    *
    * @param player - The player to stop cutscene on
    */
-  exit(player: Player) {
-    if (!this.current[player.id]) return false
+  exit(player: Player | string) {
+    const playerId = player instanceof Player ? player.id : player
+    const state = this.current.get(playerId)
+    if (!state) return false
 
     // Cancel animation
-    this.current[player.id].controller.cancel = true
+    state.controller.cancel = true
 
     // Cleanup and restore to the previous state
-    delete this.current[player.id]
-    restorePlayerCamera(player, this.restoreCameraTime)
+    this.current.delete(playerId)
+    if (player instanceof Player) restorePlayerCamera(player, this.restoreCameraTime)
 
     return true
   }

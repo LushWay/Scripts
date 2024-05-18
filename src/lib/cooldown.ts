@@ -49,7 +49,7 @@ export class Cooldown {
   }
 
   expire() {
-    delete this.db[this.key]
+    Reflect.deleteProperty(this.db, this.key)
   }
 
   private get elapsed() {

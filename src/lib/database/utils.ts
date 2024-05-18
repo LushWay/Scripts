@@ -128,8 +128,6 @@ export class DatabaseUtils {
     )
     this.waitingForBackup = true
   }
-
-  protected constructor() {}
 }
 
 if (!__TEST__) {

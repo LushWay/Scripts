@@ -91,7 +91,7 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
       ),
     )
     .addButton('§cУдалить§r', () => {
-      delete table[key]
+      Reflect.deleteProperty(table, key)
       system.delay(back)
     })
     .addButtonBack(back)

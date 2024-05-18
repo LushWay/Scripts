@@ -33,7 +33,9 @@ export class FormCallback<Form extends BaseForm = BaseForm> {
   error(message: string): void {
     new MessageForm('§cОшибка', message)
       .setButton1('Назад', this.back)
-      .setButton2('§cЗакрыть', () => {})
+      .setButton2('§cЗакрыть', () => {
+        // Do nothing
+      })
       .show(this.player)
   }
 }

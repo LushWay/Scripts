@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-extraneous-class */
 import { ContainerSlot, Player, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard } from 'lib/region/index'
@@ -15,22 +16,21 @@ export class PlaceAction {
   static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: Dimensions = 'overworld') {
     const id = this.placeId(place, dimension)
 
-    this[type][id] ??= new Set()
-    this[type][id].add(action)
+    if (!this[type].has(id)) this[type].set(id, new Set())
+    this[type].get(id)?.add(action)
 
     return {
       id,
       action,
-      unsubscribe() {
-        PlaceAction[type][id].delete(action)
-
-        if (PlaceAction[type][id].size === 0) delete PlaceAction[type][id]
+      unsubscribe: () => {
+        this[type].get(id)?.delete(action)
+        if (this[type].get(id)?.size === 0) this[type].delete(id)
       },
     }
   }
 
   private static emit(to: PlaceType, place: Vector3, player: Player, dimension: Dimensions) {
-    const actions = this[to][this.placeId(place, dimension)]
+    const actions = this[to].get(this.placeId(place, dimension))
     if (!actions) return false
 
     actions.forEach(action => action(player))
@@ -42,14 +42,14 @@ export class PlaceAction {
     return this.subscribe('enters', place, action, dimension)
   }
 
-  private static enters: Record<string, Set<PlayerCallback>> = {}
+  private static enters = new Map<string, Set<PlayerCallback>>()
 
   /** Creates action that triggers function when any player interacts with block on this place. */
   static onInteract(place: Vector3, action: PlayerCallback, dimension: Dimensions) {
     return this.subscribe('interactions', place, action, dimension)
   }
 
-  private static interactions: Record<string, Set<PlayerCallback>> = {}
+  private static interactions = new Map<string, Set<PlayerCallback>>()
 
   static {
     world.beforeEvents.playerInteractWithBlock.subscribe(event => {
@@ -71,8 +71,6 @@ export class PlaceAction {
         return true
     }, -2)
   }
-
-  protected constructor() {}
 }
 
 type LockActionChecker = (player: Player) => boolean | { lockText: string }

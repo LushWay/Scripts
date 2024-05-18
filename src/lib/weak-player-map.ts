@@ -1,24 +1,32 @@
 import { Player, world } from '@minecraft/server'
 
 const id = (player: Player | string) => (player instanceof Player ? player.id : player)
-const onlineWeakMaps: Pick<Map<string, unknown>, 'has' | 'delete'>[] = []
+const onlineWeakMaps: (Pick<Map<string, unknown>, 'has' | 'delete'> & { onLeave?: OnLeaveCallback })[] = []
 
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   for (const map of onlineWeakMaps) {
-    if (map.has(playerId)) map.delete(playerId)
+    if (map.has(playerId)) {
+      map.onLeave?.(playerId)
+      map.delete(playerId)
+    }
   }
 })
 
+type OnLeaveCallback = (playerId: string) => void
+
 export class WeakPlayerMap<T> extends Map<string, T> {
+  onLeave?: OnLeaveCallback
+
   /**
    * Creates new WeakPlayerMap
    *
    * @param options - Options
    * @param options.removeOnLeave - Whenether to remove player from map when it leavs
    */
-  constructor(options: { removeOnLeave: boolean }) {
+  constructor(options: { removeOnLeave: boolean; onLeave?: OnLeaveCallback }) {
     super()
     if (options.removeOnLeave) onlineWeakMaps.push(this)
+    if (options.onLeave) this.onLeave
   }
 
   get(player: Player | string) {

@@ -34,5 +34,7 @@ export class DefaultPlaceWithInventory {
     callback()
   }
 
-  saveInventory(player: Player) {}
+  saveInventory(player: Player) {
+    // Implementation in subclass
+  }
 }

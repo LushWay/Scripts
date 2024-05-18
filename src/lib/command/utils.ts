@@ -5,11 +5,6 @@ import { inaccurateSearch } from '../search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
 
-/**
- * @param {string} message
- * @param {number} prefixSize
- * @returns
- */
 export function parseCommand(message: string, prefixSize = 1) {
   const command = message.slice(prefixSize).trim()
 
@@ -39,9 +34,7 @@ export function parseArguments(message: string): string[] {
 /**
  * Sends a command not found message to a player
  *
- * @param {Player} player Player to send message to
- * @param {string} command
- * @returns {void}
+ * @param player Player to send message to
  */
 export function commandNotFound(player: Player, command: string): void {
   player.tell({
@@ -64,9 +57,7 @@ export function commandNotFound(player: Player, command: string): void {
 /**
  * Sends a command not found message to a player
  *
- * @param {Player} player Player to send message to
- * @param {string} command
- * @returns {void}
+ * @param player Player to send message to
  */
 function suggestCommand(player: Player, command: string): void {
   if (!command) return
@@ -117,16 +108,8 @@ export function commandNoPermissions(player: Player, command: import('./index').
   )
 }
 
-/**
- * Sends a syntax failure message to player
- *
- * @param {Player} player Undefined
- * @param {import('./index').Command} command Undefined
- * @param {string[]} args Undefined
- * @param {number} i Undefined
- * @returns {void}
- */
-export function commandSyntaxFail(player: Player, command: import('./index').Command, args: string[], i: number): void {
+/** Sends a syntax failure message to player */
+export function commandSyntaxFail(player: Player, command: import('./index').Command, args: string[], i: number) {
   player.tell({
     rawtext: [
       {
@@ -149,10 +132,6 @@ export function commandSyntaxFail(player: Player, command: import('./index').Com
  *
  * @example
  *   parseLocationAugs(['~1', '3', '^7'], { location: [1, 2, 3], viewVector: [1, 2, 3] })
- *
- * @param a0
- * @param data
- * @returns
  */
 export function parseLocationArguments(
   [x, y, z]: [x: string, y: string, z: string],
@@ -214,11 +193,7 @@ export function sendCallback(
 
   ;(async () => {
     try {
-      await lastArg.sys.callback?.(
-        new CommandContext(event, cmdArgs, baseCommand, rawInput),
-        // @ts-expect-error AAAAAAA
-        ...argsToReturn,
-      )
+      await lastArg.sys.callback?.(new CommandContext(event, cmdArgs, baseCommand, rawInput), ...argsToReturn)
     } catch (e) {
       event.sender.warn(
         'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.',

@@ -1,6 +1,8 @@
-export class HealthIndicatorConfig {
-  /** Array of player ids who wouldn't get pvp lock */
-  static disabled: string[] = []
+import { WeakPlayerMap } from 'lib/weak-player-map'
 
-  static lockDisplay: Record<string, number> = {}
+export const HealthIndicatorConfig = {
+  /** Array of player ids who wouldn't get pvp lock */
+  disabled: [] as string[],
+
+  lockDisplay: new WeakPlayerMap<number>({ removeOnLeave: true }),
 }

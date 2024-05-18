@@ -6,241 +6,210 @@ import { util, Vector } from 'lib'
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
-import { PLAYER_NAME_TAG_MODIFIERS, setNameTag } from 'modules/indicator/playerNameTag'
+import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/playerNameTag'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 // TODO Rewrite in class
 
-const HURT_ENTITIES: Record<
-  string,
-  (
-    | {
-        separated: false
-      }
-    | {
-        separated: true
-        indicator: Entity
-      }
-  ) & {
-    hurtEntity: Entity
-    damage: number
-    expires: number
-  }
-> = {}
-const INDICATOR_TAG = 'HEALTH_INDICATOR'
-
-/**
- * Entities that have nameTag "always_show": true and dont have boss_bar
- *
- * @type {string[]}
- */
-const ALWAYS_SHOWS: string[] = [MinecraftEntityTypes.Player]
-
-/** List of families to indicate health */
-const ALLOWED_FAMILIES = ['monster']
-
-// Show indicator on hurt
-
-world.afterEvents.entityHurt.subscribe(event => {
-  if (event.damage === 0) return
-
-  // Validate entity
-  if (!event.hurtEntity.isValid()) return
-
-  const { id } = event.hurtEntity
-  if (!id || NOT_MOB_ENTITIES.includes(id)) return
-  if (
-    !event.hurtEntity.isValid() ||
-    !(event.hurtEntity.matches({ families: ALLOWED_FAMILIES }) || event.hurtEntity instanceof Player)
-  )
-    return
-
-  // Not trigget by close chat
-  if (ClosingChatSet.has(event.hurtEntity.id)) return
-
-  updateIndicator({ entity: event.hurtEntity, damage: Math.floor(event.damage) })
-})
-
-// Remove indicator
-
-world.afterEvents.entityDie.subscribe(event => {
-  if (!event.deadEntity.isValid()) return
-
-  const { id } = event.deadEntity
-  if (!id) return
-
-  const info = HURT_ENTITIES[id]
-  if (!info) return
-
-  if (info.separated) {
-    try {
-      info.indicator.remove()
-    } catch {}
-  }
-
-  delete HURT_ENTITIES[id]
-})
-
-system.runInterval(
-  () => {
-    const indicators = getIDs(getIndicators())
-    const usedIndicators = new Set()
-    const now = Date.now()
-
-    for (const [id, info] of Object.entries(HURT_ENTITIES)) {
-      const entity = info.hurtEntity
-
-      if (!entity || (info.damage === 0 && info.expires < now)) {
-        if (info.separated)
-          try {
-            info.indicator.remove()
-          } catch {}
-
-        delete HURT_ENTITIES[id]
-        continue
-      }
-
-      if (info.separated) usedIndicators.add(info.indicator.id)
-
-      updateIndicator({ entity, damage: -info.damage })
-    }
-
-    for (const indicator of indicators) {
-      if (!usedIndicators.has(indicator.id)) {
-        try {
-          indicator.entity.remove()
-        } catch {}
-      }
-    }
-  },
-  'health indicator, damage reducer',
-  10,
-)
-
-const BAR_SYMBOL = '|'
-
-/**
- * Gets damage indicator name depending on entity's currnet heart and damage applied
- *
- * @param {Entity} entity
- * @returns {string}
- */
-function getBar(entity: Entity, hp = entity.getComponent('health')): string {
-  if (entity instanceof Player && isNotPlaying(entity)) return ''
-  if (!hp || !(entity.id in HURT_ENTITIES)) return ''
-  const maxHP = hp.defaultValue
-
-  const s = 50
-  const scale = maxHP <= s ? 1 : maxHP / s
-
-  const full = ~~(maxHP / scale)
-  const current = ~~(hp.currentValue / scale)
-
-  const damage = ~~(HURT_ENTITIES[entity.id].damage / scale)
-
-  let bar = ''
-  for (let i = 1; i <= full; i++) {
-    if (i <= current) {
-      bar += '§c' + BAR_SYMBOL
-      continue
-    }
-    if (i > current && i <= current + damage) {
-      bar += '§e' + BAR_SYMBOL
-      continue
-    }
-
-    bar += '§7' + BAR_SYMBOL
-  }
-
-  return bar
+interface BaseHurtEntity {
+  hurtEntity: Entity
+  damage: number
+  expires: number
 }
 
-PLAYER_NAME_TAG_MODIFIERS.push(p => {
-  const bar = getBar(p)
-  if (bar) return '\n' + bar
-  else return false
-})
+interface SeparatedHurtEntity {
+  separated: true
+  indicator: Entity
+}
 
-/** @param {{ entity: Entity; damage?: number; entityId?: string }} param0 */
-function updateIndicator({ entity, damage = 0, entityId }: { entity: Entity; damage?: number; entityId?: string }) {
-  if (entity.isValid()) return
-  entityId ??= entity.id
+interface SingleHurtEntity {
+  separated: false
+}
 
-  let info = HURT_ENTITIES[entityId]
+class HealthIndicator {
+  hurtEntities = new Map<string, (SeparatedHurtEntity | SingleHurtEntity) & BaseHurtEntity>()
 
-  if (!info) {
-    const separated = !ALWAYS_SHOWS.includes(entity.typeId)
-    const base = {
-      hurtEntity: entity,
-      expires: Date.now(),
-      damage: 0,
-    }
+  indicatorTag = 'HEALTH_INDICATOR'
 
-    if (separated) {
-      info = {
-        ...base,
-        separated: true,
-        indicator: spawnIndicator(entity),
-      }
-    } else {
-      info = {
-        ...base,
-        separated: false,
-      }
-    }
+  /** Entities that have nameTag "always_show": true and dont have boss_bar */
+  alwaysShows: string[] = [MinecraftEntityTypes.Player]
 
-    HURT_ENTITIES[entityId] = info
-  }
+  /** List of families to indicate health */
+  allowedFamilies = ['monster']
 
-  if (damage > 0) {
-    info.expires = Date.now() + util.ms.from('sec', 10)
-  }
+  constructor() {
+    // Show indicator on hurt
+    world.afterEvents.entityHurt.subscribe(event => {
+      if (event.damage === 0) return
 
-  info.damage += damage
-  // Do not allow values below 0
-  info.damage = Math.max(0, info.damage)
+      // Validate entity
+      if (!event.hurtEntity.isValid()) return
 
-  try {
-    setNameTag(info.separated ? info.indicator : info.hurtEntity, () => getBar(entity))
-  } catch (e) {
-    if (e instanceof Error && e.message.match(/Failed to (set|get) property/)) {
-      delete HURT_ENTITIES[entityId]
-      return
-    }
+      const { id } = event.hurtEntity
+      if (!id || NOT_MOB_ENTITIES.includes(id)) return
+      if (
+        !event.hurtEntity.isValid() ||
+        !(event.hurtEntity.matches({ families: this.allowedFamilies }) || event.hurtEntity instanceof Player)
+      )
+        return
 
-    throw e
-  }
-  if (info.separated)
-    try {
-      info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
-    } catch (e) {
-      if (e instanceof Error && e.message.includes("Failed to call function 'getHeadLocation'")) {
+      // Not trigget by close chat
+      if (ClosingChatSet.has(event.hurtEntity.id)) return
+
+      this.updateIndicator({ entity: event.hurtEntity, damage: Math.floor(event.damage) })
+    })
+
+    // Remove indicator
+    world.afterEvents.entityDie.subscribe(event => {
+      if (!event.deadEntity.isValid()) return
+
+      const { id } = event.deadEntity
+      if (!id) return
+
+      const info = this.hurtEntities.get(id)
+      if (!info) return
+
+      if (info.separated) {
         try {
           info.indicator.remove()
         } catch {}
-
-        delete HURT_ENTITIES[entityId]
       }
+
+      this.hurtEntities.delete(id)
+    })
+
+    system.runInterval(
+      () => {
+        const indicators = this.getIDs(this.getIndicators())
+        const usedIndicators = new Set()
+        const now = Date.now()
+
+        for (const [id, info] of this.hurtEntities) {
+          const entity = info.hurtEntity
+
+          if (!entity || (info.damage === 0 && info.expires < now)) {
+            if (info.separated && info.indicator.isValid()) info.indicator.remove()
+            this.hurtEntities.delete(id)
+            continue
+          }
+
+          if (info.separated) usedIndicators.add(info.indicator.id)
+          this.updateIndicator({ entity, damage: -info.damage })
+        }
+
+        for (const indicator of indicators) {
+          if (!usedIndicators.has(indicator.id) && indicator.entity.isValid()) {
+            indicator.entity.remove()
+          }
+        }
+      },
+      'health indicator, damage reducer',
+      10,
+    )
+
+    PlayerNameTagModifiers.push(p => {
+      const bar = this.getBar(p)
+      if (bar) return '\n' + bar
+      else return false
+    })
+  }
+
+  /** Gets damage indicator name depending on entity's currnet heart and damage applied */
+  getBar(entity: Entity, hp = entity.getComponent('health')): string {
+    if (entity instanceof Player && isNotPlaying(entity)) return ''
+
+    const hurtEntity = this.hurtEntities.get(entity.id)
+    if (!hp || !hurtEntity) return ''
+    const maxHP = hp.defaultValue
+
+    const s = 50
+    const scale = maxHP <= s ? 1 : maxHP / s
+
+    const full = ~~(maxHP / scale)
+    const current = ~~(hp.currentValue / scale)
+    const damage = ~~(hurtEntity.damage / scale)
+
+    let bar = ''
+    for (let i = 1; i <= full; i++) {
+      if (i <= current) {
+        bar += '§c' + this.barSymbol
+        continue
+      }
+      if (i > current && i <= current + damage) {
+        bar += '§e' + this.barSymbol
+        continue
+      }
+
+      bar += '§7' + this.barSymbol
     }
+
+    return bar
+  }
+
+  barSymbol = '|'
+
+  updateIndicator({ entity, damage = 0 }: { entity: Entity; damage?: number }) {
+    if (!entity.isValid()) return
+
+    const info = this.createHurtEntityRecord(entity)
+
+    if (damage > 0) info.expires = Date.now() + util.ms.from('sec', 10)
+    info.damage = Math.max(0, info.damage + damage) // Do not allow values less then 0
+
+    setNameTag(info.separated ? info.indicator : info.hurtEntity, () => this.getBar(entity))
+    if (info.separated && entity.isValid()) {
+      info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+    }
+  }
+
+  private createHurtEntityRecord(entity: Entity) {
+    let info = this.hurtEntities.get(entity.id)
+    if (!info) {
+      const separated = !this.alwaysShows.includes(entity.typeId)
+      const base = {
+        hurtEntity: entity,
+        expires: Date.now(),
+        damage: 0,
+      }
+
+      if (separated) {
+        info = {
+          ...base,
+          separated: true,
+          indicator: this.spawnIndicator(entity),
+        }
+      } else {
+        info = {
+          ...base,
+          separated: false,
+        }
+      }
+
+      this.hurtEntities.set(entity.id, info)
+    }
+
+    return info
+  }
+
+  spawnIndicator(entity: Entity) {
+    const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
+    indicator.addTag(this.indicatorTag)
+    return indicator
+  }
+
+  getIndicators() {
+    return world.overworld.getEntities({
+      type: CUSTOM_ENTITIES.floatingText,
+      tags: [this.indicatorTag],
+    })
+  }
+
+  getIDs(entities: Entity[]) {
+    return entities.map(entity => ({
+      id: util.run(() => entity.id)[0],
+      entity,
+    }))
+  }
 }
 
-/** @param {Entity} entity */
-function spawnIndicator(entity: Entity) {
-  const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
-  indicator.addTag(INDICATOR_TAG)
-  return indicator
-}
-
-function getIndicators() {
-  return world.overworld.getEntities({
-    type: CUSTOM_ENTITIES.floatingText,
-    tags: [INDICATOR_TAG],
-  })
-}
-
-function getIDs(entities: Entity[]) {
-  return entities.map(entity => ({
-    id: util.run(() => entity.id)[0],
-    entity,
-  }))
-}
+export default new HealthIndicator()

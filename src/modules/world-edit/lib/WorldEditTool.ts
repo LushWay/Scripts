@@ -176,7 +176,8 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
       if (returnUndefined) return undefined
       raw = JSON.parse(JSON.stringify(this.loreFormat))
     }
-    delete raw.version
+
+    if ('version' in raw) Reflect.deleteProperty(raw, 'version')
 
     return raw
   }

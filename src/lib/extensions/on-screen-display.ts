@@ -1,5 +1,6 @@
 import { Player, RawMessage, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
+import { WeakPlayerMap } from 'lib/weak-player-map'
 
 declare module '@minecraft/server' {
   interface HudTitleDisplayOptions {
@@ -63,7 +64,7 @@ type OtherScreenDisplayTypes = Partial<
   >
 >
 
-const titles: Record<string, CommonTitleTypes & OtherScreenDisplayTypes> = {}
+const titles = new WeakPlayerMap<CommonTitleTypes & OtherScreenDisplayTypes>({ removeOnLeave: true })
 
 type ScreenDisplayOverrideThis = ThisType<
   {
@@ -81,7 +82,12 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
   },
 
   setHudTitle(message, options, prefix = $title, n = 0) {
-    const playerScreenDisplay = (titles[this.player.id] ??= { actions: [] })
+    let playerScreenDisplay = titles.get(this.player.id)
+    if (!playerScreenDisplay) {
+      playerScreenDisplay = { actions: [] }
+      titles.set(this.player.id, playerScreenDisplay)
+    }
+
     let type: ScreenDisplayType = 'title'
 
     if (prefix === $tipPrefix) {
@@ -194,7 +200,7 @@ system.run(() => {
             priority: event.title.priority ?? 0,
           })
 
-          delete titles[id]
+          titles.delete(id)
         }
 
         if (player) {

@@ -2,8 +2,8 @@ import { Entity, EntityLifetimeState, Player, ScoreboardObjective, system, world
 import { CUSTOM_ENTITIES } from 'lib/assets/config'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
-import { table } from './database/abstract'
 import { Vector } from 'lib/vector'
+import { table } from './database/abstract'
 
 export interface LeaderboardInfo {
   style: keyof typeof Leaderboard.styles
@@ -61,7 +61,7 @@ export class Leaderboard {
     },
   }
 
-  static all: Record<string, Leaderboard> = {}
+  static all = new Map<string, Leaderboard>()
 
   static createLeaderboard({
     objective,
@@ -88,16 +88,16 @@ export class Leaderboard {
     public entity: Entity,
     public info: LeaderboardInfo,
   ) {
-    if (entity.id in Leaderboard.all) return Leaderboard.all[entity.id]
+    const previous = Leaderboard.all.get(entity.id)
+    if (previous) return previous
 
     this.update()
-
-    Leaderboard.all[entity.id] = this
+    Leaderboard.all.set(entity.id, this)
   }
 
   remove() {
-    delete Leaderboard.db[this.entity.id]
-    delete Leaderboard.all[this.entity.id]
+    Reflect.deleteProperty(Leaderboard.db, this.entity.id)
+    Leaderboard.all.delete(this.entity.id)
     this.entity.remove()
   }
 
@@ -154,11 +154,11 @@ system.runInterval(
   () => {
     for (const [id, leaderboard] of Object.entries(immutable)) {
       if (!leaderboard) continue
-      const LB = Leaderboard.all[id]
+      const info = Leaderboard.all.get(id)
 
-      if (LB) {
-        if (LB.entity.lifetimeState === EntityLifetimeState.Unloaded) continue
-        LB.updateLeaderboard()
+      if (info) {
+        if (info.entity.lifetimeState === EntityLifetimeState.Unloaded) continue
+        info.updateLeaderboard()
       } else {
         const entity = world[leaderboard.dimension]
           .getEntities({

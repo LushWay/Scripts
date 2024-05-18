@@ -41,4 +41,3 @@ describe('region initialization', () => {
     expect(restoreRegionFromJSON(['test 2', regionJSON], [RadiusRegion, TestRegion])).toBeInstanceOf(TestRegion)
   })
 })
-

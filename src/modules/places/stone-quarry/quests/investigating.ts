@@ -5,6 +5,7 @@ import { Cutscene } from 'modules/quests/lib/cutscene'
 import { Quest } from 'modules/quests/lib/quest'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class StoneQuarryInvestigating {
   static place = StoneQuarry
 
@@ -21,7 +22,9 @@ class StoneQuarryInvestigating {
         text: 'поговорите с горожанами',
         description: 'Лучше всего узнавать о городе у местных, поговорите с ними!',
         activate() {
-          return new Temporary(() => {})
+          return new Temporary(() => {
+            // TODO WRITE
+          })
         },
       })
     },

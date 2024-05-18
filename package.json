@@ -23,7 +23,6 @@
     "@minecraft/vanilla-data": "1.20.80"
   },
   "devDependencies": {
-    "@sentry/esbuild-plugin": "^2.16.1",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitest/coverage-istanbul": "^1.6.0",
@@ -59,7 +58,8 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/strict",
+      "plugin:@typescript-eslint/stylistic",
       "prettier"
     ],
     "plugins": [
@@ -91,6 +91,8 @@
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-extraneous-class": "off",
+      "@typescript-eslint/no-invalid-void-type": "off",
       "@typescript-eslint/naming-convention": [
         "warn",
         {
@@ -150,6 +152,8 @@
     "ignorePatterns": [
       "tools/*",
       "src/lib/assets/*",
+      "**/*.test.ts",
+      "**/*.spec.ts",
       "scripts/*",
       "src/test/__mocks__/*"
     ],

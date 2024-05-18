@@ -32,6 +32,7 @@ type InteractionAllowed = (
     | { type: 'place'; event: PlayerPlaceBlockBeforeEvent }
     | { type: 'interactWithBlock'; event: PlayerInteractWithBlockBeforeEvent }
     | { type: 'interactWithEntity'; event: PlayerInteractWithEntityBeforeEvent },
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => boolean | void
 
 type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined

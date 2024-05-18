@@ -3,10 +3,11 @@ import { EventSignal } from 'lib/event-signal'
 import { WeakPlayerMap } from 'lib/weak-player-map'
 import { Region } from './Region'
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RegionEvents {
   /**
    * Player map that contains region list that player is currently in. Updated each second by region interval. Used to
-   * emit events such as {@link Region.onPlayerRegionsChange}
+   * emit events such as {@link RegionEvents.onPlayerRegionsChange}
    */
   static playerInRegionsCache = new WeakPlayerMap<Region[]>({ removeOnLeave: true })
 
@@ -14,8 +15,7 @@ export class RegionEvents {
    * Event that triggers when player regions have changed. Updated each second by region interval. Uses
    * {@link Region.playerInRegionsCache} under the hood
    */
-  static onPlayerRegionsChange =
-    new EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>()
+  static onPlayerRegionsChange = new EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>()
 
   /**
    * Listens for player region changes and triggers a callback when a player enters a specific region.
@@ -28,6 +28,4 @@ export class RegionEvents {
       if (!previous.includes(region) && newest.includes(region)) callback(player)
     })
   }
-
-  protected constructor() {}
 }

@@ -32,6 +32,29 @@ suite('WeakPlayerMap', () => {
     test.assert(playerMap.has(player), 'Map should contain the player after leaving')
   })
 
+  test('testWeakPlayerMapCallback', async test => {
+    const player = test.player()
+    const playerId = player.id
+    let called = 0
+    const playerMap = new WeakPlayerMap<string>({
+      removeOnLeave: true,
+      onLeave(pId) {
+        test.assert(pId === playerId, 'Player id should match')
+        called++
+      },
+    })
+
+    playerMap.set(player, 'testValue')
+
+    test.assert(playerMap.get(player) === 'testValue', "Value should be 'testValue'")
+    test.assert(playerMap.has(player), 'Map should contain the player')
+
+    player.remove()
+
+    test.assert(playerMap.has(player), 'Map should not contain the player after leaving')
+    test.assert(called === 1, 'On leave callback should be called once')
+  })
+
   test('testWeakOnlinePlayerMap', async test => {
     const player = test.player()
     const onlinePlayerMap = new WeakOnlinePlayerMap<string>()

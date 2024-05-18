@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+/* eslint-disable */
 // @ts-nocheck
 // TODO Update
 
@@ -17,7 +17,7 @@ const minpl = 2,
  * @param {string} sound - The sound to play.
  * @param {string} text - The text that will be displayed to the player.
  */
-function forEveryQuenedPlayer(sound, text) {
+function forEveryQuenedPlayer(sound: string, text: string) {
   for (const name in BR_QUENE) {
     const player = Player.getById(name)
     if (!player) {
@@ -29,13 +29,12 @@ function forEveryQuenedPlayer(sound, text) {
   }
 }
 
-/** @param {Player} player */
-export function teleportToBR(player) {}
+export function teleportToBR(player: Player) {}
 
 const ks = Object.keys
 BATTLE_ROYAL_EVENTS.join.subscribe(player => {
   /** @type {Player} */
-  const pl = player
+  const pl: Player = player
   if (br.players.map(e => e.name).includes(pl.name)) return
   if (br.game.started) return pl.onScreenDisplay.setActionBar(`§cИгра уже идет!`)
   if (BR_QUENE[pl.name])

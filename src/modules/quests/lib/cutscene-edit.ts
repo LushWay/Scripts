@@ -42,8 +42,8 @@ const controls: Record<
     ),
     (player, cutscene, temp) => {
       // Restore bakcup
-      const backup = EDITING_CUTSCENE[player.id]
-      cutscene.sections = backup.cutsceneSectionsBackup
+      const backup = EditingCutscene.get(player.id)
+      if (backup) cutscene.sections = backup.cutsceneSectionsBackup
 
       temp.cleanup()
       player.success('Успешно отменено!')
@@ -139,7 +139,10 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
     return {
       cleanup() {
-        const { hotbarSlots: slots, position } = EDITING_CUTSCENE[player.id]
+        const editingPlayer = EditingCutscene.get(player.id)
+        if (!editingPlayer) return
+
+        const { hotbarSlots: slots, position } = editingPlayer
 
         if (player.isValid()) {
           forEachHotbarSlot(player, (i, container) => {
@@ -150,7 +153,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
           player.teleport(position)
         }
 
-        delete EDITING_CUTSCENE[player.id]
+        EditingCutscene.delete(player.id)
         cutscene.save()
       },
     }
@@ -180,14 +183,14 @@ interface EditingCutscenePlayer {
 }
 
 /** Map of player id to player editing cutscene */
-const EDITING_CUTSCENE: Record<string, EditingCutscenePlayer> = {}
+const EditingCutscene = new Map<string, EditingCutscenePlayer>()
 
 function backupPlayerInventoryAndCutscene(player: Player, cutscene: Cutscene) {
-  EDITING_CUTSCENE[player.id] = {
+  EditingCutscene.set(player.id, {
     hotbarSlots: backupPlayerInventory(player),
     position: Vector.floor(player.location),
     cutsceneSectionsBackup: cutscene.sections.slice(),
-  }
+  })
 
   cutscene.sections = []
 }

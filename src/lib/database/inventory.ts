@@ -122,7 +122,7 @@ export class InventoryStore {
   private tableType = tableType
 
   /** List of all loaded inventories */
-  private inventories: Record<string, Inventory> = {}
+  private inventories = new Map<string, Inventory>()
 
   /**
    * Creates new inventory store manager
@@ -173,7 +173,7 @@ export class InventoryStore {
 
         // Saving previosly parsed inventory if exists
         if (owner) {
-          this.inventories[owner] = store
+          this.inventories.set(owner, store)
           store = {
             xp: 0,
             health: 20,
@@ -207,19 +207,15 @@ export class InventoryStore {
     }
 
     if (owner) {
-      this.inventories[owner] = store
+      this.inventories.set(owner, store)
     }
   }
 
   private save() {
     const items: ItemStack[] = []
 
-    for (const owner in this.inventories) {
-      const store = this.inventories[owner]
-
+    for (const [owner, store] of this.inventories) {
       const storeIndex = items.length
-
-      /** @type {StoreManifest} */
       const manifest: StoreManifest = {
         health: store.health,
         xp: store.xp,
@@ -287,8 +283,7 @@ export class InventoryStore {
   }
 
   remove(id: string) {
-    delete this.inventories[id]
-
+    this.inventories.delete(id)
     this.requestSave()
   }
 
@@ -321,7 +316,7 @@ export class InventoryStore {
   /**
    * Gets entity store from saved and removes to avoid bugs
    *
-   * @param {string} key - The ID of the entity whose store is being retrieved.
+   * @param {string} id - The ID of the entity whose store is being retrieved.
    * @param {object} [o]
    * @param {boolean} [o.remove] - A boolean parameter that determines whether the entity store should be removed from
    *   the internal stores object after it has been retrieved. If set to true, the store will be deleted from the
@@ -329,15 +324,14 @@ export class InventoryStore {
    * @param {Inventory} [o.fallback] - Inventory to return if there is no inventory in store
    * @returns The entity store associated with the given entity ID.
    */
-  get(key: string, { remove = true, fallback }: { remove?: boolean; fallback?: Inventory } = {}) {
-    if (!this.has(key)) {
+  get(id: string, { remove = true, fallback }: { remove?: boolean; fallback?: Inventory } = {}) {
+    const store = this.inventories.get(id)
+    if (!store) {
       if (fallback) return fallback
-      else throw new DatabaseError('Not found inventory!')
+      else throw new DatabaseError('Inventory not found')
     }
 
-    const store = this.inventories[key]
-
-    if (remove) delete this.inventories[key]
+    if (remove) this.remove(id)
     return store
   }
 
@@ -361,12 +355,12 @@ export class InventoryStore {
     }: { rewrite?: boolean; keepInventory?: boolean; key?: string } = {},
   ) {
     if (key in this.inventories && !rewrite)
-      throw new DatabaseError('Failed to rewrite entity store with disabled rewriting.')
+      throw new DatabaseError('Cannot rewrite entity store with disabled rewriting.')
 
-    this.inventories[key] = InventoryStore.get(entity)
-    if (!keepInventory) entity.container?.clearAll()
-
+    this.inventories.set(key, InventoryStore.get(entity))
     this.requestSave()
+
+    if (!keepInventory) entity.container?.clearAll()
   }
 
   /**

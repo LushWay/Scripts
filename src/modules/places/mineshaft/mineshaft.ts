@@ -32,8 +32,6 @@ class MineshaftBuilder {
 
     return orePositions
   }
-
-  constructor() {}
 }
 
 export const Mineshaft = new MineshaftBuilder()

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
 import { CONFIG } from '../assets/config'
 import { is } from '../roles'
@@ -21,15 +22,16 @@ type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) 
 
 type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
 
-export class Command<
-  Callback extends (ctx: CommandContext, ...args: unknown[]) => unknown = (ctx: CommandContext) => unknown,
-> {
-  /** @param {string} message */
+type CommandCallback = (ctx: CommandContext, ...args: unknown[]) => unknown
+
+export class Command<Callback extends CommandCallback = CommandCallback> {
   static isCommand(message: string) {
     return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
 
-  static chatSendListener(event: ChatSendAfterEvent) {}
+  static chatSendListener(event: ChatSendAfterEvent) {
+    // Hook
+  }
 
   static chatListener(event: ChatSendAfterEvent) {
     if (!this.isCommand(event.message)) return this.chatSendListener(event)
