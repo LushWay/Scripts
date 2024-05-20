@@ -8,23 +8,6 @@ declare module '@minecraft/server' {
     const database: Record<string, PlayerDatabase>
 
     /**
-     * Searches online player by ID
-     *
-     * @param id - Player ID
-     */
-    function getById(id: string): Player | undefined
-    /**
-     * Searches online player by name
-     *
-     * **CAUTION**: You should ALWAYS prefer using `getById` because of security purposes. Minecraft is weird with how
-     * it handles names, e.g. they can be changed, spoofed etc. So you totally should NOT depend on player name or
-     * search player by it, unless the player is searching other player.
-     *
-     * @param name - Player name to search for
-     */
-    function getByName(name: string): Player | undefined
-
-    /**
      * Gets player name from the {@link Player.database} by id
      *
      * If the id is undefined or name not found, undefined is returned
@@ -51,16 +34,16 @@ declare module '@minecraft/server' {
 }
 
 expand(Player, {
+  database: table<PlayerDatabase>('player', () => ({
+    role: __RELEASE__ ? 'member' : 'spectator',
+    inv: 'spawn',
+    survival: {},
+  })),
   name(id) {
     if (!id) return void 0
 
     return Player.database[id].name
   },
-  database: table<PlayerDatabase>('player', () => ({
-    role: __PRODUCTION__ ? 'member' : 'spectator',
-    inv: 'spawn',
-    survival: {},
-  })),
 })
 
 Object.defineProperty(Player.prototype, 'database', {

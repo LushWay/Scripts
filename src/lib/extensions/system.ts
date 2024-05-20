@@ -69,9 +69,7 @@ function Timer(
   ticks = 0,
 ) {
   const visualId = `${name} (${type} ${ticks} ticks)`
-
   const path = util.error.stack.get(1)
-
   TIMERS_PATHES[visualId] = path
 
   return set(function timer() {

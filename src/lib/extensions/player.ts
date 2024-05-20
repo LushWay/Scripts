@@ -81,6 +81,25 @@ declare module '@minecraft/server' {
      */
     closeChat(lowHealthMessage?: string): boolean
   }
+
+  namespace Player {
+    /**
+     * Searches online player by ID
+     *
+     * @param id - Player ID
+     */
+    function getById(id: string): Player | undefined
+    /**
+     * Searches online player by name
+     *
+     * **CAUTION**: You should ALWAYS prefer using {@link Player.getById} because of security purposes. Minecraft is
+     * weird with how it handles names, e.g. they can be changed, spoofed etc. So you totally should NOT depend on
+     * player name or search player by it, unless the player is searching other player.
+     *
+     * @param name - Player name to search for
+     */
+    function getByName(name: string): Player | undefined
+  }
 }
 
 expand(Player, {
