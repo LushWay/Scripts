@@ -11,7 +11,10 @@ interface GlobalLetter {
   rewards: import('./rewards').Reward[]
 }
 
-interface LocalLetterMetadata { read: boolean; rewardsClaimed: boolean }
+interface LocalLetterMetadata {
+  read: boolean
+  rewardsClaimed: boolean
+}
 
 /** "pointer" to a global letter */
 type LetterLink = LocalLetterMetadata & { id: string }
@@ -102,17 +105,16 @@ export class Mail {
   /**
    * Converts letter pointer or local letter to the LocalLetter
    *
-   * @param {LetterLink | LocalLetter} letter - Letter pointer or the local letter
+   * @param letter - Letter pointer or the local letter
    */
   static toLocalLetter(letter: LetterLink | LocalLetter) {
     if ('id' in letter) {
       const global = Mail.dbGlobal[letter.id]
       if (!global) return
 
-      return {
-        ...global,
-        ...letter,
-      }
+      // We cannot use spread syntax here because it will create new
+      // object, so canges will not be saved to the database
+      return Object.setPrototypeOf(global, letter) as LocalLetter
     } else return letter
   }
 
@@ -124,11 +126,9 @@ export class Mail {
   static getLetters(playerId: string) {
     const letters = []
 
-    for (const [index, letter] of this.dbPlayers[playerId].entries()) {
-      const localLetter = this.toLocalLetter(letter)
-      if (localLetter) {
-        letters.push({ letter: localLetter, index })
-      }
+    for (const [index, anyLetter] of this.dbPlayers[playerId].entries()) {
+      const letter = this.toLocalLetter(anyLetter)
+      if (letter) letters.push({ letter, index })
     }
 
     return letters

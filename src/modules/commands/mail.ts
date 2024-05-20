@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, ArrayForm, Mail, Menu, Settings } from 'lib'
+import { ActionForm, ArrayForm, Mail, Menu, Settings, prompt } from 'lib'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/rewards'
 
@@ -53,7 +53,7 @@ export function mailMenu(player: Player, back?: VoidFunction) {
         name,
         null,
         () => {
-          letterDetails({ letter, index }, player)
+          letterDetailsMenu({ letter, index }, player)
           if (getSettings(player).mailReadOnOpen) Mail.readMessage(player.id, index)
         },
       ]
@@ -74,46 +74,45 @@ export function mailMenu(player: Player, back?: VoidFunction) {
   }).show(player)
 }
 
-function letterDetails(
+function letterDetailsMenu(
   { letter, index }: ReturnType<(typeof Mail)['getLetters']>[number],
   player: Player,
   back = () => mailMenu(player),
   message = '',
 ) {
+  const settings = getSettings(player)
   const form = new ActionForm(
     letter.title,
     message + letter.content + '\n\n§l§fНаграды:§r\n' + Rewards.restore(letter.rewards).toString(),
   ).addButtonBack(back)
 
-  if (!letter.rewardsClaimed && letter.rewards?.length)
+  if (!letter.rewardsClaimed && letter.rewards.length)
     form.addButton('Забрать награду', () => {
       Mail.claimRewards(player, index)
-
-      const message = `§aНаграда успешно забрана!`
-      player.success(message)
-
-      letterDetails({ letter, index }, player, back, message + '\n\n§r§f')
+      letterDetailsMenu({ letter, index }, player, back, message + '§aНаграда успешно забрана!\n\n§r§f')
     })
 
-  if (!letter.read)
+  if (!letter.read && !settings.mailReadOnOpen)
     form.addButton('Пометить как прочитанное', () => {
       Mail.readMessage(player.id, index)
       back()
     })
 
-  let deleteDesc = '§cВы уверены, что хотите удалить письмо?'
+  let deleteDescription = '§cУдалить письмо?'
   if (!letter.rewardsClaimed) {
     if (getSettings(player).mailClaimOnDelete) {
-      deleteDesc += ' Все награды будут собраны автоматически'
+      deleteDescription += ' Все награды будут собраны автоматически'
     } else {
-      deleteDesc += ' Вы потеряете все награды, прикрепленные к письму!'
+      deleteDescription += ' Вы потеряете все награды, прикрепленные к письму!'
     }
   }
 
-  form.addButtonPrompt('§cУдалить письмо', deleteDesc, () => {
-    if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
-    Mail.deleteMessage(player, index)
-    back()
+  form.addButton('§cУдалить письмо', null, () => {
+    prompt(player, deleteDescription, '§cУдалить', () => {
+      if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
+      Mail.deleteMessage(player, index)
+      back()
+    })
   })
 
   form.show(player)
