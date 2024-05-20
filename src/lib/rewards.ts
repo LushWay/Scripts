@@ -51,6 +51,15 @@ export class Rewards {
   }
 
   /**
+   * Removes a reward
+   * 
+   * @param {Reward} reward The reward to remove
+   */
+  remove(reward: Reward) {
+    this.entries = this.entries.filter(entry => entry != reward)
+  }
+
+  /**
    * Gives a reward to the player
    *
    * @param player - The player to give out the rewards to
@@ -87,22 +96,28 @@ export class Rewards {
   }
 
   /**
+   * Returns a single reward as a human-readable string
+   * 
+   * @param {Reward} reward The reward
+   * @returns {string}
+   */
+  static rewardToString(reward: Reward): string {
+    if (reward.type == 'scores' && reward.score == 'leafs')
+      return `${emoji.leaf} Листья x ${reward.count}`
+    else if (reward.type === 'scores' && reward.score == 'money')
+      return `${emoji.money} Монеты x ${reward.count}`
+    else if (reward.type === 'item')
+      return itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
+    else return `${reward.score} x ${reward.count}`
+  }
+
+  /**
    * Returns the rewards as a human-readable string
    *
    * @returns {string}
    */
   toString(): string {
-    const rewardsAsStrings = []
-    for (const reward of this.entries) {
-      if (reward.type == 'scores' && reward.score == 'leafs')
-        rewardsAsStrings.push(`${emoji.leaf} Листья x ${reward.count}`)
-      else if (reward.type === 'scores' && reward.score == 'money')
-        rewardsAsStrings.push(`${emoji.money} Монеты x ${reward.count}`)
-      else if (reward.type === 'item')
-        rewardsAsStrings.push(itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id }))
-      else rewardsAsStrings.push(`${reward.score} x ${reward.count}`)
-    }
-    return rewardsAsStrings.join('\n')
+    return this.entries.map(Rewards.rewardToString).join('\n')
   }
 }
 
