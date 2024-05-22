@@ -1,5 +1,5 @@
 import { TicksPerDay, system, world } from '@minecraft/server'
-import { Settings } from 'lib'
+import { SETTINGS_GROUP_NAME, Settings } from 'lib'
 
 const MinutesPerDay = 24 * 60
 const Offset = 6000
@@ -17,7 +17,7 @@ function realTimeToMinecraftTicks(date = new Date()) {
   return result
 }
 
-const settings = Settings.world('server', {
+const settings = Settings.world('common', {
   syncRealTime: {
     name: 'Синхронизировать время',
     description: 'Синхронизировать время в майнкрафте с реальным',
@@ -30,6 +30,5 @@ system.runInterval(
     if (settings.syncRealTime) world.setTimeOfDay(realTimeToMinecraftTicks())
   },
   'syncRealTime',
-  // One minute
   5,
 )

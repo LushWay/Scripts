@@ -1,9 +1,13 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
 import { expand, util } from 'lib'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocksSet'
-import { WE_PLAYER_SETTINGS } from '../settings'
+import { WorldEditPlayerSettings } from '../settings'
 
-type IntervalFunction = (player: Player, slot: ContainerSlot, settings: ReturnType<typeof WE_PLAYER_SETTINGS>) => void
+type IntervalFunction = (
+  player: Player,
+  slot: ContainerSlot,
+  settings: ReturnType<typeof WorldEditPlayerSettings>,
+) => void
 type LoreStringName = 'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'
 
 const LORE_SEPARATOR = '\u00a0'
@@ -243,7 +247,7 @@ system.runInterval(
       const item = player.mainhand()
 
       const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
-      const settings = WE_PLAYER_SETTINGS(player)
+      const settings = WorldEditPlayerSettings(player)
 
       WorldEditTool.intervals.forEach(e => e(player, item, settings))
       if (!tool) continue

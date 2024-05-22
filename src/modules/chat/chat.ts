@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { Cooldown, Settings, getRoleAndName, util } from 'lib'
+import { Cooldown, Settings, getRoleAndName } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
@@ -21,7 +21,7 @@ export class ChatBuilder {
     ranks: { description: 'Ранги в чате', value: true, name: 'Ранги' },
   })
 
-  playerSettings = Settings.player('Чат', 'chat', {
+  playerSettings = Settings.player('Чат\n§7Звуки и внешний вид чата', 'chat', {
     hightlightMessages: {
       name: 'Подсветка моих сообщений',
       description: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
@@ -69,7 +69,7 @@ export class ChatBuilder {
 
         if (__SERVER__) {
           // This is handled/parsed by ServerCore
-          // Dont really want to do APICall each time here
+          // Dont really want to do request each time here
           sendPacketToStdout('chatMessage', {
             name: event.sender.name,
             role: getRoleAndName(event.sender, { name: false }),

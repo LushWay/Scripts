@@ -25,7 +25,7 @@ export interface QuestDB {
 export class Quest {
   static error = class QuestError extends Error {}
 
-  static playerSettingsName: [displayName: string, id: string] = ['Задания', 'quest']
+  static playerSettingsName: [displayName: string, id: string] = ['Задания\n§7Настройки игровых заданий', 'quest']
 
   static playerSettings = Settings.player(...this.playerSettingsName, {
     messageForEachStep: {

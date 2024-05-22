@@ -1,6 +1,6 @@
 import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
 import { isInvalidLocation, util } from 'lib'
-import { WE_PLAYER_SETTINGS } from 'modules/world-edit/settings'
+import { WorldEditPlayerSettings } from 'modules/world-edit/settings'
 import { WorldEditTool } from './WorldEditTool'
 
 interface BrushLoreFormat {
@@ -41,7 +41,7 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
   }
 
   onUse = function onUse(this: BaseBrushTool<AdditionalLore>, player: Player, item: ItemStack) {
-    const settings = WE_PLAYER_SETTINGS(player)
+    const settings = WorldEditPlayerSettings(player)
     if (settings.enableMobile) return
 
     const lore = this.parseLore(item.getLore())
