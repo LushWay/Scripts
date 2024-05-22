@@ -9,5 +9,7 @@ export const BDS: {
 dynamicImport('@minecraft/server-net', 'ServerNet')
 
 function dynamicImport(module: string, key: keyof typeof BDS) {
-  import(module).then(module => (BDS[key] = module)).catch(() => console.warn(`§7Not available§r: ${module}`))
+  import(module)
+    .then(module => (BDS[key] = module))
+    .catch(() => !__TEST__ && console.warn(`§7Not available§r: ${module}`))
 }
