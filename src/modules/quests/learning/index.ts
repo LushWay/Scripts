@@ -50,7 +50,6 @@ class Learning extends QuestBase {
   quest = new Quest({ name: 'Обучение', desc: 'Обучение базовым механикам сервера', id: 'learning' }, (q, player) => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this
-    console.log(player.database.quests)
     if (
       !Anarchy.portal ||
       !Anarchy.portal.from ||
