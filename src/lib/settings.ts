@@ -13,7 +13,9 @@ type SettingValue = string | boolean | number | DropdownSetting[]
 
 export const SETTINGS_GROUP_NAME = Symbol('name')
 
-interface GroupNameObject { [SETTINGS_GROUP_NAME]?: string }
+interface GroupNameObject {
+  [SETTINGS_GROUP_NAME]?: string
+}
 
 export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
   string,
@@ -180,13 +182,6 @@ export class Settings {
   }
 }
 
-/**
- * @param {Player} player
- * @param {string} groupName
- * @param {boolean} forRegularPlayer
- * @param {Record<string, string>} [hints]
- */
-
 export function settingsGroupMenu(
   player: Player,
   groupName: string,
@@ -226,7 +221,7 @@ export function settingsGroupMenu(
 
     if (isToggle) {
       form.addToggle(label, value)
-    } else if (Settings.isDropdown(setting.value) && typeof value === 'number') {
+    } else if (Settings.isDropdown(setting.value)) {
       form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValueIndex: value })
     } else {
       const isString = typeof value === 'string'

@@ -85,7 +85,7 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
       defaultValue,
       none,
       noneText = ModalForm.arrayDefaultNone,
-    }: { defaultValueIndex?: number; defaultValue?: T[keyof T]; none?: None; noneText?: string } = {},
+    }: { defaultValueIndex?: number | string; defaultValue?: T[keyof T]; none?: None; noneText?: string } = {},
   ): ModalForm<AppendFormField<Callback, Exclude<None extends false ? keyof T : keyof T | null, number>>> {
     let objectKeys: (string | null)[] = Object.keys(object)
     let visibleKeys = Object.values(object)
