@@ -113,7 +113,7 @@ export class EventLoader extends EventSignal<undefined> {
 
   subscribe: EventSignal<undefined>['subscribe'] = (callback, position) => {
     if (this.loaded) callback(undefined)
-    else super.subscribe(callback, position)
+    super.subscribe(callback, position)
     return callback
   }
 }
@@ -136,6 +136,7 @@ export class EventLoaderWithArg<Data, Return = void, Callback = (arg: Data) => R
     data: Signal[typeof ARGUMENT_T],
   ): Signal[typeof RETURN_T][] {
     signal.loaded = true
+    signal.defaultValue = data
     return super.emit(signal, data)
   }
 
@@ -147,7 +148,7 @@ export class EventLoaderWithArg<Data, Return = void, Callback = (arg: Data) => R
 
   subscribe: EventSignal<Data, Return, Callback>['subscribe'] = (callback, position) => {
     if (this.loaded && typeof callback === 'function') callback(this.defaultValue)
-    else super.subscribe(callback, position)
+    super.subscribe(callback, position)
     return callback
   }
 }

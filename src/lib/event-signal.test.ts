@@ -95,6 +95,18 @@ describe('EventLoader', () => {
 
     expect(callback).toHaveBeenCalledTimes(1)
   })
+
+  it('should call subscribed callbacks with loaded data even after load', () => {
+    const callback = vi.fn()
+
+    loader.subscribe(callback)
+
+    EventLoader.load(loader)
+    expect(callback).toHaveBeenCalledTimes(1)
+
+    EventLoader.load(loader)
+    expect(callback).toHaveBeenCalledTimes(2)
+  })
 })
 
 describe('EventLoaderWithArg', () => {
@@ -120,5 +132,31 @@ describe('EventLoaderWithArg', () => {
     EventLoaderWithArg.load(loader, 100)
 
     expect(callback).toHaveBeenCalledWith(100)
+  })
+
+  it('should call subscribed callbacks with loaded data even after load', () => {
+    const callback = vi.fn()
+
+    loader.subscribe(callback)
+    EventLoaderWithArg.load(loader, 100)
+
+    expect(callback).toHaveBeenCalledWith(100)
+
+    EventLoaderWithArg.load(loader, 300)
+    expect(callback).toHaveBeenCalledWith(300)
+  })
+
+  it('should update load default arg', () => {
+    const callback = vi.fn()
+
+    loader.subscribe(callback)
+    EventLoaderWithArg.load(loader, 100)
+
+    expect(callback).toHaveBeenCalledWith(100)
+
+    EventLoaderWithArg.load(loader, 300)
+    const callback2 = vi.fn()
+    loader.subscribe(callback2)
+    expect(callback2).toHaveBeenCalledWith(300)
   })
 })
