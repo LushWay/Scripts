@@ -33,7 +33,14 @@ expand(System.prototype, {
   },
 
   runInterval(...args) {
-    return Timer('interval', super.runInterval.bind(this), ...args)
+    const runTimout = super.runTimeout.bind(this) as typeof interval
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this
+    function interval(fn: VoidFunction, ticks: number): number {
+      fn()
+      return self.run(() => runTimout(() => interval(fn, ticks), ticks))
+    }
+    return Timer('interval', interval, ...args)
   },
 
   runTimeout(...args) {

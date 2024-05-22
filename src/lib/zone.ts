@@ -12,8 +12,6 @@ const inRange = (value: number, min: number, max: number) => value <= max && val
 export class Zone {
   center
 
-  interval
-
   lastRadius: number
 
   radius
@@ -30,7 +28,7 @@ export class Zone {
   constructor(center: Vector3, radius: (players: Player[]) => number) {
     this.center = center
     this.radius = radius
-    this.interval = system.runInterval(
+    system.runInterval(
       () => {
         const players = world.getAllPlayers()
         this.lastRadius = typeof this.radius === 'function' ? this.radius(players) : this.radius

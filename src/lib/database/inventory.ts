@@ -211,20 +211,20 @@ export class InventoryStore {
       this.inventories.set(owner, store)
     }
 
-    console.log(
-      [...this.inventories.entries()].map(([id, inventory]) => [
-        Player.name(id) ?? id,
-        {
-          ...inventory,
-          equipment: Object.fromEntries(
-            Object.entries(inventory.equipment).map(([key, value]) => [key, value.typeId + ' ' + value.amount]),
-          ),
-          slots: Object.fromEntries(
-            Object.entries(inventory.slots).map(([key, value]) => [key, value.typeId + ' ' + value.amount]),
-          ),
-        },
-      ]),
-    )
+    // console.log(
+    //   [...this.inventories.entries()].map(([id, inventory]) => [
+    //     Player.name(id) ?? id,
+    //     {
+    //       ...inventory,
+    //       equipment: Object.fromEntries(
+    //         Object.entries(inventory.equipment).map(([key, value]) => [key, value.typeId + ' ' + value.amount]),
+    //       ),
+    //       slots: Object.fromEntries(
+    //         Object.entries(inventory.slots).map(([key, value]) => [key, value.typeId + ' ' + value.amount]),
+    //       ),
+    //     },
+    //   ]),
+    // )
   }
 
   private save() {
