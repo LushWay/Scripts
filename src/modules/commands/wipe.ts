@@ -1,5 +1,5 @@
 import { GameMode, system } from '@minecraft/server'
-import { Airdrop, prompt } from 'lib'
+import { Airdrop, Compass, prompt } from 'lib'
 import { Join } from 'lib/player-join'
 import { Anarchy } from 'modules/places/anarchy'
 import { Spawn } from 'modules/places/spawn'
@@ -19,6 +19,7 @@ new Command('wipe')
         delete ctx.player.database.survival.rtpElytra
         delete ctx.player.database.quests
 
+        Compass.setFor(ctx.player, undefined)
         Anarchy.inventoryStore.remove(ctx.player.id)
         ctx.player.database.inv = 'anarchy'
         Spawn.loadInventory(ctx.player)
