@@ -1,7 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 import { request } from './bds/api'
-import { Location } from './editable-location'
 
 /**
  * @param {number} value
@@ -28,7 +27,7 @@ export class Zone {
     player.onScreenDisplay.setActionBar(`§cОграничение мира до: §f${isX ? zone.x : zone.z}${isX ? 'x' : 'z'}`)
   }
 
-  constructor(center: Location<'vector3'>, radius: (players: Player[]) => number) {
+  constructor(center: Vector3, radius: (players: Player[]) => number) {
     this.center = center
     this.radius = radius
     this.interval = system.runInterval(

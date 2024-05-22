@@ -25,24 +25,22 @@ export class Furnacer {
   keyItem = new ItemStack(MinecraftItemTypes.TripwireHook).setInfo('§6Ключ от печки', '§7Ключ от печки в технограде')
 
   // TODO Add multiple key levels
-  /** @type {ItemStack[]} */
   keyItemLevels: ItemStack[] = []
 
   /**
    * Creates new Furnaceer npc store
    *
-   * @param {object} options - Options
-   * @param {Omit<import('lib/EditableNpc').EditableNpcProps, 'onInteract'>} options.npc
-   * @param {string[]} options.furnaceTypeIds - Type ids of the furnace blocks
-   * @param {boolean} options.onlyInStoneQuarry - Whenether to allow using this type of furnace outside Stone quarry
+   * @param options - Options
+   * @param options.npc
+   * @param options.furnaceTypeIds - Type ids of the furnace blocks
+   * @param options.onlyInStoneQuarry - Whenether to allow using this type of furnace outside Stone quarry
    */
-
   constructor({
     furnaceTypeIds,
     onlyInStoneQuarry,
-    npc: npcOptions,
+    npc,
   }: {
-    npc: Omit<import('lib/editable-npc').EditableNpcProps, 'onInteract'>
+    npc: Omit<import('lib/editable-npc').EditableNpcProps, 'onInteract' | 'group'>
     furnaceTypeIds: string[]
     onlyInStoneQuarry: boolean
   }) {
@@ -51,8 +49,9 @@ export class Furnacer {
     this.furnaceTypeIds = furnaceTypeIds
     this.onlyInStoneQuarry = onlyInStoneQuarry
     this.npc = Store.npc({
+      group: 'Каменоломня',
       body: p => 'У меня ты можешь купить доступ к печкам\n\n' + this.npc.store.defaultOptions.body(p),
-      ...npcOptions,
+      ...npc,
     })
 
     this.npc.store.addItem(player => {

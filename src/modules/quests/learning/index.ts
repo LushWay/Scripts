@@ -1,8 +1,8 @@
 import { ItemStack, system } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vector, location, locationWithRadius, migrateLocationName } from 'lib'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { EditableLocation, SafeAreaRegion, Temporary, actionGuard } from 'lib'
+import { SafeAreaRegion, Temporary, actionGuard } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { Menu, createPublicGiveItemCommand } from 'lib/menu'
 import { Join } from 'lib/player-join'
@@ -14,7 +14,7 @@ import { Quest } from 'modules/quests/lib/quest'
 import { randomTeleport } from 'modules/survival/random-teleport'
 import airdropTable from './airdrop'
 
-// TODO Add even more steps,
+// TODO Combine steps
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
 
@@ -197,9 +197,15 @@ export class Learning {
     },
   )
 
-  static randomTeleportLocation = new EditableLocation('learning_quest_rtp', { type: 'vector3+radius' }).safe
+  static {
+    //
+    migrateLocationName('learning_quest_crafting_table', 'quest: learning', 'Верстак')
+    migrateLocationName('learning_quest_rtp', 'quest: learning', 'Мирная зона и ртп')
+  }
 
-  static craftingTableLocation = new EditableLocation('learning_quest_crafting_table').safe
+  static randomTeleportLocation = locationWithRadius('quest: learning', 'Мирная зона и ртп')
+
+  static craftingTableLocation = location('quest: learning', 'Верстак')
 
   static startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 

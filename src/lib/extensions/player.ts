@@ -10,6 +10,13 @@ declare module '@minecraft/server' {
     isSimulated(): this is import('@minecraft/server-gametest').SimulatedPlayer
 
     /**
+     * Creates internal log. THIS DOES NOT SENDS A MESSAGE TO PLAYER.
+     *
+     * @param messages - Messages to record
+     */
+    log(prefix: string, ...messages: unknown[]): void
+
+    /**
      * Sends message prefixed with
      *
      * ```js
@@ -135,6 +142,10 @@ export const ScreenDisplaySymbol = Symbol('screen_display')
 expand(Player.prototype, {
   isSimulated() {
     return 'jump' in this
+  },
+
+  log(prefix, ...messages) {
+    console.log(`§7Player '§f${this.name}§r§7'§7 ${prefix}§7:`, ...messages)
   },
 
   // @ts-expect-error AAAAAAAAAAAAAAA

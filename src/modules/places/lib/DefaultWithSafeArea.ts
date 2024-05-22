@@ -1,7 +1,7 @@
 import { system } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { EditableLocation, SafeAreaRegion } from 'lib'
+import { SafeAreaRegion, location, locationWithRadius, locationWithRotation, migrateLocationName } from 'lib'
 import { actionGuard } from 'lib/region/index'
 
 export class DefaultPlaceWithSafeArea {
@@ -21,10 +21,18 @@ export class DefaultPlaceWithSafeArea {
 
   constructor(name: string) {
     this.name = name
-    this.portalTeleportsTo = new EditableLocation(name + ' портал телепортирует на', { type: 'vector3+rotation' }).safe
-    this.portalPos2 = new EditableLocation(name + ' портал от', { type: 'vector3' }).safe
-    this.portalPos1 = new EditableLocation(name + ' портал до', { type: 'vector3' }).safe
-    this.safeAreaLocation = new EditableLocation(name + ' мирная зона', { type: 'vector3+radius' }).safe
+    migrateLocationName(name + ' портал телепортирует на', name, 'портал телепортирует на')
+    this.portalTeleportsTo = locationWithRotation(name, 'портал телепортирует на')
+
+    migrateLocationName(name + ' портал от', name, 'портал от')
+    this.portalPos2 = location(name, 'портал от')
+
+    migrateLocationName(name + ' портал до', name, 'портал до')
+    this.portalPos1 = location(name, 'портал до')
+
+    migrateLocationName(name + ' мирная зона', name, 'мирная зона')
+    this.safeAreaLocation = locationWithRadius(name, 'мирная зона')
+
     this.safeAreaLocation.onLoad.subscribe(location => {
       this.safeArea = SafeAreaRegion.create(
         {

@@ -4,8 +4,8 @@ import { Entity, system, world } from '@minecraft/server'
 import { LootTable } from 'lib/loot-table'
 import { Region } from 'lib/region/index'
 import { table } from './database/abstract'
-import { EditableLocation } from './editable-location'
 import { isChunkUnloaded } from './game-utils'
+import { location, migrateLocationName } from './location'
 import { BossArenaRegion } from './region/kinds/BossArenaRegion'
 
 interface BossDB {
@@ -92,7 +92,8 @@ export class Boss {
     this.respawnTime = respawnTime
     this.bossEvent = bossEvent
     this.loot = loot
-    this.location = new EditableLocation('Босс ' + name).safe
+    migrateLocationName('Босс ' + name, 'Боссы', name)
+    this.location = location('Боссы', name)
     this.arenaRadius = arenaRadius
 
     // Without delay any error during loading

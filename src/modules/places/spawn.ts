@@ -1,7 +1,7 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { EditableLocation, InventoryStore, Portal, RegionCallback, Settings, util } from 'lib'
+import { InventoryStore, Portal, RegionCallback, Settings, locationWithRotation, migrateLocationName, util } from 'lib'
 
 import { Menu } from 'lib/menu'
 import { Join } from 'lib/player-join'
@@ -10,6 +10,8 @@ import { showSurvivalHud } from 'modules/survival/sidebar'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
 
+migrateLocationName('spawn', 'common', 'spawn')
+
 class SpawnBuilder extends DefaultPlaceWithInventory {
   portal: Portal | undefined
 
@@ -17,10 +19,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
   inventoryName: InventoryTypeName = 'spawn'
 
-  location = new EditableLocation('spawn', {
-    fallback: { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
-    type: 'vector3+rotation',
-  }).safe
+  location = locationWithRotation('common', 'spawn', { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
 
   inventory: import('lib').Inventory = {
     xp: 0,
@@ -37,8 +36,9 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
     },
   })
 
-  /** Loads spawn inventory to specified player */
+  private readonly name = 'Spawn'
 
+  /** Loads spawn inventory to specified player */
   loadInventory(player: Player) {
     super.loadInventory(player, () => {
       InventoryStore.load({ to: player, from: this.inventory, clearAll: true })
@@ -55,7 +55,6 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
         'spawn',
         null,
         null,
-
         player => {
           const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
           if (!title) return
@@ -66,25 +65,22 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
           showSurvivalHud(player)
           title()
         },
-
         { allowAnybody: true },
       )
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
-
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
         // Skip after death respawns
         if (!initialSpawn) return
-
         if (player.isSimulated()) return
-
-        // Force know if player is not playing
         if (isNotPlaying(player)) return Join.setPlayerJoinPosition(player)
 
         // Check settings
-        if (!this.settings(player).teleportToSpawnOnJoin) return
+        if (!this.settings(player).teleportToSpawnOnJoin)
+          return player.log(this.name, 'not teleporting to spawn on join because player disabled it via settings')
 
         util.catch(() => {
+          player.log(this.name, 'teleporting player to spawn on join')
           this.portal?.teleport(player)
           system.runTimeout(() => Join.setPlayerJoinPosition(player), 'Spawn set player position after join', 10)
         })
@@ -117,5 +113,4 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Spawn = new SpawnBuilder()

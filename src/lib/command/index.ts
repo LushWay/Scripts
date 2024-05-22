@@ -38,9 +38,9 @@ export class Command<Callback extends CommandCallback = CommandCallback> {
 
     const parsed = parseCommand(event.message, 1)
     if (!parsed) {
-      console.error(`Unable to parse command '${event.message}', user: '${event.sender.name}§r'`)
+      event.sender.log('Command', `§cUnable to parse command '§f${event.message}§'`)
       return event.sender.fail('Не удалось обработать команду.')
-    }
+    } else event.sender.log('Command', event.message)
 
     const { cmd, args, input } = parsed
 

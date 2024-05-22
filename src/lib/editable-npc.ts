@@ -2,7 +2,7 @@ import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } fro
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, isChunkUnloaded } from 'lib'
-import { EditableLocation } from './editable-location'
+import { location } from './location'
 
 export type EditableNpcProps = ConstructorParameters<typeof EditableNpc>[0]
 
@@ -43,11 +43,13 @@ export class EditableNpc {
     name,
     onInteract,
     dimensionId = 'overworld',
+    group,
     skin,
   }: {
     id: string
     onInteract: (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void
     name: string
+    group: string
     dimensionId?: Dimensions
     skin?: number
   }) {
@@ -57,7 +59,7 @@ export class EditableNpc {
     this.dimensionId = dimensionId
     this.skinIndex = skin
 
-    this.location = new EditableLocation(id + ' NPC').safe
+    this.location = location(group, name)
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
     })
@@ -77,13 +79,13 @@ export class EditableNpc {
       world.afterEvents.entitySpawn.subscribe(({ entity }) => {
         if (entity.id !== this.entity?.id) return
 
-        this.setupNpc(entity)
+        this.configureNpcEntity(entity)
         cleanup()
       })
     })
   }
 
-  setupNpc(entity: Entity) {
+  configureNpcEntity(entity: Entity) {
     const npc = entity.getComponent('npc')
     if (!npc) return
 
@@ -158,7 +160,7 @@ system.runInterval(
 
       if (!npc.entity) npc.spawn()
       // Apply nameTag etc
-      else npc.setupNpc(npc.entity)
+      else npc.configureNpcEntity(npc.entity)
     })
   },
   'npc loading',
