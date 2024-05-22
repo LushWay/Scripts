@@ -22,6 +22,9 @@ export interface QuestDB {
   completed: string[]
 }
 
+// TODO Refactor quest to use builder style
+// TODO Allow place in any step type
+
 export class Quest {
   static error = class QuestError extends Error {}
 
@@ -41,7 +44,7 @@ export class Quest {
 
       return function (player: Player) {
         const status = Quest.active(player)
-        if (!status) return false
+        if (!status) return ''
 
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
@@ -201,6 +204,7 @@ interface QuestStepInput {
   text: QuestText
   description?: QuestText
   activate?(firstTime: boolean): { cleanup(): void }
+  place?: Vector3
 }
 
 type QuestStepThis<DB = unknown> = {
@@ -285,14 +289,18 @@ class PlayerQuest {
   }: Omit<QuestStepInput, 'activate'> & {
     isItem: (item: ContainerSlot) => boolean
   } & ThisType<QuestStepThis>) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this
     this.dynamic({
       ...options,
       activate() {
-        return new Temporary(() => {
+        return new Temporary(temp => {
           const action = InventoryIntervalAction.subscribe(({ player, slot }) => {
             if (player.id !== this.player.id) return
             if (isRequestedItem(slot)) this.next()
           })
+
+          if (options.place) self.targetCompassTo({ place: options.place, temporary: temp.temp })
 
           return {
             cleanup() {
@@ -377,38 +385,6 @@ class PlayerQuest {
     }
 
     this.dynamic(options as unknown as QuestStepThis)
-  }
-
-  dialogue(options: QuestDialogueInput & Partial<QuestDialogueThis> & ThisType<QuestDialogueThis>) {
-    if (!options.npcEntity.isValid()) return this.failed('Неигровой персонаж недоступен')
-    const location = options.npcEntity.location
-
-    options.placeText ??= () => 'Доберитесь до ' + options.npcEntity.nameTag
-
-    this.place(
-      Vector.add(location, Vector.multiply(Vector.one, -1)),
-      Vector.add(location, Vector.one),
-      options.placeText,
-      options.placeDescription,
-    )
-    this.dynamic({
-      text: options.talkText,
-      description: options.talkDescription,
-      activate() {
-        return new Temporary(({ system }) => {
-          system.afterEvents.scriptEventReceive.subscribe(
-            event => {
-              if (event.id !== 'quest:dialogue.end' || !event.initiator) return
-              if (event.initiator.id !== this.player.id) return
-              this.next()
-            },
-            {
-              namespaces: ['quest'],
-            },
-          )
-        })
-      },
-    })
   }
 
   airdrop(options: QuestAirdropInput & ThisType<QuestAirdropThis>) {
@@ -612,3 +588,11 @@ type QuestAirdropThis = Partial<QuestStepThis> & QuestAirdropInput
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noCleanup = { cleanup() {} }
+
+export class QuestBase {
+  id: string
+
+  get group() {
+    return 'quest: ' + this.id
+  }
+}

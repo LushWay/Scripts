@@ -127,7 +127,7 @@ const quest = new Quest(
     const { deadAt } = player.database.survival
     if (!deadAt) return q.failed('Ваше место смерти потерялось!')
     q.dynamic({
-      text: `§dВы умерли на\n${Vector.string(deadAt, true)}`,
+      text: `§dВерните свои вещи!`,
       description: `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
       }, они ждут вас!`,

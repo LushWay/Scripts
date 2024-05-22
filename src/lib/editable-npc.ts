@@ -6,6 +6,8 @@ import { location } from './location'
 
 export type EditableNpcProps = ConstructorParameters<typeof EditableNpc>[0]
 
+type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void | false
+
 export class EditableNpc {
   static type = MinecraftEntityTypes.Npc
 
@@ -30,13 +32,12 @@ export class EditableNpc {
   /**
    * Creates new dynamically loadable npc
    *
-   * @param {object} o - Options
-   * @param {string} o.id - Type name of the npc. Used to restore npc pointer after script reload
-   * @param {(event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void} o.onInteract - Function that gets
-   *   called on interact
-   * @param {string} o.name - NameTag of the npc
-   * @param {Dimensions} [o.dimensionId] - Dimension id
-   * @param {number} [o.skin] - Index of the npc skin
+   * @param o - Options
+   * @param o.id - Type name of the npc. Used to restore npc pointer after script reload
+   * @param o.onInteract - Function that gets called on interact
+   * @param o.name - NameTag of the npc
+   * @param o.dimensionId - Dimension id
+   * @param o.skin - Index of the npc skin
    */
   constructor({
     id,
@@ -47,7 +48,7 @@ export class EditableNpc {
     skin,
   }: {
     id: string
-    onInteract: (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void
+    onInteract: OnInteract
     name: string
     group: string
     dimensionId?: Dimensions
@@ -65,6 +66,19 @@ export class EditableNpc {
     })
 
     EditableNpc.npcs.push(this)
+  }
+
+  addQuestInteraction(interaction: OnInteract) {
+    this.questInteractions.add(interaction)
+    return interaction
+  }
+
+  private questInteractions = new Set<OnInteract>()
+
+  private onQuestInteraction: OnInteract = event => {
+    for (const interaction of this.questInteractions) {
+      if (interaction(event)) return // Return on first successfull interaction
+    }
   }
 
   spawn() {
@@ -93,30 +107,30 @@ export class EditableNpc {
     npc.name = this.name
     if (typeof this.skinIndex === 'number') npc.skinIndex = this.skinIndex
   }
+
+  static {
+    world.beforeEvents.playerInteractWithEntity.subscribe(event => {
+      if (event.target.typeId !== MinecraftEntityTypes.Npc) return
+      if (event.player.isGamemode('creative') && event.player.isSneaking) return
+
+      event.cancel = true
+      system.run(() => {
+        try {
+          const npc = EditableNpc.npcs.find(e => e.entity?.id === event.target.id)
+          const component = event.target.getComponent('npc')
+          const npcName = component ? component.name : event.target.nameTag
+
+          if (!npc || npc.onQuestInteraction(event) === false || npc.onInteract(event) === false) {
+            return event.player.fail(`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
+          }
+        } catch (e) {
+          event.player.fail('Не удалось открыть диалог. Сообщите об этом администрации.')
+          console.error(e)
+        }
+      })
+    })
+  }
 }
-
-world.beforeEvents.playerInteractWithEntity.subscribe(event => {
-  if (event.target.typeId !== MinecraftEntityTypes.Npc) return
-  if (event.player.isGamemode('creative') && event.player.isSneaking) return
-
-  event.cancel = true
-  system.run(() => {
-    try {
-      const npc = EditableNpc.npcs.find(e => e.entity?.id === event.target.id)
-      const comp = event.target.getComponent('npc')
-      if (!npc)
-        return event.player.fail(
-          `§f${comp ? comp.name : event.target.nameTag}: §cЯ не могу с вами говорить. Приходите позже.`,
-        )
-
-      npc.onInteract(event)
-    } catch (e) {
-      event.player.fail('Не удалось открыть диалог. Сообщите об этом администрации.')
-      console.error(e)
-    }
-  })
-})
-
 system.runInterval(
   () => {
     /** Store entities from each dimension so we are not grabbing them much */

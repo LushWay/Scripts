@@ -9,7 +9,9 @@ type SidebarLine = string | false
 
 export type DynamicLine<E> = (player: Player, extra: E) => SidebarLine
 
-export interface SidebarLineInit<E> { init(sidebar: Sidebar): DynamicLine<E> }
+export interface SidebarLineInit<E> {
+  init(sidebar: Sidebar): DynamicLine<E>
+}
 
 export type SidebarVariables<E, V = DynamicLine<E>> = Record<string, V | string>
 
@@ -90,11 +92,10 @@ export class Sidebar<E = unknown> {
 
     if (Array.isArray(content)) {
       for (const [i, tip] of content.entries()) {
-        if (!tip) continue
         const index = i + 1
         if (index !== 1 && index !== 2 && index !== 3 && index !== 4 && index !== 5) continue
 
-        player.onScreenDisplay.setTip(index, wrap(tip))
+        player.onScreenDisplay.setTip(index, wrap(tip || ''))
       }
       player.onScreenDisplay.setSidebar('')
     } else {

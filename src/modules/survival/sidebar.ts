@@ -63,36 +63,35 @@ const survivalSidebar = new Sidebar(
     getExtra: player => getSidebarSettings(player),
 
     getOptions(player, settings) {
-      const main = `§l$${names.mode}§r§f$${names.region}`
+      const main = `$${names.region}`
 
       const scores = `§6$${names.money}${emoji.money} §2$${names.leafs}${emoji.leaf}`
-      const online = `${emoji.online} §f$${names.online}§7/55`
-      const second = `${scores}\n${online}${settings?.mode === 'sidebar' ? '\n \n' : ''}`
+      const online = `§f$${names.online}§7/55${emoji.online}`
+      const second = `${scores} ${online}${settings?.mode === 'sidebar' ? '\n \n' : ''}`
 
       return {
         format:
           settings?.mode === 'sidebar'
             ? `${main}\n${second}\n$${names.quest}`
-            : [main, second, `$${names.quest}`, undefined, undefined],
+            : [second, `$${names.quest}`, main, undefined, undefined],
 
         maxWordCount: settings?.sidebarMaxWordLength ?? 20,
       }
     },
   },
   {
-    [names.mode]: player => inventoryDisplay[player.database.inv],
     [names.region]: (player, settings) => {
-      let text = ''
+      const regions = Region.nearestRegions(player.location, player.dimension.type)
+      const region = regions[0]
+      let text = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
       if (player.database.inv === 'anarchy') {
-        const region = Region.nearestRegion(player.location, player.dimension.type)
         if (region) {
-          if (!region.permissions.pvp) text = ' §aмирная зона§f'
-
-          if (region instanceof SafeAreaRegion && region.safeAreaName) text += ' ' + region.safeAreaName
-
-          if (region instanceof MineshaftRegion) text += ' шахта'
-
-          if (region instanceof BaseRegion && region.getMemberRole(player.id)) text = ' §6ваша база'
+          //
+          text = ''
+          if (regions.find(e => !e.permissions.pvp)) text = '§aМирная зона§f '
+          if (region instanceof SafeAreaRegion && region.safeAreaName) text += region.safeAreaName
+          if (region instanceof MineshaftRegion) text += '§7Шахта'
+          if (region instanceof BaseRegion && region.getMemberRole(player.id)) text = '§6Ваша база'
         }
       }
 
