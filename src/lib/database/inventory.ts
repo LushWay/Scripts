@@ -190,6 +190,7 @@ export class InventoryStore {
           type: typeof e === 'string' ? 'equipment' : 'slots',
           index: e,
         }))
+        continue
       }
 
       if (!slots) {
@@ -209,6 +210,21 @@ export class InventoryStore {
     if (owner) {
       this.inventories.set(owner, store)
     }
+
+    console.log(
+      [...this.inventories.entries()].map(([id, inventory]) => [
+        Player.name(id) ?? id,
+        {
+          ...inventory,
+          equipment: Object.fromEntries(
+            Object.entries(inventory.equipment).map(([key, value]) => [key, value.typeId + ' ' + value.amount]),
+          ),
+          slots: Object.fromEntries(
+            Object.entries(inventory.slots).map(([key, value]) => [key, value.typeId + ' ' + value.amount]),
+          ),
+        },
+      ]),
+    )
   }
 
   private save() {
@@ -369,6 +385,6 @@ export class InventoryStore {
    * @param key - Entity ID to check
    */
   has(key: string) {
-    return key in this.inventories
+    return this.inventories.has(key)
   }
 }
