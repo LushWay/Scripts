@@ -7,42 +7,19 @@
       "is_summonable": true,
       "is_experimental": false,
       "properties": {
-        // ADD MARKER
         // used in RP/entities/player.json
-        "sm:marker.enabled": {
+        "sm:minimap": {
           "type": "bool",
           "default": false,
           "client_sync": true
         },
 
-        // used in RP/animations/player.json
-        "sm:marker.x": {
-          "type": "int",
-          "range": [-300, 300],
-          "default": 0,
-          "client_sync": true
-        },
-        "sm:marker.y": {
-          "type": "int",
-          "range": [-300, 300],
-          "default": 0,
-          "client_sync": true
-        },
-        "sm:marker.scale": {
-          "type": "float",
-          "range": [0.0, 1.0],
-          "default": 0.7,
-          "client_sync": true
-        },
-
-        // used in RP/render_controllers/player.json
-        "sm:marker.texture": {
-          "type": "int",
-          "range": [0, 1],
-          "default": 0,
+        // used in RP/entities/player.json
+        "sm:minimap_force_hide": {
+          "type": "bool",
+          "default": false,
           "client_sync": true
         }
-        // ADD MARKER END
       },
       "scripts": {
         "animate": ["minimap"]

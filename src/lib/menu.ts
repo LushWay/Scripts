@@ -76,9 +76,18 @@ export class Compass {
   /** Map of player as key and compass target as value */
   private static players = new WeakOnlinePlayerMap<Vector3>()
 
-  private static action = InventoryIntervalAction.subscribe(({ player, slot }) => {
+  private static action = InventoryIntervalAction.subscribe(({ player, slot, i }) => {
     const isMenu = slot.typeId === CUSTOM_ITEMS.menu
-    if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && !isMenu) return
+    if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && !isMenu) {
+      if (i === player.selectedSlot) {
+        player.setProperty('sm:minimap', false)
+      }
+      return
+    }
+
+    if (i === player.selectedSlot) {
+      player.setProperty('sm:minimap', true)
+    }
 
     const target = this.players.get(player)
     if (!target) {

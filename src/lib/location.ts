@@ -18,7 +18,7 @@ export function locationWithRotation(group: string, name: string, fallback?: Loc
 export function locationWithRadius(group: string, name: string, fallback?: LocationWithRadius['locationFormat']) {
   return LocationWithRadius.create(group, name, fallback)
 }
-console.log('All names:', Settings.worldDatabase['locations'])
+// console.log('All names:', Settings.worldDatabase['locations'])
 
 /** Migration helper */
 export function migrateLocationName(oldName: string, newGroup: string, newName: string) {

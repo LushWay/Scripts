@@ -190,7 +190,7 @@ system.run(() => {
   system.runInterval(
     () => {
       const players = world.getAllPlayers()
-      for (const [id, event] of Object.entries(titles)) {
+      for (const [id, event] of titles.entries()) {
         const player = players.find(e => e.id === id)
 
         if (event.title?.expires && event.title.expires < Date.now()) {

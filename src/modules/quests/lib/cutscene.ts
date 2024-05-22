@@ -1,4 +1,4 @@
-import { EasingType, Player, system } from '@minecraft/server'
+import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
 import { Vector } from 'lib'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
@@ -88,9 +88,18 @@ export class Cutscene {
       return
     }
 
+    player.onScreenDisplay.hideAllExcept([])
+    player.setProperty('sm:minimap_force_hide', true)
+    // TODO Hide other menu (tips, sidebar)
+
     const controller = { cancel: false }
     this.forEachPoint(
       async (point, pointNum, section, sectionNum) => {
+        if (!player.isValid()) {
+          controller.cancel = true
+          return
+        }
+
         const sectionSwitch = pointNum === 0 && sectionNum !== 0
         if (!sectionSwitch) {
           player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
@@ -204,7 +213,17 @@ export class Cutscene {
 
     // Cleanup and restore to the previous state
     this.current.delete(playerId)
-    if (player instanceof Player) restorePlayerCamera(player, this.restoreCameraTime)
+    if (player instanceof Player) {
+      restorePlayerCamera(player, this.restoreCameraTime)
+      player.setProperty('sm:minimap_force_hide', false)
+      system.runTimeout(
+        () => {
+          if (player.isValid()) player.onScreenDisplay.resetHudElements()
+        },
+        'restoreCutsceneHud',
+        this.restoreCameraTime * TicksPerSecond,
+      )
+    }
 
     return true
   }
