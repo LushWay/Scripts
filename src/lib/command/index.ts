@@ -22,9 +22,9 @@ type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) 
 
 type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
 
-type CommandCallback = (ctx: CommandContext, ...args: unknown[]) => unknown
+type CommandCallback = (ctx: CommandContext, ...args: unknown[]) => void
 
-export class Command<Callback extends CommandCallback = CommandCallback> {
+export class Command<Callback extends CommandCallback = (ctx: CommandContext) => void> {
   static isCommand(message: string) {
     return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
