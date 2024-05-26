@@ -3,7 +3,7 @@ import { ActionForm, Mail, ModalForm } from 'lib'
 import { createSelectPlayerMenu } from 'lib/form/selectPlayersMenu'
 import { Rewards } from 'lib/rewards'
 
-interface SendSettings {
+interface SendState {
   recipients: { id: string; name: string }[]
   rewards: Rewards
   title: string
@@ -16,7 +16,7 @@ new Command('send')
   .setPermissions('admin')
   .executes(ctx => sendMenu(ctx.player))
 
-function addScoresMenu(player: Player, settings: SendSettings) {
+function addScoresMenu(player: Player, state: SendState) {
   new ModalForm('Добавить награду: счёт')
     .addDropdown(
       'Счёт',
@@ -25,12 +25,12 @@ function addScoresMenu(player: Player, settings: SendSettings) {
     .addTextField('Количество', '1000', '0')
     .show(player, (_ctx, score, amountStr) => {
       const amount = parseInt(amountStr)
-      if (!isNaN(amount) && amount != 0) settings.rewards.scores(score, amount)
-      sendMenu(player, settings.back, settings)
+      if (!isNaN(amount) && amount != 0) state.rewards.scores(score, amount)
+      sendMenu(player, state.back, state)
     })
 }
 
-function editEmailMenu(player: Player, settings: SendSettings) {
+function editEmailMenu(player: Player, state: SendState) {
   new ModalForm('Изменить письмо')
     .addTextField('Заголовок', 'Название письма')
     .addTextField('Строка 1', 'Добрый день, уважаемый строитель!')
@@ -44,16 +44,16 @@ function editEmailMenu(player: Player, settings: SendSettings) {
     .addTextField('Строка 9', '')
     .addTextField('Строка 10', 'С уважением, Администрация')
     .show(player, (_ctx, title, ...lines) => {
-      settings.title = title
-      settings.contents = lines.filter(Boolean).join('\n')
-      sendMenu(player, settings.back, settings)
+      state.title = title
+      state.contents = lines.filter(Boolean).join('\n')
+      sendMenu(player, state.back, state)
     })
 }
 
-export function sendMenu(player: Player, back?: VoidFunction, settings?: SendSettings) {
+export function sendMenu(player: Player, back?: VoidFunction, state?: SendState) {
   if (!back) back = () => null
-  if (!settings)
-    settings = {
+  if (!state)
+    state = {
       recipients: createSelectPlayerMenu.defaultAllTargets(),
       rewards: new Rewards(),
       title: '',
@@ -64,29 +64,29 @@ export function sendMenu(player: Player, back?: VoidFunction, settings?: SendSet
   const form = new ActionForm('Отправить письмо')
 
   form.addButton(
-    ...createSelectPlayerMenu(player, settings.recipients, () => sendMenu(player, back, settings), {
+    ...createSelectPlayerMenu(player, state.recipients, () => sendMenu(player, back, state), {
       title: 'Выбрать игроков',
     }),
   )
 
-  form.addButton('Добавить счёт', () => addScoresMenu(player, settings))
-  const rewards = settings.rewards.serialize()
+  form.addButton('Добавить счёт', () => addScoresMenu(player, state))
+  const rewards = state.rewards.serialize()
   for (const reward of rewards) {
     // We want to use the index
     form.addButton(Rewards.rewardToString(reward), () => {
-      settings.rewards.remove(reward)
-      sendMenu(player, settings.back, settings)
+      state.rewards.remove(reward)
+      sendMenu(player, state.back, state)
     })
   }
 
-  form.addButton('Изменить тему и текст', () => editEmailMenu(player, settings))
+  form.addButton('Изменить тему и текст', () => editEmailMenu(player, state))
 
   form.addButton('Отправить', () =>
     Mail.sendMultiple(
-      settings.recipients.length == 0 ? Object.keys(Player.database) : settings.recipients.map(p => p.id),
-      settings.title,
-      settings.contents,
-      settings.rewards,
+      state.recipients.length == 0 ? Object.keys(Player.database) : state.recipients.map(p => p.id),
+      state.title,
+      state.contents,
+      state.rewards,
     ),
   )
 
