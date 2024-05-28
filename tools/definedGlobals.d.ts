@@ -6,6 +6,7 @@ declare global {
   const __TEST__: boolean
   const __RELEASE__: boolean
   const __SERVER_PORT__: string
+  const __VITEST__: boolean
 }
 
 export {}

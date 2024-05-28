@@ -6,7 +6,7 @@ import { generateDefine } from './generateDefine.js'
 import { logger } from './logger.js'
 
 export function parseCliArguments() {
-  let dev, test, world, port
+  let dev, test, world, port, vitest
 
   try {
     const { values } = util.parseArgs({
@@ -14,17 +14,19 @@ export function parseCliArguments() {
       options: {
         dev: { type: 'boolean', default: false },
         test: { type: 'boolean', default: false },
+        vitest: { type: 'boolean', default: false },
         world: { type: 'boolean', default: false },
         port: { type: 'string' },
         help: { type: 'boolean', default: false, short: 'h' },
       },
     })
-    ;({ dev, test, world, port } = values)
+    ;({ dev, test, world, port, vitest } = values)
 
     if (values.help) {
       logger.info(`build [options] 
   --dev: bool
   --test: bool
+  --vitest: bool
   --world: bool
   --port: int
 `)
@@ -40,7 +42,7 @@ export function parseCliArguments() {
     process.exit(1)
   }
 
-  return { dev, test, world, port }
+  return { dev, test, world, port, vitest }
 }
 
 /**
@@ -62,7 +64,7 @@ export function out(dir, file) {
  * @param {import('../../build.js').CliOptions} param0
  * @param {esbuild.BuildOptions} options
  */
-export function build({ test, dev, world, port }, options) {
+export function build({ test, dev, world, port, vitest }, options) {
   let start = Date.now()
   let firstBuild = true
 
@@ -72,7 +74,7 @@ export function build({ test, dev, world, port }, options) {
     bundle: true,
     sourcemap: 'linked',
     legalComments: 'none',
-    define: generateDefine({ dev, test, world, port }),
+    define: generateDefine({ dev, test, world, port, vitest }),
 
     plugins: [
       {

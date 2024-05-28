@@ -3,18 +3,21 @@ import { defineConfig } from 'vitest/config'
 import { generateDefine } from './tools/build/generateDefine'
 
 export default defineConfig({
-  define: generateDefine({ dev: true, test: true, world: false, port: '1000' }),
+  define: generateDefine({ dev: true, test: true, world: false, port: '1000', vitest: true }),
   test: {
     coverage: {
       provider: 'istanbul',
       reporter: ['html'],
+      include: ['src/lib', 'src/modules'],
+      exclude: ['src/lib/assets', 'src/lib/bds'],
     },
     alias: {
       '@minecraft/server': 'test/__mocks__/minecraft_server.ts',
       '@minecraft/server-net': 'test/__mocks__/minecraft_server-net.ts',
       '@minecraft/server-ui': 'test/__mocks__/minecraft_server-ui.ts',
+      '@minecraft/server-gametest': 'test/__mocks__/minecraft_server-gametest.ts',
     },
-    exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts'],
+    exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts', 'src/test/**'],
   },
   plugins: [tsconfig()],
 })

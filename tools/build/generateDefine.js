@@ -1,11 +1,12 @@
 /** @param {import('../../build.js').CliOptions} args */
-export function generateDefine({ dev, test, world, port }) {
+export function generateDefine({ dev, test, world, port, vitest }) {
   return Object.fromEntries(
     Object.entries({
       __DEV__: dev,
       __PRODUCTION__: !dev,
       __RELEASE__: false,
       __TEST__: test,
+      __VITEST__: vitest,
       __SERVER__: !world,
       __SERVER_PORT__: port,
       __ESBUILD__: true,

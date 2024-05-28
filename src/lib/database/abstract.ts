@@ -15,8 +15,6 @@ export function table<Value>(
   name: string,
   defaultValue?: DatabaseDefaultValue<Value>,
 ): Record<string, Value | undefined> {
-  if (!provider) throw new DatabaseError('No database provider was specified!')
-
   return provider.createTable(name, defaultValue as DatabaseDefaultValue<Value>)
 }
 
@@ -58,4 +56,5 @@ if (__TEST__) {
     getRawTableData: tableId => JSON.stringify(TestDatabase.tables[tableId]),
   })
 }
+
 export class DatabaseError extends Error {}
