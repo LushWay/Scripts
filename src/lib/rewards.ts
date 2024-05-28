@@ -7,7 +7,6 @@ export type Reward =
   | {
       type: 'scores'
       count: number
-
       score: import('@minecraft/server').ScoreName
     }
   | {
@@ -52,7 +51,7 @@ export class Rewards {
 
   /**
    * Removes a reward
-   * 
+   *
    * @param {Reward} reward The reward to remove
    */
   remove(reward: Reward) {
@@ -97,15 +96,13 @@ export class Rewards {
 
   /**
    * Returns a single reward as a human-readable string
-   * 
+   *
    * @param {Reward} reward The reward
    * @returns {string}
    */
   static rewardToString(reward: Reward): string {
-    if (reward.type == 'scores' && reward.score == 'leafs')
-      return `${emoji.leaf} Листья x ${reward.count}`
-    else if (reward.type === 'scores' && reward.score == 'money')
-      return `${emoji.money} Монеты x ${reward.count}`
+    if (reward.type == 'scores' && reward.score == 'leafs') return `${emoji.leaf} Листья x ${reward.count}`
+    else if (reward.type === 'scores' && reward.score == 'money') return `${emoji.money} Монеты x ${reward.count}`
     else if (reward.type === 'item')
       return itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
     else return `${reward.score} x ${reward.count}`
@@ -126,7 +123,6 @@ export class Rewards {
  *
  * @param {ItemStack} item
  */
-
 export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§g', newline = false) {
   return `${item.nameTag ?? itemLocaleName(item)}§r${newline ? '\n' : ''}${item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''}`
 }

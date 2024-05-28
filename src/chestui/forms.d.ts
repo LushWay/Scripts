@@ -52,13 +52,16 @@ declare class ChestFormData {
    */
   pattern(
     pattern: string[],
-    key: Record<string, {
+    key: Record<
+      string,
+      {
         itemName?: string
         itemDesc?: string[]
         stackSize?: number
         enchanted?: boolean
         texture: string
-      }>,
+      }
+    >,
   ): ChestFormData
 
   /**

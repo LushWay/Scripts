@@ -7,4 +7,3 @@ describe('vector extra functions', () => {
     expect(Vector.around({ x: 10, y: 0, z: -5 }, 5)).toEqual([new Vector(15, 5, 0), new Vector(5, -5, -10)])
   })
 })
-
