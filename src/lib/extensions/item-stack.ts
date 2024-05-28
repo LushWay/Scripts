@@ -11,16 +11,16 @@ import { expand } from './extend'
 declare module '@minecraft/server' {
   interface ItemStack {
     /** Alias to {@link ItemStack.getComponent}('cooldown') */
-    cooldown: ItemCooldownComponent
+    cooldown?: ItemCooldownComponent
 
     /** Alias to {@link ItemStack.getComponent}('enchantable') */
-    enchantable: ItemEnchantableComponent
+    enchantable?: ItemEnchantableComponent
 
     /** Alias to {@link ItemStack.getComponent}('durability') */
-    durability: ItemDurabilityComponent
+    durability?: ItemDurabilityComponent
 
     /** Alias to {@link ItemStack.getComponent}('food') */
-    food: ItemFoodComponent
+    food?: ItemFoodComponent
 
     /** Checks if one item stack properties are fully equal to another (nameTag and lore) */
     is(another: ItemStack): boolean

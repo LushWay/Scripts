@@ -82,7 +82,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
     player.teleport(nearestPlace.portalTeleportsTo)
   } else {
     delete player.database.survival.anarchy
-    Spawn.loadInventory(player)
+    Spawn.switchInventory(player)
   }
 
   if (getSettings(player).restoreInvQuest) {

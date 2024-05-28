@@ -1,4 +1,4 @@
-import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
+import { ContainerSlot, Player, system, world } from '@minecraft/server'
 import {
   Airdrop,
   Compass,
@@ -564,16 +564,6 @@ type QuestCounterInput = {
 type QuestCounterThis = Omit<QuestStepThis, 'text'> & {
   diff(this: Omit<QuestStepThis, 'text'>, m: number): void
 } & Omit<QuestCounterInput, 'text' | 'description'>
-
-type QuestDialogueInput = {
-  npcEntity: Entity
-  placeText?: QuestStepInput['text']
-  placeDescription?: QuestStepInput['text']
-  talkText: QuestStepInput['text']
-  talkDescription?: QuestStepInput['text']
-} & QuestStepInput
-
-type QuestDialogueThis = QuestStepThis & QuestDialogueInput
 
 type QuestAirdropInput = {
   text?: (AirdropPos: string) => string

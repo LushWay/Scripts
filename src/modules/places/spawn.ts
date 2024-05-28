@@ -11,6 +11,8 @@ import { isNotPlaying } from 'modules/world-edit/isBuilding'
 import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
+  private readonly name = 'Spawn'
+
   portal: Portal | undefined
 
   region: SafeAreaRegion | undefined
@@ -19,13 +21,6 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
   location = locationWithRotation('common', 'spawn', { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
 
-  inventory: import('lib').Inventory = {
-    xp: 0,
-    health: 20,
-    equipment: {},
-    slots: { 0: Menu.item },
-  }
-
   settings = Settings.player('Вход', 'join', {
     teleportToSpawnOnJoin: {
       value: true,
@@ -33,16 +28,6 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
       description: 'Определяет, будете ли вы телепортироваться на спавн при входе',
     },
   })
-
-  private readonly name = 'Spawn'
-
-  /** Loads spawn inventory to specified player */
-  loadInventory(player: Player) {
-    super.loadInventory(player, () => {
-      InventoryStore.load({ to: player, from: this.inventory, clearAll: true })
-      player.database.inv = 'spawn'
-    })
-  }
 
   constructor() {
     super()
@@ -57,7 +42,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
           const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
           if (!title) return
 
-          this.loadInventory(player)
+          this.switchInventory(player)
           spawnLocation.teleport(player)
 
           showSurvivalHud(player)
@@ -92,6 +77,22 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
     }
   }
 
+  loadInventory(player: Player): void {
+    InventoryStore.load({
+      to: player,
+      from: {
+        xp: 0,
+        health: 20,
+        equipment: {},
+        slots: { 0: Menu.item },
+      },
+      clearAll: true,
+    })
+    player.database.inv = 'spawn'
+  }
+
+  saveInventory = undefined
+
   regionCallback: RegionCallback = (player, region) => {
     if (player.isSimulated()) return
     if (region === this.region) {
@@ -104,7 +105,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
       })
     } else {
       if (player.database.inv === 'spawn' && !isNotPlaying(player)) {
-        this.loadInventory(player)
+        this.switchInventory(player)
         this.portal?.teleport(player)
       }
     }

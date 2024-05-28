@@ -22,7 +22,7 @@ new Command('wipe')
         Compass.setFor(ctx.player, undefined)
         Anarchy.inventoryStore.remove(ctx.player.id)
         ctx.player.database.inv = 'anarchy'
-        Spawn.loadInventory(ctx.player)
+        Spawn.switchInventory(ctx.player)
         Spawn.portal?.teleport(ctx.player)
         Anarchy.inventoryStore.remove(ctx.player.id)
 

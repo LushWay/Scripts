@@ -26,11 +26,38 @@ declare global {
     fromEntries<V = unknown, K extends string = string>(entries: Iterable<readonly [K, V]>): Record<K, V>
 
     keys<T extends Record<string, unknown>>(o: T): (keyof T extends string ? keyof T : never)[]
+
+    /**
+     * Creates a new object by applying a mapper function to each key-value pair in the input object.
+     *
+     * @example
+     *   Object.map({ a: 1, b: 2, c: 3 }, (key, value) => [key + 'A', value]) // { aA: 1, bA: 2, cA: 3 }
+     *
+     * @param object - The input object to be processed.
+     * @param mapper - A function that takes a value, key, and the original object, and returns a new key-value pair as
+     *   a tuple [newKey, newValue]. If the mapper returns false, the key-value pair is excluded from the new object.
+     * @returns A new object constructed from the key-value pairs returned by the mapper.
+     */
+    map<T extends Record<string, unknown>, K2 extends string, V2>(
+      object: T,
+      mapper: (key: keyof T, value: Required<T>[keyof T], object: NoInfer<T>) => [K2, V2] | false,
+    ): NoInfer<Record<K2, V2>>
   }
 }
 
 /** Common JavaScript objects */
 Object.entriesStringKeys = Object.entries
+
+Object.map = (object, mapper) => {
+  const result: Record<string, unknown> = {}
+
+  for (const key of Object.getOwnPropertyNames(object)) {
+    const mapped = mapper(key as any, (object as any)[key], object)
+    if (mapped) result[mapped[0]] = mapped[1]
+  }
+
+  return result as any
+}
 
 declare global {
   interface Math {

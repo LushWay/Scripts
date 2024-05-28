@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
-export class DefaultPlaceWithInventory {
+export abstract class DefaultPlaceWithInventory {
   static places: DefaultPlaceWithInventory[] = []
 
   inventoryName: InventoryTypeName
@@ -16,7 +16,7 @@ export class DefaultPlaceWithInventory {
    * @param player - Player to load
    * @param callback - Function that gets executed when inventory actually needs to be loaded
    */
-  loadInventory(player: Player, callback: VoidFunction) {
+  switchInventory(player: Player) {
     if (isNotPlaying(player)) return
 
     const currentInventory = player.database.inv
@@ -27,14 +27,14 @@ export class DefaultPlaceWithInventory {
       if (place === this) return
 
       if (place.inventoryName === currentInventory) {
-        place.saveInventory(player)
+        place.saveInventory?.(player)
       }
     })
 
-    callback()
+    this.loadInventory(player)
   }
 
-  saveInventory(player: Player) {
-    // Implementation in subclass
-  }
+  abstract loadInventory(player: Player): void
+
+  abstract saveInventory?(player: Player): void
 }
