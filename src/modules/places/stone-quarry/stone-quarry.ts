@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, LootTable, util } from 'lib'
+import { Boss, Loot, util } from 'lib'
 import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
 import { Furnacer } from '../../features/furnacer'
 
@@ -10,7 +10,7 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
     entityTypeId: MinecraftEntityTypes.Wither,
     bossEvent: false,
     respawnTime: util.ms.from('hour', 1),
-    loot: new LootTable({ id: 'wither drop', fill: { type: 'itemsCount' } }, { type: 'NetherStar', chance: '100%' }),
+    loot: new Loot('wither drop').item('NetherStar').build,
   })
 
   commonOvener = new Furnacer({
@@ -32,7 +32,7 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
     furnaceTypeIds: [MinecraftBlockTypes.LitBlastFurnace],
     npc: {
       id: 'foodOvener',
-      name: 'Хавка',
+      name: 'Едоед',
     },
     onlyInStoneQuarry: false,
   })

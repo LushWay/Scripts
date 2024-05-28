@@ -18,12 +18,8 @@ export class Boss {
   /** Boss Database. Contains meta information about spawned boss entities */
   static db = table<BossDB>('boss')
 
-  /**
-   * List of all registered boss types
-   *
-   * @type {Boss[]}
-   */
-  static types: Boss[] = []
+  /** List of all registered boss types */
+  static all: Boss[] = []
 
   arenaRadius
 
@@ -49,22 +45,22 @@ export class Boss {
 
   static {
     world.afterEvents.entityDie.subscribe(data => {
-      Boss.types.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
+      Boss.all.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
     })
 
-    system.runInterval(() => Boss.types.forEach(e => e.check()), 'boss respawn', 40)
+    system.runInterval(() => Boss.all.forEach(e => e.check()), 'boss respawn', 40)
   }
 
   /**
-   * @param {object} o
-   * @param {string} o.name Script id used for location
-   * @param {string} o.entityTypeId
-   * @param {string} o.displayName
-   * @param {number} o.respawnTime In ms
-   * @param {boolean} [o.bossEvent]
-   * @param {number} [o.arenaRadius]
-   * @param {LootTable} o.loot
-   * @param {Dimensions} [o.dimensionId]
+   * @param o
+   * @param o.name Script id used for location
+   * @param o.entityTypeId
+   * @param o.displayName
+   * @param o.respawnTime In ms
+   * @param o.bossEvent
+   * @param o.arenaRadius
+   * @param o.loot
+   * @param o.dimensionId
    */
   constructor({
     name,
@@ -94,22 +90,16 @@ export class Boss {
     this.loot = loot
     this.location = location('Боссы', name)
     this.arenaRadius = arenaRadius
-
-    // Without delay any error during loading
-    // caused this file to stop loading
-    // so none of intervals would register.
-    system.delay(() => {
-      this.location.onLoad.subscribe(center => {
-        this.check()
-        this.region = BossArenaRegion.create({
-          center,
-          radius: this.arenaRadius,
-          dimensionId: this.dimensionId,
-        })
+    this.location.onLoad.subscribe(center => {
+      this.check()
+      this.region = BossArenaRegion.create({
+        center,
+        radius: this.arenaRadius,
+        dimensionId: this.dimensionId,
       })
     })
 
-    Boss.types.push(this)
+    Boss.all.push(this)
   }
 
   check() {
@@ -119,7 +109,6 @@ export class Boss {
     const db = Boss.db[this.name]
     if (db) {
       if (db.dead) {
-        // After death interval
         this.checkRespawnTime(db)
       } else {
         this.ensureEntity(db)
@@ -130,8 +119,6 @@ export class Boss {
     }
   }
 
-  /** @param {BossDB} db */
-
   checkRespawnTime(db: BossDB) {
     if (Date.now() > db.date + this.respawnTime) this.spawnEntity()
   }
@@ -141,15 +128,12 @@ export class Boss {
 
     // Get type id
     const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
-
-    // Log
     console.debug(`Boss(${this.name}).spawnEntity(${entityTypeId})`)
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
 
     // Save to database
-
     Boss.db[this.name] = {
       id: this.entity.id,
       date: Date.now(),
@@ -157,12 +141,7 @@ export class Boss {
     }
   }
 
-  /**
-   * Ensures that entity exists and if not calls onDie method
-   *
-   * @param {BossDB} db
-   */
-
+  /** Ensures that entity exists and if not calls onDie method */
   ensureEntity(db: BossDB) {
     const entity = world[this.dimensionId]
       .getEntities({

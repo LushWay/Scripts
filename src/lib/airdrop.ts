@@ -46,7 +46,7 @@ export class Airdrop {
   /**
    * Spawns airdrop at the given position
    *
-   * @param {Vector3} position - Position to spawn airdrop on
+   * @param position - Position to spawn airdrop on
    */
   spawn(position: Vector3) {
     console.debug('spawning airdrop at', Vector.string(Vector.floor(position), true))
@@ -232,7 +232,6 @@ system.runInterval(
   interval,
 )
 
-/** @param {Entity | undefined} entity */
 export function inventoryIsEmpty(entity: Entity | undefined) {
   if (!entity?.isValid()) return false
 
@@ -242,10 +241,6 @@ export function inventoryIsEmpty(entity: Entity | undefined) {
   if (container.emptySlotsCount === container.size) return true
 }
 
-/**
- * @param {Entity[]} arr
- * @param {'chestMinecart' | 'chicken'} type
- */
 function cleanup(arr: Entity[], type: 'chestMinecart' | 'chicken') {
   for (const entity of arr) {
     if (!entity.isValid()) continue
@@ -256,12 +251,7 @@ function cleanup(arr: Entity[], type: 'chestMinecart' | 'chicken') {
   }
 }
 
-/**
- * Finds entity in entity array by id and removes it from array
- *
- * @param {Entity[]} arr
- * @param {string} id
- */
+/** Finds entity in entity array by id and removes it from array */
 const findAndRemove = (arr: Entity[], id: string) => {
   const i = arr.findIndex(e => e?.id === id)
   if (i !== -1) return arr.splice(i, 1)[0]

@@ -10,7 +10,7 @@ import {
   BUTTON,
   ChestForm,
   DatabaseUtils,
-  LootTable,
+  Loot,
   Mail,
   NpcForm,
   Settings,
@@ -127,7 +127,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     if (ctx.arguments[1]) ctx.reply('Аирдроп для')
 
     const airdrop = new Airdrop({
-      loot: Object.values(LootTable.instances)[0],
+      loot: Object.values(Loot.instances)[0],
       forPlayerId: ctx.arguments[1] ? ctx.player.id : undefined,
     })
 

@@ -34,3 +34,10 @@ export class WorldAfterEvents {
 export class WorldBeforeEvents {}
 
 export const world = new World()
+
+export class ItemStack {
+  constructor(public typeId: string) {}
+  clone() {
+    return new ItemStack(this.typeId)
+  }
+}
