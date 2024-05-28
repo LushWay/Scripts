@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-
-export const BDS: {
-  ServerNet: null | typeof import('@minecraft/server-net')
-} = {
-  ServerNet: null,
+interface Modules {
+  Net: null | typeof import('@minecraft/server-net')
 }
 
-dynamicImport('@minecraft/server-net', 'ServerNet')
+export const ServerModules: Modules = /* @__PURE__ */ (() => {
+  const ServerModules: Modules = {
+    Net: null,
+  }
 
-function dynamicImport(module: string, key: keyof typeof BDS) {
-  import(module)
-    .then(module => (BDS[key] = module))
-    .catch(() => !__TEST__ && console.warn(`§7Not available§r: ${module}`))
-}
+  dynamicImport('@minecraft/server-net', 'Net')
+
+  function dynamicImport(module: string, key: keyof typeof ServerModules) {
+    import(module)
+      .then(module => (ServerModules[key] = module))
+      .catch(() => !__TEST__ && console.warn(`§7Not available§r: ${module}`))
+  }
+
+  return ServerModules
+})()

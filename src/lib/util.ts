@@ -20,7 +20,7 @@ export const util = {
         error.name = 'StringError'
       }
 
-      if (__PRODUCTION__)
+      __PRODUCTION__ &&
         sendPacketToStdout('error', {
           name: error.name ?? 'Error',
           stack: error.stack ?? '',

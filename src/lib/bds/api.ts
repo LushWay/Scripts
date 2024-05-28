@@ -1,5 +1,5 @@
 import { util } from 'lib/util'
-import { BDS } from './modules'
+import { ServerModules } from './modules'
 
 class RequestError extends Error {}
 
@@ -12,8 +12,8 @@ export async function request<Path extends keyof Scripts.Routes>(
   const prefix = `request('${path}'`
   console.warn(`${prefix},`, body, '§r)')
 
-  if (BDS.ServerNet) {
-    const { http, HttpRequest, HttpRequestMethod } = BDS.ServerNet
+  if (ServerModules.Net) {
+    const { http, HttpRequest, HttpRequestMethod } = ServerModules.Net
 
     const response = await http.request(
       new HttpRequest(`http://localhost:${__SERVER_PORT__}/` + path)
