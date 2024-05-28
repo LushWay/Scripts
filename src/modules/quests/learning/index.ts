@@ -1,5 +1,5 @@
 import { ItemStack, system } from '@minecraft/server'
-import { ActionForm, Vector, location, locationWithRadius, migrateLocationName } from 'lib'
+import { ActionForm, Vector, location, locationWithRadius } from 'lib'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { SafeAreaRegion, Temporary, actionGuard } from 'lib'
@@ -18,9 +18,6 @@ import airdropTable from './airdrop'
 // TODO Combine steps
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
-
-migrateLocationName('learning_quest_crafting_table', 'quest: learning', 'Верстак')
-migrateLocationName('learning_quest_rtp', 'quest: learning', 'Мирная зона и ртп')
 
 class Learning extends QuestBase {
   id = 'learning'

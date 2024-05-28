@@ -1,7 +1,7 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { InventoryStore, Portal, RegionCallback, Settings, locationWithRotation, migrateLocationName, util } from 'lib'
+import { InventoryStore, Portal, RegionCallback, Settings, locationWithRotation, util } from 'lib'
 
 import { Menu } from 'lib/menu'
 import { Join } from 'lib/player-join'
@@ -9,8 +9,6 @@ import { SafeAreaRegion } from 'lib/region/kinds/SafeAreaRegion'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
-
-migrateLocationName('spawn', 'common', 'spawn')
 
 class SpawnBuilder extends DefaultPlaceWithInventory {
   portal: Portal | undefined

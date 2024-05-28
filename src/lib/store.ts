@@ -1,6 +1,6 @@
 import { ItemStack, Player, system } from '@minecraft/server'
 
-import { PlaceAction, Settings, location, migrateLocationName } from 'lib'
+import { PlaceAction, Settings, location } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Cooldown } from 'lib/cooldown'
 import { Cost } from 'lib/cost'
@@ -18,7 +18,6 @@ interface StoreOptions {
 export class Store {
   static block(options: StoreOptions & { dimensionId: Dimensions }) {
     const store = new Store(options)
-    migrateLocationName(options.name + ' магазин', options.group, options.name)
     location(options.group, options.name).onLoad.subscribe(location => {
       /** We dont actually want to store that on disk */
       const cooldownDatabase: JsonObject = {}

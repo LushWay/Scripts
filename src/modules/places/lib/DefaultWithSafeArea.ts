@@ -1,7 +1,7 @@
 import { system } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { SafeAreaRegion, location, locationWithRadius, locationWithRotation, migrateLocationName } from 'lib'
+import { SafeAreaRegion, location, locationWithRadius, locationWithRotation } from 'lib'
 import { actionGuard } from 'lib/region/index'
 
 export class DefaultPlaceWithSafeArea {
@@ -21,16 +21,9 @@ export class DefaultPlaceWithSafeArea {
 
   constructor(name: string) {
     this.name = name
-    migrateLocationName(name + ' портал телепортирует на', name, 'портал телепортирует на')
     this.portalTeleportsTo = locationWithRotation(name, 'портал телепортирует на')
-
-    migrateLocationName(name + ' портал от', name, 'портал от')
     this.portalPos2 = location(name, 'портал от')
-
-    migrateLocationName(name + ' портал до', name, 'портал до')
     this.portalPos1 = location(name, 'портал до')
-
-    migrateLocationName(name + ' мирная зона', name, 'мирная зона')
     this.safeAreaLocation = locationWithRadius(name, 'мирная зона')
 
     this.safeAreaLocation.onLoad.subscribe(location => {

@@ -5,7 +5,7 @@ import { LootTable } from 'lib/loot-table'
 import { Region } from 'lib/region/index'
 import { table } from './database/abstract'
 import { isChunkUnloaded } from './game-utils'
-import { location, migrateLocationName } from './location'
+import { location } from './location'
 import { BossArenaRegion } from './region/kinds/BossArenaRegion'
 
 interface BossDB {
@@ -92,7 +92,6 @@ export class Boss {
     this.respawnTime = respawnTime
     this.bossEvent = bossEvent
     this.loot = loot
-    migrateLocationName('Босс ' + name, 'Боссы', name)
     this.location = location('Боссы', name)
     this.arenaRadius = arenaRadius
 
