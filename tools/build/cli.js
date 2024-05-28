@@ -16,9 +16,20 @@ export function parseCliArguments() {
         test: { type: 'boolean', default: false },
         world: { type: 'boolean', default: false },
         port: { type: 'string' },
+        help: { type: 'boolean', default: false, short: 'h' },
       },
     })
     ;({ dev, test, world, port } = values)
+
+    if (values.help) {
+      logger.info(`build [options] 
+  --dev: bool
+  --test: bool
+  --world: bool
+  --port: int
+`)
+      process.exit(0)
+    }
 
     if (!port) port = '19514'
     if (isNaN(parseInt(port))) {
