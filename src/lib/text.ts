@@ -25,13 +25,13 @@ function createSingleConcat(
   } as TFn & TStatic
 }
 
-function createMultiConcat(options: ColorizingOptions = {}, name?: string) {
+function createMultiConcat(options: ColorizingOptions = {}) {
   const t = createSingleConcat(options)
   t.roles = createSingleConcat({ roles: true, ...options })
   t.badge = createSingleConcat({ badge: true, ...options })
   t.plurals = createSingleConcat({ plurals: true, ...options })
   t.time = createSingleConcat({ time: true, ...options })
-  if (name !== 'error') t.error = createSingleConcat({ textColor: '§c', unitColor: '§f', ...options })
+  t.error = createSingleConcat({ textColor: '§c', unitColor: '§f', ...options })
   t.options = options => createMultiConcat(options)
   return t
 }

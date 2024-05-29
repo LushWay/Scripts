@@ -80,9 +80,7 @@ export class World {
   }
 }
 
-export class WorldAfterEvents {
-  readonly playerLeave = new EventSignal()
-}
+export class WorldAfterEvents {}
 export class WorldBeforeEvents {}
 
 export const world = new World()
