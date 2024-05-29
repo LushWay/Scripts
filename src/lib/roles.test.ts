@@ -22,4 +22,18 @@ describe('roles auto switch gamemode', () => {
     setRole(player, 'spectator')
     expect(player.getGameMode()).toBe(GameMode.spectator)
   })
+
+  it('should return valid role', () => {
+    // @ts-expect-error
+    const player = new Player() as Player
+
+    // @ts-expect-error
+    player.database.role = 'oldrole'
+
+    expect(getRole(player)).toBe('member')
+  })
+
+  it('should not throw for unknown player', () => {
+    setRole('unknown', 'tester')
+  })
 })

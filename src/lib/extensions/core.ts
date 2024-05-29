@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { EventLoader, EventSignal } from '../event-signal'
 
 /** Core server features */
-const Core = {
+export const Core = {
   name: '§aLush§bWay',
   beforeEvents: {
     /** Fires when player role changes */
@@ -14,14 +14,6 @@ const Core = {
     worldLoad: new EventLoader(),
   },
 }
-
-type CoreType = typeof Core
-declare global {
-  // eslint-disable-next-line no-var
-  var Core: CoreType
-}
-
-globalThis.Core = Core
 
 if (!__VITEST__) {
   system.run(function waiter() {

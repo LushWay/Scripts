@@ -1,3 +1,4 @@
+import { Core } from 'lib/extensions/core'
 import { Join } from 'lib/player-join'
 import { INTERACTABLE_ENTITIES, actionGuard, loadRegionsWithGuards } from 'lib/region/index'
 import { Spawn } from 'modules/places/spawn'

@@ -1,6 +1,6 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib/util'
+import { isKeyof, util } from 'lib/util'
 import { EventSignal } from './event-signal'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
@@ -83,7 +83,7 @@ export class Loot {
    * @param type Type of the item
    */
   item(type: string | Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
-    if (util.isKeyof(type, MinecraftItemTypes)) type = MinecraftItemTypes[type]
+    if (isKeyof(type, MinecraftItemTypes)) type = MinecraftItemTypes[type]
     this.create(new ItemStack(type))
 
     return this

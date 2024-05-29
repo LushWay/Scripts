@@ -1,6 +1,7 @@
 import { Enchantment, world } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { EventLoader } from 'lib/event-signal'
+import { Core } from './extensions/core'
 
 const location = { x: 0, y: -10, z: 0 }
 const dimension = world.overworld

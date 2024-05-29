@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 import { LockAction, PlaceAction } from 'lib/action'
 import { Vector } from 'lib/vector'
+import { Core } from './extensions/core'
 
 // TODO Builder style
 

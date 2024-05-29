@@ -1,7 +1,7 @@
 import { ItemStack, system } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { isKeyof, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { TechCity } from 'modules/places/tech-city'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
@@ -25,7 +25,7 @@ system.runPlayerInterval(
     const { typeId } = player.mainhand()
 
     // TODO Maybe check for region or inv type
-    if (typeId && util.isKeyof(typeId, HoeEffectLevels)) {
+    if (typeId && isKeyof(typeId, HoeEffectLevels)) {
       player.addEffect(MinecraftEffectTypes.Haste, 2, {
         amplifier: HoeEffectLevels[typeId],
         showParticles: false,

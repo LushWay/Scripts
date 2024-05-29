@@ -1,6 +1,7 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
 import { Settings } from 'lib'
 import { HealthIndicatorConfig } from './config'
+import { Core } from 'lib/extensions/core'
 
 // █
 

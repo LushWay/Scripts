@@ -18,7 +18,7 @@ declare global {
   var verbose: boolean
 
   interface Function {
-    bind<Fn extends (...args: unknown[]) => unknown>(this: Fn, context: object, args: unknown[]): Fn
+    bind<Fn>(this: Fn, context: object, args: unknown[]): Fn
   }
 
   interface ObjectConstructor {

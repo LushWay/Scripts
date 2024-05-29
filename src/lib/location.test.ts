@@ -41,6 +41,13 @@ describe('location', () => {
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60 }))
     expect(loc.firstLoad).toBe(false)
   })
+
+  it('should not load invalid location', () => {
+    Settings.worldDatabase['group1'] = { name1: 'in va lid' }
+    const loc = location('group1', 'name1')
+
+    expect(loc.valid).toBe(false)
+  })
 })
 
 describe('locationWithRotation', () => {

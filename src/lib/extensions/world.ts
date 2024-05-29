@@ -1,7 +1,8 @@
-import {  World, world } from '@minecraft/server'
-import { util } from '../util'
-import { expand } from './extend'
+import { World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
+import { util } from '../util'
+import { Core } from './core'
+import { expand } from './extend'
 
 declare module '@minecraft/server' {
   interface World {
@@ -28,7 +29,7 @@ const send = world.sendMessage.bind(world)
 
 expand(World.prototype, {
   say(message) {
-    if (globalThis.Core?.afterEvents?.worldLoad?.loaded) {
+    if (Core.afterEvents.worldLoad.loaded) {
       this.say = send
       return send(message)
     }

@@ -4,31 +4,7 @@
     "composite": true,
     "noEmit": false
   },
-  "plugins": [
-    {
-      "name": "typescript-plugin-import-filter",
-      "excludes": [
-        { "module": "leafy-utils" },
-        { "module": "src/chestui/**" },
-        { "module": "@sentry/**" },
-        { "module": "vm" },
-        { "module": "readline**" },
-        { "module": "net**" },
-        { "module": "module**" },
-        { "module": "ttl2**" },
-        { "module": "src/test" },
-        { "module": "pref_hooks" },
-        { "module": "async_hooks" },
-        { "module": "fs**" },
-        { "module": "tty" },
-        { "module": "stream" },
-        { "module": "domain" },
-        { "module": "zlib" },
-        { "module": "node:**" },
-        { "module": "crypto" }
-      ]
-    }
-  ],
+
   "include": ["./src", "./src/**/*.test.ts"],
   "exclude": ["./src/**/*.spec.ts", "./src/test/framework.ts", "./src/test/loader.ts", "node_modules"],
   "references": []

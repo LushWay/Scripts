@@ -4,6 +4,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { util } from '../util'
 import { DatabaseError } from './abstract'
 import { DatabaseUtils } from './utils'
+import { Core } from 'lib/extensions/core'
 
 const tableType = 'inventory'
 

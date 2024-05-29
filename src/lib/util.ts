@@ -388,27 +388,15 @@ export const util = {
     },
   ),
 
-  isKeyof<O extends Record<string | symbol | number, unknown>>(str: string | symbol | number, obj: O): str is keyof O {
-    return str in obj
-  },
-
-  nonNullable<T>(value: T): value is NonNullable<T> {
-    return typeof value !== 'undefined' && value !== null
-  },
-
-  dedupe<T>(array: T[]): T[] {
-    return [...new Set(array)]
-  },
-
   /**
    * Creates paginator object for array
    *
    * @template T - Item type
-   * @param {T[]} array - Array of items to display
-   * @param {number} [perPage] - Items per page
-   * @param {number} [startPage] - Page to start from
-   * @param {number} [minLength=perPage] - Minimal items count to paginate. If array has less then this count, array is
-   *   returned. Default is `perPage`
+   * @param array - Array of items to display
+   * @param perPage - Items per page
+   * @param startPage - Page to start from
+   * @param minLength - Minimal items count to paginate. If array has less then this count, array is returned. Default
+   *   is `perPage`
    */
   paginate<T>(array: T[], perPage = 10, startPage = 1, minLength: number = perPage) {
     if (array.length <= minLength) return { array, canGoNext: false, canGoBack: false, maxPages: 1, page: 1 }
@@ -520,12 +508,10 @@ export const util = {
 
   /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
-    if (__SERVER__)
-      return text.replace(/§(.)/g, (_, a) => this.terminalColors[a] ?? this.terminalColors.r) + this.terminalColors.r
-
-    return text.replace(/§(.)/g, '')
+    return __SERVER__
+      ? text.replace(/§(.)/g, (_, a) => TerminalColors[a] ?? TerminalColors.r) + TerminalColors.r
+      : text.replace(/§(.)/g, '')
   },
-  terminalColors: TerminalColors,
 }
 
 export type Paginator = ReturnType<(typeof util)['paginate']>
@@ -534,3 +520,16 @@ export type Paginator = ReturnType<(typeof util)['paginate']>
 type Plurals = [string, string, string]
 
 type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'
+
+export function noNullable<T>(value: T): value is NonNullable<T> {
+  return typeof value !== 'undefined' && value !== null
+}
+
+export function noBoolean<T>(value: T): value is Exclude<T, boolean> {
+  return value !== false
+}
+
+type Key = string | symbol | number
+export function isKeyof<O extends Record<Key, unknown>>(key: Key, object: O): key is keyof O {
+  return key in object
+}

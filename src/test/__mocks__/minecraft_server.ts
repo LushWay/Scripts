@@ -75,8 +75,27 @@ export class World {
   afterEvents = wrapEvents(new WorldAfterEvents())
   beforeEvents = wrapEvents(new WorldBeforeEvents())
   sendMessage = vi.fn()
+  getPlayers() {
+    return []
+  }
   getDimension(id: MinecraftDimensionTypes) {
     return new Dimension(id)
+  }
+}
+
+type DynamicPropertyValue = string | number | boolean | undefined | Vector3
+
+class DynamicPropertiesProvider {
+  private dynamicProperties: Record<string, DynamicPropertyValue> = {}
+  getDynamicProperty(key: string) {
+    return this.dynamicProperties[key]
+  }
+  setDynamicProperty(key: string, value: DynamicPropertyValue) {
+    if (value === undefined) Reflect.deleteProperty(this.dynamicProperties, key)
+    else this.dynamicProperties[key] = value
+  }
+  getDynamicPropertiesIds() {
+    return Object.keys(this.dynamicProperties)
   }
 }
 
@@ -85,10 +104,27 @@ export class WorldBeforeEvents {}
 
 export const world = new World()
 
-export class ItemStack {
-  constructor(public typeId: string) {}
+export class ItemStack extends DynamicPropertiesProvider {
+  typeId: string
+
+  constructor(
+    public itemType: mc.ItemType | string,
+    public amount: number = 1,
+  ) {
+    super()
+    this.typeId = typeof itemType === 'string' ? itemType : itemType.id
+  }
+
+  private lore: string[] = []
+  getLore() {
+    return this.lore.slice()
+  }
+  setLore(lore: string[]) {
+    this.lore = lore
+  }
+
   clone() {
-    return new ItemStack(this.typeId)
+    return new ItemStack(this.typeId, this.amount)
   }
 }
 

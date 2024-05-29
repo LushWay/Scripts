@@ -53,8 +53,8 @@ interface ColorizingOptions {
   time?: boolean
 }
 
-function textUnitColorize(unit: unknown, options: ColorizingOptions = {}) {
-  const { unitColor = '§f', textColor = '§7' } = options
+export function textUnitColorize(unit: unknown, options: ColorizingOptions = {}) {
+  const { unitColor = '§f' } = options
   switch (typeof unit) {
     case 'string':
       return unitColor + unit
@@ -76,7 +76,9 @@ function textUnitColorize(unit: unknown, options: ColorizingOptions = {}) {
 
     case 'number':
     case 'bigint':
-    case 'boolean':
       return '§6' + unit + '§r'
+
+    case 'boolean':
+      return unit ? '§fДа' : '§cНет'
   }
 }

@@ -8,6 +8,7 @@ import { openBaseMenu } from 'modules/places/base/base-menu'
 import { questsMenu } from 'modules/quests/quest-menu'
 import { Anarchy } from '../places/anarchy'
 import { Spawn } from '../places/spawn'
+import { Core } from 'lib/extensions/core'
 
 function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = 'Спавн', extra = '') {
   const here = inv === place

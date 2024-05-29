@@ -11,6 +11,7 @@ import {
   Vector,
 } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
+import { Core } from 'lib/extensions/core'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 export interface QuestDB {

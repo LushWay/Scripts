@@ -19,20 +19,16 @@ describe('migrations', () => {
     })
 
     // Value is not migrated, because migration depends on delay
-    expect(database['key1']).toMatchInlineSnapshot(`
-      {
-        "newkey": "",
-        "oldkey": "some value",
-      }
-    `)
+    expect(database['key1']).toEqual({
+      newkey: '',
+      oldkey: 'some value',
+    })
 
     return new Promise<void>(resolve => {
       system.delay(() => {
-        expect(database['key1']).toMatchInlineSnapshot(`
-          {
-            "newkey": "some value",
-          }
-        `)
+        expect(database['key1']).toEqual({
+          newkey: 'some value',
+        })
         resolve()
       })
     })
@@ -43,11 +39,33 @@ describe('migrations', () => {
       const migrate = vi.fn()
 
       migration('test migration 2', migrate)
-      migration('test migration 2', migrate)
 
       system.delay(() => {
         expect(migrate).toHaveBeenCalledOnce()
+
+        migration('test migration 2', migrate)
+        expect(migrate).toHaveBeenCalledOnce()
+
         resolve()
+      })
+    })
+  })
+
+  it('should migrate only once even when multiple migrations are triggered', () => {
+    return new Promise<void>(resolve => {
+      const migrate = vi.fn()
+
+      migration('test migration 3', migrate)
+      migration('test migration 3', migrate)
+
+      system.delay(() => {
+        expect(migrate).toHaveBeenCalledOnce()
+        migration('test migration 3', migrate)
+
+        system.delay(() => {
+          expect(migrate).toHaveBeenCalledOnce()
+          resolve()
+        })
       })
     })
   })

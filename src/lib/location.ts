@@ -90,7 +90,7 @@ class Location<T extends Vector3> {
     }
 
     const input = raw.trim().split(' ').map(Number)
-    if (input.length !== this.format.split(' ').length) {
+    if (input.length !== this.format.split(' ').length || input.some(e => isNaN(e))) {
       return console.error(
         new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`),
       )

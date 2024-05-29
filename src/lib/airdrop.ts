@@ -6,6 +6,7 @@ import { table } from './database/abstract'
 import { isInvalidLocation } from './game-utils'
 import { LootTable } from './loot-table'
 import { Temporary } from './temporary'
+import { Core } from './extensions/core'
 
 export class Airdrop {
   static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true }>('airdrop')

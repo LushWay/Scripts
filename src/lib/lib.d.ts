@@ -36,8 +36,11 @@ declare global {
    */
   type WordPluralForms = [one: string, more: string, aa: string]
 
+  type ValueOf<T> = T[keyof T]
+
   /** Text that can be displayed on player screen and should support translation */
-  type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
+  type Text = import('lib/text').Text
+  // type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
 
   // Custom immutable type
   // source: https://github.com/Microsoft/TypeScript/issues/13923#issuecomment-653675557

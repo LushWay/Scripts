@@ -1,16 +1,14 @@
 import { system } from '@minecraft/server'
 import { table } from './abstract'
 
+const database = table<boolean>('databaseMigrations')
+
 export function migration(name: string, migrateFN: VoidFunction) {
-  if (!migration.database[name]) {
+  if (!database[name]) {
     system.delay(() => {
-      if (migration.database[name]) return
+      if (database[name]) return
       migrateFN()
-      migration.database[name] = true
+      database[name] = true
     })
   }
-}
-
-export namespace migration {
-  export const database = table<boolean>('databaseMigrations')
 }

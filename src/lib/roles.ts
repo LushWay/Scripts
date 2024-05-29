@@ -1,6 +1,7 @@
 import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
-import { util } from 'lib/util'
+import { isKeyof, util } from 'lib/util'
+import { Core } from './extensions/core'
 
 declare global {
   /** Any known role */
@@ -210,7 +211,7 @@ if (!__VITEST__) {
       }
 
       const role = event.id.toLowerCase().replace('role:', '')
-      if (!util.isKeyof(role, ROLES)) {
+      if (!isKeyof(role, ROLES)) {
         return console.error(
           `(SCRIPTEVENT::${event.id}) Unkown role: ${role}, allowed roles:\n${Object.entries(ROLES)
             .map(e => e[0] + ': ' + e[1])

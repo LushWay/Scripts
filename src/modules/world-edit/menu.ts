@@ -1,7 +1,7 @@
 import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, is, typeIdToReadable, util } from 'lib'
+import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, is, noNullable, typeIdToReadable, util } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
@@ -57,7 +57,7 @@ function WEChestFromBlocksSet(player: Player) {
   new ModalForm('Выбери набор блоков...')
     .addDropdown('Набор блоков', ...blocksSetDropdown(['', ''], player))
     .show(player, (ctx, blockset) => {
-      const blocks: ReplaceTarget[] = getBlocksSetForReplaceTarget([player.id, blockset]).filter(util.nonNullable)
+      const blocks: ReplaceTarget[] = getBlocksSetForReplaceTarget([player.id, blockset]).filter(noNullable)
       const pos1 = Vector.floor(player.location)
       const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
       WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
