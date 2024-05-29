@@ -1,6 +1,7 @@
-import { MinecraftDimensionTypes, World, world } from '@minecraft/server'
+import {  World, world } from '@minecraft/server'
 import { util } from '../util'
 import { expand } from './extend'
+import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 
 declare module '@minecraft/server' {
   interface World {
@@ -36,9 +37,9 @@ expand(World.prototype, {
 
     send(message)
   },
-  overworld: world.getDimension(MinecraftDimensionTypes.overworld),
-  nether: world.getDimension(MinecraftDimensionTypes.nether),
-  end: world.getDimension(MinecraftDimensionTypes.theEnd),
+  overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
+  nether: world.getDimension(MinecraftDimensionTypes.Nether),
+  end: world.getDimension(MinecraftDimensionTypes.TheEnd),
   debug(...data: unknown[]) {
     this.say(data.map(e => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
   },

@@ -530,6 +530,7 @@ export const util = {
 
 export type Paginator = ReturnType<(typeof util)['paginate']>
 
+/** Plurals forms in format `1 секунда 2 секунды 5 секунд` */
 type Plurals = [string, string, string]
 
 type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'

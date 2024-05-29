@@ -197,30 +197,32 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   }
 })
 
-// Allow recieving roles from scriptevent function run by console
-system.afterEvents.scriptEventReceive.subscribe(event => {
-  if (event.id.toLowerCase().startsWith('role:')) {
-    if (event.sourceType === ScriptEventSource.Server) {
-      // Allow
-    } else {
-      if (Object.values(Player.database).find(e => WHO_CAN_CHANGE.includes(e.role))) {
-        return console.error(`(SCRIPTEVENT::${event.id}) Admin already set.`)
+if (!__VITEST__) {
+  // Allow recieving roles from scriptevent function run by console
+  system.afterEvents.scriptEventReceive.subscribe(event => {
+    if (event.id.toLowerCase().startsWith('role:')) {
+      if (event.sourceType === ScriptEventSource.Server) {
+        // Allow
+      } else {
+        if (Object.values(Player.database).find(e => WHO_CAN_CHANGE.includes(e.role))) {
+          return console.error(`(SCRIPTEVENT::${event.id}) Admin already set.`)
+        }
       }
+
+      const role = event.id.toLowerCase().replace('role:', '')
+      if (!util.isKeyof(role, ROLES)) {
+        return console.error(
+          `(SCRIPTEVENT::${event.id}) Unkown role: ${role}, allowed roles:\n${Object.entries(ROLES)
+            .map(e => e[0] + ': ' + e[1])
+            .join('\n')}`,
+        )
+      }
+
+      const player = Player.getByName(event.message)
+      if (!player) return console.error(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)
+
+      setRole(player, role)
+      console.warn(`(SCRIPTEVENT::${event.id}) ROLE HAS BEEN SET`)
     }
-
-    const role = event.id.toLowerCase().replace('role:', '')
-    if (!util.isKeyof(role, ROLES)) {
-      return console.error(
-        `(SCRIPTEVENT::${event.id}) Unkown role: ${role}, allowed roles:\n${Object.entries(ROLES)
-          .map(e => e[0] + ': ' + e[1])
-          .join('\n')}`,
-      )
-    }
-
-    const player = Player.getByName(event.message)
-    if (!player) return console.error(`(SCRIPTEVENT::${event.id}) PLAYER NOT FOUND`)
-
-    setRole(player, role)
-    console.warn(`(SCRIPTEVENT::${event.id}) ROLE HAS BEEN SET`)
-  }
-})
+  })
+}

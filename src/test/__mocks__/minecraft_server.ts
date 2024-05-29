@@ -1,13 +1,45 @@
+import * as mc from '@minecraft/server'
+import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 import { vi } from 'vitest'
 
-export class Player {
+export class Container {}
+
+export class Entity {
+  id = 'test entity id'
+  nameTag = 'test entity nameTag'
+  teleport = vi.fn()
+}
+
+export class Player extends Entity {
   // @ts-expect-error AAAAAA
   static name() {
     return ''
   }
 
-  teleport = vi.fn()
+  constructor() {
+    super()
+    EventSignal.emit(
+      (world.afterEvents as unknown as mc.WorldAfterEvents).playerJoin as unknown as EventSignal<any>,
+      { playerId: this.id, playerName: this.name } as mc.PlayerJoinAfterEvent,
+    )
+    EventSignal.emit(
+      (world.afterEvents as unknown as mc.WorldAfterEvents).playerSpawn as unknown as EventSignal<any>,
+      { player: this as unknown as mc.Player, initialSpawn: true } as mc.PlayerSpawnAfterEvent,
+    )
+  }
+
+  id = 'test player id'
+  name = 'Test player name'
+  nameTag = this.name
+
+  private gamemode: GameMode = GameMode.survival
+  getGameMode() {
+    return this.gamemode
+  }
+  setGameMode(gameMode: GameMode) {
+    this.gamemode = gameMode
+  }
 }
 
 export class System {
@@ -19,13 +51,33 @@ export class System {
     setImmediate(fn)
     return 0
   }
+
+  runInterval = vi.fn()
+  runTimeout = vi.fn()
+  runJob = vi.fn()
 }
 
 export const system = new System()
 
+function wrapEvents(events: WorldAfterEvents | WorldBeforeEvents) {
+  return new Proxy(events as Record<string, EventSignal<any>>, {
+    get(target, p, receiver) {
+      if (typeof p === 'symbol') return Reflect.get(target, p, receiver)
+      if (target[p]) return target[p]
+
+      target[p] = new EventSignal()
+      return target[p]
+    },
+  })
+}
+
 export class World {
-  afterEvents = new WorldAfterEvents()
-  beforeEvents = new WorldBeforeEvents()
+  afterEvents = wrapEvents(new WorldAfterEvents())
+  beforeEvents = wrapEvents(new WorldBeforeEvents())
+  sendMessage = vi.fn()
+  getDimension(id: MinecraftDimensionTypes) {
+    return new Dimension(id)
+  }
 }
 
 export class WorldAfterEvents {
@@ -40,4 +92,17 @@ export class ItemStack {
   clone() {
     return new ItemStack(this.typeId)
   }
+}
+
+export class ContainerSlot {}
+
+export class Dimension {
+  constructor(public id: MinecraftDimensionTypes) {}
+}
+
+export enum GameMode {
+  adventure = 'adventure',
+  creative = 'creative',
+  spectator = 'spectator',
+  survival = 'survival',
 }

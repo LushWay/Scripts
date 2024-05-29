@@ -37,7 +37,42 @@
     "plugins": [
       {
         "name": "typescript-plugin-import-filter",
-        "excludes": [{ "module": "leafy-utils" }, { "module": "src/chestui/**" }, { "module": "@sentry/**" }]
+        "excludes": [
+          { "module": "leafy-utils" },
+          { "module": "src/chestui/**" },
+          { "module": "@sentry/**" },
+          { "module": "vm" },
+          { "module": "readline" },
+          { "module": "readline/promises" },
+          { "module": "console" },
+          { "module": "events" },
+          { "module": "process" },
+          { "module": "net" },
+          { "module": "module" },
+          { "module": "tls2" },
+          { "module": "tls" },
+          { "module": "http**" },
+          { "module": "vitest" },
+          { "module": "perf_hooks" },
+          { "module": "dgram" },
+          { "module": "trace_events" },
+          { "module": "async_hooks" },
+          { "module": "fs" },
+          { "module": "tty" },
+          { "module": "stream" },
+          { "module": "stream/web" },
+          { "module": "domain" },
+          { "module": "zlib" },
+          { "module": "v8" },
+          { "module": "dns" },
+          { "module": "worker_threads" },
+          { "module": "os" },
+          { "module": "source-map-js" },
+          { "module": "dns/promises" },
+          { "module": "util" },
+          { "module": "node:" },
+          { "module": "crypto" }
+        ]
       }
     ]
   },

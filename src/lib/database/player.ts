@@ -1,4 +1,4 @@
-import { Player, PlayerDatabase, world } from '@minecraft/server'
+import { Player, world, type PlayerDatabase } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
 import { table } from './abstract'
 
