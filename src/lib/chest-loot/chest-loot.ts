@@ -10,6 +10,7 @@ import ChestLootAnimation from './animation'
 
 export class ChestLoot {
   static floatingTextDynamicProperty = 'chestloot:text'
+
   static chests = new Map<string, ChestLoot>()
 
   static getChestName(id: string) {
@@ -25,11 +26,8 @@ export class ChestLoot {
     private lootTable: LootTable,
     public dimensionId: ShortcutDimensions = 'overworld',
   ) {
-    this.onValidLocation = this.onValidLocation.bind(this)
-    this.onInteract = this.onInteract.bind(this)
-
     this.location = location(locationGroup, id)
-    this.location.onLoad.subscribe(this.onValidLocation)
+    this.location.onLoad.subscribe(l => this.onValidLocation(l))
 
     ChestLoot.chests.set(id, this)
   }
@@ -42,7 +40,7 @@ export class ChestLoot {
 
   private onValidLocation(location: ValidSafeLocation<Vector3>) {
     this.floatingText.update(location, t`Сундук ${this.displayName}`)
-    if (location.firstLoad) PlaceAction.onInteract(location, this.onInteract, this.dimensionId)
+    if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionId)
 
     try {
       world[this.dimensionId].setBlockType(location, MinecraftBlockTypes.EnderChest)
@@ -54,16 +52,21 @@ export class ChestLoot {
 
   private onInteract(player: Player) {
     system.delay(() => {
-      if (!this.location.valid) return player.fail('Сундук еще не готов...')
+      if (!this.location.valid) {
+        player.fail('Сундук еще не готов...')
+        return
+      }
 
       const storage = schema.parse(player.mainhand())
       if (!storage) {
-        return player.fail(t.error`Чтобы открыть этот сундук, возьмите в руки ключ для сундука ${this.displayName}!`)
+        player.fail(t.error`Чтобы открыть этот сундук, возьмите в руки ключ для сундука ${this.displayName}!`)
+        return
       }
 
       if (storage.chest !== this.id) {
         const name = ChestLoot.getChestName(storage.chest)
-        return player.fail(t.error`Ключ для ${name} не подходит к сундуку ${this.displayName}`)
+        player.fail(t.error`Ключ для ${name} не подходит к сундуку ${this.displayName}`)
+        return
       }
 
       this.open(player, storage, this.location)
@@ -83,7 +86,7 @@ export class ChestLoot {
 const schema = new ItemLoreSchema('chestloot')
   .property('chest', String)
 
-  .nameTag((_, storage) => t.header`Ключ для сундука ${ChestLoot.getChestName(storage['chest'])}`)
+  .nameTag((_, storage) => t.header`Ключ для сундука ${ChestLoot.getChestName(storage.chest)}`)
   .lore(lore => [t`Используйте этот ключ, чтобы открыть сундук с лутом!`, ...lore])
 
   .build()

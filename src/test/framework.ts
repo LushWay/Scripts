@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { RawMessage } from '@minecraft/server'
 import * as gametest from '@minecraft/server-gametest'
 import { expand } from 'lib/extensions/extend'
@@ -31,7 +33,7 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
 
   const className = classNameGlobal
   const fullname = className + ':' + should
-  const filename = util.error.stack.get(1)?.split('\n')?.[0]?.trim() ?? 'unknown file'
+  const filename = util.error.stack.get(1).split('\n')[0]?.trim() ?? 'unknown file'
   return gametest
     .registerAsync(className, should, async test => {
       const history: string[] = []
@@ -86,7 +88,7 @@ function expandTest(test: gametest.Test, history: string[], fullname: string) {
 }
 
 function expandPlayer(player: gametest.SimulatedPlayer, test: gametest.ExtendedTest) {
-  expand(player as gametest.ExtendedSimulatedPlayer, {
+  expand(player, {
     get name() {
       return this.isValid() ? super.name : 'Testing player'
     },
@@ -95,7 +97,7 @@ function expandPlayer(player: gametest.SimulatedPlayer, test: gametest.ExtendedT
     },
 
     tell(message) {
-      return this.sendMessage(message)
+      this.sendMessage(message)
     },
 
     sendMessage(message) {

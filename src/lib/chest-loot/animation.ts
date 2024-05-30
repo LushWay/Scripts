@@ -13,7 +13,9 @@ export default class ChestLootAnimation {
   ) {}
 
   private timesec = 2
+
   private timetick = TicksPerSecond * this.timesec
+
   private timems = this.timesec * 1000
 
   private readonly entityOffset = { x: 1.2, y: -1, z: 0.9 }
@@ -47,9 +49,9 @@ export default class ChestLootAnimation {
     })[0]
 
     if (!entity)
-      return console.warn(
+      { console.warn(
         t.error`Unable to spawn armor stand for ${this.id}, location ${Vector.string(location, true)}`,
-      )
+      ); return; }
 
     // Equippable does not work's with armor stand in 1.20.81, please replace to equippable replace when fixed
     entity.runCommand(`replaceitem entity @s slot.weapon.mainhand 0 ${item.typeId}`)
@@ -76,9 +78,9 @@ export default class ChestLootAnimation {
 
     this.current.timeout = system.runTimeout(
       () => {
-        if (!this.current) return this.stop()
-        if (!this.current.entity.isValid() || !this.current.player.isValid()) return this.stop()
-        if (Cooldown.isExpired(this.current.date, this.timems)) return this.stop()
+        if (!this.current) { this.stop(); return; }
+        if (!this.current.entity.isValid() || !this.current.player.isValid()) { this.stop(); return; }
+        if (Cooldown.isExpired(this.current.date, this.timems)) { this.stop(); return; }
 
         this.animate(this.current.entity, this.current.player, this.current)
         this.current.stage++

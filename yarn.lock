@@ -2061,6 +2061,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-only-warn@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "eslint-plugin-only-warn@npm:1.1.0"
+  checksum: 10c0/72dfc947aa944321dfa63938f2e8bb91e7fda68f988837a8accf4551534ed04bf71957a46d00a4ddc43de5fe31055da12365b2c53c6ee6508f2ba203cd2cfa27
+  languageName: node
+  linkType: hard
+
 "eslint-plugin-scriptapi@file:tools/eslint-plugin::locator=scripts%40workspace%3A.":
   version: 0.0.2
   resolution: "eslint-plugin-scriptapi@file:tools/eslint-plugin#tools/eslint-plugin::hash=3ff07d&locator=scripts%40workspace%3A."
@@ -4001,6 +4008,7 @@ __metadata:
     eslint-import-resolver-typescript: "npm:^3.6.1"
     eslint-plugin-file-progress: "npm:^1.3.0"
     eslint-plugin-import: "npm:eslint-plugin-import-x@latest"
+    eslint-plugin-only-warn: "npm:^1.1.0"
     eslint-plugin-scriptapi: "file:tools/eslint-plugin"
     leafy-utils: "npm:^7.1.2"
     prettier: "npm:^3.2.5"

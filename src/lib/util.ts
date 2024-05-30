@@ -24,7 +24,7 @@ export const util = {
         sendPacketToStdout('error', {
           name: error.name ?? 'Error',
           stack: error.stack ?? '',
-          message: error.message ?? '',
+          message: error.message,
         })
 
       const stack = util.error.stack.get(omitStackLines + 1, error.stack)
@@ -63,7 +63,7 @@ export const util = {
           const stackArray = stack.split('\n')
 
           const mappedStack = stackArray
-            .map(e => e?.replace(/\s+at\s/g, '')?.replace(/\n/g, ''))
+            .map(e => e.replace(/\s+at\s/g, '').replace(/\n/g, ''))
             .map(e => {
               for (const [r, p] of this.modifiers) {
                 if (typeof e !== 'string' || e.length < 1) break
@@ -181,7 +181,7 @@ export const util = {
             }
             const cl = c.function
             // function
-            r = `${isArrow ? '' : `${cl.function} ƒ `}`
+            r = isArrow ? '' : `${cl.function} ƒ `
             // "name"
             r += `${cl.name}${name}`
             // "(arg, arg)"
@@ -232,9 +232,9 @@ export const util = {
     }
 
     return JSON.stringify(target, (_, value) => rep(value), space)
-      ?.replace(/"/g, cw)
-      ?.replace(new RegExp(uniqueKey, 'g'), '"')
-      ?.slice(0, 1000)
+      .replace(/"/g, cw)
+      .replace(new RegExp(uniqueKey, 'g'), '"')
+      .slice(0, 1000)
   },
 
   /**
@@ -258,8 +258,11 @@ export const util = {
     const prefix = `§6${subtype}: `
     try {
       const promise = fn()
-      if (promise instanceof Promise) promise.catch(e => console.error(prefix + this.error(e, { omitStackLines: 1 })))
-    } catch (e) {
+      if (promise instanceof Promise)
+        promise.catch((e: unknown) => {
+          console.error(prefix + this.error(e, { omitStackLines: 1 }))
+        })
+    } catch (e: unknown) {
       console.error(prefix + this.error(e, { omitStackLines: 1 }))
     }
   },
@@ -469,7 +472,7 @@ export const util = {
       // Last element index
       const i = lines.length - 1
       const line = lines[i]
-      const lastLineChar = line?.[line.length - 1]
+      const lastLineChar = line[line.length - 1]
 
       if (lastLineChar === '§' || char === '§') {
         // Ignore limit for invisible chars

@@ -33,6 +33,7 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-file-progress": "^1.3.0",
     "eslint-plugin-import": "npm:eslint-plugin-import-x@latest",
+    "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-scriptapi": "file:tools/eslint-plugin",
     "leafy-utils": "^7.1.2",
     "prettier": "^3.2.5",
@@ -64,8 +65,12 @@
     ],
     "plugins": [
       "@typescript-eslint",
-      "scriptapi"
+      "scriptapi",
+      "only-warn"
     ],
+    "parserOptions": {
+      "project": "./tsconfig.eslint.json"
+    },
     "settings": {
       "scriptapi/no-cycle": {
         "maxDepth": 20
@@ -93,6 +98,11 @@
       "@typescript-eslint/no-namespace": "off",
       "@typescript-eslint/no-extraneous-class": "off",
       "@typescript-eslint/no-invalid-void-type": "off",
+      "@typescript-eslint/no-confusing-void-expression": "off",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
+      "@typescript-eslint/prefer-return-this-type": "off",
+      "@typescript-eslint/no-unsafe-enum-comparison": "off",
       "@typescript-eslint/naming-convention": [
         "warn",
         {

@@ -42,15 +42,12 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
   }
 }
 
-function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet | undefined {
-  const blocks = getAllBlocksSets(playerId)[blocksSetName]
-  if (!blocks) return
-
-  return blocks.filter(e => e[2] > 0)
+function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet {
+  return getAllBlocksSets(playerId)[blocksSetName].filter(e => e[2] > 0)
 }
 
-export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef): BlockPermutation[] {
-  return (getActiveBlockInSetByRef([playerId, blocksSetName]) ?? [])
+export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {
+  return getActiveBlockInSetByRef([playerId, blocksSetName])
     .map(([type, states, weight]) => {
       let permutation
 
@@ -70,15 +67,14 @@ export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef): Bloc
           stringifyBlocksSetRef([playerId, blocksSetName]),
         )
       }
-      return new Array(weight).fill(permutation)
+      return new Array(weight).fill(permutation) as BlockPermutation[]
     })
-
     .filter(e => e.length)
     .flat()
 }
 
 export function getBlocksSetForReplaceTarget(ref: BlocksSetRef) {
-  return (getActiveBlockInSetByRef(ref) ?? [undefined]).map(e => {
+  return getActiveBlockInSetByRef(ref).map(e => {
     if (Array.isArray(e)) {
       const [typeId, states] = e
       return { typeId, states: states ?? {} }
