@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { util } from './util'
 
 export class Cooldown {
-  static expired(timestamp: number, cooldown: number) {
+  static isExpired(timestamp: number, cooldown: number) {
     return Date.now() - timestamp >= cooldown
   }
 

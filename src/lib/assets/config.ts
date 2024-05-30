@@ -18,6 +18,7 @@ export const CUSTOM_ITEMS = {
   wand: 'we:wand',
   compassPrefix: 'sm:compass',
   money: 'sm:money',
+  key: 'sm:key',
 }
 
 export const CUSTOM_ENTITIES = {
@@ -34,4 +35,8 @@ export const SOUNDS = {
   action: 'random.orb',
   click: 'note.hat',
   fail: 'block.false_permissions',
+}
+
+export const CUSTOM_STRUCTURES = {
+  FloatingItem: 'mystructure:floatingitem',
 }

@@ -6,6 +6,7 @@ import { util } from './util'
 export type Text = string
 interface TStatic {
   error: TFn & Omit<TStatic, 'error'>
+  header: TFn
   roles: (text: TemplateStringsArray, ...players: Player[]) => Text
   badge: (text: TemplateStringsArray, n: number) => Text
   plurals: (text: TemplateStringsArray, n: number, plurals: [one: string, two: string, five: string]) => Text
@@ -28,6 +29,7 @@ function createSingleConcat(
 function createMultiConcat(options: ColorizingOptions = {}) {
   const t = createSingleConcat(options)
   t.roles = createSingleConcat({ roles: true, ...options })
+  t.header = createSingleConcat({ textColor: '§6', unitColor: '§f§l', ...options })
   t.badge = createSingleConcat({ badge: true, ...options })
   t.plurals = createSingleConcat({ plurals: true, ...options })
   t.time = createSingleConcat({ time: true, ...options })

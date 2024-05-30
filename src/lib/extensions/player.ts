@@ -27,7 +27,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: warn success info
      */
-    fail(message: string): void
+    fail(message: string, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -39,7 +39,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail success info**
      */
-    warn(message: string): void
+    warn(message: string, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -51,7 +51,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn info**
      */
-    success(message: string): void
+    success(message: string, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -63,7 +63,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn success**
      */
-    info(message: string): void
+    info(message: string, sound?: boolean): void
 
     /** Gets ContainerSlot from the player mainhand */
     mainhand(): ContainerSlot
@@ -127,10 +127,10 @@ expand(Player, {
   },
 })
 
-function prefix(pref: string, sound: string): (this: Player, message: string) => void {
-  return function (this, message) {
+function prefix(pref: string, sound: string): (this: Player, message: string, playSound?: boolean) => void {
+  return function (this, message, playSound = true) {
     system.delay(() => {
-      this.playSound(sound)
+      if (playSound) this.playSound(sound)
       this.tell(pref + message)
     })
   }

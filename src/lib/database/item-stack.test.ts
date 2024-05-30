@@ -5,7 +5,7 @@ import { ItemLoreSchema } from './item-stack'
 
 describe('item stack', () => {
   it('should create item', () => {
-    const keyLore = new ItemLoreSchema()
+    const keyLore = new ItemLoreSchema('test')
       .property('key', String)
 
       .property('owner', String)
@@ -14,7 +14,7 @@ describe('item stack', () => {
       .property('owned', Boolean)
       .display('Занято')
 
-      .property('someOptionalWithDefault', 3000) // 3 is default value
+      .property('someOptionalWithDefault', 3000)
       .display('Отображение опции')
 
       .build()
@@ -23,16 +23,17 @@ describe('item stack', () => {
       key: 'defaultkey',
       owner: 'Имя',
       owned: true,
-      // someOptionalWithDefault is not required
     })
 
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
-        "§7Владелец: §fИмя",
-        "§7Занято: §fДа",
-        "§7Отображение опции: §63000§r",
+        "§r§f§7Владелец: §fИмя",
+        "§r§f§7Занято: §fДа",
+        "§r§r§7Отображение опции: §63000§r",
       ]
     `)
+
+    if (!storage) throw new TypeError('Storage is empty!')
 
     storage.key = 'key'
     storage.owner = 'owner'
@@ -40,24 +41,27 @@ describe('item stack', () => {
     expect(storage).toEqual({ key: 'key', owner: 'owner', owned: true, someOptionalWithDefault: 3000 })
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
-        "§7Владелец: §fowner",
-        "§7Занято: §fДа",
-        "§7Отображение опции: §63000§r",
+        "§r§f§7Владелец: §fowner",
+        "§r§f§7Занято: §fДа",
+        "§r§r§7Отображение опции: §63000§r",
       ]
     `)
   })
 
   it('should create item with array property', () => {
-    const key = new ItemLoreSchema().property('keys', [String]).display('Ключи').build()
+    const key = new ItemLoreSchema('test').property('keys', [String]).display('Ключи').build()
 
     const { item, storage } = key.create({ keys: ['string', 'string2'] })
+    if (!storage) throw new TypeError('Storage is empty!')
+
     expectTypeOf(storage.keys).toBeArray()
     expect(storage.keys).toEqual(['string', 'string2'])
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
-        "§7Ключи: [
+        "§r§7§7Ключи: [
         §2\`string\`§r,
-        §2\`string2\`§r
+        §2\`string",
+        "§r§r2\`§r
       ]",
       ]
     `)

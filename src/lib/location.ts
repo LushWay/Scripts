@@ -32,7 +32,7 @@ export function migrateLocationName(oldName: string, newGroup: string, newName: 
   }
 }
 
-interface SafeLocation<T extends Vector3> {
+interface SafeLocationCommon<T extends Vector3> {
   onLoad: Location<T>['onLoad']
   teleport: Location<T>['teleport']
   firstLoad: boolean
@@ -40,12 +40,14 @@ interface SafeLocation<T extends Vector3> {
 
 export type ValidSafeLocation<T extends Vector3> = {
   valid: true
-} & SafeLocation<T> &
+} & SafeLocationCommon<T> &
   T
 
 export type InvalidSafeLocation<T extends Vector3> = {
   valid: false
-} & SafeLocation<T>
+} & SafeLocationCommon<T>
+
+export type SafeLocation<T extends Vector3> = InvalidSafeLocation<T> | ValidSafeLocation<T>
 
 class Location<T extends Vector3> {
   static create<V extends Vector3, T extends typeof Location<V>>(this: T, group: string, name: string, fallback?: V) {

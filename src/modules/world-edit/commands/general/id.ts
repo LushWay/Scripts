@@ -1,4 +1,5 @@
 import {} from '@minecraft/server'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Vector, util } from 'lib'
 
 const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
@@ -7,7 +8,14 @@ root.executes(ctx => {
   const item = ctx.player.mainhand()
   if (!item) return ctx.reply('§cВ руке нет предмета!')
 
-  ctx.reply(`§b► §f${item?.typeId?.replace('minecraft:', '')} ${item?.nameTag ? `(${item?.nameTag}) ` : ''}`)
+  let message = `§b► §f${item?.typeId?.replace('minecraft:', '')} ${item?.nameTag ? `(${item?.nameTag}) ` : ''}`
+  if (item.nameTag) message += ` (${item.nameTag})`
+  if (!item.isStackable && item.getDynamicPropertyIds().length) {
+    message +=
+      '\nDynamicProperties ' +
+      util.inspect(Object.fromEntries(item.getDynamicPropertyIds().map(e => [e, item.getDynamicProperty(e)])))
+  }
+  ctx.reply(message)
 })
 
 root
@@ -37,4 +45,28 @@ root
   .setDescription('Выдает наклон головы')
   .executes(ctx => {
     ctx.reply(`§a► §f${ctx.player.getRotation().x} ${ctx.player.getRotation().y}`)
+  })
+
+root
+  .overload('e')
+  .setDescription('Выдает стату ближайшего энтити')
+  .executes(ctx => {
+    const entity = ctx.player.dimension.getEntities({
+      excludeTags: [MinecraftEntityTypes.Player],
+      location: ctx.player.location,
+      closest: 1,
+    })[0]
+    if (!entity) return ctx.error('No entity found!')
+
+    let message = `${entity.typeId}`
+    for (const c of entity.getComponents()) {
+      message +=
+        '\n' +
+        util.inspect(
+          Object.map(c as unknown as Record<string, unknown>, (k, v) =>
+            k === 'entity' || k === 'isValid' ? false : [k, v],
+          ),
+        )
+    }
+    ctx.reply(message)
   })

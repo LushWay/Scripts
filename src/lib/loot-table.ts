@@ -210,15 +210,23 @@ export class LootTable {
     EventSignal.emit(LootTable.onNew, this)
   }
 
+  generateOne() {
+    const items = this.items.map(i => this.generateItems(i)).flat()
+
+    const index = this.selectByChance(items)
+
+    return (items[index] ?? items[0]).stack
+  }
+
   /**
    * Randomizes items and returns an array with specified size
    *
    * @param length - Size of the array
-   * @param stepMax - Maximum steps for randomizing air
    * @returns Array of ItemStack or undefined
    */
   generate(length = this.items.length): (ItemStack | undefined)[] {
-    const items: PreparedItems = this.items.map(i => this.generateItems(i)).flat()
+    const items = this.items.map(i => this.generateItems(i)).flat()
+    if (length === 1) return items.map(e => e.stack)
 
     // Separate items by chance
     let explictItems = items.filter(e => e.chance === 100)
@@ -238,18 +246,8 @@ export class LootTable {
         explictItems = explictItems.filter(e => e !== item)
         return item.stack
       } else if (randomizableItems.length > 0) {
-        const totalChance = randomizableItems.reduce((sum, item) => sum + item.chance, 0)
-        let random = Math.randomInt(0, totalChance)
-        let selectedIndex = -1
-
         // Find the item based on random chance
-        for (let i = 0; i < randomizableItems.length; i++) {
-          random -= randomizableItems[i].chance
-          if (random < 0) {
-            selectedIndex = i
-            break
-          }
-        }
+        const selectedIndex = this.selectByChance(randomizableItems)
 
         if (selectedIndex !== -1) {
           const [item] = randomizableItems.splice(selectedIndex, 1) // Remove and get item
@@ -259,13 +257,28 @@ export class LootTable {
     })
   }
 
+  private selectByChance(items: PreparedItems): number | -1 {
+    const totalChance = items.reduce((sum, item) => sum + item.chance, 0)
+
+    let random = Math.randomInt(0, totalChance)
+    let selectedIndex = -1
+    for (const [i, { chance }] of items.entries()) {
+      random -= chance
+      if (random < 0) {
+        selectedIndex = i
+        break
+      }
+    }
+
+    return selectedIndex
+  }
+
   private generateItems(item: StoredItem): PreparedItems {
     try {
       // Randomise item properties
       const amount = item.amount.randomElement()
       if (amount <= 0) return []
       if (amount > item.itemStack.maxAmount) {
-        // TODO Splitting
         const average = Math.floor(amount / item.itemStack.maxAmount)
         const last = amount % item.itemStack.maxAmount
         return new Array(average)

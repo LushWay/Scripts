@@ -1,9 +1,7 @@
 import { Temporary } from 'lib'
-import { RegionEvents } from 'lib/region/events'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { Cutscene } from 'modules/quests/lib/cutscene'
 import { Quest } from 'modules/quests/lib/quest'
-import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class StoneQuarryInvestigating {
@@ -31,12 +29,11 @@ class StoneQuarryInvestigating {
   )
 
   static init() {
-    RegionEvents.onEnter(this.place.safeArea, player => {
-      if (isNotPlaying(player)) return
-
-      this.quest.enter(player)
-      this.cutscene.play(player)
-    })
+    // RegionEvents.onEnter(this.place.safeArea, player => {
+    //   if (isNotPlaying(player)) return
+    //   this.quest.enter(player)
+    //   this.cutscene.play(player)
+    // })
   }
 }
 

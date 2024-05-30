@@ -58,8 +58,8 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended",
-      "plugin:@typescript-eslint/strictTypeChecked",
-      "plugin:@typescript-eslint/stylisticTypeChecked",
+      "plugin:@typescript-eslint/strict-type-checked",
+      "plugin:@typescript-eslint/stylistic-type-checked",
       "prettier"
     ],
     "plugins": [

@@ -1,92 +1,130 @@
-import { ItemStack } from '@minecraft/server'
-import { textUnitColorize } from 'lib/text'
-import { noBoolean } from 'lib/util'
+import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
+import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { t, textUnitColorize } from 'lib/text'
+import { noBoolean, util } from 'lib/util'
 
-export class ItemLoreSchema<T extends Config> {
-  constructor(private itemTypeId = 'sm:key') {}
+export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
+  constructor(
+    private schemaId: string,
+    private itemTypeId = CUSTOM_ITEMS.key,
+  ) {}
 
-  private properties: Properties = {}
+  private properties: Schema = {}
 
   private currentProperty?: string
 
   property<N extends string, D extends Schema.Property<Schema.Property.Saveable>>(
     name: N,
     defaultValue: D,
-  ): ItemLoreSchema<T & { [K in N]?: D }>
+  ): ItemLoreSchema<T & { [K in N]?: D }, D>
   property<N extends string, D extends Schema.Property<Schema.Property.Required>>(
     name: N,
-    defaultValue: D,
-  ): ItemLoreSchema<T & { [K in N]: D }>
-  property<N extends string, D extends Schema.Property.Config>(
-    name: N,
-    defaultValue: D,
-  ): ItemLoreSchema<T & { [K in N]: D }> {
+    type: D,
+  ): ItemLoreSchema<T & { [K in N]: D }, D>
+  property<N extends string, D extends Schema.Property.Any>(name: N, type: D): ItemLoreSchema<T & { [K in N]: D }, D> {
     this.currentProperty = name
-    this.properties[name] = { defaultValue }
+    this.properties[name] = { type }
 
-    return this
+    return this as unknown as ItemLoreSchema<T & { [K in N]: D }, D>
   }
 
-  display(text: Text) {
+  display(text: Text, prepareProperty?: PrepareProperty<ParsedSchemaProperty<L>>) {
     if (!this.currentProperty) throw new Error('Create property first!')
 
     this.properties[this.currentProperty].text = text
+    if (prepareProperty) this.properties[this.currentProperty].prepareProperty = prepareProperty
 
     return this
   }
 
-  lore(prepareLore: PrepareLore, prepareProperty?: PrepareProperty) {
+  prepareNameTag: PrepareNameTag<T> | undefined
+
+  nameTag(prepareNameTag: PrepareNameTag<T>) {
+    this.prepareNameTag = prepareNameTag
+
+    return this
+  }
+
+  lore(prepareLore: PrepareLore<T>) {
     this.prepareLore = prepareLore
-    if (prepareProperty) this.prepareProperty = prepareProperty
 
     return this
   }
 
   build() {
-    return new ItemLore<T>(this.properties, (i, s) => this.setLore(i, s), this.itemTypeId)
+    return new ItemLore<T>(this.properties, (i, s) => this.prepareItem(i, s), this.itemTypeId, this.schemaId)
   }
 
-  private setLore(itemStack: Item, storage: Partial<ParsedConfig<T>>) {
-    return itemStack.setLore(this.prepareLore(itemStack, this.prepareProperties(storage)))
+  private prepareItem(itemStack: Item, storage: ParsedSchema<T>) {
+    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage)
+    itemStack.setLore(
+      this.prepareLore(this.prepareProperties(storage), itemStack, storage)
+        .map(e => util.wrapLore(e))
+        .flat(),
+    )
   }
 
-  private prepareLore: PrepareLore = (item, properties) => properties
+  private prepareLore: PrepareLore<T> = properties => properties
 
-  private prepareProperty: PrepareProperty = unit => textUnitColorize(unit)
-
-  private prepareProperties(storage: Partial<ParsedConfig<T>>): string[] {
+  private prepareProperties(storage: Partial<ParsedSchema<T>>): string[] {
     return Object.entries(this.properties)
-      .map(([key, { text }]) => {
+      .map(([key, { text, prepareProperty }]) => {
         if (!text) return false
-        return `§7${text}: ${this.prepareProperty(storage[key], key)}`
+
+        const unit = prepareProperty ? prepareProperty(storage[key], key) : storage[key]
+        return `§7${text}: ${textUnitColorize(unit)}`
       })
       .filter(noBoolean)
   }
 }
 
-class ItemLore<T extends Config> {
+class ItemLore<T extends TypeSchema> {
+  static loreSchemaId = 'lsid'
+
   constructor(
-    private properties: Properties,
-    private setLore: (itemStack: Item, storage: Partial<ParsedConfig<T>>) => void,
+    private properties: Schema,
+    private prepareItem: (itemStack: Item, storage: ParsedSchema<T>) => void,
     private readonly itemTypeId: string,
+    private readonly lsid: string,
   ) {}
 
-  create(config: ParsedConfig<T>) {
+  create(config: ParsedSchema<T>) {
     const item = new ItemStack(this.itemTypeId)
-    return { item, storage: this.parse(item, config) }
+    item.setDynamicProperty(ItemLore.loreSchemaId, this.lsid)
+
+    const storage = this.parse(item, config)
+    if (!storage) throw new Error('Unable to create item using schema')
+
+    for (const [key, value] of Object.entriesStringKeys(config)) storage[key] = value
+
+    return { item, storage }
   }
 
-  parse(itemStack: Item, defaultConfig: Partial<ParsedConfig<T>> = {}) {
-    if (itemStack.isStackable) throw new Error('Only unstackable items are allowed!')
+  parse(itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}) {
+    try {
+      if (itemStack.isStackable) return
+    } catch (e) {
+      if (e instanceof InvalidContainerSlotError) return
+      throw e
+    }
 
-    const storage: Partial<ParsedConfig<T>> = {}
+    const lsid = itemStack.getDynamicProperty(ItemLore.loreSchemaId)
+    if (typeof lsid === 'string') {
+      if (lsid !== this.lsid) return
+    } else {
+      if (lsid) console.warn(t.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${util.inspect(lsid)}`)
+      return
+    }
 
-    for (const [key, { defaultValue }] of Object.entries(this.properties)) {
+    const storage = {} as ParsedSchema<T>
+
+    for (const [key, { type: defaultValue }] of Object.entries(this.properties)) {
       const isRequired = this.isRequired(defaultValue)
+
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {
           itemStack.setDynamicProperty(key, v === defaultValue ? undefined : JSON.stringify(v))
-          this.setLore(itemStack, storage)
+          this.prepareItem(itemStack, storage)
         },
 
         get(): Schema.Property.Saveable {
@@ -105,59 +143,66 @@ class ItemLore<T extends Config> {
       })
     }
 
-    this.setLore(itemStack, storage)
+    this.prepareItem(itemStack, storage)
 
-    return storage as ParsedConfig<T>
+    return storage
   }
 
-  private isRequired(property: Schema.Property.Config): boolean {
+  is(itemStack: ItemStack | ContainerSlot) {
+    if (itemStack.isStackable) return false
+
+    const lsid = itemStack.getDynamicProperty(ItemLore.loreSchemaId)
+    return lsid === this.lsid
+  }
+
+  private isRequired(property: Schema.Property.Any): boolean {
     return (
-      (required as Schema.Property.Config[]).includes(property) ||
+      (required as Schema.Property.Any[]).includes(property) ||
       (Array.isArray(property) && property.some(e => this.isRequired(e)))
     )
   }
 }
 
+export type ItemLoreStorage<T extends ItemLore<TypeSchema>> = Exclude<ReturnType<T['parse']>, void>
+
 const required = [Number, Boolean, String]
 
 declare namespace Schema {
   namespace Property {
-    type Required = ValueOf<typeof required>
+    type Required = (typeof required)[number]
     type Saveable = string | number | boolean
 
-    type Config = Property<Saveable | Required>
+    type Any = Property<Saveable | Required>
   }
 
   type Property<T> = T | T[]
 }
 
-type Config = Record<string, { type: Schema.Property.Config; text?: Text }>
-type ParsedConfig<T extends Config> = {
-  [K in keyof T]: T[K] extends StringConstructor
-    ? string
-    : T[K] extends NumberConstructor
-      ? number
-      : T[K] extends BooleanConstructor
-        ? boolean
-        : T[K] extends StringConstructor[]
-          ? string[]
-          : T[K] extends NumberConstructor[]
-            ? number[]
-            : T[K] extends BooleanConstructor[]
-              ? boolean[]
-              : T[K]['type']
+type Schema = Record<string, { type: Schema.Property.Any; text?: Text; prepareProperty?: PrepareProperty }>
+type TypeSchema = Record<string, Schema.Property.Any>
+
+type ParsedSchema<T extends TypeSchema> = {
+  [K in keyof T]: ParsedSchemaProperty<T[K]>
 }
 
-type Item = Pick<ItemStack, 'getDynamicProperty' | 'setDynamicProperty' | 'setLore' | 'isStackable'>
+type ParsedSchemaProperty<T extends Schema.Property.Any> = T extends StringConstructor
+  ? string
+  : T extends NumberConstructor
+    ? number
+    : T extends BooleanConstructor
+      ? boolean
+      : T extends StringConstructor[]
+        ? string[]
+        : T extends NumberConstructor[]
+          ? number[]
+          : T extends BooleanConstructor[]
+            ? boolean[]
+            : T
 
-type PrepareProperty = (unit: unknown, key: string) => string
+type Item = Pick<ItemStack, 'getDynamicProperty' | 'setDynamicProperty' | 'setLore' | 'isStackable' | 'nameTag'>
 
-type PrepareLore = (itemStack: Item, properties: string[]) => string[]
+type PrepareProperty<U = unknown> = (unit: U, key: string) => string
 
-type Properties = Record<
-  string,
-  {
-    defaultValue: Schema.Property.Config
-    text?: Text
-  }
->
+type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => string[]
+
+type PrepareNameTag<T extends TypeSchema> = (itemStack: Item, storage: ParsedSchema<T>) => string

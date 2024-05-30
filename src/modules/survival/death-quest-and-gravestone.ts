@@ -101,7 +101,7 @@ system.runInterval(
         continue
       }
 
-      if (Cooldown.expired(at, gravestoneCleanupAfter)) {
+      if (Cooldown.isExpired(at, gravestoneCleanupAfter)) {
         if (inventoryIsEmpty(entity)) entity.remove()
       }
     }

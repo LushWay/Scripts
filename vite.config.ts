@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'istanbul',
-      reporter: ['html'],
+      reporter: ['html', 'json'],
       include: ['src/lib', 'src/modules'],
       exclude: ['src/lib/assets', 'src/lib/bds'],
     },
