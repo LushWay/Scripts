@@ -1,4 +1,3 @@
-scripts/@minecraft
-scripts/chestui
-scripts/lib/Assets
-scripts/lib/Lang
+src/chestui
+src/lib/assets
+src/lib/lang

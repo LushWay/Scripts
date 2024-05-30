@@ -17,10 +17,12 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
     name: N,
     defaultValue: D,
   ): ItemLoreSchema<T & { [K in N]?: D }, D>
+
   property<N extends string, D extends Schema.Property<Schema.Property.Required>>(
     name: N,
     type: D,
   ): ItemLoreSchema<T & { [K in N]: D }, D>
+
   property<N extends string, D extends Schema.Property.Any>(name: N, type: D): ItemLoreSchema<T & { [K in N]: D }, D> {
     this.currentProperty = name
     this.properties[name] = { type }
