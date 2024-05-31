@@ -4,8 +4,8 @@ import { ActionForm, Vector, location, locationWithRadius } from 'lib'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { SafeAreaRegion, Temporary, actionGuard } from 'lib'
 import { SOUNDS } from 'lib/assets/config'
-import { EditableNpc } from 'lib/editable-npc'
 import { Menu, createPublicGiveItemCommand } from 'lib/menu'
+import { Npc } from 'lib/npc'
 import { Join } from 'lib/player-join'
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy'
@@ -32,7 +32,7 @@ class Learning extends QuestBase {
 
   safeArea: SafeAreaRegion | undefined = void 0
 
-  minerNpc = new EditableNpc({
+  minerNpc = new Npc({
     dimensionId: 'overworld',
     id: 'minerNpc',
     group: this.group,

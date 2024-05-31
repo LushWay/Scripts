@@ -101,11 +101,11 @@ export class Rewards {
    * @returns {string}
    */
   static rewardToString(reward: Reward): string {
-    if (reward.type == 'scores' && reward.score == 'leafs') return `${emoji.leaf} Листья x ${reward.count}`
-    else if (reward.type === 'scores' && reward.score == 'money') return `${emoji.money} Монеты x ${reward.count}`
+    if (reward.type == 'scores' && reward.score == 'leafs') return `${emoji.leaf} Листья x${reward.count}`
+    else if (reward.type === 'scores' && reward.score == 'money') return `${emoji.money} Монеты x${reward.count}`
     else if (reward.type === 'item')
       return itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
-    else return `${reward.score} x ${reward.count}`
+    else return `${reward.score} x${reward.count}`
   }
 
   /**
@@ -124,5 +124,8 @@ export class Rewards {
  * @param {ItemStack} item
  */
 export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§g', newline = false) {
-  return `${item.nameTag ?? itemLocaleName(item)}§r${newline ? '\n' : ''}${item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''}`
+  const name = item.nameTag ?? itemLocaleName(item)
+  const count = item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''
+  
+  return `${name}§r${newline ? '\n' : ''}${count}`
 }

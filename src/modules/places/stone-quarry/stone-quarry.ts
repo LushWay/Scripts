@@ -4,6 +4,7 @@ import { Boss, Loot, util } from 'lib'
 import { ChestLoot } from 'lib/chest-loot/chest-loot'
 import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
 import { Furnacer } from '../../features/furnacer'
+import gunsmith from './gunsmith'
 
 class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
   witherBoss = new Boss({
@@ -34,13 +35,15 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
     furnaceTypeIds: [MinecraftBlockTypes.LitBlastFurnace],
     npc: {
       id: 'foodOvener',
-      name: 'Едоед',
+      name: '§6Пекарь',
     },
     onlyInStoneQuarry: false,
   })
 
+  gunsmith = gunsmith(this.name)
+
   chestKit = new ChestLoot(
-    'LootChest',
+    'Сундук с наградой',
     this.name,
     this.name,
     new Loot(this.name + 'LootChest')

@@ -9,7 +9,7 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['html', 'json'],
       include: ['src/lib', 'src/modules'],
-      exclude: ['src/lib/assets', 'src/lib/bds'],
+      exclude: ['src/lib/assets', 'src/lib/bds', 'src/test'],
     },
     alias: {
       '@minecraft/server': 'test/__mocks__/minecraft_server.ts',
@@ -17,7 +17,7 @@ export default defineConfig({
       '@minecraft/server-ui': 'test/__mocks__/minecraft_server-ui.ts',
       '@minecraft/server-gametest': 'test/__mocks__/minecraft_server-gametest.ts',
     },
-    exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts', 'src/test/**'],
+    exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts'],
   },
   plugins: [tsconfig()],
 })

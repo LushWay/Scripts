@@ -3,12 +3,58 @@ import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 import { vi } from 'vitest'
 
-export class Container {}
+export class Component {
+  readonly 'typeId': string
+  'isValid'(): boolean {
+    return true
+  }
+}
+
+export class EntityComponent extends Component {
+  constructor(readonly entity: Entity) {
+    super()
+  }
+}
+
+export class EntityInventoryComponent extends EntityComponent {
+  'constructor'(
+    entity: Entity,
+    readonly additionalSlotsPerStrength: number,
+    readonly canBeSiphonedFrom: boolean,
+    readonly containerType: string,
+    readonly inventorySize: number,
+    isPrivate: boolean,
+    readonly restrictToOwner: boolean,
+  ) {
+    super(entity)
+    this.private = isPrivate
+  }
+
+  readonly 'typeId' = EntityInventoryComponent.componentId
+  readonly 'private': boolean
+  readonly 'container' = new Container(this.inventorySize)
+  static readonly 'componentId' = 'minecraft:inventory'
+}
 
 export class Entity {
   id = 'test entity id'
   nameTag = 'test entity nameTag'
   teleport = vi.fn()
+
+  private readonly components: EntityComponent[] = [
+    new EntityInventoryComponent(this, 0, false, 'entity', 32, false, false),
+  ]
+
+  getComponent(name: string) {
+    return this.components.find(e => e.typeId.replace('minecraft:', '') === name.replace('minecraft:', ''))
+  }
+  getComponents() {
+    return [...this.components.values()]
+  }
+
+  isValid() {
+    return true
+  }
 }
 
 export class Player extends Entity {
@@ -99,15 +145,21 @@ export class WorldBeforeEvents {}
 
 export const world = new World()
 
+export class ItemType {
+  constructor(readonly id: string) {}
+}
+
 export class ItemStack extends DynamicPropertiesProvider {
   typeId: string
+  readonly type: ItemType
 
   constructor(
-    public itemType: mc.ItemType | string,
+    itemType: mc.ItemType | string,
     public amount: number = 1,
   ) {
     super()
     this.typeId = typeof itemType === 'string' ? itemType : itemType.id
+    this.type = typeof itemType === 'string' ? new ItemType(itemType) : itemType
   }
 
   private lore: string[] = []
@@ -121,9 +173,13 @@ export class ItemStack extends DynamicPropertiesProvider {
   clone() {
     return new ItemStack(this.typeId, this.amount)
   }
-}
 
-export class ContainerSlot {}
+  maxAmount = 64
+
+  isStackableWith(itemStack: ItemStack): boolean {
+    return itemStack.typeId === this.typeId && this.amount + itemStack.amount < this.maxAmount
+  }
+}
 
 export class Dimension {
   heightRange = {
@@ -139,4 +195,128 @@ export enum GameMode {
   creative = 'creative',
   spectator = 'spectator',
   survival = 'survival',
+}
+
+export class ContainerSlot {
+  static create(slot: number, container: Container) {
+    const containerSlot = new this(slot, container)
+    return new Proxy(containerSlot, {
+      get(target, p, receiver) {
+        if (p in target) {
+          return Reflect.get(target, p, receiver)
+        } else {
+          return Reflect.get(containerSlot.item, p, containerSlot.item)
+        }
+      },
+      set(target, p, receiver) {
+        if (p in target) {
+          return Reflect.set(target, p, receiver)
+        } else {
+          return Reflect.set(containerSlot.item, p, containerSlot.item)
+        }
+      },
+    })
+  }
+
+  private constructor(
+    private slot: number,
+    private container: Container,
+  ) {}
+
+  private get item() {
+    const item = this.container.getItem(this.slot, false)
+    if (!item) throw new Error('No item')
+    return item
+  }
+
+  getItem(): ItemStack | undefined {
+    if (!this.hasItem()) throw new Error('No item')
+    return this.container.getItem(this.slot)
+  }
+
+  hasItem(): boolean {
+    return !!this.container.getItem(this.slot)
+  }
+
+  setItem(itemStack?: ItemStack): void {
+    this.container.setItem(this.slot, itemStack)
+  }
+
+  get amount() {
+    return this.item.amount
+  }
+
+  set amount(a: number) {
+    this.item.amount = a
+  }
+}
+
+export class Container {
+  private readonly storage = new Map<number, ItemStack>()
+  constructor(readonly size: number) {}
+
+  get emptySlotsCount() {
+    return this.size - this.storage.size
+  }
+
+  addItem(itemStack: ItemStack): ItemStack | undefined {
+    for (let i = 0; i < this.size; i++) {
+      const item = this.getItem(i)
+      if (!item?.isStackableWith(itemStack)) continue
+      ;(this.storage.get(i) as unknown as ItemStack).amount += itemStack.amount
+      return itemStack
+    }
+
+    for (let i = 0; i < this.size; i++) {
+      if (this.getItem(i)) continue
+      this.setItem(i, itemStack)
+      return itemStack
+    }
+  }
+
+  clearAll(): void {
+    this.storage.clear()
+  }
+
+  getItem(slot: number, clone = true): ItemStack | undefined {
+    const item = this.storage.get(slot)
+    return clone ? item?.clone() : item
+  }
+
+  getSlot(slot: number): ContainerSlot {
+    return ContainerSlot.create(slot, this)
+  }
+
+  isValid(): boolean {
+    return true
+  }
+
+  moveItem(fromSlot: number, toSlot: number, toContainer: Container): void {
+    const item = this.getItem(fromSlot)
+    if (item) this.setItem(fromSlot, undefined)
+
+    toContainer.setItem(toSlot, item)
+  }
+
+  setItem(slot: number, itemStack?: ItemStack): void {
+    if (!itemStack) {
+      this.storage.delete(slot)
+    } else this.storage.set(slot, itemStack)
+  }
+
+  swapItems(slot: number, otherSlot: number, otherContainer: Container): void {
+    const item = this.getItem(slot)
+    if (!item) return
+
+    this.setItem(slot, undefined)
+    otherContainer.setItem(otherSlot, item)
+  }
+
+  transferItem(fromSlot: number, toContainer: Container): ItemStack | undefined {
+    const item = this.getItem(fromSlot)
+    if (!item) return
+
+    this.setItem(fromSlot, undefined)
+    return toContainer.addItem(item)
+  }
 }

@@ -4,7 +4,7 @@ import { Vector, util } from 'lib'
 import { MoneyCost } from 'lib/cost'
 import { table } from 'lib/database/abstract'
 import { actionGuard } from 'lib/region/index'
-import { Store } from 'lib/store'
+import { Shop } from 'lib/shop'
 import { StoneQuarry } from '../places/stone-quarry/stone-quarry'
 
 export class Furnacer {
@@ -40,7 +40,7 @@ export class Furnacer {
     onlyInStoneQuarry,
     npc,
   }: {
-    npc: Omit<import('lib/editable-npc').EditableNpcProps, 'onInteract' | 'group'>
+    npc: Omit<import('lib/npc').NpcOptions, 'onInteract' | 'group'>
     furnaceTypeIds: string[]
     onlyInStoneQuarry: boolean
   }) {
@@ -48,13 +48,13 @@ export class Furnacer {
 
     this.furnaceTypeIds = furnaceTypeIds
     this.onlyInStoneQuarry = onlyInStoneQuarry
-    this.npc = Store.npc({
+    this.npc = Shop.npc({
       group: 'Каменоломня',
-      body: p => 'У меня ты можешь купить доступ к печкам\n\n' + this.npc.store.defaultOptions.body(p),
+      body: () => 'У меня ты можешь купить доступ к печкам\n\n',
       ...npc,
     })
 
-    this.npc.store.addItem(player => {
+    this.npc.shop.menu((form, player) => {
       const item = this.keyItem.clone()
       item.setLore(
         FurnaceKeyItem.stringifyLore({
@@ -63,8 +63,8 @@ export class Furnacer {
           lastPlayerId: player.id,
         }),
       )
-      return item
-    }, new MoneyCost(5))
+      form.addItem(item, new MoneyCost(5))
+    })
   }
 }
 
