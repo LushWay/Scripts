@@ -5,92 +5,91 @@ import { util } from './util'
 
 export type Text = string
 
-interface TStatic {
-  error: TFn & Omit<TStatic, 'error'>
-  header: TFn
-  roles: (text: TemplateStringsArray, ...players: Player[]) => Text
-  badge: (text: TemplateStringsArray, n: number) => Text
-  num: (text: TemplateStringsArray, n: number, plurals: Plurals) => Text
-  time: (text: TemplateStringsArray, time: number) => Text
-  options: (options: ColorizingOptions) => TStatic
+type TSA = TemplateStringsArray
+type Fn = (text: TSA, ...args: unknown[]) => Text
+interface Multi {
+  error: Fn & Omit<Multi, 'error'>
+  header: Fn
+  roles: (text: TSA, ...players: Player[]) => Text
+  badge: (text: TSA, n: number) => Text
+  num: (text: TSA, n: number, plurals: Plurals) => Text
+  time: (text: TSA, time: number) => Text
+  options: (options: ColorizingOptions) => Multi
 }
 
-type TFn = (text: TemplateStringsArray, ...args: unknown[]) => Text
-
-export function textTable(table: Record<string, unknown>) {
-  return Object.entries(table)
-    .map(([key, value]) => `§7${key}: ${textUnitColorize(value)}`)
-    .join('\n')
+export function textTable(table: Record<string, unknown>, join: false): string[]
+export function textTable(table: Record<string, unknown>, join?: true): string
+export function textTable(table: Record<string, unknown>, join = true): string | string[] {
+  const mapped = Object.entries(table).map(([key, value]) => `§7${key}: ${textUnitColorize(value)}`)
+  return join ? mapped.join('\n') : mapped
 }
 
-export const t = createMultiConcat()
+export const t = createMulti()
 
-function createMultiConcat(options: ColorizingOptions = {}, name?: keyof TStatic) {
-  options.textColor ??= '§7'
-  const t = createSingleConcat(options)
-  t.roles = createSingleConcat({ roles: true, ...options })
-  t.header = createSingleConcat({ textColor: '§6', unitColor: '§f§l', ...options })
-  t.badge = createBadgeConcat(options)
-  t.num = createNumConcat(options)
-  t.time = createSingleConcat({ time: true, ...options })
+function createMulti(options: ColorizingOptions = {}, name?: keyof Multi) {
+  const t = createSingle(options)
+  t.roles = createSingle({ roles: true, ...options })
+  t.header = createSingle({ textColor: '§6', ...options, unitColor: '§f§l' })
+  t.badge = createBadge(options)
+  t.num = createNum(options)
+  t.time = createSingle(options)
 
-  if (name !== 'error') t.error = createMultiConcat({ textColor: '§c', unitColor: '§f', ...options }, 'error')
-  t.options = options => createMultiConcat(options)
+  if (name !== 'error') t.error = createMulti({ textColor: '§c', unitColor: '§f', ...options }, 'error')
+  t.options = options => createMulti(options)
   return t
 }
 
-function createSingleConcat(
+function createSingle(
   options?: ColorizingOptions,
-  fn = (string: string, arg: unknown, i: number, array: readonly unknown[]) => string + textUnitColorize(arg, options),
+  fn = (text: string, unit: unknown, i: number, units: unknown[]) => text + textUnitColorize(unit, options),
 ) {
-  const textColor = options?.textColor ?? '§7'
-  return function t(text, ...args) {
+  const { textColor } = addDefaultsToOptions(options)
+
+  return function t(text, ...units) {
     const raw = text.raw.slice()
     if (raw.at(-1) === '') raw.pop()
-    return raw.reduce((previous, string, i, arr) => previous + fn(string, args[i], i, args) + textColor, textColor)
-  } as TFn & TStatic
+    return raw.reduce((previous, text, i) => previous + fn(text, units[i], i, units) + textColor, textColor)
+  } as Fn & Multi
 }
 
-function createBadgeConcat(options: ColorizingOptions): (text: TemplateStringsArray, n: number) => Text {
-  return createSingleConcat(options, (string, arg) => {
-    if (typeof arg === 'number') {
-      if (arg > 0) return string + '§8(' + '§c' + arg + '§8)'
-      return string.trimEnd()
-    }
-    return string + textUnitColorize(arg)
+function createBadge(options: ColorizingOptions): (text: TSA, n: number) => Text {
+  return createSingle(options, (text, unit) => {
+    if (typeof unit !== 'number') return text + textUnitColorize(unit)
+    if (unit > 0) return `${text}§8(§c${unit}§8)`
+    return text.trimEnd()
   })
 }
 
-function createNumConcat(
-  options: ColorizingOptions,
-): (text: TemplateStringsArray, n: number, plurals: Plurals) => Text {
-  return createSingleConcat(options, (string, arg, i, arr) => {
-    if (isPlurals(arg)) {
-      const n = arr[i - 1]
-      if (typeof n === 'number') {
-        return string + ngettext(n, arg)
-      }
+function createNum(options: ColorizingOptions): (text: TSA, n: number, plurals: Plurals) => Text {
+  return createSingle(options, (text, unit, i, units) => {
+    if (isPlurals(unit)) {
+      const n = units[i - 1]
+      if (typeof n === 'number') return text + ngettext(n, unit)
     }
 
-    return string + textUnitColorize(arg)
+    return text + textUnitColorize(unit)
   })
 }
 
-function isPlurals(arg: unknown): arg is Plurals {
-  return Array.isArray(arg) && typeof arg[0] === 'string' && typeof arg[1] === 'string' && typeof arg[2] === 'string'
+function isPlurals(unit: unknown): unit is Plurals {
+  return (
+    Array.isArray(unit) && typeof unit[0] === 'string' && typeof unit[1] === 'string' && typeof unit[2] === 'string'
+  )
+}
+
+function addDefaultsToOptions(options: ColorizingOptions = {}): Required<ColorizingOptions> {
+  const { unitColor = '§f', textColor = '§7', roles = false } = options
+  return { unitColor, textColor, roles }
 }
 
 interface ColorizingOptions {
   unitColor?: string
   textColor?: string
   roles?: boolean
-  badge?: boolean
-  plurals?: boolean
-  time?: boolean
 }
 
 export function textUnitColorize(unit: unknown, options: ColorizingOptions = {}) {
-  const { unitColor = '§f' } = options
+  const { unitColor } = addDefaultsToOptions(options)
   switch (typeof unit) {
     case 'string':
       return unitColor + unit
@@ -112,7 +111,7 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
 
     case 'number':
     case 'bigint':
-      return '§6' + unit + '§r'
+      return '§6' + unit
 
     case 'boolean':
       return unit ? '§fДа' : '§cНет'

@@ -13,4 +13,12 @@ describe('RadiusRegion', () => {
     const kind = region.kind
     expect(kind).toBe(TestRegion.kind)
   })
+
+  it('should detect if vector is in region', () => {
+    const region = RadiusRegion.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
+
+    expect(region.isVectorInRegion({ x: 0, y: 0, z: 0 }, 'overworld')).toBe(true)
+    expect(region.isVectorInRegion({ x: 0, y: 0, z: 0 }, 'nether')).toBe(false)
+    expect(region.isVectorInRegion({ x: 0, y: 3, z: 0 }, 'overworld')).toBe(false)
+  })
 })

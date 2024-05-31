@@ -1,6 +1,6 @@
 import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
-import { isKeyof, util } from 'lib/util'
+import { isKeyof } from 'lib/util'
 import { Core } from './extensions/core'
 
 declare global {

@@ -93,9 +93,9 @@ class Location<T extends Vector3> {
 
     const input = raw.trim().split(' ').map(Number)
     if (input.length !== this.format.split(' ').length || input.some(e => isNaN(e))) {
-      return console.error(
-        new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`),
-      )
+      const error = new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`)
+      if (__VITEST__) throw error
+      else return console.error(error)
     }
 
     for (const [i, key] of Object.keys(this.locationFormat).entries()) {

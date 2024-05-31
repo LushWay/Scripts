@@ -78,6 +78,7 @@
           { "module": "dns/promises" },
           { "module": "util" },
           { "module": "node:" },
+          { "module": "node:test" },
           { "module": "crypto" }
         ]
       }

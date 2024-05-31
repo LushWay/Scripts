@@ -4,7 +4,7 @@ import 'lib/load/enviroment'
 import 'lib/command/index'
 
 import { Player } from '@minecraft/server'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest'
 import { setRole } from './roles'
 import './text'
 import { t, textTable } from './text'
@@ -18,9 +18,10 @@ beforeEach(() => {
 
 describe('text', () => {
   it('should create text', () => {
-    console.log(t`Some string ${'that colors'} properly ${5} times`)
-    console.log(t`Some string ${'that colors'} properly ${5} times`)
-    console.log(t`Some string with ${player}`)
+    expect(t`Some string ${'that colors'} properly ${5} times`).toMatchInlineSnapshot(
+      `"§7Some string §fthat colors§7 properly §65§7 times§7"`,
+    )
+    expect(t`Some string with ${player}`).toMatchInlineSnapshot(`"§7Some string with §fTest player name§7"`)
   })
 
   it('should create text with roles', () => {
@@ -29,7 +30,7 @@ describe('text', () => {
   })
 
   it('should create nested text', () => {
-    console.log(t`А мы любим ${t.roles`вложенные роли этого чела: ${player}`}`)
+    expect(t`А мы любим ${t.roles`вложенные роли этого чела: ${player}`}`).toMatchInlineSnapshot(`"§7А мы любим §f§7вложенные роли этого чела: §5Админ§r §fTest player name§7§7"`)
   })
 
   it('should apply options', () => {
@@ -42,7 +43,7 @@ describe('text', () => {
     expect(
       t.error`Много текста ${'длинной'} и полезной в ${5} степени ошибки, произведенной игроком ${player}`,
     ).toMatchInlineSnapshot(
-      `"§7Много текста §fдлинной§7 и полезной в §65§r§7 степени ошибки, произведенной игроком §fTest player name§7"`,
+      `"§cМного текста §fдлинной§c и полезной в §65§c степени ошибки, произведенной игроком §fTest player name§c"`,
     )
   })
 
@@ -85,7 +86,7 @@ describe('text', () => {
     expect(`§7Было сломано §6${n} §7${text}`).toMatchInlineSnapshot(`"§7Было сломано §610 §7блоков"`)
 
     expect(t.num`Было сломано ${n} ${['блок', 'блока', 'блоков']}`).toMatchInlineSnapshot(
-      `"§7Было сломано §610§7 блоков"`,
+      `"§7Было сломано §610§7 блоков§7"`,
     )
   })
 
@@ -93,17 +94,33 @@ describe('text', () => {
     expect(t.badge`Письма ${-3}`).toMatchInlineSnapshot(`"§7Письма§7"`)
     expect(t.badge`Письма ${0}`).toMatchInlineSnapshot(`"§7Письма§7"`)
     expect(t.badge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §8(§c3§8)§7"`)
+
+    // @ts-expect-error
+    expect(t.badge`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
   })
 })
 
 describe('textTable', () => {
   it('should create text table', () => {
-    console.log(
+    expect(
       textTable({
         'Ключ': 'значение',
         'Другой ключ': 2,
         'Игрок': player,
       }),
-    )
+    ).toMatchInlineSnapshot(`
+      "§7Ключ: §fзначение
+      §7Другой ключ: §62
+      §7Игрок: §fTest player name"
+    `)
+  })
+
+  it('should create array', () => {
+    expectTypeOf(textTable({})).toBeString()
+    expectTypeOf(textTable({}, true)).toBeString()
+
+    expectTypeOf(textTable({}, false)).toBeArray()
+
+    expect(textTable({ key: 'value' }, false)).toEqual(['§7key: §fvalue'])
   })
 })

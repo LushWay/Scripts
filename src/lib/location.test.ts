@@ -44,9 +44,10 @@ describe('location', () => {
 
   it('should not load invalid location', () => {
     Settings.worldDatabase['group1'] = { name1: 'in va lid' }
-    const loc = location('group1', 'name1')
 
-    expect(loc.valid).toBe(false)
+    expect(() => location('group1', 'name1')).toThrowErrorMatchingInlineSnapshot(
+      `[TypeError: Invalid location, expected 'x y z' but recieved 'in va lid']`,
+    )
   })
 })
 

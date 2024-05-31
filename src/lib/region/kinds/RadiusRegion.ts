@@ -1,5 +1,5 @@
-import { Vector } from 'lib/vector'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
+import { Vector } from 'lib/vector'
 import { RegionDatabase } from '../database'
 
 export interface RadiusRegionOptions extends RegionCreationOptions {
@@ -18,9 +18,7 @@ export class RadiusRegion extends Region implements RadiusRegionOptions {
     const region = super.create(options, key ?? this.generateRegionKey())
 
     // Set radius region kind
-    if (region instanceof RadiusRegion) {
-      region.kind = (this as unknown as RadiusRegion).kind
-    }
+    ;(region as unknown as RadiusRegion).kind = (this as unknown as RadiusRegion).kind
 
     if (!key) region.save()
 

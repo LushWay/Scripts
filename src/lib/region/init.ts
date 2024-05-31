@@ -1,3 +1,4 @@
+import { system } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { BaseRegion } from '../../modules/places/base/BaseRegion'
 import { MineshaftRegion } from '../../modules/places/mineshaft/MineshaftRegion'
@@ -6,7 +7,9 @@ import { CubeRegion } from './kinds/CubeRegion'
 import { RadiusRegion } from './kinds/RadiusRegion'
 import { SafeAreaRegion } from './kinds/SafeAreaRegion'
 
-Object.entries(RegionDatabase).forEach(r => restoreRegionFromJSON(r))
+system.delay(() => {
+  Object.entries(RegionDatabase).forEach(r => restoreRegionFromJSON(r))
+})
 
 export function restoreRegionFromJSON(
   [key, region]: [string, (typeof RegionDatabase)[string]],

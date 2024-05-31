@@ -12,11 +12,6 @@ export class Entity {
 }
 
 export class Player extends Entity {
-  // @ts-expect-error AAAAAA
-  static name() {
-    return ''
-  }
-
   constructor() {
     super()
     EventSignal.emit(
@@ -131,6 +126,11 @@ export class ItemStack extends DynamicPropertiesProvider {
 export class ContainerSlot {}
 
 export class Dimension {
+  heightRange = {
+    min: -64,
+    max: 365,
+  }
+
   constructor(public id: MinecraftDimensionTypes) {}
 }
 

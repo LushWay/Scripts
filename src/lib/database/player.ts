@@ -13,7 +13,7 @@ declare module '@minecraft/server' {
      * If the id is undefined or name not found, undefined is returned
      *
      * @example
-     *   Player.id(playerId) // Shp1nat9841
+     *   Player.nameById(playerId) // Shp1nat9841
      */
     function name(id: string): string | undefined
   }
