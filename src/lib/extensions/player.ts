@@ -1,5 +1,5 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { request } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { expand } from './extend'
@@ -23,7 +23,7 @@ declare module '@minecraft/server' {
      * '§4§l> §r§c'
      * ```
      *
-     * And plays {@link SOUNDS}.fail
+     * And plays {@link Sounds}.fail
      *
      * Other message types: warn success info
      */
@@ -35,7 +35,7 @@ declare module '@minecraft/server' {
      * '§l§e⚠ §6'
      * ```
      *
-     * And plays {@link SOUNDS}.fail
+     * And plays {@link Sounds}.fail
      *
      * Other message types: **fail success info**
      */
@@ -47,7 +47,7 @@ declare module '@minecraft/server' {
      * '§a§l> §r'
      * ```
      *
-     * And plays {@link SOUNDS}.success
+     * And plays {@link Sounds}.success
      *
      * Other message types: **fail warn info**
      */
@@ -59,7 +59,7 @@ declare module '@minecraft/server' {
      * '§b§l> §r§3'
      * ```
      *
-     * And plays {@link SOUNDS}.action
+     * And plays {@link Sounds}.action
      *
      * Other message types: **fail warn success**
      */
@@ -160,10 +160,10 @@ expand(Player.prototype, {
     }
   },
 
-  fail: prefix('§4§l> §r§c', SOUNDS.fail),
-  warn: prefix('§e⚠ §6', SOUNDS.fail),
-  success: prefix('§a§l> §r', SOUNDS.success),
-  info: prefix('§b§l> §r§3', SOUNDS.action),
+  fail: prefix('§4§l> §r§c', Sounds.Fail),
+  warn: prefix('§e⚠ §6', Sounds.Fail),
+  success: prefix('§a§l> §r', Sounds.Success),
+  info: prefix('§b§l> §r§3', Sounds.Action),
 
   tell: Player.prototype.sendMessage,
 

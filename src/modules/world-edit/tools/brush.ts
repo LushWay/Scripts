@@ -1,6 +1,6 @@
 import { Entity, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, world } from '@minecraft/server'
 import { ModalForm, Vector, is } from 'lib'
-import { CUSTOM_ENTITIES, CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomEntityTypes, CustomItems } from 'lib/assets/config'
 import { WeakPlayerMap } from 'lib/weak-player-map'
 import { WE_CONFIG } from '../config'
 import { BaseBrushTool } from '../lib/BaseBrushTool'
@@ -18,7 +18,7 @@ import { SHAPES } from '../utils/shapes'
 
 world.overworld
   .getEntities({
-    type: CUSTOM_ENTITIES.floatingText,
+    type: CustomEntityTypes.FloatingText,
     name: WE_CONFIG.BRUSH_LOCATOR,
   })
 
@@ -44,7 +44,7 @@ class BrushTool extends BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }
 const brush = new BrushTool({
   name: 'brush',
   displayName: 'кисть',
-  itemStackId: CUSTOM_ITEMS.brush,
+  itemStackId: CustomItems.WeBrush,
   loreFormat: {
     version: 2,
 
@@ -110,7 +110,7 @@ const brush = new BrushTool({
 
       if (!BRUSH_LOCATORS.has(player.id)) {
         try {
-          const entity = player.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, location)
+          const entity = player.dimension.spawnEntity(CustomEntityTypes.FloatingText, location)
 
           entity.addTag(player.name)
           entity.nameTag = WE_CONFIG.BRUSH_LOCATOR

@@ -2,7 +2,7 @@ import { Block, BlockPermutation, Player, system, world } from '@minecraft/serve
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm, Vector, is, util } from 'lib'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/world-edit/utils/blocksSet'
 import { BaseBrushTool } from '../lib/BaseBrushTool'
@@ -22,7 +22,7 @@ class SmoothTool extends BaseBrushTool<SmoothProps> {
 const smoother = new SmoothTool({
   name: 'smoother',
   displayName: 'сглаживание',
-  itemStackId: CUSTOM_ITEMS.brush,
+  itemStackId: CustomItems.WeBrush,
   loreFormat: {
     version: 2,
 

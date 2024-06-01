@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { ModalForm, Vector } from 'lib'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'
 import { WorldEditTool } from '../lib/WorldEditTool'
@@ -29,7 +29,7 @@ const shovel = new WorldEditTool({
     height: 1,
     zone: -1,
   },
-  itemStackId: CUSTOM_ITEMS.shovel,
+  itemStackId: CustomItems.WeShovel,
 
   editToolForm(slot, player) {
     const lore = shovel.parseLore(slot.getLore())

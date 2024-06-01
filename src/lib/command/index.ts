@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { CONFIG } from '../assets/config'
 import { is } from '../roles'
 import {
   ArrayArgumentType,
@@ -25,8 +24,10 @@ type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
 type CommandCallback = (ctx: CommandContext, ...args: unknown[]) => void
 
 export class Command<Callback extends CommandCallback = (ctx: CommandContext) => void> {
+  static prefixes = ['.', '-']
+
   static isCommand(message: string) {
-    return CONFIG.commandPrefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
+    return this.prefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
 
   static chatSendListener(event: ChatSendAfterEvent) {

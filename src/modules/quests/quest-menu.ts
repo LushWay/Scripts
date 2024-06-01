@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageForm, util } from 'lib'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { Quest } from 'modules/quests/lib/quest'
@@ -20,7 +20,7 @@ quest
     const q = Quest.active(ctx.player)
     if (!q) return ctx.error('У вас нет активных заданий!')
     q.quest.exit(ctx.player)
-    ctx.player.playSound(SOUNDS.success)
+    ctx.player.playSound(Sounds.Success)
     ctx.reply('§6> §fУспешно')
   })
 

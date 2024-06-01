@@ -1,6 +1,6 @@
 import { Entity, ItemStack, Player, ShortcutDimensions, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { CUSTOM_STRUCTURES } from '../assets/config'
+import { CustomStructures } from '../assets/config'
 import { Cooldown } from '../cooldown'
 import { t } from '../text'
 import { Vector } from '../vector'
@@ -38,7 +38,7 @@ export default class ChestLootAnimation {
   start(player: Player, item: ItemStack, location: Vector3) {
     if (this.current) this.stop()
 
-    world.structureManager.place(CUSTOM_STRUCTURES.FloatingItem, world[this.dimensionId], location, {
+    world.structureManager.place(CustomStructures.FloatingItem, world[this.dimensionId], location, {
       includeBlocks: false,
     })
 
@@ -48,10 +48,10 @@ export default class ChestLootAnimation {
       maxDistance: 1,
     })[0]
 
-    if (!entity)
-      { console.warn(
-        t.error`Unable to spawn armor stand for ${this.id}, location ${Vector.string(location, true)}`,
-      ); return; }
+    if (!entity) {
+      console.warn(t.error`Unable to spawn armor stand for ${this.id}, location ${Vector.string(location, true)}`)
+      return
+    }
 
     // Equippable does not work's with armor stand in 1.20.81, please replace to equippable replace when fixed
     entity.runCommand(`replaceitem entity @s slot.weapon.mainhand 0 ${item.typeId}`)
@@ -78,9 +78,18 @@ export default class ChestLootAnimation {
 
     this.current.timeout = system.runTimeout(
       () => {
-        if (!this.current) { this.stop(); return; }
-        if (!this.current.entity.isValid() || !this.current.player.isValid()) { this.stop(); return; }
-        if (Cooldown.isExpired(this.current.date, this.timems)) { this.stop(); return; }
+        if (!this.current) {
+          this.stop()
+          return
+        }
+        if (!this.current.entity.isValid() || !this.current.player.isValid()) {
+          this.stop()
+          return
+        }
+        if (Cooldown.isExpired(this.current.date, this.timems)) {
+          this.stop()
+          return
+        }
 
         this.animate(this.current.entity, this.current.player, this.current)
         this.current.stage++

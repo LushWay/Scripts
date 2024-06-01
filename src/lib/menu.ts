@@ -1,6 +1,6 @@
 import { ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
 import { InventoryIntervalAction } from 'lib/action'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
@@ -10,7 +10,7 @@ import { ActionForm } from './form/action'
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
 
-  static createItem(typeId = CUSTOM_ITEMS.menu, name = '§b§lМеню\n§r§f(use)') {
+  static createItem(typeId = CustomItems.Menu, name = '§b§lМеню\n§r§f(use)') {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
@@ -40,7 +40,7 @@ export class Menu {
 
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
       if (!(player instanceof Player)) return
-      if (itemStack.typeId !== this.item.typeId && !itemStack.typeId.startsWith(CUSTOM_ITEMS.compassPrefix)) return
+      if (itemStack.typeId !== this.item.typeId && !itemStack.typeId.startsWith(CustomItems.CompassPrefix)) return
 
       util.catch(() => {
         const menu = this.open(player)
@@ -70,15 +70,15 @@ export class Compass {
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(CUSTOM_ITEMS.compassPrefix + i, '§r§l§6Цель\n§r§7(use)')
+    return Menu.createItem(CustomItems.CompassPrefix + i, '§r§l§6Цель\n§r§7(use)')
   })
 
   /** Map of player as key and compass target as value */
   private static players = new WeakOnlinePlayerMap<Vector3>()
 
   private static action = InventoryIntervalAction.subscribe(({ player, slot, i }) => {
-    const isMenu = slot.typeId === CUSTOM_ITEMS.menu
-    if (!slot.typeId?.startsWith(CUSTOM_ITEMS.compassPrefix) && !isMenu) {
+    const isMenu = slot.typeId === CustomItems.Menu
+    if (!slot.typeId?.startsWith(CustomItems.CompassPrefix) && !isMenu) {
       if (i === player.selectedSlot) {
         player.setProperty('sm:minimap', false)
       }
@@ -99,7 +99,7 @@ export class Compass {
     if (!Vector.valid(target.value)) return
 
     const direction = this.getCompassIndex(player.getViewDirection(), player.location, target.value)
-    const typeId = CUSTOM_ITEMS.compassPrefix + direction
+    const typeId = CustomItems.CompassPrefix + direction
     if (slot.typeId === typeId || typeof direction !== 'number') return
 
     const item = this.items[direction]

@@ -1,6 +1,6 @@
 import { BlockTypes } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { CUSTOM_ENTITIES } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/config'
 
 /** All doors and switches in minecraft */
 export const DOORS_AND_SWITCHES = BlockTypes.getAll()
@@ -33,8 +33,8 @@ export const INTERACTABLE_ENTITIES: string[] = [MinecraftEntityTypes.Npc]
  * permissions and other filterings
  */
 export const NOT_MOB_ENTITIES = [
-  CUSTOM_ENTITIES.database,
-  CUSTOM_ENTITIES.floatingText,
-  CUSTOM_ENTITIES.sit,
+  CustomEntityTypes.Database,
+  CustomEntityTypes.FloatingText,
+  CustomEntityTypes.Sit,
   MinecraftEntityTypes.Npc,
 ]

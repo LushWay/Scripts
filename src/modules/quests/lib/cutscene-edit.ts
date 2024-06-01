@@ -3,8 +3,9 @@ import { Vector } from 'lib'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Temporary, isInvalidLocation, util } from 'lib'
-import { CONFIG } from 'lib/assets/config'
+import { t } from 'lib/text'
 import { Cutscene } from './cutscene'
+import { cutscene as cusceneCommand } from './cutscene-menu'
 
 /** List of items that controls the editing process */
 const controls: Record<
@@ -57,7 +58,7 @@ const controls: Record<
     ),
     (player, cutscene, temp) => {
       temp.cleanup()
-      player.success(`Сохранено. Проверить: §7${CONFIG.commandPrefixes[0]}cutscene play ${cutscene.id}`)
+      player.success(t`Сохранено. Проверить: ${cusceneCommand}§f play ${cutscene.id}`)
     },
   ],
 }

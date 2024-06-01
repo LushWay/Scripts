@@ -6,7 +6,7 @@ import { editCatcutscene } from './cutscene-edit'
 
 new Cutscene('test', 'Test')
 
-const cutscene = new Command('cutscene')
+export const cutscene = new Command('cutscene')
   .setDescription('Катсцена')
   .setPermissions('member')
   .executes(ctx => {

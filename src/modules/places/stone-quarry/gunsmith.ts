@@ -1,5 +1,5 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
-import { MinecraftEnchantmentTypes, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { MoneyCost, MultiCost } from 'lib/cost'
 import { Shop } from 'lib/shop'
 
@@ -26,22 +26,18 @@ function gunsmith(group: string) {
           )
           .addItemModifier(
             'Улучшить остроту',
-            new MultiCost().item(i.LapisLazuli, 3),
+            new MultiCost().item(i.LapisLazuli, 3).money(10),
             item => item.typeId.endsWith('sword'),
-            slot => {
-              const item = slot.getItem()
-              if (item) {
-                item.enchantable?.addEnchantment({
-                  type: new EnchantmentType(MinecraftEnchantmentTypes.Sharpness),
-                  level: (item.enchantable?.getEnchantment(MinecraftEnchantmentTypes.Sharpness)?.level ?? 0) + 1,
-                })
-                slot.setItem(item)
-              }
-            },
+            slot => updateEnchatnment(slot, e.Sharpness, 1),
           )
       })
       .addSection('Улучшить броню', form => {
-        form
+        form.addItemModifier(
+          'Улучшить защиту',
+          new MultiCost().item(i.LapisLazuli, 3).money(10),
+          item => item.typeId.endsWith('chestplate'),
+          slot => updateEnchatnment(slot, e.Protection, 1),
+        )
       })
       .addSection('Все для рейда', form => {
         form.addItemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
@@ -51,6 +47,17 @@ function gunsmith(group: string) {
   })
 
   return { shop, entity }
+}
+
+function updateEnchatnment(slot: ContainerSlot, type: e, level = 1) {
+  const item = slot.getItem()
+  if (item && item.enchantable) {
+    item.enchantable.addEnchantment({
+      type: new EnchantmentType(type),
+      level: (item.enchantable.getEnchantment(type)?.level ?? 0) + level,
+    })
+    slot.setItem(item)
+  }
 }
 
 function upgradeDiamondSwordToNetherite(slot: ContainerSlot) {

@@ -3,7 +3,7 @@ import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { util, Vector } from 'lib'
 
-import { CUSTOM_ENTITIES } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
 import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/playerNameTag'
@@ -192,14 +192,14 @@ class HealthIndicator {
   }
 
   spawnIndicator(entity: Entity) {
-    const indicator = entity.dimension.spawnEntity(CUSTOM_ENTITIES.floatingText, entity.getHeadLocation())
+    const indicator = entity.dimension.spawnEntity(CustomEntityTypes.FloatingText, entity.getHeadLocation())
     indicator.addTag(this.indicatorTag)
     return indicator
   }
 
   getIndicators() {
     return world.overworld.getEntities({
-      type: CUSTOM_ENTITIES.floatingText,
+      type: CustomEntityTypes.FloatingText,
       tags: [this.indicatorTag],
     })
   }

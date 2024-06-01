@@ -1,5 +1,4 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
-import { CONFIG } from './assets/config'
 import { ROLES, getRole } from './roles'
 import { util } from './util'
 
@@ -134,7 +133,7 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
         if (options.roles) return `${ROLES[getRole(unit.id)]}§r ${unitColor}${unit.name}`
         else return unitColor + unit.name
       } else if (globalThis.Command && unit instanceof Command) {
-        return unitColor + CONFIG.commandPrefixes[0] + unit.sys.name
+        return unitColor + Command.prefixes[0] + unit.sys.name
       } else return util.inspect(unit)
 
     case 'symbol':

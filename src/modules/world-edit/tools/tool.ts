@@ -1,6 +1,6 @@
 import { MolangVariableMap, system, world } from '@minecraft/server'
 import { ActionForm, ModalForm, Vector, util } from 'lib'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
 import { WorldEditTool } from '../lib/WorldEditTool'
@@ -12,7 +12,7 @@ const actions: Record<string, string[]> = {
 
 new WorldEditTool({
   name: 'tool',
-  itemStackId: CUSTOM_ITEMS.tool,
+  itemStackId: CustomItems.WeTool,
   displayName: 'инструмент',
 
   editToolForm(item, player) {
@@ -123,7 +123,7 @@ system.runInterval(
     for (const player of world.getAllPlayers()) {
       const item = player.mainhand()
 
-      if (!item || item.typeId !== CUSTOM_ITEMS.wand) return
+      if (!item || item.typeId !== CustomItems.WeWand) return
 
       const lore = item.getLore()
 

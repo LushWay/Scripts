@@ -3,7 +3,7 @@ import { ActionForm, Vector, location, locationWithRadius } from 'lib'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { SafeAreaRegion, Temporary, actionGuard } from 'lib'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { Menu, createPublicGiveItemCommand } from 'lib/menu'
 import { Npc } from 'lib/npc'
 import { Join } from 'lib/player-join'
@@ -87,7 +87,7 @@ class Learning extends QuestBase {
 
             console.debug(`${player.name} brock ${brokenBlockPermutation.type.id}`)
 
-            this.player.playSound(SOUNDS.action)
+            this.player.playSound(Sounds.Action)
             this.diff(1)
           })
         })
@@ -146,7 +146,7 @@ class Learning extends QuestBase {
             if (event.player.id !== this.player.id) return
             if (event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.Stone) return
 
-            this.player.playSound(SOUNDS.action)
+            this.player.playSound(Sounds.Action)
             this.diff(1)
           })
         })
@@ -176,7 +176,7 @@ class Learning extends QuestBase {
             )
               return
 
-            this.player.playSound(SOUNDS.action)
+            this.player.playSound(Sounds.Action)
             this.diff(1)
           })
         })

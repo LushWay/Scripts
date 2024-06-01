@@ -1,5 +1,5 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, system, world } from '@minecraft/server'
-import { CUSTOM_ENTITIES } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/config'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
@@ -18,7 +18,7 @@ export class Leaderboard {
 
   static tag = 'LEADERBOARD'
 
-  static entityId = CUSTOM_ENTITIES.floatingText
+  static entityId = CustomEntityTypes.FloatingText
 
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
     if (scoreboardId.endsWith('Time')) {

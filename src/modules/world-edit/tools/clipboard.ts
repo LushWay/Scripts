@@ -1,5 +1,5 @@
 import { StructureRotation, system } from '@minecraft/server'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 import { WorldEditTool } from 'modules/world-edit/lib/WorldEditTool'
@@ -7,7 +7,7 @@ import { WorldEditTool } from 'modules/world-edit/lib/WorldEditTool'
 const clipboard = new WorldEditTool({
   name: 'clipboard',
   displayName: 'Копировать/Вставить',
-  itemStackId: CUSTOM_ITEMS.tool,
+  itemStackId: CustomItems.WeTool,
   loreFormat: {
     version: 0,
     mode: 'paste',

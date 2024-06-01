@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 
 export class CommandContext {
   input
@@ -38,7 +38,7 @@ export class CommandContext {
    */
   reply(text: unknown) {
     this.player.tell(text + '')
-    this.player.playSound(SOUNDS.click)
+    this.player.playSound(Sounds.Click)
   }
 
   /**

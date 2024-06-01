@@ -9,7 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 import { Vector, getRole, prompt, util } from 'lib'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { table } from 'lib/database/abstract'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
@@ -62,7 +62,7 @@ export class WorldEdit {
       const color = { 1: '§5', 2: '§d' }[pos]
 
       this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
-      this.player.playSound(SOUNDS.action)
+      this.player.playSound(Sounds.Action)
       this.updateSelectionCuboids()
     })
   }

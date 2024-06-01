@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { LockAction } from 'lib'
-import { CUSTOM_ENTITIES } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/config'
 
 new Command('sit')
   .setDescription('Присаживает вас')
@@ -9,7 +9,7 @@ new Command('sit')
   .executes(ctx => {
     if (ctx.player.getVelocity().y !== 0) return ctx.error('Вы не можете сесть в падении!')
     if (LockAction.locked(ctx.player)) return
-    const entity = ctx.player.dimension.spawnEntity(CUSTOM_ENTITIES.sit, ctx.player.location)
+    const entity = ctx.player.dimension.spawnEntity(CustomEntityTypes.Sit, ctx.player.location)
     ctx.player.closeChat()
     // Rideable component doesnt works
     entity.runCommand('ride @p start_riding @s teleport_rider ')
@@ -23,7 +23,7 @@ new Command('sit')
 system.runInterval(
   () => {
     for (const e of world.overworld.getEntities({
-      type: CUSTOM_ENTITIES.sit,
+      type: CustomEntityTypes.Sit,
     })) {
       const players = e.dimension.getEntities({
         type: 'minecraft:player',

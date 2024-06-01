@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { Cooldown, Settings, getRoleAndName } from 'lib'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 
@@ -80,7 +80,7 @@ export class ChatBuilder {
 
         for (const near of nearPlayers) {
           near.tell(message)
-          if (!this.playerSettings(near).disableSound) near.playSound(SOUNDS.click)
+          if (!this.playerSettings(near).disableSound) near.playSound(Sounds.Click)
         }
 
         for (const outranged of otherPlayers) {

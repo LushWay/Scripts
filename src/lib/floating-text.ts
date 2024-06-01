@@ -1,12 +1,12 @@
 import { Entity, ShortcutDimensions, world } from '@minecraft/server'
-import { CUSTOM_ENTITIES } from './assets/config'
+import { CustomEntityTypes } from './assets/config'
 import { isChunkUnloaded } from './game-utils'
 import { Vector } from './vector'
 
 export class FloatingText {
   private static readonly dynamicProperty = 'floatingText'
 
-  private static readonly typeId = CUSTOM_ENTITIES.floatingText
+  private static readonly typeId = CustomEntityTypes.FloatingText
 
   constructor(
     private id: string,

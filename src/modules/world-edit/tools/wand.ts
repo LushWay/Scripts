@@ -1,6 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import { ActionForm } from 'lib'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 import { setSelection } from 'modules/world-edit/commands/region/set'
 import { WorldEdit } from '../lib/WorldEdit'
 import { WorldEditTool } from '../lib/WorldEditTool'
@@ -8,7 +8,7 @@ import { WorldEditTool } from '../lib/WorldEditTool'
 const wand = new WorldEditTool({
   name: 'wand',
   displayName: 'топор',
-  itemStackId: CUSTOM_ITEMS.wand,
+  itemStackId: CustomItems.WeWand,
   overrides: {
     getMenuButtonName(player) {
       if (super.getMenuButtonName(player) === '') return ''

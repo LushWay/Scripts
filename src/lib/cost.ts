@@ -1,5 +1,5 @@
 import { ItemStack, Player, RawText } from '@minecraft/server'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { emoji } from 'lib/assets/emoji'
 import { itemLocaleName } from './game-utils'
 import { itemDescription } from './rewards'
@@ -7,15 +7,20 @@ import { MaybeRawText, t } from './text'
 import { noBoolean } from './util'
 
 export class Cost<T = unknown> {
-  /** Returns string representation of cost */
+  /**
+   * Returns string representation of cost
+   *
+   * @param canBuy - Whenether to display this cost as affordable by player or not
+   * @param player - Player to check cost on. Used in MultipleCost to check each one manually
+   */
   toString(canBuy = true, player?: Player): MaybeRawText {
     return ''
   }
 
   /**
-   * If the player have this cost returns true, otherwise false
+   * If the player have this cost value returns true, otherwise false
    *
-   * @param {Player} player - Player to check on
+   * @param player - Player to check on
    */
   has(player: Player): boolean {
     return false
@@ -24,24 +29,25 @@ export class Cost<T = unknown> {
   /**
    * Removes this cost from player
    *
-   * @param {Player} player - Buyer
+   * @param player - Buyer
    */
   buy(player: Player): T {
-    player.playSound(SOUNDS.action)
+    player.playSound(Sounds.Action)
     return undefined as T
   }
 
   /**
    * Returns fail info for player
    *
-   * @param {Player} player - Player to play sound on
+   * @param player - Player to play sound on
    */
   failed(player: Player): MaybeRawText {
-    player.playSound(SOUNDS.fail)
+    player.playSound(Sounds.Fail)
     return ''
   }
 }
 
+/** Class used co combine multiple Costs */
 export class MultiCost<T extends Cost[]> extends Cost {
   private costs: T
 

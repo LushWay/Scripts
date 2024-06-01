@@ -1,5 +1,5 @@
 import { Loot } from 'lib'
-import { CUSTOM_ITEMS } from 'lib/assets/config'
+import { CustomItems } from 'lib/assets/config'
 
 export default new Loot('starter')
   .item('WoodenSword')
@@ -26,6 +26,6 @@ export default new Loot('starter')
     '31...64': '10%',
   })
 
-  .item(CUSTOM_ITEMS.money)
+  .item(CustomItems.Money)
   .chance('100%')
   .amount({ '90...100': '1%' }).build

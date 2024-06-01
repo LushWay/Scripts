@@ -10,7 +10,7 @@ import {
   Temporary,
   Vector,
 } from 'lib'
-import { SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { Core } from 'lib/extensions/core'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
@@ -147,7 +147,7 @@ export class Quest {
             stayDuration: 20 * 4,
             fadeOutDuration: 20,
           })
-          player.playSound(SOUNDS.levelup)
+          player.playSound(Sounds.LevelUp)
         },
         'quest title',
         20,

@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { CONFIG, SOUNDS } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/config'
 import { ROLES } from 'lib/roles'
 import { inaccurateSearch } from '../search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
@@ -48,7 +48,7 @@ export function commandNotFound(player: Player, command: string): void {
       },
     ],
   })
-  player.playSound(SOUNDS.fail)
+  player.playSound(Sounds.Fail)
 
   suggestCommand(player, command)
   player.tell('§cСписок всех доступных вам команд: §f.help')
@@ -118,7 +118,7 @@ export function commandSyntaxFail(player: Player, command: import('./index').Com
       {
         translate: `commands.generic.syntax`,
         with: [
-          `${CONFIG.commandPrefixes[0]}${command.sys.name} ${args.slice(0, i).join(' ')}`,
+          `${Command.prefixes[0]}${command.sys.name} ${args.slice(0, i).join(' ')}`,
           args[i] ?? ' ',
           args.slice(i + 1).join(' '),
         ],
