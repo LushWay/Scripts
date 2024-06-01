@@ -57,7 +57,7 @@ export class MultiCost<T extends Cost[]> extends Cost {
           const string = cost.toString(!canBuy && player ? cost.has(player) : canBuy, player)
           if (string === '') return false
 
-          if (arr.length - i === i) return t.raw`${string}`
+          if (arr.length - 1 === i) return t.raw`${string}`
           else return t.raw`${string}, `
         })
         .filter(noBoolean),
@@ -69,6 +69,7 @@ export class MultiCost<T extends Cost[]> extends Cost {
   }
 
   buy(player: Player) {
+    super.buy(player)
     return this.costs.map(e => e.buy(player)) as {
       -readonly [P in keyof T]: T[P] extends Cost<infer R> ? R : never
     }
@@ -83,7 +84,9 @@ export class MultiCost<T extends Cost[]> extends Cost {
         const failed = cost.failed(player)
         if (failed === '') continue
 
-        messages = t.raw`${messages ?? ''}\n${failed}`
+        if (messages) {
+          messages = t.raw`${messages}\n${failed}`
+        } else messages = t.raw`${failed}`
       }
     }
 
@@ -242,6 +245,6 @@ export class ShouldHaveItemCost extends ItemCost {
   }
 
   failed(player: Player) {
-    return ''
+    return t.error`Нет предмета`
   }
 }

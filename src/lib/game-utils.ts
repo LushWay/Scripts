@@ -142,6 +142,7 @@ const itemModifiers: ((s: string) => string | undefined)[] = [
   darkOak => {
     if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door') return darkOak.replace('dark_oak', 'big_oak')
   },
+  lazuli => (lazuli === 'lapis_lazuli' ? 'dye.blue' : lazuli),
 ]
 
 // const afterItems: ((s: string) => string)[] = [s => s.replace(/\.name$/, '')]

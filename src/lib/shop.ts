@@ -24,7 +24,7 @@ interface ShopOptions {
 interface ShopProduct<T = unknown> {
   name: MaybeRawText | ((canBuy: boolean) => MaybeRawText)
   cost: Cost<T>
-  onBuy: (player: Player, text: MaybeRawText) => void
+  onBuy: (player: Player, text: MaybeRawText, successBuy: VoidFunction) => void | false
 }
 
 interface ShopSection {
@@ -113,7 +113,7 @@ export class Shop {
   }
 
   open(player: Player) {
-    const menu = new ShopForm(this.name, this.getBody(player) + this.defaultBody(player))
+    const menu = new ShopForm(t.header.raw`${this.name}`, t.raw`${this.getBody(player)}${this.defaultBody(player)}`)
     this.getMenu(menu, player)
     menu.show(player)
   }
@@ -123,8 +123,8 @@ export class ShopForm {
   private buttons: (ShopProduct | ShopSection)[] = []
 
   constructor(
-    private title: string,
-    private body: string,
+    private title: MaybeRawText,
+    private body: MaybeRawText,
   ) {}
 
   /**
@@ -158,38 +158,47 @@ export class ShopForm {
     itemFilter: (itemStack: ItemStack) => boolean,
     modifyItem: (itemSlot: ContainerSlot) => void,
   ) {
-    this.addProduct(name, new MultiCost(new ShouldHaveItemCost('', 1, itemFilter), cost), (player, text) => {
-      const form = new ChestForm('45').title(text).pattern([0, 0], ['<-------?'], {
-        '<': {
-          icon: BUTTON['<'],
-          callback: () => {
-            this.show(player)
+    return this.addProduct(
+      name,
+      new MultiCost(new ShouldHaveItemCost('', 1, itemFilter), cost),
+      (player, text, success) => {
+        const form = new ChestForm('45').title(text).pattern([0, 0], ['<-------?'], {
+          '<': {
+            icon: BUTTON['<'],
+            callback: () => {
+              this.show(player)
+            },
           },
-        },
-        '-': {
-          icon: MinecraftBlockTypes.GlassPane,
-        },
-        '?': {
-          icon: BUTTON['?'],
-        },
-      })
-
-      const { container } = player
-      if (!container) return
-      for (const [i, item] of container.entries().filter(([, item]) => item && itemFilter(item))) {
-        if (!item) continue
-        form.button({
-          slot: i + 9,
-          icon: item.typeId,
-          nameTag: typeIdToReadable(item.typeId),
-          amount: item.amount,
-          lore: item.getLore(),
-          callback: () => cost.buy(player) && modifyItem(container.getSlot(i)),
+          '-': {
+            icon: MinecraftBlockTypes.GlassPane,
+          },
+          '?': {
+            icon: BUTTON['?'],
+          },
         })
-      }
 
-      form.show(player)
-    })
+        const { container } = player
+        if (!container) return
+        for (const [i, item] of container.entries().filter(([, item]) => item && itemFilter(item))) {
+          if (!item) continue
+          form.button({
+            slot: i + 9,
+            icon: item.typeId,
+            nameTag: typeIdToReadable(item.typeId),
+            amount: item.amount,
+            lore: item.getLore(),
+            callback: () => {
+              cost.buy(player)
+              modifyItem(container.getSlot(i))
+              success()
+            },
+          })
+        }
+
+        form.show(player)
+        return false
+      },
+    )
   }
 
   /**
@@ -224,14 +233,15 @@ export class ShopForm {
         const canBuy = cost.has(player)
         const text = typeof name === 'function' ? name(canBuy) : name
 
-        form.addButton(t.raw`${text}\n${cost.toString(canBuy, player)}`, () =>
-          this.buy({ text: text, cost, onBuy, player, back }),
+        form.addButton(
+          t.options({ unitColor: canBuy ? '§f' : '§7' }).raw`§l${text}§r\n${cost.toString(canBuy, player)}`,
+          () => this.buy({ text: text, cost, onBuy, player, back }),
         )
       } else {
         const { name, onOpen } = button
 
         form.addButton(name, () => {
-          const form = new ShopForm(this.title + ' > ' + name, this.body)
+          const form = new ShopForm(t.header.raw`${this.title} > ${name}`, this.body)
           onOpen(form)
           form.show(player, '', () => this.show(player))
         })
@@ -244,7 +254,7 @@ export class ShopForm {
   private buy({ onBuy, cost, player, text, back }: ShopProductBuy) {
     const canBuy = () => {
       if (!cost.has(player)) {
-        this.show(player, t.raw`${t.error`Недостаточно средств: `}${cost.failed(player)}`, back)
+        this.show(player, t.raw`${t.error`Недостаточно средств:\n`}${cost.failed(player)}`, back)
         return false
       } else return true
     }
@@ -253,8 +263,11 @@ export class ShopForm {
 
     const purchase = () => {
       if (!canBuy()) return
-      onBuy(player, text)
-      this.show(player, t.options({ textColor: '§a' }).raw`Успешная покупка: ${text} за ${cost.toString()}!`)
+
+      const successBuy = () =>
+        this.show(player, t.options({ textColor: '§a' }).raw`Успешная покупка: ${text} за ${cost.toString()}!`)
+
+      if (onBuy(player, text, successBuy) !== false) successBuy()
     }
 
     if (Shop.getPlayerSettings(player).prompt) {
