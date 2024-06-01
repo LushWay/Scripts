@@ -44,15 +44,17 @@ expand(System.prototype, {
   },
 
   runTimeout(...args) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return Timer('timeout', super.runTimeout.bind(this), ...args)
   },
 
   runPlayerInterval(callback, ...args) {
     return Timer(
       'playerInterval',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       super.runInterval.bind(this),
       function playersInterval() {
-        for (const player of world.getAllPlayers()) player && callback(player)
+        for (const player of world.getAllPlayers()) player.isValid() && callback(player)
       },
 
       ...args,

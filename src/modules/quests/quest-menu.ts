@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { MessageForm, util } from 'lib'
+import { MessageForm, noNullable, util } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
@@ -29,7 +29,7 @@ quest
   .setPermissions('techAdmin')
   .executes(ctx => {
     const form = new ActionForm('Quests', 'Выбери')
-    for (const [name, q] of Object.entries(Quest.list)) {
+    for (const [name, q] of Quest.all.entries()) {
       form.addButton(name, () => {
         q.enter(ctx.player)
       })
@@ -55,11 +55,11 @@ export function questsMenu(player: Player, back?: VoidFunction) {
       )
     },
     button(dbquest) {
-      const quest = Quest.list[dbquest.id]
+      const quest = Quest.all.get(dbquest.id)
       if (!quest) return false
 
       return [
-        `${quest.name}\n${quest.steps(player)?.list[dbquest.step]?.text() ?? ''}`,
+        `${quest.name}\n${quest.steps(player).list[dbquest.step]?.text() ?? ''}`,
         null,
         () => questMenu(player, quest, self),
       ]
@@ -83,7 +83,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
     'Завершенные задания',
     'Список завершенных заданий',
 
-    quests.completed.map(e => Quest.list[e]).filter(Boolean),
+    quests.completed.map(e => Quest.all.get(e)).filter(noNullable),
 
     {
       filters: {},

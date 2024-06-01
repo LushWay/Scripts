@@ -1,4 +1,5 @@
-import { ActionForm, ModalForm, util } from 'lib'
+/* eslint-disable @typescript-eslint/use-unknown-in-catch-callback-variable */
+import { ActionForm, ModalForm } from 'lib'
 import { request } from 'lib/bds/api'
 
 new Command('shell').setPermissions('techAdmin').executes(ctx => {

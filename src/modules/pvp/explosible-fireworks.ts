@@ -15,7 +15,7 @@ world.afterEvents.itemUse.subscribe(event => {
   if (event.itemStack.typeId !== MinecraftItemTypes.Crossbow) return
   if (!(event.source instanceof Player) || !event.source.isValid()) return
 
-  for (const [id, { date, entity }] of Object.entries(SPAWNED_FIREWORKS)) {
+  for (const [id, { date, entity }] of SPAWNED_FIREWORKS.entries()) {
     if (!entity.isValid()) continue
     if (Date.now() - date < 5 && Vector.distance(event.source.location, entity.location) < 2) {
       SPAWNED_FIREWORKS.delete(id)
@@ -33,7 +33,7 @@ system.runInterval(
       if (Date.now() - date > 5) SPAWNED_FIREWORKS.delete(id)
     }
 
-    for (const [id, { source, firework }] of Object.entries(FIREWORKS)) {
+    for (const [id, { source, firework }] of FIREWORKS.entries()) {
       if (!firework.isValid()) {
         FIREWORKS.delete(id)
         continue

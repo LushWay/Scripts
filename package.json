@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "lint": "npx eslint ./src/ --fix --plugin file-progress --rule 'file-progress/activate: 1'",
+    "test": "./node_modules/vitest/vitest.mjs",
+    "coverage": "./node_modules/vitest/vitest.mjs --coverage",
+    "cov": "./node_modules/vitest/vitest.mjs --coverage --ui",
     "patches": "node tools/patches.js",
     "prepare": "git config core.ignorecase false"
   },
@@ -59,8 +62,8 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended",
-      "plugin:@typescript-eslint/strict",
-      "plugin:@typescript-eslint/stylistic",
+      "plugin:@typescript-eslint/strict-type-checked",
+      "plugin:@typescript-eslint/stylistic-type-checked",
       "prettier"
     ],
     "plugins": [
@@ -103,6 +106,7 @@
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/prefer-return-this-type": "off",
       "@typescript-eslint/no-unsafe-enum-comparison": "off",
+      "@typescript-eslint/no-misused-promises": "off",
       "@typescript-eslint/naming-convention": [
         "warn",
         {
@@ -160,13 +164,26 @@
         }
       ]
     },
+    "overrides": [
+      {
+        "files": [
+          "src/lib/extensions/**"
+        ],
+        "rules": {
+          "@typescript-eslint/no-unsafe-member-access": "off",
+          "@typescript-eslint/no-unsafe-return": "off",
+          "@typescript-eslint/no-unsafe-call": "off",
+          "@typescript-eslint/no-unsafe-assignment": "off"
+        }
+      }
+    ],
     "ignorePatterns": [
-      "tools/*",
-      "src/lib/assets/*",
+      "tools",
       "**/*.test.ts",
       "**/*.spec.ts",
-      "scripts/*",
-      "src/test/__mocks__/*"
+      "src/chestui",
+      "scripts",
+      "src/test/__mocks__"
     ],
     "root": true
   },

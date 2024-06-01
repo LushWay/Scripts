@@ -1,10 +1,3 @@
-/**
- * @typedef {Object} ChunkSize
- * @property {number} x - The max Length of a chunk
- * @property {number} y - The max Height of a chunk
- * @property {number} z - The max Width of a chunk
- */
-
 export class Cuboid {
   max
 
@@ -38,11 +31,6 @@ export class Cuboid {
 
   zRadius
 
-  /**
-   * @param {Vector3} pos1
-   * @param {Vector3} pos2
-   */
-
   constructor(pos1: Vector3, pos2: Vector3) {
     this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z }
     this.pos2 = { x: pos2.x, y: pos2.y, z: pos2.z }
@@ -74,11 +62,7 @@ export class Cuboid {
     this.zCenter = (this.zMax + this.zMin) / 2
   }
 
-  /**
-   * Returns the amount of blocks in this cuboid
-   *
-   * @returns {number}
-   */
+  /** Returns the amount of blocks in this cuboid */
   get size(): number {
     const x = this.xMax - this.xMin + 1
     const y = this.yMax - this.yMin + 1
@@ -86,12 +70,7 @@ export class Cuboid {
     return x * y * z
   }
 
-  /**
-   * Splits a cuboid into mulitple cuboid of a chunk size
-   *
-   * @param {Vector3} size
-   * @returns {Cuboid[]}
-   */
+  /** Splits a cuboid into mulitple cuboid of a chunk size */
   split(size: Vector3 = { x: 1, y: 1, z: 1 }): Cuboid[] {
     const breakpoints: Record<string, number[]> = {
       x: [],
@@ -100,7 +79,6 @@ export class Cuboid {
     }
 
     const cubes: Cuboid[] = []
-
     for (const entry of Object.entries(size)) {
       const [axis, value] = entry as [keyof Vector3, number]
 
@@ -134,7 +112,7 @@ export class Cuboid {
             const nextValue = breakpoints[axis][indexOf[axis] + 1]
             if (!nextValue && breakpoints[axis].length > 1) return
 
-            nextCord[axis] = nextValue ?? current[axis]
+            nextCord[axis] = (nextValue as number | undefined) ?? current[axis]
             if (nextCord[axis] !== this.max[axis]) nextCord[axis]--
           }
 

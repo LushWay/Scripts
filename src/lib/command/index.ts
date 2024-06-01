@@ -19,7 +19,9 @@ type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) 
   ? (ctx: X, ...args: [...E, Next]) => R
   : never
 
-type ArgReturn<Callback, Type> = Command<AppendArgument<Callback, Type>>
+type ArgReturn<Callback, Type, Optional> = Command<
+  AppendArgument<Callback, Optional extends true ? (Type | undefined) : Type>
+>
 
 type CommandCallback = (ctx: CommandContext, ...args: unknown[]) => void
 
@@ -45,7 +47,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
 
     const { cmd, args, input } = parsed
 
-    const command = Command.commands.find(c => c.sys.name === cmd || c.sys.aliases?.includes(cmd))
+    const command = Command.commands.find(c => c.sys.name === cmd || c.sys.aliases.includes(cmd))
     if (!command) return commandNotFound(event.sender, cmd)
 
     if (!command.sys.requires(event.sender)) return commandNoPermissions(event.sender, command)
@@ -63,7 +65,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
         )
         if (!child && !args[i] && start.sys.callback) return 'success'
         if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
-        if (!child.sys?.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
+        if (!child.sys.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
         childs.push(child)
         return getChilds(child, i + 1)
       }
@@ -131,7 +133,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     group: 'test' as 'test' | 'we' | 'public',
 
     /** Argument type of the command */
-    type: new LiteralArgumentType('command') as IArgumentType,
+    type: new LiteralArgumentType('command') as IArgumentType<boolean>,
 
     /** The Arguments of this command */
     children: [] as Command[],
@@ -151,7 +153,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    *
    * @param {string} name - Name of the new command
    */
-  constructor(name: string, type?: IArgumentType, depth = 0, parent: Command | null = null) {
+  constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
     this.sys.name = name
 
     if (type) this.sys.type = type
@@ -259,7 +261,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param type A special type to be added
    * @returns New branch to this command
    */
-  private argument<T extends IArgumentType>(type: T): ArgReturn<Callback, T['type']> {
+  private argument<T extends IArgumentType<boolean>>(type: T): ArgReturn<Callback, T['type'], T['optional']> {
     const cmd = new Command(this.sys.name, type, this.sys.depth + 1, this)
     cmd.sys.name = this.sys.name
     cmd.sys.description = this.sys.description
@@ -281,7 +283,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param {string} name Name this argument should have
    * @returns New branch to this command
    */
-  string(name: string, optional = false) {
+  string<T extends boolean = false>(name: string, optional: T = false as T) {
     return this.argument(new StringArgumentType(name, optional))
   }
 
@@ -291,7 +293,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param {string} name Name this argument should have
    * @returns New branch to this command
    */
-  int(name: string, optional = false) {
+  int<T extends boolean = false>(name: string, optional: T = false as T) {
     return this.argument(new IntegerArgumentType(name, optional))
   }
 
@@ -302,7 +304,11 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param types
    * @returns New branch to this command
    */
-  array<T extends readonly string[]>(name: string, types: T, optional = false): ArgReturn<Callback, T[number]> {
+  array<T extends readonly string[], B extends boolean = false>(
+    name: string,
+    types: T,
+    optional: B = false as B,
+  ): ArgReturn<Callback, T[number], B> {
     return this.argument(new ArrayArgumentType(name, types, optional))
   }
 
@@ -312,7 +318,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param name Name this argument should have
    * @returns New branch to this command
    */
-  boolean(name: string, optional = false) {
+  boolean<T extends boolean = false>(name: string, optional: T = false as T) {
     return this.argument(new BooleanArgumentType(name, optional))
   }
 
@@ -322,8 +328,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param name Name this argument should have
    * @returns New branch to this command
    */
-
-  location(name: string, optional = false): ArgReturn<Callback, Vector3> {
+  location<T extends boolean = false>(name: string, optional: T = false as T): ArgReturn<Callback, Vector3, T> {
     const cmd = this.argument(new LocationArgumentType(name, optional))
     if (!name.endsWith('*')) {
       const newArg = cmd.location(name + '_y*', optional).location(name + '_z*', optional)

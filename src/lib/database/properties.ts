@@ -39,7 +39,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
         }
 
         for (let i = 0; i < length; i++) {
-          const prop = world.getDynamicProperty(this.id + DynamicPropertyDB.separator + i)
+          const prop = world.getDynamicProperty(`${this.id}${DynamicPropertyDB.separator}${i}`)
           if (typeof prop !== 'string') {
             console.error(
               new DatabaseError(
@@ -54,7 +54,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
       }
 
       this.value = Object.fromEntries(
-        Object.entries(JSON.parse(value || '{}')).map(([key, value]) => {
+        Object.entries(JSON.parse(value || '{}') as Record<string, unknown>).map(([key, value]) => {
           const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
           return [
             // Add default value
@@ -66,7 +66,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
         }),
       )
     } catch (error) {
-      console.error(new DatabaseError(`Failed to init table '${this.id}': ${util.error(error)}`))
+      console.error(new DatabaseError(`Failed to init table '${this.id}': ${util.error(error as Error)}`))
     }
   }
 
@@ -75,7 +75,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
     if (!strings) throw new DatabaseError('Failed to save db: cannot split')
     world.setDynamicProperty(this.id, strings.length)
     for (const [i, string] of strings.entries()) {
-      world.setDynamicProperty(this.id + DynamicPropertyDB.separator + i, string)
+      world.setDynamicProperty(`${this.id}${DynamicPropertyDB.separator}${i}`, string)
     }
   }
 }
@@ -85,6 +85,7 @@ configureDatabase({
     new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
   tables: DynamicPropertyDB.tables,
   getRawTableData(tableId) {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     return world.getDynamicProperty(tableId) + ''
   },
 })

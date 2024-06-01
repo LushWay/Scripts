@@ -1,7 +1,7 @@
 import { ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, getBlockStatus, Vector } from 'lib'
+import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, Vector, getBlockStatus } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
@@ -22,7 +22,7 @@ actionGuard((_, __, ctx) => {
 })
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
-  const { player, block, faceLocation } = event
+  const { player, block } = event
   const itemStack = player.mainhand()
   try {
     if (!itemStack.getItem()?.is(BASE_ITEM_STACK) || LockAction.locked(player)) return
@@ -72,7 +72,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 
   system.delay(() => {
     const center = Vector.floor(block.location)
-    if (!player.isSimulated) console.log(player.name + ' created a base on ' + Vector.string(center, true))
+    if (!player.isSimulated()) console.log(player.name + ' created a base on ' + Vector.string(center, true))
     BaseRegion.create({
       center: center,
       radius: 30,

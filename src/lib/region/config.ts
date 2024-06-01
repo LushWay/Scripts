@@ -37,4 +37,4 @@ export const NOT_MOB_ENTITIES = [
   CustomEntityTypes.FloatingText,
   CustomEntityTypes.Sit,
   MinecraftEntityTypes.Npc,
-]
+] as string[]

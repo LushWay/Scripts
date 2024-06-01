@@ -10,6 +10,20 @@ export class Component {
   }
 }
 
+export class ItemComponent extends Component {}
+export class ItemCooldownComponent extends ItemComponent {
+  componentId: 'minecraft:cooldown'
+}
+export class ItemEnchantableComponent extends ItemComponent {
+  componentId: 'minecraft:enchantable'
+}
+export class ItemDurabilityComponent extends ItemComponent {
+  componentId: 'minecraft:durability'
+}
+export class ItemFoodComponent extends ItemComponent {
+  componentId: 'minecraft:food'
+}
+
 export class EntityComponent extends Component {
   constructor(readonly entity: Entity) {
     super()

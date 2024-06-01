@@ -6,7 +6,7 @@ new Command('enchant')
   .setDescription('Зачаровывает предмет')
   .setPermissions('admin')
   .array('enchantName', Object.values(MinecraftEnchantmentTypes), true)
-  .int('level', true)
+  .int('level')
   .executes((ctx, enchant, level) => {
     if (!enchant) return ctx.reply(Object.values(MinecraftEnchantmentTypes).join('\n'))
 

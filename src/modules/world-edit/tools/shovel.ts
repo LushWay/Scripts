@@ -17,7 +17,8 @@ const shovel = new WorldEditTool({
   displayName: 'лопата',
   overrides: {
     getMenuButtonName(player) {
-      return super.getMenuButtonName(player).replace(/а$/, 'у')
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      return (super.getMenuButtonName as WorldEditTool['getMenuButtonName'])(player).replace(/а$/, 'у')
     },
   },
   loreFormat: {
@@ -65,7 +66,7 @@ const shovel = new WorldEditTool({
         slot.setLore(shovel.stringifyLore(lore))
 
         player.success(
-          `${lore.blocksSet ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
+          `${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
         )
       })
   },
@@ -99,15 +100,11 @@ const shovel = new WorldEditTool({
       if (!block) continue
 
       for (const replaceBlock of replaceBlocks) {
-        if (replaceBlock) {
-          if (!block.permutation.matches(replaceBlock.typeId)) continue
-          if (replaceBlock.states) {
-            const states = block.permutation.getAllStates()
+        if (!block.permutation.matches(replaceBlock.typeId)) continue
+        const states = block.permutation.getAllStates()
 
-            for (const [name, value] of Object.entries(replaceBlock.states)) {
-              if (states[name] !== value) continue
-            }
-          }
+        for (const [name, value] of Object.entries(replaceBlock.states)) {
+          if (states[name] !== value) continue
         }
 
         block.setPermutation(blocks.randomElement())

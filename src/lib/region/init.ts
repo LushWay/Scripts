@@ -1,4 +1,5 @@
 import { system } from '@minecraft/server'
+import { migration } from 'lib/database/migrations'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { BaseRegion } from '../../modules/places/base/BaseRegion'
 import { MineshaftRegion } from '../../modules/places/mineshaft/MineshaftRegion'
@@ -15,7 +16,7 @@ export function restoreRegionFromJSON(
   [key, region]: [string, (typeof RegionDatabase)[string]],
   kinds = [RadiusRegion, MineshaftRegion, SafeAreaRegion, BaseRegion],
 ) {
-  if (!region) return
+  if (typeof region === 'undefined') return
 
   let created
   region = ProxyDatabase.unproxy(region)

@@ -26,13 +26,9 @@ export class Temporary {
   cleaned = false
 
   /** Creates new temporary system */
-  constructor(execute: (arg: ProxiedSubscribers) => void | { cleanup(): void }, parent?: Temporary) {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let target: Temporary = this
-
-    if (parent) {
-      target = parent
-    } else {
+  constructor(execute: (arg: ProxiedSubscribers) => void | { cleanup(this: void): void }, parent?: Temporary) {
+    const target = parent ? parent : this
+    if (target === this) {
       this.proxies = {
         world: Object.setPrototypeOf(
           {
@@ -40,23 +36,21 @@ export class Temporary {
             beforeEvents: this.proxyEvents(world.beforeEvents),
           },
           world,
-        ),
+        ) as World,
         system: Object.setPrototypeOf(
           {
             afterEvents: this.proxyEvents(system.afterEvents),
             beforeEvents: this.proxyEvents(system.beforeEvents),
           },
           this.proxySystem(),
-        ),
+        ) as System,
         cleanup: this.cleanup,
         temp: this,
       }
     }
 
     const result = execute(target.proxies)
-
     if (result) target.cleaners.push(result.cleanup)
-
     return target
   }
 
@@ -95,20 +89,18 @@ export class Temporary {
   }
 
   private proxySystem() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const temp = this
     return new Proxy(system, {
-      get(target, p, reciever) {
-        if (p === 'toJSON') return Reflect.get(target, p, reciever)
-        if (typeof p === 'symbol') return Reflect.get(target, p, reciever)
+      get: (target, p, reciever) => {
+        if (p === 'toJSON') return Reflect.get(target, p, reciever) as unknown
+        if (typeof p === 'symbol') return Reflect.get(target, p, reciever) as unknown
 
-        const value: System[keyof System] = Reflect.get(target, p, reciever)
+        const value = Reflect.get(target, p, reciever) as System[keyof System]
         if (typeof value !== 'function') return value
 
         return (...args: unknown[]) => {
-          const handle = value.call(target, ...args)
+          const handle = value.call(target, ...args) as unknown
           if (typeof handle === 'number') {
-            temp.cleaners.push(() => system.clearRun(handle))
+            this.cleaners.push(() => system.clearRun(handle))
           }
           return handle
         }
@@ -117,8 +109,8 @@ export class Temporary {
   }
 
   /** Unsubscribes all temporary events */
-  cleanup: (this: Temporary) => void = (() => {
+  cleanup = (() => {
     this.cleaners.forEach(fn => fn())
     this.cleaned = true
-  }).bind(this)
+  }) as (this: void) => void
 }

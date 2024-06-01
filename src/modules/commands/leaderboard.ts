@@ -15,7 +15,7 @@ function leaderboardMenu(player: Player) {
 
   form.addButton('§3Добавить', BUTTON['+'], editLeaderboard)
 
-  for (const lb of Object.values(Leaderboard.all)) {
+  for (const lb of Leaderboard.all.values()) {
     form.addButton(info(lb), () => {
       editLeaderboard(player, lb)
     })
@@ -86,8 +86,6 @@ function editLeaderboard(
         )
     })
     .addButton(action + 'позицию' + warn('location', 'dimension'), () => {
-      /** @type {Record<import('@minecraft/server').ShortcutDimensions, string>} */
-
       const dimensions: Record<import('@minecraft/server').ShortcutDimensions, string> = {
         overworld: 'Верхний мир',
         nether: 'Нижний мир',
@@ -113,7 +111,6 @@ function editLeaderboard(
         })
     })
     .addButton(action + 'стиль' + warn('style'), () => {
-      /** @type {Record<keyof (typeof Leaderboard)['styles'], string>} */
       const styles: Record<keyof (typeof Leaderboard)['styles'], string> = {
         gray: '§7Серый',
         white: '§fБелый',

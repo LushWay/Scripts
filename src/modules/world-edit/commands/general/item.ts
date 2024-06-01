@@ -7,10 +7,9 @@ root
   .string('lore')
   .executes(ctx => {
     const item = ctx.player.mainhand()
-    if (!item) return ctx.reply('§cВ руке нет предмета!')
-    const oldtag = item.getLore()
+    const oldlore = item.getLore()
     item.setLore(ctx.arguments)
-    ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.getLore()}`)
+    ctx.reply(`§a► §f${oldlore} ► ${item.getLore()}`)
   })
 
 root
@@ -20,7 +19,6 @@ root
   .string('name')
   .executes((ctx, name) => {
     const item = ctx.player.mainhand()
-    if (!item) return ctx.reply('§cВ руке нет предмета!')
     const oldtag = item.nameTag
     item.nameTag = name
     ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.nameTag}`)
@@ -32,8 +30,7 @@ root
   .int('count')
   .executes((ctx, count) => {
     const item = ctx.player.mainhand()
-    if (!item) return ctx.reply('§cВ руке нет предмета!')
-    const oldtag = item.amount
+    const oldamount = item.amount
     item.amount = count
-    ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.amount}`)
+    ctx.reply(`§a► §f${oldamount} ► ${item.amount}`)
   })

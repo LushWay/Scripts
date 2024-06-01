@@ -48,7 +48,7 @@ actionGuard((player, region, ctx) => {
     // Check item
 
     !ctx.event.itemStack?.typeId ||
-    !(ctx.event.itemStack?.typeId in HoeEffectLevels)
+    !(ctx.event.itemStack.typeId in HoeEffectLevels)
   )
     return
 

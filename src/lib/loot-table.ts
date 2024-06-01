@@ -1,6 +1,7 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, util } from 'lib/util'
+import { Command } from './command'
 import { EventSignal } from './event-signal'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
@@ -23,23 +24,22 @@ interface StoredItem {
   damage: number[]
 }
 
-if (globalThis.Command)
-  new Command('loot')
-    .setPermissions('curator')
-    .string('lootTableName', true)
-    .executes((ctx, lootTableName) => {
-      const lootTable = LootTable.instances[lootTableName]
-      if (!lootTable)
-        return ctx.error(
-          `${lootTableName} - unknown loot table. All tables:\n${Object.keys(LootTable.instances).join('\n')}`,
-        )
+new Command('loot')
+  .setPermissions('curator')
+  .string('lootTableName')
+  .executes((ctx, lootTableName) => {
+    const lootTable = LootTable.instances[lootTableName]
+    if (typeof lootTable === 'undefined')
+      return ctx.error(
+        `${lootTableName} - unknown loot table. All tables:\n${Object.keys(LootTable.instances).join('\n')}`,
+      )
 
-      const block = ctx.player.dimension.getBlock(ctx.player.location)?.below()
-      if (!block) return ctx.error('No block under feats')
-      const inventory = block.getComponent('inventory')
-      if (!inventory || !inventory.container) return ctx.error('No inventory in block')
-      lootTable.fillContainer(inventory.container)
-    })
+    const block = ctx.player.dimension.getBlock(ctx.player.location)?.below()
+    if (!block) return ctx.error('No block under feats')
+    const inventory = block.getComponent('inventory')
+    if (!inventory?.container) return ctx.error('No inventory in block')
+    lootTable.fillContainer(inventory.container)
+  })
 
 type PreparedItems = { stack: ItemStack; chance: number }[]
 
@@ -82,7 +82,7 @@ export class Loot {
    *
    * @param type Type of the item
    */
-  item(type: string | Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
+  item(type: string) {
     if (isKeyof(type, MinecraftItemTypes)) type = MinecraftItemTypes[type]
     this.create(new ItemStack(type))
 
@@ -176,7 +176,7 @@ export class Loot {
     }
 
     const size = Object.values(parsed).reduce((p, c) => p + c, 0)
-    const array: number[] = new Array(size)
+    const array = new Array<number>(size)
 
     let i = 0
     for (const [key, value] of Object.entries(parsed)) {
@@ -257,7 +257,7 @@ export class LootTable {
     })
   }
 
-  private selectByChance(items: PreparedItems): number | -1 {
+  private selectByChance(items: PreparedItems): number {
     const totalChance = items.reduce((sum, item) => sum + item.chance, 0)
 
     let random = Math.randomInt(0, totalChance)

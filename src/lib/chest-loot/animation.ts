@@ -48,7 +48,7 @@ export default class ChestLootAnimation {
       maxDistance: 1,
     })[0]
 
-    if (!entity) {
+    if (typeof entity === 'undefined') {
       console.warn(t.error`Unable to spawn armor stand for ${this.id}, location ${Vector.string(location, true)}`)
       return
     }

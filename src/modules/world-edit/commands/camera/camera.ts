@@ -51,8 +51,6 @@ function setupCameraForm(player: Player, target: Player) {
 
       if (!facing) return ctx.error('Не указана ни одна позиция для наблюдения камерой')
 
-      if (!mode) return ctx.error('Неизвестный режим камеры ' + util.inspect(mode))
-
       data.camera = {
         type,
         ease: EasingType[ease],
@@ -83,6 +81,7 @@ function createCameraInteval(player: Player) {
       const data = player.database
 
       if (data.camera) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (data.camera.mode === 'spinAroundPos') {
           data.camera.modeStep ??= 1
 

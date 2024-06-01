@@ -3,6 +3,7 @@ import { CustomEntityTypes } from 'lib/assets/config'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
+import { Nullable } from 'vitest'
 import { table } from './database/abstract'
 
 export interface LeaderboardInfo {
@@ -113,7 +114,7 @@ export class Leaderboard {
 
   get scoreboard() {
     return (
-      this.objective ??
+      (this.objective as Nullable<typeof this.objective>) ??
       (this.objective =
         world.scoreboard.getObjective(this.info.objective) ??
         world.scoreboard.addObjective(this.info.objective, this.info.displayName))
@@ -124,7 +125,8 @@ export class Leaderboard {
     const scoreboard = this.scoreboard
     const dname = scoreboard.displayName
     const name = dname.charAt(0).toUpperCase() + dname.slice(1)
-    const style = Leaderboard.styles[this.info.style] ?? Leaderboard.styles.gray
+    const style =
+      (Leaderboard.styles[this.info.style] as Nullable<ValueOf<typeof Leaderboard.styles>>) ?? Leaderboard.styles.gray
     const filler = `§${style.fill1}-§${style.fill2}-`.repeat(10)
 
     let leaderboard = ``
@@ -138,7 +140,8 @@ export class Leaderboard {
       const { pos: t, nick: n, score: s } = style
 
       const name =
-        Player.name(scoreInfo.participant?.displayName) ?? scoreInfo.participant?.displayName ?? '§8<Unknown player>'
+        ((Player.name(scoreInfo.participant.displayName) ?? scoreInfo.participant.displayName) as string | undefined) ??
+        '§8<Unknown player>'
 
       leaderboard += `§ы§${t}#${i + 1}§r `
       leaderboard += `§${n}${name}§r `
@@ -153,7 +156,7 @@ const immutable = ProxyDatabase.immutableUnproxy(Leaderboard.db)
 system.runInterval(
   () => {
     for (const [id, leaderboard] of Object.entries(immutable)) {
-      if (!leaderboard) continue
+      if (typeof leaderboard === 'undefined') continue
       const info = Leaderboard.all.get(id)
 
       if (info) {
@@ -169,7 +172,8 @@ system.runInterval(
 
           .find(e => e.id === id)
 
-        if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded || !leaderboard) continue
+        if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded || typeof leaderboard === 'undefined')
+          continue
         new Leaderboard(entity, leaderboard).updateLeaderboard()
       }
     }
@@ -194,5 +198,5 @@ function toMetricNumbers(value: number): string {
   if (exp === 0) return value.toString()
 
   const scaled = value / Math.pow(10, exp * 3)
-  return `${scaled.toFixed(1)}${exp > 5 ? 'e' + exp : types[exp]}`
+  return `${scaled.toFixed(1)}${exp > 5 ? `e${exp}` : types[exp]}`
 }

@@ -5,6 +5,7 @@ import { FormCallback } from 'lib/form/utils'
 import { util } from 'lib/util'
 import { WeakPlayerMap } from 'lib/weak-player-map'
 import { table } from './database/abstract'
+import { t } from './text'
 
 type DropdownSetting = [value: string, displayText: string]
 
@@ -36,7 +37,9 @@ type toPlain<T> = T extends true | false
     ? string
     : T extends DropdownSetting[]
       ? T[number][0]
-      : T
+      : T extends number
+        ? number
+        : T
 
 export type SettingsConfigParsed<T extends SettingsConfig> = {
   [K in keyof T]: toPlain<T[K]['value']>
@@ -47,7 +50,7 @@ export type SettingsDatabase = Record<string, SettingsDatabaseValue>
 
 export type PlayerSettingValues = boolean | string | number | DropdownSetting[]
 
-type WorldSettingsConfig = SettingsConfig<SettingValue> & Record<string, { requires?: boolean }>
+type WorldSettingsConfig = SettingsConfig & Record<string, { requires?: boolean }>
 
 export class Settings {
   /** Creates typical settings database */
@@ -159,9 +162,9 @@ export class Settings {
         enumerable: true,
         get() {
           const value = config[prop].value
-          return database[groupName]?.[key] ?? (Settings.isDropdown(value) ? value[0][0] : value)
+          return database[groupName][key] ?? (Settings.isDropdown(value) ? value[0][0] : value)
         },
-        set(v) {
+        set(v: SettingValue) {
           const value = (database[groupName] ??= {})
           value[key] = v
           config[prop].onChange?.()
@@ -200,12 +203,12 @@ export function settingsGroupMenu(
   )
 
   for (const key in config) {
-    const saved = store[key]
+    const saved = store[key] as string | number | boolean | undefined
     const setting = config[key]
     const value = saved ?? setting.value
 
     const isUnset = typeof saved === 'undefined'
-    const isRequired = Reflect.get(config[key], 'requires') && isUnset
+    const isRequired = (Reflect.get(config[key], 'requires') as boolean) && isUnset
 
     const isToggle = typeof value === 'boolean'
 
@@ -222,7 +225,9 @@ export function settingsGroupMenu(
     if (isToggle) {
       form.addToggle(label, value)
     } else if (Settings.isDropdown(setting.value)) {
-      form.addDropdownFromObject(label, Object.fromEntries(setting.value), { defaultValueIndex: value })
+      form.addDropdownFromObject(label, Object.fromEntries(setting.value), {
+        defaultValueIndex: Settings.isDropdown(value) ? undefined : value,
+      })
     } else {
       const isString = typeof value === 'string'
 
@@ -238,34 +243,42 @@ export function settingsGroupMenu(
     buttons.push([
       key,
       input => {
-        if (typeof input === 'undefined' || input === '') return ''
+        try {
+          if (typeof input === 'undefined' || input === '') return ''
 
-        let result
-        if (typeof input === 'boolean' || Settings.isDropdown(setting.value)) {
-          result = input
-        } else {
-          switch (typeof setting.value) {
-            case 'string':
-              result = input
-              break
-            case 'number':
-              result = Number(input)
-              if (isNaN(result)) return '§cВведите число!'
-              break
-            case 'object':
-              try {
-                result = JSON.parse(input)
-              } catch (error) {
-                return `§c${error.message}`
-              }
-              break
+          let result
+          if (typeof input === 'boolean' || Settings.isDropdown(setting.value)) {
+            result = input
+          } else {
+            switch (typeof setting.value) {
+              case 'string':
+                result = input
+                break
+              case 'number':
+                result = Number(input)
+                if (isNaN(result)) return '§cВведите число!'
+                break
+              case 'object':
+                result = JSON.parse(input) as typeof result
+
+                break
+            }
           }
+
+          if (util.stringify(store[key]) === util.stringify(result)) return ''
+
+          if (result) {
+            player.log(t`Changed ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' to '${result}'`)
+            store[key] = result
+          }
+
+          return showHintAboutSavedStatus ? '§aСохранено!' : ''
+        } catch (error: unknown) {
+          player.log(
+            t.error`Changing ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' error: ${util.error(error as Error)}`,
+          )
+          return util.error.isError(error) ? `§c${error.message}` : util.inspect(error)
         }
-
-        if (util.stringify(store[key]) === util.stringify(result)) return ''
-
-        store[key] = result
-        return showHintAboutSavedStatus ? '§aСохранено!' : ''
       },
     ])
   }

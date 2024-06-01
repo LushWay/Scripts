@@ -2,7 +2,7 @@ import { ProxyDatabase } from './proxy'
 
 export type DatabaseDefaultValue<Value> = (key: string) => NoInfer<Value>
 
-export function table<Value>(name: string, defaultValue: DatabaseDefaultValue<Value>): Record<string, Value>
+export function table<Value>(name: string, defaultValue?: DatabaseDefaultValue<Value>): Record<string, Value>
 export function table<Value>(name: string): Record<string, Value | undefined>
 
 /**
@@ -15,7 +15,7 @@ export function table<Value>(
   name: string,
   defaultValue?: DatabaseDefaultValue<Value>,
 ): Record<string, Value | undefined> {
-  return provider.createTable(name, defaultValue as DatabaseDefaultValue<Value>)
+  return provider.createTable(name, defaultValue)
 }
 
 export type DatabaseTable = Record<string, unknown>

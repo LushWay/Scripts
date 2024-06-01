@@ -59,12 +59,12 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
 
     try {
       this.onBrushUse(player, lore, hit)
-    } catch (e) {
+    } catch (e: unknown) {
       if (isInvalidLocation(e)) {
         fail('Блок не прогружен.')
       } else {
         console.error(e)
-        fail('Ошибка ' + util.error.message.get(e))
+        fail('Ошибка ' + util.error.message.get(e as Error))
       }
     }
   }

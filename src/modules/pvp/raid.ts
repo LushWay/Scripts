@@ -9,7 +9,7 @@ const raiderLockTime = util.ms.from('min', 10) / 20
 world.beforeEvents.explosion.subscribe(event => {
   const impactedBlocks = event.getImpactedBlocks().filter(block => {
     const region = Region.nearestRegion(block, event.dimension.type)
-    if (region && region.permissions.pvp) {
+    if (region?.permissions.pvp) {
       for (const id of region.permissions.owners) notify.set(id, targetLockTime)
       return true
     }

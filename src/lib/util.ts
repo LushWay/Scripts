@@ -221,11 +221,11 @@ export const util = {
           break
 
         case 'undefined':
-          value = c.undefined + value + '§r'
+          value = `${c.undefined}${value}§r`
           break
 
         default:
-          value = c.nonstring + value + '§r'
+          value = `${c.nonstring}${value}§r`
           break
       }
       return value
@@ -260,10 +260,10 @@ export const util = {
       const promise = fn()
       if (promise instanceof Promise)
         promise.catch((e: unknown) => {
-          console.error(prefix + this.error(e, { omitStackLines: 1 }))
+          console.error(prefix + this.error(e as Error, { omitStackLines: 1 }))
         })
     } catch (e: unknown) {
-      console.error(prefix + this.error(e, { omitStackLines: 1 }))
+      console.error(prefix + this.error(e as Error, { omitStackLines: 1 }))
     }
   },
 
@@ -443,6 +443,7 @@ export const util = {
     string += ' '
     if (brackets) string += bracketColor + '('
     string += color
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     string += number
     if (brackets) string += bracketColor + ')§r'
 
@@ -512,7 +513,8 @@ export const util = {
   /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
     return __SERVER__
-      ? text.replace(/§(.)/g, (_, a) => TerminalColors[a] ?? TerminalColors.r) + TerminalColors.r
+      ? text.replace(/§(.)/g, (_, a: string) => (TerminalColors[a] as string | undefined) ?? TerminalColors.r) +
+          TerminalColors.r
       : text.replace(/§(.)/g, '')
   },
 }

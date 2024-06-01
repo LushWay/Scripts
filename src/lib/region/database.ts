@@ -18,4 +18,11 @@ interface RadiusRegionSave {
   permissions: Partial<RegionPermissions>
 }
 
-export const RegionDatabase = table<CubeRegionSave | RadiusRegionSave>('region')
+export const RegionDatabase = table<CubeRegionSave | RadiusRegionSave>('region', () => ({
+  t: 'r',
+  permissions: {},
+  dimensionId: 'overworld',
+  center: { x: 0, y: 0, z: 0 },
+  st: 'radius',
+  radius: 0,
+}))

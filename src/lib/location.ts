@@ -22,11 +22,11 @@ export function locationWithRadius(group: string, name: string, fallback?: Locat
 
 /** Migration helper */
 export function migrateLocationName(oldName: string, newGroup: string, newName: string) {
-  const oldvalue = Settings.worldDatabase['locations'][oldName]
+  const oldvalue = Settings.worldDatabase.locations[oldName]
   if (oldvalue) {
     console.log(`§7[LocationNameMigration] Renaming '§f${oldName}§7' to '§f${newGroup} - ${newName}§7'`)
     Settings.worldDatabase[newGroup][newName] = oldvalue
-    Reflect.deleteProperty(Settings.worldDatabase['locations'], oldName)
+    Reflect.deleteProperty(Settings.worldDatabase.locations, oldName)
   } else if (!Settings.worldDatabase[newGroup][newName]) {
     console.warn(`§7[LocationNameMigration] No rename for '§f${oldName}§7'`)
   }
@@ -57,7 +57,7 @@ class Location<T extends Vector3> {
       name,
       description: location.format,
       value: fallback ? Object.values(fallback).join(' ').trim() : '',
-      onChange: () => location.load(),
+      onChange: () => location.load(true),
     }
 
     location.load()
@@ -84,7 +84,7 @@ class Location<T extends Vector3> {
     protected fallback?: T,
   ) {}
 
-  private load() {
+  private load(throws = false) {
     const raw = Settings.worldDatabase[this.group][this.name]
     if (typeof raw !== 'string' || raw === '') {
       if (this.fallback) this.updateLocation(this.fallback)
@@ -94,8 +94,8 @@ class Location<T extends Vector3> {
     const input = raw.trim().split(' ').map(Number)
     if (input.length !== this.format.split(' ').length || input.some(e => isNaN(e))) {
       const error = new TypeError(`Invalid location, expected '${this.format}' but recieved '${util.stringify(raw)}'`)
-      if (__VITEST__) throw error
-      else return console.error(error)
+      if (throws) throw error
+      else return console.warn(error)
     }
 
     for (const [i, key] of Object.keys(this.locationFormat).entries()) {
@@ -110,8 +110,8 @@ class Location<T extends Vector3> {
     this.firstLoad = false
   }
 
-  get safe(): ValidSafeLocation<T> | InvalidSafeLocation<T> {
-    return Object.setPrototypeOf(this.location, this)
+  get safe() {
+    return Object.setPrototypeOf(this.location, this) as ValidSafeLocation<T> | InvalidSafeLocation<T>
   }
 
   get valid() {
@@ -131,7 +131,7 @@ class LocationWithRotation extends Location<Vector3 & { xRot: number; yRot: numb
   protected locationFormat = { x: 0, y: 0, z: 0, xRot: 0, yRot: 0 }
 
   protected get teleportOptions(): TeleportOptions {
-    return { rotation: { x: this.locationFormat.xRot, y: this.locationFormat.yRot } }
+    return { rotation: { x: this.location.xRot, y: this.location.yRot } }
   }
 }
 

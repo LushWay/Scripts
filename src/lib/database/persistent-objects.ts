@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { world } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
 import { DatabaseError } from './abstract'
@@ -18,7 +21,7 @@ export class PersistentSet<T> extends Set<T> {
           return
         }
 
-        parsed.forEach(value => this.add(value))
+        parsed.forEach(value => this.add(value as T))
       }
     } catch (error) {
       console.error(new DatabaseError(`Failed to init PersistentSet<${this.id}>`), error)
@@ -39,7 +42,7 @@ expand(PersistentSet.prototype, {
   delete(...args: unknown[]) {
     const result = super.delete(...args)
     this.save()
-    return result
+    return result as boolean
   },
   clear() {
     super.clear()

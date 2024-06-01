@@ -76,9 +76,9 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
     }))
     .sort((a, b) => a.distance - b.distance)
 
-  const nearestPlace = places[0].place
+  const nearestPlace = places[0]?.place as DefaultPlaceWithSafeArea | undefined
 
-  if (nearestPlace && nearestPlace.portalTeleportsTo.valid) {
+  if (nearestPlace?.portalTeleportsTo.valid) {
     player.teleport(nearestPlace.portalTeleportsTo)
   } else {
     delete player.database.survival.anarchy
@@ -118,7 +118,7 @@ actionGuard((player, _, ctx) => {
   if (typeof owner !== 'string') return
 
   if (owner === player.id) return true
-  if (Player.database[owner]?.survival.newbie) return false
+  if (Player.database[owner].survival.newbie) return false
 })
 
 const quest = new Quest(

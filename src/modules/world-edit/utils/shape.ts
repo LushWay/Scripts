@@ -37,16 +37,15 @@ export function placeShape(
     )
 
     const cuboid = new Cuboid(loc1, loc2)
-    const conditionFunction = new Function(
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const condition = new Function(
       'x, y, z, {xMin, xMax, yMin, yMax, zMin, zMax, xCenter, yCenter, zCenter, xRadius, yRadius, zRadius}, rad',
       `return ${shape}`,
-    )
-
-    const condition: (...args: number[]) => boolean = (x, y, z): boolean => conditionFunction(x, y, z, cuboid, size)
+    ) as (x: number, y: number, z: number, cuboid: Cuboid, size: number) => boolean
 
     let blocksSet = 0
     for (const { x, y, z } of Vector.foreach(loc1, loc2)) {
-      if (!condition(x, y, z)) continue
+      if (!condition(x, y, z, cuboid, size)) continue
       const location = Vector.add(pos, { x, y, z })
       const block = player.dimension.getBlock(location)
       for (const replaceBlock of replaceBlocks) {

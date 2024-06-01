@@ -25,10 +25,10 @@ export async function request<Path extends keyof Scripts.Routes>(
 
     let body
     try {
-      body = JSON.parse(response.body)
+      body = JSON.parse(response.body) as { status: number }
     } catch (error) {
       throw new RequestError(
-        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${util.error(error)}`,
+        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${util.error(error as Error)}`,
       )
     }
 

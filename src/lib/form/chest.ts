@@ -26,7 +26,7 @@ const SIZES = {
 interface ChestButton {
   text: string
   icon: string | undefined | number
-  callback?: (p: Player) => void
+  callback?: (p: Player) => void | Promise<void>
 }
 
 export interface ChestButtonOptions {
@@ -119,7 +119,7 @@ export class ChestForm {
       const row = pattern[y]
       for (let x = 0; x < row.length; x++) {
         const slot = key[row[x]]
-        if (!slot) continue
+        if (typeof slot === 'undefined') continue
 
         this.button({
           ...slot,
@@ -148,6 +148,6 @@ export class ChestForm {
         if (!callback) this.show(player)
         else util.catch(() => callback(player))
       })
-      .catch(console.error)
+      .catch((e: unknown) => console.error(e))
   }
 }

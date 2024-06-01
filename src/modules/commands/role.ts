@@ -1,5 +1,5 @@
 import { Player, world } from '@minecraft/server'
-import { FormCallback, ROLES, getRole, setRole, util } from 'lib'
+import { FormCallback, ROLES, getRole, setRole } from 'lib'
 import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
 import { WHO_CAN_CHANGE } from 'lib/roles'
@@ -110,9 +110,6 @@ function roleMenu(player: Player) {
 
             .addTextField('Причина смены роли', `Например, "чел дурной, пол технограда снес"`)
             .show(player, (formCtx, notify, showName, newrole, message) => {
-              if (!newrole)
-                return formCtx.error('Неизвестная роль: ' + newrole + '§r, допустимые: ' + util.inspect(ROLES))
-
               if (target instanceof Player) {
                 if (notify && target instanceof Player)
                   target.info(

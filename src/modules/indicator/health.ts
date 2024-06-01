@@ -87,7 +87,7 @@ class HealthIndicator {
         for (const [id, info] of this.hurtEntities) {
           const entity = info.hurtEntity
 
-          if (!entity || (info.damage === 0 && info.expires < now)) {
+          if (info.damage === 0 && info.expires < now) {
             if (info.separated && info.indicator.isValid()) info.indicator.remove()
             this.hurtEntities.delete(id)
             continue

@@ -102,8 +102,6 @@ class JoinBuilder {
 
   private join(player: Player, where: 'air' | 'ground') {
     delete player.database.join
-
-    player.scores.joinTimes ??= 0
     player.scores.joinTimes++
 
     const message = Join.config.messages[where]

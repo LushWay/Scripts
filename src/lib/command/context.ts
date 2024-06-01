@@ -37,7 +37,7 @@ export class CommandContext {
    * @param text Message or a lang code
    */
   reply(text: unknown) {
-    this.player.tell(text + '')
+    this.player.tell(`${text}`)
     this.player.playSound(Sounds.Click)
   }
 

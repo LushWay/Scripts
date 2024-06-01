@@ -1,10 +1,10 @@
 import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/server'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Core } from 'lib/extensions/core'
 import { util } from '../util'
 import { DatabaseError } from './abstract'
 import { DatabaseUtils } from './utils'
-import { Core } from 'lib/extensions/core'
 
 const tableType = 'inventory'
 
@@ -60,7 +60,7 @@ export class InventoryStore {
     if (clearAll) container.clearAll()
     for (const [i, item] of Object.entries(from.slots)) {
       try {
-        if (item) container.setItem(Number(i), item)
+        if (typeof item !== 'undefined') container.setItem(Number(i), item)
       } catch (e) {
         to.fail(`Не удалось загрузить предмет в слот ${i}.`)
         console.error(
@@ -194,12 +194,12 @@ export class InventoryStore {
         continue
       }
 
-      if (!slots) {
+      if (typeof slots === 'undefined') {
         return console.error(new DatabaseError(`Failed to load InventoryStore(${this.tableName}): No manifest found!`))
       }
 
       const slot = slots[step]
-      if (slot) {
+      if (typeof slot !== 'undefined') {
         const { type, index } = slot
         // @ts-expect-error AAAAAAAAAAAAAAAA
         store[type][index] = item
@@ -250,7 +250,7 @@ export class InventoryStore {
       }
 
       for (const [key, stack] of Object.entries(store.slots)) {
-        if (!stack) continue
+        if (typeof stack === 'undefined') continue
 
         const move = manifest.slots.push(Number(key))
         items[storeIndex + move] = stack

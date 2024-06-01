@@ -10,7 +10,7 @@ import { ActionForm } from './form/action'
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
 
-  static createItem(typeId = CustomItems.Menu, name = '§b§lМеню\n§r§f(use)') {
+  static createItem(typeId: string = CustomItems.Menu, name = '§b§lМеню\n§r§f(use)') {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
@@ -70,7 +70,7 @@ export class Compass {
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(CustomItems.CompassPrefix + i, '§r§l§6Цель\n§r§7(use)')
+    return Menu.createItem(`${CustomItems.CompassPrefix}${i}`, '§r§l§6Цель\n§r§7(use)')
   })
 
   /** Map of player as key and compass target as value */
@@ -99,12 +99,12 @@ export class Compass {
     if (!Vector.valid(target.value)) return
 
     const direction = this.getCompassIndex(player.getViewDirection(), player.location, target.value)
-    const typeId = CustomItems.CompassPrefix + direction
+    const typeId = `${CustomItems.CompassPrefix}${direction}`
     if (slot.typeId === typeId || typeof direction !== 'number') return
 
     const item = this.items[direction]
     try {
-      if (item) slot.setItem(item)
+      if (typeof item !== 'undefined') slot.setItem(item)
     } catch (e) {}
   })
 
@@ -122,7 +122,7 @@ export class Compass {
 export function createPublicGiveItemCommand(
   name: string,
   itemStack: ItemStack,
-  is: ItemStack['is'] = itemStack.is.bind(itemStack),
+  is = itemStack.is.bind(itemStack) as ItemStack['is'],
 ) {
   const itemNameTag = itemStack.nameTag?.split('\n')[0]
 
@@ -136,12 +136,12 @@ export function createPublicGiveItemCommand(
     if (mode === 'tell') {
       if (items.length) {
         for (const [i] of items) container.setItem(i, void 0)
-        player.info('§c- ' + itemNameTag)
+        player.info(`§c- ${itemNameTag}`)
       } else {
         container.addItem(itemStack)
-        player.info('§a+ ' + itemNameTag)
+        player.info(`§a+ ${itemNameTag}`)
       }
-    } else if (mode === 'ensure') {
+    } else {
       if (!items.length) {
         container.addItem(itemStack)
       }

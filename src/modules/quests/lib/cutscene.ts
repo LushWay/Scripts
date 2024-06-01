@@ -33,10 +33,12 @@ export class Cutscene {
   static db = table<Sections>('cutscene', () => [])
 
   /** List of all cutscenes */
-  static list: Record<string, Cutscene> = {}
+  static all = new Map<string, Cutscene>()
 
   static getCurrent(player: Player) {
-    return Object.values(this.list).find(e => e.current.get(player.id))
+    for (const cutscene of this.all.values()) {
+      if (cutscene.current.get(player.id)) return cutscene
+    }
   }
 
   /** List of cutscene sections */
@@ -61,7 +63,7 @@ export class Cutscene {
     public id: string,
     public displayName: string,
   ) {
-    Cutscene.list[id] = this
+    Cutscene.all.set(id, this)
 
     this.sections = Cutscene.db[this.id].slice()
   }
@@ -127,7 +129,7 @@ export class Cutscene {
         }
       },
       { controller, exit: () => this.exit(player) },
-    ).catch(console.error)
+    )
 
     this.current.set(player.id, {
       player,
@@ -155,20 +157,20 @@ export class Cutscene {
       intervalTime = this.intervalTime,
     }: { controller: AbortController; sections?: Sections; exit?: VoidFunction; intervalTime?: number },
   ) {
+    const end = new Error('End.')
     try {
       for (const [sectionIndex, section] of sections.entries()) {
-        if (!section) throw 0
+        if (!section) throw end
 
         for (const { index: pointIndex, ...point } of this.pointIterator(section)) {
-          if (controller.cancel) throw 0
+          if (controller.cancel) throw end
 
           await callback(point, pointIndex, section, sectionIndex)
           await system.sleep(intervalTime)
         }
       }
     } catch (error) {
-      // 0 means end
-      if (error !== 0) console.error(error)
+      if (error !== end) console.error(error)
     } finally {
       exit?.()
     }

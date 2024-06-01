@@ -103,11 +103,11 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
       priority: 0,
     })
 
-    const priority = options?.priority ?? 0
+    const priority = options.priority ?? 0
     if (screenDisplay.priority > priority) return
     else screenDisplay.priority = priority
 
-    if (options && type === 'title') {
+    if (typeof options !== 'undefined' && type === 'title') {
       const totalTicks = options.fadeInDuration + options.fadeOutDuration + options.stayDuration
       if (totalTicks !== -1) {
         screenDisplay.expires = Date.now() + totalTicks * TicksPerSecond
@@ -117,7 +117,7 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
     // Do not update same text
     if (screenDisplay.value === message) {
       if (type === 'title') {
-        if (screenDisplay.subtitle === options?.subtitle) return
+        if (screenDisplay.subtitle === options.subtitle) return
       } else return
     }
 
@@ -125,10 +125,11 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
       if (!player.isValid()) return
 
       try {
-        const title = `${prefix === $tipPrefix ? prefix + n : prefix}${message}`
-        options ??= { ...defaultTitleOptions }
+        const title = `${prefix === $tipPrefix ? `${prefix}${n}` : prefix}${message}`
+        if (typeof options === 'undefined') options = { ...defaultTitleOptions }
 
         // @ts-expect-error AAAAAAAAAAAAAAA
+        // eslint-disable-next-line
         player[ScreenDisplaySymbol].setTitle(title, options)
       } catch (e) {
         console.error(e)
@@ -137,7 +138,7 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
       // Update references
       screenDisplay.value = message
       if (type === 'title') {
-        screenDisplay.subtitle = options?.subtitle
+        screenDisplay.subtitle = options.subtitle
       }
     })
   },
@@ -196,8 +197,7 @@ system.run(() => {
         if (event.title?.expires && event.title.expires < Date.now()) {
           player?.onScreenDisplay.setHudTitle('', {
             ...defaultTitleOptions,
-
-            priority: event.title.priority ?? 0,
+            priority: (event.title.priority as number | undefined) ?? 0,
           })
 
           titles.delete(id)

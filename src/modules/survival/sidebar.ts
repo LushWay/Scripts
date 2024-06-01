@@ -67,22 +67,23 @@ const survivalSidebar = new Sidebar(
 
       const scores = `§6$${names.money}${emoji.money} §2$${names.leafs}${emoji.leaf}`
       const online = `§f$${names.online}§7/55${emoji.online}`
-      const second = `${scores} ${online}${settings?.mode === 'sidebar' ? '\n \n' : ''}`
+      const second = `${scores} ${online}${settings.mode === 'sidebar' ? '\n \n' : ''}`
 
       return {
         format:
-          settings?.mode === 'sidebar'
+          settings.mode === 'sidebar'
             ? `${main}\n${second}\n$${names.quest}`
             : [second, `$${names.quest}`, main, undefined, undefined],
 
-        maxWordCount: settings?.sidebarMaxWordLength ?? 20,
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        maxWordCount: settings.sidebarMaxWordLength ?? 20,
       }
     },
   },
   {
     [names.region]: (player, settings) => {
       const regions = Region.nearestRegions(player.location, player.dimension.type)
-      const region = regions[0]
+      const region = regions[0] as Region | undefined
       let text = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
       if (player.database.inv === 'anarchy') {
         if (region) {

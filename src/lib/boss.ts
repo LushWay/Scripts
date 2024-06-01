@@ -107,7 +107,7 @@ export class Boss {
     if (isChunkUnloaded({ dimensionId: this.dimensionId, location: this.location })) return
 
     const db = Boss.db[this.name]
-    if (db) {
+    if (typeof db !== 'undefined') {
       if (db.dead) {
         this.checkRespawnTime(db)
       } else {

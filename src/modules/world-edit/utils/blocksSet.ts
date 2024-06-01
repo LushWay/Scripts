@@ -16,10 +16,10 @@ export type BlocksSetRef = [owner: string, blocksSetName: string]
 const blocksSets = table<BlocksSets>('blockSets')
 
 export function getOtherPlayerBlocksSets(playerId: string): [string, BlocksSets][] {
-  return (Object.entries(blocksSets) as [string, BlocksSets][]).filter(e => e[0] !== playerId && e[0])
+  return Object.entries(blocksSets).filter(e => e[0] !== playerId && e[0])
 }
 
-export function getAllBlocksSets(id: string): BlocksSets {
+export function getAllBlocksSets(id: string): Record<string, BlocksSet | undefined> {
   const playerBlocksSets = blocksSets[id] ?? {}
   return { ...playerBlocksSets, ...DEFAULT_BLOCK_SETS }
 }
@@ -31,7 +31,7 @@ export function getOwnBlocksSetsCount(id: string) {
 export function setBlocksSet(id: string, setName: string, set: BlocksSet | undefined) {
   blocksSets[id] ??= {}
   const db = blocksSets[id]
-  if (db) {
+  if (typeof db !== 'undefined') {
     if (set) {
       // Append new set onto start
 
@@ -42,12 +42,12 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
   }
 }
 
-function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet {
-  return getAllBlocksSets(playerId)[blocksSetName].filter(e => e[2] > 0)
+function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet | undefined {
+  return getAllBlocksSets(playerId)[blocksSetName]?.filter(e => e[2] > 0)
 }
 
 export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {
-  return getActiveBlockInSetByRef([playerId, blocksSetName])
+  return (getActiveBlockInSetByRef([playerId, blocksSetName]) ?? [])
     .map(([type, states, weight]) => {
       let permutation
 
@@ -74,7 +74,7 @@ export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {
 }
 
 export function getBlocksSetForReplaceTarget(ref: BlocksSetRef) {
-  return getActiveBlockInSetByRef(ref).map(e => {
+  return (getActiveBlockInSetByRef(ref) ?? [undefined]).map(e => {
     if (Array.isArray(e)) {
       const [typeId, states] = e
       return { typeId, states: states ?? {} }

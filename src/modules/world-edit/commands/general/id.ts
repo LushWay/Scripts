@@ -6,9 +6,8 @@ const root = new Command('id').setDescription('Выдает айди').setPermis
 
 root.executes(ctx => {
   const item = ctx.player.mainhand()
-  if (!item) return ctx.reply('§cВ руке нет предмета!')
-
-  let message = `§b► §f${item?.typeId?.replace('minecraft:', '')} ${item?.nameTag ? `(${item?.nameTag}) ` : ''}`
+  if (!item.typeId) return ctx.error('Нет предмета!')
+  let message = `§b► §f${item.typeId.replace('minecraft:', '')} ${item.nameTag ? `(${item.nameTag}) ` : ''}`
   if (item.nameTag) message += ` (${item.nameTag})`
   if (!item.isStackable && item.getDynamicPropertyIds().length) {
     message +=
@@ -22,8 +21,9 @@ root
   .overload('l')
   .setDescription('Выдает id блока по локации')
   .location('location', true)
-  .executes((ctx, location) => {
+  .executes((ctx, location = ctx.player.location) => {
     const l = Vector.floor(location)
+
     const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
     ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(block.permutation.getAllStates())}`)
@@ -33,7 +33,7 @@ root
   .overload('p')
   .setDescription('Выдает все states блока по локации')
   .location('location', true)
-  .executes((ctx, location) => {
+  .executes((ctx, location = ctx.player.location) => {
     const l = Vector.floor(location)
     const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
@@ -55,11 +55,11 @@ root
       excludeTags: [MinecraftEntityTypes.Player],
       location: ctx.player.location,
       closest: 1,
-    })[0]
-    if (!entity) return ctx.error('No entity found!')
+    })
+    if (!entity[0]) return ctx.error('No entity found!')
 
-    let message = `${entity.typeId}`
-    for (const c of entity.getComponents()) {
+    let message = entity[0].typeId
+    for (const c of entity[0].getComponents()) {
       message +=
         '\n' +
         util.inspect(

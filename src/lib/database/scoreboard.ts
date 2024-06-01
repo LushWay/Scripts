@@ -51,7 +51,8 @@ const untypedDisplayNames: Record<string, string> = displayNames
 
 expand(ScoreboardObjective.prototype, {
   get displayName() {
-    return untypedDisplayNames[this.id] ?? super.displayName
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return (untypedDisplayNames[this.id] ?? super.displayName) as string
   },
 })
 
@@ -60,10 +61,9 @@ Reflect.defineProperty(Player.prototype, 'scores', {
   configurable: false,
   enumerable: true,
   get() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const player: Player = this
+    const player = this as Player
 
-    if (players[player.id]) {
+    if (typeof players[player.id] !== 'undefined') {
       let valid = false
       try {
         valid = players[player.id].player.isValid()
@@ -81,7 +81,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
             money: 0,
           },
           {
-            set(_, p, newValue) {
+            set(_, p, newValue: number) {
               if (typeof p === 'symbol')
                 throw new Error('Symbol objectives to set are not accepted, recieved ' + util.stringify(p))
 
@@ -90,7 +90,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
             },
             get(_, p) {
               if (typeof p === 'symbol')
-                throw new Error('Symbol objectives to get are not accepted, recieved ' + p.description)
+                throw new Error(`Symbol objectives to get are not accepted, recieved ${p.description}`)
 
               try {
                 return ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(obj.player.id) ?? 0
@@ -162,7 +162,7 @@ export class ScoreboardDB {
   }
 
   reset() {
-    this.scoreboard.getParticipants().forEach(this.scoreboard.removeParticipant)
+    this.scoreboard.getParticipants().forEach(e => this.scoreboard.removeParticipant(e))
   }
 }
 

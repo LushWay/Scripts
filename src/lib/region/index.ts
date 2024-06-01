@@ -36,7 +36,7 @@ type InteractionAllowed = (
 ) => boolean | void
 
 type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
-export type RegionCallback = (player: Player, region: Region) => void
+export type RegionCallback = (player: Player, region: Region | undefined) => void
 
 const ACTION_GUARD = new EventSignal<Parameters<InteractionAllowed>, boolean | undefined, InteractionAllowed>()
 
@@ -75,8 +75,8 @@ export function loadRegionsWithGuards({
     const region = Region.nearestRegion(event.block, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithBlock', event })) return
 
-    if (DOORS_AND_SWITCHES.includes(event.block.typeId) && region?.permissions?.doorsAndSwitches) return
-    if (BLOCK_CONTAINERS.includes(event.block.typeId) && region?.permissions?.openContainers) return
+    if (DOORS_AND_SWITCHES.includes(event.block.typeId) && region?.permissions.doorsAndSwitches) return
+    if (BLOCK_CONTAINERS.includes(event.block.typeId) && region?.permissions.openContainers) return
 
     event.cancel = true
   })
@@ -118,15 +118,14 @@ export function loadRegionsWithGuards({
     () => {
       for (const player of world.getAllPlayers()) {
         const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
-        const newest = Region.nearestRegions(player.location, player.dimension.type)
+        const nearest = Region.nearestRegions(player.location, player.dimension.type)
 
-        if (newest.length !== previous.length || previous.some((region, i) => region !== newest[i])) {
-          EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })
+        if (nearest.length !== previous.length || previous.some((region, i) => region !== nearest[i])) {
+          EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest: nearest })
         }
 
-        RegionEvents.playerInRegionsCache.set(player, newest)
-
-        regionCallback(player, newest[0])
+        RegionEvents.playerInRegionsCache.set(player, nearest)
+        regionCallback(player, nearest[0])
       }
     },
     'region callback',

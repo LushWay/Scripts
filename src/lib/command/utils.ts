@@ -9,19 +9,15 @@ export function parseCommand(message: string, prefixSize = 1) {
   const command = message.slice(prefixSize).trim()
 
   const match = command.match(/^(?<command>[^\s]+)\s?(?<input>.+)?$/)
-  if (!match || !match.groups || !match.groups.command) return false
+  if (!match?.groups?.command) return false
 
   const cmd = match.groups.command
-  const input = match.groups.input ?? ''
+  const input = (match.groups.input as string | undefined) ?? ''
   const args = parseArguments(input)
 
   return { cmd, args, input }
 }
 
-/**
- * @param {string} message
- * @returns {string[]}
- */
 export function parseArguments(message: string): string[] {
   const augments = message
     .trim()
@@ -44,7 +40,7 @@ export function commandNotFound(player: Player, command: string): void {
       },
       {
         translate: `commands.generic.unknown`,
-        with: [`${command}`],
+        with: [command],
       },
     ],
   })
@@ -64,9 +60,9 @@ function suggestCommand(player: Player, command: string): void {
 
   const cmds = new Set<string>()
 
-  for (const c of Command.commands.filter(e => e.sys.requires && e.sys.requires(player))) {
+  for (const c of Command.commands.filter(e => e.sys.requires(player))) {
     cmds.add(c.sys.name)
-    if (c.sys.aliases && c.sys.aliases?.length > 0) {
+    if (c.sys.aliases.length > 0) {
       c.sys.aliases.forEach(e => cmds.add(e))
     }
   }
@@ -100,7 +96,7 @@ function suggestCommand(player: Player, command: string): void {
  */
 export function commandNoPermissions(player: Player, command: import('./index').Command): void {
   let additional = ''
-  if (__DEV__ && command.sys.role) {
+  if (__DEV__ && typeof command.sys.role !== 'undefined') {
     additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.role]}§c`
   }
   player.fail(
@@ -144,7 +140,7 @@ export function parseLocationArguments(
   const locations = [location.x, location.y, location.z]
   const viewVectors = [viewVector.x, viewVector.y, viewVector.z]
   const a = [x, y, z].map(arg => {
-    const r = parseFloat(arg?.replace(/^[~^]/g, ''))
+    const r = parseFloat(arg.replace(/^[~^]/g, ''))
     return isNaN(r) ? 0 : r
   })
   const b = [x, y, z].map((arg, index) => {
@@ -193,12 +189,16 @@ export function sendCallback(
 
   ;(async () => {
     try {
-      await lastArg.sys.callback?.(new CommandContext(event, cmdArgs, baseCommand, rawInput), ...argsToReturn)
+      await (lastArg.sys.callback?.(
+        new CommandContext(event, cmdArgs, baseCommand, rawInput),
+        // @ts-expect-error AAAAAAAAAAAA
+        ...argsToReturn,
+      ) as Promise<void> | void)
     } catch (e) {
       event.sender.warn(
         'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.',
       )
       console.error(e)
     }
-  })().catch(console.error)
+  })()
 }

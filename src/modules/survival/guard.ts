@@ -38,7 +38,7 @@ loadRegionsWithGuards({
 
   regionCallback(player, currentRegion) {
     if (currentRegion) {
-      if (!currentRegion?.permissions.pvp && !isBuilding(player)) {
+      if (!currentRegion.permissions.pvp && !isBuilding(player)) {
         player.triggerEvent('player:spawn')
       }
     }

@@ -9,7 +9,7 @@ type ProxiedDynamicObject = DynamicObject & {
 }
 
 export class ProxyDatabase<Key extends string = string, Value = undefined> {
-  private static getUnproxied<T extends DynamicObject>(value: T): T {
+  private static getUnproxied<T>(value: T): T {
     if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET] as T
     return value
   }
@@ -19,8 +19,8 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
    *
    * **Caution**: This creates new object on every use, consider using {@link ProxyDatabase.immutableUnproxy} instead
    */
-  static unproxy<T extends object>(value: T): T {
-    if (typeof value === 'object' && value !== null)
+  static unproxy<T>(value: T): T {
+    if (value !== null && typeof value === 'object')
       return this.setDefaults({}, this.getUnproxied(value as DynamicObject)) as T
 
     return value
@@ -171,6 +171,7 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
         if (typeof p === 'symbol') return Reflect.set(target, p, value, reciever)
 
         // Set value
+        // eslint-disable-next-line
         if (value[IS_PROXIED]) value = value[PROXY_TARGET]
 
         const setted = Reflect.set(target, p, value, reciever)

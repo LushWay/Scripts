@@ -131,7 +131,7 @@ class ItemLore<T extends TypeSchema> {
 
         get(): Schema.Property.Saveable {
           const saved = itemStack.getDynamicProperty(key)
-          if (typeof saved === 'string') return JSON.parse(saved)
+          if (typeof saved === 'string') return JSON.parse(saved) as Schema.Property.Saveable
           if (defaultConfig[key]) return defaultConfig[key] as Schema.Property.Saveable
 
           if (isRequired) {

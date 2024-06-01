@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { ItemStack, MolangVariableMap, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
@@ -10,12 +12,12 @@ import {
   BUTTON,
   ChestForm,
   DatabaseUtils,
-  Loot,
   Mail,
   NpcForm,
   Settings,
   Vector,
   is,
+  isKeyof,
   itemLocaleName,
   restorePlayerCamera,
   util,
@@ -122,35 +124,6 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
         40,
       )
     })
-  },
-  airdrop(ctx) {
-    if (ctx.arguments[1]) ctx.reply('Аирдроп для')
-
-    const airdrop = new Airdrop({
-      loot: Object.values(Loot.instances)[0],
-      forPlayerId: ctx.arguments[1] ? ctx.player.id : undefined,
-    })
-
-    airdrop.spawn(Vector.add(Vector.floor(ctx.player.location), { x: 0, z: 0, y: 30 }))
-
-    system.runTimeout(
-      () => {
-        const a = system.runInterval(
-          () => {
-            if (!airdrop.chestMinecart || !airdrop.chestMinecart.isValid()) {
-              //|| airdrop.status === 'being looted'
-              return system.clearRun(a)
-            }
-
-            airdrop.showParticleTrace()
-          },
-          'test airdrop',
-          20,
-        )
-      },
-      'test airdrop',
-      20,
-    )
   },
   slot(ctx) {
     ctx.reply(ctx.player.selectedSlot)
@@ -345,8 +318,8 @@ const c = new Command('test').setDescription('Разные тесты')
 c.string('id', true).executes(async (ctx, id) => {
   const source = is(ctx.player.id, 'techAdmin') ? { ...publicTests, ...tests } : tests
   const keys = Object.keys(source)
-  if (!keys.includes(id)) return ctx.error('Неизвестный тест ' + id + ', доступные:\n§f' + keys.join('\n'))
+  if (!isKeyof(id as string, source)) return ctx.error('Неизвестный тест ' + id + ', доступные:\n§f' + keys.join('\n'))
   ctx.reply('Tест ' + id)
 
-  util.catch(() => source[id](ctx), 'Test')
+  util.catch(() => source[id as string](ctx), 'Test')
 })

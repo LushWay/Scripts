@@ -7,7 +7,7 @@
  * @param gramSize The size of the grams. Defaults to length 2.
  */
 export function stringSimilarity(str1: string, str2: string, gramSize = 2) {
-  if (!str1?.length || !str2?.length) {
+  if (!str1.length || !str2.length) {
     return 0.0
   }
 
@@ -28,13 +28,9 @@ export function stringSimilarity(str1: string, str2: string, gramSize = 2) {
   return hits / total
 }
 
-/**
- * @param {string} s
- * @param {number} len
- */
 function getNGrams(s: string, len: number) {
   s = ' '.repeat(len - 1) + s.toLowerCase() + ' '.repeat(len - 1)
-  const v = new Array(s.length - len + 1)
+  const v = new Array<string>(s.length - len + 1)
   for (let i = 0; i < v.length; i++) {
     v[i] = s.slice(i, i + len)
   }

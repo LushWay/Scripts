@@ -136,19 +136,19 @@ new Command('player')
 GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
   let succeed = false
   for (let e = 0; e < 5; e++) {
-    const player = test.spawnSimulatedPlayer({ x: -1, y: 3, z: -1 }, 'Tester (' + e + ')', GameMode.adventure)
+    const player = test.spawnSimulatedPlayer({ x: -1, y: 3, z: -1 }, `Tester (${e})`, GameMode.adventure)
     player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) })
     await test.idle(Math.random() * 50)
     util.catch(async () => {
       while (!succeed) {
         await test.idle(Math.random() * 40)
-        if (!player) break
+        if (!player.isValid()) break
         const net = player.dimension.getEntities({
           location: player.location,
           type: 'minecraft:player',
           closest: 1,
         })[0]
-        if (!net) continue
+        if (typeof net === 'undefined') continue
         player.lookAtEntity(net)
         await test.idle(20)
         // player.stopMoving();
@@ -178,6 +178,6 @@ function rd(max: number, min = 0, msg = false) {
   if (max == min || max < min) return max
 
   const rd = Math.round(min + Math.random() * (max - min))
-  if (msg) world.say(msg + '\nmax: ' + max + ' min: ' + min + ' rd: ' + rd)
+  if (msg) world.say(`${msg}\nmax: ${max} min: ${min} rd: ${rd}`)
   return rd
 }

@@ -1,8 +1,9 @@
 import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Temporary, isChunkUnloaded } from 'lib'
+import { Temporary, Vector, isChunkUnloaded } from 'lib'
 import { location } from './location'
+import { t } from './text'
 
 type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void | false
 
@@ -27,7 +28,7 @@ export class Npc {
 
   static npcs: Npc[] = []
 
-  private readonly location
+  private location
 
   private entity: Entity | undefined
 
@@ -41,7 +42,9 @@ export class Npc {
     this.dimensionId = options.dimensionId ?? 'overworld'
     this.location = location(options.group, options.name)
     this.location.onLoad.subscribe(location => {
+      console.log('location is valid')
       if (this.entity) this.entity.teleport(location)
+      this.location = location
     })
 
     Npc.npcs.push(this)
@@ -56,12 +59,12 @@ export class Npc {
 
   private onQuestInteraction: OnInteract = event => {
     for (const interaction of this.questInteractions) {
-      if (interaction(event)) return // Return on first successfull interaction
+      if (interaction(event) !== false) return // Return on first successfull interaction
     }
   }
 
   private spawn() {
-    console.debug('Spawning npc')
+    console.debug('Spawning npc at ' + Vector.string(this.location as Vector3))
     if (!this.location.valid) {
       throw new TypeError(`§cNpc(§r${this.id}§r§c): Location is not valid, spawn is impossible. Set location first`)
     }
@@ -83,8 +86,9 @@ export class Npc {
     if (!npc) return
 
     entity.setDynamicProperty(Npc.dynamicPropertyName, this.id)
-    npc.name = this.options.name
+    npc.name = '§6§l' + this.options.name
     if (typeof this.options.skin === 'number') npc.skinIndex = this.options.skin
+    if (this.location.valid) entity.teleport(this.location)
   }
 
   static {
@@ -128,16 +132,15 @@ export class Npc {
           })))
 
           const filteredNpcs = npcs.filter(e => e.npc === npc.id)
-          console.debug({ filteredNpcs: filteredNpcs.length, npcs: npcs.length })
+          console.debug(
+            t`${'NpcLoading'}: all: ${npcs.length}, filtered: ${filteredNpcs.length}, action: ${filteredNpcs.length > 1 ? 'removing' : 'none'}`,
+          )
 
           if (filteredNpcs.length > 1) {
-            console.debug('More then one')
             // More then one? Save only first one, kill others
             npc.entity = filteredNpcs.shift()?.entity
-
             filteredNpcs.forEach(e => e.entity.remove())
           } else {
-            console.debug('Found one')
             npc.entity = filteredNpcs[0]?.entity
           }
 

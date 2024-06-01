@@ -68,8 +68,8 @@ export function createSelectPlayerMenu(
     `${options.title}§r §f§l${selected.length}§7/${players.length}\n§r§7${selected
       .slice(0, 10)
       .map(e => e.name)
-      .join(', §r§7')}` as string,
-    BUTTON['+'] as string,
+      .join(', §r§7')}`,
+    BUTTON['+'],
     callback,
   ] as const
 }

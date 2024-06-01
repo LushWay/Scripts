@@ -86,15 +86,12 @@ export class WorldEdit {
 
   constructor(private player: Player) {
     const id = player.id
-
     if (id in WorldEdit.instances) return WorldEdit.instances[id]
-
     WorldEdit.instances[id] = this
 
     let db = WorldEdit.db[this.player.id]
-    if (!db) {
+    if (typeof db === 'undefined') {
       db = { pos1: Vector.one, pos2: Vector.one }
-
       WorldEdit.db[this.player.id] = db
     }
 
@@ -303,10 +300,10 @@ export class WorldEdit {
           integrity,
           integritySeed,
         })
-      } catch (e) {
+      } catch (e: unknown) {
         if (e instanceof Error) {
           player.fail(e.message)
-        } else throw new Error(e)
+        } else throw e
       }
 
       this.player.success(`Успешно вставлено в ${Vector.string(pastePos1)}`)

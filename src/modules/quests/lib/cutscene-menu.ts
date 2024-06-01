@@ -29,14 +29,14 @@ cutscene
   .setPermissions('techAdmin')
   .string('name', false)
   .executes((ctx, name) => {
-    const cutscene = Cutscene.list[name]
-    if (!cutscene) return ctx.error(Object.keys(Cutscene.list).join('\n'))
+    const cutscene = Cutscene.all.get(name)
+    if (!cutscene) return ctx.error(Object.keys(Cutscene.all).join('\n'))
 
     cutscene.play(ctx.player)
   })
 
 function selectCutsceneMenu(player: Player) {
-  new ArrayForm('Катсцены', 'Список доступных для редактирования катсцен:', Object.values(Cutscene.list), {
+  new ArrayForm('Катсцены', 'Список доступных для редактирования катсцен:', [...Cutscene.all.values()], {
     filters: {},
     button(cutscene) {
       return [cutscene.id, null, () => manageCutsceneMenu(player, cutscene)]
@@ -48,7 +48,7 @@ function manageCutsceneMenu(player: Player, cutscene: Cutscene) {
   new ActionForm(
     cutscene.id,
     `Секций: ${cutscene.sections.length}\nТочек: ${cutscene.sections.reduce(
-      (count, section) => (section ? count + section?.points.length : count),
+      (count, section) => (section ? count + section.points.length : count),
       0,
     )}`,
   )

@@ -60,7 +60,7 @@ function tpToPlayer(player: Player) {
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    form.addButton(`${getRoleAndName(p)}`, () => player.teleport(p.location))
+    form.addButton(getRoleAndName(p), () => player.teleport(p.location))
   }
 
   form.show(player)
@@ -76,12 +76,7 @@ function location(
   if (place.portalTeleportsTo.valid) {
     return {
       players: playersC,
-      location:
-        Vector.string(place.portalTeleportsTo) +
-        ' ' +
-        place.portalTeleportsTo.xRot +
-        ' ' +
-        place.portalTeleportsTo.yRot,
+      location: `${Vector.string(place.portalTeleportsTo)} ${place.portalTeleportsTo.xRot} ${place.portalTeleportsTo.yRot}`,
     }
   }
 

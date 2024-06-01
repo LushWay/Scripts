@@ -165,6 +165,7 @@ expand(Player.prototype, {
   success: prefix('§a§l> §r', Sounds.Success),
   info: prefix('§b§l> §r§3', Sounds.Action),
 
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   tell: Player.prototype.sendMessage,
 
   applyDash(target, horizontalStrength, verticalStrength) {
@@ -229,7 +230,8 @@ declare module '@minecraft/server' {
 
 expand(Entity.prototype, {
   get container() {
-    if (!this || !this.getComponent) throw new ReferenceError('Bound prototype object does not exists')
+    if (typeof this === 'undefined' || !this.getComponent)
+      throw new ReferenceError('Bound prototype object does not exists')
     if (!super.isValid()) throw new ReferenceError('Entity is invalid')
     return this.getComponent('inventory')?.container
   },

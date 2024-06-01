@@ -123,7 +123,7 @@ export class ArrayForm<
     const firstFilterConfig = this.filtersConfig[key]
 
     if (size === 0) return
-    if (size === 1 && Settings.isDropdown(firstFilterConfig?.value)) {
+    if (size === 1 && Settings.isDropdown(firstFilterConfig.value)) {
       const values = firstFilterConfig.value
       let i = values.findIndex(e => filters[key] === e[0])
       form.addButton('§3' + firstFilterConfig.name + ':§f ' + values[i][1], () => {

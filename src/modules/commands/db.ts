@@ -23,7 +23,7 @@ function selectTable(player: Player, firstCall?: true) {
 
 function showTable(player: Player, tableId: string, table: DatabaseTable) {
   const selfback = () => showTable(player, tableId, table)
-  const menu = new ActionForm(`${table}`)
+  const menu = new ActionForm(tableId)
 
   menu.addButton(ActionForm.backText, () => selectTable(player))
   menu.addButton('§3Новое значение§r', () => {
@@ -40,10 +40,10 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
   menu.addButton('§3Посмотреть в §fRAW', () => {
     let raw = getProvider().getRawTableData(tableId)
     try {
-      if (typeof raw === 'string') raw = JSON.parse(raw)
+      if (typeof raw === 'string') raw = JSON.parse(raw) as typeof raw
     } catch {}
 
-    new ActionForm('§3RAW table §f' + table, util.inspect(raw)).addButton('Oк', selectTable).show(player)
+    new ActionForm('§3RAW table §f' + tableId, util.inspect(raw)).addButton('Oк', selectTable).show(player)
   })
 
   const keys = Object.keys(table)
@@ -51,8 +51,7 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
     let name = key
     if (tableId === 'player') {
       const playerDatabase = table as typeof Player.database
-
-      name = `${playerDatabase[key].name} ${ROLES[getRole(key)] ?? '§7Без роли'}\n§8(${key})`
+      name = `${playerDatabase[key].name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
     }
 
     menu.addButton(name, () => tableProperty(key, table, player, selfback))
@@ -108,7 +107,7 @@ function changeValue(
   let valueType = typeof value
   const typeDropdown = ['string', 'number', 'boolean', 'object']
   if (value) typeDropdown.unshift('Оставить прежний §7(' + valueType + ')')
-  const stringifiedValue = value ? (typeof value === 'object' ? JSON.stringify(value) : value + '') : ''
+  const stringifiedValue = value ? JSON.stringify(value) : ''
 
   new ModalForm('§3+Значение ')
     .addTextField('Ключ', ' ', key)
@@ -136,8 +135,8 @@ function changeValue(
         case 'object':
           try {
             newValue = JSON.parse(input)
-          } catch (e) {
-            world.say('§4DB §cJSON.parse error: ' + e.message)
+          } catch (e: unknown) {
+            world.say(`§4DB §cJSON.parse error: ${(e as Error).message}`)
             return
           }
 

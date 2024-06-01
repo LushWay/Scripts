@@ -1,4 +1,5 @@
 import {
+  ItemComponent,
   ItemCooldownComponent,
   ItemDurabilityComponent,
   ItemEnchantableComponent,
@@ -8,20 +9,22 @@ import {
 import { util } from 'lib/util'
 import { expand } from './extend'
 
+interface ItemComponentAliases {
+  /** Alias to {@link ItemStack.getComponent}('cooldown') */
+  cooldown?: ItemCooldownComponent
+
+  /** Alias to {@link ItemStack.getComponent}('enchantable') */
+  enchantable?: ItemEnchantableComponent
+
+  /** Alias to {@link ItemStack.getComponent}('enchantable') */
+  durability?: ItemDurabilityComponent
+
+  /** Alias to {@link ItemStack.getComponent}('enchantable') */
+  food?: ItemFoodComponent
+}
+
 declare module '@minecraft/server' {
-  interface ItemStack {
-    /** Alias to {@link ItemStack.getComponent}('cooldown') */
-    cooldown?: ItemCooldownComponent
-
-    /** Alias to {@link ItemStack.getComponent}('enchantable') */
-    enchantable?: ItemEnchantableComponent
-
-    /** Alias to {@link ItemStack.getComponent}('durability') */
-    durability?: ItemDurabilityComponent
-
-    /** Alias to {@link ItemStack.getComponent}('food') */
-    food?: ItemFoodComponent
-
+  interface ItemStack extends ItemComponentAliases {
     /** Checks if one item stack properties are fully equal to another (nameTag and lore) */
     is(another: ItemStack): boolean
 
@@ -30,36 +33,22 @@ declare module '@minecraft/server' {
   }
 }
 
-Object.defineProperties(ItemStack.prototype, {
-  enchantable: {
-    get() {
-      return this.getComponent(ItemEnchantableComponent.componentId)
+const aliases = {
+  cooldown: ItemCooldownComponent,
+  enchantable: ItemEnchantableComponent,
+  durability: ItemDurabilityComponent,
+  food: ItemFoodComponent,
+} satisfies Record<keyof ItemComponentAliases, unknown>
+
+for (const [aliasName, { componentId }] of Object.entries(aliases)) {
+  Object.defineProperty(ItemStack.prototype, aliasName, {
+    get(this: ItemStack) {
+      return this.getComponent(componentId) as ItemComponent
     },
     configurable: false,
     enumerable: true,
-  },
-  food: {
-    get() {
-      return this.getComponent(ItemFoodComponent.componentId)
-    },
-    configurable: false,
-    enumerable: true,
-  },
-  durability: {
-    get() {
-      return this.getComponent(ItemDurabilityComponent.componentId)
-    },
-    configurable: false,
-    enumerable: true,
-  },
-  cooldown: {
-    get() {
-      return this.getComponent(ItemCooldownComponent.componentId)
-    },
-    configurable: false,
-    enumerable: true,
-  },
-})
+  })
+}
 
 expand(ItemStack.prototype, {
   setInfo(nameTag, description) {
@@ -71,7 +60,7 @@ expand(ItemStack.prototype, {
 
   is(item) {
     try {
-      if (!item || !(item instanceof ItemStack)) return false
+      if (typeof item === 'undefined' || !(item instanceof ItemStack)) return false
       if (this.isStackable && this.isStackableWith(item)) return true
 
       const anotherLore = item.getLore()

@@ -11,12 +11,12 @@ const help = new Command('help')
 
 help
   .int('page', true)
-  .int('commandsInPage', true)
-  .executes((ctx, inputPage, commandsInPage) => {
+  .int('commandsOnPage', true)
+  .executes((ctx, inputPage, commandsOnPage) => {
     const avaibleCommands = Command.commands.filter(e => e.sys.requires(ctx.player))
-    const cmds = commandsInPage || 15
+    const cmds = Math.max(1, commandsOnPage ?? 15)
     const maxPages = Math.ceil(avaibleCommands.length / cmds)
-    const page = Math.min(inputPage || 1, maxPages)
+    const page = Math.min(Math.max(inputPage ?? 1, 1), maxPages)
     const path = avaibleCommands.slice(page * cmds - cmds, page * cmds)
 
     const cv = colors[getRole(ctx.player.id)]
@@ -27,7 +27,7 @@ help
       const q = '§f.'
 
       const c = `${cv}§r ${q}${command.sys.name} §o§7- ${
-        command.sys.description ? `${command.sys.description}` : ' Пусто' //§r
+        command.sys.description ? command.sys.description : ' Пусто' //§r
       }`
       ctx.reply('§ы' + c)
     }
@@ -41,14 +41,14 @@ help
  */
 
 function helpForCommand(player: Player, commandName: string) {
-  const cmd = Command.commands.find(e => e.sys.name == commandName || e.sys?.aliases?.includes(commandName))
+  const cmd = Command.commands.find(e => e.sys.name == commandName || e.sys.aliases.includes(commandName))
 
   if (!cmd) return commandNotFound(player, commandName)
 
-  if (!cmd.sys?.requires(player)) return commandNoPermissions(player, cmd)
+  if (!cmd.sys.requires(player)) return commandNoPermissions(player, cmd)
 
   const d = cmd.sys
-  const aliases = d.aliases?.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
+  const aliases = d.aliases.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
   const str = `   §fКоманда §6-${d.name} ${aliases}`
 
   // ctx.reply(`§7§ы┌──`);
@@ -108,7 +108,7 @@ function getType(o: Command) {
   const q = t.optional
 
   if (t.typeName === 'literal') return `${q ? '§7' : '§f'}${t.name}`
-  return `${q ? `§7[${t.name}: §7${t.typeName}§7]` : `§6<${t.name}: §6${t.typeName}§6>`}`
+  return q ? `§7[${t.name}: §7${t.typeName}§7]` : `§6<${t.name}: §6${t.typeName}§6>`
 }
 
 const colors: Record<Role, string> = Object.fromEntries(

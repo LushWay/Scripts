@@ -51,7 +51,7 @@ function gunsmith(group: string) {
 
 function updateEnchatnment(slot: ContainerSlot, type: e, level = 1) {
   const item = slot.getItem()
-  if (item && item.enchantable) {
+  if (item?.enchantable) {
     item.enchantable.addEnchantment({
       type: new EnchantmentType(type),
       level: (item.enchantable.getEnchantment(type)?.level ?? 0) + level,
@@ -67,7 +67,7 @@ function upgradeDiamondSwordToNetherite(slot: ContainerSlot) {
   item.setLore(slot.getLore())
 
   if (item.enchantable && slotItem.enchantable)
-    item.enchantable?.addEnchantments(slotItem.enchantable?.getEnchantments())
+    item.enchantable.addEnchantments(slotItem.enchantable.getEnchantments())
 
   if (item.durability && slotItem.durability) item.durability.damage = slotItem.durability.damage
   slot.setItem(item)

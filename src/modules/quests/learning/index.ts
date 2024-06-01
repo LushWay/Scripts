@@ -48,8 +48,7 @@ class Learning extends QuestBase {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this
     if (
-      !Anarchy.portal ||
-      !Anarchy.portal.from ||
+      !Anarchy.portal?.from ||
       !Anarchy.portal.to ||
       !this.randomTeleportLocation.valid ||
       !this.craftingTableLocation.valid
@@ -71,7 +70,7 @@ class Learning extends QuestBase {
           // in spawn inventory that will be replaced with
           // anarchy
           system.delay(() => {
-            self.startAxeGiveCommand?.ensure(this.player)
+            self.startAxeGiveCommand.ensure(this.player)
             const { container } = this.player
             if (!container) return
 

@@ -12,6 +12,7 @@ import {
 } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { Core } from 'lib/extensions/core'
+import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 export interface QuestDB {
@@ -41,7 +42,7 @@ export class Quest {
 
   static sidebar: import('lib/sidebar').SidebarLineInit<unknown> = {
     init(sidebar) {
-      const onquestupdate = sidebar.show.bind(sidebar)
+      const onquestupdate = sidebar.show.bind(sidebar) as (typeof sidebar)['show']
 
       return function (player: Player) {
         const status = Quest.active(player)
@@ -50,19 +51,19 @@ export class Quest {
         const listeners = status.quest.steps(player).updateListeners
         if (!listeners.has(onquestupdate)) listeners.add(onquestupdate)
 
-        return `§f§l${status.quest.name}:§r§6 ${status.step?.text()}`
+        return `§f§l${status.quest.name}:§r§6 ${status.step.text()}`
       }
     },
   }
 
-  static list: Record<string, Quest> = {}
+  static all = new Map<string, Quest>()
 
   static active(player: Player, quest?: Quest) {
     const db = player.database
     const dbquest = quest ? db.quests?.active.find((q: { id: string }) => q.id === quest?.id) : db.quests?.active[0]
     if (!dbquest) return false
 
-    quest ??= Quest.list[dbquest.id]
+    quest ??= this.all.get(dbquest.id)
     if (!quest) return false
 
     return {
@@ -78,8 +79,7 @@ export class Quest {
 
   name
 
-  // TODO Replace with weak player map
-  players: Record<string, PlayerQuest> = {}
+  players = new WeakOnlinePlayerMap<PlayerQuest>()
 
   constructor(
     { id, name, desc }: { name: string; id: string; desc: string },
@@ -89,7 +89,7 @@ export class Quest {
     this.name = name
     this.description = desc
 
-    Quest.list[this.id] = this
+    Quest.all.set(this.id, this)
 
     Core.afterEvents.worldLoad.subscribe(() => {
       world.getAllPlayers().forEach(e => setQuest(e, this))
@@ -97,13 +97,13 @@ export class Quest {
   }
 
   steps(player: Player) {
-    if (this.players[player.id]) return this.players[player.id]
+    const step = this.players.get(player)
+    if (step) return step.value
 
-    this.players[player.id] = new PlayerQuest(this, player)
-    this.init(this.players[player.id], player)
-    world.afterEvents.playerLeave.subscribe(({ playerId }) => Reflect.deleteProperty(this.players, playerId))
-
-    return this.players[player.id]
+    const quest = new PlayerQuest(this, player)
+    this.players.set(player, quest)
+    this.init(quest, player)
+    return quest
   }
 
   enter(player: Player) {
@@ -129,7 +129,7 @@ export class Quest {
 
     const steps = this.steps(player)
     const step = steps.list[stepIndex] ?? steps.list[0]
-    if (!step) return false
+    if (typeof step === 'undefined') return false
 
     if (Quest.playerSettings(player).messageForEachStep) {
       const text = step.text()
@@ -185,7 +185,7 @@ Join.onMoveAfterJoin.subscribe(({ player }) => setQuests(player))
 function setQuests(player: Player) {
   system.delay(() => {
     player.database.quests?.active.forEach(db => {
-      const quest = Quest.list[db.id]
+      const quest = Quest.all.get(db.id)
       if (!quest) return
 
       setQuest(player, quest, db)
@@ -204,7 +204,7 @@ type QuestText = string | DynamicQuestText
 interface QuestStepInput {
   text: QuestText
   description?: QuestText
-  activate?(firstTime: boolean): { cleanup(): void }
+  activate?(firstTime: boolean): { cleanup(this: void): void }
   place?: Vector3
 }
 
@@ -255,7 +255,7 @@ class PlayerQuest {
         if (active) active.db = value
       },
       player: this.player,
-      update: this.update.bind(this),
+      update: this.update.bind(this) as this['update'],
       quest: this.quest,
       next() {
         if (isNotPlaying(this.player)) return
@@ -368,7 +368,7 @@ class PlayerQuest {
       }
     }
 
-    const inputedActivate = options.activate?.bind(options)
+    const inputedActivate = options.activate?.bind(options) as (typeof options)['activate']
     options.activate = function (firstTime) {
       if (!this.player) throw new ReferenceError('Quest: this.player is undefined!')
 
@@ -377,13 +377,11 @@ class PlayerQuest {
 
       return inputedActivate?.(firstTime) ?? noCleanup
     }
-    const inputedText = options.text.bind(options)
-    options.text = () => inputedText(options.value)
+    const inputedText = options.text.bind(options) as (typeof options)['text']
+    options.text = () => inputedText(options.value ?? 0)
 
-    if (options.description) {
-      const inputedDescription = options.description.bind(options)
-      options.description = () => inputedDescription(options.value)
-    }
+    const inputedDescription = options.description?.bind(options) as (typeof options)['description']
+    if (inputedDescription) options.description = () => inputedDescription(options.value ?? 0)
 
     this.dynamic(options as unknown as QuestStepThis)
   }
@@ -444,7 +442,7 @@ class PlayerQuest {
         }
 
         debugAirdrop()
-        if (!airdrop || !airdrop.chestMinecart) return this.error('Не удалось вызвать аирдроп')
+        if (!airdrop?.chestMinecart) return this.error('Не удалось вызвать аирдроп')
 
         const temporary = new Temporary(({ world, system, cleanup }) => {
           system.runInterval(() => debugAirdrop(), 'PlayerQuest.airdrop debug', 20)
@@ -479,7 +477,7 @@ class PlayerQuest {
             if (!airdrop) return temporary.cleanup()
 
             const airdropEntity = airdrop.chestMinecart
-            if (!airdropEntity || !airdropEntity.isValid()) return
+            if (!airdropEntity?.isValid()) return
 
             this.place = airdropEntity.location
 
@@ -524,7 +522,6 @@ class PlayerQuest {
         () => {
           if (!this.player.isValid()) return
           if (
-            !options.place ||
             typeof options.place.x !== 'number' ||
             typeof options.place.y !== 'number' ||
             typeof options.place.z !== 'number'

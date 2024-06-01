@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable no-var */
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
@@ -52,6 +57,7 @@ Object.map = (object, mapper) => {
   const result: Record<string, unknown> = {}
 
   for (const key of Object.getOwnPropertyNames(object)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const mapped = mapper(key as any, (object as any)[key], object)
     if (mapped) result[mapped[0]] = mapped[1]
   }

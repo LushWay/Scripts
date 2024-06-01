@@ -35,6 +35,7 @@ export class BigStructure extends Cuboid {
     this.savePromise = this.save()
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   private async save() {
     this.structures = []
     const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
@@ -111,39 +112,4 @@ export class BigStructure extends Cuboid {
         `§c${options.errors}§f/${options.total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
       )
   }
-}
-
-async function performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-  command: string,
-  vector1: Vector3,
-  vector2: Vector3,
-  options: { errors: number; total: number },
-  forceTp = false,
-) {
-  let result = 0
-  if (!forceTp) {
-    result = world.overworld.runCommand(command).successCount
-  }
-  console.debug(command, result)
-  options.total++
-
-  if (!result) {
-    world.say('Область будет прогружена (' + options.total + ')')
-
-    // world.overworld.runCommand(`tickingarea remove safezone`)
-
-    world.getAllPlayers()[0].teleport(Vector.divide(Vector.add(vector1, vector2), 2))
-
-    // world.overworld.runCommand(`tickingarea add ${Vector.string(vector1)} ${Vector.string(vector2)} safezone`)
-    await system.sleep(60)
-
-    const result = world.overworld.runCommand(command)
-
-    if (!result) world.say('§cНеуспешно' + options.total)
-    if (!result) {
-      options.errors++
-      return 0
-    }
-  }
-  return 1
 }

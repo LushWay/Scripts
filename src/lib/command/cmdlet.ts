@@ -31,7 +31,7 @@ export class CmdLet {
     for (const cmdlet of CmdLet.list) {
       const input = cmdlets.find(e => e[0] === cmdlet.name)
       if (input) {
-        results.push(cmdlet.callback?.(new CommandContext(event, args, command, rawInput), input[0]))
+        results.push(cmdlet.callback(new CommandContext(event, args, command, rawInput), input[0]))
       }
     }
 

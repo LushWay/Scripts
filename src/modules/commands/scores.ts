@@ -23,8 +23,6 @@ function alias(name = 'leafs') {
     })
 }
 
-/** @param {Player} player */
-
 function scoreManagerMenu(player: Player) {
   const form = new ActionForm('Выберите счет')
 
@@ -121,7 +119,7 @@ function addTargetToScoreboardMenu(player: Player, scoreboard: ScoreboardObjecti
     },
 
     sort(players, filters) {
-      if (filters.sort) {
+      if (filters.sort === 'online') {
         return players.sort((a, b) => (!a.online && b.online ? -1 : a.online ? 0 : 1))
       }
 

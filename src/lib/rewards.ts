@@ -70,7 +70,6 @@ export class Rewards {
       if (!player.container) return
       player.container.addItem(new ItemStack(reward.id, reward.count))
     } else if (reward.type === 'scores') {
-      if (!reward.score) return
       player.scores[reward.score] += reward.count
     }
   }
@@ -98,19 +97,18 @@ export class Rewards {
   /**
    * Returns a single reward as a human-readable string
    *
-   * @param {Reward} reward The reward
-   * @returns {string}
+   * @param reward The reward to stringify
    */
-  static rewardToString(reward: Reward): RawMessage {
+  static rewardToString(this: void, reward: Reward): RawMessage {
     let text: string | RawMessage
     if (reward.type === 'scores') {
       if (reward.score === 'leafs') text = `${reward.count}${emoji.leaf}`
       else if (reward.score === 'money') text = `${reward.count}${emoji.money}`
       else text = `${reward.score} x${reward.count}`
-    } else if (reward.type === 'item')
+    } else if ((reward.type as string) === 'item')
       text = itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id }, undefined)
+    else text = 'Неизвестная награда...'
 
-    text ??= 'Неизвестная награда...'
     return typeof text === 'string' ? { text } : text
   }
 

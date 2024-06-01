@@ -22,8 +22,8 @@ interface LocationInDimension {
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
 export function getBlockStatus({ location, dimensionId }: LocationInDimension) {
   try {
-    const block = world[dimensionId]?.getBlock(location)
-    if (!block || !block.isValid()) return 'unloaded'
+    const block = world[dimensionId].getBlock(location)
+    if (!block?.isValid()) return 'unloaded'
 
     return block
   } catch (e) {

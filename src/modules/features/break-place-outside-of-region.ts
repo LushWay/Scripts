@@ -48,7 +48,7 @@ actionGuard((player, region, ctx) => {
               maxDistance: 2,
             })
             .forEach(e => {
-              if (e?.isValid()) e.remove()
+              if (e.isValid()) e.remove()
             })
         })
       }

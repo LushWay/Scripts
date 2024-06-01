@@ -9,6 +9,7 @@ import { prompt } from 'lib/form/message'
 import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
 import { configureNylium } from 'modules/world-edit/tools/nylium'
 import {
+  BlocksSet,
   BlocksSets,
   DEFAULT_BLOCK_SETS,
   SHARED_POSTFIX,
@@ -25,7 +26,7 @@ import { WorldEditTool } from './lib/WorldEditTool'
 export function WEmenu(player: Player, body = '') {
   const heldItem = player.mainhand()
   if (heldItem.typeId) {
-    body = `Создание доступно только при пустой руке.` || body
+    body = body || `Создание доступно только при пустой руке.`
   }
 
   const we = WorldEdit.forPlayer(player)
@@ -150,7 +151,7 @@ function WEmanageBlocksSetMenu({
 
       if (!name || name === setName) return onFail?.()
       if (deletePrevious && setName) setBlocksSet(player.id, setName, undefined)
-      setBlocksSet(player.id, name, set ? JSON.parse(JSON.stringify(set)) : set)
+      setBlocksSet(player.id, name, set ? (JSON.parse(JSON.stringify(set)) as BlocksSet) : set)
       WEeditBlocksSetMenu({
         player,
         setName: name,
@@ -159,11 +160,6 @@ function WEmanageBlocksSetMenu({
       })
     })
 }
-
-/**
- * @param {Player} player
- * @param {() => void} back
- */
 
 function WEotherPlayersBlockSetsMenu(player: Player, back: () => void) {
   new ArrayForm('§3Наборы блоков других игроков §f$page/$max', '', getOtherPlayerBlocksSets(player.id), {
@@ -232,8 +228,7 @@ function WEplayerBlockSetMenu(
   onBack: () => void,
 ) {
   const name = Player.name(otherPlayerId) ?? otherPlayerId
-
-  const pform = new ActionForm(name ?? otherPlayerId, '§3Наборы блоков:')
+  const pform = new ActionForm(name, '§3Наборы блоков:')
 
   pform.addButton(ActionForm.backText, onBack)
 
@@ -244,7 +239,7 @@ function WEplayerBlockSetMenu(
         setName,
         sets: blockSets,
         ownsSet: false,
-        back: () => pform.show(player),
+        back: () => void pform.show(player),
       }),
     )
   }
@@ -281,7 +276,7 @@ function WEeditBlocksSetMenu(o: {
     back = () => WEblocksSetsMenu(player),
   } = o
   let set = sets[setName]
-  if (!set) {
+  if (typeof set === 'undefined') {
     set = []
     setBlocksSet(player.id, setName, set)
     sets[setName] = set
@@ -289,7 +284,7 @@ function WEeditBlocksSetMenu(o: {
 
   const blockBelow = player.dimension.getBlock(player.location)?.below()
   const blockOnViewHit = player.getBlockFromViewDirection()
-  const blockOnView = blockOnViewHit && blockOnViewHit.block
+  const blockOnView = blockOnViewHit?.block
   const form = new ChestForm('large')
 
   const empty: ChestButtonOptions = {
@@ -387,7 +382,7 @@ function WEeditBlocksSetMenu(o: {
         nameTag: '§cОчистить',
         description: '\n§cочищает набор ото всех выключенных блоков',
         callback() {
-          const blocksToClear = set.filter(e => (e[2] ?? 1) < 1)
+          const blocksToClear = set.filter(e => e[2] < 1)
 
           prompt(
             player,
@@ -539,12 +534,10 @@ function WEeditBlocksSetMenu(o: {
   }
 
   for (const [i, item] of set.entries()) {
-    if (item) {
-      const [typeId, states] = item
-      const base = 9 * 1 // 1 row
+    const [typeId, states] = item
+    const base = 9 * 1 // 1 row
 
-      addBlock(base + i, typeId, states)
-    }
+    addBlock(base + i, typeId, states)
   }
 
   if (ownsSet) {
@@ -555,7 +548,7 @@ function WEeditBlocksSetMenu(o: {
     for (let i = 0; i < container.size; i++) {
       const item = container.getItem(i)
 
-      if (!item || set.find(e => e[0] === item.typeId) || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId))
+      if (!item || !!set.find(e => e[0] === item.typeId) || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId))
         continue
 
       const base = 9 * 4 // 4 row
@@ -575,7 +568,7 @@ export function WEeditBlockStatesMenu(
   back: () => void,
   edited = false,
 ) {
-  const promise = new Promise<Record<string, string | boolean | number>>(resolve => {
+  return new Promise<Record<string, string | boolean | number>>(resolve => {
     const form = new ActionForm('Редактировать свойства блока')
 
     form.addButton(ActionForm.backText, () => {
@@ -631,10 +624,6 @@ export function WEeditBlockStatesMenu(
 
     form.show(player)
   })
-
-  promise.catch(util.catch)
-
-  return promise
 }
 
 /** Reference to block that can be replaced */
@@ -694,7 +683,7 @@ export function WEundoRedoMenu(
 
   if (is(player.id, 'grandBuilder')) {
     form.addButton('§3Действия других игроков', () => {
-      WEundoRedoOtherPlayersMenu(player, () => form.show(player))
+      WEundoRedoOtherPlayersMenu(player, () => void form.show(player))
     })
   }
 

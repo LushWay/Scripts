@@ -13,6 +13,32 @@ patchPackage('@minecraft/server', {
       find: 'runTimeout(callback: () => void, tickDelay?: number): number;',
       replace: 'runTimeout(callback: () => void, name: string, tickDelay?: number): number;',
     },
+    {
+      find: `/**
+    * @remarks
+    * Identifier of the type of items for the stack. If a
+    * namespace is not specified, 'minecraft:' is assumed.
+    * Examples include 'wheat' or 'apple'.
+    *
+    * @throws
+    * Throws if the slot's container is invalid.
+    *
+    * {@link InvalidContainerSlotError}
+    */
+   readonly typeId: string;`,
+      replace: `/**
+   * @remarks
+   * Identifier of the type of items for the stack. If a
+   * namespace is not specified, 'minecraft:' is assumed.
+   * Examples include 'wheat' or 'apple'.
+   *
+   * @throws
+   * Throws if the slot's container is invalid.
+   *
+   * {@link InvalidContainerSlotError}
+   */
+  readonly typeId?: string;`,
+    },
   ],
   additions: {
     beginning: '',
@@ -20,4 +46,3 @@ patchPackage('@minecraft/server', {
     ending: notice,
   },
 })
-

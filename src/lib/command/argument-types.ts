@@ -1,4 +1,4 @@
-export interface IArgumentType {
+export interface IArgumentType<T extends boolean = false> {
   /** The return type */
   type: unknown
 
@@ -23,7 +23,7 @@ export interface IArgumentType {
   name: string
 
   /** Argument optionality */
-  optional: boolean
+  optional: T
 
   /** Checks if a value matches this argument type, also returns the corridsponding type */
   matches(value: string): {
@@ -32,10 +32,10 @@ export interface IArgumentType {
   }
 }
 
-export class LiteralArgumentType implements IArgumentType {
+export class LiteralArgumentType<T extends boolean = false> implements IArgumentType<T> {
   constructor(
     public name = 'literal',
-    public optional = false,
+    public optional: T = false as T,
   ) {}
 
   type: null
@@ -49,10 +49,10 @@ export class LiteralArgumentType implements IArgumentType {
   }
 }
 
-export class StringArgumentType implements IArgumentType {
+export class StringArgumentType<T extends boolean = false> implements IArgumentType<T> {
   constructor(
     public name = 'string',
-    public optional = false,
+    public optional: T = false as T,
   ) {}
 
   type: string
@@ -67,10 +67,10 @@ export class StringArgumentType implements IArgumentType {
   }
 }
 
-export class IntegerArgumentType implements IArgumentType {
+export class IntegerArgumentType<T extends boolean = false> implements IArgumentType<T> {
   constructor(
     public name = 'integer',
-    public optional = false,
+    public optional: T = false as T,
   ) {}
 
   type: number
@@ -86,10 +86,10 @@ export class IntegerArgumentType implements IArgumentType {
   }
 }
 
-export class LocationArgumentType implements IArgumentType {
+export class LocationArgumentType<T extends boolean = false> implements IArgumentType<T> {
   constructor(
     public name = 'location',
-    public optional = false,
+    public optional: T = false as T,
   ) {}
 
   type: Vector3
@@ -106,10 +106,10 @@ export class LocationArgumentType implements IArgumentType {
   }
 }
 
-export class BooleanArgumentType implements IArgumentType {
+export class BooleanArgumentType<T extends boolean = false> implements IArgumentType<T> {
   constructor(
     public name = 'boolean',
-    public optional = false,
+    public optional: T = false as T,
   ) {}
 
   type: boolean
@@ -124,11 +124,11 @@ export class BooleanArgumentType implements IArgumentType {
   }
 }
 
-export class ArrayArgumentType<T extends readonly string[]> implements IArgumentType {
+export class ArrayArgumentType<T extends readonly string[], B extends boolean = false> implements IArgumentType<B> {
   constructor(
     public name = 'array',
     public types: T,
-    public optional = false,
+    public optional: B = false as B,
   ) {
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
   }

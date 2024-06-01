@@ -11,7 +11,7 @@ type IntervalFunction = (
 type LoreStringName = 'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'
 
 const LORE_SEPARATOR = '\u00a0'
-const LORE_BLOCKS_SET_KEYS_T: (LoreStringName | string)[] = ['blocksSet', 'replaceBlocksSet']
+const LORE_BLOCKS_SET_KEYS_T: string[] = ['blocksSet', 'replaceBlocksSet'] satisfies LoreStringName[]
 
 type LoreFormatType = {
   [P in LoreStringName]?: unknown
@@ -97,7 +97,7 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
     this.itemId = itemStackId
     if (editToolForm) this.editToolForm = editToolForm
     this.loreFormat = loreFormat ?? { version: 0 }
-    this.loreFormat.version ??= 0
+    ;(this.loreFormat as Partial<LoreFormat>).version ??= 0
     this.onUse = onUse
     this.interval0 = interval0
     this.interval10 = interval10
@@ -116,8 +116,6 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
       })
   }
 
-  /** @param {Player} player */
-
   getToolSlot(player: Player) {
     const slot = player.mainhand()
 
@@ -133,22 +131,12 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
     }
   }
 
-  /**
-   * @param {Player} player
-   * @returns {string}
-   */
-
   getMenuButtonNameColor(player: Player): string {
     const { typeId } = player.mainhand()
     const edit = typeId === this.itemId
     const air = !typeId
     return edit ? '§2' : air ? '' : '§8'
   }
-
-  /**
-   * @param {Player} player
-   * @returns {string}
-   */
 
   getMenuButtonName(player: Player): string {
     const { typeId } = player.mainhand()
@@ -168,25 +156,22 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
     try {
       raw = JSON.parse(
         lore
-
           .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
           .join('')
           .replace(/§(.)/g, '$1'),
-      )
+      ) as LoreFormat
     } catch (e) {
       e
     }
     if (raw?.version !== this.loreFormat.version) {
       if (returnUndefined) return undefined
-      raw = JSON.parse(JSON.stringify(this.loreFormat))
+      raw = JSON.parse(JSON.stringify(this.loreFormat)) as LoreFormat
     }
 
     if ('version' in raw) Reflect.deleteProperty(raw, 'version')
-
     return raw
   }
 
-  /** @type {Record<string, string>} */
   loreTranslation: Record<string, string> = {
     shape: 'Форма',
     size: 'Размер',
@@ -198,12 +183,8 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
     zone: 'Отступ',
   }
 
-  /**
-   * @param {LoreFormat} format
-   * @returns {string[]}
-   */
   stringifyLore(format: LoreFormat): string[] {
-    format.version ??= this.loreFormat.version
+    ;(format as Partial<LoreFormat>).version ??= this.loreFormat.version
     return [
       ...Object.entries(format)
         .filter(([key]) => key !== 'version')
@@ -213,7 +194,7 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
             : util.inspect(value)
 
           const k = this.loreTranslation[key] ?? key
-          return `${k}: ${val}`.match(/.{0,48}/g) || []
+          return `${k}: ${val}`.match(/.{0,48}/g) ?? []
         })
         .flat()
         .filter(Boolean)
@@ -225,7 +206,7 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
         .split('')
         .map(e => '§' + e)
         .join('')
-        .match(/.{0,50}/g) || []),
+        .match(/.{0,50}/g) ?? []),
     ]
   }
 }
@@ -236,14 +217,14 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
 
     .filter(e => e.itemId === item.typeId)
 
-    .forEach(tool => util.catch(() => tool?.onUse?.(player, item)))
+    .forEach(tool => util.catch(() => tool.onUse?.(player, item)))
 })
 
 let ticks = 0
 system.runInterval(
   () => {
     for (const player of world.getAllPlayers()) {
-      if (!player) continue
+      if (!player.isValid()) continue
       const item = player.mainhand()
 
       const tool = WorldEditTool.tools.find(e => e.itemId === item.typeId)
@@ -251,14 +232,11 @@ system.runInterval(
 
       WorldEditTool.intervals.forEach(e => e(player, item, settings))
       if (!tool) continue
-      /** @type {(undefined | IntervalFunction)[]} */
 
       const fn: (undefined | IntervalFunction)[] = [tool.interval0]
 
       if (ticks % 10 === 0) fn.push(tool.interval10)
-
       if (ticks % 20 === 0) fn.push(tool.interval20)
-
       fn.forEach(e => e?.(player, item, settings))
     }
     if (ticks >= 20) ticks = 0

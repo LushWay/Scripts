@@ -1,7 +1,7 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
 import { Settings } from 'lib'
-import { HealthIndicatorConfig } from './config'
 import { Core } from 'lib/extensions/core'
+import { HealthIndicatorConfig } from './config'
 
 // █
 
@@ -104,7 +104,8 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
     return
 
   // Its player.chatClose
-  if (!damage.damagingEntity && event.hurtEntity && damage.cause === EntityDamageCause.entityAttack) return
+  if (!damage.damagingEntity && event.hurtEntity instanceof Player && damage.cause === EntityDamageCause.entityAttack)
+    return
 
   const healthComponent = event.hurtEntity.getComponent('minecraft:health')
   if (!healthComponent) return
@@ -130,7 +131,7 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
       // 	);
       // } else {
       // Kill
-      if (event?.hurtEntity instanceof Player) {
+      if (event.hurtEntity instanceof Player) {
         // Player
         damage.damagingEntity.onScreenDisplay.setActionBar(
           `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`,

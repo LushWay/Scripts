@@ -55,8 +55,8 @@ export class RadiusRegionWithStructure extends RadiusRegion {
               }
             }
             resolve()
-          } catch (e) {
-            reject(e)
+          } catch (e: unknown) {
+            reject(e as Error)
           }
         })(),
       )

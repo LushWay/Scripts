@@ -1,10 +1,10 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, ModalForm, typeIdToReadable, util } from 'lib'
+import { ActionForm, BUTTON, ModalForm, typeIdToReadable } from 'lib'
 import { ChestForm } from 'lib/form/chest'
 import { inaccurateSearch } from 'lib/search'
-import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
+import { ReplaceTarget, WEeditBlockStatesMenu } from 'modules/world-edit/menu'
 import { getAllBlocksSets, getBlocksSetByRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocksSet'
 import { WorldEdit } from '../../lib/WorldEdit'
 
@@ -80,19 +80,6 @@ export function setSelection(player: Player) {
 
 type ButtonOptions = Omit<import('lib/form/chest').ChestButtonOptions, 'slot'>
 
-/**
- * @param {Player} player
- * @param {keyof typeof selectedBlocks} type
- * @param {string} [desc=''] Default is `''`
- * @param {object} [param3={}] Default is `{}`
- * @param {(player: Player) => void} [param3.onSelect=setSelection] Default is `setSelection`
- * @param {Partial<ButtonOptions>} [param3.notSelected]
- * @returns {[
- *   blocks: (BlockPermutation | import('modules/world-edit/menu').ReplaceTarget)[] | undefined,
- *   options: ButtonOptions,
- * ]}
- */
-
 function use(
   player: Player,
   type: keyof typeof selectedBlocks,
@@ -101,10 +88,7 @@ function use(
     onSelect = setSelection,
     notSelected = {},
   }: { onSelect?: (player: Player) => void; notSelected?: Partial<ButtonOptions> } = {},
-): [
-  blocks: (BlockPermutation | import('modules/world-edit/menu').ReplaceTarget)[] | undefined,
-  options: ButtonOptions,
-] {
+): [blocks: (BlockPermutation | ReplaceTarget)[] | undefined, options: ButtonOptions] {
   const block = selectedBlocks[type][player.id]
 
   const callback = () => {
@@ -178,7 +162,6 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
   const selectedBlock =
     currentSelection &&
     'permutations' in currentSelection &&
-    currentSelection.permutations &&
     currentSelection.permutations[0] &&
     typeIdToReadable(
       currentSelection.permutations[0] instanceof BlockPermutation
@@ -234,7 +217,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             },
             'G': {
               ...(blockFromView?.block
-                ? ChestForm.permutationToButton(blockFromView?.block.permutation)
+                ? ChestForm.permutationToButton(blockFromView.block.permutation)
                 : { icon: MinecraftBlockTypes.Air }),
               description: 'Нажми чтобы выбрать блок на который смотришь',
               callback: () =>
@@ -299,7 +282,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
     base.show(player)
   })
 
-  promise.catch(console.error)
+  promise.catch((e: unknown) => console.error(e))
 
   return promise
 }

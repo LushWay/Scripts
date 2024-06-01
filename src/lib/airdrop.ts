@@ -3,10 +3,10 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib/region/index'
 import { Vector } from 'lib/vector'
 import { table } from './database/abstract'
+import { Core } from './extensions/core'
 import { isInvalidLocation } from './game-utils'
 import { LootTable } from './loot-table'
 import { Temporary } from './temporary'
-import { Core } from './extensions/core'
 
 export class Airdrop {
   static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true }>('airdrop')
@@ -97,7 +97,7 @@ export class Airdrop {
 
     this.chestMinecart.triggerEvent('chest_minecart:ground')
     try {
-      console.debug('Loading loot table', this.lootTable ? this.lootTable.id : 'NO NAME')
+      console.debug('Loading loot table', this.lootTable.id ? this.lootTable.id : 'NO NAME')
       if (this.chestMinecart.container) this.lootTable.fillContainer(this.chestMinecart.container)
     } catch (e) {
       console.error('Failed to load loot table into airdrop:', e)
@@ -122,7 +122,7 @@ export class Airdrop {
 
   /** Shows particle trace under chest minecart */
   async showParticleTrace(from?: Vector3, minecart = this.chestMinecart) {
-    if (!from && minecart && minecart.isValid()) {
+    if (!from && minecart?.isValid()) {
       from = minecart.location
     }
 
@@ -192,12 +192,11 @@ system.runInterval(
       if (airdrop.status === 'restoring') {
         try {
           const saved = Airdrop.db[airdrop.id]
-
-          if (!saved) return airdrop.delete()
+          if (typeof saved === 'undefined') return airdrop.delete()
 
           airdrop.chestMinecart = findAndRemove(chestMinecarts, saved.chest)
-
           airdrop.chicken = findAndRemove(chickens, saved.chicken)
+
           if (saved.looted) {
             if (airdrop.chestMinecart?.isValid()) {
               airdrop.status = 'being looted'
@@ -213,14 +212,12 @@ system.runInterval(
         } catch (error) {
           console.error('Failed to restore airdrop', error)
         }
-      } else if (airdrop.status === 'being looted') {
+      } else {
         if (airdrop.chestMinecart) findAndRemove(chestMinecarts, airdrop.chestMinecart.id)
 
         // Clear empty looted airdrops
-
         if (inventoryIsEmpty(airdrop.chestMinecart)) {
           if (airdrop.chicken) findAndRemove(chickens, airdrop.chicken.id)
-
           airdrop.delete()
         }
       }
@@ -254,18 +251,18 @@ function cleanup(arr: Entity[], type: 'chestMinecart' | 'chicken') {
 
 /** Finds entity in entity array by id and removes it from array */
 const findAndRemove = (arr: Entity[], id: string) => {
-  const i = arr.findIndex(e => e?.id === id)
+  const i = arr.findIndex(e => e.id === id)
   if (i !== -1) return arr.splice(i, 1)[0]
 }
 
 Core.afterEvents.worldLoad.subscribe(() => {
   for (const [key, saved] of Object.entries(Airdrop.db)) {
-    if (!saved) continue
+    if (typeof saved === 'undefined') continue
     const loot = LootTable.instances[saved.loot]
 
     const restore = (loot: LootTable) => new Airdrop({ loot, forPlayerId: saved.for }, key)
 
-    if (!loot) {
+    if (typeof loot === 'undefined') {
       LootTable.onNew.subscribe(lootTable => {
         if (lootTable.id === saved.loot) {
           restore(loot)

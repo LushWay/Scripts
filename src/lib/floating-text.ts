@@ -21,7 +21,7 @@ export class FloatingText {
     location = Vector.add(location, { x: 0.5, y: 0.7, z: 0.5 })
 
     if (!this.entity) {
-      this.find()
+      this.entity = this.find()
       if (!this.entity) this.create(location)
     }
 
@@ -39,7 +39,7 @@ export class FloatingText {
   }
 
   private find() {
-    this.entity = world[this.dimensionId]
+    return world[this.dimensionId]
       .getEntities({ type: FloatingText.typeId })
       .find(e => e.getDynamicProperty(FloatingText.dynamicProperty) === this.id)
   }

@@ -204,7 +204,7 @@ function backupPlayerInventory(player: Player) {
   })
 
   for (const [slot, item] of Object.values(controls)) {
-    container?.setItem(slot, item)
+    container.setItem(slot, item)
   }
 
   return hotbarSlots

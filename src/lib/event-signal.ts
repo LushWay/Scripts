@@ -37,12 +37,10 @@ export class EventSignal<Argument, Return = void, Callback = (arg: Argument) => 
    *   interface with three type parameters.
    * @returns Object with two properties: `subscribe` and `unsubscribe`.
    */
-  static bound<Signal extends EventSignal<unknown, unknown, unknown>>(
-    signal: Signal,
-  ): Pick<Signal, 'subscribe' | 'unsubscribe'> {
+  static bound<Signal extends EventSignal<unknown, unknown, unknown>>(signal: Signal) {
     return {
-      subscribe: signal.subscribe.bind(signal),
-      unsubscribe: signal.unsubscribe.bind(signal),
+      subscribe: signal.subscribe.bind(signal) as Signal['subscribe'],
+      unsubscribe: signal.unsubscribe.bind(signal) as Signal['unsubscribe'],
     }
   }
 

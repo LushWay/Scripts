@@ -95,7 +95,7 @@ export class Sidebar<E = unknown> {
         const index = i + 1
         if (index !== 1 && index !== 2 && index !== 3 && index !== 4 && index !== 5) continue
 
-        player.onScreenDisplay.setTip(index, wrap(tip || ''))
+        player.onScreenDisplay.setTip(index, wrap(tip ?? ''))
       }
       player.onScreenDisplay.setSidebar('')
     } else {

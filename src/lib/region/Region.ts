@@ -172,7 +172,7 @@ export class Region {
       if (player) onlineOwners.push(player)
     }
     onlineOwners.forEach(
-      (player, i, owners) => player && util.catch(() => callback(player, i, owners), 'Region.forEachOwner'),
+      (player, i, owners) => player.isValid() && util.catch(() => callback(player, i, owners), 'Region.forEachOwner'),
     )
   }
 

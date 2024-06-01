@@ -40,12 +40,18 @@ system.runInterval(
   function scheduledBlockPlaceInterval() {
     for (const dimension of DIMENSIONS) {
       const schedules = IMMUTABLE_DB[dimension]
-      if (!Array.isArray(schedules) || !schedules.length) continue
+      if (typeof schedules === 'undefined') {
+        Reflect.deleteProperty(SHEDULED_DB, dimension)
+        continue
+      }
 
       const time = util.benchmark('dimension', 'sc')
-      for (const schedule of schedules) {
-        if (!schedule) continue
-
+      for (let i = schedules.length - 1; i >= 0; i--) {
+        const schedule = schedules[i]
+        if (typeof schedule === 'undefined') {
+          SHEDULED_DB[dimension].splice(i, 1)
+          continue
+        }
         if (Date.now() < schedule.date) continue
 
         // To prevent blocks from restoring randomly in air
@@ -60,7 +66,7 @@ system.runInterval(
           const block = world.overworld.getBlock(schedule.location)
           if (!block?.isValid()) continue
 
-          block?.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
+          block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
           console.debug('schedule place', schedule.typeId, schedule.location)
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) continue
@@ -68,7 +74,7 @@ system.runInterval(
         }
 
         // Remove successfully placed block from the schedule array
-        SHEDULED_DB[dimension] = schedules.filter(e => e !== schedule)
+        SHEDULED_DB[dimension].splice(i, 1)
       }
 
       time()

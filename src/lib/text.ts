@@ -1,6 +1,7 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ROLES, getRole } from './roles'
 import { util } from './util'
+import { Command } from './command'
 
 export type Text = string
 export type MaybeRawText = string | RawText
@@ -50,7 +51,8 @@ function createRaw(options: ColorizingOptions): (text: TSA, ...units: (string | 
     const raw: RawText = { rawtext: [{ text: options.textColor }] }
 
     for (const [i, t] of texts.entries()) {
-      const unit = units[i]
+      const unit = units[i] as string | RawText | undefined | null
+
       raw.rawtext?.push({ text: t })
       if (unit === '' || unit === undefined || unit === null) continue
       else if (typeof unit === 'string') {
@@ -132,7 +134,7 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
       if (unit instanceof Player) {
         if (options.roles) return `${ROLES[getRole(unit.id)]}§r ${unitColor}${unit.name}`
         else return unitColor + unit.name
-      } else if (globalThis.Command && unit instanceof Command) {
+      } else if (unit instanceof Command) {
         return unitColor + Command.prefixes[0] + unit.sys.name
       } else return util.inspect(unit)
 
@@ -142,7 +144,7 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
 
     case 'number':
     case 'bigint':
-      return '§6' + unit
+      return `§6${unit}`
 
     case 'boolean':
       return unit ? '§fДа' : '§cНет'

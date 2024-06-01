@@ -49,7 +49,7 @@ expand(Player, {
 Object.defineProperty(Player.prototype, 'database', {
   enumerable: true,
   configurable: false,
-  get() {
+  get(this: Player) {
     return Player.database[this.id]
   },
 })

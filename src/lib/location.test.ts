@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { Player } from '@minecraft/server'
+import { MockInstance, beforeEach, describe, expect, it, vi } from 'vitest'
 import { table } from './database/abstract'
-import { location, locationWithRadius, locationWithRotation } from './location'
+import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
 import { Settings } from './settings'
 
 beforeEach(() => {
@@ -9,9 +10,16 @@ beforeEach(() => {
 })
 
 describe('location', () => {
-  it('should create a location with default values', () => {
+  it('should create a location', () => {
     const loc = location('group1', 'name1')
     expect(loc.valid).toBe(false)
+    expect(loc.onLoad).toBeDefined()
+    expect(loc.teleport).toBeDefined()
+  })
+
+  it('should create a location with default values', () => {
+    const loc = location('group1', 'name1', { x: 10, y: 40, z: 60 })
+    expect(loc.valid).toBe(true)
     expect(loc.onLoad).toBeDefined()
     expect(loc.teleport).toBeDefined()
   })
@@ -24,6 +32,12 @@ describe('location', () => {
 
     expect(loc.x).toBe(10)
     expect(loc.y).toBe(20)
+    expect(loc.z).toBe(30)
+
+    Settings.worldDatabase['group1'] = { name1: '40 60 30' }
+    Settings.worldMap['group1']['name1'].onChange?.()
+    expect(loc.x).toBe(40)
+    expect(loc.y).toBe(60)
     expect(loc.z).toBe(30)
   })
 
@@ -43,11 +57,30 @@ describe('location', () => {
   })
 
   it('should not load invalid location', () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     Settings.worldDatabase['group1'] = { name1: 'in va lid' }
+    location('group1', 'name1')
 
-    expect(() => location('group1', 'name1')).toThrowErrorMatchingInlineSnapshot(
-      `[TypeError: Invalid location, expected 'x y z' but recieved 'in va lid']`,
-    )
+    expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        [TypeError: Invalid location, expected 'x y z' but recieved 'in va lid'],
+      ]
+    `)
+  })
+
+  it('should teleport', () => {
+    const loc = location('group', 'name', { x: 0, y: 1, z: 1 })
+    // @ts-expect-error
+    const player = new Player() as Player
+    loc.teleport(player)
+    expect((player.teleport as unknown as MockInstance).mock.calls[0]).toEqual([
+      {
+        x: 0.5,
+        y: 0,
+        z: 0.5,
+      },
+      {},
+    ])
   })
 })
 
@@ -87,6 +120,26 @@ describe('locationWithRotation', () => {
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60, xRot: 30, yRot: 60 }))
   })
+
+  it('should teleport', () => {
+    const loc = locationWithRotation('group', 'name', { x: 0, y: 1, z: 1, xRot: 90, yRot: 0 })
+    // @ts-expect-error
+    const player = new Player() as Player
+    loc.teleport(player)
+    expect((player.teleport as unknown as MockInstance).mock.calls[0]).toEqual([
+      {
+        x: 0.5,
+        y: 0,
+        z: 0.5,
+      },
+      {
+        rotation: {
+          x: 90,
+          y: 0,
+        },
+      },
+    ])
+  })
 })
 
 describe('locationWithRadius', () => {
@@ -120,5 +173,37 @@ describe('locationWithRadius', () => {
     settings['name3'] = '40 50 60 10'
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60, radius: 10 }))
+  })
+})
+
+describe('migrate', () => {
+  it('should migrate location', () => {
+    Settings.worldDatabase['locations']['oldname'] = '1 0 1'
+    migrateLocationName('oldname', 'group', 'name')
+    expect(Settings.worldDatabase['group']['name']).toBe('1 0 1')
+  })
+
+  it('should not migrate already migrated location', () => {
+    Settings.worldDatabase['group']['name2'] = '1 0 1'
+    const consoleErrorSpy = vi.spyOn(console, 'warn')
+
+    migrateLocationName('does not exists', 'group', 'name2')
+
+    expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`undefined`)
+    expect(Settings.worldDatabase['group']['name2']).toBe('1 0 1')
+  })
+
+  it('should not migrate location that was empty', () => {
+    Settings.worldDatabase['group']['name2'] = '1 0 1'
+    const consoleErrorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    migrateLocationName('was never defined', 'group', 'name3')
+
+    expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        "§7[LocationNameMigration] No rename for '§fwas never defined§7'",
+      ]
+    `)
+    expect(Settings.worldDatabase['group']['name3']).toBeUndefined()
   })
 })

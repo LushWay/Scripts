@@ -54,7 +54,7 @@ export class DatabaseUtils {
   private static readonly tablesDimension = world.overworld
 
   private static tables(): TableEntity[] {
-    if (this.allEntities) return this.allEntities
+    if (typeof this.allEntities !== 'undefined') return this.allEntities
     this.allEntities = this.getEntities()
 
     if (this.allEntities.length < 1) {
@@ -75,7 +75,7 @@ export class DatabaseUtils {
       if (this.allEntities.length < 1) {
         console.warn('§cНе удалось загрузить базы данных из бэкапа.')
         return []
-      } else console.warn('Бэкап успешно загружен! Всего баз данных: ' + this.allEntities.length)
+      } else console.warn(`Бэкап успешно загружен! Всего баз данных: ${this.allEntities.length}`)
     }
 
     return this.allEntities

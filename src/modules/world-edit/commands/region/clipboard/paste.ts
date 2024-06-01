@@ -19,7 +19,7 @@ new Command('paste')
   .setDescription('Вставляет заранее скопированную зону')
   .setPermissions('builder')
   .setGroup('we')
-  .array('rotation', Object.keys(Rotations), true)
+  .array('rotation', Object.keys(Rotations) as unknown as `${keyof typeof Rotations}`[], true)
   .array('mirror', Object.keys(MirrorAxis), true)
   .boolean('includeEntites', true)
   .boolean('includeBlocks', true)
@@ -31,5 +31,13 @@ new Command('paste')
     }
 
     const we = WorldEdit.forPlayer(ctx.player)
-    we.paste(ctx.player, Rotations[rotation], MirrorAxis[mirror], includeEntites, includeBlocks, integrity, seed)
+    we.paste(
+      ctx.player,
+      Rotations[rotation ?? 0],
+      MirrorAxis[mirror as 'none'],
+      includeEntites,
+      includeBlocks,
+      integrity,
+      seed,
+    )
   })

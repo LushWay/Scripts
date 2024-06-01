@@ -196,8 +196,8 @@ function* getBlocksAreasData(block: Block, radius: number) {
       for (let z = -radius; z < radius; z++) {
         const location = Vector.add(block.location, { x, y, z })
 
-        if (BLOCK_CACHE[location.x]?.[location.y]?.[location.z]) {
-          bz.push(BLOCK_CACHE[location.x]?.[location.y]?.[location.z])
+        if (BLOCK_CACHE[location.x][location.y][location.z]) {
+          bz.push(BLOCK_CACHE[location.x][location.y][location.z])
           yield
           continue
         }

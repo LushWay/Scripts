@@ -103,7 +103,7 @@ export class LockAction {
     }: { ignore?: LockAction[]; accept?: LockAction[]; tell?: boolean; returnText?: boolean } = {},
   ) {
     for (const lock of this.instances) {
-      if (ignore && ignore.includes(lock)) continue
+      if (ignore?.includes(lock)) continue
       if (accept && !accept.includes(lock)) continue
 
       const isLocked = lock.isLocked(player)

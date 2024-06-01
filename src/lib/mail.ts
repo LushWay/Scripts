@@ -110,7 +110,7 @@ export class Mail {
   static toLocalLetter(letter: LetterLink | LocalLetter) {
     if ('id' in letter) {
       const global = Mail.dbGlobal[letter.id]
-      if (!global) return
+      if (typeof global === 'undefined') return
 
       // We cannot use spread syntax here because it will create new
       // object, so canges will not be saved to the database

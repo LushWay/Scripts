@@ -94,14 +94,14 @@ actionGuard((player, region, ctx) => {
   const furnace = FurnaceKeyItem.db[blockId]
 
   // Access allowed
-  if (furnace && furnace.code === lore.code) {
+  if (typeof furnace !== 'undefined' && furnace.code === lore.code) {
     furnace.lastPlayerId = player.id
     return true
   }
 
   // Furnace is free, creating access key
   if (lore.status === 'notUsed') {
-    if (furnace) {
+    if (typeof furnace !== 'undefined') {
       if (furnace.expires < Date.now()) {
         // Notify previous owner (Maybe?)
       } else {
@@ -171,7 +171,7 @@ class FurnaceKeyItem {
    */
 
   static stringifyLore(key: FurnaceKeyInfo) {
-    const name = key.lastPlayerName || (key.lastPlayerId ? Player.name(key.lastPlayerId) : undefined)
+    const name = key.lastPlayerName ?? (key.lastPlayerId ? Player.name(key.lastPlayerId) : undefined)
     return [
       ...util.wrapLore('§7Ключ от печки в технограде. Используйте его чтобы открыть печку'),
       ' ',
@@ -221,7 +221,7 @@ class FurnaceKeyItem {
       () => {
         let players
         for (const [key, furnace] of Object.entries(FurnaceKeyItem.db)) {
-          if (!furnace) continue
+          if (typeof furnace === 'undefined') continue
           if (furnace.warnedAboutExpire) continue
 
           const untilExpire = furnace.expires - Date.now()
