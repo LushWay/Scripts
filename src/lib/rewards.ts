@@ -1,7 +1,8 @@
-import { ItemStack, Player, ScoreName } from '@minecraft/server'
+import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
+import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { emoji } from 'lib/assets/emoji'
 import { itemLocaleName } from './game-utils'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { noBoolean } from './util'
 
 export type Reward =
   | {
@@ -100,21 +101,22 @@ export class Rewards {
    * @param {Reward} reward The reward
    * @returns {string}
    */
-  static rewardToString(reward: Reward): string {
-    if (reward.type == 'scores' && reward.score == 'leafs') return `${emoji.leaf} Листья x${reward.count}`
-    else if (reward.type === 'scores' && reward.score == 'money') return `${emoji.money} Монеты x${reward.count}`
-    else if (reward.type === 'item')
-      return itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
-    else return `${reward.score} x${reward.count}`
+  static rewardToString(reward: Reward): RawMessage {
+    let text: string | RawMessage
+    if (reward.type === 'scores') {
+      if (reward.score === 'leafs') text = `${reward.count}${emoji.leaf}`
+      else if (reward.score === 'money') text = `${reward.count}${emoji.money}`
+      else text = `${reward.score} x${reward.count}`
+    } else if (reward.type === 'item')
+      text = itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id }, undefined)
+
+    text ??= 'Неизвестная награда...'
+    return typeof text === 'string' ? { text } : text
   }
 
-  /**
-   * Returns the rewards as a human-readable string
-   *
-   * @returns {string}
-   */
-  toString(): string {
-    return this.entries.map(Rewards.rewardToString).join('\n')
+  /** Returns the rewards as a human-readable string */
+  toString(): RawMessage {
+    return { rawtext: this.entries.map(Rewards.rewardToString) }
   }
 }
 
@@ -123,9 +125,12 @@ export class Rewards {
  *
  * @param {ItemStack} item
  */
-export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§g', newline = false) {
-  const name = item.nameTag ?? itemLocaleName(item)
-  const count = item.amount ? `${newline ? '' : ' '}${c}x${item.amount}${newline ? ' ' : ''}` : ''
-  
-  return `${name}§r${newline ? '\n' : ''}${count}`
+export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§7'): RawMessage {
+  return {
+    rawtext: [
+      { text: c },
+      item.nameTag ? { text: item.nameTag } : { translate: itemLocaleName(item) },
+      item.amount ? { text: ` §r${c}x${item.amount}` } : false,
+    ].filter(noBoolean),
+  }
 }

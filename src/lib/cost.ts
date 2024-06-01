@@ -1,10 +1,14 @@
-import { ItemStack, Player } from '@minecraft/server'
+import { ItemStack, Player, RawText } from '@minecraft/server'
 import { SOUNDS } from 'lib/assets/config'
 import { emoji } from 'lib/assets/emoji'
+import { itemLocaleName } from './game-utils'
+import { itemDescription } from './rewards'
+import { MaybeRawText, t } from './text'
+import { noBoolean } from './util'
 
-export class Cost {
+export class Cost<T = unknown> {
   /** Returns string representation of cost */
-  toString(canBuy = true): string {
+  toString(canBuy = true, player?: Player): MaybeRawText {
     return ''
   }
 
@@ -13,7 +17,7 @@ export class Cost {
    *
    * @param {Player} player - Player to check on
    */
-  check(player: Player): boolean {
+  has(player: Player): boolean {
     return false
   }
 
@@ -22,8 +26,9 @@ export class Cost {
    *
    * @param {Player} player - Buyer
    */
-  buy(player: Player) {
+  buy(player: Player): T {
     player.playSound(SOUNDS.action)
+    return undefined as T
   }
 
   /**
@@ -31,39 +36,74 @@ export class Cost {
    *
    * @param {Player} player - Player to play sound on
    */
-  failed(player: Player): string {
+  failed(player: Player): MaybeRawText {
     player.playSound(SOUNDS.fail)
-    return 'Недостаточно средств'
+    return ''
   }
 }
 
-export class MultiCost extends Cost {
-  private costs: Cost[]
+export class MultiCost<T extends Cost[]> extends Cost {
+  private costs: T
 
-  constructor(...costs: Cost[]) {
+  constructor(...costs: T) {
     super()
     this.costs = costs
   }
 
-  toString(canBuy = true): string {
-    return this.costs.map(e => e.toString(canBuy)).join(' ')
+  toString(canBuy = true, player?: Player): RawText {
+    return {
+      rawtext: this.costs
+        .map((cost, i, arr) => {
+          const string = cost.toString(!canBuy && player ? cost.has(player) : canBuy, player)
+          if (string === '') return false
+
+          if (arr.length - i === i) return t.raw`${string}`
+          else return t.raw`${string}, `
+        })
+        .filter(noBoolean),
+    }
   }
 
-  check(player: Player): boolean {
-    return this.costs.every(e => e.check(player))
+  has(player: Player): boolean {
+    return this.costs.every(e => e.has(player))
   }
 
-  buy(player: Player): void {
-    this.costs.forEach(e => e.buy(player))
+  buy(player: Player) {
+    return this.costs.map(e => e.buy(player)) as {
+      -readonly [P in keyof T]: T[P] extends Cost<infer R> ? R : never
+    }
   }
 
-  failed(player: Player): string {
+  failed(player: Player): MaybeRawText {
+    super.failed(player)
+    let messages: RawText | undefined
     for (const cost of this.costs) {
-      const canBuy = cost.check(player)
-      if (!canBuy) return cost.failed(player)
+      const canBuy = cost.has(player)
+      if (!canBuy) {
+        const failed = cost.failed(player)
+        if (failed === '') continue
+
+        messages = t.raw`${messages ?? ''}\n${failed}`
+      }
     }
 
-    return super.failed(player)
+    return messages ?? t.raw`Недостаточно средств.`
+  }
+
+  item = this.createCostAlias(ItemCost)
+
+  money = this.createCostAlias(MoneyCost)
+
+  leafy = this.createCostAlias(LeafyCost)
+
+  private createCostAlias<T extends typeof Cost | typeof ItemCost | typeof ScoreboardCost>(target: T) {
+    return (...args: ConstructorParameters<T>) => {
+      this.costs.push(
+        // @ts-expect-error Idk why it complains
+        new target(...args),
+      )
+      return this
+    }
   }
 }
 
@@ -86,7 +126,7 @@ class ScoreboardCost extends Cost {
     return `${canBuy ? this.color : '§c'}${this.cost}${this.emoji}`
   }
 
-  check(player: Player) {
+  has(player: Player) {
     return player.scores[this.scoreboard] >= this.cost
   }
 
@@ -98,7 +138,7 @@ class ScoreboardCost extends Cost {
   failed(player: Player) {
     super.failed(player)
     const have = player.scores[this.scoreboard]
-    return `§cНедостаточно средств (§4${have}/${this.cost}§c). Нужно еще ${this.color}${this.cost - have}`
+    return t.error`${have}/${this.cost}${this.emoji}`
   }
 }
 
@@ -121,24 +161,24 @@ export class LeafyCost extends ScoreboardCost {
 export class ItemCost extends Cost {
   /**
    * Creates new cost that checks for ItemStack in player inventory by checking their typeIds. For items with
-   * enchantemts and other custom properties use {@link ItemStackCost}
+   * enchantemts and other custom properties use ItemStack
    *
-   * @param typeId - Type id to search for.
+   * @param item - Type id or ItemStack to search for.
    * @param amount - Amount of items to search for.
    */
   constructor(
-    private readonly typeId: string,
-    private readonly amount = 1,
+    private readonly item: string | ItemStack,
+    private readonly amount = item instanceof ItemStack ? item.amount : 1,
+    protected is = (itemStack: ItemStack) => {
+      if (typeof this.item === 'string') return itemStack.typeId === this.item
+      return this.item.is(itemStack)
+    },
   ) {
     super()
   }
 
-  protected is(itemStack: ItemStack): boolean {
-    return itemStack.typeId === this.typeId
-  }
-
   protected getItems(player: Player) {
-    if (!player.container) return { canBuy: false, slots: new Map<number, number | undefined>() }
+    if (!player.container) return { canBuy: false, slots: new Map<number, number | undefined>(), amount: 0 }
 
     let amount = this.amount
     const slots = new Map<number, number | undefined>()
@@ -157,10 +197,10 @@ export class ItemCost extends Cost {
       }
     }
 
-    return { canBuy: amount <= 0, slots }
+    return { canBuy: amount <= 0, slots, amount }
   }
 
-  check(player: Player) {
+  has(player: Player) {
     return this.getItems(player).canBuy
   }
 
@@ -177,25 +217,31 @@ export class ItemCost extends Cost {
       }
     }
   }
-}
 
-export class ItemStackCost extends ItemCost {
-  /**
-   * Creates new cost that checks for ItemStack in player inventory. Usefull for items with enchantemts and other custom
-   * properties.
-   *
-   * @param itemStack - {@link ItemStack} to check
-   * @param amount - Amount of items. Defaults to {@link ItemStack.amount}. Usefull when cost requires amount that is
-   *   greater then max item stack allowed amount
-   */
-  constructor(
-    private readonly itemStack: ItemStack,
-    amount?: number,
-  ) {
-    super(itemStack.typeId, amount ?? itemStack.amount)
+  toString(canBuy?: boolean): MaybeRawText {
+    return itemDescription(
+      this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
+      canBuy ? '§7' : '§c',
+    )
   }
 
-  protected override is(itemStack: ItemStack): boolean {
-    return itemStack.is(this.itemStack)
+  failed(player: Player): MaybeRawText {
+    const items = this.getItems(player)
+
+    return t.raw`${t.error`${this.amount - items.amount}/${this.amount} `}${{ translate: itemLocaleName(this.item instanceof ItemStack ? this.item : { typeId: this.item }) }}`
+  }
+}
+
+export class ShouldHaveItemCost extends ItemCost {
+  buy(player: Player): void {
+    return
+  }
+
+  toString() {
+    return ''
+  }
+
+  failed(player: Player) {
+    return ''
   }
 }

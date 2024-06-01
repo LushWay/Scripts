@@ -1,7 +1,8 @@
-import { BlockPermutation, Player } from '@minecraft/server'
+import { BlockPermutation, Player, RawText } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { typeIdToReadable } from 'lib/game-utils'
+import { MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds'
 import { BUTTON, showForm } from './utils'
@@ -51,20 +52,20 @@ export class ChestForm {
     }
   }
 
-  private titleText: string
+  private titleText: RawText
 
   private buttons: ChestButton[] = []
 
   constructor(sizeType: keyof typeof SIZES = 'small') {
     const [sizeName, size] = SIZES[sizeType]
 
-    this.titleText = sizeName
+    this.titleText = t.raw`${sizeName}`
 
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
 
-  title(text: string) {
-    this.titleText += text
+  title(text: MaybeRawText) {
+    this.titleText = t.raw`${this.titleText}${text}`
     return this
   }
 
@@ -85,7 +86,6 @@ export class ChestForm {
 
     if (description) lore = util.wrapLore(description)
 
-    /** @type {ChestButton} */
     const slotData: ChestButton = {
       text: `stack#${Math.min(Math.max(amount, 1) || 1, 99)
         .toString()

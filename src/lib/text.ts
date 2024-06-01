@@ -1,21 +1,23 @@
-import { Player } from '@minecraft/server'
+import { Player, RawMessage, RawText } from '@minecraft/server'
 import { CONFIG } from './assets/config'
 import { ROLES, getRole } from './roles'
 import { util } from './util'
 
 export type Text = string
+export type MaybeRawText = string | RawText
 
 type TSA = TemplateStringsArray
 type Fn = (text: TSA, ...args: unknown[]) => Text
-interface Multi {
-  error: Fn & Omit<Multi, 'error'>
-  header: Fn
+type OptionsModifiers = 'error' | 'header'
+interface MultiStatic {
+  raw: (text: TSA, ...units: (string | RawText | RawMessage)[]) => RawText
   roles: (text: TSA, ...players: Player[]) => Text
   badge: (text: TSA, n: number) => Text
   num: (text: TSA, n: number, plurals: Plurals) => Text
   time: (text: TSA, time: number) => Text
   options: (options: ColorizingOptions) => Multi
 }
+type Multi = MultiStatic & Record<OptionsModifiers, Fn & Omit<MultiStatic, OptionsModifiers>>
 
 export function textTable(table: Record<string, unknown>, join: false): string[]
 export function textTable(table: Record<string, unknown>, join?: true): string
@@ -26,17 +28,47 @@ export function textTable(table: Record<string, unknown>, join = true): string |
 
 export const t = createMulti()
 
-function createMulti(options: ColorizingOptions = {}, name?: keyof Multi) {
+function createMulti(options: ColorizingOptions = {}, modifier = false) {
   const t = createSingle(options)
   t.roles = createSingle({ roles: true, ...options })
-  t.header = createSingle({ textColor: '§6', ...options, unitColor: '§f§l' })
   t.badge = createBadge(options)
   t.num = createNum(options)
   t.time = createSingle(options)
+  t.raw = createRaw(options)
 
-  if (name !== 'error') t.error = createMulti({ textColor: '§c', unitColor: '§f', ...options }, 'error')
+  if (!modifier) {
+    t.header = createMulti({ textColor: '§6', ...options, unitColor: '§f§l' }, true)
+    t.error = createMulti({ textColor: '§c', unitColor: '§f', ...options }, true)
+  }
   t.options = options => createMulti(options)
   return t
+}
+
+function createRaw(options: ColorizingOptions): (text: TSA, ...units: (string | RawText)[]) => RawText {
+  options = addDefaultsToOptions(options)
+  return (text, ...units) => {
+    const texts = text.slice()
+    const raw: RawText = { rawtext: [{ text: options.textColor }] }
+
+    for (const [i, t] of texts.entries()) {
+      const unit = units[i]
+      raw.rawtext?.push({ text: t })
+      if (unit === '' || unit === undefined || unit === null) continue
+      else if (typeof unit === 'string') {
+        if (unit !== '') raw.rawtext?.push({ text: textUnitColorize(unit, options) })
+      } else {
+        raw.rawtext?.push({ text: options.unitColor })
+        if (Array.isArray(unit.rawtext)) {
+          raw.rawtext?.push(...unit.rawtext)
+        } else {
+          raw.rawtext?.push(unit)
+        }
+        raw.rawtext?.push({ text: options.textColor })
+      }
+    }
+
+    return raw
+  }
 }
 
 function createSingle(
@@ -46,7 +78,7 @@ function createSingle(
   const { textColor } = addDefaultsToOptions(options)
 
   return function t(text, ...units) {
-    const raw = text.raw.slice()
+    const raw = text.slice()
     if (raw.at(-1) === '') raw.pop()
     return raw.reduce((previous, text, i) => previous + fn(text, units[i], i, units) + textColor, textColor)
   } as Fn & Multi

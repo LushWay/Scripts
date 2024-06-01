@@ -63,7 +63,7 @@ export class Furnacer {
           lastPlayerId: player.id,
         }),
       )
-      form.addItem(item, new MoneyCost(5))
+      form.addItemStack(item, new MoneyCost(5))
     })
   }
 }

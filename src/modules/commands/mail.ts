@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, prompt, util } from 'lib'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/rewards'
+import { t } from 'lib/text'
 
 new Command('mail').setDescription('Посмотреть входящие сообщения почты').executes(ctx => mailMenu(ctx.player))
 
@@ -83,7 +84,7 @@ function letterDetailsMenu(
   const settings = getSettings(player)
   const form = new ActionForm(
     letter.title,
-    message + letter.content + '\n\n§l§fНаграды:§r\n' + Rewards.restore(letter.rewards).toString(),
+    t.raw`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString()}`,
   ).addButtonBack(back)
 
   if (!letter.rewardsClaimed && letter.rewards.length)

@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
+import { MaybeRawText } from 'lib/text'
 import { util } from '../util'
 import { showForm } from './utils'
 
@@ -12,12 +13,6 @@ interface IMessageFormButton {
 
 export class MessageForm {
   triedToShow
-
-  /** The title that this form should have */
-  title: string
-
-  /** Extra text that should be displayed in the form */
-  body: string
 
   /** The default minecraft form this form is based on */
   private form: MessageFormData
@@ -36,9 +31,7 @@ export class MessageForm {
    * @param title The title that this form should have
    * @param body Extra text that should be displayed in the form
    */
-  constructor(title: string, body: string) {
-    this.title = title
-    this.body = body
+  constructor(title: MaybeRawText, body: MaybeRawText) {
     this.form = new MessageFormData()
     if (title) this.form.title(title)
     if (body) this.form.body(body)

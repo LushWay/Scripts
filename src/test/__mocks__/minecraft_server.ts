@@ -58,6 +58,14 @@ export class Entity {
 }
 
 export class Player extends Entity {
+  scores = new Proxy(
+    {},
+    {
+      get(target, p, receiver) {
+        return Reflect.get(target, p, receiver) ?? 0
+      },
+    },
+  )
   constructor() {
     super()
     EventSignal.emit(
@@ -73,6 +81,7 @@ export class Player extends Entity {
   id = 'test player id'
   name = 'Test player name'
   nameTag = this.name
+  playSound = vi.fn()
 
   private gamemode: GameMode = GameMode.survival
   getGameMode() {

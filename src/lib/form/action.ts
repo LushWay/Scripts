@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { prompt } from 'lib/form/message'
 import { util } from 'lib/util'
@@ -6,7 +6,7 @@ import { BUTTON, showForm } from './utils'
 
 interface IActionFormButton {
   /** Text that gets displayed on the button */
-  text: string
+  text: string | RawMessage
   /** The icon that is showed with this button */
   iconPath?: string | null
   /** What gets called when this gets clicked */
@@ -30,9 +30,9 @@ export class ActionForm {
    * @param body - Extra text that should be displayed in the form
    * @param prefix - Prefix used by ui side to determine which type of form to render (e.g. it can be chestui or npc)
    */
-  constructor(title: string, body = '', prefix = '§c§o§m§m§o§n§r§f') {
+  constructor(title: string | RawText, body: string | RawText = '', prefix = '§c§o§m§m§o§n§r§f') {
     this.form = new ActionFormData()
-    this.form.title(prefix + title)
+    this.form.title({ rawtext: [{ text: prefix }, typeof title === 'string' ? { text: title } : title] })
     this.form.body(body)
   }
 
@@ -42,7 +42,7 @@ export class ActionForm {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string, callback: PlayerCallback): ActionForm
+  addButton(text: string | RawMessage, callback: PlayerCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -51,7 +51,7 @@ export class ActionForm {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string, iconPath: string | null, callback: PlayerCallback): ActionForm
+  addButton(text: string | RawMessage, iconPath: string | null, callback: PlayerCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -60,7 +60,11 @@ export class ActionForm {
    * @param iconPathOrCallback - The path this button icon
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string, iconPathOrCallback: string | null | PlayerCallback, callback?: PlayerCallback): ActionForm {
+  addButton(
+    text: string | RawMessage,
+    iconPathOrCallback: string | null | PlayerCallback,
+    callback?: PlayerCallback,
+  ): ActionForm {
     let iconPath
     if (typeof iconPathOrCallback === 'function') {
       callback = iconPathOrCallback

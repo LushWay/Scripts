@@ -8,7 +8,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { MinecraftBlockTypes, MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftCameraPresetsTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib/vector'
 
 /** Represents location in the specific dimension */
@@ -101,7 +101,7 @@ export function itemLocaleName(item: Pick<ItemStack, 'typeId'>) {
       id = result ?? id
     }
 
-    return `%tile.${id}.name`
+    return `tile.${id}.name`
   }
 
   for (const fn of itemModifiers) {
@@ -109,13 +109,15 @@ export function itemLocaleName(item: Pick<ItemStack, 'typeId'>) {
     id = result ?? id
   }
 
-  let name = `%item.${id}.name`
-  for (const fn of afterItems) name = fn(name) ?? name
+  const name = `item.${id}.name`
+  // for (const fn of afterItems) name = fn(name) ?? name
 
   return name
 }
 
-const blocks: string[] = Object.values(MinecraftBlockTypes)
+const blocks: string[] = Object.values(MinecraftBlockTypes as Record<string, string>).concat(
+  MinecraftItemTypes.Planks as string,
+)
 const itemTypes = ['boat', 'banner_pattern']
 const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join('|')})`)
 
@@ -142,7 +144,7 @@ const itemModifiers: ((s: string) => string | undefined)[] = [
   },
 ]
 
-const afterItems: ((s: string) => string)[] = [s => s.replace(/\.name$/, '')]
+// const afterItems: ((s: string) => string)[] = [s => s.replace(/\.name$/, '')]
 const blockTypes = ['wool']
 const blockRegExp = new RegExp(`^(.+)_(${blockTypes.join('|')})`)
 
@@ -156,5 +158,12 @@ const blockModifiers: ((s: string) => string | undefined)[] = [
     if (!match) return
     const [, color, type] = match
     return `${type}.${color}`
+  },
+  planks => {
+    if (!planks.endsWith('planks')) return
+    const type = planks.replace(/_?planks/, '')
+    if (!['acacia', 'big_oak', 'birch', 'jungle', '', 'spruce', 'oak'].includes(type)) return planks
+
+    return `planks.${type}`
   },
 ]

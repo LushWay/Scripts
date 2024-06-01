@@ -1,14 +1,19 @@
-import { ItemStack, Player, system } from '@minecraft/server'
-
-import { PlaceAction, Settings, location } from 'lib'
+import { ContainerSlot, ItemStack, Player, system } from '@minecraft/server'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { PlaceAction } from 'lib/action'
 import { emoji } from 'lib/assets/emoji'
 import { Cooldown } from 'lib/cooldown'
-import { Cost } from 'lib/cost'
+import { Cost, MultiCost, ShouldHaveItemCost } from 'lib/cost'
 import { ActionForm } from 'lib/form/action'
+import { ChestForm } from 'lib/form/chest'
 import { MessageForm } from 'lib/form/message'
+import { location } from 'lib/location'
 import { Npc } from 'lib/npc'
+import { Settings } from 'lib/settings'
+import { MaybeRawText, t, textTable } from 'lib/text'
+import { BUTTON } from './form/utils'
+import { typeIdToReadable } from './game-utils'
 import { itemDescription } from './rewards'
-import { t, textTable } from './text'
 
 interface ShopOptions {
   group: string
@@ -16,27 +21,28 @@ interface ShopOptions {
   body: (player: Player) => string
 }
 
-interface ShopProduct {
-  name: Text | ((canBuy: boolean) => Text)
-  cost: Cost
-  onBuy: (player: Player) => void
+interface ShopProduct<T = unknown> {
+  name: MaybeRawText | ((canBuy: boolean) => MaybeRawText)
+  cost: Cost<T>
+  onBuy: (player: Player, text: MaybeRawText) => void
 }
 
 interface ShopSection {
-  name: Text
+  name: MaybeRawText
   onOpen: (form: ShopForm) => void
 }
 
 type ShopProductBuy = Omit<ShopProduct, 'name'> & {
   player: Player
-  text: Text
+  text: MaybeRawText
+  back?: VoidFunction
 }
 
 type ShopMenuGenerator = (menu: ShopForm, player: Player) => void
 
 export class Shop {
   static block(options: ShopOptions & { dimensionId: Dimensions }) {
-    const shop = new Shop(options.group, options.name)
+    const shop = new Shop(options.name)
     location(options.group, options.name).onLoad.subscribe(location => {
       /** We dont actually want to store that on disk */
       const cooldownDatabase: JsonObject = {}
@@ -61,7 +67,7 @@ export class Shop {
   }
 
   static npc(options: ShopOptions & { dimensionId?: Dimensions; id: string }) {
-    const shop = new Shop(options.group, options.name)
+    const shop = new Shop(options.name)
     const entity = new Npc({
       ...options,
       onInteract: event => shop.open(event.player),
@@ -80,10 +86,7 @@ export class Shop {
 
   static shops: Shop[] = []
 
-  constructor(
-    private group: string,
-    private name: string,
-  ) {
+  constructor(private name: string) {
     Shop.shops.push(this)
   }
 
@@ -144,9 +147,49 @@ export class ShopForm {
    * @param onBuy
    * @returns
    */
-  addProduct(name: ShopProduct['name'], cost: ShopProduct['cost'], onBuy: ShopProduct['onBuy']) {
+  addProduct<T extends Cost>(name: ShopProduct<T>['name'], cost: T, onBuy: ShopProduct<T>['onBuy']) {
     this.buttons.push({ name, cost, onBuy })
     return this
+  }
+
+  addItemModifier(
+    name: ShopProduct['name'],
+    cost: Cost,
+    itemFilter: (itemStack: ItemStack) => boolean,
+    modifyItem: (itemSlot: ContainerSlot) => void,
+  ) {
+    this.addProduct(name, new MultiCost(new ShouldHaveItemCost('', 1, itemFilter), cost), (player, text) => {
+      const form = new ChestForm('45').title(text).pattern([0, 0], ['<-------?'], {
+        '<': {
+          icon: BUTTON['<'],
+          callback: () => {
+            this.show(player)
+          },
+        },
+        '-': {
+          icon: MinecraftBlockTypes.GlassPane,
+        },
+        '?': {
+          icon: BUTTON['?'],
+        },
+      })
+
+      const { container } = player
+      if (!container) return
+      for (const [i, item] of container.entries().filter(([, item]) => item && itemFilter(item))) {
+        if (!item) continue
+        form.button({
+          slot: i + 9,
+          icon: item.typeId,
+          nameTag: typeIdToReadable(item.typeId),
+          amount: item.amount,
+          lore: item.getLore(),
+          callback: () => cost.buy(player) && modifyItem(container.getSlot(i)),
+        })
+      }
+
+      form.show(player)
+    })
   }
 
   /**
@@ -155,17 +198,13 @@ export class ShopForm {
    * @param item
    * @param cost
    */
-  addItem(item: ItemStack, cost: Cost) {
-    this.addProduct(
-      canBuy => itemDescription(item, canBuy ? '§g' : '§7', true),
-      cost,
-      player => {
-        if (!player.container) return
+  addItemStack(item: ItemStack, cost: Cost) {
+    this.addProduct(itemDescription(item, '§f'), cost, player => {
+      if (!player.container) return
 
-        cost.buy(player)
-        player.container.addItem(item)
-      },
-    )
+      cost.buy(player)
+      player.container.addItem(item)
+    })
     return this
   }
 
@@ -175,26 +214,26 @@ export class ShopForm {
    * @param player - Player to open store for
    * @param message - Additional message to show in store description
    */
-  show(player: Player, message = '', back?: VoidFunction) {
-    if (message) message += '§r\n \n§f'
-
-    const form = new ActionForm(this.title, message + this.body)
+  show(player: Player, message: MaybeRawText = '', back?: VoidFunction) {
+    const form = new ActionForm(this.title, t.raw`${message}${message ? '§r\n \n§f' : ''}${this.body}`)
     if (back) form.addButtonBack(back)
 
     for (const button of this.buttons) {
       if ('cost' in button) {
         const { name, cost, onBuy } = button
-        const canBuy = cost.check(player)
-        const text = typeof name === 'string' ? name : name(canBuy)
+        const canBuy = cost.has(player)
+        const text = typeof name === 'function' ? name(canBuy) : name
 
-        form.addButton(`${name}${cost.toString(canBuy)}`, () => this.buy({ text: text, cost, onBuy, player }))
+        form.addButton(t.raw`${text}\n${cost.toString(canBuy, player)}`, () =>
+          this.buy({ text: text, cost, onBuy, player, back }),
+        )
       } else {
         const { name, onOpen } = button
 
         form.addButton(name, () => {
-          const form = new ShopForm(name, '')
+          const form = new ShopForm(this.title + ' > ' + name, this.body)
           onOpen(form)
-          form.show(player)
+          form.show(player, '', () => this.show(player))
         })
       }
     }
@@ -202,10 +241,10 @@ export class ShopForm {
     form.show(player)
   }
 
-  private buy({ onBuy, cost, player, text }: ShopProductBuy) {
+  private buy({ onBuy, cost, player, text, back }: ShopProductBuy) {
     const canBuy = () => {
-      if (!cost.check(player)) {
-        this.show(player, cost.failed(player))
+      if (!cost.has(player)) {
+        this.show(player, t.raw`${t.error`Недостаточно средств: `}${cost.failed(player)}`, back)
         return false
       } else return true
     }
@@ -214,12 +253,12 @@ export class ShopForm {
 
     const purchase = () => {
       if (!canBuy()) return
-      onBuy(player)
-      this.show(player, `§aУспешная покупка: §f${text} §aза ${cost.toString()}§a!`)
+      onBuy(player, text)
+      this.show(player, t.options({ textColor: '§a' }).raw`Успешная покупка: ${text} за ${cost.toString()}!`)
     }
 
     if (Shop.getPlayerSettings(player).prompt) {
-      new MessageForm(t.header`Подтверждение`, t`Купить ${text} за ${cost.toString()}?`)
+      new MessageForm(t.header`Подтверждение`, t.raw`Купить ${text} за ${cost.toString()}?`)
         .setButton1(t`Купить!`, purchase)
         .setButton2(t.error`Отмена`, () => this.show(player, t.error`Покупка отменена`))
         .show(player)
