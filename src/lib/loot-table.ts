@@ -41,7 +41,7 @@ new Command('loot')
     lootTable.fillContainer(inventory.container)
   })
 
-type PreparedItems = { stack: ItemStack; chance: number }[]
+type PreparedItems = { item: ItemStack; chance: number }[]
 
 export class Loot {
   private items: StoredItem[] = []
@@ -212,10 +212,7 @@ export class LootTable {
 
   generateOne() {
     const items = this.items.map(i => this.generateItems(i)).flat()
-
-    const index = this.selectByChance(items)
-
-    return (items[index] ?? items[0]).stack
+    return selectByChance(items).item
   }
 
   /**
@@ -226,7 +223,7 @@ export class LootTable {
    */
   generate(length = this.items.length): (ItemStack | undefined)[] {
     const items = this.items.map(i => this.generateItems(i)).flat()
-    if (length === 1) return items.map(e => e.stack)
+    if (length === 1) return items.map(e => e.item)
 
     // Separate items by chance
     let explictItems = items.filter(e => e.chance === 100)
@@ -244,15 +241,12 @@ export class LootTable {
       if (explictItems.length > 0) {
         const item = explictItems.randomElement() // Remove and get item
         explictItems = explictItems.filter(e => e !== item)
-        return item.stack
+        return item.item
       } else if (randomizableItems.length > 0) {
-        // Find the item based on random chance
-        const selectedIndex = this.selectByChance(randomizableItems)
+        const { index, item } = selectByChance(randomizableItems)
+        randomizableItems.splice(index, 1)
 
-        if (selectedIndex !== -1) {
-          const [item] = randomizableItems.splice(selectedIndex, 1) // Remove and get item
-          return item.stack
-        }
+        return item
       }
     })
   }
@@ -314,7 +308,7 @@ export class LootTable {
 
       return [
         {
-          stack,
+          item: stack,
           chance: item.chance,
         },
       ]
@@ -337,4 +331,16 @@ function parseIntStrict(string: string) {
   if (isNaN(int)) throw new TypeError(`Expected number, got ${util.inspect(string)}`)
 
   return int
+}
+
+export function selectByChance<T>(items: { chance: number; item: T }[]) {
+  const totalChance = items.reduce((sum, { chance }) => sum + chance, 0)
+  let random = Math.randomFloat(0, totalChance)
+
+  for (const [index, { chance, item }] of items.entries()) {
+    random -= chance
+    if (random < 0) return { index, item }
+  }
+
+  return { index: 0, item: items[0].item }
 }

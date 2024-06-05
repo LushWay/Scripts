@@ -1,4 +1,3 @@
-import { world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib/vector'
 import { TestStructures } from 'test/constants'
@@ -14,24 +13,16 @@ suite('RadiusRegionWithStructure', () => {
     })
 
     region.saveStructure() // save empty structure with air
-
-    const locations = Vector.foreach(...Vector.around(region.center, region.radius))
-    let i = 0
-    for (const location of locations) {
-      const isIn = region.isVectorInRegion(location, region.dimensionId)
-      world[region.dimensionId].setBlockType(location, isIn ? MinecraftBlockTypes.Bedrock : MinecraftBlockTypes.Glass)
-      i++
-      if (i % 5 === 0) await test.idle(1)
-    }
+    await region.forEachVector((vector, isIn, dimension) => {
+      dimension.setBlockType(vector, isIn ? MinecraftBlockTypes.Bedrock : MinecraftBlockTypes.Glass)
+    })
 
     await test.idle(40)
-
     await region.loadStructure()
 
-    for (const location of locations) {
-      const isIn = region.isVectorInRegion(location, region.dimensionId)
-      test.assertBlockPresent(isIn ? MinecraftBlockTypes.Air : MinecraftBlockTypes.Glass, test.worldLocation(location))
-    }
+    await region.forEachVector((vector, isIn) => {
+      test.assertBlockPresent(isIn ? MinecraftBlockTypes.Air : MinecraftBlockTypes.Glass, test.worldLocation(vector))
+    })
 
     test.succeed()
   })

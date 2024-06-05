@@ -28,7 +28,6 @@ export class CubeRegion extends Region implements CubeRegionOptions {
     }
   }
 
-  /** @inheritdoc */
   isVectorInRegion(vector: Vector3, dimension: Dimensions) {
     if (!super.isVectorInRegion(vector, dimension)) return false
 
@@ -36,7 +35,6 @@ export class CubeRegion extends Region implements CubeRegionOptions {
     return Vector.between(from, to, vector)
   }
 
-  /** @inheritdoc */
   protected toJSON() {
     return {
       ...super.toJSON(),
@@ -46,7 +44,6 @@ export class CubeRegion extends Region implements CubeRegionOptions {
     }
   }
 
-  /** @inheritdoc */
   save() {
     if (!this.saveable) return false
     RegionDatabase[this.key] = this.toJSON()

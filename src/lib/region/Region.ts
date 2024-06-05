@@ -39,10 +39,12 @@ export class Region {
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     if (!key) {
-      // When generating new key we are creating new region and should save it
+      // We are creating new region and should save it
       region.save()
+      region.onCreate()
     } else {
-      // When restoring with existing key, we should not save region
+      // Restoring region with existing key
+      region.onRestore()
     }
 
     return region as unknown as InstanceType<T>
@@ -119,6 +121,16 @@ export class Region {
   ) {
     this.dimensionId = dimensionId
     Region.regions.push(this)
+  }
+
+  /** Function that gets called on region creation after saving (once) */
+  protected onCreate() {
+    // Hook
+  }
+
+  /** Function that gets called on restore */
+  protected onRestore() {
+    // Hook
   }
 
   /** Checks if the vector is in the region */

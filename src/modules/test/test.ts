@@ -30,7 +30,6 @@ import { ModalForm } from 'lib/form/modal'
 import { Compass } from 'lib/menu'
 import { Rewards } from 'lib/rewards'
 import { BASE_ITEM_STACK } from 'modules/places/base/base'
-import { Mineshaft } from 'modules/places/mineshaft/mineshaft'
 import './enchant'
 // import './simulatedPlayer'
 
@@ -246,19 +245,6 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     })
 
     console.warn(util.inspect(res))
-  },
-  ore(ctx) {
-    const rad = Number(ctx.arguments[1])
-    const rad2 = Number(ctx.arguments[2])
-    if (isNaN(rad)) return ctx.error(ctx.arguments[1] + ' should be number!')
-    if (isNaN(rad2)) return ctx.error(ctx.arguments[2] + ' should be number!')
-    // new Shape(SHAPES.sphere, ctx.sender.location, ["air"], rad);
-
-    const orePositions = Mineshaft.generateOre({ center: ctx.player.location, minRadius: rad, maxRadius: rad2 })
-
-    for (const position of orePositions) {
-      ctx.player.dimension.getBlock(position)?.setType(MinecraftBlockTypes.Stone)
-    }
   },
   lore(ctx) {
     ctx.player.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])

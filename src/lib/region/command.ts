@@ -7,7 +7,7 @@ import { Region } from 'lib/region/Region'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { BaseRegion } from '../../modules/places/base/BaseRegion'
-import { MineshaftRegion } from '../../modules/places/mineshaft/MineshaftRegion'
+import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
 import { RadiusRegion } from './kinds/RadiusRegion'
 import { SafeAreaRegion } from './kinds/SafeAreaRegion'
 

@@ -162,7 +162,10 @@ export class Settings {
         enumerable: true,
         get() {
           const value = config[prop].value
-          return database[groupName][key] ?? (Settings.isDropdown(value) ? value[0][0] : value)
+          return (
+            (database[groupName] as SettingsDatabaseValue | undefined)?.[key] ??
+            (Settings.isDropdown(value) ? value[0][0] : value)
+          )
         },
         set(v: SettingValue) {
           const value = (database[groupName] ??= {})

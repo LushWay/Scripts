@@ -14,7 +14,7 @@ import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config
 import { RegionEvents } from './events'
 import './init'
 export * from '../../modules/places/base/BaseRegion'
-export * from '../../modules/places/mineshaft/MineshaftRegion'
+export * from '../../modules/places/mineshaft/mineshaft-region'
 export * from './Region'
 export * from './command'
 export * from './config'
@@ -32,7 +32,6 @@ type InteractionAllowed = (
     | { type: 'place'; event: PlayerPlaceBlockBeforeEvent }
     | { type: 'interactWithBlock'; event: PlayerInteractWithBlockBeforeEvent }
     | { type: 'interactWithEntity'; event: PlayerInteractWithEntityBeforeEvent },
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => boolean | void
 
 type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined

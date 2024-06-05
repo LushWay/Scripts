@@ -1,9 +1,9 @@
-import { BlockVolume, StructureSaveMode, system, world } from '@minecraft/server'
+import { BlockPermutation, BlockVolume, Dimension, StructureSaveMode, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 import { RadiusRegion } from './RadiusRegion'
 
 export class RadiusRegionWithStructure extends RadiusRegion {
-  static readonly kind = 'struct'
+  static readonly kind: string = 'struct'
 
   protected readonly saveable = true
 
@@ -35,31 +35,25 @@ export class RadiusRegionWithStructure extends RadiusRegion {
     )
   }
 
-  loadStructure() {
+  forEachStructureBlock(
+    callback: (vector: Vector3, structureSavedBlock: BlockPermutation | undefined, dimension: Dimension) => void,
+  ) {
     const structure = world.structureManager.get(this.structureName)
     if (!structure) throw new TypeError('No structure found!')
 
     const edges = this.edges
-    const isIn = (v: Vector3) => this.isVectorInRegion(v, this.dimensionId)
-    const dimension = world[this.dimensionId]
 
-    return new Promise<void>((resolve, reject) => {
-      system.runJob(
-        (function* loadStructureJob() {
-          try {
-            for (const vector of Vector.foreach(...edges)) {
-              if (isIn(vector)) {
-                const block = structure.getBlockPermutation(Vector.subtract(edges[0], vector))
-                if (block) dimension.setBlockPermutation(vector, block)
-                yield
-              }
-            }
-            resolve()
-          } catch (e: unknown) {
-            reject(e as Error)
-          }
-        })(),
-      )
+    return this.forEachVector((vector, isIn, dimension) => {
+      if (isIn) {
+        const structureSavedBlock = structure.getBlockPermutation(Vector.subtract(edges[0], vector))
+        callback(vector, structureSavedBlock, dimension)
+      }
+    })
+  }
+
+  loadStructure() {
+    return this.forEachStructureBlock((vector, block, dimension) => {
+      if (block) dimension.setBlockPermutation(vector, block)
     })
   }
 }
