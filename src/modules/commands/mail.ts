@@ -4,7 +4,10 @@ import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/rewards'
 import { t } from 'lib/text'
 
-new Command('mail').setDescription('Посмотреть входящие сообщения почты').executes(ctx => mailMenu(ctx.player))
+new Command('mail')
+  .setDescription('Посмотреть входящие сообщения почты')
+  .setPermissions('member')
+  .executes(ctx => mailMenu(ctx.player))
 
 const getSettings = Settings.player(...Menu.settings, {
   mailReadOnOpen: {
