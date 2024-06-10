@@ -70,7 +70,8 @@ export async function generateManigestJson({ world, dev, test }, outfile) {
         version: '1.0.0-beta',
       },
     ],
-    capabilities: dev || test ? ['script_eval'] : [],
+    // TODO Remove on release
+    capabilities: true ? ['script_eval'] : [],
   }
 
   base.dependencies = dependencies
