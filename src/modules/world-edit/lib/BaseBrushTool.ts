@@ -1,4 +1,4 @@
-import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
+import { BlockRaycastHit, InvalidContainerSlotError, ItemStack, Player } from '@minecraft/server'
 import { isInvalidLocation, util } from 'lib'
 import { WorldEditPlayerSettings } from 'modules/world-edit/settings'
 import { WorldEditTool } from './WorldEditTool'
@@ -34,7 +34,15 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
   }
 
   isOurBrushType(lore: this['loreFormat'] | Pick<ItemStack, 'getLore'>) {
-    if ('getLore' in lore) lore = this.parseLore(lore.getLore())
+    if ('getLore' in lore) {
+      try {
+        lore = this.parseLore(lore.getLore())
+      } catch (e) {
+        if (e instanceof InvalidContainerSlotError) return false // No item in the container
+        throw e
+      }
+    }
+
     if ('type' in this.loreFormat && 'type' in lore && lore.type !== this.loreFormat.type) return false
 
     return true

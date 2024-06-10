@@ -16,6 +16,9 @@ import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { Cuboid } from './Cuboid'
 import { BigStructure } from './Structure'
 
+// TODO Use Map for instances
+// TODO Add WorldEdit.runMultipleAsyncJobs
+
 interface WeDB {
   pos1: Vector3
   pos2: Vector3
@@ -107,7 +110,6 @@ export class WorldEdit {
    * @param error - The `error` parameter is the error object or error message that occurred during the action. It can
    *   be either an Error object or a string representing the error message.
    */
-
   failedTo(action: string, error: unknown) {
     const text = util.error.isError(error) ? util.error(error) : util.inspect(error)
     if (!text) return
@@ -125,12 +127,11 @@ export class WorldEdit {
   /**
    * Backups a location
    *
-   * @param {string} name - Name of the backup. Used by undo/redo
-   * @param {Vector3} pos1 Position 1 of cuboid location
-   * @param {Vector3} pos2 Position 2 of cuboid location
-   * @param {BigStructure[]} history Save location where you want the to store your backup
+   * @param name - Name of the backup. Used by undo/redo
+   * @param pos1 Position 1 of cuboid location
+   * @param pos2 Position 2 of cuboid location
+   * @param history Save location where you want the to store your backup
    */
-
   async backup(
     name: string,
     pos1: Vector3 = this.pos1,
@@ -179,13 +180,7 @@ export class WorldEdit {
     }
   }
 
-  /**
-   * Loads backup and removes it from history
-   *
-   * @param {BigStructure[]} history
-   * @param {BigStructure} backup
-   */
-
+  /** Loads backup and removes it from history */
   loadBackup(history: BigStructure[], backup: BigStructure) {
     this.backup(
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
@@ -203,7 +198,7 @@ export class WorldEdit {
   /**
    * Undoes the latest history save
    *
-   * @param {number} amount Times you want to undo
+   * @param amount Times you want to undo
    */
   undo(amount = 1) {
     this.loadFromArray(amount, this.history)
@@ -212,7 +207,7 @@ export class WorldEdit {
   /**
    * Redoes the latest history save
    *
-   * @param {number} amount Times you want to redo
+   * @param amount Times you want to redo
    */
   redo(amount = 1) {
     this.loadFromArray(amount, this.undos)
@@ -222,7 +217,7 @@ export class WorldEdit {
   async copy() {
     try {
       const selection = await this.ensureSelection()
-      if (!selection) return
+      if (!selection) return this.player.fail('Зона для копирования не выделена!')
 
       this.currentCopy = new BigStructure(
         WE_CONFIG.COPY_FILE_NAME + this.player.id,
@@ -242,12 +237,7 @@ export class WorldEdit {
     }
   }
 
-  /**
-   * Parses paste positions, used by this.paste and by draw paste selection
-   *
-   * @param {Parameters<WorldEdit['paste']>[1]} rotation
-   * @param {NonNullable<WorldEdit['currentCopy']>} currentCopy
-   */
+  /** Parses paste positions, used by this.paste and by draw paste selection */
   pastePositions(rotation: Parameters<WorldEdit['paste']>[1], currentCopy: NonNullable<WorldEdit['currentCopy']>) {
     let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
     const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
@@ -266,15 +256,15 @@ export class WorldEdit {
    * @example
    *   paste(Player, 0, 'none', false, true, 100.0, '')
    *
-   * @param {Player} player Player to execute on
-   * @param {0 | 90 | 180 | 270} rotation Specifies the rotation when loading a structure
-   * @param {'none' | 'x' | 'xz' | 'z'} mirror Specifies the axis of mirror flip when loading a structure
-   * @param {boolean} includeEntities Specifies whether including entites or not
-   * @param {boolean} includeBlocks Specifies whether including blocks or not
-   * @param {number} integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in
-   *   the structure are loaded.
-   * @param {string} integritySeed Specifies the seed when calculating whether a block should be loaded according to
-   *   integrity. If unspecified, a random seed is taken.
+   * @param player Player to execute on
+   * @param rotation Specifies the rotation when loading a structure
+   * @param mirror Specifies the axis of mirror flip when loading a structure
+   * @param includeEntities Specifies whether including entites or not
+   * @param includeBlocks Specifies whether including blocks or not
+   * @param integrity Specifies the integrity (probability of each block being loaded). If 100, all blocks in the
+   *   structure are loaded.
+   * @param integritySeed Specifies the seed when calculating whether a block should be loaded according to integrity.
+   *   If unspecified, a random seed is taken.
    */
   async paste(
     player: Player,
@@ -287,24 +277,17 @@ export class WorldEdit {
   ) {
     try {
       if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')
-
       const { pastePos1, pastePos2 } = this.pastePositions(rotation, this.currentCopy)
 
-      try {
-        await this.backup('Вставка (paste)', pastePos1, pastePos2)
-        await this.currentCopy.load(pastePos1, undefined, {
-          rotation,
-          mirror,
-          includeEntities,
-          includeBlocks,
-          integrity,
-          integritySeed,
-        })
-      } catch (e: unknown) {
-        if (e instanceof Error) {
-          player.fail(e.message)
-        } else throw e
-      }
+      await this.backup('Вставка (paste)', pastePos1, pastePos2)
+      await this.currentCopy.load(pastePos1, undefined, {
+        rotation,
+        mirror,
+        includeEntities,
+        includeBlocks,
+        integrity,
+        integritySeed,
+      })
 
       this.player.success(`Успешно вставлено в ${Vector.string(pastePos1)}`)
     } catch (error) {
@@ -316,7 +299,6 @@ export class WorldEdit {
   async ensureSelection() {
     const player = this.player
     if (!this.selection) return player.fail('§cЗона не выделена!')
-    /** @type {Partial<Record<Role, number>>} */
     const limits: Partial<Record<Role, number>> = {
       builder: 10000,
       admin: 10000,

@@ -1,5 +1,6 @@
 import { BlockVolume, Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vector } from 'lib'
+import { t } from 'lib/text'
 import { WE_CONFIG } from '../config'
 import { Cuboid } from './Cuboid'
 
@@ -56,12 +57,7 @@ export class BigStructure extends Cuboid {
         saveMode: StructureSaveMode.Memory,
       })
 
-      // const result = await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-      //   `structure save "${name}" ${Vector.string(min)} ${Vector.string(max)} false memory true`,
-      //   min,
-      //   max,
-      //   options,
-      // )
+      // console.log(t`Created from world: ${Vector.string(min)} ${Vector.string(max)}, name: ${name}`)
 
       this.structures.push({
         name,
@@ -78,38 +74,45 @@ export class BigStructure extends Cuboid {
   }
 
   async load(position = this.min, dimension = this.dimension, placeOptions?: StructurePlaceOptions) {
-    const options = { errors: 0, total: 0 }
+    const { structures, min } = this
 
-    for (const file of this.structures) {
-      let to
-      let from
+    return new Promise<void>((resolve, reject) => {
+      let errors = 0
+      let total = 0
 
-      if (position === this.min) {
-        to = file.min
+      system.runJob(
+        (function* job() {
+          for (const file of structures) {
+            try {
+              let to
 
-        from = file.max
-      } else {
-        const offsetFrom = Vector.subtract(file.max, this.min)
+              if (position === min) {
+                to = file.min
+              } else {
+                const offsetTo = Vector.subtract(file.min, min)
+                to = Vector.add(position, offsetTo)
+              }
 
-        const offsetTo = Vector.subtract(file.min, this.min)
-        from = Vector.add(position, offsetFrom)
-        to = Vector.add(position, offsetTo)
-      }
-
-      world.structureManager.place(file.name, dimension, to, placeOptions)
-      // await performCommandOnLoadedChunkAndTeleportPlayerIfNot(
-      //   `structure load "${file.name}" ${Vector.string(to)}${additional}`,
-      //   from,
-      //   to,
-      //   options,
-      // )
-
-      await system.sleep(1)
-    }
-
-    if (options.errors > 0)
-      throw new Error(
-        `§c${options.errors}§f/${options.total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
+              // console.log(`/structure load "${file.name}" ${Vector.string(to)}`)
+              world.structureManager.place(file.name, dimension, to, placeOptions)
+            } catch (e) {
+              errors++
+            } finally {
+              total++
+              yield
+            }
+          }
+        })(),
       )
+
+      if (errors > 0)
+        reject(
+          new Error(
+            `§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
+          ),
+        )
+
+      resolve()
+    })
   }
 }

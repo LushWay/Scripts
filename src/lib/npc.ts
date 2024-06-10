@@ -42,7 +42,6 @@ export class Npc {
     this.dimensionId = options.dimensionId ?? 'overworld'
     this.location = location(options.group, options.name)
     this.location.onLoad.subscribe(location => {
-      console.log('location is valid')
       if (this.entity) this.entity.teleport(location)
       this.location = location
     })

@@ -119,7 +119,7 @@ export class BooleanArgumentType<T extends boolean = false> implements IArgument
   matches(value: string) {
     return {
       success: /^(true|false)$/g.test(value),
-      value: value == 'true' ? true : false,
+      value: typeof value === 'undefined' ? undefined : value == 'true' ? true : false,
     }
   }
 }
