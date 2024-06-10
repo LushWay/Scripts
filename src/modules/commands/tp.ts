@@ -9,7 +9,7 @@ import { VillageOfMiners } from 'modules/places/village-of-miners'
 import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 new Command('tp')
-  .setPermissions(__PRODUCTION__ ? 'techAdmin' : 'everybody')
+  .setPermissions(__RELEASE__ ? 'techAdmin' : 'everybody')
   .setDescription('Открывает меню телепортации')
   .executes(ctx => {
     if (ctx.player.database.role === 'member')
