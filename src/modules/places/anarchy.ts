@@ -84,13 +84,13 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
   loadInventory(player: Player) {
     if (this.inventoryStore.has(player.id)) {
-      player.log('Anarchy - loading saved inventory')
+      player.log('Anarchy', 'loading saved inventory')
       InventoryStore.load({
         to: player,
         from: this.inventoryStore.get(player.id, { remove: true }),
       })
     } else {
-      player.log('Anarchy - loading empty inventory')
+      player.log('Anarchy', 'loading empty inventory')
       InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
     }
 
@@ -106,7 +106,8 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     const inv = this.inventoryStore.get(player.id, { remove: false, fallback: InventoryStore.emptyInventory })
 
     player.log(
-      'Anarchy - saved inventory',
+      'Anarchy',
+      'saved inventory',
       Object.entries(inv.slots).map(e => `${e[0]} ${e[1].typeId}`),
     )
 

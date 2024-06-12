@@ -269,15 +269,18 @@ export function settingsGroupMenu(
           }
 
           if (util.stringify(store[key]) === util.stringify(result)) return ''
-
-          if (result) {
-            player.log(t`Changed ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' to '${result}'`)
+          if (typeof result !== 'undefined') {
+            player.log(
+              'Settings',
+              t`Changed ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' to '${result}'`,
+            )
             store[key] = result
           }
 
           return showHintAboutSavedStatus ? '§aСохранено!' : ''
         } catch (error: unknown) {
           player.log(
+            'Settings',
             t.error`Changing ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' error: ${util.error(error as Error)}`,
           )
           return util.error.isError(error) ? `§c${error.message}` : util.inspect(error)
