@@ -79,12 +79,14 @@
           { "module": "util" },
           { "module": "node:" },
           { "module": "node:test" },
-          { "module": "crypto" }
+          { "module": "crypto" },
+          { "module": "src/test/__mocks__" },
+          { "module": "vitest/dist/**" }
         ]
       }
     ]
   },
-  "include": ["src", "tools/definedGlobals.d.ts"],
+  "include": ["src", "tools/defines.d.ts"],
   "exclude": ["node_modules", "src/chestui", "src/test/*", "vitest/dist/**"],
 
   // Pollutes global

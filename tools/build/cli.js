@@ -2,7 +2,7 @@ import * as esbuild from 'esbuild'
 import fs from 'fs'
 import path from 'path'
 import util from 'util'
-import { generateDefine } from './generateDefine.js'
+import { generateDefine } from '../define.js'
 import { logger } from './logger.js'
 
 export function parseCliArguments() {

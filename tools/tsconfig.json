@@ -13,5 +13,5 @@
     "module": "NodeNext"
   },
   "include": ["."],
-  "exclude": ["./definedGlobals.d.ts"]
+  "exclude": ["defines.d.ts"]
 }
