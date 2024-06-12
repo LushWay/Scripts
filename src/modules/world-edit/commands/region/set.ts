@@ -5,8 +5,8 @@ import { ActionForm, BUTTON, ModalForm, typeIdToReadable } from 'lib'
 import { ChestForm } from 'lib/form/chest'
 import { inaccurateSearch } from 'lib/search'
 import { ReplaceTarget, WEeditBlockStatesMenu } from 'modules/world-edit/menu'
-import { getAllBlocksSets, getBlocksSetByRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocksSet'
-import { WorldEdit } from '../../lib/WorldEdit'
+import { getAllBlocksSets, getBlocksSetByRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
+import { WorldEdit } from '../../lib/world-edit'
 
 const set = new Command('set')
   .setDescription('Частично или полностью заполняет блоки в выделенной области')
@@ -29,7 +29,7 @@ set.executes(ctx => {
 
 type SelectedBlock =
   | { permutations: (BlockPermutation | import('modules/world-edit/menu').ReplaceTarget)[] }
-  | { ref: import('modules/world-edit/utils/blocksSet').BlocksSetRef }
+  | { ref: import('modules/world-edit/utils/blocks-set').BlocksSetRef }
   | undefined
 
 const selectedBlocks = {

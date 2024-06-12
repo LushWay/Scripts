@@ -2,9 +2,9 @@ import { ContainerSlot, ItemStack, Player, system, world } from '@minecraft/serv
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm } from 'lib'
-import { isBuilding } from 'modules/world-edit/isBuilding'
-import { WorldEditTool } from '../lib/WorldEditTool'
-import { BlocksSetRef, blocksSetDropdown, getBlocksSetByRef, stringifyBlocksSetRef } from '../utils/blocksSet'
+import { isBuilding } from 'lib/game-utils'
+import { WorldEditTool } from '../lib/world-edit-tool'
+import { BlocksSetRef, blocksSetDropdown, getBlocksSetByRef, stringifyBlocksSetRef } from '../utils/blocks-set'
 
 const nylium = new WorldEditTool({
   name: 'nylium',

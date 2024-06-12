@@ -1,8 +1,7 @@
 import { BlockVolume, Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vector } from 'lib'
-import { t } from 'lib/text'
 import { WE_CONFIG } from '../config'
-import { Cuboid } from './Cuboid'
+import { Cuboid } from './ccuboid'
 
 export class BigStructure extends Cuboid {
   id
@@ -48,6 +47,7 @@ export class BigStructure extends Cuboid {
       const name = `mystructure:${this.prefix}|${i}`
       const min = cube.pos1
       const max = cube.pos2
+
       try {
         world.structureManager.delete(name)
       } catch {}
@@ -96,23 +96,24 @@ export class BigStructure extends Cuboid {
               // console.log(`/structure load "${file.name}" ${Vector.string(to)}`)
               world.structureManager.place(file.name, dimension, to, placeOptions)
             } catch (e) {
+              console.error(e)
               errors++
             } finally {
               total++
               yield
             }
           }
+
+          if (errors > 0)
+            reject(
+              new Error(
+                `§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
+              ),
+            )
+
+          resolve()
         })(),
       )
-
-      if (errors > 0)
-        reject(
-          new Error(
-            `§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
-          ),
-        )
-
-      resolve()
     })
   }
 }

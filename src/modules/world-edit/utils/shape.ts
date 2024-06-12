@@ -2,8 +2,8 @@ import { BlockPermutation, Player, system } from '@minecraft/server'
 import { Vector, util } from 'lib'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG } from '../config'
-import { Cuboid } from '../lib/Cuboid'
-import { WorldEdit } from '../lib/WorldEdit'
+import { Cuboid } from '../lib/ccuboid'
+import { WorldEdit } from '../lib/world-edit'
 
 /**
  * @example

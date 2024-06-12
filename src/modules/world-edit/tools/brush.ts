@@ -3,8 +3,8 @@ import { ModalForm, Vector, is } from 'lib'
 import { CustomEntityTypes, CustomItems } from 'lib/assets/config'
 import { WeakPlayerMap } from 'lib/weak-player-map'
 import { WE_CONFIG } from '../config'
-import { BaseBrushTool } from '../lib/BaseBrushTool'
-import { WorldEditTool } from '../lib/WorldEditTool'
+import { BaseBrushTool } from '../lib/base-brush-tool'
+import { WorldEditTool } from '../lib/world-edit-tool'
 import {
   BlocksSetRef,
   SHARED_POSTFIX,
@@ -12,7 +12,7 @@ import {
   getAllBlocksSets,
   getBlocksSetByRef,
   getBlocksSetForReplaceTarget,
-} from '../utils/blocksSet'
+} from '../utils/blocks-set'
 import { placeShape } from '../utils/shape'
 import { SHAPES } from '../utils/shapes'
 

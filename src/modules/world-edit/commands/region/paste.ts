@@ -1,5 +1,5 @@
 import { StructureMirrorAxis, StructureRotation } from '@minecraft/server'
-import { WorldEdit } from '../../lib/WorldEdit'
+import { WorldEdit } from '../../lib/world-edit'
 
 const MirrorAxis = {
   none: StructureMirrorAxis.None,
@@ -26,18 +26,11 @@ new Command('paste')
   .int('integrity', true)
   .string('seed', true)
   .executes((ctx, rotation = '0', mirror = 'none', includeEntites = true, includeBlocks = true, integrity, seed) => {
-    console.log({
-      rotation,
-      mirror,
-      includeBlocks,
-      includeEntites,
-    })
     if (!includeEntites && !includeBlocks) {
       return ctx.error('Невозможно вставить структуру без блоков и сущностей!')
     }
 
     WorldEdit.forPlayer(ctx.player).paste(
-      ctx.player,
       Rotations[rotation],
       MirrorAxis[mirror],
       includeEntites,

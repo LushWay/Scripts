@@ -1,8 +1,8 @@
 import { StructureRotation, system } from '@minecraft/server'
 import { CustomItems } from 'lib/assets/config'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
-import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
-import { WorldEditTool } from 'modules/world-edit/lib/WorldEditTool'
+import { WorldEdit } from 'modules/world-edit/lib/world-edit'
+import { WorldEditTool } from 'modules/world-edit/lib/world-edit-tool'
 
 const clipboard = new WorldEditTool({
   name: 'clipboard',
@@ -26,7 +26,7 @@ const clipboard = new WorldEditTool({
     if (player.isSneaking) {
       we.undo(1)
     } else {
-      we.paste(player)
+      we.paste()
     }
   },
 

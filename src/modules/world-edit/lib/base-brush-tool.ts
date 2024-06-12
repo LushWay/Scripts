@@ -1,11 +1,11 @@
 import { BlockRaycastHit, InvalidContainerSlotError, ItemStack, Player } from '@minecraft/server'
 import { isInvalidLocation, util } from 'lib'
 import { WorldEditPlayerSettings } from 'modules/world-edit/settings'
-import { WorldEditTool } from './WorldEditTool'
+import { WorldEditTool } from './world-edit-tool'
 
 interface BrushLoreFormat {
   version: number
-  replaceBlocksSet: import('modules/world-edit/utils/blocksSet').BlocksSetRef
+  replaceBlocksSet: import('modules/world-edit/utils/blocks-set').BlocksSetRef
   size: number
   maxDistance: number
   type: 'brush' | 'smoother'

@@ -1,4 +1,4 @@
-import { WorldEdit } from '../../lib/WorldEdit'
+import { WorldEdit } from '../../lib/world-edit'
 
 new Command('undo')
   .setGroup('we')

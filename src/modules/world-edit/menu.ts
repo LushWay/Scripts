@@ -6,7 +6,7 @@ import { Sounds } from 'lib/assets/config'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { prompt } from 'lib/form/message'
-import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
+import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { configureNylium } from 'modules/world-edit/tools/nylium'
 import {
   BlocksSet,
@@ -19,8 +19,8 @@ import {
   getOtherPlayerBlocksSets,
   getOwnBlocksSetsCount,
   setBlocksSet,
-} from 'modules/world-edit/utils/blocksSet'
-import { WorldEditTool } from './lib/WorldEditTool'
+} from 'modules/world-edit/utils/blocks-set'
+import { WorldEditTool } from './lib/world-edit-tool'
 
 /** Main we menu */
 export function WEmenu(player: Player, body = '') {
@@ -132,11 +132,11 @@ function WEmanageBlocksSetMenu({
   deletePrevious = false,
   onFail,
 }: {
-  blockSets: import('modules/world-edit/utils/blocksSet').BlocksSets
+  blockSets: import('modules/world-edit/utils/blocks-set').BlocksSets
   player: Player
   action: string
   setName?: string
-  set?: import('modules/world-edit/utils/blocksSet').BlocksSets[string]
+  set?: import('modules/world-edit/utils/blocks-set').BlocksSets[string]
   deletePrevious?: boolean
   onFail?: () => void
 }) {
@@ -224,7 +224,7 @@ function WEotherPlayersBlockSetsMenu(player: Player, back: () => void) {
 function WEplayerBlockSetMenu(
   player: Player,
   otherPlayerId: string,
-  blockSets: import('modules/world-edit/utils/blocksSet').BlocksSets,
+  blockSets: import('modules/world-edit/utils/blocks-set').BlocksSets,
   onBack: () => void,
 ) {
   const name = Player.name(otherPlayerId) ?? otherPlayerId
@@ -548,7 +548,12 @@ function WEeditBlocksSetMenu(o: {
     for (let i = 0; i < container.size; i++) {
       const item = container.getItem(i)
 
-      if (!item || !!set.find(e => e[0] === item.typeId) || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId))
+      if (
+        !item ||
+        !!set.find(e => e[0] === item.typeId) ||
+        !BlockTypes.get(item.typeId) ||
+        blocks.includes(item.typeId)
+      )
         continue
 
       const base = 9 * 4 // 4 row

@@ -3,7 +3,7 @@ import { ActionForm, ModalForm, Vector, util } from 'lib'
 import { CustomItems } from 'lib/assets/config'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
-import { WorldEditTool } from '../lib/WorldEditTool'
+import { WorldEditTool } from '../lib/world-edit-tool'
 
 const actions: Record<string, string[]> = {
   Particle: ListParticles,

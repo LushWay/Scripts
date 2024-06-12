@@ -2,7 +2,7 @@ import {} from '@minecraft/server'
 import { Vector } from 'lib'
 import { CommandContext } from 'lib/command/context'
 import { t } from 'lib/text'
-import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
+import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 
 function getSelection(ctx: CommandContext) {
   const we = WorldEdit.forPlayer(ctx.player)

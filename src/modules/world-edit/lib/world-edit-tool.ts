@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
 import { expand, util } from 'lib'
-import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocksSet'
+import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { WorldEditPlayerSettings } from '../settings'
 
 type IntervalFunction = (

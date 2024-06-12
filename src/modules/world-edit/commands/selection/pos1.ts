@@ -1,6 +1,6 @@
 import {} from '@minecraft/server'
 import { Vector } from 'lib'
-import { WorldEdit } from '../../lib/WorldEdit'
+import { WorldEdit } from '../../lib/world-edit'
 
 new Command('pos1')
   .setDescription('Устанавливает позицию 1 (ломать)')

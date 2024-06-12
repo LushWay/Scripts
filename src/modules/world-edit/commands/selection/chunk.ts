@@ -1,6 +1,6 @@
 import { Entity, Player } from '@minecraft/server'
 import { Vector } from 'lib'
-import { WorldEdit } from '../../lib/WorldEdit'
+import { WorldEdit } from '../../lib/world-edit'
 
 /**
  * Gets the cuboid positions of a entitys chunk

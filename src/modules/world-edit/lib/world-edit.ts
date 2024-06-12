@@ -13,8 +13,8 @@ import { Sounds } from 'lib/assets/config'
 import { table } from 'lib/database/abstract'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
-import { Cuboid } from './Cuboid'
-import { BigStructure } from './Structure'
+import { BigStructure } from './big-structure'
+import { Cuboid } from './ccuboid'
 
 // TODO Use Map for instances
 // TODO Add WorldEdit.runMultipleAsyncJobs
@@ -238,7 +238,7 @@ export class WorldEdit {
   }
 
   /** Parses paste positions, used by this.paste and by draw paste selection */
-  pastePositions(rotation: Parameters<WorldEdit['paste']>[1], currentCopy: NonNullable<WorldEdit['currentCopy']>) {
+  pastePositions(rotation: StructureRotation, currentCopy: NonNullable<WorldEdit['currentCopy']>) {
     let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
     const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
     let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
@@ -267,13 +267,12 @@ export class WorldEdit {
    *   If unspecified, a random seed is taken.
    */
   async paste(
-    player: Player,
     rotation: StructureRotation = StructureRotation.None,
     mirror: StructureMirrorAxis = StructureMirrorAxis.None,
     includeEntities = false,
     includeBlocks = true,
-    integrity = 100.0,
-    integritySeed = '',
+    integrity?: number,
+    integritySeed?: string,
   ) {
     try {
       if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')

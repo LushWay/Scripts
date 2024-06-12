@@ -1,16 +1,16 @@
 import { world } from '@minecraft/server'
 import { ModalForm, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
-import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
+import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'
-import { WorldEditTool } from '../lib/WorldEditTool'
+import { WorldEditTool } from '../lib/world-edit-tool'
 import {
   BlocksSetRef,
   blocksSetDropdown,
   getAllBlocksSets,
   getBlocksSetByRef,
   getBlocksSetForReplaceTarget,
-} from '../utils/blocksSet'
+} from '../utils/blocks-set'
 
 const shovel = new WorldEditTool({
   name: 'shovel',

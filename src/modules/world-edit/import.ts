@@ -1,5 +1,5 @@
-import './lib/WorldEdit'
-import './lib/WorldEditTool'
+import './lib/world-edit'
+import './lib/world-edit-tool'
 
 import './commands/general/id'
 import './commands/general/item'

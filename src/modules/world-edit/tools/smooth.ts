@@ -3,9 +3,9 @@ import { Block, BlockPermutation, Player, system, world } from '@minecraft/serve
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm, Vector, is, util } from 'lib'
 import { CustomItems } from 'lib/assets/config'
-import { WorldEdit } from 'modules/world-edit/lib/WorldEdit'
-import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/world-edit/utils/blocksSet'
-import { BaseBrushTool } from '../lib/BaseBrushTool'
+import { WorldEdit } from 'modules/world-edit/lib/world-edit'
+import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/world-edit/utils/blocks-set'
+import { BaseBrushTool } from '../lib/base-brush-tool'
 
 interface SmoothProps {
   smoothLevel: number
