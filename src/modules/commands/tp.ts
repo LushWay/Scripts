@@ -1,12 +1,12 @@
 import { Player, system, world } from '@minecraft/server'
 import { ActionForm, Vector, getRoleAndName, util } from 'lib'
+import { isNotPlaying } from 'lib/game-utils'
 import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { TechCity } from 'modules/places/tech-city'
 import { VillageOfExplorers } from 'modules/places/village-of-explorers'
 import { VillageOfMiners } from 'modules/places/village-of-miners'
-import { isNotPlaying } from 'modules/world-edit/isBuilding'
 
 new Command('tp')
   .setPermissions(__RELEASE__ ? 'techAdmin' : 'everybody')

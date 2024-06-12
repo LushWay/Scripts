@@ -145,7 +145,7 @@ expand(Player.prototype, {
   },
 
   log(prefix, ...messages) {
-    console.log(`§7Player '§f${this.name}§r§7'§7 ${prefix}§7:`, ...messages)
+    console.log(`§7[§f${this.name}§r§7][${prefix}§7]:`, ...messages)
   },
 
   // @ts-expect-error AAAAAAAAAAAAAAA
@@ -162,7 +162,7 @@ expand(Player.prototype, {
 
   fail: prefix('§4§l> §r§c', Sounds.Fail),
   warn: prefix('§e⚠ §6', Sounds.Fail),
-  success: prefix('§a§l> §r', Sounds.Success),
+  success: prefix('§a§l> §r', Sounds.Action),
   info: prefix('§b§l> §r§3', Sounds.Action),
 
   // eslint-disable-next-line @typescript-eslint/unbound-method

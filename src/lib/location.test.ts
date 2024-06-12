@@ -1,4 +1,7 @@
 import { Player } from '@minecraft/server'
+import 'lib/extensions/player'
+
+import 'lib/database/player'
 import { MockInstance, beforeEach, describe, expect, it, vi } from 'vitest'
 import { table } from './database/abstract'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
@@ -57,7 +60,7 @@ describe('location', () => {
   })
 
   it('should not load invalid location', () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     Settings.worldDatabase['group1'] = { name1: 'in va lid' }
     location('group1', 'name1')
 

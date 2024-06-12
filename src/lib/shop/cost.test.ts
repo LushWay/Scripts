@@ -36,8 +36,22 @@ describe('cost', () => {
 })
 
 describe('MultiCost', () => {
-  class StringCost extends Cost<string> {}
-  class NumberCost extends Cost<number> {}
+  class StringCost extends Cost<string> {
+    toString() {
+      return ''
+    }
+    has() {
+      return true
+    }
+  }
+  class NumberCost extends Cost<number> {
+    toString() {
+      return ''
+    }
+    has() {
+      return true
+    }
+  }
 
   it('should have types', () => {
     // @ts-expect-error

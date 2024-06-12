@@ -4,7 +4,7 @@ import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { Nullable } from 'vitest'
-import { table } from './database/abstract'
+import { table } from '../database/abstract'
 
 export interface LeaderboardInfo {
   style: keyof typeof Leaderboard.styles

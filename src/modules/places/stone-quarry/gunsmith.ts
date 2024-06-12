@@ -1,7 +1,7 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
-import { MoneyCost, MultiCost } from 'lib/cost'
-import { Shop } from 'lib/shop'
+import { MoneyCost, MultiCost } from 'lib/shop/cost'
+import { Shop } from 'lib/shop/shop'
 
 export default gunsmith
 
@@ -66,8 +66,7 @@ function upgradeDiamondSwordToNetherite(slot: ContainerSlot) {
   const item = new ItemStack(i.NetheriteSword)
   item.setLore(slot.getLore())
 
-  if (item.enchantable && slotItem.enchantable)
-    item.enchantable.addEnchantments(slotItem.enchantable.getEnchantments())
+  if (item.enchantable && slotItem.enchantable) item.enchantable.addEnchantments(slotItem.enchantable.getEnchantments())
 
   if (item.durability && slotItem.durability) item.durability.damage = slotItem.durability.damage
   slot.setItem(item)

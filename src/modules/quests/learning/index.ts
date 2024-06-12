@@ -2,16 +2,18 @@ import { ItemStack, system } from '@minecraft/server'
 import { ActionForm, Vector, location, locationWithRadius } from 'lib'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { SafeAreaRegion, Temporary, actionGuard } from 'lib'
+import { SafeAreaRegion, actionGuard } from 'lib'
 import { Sounds } from 'lib/assets/config'
-import { Menu, createPublicGiveItemCommand } from 'lib/menu'
-import { Npc } from 'lib/npc'
 import { Join } from 'lib/player-join'
+import { Quest } from 'lib/quest/index'
+import { Airdrop } from 'lib/rpg/airdrop'
+import { Menu, createPublicGiveItemCommand } from 'lib/rpg/menu'
+import { Npc } from 'lib/rpg/npc'
+
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy'
 import { Spawn } from 'modules/places/spawn'
 import { VillageOfMiners } from 'modules/places/village-of-miners'
-import { Quest, QuestBase } from 'modules/quests/lib/quest'
 import { randomTeleport } from 'modules/survival/random-teleport'
 import airdropTable from './airdrop'
 
@@ -19,12 +21,154 @@ import airdropTable from './airdrop'
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
 
-class Learning extends QuestBase {
+class Learning {
   id = 'learning'
 
-  randomTeleportLocation = locationWithRadius(this.group, 'Мирная зона и ртп')
+  quest = new Quest('learning', 'Обучение', 'Обучение базовым механикам сервера', (q, player) => {
+    if (!Anarchy.portal?.from || !Anarchy.portal.to) return q.failed('§cСервер не настроен')
+    if (!this.randomTeleportLocation.valid || !this.craftingTableLocation.valid)
+      return q.failed('§cОбучение не настроено')
 
-  craftingTableLocation = location(this.group, 'Верстак')
+    q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
+
+    q.counter((current, end) => `§6Наруби §f${current}/${end} §6блоков дерева`, 5).activate((ctx, firstTime) => {
+      if (firstTime) {
+        // Delay code by one tick to prevent giving item
+        // in spawn inventory that will be replaced with
+        // anarchy
+        system.delay(() => {
+          this.startAxeGiveCommand.ensure(player)
+          player.container?.setItem(8, Menu.item)
+        })
+      }
+
+      ctx.world.afterEvents.playerBreakBlock.subscribe(({ player: ep, brokenBlockPermutation }) => {
+        if (player.id !== ep.id) return
+        if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
+
+        console.debug(`${player.name} have brocken ${brokenBlockPermutation.type.id}`)
+
+        player.playSound(Sounds.Action)
+        ctx.diff(1)
+      })
+    })
+
+    q.dynamic('§6Выйди под открытое небо')
+      .description('Деревья могут помешать. Выйди туда, где над тобой будет только небо')
+      .activate(ctx => {
+        ctx.system.runInterval(
+          () => {
+            const hit = player.dimension.getBlockFromRay(
+              player.location,
+              { x: 0, y: 1, z: 0 },
+              { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 },
+            )
+
+            if (hit) {
+              player.onScreenDisplay.setActionBar('§6Выйди под открытое небо!')
+            } else {
+              player.onScreenDisplay.setActionBar('')
+              player.success('Посмотри наверх!')
+              ctx.next()
+            }
+          },
+          'learning quest, free space detecter',
+          20,
+        )
+      })
+
+    q.dynamic('Открой вагонетку').activate((ctx, firstTime) => {
+      if (!player.isValid()) return
+
+      function spawnAirdrop() {
+        const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })
+        const position = Vector.add(player.location, { x: 0, y: 20, z: 0 })
+        airdrop.spawn(position)
+        return airdrop
+      }
+
+      function getAirdrop() {
+        const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
+        if (!airdrop) throw new Quest.error('No airdrop found')
+        return airdrop
+      }
+
+      const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
+      if (!airdrop.chestMinecart) return ctx.error('Не удалось вызвать аирдроп')
+
+      ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
+        const airdropEntity = airdrop.chestMinecart
+        if (!airdropEntity) return
+        if (event.target.id !== airdropEntity.id) return
+
+        if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
+      })
+
+      ctx.world.afterEvents.entityDie.subscribe(event => {
+        if (event.deadEntity.id !== airdrop.chestMinecart?.id) return
+        ctx.system.delay(() => ctx.next())
+      })
+
+      let i = 0
+      ctx.onInterval(() => {
+        if (!airdrop.chestMinecart?.isValid()) return
+        ctx.place = Vector.floor(airdrop.chestMinecart.location)
+
+        if (i === 1) {
+          i = 0
+          airdrop.showParticleTrace(ctx.place)
+        } else i++
+
+        ctx.update()
+      })
+    })
+
+    q.item('§6Сделайте деревянную кирку')
+      .description('Чтобы пойти в шахту, нужна кирка. Сделайте ее!')
+      .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
+      .place(this.craftingTableLocation)
+
+    q.counter((i, end) => `§6Накопайте §f${i}/${end}§6 камня`, 10)
+      .description('Отправляйтесь в шахту, найдите и накопайте камня.')
+      .activate(ctx => {
+        ctx.world.afterEvents.playerBreakBlock.subscribe(event => {
+          if (event.player.id !== player.id) return
+          if (event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.Stone) return
+
+          player.playSound(Sounds.Action)
+          ctx.diff(1)
+        })
+      })
+
+    q.item('§6Сделайте каменную кирку')
+      .description('Сделайте каменную кирку. Время улучшить инструмент!')
+      .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
+      .place(this.craftingTableLocation)
+
+    q.counter((i, end) => `§6Накопайте §f${i}/${end}§6 железа`, 5).activate(ctx => {
+      ctx.world.afterEvents.playerBreakBlock.subscribe(({ brokenBlockPermutation, player }) => {
+        if (player.id !== player.id) return
+        if (
+          brokenBlockPermutation.type.id !== MinecraftBlockTypes.IronOre &&
+          brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
+        )
+          return
+
+        player.playSound(Sounds.Action)
+        ctx.diff(1)
+      })
+    })
+
+    q.end(ctx => {
+      player.success(
+        'Обучение закончено! Вы можете пойти в каменоломню чтобы переплавить железо или продолжить добывавать новые ресурсы в шахте.',
+      )
+    })
+  })
+
+  randomTeleportLocation = locationWithRadius(this.quest.group, 'Мирная зона и ртп')
+
+  craftingTableLocation = location(this.quest.group, 'Верстак')
 
   startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 
@@ -35,167 +179,20 @@ class Learning extends QuestBase {
   minerNpc = new Npc({
     dimensionId: 'overworld',
     id: 'minerNpc',
-    group: this.group,
+    group: this.quest.group,
     name: 'Шахтер',
     onInteract: event => {
-      if (!this.quest.current(event.player)) return false
+      if (!this.quest.getPlayerStep(event.player)) return false
 
       new ActionForm('Шахтер', 'Новенький? Не знаешь куда идти? ').show(event.player)
     },
   })
 
-  quest = new Quest({ name: 'Обучение', desc: 'Обучение базовым механикам сервера', id: 'learning' }, (q, player) => {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this
-    if (
-      !Anarchy.portal?.from ||
-      !Anarchy.portal.to ||
-      !this.randomTeleportLocation.valid ||
-      !this.craftingTableLocation.valid
-    )
-      return q.failed('§cОбучение или сервер не настроены')
-
-    q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
-
-    q.counter({
-      end: 5,
-
-      text(value) {
-        return `§6Наруби §f${value}/${this.end} §6блоков дерева`
-      },
-
-      activate(firstTime) {
-        if (firstTime) {
-          // Delay code by one tick to prevent giving item
-          // in spawn inventory that will be replaced with
-          // anarchy
-          system.delay(() => {
-            self.startAxeGiveCommand.ensure(this.player)
-            const { container } = this.player
-            if (!container) return
-
-            const slot = container.getSlot(8)
-            slot.setItem(Menu.item)
-          })
-        }
-
-        return new Temporary(({ world }) => {
-          world.afterEvents.playerBreakBlock.subscribe(({ player, brokenBlockPermutation }) => {
-            if (player.id !== this.player.id) return
-            if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
-
-            console.debug(`${player.name} brock ${brokenBlockPermutation.type.id}`)
-
-            this.player.playSound(Sounds.Action)
-            this.diff(1)
-          })
-        })
-      },
-    })
-
-    q.dynamic({
-      text: '§6Выйди под открытое небо',
-      description: 'Деревья могут помешать. Выйди туда, где над тобой будет только небо',
-      activate() {
-        return new Temporary(({ system }) => {
-          system.runInterval(
-            () => {
-              const hit = this.player.dimension.getBlockFromRay(
-                this.player.location,
-                { x: 0, y: 1, z: 0 },
-                { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 },
-              )
-
-              if (hit) {
-                this.player.onScreenDisplay.setActionBar('§6Выйди под открытое небо!')
-              } else {
-                this.player.onScreenDisplay.setActionBar('')
-                this.player.success('Посмотри наверх!')
-                this.next()
-              }
-            },
-            'learning quest, free space detecter',
-            20,
-          )
-        })
-      },
-    })
-
-    q.airdrop({
-      lootTable: airdropTable,
-      abovePlayerY: 20,
-    })
-
-    q.item({
-      text: () => '§6Сделайте деревянную кирку',
-      description: 'Чтобы пойти в шахту, нужна кирка. Сделайте ее!',
-      isItem: item => item.typeId === MinecraftItemTypes.WoodenPickaxe,
-      place: this.craftingTableLocation,
-    })
-
-    q.counter({
-      end: 10,
-      text(i) {
-        return `§6Накопайте §f${i}/${this.end}§6 камня`
-      },
-      description: () => 'Отправляйтесь в шахту, найдите и накопайте камня.',
-      activate() {
-        return new Temporary(({ world }) => {
-          world.afterEvents.playerBreakBlock.subscribe(event => {
-            if (event.player.id !== this.player.id) return
-            if (event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.Stone) return
-
-            this.player.playSound(Sounds.Action)
-            this.diff(1)
-          })
-        })
-      },
-    })
-
-    q.item({
-      text: () => '§6Сделайте каменную кирку',
-      description: 'Сделайте каменную кирку. Время улучшить инструмент!',
-      isItem: item => item.typeId === MinecraftItemTypes.StonePickaxe,
-      place: this.craftingTableLocation,
-    })
-
-    q.counter({
-      end: 5,
-      text(i) {
-        return `§6Накопайте §f${i}/${this.end}§6 железа`
-      },
-      description: () => 'Отправляйтесь в шахту, найдите и накопайте железа!',
-      activate() {
-        return new Temporary(({ world }) => {
-          world.afterEvents.playerBreakBlock.subscribe(event => {
-            if (event.player.id !== this.player.id) return
-            if (
-              event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.IronOre &&
-              event.brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
-            )
-              return
-
-            this.player.playSound(Sounds.Action)
-            this.diff(1)
-          })
-        })
-      },
-    })
-
-    q.end(function (this) {
-      this.player.success(
-        'Обучение закончено! Вы можете пойти в каменоломню чтобы переплавить железо или продолжить добывавать новые ресурсы в шахте.',
-      )
-    })
-  })
-
   constructor() {
-    //
-    super()
     actionGuard((player, region, ctx) => {
       if (ctx.type !== 'break') return
       if (region !== VillageOfMiners.safeArea) return
-      if (this.quest.current(player)) {
+      if (this.quest.getPlayerStep(player)) {
         system.delay(() => {
           player.fail('Блоки можно ломать только глубже в шахте!')
         })

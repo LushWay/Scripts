@@ -9,13 +9,13 @@ type SidebarLine = string | false
 
 export type DynamicLine<E> = (player: Player, extra: E) => SidebarLine
 
-export interface SidebarLineInit<E> {
-  init(sidebar: Sidebar): DynamicLine<E>
+export interface SidebarLineCreate<E> {
+  create(sidebar: Sidebar): DynamicLine<E>
 }
 
 export type SidebarVariables<E, V = DynamicLine<E>> = Record<string, V | string>
 
-export type SidebarRawVariables<E> = SidebarVariables<E, SidebarLineInit<E> | DynamicLine<E>>
+export type SidebarRawVariables<E> = SidebarVariables<E, SidebarLineCreate<E> | DynamicLine<E>>
 
 /** Description */
 export class Sidebar<E = unknown> {
@@ -59,7 +59,7 @@ export class Sidebar<E = unknown> {
 
     for (const [key, e] of Object.entries(content)) {
       if (typeof e === 'object') {
-        base[key] = e.init(this)
+        base[key] = e.create(this)
       } else base[key] = e
     }
 

@@ -15,12 +15,14 @@ export class RadiusRegion extends Region implements RadiusRegionOptions {
   static readonly kind: string = 'radius'
 
   static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
-    const region = super.create(options, key ?? this.generateRegionKey())
+    const region = super.create(options, key)
 
-    // Set radius region kind
-    ;(region as unknown as RadiusRegion).kind = (this as unknown as RadiusRegion).kind
+    if (region instanceof RadiusRegion) {
+      // Set radius region kind
+      ;(region as unknown as RadiusRegion).kind = (this as unknown as RadiusRegion).kind
 
-    if (!key) region.save()
+      if (!key) region.save()
+    }
 
     return region as unknown as InstanceType<T>
   }

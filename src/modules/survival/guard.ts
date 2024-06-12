@@ -1,8 +1,8 @@
 import { Core } from 'lib/extensions/core'
+import { isBuilding } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
 import { INTERACTABLE_ENTITIES, actionGuard, loadRegionsWithGuards } from 'lib/region/index'
 import { Spawn } from 'modules/places/spawn'
-import { isBuilding } from 'modules/world-edit/isBuilding'
 
 console.log('§7Mode is survival')
 export const ALLOW_SPAWN_PROP = 'allowSpawn'

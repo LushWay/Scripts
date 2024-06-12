@@ -1,8 +1,8 @@
 import { Player, system, world } from '@minecraft/server'
 import { BaseRegion, Menu, MineshaftRegion, Region, SafeAreaRegion, Settings, Sidebar, util } from 'lib'
 import { emoji } from 'lib/assets/emoji'
+import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
-import { Quest } from 'modules/quests/lib/quest'
 
 const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
@@ -103,7 +103,7 @@ const survivalSidebar = new Sidebar(
     [names.money]: player => util.numseparate(player.scores.money),
     [names.leafs]: player => util.numseparate(player.scores.leafs),
     [names.online]: {
-      init() {
+      create() {
         let online = world.getAllPlayers().length
 
         world.afterEvents.playerLeave.subscribe(() => online--)

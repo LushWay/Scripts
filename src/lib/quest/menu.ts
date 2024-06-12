@@ -3,7 +3,7 @@ import { MessageForm, noNullable, util } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
-import { Quest } from 'modules/quests/lib/quest'
+import { Quest } from './quest'
 
 const quest = new Command('q')
   .setAliases('quest')
@@ -17,7 +17,7 @@ quest
   .overload('exit')
   .setDescription('Выйти')
   .executes(ctx => {
-    const q = Quest.active(ctx.player)
+    const q = Quest.getCurrent(ctx.player)
     if (!q) return ctx.error('У вас нет активных заданий!')
     q.quest.exit(ctx.player)
     ctx.player.playSound(Sounds.Success)
@@ -29,7 +29,7 @@ quest
   .setPermissions('techAdmin')
   .executes(ctx => {
     const form = new ActionForm('Quests', 'Выбери')
-    for (const [name, q] of Quest.all.entries()) {
+    for (const [name, q] of Quest.quests.entries()) {
       form.addButton(name, () => {
         q.enter(ctx.player)
       })
@@ -55,23 +55,15 @@ export function questsMenu(player: Player, back?: VoidFunction) {
       )
     },
     button(dbquest) {
-      const quest = Quest.all.get(dbquest.id)
-      if (!quest) return false
+      const quest = Quest.quests.get(dbquest.id)
+      const step = quest?.getPlayerStep(player, dbquest.i)
+      if (!step || !quest) return false
 
-      return [
-        `${quest.name}\n${quest.steps(player).list[dbquest.step]?.text() ?? ''}`,
-        null,
-        () => questMenu(player, quest, self),
-      ]
+      return [`${quest.name}\n${step.text()}`, null, () => questMenu(player, quest, self)]
     },
     back,
   }).show(player)
 }
-
-/**
- * @param {Player} player
- * @param {VoidFunction} back
- */
 
 function completeQuestsMenu(player: Player, back: VoidFunction) {
   const self = () => completeQuestsMenu(player, back)
@@ -82,9 +74,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
   new ArrayForm(
     'Завершенные задания',
     'Список завершенных заданий',
-
-    quests.completed.map(e => Quest.all.get(e)).filter(noNullable),
-
+    quests.completed.map(e => Quest.quests.get(e)).filter(noNullable),
     {
       filters: {},
       button(quest, filters) {
@@ -102,7 +92,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
  */
 
 function questMenu(player: Player, quest: Quest, back: VoidFunction) {
-  const current = quest.current(player)
+  const current = quest.getPlayerStep(player)
   let currentDescription = ''
   if (current) {
     currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}`

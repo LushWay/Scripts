@@ -12,7 +12,13 @@ export class Vector {
    *
    * Valid vector don't uses NaN values
    */
-  static valid = (a: Vector3) => !(isNaN(a.x) || isNaN(a.y) || isNaN(a.z))
+  static valid = (a: Vector3) =>
+    !isNaN(a.x) &&
+    !isNaN(a.y) &&
+    !isNaN(a.z) &&
+    typeof a.x === 'number' &&
+    typeof a.y === 'number' &&
+    typeof a.z === 'number'
 
   /** Returns dot product of two vectors */
   static dot = (a: Vector3, b: Vector3) => a.x * b.x + a.y * b.y + a.z * b.z

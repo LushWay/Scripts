@@ -1,14 +1,14 @@
 import { ActionForm, FormCallback, util } from 'lib'
+import { Core } from 'lib/extensions/core'
 import { Mail } from 'lib/mail'
-import { Menu } from 'lib/menu'
 import { Join } from 'lib/player-join'
+import { questsMenu } from 'lib/quest/menu'
+import { Menu } from 'lib/rpg/menu'
 import { playerSettingsMenu } from 'lib/settings'
 import { mailMenu } from 'modules/commands/mail'
 import { openBaseMenu } from 'modules/places/base/base-menu'
-import { questsMenu } from 'modules/quests/quest-menu'
 import { Anarchy } from '../places/anarchy'
 import { Spawn } from '../places/spawn'
-import { Core } from 'lib/extensions/core'
 
 function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = 'Спавн', extra = '') {
   const here = inv === place

@@ -35,4 +35,4 @@ actionGuard((player, region, ctx) => {
     })
     return true
   }
-}, 100)
+})

@@ -24,6 +24,15 @@ declare module '@minecraft/server' {
      * @returns Promise that resolves after given ticks time
      */
     sleep(time: number): Promise<void>
+
+    /**
+     * @remarks
+     *   Queues a generator to run until completion. The generator will be given a time slice each tick, and will be run
+     *   until it yields or completes.
+     * @returns An opaque handle that can be used with {@link System.clearJob} to stop the run of this generator.
+     * @beta
+     */
+    runJobForEach<T>(array: T[], callback: (element: T, i: number, array: T[]) => void): Promise<void>
   }
 }
 
@@ -33,14 +42,8 @@ expand(System.prototype, {
   },
 
   runInterval(...args) {
-    const runTimout = super.runTimeout.bind(this) as typeof interval
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this
-    function interval(fn: VoidFunction, ticks: number): number {
-      fn()
-      return self.run(() => runTimout(() => interval(fn, ticks), ticks))
-    }
-    return Timer('interval', interval, ...args)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return Timer('interval', super.runInterval.bind(this), ...args)
   },
 
   runTimeout(...args) {
@@ -64,6 +67,24 @@ expand(System.prototype, {
   delay(fn) {
     this.run(function delay() {
       util.catch(fn, 'system.delay')
+    })
+  },
+
+  runJobForEach(array, callback) {
+    return new Promise((resolve, reject) => {
+      this.runJob(
+        (function* generator() {
+          try {
+            for (const [i, element] of array.entries()) {
+              callback(element, i, array)
+              yield
+            }
+            resolve()
+          } catch (error: unknown) {
+            reject(error as Error)
+          }
+        })(),
+      )
     })
   },
 })

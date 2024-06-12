@@ -1,11 +1,12 @@
 import { Container, ItemStack, MolangVariableMap, Player } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vector } from 'lib/vector'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Temporary, isInvalidLocation, util } from 'lib'
+import { CustomItems } from 'lib/assets/config'
 import { t } from 'lib/text'
 import { Cutscene } from './cutscene'
-import { cutscene as cusceneCommand } from './cutscene-menu'
+import { cutscene as cusceneCommand } from './menu'
 
 /** List of items that controls the editing process */
 const controls: Record<
@@ -14,7 +15,10 @@ const controls: Record<
 > = {
   create: [
     3,
-    new ItemStack('we:tool').setInfo('§r§6> §fСоздать точку', 'используй предмет, чтобы создать точку катсцены.'),
+    new ItemStack(CustomItems.WeTool).setInfo(
+      '§r§6> §fСоздать точку',
+      'используй предмет, чтобы создать точку катсцены.',
+    ),
     (player, cutscene) => {
       if (!cutscene.sections[0]) cutscene.withNewSection(cutscene.sections, {})
 
@@ -73,15 +77,13 @@ const controls: Record<
 export function editCatcutscene(player: Player, cutscene: Cutscene) {
   backupPlayerInventoryAndCutscene(player, cutscene)
 
-  new Temporary(({ world, system, temp }) => {
+  new Temporary(({ world, system, temporary }) => {
     system.runInterval(
       () => {
         for (const section of cutscene.sections) {
           if (!section) continue
 
-          for (const point of section.points) {
-            particle(point, blueParticle)
-          }
+          for (const point of section.points) particle(point, blueParticle)
         }
       },
       'cutscene section edges particles',
@@ -90,7 +92,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
     const controller = { cancel: false }
     util.catch(async function visualize() {
-      while (!temp.cleaned) {
+      while (!temporary.cleaned) {
         await system.sleep(10)
 
         const sections = cutscene.withNewPoint(player)
@@ -117,13 +119,13 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
       for (const [, control, onUse] of Object.values(controls)) {
         if (control.is(event.itemStack)) {
           event.cancel = true
-          system.delay(() => onUse(player, cutscene, temp))
+          system.delay(() => onUse(player, cutscene, temporary))
         }
       }
     })
 
     world.beforeEvents.playerLeave.subscribe(event => {
-      if (event.player.id === player.id) temp.cleanup()
+      if (event.player.id === player.id) temporary.cleanup()
     })
 
     function particle(point: Vector3 | undefined, vars: MolangVariableMap) {
@@ -132,8 +134,8 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
         player.dimension.spawnParticle('minecraft:wax_particle', point, vars)
       } catch (e) {
         if (isInvalidLocation(e)) return
-
         if (e instanceof TypeError && e.message.includes('Native optional type conversion')) return
+
         console.error(e)
       }
     }
@@ -143,14 +145,10 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
         const editingPlayer = EditingCutscene.get(player.id)
         if (!editingPlayer) return
 
-        const { hotbarSlots: slots, position } = editingPlayer
+        const { hotbarSlots, position } = editingPlayer
 
         if (player.isValid()) {
-          forEachHotbarSlot(player, (i, container) => {
-            container.setItem(i, undefined)
-            container.setItem(i, slots[i])
-          })
-
+          forEachHotbarSlot(player, (i, container) => container.setItem(i, hotbarSlots[i]))
           player.teleport(position)
         }
 

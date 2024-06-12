@@ -5,7 +5,7 @@ import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
-import { ActionForm } from './form/action'
+import { ActionForm } from '../form/action'
 
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']

@@ -1,9 +1,9 @@
 import { GameMode, Player } from '@minecraft/server'
 import { InventoryStore, Portal, ValidSafeLocation, Vector, Zone, location } from 'lib'
+import { isNotPlaying } from 'lib/game-utils'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
-import { isNotPlaying } from 'modules/world-edit/isBuilding'
 import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
 
 // TODO Newbie savemode

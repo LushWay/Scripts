@@ -2,8 +2,8 @@ import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } fro
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, Vector, isChunkUnloaded } from 'lib'
-import { location } from './location'
-import { t } from './text'
+import { location } from 'lib/location'
+import { t } from 'lib/text'
 
 type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void | false
 

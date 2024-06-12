@@ -1,30 +1,26 @@
 import { ItemStack, Player, RawText } from '@minecraft/server'
 import { Sounds } from 'lib/assets/config'
 import { emoji } from 'lib/assets/emoji'
-import { itemLocaleName } from './game-utils'
-import { itemDescription } from './rewards'
-import { MaybeRawText, t } from './text'
-import { noBoolean } from './util'
+import { itemLocaleName } from 'lib/game-utils'
+import { itemDescription } from 'lib/shop/rewards'
+import { MaybeRawText, t } from 'lib/text'
+import { noBoolean } from 'lib/util'
 
-export class Cost<T = unknown> {
+export abstract class Cost<T = unknown> {
   /**
    * Returns string representation of cost
    *
    * @param canBuy - Whenether to display this cost as affordable by player or not
    * @param player - Player to check cost on. Used in MultipleCost to check each one manually
    */
-  toString(canBuy = true, player?: Player): MaybeRawText {
-    return ''
-  }
+  abstract toString(canBuy?: boolean, player?: Player): MaybeRawText
 
   /**
    * If the player have this cost value returns true, otherwise false
    *
    * @param player - Player to check on
    */
-  has(player: Player): boolean {
-    return false
-  }
+  abstract has(player: Player): boolean
 
   /**
    * Removes this cost from player
@@ -105,7 +101,7 @@ export class MultiCost<T extends Cost[]> extends Cost {
 
   leafy = this.createCostAlias(LeafyCost)
 
-  private createCostAlias<T extends typeof Cost | typeof ItemCost | typeof ScoreboardCost>(target: T) {
+  private createCostAlias<T extends typeof ItemCost | typeof ScoreboardCost>(target: T) {
     return (...args: ConstructorParameters<T>) => {
       this.costs.push(
         // @ts-expect-error Idk why it complains

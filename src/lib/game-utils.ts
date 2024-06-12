@@ -10,6 +10,8 @@ import {
 } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftCameraPresetsTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib/vector'
+import { PersistentSet } from './database/persistent-objects'
+import { getRole } from './roles'
 
 /** Represents location in the specific dimension */
 interface LocationInDimension {
@@ -168,3 +170,14 @@ const blockModifiers: ((s: string) => string | undefined)[] = [
     return `planks.${type}`
   },
 ]
+
+export const CURRENT_BUILDERS = new PersistentSet('onlineBuilderList')
+
+export function isBuilding(player: Player, uptodate = false) {
+  if (uptodate) return player.isGamemode('creative') && getRole(player) !== 'member'
+  return CURRENT_BUILDERS.has(player.id)
+}
+
+export function isNotPlaying(player: Player) {
+  return isBuilding(player, true) || player.isGamemode('spectator')
+}

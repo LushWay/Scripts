@@ -1,8 +1,9 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, is } from 'lib'
+import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
+import { is } from 'lib/roles'
 import { Cutscene } from './cutscene'
-import { editCatcutscene } from './cutscene-edit'
+import { editCatcutscene } from './edit'
 
 new Cutscene('test', 'Test')
 

@@ -78,10 +78,10 @@ export class IntegerArgumentType<T extends boolean = false> implements IArgument
   typeName = 'int'
 
   matches(value: string) {
-    const val = parseInt(value)
+    const n = parseInt(value)
     return {
-      success: !isNaN(val),
-      value: val,
+      success: !isNaN(n),
+      value: this.optional && isNaN(n) ? undefined : n,
     }
   }
 }

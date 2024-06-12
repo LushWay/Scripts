@@ -16,7 +16,7 @@ describe('SafeAreaRegion', () => {
   it('should not save region to database', () => {
     const region = TestSafeAreaRegion.create({ center: Vector.one, dimensionId: 'overworld', radius: 1 })
 
-    expect(RegionDatabase[region.regionKey]).toBe(undefined)
+    expect(region.regionKey in RegionDatabase).toBe(false)
   })
 
   it('should have safe area name', () => {

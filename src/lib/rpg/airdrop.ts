@@ -2,11 +2,11 @@ import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib/region/index'
 import { Vector } from 'lib/vector'
-import { table } from './database/abstract'
-import { Core } from './extensions/core'
-import { isInvalidLocation } from './game-utils'
-import { LootTable } from './loot-table'
-import { Temporary } from './temporary'
+import { table } from '../database/abstract'
+import { Core } from '../extensions/core'
+import { isInvalidLocation } from '../game-utils'
+import { LootTable } from 'lib/rpg/loot-table'
+import { Temporary } from '../temporary'
 
 export class Airdrop {
   static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true }>('airdrop')

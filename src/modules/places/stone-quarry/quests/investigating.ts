@@ -1,34 +1,24 @@
 import { Temporary } from 'lib'
+import { Cutscene } from 'lib/cutscene/index'
+import { Quest } from 'lib/quest/index'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
-import { Cutscene } from 'modules/quests/lib/cutscene'
-import { Quest } from 'modules/quests/lib/quest'
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-class StoneQuarryInvestigating {
+export class StoneQuarryInvestigating {
   static place = StoneQuarry
 
-  static cutscene = new Cutscene('StoneQuarryInvestigating', 'Исследование каменоломни')
-
-  static quest = new Quest(
-    {
-      id: 'stone quarry investigating',
-      name: 'Каменоломня',
-      desc: 'Исследуйте новый город!',
-    },
-    (q, p) => {
-      q.dynamic({
-        text: 'поговорите с горожанами',
-        description: 'Лучше всего узнавать о городе у местных, поговорите с ними!',
-        activate() {
-          return new Temporary(() => {
-            // TODO WRITE
-          })
-        },
+  static quest = new Quest('StoneQuarryInvestigating', 'Каменоломня', 'Исследуйте новый город!', (q, p) => {
+    q.dynamic('поговорите с горожанами')
+      .description('Лучше всего узнавать о городе у местных, поговорите с ними!')
+      .activate(ctx => {
+        return new Temporary(() => {
+          // TODO
+        })
       })
-    },
-  )
+  })
 
-  static init() {
+  static cutscene = new Cutscene(this.quest.id, 'Исследование каменоломни')
+
+  static {
     // RegionEvents.onEnter(this.place.safeArea, player => {
     //   if (isNotPlaying(player)) return
     //   this.quest.enter(player)
@@ -36,5 +26,3 @@ class StoneQuarryInvestigating {
     // })
   }
 }
-
-StoneQuarryInvestigating.init()

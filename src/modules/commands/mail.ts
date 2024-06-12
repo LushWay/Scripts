@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, prompt, util } from 'lib'
 import { Join } from 'lib/player-join'
-import { Rewards } from 'lib/rewards'
+import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 
 new Command('mail')

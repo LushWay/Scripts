@@ -1,5 +1,5 @@
 import * as mc from '@minecraft/server'
-import '../../tools/definedGlobals'
+import '../../tools/defines'
 
 type JsonPrimative = string | number | boolean | null
 type JsonArray = Json[]
@@ -80,7 +80,7 @@ declare module '@minecraft/server' {
     name?: string | undefined
     readonly role: Role
     prevRole?: Role
-    quests?: import('../modules/quests/lib/quest').QuestDB
+    quests?: import('./quest/quest').QuestDB
     join?: {
       position?: number[]
       stage?: number

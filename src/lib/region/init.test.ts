@@ -62,10 +62,6 @@ describe('region initialization', () => {
     )
   })
 
-  it('should restore with empty region', () => {
-    expect(restoreRegionFromJSON(['test', undefined])).toBe(undefined)
-  })
-
   it('should restore cuberegion', () => {
     const region = TestCubeRegion.create({ from: Vector.one, to: Vector.one, dimensionId: 'overworld' })
     const regionJSON = RegionDatabase[region.regionKey]

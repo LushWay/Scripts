@@ -2,6 +2,7 @@ import { BlockPermutation, LocationInUnloadedChunkError, system, world } from '@
 import { Vector, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
+import { t } from 'lib/text'
 
 interface ScheduledBlockPlace {
   typeId: string
@@ -67,7 +68,9 @@ system.runInterval(
           if (!block?.isValid()) continue
 
           block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
-          console.debug('schedule place', schedule.typeId, schedule.location)
+          console.log(
+            t`Schedule place ${schedule.typeId.replace('minecraft:', '')} to ${Vector.string(schedule.location, true)}`,
+          )
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) continue
           console.error(e)

@@ -1,7 +1,7 @@
 import { Entity, ShortcutDimensions, world } from '@minecraft/server'
-import { CustomEntityTypes } from './assets/config'
-import { isChunkUnloaded } from './game-utils'
-import { Vector } from './vector'
+import { CustomEntityTypes } from 'lib/assets/config'
+import { isChunkUnloaded } from 'lib/game-utils'
+import { Vector } from 'lib/vector'
 
 export class FloatingText {
   private static readonly dynamicProperty = 'floatingText'
@@ -16,7 +16,9 @@ export class FloatingText {
   private entity: Entity | undefined
 
   update(location: Vector3, nameTag: string) {
-    if (isChunkUnloaded({ location, dimensionId: this.dimensionId })) return console.log('Unloaded')
+    if (isChunkUnloaded({ location, dimensionId: this.dimensionId })) {
+      return console.warn(this.prefix + 'Chunk is unloaded')
+    }
 
     location = Vector.add(location, { x: 0.5, y: 0.7, z: 0.5 })
 
@@ -29,7 +31,7 @@ export class FloatingText {
       this.entity.teleport(location)
       this.entity.nameTag = nameTag
     } else {
-      console.warn('Entity is invalid')
+      console.warn(this.prefix + 'Entity is invalid')
     }
   }
 
@@ -42,5 +44,9 @@ export class FloatingText {
     return world[this.dimensionId]
       .getEntities({ type: FloatingText.typeId })
       .find(e => e.getDynamicProperty(FloatingText.dynamicProperty) === this.id)
+  }
+
+  private get prefix() {
+    return `[FloatingText][${this.id}] `
   }
 }

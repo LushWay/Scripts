@@ -13,14 +13,14 @@ interface ProxiedSubscribers {
   system: System
   world: World
   cleanup: VoidFunction
-  temp: Temporary
+  temporary: Temporary
 }
 
 export class Temporary {
   /** List of functions that will be called on clear */
-  private cleaners: VoidFunction[] = []
+  protected cleaners: VoidFunction[] = []
 
-  private proxies: ProxiedSubscribers
+  protected proxies: ProxiedSubscribers
 
   /** Weather events are unsubscribed or not */
   cleaned = false
@@ -45,7 +45,7 @@ export class Temporary {
           this.proxySystem(),
         ) as System,
         cleanup: this.cleanup,
-        temp: this,
+        temporary: this,
       }
     }
 
@@ -100,7 +100,10 @@ export class Temporary {
         return (...args: unknown[]) => {
           const handle = value.call(target, ...args) as unknown
           if (typeof handle === 'number') {
-            this.cleaners.push(() => system.clearRun(handle))
+            this.cleaners.push(() => {
+              console.log('Clearing run', handle)
+              system.clearRun(handle)
+            })
           }
           return handle
         }
@@ -109,7 +112,7 @@ export class Temporary {
   }
 
   /** Unsubscribes all temporary events */
-  cleanup = (() => {
+  readonly cleanup = (() => {
     this.cleaners.forEach(fn => fn())
     this.cleaned = true
   }) as (this: void) => void

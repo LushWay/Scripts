@@ -5,7 +5,7 @@ import { isKeyof, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { TechCity } from 'modules/places/tech-city'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
-import { withState } from 'modules/world-edit/utils/blocksSet'
+import { withState } from 'modules/world-edit/utils/blocks-set'
 
 const [quartzTypeId, states] = withState(MinecraftBlockTypes.QuartzBlock, {
   chisel_type: 'smooth',

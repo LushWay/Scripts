@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { isNotPlaying } from 'modules/world-edit/isBuilding'
+import { isNotPlaying } from 'lib/game-utils'
 
 export abstract class DefaultPlaceWithInventory {
   static places: DefaultPlaceWithInventory[] = []

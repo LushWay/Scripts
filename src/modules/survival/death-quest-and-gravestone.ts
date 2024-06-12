@@ -1,9 +1,9 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Settings, Temporary, Vector, actionGuard, inventoryIsEmpty, util } from 'lib'
+import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, util } from 'lib'
+import { Quest } from 'lib/quest/quest'
 import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
 import { Spawn } from 'modules/places/spawn'
-import { Quest } from 'modules/quests/lib/quest'
 import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
 const gravestoneOwnerKey = 'owner'
@@ -121,33 +121,28 @@ actionGuard((player, _, ctx) => {
   if (Player.database[owner].survival.newbie) return false
 })
 
-const quest = new Quest(
-  { id: 'restoreInventory', name: 'Вернуть вещи', desc: 'Верните вещи после смерти!' },
-  (q, player) => {
-    const { deadAt } = player.database.survival
-    if (!deadAt) return q.failed('Ваше место смерти потерялось!')
-    q.dynamic({
-      text: `§dВерните свои вещи!`,
-      description: `Верните свои вещи${
+const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
+  const { deadAt } = player.database.survival
+  if (!deadAt) return q.failed('Ваше место смерти потерялось!')
+
+  q.dynamic(`§dВерните свои вещи!`)
+    .description(
+      `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
       }, они ждут вас!`,
-      activate() {
-        return new Temporary(({ world, temp }) => {
-          q.targetCompassTo({ place: deadAt, temporary: temp })
+    )
+    .activate(ctx => {
+      ctx.place = deadAt
+      ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
+        if (event.player.id !== player.id) return
+        const key = event.target.getDynamicProperty(gravestoneOwnerKey)
+        if (key !== player.id) return
 
-          world.afterEvents.playerInteractWithEntity.subscribe(event => {
-            if (event.player.id !== player.id) return
-            const key = event.target.getDynamicProperty(gravestoneOwnerKey)
-            if (key !== player.id) return
-
-            this.next()
-          })
-        })
-      },
+        ctx.next()
+      })
     })
 
-    q.end(() => {
-      player.success('Поздравляем! В будущем постарайтесь быть осторожнее.')
-    })
-  },
-)
+  q.end(() => {
+    player.success('Поздравляем! В будущем постарайтесь быть осторожнее.')
+  })
+})

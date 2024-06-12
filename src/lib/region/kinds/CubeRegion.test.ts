@@ -24,6 +24,6 @@ describe('CubeRegion', () => {
 
     const region = NonSaveableCubeRegion.create({ from: Vector.zero, to: Vector.zero, dimensionId: 'overworld' })
 
-    expect(RegionDatabase[region.regionKey]).toBeUndefined()
+    expect(region.regionKey in RegionDatabase).toBe(false)
   })
 })

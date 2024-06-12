@@ -1,10 +1,10 @@
 import { ItemStack, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector, util } from 'lib'
-import { MoneyCost } from 'lib/cost'
 import { table } from 'lib/database/abstract'
 import { actionGuard } from 'lib/region/index'
-import { Shop } from 'lib/shop'
+import { MoneyCost } from 'lib/shop/cost'
+import { Shop } from 'lib/shop/shop'
 import { StoneQuarry } from '../places/stone-quarry/stone-quarry'
 
 export class Furnacer {

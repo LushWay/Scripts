@@ -1,8 +1,8 @@
 import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { emoji } from 'lib/assets/emoji'
-import { itemLocaleName } from './game-utils'
-import { noBoolean } from './util'
+import { itemLocaleName } from 'lib/game-utils'
+import { noBoolean } from 'lib/util'
 
 export type Reward =
   | {

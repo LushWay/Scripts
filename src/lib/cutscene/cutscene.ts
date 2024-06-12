@@ -1,9 +1,9 @@
 import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vector } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
-import { restorePlayerCamera } from 'lib'
 import { table } from 'lib/database/abstract'
+import { restorePlayerCamera } from 'lib/game-utils'
 import { WeakPlayerMap } from 'lib/weak-player-map'
 
 /**
