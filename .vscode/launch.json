@@ -4,9 +4,11 @@
     {
       "type": "minecraft-js",
       "request": "attach",
+      "targetModuleUuid": "8198b306-bfbb-48c9-874d-217cd4cef1ae",
       "name": "Minecraft debugger",
       "mode": "listen",
-      "localRoot": "${workspaceFolder}/scripts/",
+      "localRoot": "${workspaceFolder}/src/",
+      "sourceMapRoot": "${workspaceFolder}/scripts/",
       "port": 1000
     }
   ]

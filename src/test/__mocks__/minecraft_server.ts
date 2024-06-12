@@ -3,10 +3,18 @@ import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 import { vi } from 'vitest'
 
+export class ScoreboardObjective {}
+
 export class Component {
   readonly 'typeId': string
   'isValid'(): boolean {
     return true
+  }
+}
+
+export class BlockTypes {
+  static getAll() {
+    return []
   }
 }
 
@@ -116,9 +124,15 @@ export class System {
     return 0
   }
 
-  runInterval = vi.fn()
-  runTimeout = vi.fn()
-  runJob = vi.fn()
+  runInterval() {
+    return 0
+  }
+  runTimeout() {
+    return 0
+  }
+  runJob() {
+    return 0
+  }
 }
 
 export const system = new System()
@@ -167,6 +181,15 @@ export class WorldAfterEvents {}
 export class WorldBeforeEvents {}
 
 export const world = new World()
+
+export class ItemTypes {
+  static get(itemId: string): ItemType | undefined {
+    return new ItemType(itemId)
+  }
+  static getAll(): ItemType[] {
+    return []
+  }
+}
 
 export class ItemType {
   constructor(readonly id: string) {}
@@ -342,4 +365,47 @@ export class Container {
     this.setItem(fromSlot, undefined)
     return toContainer.addItem(item)
   }
+}
+
+/** The types of item components that are accessible via function ItemStack.getComponent. */
+export enum ItemComponentTypes {
+  /**
+   * @remarks
+   *   The minecraft:cooldown component.
+   */
+  Cooldown = 'minecraft:cooldown',
+  /**
+   * @remarks
+   *   The minecraft:durability component.
+   */
+  Durability = 'minecraft:durability',
+  /**
+   * @remarks
+   *   The minecraft:enchantable component.
+   */
+  Enchantable = 'minecraft:enchantable',
+  /**
+   * @remarks
+   *   The minecraft:food component.
+   */
+  Food = 'minecraft:food',
+}
+
+/** Describes how an an item can be moved within a container. */
+export enum ItemLockMode {
+  /**
+   * @remarks
+   *   The item cannot be dropped or crafted with.
+   */
+  inventory = 'inventory',
+  /**
+   * @remarks
+   *   The item has no container restrictions.
+   */
+  none = 'none',
+  /**
+   * @remarks
+   *   The item cannot be moved from its slot, dropped or crafted with.
+   */
+  slot = 'slot',
 }
