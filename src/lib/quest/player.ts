@@ -1,34 +1,12 @@
 import { Player } from '@minecraft/server'
-import { PlaceAction } from 'lib/action'
 import { isNotPlaying } from 'lib/game-utils'
-import { Vector } from 'lib/vector'
 import { Quest } from './quest'
 import { QS, QSBuilder } from './step'
 
 import { QSCounter, QSCounterBuilder } from './steps/counter'
 import { QSDynamic, QSDynamicBuilder } from './steps/dynamic'
 import { QSItem, QSItemBuilder } from './steps/item'
-
-function questPlaceStep(from: Vector3, to: Vector3, text: Text) {
-  return this.dynamic(text).activate(ctx => {
-    const actions = [...Vector.foreach(from, to)].map(pos =>
-      PlaceAction.onEnter(pos, player => {
-        if (player.id !== this.player.id) return
-        ctx.next()
-      }),
-    )
-
-    const min = Vector.min(from, to)
-    const max = Vector.max(from, to)
-    const size = Vector.subtract(max, min)
-    const edge = Vector.multiply(size, 0.5)
-    ctx.place = Vector.add(Vector.add(min, edge), { x: 1, y: 1, z: 1 })
-
-    return {
-      cleanup: () => actions.forEach(a => a.unsubscribe()),
-    }
-  })
-}
+import { QSPlace } from './steps/place'
 
 export class PlayerQuest {
   constructor(
@@ -50,26 +28,7 @@ export class PlayerQuest {
     return this.dynamic(reason).activate(ctx => ctx.error(reason))
   }
 
-  place = (from: Vector3, to: Vector3, text: Text) => {
-    return this.dynamic(text).activate(ctx => {
-      const actions = [...Vector.foreach(from, to)].map(pos =>
-        PlaceAction.onEnter(pos, player => {
-          if (player.id !== this.player.id) return
-          ctx.next()
-        }),
-      )
-
-      const min = Vector.min(from, to)
-      const max = Vector.max(from, to)
-      const size = Vector.subtract(max, min)
-      const edge = Vector.multiply(size, 0.5)
-      ctx.place = Vector.add(Vector.add(min, edge), { x: 1, y: 1, z: 1 })
-
-      return {
-        cleanup: () => actions.forEach(a => a.unsubscribe()),
-      }
-    })
-  }
+  place = QSPlace.bind(this) as OmitThisParameter<typeof QSPlace>
 
   end = (action: (ctx: PlayerQuest) => void) => {
     this.onEnd = action.bind(this, this) as VoidFunction

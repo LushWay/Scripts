@@ -146,7 +146,7 @@ export class InventoryIntervalAction {
         const { container } = player
         if (!container) return
 
-        const selectedSlot = player.selectedSlot
+        const selectedSlot = player.selectedSlotIndex
 
         for (const [i, slot] of container.slotEntries()) {
           if (i === selectedSlot) EventSignal.emit(MainhandIntervalAction.signal, { player, slot })

@@ -1,4 +1,4 @@
-import { BlockVolume, Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
+import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vector } from 'lib'
 import { WE_CONFIG } from '../config'
 import { Cuboid } from './ccuboid'
@@ -51,7 +51,7 @@ export class BigStructure extends Cuboid {
       try {
         world.structureManager.delete(name)
       } catch {}
-      world.structureManager.createFromWorld(name, this.dimension, new BlockVolume(min, max), {
+      world.structureManager.createFromWorld(name, this.dimension, min, max, {
         includeEntities: false,
         includeBlocks: true,
         saveMode: StructureSaveMode.Memory,

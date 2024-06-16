@@ -79,13 +79,13 @@ export class Compass {
   private static action = InventoryIntervalAction.subscribe(({ player, slot, i }) => {
     const isMenu = slot.typeId === CustomItems.Menu
     if (!slot.typeId?.startsWith(CustomItems.CompassPrefix) && !isMenu) {
-      if (i === player.selectedSlot) {
+      if (i === player.selectedSlotIndex) {
         player.setProperty('sm:minimap', false)
       }
       return
     }
 
-    if (i === player.selectedSlot) {
+    if (i === player.selectedSlotIndex) {
       player.setProperty('sm:minimap', true)
     }
 

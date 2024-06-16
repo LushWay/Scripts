@@ -1,4 +1,4 @@
-import { BlockVolume, Entity, StructureSaveMode, system, world } from '@minecraft/server'
+import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 
 interface TableEntity {
@@ -119,7 +119,8 @@ export class DatabaseUtils {
         world.structureManager.createFromWorld(
           this.backupName,
           this.tablesDimension,
-          new BlockVolume(this.entityLocation, this.entityLocation),
+          this.entityLocation,
+          this.entityLocation,
           { includeBlocks: false, includeEntities: true, saveMode: StructureSaveMode.World },
         )
       },

@@ -125,7 +125,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     })
   },
   slot(ctx) {
-    ctx.reply(ctx.player.selectedSlot)
+    ctx.reply(ctx.player.selectedSlotIndex)
   },
 
   base(ctx) {

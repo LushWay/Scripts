@@ -100,14 +100,17 @@ const shovel = new WorldEditTool({
       if (!block) continue
 
       for (const replaceBlock of replaceBlocks) {
-        if (!block.permutation.matches(replaceBlock.typeId)) continue
-        const states = block.permutation.getAllStates()
+        if (replaceBlock) {
+          if (!block.permutation.matches(replaceBlock.typeId)) continue
+          const states = block.permutation.getAllStates()
 
-        for (const [name, value] of Object.entries(replaceBlock.states)) {
-          if (states[name] !== value) continue
+          for (const [name, value] of Object.entries(replaceBlock.states)) {
+            if (states[name] !== value) continue
+          }
         }
 
         block.setPermutation(blocks.randomElement())
+        break
       }
     }
   },

@@ -70,7 +70,7 @@ async function createCommonBaseTest(test: ExtendedTest) {
 
   owner.mainhand().setItem(BASE_ITEM_STACK)
   await test.idle(10)
-  owner.useItemInSlotOnBlock(owner.selectedSlot, { x: 2, y: 2, z: 2 })
+  owner.useItemInSlotOnBlock(owner.selectedSlotIndex, { x: 2, y: 2, z: 2 })
   owner.mainhand().setItem(new ItemStack('minecraft:air'))
 
   return { owner, raider }

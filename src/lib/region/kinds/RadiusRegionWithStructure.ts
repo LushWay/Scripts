@@ -23,16 +23,11 @@ export class RadiusRegionWithStructure extends RadiusRegion {
     }
 
     // console.log('Saving structure with name', this.structureName, 'and egdes', this.edges)
-    world.structureManager.createFromWorld(
-      this.structureName,
-      world[this.dimensionId],
-      new BlockVolume(...this.edges),
-      {
-        saveMode: StructureSaveMode.World,
-        includeEntities: false,
-        includeBlocks: true,
-      },
-    )
+    world.structureManager.createFromWorld(this.structureName, world[this.dimensionId], ...this.edges, {
+      saveMode: StructureSaveMode.World,
+      includeEntities: false,
+      includeBlocks: true,
+    })
   }
 
   forEachStructureBlock(

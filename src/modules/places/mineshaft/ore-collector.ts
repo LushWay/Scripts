@@ -50,7 +50,7 @@ export class OreCollector {
         return {
           ore,
           isDeepslate: ore[deepslates].includes(typeId),
-          get stone() {
+          get empty() {
             return this.isDeepslate ? b.Deepslate : b.Stone
           },
         }

@@ -22,7 +22,7 @@ export class MineshaftRegion extends RadiusRegionWithStructure {
       if (isIn) {
         const block = dimension.getBlock(vector)
         const ore = block && ores.getOre(block.typeId)
-        if (ore) block.setType(ore.isDeepslate ? b.Deepslate : b.Stone)
+        if (ore) block.setType(ore.empty)
       }
     })
 

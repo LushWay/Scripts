@@ -1,4 +1,4 @@
-import { Block, Dimension } from '@minecraft/server'
+import { Block, Dimension, Player } from '@minecraft/server'
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { Vector } from 'lib'
 import { Ore, OreCollector } from './ore-collector'
@@ -20,24 +20,25 @@ export const ores = new OreCollector(
   new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).chance(0.1),
 ).stoneChance(90)
 
-export function placeOre(block: Block, dimension: Dimension) {
-  const possibleOreBlocks = []
-  const airCache: Record<string, boolean> = { [Vector.string(block)]: false }
-  for (const vector of edgeBlockRelativeTo(block)) {
-    const oreBlock = dimension.getBlock(vector)
-    if (!oreBlock || oreBlock.isAir) continue
+export function placeOre(brokenBlock: Block, dimension: Dimension, player: Player) {
+  const possibleBlocks = []
+  const airCache: Record<string, boolean> = { [Vector.string(brokenBlock)]: false }
 
-    const nearAir = edgeBlockRelativeTo(oreBlock).find(
-      e => (airCache[Vector.string(e)] ??= !!dimension.getBlock(e)?.isAir),
-    )
+  for (const vector of getEdgeBlocksOf(brokenBlock)) {
+    const block = dimension.getBlock(vector)
+    if (!block || block.isAir) continue
+
+    const nearAir = getEdgeBlocksOf(vector).find(e => (airCache[Vector.string(e)] ??= !!dimension.getBlock(e)?.isAir))
 
     if (nearAir) continue
-    possibleOreBlocks.push(oreBlock)
+    possibleBlocks.push(block)
   }
-  const oreBlock = possibleOreBlocks.randomElement()
-  if ((oreBlock as Block | undefined) && !oreBlock.isAir) {
-    const oreTypeId = ores.selectOreByChance(oreBlock.typeId === b.Deepslate)
-    if (oreTypeId) oreBlock.setType(oreTypeId)
+
+  const block = possibleBlocks.randomElement()
+  if (block.isValid() && !block.isAir) {
+    const isDeepslate = block.typeId === b.Deepslate
+    const oreTypeId = ores.selectOreByChance(isDeepslate)
+    if (oreTypeId) block.setType(oreTypeId)
   }
 }
 
@@ -63,7 +64,7 @@ export function placeOre(block: Block, dimension: Dimension) {
  *   +1
  *   ```
  */
-export const edgeBlockRelativeTo = (base: Vector3) =>
+export const getEdgeBlocksOf = (base: Vector3) =>
   [
     { x: 0, z: 0, y: -1 },
     { x: -1, z: 0, y: 0 },

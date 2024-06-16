@@ -6,6 +6,6 @@ new Command('pos2')
   .setDescription('Устанавливает позицию 2 (использовать)')
   .setPermissions('builder')
   .location('pos', true)
-  .executes((ctx, pos) => {
+  .executes((ctx, pos = ctx.player.location) => {
     WorldEdit.forPlayer(ctx.player).pos2 = Vector.floor(pos)
   })

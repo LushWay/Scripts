@@ -40,7 +40,7 @@ export class Furnacer {
     onlyInStoneQuarry,
     npc,
   }: {
-    npc: Omit<import('lib/npc').NpcOptions, 'onInteract' | 'group'>
+    npc: Omit<import('lib/rpg/npc').NpcOptions, 'onInteract' | 'group'>
     furnaceTypeIds: string[]
     onlyInStoneQuarry: boolean
   }) {
