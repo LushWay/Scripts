@@ -1,4 +1,6 @@
-import { notice, patchPackage } from './patch-package.js'
+import { m, notice, patchPackage } from './patch-package.js'
+
+/** @typedef {import('@minecraft/server')} A */
 
 // TODO Remove all patch scripts
 patchPackage('@minecraft/server', {
@@ -14,30 +16,15 @@ patchPackage('@minecraft/server', {
       replace: 'runTimeout(callback: () => void, name: string, tickDelay?: number): number;',
     },
     {
-      find: `/**
-    * @remarks
-    * Identifier of the type of items for the stack. If a
-    * namespace is not specified, 'minecraft:' is assumed.
-    * Examples include 'wheat' or 'apple'.
-    *
-    * @throws
-    * Throws if the slot's container is invalid.
-    *
-    * {@link InvalidContainerSlotError}
-    */
-   readonly typeId: string;`,
-      replace: `/**
-   * @remarks
-   * Identifier of the type of items for the stack. If a
-   * namespace is not specified, 'minecraft:' is assumed.
-   * Examples include 'wheat' or 'apple'.
-   *
-   * @throws
-   * Throws if the slot's container is invalid.
-   *
-   * {@link InvalidContainerSlotError}
-   */
-  readonly typeId?: string;`,
+      find: m` * @throws
+     * Throws if the slot's container is invalid.
+     *
+     * {@link InvalidContainerSlotError}
+     */
+    readonly typeId: string;`,
+      replace: `
+     */
+    readonly typeId?: string;`,
     },
   ],
   additions: {
