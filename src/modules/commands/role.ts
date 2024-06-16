@@ -43,8 +43,9 @@ function roleMenu(player: Player) {
 
   const players = world.getAllPlayers()
 
-  new ArrayForm('Roles $page/$max', '§3Ваша роль: ' + ROLES[prole], Object.entries(Player.database).reverse(), {
-    filters: {
+  new ArrayForm('Roles $page/$max', Object.entries(Player.database).reverse())
+    .description('§3Ваша роль: ' + ROLES[prole])
+    .filters({
       sort: {
         name: 'Сортировать по',
         value: [
@@ -52,34 +53,20 @@ function roleMenu(player: Player) {
           ['join date', '§6дате входа'],
         ],
       },
-    },
-
-    sort(keys, filters) {
+    })
+    .sort((keys, filters) => {
       if (filters.sort === 'role') {
         return keys
           .sort((a, b) => FULL_HIERARCHY.indexOf(a[1].role) - FULL_HIERARCHY.indexOf(b[1].role))
           .filter(key => key[0] !== player.id)
       } else return keys
-    },
+    })
+    .addCustomButtonBeforeArray(function (this, form) {
+      const button = this.button?.([player.id, player.database], { sort: 'role' }, form)
 
-    addCustomButtonBeforeArray(form) {
-      const button = this.button([player.id, player.database], { sort: 'role' }, form)
-
-      if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', null, button[2])
-    },
-
-    button(
-      [
-        id,
-        {
-          role,
-
-          name: dbname,
-        },
-      ],
-      _,
-      form,
-    ) {
+      if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', button[1])
+    })
+    .button(([id, { role, name: dbname }], _, form) => {
       const target = players.find(e => e.id === id) ?? id
       const name = typeof target === 'string' ? dbname ?? 'Без имени' : target.name
 
@@ -87,7 +74,6 @@ function roleMenu(player: Player) {
         `${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${
           canChange(prole, role) ? '' : ' §4Не сменить'
         }`,
-        null,
         () => {
           const self = player.id === id
           if (!canChange(prole, role, self)) {
@@ -107,9 +93,8 @@ function roleMenu(player: Player) {
             .addDropdownFromObject('Роль', filteredRoles, {
               defaultValueIndex: Object.keys(filteredRoles).findIndex(e => e === role),
             })
-
             .addTextField('Причина смены роли', `Например, "чел дурной, пол технограда снес"`)
-            .show(player, (formCtx, notify, showName, newrole, message) => {
+            .show(player, (_, notify, showName, newrole, message) => {
               if (target instanceof Player) {
                 if (notify && target instanceof Player)
                   target.info(
@@ -128,6 +113,6 @@ function roleMenu(player: Player) {
             })
         },
       ]
-    },
-  }).show(player)
+    })
+    .show(player)
 }

@@ -19,7 +19,7 @@ export function getOtherPlayerBlocksSets(playerId: string): [string, BlocksSets]
   return Object.entries(blocksSets).filter(e => e[0] !== playerId && e[0])
 }
 
-export function getAllBlocksSets(id: string): Record<string, BlocksSet | undefined> {
+export function getAllBlocksSets(id: string): BlocksSets {
   const playerBlocksSets = blocksSets[id] ?? {}
   return { ...playerBlocksSets, ...DEFAULT_BLOCK_SETS }
 }
@@ -43,7 +43,7 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
 }
 
 function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet | undefined {
-  return getAllBlocksSets(playerId)[blocksSetName]?.filter(e => e[2] > 0)
+  return getAllBlocksSets(playerId)[blocksSetName].filter(e => e[2] > 0)
 }
 
 export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {

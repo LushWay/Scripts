@@ -9,9 +9,7 @@ const quest = new Command('q')
   .setAliases('quest')
   .setDescription('Меню заданий')
   .setPermissions('member')
-  .executes(ctx => {
-    questsMenu(ctx.player)
-  })
+  .executes(ctx => questsMenu(ctx.player))
 
 quest
   .overload('exit')
@@ -19,6 +17,7 @@ quest
   .executes(ctx => {
     const q = Quest.getCurrent(ctx.player)
     if (!q) return ctx.error('У вас нет активных заданий!')
+
     q.quest.exit(ctx.player)
     ctx.player.playSound(Sounds.Success)
     ctx.reply('§6> §fУспешно')
@@ -46,50 +45,34 @@ export function questsMenu(player: Player, back?: VoidFunction) {
 
   const self = () => questsMenu(player, back)
 
-  new ArrayForm('§3Задания', !quests.active.length ? 'Нет активных заданий.' : '', quests.active, {
-    filters: {},
-
-    addCustomButtonBeforeArray(form) {
+  new ArrayForm('§3Задания', quests.active)
+    .description(!quests.active.length ? 'Нет активных заданий.' : '')
+    .addCustomButtonBeforeArray(form => {
       form.addButton(util.badge('§3Завершенные задания', quests.completed.length), () =>
         completeQuestsMenu(player, self),
       )
-    },
-    button(dbquest) {
+    })
+    .button(dbquest => {
       const quest = Quest.quests.get(dbquest.id)
       const step = quest?.getPlayerStep(player, dbquest.i)
       if (!step || !quest) return false
 
-      return [`${quest.name}\n${step.text()}`, null, () => questMenu(player, quest, self)]
-    },
-    back,
-  }).show(player)
+      return [`${quest.name}\n${step.text()}`, () => questMenu(player, quest, self)]
+    })
+    .back(back)
+    .show(player)
 }
 
 function completeQuestsMenu(player: Player, back: VoidFunction) {
-  const self = () => completeQuestsMenu(player, back)
-
   const { quests } = player.database
   if (!quests) return
 
-  new ArrayForm(
-    'Завершенные задания',
-    'Список завершенных заданий',
-    quests.completed.map(e => Quest.quests.get(e)).filter(noNullable),
-    {
-      filters: {},
-      button(quest, filters) {
-        return [quest.name, null, () => questMenu(player, quest, self)]
-      },
-
-      back,
-    },
-  ).show(player)
+  new ArrayForm('Завершенные задания', quests.completed.map(e => Quest.quests.get(e)).filter(noNullable))
+    .description('Список завершенных заданий')
+    .button(quest => [quest.name, () => questMenu(player, quest, () => completeQuestsMenu(player, back))])
+    .back(back)
+    .show(player)
 }
-
-/**
- * @param {Player} player
- * @param {Quest} quest
- */
 
 function questMenu(player: Player, quest: Quest, back: VoidFunction) {
   const current = quest.getPlayerStep(player)

@@ -31,8 +31,8 @@ const getJoinSettings = Settings.player(...Join.settingsName, {
 })
 
 export function mailMenu(player: Player, back?: VoidFunction) {
-  new ArrayForm(`Почта${Mail.unreadBadge(player.id)}`, 'Входящие', Mail.getLetters(player.id), {
-    filters: {
+  new ArrayForm(`Почта${Mail.unreadBadge(player.id)}`, Mail.getLetters(player.id))
+    .filters({
       unread: {
         name: 'Непрочитанные',
         description: 'Показывать только непрочитанные сообщения',
@@ -50,20 +50,18 @@ export function mailMenu(player: Player, back?: VoidFunction) {
           ['name', 'Имени'],
         ],
       },
-    },
-    button({ letter, index }) {
+    })
+    .button(({ letter, index }) => {
       const name = `${letter.read ? '§7' : '§f'}${letter.title}${letter.read ? '\n§8' : '§c*\n§7'}${letter.content}`
       return [
         name,
-        null,
         () => {
           letterDetailsMenu({ letter, index }, player)
           if (getSettings(player).mailReadOnOpen) Mail.readMessage(player.id, index)
         },
       ]
-    },
-
-    sort(keys, filters) {
+    })
+    .sort((keys, filters) => {
       if (filters.unread) keys = keys.filter(letter => !letter.letter.read)
 
       if (filters.unclaimed) keys = keys.filter(letter => !letter.letter.rewardsClaimed)
@@ -73,9 +71,9 @@ export function mailMenu(player: Player, back?: VoidFunction) {
         : keys.reverse()
 
       return keys
-    },
-    back,
-  }).show(player)
+    })
+    .back(back)
+    .show(player)
 }
 
 function letterDetailsMenu(

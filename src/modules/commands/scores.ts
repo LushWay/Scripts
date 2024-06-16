@@ -2,6 +2,7 @@ import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@min
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'
+import { selectPlayer } from 'lib/form/select-player'
 
 new Command('scores')
   .setDescription('Управляет счетом игроков (монеты, листья)')
@@ -41,109 +42,53 @@ function scoreManagerMenu(player: Player) {
   form.show(player)
 }
 
-/**
- * @param {Player} player
- * @param {ScoreboardObjective} scoreboard
- */
+function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
+  const scoreboard = new ScoreboardDB(objective.id)
 
-function scoreboardMenu(player: Player, scoreboard: ScoreboardObjective) {
-  const manager = new ScoreboardDB(scoreboard.id)
-
-  new ArrayForm(scoreboard.displayName + '§r§f $page/$max', '', scoreboard.getParticipants(), {
-    filters: {
+  new ArrayForm(objective.displayName + '§r§f $page/$max', objective.getParticipants())
+    .filters({
       online: {
         name: 'Онлайн',
         description: 'Показывать только игроков онлайн',
         value: false,
       },
-    },
-
-    sort(array, filters) {
+    })
+    .sort((array, filters) => {
       if (!filters.online) return array
 
       const online = world.getAllPlayers().map(e => e.id)
 
       return array.filter(e => online.includes(e.displayName))
-    },
-    button(p) {
-      if (p.type === ScoreboardIdentityType.FakePlayer) {
-        const name = Player.name(p.displayName)
-        if (!name) return false
-        return [
-          `${name}§r §6${Leaderboard.parseCustomScore(scoreboard.id, manager.get(p.displayName))}`,
-          null,
-          () => editPlayerScore(player, scoreboard, p.displayName, name),
-        ]
-      } else return false
-    },
-    back: () => scoreManagerMenu(player),
+    })
+    .button(p => {
+      if (p.type !== ScoreboardIdentityType.FakePlayer) return false
 
-    addCustomButtonBeforeArray(form) {
-      form.addButton('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, scoreboard))
+      const name = Player.name(p.displayName)
+      if (!name) return false
+
+      return [
+        `${name}§r §6${Leaderboard.parseCustomScore(objective.id, scoreboard.get(p.displayName))}`,
+        () => editPlayerScore(player, objective, p.displayName, name),
+      ]
+    })
+    .addCustomButtonBeforeArray(form => {
+      form.addButton('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, objective))
       form.addButtonPrompt(
         '§cУдалить таблицу',
         '§cУдалить',
-        () => world.scoreboard.removeObjective(scoreboard.id),
+        () => world.scoreboard.removeObjective(objective.id),
         undefined,
         'textures/ui/trash_light',
       )
-    },
-  }).show(player)
+    })
+    .back(() => scoreManagerMenu(player))
 }
 
-/**
- * @param {Player} player
- * @param {ScoreboardObjective} scoreboard
- * @returns
- */
+function addTargetToScoreboardMenu(player: Player, objective: ScoreboardObjective) {
+  const self = () => addTargetToScoreboardMenu(player, objective)
 
-function addTargetToScoreboardMenu(player: Player, scoreboard: ScoreboardObjective) {
-  const onlinePlayers = world.getAllPlayers()
-  const players = []
-  for (const [id, data] of Object.entries(Player.database)) {
-    const player = onlinePlayers.find(e => e.id === id)
-
-    const name = player?.name ?? data.name ?? id
-    players.push({ online: !!player, name, id })
-  }
-
-  new ArrayForm('§3Выберите игрока', '', players, {
-    filters: {
-      sort: {
-        name: 'Сортировать по',
-        value: [
-          ['online', 'Онлайну'],
-          ['date', 'Дате входа'],
-        ],
-      },
-    },
-
-    sort(players, filters) {
-      if (filters.sort === 'online') {
-        return players.sort((a, b) => (!a.online && b.online ? -1 : a.online ? 0 : 1))
-      }
-
-      return players
-    },
-    button({ id, name }) {
-      return [
-        name,
-        null,
-        () => {
-          editPlayerScore(player, scoreboard, id, name, () => addTargetToScoreboardMenu(player, scoreboard))
-        },
-      ]
-    },
-    back: () => scoreboardMenu(player, scoreboard),
-  }).show(player)
+  selectPlayer(player, self).then(e => editPlayerScore(player, objective, e.id, e.name, self))
 }
-
-/**
- * @param {Player} player
- * @param {ScoreboardObjective} scoreboard
- * @param {string} targetId
- * @param {string} targetName
- */
 
 function editPlayerScore(
   player: Player,

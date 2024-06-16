@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { is } from 'lib/roles'
+import { t } from 'lib/text'
 import { Cutscene } from './cutscene'
 import { editCatcutscene } from './edit'
 
@@ -37,22 +38,16 @@ cutscene
   })
 
 function selectCutsceneMenu(player: Player) {
-  new ArrayForm('Катсцены', 'Список доступных для редактирования катсцен:', [...Cutscene.all.values()], {
-    filters: {},
-    button(cutscene) {
-      return [cutscene.id, null, () => manageCutsceneMenu(player, cutscene)]
-    },
-  }).show(player)
+  new ArrayForm('Катсцены', [...Cutscene.all.values()])
+    .description('Список доступных для редактирования катсцен:')
+    .button(cutscene => [cutscene.id, () => manageCutsceneMenu(player, cutscene)])
+    .show(player)
 }
 
 function manageCutsceneMenu(player: Player, cutscene: Cutscene) {
-  new ActionForm(
-    cutscene.id,
-    `Секций: ${cutscene.sections.length}\nТочек: ${cutscene.sections.reduce(
-      (count, section) => (section ? count + section.points.length : count),
-      0,
-    )}`,
-  )
+  const dots = cutscene.sections.reduce((count, section) => (section ? count + section.points.length : count), 0)
+
+  new ActionForm(cutscene.id, t`Секций: ${cutscene.sections.length}\nТочек: ${dots}`)
     .addButton(ActionForm.backText, () => selectCutsceneMenu(player))
     .addButton('Редактировать', () => editCatcutscene(player, cutscene))
     .addButton('Воспроизвести', () => cutscene.play(player))

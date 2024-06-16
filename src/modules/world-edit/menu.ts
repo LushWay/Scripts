@@ -83,17 +83,12 @@ function WEChestFromBlocksSet(player: Player) {
     })
 }
 
-/** @param {Player} player */
-
 function WEblocksSetsMenu(player: Player) {
   const blockSets = getAllBlocksSets(player.id)
 
-  new ArrayForm('Наборы блоков §l$page/$max', '', Object.keys(blockSets), {
-    filters: {},
-
-    back: () => WEmenu(player),
-
-    addCustomButtonBeforeArray(sets) {
+  new ArrayForm('Наборы блоков §l$page/$max', Object.keys(blockSets))
+    .back(() => WEmenu(player))
+    .addCustomButtonBeforeArray(sets => {
       sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
         WEmanageBlocksSetMenu({
           blockSets,
@@ -105,22 +100,21 @@ function WEblocksSetsMenu(player: Player) {
       sets.addButton('§3Наборы других игроков...', () =>
         WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player)),
       )
-    },
-    button(setName, filters) {
-      const shared = Object.values(DEFAULT_BLOCK_SETS).find(e => blockSets[setName] === e)
+    })
+    .button(setName => {
+      const isOwnSet = !Object.values(DEFAULT_BLOCK_SETS).find(e => blockSets[setName] === e)
       return [
         setName,
-        null,
         () =>
           WEeditBlocksSetMenu({
             player,
             setName,
             sets: blockSets,
-            ownsSet: !shared,
+            ownsSet: isOwnSet,
           }),
       ]
-    },
-  }).show(player)
+    })
+    .show(player)
 }
 
 function WEmanageBlocksSetMenu({
@@ -161,9 +155,9 @@ function WEmanageBlocksSetMenu({
     })
 }
 
-function WEotherPlayersBlockSetsMenu(player: Player, back: () => void) {
-  new ArrayForm('§3Наборы блоков других игроков §f$page/$max', '', getOtherPlayerBlocksSets(player.id), {
-    filters: {
+function WEotherPlayersBlockSetsMenu(player: Player, back: VoidFunction) {
+  new ArrayForm('§3Наборы блоков других игроков §f$page/$max', getOtherPlayerBlocksSets(player.id))
+    .filters({
       online: {
         name: 'Онлайн',
         description: 'Показывать только игроков онлайн',
@@ -182,44 +176,31 @@ function WEotherPlayersBlockSetsMenu(player: Player, back: () => void) {
           ['name', 'Имени'],
         ],
       },
-    },
-
-    back,
-
-    button([otherPlayerId, blocksSets], filters) {
+    })
+    .back(back)
+    .button(([otherPlayerId, blocksSets], filters) => {
       const name = Player.name(otherPlayerId) ?? otherPlayerId
 
       return [
         filters.blockCount ? util.badge(name, Object.keys(blocksSets).length, { color: '§7' }) : name,
-        null,
         () => {
           WEplayerBlockSetMenu(player, otherPlayerId, blocksSets, () => WEotherPlayersBlockSetsMenu(player, back))
         },
       ]
-    },
-
-    sort(array, filters) {
+    })
+    .sort((array, filters) => {
       if (filters.online) {
         const players = world.getAllPlayers().map(e => e.id)
-
         array = array.filter(p => players.includes(p[0]))
       }
 
       if (filters.sort === 'date') return array.reverse()
-
       if (filters.sort === 'name') return array.sort((a, b) => a[0].localeCompare(b[0]))
 
       return array.sort((a, b) => Object.keys(b[1]).length - Object.keys(a[1]).length)
-    },
-  }).show(player)
+    })
+    .show(player)
 }
-
-/**
- * @param {Player} player
- * @param {string} otherPlayerId
- * @param {import('modules/world-edit/utils/blocksSet').BlocksSets} blockSets
- * @param {() => void} onBack
- */
 
 function WEplayerBlockSetMenu(
   player: Player,
@@ -245,17 +226,6 @@ function WEplayerBlockSetMenu(
   }
   pform.show(player)
 }
-
-/**
- * @param {object} o
- * @param {Player} o.player
- * @param {string} o.setName
- * @param {import('modules/world-edit/utils/blocksSet').BlocksSets} [o.sets]
- * @param {boolean} [o.ownsSet]
- * @param {boolean} [o.add]
- * @param {boolean} [o.editStates]
- * @param {() => void} [o.back]
- */
 
 function WEeditBlocksSetMenu(o: {
   player: Player

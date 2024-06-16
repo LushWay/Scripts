@@ -1,6 +1,6 @@
 import { Player, ScoreName, world } from '@minecraft/server'
 import { ActionForm, Mail, ModalForm } from 'lib'
-import { createSelectPlayerMenu } from 'lib/form/selectPlayersMenu'
+import { createSelectPlayerMenu } from 'lib/form/select-player'
 import { Rewards } from 'lib/shop/rewards'
 
 interface SendState {
@@ -54,7 +54,7 @@ export function sendMenu(player: Player, back?: VoidFunction, state?: SendState)
   if (!back) back = () => null
   if (!state)
     state = {
-      recipients: createSelectPlayerMenu.defaultAllTargets(),
+      recipients: createSelectPlayerMenu.defaultAll(),
       rewards: new Rewards(),
       title: '',
       contents: '',
