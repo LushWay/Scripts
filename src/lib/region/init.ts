@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { BaseRegion } from '../../modules/places/base/BaseRegion'
+import { BaseRegion } from '../../modules/places/base/region'
 import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
 import { RegionDatabase } from './database'
 import { CubeRegion } from './kinds/CubeRegion'

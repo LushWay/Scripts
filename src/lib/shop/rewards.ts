@@ -106,7 +106,7 @@ export class Rewards {
       else if (reward.score === 'money') text = `${reward.count}${emoji.money}`
       else text = `${reward.score} x${reward.count}`
     } else if ((reward.type as string) === 'item')
-      text = itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id }, undefined)
+      text = itemDescription({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
     else text = 'Неизвестная награда...'
 
     return typeof text === 'string' ? { text } : text
@@ -123,12 +123,16 @@ export class Rewards {
  *
  * @param {ItemStack} item
  */
-export function itemDescription(item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>, c = '§7'): RawMessage {
+export function itemDescription(
+  item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'>,
+  c = '§7',
+  amount = true,
+): RawMessage {
   return {
     rawtext: [
       { text: c },
-      item.nameTag ? { text: item.nameTag } : { translate: itemLocaleName(item) },
-      item.amount ? { text: ` §r${c}x${item.amount}` } : false,
+      item.nameTag ? { text: item.nameTag.replaceAll(/§./g, '') } : { translate: itemLocaleName(item) },
+      amount && item.amount ? { text: ` §r§f${c}x${item.amount}` } : false,
     ].filter(noBoolean),
   }
 }

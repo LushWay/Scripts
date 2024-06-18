@@ -99,12 +99,8 @@ export class Temporary {
 
         return (...args: unknown[]) => {
           const handle = value.call(target, ...args) as unknown
-          if (typeof handle === 'number') {
-            this.cleaners.push(() => {
-              console.log('Clearing run', handle)
-              system.clearRun(handle)
-            })
-          }
+          if (typeof handle === 'number') this.cleaners.push(() => system.clearRun(handle))
+
           return handle
         }
       },

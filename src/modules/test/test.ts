@@ -27,9 +27,8 @@ import { CommandContext } from 'lib/command/context'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
-import { Rewards } from 'lib/shop/rewards'
 import { Compass } from 'lib/rpg/menu'
-import { BASE_ITEM_STACK } from 'modules/places/base/base'
+import { Rewards } from 'lib/shop/rewards'
 import './enchant'
 // import './simulatedPlayer'
 
@@ -128,9 +127,6 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     ctx.reply(ctx.player.selectedSlotIndex)
   },
 
-  base(ctx) {
-    ctx.player.container?.addItem(BASE_ITEM_STACK)
-  },
   logs() {
     console.log('This is log §6color§r test §lbold')
     console.info('This is info test')

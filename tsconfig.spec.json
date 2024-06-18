@@ -4,7 +4,13 @@
     "composite": true,
     "noEmit": false
   },
-  "include": ["./src", "./src/test/framework.ts", "./src/test/loader.ts", "./src/**/*.spec.ts"],
+  "include": [
+    "./src",
+    "./src/test/framework.ts",
+    "./src/test/loader.ts",
+    "./src/**/*.spec.ts",
+    "src/modules/places/tech-city/engineer.ts"
+  ],
   "exclude": ["./src/**/*.test.ts", "node_modules"],
   "references": []
 }

@@ -1,14 +1,14 @@
 import { GameMode, Player } from '@minecraft/server'
-import { InventoryStore, Portal, ValidSafeLocation, Vector, Zone, location } from 'lib'
+import { InventoryStore, Portal, ValidLocation, Vector, Zone, location } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
-import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
+import { AreaWithInventory } from './lib/area-with-inventory'
 
 // TODO Newbie savemode
 
-class AnarchyBuilder extends DefaultPlaceWithInventory {
+class AnarchyBuilder extends AreaWithInventory {
   portal: Portal | undefined
 
   zone: Zone | undefined
@@ -20,9 +20,9 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location('common', 'центр анархии')
+  centerLocation = location('common', 'anarchy center', 'центр анархии')
 
-  portalLocation = location('common', 'портал на анархию')
+  portalLocation = location('common', 'anarchy portal', 'портал на анархию')
 
   inventoryStore = new InventoryStore('anarchy')
 
@@ -44,7 +44,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     this.portalLocation.onLoad.subscribe(portalLocation => this.createPortal(portalLocation))
   }
 
-  private createPortal(portalLocation: ValidSafeLocation<Vector3>) {
+  private createPortal(portalLocation: ValidLocation<Vector3>) {
     this.portal = new Portal('anarchy', ...Vector.around(portalLocation, 0, 1, 1), player => {
       if (isNotPlaying(player)) return tpMenuOnce(player)
       if (player.database.inv === this.inventoryName) {
@@ -98,7 +98,7 @@ class AnarchyBuilder extends DefaultPlaceWithInventory {
     player.database.inv = this.inventoryName
   }
 
-  saveInventory: DefaultPlaceWithInventory['saveInventory'] = player => {
+  saveInventory: AreaWithInventory['saveInventory'] = player => {
     this.inventoryStore.saveFrom(player, {
       rewrite: true,
       keepInventory: false,

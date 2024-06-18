@@ -7,18 +7,22 @@ import { table } from 'lib/database/abstract'
 export class ChatBuilder {
   db = table<string>('chatCooldown')
 
-  settings = Settings.world('chat', {
+  settings = Settings.world(...Settings.worldCommon, {
     cooldown: {
-      name: 'Задержка',
+      name: 'Задержка чата',
       description: '0 что бы отключить',
       value: 0,
     },
     range: {
-      name: 'Радиус',
+      name: 'Радиус чата',
       description: 'Радиус для затемнения сообщений дальних игроков',
       value: 30,
     },
-    ranks: { description: 'Ранги в чате', value: true, name: 'Ранги' },
+    ranks: {
+      name: 'Ранги в чате',
+      description: 'Ранги в чате',
+      value: true,
+    },
   })
 
   playerSettings = Settings.player('Чат\n§7Звуки и внешний вид чата', 'chat', {

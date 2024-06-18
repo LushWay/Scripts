@@ -14,14 +14,14 @@ beforeEach(() => {
 
 describe('location', () => {
   it('should create a location', () => {
-    const loc = location('group1', 'name1')
+    const loc = location('group1', 'name1', 'display name')
     expect(loc.valid).toBe(false)
     expect(loc.onLoad).toBeDefined()
     expect(loc.teleport).toBeDefined()
   })
 
   it('should create a location with default values', () => {
-    const loc = location('group1', 'name1', { x: 10, y: 40, z: 60 })
+    const loc = location('group1', 'name1', 'display name', { x: 10, y: 40, z: 60 })
     expect(loc.valid).toBe(true)
     expect(loc.onLoad).toBeDefined()
     expect(loc.teleport).toBeDefined()
@@ -29,7 +29,7 @@ describe('location', () => {
 
   it('should load and update location from Settings', () => {
     Settings.worldDatabase['group1'] = { name1: '10 20 30' }
-    const loc = location('group1', 'name1')
+    const loc = location('group1', 'name1', 'display name')
     expect(loc.valid).toBe(true)
     if (!loc.valid) return
 
@@ -46,7 +46,7 @@ describe('location', () => {
 
   it('should emit event on location change', () => {
     Settings.worldDatabase['group1'] = { name1: '0 0 1' }
-    const loc = location('group1', 'name1')
+    const loc = location('group1', 'name1', 'display name')
     const callback = vi.fn()
 
     loc.onLoad.subscribe(callback)
@@ -62,7 +62,7 @@ describe('location', () => {
   it('should not load invalid location', () => {
     const consoleErrorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     Settings.worldDatabase['group1'] = { name1: 'in va lid' }
-    location('group1', 'name1')
+    location('group1', 'name1', 'display name')
 
     expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
@@ -72,7 +72,7 @@ describe('location', () => {
   })
 
   it('should teleport', () => {
-    const loc = location('group', 'name', { x: 0, y: 1, z: 1 })
+    const loc = location('group', 'name', 'display name', { x: 0, y: 1, z: 1 })
     // @ts-expect-error
     const player = new Player() as Player
     loc.teleport(player)
@@ -89,7 +89,7 @@ describe('location', () => {
 
 describe('locationWithRotation', () => {
   it('should create a location with rotation with default values', () => {
-    const loc = locationWithRotation('group2', 'name2')
+    const loc = locationWithRotation('group2', 'name2', 'display name')
 
     expect(loc.valid).toBe(false)
     expect(loc.onLoad).toBeDefined()
@@ -98,7 +98,7 @@ describe('locationWithRotation', () => {
 
   it('should load and update location with rotation from Settings', () => {
     Settings.worldDatabase['group2'] = { name2: '10 20 30 45 90' }
-    const loc = locationWithRotation('group2', 'name2')
+    const loc = locationWithRotation('group2', 'name2', 'display name')
 
     expect(loc.valid).toBe(true)
     if (!loc.valid) return
@@ -112,7 +112,7 @@ describe('locationWithRotation', () => {
 
   it('should emit event on location with rotation change', () => {
     Settings.worldDatabase['group2'] = { name2: '10 20 30 45 90' }
-    const loc = locationWithRotation('group2', 'name2')
+    const loc = locationWithRotation('group2', 'name2', 'display name')
     const callback = vi.fn()
 
     loc.onLoad.subscribe(callback)
@@ -125,7 +125,7 @@ describe('locationWithRotation', () => {
   })
 
   it('should teleport', () => {
-    const loc = locationWithRotation('group', 'name', { x: 0, y: 1, z: 1, xRot: 90, yRot: 0 })
+    const loc = locationWithRotation('group', 'name', 'display name', { x: 0, y: 1, z: 1, xRot: 90, yRot: 0 })
     // @ts-expect-error
     const player = new Player() as Player
     loc.teleport(player)
@@ -147,7 +147,7 @@ describe('locationWithRotation', () => {
 
 describe('locationWithRadius', () => {
   it('should create a location with radius with default values', () => {
-    const loc = locationWithRadius('group3', 'name3')
+    const loc = locationWithRadius('group3', 'name3', 'display name')
     expect(loc.valid).toBe(false)
     expect(loc.onLoad).toBeDefined()
     expect(loc.teleport).toBeDefined()
@@ -155,7 +155,7 @@ describe('locationWithRadius', () => {
 
   it('should load and update location with radius from Settings', () => {
     Settings.worldDatabase['group3'] = { name3: '10 20 30 5' }
-    const loc = locationWithRadius('group3', 'name3')
+    const loc = locationWithRadius('group3', 'name3', 'display name')
 
     expect(loc.valid).toBe(true)
     if (!loc.valid) return
@@ -168,7 +168,7 @@ describe('locationWithRadius', () => {
 
   it('should emit event on location with radius change', () => {
     Settings.worldDatabase['group3'] = { name3: '10 20 30 5' }
-    const loc = locationWithRadius('group3', 'name3')
+    const loc = locationWithRadius('group3', 'name3', 'display name')
     const callback = vi.fn()
     loc.onLoad.subscribe(callback)
 
@@ -182,7 +182,7 @@ describe('locationWithRadius', () => {
 describe('migrate', () => {
   it('should migrate location', () => {
     Settings.worldDatabase['locations']['oldname'] = '1 0 1'
-    migrateLocationName('oldname', 'group', 'name')
+    migrateLocationName('locations', 'oldname', 'group', 'name')
     expect(Settings.worldDatabase['group']['name']).toBe('1 0 1')
   })
 
@@ -190,9 +190,9 @@ describe('migrate', () => {
     Settings.worldDatabase['group']['name2'] = '1 0 1'
     const consoleErrorSpy = vi.spyOn(console, 'warn')
 
-    migrateLocationName('does not exists', 'group', 'name2')
+    migrateLocationName('unknown group', 'does not exists', 'group', 'name2')
 
-    expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`undefined`)
+    expect(consoleErrorSpy.mock.calls[0]).toBeUndefined()
     expect(Settings.worldDatabase['group']['name2']).toBe('1 0 1')
   })
 
@@ -200,11 +200,11 @@ describe('migrate', () => {
     Settings.worldDatabase['group']['name2'] = '1 0 1'
     const consoleErrorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-    migrateLocationName('was never defined', 'group', 'name3')
+    migrateLocationName('unknown group', 'was never defined', 'group', 'name3')
 
     expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7[LocationNameMigration] No rename for '§fwas never defined§7'",
+        "§cNo location found at §funknown group§c:§fwas never defined§c",
       ]
     `)
     expect(Settings.worldDatabase['group']['name3']).toBeUndefined()

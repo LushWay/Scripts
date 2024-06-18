@@ -4,7 +4,7 @@ import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema, ItemLoreStorage } from '../database/item-stack'
-import { SafeLocation, ValidSafeLocation, location } from '../location'
+import { SafeLocation, ValidLocation, location } from '../location'
 import { t } from '../text'
 import ChestLootAnimation from './animation'
 
@@ -19,31 +19,38 @@ export class ChestLoot {
 
   private location: SafeLocation<Vector3>
 
+  private floatingText: FloatingText
+
+  private readonly id: string
+
   constructor(
-    public id: string,
+    public locationId: string,
     public locationGroup = 'chestloot',
     public displayName: Text,
     private lootTable: LootTable,
     public dimensionId: ShortcutDimensions = 'overworld',
   ) {
-    this.location = location(locationGroup, id)
+    this.id = locationGroup + ' ' + locationId
+    this.location = location(locationGroup, locationId, displayName)
+    this.floatingText = new FloatingText(this.id, this.dimensionId)
     this.location.onLoad.subscribe(l => this.onValidLocation(l))
 
-    ChestLoot.chests.set(id, this)
+    ChestLoot.chests.set(this.id, this)
   }
 
   createKeyItemStack() {
     return schema.create({ chest: this.id }).item
   }
 
-  private floatingText = new FloatingText(this.id, this.dimensionId)
-
-  private onValidLocation(location: ValidSafeLocation<Vector3>) {
-    this.floatingText.update(location, t`Сундук ${this.displayName}`)
+  private onValidLocation(location: ValidLocation<Vector3>) {
+    this.floatingText.update(location, t`${this.displayName} cундук`)
     if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionId)
 
     try {
-      world[this.dimensionId].setBlockType(location, MinecraftBlockTypes.EnderChest)
+      const block = world[this.dimensionId].getBlock(location)
+      if (!block || block.typeId === MinecraftBlockTypes.EnderChest) return
+
+      block.setType(MinecraftBlockTypes.EnderChest)
     } catch (e) {
       if (e instanceof LocationInUnloadedChunkError) return
       throw e
@@ -80,7 +87,7 @@ export class ChestLoot {
     this.animation.start(player, this.lootTable.generateOne(), location)
   }
 
-  private animation = new ChestLootAnimation(this.id, this.displayName, this.dimensionId)
+  private animation = new ChestLootAnimation(this.locationId, this.displayName, this.dimensionId)
 }
 
 const schema = new ItemLoreSchema('chestloot')

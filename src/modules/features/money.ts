@@ -5,7 +5,7 @@ import { emoji } from 'lib/assets/emoji'
 world.afterEvents.itemUse.subscribe(event => {
   if (event.itemStack.typeId === CustomItems.Money) {
     const { amount } = event.itemStack
-    event.source.success(`§6+${amount}${emoji.money}`)
+    event.source.info(`§6+${amount}${emoji.money}`)
     event.source.scores.money += amount
     event.source.mainhand().setItem(undefined)
   }

@@ -6,7 +6,7 @@ import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 export class StoneQuarryInvestigating {
   static place = StoneQuarry
 
-  static quest = new Quest('StoneQuarryInvestigating', 'Каменоломня', 'Исследуйте новый город!', (q, p) => {
+  static quest = new Quest('StoneQuarryInvestigating', StoneQuarry.name, 'Исследуйте новый город!', (q, p) => {
     q.dynamic('поговорите с горожанами')
       .description('Лучше всего узнавать о городе у местных, поговорите с ними!')
       .activate(ctx => {

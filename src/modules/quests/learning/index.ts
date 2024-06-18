@@ -1,17 +1,18 @@
 import { ItemStack, system } from '@minecraft/server'
-import { ActionForm, Vector, location, locationWithRadius } from 'lib'
+import { ActionForm, location, locationWithRadius, Vector } from 'lib'
 
-import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { SafeAreaRegion, actionGuard } from 'lib'
+import { MinecraftBlockTypes as b, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { actionGuard, SafeAreaRegion } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
-import { Menu, createPublicGiveItemCommand } from 'lib/rpg/menu'
+import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 import { Npc } from 'lib/rpg/npc'
 
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy'
+import { OrePlace } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { VillageOfMiners } from 'modules/places/village-of-miners'
 import { randomTeleport } from 'modules/survival/random-teleport'
@@ -31,27 +32,29 @@ class Learning {
 
     q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
 
-    q.counter((current, end) => `§6Наруби §f${current}/${end} §6блоков дерева`, 5).activate((ctx, firstTime) => {
-      if (firstTime) {
-        // Delay code by one tick to prevent giving item
-        // in spawn inventory that will be replaced with
-        // anarchy
-        system.delay(() => {
-          this.startAxeGiveCommand.ensure(player)
-          player.container?.setItem(8, Menu.item)
+    q.counter((current, end) => `§6Добыто дерева: §f${current}/${end}`, 5)
+      .description('Нарубите дерева')
+      .activate((ctx, firstTime) => {
+        if (firstTime) {
+          // Delay code by one tick to prevent giving item
+          // in spawn inventory that will be replaced with
+          // anarchy
+          system.delay(() => {
+            this.startAxeGiveCommand.ensure(player)
+            player.container?.setItem(8, Menu.item)
+          })
+        }
+
+        ctx.world.afterEvents.playerBreakBlock.subscribe(({ player: ep, brokenBlockPermutation }) => {
+          if (player.id !== ep.id) return
+          if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
+
+          console.debug(`${player.name} have brocken ${brokenBlockPermutation.type.id}`)
+
+          player.playSound(Sounds.Action)
+          ctx.diff(1)
         })
-      }
-
-      ctx.world.afterEvents.playerBreakBlock.subscribe(({ player: ep, brokenBlockPermutation }) => {
-        if (player.id !== ep.id) return
-        if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
-
-        console.debug(`${player.name} have brocken ${brokenBlockPermutation.type.id}`)
-
-        player.playSound(Sounds.Action)
-        ctx.diff(1)
       })
-    })
 
     q.dynamic('§6Выйди под открытое небо')
       .description('Деревья могут помешать. Выйди туда, где над тобой будет только небо')
@@ -124,16 +127,16 @@ class Learning {
     })
 
     q.item('§6Сделайте деревянную кирку')
-      .description('Чтобы пойти в шахту, нужна кирка. Сделайте ее!')
+      .description('Чтобы пойти в шахту, нужна кирка. Сделайте ее на верстаке в ближайшей деревне!')
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
       .place(this.craftingTableLocation)
 
-    q.counter((i, end) => `§6Накопайте §f${i}/${end}§6 камня`, 10)
+    q.counter((i, end) => `§6Добыто камня: §f${i}/${end}`, 10)
       .description('Отправляйтесь в шахту, найдите и накопайте камня.')
       .activate(ctx => {
         ctx.world.afterEvents.playerBreakBlock.subscribe(event => {
           if (event.player.id !== player.id) return
-          if (event.brokenBlockPermutation.type.id !== MinecraftBlockTypes.Stone) return
+          if (event.brokenBlockPermutation.type.id !== b.Stone) return
 
           player.playSound(Sounds.Action)
           ctx.diff(1)
@@ -141,15 +144,30 @@ class Learning {
       })
 
     q.item('§6Сделайте каменную кирку')
-      .description('Сделайте каменную кирку. Время улучшить инструмент!')
+      .description('Вернитесь к верстаку и улучшите свой инструмент.')
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
       .place(this.craftingTableLocation)
 
-    q.counter((i, end) => `§6Накопайте §f${i}/${end}§6 железа`, 5).activate(ctx => {
+    q.counter((i, end) => `§6Добыто железной руды: §f${i}/${end}`, 5).activate(ctx => {
+      console.log('AA')
+      // Force iron ore generation
+      ctx.subscribe(OrePlace, ({ player, isDeepslate }) => {
+        if (player.id !== player.id) return
+        ctx.db ??= { count: ctx.value }
+        ;(ctx.db as { iron?: number }).iron ??= 0
+
+        if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
+          if (ctx.db.iron >= ctx.end) return
+          ctx.db.iron++
+          return isDeepslate ? b.DeepslateIronOre : b.IronOre
+        }
+      })
+
+      // Check if it breaks
       ctx.world.afterEvents.playerBreakBlock.subscribe(({ brokenBlockPermutation, player }) => {
         if (player.id !== player.id) return
         if (
-          brokenBlockPermutation.type.id !== MinecraftBlockTypes.IronOre &&
+          brokenBlockPermutation.type.id !== b.IronOre &&
           brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
         )
           return
@@ -166,9 +184,9 @@ class Learning {
     })
   })
 
-  randomTeleportLocation = locationWithRadius(this.quest.group, 'Мирная зона и ртп')
+  randomTeleportLocation = locationWithRadius(this.quest.group, 'safearea', 'Мирная зона и ртп')
 
-  craftingTableLocation = location(this.quest.group, 'Верстак')
+  craftingTableLocation = location(this.quest.group, 'crafting table', 'Верстак')
 
   startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 

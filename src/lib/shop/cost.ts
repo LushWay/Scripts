@@ -1,7 +1,6 @@
 import { ItemStack, Player, RawText } from '@minecraft/server'
 import { Sounds } from 'lib/assets/config'
 import { emoji } from 'lib/assets/emoji'
-import { itemLocaleName } from 'lib/game-utils'
 import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { noBoolean } from 'lib/util'
@@ -223,17 +222,18 @@ export class ItemCost extends Cost {
     }
   }
 
-  toString(canBuy?: boolean): MaybeRawText {
+  toString(canBuy?: boolean, _?: Player | undefined, amount = false): MaybeRawText {
     return itemDescription(
       this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',
+      amount,
     )
   }
 
   failed(player: Player): MaybeRawText {
     const items = this.getItems(player)
 
-    return t.raw`${t.error`${this.amount - items.amount}/${this.amount} `}${{ translate: itemLocaleName(this.item instanceof ItemStack ? this.item : { typeId: this.item }) }}`
+    return t.raw`${t.error`${this.amount - items.amount}/${this.amount} `}${this.toString(false, void 0, false)}`
   }
 }
 

@@ -2,7 +2,7 @@ import '../places/anarchy'
 import '../places/mineshaft/mineshaft'
 import '../places/spawn'
 import '../places/stone-quarry/stone-quarry'
-import '../places/tech-city'
+import '../places/tech-city/tech-city'
 import '../places/village-of-explorers'
 import '../places/village-of-miners'
 

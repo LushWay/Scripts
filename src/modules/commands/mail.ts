@@ -22,7 +22,7 @@ const getSettings = Settings.player(...Menu.settings, {
   },
 })
 
-const getJoinSettings = Settings.player(...Join.settingsName, {
+const getJoinSettings = Settings.player(...Join.settings.extend, {
   unreadMails: {
     name: 'Почта',
     description: 'Показывать ли при входе сообщение с кол-вом непрочитанных',

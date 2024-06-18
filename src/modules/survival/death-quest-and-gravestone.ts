@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, util } from 'lib'
 import { Quest } from 'lib/quest/quest'
-import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
+import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
 import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
@@ -50,7 +50,7 @@ world.afterEvents.entityDie.subscribe(event => {
 
 // TODO Clear minecart items from inventory/world
 
-const getSettings = Settings.player(...Quest.playerSettingsName, {
+const getSettings = Settings.player(...Quest.playerSettings.extend, {
   restoreInvQuest: {
     name: 'Задание "Вернуть вещи"',
     description: 'Включать ли задание по восстановлению инвентаря после смерти',
@@ -69,14 +69,14 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   const deadAt = player.database.survival.deadAt
   if (!deadAt) return
 
-  const places = DefaultPlaceWithSafeArea.places
+  const places = PlaceWithSafeArea.places
     .map(place => ({
       distance: Vector.distance(place.safeArea.center, deadAt) - place.safeArea.radius,
       place,
     }))
     .sort((a, b) => a.distance - b.distance)
 
-  const nearestPlace = places[0]?.place as DefaultPlaceWithSafeArea | undefined
+  const nearestPlace = places[0]?.place as PlaceWithSafeArea | undefined
 
   if (nearestPlace?.portalTeleportsTo.valid) {
     player.teleport(nearestPlace.portalTeleportsTo)

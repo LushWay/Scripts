@@ -1,8 +1,8 @@
-import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
+import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 
-class VillageOfMinersBuilder extends DefaultPlaceWithSafeArea {
+class VillageOfMinersBuilder extends PlaceWithSafeArea {
   constructor() {
-    super('Деревня шахтеров')
+    super('VillageOfMiners', 'Деревня шахтеров')
   }
 }
 

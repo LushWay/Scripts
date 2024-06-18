@@ -1,13 +1,13 @@
 import { Player } from '@minecraft/server'
 import { isNotPlaying } from 'lib/game-utils'
 
-export abstract class DefaultPlaceWithInventory {
-  static places: DefaultPlaceWithInventory[] = []
+export abstract class AreaWithInventory {
+  static places: AreaWithInventory[] = []
 
   inventoryName: InventoryTypeName
 
   constructor() {
-    DefaultPlaceWithInventory.places.push(this)
+    AreaWithInventory.places.push(this)
   }
 
   /**
@@ -22,7 +22,7 @@ export abstract class DefaultPlaceWithInventory {
     const currentInventory = player.database.inv
     if (currentInventory === this.inventoryName) return
 
-    DefaultPlaceWithInventory.places.forEach(place => {
+    AreaWithInventory.places.forEach(place => {
       // Prevent from self saving
       if (place === this) return
 

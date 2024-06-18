@@ -3,11 +3,11 @@ import { ItemStack, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, util } from 'lib'
 import { actionGuard } from 'lib/region/index'
-import { TechCity } from 'modules/places/tech-city'
+import { TechCity } from 'modules/places/tech-city/tech-city'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { withState } from 'modules/world-edit/utils/blocks-set'
 
-const [quartzTypeId, states] = withState(MinecraftBlockTypes.QuartzBlock, {
+const [quartzTypeId] = withState(MinecraftBlockTypes.QuartzBlock, {
   chisel_type: 'smooth',
 })
 
@@ -37,7 +37,6 @@ system.runPlayerInterval(
 )
 
 actionGuard((player, region, ctx) => {
-  // TODO Maybe allow breaking quartz outside of the region
   if (
     ctx.type !== 'break' ||
     region !== TechCity.safeArea ||
@@ -54,11 +53,8 @@ actionGuard((player, region, ctx) => {
 
   scheduleBlockPlace({
     dimension: ctx.event.dimension.type,
-
     location: ctx.event.block.location,
-
     typeId: ctx.event.block.typeId,
-
     states: ctx.event.block.permutation.getAllStates(),
     restoreTime: util.ms.from('min', 2),
   })

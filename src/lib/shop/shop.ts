@@ -9,9 +9,11 @@ import { Cost } from 'lib/shop/cost'
 import { MaybeRawText, t, textTable } from 'lib/text'
 import { ShopForm } from './form'
 
-interface ShopOptions {
+export interface ShopOptions {
   group: string
+  id: string
   name: string
+  dimensionId: Dimensions
   body: (player: Player) => string
 }
 
@@ -30,9 +32,9 @@ export type ShopProductBuy = Omit<ShopProduct, 'name'> & {
 type ShopMenuGenerator = (menu: ShopForm, player: Player) => void
 
 export class Shop {
-  static block(options: ShopOptions & { dimensionId: Dimensions }) {
+  static block(options: ShopOptions) {
     const shop = new Shop(options.name)
-    location(options.group, options.name).onLoad.subscribe(location => {
+    location(options.group, options.id, options.name).onLoad.subscribe(location => {
       /** We dont actually want to store that on disk */
       const cooldownDatabase: JsonObject = {}
 
@@ -55,7 +57,7 @@ export class Shop {
     return shop
   }
 
-  static npc(options: ShopOptions & { dimensionId?: Dimensions; id: string }) {
+  static npc(options: ShopOptions) {
     const shop = new Shop(options.name)
     const entity = new Npc({
       ...options,

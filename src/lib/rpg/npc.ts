@@ -40,7 +40,7 @@ export class Npc {
   constructor(private options: NpcOptions) {
     this.id = options.id
     this.dimensionId = options.dimensionId ?? 'overworld'
-    this.location = location(options.group, options.name)
+    this.location = location(options.group, options.id, options.name)
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
       this.location = location

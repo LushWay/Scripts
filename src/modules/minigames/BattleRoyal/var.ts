@@ -9,7 +9,7 @@ export const BATTLE_ROYAL_EVENTS = {
 
 export const BR_QUENE: Record<string, boolean> = {}
 
-export const BR_CONFIG = Settings.world('BattleRoyal', {
+export const BR_CONFIG = Settings.world('BattleRoyal', 'BattleRoyal', {
   gamepos: { description: 'x y', value: '', name: 'Центр игры' },
   time: {
     description: 'Время игры в формате MM:SS (15:00)',

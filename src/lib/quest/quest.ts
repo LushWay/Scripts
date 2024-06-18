@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { Join, Settings } from 'lib'
+import { Join, SETTINGS_GROUP_NAME, Settings } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
 import { PlayerQuest } from './player'
@@ -17,9 +17,7 @@ export interface QuestDB {
 export class Quest {
   static error = class QuestError extends Error {}
 
-  static playerSettingsName: [displayName: string, id: string] = ['Задания\n§7Настройки игровых заданий', 'quest']
-
-  static playerSettings = Settings.player(...this.playerSettingsName, {
+  static playerSettings = Settings.player('Задания\n§7Настройки игровых заданий', 'quest', {
     messageForEachStep: {
       value: true,
       name: 'Сообщение в чат при каждом шаге',
@@ -68,39 +66,58 @@ export class Quest {
     ) => void,
   ) {
     Quest.quests.set(this.id, this)
-    system.delay(() => world.getAllPlayers().forEach(e => Quest.restore(e, this)))
+    system.delay(() => {
+      world.getAllPlayers().forEach(e => Quest.restore(e, this))
+
+      const questSettings = Settings.worldMap[this.group]
+      if (typeof questSettings !== 'undefined' && Object.keys(questSettings).length) {
+        questSettings[SETTINGS_GROUP_NAME] = `Задание: ${this.name}\n§7${this.description}`
+      }
+    })
   }
 
   enter(player: Player) {
-    this.move(player, 0)
+    this.setStep(player, 0)
   }
 
-  move(player: Player, i: number, restore = false) {
-    const step = this.getPlayerStep(player, i)
-    if (!step) return
+  setStep(player: Player, i: number, restore = false) {
+    const step = this.getPlayerStep(player, i) ?? this.createPlayerSteps(player, i)
+    if (typeof step === 'undefined') return // Index can be unknown, e.g quest have 4 steps but index is 10
 
-    const active = this.getDatabase(player, i)
+    const db = this.getDatabase(player) ?? this.createDatabase(player, i)
 
-    if (!restore) delete active.db // Next step, clean previous db
-    active.i = i
+    if (!restore) delete db.db // Next step, clean previous db
+    db.i = i
     this.stepSwitchVisual(player, step, i, restore)
     step.enter(!restore)
   }
 
-  getPlayerStep(player: Player, index = this.getDatabase(player, 0).i): QS | undefined {
-    return this.getPlayerSteps(player).list[index]
+  getPlayerStep(player: Player, index = this.getActive(player)?.i): QS | undefined {
+    return this.players.get(player)?.value.list[index ?? 0]
   }
 
-  getPlayerSteps(player: Player) {
-    const step = this.players.get(player)
-    if (step) {
-      return step.value
-    } else {
-      const quest = new PlayerQuest(this, player)
-      this.players.set(player, quest)
-      this.create(quest, player)
-      return quest
-    }
+  private createPlayerSteps(player: Player, index: number) {
+    const steps = new PlayerQuest(this, player)
+    this.players.set(player, steps)
+    this.create(steps, player)
+
+    return steps.list[index]
+  }
+
+  private getDatabase(player: Player) {
+    return player.database.quests?.active.find(e => e.id === this.id)
+  }
+
+  private createDatabase(player: Player, i: number) {
+    const quests = (player.database.quests ??= {
+      active: [],
+      completed: [],
+    })
+
+    const db = { id: this.id, i: i } as QuestDB['active'][number]
+    quests.active.unshift(db)
+
+    return db
   }
 
   /**
@@ -111,14 +128,14 @@ export class Quest {
    * @param player - Player to recieve quest from
    * @param i - Number that represents the step index of the quest.
    */
-  private getDatabase(player: Player, i: number) {
+  private getActive(player: Player, i?: number) {
     const quests = (player.database.quests ??= {
       active: [],
       completed: [],
     })
 
     let active = quests.active.find(e => e.id === this.id)
-    if (!active) {
+    if (!active && typeof i === 'number') {
       active = { id: this.id, i: i }
       quests.active.unshift(active)
     }
@@ -188,6 +205,6 @@ export class Quest {
     quest: Quest,
     db = player.database.quests?.active.find(e => e.id === quest.id),
   ) {
-    if (db) quest.move(player, db.i, true)
+    if (db) quest.setStep(player, db.i, true)
   }
 }

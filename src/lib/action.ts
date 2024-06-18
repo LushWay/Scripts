@@ -69,7 +69,7 @@ export class PlaceAction {
         this.placeId(ctx.event.block, ctx.event.block.dimension.type) in this.interactions
       )
         return true
-    }, -2)
+    }, 100000)
   }
 }
 

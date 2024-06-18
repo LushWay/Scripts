@@ -104,7 +104,7 @@ export class ShopForm {
    * @param cost
    */
   addItemStack(item: ItemStack, cost: Cost) {
-    this.addProduct(itemDescription(item, '§f'), cost, player => {
+    this.addProduct(itemDescription(item, ''), cost, player => {
       if (!player.container) return
 
       cost.buy(player)

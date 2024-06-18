@@ -24,7 +24,7 @@ export enum CustomStructures {
 export enum Sounds {
   LevelUp = 'random.levelup',
   Success = 'note.pling',
-  Action = 'random.orb',
+  Action = 'place.tuff',
   Click = 'note.hat',
   Fail = 'block.false_permissions',
 }

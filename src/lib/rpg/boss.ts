@@ -3,7 +3,7 @@
 import { Entity, system, world } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { isChunkUnloaded } from 'lib/game-utils'
-import { location } from 'lib/location'
+import { location, migrateLocationName } from 'lib/location'
 import { Region } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/BossArenaRegion'
 import { LootTable } from 'lib/rpg/loot-table'
@@ -27,7 +27,7 @@ export class Boss {
 
   dimensionId
 
-  displayName
+  name
 
   entity: Entity | undefined
 
@@ -37,7 +37,7 @@ export class Boss {
 
   loot
 
-  name
+  id
 
   region: Region
 
@@ -52,43 +52,44 @@ export class Boss {
   }
 
   /**
-   * @param o
-   * @param o.name Script id used for location
-   * @param o.entityTypeId
-   * @param o.displayName
+   * Creates a new boss
+   *
+   * @param {object} o
+   * @param o.group Group id used for location
+   * @param o.name Unique id used for location
    * @param o.respawnTime In ms
-   * @param o.bossEvent
-   * @param o.arenaRadius
-   * @param o.loot
-   * @param o.dimensionId
    */
   constructor({
-    name,
+    group,
+    id,
     entityTypeId,
-    displayName,
+    name,
     respawnTime,
     bossEvent = true,
     arenaRadius = 10,
     dimensionId = 'overworld',
     loot,
   }: {
-    name: string
+    group: string
+    id: string
     entityTypeId: string
-    displayName: string
+    name: string
     respawnTime: number
     bossEvent?: boolean
     arenaRadius?: number
     loot: LootTable
     dimensionId?: Dimensions
   }) {
-    this.name = name
-    this.dimensionId = dimensionId
+    this.id = id
     this.entityTypeId = entityTypeId
-    this.displayName = displayName
+    this.dimensionId = dimensionId
+    this.name = name
     this.respawnTime = respawnTime
     this.bossEvent = bossEvent
     this.loot = loot
-    this.location = location('Боссы', name)
+
+    migrateLocationName('Боссы', id, group, id)
+    this.location = location(group, id, name)
     this.arenaRadius = arenaRadius
     this.location.onLoad.subscribe(center => {
       this.check()
@@ -106,7 +107,7 @@ export class Boss {
     if (!this.location.valid) return
     if (isChunkUnloaded({ dimensionId: this.dimensionId, location: this.location })) return
 
-    const db = Boss.db[this.name]
+    const db = Boss.db[this.id]
     if (typeof db !== 'undefined') {
       if (db.dead) {
         this.checkRespawnTime(db)
@@ -128,13 +129,13 @@ export class Boss {
 
     // Get type id
     const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
-    console.debug(`Boss(${this.name}).spawnEntity(${entityTypeId})`)
+    console.debug(`Boss(${this.id}).spawnEntity(${entityTypeId})`)
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
 
     // Save to database
-    Boss.db[this.name] = {
+    Boss.db[this.id] = {
       id: this.entity.id,
       date: Date.now(),
       dead: false,
@@ -161,18 +162,18 @@ export class Boss {
 
   onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
-    console.debug(`Boss(${this.name}).onDie()`)
+    console.debug(`Boss(${this.id}).onDie()`)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
 
-    Boss.db[this.name] = {
+    Boss.db[this.id] = {
       id: '',
       date: Date.now(),
       dead: true,
     }
 
     if (dropLoot) {
-      world.say('§6Убит босс §f' + this.displayName + '!')
+      world.say('§6Убит босс §f' + this.name + '!')
 
       this.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
       // TODO Give money depending on how many hits etc

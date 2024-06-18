@@ -4,8 +4,8 @@ import { Vector, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { actionGuard } from 'lib/region/index'
 import { MoneyCost } from 'lib/shop/cost'
-import { Shop } from 'lib/shop/shop'
-import { StoneQuarry } from '../places/stone-quarry/stone-quarry'
+import { Shop, ShopOptions } from 'lib/shop/shop'
+import { StoneQuarry } from './stone-quarry'
 
 export class Furnacer {
   /**
@@ -40,7 +40,7 @@ export class Furnacer {
     onlyInStoneQuarry,
     npc,
   }: {
-    npc: Omit<import('lib/rpg/npc').NpcOptions, 'onInteract' | 'group'>
+    npc: Omit<ShopOptions, 'body' | 'dimensionId'>
     furnaceTypeIds: string[]
     onlyInStoneQuarry: boolean
   }) {
@@ -49,8 +49,8 @@ export class Furnacer {
     this.furnaceTypeIds = furnaceTypeIds
     this.onlyInStoneQuarry = onlyInStoneQuarry
     this.npc = Shop.npc({
-      group: 'Каменоломня',
       body: () => 'У меня ты можешь купить доступ к печкам\n\n',
+      dimensionId: 'overworld',
       ...npc,
     })
 

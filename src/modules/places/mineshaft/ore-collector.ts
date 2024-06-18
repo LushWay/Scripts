@@ -1,55 +1,54 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { selectByChance } from 'lib'
 
-const types = Symbol('ore.types')
-const deepslates = Symbol('ore.deepslate')
-const all = Symbol('ore.all')
-const chance = Symbol('ore.chance')
-
 export class Ore {
-  [types]: string[] = []
+  private types: string[] = []
 
   type(typeId: string) {
-    this[types].push(typeId)
+    this.types.push(typeId)
     return this
   }
 
-  [deepslates]: string[] = []
+  private deepslates: string[] = []
 
   deepslate(typeId: string) {
-    this[deepslates].push(typeId)
+    this.deepslates.push(typeId)
     return this
   }
 
-  [all]: string[] = [];
-
-  [chance] = 1
-
-  chance(count: number) {
-    this[chance] = count
-    return this
+  chance(chance: number) {
+    return {
+      chance,
+      item: {
+        chance,
+        all: this.types.concat(this.deepslates),
+        types: this.types,
+        deepslates: this.deepslates,
+      },
+    }
   }
 }
 
+type CompiledOre = ReturnType<Ore['chance']>
+
 export class OreCollector {
-  private readonly entries: Ore[]
+  private entries: CompiledOre[]
 
   private readonly typeIds: string[]
 
-  constructor(...entries: Ore[]) {
+  constructor(...entries: CompiledOre[]) {
     this.entries = entries
-    this.entries.forEach(e => (e[all] = e[types].concat(e[deepslates])))
-    this.typeIds = entries.map(e => e[all]).flat()
+    this.typeIds = entries.map(e => e.item.all).flat()
   }
 
   getOre(typeId: string) {
     if (!this.typeIds.includes(typeId)) return
 
     for (const ore of this.entries) {
-      if (ore[all].includes(typeId)) {
+      if (ore.item.all.includes(typeId)) {
         return {
           ore,
-          isDeepslate: ore[deepslates].includes(typeId),
+          isDeepslate: ore.item.deepslates.includes(typeId),
           get empty() {
             return this.isDeepslate ? b.Deepslate : b.Stone
           },
@@ -59,17 +58,22 @@ export class OreCollector {
   }
 
   stoneChance(stoneChance: number) {
-    this.chances = this.entries
-      .map(e => ({ chance: e[chance], item: e }))
-      .concat({ chance: stoneChance, item: new Ore().type('').deepslate('') })
+    this.entries = this.entries.concat(new Ore().type('').deepslate('').chance(stoneChance))
 
     return this
   }
 
-  private chances: { chance: number; item: Ore }[] = []
-
   selectOreByChance(deepslate = false) {
-    const ore = selectByChance(this.chances).item
-    return deepslate ? ore[deepslates][0] : ore[types][0]
+    const ore = selectByChance(this.entries).item
+    return deepslate ? ore.deepslates[0] : ore.types[0]
+  }
+
+  with(ore: CompiledOre, chance = ore.chance) {
+    return Object.setPrototypeOf(
+      {
+        entries: this.entries.concat({ chance, item: { ...ore.item, chance } }),
+      },
+      Object.getPrototypeOf(this) as this,
+    ) as this
   }
 }

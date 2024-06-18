@@ -1,69 +1,67 @@
-import { Player, TeleportOptions, Vector3 } from '@minecraft/server'
+import { Player, TeleportOptions, Vector3, system } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
 import { Settings } from './settings'
+import { t } from './text'
 import { util } from './util'
 
-/** Creates reference to a location that can be changed via settings command */
-export function location(group: string, name: string, fallback?: Vector3) {
-  return Location.create(group, name, fallback)
-}
-
-/** Creates reference to a location that can be changed via settings command */
-export function locationWithRotation(group: string, name: string, fallback?: LocationWithRotation['locationFormat']) {
-  return LocationWithRotation.create(group, name, fallback)
-}
-
-/** Creates reference to a location that can be changed via settings command */
-export function locationWithRadius(group: string, name: string, fallback?: LocationWithRadius['locationFormat']) {
-  return LocationWithRadius.create(group, name, fallback)
-}
-// console.log('All names:', Settings.worldDatabase['locations'])
-
-/** Migration helper */
-export function migrateLocationName(oldName: string, newGroup: string, newName: string) {
-  const oldvalue = Settings.worldDatabase.locations[oldName]
-  if (oldvalue) {
-    console.log(`§7[LocationNameMigration] Renaming '§f${oldName}§7' to '§f${newGroup} - ${newName}§7'`)
-    Settings.worldDatabase[newGroup][newName] = oldvalue
-    Reflect.deleteProperty(Settings.worldDatabase.locations, oldName)
-  } else if (!Settings.worldDatabase[newGroup][newName]) {
-    console.warn(`§7[LocationNameMigration] No rename for '§f${oldName}§7'`)
-  }
-}
-
-interface SafeLocationCommon<T extends Vector3> {
+interface LocationCommon<T extends Vector3> {
   onLoad: Location<T>['onLoad']
   teleport: Location<T>['teleport']
   firstLoad: boolean
 }
 
-export type ValidSafeLocation<T extends Vector3> = {
+export type ValidLocation<T extends Vector3> = {
   valid: true
-} & SafeLocationCommon<T> &
+} & LocationCommon<T> &
   T
 
-export type InvalidSafeLocation<T extends Vector3> = {
+export type InvalidLocation<T extends Vector3> = {
   valid: false
-} & SafeLocationCommon<T>
+} & LocationCommon<T>
 
-export type SafeLocation<T extends Vector3> = InvalidSafeLocation<T> | ValidSafeLocation<T>
+export type SafeLocation<T extends Vector3> = InvalidLocation<T> | ValidLocation<T>
 
 class Location<T extends Vector3> {
-  static create<V extends Vector3, T extends typeof Location<V>>(this: T, group: string, name: string, fallback?: V) {
-    const location = new this(group, name, fallback)
-    Settings.worldMap[group] ??= {}
-    Settings.worldMap[group][name] = {
-      name,
-      description: location.format,
-      value: fallback ? Object.values(fallback).join(' ').trim() : '',
-      onChange: () => location.load(true),
+  /**
+   * Returns function that creates location
+   *
+   * @param this - Location type
+   * @returns - Function that creates location
+   */
+  static creator<V extends Vector3, L extends typeof Location<V>>(this: L) {
+    /** @param group - Location group */
+    return (group: string, id: string, name: string, fallback?: V) => {
+      const location = new this(group, id, fallback)
+      Settings.worldMap[group] ??= {}
+
+      if (!Settings.worldDatabase[group][id]) {
+        const old = Settings.worldDatabase[group][name]
+        if (old) {
+          console.debug(t`${group}: ${name} -> ${id} (${old})`)
+          Settings.worldDatabase[group][id] = old
+          Reflect.deleteProperty(Settings.worldDatabase[group], name)
+
+          if (!Object.keys(Settings.worldDatabase[group]).length) {
+            Reflect.deleteProperty(Settings.worldDatabase, group)
+          }
+        } else {
+          console.warn(t.error`${'§4' + group}: No migration for ${name} -> ${id}`)
+        }
+      }
+
+      Settings.worldMap[group][id] = {
+        name: name,
+        description: location.format,
+        value: fallback ? Object.values(fallback).join(' ').trim() : '',
+        onChange: () => location.load(true),
+      }
+
+      location.load()
+      location.firstLoad = true
+
+      return location.safe
     }
-
-    location.load()
-    location.firstLoad = true
-
-    return location.safe
   }
 
   protected locationFormat = { x: 0, y: 0, z: 0 } as T
@@ -76,7 +74,7 @@ class Location<T extends Vector3> {
 
   firstLoad = true
 
-  readonly onLoad = new EventLoaderWithArg(this.safe as ValidSafeLocation<T>)
+  readonly onLoad = new EventLoaderWithArg(this.safe as ValidLocation<T>)
 
   protected constructor(
     protected group: string,
@@ -106,12 +104,12 @@ class Location<T extends Vector3> {
 
   private updateLocation(location: T) {
     this.location = location
-    EventLoaderWithArg.load(this.onLoad, this.safe as ValidSafeLocation<T>)
+    EventLoaderWithArg.load(this.onLoad, this.safe as ValidLocation<T>)
     this.firstLoad = false
   }
 
   get safe() {
-    return Object.setPrototypeOf(this.location, this) as ValidSafeLocation<T> | InvalidSafeLocation<T>
+    return Object.setPrototypeOf(this.location, this) as ValidLocation<T> | InvalidLocation<T>
   }
 
   get valid() {
@@ -137,4 +135,54 @@ class LocationWithRotation extends Location<Vector3 & { xRot: number; yRot: numb
 
 class LocationWithRadius extends Location<Vector3 & { radius: number }> {
   protected locationFormat = { x: 0, y: 0, z: 0, radius: 0 }
+}
+
+/** Creates reference to a location that can be changed via settings command */
+export const location = Location.creator()
+
+/** Creates reference to a location that can be changed via settings command */
+export const locationWithRotation = LocationWithRotation.creator<
+  Vector3 & { xRot: number; yRot: number },
+  typeof LocationWithRotation
+>()
+
+/** Creates reference to a location that can be changed via settings command */
+export const locationWithRadius = LocationWithRadius.creator<Vector3 & { radius: number }, typeof LocationWithRadius>()
+
+system.delay(() => {
+  for (const [k, d] of Object.entries(Settings.worldDatabase)) {
+    if (!Object.keys(d).length) {
+      Reflect.deleteProperty(Settings.worldDatabase, k)
+    }
+  }
+})
+
+/** Migration helper */
+export function migrateLocationName(oldGroup: string, oldName: string, newGroup: string, newName: string) {
+  const location = Settings.worldDatabase[oldGroup][oldName]
+  if (typeof location !== 'undefined') {
+    console.debug(t`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
+
+    Settings.worldDatabase[newGroup][newName] = location
+
+    Reflect.deleteProperty(Settings.worldDatabase[oldGroup], oldName)
+  } else if (!Settings.worldDatabase[newGroup][newName]) {
+    console.warn(t.error`No location found at ${oldGroup}:${oldName}`)
+  }
+}
+
+export function migrateLocationGroup(from: string, to: string) {
+  const group = Settings.worldDatabase[from]
+  if (typeof group !== 'undefined') {
+    console.debug(t`Migrating group ${from} to ${to}`)
+
+    Settings.worldDatabase[to] = {
+      ...(Settings.worldDatabase[to] ?? {}),
+      ...group,
+    }
+
+    Reflect.deleteProperty(Settings.worldDatabase, from)
+  } else {
+    console.warn(t.error`No migration for group ${from}`)
+  }
 }

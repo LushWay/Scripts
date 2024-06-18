@@ -3,7 +3,7 @@ import type { ExtendedSimulatedPlayer, ExtendedTest } from '@minecraft/server-ga
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { TestStructures } from 'test/constants'
 import { suite, test } from 'test/framework'
-import { BASE_ITEM_STACK } from './base'
+import { BaseItem } from './base'
 
 suite('base', () => {
   test('should break blocks only by region owner', async test => {
@@ -68,7 +68,7 @@ async function createCommonBaseTest(test: ExtendedTest) {
   const owner = test.spawnSimulatedPlayer({ x: 0, y: 3, z: 0 }, 'Base owner')
   const raider = test.spawnSimulatedPlayer({ x: 3, y: 3, z: 0 }, 'Raider')
 
-  owner.mainhand().setItem(BASE_ITEM_STACK)
+  owner.mainhand().setItem(BaseItem.itemStack)
   await test.idle(10)
   owner.useItemInSlotOnBlock(owner.selectedSlotIndex, { x: 2, y: 2, z: 2 })
   owner.mainhand().setItem(new ItemStack('minecraft:air'))

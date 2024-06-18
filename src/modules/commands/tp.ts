@@ -1,10 +1,10 @@
 import { Player, system, world } from '@minecraft/server'
 import { ActionForm, Vector, getRoleAndName, util } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
-import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
+import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
-import { TechCity } from 'modules/places/tech-city'
+import { TechCity } from 'modules/places/tech-city/tech-city'
 import { VillageOfExplorers } from 'modules/places/village-of-explorers'
 import { VillageOfMiners } from 'modules/places/village-of-miners'
 
@@ -29,10 +29,10 @@ function tpMenu(player: Player) {
   }))
 
   const locations: Record<string, ReturnType<typeof location>> = {
-    'Деревня шахтеров': location(VillageOfMiners, '136 71 13457 140 -10', players),
-    'Деревня исследователей': location(VillageOfExplorers, '-35 75 13661 0 20', players),
-    'Каменоломня': location(StoneQuarry, '-1300 76 14800 -90 5', players),
-    'Техноград': location(TechCity, '-1288 64 13626 90 -10', players),
+    [VillageOfMiners.name]: location(VillageOfMiners, '136 71 13457 140 -10', players),
+    [VillageOfExplorers.name]: location(VillageOfExplorers, '-35 75 13661 0 20', players),
+    [StoneQuarry.name]: location(StoneQuarry, '-1300 76 14800 -90 5', players),
+    [TechCity.name]: location(TechCity, '-1288 64 13626 90 -10', players),
   }
 
   if (Spawn.region)
@@ -67,7 +67,7 @@ function tpToPlayer(player: Player) {
 }
 
 function location(
-  place: Pick<DefaultPlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>,
+  place: Pick<PlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>,
   fallback: string,
   players: { location: Vector3; dimension: Dimensions }[],
 ) {

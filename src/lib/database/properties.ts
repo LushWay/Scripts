@@ -15,8 +15,8 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
   ) {
     super(id, defaultValue)
     if (id in DynamicPropertyDB.tables) throw new DatabaseError(`Table ${this.id} already initialized!`)
-    DynamicPropertyDB.tables[id] = this.proxy()
     this.init()
+    DynamicPropertyDB.tables[id] = this.proxy()
   }
 
   private init() {
@@ -83,6 +83,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
 configureDatabase({
   createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
     new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
+
   tables: DynamicPropertyDB.tables,
   getRawTableData(tableId) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands

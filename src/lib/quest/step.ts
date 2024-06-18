@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { Vector } from 'lib'
+import { EventSignal, Vector } from 'lib'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
 import { PlayerQuest } from './player'
@@ -188,5 +188,11 @@ export abstract class QS<DB = unknown> extends Temporary {
    */
   get system() {
     return this.proxies.system
+  }
+
+  subscribe<T extends EventSignal.Any>(eventSignal: T, callback: EventSignal.Callback<T>) {
+    eventSignal.subscribe(callback)
+    this.cleaners.push(() => eventSignal.unsubscribe(callback))
+    return callback
   }
 }

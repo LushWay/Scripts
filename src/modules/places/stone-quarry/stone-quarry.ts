@@ -1,15 +1,18 @@
-import { system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, util } from 'lib'
-import { ChestLoot } from 'lib/chest-loot/chest-loot'
-import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
-import { Furnacer } from '../../features/furnacer'
-import gunsmith from './gunsmith'
+import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { Furnacer } from './furnacer'
+import { Gunsmith } from './gunsmith'
 
-class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
+class StoneQuarryBuilder extends PlaceWithSafeArea {
+  constructor() {
+    super('StoneQuarry', 'Каменоломня')
+  }
+
   witherBoss = new Boss({
-    name: 'wither',
-    displayName: 'Камнедробилка',
+    group: this.group,
+    id: 'wither',
+    name: 'Камнедробилка',
     entityTypeId: MinecraftEntityTypes.Wither,
     bossEvent: false,
     respawnTime: util.ms.from('hour', 1),
@@ -18,6 +21,7 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
 
   commonOvener = new Furnacer({
     npc: {
+      group: this.group,
       id: 'ovener',
       name: '§6Печкин',
     },
@@ -32,43 +36,17 @@ class StoneQuarryBuilder extends DefaultPlaceWithSafeArea {
   })
 
   foodOvener = new Furnacer({
-    furnaceTypeIds: [MinecraftBlockTypes.LitBlastFurnace],
     npc: {
+      group: this.group,
       id: 'foodOvener',
       name: '§6Пекарь',
     },
+
+    furnaceTypeIds: [MinecraftBlockTypes.LitBlastFurnace],
     onlyInStoneQuarry: false,
   })
 
-  gunsmith = gunsmith(this.name)
-
-  chestKit = new ChestLoot(
-    'Сундук с наградой',
-    this.name,
-    this.name,
-    new Loot(this.name + 'LootChest')
-      .item('NetheriteSword')
-      .enchantmetns({
-        sharpness: {
-          '1...2': '80%',
-          '3...5': '20%',
-        },
-      })
-      .item('Stonebrick')
-      .amount({ '1...64': '100%' }).build,
-    'overworld',
-  )
-
-  constructor() {
-    super('Каменоломня')
-
-    new Command('stnq').executes(ctx => {
-      ctx.player.container?.clearAll()
-      system.delay(() => {
-        ctx.player.container?.addItem(this.chestKit.createKeyItemStack())
-      })
-    })
-  }
+  gunsmith = new Gunsmith(this.group)
 }
 
 export const StoneQuarry = new StoneQuarryBuilder()

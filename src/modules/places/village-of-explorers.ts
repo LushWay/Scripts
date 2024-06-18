@@ -1,15 +1,16 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, util } from 'lib'
-import { DefaultPlaceWithSafeArea } from 'modules/places/lib/DefaultWithSafeArea'
+import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 
-class VillageOfExporersBuilder extends DefaultPlaceWithSafeArea {
+class VillageOfExporersBuilder extends PlaceWithSafeArea {
   constructor() {
-    super('Деревня исследователей')
+    super('VillageOfExporers', 'Деревня исследователей')
   }
 
   slimeBoss = new Boss({
-    name: 'slime',
-    displayName: 'Слайм',
+    group: this.group,
+    id: 'slime',
+    name: 'Слайм',
     entityTypeId: MinecraftEntityTypes.Slime,
     respawnTime: util.ms.from('min', 10),
     loot: new Loot('slime boss').item('SlimeBall').amount({

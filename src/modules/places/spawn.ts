@@ -8,9 +8,9 @@ import { Join } from 'lib/player-join'
 import { SafeAreaRegion } from 'lib/region/kinds/SafeAreaRegion'
 import { Menu } from 'lib/rpg/menu'
 import { showSurvivalHud } from 'modules/survival/sidebar'
-import { DefaultPlaceWithInventory } from './lib/DefaultWithInventory'
+import { AreaWithInventory } from './lib/area-with-inventory'
 
-class SpawnBuilder extends DefaultPlaceWithInventory {
+class SpawnBuilder extends AreaWithInventory {
   private readonly name = 'Spawn'
 
   portal: Portal | undefined
@@ -19,7 +19,7 @@ class SpawnBuilder extends DefaultPlaceWithInventory {
 
   inventoryName: InventoryTypeName = 'spawn'
 
-  location = locationWithRotation('common', 'spawn', { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
+  location = locationWithRotation('common', 'spawn', 'Спавн', { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
 
   settings = Settings.player('Вход', 'join', {
     teleportToSpawnOnJoin: {

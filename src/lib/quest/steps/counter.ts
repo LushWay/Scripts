@@ -1,7 +1,7 @@
 import { isNotPlaying } from 'lib/game-utils'
 import { QS, QSBuilder } from '../step'
 
-export class QSCounter extends QS<number> {
+export class QSCounter extends QS<{ count: number }> {
   value = 0
 
   end = 1
@@ -12,7 +12,8 @@ export class QSCounter extends QS<number> {
 
     if (result < this.end) {
       // Saving value to db
-      this.db = result
+      this.db ??= { count: result }
+      this.db.count = result
 
       // Updating interface
       this.value = result
@@ -23,7 +24,7 @@ export class QSCounter extends QS<number> {
   }
 
   protected activate: QS.Activator<this> = ctx => {
-    if (typeof ctx.db === 'number') ctx.value = ctx.db
+    if (typeof ctx.db?.count === 'number') ctx.value = ctx.db.count
   }
 }
 

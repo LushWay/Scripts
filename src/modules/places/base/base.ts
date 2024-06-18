@@ -3,35 +3,34 @@ import { ItemStack, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, Vector, getBlockStatus } from 'lib'
 import { actionGuard } from 'lib/region/index'
+import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 
-export const BASE_ITEM_STACK = new ItemStack(MinecraftItemTypes.Barrel, 1).setInfo(
-  '§r§6База',
-  '§7Поставьте эту бочку и она стане базой.',
-)
-
-// new Store({ x: 88, y: 77, z: 13450 }, 'overworld').addItem(BASE_ITEM_STACK, new ScoreboardCost(10))
+export const BaseItem = new CustomItemWithBlueprint('base')
+  .setTypeId(MinecraftItemTypes.Barrel)
+  .setNameTag('§6База')
+  .setDescription('Поставьте эту бочку и она станет базой.')
 
 actionGuard((_, __, ctx) => {
   if (
     (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
-    ctx.event.player.mainhand().getItem()?.is(BASE_ITEM_STACK)
+    BaseItem.isItem(ctx.event.player.mainhand().getItem())
   )
     return true
 })
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block } = event
-  const itemStack = player.mainhand()
+  const mainhand = player.mainhand()
   try {
-    if (!itemStack.getItem()?.is(BASE_ITEM_STACK) || LockAction.locked(player)) return
+    if (!BaseItem.isItem(mainhand.getItem()) || LockAction.locked(player)) return
   } catch (e) {
     if (e instanceof TypeError && e.message.match(/native handle/)) return
     return console.error(e)
   }
 
-  const region = Region.regionInstancesOf(RadiusRegion).find(e => e.getMemberRole(player) !== false)
+  const region = Region.regionInstancesOf(BaseRegion).find(e => e.getMemberRole(player) !== false)
 
   if (region) {
     event.cancel = true
@@ -98,7 +97,7 @@ base
   .setPermissions('techAdmin')
   .setDescription('Выдает предмет базы')
   .executes(ctx => {
-    ctx.player.container?.addItem(BASE_ITEM_STACK)
+    ctx.player.container?.addItem(BaseItem.itemStack)
     ctx.reply('База выдана')
   })
 

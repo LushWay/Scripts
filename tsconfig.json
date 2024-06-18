@@ -86,7 +86,7 @@
       }
     ]
   },
-  "include": ["src", "tools/defines.d.ts"],
+  "include": ["src", "tools/defines.d.ts", "src/modules/places/tech-city/engineer.ts"],
   "exclude": ["node_modules", "src/chestui", "src/test/*", "vitest/dist/**"],
 
   // Pollutes global

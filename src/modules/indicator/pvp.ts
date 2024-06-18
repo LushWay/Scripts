@@ -7,7 +7,7 @@ import { HealthIndicatorConfig } from './config'
 
 const { lockDisplay } = HealthIndicatorConfig
 
-const options = Settings.world('pvp', {
+const options = Settings.world(...Settings.worldCommon, {
   enabled: {
     value: true,
     description: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',

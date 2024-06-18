@@ -4,7 +4,7 @@ import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { ores, placeOre } from './algo'
 
 actionGuard((player, region, ctx) => {
-  if (!isNotPlaying(player)) return
+  if (isNotPlaying(player)) return
   if (!(region instanceof MineshaftRegion)) return
 
   switch (ctx.type) {
@@ -42,4 +42,4 @@ actionGuard((player, region, ctx) => {
       return true
     }
   }
-}, 100)
+})

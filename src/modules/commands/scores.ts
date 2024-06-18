@@ -82,6 +82,7 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
       )
     })
     .back(() => scoreManagerMenu(player))
+    .show(player)
 }
 
 function addTargetToScoreboardMenu(player: Player, objective: ScoreboardObjective) {

@@ -1,5 +1,5 @@
-import { TicksPerDay, system, world } from '@minecraft/server'
-import { SETTINGS_GROUP_NAME, Settings } from 'lib'
+import { TicksPerDay, TimeOfDay, system, world } from '@minecraft/server'
+import { Settings } from 'lib'
 
 const MinutesPerDay = 24 * 60
 const Offset = 6000
@@ -17,18 +17,31 @@ function realTimeToMinecraftTicks(date = new Date()) {
   return result
 }
 
-const settings = Settings.world('common', {
+const settings = Settings.world(...Settings.worldCommon, {
   syncRealTime: {
     name: 'Синхронизировать время',
     description: 'Синхронизировать время в майнкрафте с реальным',
     value: true,
+    onChange() {
+      if (settings.syncRealTime) {
+        world.say('§7Теперь время игры синхронизируется с реальным')
+        sync()
+      } else {
+        world.say('§7Время игры больше не синхронизируется с реальным')
+        system.clearRun(id)
+        world.setTimeOfDay(TimeOfDay.Day)
+      }
+    },
   },
 })
 
-system.runInterval(
-  function syncRealTime() {
-    if (settings.syncRealTime) world.setTimeOfDay(realTimeToMinecraftTicks())
-  },
-  'syncRealTime',
-  5,
-)
+let id = 0
+function sync() {
+  id = system.runInterval(
+    function syncRealTime() {
+      world.setTimeOfDay(realTimeToMinecraftTicks())
+    },
+    'syncRealTime',
+    5,
+  )
+}

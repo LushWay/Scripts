@@ -41,7 +41,7 @@ export class PlayerQuest {
     step.cleanup()
 
     if (this.list[index + 1]) {
-      this.quest.move(this.player, index + 1)
+      this.quest.setStep(this.player, index + 1)
     } else {
       this.quest.exit(this.player, true)
       this.onEnd()

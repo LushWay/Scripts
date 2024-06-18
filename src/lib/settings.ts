@@ -12,9 +12,9 @@ type DropdownSetting = [value: string, displayText: string]
 /** Any setting value type */
 type SettingValue = string | boolean | number | DropdownSetting[]
 
-export const SETTINGS_GROUP_NAME = Symbol('name')
+export const SETTINGS_GROUP_NAME = Symbol('SettingGroupName')
 
-interface GroupNameObject {
+interface ConfigMeta {
   [SETTINGS_GROUP_NAME]?: string
 }
 
@@ -27,7 +27,7 @@ export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
     onChange?: VoidFunction
   }
 > &
-  GroupNameObject
+  ConfigMeta
 
 /** Сonverting true and false to boolean and string[] to string and string literal to plain string */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -68,36 +68,35 @@ export class Settings {
    *
    * @template Config
    * @param name - The name that shows to players
-   * @param groupName - The prefix for the database.
+   * @param group - The prefix for the database.
    * @param config - This is an object that contains the default values for each option.
    * @returns An function that returns object with properties that are getters and setters.
    */
   static player<Config extends SettingsConfig<PlayerSettingValues>>(
     name: string,
-    groupName: string,
-    config: Narrow<Config> & GroupNameObject,
-  ): (player: Player) => SettingsConfigParsed<Config> {
-    config[SETTINGS_GROUP_NAME] = name
-
-    this.insertGroup('playerMap', groupName, config as Config)
+    group: string,
+    config: Narrow<Config> & ConfigMeta,
+  ) {
+    this.insertGroup('playerMap', name, group, config as Config)
 
     const cache = new WeakPlayerMap({ removeOnLeave: true })
 
-    return player => {
+    const fn = (player: Player): SettingsConfigParsed<Config> => {
       const cached = cache.get(player)
       if (cached) {
         return cached as SettingsConfigParsed<Config>
       } else {
-        const settings = this.parseConfig(
-          Settings.playerDatabase,
-          groupName,
-          this.playerMap[groupName] as Config,
-          player,
-        )
+        const settings = this.parseConfig(Settings.playerDatabase, group, this.playerMap[group] as Config, player)
         cache.set(player, settings)
         return settings
       }
     }
+
+    fn.groupId = group
+    fn.groupName = name
+    fn.extend = [name, group] as const
+
+    return fn
   }
 
   static worldDatabase = this.createDatabase('worldOptions')
@@ -109,31 +108,38 @@ export class Settings {
    * object's properties in localStorage
    *
    * @template Config
-   * @param groupName - The prefix for the database.
+   * @param group - The prefix for the database.
    * @param config - The default values for the options.
    * @returns An object with properties that are getters and setters.
    */
   static world<Config extends WorldSettingsConfig>(
-    groupName: string,
-    config: Narrow<Config> & GroupNameObject,
+    name: string,
+    group: string,
+    config: Narrow<Config> & ConfigMeta,
   ): SettingsConfigParsed<Config> {
-    this.insertGroup('worldMap', groupName, config as Config)
-    return this.parseConfig(Settings.worldDatabase, groupName, this.worldMap[groupName] as Config)
+    this.insertGroup('worldMap', name, group, config as Config)
+    return this.parseConfig(Settings.worldDatabase, group, this.worldMap[group] as Config)
   }
+
+  static worldCommon = ['Общие настройки мира\n§7Чат, спавн и тд', 'common'] as const
 
   private static insertGroup<Config extends SettingsConfig>(
     to: 'worldMap' | 'playerMap',
-    groupName: string,
+    name: string,
+    group: string,
     config: Config,
   ) {
-    if (!(groupName in this[to])) {
-      this[to][groupName] = config
+    if (!(group in this[to])) {
+      this[to][group] = config
     } else {
-      this[to][groupName] = {
+      this[to][group] = {
         ...config,
-        ...this[to][groupName],
+        ...this[to][group],
       }
     }
+
+    this[to][group][SETTINGS_GROUP_NAME] = name
+    this[to][group]
   }
 
   /**
@@ -338,16 +344,16 @@ export function playerSettingsMenu(player: Player, back?: VoidFunction) {
 export function worldSettingsMenu(player: Player) {
   const form = new ActionForm('§dНастройки мира')
 
-  for (const groupName in Settings.worldMap) {
-    const database = Settings.worldDatabase[groupName]
+  for (const [groupId, group] of Object.entries(Settings.worldMap)) {
+    const database = Settings.worldDatabase[groupId]
 
     let unsetCount = 0
-    for (const [key, option] of Object.entries(Settings.worldMap[groupName])) {
+    for (const [key, option] of Object.entries(group)) {
       if (option.requires && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.addButton(util.badge(groupName, unsetCount, { color: '§c' }), () => {
-      settingsGroupMenu(player, groupName, false)
+    form.addButton(util.badge(group[SETTINGS_GROUP_NAME] ?? groupId, unsetCount, { color: '§c' }), () => {
+      settingsGroupMenu(player, groupId, false)
     })
   }
 
