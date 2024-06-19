@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { world } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
-import { DatabaseError } from './abstract'
 
 export class PersistentSet<T> extends Set<T> {
   constructor(public id: string) {
@@ -24,7 +23,7 @@ export class PersistentSet<T> extends Set<T> {
         parsed.forEach(value => this.add(value as T))
       }
     } catch (error) {
-      console.error(new DatabaseError(`Failed to init PersistentSet<${this.id}>`), error)
+      console.error(`Failed to init PersistentSet<${this.id}>`, error)
     }
   }
 

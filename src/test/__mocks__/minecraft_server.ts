@@ -159,6 +159,10 @@ export class World {
   getDimension(id: MinecraftDimensionTypes) {
     return new Dimension(id)
   }
+
+  getDynamicProperty() {
+    return undefined
+  }
 }
 
 type DynamicPropertyValue = string | number | boolean | undefined | Vector3
