@@ -39,7 +39,7 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
     return this
   }
 
-  prepareNameTag: PrepareNameTag<T> | undefined
+  private prepareNameTag: PrepareNameTag<T> | undefined
 
   nameTag(prepareNameTag: PrepareNameTag<T>) {
     this.prepareNameTag = prepareNameTag
@@ -47,8 +47,8 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
     return this
   }
 
-  lore(prepareLore: PrepareLore<T>) {
-    this.prepareLore = prepareLore
+  lore(prepareLore: PrepareLore<T> | string) {
+    this.prepareLore = typeof prepareLore === 'string' ? p => [prepareLore, ...p] : prepareLore
 
     return this
   }
@@ -74,6 +74,8 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
         if (!text) return false
 
         const unit = prepareProperty ? prepareProperty(storage[key], key) : storage[key]
+        if (unit === false) return false
+
         return `§7${text}: ${textUnitColorize(unit)}`
       })
       .filter(noBoolean)
@@ -203,7 +205,7 @@ type ParsedSchemaProperty<T extends Schema.Property.Any> = T extends StringConst
 
 type Item = Pick<ItemStack, 'getDynamicProperty' | 'setDynamicProperty' | 'setLore' | 'isStackable' | 'nameTag'>
 
-type PrepareProperty<U = unknown> = (unit: U, key: string) => string
+type PrepareProperty<U = unknown> = (unit: U, key: string) => string | false
 
 type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => string[]
 

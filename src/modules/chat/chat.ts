@@ -4,7 +4,7 @@ import { Sounds } from 'lib/assets/config'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 
-export class ChatBuilder {
+class ChatBuilder {
   db = table<string>('chatCooldown')
 
   settings = Settings.world(...Settings.worldCommon, {
@@ -12,6 +12,7 @@ export class ChatBuilder {
       name: 'Задержка чата',
       description: '0 что бы отключить',
       value: 0,
+      onChange: () => this.updateCooldown(),
     },
     range: {
       name: 'Радиус чата',
@@ -38,19 +39,19 @@ export class ChatBuilder {
     },
   })
 
+  private cooldown: Cooldown
+
+  private updateCooldown() {
+    this.cooldown = new Cooldown(this.settings.cooldown, true, this.db)
+  }
+
   constructor() {
+    this.updateCooldown()
     Command.chatSendListener = event => {
       if (Command.isCommand(event.message)) return
 
       try {
-        const cooldownTime = this.settings.cooldown
-        if (cooldownTime > 0) {
-          const cooldown = new Cooldown(this.db, 'CD', event.sender, this.settings.cooldown)
-
-          // Player is under chat cooldown, show error message
-          if (cooldown.tellIfExpired()) return
-          cooldown.start()
-        }
+        if (!this.cooldown.isExpired(event.sender)) return
 
         const allPlayers = world.getAllPlayers()
 
@@ -104,5 +105,4 @@ export class ChatBuilder {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Chat = new ChatBuilder()

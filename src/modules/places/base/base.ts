@@ -1,4 +1,4 @@
-import { ItemStack, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, Vector, getBlockStatus } from 'lib'
@@ -8,9 +8,9 @@ import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 
 export const BaseItem = new CustomItemWithBlueprint('base')
-  .setTypeId(MinecraftItemTypes.Barrel)
-  .setNameTag('§6База')
-  .setDescription('Поставьте эту бочку и она станет базой.')
+  .typeId(MinecraftItemTypes.Barrel)
+  .nameTag('§6База')
+  .lore('Поставьте эту бочку и она станет базой.')
 
 actionGuard((_, __, ctx) => {
   if (

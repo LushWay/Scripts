@@ -3,12 +3,13 @@ import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecr
 import { MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 
-export class Gunsmith extends ShopNpc {
+export class Mage extends ShopNpc {
   constructor(group: string) {
     super({
       group,
       id: 'gunsmith',
       name: 'Оружейник',
+      dimensionId: 'overworld',
       body: () => 'Чего пожелаешь?',
     })
 

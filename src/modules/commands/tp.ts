@@ -5,8 +5,8 @@ import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { TechCity } from 'modules/places/tech-city/tech-city'
-import { VillageOfExplorers } from 'modules/places/village-of-explorers'
-import { VillageOfMiners } from 'modules/places/village-of-miners'
+import { VillageOfExplorers } from 'modules/places/village-of-explorers/village-of-explorers'
+import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 
 new Command('tp')
   .setPermissions(__RELEASE__ ? 'techAdmin' : 'everybody')

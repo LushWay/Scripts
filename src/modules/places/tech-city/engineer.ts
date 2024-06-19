@@ -1,31 +1,30 @@
 import { ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { Cost, MultiCost } from 'lib/shop/cost'
-import { Shop } from 'lib/shop/shop'
+import { ShopNpc } from 'lib/shop/npc'
 import { CustomItemWithBlueprint } from '../../../lib/rpg/custom-item'
 import { BaseItem } from '../base/base'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
-  .setTypeId(i.PolishedTuffWall)
-  .setNameTag('Пушка')
-  .setDescription('Пушка заглушка, не работает пока')
+  .typeId(i.PolishedTuffWall)
+  .nameTag('Пушка')
+  .lore('Пушка заглушка, не работает пока')
 
 export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
-  .setTypeId(i.PolishedTuffSlab)
-  .setNameTag('Снаряд для пушки')
-  .setDescription('Да.')
+  .typeId(i.PolishedTuffSlab)
+  .nameTag('Снаряд для пушки')
+  .lore('Да.')
 
-export class Engineer {
+export class Engineer extends ShopNpc {
   constructor(public group: string) {
-    const { shop } = Shop.npc({
+    super({
       group,
       id: 'engineer',
       name: 'Инженер',
       body: () => 'Ну типа дай мне чертеж, a я те чета там наколупаю, да',
-      dimensionId: 'overworld',
     })
 
-    shop.menu((menu, player) => {
+    this.shop.menu(menu => {
       function addItem(item: CustomItemWithBlueprint, cost: Cost) {
         menu.addItemStack(item.itemStack, new MultiCost(cost).item(item.blueprint))
       }

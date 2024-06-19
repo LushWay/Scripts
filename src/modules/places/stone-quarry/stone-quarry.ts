@@ -26,7 +26,7 @@ class StoneQuarryBuilder extends PlaceWithSafeArea {
       name: '§6Печкин',
     },
 
-    furnaceTypeIds: [
+    furnaces: [
       MinecraftBlockTypes.BlastFurnace,
       MinecraftBlockTypes.LitBlastFurnace,
       MinecraftBlockTypes.Furnace,
@@ -42,7 +42,7 @@ class StoneQuarryBuilder extends PlaceWithSafeArea {
       name: '§6Пекарь',
     },
 
-    furnaceTypeIds: [MinecraftBlockTypes.LitBlastFurnace],
+    furnaces: [MinecraftBlockTypes.LitBlastFurnace],
     onlyInStoneQuarry: false,
   })
 

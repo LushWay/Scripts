@@ -14,7 +14,7 @@ import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy'
 import { OrePlace } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
-import { VillageOfMiners } from 'modules/places/village-of-miners'
+import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import { randomTeleport } from 'modules/survival/random-teleport'
 import airdropTable from './airdrop'
 

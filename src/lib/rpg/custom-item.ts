@@ -6,33 +6,33 @@ class CustomItem {
     system.run(() => (this.cache = this.itemStack))
   }
 
-  private typeId: string
+  private _typeId: string
 
-  setTypeId(typeId: string) {
-    this.typeId = typeId
+  typeId(typeId: string) {
+    this._typeId = typeId
     return this
   }
 
-  protected nameTag: string
+  protected _nameTag: string
 
-  setNameTag(nameTag: string) {
-    this.nameTag = nameTag
+  nameTag(nameTag: string) {
+    this._nameTag = nameTag
     return this
   }
 
-  private description: string
+  private _description: string
 
-  setDescription(desc: string) {
-    this.description = desc
+  lore(desc: string) {
+    this._description = desc
     return this
   }
 
   get itemStack() {
-    if (!this.typeId) throw new TypeError('No type id specified for custom item ' + this.id)
-    if (!this.nameTag) throw new TypeError('No type nameTag specified for custom item ' + this.id)
-    if (!this.description) throw new TypeError('No type description specified for custom item ' + this.id)
+    if (!this._typeId) throw new TypeError('No type id specified for custom item ' + this.id)
+    if (!this._nameTag) throw new TypeError('No type nameTag specified for custom item ' + this.id)
+    if (!this._description) throw new TypeError('No type description specified for custom item ' + this.id)
 
-    const item = new ItemStack(this.typeId).setInfo('§6' + this.nameTag, '§7' + this.description)
+    const item = new ItemStack(this._typeId).setInfo('§6' + this._nameTag, '§7' + this._description)
     return item
   }
 
@@ -47,7 +47,7 @@ class CustomItem {
 export class CustomItemWithBlueprint extends CustomItem {
   get blueprint() {
     return new ItemStack(i.Paper).setInfo(
-      '§fЧертеж предмета ' + this.nameTag,
+      '§fЧертеж предмета ' + this._nameTag,
       'С помощью него вы можете сделать предмет у инженера',
     )
   }
