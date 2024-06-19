@@ -100,7 +100,6 @@ class ItemLore<T extends TypeSchema> {
     if (!storage) throw new Error('Unable to create item using schema')
 
     for (const [key, value] of Object.entriesStringKeys(config)) storage[key] = value
-
     return { item, storage }
   }
 
@@ -125,7 +124,7 @@ class ItemLore<T extends TypeSchema> {
     for (const [key, { type: defaultValue }] of Object.entries(this.properties)) {
       const isRequired = this.isRequired(defaultValue)
       const saved = itemStack.getDynamicProperty(key)
-      if (typeof saved !== 'string' && isRequired) return
+      if (typeof saved !== 'string' && isRequired && !defaultConfig[key]) return
 
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {
