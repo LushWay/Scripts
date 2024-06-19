@@ -108,13 +108,11 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
       }
     })
 
-    const cooldown = new Cooldown({}, '', player, 1000, false)
+    const cooldown = new Cooldown(1000)
 
     world.beforeEvents.itemUse.subscribe(event => {
       if (event.source.id !== player.id) return
-
-      if (!cooldown.isExpired) return
-      cooldown.start()
+      if (!cooldown.isExpired(player)) return
 
       for (const [, control, onUse] of Object.values(controls)) {
         if (control.is(event.itemStack)) {

@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { util } from './util'
+import { t } from './text'
 
 export class Cooldown {
   static isExpired(timestamp: number, cooldown: number) {
@@ -7,74 +7,47 @@ export class Cooldown {
   }
 
   /**
-   * Generates a unique key for the cooldown in the database
-   *
-   * @param name - The name of the cooldown
-   * @param id - The ID of the player or source related to the cooldown
-   * @returns - The generated key
-   */
-
-  static genDBkey(name: string, id: string): string {
-    return 'COOLDOWN_' + name + ':' + id
-  }
-
-  private key: string
-
-  player: Player | undefined
-
-  /**
    * Create class for manage player cooldowns
    *
-   * @param db Database to store cooldowns
-   * @param prefix Preifx of the cooldown
-   * @param source Id or player that used for generate key and tell messages
-   * @param time Time in ms
+   * @param time - Time in ms
    * @param tell - Whenther to tell player cooldown status or not. Default is `true`
+   * @param db - Database to store cooldowns
    */
-
   constructor(
-    private db: Record<string, unknown>,
-    prefix: string,
-    source: string | Player,
-    private time: number,
-    public tell = true,
+    private readonly time: number,
+    private readonly tell = true,
+    private db: Record<string, unknown> = {},
   ) {
     this.db = db
-    this.key = Cooldown.genDBkey(prefix, typeof source === 'string' ? source : source.id)
-    if (typeof source !== 'string') this.player = source
   }
 
-  start() {
-    this.db[this.key] = Date.now()
-  }
+  private getElapsed(key: string) {
+    const timestamp = this.db[key]
+    if (typeof timestamp !== 'number') return 0
 
-  expire() {
-    Reflect.deleteProperty(this.db, this.key)
-  }
-
-  private get elapsed() {
-    const start = this.db[this.key]
-    if (typeof start !== 'number') return 0
-
-    const elapsed = Date.now() - start
+    const elapsed = Date.now() - timestamp
     if (elapsed <= this.time) return elapsed
 
     return 0
   }
 
-  get isExpired() {
-    return this.elapsed === 0
-  }
+  /**
+   * Checks if cooldown for player is expired and returns true, otherwise tells player about it if {@link this.tell} is
+   * true and returns false
+   *
+   * @param player - Player to check
+   * @returns - Whenether cooldown is expired or not
+   */
+  isExpired(player: Player) {
+    const elapsed = this.getElapsed(player.id)
+    if (elapsed) {
+      if (this.tell) player.fail(t.error.time`§cПодожди еще §f${this.time - elapsed}`)
 
-  tellIfExpired() {
-    const elapsed = this.elapsed
-    if (!elapsed) return true
+      return false
+    } else {
+      this.db[player.id] = Date.now()
 
-    if (this.player && this.tell) {
-      const time = util.ms.remaining(this.time - elapsed)
-      this.player.fail(`§cПодожди еще §f${time.value} §c${time.type}`)
+      return true
     }
-
-    return false
   }
 }
