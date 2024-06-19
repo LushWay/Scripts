@@ -7,8 +7,8 @@ export class Mage extends ShopNpc {
   constructor(group: string) {
     super({
       group,
-      id: 'gunsmith',
-      name: 'Оружейник',
+      id: 'mage',
+      name: 'Маг',
       dimensionId: 'overworld',
       body: () => 'Чего пожелаешь?',
     })

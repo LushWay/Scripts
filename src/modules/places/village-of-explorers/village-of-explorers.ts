@@ -2,6 +2,7 @@ import { ItemStack } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, util } from 'lib'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { Mage } from './mage'
 
 export const BossSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
   '§aМагическая слизь',
@@ -33,6 +34,8 @@ class VillageOfExporersBuilder extends PlaceWithSafeArea {
         '65...256': '50%',
       }).build,
   })
+
+  mage = new Mage(this.group)
 }
 
 export const VillageOfExplorers = new VillageOfExporersBuilder()
