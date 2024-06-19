@@ -151,6 +151,7 @@ export function createPublicGiveItemCommand(
   const command = new Command(name)
     .setDescription(`Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`)
     .setGroup('public')
+    .setPermissions('member')
     .executes(ctx => {
       give(ctx.player)
     })
