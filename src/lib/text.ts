@@ -1,7 +1,7 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
+import { Command } from './command'
 import { ROLES, getRole } from './roles'
 import { util } from './util'
-import { Command } from './command'
 
 export type Text = string
 export type MaybeRawText = string | RawText
@@ -26,21 +26,21 @@ export function textTable(table: Record<string, unknown>, join = true): string |
   return join ? mapped.join('\n') : mapped
 }
 
-export const t = createMulti()
+export const t = createGroup()
 
-function createMulti(options: ColorizingOptions = {}, modifier = false) {
+function createGroup(options: ColorizingOptions = {}, modifier = false) {
   const t = createSingle(options)
   t.roles = createSingle({ roles: true, ...options })
   t.badge = createBadge(options)
   t.num = createNum(options)
-  t.time = createSingle(options)
+  t.time = createTime(options)
   t.raw = createRaw(options)
 
   if (!modifier) {
-    t.header = createMulti({ textColor: '§6', ...options, unitColor: '§f§l' }, true)
-    t.error = createMulti({ textColor: '§c', unitColor: '§f', ...options }, true)
+    t.header = createGroup({ textColor: '§6', ...options, unitColor: '§f§l' }, true)
+    t.error = createGroup({ textColor: '§c', unitColor: '§f', ...options }, true)
   }
-  t.options = options => createMulti(options)
+  t.options = options => createGroup(options)
   return t
 }
 
@@ -87,7 +87,7 @@ function createSingle(
 
 function createBadge(options: ColorizingOptions): (text: TSA, n: number) => Text {
   return createSingle(options, (text, unit) => {
-    if (typeof unit !== 'number') return text + textUnitColorize(unit)
+    if (typeof unit !== 'number') return text + textUnitColorize(unit, options)
     if (unit > 0) return `${text}§8(§c${unit}§8)`
     return text.trimEnd()
   })
@@ -100,7 +100,16 @@ function createNum(options: ColorizingOptions): (text: TSA, n: number, plurals: 
       if (typeof n === 'number') return text + ngettext(n, unit)
     }
 
-    return text + textUnitColorize(unit)
+    return text + textUnitColorize(unit, options)
+  })
+}
+
+function createTime(options: ColorizingOptions): (text: TSA, time: number) => Text {
+  return createSingle(options, (text, unit, i, units) => {
+    if (typeof unit !== 'number') return text + textUnitColorize(unit, options)
+
+    const time = util.ms.remaining(unit)
+    return text + `${textUnitColorize(time.value, options)} ${addDefaultsToOptions(options).textColor}${time.type}`
   })
 }
 

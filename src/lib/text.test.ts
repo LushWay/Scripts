@@ -30,7 +30,9 @@ describe('text', () => {
   })
 
   it('should create nested text', () => {
-    expect(t`А мы любим ${t.roles`вложенные роли этого чела: ${player}`}`).toMatchInlineSnapshot(`"§7А мы любим §f§7вложенные роли этого чела: §5Админ§r §fTest player name§7§7"`)
+    expect(t`А мы любим ${t.roles`вложенные роли этого чела: ${player}`}`).toMatchInlineSnapshot(
+      `"§7А мы любим §f§7вложенные роли этого чела: §5Админ§r §fTest player name§7§7"`,
+    )
   })
 
   it('should apply options', () => {
@@ -88,6 +90,15 @@ describe('text', () => {
     expect(t.num`Было сломано ${n} ${['блок', 'блока', 'блоков']}`).toMatchInlineSnapshot(
       `"§7Было сломано §610§7 блоков§7"`,
     )
+  })
+
+  it('should work with time', () => {
+    expect(t.time`Прошло ${0}`).toMatchInlineSnapshot(`"§7Прошло §f0 §7миллисекунд§7"`)
+    expect(t.time`Прошло ${3000}`).toMatchInlineSnapshot(`"§7Прошло §f3 §7секунды§7"`)
+    expect(t.time`Прошло ${300000}`).toMatchInlineSnapshot(`"§7Прошло §f5 §7минут§7"`)
+
+    // @ts-expect-error
+    expect(t.time`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
   })
 
   it('should work with badge', () => {
