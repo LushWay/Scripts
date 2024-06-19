@@ -1,12 +1,13 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, util } from 'lib'
-import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { City } from '../lib/city'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 
-class StoneQuarryBuilder extends PlaceWithSafeArea {
+class StoneQuarryBuilder extends City {
   constructor() {
     super('StoneQuarry', 'Каменоломня')
+    this.create()
   }
 
   witherBoss = new Boss({
@@ -39,7 +40,7 @@ class StoneQuarryBuilder extends PlaceWithSafeArea {
     npc: {
       group: this.group,
       id: 'foodOvener',
-      name: '§6Пекарь',
+      name: '§6Тетя зина',
     },
 
     furnaces: [MinecraftBlockTypes.LitBlastFurnace],
@@ -47,6 +48,13 @@ class StoneQuarryBuilder extends PlaceWithSafeArea {
   })
 
   gunsmith = new Gunsmith(this.group)
+
+  private create() {
+    this.createKits(
+      normal => normal.item('RedTerracotta').build,
+      donut => donut.item('RedTerracotta').build,
+    )
+  }
 }
 
 export const StoneQuarry = new StoneQuarryBuilder()

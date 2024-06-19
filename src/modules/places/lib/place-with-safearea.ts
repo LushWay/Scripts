@@ -1,7 +1,7 @@
 import { system } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { SafeAreaRegion, Settings, location, locationWithRadius, locationWithRotation, migrateLocationGroup } from 'lib'
+import { SafeAreaRegion, Settings, location, locationWithRadius, locationWithRotation } from 'lib'
 import { actionGuard } from 'lib/region/index'
 
 export class PlaceWithSafeArea {

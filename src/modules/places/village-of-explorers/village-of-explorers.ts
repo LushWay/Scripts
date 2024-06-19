@@ -1,7 +1,7 @@
 import { ItemStack } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, util } from 'lib'
-import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { City } from '../lib/city'
 import { Mage } from './mage'
 
 export const BossSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
@@ -9,9 +9,10 @@ export const BossSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo
   'Используется у Инженера',
 )
 
-class VillageOfExporersBuilder extends PlaceWithSafeArea {
+class VillageOfExporersBuilder extends City {
   constructor() {
     super('VillageOfExporers', 'Деревня исследователей')
+    this.create()
   }
 
   slimeBoss = new Boss({
@@ -36,6 +37,13 @@ class VillageOfExporersBuilder extends PlaceWithSafeArea {
   })
 
   mage = new Mage(this.group)
+
+  private create() {
+    this.createKits(
+      normal => normal.item('Dirt').build,
+      donut => donut.itemStack(BossSlimeBall).build,
+    )
+  }
 }
 
 export const VillageOfExplorers = new VillageOfExporersBuilder()

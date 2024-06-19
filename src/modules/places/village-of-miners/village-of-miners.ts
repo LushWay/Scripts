@@ -1,8 +1,16 @@
-import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { City } from '../lib/city'
 
-class VillageOfMinersBuilder extends PlaceWithSafeArea {
+class VillageOfMinersBuilder extends City {
   constructor() {
     super('VillageOfMiners', 'Деревня шахтеров')
+    this.create()
+  }
+
+  private create() {
+    this.createKits(
+      normal => normal.item('Dirt').build,
+      donut => donut.item('Dirt').build,
+    )
   }
 }
 
