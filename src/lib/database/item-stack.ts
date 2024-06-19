@@ -124,7 +124,7 @@ class ItemLore<T extends TypeSchema> {
     for (const [key, { type: defaultValue }] of Object.entries(this.properties)) {
       const isRequired = this.isRequired(defaultValue)
       const saved = itemStack.getDynamicProperty(key)
-      if (typeof saved !== 'string' && isRequired && !defaultConfig[key]) return
+      if (typeof saved !== 'string' && isRequired && typeof defaultConfig[key] === 'undefined') return
 
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {

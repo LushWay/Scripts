@@ -23,7 +23,6 @@ export class PlaceWithSafeArea {
   ) {
     // Define settings group name
     Settings.world(name, group, {})
-    migrateLocationGroup(name, group)
 
     this.safeAreaLocation = locationWithRadius(group, 'safearea', 'мирная зона')
     this.portalTeleportsTo = locationWithRotation(group, 'portal teleports to', 'портал телепортирует на')

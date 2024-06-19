@@ -3,7 +3,7 @@
 import { Entity, system, world } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { isChunkUnloaded } from 'lib/game-utils'
-import { location, migrateLocationName } from 'lib/location'
+import { location } from 'lib/location'
 import { Region } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/BossArenaRegion'
 import { LootTable } from 'lib/rpg/loot-table'
@@ -88,7 +88,6 @@ export class Boss {
     this.bossEvent = bossEvent
     this.loot = loot
 
-    migrateLocationName('Боссы', id, group, id)
     this.location = location(group, id, name)
     this.arenaRadius = arenaRadius
     this.location.onLoad.subscribe(center => {

@@ -34,22 +34,6 @@ class Location<T extends Vector3> {
     return (group: string, id: string, name: string, fallback?: V) => {
       const location = new this(group, id, fallback)
       Settings.worldMap[group] ??= {}
-
-      if (!Settings.worldDatabase[group][id]) {
-        const old = Settings.worldDatabase[group][name]
-        if (old) {
-          console.debug(t`${group}: ${name} -> ${id} (${old})`)
-          Settings.worldDatabase[group][id] = old
-          Reflect.deleteProperty(Settings.worldDatabase[group], name)
-
-          if (!Object.keys(Settings.worldDatabase[group]).length) {
-            Reflect.deleteProperty(Settings.worldDatabase, group)
-          }
-        } else {
-          console.warn(t.error`${'§4' + group}: No migration for ${name} -> ${id}`)
-        }
-      }
-
       Settings.worldMap[group][id] = {
         name: name,
         description: location.format,
