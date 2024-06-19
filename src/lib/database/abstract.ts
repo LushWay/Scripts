@@ -2,8 +2,8 @@ import { ProxyDatabase } from './proxy'
 
 export type DatabaseDefaultValue<Value> = (key: string) => NoInfer<Value>
 
-export function table<Value>(name: string, defaultValue?: DatabaseDefaultValue<Value>): Record<string, Value>
 export function table<Value>(name: string): Record<string, Value | undefined>
+export function table<Value>(name: string, defaultValue?: DatabaseDefaultValue<Value>): Record<string, Value>
 
 /**
  * Creates proxy-based database that works just like an ordinary ja
