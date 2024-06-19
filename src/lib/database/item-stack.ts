@@ -124,6 +124,8 @@ class ItemLore<T extends TypeSchema> {
 
     for (const [key, { type: defaultValue }] of Object.entries(this.properties)) {
       const isRequired = this.isRequired(defaultValue)
+      const saved = itemStack.getDynamicProperty(key)
+      if (typeof saved !== 'string' && isRequired) return
 
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {
@@ -131,16 +133,9 @@ class ItemLore<T extends TypeSchema> {
           this.prepareItem(itemStack, storage)
         },
 
-        get(): Schema.Property.Saveable {
-          const saved = itemStack.getDynamicProperty(key)
+        get() {
           if (typeof saved === 'string') return JSON.parse(saved) as Schema.Property.Saveable
-          if (defaultConfig[key]) return defaultConfig[key] as Schema.Property.Saveable
-
-          if (isRequired) {
-            throw new TypeError(`Item does not contains required value. Key: ${key}, default value: ${defaultValue}`)
-          }
-
-          return defaultValue as Schema.Property.Saveable
+          return defaultConfig[key] as Schema.Property.Saveable
         },
         enumerable: true,
         configurable: false,
