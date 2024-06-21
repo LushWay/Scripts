@@ -10,7 +10,7 @@ import {
 } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftCameraPresetsTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib/vector'
-import { PersistentSet } from './database/persistent-objects'
+import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
 
 /** Represents location in the specific dimension */

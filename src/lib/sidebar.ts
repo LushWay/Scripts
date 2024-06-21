@@ -82,26 +82,31 @@ export class Sidebar<E = unknown> {
       }
     }
 
-    function wrap(line: string) {
-      return line
-        .split('\n')
-        .map(e => util.wrap(e, options.maxWordCount))
-        .flat()
-        .join('\n')
-    }
-
     if (Array.isArray(content)) {
+      this.clearSidebar(player)
       for (const [i, tip] of content.entries()) {
-        const index = i + 1
-        if (index !== 1 && index !== 2 && index !== 3 && index !== 4 && index !== 5) continue
-
-        player.onScreenDisplay.setTip(index, wrap(tip ?? ''))
+        player.onScreenDisplay.setTip((i + 1) as 1 | 2 | 3 | 4 | 5, this.wrap(tip ?? '', options.maxWordCount))
       }
-      player.onScreenDisplay.setSidebar('')
     } else {
-      for (const i of [1, 2, 3, 4, 5] as const) player.onScreenDisplay.setTip(i, '')
-      player.onScreenDisplay.setSidebar(wrap(content))
+      this.clearTips(player)
+      player.onScreenDisplay.setSidebar(this.wrap(content, options.maxWordCount))
     }
+  }
+
+  private wrap(line: string, maxWordCount: number) {
+    return line
+      .split('\n')
+      .map(e => util.wrap(e, maxWordCount))
+      .flat()
+      .join('\n')
+  }
+
+  private clearSidebar(player: Player) {
+    player.onScreenDisplay.setSidebar('')
+  }
+
+  private clearTips(player: Player) {
+    for (const i of [1, 2, 3, 4, 5] as const) player.onScreenDisplay.setTip(i, '')
   }
 }
 

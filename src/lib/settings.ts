@@ -3,7 +3,7 @@ import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { FormCallback } from 'lib/form/utils'
 import { util } from 'lib/util'
-import { WeakPlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { table } from './database/abstract'
 import { t } from './text'
 
@@ -79,7 +79,7 @@ export class Settings {
   ) {
     this.insertGroup('playerMap', name, group, config as Config)
 
-    const cache = new WeakPlayerMap({ removeOnLeave: true })
+    const cache = new WeakPlayerMap()
 
     const fn = (player: Player): SettingsConfigParsed<Config> => {
       const cached = cache.get(player)

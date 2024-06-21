@@ -1,15 +1,14 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
-import { WeakPlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Region } from './Region'
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RegionEvents {
   /**
    * Player map that contains region list that player is currently in. Updated each second by region interval. Used to
    * emit events such as {@link RegionEvents.onPlayerRegionsChange}
    */
-  static playerInRegionsCache = new WeakPlayerMap<Region[]>({ removeOnLeave: true })
+  static playerInRegionsCache = new WeakPlayerMap<Region[]>()
 
   /**
    * Event that triggers when player regions have changed. Updated each second by region interval. Uses

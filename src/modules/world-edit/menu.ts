@@ -640,7 +640,7 @@ export function WEundoRedoMenu(
   player: Player,
   back: VoidFunction = () => WEmenu(player),
   mode: 'undo' | 'redo' = 'undo',
-  source: string = player.id,
+  [source, we]: [string, WorldEdit] = [player.id, WorldEdit.forPlayer(player)],
   body = '',
 ) {
   const form = new ActionForm(
@@ -653,7 +653,7 @@ export function WEundoRedoMenu(
   form.addButtonBack(back)
 
   form.addButton(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
-    WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', source),
+    WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', [source, we]),
   )
 
   if (is(player.id, 'grandBuilder')) {
@@ -662,14 +662,13 @@ export function WEundoRedoMenu(
     })
   }
 
-  const we = WorldEdit.instances[source]
   const actions = mode === 'undo' ? we.history : we.undos
-  // TODO Maybe group similiar actions
+
   for (const action of actions.slice().reverse()) {
     form.addButton(action.name, () => {
       we.loadBackup(actions, action)
       player.playSound(Sounds.Success)
-      WEundoRedoMenu(player, back, mode, source, '§aУспешно загружено!\n\n')
+      WEundoRedoMenu(player, back, mode, [source, we], '§aУспешно загружено!\n\n')
     })
   }
 
@@ -679,11 +678,11 @@ export function WEundoRedoMenu(
 function WEundoRedoOtherPlayersMenu(player: Player, back: VoidFunction) {
   const form = new ActionForm('Выбрать игрока...').addButtonBack(back)
 
-  for (const playerId of Object.keys(WorldEdit.instances)) {
+  for (const [playerId, we] of WorldEdit.instances.entries()) {
     const name = Player.name(playerId) ?? '<Без имени>'
 
     form.addButton(name, () => {
-      WEundoRedoMenu(player, () => WEundoRedoOtherPlayersMenu(player, back), 'undo', playerId)
+      WEundoRedoMenu(player, () => WEundoRedoOtherPlayersMenu(player, back), 'undo', [playerId, we])
     })
   }
 

@@ -1,6 +1,6 @@
 import { Player, RawMessage, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
-import { WeakPlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 declare module '@minecraft/server' {
   interface HudTitleDisplayOptions {
@@ -64,7 +64,7 @@ type OtherScreenDisplayTypes = Partial<
   >
 >
 
-const titles = new WeakPlayerMap<CommonTitleTypes & OtherScreenDisplayTypes>({ removeOnLeave: true })
+const titles = new WeakPlayerMap<CommonTitleTypes & OtherScreenDisplayTypes>()
 
 type ScreenDisplayOverrideThis = ThisType<
   {

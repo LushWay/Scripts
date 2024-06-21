@@ -1,7 +1,7 @@
 import { Entity, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, world } from '@minecraft/server'
 import { ModalForm, Vector, is } from 'lib'
 import { CustomEntityTypes, CustomItems } from 'lib/assets/config'
-import { WeakPlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG } from '../config'
 import { BaseBrushTool } from '../lib/base-brush-tool'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -156,4 +156,4 @@ WorldEditTool.intervals.push((player, slot) => {
   }
 })
 
-const BRUSH_LOCATORS = new WeakPlayerMap<Entity>({ removeOnLeave: false })
+const BRUSH_LOCATORS = new WeakPlayerMap<Entity>()

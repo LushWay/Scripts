@@ -11,12 +11,12 @@ import {
 import { Vector, getRole, prompt, util } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { table } from 'lib/database/abstract'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { BigStructure } from './big-structure'
 import { Cuboid } from './ccuboid'
 
-// TODO Use Map for instances
 // TODO Add WorldEdit.runMultipleAsyncJobs
 
 interface WeDB {
@@ -25,14 +25,24 @@ interface WeDB {
 }
 
 export class WorldEdit {
-  static db = table<WeDB>('worldEdit')
+  static db = table<WeDB>('worldEdit', () => ({ pos1: Vector.one, pos2: Vector.one }))
 
   static forPlayer(player: Player) {
-    if (player.id in this.instances) return this.instances[player.id]
-    return new WorldEdit(player)
+    const we = this.instances.get(player.id)
+    return we ?? new WorldEdit(player)
   }
 
-  static instances: Record<string, WorldEdit> = {}
+  static instances = new WeakPlayerMap<WorldEdit>({ removeOnLeave: false })
+
+  static {
+    system.runInterval(
+      () => {
+        for (const we of WorldEdit.instances.values()) we.drawSelection()
+      },
+      'we Selection',
+      20,
+    )
+  }
 
   selection: Cuboid | undefined
 
@@ -88,17 +98,11 @@ export class WorldEdit {
   private historyLimit = 100
 
   constructor(private player: Player) {
-    const id = player.id
-    if (id in WorldEdit.instances) return WorldEdit.instances[id]
-    WorldEdit.instances[id] = this
+    const we = WorldEdit.instances.get(player)
+    if (we) return we
 
-    let db = WorldEdit.db[this.player.id]
-    if (typeof db === 'undefined') {
-      db = { pos1: Vector.one, pos2: Vector.one }
-      WorldEdit.db[this.player.id] = db
-    }
-
-    this.db = db
+    WorldEdit.instances.set(player, this)
+    this.db = WorldEdit.db[this.player.id]
     this.updateSelectionCuboids()
   }
 
@@ -412,11 +416,3 @@ export class WorldEdit {
     }
   }
 }
-
-system.runInterval(
-  () => {
-    for (const build of Object.values(WorldEdit.instances)) build.drawSelection()
-  },
-  'we Selection',
-  20,
-)

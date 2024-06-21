@@ -1,7 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 import { Join, SETTINGS_GROUP_NAME, Settings } from 'lib'
 import { Sounds } from 'lib/assets/config'
-import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { PlayerQuest } from './player'
 import { QS } from './step'
 
@@ -46,7 +46,7 @@ export class Quest {
     return db && this.quests.get(db.id)?.getPlayerStep(player, db.i)
   }
 
-  players = new WeakOnlinePlayerMap<PlayerQuest>()
+  players = new WeakPlayerMap<PlayerQuest>({ onLeave: (_, v) => v.list.forEach(e => e.cleanup()) })
 
   /**
    * Creates a Quest and registers it in a collection.
@@ -93,7 +93,7 @@ export class Quest {
   }
 
   getPlayerStep(player: Player, index = this.getActive(player)?.i): QS | undefined {
-    return this.players.get(player)?.value.list[index ?? 0]
+    return this.players.get(player)?.list[index ?? 0]
   }
 
   private createPlayerSteps(player: Player, index: number) {
