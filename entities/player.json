@@ -12,20 +12,7 @@
           "type": "bool",
           "default": false,
           "client_sync": true
-        },
-
-        // used in RP/entities/player.json
-        "sm:minimap_force_hide": {
-          "type": "bool",
-          "default": false,
-          "client_sync": true
         }
-      },
-      "scripts": {
-        "animate": ["minimap"]
-      },
-      "animations": {
-        "minimap": "controller.animation.player.minimap"
       }
     },
     "component_groups": {

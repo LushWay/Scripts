@@ -1,10 +1,10 @@
-import { ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
-import { InventoryIntervalAction } from 'lib/action'
+import { ContainerSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
+import { InventoryInterval } from 'lib/action'
 import { CustomItems } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
-import { WeakOnlinePlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
 
 export class Menu {
@@ -74,42 +74,55 @@ export class Compass {
   })
 
   /** Map of player as key and compass target as value */
-  private static players = new WeakOnlinePlayerMap<Vector3>()
+  private static players = new WeakPlayerMap<Vector3>()
 
-  private static action = InventoryIntervalAction.subscribe(({ player, slot, i }) => {
+  static readonly forceHide = new WeakPlayerSet()
+
+  static {
+    InventoryInterval.slots.subscribe(({ player, slot, i }) => {
+      const isMainhand = i === player.selectedSlotIndex
+      this.setMenu(slot, player, isMainhand)
+    })
+
+    InventoryInterval.offhand.subscribe(({ player, slot }) => {
+      this.setMenu(slot, player, true)
+    })
+  }
+
+  private static setMenu(slot: ContainerSlot, player: Player, isHand: boolean) {
     const isMenu = slot.typeId === CustomItems.Menu
-    if (!slot.typeId?.startsWith(CustomItems.CompassPrefix) && !isMenu) {
-      if (i === player.selectedSlotIndex) {
-        player.setProperty('sm:minimap', false)
-      }
-      return
-    }
+    const isCompass = slot.typeId?.startsWith(CustomItems.CompassPrefix)
 
-    if (i === player.selectedSlotIndex) {
-      player.setProperty('sm:minimap', true)
+    if (!isCompass && !isMenu) {
+      if (isHand) player.setProperty('sm:minimap', false)
+      return
+    } else if (isHand) {
+      if (!this.forceHide.has(player)) player.setProperty('sm:minimap', true)
     }
 
     const target = this.players.get(player)
     if (!target) {
-      if (isMenu) return
-
-      return slot.setItem(Menu.item)
+      if (isCompass) slot.setItem(Menu.item)
+      return
     }
 
-    if (!Vector.valid(target.value)) return
+    const item = this.getCompassItem(player.getViewDirection(), player.location, target)
+    if (!item) return
+    if (slot.typeId === item.typeId) return
 
-    const direction = this.getCompassIndex(player.getViewDirection(), player.location, target.value)
-    const typeId = `${CustomItems.CompassPrefix}${direction}`
-    if (slot.typeId === typeId || typeof direction !== 'number') return
-
-    const item = this.items[direction]
     try {
-      if (typeof item !== 'undefined') slot.setItem(item)
+      slot.setItem(item)
     } catch (e) {}
-  })
+  }
+
+  private static getCompassItem(view: Vector3, origin: Vector3, target: Vector3) {
+    const i = this.getCompassIndex(view, origin, target)
+    if (typeof i === 'number') return this.items[i]
+  }
 
   private static getCompassIndex(view: Vector3, origin: Vector3, target: Vector3) {
-    if (!Vector.valid(view)) return
+    if (!Vector.valid(view) || !Vector.valid(target) || !Vector.valid(origin)) return
+
     const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
     const ot = Vector.multiply(Vector.subtract(target, origin), { x: 1, y: 0, z: 1 }).normalized()
     const cos = Vector.dot(v, ot)

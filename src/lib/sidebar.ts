@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { util } from 'lib/util'
+import { WeakPlayerSet } from './weak-player-storage'
 
 type Format =
   | string
@@ -20,6 +21,8 @@ export type SidebarRawVariables<E> = SidebarVariables<E, SidebarLineCreate<E> | 
 /** Description */
 export class Sidebar<E = unknown> {
   static instances: Sidebar[] = []
+
+  static forceHide = new WeakPlayerSet()
 
   content
 
@@ -67,6 +70,12 @@ export class Sidebar<E = unknown> {
   }
 
   show(player: Player) {
+    if (Sidebar.forceHide.has(player)) {
+      this.clearSidebar(player)
+      this.clearTips(player)
+      return
+    }
+
     const extra = this.getExtra(player)
     const options = this.getOptions(player, extra)
     let content = options.format

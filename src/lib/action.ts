@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
-import { ContainerSlot, Player, system } from '@minecraft/server'
+import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard } from 'lib/region/index'
 import { Vector } from 'lib/vector'
@@ -128,12 +128,12 @@ export class LockAction {
   }
 }
 
-export class InventoryIntervalAction {
-  private static signal = new EventSignal<{ player: Player; slot: ContainerSlot; i: number }>()
+export class InventoryInterval {
+  static slots = new EventSignal<{ player: Player; slot: ContainerSlot; i: number }>()
 
-  static subscribe = EventSignal.bound(this.signal).subscribe
+  static mainhand = new EventSignal<{ player: Player; slot: ContainerSlot }>()
 
-  static unsubscribe = EventSignal.bound(this.signal).unsubscribe
+  static offhand = new EventSignal<{ player: Player; slot: ContainerSlot }>()
 
   static {
     system.runPlayerInterval(
@@ -144,22 +144,16 @@ export class InventoryIntervalAction {
         if (!container) return
 
         const selectedSlot = player.selectedSlotIndex
-
         for (const [i, slot] of container.slotEntries()) {
-          if (i === selectedSlot) EventSignal.emit(MainhandIntervalAction.signal, { player, slot })
-          EventSignal.emit(this.signal, { player, slot, i })
+          if (i === selectedSlot) EventSignal.emit(this.mainhand, { player, slot })
+          EventSignal.emit(this.slots, { player, slot, i })
         }
+
+        const offhand = player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Offhand)
+        if (offhand) EventSignal.emit(this.offhand, { player, slot: offhand })
       },
       'InventoryIntervalAction',
       5,
     )
   }
-}
-
-export class MainhandIntervalAction {
-  static signal = new EventSignal<{ player: Player; slot: ContainerSlot }>()
-
-  static subscribe = EventSignal.bound(this.signal).subscribe
-
-  static unsubscribe = EventSignal.bound(this.signal).subscribe
 }

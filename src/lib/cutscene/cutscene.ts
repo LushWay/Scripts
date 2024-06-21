@@ -2,9 +2,10 @@ import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
+import { Compass, Sidebar } from 'lib'
 import { table } from 'lib/database/abstract'
 import { restorePlayerCamera } from 'lib/game-utils'
-import { WeakPlayerMap } from 'lib/weak-player-map'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 /**
  * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
@@ -53,7 +54,6 @@ export class Cutscene {
     player: Player
     controller: AbortController
   }>({
-    removeOnLeave: true,
     onLeave: playerId => this.exit(playerId),
   })
 
@@ -91,8 +91,8 @@ export class Cutscene {
     }
 
     player.onScreenDisplay.hideAllExcept([])
-    player.setProperty('sm:minimap_force_hide', true)
-    // TODO Hide other menu (tips, sidebar)
+    Compass.forceHide.add(player)
+    Sidebar.forceHide.add(player)
 
     const controller = { cancel: false }
     this.forEachPoint(
@@ -217,10 +217,11 @@ export class Cutscene {
     this.current.delete(playerId)
     if (player instanceof Player) {
       restorePlayerCamera(player, this.restoreCameraTime)
-      player.setProperty('sm:minimap_force_hide', false)
       system.runTimeout(
         () => {
           if (player.isValid()) player.onScreenDisplay.resetHudElements()
+          Compass.forceHide.delete(player)
+          Sidebar.forceHide.delete(player)
         },
         'restoreCutsceneHud',
         this.restoreCameraTime * TicksPerSecond,
