@@ -1,8 +1,7 @@
-import { ContainerSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
+import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player } from '@minecraft/server'
 import { InventoryInterval } from 'lib/action'
 import { CustomItems } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
-import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
@@ -29,31 +28,35 @@ export class Menu {
   static give
 
   static {
-    const { give, command } = createPublicGiveItemCommand('menu', this.item, another => {
-      if (another.typeId === this.item.typeId || another.typeId.startsWith('sm:compass')) return true
-      return false
-    })
+    const { give, command } = createPublicGiveItemCommand('menu', this.item, another => this.isMenu(another))
 
     this.give = give
 
     this.command = command
 
-    world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
-      if (!(player instanceof Player)) return
-      if (itemStack.typeId !== this.item.typeId && !itemStack.typeId.startsWith(CustomItems.CompassPrefix)) return
+    // world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
+    //   if (!(player instanceof Player)) return
+    //   if (!this.isMenu(itemStack)) return
 
-      util.catch(() => {
-        const menu = this.open(player)
-
-        if (menu) menu.show(player)
-      })
-    })
+    //   util.catch(() => {
+    //     const menu = this.open(player)
+    //     if (menu) menu.show(player)
+    //   })
+    // })
   }
 
   static open(player: Player): ActionForm | false {
     new MessageForm('Меню выключено', 'Все еще в разработке').show(player)
 
     return false
+  }
+
+  static isCompass(slot: Pick<ContainerSlot, 'typeId'>) {
+    return !!slot.typeId?.startsWith(CustomItems.CompassPrefix)
+  }
+
+  static isMenu(slot: Pick<ContainerSlot, 'typeId'>) {
+    return this.isCompass(slot) || slot.typeId === this.item.typeId
   }
 }
 
@@ -78,31 +81,35 @@ export class Compass {
 
   static readonly forceHide = new WeakPlayerSet()
 
+  private static slotInfo(player: Player, slot: ContainerSlot, i: number) {
+    const isMainhand = player.selectedSlotIndex === i
+    const isMenu = Menu.isMenu(slot)
+    const offhand = isMainhand && player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Offhand)
+    const isOffhandMenu = offhand && Menu.isMenu(offhand)
+
+    return { isMenu, isMainhand, isOffhandMenu, offhand }
+  }
+
   static {
     InventoryInterval.slots.subscribe(({ player, slot, i }) => {
-      const isMainhand = i === player.selectedSlotIndex
-      this.setMenu(slot, player, isMainhand)
-    })
+      const { isMainhand, isMenu, isOffhandMenu, offhand } = this.slotInfo(player, slot, i)
 
-    InventoryInterval.offhand.subscribe(({ player, slot }) => {
-      this.setMenu(slot, player, true)
+      if ((isMainhand && isMenu) || isOffhandMenu) {
+        if (!this.forceHide.has(player)) player.setProperty('sm:minimap', true)
+      } else {
+        if (isMainhand) player.setProperty('sm:minimap', false)
+        return
+      }
+
+      this.updateCompassInSlot(slot, player)
+      if (isMainhand && offhand) this.updateCompassInSlot(offhand, player)
     })
   }
 
-  private static setMenu(slot: ContainerSlot, player: Player, isHand: boolean) {
-    const isMenu = slot.typeId === CustomItems.Menu
-    const isCompass = slot.typeId?.startsWith(CustomItems.CompassPrefix)
-
-    if (!isCompass && !isMenu) {
-      if (isHand) player.setProperty('sm:minimap', false)
-      return
-    } else if (isHand) {
-      if (!this.forceHide.has(player)) player.setProperty('sm:minimap', true)
-    }
-
+  private static updateCompassInSlot(slot: ContainerSlot, player: Player) {
     const target = this.players.get(player)
     if (!target) {
-      if (isCompass) slot.setItem(Menu.item)
+      if (Menu.isCompass(slot)) slot.setItem(Menu.item)
       return
     }
 
@@ -116,11 +123,6 @@ export class Compass {
   }
 
   private static getCompassItem(view: Vector3, origin: Vector3, target: Vector3) {
-    const i = this.getCompassIndex(view, origin, target)
-    if (typeof i === 'number') return this.items[i]
-  }
-
-  private static getCompassIndex(view: Vector3, origin: Vector3, target: Vector3) {
     if (!Vector.valid(view) || !Vector.valid(target) || !Vector.valid(origin)) return
 
     const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
@@ -128,7 +130,9 @@ export class Compass {
     const cos = Vector.dot(v, ot)
     const sin = Vector.dot(Vector.cross(ot, v), Vector.up)
     const angle = Math.atan2(sin, cos)
-    return Math.floor((16 * angle) / Math.PI + 16) || 0
+    const i = Math.floor((16 * angle) / Math.PI + 16) || 0
+
+    if (typeof i === 'number') return this.items[i]
   }
 }
 
