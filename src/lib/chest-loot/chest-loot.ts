@@ -9,11 +9,9 @@ import { t } from '../text'
 import ChestLootAnimation from './animation'
 
 export class ChestLoot {
-  static floatingTextDynamicProperty = 'chestloot:text'
-
   static chests = new Map<string, ChestLoot>()
 
-  static getChestName(id: string) {
+  static getName(id: string) {
     return ChestLoot.chests.get(id)?.displayName ?? 'Неизвестный'
   }
 
@@ -59,10 +57,7 @@ export class ChestLoot {
 
   private onInteract(player: Player) {
     system.delay(() => {
-      if (!this.location.valid) {
-        player.fail('Сундук еще не готов...')
-        return
-      }
+      if (!this.location.valid) return
 
       const storage = schema.parse(player.mainhand())
       if (!storage) {
@@ -71,7 +66,7 @@ export class ChestLoot {
       }
 
       if (storage.chest !== this.id) {
-        const name = ChestLoot.getChestName(storage.chest)
+        const name = ChestLoot.getName(storage.chest)
         player.fail(t.error`Ключ для ${name} не подходит к сундуку ${this.displayName}`)
         return
       }
@@ -84,6 +79,7 @@ export class ChestLoot {
     player.success(t`Открыт сундук ${this.displayName}!`, false)
     player.mainhand().setItem(undefined)
 
+    console.log(new Array(10).fill(null).map(e => this.lootTable.generateOne().nameTag))
     this.animation.start(player, this.lootTable.generateOne(), location)
   }
 
@@ -93,7 +89,7 @@ export class ChestLoot {
 const schema = new ItemLoreSchema('chestloot')
   .property('chest', String)
 
-  .nameTag((_, storage) => t.header`Ключ для сундука ${ChestLoot.getChestName(storage.chest)}`)
+  .nameTag((_, storage) => t.header`Ключ для сундука ${ChestLoot.getName(storage.chest)}`)
   .lore(lore => [t`Используйте этот ключ, чтобы открыть сундук с лутом!`, ...lore])
 
   .build()

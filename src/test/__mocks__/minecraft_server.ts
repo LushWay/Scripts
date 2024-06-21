@@ -200,6 +200,10 @@ export class ItemType {
 }
 
 export class ItemStack extends DynamicPropertiesProvider {
+  nameTag: string
+  getComponent() {
+    return
+  }
   typeId: string
   readonly type: ItemType
 
@@ -221,7 +225,9 @@ export class ItemStack extends DynamicPropertiesProvider {
   }
 
   clone() {
-    return new ItemStack(this.typeId, this.amount)
+    const item = new ItemStack(this.typeId, this.amount)
+    Object.assign(item, this)
+    return item
   }
 
   maxAmount = 64

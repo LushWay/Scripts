@@ -2,6 +2,7 @@ import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
+import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 
 export class Mage extends ShopNpc {
   constructor(group: string) {
@@ -18,12 +19,6 @@ export class Mage extends ShopNpc {
         .addSection('Улучшить оружие', form => {
           form
             .addItemModifier(
-              'Улучшить незеритовый меч до алмазного',
-              new MultiCost().item(i.NetheriteIngot, 10).item(i.GoldIngot, 5).item(i.OakPlanks, 100).money(1000),
-              item => item.typeId === i.DiamondSword,
-              slot => this.upgradeDiamondSwordToNetherite(slot),
-            )
-            .addItemModifier(
               'Улучшить остроту',
               new MultiCost().item(i.LapisLazuli, 3).money(10),
               item => item.typeId.endsWith('sword'),
@@ -38,10 +33,16 @@ export class Mage extends ShopNpc {
             slot => this.updateEnchatnment(slot, e.Protection, 1),
           )
         })
-        .addSection('Все для рейда', form => {
-          form.addItemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
-          form.addItemStack(new ItemStack(i.Gunpowder, 10), new MoneyCost(100))
-          form.addItemStack(new ItemStack(i.DiamondSword), new MoneyCost(100))
+        .addSection('Все для магии', form => {
+          form.addSection('Грибы', form => {
+            form.addItemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
+            form.addItemStack(new ItemStack(i.RedMushroom), new MoneyCost(200))
+          })
+          form.addSection('Зелья', form => {
+            form.addItemStack(new ItemStack(i.SplashPotion), new MoneyCost(10))
+          })
+          form.addItemStack(IceBombItem, new MoneyCost(100))
+          form.addItemStack(FireBallItem, new MoneyCost(100))
         })
     })
   }
@@ -55,18 +56,5 @@ export class Mage extends ShopNpc {
       })
       slot.setItem(item)
     }
-  }
-
-  upgradeDiamondSwordToNetherite(slot: ContainerSlot) {
-    const slotItem = slot.getItem()
-    if (!slotItem) return
-    const item = new ItemStack(i.NetheriteSword)
-    item.setLore(slot.getLore())
-
-    if (item.enchantable && slotItem.enchantable)
-      item.enchantable.addEnchantments(slotItem.enchantable.getEnchantments())
-
-    if (item.durability && slotItem.durability) item.durability.damage = slotItem.durability.damage
-    slot.setItem(item)
   }
 }

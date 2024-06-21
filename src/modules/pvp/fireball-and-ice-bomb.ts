@@ -1,9 +1,10 @@
-import { Entity, system, world } from '@minecraft/server'
+import { Entity, ItemStack, system, world } from '@minecraft/server'
 
-import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Vector, util } from 'lib'
+import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { util } from 'lib'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 // TODO Make custom items and throw effects work properly
+// TODO FIX ALL THAT BUGGED SHIT
 // may use projectileComponent in 1.9.0-beta
 
 // Snow bomb / Fireball
@@ -27,6 +28,15 @@ import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 //   })
 // })
 
+export const FireBallItem = new ItemStack('sm:fireball').setInfo(
+  '§4Огненный шар\n§7(use)',
+  'Используйте, чтобы отправить все в огненный ад',
+)
+export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
+  '§3Снежная бомба\n§7(use)',
+  'Используйте, чтобы отправить все к снежной королеве под льдину',
+)
+
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
     if (!event.entity.isValid()) return
@@ -41,8 +51,7 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
     const location = event.entity.location
     const dimension = event.entity.dimension
     system.delay(() => {
-      event.entity.teleport(Vector.zero)
-      event.entity.remove()
+      if (event.entity.isValid()) event.entity.remove()
       dimension.createExplosion(location, 1, {
         causesFire: true,
         breaksBlocks: true,
@@ -61,18 +70,24 @@ const ICE_BOMB_TRANSOFORM: Record<string, string> = {
   [MinecraftBlockTypes.FlowingLava]: MinecraftBlockTypes.Stone,
 }
 
-let entities: Entity[] = []
-system.runInterval(
-  () => {
-    entities = world.overworld.getEntities({ type: MinecraftEntityTypes.Snowball })
-  },
-  'ice bomb update cached entities',
-  10,
-)
+// TODO Standartized onSpawnByPlayer event for entities like this
+const iceBombs: Entity[] = []
+
+world.afterEvents.itemUse.subscribe(event => {
+  if (!event.itemStack.is(IceBombItem)) return
+
+  const entity = event.source.dimension.getEntities({
+    location: event.source.location,
+    maxDistance: 3,
+    type: MinecraftEntityTypes.Snowball,
+  })[0]
+
+  if (typeof entity !== 'undefined') iceBombs.push(entity)
+})
 
 system.runInterval(
   () => {
-    for (const entity of entities) {
+    for (const entity of iceBombs) {
       if (!entity.isValid()) continue
 
       const block = entity.dimension.getBlock(entity.location)

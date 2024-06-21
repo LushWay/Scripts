@@ -14,22 +14,13 @@ export class Gunsmith extends ShopNpc {
 
     this.shop.menu(form => {
       form
-        .addSection('Улучшить оружие', form => {
-          form
-            .addItemModifier(
-              'Улучшить незеритовый меч до алмазного',
-              new MultiCost().item(i.NetheriteIngot, 10).item(i.GoldIngot, 5).item(i.OakPlanks, 100).money(1000),
-              item => item.typeId === i.DiamondSword,
-              slot => this.upgradeDiamondSwordToNetherite(slot),
-            )
-            .addItemModifier(
-              'Улучшить остроту',
-              new MultiCost().item(i.LapisLazuli, 3).money(10),
-              item => item.typeId.endsWith('sword'),
-              slot => this.updateEnchatnment(slot, e.Sharpness, 1),
-            )
-        })
-        .addSection('Улучшить броню', form => {
+        .addItemModifier(
+          'Улучшить незеритовый меч до алмазного',
+          new MultiCost().item(i.NetheriteIngot, 10).item(i.GoldIngot, 5).item(i.OakPlanks, 100).money(1000),
+          item => item.typeId === i.DiamondSword,
+          slot => this.upgradeDiamondSwordToNetherite(slot),
+        )
+        .addSection('Броня', form => {
           form.addItemModifier(
             'Улучшить защиту',
             new MultiCost().item(i.LapisLazuli, 3).money(10),
@@ -40,7 +31,7 @@ export class Gunsmith extends ShopNpc {
         .addSection('Все для рейда', form => {
           form.addItemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
           form.addItemStack(new ItemStack(i.Gunpowder, 10), new MoneyCost(100))
-          form.addItemStack(new ItemStack(i.DiamondSword), new MoneyCost(100))
+          form.addItemStack(new ItemStack(i.TntMinecart, 1), new MoneyCost(400))
         })
     })
   }

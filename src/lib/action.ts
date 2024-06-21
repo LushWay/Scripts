@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
-import { ContainerSlot, Player, system, world } from '@minecraft/server'
+import { ContainerSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard } from 'lib/region/index'
 import { Vector } from 'lib/vector'
@@ -10,7 +10,7 @@ type PlayerCallback = (player: Player) => void
 
 export class PlaceAction {
   private static placeId(place: Vector3, dimension: Dimensions) {
-    return Vector.string(place) + dimension
+    return Vector.string(Vector.floor(place)) + ' ' + dimension
   }
 
   static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: Dimensions = 'overworld') {
@@ -52,10 +52,6 @@ export class PlaceAction {
   private static interactions = new Map<string, Set<PlayerCallback>>()
 
   static {
-    world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-      if (this.emit('interactions', event.block, event.player, event.player.dimension.type)) event.cancel = true
-    })
-
     system.runPlayerInterval(
       player => this.emit('enters', Vector.floor(player.location), player, player.dimension.type),
       'PlaceAction.enters',
@@ -66,9 +62,10 @@ export class PlaceAction {
       // Allow using any block specified by interaction
       if (
         ctx.type === 'interactWithBlock' &&
-        this.placeId(ctx.event.block, ctx.event.block.dimension.type) in this.interactions
-      )
-        return true
+        this.emit('interactions', ctx.event.block, ctx.event.player, ctx.event.player.dimension.type)
+      ) {
+        return false
+      }
     }, 100000)
   }
 }

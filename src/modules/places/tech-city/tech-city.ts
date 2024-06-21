@@ -1,3 +1,4 @@
+import { Loot } from 'lib'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { CannonBulletItem, CannonItem, Engineer } from './engineer'
@@ -15,7 +16,7 @@ class TechCityBuilder extends City {
       normal =>
         normal
           .itemStack(CannonItem.blueprint)
-          .chance('20%')
+          .chance('10%')
 
           .itemStack(CannonBulletItem.blueprint)
           .chance('10%')
@@ -25,27 +26,27 @@ class TechCityBuilder extends City {
             '20...40': '70%',
             '41...64': '30%',
           })
-          .chance('5%').build,
+          .chance('10%').build,
 
       donut =>
         donut
           .itemStack(CannonBulletItem.blueprint)
-          .chance('40%')
+          .chance('3%')
 
           .itemStack(CannonBulletItem.itemStack)
-          .chance('0.004%')
+          .chance('3%')
 
           .itemStack(CannonItem.blueprint)
-          .chance('30%')
+          .chance('2%')
 
           .itemStack(CannonItem.itemStack)
-          .chance('0.003%')
+          .chance('2%')
 
           .itemStack(BaseItem.blueprint)
-          .chance('20%')
+          .chance('1%')
 
           .itemStack(BaseItem.itemStack)
-          .chance('0.002%').build,
+          .chance('1%').build,
     )
 
     new Command('techcity').setPermissions('techAdmin').executes(ctx => {

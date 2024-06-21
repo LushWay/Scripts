@@ -131,7 +131,9 @@ export function itemDescription(
   return {
     rawtext: [
       { text: c },
-      item.nameTag ? { text: item.nameTag.replaceAll(/§./g, '') } : { translate: itemLocaleName(item) },
+      item.nameTag
+        ? { text: item.nameTag.replaceAll(/§./g, '').replace(/\n.*/, '') }
+        : { translate: itemLocaleName(item) },
       amount && item.amount ? { text: ` §r§f${c}x${item.amount}` } : false,
     ].filter(noBoolean),
   }

@@ -136,7 +136,7 @@ export class ShopForm {
       } else {
         const { name, onOpen } = button
 
-        form.addButton(name, () => {
+        form.addButton(t.options({ unitColor: '§3' }).raw`${name}`, () => {
           const form = new ShopForm(t.header.raw`${this.title} > ${name}`, this.body)
           onOpen(form)
           form.show(player, '', () => this.show(player))
