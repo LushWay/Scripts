@@ -56,19 +56,6 @@ describe('EventSignal', () => {
     expect(callback1).toHaveBeenCalledTimes(1)
     expect(callback2).toHaveBeenCalledTimes(1)
   })
-
-  it('should bind subscribe and unsubscribe methods', () => {
-    const boundSignal = EventSignal.bound(signal)
-
-    const callback = vi.fn()
-    boundSignal.subscribe(callback)
-    EventLoader.emit(signal, 'testData')
-    expect(callback).toHaveBeenCalledTimes(1)
-
-    boundSignal.unsubscribe(callback)
-    EventLoader.emit(signal, 'testData')
-    expect(callback).toHaveBeenCalledTimes(1)
-  })
 })
 
 describe('EventLoader', () => {
