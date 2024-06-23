@@ -25,6 +25,7 @@ describe('item stack', () => {
       owned: true,
     })
 
+    expect(storage).toEqual({ key: 'defaultkey', owner: 'Имя', owned: true, someOptionalWithDefault: 3000 })
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
         "§r§f§7Владелец: §fИмя",

@@ -123,8 +123,8 @@ class ItemLore<T extends TypeSchema> {
 
     for (const [key, { type: defaultValue }] of Object.entries(this.properties)) {
       const isRequired = this.isRequired(defaultValue)
-      const saved = itemStack.getDynamicProperty(key)
-      if (typeof saved !== 'string' && isRequired && typeof defaultConfig[key] === 'undefined') return
+      const getSaved = () => itemStack.getDynamicProperty(key)
+      if (typeof getSaved() !== 'string' && isRequired && typeof defaultConfig[key] === 'undefined') return
 
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {
@@ -133,8 +133,10 @@ class ItemLore<T extends TypeSchema> {
         },
 
         get() {
+          const saved = getSaved()
           if (typeof saved === 'string') return JSON.parse(saved) as Schema.Property.Saveable
-          return defaultConfig[key] as Schema.Property.Saveable
+          if (!isRequired && typeof defaultValue !== 'undefined') return defaultValue
+          return defaultConfig[key]
         },
         enumerable: true,
         configurable: false,
@@ -199,7 +201,7 @@ type ParsedSchemaProperty<T extends Schema.Property.Any> = T extends StringConst
 
 type Item = Pick<ItemStack, 'getDynamicProperty' | 'setDynamicProperty' | 'setLore' | 'isStackable' | 'nameTag'>
 
-type PrepareProperty<U = unknown> = (unit: U, key: string) => string | false
+type PrepareProperty<U = any> = (unit: U, key: string) => string | false
 
 type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => string[]
 
