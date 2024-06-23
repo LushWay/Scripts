@@ -4,6 +4,8 @@
     "allowJs": true,
     "checkJs": true,
     "noEmit": true,
+    "strict": true,
+    "strictBindCallApply": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,
