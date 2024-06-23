@@ -3,7 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
 import { PlaceAction } from '../action'
-import { ItemLoreSchema, ItemLoreStorage } from '../database/item-stack'
+import { ItemLoreSchema } from '../database/item-stack'
 import { SafeLocation, ValidLocation, location } from '../location'
 import { t } from '../text'
 import ChestLootAnimation from './animation'
@@ -71,11 +71,11 @@ export class ChestLoot {
         return
       }
 
-      this.open(player, storage, this.location)
+      this.open(player, this.location)
     })
   }
 
-  private open(player: Player, storage: ItemLoreStorage<typeof schema>, location: Vector3) {
+  private open(player: Player, location: Vector3) {
     player.success(t`Открыт сундук ${this.displayName}!`, false)
     player.mainhand().setItem(undefined)
 

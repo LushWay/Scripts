@@ -56,6 +56,31 @@ describe('EventSignal', () => {
     expect(callback1).toHaveBeenCalledTimes(1)
     expect(callback2).toHaveBeenCalledTimes(1)
   })
+
+  it('should work with multiple arguments', () => {
+    const callback = vi.fn()
+
+    const signal = new EventSignal<[string, number, boolean], false>()
+    signal.subscribe(callback)
+    signal.subscribe(arg => {
+      expect(arg).toEqual(['string', 3, false])
+      return false
+    })
+
+    EventSignal.emit(signal, ['string', 3, false])
+
+    expect(callback.mock.calls).toEqual([[['string', 3, false]]])
+  })
+
+  it('should work with multiple arguments', () => {
+    const callback = vi.fn()
+
+    const signal = new EventSignal<unknown, false, (a: string, b: number, c: boolean) => false>()
+    signal.subscribe(callback)
+
+    EventSignal.emit(signal, 'string', 3, false)
+    expect(callback.mock.calls).toEqual([['string', 3, false]])
+  })
 })
 
 describe('EventLoader', () => {
@@ -144,6 +169,9 @@ describe('EventLoaderWithArg', () => {
     EventLoaderWithArg.load(loader, 300)
     const callback2 = vi.fn()
     loader.subscribe(callback2)
+    loader.subscribe(arg => {
+      expect(arg).toBe(300)
+    })
     expect(callback2).toHaveBeenCalledWith(300)
   })
 })

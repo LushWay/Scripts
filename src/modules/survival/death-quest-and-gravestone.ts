@@ -71,7 +71,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
 
   const places = PlaceWithSafeArea.places
     .map(place => ({
-      distance: Vector.distance(place.safeArea.center, deadAt) - place.safeArea.radius,
+      distance: place.safeArea ? Vector.distance(place.safeArea.center, deadAt) - place.safeArea.radius : 0,
       place,
     }))
     .sort((a, b) => a.distance - b.distance)

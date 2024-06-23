@@ -4,12 +4,12 @@ import { QS, QSBuilder } from '../step'
 
 /** Waits for item in the inventory */
 export class QSItem extends QS {
-  isItem: (item: ContainerSlot) => boolean
+  isItem: (item: ContainerSlot) => boolean = () => false
 
-  protected activate: QS.Activator<this> = ctx => {
+  protected activate() {
     const action = InventoryInterval.slots.subscribe(({ player, slot }) => {
-      if (player.id !== ctx.player.id) return
-      if (ctx.isItem(slot)) ctx.next()
+      if (player.id !== this.player.id) return
+      if (this.isItem(slot)) this.next()
     })
 
     return { cleanup: () => InventoryInterval.slots.unsubscribe(action) }

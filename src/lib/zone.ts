@@ -12,7 +12,7 @@ const inRange = (value: number, min: number, max: number) => value <= max && val
 export class Zone {
   center
 
-  lastRadius: number
+  lastRadius = 0
 
   radius
 

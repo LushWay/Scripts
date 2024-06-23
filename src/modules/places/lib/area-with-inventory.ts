@@ -4,7 +4,7 @@ import { isNotPlaying } from 'lib/game-utils'
 export abstract class AreaWithInventory {
   static places: AreaWithInventory[] = []
 
-  inventoryName: InventoryTypeName
+  abstract inventoryName: InventoryTypeName
 
   constructor() {
     AreaWithInventory.places.push(this)

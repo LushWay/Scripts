@@ -1,21 +1,28 @@
 import { table } from 'lib/database/abstract'
 import { RegionPermissions } from './Region'
 
-interface CubeRegionSave {
-  t: 'c'
-  from: VectorXZ
-  to: VectorXZ
+export type RLDB = JsonObject | undefined
+
+export interface RegionSave {
+  /** Region type */
+  t: string
+  /** Linked database */
+  ldb?: RLDB
   dimensionId: Dimensions
   permissions: Partial<RegionPermissions>
 }
 
-interface RadiusRegionSave {
+export interface CubeRegionSave extends RegionSave {
+  t: 'c'
+  from: VectorXZ
+  to: VectorXZ
+}
+
+export interface RadiusRegionSave extends RegionSave {
   t: 'r'
   st: string
   radius: number
   center: Vector3
-  dimensionId: Dimensions
-  permissions: Partial<RegionPermissions>
 }
 
 export const RegionDatabase = table<CubeRegionSave | RadiusRegionSave>('region', () => ({

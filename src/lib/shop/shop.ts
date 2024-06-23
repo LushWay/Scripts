@@ -47,7 +47,7 @@ export class Shop {
     return this
   }
 
-  private getMenu: ShopMenuGenerator
+  private getMenu: ShopMenuGenerator = menu => menu
 
   /**
    * Sets shop menu generator function

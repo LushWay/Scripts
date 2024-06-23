@@ -20,6 +20,7 @@ export class Temporary {
   /** List of functions that will be called on clear */
   protected cleaners: VoidFunction[] = []
 
+  // @ts-expect-error Assignment is done.
   protected proxies: ProxiedSubscribers
 
   /** Weather events are unsubscribed or not */
@@ -98,7 +99,11 @@ export class Temporary {
         if (typeof value !== 'function') return value
 
         return (...args: unknown[]) => {
-          const handle = value.call(target, ...args) as unknown
+          const handle = value.call(
+            target,
+            // @ts-expect-error Huuuuh idk
+            ...args,
+          )
           if (typeof handle === 'number') this.cleaners.push(() => system.clearRun(handle))
 
           return handle

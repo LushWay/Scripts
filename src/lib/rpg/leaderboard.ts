@@ -106,7 +106,7 @@ export class Leaderboard {
     Leaderboard.db[this.entity.id] = this.info
   }
 
-  private objective: ScoreboardObjective
+  private objective?: ScoreboardObjective
 
   set scoreboard(v) {
     this.objective = v
@@ -114,7 +114,7 @@ export class Leaderboard {
 
   get scoreboard() {
     return (
-      (this.objective as Nullable<typeof this.objective>) ??
+      this.objective ??
       (this.objective =
         world.scoreboard.getObjective(this.info.objective) ??
         world.scoreboard.addObjective(this.info.objective, this.info.displayName))

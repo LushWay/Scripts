@@ -6,21 +6,21 @@ class CustomItem {
     system.run(() => (this.cache = this.itemStack))
   }
 
-  private _typeId: string
+  private _typeId: string | undefined
 
   typeId(typeId: string) {
     this._typeId = typeId
     return this
   }
 
-  protected _nameTag: string
+  protected _nameTag: string | undefined
 
   nameTag(nameTag: string) {
     this._nameTag = nameTag
     return this
   }
 
-  private _description: string
+  private _description: string | undefined
 
   lore(desc: string) {
     this._description = desc
@@ -47,7 +47,7 @@ class CustomItem {
 export class CustomItemWithBlueprint extends CustomItem {
   get blueprint() {
     return new ItemStack(i.Paper).setInfo(
-      '§fЧертеж предмета ' + this._nameTag,
+      '§fЧертеж предмета ' + (this._nameTag ?? 'Неизвестный'),
       'С помощью него вы можете сделать предмет у инженера',
     )
   }

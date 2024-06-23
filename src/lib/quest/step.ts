@@ -7,7 +7,7 @@ import { Quest } from './quest'
 
 export namespace QS {
   export type Text = string | TextFn
-  export type TextFn = (...args: unknown[]) => string
+  export type TextFn = (...args: any[]) => string
 
   export type Activator<T extends QS> = (ctx: T, firstTime: boolean) => Cleanup
 
@@ -19,7 +19,7 @@ export namespace QS {
 export abstract class QSBuilder<S extends QS> {
   constructor(protected readonly step: S) {}
 
-  create(args: [text: QS.Text, ...args: unknown[]]) {
+  create(args: [text: QS.Text, ...args: any[]]) {
     this.step.text = this.toFn(args[0])
   }
 
@@ -59,7 +59,7 @@ export abstract class QSBuilder<S extends QS> {
 }
 
 /** Quest step base class */
-export abstract class QS<DB = unknown> extends Temporary {
+export abstract class QS<DB = any> extends Temporary {
   constructor(
     public quest: Quest,
     public player: Player,
@@ -73,19 +73,21 @@ export abstract class QS<DB = unknown> extends Temporary {
 
   description?: QS.TextFn
 
-  private activators = new Set<QS.Activator<this>>()
+  private activators = new Set<QS.Activator<any>>()
 
   /**
    * Adds callback function that will be called when quest step is becoming active
    *
    * @param callback - Callback function
    */
-  onActivate(callback: QS.Activator<this>) {
+  onActivate(callback: QS.Activator<any>) {
     this.activators.add(callback)
   }
 
   /** Hook for custom quest steps to run */
-  protected abstract activate: QS.Activator<this>
+  protected abstract activate(firstRun: boolean): QS.Cleanup
+
+  restoring = false
 
   /**
    * Enters player in this step
@@ -93,7 +95,9 @@ export abstract class QS<DB = unknown> extends Temporary {
    * @param firstTime - Whenether function is called in quest restore mode or in first time
    */
   enter(firstTime: boolean) {
-    this.activators.add(this.activate)
+    const cleanup = this.activate(firstTime)
+    if (cleanup) this.cleaners.push(cleanup.cleanup)
+
     this.activators.forEach(activate => {
       const result = activate(this, firstTime)
       if (result) this.cleaners.push(result.cleanup)
@@ -190,7 +194,7 @@ export abstract class QS<DB = unknown> extends Temporary {
     return this.proxies.system
   }
 
-  subscribe<T extends EventSignal.Any>(eventSignal: T, callback: EventSignal.Callback<T>) {
+  subscribe<T extends EventSignal<any>>(eventSignal: T, callback: EventSignal.Callback<T>) {
     eventSignal.subscribe(callback)
     this.cleaners.push(() => eventSignal.unsubscribe(callback))
     return callback

@@ -39,7 +39,7 @@ export class Boss {
 
   id
 
-  region: Region
+  region?: Region
 
   respawnTime
 

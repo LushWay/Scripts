@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
-import { RegionDatabase } from './database'
+import { RLDB, RegionDatabase, RegionSave } from './database'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
@@ -28,7 +28,7 @@ export interface RegionCreationOptions {
 }
 
 /** Represents protected region in the world. */
-export class Region {
+export class Region<LDB extends RLDB = any> {
   protected static generateRegionKey() {
     return new Date(Date.now()).toISOString()
   }
@@ -64,6 +64,15 @@ export class Region {
   }
 
   /**
+   * Filters an array of regions to return instances of a specific region type.
+   *
+   * @returns Array of instances that match the specified type `R` of Region.
+   */
+  static instances<I extends Region, T extends { new (): I; regions: Region[] }>(this: T) {
+    return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
+  }
+
+  /**
    * Returns the nearest region based on a block location and dimension ID.
    *
    * @param {Vector3} location - Representing the location of a block in the world
@@ -96,6 +105,7 @@ export class Region {
   dimensionId: Dimensions
 
   /** Region permissions */
+  // @ts-expect-error This not really an issue
   permissions: RegionPermissions
 
   /** Permissions used by default */
@@ -188,11 +198,17 @@ export class Region {
     )
   }
 
+  /** Database linked to the region */
+  // @ts-expect-error Hyuyh i think we can ignore it
+  linkedDatabase: LDB
+
   /** Prepares region instance to be saved into the database */
-  protected toJSON() {
+  protected toJSON(): RegionSave {
     return {
+      t: '',
       permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,
+      ldb: this.linkedDatabase,
     }
   }
 

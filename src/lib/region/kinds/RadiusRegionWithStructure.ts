@@ -1,4 +1,4 @@
-import { BlockPermutation, BlockVolume, Dimension, StructureSaveMode, world } from '@minecraft/server'
+import { BlockPermutation, Dimension, StructureSaveMode, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 import { RadiusRegion } from './RadiusRegion'
 

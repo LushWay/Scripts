@@ -71,7 +71,7 @@ function location(
   fallback: string,
   players: { location: Vector3; dimension: Dimensions }[],
 ) {
-  const playersC = players.filter(e => place.safeArea.isVectorInRegion(e.location, e.dimension)).length
+  const playersC = players.filter(e => place.safeArea?.isVectorInRegion(e.location, e.dimension)).length
 
   if (place.portalTeleportsTo.valid) {
     return {

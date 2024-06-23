@@ -44,7 +44,7 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
         try {
           // Etest.succeed()
         } catch {}
-      } catch (error) {
+      } catch (error: any) {
         let info = `§f§l§R FAIL §r ${filename} > §f${fullname}\n`
 
         const stringHistory = history

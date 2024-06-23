@@ -38,7 +38,7 @@ export class LiteralArgumentType<T extends boolean = false> implements IArgument
     public optional: T = false as T,
   ) {}
 
-  type: null
+  type = null
 
   typeName = 'literal'
 
@@ -55,7 +55,7 @@ export class StringArgumentType<T extends boolean = false> implements IArgumentT
     public optional: T = false as T,
   ) {}
 
-  type: string
+  type = 'string'
 
   typeName = '§3string'
 
@@ -73,7 +73,7 @@ export class IntegerArgumentType<T extends boolean = false> implements IArgument
     public optional: T = false as T,
   ) {}
 
-  type: number
+  type = 1
 
   typeName = 'int'
 
@@ -92,7 +92,7 @@ export class LocationArgumentType<T extends boolean = false> implements IArgumen
     public optional: T = false as T,
   ) {}
 
-  type: Vector3
+  type = { x: 0, y: 0, z: 0 } as Vector3
 
   typeName = 'location'
 
@@ -112,7 +112,7 @@ export class BooleanArgumentType<T extends boolean = false> implements IArgument
     public optional: T = false as T,
   ) {}
 
-  type: boolean
+  type = false as boolean
 
   typeName = 'boolean'
 
@@ -133,7 +133,7 @@ export class ArrayArgumentType<T extends readonly string[], B extends boolean = 
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
   }
 
-  type: T[number]
+  type: T[number] = this.types[0]
 
   typeName = 'string'
 

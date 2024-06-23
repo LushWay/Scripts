@@ -12,10 +12,6 @@ interface BrushLoreFormat {
 }
 
 export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<BrushLoreFormat & AdditionalLore> {
-  displayName: string
-
-  loreFormat: BrushLoreFormat & AdditionalLore
-
   getToolSlot(player: Player) {
     const slot = super.getToolSlot(player)
 
@@ -59,8 +55,6 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
       maxDistance: lore.maxDistance,
     })
 
-    /** @param {string} reason */
-
     const fail = (reason: string) => player.fail('§7Кисть§f: §c' + reason)
 
     if (!hit) return fail('Блок слишком далеко.')
@@ -80,6 +74,4 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
   onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit) {
     // See implementation in subclass
   }
-
-  clearLoreFormat: BrushLoreFormat & AdditionalLore
 }

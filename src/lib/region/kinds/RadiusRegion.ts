@@ -1,7 +1,7 @@
 import { Dimension, system, world } from '@minecraft/server'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
 import { Vector } from 'lib/vector'
-import { RegionDatabase } from '../database'
+import { RLDB, RadiusRegionSave, RegionDatabase } from '../database'
 
 export interface RadiusRegionOptions extends RegionCreationOptions {
   /** The position of the region center */
@@ -10,7 +10,7 @@ export interface RadiusRegionOptions extends RegionCreationOptions {
   radius: number
 }
 
-export class RadiusRegion extends Region implements RadiusRegionOptions {
+export class RadiusRegion<LDB extends RLDB = any> extends Region<LDB> implements RadiusRegionOptions {
   /** Used to restore region from the database */
   static readonly kind: string = 'radius'
 
@@ -49,7 +49,7 @@ export class RadiusRegion extends Region implements RadiusRegionOptions {
     return Vector.distance(this.center, vector) < this.radius
   }
 
-  protected toJSON() {
+  protected toJSON(): RadiusRegionSave {
     return {
       ...super.toJSON(),
       t: 'r' as const,

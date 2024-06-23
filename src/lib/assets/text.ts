@@ -15,6 +15,7 @@ export const text: Record<string, (...args: (string | number)[]) => string> = {
     `§7│----------------\n│§c  Ты проиграл!\n§7│----------------\n│  §eПобедил:§f ${a}, §eзабрав награду в §f${b} §a(S)\n§7│`,
   'br.end.draw': () => `§7│----------------\n│  §eНичья!\n§7│----------------`,
 
+  // @ts-expect-error huuuuuuuuuh
   'stats': (
     hrs,
     min,

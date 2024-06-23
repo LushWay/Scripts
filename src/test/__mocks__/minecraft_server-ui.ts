@@ -29,7 +29,7 @@ export class ActionFormData {
 export class FormResponse {
   constructor() {}
   readonly cancelationReason?: FormCancelationReason
-  readonly canceled: boolean
+  readonly canceled: boolean = false
 }
 
 export class ActionFormResponse extends FormResponse {
@@ -105,5 +105,5 @@ export class ModalFormResponse extends FormResponse {
 }
 
 export class FormRejectError extends Error {
-  reason: FormRejectReason
+  reason: FormRejectReason = FormRejectReason.PlayerQuit
 }

@@ -39,6 +39,7 @@ class ChatBuilder {
     },
   })
 
+  // @ts-expect-error It is initialized
   private cooldown: Cooldown
 
   private updateCooldown() {

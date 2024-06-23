@@ -7,9 +7,9 @@ type CmdLetCallback = (ctx: CommandContext, param: string) => 'stop' | void
 export class CmdLet {
   static list: CmdLet[] = []
 
-  callback: CmdLetCallback
+  callback: CmdLetCallback | undefined
 
-  description: string
+  description: string | undefined
 
   name: string
 
@@ -30,7 +30,7 @@ export class CmdLet {
     const results = []
     for (const cmdlet of CmdLet.list) {
       const input = cmdlets.find(e => e[0] === cmdlet.name)
-      if (input) {
+      if (input && cmdlet.callback) {
         results.push(cmdlet.callback(new CommandContext(event, args, command, rawInput), input[0]))
       }
     }

@@ -37,7 +37,7 @@ type InteractionAllowed = (
 type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
 export type RegionCallback = (player: Player, region: Region | undefined) => void
 
-const ACTION_GUARD = new EventSignal<Parameters<InteractionAllowed>, boolean | undefined, InteractionAllowed>()
+const ACTION_GUARD = new EventSignal<Parameters<InteractionAllowed>, boolean | void, InteractionAllowed>()
 
 export function actionGuard(fn: InteractionAllowed, position?: number) {
   ACTION_GUARD.subscribe(fn, position)

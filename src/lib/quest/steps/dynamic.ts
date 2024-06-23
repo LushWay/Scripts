@@ -1,7 +1,9 @@
 import { QS, QSBuilder } from '../step'
 
 export class QSDynamic extends QS {
-  protected activate: QS.Activator<this> = () => void 0
+  protected activate() {
+    // Nothing...
+  }
 }
 
 export class QSDynamicBuilder extends QSBuilder<QSDynamic> {

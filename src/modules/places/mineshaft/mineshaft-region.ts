@@ -1,4 +1,3 @@
-import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { type RegionPermissions } from 'lib/region/Region'
 import { RadiusRegionWithStructure } from 'lib/region/kinds/RadiusRegionWithStructure'
 import { ores } from './algo'

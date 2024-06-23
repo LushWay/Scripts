@@ -20,16 +20,16 @@ export class BlockTypes {
 
 export class ItemComponent extends Component {}
 export class ItemCooldownComponent extends ItemComponent {
-  componentId: 'minecraft:cooldown'
+  componentId = 'minecraft:cooldown' as const
 }
 export class ItemEnchantableComponent extends ItemComponent {
-  componentId: 'minecraft:enchantable'
+  componentId = 'minecraft:enchantable' as const
 }
 export class ItemDurabilityComponent extends ItemComponent {
-  componentId: 'minecraft:durability'
+  componentId = 'minecraft:durability' as const
 }
 export class ItemFoodComponent extends ItemComponent {
-  componentId: 'minecraft:food'
+  componentId = 'minecraft:food' as const
 }
 
 export class EntityComponent extends Component {
@@ -200,7 +200,7 @@ export class ItemType {
 }
 
 export class ItemStack extends DynamicPropertiesProvider {
-  nameTag: string
+  nameTag: string | undefined
   getComponent() {
     return
   }

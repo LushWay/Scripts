@@ -19,7 +19,7 @@ export type SidebarVariables<E, V = DynamicLine<E>> = Record<string, V | string>
 export type SidebarRawVariables<E> = SidebarVariables<E, SidebarLineCreate<E> | DynamicLine<E>>
 
 /** Description */
-export class Sidebar<E = unknown> {
+export class Sidebar<E = any> {
   static instances: Sidebar[] = []
 
   static forceHide = new WeakPlayerSet()

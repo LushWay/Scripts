@@ -23,8 +23,8 @@ export class QSCounter extends QS<{ count: number }> {
     }
   }
 
-  protected activate: QS.Activator<this> = ctx => {
-    if (typeof ctx.db?.count === 'number') ctx.value = ctx.db.count
+  protected activate = () => {
+    if (typeof this.db?.count === 'number') this.value = this.db.count
   }
 }
 

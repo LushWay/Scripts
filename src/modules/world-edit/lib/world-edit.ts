@@ -48,6 +48,7 @@ export class WorldEdit {
 
   visualSelectionCuboid: Cuboid | undefined
 
+  // @ts-expect-error Huh, it init
   db: WeDB
 
   get pos1() {

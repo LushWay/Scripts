@@ -49,9 +49,7 @@ export class WeakPlayerSet extends Set<string> {
   }
 }
 
-type WeakStorage = Pick<Map<string, unknown>, 'has' | 'delete'> &
-  Partial<Pick<WeakPlayerMap<unknown>, 'get' | 'onLeave'>>
-
+type WeakStorage = Pick<Map<string, any>, 'has' | 'delete'> & Partial<Pick<WeakPlayerMap<any>, 'get' | 'onLeave'>>
 type OnLeaveCallback<T> = (playerId: string, setValue: T) => void
 
 interface WeakStorageOptions<T> {
@@ -63,7 +61,7 @@ interface WeakStorageOptions<T> {
 
 const id = (player: Player | string) => (player instanceof Player ? player.id : player)
 
-function createWeakStorage(storage: WeakStorage, options?: WeakStorageOptions<unknown>) {
+function createWeakStorage(storage: WeakStorage, options?: WeakStorageOptions<any>) {
   if (options?.removeOnLeave ?? true) weakStorages.push(storage)
   if (options?.onLeave) storage.onLeave = options.onLeave
 }

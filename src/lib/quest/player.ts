@@ -28,7 +28,7 @@ export class PlayerQuest {
     return this.dynamic(reason).activate(ctx => ctx.error(reason))
   }
 
-  place = QSPlace.bind(this) as OmitThisParameter<typeof QSPlace>
+  place = QSPlace.bind(this)
 
   end = (action: (ctx: PlayerQuest) => void) => {
     this.onEnd = action.bind(this, this) as VoidFunction
@@ -55,10 +55,7 @@ export class PlayerQuest {
     this.updateListeners.forEach(e => e(this.player))
   }
 
-  private wrapStep<S extends QS, B extends QSBuilder<S>>(
-    Builder: new (step: S) => B,
-    Step: new (...args: unknown[]) => S,
-  ) {
+  private wrapStep<S extends QS, B extends QSBuilder<S>>(Builder: new (step: S) => B, Step: new (...args: any[]) => S) {
     return (...args: Parameters<B['create']>[0]) => {
       const index = this.list.length
       const step: S = new Step(this.quest, this.player, this, () => this.next(step, index))

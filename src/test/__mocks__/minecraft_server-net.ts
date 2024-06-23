@@ -25,10 +25,10 @@ export class HttpHeader {
 }
 
 export class HttpRequest {
-  body: string
-  headers: HttpHeader[]
-  method: HttpRequestMethod
-  timeout: number
+  body: string = ''
+  headers: HttpHeader[] = []
+  method: HttpRequestMethod = HttpRequestMethod.Get
+  timeout: number = 5000
 
   constructor(public uri: string) {}
 
@@ -50,10 +50,10 @@ export class HttpRequest {
 }
 
 export class HttpResponse {
-  readonly body: string
-  readonly headers: HttpHeader[]
-  readonly request: HttpRequest
-  readonly status: number
+  readonly body: string = ''
+  readonly headers: HttpHeader[] = []
+  readonly request: HttpRequest = new HttpRequest('')
+  readonly status: number = 200
 }
 
 export const http: HttpClient = new HttpClient()

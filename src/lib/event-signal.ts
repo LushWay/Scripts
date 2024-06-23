@@ -3,10 +3,10 @@
  * all subscribers.
  *
  * @template T The type of the data that the events will be emitted with.
- * @template Return Return type of the subscriber. Default is `void`
+ * @template R Return type of the subscriber. Default is `void`
  * @template Callback The type of the callback function that will be used for the events.
  */
-export class EventSignal<T, Return = void, Callback extends CreateCallback<T, Return> = CreateCallback<T, Return>> {
+export class EventSignal<T, R = void, Callback extends (...args: any[]) => R = (arg: T) => R> {
   /**
    * Iterates through sorted subscribers of a given event signal and calls each subscriber function with the provided
    * argument, returning an array of results.
@@ -15,10 +15,10 @@ export class EventSignal<T, Return = void, Callback extends CreateCallback<T, Re
    * @param argument - Data that will be passed to the event subscribers when the event signal is emitted.
    * @returns Array of results after calling each subscriber function with the provided argument.
    */
-  static emit<T extends EventSignal<any>>(signal: T, ...args: EventSignal.Argument<T>[]) {
+  static emit<T extends EventSignal<any, any, any>>(signal: T, ...args: EventSignal.Argument<T>) {
     const results = []
     for (const [fn] of this.sortSubscribers(signal)) {
-      results.push((fn as CreateCallback<unknown[], unknown>)(...args))
+      results.push((fn as (...args: any[]) => unknown)(...args))
     }
     return results as EventSignal.Return<T>[]
   }
@@ -30,7 +30,7 @@ export class EventSignal<T, Return = void, Callback extends CreateCallback<T, Re
    * @returns Array of tuples where each tuple contains the callback function and the number associated with it. The
    *   array is sorted based on the numbers in descending order.
    */
-  static sortSubscribers<T extends EventSignal<any>>(signal: T) {
+  static sortSubscribers<T extends EventSignal<any, any, any>>(signal: T) {
     return [...signal.events.entries()].sort((a, b) => b[1] - a[1]) as [EventSignal.Callback<T>, number][]
   }
 
@@ -65,8 +65,7 @@ export class EventSignal<T, Return = void, Callback extends CreateCallback<T, Re
 
 export declare namespace EventSignal {
   /** Infers the argument type of the EventSignal */
-  type Argument<T extends EventSignal<any>> =
-    T extends EventSignal<infer A> ? (A extends unknown[] ? A[number] : A) : unknown
+  type Argument<T extends EventSignal<any>> = Parameters<Callback<T>>
 
   /** Infers the return type of the EventSignal */
   type Return<T extends EventSignal<any>> = T extends EventSignal<any, infer R> ? R : unknown
@@ -74,8 +73,6 @@ export declare namespace EventSignal {
   /** Infers the callback type of the EventSignal */
   type Callback<T extends EventSignal<any>> = T extends EventSignal<any, any, infer C> ? C : unknown
 }
-
-type CreateCallback<A, R> = A extends unknown[] ? (...args: A) => R : (arg: A) => R
 
 export class EventLoader extends EventSignal<undefined> {
   /**
@@ -102,29 +99,29 @@ export class EventLoader extends EventSignal<undefined> {
  * The Subscriber class is a utility class that allows subscribing and unsubscribing to events, and emitting events to
  * all subscribers.
  *
- * @template A The type of the data that the events will be emitted with.
- * @template Return Return type of the subscriber. Default is `void`
+ * @template T The type of the data that the events will be emitted with.
+ * @template R Return type of the subscriber. Default is `void`
  * @template Callback The type of the callback function that will be used for the events.
  */
-export class EventLoaderWithArg<
-  A,
-  Return = void,
-  Callback extends CreateCallback<A, Return> = CreateCallback<A, Return>,
-> extends EventSignal<A, Return, Callback> {
-  static load<T extends EventLoaderWithArg<any>>(signal: T, argument: EventSignal.Argument<T>) {
+export class EventLoaderWithArg<T, R = void, Callback extends (arg: T) => R = (arg: T) => R> extends EventSignal<
+  T,
+  R,
+  Callback
+> {
+  static load<T extends EventLoaderWithArg<any>>(signal: T, ...arg: EventSignal.Argument<T>) {
     signal.loaded = true
-    signal.defaultArgument = argument
-    return super.emit(signal, argument)
+    signal.defaultArgument = arg
+    return super.emit(signal, ...arg)
   }
 
   loaded = false
 
-  constructor(private defaultArgument: A) {
+  constructor(private defaultArgument: T) {
     super()
   }
 
-  subscribe: EventSignal<A, Return, Callback>['subscribe'] = (callback, position) => {
-    if (this.loaded && typeof callback === 'function') callback(this.defaultArgument)
+  subscribe: EventSignal<T, R, Callback>['subscribe'] = (callback, position) => {
+    if (this.loaded) (callback as (...args: any[]) => unknown)(...(this.defaultArgument as T[]))
     super.subscribe(callback, position)
     return callback
   }

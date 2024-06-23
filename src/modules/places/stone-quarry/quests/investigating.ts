@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Temporary } from 'lib'
 import { Cutscene } from 'lib/cutscene/index'
 import { Quest } from 'lib/quest/index'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 
-export class StoneQuarryInvestigating {
+class StoneQuarryInvestigating {
   static place = StoneQuarry
 
   static quest = new Quest('StoneQuarryInvestigating', StoneQuarry.name, 'Исследуйте новый город!', (q, p) => {
@@ -26,3 +27,5 @@ export class StoneQuarryInvestigating {
     // })
   }
 }
+
+new StoneQuarryInvestigating()

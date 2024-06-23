@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable no-var */
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
@@ -21,10 +16,6 @@ declare global {
 
   var console: Console
   var verbose: boolean
-
-  interface Function {
-    bind<Fn>(this: Fn, context: object, args: unknown[]): Fn
-  }
 
   interface ObjectConstructor {
     entriesStringKeys<O extends Record<string, unknown>>(o: O): [keyof O, O[keyof O]][]
@@ -125,13 +116,6 @@ Array.prototype.randomElement = function () {
   return this[~~(Math.random() * this.length)]
 }
 
-Array.prototype.at ??= function at<T>(this: T[], n: number) {
-  n = Math.trunc(n) || 0
-  if (n < 0) n += this.length
-  if (n < 0 || n >= this.length) return
-  return this[n]
-}
-
 expand(Array, {
   equals(one, two) {
     return one.every((e, i) => e === two[i])
@@ -142,13 +126,6 @@ declare global {
   interface String {
     at(n: number): string
   }
-}
-
-String.prototype.at ??= function at<T>(this: T[], n: number) {
-  n = Math.trunc(n) || 0
-  if (n < 0) n += this.length
-  if (n < 0 || n >= this.length) return
-  return String.prototype.charAt.call(this, n)
 }
 
 function format(args: unknown[]) {

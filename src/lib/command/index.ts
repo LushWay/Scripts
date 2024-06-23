@@ -20,10 +20,10 @@ type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) 
   : never
 
 type ArgReturn<Callback, Type, Optional> = Command<
-  AppendArgument<Callback, Optional extends true ? (Type | undefined) : Type>
+  AppendArgument<Callback, Optional extends true ? Type | undefined : Type>
 >
 
-type CommandCallback = (ctx: CommandContext, ...args: unknown[]) => void
+type CommandCallback = (ctx: CommandContext, ...args: any[]) => void
 
 export class Command<Callback extends CommandCallback = (ctx: CommandContext) => void> {
   static prefixes = ['.', '-']

@@ -5,7 +5,7 @@ import { t } from 'lib/text'
 import { PlaceWithSafeArea } from './place-with-safearea'
 
 export class City extends PlaceWithSafeArea {
-  quests: Quest[]
+  quests: Quest[] = []
 
   createQuest() {
     // return new Quest()

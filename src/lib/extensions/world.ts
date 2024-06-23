@@ -25,7 +25,7 @@ declare module '@minecraft/server' {
   }
 }
 
-const send = world.sendMessage.bind(world) as World['sendMessage']
+const send = world.sendMessage.bind(world)
 
 expand(World.prototype, {
   say(message) {

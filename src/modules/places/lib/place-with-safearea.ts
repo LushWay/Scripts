@@ -13,7 +13,7 @@ export class PlaceWithSafeArea {
 
   portalTeleportsTo
 
-  safeArea: SafeAreaRegion
+  safeArea?: SafeAreaRegion
 
   safeAreaLocation
 

@@ -19,11 +19,11 @@ export class MessageForm {
 
   /** The first button of the dialog. */
 
-  private button1: IMessageFormButton
+  private button1?: IMessageFormButton
 
   /** The seccond button of the dialog. */
 
-  private button2: IMessageFormButton
+  private button2?: IMessageFormButton
 
   /**
    * Creates a new form to be shown to a player
@@ -83,7 +83,7 @@ export class MessageForm {
     const response = await showForm(this.form, player)
     if (response === false || !(response instanceof MessageFormResponse)) return
 
-    const callback = this[response.selection ? 'button1' : 'button2'].callback
+    const callback = this[response.selection ? 'button1' : 'button2']?.callback
     if (callback) util.catch(callback)
   }
 }
