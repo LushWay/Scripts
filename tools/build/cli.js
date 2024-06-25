@@ -54,7 +54,7 @@ export function out(dir, file) {
     fs.rmSync(dir, { force: true, recursive: true })
     fs.mkdirSync(dir)
   } catch (e) {
-    logger.warn(e)
+    logger.warn('Failed to empty out dir', e)
   }
 
   return { outdir: dir, outfile: path.join(dir, file) }
