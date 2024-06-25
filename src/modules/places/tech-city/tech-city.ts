@@ -68,7 +68,6 @@ class TechCityBuilder extends City {
       .chance('20%')
       .item('RedTerracotta')
       .amount({ '0...120': '10%', '121...300': '20%' }).build,
-    bossEvent: false,
   })
 }
 
