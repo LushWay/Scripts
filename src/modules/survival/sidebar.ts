@@ -63,17 +63,17 @@ const survivalSidebar = new Sidebar(
     getExtra: player => getSidebarSettings(player),
 
     getOptions(player, settings) {
-      const main = `$${names.region}`
+      const region = `$${names.region}`
 
       const scores = `§6$${names.money}${emoji.money} §2$${names.leafs}${emoji.leaf}`
       const online = `§f$${names.online}§7/55${emoji.online}`
-      const second = `${scores} ${online}${settings.mode === 'sidebar' ? '\n \n' : ''}`
+      const stats = `${scores} ${online}${settings.mode === 'sidebar' ? '\n \n' : ''}`
 
       return {
         format:
           settings.mode === 'sidebar'
-            ? `${main}\n${second}\n$${names.quest}`
-            : [second, `$${names.quest}`, main, undefined, undefined],
+            ? `${region}\n${stats}\n$${names.quest}`
+            : [stats, undefined, `$${names.quest}`, undefined, region],
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         maxWordCount: settings.sidebarMaxWordLength ?? 20,

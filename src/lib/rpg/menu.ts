@@ -107,6 +107,8 @@ export class Compass {
   }
 
   private static updateCompassInSlot(slot: ContainerSlot, player: Player) {
+    if (!Menu.isMenu(slot)) return
+
     const target = this.players.get(player)
     if (!target) {
       if (Menu.isCompass(slot)) slot.setItem(Menu.item)
@@ -136,11 +138,7 @@ export class Compass {
   }
 }
 
-export function createPublicGiveItemCommand(
-  name: string,
-  itemStack: ItemStack,
-  is = itemStack.is.bind(itemStack),
-) {
+export function createPublicGiveItemCommand(name: string, itemStack: ItemStack, is = itemStack.is.bind(itemStack)) {
   const itemNameTag = itemStack.nameTag?.split('\n')[0]
 
   /** Gives player an item */
