@@ -27,7 +27,7 @@ export class Quest {
 
   static sidebar: import('lib/sidebar').SidebarLineCreate<unknown> = {
     create(sidebar) {
-      const showSidebar = sidebar.show.bind(sidebar) as (typeof sidebar)['show']
+      const showSidebar = sidebar.show.bind(sidebar)
 
       return function (player: Player) {
         const current = Quest.getCurrent(player)

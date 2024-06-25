@@ -3,7 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Loot, LootTable, Vector, isChunkUnloaded, util } from 'lib'
 import { RadiusRegion } from './RadiusRegion'
 
-interface DRD<LDB extends JsonObject> extends JsonObject {
+interface DungeonRegionDatabase<LDB extends JsonObject> extends JsonObject {
   chests: Record<string, number | null>
   dungeon: LDB | null
 }
@@ -34,7 +34,7 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
     )
   }
 
-  linkedDatabase: DRD<LDB> = {
+  linkedDatabase: DungeonRegionDatabase<LDB> = {
     chests: {},
     dungeon: null,
   }

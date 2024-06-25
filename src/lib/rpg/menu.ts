@@ -139,7 +139,7 @@ export class Compass {
 export function createPublicGiveItemCommand(
   name: string,
   itemStack: ItemStack,
-  is = itemStack.is.bind(itemStack) as ItemStack['is'],
+  is = itemStack.is.bind(itemStack),
 ) {
   const itemNameTag = itemStack.nameTag?.split('\n')[0]
 
