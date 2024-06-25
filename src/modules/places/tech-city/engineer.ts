@@ -1,5 +1,5 @@
 import { ItemStack } from '@minecraft/server'
-import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { MinecraftItemTypes, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { Cost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { CustomItemWithBlueprint } from '../../../lib/rpg/custom-item'
@@ -14,6 +14,8 @@ export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
   .typeId(i.PolishedTuffSlab)
   .nameTag('Снаряд для пушки')
   .lore('Да.')
+
+export const MicroSchema = new ItemStack(MinecraftItemTypes.IronIngot).setInfo('Микросхема', 'Нужная фигня, да')
 
 export class Engineer extends ShopNpc {
   constructor(public group: string) {

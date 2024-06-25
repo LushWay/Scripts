@@ -1,7 +1,8 @@
-import { Loot } from 'lib'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { Boss, Loot, util } from 'lib'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
-import { CannonBulletItem, CannonItem, Engineer } from './engineer'
+import { CannonBulletItem, CannonItem, Engineer, MicroSchema } from './engineer'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -54,6 +55,20 @@ class TechCityBuilder extends City {
       ctx.player.container?.addItem(donut.createKeyItemStack())
     })
   }
+
+  golem = new Boss({
+    group: this.group,
+    id: 'golem',
+    respawnTime: util.ms.from('min', 10),
+    name: 'Робот',
+    entityTypeId: MinecraftEntityTypes.IronGolem,
+    loot: new Loot('GolemLoot')
+      .itemStack(MicroSchema)
+      .amount({ '10...64': '1%' })
+      .chance('20%')
+      .item('RedTerracotta')
+      .amount({ '0...120': '10%', '121...300': '20%' }).build,
+  })
 }
 
 export const TechCity = new TechCityBuilder()
