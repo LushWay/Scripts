@@ -125,7 +125,7 @@ const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верн
   const { deadAt } = player.database.survival
   if (!deadAt) return q.failed('Ваше место смерти потерялось!')
 
-  q.dynamic(`§dВерните свои вещи!`)
+  q.dynamic(`§d!!!`)
     .description(
       `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
