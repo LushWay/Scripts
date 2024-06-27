@@ -18,7 +18,7 @@ on:
 jobs:
   test:
     name: Test/Coverage
-    runs-on: ubuntu/latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
 
@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 22
 
-      - run: yarn install --immutable --immutable-cache
+      - run: yarn install --immutable
       - run: node build
       - run: yarn test --run --coverage
       - uses: paambaati/codeclimate-action@v8.0.0
