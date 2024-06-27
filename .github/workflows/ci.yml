@@ -1,3 +1,5 @@
+## TODO When branch protection is enabled, make a CD action that triggers on push to main and deploys script. Also this action should upload coverage
+
 name: CI
 on:
   workflow_dispatch:
@@ -8,7 +10,7 @@ on:
     tags:
       - '!*' # Do not execute on tags
     paths:
-      - src/*
+      - src/**
       - yarn.lock
       - .github/workflows/test.yml
 
