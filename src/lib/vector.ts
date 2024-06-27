@@ -236,6 +236,15 @@ export class Vector {
     return vector
   }
 
+  /** Checks if provided vector is on the edge of max and min */
+  static isedge(min: Vector3, max: Vector3, { x, y, z }: Vector3) {
+    return (
+      ((x == min.x || x == max.x) && (y == min.y || y == max.y)) ||
+      ((y == min.y || y == max.y) && (z == min.z || z == max.z)) ||
+      ((z == min.z || z == max.z) && (x == min.x || x == max.x))
+    )
+  }
+
   /**
    * @remarks
    *   A constant vector that represents (0, 0, -1).

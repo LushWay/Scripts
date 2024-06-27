@@ -17,7 +17,8 @@ export class FloatingText {
 
   update(location: Vector3, nameTag: string) {
     if (isChunkUnloaded({ location, dimensionId: this.dimensionId })) {
-      return console.warn(this.prefix + 'Chunk is unloaded')
+      // return console.warn(this.prefix + 'Chunk is unloaded')
+      return
     }
 
     location = Vector.add(location, { x: 0.5, y: 0.7, z: 0.5 })

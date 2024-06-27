@@ -1,7 +1,7 @@
 import { Dimension, system, world } from '@minecraft/server'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
 import { Vector } from 'lib/vector'
-import { RLDB, RadiusRegionSave, RegionDatabase } from '../database'
+import { RLDB, RadiusRegionSave, RegionDatabase, registerRegionType } from '../database'
 
 export interface RadiusRegionOptions extends RegionCreationOptions {
   /** The position of the region center */
@@ -11,6 +11,8 @@ export interface RadiusRegionOptions extends RegionCreationOptions {
 }
 
 export class RadiusRegion<LDB extends RLDB = any> extends Region<LDB> implements RadiusRegionOptions {
+  static type = 'r'
+
   /** Used to restore region from the database */
   static readonly kind: string = 'radius'
 
@@ -90,3 +92,5 @@ export class RadiusRegion<LDB extends RLDB = any> extends Region<LDB> implements
     })
   }
 }
+
+registerRegionType(RadiusRegion)

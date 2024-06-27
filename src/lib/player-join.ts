@@ -3,6 +3,7 @@ import { sendPacketToStdout } from 'lib/bds/api'
 import { EventSignal } from 'lib/event-signal'
 import { getRoleAndName } from 'lib/roles'
 import { Settings } from 'lib/settings'
+import { t } from 'lib/text'
 import { util } from 'lib/util'
 
 class JoinBuilder {
@@ -106,13 +107,14 @@ class JoinBuilder {
 
     const message = Join.config.messages[where]
 
-    sendPacketToStdout('joinOrLeave', {
-      name: player.name,
-      role: getRoleAndName(player, { name: false }),
-      status: 'move',
-      where,
-      print: `${getRoleAndName(player)} ${message}`,
-    })
+    __SERVER__ &&
+      sendPacketToStdout('joinOrLeave', {
+        name: player.name,
+        role: getRoleAndName(player, { name: false }),
+        status: 'move',
+        where,
+        print: t`[${player.name}][${getRoleAndName(player, { name: false })}]: ${message}`,
+      })
 
     for (const other of world.getPlayers()) {
       if (other.id === player.id) continue

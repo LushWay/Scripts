@@ -21,6 +21,7 @@ export * from './config'
 export * from './database'
 export * from './kinds/BossArenaRegion'
 export * from './kinds/CubeRegion'
+export * from './kinds/DungeonRegion'
 export * from './kinds/RadiusRegion'
 export * from './kinds/SafeAreaRegion'
 

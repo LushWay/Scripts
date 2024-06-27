@@ -28,7 +28,7 @@ new Command('loot')
   .setPermissions('curator')
   .string('lootTableName')
   .executes((ctx, lootTableName) => {
-    const lootTable = LootTable.instances[lootTableName]
+    const lootTable = LootTable.instances.get(lootTableName)
     if (typeof lootTable === 'undefined')
       return ctx.error(
         `${lootTableName} - unknown loot table. All tables:\n${Object.keys(LootTable.instances).join('\n')}`,
@@ -46,9 +46,8 @@ type PreparedItems = { item: ItemStack; chance: number }[]
 export class Loot {
   private items: StoredItem[] = []
 
-  private totalChance = 0
-
-  private creating?: StoredItem
+  /** Item being created */
+  private current?: StoredItem
 
   /**
    * Creates new LootTable with specified items
@@ -58,7 +57,7 @@ export class Loot {
    * @param o.fill
    * @param items - Items to randomise
    */
-  constructor(private id: string) {
+  constructor(private id?: string) {
     system.delay(() => this.build)
   }
 
@@ -68,14 +67,6 @@ export class Loot {
    * @param type Keyof MinecraftItemTypes
    */
   item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>): this
-
-  /**
-   * Creates new item entry from raw string
-   *
-   * @param type TypeId of the item
-   */
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  item(type: string): this
 
   /**
    * Creates new item entry
@@ -96,20 +87,19 @@ export class Loot {
   }
 
   private create(itemStack: ItemStack) {
-    if (this.creating) this.items.push(this.creating)
-    this.creating = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {} }
+    if (this.current) this.items.push(this.current)
+    this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {} }
   }
 
   private modifyCreatingItem() {
-    if (!this.creating) throw new Error('You should create item first! Use .item or .itemStack')
-    return this.creating
+    if (!this.current) throw new Error('You should create item first! Use .item or .itemStack')
+    return this.current
   }
 
   chance(percent: Percent) {
     const chance = parseInt(percent)
     if (isNaN(chance)) throw new TypeError(`Chance must be \`{number}%\`, got '${util.inspect(percent)}' instead!`)
 
-    if (chance !== 100) this.totalChance += chance
     this.modifyCreatingItem().chance = chance
 
     return this
@@ -188,26 +178,31 @@ export class Loot {
   }
 
   get build() {
-    if (this.creating) {
-      this.items.push(this.creating)
-      delete this.creating
+    if (this.current) {
+      this.items.push(this.current)
+      delete this.current
     }
-    return new LootTable(this.items, this.totalChance, this.id)
+
+    return new LootTable(this.items, this.id)
   }
 }
 
 export class LootTable {
-  static instances: Record<string, LootTable> = {}
+  static instances = new Map<string, LootTable>()
 
   static onNew = new EventSignal<LootTable>()
 
   constructor(
     private items: StoredItem[],
-    private totalChance: number,
-    public id: string,
+    public id?: string,
   ) {
-    LootTable.instances[id] = this
-    EventSignal.emit(LootTable.onNew, this)
+    if (id) {
+      const created = LootTable.instances.get(id)
+      if (created) return created
+
+      LootTable.instances.set(id, this)
+      EventSignal.emit(LootTable.onNew, this)
+    }
   }
 
   generateOne() {
@@ -249,22 +244,6 @@ export class LootTable {
         return item
       }
     })
-  }
-
-  private selectByChance(items: PreparedItems): number {
-    const totalChance = items.reduce((sum, item) => sum + item.chance, 0)
-
-    let random = Math.randomInt(0, totalChance)
-    let selectedIndex = -1
-    for (const [i, { chance }] of items.entries()) {
-      random -= chance
-      if (random < 0) {
-        selectedIndex = i
-        break
-      }
-    }
-
-    return selectedIndex
   }
 
   private generateItems(item: StoredItem): PreparedItems {
@@ -320,7 +299,7 @@ export class LootTable {
 
   fillContainer(container: Container) {
     container.clearAll()
-    for (const [i, item] of this.generate(container.size).entries()) {
+    for (const [i, item] of this.generate(container.size).shuffle().entries()) {
       if (item) container.setItem(i, item)
     }
   }

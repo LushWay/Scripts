@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { Region, RegionCreationOptions } from 'lib/region/Region'
-import { RegionDatabase } from '../database'
+import { RegionDatabase, registerRegionType } from '../database'
 import { Vector } from 'lib/vector'
 
 interface CubeRegionOptions extends RegionCreationOptions {
@@ -11,6 +11,8 @@ interface CubeRegionOptions extends RegionCreationOptions {
 }
 
 export class CubeRegion extends Region implements CubeRegionOptions {
+  static type = 'c'
+
   from: VectorXZ
 
   to: VectorXZ
@@ -38,6 +40,7 @@ export class CubeRegion extends Region implements CubeRegionOptions {
   protected toJSON() {
     return {
       ...super.toJSON(),
+      st: '',
       t: 'c' as const,
       from: this.from,
       to: this.to,
@@ -49,3 +52,5 @@ export class CubeRegion extends Region implements CubeRegionOptions {
     RegionDatabase[this.key] = this.toJSON()
   }
 }
+
+registerRegionType(CubeRegion)

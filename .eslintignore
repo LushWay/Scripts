@@ -1,3 +1,4 @@
 src/chestui
 src/lib/assets
+!src/lib/config.ts
 src/lib/lang

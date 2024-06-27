@@ -1,5 +1,6 @@
 import './camera'
 import './db'
+import './dungeon'
 import './gamemode'
 import './help'
 import './leaderboard'

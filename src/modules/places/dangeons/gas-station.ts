@@ -1,30 +1,113 @@
-import { util } from 'lib'
+import { Loot, Region, registerRegionType, util } from 'lib'
+import { CustomStructures } from 'lib/assets/config'
 import { DungeonRegion } from 'lib/region/kinds/DungeonRegion'
 import { CannonBulletItem } from '../tech-city/engineer'
+
+export class GasStationGarageRegion extends DungeonRegion {
+  static kind = 'gas_station_garage'
+
+  protected structureId = CustomStructures.GasStationGarage as string
+
+  protected structureSize = { x: 19, y: 12, z: 27 }
+
+  protected configureDungeon() {
+    const loot = new Loot()
+      .itemStack(CannonBulletItem.blueprint)
+      .chance('10%')
+
+      .item('Apple')
+      .chance('50%')
+
+      .item('String')
+      .chance('30%')
+      .amount({
+        '10...20': '10%',
+        '21...30': '20%',
+      })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' }).build
+
+    this.createChest({ x: 0, y: 0, z: 0 }, loot).restoreTime(util.ms.from('sec', 10))
+  }
+
+  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+  public get displayName() {
+    return 'Гараж'
+  }
+}
+registerRegionType(GasStationGarageRegion as typeof Region)
 
 export class GasStationRegion extends DungeonRegion {
   static kind = 'gas_station'
 
-  protected structureId = 'mystructure:dungeons/gas_station'
+  protected structureId = 'dungeon/gas_station'
 
-  protected structurePosition = { x: 0, y: 0, z: 0 }
+  protected structureSize = { x: 0, y: 0, z: 0 }
 
-  protected configureDungeon() {
-    this.createChest(
-      { x: 0, y: 0, z: 0 },
-      loot =>
-        loot
-          .itemStack(CannonBulletItem.blueprint)
-          .chance('10%')
+  protected configureDungeon(): void {
+    const loot = new Loot()
+      .itemStack(CannonBulletItem.blueprint)
+      .chance('10%')
 
-          .item('Apple')
-          .chance('50%')
+      .item('String')
+      .chance('30%')
+      .amount({
+        '10...20': '10%',
+        '21...30': '20%',
+      })
 
-          .item('String')
-          .chance('30%')
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
 
-          .item('Web')
-          .chance('40%').build,
-    ).restoreTime(util.ms.from('min', 1))
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' })
+
+      .item('Web')
+      .chance('40%')
+      .amount({ '1...2': '1%' }).build
+
+    this.createChest({ x: 0, y: -1, z: 0 }, loot).restoreTime(util.ms.from('sec', 10))
+  }
+
+  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+  public get displayName() {
+    return 'Заправка'
   }
 }
+registerRegionType(GasStationRegion as typeof Region)

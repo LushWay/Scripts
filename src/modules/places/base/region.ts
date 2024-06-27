@@ -1,5 +1,6 @@
 import { type RegionPermissions } from 'lib/region/Region'
-import { RadiusRegion } from '../../../lib/region/kinds/RadiusRegion'
+import { registerRegionType } from 'lib/region/database'
+import { RadiusRegion } from 'lib/region/kinds/RadiusRegion'
 
 // TODO Base levels, save structure of inital place on creation, shadow regions after removing etc
 
@@ -14,3 +15,4 @@ export class BaseRegion extends RadiusRegion {
     owners: [],
   }
 }
+registerRegionType(BaseRegion)

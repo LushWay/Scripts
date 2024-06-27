@@ -29,6 +29,10 @@ export interface RegionCreationOptions {
 
 /** Represents protected region in the world. */
 export class Region<LDB extends RLDB = any> {
+  static type: string
+
+  static kind: string
+
   protected static generateRegionKey() {
     return new Date(Date.now()).toISOString()
   }
@@ -130,7 +134,7 @@ export class Region<LDB extends RLDB = any> {
     protected key: string,
   ) {
     this.dimensionId = dimensionId
-    Region.regions.push(this)
+    if (key) Region.regions.push(this)
   }
 
   /** Function that gets called on region creation after saving (once) */
@@ -156,9 +160,14 @@ export class Region<LDB extends RLDB = any> {
     return Player.name(this.permissions.owners[0])
   }
 
-  /** Display name of the region */
+  /** Name of the region that should always be */
   get name() {
     return this.ownerName ?? new Date(this.key).format()
+  }
+
+  /** Name that will be displayed on the sidebar e.g. It can be empty. */
+  get displayName(): string | undefined {
+    return undefined
   }
 
   /**

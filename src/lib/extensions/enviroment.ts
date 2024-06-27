@@ -99,6 +99,7 @@ declare global {
      */
     randomElement(): T
     at(n: number): T
+    shuffle(): T[]
   }
 
   interface ArrayConstructor {
@@ -110,6 +111,17 @@ declare global {
      */
     equals(one: unknown[], two: unknown[]): boolean
   }
+}
+
+Array.prototype.shuffle = function () {
+  let i = this.length
+  while (i) {
+    const j = Math.floor(Math.random() * i)
+    const t = this[--i]
+    this[i] = this[j]
+    this[j] = t
+  }
+  return this
 }
 
 Array.prototype.randomElement = function () {

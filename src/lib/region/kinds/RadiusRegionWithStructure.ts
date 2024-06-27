@@ -2,9 +2,7 @@ import { BlockPermutation, Dimension, StructureSaveMode, world } from '@minecraf
 import { Vector } from 'lib/vector'
 import { RadiusRegion } from './RadiusRegion'
 
-export class RadiusRegionWithStructure extends RadiusRegion {
-  static readonly kind: string = 'struct'
-
+export abstract class RadiusRegionWithStructure extends RadiusRegion {
   protected readonly saveable = true
 
   protected get structureName() {

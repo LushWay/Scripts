@@ -1,4 +1,5 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { registerRegionType } from '../database'
 import { RadiusRegion, RadiusRegionOptions } from './RadiusRegion'
 
 interface SafeAreaRegionOptions extends RadiusRegionOptions {
@@ -10,8 +11,6 @@ export class SafeAreaRegion extends RadiusRegion {
   static readonly kind = 'safe'
 
   protected readonly saveable = false
-
-  readonly safeAreaName
 
   protected readonly defaultPermissions = {
     allowedEntities: [
@@ -31,6 +30,8 @@ export class SafeAreaRegion extends RadiusRegion {
 
   readonly allowUsageOfCraftingTable: boolean = false
 
+  readonly safeAreaName?: string
+
   constructor(options: SafeAreaRegionOptions, key: string) {
     super(options, key)
     this.safeAreaName = options.safeAreaName
@@ -40,4 +41,10 @@ export class SafeAreaRegion extends RadiusRegion {
   get name() {
     return this.safeAreaName ? `Безопасная зона ${this.safeAreaName}` : super.name
   }
+
+  get displayName() {
+    return this.safeAreaName
+  }
 }
+
+registerRegionType(SafeAreaRegion)
