@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 
-export class PersistentSet<T> extends Set<T> {
+export class PersistentSet<T extends Json> extends Set<T> {
   constructor(public id: string) {
     super()
     this.load()
@@ -10,6 +10,7 @@ export class PersistentSet<T> extends Set<T> {
     const id = `PersistentSet<${this.id}>:`
     try {
       const saved = world.getDynamicProperty(this.id)
+      if (typeof saved === 'undefined') return // Set was not saved
       if (typeof saved !== 'string') return console.warn(`${id} Dynamic property is not a string:`, saved)
 
       const values = JSON.parse(saved) as T[]

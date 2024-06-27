@@ -1,11 +1,6 @@
 import * as mc from '@minecraft/server'
 import '../../tools/defines'
 
-type JsonPrimative = string | number | boolean | null
-type JsonArray = Json[]
-type JsonComposite = JsonArray | JsonObject
-type Json = JsonPrimative | JsonComposite
-
 declare global {
   type VoidFunction = () => void
 
@@ -16,9 +11,18 @@ declare global {
 
   type Dimensions = mc.ShortcutDimensions
 
+  /** Represents JSON-compatible primitive type */
+  type JsonPrimative = string | number | boolean | null | undefined
+
   /** Represents JSON-compatible object type */
   // eslint-disable-next-line
   type JsonObject = { [key: string]: Json }
+
+  /** Represents JSON-compatible object or primitive type */
+  type Json = JsonPrimative | JsonArray | JsonObject
+
+  /** Represents JSON-compatible array type */
+  type JsonArray = Json[]
 
   type PartialParts<B, ThisArg = B> = {
     [P in keyof B]?: B[P] extends (...param: infer param) => infer ret ? (this: ThisArg, ...param: param) => ret : B[P]

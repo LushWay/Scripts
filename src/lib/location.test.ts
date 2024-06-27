@@ -181,9 +181,18 @@ describe('locationWithRadius', () => {
 
 describe('migrate', () => {
   it('should migrate location', () => {
+    Settings.worldDatabase['group']['name2'] = '1 0 1'
+    const consoleLogSpy = vi.spyOn(console, 'debug').mockImplementation(() => {})
+
     Settings.worldDatabase['locations']['oldname'] = '1 0 1'
     migrateLocationName('locations', 'oldname', 'group', 'name')
+
     expect(Settings.worldDatabase['group']['name']).toBe('1 0 1')
+    expect(consoleLogSpy.mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        "§7Migrating location §flocations§7:§foldname§7 to §fgroup§7:§fname§7",
+      ]
+    `)
   })
 
   it('should not migrate already migrated location', () => {

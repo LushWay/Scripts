@@ -133,7 +133,6 @@ describe('EventLoaderWithArg', () => {
     const callback = vi.fn()
 
     loader.subscribe(callback)
-
     expect(callback).toHaveBeenCalledWith(42)
   })
 

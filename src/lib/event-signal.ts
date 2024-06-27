@@ -108,20 +108,23 @@ export class EventLoaderWithArg<T, R = void, Callback extends (arg: T) => R = (a
   R,
   Callback
 > {
-  static load<T extends EventLoaderWithArg<any>>(signal: T, ...arg: EventSignal.Argument<T>) {
+  static load<T extends EventLoaderWithArg<any>>(signal: T, ...args: EventSignal.Argument<T>) {
     signal.loaded = true
-    signal.defaultArgument = arg
-    return super.emit(signal, ...arg)
+    signal.lastArgs = args
+    return super.emit(signal, ...args)
   }
 
   loaded = false
 
-  constructor(private defaultArgument: T) {
+  private lastArgs: T[]
+
+  constructor(...defaultArgs: T[]) {
     super()
+    this.lastArgs = defaultArgs
   }
 
   subscribe: EventSignal<T, R, Callback>['subscribe'] = (callback, position) => {
-    if (this.loaded) (callback as (...args: any[]) => unknown)(...(this.defaultArgument as T[]))
+    if (this.loaded) (callback as (...args: any[]) => unknown)(...this.lastArgs)
     super.subscribe(callback, position)
     return callback
   }

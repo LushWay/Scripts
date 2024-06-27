@@ -171,7 +171,7 @@ const blockModifiers: ((s: string) => string | undefined)[] = [
   },
 ]
 
-export const CURRENT_BUILDERS = new PersistentSet('onlineBuilderList')
+export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
 
 export function isBuilding(player: Player, uptodate = false) {
   if (uptodate) return player.isGamemode('creative') && getRole(player) !== 'member'
