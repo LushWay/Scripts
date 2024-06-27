@@ -130,6 +130,7 @@ expand(Player, {
 function prefix(pref: string, sound: string): (this: Player, message: string, playSound?: boolean) => void {
   return function (this, message, playSound = true) {
     system.delay(() => {
+      if (!this.isValid()) return
       if (playSound) this.playSound(sound)
       this.tell(pref + message)
     })
