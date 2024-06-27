@@ -136,10 +136,6 @@ describe('EventLoaderWithArg', () => {
     expect(callback).toHaveBeenCalledWith(42)
   })
 
-  it('fails', () => {
-    expect(1).toBe(2)
-  })
-
   it('should call subscribed callbacks with loaded data if not loaded', () => {
     const callback = vi.fn()
 
