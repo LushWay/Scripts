@@ -18,7 +18,9 @@ export enum CustomEntityTypes {
 }
 
 export enum CustomStructures {
-  FloatingItem = 'mystructure:floatingitem',
+  FloatingItem = 'mystructure:floating_item',
+  CustomEnchantments = 'mystructure:custom_enchantments',
+  GasStationGarage = 'mystructure:dungeons/gas_station_garage',
 }
 
 export enum Sounds {
