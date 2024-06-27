@@ -1,4 +1,4 @@
 export const TestStructures = {
-  flat: 'Test:flat_5x5x5',
-  empty: 'Test:empty',
+  flat: 'test:flat_5x5x5',
+  empty: 'test:empty',
 }

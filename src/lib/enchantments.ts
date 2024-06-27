@@ -15,7 +15,7 @@ export const Enchantments = {
 }
 
 function load() {
-  // world.structureManager.place('CustomEnchantments', dimension, location)
+  // world.structureManager.place(CustomStructures.CustomEnchantments, dimension, location)
   // const entities = dimension.getEntities({
   //   type: DatabaseUtils.entityTypeId,
   //   location: location,
