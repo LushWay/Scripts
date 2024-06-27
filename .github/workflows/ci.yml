@@ -33,7 +33,11 @@ jobs:
 
       - run: yarn test --run --coverage
 
-      - uses: paambaati/codeclimate-action@v8.0.0
+      - name: Upload coverage
+        # Run only on push on main repo
+        if: github.repository == 'LushWay/Scripts' && github.ref == 'refs/heads/main'
+
+        uses: paambaati/codeclimate-action@v8.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
 
