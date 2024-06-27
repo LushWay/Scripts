@@ -4,7 +4,7 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { typeIdToReadable } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
-import { typeIdToDataId, typeIdToID } from '../../chestui/typeIds'
+import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 
 const NUMBER_OF_1_16_100_ITEMS = 0
