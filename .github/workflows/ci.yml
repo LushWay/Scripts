@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI
 on:
   workflow_dispatch:
 
@@ -16,7 +16,7 @@ on:
 
 jobs:
   test:
-    name: Test/Coverage
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -38,7 +38,7 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
 
   lint:
-    name: Format/Lint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -58,6 +58,9 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+
+    # Run only on push on main repo
+    if: github.repository == 'LushWay/Scripts' && github.ref == 'refs/heads/main'
     needs: [test, lint]
     steps:
       - run: echo 'Deploy occurs'
