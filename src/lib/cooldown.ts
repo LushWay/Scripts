@@ -15,7 +15,7 @@ export class Cooldown {
    */
   constructor(
     private readonly time: number,
-    private readonly tell = true,
+    private readonly tell: boolean =  true,
     private db: Record<string, unknown> = {},
   ) {
     this.db = db
