@@ -13,8 +13,6 @@ on:
       - .github/workflows/test.yml
 
   pull_request:
-    paths:
-      - '!*.MD'
 
 jobs:
   test:
