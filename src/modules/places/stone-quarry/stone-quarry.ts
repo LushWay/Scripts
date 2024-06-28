@@ -1,6 +1,7 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
 import { City } from '../lib/city'
+import { Stoner } from '../lib/npc/stoner'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 
@@ -48,6 +49,8 @@ class StoneQuarryBuilder extends City {
   })
 
   gunsmith = new Gunsmith(this.group)
+
+  stoner = new Stoner(this.group)
 
   private create() {
     this.createKits(

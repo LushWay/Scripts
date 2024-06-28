@@ -22,7 +22,7 @@ export class ShopNpc {
    * @param options - Creation options
    */
   constructor(options: ShopNpcOptions) {
-    this.shop = new Shop(options.name)
+    this.shop = new Shop(options.name, options.id)
     this.npc = new Npc({
       ...options,
       onInteract: event => this.shop.open(event.player),
@@ -38,7 +38,7 @@ export class ShopBlock {
   private cooldown = new Cooldown(1000, false)
 
   constructor(options: ShopNpcOptions) {
-    this.shop = new Shop(options.name)
+    this.shop = new Shop(options.name, options.id)
     this.location = location(options.group, options.id, options.name)
     this.location.onLoad.subscribe(location => {
       PlaceAction.onInteract(

@@ -15,15 +15,24 @@ export class Shop {
   })
 
   /** List of all available shops */
-  static shops: Shop[] = []
+  static shops = new Map<string, Shop>()
 
   /**
    * Creates new Shop
    *
    * @param name - Name of the shop that will be displayed in form
    */
-  constructor(private name: string) {
-    Shop.shops.push(this)
+  constructor(
+    private name: string,
+    private id: string,
+  ) {
+    const shop = Shop.shops.get(id)
+    if (shop) {
+      console.warn(new Error(t.error`Shop ${id} already exists`))
+      return shop
+    }
+
+    Shop.shops.set(id, this)
   }
 
   private defaultBody = (player: Player) =>
@@ -65,7 +74,11 @@ export class Shop {
    * @param player - Player to open menu for
    */
   open(player: Player) {
-    const menu = new ShopForm(t.header.raw`${this.name}`, t.raw`${this.getBody(player)}${this.defaultBody(player)}`)
+    const menu = new ShopForm(
+      t.header.raw`${this.name}`,
+      t.raw`${this.getBody(player)}${this.defaultBody(player)}`,
+      this.id,
+    )
     this.getMenu(menu, player)
     menu.show(player)
   }

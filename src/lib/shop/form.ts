@@ -1,11 +1,12 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ChestForm } from 'lib/form/chest'
 import { MessageForm } from 'lib/form/message'
 import { BUTTON } from 'lib/form/utils'
 import { typeIdToReadable } from 'lib/game-utils'
-import { Cost, MultiCost, ShouldHaveItemCost } from 'lib/shop/cost'
+import { Cost, ItemCost, MoneyCost, MultiCost, ShouldHaveItemCost } from 'lib/shop/cost'
 import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { Shop, ShopProduct, ShopProductBuy } from './shop'
@@ -16,11 +17,14 @@ interface ShopSection {
 }
 
 export class ShopForm {
+  static database = table<Record<string, number | undefined>>('shop', () => ({}))
+
   private buttons: (ShopProduct | ShopSection)[] = []
 
   constructor(
     private title: MaybeRawText,
     private body: MaybeRawText,
+    private shopId: string,
   ) {}
 
   /**
@@ -97,6 +101,74 @@ export class ShopForm {
     )
   }
 
+  addConfigurableItemSection(type: MinecraftItemTypes) {
+    const db = ShopForm.database[this.shopId]
+    const restoredCount = db[type]
+
+    return {
+      /** Sets default count */
+      defaultCount: (defaultCount = 100) => ({
+        /** Sets max count */
+        maxCount: (maxCount = 1000) => ({
+          /** Sets base price (aka minPrice) */
+          basePrice: (basePrice: number) => {
+            this.createConfigurableItem({
+              type,
+              count: restoredCount ?? defaultCount,
+              maxCount,
+              minPrice: basePrice,
+            })
+
+            return this as ShopForm
+          },
+        }),
+      }),
+    }
+  }
+
+  createConfigurableItem({
+    type,
+    count,
+    maxCount,
+    minPrice,
+  }: {
+    type: MinecraftItemTypes
+    count: number
+    maxCount: number
+    minPrice: number
+  }) {
+    this.addSection(itemDescription({ typeId: type, amount: 1 }), form => {
+      const buy = (maxCount / count) * minPrice
+
+      function addBuy(count = 1) {
+        const cost = new MoneyCost(buy * count)
+        form.addProduct(`Купить x${count}`, cost, player => {
+          if (!player.container) return
+
+          cost.buy(player)
+          player.container.addItem(new ItemStack(type, count))
+        })
+      }
+      addBuy(1)
+      addBuy(10)
+      addBuy(20)
+      addBuy(100)
+
+      const sell = buy / 2
+      function addSell(count = 1) {
+        const cost = new ItemCost(type, count)
+        form.addProduct(`Продать x${count}`, cost, player => {
+          player.scores.money += sell * count
+        })
+      }
+
+      addSell(1)
+      addSell(10)
+      addSell(20)
+      addSell(100)
+    })
+  }
+
   /**
    * Adds buyable item to shop menu
    *
@@ -137,7 +209,7 @@ export class ShopForm {
         const { name, onOpen } = button
 
         form.addButton(t.options({ unit: '§3' }).raw`${name}`, () => {
-          const form = new ShopForm(t.header.raw`${this.title} > ${name}`, this.body)
+          const form = new ShopForm(t.header.raw`${this.title} > ${name}`, this.body, this.shopId)
           onOpen(form)
           form.show(player, '', () => this.show(player))
         })
@@ -174,3 +246,14 @@ export class ShopForm {
     } else purchase()
   }
 }
+
+new ShopForm('', '', '')
+  .addConfigurableItemSection(MinecraftItemTypes.Apple)
+  .defaultCount(100)
+  .maxCount()
+  .basePrice(300)
+
+  .addConfigurableItemSection(MinecraftItemTypes.AcaciaDoor)
+  .defaultCount(2)
+  .maxCount(10)
+  .basePrice(2)
