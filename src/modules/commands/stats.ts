@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, Menu, Settings, util } from 'lib'
+import { t } from 'lib/text'
 
 new Command('stats').setDescription('Показывает статистику по игре').executes(ctx => showStats(ctx.player))
 
@@ -16,8 +17,7 @@ function showStats(player: Player, target: Player = player, back?: VoidFunction)
 
   function formatDate(date: number) {
     if (settings.statsRelative) {
-      const { type, value } = util.ms.remaining(date)
-      return `${value} ${type}`
+      return t.time`${date}`
     } else {
       const secsTotal = Math.floor(date / 1000)
 

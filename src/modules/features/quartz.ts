@@ -1,7 +1,7 @@
 import { ItemStack, system } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { isKeyof, util } from 'lib'
+import { isKeyof, ms } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { TechCity } from 'modules/places/tech-city/tech-city'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
@@ -56,7 +56,7 @@ actionGuard((player, region, ctx) => {
     location: ctx.event.block.location,
     typeId: ctx.event.block.typeId,
     states: ctx.event.block.permutation.getAllStates(),
-    restoreTime: util.ms.from('min', 2),
+    restoreTime: ms.from('min', 2),
   })
 
   system.delay(() => {

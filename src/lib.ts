@@ -36,6 +36,7 @@ export * from 'lib/search'
 export * from 'lib/settings'
 export * from 'lib/sidebar'
 export * from 'lib/temporary'
+export * from 'lib/utils/ms'
 export * from 'lib/zone'
 
 // Region

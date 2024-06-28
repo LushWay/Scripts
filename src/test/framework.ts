@@ -3,7 +3,8 @@
 import { RawMessage } from '@minecraft/server'
 import * as gametest from '@minecraft/server-gametest'
 import { expand } from 'lib/extensions/extend'
-import { util } from 'lib/util'
+import { stringifyError, util } from 'lib/util'
+import { inspect, stringify } from 'lib/utils/inspect'
 import { TestStructures } from 'test/constants'
 import './framework'
 
@@ -17,7 +18,7 @@ declare module '@minecraft/server-gametest' {
 }
 
 function formatRawText(e: RawMessage | string) {
-  return typeof e === 'string' ? e : util.error.isError(e) ? util.error(e) : util.inspect(e)
+  return typeof e === 'string' ? e : stringify(e)
 }
 
 let classNameGlobal = ''
@@ -33,7 +34,7 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
 
   const className = classNameGlobal
   const fullname = className + ':' + should
-  const filename = util.error.stack.get(1).split('\n')[0]?.trim() ?? 'unknown file'
+  const filename = stringifyError.stack.get(1).split('\n')[0]?.trim() ?? 'unknown file'
   return gametest
     .registerAsync(className, should, async test => {
       const history: string[] = []
@@ -48,7 +49,7 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
         let info = `§f§l§R FAIL §r ${filename} > §f${fullname}\n`
 
         const stringHistory = history
-          .concat(util.error(error))
+          .concat(stringifyError(error))
           .map(e => e.split('\n'))
           .flat()
           .map(line => '§r§f\n  ' + line)
@@ -57,7 +58,7 @@ export function test(should: string, testFunction: (test: gametest.ExtendedTest)
         console.log(info)
         test.print(`§c§lFAIL§r §f${fullname}\n` + stringHistory)
 
-        test.fail(util.error(error).replaceAll('§f', '§7'))
+        test.fail(stringifyError(error).replaceAll('§f', '§7'))
       }
     })
     .structureName(TestStructures.empty)
@@ -93,7 +94,7 @@ function expandPlayer(player: gametest.SimulatedPlayer, test: gametest.ExtendedT
       return this.isValid() ? super.name : 'Testing player'
     },
     playSound(sound, options) {
-      test.print(`${this.name}: §9playSound§f(§2'${sound}'§f, ${util.inspect(options)}§f)`)
+      test.print(`${this.name}: §9playSound§f(§2'${sound}'§f, ${inspect(options)}§f)`)
     },
 
     tell(message) {

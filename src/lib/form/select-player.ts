@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { BUTTON } from 'lib/form/utils'
-import { util } from 'lib/util'
+import { t } from 'lib/text'
 
 /**
  * Creates select player menu
@@ -45,12 +45,12 @@ export function createSelectPlayerMenu(
       })
       .addCustomButtonBeforeArray(form => {
         if (selected.length) {
-          form.addButton(util.badge('§3Убрать выделение', selected.length), BUTTON['-'], () => {
+          form.addButton(t.badge`§3Убрать выделение ${selected.length}`, BUTTON['-'], () => {
             selected.splice(0, selected.length)
             callback()
           })
         } else {
-          form.addButton(util.badge('§3Выбрать всех', players.length), BUTTON['+'], () => {
+          form.addButton(t.badge`§3Выбрать всех ${players.length}`, BUTTON['+'], () => {
             selected.splice(0, selected.length, ...getAllPlayersSelected())
             callback()
           })

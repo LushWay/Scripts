@@ -1,6 +1,6 @@
 import { World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
-import { util } from '../util'
+import { stringify, util } from '../util'
 import { Core } from './core'
 import { expand } from './extend'
 
@@ -42,7 +42,7 @@ expand(World.prototype, {
   nether: world.getDimension(MinecraftDimensionTypes.Nether),
   end: world.getDimension(MinecraftDimensionTypes.TheEnd),
   debug(...data: unknown[]) {
-    this.say(data.map(e => (typeof e === 'string' ? e : util.inspect(e))).join(' '))
+    this.say(data.map(stringify).join(' '))
   },
 
   logOnce(name, ...data: unknown[]) {

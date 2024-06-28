@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { ROLES, getRole, util } from 'lib'
+import { ROLES, getRole, inspect, util } from 'lib'
 import { DatabaseTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
@@ -43,7 +43,7 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
       if (typeof raw === 'string') raw = JSON.parse(raw) as typeof raw
     } catch {}
 
-    new ActionForm('§3RAW table §f' + tableId, util.inspect(raw)).addButton('Oк', selectTable).show(player)
+    new ActionForm('§3RAW table §f' + tableId, inspect(raw)).addButton('Oк', selectTable).show(player)
   })
 
   const keys = Object.keys(table)
@@ -75,7 +75,7 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
 
   new ActionForm(
     '§3Ключ ' + key,
-    `§7Тип: §f${typeof value}\n ${failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''}\n${util.inspect(value)}\n `,
+    `§7Тип: §f${typeof value}\n ${failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''}\n${inspect(value)}\n `,
   )
     .addButton('Изменить', () =>
       changeValue(
@@ -83,7 +83,7 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
         value,
         newValue => {
           table[key] = newValue
-          player.tell(util.inspect(value) + '§r -> ' + util.inspect(newValue))
+          player.tell(inspect(value) + '§r -> ' + inspect(newValue))
         },
         () => tableProperty(key, table, player, back),
         key,

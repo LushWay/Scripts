@@ -1,10 +1,11 @@
-import { ActionForm, FormCallback, util } from 'lib'
+import { ActionForm, FormCallback } from 'lib'
 import { Core } from 'lib/extensions/core'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { questsMenu } from 'lib/quest/menu'
 import { Menu } from 'lib/rpg/menu'
 import { playerSettingsMenu } from 'lib/settings'
+import { t } from 'lib/text'
 import { mailMenu } from 'modules/commands/mail'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { Anarchy } from '../places/anarchy'
@@ -34,10 +35,8 @@ Menu.open = player => {
       Anarchy.portal?.teleport(player)
     })
     .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', back)
-    .addButton(
-      util.badge('Задания', player.database.quests?.active.length ?? 0),
-      'textures/ui/sidebar_icons/genre',
-      () => questsMenu(player, back),
+    .addButton(t.badge`Задания ${player.database.quests?.active.length ?? 0}`, 'textures/ui/sidebar_icons/genre', () =>
+      questsMenu(player, back),
     )
 
   if (player.database.inv === 'anarchy')

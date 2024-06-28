@@ -3,6 +3,8 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { util } from '../util'
 import { expand } from './extend'
+import stringifyError from 'lib/utils/error'
+import { stringify } from 'lib/utils/inspect'
 
 declare global {
   interface Console {
@@ -143,17 +145,7 @@ declare global {
 function format(args: unknown[]) {
   const isPacket = typeof args[0] === 'string' && args[0].startsWith('[Packet]')
   if (typeof globalThis.loaded === 'number' && globalThis.loaded !== 0 && !isPacket && !__VITEST__) prefixFormat(args)
-  return args
-    .map(e =>
-      util.toTerminalColors(
-        typeof e === 'string'
-          ? e
-          : typeof e === 'object' && e !== null && e instanceof Error
-            ? util.error(e)
-            : util.inspect(e),
-      ),
-    )
-    .join(' ')
+  return args.map(e => util.toTerminalColors(stringify(e))).join(' ')
 }
 
 function prefixFormat(args: unknown[]) {

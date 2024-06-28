@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, util } from 'lib'
+import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, ms } from 'lib'
 import { Quest } from 'lib/quest/quest'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
@@ -10,7 +10,7 @@ const gravestoneOwnerKey = 'owner'
 export const gravestoneEntity = MinecraftEntityTypes.HopperMinecart
 const gravestoneTag = 'gravestone'
 const gravestoneSpawnedAt = 'gravestoneAt'
-const gravestoneCleanupAfter = util.ms.from('sec', 5)
+const gravestoneCleanupAfter = ms.from('sec', 5)
 
 world.afterEvents.entityDie.subscribe(event => {
   if (event.deadEntity instanceof Player) {

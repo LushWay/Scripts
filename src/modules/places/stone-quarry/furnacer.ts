@@ -1,11 +1,12 @@
 import { ItemStack, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector, util } from 'lib'
+import { Vector, ms, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { actionGuard } from 'lib/region/index'
 import { MoneyCost } from 'lib/shop/cost'
 import { ShopNpc, ShopNpcOptions } from 'lib/shop/npc'
+import { t } from 'lib/text'
 import { StoneQuarry } from './stone-quarry'
 
 export class Furnacer extends ShopNpc {
@@ -98,9 +99,8 @@ actionGuard((player, region, ctx) => {
       if (furnace.expires < Date.now()) {
         // Notify previous owner (Maybe?)
       } else {
-        const remaining = util.ms.remaining(furnace.expires - Date.now())
         return notAllowed(
-          `Эта печка уже занята. Печка освободится через §f${remaining.value} §c${remaining.type}, ключ: §f${furnace.code}`,
+          t.error`Эта печка уже занята. Печка освободится через ${t.error.time`${furnace.expires - Date.now()}`}, ключ: ${furnace.code}`,
         )
       }
     } else {
@@ -108,7 +108,7 @@ actionGuard((player, region, ctx) => {
       system.delay(() => {
         FurnaceKeyItem.db[blockId] = {
           code: lore.code,
-          expires: Date.now() + util.ms.from('hour', 1),
+          expires: Date.now() + ms.from('hour', 1),
           lastPlayerId: player.id,
         }
 
@@ -165,13 +165,13 @@ class FurnaceKeyItem {
           if (furnace.warnedAboutExpire) continue
 
           const untilExpire = furnace.expires - Date.now()
-          if (untilExpire < util.ms.from('min', 5)) {
+          if (untilExpire < ms.from('min', 5)) {
             players ??= world.getAllPlayers()
 
             const player = players.find(e => e.id === furnace.lastPlayerId)
             if (player) {
               player.warn(
-                `Через 5 минут ресурсы в вашей печке перестанут быть приватными! §7Печка находится на §f${key}§7, ключ: §f${furnace.code}`,
+                t`Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ${key}, ключ: ${furnace.code}`,
               )
 
               furnace.warnedAboutExpire = 1

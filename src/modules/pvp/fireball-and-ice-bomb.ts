@@ -1,7 +1,7 @@
 import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { util } from 'lib'
+import { ms } from 'lib'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 // TODO Make custom items and throw effects work properly
 // TODO FIX ALL THAT BUGGED SHIT
@@ -97,7 +97,7 @@ system.runInterval(
           location: block.location,
           typeId: block.typeId,
           states: block.permutation.getAllStates(),
-          restoreTime: util.ms.from('min', 1),
+          restoreTime: ms.from('min', 1),
         })
 
         block.setType(ICE_BOMB_TRANSOFORM[block.typeId])

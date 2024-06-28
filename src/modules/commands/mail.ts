@@ -1,10 +1,10 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, ArrayForm, Mail, Menu, Settings, prompt, util } from 'lib'
+import { ActionForm, ArrayForm, Mail, Menu, Settings, prompt } from 'lib'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 
-new Command('mail')
+const command = new Command('mail')
   .setDescription('Посмотреть входящие сообщения почты')
   .setPermissions('member')
   .executes(ctx => mailMenu(ctx.player))
@@ -122,9 +122,10 @@ function letterDetailsMenu(
 
 Join.onMoveAfterJoin.subscribe(({ player }) => {
   if (!getJoinSettings(player).unreadMails) return
+
   const unreadCount = Mail.getUnreadMessagesCount(player.id)
   if (unreadCount === 0) return
-  player.info(
-    `§f§lПочта: §r§7У вас §f${unreadCount} §7${util.ngettext(unreadCount, ['непрочитанное сообщение', 'непрочитанных сообщения', 'непрочитанных сообщений'])}! Посмотреть: §f.mail`,
-  )
+
+  const messages = t.num`${unreadCount} ${['непрочитанное сообщение', 'непрочитанных сообщения', 'непрочитанных сообщений']}!`
+  player.info(t`${t.header`Почта:`} У вас ${messages} Посмотреть: ${command}`)
 })

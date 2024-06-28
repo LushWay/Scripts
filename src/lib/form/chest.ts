@@ -3,7 +3,7 @@ import { BlockPermutation, Player, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { typeIdToReadable } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
-import { util } from 'lib/util'
+import { inspect, util } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 
@@ -48,7 +48,7 @@ export class ChestForm {
     return {
       nameTag: typeIdToReadable(permutation.type.id),
       icon: permutation.type.id,
-      lore: [...(Object.keys(states).length ? util.inspect(states).split('\n') : [])],
+      lore: [...(Object.keys(states).length ? inspect(states).split('\n') : [])],
     }
   }
 

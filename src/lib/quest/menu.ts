@@ -1,8 +1,9 @@
 import { Player } from '@minecraft/server'
-import { MessageForm, noNullable, util } from 'lib'
+import { MessageForm, noNullable } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
+import { t } from 'lib/text'
 import { Quest } from './quest'
 
 const quest = new Command('q')
@@ -48,9 +49,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
   new ArrayForm('§3Задания', quests.active)
     .description(!quests.active.length ? 'Нет активных заданий.' : '')
     .addCustomButtonBeforeArray(form => {
-      form.addButton(util.badge('§3Завершенные задания', quests.completed.length), () =>
-        completeQuestsMenu(player, self),
-      )
+      form.addButton(t.badge`§3Завершенные задания ${quests.completed.length}`, () => completeQuestsMenu(player, self))
     })
     .button(dbquest => {
       const quest = Quest.quests.get(dbquest.id)

@@ -7,8 +7,7 @@ import { Player } from '@minecraft/server'
 import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest'
 import { setRole } from './roles'
 import './text'
-import { t, textTable } from './text'
-import { util } from './util'
+import { ngettext, t, textTable } from './text'
 
 let player: Player
 beforeEach(() => {
@@ -36,7 +35,7 @@ describe('text', () => {
   })
 
   it('should apply options', () => {
-    expect(t.options({ unitColor: '§g', textColor: '§4' }).roles`Все должно работать ${player}`).toMatchInlineSnapshot(
+    expect(t.options({ unit: '§g', text: '§4' }).roles`Все должно работать ${player}`).toMatchInlineSnapshot(
       `"§4Все должно работать §5Админ§r §gTest player name§4"`,
     )
   })
@@ -84,7 +83,7 @@ describe('text', () => {
   it('should stringify num with plurals', () => {
     const n = 10
 
-    const text = util.ngettext(n, ['блок', 'блока', 'блоков'])
+    const text = ngettext(n, ['блок', 'блока', 'блоков'])
     expect(`§7Было сломано §6${n} §7${text}`).toMatchInlineSnapshot(`"§7Было сломано §610 §7блоков"`)
 
     expect(t.num`Было сломано ${n} ${['блок', 'блока', 'блоков']}`).toMatchInlineSnapshot(
@@ -105,6 +104,8 @@ describe('text', () => {
     expect(t.badge`Письма ${-3}`).toMatchInlineSnapshot(`"§7Письма§7"`)
     expect(t.badge`Письма ${0}`).toMatchInlineSnapshot(`"§7Письма§7"`)
     expect(t.badge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §8(§c3§8)§7"`)
+    expect(t.badge`${3}`).toMatchInlineSnapshot(`"§7§8(§c3§8)§7"`)
+    expect(t.badge`${0}`).toMatchInlineSnapshot(`"§7§7"`)
 
     // @ts-expect-error
     expect(t.badge`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)

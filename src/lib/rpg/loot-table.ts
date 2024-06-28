@@ -2,7 +2,7 @@ import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@mi
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Command } from 'lib/command'
 import { EventSignal } from 'lib/event-signal'
-import { isKeyof, util } from 'lib/util'
+import { inspect, isKeyof, util } from 'lib/util'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
@@ -107,7 +107,7 @@ export class Loot {
 
   chance(percent: Percent) {
     const chance = parseInt(percent)
-    if (isNaN(chance)) throw new TypeError(`Chance must be \`{number}%\`, got '${util.inspect(percent)}' instead!`)
+    if (isNaN(chance)) throw new TypeError(`Chance must be \`{number}%\`, got '${inspect(percent)}' instead!`)
 
     this.modifyCreatingItem().chance = chance
 
@@ -316,7 +316,7 @@ export class LootTable {
 
 function parseIntStrict(string: string) {
   const int = parseInt(string)
-  if (isNaN(int)) throw new TypeError(`Expected number, got ${util.inspect(string)}`)
+  if (isNaN(int)) throw new TypeError(`Expected number, got ${inspect(string)}`)
 
   return int
 }

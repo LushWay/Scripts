@@ -4,7 +4,7 @@ import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/kinds/region'
-import { util } from 'lib/util'
+import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { BaseRegion } from '../../modules/places/base/region'
 import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
@@ -103,10 +103,10 @@ function editRegion(player: Player, region: RadiusRegion, back: () => void): Pro
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
   const [x, y, z] = parseArguments(location)
-  if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + util.inspect(location))
+  if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + inspect(location))
 
   const parsed = parseLocationArguments([x, y, z], player)
-  if (!parsed) return ctx.error('Неправильная локация: ' + util.inspect(location))
+  if (!parsed) return ctx.error('Неправильная локация: ' + inspect(location))
 
   return parsed
 }

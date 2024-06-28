@@ -1,6 +1,5 @@
 import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
-import { util } from 'lib/util'
 
 declare module '@minecraft/server' {
   type GameplayStatScoreName =
@@ -83,7 +82,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
           {
             set(_, p, newValue: number) {
               if (typeof p === 'symbol')
-                throw new Error('Symbol objectives to set are not accepted, recieved ' + util.stringify(p))
+                throw new Error(`Symbol objectives to set are not accepted, recieved ${p.description}`)
 
               ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(obj.player.id, Math.round(newValue))
               return true

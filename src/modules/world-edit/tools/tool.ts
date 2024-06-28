@@ -1,5 +1,5 @@
 import { MolangVariableMap, system, world } from '@minecraft/server'
-import { ActionForm, ModalForm, Vector, util } from 'lib'
+import { ActionForm, ModalForm, Vector, inspect, util } from 'lib'
 import { CustomItems } from 'lib/assets/config'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
@@ -82,7 +82,7 @@ new WorldEditTool({
             if (index === -1)
               return ctx.error(
                 'Неизвестный ID или номер партикла! Убедитесь что ID начинается с minecraft: и партикл состоит только из цифр\n' +
-                  util.inspect({ text, num, parsedNum: number }),
+                  inspect({ text, num, parsedNum: number }),
               )
 
             callback(text, index)

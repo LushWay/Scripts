@@ -115,7 +115,7 @@ class ItemLore<T extends TypeSchema> {
     if (typeof lsid === 'string') {
       if (lsid !== this.lsid) return
     } else {
-      if (lsid) console.warn(t.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${util.inspect(lsid)}`)
+      if (lsid) console.warn(t.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${lsid}`)
       return
     }
 

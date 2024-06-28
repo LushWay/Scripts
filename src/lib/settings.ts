@@ -2,10 +2,11 @@ import { Player } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { FormCallback } from 'lib/form/utils'
-import { util } from 'lib/util'
+import { stringify } from 'lib/util'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { table } from './database/abstract'
 import { t } from './text'
+import stringifyError from './utils/error'
 
 type DropdownSetting = [value: string, displayText: string]
 
@@ -241,7 +242,7 @@ export function settingsGroupMenu(
       const isString = typeof value === 'string'
 
       if (!isString) {
-        label += `\n§7§lЗначение:§r ${util.stringify(value)}`
+        label += `\n§7§lЗначение:§r ${stringify(value)}`
 
         label += `\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`
       }
@@ -274,7 +275,7 @@ export function settingsGroupMenu(
             }
           }
 
-          if (util.stringify(store[key]) === util.stringify(result)) return ''
+          if (stringify(store[key]) === stringify(result)) return ''
           if (typeof result !== 'undefined') {
             player.log(
               'Settings',
@@ -287,9 +288,10 @@ export function settingsGroupMenu(
         } catch (error: unknown) {
           player.log(
             'Settings',
-            t.error`Changing ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' error: ${util.error(error as Error)}`,
+            t.error`Changing ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' error: ${error}`,
           )
-          return util.error.isError(error) ? `§c${error.message}` : util.inspect(error)
+
+          return stringifyError.isError(error) ? `§c${error.message}` : stringify(error)
         }
       },
     ])
@@ -352,7 +354,7 @@ export function worldSettingsMenu(player: Player) {
       if (option.requires && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.addButton(util.badge(group[SETTINGS_GROUP_NAME] ?? groupId, unsetCount, { color: '§c' }), () => {
+    form.addButton(`${group[SETTINGS_GROUP_NAME] ?? groupId} ${t.error.badge`${unsetCount}`}`, () => {
       settingsGroupMenu(player, groupId, false)
     })
   }

@@ -6,6 +6,7 @@ import { CustomItems } from 'lib/assets/config'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/world-edit/utils/blocks-set'
 import { BaseBrushTool } from '../lib/base-brush-tool'
+import { ngettext } from 'lib/text'
 
 interface SmoothProps {
   smoothLevel: number
@@ -154,7 +155,7 @@ export async function smoothVoxelData(
 
     if (radius > 5)
       player.info(
-        prefix + `Будет заполнено §6${toFill.length} §f${util.ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
+        prefix + `Будет заполнено §6${toFill.length} §f${ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
       )
 
     for (const e of toFill) {

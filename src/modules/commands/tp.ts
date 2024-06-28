@@ -1,6 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 import { ActionForm, Vector, getRoleAndName, util } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
+import { ngettext } from 'lib/text'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
@@ -39,7 +40,7 @@ function tpMenu(player: Player) {
     locations['Спавн'] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    form.addButton(`${name} §7(${players} ${util.ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
+    form.addButton(`${name} §7(${players} ${ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
       if (player.database.inv !== 'anarchy' && !isNotPlaying(player)) {
         return player.fail(
           'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.',

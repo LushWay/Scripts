@@ -130,13 +130,13 @@ export class ShopForm {
         const text = typeof name === 'function' ? name(canBuy) : name
 
         form.addButton(
-          t.options({ unitColor: canBuy ? '§f' : '§7' }).raw`§l${text}§r\n${cost.toString(canBuy, player)}`,
+          t.options({ unit: canBuy ? '§f' : '§7' }).raw`§l${text}§r\n${cost.toString(canBuy, player)}`,
           () => this.buy({ text: text, cost, onBuy, player, back }),
         )
       } else {
         const { name, onOpen } = button
 
-        form.addButton(t.options({ unitColor: '§3' }).raw`${name}`, () => {
+        form.addButton(t.options({ unit: '§3' }).raw`${name}`, () => {
           const form = new ShopForm(t.header.raw`${this.title} > ${name}`, this.body)
           onOpen(form)
           form.show(player, '', () => this.show(player))
@@ -161,7 +161,7 @@ export class ShopForm {
       if (!canBuy()) return
 
       const successBuy = () =>
-        this.show(player, t.options({ textColor: '§a' }).raw`Успешная покупка: ${text} за ${cost.toString()}!`)
+        this.show(player, t.options({ text: '§a' }).raw`Успешная покупка: ${text} за ${cost.toString()}!`)
 
       if (onBuy(player, text, successBuy) !== false) successBuy()
     }

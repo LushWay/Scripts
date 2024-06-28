@@ -1,5 +1,6 @@
 import { BlockRaycastHit, InvalidContainerSlotError, ItemStack, Player } from '@minecraft/server'
-import { isInvalidLocation, util } from 'lib'
+import { isInvalidLocation } from 'lib'
+import stringifyError from 'lib/utils/error'
 import { WorldEditPlayerSettings } from 'modules/world-edit/settings'
 import { WorldEditTool } from './world-edit-tool'
 
@@ -66,7 +67,7 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
         fail('Блок не прогружен.')
       } else {
         console.error(e)
-        fail('Ошибка ' + util.error.message.get(e as Error))
+        fail('Ошибка ' + stringifyError.message.get(e as Error))
       }
     }
   }

@@ -1,10 +1,11 @@
 import { Player, system, world } from '@minecraft/server'
-import { LockAction, Region, util } from 'lib'
+import { LockAction, Region, ms } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
+import { t } from 'lib/text'
 
 const notify = new Map<string, number>()
-const targetLockTime = util.ms.from('min', 8) / 20
-const raiderLockTime = util.ms.from('min', 10) / 20
+const targetLockTime = ms.from('min', 8) / 20
+const raiderLockTime = ms.from('min', 10) / 20
 
 world.beforeEvents.explosion.subscribe(event => {
   const impactedBlocks = event.getImpactedBlocks().filter(block => {
@@ -23,8 +24,7 @@ const locktext = 'Вы находитесь в режиме рейдблока.'
 new LockAction(player => {
   const raidLockTime = player.scores.raid
   if (raidLockTime > 0) {
-    const { value, type } = util.ms.remaining(raidLockTime * 1000, { converters: ['sec', 'min', 'hour', 'day'] })
-    return { lockText: `${locktext} Осталось ${value} ${type}` }
+    return { lockText: `${locktext} Осталось ${t.error.ttime(raidLockTime * 1000)}` }
   } else return false
 }, locktext)
 

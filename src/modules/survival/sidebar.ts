@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { Menu, Region, Settings, Sidebar, util } from 'lib'
+import { Menu, Region, Settings, Sidebar, separateNumberWithDots } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
@@ -102,8 +102,8 @@ const survivalSidebar = new Sidebar(
 
       return text
     },
-    [names.money]: player => util.numseparate(player.scores.money),
-    [names.leafs]: player => util.numseparate(player.scores.leafs),
+    [names.money]: player => separateNumberWithDots(player.scores.money),
+    [names.leafs]: player => separateNumberWithDots(player.scores.leafs),
     [names.online]: {
       create() {
         let online = world.getAllPlayers().length

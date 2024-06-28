@@ -1,7 +1,7 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/config'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { util } from 'lib/util'
+import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 import { Nullable } from 'vitest'
 import { table } from '../database/abstract'
@@ -23,9 +23,7 @@ export class Leaderboard {
 
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
     if (scoreboardId.endsWith('Time')) {
-      const time = util.ms.remaining(score, { converters: ['ms', 'sec', 'min', 'hour'] })
-
-      return `${time.value} ${time.type}`
+      return t.time`${score}`
     } else if (scoreboardId.endsWith('Date')) {
       return new Date(score * 1000).format()
     }

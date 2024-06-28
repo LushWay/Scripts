@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
-import { expand, util } from 'lib'
+import { expand, inspect, util } from 'lib'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { WorldEditPlayerSettings } from '../settings'
 
@@ -191,7 +191,7 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
         .map(([key, value]) => {
           const val = WorldEditTool.loreBlockSetKeys.includes(key)
             ? stringifyBlocksSetRef(value as BlocksSetRef)
-            : util.inspect(value)
+            : inspect(value)
 
           const k = this.loreTranslation[key] ?? key
           return `${k}: ${val}`.match(/.{0,48}/g) ?? []

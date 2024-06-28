@@ -1,7 +1,7 @@
 import { EasingType, Player, system, world } from '@minecraft/server'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
-import { ActionForm, ModalForm, Vector, util } from 'lib'
+import { ActionForm, ModalForm, Vector, inspect } from 'lib'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 
 export type CameraDBModes = 'spinAroundPos'
@@ -39,7 +39,7 @@ function setupCameraForm(player: Player, target: Player) {
       const rawPosArray = parseArguments(rawPos)
       const pos = parseLocationArguments([rawPosArray[0], rawPosArray[1], rawPosArray[2]], player)
 
-      if (!pos) return ctx.error('Неправильныe координаты центральной позиции камеры: ' + util.inspect(rawPosArray))
+      if (!pos) return ctx.error('Неправильныe координаты центральной позиции камеры: ' + inspect(rawPosArray))
 
       let facing
       if (facingPosRaw) {

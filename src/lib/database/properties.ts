@@ -3,6 +3,7 @@ import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from '../util'
 import { DatabaseDefaultValue, DatabaseError, DatabaseTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
+import { t } from 'lib/text'
 
 class DynamicPropertyDB<Key extends string = string, Value = undefined> extends ProxyDatabase<Key, Value> {
   static tables: Record<string, DatabaseTable> = {}
@@ -43,7 +44,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
           if (typeof prop !== 'string') {
             console.error(
               new DatabaseError(
-                `Corrupted database table '${this.id}', index ${i}, expected string, recieved '${util.inspect(prop)}'`,
+                t.error`Corrupted database table '${this.id}', index ${i}, expected string, recieved '${prop}'`,
               ),
             )
             console.error('Loaded part of database:', value)
@@ -66,7 +67,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
         }),
       )
     } catch (error) {
-      console.error(new DatabaseError(`Failed to init table '${this.id}': ${util.error(error as Error)}`))
+      console.error(new DatabaseError(t`Failed to init table '${this.id}': ${error}`))
     }
   }
 

@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, util } from 'lib'
+import { Boss, Loot, ms } from 'lib'
 import { City } from '../lib/city'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
@@ -16,7 +16,7 @@ class StoneQuarryBuilder extends City {
     name: 'Камнедробилка',
     entityTypeId: MinecraftEntityTypes.Wither,
     bossEvent: false,
-    respawnTime: util.ms.from('hour', 1),
+    respawnTime: ms.from('hour', 1),
     loot: new Loot('wither drop').item('NetherStar').build,
   })
 

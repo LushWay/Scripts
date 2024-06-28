@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector, util } from 'lib'
+import { Vector, ms } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
@@ -12,7 +12,7 @@ actionGuard((player, region, ctx) => {
       const dimension = ctx.event.block.dimension
       const base = {
         dimension: dimension.type,
-        restoreTime: util.ms.from('sec', 10),
+        restoreTime: ms.from('sec', 10),
       }
 
       if (ctx.type === 'place') {

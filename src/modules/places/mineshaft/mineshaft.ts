@@ -1,5 +1,5 @@
 import { system } from '@minecraft/server'
-import { actionGuard, isNotPlaying, util } from 'lib'
+import { actionGuard, isNotPlaying, ms } from 'lib'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { ores, placeOre } from './algo'
 import { MineshaftRegion } from './mineshaft-region'
@@ -22,7 +22,7 @@ actionGuard((player, region, ctx) => {
       scheduleBlockPlace({
         dimension: dimension.type,
         location: block.location,
-        restoreTime: util.ms.from('min', Math.randomInt(1, 3)),
+        restoreTime: ms.from('min', Math.randomInt(1, 3)),
         typeId: ore ? ore.empty : block.typeId,
         states: ore ? undefined : block.permutation.getAllStates(),
       })
@@ -35,7 +35,7 @@ actionGuard((player, region, ctx) => {
       scheduleBlockPlace({
         dimension: dimension.type,
         location: block.location,
-        restoreTime: util.ms.from('min', Math.randomInt(3, 10)),
+        restoreTime: ms.from('min', Math.randomInt(3, 10)),
         typeId: block.typeId,
         states: block.permutation.getAllStates(),
       })

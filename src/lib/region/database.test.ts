@@ -76,7 +76,7 @@ describe('region initialization', () => {
 
     const region = OldRadiusRegionKind.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
 
-    const consoleWarn = vi.spyOn(console, 'warn')
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     expect(restoreRegionFromJSON(['test', region.json])).toBeUndefined()
     expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
       [

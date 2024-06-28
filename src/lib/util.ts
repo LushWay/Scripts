@@ -1,370 +1,23 @@
 import { TerminalColors } from './assets/terminal-colors'
-import { sendPacketToStdout } from './bds/api'
+import stringifyError from './utils/error'
+import { inspect, stringify } from './utils/inspect'
+
+export { inspect, stringify, stringifyError }
 
 export const util = {
-  error: Object.assign(
-    /**
-     * Stringify and show error in console
-     *
-     * @param error
-     * @param options
-     * @param options.errorName - Overrides error name
-     * @param options.parseOnly - Whenever to log error to console or not.
-     */
-    function error(
-      error: { message: string; stack?: string; name?: string } | string,
-      { omitStackLines = 0 }: { omitStackLines?: number } = {},
-    ) {
-      if (typeof error === 'string') {
-        error = new Error(error)
-        error.name = 'StringError'
-      }
-
-      __PRODUCTION__ &&
-        sendPacketToStdout('error', {
-          name: error.name ?? 'Error',
-          stack: error.stack ?? '',
-          message: error.message,
-        })
-
-      const stack = util.error.stack.get(omitStackLines + 1, error.stack)
-      const message = util.error.message.get(error)
-      const name = error.name ?? 'Error'
-      const text = `§4${name}: §c${message}\n§f${stack}`
-
-      return text
-    },
-    {
-      /** Checks if provided argument is instanceof Error */
-      isError(object: unknown): object is Error {
-        return typeof object === 'object' && object !== null && object instanceof Error
-      },
-      stack: {
-        modifiers: [
-          [/\\/g, '/'],
-          [/<anonymous>/, 'ƒ'],
-          [/ƒ \((.+)\)/, 'ƒ $1'],
-          [/(.*)\(native\)(.*)/, '§8$1(native)$2§f'],
-          [s => (s.includes('lib') ? `§7${s.replace(/§./g, '')}§f` : s)],
-          // [s => (s.startsWith('§7') ? s : s.replace(/:(\d+)/, ':§6$1§f'))],
-        ] as [RegExp | ((s: string) => string), string?][],
-
-        /** Parses stack */
-        get(omitLines = 0, stack?: string): string {
-          if (!stack) {
-            stack = new Error().stack
-            if (!stack) return 'Null stack'
-            stack = stack
-              .split('\n')
-              .slice(omitLines + 1)
-              .join('\n')
-          }
-
-          const stackArray = stack.split('\n')
-
-          const mappedStack = stackArray
-            .map(e => e.replace(/\s+at\s/g, '').replace(/\n/g, ''))
-            .map(e => {
-              for (const [r, p] of this.modifiers) {
-                if (typeof e !== 'string' || e.length < 1) break
-
-                if (typeof r === 'function') e = r(e)
-                else e = e.replace(r, p ?? '')
-              }
-              return e
-            })
-            .filter(e => e && /^\s*\S/g.test(e))
-            .map(e => `   ${e}\n`)
-
-          return mappedStack.join('')
-        },
-      },
-      message: {
-        modifiers: [
-          // [/\n/g, ''],
-          [/Module \[(.*)\] not found\. Native module error or file not found\./g, '§cNot found: §6$1', 'LoadError'],
-        ] as [RegExp | string, string, string?][],
-
-        /** @param {{ message?: string; name?: string }} error */
-        get(error: { message?: string; name?: string }) {
-          let message = error.message ?? ''
-          for (const [find, replace, newname] of this.modifiers) {
-            const newmessage = message.replace(find, replace)
-            if (newmessage !== message && newname) error.name = newname
-            message = newmessage
-          }
-
-          return message
-        },
-      },
-    },
-  ),
-
-  stringify(target: unknown) {
-    if (typeof target === 'string') return target
-    return this.inspect(target)
-  },
-
-  inspect(target: unknown, space = '  ', cw = '', funcCode = false, depth = 0) {
-    const c = {
-      function: {
-        function: '§5',
-        name: '§d',
-        arguments: '§f',
-        code: '§8',
-        brackets: '§7',
-      },
-
-      nonstring: '§6',
-      undefined: '§7',
-      symbol: '§2',
-      string: '§2',
-    }
-
-    const uniqueKey = Date.now().toString()
-
-    // avoid Circular structure error
-    const visited = new WeakSet()
-
-    if (depth > 10 || typeof target !== 'object') return `${rep(target)}` || `${target}` || '{}'
-
-    function rep(value: unknown) {
-      if (typeof value === 'object' && value !== null) {
-        if (visited.has(value)) {
-          // Circular structure detected
-          return '§b<ref *>§r'
-        } else {
-          try {
-            visited.add(value)
-          } catch (e) {}
-        }
-      }
-
-      switch (typeof value) {
-        case 'function': {
-          let r: string = value.toString().replace(/[\n\r]/g, '')
-
-          if (!funcCode) {
-            const native = r.includes('[native code]')
-            const code = native ? ' [native code] ' : '...'
-            let isArrow = true
-            let name = ''
-
-            if (r.startsWith('function')) {
-              r = r.replace(/^function\s*/, '')
-              isArrow = false
-            }
-
-            const match = r.match(/(\w*)\(/)?.[1]
-            if (match) {
-              name = match
-              r = r.replace(name, '')
-            }
-
-            let args = '()',
-              bracket = false,
-              escape = false
-
-            for (const [i, char] of r.split('').entries()) {
-              if (char === '"' && !escape) {
-                bracket = !bracket
-              }
-
-              if (char === '\\') {
-                escape = true
-              } else escape = false
-
-              if (!bracket && char === ')') {
-                args = r.substring(0, i)
-                break
-              }
-            }
-            const cl = c.function
-            // function
-            r = isArrow ? '' : `${cl.function} ƒ `
-            // "name"
-            r += `${cl.name}${name}`
-            // "(arg, arg)"
-            r += `${cl.arguments}${args})`
-            // " => "  or  " "
-            r += `${cl.function}${isArrow ? ' => ' : ' '}`
-            // "{ code }"
-            r += `${cl.brackets}{${cl.code}${code}${cl.brackets}}§r`
-          }
-
-          value = r
-
-          break
-        }
-
-        case 'object': {
-          if (Array.isArray(value)) break
-          if (value === null) return 'null'
-
-          const allInherits: JsonObject = {}
-
-          for (const key in value)
-            try {
-              // value[key] can be ungettable
-              allInherits[key] = (value as JsonObject)[key]
-            } catch (e) {}
-
-          value = allInherits
-          break
-        }
-        case 'symbol':
-          value = `${c.symbol}Symbol(${value.description})§r`
-          break
-
-        case 'string':
-          value = `${c.string}\`${value.replace(/"/g, uniqueKey).replace(/§/g, '§§')}\`§r`
-          break
-
-        case 'undefined':
-          value = `${c.undefined}${value}§r`
-          break
-
-        default:
-          value = `${c.nonstring}${value}§r`
-          break
-      }
-      return value
-    }
-
-    return JSON.stringify(target, (_, value) => rep(value), space)
-      .replace(/"/g, cw)
-      .replace(new RegExp(uniqueKey, 'g'), '"')
-      .slice(0, 1000)
-  },
-
-  /**
-   * Instantly runs given function and if it throws synhronous error it will be catched and returned as second element
-   * in the array
-   *
-   * @param fn
-   */
-  run<T extends () => unknown = () => unknown>(
-    fn: T,
-  ): [result: ReturnType<T>, error: undefined] | [result: undefined, error: unknown] {
-    try {
-      return [fn() as ReturnType<T>, void 0]
-    } catch (error) {
-      return [void 0, error]
-    }
-  },
-
   /** Runs the given callback safly. If it throws any error it will be handled */
   catch(fn: () => void | Promise<void>, subtype = 'Handled') {
     const prefix = `§6${subtype}: `
     try {
       const promise = fn()
-      if (promise instanceof Promise)
+      if (promise instanceof Promise) {
         promise.catch((e: unknown) => {
-          console.error(prefix + this.error(e as Error, { omitStackLines: 1 }))
+          console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
         })
-    } catch (e: unknown) {
-      console.error(prefix + this.error(e as Error, { omitStackLines: 1 }))
-    }
-  },
-
-  /**
-   * Gets plural form based on provided number
-   *
-   * @param n - Number
-   * @param forms - Plurals forms in format `1 секунда 2 секунды 5 секунд`
-   * @returns Plural form. Currently only Russian supported
-   */
-  ngettext(n: number, [one = 'секунда', few = 'секунды', more = 'секунд']: Plurals) {
-    if (!Number.isInteger(n)) return more
-    return [one, few, more][
-      n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2
-    ]
-  },
-
-  ms: {
-    /**
-     * Parses the remaining time in milliseconds into a more human-readable format
-     *
-     * @example
-     *   const {type, value} = util.ms.remaining(1000)
-     *   console.log(value + ' ' + type) // 1 секунда
-     *
-     * @example
-     *   const {type, value} = util.ms.remaining(1000 * 60 * 2)
-     *   console.log(value + ' ' + type) // 2 минуты
-     *
-     * @example
-     *   const {type, value} = util.ms.remaining(1000 * 60 * 2, { converters: ['sec' ]}) // only convert to sec
-     *   console.log(value + ' ' + type) // 120 секунд
-     *
-     * @param ms - Milliseconds to parse from
-     * @param options - Convertion options
-     * @param options.converters - List of types to convert to. If some time was not specified, e.g. ms, the most
-     *   closest type will be used
-     * @returns - An object containing the parsed time and the type of time (e.g. "days", "hours", etc.)
-     */
-    remaining(
-      ms: number,
-      { converters: converterTypes = ['sec', 'min', 'hour', 'day'] }: { converters?: Time[] } = {},
-    ): { value: string; type: string } {
-      const converters = converterTypes.map(type => util.ms.converters[type]).sort((a, b) => b.time - a.time)
-      for (const { time, friction = 0, plurals } of converters) {
-        const value = ms / time
-        if (~~value >= 1) {
-          // Replace all 234.0 values to 234
-          const parsedTime = value
-            .toFixed(friction)
-            .replace(/(\.[1-9]*)0+$/m, '$1')
-            .replace(/\.$/m, '')
-
-          return {
-            value: parsedTime,
-            type: util.ngettext(Number(parsedTime), plurals),
-          }
-        }
       }
-
-      return { value: ms.toString(), type: 'миллисекунд' }
-    },
-    /** Converts provided time to ms depending on the type */
-    from(type: Time, num: number) {
-      return this.converters[type].time * num
-    },
-    converters: {
-      ms: {
-        time: 1,
-        plurals: ['миллисекунд', 'миллисекунды', 'миллисекунд'],
-      },
-      sec: {
-        time: 1000,
-        plurals: ['секунда', 'секунды', 'секунд'],
-      },
-      min: {
-        time: 1000 * 60,
-        plurals: ['минуту', 'минуты', 'минут'],
-        friction: 1,
-      },
-      hour: {
-        time: 1000 * 60 * 60,
-        plurals: ['час', 'часа', 'часов'],
-        friction: 1,
-      },
-      day: {
-        time: 1000 * 60 * 60 * 60 * 24,
-        plurals: ['день', 'дня', 'дней'],
-        friction: 2,
-      },
-      month: {
-        time: 1000 * 60 * 60 * 60 * 24 * 30,
-        plurals: ['месяц', 'месяца', 'месяцев'],
-        friction: 2,
-      },
-      year: {
-        time: 1000 * 60 * 60 * 60 * 24 * 30 * 12,
-        plurals: ['год', 'года', 'лет'],
-        friction: 3,
-      },
-    } as Record<Time, { time: number; friction?: number; plurals: Plurals }>,
+    } catch (e: unknown) {
+      console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
+    }
   },
 
   benchmark: Object.assign(
@@ -417,40 +70,6 @@ export const util = {
   },
 
   /**
-   * Adds unread count badge to the string
-   *
-   * @param {string} string
-   * @param {number} number
-   * @param {object} [options]
-   * @param {boolean} [options.showZero=false] Default is `false`
-   * @param {string} [options.color='§f'] Default is `'§f'`
-   * @param {boolean} [options.brackets=true] Default is `true`
-   * @param {string} [options.bracketColor=color] Default is `color`
-   */
-
-  badge(
-    string: string,
-    number: number,
-    {
-      showZero = false,
-      color = '§f',
-      brackets = true,
-      bracketColor = color,
-    }: { showZero?: boolean; color?: string; brackets?: boolean; bracketColor?: string } = {},
-  ) {
-    if (!showZero && number === 0) return string
-
-    string += ' '
-    if (brackets) string += bracketColor + '('
-    string += color
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    string += number
-    if (brackets) string += bracketColor + ')§r'
-
-    return string
-  },
-
-  /**
    * Wraps the line
    *
    * @param string
@@ -500,16 +119,6 @@ export const util = {
     })
   },
 
-  /**
-   * Formats big number and adds . separator, e.g. 15000 -> 15.000
-   *
-   * @param n
-   * @returns Formatted string
-   */
-  numseparate(n = 0, separator = '.') {
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
-  },
-
   /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
     return __SERVER__
@@ -521,20 +130,62 @@ export const util = {
 
 export type Paginator = ReturnType<(typeof util)['paginate']>
 
-/** Plurals forms in format `1 секунда 2 секунды 5 секунд` */
-type Plurals = [string, string, string]
+/**
+ * Formats big number and adds . separator, e.g. 15000 -> 15.000
+ *
+ * @param n
+ * @returns Formatted string
+ */
+export function separateNumberWithDots(n = 0, separator = '.') {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
+}
 
-type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'
-
+/**
+ * Helper function used to filter out null and undefined values from array
+ *
+ *     const array = [false, 'string', null, undefined] // (boolean | string | null | undefined)[]
+ *
+ *     array.filter(noNullable) // (boolean | string)[]
+ *
+ * @param value - Array to filter
+ * @returns
+ */
 export function noNullable<T>(value: T): value is NonNullable<T> {
   return typeof value !== 'undefined' && value !== null
 }
 
+/**
+ * Helper function used to filter out booleans from array
+ *
+ *     const array = [false, 'string', { object: true }] // (boolean | string | {..})[]
+ *
+ *     array.filter(noBoolean) // (string | {...})[]
+ *
+ * @param value - Array to filter
+ * @returns
+ */
 export function noBoolean<T>(value: T): value is Exclude<T, boolean> {
-  return value !== false
+  return value !== false && value !== true
 }
 
 type Key = string | symbol | number
+
+/**
+ * Checks if a given key is an existing key of a specified object.
+ *
+ *     enum Example {
+ *       Value = 'value',
+ *       Another = 'another
+ *     }
+ *     const a = 'value'
+ *
+ *     if (a in Example) Example[a] // type error
+ *     if (isKeyof(a, example)) Example[a] // works!
+ *
+ * @param {Key} key - Key that you want to check if it exists in the provided object.
+ * @param {O} object - Object to check key on
+ * @returns Boolean value indicating whether the `key` provided is a key of the `object` provided.
+ */
 export function isKeyof<O extends Record<Key, unknown>>(key: Key, object: O): key is keyof O {
   return key in object
 }

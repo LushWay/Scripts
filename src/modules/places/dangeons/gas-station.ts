@@ -1,4 +1,4 @@
-import { Loot, Region, registerRegionKind, util } from 'lib'
+import { Loot, Region, ms, registerRegionKind } from 'lib'
 import { CustomStructures } from 'lib/assets/config'
 import { DungeonRegion } from 'lib/region/kinds/dungeon'
 import { CannonBulletItem } from '../tech-city/engineer'
@@ -57,7 +57,7 @@ export class GasStationGarageRegion extends DungeonRegion {
       .chance('40%')
       .amount({ '1...2': '1%' }).build
 
-    this.createChest({ x: 0, y: 0, z: 0 }, loot).restoreTime(util.ms.from('sec', 10))
+    this.createChest({ x: 0, y: 0, z: 0 }, loot).restoreTime(ms.from('sec', 10))
   }
 
   // eslint-disable-next-line @typescript-eslint/class-literal-property-style
@@ -102,7 +102,7 @@ export class GasStationCommonRegion extends DungeonRegion {
       .chance('40%')
       .amount({ '1...2': '1%' }).build
 
-    this.createChest({ x: 0, y: -1, z: 0 }, loot).restoreTime(util.ms.from('sec', 10))
+    this.createChest({ x: 0, y: -1, z: 0 }, loot).restoreTime(ms.from('sec', 10))
   }
 
   // eslint-disable-next-line @typescript-eslint/class-literal-property-style
@@ -147,7 +147,7 @@ export class GasStationRegion extends DungeonRegion {
       .chance('40%')
       .amount({ '1...2': '1%' }).build
 
-    this.createChest({ x: 0, y: -1, z: 0 }, loot).restoreTime(util.ms.from('sec', 10))
+    this.createChest({ x: 0, y: -1, z: 0 }, loot).restoreTime(ms.from('sec', 10))
   }
 
   // eslint-disable-next-line @typescript-eslint/class-literal-property-style

@@ -1,6 +1,7 @@
 import { System, world } from '@minecraft/server'
 import { util } from '../util'
 import { expand } from './extend'
+import stringifyError from 'lib/utils/error'
 
 declare module '@minecraft/server' {
   interface System {
@@ -99,7 +100,7 @@ function Timer(
   ticks = 0,
 ) {
   const visualId = `${name} (${type} ${ticks} ticks)`
-  const path = util.error.stack.get(1)
+  const path = stringifyError.stack.get(1)
   TIMERS_PATHES[visualId] = path
 
   return set(function timer() {

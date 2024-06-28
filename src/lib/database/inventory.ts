@@ -2,7 +2,8 @@ import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/ser
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Core } from 'lib/extensions/core'
-import { util } from '../util'
+import { t } from 'lib/text'
+import stringifyError from 'lib/utils/error'
 import { DatabaseError } from './abstract'
 import { DatabaseUtils } from './utils'
 
@@ -167,7 +168,10 @@ export class InventoryStore {
 
       // Finding manifest
       if (raw && raw.at(0) === '{' && raw.at(-1) === '}') {
-        const [manifest] = util.run(() => JSON.parse(raw) as StoreManifest)
+        let manifest
+        try {
+          manifest = JSON.parse(raw) as StoreManifest
+        } catch {}
 
         // No data means that this isnt manifest, do nothing
         if (!manifest) continue
@@ -244,7 +248,7 @@ export class InventoryStore {
         if (!store.equipment[key]) continue
         const move = manifest.slots.push(key)
         const eq = store.equipment[key]
-        if (!eq) throw new DatabaseError('Failed to get equipment with key ' + util.inspect(key))
+        if (!eq) throw new DatabaseError(t.error`Failed to get equipment with key ${key}`)
 
         items[storeIndex + move] = eq
       }
@@ -320,7 +324,7 @@ export class InventoryStore {
             'Unable to save InventoryStore, error:',
             error,
             '\nSaving request by:',
-            util.error.stack.get(2, stack),
+            stringifyError.stack.get(2, stack),
           )
         }
       },

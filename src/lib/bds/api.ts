@@ -1,4 +1,5 @@
-import { util } from 'lib/util'
+import { t } from 'lib/text'
+import { inspect } from 'lib/util'
 import { ServerModules } from './modules'
 
 class RequestError extends Error {}
@@ -28,7 +29,7 @@ export async function request<Path extends keyof Scripts.Routes>(
       body = JSON.parse(response.body) as { status: number }
     } catch (error) {
       throw new RequestError(
-        `${prefix}): Failed to parse NodeServer response.body: ${util.inspect(response.body)}\n${util.error(error as Error)}`,
+        t.error`${prefix}): Failed to parse NodeServer response.body: ${inspect(response.body)}\n${error}`,
       )
     }
 

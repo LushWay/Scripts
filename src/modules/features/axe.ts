@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Region, util } from 'lib'
+import { Region, ms, util } from 'lib'
 import { isBuilding } from 'lib/game-utils'
 import { actionGuard } from 'lib/region/index'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
@@ -36,7 +36,7 @@ world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: b
     location: block.location,
     typeId: broken.type.id,
     states: broken.getAllStates(),
-    restoreTime: util.ms.from('min', 1),
+    restoreTime: ms.from('min', 1),
   })
 
   player.container

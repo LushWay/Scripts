@@ -16,6 +16,7 @@ import {
   NpcForm,
   Settings,
   Vector,
+  inspect,
   is,
   isKeyof,
   itemLocaleName,
@@ -150,7 +151,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     menu.show(ctx.player)
   },
   components: ctx => {
-    ctx.reply(util.inspect(ctx.player.getComponents()))
+    ctx.reply(inspect(ctx.player.getComponents()))
   },
 
   dbinspect(ctx) {
@@ -240,7 +241,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       playerName: ctx.player.name,
     })
 
-    console.warn(util.inspect(res))
+    console.warn(inspect(res))
   },
   lore(ctx) {
     ctx.player.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])

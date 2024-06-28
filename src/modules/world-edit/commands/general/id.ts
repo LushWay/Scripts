@@ -1,6 +1,6 @@
 import {} from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Vector, util } from 'lib'
+import { Vector, inspect, util } from 'lib'
 
 const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
 
@@ -12,7 +12,7 @@ root.executes(ctx => {
   if (!item.isStackable && item.getDynamicPropertyIds().length) {
     message +=
       '\nDynamicProperties ' +
-      util.inspect(Object.fromEntries(item.getDynamicPropertyIds().map(e => [e, item.getDynamicProperty(e)])))
+      inspect(Object.fromEntries(item.getDynamicPropertyIds().map(e => [e, item.getDynamicProperty(e)])))
   }
   ctx.reply(message)
 })
@@ -26,7 +26,7 @@ root
 
     const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
-    ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}\n${util.inspect(block.permutation.getAllStates())}`)
+    ctx.reply(`§b► §f${block.typeId.replace('minecraft:', '')}\n${inspect(block.permutation.getAllStates())}`)
   })
 
 root
@@ -37,7 +37,7 @@ root
     const l = Vector.floor(location)
     const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
-    ctx.reply(util.inspect(block.permutation.getAllStates()))
+    ctx.reply(inspect(block.permutation.getAllStates()))
   })
 
 root
@@ -62,7 +62,7 @@ root
     for (const c of entity[0].getComponents()) {
       message +=
         '\n' +
-        util.inspect(
+        inspect(
           Object.map(c as unknown as Record<string, unknown>, (k, v) =>
             k === 'entity' || k === 'isValid' ? false : [k, v],
           ),

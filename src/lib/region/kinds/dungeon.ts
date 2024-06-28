@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Loot, LootTable, RegionPermissions, Vector, isChunkUnloaded, util } from 'lib'
+import { Cooldown, Loot, LootTable, RegionPermissions, Vector, isChunkUnloaded, ms } from 'lib'
 import { RadiusRegion } from './radius'
 
 interface DungeonRegionDatabase<LDB extends JsonObject> extends JsonObject {
@@ -71,7 +71,7 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
       id,
       location,
       loot: loot instanceof LootTable ? loot : loot(new Loot('DungeonChest' + this.key + id)),
-      restoreTime: util.ms.from('min', 5),
+      restoreTime: ms.from('min', 5),
     }
 
     this.chests.push(chest)

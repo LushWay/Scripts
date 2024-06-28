@@ -1,6 +1,6 @@
 import { ItemStack } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, util } from 'lib'
+import { Boss, Loot, ms } from 'lib'
 import { City } from '../lib/city'
 import { Mage } from './mage'
 
@@ -20,7 +20,7 @@ class VillageOfExporersBuilder extends City {
     id: 'slime',
     name: 'Магический Слайм',
     entityTypeId: MinecraftEntityTypes.Slime,
-    respawnTime: util.ms.from('min', 10),
+    respawnTime: ms.from('min', 10),
     loot: new Loot('slime boss')
       .itemStack(BossSlimeBall)
       .amount({

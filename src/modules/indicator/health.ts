@@ -1,7 +1,7 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { util, Vector } from 'lib'
+import { ms, Vector } from 'lib'
 
 import { CustomEntityTypes } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'
@@ -153,7 +153,7 @@ class HealthIndicator {
 
     const info = this.createHurtEntityRecord(entity)
 
-    if (damage > 0) info.expires = Date.now() + util.ms.from('sec', 10)
+    if (damage > 0) info.expires = Date.now() + ms.from('sec', 10)
     info.damage = Math.max(0, info.damage + damage) // Do not allow values less then 0
 
     setNameTag(info.separated ? info.indicator : info.hurtEntity, () => this.getBar(entity))
@@ -205,10 +205,14 @@ class HealthIndicator {
   }
 
   getIDs(entities: Entity[]) {
-    return entities.map(entity => ({
-      id: util.run(() => entity.id)[0],
-      entity,
-    }))
+    return entities.map(entity => {
+      let id
+      try {
+        id = entity.id
+      } catch {}
+
+      return { id, entity }
+    })
   }
 }
 

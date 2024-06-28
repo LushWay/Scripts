@@ -1,5 +1,5 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, util } from 'lib'
+import { Boss, Loot, ms } from 'lib'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { CannonBulletItem, CannonItem, Engineer, MicroSchema } from './engineer'
@@ -59,7 +59,7 @@ class TechCityBuilder extends City {
   golem = new Boss({
     group: this.group,
     id: 'golem',
-    respawnTime: util.ms.from('min', 10),
+    respawnTime: ms.from('min', 10),
     name: 'Робот',
     entityTypeId: MinecraftEntityTypes.IronGolem,
     loot: new Loot('GolemLoot')

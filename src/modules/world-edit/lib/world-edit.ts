@@ -11,11 +11,14 @@ import {
 import { Vector, getRole, prompt, util } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { table } from 'lib/database/abstract'
+import { ngettext, t } from 'lib/text'
+import stringifyError from 'lib/utils/error'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { BigStructure } from './big-structure'
 import { Cuboid } from './ccuboid'
+import { stringify } from 'lib/utils/inspect'
 
 // TODO Add WorldEdit.runMultipleAsyncJobs
 
@@ -116,8 +119,9 @@ export class WorldEdit {
    *   be either an Error object or a string representing the error message.
    */
   failedTo(action: string, error: unknown) {
-    const text = util.error.isError(error) ? util.error(error) : util.inspect(error)
+    const text = stringify(error)
     if (!text) return
+
     console.error(text)
     this.player.fail(`Не удалось ${action}§f: ${error}`)
   }
@@ -177,9 +181,7 @@ export class WorldEdit {
         this.loadBackup(history, backup)
       }
 
-      this.player.info(
-        `§3Успешно отменено §f${amount} §3${util.ngettext(amount, ['действие', 'действия', 'действий'])}!`,
-      )
+      this.player.info(`§3Успешно отменено §f${amount} §3${ngettext(amount, ['действие', 'действия', 'действий'])}!`)
     } catch (error) {
       this.failedTo('отменить', error)
     }
@@ -391,18 +393,12 @@ export class WorldEdit {
         })(),
       )
 
-      const endTime = util.ms.remaining(Date.now() - startTime, {
-        converters: ['ms', 'sec', 'min'],
-      })
-
-      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3${util.ngettext(selection.size, [
+      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3${ngettext(selection.size, [
         'блок',
         'блока',
         'блоков',
-      ])}`
-      if (endTime.value !== '0') {
-        reply += ` за §f${endTime.value} §3${endTime.type}.`
-      }
+      ])} за ${t.options({ unit: '§f', text: '§3' }).ttime(Date.now() - startTime)}.`
+
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyReplaceTargets(replaceTargets)}`
       }
