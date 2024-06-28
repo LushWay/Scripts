@@ -15,12 +15,12 @@ export class Stoner extends ShopNpc {
         .addConfigurableItemSection(i.Andesite)
         .defaultCount(1_000)
         .maxCount(10_000)
-        .basePrice(3)
+        .basePrice(1)
 
         .addConfigurableItemSection(i.Cobblestone)
         .defaultCount(1_000)
         .maxCount(20_000)
-        .basePrice(5)
+        .basePrice(2)
     })
   }
 }

@@ -1,10 +1,9 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { Command } from './command'
 import { ROLES, getRole } from './roles'
-import { util } from './util'
-import { ms } from './utils/ms'
-import stringifyError from './utils/error'
+import { separateNumberWithDots } from './util'
 import { stringify } from './utils/inspect'
+import { ms } from './utils/ms'
 
 export type Text = string
 export type MaybeRawText = string | RawText
@@ -157,6 +156,7 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
       return '§c<>§r'
 
     case 'number':
+      return `§6${separateNumberWithDots(unit)}`
     case 'bigint':
       return `§6${unit}`
 

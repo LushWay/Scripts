@@ -169,6 +169,10 @@ const blockModifiers: ((s: string) => string | undefined)[] = [
 
     return `planks.${type}`
   },
+  stone => {
+    if (['andesite', 'andesiteSmooth', 'diorite', 'dioriteSmooth', 'granite', 'graniteSmooth', 'stone'].includes(stone))
+      return `stone.${stone}`
+  },
 ]
 
 export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')

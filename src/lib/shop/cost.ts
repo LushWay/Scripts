@@ -3,7 +3,7 @@ import { Sounds } from 'lib/assets/config'
 import { emoji } from 'lib/assets/emoji'
 import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
-import { noBoolean } from 'lib/util'
+import { noBoolean, separateNumberWithDots } from 'lib/util'
 
 export abstract class Cost<T = unknown> {
   /**
@@ -127,7 +127,7 @@ class ScoreboardCost extends Cost {
   color = '§7'
 
   toString(canBuy = true) {
-    return `${canBuy ? this.color : '§c'}${this.cost}${this.emoji}`
+    return `${canBuy ? this.color : '§c'}${separateNumberWithDots(this.cost)}${this.emoji}`
   }
 
   has(player: Player) {
@@ -222,7 +222,7 @@ export class ItemCost extends Cost {
     }
   }
 
-  toString(canBuy?: boolean, _?: Player | undefined, amount = false): MaybeRawText {
+  toString(canBuy?: boolean, _?: Player | undefined, amount = true): MaybeRawText {
     return itemDescription(
       this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',

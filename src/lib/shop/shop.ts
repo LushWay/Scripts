@@ -1,7 +1,6 @@
 import { Player } from '@minecraft/server'
-import { emoji } from 'lib/assets/emoji'
 import { Settings } from 'lib/settings'
-import { Cost } from 'lib/shop/cost'
+import { Cost, LeafyCost, MoneyCost } from 'lib/shop/cost'
 import { MaybeRawText, t, textTable } from 'lib/text'
 import { ShopForm } from './form'
 
@@ -24,7 +23,7 @@ export class Shop {
    */
   constructor(
     private name: string,
-    private id: string,
+    readonly id: string,
   ) {
     const shop = Shop.shops.get(id)
     if (shop) {
@@ -38,7 +37,7 @@ export class Shop {
   private defaultBody = (player: Player) =>
     textTable({
       'Подтверждение перед покупкой': Shop.getPlayerSettings(player).prompt,
-      'Ваш баланс': `${player.scores.money}${emoji.money}`,
+      'Ваш баланс': new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
     })
 
   private getBody = (player: Player): Text => ''
@@ -56,7 +55,7 @@ export class Shop {
     return this
   }
 
-  private getMenu: ShopMenuGenerator = menu => menu
+  private onOpen: ShopMenuGenerator = menu => menu
 
   /**
    * Sets shop menu generator function
@@ -64,7 +63,7 @@ export class Shop {
    * @param generate - Function that recives menu and adds buttons/sections to it
    */
   menu(generate: ShopMenuGenerator) {
-    this.getMenu = generate
+    this.onOpen = generate
     return this
   }
 
@@ -74,13 +73,12 @@ export class Shop {
    * @param player - Player to open menu for
    */
   open(player: Player) {
-    const menu = new ShopForm(
-      t.header.raw`${this.name}`,
-      t.raw`${this.getBody(player)}${this.defaultBody(player)}`,
-      this.id,
-    )
-    this.getMenu(menu, player)
-    menu.show(player)
+    new ShopForm(
+      () => t.header.raw`${this.name}`,
+      () => t.raw`${this.getBody(player)}${this.defaultBody(player)}`,
+      this,
+      this.onOpen,
+    ).show(player)
   }
 }
 
@@ -96,4 +94,4 @@ export type ShopProductBuy = Omit<ShopProduct, 'name'> & {
   back?: VoidFunction
 }
 
-type ShopMenuGenerator = (menu: ShopForm, player: Player) => void
+export type ShopMenuGenerator = (menu: ShopForm, player: Player) => void

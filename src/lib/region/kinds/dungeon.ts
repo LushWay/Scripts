@@ -18,7 +18,13 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
       () => {
         for (const dungeon of this.dungeons) {
           for (const chest of dungeon.chests) {
-            if (isChunkUnloaded({ location: chest.location, dimensionId: dungeon.dimensionId })) continue
+            if (
+              isChunkUnloaded({
+                location: Vector.add(dungeon.center, chest.location),
+                dimensionId: dungeon.dimensionId,
+              })
+            )
+              continue
 
             const placed = dungeon.linkedDatabase.chests[chest.id]
             if (!placed || Cooldown.isExpired(placed, chest.restoreTime)) {

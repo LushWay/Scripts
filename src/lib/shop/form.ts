@@ -9,22 +9,25 @@ import { typeIdToReadable } from 'lib/game-utils'
 import { Cost, ItemCost, MoneyCost, MultiCost, ShouldHaveItemCost } from 'lib/shop/cost'
 import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
-import { Shop, ShopProduct, ShopProductBuy } from './shop'
+import { Shop, ShopMenuGenerator, ShopProduct, ShopProductBuy } from './shop'
 
 interface ShopSection {
   name: MaybeRawText
-  onOpen: (form: ShopForm) => void
+  onOpen: ShopMenuGenerator
 }
+
+type Buttons = (ShopProduct | ShopSection)[]
 
 export class ShopForm {
   static database = table<Record<string, number | undefined>>('shop', () => ({}))
 
-  private buttons: (ShopProduct | ShopSection)[] = []
+  private buttons: Buttons = []
 
   constructor(
-    private title: MaybeRawText,
-    private body: MaybeRawText,
-    private shopId: string,
+    private title: () => MaybeRawText,
+    private body: () => MaybeRawText,
+    private readonly shop: Shop,
+    private readonly onOpen: ShopMenuGenerator,
   ) {}
 
   /**
@@ -102,23 +105,17 @@ export class ShopForm {
   }
 
   addConfigurableItemSection(type: MinecraftItemTypes) {
-    const db = ShopForm.database[this.shopId]
-    const restoredCount = db[type]
-
     return {
       /** Sets default count */
       defaultCount: (defaultCount = 100) => ({
         /** Sets max count */
         maxCount: (maxCount = 1000) => ({
           /** Sets base price (aka minPrice) */
-          basePrice: (basePrice: number) => {
-            this.createConfigurableItem({
-              type,
-              count: restoredCount ?? defaultCount,
-              maxCount,
-              minPrice: basePrice,
-            })
+          basePrice: (minPrice: number) => {
+            const db = ShopForm.database[this.shop.id]
+            const count = (db[type] ??= defaultCount)
 
+            this.createConfigurableItem({ type, count, maxCount, minPrice })
             return this as ShopForm
           },
         }),
@@ -126,7 +123,7 @@ export class ShopForm {
     }
   }
 
-  createConfigurableItem({
+  private createConfigurableItem({
     type,
     count,
     maxCount,
@@ -137,15 +134,38 @@ export class ShopForm {
     maxCount: number
     minPrice: number
   }) {
-    this.addSection(itemDescription({ typeId: type, amount: 1 }), form => {
-      const buy = (maxCount / count) * minPrice
+    this.addSection(itemDescription({ typeId: type, amount: 0 }), form => {
+      const db = ShopForm.database[this.shop.id]
+      const buy = ~~((maxCount / count) * minPrice)
+      const sell = ~~(buy / 2)
+
+      const original = form.body
+      form.body = () => t.raw`${original()}\nТовара на складе: ${t`${db[type] ?? 0}/${maxCount}`}`
+
+      form.addSection('§3Продать', form => {
+        function addSell(count = 1) {
+          const cost = new ItemCost(type, count)
+          form.addProduct(new MoneyCost(sell * count).toString(), cost, player => {
+            cost.buy(player)
+
+            db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
+            player.scores.money += sell * count
+          })
+        }
+
+        addSell(1)
+        addSell(10)
+        addSell(20)
+        addSell(100)
+      })
 
       function addBuy(count = 1) {
         const cost = new MoneyCost(buy * count)
-        form.addProduct(`Купить x${count}`, cost, player => {
+        form.addProduct(itemDescription({ typeId: type, amount: count }), cost, player => {
           if (!player.container) return
 
           cost.buy(player)
+          db[type] = Math.max(0, (db[type] ?? count) - count)
           player.container.addItem(new ItemStack(type, count))
         })
       }
@@ -153,19 +173,6 @@ export class ShopForm {
       addBuy(10)
       addBuy(20)
       addBuy(100)
-
-      const sell = buy / 2
-      function addSell(count = 1) {
-        const cost = new ItemCost(type, count)
-        form.addProduct(`Продать x${count}`, cost, player => {
-          player.scores.money += sell * count
-        })
-      }
-
-      addSell(1)
-      addSell(10)
-      addSell(20)
-      addSell(100)
     })
   }
 
@@ -192,31 +199,40 @@ export class ShopForm {
    * @param message - Additional message to show in store description
    */
   show(player: Player, message: MaybeRawText = '', back?: VoidFunction) {
-    const form = new ActionForm(this.title, t.raw`${message}${message ? '§r\n \n§f' : ''}${this.body}`)
-    if (back) form.addButtonBack(back)
+    const form: { buttons: Buttons; body: () => MaybeRawText; title: () => MaybeRawText } = {
+      buttons: [],
+      body: this.body,
+      title: this.title,
+    }
+    this.onOpen(Object.setPrototypeOf(form, this) as this, player)
 
-    for (const button of this.buttons) {
+    const actionForm = new ActionForm(form.title(), t.raw`${message}${message ? '§r\n \n§f' : ''}${form.body()}`)
+    if (back) actionForm.addButtonBack(back)
+
+    for (const button of form.buttons) {
       if ('cost' in button) {
         const { name, cost, onBuy } = button
         const canBuy = cost.has(player)
+        const unit = canBuy ? '§f' : '§7'
         const text = typeof name === 'function' ? name(canBuy) : name
 
-        form.addButton(
-          t.options({ unit: canBuy ? '§f' : '§7' }).raw`§l${text}§r\n${cost.toString(canBuy, player)}`,
-          () => this.buy({ text: text, cost, onBuy, player, back }),
+        actionForm.addButton(t.options({ unit }).raw`§l${text}§r\n${cost.toString(canBuy, player)}`, () =>
+          this.buy({ text: text, cost, onBuy, player, back }),
         )
       } else {
         const { name, onOpen } = button
 
-        form.addButton(t.options({ unit: '§3' }).raw`${name}`, () => {
-          const form = new ShopForm(t.header.raw`${this.title} > ${name}`, this.body, this.shopId)
-          onOpen(form)
-          form.show(player, '', () => this.show(player))
+        actionForm.addButton(t.options({ unit: '§3' }).raw`${name}`, () => {
+          new ShopForm(() => t.header.raw`${form.title()} > ${name}`, form.body, this.shop, onOpen).show(
+            player,
+            '',
+            () => this.show(player),
+          )
         })
       }
     }
 
-    form.show(player)
+    actionForm.show(player)
   }
 
   private buy({ onBuy, cost, player, text, back }: ShopProductBuy) {
@@ -246,14 +262,3 @@ export class ShopForm {
     } else purchase()
   }
 }
-
-new ShopForm('', '', '')
-  .addConfigurableItemSection(MinecraftItemTypes.Apple)
-  .defaultCount(100)
-  .maxCount()
-  .basePrice(300)
-
-  .addConfigurableItemSection(MinecraftItemTypes.AcaciaDoor)
-  .defaultCount(2)
-  .maxCount(10)
-  .basePrice(2)

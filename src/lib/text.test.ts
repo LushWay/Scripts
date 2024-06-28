@@ -110,6 +110,49 @@ describe('text', () => {
     // @ts-expect-error
     expect(t.badge`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
   })
+
+  it('should work with rawTxt', () => {
+    expect(t.raw`Common text`).toMatchInlineSnapshot(`
+      {
+        "rawtext": [
+          {
+            "text": "§7",
+          },
+          {
+            "text": "Common text",
+          },
+        ],
+      }
+    `)
+
+    const rawText = { text: 'value' }
+    const ttt = t.raw`${rawText}`
+    expect(ttt).toMatchInlineSnapshot(`
+      {
+        "rawtext": [
+          {
+            "text": "§7",
+          },
+          {
+            "text": "",
+          },
+          {
+            "text": "§f",
+          },
+          {
+            "text": "value",
+          },
+          {
+            "text": "§7",
+          },
+          {
+            "text": "",
+          },
+        ],
+      }
+    `)
+    expect(ttt.rawtext?.[3]).toBe(rawText)
+  })
 })
 
 describe('textTable', () => {
