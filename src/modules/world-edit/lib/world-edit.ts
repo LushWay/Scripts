@@ -8,17 +8,16 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { Vector, getRole, prompt, util } from 'lib'
+import { Vector, getRole, prompt } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { table } from 'lib/database/abstract'
 import { ngettext, t } from 'lib/text'
-import stringifyError from 'lib/utils/error'
+import { stringify } from 'lib/utils/inspect'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { BigStructure } from './big-structure'
 import { Cuboid } from './ccuboid'
-import { stringify } from 'lib/utils/inspect'
 
 // TODO Add WorldEdit.runMultipleAsyncJobs
 
@@ -364,13 +363,14 @@ export class WorldEdit {
       system.runJob(
         (function* fillBetweenJob() {
           nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
+            const block = world.overworld.getBlock(position)
+
             for (const replaceBlock of replaceTargets) {
               try {
-                const block = world.overworld.getBlock(position)
-
                 if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
 
                 block?.setPermutation(toPermutation(blocks.randomElement()))
+                yield
                 continue nextBlock
               } catch (e) {
                 if (errors < 3 && e instanceof Error) {
@@ -384,10 +384,9 @@ export class WorldEdit {
                   console.error(e)
 
                 errors++
+              } finally {
+                all++
               }
-
-              all++
-              yield
             }
           }
         })(),

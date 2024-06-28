@@ -45,7 +45,8 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
 }
 
 function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet | undefined {
-  return getAllBlocksSets(playerId)[blocksSetName].filter(e => e[2] > 0)
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return getAllBlocksSets(playerId)[blocksSetName]?.filter(e => e[2] > 0)
 }
 
 export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {
