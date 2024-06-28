@@ -5,7 +5,7 @@ import { InventoryStore, Portal, RegionCallback, Settings, locationWithRotation,
 
 import { isNotPlaying } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
-import { SafeAreaRegion } from 'lib/region/kinds/SafeAreaRegion'
+import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
 import { Menu } from 'lib/rpg/menu'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'

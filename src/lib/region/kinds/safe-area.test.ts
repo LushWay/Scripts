@@ -4,7 +4,7 @@ import 'lib/database/player'
 import { Vector } from 'lib/vector'
 import { describe, expect, it } from 'vitest'
 import { RegionDatabase } from '../database'
-import { SafeAreaRegion } from './SafeAreaRegion'
+import { SafeAreaRegion } from './safe-area'
 
 class TestSafeAreaRegion extends SafeAreaRegion {
   get regionKey() {

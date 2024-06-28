@@ -1,11 +1,12 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib/region/index'
+import { LootTable } from 'lib/rpg/loot-table'
+import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
 import { isInvalidLocation } from '../game-utils'
-import { LootTable } from 'lib/rpg/loot-table'
 import { Temporary } from '../temporary'
 
 export class Airdrop {
@@ -110,6 +111,10 @@ export class Airdrop {
 
   save() {
     if (!this.chestMinecart || !this.chicken) return
+    if (!this.lootTable.id) {
+      console.warn(t`[Airdrop][${this.id}] Unable to save, LootTable must have an id`)
+      return
+    }
 
     Airdrop.db[this.id] = {
       for: this.for,
@@ -258,15 +263,13 @@ const findAndRemove = (arr: Entity[], id: string) => {
 Core.afterEvents.worldLoad.subscribe(() => {
   for (const [key, saved] of Object.entries(Airdrop.db)) {
     if (typeof saved === 'undefined') continue
-    const loot = LootTable.instances[saved.loot]
+    const loot = LootTable.instances.get(saved.loot)
 
     const restore = (loot: LootTable) => new Airdrop({ loot, forPlayerId: saved.for }, key)
 
-    if (typeof loot === 'undefined') {
+    if (!loot) {
       LootTable.onNew.subscribe(lootTable => {
-        if (lootTable.id === saved.loot) {
-          restore(loot)
-        }
+        if (lootTable.id === saved.loot) restore(lootTable)
       })
     } else {
       restore(loot)

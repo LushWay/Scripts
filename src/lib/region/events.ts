@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { Region } from './Region'
+import { Region } from './kinds/region'
 
 export class RegionEvents {
   /**

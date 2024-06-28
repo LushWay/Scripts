@@ -1,11 +1,12 @@
 import { system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { BaseRegion, CubeRegion, LockAction, RadiusRegion, Region, Vector, getBlockStatus } from 'lib'
+import { CubeRegion, LockAction, RadiusRegion, Region, Vector, getBlockStatus } from 'lib'
 import { actionGuard } from 'lib/region/index'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
+import { BaseRegion } from './region'
 
 export const BaseItem = new CustomItemWithBlueprint('base')
   .typeId(MinecraftItemTypes.Barrel)

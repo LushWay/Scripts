@@ -3,7 +3,7 @@ import './framework'
 
 import 'lib/bds/api.spec'
 import 'lib/command/index.spec'
-import 'lib/region/kinds/RadiusRegionWithStructure.spec'
+import 'lib/region/kinds/radius-with-structure.test'
 import 'lib/temporary.spec'
 import 'modules/places/base/base.spec'
 import 'modules/places/mineshaft/mineshaft-region.spec'

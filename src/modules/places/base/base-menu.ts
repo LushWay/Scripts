@@ -1,14 +1,6 @@
 import { Player } from '@minecraft/server'
-import {
-  ActionForm,
-  BaseRegion,
-  LockAction,
-  RadiusRegion,
-  Region,
-  Vector,
-  editRegionPermissions,
-  manageRegionMembers,
-} from 'lib'
+import { ActionForm, LockAction, RadiusRegion, Region, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
+import { BaseRegion } from './region'
 
 export function openBaseMenu(
   player: Player,

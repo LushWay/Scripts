@@ -1,9 +1,8 @@
 import { Vector } from 'lib/vector'
-import { beforeAll, describe, expect, it } from 'vitest'
-import { RegionDatabase } from './database'
-import { restoreRegionFromJSON } from './init'
-import { CubeRegion } from './kinds/CubeRegion'
-import { RadiusRegion } from './kinds/RadiusRegion'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { RegionDatabase, registerRegionKind, restoreRegionFromJSON } from './database'
+import { CubeRegion } from './kinds/cube'
+import { RadiusRegion } from './kinds/radius'
 
 class TestRadiusRegion extends RadiusRegion {
   static kind = 'test'
@@ -20,6 +19,7 @@ class TestRadiusRegion extends RadiusRegion {
     return this.key
   }
 }
+registerRegionKind(TestRadiusRegion)
 
 class TestCubeRegion extends CubeRegion {
   get regionKey() {
@@ -30,6 +30,7 @@ class TestCubeRegion extends CubeRegion {
     return this.toJSON()
   }
 }
+registerRegionKind(TestCubeRegion)
 
 beforeAll(() => {
   TestRadiusRegion.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
@@ -46,8 +47,8 @@ describe('region initialization', () => {
     expect(json.t).toBe('r')
     expect(json.st).toBe(TestRadiusRegion.kind)
 
-    expect(restoreRegionFromJSON(['test', json], [RadiusRegion, TestRadiusRegion])).toBeInstanceOf(TestRadiusRegion)
-    expect(restoreRegionFromJSON(['test', json], [RadiusRegion, TestRadiusRegion])).toEqual(region)
+    expect(restoreRegionFromJSON(['test', json])).toBeInstanceOf(TestRadiusRegion)
+    expect(restoreRegionFromJSON(['test', json])).toEqual(region)
   })
 
   it('should restore region from database', () => {
@@ -57,9 +58,7 @@ describe('region initialization', () => {
     expect(regionJSON).toEqual(region.json)
 
     region.delete()
-    expect(restoreRegionFromJSON(['test 2', regionJSON], [RadiusRegion, TestRadiusRegion])).toBeInstanceOf(
-      TestRadiusRegion,
-    )
+    expect(restoreRegionFromJSON(['test 2', regionJSON])).toBeInstanceOf(TestRadiusRegion)
   })
 
   it('should restore cuberegion', () => {
@@ -77,6 +76,12 @@ describe('region initialization', () => {
 
     const region = OldRadiusRegionKind.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
 
-    expect(restoreRegionFromJSON(['test', region.json])).toBeInstanceOf(RadiusRegion)
+    const consoleWarn = vi.spyOn(console, 'warn')
+    expect(restoreRegionFromJSON(['test', region.json])).toBeUndefined()
+    expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        "§7[Region][Database] No kind found for §fr§7 -> §funknown§7. Maybe you forgot to register kind or import file?§7",
+      ]
+    `)
   })
 })

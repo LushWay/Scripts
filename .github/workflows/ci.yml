@@ -57,7 +57,9 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: yarn prettier -w src
+      - run: node build
+
+      - run: yarn tsc -b
 
       - run: yarn eslint src
 

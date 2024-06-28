@@ -1,7 +1,7 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { Region, RegionCreationOptions } from 'lib/region/Region'
 import { Vector } from 'lib/vector'
-import { RLDB, RadiusRegionSave, RegionDatabase, registerRegionType } from '../database'
+import { RLDB, RadiusRegionSave, registerRegionKind } from '../database'
+import { Region, RegionCreationOptions } from './region'
 
 export interface RadiusRegionOptions extends RegionCreationOptions {
   /** The position of the region center */
@@ -11,29 +11,9 @@ export interface RadiusRegionOptions extends RegionCreationOptions {
 }
 
 export class RadiusRegion<LDB extends RLDB = any> extends Region<LDB> implements RadiusRegionOptions {
-  static type = 'r'
+  static readonly type: string = 'r'
 
-  /** Used to restore region from the database */
   static readonly kind: string = 'radius'
-
-  static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
-    const region = super.create(options, key)
-
-    if (region instanceof RadiusRegion) {
-      // Set radius region kind
-      ;(region as unknown as RadiusRegion).kind = (this as unknown as RadiusRegion).kind
-
-      if (!key) region.save()
-    }
-
-    return region as unknown as InstanceType<T>
-  }
-
-  /**
-   * RadiusRegion kind. Do not specify it directly in the subclassed regions, because it is setted from the static
-   * property by {@link RadiusRegion.create} method
-   */
-  private kind = RadiusRegion.kind
 
   center: Vector3
 
@@ -46,24 +26,15 @@ export class RadiusRegion<LDB extends RLDB = any> extends Region<LDB> implements
   }
 
   isVectorInRegion(vector: Vector3, dimensionId: Dimensions) {
-    if (!super.isVectorInRegion(vector, dimensionId)) return false
-
-    return Vector.distance(this.center, vector) < this.radius
+    return super.isVectorInRegion(vector, dimensionId) && Vector.distance(this.center, vector) < this.radius
   }
 
-  protected toJSON(): RadiusRegionSave {
+  protected toJSON() {
     return {
       ...super.toJSON(),
-      t: 'r' as const,
-      st: this.kind,
       center: this.center,
       radius: this.radius,
-    }
-  }
-
-  save() {
-    if (!this.saveable) return false
-    RegionDatabase[this.key] = this.toJSON()
+    } as RadiusRegionSave
   }
 
   protected get edges() {
@@ -93,4 +64,4 @@ export class RadiusRegion<LDB extends RLDB = any> extends Region<LDB> implements
   }
 }
 
-registerRegionType(RadiusRegion)
+registerRegionKind(RadiusRegion)

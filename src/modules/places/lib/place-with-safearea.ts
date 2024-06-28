@@ -1,8 +1,4 @@
-import { system } from '@minecraft/server'
-
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { SafeAreaRegion, Settings, location, locationWithRadius, locationWithRotation } from 'lib'
-import { actionGuard } from 'lib/region/index'
 
 export class PlaceWithSafeArea {
   static places: PlaceWithSafeArea[] = []
@@ -44,16 +40,3 @@ export class PlaceWithSafeArea {
     PlaceWithSafeArea.places.push(this)
   }
 }
-
-system.delay(() => {
-  actionGuard((_, region, ctx) => {
-    if (
-      ctx.type === 'interactWithBlock' &&
-      ctx.event.block.typeId === MinecraftBlockTypes.CraftingTable &&
-      region instanceof SafeAreaRegion &&
-      region.allowUsageOfCraftingTable
-    ) {
-      return true
-    }
-  })
-})

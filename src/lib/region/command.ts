@@ -3,13 +3,13 @@ import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
-import { Region } from 'lib/region/Region'
+import { Region } from 'lib/region/kinds/region'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { BaseRegion } from '../../modules/places/base/region'
 import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
-import { RadiusRegion } from './kinds/RadiusRegion'
-import { SafeAreaRegion } from './kinds/SafeAreaRegion'
+import { RadiusRegion } from './kinds/radius'
+import { SafeAreaRegion } from './kinds/safe-area'
 
 new Command('region')
   .setPermissions('techAdmin')

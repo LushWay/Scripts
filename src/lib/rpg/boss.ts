@@ -5,7 +5,7 @@ import { table } from 'lib/database/abstract'
 import { isChunkUnloaded } from 'lib/game-utils'
 import { location } from 'lib/location'
 import { Region } from 'lib/region/index'
-import { BossArenaRegion } from 'lib/region/kinds/BossArenaRegion'
+import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 
 interface BossDB {

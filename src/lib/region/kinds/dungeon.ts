@@ -1,7 +1,7 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Loot, LootTable, RegionPermissions, Vector, isChunkUnloaded, util } from 'lib'
-import { RadiusRegion } from './RadiusRegion'
+import { RadiusRegion } from './radius'
 
 interface DungeonRegionDatabase<LDB extends JsonObject> extends JsonObject {
   chests: Record<string, number | null>
@@ -17,12 +17,10 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
     system.runInterval(
       () => {
         for (const dungeon of this.dungeons) {
-          // Maybe check chunk here, idk
-
           for (const chest of dungeon.chests) {
             if (isChunkUnloaded({ location: chest.location, dimensionId: dungeon.dimensionId })) continue
-            const placed = dungeon.linkedDatabase.chests[chest.id]
 
+            const placed = dungeon.linkedDatabase.chests[chest.id]
             if (!placed || Cooldown.isExpired(placed, chest.restoreTime)) {
               dungeon.updateChest(chest)
             }

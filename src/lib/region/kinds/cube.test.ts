@@ -2,7 +2,7 @@ import 'lib/load/extensions'
 import { Vector } from 'lib/vector'
 import { describe, expect, it } from 'vitest'
 import { RegionDatabase } from '../database'
-import { CubeRegion } from './CubeRegion'
+import { CubeRegion } from './cube'
 
 describe('CubeRegion', () => {
   it('should show whenether is vector in region or not', () => {

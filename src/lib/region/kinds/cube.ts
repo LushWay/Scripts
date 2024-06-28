@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
-import { Region, RegionCreationOptions } from 'lib/region/Region'
-import { RegionDatabase, registerRegionType } from '../database'
+import { Region, RegionCreationOptions } from './region'
 import { Vector } from 'lib/vector'
+import { CubeRegionSave, registerRegionKind } from '../database'
 
 interface CubeRegionOptions extends RegionCreationOptions {
   /** The position of the first block of the region. */
@@ -12,6 +12,8 @@ interface CubeRegionOptions extends RegionCreationOptions {
 
 export class CubeRegion extends Region implements CubeRegionOptions {
   static type = 'c'
+
+  static kind = 'cube'
 
   from: VectorXZ
 
@@ -40,17 +42,10 @@ export class CubeRegion extends Region implements CubeRegionOptions {
   protected toJSON() {
     return {
       ...super.toJSON(),
-      st: '',
-      t: 'c' as const,
       from: this.from,
       to: this.to,
-    }
-  }
-
-  save() {
-    if (!this.saveable) return false
-    RegionDatabase[this.key] = this.toJSON()
+    } as CubeRegionSave
   }
 }
 
-registerRegionType(CubeRegion)
+registerRegionKind(CubeRegion)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { RadiusRegion } from './RadiusRegion'
+import { RadiusRegion } from './radius'
 
 class TestRegion extends RadiusRegion {
   static kind = 'test'

@@ -1,16 +1,12 @@
 import { BlockPermutation, Dimension, StructureSaveMode, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
-import { RadiusRegion } from './RadiusRegion'
+import { RadiusRegion } from './radius'
 
 export abstract class RadiusRegionWithStructure extends RadiusRegion {
   protected readonly saveable = true
 
   protected get structureName() {
     return 'region:' + this.key.replaceAll(':', '|')
-  }
-
-  protected get edges() {
-    return Vector.around(this.center, this.radius - 1)
   }
 
   saveStructure() {

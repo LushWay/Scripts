@@ -1,6 +1,7 @@
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { registerRegionType } from '../database'
-import { RadiusRegion, RadiusRegionOptions } from './RadiusRegion'
+import { system } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { actionGuard } from '../index'
+import { RadiusRegion, RadiusRegionOptions } from './radius'
 
 interface SafeAreaRegionOptions extends RadiusRegionOptions {
   safeAreaName?: string
@@ -8,8 +9,6 @@ interface SafeAreaRegionOptions extends RadiusRegionOptions {
 }
 
 export class SafeAreaRegion extends RadiusRegion {
-  static readonly kind = 'safe'
-
   protected readonly saveable = false
 
   protected readonly defaultPermissions = {
@@ -45,6 +44,19 @@ export class SafeAreaRegion extends RadiusRegion {
   get displayName() {
     return this.safeAreaName
   }
-}
 
-registerRegionType(SafeAreaRegion)
+  static {
+    system.delay(() => {
+      actionGuard((_, region, ctx) => {
+        if (
+          ctx.type === 'interactWithBlock' &&
+          region instanceof SafeAreaRegion &&
+          ctx.event.block.typeId === MinecraftBlockTypes.CraftingTable &&
+          region.allowUsageOfCraftingTable
+        ) {
+          return true
+        }
+      })
+    })
+  }
+}

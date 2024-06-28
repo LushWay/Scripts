@@ -1,7 +1,9 @@
 import { Player } from '@minecraft/server'
+import 'lib/load/extensions'
+
 import 'lib/database/player'
 import { describe, expect, it } from 'vitest'
-import { Region } from './Region'
+import { Region } from './region'
 
 describe('Region', () => {
   it('should create region', () => {

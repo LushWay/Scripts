@@ -1,5 +1,5 @@
-import { type RegionPermissions } from 'lib/region/Region'
-import { RadiusRegion } from './RadiusRegion'
+import { RadiusRegion } from './radius'
+import { type RegionPermissions } from './region'
 
 export class BossArenaRegion extends RadiusRegion {
   static readonly kind = 'boss'

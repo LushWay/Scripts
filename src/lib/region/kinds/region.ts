@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
-import { RLDB, RegionDatabase, RegionSave } from './database'
+import { RLDB, RegionDatabase, RegionSave } from '../database'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
@@ -29,9 +29,9 @@ export interface RegionCreationOptions {
 
 /** Represents protected region in the world. */
 export class Region<LDB extends RLDB = any> {
-  static type: string
+  static readonly type: string
 
-  static kind: string
+  static readonly kind: string
 
   protected static generateRegionKey() {
     return new Date(Date.now()).toISOString()
@@ -42,6 +42,9 @@ export class Region<LDB extends RLDB = any> {
     const region = new this(options, key ?? this.generateRegionKey())
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
+    region.type = this.type
+    region.kind = this.kind
+
     if (!key) {
       // We are creating new region and should save it
       region.save()
@@ -211,10 +214,19 @@ export class Region<LDB extends RLDB = any> {
   // @ts-expect-error Hyuyh i think we can ignore it
   linkedDatabase: LDB
 
+  /** Region kind */
+  // @ts-expect-error Initialized in the create function
+  private kind: string
+
+  /** Region type */
+  // @ts-expect-error Initialized in the create function
+  private type: string
+
   /** Prepares region instance to be saved into the database */
   protected toJSON(): RegionSave {
     return {
-      t: '',
+      t: this.type,
+      st: this.kind,
       permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,
       ldb: this.linkedDatabase,
@@ -228,7 +240,7 @@ export class Region<LDB extends RLDB = any> {
   save() {
     if (!this.saveable) return false
 
-    this.toJSON()
+    RegionDatabase[this.key] = this.toJSON()
   }
 
   /** Removes this region */

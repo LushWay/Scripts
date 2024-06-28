@@ -2,7 +2,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib/vector'
 import { TestStructures } from 'test/constants'
 import { suite, test } from 'test/framework'
-import { RadiusRegionWithStructure } from './RadiusRegionWithStructure'
+import { RadiusRegionWithStructure } from './radius-with-structure'
 
 suite('RadiusRegionWithStructure', () => {
   test('should save and load structure only with region blocks', async test => {

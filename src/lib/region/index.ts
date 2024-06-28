@@ -9,21 +9,21 @@ import {
   world,
 } from '@minecraft/server'
 import { EventSignal } from '../event-signal'
-import { Region } from './Region'
 import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config'
 import { RegionEvents } from './events'
-import './init'
-export * from '../../modules/places/base/region'
-export * from '../../modules/places/mineshaft/mineshaft-region'
-export * from './Region'
+import { Region } from './kinds/region'
 export * from './command'
 export * from './config'
 export * from './database'
-export * from './kinds/BossArenaRegion'
-export * from './kinds/CubeRegion'
-export * from './kinds/DungeonRegion'
-export * from './kinds/RadiusRegion'
-export * from './kinds/SafeAreaRegion'
+export * from './kinds/region'
+
+export * from './kinds/radius'
+
+export * from './kinds/cube'
+
+export * from './kinds/boss-arena'
+export * from './kinds/dungeon'
+export * from './kinds/safe-area'
 
 type InteractionAllowed = (
   player: Player,
