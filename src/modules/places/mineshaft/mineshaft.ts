@@ -1,7 +1,8 @@
 import { system } from '@minecraft/server'
-import { MineshaftRegion, actionGuard, isNotPlaying, util } from 'lib'
+import { actionGuard, isNotPlaying, util } from 'lib'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { ores, placeOre } from './algo'
+import { MineshaftRegion } from './mineshaft-region'
 
 actionGuard((player, region, ctx) => {
   if (isNotPlaying(player)) return

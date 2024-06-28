@@ -1,8 +1,10 @@
 import { Player, system, world } from '@minecraft/server'
-import { BaseRegion, Menu, MineshaftRegion, Region, SafeAreaRegion, Settings, Sidebar, util } from 'lib'
+import { Menu, Region, Settings, Sidebar, util } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
+import { BaseRegion } from 'modules/places/base/region'
+import { MineshaftRegion } from 'modules/places/mineshaft/mineshaft-region'
 
 const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
