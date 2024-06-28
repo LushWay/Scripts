@@ -1,6 +1,9 @@
 # LushWay Server Script
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/5ebbef5256d1206adaf4/maintainability)](https://codeclimate.com/github/LushWay/Scripts/maintainability)
+![Commit activity](https://img.shields.io/github/commit-activity/m/LushWay/Scripts)
+![Build status](https://img.shields.io/github/actions/workflow/status/LushWay/Scripts/ci.yml)
+
 
 Script API pack for Minecraft Bedrock Server [@LushWay](https://github.com/LushWay). 
 
