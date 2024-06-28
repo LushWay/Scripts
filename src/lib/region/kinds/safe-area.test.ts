@@ -1,6 +1,6 @@
 import 'lib/load/extensions'
-
 import 'lib/database/player'
+
 import { Vector } from 'lib/vector'
 import { describe, expect, it } from 'vitest'
 import { RegionDatabase } from '../database'

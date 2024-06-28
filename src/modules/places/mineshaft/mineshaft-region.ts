@@ -1,6 +1,6 @@
 import { registerRegionKind } from 'lib/region/database'
 import { RadiusRegionWithStructure } from 'lib/region/kinds/radius-with-structure'
-import { type RegionPermissions } from 'lib/region/region'
+import { type RegionPermissions } from 'lib/region/kinds/region'
 import { ores } from './algo'
 
 export class MineshaftRegion extends RadiusRegionWithStructure {

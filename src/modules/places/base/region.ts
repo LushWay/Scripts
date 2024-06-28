@@ -1,6 +1,6 @@
 import { registerRegionKind } from 'lib/region/database'
 import { RadiusRegion } from 'lib/region/kinds/radius'
-import { type RegionPermissions } from 'lib/region/region'
+import { type RegionPermissions } from 'lib/region/kinds/region'
 
 // TODO Base levels, save structure of inital place on creation, shadow regions after removing etc
 

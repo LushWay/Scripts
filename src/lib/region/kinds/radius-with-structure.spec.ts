@@ -4,9 +4,11 @@ import { TestStructures } from 'test/constants'
 import { suite, test } from 'test/framework'
 import { RadiusRegionWithStructure } from './radius-with-structure'
 
+class TestStructure extends RadiusRegionWithStructure {}
+
 suite('RadiusRegionWithStructure', () => {
   test('should save and load structure only with region blocks', async test => {
-    const region = RadiusRegionWithStructure.create({
+    const region = TestStructure.create({
       dimensionId: test.getDimension().type,
       center: test.worldLocation(new Vector(2, 5, 2)),
       radius: 3,
