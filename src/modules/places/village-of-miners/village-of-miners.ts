@@ -1,4 +1,5 @@
 import { City } from '../lib/city'
+import { Stoner } from '../lib/npc/stoner'
 
 class VillageOfMinersBuilder extends City {
   constructor() {
@@ -12,6 +13,8 @@ class VillageOfMinersBuilder extends City {
       donut => donut.item('Dirt').build,
     )
   }
+
+  stoner = new Stoner(this.group)
 }
 
 export const VillageOfMiners = new VillageOfMinersBuilder()

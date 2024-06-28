@@ -50,8 +50,6 @@ class StoneQuarryBuilder extends City {
 
   gunsmith = new Gunsmith(this.group)
 
-  stoner = new Stoner(this.group)
-
   private create() {
     this.createKits(
       normal => normal.item('RedTerracotta').build,

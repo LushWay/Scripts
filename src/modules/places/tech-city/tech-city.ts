@@ -3,6 +3,7 @@ import { Boss, Loot, ms } from 'lib'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { CannonBulletItem, CannonItem, Engineer, MicroSchema } from './engineer'
+import { Stoner } from '../lib/npc/stoner'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -69,6 +70,8 @@ class TechCityBuilder extends City {
       .item('RedTerracotta')
       .amount({ '0...120': '10%', '121...300': '20%' }).build,
   })
+
+  stoner = new Stoner(this.group)
 }
 
 export const TechCity = new TechCityBuilder()

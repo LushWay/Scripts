@@ -2,6 +2,7 @@ import { ItemStack } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
 import { City } from '../lib/city'
+import { Stoner } from '../lib/npc/stoner'
 import { Mage } from './mage'
 
 export const BossSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
@@ -44,6 +45,8 @@ class VillageOfExporersBuilder extends City {
       donut => donut.itemStack(BossSlimeBall).build,
     )
   }
+
+  stoner = new Stoner(this.group)
 }
 
 export const VillageOfExplorers = new VillageOfExporersBuilder()
