@@ -3,7 +3,7 @@ import { EventLoader, EventSignal } from '../event-signal'
 
 /** Core server features */
 export const Core = {
-  name: '§aLush§bWay',
+  name: '§aLush§fWay',
   beforeEvents: {
     /** Fires when player role changes */
     roleChange: new EventSignal<{ id: string; player?: Player; newRole: Role; oldRole: Role }>(),
