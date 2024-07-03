@@ -3,6 +3,7 @@ import { ChestLoot } from 'lib/chest-loot/chest-loot'
 import { Quest } from 'lib/quest'
 import { t } from 'lib/text'
 import { PlaceWithSafeArea } from './place-with-safearea'
+import { Cutscene } from 'lib/cutscene'
 
 export class City extends PlaceWithSafeArea {
   quests: Quest[] = []
@@ -22,4 +23,6 @@ export class City extends PlaceWithSafeArea {
 
     return { normal, donut }
   }
+
+  cutscene = new Cutscene(this.group, 'Исследование ' + this.name)
 }

@@ -25,6 +25,7 @@ import {
 } from 'lib'
 import { request } from 'lib/bds/api'
 import { CommandContext } from 'lib/command/context'
+import { Cutscene } from 'lib/cutscene'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
@@ -297,6 +298,10 @@ const publicTests: Record<string, (ctx: CommandContext) => void | Promise<void>>
 }
 
 const c = new Command('test').setDescription('Разные тесты')
+
+new Cutscene('animation1', 'Animation1')
+new Cutscene('animation2', 'Animation2')
+new Cutscene('animation3', 'Animation3')
 
 c.string('id', true).executes(async (ctx, id) => {
   const source = is(ctx.player.id, 'techAdmin') ? { ...publicTests, ...tests } : tests
