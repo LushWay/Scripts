@@ -15,6 +15,10 @@
         },
         "minecraft:loot": {
           "table": "loot_tables/empty.json"
+        },
+        "minecraft:nameable": {
+          "allow_name_tag_renaming": true,
+          "always_show": true
         }
       }
     },
