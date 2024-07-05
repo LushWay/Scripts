@@ -89,9 +89,8 @@ const survivalSidebar = new Sidebar(
       let text = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
       if (player.database.inv === 'anarchy') {
         if (region) {
-          //
           text = ''
-          if (regions.find(e => !e.permissions.pvp)) text = '§aМирная зона§f '
+          if (!region.permissions.pvp) text = '§aМирная зона§f '
           if (region.displayName) text += region.displayName
           if (region instanceof MineshaftRegion) text += '§7Шахта'
           if (region instanceof BaseRegion && region.getMemberRole(player.id)) text = '§6Ваша база'

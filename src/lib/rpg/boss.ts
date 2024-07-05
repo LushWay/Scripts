@@ -96,6 +96,7 @@ export class Boss {
         center,
         radius: this.arenaRadius,
         dimensionId: this.dimensionId,
+        bossName: name,
       })
     })
 
@@ -132,6 +133,11 @@ export class Boss {
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
+    try {
+      this.entity.nameTag = this.name
+    } catch (e) {
+      console.error(e)
+    }
 
     // Save to database
     Boss.db[this.id] = {
