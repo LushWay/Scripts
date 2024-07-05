@@ -4,7 +4,7 @@ import { BossArenaRegion } from './boss-arena'
 
 describe('BossArenaRegion', () => {
   it('should create region', () => {
-    const region = BossArenaRegion.create({ center: Vector.one, radius: 1, dimensionId: 'overworld' })
+    const region = BossArenaRegion.create({ center: Vector.one, radius: 1, dimensionId: 'overworld', bossName: 'Abc' })
 
     expect(region).toBeInstanceOf(BossArenaRegion)
   })
