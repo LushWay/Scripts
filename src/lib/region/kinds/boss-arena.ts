@@ -6,6 +6,8 @@ export class BossArenaRegion extends RadiusRegion {
 
   protected readonly saveable = false
 
+  protected priority = 10
+
   protected readonly defaultPermissions: RegionPermissions = {
     allowedEntities: 'all',
     doorsAndSwitches: true,

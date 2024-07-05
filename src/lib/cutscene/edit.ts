@@ -123,7 +123,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
     })
 
     world.beforeEvents.playerLeave.subscribe(event => {
-      if (event.player.id === player.id) temporary.cleanup()
+      if (event.player.id === player.id) system.delay(() => temporary.cleanup())
     })
 
     function particle(point: Vector3 | undefined, vars: MolangVariableMap) {
