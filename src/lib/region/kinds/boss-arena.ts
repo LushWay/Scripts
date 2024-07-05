@@ -10,14 +10,14 @@ export class BossArenaRegion extends RadiusRegion {
 
   protected readonly saveable = false
 
-  radius = 50
+  radius = 40
 
   protected priority = 10
 
   bossName: string
 
   get displayName(): string | undefined {
-    return `§cБосс §6${this.name}`
+    return `§cБосс §6${this.bossName}`
   }
 
   protected readonly defaultPermissions: RegionPermissions = {

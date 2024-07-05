@@ -19,6 +19,24 @@
         "minecraft:nameable": {
           "allow_name_tag_renaming": true,
           "always_show": true
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "entity_types": [
+            {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "value": "player"
+              },
+              "max_dist": 40
+            }
+          ],
+          "must_see": true
+        },
+        "minecraft:boss": {
+          "should_darken_sky": false,
+          "hud_range": 40
         }
       }
     },
