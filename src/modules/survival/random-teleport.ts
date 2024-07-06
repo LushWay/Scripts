@@ -62,7 +62,6 @@ export function randomTeleport(
   const z = Math.randomInt(from.z, to.z)
 
   try {
-    // TODO Load by tickingarea
     const hit = world[dimension].getBlockFromRay({ x, y: y - 2, z }, Vector.down)
     if (hit) {
       const { block } = hit

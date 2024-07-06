@@ -8,15 +8,29 @@
       "is_experimental": false
     },
     "component_groups": {
-      "sm:boss": {
+      "lw:boss": {
+        // General boss options
+        "minecraft:experience_reward": {
+          "on_death": "100"
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/empty.json"
+        },
+        "minecraft:nameable": {
+          "allow_name_tag_renaming": true,
+          "always_show": true
+        },
+        "minecraft:boss": {
+          "should_darken_sky": false,
+          "hud_range": 40
+        },
+
+        // Entity specific options
         "minecraft:collision_box": {
           "width": 1.04,
           "height": 1.04
         },
-        "minecraft:boss": {
-          "should_darken_sky": false,
-          "hud_range": 50
-        },
+
         "minecraft:health": {
           "value": 100,
           "max": 100
@@ -26,9 +40,6 @@
         },
         "minecraft:scale": {
           "value": 4
-        },
-        "minecraft:loot": {
-          "table": "loot_tables/entities/empty.json"
         }
       },
 
@@ -204,9 +215,9 @@
           "component_groups": ["minecraft:slime_aggressive"]
         }
       },
-      "sm:boss": {
+      "lw:boss": {
         "add": {
-          "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_large", "sm:boss"]
+          "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_large", "lw:boss"]
         }
       }
     }

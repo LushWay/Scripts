@@ -1,3 +1,4 @@
+import { Loot } from 'lib'
 import { City } from '../lib/city'
 import { Stoner } from '../lib/npc/stoner'
 
@@ -8,10 +9,7 @@ class VillageOfMinersBuilder extends City {
   }
 
   private create() {
-    this.createKits(
-      normal => normal.item('Dirt').build,
-      donut => donut.item('Dirt').build,
-    )
+    this.createKits(new Loot().item('Dirt').build, new Loot().item('Dirt').build)
   }
 
   stoner = new Stoner(this.group)

@@ -2,10 +2,11 @@ import { Player, system } from '@minecraft/server'
 import { PlaceAction } from 'lib/action'
 import { Cooldown } from 'lib/cooldown'
 import { SafeLocation, location } from 'lib/location'
-import { Npc, NpcOptions } from 'lib/rpg/npc'
+import { Npc } from 'lib/rpg/npc'
+import { Place } from 'lib/rpg/place'
 import { Shop } from './shop'
 
-export interface ShopNpcOptions extends Omit<NpcOptions, 'onInteract'> {
+export interface ShopNpcOptions {
   body: (player: Player) => string
 }
 
@@ -21,12 +22,9 @@ export class ShopNpc {
    *
    * @param options - Creation options
    */
-  constructor(options: ShopNpcOptions) {
-    this.shop = new Shop(options.name, options.id)
-    this.npc = new Npc({
-      ...options,
-      onInteract: event => this.shop.open(event.player),
-    })
+  constructor(point: Place) {
+    this.shop = new Shop(point.name, point.id)
+    this.npc = new Npc(point, event => this.shop.open(event.player))
   }
 }
 
@@ -37,9 +35,9 @@ export class ShopBlock {
 
   private cooldown = new Cooldown(1000, false)
 
-  constructor(options: ShopNpcOptions) {
-    this.shop = new Shop(options.name, options.id)
-    this.location = location(options.group, options.id, options.name)
+  constructor(place: Place) {
+    this.shop = new Shop(place.name, place.id)
+    this.location = location(place)
     this.location.onLoad.subscribe(location => {
       PlaceAction.onInteract(
         location,
@@ -49,7 +47,7 @@ export class ShopBlock {
           })
           return true
         },
-        options.dimensionId ?? 'overworld',
+        place.group.dimensionId,
       )
     })
   }

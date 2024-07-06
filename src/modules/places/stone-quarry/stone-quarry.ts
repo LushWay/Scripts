@@ -10,50 +10,36 @@ class StoneQuarryBuilder extends City {
     this.create()
   }
 
-  witherBoss = new Boss({
-    group: this.group,
-    id: 'wither',
-    name: 'Камнедробилка',
-    entityTypeId: MinecraftEntityTypes.Wither,
-    bossEvent: true,
-    respawnTime: ms.from('hour', 1),
-    loot: new Loot('wither drop').item('NetherStar').build,
-  })
+  w = Boss.create()
+    .group(this.group)
+    .id('wither')
+    .name('Камнедробилка')
+    .typeId(MinecraftEntityTypes.Wither)
+    .loot(new Loot('wither drop').item('NetherStar').build)
+    .respawnTime(ms.from('hour', 1))
+    .spawnEvent(true)
 
-  commonOvener = new Furnacer({
-    npc: {
-      group: this.group,
-      id: 'ovener',
-      name: '§6Печкин',
-    },
-
-    furnaces: [
+  commonOvener = Furnacer.create()
+    .id('ovener')
+    .name('§6Печкин')
+    .furnaces([
       MinecraftBlockTypes.BlastFurnace,
       MinecraftBlockTypes.LitBlastFurnace,
       MinecraftBlockTypes.Furnace,
       MinecraftBlockTypes.LitFurnace,
-    ],
-    onlyInStoneQuarry: true,
-  })
+    ])
+    .onlyInStoneQuarry(true)
 
-  foodOvener = new Furnacer({
-    npc: {
-      group: this.group,
-      id: 'foodOvener',
-      name: '§6Тетя зина',
-    },
-
-    furnaces: [MinecraftBlockTypes.LitBlastFurnace],
-    onlyInStoneQuarry: false,
-  })
+  foodOvener = Furnacer.create()
+    .id('foodOvener')
+    .name('§6Тетя зина')
+    .furnaces([MinecraftBlockTypes.LitBlastFurnace])
+    .onlyInStoneQuarry(false)
 
   gunsmith = new Gunsmith(this.group)
 
   private create() {
-    this.createKits(
-      normal => normal.item('RedTerracotta').build,
-      donut => donut.item('RedTerracotta').build,
-    )
+    this.createKits(new Loot().item('RedTerracotta').build, new Loot().item('RedTerracotta').build)
   }
 }
 

@@ -3,8 +3,6 @@ import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 import { vi } from 'vitest'
 
-export class ScoreboardObjective {}
-
 export class Component {
   readonly 'typeId': string
   'isValid'(): boolean {
@@ -80,15 +78,7 @@ export class Entity {
 }
 
 export class Player extends Entity {
-  scores = new Proxy(
-    {},
-    {
-      get(target, p, receiver) {
-        return Reflect.get(target, p, receiver) ?? 0
-      },
-    },
-  )
-  constructor() {
+  constructor(initialSpawn = true) {
     super()
     EventSignal.emit(
       (world.afterEvents as unknown as mc.WorldAfterEvents).playerJoin as unknown as EventSignal<any>,
@@ -96,7 +86,7 @@ export class Player extends Entity {
     )
     EventSignal.emit(
       (world.afterEvents as unknown as mc.WorldAfterEvents).playerSpawn as unknown as EventSignal<any>,
-      { player: this as unknown as mc.Player, initialSpawn: true } as mc.PlayerSpawnAfterEvent,
+      { player: this as unknown as mc.Player, initialSpawn } as mc.PlayerSpawnAfterEvent,
     )
   }
 
@@ -111,6 +101,9 @@ export class Player extends Entity {
   }
   setGameMode(gameMode: GameMode) {
     this.gamemode = gameMode
+  }
+  getRotation() {
+    return { x: 0, y: 0 }
   }
 }
 
@@ -149,7 +142,97 @@ function wrapEvents(events: WorldAfterEvents | WorldBeforeEvents) {
   })
 }
 
+/** Contains objectives and participants for the scoreboard. */
+export class Scoreboard {
+  objectives: ScoreboardObjective[] = []
+
+  addObjective(objectiveId: string, displayName?: string): ScoreboardObjective {
+    const obj = new ScoreboardObjective(objectiveId, displayName)
+    this.objectives.push(obj)
+    return obj
+  }
+  clearObjectiveAtDisplaySlot(displaySlotId: any): ScoreboardObjective | undefined {
+    return
+  }
+  getObjective(objectiveId: string): ScoreboardObjective | undefined {
+    return this.objectives.find(e => e.id === objectiveId)
+  }
+
+  getObjectiveAtDisplaySlot(displaySlotId: any) {
+    return
+  }
+  getObjectives(): ScoreboardObjective[] {
+    return []
+  }
+  getParticipants(): ScoreboardIdentity[] {
+    return []
+  }
+  removeObjective(objectiveId: ScoreboardObjective | string): boolean {
+    return false
+  }
+
+  setObjectiveAtDisplaySlot(displaySlotId: any, objectiveDisplaySetting: any): ScoreboardObjective | undefined {
+    return
+  }
+}
+
+/** Contains an identity of the scoreboard item. */
+export class ScoreboardIdentity {
+  readonly 'displayName': string
+  readonly 'id': number
+  readonly 'type': any
+  'getEntity'(): Entity | undefined {
+    return
+  }
+  'isValid'() {
+    return false
+  }
+}
+
+export class ScoreboardObjective {
+  constructor(
+    readonly id: string,
+    displayName?: string,
+  ) {}
+
+  private participiants = new Map<string, number>()
+
+  private getId(p: Entity | ScoreboardIdentity | string) {
+    return p instanceof Entity ? p.id : p instanceof ScoreboardIdentity ? p.id + '' : p
+  }
+
+  addScore(participant: Entity | ScoreboardIdentity | string, scoreToAdd: number): number {
+    const score = this.participiants.get(this.getId(participant))
+    if (typeof score !== 'undefined') {
+      this.participiants.set(this.getId(participant), score + scoreToAdd)
+    }
+    return scoreToAdd
+  }
+  getParticipants(): ScoreboardIdentity[] {
+    return []
+  }
+  getScore(participant: Entity | ScoreboardIdentity | string): number | undefined {
+    return this.participiants.get(this.getId(participant))
+  }
+  getScores(): any[] {
+    return []
+  }
+  hasParticipant(participant: Entity | ScoreboardIdentity | string): boolean {
+    return this.participiants.has(this.getId(participant))
+  }
+  isValid(): boolean {
+    return true
+  }
+  removeParticipant(participant: Entity | ScoreboardIdentity | string): boolean {
+    return false
+  }
+  setScore(participant: Entity | ScoreboardIdentity | string, score: number): void {
+    this.participiants.set(this.getId(participant), score)
+  }
+}
+
 export class World {
+  scoreboard = new Scoreboard()
   afterEvents = wrapEvents(new WorldAfterEvents())
   beforeEvents = wrapEvents(new WorldBeforeEvents())
   sendMessage = vi.fn()

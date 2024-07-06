@@ -1,5 +1,6 @@
 import { ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { Group } from 'lib/rpg/place'
 import { Cost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { CustomItemWithBlueprint } from '../../../lib/rpg/custom-item'
@@ -18,14 +19,10 @@ export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
 export const MicroSchema = new ItemStack(MinecraftItemTypes.IronIngot).setInfo('Микросхема', 'Нужная фигня, да')
 
 export class Engineer extends ShopNpc {
-  constructor(public group: string) {
-    super({
-      group,
-      id: 'engineer',
-      name: 'Инженер',
-      body: () => 'Ну типа дай мне чертеж, a я те чета там наколупаю, да',
-    })
+  constructor(public group: Group) {
+    super(group.point('engineer').name('Инжeнер'))
 
+    this.shop.body(() => 'Ну типа дай мне чертеж, a я те чета там наколупаю, да')
     this.shop.menu(menu => {
       function addItem(item: CustomItemWithBlueprint, cost: Cost) {
         menu.addItemStack(item.itemStack, new MultiCost(cost).item(item.blueprint))

@@ -2,7 +2,7 @@ import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@mi
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Command } from 'lib/command'
 import { EventSignal } from 'lib/event-signal'
-import { inspect, isKeyof, util } from 'lib/util'
+import { inspect, isKeyof } from 'lib/util'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`

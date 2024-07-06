@@ -1,29 +1,24 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { Group } from 'lib/rpg/place'
 import { MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 
 export class Mage extends ShopNpc {
-  constructor(group: string) {
-    super({
-      group,
-      id: 'mage',
-      name: 'Маг',
-      dimensionId: 'overworld',
-      body: () => 'Чего пожелаешь?',
-    })
+  constructor(group: Group) {
+    super(group.point('mage').name('Маг'))
 
+    this.shop.body(() => 'Чего пожелаешь?')
     this.shop.menu(form => {
       form
         .addSection('Улучшить оружие', form => {
-          form
-            .addItemModifier(
-              'Улучшить остроту',
-              new MultiCost().item(i.LapisLazuli, 3).money(10),
-              item => item.typeId.endsWith('sword'),
-              slot => this.updateEnchatnment(slot, e.Sharpness, 1),
-            )
+          form.addItemModifier(
+            'Улучшить остроту',
+            new MultiCost().item(i.LapisLazuli, 3).money(10),
+            item => item.typeId.endsWith('sword'),
+            slot => this.updateEnchatnment(slot, e.Sharpness, 1),
+          )
         })
         .addSection('Улучшить броню', form => {
           form.addItemModifier(

@@ -2,16 +2,25 @@
 
 import { Entity, system, world } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { isChunkUnloaded } from 'lib/game-utils'
-import { location } from 'lib/location'
+import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
+import { location, SafeLocation } from 'lib/location'
 import { Region } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
+import { Group, Place } from './place'
 
 interface BossDB {
   id: string
   date: number
   dead: boolean
+}
+
+interface BossOptions {
+  place: Place
+  typeId: string
+  loot: LootTable
+  spawnEvent: boolean | string
+  respawnTime: number
 }
 
 export class Boss {
@@ -21,27 +30,24 @@ export class Boss {
   /** List of all registered boss types */
   static all: Boss[] = []
 
-  arenaRadius
-
-  bossEvent
-
-  dimensionId
-
-  name
+  static create() {
+    return Group.pointCreator(place => ({
+      typeId: (typeId: string) => ({
+        loot: (loot: LootTable) => ({
+          respawnTime: (respawnTime: number) => ({
+            spawnEvent: (spawnEvent: BossOptions['spawnEvent']) =>
+              new Boss({ place, typeId, loot, respawnTime, spawnEvent }),
+          }),
+        }),
+      }),
+    }))
+  }
 
   entity: Entity | undefined
 
-  entityTypeId
-
-  location
-
-  loot
-
-  id
-
   region?: Region
 
-  respawnTime
+  location: SafeLocation<Vector3>
 
   static {
     world.afterEvents.entityDie.subscribe(data => {
@@ -59,55 +65,30 @@ export class Boss {
    * @param o.name Unique id used for location
    * @param o.respawnTime In ms
    */
-  constructor({
-    group,
-    id,
-    entityTypeId,
-    name,
-    respawnTime,
-    bossEvent = true,
-    arenaRadius = 10,
-    dimensionId = 'overworld',
-    loot,
-  }: {
-    group: string
-    id: string
-    entityTypeId: string
-    name: string
-    respawnTime: number
-    bossEvent?: boolean
-    arenaRadius?: number
-    loot: LootTable
-    dimensionId?: Dimensions
-  }) {
-    this.id = id
-    this.entityTypeId = entityTypeId
-    this.dimensionId = dimensionId
-    this.name = name
-    this.respawnTime = respawnTime
-    this.bossEvent = bossEvent
-    this.loot = loot
-
-    this.location = location(group, id, name)
-    this.arenaRadius = arenaRadius
+  constructor(private options: BossOptions) {
+    this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()
       this.region = BossArenaRegion.create({
         center,
-        radius: this.arenaRadius,
-        dimensionId: this.dimensionId,
-        bossName: name,
+        radius: 40,
+        dimensionId: this.options.place.group.dimensionId,
+        bossName: this.options.place.name,
       })
     })
 
     Boss.all.push(this)
   }
 
+  get dimensionId() {
+    return this.options.place.group.dimensionId
+  }
+
   check() {
     if (!this.location.valid) return
-    if (isChunkUnloaded({ dimensionId: this.dimensionId, location: this.location })) return
+    if (isChunkUnloaded(this as LocationInDimension)) return
 
-    const db = Boss.db[this.id]
+    const db = Boss.db[this.options.place.id]
     if (typeof db !== 'undefined') {
       if (db.dead) {
         this.checkRespawnTime(db)
@@ -121,26 +102,26 @@ export class Boss {
   }
 
   checkRespawnTime(db: BossDB) {
-    if (Date.now() > db.date + this.respawnTime) this.spawnEntity()
+    if (Date.now() > db.date + this.options.respawnTime) this.spawnEntity()
   }
 
   spawnEntity() {
     if (!this.location.valid) return
 
     // Get type id
-    const entityTypeId = this.entityTypeId + (this.bossEvent ? '<sm:boss>' : '')
-    console.debug(`Boss(${this.id}).spawnEntity(${entityTypeId})`)
+    const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
+    console.debug(`Boss(${this.options.place.id}).spawnEntity(${entityTypeId})`)
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
     try {
-      this.entity.nameTag = this.name
+      this.entity.nameTag = this.options.place.name
     } catch (e) {
       console.error(e)
     }
 
     // Save to database
-    Boss.db[this.id] = {
+    Boss.db[this.options.place.id] = {
       id: this.entity.id,
       date: Date.now(),
       dead: false,
@@ -151,7 +132,7 @@ export class Boss {
   ensureEntity(db: BossDB) {
     const entity = world[this.dimensionId]
       .getEntities({
-        type: this.entityTypeId,
+        type: this.options.typeId,
         // location: this.location,
         // maxDistance: this.areaRadius,
       })
@@ -167,20 +148,20 @@ export class Boss {
 
   onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
-    console.debug(`Boss(${this.id}).onDie()`)
+    console.debug(`Boss(${this.options.place.id}).onDie()`)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
 
-    Boss.db[this.id] = {
+    Boss.db[this.options.place.id] = {
       id: '',
       date: Date.now(),
       dead: true,
     }
 
     if (dropLoot) {
-      world.say('§6Убит босс §f' + this.name + '!')
+      world.say('§6Убит босс §f' + this.options.place.name + '!')
 
-      this.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
+      this.options.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
       // TODO Give money depending on how many hits etc
     }
   }

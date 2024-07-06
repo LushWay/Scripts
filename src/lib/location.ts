@@ -1,9 +1,9 @@
 import { Player, TeleportOptions, Vector3, system } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
+import { Place } from './rpg/place'
 import { Settings } from './settings'
 import { t } from './text'
-import { util } from './util'
 
 interface LocationCommon<T extends Vector3> {
   onLoad: Location<T>['onLoad']
@@ -31,11 +31,12 @@ class Location<T extends Vector3> {
    */
   static creator<V extends Vector3, L extends typeof Location<V>>(this: L) {
     /** @param group - Location group */
-    return (group: string, id: string, name: string, fallback?: V) => {
-      const location = new this(group, id, fallback)
-      Settings.worldMap[group] ??= {}
-      Settings.worldMap[group][id] = {
-        name: name,
+    return (place: Place, fallback?: V) => {
+      const location = new this(place.group.id, place.id, fallback)
+
+      Settings.worldMap[place.group.id] ??= {}
+      Settings.worldMap[place.group.id][place.id] = {
+        name: place.name,
         description: location.format,
         value: fallback ? Object.values(fallback).join(' ').trim() : '',
         onChange: () => location.load(true),

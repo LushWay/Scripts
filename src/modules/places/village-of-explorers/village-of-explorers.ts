@@ -16,34 +16,33 @@ class VillageOfExporersBuilder extends City {
     this.create()
   }
 
-  slimeBoss = new Boss({
-    group: this.group,
-    id: 'slime',
-    name: 'Магический Слайм',
-    entityTypeId: MinecraftEntityTypes.Slime,
-    respawnTime: ms.from('min', 10),
-    loot: new Loot('slime boss')
-      .itemStack(BossSlimeBall)
-      .amount({
-        '40...64': '2%',
-        '65...128': '1%',
-      })
+  slimeBoss = Boss.create()
+    .group(this.group)
+    .id('slime')
+    .name('Магический Слайм')
+    .typeId(MinecraftEntityTypes.Slime)
+    .loot(
+      new Loot('slime boss')
+        .itemStack(BossSlimeBall)
+        .amount({
+          '40...64': '2%',
+          '65...128': '1%',
+        })
 
-      .item('SlimeBall')
-      .amount({
-        '0...10': '10%',
-        '11...64': '40%',
-        '65...256': '50%',
-      }).build,
-  })
+        .item('SlimeBall')
+        .amount({
+          '0...10': '10%',
+          '11...64': '40%',
+          '65...256': '50%',
+        }).build,
+    )
+    .respawnTime(ms.from('min', 10))
+    .spawnEvent(true)
 
   mage = new Mage(this.group)
 
   private create() {
-    this.createKits(
-      normal => normal.item('Dirt').build,
-      donut => donut.itemStack(BossSlimeBall).build,
-    )
+    this.createKits(new Loot().item('Dirt').build, new Loot().itemStack(BossSlimeBall).build)
   }
 
   stoner = new Stoner(this.group)

@@ -9,14 +9,15 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftCameraPresetsTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { SafeLocation } from 'lib'
 import { Vector } from 'lib/vector'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
 
 /** Represents location in the specific dimension */
-interface LocationInDimension {
+export interface LocationInDimension {
   /** Location of the place */
-  location: Vector3
+  location: Vector3 | SafeLocation<Vector3>
   /** Dimension of the location */
   dimensionId: Dimensions
 }
@@ -24,6 +25,8 @@ interface LocationInDimension {
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
 export function getBlockStatus({ location, dimensionId }: LocationInDimension) {
   try {
+    if ('valid' in location && !location.valid) return 'unloaded'
+
     const block = world[dimensionId].getBlock(location)
     if (!block?.isValid()) return 'unloaded'
 

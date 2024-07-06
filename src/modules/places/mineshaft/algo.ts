@@ -1,6 +1,7 @@
 import { Block, Dimension, Player } from '@minecraft/server'
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
-import { EventSignal, Vector } from 'lib'
+import { Vector } from 'lib'
+import { EventSignal } from 'lib/event-signal'
 import { Ore, OreCollector } from './ore-collector'
 
 export const ores = new OreCollector(

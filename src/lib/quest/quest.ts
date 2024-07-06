@@ -1,6 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 import { Join, SETTINGS_GROUP_NAME, Settings } from 'lib'
 import { Sounds } from 'lib/assets/config'
+import { Group } from 'lib/rpg/place'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { PlayerQuest } from './player'
 import { QS } from './step'
@@ -69,7 +70,7 @@ export class Quest {
     system.delay(() => {
       world.getAllPlayers().forEach(e => Quest.restore(e, this))
 
-      const questSettings = Settings.worldMap[this.group]
+      const questSettings = Settings.worldMap[this.group.id]
       if (typeof questSettings !== 'undefined' && Object.keys(questSettings).length) {
         questSettings[SETTINGS_GROUP_NAME] = `Задание: ${this.name}\n§7${this.description}`
       }
@@ -197,7 +198,7 @@ export class Quest {
   }
 
   get group() {
-    return 'quest: ' + this.id
+    return new Group('quest: ' + this.id, this.name)
   }
 
   private static restore(

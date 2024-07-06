@@ -1,6 +1,7 @@
 import { system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { SafeAreaRegion, Settings, actionGuard, location, locationWithRadius, locationWithRotation } from 'lib'
+import { SafeAreaRegion, actionGuard, location, locationWithRadius, locationWithRotation } from 'lib'
+import { Group } from 'lib/rpg/place'
 
 export class PlaceWithSafeArea {
   static places: PlaceWithSafeArea[] = []
@@ -15,17 +16,19 @@ export class PlaceWithSafeArea {
 
   safeAreaLocation
 
+  readonly group: Group
+
   constructor(
-    public readonly group: string,
+    group: string,
     public readonly name: string,
   ) {
-    // Define settings group name
-    Settings.world(name, group, {})
-
-    this.safeAreaLocation = locationWithRadius(group, 'safearea', 'мирная зона')
-    this.portalTeleportsTo = locationWithRotation(group, 'portal teleports to', 'портал телепортирует на')
-    this.portalPos2 = location(group, 'portal from', 'портал от')
-    this.portalPos1 = location(group, 'portal to', 'портал до')
+    this.group = new Group(group, name)
+    this.safeAreaLocation = locationWithRadius(this.group.point('safearea').name('мирная зона'))
+    this.portalTeleportsTo = locationWithRotation(
+      this.group.point('portal teleports to').name('портал телепортирует на'),
+    )
+    this.portalPos2 = location(this.group.point('portal from').name('портал от'))
+    this.portalPos1 = location(this.group.point('portal to').name('портал до'))
 
     this.safeAreaLocation.onLoad.subscribe(location => {
       this.safeArea = SafeAreaRegion.create(

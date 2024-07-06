@@ -1,9 +1,9 @@
-import { Loot, LootTable } from 'lib'
+import { LootTable } from 'lib'
 import { ChestLoot } from 'lib/chest-loot/chest-loot'
+import { Cutscene } from 'lib/cutscene'
 import { Quest } from 'lib/quest'
 import { t } from 'lib/text'
 import { PlaceWithSafeArea } from './place-with-safearea'
-import { Cutscene } from 'lib/cutscene'
 
 export class City extends PlaceWithSafeArea {
   quests: Quest[] = []
@@ -12,17 +12,12 @@ export class City extends PlaceWithSafeArea {
     // return new Quest()
   }
 
-  protected createKits(normalLoot: (loot: Loot) => LootTable, donutLoot: (loot: Loot) => LootTable) {
-    const normal = new ChestLoot(
-      'normal kit',
-      this.group,
-      t`§7Обычный`,
-      normalLoot(new Loot(this.group + ' normal kit')),
-    )
-    const donut = new ChestLoot('donut kit', this.group, t`§6Донатный`, donutLoot(new Loot(this.group + ' donut kit')))
+  protected createKits(normalLoot: LootTable, donutLoot: LootTable) {
+    const normal = new ChestLoot(this.group.point('normal kit').name(t`§7Обычный`), normalLoot)
+    const donut = new ChestLoot(this.group.point('donut kit').name(t`§6Донатный`), donutLoot)
 
     return { normal, donut }
   }
 
-  cutscene = new Cutscene(this.group, 'Исследование ' + this.name)
+  cutscene = new Cutscene(this.group.id, 'Исследование ' + this.name)
 }

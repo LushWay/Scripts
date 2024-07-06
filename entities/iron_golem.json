@@ -9,7 +9,24 @@
     },
 
     "component_groups": {
-      "sm:boss": {
+      "lw:boss": {
+        // General boss options
+        "minecraft:experience_reward": {
+          "on_death": "100"
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/empty.json"
+        },
+        "minecraft:nameable": {
+          "allow_name_tag_renaming": true,
+          "always_show": true
+        },
+        "minecraft:boss": {
+          "should_darken_sky": false,
+          "hud_range": 40
+        },
+
+        // Entity specific options
         "minecraft:behavior.nearest_attackable_target": {
           "priority": 3,
           "entity_types": [
@@ -23,23 +40,10 @@
           "must_see": true,
           "must_reach": true
         },
-        "minecraft:experience_reward": {
-          "on_death": "100"
-        },
-        "minecraft:loot": {
-          "table": "loot_tables/empty.json"
-        },
+
         "minecraft:health": {
           "value": 300,
           "max": 300
-        },
-        "minecraft:boss": {
-          "should_darken_sky": true,
-          "hud_range": 55
-        },
-        "minecraft:nameable": {
-          "allow_name_tag_renaming": true,
-          "always_show": true
         }
       },
       "minecraft:player_created": {
@@ -303,9 +307,9 @@
         }
       },
 
-      "sm:boss": {
+      "lw:boss": {
         "add": {
-          "component_groups": ["sm:boss"]
+          "component_groups": ["lw:boss"]
         }
       }
     }

@@ -1,15 +1,24 @@
 import { ItemStack, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector, ms, util } from 'lib'
+import { Vector, ms } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { actionGuard } from 'lib/region/index'
+import { Group, Place } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
-import { ShopNpc, ShopNpcOptions } from 'lib/shop/npc'
+import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { StoneQuarry } from './stone-quarry'
 
 export class Furnacer extends ShopNpc {
+  static create() {
+    return Group.pointCreator(place => ({
+      furnaces: (furnaces: string[]) => ({
+        onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer({ place, furnaces, onlyInStoneQuarry }),
+      }),
+    })).group(StoneQuarry.group)
+  }
+
   /**
    * List of all Furnacers npc
    *
@@ -32,19 +41,17 @@ export class Furnacer extends ShopNpc {
    * @param options.furnaceTypeIds - Type ids of the furnace blocks
    * @param options.onlyInStoneQuarry - Whenether to allow using this type of furnace outside Stone quarry
    */
-  constructor({
-    npc,
+  private constructor({
+    place,
     furnaces,
     onlyInStoneQuarry,
   }: {
-    npc: Omit<ShopNpcOptions, 'body' | 'dimensionId'>
+    place: Place
     furnaces: string[]
     onlyInStoneQuarry: boolean
   }) {
-    super({
-      body: () => 'У меня ты можешь купить доступ к печкам\n\n',
-      ...npc,
-    })
+    super(place)
+    this.shop.body(() => 'У меня ты можешь купить доступ к печкам\n\n')
     Furnacer.npcs.push(this)
 
     this.furnaceTypeIds = furnaces

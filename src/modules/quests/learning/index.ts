@@ -184,9 +184,9 @@ class Learning {
     })
   })
 
-  randomTeleportLocation = locationWithRadius(this.quest.group, 'safearea', 'Мирная зона и ртп')
+  randomTeleportLocation = locationWithRadius(this.quest.group.point('safearea').name('Мирная зона и ртп'))
 
-  craftingTableLocation = location(this.quest.group, 'crafting table', 'Верстак')
+  craftingTableLocation = location(this.quest.group.point('crafting table').name('Верстак'))
 
   startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 
@@ -194,16 +194,10 @@ class Learning {
 
   safeArea: SafeAreaRegion | undefined = void 0
 
-  minerNpc = new Npc({
-    dimensionId: 'overworld',
-    id: 'minerNpc',
-    group: this.quest.group,
-    name: 'Шахтер',
-    onInteract: event => {
-      if (!this.quest.getPlayerStep(event.player)) return false
+  minerNpc = new Npc(this.quest.group.point('minerNpc').name('Шахтер'), event => {
+    if (!this.quest.getPlayerStep(event.player)) return false
 
-      new ActionForm('Шахтер', 'Новенький? Не знаешь куда идти? ').show(event.player)
-    },
+    new ActionForm('Шахтер', 'Новенький? Не знаешь куда идти? ').show(event.player)
   })
 
   constructor() {

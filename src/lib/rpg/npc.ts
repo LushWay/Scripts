@@ -4,21 +4,10 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, Vector, isChunkUnloaded } from 'lib'
 import { location } from 'lib/location'
 import { t } from 'lib/text'
+import { Place } from './place'
 
-type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void | false
-
-export interface NpcOptions {
-  /** Unique identifier of the npc. Used to restore npc pointer after script reload */
-  id: string
-  /** Callback function that gets called on interact */
-  onInteract: OnInteract
-  /** NameTag of the npc */
-  name: string
-  group: string
-  /** Dimension id */
-  dimensionId?: Dimensions
-  /** Index of the npc skin */
-  skin?: number
+declare namespace Npc {
+  type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void | false
 }
 
 export class Npc {
@@ -28,19 +17,22 @@ export class Npc {
 
   static npcs: Npc[] = []
 
-  private location
+  location
 
   private entity: Entity | undefined
 
   private readonly id: string
 
-  private readonly dimensionId: Dimensions
+  readonly dimensionId: Dimensions
 
   /** Creates new dynamically loadable npc */
-  constructor(private options: NpcOptions) {
-    this.id = options.id
-    this.dimensionId = options.dimensionId ?? 'overworld'
-    this.location = location(options.group, options.id, options.name)
+  constructor(
+    private point: Place,
+    private onInteract: Npc.OnInteract,
+  ) {
+    this.id = point.fullId
+    this.dimensionId = point.group.dimensionId
+    this.location = location(point)
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
       this.location = location
@@ -49,14 +41,14 @@ export class Npc {
     Npc.npcs.push(this)
   }
 
-  addQuestInteraction(interaction: OnInteract) {
+  addQuestInteraction(interaction: Npc.OnInteract) {
     this.questInteractions.add(interaction)
     return interaction
   }
 
-  private questInteractions = new Set<OnInteract>()
+  private questInteractions = new Set<Npc.OnInteract>()
 
-  private onQuestInteraction: OnInteract = event => {
+  private onQuestInteraction: Npc.OnInteract = event => {
     for (const interaction of this.questInteractions) {
       if (interaction(event) !== false) return // Return on first successfull interaction
     }
@@ -85,8 +77,7 @@ export class Npc {
     if (!npc) return
 
     entity.setDynamicProperty(Npc.dynamicPropertyName, this.id)
-    npc.name = '§6§l' + this.options.name
-    if (typeof this.options.skin === 'number') npc.skinIndex = this.options.skin
+    npc.name = '§6§l' + this.point.name
     if (this.location.valid) entity.teleport(this.location)
   }
 
@@ -102,7 +93,7 @@ export class Npc {
           const component = event.target.getComponent('npc')
           const npcName = component ? component.name : event.target.nameTag
 
-          if (!npc || npc.onQuestInteraction(event) === false || npc.options.onInteract(event) === false) {
+          if (!npc || npc.onQuestInteraction(event) === false || npc.onInteract(event) === false) {
             return event.player.fail(`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
           }
         } catch (e) {
@@ -120,10 +111,7 @@ export class Npc {
 
         this.npcs.forEach(npc => {
           if (npc.entity) return // Entity already loaded
-
-          const location = npc.location
-          if (!location.valid) return
-          if (isChunkUnloaded({ dimensionId: npc.dimensionId, location })) return
+          if (isChunkUnloaded(npc)) return
 
           const npcs = (cache[npc.dimensionId] ??= world[npc.dimensionId].getEntities({ type: Npc.type }).map(e => ({
             entity: e,

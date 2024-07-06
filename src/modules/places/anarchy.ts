@@ -20,9 +20,9 @@ class AnarchyBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location('common', 'anarchy center', 'центр анархии')
+  centerLocation = location(Spawn.group.point('anarchy center').name('центр анархии'))
 
-  portalLocation = location('common', 'anarchy portal', 'портал на анархию')
+  portalLocation = location(Spawn.group.point('anarchy portal').name('портал на анархию'))
 
   inventoryStore = new InventoryStore('anarchy')
 

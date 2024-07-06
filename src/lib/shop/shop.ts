@@ -48,7 +48,7 @@ export class Shop {
    * @param body - Shop body generator function
    * @param useDefaultBody - Whenether to use default body with balance and other info or not
    */
-  body(body: (player: Player) => Text, useDefaultBody: boolean) {
+  body(body: (player: Player) => Text, useDefaultBody = true) {
     this.getBody = body
     if (!useDefaultBody) this.defaultBody = () => ''
     else this.defaultBody = Shop.prototype.defaultBody

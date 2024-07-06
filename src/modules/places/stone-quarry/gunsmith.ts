@@ -1,16 +1,13 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { Group } from 'lib/rpg/place'
 import { MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 
 export class Gunsmith extends ShopNpc {
-  constructor(group: string) {
-    super({
-      group,
-      id: 'gunsmith',
-      name: 'Оружейник',
-      body: () => 'Чего пожелаешь?',
-    })
+  constructor(group: Group) {
+    super(group.point('gunsmith').name('Оружейник'))
+    this.shop.body(() => 'Чего пожелаешь?')
 
     this.shop.menu(form => {
       form
