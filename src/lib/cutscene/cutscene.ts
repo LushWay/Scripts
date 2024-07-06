@@ -122,6 +122,8 @@ export class Cutscene {
 
           await system.sleep(10)
 
+          if (!player.isValid()) return
+
           // There is no way to set a camera without easing using pure script
           player.runCommand(
             `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vector.string(point)} rot ${point.rx} ${point.ry}`,
