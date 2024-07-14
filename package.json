@@ -68,7 +68,6 @@
     ],
     "plugins": [
       "@typescript-eslint",
-      "scriptapi",
       "only-warn"
     ],
     "parserOptions": {
@@ -91,10 +90,6 @@
       "no-undef": "off",
       "prefer-const": "warn",
       "lines-between-class-members": "warn",
-      "scriptapi/no-cycle": "error",
-      "scriptapi/ensure-modules": "error",
-      "scriptapi/no-unsupported-features": "error",
-      "scriptapi/ensure-export-boundaries": "error",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-types": "warn",
       "@typescript-eslint/no-unused-vars": "off",
