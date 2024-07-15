@@ -5,7 +5,7 @@
     "noEmit": false
   },
 
-  "include": ["./src", "./src/**/*.test.ts", "src/modules/places/tech-city/engineer.ts"],
+  "include": ["./src", "./src/**/*.test.ts"],
   "exclude": ["./src/**/*.spec.ts", "./src/test/framework.ts", "./src/test/loader.ts", "node_modules"],
   "references": []
 }

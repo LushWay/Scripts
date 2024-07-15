@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "plugins": []
-  },
-  "include": ["src", "tools/definedGlobals.d.ts", "vite.config.ts"],
-  "exclude": ["node_modules", "src/chestui"]
-}
