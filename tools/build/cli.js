@@ -18,17 +18,19 @@ export function parseCliArguments() {
         world: { type: 'boolean', default: false },
         port: { type: 'string' },
         help: { type: 'boolean', default: false, short: 'h' },
+        outdir: { type: 'string', default: 'scripts' },
       },
     })
     ;({ dev, test, world, port, vitest } = values)
 
     if (values.help) {
       logger.info(`build [options] 
-  --dev: bool
-  --test: bool
-  --vitest: bool
-  --world: bool
+  --dev: [bool=false]
+  --test: [bool=false]
+  --vitest: [bool=false]
+  --world: [bool=false]
   --port: int
+  --outdir: [string='scripts']
 `)
       process.exit(0)
     }
@@ -51,6 +53,10 @@ export function parseCliArguments() {
  */
 export function out(dir, file) {
   try {
+    if (fs.existsSync(path.join(dir, '.git'))) {
+      logger.error('Unable to empty dir which contains .git folder.')
+      process.exit(0)
+    }
     fs.rmSync(dir, { force: true, recursive: true })
     fs.mkdirSync(dir)
   } catch (e) {

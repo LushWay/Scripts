@@ -1,4 +1,4 @@
-import tsconfig from 'vite-tsconfig-paths'
+import tsconfig_paths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 import { generateDefine } from './tools/define'
 
@@ -19,5 +19,5 @@ export default defineConfig({
     },
     exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts'],
   },
-  plugins: [tsconfig()],
+  plugins: [tsconfig_paths()],
 })

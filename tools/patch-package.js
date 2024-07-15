@@ -22,7 +22,7 @@ export const resolve = require.resolve
  *
  * @param {string} packageName - The name of the package to patch.
  * @param {object} options - The patching options.
- * @param {{ find: RegExp | string; replace: string; all?: boolean; throw?: boolean }[]} options.replaces - The
+ * @param {{ find: RegExp | string; replace: string; all?: boolean; throwError?: boolean }[]} options.replaces - The
  *   replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
  * @param {Record<string, string> | undefined} options.classes Pairs of class name and method to add.
  * @param {object} options.additions
@@ -38,14 +38,13 @@ export async function patchPackage(packageName, options) {
   if (patchedCode.includes(Notice)) return console.log('\x1B[94m➤\x1B[39m \x1B[90mYN0000\x1B[39m: Already patched')
 
   // Apply the replacements
-  for (const replace of options.replaces) {
-    const replaceFN = replace.all ? patchedCode.replaceAll : patchedCode.replace
-    const newCode = replaceFN.call(patchedCode, replace.find, replace.replace)
+  for (const { all, find, replace, throwError } of options.replaces) {
+    const newCode = patchedCode[all ? 'replaceAll' : 'replace'](find, replace)
 
     if (newCode !== patchedCode) {
       patchedCode = newCode
     } else {
-      if (replace.throw !== false) throw new Error(`Unable to find replace for ${replace.find}`)
+      if (throwError !== false) throw new Error(`Unable to find replace for ${find}`)
     }
   }
 
