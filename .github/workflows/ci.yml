@@ -1,4 +1,4 @@
-## TODO When branch protection is enabled, make a CD action that triggers on push to main and deploys script. Also this action should upload coverage
+## TODO When branch protection is enabled, make a CD action that triggers on push to main and deploys script. Also CD, not CI action should upload coverage
 
 name: CI
 on:
@@ -13,6 +13,7 @@ on:
       - src/**
       - yarn.lock
       - .github/workflows/test.yml
+      - eslint.plugin.js
 
   pull_request:
 
