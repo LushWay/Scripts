@@ -160,9 +160,7 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
           .join('')
           .replace(/§(.)/g, '$1'),
       ) as LoreFormat
-    } catch (e) {
-      e
-    }
+    } catch {}
     if (raw?.version !== this.loreFormat.version) {
       if (returnUndefined) return undefined
       raw = JSON.parse(JSON.stringify(this.loreFormat)) as LoreFormat

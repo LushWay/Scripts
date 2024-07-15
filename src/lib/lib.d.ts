@@ -48,31 +48,31 @@ declare global {
 
   // Custom immutable type
   // source: https://github.com/Microsoft/TypeScript/issues/13923#issuecomment-653675557
-  export type Immutable<T> =
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    T extends Function | boolean | number | string | null | undefined
-      ? T
-      : T extends (infer U)[]
-        ? readonly Immutable<U>[]
-        : T extends Map<infer K, infer V>
-          ? ReadonlyMap<Immutable<K>, Immutable<V>>
-          : T extends Set<infer S>
-            ? ReadonlySet<Immutable<S>>
-            : { readonly [P in keyof T]: Immutable<T[P]> }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  export type Immutable<T> = T extends Function | boolean | number | string | null | undefined
+    ? T
+    : T extends (infer U)[]
+      ? readonly Immutable<U>[]
+      : T extends Map<infer K, infer V>
+        ? ReadonlyMap<Immutable<K>, Immutable<V>>
+        : T extends Set<infer S>
+          ? ReadonlySet<Immutable<S>>
+          : { readonly [P in keyof T]: Immutable<T[P]> }
 
   /** Narrows type. source: ts-toolbelt npm package */
   type Narrow<T> =
     | (T extends [] ? [] : never)
     | (T extends Narrowable ? T : never)
     | {
-        // eslint-disable-next-line @typescript-eslint/ban-types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
         [K in keyof T]: T[K] extends Function ? T[K] : Narrow<T[K]>
       }
 
   // Vite compability
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface WebSocket {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Worker {}
 }
 

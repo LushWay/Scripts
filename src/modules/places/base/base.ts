@@ -27,7 +27,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   try {
     if (!BaseItem.isItem(mainhand.getItem()) || LockAction.locked(player)) return
   } catch (e) {
-    if (e instanceof TypeError && e.message.match(/native handle/)) return
+    if (e instanceof TypeError && (/native handle/.exec(e.message))) return
     return console.error(e)
   }
 

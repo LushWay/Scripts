@@ -155,7 +155,7 @@ export class Loot {
       const value = parseIntStrict(rawValue)
 
       if (range.includes('.')) {
-        const match = range.match(/^(\d{1,4})\.\.\.(\d{1,4})$/)
+        const match = /^(\d{1,4})\.\.\.(\d{1,4})$/.exec(range)
         if (!match) throw new RangeError(`Range '${range}' doesn't matches the pattern 'number...number'.`)
 
         const [, min, max] = match.map(parseIntStrict)

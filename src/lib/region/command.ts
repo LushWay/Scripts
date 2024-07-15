@@ -44,7 +44,7 @@ function regionForm(player: Player) {
     .show(player)
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+ 
 function regionList(player: Player, RegionType: typeof RadiusRegion, back = () => regionForm(player)) {
   const form = new ActionForm('Список ' + RegionType.name)
 

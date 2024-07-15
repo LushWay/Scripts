@@ -27,7 +27,7 @@ interface WeDB {
 }
 
 export class WorldEdit {
-  static db = table<WeDB>('worldEdit', () => ({ pos1: Vector.one, pos2: Vector.one }))
+  static db = table<WeDB>('worldEdit', () => ({ pos1: { x: 0, y: 0, z: 0 }, pos2: { x: 0, y: 0, z: 0 } }))
 
   static forPlayer(player: Player) {
     const we = this.instances.get(player.id)
@@ -50,7 +50,6 @@ export class WorldEdit {
 
   visualSelectionCuboid: Cuboid | undefined
 
-  // @ts-expect-error Huh, it init
   db: WeDB
 
   get pos1() {
@@ -101,11 +100,12 @@ export class WorldEdit {
   private historyLimit = 100
 
   constructor(private player: Player) {
+    this.db = WorldEdit.db[this.player.id]
+
     const we = WorldEdit.instances.get(player)
     if (we) return we
 
     WorldEdit.instances.set(player, this)
-    this.db = WorldEdit.db[this.player.id]
     this.updateSelectionCuboids()
   }
 

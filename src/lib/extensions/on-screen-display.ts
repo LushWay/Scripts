@@ -129,7 +129,6 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
         if (typeof options === 'undefined') options = { ...defaultTitleOptions }
 
         // @ts-expect-error AAAAAAAAAAAAAAA
-        // eslint-disable-next-line
         player[ScreenDisplaySymbol].setTitle(title, options)
       } catch (e) {
         console.error(e)

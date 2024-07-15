@@ -35,9 +35,9 @@ const shovel = new WorldEditTool({
   editToolForm(slot, player) {
     const lore = shovel.parseLore(slot.getLore())
     new ModalForm('§3Лопата')
-      .addSlider('Радиус', 0, 10, 1, lore.radius ?? 1)
-      .addSlider('Высота', 1, 10, 1, lore.height ?? 1)
-      .addSlider('Сдвиг (-1 под ногами, 2 над головой)', -10, 10, 1, lore.zone ?? 1)
+      .addSlider('Радиус', 0, 10, 1, lore.radius)
+      .addSlider('Высота', 1, 10, 1, lore.height)
+      .addSlider('Сдвиг (-1 под ногами, 2 над головой)', -10, 10, 1, lore.zone)
 
       .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
       .addDropdownFromObject(

@@ -1,12 +1,12 @@
 import { Block, BlockPermutation, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ModalForm, Vector, is, util } from 'lib'
+import { is, ModalForm, util, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
-import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { BlocksSetRef, SHARED_POSTFIX, getAllBlocksSets } from 'modules/world-edit/utils/blocks-set'
-import { BaseBrushTool } from '../lib/base-brush-tool'
 import { ngettext } from 'lib/text'
+import { WorldEdit } from 'modules/world-edit/lib/world-edit'
+import { BlocksSetRef, getAllBlocksSets, SHARED_POSTFIX } from 'modules/world-edit/utils/blocks-set'
+import { BaseBrushTool } from '../lib/base-brush-tool'
 
 interface SmoothProps {
   smoothLevel: number
@@ -16,6 +16,7 @@ interface SmoothProps {
 
 class SmoothTool extends BaseBrushTool<SmoothProps> {
   onBrushUse: BaseBrushTool<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
+    // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable
     smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(console.error)
   }
 }
@@ -57,8 +58,7 @@ const smoother = new SmoothTool({
         lore.smoothLevel = smoothLevel
 
         if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
-        slot.nameTag = '§r§3Сглаживание §6' + size
-        '§r §f' + (replaceBlocksSet ? replaceBlocksSet.replace(SHARED_POSTFIX, '') : '')
+        slot.nameTag = `§r§3Сглаживание §6${size}§r §f${replaceBlocksSet ? replaceBlocksSet.replace(SHARED_POSTFIX, '') : ''}`
 
         slot.setLore(smoother.stringifyLore(lore))
         player.success(
@@ -79,100 +79,112 @@ export async function smoothVoxelData(
   smoothLevel: number,
   replaceBlocks: (import('modules/world-edit/menu').ReplaceTarget | undefined)[] = [undefined],
 ) {
-  const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
-  const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
+  return new Promise<void>((resolve, reject) => {
+    const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
+    const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
 
-  WorldEdit.forPlayer(player).backup('Сглаживание', pos1, pos2)
+    WorldEdit.forPlayer(player).backup('Сглаживание', pos1, pos2)
 
-  function* smootherJob() {
-    const prefix = '§7Сглаживание: §f '
+    function* smootherJob() {
+      try {
+        const prefix = '§7Сглаживание: §f '
 
-    if (radius > 5) player.info(prefix + 'Вычисление...')
-    // Create a copy of the voxel data
-    const time1 = util.benchmark('getBlocksAreasData', 'we')
-    const gen = getBlocksAreasData(baseBlock, radius)
-    let value
-    while (!(value = gen.next()).done) yield
+        if (radius > 5) player.info(prefix + 'Вычисление...')
+        // Create a copy of the voxel data
+        const time1 = util.benchmark('getBlocksAreasData', 'we')
+        const gen = getBlocksAreasData(baseBlock, radius)
+        let value
+        while (!(value = gen.next()).done) yield
 
-    const voxelDataCopy = value.value
-    const setBlocks: BlockCacheMatrix<Pick<BlockCache, 'location' | 'permutation'>> = {}
-    time1()
+        const voxelDataCopy = value.value
 
-    const time2 = util.benchmark('calculate smooth', 'we')
+        type BlockToFill = Pick<BlockCache, 'location' | 'permutation'>
+        const setBlocks: BlockCacheMatrix<BlockToFill> = {}
+        time1()
 
-    const sizeX = voxelDataCopy.length
-    const sizeY = voxelDataCopy[0].length
-    const sizeZ = voxelDataCopy[0][0].length
-    for (let smooth = 0; smooth <= smoothLevel; smooth++) {
-      // Apply smoothing
-      for (let x = 1; x < sizeX - 1; x++) {
-        for (let y = 1; y < sizeY - 1; y++) {
-          for (let z = 1; z < sizeZ - 1; z++) {
-            let sum = 0
-            const permutations = []
-            const cache = voxelDataCopy[x][y][z]
-            for (let dx = -1; dx <= 1; dx++) {
-              for (let dy = -1; dy <= 1; dy++) {
-                for (let dz = -1; dz <= 1; dz++) {
-                  const { permutation, void: isVoid } = voxelDataCopy[x + dx][y + dy][z + dz]
-                  if (!isVoid) {
-                    sum++
-                    permutations.push(permutation)
+        const time2 = util.benchmark('calculate smooth', 'we')
+
+        const sizeX = voxelDataCopy.length
+        const sizeY = voxelDataCopy[0].length
+        const sizeZ = voxelDataCopy[0][0].length
+        for (let smooth = 0; smooth <= smoothLevel; smooth++) {
+          // Apply smoothing
+          for (let x = 1; x < sizeX - 1; x++) {
+            for (let y = 1; y < sizeY - 1; y++) {
+              for (let z = 1; z < sizeZ - 1; z++) {
+                let sum = 0
+                const permutations = []
+                const cache = voxelDataCopy[x][y][z]
+                for (let dx = -1; dx <= 1; dx++) {
+                  for (let dy = -1; dy <= 1; dy++) {
+                    for (let dz = -1; dz <= 1; dz++) {
+                      const { permutation, void: isVoid } = voxelDataCopy[x + dx][y + dy][z + dz]
+                      if (!isVoid) {
+                        sum++
+                        permutations.push(permutation)
+                      }
+                    }
                   }
+                }
+                yield
+
+                // If the sum is greater than the number of surrounding voxels / 2, set the voxel to solid
+                if (sum > 13 && cache.void) {
+                  cache.permutation = permutations.randomElement()
+                  cache.void = false
+                } else if (sum < 13 && !cache.void) {
+                  // If the sum is less than the number of surrounding voxels / 2, set the voxel to empty
+                  cache.permutation = undefined
+                  cache.void = true
+                }
+
+                if (sum !== 13) {
+                  const location = cache.location
+                  ;((setBlocks[location.x] ??= {})[location.y] ??= {})[location.z] = cache
                 }
               }
             }
-            yield
+          }
+        }
 
-            // If the sum is greater than the number of surrounding voxels / 2, set the voxel to solid
-            if (sum > 13 && cache.void) {
-              cache.permutation = permutations.randomElement()
-              cache.void = false
-            } else if (sum < 13 && !cache.void) {
-              // If the sum is less than the number of surrounding voxels / 2, set the voxel to empty
-              cache.permutation = undefined
-              cache.void = true
-            }
+        time2()
+        const time3 = util.benchmark('fill blocks', 'we')
 
-            if (sum !== 13) {
-              setBlocks[cache.location.x] ??= {}
-
-              setBlocks[cache.location.x][cache.location.y] ??= {}
-
-              setBlocks[cache.location.x][cache.location.y][cache.location.z] = cache
+        const toFill: BlockToFill[] = []
+        for (const x of Object.values(setBlocks)) {
+          if (!x) continue
+          for (const y of Object.values(x)) {
+            if (!y) continue
+            for (const z of Object.values(y)) {
+              if (!z) continue
+              toFill.push(z)
             }
           }
         }
+
+        if (radius > 5)
+          player.info(
+            prefix + `Будет заполнено §6${toFill.length} §f${ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
+          )
+
+        for (const e of toFill) {
+          const block = world.overworld.getBlock(e.location)
+
+          if (e.permutation) block?.setPermutation(e.permutation)
+          else block?.setType(MinecraftBlockTypes.Air)
+
+          yield
+        }
+
+        time3()
+        if (radius > 5) player.success(prefix + 'Готово')
+        resolve()
+      } catch (e) {
+        reject(e as Error)
       }
     }
-
-    time2()
-    const time3 = util.benchmark('fill blocks', 'we')
-
-    const toFill = Object.values(setBlocks)
-      .map(e => Object.values(e).map(e => Object.values(e)))
-      .flat(2)
-
-    if (radius > 5)
-      player.info(
-        prefix + `Будет заполнено §6${toFill.length} §f${ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
-      )
-
-    for (const e of toFill) {
-      if (!e.location) continue
-
-      const block = world.overworld.getBlock(e.location)
-
-      if (e.permutation) block?.setPermutation(e.permutation)
-      else block?.setType(MinecraftBlockTypes.Air)
-
-      yield
-    }
-
-    time3()
-    if (radius > 5) player.success(prefix + 'Готово')
-  }
-  system.runJob(smootherJob())
+    system.runJob(smootherJob())
+  })
 }
 
 interface BlockCache {
@@ -183,7 +195,7 @@ interface BlockCache {
 
 type BlockCacheMatrix<MatrixValue extends object = BlockCache> = Record<
   string,
-  Record<string, Record<string, MatrixValue>>
+  undefined | Record<string, undefined | Record<string, undefined | MatrixValue>>
 >
 
 const BLOCK_CACHE: BlockCacheMatrix = {}
@@ -197,8 +209,9 @@ function* getBlocksAreasData(block: Block, radius: number) {
       for (let z = -radius; z < radius; z++) {
         const location = Vector.add(block.location, { x, y, z })
 
-        if (BLOCK_CACHE[location.x][location.y][location.z]) {
-          bz.push(BLOCK_CACHE[location.x][location.y][location.z])
+        const value = BLOCK_CACHE[location.x]?.[location.y]?.[location.z]
+        if (value) {
+          bz.push(value)
           yield
           continue
         }
@@ -220,10 +233,7 @@ function* getBlocksAreasData(block: Block, radius: number) {
           void: isAir || isLiquid || !isSolid,
         }
         bz.push(newBlockData)
-
-        BLOCK_CACHE[location.x] ??= {}
-        BLOCK_CACHE[location.x][location.y] ??= {}
-        BLOCK_CACHE[location.x][location.y][location.z] = newBlockData
+        ;((BLOCK_CACHE[location.x] ??= {})[location.y] ??= {})[location.z] = newBlockData
 
         yield
       }

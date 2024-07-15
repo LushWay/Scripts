@@ -128,18 +128,18 @@ const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join('|')})`)
 
 const itemModifiers: ((s: string) => string | undefined)[] = [
   spawnEgg => {
-    const match = spawnEgg.match(/^(.+)_spawn_egg$/)
+    const match = /^(.+)_spawn_egg$/.exec(spawnEgg)
     if (!match) return
     return `spawn_egg.entity.${match[1]}`
   },
   chestBoat => {
-    const match = chestBoat.match(/^(.+)_chest_boat$/)
+    const match = /^(.+)_chest_boat$/.exec(chestBoat)
     if (!match) return
     return `chest_boat.${match[1]}`
   },
   id => {
     if (id.includes('.')) return
-    const match = id.match(itemRegExp)
+    const match = itemRegExp.exec(id)
     if (!match) return
     const [, color, type] = match
     return `${type}.${color}`
@@ -160,7 +160,7 @@ const blockModifiers: ((s: string) => string | undefined)[] = [
   },
   id => {
     if (id.includes('.')) return
-    const match = id.match(blockRegExp)
+    const match = blockRegExp.exec(id)
     if (!match) return
     const [, color, type] = match
     return `${type}.${color}`

@@ -1,7 +1,7 @@
 import { System, world } from '@minecraft/server'
+import stringifyError from 'lib/utils/error'
 import { util } from '../util'
 import { expand } from './extend'
-import stringifyError from 'lib/utils/error'
 
 declare module '@minecraft/server' {
   interface System {
@@ -58,7 +58,9 @@ expand(System.prototype, {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       super.runInterval.bind(this),
       function playersInterval() {
-        for (const player of world.getAllPlayers()) player.isValid() && callback(player)
+        for (const player of world.getAllPlayers()) {
+          if (player.isValid()) callback(player)
+        }
       },
 
       ...args,
@@ -100,20 +102,23 @@ function Timer(
   ticks = 0,
 ) {
   const visualId = `${name} (${type} ${ticks} ticks)`
-  const path = stringifyError.stack.get(1)
+  const path = stringifyError.stack.get(__DEV__ ? 2 : 1)
   TIMERS_PATHES[visualId] = path
 
-  return set(function timer() {
-    let end
-    __DEV__ && (end = util.benchmark(visualId, 'timers'))
-
+  function timer() {
     util.catch(fn, type[0].toUpperCase() + type.slice(1))
+  }
 
-    if (__DEV__) {
-      const tookTicks = (end?.() ?? 1) / 20
-      if (tookTicks > ticks + 1) {
-        console.warn(`§6Spike on ${type} §f${name}:§6 took §c${tookTicks.toFixed(2)}§f/${ticks}§6 ticks§r\n${path}`)
-      }
-    }
-  }, ticks)
+  return __DEV__
+    ? set(function devTimerWithBench() {
+        const end = util.benchmark(visualId, 'timers')
+
+        timer()
+
+        const tookTicks = end() / 20
+        if (tookTicks > ticks + 1) {
+          console.warn(`§6Spike on ${type} §f${name}:§6 took §c${tookTicks.toFixed(2)}§f/${ticks}§6 ticks§r\n${path}`)
+        }
+      }, ticks)
+    : set(timer, ticks)
 }

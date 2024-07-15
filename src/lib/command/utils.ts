@@ -9,7 +9,7 @@ import { CommandContext } from './context'
 export function parseCommand(message: string, prefixSize = 1) {
   const command = message.slice(prefixSize).trim()
 
-  const match = command.match(/^(?<command>[^\s]+)\s?(?<input>.+)?$/)
+  const match = /^(?<command>[^\s]+)\s?(?<input>.+)?$/.exec(command)
   if (!match?.groups?.command) return false
 
   const cmd = match.groups.command

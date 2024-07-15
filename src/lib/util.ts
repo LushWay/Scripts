@@ -113,7 +113,7 @@ export const util = {
     let color = '§7'
     return this.wrap(lore, 30).map(e => {
       // Get latest color from the string
-      const match = e.match(/^.*(§.)/)
+      const match = /^.*(§.)/.exec(e)
       if (match) color = match[1]
       return '§r' + color + e
     })

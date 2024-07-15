@@ -1,6 +1,6 @@
 import { World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
-import { stringify, util } from '../util'
+import { stringify } from '../util'
 import { Core } from './core'
 import { expand } from './extend'
 

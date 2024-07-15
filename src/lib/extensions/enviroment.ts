@@ -1,10 +1,9 @@
 /* eslint-disable no-var */
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { stringify } from 'lib/utils/inspect'
 import { util } from '../util'
 import { expand } from './extend'
-import stringifyError from 'lib/utils/error'
-import { stringify } from 'lib/utils/inspect'
 
 declare global {
   interface Console {
@@ -50,12 +49,11 @@ Object.map = (object, mapper) => {
   const result: Record<string, unknown> = {}
 
   for (const key of Object.getOwnPropertyNames(object)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const mapped = mapper(key as any, (object as any)[key], object)
+    const mapped = mapper(key, (object as Record<string | number | symbol, never>)[key], object)
     if (mapped) result[mapped[0]] = mapped[1]
   }
 
-  return result as any
+  return result as Record<string | number | symbol, never>
 }
 
 declare global {
@@ -115,7 +113,7 @@ declare global {
   }
 }
 
-Array.prototype.shuffle = function () {
+Array.prototype.shuffle = function (this: unknown[]) {
   let i = this.length
   while (i) {
     const j = Math.floor(Math.random() * i)
@@ -126,7 +124,7 @@ Array.prototype.shuffle = function () {
   return this
 }
 
-Array.prototype.randomElement = function () {
+Array.prototype.randomElement = function (this: unknown[]) {
   return this[~~(Math.random() * this.length)]
 }
 

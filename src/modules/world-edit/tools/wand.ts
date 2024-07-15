@@ -11,6 +11,7 @@ const wand = new WorldEditTool({
   itemStackId: CustomItems.WeWand,
   overrides: {
     getMenuButtonName(player) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       if (super.getMenuButtonName(player) === '') return ''
 
       const tool = player.mainhand().typeId === this.itemId
@@ -38,7 +39,7 @@ world.beforeEvents.itemUseOn.subscribe(event => {
 
   const we = WorldEdit.forPlayer(event.source)
   const blockLocation = event.block
-  const pos = we.pos2 ?? { x: 0, y: 0, z: 0 }
+  const pos = we.pos2
   if (pos.x === blockLocation.x && pos.y === blockLocation.y && pos.z === blockLocation.z) return
   we.pos2 = blockLocation
 })
@@ -48,7 +49,7 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
   event.cancel = true
 
   const we = WorldEdit.forPlayer(event.player)
-  const pos = we.pos1 ?? { x: 0, y: 0, z: 0 }
+  const pos = we.pos1
   if (pos.x === event.block.location.x && pos.y === event.block.location.y && pos.z === event.block.location.z) return
 
   we.pos1 = event.block.location

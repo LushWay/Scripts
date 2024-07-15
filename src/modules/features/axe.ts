@@ -1,14 +1,14 @@
 import { world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Region, ms, util } from 'lib'
+import { Region, ms } from 'lib'
 import { isBuilding } from 'lib/game-utils'
 import { actionGuard } from 'lib/region/index'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 export class Axe {
   static breaks: string[] = Object.entries(MinecraftBlockTypes)
-    .filter(e => e[0].match(/log/i))
+    .filter(e => /log/i.exec(e[0]))
     .map(e => e[1])
 
   static allowBreakInRegions: Region[] = []
@@ -38,7 +38,4 @@ world.afterEvents.playerBreakBlock.subscribe(({ block, brokenBlockPermutation: b
     states: broken.getAllStates(),
     restoreTime: ms.from('min', 1),
   })
-
-  player.container
-  player.getComponent('inventory')?.container
 })

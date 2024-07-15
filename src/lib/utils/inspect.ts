@@ -56,7 +56,7 @@ export function inspect(target: unknown, space = '  ', cw = '', funcCode = false
             isArrow = false
           }
 
-          const match = r.match(/(\w*)\(/)?.[1]
+          const match = (/(\w*)\(/.exec(r))?.[1]
           if (match) {
             name = match
             r = r.replace(name, '')

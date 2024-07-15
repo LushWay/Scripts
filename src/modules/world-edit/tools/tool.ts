@@ -1,5 +1,5 @@
 import { MolangVariableMap, system, world } from '@minecraft/server'
-import { ActionForm, ModalForm, Vector, inspect, util } from 'lib'
+import { ActionForm, ModalForm, Vector, inspect } from 'lib'
 import { CustomItems } from 'lib/assets/config'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
@@ -94,7 +94,7 @@ new WorldEditTool({
   onUse(player) {
     const item = player.mainhand()
     const lore = item.getLore()
-    if (!lore || !lore[0]) return
+    if (!lore[0]) return
     const action = lore[0]
 
     if (action in actions) {
@@ -111,7 +111,7 @@ new WorldEditTool({
     }
     if (action === 'teleportToView') {
       const dot = player.getBlockFromViewDirection()
-      if (dot && dot.block) player.teleport(dot.block)
+      if (dot?.block) player.teleport(dot.block)
     }
   },
 })
@@ -122,8 +122,7 @@ system.runInterval(
   () => {
     for (const player of world.getAllPlayers()) {
       const item = player.mainhand()
-
-      if (!item || item.typeId !== CustomItems.WeWand) return
+      if (item.typeId !== CustomItems.WeWand) return
 
       const lore = item.getLore()
 

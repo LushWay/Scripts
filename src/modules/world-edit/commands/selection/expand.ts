@@ -2,7 +2,7 @@ import {} from '@minecraft/server'
 import { Vector } from 'lib'
 import { WorldEdit } from '../../lib/world-edit'
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+ 
 export class SelectionManager {
   /**
    * Expands the selection area

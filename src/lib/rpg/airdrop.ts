@@ -136,7 +136,7 @@ export class Airdrop {
       x -= 0
       z -= 0
 
-      // eslint-disable-next-line for-direction
+       
       for (let y = from.y; y > from.y - 10; y--) {
         try {
           world.overworld.spawnParticle('minecraft:balloon_gas_particle', { x, y, z })
