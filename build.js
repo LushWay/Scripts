@@ -1,14 +1,12 @@
 // @ts-check
 
-import { build, out, parseCliArguments } from './tools/build/cli.js'
-import { generateManigestJson } from './tools/build/generateManigestJson.js'
+import { build, parseCliArguments } from './tools/build/cli.js'
+import { generateManigestJson } from './tools/build/manifest.js'
 
-const args = parseCliArguments()
-const { outfile } = out('scripts', 'index.js')
+const args = parseCliArguments('scripts', 'index.js')
 
 build(args, {
   entryPoints: [!args.test ? 'src/index.ts' : 'src/test/loader.ts'],
-  outfile: outfile,
   target: 'es2020',
   platform: 'neutral',
   external: [
@@ -22,6 +20,4 @@ build(args, {
   .onReady(() => process.send?.('ready'))
   .onReload(() => process.send?.('reload'))
 
-generateManigestJson(args, outfile)
-
-/** @typedef {ReturnType<typeof parseCliArguments>} CliOptions */
+generateManigestJson(args)

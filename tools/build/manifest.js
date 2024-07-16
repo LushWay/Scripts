@@ -2,11 +2,8 @@ import { PackageJSON, writeJSON } from 'leafy-utils'
 import path from 'path'
 import { logger } from './logger.js'
 
-/**
- * @param {import('../../build.js').CliOptions} arg
- * @param {string} outfile
- */
-export async function generateManigestJson({ world, dev, test }, outfile) {
+/** @param {import('./cli.js').CliOptions} arg */
+export async function generateManigestJson({ world, outfile }) {
   const packagejson = new PackageJSON()
   await packagejson.init()
   const dependencies = Object.entries(packagejson.content.dependencies)
@@ -54,20 +51,8 @@ export async function generateManigestJson({ world, dev, test }, outfile) {
     ],
     dependencies: [
       {
-        module_name: '@minecraft/server',
-        version: '1.8.0-beta',
-      },
-      {
-        module_name: '@minecraft/server-ui',
-        version: '1.2.0-beta',
-      },
-      {
-        module_name: '@minecraft/server-gametest',
-        version: '1.0.0-beta',
-      },
-      {
-        module_name: '@minecraft/server-net',
-        version: '1.0.0-beta',
+        module_name: 'name',
+        version: 'version',
       },
     ],
     // TODO Remove on release
@@ -75,13 +60,8 @@ export async function generateManigestJson({ world, dev, test }, outfile) {
   }
 
   base.dependencies = dependencies
-    .filter(e => {
-      if (world) {
-        // net is not available on common worlds
-        if (e[0] === '@minecraft/server-net') return false
-      }
-      return true
-    })
+    // server-net is not available on world
+    .filter(e => !(world && e[0] === '@minecraft/server-net'))
     .map(e => ({
       module_name: e[0],
       version: e[1],

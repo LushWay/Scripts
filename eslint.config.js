@@ -16,6 +16,7 @@ export default ts.config(
       '**/*.config.{js,ts}',
       '**/*.spec.ts',
       '**/*.test.ts',
+      'build.js',
       'src/lib/assets/**',
       '!src/lib/config.ts',
       'src/lib/lang/**',

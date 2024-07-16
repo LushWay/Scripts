@@ -3,11 +3,16 @@ import fs from 'fs'
 import path from 'path'
 import util from 'util'
 import { generateDefine } from '../define.js'
+import { error } from '../error.js'
 import { logger } from './logger.js'
 
-export function parseCliArguments() {
-  let dev, test, world, port, vitest
+/** @typedef {ReturnType<typeof parseCliArguments>} CliOptions */
 
+/**
+ * @param {string} dir
+ * @param {string} file
+ */
+export function parseCliArguments(dir, file) {
   try {
     const { values } = util.parseArgs({
       args: process.argv.slice(2),
@@ -16,66 +21,69 @@ export function parseCliArguments() {
         test: { type: 'boolean', default: false },
         vitest: { type: 'boolean', default: false },
         world: { type: 'boolean', default: false },
-        port: { type: 'string' },
+        port: { type: 'string', default: '19514' },
         help: { type: 'boolean', default: false, short: 'h' },
-        outdir: { type: 'string', default: 'scripts' },
+        outdir: { type: 'string', default: dir },
+        outfile: { type: 'string', default: file },
       },
     })
-    ;({ dev, test, world, port, vitest } = values)
+    const { dev, test, world, port, vitest, outdir, outfile } = values
 
     if (values.help) {
       logger.info(`build [options] 
-  --dev: [bool=false]
-  --test: [bool=false]
-  --vitest: [bool=false]
-  --world: [bool=false]
-  --port: int
-  --outdir: [string='scripts']
+
+  Options:
+  --dev: [bool=false] ${dev}
+  --test: [bool=false] ${test}
+  --vitest: [bool=false] ${vitest}
+  --world: [bool=false] ${world}
+  --port: [int=19514] ${port}
+  --outdir: [string='${dir}'] ${outdir}
+  --outfile: [string='${file}'] ${outfile}
+
+  --help: Shows this page
 `)
       process.exit(0)
     }
 
-    if (!port) port = '19514'
-    if (isNaN(parseInt(port))) {
-      throw `Port must be a number, recieved '${port}'`
-    }
+    if (isNaN(parseInt(port ?? ''))) throw `Port must be a number, recieved '${port}'`
+    return { dev, test, world, port, vitest, ...getPathsAndCleanDirectory(dir, file) }
   } catch (e) {
     logger.error(e instanceof Error ? e.message : e)
     process.exit(1)
   }
-
-  return { dev, test, world, port, vitest }
 }
 
 /**
  * @param {string} dir
  * @param {string} file
  */
-export function out(dir, file) {
+function getPathsAndCleanDirectory(dir, file) {
   try {
     if (fs.existsSync(path.join(dir, '.git'))) {
-      logger.error('Unable to empty dir which contains .git folder.')
-      process.exit(0)
+      logger.error('Unable to empty dir which contains .git folder:', path.join(process.cwd(), dir))
+      process.exit(1)
     }
     fs.rmSync(dir, { force: true, recursive: true })
     fs.mkdirSync(dir)
   } catch (e) {
-    if (!(e instanceof Error && 'code' in e && e.code === 'EACESS')) logger.warn('Failed to empty out dir', e)
+    if (!error(e).is('EACESS')) logger.warn('Failed to empty out dir', e)
   }
 
   return { outdir: dir, outfile: path.join(dir, file) }
 }
 
 /**
- * @param {import('../../build.js').CliOptions} param0
+ * @param {CliOptions} param0
  * @param {esbuild.BuildOptions} options
  */
-export function build({ test, dev, world, port, vitest }, options) {
+export function build({ test, dev, world, port, vitest, outfile }, options) {
   let start = Date.now()
   let firstBuild = true
 
   /** @type {esbuild.BuildOptions} */
   const config = {
+    outfile,
     treeShaking: true,
     bundle: true,
     sourcemap: 'linked',
