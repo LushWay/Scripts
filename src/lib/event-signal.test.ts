@@ -15,10 +15,10 @@ describe('EventSignal', () => {
     signal.subscribe(callback1)
     signal.subscribe(callback2)
 
-    EventSignal.emit(signal, 'testData')
+    EventSignal.emit(signal, 'data')
 
-    expect(callback1).toHaveBeenCalledWith('testData')
-    expect(callback2).toHaveBeenCalledWith('testData')
+    expect(callback1).toHaveBeenCalledWith('data')
+    expect(callback2).toHaveBeenCalledWith('data')
   })
 
   it('should sort subscribers by position', () => {
