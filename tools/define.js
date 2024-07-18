@@ -1,4 +1,4 @@
-/** @param {Omit<import('./build/cli.js').CliOptions, 'outfile' | 'outdir'>} args */
+/** @param {Omit<import('./build/cli.js').BuildArgs, 'outfile' | 'outdir' | 'entry'>} args */
 export function generateDefine({ dev, test, world, port, vitest }) {
   return Object.fromEntries(
     Object.entries({

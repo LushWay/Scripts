@@ -2,7 +2,7 @@ import { PackageJSON, writeJSON } from 'leafy-utils'
 import path from 'path'
 import { logger } from './logger.js'
 
-/** @param {import('./cli.js').CliOptions} arg */
+/** @param {import('./cli.js').BuildArgs} arg */
 export async function generateManigestJson({ world, outfile }) {
   const packagejson = new PackageJSON()
   await packagejson.init()

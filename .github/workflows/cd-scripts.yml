@@ -1,6 +1,4 @@
-## TODO When branch protection is enabled, make a CD action that triggers on push to main and deploys script. Also CD, not CI action should upload coverage
-
-name: CI
+name: CD
 on:
   workflow_dispatch:
 
@@ -11,9 +9,12 @@ on:
       - '!*' # Do not execute on tags
     paths:
       - src/**
+      - tools/**
       - yarn.lock
-      - .github/workflows/test.yml
-      - eslint.plugin.js
+      - .github/workflows/cd-scripts.yml
+      - eslint.config.js
+      - vitest.config.ts
+      - tsconfig.json
 
   pull_request:
 
@@ -28,7 +29,6 @@ jobs:
 
       - uses: actions/setup-node@master
         with:
-          cache: yarn
           node-version: 22
 
       - run: yarn install --immutable
@@ -64,13 +64,3 @@ jobs:
       - run: yarn tsc -b
 
       - run: yarn eslint src
-
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-
-    # Run only on push on main repo
-    if: github.repository == 'LushWay/Scripts' && github.ref == 'refs/heads/main'
-    needs: [test, lint]
-    steps:
-      - run: echo 'Deploy occurs'

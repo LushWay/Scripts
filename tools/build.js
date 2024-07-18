@@ -1,10 +1,9 @@
 // @ts-check
 
-import { build, parseCliArguments } from './tools/build/cli.js'
-import { generateManigestJson } from './tools/build/manifest.js'
+import { build, buildArgumentsWithDist } from './build/cli.js'
+import { generateManigestJson } from './build/manifest.js'
 
-const args = parseCliArguments('scripts', 'index.js')
-
+const args = buildArgumentsWithDist('scripts')
 build(args, {
   entryPoints: [!args.test ? 'src/index.ts' : 'src/test/loader.ts'],
   target: 'es2020',
@@ -17,7 +16,4 @@ build(args, {
     '@minecraft/server-gametest',
   ],
 })
-  .onReady(() => process.send?.('ready'))
-  .onReload(() => process.send?.('reload'))
-
 generateManigestJson(args)

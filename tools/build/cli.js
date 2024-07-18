@@ -4,15 +4,13 @@ import path from 'path'
 import util from 'util'
 import { generateDefine } from '../define.js'
 import { error } from '../error.js'
+import { forkBuild } from './call.js'
 import { logger } from './logger.js'
 
-/** @typedef {ReturnType<typeof parseCliArguments>} CliOptions */
+/** @typedef {ReturnType<typeof buildArgumentsWithDist>} BuildArgs */
 
-/**
- * @param {string} dir
- * @param {string} file
- */
-export function parseCliArguments(dir, file) {
+/** @param {string} dir */
+export function buildArgumentsWithDist(dir) {
   try {
     const { values } = util.parseArgs({
       args: process.argv.slice(2),
@@ -24,10 +22,10 @@ export function parseCliArguments(dir, file) {
         port: { type: 'string', default: '19514' },
         help: { type: 'boolean', default: false, short: 'h' },
         outdir: { type: 'string', default: dir },
-        outfile: { type: 'string', default: file },
+        entry: { type: 'string' },
       },
     })
-    const { dev, test, world, port, vitest, outdir, outfile } = values
+    const { dev, test, world, port, vitest, outdir, entry } = values
 
     if (values.help) {
       logger.info(`build [options] 
@@ -39,7 +37,7 @@ export function parseCliArguments(dir, file) {
   --world: [bool=false] ${world}
   --port: [int=19514] ${port}
   --outdir: [string='${dir}'] ${outdir}
-  --outfile: [string='${file}'] ${outfile}
+  --entry: [string] ${entry}
 
   --help: Shows this page
 `)
@@ -47,18 +45,15 @@ export function parseCliArguments(dir, file) {
     }
 
     if (isNaN(parseInt(port ?? ''))) throw `Port must be a number, recieved '${port}'`
-    return { dev, test, world, port, vitest, ...getPathsAndCleanDirectory(dir, file) }
+    return { dev, test, world, port, vitest, entry, ...getOutPathsAndCleanDirectory(outdir ?? dir) }
   } catch (e) {
     logger.error(e instanceof Error ? e.message : e)
     process.exit(1)
   }
 }
 
-/**
- * @param {string} dir
- * @param {string} file
- */
-function getPathsAndCleanDirectory(dir, file) {
+/** @param {string} dir */
+function getOutPathsAndCleanDirectory(dir) {
   try {
     if (fs.existsSync(path.join(dir, '.git'))) {
       logger.error('Unable to empty dir which contains .git folder:', path.join(process.cwd(), dir))
@@ -70,14 +65,14 @@ function getPathsAndCleanDirectory(dir, file) {
     if (!error(e).is('EACESS')) logger.warn('Failed to empty out dir', e)
   }
 
-  return { outdir: dir, outfile: path.join(dir, file) }
+  return { outdir: dir, outfile: forkBuild.outfile(dir) }
 }
 
 /**
- * @param {CliOptions} param0
+ * @param {BuildArgs} param0
  * @param {esbuild.BuildOptions} options
  */
-export function build({ test, dev, world, port, vitest, outfile }, options) {
+export function build({ test, dev, world, port, vitest, outfile, entry }, options) {
   let start = Date.now()
   let firstBuild = true
 
@@ -94,9 +89,7 @@ export function build({ test, dev, world, port, vitest, outfile }, options) {
       {
         name: 'start/stop',
         setup(build) {
-          build.onStart(() => {
-            start = Date.now()
-          })
+          build.onStart(() => void (start = Date.now()))
           build.onEnd(() => {
             const mode = dev ? 'development' : test ? 'test' : 'production'
             const time = `in ${Date.now() - start}ms`
@@ -104,8 +97,8 @@ export function build({ test, dev, world, port, vitest, outfile }, options) {
             if (firstBuild) {
               if (dev) logger.success(`Started esbuild in watch mode${test ? ' Test build is enabled.' : ''}`)
               else logger.info(`${firstBuild ? 'Built' : 'Rebuilt'} for ${mode} ${time}`)
-              onready?.()
-            } else if (dev) onreload?.()
+              process.send?.('ready')
+            } else if (dev) process.send?.(['reload', outfile])
 
             firstBuild = false
           })
@@ -113,30 +106,13 @@ export function build({ test, dev, world, port, vitest, outfile }, options) {
       },
     ],
     ...options,
+    entryPoints: entry ? [entry] : options.entryPoints,
   }
 
   if (dev) {
     esbuild.context(config).then(ctx => ctx.watch())
   } else {
     esbuild.build(config)
-  }
-
-  /** @type {VoidFunction | null} */
-  let onready
-  /** @type {VoidFunction | null} */
-  let onreload
-
-  return {
-    /** @param {VoidFunction} callback */
-    onReady(callback) {
-      onready = callback
-      return this
-    },
-    /** @param {VoidFunction} callback */
-    onReload(callback) {
-      onreload = callback
-      return this
-    },
   }
 }
 
