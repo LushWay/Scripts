@@ -23,11 +23,13 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4.1.7
+        with:
+          submodules: true
 
       - run: corepack enable
 
-      - uses: actions/setup-node@master
+      - uses: actions/setup-node@v4.0.3
         with:
           node-version: 22
 
@@ -49,11 +51,13 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4.1.7
+        with:
+          submodules: true
 
       - run: corepack enable
 
-      - uses: actions/setup-node@master
+      - uses: actions/setup-node@v4.0.3
         with:
           node-version: 22
 
