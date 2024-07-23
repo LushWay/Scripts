@@ -22,16 +22,15 @@ new Command('wipe')
         delete ctx.player.database.quests
 
         Compass.setFor(ctx.player, undefined)
-        Anarchy.inventoryStore.remove(ctx.player.id)
-        ctx.player.database.inv = 'anarchy'
-        Spawn.switchInventory(ctx.player)
-        Spawn.portal?.teleport(ctx.player)
-        Anarchy.inventoryStore.remove(ctx.player.id)
         Airdrop.instances.filter(a => a.for === ctx.player.id).forEach(a => a.delete())
 
         system.runTimeout(
           () => {
             delete ctx.player.database.survival.anarchy
+            ctx.player.database.inv = 'anarchy'
+            Anarchy.inventoryStore.remove(ctx.player.id)
+            Spawn.switchInventory(ctx.player)
+            Spawn.portal?.teleport(ctx.player)
             Join.emitFirstJoin(ctx.player)
           },
           'clear',

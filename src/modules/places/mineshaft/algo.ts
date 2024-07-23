@@ -2,7 +2,8 @@ import { Block, Dimension, Player } from '@minecraft/server'
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { Vector } from 'lib'
 import { EventSignal } from 'lib/event-signal'
-import { Ore, OreCollector } from './ore-collector'
+import { MineshaftRegion } from './mineshaft-region'
+import { Ore, OreCollector, OreEntry } from './ore-collector'
 
 export const ores = new OreCollector(
   new Ore().type(b.CoalOre).deepslate(b.CoalOre).chance(3),
@@ -29,6 +30,8 @@ export function placeOre(brokenBlock: Block, dimension: Dimension, player: Playe
     const block = dimension.getBlock(vector)
     if (!block || block.isAir) continue
 
+    if (!MineshaftRegion.nearestRegion(vector, dimension.type)) continue
+
     const nearAir = getEdgeBlocksOf(vector).find(e => (airCache[Vector.string(e)] ??= !!dimension.getBlock(e)?.isAir))
 
     if (nearAir) continue
@@ -38,9 +41,9 @@ export function placeOre(brokenBlock: Block, dimension: Dimension, player: Playe
   const block = possibleBlocks.randomElement() as Block | undefined
   if (block?.isValid() && !block.isAir) {
     const brokenOre = ores.getOre(brokenBlock.typeId)
-    const isDeepslate = block.typeId === b.Deepslate
-    const overrideTypeId = getOverrideTypeId({ isDeepslate, player })
-    console.debug('Overriding ore', overrideTypeId, brokenOre)
+    const isDeepslate = brokenOre?.isDeepslate ?? false
+    const overrideTypeId = getOreTypeId({ player, isDeepslate, ore: brokenOre?.ore })
+    // console.debug('Overriding ore', overrideTypeId, brokenOre)
 
     const oreTypeId =
       overrideTypeId ??
@@ -53,16 +56,15 @@ export function placeOre(brokenBlock: Block, dimension: Dimension, player: Playe
 interface OrePlaceEvent {
   player: Player
   isDeepslate: boolean
+  ore: undefined | OreEntry
 }
 
 export const OrePlace = new EventSignal<OrePlaceEvent, void | string>()
 
-function getOverrideTypeId(event: OrePlaceEvent) {
+function getOreTypeId(event: OrePlaceEvent) {
   for (const [action] of EventSignal.sortSubscribers(OrePlace)) {
     const typeId = action(event)
-    if (typeId) {
-      return typeId
-    }
+    if (typeId) return typeId
   }
 }
 

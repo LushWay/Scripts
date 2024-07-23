@@ -29,30 +29,30 @@ export class Ore {
   }
 }
 
-type CompiledOre = ReturnType<Ore['chance']>
+export type OreEntry = ReturnType<Ore['chance']>
 
 export class OreCollector {
-  private entries: CompiledOre[]
+  private entries: OreEntry[]
 
   private readonly typeIds: string[]
 
-  constructor(...entries: CompiledOre[]) {
+  constructor(...entries: OreEntry[]) {
     this.entries = entries
     this.typeIds = entries.map(e => e.item.all).flat()
   }
 
+  isOre(typeId: string) {
+    return this.typeIds.includes(typeId)
+  }
+
   getOre(typeId: string) {
-    if (!this.typeIds.includes(typeId)) return
+    if (!this.isOre(typeId)) return
 
     for (const ore of this.entries) {
       if (ore.item.all.includes(typeId)) {
-        return {
-          ore,
-          isDeepslate: ore.item.deepslates.includes(typeId),
-          get empty() {
-            return this.isDeepslate ? b.Deepslate : b.Stone
-          },
-        }
+        const isDeepslate = ore.item.deepslates.includes(typeId)
+        const empty = isDeepslate ? b.Deepslate : b.Stone
+        return { ore, isDeepslate, empty }
       }
     }
   }
@@ -68,7 +68,7 @@ export class OreCollector {
     return deepslate ? ore.deepslates[0] : ore.types[0]
   }
 
-  with(ore: CompiledOre, chance = ore.chance) {
+  with(ore: OreEntry, chance = ore.chance) {
     return Object.setPrototypeOf(
       {
         entries: this.entries.concat({ chance, item: { ...ore.item, chance } }),

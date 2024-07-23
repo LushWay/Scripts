@@ -1,7 +1,7 @@
 import { ItemStack, system } from '@minecraft/server'
 import { ActionForm, location, locationWithRadius, Vector } from 'lib'
 
-import { MinecraftBlockTypes as b, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard, SafeAreaRegion } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { Join } from 'lib/player-join'
@@ -12,7 +12,7 @@ import { Npc } from 'lib/rpg/npc'
 
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy'
-import { OrePlace } from 'modules/places/mineshaft/algo'
+import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import { randomTeleport } from 'modules/survival/random-teleport'
@@ -126,10 +126,12 @@ class Learning {
       })
     })
 
+    const crafting = Vector.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
+
     q.item('§6Сделайте деревянную кирку')
       .description('Чтобы пойти в шахту, нужна кирка. Сделайте ее на верстаке в ближайшей деревне!')
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
-      .place(this.craftingTableLocation)
+      .place(crafting)
 
     q.counter((i, end) => `§6Добыто камня: §f${i}/${end}`, 10)
       .description('Отправляйтесь в шахту, найдите и накопайте камня.')
@@ -146,40 +148,42 @@ class Learning {
     q.item('§6Сделайте каменную кирку')
       .description('Вернитесь к верстаку и улучшите свой инструмент.')
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
-      .place(this.craftingTableLocation)
+      .place(crafting)
 
-    q.counter((i, end) => `§6Добыто железной руды: §f${i}/${end}`, 5).activate(ctx => {
-      console.log('AA')
-      // Force iron ore generation
-      ctx.subscribe(OrePlace, ({ player, isDeepslate }) => {
-        if (player.id !== player.id) return
-        ctx.db ??= { count: ctx.value }
-        ;(ctx.db as { iron?: number }).iron ??= 0
+    q.counter((i, end) => `§6Добыто железной руды: §f${i}/${end}`, 5)
+      .description('Отправляйтесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
+      .activate(ctx => {
+        // Force iron ore generation
+        ctx.subscribe(OrePlace, ({ player, isDeepslate }) => {
+          if (player.id !== player.id) return
 
-        if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
-          if (ctx.db.iron >= ctx.end) return
-          ctx.db.iron++
-          return isDeepslate ? b.DeepslateIronOre : b.IronOre
-        }
+          ctx.db ??= { count: ctx.value }
+          ;(ctx.db as { iron?: number }).iron ??= 0
+
+          if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
+            if (ctx.db.iron >= ctx.end) return
+            ctx.db.iron++
+            return isDeepslate ? b.DeepslateIronOre : b.IronOre
+          }
+        })
+
+        // Check if it breaks
+        ctx.world.afterEvents.playerBreakBlock.subscribe(({ brokenBlockPermutation, player }) => {
+          if (player.id !== player.id) return
+          if (
+            brokenBlockPermutation.type.id !== b.IronOre &&
+            brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
+          )
+            return
+
+          player.playSound(Sounds.Action)
+          ctx.diff(1)
+        })
       })
-
-      // Check if it breaks
-      ctx.world.afterEvents.playerBreakBlock.subscribe(({ brokenBlockPermutation, player }) => {
-        if (player.id !== player.id) return
-        if (
-          brokenBlockPermutation.type.id !== b.IronOre &&
-          brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
-        )
-          return
-
-        player.playSound(Sounds.Action)
-        ctx.diff(1)
-      })
-    })
 
     q.end(ctx => {
       player.success(
-        'Обучение закончено! Вы можете пойти в каменоломню чтобы переплавить железо или продолжить добывавать новые ресурсы в шахте.',
+        'Обучение закончено! Вы можете пойти в каменоломню чтобы переплавить железо или продолжить добывать новые ресурсы в шахте.',
       )
     })
   })
@@ -205,8 +209,23 @@ class Learning {
       if (ctx.type !== 'break') return
       if (region !== VillageOfMiners.safeArea) return
       if (this.quest.getPlayerStep(player)) {
+        const isOre =
+          ores.isOre(ctx.event.block.typeId) ||
+          (
+            [
+              MinecraftBlockTypes.Stone,
+              MinecraftBlockTypes.Andesite,
+              MinecraftBlockTypes.Diorite,
+              MinecraftBlockTypes.Granite,
+              MinecraftBlockTypes.Deepslate,
+            ] as string[]
+          ).includes(ctx.event.block.typeId)
         system.delay(() => {
-          player.fail('Блоки можно ломать только глубже в шахте!')
+          if (isOre) {
+            player.fail('Блоки можно ломать только глубоко в шахте!')
+          } else {
+            player.fail('В мирной зоне ломать блоки запрещено.')
+          }
         })
       }
     })

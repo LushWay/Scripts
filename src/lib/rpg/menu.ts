@@ -94,6 +94,8 @@ export class Compass {
     InventoryInterval.slots.subscribe(({ player, slot, i }) => {
       const { isMainhand, isMenu, isOffhandMenu, offhand } = this.slotInfo(player, slot, i)
 
+      if (isMenu) this.updateCompassInSlot(slot, player)
+
       if ((isMainhand && isMenu) || isOffhandMenu) {
         if (!this.forceHide.has(player)) player.setProperty('sm:minimap', true)
       } else {
@@ -101,7 +103,6 @@ export class Compass {
         return
       }
 
-      this.updateCompassInSlot(slot, player)
       if (isMainhand && offhand) this.updateCompassInSlot(offhand, player)
     })
   }

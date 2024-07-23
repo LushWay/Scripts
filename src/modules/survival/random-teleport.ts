@@ -1,4 +1,13 @@
-import { EquipmentSlot, ItemLockMode, ItemStack, Player, system, world } from '@minecraft/server'
+import {
+  EquipmentSlot,
+  ItemLockMode,
+  ItemStack,
+  LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
+  Player,
+  system,
+  world,
+} from '@minecraft/server'
 
 import { MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { LockAction, Vector, util } from 'lib'
@@ -78,7 +87,14 @@ export function randomTeleport(
       }
     }
   } catch (e) {
-    console.error('Random teleport location check failed, skipping', e)
+    console.warn(
+      'Random teleport location check failed, skipping: ',
+      e instanceof LocationInUnloadedChunkError
+        ? 'unloaded chunk'
+        : e instanceof LocationOutOfWorldBoundariesError
+          ? 'out of world bounds'
+          : e,
+    )
   }
 
   target.teleport(
