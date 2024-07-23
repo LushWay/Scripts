@@ -6,6 +6,7 @@
     "noEmit": true,
     "strict": true,
     "strictBindCallApply": true,
+    "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,
@@ -89,7 +90,7 @@
     ]
   },
   "include": ["src", "tools/defines.d.ts", "src/modules/places/tech-city/engineer.ts"],
-  "exclude": ["node_modules", "src/chestui", "src/test/*", "vitest/dist/**"],
+  "exclude": ["node_modules", "src/chestui", "src/test/**", "vitest/dist/**", "scripts/**"],
 
   // Pollutes global
   "references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
