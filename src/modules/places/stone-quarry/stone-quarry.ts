@@ -20,6 +20,7 @@ class StoneQuarryBuilder extends City {
     .spawnEvent(true)
 
   commonOvener = Furnacer.create()
+    .group(this.group)
     .id('ovener')
     .name('§6Печкин')
     .furnaces([
@@ -31,6 +32,7 @@ class StoneQuarryBuilder extends City {
     .onlyInStoneQuarry(true)
 
   foodOvener = Furnacer.create()
+    .group(this.group)
     .id('foodOvener')
     .name('§6Тетя зина')
     .furnaces([MinecraftBlockTypes.LitBlastFurnace])

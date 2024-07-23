@@ -1,48 +1,16 @@
 /* eslint-disable @typescript-eslint/use-unknown-in-catch-callback-variable */
-import { ActionForm, ModalForm } from 'lib'
 import { request } from 'lib/bds/api'
+import { stringify } from 'lib/utils/inspect'
 
-new Command('shell').setPermissions('techAdmin').executes(ctx => {
-  const form = new ActionForm('Shell')
-    .addButton('git pull', () => {
-      const form = new ActionForm('Type')
-      const types: ('script' | 'server' | 'process')[] = ['script', 'server', 'process']
-      for (const type of types) {
-        form.addButton(type, () => {
-          ctx.reply('§6> §rПринято.')
-
-          request('gitPull', { restartType: type })
-            .then(s => ctx.player.tell(s.statusMessage))
-            .catch(console.error)
-        })
-      }
-      form.show(ctx.player)
-    })
-    .addButton('git status', () => {
-      const form = new ActionForm('Type')
-      const cwds: ('sm-api' | 'root')[] = ['sm-api', 'root']
-      for (const type of cwds) {
-        form.addButton(type, () => {
-          ctx.reply('§6> §rПринято.')
-
-          request('gitStatus', { cwd: type })
-            .then(s => ctx.player.tell(s.statusMessage))
-            .catch(console.error)
-        })
-      }
-      form.show(ctx.player)
-    })
-    .addButton('Backup', () => {
-      new ModalForm('Backup')
-
-        .addTextField('Backup commit name\nЛучше всего то, что значимого было изменено', 'ничего не произойдет')
-        .show(ctx.player, (_, backupname) => {
-          ctx.reply('§6> §rПринято.')
-          request('backup', { name: backupname })
-            .then(s => ctx.player.tell(s.statusMessage))
-            .catch(console.error)
-        })
-    })
-
-  form.show(ctx.player)
-})
+new Command('backup')
+  .setPermissions('techAdmin')
+  .string('name', true)
+  .executes((ctx, name = 'InWorldBackup') => {
+    ctx.reply('§6> §rПринято.')
+    request('backup', { name })
+      .then(s => ctx.player.tell(s.statusMessage))
+      .catch(e => {
+        console.error(e)
+        ctx.player.fail(stringify(e))
+      })
+  })

@@ -88,7 +88,7 @@ export class Boss {
     if (!this.location.valid) return
     if (isChunkUnloaded(this as LocationInDimension)) return
 
-    const db = Boss.db[this.options.place.id]
+    const db = Boss.db[this.options.place.fullId]
     if (typeof db !== 'undefined') {
       if (db.dead) {
         this.checkRespawnTime(db)
@@ -110,7 +110,7 @@ export class Boss {
 
     // Get type id
     const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
-    console.debug(`Boss(${this.options.place.id}).spawnEntity(${entityTypeId})`)
+    console.debug(`Boss(${this.options.place.fullId}).spawnEntity(${entityTypeId})`)
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
@@ -121,7 +121,7 @@ export class Boss {
     }
 
     // Save to database
-    Boss.db[this.options.place.id] = {
+    Boss.db[this.options.place.fullId] = {
       id: this.entity.id,
       date: Date.now(),
       dead: false,
@@ -148,11 +148,11 @@ export class Boss {
 
   onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
-    console.debug(`Boss(${this.options.place.id}).onDie()`)
+    console.debug(`Boss(${this.options.place.fullId}).onDie()`)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
 
-    Boss.db[this.options.place.id] = {
+    Boss.db[this.options.place.fullId] = {
       id: '',
       date: Date.now(),
       dead: true,

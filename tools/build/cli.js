@@ -1,10 +1,10 @@
 import * as esbuild from 'esbuild'
 import fs from 'fs'
 import path from 'path'
-import util from 'util'
+import util, { isDeepStrictEqual } from 'util'
 import { generateDefine } from '../define.js'
 import { error } from '../error.js'
-import { forkBuild } from './call.js'
+import { build } from './call.js'
 import { logger } from './logger.js'
 
 /** @typedef {ReturnType<typeof buildArgumentsWithDist>} BuildArgs */
@@ -65,16 +65,19 @@ function getOutPathsAndCleanDirectory(dir) {
     if (!error(e).is('EACESS')) logger.warn('Failed to empty out dir', e)
   }
 
-  return { outdir: dir, outfile: forkBuild.outfile(dir) }
+  return { outdir: dir, outfile: build.outfile(dir) }
 }
 
 /**
  * @param {BuildArgs} param0
  * @param {esbuild.BuildOptions} options
  */
-export function build({ test, dev, world, port, vitest, outfile, entry }, options) {
+export function buildCommand({ test, dev, world, port, vitest, outfile, entry }, options) {
   let start = Date.now()
   let firstBuild = true
+  const at = process.cwd()
+  /** @type {import('esbuild').Metafile | undefined} */
+  let oldmeta
 
   /** @type {esbuild.BuildOptions} */
   const config = {
@@ -84,21 +87,38 @@ export function build({ test, dev, world, port, vitest, outfile, entry }, option
     sourcemap: 'linked',
     legalComments: 'none',
     define: generateDefine({ dev, test, world, port, vitest }),
+    metafile: true,
 
     plugins: [
       {
         name: 'start/stop',
         setup(build) {
           build.onStart(() => void (start = Date.now()))
-          build.onEnd(() => {
+          build.onEnd(result => {
             const mode = dev ? 'development' : test ? 'test' : 'production'
             const time = `in ${Date.now() - start}ms`
 
+            let changed = ''
+            if (oldmeta) {
+              if (result.metafile)
+                for (const file in result.metafile.inputs) {
+                  if (file in oldmeta.inputs) {
+                    if (!isDeepStrictEqual(result.metafile.inputs[file], oldmeta.inputs[file])) changed = file
+                  } else {
+                    changed = file
+                    break
+                  }
+                }
+              oldmeta = result.metafile
+            } else oldmeta = result.metafile
+
             if (firstBuild) {
-              if (dev) logger.success(`Started esbuild in watch mode${test ? ' Test build is enabled.' : ''}`)
-              else logger.info(`${firstBuild ? 'Built' : 'Rebuilt'} for ${mode} ${time}`)
+              if (dev) logger.success(`Watching for changes at ${at}${test ? ' Test build is enabled.' : ''}`)
+              else logger.info(`Built for ${mode} at ${at} ${time}`)
               process.send?.('ready')
-            } else if (dev) process.send?.(['reload', outfile])
+            } else if (dev) {
+              if (changed) process.send?.(['reload', changed])
+            }
 
             firstBuild = false
           })

@@ -1,14 +1,15 @@
 import { t } from 'lib/text'
 import { inspect } from 'lib/util'
 import { ServerModules } from './modules'
+import { ServerRpc } from './routes'
 
 class RequestError extends Error {}
 
 /** Makes http request to node instance */
-export async function request<Path extends keyof Scripts.Routes>(
+export async function request<Path extends keyof ServerRpc.Routes>(
   path: Path,
-  body: Scripts.Routes[Path]['req'],
-): Promise<Scripts.Routes[Path]['res']> {
+  body: ServerRpc.Routes[Path]['req'],
+): Promise<ServerRpc.Routes[Path]['res']> {
   const sbody = JSON.stringify(body)
   const prefix = `request('${path}'`
   console.warn(`${prefix},`, body, '§r)')
@@ -48,6 +49,9 @@ export async function request<Path extends keyof Scripts.Routes>(
  * @param type - Packet type
  * @param packet - Packet content
  */
-export function sendPacketToStdout<T extends keyof Scripts.StdoutPackets>(type: T, packet: Scripts.StdoutPackets[T]) {
+export function sendPacketToStdout<T extends keyof ServerRpc.StdoutPackets>(
+  type: T,
+  packet: ServerRpc.StdoutPackets[T],
+) {
   console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
 }

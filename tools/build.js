@@ -1,10 +1,10 @@
 // @ts-check
 
-import { build, buildArgumentsWithDist } from './build/cli.js'
+import { buildArgumentsWithDist, buildCommand } from './build/cli.js'
 import { generateManigestJson } from './build/manifest.js'
 
 const args = buildArgumentsWithDist('scripts')
-build(args, {
+buildCommand(args, {
   entryPoints: [!args.test ? 'src/index.ts' : 'src/test/loader.ts'],
   target: 'es2020',
   platform: 'neutral',

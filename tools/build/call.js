@@ -3,7 +3,7 @@ import path from 'path'
 
 /** @typedef {import('../defines.js')} A */
 
-export function forkBuild() {
+export function build() {
   return {
     /**
      * @param {string} cwd - Working directory. Defaults to '.'
@@ -14,8 +14,8 @@ export function forkBuild() {
        * @param {string} outdir - Directory where build output (index.js, index.js.map) will be written to. Defaults to
        *   scripts
        */
-      outdir: (outdir = forkBuild.outdir) => ({
-        args: (args = forkBuild.args()) => ({
+      outdir: (outdir = build.outdir) => ({
+        args: (args = build.args()) => ({
           /**
            * Adds callback that will be called when initial build finishes
            *
@@ -23,17 +23,19 @@ export function forkBuild() {
            */
           onReady: onReady => ({
             /**
-             * @param {undefined | ((this: void) => void)} onReload - Will be called on reload in watch mode
+             * @param {undefined | ((this: void, changedFile: string) => void)} onReload - Will be called on reload in
+             *   watch mode
              * @returns {Promise<import('child_process').ChildProcess>} - Resolves with build process
              */
             onWatchModeUpdate: onReload =>
               new Promise((resolve, reject) => {
-                args = args.concat(`--outdir=${outdir}`, `--entry=${entry}`)
+                args = args.concat(`--outdir=${outdir}`, entry ? `--entry=${entry}` : '').filter(Boolean)
                 const p = child_process
                   .fork('tools/build.js', args, { cwd, stdio: 'inherit' })
                   .on('message', message => {
-                    if (message === 'ready') onReady(forkBuild.outfile(outdir)), resolve(p)
-                    if (message === 'reload') onReload?.()
+                    if (message === 'ready') onReady(build.outfile(outdir)), resolve(p)
+                    if (Array.isArray(message) && message[0] === 'reload' && typeof message[1] === 'string')
+                      onReload?.(message[1])
                   })
                   .on('error', reject)
               }), // onReload
@@ -44,7 +46,7 @@ export function forkBuild() {
   }
 }
 
-forkBuild.outdir = 'scripts'
-forkBuild.outfile = (dir = forkBuild.outdir) => path.join(dir, 'index.js')
-forkBuild.args = () =>
+build.outdir = 'scripts'
+build.outfile = (dir = build.outdir) => path.join(dir, 'index.js')
+build.args = () =>
   [__DEV__ && '--dev', __TEST__ && '--test', `--port=${__SERVER_PORT__}`].filter(v => typeof v === 'string')

@@ -3,7 +3,7 @@ import path from 'path'
 import { logger } from './logger.js'
 
 /** @param {import('./cli.js').BuildArgs} arg */
-export async function generateManigestJson({ world, outfile }) {
+export async function generateManigestJson({ world, outfile, outdir }) {
   const packagejson = new PackageJSON()
   await packagejson.init()
   const dependencies = Object.entries(packagejson.content.dependencies)
@@ -46,7 +46,7 @@ export async function generateManigestJson({ world, outfile }) {
         type: 'script',
         uuid: '4f6a99e0-c4a2-4172-8818-c753d5cdab1f',
         version: [0, 0, 0],
-        entry: outfile.replace(path.sep, '/'),
+        entry: path.join('scripts', outfile.replace(outdir, '')).replaceAll(path.sep, '/'),
       },
     ],
     dependencies: [
@@ -67,6 +67,8 @@ export async function generateManigestJson({ world, outfile }) {
       version: e[1],
     }))
 
-  await writeJSON('./manifest.json', base).catch(e => logger.error('Failed writing manifest.json file:', e))
+  await writeJSON(path.join(outdir, '../manifest.json'), base).catch(e =>
+    logger.error('Failed writing manifest.json file:', e),
+  )
   await packagejson.write()
 }

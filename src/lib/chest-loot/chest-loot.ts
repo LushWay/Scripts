@@ -82,7 +82,7 @@ export class ChestLoot {
     this.animation.start(player, this.lootTable.generateOne(), location)
   }
 
-  private animation = new ChestLootAnimation(this.place.id, this.place.name, this.dimensionId)
+  private animation = new ChestLootAnimation(this.place.fullId, this.place.name, this.dimensionId)
 }
 
 const schema = new ItemLoreSchema('chestloot')

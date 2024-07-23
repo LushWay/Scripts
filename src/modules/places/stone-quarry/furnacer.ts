@@ -16,7 +16,7 @@ export class Furnacer extends ShopNpc {
       furnaces: (furnaces: string[]) => ({
         onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer({ place, furnaces, onlyInStoneQuarry }),
       }),
-    })).group(StoneQuarry.group)
+    }))
   }
 
   /**
