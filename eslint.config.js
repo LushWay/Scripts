@@ -81,9 +81,11 @@ export default ts.config(
         },
       ],
     },
-    plugins: {
-      'only-warn': onlyWarn,
-    },
+    plugins: process.env.CI
+      ? {}
+      : {
+          'only-warn': onlyWarn,
+        },
   },
   {
     files: ['src/lib/extensions/**'],

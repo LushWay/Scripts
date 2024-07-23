@@ -248,7 +248,7 @@ export class InventoryStore {
         if (!store.equipment[key]) continue
         const move = manifest.slots.push(key)
         const eq = store.equipment[key]
-        if (!eq) throw new DatabaseError(t.error`Failed to get equipment with key ${key}`)
+        if (typeof eq === 'undefined') throw new DatabaseError(t.error`Failed to get equipment with key ${key}`)
 
         items[storeIndex + move] = eq
       }
