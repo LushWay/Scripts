@@ -35,7 +35,7 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: node build
+      - run: node tools/build
 
       - run: yarn test --run --coverage
 
@@ -63,7 +63,7 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: node build
+      - run: node tools/build
 
       - run: yarn tsc -b
 
