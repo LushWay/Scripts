@@ -2707,13 +2707,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leafy-utils@npm:^7.1.2":
-  version: 7.1.2
-  resolution: "leafy-utils@npm:7.1.2"
+"leafy-utils@npm:^7.1.3":
+  version: 7.1.3
+  resolution: "leafy-utils@npm:7.1.3"
   bin:
     commit: ./bin/commit.js
     publish: ./bin/publish.js
-  checksum: 10c0/cbbd76ad5015e291d7f3ae1330f7f531372bcf164206f842f3d904431194710e2ef290aa3cfd66e2d0ccc30d65dfce4dbe7914c8caa496cb65348e1e88c4508b
+  checksum: 10c0/cecff7822bef611f53334e773933bf8b3e764340a06457178a16549f4ec36dc641282e8015f37e35237cccdad81c6b90c348bc3d4a7a3c78f390cbb553cc5718
   languageName: node
   linkType: hard
 
@@ -3724,7 +3724,7 @@ __metadata:
     eslint-plugin-file-progress: "npm:^1.4.0"
     eslint-plugin-only-warn: "npm:^1.1.0"
     eslint-plugin-scriptapi: "portal:tools/eslint-plugin"
-    leafy-utils: "npm:^7.1.2"
+    leafy-utils: "npm:^7.1.3"
     prettier: "npm:^3.3.3"
     prettier-plugin-jsdoc: "npm:^1.3.0"
     tslib: "npm:^2.6.2"
