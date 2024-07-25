@@ -55,5 +55,5 @@ Menu.open = player => {
 }
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-  if (firstJoin) Menu.give(player, { mode: 'ensure' })
+  if (firstJoin) Menu.item.give(player, { mode: 'ensure' })
 })
