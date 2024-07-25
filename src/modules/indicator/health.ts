@@ -33,50 +33,54 @@ class HealthIndicator {
   alwaysShows: string[] = [MinecraftEntityTypes.Player]
 
   /** List of families to indicate health */
-  allowedFamilies = ['monster']
+  allowedFamilies = ['monster', 'player']
 
   constructor() {
     // Show indicator on hurt
-    world.afterEvents.entityHurt.subscribe(event => {
-      if (event.damage === 0) return
-
-      // Validate entity
-      if (!event.hurtEntity.isValid()) return
-
-      const { id } = event.hurtEntity
-      if (!id || NOT_MOB_ENTITIES.includes(id)) return
-      if (
-        !event.hurtEntity.isValid() ||
-        !(event.hurtEntity.matches({ families: this.allowedFamilies }) || event.hurtEntity instanceof Player)
-      )
-        return
-      if (Boss.isBoss(event.hurtEntity)) return
-
-      // Not trigget by close chat
-      if (ClosingChatSet.has(event.hurtEntity.id)) return
-
-      this.updateIndicator({ entity: event.hurtEntity, damage: Math.floor(event.damage) })
-    })
+    this.showIndicatorOnHurt()
 
     // Remove indicator
-    world.afterEvents.entityDie.subscribe(event => {
-      if (!event.deadEntity.isValid()) return
+    this.removeIndicatorOnDie()
 
-      const { id } = event.deadEntity
-      if (!id) return
+    this.damageReducer()
 
-      const info = this.hurtEntities.get(id)
+    PlayerNameTagModifiers.push(p => {
+      const bar = this.getBar(p)
+      if (bar) return '\n' + bar
+      else return false
+    })
+  }
+
+  private showIndicatorOnHurt() {
+    world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage }) => {
+      if (
+        damage <= 0 ||
+        !hurtEntity.isValid() ||
+        !hurtEntity.matches({ families: this.allowedFamilies }) ||
+        NOT_MOB_ENTITIES.includes(hurtEntity.typeId) ||
+        ClosingChatSet.has(hurtEntity.id) ||
+        Boss.isBoss(hurtEntity)
+      )
+        return
+
+      this.updateIndicator({ entity: hurtEntity, damage: Math.floor(damage) })
+    })
+  }
+
+  private removeIndicatorOnDie() {
+    world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+      const info = this.hurtEntities.get(deadEntity.id)
       if (!info) return
 
-      if (info.separated) {
-        try {
-          info.indicator.remove()
-        } catch {}
+      if (info.separated && info.indicator.isValid()) {
+        info.indicator.remove()
       }
 
-      this.hurtEntities.delete(id)
+      this.hurtEntities.delete(deadEntity.id)
     })
+  }
 
+  private damageReducer() {
     system.runInterval(
       () => {
         const indicators = this.getIDs(this.getIndicators())
@@ -105,12 +109,6 @@ class HealthIndicator {
       'health indicator, damage reducer',
       10,
     )
-
-    PlayerNameTagModifiers.push(p => {
-      const bar = this.getBar(p)
-      if (bar) return '\n' + bar
-      else return false
-    })
   }
 
   /** Gets damage indicator name depending on entity's currnet heart and damage applied */
@@ -128,6 +126,12 @@ class HealthIndicator {
     const current = ~~(hp.currentValue / scale)
     const damage = ~~(hurtEntity.damage / scale)
 
+    return this.fillBar(full, current, damage)
+  }
+
+  private barSymbol = '|'
+
+  private fillBar(full: number, current: number, damage: number) {
     let bar = ''
     for (let i = 1; i <= full; i++) {
       if (i <= current) {
@@ -141,11 +145,8 @@ class HealthIndicator {
 
       bar += '§7' + this.barSymbol
     }
-
     return bar
   }
-
-  private barSymbol = '|'
 
   private updateIndicator({ entity, damage = 0 }: { entity: Entity; damage?: number }) {
     if (!entity.isValid()) return
