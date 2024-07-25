@@ -5,6 +5,7 @@ import { t } from 'lib/text'
 import { inaccurateSearch } from '../search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
+import { developerKnow } from 'lib/assets/text'
 
 export function parseCommand(message: string, prefixSize = 1) {
   const command = message.slice(prefixSize).trim()
@@ -198,9 +199,7 @@ export function sendCallback(
         ...argsToReturn,
       ) as Promise<void> | void)
     } catch (e) {
-      event.sender.warn(
-        'При выполнении команды произошла ошибка. Разработчики уже оповещены о проблеме и работают над ее исправлением.',
-      )
+      event.sender.warn(`При выполнении команды произошла ошибка. ${developerKnow}`)
       console.error(e)
     }
   })()

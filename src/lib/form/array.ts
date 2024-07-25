@@ -30,7 +30,11 @@ export declare namespace ArrayForm {
   }
 }
 
-export class ArrayForm<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
+export class ArrayForm<
+  T,
+  C extends SettingsConfig = SettingsConfig,
+  F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
+> {
   private config: ArrayForm.Options<T, C, F> = {
     filters: {
       [SETTINGS_GROUP_NAME]: 'Пустые фильтры',
@@ -39,7 +43,7 @@ export class ArrayForm<T, C extends SettingsConfig, F extends SettingsConfigPars
 
   constructor(
     private title: Text,
-    private array: T[],
+    private array: readonly T[],
   ) {}
 
   description(text: Text) {
@@ -212,7 +216,7 @@ export class ArrayForm<T, C extends SettingsConfig, F extends SettingsConfigPars
     } else return this.array
   }
 
-  private addButtons(array: T[], form: ActionForm, filters: F) {
+  private addButtons(array: readonly T[], form: ActionForm, filters: F) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     for (const item of array) {
       const button = this.config.button(item, filters, form)

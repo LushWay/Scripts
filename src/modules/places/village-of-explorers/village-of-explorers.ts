@@ -16,6 +16,7 @@ class VillageOfExporersBuilder extends City {
     this.create()
   }
 
+  // TODO Resistance to frogs cuz they kill boss in one shot lol
   slimeBoss = Boss.create()
     .group(this.group)
     .id('slime')

@@ -1,7 +1,8 @@
-import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player } from '@minecraft/server'
+import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
 import { InventoryInterval } from 'lib/action'
 import { CustomItems } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
+import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
@@ -21,28 +22,20 @@ export class Menu {
     return item.clone()
   }
 
-  static item = this.createItem()
+  static itemStack = this.createItem()
 
-  static command
-
-  static give
+  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another))
 
   static {
-    const { give, command } = createPublicGiveItemCommand('menu', this.item, another => this.isMenu(another))
+    world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
+      if (!(player instanceof Player)) return
+      if (!this.isMenu(itemStack)) return
 
-    this.give = give
-
-    this.command = command
-
-    // world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
-    //   if (!(player instanceof Player)) return
-    //   if (!this.isMenu(itemStack)) return
-
-    //   util.catch(() => {
-    //     const menu = this.open(player)
-    //     if (menu) menu.show(player)
-    //   })
-    // })
+      util.catch(() => {
+        const menu = this.open(player)
+        if (menu) menu.show(player)
+      })
+    })
   }
 
   static open(player: Player): ActionForm | false {
@@ -56,7 +49,7 @@ export class Menu {
   }
 
   static isMenu(slot: Pick<ContainerSlot, 'typeId'>) {
-    return this.isCompass(slot) || slot.typeId === this.item.typeId
+    return this.isCompass(slot) || slot.typeId === this.itemStack.typeId
   }
 }
 
@@ -97,9 +90,9 @@ export class Compass {
       if (isMenu) this.updateCompassInSlot(slot, player)
 
       if ((isMainhand && isMenu) || isOffhandMenu) {
-        if (!this.forceHide.has(player)) player.setProperty('sm:minimap', true)
+        if (!this.forceHide.has(player)) player.setProperty('lw:minimap', true)
       } else {
-        if (isMainhand) player.setProperty('sm:minimap', false)
+        if (isMainhand) player.setProperty('lw:minimap', false)
         return
       }
 
@@ -112,7 +105,7 @@ export class Compass {
 
     const target = this.players.get(player)
     if (!target) {
-      if (Menu.isCompass(slot)) slot.setItem(Menu.item)
+      if (Menu.isCompass(slot)) slot.setItem(Menu.itemStack)
       return
     }
 

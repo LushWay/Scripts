@@ -116,9 +116,7 @@ export function buildCommand({ test, dev, world, port, vitest, outfile, entry },
               if (dev) logger.success(`Watching for changes at ${at}${test ? ' Test build is enabled.' : ''}`)
               else logger.info(`Built for ${mode} at ${at} ${time}`)
               process.send?.('ready')
-            } else if (dev) {
-              if (changed) process.send?.(['reload', changed])
-            }
+            } else if (dev) process.send?.(['reload', changed])
 
             firstBuild = false
           })

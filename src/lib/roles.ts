@@ -124,9 +124,12 @@ export function getRoleAndName(
     nameSpacing?: boolean
   } = {},
 ) {
+  const id = playerID instanceof Player ? playerID.id : playerID
+  const db = Player.database[id]
   let display = ''
 
   if (useRole) {
+    if (db.survival.newbie) display += '§bНовичок '
     const role = getRole(playerID)
     if (role !== 'member') {
       display += ROLES[role]

@@ -87,7 +87,7 @@ class SpawnBuilder extends AreaWithInventory {
         xp: 0,
         health: 20,
         equipment: {},
-        slots: { 0: Menu.item },
+        slots: { 0: Menu.itemStack },
       },
       clearAll: true,
     })

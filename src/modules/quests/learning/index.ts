@@ -41,7 +41,7 @@ class Learning {
           // anarchy
           system.delay(() => {
             this.startAxeGiveCommand.ensure(player)
-            player.container?.setItem(8, Menu.item)
+            player.container?.setItem(8, Menu.itemStack)
           })
         }
 

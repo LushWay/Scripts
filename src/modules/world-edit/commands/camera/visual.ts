@@ -2,7 +2,7 @@ import { Player, system } from '@minecraft/server'
 import { InventoryStore } from 'lib/database/inventory'
 import { CURRENT_BUILDERS, isBuilding } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
-import { ROLES, getRole } from 'lib/roles'
+import { getRoleAndName } from 'lib/roles'
 import { PlayerNameTagModifiers } from 'modules/indicator/playerNameTag'
 
 const builderInventory = new InventoryStore('build')
@@ -49,7 +49,7 @@ system.runPlayerInterval(
 )
 
 // Insert role value right after name
-PlayerNameTagModifiers.splice(1, 0, p => isBuilding(p) && `\n${ROLES[getRole(p.id)]}`)
+PlayerNameTagModifiers.push(p => isBuilding(p) && `\n${getRoleAndName(p.id, { name: false })}`)
 
 function setBuildingTip(player: Player, value = true) {
   player.onScreenDisplay.setTip(1, value ? 'Режим стройки' : '')

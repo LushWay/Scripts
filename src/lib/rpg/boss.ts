@@ -43,6 +43,12 @@ export class Boss {
     }))
   }
 
+  static isBoss(entityOrId: Entity | string) {
+    const id = entityOrId instanceof Entity ? entityOrId.id : entityOrId
+
+    return this.all.some(e => e.entity?.id === id)
+  }
+
   entity: Entity | undefined
 
   region?: Region

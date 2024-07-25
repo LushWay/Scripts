@@ -10,14 +10,16 @@ export type MaybeRawText = string | RawText
 
 type TSA = TemplateStringsArray
 type Fn = (text: TSA, ...args: unknown[]) => Text
-type OptionsModifiers = 'error' | 'header'
+type OptionsModifiers = 'error' | 'warn' | 'header'
 interface MultiStatic {
   raw: (text: TSA, ...units: (string | RawText | RawMessage)[]) => RawText
   roles: (text: TSA, ...players: Player[]) => Text
   badge: (text: TSA, n: number) => Text
   num: (text: TSA, n: number, plurals: Plurals) => Text
-  time: (text: TSA, time: number) => Text
-  ttime: (time: number) => Text
+
+  time(time: number): Text
+  time(text: TSA, time: number): Text
+
   options: (options: ColorizingOptions) => Multi
 }
 type Multi = MultiStatic & Record<OptionsModifiers, Fn & Omit<MultiStatic, OptionsModifiers>>
@@ -36,13 +38,13 @@ function createGroup(options: ColorizingOptions = {}, modifier = false) {
   t.roles = createSingle({ roles: true, ...options })
   t.badge = createBadge(options)
   t.num = createNum(options)
-  t.time = createTime(options)
-  t.ttime = time => t.time`${time}`
+  t.time = createOverload(createTime(options), (t, time: number) => t`${time}`)
   t.raw = createRaw(options)
 
   if (!modifier) {
     t.header = createGroup({ text: '§6', ...options, unit: '§f§l' }, true)
     t.error = createGroup({ text: '§c', unit: '§f', ...options }, true)
+    t.warn = createGroup({ text: '§e', unit: '§f', ...options }, true)
   }
   t.options = options => createGroup(options)
   return t
@@ -106,6 +108,20 @@ function createNum(options: ColorizingOptions): (text: TSA, n: number, plurals: 
 
     return text + textUnitColorize(unit, options)
   })
+}
+
+function createOverload<T extends (text: TSA, ...args: any[]) => Text, O extends (t: T, ...args: any[]) => Text>(
+  tsa: T,
+  overload: O,
+) {
+  return (...args: unknown[]) => {
+    if (isTSA(args[0])) return tsa(args[0], ...args.slice(1))
+    else return overload(tsa, ...args)
+  }
+}
+
+function isTSA(arg: unknown): arg is TemplateStringsArray {
+  return Array.isArray(arg) && 'raw' in arg
 }
 
 function createTime(options: ColorizingOptions): (text: TSA, time: number) => Text {

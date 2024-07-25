@@ -27,6 +27,8 @@ class JoinBuilder {
 
   onMoveAfterJoin = new EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>()
 
+  onFirstTimeSpawn = new EventSignal<Player>()
+
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (!firstJoin) player.tell(`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
@@ -35,6 +37,7 @@ class JoinBuilder {
       if (!initialSpawn) return
       if (player.scores.joinDate === 0) player.scores.joinDate = ~~(Date.now() / 1000)
       this.setPlayerJoinPosition(player)
+      EventSignal.emit(this.onFirstTimeSpawn, player)
     }),
   }
 

@@ -24,7 +24,7 @@ const locktext = 'Вы находитесь в режиме рейдблока.'
 new LockAction(player => {
   const raidLockTime = player.scores.raid
   if (raidLockTime > 0) {
-    return { lockText: `${locktext} Осталось ${t.error.ttime(raidLockTime * 1000)}` }
+    return { lockText: `${locktext} Осталось ${t.error.time(raidLockTime * 1000)}` }
   } else return false
 }, locktext)
 

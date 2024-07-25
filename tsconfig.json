@@ -83,7 +83,7 @@
           { "module": "node:" },
           { "module": "node:test" },
           { "module": "crypto" },
-          { "module": "src/test/__mocks__" },
+          { "module": "src/test/__mocks__/**" },
           { "module": "vitest/dist/**" }
         ]
       }

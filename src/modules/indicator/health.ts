@@ -1,15 +1,13 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { ms, Vector } from 'lib'
+import { Boss, ms, Vector } from 'lib'
 
 import { CustomEntityTypes } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { isNotPlaying } from 'lib/game-utils'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
 import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/playerNameTag'
-
-// TODO Rewrite in class
 
 interface BaseHurtEntity {
   hurtEntity: Entity
@@ -27,9 +25,9 @@ interface SingleHurtEntity {
 }
 
 class HealthIndicator {
-  hurtEntities = new Map<string, (SeparatedHurtEntity | SingleHurtEntity) & BaseHurtEntity>()
+  private hurtEntities = new Map<string, (SeparatedHurtEntity | SingleHurtEntity) & BaseHurtEntity>()
 
-  indicatorTag = 'HEALTH_INDICATOR'
+  private indicatorTag = 'HEALTH_INDICATOR'
 
   /** Entities that have nameTag "always_show": true and dont have boss_bar */
   alwaysShows: string[] = [MinecraftEntityTypes.Player]
@@ -52,6 +50,7 @@ class HealthIndicator {
         !(event.hurtEntity.matches({ families: this.allowedFamilies }) || event.hurtEntity instanceof Player)
       )
         return
+      if (Boss.isBoss(event.hurtEntity)) return
 
       // Not trigget by close chat
       if (ClosingChatSet.has(event.hurtEntity.id)) return
@@ -115,7 +114,7 @@ class HealthIndicator {
   }
 
   /** Gets damage indicator name depending on entity's currnet heart and damage applied */
-  getBar(entity: Entity, hp = entity.getComponent('health')): string {
+  private getBar(entity: Entity, hp = entity.getComponent('health')): string {
     if (entity instanceof Player && isNotPlaying(entity)) return ''
 
     const hurtEntity = this.hurtEntities.get(entity.id)
@@ -146,9 +145,9 @@ class HealthIndicator {
     return bar
   }
 
-  barSymbol = '|'
+  private barSymbol = '|'
 
-  updateIndicator({ entity, damage = 0 }: { entity: Entity; damage?: number }) {
+  private updateIndicator({ entity, damage = 0 }: { entity: Entity; damage?: number }) {
     if (!entity.isValid()) return
 
     const info = this.createHurtEntityRecord(entity)
@@ -191,20 +190,20 @@ class HealthIndicator {
     return info
   }
 
-  spawnIndicator(entity: Entity) {
+  private spawnIndicator(entity: Entity) {
     const indicator = entity.dimension.spawnEntity(CustomEntityTypes.FloatingText, entity.getHeadLocation())
     indicator.addTag(this.indicatorTag)
     return indicator
   }
 
-  getIndicators() {
+  private getIndicators() {
     return world.overworld.getEntities({
       type: CustomEntityTypes.FloatingText,
       tags: [this.indicatorTag],
     })
   }
 
-  getIDs(entities: Entity[]) {
+  private getIDs(entities: Entity[]) {
     return entities.map(entity => {
       let id
       try {

@@ -396,7 +396,7 @@ export class WorldEdit {
         'блок',
         'блока',
         'блоков',
-      ])} за ${t.options({ unit: '§f', text: '§3' }).ttime(Date.now() - startTime)}.`
+      ])} за ${t.options({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
 
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyReplaceTargets(replaceTargets)}`

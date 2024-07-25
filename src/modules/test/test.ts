@@ -32,6 +32,7 @@ import { ModalForm } from 'lib/form/modal'
 import { Compass } from 'lib/rpg/menu'
 import { Rewards } from 'lib/shop/rewards'
 import './enchant'
+import './properties'
 // import './simulatedPlayer'
 
 // There you can create simple one time tests taht will be run using .test <name> command
