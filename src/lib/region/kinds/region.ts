@@ -44,6 +44,7 @@ export class Region<LDB extends RLDB = any> {
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.type = this.type
     region.kind = this.kind
+    region.creator = this
 
     if (!key) {
       // We are creating new region and should save it
@@ -211,16 +212,13 @@ export class Region<LDB extends RLDB = any> {
   }
 
   /** Database linked to the region */
-  // @ts-expect-error Hyuyh i think we can ignore it
-  linkedDatabase: LDB
+  linkedDatabase!: LDB
 
   /** Region kind */
-  // @ts-expect-error Initialized in the create function
-  private kind: string
+  private kind!: string
 
   /** Region type */
-  // @ts-expect-error Initialized in the create function
-  private type: string
+  private type!: string
 
   /** Prepares region instance to be saved into the database */
   protected toJSON(): RegionSave {
@@ -248,4 +246,6 @@ export class Region<LDB extends RLDB = any> {
     Region.regions = Region.regions.filter(e => e.key !== this.key)
     Reflect.deleteProperty(RegionDatabase, this.key)
   }
+
+  creator!: typeof Region
 }

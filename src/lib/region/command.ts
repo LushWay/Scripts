@@ -4,11 +4,13 @@ import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/kinds/region'
+import { textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { BaseRegion } from '../../modules/places/base/region'
 import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
 import { RadiusRegion } from './kinds/radius'
+import { RadiusRegionWithStructure } from './kinds/radius-with-structure'
 import { SafeAreaRegion } from './kinds/safe-area'
 
 new Command('region')
@@ -31,9 +33,7 @@ function regionForm(player: Player) {
   if (currentRegion instanceof RadiusRegion) {
     form.addButton(
       'Регион на ' + Vector.string(Vector.floor(currentRegion.center), true) + '§f\n' + currentRegion.name,
-      () => {
-        editRegion(player, currentRegion, () => regionForm(player))
-      },
+      () => editRegion(player, currentRegion, () => regionForm(player)),
     )
   }
 
@@ -44,7 +44,6 @@ function regionForm(player: Player) {
     .show(player)
 }
 
- 
 function regionList(player: Player, RegionType: typeof RadiusRegion, back = () => regionForm(player)) {
   const form = new ActionForm('Список ' + RegionType.name)
 
@@ -79,9 +78,12 @@ function regionList(player: Player, RegionType: typeof RadiusRegion, back = () =
 
 const pluralForms: WordPluralForms = ['региона', 'регион', 'в регионе']
 
-function editRegion(player: Player, region: RadiusRegion, back: () => void): Promise<void> {
+function editRegion(player: Player, region: RadiusRegion, back: () => void) {
   const selfback = () => editRegion(player, region, back)
-  return new ActionForm('Регион ' + region.name)
+  const form = new ActionForm(
+    'Регион ' + region.name,
+    textTable({ 'Тип региона': region.creator.name, 'Радиус': region.radius }),
+  )
     .addButton(ActionForm.backText, back)
     .addButton('Участники', () =>
       manageRegionMembers(player, region, {
@@ -97,8 +99,14 @@ function editRegion(player: Player, region: RadiusRegion, back: () => void): Pro
         extendedEditPermissions: true,
       }),
     )
-    .addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять')
-    .show(player)
+
+  if (region instanceof RadiusRegionWithStructure) {
+    form.addButton('Восстановить структуру', () => {
+      region.loadStructure()
+    })
+  }
+
+  form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
