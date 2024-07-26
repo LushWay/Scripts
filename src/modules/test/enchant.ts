@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
+import { MinecraftEffectTypes, MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { Enchantments } from '../../lib/enchantments'
 
 new Command('enchant')
@@ -38,4 +38,21 @@ new Command('repair')
 
     durability.damage = 0
     ctx.player.mainhand().setItem(item)
+  })
+
+new Command('heal')
+  .setPermissions('techAdmin')
+  .setDescription('Восстанавливает хп')
+  .executes(ctx => {
+    const item = ctx.player.getComponent('health')
+    if (!item) return ctx.error('Вы мертвы.')
+
+    item.resetToMaxValue()
+  })
+
+new Command('eat')
+  .setPermissions('techAdmin')
+  .setDescription('Восстанавливает голод')
+  .executes(ctx => {
+    ctx.player.addEffect(MinecraftEffectTypes.Saturation, 1, { amplifier: 255 })
   })
