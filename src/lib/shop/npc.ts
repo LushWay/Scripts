@@ -24,7 +24,9 @@ export class ShopNpc {
    */
   constructor(place: Place) {
     this.shop = new Shop(place.name, place.fullId)
-    this.npc = new Npc(place, event => this.shop.open(event.player))
+    this.npc = new Npc(place, event => {
+      this.shop.open(event.player)
+    })
   }
 }
 

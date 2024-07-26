@@ -139,7 +139,7 @@ export class ShopForm {
       const buy = ~~((maxCount / count) * minPrice)
       const sell = ~~(buy / 2)
 
-      const original = form.body
+      const original = form.body.bind(form)
       form.body = () => t.raw`${original()}\nТовара на складе: ${t`${db[type] ?? 0}/${maxCount}`}`
 
       form.addSection('§3Продать', form => {

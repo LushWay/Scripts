@@ -34,7 +34,9 @@ export class Shop {
     Shop.shops.set(id, this)
   }
 
-  private defaultBody = (player: Player) =>
+  private useDefaultBody = true
+
+  private static defaultBody = (player: Player) =>
     textTable({
       'Подтверждение перед покупкой': Shop.getPlayerSettings(player).prompt,
       'Ваш баланс': new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
@@ -50,8 +52,7 @@ export class Shop {
    */
   body(body: (player: Player) => Text, useDefaultBody = true) {
     this.getBody = body
-    if (!useDefaultBody) this.defaultBody = () => ''
-    else this.defaultBody = Shop.prototype.defaultBody
+    this.useDefaultBody = useDefaultBody
     return this
   }
 
@@ -75,7 +76,7 @@ export class Shop {
   open(player: Player) {
     new ShopForm(
       () => t.header.raw`${this.name}`,
-      () => t.raw`${this.getBody(player)}${this.defaultBody(player)}`,
+      () => t.raw`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
       this,
       this.onOpen,
     ).show(player)
