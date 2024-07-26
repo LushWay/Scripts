@@ -30,7 +30,7 @@ world.afterEvents.entityDie.subscribe(event => {
     gravestone.setDynamicProperty(gravestoneOwnerKey, playerId)
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
     gravestone.addTag(gravestoneTag)
-    gravestone.nameTag = `§c§h§e§s§t§6Могила §f${name}`
+    gravestone.nameTag = `§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? '§bновичка ' : ''}§f${name}`
 
     const gravestoneContainer = gravestone.container
 
