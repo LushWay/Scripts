@@ -1,4 +1,5 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { Airdrop } from 'lib'
 import { RadiusRegion, RadiusRegionOptions } from './radius'
 
 interface SafeAreaRegionOptions extends RadiusRegionOptions {
@@ -14,8 +15,7 @@ export class SafeAreaRegion extends RadiusRegion {
       MinecraftEntityTypes.Player,
       MinecraftEntityTypes.Npc,
       MinecraftEntityTypes.ArmorStand,
-      MinecraftEntityTypes.Chicken,
-      MinecraftEntityTypes.ChestMinecart,
+      ...Airdrop.entities,
       'minecraft:painting',
       'minecraft:item',
     ],

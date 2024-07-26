@@ -1,5 +1,6 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
-import { selectByChance } from 'lib'
+import { selectByChance, stringifyError } from 'lib'
+import { t } from 'lib/text'
 
 export class Ore {
   private types: string[] = []
@@ -12,7 +13,28 @@ export class Ore {
   private deepslates: string[] = []
 
   deepslate(typeId: string) {
+    if (!typeId.includes('deepslate') && ![''].includes(typeId)) {
+      console.warn(
+        t.warn`Ore ${this.types.join(' ')} included a deeplsate typeid (${typeId}) that does not have deeplsate inside.\n${stringifyError.stack.get(1)}`,
+      )
+    }
+
     this.deepslates.push(typeId)
+    return this
+  }
+
+  private belowY = 200
+
+  /** Restricts ore spawning to only below this y-point */
+  below(y: number) {
+    this.belowY = y
+    return this
+  }
+
+  private group = 0
+
+  groupChance(chance: number) {
+    this.group = chance
     return this
   }
 
@@ -24,6 +46,8 @@ export class Ore {
         all: this.types.concat(this.deepslates),
         types: this.types,
         deepslates: this.deepslates,
+        below: this.belowY,
+        groupChance: this.group,
       },
     }
   }
@@ -63,8 +87,8 @@ export class OreCollector {
     return this
   }
 
-  selectOreByChance(deepslate = false) {
-    const ore = selectByChance(this.entries).item
+  selectOreByChance(deepslate = false, y: number) {
+    const ore = selectByChance(this.entries.filter(e => y <= e.item.below)).item
     return deepslate ? ore.deepslates[0] : ore.types[0]
   }
 

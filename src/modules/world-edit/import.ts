@@ -20,7 +20,7 @@ import './commands/region/copy'
 import './commands/region/paste'
 import './commands/region/set'
 
-import './commands/camera/visual'
+import './builder'
 
 import './tools/brush'
 import './tools/clipboard'

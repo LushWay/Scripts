@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { EventSignal, Vector } from 'lib'
+import { developersAreWarned } from 'lib/assets/text'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
 import { PlayerQuest } from './player'
@@ -99,8 +100,13 @@ export abstract class QS<DB = any> extends Temporary {
     if (cleanup) this.cleaners.push(cleanup.cleanup)
 
     this.activators.forEach(activate => {
-      const result = activate(this, firstTime)
-      if (result) this.cleaners.push(result.cleanup)
+      try {
+        const result = activate(this, firstTime)
+        if (result) this.cleaners.push(result.cleanup)
+      } catch (e) {
+        this.error(`При активации шага произошла ошибка. ${developersAreWarned}`)
+        throw e
+      }
     })
   }
 

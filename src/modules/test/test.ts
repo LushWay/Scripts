@@ -23,6 +23,7 @@ import {
   restorePlayerCamera,
   util,
 } from 'lib'
+import { CustomEntityTypes } from 'lib/assets/config'
 import { request } from 'lib/bds/api'
 import { CommandContext } from 'lib/command/context'
 import { Cutscene } from 'lib/cutscene'
@@ -31,6 +32,7 @@ import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { Compass } from 'lib/rpg/menu'
 import { Rewards } from 'lib/shop/rewards'
+import loot from '../quests/learning/airdrop'
 import './enchant'
 import './properties'
 // import './simulatedPlayer'
@@ -46,6 +48,19 @@ import './properties'
 // other tests are available only for tech admins and above
 
 const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
+  air(ctx) {
+    const airdrop = new Airdrop({ loot })
+    airdrop.spawn(Vector.add(ctx.player.location, { x: 0, y: 30, z: 0 }))
+    system.runInterval(
+      () => {
+        if (!airdrop.chest?.isValid()) return
+
+        airdrop.showParticleTrace()
+      },
+      'testsa',
+      20,
+    )
+  },
   scen(ctx) {
     const player = ctx.player
 
@@ -113,12 +128,12 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       system.runInterval(
         () => {
           const minecarts = ctx.player.dimension.getEntities({
-            type: MinecraftEntityTypes.ChestMinecart,
+            type: CustomEntityTypes.Loot,
             maxDistance: 20,
             location: ctx.player.location,
           })
           for (const minecart of minecarts) {
-            Airdrop.prototype.showParticleTrace(minecart.location, minecart)
+            Airdrop.prototype.showParticleTrace(minecart)
           }
         },
         'minecart test',

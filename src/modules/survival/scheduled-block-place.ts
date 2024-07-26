@@ -24,7 +24,7 @@ export function scheduleBlockPlace({
   dimension: Dimensions
   restoreTime: number
 }) {
-  const other = SHEDULED_DB[dimension].find(e => Vector.string(e.location) === Vector.string(options.location))
+  const other = IMMUTABLE_DB[dimension].find(e => Vector.equals(e.location, options.location))
 
   if (!other) SHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
@@ -37,52 +37,79 @@ const IMMUTABLE_DB = ProxyDatabase.immutableUnproxy(SHEDULED_DB)
 /** @type {['overworld', 'nether', 'end']} */
 const DIMENSIONS: ['overworld', 'nether', 'end'] = ['overworld', 'nether', 'end']
 
-system.runInterval(
-  function scheduledBlockPlaceInterval() {
-    for (const dimension of DIMENSIONS) {
-      const schedules = IMMUTABLE_DB[dimension]
-      if (typeof schedules === 'undefined') {
-        Reflect.deleteProperty(SHEDULED_DB, dimension)
-        continue
+function timeout() {
+  system.runTimeout(
+    () => {
+      function* scheduledBlockPlaceJob() {
+        for (const dimension of DIMENSIONS) {
+          const schedules = IMMUTABLE_DB[dimension]
+          if (typeof schedules === 'undefined') {
+            Reflect.deleteProperty(SHEDULED_DB, dimension)
+            continue
+          }
+
+          const time = util.benchmark('dimension', 'sc')
+          for (let i = schedules.length - 1; i >= 0; i--) {
+            const schedule = schedules[i]
+            if (typeof schedule === 'undefined') {
+              SHEDULED_DB[dimension].splice(i, 1)
+              yield
+              continue
+            }
+
+            let date = schedule.date
+            if (schedules.length > 500) {
+              date -= ~~(schedules.length / 500)
+            }
+            if (Date.now() < date) {
+              yield
+              continue
+            }
+
+            // To prevent blocks from restoring randomly in air
+            // we calculate if there is near broken block
+            const nearAir = schedules.find(
+              e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > date,
+            )
+            if (nearAir) {
+              yield
+              continue
+            }
+
+            try {
+              const block = world.overworld.getBlock(schedule.location)
+              if (!block?.isValid()) {
+                yield
+                continue
+              }
+
+              block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
+              console.log(
+                t`Schedule place ${schedule.typeId.replace('minecraft:', '')} to ${Vector.string(schedule.location, true)}, remains ${schedules.length}`,
+              )
+            } catch (e) {
+              if (e instanceof LocationInUnloadedChunkError) {
+                continue
+                yield
+              }
+              console.error(e)
+            }
+
+            // Remove successfully placed block from the schedule array
+            SHEDULED_DB[dimension].splice(i, 1)
+            yield
+          }
+
+          time()
+          timeout()
+        }
       }
 
-      const time = util.benchmark('dimension', 'sc')
-      for (let i = schedules.length - 1; i >= 0; i--) {
-        const schedule = schedules[i]
-        if (typeof schedule === 'undefined') {
-          SHEDULED_DB[dimension].splice(i, 1)
-          continue
-        }
-        if (Date.now() < schedule.date) continue
+      system.runJob(scheduledBlockPlaceJob())
+    },
+    'scheduled block place',
+    10,
+  )
+}
 
-        // To prevent blocks from restoring randomly in air
-        // we calculate if there is near broken block and swap
-        // their restore date, so they will restore in reversed order
-        const nearBlock = schedules.find(
-          e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > schedule.date,
-        )
-        if (nearBlock) continue
-
-        try {
-          const block = world.overworld.getBlock(schedule.location)
-          if (!block?.isValid()) continue
-
-          block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
-          console.log(
-            t`Schedule place ${schedule.typeId.replace('minecraft:', '')} to ${Vector.string(schedule.location, true)}`,
-          )
-        } catch (e) {
-          if (e instanceof LocationInUnloadedChunkError) continue
-          console.error(e)
-        }
-
-        // Remove successfully placed block from the schedule array
-        SHEDULED_DB[dimension].splice(i, 1)
-      }
-
-      time()
-    }
-  },
-  'scheduled block place',
-  10,
-)
+timeout()

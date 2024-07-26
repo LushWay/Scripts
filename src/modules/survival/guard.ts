@@ -1,3 +1,4 @@
+import { PlayerEvents } from 'lib/assets/player-properties'
 import { Core } from 'lib/extensions/core'
 import { isBuilding } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
@@ -39,7 +40,9 @@ loadRegionsWithGuards({
   regionCallback(player, currentRegion) {
     if (currentRegion) {
       if (!currentRegion.permissions.pvp && !isBuilding(player)) {
-        player.triggerEvent('player:spawn')
+        player.triggerEvent(
+          player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
+        )
       }
     }
 

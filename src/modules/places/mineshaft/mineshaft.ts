@@ -17,7 +17,8 @@ actionGuard((player, region, ctx) => {
       const { block, dimension } = ctx.event
       const ore = ores.getOre(block.typeId)
 
-      system.delay(() => placeOre(block, dimension, player))
+      const typeId = block.typeId
+      system.delay(() => placeOre(block, typeId, dimension, player))
 
       scheduleBlockPlace({
         dimension: dimension.type,

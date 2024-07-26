@@ -2,7 +2,7 @@ import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } fro
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, Vector, isChunkUnloaded } from 'lib'
-import { developerKnow } from 'lib/assets/text'
+import { developersAreWarned } from 'lib/assets/text'
 import { location } from 'lib/location'
 import { t } from 'lib/text'
 import { Place } from './place'
@@ -98,7 +98,7 @@ export class Npc {
             return event.player.fail(`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
           }
         } catch (e) {
-          event.player.warn(`Не удалось открыть диалог. ${developerKnow}`)
+          event.player.warn(`Не удалось открыть диалог. ${developersAreWarned}`)
           console.error(e)
         }
       })

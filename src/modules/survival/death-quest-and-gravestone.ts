@@ -1,13 +1,13 @@
 import { Player, system, world } from '@minecraft/server'
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, ms } from 'lib'
+import { CustomEntityTypes } from 'lib/assets/config'
 import { Quest } from 'lib/quest/quest'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
 import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
 const gravestoneOwnerKey = 'owner'
-export const gravestoneEntity = MinecraftEntityTypes.HopperMinecart
+export const gravestoneEntity = CustomEntityTypes.Loot
 const gravestoneTag = 'gravestone'
 const gravestoneSpawnedAt = 'gravestoneAt'
 const gravestoneCleanupAfter = ms.from('sec', 5)
@@ -18,37 +18,43 @@ world.afterEvents.entityDie.subscribe(event => {
     const playerContainer = event.deadEntity.container
 
     if (playerContainer?.emptySlotsCount === playerContainer?.size && settings.noInvMessage) {
-      return event.deadEntity.warn('Вы умерли без вещей!')
+      event.deadEntity.warn('Вы умерли без вещей!')
     }
 
     const { dimension, id: playerId, location, name } = event.deadEntity
     event.deadEntity.database.survival.deadAt = Vector.floor(location)
     const head = event.deadEntity.getHeadLocation()
 
-    const gravestone = dimension.spawnEntity(gravestoneEntity + '<loot>', head)
+    const gravestone = dimension.spawnEntity(gravestoneEntity, head)
     gravestone.setDynamicProperty(ALLOW_SPAWN_PROP, true)
     gravestone.setDynamicProperty(gravestoneOwnerKey, playerId)
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
     gravestone.addTag(gravestoneTag)
-    gravestone.nameTag = `§6Могила §f${name}`
+    gravestone.nameTag = `§c§h§e§s§t§6Могила §f${name}`
 
     const gravestoneContainer = gravestone.container
 
-    if (playerContainer && gravestoneContainer) {
-      for (const [i, item] of playerContainer.entries()) {
-        if (item?.keepOnDeath) continue
-        gravestoneContainer.setItem(i, item)
-        playerContainer.setItem(i, undefined)
-      }
-    }
+    // if (playerContainer && gravestoneContainer) {
+    //   for (const [i, item] of playerContainer.entries()) {
+    //     if (!item || item.keepOnDeath) continue
+    //     gravestoneContainer.setItem(i, item)
+    //     playerContainer.setItem(i, undefined)
+    //     console.log('Added', item.typeId, item.amount)
+    //   }
+    // }
 
     system.delay(() => {
-      dimension.getEntities({ location: head, type: 'minecraft:item', maxDistance: 2 }).forEach(e => e.teleport(head))
+      dimension.getEntities({ location: head, type: 'minecraft:item', maxDistance: 2 }).forEach(e => {
+        const item = e.getComponent('item')?.itemStack
+        if (item) {
+          gravestoneContainer?.addItem(item)
+          e.remove()
+          // console.log('Dropped', item.typeId, item.amount)
+        }
+      })
     })
   }
 })
-
-// TODO Clear minecart items from inventory/world
 
 const getSettings = Settings.player(...Quest.playerSettings.extend, {
   restoreInvQuest: {
@@ -129,7 +135,7 @@ const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верн
     .description(
       `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
-      }, они ждут вас!`,
+      }, они ждут вас на ${Vector.string(deadAt, true)}§6!`,
     )
     .activate(ctx => {
       ctx.place = deadAt

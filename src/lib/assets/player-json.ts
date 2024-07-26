@@ -68,6 +68,33 @@ export const playerJson = {
           ]
         }
       },
+      "safezone": {
+        "minecraft:spell_effects": {
+          "add_effects": [
+            {
+              "effect": "weakness",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": false
+            },
+            {
+              "effect": "resistance",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": true
+            },
+            {
+              "effect": "fire_resistance",
+              "duration": 2,
+              "amplifier": 255,
+              "visible": false,
+              "display_on_screen_animation": false
+            }
+          ]
+        }
+      },
       "warn": {
         "minecraft:spell_effects": {
           "add_effects": [
@@ -333,6 +360,11 @@ export const playerJson = {
       "player:spawn": {
         "add": {
           "component_groups": ["spawn"]
+        }
+      },
+      "player:safezone": {
+        "add": {
+          "component_groups": ["safezone"]
         }
       },
       "player:not_in_spawn": {

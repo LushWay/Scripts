@@ -25,3 +25,17 @@ new Command('enchant')
 
     mainhand.setItem(item)
   })
+
+new Command('repair')
+  .setPermissions('techAdmin')
+  .setDescription('Чинит предмет')
+  .executes(ctx => {
+    const item = ctx.player.mainhand().getItem()
+    if (!item) return ctx.error('В руке нет предмета.')
+
+    const durability = item.durability
+    if (!durability) return ctx.error('Этот предмет невозможно починить.')
+
+    durability.damage = 0
+    ctx.player.mainhand().setItem(item)
+  })

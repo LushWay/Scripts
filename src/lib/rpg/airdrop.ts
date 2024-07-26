@@ -1,5 +1,6 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { CustomEntityTypes } from 'lib/assets/config'
 import { actionGuard } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
 import { t } from 'lib/text'
@@ -9,18 +10,28 @@ import { Core } from '../extensions/core'
 import { isInvalidLocation } from '../game-utils'
 import { Temporary } from '../temporary'
 
+// TODO Refactor to use creator style for creating
+// TODO Make internal properties private
+// TODO Make creator to register airdrop with id that will replace loot table id and make .spawn function on it
+
 export class Airdrop {
   static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true }>('airdrop')
 
-  static minecartTag = 'chest_minecart:loot'
+  static chestTypeId = CustomEntityTypes.Loot
+
+  static chickenTypeId = MinecraftEntityTypes.Chicken
+
+  static entities = [this.chestTypeId, this.chickenTypeId]
+
+  static chestTag = 'chest_minecart:loot'
 
   static chickenTag = 'chicken:loot'
 
-  static chestOffset = { x: 0, y: -2, z: 0 }
+  static chestOffset = { x: 0, y: -1.2, z: 0 }
 
   static instances: Airdrop[] = []
 
-  chestMinecart: Entity | undefined
+  chest: Entity | undefined
 
   chicken: Entity | undefined
 
@@ -28,7 +39,7 @@ export class Airdrop {
 
   id
 
-  lootTable
+  private lootTable
 
   status: 'restoring' | 'falling' | 'being looted' = 'restoring'
 
@@ -51,55 +62,44 @@ export class Airdrop {
    * @param position - Position to spawn airdrop on
    */
   spawn(position: Vector3) {
-    console.debug('spawning airdrop at', Vector.string(Vector.floor(position), true))
+    console.debug('Airdrop spawning at', Vector.string(Vector.floor(position), true))
 
-    this.chicken = world.overworld.spawnEntity('minecraft:chicken<chicken:drop>', position)
-    this.chestMinecart = world.overworld.spawnEntity(
-      'minecraft:chest_minecart<chest_minecart:drop>',
-      Vector.add(position, Airdrop.chestOffset),
-    )
+    const spawn = (name: 'chicken' | 'chest', typeId: string, position: Vector3, tag: string) => {
+      this[name] = world.overworld.spawnEntity(typeId, position)
 
-    let chest = false
-    let chicken = false
+      new Temporary(({ world, cleanup }) => {
+        world.afterEvents.entitySpawn.subscribe(event => {
+          if (event.entity.id !== this[name]?.id) return
 
-    new Temporary(({ world, cleanup }) => {
-      world.afterEvents.entitySpawn.subscribe(event => {
-        if (event.entity.id === this.chestMinecart?.id) {
-          this.chestMinecart.addTag(Airdrop.minecartTag)
-          console.debug('spawned chest minecart')
-          chest = true
-          if (chicken) cleanup()
-        }
-
-        if (event.entity.id === this.chicken?.id) {
-          this.chicken.addTag(Airdrop.chickenTag)
-          console.debug('spawned chicken')
-          chicken = true
-          if (chest) cleanup()
-        }
+          event.entity.addTag(tag)
+          console.debug('Airdrop spawned ' + name)
+          cleanup()
+        })
       })
-    })
+    }
+
+    spawn('chicken', `${Airdrop.chickenTypeId}<chicken:drop>`, position, Airdrop.chickenTag)
+    spawn('chest', Airdrop.chestTypeId, Vector.add(position, Airdrop.chestOffset), Airdrop.chestTag)
 
     this.status = 'falling'
     this.save()
   }
 
   teleport() {
-    if (!this.chestMinecart || !this.chicken || !this.chicken.isValid() || !this.chestMinecart.isValid()) return
+    if (!this.chest || !this.chicken || !this.chicken.isValid() || !this.chest.isValid()) return
 
-    this.chestMinecart.teleport(Vector.add(this.chicken.location, Airdrop.chestOffset))
-    if (!this.chestMinecart.dimension.getBlock(this.chestMinecart.location)?.below()?.isAir) {
+    this.chest.teleport(Vector.add(this.chicken.location, Airdrop.chestOffset))
+    if (!this.chest.dimension.getBlock(this.chest.location)?.below()?.isAir) {
       this.beingLooted()
     }
   }
 
   beingLooted() {
-    if (!this.chestMinecart || !this.chicken) return
+    if (!this.chest || !this.chicken) return
 
-    this.chestMinecart.triggerEvent('chest_minecart:ground')
     try {
-      console.debug('Loading loot table', this.lootTable.id ? this.lootTable.id : 'NO NAME')
-      if (this.chestMinecart.container) this.lootTable.fillContainer(this.chestMinecart.container)
+      console.debug('Loading loot table', this.lootTable.id ? this.lootTable.id : 'NO ID')
+      if (this.chest.container) this.lootTable.fillContainer(this.chest.container)
     } catch (e) {
       console.error('Failed to load loot table into airdrop:', e)
     }
@@ -110,7 +110,7 @@ export class Airdrop {
   }
 
   save() {
-    if (!this.chestMinecart || !this.chicken) return
+    if (!this.chest || !this.chicken) return
     if (!this.lootTable.id) {
       console.warn(t`[Airdrop][${this.id}] Unable to save, LootTable must have an id`)
       return
@@ -118,7 +118,7 @@ export class Airdrop {
 
     Airdrop.db[this.id] = {
       for: this.for,
-      chest: this.chestMinecart.id,
+      chest: this.chest.id,
       chicken: this.chicken.id,
       loot: this.lootTable.id,
       ...(this.status === 'being looted' ? { looted: true } : {}),
@@ -126,17 +126,14 @@ export class Airdrop {
   }
 
   /** Shows particle trace under chest minecart */
-  async showParticleTrace(from?: Vector3, minecart = this.chestMinecart) {
-    if (!from && minecart?.isValid()) {
-      from = minecart.location
-    }
+  showParticleTrace(entity = this.chicken) {
+    if (!entity?.isValid()) return { x: 0, y: 0, z: 0 }
 
-    if (from) {
-      let { x, z } = from
-      x -= 0
-      z -= 0
+    const from = entity.location
+    const { x, z } = from
 
-       
+    show()
+    async function show() {
       for (let y = from.y; y > from.y - 10; y--) {
         try {
           world.overworld.spawnParticle('minecraft:balloon_gas_particle', { x, y, z })
@@ -147,20 +144,22 @@ export class Airdrop {
         }
       }
     }
+
+    return from
   }
 
   delete() {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
     Reflect.deleteProperty(Airdrop.db, this.id)
 
-    /** @param {'chestMinecart' | 'chicken'} key */
-    const kill = (key: 'chestMinecart' | 'chicken') => {
+    /** @param {'chest' | 'chicken'} key */
+    const kill = (key: 'chest' | 'chicken') => {
       try {
         this[key]?.remove()
       } catch {}
     }
 
-    kill('chestMinecart')
+    kill('chest')
     kill('chicken')
   }
 }
@@ -186,11 +185,11 @@ system.runInterval(
       if (!canPerformHeavyOperation) continue
 
       chestMinecarts ??= world.overworld.getEntities({
-        type: MinecraftEntityTypes.ChestMinecart,
-        tags: [Airdrop.minecartTag],
+        type: Airdrop.chestTag,
+        tags: [Airdrop.chestTag],
       })
       chickens ??= world.overworld.getEntities({
-        type: MinecraftEntityTypes.Chicken,
+        type: Airdrop.chickenTypeId,
         tags: [Airdrop.chickenTag],
       })
 
@@ -199,16 +198,16 @@ system.runInterval(
           const saved = Airdrop.db[airdrop.id]
           if (typeof saved === 'undefined') return airdrop.delete()
 
-          airdrop.chestMinecart = findAndRemove(chestMinecarts, saved.chest)
+          airdrop.chest = findAndRemove(chestMinecarts, saved.chest)
           airdrop.chicken = findAndRemove(chickens, saved.chicken)
 
           if (saved.looted) {
-            if (airdrop.chestMinecart?.isValid()) {
+            if (airdrop.chest?.isValid()) {
               airdrop.status = 'being looted'
               console.debug('Restored looted airdrop')
             }
           } else {
-            if (airdrop.chicken?.isValid() && airdrop.chestMinecart?.isValid()) {
+            if (airdrop.chicken?.isValid() && airdrop.chest?.isValid()) {
               console.debug('Restored failling airdrop')
 
               airdrop.status = 'falling'
@@ -218,16 +217,16 @@ system.runInterval(
           console.error('Failed to restore airdrop', error)
         }
       } else {
-        if (airdrop.chestMinecart) findAndRemove(chestMinecarts, airdrop.chestMinecart.id)
+        if (airdrop.chest) findAndRemove(chestMinecarts, airdrop.chest.id)
 
         // Clear empty looted airdrops
-        if (inventoryIsEmpty(airdrop.chestMinecart)) {
+        if (inventoryIsEmpty(airdrop.chest)) {
           if (airdrop.chicken) findAndRemove(chickens, airdrop.chicken.id)
           airdrop.delete()
         }
       }
 
-      cleanup(chestMinecarts, 'chestMinecart')
+      cleanup(chestMinecarts, 'chest')
       cleanup(chickens, 'chicken')
     }
   },
@@ -244,7 +243,7 @@ export function inventoryIsEmpty(entity: Entity | undefined) {
   if (container.emptySlotsCount === container.size) return true
 }
 
-function cleanup(arr: Entity[], type: 'chestMinecart' | 'chicken') {
+function cleanup(arr: Entity[], type: 'chest' | 'chicken') {
   for (const entity of arr) {
     if (!entity.isValid()) continue
 
@@ -278,19 +277,17 @@ Core.afterEvents.worldLoad.subscribe(() => {
 })
 
 actionGuard((player, _region, ctx) => {
-  if (ctx.type === 'interactWithEntity') {
-    if (ctx.event.target.typeId === MinecraftEntityTypes.ChestMinecart) {
-      const airdrop = Airdrop.instances.find(e => e.chestMinecart?.id === ctx.event.target.id)
+  if (ctx.type === 'interactWithEntity' && ctx.event.target.typeId === Airdrop.chestTypeId) {
+    const airdrop = Airdrop.instances.find(e => e.chest?.id === ctx.event.target.id)
 
-      if (airdrop?.for) {
-        // Check if airdrop is for specific user
+    if (airdrop?.for) {
+      // Check if airdrop is for specific user
 
-        if (player.id !== airdrop.for) return false
-        return true
-      } else {
-        // Allow interacting with any airdrop by default
-        return true
-      }
+      if (player.id !== airdrop.for) return false
+      return true
+    } else {
+      // Allow interacting with any airdrop by default
+      return true
     }
   }
 }, -1)

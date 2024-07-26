@@ -33,6 +33,7 @@ type InteractionAllowed = (
     | { type: 'place'; event: PlayerPlaceBlockBeforeEvent }
     | { type: 'interactWithBlock'; event: PlayerInteractWithBlockBeforeEvent }
     | { type: 'interactWithEntity'; event: PlayerInteractWithEntityBeforeEvent },
+  regions: Region[],
 ) => boolean | void
 
 type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
@@ -44,9 +45,9 @@ export function actionGuard(fn: InteractionAllowed, position?: number) {
   ACTION_GUARD.subscribe(fn, position)
 }
 
-const allowed: InteractionAllowed = (player, region, context) => {
+const allowed: InteractionAllowed = (player, region, context, regions) => {
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
-    const result = fn(player, region, context)
+    const result = fn(player, region, context, regions)
     if (typeof result !== 'undefined') return result
   }
 }
@@ -70,10 +71,16 @@ export function loadRegionsWithGuards({
   if (LOADED) throw new Error('Regions are already loaded!')
   LOADED = true
 
+  function getRegions(location: Vector3, dimensionType: Dimensions) {
+    const regions = Region.nearestRegions(location, dimensionType)
+    const region = regions[0] as Region | undefined
+    return { region, regions }
+  }
+
   /** Permissions for region */
   world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-    const region = Region.nearestRegion(event.block, event.player.dimension.type)
-    if (allowed(event.player, region, { type: 'interactWithBlock', event })) return
+    const { regions, region } = getRegions(event.block, event.player.dimension.type)
+    if (allowed(event.player, region, { type: 'interactWithBlock', event }, regions)) return
 
     if (DOORS_AND_SWITCHES.includes(event.block.typeId) && region?.permissions.doorsAndSwitches) return
     if (BLOCK_CONTAINERS.includes(event.block.typeId) && region?.permissions.openContainers) return
@@ -83,24 +90,24 @@ export function loadRegionsWithGuards({
 
   /** Permissions for region */
   world.beforeEvents.playerInteractWithEntity.subscribe(event => {
-    const region = Region.nearestRegion(event.target.location, event.player.dimension.type)
-    if (allowed(event.player, region, { type: 'interactWithEntity', event })) return
+    const { regions, region } = getRegions(event.target.location, event.player.dimension.type)
+    if (allowed(event.player, region, { type: 'interactWithEntity', event }, regions)) return
 
     event.cancel = true
   })
 
   /** Permissions for region */
   world.beforeEvents.playerPlaceBlock.subscribe(event => {
-    const region = Region.nearestRegion(event.block.location, event.player.dimension.type)
-    if (allowed(event.player, region, { type: 'place', event })) return
+    const { regions, region } = getRegions(event.block.location, event.player.dimension.type)
+    if (allowed(event.player, region, { type: 'place', event }, regions)) return
 
     event.cancel = true
   })
 
   /** Permissions for region */
   world.beforeEvents.playerBreakBlock.subscribe(event => {
-    const region = Region.nearestRegion(event.block.location, event.player.dimension.type)
-    if (allowed(event.player, region, { type: 'break', event })) return
+    const { regions, region } = getRegions(event.block.location, event.player.dimension.type)
+    if (allowed(event.player, region, { type: 'break', event }, regions)) return
 
     event.cancel = true
   })

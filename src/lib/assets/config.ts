@@ -15,6 +15,7 @@ export enum CustomEntityTypes {
   Database = 'rubedo:database',
   Sit = 'sm:sit',
   FloatingText = 'f:t',
+  Loot = 'lw:loot',
 }
 
 export enum CustomStructures {

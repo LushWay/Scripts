@@ -23,6 +23,8 @@ export class Vector {
   /** Returns dot product of two vectors */
   static dot = (a: Vector3, b: Vector3) => a.x * b.x + a.y * b.y + a.z * b.z
 
+  static equals = (a: Vector3, b: Vector3) => a.x === b.x && a.y === b.y && a.z === b.z
+
   /**
    * Returns two dots around vector
    *

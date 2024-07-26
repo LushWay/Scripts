@@ -54,4 +54,4 @@ export const text: Record<string, (...args: (string | number)[]) => string> = {
 §8-----------------------------`,
 }
 
-export const developerKnow = `Разработчики уже оповещены о проблеме и работают над ее исправлением.`
+export const developersAreWarned = `Разработчики уже оповещены о проблеме и работают над ее исправлением.`

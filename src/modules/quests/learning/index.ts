@@ -10,6 +10,7 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 import { Npc } from 'lib/rpg/npc'
 
+import { t } from 'lib/text'
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
@@ -49,7 +50,7 @@ class Learning {
           if (player.id !== ep.id) return
           if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
 
-          console.debug(`${player.name} have brocken ${brokenBlockPermutation.type.id}`)
+          player.log('mined', brokenBlockPermutation.type.id)
 
           player.playSound(Sounds.Action)
           ctx.diff(1)
@@ -80,7 +81,7 @@ class Learning {
         )
       })
 
-    q.dynamic('Открой вагонетку').activate((ctx, firstTime) => {
+    q.dynamic('Открой упавший с неба сундук').activate((ctx, firstTime) => {
       if (!player.isValid()) return
 
       function spawnAirdrop() {
@@ -92,15 +93,18 @@ class Learning {
 
       function getAirdrop() {
         const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
-        if (!airdrop) throw new Quest.error('No airdrop found')
+        if (!airdrop) {
+          ctx.player.log(ctx.quest.id, t.error`No airdrop found`)
+          return spawnAirdrop()
+        }
         return airdrop
       }
 
       const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
-      if (!airdrop.chestMinecart) return ctx.error('Не удалось вызвать аирдроп')
+      if (!airdrop.chest) return ctx.error('Не удалось вызвать аирдроп')
 
       ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
-        const airdropEntity = airdrop.chestMinecart
+        const airdropEntity = airdrop.chest
         if (!airdropEntity) return
         if (event.target.id !== airdropEntity.id) return
 
@@ -108,28 +112,24 @@ class Learning {
       })
 
       ctx.world.afterEvents.entityDie.subscribe(event => {
-        if (event.deadEntity.id !== airdrop.chestMinecart?.id) return
+        if (event.deadEntity.id !== airdrop.chest?.id) return
         ctx.system.delay(() => ctx.next())
       })
 
       let i = 0
       ctx.onInterval(() => {
-        if (!airdrop.chestMinecart?.isValid()) return
-        ctx.place = Vector.floor(airdrop.chestMinecart.location)
-
         if (i === 1) {
           i = 0
-          airdrop.showParticleTrace(ctx.place)
+          ctx.place = airdrop.showParticleTrace()
+          ctx.update()
         } else i++
-
-        ctx.update()
       })
     })
 
     const crafting = Vector.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
 
     q.item('§6Сделайте деревянную кирку')
-      .description('Чтобы пойти в шахту, нужна кирка. Сделайте ее на верстаке в ближайшей деревне!')
+      .description('Следуя компасу, доберитесь до верстака и сделайте деревянную кирку!')
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
       .place(crafting)
 
@@ -151,7 +151,7 @@ class Learning {
       .place(crafting)
 
     q.counter((i, end) => `§6Добыто железной руды: §f${i}/${end}`, 5)
-      .description('Отправляйтесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
+      .description('Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
       .activate(ctx => {
         // Force iron ore generation
         ctx.subscribe(OrePlace, ({ player, isDeepslate }) => {

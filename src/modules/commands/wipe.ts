@@ -3,6 +3,7 @@ import { Airdrop, Compass, Join, prompt } from 'lib'
 import { Quest } from 'lib/quest'
 import { Anarchy } from 'modules/places/anarchy'
 import { Spawn } from 'modules/places/spawn'
+import { updateBuilderStatus } from 'modules/world-edit/builder'
 
 new Command('wipe')
   .setDescription('Очищает все данные (для тестов)')
@@ -14,6 +15,7 @@ new Command('wipe')
       '§cДа',
       () => {
         ctx.player.setGameMode(GameMode.survival)
+        updateBuilderStatus(ctx.player)
 
         delete ctx.player.database.survival.bn
         delete ctx.player.database.survival.rtpElytra
@@ -24,13 +26,13 @@ new Command('wipe')
         Compass.setFor(ctx.player, undefined)
         Airdrop.instances.filter(a => a.for === ctx.player.id).forEach(a => a.delete())
 
+        delete ctx.player.database.survival.anarchy
+        Anarchy.inventoryStore.remove(ctx.player.id)
+        Spawn.loadInventory(ctx.player)
+        Spawn.portal?.teleport(ctx.player)
+
         system.runTimeout(
           () => {
-            delete ctx.player.database.survival.anarchy
-            ctx.player.database.inv = 'anarchy'
-            Anarchy.inventoryStore.remove(ctx.player.id)
-            Spawn.switchInventory(ctx.player)
-            Spawn.portal?.teleport(ctx.player)
             Join.emitFirstJoin(ctx.player)
           },
           'clear',
