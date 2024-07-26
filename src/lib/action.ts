@@ -1,4 +1,3 @@
- 
 import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard } from 'lib/region/index'

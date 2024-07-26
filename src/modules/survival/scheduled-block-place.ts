@@ -16,6 +16,8 @@ export const SHEDULED_DB = table<ScheduledBlockPlace[]>('ScheduledBlockPlace', (
   ScheduledBlockPlace[]
 >
 
+// TODO Меню с кол-вом отложенных блоков
+// TODO Кнопка "поставить все отложенные блоки"
 export function scheduleBlockPlace({
   dimension,
   restoreTime,
@@ -49,6 +51,9 @@ function timeout() {
           }
 
           const time = util.benchmark('dimension', 'sc')
+
+          // The direction is reversed because we are mutating
+          // the array that we are iterating thro
           for (let i = schedules.length - 1; i >= 0; i--) {
             const schedule = schedules[i]
             if (typeof schedule === 'undefined') {
@@ -89,8 +94,8 @@ function timeout() {
               )
             } catch (e) {
               if (e instanceof LocationInUnloadedChunkError) {
-                continue
                 yield
+                continue
               }
               console.error(e)
             }

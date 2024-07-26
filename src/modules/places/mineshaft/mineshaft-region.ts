@@ -18,15 +18,21 @@ export class MineshaftRegion extends RadiusRegionWithStructure {
   }
 
   protected onCreate(): void {
+    let oresFound = 0
     this.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
         const block = dimension.getBlock(vector)
         const ore = block && ores.getOre(block.typeId)
-        if (ore) block.setType(ore.empty)
+        if (ore) {
+          block.setType(ore.empty)
+          oresFound++
+        }
       }
     })
 
     this.saveStructure()
+
+    console.log('Created new mineshaft region. Ores found:', oresFound)
   }
 }
 

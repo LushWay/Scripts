@@ -3,6 +3,7 @@ import { actionGuard, isNotPlaying, ms } from 'lib'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { ores, placeOre } from './algo'
 import { MineshaftRegion } from './mineshaft-region'
+// TODO Если в регионе шахты не остается ни одного отлложенно-поставленного блока, регион шахты должен загрузить сохраненную структуру
 
 actionGuard((player, region, ctx) => {
   if (isNotPlaying(player)) return
