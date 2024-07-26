@@ -7,7 +7,18 @@ import { PlayerNameTagModifiers } from 'modules/indicator/playerNameTag'
 const prefix = 'newbie'
 const property = PlayerProperties['lw:newbie']
 
-export function askForExitingNewbieMode(player: Player, reason: Text, callback: VoidFunction, back: VoidFunction) {
+export function isNewbie(player: Player) {
+  return !!player.database.survival.newbie
+}
+
+export function askForExitingNewbieMode(
+  player: Player,
+  reason: Text,
+  callback: VoidFunction,
+  back: VoidFunction = () => player.success('Успешно отменено'),
+) {
+  if (!isNewbie(player)) return callback()
+
   prompt(
     player,
     'Если вы совершите это действие, вы потеряете статус новичка:\n - Другие игроки смогут наносить вам урон\n - Другие игроки смогут забирать ваш лут после смерти',
@@ -22,6 +33,8 @@ export function askForExitingNewbieMode(player: Player, reason: Text, callback: 
 }
 
 export function exitNewbieMode(player: Player, reason: Text) {
+  if (!isNewbie(player)) return
+
   player.warn(t.warn`Вы ${reason}, поэтому вышли из режима новичка.`)
   delete player.database.survival.newbie
   player.setProperty(property, false)
