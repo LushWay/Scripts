@@ -34,7 +34,9 @@ export abstract class RadiusRegionWithStructure extends RadiusRegion {
 
     return this.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
-        const structureSavedBlock = structure.getBlockPermutation(Vector.subtract(edges[0], vector))
+        const structureSavedBlock = structure.getBlockPermutation(
+          Vector.multiply(Vector.subtract(edges[1], vector), -1),
+        )
         callback(vector, structureSavedBlock, dimension)
       }
     })
