@@ -2,8 +2,6 @@ import { Player, system } from '@minecraft/server'
 import { InventoryStore } from 'lib/database/inventory'
 import { CURRENT_BUILDERS, isBuilding } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
-import { getRoleAndName } from 'lib/roles'
-import { PlayerNameTagModifiers } from 'modules/indicator/playerNameTag'
 
 const builderInventory = new InventoryStore('build')
 
@@ -15,7 +13,7 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
 system.runPlayerInterval(updateBuilderStatus, 'builder list update', 10)
 
 // Insert role value right after name
-PlayerNameTagModifiers.push(p => isBuilding(p) && `\n${getRoleAndName(p.id, { name: false })}`)
+// PlayerNameTagModifiers.push(p => isBuilding(p) && `\n${getFullname(p.id, { name: false })}`)
 
 export function updateBuilderStatus(player: Player) {
   const isBuilder = isBuilding(player, true)

@@ -88,7 +88,7 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
 function addTargetToScoreboardMenu(player: Player, objective: ScoreboardObjective) {
   const self = () => addTargetToScoreboardMenu(player, objective)
 
-  selectPlayer(player, self).then(e => editPlayerScore(player, objective, e.id, e.name, self))
+  selectPlayer(player, 'добавить его в таблицу', self).then(e => editPlayerScore(player, objective, e.id, e.name, self))
 }
 
 function editPlayerScore(

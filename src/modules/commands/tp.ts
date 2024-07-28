@@ -1,6 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
-import { ActionForm, Vector, getRoleAndName, util } from 'lib'
+import { ActionForm, Vector } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
+import { getFullname } from 'lib/get-fullname'
 import { ngettext } from 'lib/text'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
@@ -61,7 +62,7 @@ function tpToPlayer(player: Player) {
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    form.addButton(getRoleAndName(p), () => player.teleport(p.location))
+    form.addButton(getFullname(p), () => player.teleport(p.location))
   }
 
   form.show(player)

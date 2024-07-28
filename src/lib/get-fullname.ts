@@ -1,0 +1,72 @@
+import { Player } from '@minecraft/server'
+import { Clan } from './clan/clan'
+import { getRole, ROLES } from './roles'
+
+/**
+ * Gets displayable the role of this player
+ *
+ * @example
+ *   getDisplayRole(player.id) === '§aРуководство §r§fXilLeR228§r'
+ *
+ * @example
+ *   getDisplayRole(player.id, { name: false }) === '§aРуководство§r'
+ *
+ * @param playerID - Player or his id to get role from
+ * @param o - Options
+ * @param o.role - Whenther to include role or not. Default is `true`
+ * @param o.name - Whenether to include player name or not. Default is `true`
+ * @param o.noName - Name to display if no name was found. Default is `'Unknown'`
+ * @param o.nameColor - String used between role and name. Default is `'§r§f'`
+ * @param o.clearColorAfter - Whenether to add §r at the end of the string or not
+ * @param o.nameSpacing - Add spacing after role. Defaults to !!name
+ */
+
+export function getFullname(
+  playerID: Player | string,
+  {
+    role: useRole = true,
+    clan: useClan = true,
+    name = true,
+    noName = 'Unknown',
+    nameColor = '§r§f',
+    clearColorAfter = true,
+  }: {
+    clan?: boolean
+    role?: boolean
+    name?: boolean
+    noName?: string
+    nameColor?: string
+    clearColorAfter?: boolean
+  } = {},
+) {
+  const id = playerID instanceof Player ? playerID.id : playerID
+  const db = Player.database[id]
+  let result = ''
+  const add = (text: string) => (result += result ? ' ' + text : text)
+
+  if (useRole) {
+    if (db.survival.newbie) add('§bНовичок')
+
+    const role = getRole(playerID)
+    if (role !== 'member') add(ROLES[role])
+  }
+
+  if (useClan) {
+    const clan = Clan.getPlayerClan(id)
+    if (clan) add('§r§7[' + clan.db.shortname + ']§f')
+  }
+
+  if (name) {
+    result += nameColor
+    if (playerID instanceof Player) {
+      add(playerID.name)
+    } else {
+      const name = Player.name(playerID)
+      add(name ? name : noName)
+    }
+  }
+
+  if (clearColorAfter) result += '§r'
+
+  return result
+}

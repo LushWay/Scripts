@@ -1,8 +1,9 @@
 import { world } from '@minecraft/server'
-import { Cooldown, Settings, getRoleAndName } from 'lib'
+import { Cooldown, Settings } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
+import { getFullname } from 'lib/get-fullname'
 
 class ChatBuilder {
   db = table<string>('chatCooldown')
@@ -71,14 +72,14 @@ class ChatBuilder {
         // Outranged players
         const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
         const messageText = event.message.replace(/\\n/g, '\n')
-        const message = `${getRoleAndName(event.sender, { nameColor: '§7' })}§r: ${messageText}`
+        const message = `${getFullname(event.sender, { nameColor: '§7' })}§r: ${messageText}`
 
         if (__SERVER__) {
           // This is handled/parsed by ServerCore
           // Dont really want to do request each time here
           sendPacketToStdout('chatMessage', {
             name: event.sender.name,
-            role: getRoleAndName(event.sender, { name: false }),
+            role: getFullname(event.sender, { name: false }),
             print: message,
             message: messageText,
           })
@@ -90,13 +91,13 @@ class ChatBuilder {
         }
 
         for (const outranged of otherPlayers) {
-          outranged.tell(`${getRoleAndName(event.sender, { nameColor: '§8' })}§7: ${messageText}`)
+          outranged.tell(`${getFullname(event.sender, { nameColor: '§8' })}§7: ${messageText}`)
         }
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages
         event.sender.tell(
           doHightlight
-            ? `${getRoleAndName(event.sender, { name: false, nameSpacing: true })}§6§lЯ§r: §f${messageText}`
+            ? `${getFullname(event.sender, { name: false, nameSpacing: true })}§6§lЯ§r: §f${messageText}`
             : message,
         )
       } catch (error) {

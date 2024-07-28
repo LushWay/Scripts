@@ -1,7 +1,6 @@
 import { Player } from '@minecraft/server'
 
 import { Rewards } from 'lib/shop/rewards'
-import { util } from 'lib/util'
 import { table } from './database/abstract'
 import { t } from './text'
 
@@ -43,6 +42,7 @@ export class Mail {
    * @param {Rewards} rewards The attached rewards
    */
   static send(playerId: string, title: string, content: string, rewards: Rewards) {
+    Mail.inform(playerId, title)
     this.dbPlayers[playerId].push({
       read: false,
       title,
@@ -50,6 +50,11 @@ export class Mail {
       rewards: rewards.serialize(),
       rewardsClaimed: false,
     })
+  }
+
+  private static inform(playerId: string, title: string) {
+    const player = Player.getById(playerId)
+    if (player) player.info(t`${t.header`Почта`}: ${title}, просмотреть: .mail`)
   }
 
   /**
@@ -76,6 +81,7 @@ export class Mail {
     }
 
     for (const playerId of playerIds) {
+      Mail.inform(playerId, title)
       this.dbPlayers[playerId].push({
         read: false,
         rewardsClaimed: false,

@@ -91,6 +91,7 @@ function getPlayersForSelectMenu(offline = true) {
 
 export function selectPlayer(
   player: Player,
+  reason: string,
   back?: VoidFunction,
 ): Promise<{ id: string; name: string; player?: Player }> {
   return new Promise(resolve => {
@@ -104,7 +105,7 @@ export function selectPlayer(
       players.push({ online: !!player, name, id, player })
     }
 
-    new ArrayForm('§3Выберите игрока', players)
+    new ArrayForm('§3Выберите игрока чтобы §f' + reason, players)
       .filters({
         sort: {
           name: 'Сортировать по',
@@ -115,11 +116,11 @@ export function selectPlayer(
         },
       })
       .sort((players, filters) => {
-        if (filters.sort === 'online') return players.sort((a, b) => (!a.online && b.online ? -1 : a.online ? 0 : 1))
+        if (filters.sort === 'online') return players.sort((a, b) => (!a.online && b.online ? 1 : a.online ? 0 : -1))
         return players
       })
-      .button(({ id, name }) => {
-        return [name, () => resolve({ id, name })]
+      .button(({ id, name, online }) => {
+        return [(online ? '§f' : '§8') + name, () => resolve({ id, name })]
       })
       .back(back)
       .show(player)

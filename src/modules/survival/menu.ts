@@ -1,4 +1,5 @@
 import { ActionForm, FormCallback } from 'lib'
+import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
@@ -39,12 +40,13 @@ Menu.open = player => {
       questsMenu(player, back),
     )
 
-  if (player.database.inv === 'anarchy')
-    form
-      .addButton('База', 'textures/blocks/barrel_side', () =>
-        openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
-      )
-      .addButton('§6Кланы\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
+  if (player.database.inv === 'anarchy') {
+    form.addButton('База', 'textures/blocks/barrel_side', () =>
+      openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
+    )
+    const [clanText, clan] = clanMenu(player, back)
+    form.addButton(clanText, 'textures/ui/permissions_op_crown', clan)
+  }
 
   form
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)

@@ -1,10 +1,10 @@
 import { Player, system, world } from '@minecraft/server'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { EventSignal } from 'lib/event-signal'
-import { getRoleAndName } from 'lib/roles'
 import { Settings } from 'lib/settings'
 import { t } from 'lib/text'
 import { util } from 'lib/util'
+import { getFullname } from './get-fullname'
 
 class JoinBuilder {
   config = {
@@ -113,10 +113,10 @@ class JoinBuilder {
     __SERVER__ &&
       sendPacketToStdout('joinOrLeave', {
         name: player.name,
-        role: getRoleAndName(player, { name: false }),
+        role: getFullname(player, { name: false }),
         status: 'move',
         where,
-        print: t`[${player.name}][${getRoleAndName(player, { name: false })}]: ${message}`,
+        print: t`[${player.name}][${getFullname(player, { name: false })}]: ${message}`,
       })
 
     for (const other of world.getPlayers()) {
