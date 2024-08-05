@@ -7,7 +7,7 @@ import { Player } from '@minecraft/server'
 import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest'
 import { setRole } from './roles'
 import './text'
-import { ngettext, t, textTable } from './text'
+import { t, textTable } from './text'
 
 let player: Player
 beforeEach(() => {
@@ -78,17 +78,6 @@ describe('text', () => {
 
   it('should stringify in error mode with nested options', () => {
     expect(t.error)
-  })
-
-  it('should stringify num with plurals', () => {
-    const n = 10
-
-    const text = ngettext(n, ['блок', 'блока', 'блоков'])
-    expect(`§7Было сломано §6${n} §7${text}`).toMatchInlineSnapshot(`"§7Было сломано §610 §7блоков"`)
-
-    expect(t.num`Было сломано ${n} ${['блок', 'блока', 'блоков']}`).toMatchInlineSnapshot(
-      `"§7Было сломано §610§7 блоков§7"`,
-    )
   })
 
   it('should work with time', () => {

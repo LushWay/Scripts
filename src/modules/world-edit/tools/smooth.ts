@@ -3,7 +3,7 @@ import { Block, BlockPermutation, Player, system, world } from '@minecraft/serve
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, util, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
-import { ngettext } from 'lib/text'
+import { ngettext } from 'lib/utils/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { BlocksSetRef, getAllBlocksSets, SHARED_POSTFIX } from 'modules/world-edit/utils/blocks-set'
 import { BaseBrushTool } from '../lib/base-brush-tool'
