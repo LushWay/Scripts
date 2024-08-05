@@ -73,13 +73,14 @@ class ChatBuilder {
         const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
         const messageText = event.message.replace(/\\n/g, '\n')
         const message = `${getFullname(event.sender, { nameColor: '§7' })}§r: ${messageText}`
+        const fullrole = getFullname(event.sender, { name: false })
 
         if (__SERVER__) {
           // This is handled/parsed by ServerCore
           // Dont really want to do request each time here
           sendPacketToStdout('chatMessage', {
             name: event.sender.name,
-            role: getFullname(event.sender, { name: false }),
+            role: fullrole,
             print: message,
             message: messageText,
           })
@@ -95,11 +96,7 @@ class ChatBuilder {
         }
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages
-        event.sender.tell(
-          doHightlight
-            ? `${getFullname(event.sender, { name: false, nameSpacing: true })}§6§lЯ§r: §f${messageText}`
-            : message,
-        )
+        event.sender.tell(doHightlight ? `${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message)
       } catch (error) {
         console.error(error)
       }
