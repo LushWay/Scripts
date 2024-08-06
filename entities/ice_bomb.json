@@ -2,7 +2,7 @@
   "format_version": "1.10.0",
   "minecraft:entity": {
     "description": {
-      "identifier": "sm:ice_bomb",
+      "identifier": "lw:ice_bomb",
       "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false
@@ -17,7 +17,7 @@
           "definition_event": {
             "affect_projectile": true,
             "event_trigger": {
-              "event": "sm:explode",
+              "event": "lw:explode",
               "target": "self"
             }
           },
@@ -42,9 +42,9 @@
       }
     },
     "events": {
-      "sm:explode": {
+      "lw:explode": {
         "add": {
-          "component_groups": ["sm:exploding"]
+          "component_groups": ["lw:exploding"]
         }
       }
     }

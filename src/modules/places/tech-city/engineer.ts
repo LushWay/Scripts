@@ -1,22 +1,13 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { Group } from 'lib/rpg/place'
 import { Cost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { MaybeRawText, t } from 'lib/text'
+import { CannonBulletItem, CannonItem } from 'modules/features/cannon'
 import { isNewbie } from 'modules/pvp/newbie'
-import { CustomItemWithBlueprint } from '../../../lib/rpg/custom-item'
 import { BaseItem } from '../base/base'
-
-export const CannonItem = new CustomItemWithBlueprint('cannon')
-  .typeId(i.PolishedTuffWall)
-  .nameTag('Пушка')
-  .lore('Пушка заглушка, не работает пока')
-
-export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
-  .typeId(i.PolishedTuffSlab)
-  .nameTag('Снаряд для пушки')
-  .lore('Да.')
 
 export const MicroSchema = new ItemStack(MinecraftItemTypes.IronIngot).setInfo('Микросхема', 'Нужная фигня, да')
 

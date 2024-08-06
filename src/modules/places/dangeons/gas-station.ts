@@ -1,7 +1,7 @@
 import { Loot, Region, ms, registerRegionKind } from 'lib'
 import { CustomStructures } from 'lib/assets/config'
 import { DungeonRegion } from 'lib/region/kinds/dungeon'
-import { CannonBulletItem } from '../tech-city/engineer'
+import { CannonBulletItem } from 'modules/features/cannon'
 
 export class GasStationGarageRegion extends DungeonRegion {
   static kind = 'gas_station_garage'

@@ -1,8 +1,8 @@
 export enum CustomItems {
-  Menu = 'sm:menu',
-  CompassPrefix = 'sm:compass',
-  Money = 'sm:money',
-  Key = 'sm:key',
+  Menu = 'lw:menu',
+  CompassPrefix = 'lw:compass',
+  Money = 'lw:money',
+  Key = 'lw:key',
 
   WeWand = 'we:wand',
   WeBrush = 'we:brush',
@@ -13,7 +13,7 @@ export enum CustomItems {
 
 export enum CustomEntityTypes {
   Database = 'rubedo:database',
-  Sit = 'sm:sit',
+  Sit = 'lw:sit',
   FloatingText = 'f:t',
   Loot = 'lw:loot',
 }

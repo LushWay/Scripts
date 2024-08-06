@@ -92,7 +92,7 @@ export class Compass {
       if ((isMainhand && isMenu) || isOffhandMenu) {
         if (!this.forceHide.has(player)) player.setProperty('lw:minimap', true)
       } else {
-        if (isMainhand) player.setProperty('lw:minimap', false)
+        if (isMainhand && !player.isSimulated()) player.setProperty('lw:minimap', false)
         return
       }
 

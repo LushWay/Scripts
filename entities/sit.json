@@ -2,7 +2,7 @@
   "format_version": "1.17.100",
   "minecraft:entity": {
     "description": {
-      "identifier": "sm:sit",
+      "identifier": "lw:sit",
       "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false

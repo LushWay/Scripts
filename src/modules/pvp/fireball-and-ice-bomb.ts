@@ -9,7 +9,7 @@ import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 // Snow bomb / Fireball
 // world.afterEvents.itemUse.subscribe(data => {
-//   if (!['sm:ice_bomb', 'sm:fireball'].includes(data.itemStack.typeId)) return
+//   if (!['lw:ice_bomb', 'lw:fireball'].includes(data.itemStack.typeId)) return
 
 //   system.delay(() => {
 //     if (!(data.source instanceof Player)) return
@@ -28,7 +28,7 @@ import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 //   })
 // })
 
-export const FireBallItem = new ItemStack('sm:fireball').setInfo(
+export const FireBallItem = new ItemStack('lw:fireball').setInfo(
   '§4Огненный шар\n§7(use)',
   'Используйте, чтобы отправить все в огненный ад',
 )
@@ -40,7 +40,7 @@ export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
     if (!event.entity.isValid()) return
-    if (event.entity.typeId !== 'sm:fireball') {
+    if (event.entity.typeId !== 'lw:fireball') {
       return system.delay(() => {
         try {
           event.entity.remove()
@@ -59,7 +59,7 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
     })
   },
   {
-    eventTypes: ['sm:explode'],
+    eventTypes: ['lw:explode'],
   },
 )
 

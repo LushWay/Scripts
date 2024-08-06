@@ -1,10 +1,10 @@
 import { Entity, Player, system } from '@minecraft/server'
-import { isBuilding } from 'lib'
-import { getFullname } from 'lib/get-fullname'
+// import { isBuilding } from 'lib'
+// import { getFullname } from 'lib/get-fullname'
 
 export const PlayerNameTagModifiers: ((player: Player) => string | false)[] = [
   player => player.name,
-  player => '\n' + getFullname(player, { role: isBuilding(player), name: false }),
+  // player => '\n' + getFullname(player, { role: isBuilding(player), name: false }),
 ]
 
 system.runPlayerInterval(player => setNameTag(player, ''), 'player.nameTag modifiers', 40)

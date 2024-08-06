@@ -11,12 +11,12 @@ world.beforeEvents.itemUse.subscribe(data => {
   system.delay(() => {
     if (!(data.source instanceof Player)) return
 
-    const tnt = data.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, data.source.location)
     const tntSlot = data.source.mainhand()
 
     if (tntSlot.amount === 1) tntSlot.setItem(undefined)
     else tntSlot.amount--
 
+    const tnt = data.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, data.source.location)
     tnt.applyImpulse(data.source.getViewDirection())
     data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
   })

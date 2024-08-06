@@ -2,7 +2,7 @@
   "format_version": "1.18.0",
   "minecraft:item": {
     "description": {
-      "identifier": "sm:compass13"
+      "identifier": "lw:compass13"
     },
     "components": {
       "minecraft:max_stack_size": 1,
@@ -16,7 +16,7 @@
       },
       "minecraft:cooldown": {
         "duration": 0.5,
-        "category": "sm:compass"
+        "category": "lw:compass"
       },
       "minecraft:creative_category": {
         "category": "commands"

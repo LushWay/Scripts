@@ -2,7 +2,7 @@
   "format_version": "1.16.100",
   "minecraft:item": {
     "description": {
-      "identifier": "sm:fireball"
+      "identifier": "lw:fireball"
     },
     "components": {
       "minecraft:max_stack_size": 16,
@@ -29,7 +29,7 @@
     "events": {
       "throw": {
         "shoot": {
-          "projectile": "sm:fireball",
+          "projectile": "lw:fireball",
           "launch_power": 0.4,
           "angle_offset": 1
         },

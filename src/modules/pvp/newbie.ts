@@ -87,6 +87,8 @@ new Command('newbie')
   .setPermissions('techAdmin')
   .setDescription('Вводит в режим новчика')
   .executes(ctx => {
-    enterNewbieMode(ctx.player)
+    if (isNewbie(ctx.player)) {
+      exitNewbieMode(ctx.player, 'ds htib')
+    } else enterNewbieMode(ctx.player)
     ctx.reply('Успешно')
   })

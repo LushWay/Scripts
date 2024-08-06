@@ -8,7 +8,7 @@
       "is_experimental": false
     },
     "component_groups": {
-      "sm:exploding": {
+      "lw:exploding": {
         "minecraft:explode": {
           "fuse_length": 0,
           "fuse_lit": true,
@@ -32,9 +32,9 @@
       }
     },
     "events": {
-      "sm:explode": {
+      "lw:explode": {
         "add": {
-          "component_groups": ["sm:exploding"]
+          "component_groups": ["lw:exploding"]
         }
       }
     }

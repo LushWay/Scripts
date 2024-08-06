@@ -3,7 +3,8 @@ import { Boss, Loot, ms } from 'lib'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { Stoner } from '../lib/npc/stoner'
-import { CannonBulletItem, CannonItem, Engineer, MicroSchema } from './engineer'
+import { CannonBulletItem, CannonItem } from 'modules/features/cannon'
+import { Engineer, MicroSchema } from './engineer'
 
 class TechCityBuilder extends City {
   constructor() {
