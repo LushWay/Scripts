@@ -1,6 +1,6 @@
 export declare namespace ServerRpc {
   interface Routes {
-    ping: { req: unknown; res: { status: number } }
+    ping: { req: undefined; res: { status: number } }
     playerPlatform: {
       req: { playerName: string }
       res: { platform: 'win10' | 'android' | 'console' }
@@ -9,12 +9,9 @@ export declare namespace ServerRpc {
       req: { name: string }
       res: { statusMessage: string }
     }
-    reload: {
-      req: { status: number }
-      res: { status: number }
-    }
-    command: { req: { command: string }; res: unknown }
-    say: { req: { message: string }; res: unknown }
+    reload: { req: undefined; res: undefined }
+    command: { req: { command: string }; res: undefined }
+    say: { req: { message: string }; res: undefined }
   }
 
   interface StdoutPackets {

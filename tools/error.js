@@ -1,16 +1,19 @@
 /**
  * Gets common node error properties
  *
- * @param {unknown} error
+ * @param {unknown} e
  */
-export function error(error) {
-  const code = error && typeof error === 'object' && 'code' in error && typeof error.code === 'string' && error.code
+export function error(e) {
+  const code = e && typeof e === 'object' && 'code' in e && typeof e.code === 'string' && e.code
 
   return {
     code() {
       return code
     },
-    /** @param {'EACESS' | 'ENOENT' | 'EEXIST'} type */
+    cause() {
+      return e && e instanceof Error && e.cause ? error(e.cause) : error({})
+    },
+    /** @param {'EACESS' | 'ENOENT' | 'EEXIST' | 'ECONNREFUSED'} type */
     is(type) {
       return code === type
     },
