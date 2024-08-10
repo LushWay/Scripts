@@ -19,6 +19,7 @@ world.afterEvents.entityDie.subscribe(event => {
 
     if (playerContainer?.emptySlotsCount === playerContainer?.size && settings.noInvMessage) {
       event.deadEntity.warn('Вы умерли без вещей!')
+      if (event.deadEntity.isSimulated()) return
     }
 
     const { dimension, id: playerId, location, name } = event.deadEntity
