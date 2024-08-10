@@ -31,7 +31,7 @@ export declare namespace ArrayForm {
 }
 
 export class ArrayForm<
-  T,
+  const T,
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
@@ -43,7 +43,7 @@ export class ArrayForm<
 
   constructor(
     private title: Text,
-    private array: readonly T[],
+    private array: T[],
   ) {}
 
   description(text: Text) {
@@ -216,7 +216,7 @@ export class ArrayForm<
     } else return this.array
   }
 
-  private addButtons(array: readonly T[], form: ActionForm, filters: F) {
+  private addButtons(array: T[], form: ActionForm, filters: F) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     for (const item of array) {
       const button = this.config.button(item, filters, form)

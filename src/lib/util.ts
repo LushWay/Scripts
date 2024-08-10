@@ -54,7 +54,7 @@ export const util = {
    * @param minLength - Minimal items count to paginate. If array has less then this count, array is returned. Default
    *   is `perPage`
    */
-  paginate<T>(array: readonly T[], perPage = 10, startPage = 1, minLength: number = perPage) {
+  paginate<const T>(array: T[], perPage = 10, startPage = 1, minLength: number = perPage) {
     if (array.length <= minLength) return { array, canGoNext: false, canGoBack: false, maxPages: 1, page: 1 }
 
     const maxPages = Math.ceil(array.length / perPage)
