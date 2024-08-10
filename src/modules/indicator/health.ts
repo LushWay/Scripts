@@ -129,7 +129,7 @@ class HealthIndicator {
     return this.fillBar(full, current, damage)
   }
 
-  private barSymbol = '|'
+  private barSymbol = '▌'
 
   private fillBar(full: number, current: number, damage: number) {
     let bar = ''
