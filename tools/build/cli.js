@@ -88,8 +88,9 @@ export function buildCommand({ test, dev, world, port, vitest, outfile, entry },
     legalComments: 'none',
     define: generateDefine({ dev, test, world, port, vitest }),
     metafile: true,
-
+    ...options,
     plugins: [
+      ...(options.plugins ?? []),
       {
         name: 'start/stop',
         setup(build) {
@@ -97,6 +98,8 @@ export function buildCommand({ test, dev, world, port, vitest, outfile, entry },
           build.onEnd(result => {
             const mode = dev ? 'development' : test ? 'test' : 'production'
             const time = `in ${Date.now() - start}ms`
+
+            if (result.errors.length) return logger.error('Unable to build for', mode, time)
 
             let changed = ''
             if (oldmeta) {
@@ -123,7 +126,6 @@ export function buildCommand({ test, dev, world, port, vitest, outfile, entry },
         },
       },
     ],
-    ...options,
     entryPoints: entry ? [entry] : options.entryPoints,
   }
 
