@@ -34,12 +34,6 @@ help
     ctx.reply(`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
   })
 
-/**
- * @param {Player} player
- * @param {string} commandName
- * @returns
- */
-
 function helpForCommand(player: Player, commandName: string) {
   const cmd = Command.commands.find(e => e.sys.name == commandName || e.sys.aliases.includes(commandName))
 
@@ -48,23 +42,19 @@ function helpForCommand(player: Player, commandName: string) {
   if (!cmd.sys.requires(player)) return commandNoPermissions(player, cmd)
 
   const d = cmd.sys
-  const aliases = d.aliases.length > 0 ? '§7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
-  const str = `   §fКоманда §6-${d.name} ${aliases}`
+  const aliases = d.aliases.length > 0 ? ' §7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
+  const overview = `   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
 
-  // ctx.reply(`§7§ы┌──`);
   player.tell(' ')
-  player.tell(str)
+  player.tell(overview)
   player.tell(' ')
 
-  let l = str.length
-
-  for (const [command, description] of childrensToHelpText(player, cmd).map(e => getParentType(e))) {
-    const _ = `§7   §f-${command}§7§o - ${description}§r`
-    l = Math.max(l, _.length)
-    player.tell(_)
+  let child = false
+  for (const subcommand of Command.getHelp(cmd)) {
+    child = true
+    player.tell(`§7   §f.${subcommand}`)
   }
-  player.tell(' ')
-  // ctx.reply(`${new Array(l).join(" ")}§7§ы──┘`);
+  if (child) player.tell(' ')
   return
 }
 
@@ -76,42 +66,6 @@ new CmdLet('help').setDescription('Выводит справку о команд
   return 'stop'
 })
 
-function childrensToHelpText(player: Player, command: Command): Command[] {
-  const childrens = []
-
-  for (const children of command.sys.children.filter(e => e.sys.requires(player))) {
-    if (children.sys.children.length < 1) childrens.push(children)
-    else childrens.push(...childrensToHelpText(player, children))
-  }
-  return childrens
-}
-
-function getParentType(command: Command, init = true): [string, undefined | string] {
-  const curtype = getType(command)
-
-  let description
-
-  if (init && command.sys.description) {
-    description = command.sys.description
-    init = false
-  }
-
-  if (command.sys.depth === 0 || !command.sys.parent) return [curtype, description]
-  else {
-    const parents = getParentType(command.sys.parent, init)
-    return [`${parents[0]}§f ${curtype}`, description ?? parents[1] ?? '<нет описания>']
-  }
-}
-
-function getType(o: Command) {
-  const t = o.sys.type
-  const q = t.optional
-
-  if (t.typeName === 'literal') return `${q ? '§7' : '§f'}${t.name}`
-  return q ? `§7[${t.name}: §7${t.typeName}§7]` : `§6<${t.name}: §6${t.typeName}§6>`
-}
-
 const colors: Record<Role, string> = Object.fromEntries(
-  Object.entriesStringKeys(ROLES).map(e => [e[0], e[1][0] + e[1][1]]),
+  Object.entriesStringKeys(ROLES).map(([role, display]) => [role, display.slice(0, 2)]),
 )
-colors.member = '§2'

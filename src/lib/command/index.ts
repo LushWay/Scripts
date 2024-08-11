@@ -157,6 +157,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     this.sys.name = name
 
     if (type) this.sys.type = type
+    else this.sys.type.name = name
+
     if (parent) this.sys.parent = parent
 
     if (depth === 0) Command.commands.push(this)
@@ -284,7 +286,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @returns New branch to this command
    */
   string<T extends boolean = false>(name: string, optional: T = false as T) {
-    return this.argument(new StringArgumentType(name, optional))
+    return this.argument(new StringArgumentType<T>(name, optional))
   }
 
   /**
@@ -294,7 +296,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @returns New branch to this command
    */
   int<T extends boolean = false>(name: string, optional: T = false as T) {
-    return this.argument(new IntegerArgumentType(name, optional))
+    return this.argument(new IntegerArgumentType<T>(name, optional))
   }
 
   /**
@@ -304,12 +306,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param types
    * @returns New branch to this command
    */
-  array<T extends readonly string[], B extends boolean = false>(
-    name: string,
-    types: T,
-    optional: B = false as B,
-  ): ArgReturn<Callback, T[number], B> {
-    return this.argument(new ArrayArgumentType(name, types, optional))
+  array<const T extends string[], B extends boolean = false>(name: string, types: T, optional: B = false as B) {
+    return this.argument(new ArrayArgumentType<T, B>(name, types, optional))
   }
 
   /**
@@ -319,7 +317,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @returns New branch to this command
    */
   boolean<T extends boolean = false>(name: string, optional: T = false as T) {
-    return this.argument(new BooleanArgumentType(name, optional))
+    return this.argument(new BooleanArgumentType<T>(name, optional))
   }
 
   /**
@@ -365,6 +363,17 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   executes(callback: Callback): Command<Callback> {
     this.sys.callback = callback
     return this
+  }
+
+  static getHelp(command: Command, description?: string): string[] {
+    const type = command.sys.type.toString()
+    const base = command.sys.callback ? [`${type}${description ? `§7§o - ${description}` : ''}`] : []
+    return base.concat(
+      command.sys.children
+        .map(e => this.getHelp(e, command.sys.description))
+        .flat()
+        .map(e => type + ' ' + e),
+    )
   }
 }
 

@@ -1,6 +1,6 @@
-export interface IArgumentType<T extends boolean = false> {
+export abstract class IArgumentType<T extends boolean = false> {
   /** The return type */
-  type: unknown
+  abstract type: unknown
 
   /**
    * The name that the help for this command will see
@@ -17,26 +17,34 @@ export interface IArgumentType<T extends boolean = false> {
    * @example
    *   number
    */
-  typeName: string
+  abstract typeName: string
 
   /** The name this argument is */
-  name: string
+  abstract name: string
 
   /** Argument optionality */
-  optional: T
+  abstract optional: T
 
   /** Checks if a value matches this argument type, also returns the corridsponding type */
-  matches(value: string): {
+  abstract matches(value: string): {
     success: boolean
     value?: unknown
   }
+
+  toString() {
+    const { name, typeName, optional } = this
+    console.log('AAAA')
+    return optional ? `§7[${name}§r§7: ${typeName}§7]` : `§6<${name}§r§6: ${typeName}§6>`
+  }
 }
 
-export class LiteralArgumentType<T extends boolean = false> implements IArgumentType<T> {
+export class LiteralArgumentType<T extends boolean = false> extends IArgumentType<T> {
   constructor(
     public name = 'literal',
     public optional: T = false as T,
-  ) {}
+  ) {
+    super()
+  }
 
   type = null
 
@@ -47,13 +55,19 @@ export class LiteralArgumentType<T extends boolean = false> implements IArgument
       success: this.name === value,
     }
   }
+
+  toString(): string {
+    return `${this.optional ? '§7' : '§f'}${this.name}`
+  }
 }
 
-export class StringArgumentType<T extends boolean = false> implements IArgumentType<T> {
+export class StringArgumentType<T extends boolean = false> extends IArgumentType<T> {
   constructor(
     public name = 'string',
     public optional: T = false as T,
-  ) {}
+  ) {
+    super()
+  }
 
   type = 'string'
 
@@ -67,11 +81,13 @@ export class StringArgumentType<T extends boolean = false> implements IArgumentT
   }
 }
 
-export class IntegerArgumentType<T extends boolean = false> implements IArgumentType<T> {
+export class IntegerArgumentType<T extends boolean = false> extends IArgumentType<T> {
   constructor(
     public name = 'integer',
     public optional: T = false as T,
-  ) {}
+  ) {
+    super()
+  }
 
   type = 1
 
@@ -86,11 +102,13 @@ export class IntegerArgumentType<T extends boolean = false> implements IArgument
   }
 }
 
-export class LocationArgumentType<T extends boolean = false> implements IArgumentType<T> {
+export class LocationArgumentType<T extends boolean = false> extends IArgumentType<T> {
   constructor(
     public name = 'location',
     public optional: T = false as T,
-  ) {}
+  ) {
+    super()
+  }
 
   type = { x: 0, y: 0, z: 0 } as Vector3
 
@@ -106,11 +124,13 @@ export class LocationArgumentType<T extends boolean = false> implements IArgumen
   }
 }
 
-export class BooleanArgumentType<T extends boolean = false> implements IArgumentType<T> {
+export class BooleanArgumentType<T extends boolean = false> extends IArgumentType<T> {
   constructor(
     public name = 'boolean',
     public optional: T = false as T,
-  ) {}
+  ) {
+    super()
+  }
 
   type = false as boolean
 
@@ -124,12 +144,13 @@ export class BooleanArgumentType<T extends boolean = false> implements IArgument
   }
 }
 
-export class ArrayArgumentType<T extends readonly string[], B extends boolean = false> implements IArgumentType<B> {
+export class ArrayArgumentType<const T extends string[], B extends boolean = false> extends IArgumentType<B> {
   constructor(
     public name = 'array',
     public types: T,
     public optional: B = false as B,
   ) {
+    super()
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
   }
 
