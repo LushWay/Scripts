@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export abstract class IArgumentType<T extends boolean = false> {
   /** The return type */
   abstract type: unknown
@@ -33,7 +34,6 @@ export abstract class IArgumentType<T extends boolean = false> {
 
   toString() {
     const { name, typeName, optional } = this
-    console.log('AAAA')
     return optional ? `§7[${name}§r§7: ${typeName}§7]` : `§6<${name}§r§6: ${typeName}§6>`
   }
 }
