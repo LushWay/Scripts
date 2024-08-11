@@ -1,11 +1,15 @@
-import { Player } from '@minecraft/server'
+import { EnchantmentType, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { registerAsync } from '@minecraft/server-gametest'
-import { Temporary } from 'lib'
+import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Enchantments, isKeyof, Temporary } from 'lib'
 import { t } from 'lib/text'
 import { TestStructures } from 'test/constants'
 
+const players: Player[] = []
 registerAsync('test', 'damage', async test => {
   const player = test.spawnSimulatedPlayer({ x: 0, y: 1, z: 0 })
+  players.push(player)
+  armorCommand()
 
   new Temporary(({ world }) => {
     world.afterEvents.entityDie.subscribe(event => {
@@ -41,3 +45,59 @@ registerAsync('test', 'damage', async test => {
 })
   .maxTicks(999999)
   .structureName(TestStructures.empty)
+
+let exists = false
+function armorCommand() {
+  if (exists) return
+
+  exists = true
+  new Command('simarmor')
+    .setDescription('Заменяет броню у всех симулированных игроков созданных с помощью test:damage')
+    .setPermissions('techAdmin')
+    .array('type', ['Golden', 'Leather', 'Chainmail', 'Iron', 'Diamond', 'Netherite'])
+    .string('ench', true)
+    .int('level', true)
+    .executes((ctx, type, ench = MinecraftEnchantmentTypes.Protection, level = 0) => {
+      if (!isKeyof(ench, Enchantments.typed)) return ctx.error('Enchs:\n' + Object.keys(Enchantments.typed).join('\n'))
+      const levels = Enchantments.typed[ench]
+
+      const types: [EquipmentSlot, keyof typeof MinecraftItemTypes][] = [
+        [EquipmentSlot.Head, `${type}Helmet`],
+        [EquipmentSlot.Chest, `${type}Chestplate`],
+        [EquipmentSlot.Legs, `${type}Leggings`],
+        [EquipmentSlot.Feet, `${type}Boots`],
+      ]
+      let items: [EquipmentSlot, ItemStack][] = []
+
+      const enchs = levels[level]
+      if (typeof enchs === 'undefined') {
+        if (level <= 4 && level >= 0) {
+          items = types.map(([slot, typeId]) => {
+            const item = new ItemStack(MinecraftItemTypes[typeId])
+
+            if (level) {
+              const { enchantable } = item
+              if (!enchantable) return [slot, item]
+
+              enchantable.addEnchantment({ type: new EnchantmentType(ench), level })
+            }
+            return [slot, item]
+          })
+        } else return ctx.error('Levels:\n' + Object.keys(ench).concat(['0', '1', '2', '3', '4']).join('\n'))
+      } else {
+        items = types.map(([slot, typeId]) => [slot, enchs[MinecraftItemTypes[typeId]]])
+      }
+
+      for (const player of players) {
+        if (!player.isValid()) continue
+
+        const equippable = player.getComponent('equippable')
+        if (!equippable) continue
+
+        for (const [slot, item] of items) {
+          if (typeof item === 'undefined') return ctx.error(`No item for slot ${slot}!`)
+          equippable.setEquipment(slot, item)
+        }
+      }
+    })
+}

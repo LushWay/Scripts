@@ -1,57 +1,69 @@
-import { Enchantment, world } from '@minecraft/server'
-import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
+import { ItemStack, world } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { EventLoader } from 'lib/event-signal'
+import { EnchantmentMetadata } from './assets/enchantments'
 import { Core } from './extensions/core'
 
 const location = { x: 0, y: -10, z: 0 }
 const dimension = world.overworld
 
 export const Enchantments = {
-  custom: {} as Record<string, Record<number, Enchantment>>,
-
-  typed: {} as Record<MinecraftEnchantmentTypes, Record<number, Enchantment>>,
-
+  custom: {} as Record<string, Record<number, Record<string, ItemStack>>>,
+  typed: {} as Record<MinecraftEnchantmentTypes, Record<number, Record<MinecraftItemTypes, ItemStack>>>,
   onLoad: new EventLoader(),
 }
 
 function load() {
-  // world.structureManager.place(CustomStructures.CustomEnchantments, dimension, location)
-  // const entities = dimension.getEntities({
-  //   type: DatabaseUtils.entityTypeId,
-  //   location: location,
-  //   maxDistance: 2,
-  // })
+  let expecting = EnchantmentMetadata.items as number
+  for (let i = 1; i <= EnchantmentMetadata.files; i++) {
+    const structure = `mystructure:generated/${i}`
+    world.structureManager.place(structure, dimension, location)
+    const block = dimension.getBlock(location)
+    const chest = block?.getComponent('inventory')
 
-  // const entity = entities[0]
+    if (!block || block.typeId !== MinecraftBlockTypes.Chest || !chest?.container)
+      return console.warn(
+        `Unable to load ${structure}, block is`,
+        block?.typeId,
+        'chest component:',
+        !!chest,
+        'container:',
+        !!chest?.container,
+      )
 
-  // if (!entity) return console.error(new Error('Unable to find CustomEnchantments entity'))
+    for (const [slot, item] of chest.container.entries()) {
+      if (expecting === 0) break
+      if (!item) {
+        console.log(`No item on slot`, slot, 'in', structure)
+        continue
+      }
 
-  // const { container } = entity
-  // if (!container) return
+      const enchants = item.enchantable
+      const ench = enchants?.getEnchantments()[0]
+      if (!enchants || !ench) {
+        console.warn(
+          'Unable to load enchants for slot',
+          slot,
+          'in',
+          structure,
+          'typeId',
+          item.typeId,
+          'enchs',
+          !!enchants,
+        )
+        continue
+      }
 
-  // for (let i = 0; i < container.size; i++) {
-  //   const item = container.getItem(i)
-  //   if (item?.typeId !== MinecraftItemTypes.EnchantedBook) break
+      ;((Enchantments.custom[ench.type.id] ??= {})[ench.level] ??= {})[item.typeId] = item
+      expecting--
+    }
+  }
 
-  //   const enchantments = item.getComponent('enchantments')
-  //   if (!enchantments?.enchantments)
-  //     return util.error(
-  //       new Error('Found unexpected enchantment type on slot ' + i + '. Enchantments: ' + util.inspect(enchantments)),
-  //     )
-
-  //   for (const enchantment of enchantments.enchantments) {
-  //     Enchantments.custom[enchantment.type.id] ??= [
-  //       new Enchantment(enchantment.type, 1),
-  //       new Enchantment(enchantment.type, 1),
-  //     ]
-
-  //     Enchantments.custom[enchantment.type.id][enchantment.level] = enchantment
-  //   }
-  // }
-
-  // entities.forEach(e => e.remove())
+  if (expecting !== 0) {
+    console.warn(`Loading enchants failed: ${EnchantmentMetadata.items - expecting}\\${EnchantmentMetadata.items}`)
+  }
   Enchantments.typed = Enchantments.custom
   EventLoader.load(Enchantments.onLoad)
 }
 
-Core.afterEvents.worldLoad.subscribe(load)
+if (!__VITEST__) Core.afterEvents.worldLoad.subscribe(load)

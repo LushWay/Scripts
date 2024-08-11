@@ -1,29 +1,46 @@
 import { world } from '@minecraft/server'
-import { MinecraftEffectTypes, MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
-import { Enchantments } from '../../lib/enchantments'
+import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
+import { Enchantments } from 'lib/enchantments'
 
 new Command('enchant')
   .setDescription('Зачаровывает предмет')
   .setPermissions('admin')
-  .array('enchantName', Object.values(MinecraftEnchantmentTypes), true)
+  .string('enchantName', true)
   .int('level')
   .executes((ctx, enchant, level) => {
-    if (!enchant) return ctx.reply(Object.values(MinecraftEnchantmentTypes).join('\n'))
-
+    if (!enchant || !(enchant in Enchantments.custom)) return ctx.reply(Object.keys(Enchantments.custom).join('\n'))
+    const ench = Enchantments.custom[enchant]
     const mainhand = ctx.player.mainhand()
-
     const item = mainhand.getItem()
+
     if (!item) return ctx.error('No item!')
+
+    const enchlevels = ench[level]
+    if (typeof enchlevels === 'undefined')
+      return ctx.error('Level unavailable. Levels:\n' + Object.keys(ench).join('\n'))
+
+    const enchitem = enchlevels[item.typeId]
+    if (typeof enchitem === 'undefined') return ctx.error('Available items:\n' + Object.keys(enchitem).join('\n'))
+
     const enchantments = item.getComponent('enchantable')
-    if (!enchantments) return ctx.error('A')
-    enchantments.removeEnchantment(enchant)
-    console.debug({ Enchantments: Enchantments.custom, enchant, level })
+    if (!enchantments) return ctx.error('Not enchantable!')
 
-    enchantments.addEnchantment(Enchantments.custom[enchant][level])
+    const newitem = enchitem.clone()
 
-    world.debug('enchants', [...enchantments.getEnchantments()])
+    newitem.enchantable?.addEnchantments(enchantments.getEnchantments().filter(e => e.type.id !== enchant))
+    newitem.nameTag = item.nameTag
+    newitem.amount = item.amount
+    if (newitem.durability && item.durability) newitem.durability.damage = item.durability.damage
+    newitem.setLore(item.getLore())
+    newitem.setCanDestroy(item.getCanDestroy())
+    newitem.setCanPlaceOn(item.getCanPlaceOn())
+    newitem.keepOnDeath = item.keepOnDeath
+    newitem.lockMode = item.lockMode
+    for (const prop of item.getDynamicPropertyIds()) newitem.setDynamicProperty(prop, item.getDynamicProperty(prop))
 
-    mainhand.setItem(item)
+    if (newitem.enchantable) world.debug('enchants', [...newitem.enchantable.getEnchantments()])
+
+    mainhand.setItem(newitem)
   })
 
 new Command('repair')
