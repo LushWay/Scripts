@@ -34,3 +34,15 @@ root
     item.amount = count
     ctx.reply(`§a► §f${oldamount} ► ${item.amount}`)
   })
+
+new Command('dupe')
+  .setPermissions('techAdmin')
+  .setDescription('Дюпает предмет')
+  .executes(ctx => {
+    const slot = ctx.player.mainhand()
+    const item = slot.getItem()
+    if (!item) return ctx.error('Нечего дюпать!')
+
+    ctx.player.container?.addItem(item)
+    ctx.player.success('Успешно!')
+  })
