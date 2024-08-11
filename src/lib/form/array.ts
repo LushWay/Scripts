@@ -43,7 +43,7 @@ export class ArrayForm<
 
   constructor(
     private title: Text,
-    private array: T[],
+    private array: readonly T[],
   ) {}
 
   description(text: Text) {
@@ -216,7 +216,7 @@ export class ArrayForm<
     } else return this.array
   }
 
-  private addButtons(array: T[], form: ActionForm, filters: F) {
+  private addButtons(array: readonly T[], form: ActionForm, filters: F) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     for (const item of array) {
       const button = this.config.button(item, filters, form)

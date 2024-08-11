@@ -1,5 +1,5 @@
-import { Player, system, world } from '@minecraft/server'
-import { Menu, Region, Settings, Sidebar, separateNumberWithDots } from 'lib'
+import { Player, system, TicksPerSecond, world } from '@minecraft/server'
+import { Menu, Region, Settings, Sidebar, ms, separateNumberWithDots } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
@@ -105,7 +105,9 @@ const survivalSidebar = new Sidebar(
     [names.leafs]: player => separateNumberWithDots(player.scores.leafs),
     [names.online]: {
       create() {
-        let online = world.getAllPlayers().length
+        const actual = () => world.getAllPlayers().length
+        let online = actual()
+        system.runTimeout(() => (online = actual()), 'actual online', TicksPerSecond * 60 * 20)
 
         world.afterEvents.playerLeave.subscribe(() => online--)
         world.afterEvents.playerJoin.subscribe(() => online++)

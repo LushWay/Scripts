@@ -6,6 +6,7 @@
  * @template R Return type of the subscriber. Default is `void`
  * @template Callback The type of the callback function that will be used for the events.
  */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export class EventSignal<T, R = void, Callback extends (...args: any[]) => R = (arg: T) => R> {
   /**
    * Iterates through sorted subscribers of a given event signal and calls each subscriber function with the provided

@@ -56,7 +56,7 @@ export function inspect(target: unknown, space = '  ', cw = '', funcCode = false
             isArrow = false
           }
 
-          const match = (/(\w*)\(/.exec(r))?.[1]
+          const match = /(\w*)\(/.exec(r)?.[1]
           if (match) {
             name = match
             r = r.replace(name, '')
@@ -118,7 +118,7 @@ export function inspect(target: unknown, space = '  ', cw = '', funcCode = false
         break
 
       case 'string':
-        value = `${c.string}\`${value.replace(/"/g, uniqueKey).replace(/§/g, '§§')}\`§r`
+        value = `${c.string}\`${value.replace(/"/g, uniqueKey).replace(/§/g, '$')}\`§r`
         break
 
       case 'undefined':

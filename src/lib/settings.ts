@@ -124,6 +124,7 @@ export class Settings {
 
   static worldCommon = ['Общие настройки мира\n§7Чат, спавн и тд', 'common'] as const
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   private static insertGroup<Config extends SettingsConfig>(
     to: 'worldMap' | 'playerMap',
     name: string,

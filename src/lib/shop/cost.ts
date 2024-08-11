@@ -5,6 +5,7 @@ import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { noBoolean, separateNumberWithDots } from 'lib/util'
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export abstract class Cost<T = unknown> {
   /**
    * Returns string representation of cost

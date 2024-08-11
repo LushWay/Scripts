@@ -39,7 +39,7 @@ export class Zone {
           const rmax = { x: center.x + rad, z: center.x + rad }
           const rmin = { x: center.z - rad, z: center.z - rad }
           if (typeof p === 'undefined') {
-            if (!reloadSent) request('reload', { status: 300 })
+            if (!reloadSent) request('reload', { reason: 'Player is undefined' })
             reloadSent = true
             return
           }

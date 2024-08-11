@@ -56,7 +56,8 @@ class HealthIndicator {
       if (
         damage <= 0 ||
         !hurtEntity.isValid() ||
-        !hurtEntity.matches({ families: this.allowedFamilies }) ||
+        (!hurtEntity.matches({ families: this.allowedFamilies }) &&
+          !(hurtEntity instanceof Player && hurtEntity.isSimulated())) ||
         NOT_MOB_ENTITIES.includes(hurtEntity.typeId) ||
         ClosingChatSet.has(hurtEntity.id) ||
         Boss.isBoss(hurtEntity)

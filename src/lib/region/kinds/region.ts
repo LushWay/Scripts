@@ -76,6 +76,7 @@ export class Region<LDB extends RLDB = any> {
    *
    * @returns Array of instances that match the specified type `R` of Region.
    */
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   static instances<I extends Region, T extends { new (): I; regions: Region[] }>(this: T) {
     return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
   }

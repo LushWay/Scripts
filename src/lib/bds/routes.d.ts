@@ -9,7 +9,7 @@ export declare namespace ServerRpc {
       req: { name: string }
       res: { statusMessage: string }
     }
-    reload: { req: undefined; res: undefined }
+    reload: { req: { reason: string } | undefined; res: undefined }
     command: { req: { command: string }; res: undefined }
     say: { req: { message: string }; res: undefined }
   }

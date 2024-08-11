@@ -211,8 +211,9 @@ expand(Player.prototype, {
   mainhand() {
     const equippable = this.getComponent('equippable')
     if (!equippable) {
-      request('reload', { status: 100 })
-      throw new ReferenceError(`Player '${this.name}' doesn't have equippable component (probably died).`)
+      const reason = `Player '${this.name}' doesn't have equippable component (probably died).`
+      request('reload', { reason })
+      throw new ReferenceError(reason)
     }
     return equippable.getEquipmentSlot(EquipmentSlot.Mainhand)
   },

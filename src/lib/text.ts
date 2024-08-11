@@ -111,6 +111,7 @@ function createNum(options: ColorizingOptions): (text: TSA, n: number, plurals: 
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 function createOverload<T extends (text: TSA, ...args: any[]) => Text, O extends (t: T, ...args: any[]) => Text>(
   tsa: T,
   overload: O,
