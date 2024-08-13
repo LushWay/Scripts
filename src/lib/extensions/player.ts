@@ -51,7 +51,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn info**
      */
-    success(message: string, sound?: boolean): void
+    success(message?: string, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -127,8 +127,18 @@ expand(Player, {
   },
 })
 
-function prefix(pref: string, sound: string): (this: Player, message: string, playSound?: boolean) => void {
-  return function (this, message, playSound = true) {
+function prefix(pref: string, sound: string): (this: Player, message: string, playSound?: boolean) => void
+function prefix(
+  pref: string,
+  sound: string,
+  defaultText: string,
+): (this: Player, message?: string, playSound?: boolean) => void
+function prefix(
+  pref: string,
+  sound: string,
+  defaultText?: string,
+): (this: Player, message: string, playSound?: boolean) => void {
+  return function (this, message = defaultText, playSound = true) {
     system.delay(() => {
       if (!this.isValid()) return
       if (playSound) this.playSound(sound)
@@ -163,7 +173,7 @@ expand(Player.prototype, {
 
   fail: prefix('§4§l> §r§c', Sounds.Fail),
   warn: prefix('§e⚠ §6', Sounds.Fail),
-  success: prefix('§a§l> §r', Sounds.Action),
+  success: prefix('§a§l> §r', Sounds.Action, 'Успешно'),
   info: prefix('§b§l> §r§3', Sounds.Action),
 
   // eslint-disable-next-line @typescript-eslint/unbound-method

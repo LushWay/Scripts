@@ -1,8 +1,10 @@
-import { EntityDamageCause, Player, world } from '@minecraft/server'
-import { isBuilding, Join, prompt } from 'lib'
+import { EntityDamageCause, Player, system, world } from '@minecraft/server'
+import { Cooldown, is, isBuilding, Join, ms, prompt } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-properties'
 import { t } from 'lib/text'
 import { PlayerNameTagModifiers } from 'modules/indicator/playerNameTag'
+
+const newbieTime = ms.from('hour', 2)
 
 const prefix = 'newbie'
 const property = PlayerProperties['lw:newbie']
@@ -43,10 +45,13 @@ export function exitNewbieMode(player: Player, reason: Text) {
 
 function enterNewbieMode(player: Player) {
   player.database.survival.newbie = 1
+  player.scores.anarchyOnlineTime = 0
   player.setProperty(property, true)
 }
 
 Join.onFirstTimeSpawn.subscribe(enterNewbieMode)
+
+const damageCd = new Cooldown(ms.from('min', 1), false)
 
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity, cause } }) => {
   if (!(hurtEntity instanceof Player)) return
@@ -56,12 +61,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   const denyDamage = () => {
     hurtEntity.log(
       prefix,
-      'Recieved damage',
-      damage.toFixed(2),
-      'health',
-      health?.currentValue.toFixed(2),
-      'with cause',
-      cause,
+      t`Recieved damage ${damage.toFixed(2)}, health ${health?.currentValue.toFixed(2)}, with cause ${cause}`,
     )
     if (health) health.setCurrentValue(health.currentValue + damage)
     hurtEntity.teleport(hurtEntity.location)
@@ -70,25 +70,35 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   if (hurtEntity.database.survival.newbie && cause === EntityDamageCause.fireTick) {
     denyDamage()
   } else if (damagingEntity instanceof Player && damagingEntity.database.survival.newbie) {
-    denyDamage()
-    askForExitingNewbieMode(
-      damagingEntity,
-      'ударили игрока',
-      () => hurtEntity.applyDamage(damage, { damagingEntity, cause }),
-      () => damagingEntity.info('Будь осторожнее в следующий раз.'),
-    )
-    // TODO When called multiple times in the same minute warn and auto exit newbie mode
+    if (damageCd.isExpired(damagingEntity)) {
+      denyDamage()
+      askForExitingNewbieMode(
+        damagingEntity,
+        'ударили игрока',
+        () => hurtEntity.applyDamage(damage, { damagingEntity, cause }),
+        () => damagingEntity.info('Будь осторожнее в следующий раз.'),
+      )
+    } else {
+      exitNewbieMode(damagingEntity, 'снова ударили игрока')
+    }
   }
 })
 
 PlayerNameTagModifiers.push(p => (p.database.survival.newbie && !isBuilding(p) ? ' \n§bНовичок§r' : false))
 
 new Command('newbie')
-  .setPermissions('techAdmin')
-  .setDescription('Вводит в режим новчика')
+  .setPermissions('member')
+  .setDescription('Используйте, чтобы выйти из режима новичка')
   .executes(ctx => {
     if (isNewbie(ctx.player)) {
-      exitNewbieMode(ctx.player, 'ds htib')
-    } else enterNewbieMode(ctx.player)
-    ctx.reply('Успешно')
+      exitNewbieMode(ctx.player, 'использовали команду')
+    } else if (is(ctx.player.id, 'techAdmin')) {
+      enterNewbieMode(ctx.player)
+      ctx.player.success()
+    } else return ctx.error('Вы не находитесь в режиме новичка.')
   })
+
+system.runPlayerInterval(player => {
+  if (isNewbie(player) && player.scores.anarchyOnlineTime > newbieTime)
+    exitNewbieMode(player, 'провели на анархии больше 2 часов')
+}, 'newbie mode exit')
