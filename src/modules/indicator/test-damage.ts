@@ -55,9 +55,9 @@ function armorCommand() {
     .setDescription('Заменяет броню у всех симулированных игроков созданных с помощью test:damage')
     .setPermissions('techAdmin')
     .array('type', ['Golden', 'Leather', 'Chainmail', 'Iron', 'Diamond', 'Netherite'])
-    .string('ench', true)
     .int('level', true)
-    .executes((ctx, type, ench = MinecraftEnchantmentTypes.Protection, level = 0) => {
+    .string('ench', true)
+    .executes((ctx, type, level = 0, ench = MinecraftEnchantmentTypes.Protection) => {
       if (!isKeyof(ench, Enchantments.typed)) return ctx.error('Enchs:\n' + Object.keys(Enchantments.typed).join('\n'))
       const levels = Enchantments.typed[ench]
 

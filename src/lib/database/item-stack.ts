@@ -13,17 +13,20 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
 
   private currentProperty?: string
 
-  property<N extends string, D extends Schema.Property<Schema.Property.Saveable>>(
+  property<N extends string, const D extends Schema.Property<Schema.Property.Saveable>>(
     name: N,
     defaultValue: D,
   ): ItemLoreSchema<T & { [K in N]?: D }, D>
 
-  property<N extends string, D extends Schema.Property<Schema.Property.Required>>(
+  property<N extends string, const D extends Schema.Property<Schema.Property.Required>>(
     name: N,
     type: D,
   ): ItemLoreSchema<T & { [K in N]: D }, D>
 
-  property<N extends string, D extends Schema.Property.Any>(name: N, type: D): ItemLoreSchema<T & { [K in N]: D }, D> {
+  property<N extends string, const D extends Schema.Property.Any>(
+    name: N,
+    type: D,
+  ): ItemLoreSchema<T & { [K in N]: D }, D> {
     this.currentProperty = name
     this.properties[name] = { type }
 
@@ -54,7 +57,12 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   }
 
   build() {
-    return new ItemLore<T>(this.properties, (i, s) => this.prepareItem(i, s), this.itemTypeId, this.schemaId)
+    return new ItemLoreSchemaCompiled<T>(
+      this.properties,
+      (i, s) => this.prepareItem(i, s),
+      this.itemTypeId,
+      this.schemaId,
+    )
   }
 
   private prepareItem(itemStack: Item, storage: ParsedSchema<T>) {
@@ -82,7 +90,7 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   }
 }
 
-class ItemLore<T extends TypeSchema> {
+export class ItemLoreSchemaCompiled<T extends TypeSchema> {
   static loreSchemaId = 'lsid'
 
   constructor(
@@ -92,9 +100,9 @@ class ItemLore<T extends TypeSchema> {
     private readonly lsid: string,
   ) {}
 
-  create(config: ParsedSchema<T>) {
-    const item = new ItemStack(this.itemTypeId)
-    item.setDynamicProperty(ItemLore.loreSchemaId, this.lsid)
+  create(config: ParsedSchema<T>, typeId = this.itemTypeId) {
+    const item = new ItemStack(typeId)
+    item.setDynamicProperty(ItemLoreSchemaCompiled.loreSchemaId, this.lsid)
 
     const storage = this.parse(item, config)
     if (!storage) throw new Error('Unable to create item using schema')
@@ -111,7 +119,7 @@ class ItemLore<T extends TypeSchema> {
       throw e
     }
 
-    const lsid = itemStack.getDynamicProperty(ItemLore.loreSchemaId)
+    const lsid = itemStack.getDynamicProperty(ItemLoreSchemaCompiled.loreSchemaId)
     if (typeof lsid === 'string') {
       if (lsid !== this.lsid) return
     } else {
@@ -154,7 +162,7 @@ class ItemLore<T extends TypeSchema> {
     }
     if (itemStack.isStackable) return false
 
-    const lsid = itemStack.getDynamicProperty(ItemLore.loreSchemaId)
+    const lsid = itemStack.getDynamicProperty(ItemLoreSchemaCompiled.loreSchemaId)
     return lsid === this.lsid
   }
 
@@ -166,7 +174,7 @@ class ItemLore<T extends TypeSchema> {
   }
 }
 
-export type ItemLoreStorage<T extends ItemLore<TypeSchema>> = Exclude<ReturnType<T['parse']>, void>
+export type ItemLoreStorage<T extends ItemLoreSchemaCompiled<TypeSchema>> = Exclude<ReturnType<T['parse']>, void>
 
 const required = [Number, Boolean, String]
 

@@ -232,6 +232,8 @@ expand(Player.prototype, {
 declare module '@minecraft/server' {
   interface Entity {
     readonly container?: Container
+
+    isPlayer(): this is Player
   }
 
   interface Container {
@@ -246,6 +248,9 @@ expand(Entity.prototype, {
       throw new ReferenceError('Bound prototype object does not exists')
     if (!super.isValid()) throw new ReferenceError('Entity is invalid')
     return this.getComponent('inventory')?.container
+  },
+  isPlayer() {
+    return this instanceof Player
   },
 })
 
