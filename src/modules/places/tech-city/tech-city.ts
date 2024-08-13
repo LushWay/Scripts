@@ -6,6 +6,7 @@ import { Stoner } from '../lib/npc/stoner'
 import { CannonBulletItem, CannonItem } from 'modules/features/cannon'
 import { Engineer, MicroSchema } from './engineer'
 import { Butcher } from '../lib/npc/butcher'
+import { Woodman } from '../lib/npc/woodman'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -18,6 +19,8 @@ class TechCityBuilder extends City {
   stoner = new Stoner(this.group)
 
   butcher = new Butcher(this.group)
+
+  woodman = new Woodman(this.group)
 
   golemn = Boss.create()
     .group(this.group)

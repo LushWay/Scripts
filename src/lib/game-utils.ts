@@ -122,6 +122,7 @@ export function itemLocaleName(item: Pick<ItemStack, 'typeId'>) {
 
 const blocks: string[] = Object.values(MinecraftBlockTypes as Record<string, string>).concat(
   MinecraftItemTypes.Planks as string,
+  MinecraftItemTypes.Wood as string,
 )
 const itemTypes = ['boat', 'banner_pattern']
 const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join('|')})`)
@@ -167,12 +168,27 @@ const blockModifiers: ((s: string) => string | undefined)[] = [
     const [, color, type] = match
     return `${type}.${color}`
   },
+
+  darkOak => {
+    if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door' && !darkOak.includes('wood'))
+      return darkOak.replace('dark_oak', 'big_oak')
+  },
   planks => {
     if (!planks.endsWith('planks')) return
     const type = planks.replace(/_?planks/, '')
     if (!['acacia', 'big_oak', 'birch', 'jungle', '', 'spruce', 'oak'].includes(type)) return planks
 
+    if (!type) return 'planks'
     return `planks.${type}`
+  },
+
+  wood => {
+    if (!wood.endsWith('wood')) return
+    const type = wood.replace(/_?wood/, '')
+    if (!['acacia', 'dark_oak', 'birch', 'jungle', '', 'spruce', 'oak'].includes(type)) return wood
+
+    if (!type) return 'wood.oak'
+    return `wood.${type}`
   },
   stone => {
     if (['andesite', 'andesiteSmooth', 'diorite', 'dioriteSmooth', 'granite', 'graniteSmooth', 'stone'].includes(stone))

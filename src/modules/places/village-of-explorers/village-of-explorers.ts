@@ -5,6 +5,7 @@ import { City } from '../lib/city'
 import { Stoner } from '../lib/npc/stoner'
 import { Mage } from './mage'
 import { Butcher } from '../lib/npc/butcher'
+import { Woodman } from '../lib/npc/woodman'
 
 export const BossSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
   '§aМагическая слизь',
@@ -18,6 +19,8 @@ class VillageOfExporersBuilder extends City {
   }
 
   butcher = new Butcher(this.group)
+
+  woodman = new Woodman(this.group)
 
   // TODO Resistance to frogs cuz they kill boss in one shot lol
   slimeBoss = Boss.create()

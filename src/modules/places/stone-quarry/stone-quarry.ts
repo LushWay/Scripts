@@ -1,9 +1,10 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
 import { City } from '../lib/city'
+import { Butcher } from '../lib/npc/butcher'
+import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
-import { Butcher } from '../lib/npc/butcher'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -12,6 +13,8 @@ class StoneQuarryBuilder extends City {
   }
 
   butcher = new Butcher(this.group)
+
+  woodman = new Woodman(this.group)
 
   w = Boss.create()
     .group(this.group)
