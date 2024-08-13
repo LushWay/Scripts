@@ -3,12 +3,15 @@ import { Boss, Loot, ms } from 'lib'
 import { City } from '../lib/city'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
+import { Butcher } from '../lib/npc/butcher'
 
 class StoneQuarryBuilder extends City {
   constructor() {
     super('StoneQuarry', 'Каменоломня')
     this.create()
   }
+
+  butcher = new Butcher(this.group)
 
   w = Boss.create()
     .group(this.group)

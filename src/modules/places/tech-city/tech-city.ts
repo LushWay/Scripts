@@ -5,6 +5,7 @@ import { City } from '../lib/city'
 import { Stoner } from '../lib/npc/stoner'
 import { CannonBulletItem, CannonItem } from 'modules/features/cannon'
 import { Engineer, MicroSchema } from './engineer'
+import { Butcher } from '../lib/npc/butcher'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -13,6 +14,26 @@ class TechCityBuilder extends City {
   }
 
   engineer = new Engineer(this.group)
+
+  stoner = new Stoner(this.group)
+
+  butcher = new Butcher(this.group)
+
+  golemn = Boss.create()
+    .group(this.group)
+    .id('golem')
+    .name('Робот')
+    .typeId(MinecraftEntityTypes.IronGolem)
+    .loot(
+      new Loot('GolemLoot')
+        .itemStack(MicroSchema)
+        .amount({ '10...64': '1%' })
+        .chance('20%')
+        .item('RedTerracotta')
+        .amount({ '0...120': '10%', '121...300': '20%' }).build,
+    )
+    .respawnTime(ms.from('min', 10))
+    .spawnEvent(true)
 
   private create() {
     const { normal, donut } = this.createKits(
@@ -55,24 +76,6 @@ class TechCityBuilder extends City {
       ctx.player.container?.addItem(donut.createKeyItemStack())
     })
   }
-
-  golemn = Boss.create()
-    .group(this.group)
-    .id('golem')
-    .name('Робот')
-    .typeId(MinecraftEntityTypes.IronGolem)
-    .loot(
-      new Loot('GolemLoot')
-        .itemStack(MicroSchema)
-        .amount({ '10...64': '1%' })
-        .chance('20%')
-        .item('RedTerracotta')
-        .amount({ '0...120': '10%', '121...300': '20%' }).build,
-    )
-    .respawnTime(ms.from('min', 10))
-    .spawnEvent(true)
-
-  stoner = new Stoner(this.group)
 }
 
 export const TechCity = new TechCityBuilder()

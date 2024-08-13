@@ -137,6 +137,8 @@ const itemModifiers: ((s: string) => string | undefined)[] = [
     if (!match) return
     return `chest_boat.${match[1]}`
   },
+  cod => (cod === 'cod' ? 'fish' : cod),
+  mutton => (mutton === 'mutton' ? 'muttonRaw' : mutton),
   id => {
     if (id.includes('.')) return
     const match = itemRegExp.exec(id)
