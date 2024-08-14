@@ -28,17 +28,25 @@ export class Mage extends ShopNpc {
             slot => this.updateEnchatnment(slot, e.Protection, 1),
           )
         })
-        .addSection('Все для магии', form => {
-          form.addSection('Грибы', form => {
-            form.addItemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
-            form.addItemStack(new ItemStack(i.RedMushroom), new MoneyCost(200))
-          })
-          form.addSection('Зелья', form => {
-            form.addItemStack(new ItemStack(i.SplashPotion), new MoneyCost(10))
-          })
-          form.addItemStack(IceBombItem, new MoneyCost(100))
-          form.addItemStack(FireBallItem, new MoneyCost(100))
-        })
+        .addSection('Все для магии', form =>
+          form
+            .addSection('Грибы', form =>
+              form
+                .addItemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
+                .addItemStack(new ItemStack(i.RedMushroom), new MoneyCost(200)),
+            )
+
+            // TODO Potion API
+            // Пока нет PotionAPI или сгенереных предметов не трогаем
+
+            // .addSection('Зелья', form => {
+            //   form.addItemStack(new ItemStack(i.SplashPotion), new MoneyCost(10))
+            // })
+            .addItemStack(IceBombItem, new MoneyCost(100))
+            .addItemStack(FireBallItem, new MoneyCost(100))
+            .addItemStack(new ItemStack(i.TotemOfUndying), new MultiCost().money(6_000).item(i.Emerald, 1))
+            .addItemStack(new ItemStack(i.EnchantedGoldenApple), new MultiCost().item(i.GoldenApple).money(10_000)),
+        )
     })
   }
 
