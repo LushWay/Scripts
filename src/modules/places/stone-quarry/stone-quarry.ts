@@ -5,6 +5,9 @@ import { Butcher } from '../lib/npc/butcher'
 import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
+import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
+import { Barman } from 'modules/places/stone-quarry/barman'
+import { Coachman } from 'modules/places/stone-quarry/coachman'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -15,6 +18,12 @@ class StoneQuarryBuilder extends City {
   butcher = new Butcher(this.group)
 
   woodman = new Woodman(this.group)
+
+  auntzine = new AuntZina(this.group)
+
+  barman = new Barman(this.group)
+
+  coachman = new Coachman(this.group)
 
   w = Boss.create()
     .group(this.group)

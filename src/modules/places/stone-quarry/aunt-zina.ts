@@ -4,7 +4,7 @@ import { Group } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 
-export class Barman extends ShopNpc {
+export class AuntZina extends ShopNpc {
   constructor(group: Group) {
     super(group.point('aunt-zina').name('Тетя Зина'))
     this.shop.body(() => 'Заходиии, располагайся. Вся еда свежая, только из печи!\n\n')
