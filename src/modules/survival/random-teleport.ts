@@ -121,9 +121,8 @@ export function randomTeleport(
       if (elytra) {
         giveElytra(target, keepInSkyTime)
       } else {
-        // TODO Set right time
         const blocks = y - fromYtoBlock
-        const ticks = (blocks / 2) * 20
+        const ticks = (blocks / 4) * 20
         target.addEffect(MinecraftEffectTypes.SlowFalling, ticks, {
           amplifier: 1,
           showParticles: false,

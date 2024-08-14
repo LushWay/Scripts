@@ -14,7 +14,6 @@ const descriptions = {
   [ItemAbility.Nothing]: 'Неизвестная',
 } satisfies Record<ItemAbility, string>
 
-// TODO Levels thro different properties?
 export const itemAbilitySchema = new ItemLoreSchema('item-ability')
   .property('ability', String)
   .display('Способность', p => (isKeyof(p, descriptions) ? descriptions[p] : descriptions[ItemAbility.Nothing]))

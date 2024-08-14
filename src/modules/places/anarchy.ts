@@ -6,15 +6,12 @@ import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
 
-// TODO Newbie savemode
-
 class AnarchyBuilder extends AreaWithInventory {
   portal: Portal | undefined
 
   zone: Zone | undefined
 
   learningRTP(player: Player) {
-    // TODO Proper rtp near random city
     // Hook function
   }
 
