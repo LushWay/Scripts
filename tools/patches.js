@@ -1,8 +1,6 @@
 import { m, notice, patchPackage } from './patch-package.js'
 
 /** @typedef {import('@minecraft/server')} A */
-
-// TODO Remove all patch scripts
 patchPackage('@minecraft/server', {
   classes: {},
   replaces: [
