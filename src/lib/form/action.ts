@@ -51,7 +51,7 @@ export class ActionForm {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, iconPath: string | null, callback: PlayerCallback): ActionForm
+  addButton(text: string | RawMessage, iconPath: string | null | undefined, callback: PlayerCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -62,7 +62,7 @@ export class ActionForm {
    */
   addButton(
     text: string | RawMessage,
-    iconPathOrCallback: string | null | PlayerCallback,
+    iconPathOrCallback: string | null | undefined | PlayerCallback,
     callback?: PlayerCallback,
   ): ActionForm {
     let iconPath

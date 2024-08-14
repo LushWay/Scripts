@@ -1,3 +1,7 @@
+import { writeFile } from 'fs/promises'
+import { LeafyLogger } from 'leafy-utils'
+import path from 'path'
+
 /**
  * @param {string} modifier
  * @param {string} code
@@ -10,4 +14,21 @@ export function injectCode(modifier, code) {
     
 ${code}
 `
+}
+
+const logger = new LeafyLogger({ prefix: 'assets' })
+
+/**
+ * @param {string} asset
+ * @param {string} caller
+ * @param {string | (() => Promise<string> | string)} code
+ */
+export async function injectAsset(asset, caller, code, base = 'src') {
+  try {
+    if (typeof code === 'function') code = await code()
+
+    await writeFile(path.join(base, 'lib', 'assets', asset), injectCode(caller, code))
+  } catch (e) {
+    logger.error(`Unable to write asset ${asset}:`, e)
+  }
 }

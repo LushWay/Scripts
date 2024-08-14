@@ -11,6 +11,6 @@
     "types": [],
     "module": "NodeNext"
   },
-  "include": ["."],
+  "include": [".", "../../tools/generate-lang-json.ts"],
   "exclude": ["defines.d.ts"]
 }

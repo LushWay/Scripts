@@ -188,17 +188,16 @@ export class ItemCost extends Cost {
     let amount = this.amount
     const slots = new Map<number, number | undefined>()
     for (const [i, item] of player.container.entries()) {
-      if (!item) continue
-      if (this.is(item)) {
-        amount -= item.amount
-        if (amount < 0) {
-          // in this slot there is more items then we need
-          slots.set(i, -amount)
-          continue
-        } else {
-          // take all the items from this slot
-          slots.set(i, undefined)
-        }
+      if (!item || !this.is(item)) continue
+
+      amount -= item.amount
+      if (amount < 0) {
+        // in this slot there is more items then we need
+        slots.set(i, -amount)
+        break
+      } else {
+        // take all the items from this slot
+        slots.set(i, undefined)
       }
     }
 
@@ -221,6 +220,8 @@ export class ItemCost extends Cost {
         container.setItem(i, undefined)
       }
     }
+
+    super.buy(player)
   }
 
   toString(canBuy?: boolean, _?: Player | undefined, amount = true): MaybeRawText {
@@ -232,6 +233,7 @@ export class ItemCost extends Cost {
   }
 
   failed(player: Player): MaybeRawText {
+    super.failed(player)
     const items = this.getItems(player)
 
     return t.raw`${t.error`${this.amount - items.amount}/${this.amount} `}${this.toString(false, void 0, false)}`
@@ -250,4 +252,24 @@ export class ShouldHaveItemCost extends ItemCost {
   failed(player: Player) {
     return t.error`Нет предмета`
   }
+}
+
+export const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
+export const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
+
+function ErrorCost(message: MaybeRawText) {
+  return new (class extends Cost {
+    toString(): MaybeRawText {
+      return message
+    }
+
+    has() {
+      return false
+    }
+
+    failed(player: Player) {
+      super.failed(player)
+      return this.toString()
+    }
+  })()
 }

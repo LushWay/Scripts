@@ -1,13 +1,26 @@
 import { BlockPermutation, Player, RawText } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { typeIdToReadable } from 'lib/game-utils'
+import { nmspc, typeIdToReadable } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
 import { inspect, util } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 
-const NUMBER_OF_1_16_100_ITEMS = 0
+const NUMBER_OF_1_16_100_ITEMS = 41
+
+export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
+  if (textureOrTypeId.startsWith('textures')) return textureOrTypeId
+
+  const typeId = nmspc(textureOrTypeId)
+  const ID = typeIdToID.get(typeId) ?? typeIdToDataId.get(typeId)
+  if (typeof ID === 'undefined') return BUTTON['?']
+
+  let AUX = (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536
+  if (enchanted) AUX += 32768
+
+  return AUX.toString()
+}
 
 const SIZES = {
   '5 ': ['§c§h§e§s§t§0§5§r§f', 5],
@@ -25,7 +38,7 @@ const SIZES = {
 
 interface ChestButton {
   text: string
-  icon: string | undefined | number
+  icon: string | undefined
   callback?: (p: Player) => void | Promise<void>
 }
 
@@ -80,27 +93,16 @@ export class ChestForm {
     enchanted = false,
     callback,
   }: ChestButtonOptions) {
-    const id = icon.includes(':') ? icon : 'minecraft:' + icon
-    const ID = typeIdToID.get(id) ?? typeIdToDataId.get(id)
-    if (typeof ID === 'undefined' && icon.includes('minecraft:')) icon = BUTTON['?']
-
     if (description) lore = util.wrapLore(description)
 
-    const slotData: ChestButton = {
+    this.buttons[slot] = {
       text: `stack#${Math.min(Math.max(amount, 1) || 1, 99)
         .toString()
         .padStart(2, '0')}§r${nameTag}§r${lore.map(e => '\n§r' + e).join('')}`,
-
-      icon: typeof ID === 'number' ? (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536 : icon,
-
+      icon: getAuxOrTexture(icon, enchanted),
       callback: callback ?? (p => this.show(p)),
     }
 
-    if (enchanted && typeof slotData.icon === 'number') {
-      slotData.icon += 32768
-    }
-
-    this.buttons[slot] = slotData
     return this
   }
 

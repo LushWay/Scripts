@@ -10,6 +10,7 @@ import {
 } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftCameraPresetsTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { SafeLocation } from 'lib'
+import { blockItemsLangJson } from 'lib/assets/blocks-items-lang'
 import { Vector } from 'lib/vector'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
@@ -99,25 +100,7 @@ export function typeIdToReadable(typeId: string) {
  *   itemLocaleName(apple) // %item.apple.name
  */
 export function itemLocaleName(item: Pick<ItemStack, 'typeId'>) {
-  let id = item.typeId.replace('minecraft:', '')
-  if (blocks.includes(item.typeId)) {
-    for (const fn of blockModifiers) {
-      const result = fn(id)
-      id = result ?? id
-    }
-
-    return `tile.${id}.name`
-  }
-
-  for (const fn of itemModifiers) {
-    const result = fn(id)
-    id = result ?? id
-  }
-
-  const name = `item.${id}.name`
-  // for (const fn of afterItems) name = fn(name) ?? name
-
-  return name
+  return item.typeId in blockItemsLangJson ? blockItemsLangJson[item.typeId] : item.typeId
 }
 
 const blocks: string[] = Object.values(MinecraftBlockTypes as Record<string, string>).concat(
@@ -205,4 +188,9 @@ export function isBuilding(player: Player, uptodate = false) {
 
 export function isNotPlaying(player: Player) {
   return isBuilding(player, true) || player.isGamemode('spectator')
+}
+
+/** Adds minecraft: namespace to the text if not added already */
+export function nmspc(text: string) {
+  return text.includes(':') ? text : `minecraft:${text}`
 }

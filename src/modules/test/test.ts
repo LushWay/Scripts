@@ -16,6 +16,7 @@ import {
   NpcForm,
   Settings,
   Vector,
+  getAuxOrTexture,
   inspect,
   is,
   isKeyof,
@@ -252,6 +253,13 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       'test',
       10,
     )
+  },
+  frm(ctx) {
+    new ActionForm('Test')
+      .addButton('Test', getAuxOrTexture(MinecraftItemTypes.TripwireHook), () => {})
+      .addButton('Test', BUTTON['<'], () => {})
+      .addButton('Test', getAuxOrTexture(BUTTON['<']), () => {})
+      .show(ctx.player)
   },
   async api(ctx) {
     const res = await request('playerPlatform', {

@@ -1,17 +1,17 @@
 // @ts-check
 
-import { readFileSync, writeFileSync } from 'fs'
+import { readdirSync, readFileSync } from 'fs'
 import { buildArgumentsWithDist, buildCommand } from './build/cli.js'
-import { injectCode } from './build/inject.js'
+import { injectAsset } from './build/inject.js'
 import { generateManigestJson } from './build/manifest.js'
 
-const playerJsonAsset = 'src/lib/assets/player-json.ts'
-try {
-  const player = readFileSync('entities/player.json').toString()
-  writeFileSync(playerJsonAsset, injectCode('tools/build.js', `export const playerJson = ${player.trimEnd()} as const`))
-} catch (e) {
-  console.warn('Unable to update', playerJsonAsset + ':', e)
-}
+await injectAsset(
+  'generated.ts',
+  'tools/build.js',
+  () => `export const playerJson = ${readFileSync('entities/player.json').toString().trimEnd()} as const
+  
+export const totalItemsJson = ${readdirSync('items').length}`,
+)
 
 const args = buildArgumentsWithDist('scripts')
 buildCommand(args, {

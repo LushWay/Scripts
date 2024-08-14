@@ -1,7 +1,7 @@
 import { ItemStack, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { EventLoader } from 'lib/event-signal'
-import { EnchantmentMetadata } from './assets/enchantments'
+import { enchantmentsJson } from './assets/enchantments'
 import { Core } from './extensions/core'
 
 const location = { x: 0, y: -10, z: 0 }
@@ -14,8 +14,8 @@ export const Enchantments = {
 }
 
 function load() {
-  let expecting = EnchantmentMetadata.items as number
-  for (let i = 1; i <= EnchantmentMetadata.files; i++) {
+  let expecting = enchantmentsJson.items as number
+  for (let i = 1; i <= enchantmentsJson.files; i++) {
     const structure = `mystructure:generated/${i}`
     world.structureManager.place(structure, dimension, location)
     const block = dimension.getBlock(location)
@@ -60,7 +60,7 @@ function load() {
   }
 
   if (expecting !== 0) {
-    console.warn(`Loading enchants failed: ${EnchantmentMetadata.items - expecting}\\${EnchantmentMetadata.items}`)
+    console.warn(`Loading enchants failed: ${enchantmentsJson.items - expecting}\\${enchantmentsJson.items}`)
   }
   Enchantments.typed = Enchantments.custom
   EventLoader.load(Enchantments.onLoad)

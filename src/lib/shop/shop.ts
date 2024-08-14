@@ -11,6 +11,11 @@ export class Shop {
       description: 'Определяет, включено ли подтверждение перед покупкой.',
       value: true,
     },
+    defaultBody: {
+      name: 'Показывать счет',
+      description: 'Показывать ли счет в меню (монеты, листья)',
+      value: false,
+    },
   })
 
   /** List of all available shops */
@@ -37,10 +42,13 @@ export class Shop {
   private useDefaultBody = true
 
   private static defaultBody = (player: Player) =>
-    textTable({
-      'Подтверждение перед покупкой': Shop.getPlayerSettings(player).prompt,
-      'Ваш баланс': new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
-    })
+    Shop.getPlayerSettings(player).defaultBody
+      ? textTable({
+          'Подтверждение перед покупкой': Shop.getPlayerSettings(player).prompt,
+          'Ваш баланс':
+            new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
+        })
+      : ''
 
   private getBody = (player: Player): Text => ''
 
@@ -79,7 +87,7 @@ export class Shop {
       () => t.raw`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
       this,
       this.onOpen,
-    ).show(player)
+    ).show(player, undefined, undefined)
   }
 }
 
@@ -87,6 +95,8 @@ export interface ShopProduct<T = unknown> {
   name: MaybeRawText | ((canBuy: boolean) => MaybeRawText)
   cost: Cost<T>
   onBuy: (player: Player, text: MaybeRawText, successBuy: VoidFunction) => void | false
+  texture?: string
+  sell?: boolean
 }
 
 export type ShopProductBuy = Omit<ShopProduct, 'name'> & {

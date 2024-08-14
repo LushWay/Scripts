@@ -9,7 +9,7 @@ export class Woodman extends ShopNpc {
 
     this.shop.menu(form => {
       for (const [name, typeId] of Object.entries(i)) {
-        if (name.startsWith('Warped') || name.startsWith('Crimson')) continue
+        if (name.startsWith('Warped') || name.startsWith('Crimson') || name === 'Planks' || name === 'Wood') continue
 
         if (name.endsWith('Planks')) {
           form.addConfigurableItemSection(typeId).defaultCount(1000).maxCount(10_000).basePrice(5)
