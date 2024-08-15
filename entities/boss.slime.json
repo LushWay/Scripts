@@ -32,14 +32,37 @@
         },
 
         "minecraft:health": {
-          "value": 100,
-          "max": 100
+          "value": 200,
+          "max": 200
         },
         "minecraft:attack": {
-          "damage": 6
+          "damage": 8
+        },
+        "minecraft:movement": {
+          "value": 1
+        },
+        "minecraft:scale": {
+          "value": 6
+        }
+      },
+
+      "lw:big": {
+        "minecraft:collision_box": {
+          "width": 1.04,
+          "height": 1.04
         },
         "minecraft:scale": {
           "value": 4
+        }
+      },
+
+      "lw:normal": {
+        "minecraft:collision_box": {
+          "width": 1.04,
+          "height": 1.04
+        },
+        "minecraft:scale": {
+          "value": 2
         }
       },
 
@@ -218,6 +241,16 @@
       "lw:boss": {
         "add": {
           "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_large", "lw:boss"]
+        }
+      },
+      "lw:slime_big": {
+        "add": {
+          "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_large", "lw:big"]
+        }
+      },
+      "lw:slime_normal": {
+        "add": {
+          "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_medium", "lw:normal"]
         }
       }
     }

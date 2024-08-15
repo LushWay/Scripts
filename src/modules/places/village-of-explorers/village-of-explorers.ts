@@ -1,11 +1,12 @@
-import { ItemStack } from '@minecraft/server'
+import { ItemStack, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, ms } from 'lib'
+import { Boss, Loot, ms, Vector } from 'lib'
 import { City } from '../lib/city'
-import { Stoner } from '../lib/npc/stoner'
-import { Mage } from './mage'
 import { Butcher } from '../lib/npc/butcher'
+import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
+import { Mage } from './mage'
+import { createBossSlime } from './slime.boss'
 
 export const BossSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
   '§aМагическая слизь',
@@ -22,29 +23,7 @@ class VillageOfExporersBuilder extends City {
 
   woodman = new Woodman(this.group)
 
-  // TODO Resistance to frogs cuz they kill boss in one shot lol
-  slimeBoss = Boss.create()
-    .group(this.group)
-    .id('slime')
-    .name('Магический Слайм')
-    .typeId(MinecraftEntityTypes.Slime)
-    .loot(
-      new Loot('slime boss')
-        .itemStack(BossSlimeBall)
-        .amount({
-          '40...64': '2%',
-          '65...128': '1%',
-        })
-
-        .item('SlimeBall')
-        .amount({
-          '0...10': '10%',
-          '11...64': '40%',
-          '65...256': '50%',
-        }).build,
-    )
-    .respawnTime(ms.from('min', 10))
-    .spawnEvent(true)
+  slimeBoss = createBossSlime(this.group)
 
   mage = new Mage(this.group)
 
