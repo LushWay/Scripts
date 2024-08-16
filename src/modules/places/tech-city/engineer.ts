@@ -32,17 +32,17 @@ export class Engineer extends ShopNpc {
     this.shop.body(() => 'Ну типа дай мне чертеж, a я те чета там наколупаю, да\n')
     this.shop.menu(menu => {
       function addItem(item: CustomItemWithBlueprint, cost: Cost) {
-        menu.addItemStack(item.itemStack, new MultiCost(cost).item(item.blueprint))
+        menu.itemStack(item.itemStack, new MultiCost(cost).item(item.blueprint))
       }
 
       addItem(BaseItem, new MultiCost(new NotNewbieCost()).money(1000))
       addItem(CannonItem, new MultiCost().money(200))
       addItem(CannonBulletItem, new MultiCost().money(100).item(new ItemStack(i.SlimeBall)))
 
-      menu.addSection('Все для редстоуна', menu => {
-        menu.addItemStack(new ItemStack(i.Slime), new MultiCost().money(5))
-        menu.addItemStack(new ItemStack(i.HoneyBlock), new MultiCost().money(10))
-        menu.addItemStack(new ItemStack(i.Piston), new MultiCost().money(8))
+      menu.section('Все для редстоуна', menu => {
+        menu.itemStack(new ItemStack(i.Slime), new MultiCost().money(5))
+        menu.itemStack(new ItemStack(i.HoneyBlock), new MultiCost().money(10))
+        menu.itemStack(new ItemStack(i.Piston), new MultiCost().money(8))
       })
     })
   }

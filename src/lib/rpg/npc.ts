@@ -1,8 +1,9 @@
-import { Entity, PlayerInteractWithEntityBeforeEvent, World, system, world } from '@minecraft/server'
+import { Entity, EntityLifetimeState, PlayerInteractWithEntityBeforeEvent, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, Vector, isChunkUnloaded } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
+import { Core } from 'lib/extensions/core'
 import { location } from 'lib/location'
 import { t } from 'lib/text'
 import { Place } from './place'
@@ -104,42 +105,41 @@ export class Npc {
       })
     })
 
-    system.runInterval(
-      () => {
-        /** Store entities from each dimension so we are not grabbing them much */
-        const cache: Partial<Record<Dimensions, { npc: ReturnType<World['getDynamicProperty']>; entity: Entity }[]>> =
-          {}
+    Core.afterEvents.worldLoad.subscribe(() => {
+      system.runInterval(
+        () => {
+          this.npcs.forEach(npc => {
+            if (npc.entity) return // Entity already loaded
+            if (isChunkUnloaded(npc)) return
 
-        this.npcs.forEach(npc => {
-          if (npc.entity) return // Entity already loaded
-          if (isChunkUnloaded(npc)) return
+            const npcs = world[npc.dimensionId].getEntities({ type: Npc.type }).map(e => ({
+              entity: e,
+              npc: e.getDynamicProperty(Npc.dynamicPropertyName),
+            }))
 
-          const npcs = (cache[npc.dimensionId] ??= world[npc.dimensionId].getEntities({ type: Npc.type }).map(e => ({
-            entity: e,
-            npc: e.getDynamicProperty(Npc.dynamicPropertyName),
-          })))
+            const filteredNpcs = npcs.filter(e => e.npc === npc.id)
+            console.debug(
+              t`${'NpcLoading'}: all: ${npcs.length}, filtered: ${filteredNpcs.length}, action: ${filteredNpcs.length > 1 ? 'removing' : 'none'}`,
+            )
 
-          const filteredNpcs = npcs.filter(e => e.npc === npc.id)
-          console.debug(
-            t`${'NpcLoading'}: all: ${npcs.length}, filtered: ${filteredNpcs.length}, action: ${filteredNpcs.length > 1 ? 'removing' : 'none'}`,
-          )
+            if (filteredNpcs.length > 1) {
+              // More then one? Save only first one, kill others
+              npc.entity = filteredNpcs.find(e => e.entity.isValid() && e.entity.lifetimeState === EntityLifetimeState.Loaded && e.entity.getComponent('npc')?.skinIndex !== 0)?.entity
+              
+              if (npc.entity) filteredNpcs.forEach(e => e.entity.id !== npc.entity?.id && e.entity.remove())
+            } else {
+              npc.entity = filteredNpcs[0]?.entity
+            }
 
-          if (filteredNpcs.length > 1) {
-            // More then one? Save only first one, kill others
-            npc.entity = filteredNpcs.shift()?.entity
-            filteredNpcs.forEach(e => e.entity.remove())
-          } else {
-            npc.entity = filteredNpcs[0]?.entity
-          }
-
-          // Cannot find, spawn
-          if (!npc.entity) npc.spawn()
-          // Apply nameTag etc
-          else npc.configureNpcEntity(npc.entity)
-        })
-      },
-      'npc loading',
-      20,
-    )
+            // Cannot find, spawn
+            if (!npc.entity) npc.spawn()
+            // Apply nameTag etc
+            else npc.configureNpcEntity(npc.entity)
+          })
+        },
+        'npc loading',
+        20,
+      )
+    })
   }
 }

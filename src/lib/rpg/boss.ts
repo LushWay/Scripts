@@ -1,10 +1,11 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
 import { Entity, system, world } from '@minecraft/server'
+import { Temporary } from 'lib'
 import { table } from 'lib/database/abstract'
+import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
 import { location, SafeLocation } from 'lib/location'
-import { Region } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { Group, Place } from './place'
@@ -51,7 +52,7 @@ export class Boss {
 
   entity: Entity | undefined
 
-  region?: Region
+  region?: BossArenaRegion
 
   location: SafeLocation<Vector3>
 
@@ -60,7 +61,9 @@ export class Boss {
       Boss.all.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
     })
 
-    system.runInterval(() => Boss.all.forEach(e => e.check()), 'boss respawn', 40)
+    Core.afterEvents.worldLoad.subscribe(() => {
+      system.runInterval(() => Boss.all.forEach(e => e.check()), 'boss respawn', 40)
+    })
   }
 
   /**
@@ -121,7 +124,17 @@ export class Boss {
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
     try {
-      this.entity.nameTag = this.options.place.name
+      new Temporary(({ world, cleanup }) => {
+        world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+          if (entity.id !== this.entity?.id) return
+
+          system.delay(() => {
+            if (!this.entity) return
+            this.entity.nameTag = this.options.place.name
+          })
+          cleanup()
+        })
+      })
     } catch (e) {
       console.error(e)
     }
@@ -149,6 +162,8 @@ export class Boss {
       // Boss went out of location or in unloaded chunk, respawn after interval
       this.onDie({ dropLoot: false })
     }
+
+    if (entity) entity.nameTag = this.options.place.name
     this.entity = entity
   }
 

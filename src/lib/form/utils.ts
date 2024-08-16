@@ -90,9 +90,11 @@ export async function showForm(
 }
 
 export const BUTTON = {
-  '<': 'textures/ui/arrow_l_default',
-  '>': 'textures/ui/arrow_r_default',
-  '+': 'textures/ui/plus',
-  '-': 'textures/ui/minus',
-  '?': 'textures/ui/how_to_play_button_default_light',
+  '<': 'textures/ui/custom/arrow_left',
+  '>': 'textures/ui/custom/arrow_right',
+  '+': 'textures/ui/custom/plus',
+  '-': 'textures/ui/custom/minus',
+  '?': 'textures/ui/custom/help',
+  'search': 'textures/ui/custom/search',
+  'settings': 'textures/ui/custom/settings',
 }

@@ -31,6 +31,7 @@ import { Cutscene } from 'lib/cutscene'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
+import { form } from 'lib/form/new'
 import { Compass } from 'lib/rpg/menu'
 import { Rewards } from 'lib/shop/rewards'
 import loot from '../quests/learning/airdrop'
@@ -254,11 +255,23 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       10,
     )
   },
+  frm2(ctx) {
+    const second = form(title => {
+      title('Second').body('Something')
+    })
+
+    const main = form(title => {
+      title('Main').button(second)
+    })
+
+    main.show(ctx.player)
+  },
   frm(ctx) {
     new ActionForm('Test')
       .addButton('Test', getAuxOrTexture(MinecraftItemTypes.TripwireHook), () => {})
       .addButton('Test', BUTTON['<'], () => {})
       .addButton('Test', getAuxOrTexture(BUTTON['<']), () => {})
+      .addButton('Test', () => {})
       .show(ctx.player)
   },
   async api(ctx) {

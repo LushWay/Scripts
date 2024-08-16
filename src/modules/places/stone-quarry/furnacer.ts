@@ -65,7 +65,7 @@ export class Furnacer extends ShopNpc {
         location: '',
       })
 
-      form.addItemStack(item, new MoneyCost(5))
+      form.itemStack(item, new MoneyCost(5))
     })
   }
 }

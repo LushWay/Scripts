@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { Settings } from 'lib/settings'
-import { Cost, LeafyCost, MoneyCost } from 'lib/shop/cost'
-import { MaybeRawText, t, textTable } from 'lib/text'
-import { ShopForm } from './form'
+import { LeafyCost, MoneyCost } from 'lib/shop/cost'
+import { t, textTable } from 'lib/text'
+import { ShopForm, ShopMenuCreate } from './form'
 
 export class Shop {
   static getPlayerSettings = Settings.player('Магазин\n§7Внутриигровой магазин', 'market', {
@@ -64,14 +64,14 @@ export class Shop {
     return this
   }
 
-  private onOpen: ShopMenuGenerator = menu => menu
+  private onOpen: ShopMenuCreate = menu => menu
 
   /**
    * Sets shop menu generator function
    *
    * @param generate - Function that recives menu and adds buttons/sections to it
    */
-  menu(generate: ShopMenuGenerator) {
+  menu(generate: ShopMenuCreate) {
     this.onOpen = generate
     return this
   }
@@ -90,19 +90,3 @@ export class Shop {
     ).show(player, undefined, undefined)
   }
 }
-
-export interface ShopProduct<T = unknown> {
-  name: MaybeRawText | ((canBuy: boolean) => MaybeRawText)
-  cost: Cost<T>
-  onBuy: (player: Player, text: MaybeRawText, successBuy: VoidFunction) => void | false
-  texture?: string
-  sell?: boolean
-}
-
-export type ShopProductBuy = Omit<ShopProduct, 'name'> & {
-  player: Player
-  text: MaybeRawText
-  back?: VoidFunction
-}
-
-export type ShopMenuGenerator = (menu: ShopForm, player: Player) => void

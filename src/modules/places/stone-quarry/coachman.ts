@@ -10,7 +10,7 @@ export class Coachman extends ShopNpc {
     this.shop.body(() => 'Wtf ой то есть мне пока нечего тебе предложить\n\n')
 
     this.shop.menu(form => {
-      form.addItemStack(new ItemStack(i.HorseSpawnEgg), new MoneyCost(200_000))
+      form.itemStack(new ItemStack(i.HorseSpawnEgg), new MoneyCost(200_000))
     })
   }
 }

@@ -10,13 +10,13 @@ export class AuntZina extends ShopNpc {
     this.shop.body(() => 'Заходиии, располагайся. Вся еда свежая, только из печи!\n\n')
 
     this.shop.menu(form => {
-      form.addItemStack(new ItemStack(i.CookedBeef), new MoneyCost(200))
-      form.addItemStack(new ItemStack(i.CookedChicken), new MoneyCost(200))
-      form.addItemStack(new ItemStack(i.CookedCod), new MoneyCost(200))
-      form.addItemStack(new ItemStack(i.CookedMutton), new MoneyCost(200))
-      form.addItemStack(new ItemStack(i.CookedPorkchop), new MoneyCost(200))
-      form.addItemStack(new ItemStack(i.CookedRabbit), new MoneyCost(200))
-      form.addItemStack(new ItemStack(i.CookedSalmon), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedBeef), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedChicken), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedCod), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedMutton), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedPorkchop), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedRabbit), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedSalmon), new MoneyCost(200))
     })
   }
 }

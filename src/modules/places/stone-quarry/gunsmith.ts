@@ -11,24 +11,24 @@ export class Gunsmith extends ShopNpc {
 
     this.shop.menu(form => {
       form
-        .addItemModifier(
+        .itemModifier(
           'Улучшить незеритовый меч до алмазного',
           new MultiCost().item(i.NetheriteIngot, 10).item(i.GoldIngot, 5).item(i.OakPlanks, 100).money(1000),
           item => item.typeId === i.DiamondSword,
           slot => this.upgradeDiamondSwordToNetherite(slot),
         )
-        .addSection('Броня', form => {
-          form.addItemModifier(
+        .section('Броня', form => {
+          form.itemModifier(
             'Улучшить защиту',
             new MultiCost().item(i.LapisLazuli, 3).money(10),
             item => item.typeId.endsWith('chestplate'),
             slot => this.updateEnchatnment(slot, e.Protection, 1),
           )
         })
-        .addSection('Все для рейда', form => {
-          form.addItemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
-          form.addItemStack(new ItemStack(i.Gunpowder, 10), new MoneyCost(100))
-          form.addItemStack(new ItemStack(i.TntMinecart, 1), new MoneyCost(400))
+        .section('Все для рейда', form => {
+          form.itemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
+          form.itemStack(new ItemStack(i.Gunpowder, 10), new MoneyCost(100))
+          form.itemStack(new ItemStack(i.TntMinecart, 1), new MoneyCost(400))
         })
     })
   }

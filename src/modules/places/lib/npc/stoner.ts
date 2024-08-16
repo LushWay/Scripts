@@ -10,37 +10,37 @@ export class Stoner extends ShopNpc {
     this.shop.menu(form => {
       form
 
-        .addConfigurableItemSection(i.Cobblestone)
+        .sellableItem(i.Cobblestone)
         .defaultCount(1_000)
         .maxCount(20_000)
         .basePrice(2)
 
-        .addConfigurableItemSection(i.Andesite)
+        .sellableItem(i.Andesite)
         .defaultCount(1_000)
         .maxCount(10_000)
         .basePrice(1)
 
-        .addConfigurableItemSection(i.Diorite)
+        .sellableItem(i.Diorite)
         .defaultCount(2_000)
         .maxCount(10_000)
         .basePrice(1)
 
-        .addConfigurableItemSection(i.Granite)
+        .sellableItem(i.Granite)
         .defaultCount(3_000)
         .maxCount(10_000)
         .basePrice(1)
 
-        .addConfigurableItemSection(i.Tuff)
+        .sellableItem(i.Tuff)
         .defaultCount(2_000)
         .maxCount(10_000)
         .basePrice(1)
 
-        .addConfigurableItemSection(i.Deepslate)
+        .sellableItem(i.Deepslate)
         .defaultCount(100)
         .maxCount(20_000)
         .basePrice(2)
 
-        .addConfigurableItemSection(i.Calcite)
+        .sellableItem(i.Calcite)
         .defaultCount(10)
         .maxCount(1000)
         .basePrice(10)

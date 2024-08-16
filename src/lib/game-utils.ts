@@ -1,14 +1,17 @@
 import {
   EasingType,
+  Enchantment,
   ItemStack,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
+  RawMessage,
+  RawText,
   TicksPerSecond,
   system,
   world,
 } from '@minecraft/server'
-import { MinecraftBlockTypes, MinecraftCameraPresetsTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { MinecraftCameraPresetsTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { SafeLocation } from 'lib'
 import { blockItemsLangJson } from 'lib/assets/blocks-items-lang'
 import { Vector } from 'lib/vector'
@@ -74,6 +77,7 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
  * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
  * capitalizes first letter
  *
+ * @deprecated Consider using {@link itemLocaleName}
  * @example
  *   typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
  *
@@ -99,85 +103,10 @@ export function typeIdToReadable(typeId: string) {
  *   const apple = new ItemStack(MinecraftItemTypes.Apple)
  *   itemLocaleName(apple) // %item.apple.name
  */
-export function itemLocaleName(item: Pick<ItemStack, 'typeId'>) {
-  return item.typeId in blockItemsLangJson ? blockItemsLangJson[item.typeId] : item.typeId
+export function itemLocaleName(item: Pick<ItemStack, 'typeId'> | string) {
+  const typeId = typeof item === 'object' ? item.typeId : item
+  return typeId in blockItemsLangJson ? blockItemsLangJson[typeId] : typeId
 }
-
-const blocks: string[] = Object.values(MinecraftBlockTypes as Record<string, string>).concat(
-  MinecraftItemTypes.Planks as string,
-  MinecraftItemTypes.Wood as string,
-)
-const itemTypes = ['boat', 'banner_pattern']
-const itemRegExp = new RegExp(`^(.+)_(${itemTypes.join('|')})`)
-
-const itemModifiers: ((s: string) => string | undefined)[] = [
-  spawnEgg => {
-    const match = /^(.+)_spawn_egg$/.exec(spawnEgg)
-    if (!match) return
-    return `spawn_egg.entity.${match[1]}`
-  },
-  chestBoat => {
-    const match = /^(.+)_chest_boat$/.exec(chestBoat)
-    if (!match) return
-    return `chest_boat.${match[1]}`
-  },
-  cod => (cod === 'cod' ? 'fish' : cod),
-  mutton => (mutton === 'mutton' ? 'muttonRaw' : mutton),
-  id => {
-    if (id.includes('.')) return
-    const match = itemRegExp.exec(id)
-    if (!match) return
-    const [, color, type] = match
-    return `${type}.${color}`
-  },
-  darkOak => {
-    if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door') return darkOak.replace('dark_oak', 'big_oak')
-  },
-  lazuli => (lazuli === 'lapis_lazuli' ? 'dye.blue' : lazuli),
-]
-
-// const afterItems: ((s: string) => string)[] = [s => s.replace(/\.name$/, '')]
-const blockTypes = ['wool']
-const blockRegExp = new RegExp(`^(.+)_(${blockTypes.join('|')})`)
-
-const blockModifiers: ((s: string) => string | undefined)[] = [
-  id => {
-    if (id === 'cobblestone_wall') return `cobblestone_wall.normal`
-  },
-  id => {
-    if (id.includes('.')) return
-    const match = blockRegExp.exec(id)
-    if (!match) return
-    const [, color, type] = match
-    return `${type}.${color}`
-  },
-
-  darkOak => {
-    if (darkOak.includes('dark_oak') && darkOak !== 'dark_oak_door' && !darkOak.includes('wood'))
-      return darkOak.replace('dark_oak', 'big_oak')
-  },
-  planks => {
-    if (!planks.endsWith('planks')) return
-    const type = planks.replace(/_?planks/, '')
-    if (!['acacia', 'big_oak', 'birch', 'jungle', '', 'spruce', 'oak'].includes(type)) return planks
-
-    if (!type) return 'planks'
-    return `planks.${type}`
-  },
-
-  wood => {
-    if (!wood.endsWith('wood')) return
-    const type = wood.replace(/_?wood/, '')
-    if (!['acacia', 'dark_oak', 'birch', 'jungle', '', 'spruce', 'oak'].includes(type)) return wood
-
-    if (!type) return 'wood.oak'
-    return `wood.${type}`
-  },
-  stone => {
-    if (['andesite', 'andesiteSmooth', 'diorite', 'dioriteSmooth', 'granite', 'graniteSmooth', 'stone'].includes(stone))
-      return `stone.${stone}`
-  },
-]
 
 export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
 
@@ -193,4 +122,15 @@ export function isNotPlaying(player: Player) {
 /** Adds minecraft: namespace to the text if not added already */
 export function nmspc(text: string) {
   return text.includes(':') ? text : `minecraft:${text}`
+}
+
+export function translateEnchantment(e: MinecraftEntityTypes | Enchantment): RawText {
+  const rawtext: RawMessage[] = [{ translate: itemLocaleName({ typeId: typeof e === 'string' ? e : e.type.id }) }]
+  if (typeof e === 'object') {
+    rawtext.push(
+      { text: ' ' },
+      e.level < 10 ? { translate: `enchantment.level.${e.level.toString()}` } : { text: e.level.toString() },
+    )
+  }
+  return { rawtext }
 }

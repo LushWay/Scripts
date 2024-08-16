@@ -9,37 +9,37 @@ export class Butcher extends ShopNpc {
 
     this.shop.menu(form =>
       form
-        .addConfigurableItemSection(i.Beef)
+        .sellableItem(i.Beef)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10)
 
-        .addConfigurableItemSection(i.Chicken)
+        .sellableItem(i.Chicken)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10)
 
-        .addConfigurableItemSection(i.Cod)
+        .sellableItem(i.Cod)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10)
 
-        .addConfigurableItemSection(i.Mutton)
+        .sellableItem(i.Mutton)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10)
 
-        .addConfigurableItemSection(i.Porkchop)
+        .sellableItem(i.Porkchop)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10)
 
-        .addConfigurableItemSection(i.Rabbit)
+        .sellableItem(i.Rabbit)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10)
 
-        .addConfigurableItemSection(i.Salmon)
+        .sellableItem(i.Salmon)
         .defaultCount(100)
         .maxCount(1_000)
         .basePrice(10),

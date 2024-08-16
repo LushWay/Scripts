@@ -4,13 +4,15 @@ import 'lib/extensions/player'
 
 import 'lib/database/player'
 import { describe, expect, expectTypeOf, it } from 'vitest'
-import { Cost, ItemCost, MultiCost } from './cost'
+import { Cost, ItemCost, MoneyCost, MultiCost } from './cost'
 
 describe('cost', () => {
   it('should create item cost', () => {
     // @ts-expect-error
     const player = new Player() as Player
     const cost = new ItemCost(MinecraftItemTypes.Apple, 2)
+
+    new MultiCost(new MoneyCost(100), new ItemCost(new ItemStack(MinecraftItemTypes.Apple)))
 
     expect(cost.has(player)).toBe(false) // 0 items
 
@@ -32,6 +34,15 @@ describe('cost', () => {
     function addItem() {
       player.container?.addItem(new ItemStack(MinecraftItemTypes.Apple))
     }
+  })
+
+  it('should allow empty multicost', () => {
+    // @ts-expect-error
+    const player = new Player() as Player
+    const cost = new MultiCost()
+
+    expect(cost.has(player)).toBe(true)
+    expect(cost.buy(player)).toEqual([])
   })
 
   it('should take items', () => {

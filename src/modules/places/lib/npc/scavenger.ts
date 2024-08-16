@@ -10,7 +10,7 @@ export class Scavenger extends ShopNpc {
     this.shop.body(() => 'Скоро ты сможешь прдавать мне весь свой мусор хеехех\n\n')
 
     this.shop.menu(form => {
-      form.addItemStack(new ItemStack(i.OakSapling), new MoneyCost(1))
+      form.itemStack(new ItemStack(i.OakSapling), new MoneyCost(1))
     })
   }
 }

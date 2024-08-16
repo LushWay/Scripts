@@ -21,7 +21,7 @@ export class Jeweler extends ShopNpc {
         ] as const
       ).forEach(([typeId, rarity]) => {
         form
-          .addConfigurableItemSection(typeId)
+          .sellableItem(typeId)
           .defaultCount(10_000)
           .maxCount(rarity * 100_000)
           .basePrice((4 - rarity) * 10)

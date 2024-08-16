@@ -2,30 +2,45 @@ import { EntityDamageCause, world } from '@minecraft/server'
 import { isKeyof, selectByChance } from 'lib'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 
-export enum ItemAbility {
+export enum Ability {
   Vampire = 'vamp',
   ExtraDamage = 'dmgx',
   Nothing = '0',
 }
 
-const descriptions = {
-  [ItemAbility.Vampire]: 'Вампиризм\n\nВосстанавливает вам половину наносимого этим мечом урона',
-  [ItemAbility.ExtraDamage]: 'Дополнительный урон\n\n10% шанс сделать двойной урон',
-  [ItemAbility.Nothing]: 'Неизвестная',
-} satisfies Record<ItemAbility, string>
+const names = {
+  [Ability.Vampire]: 'Вампиризм',
+  [Ability.ExtraDamage]: 'Дополнительный урон',
+  [Ability.Nothing]: 'Неизвестная',
+} satisfies Record<Ability, string>
 
-export const itemAbilitySchema = new ItemLoreSchema('item-ability')
+const descriptions = {
+  [Ability.Vampire]: 'Восстанавливает вам половину наносимого этим мечом урона',
+  [Ability.ExtraDamage]: '10% шанс сделать двойной урон',
+  [Ability.Nothing]: '',
+}
+
+export const schema = new ItemLoreSchema('item-ability')
   .property('ability', String)
-  .display('Способность', p => (isKeyof(p, descriptions) ? descriptions[p] : descriptions[ItemAbility.Nothing]))
+  .display('Способность', p =>
+    isKeyof(p, descriptions) ? `${names[p]}\n\n${descriptions[p]}` : names[Ability.Nothing],
+  )
   .build()
+
+export const ItemAbility = {
+  Ability,
+  descriptions,
+  names,
+  schema,
+}
 
 new Command('itemability')
   .setDescription('Позволяет получать предмет с кастомной чаркой')
   .setPermissions('techAdmin')
   .array('sword type', ['diamond', 'iron', 'netherite'])
-  .array('ability', [ItemAbility.Vampire, ItemAbility.ExtraDamage])
+  .array('ability', [Ability.Vampire, Ability.ExtraDamage])
   .executes((ctx, type, ability) => {
-    const { item } = itemAbilitySchema.create({ ability }, `minecraft:${type}_sword`)
+    const { item } = schema.create({ ability }, `minecraft:${type}_sword`)
     ctx.player.container?.addItem(item)
   })
 
@@ -34,11 +49,11 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
 
   const mainhand = damagingEntity.mainhand()
   const item = mainhand.isValid() && mainhand.getItem()
-  const storage = item && itemAbilitySchema.parse(item)
+  const storage = item && schema.parse(item)
   if (!storage) return
 
   switch (storage.enchant) {
-    case ItemAbility.Vampire: {
+    case Ability.Vampire: {
       const health = damagingEntity.getComponent('health')
       if (health) {
         const newValue = health.currentValue + damage / 2
@@ -50,7 +65,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       }
       break
     }
-    case ItemAbility.ExtraDamage: {
+    case Ability.ExtraDamage: {
       if (selectByChance(extraDamage).item) {
         damagingEntity.success('х2 урон!', false)
         hurtEntity.applyDamage(damage, { damagingEntity, cause })
@@ -58,7 +73,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       break
     }
     default: {
-      storage.enchant = ItemAbility.Nothing
+      storage.enchant = Ability.Nothing
     }
   }
 })

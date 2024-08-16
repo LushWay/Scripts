@@ -1,4 +1,4 @@
-import { System, world } from '@minecraft/server'
+import { system, System, world } from '@minecraft/server'
 import stringifyError from 'lib/utils/error'
 import { util } from '../util'
 import { expand } from './extend'
@@ -34,6 +34,14 @@ declare module '@minecraft/server' {
      * @beta
      */
     runJobForEach<T>(array: T[], callback: (element: T, i: number, array: T[]) => void): Promise<void>
+
+    /**
+     * Runs a set of code on an interval inside of runJob each tickInterval ticks
+     *
+     * @param callback Code to run
+     * @param tickInterval Time in ticks between each run. Its not guaranted that it will be consistent
+     */
+    runJobInterval(callback: () => void | Generator, tickInterval: number): void
   }
 }
 
@@ -71,6 +79,20 @@ expand(System.prototype, {
     this.run(function delay() {
       util.catch(fn, 'system.delay')
     })
+  },
+
+  runJobInterval(callback, tickInterval) {
+    function jobInterval() {
+      system.runJob(
+        (function* job() {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          for (const _ of callback() ?? []) yield
+          system.runTimeout(jobInterval, 'jobInterval', tickInterval)
+        })(),
+      )
+    }
+
+    system.delay(jobInterval)
   },
 
   runJobForEach(array, callback) {
