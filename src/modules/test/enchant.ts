@@ -71,5 +71,5 @@ new Command('eat')
   .setPermissions('techAdmin')
   .setDescription('Восстанавливает голод')
   .executes(ctx => {
-    ctx.player.addEffect(MinecraftEffectTypes.Saturation, 1, { amplifier: 255 })
+    ctx.player.addEffect(MinecraftEffectTypes.Saturation, 2, { amplifier: 255 })
   })
