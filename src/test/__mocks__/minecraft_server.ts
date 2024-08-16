@@ -105,6 +105,8 @@ export class Player extends Entity {
   getRotation() {
     return { x: 0, y: 0 }
   }
+
+  location = { x: 0, y: 0, z: 0 }
 }
 
 export class System {

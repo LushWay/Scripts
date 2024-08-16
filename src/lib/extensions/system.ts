@@ -76,8 +76,9 @@ expand(System.prototype, {
   },
 
   delay(fn) {
+    const origin = stringifyError.stack.get(1)
     this.run(function delay() {
-      util.catch(fn, 'system.delay')
+      util.catch(fn, 'system.delay', origin)
     })
   },
 

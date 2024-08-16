@@ -1,9 +1,8 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { util } from '../util'
+import { t } from 'lib/text'
 import { DatabaseDefaultValue, DatabaseError, DatabaseTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
-import { t } from 'lib/text'
 
 class DynamicPropertyDB<Key extends string = string, Value = undefined> extends ProxyDatabase<Key, Value> {
   static tables: Record<string, DatabaseTable> = {}
@@ -62,7 +61,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
             key,
             typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
               ? ProxyDatabase.setDefaults(value as JsonObject, defaultv as JsonObject)
-              : value ?? defaultv,
+              : (value ?? defaultv),
           ]
         }),
       )
@@ -81,13 +80,14 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
   }
 }
 
-configureDatabase({
-  createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
-    new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
+if (!__VITEST__)
+  configureDatabase({
+    createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
+      new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
 
-  tables: DynamicPropertyDB.tables,
-  getRawTableData(tableId) {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    return world.getDynamicProperty(tableId) + ''
-  },
-})
+    tables: DynamicPropertyDB.tables,
+    getRawTableData(tableId) {
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      return world.getDynamicProperty(tableId) + ''
+    },
+  })
