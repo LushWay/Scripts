@@ -143,7 +143,7 @@ export class ArrayForm<
   ) {
     form.addButton(
       !searchQuery ? '§3Поиск' : `§3Результаты поиска по запросу\n§f${searchQuery}`,
-      'textures/ui/magnifying_glass',
+      BUTTON['search'],
       () => {
         new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
           this.show(player, fromPage, filtersDatabase, parsedFilters, query)
@@ -181,7 +181,7 @@ export class ArrayForm<
     } else {
       const propertName = 'filters'
       const applied = Object.keys(database[propertName] ?? {}).length
-      form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, 'textures/ui/gear', () =>
+      form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON['settings'], () =>
         settingsGroupMenu(
           player,
           propertName,

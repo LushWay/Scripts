@@ -1,4 +1,4 @@
-import { ActionForm, FormCallback } from 'lib'
+import { ActionForm, BUTTON, FormCallback } from 'lib'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { Mail } from 'lib/mail'
@@ -50,8 +50,8 @@ Menu.open = player => {
 
   form
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
-    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/gear', () => mailMenu(player, back))
-    .addButton('§7Настройки', 'textures/ui/gear', () => playerSettingsMenu(player, back))
+    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, BUTTON.settings, () => mailMenu(player, back))
+    .addButton('§7Настройки', BUTTON.settings, () => playerSettingsMenu(player, back))
 
   return form
 }

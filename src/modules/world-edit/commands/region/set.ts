@@ -42,7 +42,7 @@ export function setSelection(player: Player) {
   const [replaceBlock, replaceBlockDisplay] = use(player, 'replaceBlock', 'Заменяемый блок', {
     notSelected: {
       description: 'Будут заполнены все блоки. Нажми чтобы выбрать конкретные',
-      icon: 'textures/ui/magnifying_glass.png',
+      icon: 'textures/ui/custom/search.png',
     },
   })
   new ChestForm('small')
