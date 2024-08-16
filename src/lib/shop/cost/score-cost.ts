@@ -9,7 +9,7 @@ export class ScoreboardCost extends Cost {
 
   constructor(cost = 1) {
     super()
-    if (cost < 0) throw new TypeError(`Invalid ScoreboardCost: ${cost} < 0, positive number expected`)
+    if (cost < 0) throw new TypeError(`Invalid ScoreboardCost: §f${cost}§c < 0, positive number expected`)
     this.cost = cost
   }
 

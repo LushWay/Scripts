@@ -1,7 +1,7 @@
 import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { langKey } from 'lib'
 import { emoji } from 'lib/assets/emoji'
-import { itemLocaleName } from 'lib/game-utils'
 import { noBoolean } from 'lib/util'
 
 export type Reward =
@@ -131,9 +131,7 @@ export function itemDescription(
   return {
     rawtext: [
       { text: c },
-      item.nameTag
-        ? { text: item.nameTag.replaceAll(/§./g, '').replace(/\n.*/, '') }
-        : { translate: itemLocaleName(item) },
+      item.nameTag ? { text: item.nameTag.replaceAll(/§./g, '').replace(/\n.*/, '') } : { translate: langKey(item) },
       amount && item.amount ? { text: ` §r§f${c}x${item.amount}` } : false,
     ].filter(noBoolean),
   }

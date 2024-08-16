@@ -2,10 +2,11 @@ import { ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { BUTTON, getAuxOrTexture } from 'lib'
 import { t } from 'lib/text'
-import { ItemCost, MoneyCost, NoItemsToSell, TooMuchItems } from '../cost'
+import { ItemCost, MoneyCost } from '../cost'
 import { ShopForm, ShopFormSection } from '../form'
 import { itemDescription } from '../rewards'
 import { Shop } from '../shop'
+import { ErrorCost } from '../cost/cost'
 
 export function createSellableItem({
   form,
@@ -55,6 +56,9 @@ export function createSellableItem({
     aux,
   )
 }
+
+const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
+const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
 
 function createBuy(
   buy: number,

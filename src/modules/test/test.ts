@@ -1,9 +1,10 @@
 /* eslint-disable */
 
-import { ItemStack, MolangVariableMap, system, world } from '@minecraft/server'
+import { MolangVariableMap, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
+  MinecraftEnchantmentTypes,
   MinecraftEntityTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data'
@@ -20,7 +21,6 @@ import {
   inspect,
   is,
   isKeyof,
-  itemLocaleName,
   restorePlayerCamera,
   util,
 } from 'lib'
@@ -198,27 +198,11 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       }),
     )
   },
-  localization(ctx) {
-    const i = MinecraftItemTypes
-
-    const items = [
-      i.AcaciaButton,
-      i.AcaciaStairs,
-      i.Apple,
-      i.BannerPattern,
-      i.NetheriteAxe,
-      i.ZombieHorseSpawnEgg,
-      i.Boat,
-      i.ChestBoat,
-      i.DarkOakBoat,
-      i.BlueWool,
-      i.CobblestoneWall,
-    ]
-
-    for (const item of items) {
-      const stack = new ItemStack(item)
-      ctx.reply(itemLocaleName(stack))
-    }
+  e(ctx) {
+    const m = ctx.player.mainhand()
+    const item = m.getItem()
+    if (!item) return
+    console.log(Object.values(MinecraftEnchantmentTypes).map(e => item.enchantable?.getEnchantment(e)))
   },
   particle(ctx) {
     const block = ctx.player.getBlockFromViewDirection({

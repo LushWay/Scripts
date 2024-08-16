@@ -17,6 +17,10 @@ export class MultiCost<T extends Cost[]> extends Cost {
     return this.costs.every(e => e.type === CostType.Requirement) ? CostType.Requirement : CostType.Action
   }
 
+  get multiline(): boolean {
+    return this.costs.length > 1 || this.costs.some(e => e.multiline)
+  }
+
   toString(canBuy = true, player?: Player): RawText {
     return {
       rawtext: this.costs

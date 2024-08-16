@@ -215,7 +215,11 @@ export class ShopForm {
   private buy({ onBuy, cost, player, text, back, sell }: ShopProductBuy) {
     const canBuy = () => {
       if (!cost.has(player)) {
-        this.show(player, t.raw`${t.error`Недостаточно средств:\n`}${cost.failed(player)}`, back)
+        this.show(
+          player,
+          t.raw`${t.error`Покупка невозможна:${cost.multiline ? '\n' : ' '}`}${cost.failed(player)}`,
+          back,
+        )
         return false
       } else return true
     }

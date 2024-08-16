@@ -1,10 +1,13 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
-import { ActionForm, getAuxOrTexture } from 'lib'
+import { Enchantments, isKeyof, translateEnchantment } from 'lib'
+import { Sounds } from 'lib/assets/config'
 import { Group } from 'lib/rpg/place'
-import { FreeCost, MoneyCost, MultiCost } from 'lib/shop/cost'
+import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
+import { ErrorCost } from 'lib/shop/cost/cost'
+import { ShopFormSection } from 'lib/shop/form'
 import { ShopNpc } from 'lib/shop/npc'
-import { itemDescription } from 'lib/shop/rewards'
+import { t } from 'lib/text'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 import { ItemAbility } from 'modules/pvp/item-ability'
 
@@ -14,95 +17,129 @@ export class Mage extends ShopNpc {
 
     this.shop.body(() => 'Чего пожелаешь?')
     this.shop.menu(form => {
-      form
-        .section('Улучшить/купить оружие', (form, player) => {
-          form.itemModifier(
-            'Улучшить остроту меча',
-            FreeCost,
-            item => item.typeId.endsWith('sword'),
-            slot => {
-              const item = slot.getItem()
-              if (!item) return
+      form.itemModifierSection(
+        'Улучшить меч',
+        item => ['sword'].some(e => item.typeId.endsWith(e)),
+        'любой меч',
+        (form, slot, item) => {
+          const ench = this.createEnch(form, item, slot)
 
-              const subform = new ActionForm('Туы')
-                .addButtonBack(form.show)
-                .addButton(
-                  itemDescription(item),
-                  getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
-                  () => subform.show(player),
-                )
-                .addButton('Ффф', () => {
-                  this.updateEnchatnment(slot, e.Sharpness, 1)
-                })
+          ench(e.Sharpness, level => new MultiCost().money(level * 20))
+        },
+      )
 
-              subform.show(player)
-            },
-          )
-          form.product(
-            `§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`,
-            new MultiCost().item(i.DiamondSword).item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10_000),
-            player => {
-              player.container?.addItem(
-                ItemAbility.schema.create({ ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
-              )
-            },
+      form.itemModifierSection(
+        'Улучшить броню',
+        item => ['chestplate', 'leggings', 'boots', 'helmet'].some(e => item.typeId.endsWith(e)),
+        'любой элемент брони',
+        (form, slot, item) => {
+          const ench = this.createEnch(form, item, slot)
+
+          ench(e.Protection, level => new MultiCost().money(level * 20))
+          ench(e.ProjectileProtection, level => new MultiCost().money(level * 20))
+          ench(e.FireProtection, level => new MultiCost().money(level * 20))
+          ench(e.BlastProtection, level => new MultiCost().money(level * 20))
+        },
+      )
+
+      form.section('Оружие со способностями', (form, player) => {
+        const cost = new MultiCost().item(i.DiamondSword).item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10000)
+        form.product(`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`, cost, player => {
+          if (!player.container) return
+
+          cost.buy(player)
+          player.container.addItem(
+            ItemAbility.schema.create({ ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
           )
         })
-        // .section('Улучшить броню', form => {
-        //   form.itemModifierSection(
-        //     '+Защита',
-        //     item => item.typeId.endsWith('chestplate'),
-        //     'Броня',
-        //     form => {},
-        //   )
-        //   form.itemModifier(
-        //     'Улучшить защиту',
-        //     new MultiCost().item(i.LapisLazuli, 3).money(10),
-        //     item => item.typeId.endsWith('chestplate'),
-        //     slot => this.updateEnchatnment(slot, e.Protection, 1),
-        //   )
-        // })
-        .itemModifierSection(
-          'Улучшить броню',
-          item => item.typeId.endsWith('chestplate'),
-          'любой элемент брони',
-          (form, slot) => {
-            form.product('+Защита', new MultiCost().money(1), (player, text, success) => {
-              this.updateEnchatnment(slot, e.Protection, 1)
-              success()
-            })
-          },
-        )
-        .section('Все для магии', form =>
-          form
-            .section('Грибы', form =>
-              form
-                .itemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
-                .itemStack(new ItemStack(i.RedMushroom), new MoneyCost(200)),
-            )
+      })
 
-            // TODO Potion API
-            // Пока нет PotionAPI или сгенереных предметов не трогаем
+      form.section('Все для магии', form =>
+        form
+          .section('Грибы', form =>
+            form
+              .itemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
+              .itemStack(new ItemStack(i.RedMushroom), new MoneyCost(200)),
+          )
 
-            // .addSection('Зелья', form => {
-            //   form.addItemStack(new ItemStack(i.SplashPotion), new MoneyCost(10))
-            // })
-            .itemStack(IceBombItem, new MoneyCost(100))
-            .itemStack(FireBallItem, new MoneyCost(100))
-            .itemStack(new ItemStack(i.TotemOfUndying), new MultiCost().money(6_000).item(i.Emerald, 1))
-            .itemStack(new ItemStack(i.EnchantedGoldenApple), new MultiCost().item(i.GoldenApple).money(10_000)),
-        )
+          // TODO Potion API
+          // Пока нет PotionAPI или сгенереных предметов не трогаем
+
+          // .addSection('Зелья', form => {
+          //   form.addItemStack(new ItemStack(i.SplashPotion), new MoneyCost(10))
+          // })
+          .itemStack(IceBombItem, new MoneyCost(100))
+          .itemStack(FireBallItem, new MoneyCost(100))
+          .itemStack(new ItemStack(i.TotemOfUndying), new MultiCost().money(6_000).item(i.Emerald, 1))
+          .itemStack(new ItemStack(i.EnchantedGoldenApple), new MultiCost().item(i.GoldenApple).money(10_000)),
+      )
     })
   }
 
-  updateEnchatnment(slot: ContainerSlot, type: e, level = 1) {
-    const item = slot.getItem()
-    if (item?.enchantable) {
-      item.enchantable.addEnchantment({
-        type: new EnchantmentType(type),
-        level: (item.enchantable.getEnchantment(type)?.level ?? 0) + level,
-      })
-      slot.setItem(item)
+  createEnch(form: ShopFormSection, item: ItemStack, slot: ContainerSlot) {
+    return (type: e, getCost: (currentLevel: number) => Cost, up = 1) => {
+      const { can, level } = this.updateEnchatnment(slot, type, up, true)
+      form.product(
+        { rawtext: [{ text: `${can ? '' : '§7'}+` }, ...(translateEnchantment(type).rawtext ?? [])] },
+        can ? getCost(level) : level === -1 ? Incompatible : MaxLevel,
+        player => {
+          this.updateEnchatnment(slot, type, up)
+          player.playSound(Sounds.LevelUp)
+        },
+      )
     }
   }
+
+  updateEnchatnment(slot: ContainerSlot, type: e, up = 1, check = false): { can: boolean; level: number } {
+    const item = slot.getItem()?.clone()
+    const cant = { can: false, level: 0 }
+
+    if (item?.enchantable) {
+      const { maxLevel: max } = new EnchantmentType(type)
+      const current = item.enchantable.getEnchantment(type)?.level ?? 0
+      const level = current + up
+
+      if (level > max) {
+        const levels = Enchantments.typed[type]
+        if (typeof levels === 'undefined') return cant
+
+        const items = levels[current + 1]
+        if (typeof items === 'undefined') return cant
+
+        const enchitem = isKeyof(item.typeId, items) ? items[item.typeId] : undefined
+        if (!enchitem) return cant
+
+        if (check) return { can: true, level }
+        const newitem = enchitem.clone()
+        newitem.enchantable?.addEnchantments(item.enchantable.getEnchantments().filter(e => e.type.id !== type))
+
+        copyItemProps(item, newitem)
+        slot.setItem(newitem)
+      } else {
+        try {
+          item.enchantable.addEnchantment({ type: new EnchantmentType(type), level })
+        } catch (e) {
+          return { can: false, level: -1 }
+        }
+        if (check) return { can: true, level }
+        slot.setItem(item)
+      }
+    }
+    return cant
+  }
+}
+
+const MaxLevel = ErrorCost(t.error`Максимальный уровень`)
+const Incompatible = ErrorCost(t`§8Зачарование несовместимо`)
+
+function copyItemProps(item: ItemStack, newitem: ItemStack) {
+  newitem.nameTag = item.nameTag
+  newitem.amount = item.amount
+  if (newitem.durability && item.durability) newitem.durability.damage = item.durability.damage
+  newitem.setLore(item.getLore())
+  newitem.setCanDestroy(item.getCanDestroy())
+  newitem.setCanPlaceOn(item.getCanPlaceOn())
+  newitem.keepOnDeath = item.keepOnDeath
+  newitem.lockMode = item.lockMode
+  for (const prop of item.getDynamicPropertyIds()) newitem.setDynamicProperty(prop, item.getDynamicProperty(prop))
 }

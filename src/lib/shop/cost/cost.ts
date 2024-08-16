@@ -16,7 +16,12 @@ export abstract class Cost<T = unknown> {
     return CostType.Action
   }
 
-  /**
+  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+  get multiline(): boolean {
+    return false
+  }
+
+   /**
    * Returns string representation of cost
    *
    * @param canBuy - Whenether to display this cost as affordable by player or not
@@ -52,8 +57,6 @@ export abstract class Cost<T = unknown> {
   }
 }
 
-export const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
-export const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
 export const FreeCost: Cost = new (class extends Cost {
   get type(): CostType {
     return CostType.Requirement
@@ -68,7 +71,7 @@ export const FreeCost: Cost = new (class extends Cost {
   }
 })()
 
-function ErrorCost(message: MaybeRawText): Cost {
+export function ErrorCost(message: MaybeRawText): Cost {
   return new (class extends Cost {
     get type(): CostType {
       return CostType.Requirement

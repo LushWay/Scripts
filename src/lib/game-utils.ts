@@ -11,7 +11,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { MinecraftCameraPresetsTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { MinecraftCameraPresetsTypes, MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { SafeLocation } from 'lib'
 import { blockItemsLangJson } from 'lib/assets/blocks-items-lang'
 import { Vector } from 'lib/vector'
@@ -77,7 +77,7 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
  * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
  * capitalizes first letter
  *
- * @deprecated Consider using {@link itemLocaleName}
+ * @deprecated Consider using {@link langKey}
  * @example
  *   typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
  *
@@ -101,9 +101,9 @@ export function typeIdToReadable(typeId: string) {
  *
  * @example
  *   const apple = new ItemStack(MinecraftItemTypes.Apple)
- *   itemLocaleName(apple) // %item.apple.name
+ *   langKey(apple) // %item.apple.name
  */
-export function itemLocaleName(item: Pick<ItemStack, 'typeId'> | string) {
+export function langKey(item: Pick<ItemStack, 'typeId'> | string) {
   const typeId = typeof item === 'object' ? item.typeId : item
   return typeId in blockItemsLangJson ? blockItemsLangJson[typeId] : typeId
 }
@@ -124,8 +124,8 @@ export function nmspc(text: string) {
   return text.includes(':') ? text : `minecraft:${text}`
 }
 
-export function translateEnchantment(e: MinecraftEntityTypes | Enchantment): RawText {
-  const rawtext: RawMessage[] = [{ translate: itemLocaleName({ typeId: typeof e === 'string' ? e : e.type.id }) }]
+export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment): RawText {
+  const rawtext: RawMessage[] = [{ translate: langKey({ typeId: typeof e === 'string' ? e : e.type.id }) }]
   if (typeof e === 'object') {
     rawtext.push(
       { text: ' ' },

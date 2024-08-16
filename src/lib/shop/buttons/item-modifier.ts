@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { BUTTON, ChestForm, getAuxOrTexture, itemLocaleName, translateEnchantment } from 'lib'
+import { BUTTON, ChestForm, getAuxOrTexture, langKey, translateEnchantment, typeIdToReadable } from 'lib'
 import { MaybeRawText, t } from 'lib/text'
 import { Cost, MultiCost, ShouldHaveItemCost } from '../cost'
 import { ShopForm, ShopFormSection, ShopProduct } from '../form'
@@ -76,12 +76,17 @@ export function createItemModifierSection(
             back,
 
             (form, player) => {
+              const itemStack = slot.getItem()
+
+              if (!itemStack) return
+              item = itemStack
+
               form.body = () =>
                 t.raw`Зачарования:\n${{
                   rawtext: item.enchantable?.getEnchantments().map(translateEnchantment).flat(),
                 }}`
               form.button(
-                t.raw`Выбранный предмет: ${{ translate: itemLocaleName(item) }}\n§7Нажмите, чтобы сменить`,
+                t.raw`Выбранный предмет: ${{ translate: langKey(item) }}\n§7Нажмите, чтобы сменить`,
                 getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
                 select,
               )
@@ -119,8 +124,9 @@ function selectItem(itemFilter: ItemFilter, player: Player, text: MaybeRawText, 
     chestForm.button({
       slot: i + 9,
       icon: item.typeId,
-      nameTag: '%' + itemLocaleName(item.typeId),
+      nameTag: typeIdToReadable(item.typeId), // TODO: use '%' + langKey(item.typeId),
       amount: item.amount,
+      enchanted: !!item.enchantable?.getEnchantments().length,
       lore: item.getLore(),
       callback: () => select(container.getSlot(i), item),
     })

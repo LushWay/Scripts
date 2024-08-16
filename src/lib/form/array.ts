@@ -141,15 +141,11 @@ export class ArrayForm<
     filtersDatabase: SettingsDatabase,
     parsedFilters: F,
   ) {
-    form.addButton(
-      !searchQuery ? '§3Поиск' : `§3Результаты поиска по запросу\n§f${searchQuery}`,
-      BUTTON['search'],
-      () => {
-        new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
-          this.show(player, fromPage, filtersDatabase, parsedFilters, query)
-        })
-      },
-    )
+    form.addButton(!searchQuery ? '§3Поиск' : `§3Результаты поиска по запросу\n§f${searchQuery}`, BUTTON.search, () => {
+      new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
+        this.show(player, fromPage, filtersDatabase, parsedFilters, query)
+      })
+    })
   }
 
   private addFilterButton(
@@ -181,7 +177,7 @@ export class ArrayForm<
     } else {
       const propertName = 'filters'
       const applied = Object.keys(database[propertName] ?? {}).length
-      form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON['settings'], () =>
+      form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,
           propertName,
