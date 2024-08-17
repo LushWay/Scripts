@@ -1,4 +1,4 @@
-import '../places/anarchy'
+import '../places/anarchy/anarchy'
 import '../places/mineshaft/mineshaft'
 import '../places/spawn'
 import '../places/stone-quarry/stone-quarry'

@@ -2,7 +2,7 @@ import { EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { Cooldown, is, isBuilding, Join, ms, prompt } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-properties'
 import { t } from 'lib/text'
-import { PlayerNameTagModifiers } from 'modules/indicator/playerNameTag'
+import { PlayerNameTagModifiers } from 'modules/indicator/player-name-tag'
 
 const newbieTime = ms.from('hour', 2)
 

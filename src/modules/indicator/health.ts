@@ -7,7 +7,7 @@ import { CustomEntityTypes } from 'lib/assets/config'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { isNotPlaying } from 'lib/game-utils'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
-import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/playerNameTag'
+import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/player-name-tag'
 
 interface BaseHurtEntity {
   hurtEntity: Entity

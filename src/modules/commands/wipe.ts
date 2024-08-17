@@ -1,7 +1,7 @@
 import { GameMode, system } from '@minecraft/server'
 import { Airdrop, Compass, Join, prompt } from 'lib'
 import { Quest } from 'lib/quest'
-import { Anarchy } from 'modules/places/anarchy'
+import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Spawn } from 'modules/places/spawn'
 import { updateBuilderStatus } from 'modules/world-edit/builder'
 

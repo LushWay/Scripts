@@ -9,7 +9,7 @@ import { playerSettingsMenu } from 'lib/settings'
 import { t } from 'lib/text'
 import { mailMenu } from 'modules/commands/mail'
 import { openBaseMenu } from 'modules/places/base/base-menu'
-import { Anarchy } from '../places/anarchy'
+import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
 
 function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = 'Спавн', extra = '') {

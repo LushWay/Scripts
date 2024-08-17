@@ -1,15 +1,17 @@
 import { GameMode, Player } from '@minecraft/server'
-import { InventoryStore, Portal, ValidLocation, Vector, Zone, location } from 'lib'
+import { InventoryStore, Portal, ValidLocation, Vector, location } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
-import { AreaWithInventory } from './lib/area-with-inventory'
+import { AreaWithInventory } from '../lib/area-with-inventory'
+import { RadioactiveZone } from './radioactive-zone'
+import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {
   portal: Portal | undefined
 
-  zone: Zone | undefined
+  zone: RadioactiveZone | undefined
 
   learningRTP(player: Player) {
     // Hook function
@@ -29,7 +31,7 @@ class AnarchyBuilder extends AreaWithInventory {
     this.centerLocation.onLoad.subscribe(centerLocation => {
       if (!centerLocation.firstLoad) return console.warn('Anarchy center changed, reload to update zone/radius command')
 
-      this.zone = new Zone(centerLocation, players => players.length * 50)
+      this.zone = new RadioactiveZone(centerLocation, players => players.length * 500 + 3000)
 
       new Command('radius')
         .setDescription('Выдает радиус границы анархии сейчас')

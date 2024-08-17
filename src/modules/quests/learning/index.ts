@@ -12,7 +12,7 @@ import { Npc } from 'lib/rpg/npc'
 
 import { t } from 'lib/text'
 import { Axe } from 'modules/features/axe'
-import { Anarchy } from 'modules/places/anarchy'
+import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
