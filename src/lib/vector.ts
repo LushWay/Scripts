@@ -166,13 +166,7 @@ export class Vector {
    *   Returns a vector that is made from the largest components of two vectors.
    */
   static max(a: Vector3, b: Vector3) {
-    const vectors = [a, b]
-    const arr = vectors.map(({ x, y, z }) => new Vector(x, y, z).length())
-    const max = Math.max(...arr)
-    const index = arr.indexOf(max)
-    const vector3 = vectors[index]
-
-    return new Vector(vector3.x, vector3.y, vector3.z)
+    return { x: Math.max(a.x, b.x), y: Math.max(a.y, b.y), z: Math.max(a.z, b.z) }
   }
 
   /**
@@ -180,13 +174,7 @@ export class Vector {
    *   Returns a vector that is made from the smallest components of two vectors.
    */
   static min(a: Vector3, b: Vector3) {
-    const vectors = [a, b]
-    const arr = vectors.map(({ x, y, z }) => new Vector(x, y, z).length())
-    const min = Math.min(...arr)
-    const index = arr.indexOf(min)
-    const vector3 = vectors[index]
-
-    return new Vector(vector3.x, vector3.y, vector3.z)
+    return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), z: Math.min(a.z, b.z) }
   }
 
   /**

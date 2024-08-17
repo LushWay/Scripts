@@ -5,6 +5,7 @@ import { InventoryStore, Portal, RegionCallback, Settings, locationWithRotation,
 
 import { isNotPlaying } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
 import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
@@ -72,11 +73,7 @@ class SpawnBuilder extends AreaWithInventory {
         })
       })
 
-      this.region = SafeAreaRegion.create({
-        center: spawnLocation,
-        radius: 30,
-        dimensionId: 'overworld',
-      })
+      this.region = SafeAreaRegion.create(new SphereArea({ center: spawnLocation, radius: 30 }, 'overworld'))
     }
   }
 

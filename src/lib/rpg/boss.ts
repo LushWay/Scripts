@@ -6,6 +6,7 @@ import { table } from 'lib/database/abstract'
 import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
 import { location, SafeLocation } from 'lib/location'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { Group, Place } from './place'
@@ -78,12 +79,10 @@ export class Boss {
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()
-      this.region = BossArenaRegion.create({
-        center,
-        radius: 40,
-        dimensionId: this.options.place.group.dimensionId,
-        bossName: this.options.place.name,
-      })
+      this.region = BossArenaRegion.create(
+        new SphereArea({ center, radius: 40 }, this.options.place.group.dimensionId),
+        { bossName: this.options.place.name },
+      )
     })
 
     Boss.all.push(this)

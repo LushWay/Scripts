@@ -36,5 +36,8 @@ export const NOT_MOB_ENTITIES = [
   CustomEntityTypes.Database,
   CustomEntityTypes.FloatingText,
   CustomEntityTypes.Sit,
+  CustomEntityTypes.Grave,
+  CustomEntityTypes.Loot,
   MinecraftEntityTypes.Npc,
+  'minecraft:item',
 ] as string[]

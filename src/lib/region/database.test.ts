@@ -1,11 +1,12 @@
+import { Region } from 'lib'
 import { Vector } from 'lib/vector'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { ChunkCubeArea } from './areas/chunk-cube'
+import { SphereArea } from './areas/sphere'
 import { RegionDatabase, registerRegionKind, restoreRegionFromJSON } from './database'
-import { CubeRegion } from './kinds/cube'
-import { RadiusRegion } from './kinds/radius'
 
-class TestRadiusRegion extends RadiusRegion {
-  static kind = 'test'
+class TestK1Region extends Region {
+  static kind = 'k1'
 
   method() {}
 
@@ -19,9 +20,11 @@ class TestRadiusRegion extends RadiusRegion {
     return this.key
   }
 }
-registerRegionKind(TestRadiusRegion)
+registerRegionKind(TestK1Region)
 
-class TestCubeRegion extends CubeRegion {
+class TestK2Region extends Region {
+  static kind = 'k2'
+
   get regionKey() {
     return this.key
   }
@@ -30,57 +33,58 @@ class TestCubeRegion extends CubeRegion {
     return this.toJSON()
   }
 }
-registerRegionKind(TestCubeRegion)
+registerRegionKind(TestK2Region)
 
 beforeAll(() => {
-  TestRadiusRegion.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
+  TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
 })
 
 describe('region initialization', () => {
   it('should restore right kind of region from json', () => {
-    const region = TestRadiusRegion.create(
-      { center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 },
+    const region = TestK1Region.create(
+      new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'),
+      {},
       'test',
     )
     const json = region.json
 
-    expect(json.t).toBe('r')
-    expect(json.st).toBe(TestRadiusRegion.kind)
+    expect(json.a.t).toBe(SphereArea.type)
+    expect(json.k).toBe(TestK1Region.kind)
 
-    expect(restoreRegionFromJSON(['test', json])).toBeInstanceOf(TestRadiusRegion)
+    expect(restoreRegionFromJSON(['test', json])).toBeInstanceOf(TestK1Region)
     expect(restoreRegionFromJSON(['test', json])).toEqual(region)
   })
 
   it('should restore region from database', () => {
-    const region = TestRadiusRegion.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
+    const region = TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
     const regionJSON = RegionDatabase[region.regionKey]
 
     expect(regionJSON).toEqual(region.json)
 
     region.delete()
-    expect(restoreRegionFromJSON(['test 2', regionJSON])).toBeInstanceOf(TestRadiusRegion)
+    expect(restoreRegionFromJSON(['test 2', regionJSON])).toBeInstanceOf(TestK1Region)
   })
 
   it('should restore cuberegion', () => {
-    const region = TestCubeRegion.create({ from: Vector.one, to: Vector.one, dimensionId: 'overworld' })
+    const region = TestK2Region.create(new ChunkCubeArea({ from: Vector.one, to: Vector.one }, 'overworld'))
     const regionJSON = RegionDatabase[region.regionKey]
 
     expect(regionJSON).toEqual(region.json)
-    expect(restoreRegionFromJSON(['test', regionJSON])).toBeInstanceOf(CubeRegion)
+    expect(restoreRegionFromJSON(['test', regionJSON])).toBeInstanceOf(TestK2Region)
   })
 
   it('should restore defult RadiusRegion when kind is unknown', () => {
-    class OldRadiusRegionKind extends TestRadiusRegion {
+    class OldRadiusRegionKind extends TestK1Region {
       static kind = 'unknown'
     }
 
-    const region = OldRadiusRegionKind.create({ center: { x: 0, y: 0, z: 0 }, dimensionId: 'overworld', radius: 2 })
-
+    const region = OldRadiusRegionKind.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
     const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
     expect(restoreRegionFromJSON(['test', region.json])).toBeUndefined()
     expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7[Region][Database] No kind found for §fr§7 -> §funknown§7. Maybe you forgot to register kind or import file?§7",
+        "§7[Region][Database] No kind found for §funknown§7. Maybe you forgot to register kind or import file?§7",
       ]
     `)
   })

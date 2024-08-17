@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, LockAction, RadiusRegion, Region, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
+import { ActionForm, LockAction, Region, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
 import { BaseRegion } from './region'
 
 export function openBaseMenu(
@@ -16,18 +16,18 @@ export function openBaseMenu(
   baseMenu(player, base, back)
 }
 
-function baseMenu(player: Player, base: RadiusRegion, back?: VoidFunction) {
+function baseMenu(player: Player, base: Region, back?: VoidFunction) {
   const isOwner = base.getMemberRole(player) === 'owner'
   const baseBack = () => baseMenu(player, base, back)
   const form = new ActionForm(
     'Меню базы',
-    `${isOwner ? 'Это ваша база.' : `База игрока ${base.ownerName}`}\n\nКоординаты: ${Vector.string(base.center, true)}`,
+    `${isOwner ? 'Это ваша база.' : `База игрока ${base.ownerName}`}\n\nКоординаты: ${Vector.string(base.area.center, true)}`,
   )
 
   if (back) form.addButtonBack(back)
 
   form
-    .addButton('Телепорт!', () => player.teleport(Vector.add(base.center, { x: 0.5, y: 2, z: 0.5 })))
+    .addButton('Телепорт!', () => player.teleport(Vector.add(base.area.center, { x: 0.5, y: 2, z: 0.5 })))
     .addButton(`Участники§7 (${base.permissions.owners.length})`, () =>
       manageRegionMembers(player, base, {
         back: baseBack,

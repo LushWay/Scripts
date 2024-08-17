@@ -1,7 +1,8 @@
 import { Block, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { CubeRegion, LockAction, RadiusRegion, Region, Vector, getBlockStatus } from 'lib'
+import { LockAction, Region, Vector, getBlockStatus } from 'lib'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { actionGuard } from 'lib/region/index'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { openBaseMenu } from 'modules/places/base/base-menu'
@@ -50,9 +51,8 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     return player.fail(`§cВы уже ${isOwner ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`}!`)
   }
 
-  const nearRegion = getNearRegions(block)
-
-  if (nearRegion) {
+  const isThereNearRegions = Region.regions.some(r => r.area.isNear(block, 50))
+  if (isThereNearRegions) {
     event.cancel = true
     return player.fail('§cРядом есть другие регионы!')
   }
@@ -70,22 +70,20 @@ base
   .setDescription('Выдает предмет базы')
   .executes(ctx => {
     ctx.player.container?.addItem(BaseItem.itemStack)
-    ctx.reply('База выдана')
+    ctx.player.success()
   })
 
 system.runInterval(
   () => {
-    const playersLocations = world.getAllPlayers().map(p => {
-      return { dimension: p.dimension.type, loc: p.location }
-    })
+    const playersLocations = world.getAllPlayers().map(p => ({ d: p.dimension.type, l: p.location }))
 
     for (const base of Region.regionInstancesOf(BaseRegion)) {
-      const block = getBlockStatus({ location: base.center, dimensionId: base.dimensionId })
+      const block = getBlockStatus({ location: base.area.center, dimensionId: base.dimensionId })
       if (block === 'unloaded') continue
 
       if (block.typeId === MinecraftBlockTypes.Barrel) {
-        if (playersLocations.find(e => e.dimension === base.dimensionId && Vector.distance(base.center, e.loc) < 10)) {
-          spawnParticlesInArea(base.center, Vector.add(base.center, Vector.one))
+        if (playersLocations.some(p => p.d === base.dimensionId && base.area.isNear(p.l, 10))) {
+          spawnParticlesInArea(base.area.center, Vector.add(base.area.center, Vector.one))
         }
       } else {
         // TODO База должна сгнить
@@ -101,10 +99,7 @@ system.runInterval(
 function createBase(block: Block, player: Player) {
   const center = Vector.floor(block.location)
   if (!player.isSimulated()) player.log('Base', 'created a on ' + Vector.string(center, true))
-  BaseRegion.create({
-    center: center,
-    radius: 10,
-    dimensionId: block.dimension.type,
+  BaseRegion.create(new SphereArea({ center, radius: 10 }, block.dimension.type), {
     permissions: {
       doorsAndSwitches: false,
       openContainers: false,
@@ -114,29 +109,4 @@ function createBase(block: Block, player: Player) {
     },
   })
   player.success('База успешно создана! Чтобы открыть меню базы используйте команду §6.base')
-}
-
-function getNearRegions(block: Block) {
-  return Region.regions.find(r => {
-    if (r instanceof RadiusRegion) {
-      return Vector.distance(r.center, block.location) < r.radius + 50
-    } else if (r instanceof CubeRegion) {
-      const { from, to } = r.edges
-
-      const min = Vector.min(from, to)
-      const max = Vector.max(from, to)
-
-      const size = 30
-
-      return Vector.between(
-        Vector.add(min, { x: -size, y: 0, z: -size }),
-        Vector.add(max, { x: size, y: 0, z: size }),
-        {
-          x: block.x,
-          y: 0,
-          z: block.z,
-        },
-      )
-    }
-  })
 }

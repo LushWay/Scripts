@@ -2,16 +2,18 @@ import { system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
+import { Area } from './areas/area'
+import { SphereArea } from './areas/sphere'
 import type { Region, RegionPermissions } from './kinds/region'
 
 export type RLDB = JsonObject | undefined
 
 export interface RegionSave {
-  /** Region type */
-  t: string
+  /** Region type (area) */
+  a: { t: string; d: JsonObject }
 
   /** Region subtype (kind) */
-  st: string
+  k: string
 
   /** Linked database */
   ldb?: RLDB
@@ -19,25 +21,11 @@ export interface RegionSave {
   permissions: Partial<RegionPermissions>
 }
 
-export interface CubeRegionSave extends RegionSave {
-  t: 'c'
-  from: VectorXZ
-  to: VectorXZ
-}
-
-export interface RadiusRegionSave extends RegionSave {
-  t: 'r'
-  radius: number
-  center: Vector3
-}
-
-export const RegionDatabase = table<CubeRegionSave | RadiusRegionSave | RegionSave>('region', () => ({
-  t: 'r',
-  st: 'radius',
-  permissions: {},
+export const RegionDatabase = table<RegionSave>('region-v2', () => ({
+  a: { t: SphereArea.type, d: {} },
+  k: 'r',
   dimensionId: 'overworld',
-  center: { x: 0, y: 0, z: 0 },
-  radius: 0,
+  permissions: {},
 }))
 
 system.delay(() => {
@@ -56,17 +44,25 @@ export function registerRegionKind(region: typeof Region) {
 }
 
 export function restoreRegionFromJSON([key, region]: [string, (typeof RegionDatabase)[string]]) {
+  Area.loaded = true
   loaded = true
 
   if (typeof region === 'undefined') return
   region = ProxyDatabase.unproxy(region)
 
-  const kind = kinds.find(e => e.type === region.t && e.kind === region.st)
+  const kind = kinds.find(e => e.kind === region.k)
   if (!kind) {
+    console.warn(t`[Region][Database] No kind found for ${region.k}. Maybe you forgot to register kind or import file?`)
+    return
+  }
+
+  const area = Area.areas.find(e => e.type === region.a.t)
+  if (!area) {
     console.warn(
-      t`[Region][Database] No kind found for ${region.t} -> ${region.st}. Maybe you forgot to register kind or import file?`,
+      t`[Region][Database] No area found for ${region.a.t}. Maybe you forgot to register kind or import file?`,
     )
     return
   }
-  return kind.create(region, key)
+
+  return kind.create(new area(region.a.d), region, key)
 }

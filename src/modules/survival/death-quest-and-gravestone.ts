@@ -2,6 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, ms } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/config'
 import { Quest } from 'lib/quest/quest'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
 import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
@@ -78,7 +79,10 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
 
   const places = PlaceWithSafeArea.places
     .map(place => ({
-      distance: place.safeArea ? Vector.distance(place.safeArea.center, deadAt) - place.safeArea.radius : 0,
+      distance: place.safeArea
+        ? Vector.distance(place.safeArea.area.center, deadAt) -
+          (place.safeArea.area instanceof SphereArea ? place.safeArea.area.radius : 0)
+        : 0,
       place,
     }))
     .sort((a, b) => a.distance - b.distance)

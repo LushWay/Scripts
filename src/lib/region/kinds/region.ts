@@ -1,7 +1,8 @@
-import { Player } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
+import { Area } from '../areas/area'
 import { RLDB, RegionDatabase, RegionSave } from '../database'
 
 /** Role of the player related to the region */
@@ -23,7 +24,6 @@ export interface RegionPermissions extends Record<string | number | symbol, unkn
 
 /** Options used in {@link Region.create} */
 export interface RegionCreationOptions {
-  dimensionId: Dimensions
   permissions?: Partial<RegionPermissions>
 }
 
@@ -38,11 +38,15 @@ export class Region<LDB extends RLDB = any> {
   }
 
   /** Creates a new region */
-  static create<T extends typeof Region>(this: T, options: ConstructorParameters<T>[0], key?: string): InstanceType<T> {
-    const region = new this(options, key ?? this.generateRegionKey())
+  static create<T extends typeof Region>(
+    this: T,
+    area: Area,
+    options: ConstructorParameters<T>[1] = {},
+    key?: string,
+  ): InstanceType<T> {
+    const region = new this(area, options, key ?? this.generateRegionKey())
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
-    region.type = this.type
     region.kind = this.kind
     region.creator = this
 
@@ -111,7 +115,9 @@ export class Region<LDB extends RLDB = any> {
   protected readonly priority: number = 0
 
   /** Region dimension */
-  dimensionId: Dimensions
+  get dimensionId(): Dimensions {
+    return this.area.dimensionId
+  }
 
   /** Region permissions */
   // @ts-expect-error This not really an issue
@@ -126,19 +132,27 @@ export class Region<LDB extends RLDB = any> {
     owners: [],
   }
 
+  /** Database linked to the region */
+  linkedDatabase!: LDB
+
+  /** Region kind */
+  private kind!: string
+
+  creator!: typeof Region
+
   /**
    * Creates the region
    *
-   * @param o - Region creation options
-   * @param o.dimensionId - The dimension ID of the region.
-   * @param o.permissions - An object containing the permissions for the region.
+   * @param area - Area where region is located
+   * @param _options - Region creation options
    * @param o.key - The key of the region. This is used to identify the region.
    */
   constructor(
-    { dimensionId }: RegionCreationOptions,
+    public area: Area,
+    _options: RegionCreationOptions,
     protected key: string,
   ) {
-    this.dimensionId = dimensionId
+    this.area = area
     if (key) Region.regions.push(this)
   }
 
@@ -158,6 +172,10 @@ export class Region<LDB extends RLDB = any> {
 
     // See the implementation in the sub class
     return true
+  }
+
+  get dimension() {
+    return world[this.dimensionId]
   }
 
   /** Region owner name */
@@ -212,20 +230,11 @@ export class Region<LDB extends RLDB = any> {
     )
   }
 
-  /** Database linked to the region */
-  linkedDatabase!: LDB
-
-  /** Region kind */
-  private kind!: string
-
-  /** Region type */
-  private type!: string
-
   /** Prepares region instance to be saved into the database */
   protected toJSON(): RegionSave {
     return {
-      t: this.type,
-      st: this.kind,
+      a: this.area.toJSON(),
+      k: this.kind,
       permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionId,
       ldb: this.linkedDatabase,
@@ -247,6 +256,4 @@ export class Region<LDB extends RLDB = any> {
     Region.regions = Region.regions.filter(e => e.key !== this.key)
     Reflect.deleteProperty(RegionDatabase, this.key)
   }
-
-  creator!: typeof Region
 }

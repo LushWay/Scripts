@@ -1,10 +1,10 @@
 import { registerRegionKind } from 'lib/region/database'
-import { RadiusRegionWithStructure } from 'lib/region/kinds/radius-with-structure'
 import { type RegionPermissions } from 'lib/region/kinds/region'
+import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 
-// TODO Base levels, save structure of inital place on creation, shadow regions after removing etc
+// TODO Base levels, shadow regions after removing etc
 
-export class BaseRegion extends RadiusRegionWithStructure {
+export class BaseRegion extends RegionWithStructure {
   static readonly kind = 'base'
 
   protected readonly defaultPermissions: RegionPermissions = {

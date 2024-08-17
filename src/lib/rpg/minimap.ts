@@ -13,7 +13,7 @@ export enum MinimapNpc {
 
 export function setMinimapNpcPosition(player: Player, npc: MinimapNpc, x: number, z: number) {
   try {
-    console.debug('Setting minimap to', x, z)
+    // console.debug('Setting minimap to', x, z)
     player.setProperty(PlayerProperties[`lw:minimap_npc_${npc}_x`], x)
     player.setProperty(PlayerProperties[`lw:minimap_npc_${npc}_z`], z)
   } catch (error) {

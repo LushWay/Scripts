@@ -34,14 +34,14 @@ export function createBossSlime(group: Group) {
 
     const slimes = world.overworld.getEntities({
       location: boss.location,
-      maxDistance: boss.region.radius,
+      maxDistance: boss.region.area.radius,
       type: boss.entity.typeId,
     })
     if (!slimes.length) return
 
     const frogs = world.overworld.getEntities({
       location: boss.location,
-      maxDistance: boss.region.radius + 10,
+      maxDistance: boss.region.area.radius + 10,
       type: MinecraftEntityTypes.Frog,
     })
     for (const frog of frogs) frog.remove()

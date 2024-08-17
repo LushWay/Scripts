@@ -1,25 +1,21 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Airdrop } from 'lib'
-import { CustomEntityTypes } from 'lib/assets/config'
-import { RadiusRegion, RadiusRegionOptions } from './radius'
+import { Area } from '../areas/area'
+import { Region, RegionCreationOptions } from './region'
 
-interface SafeAreaRegionOptions extends RadiusRegionOptions {
+interface SafeAreaRegionOptions extends RegionCreationOptions {
   safeAreaName?: string
   allowUsageOfCraftingTable?: boolean
 }
 
-export class SafeAreaRegion extends RadiusRegion {
+export class SafeAreaRegion extends Region {
   protected readonly saveable = false
 
   protected readonly defaultPermissions = {
     allowedEntities: [
       MinecraftEntityTypes.Player,
-      MinecraftEntityTypes.Npc,
       MinecraftEntityTypes.ArmorStand,
-      ...Airdrop.entities,
-      ...CustomEntityTypes.Grave,
+      MinecraftEntityTypes.Chicken,
       'minecraft:painting',
-      'minecraft:item',
     ],
     doorsAndSwitches: false,
     openContainers: false,
@@ -31,8 +27,8 @@ export class SafeAreaRegion extends RadiusRegion {
 
   readonly safeAreaName?: string
 
-  constructor(options: SafeAreaRegionOptions, key: string) {
-    super(options, key)
+  constructor(area: Area, options: SafeAreaRegionOptions, key: string) {
+    super(area, options, key)
     this.safeAreaName = options.safeAreaName
     this.allowUsageOfCraftingTable = options.allowUsageOfCraftingTable ?? true
   }

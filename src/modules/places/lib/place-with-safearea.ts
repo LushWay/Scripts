@@ -2,6 +2,7 @@ import { Player, system, TicksPerSecond } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { actionGuard, location, locationWithRadius, locationWithRotation, SafeAreaRegion } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
 
@@ -34,13 +35,8 @@ export class PlaceWithSafeArea {
 
     this.safeAreaLocation.onLoad.subscribe(location => {
       this.safeArea = SafeAreaRegion.create(
-        {
-          safeAreaName: name,
-          dimensionId: 'overworld',
-          center: location,
-          radius: location.radius,
-        },
-        group + ' safe area',
+        new SphereArea({ center: location, radius: location.radius }, 'overworld'),
+        { safeAreaName: name },
       )
       RegionEvents.onEnter(this.safeArea, player => {
         if (this.onEnter(player)) {

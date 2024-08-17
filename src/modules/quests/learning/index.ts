@@ -10,6 +10,7 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 import { Npc } from 'lib/rpg/npc'
 
+import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
@@ -231,12 +232,10 @@ class Learning {
     })
 
     this.randomTeleportLocation.onLoad.subscribe(location => {
-      this.safeArea = SafeAreaRegion.create({
-        permissions: { allowedEntities: 'all' },
-        center: location,
-        radius: location.radius * 5,
-        dimensionId: 'overworld',
-      })
+      this.safeArea = SafeAreaRegion.create(
+        new SphereArea({ center: location, radius: location.radius * 5 }, 'overworld'),
+        { permissions: { allowedEntities: 'all' } },
+      )
 
       Axe.allowBreakInRegions.push(this.safeArea)
     })

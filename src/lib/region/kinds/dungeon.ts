@@ -1,14 +1,15 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Loot, LootTable, RegionPermissions, Vector, isChunkUnloaded, ms } from 'lib'
-import { RadiusRegion } from './radius'
+import { Cooldown, Loot, LootTable, Vector, isChunkUnloaded, ms } from 'lib'
+import { SphereArea } from '../areas/sphere'
+import { Region, RegionPermissions } from './region'
 
 interface DungeonRegionDatabase<LDB extends JsonObject> extends JsonObject {
   chests: Record<string, number | null>
   dungeon: LDB | null
 }
 
-export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends RadiusRegion {
+export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends Region {
   static kind = 'dungeon'
 
   static dungeons: DungeonRegion[] = []
@@ -20,8 +21,8 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
           for (const chest of dungeon.chests) {
             if (
               isChunkUnloaded({
-                location: Vector.add(dungeon.center, chest.location),
-                dimensionId: dungeon.dimensionId,
+                location: Vector.add(dungeon.area.center, chest.location),
+                dimensionId: dungeon.dimension.type,
               })
             )
               continue
@@ -51,12 +52,13 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
 
   protected override onCreate() {
     const { x, y, z } = this.structureSize
-    this.radius = new Vector(x, y, z).length()
+    if (this.area instanceof SphereArea) this.area.radius = new Vector(x, y, z).length()
     this.placeStructure()
     this.onRestore()
   }
 
   protected override onRestore() {
+    super.onRestore()
     DungeonRegion.dungeons.push(this)
     this.configureDungeon()
   }
@@ -91,7 +93,7 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
 
   private updateChest(chest: DungeonChest) {
     this.linkedDatabase.chests[chest.id] = Date.now()
-    const block = world[this.dimensionId].getBlock(Vector.add(this.center, chest.location))
+    const block = this.dimension.getBlock(Vector.add(this.area.center, chest.location))
     if (!block?.isValid()) throw new ReferenceError('Chest block is not loaded!')
 
     if (block.typeId !== MinecraftBlockTypes.Chest) block.setType(MinecraftBlockTypes.Chest)
@@ -103,7 +105,7 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
   }
 
   protected get structurePosition() {
-    return Vector.add(this.center, Vector.multiply(this.structureSize, -0.5))
+    return Vector.add(this.area.center, Vector.multiply(this.structureSize, -0.5))
   }
 
   getVisualStructure() {
@@ -111,7 +113,7 @@ export abstract class DungeonRegion<LDB extends JsonObject = JsonObject> extends
   }
 
   private placeStructure() {
-    world.structureManager.place(this.structureId, world[this.dimensionId], this.structurePosition)
+    world.structureManager.place(this.structureId, this.dimension, this.structurePosition)
   }
 }
 

@@ -1,16 +1,12 @@
-import { RadiusRegion, RadiusRegionOptions } from './radius'
-import { type RegionPermissions } from './region'
+import { Area } from '../areas/area'
+import { Region, RegionCreationOptions, type RegionPermissions } from './region'
 
-interface BossArenaRegionOptions extends RadiusRegionOptions {
+interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: string
 }
 
-export class BossArenaRegion extends RadiusRegion {
-  static readonly kind = 'boss'
-
+export class BossArenaRegion extends Region {
   protected readonly saveable = false
-
-  radius = 40
 
   protected priority = 10
 
@@ -28,8 +24,8 @@ export class BossArenaRegion extends RadiusRegion {
     owners: [],
   }
 
-  constructor(options: BossArenaRegionOptions, key: string) {
-    super(options, key)
+  constructor(area: Area, options: BossArenaRegionOptions, key: string) {
+    super(area, options, key)
     this.bossName = options.bossName
   }
 }

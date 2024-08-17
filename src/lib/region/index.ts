@@ -17,10 +17,6 @@ export * from './config'
 export * from './database'
 export * from './kinds/region'
 
-export * from './kinds/radius'
-
-export * from './kinds/cube'
-
 export * from './kinds/boss-arena'
 export * from './kinds/dungeon'
 export * from './kinds/safe-area'

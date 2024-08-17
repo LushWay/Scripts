@@ -1,5 +1,6 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { langKey } from 'lib'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
@@ -15,16 +16,9 @@ export class Gunsmith extends ShopNpc {
           'Улучшить незеритовый меч до алмазного',
           new MultiCost().item(i.NetheriteIngot, 10).item(i.GoldIngot, 5).item(i.OakPlanks, 100).money(1000),
           item => item.typeId === i.DiamondSword,
+          { rawtext: [{ translate: langKey({ typeId: i.DiamondSword }) }] },
           slot => this.upgradeDiamondSwordToNetherite(slot),
         )
-        .section('Броня', form => {
-          form.itemModifier(
-            'Улучшить защиту',
-            new MultiCost().item(i.LapisLazuli, 3).money(10),
-            item => item.typeId.endsWith('chestplate'),
-            slot => this.updateEnchatnment(slot, e.Protection, 1),
-          )
-        })
         .section('Все для рейда', form => {
           form.itemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
           form.itemStack(new ItemStack(i.Gunpowder, 10), new MoneyCost(100))

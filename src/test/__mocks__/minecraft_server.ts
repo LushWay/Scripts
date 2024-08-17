@@ -107,6 +107,20 @@ export class Player extends Entity {
   }
 
   location = { x: 0, y: 0, z: 0 }
+
+  private properties: Record<string, any> = {}
+
+  setProperty(p: string, v: any) {
+    this.properties[p] = v
+  }
+
+  getProperty(p: string) {
+    return this.properties[p]
+  }
+
+  hasProperty(p: string) {
+    return p in this.properties
+  }
 }
 
 export class System {
@@ -125,7 +139,9 @@ export class System {
   runTimeout() {
     return 0
   }
-  runJob() {
+  runJob(job: Generator) {
+    for (const a of job) {
+    }
     return 0
   }
 }
@@ -241,6 +257,11 @@ export class World {
   getPlayers() {
     return []
   }
+
+  getAllPlayers() {
+    return []
+  }
+
   getDimension(id: MinecraftDimensionTypes) {
     return new Dimension(id)
   }

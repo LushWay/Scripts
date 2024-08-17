@@ -9,9 +9,9 @@ import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { BaseRegion } from '../../modules/places/base/region'
 import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
-import { RadiusRegion } from './kinds/radius'
-import { RadiusRegionWithStructure } from './kinds/radius-with-structure'
+import { SphereArea } from './areas/sphere'
 import { SafeAreaRegion } from './kinds/safe-area'
+import { RegionWithStructure } from './kinds/with-structure'
 
 new Command('region')
   .setPermissions('techAdmin')
@@ -30,12 +30,11 @@ function regionForm(player: Player) {
 
   const currentRegion = Region.nearestRegion(player.location, player.dimension.type)
 
-  if (currentRegion instanceof RadiusRegion) {
+  if (currentRegion)
     form.addButton(
-      'Регион на ' + Vector.string(Vector.floor(currentRegion.center), true) + '§f\n' + currentRegion.name,
+      'Регион на ' + Vector.string(Vector.floor(currentRegion.area.center), true) + '§f\n' + currentRegion.name,
       () => editRegion(player, currentRegion, () => regionForm(player)),
     )
-  }
 
   form
     .addButton('Базы', reg(BaseRegion))
@@ -44,7 +43,7 @@ function regionForm(player: Player) {
     .show(player)
 }
 
-function regionList(player: Player, RegionType: typeof RadiusRegion, back = () => regionForm(player)) {
+function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {
   const form = new ActionForm('Список ' + RegionType.name)
 
   form.addButton(ActionForm.backText, back).addButton('Создать', BUTTON['+'], () => {
@@ -58,14 +57,8 @@ function regionList(player: Player, RegionType: typeof RadiusRegion, back = () =
         if (!center) return
         center = Vector.floor(center)
 
-        editRegion(
-          player,
-          RegionType.create({
-            center,
-            radius,
-            dimensionId: player.dimension.type,
-          }),
-          () => regionList(player, RegionType, back),
+        editRegion(player, RegionType.create(new SphereArea({ radius, center }, player.dimension.type)), () =>
+          regionList(player, RegionType, back),
         )
       })
   })
@@ -78,11 +71,15 @@ function regionList(player: Player, RegionType: typeof RadiusRegion, back = () =
 
 const pluralForms: WordPluralForms = ['региона', 'регион', 'в регионе']
 
-function editRegion(player: Player, region: RadiusRegion, back: () => void) {
+function editRegion(player: Player, region: Region, back: () => void) {
   const selfback = () => editRegion(player, region, back)
   const form = new ActionForm(
     'Регион ' + region.name,
-    textTable({ 'Тип региона': region.creator.name, 'Радиус': region.radius }),
+    textTable({
+      'Тип региона': region.creator.name,
+      'Центр': region.area.center,
+      'Радиус': region.area instanceof SphereArea ? region.area.radius : 'не поддерживается',
+    }),
   )
     .addButton(ActionForm.backText, back)
     .addButton('Участники', () =>
@@ -100,7 +97,7 @@ function editRegion(player: Player, region: RadiusRegion, back: () => void) {
       }),
     )
 
-  if (region instanceof RadiusRegionWithStructure) {
+  if (region instanceof RegionWithStructure) {
     form.addButton('Восстановить структуру', () => {
       region.loadStructure()
     })
@@ -121,7 +118,7 @@ function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, p
 
 export function editRegionPermissions(
   player: Player,
-  region: RadiusRegion,
+  region: Region,
   {
     pluralForms,
     back,
@@ -141,19 +138,24 @@ export function editRegionPermissions(
     )
 
   if (extendedEditPermissions) {
-    form = form
-      .addToggle(`PVP\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`, region.permissions.pvp)
-      .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.radius)
-      .addTextField('Центр региона', Vector.string(region.center), Vector.string(region.center))
+    form = form.addToggle(`PVP\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`, region.permissions.pvp)
+
+    if (region.area instanceof SphereArea)
+      form
+        .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
+        .addTextField('Центр региона', Vector.string(region.area.center), Vector.string(region.area.center))
   }
-  form.show(player, (ctx, doors, containers, pvp, radius, rawCenter) => {
+  form.show(player, (ctx, doors, containers, pvp, radiusOrCenter, rawCenter) => {
     region.permissions.doorsAndSwitches = doors
     region.permissions.openContainers = containers
     if (typeof pvp !== 'undefined') region.permissions.pvp = pvp
-    if (typeof radius !== 'undefined') region.radius = radius
-    if (rawCenter) {
-      const center = parseLocationFromForm(ctx, rawCenter, player)
-      if (center) region.center = center
+
+    if (region.area instanceof SphereArea) {
+      if (typeof radiusOrCenter === 'number') region.area.radius = radiusOrCenter
+      if (rawCenter) {
+        const center = parseLocationFromForm(ctx, rawCenter, player)
+        if (center) region.area.center = center
+      }
     }
     region.save()
     back()
@@ -162,7 +164,7 @@ export function editRegionPermissions(
 
 export function manageRegionMembers(
   player: Player,
-  region: RadiusRegion,
+  region: Region,
   {
     back,
     member = region.getMemberRole(player.id),

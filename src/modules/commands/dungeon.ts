@@ -1,7 +1,8 @@
 import { MolangVariableMap, Player, system, world } from '@minecraft/server'
-import { ArrayForm, RadiusRegion, Vector } from 'lib'
+import { ArrayForm, Region, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { GasStationGarageRegion, GasStationRegion } from 'modules/places/dangeons/gas-station'
 
@@ -71,11 +72,8 @@ function getDungeon(player: Player) {
 
   return {
     dungeon: new Region(
-      {
-        center: Vector.floor(player.location),
-        dimensionId: player.dimension.type,
-        radius: 0,
-      },
+      new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
+      {},
       '',
     ),
     Region,
@@ -88,12 +86,10 @@ world.afterEvents.itemUse.subscribe(event => {
   if (!dungeon) return
   const { dungeon: i } = dungeon
 
-  ;(dungeon.Region as unknown as typeof RadiusRegion).create({
-    dimensionId: i.dimensionId,
-    center: i.center,
-    radius: 0,
-  })
-  player.success(t`Данж создан на ${Vector.string(i.center, true)}`)
+  ;(dungeon.Region as unknown as typeof Region).create(
+    new SphereArea({ center: i.area.center, radius: 0 }, i.dimensionId),
+  )
+  player.success(t`Данж создан на ${Vector.string(i.area.center, true)}`)
 })
 
 const particle = new MolangVariableMap()
