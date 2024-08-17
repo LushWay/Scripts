@@ -3,6 +3,7 @@ import { noBoolean } from 'lib'
 import { MaybeRawText, t } from 'lib/text'
 import { Cost, ItemCost, LeafyCost, MoneyCost, ScoreboardCost } from '../cost'
 import { CostType } from './cost'
+import { XPCost } from './xp'
 
 /** Class used co combine multiple Costs */
 export class MultiCost<T extends Cost[]> extends Cost {
@@ -70,7 +71,9 @@ export class MultiCost<T extends Cost[]> extends Cost {
 
   leafy = this.createCostAlias(LeafyCost)
 
-  private createCostAlias<T extends typeof ItemCost | typeof ScoreboardCost>(target: T) {
+  xp = this.createCostAlias(XPCost)
+
+  private createCostAlias<T extends typeof ItemCost | typeof ScoreboardCost | typeof XPCost>(target: T) {
     return (...args: ConstructorParameters<T>) => {
       this.costs.push(
         // @ts-expect-error Idk why it complains

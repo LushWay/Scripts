@@ -103,4 +103,8 @@ export class ShouldHaveItemCost extends ItemCost {
   failed(player: Player) {
     return this.text ? t.error`В инвентаре нет ${this.text}` : t.error`Нет предмета`
   }
+
+  buy(player: Player): void {
+    return
+  }
 }
