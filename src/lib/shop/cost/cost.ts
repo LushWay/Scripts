@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/config'
-import { MaybeRawText, t } from 'lib/text'
+import { Sounds as CustomSounds } from 'lib/assets/custom-sounds'
+import { MaybeRawText } from 'lib/text'
 
 export enum CostType {
   /** Cost with this type removes item from inv, changes score etc */
@@ -21,7 +22,7 @@ export abstract class Cost<T = unknown> {
     return false
   }
 
-   /**
+  /**
    * Returns string representation of cost
    *
    * @param canBuy - Whenether to display this cost as affordable by player or not
@@ -42,7 +43,7 @@ export abstract class Cost<T = unknown> {
    * @param player - Buyer
    */
   buy(player: Player): T {
-    player.playSound(Sounds.Action)
+    if (this.type === CostType.Action) player.playSound(CustomSounds['lw.pay'])
     return undefined as T
   }
 

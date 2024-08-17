@@ -1,14 +1,15 @@
 import { ItemStack, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector, ms } from 'lib'
+import { Vector, getAuxOrTexture, ms } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { actionGuard } from 'lib/region/index'
 import { Group, Place } from 'lib/rpg/place'
-import { MoneyCost } from 'lib/shop/cost'
+import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { StoneQuarry } from './stone-quarry'
+import { Sounds } from 'lib/assets/custom-sounds'
 
 export class Furnacer extends ShopNpc {
   static create() {
@@ -65,7 +66,27 @@ export class Furnacer extends ShopNpc {
         location: '',
       })
 
-      form.itemStack(item, new MoneyCost(5))
+      form.itemStack(item, new MoneyCost(50), getAuxOrTexture(MinecraftItemTypes.TripwireHook, true))
+      form.itemModifier(
+        'Сдать неиспользуемый ключ',
+        FreeCost,
+        i => FurnaceKeyItem.schema.is(i),
+        'Ключ от печки',
+        (slot, _, text) => {
+          const parsed = FurnaceKeyItem.schema.parse(slot)
+          if (!parsed) return
+
+          const key = Object.entries(FurnaceKeyItem.db).find(e => e[1]?.code === parsed.code)?.[0]
+          if (key) Reflect.deleteProperty(FurnaceKeyItem.db, key)
+          slot.setItem(undefined)
+
+          form.show(text)
+
+          player.scores.money += 20
+          player.playSound(Sounds['lw.pay'])
+          return false
+        },
+      )
     })
   }
 }
@@ -84,10 +105,7 @@ actionGuard((player, region, ctx) => {
     return false
   }
 
-  if (!ctx.event.itemStack) return notAllowed()
-  if (ctx.event.itemStack.typeId !== furnacer.keyItem.typeId) return notAllowed()
-
-  const lore = FurnaceKeyItem.schema.parse(player.mainhand())
+  const lore = FurnaceKeyItem.schema.parse(player.mainhand(), undefined, false)
   if (!lore) return notAllowed()
 
   const blockId = Vector.string(ctx.event.block)
@@ -123,7 +141,6 @@ actionGuard((player, region, ctx) => {
         lore.location = Vector.string(ctx.event.block.location, true)
         lore.player = player.name
 
-        player.mainhand().setItem(ctx.event.itemStack)
         player.success('Ключ теперь привязан к этой печке! Не забудьте забрать из нее ресурсы через час!')
       })
 

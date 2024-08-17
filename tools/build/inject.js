@@ -23,11 +23,11 @@ const logger = new LeafyLogger({ prefix: 'assets' })
  * @param {string} caller
  * @param {string | (() => Promise<string> | string)} code
  */
-export async function injectAsset(asset, caller, code, base = 'src') {
+export async function injectAsset(asset, caller, code, base = '.') {
   try {
     if (typeof code === 'function') code = await code()
 
-    await writeFile(path.join(base, 'lib', 'assets', asset), injectCode(caller, code))
+    await writeFile(path.join(base, 'src', 'lib', 'assets', asset), injectCode(caller, code))
   } catch (e) {
     logger.error(`Unable to write asset ${asset}:`, e)
   }

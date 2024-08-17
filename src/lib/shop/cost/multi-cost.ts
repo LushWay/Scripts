@@ -25,12 +25,11 @@ export class MultiCost<T extends Cost[]> extends Cost {
   toString(canBuy = true, player?: Player): RawText {
     return {
       rawtext: this.costs
-        .map((cost, i, arr) => {
-          const string = cost.toString(!canBuy && player ? cost.has(player) : canBuy, player)
+        .map(cost => cost.toString(!canBuy && player ? cost.has(player) : canBuy, player))
+        .map((string, i, arr) => {
           if (string === '') return false
-
-          if (arr.length - 1 === i) return t.raw`${string}`
-          else return t.raw`${string}, `
+          if (arr.length !== 0 && arr[i - 1]) return t.raw`, ${string}`
+          else return t.raw`${string}`
         })
         .filter(noBoolean),
     }

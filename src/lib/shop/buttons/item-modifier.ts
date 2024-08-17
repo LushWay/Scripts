@@ -12,13 +12,14 @@ export function createItemModifier(
   shopForm: ShopForm,
   name: ShopProduct['name'],
   cost: Cost,
+  itemFilterName: MaybeRawText,
   itemFilter: ItemFilter,
-  modifyItem: OnSelect,
+  modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: MaybeRawText) => boolean | void,
 ) {
   shopForm.product(
     name,
-    new MultiCost(ShouldHaveItemCost.createFromFilter(itemFilter, 'Выберите '), cost),
-    (player, text, success) => {
+    new MultiCost(ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName), cost),
+    (player, text, success, successBuyText) => {
       selectItem(
         itemFilter,
         player,
@@ -27,8 +28,7 @@ export function createItemModifier(
         // OnSelect
         (slot, item) => {
           cost.buy(player)
-          modifyItem(slot, item)
-          success()
+          if (modifyItem(slot, item, successBuyText) !== false) success()
         },
 
         // Back

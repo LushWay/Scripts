@@ -1,6 +1,8 @@
-import { system } from '@minecraft/server'
+import { Player, system, TicksPerSecond } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { SafeAreaRegion, actionGuard, location, locationWithRadius, locationWithRotation } from 'lib'
+import { actionGuard, location, locationWithRadius, locationWithRotation, SafeAreaRegion } from 'lib'
+import { Sounds } from 'lib/assets/custom-sounds'
+import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
 
 export class PlaceWithSafeArea {
@@ -40,9 +42,24 @@ export class PlaceWithSafeArea {
         },
         group + ' safe area',
       )
+      RegionEvents.onEnter(this.safeArea, player => {
+        if (this.onEnter(player)) {
+          player.onScreenDisplay.setHudTitle('§f' + this.name, {
+            subtitle: '§aМирная зона',
+            fadeInDuration: 0.5 * TicksPerSecond,
+            stayDuration: 3 * TicksPerSecond,
+            fadeOutDuration: 2 * TicksPerSecond,
+          })
+          player.playSound(Sounds['lw.zone_enter'], { volume: 0.2, pitch: 0.9 })
+        }
+      })
     })
 
     PlaceWithSafeArea.places.push(this)
+  }
+
+  onEnter(player: Player): boolean {
+    return true
   }
 }
 

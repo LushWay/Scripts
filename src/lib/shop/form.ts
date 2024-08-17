@@ -111,9 +111,10 @@ export class ShopForm {
     name: ShopProduct['name'],
     cost: Cost,
     itemFilter: (itemStack: ItemStack) => boolean,
-    modifyItem: (itemSlot: ContainerSlot) => void,
+    itemFilterName: MaybeRawText,
+    modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: MaybeRawText) => boolean | void,
   ) {
-    createItemModifier(this, name, cost, itemFilter, modifyItem)
+    createItemModifier(this, name, cost, itemFilterName, itemFilter, modifyItem)
     return this
   }
 
@@ -153,7 +154,7 @@ export class ShopForm {
    * @param item
    * @param cost
    */
-  itemStack(item: ItemStack, cost: Cost) {
+  itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId)) {
     this.product(
       itemDescription(item, ''),
       cost,
@@ -163,7 +164,7 @@ export class ShopForm {
         cost.buy(player)
         player.container.addItem(item)
       },
-      getAuxOrTexture(item.typeId),
+      texture,
       undefined,
       false,
     )
