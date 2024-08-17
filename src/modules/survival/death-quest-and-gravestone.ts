@@ -7,7 +7,7 @@ import { Spawn } from 'modules/places/spawn'
 import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
 const gravestoneOwnerKey = 'owner'
-export const gravestoneEntity = CustomEntityTypes.Loot
+export const gravestoneEntity = CustomEntityTypes.Grave
 const gravestoneTag = 'gravestone'
 const gravestoneSpawnedAt = 'gravestoneAt'
 const gravestoneCleanupAfter = ms.from('sec', 5)

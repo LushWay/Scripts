@@ -75,7 +75,7 @@ export class Airdrop {
           if (event.entity.id !== this[name]?.id) return
 
           event.entity.addTag(tag)
-          if (name === 'chest') event.entity.nameTag = `§c§h§e§s§t§6Аирдроп`
+          if (name === 'chest') event.entity.nameTag = `§l§f§kii§r§b Аирдроп §k§f§lii§r`
           console.debug('Airdrop spawned ' + name)
           cleanup()
         })

@@ -16,6 +16,7 @@ export enum CustomEntityTypes {
   Sit = 'lw:sit',
   FloatingText = 'f:t',
   Loot = 'lw:loot',
+  Grave = 'lw:grave',
 }
 
 export enum CustomStructures {

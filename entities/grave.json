@@ -2,7 +2,7 @@
   "format_version": "1.16.0",
   "minecraft:entity": {
     "description": {
-      "identifier": "lw:loot",
+      "identifier": "lw:grave",
       "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false
@@ -16,7 +16,7 @@
     "components": {
       "minecraft:inventory": {
         "container_type": "inventory",
-        "inventory_size": 27
+        "inventory_size": 54
       },
       "minecraft:nameable": {
         "allow_name_tag_renaming": true,
@@ -28,7 +28,7 @@
       },
       "minecraft:collision_box": {
         "width": 0.8,
-        "height": 0.8
+        "height": 1.4
       },
 
       "minecraft:pushable": {
@@ -50,7 +50,7 @@
     },
 
     "events": {
-      "loot:kill": {
+      "grave:kill": {
         "add": {
           "component_groups": ["kill"]
         }
