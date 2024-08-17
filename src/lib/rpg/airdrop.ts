@@ -9,6 +9,7 @@ import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
 import { isInvalidLocation } from '../game-utils'
 import { Temporary } from '../temporary'
+import { resetMinimapNpcPosition, setMinimamNpcPosition } from './minimap'
 
 // TODO Refactor to use creator style for creating
 // TODO Make internal properties private
@@ -30,6 +31,8 @@ export class Airdrop {
   static chestOffset = { x: 0, y: -1.2, z: 0 }
 
   static instances: Airdrop[] = []
+
+  static minimaped: Airdrop | undefined
 
   chest: Entity | undefined
 
@@ -72,6 +75,7 @@ export class Airdrop {
           if (event.entity.id !== this[name]?.id) return
 
           event.entity.addTag(tag)
+          if (name === 'chest') event.entity.nameTag = `§c§h§e§s§t§6Аирдроп`
           console.debug('Airdrop spawned ' + name)
           cleanup()
         })
@@ -83,6 +87,21 @@ export class Airdrop {
 
     this.status = 'falling'
     this.save()
+
+    return this
+  }
+
+  createMarkerOnMinimap(players = world.getAllPlayers()) {
+    if (!this.chest) return
+
+    Airdrop.minimaped = this
+    const { x, z } = Vector.floor(this.chest.location)
+
+    for (const player of players) {
+      setMinimamNpcPosition(player, 1, x, z)
+    }
+
+    return this
   }
 
   teleport() {
@@ -221,6 +240,9 @@ system.runInterval(
 
         // Clear empty looted airdrops
         if (inventoryIsEmpty(airdrop.chest)) {
+          if (airdrop === Airdrop.minimaped) {
+            for (const player of world.getAllPlayers()) resetMinimapNpcPosition(player, 1)
+          }
           if (airdrop.chicken) findAndRemove(chickens, airdrop.chicken.id)
           airdrop.delete()
         }

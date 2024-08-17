@@ -33,7 +33,9 @@ import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { Compass } from 'lib/rpg/menu'
+import { setMinimamNpcPosition } from 'lib/rpg/minimap'
 import { Rewards } from 'lib/shop/rewards'
+import { requestAirdrop } from 'modules/places/anarchy/airdrop'
 import loot from '../quests/learning/airdrop'
 import './enchant'
 import './properties'
@@ -198,11 +200,22 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       }),
     )
   },
+  airdrop(ctx) {
+    requestAirdrop(!!ctx.arguments[2])
+  },
   e(ctx) {
     const m = ctx.player.mainhand()
     const item = m.getItem()
     if (!item) return
     console.log(Object.values(MinecraftEnchantmentTypes).map(e => item.enchantable?.getEnchantment(e)))
+  },
+  m(ctx) {
+    setMinimamNpcPosition(
+      ctx.player,
+      Number(ctx.arguments[1]) as 1 | 2,
+      Number(ctx.arguments[2]),
+      Number(ctx.arguments[3]),
+    )
   },
   particle(ctx) {
     const block = ctx.player.getBlockFromViewDirection({

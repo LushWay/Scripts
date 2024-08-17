@@ -6,6 +6,7 @@ import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
+import { setMinimapEnabled } from './minimap'
 
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
@@ -90,9 +91,9 @@ export class Compass {
       if (isMenu) this.updateCompassInSlot(slot, player)
 
       if ((isMainhand && isMenu) || isOffhandMenu) {
-        if (!this.forceHide.has(player)) player.setProperty('lw:minimap', true)
+        if (!this.forceHide.has(player)) setMinimapEnabled(player, true)
       } else {
-        if (isMainhand && !player.isSimulated()) player.setProperty('lw:minimap', false)
+        if (isMainhand && !player.isSimulated()) setMinimapEnabled(player, false)
         return
       }
 

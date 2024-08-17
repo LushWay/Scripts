@@ -1,7 +1,8 @@
 import { EntityDamageCause, Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
+import { request } from 'lib/bds/api'
+import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
-import { request } from '../../../lib/bds/api'
 
 export class RadioactiveZone {
   lastRadius = 0
@@ -24,16 +25,20 @@ export class RadioactiveZone {
             return
           }
 
+          if (p.database.inv !== 'anarchy') continue
+
           const distance = Vector.distance(p.location, center)
           if (distance > rad) {
             // Radioactive sound
-            p.addEffect(MinecraftEffectTypes.Nausea, 2 * TicksPerSecond, { showParticles: false, amplifier: 1 })
+            p.onScreenDisplay.setActionBar(t.warn`Высокая радиация!`)
+            p.addEffect(MinecraftEffectTypes.Poison, 10 * TicksPerSecond, { showParticles: true, amplifier: 1 })
           }
 
           if (distance > rad + 20) {
             // Most radioactive sound
+            p.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`)
             p.applyDamage(2, { cause: EntityDamageCause.magic })
-            p.addEffect(MinecraftEffectTypes.Darkness, 2 * TicksPerSecond, { amplifier: 255, showParticles: false })
+            p.addEffect(MinecraftEffectTypes.Darkness, 10 * TicksPerSecond, { showParticles: true, amplifier: 255 })
           }
         }
       },

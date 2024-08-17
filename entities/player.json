@@ -25,6 +25,31 @@
           "values": ["no", "green", "red", "blue", "yellow"],
           "default": "no",
           "client_sync": false
+        },
+
+        "lw:minimap_npc_1_x": {
+          "type": "int",
+          "default": -20000,
+          "range": [-20000, 20000],
+          "client_sync": true
+        },
+        "lw:minimap_npc_1_z": {
+          "type": "int",
+          "default": -20000,
+          "range": [-20000, 20000],
+          "client_sync": true
+        },
+        "lw:minimap_npc_2_x": {
+          "type": "int",
+          "default": -20000,
+          "range": [-20000, 20000],
+          "client_sync": true
+        },
+        "lw:minimap_npc_2_z": {
+          "type": "int",
+          "default": -20000,
+          "range": [-20000, 20000],
+          "client_sync": true
         }
       }
     },

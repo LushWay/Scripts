@@ -1,5 +1,5 @@
-import { system, TicksPerSecond, world } from '@minecraft/server'
-import { Airdrop, Loot, ms, Vector } from 'lib'
+import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
+import { Airdrop, Loot, Vector } from 'lib'
 import { t } from 'lib/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonBulletItem, CannonItem } from '../../features/cannon'
@@ -47,29 +47,41 @@ const powerfull = new Loot('powerfull_airdrop')
   .itemStack(CannonItem.itemStack)
   .chance('5%').build
 
+let airdrop: Airdrop | undefined
 function timeout() {
   system.runTimeout(
     async () => {
-      if (!Anarchy.zone || Anarchy.zone.lastRadius < 100) return
+      if (!Anarchy.zone) return timeout()
 
       const online = world.getAllPlayers().length
-      if (online < 1) return
+      if (online < 1) return timeout()
 
+      if (airdrop) airdrop.delete()
       const isPowerfull = online > 3
-
-      const result = await randomLocationInAnarchy()
-      if (result) {
-        world.say(
-          t.raw`§l§a>§r§7 ${isPowerfull ? 'Усиленный' : 'Обычный'} аирдроп появился на ${Vector.string(result.topmost)}!`,
-        )
-        new Airdrop({ loot: isPowerfull ? powerfull : base }).spawn(result.air)
-      }
+      airdrop = await requestAirdrop(isPowerfull)
 
       timeout()
     },
     'airdrop',
-    ms.from('min', 3) / TicksPerSecond,
+    // 3 min
+    20 * 60 * 3,
   )
 }
 
 timeout()
+export async function requestAirdrop(isPowerfull: boolean) {
+  const result = await randomLocationInAnarchy()
+  if (result) {
+    try {
+      const airdrop = new Airdrop({ loot: isPowerfull ? powerfull : base }).spawn(result.air).createMarkerOnMinimap()
+      world.say(
+        t.raw`§l§a>§r§7 ${isPowerfull ? 'Усиленный' : 'Обычный'} аирдроп появился на ${Vector.string(result.topmost, true)}!`,
+      )
+      return airdrop
+    } catch (e) {
+      if (e instanceof LocationInUnloadedChunkError) {
+        console.warn('Unable spawn half hourly airdrop: location unloaded')
+      }
+    }
+  }
+}

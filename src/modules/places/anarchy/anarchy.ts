@@ -1,6 +1,7 @@
 import { GameMode, Player } from '@minecraft/server'
 import { InventoryStore, Portal, ValidLocation, Vector, location } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
+import { t } from 'lib/text'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
@@ -37,7 +38,7 @@ class AnarchyBuilder extends AreaWithInventory {
         .setDescription('Выдает радиус границы анархии сейчас')
         .setGroup('public')
         .setPermissions('member')
-        .executes(ctx => ctx.player.info(`Радиус границы анархии сейчас: ${this.zone?.lastRadius}`))
+        .executes(ctx => ctx.player.info(t`Радиус границы анархии сейчас: ${this.zone?.lastRadius}`))
     })
 
     this.portalLocation.onLoad.subscribe(portalLocation => this.createPortal(portalLocation))
