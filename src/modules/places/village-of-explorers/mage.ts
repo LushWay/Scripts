@@ -1,10 +1,15 @@
 import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
-import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
-import { Enchantments, isKeyof, translateEnchantment } from 'lib'
+import {
+  MinecraftEnchantmentTypes as e,
+  MinecraftItemTypes as i,
+  MinecraftEnchantmentTypes,
+  MinecraftItemTypes,
+} from '@minecraft/vanilla-data'
+import { Enchantments, getAuxOrTexture, isKeyof, langKey, translateEnchantment } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
-import { ErrorCost } from 'lib/shop/cost/cost'
+import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'
 import { ShopFormSection } from 'lib/shop/form'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
@@ -34,11 +39,61 @@ export class Mage extends ShopNpc {
         'любой элемент брони',
         (form, slot, item) => {
           const ench = this.createEnch(form, item, slot)
+          const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
-          ench(e.Protection, level => new MultiCost().money(level * 20))
-          ench(e.ProjectileProtection, level => new MultiCost().money(level * 20))
-          ench(e.FireProtection, level => new MultiCost().money(level * 20))
-          ench(e.BlastProtection, level => new MultiCost().money(level * 20))
+          ench(e.Protection, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.ProjectileProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.FireProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.BlastProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
+        },
+      )
+
+      form.itemModifierSection(
+        'Использовать книгу чар',
+        item => item.typeId === MinecraftItemTypes.EnchantedBook,
+        { rawtext: [{ translate: langKey({ typeId: MinecraftItemTypes.EnchantedBook }) }] },
+        (bookForm, book, bookItem) => {
+          const bookEnch = bookItem.enchantable?.getEnchantments()[0]
+          const type = Object.values(MinecraftEnchantmentTypes).find(e => e === bookEnch?.type.id)
+          if (!bookEnch || !type)
+            return bookForm.product('Нет зачарований', Incompatible, () => {
+              return
+            })
+
+          bookForm.itemModifierSection(
+            'Предмет',
+            item => item.typeId !== MinecraftItemTypes.EnchantedBook && this.updateEnchatnment(item, type, 1, true).can,
+            'Предмет для зачарования',
+            (itemForm, target, targetItem, _, addSelectItem) => {
+              const enchs = targetItem.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
+              const level = targetItem.enchantable?.getEnchantment(new EnchantmentType(type))?.level ?? 0
+
+              itemForm.product(
+                t.raw`§r§7Выбранная книга: ${translateEnchantment(bookEnch)}`,
+                FreeCost,
+                () => bookForm.show(),
+                getAuxOrTexture(MinecraftItemTypes.EnchantedBook),
+              )
+
+              addSelectItem()
+
+              itemForm.product(
+                t.raw`Зачаровать`,
+                level >= bookEnch.level
+                  ? level === bookEnch.level
+                    ? LevelIsSame
+                    : LevelIsHigher
+                  : new MultiCost().money(1000).xp(~~((bookEnch.level * enchs) / 2)),
+                (_, __, _s, text) => {
+                  book.setItem(undefined)
+                  this.updateEnchatnment(target, type, bookEnch.level - level)
+                  form.show(text)
+                  return false
+                },
+              )
+            },
+            true,
+          )
         },
       )
 
@@ -90,8 +145,8 @@ export class Mage extends ShopNpc {
     }
   }
 
-  updateEnchatnment(slot: ContainerSlot, type: e, up = 1, check = false): { can: boolean; level: number } {
-    const item = slot.getItem()?.clone()
+  updateEnchatnment(slot: ContainerSlot | ItemStack, type: e, up = 1, check = false): { can: boolean; level: number } {
+    const item = slot instanceof ItemStack ? slot.clone() : slot.getItem()?.clone()
     const cant = { can: false, level: 0 }
 
     if (item?.enchantable) {
@@ -114,7 +169,7 @@ export class Mage extends ShopNpc {
         newitem.enchantable?.addEnchantments(item.enchantable.getEnchantments().filter(e => e.type.id !== type))
 
         copyItemProps(item, newitem)
-        slot.setItem(newitem)
+        if (slot instanceof ContainerSlot) slot.setItem(newitem)
       } else {
         try {
           item.enchantable.addEnchantment({ type: new EnchantmentType(type), level })
@@ -122,13 +177,15 @@ export class Mage extends ShopNpc {
           return { can: false, level: -1 }
         }
         if (check) return { can: true, level }
-        slot.setItem(item)
+        if (slot instanceof ContainerSlot) slot.setItem(item)
       }
     }
     return cant
   }
 }
 
+const LevelIsHigher = ErrorCost(t.error`Уровень зачара предмета уже выше книжки`)
+const LevelIsSame = ErrorCost(t.error`Уровень зачара предмета как у книжки`)
 const MaxLevel = ErrorCost(t.error`Максимальный уровень`)
 const Incompatible = ErrorCost(t`§8Зачарование несовместимо`)
 

@@ -85,6 +85,8 @@ function createBuy(
         player.container.addItem(new ItemStack(type, count))
       },
       aux,
+      undefined,
+      false,
     )
   }
 }
@@ -108,8 +110,6 @@ function createSell(
 
       // Actoin
       player => {
-        cost.buy(player)
-
         db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
         player.scores.money += sell * count
       },

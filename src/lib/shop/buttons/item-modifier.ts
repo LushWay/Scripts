@@ -44,6 +44,7 @@ export type ShopMenuWithSlotCreate = (
   slot: ContainerSlot,
   itemStack: ItemStack,
   player: Player,
+  addSelectItem: VoidFunction,
 ) => void
 
 export function createItemModifierSection(
@@ -54,6 +55,7 @@ export function createItemModifierSection(
   itemFilterName: MaybeRawText,
   itemFilter: ItemFilter,
   onOpen: ShopMenuWithSlotCreate,
+  manualSelectItemButton = false,
 ) {
   shopForm.product(name, ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName), (player, text) => {
     const back = () => shopForm.show(player, undefined, undefined)
@@ -83,14 +85,21 @@ export function createItemModifierSection(
 
               form.body = () =>
                 t.raw`Зачарования:\n${{
-                  rawtext: item.enchantable?.getEnchantments().map(translateEnchantment).flat(),
+                  rawtext: item.enchantable
+                    ?.getEnchantments()
+                    .map(e => [translateEnchantment(e), { text: '\n' }])
+                    .flat(),
                 }}`
-              form.button(
-                t.raw`Выбранный предмет: ${{ translate: langKey(item) }}\n§7Нажмите, чтобы сменить`,
-                getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
-                select,
-              )
-              onOpen(form, slot, item, player)
+
+              const addSelectItem = () =>
+                form.button(
+                  t.raw`Выбранный предмет: ${{ translate: langKey(item) }}\n§7Нажмите, чтобы сменить`,
+                  getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
+                  select,
+                )
+
+              if (!manualSelectItemButton) addSelectItem()
+              onOpen(form, slot, item, player, addSelectItem)
             },
           )
         },
@@ -104,10 +113,16 @@ export function createItemModifierSection(
   })
 }
 
-function selectItem(itemFilter: ItemFilter, player: Player, text: MaybeRawText, select: OnSelect, back?: VoidFunction) {
+export function selectItem(
+  itemFilter: ItemFilter,
+  player: Player,
+  text: MaybeRawText,
+  select: OnSelect,
+  back?: VoidFunction,
+) {
   const { container } = player
   if (!container) return
-  const chestForm = new ChestForm('45').title(text).pattern([0, 0], ['<-------?'], {
+  const chestForm = new ChestForm('45').title(t.options({ unit: '§0' }).raw`${text}`).pattern([0, 0], ['<-------?'], {
     '<': {
       icon: BUTTON['<'],
       callback: back,
@@ -127,7 +142,10 @@ function selectItem(itemFilter: ItemFilter, player: Player, text: MaybeRawText, 
       nameTag: typeIdToReadable(item.typeId), // TODO: use '%' + langKey(item.typeId),
       amount: item.amount,
       enchanted: !!item.enchantable?.getEnchantments().length,
-      lore: item.getLore(),
+      lore: (item.enchantable
+        ? item.enchantable.getEnchantments().map(e => `${typeIdToReadable(e.type.id)}: ${e.level}`)
+        : []
+      ).concat(item.getLore()),
       callback: () => select(container.getSlot(i), item),
     })
   }

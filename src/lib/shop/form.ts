@@ -1,5 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { getAuxOrTexture } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
@@ -23,7 +24,7 @@ interface ShopSection {
 export interface ShopProduct<T = unknown> {
   name: MaybeRawText | ((canBuy: boolean) => MaybeRawText)
   cost: Cost<T>
-  onBuy: (player: Player, text: MaybeRawText, successBuy: VoidFunction) => void | false
+  onBuy: (player: Player, text: MaybeRawText, successBuy: VoidFunction, successBuyText: MaybeRawText) => void | false
   texture?: string
   sell?: boolean
 }
@@ -41,7 +42,7 @@ type ShopProductBuy = Omit<ShopProduct, 'name'> & {
 }
 
 export type ShopFormSection = Omit<ShopForm, 'show'> & {
-  show: VoidFunction
+  show: (text?: MaybeRawText) => void
   body: ShopForm['body']
   title: ShopForm['title']
 }
@@ -94,8 +95,15 @@ export class ShopForm {
     onBuy: ShopProduct<T>['onBuy'],
     texture?: string,
     sell?: boolean,
+    costBuy = true,
   ) {
-    this.buttons.push({ name, cost, onBuy, texture, sell })
+    this.buttons.push({
+      name,
+      cost,
+      onBuy: costBuy ? (p, ...args) => (cost.buy(p), onBuy(p, ...args)) : onBuy,
+      texture,
+      sell,
+    })
     return this
   }
 
@@ -114,8 +122,9 @@ export class ShopForm {
     itemFilter: ItemFilter,
     itemFilterName: MaybeRawText,
     onOpen: ShopMenuWithSlotCreate,
+    manualAddSelectItem = false,
   ) {
-    createItemModifierSection(this, this.shop, name, itemFilterName, itemFilter, onOpen)
+    createItemModifierSection(this, this.shop, name, itemFilterName, itemFilter, onOpen, manualAddSelectItem)
     return this
   }
 
@@ -145,12 +154,19 @@ export class ShopForm {
    * @param cost
    */
   itemStack(item: ItemStack, cost: Cost) {
-    this.product(itemDescription(item, ''), cost, player => {
-      if (!player.container) return
+    this.product(
+      itemDescription(item, ''),
+      cost,
+      player => {
+        if (!player.container) return
 
-      cost.buy(player)
-      player.container.addItem(item)
-    })
+        cost.buy(player)
+        player.container.addItem(item)
+      },
+      getAuxOrTexture(item.typeId),
+      undefined,
+      false,
+    )
     return this
   }
 
@@ -161,7 +177,7 @@ export class ShopForm {
    * @param message - Additional message to show in store description
    */
   show(player: Player, message: MaybeRawText = '', back: undefined | VoidFunction) {
-    const show = () => this.show(player, undefined, back)
+    const show = (text?: MaybeRawText) => this.show(player, text, back)
     const form = Object.setPrototypeOf({ buttons: [], show } satisfies Base, this) as ShopFormSection & Base
     this.onOpen(form, player)
 
@@ -229,14 +245,11 @@ export class ShopForm {
     const purchase = () => {
       if (!canBuy()) return
 
-      const successBuy = () =>
-        this.show(
-          player,
-          t.options({ text: '§a' }).raw`Успешная ${sell ? 'продажа' : 'покупка'}: ${text} за ${cost.toString()}!`,
-          back,
-        )
+      const successBuyText = t.options({ text: '§a' })
+        .raw`Успешная ${sell ? '§aпродажа' : '§aпокупка'}: ${text} за ${cost.toString()}!`
+      const successBuy = () => this.show(player, successBuyText, back)
 
-      if (onBuy(player, text, successBuy) !== false) successBuy()
+      if (onBuy(player, text, successBuy, successBuyText) !== false) successBuy()
     }
 
     if (Shop.getPlayerSettings(player).prompt && cost.type === CostType.Action) {
