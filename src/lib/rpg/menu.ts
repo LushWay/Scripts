@@ -6,7 +6,7 @@ import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
-import { setMinimapEnabled } from './minimap'
+import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
 
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
@@ -62,8 +62,13 @@ export class Compass {
    * @param location - Compass target location. Use undefined to remove
    */
   static setFor(player: Player, location: Vector3 | undefined) {
-    if (location) this.players.set(player, location)
-    else this.players.delete(player)
+    if (location) {
+      this.players.set(player, location)
+      setMinimapNpcPosition(player, MinimapNpc.Quest, location.x, location.z)
+    } else {
+      this.players.delete(player)
+      resetMinimapNpcPosition(player, MinimapNpc.Quest)
+    }
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {

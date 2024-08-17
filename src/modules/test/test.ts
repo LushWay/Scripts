@@ -33,7 +33,7 @@ import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { Compass } from 'lib/rpg/menu'
-import { setMinimamNpcPosition } from 'lib/rpg/minimap'
+import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Rewards } from 'lib/shop/rewards'
 import { requestAirdrop } from 'modules/places/anarchy/airdrop'
 import loot from '../quests/learning/airdrop'
@@ -210,7 +210,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     console.log(Object.values(MinecraftEnchantmentTypes).map(e => item.enchantable?.getEnchantment(e)))
   },
   m(ctx) {
-    setMinimamNpcPosition(
+    setMinimapNpcPosition(
       ctx.player,
       Number(ctx.arguments[1]) as 1 | 2,
       Number(ctx.arguments[2]),

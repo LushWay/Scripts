@@ -9,7 +9,7 @@ import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
 import { isInvalidLocation } from '../game-utils'
 import { Temporary } from '../temporary'
-import { resetMinimapNpcPosition, setMinimamNpcPosition } from './minimap'
+import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './minimap'
 
 // TODO Refactor to use creator style for creating
 // TODO Make internal properties private
@@ -98,7 +98,7 @@ export class Airdrop {
     const { x, z } = Vector.floor(this.chest.location)
 
     for (const player of players) {
-      setMinimamNpcPosition(player, 1, x, z)
+      setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
     }
 
     return this
@@ -241,7 +241,7 @@ system.runInterval(
         // Clear empty looted airdrops
         if (inventoryIsEmpty(airdrop.chest)) {
           if (airdrop === Airdrop.minimaped) {
-            for (const player of world.getAllPlayers()) resetMinimapNpcPosition(player, 1)
+            for (const player of world.getAllPlayers()) resetMinimapNpcPosition(player, MinimapNpc.Airdrop)
           }
           if (airdrop.chicken) findAndRemove(chickens, airdrop.chicken.id)
           airdrop.delete()
