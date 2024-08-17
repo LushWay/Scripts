@@ -63,8 +63,8 @@ function timeout() {
       timeout()
     },
     'airdrop',
-    // 3 min
-    20 * 60 * 3,
+    // 15 min
+    20 * 60 * 15,
   )
 }
 
