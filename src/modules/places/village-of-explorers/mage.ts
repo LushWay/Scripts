@@ -168,7 +168,7 @@ export class Mage extends ShopNpc {
         const newitem = enchitem.clone()
         newitem.enchantable?.addEnchantments(item.enchantable.getEnchantments().filter(e => e.type.id !== type))
 
-        copyItemProps(item, newitem)
+        copyAllItemPropertiesExceptEnchants(item, newitem)
         if (slot instanceof ContainerSlot) slot.setItem(newitem)
       } else {
         try {
@@ -189,7 +189,7 @@ const LevelIsSame = ErrorCost(t.error`Уровень зачара предмет
 const MaxLevel = ErrorCost(t.error`Максимальный уровень`)
 const Incompatible = ErrorCost(t`§8Зачарование несовместимо`)
 
-function copyItemProps(item: ItemStack, newitem: ItemStack) {
+export function copyAllItemPropertiesExceptEnchants(item: ItemStack, newitem: ItemStack) {
   newitem.nameTag = item.nameTag
   newitem.amount = item.amount
   if (newitem.durability && item.durability) newitem.durability.damage = item.durability.damage

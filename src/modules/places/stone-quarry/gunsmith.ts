@@ -1,9 +1,10 @@
-import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
-import { MinecraftEnchantmentTypes as e, MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { ContainerSlot, ItemStack } from '@minecraft/server'
+import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { langKey } from 'lib'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
+import { copyAllItemPropertiesExceptEnchants } from '../village-of-explorers/mage'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
@@ -27,27 +28,18 @@ export class Gunsmith extends ShopNpc {
     })
   }
 
-  updateEnchatnment(slot: ContainerSlot, type: e, level = 1) {
-    const item = slot.getItem()
-    if (item?.enchantable) {
-      item.enchantable.addEnchantment({
-        type: new EnchantmentType(type),
-        level: (item.enchantable.getEnchantment(type)?.level ?? 0) + level,
-      })
-      slot.setItem(item)
-    }
-  }
-
   upgradeDiamondSwordToNetherite(slot: ContainerSlot) {
-    const slotItem = slot.getItem()
-    if (!slotItem) return
-    const item = new ItemStack(i.NetheriteSword)
-    item.setLore(slot.getLore())
+    const item = slot.getItem()
+    if (!item) return
 
-    if (item.enchantable && slotItem.enchantable)
-      item.enchantable.addEnchantments(slotItem.enchantable.getEnchantments())
+    const newitem = new ItemStack(i.NetheriteSword)
+    copyAllItemPropertiesExceptEnchants(newitem, item)
+    if (newitem.enchantable && item.enchantable) {
+      newitem.enchantable.addEnchantments(item.enchantable.getEnchantments())
+    }
 
-    if (item.durability && slotItem.durability) item.durability.damage = slotItem.durability.damage
-    slot.setItem(item)
+    slot.setItem(newitem)
   }
 }
+
+const chances = []
