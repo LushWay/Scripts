@@ -1,5 +1,5 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { addAddableRegion } from 'lib'
+import { addAddableRegion } from 'lib/region/command'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions } from './region'
 
