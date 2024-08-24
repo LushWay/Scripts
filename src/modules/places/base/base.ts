@@ -43,7 +43,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     )
   }
 
-  const region = Region.regionInstancesOf(BaseRegion).find(e => e.getMemberRole(player) !== false)
+  const region = BaseRegion.instances().find(e => e.getMemberRole(player) !== false)
 
   if (region) {
     event.cancel = true
@@ -77,7 +77,7 @@ system.runInterval(
   () => {
     const playersLocations = world.getAllPlayers().map(p => ({ d: p.dimension.type, l: p.location }))
 
-    for (const base of Region.regionInstancesOf(BaseRegion)) {
+    for (const base of BaseRegion.instances()) {
       const block = getBlockStatus({ location: base.area.center, dimensionId: base.dimensionId })
       if (block === 'unloaded') continue
 

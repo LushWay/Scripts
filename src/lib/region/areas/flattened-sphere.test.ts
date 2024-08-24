@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FlattenedSphereArea } from './flattened-shpere'
+import { FlattenedSphereArea } from './flattened-sphere'
 
 describe('rectangle', () => {
   it('should detect if vector is in region', () => {

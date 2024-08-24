@@ -9,7 +9,7 @@ export function openBaseMenu(
 ) {
   if (LockAction.locked(player)) return
 
-  const base = Region.regionInstancesOf(BaseRegion).find(r => r.getMemberRole(player))
+  const base = BaseRegion.instances().find(r => r.getMemberRole(player))
 
   if (!base) return onFail('§cУ вас нет базы! Вступите в существующую или создайте свою.')
 

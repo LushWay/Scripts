@@ -1,4 +1,5 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { addAddableRegion } from 'lib'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions } from './region'
 
@@ -41,3 +42,4 @@ export class SafeAreaRegion extends Region {
     return this.safeAreaName
   }
 }
+addAddableRegion('Мирные зоны', SafeAreaRegion)

@@ -92,7 +92,6 @@ const survivalSidebar = new Sidebar(
           text = ''
           if (!region.permissions.pvp) text = '§aМирная зона§f '
           if (region.displayName) text += region.displayName
-          if (region instanceof MineshaftRegion) text += '§7Шахта'
           if (region instanceof BaseRegion && region.getMemberRole(player.id)) text = '§6Ваша база'
         }
       }

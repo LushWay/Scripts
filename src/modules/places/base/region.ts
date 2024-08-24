@@ -1,3 +1,4 @@
+import { addAddableRegion } from 'lib/region/command'
 import { registerRegionKind } from 'lib/region/database'
 import { type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
@@ -20,3 +21,4 @@ export class BaseRegion extends RegionWithStructure {
   }
 }
 registerRegionKind(BaseRegion)
+addAddableRegion('Базы', BaseRegion)

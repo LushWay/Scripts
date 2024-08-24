@@ -1,6 +1,6 @@
 import { BlockPermutation, Dimension, StructureSaveMode, world } from '@minecraft/server'
-import { Region } from './region'
 import { Vector } from 'lib/vector'
+import { Region } from './region'
 
 export abstract class RegionWithStructure extends Region {
   protected readonly saveable = true
@@ -43,13 +43,11 @@ export abstract class RegionWithStructure extends Region {
     const structure = world.structureManager.get(this.structureName)
     if (!structure) throw new TypeError('No structure found!')
 
-    const edges = this.area.edges
+    const [, edge] = this.area.edges
 
     return this.area.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
-        const structureSavedBlock = structure.getBlockPermutation(
-          Vector.multiply(Vector.subtract(edges[1], vector), -1),
-        )
+        const structureSavedBlock = structure.getBlockPermutation(Vector.multiply(Vector.subtract(edge, vector), -1))
         callback(vector, structureSavedBlock, dimension)
       }
     })

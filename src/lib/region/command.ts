@@ -7,11 +7,13 @@ import { Region } from 'lib/region/kinds/region'
 import { textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
-import { BaseRegion } from '../../modules/places/base/region'
-import { MineshaftRegion } from '../../modules/places/mineshaft/mineshaft-region'
 import { SphereArea } from './areas/sphere'
-import { SafeAreaRegion } from './kinds/safe-area'
 import { RegionWithStructure } from './kinds/with-structure'
+
+const addableRegions: { name: string; region: typeof Region }[] = []
+export function addAddableRegion(name: string, region: typeof Region) {
+  addableRegions.push({ name, region })
+}
 
 new Command('region')
   .setPermissions('techAdmin')
@@ -36,11 +38,10 @@ function regionForm(player: Player) {
       () => editRegion(player, currentRegion, () => regionForm(player)),
     )
 
-  form
-    .addButton('Базы', reg(BaseRegion))
-    .addButton('Шахты', reg(MineshaftRegion))
-    .addButton('Мирные зоны', reg(SafeAreaRegion))
-    .show(player)
+  for (const r of addableRegions) {
+    form.addButton(r.name, reg(r.region))
+  }
+  form.show(player)
 }
 
 function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {
@@ -63,7 +64,7 @@ function regionList(player: Player, RegionType: typeof Region, back = () => regi
       })
   })
 
-  for (const region of Region.regionInstancesOf(RegionType)) {
+  for (const region of RegionType.instances()) {
     form.addButton(region.name, () => editRegion(player, region, () => regionList(player, RegionType, back)))
   }
   form.show(player)
@@ -77,7 +78,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
     'Регион ' + region.name,
     textTable({
       'Тип региона': region.creator.name,
-      'Центр': region.area.center,
+      'Центр': Vector.string(region.area.center, true),
       'Радиус': region.area instanceof SphereArea ? region.area.radius : 'не поддерживается',
     }),
   )

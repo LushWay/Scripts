@@ -1,21 +1,12 @@
+import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
+import { addAddableRegion, ms } from 'lib'
 import { registerRegionKind } from 'lib/region/database'
-import { type RegionPermissions } from 'lib/region/kinds/region'
-import { RegionWithStructure } from 'lib/region/kinds/with-structure'
-import { ores } from './algo'
+import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
+import { MineareaRegion } from '../minearea/minearea-region'
+import { ores, placeOre } from './algo'
 
-export class MineshaftRegion extends RegionWithStructure {
+export class MineshaftRegion extends MineareaRegion {
   static readonly kind = 'mine'
-
-  /** MineShaft is more prior then other regions */
-  protected readonly priority = 1
-
-  protected readonly defaultPermissions: RegionPermissions = {
-    allowedEntities: 'all',
-    doorsAndSwitches: true,
-    openContainers: true,
-    pvp: true,
-    owners: [],
-  }
 
   protected onCreate(): void {
     let oresFound = 0
@@ -31,9 +22,32 @@ export class MineshaftRegion extends RegionWithStructure {
     })
 
     this.saveStructure()
-
     console.log('Created new mineshaft region. Ores found:', oresFound)
+  }
+
+  onBlockBreak(player: Player, event: PlayerBreakBlockBeforeEvent) {
+    const { block, dimension } = event
+    const ore = ores.getOre(block.typeId)
+
+    const typeId = block.typeId
+    system.delay(() => placeOre(block, typeId, dimension, player))
+
+    scheduleBlockPlace({
+      dimension: dimension.type,
+      location: block.location,
+      typeId: ore ? ore.empty : block.typeId,
+      states: ore ? undefined : block.permutation.getAllStates(),
+      restoreTime: ms.from('min', Math.randomInt(1, 3)),
+    })
+
+    return true
+  }
+
+  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+  get displayName() {
+    return '§7Шахта'
   }
 }
 
+addAddableRegion('Шахты', MineshaftRegion)
 registerRegionKind(MineshaftRegion)

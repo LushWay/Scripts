@@ -68,20 +68,9 @@ export class Region<LDB extends RLDB = any> {
   /**
    * Filters an array of regions to return instances of a specific region type.
    *
-   * @param {R} type - Region subclass to get
    * @returns Array of instances that match the specified type `R` of Region.
    */
-  static regionInstancesOf<R extends typeof Region>(type: R): InstanceType<R>[] {
-    return this.regions.filter((e => e instanceof type) as (e: Region) => e is InstanceType<R>)
-  }
-
-  /**
-   * Filters an array of regions to return instances of a specific region type.
-   *
-   * @returns Array of instances that match the specified type `R` of Region.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-  static instances<I extends Region, T extends { new (): I; regions: Region[] }>(this: T) {
+  static instances<I extends Region>(this: { new (...args: any[]): I; regions: Region[] }) {
     return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
   }
 
@@ -104,10 +93,10 @@ export class Region<LDB extends RLDB = any> {
    *   block location is located.
    */
   static nearestRegions(location: Vector3, dimensionId: Dimensions) {
-    const regions = this === Region ? this.regions : this.regionInstancesOf(this)
+    const regions = this === Region ? this.regions : this.instances()
 
     return regions
-      .filter(region => region.isVectorInRegion(location, dimensionId))
+      .filter(region => region.area.isVectorIn(location, dimensionId))
       .sort((a, b) => b.priority - a.priority)
   }
 
@@ -164,14 +153,6 @@ export class Region<LDB extends RLDB = any> {
   /** Function that gets called on restore */
   protected onRestore() {
     // Hook
-  }
-
-  /** Checks if the vector is in the region */
-  isVectorInRegion(vector: Vector3, dimensionId: Dimensions) {
-    if (this.dimensionId !== dimensionId) return false
-
-    // See the implementation in the sub class
-    return true
   }
 
   get dimension() {

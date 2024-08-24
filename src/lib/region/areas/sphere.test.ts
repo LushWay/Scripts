@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SphereArea } from './sphere'
 
-describe('shpere', () => {
+describe('sphere', () => {
   it('should detect if vector is in region', () => {
     const sphere = new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 })
 
