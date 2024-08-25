@@ -9,21 +9,20 @@ export class XPCost extends Cost {
   }
 
   toString(canBuy?: boolean, player?: Player): MaybeRawText {
-    return t.options({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' }).raw`Опыт: ${this.levels.toString()}`
+    return t.options({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' }).raw`${this.levels.toString()}lvl`
   }
 
   has(player: Player): boolean {
-    console.log(player.getTotalXp() / player.totalXpNeededForNextLevel)
-    return player.getTotalXp() >= this.levels
+    return player.level >= this.levels
   }
 
   failed(player: Player): MaybeRawText {
-    const xp = player.getTotalXp().toString()
-    const lvl = this.levels.toString()
-    return t.error.raw`Нужно уровней опыта: ${(Number(lvl) - Number(xp)).toString()}§c, ${xp}/${lvl}`
+    const xp = player.level
+    const lvl = this.levels
+    return t.error.raw`Нужно уровней опыта: ${(lvl - xp).toString()}§c, ${xp.toString()}/${lvl.toString()}`
   }
 
-  buy(player: Player): unknown {
-    return player.runCommand(`xp -${this.levels}L`) // YES IT DOES NOT HAVE API
+  buy(player: Player) {
+    player.addLevels(-this.levels)
   }
 }
