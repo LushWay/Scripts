@@ -48,8 +48,8 @@ export class SafeAreaRegion extends Region {
 }
 addAddableRegion('Мирные зоны', SafeAreaRegion)
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
-  const been = previous.find(e => e instanceof SafeAreaRegion)
-  const now = newest.find(e => e instanceof SafeAreaRegion)
+  const been = previous.length && previous[0] instanceof SafeAreaRegion
+  const now = newest.length && newest[0] instanceof SafeAreaRegion
   const gamemode = player.getGameMode()
   const adventure = gamemode === GameMode.adventure
   const survival = gamemode === GameMode.survival

@@ -24,37 +24,58 @@ export const ores = new OreCollector(
   new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).below(-50).chance(0.1),
 ).stoneChance(90)
 
-export function placeOre(brokenLocation: Vector3, brokenTypeId: string, dimension: Dimension, player: Player) {
+export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {
   const possibleBlocks = []
-  const airCache: Record<string, boolean> = { [Vector.string(brokenLocation)]: false }
+  const airCache: Record<string, { air: boolean; block: Block }> = {
+    [Vector.string(brokenLocation)]: { air: false, block: brokenLocation },
+  }
 
   for (const vector of getEdgeBlocksOf(brokenLocation)) {
     const block = dimension.getBlock(vector)
     if (!block || block.isAir) continue
     if (!MineshaftRegion.nearestRegion(block, dimension.type)) continue
 
-    const nearAir = getEdgeBlocksOf(block).find(e => (airCache[Vector.string(e)] ??= !!dimension.getBlock(e)?.isAir))
+    const nearAir = getEdgeBlocksOf(block).some(e => {
+      const key = Vector.string(e)
+      if (!(key in airCache)) {
+        const block = dimension.getBlock(e)
+        if (block) {
+          airCache[key] = { block, air: block.isAir }
+        } else return true
+      }
+
+      return airCache[key].air
+    })
 
     if (nearAir) continue
     possibleBlocks.push(block)
   }
+  if (!possibleBlocks.length) return
 
-  const block = possibleBlocks.randomElement() as Block | undefined
-  if (block?.isValid() && !block.isAir) {
-    const brokenOre = ores.getOre(brokenTypeId)
-    const isDeepslate =
-      brokenOre?.isDeepslate ?? (brokenTypeId === MinecraftBlockTypes.Deepslate || brokenLocation.y < -3)
-    const overrideTypeId = getOreTypeId({ player, isDeepslate, ore: brokenOre?.ore })
-    // console.debug('Overriding ore', overrideTypeId, brokenOre)
+  const brokenOre = ores.getOre(brokenTypeId)
+  const isDeepslate =
+    brokenOre?.isDeepslate ?? (brokenTypeId === MinecraftBlockTypes.Deepslate || brokenLocation.y < -3)
 
-    const oreTypeId =
-      overrideTypeId ??
-      (brokenOre ? ores.with(brokenOre.ore, brokenOre.ore.item.groupChance) : ores).selectOreByChance(
-        isDeepslate,
-        block.y,
-      )
+  const overrideTypeId = getOreTypeId({ player, isDeepslate, ore: brokenOre?.ore })
+  // console.debug('Overriding ore', overrideTypeId, brokenOre)
+  const oreTypeId =
+    (overrideTypeId ?? brokenOre)
+      ? isDeepslate
+        ? b.Deepslate
+        : b.Stone
+      : ores.selectOreByChance(isDeepslate, brokenLocation.y)
 
-    if (oreTypeId) block.setType(oreTypeId)
+  const place = (block: Block) => {
+    if (block.isValid() && !block.isAir) {
+      if (oreTypeId) block.setType(oreTypeId)
+    }
+  }
+
+  const first = possibleBlocks.randomElement()
+  place(first)
+
+  for (const block of possibleBlocks.filter(e => e !== first)) {
+    if (Math.randomInt(0, 100) > (brokenOre?.ore.item.groupChance ?? 50)) place(block)
   }
 }
 
