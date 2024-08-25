@@ -9,7 +9,7 @@ root
     const item = ctx.player.mainhand()
     const oldlore = item.getLore()
     item.setLore(ctx.arguments)
-    ctx.reply(`§a► §f${oldlore} ► ${item.getLore()}`)
+    ctx.player.success(`§a► §f${oldlore} ► ${item.getLore()}`)
   })
 
 root
@@ -21,7 +21,7 @@ root
     const item = ctx.player.mainhand()
     const oldtag = item.nameTag
     item.nameTag = name
-    ctx.reply(`§a► §f${oldtag ?? ''} ► ${item.nameTag}`)
+    ctx.player.success(`§f${oldtag ?? ''} ► ${item.nameTag}`)
   })
 root
   .overload('count')
@@ -32,7 +32,19 @@ root
     const item = ctx.player.mainhand()
     const oldamount = item.amount
     item.amount = count
-    ctx.reply(`§a► §f${oldamount} ► ${item.amount}`)
+    ctx.player.success(`§f${oldamount} ► ${item.amount}`)
+  })
+root
+  .overload('damage')
+  .int('count')
+  .executes((ctx, count) => {
+    const slot = ctx.player.mainhand()
+    const item = slot.getItem()
+    if (!item?.durability) return ctx.error('НЕА')
+
+    item.durability.damage = count
+    slot.setItem(item)
+    ctx.player.success(`${count}`)
   })
 
 new Command('dupe')
