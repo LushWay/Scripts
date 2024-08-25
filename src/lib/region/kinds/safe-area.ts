@@ -1,6 +1,8 @@
+import { GameMode } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { addAddableRegion } from 'lib/region/command'
 import { Area } from '../areas/area'
+import { RegionEvents } from '../events'
 import { Region, RegionCreationOptions } from './region'
 
 interface SafeAreaRegionOptions extends RegionCreationOptions {
@@ -45,3 +47,16 @@ export class SafeAreaRegion extends Region {
   }
 }
 addAddableRegion('Мирные зоны', SafeAreaRegion)
+RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
+  const been = previous.find(e => e instanceof SafeAreaRegion)
+  const now = newest.find(e => e instanceof SafeAreaRegion)
+  const gamemode = player.getGameMode()
+  const adventure = gamemode === GameMode.adventure
+  const survival = gamemode === GameMode.survival
+
+  if (been && adventure && !now) {
+    player.setGameMode(GameMode.survival)
+  } else if (now && survival) {
+    player.setGameMode(GameMode.adventure)
+  }
+})
