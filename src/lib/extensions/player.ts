@@ -87,6 +87,8 @@ declare module '@minecraft/server' {
      * @returns True if damaged, false if not and lowHealthMessage was shown
      */
     closeChat(lowHealthMessage?: string): boolean
+
+    lang: string
   }
 
   namespace Player {
@@ -151,6 +153,10 @@ export const ClosingChatSet = new Set<string>()
 export const ScreenDisplaySymbol = Symbol('screen_display')
 
 expand(Player.prototype, {
+  get lang() {
+    return 'ru_RU'
+  },
+
   isSimulated() {
     return 'jump' in this
   },

@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { system } from '@minecraft/server'
 import { dedupe } from 'lib/dedupe'
 import { getRandomVectorInCircle, getTopmostSolidBlock } from 'lib/game-utils'
 import { Anarchy } from 'modules/places/anarchy/anarchy'

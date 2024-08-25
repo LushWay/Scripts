@@ -1,23 +1,13 @@
 import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import {
-  ActionForm,
-  BUTTON,
-  FormCallback,
-  ModalForm,
-  Vector,
-  inspect,
-  is,
-  noNullable,
-  stringify,
-  typeIdToReadable,
-} from 'lib'
+import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, inspect, is, noNullable, stringify } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { prompt } from 'lib/form/message'
 import { t } from 'lib/text'
+import { typeIdToReadable } from 'lib/utils/lang'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { configureNylium } from 'modules/world-edit/tools/nylium'
 import {
@@ -418,9 +408,9 @@ function WEeditBlocksSetMenu(o: {
         description:
           'Блок под ногами и блок на который вы смотрите. Если нужно добавить в набор блок с опред. типом камня, например, то поставьте его под ноги и нажмите здесь.',
       },
-      'B': blockBelow ? addBlock(0, blockBelow.typeId, blockBelow.permutation.getAllStates(), false) ?? empty : empty,
+      'B': blockBelow ? (addBlock(0, blockBelow.typeId, blockBelow.permutation.getAllStates(), false) ?? empty) : empty,
       'Y': blockOnView
-        ? addBlock(0, blockOnView.typeId, blockOnView.permutation.getAllStates(), false) ?? empty
+        ? (addBlock(0, blockOnView.typeId, blockOnView.permutation.getAllStates(), false) ?? empty)
         : empty,
     },
   )

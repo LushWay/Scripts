@@ -1,9 +1,10 @@
 import { BlockPermutation, Player, RawText } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { nmspc, typeIdToReadable } from 'lib/game-utils'
+import { nmspc } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
 import { inspect, util } from 'lib/util'
+import { typeIdToReadable } from 'lib/utils/lang'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 

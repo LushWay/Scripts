@@ -5,6 +5,7 @@ import { Cost } from './cost'
 export class XPCost extends Cost {
   constructor(private levels: number) {
     super()
+    if (this.levels < 1) this.levels = 1
   }
 
   toString(canBuy?: boolean, player?: Player): MaybeRawText {

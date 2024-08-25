@@ -5,7 +5,7 @@ import {
   MinecraftEnchantmentTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data'
-import { Enchantments, getAuxOrTexture, isKeyof, langKey, translateEnchantment } from 'lib'
+import { Enchantments, getAuxOrTexture, isKeyof } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
@@ -13,6 +13,7 @@ import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'
 import { ShopFormSection } from 'lib/shop/form'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
+import { langToken, translateEnchantment } from 'lib/utils/lang'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 import { ItemAbility } from 'modules/pvp/item-ability'
 
@@ -51,7 +52,7 @@ export class Mage extends ShopNpc {
       form.itemModifierSection(
         'Использовать книгу чар',
         item => item.typeId === MinecraftItemTypes.EnchantedBook,
-        { rawtext: [{ translate: langKey({ typeId: MinecraftItemTypes.EnchantedBook }) }] },
+        { rawtext: [{ translate: langToken(MinecraftItemTypes.EnchantedBook) }] },
         (bookForm, book, bookItem) => {
           const bookEnch = bookItem.enchantable?.getEnchantments()[0]
           const type = Object.values(MinecraftEnchantmentTypes).find(e => e === bookEnch?.type.id)

@@ -1,19 +1,14 @@
 import {
   Block,
   EasingType,
-  Enchantment,
-  ItemStack,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
-  RawMessage,
-  RawText,
   TicksPerSecond,
   system,
   world,
 } from '@minecraft/server'
-import { MinecraftCameraPresetsTypes, MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
-import { blockItemsLangJson } from 'lib/assets/blocks-items-lang'
+import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
 import { SafeLocation } from 'lib/location'
 import { Vector } from 'lib/vector'
@@ -81,41 +76,6 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
   )
 }
 
-/**
- * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
- * capitalizes first letter
- *
- * @deprecated Consider using {@link langKey}
- * @example
- *   typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
- *
- * @example
- *   typeIdToReadable('minecraft:cobblestone') // Cobblestone
- *
- * @param {string} typeId
- */
-export function typeIdToReadable(typeId: string) {
-  // Format
-  typeId = typeId.replace(/^minecraft:/, '').replace(/_(.)/g, ' $1')
-
-  // Capitalize first letter
-  typeId = typeId[0].toUpperCase() + typeId.slice(1)
-
-  return typeId
-}
-
-/**
- * Gets localization name of the ItemStack
- *
- * @example
- *   const apple = new ItemStack(MinecraftItemTypes.Apple)
- *   langKey(apple) // %item.apple.name
- */
-export function langKey(item: Pick<ItemStack, 'typeId'> | string) {
-  const typeId = typeof item === 'object' ? item.typeId : item
-  return typeId in blockItemsLangJson ? blockItemsLangJson[typeId] : typeId
-}
-
 export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
 
 /**
@@ -146,33 +106,6 @@ export function nmspc(text: string) {
 }
 
 /**
- * Returns RawText representation of an Enchantment or Enchantment Type. If Enchanment is provided, also returns its as
- * another translated RawMessage
- */
-export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment): RawText {
-  const rawtext: RawMessage[] = [{ translate: langKey({ typeId: typeof e === 'string' ? e : e.type.id }) }]
-  if (typeof e === 'object') {
-    rawtext.push(
-      { text: ' ' },
-      e.level < 10 ? { translate: `enchantment.level.${e.level.toString()}` } : { text: e.level.toString() },
-    )
-  }
-  return { rawtext }
-}
-
-export async function getTopmostSolidBlock(location: Vector3) {
-  if (await loadChunk(location)) {
-    const hit = world.overworld.getBlockFromRay(location, Vector.down, { includeLiquidBlocks: true })
-    if (!hit) return false
-
-    const { block } = hit
-    if (block.isLiquid || block.isAir) {
-      return false
-    } else return block.location
-  } else return false
-}
-
-/**
  * Tries to load chunk at provided location by adding tickingarea and trying to get block at location 100 times. If
  * chunk is still unloaded, returns false. If chunk is finally loaded, returns block.
  *
@@ -180,7 +113,7 @@ export async function getTopmostSolidBlock(location: Vector3) {
  * and you call it here, it will wait for previous function to finish loading chunk and only then will execute. That is
  * for preventing overload
  */
-const loadChunk = dedupe(async function loadChunk(location: Vector3) {
+export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
   // console.debug('Load chunk entering', Vector.string(location, true))
   await world.overworld.runCommandAsync(`tickingarea remove ldchnk`)
   await world.overworld.runCommandAsync(`tickingarea add ${Vector.string(location)} ${Vector.string(location)} ldchnk `)
@@ -225,4 +158,15 @@ export function getRandomVectorInCircle(radius: number): { x: number; z: number 
   }
 
   return result
+}
+export async function getTopmostSolidBlock(location: Vector3) {
+  if (await loadChunk(location)) {
+    const hit = world.overworld.getBlockFromRay(location, Vector.down, { includeLiquidBlocks: true })
+    if (!hit) return false
+
+    const { block } = hit
+    if (block.isLiquid || block.isAir) {
+      return false
+    } else return block.location
+  } else return false
 }

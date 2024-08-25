@@ -1,13 +1,13 @@
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
+import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
+import { Barman } from 'modules/places/stone-quarry/barman'
+import { Horseman } from 'modules/places/stone-quarry/horseman'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
-import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
-import { Barman } from 'modules/places/stone-quarry/barman'
-import { Coachman } from 'modules/places/stone-quarry/coachman'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -23,7 +23,7 @@ class StoneQuarryBuilder extends City {
 
   barman = new Barman(this.group)
 
-  coachman = new Coachman(this.group)
+  coachman = new Horseman(this.group)
 
   w = Boss.create()
     .group(this.group)

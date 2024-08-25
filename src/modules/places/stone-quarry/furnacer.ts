@@ -1,6 +1,7 @@
 import { ItemStack, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector, getAuxOrTexture, ms } from 'lib'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { actionGuard } from 'lib/region/index'
@@ -9,7 +10,6 @@ import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { StoneQuarry } from './stone-quarry'
-import { Sounds } from 'lib/assets/custom-sounds'
 
 export class Furnacer extends ShopNpc {
   static create() {
@@ -94,7 +94,6 @@ export class Furnacer extends ShopNpc {
 actionGuard((player, region, ctx) => {
   // Not our event
   if (ctx.type !== 'interactWithBlock') return
-  if (region !== StoneQuarry.safeArea) return
 
   const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))
   if (!furnacer) return
@@ -103,6 +102,12 @@ actionGuard((player, region, ctx) => {
   const notAllowed = (message = 'Для использования печек вам нужно купить ключ у печкина или взять его в руки!') => {
     system.delay(() => player.fail(message))
     return false
+  }
+
+  if (region !== StoneQuarry.safeArea) {
+    if (furnacer.onlyInStoneQuarry) {
+      return notAllowed('Вы не можете пользоваться печками вне Каменоломни')
+    } else return // allow
   }
 
   const lore = FurnaceKeyItem.schema.parse(player.mainhand(), undefined, false)
