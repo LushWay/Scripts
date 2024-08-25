@@ -21,6 +21,16 @@ export interface RegionSave {
   permissions: Partial<RegionPermissions>
 }
 
+export const defaultRegionPermissions = (): RegionPermissions => ({
+  doors: true,
+  switches: true,
+  openContainers: true,
+  trapdoors: true,
+  pvp: true,
+  allowedEntities: 'all',
+  owners: [],
+})
+
 export const RegionDatabase = table<RegionSave>('region-v2', () => ({
   a: { t: SphereArea.type, d: {} },
   k: 'r',

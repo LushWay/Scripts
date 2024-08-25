@@ -16,7 +16,9 @@ export class MineareaRegion extends RegionWithStructure {
 
   protected readonly defaultPermissions: RegionPermissions = {
     allowedEntities: 'all',
-    doorsAndSwitches: true,
+    trapdoors: true,
+    doors: true,
+    switches: true,
     openContainers: true,
     pvp: true,
     owners: [],

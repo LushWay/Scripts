@@ -18,7 +18,9 @@ export class BossArenaRegion extends Region {
 
   protected readonly defaultPermissions: RegionPermissions = {
     allowedEntities: 'all',
-    doorsAndSwitches: true,
+    trapdoors: false,
+    doors: false,
+    switches: false,
     openContainers: true,
     pvp: true,
     owners: [],

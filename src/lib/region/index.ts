@@ -9,7 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 import { EventSignal } from '../event-signal'
-import { BLOCK_CONTAINERS, DOORS_AND_SWITCHES, NOT_MOB_ENTITIES } from './config'
+import { BLOCK_CONTAINERS, DOORS, NOT_MOB_ENTITIES, SWITCHES, TRAPDOORS } from './config'
 import { RegionEvents } from './events'
 import { Region } from './kinds/region'
 export * from './command'
@@ -77,8 +77,10 @@ export function loadRegionsWithGuards({
     const { regions, region } = getRegions(event.block, event.player.dimension.type)
     if (allowed(event.player, region, { type: 'interactWithBlock', event }, regions)) return
 
-    if (DOORS_AND_SWITCHES.includes(event.block.typeId) && region?.permissions.doorsAndSwitches) return
-    if (BLOCK_CONTAINERS.includes(event.block.typeId) && region?.permissions.openContainers) return
+    if (region?.permissions.switches && SWITCHES.includes(event.block.typeId)) return // allow
+    if (region?.permissions.doors && DOORS.includes(event.block.typeId)) return // allow
+    if (region?.permissions.trapdoors && TRAPDOORS.includes(event.block.typeId)) return // allow
+    if (region?.permissions.openContainers && BLOCK_CONTAINERS.includes(event.block.typeId)) return // allow
 
     event.cancel = true
   })

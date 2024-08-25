@@ -3,10 +3,19 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/config'
 
 /** All doors and switches in minecraft */
-export const DOORS_AND_SWITCHES = BlockTypes.getAll()
-  .filter(e => e.id.match(/door|trapdoor|button$/g))
+export const DOORS = BlockTypes.getAll()
+  .filter(e => e.id.endsWith('_door'))
   .map(e => e.id)
-  .concat(['minecraft:lever'])
+
+/** All doors and switches in minecraft */
+export const TRAPDOORS = BlockTypes.getAll()
+  .filter(e => e.id.endsWith('_trapdoor'))
+  .map(e => e.id)
+
+/** All doors and switches in minecraft */
+export const SWITCHES = BlockTypes.getAll()
+  .filter(e => /button|lever$/.test(e.id))
+  .map(e => e.id)
 
 /** A list of all containers a item could be in */
 export const BLOCK_CONTAINERS = [

@@ -1,17 +1,20 @@
 import { Player, world } from '@minecraft/server'
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { Area } from '../areas/area'
-import { RegionDatabase, RegionSave } from '../database'
+import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
 
 /** Permissions of the region */
 export interface RegionPermissions extends Record<string | number | symbol, unknown> {
-  /** If the player can use chests, defualt: true */
-  doorsAndSwitches: boolean
+  /** If the player can use doors, defualt: false */
+  doors: boolean
+  /** If the player can use switches, defualt: false */
+  switches: boolean
+  /** If the player can use trapdoors, defualt: false */
+  trapdoors: boolean
   /** If the player can use doors, default: true */
   openContainers: boolean
   /** If players can fight, default: false */
@@ -111,17 +114,10 @@ export class Region {
   }
 
   /** Region permissions */
-  // @ts-expect-error This not really an issue
-  permissions: RegionPermissions
+  permissions!: RegionPermissions
 
   /** Permissions used by default */
-  protected readonly defaultPermissions: RegionPermissions = {
-    doorsAndSwitches: true,
-    openContainers: true,
-    pvp: false,
-    allowedEntities: [MinecraftEntityTypes.Player, 'minecraft:item'],
-    owners: [],
-  }
+  protected readonly defaultPermissions: RegionPermissions = defaultRegionPermissions()
 
   /** Database linked to the region */
   linkedDatabase!: JsonObject | undefined

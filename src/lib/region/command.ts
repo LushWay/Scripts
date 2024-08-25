@@ -127,11 +127,28 @@ export function editRegionPermissions(
   }: { pluralForms: WordPluralForms; extendedEditPermissions?: boolean; back: () => void },
 ) {
   let form: ModalForm<
-    (ctx: FormCallback, toggles: boolean, containers: boolean, pvp?: boolean, radius?: number, center?: string) => void
+    (
+      ctx: FormCallback,
+      doors: boolean,
+      switches: boolean,
+      trapdoors: boolean,
+      containers: boolean,
+      pvp?: boolean,
+      radius?: number,
+      center?: string,
+    ) => void
   > = new ModalForm('Разрешения ' + pluralForms[0])
     .addToggle(
-      `Двери и переключатели\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери и переключатели.`,
-      region.permissions.doorsAndSwitches,
+      `Двери\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери.`,
+      region.permissions.doors,
+    )
+    .addToggle(
+      `Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать рычаг и кнопки.`,
+      region.permissions.switches,
+    )
+    .addToggle(
+      `Люки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать люки.`,
+      region.permissions.trapdoors,
     )
     .addToggle(
       `Контейнеры\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки открывать контейнеры (сундуки, шалкеры и тд)`,
@@ -146,8 +163,10 @@ export function editRegionPermissions(
         .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
         .addTextField('Центр региона', Vector.string(region.area.center), Vector.string(region.area.center))
   }
-  form.show(player, (ctx, doors, containers, pvp, radiusOrCenter, rawCenter) => {
-    region.permissions.doorsAndSwitches = doors
+  form.show(player, (ctx, doors, switches, trapdoors, containers, pvp, radiusOrCenter, rawCenter) => {
+    region.permissions.doors = doors
+    region.permissions.switches = switches
+    region.permissions.trapdoors = trapdoors
     region.permissions.openContainers = containers
     if (typeof pvp !== 'undefined') region.permissions.pvp = pvp
 

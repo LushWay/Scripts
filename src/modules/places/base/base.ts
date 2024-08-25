@@ -101,8 +101,10 @@ function createBase(block: Block, player: Player) {
   if (!player.isSimulated()) player.log('Base', 'created a on ' + Vector.string(center, true))
   BaseRegion.create(new SphereArea({ center, radius: 10 }, block.dimension.type), {
     permissions: {
-      doorsAndSwitches: false,
+      doors: false,
+      switches: false,
       openContainers: false,
+      trapdoors: false,
       pvp: true,
       allowedEntities: 'all',
       owners: [player.id],
