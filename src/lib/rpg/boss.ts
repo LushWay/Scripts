@@ -1,6 +1,7 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
 import { Entity, system, world } from '@minecraft/server'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary } from 'lib'
 import { table } from 'lib/database/abstract'
 import { Core } from 'lib/extensions/core'
@@ -9,6 +10,8 @@ import { location, SafeLocation } from 'lib/location'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
+import { givePlayerMoneyAndXp } from 'lib/rpg/money'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Group, Place } from './place'
 
 interface BossDB {
@@ -58,12 +61,21 @@ export class Boss {
   location: SafeLocation<Vector3>
 
   static {
-    world.afterEvents.entityDie.subscribe(data => {
-      Boss.all.find(e => e.entity?.id === data.deadEntity.id)?.onDie()
+    world.afterEvents.entityDie.subscribe(event => {
+      Boss.all.find(e => e.entity?.id === event.deadEntity.id)?.onDie()
     })
 
     Core.afterEvents.worldLoad.subscribe(() => {
       system.runInterval(() => Boss.all.forEach(e => e.check()), 'boss respawn', 40)
+    })
+
+    world.afterEvents.entityHurt.subscribe(event => {
+      const boss = Boss.all.find(e => e.entity?.id === event.hurtEntity.id)
+      if (!boss) return
+      if (!event.damageSource.damagingEntity?.isPlayer()) return
+
+      const prev = boss.damage.get(event.damageSource.damagingEntity) ?? 0
+      boss.damage.set(event.damageSource.damagingEntity, prev + event.damage)
     })
   }
 
@@ -83,10 +95,13 @@ export class Boss {
         new SphereArea({ center, radius: 40 }, this.options.place.group.dimensionId),
         { bossName: this.options.place.name },
       )
+      this.region.permissions.allowedEntities = [this.options.typeId, MinecraftEntityTypes.Player]
     })
 
     Boss.all.push(this)
   }
+
+  private damage = new WeakPlayerMap<number>({ removeOnLeave: true })
 
   get dimensionId() {
     return this.options.place.group.dimensionId
@@ -168,6 +183,7 @@ export class Boss {
 
   onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
+
     console.debug(`Boss(${this.options.place.fullId}).onDie()`)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
@@ -182,7 +198,15 @@ export class Boss {
       world.say('§6Убит босс §f' + this.options.place.name + '!')
 
       this.options.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
-      // TODO Give money depending on how many hits etc
+      const players = world.getAllPlayers()
+
+      for (const [playerId, damage] of this.damage) {
+        const player = players.find(e => e.id === playerId)
+        if (!player) return console.log('NO PLAYER LOL')
+
+        givePlayerMoneyAndXp(player, damage, ~~(damage / 10))
+      }
+      this.damage.clear()
     }
   }
 }
