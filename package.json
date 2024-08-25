@@ -16,21 +16,20 @@
     "@minecraft/server-gametest": "1.0.0-beta.1.21.0-stable",
     "@minecraft/server-net": "1.0.0-beta.1.21.0-stable",
     "@minecraft/server-ui": "1.2.0-beta.1.21.0-stable",
-    "@minecraft/vanilla-data": "1.21.0",
-    "async-mutex": "^0.5.0"
+    "@minecraft/vanilla-data": "1.21.0"
   },
   "resolutions": {
     "@minecraft/server": "1.12.0-beta.1.21.0-stable",
     "@minecraft/server-gametest": "1.0.0-beta.1.21.0-stable",
     "@minecraft/server-net": "1.0.0-beta.1.21.0-stable",
     "@minecraft/server-ui": "1.2.0-beta.1.21.0-stable",
-    "@minecraft/vanilla-data": "1.21.0",
-    "async-mutex": "^0.5.0"
+    "@minecraft/vanilla-data": "1.21.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
     "@vitest/coverage-istanbul": "^2.0.5",
     "@vitest/ui": "^2.0.5",
+    "async-mutex": "^0.5.0",
     "esbuild": "^0.21.5",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^9.1.0",
