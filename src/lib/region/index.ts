@@ -18,7 +18,6 @@ export * from './database'
 export * from './kinds/region'
 
 export * from './kinds/boss-arena'
-export * from './kinds/dungeon'
 export * from './kinds/safe-area'
 
 type InteractionAllowed = (

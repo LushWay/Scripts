@@ -3,7 +3,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { Area } from '../areas/area'
-import { RLDB, RegionDatabase, RegionSave } from '../database'
+import { RegionDatabase, RegionSave } from '../database'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
@@ -25,10 +25,11 @@ export interface RegionPermissions extends Record<string | number | symbol, unkn
 /** Options used in {@link Region.create} */
 export interface RegionCreationOptions {
   permissions?: Partial<RegionPermissions>
+  ldb?: JsonObject
 }
 
 /** Represents protected region in the world. */
-export class Region<LDB extends RLDB = any> {
+export class Region {
   static readonly type: string
 
   static readonly kind: string
@@ -49,6 +50,7 @@ export class Region<LDB extends RLDB = any> {
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.kind = this.kind
     region.creator = this
+    if (options.ldb) region.linkedDatabase = options.ldb
 
     if (!key) {
       // We are creating new region and should save it
@@ -122,7 +124,7 @@ export class Region<LDB extends RLDB = any> {
   }
 
   /** Database linked to the region */
-  linkedDatabase!: LDB
+  linkedDatabase!: JsonObject | undefined
 
   /** Region kind */
   private kind!: string
