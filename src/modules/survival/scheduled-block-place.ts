@@ -2,6 +2,7 @@ import { Block, BlockPermutation, LocationInUnloadedChunkError, system, world } 
 import { EventSignal, Vector, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
+import { form } from 'lib/form/new'
 import { t } from 'lib/text'
 
 interface ScheduledBlockPlace {
@@ -106,22 +107,50 @@ function getScheduleBlock(
   }
 
   let date = schedule.date
-  if (schedules.length > 500) {
-    date -= ~~(schedules.length / 500)
-  }
-  if (Date.now() < date) return
+  if (date !== 0) {
+    if (schedules.length > 500) {
+      date -= ~~(schedules.length / 500)
+    }
+    if (Date.now() < date) return
 
-  // To prevent blocks from restoring randomly in air
-  // we calculate if there is near broken block
-  const nearAir = schedules.find(
-    e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > date,
-  )
-  if (nearAir) return
+    // To prevent blocks from restoring randomly in air
+    // we calculate if there is near broken block
+    const nearAir = schedules.find(
+      e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > date,
+    )
+    if (nearAir) return
+  }
 
   const block = world.overworld.getBlock(schedule.location)
-  if (!block?.isValid()) {
-    return
-  }
+  if (!block?.isValid()) return
 
   return block
 }
+
+const scheduleForm = form(form => {
+  form.title('schd')
+  for (const [dim, blocks] of Object.entries(SCHEDULED_DB)) {
+    form.button(scheduledDimensionForm(dim, blocks))
+  }
+})
+
+const scheduledDimensionForm = (dim: string, blocks: ScheduledBlockPlace[]) =>
+  form((form, player) => {
+    const size = blocks.length
+    form.title(`§7${dim}: §f${size}`)
+    form.button(t`Place all blocks NOW`, () => {
+      player.success(`Enjoy the CHAOS. Force-placed ${size} blocks.`)
+      system.runJobForEach(blocks, e => (e.date = 0))
+    })
+    const first = blocks[0]
+    if (typeof first === 'undefined') return
+    form.button(t`TP to first: ${Vector.string(first.location, true)}\n${first.typeId}`, () => {
+      player.teleport(first.location)
+      player.success()
+    })
+  })
+
+new Command('schd')
+  .setDescription('Отложенная установка блоков')
+  .setPermissions('techAdmin')
+  .executes(ctx => scheduleForm.show(ctx.player))

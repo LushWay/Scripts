@@ -1,20 +1,23 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { showForm, util } from 'lib'
-import { MaybeRawText } from 'lib/text'
+import { MaybeRawText, t } from 'lib/text'
 
-type FormCallback = (player: Player, back?: FormCallback) => void
+type FormCallback<T extends any[] = []> = (player: Player, back?: FormCallback, ...args: T) => void
 
 class Form {
-  constructor(private back: FormCallback) {}
+  constructor(
+    private self: FormCallback,
+    private player: Player,
+  ) {}
 
   private form = new ActionFormData()
 
   currentTitle?: MaybeRawText
 
-  title(title: MaybeRawText) {
+  title(title: MaybeRawText, prefix = '§c§o§m§m§o§n§r§f') {
     this.currentTitle = title
-    this.form.title(title)
+    this.form.title(t.raw`${prefix}${title}`)
     return this as F
   }
 
@@ -60,8 +63,8 @@ class Form {
     let text, icon, callback
 
     if (textOrForm instanceof Show) {
-      text = textOrForm.title?.() ?? '>///<'
-      callback = textOrForm.show.bind(textOrForm)
+      text = textOrForm.title(this.player)
+      callback = textOrForm.show
       if (typeof callbackOrIcon === 'string') icon = callbackOrIcon
     } else {
       text = textOrForm
@@ -69,7 +72,7 @@ class Form {
 
     if (typeof callbackOrIcon === 'function') {
       callback = callbackOrIcon
-    } else {
+    } else if (typeof callbackOrIcon === 'string') {
       icon = callbackOrIcon
       callback = callbackOrUndefined
     }
@@ -79,38 +82,39 @@ class Form {
     return this
   }
 
-  async show(player: Player) {
-    if (!this.buttons.length) this.button('Пусто', undefined, () => this.show(player))
+  async show() {
+    if (!this.buttons.length) this.button('Пусто', undefined, () => this.show())
 
-    const response = await showForm(this.form, player)
+    const response = await showForm(this.form, this.player)
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
       return
 
     const callback = this.buttons[response.selection]
-    if (typeof callback === 'function') util.catch(() => callback(player, this.back))
+    if (typeof callback === 'function') util.catch(() => callback(this.player, this.self))
   }
 }
 
-type Title = (title: MaybeRawText) => F
 type F = Omit<Form, 'show' | 'currentTitle'>
-type CreateForm = (form: Title, player: Player) => void
-type CreateTitle = () => MaybeRawText
+type CreateForm<T extends any[]> = (form: F, player: Player, ...args: T) => void
 
-export function form(create: CreateForm, title?: CreateTitle) {
-  return new Show(create, title)
+export function form<T extends any[]>(create: CreateForm<T>) {
+  return new Show(create)
 }
 
-class Show {
-  constructor(
-    private create: CreateForm,
-    readonly title?: CreateTitle,
-  ) {}
+class Show<T extends any[] = []> {
+  constructor(private create: CreateForm<T>) {}
 
-  show: FormCallback = (player, back) => {
-    const form = new Form(this.show)
+  show: FormCallback<T> = (player, back, ...args) => {
+    const form = new Form(this.show, player)
     if (back) form.button('Back', undefined, back)
 
-    this.create(title => form.title(title), player)
-    return form.show(player)
+    this.create(form, player, ...args)
+    return form.show()
+  }
+
+  title(player: Player, ...args: T) {
+    const form = new Form(this.show, player)
+    this.create(form, player, ...args)
+    return form.currentTitle ?? 'No title'
   }
 }
