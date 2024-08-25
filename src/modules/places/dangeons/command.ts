@@ -1,20 +1,21 @@
 import { MolangVariableMap, Player, system, world } from '@minecraft/server'
-import { ArrayForm, Vector } from 'lib'
+import { ArrayForm, isKeyof, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
 import { StructureId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { DungeonRegion } from 'modules/places/dangeons/dungeon'
+import { Dungeon } from './loot'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', CustomItems.WeTool)
   .nameTag(() => '§fСоздает данж')
   .lore('§7Используй, чтобы создать данж')
   .property('type', String)
-  .display('Тип данжа')
+  .display('Тип данжа', t => (isKeyof(t, Dungeon.names) ? Dungeon.names[t] : t))
   .build()
 
-const dungeons = Object.entries(StructureId).filter(e => e[0].toLowerCase().includes('dungeon'))
+const dungeons = Object.values(StructureId).filter(e => e.includes('dungeon'))
 
 new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   const hand = ctx.player.mainhand()
@@ -23,9 +24,9 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   }
 
   new ArrayForm('Выбери тип данжа', dungeons)
-    .button(([name, structureId]) => {
+    .button(structureId => {
       return [
-        name.replace('Dungeon', ''),
+        isKeyof(structureId, Dungeon.names) ? Dungeon.names[structureId] : structureId,
         () => {
           const hand = ctx.player.mainhand()
           if (toolSchema.is(hand)) {
