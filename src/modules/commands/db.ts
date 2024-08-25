@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { ROLES, getRole, inspect, util } from 'lib'
+import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
 import { DatabaseTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
@@ -23,41 +23,30 @@ function selectTable(player: Player, firstCall?: true) {
 
 function showTable(player: Player, tableId: string, table: DatabaseTable) {
   const selfback = () => showTable(player, tableId, table)
-  const menu = new ActionForm(tableId)
-
-  menu.addButton(ActionForm.backText, () => selectTable(player))
-  menu.addButton('§3Новое значение§r', () => {
-    changeValue(
-      player,
-      null,
-      (newVal, key) => {
-        table[key] = newVal
-      },
-      selfback,
-    )
-  })
-
-  menu.addButton('§3Посмотреть в §fRAW', () => {
-    let raw = getProvider().getRawTableData(tableId)
-    try {
-      if (typeof raw === 'string') raw = JSON.parse(raw) as typeof raw
-    } catch {}
-
-    new ActionForm('§3RAW table §f' + tableId, inspect(raw)).addButton('Oк', selectTable).show(player)
-  })
-
   const keys = Object.keys(table)
-  for (const key of keys) {
-    let name = key
-    if (tableId === 'player') {
-      const playerDatabase = table as typeof Player.database
-      name = `${playerDatabase[key].name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
-    }
+  new ArrayForm(`${tableId} ${keys.length}`, keys)
+    .addCustomButtonBeforeArray(form => {
+      form
+        .addButton('§3Новое значение§r', () => {
+          changeValue(player, null, (newVal, key) => (table[key] = newVal), selfback)
+        })
+        .addButtonPrompt('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
+          Object.keys(table).forEach(e => Reflect.deleteProperty(table, e))
+        })
+    })
+    .back(() => selectTable(player))
+    .button(key => {
+      let name = key
+      if (tableId === 'player') {
+        const playerDatabase = table as typeof Player.database
+        name = `${playerDatabase[key].name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
+      } else {
+        name += `\n§7${JSON.stringify(table[key]).replace(/"/g, '')}`
+      }
 
-    menu.addButton(name, () => tableProperty(key, table, player, selfback))
-  }
-
-  menu.show(player)
+      return [name, () => tableProperty(key, table, player, selfback)] as const
+    })
+    .show(player)
 }
 
 function tableProperty(key: string, table: DatabaseTable, player: Player, back: VoidFunction) {
