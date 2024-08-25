@@ -2,6 +2,7 @@ import { Loot } from 'lib'
 import { CustomItems } from 'lib/assets/config'
 import { StructureId } from 'lib/assets/structures'
 import { CannonBulletItem } from 'modules/features/cannon'
+import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonBulletItem.blueprint)
@@ -20,6 +21,20 @@ const defaultLoot = new Loot('dungeon_default_loot')
 
   .item(CustomItems.Money)
   .chance('100%')
+  .amount({
+    '10...20': '80%',
+    '21...64': '20%',
+  })
+
+  .itemStack(FireBallItem)
+  .chance('10%')
+  .amount({
+    '10...20': '80%',
+    '21...64': '20%',
+  })
+
+  .itemStack(IceBombItem)
+  .chance('10%')
   .amount({
     '10...20': '80%',
     '21...64': '20%',
@@ -66,6 +81,27 @@ const loot = {
     .item('Web')
     .chance('40%')
     .amount({ '1...2': '1%' })
+
+    .item(CustomItems.Money)
+    .chance('100%')
+    .amount({
+      '10...20': '80%',
+      '21...64': '20%',
+    })
+
+    .itemStack(FireBallItem)
+    .chance('10%')
+    .amount({
+      '10...20': '80%',
+      '21...64': '20%',
+    })
+
+    .itemStack(IceBombItem)
+    .chance('10%')
+    .amount({
+      '10...20': '80%',
+      '21...64': '20%',
+    })
 
     .item('Web')
     .chance('40%')
