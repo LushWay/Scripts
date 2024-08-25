@@ -1,4 +1,4 @@
-import { Region } from 'lib'
+import { Region, RegionIsSaveable } from 'lib'
 import { Vector } from 'lib/vector'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { ChunkCubeArea } from './areas/chunk-cube'
@@ -16,10 +16,6 @@ class TestK1Region extends Region {
 
   get regionKey() {
     return this.key
-  }
-
-  get isSabeable() {
-    return this.saveable
   }
 }
 registerSaveableRegion('k1', TestK1Region)
@@ -51,7 +47,7 @@ describe('region initialization', () => {
     expect(json.a.t).toBe(SphereArea.type)
     expect(json.k).toBe(TestK1Region.kind)
 
-    expect(region.isSabeable).toBe(true)
+    expect(RegionIsSaveable in region).toBe(true)
 
     expect(restoreRegionFromJSON(['test', json])).toBeInstanceOf(TestK1Region)
     expect(restoreRegionFromJSON(['test', json])).toEqual(region)

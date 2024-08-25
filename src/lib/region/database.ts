@@ -4,7 +4,7 @@ import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
 import { Area } from './areas/area'
 import { SphereArea } from './areas/sphere'
-import type { Region, RegionPermissions } from './kinds/region'
+import { RegionIsSaveable, type Region, type RegionPermissions } from './kinds/region'
 
 export type RLDB = JsonObject | undefined
 
@@ -53,7 +53,7 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
   // @ts-expect-error Yes, we ARE breaking typescript
   region.kind = kind
   // @ts-expect-error Yes, we ARE breaking typescript
-  region.prototype.saveable = true
+  region.prototype[RegionIsSaveable] = true
 
   kinds.push(region)
 }

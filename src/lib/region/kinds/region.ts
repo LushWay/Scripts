@@ -218,12 +218,9 @@ export class Region {
     }
   }
 
-  /** Whenether region should be saved into the database or if its runtime-only, e.g. BossRegion */
-  protected readonly saveable: boolean = false
-
   /** Updates this region in the database */
   save() {
-    if (!this.saveable) return false
+    if (!(RegionIsSaveable in this)) return false
 
     RegionDatabase[this.key] = this.toJSON()
   }
@@ -234,3 +231,5 @@ export class Region {
     Reflect.deleteProperty(RegionDatabase, this.key)
   }
 }
+
+export const RegionIsSaveable = Symbol('region.saveable')
