@@ -3,8 +3,6 @@ import { Vector } from 'lib/vector'
 import { Region } from './region'
 
 export abstract class RegionWithStructure extends Region {
-  protected readonly saveable = true
-
   protected get structureName() {
     return 'region:' + this.key.replaceAll(':', '|')
   }

@@ -1,13 +1,11 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { addAddableRegion, ms } from 'lib'
-import { registerRegionKind } from 'lib/region/database'
+import { registerSaveableRegion } from 'lib/region/database'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { MineareaRegion } from '../minearea/minearea-region'
 import { ores, placeOre } from './algo'
 
 export class MineshaftRegion extends MineareaRegion {
-  static readonly kind = 'mine'
-
   protected onCreate(): void {
     let oresFound = 0
     this.area.forEachVector((vector, isIn, dimension) => {
@@ -50,4 +48,4 @@ export class MineshaftRegion extends MineareaRegion {
 }
 
 addAddableRegion('Шахты', MineshaftRegion)
-registerRegionKind(MineshaftRegion)
+registerSaveableRegion('mine', MineshaftRegion)

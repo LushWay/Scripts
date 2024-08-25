@@ -3,11 +3,9 @@ import { Vector } from 'lib/vector'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { SphereArea } from './areas/sphere'
-import { RegionDatabase, registerRegionKind, restoreRegionFromJSON } from './database'
+import { RegionDatabase, registerSaveableRegion, restoreRegionFromJSON } from './database'
 
 class TestK1Region extends Region {
-  static kind = 'k1'
-
   method() {}
 
   customProperty = 'string'
@@ -19,12 +17,14 @@ class TestK1Region extends Region {
   get regionKey() {
     return this.key
   }
+
+  get isSabeable() {
+    return this.saveable
+  }
 }
-registerRegionKind(TestK1Region)
+registerSaveableRegion('k1', TestK1Region)
 
 class TestK2Region extends Region {
-  static kind = 'k2'
-
   get regionKey() {
     return this.key
   }
@@ -33,7 +33,7 @@ class TestK2Region extends Region {
     return this.toJSON()
   }
 }
-registerRegionKind(TestK2Region)
+registerSaveableRegion('k2', TestK2Region)
 
 beforeAll(() => {
   TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
@@ -50,6 +50,8 @@ describe('region initialization', () => {
 
     expect(json.a.t).toBe(SphereArea.type)
     expect(json.k).toBe(TestK1Region.kind)
+
+    expect(region.isSabeable).toBe(true)
 
     expect(restoreRegionFromJSON(['test', json])).toBeInstanceOf(TestK1Region)
     expect(restoreRegionFromJSON(['test', json])).toEqual(region)

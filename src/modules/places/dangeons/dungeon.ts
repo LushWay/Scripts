@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Loot, LootTable, Vector, isKeyof, ms, registerRegionKind } from 'lib'
+import { Cooldown, Loot, LootTable, Vector, isKeyof, ms, registerSaveableRegion } from 'lib'
 import { StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -18,8 +18,6 @@ interface DungeonRegionOptions extends RegionCreationOptions {
 }
 
 export class DungeonRegion extends Region {
-  static kind = 'dungeon'
-
   static dungeons: DungeonRegion[] = []
 
   static {
@@ -152,7 +150,7 @@ export class DungeonRegion extends Region {
     return isKeyof(this.structureId, Dungeon.names) ? Dungeon.names[this.structureId] : 'Данж'
   }
 }
-registerRegionKind(DungeonRegion as typeof Region)
+registerSaveableRegion('dungeon', DungeonRegion as typeof Region)
 
 interface DungeonChest {
   id: string

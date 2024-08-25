@@ -1,7 +1,7 @@
 import { Player, PlayerBreakBlockBeforeEvent } from '@minecraft/server'
 import { isNotPlaying } from 'lib/game-utils'
 import { actionGuard, addAddableRegion } from 'lib/region'
-import { registerRegionKind } from 'lib/region/database'
+import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { t } from 'lib/text'
@@ -9,8 +9,6 @@ import { ms } from 'lib/utils/ms'
 import { onScheduledBlockPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 export class MineareaRegion extends RegionWithStructure {
-  static readonly kind: string = 'minearea'
-
   /** MineArea is more prior then other regions */
   protected readonly priority = 1
 
@@ -38,7 +36,6 @@ export class MineareaRegion extends RegionWithStructure {
       states: block.permutation.getAllStates(),
       restoreTime: ms.from('sec', 10), // ms.from('min', Math.randomInt(1, 3)),
     })
-    console.log('ON BLOCK BREAK MINEAREA')
 
     return true
   }
@@ -50,7 +47,7 @@ export class MineareaRegion extends RegionWithStructure {
 }
 
 addAddableRegion('Зоны добычи', MineareaRegion)
-registerRegionKind(MineareaRegion)
+registerSaveableRegion('minearea', MineareaRegion)
 
 actionGuard((player, region, ctx) => {
   if (isNotPlaying(player)) return

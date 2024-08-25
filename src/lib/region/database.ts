@@ -44,11 +44,16 @@ system.delay(() => {
 
 let loaded = false
 const kinds: (typeof Region)[] = []
-export function registerRegionKind(region: typeof Region) {
+export function registerSaveableRegion(kind: string, region: typeof Region) {
   if (loaded)
     throw new Error(
-      `Registering region type ${region.kind} failed. Regions are already restored from json. Registering class should occur on the import-time.`,
+      `Registering region type ${kind} failed. Regions are already restored from json. Registering class should occur on the import-time.`,
     )
+
+  // @ts-expect-error Yes, we ARE breaking typescript
+  region.kind = kind
+  // @ts-expect-error Yes, we ARE breaking typescript
+  region.prototype.saveable = true
 
   kinds.push(region)
 }

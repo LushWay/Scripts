@@ -11,8 +11,6 @@ interface SafeAreaRegionOptions extends RegionCreationOptions {
 }
 
 export class SafeAreaRegion extends Region {
-  protected readonly saveable = false
-
   protected readonly defaultPermissions = {
     allowedEntities: [
       MinecraftEntityTypes.Player,

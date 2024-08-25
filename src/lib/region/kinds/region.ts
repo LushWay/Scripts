@@ -33,12 +33,10 @@ export interface RegionCreationOptions {
 
 /** Represents protected region in the world. */
 export class Region {
-  static readonly type: string
-
   static readonly kind: string
 
-  protected static generateRegionKey() {
-    return new Date(Date.now()).toISOString()
+  protected static generateRegionKey(kind: string, area: string, radius: number) {
+    return `${kind} ${area}-${radius} ${new Date(Date.now()).toISOString()}`
   }
 
   /** Creates a new region */
@@ -48,7 +46,7 @@ export class Region {
     options: ConstructorParameters<T>[1] = {},
     key?: string,
   ): InstanceType<T> {
-    const region = new this(area, options, key ?? this.generateRegionKey())
+    const region = new this(area, options, key ?? this.generateRegionKey(this.kind, area.type, area.radius))
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.kind = this.kind
@@ -221,7 +219,7 @@ export class Region {
   }
 
   /** Whenether region should be saved into the database or if its runtime-only, e.g. BossRegion */
-  protected readonly saveable: boolean = true
+  protected readonly saveable: boolean = false
 
   /** Updates this region in the database */
   save() {

@@ -6,8 +6,6 @@ interface BossArenaRegionOptions extends RegionCreationOptions {
 }
 
 export class BossArenaRegion extends Region {
-  protected readonly saveable = false
-
   protected priority = 10
 
   bossName: string
