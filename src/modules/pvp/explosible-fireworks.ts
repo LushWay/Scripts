@@ -1,4 +1,4 @@
-import { Entity, Player, system, world } from '@minecraft/server'
+import { Entity, EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib'
 
@@ -20,9 +20,11 @@ world.afterEvents.itemUse.subscribe(event => {
     if (Date.now() - date < 5 && Vector.distance(event.source.location, entity.location) < 2) {
       SPAWNED_FIREWORKS.delete(id)
       FIREWORKS.set(id, { source: event.source, firework: entity })
-      break
+      return
     }
   }
+
+  console.log('UNDETECTED')
 })
 
 const FIREWORKS = new Map<string, { source: Player; firework: Entity }>()
@@ -41,12 +43,23 @@ system.runInterval(
 
       const location = firework.location
       const block = firework.dimension.getBlock(Vector.add(location, Vector.multiply(firework.getViewDirection(), 1.2)))
+      const b4 = firework.dimension.getBlock(firework.location)
+      const b2 = firework.getBlockFromViewDirection({ maxDistance: 1 })
 
-      if (block && !block.isAir) {
-        firework.dimension.createExplosion(location, 0.8 * 2, {
+      if ((block && !block.isAir) || b2 || (b4 && !b4.isAir)) {
+        firework.dimension.createExplosion(location, 1.6, {
           source,
           breaksBlocks: true,
         })
+        const entities = firework.dimension.getEntities({ location: firework.location, maxDistance: 4 })
+        for (const entity of entities) {
+          entity.applyDamage(5, {
+            cause: EntityDamageCause.entityExplosion,
+            damagingEntity: source,
+            damagingProjectile: firework,
+          })
+        }
+        firework.remove()
         FIREWORKS.delete(id)
       }
     }
