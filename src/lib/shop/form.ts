@@ -129,7 +129,7 @@ export class ShopForm {
     return this
   }
 
-  sellableItem(type: MinecraftItemTypes) {
+  dynamicCostItem(type: MinecraftItemTypes) {
     return {
       /** Sets default count */
       defaultCount: (defaultCount = 100) => ({

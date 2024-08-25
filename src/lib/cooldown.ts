@@ -41,7 +41,7 @@ export class Cooldown {
   isExpired(player: Player) {
     const elapsed = this.getElapsed(player.id)
     if (elapsed) {
-      if (this.tell) player.fail(t.error.time`§cПодожди еще §f${this.time - elapsed}`)
+      if (this.tell) player.fail(t.error.time`§cНе так быстро! Осталась §f${this.time - elapsed}`)
 
       return false
     } else {

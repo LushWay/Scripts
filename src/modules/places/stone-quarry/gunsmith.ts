@@ -2,7 +2,7 @@ import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { langToken, selectByChance } from 'lib'
 import { Group } from 'lib/rpg/place'
-import { MoneyCost, MultiCost } from 'lib/shop/cost'
+import { MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { copyAllItemPropertiesExceptEnchants } from '../village-of-explorers/mage'
@@ -35,6 +35,7 @@ export class Gunsmith extends ShopNpc {
             )
           },
         )
+
         .itemModifierSection(
           'Починить',
           i => !!i.durability && i.durability.damage !== 0,
@@ -52,10 +53,18 @@ export class Gunsmith extends ShopNpc {
             })
           },
         )
+
         .section('Все для рейда', form => {
-          form.itemStack(new ItemStack(i.Tnt, 10), new MoneyCost(300))
-          form.itemStack(new ItemStack(i.Gunpowder, 10), new MoneyCost(100))
-          form.itemStack(new ItemStack(i.TntMinecart, 1), new MoneyCost(400))
+          form
+            .dynamicCostItem(i.Tnt)
+            .defaultCount(0)
+            .maxCount(1000)
+            .basePrice(900)
+
+            .dynamicCostItem(i.Gunpowder)
+            .defaultCount(0)
+            .maxCount(10000)
+            .basePrice(100)
         })
     })
   }

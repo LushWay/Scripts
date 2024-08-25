@@ -1,23 +1,25 @@
 import { Player, system, world } from '@minecraft/server'
-
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Cooldown } from 'lib/cooldown'
+import { ms } from 'lib/utils/ms'
 
-// Bouncy tnt
+const cooldown = new Cooldown(ms.from('sec', 3))
 
-world.beforeEvents.itemUse.subscribe(data => {
-  if (data.itemStack.typeId !== MinecraftItemTypes.Tnt) return
-  data.cancel = true
+world.beforeEvents.itemUse.subscribe(event => {
+  if (event.itemStack.typeId !== MinecraftItemTypes.Tnt) return
+  if (!cooldown.isExpired(event.source)) return
+  event.cancel = true
 
   system.delay(() => {
-    if (!(data.source instanceof Player)) return
+    if (!(event.source instanceof Player)) return
 
-    const tntSlot = data.source.mainhand()
+    const tntSlot = event.source.mainhand()
 
     if (tntSlot.amount === 1) tntSlot.setItem(undefined)
     else tntSlot.amount--
 
-    const tnt = data.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, data.source.location)
-    tnt.applyImpulse(data.source.getViewDirection())
-    data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
+    const tnt = event.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, event.source.location)
+    tnt.applyImpulse(event.source.getViewDirection())
+    event.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
   })
 })
