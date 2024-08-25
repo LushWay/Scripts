@@ -27,7 +27,7 @@ export class Mage extends ShopNpc {
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
 
     this.shop.body(() => 'Чего пожелаешь?')
-    this.shop.menu(form => {
+    this.shop.menu((form, player) => {
       form.itemModifierSection(
         'Улучшить меч',
         item => ['sword'].some(e => item.typeId.endsWith(e)),
@@ -55,6 +55,20 @@ export class Mage extends ShopNpc {
           ench(e.ProjectileProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
           ench(e.FireProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
           ench(e.BlastProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
+        },
+      )
+
+      form.itemModifierSection(
+        'Улучшить инструмент',
+        item => ['shovel', 'pickaxe', 'axe', 'hoe'].some(e => item.typeId.endsWith(e)),
+        'любые топор, кирка, мотыга или лопата',
+        (form, slot, item) => {
+          const ench = this.createEnch(form, item, slot)
+          const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
+
+          ench(e.Efficiency, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.Unbreaking, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.SilkTouch, _ => new MultiCost().money(20000).xp(100))
         },
       )
 
@@ -137,6 +151,32 @@ export class Mage extends ShopNpc {
           .itemStack(FireBallItem, new MoneyCost(100))
           .itemStack(new ItemStack(i.TotemOfUndying), new MultiCost().money(6_000).item(i.Emerald, 1))
           .itemStack(new ItemStack(i.EnchantedGoldenApple), new MultiCost().item(i.GoldenApple).money(10_000)),
+      )
+
+      form.itemModifier(
+        'Отсортировать чарки',
+        FreeCost,
+        item => !!item.enchantable,
+        'любой зачарованный предмет',
+        (slot, item) => {
+          if (!item.enchantable) return
+          const prior = [
+            MinecraftEnchantmentTypes.Sharpness,
+            MinecraftEnchantmentTypes.Efficiency,
+            MinecraftEnchantmentTypes.Power,
+            MinecraftEnchantmentTypes.Protection,
+          ]
+          for (const p of prior) {
+            const ench = item.enchantable.getEnchantment(p)
+            if (!ench) continue
+            if (ench.level > ench.type.maxLevel) return player.fail('С чарками такого уровня не работаю, слетят')
+
+            item.enchantable.removeEnchantment(ench.type)
+            item.enchantable.addEnchantment(ench)
+          }
+
+          slot.setItem(item)
+        },
       )
     })
   }
