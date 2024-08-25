@@ -22,7 +22,7 @@ export class ShopNpc {
    *
    * @param options - Creation options
    */
-  constructor(place: Place) {
+  constructor(protected place: Place) {
     this.shop = new Shop(place.name, place.fullId)
     this.npc = new Npc(place, event => {
       this.shop.open(event.player)

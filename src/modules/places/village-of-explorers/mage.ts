@@ -2,6 +2,7 @@ import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
 import {
   MinecraftEnchantmentTypes as e,
   MinecraftItemTypes as i,
+  MinecraftBlockTypes,
   MinecraftEnchantmentTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data'
@@ -16,10 +17,14 @@ import { t } from 'lib/text'
 import { langToken, translateEnchantment } from 'lib/utils/lang'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 import { ItemAbility } from 'modules/pvp/item-ability'
+import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 
 export class Mage extends ShopNpc {
   constructor(group: Group) {
     super(group.point('mage').name('Маг'))
+
+    lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
 
     this.shop.body(() => 'Чего пожелаешь?')
     this.shop.menu(form => {

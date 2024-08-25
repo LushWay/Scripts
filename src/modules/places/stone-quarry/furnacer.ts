@@ -9,6 +9,7 @@ import { Group, Place } from 'lib/rpg/place'
 import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
+import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
 
 export class Furnacer extends ShopNpc {
@@ -28,8 +29,6 @@ export class Furnacer extends ShopNpc {
   static npcs: Furnacer[] = []
 
   furnaceTypeIds
-
-  onlyInStoneQuarry
 
   /** Item representing key for using furnace */
   keyItem = new ItemStack(MinecraftItemTypes.TripwireHook).setInfo('§6Ключ от печки', '§7Ключ от печки в технограде')
@@ -56,7 +55,11 @@ export class Furnacer extends ShopNpc {
     Furnacer.npcs.push(this)
 
     this.furnaceTypeIds = furnaces
-    this.onlyInStoneQuarry = onlyInStoneQuarry
+    if (onlyInStoneQuarry) {
+      for (const furnace of furnaces) {
+        lockBlockPriorToNpc(furnace, place.name)
+      }
+    }
 
     this.shop.menu((form, player) => {
       const { item } = FurnaceKeyItem.schema.create({
@@ -94,6 +97,7 @@ export class Furnacer extends ShopNpc {
 actionGuard((player, region, ctx) => {
   // Not our event
   if (ctx.type !== 'interactWithBlock') return
+  if (region !== StoneQuarry.safeArea) return
 
   const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))
   if (!furnacer) return
@@ -102,12 +106,6 @@ actionGuard((player, region, ctx) => {
   const notAllowed = (message = 'Для использования печек вам нужно купить ключ у печкина или взять его в руки!') => {
     system.delay(() => player.fail(message))
     return false
-  }
-
-  if (region !== StoneQuarry.safeArea) {
-    if (furnacer.onlyInStoneQuarry) {
-      return notAllowed('Вы не можете пользоваться печками вне Каменоломни')
-    } else return // allow
   }
 
   const lore = FurnaceKeyItem.schema.parse(player.mainhand(), undefined, false)

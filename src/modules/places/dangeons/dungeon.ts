@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Loot, LootTable, Vector, isChunkUnloaded, isKeyof, ms, registerRegionKind } from 'lib'
+import { Cooldown, Loot, LootTable, Vector, isKeyof, ms, registerRegionKind } from 'lib'
 import { StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -27,14 +27,6 @@ export class DungeonRegion extends Region {
       () => {
         for (const dungeon of this.dungeons) {
           for (const chest of dungeon.chests) {
-            if (
-              isChunkUnloaded({
-                location: Vector.add(dungeon.area.center, chest.location),
-                dimensionId: dungeon.dimension.type,
-              })
-            )
-              continue
-
             const placed = dungeon.linkedDatabase.chests[chest.id]
             if (!placed || Cooldown.isExpired(placed, chest.restoreTime)) {
               dungeon.updateChest(chest)
@@ -130,9 +122,10 @@ export class DungeonRegion extends Region {
   }
 
   private updateChest(chest: DungeonChest) {
-    this.linkedDatabase.chests[chest.id] = Date.now()
     const block = this.dimension.getBlock(Vector.add(this.structurePosition, chest.location))
-    if (!block?.isValid()) throw new ReferenceError('Chest block is not loaded!')
+    if (!block?.isValid()) return
+
+    this.linkedDatabase.chests[chest.id] = Date.now()
 
     if (block.typeId !== MinecraftBlockTypes.Chest) block.setType(MinecraftBlockTypes.Chest)
 
