@@ -34,8 +34,12 @@ export class Mage extends ShopNpc {
         'любой меч',
         (form, slot, item) => {
           const ench = this.createEnch(form, item, slot)
+          const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
-          ench(e.Sharpness, level => new MultiCost().money(level * 20))
+          ench(e.Sharpness, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.FireAspect, level => new MultiCost().money(level * 2000).xp(level * enchs))
+          ench(e.Looting, level => new MultiCost().money(level * 2000).xp(level * enchs))
+          ench(e.Knockback, level => new MultiCost().money(level * 2000).xp(level * enchs))
         },
       )
 
@@ -142,7 +146,11 @@ export class Mage extends ShopNpc {
       const { can, level } = this.updateEnchatnment(slot, type, up, true)
       form.product(
         { rawtext: [{ text: `${can ? '' : '§7'}+` }, ...(translateEnchantment(type).rawtext ?? [])] },
-        can ? getCost(level) : level === -1 ? Incompatible : MaxLevel,
+        can
+          ? new MultiCost(getCost(level)).item(MinecraftItemTypes.LapisLazuli, level)
+          : level === -1
+            ? Incompatible
+            : MaxLevel,
         player => {
           this.updateEnchatnment(slot, type, up)
           player.playSound(Sounds.LevelUp)
