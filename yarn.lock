@@ -1363,13 +1363,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"boolean@npm:^3.1.4":
-  version: 3.2.0
-  resolution: "boolean@npm:3.2.0"
-  checksum: 10c0/6a0dc9668f6f3dda42a53c181fcbdad223169c8d87b6c4011b87a8b14a21770efb2934a778f063d7ece17280f8c06d313c87f7b834bb1dd526a867ffcd00febf
-  languageName: node
-  linkType: hard
-
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -2144,15 +2137,6 @@ __metadata:
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
   checksum: 10c0/111972b37338bcb88f7d9e2c5907862c280ebf4234433b95bc611e518d192ccb2d38119c4ac86e26b668d75f7f3894f4ff5c4982899afced7ca78633b08287c4
-  languageName: node
-  linkType: hard
-
-"fast-printf@npm:^1.6.9":
-  version: 1.6.9
-  resolution: "fast-printf@npm:1.6.9"
-  dependencies:
-    boolean: "npm:^3.1.4"
-  checksum: 10c0/0196827f4c125e147e0dab1201355146f04159ea6c6f19c6f8e44476cf1d88e58a3b3aa83ec33e5b2315a53e2cb7b2e518ce28bdb7b0f8d0d01774286e670f4f
   languageName: node
   linkType: hard
 
@@ -3750,7 +3734,6 @@ __metadata:
     eslint-plugin-file-progress: "npm:^1.4.0"
     eslint-plugin-only-warn: "npm:^1.1.0"
     eslint-plugin-scriptapi: "portal:tools/eslint-plugin"
-    fast-printf: "npm:^1.6.9"
     leafy-utils: "npm:^7.1.4"
     prettier: "npm:^3.3.3"
     prettier-plugin-jsdoc: "npm:^1.3.0"
