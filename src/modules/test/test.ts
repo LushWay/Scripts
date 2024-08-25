@@ -254,11 +254,11 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
   frm2(ctx) {
     const second = form(title => {
-      title('Second').body('Something')
+      title.title('Second').body('Something')
     })
 
     const main = form(title => {
-      title('Main').button(second)
+      title.title('Main').button(second)
     })
 
     main.show(ctx.player)
