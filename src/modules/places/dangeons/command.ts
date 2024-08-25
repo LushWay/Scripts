@@ -1,10 +1,11 @@
 import { MolangVariableMap, Player, system, world } from '@minecraft/server'
-import { ArrayForm, Region, Vector } from 'lib'
+import { ArrayForm, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
+import { StructureId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
-import { GasStationGarageRegion, GasStationRegion } from 'modules/places/dangeons/gas-station'
+import { DungeonRegion } from 'modules/places/dangeons/dungeon'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', CustomItems.WeTool)
   .nameTag(() => '§fСоздает данж')
@@ -13,7 +14,7 @@ const toolSchema = new ItemLoreSchema('dungeonCreationTool', CustomItems.WeTool)
   .display('Тип данжа')
   .build()
 
-const dungeons = [GasStationGarageRegion, GasStationRegion]
+const dungeons = Object.entries(StructureId).filter(e => e[0].toLowerCase().includes('dungeon'))
 
 new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   const hand = ctx.player.mainhand()
@@ -22,18 +23,18 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   }
 
   new ArrayForm('Выбери тип данжа', dungeons)
-    .button(item => {
+    .button(([name, structureId]) => {
       return [
-        item.name.replace('Region', ''),
+        name.replace('Dungeon', ''),
         () => {
           const hand = ctx.player.mainhand()
           if (toolSchema.is(hand)) {
             const schema = toolSchema.parse(hand)
-            if (schema) schema.type = item.kind
+            if (schema) schema.type = structureId
             else ctx.error('Создайте новый предмет, старый сломался')
           } else {
             console.log('Setting item...')
-            hand.setItem(toolSchema.create({ type: item.kind }).item)
+            hand.setItem(toolSchema.create({ type: structureId }).item)
           }
         },
       ]
@@ -41,12 +42,36 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
     .show(ctx.player)
 })
 
+function getDungeon(player: Player) {
+  const mainhand = player.mainhand()
+  const storage = toolSchema.parse(mainhand)
+  if (!storage) return
+
+  const region = new DungeonRegion(
+    new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
+    { structureId: storage.type },
+    '',
+  )
+  region.configureSize()
+  return region
+}
+
+world.afterEvents.itemUse.subscribe(event => {
+  const player = event.source
+  const dungeon = getDungeon(player)
+  if (!dungeon) return
+
+  DungeonRegion.create(new SphereArea({ center: dungeon.area.center, radius: 0 }, dungeon.dimensionId), {
+    structureId: dungeon.structureId,
+  })
+  player.success(t`Данж создан на ${Vector.string(dungeon.area.center, true)}`)
+})
+
 system.runPlayerInterval(
   player => {
     const dungeon = getDungeon(player)
     if (!dungeon) return
-    const { dungeon: instance } = dungeon
-    const { position, size } = instance.getVisualStructure()
+    const { position, size } = dungeon.getVisualStructure()
 
     const max = Vector.add(position, size)
     for (const l of Vector.foreach(position, max)) {
@@ -58,39 +83,6 @@ system.runPlayerInterval(
   'dungeon place',
   30,
 )
-
-function getDungeon(player: Player) {
-  const mainhand = player.mainhand()
-  const storage = toolSchema.parse(mainhand)
-  if (!storage) return
-
-  const Region = dungeons.find(e => e.kind === storage.type)
-  if (!Region) {
-    player.onScreenDisplay.setActionBar(t.error`Данжа ${storage.type}\nбольше не существует`)
-    return
-  }
-
-  return {
-    dungeon: new Region(
-      new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
-      {},
-      '',
-    ),
-    Region,
-  }
-}
-
-world.afterEvents.itemUse.subscribe(event => {
-  const player = event.source
-  const dungeon = getDungeon(player)
-  if (!dungeon) return
-  const { dungeon: i } = dungeon
-
-  ;(dungeon.Region as unknown as typeof Region).create(
-    new SphereArea({ center: i.area.center, radius: 0 }, i.dimensionId),
-  )
-  player.success(t`Данж создан на ${Vector.string(i.area.center, true)}`)
-})
 
 const particle = new MolangVariableMap()
 
