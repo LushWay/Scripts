@@ -1,6 +1,6 @@
 import { Entity, ItemStack, Player, ShortcutDimensions, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { CustomStructures } from '../assets/config'
+import { StructureId } from 'lib/assets/structures'
 import { Cooldown } from '../cooldown'
 import { t } from '../text'
 import { Vector } from '../vector'
@@ -38,7 +38,7 @@ export default class ChestLootAnimation {
   start(player: Player, item: ItemStack, location: Vector3) {
     if (this.current) this.stop()
 
-    world.structureManager.place(CustomStructures.FloatingItem, world[this.dimensionId], location, {
+    world.structureManager.place(StructureId.FloatingItem, world[this.dimensionId], location, {
       includeBlocks: false,
     })
 

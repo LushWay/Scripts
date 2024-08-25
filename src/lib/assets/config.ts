@@ -19,12 +19,6 @@ export enum CustomEntityTypes {
   Grave = 'lw:grave',
 }
 
-export enum CustomStructures {
-  FloatingItem = 'mystructure:floating_item',
-  CustomEnchantments = 'mystructure:custom_enchantments',
-  GasStationGarage = 'mystructure:dungeons/gas_station_garage',
-}
-
 export enum Sounds {
   LevelUp = 'random.levelup',
   Success = 'note.pling',
