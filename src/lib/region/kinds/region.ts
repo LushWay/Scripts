@@ -162,7 +162,7 @@ export class Region {
 
   /** Name of the region that should always be */
   get name() {
-    return this.ownerName ?? new Date(this.key).format()
+    return this.ownerName ?? this.key
   }
 
   /** Name that will be displayed on the sidebar e.g. It can be empty. */
