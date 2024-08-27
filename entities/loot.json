@@ -31,6 +31,13 @@
         "height": 0.8
       },
 
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "cause": "all",
+          "deals_damage": false
+        }
+      },
+
       "minecraft:pushable": {
         "is_pushable": false,
         "is_pushable_by_piston": false
