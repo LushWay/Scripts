@@ -1,5 +1,5 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { Cooldown, is, isBuilding, Join, ms, prompt } from 'lib'
+import { Cooldown, isBuilding, Join, ms, prompt } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-properties'
 import { t } from 'lib/text'
 import { PlayerNameTagModifiers } from 'modules/indicator/player-name-tag'
@@ -91,11 +91,15 @@ new Command('newbie')
   .setDescription('Используйте, чтобы выйти из режима новичка')
   .executes(ctx => {
     if (isNewbie(ctx.player)) {
-      exitNewbieMode(ctx.player, 'использовали команду')
-    } else if (is(ctx.player.id, 'techAdmin')) {
-      enterNewbieMode(ctx.player)
-      ctx.player.success()
+      askForExitingNewbieMode(ctx.player, 'использовали команду', () => void 0)
     } else return ctx.error('Вы не находитесь в режиме новичка.')
+  })
+  .overload('set')
+  .setPermissions('techAdmin')
+  .setDescription('Вводит в режим новичка')
+  .executes(ctx => {
+    enterNewbieMode(ctx.player)
+    ctx.player.success()
   })
 
 system.runPlayerInterval(player => {

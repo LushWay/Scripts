@@ -102,7 +102,7 @@ new Command('hpi')
               if (typeof hit === 'undefined') return
 
               ctx.player.onScreenDisplay.setActionBar(
-                t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}`,
+                t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
               )
             },
             'hpi',

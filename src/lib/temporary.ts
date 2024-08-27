@@ -114,7 +114,7 @@ export class Temporary {
 
   /** Unsubscribes all temporary events */
   readonly cleanup = (() => {
-    this.cleaners.forEach(fn => fn())
+    this.cleaners.forEach(fn => fn !== this.cleanup && fn())
     this.cleaned = true
   }) as (this: void) => void
 }

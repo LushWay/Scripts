@@ -69,63 +69,66 @@ class Learning {
               { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 },
             )
 
-            if (hit) {
-              player.onScreenDisplay.setActionBar('§6Выйди под открытое небо!')
-            } else {
-              player.onScreenDisplay.setActionBar('')
-              player.success('Посмотри наверх!')
-              ctx.next()
-            }
+            if (!hit) ctx.next()
           },
           'learning quest, free space detecter',
           20,
         )
       })
 
-    q.dynamic('Открой упавший с неба сундук').activate((ctx, firstTime) => {
-      if (!player.isValid()) return
+    q.dynamic('Залутай аирдроп')
+      .description('Забери все из упавшего с неба сундука')
+      .activate((ctx, firstTime) => {
+        if (!player.isValid()) return
 
-      function spawnAirdrop() {
-        const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })
-        const position = Vector.add(player.location, { x: 0, y: 20, z: 0 })
-        airdrop.spawn(position)
-        return airdrop
-      }
-
-      function getAirdrop() {
-        const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
-        if (!airdrop) {
-          ctx.player.log(ctx.quest.id, t.error`No airdrop found`)
-          return spawnAirdrop()
+        function spawnAirdrop() {
+          const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })
+          ctx.db = airdrop.id
+          const position = Vector.add(player.location, { x: 0, y: 20, z: 0 })
+          airdrop.spawn(position)
+          return airdrop
         }
-        return airdrop
-      }
 
-      const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
-      if (!airdrop.chest) return ctx.error('Не удалось вызвать аирдроп')
+        function getAirdrop() {
+          const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
+          if (!airdrop) {
+            ctx.player.log(ctx.quest.id, t.error`No airdrop found`)
+            return spawnAirdrop()
+          }
+          return airdrop
+        }
 
-      ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
-        const airdropEntity = airdrop.chest
-        if (!airdropEntity) return
-        if (event.target.id !== airdropEntity.id) return
+        const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
 
-        if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
+        ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
+          const airdropEntity = airdrop.chest
+          if (!airdropEntity) return
+          if (event.target.id !== airdropEntity.id) return
+
+          if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
+        })
+
+        ctx.world.afterEvents.entityDie.subscribe(event => {
+          if (event.deadEntity.id !== airdrop.chest?.id) return
+          ctx.system.delay(() => ctx.next())
+        })
+
+        let i = 0
+        ctx.onInterval(() => {
+          if (i === 1) {
+            i = 0
+
+            if (!airdrop.chest) {
+              player.onScreenDisplay.setActionBar(
+                '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',
+              )
+            } else {
+              ctx.place = airdrop.showParticleTrace()
+              ctx.update()
+            }
+          } else i++
+        })
       })
-
-      ctx.world.afterEvents.entityDie.subscribe(event => {
-        if (event.deadEntity.id !== airdrop.chest?.id) return
-        ctx.system.delay(() => ctx.next())
-      })
-
-      let i = 0
-      ctx.onInterval(() => {
-        if (i === 1) {
-          i = 0
-          ctx.place = airdrop.showParticleTrace()
-          ctx.update()
-        } else i++
-      })
-    })
 
     const crafting = Vector.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
 

@@ -75,7 +75,7 @@ export class Airdrop {
           if (event.entity.id !== this[name]?.id) return
 
           event.entity.addTag(tag)
-          if (name === 'chest') event.entity.nameTag = `§l§f§kii§r§b Аирдроп §k§f§lii§r`
+          if (name === 'chest') event.entity.nameTag = `§l§f//§r§b Аирдроп §f§l\\\\§r`
           console.debug('Airdrop spawned ' + name)
           cleanup()
         })
@@ -204,7 +204,7 @@ system.runInterval(
       if (!canPerformHeavyOperation) continue
 
       chestMinecarts ??= world.overworld.getEntities({
-        type: Airdrop.chestTag,
+        type: Airdrop.chestTypeId,
         tags: [Airdrop.chestTag],
       })
       chickens ??= world.overworld.getEntities({
@@ -227,9 +227,8 @@ system.runInterval(
             }
           } else {
             if (airdrop.chicken?.isValid() && airdrop.chest?.isValid()) {
-              console.debug('Restored failling airdrop')
-
               airdrop.status = 'falling'
+              console.debug('Restored failling airdrop')
             }
           }
         } catch (error) {
