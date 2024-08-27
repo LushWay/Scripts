@@ -87,7 +87,6 @@ if (!__VITEST__)
 
     tables: DynamicPropertyDB.tables,
     getRawTableData(tableId) {
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      return world.getDynamicProperty(tableId) + ''
+      return `${world.getDynamicProperty(tableId)}`
     },
   })

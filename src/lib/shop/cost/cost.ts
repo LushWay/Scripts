@@ -17,7 +17,6 @@ export abstract class Cost<T = unknown> {
     return CostType.Action
   }
 
-  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
   get multiline(): boolean {
     return false
   }

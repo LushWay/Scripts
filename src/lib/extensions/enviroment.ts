@@ -181,8 +181,9 @@ expand(console, {
 globalThis.verbose = false
 
 Object.entriesStringKeys(MinecraftEntityTypes).forEach(([k, v]) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
+  if (v.includes(':')) return
+
+  // @ts-expect-error We force add prefix because WHY IT DOES NOT HAVE ONE
   MinecraftEntityTypes[k] = 'minecraft:' + v
 })
 
@@ -195,7 +196,13 @@ declare global {
      */
     format(seconds?: boolean): string
 
-    /** Converts date to format DD-MM-YYYY */
+    /**
+     * Converts date to format DD-MM-YYYY
+     *
+     * @example
+     *   const date = new Date()
+     *   date.toYYYYMMDD() 2024-12-04
+     */
     toYYYYMMDD(): string
 
     /**
@@ -216,7 +223,9 @@ Date.prototype.toYYYYMMDD = function () {
 Date.prototype.toHHMM = function () {
   const date = new Date(this)
   date.setHours(date.getHours() + 3)
-  return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0')
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  return hours + ':' + minutes
 }
 
 Date.prototype.format = function () {

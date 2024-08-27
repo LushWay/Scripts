@@ -40,7 +40,6 @@ export class MineareaRegion extends RegionWithStructure {
     return true
   }
 
-  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
   get displayName() {
     return '§7Зона добычи'
   }

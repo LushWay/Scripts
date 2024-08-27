@@ -41,7 +41,6 @@ export class MineshaftRegion extends MineareaRegion {
     return true
   }
 
-  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
   get displayName() {
     return '§7Шахта'
   }

@@ -43,6 +43,7 @@ export default ts.config(
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/class-literal-property-style': 'off',
       '@typescript-eslint/naming-convention': [
         'warn',
         {
