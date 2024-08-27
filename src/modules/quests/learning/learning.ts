@@ -262,7 +262,7 @@ class Learning {
       } else if (firstJoin) this.quest.enter(player)
     })
 
-    Anarchy.learningRTP = player => {
+    Anarchy.learningRTP = async player => {
       if (!this.randomTeleportLocation.valid) {
         player.fail('Случайное перемещение не настроено')
         Spawn.portal?.teleport(player)
@@ -275,15 +275,20 @@ class Learning {
         fadeTime: { fadeInTime: 0, holdTime: 90000, fadeOutTime: 2 },
       })
 
-      new ActionForm(
-        'Заметка',
-        'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
-      ).addButton('Понятно', () => {
-        player.camera.fade({ fadeTime: { fadeInTime: 0, holdTime: 0, fadeOutTime: 2 } })
-        if (!this.randomTeleportLocation.valid) return
+      return new Promise(r => {
+        new ActionForm(
+          'Заметка',
+          'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
+        )
+          .addButton('Понятно', () => {
+            player.camera.fade({ fadeTime: { fadeInTime: 0, holdTime: 0, fadeOutTime: 2 } })
+            if (!this.randomTeleportLocation.valid) return
 
-        console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
-        player.teleport(this.randomTeleportLocation)
+            console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
+            player.teleport(this.randomTeleportLocation)
+            r()
+          })
+          .show(player)
       })
     }
   }
