@@ -22,7 +22,7 @@ const f = form((form, player) => {
 
 type Rules = Partial<World['gameRules']>
 
-const base: Rules = {
+const base = {
   commandBlocksEnabled: false,
   spawnRadius: 0,
   keepInventory: false,
@@ -31,14 +31,13 @@ const base: Rules = {
   showRecipeMessages: true,
   recipesUnlock: true,
   naturalRegeneration: true,
-  doDayLightCycle: true,
+  doDayLightCycle: false,
   doEntityDrops: true,
   doFireTick: false,
   doTileDrops: true,
-  doWeatherCycle: true,
-}
+} satisfies Rules
 
-const ruleSets: Record<string, Rules> = {
+const ruleSets: Record<string, Omit<Rules, keyof typeof base>> = {
   'Безопасный\n§7Гриф отключен, тнт не взрывается': {
     mobGriefing: false,
     doMobLoot: false,
@@ -46,6 +45,7 @@ const ruleSets: Record<string, Rules> = {
     respawnBlocksExplode: false,
     doMobSpawning: false,
     showDeathMessages: true,
+    doWeatherCycle: false,
 
     ...base,
   },
@@ -56,6 +56,7 @@ const ruleSets: Record<string, Rules> = {
     tntExplodes: true,
     respawnBlocksExplode: true,
     showDeathMessages: false,
+    doWeatherCycle: true,
 
     ...base,
   },
