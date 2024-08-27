@@ -81,11 +81,14 @@ export class DungeonRegion extends Region {
       this.structureFile = structureFiles[this.structureId]
       this.structureSize = this.structureFile.size
       // console.log('Created dungeon with size', Vector.string(this.structureSize))
-    }
+    } else return false
+
     if (this.area instanceof SphereArea) {
       this.area.radius = Vector.distance(this.structurePosition, this.area.center)
       // console.log('Changed radius of dungeon to', this.area.radius)
     }
+
+    return true
   }
 
   protected defaultPermissions: RegionPermissions = {

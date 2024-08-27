@@ -8,8 +8,8 @@ import { location } from 'lib/location'
 import { t } from 'lib/text'
 import { Place } from './place'
 
-declare namespace Npc {
-  type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => void | false
+export declare namespace Npc {
+  type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => boolean
 }
 
 export class Npc {
@@ -29,7 +29,7 @@ export class Npc {
 
   /** Creates new dynamically loadable npc */
   constructor(
-    private point: Place,
+    readonly point: Place,
     private onInteract: Npc.OnInteract,
   ) {
     this.id = point.fullId
@@ -43,17 +43,17 @@ export class Npc {
     Npc.npcs.push(this)
   }
 
-  addQuestInteraction(interaction: Npc.OnInteract) {
-    this.questInteractions.add(interaction)
-    return interaction
-  }
-
-  private questInteractions = new Set<Npc.OnInteract>()
+  questInteractions = new Set<Npc.OnInteract>()
 
   private onQuestInteraction: Npc.OnInteract = event => {
     for (const interaction of this.questInteractions) {
-      if (interaction(event) !== false) return // Return on first successfull interaction
+      if (interaction(event)) return true // Return on first successfull interaction
     }
+    return false
+  }
+
+  get name() {
+    return this.point.name
   }
 
   private spawn() {
@@ -95,7 +95,7 @@ export class Npc {
           const component = event.target.getComponent('npc')
           const npcName = component ? component.name : event.target.nameTag
 
-          if (!npc || npc.onQuestInteraction(event) === false || npc.onInteract(event) === false) {
+          if (!npc || !(npc.onQuestInteraction(event) || npc.onInteract(event))) {
             return event.player.fail(`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
           }
         } catch (e) {
@@ -124,8 +124,13 @@ export class Npc {
 
             if (filteredNpcs.length > 1) {
               // More then one? Save only first one, kill others
-              npc.entity = filteredNpcs.find(e => e.entity.isValid() && e.entity.lifetimeState === EntityLifetimeState.Loaded && e.entity.getComponent('npc')?.skinIndex !== 0)?.entity
-              
+              npc.entity = filteredNpcs.find(
+                e =>
+                  e.entity.isValid() &&
+                  e.entity.lifetimeState === EntityLifetimeState.Loaded &&
+                  e.entity.getComponent('npc')?.skinIndex !== 0,
+              )?.entity
+
               if (npc.entity) filteredNpcs.forEach(e => e.entity.id !== npc.entity?.id && e.entity.remove())
             } else {
               npc.entity = filteredNpcs[0]?.entity

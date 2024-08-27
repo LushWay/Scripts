@@ -26,6 +26,7 @@ export class ShopNpc {
     this.shop = new Shop(place.name, place.fullId)
     this.npc = new Npc(place, event => {
       this.shop.open(event.player)
+      return true
     })
   }
 }

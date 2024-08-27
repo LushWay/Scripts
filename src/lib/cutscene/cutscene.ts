@@ -77,6 +77,10 @@ export class Cutscene {
     }
   }
 
+  get start() {
+    return this.sections[0]?.points[0]
+  }
+
   /**
    * Plays the Cutscene for the provided player
    *
@@ -95,7 +99,7 @@ export class Cutscene {
     Sidebar.forceHide.add(player)
 
     const controller = { cancel: false }
-    this.forEachPoint(
+    const promise = this.forEachPoint(
       async (point, pointNum, section, sectionNum) => {
         if (!player.isValid()) {
           controller.cancel = true
@@ -137,6 +141,8 @@ export class Cutscene {
       player,
       controller,
     })
+
+    return promise
   }
 
   /**

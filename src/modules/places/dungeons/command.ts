@@ -53,7 +53,10 @@ function getDungeon(player: Player) {
     { structureId: storage.type },
     '',
   )
-  region.configureSize()
+  if (!region.configureSize()) {
+    player.onScreenDisplay.setActionBar(t.error`Неизвестный данж: ${storage.type}`)
+    return
+  }
   return region
 }
 

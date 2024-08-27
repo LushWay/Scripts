@@ -21,7 +21,7 @@ export class Quest {
 
   static playerSettings = Settings.player('Задания\n§7Настройки игровых заданий', 'quest', {
     messageForEachStep: {
-      value: true,
+      value: false,
       name: 'Сообщение в чат при каждом шаге',
       description: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
     },
@@ -30,13 +30,28 @@ export class Quest {
   static sidebar: import('lib/sidebar').SidebarLineCreate<unknown> = {
     create(sidebar) {
       const showSidebar = sidebar.show.bind(sidebar)
+      const textCache = new WeakPlayerMap<{ step: QS; time: number }>({ removeOnLeave: true })
 
       return function (player: Player) {
         const current = Quest.getCurrent(player)
         if (!current) return ''
 
         current.playerQuest.updateListeners.add(showSidebar)
-        return `§f§l${current.quest.name}:§r§6 ${current.text()}`
+
+        const text = `§l${current.quest.name}:§r§6 ${current.text()}`
+        const cached = textCache.get(player)
+
+        if (cached?.step !== current) {
+          textCache.set(player, { step: current, time: 6 })
+          return text
+        }
+
+        if (cached.time <= 0) return text
+
+        // Animate
+        cached.time--
+        textCache.set(player, cached)
+        return `${cached.time % 2 !== 0 ? '§c°' : ''}${text}`
       }
     },
   }
@@ -150,8 +165,8 @@ export class Quest {
   /** Sends message and displays title on quest step move */
   private stepSwitchVisual(player: Player, step: QS, i: number, restore: boolean) {
     if (Quest.playerSettings(player).messageForEachStep) {
-      const text = step.text()
-      if (text) player.success(`§f§l${this.name}: §r§6${step.description ? step.description() : step.text()}`)
+      const text = step.description?.()
+      if (text) player.success(`§f§l${this.name}: §r§6${text}`)
     }
 
     if (i === 0 && !restore) {

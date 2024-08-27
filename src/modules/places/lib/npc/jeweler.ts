@@ -3,8 +3,8 @@ import { Group } from 'lib/rpg/place'
 import { ShopNpc } from 'lib/shop/npc'
 
 export class Jeweler extends ShopNpc {
-  constructor(group: Group) {
-    super(group.point('jeweler').name('Ювелир'))
+  constructor(group: Group, point = group.point('jeweler').name('Ювелир')) {
+    super(point)
     this.shop.body(() => 'Украшения я делать пока не умею.\n\n')
 
     this.shop.menu(form => {

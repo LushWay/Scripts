@@ -94,15 +94,15 @@ export class Sidebar<E = any> {
     if (Array.isArray(content)) {
       this.clearSidebar(player)
       for (const [i, tip] of content.entries()) {
-        player.onScreenDisplay.setTip((i + 1) as 1 | 2 | 3 | 4 | 5, this.wrap(tip ?? '', options.maxWordCount))
+        player.onScreenDisplay.setTip((i + 1) as 1 | 2 | 3 | 4 | 5, Sidebar.wrap(tip ?? '', options.maxWordCount))
       }
     } else {
       this.clearTips(player)
-      player.onScreenDisplay.setSidebar(this.wrap(content, options.maxWordCount))
+      player.onScreenDisplay.setSidebar(Sidebar.wrap(content, options.maxWordCount))
     }
   }
 
-  private wrap(line: string, maxWordCount: number) {
+  static wrap(line: string, maxWordCount: number) {
     return line
       .split('\n')
       .map(e => util.wrap(e, maxWordCount))

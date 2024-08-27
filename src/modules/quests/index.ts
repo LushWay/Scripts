@@ -1,1 +1,1 @@
-import './learning/index'
+import './learning/learning'

@@ -56,43 +56,42 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
   const isDeepslate =
     brokenOre?.isDeepslate ?? (brokenTypeId === MinecraftBlockTypes.Deepslate || brokenLocation.y < -3)
 
-  const overrideTypeId = getOreTypeId({ player, isDeepslate, ore: brokenOre?.ore })
-  // console.debug('Overriding ore', overrideTypeId, brokenOre)
-  const oreTypeId =
-    (overrideTypeId ?? brokenOre)
-      ? isDeepslate
-        ? b.Deepslate
-        : b.Stone
-      : ores.selectOreByChance(isDeepslate, brokenLocation.y)
-
-  const place = (block: Block) => {
-    if (block.isValid() && !block.isAir) {
-      if (oreTypeId) block.setType(oreTypeId)
-    }
+  const place = (block: Block, oreTypeId: string) => {
+    if (block.isValid() && !block.isAir && oreTypeId) block.setType(oreTypeId)
   }
 
-  const first = possibleBlocks.randomElement()
-  place(first)
-
-  for (const block of possibleBlocks.filter(e => e !== first)) {
-    if (Math.randomInt(0, 100) > (brokenOre?.ore.item.groupChance ?? 50)) place(block)
+  for (const [action] of EventSignal.sortSubscribers(OrePlace)) {
+    const placed = action({ player, isDeepslate, brokenOre: brokenOre?.ore, possibleBlocks, place, brokenLocation })
+    if (placed) return
   }
 }
 
 interface OrePlaceEvent {
   player: Player
   isDeepslate: boolean
-  ore: undefined | OreEntry
+  brokenOre: undefined | OreEntry
+  brokenLocation: Block
+  possibleBlocks: Block[]
+  place: (block: Block, oreTypeId: string) => void
 }
 
-export const OrePlace = new EventSignal<OrePlaceEvent, void | string>()
+export const OrePlace = new EventSignal<OrePlaceEvent, boolean>()
 
-function getOreTypeId(event: OrePlaceEvent) {
-  for (const [action] of EventSignal.sortSubscribers(OrePlace)) {
-    const typeId = action(event)
-    if (typeId) return typeId
+OrePlace.subscribe(({ brokenOre, isDeepslate, brokenLocation, possibleBlocks, place }) => {
+  const oreTypeId = brokenOre
+    ? isDeepslate
+      ? b.Deepslate
+      : b.Stone
+    : ores.selectOreByChance(isDeepslate, brokenLocation.y)
+  const first = possibleBlocks.randomElement()
+  place(first, oreTypeId)
+
+  for (const block of possibleBlocks.filter(e => e !== first)) {
+    if (Math.randomInt(0, 100) > (brokenOre?.item.groupChance ?? 50)) place(block, oreTypeId)
   }
-}
+
+  return true
+}, -1)
 
 /**
  * @example

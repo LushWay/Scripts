@@ -138,5 +138,5 @@ system.runPlayerInterval(
     }
   },
   'Survival sidebar',
-  20,
+  10,
 )

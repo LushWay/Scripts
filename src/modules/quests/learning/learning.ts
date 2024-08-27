@@ -1,5 +1,5 @@
 import { ItemStack, system } from '@minecraft/server'
-import { ActionForm, location, locationWithRadius, Vector } from 'lib'
+import { ActionForm, location, Vector } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard, SafeAreaRegion } from 'lib'
@@ -8,19 +8,18 @@ import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
-import { Npc } from 'lib/rpg/npc'
 
-import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
+import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
+import { stoneQuarryInvestigating } from 'modules/places/stone-quarry/quests/investigating'
+import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
-import { randomTeleport } from 'modules/survival/random-teleport'
 import airdropTable from './airdrop'
 
-// TODO Combine steps
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
 
@@ -76,7 +75,7 @@ class Learning {
         )
       })
 
-    q.dynamic('Залутай аирдроп')
+    q.dynamic('Залутай сундук, упавший с неба')
       .description('Забери все из упавшего с неба сундука')
       .activate((ctx, firstTime) => {
         if (!player.isValid()) return
@@ -132,14 +131,18 @@ class Learning {
 
     const crafting = Vector.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
 
+    q.place(...Vector.around(crafting, 10), '§6Следуя компасу, доберитесь до верстака')
+
     q.item('§6Сделайте деревянную кирку')
-      .description('Следуя компасу, доберитесь до верстака и сделайте деревянную кирку!')
+      .description('Используя верстак сделайте деревянную кирку!')
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
       .place(crafting)
 
     q.counter((i, end) => `§6Добыто камня: §f${i}/${end}`, 10)
       .description('Отправляйтесь в шахту, найдите и накопайте камня.')
       .activate(ctx => {
+        ctx.subscribe(OrePlace, () => true)
+
         ctx.world.afterEvents.playerBreakBlock.subscribe(event => {
           if (event.player.id !== player.id) return
           if (event.brokenBlockPermutation.type.id !== b.Stone) return
@@ -158,17 +161,24 @@ class Learning {
       .description('Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
       .activate(ctx => {
         // Force iron ore generation
-        ctx.subscribe(OrePlace, ({ player, isDeepslate }) => {
-          if (player.id !== player.id) return
+        ctx.subscribe(OrePlace, ({ player, isDeepslate, possibleBlocks, place }) => {
+          if (player.id !== player.id) return false
 
           ctx.db ??= { count: ctx.value }
           ;(ctx.db as { iron?: number }).iron ??= 0
 
           if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
-            if (ctx.db.iron >= ctx.end) return
-            ctx.db.iron++
-            return isDeepslate ? b.DeepslateIronOre : b.IronOre
+            if (ctx.db.iron >= ctx.end) return false
+
+            for (const block of possibleBlocks) {
+              if (ctx.db.iron >= ctx.end) break
+              place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)
+              ctx.db.iron++
+            }
+            return true
           }
+
+          return false
         })
 
         // Check if it breaks
@@ -185,14 +195,28 @@ class Learning {
         })
       })
 
-    q.end(ctx => {
-      player.success(
-        'Обучение закончено! Вы можете пойти в каменоломню чтобы переплавить железо или продолжить добывать новые ресурсы в шахте.',
+    q.dialogue(this.miner.npc, 'Узнайте что дальше у Шахтера')
+      .body('Приветствую!')
+      .buttons(
+        [
+          'Где мне переплавить железо?',
+          (ctx, back) => {
+            new ActionForm(this.miner.npc.name, `В месте, которое называется ${StoneQuarry.name}`)
+              .addButtonBack(back)
+              .addButton('Я хочу туда!', () => {
+                ctx.next()
+                stoneQuarryInvestigating.quest.enter(player)
+              })
+              .show(player)
+          },
+        ],
+        ['Где я?', (ctx, back) => new ActionForm(this.miner.npc.name, 'Хз').addButtonBack(back).show(player)],
+        ['Кто я?', (ctx, back) => new ActionForm(this.miner.npc.name, 'Хз').addButtonBack(back).show(player)],
+        ['Кто ты?', (ctx, back) => new ActionForm(this.miner.npc.name, 'Хз').addButtonBack(back).show(player)],
       )
-    })
   })
 
-  randomTeleportLocation = locationWithRadius(this.quest.group.point('safearea').name('Мирная зона и ртп'))
+  randomTeleportLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
 
   craftingTableLocation = location(this.quest.group.point('crafting table').name('Верстак'))
 
@@ -202,11 +226,7 @@ class Learning {
 
   safeArea: SafeAreaRegion | undefined = void 0
 
-  minerNpc = new Npc(this.quest.group.point('minerNpc').name('Шахтер'), event => {
-    if (!this.quest.getPlayerStep(event.player)) return false
-
-    new ActionForm('Шахтер', 'Новенький? Не знаешь куда идти? ').show(event.player)
-  })
+  miner = new Jeweler(this.quest.group, this.quest.group.point('miner').name('Шахтер'))
 
   constructor() {
     actionGuard((player, region, ctx) => {
@@ -234,15 +254,6 @@ class Learning {
       }
     })
 
-    this.randomTeleportLocation.onLoad.subscribe(location => {
-      this.safeArea = SafeAreaRegion.create(
-        new SphereArea({ center: location, radius: location.radius * 5 }, 'overworld'),
-        { permissions: { allowedEntities: 'all' } },
-      )
-
-      Axe.allowBreakInRegions.push(this.safeArea)
-    })
-
     Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (player.database.role === 'spectator') {
         player.info(
@@ -259,21 +270,12 @@ class Learning {
         return
       }
 
-      const location = this.randomTeleportLocation
-      const radius = Math.floor(location.radius / 2)
-
-      randomTeleport(
-        player,
-        Vector.add(location, { x: radius, y: 0, z: radius }),
-        Vector.add(location, { x: -radius, y: 0, z: -radius }),
-        {
-          elytra: false,
-          teleportCallback() {
-            // player.success('Вы были перемещены на случайную локацию.')
-          },
-          keepInSkyTime: 20,
-        },
-      )
+      console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
+      player.camera.fade({
+        fadeColor: { blue: 0, green: 0, red: 0 },
+        fadeTime: { fadeInTime: 0, holdTime: 4, fadeOutTime: 2 },
+      })
+      player.teleport(this.randomTeleportLocation)
     }
   }
 }
