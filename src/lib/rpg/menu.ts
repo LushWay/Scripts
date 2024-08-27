@@ -2,7 +2,7 @@ import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Playe
 import { InventoryInterval } from 'lib/action'
 import { CustomItems } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
-import { util } from 'lib/util'
+import { stringifyError, util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'

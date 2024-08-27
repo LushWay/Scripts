@@ -56,19 +56,18 @@ class AnarchyBuilder extends AreaWithInventory {
       const title = Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })
       if (!title) return
 
+      this.switchInventory(player)
+
       if (!player.database.survival.anarchy) {
         this.learningRTP(player).then(() => {
-          this.switchInventory(player)
+          showSurvivalHud(player)
         })
       } else {
-        this.switchInventory(player)
-
         player.teleport(player.database.survival.anarchy)
         delete player.database.survival.anarchy
+        showSurvivalHud(player)
+        title()
       }
-
-      showSurvivalHud(player)
-      title()
     })
 
     this.portal.command

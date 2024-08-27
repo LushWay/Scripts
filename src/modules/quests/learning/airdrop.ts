@@ -28,4 +28,8 @@ export default new Loot('starter')
 
   .item(CustomItems.Money)
   .chance('100%')
-  .amount({ '90...100': '1%' }).build
+  .amount({ '64': '100%' })
+
+  .item(CustomItems.Money)
+  .chance('100%')
+  .amount({ '64': '100%' }).build

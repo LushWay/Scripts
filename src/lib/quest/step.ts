@@ -90,6 +90,8 @@ export abstract class QS<DB = any> extends Temporary {
 
   restoring = false
 
+  private active = false
+
   /**
    * Enters player in this step
    *
@@ -97,6 +99,7 @@ export abstract class QS<DB = any> extends Temporary {
    */
   enter(firstTime: boolean) {
     const cleanup = this.activate(firstTime)
+    this.active = true
     if (cleanup) this.cleaners.push(cleanup.cleanup)
 
     this.activators.forEach(activate => {
@@ -150,8 +153,9 @@ export abstract class QS<DB = any> extends Temporary {
     this.currentPlace = place
 
     if (!this.usingCompass) {
+      console.log('Setting interval', this.text())
       this.onInterval(() => {
-        this.place && Vector.valid(this.place) && Compass.setFor(this.player, this.place)
+        this.active && this.place && Vector.valid(this.place) && Compass.setFor(this.player, this.place)
       })
       this.cleaners.push(() => {
         Compass.setFor(this.player, undefined)
@@ -179,6 +183,7 @@ export abstract class QS<DB = any> extends Temporary {
       this.intervalId = this.system.runInterval(
         () => {
           if (!this.player.isValid()) return
+          if (this.cleaned) return
           this.intervals.forEach(e => e())
         },
         'quest step',

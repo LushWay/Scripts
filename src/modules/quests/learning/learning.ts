@@ -1,5 +1,5 @@
 import { ItemStack, system } from '@minecraft/server'
-import { ActionForm, location, Vector } from 'lib'
+import { ActionForm, location, Temporary, Vector } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard, SafeAreaRegion } from 'lib'
@@ -27,11 +27,8 @@ class Learning {
   id = 'learning'
 
   quest = new Quest('learning', 'Обучение', 'Обучение базовым механикам сервера', (q, player) => {
-    if (!Anarchy.portal?.from || !Anarchy.portal.to) return q.failed('§cСервер не настроен')
     if (!this.randomTeleportLocation.valid || !this.craftingTableLocation.valid)
       return q.failed('§cОбучение не настроено')
-
-    q.place(Anarchy.portal.from, Anarchy.portal.to, '§6Зайди в портал анархии')
 
     q.counter((current, end) => `§6Добыто дерева: §f${current}/${end}`, 5)
       .description('Нарубите дерева')
@@ -259,7 +256,7 @@ class Learning {
         player.info(
           '§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.',
         )
-      } else if (firstJoin) this.quest.enter(player)
+      }
     })
 
     Anarchy.learningRTP = async player => {
@@ -270,12 +267,25 @@ class Learning {
         return
       }
 
-      player.camera.fade({
-        fadeColor: { blue: 0, green: 0, red: 0 },
-        fadeTime: { fadeInTime: 0, holdTime: 90000, fadeOutTime: 2 },
+      const temp = new Temporary(({ system }) => {
+        system.runInterval(
+          () => {
+            if (player.database.inv !== 'anarchy') return temp.cleanup()
+
+            player.camera.fade({
+              fadeColor: { blue: 0, green: 0, red: 0 },
+              fadeTime: { fadeInTime: 0, holdTime: 3, fadeOutTime: 2 },
+            })
+          },
+          'asdada',
+          20,
+        )
       })
 
-      return new Promise(r => {
+      console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
+      player.teleport(this.randomTeleportLocation)
+
+      return new Promise(resolve => {
         new ActionForm(
           'Заметка',
           'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
@@ -284,9 +294,9 @@ class Learning {
             player.camera.fade({ fadeTime: { fadeInTime: 0, holdTime: 0, fadeOutTime: 2 } })
             if (!this.randomTeleportLocation.valid) return
 
-            console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
-            player.teleport(this.randomTeleportLocation)
-            r()
+            temp.cleanup()
+            resolve()
+            this.quest.enter(player)
           })
           .show(player)
       })
