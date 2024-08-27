@@ -175,8 +175,8 @@ export class Quest {
           player.onScreenDisplay.setHudTitle('§6' + this.name, {
             subtitle: this.description,
             fadeInDuration: 0,
-            stayDuration: 20 * 4,
-            fadeOutDuration: 20,
+            stayDuration: 20 * 5,
+            fadeOutDuration: 0,
           })
           player.playSound(Sounds.LevelUp)
         },

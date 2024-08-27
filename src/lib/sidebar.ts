@@ -94,7 +94,12 @@ export class Sidebar<E = any> {
     if (Array.isArray(content)) {
       this.clearSidebar(player)
       for (const [i, tip] of content.entries()) {
-        player.onScreenDisplay.setTip((i + 1) as 1 | 2 | 3 | 4 | 5, Sidebar.wrap(tip ?? '', options.maxWordCount))
+        if (i === 2) {
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          player.onScreenDisplay.setActionBar(tip || '')
+        } else {
+          player.onScreenDisplay.setTip((i + 1) as 1 | 2 | 3 | 4 | 5, Sidebar.wrap(tip ?? '', options.maxWordCount))
+        }
       }
     } else {
       this.clearTips(player)
