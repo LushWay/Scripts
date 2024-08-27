@@ -270,18 +270,20 @@ class Learning {
         return
       }
 
-      console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
       player.camera.fade({
         fadeColor: { blue: 0, green: 0, red: 0 },
         fadeTime: { fadeInTime: 0, holdTime: 90000, fadeOutTime: 2 },
       })
-      player.teleport(this.randomTeleportLocation)
 
       new ActionForm(
         'Заметка',
         'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
       ).addButton('Понятно', () => {
         player.camera.fade({ fadeTime: { fadeInTime: 0, holdTime: 0, fadeOutTime: 2 } })
+        if (!this.randomTeleportLocation.valid) return
+
+        console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
+        player.teleport(this.randomTeleportLocation)
       })
     }
   }
