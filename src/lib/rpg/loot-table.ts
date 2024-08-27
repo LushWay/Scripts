@@ -1,5 +1,5 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
-import { MinecraftEnchantmentTypes, MinecraftItemTypes, MinecraftItemTypesUnion } from '@minecraft/vanilla-data'
+import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Command } from 'lib/command'
 import { EventSignal } from 'lib/event-signal'
 import { inspect, isKeyof } from 'lib/util'
@@ -66,14 +66,18 @@ export class Loot {
    *
    * @param type Keyof MinecraftItemTypes
    */
-  item(type: MinecraftItemTypesUnion): this
+  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>): this
 
   /**
-   * Creates new item entry from string type id
+   * Creates new item entry
    *
-   * @param type String type id
+   * @param type String type of the item
    */
-  item(type: string) {
+  // eslint-disable-next-line @typescript-eslint/unified-signatures
+  item(type: string): this
+
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  item(type: string | Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
     if (isKeyof(type, MinecraftItemTypes)) type = MinecraftItemTypes[type]
     this.create(new ItemStack(type))
 
