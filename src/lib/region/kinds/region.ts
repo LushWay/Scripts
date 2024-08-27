@@ -36,7 +36,8 @@ export class Region {
   static readonly kind: string
 
   protected static generateRegionKey(kind: string, area: string, radius: number) {
-    return `${kind} ${area}-${radius} ${new Date(Date.now()).toISOString()}`
+    const date = new Date()
+    return `${kind}-${area}-${radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
   }
 
   /** Creates a new region */
