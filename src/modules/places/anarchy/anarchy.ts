@@ -14,7 +14,7 @@ class AnarchyBuilder extends AreaWithInventory {
 
   zone: RadioactiveZone | undefined
 
-  learningRTP(player: Player) {
+  async learningRTP(player: Player): Promise<void> {
     // Hook function
   }
 
@@ -56,11 +56,13 @@ class AnarchyBuilder extends AreaWithInventory {
       const title = Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })
       if (!title) return
 
-      this.switchInventory(player)
-
       if (!player.database.survival.anarchy) {
-        this.learningRTP(player)
+        this.learningRTP(player).then(() => {
+          this.switchInventory(player)
+        })
       } else {
+        this.switchInventory(player)
+
         player.teleport(player.database.survival.anarchy)
         delete player.database.survival.anarchy
       }
