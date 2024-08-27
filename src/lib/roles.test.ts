@@ -1,7 +1,3 @@
-import 'lib/load/enviroment'
-
-import 'lib/database/player'
-
 import { GameMode, Player } from '@minecraft/server'
 import { describe, expect, it } from 'vitest'
 import { getRole, setRole } from './roles'

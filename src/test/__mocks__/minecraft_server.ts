@@ -144,6 +144,17 @@ export class System {
     }
     return 0
   }
+
+  beforeEvents = new SystemBeforeEvents()
+}
+
+export enum WatchdogTerminateReason {
+  Hang = 'Hang',
+  StackOverflow = 'StackOverflow',
+}
+
+export class SystemBeforeEvents {
+  readonly watchdogTerminate = new EventSignal<{ cancel: boolean; terminateReason: WatchdogTerminateReason }>()
 }
 
 export const system = new System()

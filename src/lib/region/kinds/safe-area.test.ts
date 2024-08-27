@@ -1,6 +1,3 @@
-import 'lib/database/player'
-import 'lib/load/extensions'
-
 import { Vector } from 'lib/vector'
 import { describe, expect, it } from 'vitest'
 import { SphereArea } from '../areas/sphere'

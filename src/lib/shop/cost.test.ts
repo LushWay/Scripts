@@ -1,8 +1,5 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import 'lib/extensions/player'
-
-import 'lib/database/player'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { Cost, ItemCost, MoneyCost, MultiCost } from './cost'
 

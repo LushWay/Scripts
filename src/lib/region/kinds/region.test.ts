@@ -1,8 +1,5 @@
 import { Player } from '@minecraft/server'
-import 'lib/load/extensions'
-
-import { Vector } from 'lib'
-import 'lib/database/player'
+import { Vector } from 'lib/vector'
 import { describe, expect, it } from 'vitest'
 import { SphereArea } from '../areas/sphere'
 import { Region } from './region'

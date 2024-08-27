@@ -17,6 +17,9 @@ describe('player database', () => {
 
   it('should skip respawns', () => {
     // @ts-expect-error
-    EventSignal.emit(world.afterEvents.playerSpawn, { initialRespawn: false })
+    const player = new Player() as Player
+
+    // @ts-expect-error
+    EventSignal.emit(world.afterEvents.playerSpawn, { player, initialRespawn: false })
   })
 })

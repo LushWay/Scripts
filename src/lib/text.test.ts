@@ -1,6 +1,3 @@
-import 'lib/database/player'
-import 'lib/load/enviroment'
-
 import 'lib/command/index'
 
 import { Player } from '@minecraft/server'

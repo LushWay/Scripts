@@ -11,6 +11,7 @@ export default defineConfig({
       include: ['src/lib', 'src/modules'],
       exclude: ['src/lib/assets', 'src/lib/bds', 'src/test', '**/*.test.ts', '**/*.spec.ts'],
     },
+    setupFiles: ['src/test/setup.ts'],
     alias: {
       '@minecraft/server': 'test/__mocks__/minecraft_server.ts',
       '@minecraft/server-net': 'test/__mocks__/minecraft_server-net.ts',

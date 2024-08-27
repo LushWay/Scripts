@@ -12,8 +12,7 @@ const reasons: Record<WatchdogTerminateReason, string> = {
   StackOverflow: 'Стэк переполнен',
 }
 
-if (!__VITEST__)
-  system.beforeEvents.watchdogTerminate.subscribe(event => {
-    world.say('§cСобакаСутулая: §f' + reasons[event.terminateReason])
-    event.cancel = true
-  })
+system.beforeEvents.watchdogTerminate.subscribe(event => {
+  world.say('§cСобакаСутулая: §f' + reasons[event.terminateReason])
+  event.cancel = true
+})

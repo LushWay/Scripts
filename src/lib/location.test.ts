@@ -1,7 +1,4 @@
 import { Player } from '@minecraft/server'
-import 'lib/extensions/player'
-
-import 'lib/database/player'
 import 'lib/database/scoreboard'
 import { MockInstance, beforeEach, describe, expect, it, vi } from 'vitest'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
