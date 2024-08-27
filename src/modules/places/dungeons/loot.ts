@@ -1,6 +1,6 @@
-import { Loot } from 'lib'
+import { Loot, LootTable } from 'lib'
 import { CustomItems } from 'lib/assets/config'
-import { StructureId } from 'lib/assets/structures'
+import { StructureDungeonsId } from 'lib/assets/structures'
 import { CannonBulletItem } from 'modules/features/cannon'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 
@@ -52,19 +52,21 @@ const defaultLoot = new Loot('dungeon_default_loot')
   .chance('40%')
   .amount({ '1...2': '1%' }).build
 
-const names = {
-  [StructureId.DungeonsGasStation1]: 'Заправка 1',
-  [StructureId.DungeonsGasStation2]: 'Заправка 2',
-  [StructureId.DungeonsGasStation3]: 'Заправка 3',
-  [StructureId.DungeonsGasStation4]: 'Заправка 4',
-  [StructureId.DungeonsGasStationGarage]: 'Гараж',
+const d = StructureDungeonsId
+
+const names: Record<StructureDungeonsId, string> = {
+  [d.GasStation1]: 'Заправка 1',
+  [d.GasStation2]: 'Заправка 2',
+  [d.GasStation3]: 'Заправка 3',
+  [d.GasStation4]: 'Заправка 4',
+  [d.GasStationGarage]: 'Гараж',
 }
-const loot = {
-  [StructureId.DungeonsGasStation1]: defaultLoot,
-  [StructureId.DungeonsGasStation2]: defaultLoot,
-  [StructureId.DungeonsGasStation3]: defaultLoot,
-  [StructureId.DungeonsGasStation4]: defaultLoot,
-  [StructureId.DungeonsGasStationGarage]: new Loot(`dungeon ${StructureId.DungeonsGasStationGarage}`)
+const loot: Record<StructureDungeonsId, LootTable> = {
+  [d.GasStation1]: defaultLoot,
+  [d.GasStation2]: defaultLoot,
+  [d.GasStation3]: defaultLoot,
+  [d.GasStation4]: defaultLoot,
+  [d.GasStationGarage]: new Loot(`dungeon ${d.GasStationGarage}`)
     .itemStack(CannonBulletItem.blueprint)
     .chance('10%')
 

@@ -13,7 +13,7 @@ export function injectCode(modifier, code) {
 // Do not modify manually.
     
 ${code}
-`
+`.replaceAll('\n', '\r\n')
 }
 
 const logger = new LeafyLogger({ prefix: 'assets' })

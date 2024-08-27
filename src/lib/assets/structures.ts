@@ -7,18 +7,25 @@ export interface StructureFile {
   size: Vector3,
   chestPositions: Vector3[]
 }
-export enum StructureId {
+export enum StructureRootId {
   CustomEnchantments = 'mystructure:custom_enchantments',
-  DungeonsGasStation1 = 'mystructure:dungeons/gas_station_1',
-  DungeonsGasStation2 = 'mystructure:dungeons/gas_station_2',
-  DungeonsGasStation3 = 'mystructure:dungeons/gas_station_3',
-  DungeonsGasStation4 = 'mystructure:dungeons/gas_station_4',
-  DungeonsGasStationGarage = 'mystructure:dungeons/gas_station_garage',
   FloatingItem = 'mystructure:floating_item',
   SpawnV1 = 'mystructure:spawn_v1',
-  TestEmpty = 'mystructure:test/empty',
-  TestFlat5x5x5 = 'mystructure:test/flat_5x5x5',
 }
+export enum StructureDungeonsId {
+  GasStation1 = 'mystructure:dungeons/gas_station_1',
+  GasStation2 = 'mystructure:dungeons/gas_station_2',
+  GasStation3 = 'mystructure:dungeons/gas_station_3',
+  GasStation4 = 'mystructure:dungeons/gas_station_4',
+  GasStationGarage = 'mystructure:dungeons/gas_station_garage',
+}
+export enum StructureTestId {
+  Empty = 'mystructure:test/empty',
+  Flat5x5x5 = 'mystructure:test/flat_5x5x5',
+}
+
+export type StructureId = StructureRootId | StructureDungeonsId | StructureTestId
+
 export const structureFiles: Record<StructureId, StructureFile> = {
   'mystructure:custom_enchantments': {
     size: {
@@ -145,4 +152,3 @@ export const structureFiles: Record<StructureId, StructureFile> = {
     chestPositions: [],
   },
 }
-

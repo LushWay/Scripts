@@ -1,11 +1,11 @@
 import { MolangVariableMap, Player, system, world } from '@minecraft/server'
 import { ArrayForm, isKeyof, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
-import { StructureId } from 'lib/assets/structures'
+import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
-import { DungeonRegion } from 'modules/places/dangeons/dungeon'
+import { DungeonRegion } from 'modules/places/dungeons/dungeon'
 import { Dungeon } from './loot'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', CustomItems.WeTool)
@@ -15,7 +15,7 @@ const toolSchema = new ItemLoreSchema('dungeonCreationTool', CustomItems.WeTool)
   .display('Тип данжа', t => (isKeyof(t, Dungeon.names) ? Dungeon.names[t] : t))
   .build()
 
-const dungeons = Object.values(StructureId).filter(e => e.includes('dungeon'))
+const dungeons = Object.values(StructureDungeonsId)
 
 new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   const hand = ctx.player.mainhand()
