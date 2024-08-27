@@ -16,7 +16,7 @@ class StoneQuarryInvestigating {
       })
     }
     q.dialogue(this.place.commonOvener.npc)
-      .body('ПРивет я продаю печки дааааааа')
+      .body('ПРивет я продаю печки даааaaаааа')
       .buttons([
         'Хоршо отлично я у тебя их куплю и переплавлю руду',
         ctx => {
