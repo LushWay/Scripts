@@ -136,11 +136,8 @@ export class ShopForm {
         /** Sets max count */
         maxCount: (maxCount = 1000) => ({
           /** Sets base price (aka minPrice) */
-          basePrice: (minPrice: number) => {
-            const db = ShopForm.database[this.shop.id]
-            const count = (db[type] ??= defaultCount)
-
-            createSellableItem({ form: this, shop: this.shop, type, count, maxCount, minPrice })
+          minPrice: (minPrice: number) => {
+            createSellableItem({ form: this, shop: this.shop, type, defaultCount, maxCount, minPrice })
             return this as ShopForm
           },
         }),

@@ -63,12 +63,12 @@ export class Gunsmith extends ShopNpc {
             .dynamicCostItem(i.Tnt)
             .defaultCount(0)
             .maxCount(1000)
-            .basePrice(900)
+            .minPrice(900)
 
             .dynamicCostItem(i.Gunpowder)
             .defaultCount(0)
             .maxCount(10000)
-            .basePrice(100)
+            .minPrice(100)
         })
     })
   }

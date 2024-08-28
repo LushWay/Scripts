@@ -20,7 +20,7 @@ export const SWITCHES = BlockTypes.getAll()
 /** A list of all containers a item could be in */
 export const BLOCK_CONTAINERS = [
   'minecraft:chest',
-  'minecraft:ender_chest',
+  // 'minecraft:ender_chest',
   'minecraft:barrel',
   'minecraft:trapped_chest',
   'minecraft:dispenser',

@@ -12,9 +12,9 @@ export class Woodman extends ShopNpc {
         if (name.startsWith('Warped') || name.startsWith('Crimson') || name === 'Planks' || name === 'Wood') continue
 
         if (name.endsWith('Planks')) {
-          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).basePrice(5)
+          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).minPrice(5)
         } else if (name.endsWith('Wood') && !/stripped/i.test(name)) {
-          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).basePrice(5)
+          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).minPrice(5)
         }
       }
     })

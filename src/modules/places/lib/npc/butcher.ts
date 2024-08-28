@@ -12,37 +12,37 @@ export class Butcher extends ShopNpc {
         .dynamicCostItem(i.Beef)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10)
+        .minPrice(10)
 
         .dynamicCostItem(i.Chicken)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10)
+        .minPrice(10)
 
         .dynamicCostItem(i.Cod)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10)
+        .minPrice(10)
 
         .dynamicCostItem(i.Mutton)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10)
+        .minPrice(10)
 
         .dynamicCostItem(i.Porkchop)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10)
+        .minPrice(10)
 
         .dynamicCostItem(i.Rabbit)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10)
+        .minPrice(10)
 
         .dynamicCostItem(i.Salmon)
         .defaultCount(100)
         .maxCount(1_000)
-        .basePrice(10),
+        .minPrice(10),
     )
   }
 }
