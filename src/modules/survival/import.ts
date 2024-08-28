@@ -31,6 +31,8 @@ declare module '@minecraft/server' {
       /** Player anarchy position */
       anarchy?: Vector3
 
+      doNotSaveAnarchy?: 1
+
       deadAt?: Vector3
     }
   }

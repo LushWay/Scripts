@@ -274,7 +274,7 @@ class Learning {
 
             player.camera.fade({
               fadeColor: { blue: 0, green: 0, red: 0 },
-              fadeTime: { fadeInTime: 0, holdTime: 3, fadeOutTime: 2 },
+              fadeTime: { fadeInTime: 0, holdTime: 2, fadeOutTime: 2 },
             })
           },
           'asdada',
@@ -283,22 +283,29 @@ class Learning {
       })
 
       console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
+      player.database.survival.doNotSaveAnarchy = 1
       player.teleport(this.randomTeleportLocation)
 
       return new Promise(resolve => {
+        const back = () => {
+          delete player.database.survival.anarchy
+          Spawn.portal?.teleport(player)
+        }
         new ActionForm(
           'Заметка',
           'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
         )
-          .addButton('Понятно', () => {
-            player.camera.fade({ fadeTime: { fadeInTime: 0, holdTime: 0, fadeOutTime: 2 } })
+          .addButton('Продолжить!', () => {
             if (!this.randomTeleportLocation.valid) return
 
+            delete player.database.survival.doNotSaveAnarchy
             temp.cleanup()
             resolve()
             this.quest.enter(player)
           })
+          .addButtonBack(back)
           .show(player)
+          .then(e => !e && back())
       })
     }
   }

@@ -34,7 +34,7 @@ export class Quest {
 
       return function (player: Player) {
         const current = Quest.getCurrent(player)
-        if (!current) return ''
+        if (!current || player.database.inv === 'spawn') return ''
 
         current.playerQuest.updateListeners.add(showSidebar)
 

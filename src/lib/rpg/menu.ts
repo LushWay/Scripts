@@ -2,7 +2,7 @@ import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Playe
 import { InventoryInterval } from 'lib/action'
 import { CustomItems } from 'lib/assets/config'
 import { MessageForm } from 'lib/form/message'
-import { stringifyError, util } from 'lib/util'
+import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
@@ -110,7 +110,7 @@ export class Compass {
     if (!Menu.isMenu(slot)) return
 
     const target = this.players.get(player)
-    if (!target) {
+    if (!target || player.database.inv === 'spawn') {
       if (Menu.isCompass(slot)) slot.setItem(Menu.itemStack)
       return
     }

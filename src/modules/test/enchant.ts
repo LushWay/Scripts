@@ -1,9 +1,5 @@
 import { world } from '@minecraft/server'
-import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { Temporary } from 'lib'
 import { Enchantments } from 'lib/enchantments'
-import { t } from 'lib/text'
-import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 new Command('enchant')
   .setDescription('Зачаровывает предмет')
@@ -44,72 +40,4 @@ new Command('enchant')
     if (newitem.enchantable) world.debug('enchants', [...newitem.enchantable.getEnchantments()])
 
     mainhand.setItem(newitem)
-  })
-
-new Command('repair')
-  .setPermissions('techAdmin')
-  .setDescription('Чинит предмет')
-  .executes(ctx => {
-    const item = ctx.player.mainhand().getItem()
-    if (!item) return ctx.error('В руке нет предмета.')
-
-    const durability = item.durability
-    if (!durability) return ctx.error('Этот предмет невозможно починить.')
-
-    durability.damage = 0
-    ctx.player.mainhand().setItem(item)
-  })
-
-new Command('heal')
-  .setPermissions('techAdmin')
-  .setDescription('Восстанавливает хп')
-  .executes(ctx => {
-    const item = ctx.player.getComponent('health')
-    if (!item) return ctx.error('Вы мертвы.')
-
-    item.resetToMaxValue()
-  })
-
-new Command('eat')
-  .setPermissions('techAdmin')
-  .setDescription('Восстанавливает голод')
-  .executes(ctx => {
-    ctx.player.addEffect(MinecraftEffectTypes.Saturation, 2, { amplifier: 255 })
-  })
-
-const hpie = new WeakPlayerMap<Temporary>({
-  removeOnLeave: true,
-  onLeave(playerId, setValue) {
-    setValue.cleanup()
-  },
-})
-new Command('hpi')
-  .setPermissions('techAdmin')
-  .setDescription('Используйте чтобы включить инспектор сущностей')
-  .executes(ctx => {
-    const hpi = hpie.get(ctx.player.id)
-    if (hpi) {
-      hpi.cleanup()
-      hpie.delete(ctx.player.id)
-      ctx.player.success()
-    } else {
-      hpie.set(
-        ctx.player.id,
-        new Temporary(({ system }) => {
-          system.runInterval(
-            () => {
-              const hit = ctx.player.getEntitiesFromViewDirection()[0]
-              if (typeof hit === 'undefined') return
-
-              ctx.player.onScreenDisplay.setActionBar(
-                t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
-              )
-            },
-            'hpi',
-            10,
-          )
-        }),
-      )
-      ctx.player.success('Наведитесь на сущность чтобы узнать ее данные')
-    }
   })

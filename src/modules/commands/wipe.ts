@@ -30,6 +30,7 @@ new Command('wipe')
         Spawn.loadInventory(ctx.player)
         Spawn.portal?.teleport(ctx.player)
         ctx.player.database.survival.newbie = 1
+        ctx.player.scores.money = 0
 
         system.runTimeout(
           () => {

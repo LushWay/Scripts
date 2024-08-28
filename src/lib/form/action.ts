@@ -119,14 +119,19 @@ export class ActionForm {
    *
    * @param player Player to show form to
    */
-  async show(player: Player): Promise<void> {
+  async show(player: Player): Promise<boolean> {
     if (!this.buttons.length) this.addButton('Пусто', () => this.show(player))
 
     const response = await showForm(this.form, player)
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
-      return
+      return false
 
     const callback = this.buttons[response.selection]?.callback
-    if (typeof callback === 'function') util.catch(() => callback(player))
+    if (typeof callback === 'function') {
+      util.catch(() => callback(player))
+      return true
+    }
+
+    return false
   }
 }

@@ -9,11 +9,10 @@ export class Stoner extends ShopNpc {
 
     this.shop.menu(form => {
       form
-
         .dynamicCostItem(i.Cobblestone)
-        .defaultCount(1_000)
+        .defaultCount(10_000)
         .maxCount(20_000)
-        .basePrice(2)
+        .basePrice(1)
 
         .dynamicCostItem(i.Andesite)
         .defaultCount(1_000)
