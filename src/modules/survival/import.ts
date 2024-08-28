@@ -28,9 +28,6 @@ declare module '@minecraft/server' {
       /** Whenether player has elytra in their inventory or not */
       rtpElytra?: 1
 
-      /** Notice about placing/breaking blocks outside of region will be restored */
-      bn?: 1
-
       /** Player anarchy position */
       anarchy?: Vector3
 

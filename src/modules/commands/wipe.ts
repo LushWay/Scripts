@@ -17,7 +17,6 @@ new Command('wipe')
         ctx.player.setGameMode(GameMode.survival)
         updateBuilderStatus(ctx.player)
 
-        delete ctx.player.database.survival.bn
         delete ctx.player.database.survival.rtpElytra
 
         ctx.player.database.quests?.active.forEach(e => Quest.quests.get(e.id)?.exit(ctx.player))
@@ -30,6 +29,7 @@ new Command('wipe')
         Anarchy.inventoryStore.remove(ctx.player.id)
         Spawn.loadInventory(ctx.player)
         Spawn.portal?.teleport(ctx.player)
+        ctx.player.database.survival.newbie = 1
 
         system.runTimeout(
           () => {

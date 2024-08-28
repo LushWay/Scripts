@@ -144,7 +144,7 @@ actionGuard((player, region, ctx) => {
         lore.location = Vector.string(ctx.event.block.location, true)
         lore.player = player.name
 
-        player.success('Ключ теперь привязан к этой печке! Не забудьте забрать из нее ресурсы через час!')
+        player.success('Ключ теперь привязан к этой печке! В течении часа вы можете ей пользоваться!')
       })
 
       // Prevent from opening furnace dialog

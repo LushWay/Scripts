@@ -35,12 +35,9 @@ actionGuard((player, region, ctx) => {
     // Interaction goes before place, so do not warn twice
     if (ctx.type !== 'interactWithBlock') {
       system.delay(() => {
-        if (!player.database.survival.bn) {
-          player.fail(
-            'Любые изменения вне региона базы исчезнут через 2 минуты. Также, любые сломанные блоки не будут выпадать.',
-          )
-          player.database.survival.bn = 1
-        }
+        player.fail(
+          'Любые изменения вне региона базы исчезнут через 2 минуты. Также, любые сломанные блоки не будут выпадать.',
+        )
 
         dimension
           .getEntities({

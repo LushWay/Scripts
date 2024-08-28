@@ -1,4 +1,4 @@
-import { ItemStack, system } from '@minecraft/server'
+import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
 import { ActionForm, location, Temporary, Vector } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
@@ -39,7 +39,7 @@ class Learning {
           // anarchy
           system.delay(() => {
             this.startAxeGiveCommand.ensure(player)
-            player.container?.setItem(8, Menu.itemStack)
+            player.getComponent('equippable')?.setEquipment(EquipmentSlot.Offhand, Menu.itemStack)
           })
         }
 
