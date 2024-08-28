@@ -12,7 +12,7 @@ world.afterEvents.itemUse.subscribe(event => {
 
 export function givePlayerMoneyAndXp(player: Player, amount: number, xp?: number) {
   player.scores.money += amount
-  player.onScreenDisplay.setActionBar(`§6+${amount}${emoji.money}${xp ? ` §a+${xp}lvl` : ''}`)
+  player.tell(`§6+${amount}${emoji.money}${xp ? ` §a+${xp}lvl` : ''}`)
   if (xp) player.addLevels(xp)
   player.playSound(CustomSounds['lw.pay'])
 }
