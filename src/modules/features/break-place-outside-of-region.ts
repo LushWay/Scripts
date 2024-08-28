@@ -1,56 +1,38 @@
-import { system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector, ms } from 'lib'
-import { actionGuard } from 'lib/region/index'
-import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
+import { ms, Vector } from 'lib'
+import { actionGuard, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
+import { BaseRegion } from 'modules/places/base/region'
+import { isScheduledToPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
-actionGuard((player, region, ctx) => {
+const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS)
+const youCannot = `Вы не можете ломать непоставленные блоки вне баз, шахт или других зон добычи`
+
+actionGuard((_, region, ctx) => {
+  if (region instanceof BaseRegion) {
+    ctx.event.player.fail(youCannot)
+    return false
+  }
   if (region) return
-
-  // TODO allow on enemy base to disable detecting enemy base
-  // TODO maybe add limit
-  if (ctx.type === 'break' || ctx.type === 'place' || ctx.type === 'interactWithBlock') {
-    const dimension = ctx.event.block.dimension
-    const base = {
-      dimension: dimension.type,
+  if (ctx.type === 'place') {
+    scheduleBlockPlace({
+      dimension: ctx.event.block.dimension.type,
       restoreTime: ms.from('sec', 10),
-    }
+      typeId: MinecraftBlockTypes.Air,
+      states: void 0,
+      location: Vector.floor(Vector.add(ctx.event.block.location, ctx.event.faceLocation)),
+    })
+    return true
+  } else if (ctx.type === 'break') {
+    const can = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
+    if (!can) ctx.event.player.fail(youCannot)
+    return can
+  } else if (ctx.type === 'interactWithBlock') {
+    const scheduled = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
+    const interactable = INTERACTABLE.includes(ctx.event.block.typeId)
 
-    if (ctx.type === 'place') {
-      scheduleBlockPlace({
-        ...base,
-        typeId: MinecraftBlockTypes.Air,
-        states: void 0,
-        location: Vector.floor(Vector.add(ctx.event.block.location, ctx.event.faceLocation)),
-      })
-    } else if (ctx.type === 'break') {
-      scheduleBlockPlace({
-        ...base,
-        typeId: ctx.event.block.typeId,
-        states: ctx.event.block.permutation.getAllStates(),
-        location: ctx.event.block.location,
-      })
-    }
-
-    // Interaction goes before place, so do not warn twice
-    if (ctx.type !== 'interactWithBlock') {
-      system.delay(() => {
-        player.fail(
-          'Любые изменения вне региона базы исчезнут через 2 минуты. Также, любые сломанные блоки не будут выпадать.',
-        )
-
-        dimension
-          .getEntities({
-            type: 'minecraft:item',
-            location: ctx.event.block.location,
-            maxDistance: 2,
-          })
-          .forEach(e => {
-            if (e.isValid()) e.remove()
-          })
-      })
-    }
-
+    return scheduled || !interactable
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (ctx.type === 'interactWithEntity') {
     return true
   }
-}, -10)
+}, -11)

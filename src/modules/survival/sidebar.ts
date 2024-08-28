@@ -1,10 +1,9 @@
 import { Player, system, TicksPerSecond, world } from '@minecraft/server'
-import { Menu, Region, Settings, Sidebar, ms, separateNumberWithDots } from 'lib'
+import { Menu, Region, separateNumberWithDots, Settings, Sidebar } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
 import { BaseRegion } from 'modules/places/base/region'
-import { MineshaftRegion } from 'modules/places/mineshaft/mineshaft-region'
 
 const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
@@ -86,13 +85,18 @@ const survivalSidebar = new Sidebar(
     [names.region]: (player, settings) => {
       const regions = Region.nearestRegions(player.location, player.dimension.type)
       const region = regions[0] as Region | undefined
-      let text = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
+      const base = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
+      let text = base
       if (player.database.inv === 'anarchy') {
         if (region) {
           text = ''
           if (!region.permissions.pvp) text = '§aМирная зона§f '
-          if (region.displayName) text += region.displayName
-          if (region instanceof BaseRegion && region.getMemberRole(player.id)) text = '§6Ваша база'
+          const { displayName } = region
+          if (displayName) text += displayName
+          if (region instanceof BaseRegion) {
+            if (region.getMemberRole(player.id)) text = '§6Ваша база'
+            else text = base
+          }
         }
       }
 

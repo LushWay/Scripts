@@ -15,7 +15,7 @@ export class Jeweler extends ShopNpc {
           [i.Redstone, 4],
           [i.LapisLazuli, 0.1],
           [i.IronIngot, 2],
-          [i.GoldOre, 0.5],
+          [i.GoldIngot, 0.5],
           [i.Diamond, 0.3],
           [i.Emerald, 0.1],
         ] as const

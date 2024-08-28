@@ -17,8 +17,6 @@ export const SCHEDULED_DB = table<ScheduledBlockPlace[]>('ScheduledBlockPlace', 
   ScheduledBlockPlace[]
 >
 
-// TODO Меню с кол-вом отложенных блоков
-// TODO Кнопка "поставить все отложенные блоки"
 export function scheduleBlockPlace({
   dimension,
   restoreTime,
@@ -27,10 +25,15 @@ export function scheduleBlockPlace({
   dimension: Dimensions
   restoreTime: number
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  const other = IMMUTABLE_DB[dimension]?.find(e => Vector.equals(e.location, options.location))
+  if (!isScheduledToPlace(options.location, dimension))
+    SCHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
+}
 
-  if (!other) SCHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
+export function isScheduledToPlace(location: Vector3, dimension: Dimensions) {
+  const dimblocks = IMMUTABLE_DB[dimension]
+  if (typeof dimblocks === 'undefined') return false
+
+  return dimblocks.find(e => Vector.equals(e.location, location))
 }
 
 export const onScheduledBlockPlace = new EventSignal<{
