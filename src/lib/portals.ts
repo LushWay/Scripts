@@ -88,7 +88,7 @@ export class Portal {
         .setAliases(...aliases)
         .setDescription(commandDescription ?? `§bТелепорт на ${name}`)
         .setGroup('public')
-        .setPermissions(allowAnybody ? 'everybody' : undefined)
+        .setPermissions(allowAnybody ? 'everybody' : 'member')
         .executes(ctx => {
           this.teleport(ctx.player)
         })

@@ -60,18 +60,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   system.delay(() => createBase(block, player))
 })
 
-const base = new Command('base').setDescription('Меню базы').executes(ctx => {
-  openBaseMenu(ctx.player)
-})
-
-base
-  .overload('getitem')
-  .setPermissions('techAdmin')
-  .setDescription('Выдает предмет базы')
-  .executes(ctx => {
-    ctx.player.container?.addItem(BaseItem.itemStack)
-    ctx.player.success()
-  })
+new Command('base').setDescription('Меню базы').executes(ctx => openBaseMenu(ctx.player))
 
 system.runInterval(
   () => {

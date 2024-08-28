@@ -1,9 +1,15 @@
 import { ItemStack, system } from '@minecraft/server'
 import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { customItems } from 'modules/commands/getitem'
 
 class CustomItem {
   constructor(public id: string) {
-    system.run(() => (this.cache = this.itemStack))
+    system.run(() => this.onBuild())
+  }
+
+  protected onBuild() {
+    this.cache = this.itemStack
+    customItems.push(this.cache)
   }
 
   private _typeId: string | undefined
@@ -29,10 +35,11 @@ class CustomItem {
 
   get itemStack() {
     if (!this._typeId) throw new TypeError('No type id specified for custom item ' + this.id)
-    if (!this._nameTag) throw new TypeError('No type nameTag specified for custom item ' + this.id)
-    if (!this._description) throw new TypeError('No type description specified for custom item ' + this.id)
 
-    const item = new ItemStack(this._typeId).setInfo('§6' + this._nameTag, '§7' + this._description)
+    const item = new ItemStack(this._typeId).setInfo(
+      this._nameTag && `§6${this._nameTag}`,
+      this._description && `§7${this._description}`,
+    )
     return item
   }
 
@@ -45,9 +52,21 @@ class CustomItem {
 }
 
 export class CustomItemWithBlueprint extends CustomItem {
+  protected onBuild(): void {
+    super.onBuild()
+    customItems.push(this.blueprint)
+  }
+
+  private _bprintName = 'Неизвестный'
+
+  setBlueprintName(name: string) {
+    this._bprintName = name
+    return this
+  }
+
   get blueprint() {
     return new ItemStack(i.Paper).setInfo(
-      '§fЧертеж предмета ' + (this._nameTag ?? 'Неизвестный'),
+      `§fЧертеж предмета ${this._nameTag ?? this._bprintName}`,
       'С помощью него вы можете сделать предмет у инженера',
     )
   }

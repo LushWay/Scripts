@@ -1,11 +1,11 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Cooldown, ms, Vector } from 'lib'
+import { actionGuard, Cooldown, ms, Vector } from 'lib'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
-  .nameTag('Поставить пушку')
+  .setBlueprintName('Пушка')
   .lore('Используй этот предмет, чтобы установить пушку')
 
 export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
@@ -14,6 +14,18 @@ export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
   .lore('Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.')
 
 const cooldown = new Cooldown(ms.from('sec', 5))
+
+world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+  if (CannonBulletItem.isItem(event.itemStack)) {
+    event.cancel = true
+  }
+})
+
+actionGuard((player, _, ctx) => {
+  if (ctx.type === 'interactWithEntity') {
+    if (ctx.event.target.typeId === 'lw:cannon') return true
+  }
+})
 
 world.beforeEvents.playerInteractWithEntity.subscribe(event => {
   if (event.target.typeId !== 'lw:cannon') return
@@ -45,9 +57,4 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
       event.target.dimension.spawnParticle('minecraft:dragon_dying_explosion', location)
     }
   })
-})
-world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-  if (CannonBulletItem.isItem(event.itemStack)) {
-    event.cancel = true
-  }
 })

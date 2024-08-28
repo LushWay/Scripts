@@ -3,6 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
 import { Place } from 'lib/rpg/place'
+import { customItems } from 'modules/commands/getitem'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
 import { SafeLocation, ValidLocation, location } from '../location'
@@ -33,6 +34,16 @@ export class ChestLoot {
     this.location.onLoad.subscribe(l => this.onValidLocation(l))
 
     ChestLoot.chests.set(this.id, this)
+
+    system.runTimeout(
+      () => {
+        const key = this.createKeyItemStack()
+        key.nameTag = `${place.group.name}: ${key.nameTag}`
+        customItems.push(key)
+      },
+      'add key',
+      10,
+    )
   }
 
   createKeyItemStack() {

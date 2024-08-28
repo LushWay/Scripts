@@ -29,7 +29,7 @@ declare module '@minecraft/server' {
     is(another: ItemStack): boolean
 
     /** Sets nameTag and lore */
-    setInfo(nameTag: string, description: string): ItemStack
+    setInfo(nameTag: string | undefined, description: string | undefined): ItemStack
   }
 }
 
@@ -52,8 +52,8 @@ for (const [aliasName, { componentId }] of Object.entries(aliases)) {
 
 expand(ItemStack.prototype, {
   setInfo(nameTag, description) {
-    this.nameTag = '§r' + nameTag
-    this.setLore(util.wrapLore(description))
+    if (typeof nameTag === 'string') this.nameTag = '§r' + nameTag
+    if (typeof description === 'string') this.setLore(util.wrapLore(description))
 
     return this.clone()
   },
