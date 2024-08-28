@@ -18,7 +18,7 @@ export class SafeAreaRegion extends Region {
       MinecraftEntityTypes.Chicken,
       'minecraft:painting',
     ],
-    doors: false,
+    doors: true,
     switches: false,
     trapdoors: false,
     openContainers: false,
