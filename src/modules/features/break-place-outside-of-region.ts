@@ -1,19 +1,22 @@
+import { Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ms, Vector } from 'lib'
-import { actionGuard, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
+import { Cooldown, ms, Vector } from 'lib'
+import { actionGuard, BLOCK_CONTAINERS, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { BaseRegion } from 'modules/places/base/region'
 import { isScheduledToPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
-const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS)
-const youCannot = `Вы не можете ломать непоставленные блоки вне баз, шахт или других зон добычи`
+const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS)
+const youCannot = (player: Player) => {
+  if (textCooldown.isExpired(player))
+    player.fail(`Вы не можете ломать непоставленные блоки вне баз, шахт или других зон добычи`)
+  return false
+}
+const textCooldown = new Cooldown(ms.from('sec', 2), false)
 
-actionGuard((_, region, ctx) => {
-  if (region instanceof BaseRegion) {
-    ctx.event.player.fail(youCannot)
-    return false
-  }
-  if (region) return
+actionGuard((player, region, ctx) => {
   if (ctx.type === 'place') {
+    if (region instanceof BaseRegion) return youCannot(player)
+
     scheduleBlockPlace({
       dimension: ctx.event.block.dimension.type,
       restoreTime: ms.from('sec', 10),
@@ -23,16 +26,17 @@ actionGuard((_, region, ctx) => {
     })
     return true
   } else if (ctx.type === 'break') {
-    const can = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
-    if (!can) ctx.event.player.fail(youCannot)
-    return can
+    if (!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)) return youCannot(player)
+    else return true
   } else if (ctx.type === 'interactWithBlock') {
-    const scheduled = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
     const interactable = INTERACTABLE.includes(ctx.event.block.typeId)
+    if (interactable && region instanceof BaseRegion) return youCannot(player)
+
+    const scheduled = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
 
     return scheduled || !interactable
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  } else if (ctx.type === 'interactWithEntity') {
+  } else if (!region && ctx.type === 'interactWithEntity') {
     return true
   }
 }, -11)

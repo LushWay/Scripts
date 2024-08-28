@@ -37,7 +37,15 @@ export class Region {
 
   protected static generateRegionKey(kind: string, area: string, radius: number) {
     const date = new Date()
-    return `${kind}-${area}-${radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
+    let key = `${kind}-${area}-${radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
+    if (key in RegionDatabase) {
+      let i = 0
+      while (`${key}-${i}` in RegionDatabase) {
+        i++
+      }
+      key = `${key}-${i}`
+    }
+    return key
   }
 
   /** Creates a new region */
