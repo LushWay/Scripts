@@ -211,11 +211,19 @@ expand(Player.prototype, {
     const damageable = been === GameMode.survival || been === GameMode.adventure
     if (!damageable) this.setGameMode(GameMode.survival)
 
+    const equippable = this.getComponent('equippable')
+    const damages =
+      equippable &&
+      [EquipmentSlot.Chest, EquipmentSlot.Feet, EquipmentSlot.Head, EquipmentSlot.Legs].map(rslot => {
+        const slot = equippable.getEquipmentSlot(rslot)
+        return { slot, item: slot.getItem() }
+      })
+
     ClosingChatSet.add(this.id)
-    this.applyDamage(1, {
-      cause: EntityDamageCause.entityAttack,
-    })
+    this.applyDamage(1, { cause: EntityDamageCause.entityAttack })
     ClosingChatSet.delete(this.id)
+
+    damages?.forEach(({ slot, item }) => slot.setItem(item))
     health.setCurrentValue(current)
     this.runCommand('stopsound @a[r=5] game.player.hurt')
 
