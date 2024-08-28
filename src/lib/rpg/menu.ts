@@ -146,15 +146,20 @@ export function createPublicGiveItemCommand(name: string, itemStack: ItemStack, 
     const { container } = player
     if (!container) return
 
-    const items = container.entries().filter(([_, item]) => item && is(item))
+    const offhand = player.getComponent('equippable')?.getEquipmentSlot(EquipmentSlot.Offhand)
+    const items = container
+      .entries()
+      .map(([i, item]) => ({ item, remove: () => container.setItem(i, void 0) }))
+      .concat([{ item: offhand?.getItem(), remove: () => offhand?.setItem(void 0) }])
+      .filter(({ item }) => item && is(item))
 
     if (mode === 'tell') {
       if (items.length) {
-        for (const [i] of items) container.setItem(i, void 0)
-        player.info(`§c- ${itemNameTag}`)
+        items.forEach(e => e.remove())
+        player.info(`§c-${itemNameTag}`)
       } else {
         container.addItem(itemStack)
-        player.info(`§a+ ${itemNameTag}`)
+        player.info(`§a+${itemNameTag}`)
       }
     } else {
       if (!items.length) {
