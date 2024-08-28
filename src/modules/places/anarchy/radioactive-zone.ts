@@ -4,6 +4,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { request } from 'lib/bds/api'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
+import { Spawn } from '../spawn'
 
 export class RadioactiveZone {
   lastRadius = 0
@@ -30,7 +31,7 @@ export class RadioactiveZone {
             return
           }
 
-          if (p.database.inv !== 'anarchy') continue
+          if (p.database.inv !== 'anarchy' || Spawn.region?.area.isVectorIn(p.location, p.dimension.type)) continue
 
           const distance = Vector.distance(p.location, center)
           let played = false
