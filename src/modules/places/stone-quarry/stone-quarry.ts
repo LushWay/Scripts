@@ -8,6 +8,7 @@ import { Butcher } from '../lib/npc/butcher'
 import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
+import { Stoner } from '../lib/npc/stoner'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -24,6 +25,8 @@ class StoneQuarryBuilder extends City {
   barman = new Barman(this.group)
 
   coachman = new Horseman(this.group)
+
+  stoner = new Stoner(this.group)
 
   w = Boss.create()
     .group(this.group)
