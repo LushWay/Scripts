@@ -1,4 +1,4 @@
-import { Entity, Player, system, world } from '@minecraft/server'
+import { Entity, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, ms, Vector } from 'lib'
@@ -56,13 +56,15 @@ class HealthIndicator {
       if (
         damage <= 0 ||
         !hurtEntity.isValid() ||
-        (!hurtEntity.matches({ families: this.allowedFamilies }) &&
-          !(hurtEntity instanceof Player && hurtEntity.isSimulated())) ||
         NOT_MOB_ENTITIES.includes(hurtEntity.typeId) ||
         ClosingChatSet.has(hurtEntity.id) ||
         Boss.isBoss(hurtEntity)
       )
         return
+
+      const matches =
+        hurtEntity.matches({ families: this.allowedFamilies }) || (hurtEntity.isPlayer() && !hurtEntity.isSimulated())
+      if (!matches) return
 
       this.updateIndicator({ entity: hurtEntity, damage: Math.floor(damage) })
     })
@@ -114,7 +116,7 @@ class HealthIndicator {
 
   /** Gets damage indicator name depending on entity's currnet heart and damage applied */
   private getBar(entity: Entity, hp = entity.getComponent('health')): string {
-    if (entity instanceof Player && isNotPlaying(entity)) return ''
+    if (entity.isPlayer() && isNotPlaying(entity)) return ''
 
     const hurtEntity = this.hurtEntities.get(entity.id)
     if (!hp || !hurtEntity) return ''

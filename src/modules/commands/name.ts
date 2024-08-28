@@ -4,7 +4,7 @@ const name = new Command('name')
   .setDescription('Меняет имя')
   .setPermissions('admin')
   .executes(ctx => {
-    ctx.player.info(ctx.player.nameTag)
+    ctx.player.tell(ctx.player.nameTag)
   })
 
 name

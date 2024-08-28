@@ -26,11 +26,13 @@ export function getFullname(
   {
     role: useRole = true,
     clan: useClan = true,
+    newbie: useNewbie = true,
     name = true,
     noName = 'Unknown',
     nameColor = '§r§f',
     clearColorAfter = true,
   }: {
+    newbie?: boolean
     clan?: boolean
     role?: boolean
     name?: boolean
@@ -40,13 +42,12 @@ export function getFullname(
   } = {},
 ) {
   const id = playerID instanceof Player ? playerID.id : playerID
-  const db = Player.database[id]
   let result = ''
   const add = (text: string) => (result += result ? ' ' + text : text)
 
-  if (useRole) {
-    if (db.survival.newbie) add('§bНовичок')
+  if (useNewbie && Player.database[id].survival.newbie) add('§bНовичок')
 
+  if (useRole) {
     const role = getRole(playerID)
     if (role !== 'member') add(ROLES[role])
   }
@@ -66,7 +67,7 @@ export function getFullname(
     }
   }
 
-  if (clearColorAfter) result += '§r'
+  if (clearColorAfter && result) result += '§r'
 
   return result
 }

@@ -1,8 +1,7 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { Cooldown, isBuilding, Join, ms, prompt } from 'lib'
+import { Cooldown, Join, ms, prompt } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-properties'
 import { t } from 'lib/text'
-import { PlayerNameTagModifiers } from 'modules/indicator/player-name-tag'
 
 const newbieTime = ms.from('hour', 2)
 
@@ -83,8 +82,6 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
     }
   }
 })
-
-PlayerNameTagModifiers.push(p => (p.database.survival.newbie && !isBuilding(p) ? ' \n§bНовичок§r' : false))
 
 new Command('newbie')
   .setPermissions('member')

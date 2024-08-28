@@ -3,8 +3,11 @@ import { isBuilding } from 'lib'
 import { getFullname } from 'lib/get-fullname'
 
 export const PlayerNameTagModifiers: ((player: Player) => string | false)[] = [
-  player => player.nameTag,
-  player => '\n' + getFullname(player, { role: isBuilding(player), name: false }),
+  player => {
+    const role = getFullname(player, { clan: false, role: isBuilding(player), name: false })
+    const clanAndName = getFullname(player, { role: false, newbie: false })
+    return role ? `${clanAndName}\n${role}` : clanAndName
+  },
 ]
 
 system.runPlayerInterval(player => setNameTag(player, ''), 'player.nameTag modifiers', 40)
