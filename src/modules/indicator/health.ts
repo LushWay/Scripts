@@ -165,6 +165,7 @@ class HealthIndicator {
 
   private createHurtEntityRecord(entity: Entity) {
     let info = this.hurtEntities.get(entity.id)
+    console.log('INfo', { info })
     if (!info) {
       const separated = !this.alwaysShows.includes(entity.typeId)
       const base = {

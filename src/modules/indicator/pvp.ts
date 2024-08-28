@@ -1,5 +1,5 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
-import { Settings } from 'lib'
+import { LockAction, Settings } from 'lib'
 import { Core } from 'lib/extensions/core'
 import { HealthIndicatorConfig } from './config'
 
@@ -8,12 +8,12 @@ import { HealthIndicatorConfig } from './config'
 const { lockDisplay } = HealthIndicatorConfig
 
 const options = Settings.world(...Settings.worldCommon, {
-  enabled: {
+  pvpEnabled: {
     value: true,
     description: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
     name: 'Включено',
   },
-  cooldown: { value: 15, description: 'Время блокировки в секундах', name: 'Время' },
+  pvpCooldown: { value: 15, description: 'Время блокировки в секундах', name: 'Время' },
 })
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
@@ -29,13 +29,13 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   },
 })
 
+const pvpLockAction = new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме пвп')
+
 system.runInterval(
   () => {
-    if (options.enabled) {
-      for (const player of world.getPlayers({
-        scoreOptions: [{ objective: 'pvp' }],
-      })) {
-        player.scores.pvp--
+    if (options.pvpEnabled) {
+      for (const player of world.getAllPlayers()) {
+        if (player.scores.pvp) player.scores.pvp--
       }
 
       for (const [key, value] of lockDisplay.entries()) {
@@ -51,18 +51,18 @@ system.runInterval(
 Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
-      if (!options.enabled) return
+      if (!options.pvpEnabled) return
       const score = player.scores.pvp
 
-      if (HealthIndicatorConfig.disabled.includes(player.id) || score < 0) return
+      if (HealthIndicatorConfig.disabled.includes(player.id) || score <= 0) return
 
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
 
-      const q = score === options.cooldown || score === 0
+      const q = score === options.pvpCooldown || score === 0
       const g = (p: string) => (q ? `§4${p}` : '')
 
-      if (!lockDisplay.has(player.id)) player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
+      player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
     },
     'PVP player',
     0,
@@ -98,21 +98,20 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
 
   if (
     !event.hurtEntity.typeId.startsWith('minecraft:') ||
-    !options.enabled ||
+    !options.pvpEnabled ||
     HealthIndicatorConfig.disabled.includes(event.hurtEntity.id)
   )
     return
 
   // Its player.chatClose
-  if (!damage.damagingEntity && event.hurtEntity instanceof Player && damage.cause === EntityDamageCause.entityAttack)
-    return
+  if (!damage.damagingEntity && event.hurtEntity.isPlayer() && damage.cause === EntityDamageCause.entityAttack) return
 
   const healthComponent = event.hurtEntity.getComponent('minecraft:health')
   if (!healthComponent) return
   const { currentValue: current, defaultValue: value } = healthComponent
 
-  if (damage.damagingEntity instanceof Player) {
-    damage.damagingEntity.scores.pvp = options.cooldown
+  if (damage.damagingEntity?.isPlayer()) {
+    damage.damagingEntity.scores.pvp = options.pvpCooldown
     damage.damagingEntity.scores.damageGive += event.damage
     if (fatal) damage.damagingEntity.scores.kills++
 
@@ -123,34 +122,31 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
       playHitSound(damage.damagingEntity, current, value)
     }
 
-    if (setting.indicator && fatal) {
-      // remove fatal        ^ and uncomment code \/
-      // if (!fatal) {
-      // 	damage.damagingEntity.onScreenDisplay.setActionBar(
-      // 		`§c-${data.damage}♥`
-      // 	);
-      // } else {
-      // Kill
-      if (event.hurtEntity instanceof Player) {
-        // Player
-        damage.damagingEntity.onScreenDisplay.setActionBar(
-          `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`,
-        )
+    if (setting.indicator) {
+      if (!fatal) {
+        // damage.damagingEntity.onScreenDisplay.setActionBar(`§c-${event.damage}♥`)
       } else {
-        // Entity
+        // Kill
+        if (event.hurtEntity instanceof Player) {
+          // Player
+          damage.damagingEntity.onScreenDisplay.setActionBar(
+            `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`,
+          )
+        } else {
+          // Entity
 
-        const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
-        damage.damagingEntity.onScreenDisplay.setActionBar({
-          rawtext: [
-            { text: '§6' },
-            {
-              translate: `entity.${entityName}.name`,
-            },
-            { text: isBow ? ' §gзастрелен' : ' §gубит' },
-          ],
-        })
+          const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
+          damage.damagingEntity.onScreenDisplay.setActionBar({
+            rawtext: [
+              { text: '§6' },
+              {
+                translate: `entity.${entityName}.name`,
+              },
+              { text: isBow ? ' §gзастрелен' : ' §gубит' },
+            ],
+          })
+        }
       }
-      // }
 
       lockDisplay.set(damage.damagingEntity.id, 2)
     }
@@ -158,9 +154,9 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
 
   if (event.hurtEntity instanceof Player) {
     // skip SimulatedPlayer because of error
-    if ('jump' in event.hurtEntity) return
+    // if ('jump' in event.hurtEntity) return
 
-    event.hurtEntity.scores.pvp = options.cooldown
+    event.hurtEntity.scores.pvp = options.pvpCooldown
     event.hurtEntity.scores.damageRecieve += event.damage
     if (fatal) event.hurtEntity.scores.deaths++
   }

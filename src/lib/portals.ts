@@ -101,6 +101,7 @@ export class Portal {
   }
 
   teleport(player: Player) {
+    if (LockAction.locked(player, { tell: true })) return
     if (this.place) Portal.teleport(player, this.place)
   }
 }

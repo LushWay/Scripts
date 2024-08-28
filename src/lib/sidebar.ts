@@ -1,5 +1,6 @@
 import { Player } from '@minecraft/server'
 import { util } from 'lib/util'
+import { HealthIndicatorConfig } from 'modules/indicator/config'
 import { WeakPlayerSet } from './weak-player-storage'
 
 type Format =
@@ -96,7 +97,7 @@ export class Sidebar<E = any> {
       for (const [i, tip] of content.entries()) {
         if (i === 2) {
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          player.onScreenDisplay.setActionBar(tip || '')
+          if (!HealthIndicatorConfig.lockDisplay.has(player)) player.onScreenDisplay.setActionBar(tip || '')
         } else {
           player.onScreenDisplay.setTip((i + 1) as 1 | 2 | 3 | 4 | 5, Sidebar.wrap(tip ?? '', options.maxWordCount))
         }
