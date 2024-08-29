@@ -16,14 +16,14 @@ export class Jeweler extends ShopNpc {
           [i.LapisLazuli, 0.1],
           [i.IronIngot, 2],
           [i.GoldIngot, 0.5],
-          [i.Diamond, 0.1],
-          [i.Emerald, 0.01],
+          [i.Diamond, 0.2],
+          [i.Emerald, 0.1],
         ] as const
       ).forEach(([typeId, rarity]) => {
         form
           .dynamicCostItem(typeId)
           .defaultCount(0)
-          .maxCount(rarity * 1_000)
+          .maxCount(rarity * 10_000)
           .minPrice((4 - rarity) * 100)
       })
     })
