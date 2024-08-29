@@ -61,6 +61,13 @@ export class DungeonRegion extends Region {
       for (const f of this.structureFile.chestPositions) {
         this.createChest(f, loot)
       }
+
+      const coolLoot =
+        (isKeyof(this.structureId, Dungeon.coolLoot) ? Dungeon.coolLoot[this.structureId] : Dungeon.defaultLoot) ??
+        Dungeon.defaultLoot
+      for (const f of this.structureFile.enderChestPositions) {
+        this.createChest(f, coolLoot)
+      }
     }
   }
 

@@ -60,12 +60,19 @@ const names: Record<StructureDungeonsId, string> = {
   [d.GasStation3]: 'Заправка 3',
   [d.GasStation4]: 'Заправка 4',
   [d.GasStationGarage]: 'Гараж',
+  [d.Avanpost]: 'Аванпост',
 }
+
+const coolLoot: Partial<Record<StructureDungeonsId, LootTable>> = {
+  [d.Avanpost]: new Loot(d.Avanpost + '2').item('GoldenApple').chance('100%').build,
+}
+
 const loot: Record<StructureDungeonsId, LootTable> = {
   [d.GasStation1]: defaultLoot,
   [d.GasStation2]: defaultLoot,
   [d.GasStation3]: defaultLoot,
   [d.GasStation4]: defaultLoot,
+  [d.Avanpost]: new Loot(d.Avanpost).item('Apple').chance('100%').build,
   [d.GasStationGarage]: new Loot(`dungeon ${d.GasStationGarage}`)
     .itemStack(CannonBulletItem.blueprint)
     .chance('10%')
@@ -136,6 +143,7 @@ const loot: Record<StructureDungeonsId, LootTable> = {
 
 export const Dungeon = {
   loot,
+  coolLoot,
   defaultLoot,
   names,
 }
