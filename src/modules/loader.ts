@@ -1,6 +1,7 @@
 import 'lib'
 
 // import '../test/test'
+import './anticheat/index'
 import './chat/chat'
 import './commands/index'
 import './indicator/index'
