@@ -1,3 +1,4 @@
+import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents } from 'lib/assets/player-properties'
 import { Core } from 'lib/extensions/core'
 import { isBuilding } from 'lib/game-utils'
@@ -26,6 +27,24 @@ actionGuard((player, region, ctx) => {
     return true
   }
 }, -100)
+
+actionGuard((player, region, ctx) => {
+  if (ctx.type === 'interactWithEntity' || ctx.type === 'interactWithBlock') {
+    const { typeId } = player.mainhand()
+
+    if (typeId === MinecraftItemTypes.Bow || typeId === MinecraftItemTypes.Crossbow) {
+      if (
+        region?.permissions.allowedEntities === 'all' ||
+        region?.permissions.allowedEntities.includes(MinecraftItemTypes.Arrow) ||
+        region?.permissions.allowedEntities.includes(MinecraftItemTypes.FireworkRocket)
+      ) {
+        // Allow
+      } else {
+        return false
+      }
+    }
+  }
+})
 
 loadRegionsWithGuards({
   spawnAllowed(region, event) {
