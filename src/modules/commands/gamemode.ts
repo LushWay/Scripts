@@ -39,7 +39,8 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
     .setDescription('Выдает эффект ' + effectName)
     .int('amlifier', true)
     .executes((ctx, amplifier = 1) => {
-      if (isNotPlaying(ctx.player)) return ctx.error('Вы не можете совершить это действие вне режима строительства')
+      if (!isNotPlaying(ctx.player)) return ctx.error('Вы не можете совершить это действие вне режима строительства')
+
       if (ctx.player.getEffect(effect)) {
         ctx.player.removeEffect(effect)
       } else {

@@ -4,7 +4,6 @@ import { Cutscene } from 'lib/cutscene'
 import { Quest } from 'lib/quest'
 import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
-import { Scavenger } from 'modules/places/lib/npc/scavenger'
 import { PlaceWithSafeArea } from './place-with-safearea'
 
 export class City extends PlaceWithSafeArea {
@@ -24,6 +23,4 @@ export class City extends PlaceWithSafeArea {
   cutscene = new Cutscene(this.group.id, 'Исследование ' + this.name)
 
   jeweler = new Jeweler(this.group)
-
-  scavenger = new Scavenger(this.group)
 }

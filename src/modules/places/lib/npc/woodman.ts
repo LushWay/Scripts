@@ -9,12 +9,12 @@ export class Woodman extends ShopNpc {
 
     this.shop.menu(form => {
       for (const [name, typeId] of Object.entries(i)) {
-        if (name.startsWith('Warped') || name.startsWith('Crimson') || name === 'Planks' || name === 'Wood') continue
+        if (name.startsWith('Warped') || name.startsWith('Crimson') || name === 'Planks' || name === 'Log') continue
 
         if (name.endsWith('Planks')) {
-          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).minPrice(5)
-        } else if (name.endsWith('Wood') && !/stripped/i.test(name)) {
-          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).minPrice(5)
+          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).minPrice(0.1)
+        } else if (name.endsWith('Log')) {
+          form.dynamicCostItem(typeId).defaultCount(1000).maxCount(10_000).minPrice(0.4)
         }
       }
     })

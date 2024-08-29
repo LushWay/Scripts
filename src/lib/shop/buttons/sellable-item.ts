@@ -1,4 +1,3 @@
-import { ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { BUTTON, getAuxOrTexture } from 'lib'
 import { t } from 'lib/text'
@@ -28,20 +27,17 @@ export function createSellableItem({
     itemDescription({ typeId: type, amount: 0 }),
     form => {
       const db = ShopForm.database[shop.id]
-      const getBuy = () => {
-        const count = db[type] ?? defaultCount
-        return (maxCount / count) * minPrice
+      const getCount = () => Math.max(1, db[type] ?? defaultCount)
+      const getBuy = (count = getCount()) => {
+        return Math.max(1, (maxCount / count) * minPrice)
       }
-      const buy = getBuy()
       const original = form.body.bind(form)
 
       form.body = () => t.raw`${original()}\nТовара на складе: ${t`${db[type] ?? 0}/${maxCount}`}`
       form.section(
         '§3Продать',
         form => {
-          const buy = getBuy()
-          const sell = buy / 2
-          const addSell = createSell(type, form, sell, db, maxCount, aux)
+          const addSell = createSell(getCount(), getBuy, type, form, db, maxCount, aux)
           addSell(1)
           addSell(10)
           addSell(20)
@@ -51,7 +47,7 @@ export function createSellableItem({
         BUTTON['+'],
       )
 
-      const addBuy = createBuy(buy, form, type, db, aux)
+      const addBuy = createBuy(getCount(), getBuy, form, type, db, aux)
       addBuy(1)
       addBuy(10)
       addBuy(20)
@@ -66,30 +62,30 @@ const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
 const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
 
 function createBuy(
-  buy: number,
+  dbCount: number,
+  getBuy: (n: number) => number,
   form: ShopFormSection,
   type: MinecraftItemTypes,
   db: Record<string, number | undefined>,
   aux: string,
 ) {
   return (count = 1) => {
-    const total = ~~(buy * count)
-    if (total <= 0) return
-    const cost = new MoneyCost(total)
+    let total = 0
+    for (let i = 0; i <= count; i++) {
+      total += getBuy(dbCount - i) / 2
+    }
+    total = ~~total
+
+    const cost = total <= 0 || dbCount - count < 0 ? NoItemsToSell : new MoneyCost(total)
     form.product(
-      // Name
       itemDescription({ typeId: type, amount: count }),
-
-      // Cost
-      (db[type] ?? 0) - count < 0 ? NoItemsToSell : cost,
-
-      // Action
+      cost,
       player => {
         if (!player.container) return
 
         cost.buy(player)
         db[type] = Math.max(0, (db[type] ?? count) - count)
-        player.container.addItem(new ItemStack(type, count))
+        player.runCommand(`give @s ${type} ${count}`)
       },
       aux,
       undefined,
@@ -99,28 +95,28 @@ function createBuy(
 }
 
 function createSell(
+  dbCount: number,
+  getSell: (n: number) => number,
   type: MinecraftItemTypes,
   form: ShopFormSection,
-  sell: number,
   db: Record<string, number | undefined>,
   maxCount: number,
   aux: string,
 ) {
   return (count = 1) => {
-    const cost = new ItemCost(type, count)
-    const total = ~~(sell * count)
-    if (total <= 0) return
+    let total = 0
+    for (let i = 0; i <= count; i++) {
+      total += getSell(dbCount + i)
+    }
+    total = ~~total
+
+    const cost = total <= 0 || count + dbCount > maxCount ? TooMuchItems : new ItemCost(type, count)
     form.product(
-      // Name
       new MoneyCost(total).toString(),
-
-      // Cost
-      count + (db[type] ?? 0) > maxCount ? TooMuchItems : cost,
-
-      // Actoin
+      cost,
       player => {
         db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
-        player.scores.money += sell * count
+        player.scores.money += total
       },
       aux,
       true,
