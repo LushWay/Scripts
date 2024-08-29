@@ -37,7 +37,6 @@ export class Mage extends ShopNpc {
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Sharpness, level => new MultiCost().money(level * 20).xp(level * enchs))
-          ench(e.FireAspect, level => new MultiCost().money(level * 2000).xp(level * enchs))
           ench(e.Looting, level => new MultiCost().money(level * 2000).xp(level * enchs))
           ench(e.Knockback, level => new MultiCost().money(level * 2000).xp(level * enchs))
         },
