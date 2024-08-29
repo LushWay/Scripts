@@ -33,16 +33,16 @@ export class Quest {
       const textCache = new WeakPlayerMap<{ step: QS; time: number }>({ removeOnLeave: true })
 
       return function (player: Player) {
-        const current = Quest.getCurrent(player)
-        if (!current || player.database.inv === 'spawn') return ''
+        const step = Quest.getCurrentStepOf(player)
+        if (!step || player.database.inv === 'spawn') return ''
 
-        current.playerQuest.updateListeners.add(showSidebar)
+        step.playerQuest.updateListeners.add(showSidebar)
 
-        const text = `§l${current.quest.name}:§r§6 ${current.text()}`
+        const text = `§l${step.quest.name}:§r§6 ${step.text()}`
         const cached = textCache.get(player)
 
-        if (cached?.step !== current) {
-          textCache.set(player, { step: current, time: 6 })
+        if (cached?.step !== step) {
+          textCache.set(player, { step: step, time: 6 })
           return text
         }
 
@@ -58,7 +58,7 @@ export class Quest {
 
   static quests = new Map<string, Quest>()
 
-  static getCurrent(player: Player) {
+  static getCurrentStepOf(player: Player) {
     const db = player.database.quests?.active[0]
     return db && this.quests.get(db.id)?.getPlayerStep(player, db.i)
   }

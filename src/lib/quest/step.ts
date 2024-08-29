@@ -90,8 +90,6 @@ export abstract class QS<DB = any> extends Temporary {
 
   restoring = false
 
-  private active = false
-
   /**
    * Enters player in this step
    *
@@ -99,7 +97,6 @@ export abstract class QS<DB = any> extends Temporary {
    */
   enter(firstTime: boolean) {
     const cleanup = this.activate(firstTime)
-    this.active = true
     if (cleanup) this.cleaners.push(cleanup.cleanup)
 
     this.activators.forEach(activate => {
@@ -142,6 +139,15 @@ export abstract class QS<DB = any> extends Temporary {
     return this.player.database.quests?.active.find(e => e.id === this.quest.id)
   }
 
+  /**
+   * Whenether quest is displayed on the screen using actionbar or not. Used for detecting whenether to show compass or
+   * not
+   */
+  private get isActive() {
+    return Quest.getCurrentStepOf(this.player) === this
+  }
+
+  /** Last set place thro {@link place} */
   private currentPlace?: Vector3
 
   /** Sets place to player compass should target to */
@@ -152,23 +158,24 @@ export abstract class QS<DB = any> extends Temporary {
   set place(place) {
     this.currentPlace = place
 
-    if (!this.usingCompass) {
-      console.log('Setting interval', this.text())
+    if (!this.compassIntervalSetup) {
+      this.compassIntervalSetup = true
+
       this.onInterval(() => {
-        this.active && this.place && Vector.valid(this.place) && Compass.setFor(this.player, this.place)
+        if (this.isActive && this.place && Vector.valid(this.place)) Compass.setFor(this.player, this.place)
       })
+
       this.cleaners.push(() => {
         Compass.setFor(this.player, undefined)
       })
-      this.usingCompass = true
     }
   }
 
-  private usingCompass = false
+  private compassIntervalSetup = false
 
   private intervals: VoidFunction[] = []
 
-  intervalId: number | undefined
+  private intervalId: number | undefined
 
   /**
    * Adds callback function to the interval that will be executed each 10 ticks while the quest step is active
@@ -192,14 +199,14 @@ export abstract class QS<DB = any> extends Temporary {
     }
   }
 
-  /** Specific to quest world. All event subscriptions will be auto unsubscribed after quest step has been switched. */
+  /** Specific to quest step world. All event subscriptions will be auto unsubscribed after quest step has been switched. */
   get world() {
     return this.proxies.world
   }
 
   /**
-   * Specific to quest system. All event subscriptions, intervals and timeouts will be auto unsubscribed after quest
-   * step has been switched.
+   * Specific to quest step system. All event subscriptions, intervals and timeouts will be auto unsubscribed after
+   * quest step has been switched.
    */
   get system() {
     return this.proxies.system

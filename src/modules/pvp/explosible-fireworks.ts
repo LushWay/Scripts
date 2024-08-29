@@ -23,8 +23,6 @@ world.afterEvents.itemUse.subscribe(event => {
       return
     }
   }
-
-  console.log('UNDETECTED')
 })
 
 const FIREWORKS = new Map<string, { source: Player; firework: Entity }>()

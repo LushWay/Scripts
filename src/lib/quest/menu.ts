@@ -16,10 +16,10 @@ quest
   .overload('exit')
   .setDescription('Выйти')
   .executes(ctx => {
-    const q = Quest.getCurrent(ctx.player)
-    if (!q) return ctx.error('У вас нет активных заданий!')
+    const step = Quest.getCurrentStepOf(ctx.player)
+    if (!step) return ctx.error('У вас нет активных заданий!')
 
-    q.quest.exit(ctx.player)
+    step.quest.exit(ctx.player)
     ctx.player.playSound(Sounds.Success)
     ctx.reply('§6> §fУспешно')
   })

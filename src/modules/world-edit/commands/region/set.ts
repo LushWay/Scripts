@@ -200,7 +200,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
           form.pattern([0, 0], ['x<xxBxxGx'], {
             '<': {
               icon: BUTTON['<'],
-              callback: () => base.show(player),
+              callback: () => void base.show(player),
             },
             'x': {
               icon: 'textures/blocks/glass',

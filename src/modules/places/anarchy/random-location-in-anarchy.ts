@@ -32,7 +32,7 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
             console.debug('Found!')
             return resolve({ air: position, topmost: topmostBlock })
           } else {
-            console.debug('Water. Try', 100 - i, 'biome')
+            if (__DEV__) console.debug('Water. Try', 100 - i, 'biome')
             timeout()
           }
         },
