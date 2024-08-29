@@ -22,9 +22,9 @@ export class Jeweler extends ShopNpc {
       ).forEach(([typeId, rarity]) => {
         form
           .dynamicCostItem(typeId)
-          .defaultCount(10_000)
-          .maxCount(rarity * 100_000)
-          .minPrice((4 - rarity) * 10)
+          .defaultCount(0)
+          .maxCount(rarity * 10_000)
+          .minPrice((4 - rarity) * 100)
       })
     })
   }

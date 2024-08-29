@@ -72,7 +72,7 @@ function createBuy(
   return (count = 1) => {
     let total = 0
     for (let i = 0; i <= count; i++) {
-      total += getBuy(dbCount - i) / 2
+      total += getBuy(dbCount - i) / 5
     }
     total = ~~total
 
