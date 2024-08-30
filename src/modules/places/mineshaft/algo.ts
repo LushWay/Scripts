@@ -40,7 +40,7 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
       if (!(key in airCache)) {
         const block = dimension.getBlock(e)
         if (block) {
-          airCache[key] = { block, air: block.isAir }
+          airCache[key] = { block, air: !block.isSolid }
         } else return true
       }
 
