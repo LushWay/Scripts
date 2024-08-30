@@ -83,6 +83,8 @@ export class ChestLoot {
 
       this.open(player, this.location)
     })
+
+    return false
   }
 
   private open(player: Player, location: Vector3) {
