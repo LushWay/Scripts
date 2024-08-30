@@ -9,6 +9,7 @@ import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { MineareaRegion } from 'modules/places/minearea/minearea-region'
@@ -18,7 +19,6 @@ import { stoneQuarryInvestigating } from 'modules/places/stone-quarry/quests/inv
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
-import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
@@ -120,7 +120,8 @@ class Learning {
 
             if (!airdrop.chest) {
               player.onScreenDisplay.setActionBar(
-                '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',ActionbarPriority.UrgentNotificiation
+                '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',
+                ActionbarPriority.UrgentNotificiation,
               )
             } else {
               ctx.place = airdrop.showParticleTrace()
@@ -139,7 +140,7 @@ class Learning {
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
       .place(crafting)
 
-    q.counter((i, end) => `§6Добыто камня: §f${i}/${end}`, 10)
+    q.counter((i, end) => `§6Спуститесь в шахту и добудьте камня: §f${i}/${end}`, 10)
       .description('Отправляйтесь в шахту, найдите и накопайте камня.')
       .activate(ctx => {
         ctx.subscribe(OrePlace, () => true)
@@ -153,12 +154,12 @@ class Learning {
         })
       })
 
-    q.item('§6Сделайте каменную кирку')
+    q.item('§6Вернитесь к верстаку и сделайте каменную кирку')
       .description('Вернитесь к верстаку и улучшите свой инструмент.')
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
       .place(crafting)
 
-    q.counter((i, end) => `§6Добыто железной руды: §f${i}/${end}`, 5)
+    q.counter(i => (i === 0 ? `§6Вновь вскопайте камень в шахте §f0/1` : `§6Добыто железной руды: §f${i}/5`), 6)
       .description('Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
       .activate(ctx => {
         // Force iron ore generation
@@ -183,20 +184,24 @@ class Learning {
         })
 
         // Check if it breaks
-        ctx.world.afterEvents.playerBreakBlock.subscribe(({ brokenBlockPermutation, player }) => {
-          if (player.id !== player.id) return
-          if (
-            brokenBlockPermutation.type.id !== b.IronOre &&
-            brokenBlockPermutation.type.id !== MinecraftItemTypes.DeepslateIronOre
-          )
-            return
+        ctx.world.afterEvents.playerBreakBlock.subscribe(
+          ({
+            brokenBlockPermutation: {
+              type: { id },
+            },
+            player,
+          }) => {
+            if (player.id !== player.id) return
+            if (ctx.value === 0 ? id !== b.Stone : id !== b.IronOre && id !== MinecraftItemTypes.DeepslateIronOre)
+              return
 
-          player.playSound(Sounds.Action)
-          ctx.diff(1)
-        })
+            player.playSound(Sounds.Action)
+            ctx.diff(1)
+          },
+        )
       })
 
-    q.dialogue(this.miner.npc, 'Узнайте что дальше у Шахтера')
+    q.dialogue(this.miner.npc, 'Узнайте, куда вам идти дальше у Шахтера')
       .body('Приветствую!')
       .buttons(
         [
