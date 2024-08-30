@@ -1,9 +1,9 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { createLogger } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/config'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
-import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
@@ -14,6 +14,8 @@ import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './mi
 // TODO Refactor to use creator style for creating
 // TODO Make internal properties private
 // TODO Make creator to register airdrop with id that will replace loot table id and make .spawn function on it
+
+const logger = createLogger('Airdrop')
 
 export class Airdrop {
   static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true }>('airdrop')
@@ -65,7 +67,7 @@ export class Airdrop {
    * @param position - Position to spawn airdrop on
    */
   spawn(position: Vector3) {
-    console.debug('Airdrop spawning at', Vector.string(Vector.floor(position), true))
+    logger.info`Spawning at ${Vector.floor(position)}`
 
     const spawn = (name: 'chicken' | 'chest', typeId: string, position: Vector3, tag: string) => {
       this[name] = world.overworld.spawnEntity(typeId, position)
@@ -76,7 +78,7 @@ export class Airdrop {
 
           event.entity.addTag(tag)
           if (name === 'chest') event.entity.nameTag = `§l§f//§r§b Аирдроп §f§l\\\\§r`
-          console.debug('Airdrop spawned ' + name)
+          logger.info`Spawned ${name}`
           cleanup()
         })
       })
@@ -117,10 +119,10 @@ export class Airdrop {
     if (!this.chest || !this.chicken) return
 
     try {
-      console.debug('Loading loot table', this.lootTable.id ? this.lootTable.id : 'NO ID')
+      logger.info`Loading loot table ${this.lootTable.id ?? 'NO ID'}`
       if (this.chest.container) this.lootTable.fillContainer(this.chest.container)
     } catch (e) {
-      console.error('Failed to load loot table into airdrop:', e)
+      logger.error`Failed to load loot table into airdrop: ${e}`
     }
 
     this.chicken.remove()
@@ -131,7 +133,7 @@ export class Airdrop {
   save() {
     if (!this.chest || !this.chicken) return
     if (!this.lootTable.id) {
-      console.warn(t`[Airdrop][${this.id}] Unable to save, LootTable must have an id`)
+      logger.error`Unable to save ${this.id}, LootTable must have an id`
       return
     }
 
@@ -159,7 +161,7 @@ export class Airdrop {
           await system.sleep(3)
         } catch (error) {
           if (isInvalidLocation(error)) continue
-          console.error(error)
+          logger.error(error)
         }
       }
     }
@@ -220,19 +222,20 @@ system.runInterval(
           airdrop.chest = findAndRemove(chestMinecarts, saved.chest)
           airdrop.chicken = findAndRemove(chickens, saved.chicken)
 
+          const yes = () => logger.info`Restored airdrop with status ${airdrop.status}`
           if (saved.looted) {
             if (airdrop.chest?.isValid()) {
               airdrop.status = 'being looted'
-              console.debug('Restored looted airdrop')
+              yes()
             }
           } else {
             if (airdrop.chicken?.isValid() && airdrop.chest?.isValid()) {
               airdrop.status = 'falling'
-              console.debug('Restored failling airdrop')
+              yes()
             }
           }
         } catch (error) {
-          console.error('Failed to restore airdrop', error)
+          logger.error('Failed to restore airdrop', error)
         }
       } else {
         if (airdrop.chest) findAndRemove(chestMinecarts, airdrop.chest.id)

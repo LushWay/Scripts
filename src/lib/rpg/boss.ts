@@ -2,7 +2,7 @@
 
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Temporary } from 'lib'
+import { createLogger, Temporary } from 'lib'
 import { table } from 'lib/database/abstract'
 import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
@@ -101,6 +101,8 @@ export class Boss {
     Boss.all.push(this)
   }
 
+  private logger = createLogger('Boss ' + this.options.place.fullId)
+
   private damage = new WeakPlayerMap<number>({ removeOnLeave: true })
 
   get dimensionId() {
@@ -133,7 +135,7 @@ export class Boss {
 
     // Get type id
     const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
-    console.debug(`Boss(${this.options.place.fullId}).spawnEntity(${entityTypeId})`)
+    this.logger.debug`Spawn: ${entityTypeId}`
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
@@ -150,7 +152,7 @@ export class Boss {
         })
       })
     } catch (e) {
-      console.error(e)
+      this.logger.error(e)
     }
 
     // Save to database
@@ -184,7 +186,7 @@ export class Boss {
   onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
 
-    console.debug(`Boss(${this.options.place.fullId}).onDie()`)
+    this.logger.info('Died')
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
 
