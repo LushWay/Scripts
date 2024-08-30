@@ -115,7 +115,6 @@ system.runInterval(
             } else if (water) {
               block.setWaterlogged(false)
             }
-            if (entity.isValid()) entity.remove()
           }
         })
     }
