@@ -1,7 +1,7 @@
 import { Entity, EntityLifetimeState, PlayerInteractWithEntityBeforeEvent, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Temporary, Vector, isChunkUnloaded } from 'lib'
+import { Temporary, Vector } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
 import { location } from 'lib/location'
@@ -108,9 +108,10 @@ export class Npc {
     Core.afterEvents.worldLoad.subscribe(() => {
       system.runInterval(
         () => {
+          const playerPositions = world.getAllPlayers().map(e => e.location)
           this.npcs.forEach(npc => {
             if (npc.entity) return // Entity already loaded
-            if (isChunkUnloaded(npc)) return
+            if (!playerPositions.some(e => npc.location.valid && Vector.distance(e, npc.location) < 10)) return
 
             const npcs = world[npc.dimensionId].getEntities({ type: Npc.type }).map(e => ({
               entity: e,
