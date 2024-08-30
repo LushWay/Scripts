@@ -1,6 +1,7 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { actionGuard, ActionGuardOrder, createLogger, isNotPlaying } from 'lib'
+import { actionGuard, ActionGuardOrder, isNotPlaying } from 'lib'
+import { createLogger } from 'lib/utils/logger'
 
 const forbiddenItems: string[] = [
   MinecraftItemTypes.Barrier,

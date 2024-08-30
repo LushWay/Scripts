@@ -1,7 +1,7 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { InventoryStore, Portal, Settings, createLogger, locationWithRotation, util } from 'lib'
+import { InventoryStore, Portal, Settings, locationWithRotation, util } from 'lib'
 
 import { isNotPlaying } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
@@ -12,13 +12,14 @@ import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
+import { createLogger } from 'lib/utils/logger'
 
 class SpawnBuilder extends AreaWithInventory {
   group = new Group('common', 'Общее')
 
   private readonly name = 'Spawn'
 
-  private logger = createLogger('Spawn')
+  private logger = createLogger(this.name)
 
   portal: Portal | undefined
 

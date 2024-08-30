@@ -1,11 +1,12 @@
 import { Entity, EntityLifetimeState, PlayerInteractWithEntityBeforeEvent, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { createLogger, Temporary, Vector } from 'lib'
+import { Temporary, Vector } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
 import { location, SafeLocation } from 'lib/location'
 import { Place } from './place'
+import { createLogger } from 'lib/utils/logger'
 
 export declare namespace Npc {
   type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => boolean
