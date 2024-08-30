@@ -6,6 +6,7 @@ import { t } from 'lib/text'
 import { util } from 'lib/util'
 import { getFullname } from './get-fullname'
 import { Core } from './extensions/core'
+import { ActionbarPriority } from './extensions/on-screen-display'
 
 class JoinBuilder {
   config = {
@@ -79,7 +80,7 @@ class JoinBuilder {
 
               // Show actionBar
               if (Join.config.actionBar) {
-                player.onScreenDisplay.setActionBar(Join.config.actionBar)
+                player.onScreenDisplay.setActionBar(Join.config.actionBar, ActionbarPriority.UrgentNotificiation)
               }
 
               player.onScreenDisplay.setHudTitle(title, {

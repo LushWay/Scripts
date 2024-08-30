@@ -29,8 +29,9 @@ new Command('wipe')
         Anarchy.inventoryStore.remove(ctx.player.id)
         Spawn.loadInventory(ctx.player)
         Spawn.portal?.teleport(ctx.player)
-        ctx.player.database.survival.newbie = 1
         ctx.player.scores.money = 0
+        ctx.player.scores.anarchyOnlineTime = 0
+        ctx.player.database.survival.newbie = 1
 
         system.runTimeout(
           () => {

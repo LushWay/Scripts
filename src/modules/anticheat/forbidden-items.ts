@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { actionGuard, createLogger, isNotPlaying } from 'lib'
+import { actionGuard, ActionGuardOrder, createLogger, isNotPlaying } from 'lib'
 
 const forbiddenItems: string[] = [
   MinecraftItemTypes.Barrier,
@@ -33,7 +33,7 @@ function interval() {
       }
     }
   } catch (e) {
-    console.error('Anticheat player error:', e)
+    logger.error(e)
   } finally {
     system.runTimeout(interval, 'anticheat', 10)
   }
@@ -48,6 +48,6 @@ actionGuard((player, _, ctx) => {
       return false
     }
   }
-})
+}, ActionGuardOrder.Anticheat)
 
 system.delay(interval)

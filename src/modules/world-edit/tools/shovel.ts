@@ -1,6 +1,7 @@
 import { world } from '@minecraft/server'
 import { ModalForm, Vector } from 'lib'
 import { CustomItems } from 'lib/assets/config'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -76,10 +77,15 @@ const shovel = new WorldEditTool({
     if (!lore) return
 
     const blocks = getBlocksSetByRef(lore.blocksSet)
-    if (!blocks.length) return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!')
+    if (!blocks.length)
+      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.UrgentNotificiation)
 
     const replaceBlocks = getBlocksSetForReplaceTarget(lore.replaceBlocksSet)
-    if (!replaceBlocks.length) return player.onScreenDisplay.setActionBar('§cЗаменяемый набор блоков лопаты пустой!')
+    if (!replaceBlocks.length)
+      return player.onScreenDisplay.setActionBar(
+        '§cЗаменяемый набор блоков лопаты пустой!',
+        ActionbarPriority.UrgentNotificiation,
+      )
 
     const loc = Vector.floor(player.location)
     const offset = lore.zone
@@ -121,7 +127,7 @@ const shovel = new WorldEditTool({
       lore[0] = '§cDisabled'
     } else lore[0] = '§aEnabled'
 
-    player.onScreenDisplay.setActionBar(lore[0])
+    player.onScreenDisplay.setActionBar(lore[0], ActionbarPriority.UrgentNotificiation)
     item.setLore(lore)
   },
 })

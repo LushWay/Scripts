@@ -1,6 +1,7 @@
 import { GameMode } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { isNotPlaying, Temporary } from 'lib'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
@@ -96,7 +97,7 @@ new Command('hpi')
 
               ctx.player.onScreenDisplay.setActionBar(
                 t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
-              )
+              ActionbarPriority.UrgentNotificiation)
             },
             'hpi',
             10,

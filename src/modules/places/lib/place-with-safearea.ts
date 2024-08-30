@@ -1,6 +1,6 @@
 import { Player, system, TicksPerSecond } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { actionGuard, location, locationWithRadius, locationWithRotation, SafeAreaRegion } from 'lib'
+import { actionGuard, ActionGuardOrder, location, locationWithRadius, locationWithRotation, SafeAreaRegion } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
@@ -69,5 +69,5 @@ system.delay(() => {
     ) {
       return true
     }
-  })
+  }, ActionGuardOrder.Feature)
 })

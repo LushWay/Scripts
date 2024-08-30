@@ -4,7 +4,7 @@ import { Vector, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
-import { actionGuard } from 'lib/region/index'
+import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { Group, Place } from 'lib/rpg/place'
 import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
@@ -151,7 +151,7 @@ actionGuard((player, region, ctx) => {
       return false
     }
   } else return notAllowed('Вы уже использовали этот ключ для другой печки.')
-})
+}, ActionGuardOrder.Feature)
 
 class FurnaceKeyItem {
   static db = table<{

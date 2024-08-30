@@ -1,5 +1,4 @@
 import {
-  EntitySpawnAfterEvent,
   Player,
   PlayerBreakBlockBeforeEvent,
   PlayerInteractWithBlockBeforeEvent,
@@ -36,45 +35,46 @@ type InteractionAllowed = (
   regions: Region[],
 ) => boolean | void
 
-type SpawnAllowed = (region: Region | undefined, data: EntitySpawnAfterEvent) => boolean | undefined
-export type RegionCallback = (player: Player, region: Region | undefined) => void
-
 const ACTION_GUARD = new EventSignal<Parameters<InteractionAllowed>, boolean | void, InteractionAllowed>()
 
-export function actionGuard(fn: InteractionAllowed, position?: number) {
+export function actionGuard(fn: InteractionAllowed, position: ActionGuardOrder) {
   ACTION_GUARD.subscribe(fn, position)
 }
 
+export enum ActionGuardOrder {
+  BlockAction = 11,
+  Anticheat = 10,
+  Feature = 9,
+  Permission = 8,
+}
+
 const allowed: InteractionAllowed = (player, region, context, regions) => {
+  if (isBuilding(player)) return true
+
+  if (region?.getMemberRole(player.id)) return true
+
+  // Disable bow in regions where allowed entities does not allow spawning arrow or firework
+  if (region && (context.type === 'interactWithEntity' || context.type === 'interactWithBlock')) {
+    const { typeId } = player.mainhand()
+    const { allowedEntities } = region.permissions
+
+    if (
+      (typeId === MinecraftItemTypes.Bow || typeId === MinecraftItemTypes.Crossbow) &&
+      !(
+        allowedEntities === 'all' ||
+        allowedEntities.includes(MinecraftItemTypes.Arrow) ||
+        allowedEntities.includes(MinecraftItemTypes.FireworkRocket)
+      )
+    ) {
+      return false
+    }
+  }
+
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
     if (typeof result !== 'undefined') return result
   }
 }
-
-actionGuard((player, region, ctx) => {
-  // Allow any action to player in creative
-  if (isBuilding(player)) return true
-
-  // Allow any action to region member
-  if (region?.getMemberRole(player.id)) return true
-
-  if (ctx.type === 'interactWithEntity' || ctx.type === 'interactWithBlock') {
-    const { typeId } = player.mainhand()
-
-    if (typeId === MinecraftItemTypes.Bow || typeId === MinecraftItemTypes.Crossbow) {
-      if (
-        region?.permissions.allowedEntities === 'all' ||
-        region?.permissions.allowedEntities.includes(MinecraftItemTypes.Arrow) ||
-        region?.permissions.allowedEntities.includes(MinecraftItemTypes.FireworkRocket)
-      ) {
-        // Allow
-      } else {
-        return false
-      }
-    }
-  }
-}, 100)
 
 function getRegions(location: Vector3, dimensionType: Dimensions) {
   const regions = Region.nearestRegions(location, dimensionType)

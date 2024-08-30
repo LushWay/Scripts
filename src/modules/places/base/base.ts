@@ -3,7 +3,7 @@ import { Block, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { LockAction, Mail, Region, Vector, createLogger, getBlockStatus } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { actionGuard } from 'lib/region/index'
+import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { Rewards } from 'lib/shop/rewards'
 import { openBaseMenu } from 'modules/places/base/base-menu'
@@ -22,7 +22,7 @@ actionGuard((_, __, ctx) => {
     BaseItem.isItem(ctx.event.player.mainhand().getItem())
   )
     return true
-})
+}, ActionGuardOrder.Feature)
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block } = event

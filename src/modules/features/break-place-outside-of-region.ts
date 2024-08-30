@@ -1,11 +1,14 @@
 import { Player } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, ms, Vector } from 'lib'
-import { actionGuard, BLOCK_CONTAINERS, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
+import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { BaseRegion } from 'modules/places/base/region'
 import { isScheduledToPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS)
+const INTERACTABLEITEMS = Object.values(MinecraftItemTypes)
+  .filter(e => e.includes('axe'))
+  .concat(MinecraftItemTypes.FlintAndSteel) as (undefined | string)[]
 const youCannot = (player: Player) => {
   if (textCooldown.isExpired(player))
     player.fail(`Вы не можете ломать непоставленные блоки вне баз, шахт или других зон добычи`)
@@ -29,14 +32,14 @@ actionGuard((player, region, ctx) => {
     if (!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)) return youCannot(player)
     else return true
   } else if (ctx.type === 'interactWithBlock') {
-    const interactable = INTERACTABLE.includes(ctx.event.block.typeId)
+    const interactable =
+      INTERACTABLE.includes(ctx.event.block.typeId) || INTERACTABLEITEMS.includes(ctx.event.itemStack?.typeId)
     if (interactable && region instanceof BaseRegion) return youCannot(player)
 
     const scheduled = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
-
     return scheduled || !interactable
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (!region && ctx.type === 'interactWithEntity') {
     return true
   }
-}, -11)
+}, ActionGuardOrder.Permission)

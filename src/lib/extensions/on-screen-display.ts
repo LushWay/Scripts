@@ -2,6 +2,13 @@ import { Player, RawMessage, ScreenDisplay, TicksPerSecond, system, world } from
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
+export enum ActionbarPriority {
+  UrgentNotificiation = 3,
+  PvP = 2,
+  Quest = 1,
+  Lowest = 0,
+}
+
 declare module '@minecraft/server' {
   interface HudTitleDisplayOptions {
     /** Priority of the displayed information */
@@ -18,6 +25,8 @@ declare module '@minecraft/server' {
      * @param text Text to set
      */
     setHudTitle(text: string, options: TitleDisplayOptions & HudTitleDisplayOptions, prefix?: string, n?: number): void
+
+    setActionBar(text: string | RawText, priority: ActionbarPriority): void
 
     /**
      * Sets player sidebar
@@ -150,7 +159,10 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
     this.setHudTitle(text, { priority, ...defaultOptions }, $tipPrefix, n)
   },
 
-  setActionBar(text) {
+  setActionBar(text, priority: number = ActionbarPriority.Lowest) {
+    const lock = actionbarLock.get(this.player)
+    if (lock && lock.priority > priority) return
+    else actionbarLock.set(this.player, { priority, expires: Date.now() + 1000 * 3 })
     return this.player[ScreenDisplaySymbol].setActionBar(text)
   },
 
@@ -183,6 +195,8 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
   },
 }
 
+const actionbarLock = new WeakPlayerMap<{ priority: ActionbarPriority; expires: number }>()
+
 const defaultOptions = { fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 0 }
 const defaultTitleOptions = { ...defaultOptions, stayDuration: -1 }
 
@@ -206,6 +220,10 @@ system.run(() => {
           // Take first action and execute it
           event.actions.shift()?.(player)
         }
+      }
+
+      for (const [id, { expires }] of actionbarLock) {
+        if (expires < Date.now()) actionbarLock.delete(id)
       }
     },
     'title set',

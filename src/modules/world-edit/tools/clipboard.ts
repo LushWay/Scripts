@@ -1,5 +1,6 @@
 import { StructureRotation, system } from '@minecraft/server'
 import { CustomItems } from 'lib/assets/config'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { WorldEditTool } from 'modules/world-edit/lib/world-edit-tool'
@@ -41,10 +42,10 @@ const clipboard = new WorldEditTool({
       player.onScreenDisplay.setActionBar(
         `Используйте предмет чтобы\n${
           player.isSneaking ? '<Отменить последнее действие>' : '<Вставить скопированную область>'
-        }`,
+        }`,ActionbarPriority.UrgentNotificiation
       )
     } else {
-      player.onScreenDisplay.setActionBar('§cВы ничего не копировали!')
+      player.onScreenDisplay.setActionBar('§cВы ничего не копировали!',ActionbarPriority.UrgentNotificiation)
     }
   },
 })

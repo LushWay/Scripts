@@ -1,6 +1,6 @@
 import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
-import { actionGuard } from 'lib/region/index'
+import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { Vector } from 'lib/vector'
 
 type PlaceType = 'enters' | 'interactions'
@@ -65,7 +65,7 @@ export class PlaceAction {
       ) {
         return false
       }
-    }, 100000)
+    }, ActionGuardOrder.BlockAction)
   }
 }
 

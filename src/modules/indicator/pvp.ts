@@ -1,6 +1,7 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
 import { LockAction, Settings } from 'lib'
 import { Core } from 'lib/extensions/core'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { HealthIndicatorConfig } from './config'
 
 // █
@@ -29,7 +30,7 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   },
 })
 
-const pvpLockAction = new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме пвп')
+new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме пвп')
 
 system.runInterval(
   () => {
@@ -62,7 +63,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
       const q = score === options.pvpCooldown || score === 0
       const g = (p: string) => (q ? `§4${p}` : '')
 
-      player.onScreenDisplay.setActionBar(`${g('»')} §6PvP: ${score} ${g('«')}`)
+      player.onScreenDisplay.setActionBar(`${g('»')} §6Сражение: ${score} ${g('«')}`, ActionbarPriority.PvP)
     },
     'PVP player',
     0,
@@ -131,20 +132,24 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
           // Player
           damage.damagingEntity.onScreenDisplay.setActionBar(
             `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`,
+            ActionbarPriority.UrgentNotificiation,
           )
         } else {
           // Entity
 
           const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
-          damage.damagingEntity.onScreenDisplay.setActionBar({
-            rawtext: [
-              { text: '§6' },
-              {
-                translate: `entity.${entityName}.name`,
-              },
-              { text: isBow ? ' §gзастрелен' : ' §gубит' },
-            ],
-          })
+          damage.damagingEntity.onScreenDisplay.setActionBar(
+            {
+              rawtext: [
+                { text: '§6' },
+                {
+                  translate: `entity.${entityName}.name`,
+                },
+                { text: isBow ? ' §gзастрелен' : ' §gубит' },
+              ],
+            },
+            ActionbarPriority.UrgentNotificiation,
+          )
         }
       }
 

@@ -1,23 +1,24 @@
 import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
-import { ActionForm, createLogger, location, Temporary, Vector } from 'lib'
+import { ActionForm, ActionGuardOrder, createLogger, location, Temporary, Vector } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { actionGuard, SafeAreaRegion } from 'lib'
+import { actionGuard } from 'lib'
 import { Sounds } from 'lib/assets/config'
 import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
-import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
+import { MineareaRegion } from 'modules/places/minearea/minearea-region'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { stoneQuarryInvestigating } from 'modules/places/stone-quarry/quests/investigating'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
@@ -44,9 +45,11 @@ class Learning {
           })
         }
 
+        const trees = Object.values(MinecraftBlockTypes).filter(e => /log/i.exec(e)) as string[]
+
         ctx.world.afterEvents.playerBreakBlock.subscribe(({ player: ep, brokenBlockPermutation }) => {
           if (player.id !== ep.id) return
-          if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
+          if (!trees.includes(brokenBlockPermutation.type.id)) return
 
           logger.player(player).info`Mined ${brokenBlockPermutation.type.id}`
 
@@ -117,7 +120,7 @@ class Learning {
 
             if (!airdrop.chest) {
               player.onScreenDisplay.setActionBar(
-                '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',
+                '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',ActionbarPriority.UrgentNotificiation
               )
             } else {
               ctx.place = airdrop.showParticleTrace()
@@ -222,7 +225,7 @@ class Learning {
 
   startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
 
-  safeArea: SafeAreaRegion | undefined = void 0
+  minearea: MineareaRegion | undefined
 
   miner = new Jeweler(this.quest.group, this.quest.group.point('miner').name('Шахтер'))
 
@@ -250,7 +253,7 @@ class Learning {
           }
         })
       }
-    })
+    }, ActionGuardOrder.Permission)
 
     Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (player.database.role === 'spectator') {

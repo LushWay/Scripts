@@ -1,6 +1,7 @@
 import { system, world } from '@minecraft/server'
 import { LockAction } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/config'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 
 new Command('sit')
   .setDescription('Присаживает вас')
@@ -16,7 +17,10 @@ new Command('sit')
     entity.setRotation(ctx.player.getRotation())
 
     system.delay(() => {
-      ctx.player.onScreenDisplay.setActionBar('§3> §fВы сели. Чтобы встать, крадитесь')
+      ctx.player.onScreenDisplay.setActionBar(
+        '§3> §fВы сели. Чтобы встать, крадитесь',
+        ActionbarPriority.UrgentNotificiation,
+      )
     })
   })
 

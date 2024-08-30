@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, ms } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/config'
 import { Quest } from 'lib/quest/quest'
-import { ALLOW_SPAWN_PROP } from 'lib/region'
+import { ActionGuardOrder, ALLOW_SPAWN_PROP } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
@@ -116,11 +116,11 @@ actionGuard((player, _, ctx) => {
   if (ctx.event.target.typeId !== gravestoneEntity) return
 
   const owner = ctx.event.target.getDynamicProperty(gravestoneOwnerKey)
-  if (typeof owner !== 'string') return
+  if (typeof owner !== 'string') return true
 
   if (owner === player.id) return true
   if (Player.database[owner].survival.newbie) return false
-})
+}, ActionGuardOrder.Feature)
 
 const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
   const { deadAt } = player.database.survival

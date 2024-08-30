@@ -5,6 +5,7 @@ import { request } from 'lib/bds/api'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 import { Spawn } from '../spawn'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 
 export class RadioactiveZone {
   lastRadius = 0
@@ -49,13 +50,13 @@ export class RadioactiveZone {
 
           if (distance > rad) {
             sound(2, 2)
-            p.onScreenDisplay.setActionBar(t.warn`Высокая радиация!`)
+            p.onScreenDisplay.setActionBar(t.warn`Высокая радиация!`, ActionbarPriority.UrgentNotificiation)
             p.addEffect(MinecraftEffectTypes.Poison, 10 * TicksPerSecond, { showParticles: true, amplifier: 1 })
           }
 
           if (distance > rad + 20) {
             sound(4, 4)
-            p.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`)
+            p.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`, ActionbarPriority.UrgentNotificiation)
             p.applyDamage(2, { cause: EntityDamageCause.magic })
             if (!p.getEffects().find(e => e.typeId === MinecraftEffectTypes.Darkness))
               p.addEffect(MinecraftEffectTypes.Darkness, 10 * TicksPerSecond, { showParticles: true, amplifier: 255 })

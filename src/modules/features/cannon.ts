@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { actionGuard, Cooldown, ms, Vector } from 'lib'
+import { actionGuard, ActionGuardOrder, Cooldown, ms, Vector } from 'lib'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
@@ -21,11 +21,11 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event => {
   }
 })
 
-actionGuard((player, _, ctx) => {
+actionGuard((_, __, ctx) => {
   if (ctx.type === 'interactWithEntity') {
     if (ctx.event.target.typeId === 'lw:cannon') return true
   }
-})
+}, ActionGuardOrder.Feature)
 
 world.beforeEvents.playerInteractWithEntity.subscribe(event => {
   if (event.target.typeId !== 'lw:cannon') return

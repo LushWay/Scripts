@@ -1,7 +1,7 @@
 import { Player, PlayerBreakBlockBeforeEvent } from '@minecraft/server'
 import { createLogger } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
-import { actionGuard, addAddableRegion } from 'lib/region'
+import { actionGuard, ActionGuardOrder, addAddableRegion } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
@@ -76,7 +76,7 @@ actionGuard((player, region, ctx) => {
       return true
     }
   }
-})
+}, ActionGuardOrder.Permission)
 
 onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
   const regions = Region.nearestRegions(block, block.dimension.type)

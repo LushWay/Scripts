@@ -1,7 +1,7 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/config'
-import { actionGuard } from 'lib/region/index'
+import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
@@ -311,4 +311,4 @@ actionGuard((player, _region, ctx) => {
       return true
     }
   }
-}, -1)
+}, ActionGuardOrder.Feature)

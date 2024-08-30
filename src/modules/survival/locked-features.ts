@@ -1,4 +1,4 @@
-import { actionGuard } from 'lib'
+import { actionGuard, ActionGuardOrder } from 'lib'
 import { t } from 'lib/text'
 
 const blocked: Record<string, string[]> = {}
@@ -21,4 +21,4 @@ actionGuard((player, region, ctx) => {
     player.fail(t.error`Я не знаю что мне делать с этим, возможно ${npc[0]} сможет сделать это за меня...`)
   }
   return false
-}, -10)
+}, ActionGuardOrder.Permission)
