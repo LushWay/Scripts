@@ -325,13 +325,22 @@ export class ItemStack extends DynamicPropertiesProvider {
   typeId: string
   readonly type: ItemType
 
-  constructor(
-    itemType: mc.ItemType | string,
-    public amount: number = 1,
-  ) {
+  constructor(itemType: mc.ItemType | string, amount: number = 1) {
     super()
+    this.amount = amount
     this.typeId = typeof itemType === 'string' ? itemType : itemType.id
     this.type = typeof itemType === 'string' ? new ItemType(itemType) : itemType
+  }
+
+  _amount: number = 1
+
+  get amount() {
+    return this._amount
+  }
+
+  set amount(amount: number) {
+    if (amount < 0 || amount > 64) throw new RangeError(`Item amount should be in range [0, 64], recieved ${amount}`)
+    this._amount = amount
   }
 
   private lore: string[] = []

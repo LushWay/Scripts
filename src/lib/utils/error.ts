@@ -1,4 +1,5 @@
-import { sendPacketToStdout } from 'lib/bds/api'
+let s: typeof import('lib/bds/api').sendPacketToStdout | undefined
+import('lib/bds/api').then(e => (s = e.sendPacketToStdout))
 
 const stringifyError = Object.assign(
   /**
@@ -19,7 +20,7 @@ const stringifyError = Object.assign(
     }
 
     __PRODUCTION__ &&
-      sendPacketToStdout('error', {
+      s?.('error', {
         name: t.name ?? 'Error',
         stack: t.stack ?? '',
         message: t.message,

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
+import { stringifySymbol } from 'lib/utils/inspect'
+import { createLogger } from 'lib/utils/logger'
 import { is } from '../roles'
 import {
   ArrayArgumentType,
@@ -14,7 +16,6 @@ import { CmdLet } from './cmdlet'
 import { CommandContext } from './context'
 import './index'
 import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand, sendCallback } from './utils'
-import { createLogger } from 'lib'
 
 type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
   ? (ctx: X, ...args: [...E, Next]) => R
@@ -85,6 +86,10 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
 
   static getHelpForCommand(command: Command, ctx: CommandContext) {
     return ctx.error('Генератор справки для команд выключен!')
+  }
+
+  [stringifySymbol]() {
+    return '§f' + Command.prefixes[0] + this.sys.name
   }
 
   sys = {

@@ -2,9 +2,24 @@ import stringifyError from './error'
 
 export function stringify(target: unknown) {
   if (typeof target === 'string') return target
+  if (
+    target &&
+    typeof target === 'object' &&
+    stringifySymbol in target &&
+    typeof target[stringifySymbol] === 'function'
+  ) {
+    try {
+      const result = target[stringifySymbol]() as unknown
+      if (typeof result === 'string') return result
+    } catch {
+      return inspect(target)
+    }
+  }
   if (stringifyError.isError(target)) return stringifyError(target)
   return inspect(target)
 }
+
+export const stringifySymbol = Symbol('stringify')
 
 export function inspect(target: unknown, space = '  ', cw = '', funcCode = false, depth = 0) {
   const c = {

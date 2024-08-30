@@ -59,7 +59,7 @@ export class ItemCost extends Cost {
     if (!container) return
     for (const [i, amount] of items.slots) {
       if (amount) {
-        container.getSlot(i).amount = amount
+        container.getSlot(i).amount += amount
       } else {
         container.setItem(i, undefined)
       }

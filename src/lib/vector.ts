@@ -360,6 +360,4 @@ export class Vector {
     const DirectionZ = this.z / magnitude
     return new Vector(DirectionX, DirectionY, DirectionZ)
   }
-
-  [VectorSymbol] = true
 }
