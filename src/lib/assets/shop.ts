@@ -71,20 +71,20 @@ export const shopFormula = {
   },
   [MinecraftItemTypes.Diamond]: {
     "maxCount": 1000,
-    "minPrice": 1000,
+    "minPrice": 500,
     "k": 0.5,
     "defaultCount": 0
   },
   [MinecraftItemTypes.GoldIngot]: {
     "maxCount": 1000,
-    "minPrice": 500,
+    "minPrice": 250,
     "k": 0.1,
     "defaultCount": 0
   },
   [MinecraftItemTypes.IronIngot]: {
     "maxCount": 20000,
-    "minPrice": 150,
-    "k": 0.01,
+    "minPrice": 50,
+    "k": 0.001,
     "defaultCount": 0
   },
   [MinecraftItemTypes.LapisLazuli]: {
