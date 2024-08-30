@@ -9,6 +9,7 @@ const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS)
 const INTERACTABLEITEMS = Object.values(MinecraftItemTypes)
   .filter(e => e.includes('axe'))
   .concat(MinecraftItemTypes.FlintAndSteel) as (undefined | string)[]
+
 const youCannot = (player: Player) => {
   if (textCooldown.isExpired(player))
     player.fail(`Вы не можете ломать непоставленные блоки вне баз, шахт или других зон добычи`)
@@ -19,6 +20,7 @@ const textCooldown = new Cooldown(ms.from('sec', 2), false)
 actionGuard((player, region, ctx) => {
   if (ctx.type === 'place') {
     if (region instanceof BaseRegion) return youCannot(player)
+    else if (region) return
 
     scheduleBlockPlace({
       dimension: ctx.event.block.dimension.type,
@@ -29,11 +31,14 @@ actionGuard((player, region, ctx) => {
     })
     return true
   } else if (ctx.type === 'break') {
+    if (region) return
+    // Break
     if (!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)) return youCannot(player)
     else return true
   } else if (ctx.type === 'interactWithBlock') {
-    const interactable =
-      INTERACTABLE.includes(ctx.event.block.typeId) || INTERACTABLEITEMS.includes(ctx.event.itemStack?.typeId)
+    // Interact
+    const interactableItem = INTERACTABLEITEMS.includes(ctx.event.itemStack?.typeId)
+    const interactable = INTERACTABLE.includes(ctx.event.block.typeId) || interactableItem
     if (interactable && region instanceof BaseRegion) return youCannot(player)
 
     const scheduled = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)

@@ -46,7 +46,18 @@ export enum ActionGuardOrder {
   Anticheat = 10,
   Feature = 9,
   Permission = 8,
+  Lowest = 7,
 }
+
+actionGuard((player, region, ctx) => {
+  if (ctx.type !== 'interactWithBlock') return
+  const { event } = ctx
+
+  if (region?.permissions.switches && SWITCHES.includes(event.block.typeId)) return true // allow
+  if (region?.permissions.doors && DOORS.includes(event.block.typeId)) return true // allow
+  if (region?.permissions.trapdoors && TRAPDOORS.includes(event.block.typeId)) return true // allow
+  if (region?.permissions.openContainers && BLOCK_CONTAINERS.includes(event.block.typeId)) return true // allow
+}, ActionGuardOrder.Lowest)
 
 const allowed: InteractionAllowed = (player, region, context, regions) => {
   if (isBuilding(player)) return true
@@ -70,6 +81,7 @@ const allowed: InteractionAllowed = (player, region, context, regions) => {
     }
   }
 
+  //
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
     if (typeof result !== 'undefined') return result
@@ -86,11 +98,6 @@ function getRegions(location: Vector3, dimensionType: Dimensions) {
 world.beforeEvents.playerInteractWithBlock.subscribe(event => {
   const { regions, region } = getRegions(event.block, event.player.dimension.type)
   if (allowed(event.player, region, { type: 'interactWithBlock', event }, regions)) return
-
-  if (region?.permissions.switches && SWITCHES.includes(event.block.typeId)) return // allow
-  if (region?.permissions.doors && DOORS.includes(event.block.typeId)) return // allow
-  if (region?.permissions.trapdoors && TRAPDOORS.includes(event.block.typeId)) return // allow
-  if (region?.permissions.openContainers && BLOCK_CONTAINERS.includes(event.block.typeId)) return // allow
 
   event.cancel = true
 })

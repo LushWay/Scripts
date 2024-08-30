@@ -19,6 +19,7 @@ import { stoneQuarryInvestigating } from 'modules/places/stone-quarry/quests/inv
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
@@ -159,29 +160,32 @@ class Learning {
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
       .place(crafting)
 
-    q.counter(i => (i === 0 ? `§6Вновь вскопайте камень в шахте §f0/1` : `§6Добыто железной руды: §f${i}/5`), 6)
+    q.counter(i => (i === 0 ? `§6Вновь вскопайте камень в шахте §f0/1` : `§6Добыто железной руды: §f${i - 1}/3`), 3 + 1)
       .description('Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
       .activate(ctx => {
         // Force iron ore generation
-        ctx.subscribe(OrePlace, ({ player, isDeepslate, possibleBlocks, place }) => {
-          if (player.id !== player.id) return false
+        ctx.subscribe(
+          OrePlace,
+          ({ player, isDeepslate, possibleBlocks, place }) => {
+            if (player.id !== player.id) return false
 
-          ctx.db ??= { count: ctx.value }
-          ;(ctx.db as { iron?: number }).iron ??= 0
+            ctx.db ??= { count: ctx.value }
+            ;(ctx.db as { iron?: number }).iron ??= 0
 
-          if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
-            if (ctx.db.iron >= ctx.end) return false
+            if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
+              if (ctx.db.iron >= ctx.end - 1) return true
 
-            for (const block of possibleBlocks) {
-              if (ctx.db.iron >= ctx.end) break
-              place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)
-              ctx.db.iron++
-            }
-            return true
-          }
-
-          return false
-        })
+              for (const block of possibleBlocks) {
+                if (ctx.db.iron >= ctx.end - 1) break
+                if (place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
+                  ctx.db.iron++
+                }
+              }
+              return true
+            } else return false
+          },
+          10,
+        )
 
         // Check if it breaks
         ctx.world.afterEvents.playerBreakBlock.subscribe(
@@ -234,9 +238,17 @@ class Learning {
 
   miner = new Jeweler(this.quest.group, this.quest.group.point('miner').name('Шахтер'))
 
+  blockedOre = new WeakPlayerMap<string[]>()
+
   constructor() {
     actionGuard((player, region, ctx) => {
       if (ctx.type !== 'break') return
+      if (ctx.event.dimension.type !== 'overworld') return
+      if ([...this.blockedOre.values()].flat().includes(Vector.string(ctx.event.block))) {
+        player.fail('Вы не можете ломать руду новичка.')
+        return false
+      }
+
       if (region !== VillageOfMiners.safeArea) return
       if (this.quest.getPlayerStep(player)) {
         const isOre =

@@ -3,6 +3,7 @@ import { Airdrop, Compass, Join, prompt } from 'lib'
 import { Quest } from 'lib/quest'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Spawn } from 'modules/places/spawn'
+import { enterNewbieMode } from 'modules/pvp/newbie'
 import { updateBuilderStatus } from 'modules/world-edit/builder'
 
 new Command('wipe')
@@ -31,7 +32,8 @@ new Command('wipe')
         Spawn.portal?.teleport(ctx.player)
         ctx.player.scores.money = 0
         ctx.player.scores.anarchyOnlineTime = 0
-        ctx.player.database.survival.newbie = 1
+
+        enterNewbieMode(ctx.player)
 
         for (let i = 0; i <= 26; i++) {
           ctx.player.runCommand(`replaceitem entity @s slot.enderchest ${i} air`)

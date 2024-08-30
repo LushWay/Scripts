@@ -101,7 +101,7 @@ actionGuard((player, region, ctx) => {
       return true
     }
   }
-}, ActionGuardOrder.Permission)
+}, ActionGuardOrder.Lowest)
 
 onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
   const regions = Region.nearestRegions(block, block.dimension.type)

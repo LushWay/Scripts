@@ -57,7 +57,10 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
     brokenOre?.isDeepslate ?? (brokenTypeId === MinecraftBlockTypes.Deepslate || brokenLocation.y < -3)
 
   const place = (block: Block, oreTypeId: string) => {
-    if (block.isValid() && !block.isAir && oreTypeId) block.setType(oreTypeId)
+    if (block.isValid() && !block.isAir && oreTypeId) {
+      block.setType(oreTypeId)
+      return true
+    } else return false
   }
 
   for (const [action] of EventSignal.sortSubscribers(OrePlace)) {
@@ -72,7 +75,7 @@ interface OrePlaceEvent {
   brokenOre: undefined | OreEntry
   brokenLocation: Block
   possibleBlocks: Block[]
-  place: (block: Block, oreTypeId: string) => void
+  place: (block: Block, oreTypeId: string) => boolean
 }
 
 export const OrePlace = new EventSignal<OrePlaceEvent, boolean>()

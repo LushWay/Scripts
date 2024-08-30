@@ -321,7 +321,6 @@ export const playerJson = {
             },
             "deals_damage": false
           },
-
           {
             "on_damage": {
               "filters": {

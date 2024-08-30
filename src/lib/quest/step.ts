@@ -212,8 +212,8 @@ export abstract class QS<DB = any> extends Temporary {
     return this.proxies.system
   }
 
-  subscribe<T extends EventSignal<any>>(eventSignal: T, callback: EventSignal.Callback<T>) {
-    eventSignal.subscribe(callback)
+  subscribe<T extends EventSignal<any>>(eventSignal: T, callback: EventSignal.Callback<T>, position?: number) {
+    eventSignal.subscribe(callback, position)
     this.cleaners.push(() => eventSignal.unsubscribe(callback))
     return callback
   }

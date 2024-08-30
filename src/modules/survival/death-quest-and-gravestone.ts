@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, ms } from 'lib'
+import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/config'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, ALLOW_SPAWN_PROP } from 'lib/region'
@@ -119,14 +119,17 @@ actionGuard((player, _, ctx) => {
   if (typeof owner !== 'string') return true
 
   if (owner === player.id) return true
-  if (Player.database[owner].survival.newbie) return false
+  if (Player.database[owner].survival.newbie) {
+    ctx.event.player.fail('Вы не можете залутать могилу новичка!')
+    return false
+  }
 }, ActionGuardOrder.Feature)
 
 const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
   const { deadAt } = player.database.survival
   if (!deadAt) return q.failed('Ваше место смерти потерялось!')
 
-  q.dynamic(`§d!!!`)
+  q.dynamic(Vector.string(deadAt, true))
     .description(
       `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''

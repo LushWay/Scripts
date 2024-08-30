@@ -45,7 +45,7 @@ export function exitNewbieMode(player: Player, reason: Text) {
   logger.player(player).info`Exited newbie mode because ${reason}`
 }
 
-function enterNewbieMode(player: Player) {
+export function enterNewbieMode(player: Player) {
   player.database.survival.newbie = 1
   player.scores.anarchyOnlineTime = 0
   player.setProperty(property, true)

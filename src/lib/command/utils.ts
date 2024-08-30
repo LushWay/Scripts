@@ -49,7 +49,7 @@ export function commandNotFound(player: Player, command: string): void {
 
   suggestCommand(player, command)
   player.tell('§cСписок всех доступных вам команд: §f.help')
-  Command.logger.player(player).error`Unknown command: ${command}`
+  Command.logger.player(player).warn`Unknown command: ${command}`
 }
 
 /**

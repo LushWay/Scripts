@@ -4,12 +4,12 @@ import { CustomEntityTypes } from 'lib/assets/config'
 
 /** All doors and switches in minecraft */
 export const DOORS = BlockTypes.getAll()
-  .filter(e => e.id.endsWith('_door'))
+  .filter(e => e.id.endsWith('door'))
   .map(e => e.id)
 
 /** All doors and switches in minecraft */
 export const TRAPDOORS = BlockTypes.getAll()
-  .filter(e => e.id.endsWith('_trapdoor'))
+  .filter(e => e.id.endsWith('trapdoor'))
   .map(e => e.id)
 
 /** All doors and switches in minecraft */
@@ -35,7 +35,12 @@ export const BLOCK_CONTAINERS = [
 ]
 
 /** With this entities player can interact (e.g. npc, custom buttons, etc) */
-export const INTERACTABLE_ENTITIES: string[] = [MinecraftEntityTypes.Npc]
+export const INTERACTABLE_ENTITIES: string[] = [
+  MinecraftEntityTypes.Npc,
+  MinecraftEntityTypes.Horse,
+  MinecraftEntityTypes.Mule,
+  MinecraftEntityTypes.Donkey,
+]
 
 /**
  * System entities like database, floating text, sit and other which are not affected by health bar display, region
