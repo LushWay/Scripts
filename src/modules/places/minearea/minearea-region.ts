@@ -1,10 +1,10 @@
 import { Player, PlayerBreakBlockBeforeEvent } from '@minecraft/server'
-import { createLogger } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
 import { actionGuard, ActionGuardOrder, addAddableRegion } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
+import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
 import { onScheduledBlockPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 

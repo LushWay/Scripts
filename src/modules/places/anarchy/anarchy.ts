@@ -1,5 +1,5 @@
 import { GameMode, Player } from '@minecraft/server'
-import { InventoryStore, Portal, ValidLocation, Vector, createLogger, location, rawMessageToString } from 'lib'
+import { InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToString } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
 import { itemDescription } from 'lib/shop/rewards'
 import { t } from 'lib/text'
@@ -8,6 +8,7 @@ import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from '../lib/area-with-inventory'
 import { RadioactiveZone } from './radioactive-zone'
+import { createLogger } from 'lib/utils/logger'
 import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {

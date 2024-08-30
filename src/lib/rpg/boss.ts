@@ -2,7 +2,6 @@
 
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { createLogger, Temporary } from 'lib'
 import { table } from 'lib/database/abstract'
 import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
@@ -11,6 +10,8 @@ import { SphereArea } from 'lib/region/areas/sphere'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
+import { Temporary } from 'lib/temporary'
+import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Group, Place } from './place'
 

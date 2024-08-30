@@ -1,11 +1,11 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { Cooldown, createLogger, Join, ms, prompt } from 'lib'
+import { Cooldown, Join, ms, prompt } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-properties'
 import { t } from 'lib/text'
+import { createLogger } from 'lib/utils/logger'
 
 const newbieTime = ms.from('hour', 2)
 
-const prefix = 'newbie'
 const property = PlayerProperties['lw:newbie']
 
 export function isNewbie(player: Player) {

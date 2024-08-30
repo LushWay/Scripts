@@ -37,7 +37,6 @@ export * from 'lib/settings'
 export * from 'lib/sidebar'
 export * from 'lib/temporary'
 export * from 'lib/utils/lang'
-export * from 'lib/utils/logger'
 export * from 'lib/utils/ms'
 
 // Region

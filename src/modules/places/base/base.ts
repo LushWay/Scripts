@@ -1,7 +1,7 @@
 import { Block, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { LockAction, Mail, Region, Vector, createLogger, getBlockStatus } from 'lib'
+import { LockAction, Mail, Region, Vector, getBlockStatus } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
@@ -10,6 +10,7 @@ import { openBaseMenu } from 'modules/places/base/base-menu'
 import { askForExitingNewbieMode, isNewbie } from 'modules/pvp/newbie'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion } from './region'
+import { createLogger } from 'lib/utils/logger'
 
 export const BaseItem = new CustomItemWithBlueprint('base')
   .typeId(MinecraftItemTypes.Barrel)
