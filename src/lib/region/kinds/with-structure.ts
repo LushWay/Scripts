@@ -3,7 +3,7 @@ import { Vector } from 'lib/vector'
 import { Region } from './region'
 
 export abstract class RegionWithStructure extends Region {
-  protected get structureName() {
+  protected get structureId() {
     return 'region:' + this.key.replaceAll(':', '|')
   }
 
@@ -15,9 +15,9 @@ export abstract class RegionWithStructure extends Region {
     this.checkSaveability()
   }
 
-  saveStructure() {
+  saveStructure(): void | Promise<void> {
     this.checkSaveability()
-    world.structureManager.createFromWorld(this.structureName, this.dimension, ...this.area.edges, {
+    world.structureManager.createFromWorld(this.structureId, this.dimension, ...this.area.edges, {
       saveMode: StructureSaveMode.World,
       includeEntities: false,
       includeBlocks: true,
@@ -36,7 +36,7 @@ export abstract class RegionWithStructure extends Region {
   forEachStructureBlock(
     callback: (vector: Vector3, structureSavedBlock: BlockPermutation | undefined, dimension: Dimension) => void,
   ) {
-    const structure = world.structureManager.get(this.structureName)
+    const structure = world.structureManager.get(this.structureId)
     if (!structure) throw new TypeError('No structure found!')
 
     const [, edge] = this.area.edges
@@ -53,5 +53,14 @@ export abstract class RegionWithStructure extends Region {
     return this.forEachStructureBlock((vector, block, dimension) => {
       if (block) dimension.setBlockPermutation(vector, block)
     })
+  }
+
+  deleteStructure() {
+    world.structureManager.delete(this.structureId)
+  }
+
+  delete() {
+    this.deleteStructure()
+    super.delete()
   }
 }

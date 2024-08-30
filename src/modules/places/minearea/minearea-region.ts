@@ -8,7 +8,7 @@ import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { ms } from 'lib/utils/ms'
 import { onScheduledBlockPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
-const logger = createLogger('MineareaRegion')
+const logger = createLogger('Minearea')
 
 export class MineareaRegion extends RegionWithStructure {
   /** MineArea is more prior then other regions */
@@ -24,9 +24,34 @@ export class MineareaRegion extends RegionWithStructure {
     owners: [],
   }
 
-  protected onCreate(): void {
-    this.saveStructure()
-    logger.info`Created new MineArea region ${this.key} and saved structure`
+  async restoreAndSaveStructure(eachVectorCallback?: (vector: Vector3) => void) {
+    const restoredRegions: MineareaRegion[] = []
+    await this.area
+      .forEachVector(async (vector, isIn) => {
+        if (!isIn) return
+
+        eachVectorCallback?.(vector)
+
+        const regions = Region.nearestRegions(vector, this.dimensionId)
+        for (const region of regions) {
+          // Prevent from region save conflicts
+          if (region instanceof MineareaRegion && !restoredRegions.includes(region) && region !== this) {
+            restoredRegions.push(region)
+            await region.loadStructure()
+          }
+        }
+      })
+      .then(() => {
+        super.saveStructure()
+      })
+
+    return restoredRegions.length
+  }
+
+  protected async onCreate() {
+    const crossRegions = await this.saveStructure()
+
+    logger.info`Created new MineArea region ${this.key} and saved structure. Crossregions restored: ${crossRegions}`
   }
 
   onBlockBreak(player: Player, event: PlayerBreakBlockBeforeEvent) {

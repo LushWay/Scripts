@@ -102,6 +102,10 @@ function editRegion(player: Player, region: Region, back: () => void) {
     form.addButton('Восстановить структуру', () => {
       region.loadStructure()
     })
+    form.addButton('Пересохранить структуру', () => {
+      region.deleteStructure()
+      region.saveStructure()
+    })
   }
 
   form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
