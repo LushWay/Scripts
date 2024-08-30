@@ -33,6 +33,10 @@ new Command('wipe')
         ctx.player.scores.anarchyOnlineTime = 0
         ctx.player.database.survival.newbie = 1
 
+        for (let i = 0; i <= 26; i++) {
+          ctx.player.runCommand(`replaceitem entity @s slot.enderchest ${i} air`)
+        }
+
         system.runTimeout(
           () => {
             Join.emitFirstJoin(ctx.player)
