@@ -1,3 +1,4 @@
+import { system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
@@ -5,10 +6,10 @@ import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
-import { Stoner } from '../lib/npc/stoner'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -59,6 +60,22 @@ class StoneQuarryBuilder extends City {
   gunsmith = new Gunsmith(this.group)
 
   private create() {
+    this.w.location.onLoad.subscribe(() => {
+      if (this.w.region) this.w.region.permissions.allowedEntities = 'all'
+    })
+
+    system.runInterval(
+      () => {
+        if (!this.w.region) return
+        if (!this.w.entity) return
+        if (!this.w.region.area.isVectorIn(this.w.entity.location, this.w.region.dimensionId)) {
+          this.w.entity.teleport(this.w.region.area.center)
+        }
+      },
+      'asdasda',
+      40,
+    )
+
     this.createKits(new Loot().item('RedTerracotta').build, new Loot().item('RedTerracotta').build)
   }
 }
