@@ -1,4 +1,5 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
+import { Vector } from 'lib'
 import { Command } from './command'
 import { ROLES, getRole } from './roles'
 import { separateNumberWithDots } from './util'
@@ -23,6 +24,13 @@ interface MultiStatic {
 
   options: (options: ColorizingOptions) => Multi
 }
+
+export declare namespace Text {
+  export type Function = Fn
+  export type Optiosn = ColorizingOptions
+  export type Static = Multi
+}
+
 type Multi = MultiStatic & Record<OptionsModifiers, Fn & Omit<MultiStatic, OptionsModifiers>>
 
 export function textTable(table: Record<string, unknown>, join: false): string[]
@@ -146,7 +154,7 @@ function addDefaultsToOptions(options: ColorizingOptions = {}): Required<Coloriz
   return { unit: unitColor, text: textColor, roles }
 }
 
-interface ColorizingOptions {
+export interface ColorizingOptions {
   unit?: string
   text?: string
   roles?: boolean
@@ -167,6 +175,8 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
         else return unitColor + unit.name
       } else if (unit instanceof Command) {
         return unitColor + Command.prefixes[0] + unit.sys.name
+      } else if (Vector.is(unit)) {
+        return Vector.string(unit, true)
       } else return stringify(unit)
 
     case 'symbol':

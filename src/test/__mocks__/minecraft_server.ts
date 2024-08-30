@@ -265,6 +265,7 @@ export class World {
   afterEvents = wrapEvents(new WorldAfterEvents())
   beforeEvents = wrapEvents(new WorldBeforeEvents())
   sendMessage = vi.fn()
+  say = vi.fn()
   getPlayers() {
     return []
   }

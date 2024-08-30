@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+import { Vector } from 'lib'
 import 'lib/database/scoreboard'
 import { MockInstance, beforeEach, describe, expect, it, vi } from 'vitest'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
@@ -19,6 +20,11 @@ describe('location', () => {
     expect(loc.valid).toBe(false)
     expect(loc.onLoad).toBeDefined()
     expect(loc.teleport).toBeDefined()
+  })
+
+  it('should create vectorable location', () => {
+    const loc = location(point)
+    expect(Vector.is(loc)).toBe(true)
   })
 
   it('should create a location with default values', () => {

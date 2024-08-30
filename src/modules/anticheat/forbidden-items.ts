@@ -1,7 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { actionGuard, isNotPlaying } from 'lib'
-import { t } from 'lib/text'
+import { actionGuard, createLogger, isNotPlaying } from 'lib'
 
 const forbiddenItems: string[] = [
   MinecraftItemTypes.Barrier,
@@ -12,6 +11,8 @@ const forbiddenItems: string[] = [
   MinecraftItemTypes.ChainCommandBlock,
   MinecraftItemTypes.RepeatingCommandBlock,
 ]
+
+const logger = createLogger('AntiCheat')
 
 function interval() {
   try {
@@ -26,7 +27,7 @@ function interval() {
         if (!typeId) continue
 
         if (forbiddenItems.includes(typeId)) {
-          player.log('ANTICHEAT', t.error`Attention! ${typeId} on slot ${i} detected!`)
+          logger.player(player).error`${typeId} on slot ${i} detected!`
           slot.setItem(undefined)
         }
       }
@@ -38,12 +39,12 @@ function interval() {
   }
 }
 
-actionGuard((player, region, ctx) => {
+actionGuard((player, _, ctx) => {
   if (isNotPlaying(player)) return
 
   if (ctx.type === 'interactWithBlock') {
     if (ctx.event.itemStack && forbiddenItems.includes(ctx.event.itemStack.typeId)) {
-      player.log('ANTICHEAT', t.error`Attention! ${ctx.event.itemStack.typeId} being placed!`)
+      logger.player(player).error`${ctx.event.itemStack.typeId} being placed!`
       return false
     }
   }

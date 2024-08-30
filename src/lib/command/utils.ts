@@ -2,7 +2,6 @@ import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/config'
 import { developersAreWarned } from 'lib/assets/text'
 import { ROLES } from 'lib/roles'
-import { t } from 'lib/text'
 import { inaccurateSearch } from '../search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
@@ -50,7 +49,7 @@ export function commandNotFound(player: Player, command: string): void {
 
   suggestCommand(player, command)
   player.tell('§cСписок всех доступных вам команд: §f.help')
-  player.log('Command', t.error`${command} - not found`)
+  Command.logger.player(player).error`Unknown command: ${command}`
 }
 
 /**
@@ -105,7 +104,8 @@ export function commandNoPermissions(player: Player, command: import('./index').
   player.fail(
     `§cУ вас нет разрешения для использования команды §f${command.sys.name}${additional}\n§cСписок всех доступных вам команд: §f.help`,
   )
-  player.log('Command', t.error`No permission to use ${command}`)
+
+  Command.logger.player(player).warn`No permission to use ${command}`
 }
 
 /** Sends a syntax failure message to player */

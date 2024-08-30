@@ -205,15 +205,14 @@ export class Region {
    *
    * @param callback - Callback to run
    */
-  forEachOwner(callback: Parameters<Player[]['forEach']>[0]) {
-    const onlineOwners = []
-    for (const ownerId of this.permissions.owners) {
-      const player = Player.getById(ownerId)
-      if (player) onlineOwners.push(player)
+  forEachOwner(callback: (playerOrId: Player | string, isOwner: boolean) => void) {
+    const players = world.getAllPlayers()
+    for (const owner of this.permissions.owners) {
+      util.catch(
+        () => callback(players.find(e => e.id === owner) ?? owner, this.permissions.owners[0] === owner),
+        'Region.forEachOwner',
+      )
     }
-    onlineOwners.forEach(
-      (player, i, owners) => player.isValid() && util.catch(() => callback(player, i, owners), 'Region.forEachOwner'),
-    )
   }
 
   /** Prepares region instance to be saved into the database */

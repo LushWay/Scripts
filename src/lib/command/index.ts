@@ -14,6 +14,7 @@ import { CmdLet } from './cmdlet'
 import { CommandContext } from './context'
 import './index'
 import { commandNoPermissions, commandNotFound, commandSyntaxFail, parseCommand, sendCallback } from './utils'
+import { createLogger } from 'lib'
 
 type AppendArgument<Base, Next> = Base extends (ctx: infer X, ...args: infer E) => infer R
   ? (ctx: X, ...args: [...E, Next]) => R
@@ -36,14 +37,16 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     // Hook
   }
 
+  static logger = createLogger('Command')
+
   static chatListener(event: ChatSendAfterEvent) {
     if (!this.isCommand(event.message)) return this.chatSendListener(event)
 
     const parsed = parseCommand(event.message, 1)
     if (!parsed) {
-      event.sender.log('Command', `§cUnable to parse command '§f${event.message}§'`)
+      this.logger.player(event.sender).error`Unable to parse: ${event.message}`
       return event.sender.fail('Не удалось обработать команду.')
-    } else event.sender.log('Command', event.message)
+    } else this.logger.player(event.sender).info`Command ${event.message}`
 
     const { cmd, args, input } = parsed
 

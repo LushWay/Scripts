@@ -89,7 +89,6 @@ export class ChestLoot {
     player.success(t`Открыт сундук ${this.place.name}!`, false)
     player.mainhand().setItem(undefined)
 
-    console.log(new Array(10).fill(null).map(e => this.lootTable.generateOne().nameTag))
     this.animation.start(player, this.lootTable.generateOne(), location)
   }
 

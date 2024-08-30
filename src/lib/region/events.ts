@@ -10,6 +10,9 @@ export class RegionEvents {
    */
   static playerInRegionsCache = new WeakPlayerMap<Region[]>()
 
+  /** Even that triggers each second and is used to update player region cache */
+  static onInterval = new EventSignal<{ player: Player; currentRegion: Region | undefined }>()
+
   /**
    * Event that triggers when player regions have changed. Updated each second by region interval. Uses
    * {@link Region.playerInRegionsCache} under the hood

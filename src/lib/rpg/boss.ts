@@ -202,7 +202,7 @@ export class Boss {
 
       for (const [playerId, damage] of this.damage) {
         const player = players.find(e => e.id === playerId)
-        if (!player) return console.log('NO PLAYER LOL')
+        if (!player) return
 
         givePlayerMoneyAndXp(player, damage, ~~(damage / 10))
       }

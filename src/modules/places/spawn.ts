@@ -1,11 +1,12 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { InventoryStore, Portal, RegionCallback, Settings, locationWithRotation, util } from 'lib'
+import { InventoryStore, Portal, Settings, createLogger, locationWithRotation, util } from 'lib'
 
 import { isNotPlaying } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
 import { SphereArea } from 'lib/region/areas/sphere'
+import { RegionEvents } from 'lib/region/events'
 import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
 import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
@@ -16,6 +17,8 @@ class SpawnBuilder extends AreaWithInventory {
   group = new Group('common', 'Общее')
 
   private readonly name = 'Spawn'
+
+  private logger = createLogger('Spawn')
 
   portal: Portal | undefined
 
@@ -35,6 +38,7 @@ class SpawnBuilder extends AreaWithInventory {
 
   constructor() {
     super()
+    this.onRegionInterval()
     if (this.location.valid) {
       const spawnLocation = this.location
       world.setDefaultSpawnLocation(spawnLocation)
@@ -64,10 +68,11 @@ class SpawnBuilder extends AreaWithInventory {
 
         // Check settings
         if (!this.settings(player).teleportToSpawnOnJoin)
-          return player.log(this.name, 'not teleporting to spawn on join because player disabled it via settings')
+          return this.logger.player(player)
+            .info`Not teleporting to spawn on join because player disabled it via settings`
 
         util.catch(() => {
-          player.log(this.name, 'teleporting player to spawn on join')
+          this.logger.player(player).info`Teleporting player to spawn on join`
           this.portal?.teleport(player)
           system.runTimeout(() => Join.setPlayerJoinPosition(player), 'Spawn set player position after join', 10)
         })
@@ -93,22 +98,24 @@ class SpawnBuilder extends AreaWithInventory {
 
   saveInventory = undefined
 
-  regionCallback: RegionCallback = (player, region) => {
-    if (player.isSimulated()) return
-    if (region === this.region) {
-      if (player.getGameMode() === GameMode.survival) {
-        player.setGameMode(GameMode.adventure)
+  private onRegionInterval() {
+    RegionEvents.onInterval.subscribe(({ player, currentRegion: region }) => {
+      if (player.isSimulated()) return
+      if (region === this.region) {
+        if (player.getGameMode() === GameMode.survival) {
+          player.setGameMode(GameMode.adventure)
+        }
+        player.addEffect(MinecraftEffectTypes.Saturation, 1, {
+          amplifier: 255,
+          showParticles: false,
+        })
+      } else {
+        if (player.database.inv === 'spawn' && !isNotPlaying(player)) {
+          this.switchInventory(player)
+          this.portal?.teleport(player)
+        }
       }
-      player.addEffect(MinecraftEffectTypes.Saturation, 1, {
-        amplifier: 255,
-        showParticles: false,
-      })
-    } else {
-      if (player.database.inv === 'spawn' && !isNotPlaying(player)) {
-        this.switchInventory(player)
-        this.portal?.teleport(player)
-      }
-    }
+    })
   }
 }
 

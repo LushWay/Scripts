@@ -1,5 +1,5 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { Cooldown, Join, ms, prompt } from 'lib'
+import { Cooldown, createLogger, Join, ms, prompt } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-properties'
 import { t } from 'lib/text'
 
@@ -33,13 +33,16 @@ export function askForExitingNewbieMode(
   )
 }
 
+const logger = createLogger('Newbie')
+
 export function exitNewbieMode(player: Player, reason: Text) {
   if (!isNewbie(player)) return
 
   player.warn(t.warn`Вы ${reason}, поэтому вышли из режима новичка.`)
   delete player.database.survival.newbie
   player.setProperty(property, false)
-  player.log(prefix, 'Exited newbie mode because', reason)
+
+  logger.player(player).info`Exited newbie mode because ${reason}`
 }
 
 function enterNewbieMode(player: Player) {
@@ -58,10 +61,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
 
   const health = hurtEntity.getComponent('health')
   const denyDamage = () => {
-    hurtEntity.log(
-      prefix,
-      t`Recieved damage ${damage.toFixed(2)}, health ${health?.currentValue.toFixed(2)}, with cause ${cause}`,
-    )
+    logger.player(hurtEntity).info`Recieved damage ${damage}, health ${health?.currentValue}, with cause ${cause}`
     if (health) health.setCurrentValue(health.currentValue + damage)
     hurtEntity.teleport(hurtEntity.location)
   }
@@ -74,7 +74,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       askForExitingNewbieMode(
         damagingEntity,
         'ударили игрока',
-        () => hurtEntity.applyDamage(damage, { damagingEntity, cause }),
+        () => void 0,
         () => damagingEntity.info('Будь осторожнее в следующий раз.'),
       )
     } else {

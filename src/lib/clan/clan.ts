@@ -140,13 +140,11 @@ export class Clan {
       playerOrId.success(message)
     } else Mail.send(id, message, 'Ура', new Rewards())
 
-    console.log({ db: this.db })
     for (const clan of Clan.getAll()) {
       clan.db.joinRequests = clan.db.joinRequests.filter(e => e !== id)
       clan.db.invites = clan.db.invites.filter(e => e !== id)
     }
     this.db.members.push(id)
-    console.log({ db: this.db })
   }
 
   delete() {

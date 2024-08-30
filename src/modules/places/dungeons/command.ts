@@ -34,7 +34,6 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
             if (schema) schema.type = structureId
             else ctx.error('Создайте новый предмет, старый сломался')
           } else {
-            console.log('Setting item...')
             hand.setItem(toolSchema.create({ type: structureId }).item)
           }
         },

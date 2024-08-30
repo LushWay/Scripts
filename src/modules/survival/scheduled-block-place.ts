@@ -1,5 +1,5 @@
 import { Block, BlockPermutation, LocationInUnloadedChunkError, system, world } from '@minecraft/server'
-import { EventSignal, Vector, util } from 'lib'
+import { EventSignal, Vector, createLogger, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { form } from 'lib/form/new'
@@ -42,6 +42,8 @@ export const onScheduledBlockPlace = new EventSignal<{
   schedules: readonly ScheduledBlockPlace[]
 }>()
 
+const logger = createLogger('SheduledPlace')
+
 // If we will not use immutable unproxied value,
 // proxy wrapper will convert all values into subproxies
 // which is too expensive when arrays are very big
@@ -71,16 +73,13 @@ function* scheduledBlockPlaceJob() {
         }
 
         block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
-        console.log(
-          t`Schedule place ${schedule.typeId.replace('minecraft:', '')} to ${Vector.string(schedule.location, true)}, remains ${schedules.length - 1}`,
-        )
+        logger.info`Schedule place ${schedule.typeId.replace('minecraft:', '')} to ${schedule.location}, remains ${schedules.length - 1}`
         EventSignal.emit(onScheduledBlockPlace, { schedule, block, schedules })
       } catch (e) {
         if (e instanceof LocationInUnloadedChunkError) {
           yield
           continue
-        }
-        console.error('Unable to place schedule', e)
+        } else logger.error`Unable to place: ${e}`
       }
 
       // Remove successfully placed block from the schedule array

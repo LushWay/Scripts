@@ -2,10 +2,10 @@ import { Player, system, world } from '@minecraft/server'
 import { Cooldown, Settings, Vector, actionGuard, inventoryIsEmpty, ms } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/config'
 import { Quest } from 'lib/quest/quest'
+import { ALLOW_SPAWN_PROP } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
-import { ALLOW_SPAWN_PROP } from 'modules/survival/guard'
 
 const gravestoneOwnerKey = 'owner'
 export const gravestoneEntity = CustomEntityTypes.Grave
@@ -36,22 +36,12 @@ world.afterEvents.entityDie.subscribe(event => {
 
     const gravestoneContainer = gravestone.container
 
-    // if (playerContainer && gravestoneContainer) {
-    //   for (const [i, item] of playerContainer.entries()) {
-    //     if (!item || item.keepOnDeath) continue
-    //     gravestoneContainer.setItem(i, item)
-    //     playerContainer.setItem(i, undefined)
-    //     console.log('Added', item.typeId, item.amount)
-    //   }
-    // }
-
     system.delay(() => {
       dimension.getEntities({ location: head, type: 'minecraft:item', maxDistance: 2 }).forEach(e => {
         const item = e.getComponent('item')?.itemStack
         if (item) {
           gravestoneContainer?.addItem(item)
           e.remove()
-          // console.log('Dropped', item.typeId, item.amount)
         }
       })
     })

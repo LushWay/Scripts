@@ -8,8 +8,6 @@ import '../places/village-of-miners/village-of-miners'
 import '../features/import'
 
 import '../quests/index'
-
-import './guard'
 import './stats'
 
 import './death-quest-and-gravestone'

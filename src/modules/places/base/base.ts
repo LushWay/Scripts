@@ -1,10 +1,11 @@
 import { Block, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { LockAction, Region, Vector, getBlockStatus } from 'lib'
+import { LockAction, Mail, Region, Vector, createLogger, getBlockStatus } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { actionGuard } from 'lib/region/index'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
+import { Rewards } from 'lib/shop/rewards'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { askForExitingNewbieMode, isNewbie } from 'modules/pvp/newbie'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
@@ -76,8 +77,19 @@ system.runInterval(
         }
       } else {
         // TODO База должна сгнить
-        base.forEachOwner(player => player.fail(`§cБаза с владельцем §f${base.ownerName}§c разрушена.`))
-        base.delete()
+        base.forEachOwner(player => {
+          const message = `§cБаза с владельцем §f${base.ownerName}§c разрушена.`
+          if (player instanceof Player) {
+            player.fail(message)
+          } else {
+            Mail.send(
+              player,
+              message,
+              'База была зарейжена. Сожалеем. Вы все еще можете восстановить ее если она не сгнила',
+              new Rewards(),
+            )
+          }
+        })
       }
     }
   },
@@ -85,9 +97,11 @@ system.runInterval(
   10,
 )
 
+const logger = createLogger('Base')
+
 function createBase(block: Block, player: Player) {
   const center = Vector.floor(block.location)
-  if (!player.isSimulated()) player.log('Base', 'created a on ' + Vector.string(center, true))
+  if (!player.isSimulated()) logger.player(player).info`Created on ${center}`
   BaseRegion.create(new SphereArea({ center, radius: 10 }, block.dimension.type), {
     permissions: {
       doors: false,

@@ -1,11 +1,10 @@
 import { Entity, EntityLifetimeState, PlayerInteractWithEntityBeforeEvent, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Temporary, Vector } from 'lib'
+import { createLogger, Temporary, Vector } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
-import { location } from 'lib/location'
-import { t } from 'lib/text'
+import { location, SafeLocation } from 'lib/location'
 import { Place } from './place'
 
 export declare namespace Npc {
@@ -19,7 +18,7 @@ export class Npc {
 
   static npcs: Npc[] = []
 
-  location
+  location: SafeLocation<Vector3>
 
   private entity: Entity | undefined
 
@@ -57,7 +56,7 @@ export class Npc {
   }
 
   private spawn() {
-    console.debug('Spawning npc at ' + Vector.string(this.location as Vector3))
+    Npc.logger.info`Spawning at ${this.location}`
     if (!this.location.valid) {
       throw new TypeError(`§cNpc(§r${this.id}§r§c): Location is not valid, spawn is impossible. Set location first`)
     }
@@ -83,6 +82,8 @@ export class Npc {
     if (this.location.valid) entity.teleport(this.location)
   }
 
+  static logger = createLogger('Npc')
+
   static {
     world.beforeEvents.playerInteractWithEntity.subscribe(event => {
       if (event.target.typeId !== MinecraftEntityTypes.Npc) return
@@ -100,7 +101,7 @@ export class Npc {
           }
         } catch (e) {
           event.player.warn(`Не удалось открыть диалог. ${developersAreWarned}`)
-          console.error(e)
+          this.logger.error(e)
         }
       })
     })
@@ -119,9 +120,8 @@ export class Npc {
             }))
 
             const filteredNpcs = npcs.filter(e => e.npc === npc.id)
-            console.debug(
-              t`${'NpcLoading'}: all: ${npcs.length}, filtered: ${filteredNpcs.length}, action: ${filteredNpcs.length > 1 ? 'removing' : 'none'}`,
-            )
+            this.logger
+              .info`all: ${npcs.length}, filtered: ${filteredNpcs.length}, action: ${filteredNpcs.length > 1 ? 'removing' : 'none'}`
 
             if (filteredNpcs.length > 1) {
               // More then one? Save only first one, kill others

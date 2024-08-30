@@ -1,12 +1,14 @@
 import { Player, PlayerBreakBlockBeforeEvent } from '@minecraft/server'
+import { createLogger } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
 import { actionGuard, addAddableRegion } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
-import { t } from 'lib/text'
 import { ms } from 'lib/utils/ms'
 import { onScheduledBlockPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
+
+const logger = createLogger('MineareaRegion')
 
 export class MineareaRegion extends RegionWithStructure {
   /** MineArea is more prior then other regions */
@@ -24,7 +26,7 @@ export class MineareaRegion extends RegionWithStructure {
 
   protected onCreate(): void {
     this.saveStructure()
-    console.log('Created new MineArea region and saved structure')
+    logger.info`Created new MineArea region ${this.key} and saved structure`
   }
 
   onBlockBreak(player: Player, event: PlayerBreakBlockBeforeEvent) {
@@ -83,11 +85,11 @@ onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
 
     const toRestore = schedules.filter(e => region.area.isVectorIn(e.location, region.dimensionId) && e !== schedule)
     if (toRestore.length) {
-      // console.log(t`Still blocks to restore: ${toRestore.length}`)
+      // logger.debug`Still blocks to restore: ${toRestore.length}`
       continue
     }
 
-    console.log(t`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`)
+    logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
     region.loadStructure()
   }
 })

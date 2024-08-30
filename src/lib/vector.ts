@@ -1,4 +1,14 @@
+export const VectorSymbol = Symbol('vector')
 export class Vector {
+  static is = (unit: unknown): unit is Vector =>
+    !!(
+      unit &&
+      typeof unit === 'object' &&
+      (unit instanceof Vector ||
+        (Object.keys(unit).length === 3 && Object.keys(unit).every(e => ['x', 'y', 'z'].includes(e))) ||
+        VectorSymbol in unit)
+    )
+
   /**
    * Returns string representation of vector ('x y z')
    *
@@ -350,4 +360,6 @@ export class Vector {
     const DirectionZ = this.z / magnitude
     return new Vector(DirectionX, DirectionY, DirectionZ)
   }
+
+  [VectorSymbol] = true
 }

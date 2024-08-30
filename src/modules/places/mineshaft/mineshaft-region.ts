@@ -1,9 +1,11 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { addAddableRegion, ms } from 'lib'
+import { addAddableRegion, createLogger, ms } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { MineareaRegion } from '../minearea/minearea-region'
 import { ores, placeOre } from './algo'
+
+const logger = createLogger("MineshaftRegion")
 
 export class MineshaftRegion extends MineareaRegion {
   protected onCreate(): void {
@@ -21,7 +23,7 @@ export class MineshaftRegion extends MineareaRegion {
       })
       .then(() => {
         this.saveStructure()
-        console.log('Created new mineshaft region. Ores found:', oresFound)
+        logger.info`Created new mineshaft region. Ores found: ${oresFound}`
       })
   }
 

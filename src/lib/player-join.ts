@@ -5,6 +5,7 @@ import { Settings } from 'lib/settings'
 import { t } from 'lib/text'
 import { util } from 'lib/util'
 import { getFullname } from './get-fullname'
+import { Core } from './extensions/core'
 
 class JoinBuilder {
   config = {
@@ -13,11 +14,11 @@ class JoinBuilder {
       stages: ['» $title «', '»  $title  «'],
       /** @type {Record<string, string>} */
       vars: {
-        title: '§6§lDevelopment§r§f',
+        title: `${Core.name}§r§f`,
       },
     },
     actionBar: '', // Optional
-    subtitle: 'Разработка!', // Optional
+    subtitle: 'Добро пожаловать!', // Optional
     messages: {
       air: '§8Очнулся в воздухе',
       ground: '§8Проснулся',

@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 
-const message = '§9┌ §fReloading script...'
-if (!__VITEST__) console.log(message)
+const message = '§9> §fReloading script...'
+if (!__VITEST__) console.info(message)
 if (!__RELEASE__) world.say(message)
-if (__GIT__) console.log('§7' + __GIT__)
+if (__GIT__) console.info('§7' + __GIT__)
 // AAA

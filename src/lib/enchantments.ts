@@ -34,7 +34,7 @@ function load() {
     for (const [slot, item] of chest.container.entries()) {
       if (expecting === 0) break
       if (!item) {
-        console.log(`No item on slot`, slot, 'in', structure)
+        console.warn(`No item on slot`, slot, 'in', structure)
         continue
       }
 

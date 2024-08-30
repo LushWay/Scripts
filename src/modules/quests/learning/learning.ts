@@ -1,5 +1,5 @@
 import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
-import { ActionForm, location, Temporary, Vector } from 'lib'
+import { ActionForm, createLogger, location, Temporary, Vector } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard, SafeAreaRegion } from 'lib'
@@ -9,7 +9,6 @@ import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
-import { t } from 'lib/text'
 import { Axe } from 'modules/features/axe'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
@@ -22,6 +21,8 @@ import airdropTable from './airdrop'
 
 // TODO Write second quests for investigating other places
 // TODO Add catscenes
+
+const logger = createLogger('Learning Quest')
 
 class Learning {
   id = 'learning'
@@ -47,7 +48,7 @@ class Learning {
           if (player.id !== ep.id) return
           if (!Axe.breaks.includes(brokenBlockPermutation.type.id)) return
 
-          player.log('mined', brokenBlockPermutation.type.id)
+          logger.player(player).info`Mined ${brokenBlockPermutation.type.id}`
 
           player.playSound(Sounds.Action)
           ctx.diff(1)
@@ -88,7 +89,7 @@ class Learning {
         function getAirdrop() {
           const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
           if (!airdrop) {
-            ctx.player.log(ctx.quest.id, t.error`No airdrop found`)
+            logger.player(player).warn`No airdrop found`
             return spawnAirdrop()
           }
           return airdrop
@@ -282,7 +283,7 @@ class Learning {
         )
       })
 
-      console.log('Teleporting to', Vector.string(this.randomTeleportLocation))
+      logger.info`Teleporting to ${this.randomTeleportLocation}`
       player.database.survival.doNotSaveAnarchy = 1
       player.teleport(this.randomTeleportLocation)
 

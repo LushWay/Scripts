@@ -1,6 +1,7 @@
 import { GameMode, Player } from '@minecraft/server'
-import { InventoryStore, Portal, ValidLocation, Vector, location } from 'lib'
+import { InventoryStore, Portal, ValidLocation, Vector, createLogger, location, rawMessageToString } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'
+import { itemDescription } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
@@ -83,15 +84,17 @@ class AnarchyBuilder extends AreaWithInventory {
       })
   }
 
+  private logger = createLogger('Anarchy')
+
   loadInventory(player: Player) {
     if (this.inventoryStore.has(player.id)) {
-      player.log('Anarchy', 'loading saved inventory')
+      this.logger.player(player).info`Loading saved inventory`
       InventoryStore.load({
         to: player,
         from: this.inventoryStore.get(player.id, { remove: true }),
       })
     } else {
-      player.log('Anarchy', 'loading empty inventory')
+      this.logger.player(player).info`Loading EMPTY inventory`
       InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
     }
 
@@ -106,11 +109,9 @@ class AnarchyBuilder extends AreaWithInventory {
     })
     const inv = this.inventoryStore.get(player.id, { remove: false, fallback: InventoryStore.emptyInventory })
 
-    player.log(
-      'Anarchy',
-      'saved inventory',
-      Object.entries(inv.slots).map(e => `${e[0]} ${e[1].typeId}`),
-    )
+    this.logger.player(player).info`Saved inventory:\n${Object.entries(inv.slots)
+      .map(([slot, item]) => ` §6${slot}§f ${rawMessageToString(itemDescription(item), 'ru_RU')}`)
+      .join('\n')}`
 
     // Do not save location if on spawn
     if (

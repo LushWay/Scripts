@@ -17,8 +17,6 @@ export abstract class RegionWithStructure extends Region {
 
   saveStructure() {
     this.checkSaveability()
-
-    // console.log('Saving structure with name', this.structureName, 'and egdes', this.edges)
     world.structureManager.createFromWorld(this.structureName, this.dimension, ...this.area.edges, {
       saveMode: StructureSaveMode.World,
       includeEntities: false,

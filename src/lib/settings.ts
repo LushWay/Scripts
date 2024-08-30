@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+import { createLogger } from 'lib'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { FormCallback } from 'lib/form/utils'
@@ -196,6 +197,8 @@ export class Settings {
   }
 }
 
+const logger = createLogger('Settings')
+
 export function settingsGroupMenu(
   player: Player,
   groupName: string,
@@ -206,6 +209,7 @@ export function settingsGroupMenu(
   back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
   showHintAboutSavedStatus = true,
 ) {
+  const displayType = forRegularPlayer ? 'own' : 'world'
   const config = configSource[groupName]
   const store = Settings.parseConfig(storeSource, groupName, config, forRegularPlayer ? player : null)
   const buttons: [string, (input: string | boolean) => string][] = []
@@ -278,19 +282,13 @@ export function settingsGroupMenu(
 
           if (stringify(store[key]) === stringify(result)) return ''
           if (typeof result !== 'undefined') {
-            player.log(
-              'Settings',
-              t`Changed ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' to '${result}'`,
-            )
+            logger.player(player).info`Changed ${displayType} setting '${groupName} > ${key}' to '${result}'`
             store[key] = result
           }
 
           return showHintAboutSavedStatus ? '§aСохранено!' : ''
         } catch (error: unknown) {
-          player.log(
-            'Settings',
-            t.error`Changing ${forRegularPlayer ? 'own' : 'world'} setting '${groupName} > ${key}' error: ${error}`,
-          )
+          logger.player(player).info`Changing ${displayType} setting '${groupName} > ${key}' error: ${error}`
 
           return stringifyError.isError(error) ? `§c${error.message}` : stringify(error)
         }

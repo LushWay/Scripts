@@ -141,20 +141,7 @@ declare global {
 }
 
 function format(args: unknown[]) {
-  const isPacket = typeof args[0] === 'string' && args[0].startsWith('[Packet]')
-  if (typeof globalThis.loaded === 'number' && globalThis.loaded !== 0 && !isPacket && !__VITEST__) prefixFormat(args)
   return args.map(e => util.toTerminalColors(stringify(e))).join(' ')
-}
-
-function prefixFormat(args: unknown[]) {
-  if (typeof args[0] === 'string' && args[0].startsWith('§9')) return
-
-  args.forEach((e, i) => {
-    if (typeof e === 'string') {
-      args[i] = e.replace(/\n/g, '\n§9│ §r')
-    }
-  })
-  args.unshift('§9│ §r')
 }
 
 expand(console, {

@@ -316,7 +316,6 @@
             },
             "deals_damage": false
           },
-
           {
             "on_damage": {
               "filters": {
