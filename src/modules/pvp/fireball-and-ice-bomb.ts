@@ -1,7 +1,9 @@
 import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { ms } from 'lib'
+import { ms, Vector } from 'lib'
+import { customItems } from 'modules/commands/getitem'
+import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 // TODO Make custom items and throw effects work properly
 // TODO FIX ALL THAT BUGGED SHIT
@@ -29,13 +31,15 @@ import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 // })
 
 export const FireBallItem = new ItemStack('lw:fireball').setInfo(
-  '§4Огненный шар\n§7(use)',
+  undefined,
   'Используйте, чтобы отправить все в огненный ад',
 )
 export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
   '§3Снежная бомба\n§7(use)',
   'Используйте, чтобы отправить все к снежной королеве под льдину',
 )
+
+customItems.push(FireBallItem, IceBombItem)
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
@@ -90,19 +94,30 @@ system.runInterval(
     for (const entity of iceBombs) {
       if (!entity.isValid()) continue
 
-      const block = entity.dimension.getBlock(entity.location)
-      if (block && block.typeId in ICE_BOMB_TRANSOFORM) {
-        scheduleBlockPlace({
-          dimension: entity.dimension.type,
-          location: block.location,
-          typeId: block.typeId,
-          states: block.permutation.getAllStates(),
-          restoreTime: ms.from('min', 1),
-        })
+      const base = Vector.floor(entity.location)
+      getEdgeBlocksOf(base)
+        .concat(base)
+        .forEach(e => {
+          const block = entity.dimension.getBlock(e)
+          const transform = block && block.typeId in ICE_BOMB_TRANSOFORM
+          const water = block?.isWaterlogged
+          if (transform || water) {
+            scheduleBlockPlace({
+              dimension: entity.dimension.type,
+              location: block.location,
+              typeId: block.typeId,
+              states: block.permutation.getAllStates(),
+              restoreTime: ms.from('min', 1),
+            })
 
-        block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
-        entity.remove()
-      }
+            if (transform) {
+              block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
+            } else if (water) {
+              block.setWaterlogged(false)
+            }
+            if (entity.isValid()) entity.remove()
+          }
+        })
     }
   },
   'ice bomb ice place',
