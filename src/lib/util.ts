@@ -139,7 +139,7 @@ export type Paginator = ReturnType<(typeof util)['paginate']>
  * @returns Formatted string
  */
 export function separateNumberWithDots(n = 0, separator = '.') {
-  return n < 100 ? n.toString() : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
+  return n.toFixed() !== n.toString() ? n.toFixed(2) : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator)
 }
 
 /**
