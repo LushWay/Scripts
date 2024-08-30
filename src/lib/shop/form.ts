@@ -1,6 +1,7 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { getAuxOrTexture } from 'lib'
+import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
@@ -129,20 +130,10 @@ export class ShopForm {
     return this
   }
 
-  dynamicCostItem(type: MinecraftItemTypes) {
-    return {
-      /** Sets default count */
-      defaultCount: (defaultCount = 100) => ({
-        /** Sets max count */
-        maxCount: (maxCount = 1000) => ({
-          /** Sets base price (aka minPrice) */
-          minPrice: (minPrice: number) => {
-            createSellableItem({ form: this, shop: this.shop, type, defaultCount, maxCount, minPrice })
-            return this as ShopForm
-          },
-        }),
-      }),
-    }
+  dynamicCostItem(typeId: keyof (typeof shopFormula)['shop'], template = shopFormula.shop[typeId]) {
+    const { defaultCount, maxCount, minPrice, k } = template
+    createSellableItem({ form: this, shop: this.shop, type: typeId, defaultCount, maxCount, minPrice, k })
+    return this as ShopForm
   }
 
   /**

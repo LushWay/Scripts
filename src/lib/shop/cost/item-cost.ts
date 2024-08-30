@@ -31,12 +31,13 @@ export class ItemCost extends Cost {
     let amount = this.amount
     const slots = new Map<number, number | undefined>()
     for (const [i, item] of player.container.entries()) {
+      if (amount === 0) break
       if (!item || !this.is(item)) continue
 
       amount -= item.amount
       if (amount < 0) {
         // in this slot there is more items then we need
-        slots.set(i, -amount)
+        slots.set(i, -(amount + item.amount))
         break
       } else {
         // take all the items from this slot

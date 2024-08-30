@@ -57,19 +57,6 @@ export class Gunsmith extends ShopNpc {
             })
           },
         )
-
-        .section('Все для рейда', form => {
-          form
-            .dynamicCostItem(i.Tnt)
-            .defaultCount(0)
-            .maxCount(1000)
-            .minPrice(900)
-
-            .dynamicCostItem(i.Gunpowder)
-            .defaultCount(0)
-            .maxCount(10000)
-            .minPrice(100)
-        })
     })
   }
 

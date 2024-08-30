@@ -1,8 +1,10 @@
+import { Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { BUTTON, getAuxOrTexture } from 'lib'
+import { shopFormula } from 'lib/assets/shop'
 import { t } from 'lib/text'
-import { ItemCost, MoneyCost } from '../cost'
-import { ErrorCost } from '../cost/cost'
+import { ItemCost, MoneyCost, MultiCost } from '../cost'
+import { ErrorCost, FreeCost } from '../cost/cost'
 import { ShopForm, ShopFormSection } from '../form'
 import { itemDescription } from '../rewards'
 import { Shop } from '../shop'
@@ -14,6 +16,7 @@ export function createSellableItem({
   defaultCount,
   maxCount,
   minPrice,
+  k,
 }: {
   shop: Shop
   form: ShopForm
@@ -21,38 +24,56 @@ export function createSellableItem({
   defaultCount: number
   maxCount: number
   minPrice: number
+  k: number
 }) {
   const aux = getAuxOrTexture(type)
+  const db = ShopForm.database[shop.id]
+  const body = () =>
+    t.raw`Товара на складе: ${t`${db[type] ?? 0}/${maxCount}`}, ${t`${(((db[type] ?? 0) / maxCount) * 100).toFixed(2)}%%`}`
+  const getCount = () => Math.max(1, db[type] ?? defaultCount)
+  const getBuy = (count = getCount()) => {
+    return Math.max(1, shopFormula.formula(maxCount, count, minPrice, k))
+  }
+
   form.section(
     itemDescription({ typeId: type, amount: 0 }),
-    form => {
-      const db = ShopForm.database[shop.id]
-      const getCount = () => Math.max(1, db[type] ?? defaultCount)
-      const getBuy = (count = getCount()) => {
-        return Math.max(1, (maxCount / count) * minPrice)
-      }
-      const original = form.body.bind(form)
-
-      form.body = () => t.raw`${original()}\nТовара на складе: ${t`${db[type] ?? 0}/${maxCount}`}`
+    (form, player) => {
+      form.body = body
       form.section(
         '§3Продать',
         form => {
+          form.body = body
           const addSell = createSell(getCount(), getBuy, type, form, db, maxCount, aux)
           addSell(1)
-          addSell(10)
-          addSell(20)
-          addSell(100)
-          addSell(500)
+          addSell(16)
+          addSell(32)
+          addSell(64)
+          addSell(256)
+          addSell(countItems(player, type))
         },
         BUTTON['+'],
       )
 
       const addBuy = createBuy(getCount(), getBuy, form, type, db, aux)
       addBuy(1)
-      addBuy(10)
-      addBuy(20)
-      addBuy(100)
-      addBuy(500)
+      addBuy(16)
+      addBuy(32)
+      addBuy(64)
+      addBuy(256)
+
+      let money = player.scores.money
+      let i = 0
+      for (;;) {
+        money -= getBuy(getCount() - i)
+        if (money > 0 && getCount() - i > 0) {
+          // More money, reduce
+          i++
+        } else {
+          // No more money, add item
+          if (i > 0) addBuy(i)
+          break
+        }
+      }
     },
     aux,
   )
@@ -60,6 +81,8 @@ export function createSellableItem({
 
 const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
 const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
+export const ImpossibleBuyCost = ErrorCost(t.error`Покупка невозможна`)
+export const ImpossibleSellCost = ErrorCost(t.error`Продажа невозможна`)
 
 function createBuy(
   dbCount: number,
@@ -70,13 +93,9 @@ function createBuy(
   aux: string,
 ) {
   return (count = 1) => {
-    let total = 0
-    for (let i = 0; i <= count; i++) {
-      total += getBuy(dbCount - i) / 5
-    }
-    total = ~~total
+    const total = getTotal(count, i => getBuy(dbCount - i))
+    const cost = total <= 0 ? ImpossibleBuyCost : dbCount - count < 0 ? NoItemsToSell : new MoneyCost(total)
 
-    const cost = total <= 0 || dbCount - count < 0 ? NoItemsToSell : new MoneyCost(total)
     form.product(
       itemDescription({ typeId: type, amount: count }),
       cost,
@@ -104,13 +123,12 @@ function createSell(
   aux: string,
 ) {
   return (count = 1) => {
-    let total = 0
-    for (let i = 0; i <= count; i++) {
-      total += getSell(dbCount + i)
-    }
-    total = ~~total
+    const total = getTotal(count, n => getSell(dbCount + n) / 2)
+    const cost = new MultiCost(
+      total <= 0 ? ImpossibleSellCost : count + dbCount > maxCount ? TooMuchItems : FreeCost,
+      new ItemCost(type, count),
+    )
 
-    const cost = total <= 0 || count + dbCount > maxCount ? TooMuchItems : new ItemCost(type, count)
     form.product(
       new MoneyCost(total).toString(),
       cost,
@@ -122,4 +140,23 @@ function createSell(
       true,
     )
   }
+}
+
+function getTotal(addCount: number, adder: (n: number) => number) {
+  let total = 0
+  for (let i = 0; i < addCount; i++) {
+    total += adder(i)
+  }
+  return ~~total
+}
+
+function countItems(player: Player, type: string) {
+  let count = 0
+  if (!player.container) return 0
+  for (const [, item] of player.container.entries()) {
+    if (!item || item.typeId !== type) continue
+
+    count += item.amount
+  }
+  return count
 }
