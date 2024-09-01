@@ -1,5 +1,5 @@
 import { LootTable } from 'lib'
-import { ChestLoot } from 'lib/chest-loot/chest-loot'
+import { ChestLoot } from 'lib/crates/chest-loot'
 import { Cutscene } from 'lib/cutscene'
 import { Quest } from 'lib/quest'
 import { t } from 'lib/text'
