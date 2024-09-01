@@ -1,5 +1,4 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { getAuxOrTexture } from 'lib'
 import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
@@ -177,13 +176,9 @@ export class ShopForm {
       if ('cost' in button) {
         // Buy/sell
         const { name, cost, onBuy, texture, sell } = button
-        const canBuy = cost.has(player)
-        const unit = canBuy ? '§f' : '§7'
-        const text = typeof name === 'function' ? name(canBuy) : name
+        const { productName, text } = Cost.productName(name, cost, player)
 
-        actionForm.addButton(t.options({ unit }).raw`§l${text}§r\n${cost.toString(canBuy, player)}`, texture, () =>
-          this.buy({ text: text, cost, onBuy, player, back, sell }),
-        )
+        actionForm.addButton(productName, texture, () => this.buy({ text, cost, onBuy, player, back, sell }))
       } else if ('onOpen' in button) {
         // Section
         const { name, onOpen, texture } = button

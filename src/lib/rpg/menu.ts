@@ -1,6 +1,6 @@
 import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
 import { InventoryInterval } from 'lib/action'
-import { CustomItems } from 'lib/assets/config'
+import { Items } from 'lib/assets/custom-items'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
@@ -11,7 +11,7 @@ import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPo
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
 
-  static createItem(typeId: string = CustomItems.Menu, name = '§b§lМеню\n§r§f(use)') {
+  static createItem(typeId: string = Items.Menu, name = '§b§lМеню\n§r§f(use)') {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
@@ -46,7 +46,7 @@ export class Menu {
   }
 
   static isCompass(slot: Pick<ContainerSlot, 'typeId'>) {
-    return !!slot.typeId?.startsWith(CustomItems.CompassPrefix)
+    return !!slot.typeId?.startsWith(Items.CompassPrefix)
   }
 
   static isMenu(slot: Pick<ContainerSlot, 'typeId'>) {
@@ -72,7 +72,7 @@ export class Compass {
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(`${CustomItems.CompassPrefix}${i}`, '§r§l§6Цель\n§r§7(use)')
+    return Menu.createItem(`${Items.CompassPrefix}${i}`, '§r§l§6Цель\n§r§7(use)')
   })
 
   /** Map of player as key and compass target as value */

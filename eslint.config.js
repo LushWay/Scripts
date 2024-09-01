@@ -1,6 +1,5 @@
 import eslint from '@eslint/js'
 import prettier from 'eslint-config-prettier'
-import onlyWarn from 'eslint-plugin-only-warn'
 import ts from 'typescript-eslint'
 
 export default ts.config(
@@ -34,6 +33,7 @@ export default ts.config(
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-deprecated': 'off',
       '@typescript-eslint/no-extraneous-class': 'off',
       '@typescript-eslint/no-invalid-void-type': 'off',
       '@typescript-eslint/no-confusing-void-expression': 'off',
@@ -82,11 +82,6 @@ export default ts.config(
         },
       ],
     },
-    plugins: process.env.CI
-      ? {}
-      : {
-          'only-warn': onlyWarn,
-        },
   },
   {
     files: ['src/lib/extensions/**'],
@@ -97,4 +92,15 @@ export default ts.config(
       '@typescript-eslint/no-unsafe-assignment': 'off',
     },
   },
+  ...(process.env.CI
+    ? []
+    : ts.config({
+        plugins: {
+          'file-progress': (await import('eslint-plugin-file-progress')).default,
+          'only-warn': (await import('eslint-plugin-only-warn')).default,
+        },
+        rules: {
+          'file-progress/activate': 'warn',
+        },
+      })),
 )

@@ -1,6 +1,6 @@
 import { MolangVariableMap, Player, system, world } from '@minecraft/server'
 import { ArrayForm, isKeyof, Vector } from 'lib'
-import { CustomItems } from 'lib/assets/config'
+import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -8,7 +8,7 @@ import { t } from 'lib/text'
 import { DungeonRegion } from 'modules/places/dungeons/dungeon'
 import { Dungeon } from './loot'
 
-const toolSchema = new ItemLoreSchema('dungeonCreationTool', CustomItems.WeTool)
+const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
   .nameTag(() => '§fСоздает данж')
   .lore('§7Используй, чтобы создать данж')
   .property('type', String)

@@ -1,6 +1,7 @@
 import { BlockPermutation, Player, RawText } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { nmspc } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
 import { inspect, util } from 'lib/util'
@@ -8,10 +9,12 @@ import { typeIdToReadable } from 'lib/utils/lang'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 
-const NUMBER_OF_1_16_100_ITEMS = 41
+const NUMBER_OF_1_16_100_ITEMS = totalCustomItems
 
+const customItemsReverted = Object.map(Items, ([k, v]) => [v, k])
 export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
   if (textureOrTypeId.startsWith('textures')) return textureOrTypeId
+  if (customItemsReverted[textureOrTypeId]) return `textures/items/${textureOrTypeId.replace('lw.', '')}`
 
   const typeId = nmspc(textureOrTypeId)
   const ID = typeIdToID.get(typeId) ?? typeIdToDataId.get(typeId)

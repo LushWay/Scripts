@@ -1,5 +1,5 @@
 {
-  "format_version": "1.16.100",
+  "format_version": "1.20.0",
   "minecraft:item": {
     "description": {
       "identifier": "lw:money"
@@ -7,12 +7,7 @@
     "components": {
       "minecraft:max_stack_size": 64,
       "minecraft:allow_off_hand": false,
-      "minecraft:icon": {
-        "texture": "money"
-      },
-      "minecraft:display_name": {
-        "value": "§6§lМонета§r\n§7(use)"
-      },
+      "minecraft:icon": { "texture": "money" },
       "minecraft:creative_category": {
         "category": "commands"
       }

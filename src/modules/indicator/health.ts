@@ -3,7 +3,7 @@ import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, ms, Vector } from 'lib'
 
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { isNotPlaying } from 'lib/game-utils'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'

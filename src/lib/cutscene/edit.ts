@@ -3,7 +3,7 @@ import { Vector } from 'lib/vector'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, Temporary, isInvalidLocation, util } from 'lib'
-import { CustomItems } from 'lib/assets/config'
+import { Items } from 'lib/assets/custom-items'
 import { t } from 'lib/text'
 import { Cutscene } from './cutscene'
 import { cutscene as cusceneCommand } from './menu'
@@ -15,10 +15,7 @@ const controls: Record<
 > = {
   create: [
     3,
-    new ItemStack(CustomItems.WeTool).setInfo(
-      '§r§6> §fСоздать точку',
-      'используй предмет, чтобы создать точку катсцены.',
-    ),
+    new ItemStack(Items.WeTool).setInfo('§r§6> §fСоздать точку', 'используй предмет, чтобы создать точку катсцены.'),
     (player, cutscene) => {
       if (!cutscene.sections[0]) cutscene.withNewSection(cutscene.sections, {})
 

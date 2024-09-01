@@ -4,8 +4,8 @@
 // Do not modify manually.
     
 export const enchantmentsJson = {
-  "files": 4,
-  "items": 99,
+  "files": 5,
+  "items": 116,
   "levels": {
     "protection": {
       "minecraft:iron_helmet": 5,
@@ -71,6 +71,12 @@ export const enchantmentsJson = {
       "minecraft:iron_sword": 8,
       "minecraft:diamond_sword": 9,
       "minecraft:netherite_sword": 10,
+      "minecraft:enchanted_book": 10
+    },
+    "efficiency": {
+      "minecraft:iron_pickaxe": 8,
+      "minecraft:diamond_pickaxe": 9,
+      "minecraft:netherite_pickaxe": 10,
       "minecraft:enchanted_book": 10
     },
     "power": {

@@ -9,11 +9,13 @@ export interface StructureFile {
   chestPositions: Vector3[]
   enderChestPositions: Vector3[]
 }
+
 export enum StructureRootId {
   CustomEnchantments = 'mystructure:custom_enchantments',
   FloatingItem = 'mystructure:floating_item',
   SpawnV1 = 'mystructure:spawn_v1',
 }
+
 export enum StructureDungeonsId {
   Avanpost = 'mystructure:dungeons/avanpost',
   GasStation1 = 'mystructure:dungeons/gas_station_1',
@@ -22,6 +24,7 @@ export enum StructureDungeonsId {
   GasStation4 = 'mystructure:dungeons/gas_station_4',
   GasStationGarage = 'mystructure:dungeons/gas_station_garage',
 }
+
 export enum StructureTestId {
   Empty = 'mystructure:test/empty',
   Flat5x5x5 = 'mystructure:test/flat_5x5x5',

@@ -2,7 +2,7 @@ import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { Airdrop, Loot, Vector } from 'lib'
 import { t } from 'lib/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
-import { CannonBulletItem, CannonItem } from '../../features/cannon'
+import { CannonItem, CannonShellItem } from '../../features/cannon'
 import { randomLocationInAnarchy } from './random-location-in-anarchy'
 
 const base = new Loot('base_airdrop')
@@ -20,7 +20,7 @@ const base = new Loot('base_airdrop')
   })
   .chance('20%')
 
-  .itemStack(CannonBulletItem.blueprint)
+  .itemStack(CannonShellItem.blueprint)
   .chance('10%')
 
   .itemStack(CannonItem.blueprint)
@@ -41,7 +41,7 @@ const powerfull = new Loot('powerfull_airdrop')
   })
   .chance('20%')
 
-  .itemStack(CannonBulletItem.itemStack)
+  .itemStack(CannonShellItem.itemStack)
   .chance('10%')
 
   .itemStack(CannonItem.itemStack)

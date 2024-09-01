@@ -197,7 +197,7 @@ export class LootTable {
   static onNew = new EventSignal<LootTable>()
 
   constructor(
-    private items: StoredItem[],
+    readonly items: StoredItem[],
     public id?: string,
   ) {
     if (id) {

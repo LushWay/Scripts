@@ -1,6 +1,5 @@
 import { Player } from '@minecraft/server'
 import { MessageForm, noNullable } from 'lib'
-import { Sounds } from 'lib/assets/config'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { t } from 'lib/text'
@@ -20,8 +19,7 @@ quest
     if (!step) return ctx.error('У вас нет активных заданий!')
 
     step.quest.exit(ctx.player)
-    ctx.player.playSound(Sounds.Success)
-    ctx.reply('§6> §fУспешно')
+    ctx.player.success()
   })
 
 quest

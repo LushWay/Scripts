@@ -2,10 +2,10 @@ import { EntityDamageCause, Player, system, TicksPerSecond, world } from '@minec
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { request } from 'lib/bds/api'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 import { Spawn } from '../spawn'
-import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 
 export class RadioactiveZone {
   lastRadius = 0
@@ -38,8 +38,8 @@ export class RadioactiveZone {
           let played = false
           const sound = (volume: number, num = 1) => {
             if (!played && soundTick) {
-              p.runCommand('stopsound @s ' + Sounds['lw.radiation'])
-              for (let i = 0; i < num; i++) p.playSound(Sounds['lw.radiation'], { volume, pitch: i * 0.5 + 1 })
+              p.runCommand('stopsound @s ' + Sounds.Radiation)
+              for (let i = 0; i < num; i++) p.playSound(Sounds.Radiation, { volume, pitch: i * 0.5 + 1 })
             }
             played = true
           }
@@ -56,14 +56,14 @@ export class RadioactiveZone {
 
           if (distance > rad + 20) {
             sound(4, 4)
+            played = true
             p.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`, ActionbarPriority.UrgentNotificiation)
             p.applyDamage(2, { cause: EntityDamageCause.magic })
             if (!p.getEffects().find(e => e.typeId === MinecraftEffectTypes.Darkness))
               p.addEffect(MinecraftEffectTypes.Darkness, 10 * TicksPerSecond, { showParticles: true, amplifier: 255 })
           }
 
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          if (!played) p.runCommand('stopsound @s ' + Sounds['lw.radiation'])
+          if (!played) p.runCommand('stopsound @s ' + Sounds.Radiation)
         }
       },
       'radioactive zone',

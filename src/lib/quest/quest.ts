@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { Join, SETTINGS_GROUP_NAME, Settings } from 'lib'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { Core } from 'lib/extensions/core'
 import { Group } from 'lib/rpg/place'
 import { WeakPlayerMap } from 'lib/weak-player-storage'

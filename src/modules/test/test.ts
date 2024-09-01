@@ -24,7 +24,7 @@ import {
   restorePlayerCamera,
   util,
 } from 'lib'
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { request } from 'lib/bds/api'
 import { CommandContext } from 'lib/command/context'
 import { Cutscene } from 'lib/cutscene'

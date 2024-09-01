@@ -10,9 +10,6 @@
       "minecraft:icon": {
         "texture": "fireball"
       },
-      "minecraft:display_name": {
-        "value": "§6§lОгненный шар§r\n§7(use)"
-      },
       "minecraft:cooldown": {
         "category": "gui",
         "duration": 0.5
@@ -30,7 +27,7 @@
       "throw": {
         "shoot": {
           "projectile": "lw:fireball",
-          "launch_power": 0.4,
+          "launch_power": 0.8,
           "angle_offset": 1
         },
         "swing": {},

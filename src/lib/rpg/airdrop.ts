@@ -1,15 +1,15 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
+import { createLogger } from 'lib/utils/logger'
 import { Vector } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
 import { isInvalidLocation } from '../game-utils'
 import { Temporary } from '../temporary'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './minimap'
-import { createLogger } from 'lib/utils/logger'
 
 // TODO Refactor to use creator style for creating
 // TODO Make internal properties private

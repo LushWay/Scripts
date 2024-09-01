@@ -1,5 +1,5 @@
 import { Entity, EntityLifetimeState, Player, ScoreboardObjective, system, world } from '@minecraft/server'
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'

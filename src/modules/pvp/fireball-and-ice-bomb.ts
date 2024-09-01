@@ -1,34 +1,10 @@
 import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { ms, Vector } from 'lib'
+import { Region, Vector } from 'lib'
 import { customItems } from 'modules/commands/getitem'
+import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
-import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
-// TODO Make custom items and throw effects work properly
-// TODO FIX ALL THAT BUGGED SHIT
-// may use projectileComponent in 1.9.0-beta
-
-// Snow bomb / Fireball
-// world.afterEvents.itemUse.subscribe(data => {
-//   if (!['lw:ice_bomb', 'lw:fireball'].includes(data.itemStack.typeId)) return
-
-//   system.delay(() => {
-//     if (!(data.source instanceof Player)) return
-
-//     const item = data.source.dimension.spawnEntity(
-//       data.itemStack.typeId,
-//       data.source.location
-//     )
-//     const itemSlot = data.source.mainhand()
-
-//     if (itemSlot.amount === 1) itemSlot.setItem(undefined)
-//     else itemSlot.amount--
-
-//     item.applyImpulse(Vector.multiply(data.source.getViewDirection(), 1.5))
-//     data.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
-//   })
-// })
 
 export const FireBallItem = new ItemStack('lw:fireball').setInfo(
   undefined,
@@ -68,7 +44,7 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
 )
 
 const ICE_BOMB_TRANSOFORM: Record<string, string> = {
-  [MinecraftBlockTypes.Water]: MinecraftBlockTypes.Ice,
+  [MinecraftBlockTypes.Water]: MinecraftBlockTypes.FrostedIce,
   [MinecraftBlockTypes.FlowingWater]: MinecraftBlockTypes.Ice,
   [MinecraftBlockTypes.Lava]: MinecraftBlockTypes.Obsidian,
   [MinecraftBlockTypes.FlowingLava]: MinecraftBlockTypes.Stone,
@@ -95,21 +71,17 @@ system.runInterval(
       if (!entity.isValid()) continue
 
       const base = Vector.floor(entity.location)
+      const dimension = entity.dimension
       getEdgeBlocksOf(base)
         .concat(base)
         .forEach(e => {
-          const block = entity.dimension.getBlock(e)
+          const regions = Region.nearestRegions(e, dimension.type)
+          if (!regions.some(e => e instanceof BaseRegion)) return
+
+          const block = dimension.getBlock(e)
           const transform = block && block.typeId in ICE_BOMB_TRANSOFORM
           const water = block?.isWaterlogged
           if (transform || water) {
-            scheduleBlockPlace({
-              dimension: entity.dimension.type,
-              location: block.location,
-              typeId: block.typeId,
-              states: block.permutation.getAllStates(),
-              restoreTime: ms.from('min', 1),
-            })
-
             if (transform) {
               block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
             } else if (water) {

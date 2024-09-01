@@ -1,6 +1,6 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { Cooldown, Join, ms, prompt } from 'lib'
-import { PlayerProperties } from 'lib/assets/player-properties'
+import { PlayerProperties } from 'lib/assets/player-json'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 

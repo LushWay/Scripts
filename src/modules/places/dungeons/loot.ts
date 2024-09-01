@@ -1,11 +1,11 @@
 import { Loot, LootTable } from 'lib'
-import { CustomItems } from 'lib/assets/config'
+import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
-import { CannonBulletItem } from 'modules/features/cannon'
+import { CannonShellItem } from 'modules/features/cannon'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
 
 const defaultLoot = new Loot('dungeon_default_loot')
-  .itemStack(CannonBulletItem.blueprint)
+  .itemStack(CannonShellItem.blueprint)
   .chance('10%')
 
   .item('String')
@@ -19,7 +19,7 @@ const defaultLoot = new Loot('dungeon_default_loot')
   .chance('40%')
   .amount({ '1...2': '1%' })
 
-  .item(CustomItems.Money)
+  .item(Items.Money)
   .chance('100%')
   .amount({
     '10...20': '80%',
@@ -74,7 +74,7 @@ const loot: Record<StructureDungeonsId, LootTable> = {
   [d.GasStation4]: defaultLoot,
   [d.Avanpost]: new Loot(d.Avanpost).item('Apple').chance('100%').build,
   [d.GasStationGarage]: new Loot(`dungeon ${d.GasStationGarage}`)
-    .itemStack(CannonBulletItem.blueprint)
+    .itemStack(CannonShellItem.blueprint)
     .chance('10%')
 
     .item('Apple')
@@ -91,7 +91,7 @@ const loot: Record<StructureDungeonsId, LootTable> = {
     .chance('40%')
     .amount({ '1...2': '1%' })
 
-    .item(CustomItems.Money)
+    .item(Items.Money)
     .chance('100%')
     .amount({
       '10...20': '80%',

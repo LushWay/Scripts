@@ -1,6 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import { ActionForm } from 'lib'
-import { CustomItems } from 'lib/assets/config'
+import { Items } from 'lib/assets/custom-items'
 import { setSelection } from 'modules/world-edit/commands/region/set'
 import { WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -8,7 +8,7 @@ import { WorldEditTool } from '../lib/world-edit-tool'
 const wand = new WorldEditTool({
   name: 'wand',
   displayName: 'топор',
-  itemStackId: CustomItems.WeWand,
+  itemStackId: Items.WeWand,
   overrides: {
     getMenuButtonName(player) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access

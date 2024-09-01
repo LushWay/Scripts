@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { Cooldown, Settings } from 'lib'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'

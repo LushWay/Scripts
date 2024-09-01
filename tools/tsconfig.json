@@ -8,9 +8,9 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2022"],
     "target": "ES2022",
-    "types": [],
+    "types": ["node"],
     "module": "NodeNext"
   },
-  "include": [".", "../../tools/generate-lang-json.ts"],
+  "include": [".", "../../tools/asset-lang-js.ts"],
   "exclude": ["defines.d.ts"]
 }

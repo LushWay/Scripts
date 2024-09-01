@@ -1,12 +1,12 @@
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
+import { CannonItem, CannonShellItem } from 'modules/features/cannon'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
-import { Stoner } from '../lib/npc/stoner'
-import { CannonBulletItem, CannonItem } from 'modules/features/cannon'
-import { Engineer, MicroSchema } from './engineer'
 import { Butcher } from '../lib/npc/butcher'
+import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
+import { Engineer, MicroSchema } from './engineer'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -44,7 +44,7 @@ class TechCityBuilder extends City {
         .itemStack(CannonItem.blueprint)
         .chance('10%')
 
-        .itemStack(CannonBulletItem.blueprint)
+        .itemStack(CannonShellItem.blueprint)
         .chance('10%')
 
         .item('RedTerracotta')
@@ -55,10 +55,10 @@ class TechCityBuilder extends City {
         .chance('10%').build,
 
       new Loot()
-        .itemStack(CannonBulletItem.blueprint)
+        .itemStack(CannonShellItem.blueprint)
         .chance('3%')
 
-        .itemStack(CannonBulletItem.itemStack)
+        .itemStack(CannonShellItem.itemStack)
         .chance('3%')
 
         .itemStack(CannonItem.blueprint)

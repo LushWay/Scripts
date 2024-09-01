@@ -4,7 +4,7 @@ import { Vector, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
-import { actionGuard, ActionGuardOrder } from 'lib/region/index'
+import { ActionGuardOrder, actionGuard } from 'lib/region/index'
 import { Group, Place } from 'lib/rpg/place'
 import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
@@ -86,7 +86,7 @@ export class Furnacer extends ShopNpc {
           form.show(text)
 
           player.scores.money += 20
-          player.playSound(Sounds['lw.pay'])
+          player.playSound(Sounds.Pay)
           return false
         },
       )

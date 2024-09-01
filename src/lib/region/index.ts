@@ -8,7 +8,7 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { PlayerEvents } from 'lib/assets/player-properties'
+import { PlayerEvents } from 'lib/assets/player-json'
 import { isBuilding } from 'lib/game-utils'
 import { EventSignal } from '../event-signal'
 import { BLOCK_CONTAINERS, DOORS, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES, SWITCHES, TRAPDOORS } from './config'

@@ -3,7 +3,7 @@ import { ActionForm, ActionGuardOrder, location, Temporary, Vector } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
@@ -55,7 +55,7 @@ class Learning {
 
           logger.player(player).info`Mined ${brokenBlockPermutation.type.id}`
 
-          player.playSound(Sounds.Action)
+          player.playSound(Sounds.Success)
           ctx.diff(1)
         })
       })
@@ -151,7 +151,7 @@ class Learning {
           if (event.player.id !== player.id) return
           if (event.brokenBlockPermutation.type.id !== b.Stone) return
 
-          player.playSound(Sounds.Action)
+          player.playSound(Sounds.Success)
           ctx.diff(1)
         })
       })
@@ -200,7 +200,7 @@ class Learning {
             if (ctx.value === 0 ? id !== b.Stone : id !== b.IronOre && id !== MinecraftItemTypes.DeepslateIronOre)
               return
 
-            player.playSound(Sounds.Action)
+            player.playSound(Sounds.Success)
             ctx.diff(1)
           },
         )

@@ -1,6 +1,7 @@
 import { Entity, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, world } from '@minecraft/server'
 import { ModalForm, Vector, is } from 'lib'
-import { CustomEntityTypes, CustomItems } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { Items } from 'lib/assets/custom-items'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG } from '../config'
 import { BaseBrushTool } from '../lib/base-brush-tool'
@@ -44,7 +45,7 @@ class BrushTool extends BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }
 const brush = new BrushTool({
   name: 'brush',
   displayName: 'кисть',
-  itemStackId: CustomItems.WeBrush,
+  itemStackId: Items.WeBrush,
   loreFormat: {
     version: 2,
 

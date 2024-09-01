@@ -7,7 +7,7 @@ import {
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data'
 import { Enchantments, getAuxOrTexture, isKeyof } from 'lib'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'

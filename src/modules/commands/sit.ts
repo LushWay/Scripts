@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { LockAction } from 'lib'
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 
 new Command('sit')

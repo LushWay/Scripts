@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { developersAreWarned } from 'lib/assets/text'
 import { ROLES } from 'lib/roles'
 import { inaccurateSearch } from '../search'

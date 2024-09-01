@@ -1,0 +1,16 @@
+{
+  "format_version": "1.20.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "lw:chip"
+    },
+    "components": {
+      "minecraft:max_stack_size": 64,
+      "minecraft:allow_off_hand": false,
+      "minecraft:icon": { "texture": "chip" },
+      "minecraft:creative_category": {
+        "category": "commands"
+      }
+    }
+  }
+}

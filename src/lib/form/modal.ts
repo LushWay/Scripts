@@ -77,7 +77,6 @@ export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> 
    * @param options.noneText
    * @returns This
    */
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   addDropdownFromObject<T extends Record<string, string> = Record<string, string>, None extends false | true = false>(
     label: string,
     object: T,

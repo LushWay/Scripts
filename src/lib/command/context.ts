@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 
 export class CommandContext {
   input

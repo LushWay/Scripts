@@ -1,5 +1,5 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { request } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { expand } from './extend'
@@ -168,8 +168,8 @@ expand(Player.prototype, {
 
   fail: prefix('§4§l> §r§c', Sounds.Fail),
   warn: prefix('§e⚠ §6', Sounds.Fail),
-  success: prefix('§a§l> §r', Sounds.Action, 'Успешно'),
-  info: prefix('§b§l> §r§3', Sounds.Action),
+  success: prefix('§a§l> §r', Sounds.Success, 'Успешно'),
+  info: prefix('§b§l> §r§3', Sounds.Success),
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   tell: Player.prototype.sendMessage,

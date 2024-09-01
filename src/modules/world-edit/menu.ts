@@ -2,7 +2,7 @@ import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, world } f
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, inspect, is, noNullable, stringify } from 'lib'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { prompt } from 'lib/form/message'
@@ -667,7 +667,7 @@ export function WEundoRedoMenu(
   for (const action of actions.slice().reverse()) {
     form.addButton(action.name, () => {
       we.loadBackup(actions, action)
-      player.playSound(Sounds.Success)
+      player.playSound(Sounds.LevelUp)
       WEundoRedoMenu(player, back, mode, [source, we], '§aУспешно загружено!\n\n')
     })
   }

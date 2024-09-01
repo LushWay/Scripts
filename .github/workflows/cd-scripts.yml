@@ -18,6 +18,9 @@ on:
 
   pull_request:
 
+env:
+  CI: true
+
 jobs:
   test:
     name: Test

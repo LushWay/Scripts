@@ -1,5 +1,5 @@
 import { Entity, ShortcutDimensions, world } from '@minecraft/server'
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { isChunkUnloaded } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
 

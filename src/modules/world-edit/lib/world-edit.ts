@@ -9,7 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 import { Vector, getRole, prompt } from 'lib'
-import { Sounds } from 'lib/assets/config'
+import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { t } from 'lib/text'
 import { stringify } from 'lib/utils/inspect'
@@ -78,7 +78,7 @@ export class WorldEdit {
       const color = { 1: '§5', 2: '§d' }[pos]
 
       this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
-      this.player.playSound(Sounds.Action)
+      this.player.playSound(Sounds.Success)
       this.updateSelectionCuboids()
     })
   }

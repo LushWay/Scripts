@@ -5,7 +5,7 @@ import { Group } from 'lib/rpg/place'
 import { Cost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { MaybeRawText, t } from 'lib/text'
-import { CannonBulletItem, CannonItem } from 'modules/features/cannon'
+import { CannonItem, CannonShellItem } from 'modules/features/cannon'
 import { isNewbie } from 'modules/pvp/newbie'
 import { BaseItem } from '../base/base'
 
@@ -37,7 +37,7 @@ export class Engineer extends ShopNpc {
 
       addItem(BaseItem, new MultiCost(new NotNewbieCost()).money(1000))
       addItem(CannonItem, new MultiCost().money(200))
-      addItem(CannonBulletItem, new MultiCost().money(100).item(new ItemStack(i.SlimeBall)))
+      addItem(CannonShellItem, new MultiCost().money(100).item(new ItemStack(i.SlimeBall)))
 
       menu.section('Все для редстоуна', menu => {
         menu.itemStack(new ItemStack(i.Slime), new MultiCost().money(5))

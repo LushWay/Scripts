@@ -1,6 +1,7 @@
 import { system, world } from '@minecraft/server'
-import { MinecraftItemTypes as i, MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard, ActionGuardOrder, Cooldown, ms, Vector } from 'lib'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
@@ -8,22 +9,21 @@ export const CannonItem = new CustomItemWithBlueprint('cannon')
   .setBlueprintName('Пушка')
   .lore('Используй этот предмет, чтобы установить пушку')
 
-export const CannonBulletItem = new CustomItemWithBlueprint('cannon bullet')
-  .typeId(i.PolishedTuffSlab)
-  .nameTag('Снаряд для пушки')
+export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')
+  .typeId('lw:cannon_shell')
   .lore('Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.')
 
 const cooldown = new Cooldown(ms.from('sec', 5))
 
 world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-  if (CannonBulletItem.isItem(event.itemStack)) {
+  if (CannonShellItem.isItem(event.itemStack)) {
     event.cancel = true
   }
 })
 
 actionGuard((_, __, ctx) => {
   if (ctx.type === 'interactWithEntity') {
-    if (ctx.event.target.typeId === 'lw:cannon') return true
+    if (ctx.event.target.typeId === CustomEntityTypes.Cannon) return true
   }
 }, ActionGuardOrder.Feature)
 
@@ -31,7 +31,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
   if (event.target.typeId !== 'lw:cannon') return
 
   const mainhand = event.player.mainhand()
-  if (!CannonBulletItem.isItem(mainhand.getItem())) return
+  if (!CannonShellItem.isItem(mainhand.getItem())) return
   if (!cooldown.isExpired(event.player)) return
 
   event.cancel = true

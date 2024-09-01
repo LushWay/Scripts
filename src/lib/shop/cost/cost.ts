@@ -1,7 +1,6 @@
 import { Player } from '@minecraft/server'
-import { Sounds } from 'lib/assets/config'
-import { Sounds as CustomSounds } from 'lib/assets/custom-sounds'
-import { MaybeRawText } from 'lib/text'
+import { Sounds as CustomSounds, Sounds } from 'lib/assets/custom-sounds'
+import { MaybeRawText, t } from 'lib/text'
 
 export enum CostType {
   /** Cost with this type removes item from inv, changes score etc */
@@ -13,6 +12,14 @@ export enum CostType {
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export abstract class Cost<T = unknown> {
+  static productName(product: MaybeRawText | ((canBuy: boolean) => MaybeRawText), cost: Cost, player: Player) {
+    const canBuy = cost.has(player)
+    const unit = canBuy ? '§f' : '§7'
+    const text = typeof product === 'function' ? product(canBuy) : product
+
+    return { text, productName: t.options({ unit }).raw`§l${text}§r\n${cost.toString(canBuy, player)}` }
+  }
+
   get type(): CostType {
     return CostType.Action
   }
@@ -42,7 +49,7 @@ export abstract class Cost<T = unknown> {
    * @param player - Buyer
    */
   buy(player: Player): T {
-    if (this.type === CostType.Action) player.playSound(CustomSounds['lw.pay'])
+    if (this.type === CostType.Action) player.playSound(CustomSounds.Pay)
     return undefined as T
   }
 

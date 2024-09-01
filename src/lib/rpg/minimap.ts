@@ -1,6 +1,5 @@
 import { Player, world } from '@minecraft/server'
-import { playerJson } from 'lib/assets/generated'
-import { PlayerProperties } from 'lib/assets/player-properties'
+import { playerJson, PlayerProperties } from 'lib/assets/player-json'
 
 export function setMinimapEnabled(player: Player, status: boolean) {
   player.setProperty(PlayerProperties['lw:minimap'], status)

@@ -1,6 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vector } from 'lib'
-import { CustomEntityTypes } from 'lib/assets/config'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, ALLOW_SPAWN_PROP } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'

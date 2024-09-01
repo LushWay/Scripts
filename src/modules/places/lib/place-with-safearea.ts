@@ -46,7 +46,7 @@ export class PlaceWithSafeArea {
             stayDuration: 3 * TicksPerSecond,
             fadeOutDuration: 2 * TicksPerSecond,
           })
-          player.playSound(Sounds['lw.zone_enter'], { volume: 0.2, pitch: 0.9 })
+          player.playSound(Sounds.ZoneEnter, { volume: 0.2, pitch: 0.9 })
         }
       })
     })
