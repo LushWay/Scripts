@@ -6,7 +6,6 @@ import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
-  .setBlueprintName('Пушка')
   .lore('Используй этот предмет, чтобы установить пушку')
 
 export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')

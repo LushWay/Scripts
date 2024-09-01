@@ -11,10 +11,14 @@ import { BUTTON, showForm } from './utils'
 
 const NUMBER_OF_1_16_100_ITEMS = totalCustomItems
 
-const customItemsReverted = Object.map(Items, ([k, v]) => [v, k])
+const customItemsReverted: Record<string, string> = Object.map(Items, (k, v) => [v, k])
 export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
   if (textureOrTypeId.startsWith('textures')) return textureOrTypeId
-  if (customItemsReverted[textureOrTypeId]) return `textures/items/${textureOrTypeId.replace('lw.', '')}`
+  if (
+    customItemsReverted[textureOrTypeId] ||
+    (textureOrTypeId.startsWith('lw:') && textureOrTypeId.includes('_spawn_egg'))
+  )
+    return `textures/items/${textureOrTypeId.replace('lw:', '').replace('_spawn_egg', '')}`
 
   const typeId = nmspc(textureOrTypeId)
   const ID = typeIdToID.get(typeId) ?? typeIdToDataId.get(typeId)

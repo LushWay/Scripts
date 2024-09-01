@@ -165,7 +165,7 @@ export async function getTopmostSolidBlock(location: Vector3) {
     if (!hit) return false
 
     const { block } = hit
-    if (block.isLiquid || block.isAir) {
+    if (!block.isValid() || block.isLiquid || block.isAir) {
       return false
     } else return block.location
   } else return false

@@ -3,13 +3,10 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { showForm, util } from 'lib'
 import { MaybeRawText, t } from 'lib/text'
 
-type FormCallback<T extends any[] = []> = (player: Player, back?: FormCallback, ...args: T) => void
+export type NewFormCallback = (player: Player, back?: NewFormCallback) => void
 
 class Form {
-  constructor(
-    private self: FormCallback,
-    private player: Player,
-  ) {}
+  constructor(private player: Player) {}
 
   private form = new ActionFormData()
 
@@ -26,7 +23,7 @@ class Form {
     return this as F
   }
 
-  private buttons: (FormCallback | undefined)[] = []
+  private buttons: (NewFormCallback | undefined)[] = []
 
   /** Adds a button to this form */
   button(link: Show, icon?: string | null | undefined): F
@@ -37,7 +34,7 @@ class Form {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, callback: FormCallback): F
+  button(text: MaybeRawText, callback: NewFormCallback): F
 
   /**
    * Adds a button to this form
@@ -46,7 +43,7 @@ class Form {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, iconPath: string | null | undefined, callback: FormCallback): F
+  button(text: MaybeRawText, iconPath: string | null | undefined, callback: NewFormCallback | Show): F
 
   /**
    * Adds a button to this form
@@ -57,8 +54,8 @@ class Form {
    */
   button(
     textOrForm: MaybeRawText | Show,
-    callbackOrIcon: string | null | undefined | FormCallback,
-    callbackOrUndefined?: FormCallback,
+    callbackOrIcon: string | null | undefined | NewFormCallback,
+    callbackOrUndefined?: NewFormCallback | Show,
   ): F {
     let text, icon, callback
 
@@ -78,43 +75,45 @@ class Form {
     }
 
     this.form.button(text, icon ?? undefined)
-    this.buttons.push(callback)
+    this.buttons.push(callback instanceof Show ? callback.show : callback)
     return this
   }
 
-  async show() {
-    if (!this.buttons.length) this.button('Пусто', undefined, () => this.show())
+  show = async () => {
+    if (!this.buttons.length) this.button('Пусто', undefined, this.show)
 
     const response = await showForm(this.form, this.player)
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
       return
 
     const callback = this.buttons[response.selection]
-    if (typeof callback === 'function') util.catch(() => callback(this.player, this.self))
+    if (typeof callback === 'function') util.catch(() => callback(this.player, this.show))
   }
 }
 
 type F = Omit<Form, 'show' | 'currentTitle'>
-type CreateForm<T extends any[]> = (form: F, player: Player, ...args: T) => void
+type CreateForm = (form: F, player: Player, back?: NewFormCallback) => void
 
-export function form<T extends any[]>(create: CreateForm<T>) {
+export function form(create: CreateForm) {
   return new Show(create)
 }
 
-class Show<T extends any[] = []> {
-  constructor(private create: CreateForm<T>) {}
+export class Show {
+  constructor(private create: CreateForm) {}
 
-  show: FormCallback<T> = (player, back, ...args) => {
-    const form = new Form(this.show, player)
-    if (back) form.button('Back', undefined, back)
+  show: NewFormCallback = (player, back) => {
+    const form = new Form(player)
+    if (back) {
+      form.button('§l§b< §r§3Назад', back)
+    }
 
-    this.create(form, player, ...args)
+    this.create(form, player, back)
     return form.show()
   }
 
-  title(player: Player, ...args: T) {
-    const form = new Form(this.show, player)
-    this.create(form, player, ...args)
+  title(player: Player) {
+    const form = new Form(player)
+    this.create(form, player)
     return form.currentTitle ?? 'No title'
   }
 }

@@ -2,6 +2,7 @@ import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { prompt } from 'lib/form/message'
 import { util } from 'lib/util'
+import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'
 
 interface IActionFormButton {
@@ -10,7 +11,7 @@ interface IActionFormButton {
   /** The icon that is showed with this button */
   iconPath?: string | null
   /** What gets called when this gets clicked */
-  callback?: PlayerCallback
+  callback?: NewFormCallback
 }
 
 export class ActionForm {
@@ -42,7 +43,7 @@ export class ActionForm {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, callback: PlayerCallback): ActionForm
+  addButton(text: string | RawMessage, callback: NewFormCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -51,7 +52,7 @@ export class ActionForm {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, iconPath: string | null | undefined, callback: PlayerCallback): ActionForm
+  addButton(text: string | RawMessage, iconPath: string | null | undefined, callback: NewFormCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -62,8 +63,8 @@ export class ActionForm {
    */
   addButton(
     text: string | RawMessage,
-    iconPathOrCallback: string | null | undefined | PlayerCallback,
-    callback?: PlayerCallback,
+    iconPathOrCallback: string | null | undefined | NewFormCallback,
+    callback?: NewFormCallback,
   ): ActionForm {
     let iconPath
     if (typeof iconPathOrCallback === 'function') {
@@ -128,7 +129,7 @@ export class ActionForm {
 
     const callback = this.buttons[response.selection]?.callback
     if (typeof callback === 'function') {
-      util.catch(() => callback(player))
+      util.catch(() => callback(player, () => this.show(player)))
       return true
     }
 

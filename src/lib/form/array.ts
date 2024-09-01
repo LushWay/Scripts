@@ -11,10 +11,16 @@ import { stringSimilarity } from '../search'
 import { util } from '../util'
 import { ActionForm } from './action'
 import { ModalForm } from './modal'
+import { NewFormCallback } from './new'
 import { BUTTON } from './utils'
 
 export declare namespace ArrayForm {
-  type Button<T, F> = (item: T, filters: F, form: ActionForm) => [text: string, callback: VoidFunction] | false
+  type Button<T, F> = (
+    item: T,
+    filters: F,
+    form: ActionForm,
+    back: VoidFunction,
+  ) => [text: string, callback: NewFormCallback] | false
   type Sort<T, F> = (array: T[], filters: F) => T[]
   type AddCustomButtons<TH> = (this: TH, form: ActionForm) => void
 
@@ -91,9 +97,10 @@ export class ArrayForm<
     filters = Settings.parseConfig(filtersDatabase, 'filters', this.config.filters) as F,
     searchQuery = '',
   ) {
-    const args = [filtersDatabase, filters] as const
+    const args = [filtersDatabase, filters, searchQuery] as const
+    const selfback = () => this.show(player, fromPage, ...args)
     const paginator = util.paginate(
-      this.getSorted(filters, searchQuery),
+      this.getSorted(filters, searchQuery, selfback),
       this.config.itemsPerPage,
       fromPage,
       this.config.minItemsForFilters,
@@ -106,7 +113,7 @@ export class ArrayForm<
     // is less then min items for filtes there is no way to
     // disable filters
     if (paginator.array.length !== this.array.length || paginator.maxPages !== 1) {
-      this.addFilterButton(form, filters, player, filtersDatabase, () => this.show(player, fromPage, ...args))
+      this.addFilterButton(form, filters, player, filtersDatabase, selfback)
       this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
     }
 
@@ -116,7 +123,7 @@ export class ArrayForm<
     if (paginator.canGoBack)
       form.addButton('§r§3Предыдущая', BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
 
-    this.addButtons(paginator.array, form, filters)
+    this.addButtons(paginator.array, form, filters, selfback)
 
     if (paginator.canGoNext) form.addButton('§3Следующая', BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
 
@@ -192,14 +199,14 @@ export class ArrayForm<
     }
   }
 
-  private getSorted(filters: F, searchQuery = '') {
+  private getSorted(filters: F, searchQuery = '', back: VoidFunction) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     if (searchQuery) {
       // Search query overrides sort option
       const sorted = []
       const empty = new ActionForm('', '')
       for (const item of this.array) {
-        const button = this.config.button(item, filters, empty)
+        const button = this.config.button(item, filters, empty, back)
 
         if (button) {
           sorted.push({ button, search: stringSimilarity(searchQuery, button[0]), item })
@@ -212,10 +219,10 @@ export class ArrayForm<
     } else return this.array
   }
 
-  private addButtons(array: readonly T[], form: ActionForm, filters: F) {
+  private addButtons(array: readonly T[], form: ActionForm, filters: F, back: VoidFunction) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     for (const item of array) {
-      const button = this.config.button(item, filters, form)
+      const button = this.config.button(item, filters, form, back)
 
       if (button) form.addButton(...button)
     }

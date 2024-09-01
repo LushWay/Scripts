@@ -1,5 +1,6 @@
 import { ItemStack, system } from '@minecraft/server'
-import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import { Items } from 'lib/assets/custom-items'
+import { langToken, translateToken } from 'lib/utils/lang'
 import { customItems } from 'modules/commands/getitem'
 
 class CustomItem {
@@ -12,7 +13,7 @@ class CustomItem {
     customItems.push(this.cache)
   }
 
-  private _typeId: string | undefined
+  protected _typeId: string | undefined
 
   typeId(typeId: string) {
     this._typeId = typeId
@@ -65,8 +66,8 @@ export class CustomItemWithBlueprint extends CustomItem {
   }
 
   get blueprint() {
-    return new ItemStack(i.Paper).setInfo(
-      `§fЧертеж предмета ${this._nameTag ?? this._bprintName}`,
+    return new ItemStack(Items.Blueprint).setInfo(
+      `§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateToken('ru_RU', langToken(this._typeId)) : this._bprintName)}`,
       'С помощью него вы можете сделать предмет у инженера',
     )
   }

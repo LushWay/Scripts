@@ -3,8 +3,8 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { form } from 'lib/form/new'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
+import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
-import { itemDescription } from 'lib/shop/rewards'
 import { customItems } from 'modules/commands/getitem'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
@@ -110,12 +110,7 @@ export class Crate {
       .button('Посмотреть содержимое', this.previewItems.show)
   })
 
-  private previewItems = form(f => {
-    f.title(t.header`${this.name} > Содержимое`)
-    for (const item of this.lootTable.items) {
-      f.button(t`${itemDescription(item.itemStack, '', false)}\n${item.chance}%%`, this.previewItems.show)
-    }
-  })
+  private previewItems = lootTablePreview(this.lootTable, t.header`${this.name + ' ящик'} > Содержимое`, true)
 
   private animation = new CrateLootAnimation(this.place.fullId, this.dimensionId)
 }

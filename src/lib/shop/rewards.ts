@@ -130,9 +130,15 @@ export function itemDescription(
 ): RawMessage {
   return {
     rawtext: [
-      { text: c },
-      item.nameTag ? { text: item.nameTag.replaceAll(/§./g, '').replace(/\n.*/, '') } : { translate: langToken(item) },
+      c ? { text: c } : false,
+      item.nameTag
+        ? { text: (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') }
+        : { translate: langToken(item) },
       amount && item.amount ? { text: ` §r§f${c}x${item.amount}` } : false,
     ].filter(noBoolean),
   }
+}
+
+function uncolor(t: string) {
+  return t.replaceAll(/§./g, '')
 }

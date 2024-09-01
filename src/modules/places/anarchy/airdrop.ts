@@ -80,7 +80,7 @@ export async function requestAirdrop(isPowerfull: boolean) {
       return airdrop
     } catch (e) {
       if (e instanceof LocationInUnloadedChunkError) {
-        console.warn('Unable spawn half hourly airdrop: location unloaded')
+        console.warn('Unable to spawn 15m airdrop: location unloaded')
       }
     }
   }

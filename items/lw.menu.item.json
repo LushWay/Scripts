@@ -11,9 +11,6 @@
       "minecraft:icon": {
         "texture": "diamond"
       },
-      "minecraft:display_name": {
-        "value": "§b§lМеню§r\n§7(use)"
-      },
       "minecraft:cooldown": {
         "category": "gui",
         "duration": 0.1
