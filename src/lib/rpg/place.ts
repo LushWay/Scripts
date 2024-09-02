@@ -1,4 +1,4 @@
-import { Settings } from 'lib'
+import { Settings } from 'lib/settings'
 
 export class Group {
   static groups = new Map<string, Group>()

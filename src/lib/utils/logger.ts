@@ -4,14 +4,14 @@ import { type Text, t } from '../text'
 
 /** Creates new logger that will use name as prefix and will output info to the console */
 export function createLogger(name: string) {
-  name = name.startsWith('§9[') ? name : `§9[${name}] `
+  name = name.startsWith('§9') ? name : `§9${name} `
   return {
     debug: createLevel(name, 'debug', debug),
     info: createLevel(name, 'info', info),
     error: createLevel(name, 'error', error),
     warn: createLevel(name, 'warn', warn),
     player: (player: Player) => {
-      const newName = `${name.trimEnd()}[§f${player.name}§9] `
+      const newName = `${name.trimEnd()} §f§l${player.name}§r `
       const cache = playerLoggers.get(newName)
       if (cache) {
         return cache

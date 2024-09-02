@@ -1,6 +1,6 @@
 import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { langToken } from 'lib'
+import { langToken } from 'lib/utils/lang'
 import { emoji } from 'lib/assets/emoji'
 import { noBoolean } from 'lib/util'
 

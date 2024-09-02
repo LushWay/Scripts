@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { MessageForm, noNullable } from 'lib'
+import { is, MessageForm, noNullable, Vector } from 'lib'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { t } from 'lib/text'
@@ -75,13 +75,17 @@ function questMenu(player: Player, quest: Quest, back: VoidFunction) {
   const current = quest.getPlayerStep(player)
   let currentDescription = ''
   if (current) {
-    currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}`
+    currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vector.string(current.place, true)}` : ''}`
   } else if (player.database.quests?.completed.includes(quest.id)) {
     currentDescription = '§aЗадание завершено'
   }
 
   const form = new ActionForm(quest.name, `${quest.description}§r\n\n${currentDescription}`)
   form.addButtonBack(back)
+
+  const place = current?.place
+  if (is(player.id, 'techAdmin') && place) form.addButton('§7admin: tp to quest point', () => player.teleport(place))
+
   form.addButtonPrompt('§cОтказаться от задания', '§cОтказаться', () => quest.exit(player), 'Назад')
   form.show(player)
 }

@@ -1,5 +1,5 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
-import { LockAction, Settings } from 'lib'
+import { Boss, LockAction, Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
@@ -12,10 +12,24 @@ const { lockDisplay } = HealthIndicatorConfig
 const options = Settings.world(...Settings.worldCommon, {
   pvpEnabled: {
     value: true,
-    description: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
-    name: 'Включено',
+    description: 'Возможность входа в сражения режим (блокировка всех тп команд)§r',
+    name: 'Режим сражения',
   },
-  pvpCooldown: { value: 60, description: 'Время блокировки в секундах', name: 'Время' },
+  pvpPlayerCooldown: {
+    value: 60,
+    description: 'Время блокировки в режиме сражения в секундах',
+    name: 'Время сражения',
+  },
+  pvpMonsterCooldown: {
+    value: 15,
+    description: 'Время блокировки в режиме сражения в секундах',
+    name: 'Время сражения с монстрами',
+  },
+  pvpBossCooldown: {
+    value: 120,
+    description: 'Время блокировки в режиме сражения в секундах',
+    name: 'Время сражения с боссом',
+  },
 })
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
@@ -31,10 +45,10 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   },
 })
 
-new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме пвп')
+new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме сражения!')
 
-world.afterEvents.entityDie.subscribe(event => {
-  if (event.deadEntity.isPlayer()) event.deadEntity.scores.pvp = 0
+world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+  if (deadEntity.isPlayer()) deadEntity.scores.pvp = 0
 })
 
 system.runInterval(
@@ -65,21 +79,25 @@ Core.afterEvents.worldLoad.subscribe(() => {
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
 
-      const q = score === options.pvpCooldown || score === 0
+      const q =
+        score === options.pvpBossCooldown ||
+        score === options.pvpMonsterCooldown ||
+        score == options.pvpPlayerCooldown ||
+        score === 1
       const g = (p: string) => (q ? `§4${p}` : '')
 
-      player.onScreenDisplay.setActionBar(`${g('»')} ${emoji.custom.sword} §6${score} ${g('«')}`, ActionbarPriority.PvP)
+      player.onScreenDisplay.setActionBar(`${g('» ')}${emoji.custom.sword} §f${score}${g(' «')}`, ActionbarPriority.PvP)
     },
     'PVP player',
     0,
   )
 
-  world.afterEvents.entityDie.subscribe(event => {
+  world.afterEvents.entityDie.subscribe(({ damageSource, deadEntity }) => {
     onDamage(
       {
         damage: 999999,
-        damageSource: event.damageSource,
-        hurtEntity: event.deadEntity,
+        damageSource,
+        hurtEntity: deadEntity,
       },
       true,
     )
@@ -90,76 +108,85 @@ Core.afterEvents.worldLoad.subscribe(() => {
   })
 })
 
-function onDamage(event: EntityHurtAfterEvent, fatal = false) {
-  const damage = event.damageSource
+function onDamage(
+  { damage, hurtEntity, damageSource: { damagingEntity, cause } }: EntityHurtAfterEvent,
+  fatal = false,
+) {
   if (
     ![
       EntityDamageCause.fireTick,
       EntityDamageCause.fireworks,
       EntityDamageCause.projectile,
       EntityDamageCause.entityAttack,
-    ].includes(damage.cause)
+    ].includes(cause)
   )
     return
 
   if (
-    !event.hurtEntity.typeId.startsWith('minecraft:') ||
+    !hurtEntity.typeId.startsWith('minecraft:') ||
+    !(hurtEntity.isPlayer() || hurtEntity.matches({ families: ['monster'] })) ||
     !options.pvpEnabled ||
-    HealthIndicatorConfig.disabled.includes(event.hurtEntity.id)
+    HealthIndicatorConfig.disabled.includes(hurtEntity.id)
   )
     return
 
   // Its player.chatClose
-  if (!damage.damagingEntity && event.hurtEntity.isPlayer() && damage.cause === EntityDamageCause.entityAttack) return
+  if (!damagingEntity && hurtEntity.isPlayer() && cause === EntityDamageCause.entityAttack) return
 
-  const healthComponent = event.hurtEntity.getComponent('minecraft:health')
+  const healthComponent = hurtEntity.getComponent('minecraft:health')
   if (!healthComponent) return
   const { currentValue: current, defaultValue: value } = healthComponent
 
-  if (damage.damagingEntity?.isPlayer()) {
-    damage.damagingEntity.scores.pvp = options.pvpCooldown
-    damage.damagingEntity.scores.damageGive += event.damage
-    if (fatal) damage.damagingEntity.scores.kills++
+  const cooldown =
+    damagingEntity?.isPlayer() && hurtEntity.isPlayer()
+      ? options.pvpPlayerCooldown
+      : Boss.isBoss(hurtEntity)
+        ? options.pvpBossCooldown
+        : options.pvpMonsterCooldown
 
-    const setting = getPlayerSettings(damage.damagingEntity)
+  if (damagingEntity?.isPlayer()) {
+    damagingEntity.scores.pvp = Math.max(damagingEntity.scores.pvp, cooldown)
+    damagingEntity.scores.damageGive += damage
+    if (fatal) damagingEntity.scores.kills++
 
-    const isBow = damage.cause === EntityDamageCause.projectile
+    const setting = getPlayerSettings(damagingEntity)
+
+    const isBow = cause === EntityDamageCause.projectile
     if (isBow && setting.bowSound) {
-      playHitSound(damage.damagingEntity, current, value)
+      playHitSound(damagingEntity, current, value)
     }
 
     if (setting.indicator) {
       if (!fatal) {
-        // damage.damagingEntity.onScreenDisplay.setActionBar(`§c-${event.damage}♥`)
+        // damagingEntity.onScreenDisplay.setActionBar(`§c-${damage}♥`)
       } else {
         // Kill
-        if (event.hurtEntity instanceof Player) {
+        if (hurtEntity instanceof Player) {
           // Player
-          damage.damagingEntity.onScreenDisplay.setActionBar(
-            `${isBow ? 'Вы застрелили' : emoji.custom.kill}${event.hurtEntity.name}`,
+          damagingEntity.onScreenDisplay.setActionBar(
+            `${isBow ? emoji.custom.kill : emoji.custom.kill} ${hurtEntity.name}`,
             ActionbarPriority.UrgentNotificiation,
           )
         } else {
           // Entity
-          const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
-          damage.damagingEntity.onScreenDisplay.setActionBar(
-            { rawtext: [{ text: emoji.custom.kill }, { translate: `entity.${entityName}.name` }] },
+          const entityName = hurtEntity.typeId.replace('minecraft:', '')
+          damagingEntity.onScreenDisplay.setActionBar(
+            { rawtext: [{ text: emoji.custom.kill + ' ' }, { translate: `entity.${entityName}.name` }] },
             ActionbarPriority.UrgentNotificiation,
           )
         }
       }
 
-      lockDisplay.set(damage.damagingEntity.id, 2)
+      lockDisplay.set(damagingEntity.id, 2)
     }
   }
 
-  if (event.hurtEntity instanceof Player) {
+  if (hurtEntity instanceof Player) {
     // skip SimulatedPlayer because of error
-    // if ('jump' in event.hurtEntity) return
-
-    event.hurtEntity.scores.pvp = options.pvpCooldown
-    event.hurtEntity.scores.damageRecieve += event.damage
-    if (fatal) event.hurtEntity.scores.deaths++
+    if ('jump' in hurtEntity) return
+    hurtEntity.scores.pvp = Math.max(hurtEntity.scores.pvp, cooldown)
+    hurtEntity.scores.damageRecieve += damage
+    if (fatal) hurtEntity.scores.deaths++
   }
 }
 

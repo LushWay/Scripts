@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 import { Clan } from './clan/clan'
 import { getRole, ROLES } from './roles'
+import { EquippmentLevel } from './rpg/equipment-level'
 
 /**
  * Gets displayable the role of this player
@@ -27,6 +28,7 @@ export function getFullname(
     role: useRole = true,
     clan: useClan = true,
     newbie: useNewbie = true,
+    equippment = false,
     name = true,
     noName = 'Unknown',
     nameColor = '§r§f',
@@ -39,6 +41,7 @@ export function getFullname(
     noName?: string
     nameColor?: string
     clearColorAfter?: boolean
+    equippment?: boolean
   } = {},
 ) {
   const id = playerID instanceof Player ? playerID.id : playerID
@@ -50,6 +53,11 @@ export function getFullname(
   if (useRole) {
     const role = getRole(playerID)
     if (role !== 'member') add(ROLES[role])
+  }
+
+  if (equippment && playerID instanceof Player) {
+    const emoji = EquippmentLevel.getEmoji(playerID)
+    if (emoji) add(emoji)
   }
 
   if (useClan) {

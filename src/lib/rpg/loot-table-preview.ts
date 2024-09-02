@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ArrayForm } from 'lib'
+import { ArrayForm } from 'lib/form/array'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
 import { itemDescription } from 'lib/shop/rewards'

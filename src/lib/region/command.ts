@@ -1,4 +1,5 @@
 import { Player, world } from '@minecraft/server'
+import 'lib/command'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'

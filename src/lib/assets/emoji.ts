@@ -34,8 +34,8 @@ export const emoji = {
       diamond: String.fromCharCode(0xe134),
       netherite: String.fromCharCode(0xe135),
     },
-    kill: String.fromCharCode(0xe164),
-    sword: String.fromCharCode(0xe165),
+    kill: String.fromCharCode(0xe165),
+    sword: String.fromCharCode(0xe164),
   },
   buttons: {
     code_builder: '',

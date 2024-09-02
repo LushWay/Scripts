@@ -20,9 +20,12 @@ class ChatBuilder {
       description: 'Радиус для затемнения сообщений дальних игроков',
       value: 30,
     },
-    ranks: {
-      name: 'Ранги в чате',
-      description: 'Ранги в чате',
+    role: {
+      name: 'Роли в чате',
+      value: true,
+    },
+    armorAndSword: {
+      name: 'Эмодзи уровня экипировки в чате',
       value: true,
     },
   })
@@ -72,7 +75,7 @@ class ChatBuilder {
         // Outranged players
         const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
         const messageText = event.message.replace(/\\n/g, '\n')
-        const message = `${getFullname(event.sender, { nameColor: '§7' })}§r: ${messageText}`
+        const message = `${getFullname(event.sender, { nameColor: '§7', equippment: this.settings.armorAndSword })}§r: ${messageText}`
         const fullrole = getFullname(event.sender, { name: false })
 
         if (__SERVER__) {

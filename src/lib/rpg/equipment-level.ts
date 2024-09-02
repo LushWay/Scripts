@@ -1,4 +1,7 @@
 import { EquipmentSlot, Player } from '@minecraft/server'
+import { emoji } from 'lib/assets/emoji'
+import { ms } from 'lib/utils/ms'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 enum Level {
   None,
@@ -45,17 +48,11 @@ function get(player: Player, mode = Mode.Half) {
 
 function getArmorLevel(player: Player, mode = Mode.Half) {
   const eq = player.getComponent('equippable')
-  console.log({
-    abc: [EquipmentSlot.Chest, EquipmentSlot.Feet, EquipmentSlot.Head, EquipmentSlot.Legs].map(e =>
-      eq?.getEquipment(e),
-    ),
-  })
   return checkMode(
     [EquipmentSlot.Chest, EquipmentSlot.Feet, EquipmentSlot.Head, EquipmentSlot.Legs].map(e => eq?.getEquipment(e)),
     ArmorLevel,
     mode,
     (item, id) => {
-      console.log({ item: item?.typeId, a: item?.typeId.includes(id.toLowerCase()) })
       return !!item && item.typeId.includes(id.toLowerCase())
     },
   )
@@ -84,8 +81,6 @@ function checkMode<T, L extends Record<string, number | string>>(
 
   if (!array) return minLevel
 
-  console.log({ levelNumbers, minLevel, maxLevel, e: [...array.entries()], c: [Object.entriesStringKeys(levels)] })
-
   const results: Partial<Record<ValueOf<L>, number>> = {}
 
   for (const [i, item] of array.entries()) {
@@ -98,8 +93,6 @@ function checkMode<T, L extends Record<string, number | string>>(
 
       const result = results[level] ?? 0
       const endOfArray = i === array.length - 1
-
-      console.log({ results, level, endOfArray })
 
       switch (mode) {
         case Mode.Some:
@@ -128,6 +121,42 @@ function isItems(level: Level, player: Player) {
   return getItemsLevel(player) >= level
 }
 
+const cache = new WeakPlayerMap<{ armor: ArmorLevel; items: ItemsLevel; expires: number }>()
+
+function getCached(player: Player): { armor: ArmorLevel; items: ItemsLevel } {
+  const cached = cache.get(player)
+  if (cached && cached.expires < Date.now()) return cached
+
+  const items = getItemsLevel(player)
+  const armor = getArmorLevel(player)
+  cache.set(player, { armor, items, expires: Date.now() + ms.from('sec', 10) })
+  return { items, armor }
+}
+
+const emojiItems: Record<ArmorLevel, string> = {
+  [ItemsLevel.None]: '',
+  [ItemsLevel.Diamond]: emoji.custom.swords.diamond,
+  [ItemsLevel.Netherite]: emoji.custom.swords.netherite,
+  [ItemsLevel.Golden]: emoji.custom.swords.golden,
+  [ItemsLevel.Stone]: emoji.custom.swords.stone,
+  [ItemsLevel.Iron]: emoji.custom.swords.iron,
+  [ItemsLevel.Wooden]: emoji.custom.swords.wooden,
+}
+const emojiArmor: Record<ArmorLevel, string> = {
+  [ArmorLevel.None]: '',
+  [ArmorLevel.Leather]: emoji.custom.armor.leather,
+  [ArmorLevel.Chainmail]: emoji.custom.armor.chainmail,
+  [ArmorLevel.Golden]: emoji.custom.armor.golden,
+  [ArmorLevel.Diamond]: emoji.custom.armor.diamond,
+  [ArmorLevel.Iron]: emoji.custom.armor.diamond,
+  [ArmorLevel.Netherite]: emoji.custom.armor.netherite,
+}
+
+function getEmoji(player: Player) {
+  const { items, armor } = getCached(player)
+  return `${emojiArmor[armor]}${emojiItems[items]}`
+}
+
 export const EquippmentLevel = {
   Level,
   ArmorLevel,
@@ -137,6 +166,8 @@ export const EquippmentLevel = {
   get,
   getArmorLevel,
   getItemsLevel,
+  getCached,
+  getEmoji,
 
   is,
   isArmor,

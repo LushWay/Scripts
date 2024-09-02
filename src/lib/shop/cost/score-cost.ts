@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { separateNumberWithDots } from 'lib'
+import { separateNumberWithDots } from 'lib/util'
 import { emoji } from 'lib/assets/emoji'
 import { t } from 'lib/text'
 import { Cost } from '../cost'
