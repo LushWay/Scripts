@@ -1,6 +1,5 @@
-import { system } from '@minecraft/server'
-import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, ms } from 'lib'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { Loot } from 'lib'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
@@ -10,6 +9,7 @@ import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
+import { createBossWither } from './wither.boss'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -29,14 +29,7 @@ class StoneQuarryBuilder extends City {
 
   stoner = new Stoner(this.group)
 
-  w = Boss.create()
-    .group(this.group)
-    .id('wither')
-    .name('Камнедробилка')
-    .typeId(MinecraftEntityTypes.Wither)
-    .loot(new Loot('wither drop').item('NetherStar').build)
-    .respawnTime(ms.from('hour', 1))
-    .spawnEvent(true)
+  wither = createBossWither(this.group)
 
   commonOvener = Furnacer.create()
     .group(this.group)
@@ -60,22 +53,6 @@ class StoneQuarryBuilder extends City {
   gunsmith = new Gunsmith(this.group)
 
   private create() {
-    this.w.location.onLoad.subscribe(() => {
-      if (this.w.region) this.w.region.permissions.allowedEntities = 'all'
-    })
-
-    system.runInterval(
-      () => {
-        if (!this.w.region) return
-        if (!this.w.entity) return
-        if (!this.w.region.area.isVectorIn(this.w.entity.location, this.w.region.dimensionId)) {
-          this.w.entity.teleport(this.w.region.area.center)
-        }
-      },
-      'asdasda',
-      40,
-    )
-
     this.createKits(new Loot().item('RedTerracotta').build, new Loot().item('RedTerracotta').build)
   }
 }

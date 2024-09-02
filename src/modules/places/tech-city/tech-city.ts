@@ -1,12 +1,12 @@
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, ms } from 'lib'
+import { Loot } from 'lib'
 import { CannonItem, CannonShellItem } from 'modules/features/cannon'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
-import { Chip, Engineer } from './engineer'
+import { Engineer } from './engineer'
+import { createBossGolem } from './golem.boss'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -22,27 +22,7 @@ class TechCityBuilder extends City {
 
   woodman = new Woodman(this.group)
 
-  golemn = Boss.create()
-    .group(this.group)
-    .id('golem')
-    .name('Робот')
-    .typeId(MinecraftEntityTypes.IronGolem)
-    .loot(
-      new Loot('GolemLoot')
-        .itemStack(Chip)
-        .amount({ '1...2': '1%' })
-        .chance('20%')
-
-        .itemStack(Chip)
-        .amount({ '1...2': '1%' })
-        .chance('20%')
-
-        .itemStack(Chip)
-        .amount({ '1...2': '1%' })
-        .chance('20%').build,
-    )
-    .respawnTime(ms.from('min', 10))
-    .spawnEvent(true)
+  golem = createBossGolem(this.group)
 
   private create() {
     const { normal, donut } = this.createKits(

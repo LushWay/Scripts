@@ -16,9 +16,8 @@ export class FloatingText {
   private entity: Entity | undefined
 
   hide() {
-    if (!this.entity?.isValid()) return
-
-    this.entity.remove()
+    if (!this.entity) this.entity = this.find()
+    if (this.entity?.isValid()) this.entity.remove()
   }
 
   update(location: Vector3, nameTag: string) {

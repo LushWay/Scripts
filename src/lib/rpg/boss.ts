@@ -30,6 +30,7 @@ interface BossOptions {
   loot: LootTable
   spawnEvent: boolean | string
   respawnTime: number
+  allowedEntities: string[] | 'all'
 }
 
 export class Boss {
@@ -44,8 +45,10 @@ export class Boss {
       typeId: (typeId: string) => ({
         loot: (loot: LootTable) => ({
           respawnTime: (respawnTime: number) => ({
-            spawnEvent: (spawnEvent: BossOptions['spawnEvent']) =>
-              new Boss({ place, typeId, loot, respawnTime, spawnEvent }),
+            allowedEntities: (allowedEntities: string[] | 'all') => ({
+              spawnEvent: (spawnEvent: BossOptions['spawnEvent']) =>
+                new Boss({ place, typeId, loot, respawnTime, spawnEvent, allowedEntities }),
+            }),
           }),
         }),
       }),
@@ -93,12 +96,15 @@ export class Boss {
    */
   constructor(private options: BossOptions) {
     this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.id}`
+
+    if (Array.isArray(this.options.allowedEntities)) this.options.allowedEntities.push(options.typeId)
+
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()
       this.region = BossArenaRegion.create(
         new SphereArea({ center, radius: 40 }, this.options.place.group.dimensionId),
-        { bossName: this.options.place.name },
+        { bossName: this.options.place.name, permissions: { allowedEntities: this.options.allowedEntities } },
       )
       this.region.permissions.allowedEntities = [this.options.typeId, MinecraftEntityTypes.Player]
     })
@@ -112,6 +118,13 @@ export class Boss {
 
   get dimensionId() {
     return this.options.place.group.dimensionId
+  }
+
+  private onInterval?: (boss: this) => void
+
+  interval(interval: (boss: this) => void) {
+    this.onInterval = interval
+    return this
   }
 
   check() {
@@ -139,7 +152,7 @@ export class Boss {
     } else if (this.location.valid) {
       this.floatingText.update(
         Vector.add(this.location, { x: 0, y: 2, z: 0 }),
-        `${this.options.place.name}\n${t.time`Осталось ${this.options.respawnTime - (Date.now() - db.date)}`}`,
+        `${this.options.place.name}\n${t.time`До появления\n§7осталось ${this.options.respawnTime - (Date.now() - db.date)}`}`,
       )
     }
   }
@@ -149,7 +162,7 @@ export class Boss {
 
     // Get type id
     const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
-    this.logger.debug`Spawn: ${entityTypeId}`
+    this.logger.info`Spawn: ${entityTypeId}`
 
     // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
@@ -179,7 +192,7 @@ export class Boss {
 
   /** Ensures that entity exists and if not calls onDie method */
   ensureEntity(db: BossDB) {
-    const entity = world[this.dimensionId]
+    this.entity ??= world[this.dimensionId]
       .getEntities({
         type: this.options.typeId,
         // location: this.location,
@@ -188,16 +201,21 @@ export class Boss {
 
       .find(e => e.id === db.id)
 
-    if (!entity) {
-      // Boss went out of location or in unloaded chunk, respawn after interval
+    if (!this.entity) {
+      // Boss died or unloaded, respawn after interval
       this.onDie({ dropLoot: false })
-    }
+    } else {
+      if (
+        this.region &&
+        this.location.valid &&
+        !this.region.area.isVectorIn(this.entity.location, this.entity.dimension.type)
+      )
+        this.entity.teleport(this.location)
 
-    if (entity) {
-      entity.nameTag = this.options.place.name
+      this.onInterval?.(this)
+      this.entity.nameTag = this.options.place.name
       this.floatingText.hide()
     }
-    this.entity = entity
   }
 
   onDie({ dropLoot = true } = {}) {
@@ -207,7 +225,7 @@ export class Boss {
       `Died. Got hits from ${[...this.damage.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
-        .map(e => `${Player.name(e[0])}: ${e[1]}`)
+        .map(e => `§l${Player.name(e[0])}§r§f: §6${e[1]}§f`)
         .join(', ')}`,
     )
     const location = this.entity?.isValid() ? this.entity.location : this.location
@@ -220,7 +238,7 @@ export class Boss {
     }
 
     if (dropLoot) {
-      world.say('§6Убит босс §f' + this.options.place.name + '!')
+      world.say(`§6Убит босс §f${this.options.place.name}!`)
 
       this.options.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
       const players = world.getAllPlayers()
@@ -229,7 +247,7 @@ export class Boss {
         const player = players.find(e => e.id === playerId)
         if (!player) return
 
-        givePlayerMoneyAndXp(player, damage, ~~(damage / 10))
+        givePlayerMoneyAndXp(player, ~~damage * 2, ~~(damage / 50))
       }
       this.damage.clear()
     }

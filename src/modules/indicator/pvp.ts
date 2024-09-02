@@ -1,8 +1,9 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
-import { Boss, LockAction, Settings } from 'lib'
+import { Boss, BossArenaRegion, LockAction, Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { RegionEvents } from 'lib/region/events'
 import { HealthIndicatorConfig } from './config'
 
 // █
@@ -45,7 +46,7 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   },
 })
 
-new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме сражения!')
+const lockAction = new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме сражения!')
 
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
   if (deadEntity.isPlayer()) deadEntity.scores.pvp = 0
@@ -67,6 +68,16 @@ system.runInterval(
   'PVP',
   20,
 )
+
+RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
+  if (
+    lockAction.isLocked(player) &&
+    previous.some(e => e instanceof BossArenaRegion) &&
+    !newest.some(e => e instanceof BossArenaRegion)
+  ) {
+    if (previous[0] instanceof BossArenaRegion) previous[0].returnEntity(player)
+  }
+})
 
 Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
@@ -122,9 +133,11 @@ function onDamage(
   )
     return
 
+  const hurtBoss = Boss.isBoss(hurtEntity)
+
   if (
     !hurtEntity.typeId.startsWith('minecraft:') ||
-    !(hurtEntity.isPlayer() || hurtEntity.matches({ families: ['monster'] })) ||
+    !(hurtEntity.isPlayer() || hurtEntity.matches({ families: ['monster'] }) || hurtBoss) ||
     !options.pvpEnabled ||
     HealthIndicatorConfig.disabled.includes(hurtEntity.id)
   )
@@ -140,7 +153,7 @@ function onDamage(
   const cooldown =
     damagingEntity?.isPlayer() && hurtEntity.isPlayer()
       ? options.pvpPlayerCooldown
-      : Boss.isBoss(hurtEntity) || (damagingEntity && Boss.isBoss(damagingEntity))
+      : hurtBoss || (damagingEntity && Boss.isBoss(damagingEntity))
         ? options.pvpBossCooldown
         : options.pvpMonsterCooldown
 

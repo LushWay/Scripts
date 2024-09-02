@@ -130,7 +130,7 @@ Array.prototype.randomElement = function (this: unknown[]) {
 
 expand(Array, {
   equals(one, two) {
-    return one.every((e, i) => e === two[i])
+    return one.length === two.length && one.every((e, i) => e === two[i])
   },
 })
 

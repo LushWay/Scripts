@@ -1,5 +1,7 @@
+import { Entity } from '@minecraft/server'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
+import { Vector } from 'lib/vector'
 
 interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: string
@@ -28,5 +30,10 @@ export class BossArenaRegion extends Region {
   constructor(area: Area, options: BossArenaRegionOptions, key: string) {
     super(area, options, key)
     this.bossName = options.bossName
+  }
+
+  returnEntity(entity: Entity) {
+    const vector = Vector.subtract(entity.location, this.area.center)
+    entity.applyKnockback(-vector.x, -vector.z, 5, 0.6)
   }
 }

@@ -3,6 +3,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { addAddableRegion } from 'lib/region/command'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
+import { BossArenaRegion } from './boss-arena'
 import { Region, RegionCreationOptions, RegionPermissions } from './region'
 
 interface SafeAreaRegionOptions extends RegionCreationOptions {
@@ -47,8 +48,8 @@ export class SafeAreaRegion extends Region {
 }
 addAddableRegion('Мирные зоны', SafeAreaRegion)
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
-  const been = previous.length && previous[0] instanceof SafeAreaRegion
-  const now = newest.length && newest[0] instanceof SafeAreaRegion
+  const been = previous.length && (previous[0] instanceof SafeAreaRegion || previous[0] instanceof BossArenaRegion)
+  const now = newest.length && (newest[0] instanceof SafeAreaRegion || newest[0] instanceof BossArenaRegion)
   const gamemode = player.getGameMode()
   const adventure = gamemode === GameMode.adventure
   const survival = gamemode === GameMode.survival

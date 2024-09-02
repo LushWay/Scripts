@@ -8,7 +8,7 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { PlayerEvents } from 'lib/assets/player-json'
+import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { isBuilding } from 'lib/game-utils'
 import { EventSignal } from '../event-signal'
 import { BLOCK_CONTAINERS, DOORS, GATES, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES, SWITCHES, TRAPDOORS } from './config'
@@ -154,21 +154,23 @@ system.runInterval(
   () => {
     for (const player of world.getAllPlayers()) {
       const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
-      const nearest = Region.nearestRegions(player.location, player.dimension.type)
+      const newest = Region.nearestRegions(player.location, player.dimension.type)
 
-      if (nearest.length !== previous.length || previous.some((region, i) => region !== nearest[i])) {
-        EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest: nearest })
+      if (!Array.equals(newest, previous)) {
+        EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })
       }
 
-      RegionEvents.playerInRegionsCache.set(player, nearest)
-      const currentRegion = nearest[0]
+      RegionEvents.playerInRegionsCache.set(player, newest)
+      const currentRegion = newest[0]
 
-      if (typeof currentRegion !== 'undefined') {
-        if (!currentRegion.permissions.pvp && !isBuilding(player)) {
+      if (typeof currentRegion !== 'undefined' && !isBuilding(player)) {
+        if (currentRegion.permissions.pvp === false) {
           player.triggerEvent(
             player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
           )
-        }
+        } else if (currentRegion.permissions.pvp === 'pve') {
+          player.setProperty(PlayerProperties['lw:newbie'], true)
+        } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], true)
       }
 
       EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })

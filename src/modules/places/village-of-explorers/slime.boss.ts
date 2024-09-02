@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Loot, ms } from 'lib'
 import { Boss } from 'lib/rpg/boss'
@@ -27,25 +27,25 @@ export function createBossSlime(group: Group) {
         }).build,
     )
     .respawnTime(ms.from('min', 10))
+    .allowedEntities([])
     .spawnEvent(true)
+    .interval(boss => {
+      if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return
 
-  system.runJobInterval(() => {
-    if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return
+      const slimes = world.overworld.getEntities({
+        location: boss.location,
+        maxDistance: boss.region.area.radius,
+        type: boss.entity.typeId,
+      })
+      if (!slimes.length) return
 
-    const slimes = world.overworld.getEntities({
-      location: boss.location,
-      maxDistance: boss.region.area.radius,
-      type: boss.entity.typeId,
+      const frogs = world.overworld.getEntities({
+        location: boss.location,
+        maxDistance: boss.region.area.radius + 10,
+        type: MinecraftEntityTypes.Frog,
+      })
+      for (const frog of frogs) frog.remove()
     })
-    if (!slimes.length) return
-
-    const frogs = world.overworld.getEntities({
-      location: boss.location,
-      maxDistance: boss.region.area.radius + 10,
-      type: MinecraftEntityTypes.Frog,
-    })
-    for (const frog of frogs) frog.remove()
-  }, 10)
 
   world.afterEvents.entityHurt.subscribe(({ hurtEntity }) => {
     if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return

@@ -1,12 +1,19 @@
-import { Entity, EntityLifetimeState, PlayerInteractWithEntityBeforeEvent, system, world } from '@minecraft/server'
+import {
+  Entity,
+  EntityLifetimeState,
+  LocationInUnloadedChunkError,
+  PlayerInteractWithEntityBeforeEvent,
+  system,
+  world,
+} from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Temporary, Vector } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
 import { location, SafeLocation } from 'lib/location'
-import { Place } from './place'
 import { createLogger } from 'lib/utils/logger'
+import { Place } from './place'
 
 export declare namespace Npc {
   type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => boolean
@@ -62,16 +69,21 @@ export class Npc {
       throw new TypeError(`§cNpc(§r${this.id}§r§c): Location is not valid, spawn is impossible. Set location first`)
     }
 
-    this.entity = world[this.dimensionId].spawnEntity(Npc.type, this.location)
+    try {
+      this.entity = world[this.dimensionId].spawnEntity(Npc.type, this.location)
 
-    new Temporary(({ world, cleanup }) => {
-      world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-        if (entity.id !== this.entity?.id) return
+      new Temporary(({ world, cleanup }) => {
+        world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+          if (entity.id !== this.entity?.id) return
 
-        this.configureNpcEntity(entity)
-        cleanup()
+          this.configureNpcEntity(entity)
+          cleanup()
+        })
       })
-    })
+    } catch (e) {
+      if (e instanceof LocationInUnloadedChunkError) return
+      Npc.logger.error(e)
+    }
   }
 
   private configureNpcEntity(entity: Entity) {
