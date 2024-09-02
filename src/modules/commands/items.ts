@@ -1,5 +1,5 @@
 import { ItemStack } from '@minecraft/server'
-import { ArrayForm, langToken } from 'lib'
+import { ArrayForm, langToken, translateToken } from 'lib'
 
 export const customItems: ItemStack[] = []
 
@@ -10,7 +10,7 @@ new Command('items')
     new ArrayForm('Items', customItems)
       .button(item => {
         return [
-          `${item.nameTag ?? `%${langToken(item.typeId)}`}\n${item.getLore().join('')}`,
+          `${item.nameTag ?? translateToken(ctx.player.lang, langToken(item.typeId))}\n${item.getLore().join('')}`,
           () => ctx.player.container?.addItem(item),
         ]
       })

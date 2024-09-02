@@ -1,5 +1,6 @@
 import { LocationInUnloadedChunkError, Player, system, world, type ShortcutDimensions } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { is } from 'lib'
 import { form } from 'lib/form/new'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
@@ -100,6 +101,13 @@ export class Crate {
         player.fail('Пока не работает.')
       })
       .button('Посмотреть содержимое', this.previewItems.show)
+
+    if (is(player.id, 'techAdmin'))
+      f.button('admin: get key', () => {
+        const item = this.createKeyItemStack()
+        item.amount = 10
+        player.container?.addItem(item)
+      })
   })
 
   private previewItems = lootTablePreview(this.lootTable, t.header`${this.name + ' ящик'} > Содержимое`, true)
