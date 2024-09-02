@@ -103,11 +103,7 @@ export class Crate {
       .button('Посмотреть содержимое', this.previewItems.show)
 
     if (is(player.id, 'techAdmin'))
-      f.button('admin: get key', () => {
-        const item = this.createKeyItemStack()
-        item.amount = 10
-        player.container?.addItem(item)
-      })
+      f.button('admin: get key', () => player.container?.addItem(this.createKeyItemStack()))
   })
 
   private previewItems = lootTablePreview(this.lootTable, t.header`${this.name + ' ящик'} > Содержимое`, true)
