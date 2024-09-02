@@ -6,7 +6,7 @@ import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
-import { Engineer, MicroSchema } from './engineer'
+import { Chip, Engineer } from './engineer'
 
 class TechCityBuilder extends City {
   constructor() {
@@ -29,11 +29,17 @@ class TechCityBuilder extends City {
     .typeId(MinecraftEntityTypes.IronGolem)
     .loot(
       new Loot('GolemLoot')
-        .itemStack(MicroSchema)
-        .amount({ '10...64': '1%' })
+        .itemStack(Chip)
+        .amount({ '1...2': '1%' })
         .chance('20%')
-        .item('RedTerracotta')
-        .amount({ '0...120': '10%', '121...300': '20%' }).build,
+
+        .itemStack(Chip)
+        .amount({ '1...2': '1%' })
+        .chance('20%')
+
+        .itemStack(Chip)
+        .amount({ '1...2': '1%' })
+        .chance('20%').build,
     )
     .respawnTime(ms.from('min', 10))
     .spawnEvent(true)

@@ -14,6 +14,8 @@ export class City extends PlaceWithSafeArea {
   }
 
   protected createKits(normalLoot: LootTable, donutLoot: LootTable) {
+    normalLoot.id = `§7${this.group.id}§f Normal Crate`
+    donutLoot.id = `§7${this.group.id}§f Donut Crate`
     const normal = new Crate(this.group.point('normal kit').name(t`§7Обычный`), normalLoot)
     const donut = new Crate(this.group.point('donut kit').name(t`§bУсиленный`), donutLoot)
 

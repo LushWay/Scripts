@@ -89,6 +89,7 @@ export class Boss {
    * @param o.respawnTime In ms
    */
   constructor(private options: BossOptions) {
+    this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.id}`
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()

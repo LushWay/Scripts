@@ -1,16 +1,16 @@
 import { ItemStack } from '@minecraft/server'
-import { ArrayForm } from 'lib'
+import { ArrayForm, langToken } from 'lib'
 
 export const customItems: ItemStack[] = []
 
-new Command('getitem')
+new Command('items')
   .setPermissions('techAdmin')
   .setDescription('Получает кастомный предмет')
   .executes(ctx => {
-    new ArrayForm('GetItem', customItems)
+    new ArrayForm('Items', customItems)
       .button(item => {
         return [
-          `${item.nameTag ?? item.typeId}\n${item.getLore().join(' ')}`,
+          `${item.nameTag ?? `%${langToken(item.typeId)}`}\n${item.getLore().join('')}`,
           () => ctx.player.container?.addItem(item),
         ]
       })

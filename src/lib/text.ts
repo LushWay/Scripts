@@ -51,8 +51,8 @@ function createGroup(options: ColorizingOptions = {}, modifier = false) {
 
   if (!modifier) {
     t.header = createGroup({ text: '§6', ...options, unit: '§f§l' }, true)
-    t.error = createGroup({ text: '§c', unit: '§f', ...options }, true)
-    t.warn = createGroup({ text: '§e', unit: '§f', ...options }, true)
+    t.error = createGroup({ ...options, text: '§c', unit: '§f', num: '§7' }, true)
+    t.warn = createGroup({ ...options, text: '§e', unit: '§f' }, true)
   }
   t.options = options => createGroup(options)
   return t
@@ -149,18 +149,19 @@ function isPlurals(unit: unknown): unit is Plurals {
 }
 
 function addDefaultsToOptions(options: ColorizingOptions = {}): Required<ColorizingOptions> {
-  const { unit: unitColor = '§f', text: textColor = '§7', roles = false } = options
-  return { unit: unitColor, text: textColor, roles }
+  const { unit = '§f', text = '§7', num = '§6', roles = false } = options
+  return { unit, text, roles, num }
 }
 
 export interface ColorizingOptions {
   unit?: string
+  num?: string
   text?: string
   roles?: boolean
 }
 
 export function textUnitColorize(unit: unknown, options: ColorizingOptions = {}) {
-  const { unit: unitColor } = addDefaultsToOptions(options)
+  const { unit: unitColor, num } = addDefaultsToOptions(options)
   switch (typeof unit) {
     case 'string':
       return unitColor + unit
@@ -181,9 +182,9 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
       return '§c<>§r'
 
     case 'number':
-      return `§6${separateNumberWithDots(unit)}`
+      return `${num}${separateNumberWithDots(unit)}`
     case 'bigint':
-      return `§6${unit}`
+      return `${num}${unit}`
 
     case 'boolean':
       return unit ? '§fДа' : '§cНет'

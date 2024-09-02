@@ -5,7 +5,7 @@ import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
 import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
-import { customItems } from 'modules/commands/getitem'
+import { customItems } from 'modules/commands/items'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
 import { SafeLocation, ValidLocation, location } from '../location'
@@ -41,15 +41,7 @@ export class Crate {
 
     Crate.crates.set(this.id, this)
 
-    system.runTimeout(
-      () => {
-        const key = this.createKeyItemStack()
-        key.nameTag = `${place.group.name}: ${key.nameTag}`
-        customItems.push(key)
-      },
-      'add key',
-      10,
-    )
+    system.runTimeout(() => customItems.push(this.createKeyItemStack()), 'add key', 10)
   }
 
   createKeyItemStack() {

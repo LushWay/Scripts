@@ -2,7 +2,7 @@ import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Region, Vector } from 'lib'
-import { customItems } from 'modules/commands/getitem'
+import { customItems } from 'modules/commands/items'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 
@@ -11,7 +11,7 @@ export const FireBallItem = new ItemStack('lw:fireball').setInfo(
   'Используйте, чтобы отправить все в огненный ад',
 )
 export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
-  '§3Снежная бомба\n§7(use)',
+  '§3Снежная бомба',
   'Используйте, чтобы отправить все к снежной королеве под льдину',
 )
 

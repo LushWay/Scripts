@@ -1,7 +1,7 @@
 import { ItemStack, system } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
 import { langToken, translateToken } from 'lib/utils/lang'
-import { customItems } from 'modules/commands/getitem'
+import { customItems } from 'modules/commands/items'
 
 class CustomItem {
   constructor(public id: string) {

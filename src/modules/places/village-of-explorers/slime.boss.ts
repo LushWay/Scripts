@@ -3,7 +3,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Loot, ms } from 'lib'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
-import { BossSlimeBall } from './village-of-explorers'
+import { MagicSlimeBall } from './village-of-explorers'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()
@@ -13,7 +13,7 @@ export function createBossSlime(group: Group) {
     .typeId(MinecraftEntityTypes.Slime)
     .loot(
       new Loot('slime boss')
-        .itemStack(BossSlimeBall)
+        .itemStack(MagicSlimeBall)
         .amount({
           '40...64': '2%',
           '65...128': '1%',
