@@ -140,7 +140,7 @@ function onDamage(
   const cooldown =
     damagingEntity?.isPlayer() && hurtEntity.isPlayer()
       ? options.pvpPlayerCooldown
-      : Boss.isBoss(hurtEntity)
+      : Boss.isBoss(hurtEntity) || (damagingEntity && Boss.isBoss(damagingEntity))
         ? options.pvpBossCooldown
         : options.pvpMonsterCooldown
 
