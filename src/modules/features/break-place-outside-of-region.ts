@@ -1,11 +1,11 @@
 import { Player } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, ms } from 'lib'
-import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
+import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { BaseRegion } from 'modules/places/base/region'
 import { isScheduledToPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
-const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS)
+const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS, GATES)
 const INTERACTABLEITEMS = Object.values(MinecraftItemTypes)
   .filter(e => e.includes('axe'))
   .concat(MinecraftItemTypes.FlintAndSteel) as (undefined | string)[]

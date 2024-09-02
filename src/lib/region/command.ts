@@ -138,7 +138,8 @@ export function editRegionPermissions(
       switches: boolean,
       trapdoors: boolean,
       containers: boolean,
-      pvp?: boolean,
+      fences: boolean,
+      pvp?: 'true' | 'false' | 'pve',
       radius?: number,
       center?: string,
     ) => void
@@ -159,21 +160,34 @@ export function editRegionPermissions(
       `Контейнеры\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки открывать контейнеры (сундуки, шалкеры и тд)`,
       region.permissions.openContainers,
     )
+    .addToggle(
+      `Калитки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать калитки.`,
+      region.permissions.gates,
+    )
 
   if (extendedEditPermissions) {
-    form = form.addToggle(`PVP\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`, region.permissions.pvp)
+    form = form.addDropdownFromObject(
+      `Сражение\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`,
+      {
+        true: 'Да',
+        pve: 'Только с сущностями (pve)',
+        false: 'Нет',
+      },
+      { defaultValueIndex: String(region.permissions.pvp) },
+    )
 
     if (region.area instanceof SphereArea)
       form
         .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
         .addTextField('Центр региона', Vector.string(region.area.center), Vector.string(region.area.center))
   }
-  form.show(player, (ctx, doors, switches, trapdoors, containers, pvp, radiusOrCenter, rawCenter) => {
+  form.show(player, (ctx, doors, switches, trapdoors, containers, fences, pvp, radiusOrCenter, rawCenter) => {
     region.permissions.doors = doors
     region.permissions.switches = switches
     region.permissions.trapdoors = trapdoors
+    region.permissions.gates = fences
     region.permissions.openContainers = containers
-    if (typeof pvp !== 'undefined') region.permissions.pvp = pvp
+    if (typeof pvp === 'string') region.permissions.pvp = pvp === 'false' ? false : pvp === 'true' ? true : 'pve'
 
     if (region.area instanceof SphereArea) {
       if (typeof radiusOrCenter === 'number') region.area.radius = radiusOrCenter

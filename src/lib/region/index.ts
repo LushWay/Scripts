@@ -11,7 +11,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents } from 'lib/assets/player-json'
 import { isBuilding } from 'lib/game-utils'
 import { EventSignal } from '../event-signal'
-import { BLOCK_CONTAINERS, DOORS, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES, SWITCHES, TRAPDOORS } from './config'
+import { BLOCK_CONTAINERS, DOORS, GATES, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES, SWITCHES, TRAPDOORS } from './config'
 import { RegionEvents } from './events'
 import { Region } from './kinds/region'
 export * from './command'
@@ -43,27 +43,31 @@ export function actionGuard(fn: InteractionAllowed, position: ActionGuardOrder) 
 
 export enum ActionGuardOrder {
   BlockAction = 11,
-  Anticheat = 10,
-  Feature = 9,
-  Permission = 8,
-  Lowest = 7,
+  RegionMember = 10,
+  Anticheat = 9,
+  Feature = 8,
+  Permission = 7,
+  Lowest = 6,
 }
 
 actionGuard((player, region, ctx) => {
-  if (ctx.type !== 'interactWithBlock') return
-  const { event } = ctx
-
-  if (region?.permissions.switches && SWITCHES.includes(event.block.typeId)) return true // allow
-  if (region?.permissions.doors && DOORS.includes(event.block.typeId)) return true // allow
-  if (region?.permissions.trapdoors && TRAPDOORS.includes(event.block.typeId)) return true // allow
-  if (region?.permissions.openContainers && BLOCK_CONTAINERS.includes(event.block.typeId)) return true // allow
-}, ActionGuardOrder.Lowest)
-
-const allowed: InteractionAllowed = (player, region, context, regions) => {
   if (isBuilding(player)) return true
 
   if (region?.getMemberRole(player.id)) return true
+}, ActionGuardOrder.RegionMember)
 
+actionGuard((player, region, ctx) => {
+  if (ctx.type !== 'interactWithBlock' || !region) return
+  const { typeId } = ctx.event.block
+
+  if (TRAPDOORS.includes(typeId)) return region.permissions.trapdoors // allow
+  if (GATES.includes(typeId)) return region.permissions.gates // allow
+  if (SWITCHES.includes(typeId)) return region.permissions.switches // allow
+  if (DOORS.includes(typeId)) return region.permissions.doors // allow
+  if (BLOCK_CONTAINERS.includes(typeId)) return region.permissions.openContainers // allow
+}, ActionGuardOrder.Permission)
+
+const allowed: InteractionAllowed = (player, region, context, regions) => {
   // Disable bow in regions where allowed entities does not allow spawning arrow or firework
   if (region && (context.type === 'interactWithEntity' || context.type === 'interactWithBlock')) {
     const { typeId } = player.mainhand()
@@ -84,7 +88,9 @@ const allowed: InteractionAllowed = (player, region, context, regions) => {
   //
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
-    if (typeof result !== 'undefined') return result
+    if (typeof result === 'boolean') {
+      return result
+    }
   }
 }
 

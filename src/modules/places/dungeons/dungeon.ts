@@ -100,9 +100,11 @@ export class DungeonRegion extends Region {
 
   protected defaultPermissions: RegionPermissions = {
     pvp: true,
+    pve: true,
     switches: true,
     doors: true,
     trapdoors: false,
+    gates: false,
     openContainers: true,
     owners: [],
     allowedEntities: 'all',

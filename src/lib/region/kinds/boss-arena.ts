@@ -18,9 +18,10 @@ export class BossArenaRegion extends Region {
     allowedEntities: 'all',
     trapdoors: false,
     doors: false,
+    gates: false,
     switches: false,
     openContainers: true,
-    pvp: true,
+    pvp: 'pve',
     owners: [],
   }
 

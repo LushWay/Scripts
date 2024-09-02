@@ -13,12 +13,14 @@ export interface RegionPermissions extends Record<string | number | symbol, unkn
   doors: boolean
   /** If the player can use switches, defualt: false */
   switches: boolean
+  /** If the player can use gates, defualt: false */
+  gates: boolean
   /** If the player can use trapdoors, defualt: false */
   trapdoors: boolean
   /** If the player can use doors, default: true */
   openContainers: boolean
-  /** If players can fight, default: false */
-  pvp: boolean
+  /** If players can fight eachother, or pve if they can fight only entities, default: false */
+  pvp: boolean | 'pve'
   /** The entities allowed to spawn in this region */
   allowedEntities: string[] | 'all'
   /** Owners of region */

@@ -17,6 +17,11 @@ export const SWITCHES = BlockTypes.getAll()
   .filter(e => /button|lever$/.test(e.id))
   .map(e => e.id)
 
+/** All gates in minecraft */
+export const GATES = BlockTypes.getAll()
+  .filter(e => e.id.includes('fence_gate'))
+  .map(e => e.id)
+
 /** A list of all containers a item could be in */
 export const BLOCK_CONTAINERS = [
   'minecraft:chest',

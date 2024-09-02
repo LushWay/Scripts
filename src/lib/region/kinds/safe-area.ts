@@ -3,7 +3,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { addAddableRegion } from 'lib/region/command'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
-import { Region, RegionCreationOptions } from './region'
+import { Region, RegionCreationOptions, RegionPermissions } from './region'
 
 interface SafeAreaRegionOptions extends RegionCreationOptions {
   safeAreaName?: string
@@ -11,7 +11,7 @@ interface SafeAreaRegionOptions extends RegionCreationOptions {
 }
 
 export class SafeAreaRegion extends Region {
-  protected readonly defaultPermissions = {
+  protected readonly defaultPermissions: RegionPermissions = {
     allowedEntities: [
       MinecraftEntityTypes.Player,
       MinecraftEntityTypes.ArmorStand,
@@ -20,6 +20,7 @@ export class SafeAreaRegion extends Region {
     ],
     doors: true,
     switches: false,
+    gates: false,
     trapdoors: false,
     openContainers: false,
     pvp: false,

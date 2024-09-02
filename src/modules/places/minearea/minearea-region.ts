@@ -16,11 +16,12 @@ export class MineareaRegion extends RegionWithStructure {
 
   protected readonly defaultPermissions: RegionPermissions = {
     allowedEntities: 'all',
+    pvp: 'pve',
     trapdoors: true,
     doors: true,
+    gates: true,
     switches: true,
     openContainers: true,
-    pvp: true,
     owners: [],
   }
 

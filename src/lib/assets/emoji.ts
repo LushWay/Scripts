@@ -1,6 +1,3 @@
-import { world } from '@minecraft/server'
-import { stringify } from 'lib'
-
 export const emoji = {
   money: '',
   leaf: '',
@@ -138,5 +135,3 @@ export const emoji = {
     },
   },
 }
-
-world.say(stringify(emoji.custom))
