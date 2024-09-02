@@ -1,7 +1,7 @@
 import { playerSettingsMenu, worldSettingsMenu } from 'lib/settings'
 
 new Command('settings')
-  .setAliases('options', 's')
+  .setAliases('options')
   .setPermissions('member')
   .setDescription('Настройки')
   .executes(ctx => {

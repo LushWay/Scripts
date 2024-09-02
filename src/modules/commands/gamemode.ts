@@ -1,8 +1,8 @@
 import { GameMode } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { isNotPlaying, Temporary } from 'lib'
+import { is, isNotPlaying, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { t, textTable } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 function fastGamemode(mode: GameMode, shorname: string) {
@@ -97,7 +97,8 @@ new Command('hpi')
 
               ctx.player.onScreenDisplay.setActionBar(
                 t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
-              ActionbarPriority.UrgentNotificiation)
+                ActionbarPriority.UrgentNotificiation,
+              )
             },
             'hpi',
             10,
@@ -105,5 +106,27 @@ new Command('hpi')
         }),
       )
       ctx.player.success('Наведитесь на сущность чтобы узнать ее данные')
+    }
+  })
+
+new Command('version')
+  .setAliases('v')
+  .setDescription('Версия сервера')
+  .executes(ctx => {
+    ctx.reply(
+      textTable({
+        'Версия майнкрафта': '1.21.2',
+        'Версия сервера': '1.21.3',
+      }),
+    )
+
+    if (is(ctx.player.id, 'techAdmin')) {
+      ctx.reply(
+        textTable({
+          Коммит: __GIT__,
+          Разработка: __DEV__,
+          Релиз: __RELEASE__,
+        }),
+      )
     }
   })

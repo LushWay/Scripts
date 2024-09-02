@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
+import { stringifyError } from 'lib'
+import { t } from 'lib/text'
 import { stringifySymbol } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
 import { is } from '../roles'
@@ -92,6 +94,18 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     return '§f' + Command.prefixes[0] + this.sys.name
   }
 
+  private static checkIsUnique(name: string) {
+    for (const command of this.commands) {
+      if (!command.sys.parent && command.sys.name === name) {
+        Command.logger
+          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? t.warn`And:\n${command.stack}` : ''}`
+        return
+      }
+    }
+  }
+
+  private stack: string
+
   sys = {
     /**
      * The name of the command
@@ -162,6 +176,9 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param {string} name - Name of the new command
    */
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
+    this.stack = stringifyError.stack.get(2)
+    if (!parent) Command.checkIsUnique(name)
+
     this.sys.name = name
 
     if (type) this.sys.type = type
@@ -197,6 +214,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    *   .setAliases('c') // Command now will be available as .c too!
    */
   setAliases(...aliases: string[]) {
+    if (!this.sys.parent) for (const alias of aliases) Command.checkIsUnique(alias)
+
     this.sys.aliases = aliases
     return this
   }
