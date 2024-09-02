@@ -1,6 +1,6 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
-import { Entity, system, world } from '@minecraft/server'
+import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { Core } from 'lib/extensions/core'
@@ -11,8 +11,11 @@ import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
+import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
+import { Vector } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { FloatingText } from './floating-text'
 import { Group, Place } from './place'
 
 interface BossDB {
@@ -128,8 +131,17 @@ export class Boss {
     }
   }
 
+  private floatingText = new FloatingText(this.options.place.fullId, this.dimensionId)
+
   checkRespawnTime(db: BossDB) {
-    if (Date.now() > db.date + this.options.respawnTime) this.spawnEntity()
+    if (Date.now() > db.date + this.options.respawnTime) {
+      this.spawnEntity()
+    } else if (this.location.valid) {
+      this.floatingText.update(
+        Vector.add(this.location, { x: 0, y: 2, z: 0 }),
+        `${this.options.place.name}\n${t.time`Осталось ${this.options.respawnTime - (Date.now() - db.date)}`}`,
+      )
+    }
   }
 
   spawnEntity() {
@@ -181,14 +193,23 @@ export class Boss {
       this.onDie({ dropLoot: false })
     }
 
-    if (entity) entity.nameTag = this.options.place.name
+    if (entity) {
+      entity.nameTag = this.options.place.name
+      this.floatingText.hide()
+    }
     this.entity = entity
   }
 
   onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
 
-    this.logger.info('Died')
+    this.logger.info(
+      `Died. Got hits from ${[...this.damage.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(e => `${Player.name(e[0])}: ${e[1]}`)
+        .join(', ')}`,
+    )
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
 

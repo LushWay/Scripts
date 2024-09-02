@@ -1,6 +1,6 @@
 import { Entity, ShortcutDimensions, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { isChunkUnloaded } from 'lib/game-utils'
+import { createLogger } from 'lib/utils/logger'
 import { Vector } from 'lib/vector'
 
 export class FloatingText {
@@ -15,11 +15,20 @@ export class FloatingText {
 
   private entity: Entity | undefined
 
+  hide() {
+    if (!this.entity?.isValid()) return
+
+    this.entity.remove()
+  }
+
   update(location: Vector3, nameTag: string) {
-    if (isChunkUnloaded({ location, dimensionId: this.dimensionId })) {
-      // return console.warn(this.prefix + 'Chunk is unloaded')
+    if (
+      !world
+        .getAllPlayers()
+        .map(e => e.location)
+        .some(e => Vector.distance(location, e) < 30)
+    )
       return
-    }
 
     location = Vector.add(location, { x: 0.5, y: 0.7, z: 0.5 })
 
@@ -32,7 +41,7 @@ export class FloatingText {
       this.entity.teleport(location)
       this.entity.nameTag = nameTag
     } else {
-      console.warn(this.prefix + 'Entity is invalid')
+      this.logger.warn('Entity is invalid')
     }
   }
 
@@ -47,7 +56,5 @@ export class FloatingText {
       .find(e => e.getDynamicProperty(FloatingText.dynamicProperty) === this.id)
   }
 
-  private get prefix() {
-    return `[FloatingText][${this.id}] `
-  }
+  private logger = createLogger(`FloatingText ${this.id}`)
 }
