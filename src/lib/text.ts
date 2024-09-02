@@ -35,7 +35,10 @@ type Multi = MultiStatic & Record<OptionsModifiers, Fn & Omit<MultiStatic, Optio
 export function textTable(table: Record<string, unknown>, join: false): string[]
 export function textTable(table: Record<string, unknown>, join?: true): string
 export function textTable(table: Record<string, unknown>, join = true): string | string[] {
-  const mapped = Object.entries(table).map(([key, value]) => `§7${key}: ${textUnitColorize(value)}`)
+  const long = Object.keys(table).length > 5
+  const mapped = Object.entries(table).map(
+    ([key, value], i) => `${long && i % 2 === 0 ? '§f' : '§7'}${key}: ${textUnitColorize(value)}`,
+  )
   return join ? mapped.join('\n') : mapped
 }
 

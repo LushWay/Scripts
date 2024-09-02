@@ -154,6 +154,23 @@ describe('textTable', () => {
       §7Другой ключ: §62
       §7Игрок: §fTest player name"
     `)
+
+    expect(
+      textTable({
+        'Ключ': 'значение',
+        'Другой ключ': 2,
+        'Другой клsюч': 2,
+        'Другой клssюч': 2,
+        'Другой клsssюч': 2,
+        'Другой клssssюч': 2,
+        'Другой клsssssюч': 2,
+        'Игрок': player,
+      }),
+    ).toMatchInlineSnapshot(`
+      "§7Ключ: §fзначение
+      §7Другой ключ: §62
+      §7Игрок: §fTest player name"
+    `)
   })
 
   it('should create array', () => {

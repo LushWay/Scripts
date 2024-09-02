@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, Menu, Settings, util } from 'lib'
-import { t } from 'lib/text'
+import { ActionForm, Menu, Settings } from 'lib'
+import { t, textTable } from 'lib/text'
 
 new Command('stats').setDescription('Показывает статистику по игре').executes(ctx => showStats(ctx.player))
 
@@ -30,16 +30,19 @@ function showStats(player: Player, target: Player = player, back?: VoidFunction)
   }
 
   const form = new ActionForm(
-    'Статистика',
-    `§f§lСтатистика игрока §r§f${target.name}§r
-§cВремени на анархии:§r ${formatDate(target.scores.anarchyOnlineTime)}
-§6Времени на сервере§r: ${formatDate(target.scores.totalOnlineTime)}
-§eБлоков сломано§r: ${target.scores.blocksBroken}
-§aБлоков поставлено§r: ${target.scores.blocksPlaced}
-§bСмертей§r: ${target.scores.deaths}
-§9Убийств§r: ${target.scores.kills}
-§5Урона получено§r: ${target.scores.damageRecieve}
-§dУрона нанесено§r: ${target.scores.damageGive}`,
+    t.header`Статистика игрока ${target.name}`,
+    textTable({
+      'Времени на сервере': formatDate(target.scores.totalOnlineTime),
+      'Времени на анархии': formatDate(target.scores.anarchyOnlineTime),
+      'Блоков сломано': target.scores.blocksBroken,
+      'Блоков поставлено': target.scores.blocksPlaced,
+      'Смертей': target.scores.deaths,
+      'Убийств': target.scores.kills,
+      'Убийств/Смертей': target.scores.kills / target.scores.deaths,
+      'Урона получено': target.scores.damageRecieve,
+      'Урона нанесено': target.scores.damageGive,
+      'Нанесено/Получено': target.scores.damageGive / target.scores.damageRecieve,
+    }),
   )
 
   form.addButton('OK', () => null)
