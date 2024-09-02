@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Cooldown, ms, Vector } from 'lib'
+import { Cooldown, ms } from 'lib'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { BaseRegion } from 'modules/places/base/region'
 import { isScheduledToPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
@@ -24,10 +24,10 @@ actionGuard((player, region, ctx) => {
 
     scheduleBlockPlace({
       dimension: ctx.event.block.dimension.type,
-      restoreTime: ms.from('sec', 10),
-      typeId: MinecraftBlockTypes.Air,
+      location: ctx.event.block.location,
       states: void 0,
-      location: Vector.floor(Vector.add(ctx.event.block.location, ctx.event.faceLocation)),
+      restoreTime: ms.from('min', 1),
+      typeId: MinecraftBlockTypes.Air,
     })
     return true
   } else if (ctx.type === 'break') {
