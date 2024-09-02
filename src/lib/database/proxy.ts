@@ -95,7 +95,7 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
       if (typeof defaultValue === 'object' && defaultValue !== null && typeof value === 'object' && value !== null) {
         if (Array.isArray(defaultValue)) {
           //
-          if (Array.isArray(value) || Array.equals(value as unknown[], defaultValue)) continue
+          if (Array.isArray(value) && Array.equals(value as unknown[], defaultValue)) continue
 
           COMPOSED[key] = value
         } else {

@@ -94,6 +94,13 @@ describe('ProxyDatabase.setDefaults', () => {
     expect(result).toEqual(defaultArray)
   })
 
+  it('should not override array', () => {
+    const sourceObject = { owners: ['120341'] }
+    const defaultObject = { owners: [] }
+    const result = ProxyDatabase.setDefaults(sourceObject, defaultObject)
+    expect(result).toEqual(sourceObject)
+  })
+
   it('should merge objects with nested structures', () => {
     const sourceObject = { a: { b: 1 }, c: 3 }
     const defaultObject = { a: { b: 2, d: 4 }, e: 5 }
@@ -185,6 +192,13 @@ describe('ProxyDatabase.removeDefaults', () => {
     const defaultObject = { a: null, b: 2, d: 4 }
     const result = ProxyDatabase.removeDefaults(sourceObject, defaultObject)
     expect(result).toEqual({ b: undefined, c: 3 })
+  })
+
+  it('should not delete not empty arrays', () => {
+    const sourceObject = { owners: ['120341'] }
+    const defaultObject = { owners: [] }
+    const result = ProxyDatabase.removeDefaults(sourceObject, defaultObject)
+    expect(result).toEqual(sourceObject)
   })
 
   it('should not remove properties that do not match default values', () => {
