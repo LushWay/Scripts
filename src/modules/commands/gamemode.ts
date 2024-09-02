@@ -1,9 +1,10 @@
-import { GameMode } from '@minecraft/server'
+import { GameMode, Player, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { is, isNotPlaying, Temporary } from 'lib'
+import { is, isNotPlaying, LockAction, Temporary, Vector } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t, textTable } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { randomLocationInAnarchy } from 'modules/places/anarchy/random-location-in-anarchy'
 
 function fastGamemode(mode: GameMode, shorname: string) {
   new Command(shorname)
@@ -129,4 +130,50 @@ new Command('version')
         }),
       )
     }
+  })
+
+const rtpPlayers = new WeakPlayerMap<Vector3>()
+new LockAction(player => rtpPlayers.has(player), 'Вы телепортируетесь!')
+
+function cancelRtp(player: Player) {
+  const location = rtpPlayers.get(player)
+  if (!location) return player.fail('Вы не телепортируетесь!')
+
+  rtpComplete(player, location)
+}
+
+function rtpComplete(player: Player, location: Vector3) {
+  rtpPlayers.delete(player)
+  player.teleport(location)
+  player.removeEffect(MinecraftEffectTypes.SlowFalling)
+}
+
+new Command('rtp')
+  .setAliases('wild')
+  .setDescription('Телепортация в случайное место на анархии')
+  .setPermissions('member')
+  .executes(ctx => {
+    if (ctx.player.dimension.type !== 'overworld' || ctx.player.database.inv !== 'anarchy')
+      return ctx.error('Недоступно')
+    if (LockAction.locked(ctx.player)) return
+
+    rtpPlayers.set(ctx.player, ctx.player.location)
+
+    randomLocationInAnarchy({
+      info: info => ctx.player.onScreenDisplay.setActionBar(info, ActionbarPriority.UrgentNotificiation),
+      onBlock: block => {
+        ctx.player.addEffect(MinecraftEffectTypes.SlowFalling, 200 * TicksPerSecond, { amplifier: 100 })
+        ctx.player.teleport(block)
+      },
+    }).then(location => {
+      if (!location) return cancelRtp(ctx.player)
+
+      rtpComplete(ctx.player, Vector.add(location.topmost, Vector.up))
+    })
+  })
+  .overload('cancel')
+  .setDescription('Отменяет телепортацию')
+  .setPermissions('member')
+  .executes(ctx => {
+    cancelRtp(ctx.player)
   })
