@@ -22,7 +22,7 @@ export declare namespace ArrayForm {
     back: VoidFunction,
   ) => [text: string, callback: NewFormCallback] | false
   type Sort<T, F> = (array: T[], filters: F) => T[]
-  type AddCustomButtons<TH> = (this: TH, form: ActionForm) => void
+  type AddCustomButtons<TH> = (this: TH, form: ActionForm, back: VoidFunction) => void
 
   interface Options<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
     filters: C
@@ -117,7 +117,7 @@ export class ArrayForm<
       this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
     }
 
-    this.config.addCustomButtonBeforeArray?.(form)
+    this.config.addCustomButtonBeforeArray?.(form, selfback)
 
     // Array item buttons & navigation
     if (paginator.canGoBack)

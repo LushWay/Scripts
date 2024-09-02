@@ -61,14 +61,14 @@ function roleMenu(player: Player) {
           .filter(key => key[0] !== player.id)
       } else return keys
     })
-    .addCustomButtonBeforeArray(function (this, form) {
-      const button = this.button?.([player.id, player.database], { sort: 'role' }, form)
+    .addCustomButtonBeforeArray(function (this, form, back) {
+      const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
 
       if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', button[1])
     })
     .button(([id, { role, name: dbname }], _, form) => {
       const target = players.find(e => e.id === id) ?? id
-      const name = typeof target === 'string' ? dbname ?? 'Без имени' : target.name
+      const name = typeof target === 'string' ? (dbname ?? 'Без имени') : target.name
 
       return [
         `${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${

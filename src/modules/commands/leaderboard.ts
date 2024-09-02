@@ -13,7 +13,7 @@ new Command('leaderboard')
 function leaderboardMenu(player: Player) {
   const form = new ActionForm('Таблицы лидеров')
 
-  form.addButton('§3Добавить', BUTTON['+'], editLeaderboard)
+  form.addButton('§3Добавить', BUTTON['+'], p => editLeaderboard(p))
 
   for (const lb of Leaderboard.all.values()) {
     form.addButton(info(lb), () => {
