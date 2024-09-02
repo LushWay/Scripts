@@ -1,5 +1,6 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
 import { LockAction, Settings } from 'lib'
+import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { HealthIndicatorConfig } from './config'
@@ -67,7 +68,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
       const q = score === options.pvpCooldown || score === 0
       const g = (p: string) => (q ? `§4${p}` : '')
 
-      player.onScreenDisplay.setActionBar(`${g('»')} §6Сражение: ${score} ${g('«')}`, ActionbarPriority.PvP)
+      player.onScreenDisplay.setActionBar(`${g('»')} ${emoji.custom.sword} §6${score} ${g('«')}`, ActionbarPriority.PvP)
     },
     'PVP player',
     0,
@@ -135,23 +136,14 @@ function onDamage(event: EntityHurtAfterEvent, fatal = false) {
         if (event.hurtEntity instanceof Player) {
           // Player
           damage.damagingEntity.onScreenDisplay.setActionBar(
-            `§gВы ${isBow ? 'застрелили' : 'убили'} §6${event.hurtEntity.name}`,
+            `${isBow ? 'Вы застрелили' : emoji.custom.kill}${event.hurtEntity.name}`,
             ActionbarPriority.UrgentNotificiation,
           )
         } else {
           // Entity
-
           const entityName = event.hurtEntity.typeId.replace('minecraft:', '')
           damage.damagingEntity.onScreenDisplay.setActionBar(
-            {
-              rawtext: [
-                { text: '§6' },
-                {
-                  translate: `entity.${entityName}.name`,
-                },
-                { text: isBow ? ' §gзастрелен' : ' §gубит' },
-              ],
-            },
+            { rawtext: [{ text: emoji.custom.kill }, { translate: `entity.${entityName}.name` }] },
             ActionbarPriority.UrgentNotificiation,
           )
         }

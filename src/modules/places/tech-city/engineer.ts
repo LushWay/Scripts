@@ -21,7 +21,7 @@ export const Chip = new ItemStack(Items.Chip).setInfo(
   'Используется для создания платы у Инжинера в Технограде',
 )
 
-class NotNewbieCost extends Cost {
+export const NotNewbieCost = new (class NotNewbieCost extends Cost {
   toString(canBuy?: boolean): MaybeRawText {
     return canBuy ? '' : t.error`Вы не можете купить это в режиме новичка`
   }
@@ -33,7 +33,7 @@ class NotNewbieCost extends Cost {
   failed(player: Player): MaybeRawText {
     return this.toString()
   }
-}
+})()
 
 export class Engineer extends ShopNpc {
   constructor(public group: Group) {
@@ -43,7 +43,7 @@ export class Engineer extends ShopNpc {
     this.shop.menu(menu => {
       menu.itemStack(
         BaseItem.itemStack,
-        new MultiCost(new NotNewbieCost())
+        new MultiCost(NotNewbieCost)
           .item(CircuitBoard)
           .item(MinecraftItemTypes.NetherStar)
           .item(BaseItem.blueprint)

@@ -1,3 +1,6 @@
+import { world } from '@minecraft/server'
+import { stringify } from 'lib'
+
 export const emoji = {
   money: '',
   leaf: '',
@@ -7,6 +10,33 @@ export const emoji = {
   pickaxe: '',
   minecoin: '',
   token: '',
+  custom: {
+    socials: {
+      discord: String.fromCharCode(0xe110),
+      youtube: String.fromCharCode(0xe111),
+      telegram: String.fromCharCode(0xe112),
+      instagram: String.fromCharCode(0xe113),
+      twitch: String.fromCharCode(0xe114),
+    },
+    armor: {
+      leather: String.fromCharCode(0xe120),
+      chainmail: String.fromCharCode(0xe121),
+      golden: String.fromCharCode(0xe122),
+      iron: String.fromCharCode(0xe123),
+      diamond: String.fromCharCode(0xe124),
+      netherite: String.fromCharCode(0xe125),
+    },
+    swords: {
+      wooden: String.fromCharCode(0xe130),
+      stone: String.fromCharCode(0xe131),
+      golden: String.fromCharCode(0xe132),
+      iron: String.fromCharCode(0xe133),
+      diamond: String.fromCharCode(0xe134),
+      netherite: String.fromCharCode(0xe135),
+    },
+    kill: String.fromCharCode(0xe164),
+    sword: String.fromCharCode(0xe165),
+  },
   buttons: {
     code_builder: '',
     immersive_reader: '',
@@ -108,3 +138,5 @@ export const emoji = {
     },
   },
 }
+
+world.say(stringify(emoji.custom))

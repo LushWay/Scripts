@@ -1,7 +1,6 @@
 import { World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { stringify } from '../util'
-import { Core } from './core'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -25,19 +24,8 @@ declare module '@minecraft/server' {
   }
 }
 
-const send = world.sendMessage.bind(world)
-
 expand(World.prototype, {
-  say(message) {
-    if (Core.afterEvents.worldLoad.loaded) {
-      this.say = send
-      return send(message)
-    }
-
-    if (typeof message === 'string' && !message.startsWith('§9')) message = '§9│ ' + message.replace(/\n/g, '\n§9│ §r')
-
-    send(message)
-  },
+  say: world.sendMessage.bind(world),
   overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
   nether: world.getDimension(MinecraftDimensionTypes.Nether),
   end: world.getDimension(MinecraftDimensionTypes.TheEnd),

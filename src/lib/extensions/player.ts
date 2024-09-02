@@ -2,6 +2,7 @@ import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, 
 import { Sounds } from 'lib/assets/custom-sounds'
 import { request } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
+import { MaybeRawText } from 'lib/text'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -20,7 +21,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: warn success info
      */
-    fail(message: string, sound?: boolean): void
+    fail(message: MaybeRawText, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -32,7 +33,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail success info**
      */
-    warn(message: string, sound?: boolean): void
+    warn(message: MaybeRawText, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -44,7 +45,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn info**
      */
-    success(message?: string, sound?: boolean): void
+    success(message?: MaybeRawText, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -56,7 +57,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn success**
      */
-    info(message: string, sound?: boolean): void
+    info(message: MaybeRawText, sound?: boolean): void
 
     /** Gets ContainerSlot from the player mainhand */
     mainhand(): ContainerSlot
@@ -122,22 +123,22 @@ expand(Player, {
   },
 })
 
-function prefix(pref: string, sound: string): (this: Player, message: string, playSound?: boolean) => void
+function prefix(pref: string, sound: string): (this: Player, message: MaybeRawText, playSound?: boolean) => void
 function prefix(
   pref: string,
   sound: string,
   defaultText: string,
-): (this: Player, message?: string, playSound?: boolean) => void
+): (this: Player, message?: MaybeRawText, playSound?: boolean) => void
 function prefix(
   pref: string,
   sound: string,
   defaultText?: string,
-): (this: Player, message: string, playSound?: boolean) => void {
+): (this: Player, message?: MaybeRawText, playSound?: boolean) => void {
   return function (this, message = defaultText, playSound = true) {
     system.delay(() => {
-      if (!this.isValid()) return
+      if (!this.isValid() || !message) return
       if (playSound) this.playSound(sound)
-      this.tell(pref + message)
+      this.tell(typeof message === 'string' ? pref + message : { rawtext: [{ text: pref }, message] })
     })
   }
 }
