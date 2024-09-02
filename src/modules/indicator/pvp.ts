@@ -14,7 +14,7 @@ const options = Settings.world(...Settings.worldCommon, {
     description: 'Возможность входа в пвп режим (блокировка всех тп команд)§r',
     name: 'Включено',
   },
-  pvpCooldown: { value: 15, description: 'Время блокировки в секундах', name: 'Время' },
+  pvpCooldown: { value: 60, description: 'Время блокировки в секундах', name: 'Время' },
 })
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
