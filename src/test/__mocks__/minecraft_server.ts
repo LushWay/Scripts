@@ -3,9 +3,10 @@ import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 import { vi } from 'vitest'
 
-export class Component {
-  readonly 'typeId': string
-  'isValid'(): boolean {
+export abstract class Component {
+  abstract readonly typeId: string
+
+  isValid(): boolean {
     return true
   }
 }
@@ -16,7 +17,13 @@ export class BlockTypes {
   }
 }
 
-export class ItemComponent extends Component {}
+export abstract class ItemComponent extends Component {
+  abstract readonly componentId: string
+
+  get typeId() {
+    return this.componentId
+  }
+}
 export class ItemCooldownComponent extends ItemComponent {
   componentId = 'minecraft:cooldown' as const
 }
@@ -30,7 +37,9 @@ export class ItemFoodComponent extends ItemComponent {
   componentId = 'minecraft:food' as const
 }
 
-export class EntityComponent extends Component {
+export abstract class EntityComponent extends Component {
+  abstract readonly typeId: string
+
   constructor(readonly entity: Entity) {
     super()
   }
@@ -56,6 +65,38 @@ export class EntityInventoryComponent extends EntityComponent {
   static readonly 'componentId' = 'minecraft:inventory'
 }
 
+export enum EquipmentSlot {
+  Chest = 'Chest',
+  Feet = 'Feet',
+  Head = 'Head',
+  Legs = 'Legs',
+  Mainhand = 'Mainhand',
+  Offhand = 'Offhand',
+}
+
+export class EntityEquippableComponent extends EntityComponent {
+  static readonly componentId = 'minecraft:equippable'
+  readonly typeId = 'minecraft:equippable'
+
+  private container = new Container(Object.keys(EquipmentSlot).length)
+  private slots: Record<EquipmentSlot, ContainerSlot> = Object.fromEntries(
+    Object.values(EquipmentSlot).map((e, i) => [e, new ContainerSlot(i, this.container)]),
+  )
+
+  getEquipment(equipmentSlot: EquipmentSlot): ItemStack | undefined {
+    return this.getEquipmentSlot(equipmentSlot).getItem()
+  }
+
+  getEquipmentSlot(equipmentSlot: EquipmentSlot): ContainerSlot {
+    return this.slots[equipmentSlot]
+  }
+
+  setEquipment(equipmentSlot: EquipmentSlot, itemStack?: ItemStack): boolean {
+    this.getEquipmentSlot(equipmentSlot).setItem(itemStack)
+    return true
+  }
+}
+
 export class Entity {
   id = 'test entity id'
   nameTag = 'test entity nameTag'
@@ -63,6 +104,7 @@ export class Entity {
 
   private readonly components: EntityComponent[] = [
     new EntityInventoryComponent(this, 0, false, 'entity', 32, false, false),
+    new EntityEquippableComponent(this),
   ]
 
   getComponent(name: string) {
@@ -381,30 +423,29 @@ export enum GameMode {
 }
 
 export class ContainerSlot {
-  static create(slot: number, container: Container) {
-    const containerSlot = new this(slot, container)
-    return new Proxy(containerSlot, {
-      get(target, p, receiver) {
+  constructor(
+    private slot: number,
+    private container: Container,
+  ) {
+    return new Proxy(this, {
+      get: (target, p, receiver) => {
         if (p in target) {
           return Reflect.get(target, p, receiver)
         } else {
-          return Reflect.get(containerSlot.item, p, containerSlot.item)
+          if (!this.hasItem()) return
+          return Reflect.get(this.item, p, this.item)
         }
       },
-      set(target, p, receiver) {
+      set: (target, p, receiver) => {
         if (p in target) {
           return Reflect.set(target, p, receiver)
         } else {
-          return Reflect.set(containerSlot.item, p, containerSlot.item)
+          if (!this.hasItem()) return true
+          return Reflect.set(this.item, p, this.item)
         }
       },
     })
   }
-
-  private constructor(
-    private slot: number,
-    private container: Container,
-  ) {}
 
   private get item() {
     const item = this.container.getItem(this.slot, false)
@@ -413,7 +454,7 @@ export class ContainerSlot {
   }
 
   getItem(): ItemStack | undefined {
-    if (!this.hasItem()) throw new Error('No item')
+    if (!this.hasItem()) return undefined
     return this.container.getItem(this.slot)
   }
 
@@ -467,7 +508,7 @@ export class Container {
   }
 
   getSlot(slot: number): ContainerSlot {
-    return ContainerSlot.create(slot, this)
+    return new ContainerSlot(slot, this)
   }
 
   isValid(): boolean {

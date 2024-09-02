@@ -32,6 +32,10 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
 
 new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме пвп')
 
+world.afterEvents.entityDie.subscribe(event => {
+  if (event.deadEntity.isPlayer()) event.deadEntity.scores.pvp = 0
+})
+
 system.runInterval(
   () => {
     if (options.pvpEnabled) {

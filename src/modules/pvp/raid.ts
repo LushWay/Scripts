@@ -1,19 +1,22 @@
-import { Player, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 import { LockAction, Region, ms } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { t } from 'lib/text'
 import { BaseRegion } from 'modules/places/base/region'
 import { MineareaRegion } from 'modules/places/minearea/minearea-region'
+import { isScheduledToPlace } from 'modules/survival/scheduled-block-place'
 
 const notify = new Map<string, { time: number; reason: string }>()
-const targetLockTime = ms.from('min', 8) / 20 / 1000
-const raiderLockTime = ms.from('min', 10) / 20 / 1000
+const targetLockTime = ms.from('min', 8)
+const raiderLockTime = ms.from('min', 10)
+const objective = ScoreboardDB.objective('raid')
 
 world.beforeEvents.explosion.subscribe(event => {
   let base = false
   const impactedBlocks = event.getImpactedBlocks().filter(block => {
     const region = Region.nearestRegion(block, event.dimension.type)
     if (region instanceof MineareaRegion) return true
+    if (isScheduledToPlace(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
       for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: 'вас рейдят' })
       base = true
@@ -39,9 +42,10 @@ new LockAction(player => {
 
 system.runInterval(
   () => {
+    const players = world.getAllPlayers().map(e => ({ player: e, id: e.id }))
     for (const [id, { time, reason }] of notify) {
       // Ищем игрока...
-      const player = Player.getById(id)
+      const player = players.find(e => e.id === id)?.player
       if (player) {
         if (player.scores.raid === 0) {
           player.tell(
@@ -62,7 +66,6 @@ system.runInterval(
       } else notify.set(id, { time: time - 1, reason })
     }
 
-    const objective = ScoreboardDB.objective('raid')
     for (const { participant, score } of objective.getScores()) {
       if (score > 1) {
         objective.addScore(participant, -1)
