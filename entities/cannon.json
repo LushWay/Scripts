@@ -16,7 +16,7 @@
       },
 
       "minecraft:type_family": {
-        "family": ["player", "mob"]
+        "family": ["mob"]
       },
       "minecraft:collision_box": {
         "width": 2.2,
