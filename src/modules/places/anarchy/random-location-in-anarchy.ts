@@ -1,10 +1,7 @@
 import { system } from '@minecraft/server'
 import { dedupe } from 'lib/dedupe'
 import { getRandomVectorInCircle, getTopmostSolidBlock } from 'lib/game-utils'
-import { createLogger } from 'lib/utils/logger'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
-
-const logger = createLogger('wild')
 
 /**
  * Tries to find random location in anarhcy zone radius which is not in the ocean. Used for Airdrops and RTP.
@@ -19,7 +16,7 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
 }: {
   info?: (info: string) => void
   onBlock?: (block: Vector3) => void
-}) {
+} = {}) {
   if (!Anarchy.zone) return
   info?.('Поиск случайной локации без воды...')
 

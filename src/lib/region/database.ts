@@ -27,6 +27,7 @@ export const defaultRegionPermissions = (): RegionPermissions => ({
   openContainers: true,
   trapdoors: true,
   pvp: true,
+  gates: true,
   allowedEntities: 'all',
   owners: [],
 })

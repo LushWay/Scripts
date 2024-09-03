@@ -171,6 +171,7 @@ export class System {
   }
 
   run(fn: VoidFunction) {
+    // @ts-ignore
     setImmediate(fn)
     return 0
   }
