@@ -6,6 +6,7 @@ describe('dedupe', () => {
     let lock = 0
     const mockFn = vi.fn(async () => {
       lock++
+      // @ts-ignore
       await new Promise(r => setTimeout(r, 2))
       lock--
       expect(lock).toBe(0)
