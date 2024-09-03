@@ -1,10 +1,11 @@
-import { GameMode, Player, TicksPerSecond, world } from '@minecraft/server'
+/* i18n-ignore */
+
+import { GameMode } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { is, isNotPlaying, LockAction, Temporary, Vector } from 'lib'
+import { is, isNotPlaying, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t, textTable } from 'lib/text'
+import { t } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { randomLocationInAnarchy } from 'modules/places/anarchy/random-location-in-anarchy'
 
 function fastGamemode(mode: GameMode, shorname: string) {
   new Command(shorname)
@@ -41,7 +42,8 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
     .setDescription('Выдает эффект ' + effectName)
     .int('amlifier', true)
     .executes((ctx, amplifier = 1) => {
-      if (!isNotPlaying(ctx.player)) return ctx.error('Вы не можете совершить это действие вне режима строительства')
+      if (!isNotPlaying(ctx.player) && !is(ctx.player.id, 'techAdmin'))
+        return ctx.error('Вы не можете совершить это действие вне режима строительства')
 
       if (ctx.player.getEffect(effect)) {
         ctx.player.removeEffect(effect)
@@ -108,72 +110,4 @@ new Command('hpi')
       )
       ctx.player.success('Наведитесь на сущность чтобы узнать ее данные')
     }
-  })
-
-new Command('version')
-  .setAliases('v')
-  .setDescription('Версия сервера')
-  .executes(ctx => {
-    ctx.reply(
-      textTable({
-        'Версия майнкрафта': '1.21.2',
-        'Версия сервера': '1.21.3',
-      }),
-    )
-
-    if (is(ctx.player.id, 'techAdmin')) {
-      ctx.reply(
-        textTable({
-          Коммит: __GIT__,
-          Разработка: __DEV__,
-          Релиз: __RELEASE__,
-        }),
-      )
-    }
-  })
-
-const rtpPlayers = new WeakPlayerMap<Vector3>()
-new LockAction(player => rtpPlayers.has(player), 'Вы телепортируетесь!')
-
-function cancelRtp(player: Player) {
-  const location = rtpPlayers.get(player)
-  if (!location) return player.fail('Вы не телепортируетесь!')
-
-  rtpComplete(player, location)
-}
-
-function rtpComplete(player: Player, location: Vector3) {
-  rtpPlayers.delete(player)
-  player.teleport(location)
-  player.removeEffect(MinecraftEffectTypes.SlowFalling)
-}
-
-new Command('rtp')
-  .setAliases('wild')
-  .setDescription('Телепортация в случайное место на анархии')
-  .setPermissions('member')
-  .executes(ctx => {
-    if (ctx.player.dimension.type !== 'overworld' || ctx.player.database.inv !== 'anarchy')
-      return ctx.error('Недоступно')
-    if (LockAction.locked(ctx.player)) return
-
-    rtpPlayers.set(ctx.player, ctx.player.location)
-
-    randomLocationInAnarchy({
-      info: info => ctx.player.onScreenDisplay.setActionBar(info, ActionbarPriority.UrgentNotificiation),
-      onBlock: block => {
-        ctx.player.addEffect(MinecraftEffectTypes.SlowFalling, 200 * TicksPerSecond, { amplifier: 100 })
-        ctx.player.teleport(block)
-      },
-    }).then(location => {
-      if (!location) return cancelRtp(ctx.player)
-
-      rtpComplete(ctx.player, Vector.add(location.topmost, Vector.up))
-    })
-  })
-  .overload('cancel')
-  .setDescription('Отменяет телепортацию')
-  .setPermissions('member')
-  .executes(ctx => {
-    cancelRtp(ctx.player)
   })

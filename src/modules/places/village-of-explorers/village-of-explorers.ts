@@ -1,7 +1,7 @@
 import { ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Loot } from 'lib'
-import { customItems } from 'modules/commands/items'
+import { customItems } from 'lib/rpg/custom-item'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { Stoner } from '../lib/npc/stoner'

@@ -4,9 +4,9 @@ import { EventSignal } from 'lib/event-signal'
 import { Settings } from 'lib/settings'
 import { t } from 'lib/text'
 import { util } from 'lib/util'
-import { getFullname } from './get-fullname'
 import { Core } from './extensions/core'
 import { ActionbarPriority } from './extensions/on-screen-display'
+import { getFullname } from './get-fullname'
 
 class JoinBuilder {
   config = {
@@ -134,15 +134,15 @@ class JoinBuilder {
       joinTimes: player.scores.joinTimes,
       firstJoin: player.scores.joinTimes === 1,
     })
-  }
 
-  private command = new Command('join')
-    .setDescription('Имитирует первый вход')
-    .setPermissions('member')
-    .executes(ctx => {
-      const player = ctx.player
-      this.emitFirstJoin(player)
-    })
+    new Command('join')
+      .setDescription('Имитирует первый вход')
+      .setPermissions('member')
+      .executes(ctx => {
+        const player = ctx.player
+        this.emitFirstJoin(player)
+      })
+  }
 
   settings = Settings.player('Вход\n§7Все действия, связанные со входом', 'join', {
     message: {

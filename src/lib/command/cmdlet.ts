@@ -36,9 +36,8 @@ export class CmdLet {
     }
 
     if (cmdlets.length > 0 && results.length < 1) {
-      const many = cmdlets.length > 1
       event.sender.fail(
-        `§cНеизвестны${many ? 'e' : 'й'} командлет${many ? 'ы' : ''} §f${cmdlets.join(
+        `§cНеизвестный аргумент: §f${cmdlets.join(
           '§c, §f',
         )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(e => `\n  §f${e.name} §7§o- ${e.description}`)}\n `,
       )

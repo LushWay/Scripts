@@ -1,6 +1,6 @@
 import { Player, system } from '@minecraft/server'
-import { Mail } from 'lib'
 import { table } from 'lib/database/abstract'
+import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import './command'

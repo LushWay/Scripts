@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'

@@ -1,5 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { BUTTON, ChestForm, getAuxOrTexture } from 'lib'
+import { ChestForm, getAuxOrTexture } from 'lib/form/chest'
+import { BUTTON } from 'lib/form/utils'
 import { MaybeRawText, t } from 'lib/text'
 import { langToken, rawTextToString, translateEnchantment, translateToken } from 'lib/utils/lang'
 import { Cost, MultiCost, ShouldHaveItemCost } from '../cost'

@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { Player, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
 import { Vector } from 'lib/vector'

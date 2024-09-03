@@ -2,7 +2,7 @@ import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Region, Vector } from 'lib'
-import { customItems } from 'modules/commands/items'
+import { customItems } from 'lib/rpg/custom-item'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 

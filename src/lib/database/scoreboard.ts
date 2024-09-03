@@ -26,7 +26,7 @@ declare module '@minecraft/server' {
   }
 }
 
-const displayNames: Record<import('@minecraft/server').ScoreName, string> = {
+export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, string> = {
   leafs: '§aЛистья',
   money: '§6Монеты',
   kills: 'Убийств',
@@ -46,7 +46,7 @@ const displayNames: Record<import('@minecraft/server').ScoreName, string> = {
   lastSeenDate: 'Последний раз онлайн',
   pvp: 'PVP',
 }
-const untypedDisplayNames: Record<string, string> = displayNames
+const untypedDisplayNames: Record<string, string> = scoreboardDisplayNames
 
 expand(ScoreboardObjective.prototype, {
   get displayName() {

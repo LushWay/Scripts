@@ -1,7 +1,8 @@
 import { ItemStack, system } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
 import { langToken, translateToken } from 'lib/utils/lang'
-import { customItems } from 'modules/commands/items'
+
+export const customItems: ItemStack[] = []
 
 class CustomItem {
   constructor(public id: string) {

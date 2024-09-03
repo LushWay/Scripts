@@ -1,7 +1,5 @@
-import { ItemStack } from '@minecraft/server'
 import { ArrayForm, langToken, translateToken } from 'lib'
-
-export const customItems: ItemStack[] = []
+import { customItems } from 'lib/rpg/custom-item'
 
 new Command('items')
   .setPermissions('techAdmin')

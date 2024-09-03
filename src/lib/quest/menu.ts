@@ -1,8 +1,11 @@
 import { Player } from '@minecraft/server'
-import { is, MessageForm, noNullable, Vector } from 'lib'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
+import { MessageForm } from 'lib/form/message'
+import { is } from 'lib/roles'
 import { t } from 'lib/text'
+import { noNullable } from 'lib/util'
+import { Vector } from 'lib/vector'
 import { Quest } from './quest'
 
 const quest = new Command('q')

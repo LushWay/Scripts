@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import {
   EquipmentSlot,
   ItemLockMode,

@@ -8,11 +8,12 @@ import {
 } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Temporary, Vector } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
 import { location, SafeLocation } from 'lib/location'
+import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
+import { Vector } from 'lib/vector'
 import { Place } from './place'
 
 export declare namespace Npc {

@@ -4,16 +4,11 @@ import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { RegionEvents } from 'lib/region/events'
-import { HealthIndicatorConfig } from './config'
-
-// █
-
-const { lockDisplay } = HealthIndicatorConfig
 
 const options = Settings.world(...Settings.worldCommon, {
   pvpEnabled: {
     value: true,
-    description: 'Возможность входа в сражения режим (блокировка всех тп команд)§r',
+    description: 'Возможность входа в сражения режим (блокировка всех тп команд)',
     name: 'Режим сражения',
   },
   pvpPlayerCooldown: {
@@ -58,11 +53,6 @@ system.runInterval(
       for (const player of world.getAllPlayers()) {
         if (player.scores.pvp) player.scores.pvp--
       }
-
-      for (const [key, value] of lockDisplay.entries()) {
-        if (value) lockDisplay.set(key, value - 1)
-        else lockDisplay.delete(key)
-      }
     }
   },
   'PVP',
@@ -85,7 +75,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
       if (!options.pvpEnabled) return
       const score = player.scores.pvp
 
-      if (HealthIndicatorConfig.disabled.includes(player.id) || score <= 0) return
+      if (score <= 0) return
 
       const settings = getPlayerSettings(player)
       if (!settings.indicator) return
@@ -138,8 +128,7 @@ function onDamage(
   if (
     !hurtEntity.typeId.startsWith('minecraft:') ||
     !(hurtEntity.isPlayer() || hurtEntity.matches({ families: ['monster'] }) || hurtBoss) ||
-    !options.pvpEnabled ||
-    HealthIndicatorConfig.disabled.includes(hurtEntity.id)
+    !options.pvpEnabled
   )
     return
 
@@ -189,8 +178,6 @@ function onDamage(
           )
         }
       }
-
-      lockDisplay.set(damagingEntity.id, 2)
     }
   }
 

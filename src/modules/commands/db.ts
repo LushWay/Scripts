@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { Player, system, world } from '@minecraft/server'
 import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
 import { DatabaseTable, getProvider } from 'lib/database/abstract'

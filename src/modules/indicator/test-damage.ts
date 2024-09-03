@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { EnchantmentType, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { registerAsync } from '@minecraft/server-gametest'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
@@ -30,8 +32,9 @@ registerAsync('test', 'damage', async test => {
         if (event.damageSource.damagingEntity instanceof Player) {
           const hp = event.hurtEntity.getComponent('health')?.currentValue ?? 0
           event.damageSource.damagingEntity.onScreenDisplay.setActionBar(
-            t`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`
-         ,ActionbarPriority.UrgentNotificiation )
+            t`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`,
+            ActionbarPriority.UrgentNotificiation,
+          )
         }
       }
     })

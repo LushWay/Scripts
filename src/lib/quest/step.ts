@@ -1,8 +1,9 @@
 import { Player } from '@minecraft/server'
-import { EventSignal, Vector } from 'lib'
 import { developersAreWarned } from 'lib/assets/text'
+import { EventSignal } from 'lib/event-signal'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
+import { Vector } from 'lib/vector'
 import { PlayerQuest } from './player'
 import { Quest } from './quest'
 

@@ -1,5 +1,6 @@
 import { Player, world, type PlayerDatabase } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
+import { t } from 'lib/text'
 import { table } from './abstract'
 
 declare module '@minecraft/server' {
@@ -57,7 +58,7 @@ Object.defineProperty(Player.prototype, 'database', {
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   if (!initialSpawn) return
   if (player.database.name && player.database.name !== player.name) {
-    const message = '§e> §3Игрок §f' + player.database.name + ' §r§3сменил ник на §f' + player.name
+    const message = t.warn`Игрок ${player.database.name} сменил ник на ${player.name}`
 
     world.say(message)
     console.warn(message)

@@ -1,4 +1,4 @@
-import { ActionForm } from 'lib'
+import { ActionForm } from 'lib/form/action'
 import { Npc } from 'lib/rpg/npc'
 import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'

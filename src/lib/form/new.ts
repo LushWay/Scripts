@@ -1,7 +1,9 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { showForm, util } from 'lib'
+import { ActionForm } from 'lib/form/action'
+import { showForm } from 'lib/form/utils'
 import { MaybeRawText, t } from 'lib/text'
+import { util } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => void
 
@@ -104,7 +106,7 @@ export class Show {
   show: NewFormCallback = (player, back) => {
     const form = new Form(player)
     if (back) {
-      form.button('§l§b< §r§3Назад', back)
+      form.button(ActionForm.backText, back)
     }
 
     this.create(form, player, back)

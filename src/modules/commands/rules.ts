@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { World, world } from '@minecraft/server'
 import { form } from 'lib/form/new'
 

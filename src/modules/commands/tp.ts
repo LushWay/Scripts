@@ -1,3 +1,5 @@
+/** I18n-ignore */
+
 import { Player, system, world } from '@minecraft/server'
 import { ActionForm, Vector } from 'lib'
 import { isNotPlaying } from 'lib/game-utils'

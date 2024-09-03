@@ -1,36 +1,9 @@
-const path = require('path')
+import exportBoundaries from './rules/export-boundaries.js'
+import translate from './rules/translate.js'
 
-/** @typedef {{ cwd: string; filename: string }} Context */
-
-/** @param {Context} context */
-function toRelative(context, filename = context.filename) {
-  if (!filename) return ''
-
-  return filename.replace(context.cwd, '').replaceAll(path.sep, '/')
-}
-
-exports.toRelative = toRelative
-
-/** @param {Context} context */
-exports.isScriptsDirectory = function (context) {
-  return toRelative(context).startsWith('/scripts')
-}
-
-/** @param {Context} context */
-exports.isLibDirectory = function (context) {
-  return toRelative(context).startsWith('/scripts/lib')
-}
-
-/** @param {Context} context */
-exports.isModulesDirectory = function (context, filename = context.filename) {
-  const relative = toRelative(context, filename)
-  return relative.startsWith('/scripts/modules')
-}
-
-module.exports.rules = {
-  'ensure-modules': require('./rules/ensure-modules'),
-  'no-unsupported-features': require('./rules/no-unsupported'),
-  'no-cycle': require('./rules/no-cycle.js'),
-  'ensure-export-boundaries': require('./rules/ensure-export-boundaries.js'),
-  'ensure-lib-exports': require('./rules/ensure-lib-exports.js'),
+export default {
+  rules: {
+    'tr': translate,
+    'export-boundaries': exportBoundaries,
+  },
 }

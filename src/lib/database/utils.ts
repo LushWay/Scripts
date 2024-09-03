@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 

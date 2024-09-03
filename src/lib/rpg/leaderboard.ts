@@ -43,12 +43,12 @@ export class Leaderboard {
       score: '7',
     },
     white: {
-      objName: 'ф',
-      fill1: 'ф',
-      fill2: 'ф',
-      pos: 'ф',
-      nick: 'ф',
-      score: 'ф',
+      objName: 'f',
+      fill1: 'f',
+      fill2: 'f',
+      pos: 'f',
+      nick: 'f',
+      score: 'f',
     },
     green: {
       objName: 'a',

@@ -2,9 +2,10 @@ import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
-import { Compass, Sidebar } from 'lib'
 import { table } from 'lib/database/abstract'
 import { restorePlayerCamera } from 'lib/game-utils'
+import { Compass } from 'lib/rpg/menu'
+import { Sidebar } from 'lib/sidebar'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 /**

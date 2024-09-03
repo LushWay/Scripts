@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/use-unknown-in-catch-callback-variable */
+/* i18n-ignore */
 import { request } from 'lib/bds/api'
 import { stringify } from 'lib/utils/inspect'
 

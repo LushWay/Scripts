@@ -1,3 +1,4 @@
+/* i18n-ignore */
 /* eslint-disable */
 
 import { MolangVariableMap, system, world } from '@minecraft/server'

@@ -7,7 +7,7 @@ export type Plurals = [one: string, two: string, five: string]
  * @returns Plural form. Currently only Russian supported
  */
 
-export function ngettext(n: number, [one = 'секунда', few = 'секунды', more = 'секунд']: Plurals) {
+export function ngettext(n: number, [one, few, more]: Plurals) {
   if (!Number.isInteger(n)) return more
   return [one, few, more][
     n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2

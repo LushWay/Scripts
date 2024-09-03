@@ -1,11 +1,11 @@
-import { ESLintUtils } from '@typescript-eslint/utils'
 import fs from 'fs/promises'
-
+import path from 'path'
+import { createRule, toRelative } from '../utils.js'
+/** @import {TSESTree} from '@typescript-eslint/utils' */
 /** @type {Record<string, string>} */
 const messages = {}
 let text = ''
 let i = 0
-const createRule = ESLintUtils.RuleCreator(name => `https://example.com/rule/${name}`)
 
 const translateRule = createRule({
   name: 'translate',
@@ -19,46 +19,69 @@ const translateRule = createRule({
   },
   defaultOptions: [],
   create(context) {
-    /** @param {string} t */
-    function a(t) {
-      const file =  context.physicalFilename.replace(process.cwd(), '') + ' '
+    /**
+     * @param {string} t
+     * @param {TSESTree.Literal | TSESTree.TemplateLiteral} node
+     */
+    function addToTranslates(t, node) {
+      const file = toRelative(context)
 
-      if (file && (file.includes(".test.ts") || file.includes(".spec.ts") || file.includes("world-edit")) || file.includes("minigames")) return
+      if (
+        (file && (file.includes('.test.ts') || file.includes('.spec.ts') || file.includes('world-edit'))) ||
+        file.includes('minigames') ||
+        context.sourceCode.text.includes('/* i18n-ignore */')
+      )
+        return
 
-      if (!text.includes('$: ' + file)) {
+      if (
+        node.parent.type == 'Property' &&
+        node.parent.parent.type === 'ObjectExpression' &&
+        node.parent.parent.parent.type === 'Property' &&
+        node.parent.parent.parent.parent.type === 'ObjectExpression' &&
+        node.parent.parent.parent.parent.parent.type === 'CallExpression' &&
+        node.parent.parent.parent.parent.parent.callee.type === 'MemberExpression' &&
+        node.parent.parent.parent.parent.parent.callee.object.type === 'Identifier' &&
+        node.parent.parent.parent.parent.parent.callee.object.name === 'Settings' &&
+        node.parent.parent.parent.parent.parent.callee.property.type === 'Identifier' &&
+        node.parent.parent.parent.parent.parent.callee.property.name === 'world'
+      )
+        return
+
+      const filelink = `file://${context.cwd}${file}`.replaceAll(path.sep, '/').replace('C:', '')
+      if (!text.includes(filelink)) {
         text += '\n'
         text += '\n'
-        text += '$: ' + file + '\n'
-        text += "\n"
+        text += filelink + '\n'
+        text += '\n'
       }
-      text += t + "\n"
+      text += t + '\n'
       messages[t] ??= ''
-      messages[t] += file 
-i++
+      messages[t] += file
+      i++
     }
 
     return {
       Literal(node) {
         if (typeof node.value === 'string' && /[а-яА-Я]/.test(node.value)) {
-          a(node.value)
+          addToTranslates(node.value, node)
         }
       },
       TemplateLiteral(node) {
         const r = node.quasis.map(e => e.value.raw).join('${0}')
         if (/[а-яА-Я]/.test(r)) {
-          a(r)
+          addToTranslates(r, node)
         }
       },
     }
   },
 })
 
-process.once('beforeExit', async () => {
-  console.log('\n\n')
-  console.log('Total messages: ', i)
-  console.log('Duplicated:', i - Object.keys(messages).length)
-  console.log('\n\n')
-  await fs.writeFile('test.txt', text)
-})
+if (process.env.I18N)
+  process.once('beforeExit', async () => {
+    console.log('Total messages: ', i)
+    console.log('Duplicated:', i - Object.keys(messages).length)
+    console.log('\n\n')
+    await fs.writeFile('test.txt', text)
+  })
 
 export default translateRule

@@ -1,5 +1,5 @@
 import { Vector3 } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vector } from 'lib/vector'
 import { Area } from './area'
 
 class ChunkCube extends Area<{ from: VectorXZ; to: VectorXZ }> {

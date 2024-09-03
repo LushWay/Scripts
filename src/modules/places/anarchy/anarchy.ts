@@ -3,12 +3,13 @@ import { InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToSt
 import { isNotPlaying } from 'lib/game-utils'
 import { itemDescription } from 'lib/shop/rewards'
 import { t } from 'lib/text'
+import { createLogger } from 'lib/utils/logger'
+import { rtpCommand } from 'modules/commands/rtp'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from '../lib/area-with-inventory'
 import { RadioactiveZone } from './radioactive-zone'
-import { createLogger } from 'lib/utils/logger'
 import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {
@@ -50,9 +51,7 @@ class AnarchyBuilder extends AreaWithInventory {
     this.portal = new Portal('anarchy', ...Vector.around(portalLocation, 0, 1, 1), player => {
       if (isNotPlaying(player)) return tpMenuOnce(player)
       if (player.database.inv === this.inventoryName) {
-        return player.fail(
-          '§cВы уже находитесь на анархии! Если это не так, используйте §f.anarchy clearpos §cчтобы очистить позицию на анархии и §f.spawn§c для перемещения на спавн.',
-        )
+        return player.fail(t.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)
       }
 
       const title = Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })
@@ -72,16 +71,16 @@ class AnarchyBuilder extends AreaWithInventory {
       }
     })
 
-    this.portal.command
+    const command = this.portal.command
+
+    command
       ?.overload('clearpos')
       .setDescription(
         'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
       )
       .executes(ctx => {
         delete ctx.player.database.survival.anarchy
-        ctx.player.success(
-          '§fУспех!§7 Теперь вы можете использовать §f-anarchy§7 для перемещения на случайную позицию.',
-        )
+        ctx.player.success(t`Успех! Теперь вы можете использовать ${command} для перемещения на случайную позицию.`)
       })
   }
 
@@ -95,7 +94,7 @@ class AnarchyBuilder extends AreaWithInventory {
         from: this.inventoryStore.get(player.id, { remove: true }),
       })
     } else {
-      this.logger.player(player).info`Loading EMPTY inventory`
+      this.logger.player(player).info`Loading empty inventory`
       InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
     }
 

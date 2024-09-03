@@ -1,10 +1,15 @@
+/* i18n-ignore */
+
 import { Container, ItemStack, MolangVariableMap, Player } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Temporary, isInvalidLocation, util } from 'lib'
 import { Items } from 'lib/assets/custom-items'
+import { Cooldown } from 'lib/cooldown'
+import { isInvalidLocation } from 'lib/game-utils'
+import { Temporary } from 'lib/temporary'
 import { t } from 'lib/text'
+import { util } from 'lib/util'
 import { Cutscene } from './cutscene'
 import { cutscene as cusceneCommand } from './menu'
 
