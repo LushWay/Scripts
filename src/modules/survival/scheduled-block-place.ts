@@ -74,7 +74,8 @@ function* scheduledBlockPlaceJob() {
         }
 
         block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
-        logger.info`${schedule.typeId.replace('minecraft:', '')} to ${schedule.location}, remains ${schedules.length - 1}`
+        if (__DEV__ || (schedules.length - 1) % 100 === 0)
+          logger.info`${schedule.typeId.replace('minecraft:', '')} to ${schedule.location}, remains ${schedules.length - 1}`
         EventSignal.emit(onScheduledBlockPlace, { schedule, block, schedules })
       } catch (e) {
         if (e instanceof LocationInUnloadedChunkError) {
