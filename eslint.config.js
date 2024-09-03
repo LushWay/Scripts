@@ -1,6 +1,7 @@
 import eslint from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import ts from 'typescript-eslint'
+import tr from './tools/eslint-plugin/i.js'
 
 export default ts.config(
   eslint.configs.recommended,
@@ -22,6 +23,10 @@ export default ts.config(
       'src/test/__mocks__/**',
     ],
   },
+  process.env.I18N ? {
+    plugins: { tr },
+    rules: { 'tr/tr': 'error' }
+  } : {},
   {
     languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname } },
     rules: {
