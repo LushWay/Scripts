@@ -191,3 +191,7 @@ type Key = string | symbol | number
 export function isKeyof<O extends Record<Key, unknown>>(key: Key, object: O): key is keyof O {
   return key in object
 }
+
+/** Empty function that does nothing. */
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const doNothing = () => {}

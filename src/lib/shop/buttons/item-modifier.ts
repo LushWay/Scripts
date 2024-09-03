@@ -36,9 +36,7 @@ export function createItemModifier(
       )
       return false
     })
-    .texture()
-    .sell()
-    .customCostBuy(true)
+    .setCustomCostBuy(true)
 }
 
 export type ShopMenuWithSlotCreate = (
@@ -81,9 +79,6 @@ export function createItemModifierSection(
       select()
       return false
     })
-    .texture()
-    .sell()
-    .customCostBuy(false)
 }
 
 function onSelect(

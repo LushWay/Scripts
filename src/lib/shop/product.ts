@@ -21,6 +21,7 @@ type OnProductCreate<T> = (product: Product) => T
 export class Product<T extends Cost = any> {
   static create<C extends Cost>() {
     let onCreateCallback: OnProductCreate<any> = s => s
+
     return {
       creator<P>(onCreate: OnProductCreate<P>, form: ProductBackForm) {
         onCreateCallback = onCreate
@@ -31,24 +32,10 @@ export class Product<T extends Cost = any> {
         player: (player: Player) => ({
           name: (name: ProductName) => ({
             cost: (cost: C) => ({
-              onBuy: (onBuy: ProductOnBuy) => ({
-                texture: (texture?: string) => ({
-                  sell: (sell = false) => ({
-                    customCostBuy: (customCostBuy = false) => {
-                      const shop = new Product<C>(
-                        name,
-                        cost,
-                        player,
-                        customCostBuy ? onBuy : (...args) => (cost.buy(player), onBuy(...args)),
-                        texture,
-                        sell,
-                        backForm,
-                      )
-                      return (onCreateCallback as OnProductCreate<P>)(shop)
-                    },
-                  }),
-                }),
-              }),
+              onBuy: (onBuy: ProductOnBuy) => {
+                const shop = new Product<C>(name, cost, player, onBuy, backForm)
+                return (onCreateCallback as OnProductCreate<P>)(shop)
+              },
             }),
           }),
         }),
@@ -60,12 +47,31 @@ export class Product<T extends Cost = any> {
     private nameGenerator: ProductName,
     private cost: T,
     private player: Player,
-    private onBuy: ProductOnBuy,
+    private onProductBuy: ProductOnBuy,
     /** Texture represnting product */
-    public texture: string | undefined,
-    private sell: boolean,
     private backForm: ProductBackForm,
   ) {}
+
+  private sell = false
+
+  setSell(value: boolean) {
+    this.sell = value
+    return this
+  }
+
+  private customCostBuy = false
+
+  setCustomCostBuy(value: boolean) {
+    this.customCostBuy = value
+    return this
+  }
+
+  public texture?: string
+
+  setTexture(texture: string) {
+    this.texture = texture
+    return this
+  }
 
   private canBuy = this.cost.has(this.player)
 
@@ -95,7 +101,9 @@ export class Product<T extends Cost = any> {
   }
 
   /* Action form button that represents this product */
-  button = [this.text, this.texture, this.callback] as const
+  get button() {
+    return [this.text, this.texture, this.callback] as const
+  }
 
   private costString = this.cost.toString(true)
 
@@ -113,14 +121,17 @@ export class Product<T extends Cost = any> {
 
   private buy = () => {
     if (!this.ensurePlayerCanBuy()) return
-    const { onBuy, player, sell, name, backForm, costString } = this
 
+    const { sell, name, costString } = this
     const successBuyText = sell
       ? t.options({ text: '§a' }).raw`Успешная продажа ${name} за ${costString}!`
       : t.options({ text: '§a' }).raw`Успешная покупка ${name} за ${costString}!`
 
-    const successBuy = () => backForm(successBuyText)
+    const successBuy = () => this.backForm(successBuyText)
 
-    if (onBuy(player, name, successBuy, successBuyText) !== false) successBuy()
+    if (this.onBuy(this.player, name, successBuy, successBuyText) !== false) successBuy()
   }
+
+  onBuy: ProductOnBuy = (...args) =>
+    this.customCostBuy ? (this.cost.buy(this.player), this.onProductBuy(...args)) : this.onProductBuy(...args)
 }

@@ -34,9 +34,10 @@ export class Gunsmith extends ShopNpc {
             ).includes(item.typeId),
           'Алмазный предмет',
           (form, slot) => {
-            form.product('Улучшить', new MultiCost().item(i.NetheriteIngot, 1).money(1000), () =>
-              this.upgradeDiamondSwordToNetherite(slot, player),
-            )
+            form.product
+              .name('Улучшить')
+              .cost(new MultiCost().item(i.NetheriteIngot, 1).money(1000))
+              .onBuy(() => this.upgradeDiamondSwordToNetherite(slot, player))
           },
         )
 
@@ -48,13 +49,16 @@ export class Gunsmith extends ShopNpc {
             const item = slot.getItem()
             if (!item?.durability) return false
 
-            form.product('Починить', new MultiCost().xp(item.durability.damage / 10), () => {
-              if (item.durability) item.durability.damage = 0
-              const olditem = item.clone()
-              item.enchantable?.removeAllEnchantments()
-              this.copyEnchantments(item, olditem, player)
-              slot.setItem(item)
-            })
+            form.product
+              .name('Починить')
+              .cost(new MultiCost().xp(item.durability.damage / 10))
+              .onBuy(() => {
+                if (item.durability) item.durability.damage = 0
+                const olditem = item.clone()
+                item.enchantable?.removeAllEnchantments()
+                this.copyEnchantments(item, olditem, player)
+                slot.setItem(item)
+              })
           },
         )
     })

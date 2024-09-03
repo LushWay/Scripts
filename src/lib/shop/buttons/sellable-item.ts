@@ -97,20 +97,18 @@ function createBuy(
     const total = getTotal(count, i => getBuy(dbCount - i))
     const cost = total <= 0 ? ImpossibleBuyCost : dbCount - count < 0 ? NoItemsToSell : new MoneyCost(total)
 
-    form.product(
-      itemDescription({ typeId: type, amount: count }),
-      cost,
-      player => {
+    form.product
+      .name(itemDescription({ typeId: type, amount: count }))
+      .cost(cost)
+      .onBuy(player => {
         if (!player.container) return
 
         cost.buy(player)
         db[type] = Math.max(0, (db[type] ?? count) - count)
         player.runCommand(`give @s ${type} ${count}`)
-      },
-      aux,
-      undefined,
-      false,
-    )
+      })
+      .setTexture(aux)
+      .setCustomCostBuy(true)
   }
 }
 
@@ -130,24 +128,20 @@ function createSell(
       new ItemCost(type, count),
     )
 
-    form.product(
-      new MoneyCost(total).toString(),
-      cost,
-      player => {
+    form.product
+      .name(new MoneyCost(total).toString())
+      .cost(cost)
+      .onBuy(player => {
         db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
         player.scores.money += total
-      },
-      aux,
-      true,
-    )
+      })
+      .setTexture(aux)
   }
 }
 
 function getTotal(addCount: number, adder: (n: number) => number) {
   let total = 0
-  for (let i = 0; i < addCount; i++) {
-    total += adder(i)
-  }
+  for (let i = 0; i < addCount; i++) total += adder(i)
   return ~~total
 }
 

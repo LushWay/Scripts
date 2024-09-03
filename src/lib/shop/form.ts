@@ -79,10 +79,10 @@ export class ShopForm {
    * @returns
    */
   product = Product.create()
-    .creator<ShopForm>(
+    .creator<Product>(
       product => {
         this.buttons.push(product)
-        return this
+        return product
       },
       message => this.show(message),
     )
@@ -132,9 +132,9 @@ export class ShopForm {
         cost.buy(player)
         player.container.addItem(item)
       })
-      .texture(texture)
-      .sell(false)
-      .customCostBuy(true)
+      .setTexture(texture)
+      .setSell(false)
+      .setCustomCostBuy(true)
 
     return this
   }

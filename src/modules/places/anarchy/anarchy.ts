@@ -1,5 +1,6 @@
 import { GameMode, Player } from '@minecraft/server'
 import { InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToString } from 'lib'
+import { Language } from 'lib/assets/lang'
 import { isNotPlaying } from 'lib/game-utils'
 import { itemDescription } from 'lib/shop/rewards'
 import { t } from 'lib/text'
@@ -110,7 +111,7 @@ class AnarchyBuilder extends AreaWithInventory {
     const inv = this.inventoryStore.get(player.id, { remove: false, fallback: InventoryStore.emptyInventory })
 
     this.logger.player(player).info`Saved inventory:\n${Object.entries(inv.slots)
-      .map(([slot, item]) => ` §6${slot}§f ${rawMessageToString(itemDescription(item), 'ru_RU')}`)
+      .map(([slot, item]) => ` §6${slot}§f ${rawMessageToString(itemDescription(item), Language.ru_RU)}`)
       .join('\n')}`
 
     // Do not save location if on spawn

@@ -6,7 +6,7 @@ import {
   MinecraftEnchantmentTypes,
   MinecraftItemTypes,
 } from '@minecraft/vanilla-data'
-import { Enchantments, getAuxOrTexture, isKeyof } from 'lib'
+import { doNothing, Enchantments, getAuxOrTexture, isKeyof } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
@@ -78,10 +78,7 @@ export class Mage extends ShopNpc {
         (bookForm, book, bookItem) => {
           const bookEnch = bookItem.enchantable?.getEnchantments()[0]
           const type = Object.values(MinecraftEnchantmentTypes).find(e => e === bookEnch?.type.id)
-          if (!bookEnch || !type)
-            return bookForm.product('Нет зачарований', Incompatible, () => {
-              return
-            })
+          if (!bookEnch || !type) return bookForm.product.name('Нет зачарований').cost(Incompatible).onBuy(doNothing)
 
           bookForm.itemModifierSection(
             'Предмет',
@@ -91,29 +88,29 @@ export class Mage extends ShopNpc {
               const enchs = targetItem.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
               const level = targetItem.enchantable?.getEnchantment(new EnchantmentType(type))?.level ?? 0
 
-              itemForm.product(
-                t.raw`§r§7Выбранная книга: ${translateEnchantment(bookEnch)}`,
-                FreeCost,
-                () => bookForm.show(),
-                getAuxOrTexture(MinecraftItemTypes.EnchantedBook),
-              )
+              itemForm.product
+                .name(t.raw`§r§7Выбранная книга: ${translateEnchantment(bookEnch)}`)
+                .cost(FreeCost)
+                .onBuy(() => bookForm.show())
+                .setTexture(getAuxOrTexture(MinecraftItemTypes.EnchantedBook))
 
               addSelectItem()
 
-              itemForm.product(
-                t.raw`Зачаровать`,
-                level >= bookEnch.level
-                  ? level === bookEnch.level
-                    ? LevelIsSame
-                    : LevelIsHigher
-                  : new MultiCost().money(1000).xp(~~((bookEnch.level * enchs) / 2)),
-                (_, __, _s, text) => {
+              itemForm.product
+                .name(t.raw`Зачаровать`)
+                .cost(
+                  level >= bookEnch.level
+                    ? level === bookEnch.level
+                      ? LevelIsSame
+                      : LevelIsHigher
+                    : new MultiCost().money(1000).xp(~~((bookEnch.level * enchs) / 2)),
+                )
+                .onBuy((_, __, _s, text) => {
                   book.setItem(undefined)
                   this.updateEnchatnment(target, type, bookEnch.level - level)
                   form.show(text)
                   return false
-                },
-              )
+                })
             },
             true,
           )
@@ -122,14 +119,17 @@ export class Mage extends ShopNpc {
 
       form.section('Оружие со способностями', (form, player) => {
         const cost = new MultiCost().item(i.DiamondSword).item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10000)
-        form.product(`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`, cost, player => {
-          if (!player.container) return
+        form.product
+          .name(`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`)
+          .cost(cost)
+          .onBuy(player => {
+            if (!player.container) return
 
-          cost.buy(player)
-          player.container.addItem(
-            ItemAbility.schema.create({ ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
-          )
-        })
+            cost.buy(player)
+            player.container.addItem(
+              ItemAbility.schema.create({ ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
+            )
+          })
       })
 
       form.section('Все для магии', form =>
@@ -183,18 +183,19 @@ export class Mage extends ShopNpc {
   createEnch(form: ShopFormSection, item: ItemStack, slot: ContainerSlot) {
     return (type: e, getCost: (currentLevel: number) => Cost, up = 1) => {
       const { can, level } = this.updateEnchatnment(slot, type, up, true)
-      form.product(
-        { rawtext: [{ text: `${can ? '' : '§7'}+` }, ...(translateEnchantment(type).rawtext ?? [])] },
-        can
-          ? new MultiCost(getCost(level)).item(MinecraftItemTypes.LapisLazuli, level)
-          : level === -1
-            ? Incompatible
-            : MaxLevel,
-        player => {
+      form.product
+        .name({ rawtext: [{ text: `${can ? '' : '§7'}+` }, ...(translateEnchantment(type).rawtext ?? [])] })
+        .cost(
+          can
+            ? new MultiCost(getCost(level)).item(MinecraftItemTypes.LapisLazuli, level)
+            : level === -1
+              ? Incompatible
+              : MaxLevel,
+        )
+        .onBuy(player => {
           this.updateEnchatnment(slot, type, up)
           player.playSound(Sounds.LevelUp)
-        },
-      )
+        })
     }
   }
 
