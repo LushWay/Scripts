@@ -41,7 +41,7 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
         const playerDatabase = table as typeof Player.database
         name = `${playerDatabase[key].name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
       } else {
-        name += `\n§7${JSON.stringify(table[key]).replace(/"/g, '')}`
+        name += `\n§7${JSON.stringify(table[key]).slice(0, 200).replace(/"/g, '')}`
       }
 
       return [name, () => tableProperty(key, table, player, selfback)] as const
