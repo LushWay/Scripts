@@ -87,6 +87,7 @@ export class Shop {
       () => t.raw`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
       this,
       this.onOpen,
-    ).show(player, undefined, undefined)
+      player,
+    ).show()
   }
 }

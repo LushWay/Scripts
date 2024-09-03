@@ -1,7 +1,7 @@
 import { Enchantment, RawMessage, RawText } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { inspect } from 'lib/util'
-import { blockItemsLangJson, langs } from '../assets/lang'
+import { blockItemsLangJson, langs, Language } from '../assets/lang'
 import { sprintf } from './sprintf'
 
 /**
@@ -73,7 +73,7 @@ export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment)
  * @param token
  * @returns
  */
-export function translateToken(lang: string, token: string): string {
+export function translateToken(token: string, lang: Language): string {
   const langMap = langs[lang]
 
   if (typeof langMap === 'undefined' || !(token in langMap)) {
@@ -85,15 +85,15 @@ export function translateToken(lang: string, token: string): string {
   } else return langMap[token]
 }
 
-export function rawTextToString(rawText: RawText, lang: string) {
+export function rawTextToString(rawText: RawText, lang: Language) {
   return rawText.rawtext?.map(e => rawMessageToString(e, lang)).join('') ?? ''
 }
 
-export function rawMessageToString(rawMessage: RawMessage, lang: string) {
+export function rawMessageToString(rawMessage: RawMessage, lang: Language) {
   let result = ''
   if (rawMessage.text) return rawMessage.text
   if (rawMessage.translate) {
-    const tr = translateToken(lang, rawMessage.translate)
+    const tr = translateToken(rawMessage.translate, lang)
     if (!rawMessage.with) {
       return tr
     } else {

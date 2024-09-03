@@ -1,5 +1,6 @@
 import { ItemStack, system } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
+import { Language } from 'lib/assets/lang'
 import { langToken, translateToken } from 'lib/utils/lang'
 
 export const customItems: ItemStack[] = []
@@ -68,7 +69,7 @@ export class CustomItemWithBlueprint extends CustomItem {
 
   get blueprint() {
     return new ItemStack(Items.Blueprint).setInfo(
-      `§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateToken('ru_RU', langToken(this._typeId)) : this._bprintName)}`,
+      `§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateToken(langToken(this._typeId), Language.ru_RU) : this._bprintName)}`,
       'С помощью него вы можете сделать предмет у инженера',
     )
   }

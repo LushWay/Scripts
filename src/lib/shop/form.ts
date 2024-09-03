@@ -1,53 +1,44 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { getAuxOrTexture } from 'lib/form/chest'
 import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
-import { MessageForm } from 'lib/form/message'
+import { getAuxOrTexture } from 'lib/form/chest'
 import { Cost } from 'lib/shop/cost'
 import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { createItemModifier, createItemModifierSection, ShopMenuWithSlotCreate } from './buttons/item-modifier'
 import { createSellableItem } from './buttons/sellable-item'
-import { CostType } from './cost/cost'
 import { ItemFilter } from './cost/item-cost'
+import { Product, ProductName } from './product'
 import { Shop } from './shop'
 
 export type ShopMenuCreate = (menu: ShopFormSection, player: Player) => void
 
-interface ShopSection {
+type MaybeRawTextFn = () => MaybeRawText
+
+interface Section {
   name: MaybeRawText
   texture?: string
   onOpen: ShopMenuCreate
 }
 
-export interface ShopProduct<T = unknown> {
-  name: MaybeRawText | ((canBuy: boolean) => MaybeRawText)
-  cost: Cost<T>
-  onBuy: (player: Player, text: MaybeRawText, successBuy: VoidFunction, successBuyText: MaybeRawText) => void | false
-  texture?: string
-  sell?: boolean
-}
-
-interface ShopCallbackButton {
+interface SimpleButton {
   text: MaybeRawText
   texture?: string
   callback: VoidFunction
 }
 
-type ShopProductBuy = Omit<ShopProduct, 'name'> & {
-  player: Player
-  text: MaybeRawText
-  back?: VoidFunction
+interface BodyAndTitle {
+  body: MaybeRawTextFn
+  title: MaybeRawTextFn
 }
 
-export type ShopFormSection = Omit<ShopForm, 'show'> & {
-  show: (text?: MaybeRawText) => void
-  body: ShopForm['body']
-  title: ShopForm['title']
-}
+export type ShopFormSection = {
+  show: (message?: MaybeRawText) => void
+} & BodyAndTitle &
+  Omit<ShopForm, 'show'>
 
-type Buttons = (ShopProduct | ShopSection | ShopCallbackButton)[]
+type Buttons = (Section | SimpleButton)[]
 
 export class ShopForm {
   static database = table<Record<string, number | undefined>>('shop', () => ({}))
@@ -55,10 +46,12 @@ export class ShopForm {
   private buttons: Buttons = []
 
   constructor(
-    private title: () => MaybeRawText,
-    private body: () => MaybeRawText,
+    private title: MaybeRawTextFn,
+    private body: MaybeRawTextFn,
     private readonly shop: Shop,
     private readonly onOpen: ShopMenuCreate,
+    private player: Player,
+    private back?: VoidFunction,
   ) {}
 
   /**
@@ -68,16 +61,12 @@ export class ShopForm {
    * @param onOpen
    * @returns
    */
-  section(name: ShopSection['name'], onOpen: ShopSection['onOpen'], texture?: string) {
+  section(name: Section['name'], onOpen: Section['onOpen'], texture?: string) {
     this.buttons.push({ name, onOpen, texture })
     return this
   }
 
-  button(
-    text: ShopCallbackButton['text'],
-    texture: ShopCallbackButton['texture'],
-    callback: ShopCallbackButton['callback'],
-  ) {
+  button(text: SimpleButton['text'], texture: SimpleButton['texture'], callback: SimpleButton['callback']) {
     this.buttons.push({ text, texture, callback })
   }
 
@@ -89,26 +78,18 @@ export class ShopForm {
    * @param onBuy
    * @returns
    */
-  product<T extends Cost>(
-    name: ShopProduct<T>['name'],
-    cost: T,
-    onBuy: ShopProduct<T>['onBuy'],
-    texture?: string,
-    sell?: boolean,
-    costBuy = true,
-  ) {
-    this.buttons.push({
-      name,
-      cost,
-      onBuy: costBuy ? (p, ...args) => (cost.buy(p), onBuy(p, ...args)) : onBuy,
-      texture,
-      sell,
-    })
-    return this
-  }
+  product = Product.create()
+    .creator<ShopForm>(
+      product => {
+        this.buttons.push(product)
+        return this
+      },
+      message => this.show(message),
+    )
+    .player(this.player)
 
   itemModifier(
-    name: ShopProduct['name'],
+    name: ProductName,
     cost: Cost,
     itemFilter: (itemStack: ItemStack) => boolean,
     itemFilterName: MaybeRawText,
@@ -142,19 +123,19 @@ export class ShopForm {
    * @param cost
    */
   itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId)) {
-    this.product(
-      itemDescription(item, ''),
-      cost,
-      player => {
+    this.product
+      .name(itemDescription(item, ''))
+      .cost(cost)
+      .onBuy(player => {
         if (!player.container) return
 
         cost.buy(player)
         player.container.addItem(item)
-      },
-      texture,
-      undefined,
-      false,
-    )
+      })
+      .texture(texture)
+      .sell(false)
+      .customCostBuy(true)
+
     return this
   }
 
@@ -164,27 +145,23 @@ export class ShopForm {
    * @param player - Player to open store for
    * @param message - Additional message to show in store description
    */
-  show(player: Player, message: MaybeRawText = '', back: undefined | VoidFunction) {
-    const show = (text?: MaybeRawText) => this.show(player, text, back)
-    const form = Object.setPrototypeOf({ buttons: [], show } satisfies Base, this) as ShopFormSection & Base
+  show = (message: MaybeRawText = '') => {
+    const { player, back } = this
+    const form = Object.setPrototypeOf({ buttons: [] } satisfies { buttons: Buttons }, this) as ShopFormSection & {
+      buttons: Buttons
+    }
     this.onOpen(form, player)
 
     const actionForm = new ActionForm(form.title(), t.raw`${message}${message ? '§r\n \n§f' : ''}${form.body()}`)
     if (back) actionForm.addButtonBack(back)
 
     for (const button of form.buttons) {
-      if ('cost' in button) {
-        // Buy/sell
-        const { name, cost, onBuy, texture, sell } = button
-        const { productName, text } = Cost.productName(name, cost, player)
-
-        actionForm.addButton(productName, texture, () => this.buy({ text, cost, onBuy, player, back, sell }))
-      } else if ('onOpen' in button) {
+      if ('onOpen' in button) {
         // Section
         const { name, onOpen, texture } = button
 
         actionForm.addButton(t.options({ unit: '§3' }).raw`${name}`, texture, () => {
-          ShopForm.showSection(name, form, this.shop, player, show, onOpen)
+          ShopForm.showSection(name, form, this.shop, player, this.show, onOpen)
         })
       } else {
         // Common button
@@ -192,67 +169,22 @@ export class ShopForm {
       }
     }
 
-    actionForm.show(player)
+    actionForm.show(this.player)
   }
 
   static showSection(
     name: MaybeRawText,
-    parent: Pick<ShopFormSection, 'body' | 'title'>,
+    parent: BodyAndTitle,
     shop: Shop,
     player: Player,
     back: undefined | VoidFunction,
     onOpen: ShopMenuCreate,
   ) {
     const title = () => t.header.raw`${parent.title()} > ${name}`
-    const form = new ShopForm(title, () => '', shop, onOpen)
-    form.show(player, undefined, back)
+    new ShopForm(title, () => '', shop, onOpen, player, back).show()
   }
 
-  static toShopFormSection(form: ShopForm): Pick<ShopFormSection, 'body' | 'title'> {
+  static toShopFormSection(form: ShopForm): BodyAndTitle {
     return { body: form.body, title: form.title }
   }
-
-  private buy({ onBuy, cost, player, text, back, sell }: ShopProductBuy) {
-    const canBuy = () => {
-      if (!cost.has(player)) {
-        this.show(
-          player,
-          t.raw`${t.error`Покупка невозможна:${cost.multiline ? '\n' : ' '}`}${cost.failed(player)}`,
-          back,
-        )
-        return false
-      } else return true
-    }
-
-    if (!canBuy()) return
-
-    const purchase = () => {
-      if (!canBuy()) return
-
-      const successBuyText = t.options({ text: '§a' })
-        .raw`Успешная ${sell ? '§aпродажа' : '§aпокупка'}: ${text} за ${cost.toString()}!`
-      const successBuy = () => this.show(player, successBuyText, back)
-
-      if (onBuy(player, text, successBuy, successBuyText) !== false) successBuy()
-    }
-
-    if (Shop.getPlayerSettings(player).prompt && cost.type === CostType.Action) {
-      new MessageForm(
-        t.header`Подтверждение`,
-        sell
-          ? t.raw`Продать ${cost.toString()}§r§7 за ${text}§r§7?`
-          : t.raw`Купить ${text}§r§7 за ${cost.toString()}§r§7?`,
-      )
-        .setButton1(sell ? t`Продать!` : t`Купить!`, purchase)
-        .setButton2(t.error`Отмена`, () =>
-          this.show(player, sell ? t.error`Продажа отменена` : t.error`Покупка отменена`, back),
-        )
-        .show(player)
-    } else purchase()
-  }
-}
-
-interface Base {
-  buttons: ShopForm['buttons']
-  show: VoidFunction
 }

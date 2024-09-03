@@ -4,6 +4,7 @@ import { request } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { MaybeRawText } from 'lib/text'
 import { expand } from './extend'
+import { Language } from 'lib/assets/lang'
 
 declare module '@minecraft/server' {
   interface Player {
@@ -82,7 +83,7 @@ declare module '@minecraft/server' {
      */
     closeChat(lowHealthMessage?: string): boolean
 
-    lang: string
+    lang: Language
   }
 
   namespace Player {
@@ -148,7 +149,7 @@ export const ScreenDisplaySymbol = Symbol('screen_display')
 
 expand(Player.prototype, {
   get lang() {
-    return 'ru_RU'
+    return Language.ru_RU
   },
 
   isSimulated() {

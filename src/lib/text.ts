@@ -187,7 +187,7 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
     case 'number':
       return `${num}${separateNumberWithDots(unit)}`
     case 'bigint':
-      return `${num}${unit}`
+      return `${num}${unit.toString()}`
 
     case 'boolean':
       return unit ? '§fДа' : '§cНет'

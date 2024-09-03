@@ -40,8 +40,8 @@ export function toUpper(k) {
  * @param {string} name
  * @param {[string, string][]} entries
  */
-export function injectEnum(name, entries) {
+export function injectEnum(name, entries, upperify = true) {
   return `export enum ${name} {
-${entries.map(([k, e]) => `  ${toUpper(k)} = '${e}',`).join('\n')}
+${entries.map(([k, e]) => `  ${upperify ? toUpper(k) : k} = '${e}',`).join('\n')}
 }`
 }

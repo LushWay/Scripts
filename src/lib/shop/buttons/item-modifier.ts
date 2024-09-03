@@ -1,28 +1,26 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { ChestForm, getAuxOrTexture } from 'lib/form/chest'
-import { BUTTON } from 'lib/form/utils'
+import { getAuxOrTexture } from 'lib/form/chest'
+import { ItemFilter, OnSelect, selectItemForm } from 'lib/form/select-item'
 import { MaybeRawText, t } from 'lib/text'
-import { langToken, rawTextToString, translateEnchantment, translateToken } from 'lib/utils/lang'
+import { langToken, translateEnchantment } from 'lib/utils/lang'
 import { Cost, MultiCost, ShouldHaveItemCost } from '../cost'
-import { ShopForm, ShopFormSection, ShopProduct } from '../form'
+import { ShopForm, ShopFormSection } from '../form'
+import { ProductName } from '../product'
 import { Shop } from '../shop'
-
-type ItemFilter = (itemStack: ItemStack) => boolean
-type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
 
 export function createItemModifier(
   shopForm: ShopForm,
-  name: ShopProduct['name'],
+  name: ProductName,
   cost: Cost,
   itemFilterName: MaybeRawText,
   itemFilter: ItemFilter,
   modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: MaybeRawText) => boolean | void,
 ) {
-  shopForm.product(
-    name,
-    new MultiCost(ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName), cost),
-    (player, text, success, successBuyText) => {
-      selectItem(
+  shopForm.product
+    .name(name)
+    .cost(new MultiCost(ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName), cost))
+    .onBuy((player, text, success, successBuyText) => {
+      selectItemForm(
         itemFilter,
         player,
         text,
@@ -34,11 +32,13 @@ export function createItemModifier(
         },
 
         // Back
-        () => shopForm.show(player, undefined, undefined),
+        () => shopForm.show(),
       )
       return false
-    },
-  )
+    })
+    .texture()
+    .sell()
+    .customCostBuy(true)
 }
 
 export type ShopMenuWithSlotCreate = (
@@ -59,121 +59,77 @@ export function createItemModifierSection(
   onOpen: ShopMenuWithSlotCreate,
   manualSelectItemButton = false,
 ) {
-  shopForm.product(name, ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName), (player, text) => {
-    const back = () => shopForm.show(player, undefined, undefined)
+  shopForm.product
+    .name(name)
+    .cost(ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName))
+    .onBuy((player, text) => {
+      const back = () => shopForm.show()
 
-    const select = () =>
-      selectItem(
-        itemFilter,
-        player,
-        text,
+      const select = () =>
+        selectItemForm(
+          itemFilter,
+          player,
+          text,
 
-        // OnSelect
-        (slot, item) => {
-          ShopForm.showSection(
-            name,
-            ShopForm.toShopFormSection(shopForm),
-            shop,
-            player,
+          // OnSelect
+          onSelect(name, shopForm, shop, player, back, select, manualSelectItemButton, onOpen),
 
-            // Back
-            back,
+          // Back
+          back,
+        )
 
-            (form, player) => {
-              const itemStack = slot.getItem()
-
-              if (!itemStack) return
-              item = itemStack
-
-              form.body = () =>
-                t.raw`Зачарования:\n${{
-                  rawtext: item.enchantable
-                    ?.getEnchantments()
-                    .map(e => [translateEnchantment(e), { text: '\n' }])
-                    .flat(),
-                }}`
-
-              const addSelectItem = () =>
-                form.button(
-                  t.raw`Выбранный предмет: ${{ translate: langToken(item) }}\n§7Нажмите, чтобы сменить`,
-                  getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
-                  select,
-                )
-
-              if (!manualSelectItemButton) addSelectItem()
-              onOpen(form, slot, item, player, addSelectItem)
-            },
-          )
-        },
-
-        // Back
-        back,
-      )
-
-    select()
-    return false
-  })
+      select()
+      return false
+    })
+    .texture()
+    .sell()
+    .customCostBuy(false)
 }
 
-export function selectItem(
-  itemFilter: ItemFilter,
+function onSelect(
+  name: MaybeRawText,
+  shopForm: ShopForm,
+  shop: Shop,
   player: Player,
-  text: MaybeRawText,
-  select: OnSelect,
-  back?: VoidFunction,
-) {
-  const { container } = player
-  if (!container) return
-  const chestForm = new ChestForm('45').title(t.options({ unit: '§0' }).raw`${text}`).pattern([0, 0], ['<-------?'], {
-    '<': {
-      icon: BUTTON['<'],
-      callback: back,
-    },
-    '-': {
-      icon: 'textures/blocks/glass',
-    },
-    '?': {
-      icon: BUTTON['?'],
-    },
-  })
-  for (const [i, item] of container.entries().filter(([, item]) => item && itemFilter(item))) {
-    if (!item) continue
+  back: () => void,
+  select: () => void,
+  manualSelectItemButton: boolean,
+  onOpen: ShopMenuWithSlotCreate,
+): OnSelect {
+  return (slot, item) => {
+    ShopForm.showSection(
+      name,
+      ShopForm.toShopFormSection(shopForm),
+      shop,
+      player,
 
-    let nameTagPrefix = ''
-    let lore: string[] = []
+      // Back
+      back,
 
-    if (item.enchantable) {
-      nameTagPrefix = '§b'
-      lore = lore.concat(
-        item.enchantable.getEnchantments().map(e => rawTextToString(translateEnchantment(e), player.lang)),
-      )
-    }
+      (form, player) => {
+        const itemStack = slot.getItem()
 
-    lore = lore.concat(item.getLore())
+        if (!itemStack) return
+        item = itemStack
 
-    if (item.durability) {
-      const max = item.durability.maxDurability
-      const dmg = item.durability.damage
-      const mod = 10 / max
-      const damaged = dmg * mod
-      const green = (max - dmg) * mod
-      const dmgP = 100 - (dmg / max) * 100
-      const color = dmgP > 80 ? '§a' : dmgP > 30 ? '§e' : '§c'
+        form.body = () =>
+          t.raw`Зачарования:\n${{
+            rawtext: item.enchantable
+              ?.getEnchantments()
+              .map(e => [translateEnchantment(e), { text: '\n' }])
+              .flat(),
+          }}`
 
-      lore.push(' ')
-      lore.push(`${color}${'▀'.repeat(green)}§8${'▀'.repeat(damaged)} ${~~dmgP}%`)
-    }
+        const addSelectItem = () =>
+          form.button(
+            t.raw`Выбранный предмет: ${{ translate: langToken(item) }}\n§7Нажмите, чтобы сменить`,
+            getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
+            select,
+          )
 
-    chestForm.button({
-      slot: i + 9,
-      icon: item.typeId,
-      nameTag: nameTagPrefix + translateToken(player.lang, langToken(item.typeId)),
-      amount: item.amount,
-      enchanted: !!item.enchantable?.getEnchantments().length,
-      lore,
-      callback: () => select(container.getSlot(i), item),
-    })
+        if (!manualSelectItemButton) addSelectItem()
+        onOpen(form, slot, item, player, addSelectItem)
+      },
+    )
   }
-
-  chestForm.show(player)
 }
