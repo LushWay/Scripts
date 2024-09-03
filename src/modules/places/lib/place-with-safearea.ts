@@ -22,10 +22,10 @@ export class PlaceWithSafeArea {
   readonly group: Group
 
   constructor(
-    group: string,
+    groupId: string,
     public readonly name: string,
   ) {
-    this.group = new Group(group, name)
+    this.group = new Group(groupId, name)
     this.safeAreaLocation = locationWithRadius(this.group.point('safearea').name('мирная зона'))
     this.portalTeleportsTo = locationWithRotation(
       this.group.point('portal teleports to').name('портал телепортирует на'),
@@ -40,7 +40,7 @@ export class PlaceWithSafeArea {
       )
       RegionEvents.onEnter(this.safeArea, player => {
         if (this.onEnter(player)) {
-          player.onScreenDisplay.setHudTitle('§f' + this.name, {
+          player.onScreenDisplay.setHudTitle(`§f${this.name}`, {
             subtitle: '§aМирная зона',
             fadeInDuration: 0.5 * TicksPerSecond,
             stayDuration: 3 * TicksPerSecond,

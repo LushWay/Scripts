@@ -118,7 +118,7 @@ class JoinBuilder {
         role: getFullname(player, { name: false }),
         status: 'move',
         where,
-        print: t`[${player.name}][${getFullname(player, { name: false })}]: ${message}`,
+        print: t`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
       })
 
     for (const other of world.getPlayers()) {
