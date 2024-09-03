@@ -93,10 +93,10 @@ export class Gunsmith extends ShopNpc {
 const looseEnchantment = [
   {
     item: true,
-    chance: 10,
+    chance: 3,
   },
   {
     item: false,
-    chance: 90,
+    chance: 97,
   },
 ]
