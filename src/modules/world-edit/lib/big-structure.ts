@@ -4,12 +4,8 @@ import { WE_CONFIG } from '../config'
 import { Cuboid } from './ccuboid'
 
 export class BigStructure extends Cuboid {
-  id
-
-  savePromise
-
   private structures: {
-    name: string
+    id: string
     min: Vector3
     max: Vector3
   }[] = []
@@ -22,55 +18,49 @@ export class BigStructure extends Cuboid {
    * @param {Vector3} pos2
    */
   constructor(
-    public prefix: string,
+    private prefix: string,
     pos1: Vector3,
     pos2: Vector3,
     public dimension: Dimension,
     public name = '',
   ) {
     super(pos1, pos2)
-    this.id = Date.now().toString(32)
-    this.prefix = `${prefix}|${this.id}`
+    this.prefix = `${prefix}|${Date.now().toString(32)}`
 
-    this.savePromise = this.save()
+    this.save()
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  private async save() {
+  save() {
     this.structures = []
     const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
-    // console.debug({ cubes: cubes.map(e => Vector.string(Vector.subtract(e.max, e.min)), true) })
-
     const options = { errors: 0, total: 0 }
 
     for (const [i, cube] of cubes.entries()) {
-      const name = `mystructure:${this.prefix}|${i}`
+      const id = `mystructure:${this.prefix}|${i}`
       const min = cube.pos1
       const max = cube.pos2
 
       try {
-        world.structureManager.delete(name)
+        world.structureManager.delete(id)
       } catch {}
-      world.structureManager.createFromWorld(name, this.dimension, min, max, {
+
+      world.structureManager.createFromWorld(id, this.dimension, min, max, {
         includeEntities: false,
         includeBlocks: true,
         saveMode: StructureSaveMode.Memory,
       })
 
-      // console.log(t`Created from world: ${Vector.string(min)} ${Vector.string(max)}, name: ${name}`)
-
-      this.structures.push({
-        name,
-        min,
-        max,
-      })
+      this.structures.push({ id, min, max })
     }
 
-    // console.debug(options.total, this.structures.length)
     if (options.errors > 0)
       throw new Error(
         `§c${options.errors}§f/${options.total}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
       )
+  }
+
+  delete() {
+    this.structures.forEach(e => world.structureManager.delete(e.id))
   }
 
   async load(position = this.min, dimension = this.dimension, placeOptions?: StructurePlaceOptions) {
@@ -94,7 +84,7 @@ export class BigStructure extends Cuboid {
               }
 
               // console.log(`/structure load "${file.name}" ${Vector.string(to)}`)
-              world.structureManager.place(file.name, dimension, to, placeOptions)
+              world.structureManager.place(file.id, dimension, to, placeOptions)
             } catch (e) {
               console.error(e)
               errors++

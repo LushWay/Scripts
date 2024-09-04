@@ -141,29 +141,23 @@ export class WorldEdit {
    * @param pos2 Position 2 of cuboid location
    * @param history Save location where you want the to store your backup
    */
-  async backup(
-    name: string,
-    pos1: Vector3 = this.pos1,
-    pos2: Vector3 = this.pos2,
-    history: BigStructure[] = this.history,
-  ) {
+  backup(name: string, pos1: Vector3 = this.pos1, pos2: Vector3 = this.pos2, history: BigStructure[] = this.history) {
     if (this.history.length === this.historyLimit) {
-      console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
       if (this.hasWarnAboutHistoryLimit) {
+        console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
         this.player.warn(
           `Вы превысили лимит отменяемых действий WorldEdit'а. Вы сможете восстановить лишь последние ${this.historyLimit} действий.`,
         )
         this.hasWarnAboutHistoryLimit = true
       }
 
-      world.structureManager.delete(history[0].id)
+      history[0].delete()
       history.splice(0, 1)
     }
 
     const structrure = new BigStructure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, this.player.dimension, name)
 
     history.push(structrure)
-    await structrure.savePromise
   }
 
   /** Loads specified amount of backups from history array */
@@ -232,7 +226,6 @@ export class WorldEdit {
         this.pos2,
         this.player.dimension,
       )
-      await this.currentCopy.savePromise
       this.player.info(
         `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
           this.pos2,
@@ -285,7 +278,7 @@ export class WorldEdit {
       if (!this.currentCopy) return this.player.fail('§cВы ничего не копировали!')
       const { pastePos1, pastePos2 } = this.pastePositions(rotation, this.currentCopy)
 
-      await this.backup('Вставка (paste)', pastePos1, pastePos2)
+      this.backup('Вставка (paste)', pastePos1, pastePos2)
       await this.currentCopy.load(pastePos1, undefined, {
         rotation,
         mirror,
