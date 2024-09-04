@@ -16,7 +16,8 @@ export function createItemModifier(
   itemFilter: ItemFilter,
   modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: MaybeRawText) => boolean | void,
 ) {
-  shopForm.product
+  shopForm
+    .product()
     .name(name)
     .cost(new MultiCost(ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName), cost))
     .onBuy((player, text, success, successBuyText) => {
@@ -57,7 +58,8 @@ export function createItemModifierSection(
   onOpen: ShopMenuWithSlotCreate,
   manualSelectItemButton = false,
 ) {
-  shopForm.product
+  shopForm
+    .product()
     .name(name)
     .cost(ShouldHaveItemCost.createFromFilter(itemFilter, itemFilterName))
     .onBuy((player, text) => {

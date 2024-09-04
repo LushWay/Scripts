@@ -77,7 +77,7 @@
       "minecraft:physics": {},
       "minecraft:input_ground_controlled": {},
       "minecraft:movement": {
-        "value": 0.1
+        "value": 0.05
       }
     },
 

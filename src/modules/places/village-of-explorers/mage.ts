@@ -78,7 +78,7 @@ export class Mage extends ShopNpc {
         (bookForm, book, bookItem) => {
           const bookEnch = bookItem.enchantable?.getEnchantments()[0]
           const type = Object.values(MinecraftEnchantmentTypes).find(e => e === bookEnch?.type.id)
-          if (!bookEnch || !type) return bookForm.product.name('Нет зачарований').cost(Incompatible).onBuy(doNothing)
+          if (!bookEnch || !type) return bookForm.product().name('Нет зачарований').cost(Incompatible).onBuy(doNothing)
 
           bookForm.itemModifierSection(
             'Предмет',
@@ -88,7 +88,8 @@ export class Mage extends ShopNpc {
               const enchs = targetItem.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
               const level = targetItem.enchantable?.getEnchantment(new EnchantmentType(type))?.level ?? 0
 
-              itemForm.product
+              itemForm
+                .product()
                 .name(t.raw`§r§7Выбранная книга: ${translateEnchantment(bookEnch)}`)
                 .cost(FreeCost)
                 .onBuy(() => bookForm.show())
@@ -96,7 +97,8 @@ export class Mage extends ShopNpc {
 
               addSelectItem()
 
-              itemForm.product
+              itemForm
+                .product()
                 .name(t.raw`Зачаровать`)
                 .cost(
                   level >= bookEnch.level
@@ -119,7 +121,8 @@ export class Mage extends ShopNpc {
 
       form.section('Оружие со способностями', (form, player) => {
         const cost = new MultiCost().item(i.DiamondSword).item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10000)
-        form.product
+        form
+          .product()
           .name(`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`)
           .cost(cost)
           .onBuy(player => {
@@ -183,7 +186,8 @@ export class Mage extends ShopNpc {
   createEnch(form: ShopFormSection, item: ItemStack, slot: ContainerSlot) {
     return (type: e, getCost: (currentLevel: number) => Cost, up = 1) => {
       const { can, level } = this.updateEnchatnment(slot, type, up, true)
-      form.product
+      form
+        .product()
         .name({ rawtext: [{ text: `${can ? '' : '§7'}+` }, ...(translateEnchantment(type).rawtext ?? [])] })
         .cost(
           can

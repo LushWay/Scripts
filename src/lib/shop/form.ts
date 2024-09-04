@@ -78,15 +78,17 @@ export class ShopForm {
    * @param onBuy
    * @returns
    */
-  product = Product.create()
-    .creator<Product>(
-      product => {
-        this.buttons.push(product)
-        return product
-      },
-      message => this.show(message),
-    )
-    .player(this.player)
+  product() {
+    return Product.create()
+      .creator<Product>(
+        product => {
+          this.buttons.push(product)
+          return product
+        },
+        message => this.show(message),
+      )
+      .player(this.player)
+  }
 
   itemModifier(
     name: ProductName,
@@ -123,7 +125,7 @@ export class ShopForm {
    * @param cost
    */
   itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId)) {
-    this.product
+    this.product()
       .name(itemDescription(item, ''))
       .cost(cost)
       .onBuy(player => {
@@ -133,7 +135,6 @@ export class ShopForm {
         player.container.addItem(item)
       })
       .setTexture(texture)
-      .setSell(false)
       .setCustomCostBuy(true)
 
     return this

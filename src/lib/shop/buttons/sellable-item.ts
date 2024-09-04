@@ -97,7 +97,8 @@ function createBuy(
     const total = getTotal(count, i => getBuy(dbCount - i))
     const cost = total <= 0 ? ImpossibleBuyCost : dbCount - count < 0 ? NoItemsToSell : new MoneyCost(total)
 
-    form.product
+    form
+      .product()
       .name(itemDescription({ typeId: type, amount: count }))
       .cost(cost)
       .onBuy(player => {
@@ -128,7 +129,8 @@ function createSell(
       new ItemCost(type, count),
     )
 
-    form.product
+    form
+      .product()
       .name(new MoneyCost(total).toString())
       .cost(cost)
       .onBuy(player => {
