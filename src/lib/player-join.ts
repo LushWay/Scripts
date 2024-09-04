@@ -104,6 +104,14 @@ class JoinBuilder {
       'joinInterval',
       20,
     )
+
+    new Command('join')
+      .setDescription('Имитирует первый вход')
+      .setPermissions('member')
+      .executes(ctx => {
+        const player = ctx.player
+        this.emitFirstJoin(player)
+      })
   }
 
   private join(player: Player, where: 'air' | 'ground') {
@@ -134,14 +142,6 @@ class JoinBuilder {
       joinTimes: player.scores.joinTimes,
       firstJoin: player.scores.joinTimes === 1,
     })
-
-    new Command('join')
-      .setDescription('Имитирует первый вход')
-      .setPermissions('member')
-      .executes(ctx => {
-        const player = ctx.player
-        this.emitFirstJoin(player)
-      })
   }
 
   settings = Settings.player('Вход\n§7Все действия, связанные со входом', 'join', {
