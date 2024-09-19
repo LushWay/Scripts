@@ -138,6 +138,7 @@ function createSell(
         player.scores.money += total
       })
       .setTexture(aux)
+      .setSell(true)
   }
 }
 
