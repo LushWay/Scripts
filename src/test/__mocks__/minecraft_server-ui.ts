@@ -1,5 +1,5 @@
 import * as minecraftserver from '@minecraft/server'
-import { isKeyof } from 'lib'
+import { isKeyof } from 'lib/util'
 import { TestPlayer } from 'test/utils'
 
 export enum FormCancelationReason {
@@ -204,6 +204,7 @@ function processCallback<T extends keyof FormData>(
   arg: FormData[T]['arg'],
 ): InstanceType<(typeof responses)[T]> {
   const callback = (player as TestPlayer).onForm?.[kind]
+
   if (!callback) throw new FormRejectError(FormRejectReason.MalformedResponse)
 
   type TT = InstanceType<(typeof responses)[T]>

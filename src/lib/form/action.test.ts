@@ -1,9 +1,9 @@
-import { ActionForm } from 'lib'
 import { TEST_createPlayer, TEST_onFormOpen } from 'test/utils'
 import { describe, expect, it, vi } from 'vitest'
+import { ActionForm } from './action'
 
 describe('ActionForm', () => {
-  it('should create action form', () => {
+  it('should create action form', async () => {
     const cb = vi.fn()
     const player = TEST_createPlayer()
     TEST_onFormOpen(player, 'action', arg => {
@@ -30,7 +30,14 @@ describe('ActionForm', () => {
       `)
       return 0
     })
-    new ActionForm('title', 'body').addButton('button', cb).show(player)
+    new ActionForm('title', 'body')
+      .addButton('button', () => {
+        console.log('ABC')
+        cb()
+      })
+      .show(player)
+
+    await new Promise(r => setImmediate(r))
     expect(cb).toHaveBeenCalledOnce()
   })
 })

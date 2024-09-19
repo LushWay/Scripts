@@ -124,6 +124,7 @@ export class ActionForm {
     if (!this.buttons.length) this.addButton('Пусто', () => this.show(player))
 
     const response = await showForm(this.form, player)
+
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
       return false
 

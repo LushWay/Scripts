@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Player } from '@minecraft/server'
-import { FormCl, FormData } from 'test/__mocks__/minecraft_server-ui'
+import type { FormCl, FormData } from 'test/__mocks__/minecraft_server-ui'
 
 export function TEST_createPlayer() {
   // @ts-expect-error Yes. We can do this
