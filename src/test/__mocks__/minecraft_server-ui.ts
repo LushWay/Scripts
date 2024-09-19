@@ -155,7 +155,7 @@ export interface FormData {
       button1: { text: MT }
       button2: { text: MT }
     }
-    returns: number
+    returns: 0 | 1
   }
   action: {
     arg: BaseFormArg & {

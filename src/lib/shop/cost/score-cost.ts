@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
-import { separateNumberWithDots } from 'lib/util'
 import { emoji } from 'lib/assets/emoji'
 import { t } from 'lib/text'
+import { separateNumberWithDots } from 'lib/util'
 import { Cost } from '../cost'
 
 export class ScoreboardCost extends Cost {
@@ -27,9 +27,9 @@ export class ScoreboardCost extends Cost {
     return player.scores[this.scoreboard] >= this.cost
   }
 
-  buy(player: Player) {
+  take(player: Player) {
     player.scores[this.scoreboard] -= this.cost
-    super.buy(player)
+    super.take(player)
   }
 
   failed(player: Player) {

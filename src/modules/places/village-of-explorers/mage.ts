@@ -128,7 +128,7 @@ export class Mage extends ShopNpc {
           .onBuy(player => {
             if (!player.container) return
 
-            cost.buy(player)
+            cost.take(player)
             player.container.addItem(
               ItemAbility.schema.create({ ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
             )

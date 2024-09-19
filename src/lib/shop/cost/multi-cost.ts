@@ -1,6 +1,6 @@
 import { Player, RawText } from '@minecraft/server'
-import { noBoolean } from 'lib/util'
 import { MaybeRawText, t } from 'lib/text'
+import { noBoolean } from 'lib/util'
 import { Cost, ItemCost, LeafyCost, MoneyCost, ScoreboardCost } from '../cost'
 import { CostType } from './cost'
 import { XPCost } from './xp'
@@ -39,9 +39,9 @@ export class MultiCost<T extends Cost[]> extends Cost {
     return this.costs.every(e => e.has(player))
   }
 
-  buy(player: Player) {
-    super.buy(player)
-    return this.costs.map(e => e.buy(player)) as {
+  take(player: Player) {
+    super.take(player)
+    return this.costs.map(e => e.take(player)) as {
       -readonly [P in keyof T]: T[P] extends Cost<infer R> ? R : never
     }
   }

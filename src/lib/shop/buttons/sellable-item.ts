@@ -104,12 +104,12 @@ function createBuy(
       .onBuy(player => {
         if (!player.container) return
 
-        cost.buy(player)
+        cost.take(player)
         db[type] = Math.max(0, (db[type] ?? count) - count)
         player.runCommand(`give @s ${type} ${count}`)
       })
       .setTexture(aux)
-      .setCustomCostBuy(true)
+      .setTakeCost(true)
   }
 }
 
@@ -134,6 +134,8 @@ function createSell(
       .name(new MoneyCost(total).toString())
       .cost(cost)
       .onBuy(player => {
+        console.log('TAKING COST')
+
         db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
         player.scores.money += total
       })

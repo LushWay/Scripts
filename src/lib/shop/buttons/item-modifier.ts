@@ -28,7 +28,7 @@ export function createItemModifier(
 
         // OnSelect
         (slot, item) => {
-          cost.buy(player)
+          cost.take(player)
           if (modifyItem(slot, item, successBuyText) !== false) success()
         },
 
@@ -37,7 +37,7 @@ export function createItemModifier(
       )
       return false
     })
-    .setCustomCostBuy(true)
+    .setTakeCost(true)
 }
 
 export type ShopMenuWithSlotCreate = (

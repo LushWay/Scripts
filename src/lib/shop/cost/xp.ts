@@ -22,7 +22,7 @@ export class XPCost extends Cost {
     return t.error.raw`Нужно уровней опыта: ${(lvl - xp).toString()}§c, ${xp.toString()}/${lvl.toString()}`
   }
 
-  buy(player: Player) {
+  take(player: Player) {
     player.addLevels(-this.levels)
   }
 }

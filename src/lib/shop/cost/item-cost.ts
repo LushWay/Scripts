@@ -52,7 +52,7 @@ export class ItemCost extends Cost {
     return this.getItems(player).canBuy
   }
 
-  buy(player: Player): void {
+  take(player: Player): void {
     const items = this.getItems(player)
 
     const { container } = player
@@ -65,7 +65,7 @@ export class ItemCost extends Cost {
       }
     }
 
-    super.buy(player)
+    super.take(player)
   }
 
   toString(canBuy?: boolean, _?: Player | undefined, amount = true): MaybeRawText {
@@ -105,7 +105,7 @@ export class ShouldHaveItemCost extends ItemCost {
     return this.text ? t.error`В инвентаре нет ${this.text}` : t.error`Нет предмета`
   }
 
-  buy(player: Player): void {
+  take(player: Player): void {
     return
   }
 }

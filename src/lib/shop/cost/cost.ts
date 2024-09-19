@@ -48,7 +48,7 @@ export abstract class Cost<T = unknown> {
    *
    * @param player - Buyer
    */
-  buy(player: Player): T {
+  take(player: Player): T {
     if (this.type === CostType.Action) player.playSound(CustomSounds.Pay)
     return undefined as T
   }

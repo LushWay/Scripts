@@ -22,7 +22,7 @@ describe('cost', () => {
     addItem()
     expect(cost.has(player)).toBe(true) // 3 item, true
 
-    cost.buy(player)
+    cost.take(player)
     expect(cost.has(player)).toBe(false) // 1 item
 
     addItem()
@@ -39,7 +39,7 @@ describe('cost', () => {
     const cost = new MultiCost()
 
     expect(cost.has(player)).toBe(true)
-    expect(cost.buy(player)).toEqual([])
+    expect(cost.take(player)).toEqual([])
   })
 
   it('should take items', () => {
@@ -58,7 +58,7 @@ describe('cost', () => {
     addItem()
     expect(cost.has(player)).toBe(true) // 3 item, true
 
-    cost.buy(player)
+    cost.take(player)
     expect(cost.has(player)).toBe(false) // 1 item
 
     addItem()
@@ -92,7 +92,7 @@ describe('MultiCost', () => {
     // @ts-expect-error
     const player = new Player() as Player
 
-    const multicost = new MultiCost(new StringCost(), new NumberCost(), new NumberCost()).buy(player)
+    const multicost = new MultiCost(new StringCost(), new NumberCost(), new NumberCost()).take(player)
     expectTypeOf(multicost[0]).toBeString()
     expectTypeOf(multicost[1]).toBeNumber()
     expectTypeOf(multicost[2]).toBeNumber()
@@ -107,7 +107,7 @@ describe('MultiCost', () => {
     // @ts-expect-error
     const player = new Player() as Player
 
-    const multicost = new MultiCost(new StringCost(), new MultiCost(new NumberCost(), new NumberCost())).buy(player)
+    const multicost = new MultiCost(new StringCost(), new MultiCost(new NumberCost(), new NumberCost())).take(player)
     expectTypeOf(multicost[0]).toBeString()
     expectTypeOf(multicost[1][0]).toBeNumber()
     expectTypeOf(multicost[1][1]).toBeNumber()

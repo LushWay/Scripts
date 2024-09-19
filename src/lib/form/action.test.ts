@@ -30,12 +30,7 @@ describe('ActionForm', () => {
       `)
       return 0
     })
-    new ActionForm('title', 'body')
-      .addButton('button', () => {
-        console.log('ABC')
-        cb()
-      })
-      .show(player)
+    new ActionForm('title', 'body').addButton('button', cb).show(player)
 
     await vi.waitFor(() => {
       expect(cb).toHaveBeenCalledOnce()

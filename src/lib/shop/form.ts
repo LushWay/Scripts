@@ -1,4 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
+import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
@@ -6,6 +7,7 @@ import { getAuxOrTexture } from 'lib/form/chest'
 import { Cost } from 'lib/shop/cost'
 import { itemDescription } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
+import { isKeyof } from 'lib/util'
 import { createItemModifier, createItemModifierSection, ShopMenuWithSlotCreate } from './buttons/item-modifier'
 import { createSellableItem } from './buttons/sellable-item'
 import { ItemFilter } from './cost/item-cost'
@@ -112,9 +114,15 @@ export class ShopForm {
     return this
   }
 
-  dynamicCostItem(typeId: keyof (typeof shopFormula)['shop'], template = shopFormula.shop[typeId]) {
-    const { defaultCount, maxCount, minPrice, k } = template
-    createSellableItem({ form: this, shop: this.shop, type: typeId, defaultCount, maxCount, minPrice, k })
+  dynamicCostItem(typeId: keyof (typeof shopFormula)['shop']): ShopForm
+
+  dynamicCostItem(typeId: MinecraftItemTypes, template: ValueOf<(typeof shopFormula)['shop']>): ShopForm
+
+  dynamicCostItem(typeId: MinecraftItemTypes, template?: ValueOf<(typeof shopFormula)['shop']>): ShopForm {
+    if (isKeyof(typeId, shopFormula.shop)) template ??= shopFormula.shop[typeId]
+    if (!template) throw new Error('No template was provided for typeId ' + typeId)
+
+    createSellableItem({ form: this, shop: this.shop, type: typeId, ...template })
     return this as ShopForm
   }
 
@@ -131,11 +139,11 @@ export class ShopForm {
       .onBuy(player => {
         if (!player.container) return
 
-        cost.buy(player)
+        cost.take(player)
         player.container.addItem(item)
       })
       .setTexture(texture)
-      .setCustomCostBuy(true)
+      .setTakeCost(true)
 
     return this
   }

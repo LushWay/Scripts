@@ -59,10 +59,10 @@ export class Product<T extends Cost = any> {
     return this
   }
 
-  private customCostBuy = false
+  private takeCost = true
 
-  setCustomCostBuy(value: boolean) {
-    this.customCostBuy = value
+  setTakeCost(value: boolean) {
+    this.takeCost = value
     return this
   }
 
@@ -133,5 +133,5 @@ export class Product<T extends Cost = any> {
   }
 
   onBuy: ProductOnBuy = (...args) =>
-    this.customCostBuy ? (this.cost.buy(this.player), this.onProductBuy(...args)) : this.onProductBuy(...args)
+    this.takeCost ? (this.cost.take(this.player), this.onProductBuy(...args)) : this.onProductBuy(...args)
 }
