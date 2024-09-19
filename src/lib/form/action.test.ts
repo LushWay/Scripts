@@ -1,4 +1,3 @@
-import { system } from '@minecraft/server'
 import { TEST_createPlayer, TEST_onFormOpen } from 'test/utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ActionForm } from './action'
@@ -38,8 +37,9 @@ describe('ActionForm', () => {
       })
       .show(player)
 
-    await system.sleep(1)
-    expect(cb).toHaveBeenCalledOnce()
+    await vi.waitFor(() => {
+      expect(cb).toHaveBeenCalledOnce()
+    })
   })
 })
 
