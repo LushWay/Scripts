@@ -134,8 +134,6 @@ function createSell(
       .name(new MoneyCost(total).toString())
       .cost(cost)
       .onBuy(player => {
-        console.log('TAKING COST')
-
         db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
         player.scores.money += total
       })
