@@ -69,17 +69,17 @@ export class Settings {
    * database
    *
    * @template Config
-   * @param name - The name that shows to players
-   * @param group - The prefix for the database.
+   * @param groupName - The name that shows to players
+   * @param groupId - The id for the database.
    * @param config - This is an object that contains the default values for each option.
    * @returns An function that returns object with properties that are getters and setters.
    */
   static player<Config extends SettingsConfig<PlayerSettingValues>>(
-    name: string,
-    group: string,
+    groupName: string,
+    groupId: string,
     config: Narrow<Config> & ConfigMeta,
   ) {
-    this.insertGroup('playerMap', name, group, config as Config)
+    this.insertGroup('playerMap', groupName, groupId, config as Config)
 
     const cache = new WeakPlayerMap()
 
@@ -88,15 +88,15 @@ export class Settings {
       if (cached) {
         return cached as SettingsConfigParsed<Config>
       } else {
-        const settings = this.parseConfig(Settings.playerDatabase, group, this.playerMap[group] as Config, player)
+        const settings = this.parseConfig(Settings.playerDatabase, groupId, this.playerMap[groupId] as Config, player)
         cache.set(player, settings)
         return settings
       }
     }
 
-    fn.groupId = group
-    fn.groupName = name
-    fn.extend = [name, group] as const
+    fn.groupId = groupId
+    fn.groupName = groupName
+    fn.extend = [groupName, groupId] as const
 
     return fn
   }
@@ -110,17 +110,17 @@ export class Settings {
    * object's properties in localStorage
    *
    * @template Config
-   * @param group - The prefix for the database.
+   * @param groupId - The id for the database.
    * @param config - The default values for the options.
    * @returns An object with properties that are getters and setters.
    */
   static world<Config extends WorldSettingsConfig>(
-    name: string,
-    group: string,
+    groupName: string,
+    groupId: string,
     config: Narrow<Config> & ConfigMeta,
   ): SettingsConfigParsed<Config> {
-    this.insertGroup('worldMap', name, group, config as Config)
-    return this.parseConfig(Settings.worldDatabase, group, this.worldMap[group] as Config)
+    this.insertGroup('worldMap', groupName, groupId, config as Config)
+    return this.parseConfig(Settings.worldDatabase, groupId, this.worldMap[groupId] as Config)
   }
 
   static worldCommon = ['Общие настройки мира\n§7Чат, спавн и тд', 'common'] as const
@@ -128,29 +128,29 @@ export class Settings {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   private static insertGroup<Config extends SettingsConfig>(
     to: 'worldMap' | 'playerMap',
-    name: string,
-    group: string,
+    groupName: string,
+    groupId: string,
     config: Config,
   ) {
-    if (!(group in this[to])) {
-      this[to][group] = config
+    if (!(groupId in this[to])) {
+      this[to][groupId] = config
     } else {
-      this[to][group] = {
+      this[to][groupId] = {
         ...config,
-        ...this[to][group],
+        ...this[to][groupId],
       }
     }
 
-    this[to][group][SETTINGS_GROUP_NAME] = name
-    this[to][group]
+    this[to][groupId][SETTINGS_GROUP_NAME] = groupName
+    this[to][groupId]
   }
 
   /**
    * It creates a proxy object that allows you to access and modify the values of a given object, but the values are
    * stored in a database
    *
-   * @param database - The prefix for the database.
-   * @param groupName - The group name of the settings
+   * @param database - The database.
+   * @param groupId - The group id of the settings
    * @param config - This is the default configuration object. It's an object with the keys being the option names and
    *   the values being the default values.
    * @param player - The player object.
@@ -158,7 +158,7 @@ export class Settings {
    */
   static parseConfig<T extends SettingsConfig>(
     database: SettingsDatabase,
-    groupName: string,
+    groupId: string,
     config: T,
     player: Player | null = null,
   ) {
@@ -172,15 +172,15 @@ export class Settings {
         get() {
           const value = config[prop].value
           return (
-            (database[groupName] as SettingsDatabaseValue | undefined)?.[key] ??
+            (database[groupId] as SettingsDatabaseValue | undefined)?.[key] ??
             (Settings.isDropdown(value) ? value[0][0] : value)
           )
         },
         set(v: SettingValue) {
-          const value = (database[groupName] ??= {})
+          const value = (database[groupId] ??= {})
           value[key] = v
           config[prop].onChange?.()
-          database[groupName] = value
+          database[groupId] = value
         },
       })
     }
