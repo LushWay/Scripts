@@ -33,7 +33,7 @@ export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
 
 /** Сonverting true and false to boolean and string[] to string and string literal to plain string */
 /* eslint-disable @typescript-eslint/naming-convention */
-type toPlain<T> = T extends true | false
+type toPlain<T extends SettingValue> = T extends true | false
   ? boolean
   : T extends string
     ? string
@@ -44,7 +44,7 @@ type toPlain<T> = T extends true | false
         : T
 
 export type SettingsConfigParsed<T extends SettingsConfig> = {
-  [K in keyof T]: toPlain<T[K]['value']>
+  -readonly [K in keyof T]: toPlain<T[K]['value']>
 }
 
 export type SettingsDatabaseValue = Record<string, SettingValue>
@@ -52,7 +52,7 @@ export type SettingsDatabase = Record<string, SettingsDatabaseValue>
 
 export type PlayerSettingValues = boolean | string | number | DropdownSetting[]
 
-type WorldSettingsConfig = SettingsConfig & Record<string, { requires?: boolean }>
+type WorldSettingsConfig = SettingsConfig & Record<string, { required?: boolean }>
 
 export class Settings {
   /** Creates typical settings database */
@@ -74,12 +74,12 @@ export class Settings {
    * @param config - This is an object that contains the default values for each option.
    * @returns An function that returns object with properties that are getters and setters.
    */
-  static player<Config extends SettingsConfig<PlayerSettingValues>>(
+  static player<const Config extends SettingsConfig<PlayerSettingValues>>(
     groupName: string,
     groupId: string,
-    config: Narrow<Config> & ConfigMeta,
+    config: Config,
   ) {
-    this.insertGroup('playerMap', groupName, groupId, config as Config)
+    this.insertGroup('playerMap', groupName, groupId, config)
 
     const cache = new WeakPlayerMap()
 
@@ -114,24 +114,18 @@ export class Settings {
    * @param config - The default values for the options.
    * @returns An object with properties that are getters and setters.
    */
-  static world<Config extends WorldSettingsConfig>(
+  static world<const Config extends WorldSettingsConfig>(
     groupName: string,
     groupId: string,
-    config: Narrow<Config> & ConfigMeta,
+    config: Config,
   ): SettingsConfigParsed<Config> {
-    this.insertGroup('worldMap', groupName, groupId, config as Config)
+    this.insertGroup('worldMap', groupName, groupId, config)
     return this.parseConfig(Settings.worldDatabase, groupId, this.worldMap[groupId] as Config)
   }
 
   static worldCommon = ['Общие настройки мира\n§7Чат, спавн и тд', 'common'] as const
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-  private static insertGroup<Config extends SettingsConfig>(
-    to: 'worldMap' | 'playerMap',
-    groupName: string,
-    groupId: string,
-    config: Config,
-  ) {
+  private static insertGroup(to: 'worldMap' | 'playerMap', groupName: string, groupId: string, config: SettingsConfig) {
     if (!(groupId in this[to])) {
       this[to][groupId] = config
     } else {
@@ -156,10 +150,10 @@ export class Settings {
    * @param player - The player object.
    * @returns An object with getters and setters
    */
-  static parseConfig<T extends SettingsConfig>(
+  static parseConfig<Config extends SettingsConfig>(
     database: SettingsDatabase,
     groupId: string,
-    config: T,
+    config: Config,
     player: Player | null = null,
   ) {
     const settings = {}
@@ -185,7 +179,7 @@ export class Settings {
       })
     }
 
-    return settings as SettingsConfigParsed<T>
+    return settings as SettingsConfigParsed<Config>
   }
 
   static isDropdown(v: SettingValue): v is DropdownSetting[] {
@@ -350,7 +344,7 @@ export function worldSettingsMenu(player: Player) {
 
     let unsetCount = 0
     for (const [key, option] of Object.entries(group)) {
-      if (option.requires && typeof database[key] === 'undefined') unsetCount++
+      if (option.required && typeof database[key] === 'undefined') unsetCount++
     }
 
     form.addButton(`${group[SETTINGS_GROUP_NAME] ?? groupId} ${t.error.badge`${unsetCount}`}`, () => {

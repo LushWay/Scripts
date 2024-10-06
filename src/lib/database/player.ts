@@ -1,5 +1,6 @@
 import { Player, world, type PlayerDatabase } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
+import { DEFAULT_ROLE } from 'lib/roles'
 import { t } from 'lib/text'
 import { table } from './abstract'
 
@@ -36,7 +37,7 @@ declare module '@minecraft/server' {
 
 expand(Player, {
   database: table<PlayerDatabase>('player', () => ({
-    role: __RELEASE__ ? 'member' : 'spectator',
+    role: DEFAULT_ROLE,
     inv: 'spawn',
     survival: {},
   })),

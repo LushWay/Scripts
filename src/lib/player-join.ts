@@ -57,7 +57,7 @@ class JoinBuilder {
   constructor() {
     system.runPlayerInterval(
       player => {
-        player.database.join
+        if (!player.isValid()) return
         const db = player.database.join
 
         if (Array.isArray(db?.position)) {
