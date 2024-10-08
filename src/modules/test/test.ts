@@ -202,7 +202,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     )
   },
   airdrop(ctx) {
-    requestAirdrop(!!ctx.arguments[2])
+    requestAirdrop(!!ctx.args[2])
   },
   e(ctx) {
     const m = ctx.player.mainhand()
@@ -211,12 +211,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     console.log(Object.values(MinecraftEnchantmentTypes).map(e => item.enchantable?.getEnchantment(e)))
   },
   m(ctx) {
-    setMinimapNpcPosition(
-      ctx.player,
-      Number(ctx.arguments[1]) as 1 | 2,
-      Number(ctx.arguments[2]),
-      Number(ctx.arguments[3]),
-    )
+    setMinimapNpcPosition(ctx.player, Number(ctx.args[1]) as 1 | 2, Number(ctx.args[2]), Number(ctx.args[3]))
   },
   particle(ctx) {
     const block = ctx.player.getBlockFromViewDirection({

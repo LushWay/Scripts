@@ -8,7 +8,7 @@ root
   .executes(ctx => {
     const item = ctx.player.mainhand()
     const oldlore = item.getLore()
-    item.setLore(ctx.arguments)
+    item.setLore(ctx.args)
     ctx.player.success(`§a► §f${oldlore} ► ${item.getLore()}`)
   })
 
