@@ -6,7 +6,10 @@ import { ServerRpc } from './routes'
 class RequestError extends Error {}
 
 /** Makes http request to node instance */
-export async function request<Path extends keyof ServerRpc.Routes>(path: Path, body: ServerRpc.Routes[Path]['req']) {
+export async function request<Path extends keyof ServerRpc.Routes>(
+  path: Path,
+  body: ServerRpc.Routes[Path]['req'],
+): Promise<ServerRpc.Routes[Path]['res']> {
   console.info(t`request(${path}, ${body})`)
 
   if (ServerModules.Net) {
@@ -23,7 +26,7 @@ export async function request<Path extends keyof ServerRpc.Routes>(path: Path, b
 
     let responseBody
     try {
-      responseBody = response.body !== '' && (JSON.parse(response.body) as unknown)
+      responseBody = JSON.parse(response.body) as unknown
     } catch (error) {
       throw new RequestError(
         t.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
