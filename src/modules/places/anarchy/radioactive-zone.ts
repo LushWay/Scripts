@@ -1,7 +1,7 @@
 import { EntityDamageCause, Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { Sounds } from 'lib/assets/custom-sounds'
-import { request } from 'lib/bds/api'
+import { sendPacketToStdout } from 'lib/bds/api'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
@@ -27,7 +27,7 @@ export class RadioactiveZone {
 
         for (const p of players) {
           if (typeof p === 'undefined') {
-            if (!reloadSent) request('reload', { reason: 'Player is undefined' })
+            if (!reloadSent) sendPacketToStdout('reload', { reason: 'Player is undefined' })
             reloadSent = true
             return
           }

@@ -26,7 +26,6 @@ import {
   util,
 } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { request } from 'lib/bds/api'
 import { CommandContext } from 'lib/command/context'
 import { Cutscene } from 'lib/cutscene'
 import { ActionForm } from 'lib/form/action'
@@ -266,13 +265,6 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
       .addButton('Test', getAuxOrTexture(BUTTON['<']), () => {})
       .addButton('Test', () => {})
       .show(ctx.player)
-  },
-  async api(ctx) {
-    const res = await request('playerPlatform', {
-      playerName: ctx.player.name,
-    })
-
-    console.warn(inspect(res))
   },
   lore(ctx) {
     ctx.player.mainhand().setLore(['\u00a0', '\u00a0', 'aaa', ' '])

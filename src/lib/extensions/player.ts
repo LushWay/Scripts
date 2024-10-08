@@ -1,10 +1,10 @@
 import { Container, Entity, EntityDamageCause, EquipmentSlot, GameMode, Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
-import { request } from 'lib/bds/api'
+import { Language } from 'lib/assets/lang'
+import { sendPacketToStdout } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { MaybeRawText } from 'lib/text'
 import { expand } from './extend'
-import { Language } from 'lib/assets/lang'
 
 declare module '@minecraft/server' {
   interface Player {
@@ -227,7 +227,7 @@ expand(Player.prototype, {
     const equippable = this.getComponent('equippable')
     if (!equippable) {
       const reason = `Player '${this.name}' doesn't have equippable component (probably died).`
-      request('reload', { reason })
+      sendPacketToStdout('reload', { reason })
       throw new ReferenceError(reason)
     }
     return equippable.getEquipmentSlot(EquipmentSlot.Mainhand)

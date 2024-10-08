@@ -5,11 +5,7 @@ export declare namespace ServerRpc {
       req: { playerName: string }
       res: { platform: 'win10' | 'android' | 'console' }
     }
-    backup: {
-      req: { name: string }
-      res: { statusMessage: string }
-    }
-    reload: { req: { reason: string } | undefined; res: undefined }
+
     command: { req: { command: string }; res: undefined }
     say: { req: { message: string }; res: undefined }
   }
@@ -31,5 +27,7 @@ export declare namespace ServerRpc {
       message: string
       stack: string
     }
+    createBackup: { name: string }
+    reload: { reason: string }
   }
 }

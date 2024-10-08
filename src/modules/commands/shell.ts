@@ -1,17 +1,10 @@
-/* eslint-disable @typescript-eslint/use-unknown-in-catch-callback-variable */
 /* i18n-ignore */
-import { request } from 'lib/bds/api'
-import { stringify } from 'lib/utils/inspect'
+import { sendPacketToStdout } from 'lib/bds/api'
 
 new Command('backup')
   .setPermissions('techAdmin')
   .string('name', true)
   .executes(ctx => {
     ctx.reply('§6> §rПринято.')
-    request('backup', { name: ctx.input || 'InWorldBackup' })
-      .then(s => ctx.player.tell(s.statusMessage))
-      .catch(e => {
-        console.error(e)
-        ctx.player.fail(stringify(e))
-      })
+    sendPacketToStdout('createBackup', { name: ctx.input || 'InWorldBackup' })
   })
