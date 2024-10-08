@@ -6,39 +6,35 @@ import { ServerRpc } from './routes'
 class RequestError extends Error {}
 
 /** Makes http request to node instance */
-export async function request<Path extends keyof ServerRpc.Routes>(
-  path: Path,
-  body: ServerRpc.Routes[Path]['req'],
-): Promise<ServerRpc.Routes[Path]['res']> {
-  const sbody = JSON.stringify(body)
-  const prefix = `request('${path}'`
-  console.warn(`${prefix},`, body, '§r)')
+export async function request<Path extends keyof ServerRpc.Routes>(path: Path, body: ServerRpc.Routes[Path]['req']) {
+  console.info(t`request(${path}, ${body})`)
 
   if (ServerModules.Net) {
     const { http, HttpRequest, HttpRequestMethod } = ServerModules.Net
 
+    const stringifiedBody = JSON.stringify(body)
     const response = await http.request(
       new HttpRequest(`http://localhost:${__SERVER_PORT__}/` + path)
         .setMethod(HttpRequestMethod.Post)
         .addHeader('content-type', 'text/plain')
-        .addHeader('content-length', sbody.length.toString())
-        .setBody(sbody),
+        .addHeader('content-length', stringifiedBody.length.toString())
+        .setBody(stringifiedBody),
     )
 
-    let body
+    let responseBody
     try {
-      body = JSON.parse(response.body) as { status: number }
+      responseBody = response.body !== '' && (JSON.parse(response.body) as unknown)
     } catch (error) {
       throw new RequestError(
-        t.error`${prefix}): Failed to parse NodeServer response.body: ${inspect(response.body)}\n${error}`,
+        t.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
       )
     }
 
-    if (body.status === 404) {
-      throw new RequestError(`${prefix}): Unkown path!`)
+    if (responseBody && typeof responseBody === 'object' && 'status' in responseBody && responseBody.status === 404) {
+      throw new RequestError(`request(${path}): Unknown path!`)
     }
 
-    return body
+    return responseBody as ServerRpc.Routes[Path]['res']
   } else console.error('NET MODULE IS DISABLED, SKIPPING')
 }
 
