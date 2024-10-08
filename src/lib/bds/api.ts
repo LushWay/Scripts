@@ -24,20 +24,17 @@ export async function request<Path extends keyof ServerRpc.Routes>(
         .setBody(stringifiedBody),
     )
 
-    let responseBody
+    if (response.status === 404) {
+      throw new RequestError(`request(${path}): Unknown path!`)
+    }
+
     try {
-      responseBody = JSON.parse(response.body) as unknown
+      return JSON.parse(response.body) as ServerRpc.Routes[Path]['res']
     } catch (error) {
       throw new RequestError(
         t.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
       )
     }
-
-    if (responseBody && typeof responseBody === 'object' && 'status' in responseBody && responseBody.status === 404) {
-      throw new RequestError(`request(${path}): Unknown path!`)
-    }
-
-    return responseBody as ServerRpc.Routes[Path]['res']
   } else console.error('NET MODULE IS DISABLED, SKIPPING')
 }
 

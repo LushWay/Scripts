@@ -6,9 +6,9 @@ import { stringify } from 'lib/utils/inspect'
 new Command('backup')
   .setPermissions('techAdmin')
   .string('name', true)
-  .executes((ctx, name = 'InWorldBackup') => {
+  .executes(ctx => {
     ctx.reply('§6> §rПринято.')
-    request('backup', { name })
+    request('backup', { name: ctx.input || 'InWorldBackup' })
       .then(s => ctx.player.tell(s.statusMessage))
       .catch(e => {
         console.error(e)

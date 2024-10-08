@@ -2,15 +2,7 @@ import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 
 export class CommandContext {
-  input
-
-  event: ChatSendAfterEvent
-
   player: Player
-
-  arguments: string[]
-
-  command: import('./index').Command
 
   /**
    * Returns a commands callback
@@ -18,14 +10,23 @@ export class CommandContext {
    * @param event Chat data that was used
    * @param args
    * @param command
-   * @param rawInput
+   * @param input
    */
-  constructor(event: ChatSendAfterEvent, args: string[], command: import('./index').Command, rawInput: string) {
-    this.event = event
+  constructor(
+    public event: ChatSendAfterEvent,
+    public args: string[],
+    public command: import('./index').Command,
+
+    /**
+     * Raw arguments of the command
+     *
+     * For `/give somebody apples` its `somebody apples`
+     *
+     * For `/help` its ``
+     */
+    public input: string,
+  ) {
     this.player = event.sender
-    this.command = command
-    this.arguments = args
-    this.input = rawInput
   }
 
   /**
