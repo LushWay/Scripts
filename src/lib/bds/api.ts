@@ -1,5 +1,6 @@
 import { t } from 'lib/text'
 import { inspect } from 'lib/util'
+import './events'
 import { ServerModules } from './modules'
 import { ScriptServerRpc } from './routes'
 

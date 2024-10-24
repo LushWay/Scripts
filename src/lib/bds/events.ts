@@ -7,7 +7,6 @@ const scriptevents: { [K in keyof ScriptServerRpc.Events]: (request: ScriptServe
     console.log('Gave airdrop key with level', level)
   },
   updatePlayerMeta(meta) {
-    console.log('Updated player meta with', meta.length, 'entries')
     externalSource.playerMetadata = meta
   },
   updatePlayerLangs(request) {
