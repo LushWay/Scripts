@@ -29,6 +29,7 @@ export * from './database'
 
 export * from './kinds/boss-arena'
 export * from './kinds/region'
+export * from './kinds/road'
 export * from './kinds/safe-area'
 
 type InteractionAllowed = (
