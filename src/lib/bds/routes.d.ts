@@ -1,16 +1,11 @@
-export declare namespace ServerRpc {
+export declare namespace ScriptServerRpc {
   interface Routes {
     ping: { req: undefined; res: { status: number } }
-    playerPlatform: {
-      req: { playerName: string }
-      res: { platform: 'win10' | 'android' | 'console' }
-    }
 
     command: { req: { command: string }; res: undefined }
-    say: { req: { message: string }; res: undefined }
   }
 
-  interface StdoutPackets {
+  interface Packets {
     chatMessage: {
       name: string
       message: string
@@ -29,5 +24,12 @@ export declare namespace ServerRpc {
     }
     createBackup: { name: string }
     reload: { reason: string }
+  }
+
+  interface Events {
+    giveAirdropKey: { level: 'basic' | 'powerfull' }
+
+    updatePlayerMeta: { id: string; xuid: string; pfid: string; lang: string; name: string }[]
+    updatePlayerLangs: { xuid: string; lang: string; pfid: string }
   }
 }

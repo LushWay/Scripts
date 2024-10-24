@@ -1,15 +1,19 @@
 import { t } from 'lib/text'
 import { inspect } from 'lib/util'
 import { ServerModules } from './modules'
-import { ServerRpc } from './routes'
+import { ScriptServerRpc } from './routes'
 
 class RequestError extends Error {}
 
-/** Makes http request to node instance */
-export async function request<Path extends keyof ServerRpc.Routes>(
+/**
+ * Makes http request to node instance
+ *
+ * @deprecated Temporary not working
+ */
+export async function request<Path extends keyof ScriptServerRpc.Routes>(
   path: Path,
-  body: ServerRpc.Routes[Path]['req'],
-): Promise<ServerRpc.Routes[Path]['res']> {
+  body: ScriptServerRpc.Routes[Path]['req'],
+): Promise<ScriptServerRpc.Routes[Path]['res']> {
   console.info(t`request(${path}, ${body})`)
 
   if (ServerModules.Net) {
@@ -33,7 +37,7 @@ export async function request<Path extends keyof ServerRpc.Routes>(
     }
 
     try {
-      return (response.body ? JSON.parse(response.body) : undefined) as ServerRpc.Routes[Path]['res']
+      return (response.body ? JSON.parse(response.body) : undefined) as ScriptServerRpc.Routes[Path]['res']
     } catch (error) {
       throw new RequestError(
         t.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
@@ -49,9 +53,12 @@ export async function request<Path extends keyof ServerRpc.Routes>(
  * @param type - Packet type
  * @param packet - Packet content
  */
-export function sendPacketToStdout<T extends keyof ServerRpc.StdoutPackets>(
+export function sendPacketToStdout<T extends keyof ScriptServerRpc.Packets>(
   type: T,
-  packet: ServerRpc.StdoutPackets[T],
+  packet: ScriptServerRpc.Packets[T],
 ) {
   console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
 }
+
+/** Data in this source comes from API so it may be unavailable */
+export const externalSource: { playerMetadata: ScriptServerRpc.Events['updatePlayerMeta'] } = { playerMetadata: [] }
