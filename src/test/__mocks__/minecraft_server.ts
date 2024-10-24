@@ -189,6 +189,8 @@ export class System {
   }
 
   beforeEvents = new SystemBeforeEvents()
+
+  afterEvents = new SystemAfterEvents()
 }
 
 export enum WatchdogTerminateReason {
@@ -198,6 +200,10 @@ export enum WatchdogTerminateReason {
 
 export class SystemBeforeEvents {
   readonly watchdogTerminate = new EventSignal<{ cancel: boolean; terminateReason: WatchdogTerminateReason }>()
+}
+
+export class SystemAfterEvents {
+  readonly scriptEventReceive = new EventSignal<unknown>()
 }
 
 export const system = new System()
