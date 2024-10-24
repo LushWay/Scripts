@@ -26,6 +26,7 @@ export function createBossGolem(group: Group) {
     .respawnTime(ms.from('min', 10))
     .allowedEntities('all')
     .spawnEvent(true)
+    .radius()
 
   return boss
 }

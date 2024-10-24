@@ -6,7 +6,7 @@ import { SafeAreaRegion } from './safe-area'
 
 class TestSafeAreaRegion extends SafeAreaRegion {
   get regionKey() {
-    return this.key
+    return this.id
   }
 }
 

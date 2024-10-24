@@ -41,6 +41,11 @@ export class FloatingText {
       this.entity.nameTag = nameTag
     } else {
       this.logger.warn('Entity is invalid')
+      try {
+        this.entity?.remove()
+      } catch {}
+
+      this.create(location)
     }
   }
 

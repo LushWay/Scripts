@@ -1,7 +1,7 @@
 import { Entity } from '@minecraft/server'
+import { Vector } from 'lib/vector'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
-import { Vector } from 'lib/vector'
 
 interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: string
@@ -25,6 +25,7 @@ export class BossArenaRegion extends Region {
     openContainers: true,
     pvp: 'pve',
     owners: [],
+    allowedAllItem: false,
   }
 
   constructor(area: Area, options: BossArenaRegionOptions, key: string) {
@@ -33,7 +34,11 @@ export class BossArenaRegion extends Region {
   }
 
   returnEntity(entity: Entity) {
-    const vector = Vector.subtract(entity.location, this.area.center)
-    entity.applyKnockback(-vector.x, -vector.z, 5, 0.6)
+    const center = this.area.center
+    const location = entity.location
+    const horizontal = Vector.distance({ x: location.x, y: 0, z: location.z }, { x: center.x, y: 0, z: center.z }) / 10
+    const vertical = Math.abs(location.y - center.y) / 10
+    const vector = Vector.subtract(location, center)
+    entity.applyKnockback(-vector.x, -vector.z, horizontal, vertical)
   }
 }

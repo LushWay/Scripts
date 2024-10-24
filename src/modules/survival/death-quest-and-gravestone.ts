@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
-import { ActionGuardOrder, ALLOW_SPAWN_PROP } from 'lib/region'
+import { ActionGuardOrder, forceAllowSpawnInRegion } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
 import { Spawn } from 'modules/places/spawn'
@@ -28,7 +28,7 @@ world.afterEvents.entityDie.subscribe(event => {
     const head = event.deadEntity.getHeadLocation()
 
     const gravestone = dimension.spawnEntity(gravestoneEntity, head)
-    gravestone.setDynamicProperty(ALLOW_SPAWN_PROP, true)
+    forceAllowSpawnInRegion(gravestone)
     gravestone.setDynamicProperty(gravestoneOwnerKey, playerId)
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
     gravestone.addTag(gravestoneTag)

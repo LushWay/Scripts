@@ -2,7 +2,9 @@
 
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { table } from 'lib/database/abstract'
+import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
 import { location, SafeLocation } from 'lib/location'
@@ -31,6 +33,7 @@ interface BossOptions {
   spawnEvent: boolean | string
   respawnTime: number
   allowedEntities: string[] | 'all'
+  radius: number
 }
 
 export class Boss {
@@ -46,8 +49,10 @@ export class Boss {
         loot: (loot: LootTable) => ({
           respawnTime: (respawnTime: number) => ({
             allowedEntities: (allowedEntities: string[] | 'all') => ({
-              spawnEvent: (spawnEvent: BossOptions['spawnEvent']) =>
-                new Boss({ place, typeId, loot, respawnTime, spawnEvent, allowedEntities }),
+              spawnEvent: (spawnEvent: BossOptions['spawnEvent']) => ({
+                radius: (radius = 40) =>
+                  new Boss({ place, typeId, loot, respawnTime, spawnEvent, allowedEntities, radius }),
+              }),
             }),
           }),
         }),
@@ -97,20 +102,27 @@ export class Boss {
   constructor(private options: BossOptions) {
     this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.id}`
 
-    if (Array.isArray(this.options.allowedEntities)) this.options.allowedEntities.push(options.typeId)
+    if (Array.isArray(this.options.allowedEntities))
+      this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()
       this.region = BossArenaRegion.create(
-        new SphereArea({ center, radius: 40 }, this.options.place.group.dimensionId),
+        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionId),
         { bossName: this.options.place.name, permissions: { allowedEntities: this.options.allowedEntities } },
       )
-      this.region.permissions.allowedEntities = [this.options.typeId, MinecraftEntityTypes.Player]
+      EventLoaderWithArg.load(this.onRegionCreate, this.region)
     })
 
     Boss.all.push(this)
   }
+
+  readonly onRegionCreate = new EventLoaderWithArg<BossArenaRegion>()
+
+  readonly onEntitySpawn = new EventSignal<Entity>()
+
+  readonly onEntityDie = new EventSignal()
 
   private logger = createLogger('Boss ' + this.options.place.fullId)
 
@@ -127,7 +139,7 @@ export class Boss {
     return this
   }
 
-  check() {
+  private check() {
     if (!this.location.valid) return
     if (isChunkUnloaded(this as LocationInDimension)) return
 
@@ -146,7 +158,7 @@ export class Boss {
 
   private floatingText = new FloatingText(this.options.place.fullId, this.dimensionId)
 
-  checkRespawnTime(db: BossDB) {
+  private checkRespawnTime(db: BossDB) {
     if (Date.now() > db.date + this.options.respawnTime) {
       this.spawnEntity()
     } else if (this.location.valid) {
@@ -157,7 +169,7 @@ export class Boss {
     }
   }
 
-  spawnEntity() {
+  private spawnEntity() {
     if (!this.location.valid) return
 
     // Get type id
@@ -173,6 +185,8 @@ export class Boss {
 
           system.delay(() => {
             if (!this.entity) return
+
+            EventSignal.emit(this.onEntitySpawn, entity)
             this.entity.nameTag = this.options.place.name
           })
           cleanup()
@@ -191,7 +205,7 @@ export class Boss {
   }
 
   /** Ensures that entity exists and if not calls onDie method */
-  ensureEntity(db: BossDB) {
+  private ensureEntity(db: BossDB) {
     this.entity ??= world[this.dimensionId]
       .getEntities({
         type: this.options.typeId,
@@ -218,7 +232,7 @@ export class Boss {
     }
   }
 
-  onDie({ dropLoot = true } = {}) {
+  private onDie({ dropLoot = true } = {}) {
     if (!this.location.valid) return
 
     this.logger.info(
@@ -228,6 +242,7 @@ export class Boss {
         .map(e => `§l${Player.name(e[0])}§r§f: §6${e[1]}§f`)
         .join(', ')}`,
     )
+    EventSignal.emit(this.onEntityDie, undefined)
     const location = this.entity?.isValid() ? this.entity.location : this.location
     delete this.entity
 
@@ -240,7 +255,12 @@ export class Boss {
     if (dropLoot) {
       world.say(`§6Убит босс §f${this.options.place.name}!`)
 
-      this.options.loot.generate().forEach(e => e && world[this.dimensionId].spawnItem(e, location))
+      this.options.loot.generate().forEach(e => {
+        if (e) {
+          const item = world[this.dimensionId].spawnItem(e, location)
+          forceAllowSpawnInRegion(item)
+        }
+      })
       const players = world.getAllPlayers()
 
       for (const [playerId, damage] of this.damage) {

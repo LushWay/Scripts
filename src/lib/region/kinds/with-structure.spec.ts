@@ -13,13 +13,13 @@ suite('RegionWithStructure', () => {
       new SphereArea({ center: test.worldLocation(new Vector(2, 5, 2)), radius: 3 }, test.getDimension().type),
     )
 
-    region.saveStructure() // save empty structure with air
+    region.structure.save() // save empty structure with air
     await region.area.forEachVector((vector, isIn, dimension) => {
       dimension.setBlockType(vector, isIn ? MinecraftBlockTypes.Bedrock : MinecraftBlockTypes.Glass)
     })
 
     await test.idle(40)
-    await region.loadStructure()
+    await region.structure.place()
 
     await region.area.forEachVector((vector, isIn) => {
       test.assertBlockPresent(isIn ? MinecraftBlockTypes.Air : MinecraftBlockTypes.Glass, test.worldLocation(vector))

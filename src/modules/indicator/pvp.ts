@@ -1,9 +1,10 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
-import { Boss, BossArenaRegion, LockAction, Settings } from 'lib'
+import { Boss, BossArenaRegion, LockAction, ms, Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { RegionEvents } from 'lib/region/events'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 const options = Settings.world(...Settings.worldCommon, {
   pvpEnabled: {
@@ -59,15 +60,38 @@ system.runInterval(
   20,
 )
 
+const playerTimeouts = new WeakPlayerMap<{ expires: number; callback: VoidFunction }>({ removeOnLeave: true })
+
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
-  if (
-    lockAction.isLocked(player) &&
-    previous.some(e => e instanceof BossArenaRegion) &&
-    !newest.some(e => e instanceof BossArenaRegion)
-  ) {
-    if (previous[0] instanceof BossArenaRegion) previous[0].returnEntity(player)
+  if (!lockAction.isLocked(player)) return
+
+  const region = previous.find(e => e instanceof BossArenaRegion)
+
+  if (lockAction.isLocked(player) && region && !newest.some(e => e instanceof BossArenaRegion)) {
+    region.returnEntity(player)
+    playerTimeouts.set(player, {
+      expires: Date.now() + ms.from('sec', 4),
+      callback() {
+        if (lockAction.isLocked(player) && !region.area.isVectorIn(player.location, player.dimension.type)) {
+          player.teleport(region.area.center)
+        }
+      },
+    })
   }
 })
+
+system.runInterval(
+  () => {
+    for (const [player, { expires, callback }] of playerTimeouts) {
+      if (expires < Date.now()) {
+        callback()
+        playerTimeouts.delete(player)
+      }
+    }
+  },
+  'returning',
+  20,
+)
 
 Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
@@ -113,6 +137,8 @@ function onDamage(
   { damage, hurtEntity, damageSource: { damagingEntity, cause } }: EntityHurtAfterEvent,
   fatal = false,
 ) {
+  if (!hurtEntity.isValid()) return
+
   if (
     ![
       EntityDamageCause.fireTick,

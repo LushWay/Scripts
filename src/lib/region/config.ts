@@ -1,4 +1,4 @@
-import { BlockTypes } from '@minecraft/server'
+import { BlockTypes, Entity } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 
@@ -60,3 +60,13 @@ export const NOT_MOB_ENTITIES = [
   MinecraftEntityTypes.Npc,
   'minecraft:item',
 ] as string[]
+
+const ALLOW_SPAWN_PROP = 'allowSpawn'
+export function forceAllowSpawnInRegion(entity: Entity) {
+  if (entity.isValid()) entity.setDynamicProperty(ALLOW_SPAWN_PROP, true)
+}
+
+export function isForceSpawnInRegionAllowed(entity: Entity) {
+  if (entity.isValid()) return entity.getDynamicProperty(ALLOW_SPAWN_PROP) === true
+  return false
+}

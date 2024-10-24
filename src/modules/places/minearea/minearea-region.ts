@@ -1,6 +1,6 @@
 import { Player, PlayerBreakBlockBeforeEvent } from '@minecraft/server'
 import { isNotPlaying } from 'lib/game-utils'
-import { actionGuard, ActionGuardOrder, addAddableRegion } from 'lib/region'
+import { actionGuard, ActionGuardOrder, registerCreatableRegion } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
@@ -22,6 +22,7 @@ export class MineareaRegion extends RegionWithStructure {
     gates: true,
     switches: true,
     openContainers: true,
+    allowedAllItem: true,
     owners: [],
   }
 
@@ -38,24 +39,22 @@ export class MineareaRegion extends RegionWithStructure {
           // Prevent from region save conflicts
           if (region instanceof MineareaRegion && !restoredRegions.includes(region) && region !== this) {
             restoredRegions.push(region)
-            await region.loadStructure()
+            await region.structure.place()
           }
         }
       })
-      .then(() => {
-        super.saveStructure()
-      })
+      .then(() => this.structure.save())
 
     return restoredRegions.length
   }
 
   protected async onCreate() {
-    const crossRegions = await this.saveStructure()
+    const crossRegions = await this.restoreAndSaveStructure()
 
-    logger.info`Created new MineArea region ${this.key} and saved structure. Crossregions restored: ${crossRegions}`
+    logger.info`Created new MineArea region ${this.id} and saved structure. Crossregions restored: ${crossRegions}`
   }
 
-  onBlockBreak(player: Player, event: PlayerBreakBlockBeforeEvent) {
+  onBlockBreak(_player: Player, event: PlayerBreakBlockBeforeEvent) {
     const { block, dimension } = event
     scheduleBlockPlace({
       dimension: dimension.type,
@@ -73,7 +72,7 @@ export class MineareaRegion extends RegionWithStructure {
   }
 }
 
-addAddableRegion('Зоны добычи', MineareaRegion)
+registerCreatableRegion('Зоны добычи', MineareaRegion)
 registerSaveableRegion('minearea', MineareaRegion)
 
 actionGuard((player, region, ctx) => {
@@ -116,6 +115,6 @@ onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
     }
 
     logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
-    region.loadStructure()
+    region.structure.place()
   }
 })

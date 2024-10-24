@@ -3,6 +3,7 @@ import { ProxyDatabase } from 'lib/database/proxy'
 import { util } from 'lib/util'
 import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
+import { RegionStructure } from '../structure'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
@@ -25,6 +26,9 @@ export interface RegionPermissions extends Record<string | number | symbol, unkn
   allowedEntities: string[] | 'all'
   /** Owners of region */
   owners: string[]
+
+  /** Whenether to allow any items to spawn or only specific with the forceSpawn flag set */
+  allowedAllItem: boolean
 }
 
 /** Options used in {@link Region.create} */
@@ -42,9 +46,7 @@ export class Region {
     let key = `${kind}-${area}-${radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
     if (key in RegionDatabase) {
       let i = 0
-      while (`${key}-${i}` in RegionDatabase) {
-        i++
-      }
+      while (`${key}-${i}` in RegionDatabase) i++
       key = `${key}-${i}`
     }
     return key
@@ -63,6 +65,7 @@ export class Region {
     region.kind = this.kind
     region.creator = this
     if (options.ldb) region.linkedDatabase = options.ldb
+    if (region.structure) region.structure.validateArea()
 
     if (!key) {
       // We are creating new region and should save it
@@ -136,20 +139,22 @@ export class Region {
 
   creator!: typeof Region
 
+  structure?: RegionStructure
+
   /**
    * Creates the region
    *
    * @param area - Area where region is located
-   * @param _options - Region creation options
+   * @param options - Region creation options
    * @param o.key - The key of the region. This is used to identify the region.
    */
   constructor(
     public area: Area,
-    _options: RegionCreationOptions,
-    protected key: string,
+    options: RegionCreationOptions,
+    readonly id: string,
   ) {
     this.area = area
-    if (key) Region.regions.push(this)
+    if (id) Region.regions.push(this)
   }
 
   /** Function that gets called on region creation after saving (once) */
@@ -173,7 +178,7 @@ export class Region {
 
   /** Name of the region that should always be */
   get name() {
-    return this.ownerName ?? this.key
+    return this.ownerName ?? this.id
   }
 
   /** Name that will be displayed on the sidebar e.g. It can be empty. */
@@ -232,13 +237,14 @@ export class Region {
   save() {
     if (!(RegionIsSaveable in this)) return false
 
-    RegionDatabase[this.key] = this.toJSON()
+    RegionDatabase[this.id] = this.toJSON()
   }
 
   /** Removes this region */
   delete() {
-    Region.regions = Region.regions.filter(e => e.key !== this.key)
-    Reflect.deleteProperty(RegionDatabase, this.key)
+    this.structure?.delete()
+    Region.regions = Region.regions.filter(e => e.id !== this.id)
+    Reflect.deleteProperty(RegionDatabase, this.id)
   }
 }
 

@@ -15,14 +15,14 @@ class TestK1Region extends Region {
   }
 
   get regionKey() {
-    return this.key
+    return this.id
   }
 }
 registerSaveableRegion('k1', TestK1Region)
 
 class TestK2Region extends Region {
   get regionKey() {
-    return this.key
+    return this.id
   }
 
   get json() {

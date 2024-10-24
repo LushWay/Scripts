@@ -108,6 +108,7 @@ export class DungeonRegion extends Region {
     openContainers: true,
     owners: [],
     allowedEntities: 'all',
+    allowedAllItem: true,
   }
 
   protected chests: DungeonChest[] = []
@@ -118,7 +119,7 @@ export class DungeonRegion extends Region {
     const chest: DungeonChest = {
       id,
       location,
-      loot: loot instanceof LootTable ? loot : loot(new Loot('DungeonChest' + this.key + id)),
+      loot: loot instanceof LootTable ? loot : loot(new Loot('DungeonChest' + this.id + id)),
       restoreTime: ms.from('min', 5),
     }
 

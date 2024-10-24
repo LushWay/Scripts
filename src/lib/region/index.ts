@@ -11,17 +11,24 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { isBuilding } from 'lib/game-utils'
 import { EventSignal } from '../event-signal'
-import { BLOCK_CONTAINERS, DOORS, GATES, INTERACTABLE_ENTITIES, NOT_MOB_ENTITIES, SWITCHES, TRAPDOORS } from './config'
+import {
+  BLOCK_CONTAINERS,
+  DOORS,
+  GATES,
+  INTERACTABLE_ENTITIES,
+  isForceSpawnInRegionAllowed,
+  NOT_MOB_ENTITIES,
+  SWITCHES,
+  TRAPDOORS,
+} from './config'
 import { RegionEvents } from './events'
 import { Region } from './kinds/region'
 export * from './command'
 export * from './config'
 export * from './database'
-export * from './kinds/region'
 
 export * from './kinds/boss-arena'
-export const ALLOW_SPAWN_PROP = 'allowSpawn'
-
+export * from './kinds/region'
 export * from './kinds/safe-area'
 
 type InteractionAllowed = (
@@ -42,10 +49,14 @@ export function actionGuard(fn: InteractionAllowed, position: ActionGuardOrder) 
 }
 
 export enum ActionGuardOrder {
+  // Place action. Interacting with block
   BlockAction = 11,
+  // Region member permissions
   RegionMember = 10,
   Anticheat = 9,
+  // Vanilla features override (base placing etc)
   Feature = 8,
+  // Limits
   Permission = 7,
   Lowest = 6,
 }
@@ -136,15 +147,13 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
 })
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
-  if (NOT_MOB_ENTITIES.includes(entity.typeId) || !entity.isValid()) return
+  const { typeId } = entity
+  if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid()) return
 
   const region = Region.nearestRegion(entity.location, entity.dimension.type)
-  if (entity.getDynamicProperty(ALLOW_SPAWN_PROP)) return
-  if (
-    !region ||
-    region.permissions.allowedEntities === 'all' ||
-    region.permissions.allowedEntities.includes(entity.typeId)
-  )
+
+  if (isForceSpawnInRegionAllowed(entity) || (typeId === 'minecraft:item' && region?.permissions.allowedAllItem)) return
+  if (!region || region.permissions.allowedEntities === 'all' || region.permissions.allowedEntities.includes(typeId))
     return
 
   entity.remove()

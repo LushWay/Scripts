@@ -1,10 +1,10 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { addAddableRegion, ms } from 'lib'
+import { ms, registerCreatableRegion } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
+import { createLogger } from 'lib/utils/logger'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { MineareaRegion } from '../minearea/minearea-region'
 import { ores, placeOre } from './algo'
-import { createLogger } from 'lib/utils/logger'
 
 const logger = createLogger('Shaft')
 
@@ -46,5 +46,5 @@ export class MineshaftRegion extends MineareaRegion {
   }
 }
 
-addAddableRegion('Шахты', MineshaftRegion)
+registerCreatableRegion('Шахты', MineshaftRegion)
 registerSaveableRegion('mine', MineshaftRegion)

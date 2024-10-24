@@ -9,10 +9,9 @@ import { textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { SphereArea } from './areas/sphere'
-import { RegionWithStructure } from './kinds/with-structure'
 
 const addableRegions: { name: string; region: typeof Region }[] = []
-export function addAddableRegion(name: string, region: typeof Region) {
+export function registerCreatableRegion(name: string, region: typeof Region) {
   addableRegions.push({ name, region })
 }
 
@@ -99,14 +98,14 @@ function editRegion(player: Player, region: Region, back: () => void) {
       }),
     )
 
-  if (region instanceof RegionWithStructure) {
-    form.addButton('Восстановить структуру', () => {
-      region.loadStructure()
+  if (region.structure) {
+    const color = region.structure.exists ? '' : '§7'
+    form.addButton(`${color}Восстановить структуру`, () => region.structure?.place())
+    form.addButton(`${color}Пересохранить структуру`, () => {
+      region.structure?.delete()
+      region.structure?.save()
     })
-    form.addButton('Пересохранить структуру', () => {
-      region.deleteStructure()
-      region.saveStructure()
-    })
+    form.addButtonPrompt('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
   }
 
   form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)

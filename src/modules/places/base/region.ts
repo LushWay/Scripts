@@ -1,4 +1,4 @@
-import { addAddableRegion } from 'lib/region/command'
+import { registerCreatableRegion } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 
@@ -6,8 +6,8 @@ import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 
 export class BaseRegion extends RegionWithStructure {
   protected onCreate(): void {
-    this.saveStructure()
+    this.structure.save()
   }
 }
 registerSaveableRegion('base', BaseRegion)
-addAddableRegion('Базы', BaseRegion)
+registerCreatableRegion('Базы', BaseRegion)

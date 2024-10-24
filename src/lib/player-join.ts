@@ -51,6 +51,8 @@ class JoinBuilder {
 
   setPlayerJoinPosition(player: Player) {
     player.database.join ??= {}
+
+    if (!player.isValid()) return
     player.database.join.position = this.playerAt(player)
   }
 

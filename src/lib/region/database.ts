@@ -30,6 +30,7 @@ export const defaultRegionPermissions = (): RegionPermissions => ({
   gates: true,
   allowedEntities: 'all',
   owners: [],
+  allowedAllItem: true,
 })
 
 export const RegionDatabase = table<RegionSave>('region-v2', () => ({
