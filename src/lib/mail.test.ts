@@ -2,7 +2,6 @@ import 'lib/extensions/player'
 
 import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/shop/rewards'
-import { beforeEach, describe, expect, it } from 'vitest'
 
 describe('mail', () => {
   beforeEach(() => {

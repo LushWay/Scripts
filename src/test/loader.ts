@@ -1,7 +1,6 @@
 import 'modules/loader'
 import './framework'
 
-import 'lib/bds/api.spec'
 import 'lib/command/index.spec'
 import 'lib/region/kinds/with-structure.spec'
 import 'lib/temporary.spec'

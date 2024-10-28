@@ -1,5 +1,4 @@
 import { t } from 'lib/text'
-import { describe, expect, it } from 'vitest'
 import { ngettext } from './ngettext'
 
 describe('ngettext', () => {

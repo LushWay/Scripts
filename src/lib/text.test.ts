@@ -1,7 +1,6 @@
 import 'lib/command/index'
 
 import { Player } from '@minecraft/server'
-import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest'
 import { setRole } from './roles'
 import './text'
 import { t, textTable } from './text'

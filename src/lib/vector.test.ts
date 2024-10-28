@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import { Vector } from './vector'
 
 describe('vector extra functions', () => {

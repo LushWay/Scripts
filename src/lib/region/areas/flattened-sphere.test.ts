@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import { FlattenedSphereArea } from './flattened-sphere'
 
 describe('rectangle', () => {

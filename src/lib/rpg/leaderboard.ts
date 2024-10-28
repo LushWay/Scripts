@@ -3,7 +3,6 @@ import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
-import { Nullable } from 'vitest'
 import { table } from '../database/abstract'
 
 export interface LeaderboardInfo {
@@ -120,6 +119,8 @@ export class Leaderboard {
   }
 
   updateLeaderboard() {
+    type Nullable<T> = T | null
+
     const scoreboard = this.scoreboard
     const dname = scoreboard.displayName
     const name = dname.charAt(0).toUpperCase() + dname.slice(1)

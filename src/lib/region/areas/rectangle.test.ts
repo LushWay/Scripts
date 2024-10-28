@@ -1,5 +1,4 @@
 import { Vector } from 'lib'
-import { describe, expect, it, vi } from 'vitest'
 import { RectangleArea } from './rectangle'
 
 describe('rectangle', () => {
@@ -71,4 +70,3 @@ describe('rectangle', () => {
     `)
   })
 })
-

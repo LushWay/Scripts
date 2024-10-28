@@ -1,4 +1,3 @@
-import { describe, expect, it, vi } from 'vitest'
 import { dedupe } from './dedupe'
 
 describe('dedupe', () => {

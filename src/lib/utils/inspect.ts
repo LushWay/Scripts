@@ -9,7 +9,7 @@ export function stringify(target: unknown) {
     typeof target[stringifySymbol] === 'function'
   ) {
     try {
-      const result = target[stringifySymbol]() as unknown
+      const result = (target[stringifySymbol] as () => unknown)()
       if (typeof result === 'string') return result
     } catch {
       return inspect(target)

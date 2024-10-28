@@ -1,7 +1,6 @@
 import * as mc from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
-import { vi } from 'vitest'
 
 export abstract class Component {
   abstract readonly typeId: string

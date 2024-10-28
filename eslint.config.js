@@ -1,7 +1,11 @@
 import eslint from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import ts from 'typescript-eslint'
+import { eslintConfigForEnv } from './tools/eslint-plugin/helpers.js'
 import tr from './tools/eslint-plugin/index.js'
+
+const CI = process.env.CI
+const VSCODE = process.env.VSCODE_CWD
 
 export default ts.config(
   eslint.configs.recommended,
@@ -100,15 +104,18 @@ export default ts.config(
       '@typescript-eslint/no-unsafe-assignment': 'off',
     },
   },
-  ...(process.env.CI
-    ? []
-    : ts.config({
-        plugins: {
-          'file-progress': (await import('eslint-plugin-file-progress')).default,
-          'only-warn': (await import('eslint-plugin-only-warn')).default,
-        },
-        rules: {
-          'file-progress/activate': 'warn',
-        },
-      })),
+  eslintConfigForEnv(process.env.PROGRESS || (!CI && !VSCODE), {
+    plugins: {
+      'file-progress': (await import('eslint-plugin-file-progress')).default,
+    },
+    rules: {
+      'file-progress/activate': 'warn',
+    },
+  }),
+
+  eslintConfigForEnv(!CI, {
+    plugins: {
+      'only-warn': (await import('eslint-plugin-only-warn')).default,
+    },
+  }),
 )

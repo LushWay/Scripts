@@ -1,6 +1,5 @@
 import { Player, world } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
-import { describe, expect, it } from 'vitest'
 import './player'
 
 describe('player database', () => {

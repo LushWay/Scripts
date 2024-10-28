@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { EventLoader, EventLoaderWithArg, EventSignal } from './event-signal'
 
 describe('EventSignal', () => {

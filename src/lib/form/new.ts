@@ -28,7 +28,7 @@ class Form {
   private buttons: (NewFormCallback | undefined)[] = []
 
   /** Adds a button to this form */
-  button(link: Show, icon?: string | null | undefined): F
+  button(link: Show, icon?: string | null): F
 
   /**
    * Adds a button to this form

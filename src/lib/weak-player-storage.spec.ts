@@ -1,8 +1,8 @@
-import { suite, test } from 'test/framework'
+import { gamesuite, gametest } from 'test/framework'
 import { WeakPlayerMap } from './weak-player-storage'
 
-suite('WeakPlayerMap', () => {
-  test('testWeakPlayerMap', async test => {
+gamesuite('WeakPlayerMap', () => {
+  gametest('testWeakPlayerMap', async test => {
     const player = test.player()
     const playerMap = new WeakPlayerMap<string>()
 
@@ -18,7 +18,7 @@ suite('WeakPlayerMap', () => {
     })
   })
 
-  test('testWeakPlayerMapOffline', async test => {
+  gametest('testWeakPlayerMapOffline', async test => {
     const player = test.player()
     const playerMap = new WeakPlayerMap<string>()
 
@@ -32,7 +32,7 @@ suite('WeakPlayerMap', () => {
     test.assert(playerMap.has(player), 'Map should contain the player after leaving')
   })
 
-  test('testWeakPlayerMapCallback', async test => {
+  gametest('testWeakPlayerMapCallback', async test => {
     const player = test.player()
     const playerId = player.id
     let called = 0

@@ -1,10 +1,10 @@
 import { ItemStack, ItemTypes } from '@minecraft/server'
 import { TestStructures } from 'test/constants'
-import { suite, test } from 'test/framework'
+import { gamesuite, gametest } from 'test/framework'
 import { gravestoneEntity } from './death-quest-and-gravestone'
 
-suite('death-quest-and-gravestone', () => {
-  test('save-inventory', async test => {
+gamesuite('death-quest-and-gravestone', () => {
+  gametest('save-inventory', async test => {
     const location = { x: 3, y: 2, z: 3 }
     const player = test.spawnSimulatedPlayer(location)
 

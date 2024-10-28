@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import { inaccurateSearch, stringSimilarity } from './search'
 
 describe('innacurate search', () => {

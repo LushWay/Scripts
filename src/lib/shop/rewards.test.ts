@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import { itemDescription } from './rewards'
 
 describe('itemDescription', () => {

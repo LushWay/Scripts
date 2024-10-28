@@ -1,6 +1,5 @@
 import 'lib/extensions/enviroment'
 
-import { describe, expect, expectTypeOf, it } from 'vitest'
 import { ItemLoreSchema } from './item-stack'
 
 describe('item stack', () => {

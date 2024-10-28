@@ -1,5 +1,4 @@
 import { Vector } from 'lib/vector'
-import { describe, expect, it } from 'vitest'
 import { SphereArea } from '../areas/sphere'
 import { RegionDatabase } from '../database'
 import { SafeAreaRegion } from './safe-area'

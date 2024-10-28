@@ -1,6 +1,5 @@
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { TEST_createPlayer, TEST_onFormOpen } from 'test/utils'
-import { describe, it } from 'vitest'
 import { Shop } from '../shop'
 
 import 'lib/database/scoreboard'

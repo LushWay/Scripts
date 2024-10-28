@@ -2,11 +2,11 @@ import { ItemStack } from '@minecraft/server'
 import type { ExtendedSimulatedPlayer, ExtendedTest } from '@minecraft/server-gametest'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { TestStructures } from 'test/constants'
-import { suite, test } from 'test/framework'
+import { gamesuite, gametest } from 'test/framework'
 import { BaseItem } from './base'
 
-suite('base', () => {
-  test('should break blocks only by region owner', async test => {
+gamesuite('base', () => {
+  gametest('should break blocks only by region owner', async test => {
     const { owner, raider } = await createCommonBaseTest(test)
 
     await test.idle(20)
@@ -22,7 +22,7 @@ suite('base', () => {
     .structureName(TestStructures.flat)
     .padding(40)
 
-  test('should remove base after explosion', async test => {
+  gametest('should remove base after explosion', async test => {
     const { owner, raider } = await createCommonBaseTest(test)
 
     await test.idle(20)

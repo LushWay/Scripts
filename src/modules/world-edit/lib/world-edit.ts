@@ -18,7 +18,7 @@ import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import { BigStructure } from './big-structure'
-import { Cuboid } from './ccuboid'
+import { Cuboid } from './cuboid'
 
 // TODO Add WorldEdit.runMultipleAsyncJobs
 

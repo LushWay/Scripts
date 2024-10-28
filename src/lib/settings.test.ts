@@ -1,4 +1,3 @@
-import { describe, expect, it, vi } from 'vitest'
 import { Settings } from './settings'
 
 describe('setting change events', () => {

@@ -32,9 +32,16 @@ export class Cuboid {
   zRadius
 
   constructor(pos1: Vector3, pos2: Vector3) {
+    // This is done to ensure that the passed values is copied
+    // For example if passed values is DatabaseValue it will
+    // decrease performance drastically when accessing any of
+    // its axises
     this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z }
     this.pos2 = { x: pos2.x, y: pos2.y, z: pos2.z }
 
+    // We could make it into methods, but QuickJS works
+    // the way that making it into one big function
+    // is more optimal
     this.xMin = Math.min(this.pos1.x, this.pos2.x)
     this.yMin = Math.min(this.pos1.y, this.pos2.y)
     this.zMin = Math.min(this.pos1.z, this.pos2.z)

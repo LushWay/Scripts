@@ -1,6 +1,5 @@
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import 'lib/extensions/enviroment'
-import { describe, expect, it } from 'vitest'
 import { Loot } from './loot-table'
 
 describe('loot table', () => {

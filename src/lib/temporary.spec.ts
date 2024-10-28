@@ -1,11 +1,11 @@
 import { system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib'
-import { suite, test } from 'test/framework'
+import { gamesuite, gametest } from 'test/framework'
 import { Temporary } from './temporary'
 
-suite('temporary', () => {
-  test('should unsubscribe afterEvents', async test => {
+gamesuite('temporary', () => {
+  gametest('should unsubscribe afterEvents', async test => {
     const blockLocation = new Vector(0, 3, 0)
     const worldLocation = test.worldLocation(blockLocation)
 

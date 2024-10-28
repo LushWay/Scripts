@@ -1,5 +1,4 @@
 import { TicksPerSecond } from '@minecraft/server'
-import { describe, expect, it } from 'vitest'
 import { fromMsToTicks, fromTicksToMs, ms } from './ms'
 
 describe('ms', () => {

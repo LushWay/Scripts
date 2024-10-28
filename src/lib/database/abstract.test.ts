@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest'
 import { getProvider, table } from './abstract'
 
 describe('abstract table', () => {

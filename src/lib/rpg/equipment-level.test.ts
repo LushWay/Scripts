@@ -1,7 +1,6 @@
 import { EquipmentSlot, ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { TEST_createPlayer } from 'test/utils'
-import { describe, expect, it } from 'vitest'
 import { EquippmentLevel } from './equipment-level'
 
 describe('equipment-level', () => {

@@ -68,7 +68,7 @@ export class ItemCost extends Cost {
     super.take(player)
   }
 
-  toString(canBuy?: boolean, _?: Player | undefined, amount = true): MaybeRawText {
+  toString(canBuy?: boolean, _?: Player, amount = true): MaybeRawText {
     return itemDescription(
       this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',

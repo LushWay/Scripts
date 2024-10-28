@@ -4,5 +4,10 @@
   "editor.formatOnType": false,
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
-  "files.autoSave": "onFocusChange"
+  "files.autoSave": "onFocusChange",
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "./**/node_modules/@types/node",
+    "./**/node_modules/**",
+    "./scripts/src/test/__mocks__/**"
+  ]
 }

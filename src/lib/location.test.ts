@@ -1,7 +1,6 @@
 import { Player } from '@minecraft/server'
 import { Vector } from 'lib'
 import 'lib/database/scoreboard'
-import { MockInstance, beforeEach, describe, expect, it, vi } from 'vitest'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
 import { Group } from './rpg/place'
 import { Settings } from './settings'
@@ -83,7 +82,7 @@ describe('location', () => {
     // @ts-expect-error
     const player = new Player(false) as Player
     loc.teleport(player)
-    expect((player.teleport as unknown as MockInstance).mock.calls[0]).toEqual([
+    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toEqual([
       {
         x: 0.5,
         y: 0,
@@ -136,7 +135,7 @@ describe('locationWithRotation', () => {
     // @ts-expect-error
     const player = new Player(false) as Player
     loc.teleport(player)
-    expect((player.teleport as unknown as MockInstance).mock.calls[0]).toEqual([
+    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toEqual([
       {
         x: 0.5,
         y: 0,

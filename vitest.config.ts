@@ -5,6 +5,7 @@ import { generateDefine } from './tools/define'
 export default defineConfig({
   define: generateDefine({ dev: true, test: true, world: false, port: '1000', vitest: true }),
   test: {
+    globals: true,
     coverage: {
       provider: 'istanbul',
       reporter: ['html', 'json', 'lcov'],

@@ -1,7 +1,6 @@
 import { Container, ContainerSlot, Entity, ItemStack } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import 'lib/extensions/player'
-import { describe, expect, it } from 'vitest'
 
 describe('minecraft/server mock', () => {
   it('should have container', () => {

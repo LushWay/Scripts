@@ -1,5 +1,5 @@
 import { CommandContext } from 'lib/command/context'
-import { suite, test } from 'test/framework'
+import { gamesuite, gametest } from 'test/framework'
 import './index'
 
 const success = 'success'
@@ -7,15 +7,15 @@ const addsSuccessTag = (ctx: CommandContext) => ctx.player.isValid() && ctx.play
 
 const command = new Command('cmd').setPermissions('everybody').executes(addsSuccessTag)
 
-suite('lib.command', () => {
-  test('inputs', async test => {
+gamesuite('lib.command', () => {
+  gametest('inputs', async test => {
     const player = test.spawnSimulatedPlayer({ x: 0, y: 0, z: 0 })
 
     player.chat('.cmd')
     test.succeedWhen(() => test.assert(player.hasTag(success), 'command was not executed'))
   })
 
-  test('overloads', async test => {
+  gametest('overloads', async test => {
     const player = test.player()
 
     command.overload('overload').executes(addsSuccessTag)
@@ -23,7 +23,7 @@ suite('lib.command', () => {
     test.succeedWhen(() => test.assert(player.hasTag(success), 'command was not executed'))
   })
 
-  test('alias', async test => {
+  gametest('alias', async test => {
     const player = test.player()
 
     command.setAliases('alias1', 'alias2')
@@ -31,7 +31,7 @@ suite('lib.command', () => {
     test.succeedWhen(() => test.assert(player.hasTag(success), 'command was not executed'))
   })
 
-  test('permission', async test => {
+  gametest('permission', async test => {
     const player = test.player()
 
     new Command('cmdw').setPermissions(() => false).executes(addsSuccessTag)

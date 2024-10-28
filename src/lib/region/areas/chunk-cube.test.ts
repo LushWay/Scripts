@@ -1,4 +1,3 @@
-import { expect, it } from 'vitest'
 import { ChunkCubeArea } from './chunk-cube'
 
 it('should show whenether is vector in region or not', () => {

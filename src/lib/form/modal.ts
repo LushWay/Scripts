@@ -12,8 +12,7 @@ interface IModalFormArg {
 
 type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R ? (...args: [...E, Next]) => R : never
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export class ModalForm<Callback extends Function = (ctx: FormCallback) => void> {
+export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => void = (ctx: FormCallback) => void> {
   static arrayDefaultNone = 'Никакой'
 
   triedToShow

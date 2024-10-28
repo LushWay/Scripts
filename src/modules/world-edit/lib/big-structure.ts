@@ -1,7 +1,7 @@
 import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vector } from 'lib'
 import { WE_CONFIG } from '../config'
-import { Cuboid } from './ccuboid'
+import { Cuboid } from './cuboid'
 
 export class BigStructure extends Cuboid {
   private structures: {

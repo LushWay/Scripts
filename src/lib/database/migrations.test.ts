@@ -1,5 +1,4 @@
 import { system } from '@minecraft/server'
-import { describe, expect, it, vi } from 'vitest'
 import { table } from './abstract'
 import { migration } from './migrations'
 

@@ -1,5 +1,4 @@
 import { GameMode, Player } from '@minecraft/server'
-import { describe, expect, it } from 'vitest'
 import { getRole, setRole } from './roles'
 
 describe('roles auto switch gamemode', () => {

@@ -1,5 +1,4 @@
 import { Vector3 } from '@minecraft/server'
-import { describe, expect, it } from 'vitest'
 import { Area } from './area'
 
 describe('area reg', () => {
@@ -20,6 +19,8 @@ describe('area reg', () => {
     Area.loaded = true
     expect(() => {
       TestArea.SaveableArea()
-    }).toThrowErrorMatchingInlineSnapshot(`[Error: Registering area type test failed. Regions are already restored from json. Registering area should occur on the import-time.]`)
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: Registering area type test failed. Regions are already restored from json. Registering area should occur on the import-time.]`,
+    )
   })
 })
