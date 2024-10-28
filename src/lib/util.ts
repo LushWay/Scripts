@@ -1,3 +1,4 @@
+import { RGB } from '@minecraft/server'
 import { TerminalColors } from './assets/terminal-colors'
 import stringifyError from './utils/error'
 import { inspect, stringify } from './utils/inspect'
@@ -190,6 +191,19 @@ type Key = string | symbol | number
  */
 export function isKeyof<O extends Record<Key, unknown>>(key: Key, object: O): key is keyof O {
   return key in object
+}
+
+export function hexToRgb(hex: `#${string}`): RGB {
+  const rgb = hex
+    // Normalize hex
+    .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (_, r, g, b) => `${r}${r}${g}${g}${b}${b}`)
+    .match(/.{2}/g)
+    ?.map(x => parseInt(x, 16) / 256)
+
+  if (!rgb) throw new TypeError(`HEX ${hex} is invalid. Expected #[a-f\\d][a-f\\d][a-f\\d]`)
+  const [red, green, blue] = rgb
+
+  return { red, green, blue }
 }
 
 /** Empty function that does nothing. */

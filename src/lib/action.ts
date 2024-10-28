@@ -71,6 +71,13 @@ export class PlaceAction {
 
 type LockActionChecker = (player: Player) => boolean | { lockText: string }
 
+export interface LockActionOptions {
+  ignore?: LockAction[]
+  accept?: LockAction[]
+  tell?: boolean
+  returnText?: boolean
+}
+
 export class LockAction {
   /** List of all existing lock actions */
   private static instances: LockAction[] = []
@@ -89,15 +96,7 @@ export class LockAction {
    * @param {boolean} [o.tell]
    * @param {boolean} [o.returnText] - Return lock text instead of boolean
    */
-  static locked(
-    player: Player,
-    {
-      ignore,
-      accept,
-      tell = true,
-      returnText,
-    }: { ignore?: LockAction[]; accept?: LockAction[]; tell?: boolean; returnText?: boolean } = {},
-  ) {
+  static locked(player: Player, { ignore, accept, tell = true, returnText }: LockActionOptions = {}) {
     for (const lock of this.instances) {
       if (ignore?.includes(lock)) continue
       if (accept && !accept.includes(lock)) continue

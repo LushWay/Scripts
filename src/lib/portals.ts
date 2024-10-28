@@ -1,107 +1,88 @@
-import { Player } from '@minecraft/server'
-import { LockAction, PlaceAction } from 'lib/action'
+import { CameraFadeOptions, Player } from '@minecraft/server'
+import { LockAction, LockActionOptions, PlaceAction } from 'lib/action'
+import { hexToRgb } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { Core } from './extensions/core'
 
-// TODO Builder style
-
-interface TeleportOptions {
-  lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]
-  place?: string
-  fadeScreen?: boolean
-}
-
 export class Portal {
-  command
-
-  from
-
-  place
-
-  to
-
-  static canTeleport(player: Player, { fadeScreen = true, lockActionOptions, place }: TeleportOptions = {}) {
-    if (LockAction.locked(player, lockActionOptions)) return false
-    if (fadeScreen) {
-      const inS = 0.2
-      const stayS = 2.0
-      const outS = 2.0
-      const red = 10 / 256
-      const green = 20 / 256
-      const blue = 10 / 256
-      // #102010
-
-      player.camera.fade({
-        fadeTime: { fadeInTime: inS, holdTime: stayS, fadeOutTime: outS },
-        fadeColor: { red, green, blue },
-      })
-    }
-
-    return () => {
-      player.onScreenDisplay.setHudTitle(place ?? Core.name, {
-        fadeInDuration: 0,
-        stayDuration: 100,
-        fadeOutDuration: 0,
-        subtitle: '§2Перемещение...',
-      })
-    }
+  static canTeleport(player: Player, lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]) {
+    return LockAction.locked(player, lockActionOptions)
   }
 
-  static teleport(player: Player, to: Vector3, options: TeleportOptions = {}) {
-    if (this.canTeleport(player, options)) player.teleport(to)
+  static showHudTitle(player: Player, place?: string) {
+    player.onScreenDisplay.setHudTitle(place ?? Core.name, {
+      fadeInDuration: 0,
+      stayDuration: 100,
+      fadeOutDuration: 0,
+      subtitle: '§2Перемещение...',
+    })
   }
 
-  /**
-   * Creates new portal.
-   *
-   * @param {string} name
-   * @param {Vector3 | null} from
-   * @param {Vector3 | null} to
-   * @param {Vector3 | ((player: Player) => void)} place
-   * @param {object} [o]
-   * @param {string[]} [o.aliases]
-   * @param {boolean} [o.createCommand]
-   * @param {string} [o.commandDescription]
-   * @param {boolean} [o.allowAnybody]
-   */
-  constructor(
-    name: string,
-    from: Vector3 | null,
-    to: Vector3 | null,
-    place: Vector3 | ((player: Player) => void),
-    {
-      aliases = [],
-      createCommand = true,
-      commandDescription,
-      allowAnybody = false,
-    }: { aliases?: string[]; createCommand?: boolean; commandDescription?: string; allowAnybody?: boolean } = {},
+  private static readonly fadeOptions: CameraFadeOptions = {
+    fadeTime: { fadeInTime: 0.2, holdTime: 2, fadeOutTime: 2 },
+    fadeColor: hexToRgb('#102010'),
+  }
+
+  static fadeScreen(player: Player) {
+    player.camera.fade(this.fadeOptions)
+  }
+
+  static teleport(
+    player: Player,
+    to: Vector3,
+    options: { lockAction?: LockActionOptions; fadeScreen?: boolean; title?: string } = {},
+    updateHud?: VoidFunction,
   ) {
-    // console.debug('Portal init', name, { from: from ? Vector.string(from) : from, to: to ? Vector.string(to) : to })
-    this.from = from
-    this.to = to
-    if (typeof place === 'function') {
-      this.teleport = place
-    } else this.place = place
+    if (!this.canTeleport(player, options.lockAction)) return
 
-    if (createCommand)
-      this.command = new Command(name)
-        .setAliases(...aliases)
-        .setDescription(commandDescription ?? `§bТелепорт на ${name}`)
-        .setGroup('public')
-        .setPermissions(allowAnybody ? 'everybody' : 'member')
-        .executes(ctx => {
-          this.teleport(ctx.player)
-        })
+    if (options.fadeScreen) this.fadeScreen(player)
+    player.teleport(to)
 
-    if (from && to) {
-      for (const pos of Vector.foreach(from, to)) {
-        PlaceAction.onEnter(pos, p => this.teleport(p))
-      }
+    updateHud?.()
+
+    this.showHudTitle(player, options.title)
+  }
+
+  static portals = new Map<string, Portal>()
+
+  /** Creates new portal. */
+  constructor(
+    readonly id: string,
+    private from: Vector3 | null,
+    private to: Vector3 | null,
+    private place: Vector3 | PlayerCallback,
+  ) {
+    const previous = Portal.portals.get(this.id)
+    if (previous) {
+      previous.from = from
+      previous.to = to
+      previous.place = place
+      previous.createPlaceAction()
+      return previous
+    } else {
+      Portal.portals.set(this.id, this)
+      this.createPlaceAction()
     }
+  }
+
+  private unsubscribers: VoidFunction[] = []
+
+  private createPlaceAction() {
+    for (const unsubscribe of this.unsubscribers) unsubscribe()
+    this.unsubscribers = []
+
+    if (this.from && this.to)
+      for (const pos of Vector.foreach(this.from, this.to)) {
+        this.unsubscribers.push(PlaceAction.onEnter(pos, p => this.teleport(p)).unsubscribe)
+      }
+  }
+
+  createCommand() {
+    return new Command(this.id).setGroup('public').executes(ctx => this.teleport(ctx.player))
   }
 
   teleport(player: Player) {
-    if (LockAction.locked(player, { tell: true })) return
-    if (this.place) Portal.teleport(player, this.place)
+    if (typeof this.place === 'function') this.place(player)
+    else Portal.teleport(player, this.place)
   }
 }

@@ -55,9 +55,9 @@ class AnarchyBuilder extends AreaWithInventory {
         return player.fail(t.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)
       }
 
-      const title = Portal.canTeleport(player, { place: '§6> §cAnarchy §6<' })
-      if (!title) return
+      if (!Portal.canTeleport(player)) return
 
+      Portal.fadeScreen(player)
       this.switchInventory(player)
 
       if (!player.database.survival.anarchy) {
@@ -68,14 +68,14 @@ class AnarchyBuilder extends AreaWithInventory {
         player.teleport(player.database.survival.anarchy)
         delete player.database.survival.anarchy
         showSurvivalHud(player)
-        title()
+        Portal.showHudTitle(player, '§6> §cAnarchy §6<')
       }
     })
 
-    const command = this.portal.command
+    const command = this.portal.createCommand().setDescription('§bПеремещает на анархию')
 
     command
-      ?.overload('clearpos')
+      .overload('clearpos')
       .setDescription(
         'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
       )

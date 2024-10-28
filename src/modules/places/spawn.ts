@@ -10,9 +10,9 @@ import { RegionEvents } from 'lib/region/events'
 import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
 import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
+import { createLogger } from 'lib/utils/logger'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
-import { createLogger } from 'lib/utils/logger'
 
 class SpawnBuilder extends AreaWithInventory {
   group = new Group('common', 'Общее')
@@ -43,22 +43,21 @@ class SpawnBuilder extends AreaWithInventory {
     if (this.location.valid) {
       const spawnLocation = this.location
       world.setDefaultSpawnLocation(spawnLocation)
-      this.portal = new Portal(
-        'spawn',
-        null,
-        null,
-        player => {
-          const title = Portal.canTeleport(player, { place: '§9> §bSpawn §9<' })
-          if (!title) return
 
-          this.switchInventory(player)
-          spawnLocation.teleport(player)
+      this.portal = new Portal('spawn', null, null, player => {
+        if (!Portal.canTeleport(player)) return
+        Portal.fadeScreen(player)
 
-          showSurvivalHud(player)
-          title()
-        },
-        { allowAnybody: true },
-      )
+        this.switchInventory(player)
+        spawnLocation.teleport(player)
+
+        showSurvivalHud(player)
+
+        // Need to happen last because showSurvivalHud will reset title show time
+        Portal.showHudTitle(player, '§9> §bSpawn §9<')
+      })
+
+      this.portal.createCommand().setPermissions('everybody').setDescription('§r§bПеремещает на спавн')
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
