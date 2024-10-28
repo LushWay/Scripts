@@ -8,6 +8,7 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
+import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { MessageForm } from './message'
 
 interface BaseForm {
@@ -97,4 +98,16 @@ export const BUTTON = {
   '?': 'textures/ui/custom/help',
   'search': 'textures/ui/custom/search',
   'settings': 'textures/ui/custom/settings',
+}
+
+export function debounceMenu<T extends (player: Player, ...args: any[]) => Promise<any>>(menu: T): T {
+  const sent = new WeakPlayerSet()
+
+  return (async (player: Player, ...args) => {
+    if (sent.has(player)) return
+
+    sent.add(player)
+    await menu(player, ...(args as Parameters<T>))
+    system.runTimeout(() => sent.delete(player), 'debounceMenu reset', 40)
+  }) as T
 }

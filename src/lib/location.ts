@@ -20,7 +20,7 @@ export type InvalidLocation<T extends Vector3> = {
   valid: false
 } & LocationCommon<T>
 
-export type SafeLocation<T extends Vector3> = InvalidLocation<T> | ValidLocation<T>
+export type ConfigurableLocation<T extends Vector3> = InvalidLocation<T> | ValidLocation<T>
 
 class Location<T extends Vector3> {
   /**
@@ -112,7 +112,12 @@ class Location<T extends Vector3> {
   }
 }
 
-class LocationWithRotation extends Location<Vector3 & { xRot: number; yRot: number }> {
+export type Vector3Rotation = Vector3 & {
+  xRot: number
+  yRot: number
+}
+
+class LocationWithRotation extends Location<Vector3Rotation> {
   protected locationFormat = { x: 0, y: 0, z: 0, xRot: 0, yRot: 0 }
 
   protected get teleportOptions(): TeleportOptions {
@@ -120,7 +125,11 @@ class LocationWithRotation extends Location<Vector3 & { xRot: number; yRot: numb
   }
 }
 
-class LocationWithRadius extends Location<Vector3 & { radius: number }> {
+export type Vector3Radius = Vector3 & {
+  radius: number
+}
+
+class LocationWithRadius extends Location<Vector3Radius> {
   protected locationFormat = { x: 0, y: 0, z: 0, radius: 0 }
 }
 

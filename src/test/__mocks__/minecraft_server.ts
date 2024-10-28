@@ -594,3 +594,91 @@ export enum ItemLockMode {
    */
   slot = 'slot',
 }
+
+// @ts-ignore Class inheritance allowed for native defined classes
+export class CommandError extends Error {}
+
+// @ts-ignore Class inheritance allowed for native defined classes
+export class EnchantmentLevelOutOfBoundsError extends Error {}
+
+// @ts-ignore Class inheritance allowed for native defined classes
+export class EnchantmentTypeNotCompatibleError extends Error {}
+
+// @ts-ignore Class inheritance allowed for native defined classes
+export class EnchantmentTypeUnknownIdError extends Error {}
+
+// @ts-ignore Class inheritance allowed for native defined classes
+export class InvalidContainerSlotError extends Error {}
+
+/** Thrown when a Structure is invalid. A structure becomes invalid when it is deleted. */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class InvalidStructureError extends Error {}
+
+/**
+ * @beta
+ * Thrown when trying to register an item custom component with
+ * a name that has already been registered.
+ */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class ItemCustomComponentAlreadyRegisteredError extends Error {}
+
+/**
+ * @beta
+ * Thrown when trying to register an item custom component with
+ * an invalid namespace.
+ */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class ItemCustomComponentNameError extends Error {}
+
+/**
+ * @beta
+ * Thrown after using the /reload command when trying to
+ * register a previously unregistered item custom component.
+ */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class ItemCustomComponentReloadNewComponentError extends Error {}
+
+/**
+ * @beta
+ * Thrown after using the /reload command when trying to
+ * register a previously registered item custom component that
+ * handles a new event.
+ */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class ItemCustomComponentReloadNewEventError extends Error {}
+
+/**
+ * @beta
+ * Thrown after using the /reload command when trying to
+ * register a previously registered item custom component with
+ * a newer API version.
+ */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class ItemCustomComponentReloadVersionError extends Error {}
+
+/** Thrown when the chunk for provided location or bounding area is not loaded. */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class LocationInUnloadedChunkError extends Error {}
+
+/** Thrown when a provided location or bounding area is outside the minimum or maximum dimension height. */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class LocationOutOfWorldBoundariesError extends Error {}
+
+/** @beta */
+// @ts-ignore Class inheritance allowed for native defined classes
+export class UnloadedChunksError extends Error {}
+
+export const HudElementsCount = 13
+export const HudVisibilityCount = 2
+/**
+ * @remarks
+ *   Holds the number of MoonPhases
+ */
+export const MoonPhaseCount = 8
+/** @beta */
+export const TicksPerDay = 24000
+/**
+ * @remarks
+ *   How many times the server ticks per second of real time.
+ */
+export const TicksPerSecond = 20

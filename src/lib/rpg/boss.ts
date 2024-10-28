@@ -2,13 +2,13 @@
 
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
-import { location, SafeLocation } from 'lib/location'
+import { ConfigurableLocation, location } from 'lib/location'
 import { SphereArea } from 'lib/region/areas/sphere'
+import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
@@ -70,7 +70,7 @@ export class Boss {
 
   region?: BossArenaRegion
 
-  location: SafeLocation<Vector3>
+  location: ConfigurableLocation<Vector3>
 
   static {
     world.afterEvents.entityDie.subscribe(event => {

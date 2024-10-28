@@ -1,5 +1,6 @@
-import { Player, RawMessage, ScreenDisplay, TicksPerSecond, system, world } from '@minecraft/server'
+import { Player, RawMessage, ScreenDisplay, system, world } from '@minecraft/server'
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
+import { fromMsToTicks, fromTicksToMs } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 export enum ActionbarPriority {
@@ -116,10 +117,27 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
     if (screenDisplay.priority > priority) return
     else screenDisplay.priority = priority
 
+    // Workaround to fix overriding title by other displays
+    if (prefix !== $title) {
+      const titleDispaly = playerScreenDisplay[$title]
+
+      if (titleDispaly && titleDispaly.expires) {
+        const { expires } = titleDispaly
+        playerScreenDisplay.actions.push(player => {
+          // @ts-expect-error AAAAAAAAAAAAAAA
+          player[ScreenDisplaySymbol].setTitle(`${$title}${titleDispaly.value as string}`, {
+            subtitle: titleDispaly.subtitle,
+            ...defaultOptions,
+            stayDuration: fromMsToTicks(expires - Date.now()),
+          })
+        })
+      }
+    }
+
     if (typeof options !== 'undefined' && type === 'title') {
       const totalTicks = options.fadeInDuration + options.fadeOutDuration + options.stayDuration
       if (totalTicks !== -1) {
-        screenDisplay.expires = Date.now() + totalTicks * TicksPerSecond
+        screenDisplay.expires = Date.now() + fromTicksToMs(totalTicks)
       } else options.stayDuration = 0
     }
 
@@ -131,11 +149,9 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
     }
 
     playerScreenDisplay.actions.push(player => {
-      if (!player.isValid()) return
-
       try {
         const title = `${prefix === $tipPrefix ? `${prefix}${n}` : prefix}${message}`
-        if (typeof options === 'undefined') options = { ...defaultTitleOptions }
+        if (typeof options === 'undefined') options = { ...defaultOptions }
 
         // @ts-expect-error AAAAAAAAAAAAAAA
         player[ScreenDisplaySymbol].setTitle(title, options)
@@ -216,7 +232,7 @@ system.run(() => {
           titles.delete(id)
         }
 
-        if (player) {
+        if (player?.isValid()) {
           // Take first action and execute it
           event.actions.shift()?.(player)
         }
@@ -227,6 +243,6 @@ system.run(() => {
       }
     },
     'title set',
-    1,
+    0,
   )
 })

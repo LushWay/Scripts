@@ -10,7 +10,7 @@ import {
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
-import { location, SafeLocation } from 'lib/location'
+import { ConfigurableLocation, location } from 'lib/location'
 import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
 import { Vector } from 'lib/vector'
@@ -27,7 +27,7 @@ export class Npc {
 
   static npcs: Npc[] = []
 
-  location: SafeLocation<Vector3>
+  location: ConfigurableLocation<Vector3>
 
   private entity: Entity | undefined
 

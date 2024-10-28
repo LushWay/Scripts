@@ -7,6 +7,8 @@ import {
   type SettingsConfigParsed,
   type SettingsDatabase,
 } from 'lib/settings'
+import { MaybeRawText } from 'lib/text'
+import { rawTextToString } from 'lib/utils/lang'
 import { stringSimilarity } from '../search'
 import { util } from '../util'
 import { ActionForm } from './action'
@@ -20,13 +22,13 @@ export declare namespace ArrayForm {
     filters: F,
     form: ActionForm,
     back: VoidFunction,
-  ) => [text: string, callback: NewFormCallback] | false
+  ) => readonly [text: MaybeRawText, callback: NewFormCallback] | false
   type Sort<T, F> = (array: T[], filters: F) => T[]
   type AddCustomButtons<TH> = (this: TH, form: ActionForm, back: VoidFunction) => void
 
   interface Options<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
     filters: C
-    description?: Text
+    description?: MaybeRawText
     button?: Button<T, F>
     sort?: Sort<T, F>
     addCustomButtonBeforeArray?: AddCustomButtons<this>
@@ -52,7 +54,7 @@ export class ArrayForm<
     private array: readonly T[],
   ) {}
 
-  description(text: Text) {
+  description(text?: MaybeRawText) {
     this.config.description = text
     return this
   }
@@ -100,7 +102,7 @@ export class ArrayForm<
     const args = [filtersDatabase, filters, searchQuery] as const
     const selfback = () => this.show(player, fromPage, ...args)
     const paginator = util.paginate(
-      this.getSorted(filters, searchQuery, selfback),
+      this.getSorted(player, filters, searchQuery, selfback),
       this.config.itemsPerPage,
       fromPage,
       this.config.minItemsForFilters,
@@ -199,7 +201,7 @@ export class ArrayForm<
     }
   }
 
-  private getSorted(filters: F, searchQuery = '', back: VoidFunction) {
+  private getSorted(player: Player, filters: F, searchQuery = '', back: VoidFunction) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     if (searchQuery) {
       // Search query overrides sort option
@@ -209,7 +211,8 @@ export class ArrayForm<
         const button = this.config.button(item, filters, empty, back)
 
         if (button) {
-          sorted.push({ button, search: stringSimilarity(searchQuery, button[0]), item })
+          const buttonText = typeof button[0] === 'string' ? button[0] : rawTextToString(button[0], player.lang)
+          sorted.push({ button, search: stringSimilarity(searchQuery, buttonText), item })
         }
       }
 

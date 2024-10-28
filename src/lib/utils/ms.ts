@@ -1,3 +1,4 @@
+import { TicksPerSecond } from '@minecraft/server'
 import { Plurals, ngettext } from './ngettext'
 
 type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'
@@ -89,4 +90,12 @@ export class ms {
       friction: 3,
     },
   }
+}
+
+export function fromTicksToMs(ticks: number) {
+  return ~~((ticks / TicksPerSecond) * 1000)
+}
+
+export function fromMsToTicks(ms: number) {
+  return ~~((ms / 1000) * TicksPerSecond)
 }

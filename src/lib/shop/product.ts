@@ -14,7 +14,7 @@ type ProductOnBuy = (
   successBuyText: MaybeRawText,
 ) => void | false
 
-type ProductBackForm = (message?: MaybeRawText) => void
+type BackFormWithMessage = (message?: MaybeRawText) => void
 
 type OnProductCreate<T> = (product: Product) => T
 
@@ -23,12 +23,12 @@ export class Product<T extends Cost = any> {
     let onCreateCallback: OnProductCreate<any> = s => s
 
     return {
-      creator<P>(onCreate: OnProductCreate<P>, form: ProductBackForm) {
+      creator<P>(onCreate: OnProductCreate<P>, form: BackFormWithMessage) {
         onCreateCallback = onCreate
         return this.form<P>(form)
       },
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-      form: <P = Product<C>>(backForm: ProductBackForm) => ({
+      form: <P = Product<C>>(backForm: BackFormWithMessage) => ({
         player: (player: Player) => ({
           name: (name: ProductName) => ({
             cost: (cost: C) => ({
@@ -49,7 +49,7 @@ export class Product<T extends Cost = any> {
     private player: Player,
     private onProductBuy: ProductOnBuy,
     /** Texture represnting product */
-    private backForm: ProductBackForm,
+    private backForm: BackFormWithMessage,
   ) {}
 
   private sell = false

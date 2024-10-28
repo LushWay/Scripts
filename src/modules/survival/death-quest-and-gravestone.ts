@@ -4,7 +4,7 @@ import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, forceAllowSpawnInRegion } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 
 const gravestoneOwnerKey = 'owner'
@@ -67,7 +67,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   const deadAt = player.database.survival.deadAt
   if (!deadAt) return
 
-  const places = PlaceWithSafeArea.places
+  const places = SafePlace.places
     .map(place => ({
       distance: place.safeArea
         ? Vector.distance(place.safeArea.area.center, deadAt) -
@@ -77,7 +77,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
     }))
     .sort((a, b) => a.distance - b.distance)
 
-  const nearestPlace = places[0]?.place as PlaceWithSafeArea | undefined
+  const nearestPlace = places[0]?.place as SafePlace | undefined
 
   if (nearestPlace?.portalTeleportsTo.valid) {
     player.teleport(nearestPlace.portalTeleportsTo)

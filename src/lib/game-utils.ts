@@ -10,7 +10,7 @@ import {
 } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
-import { SafeLocation } from 'lib/location'
+import { ConfigurableLocation } from 'lib/location'
 import { Vector } from 'lib/vector'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
@@ -18,7 +18,7 @@ import { getRole } from './roles'
 /** Represents location in the specific dimension */
 export interface LocationInDimension {
   /** Location of the place */
-  location: Vector3 | SafeLocation<Vector3>
+  location: Vector3 | ConfigurableLocation<Vector3>
   /** Dimension of the location */
   dimensionId: Dimensions
 }

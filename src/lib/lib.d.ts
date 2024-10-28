@@ -89,6 +89,7 @@ declare module '@minecraft/server' {
       position?: number[]
       stage?: number
     }
+    unlockedPortals?: string[]
   }
 }
 

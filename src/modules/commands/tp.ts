@@ -1,11 +1,12 @@
 /** I18n-ignore */
 
-import { Player, system, world } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { ActionForm, Vector } from 'lib'
+import { debounceMenu } from 'lib/form/utils'
 import { isNotPlaying } from 'lib/game-utils'
 import { getFullname } from 'lib/get-fullname'
 import { ngettext } from 'lib/utils/ngettext'
-import { PlaceWithSafeArea } from 'modules/places/lib/place-with-safearea'
+import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { TechCity } from 'modules/places/tech-city/tech-city'
@@ -71,7 +72,7 @@ function tpToPlayer(player: Player) {
 }
 
 function location(
-  place: Pick<PlaceWithSafeArea, 'portalTeleportsTo' | 'safeArea'>,
+  place: Pick<SafePlace, 'portalTeleportsTo' | 'safeArea'>,
   fallback: string,
   players: { location: Vector3; dimension: Dimensions }[],
 ) {
@@ -87,19 +88,4 @@ function location(
   return { location: fallback, players: playersC }
 }
 
-const SENT = new Set<string>()
-
-export function tpMenuOnce(player: Player) {
-  if (!SENT.has(player.id)) {
-    tpMenu(player).then(() =>
-      system.runTimeout(
-        () => {
-          SENT.delete(player.id)
-        },
-        'tp menu sent reset',
-        40,
-      ),
-    )
-    SENT.add(player.id)
-  }
-}
+export const tpMenuOnce = debounceMenu(tpMenu)

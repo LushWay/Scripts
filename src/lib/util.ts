@@ -196,7 +196,7 @@ export function isKeyof<O extends Record<Key, unknown>>(key: Key, object: O): ke
 export function hexToRgb(hex: `#${string}`): RGB {
   const rgb = hex
     // Normalize hex
-    .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (_, r, g, b) => `${r}${r}${g}${g}${b}${b}`)
+    .replace(/^#?([a-f\d]{6})$/i, (_, r: string) => r)
     .match(/.{2}/g)
     ?.map(x => parseInt(x, 16) / 256)
 

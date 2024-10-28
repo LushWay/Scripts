@@ -9,7 +9,7 @@ import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
-import { SafeLocation, ValidLocation, location } from '../location'
+import { ConfigurableLocation, ValidLocation, location } from '../location'
 import { t } from '../text'
 import CrateLootAnimation from './animation'
 
@@ -24,7 +24,7 @@ export class Crate {
 
   static typeIds: string[] = [MinecraftBlockTypes.EnderChest, MinecraftBlockTypes.Chest]
 
-  private location: SafeLocation<Vector3>
+  private location: ConfigurableLocation<Vector3>
 
   private floatingText: FloatingText
 

@@ -5,9 +5,9 @@ import { Quest } from 'lib/quest'
 import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
-import { PlaceWithSafeArea } from './place-with-safearea'
+import { SafePlace } from './safe-place'
 
-export class City extends PlaceWithSafeArea {
+export class City extends SafePlace {
   quests: Quest[] = []
 
   createQuest() {

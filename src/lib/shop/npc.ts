@@ -1,7 +1,7 @@
 import { Player, system } from '@minecraft/server'
 import { PlaceAction } from 'lib/action'
 import { Cooldown } from 'lib/cooldown'
-import { SafeLocation, location } from 'lib/location'
+import { ConfigurableLocation, location } from 'lib/location'
 import { Npc } from 'lib/rpg/npc'
 import { Place } from 'lib/rpg/place'
 import { Shop } from './shop'
@@ -34,7 +34,7 @@ export class ShopNpc {
 export class ShopBlock {
   shop: Shop
 
-  location: SafeLocation<Vector3>
+  location: ConfigurableLocation<Vector3>
 
   private cooldown = new Cooldown(1000, false)
 

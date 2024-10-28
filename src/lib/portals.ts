@@ -1,4 +1,4 @@
-import { CameraFadeOptions, Player } from '@minecraft/server'
+import { CameraFadeOptions, Player, TicksPerSecond } from '@minecraft/server'
 import { LockAction, LockActionOptions, PlaceAction } from 'lib/action'
 import { hexToRgb } from 'lib/util'
 import { Vector } from 'lib/vector'
@@ -6,16 +6,19 @@ import { Core } from './extensions/core'
 
 export class Portal {
   static canTeleport(player: Player, lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]) {
-    return LockAction.locked(player, lockActionOptions)
+    return !LockAction.locked(player, lockActionOptions)
   }
 
-  static showHudTitle(player: Player, place?: string) {
-    player.onScreenDisplay.setHudTitle(place ?? Core.name, {
-      fadeInDuration: 0,
-      stayDuration: 100,
-      fadeOutDuration: 0,
-      subtitle: '§2Перемещение...',
-    })
+  static showHudTitle(player: Player, place?: string, time = 5) {
+    if (place !== '') {
+      player.onScreenDisplay.setHudTitle(place ?? Core.name, {
+        fadeInDuration: 0,
+        stayDuration: time * TicksPerSecond,
+        fadeOutDuration: 0,
+        subtitle: '§2Перемещение...',
+        priority: 100,
+      })
+    }
   }
 
   private static readonly fadeOptions: CameraFadeOptions = {
@@ -30,17 +33,21 @@ export class Portal {
   static teleport(
     player: Player,
     to: Vector3,
-    options: { lockAction?: LockActionOptions; fadeScreen?: boolean; title?: string } = {},
+    {
+      fadeScreen = true,
+      lockAction,
+      title,
+    }: { lockAction?: LockActionOptions; fadeScreen?: boolean; title?: string } = {},
     updateHud?: VoidFunction,
   ) {
-    if (!this.canTeleport(player, options.lockAction)) return
+    if (!this.canTeleport(player, lockAction)) return
 
-    if (options.fadeScreen) this.fadeScreen(player)
+    if (fadeScreen) this.fadeScreen(player)
     player.teleport(to)
 
     updateHud?.()
 
-    this.showHudTitle(player, options.title)
+    this.showHudTitle(player, title)
   }
 
   static portals = new Map<string, Portal>()
