@@ -1,7 +1,7 @@
 import { BlockRaycastHit, InvalidContainerSlotError, ItemStack, Player } from '@minecraft/server'
 import { isInvalidLocation } from 'lib'
 import stringifyError from 'lib/utils/error'
-import { WorldEditPlayerSettings } from 'modules/world-edit/settings'
+import { worldEditPlayerSettings } from 'modules/world-edit/settings'
 import { WorldEditTool } from './world-edit-tool'
 
 interface BrushLoreFormat {
@@ -12,25 +12,28 @@ interface BrushLoreFormat {
   type: 'brush' | 'smoother'
 }
 
-export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<BrushLoreFormat & AdditionalLore> {
-  getToolSlot(player: Player) {
+export abstract class WorldEditToolBrush<AdditionalLore extends object> extends WorldEditTool<
+  BrushLoreFormat & AdditionalLore
+> {
+  abstract onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit): void
+
+  override getToolSlot(player: Player) {
     const slot = super.getToolSlot(player)
 
     if (typeof slot === 'string') return slot
 
-    if (!this.isOurBrushType(slot))
-      return 'Возьмите ' + this.displayName + 'в руку, или выберите пустой слот, чтобы создать!'
+    if (!this.isOurBrushType(slot)) return 'Возьмите ' + this.name + 'в руку, или выберите пустой слот, чтобы создать!'
 
     return slot
   }
 
-  getMenuButtonNameColor(player: Player) {
+  override getMenuButtonNameColor(player: Player) {
     const slot = player.mainhand()
     if (!this.isOurBrushType(slot)) return '§8'
     return super.getMenuButtonNameColor(player)
   }
 
-  isOurBrushType(lore: this['loreFormat'] | Pick<ItemStack, 'getLore'>) {
+  protected isOurBrushType(lore: this['loreFormat'] | Pick<ItemStack, 'getLore'>) {
     if ('getLore' in lore) {
       try {
         lore = this.parseLore(lore.getLore())
@@ -45,8 +48,8 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
     return true
   }
 
-  onUse = function onUse(this: BaseBrushTool<AdditionalLore>, player: Player, item: ItemStack) {
-    const settings = WorldEditPlayerSettings(player)
+  onUse = function onUse(this: WorldEditToolBrush<AdditionalLore>, player: Player, item: ItemStack) {
+    const settings = worldEditPlayerSettings(player)
     if (settings.enableMobile) return
 
     const lore = this.parseLore(item.getLore())
@@ -70,9 +73,5 @@ export class BaseBrushTool<AdditionalLore extends object> extends WorldEditTool<
         fail('Ошибка ' + stringifyError.message.get(e as Error))
       }
     }
-  }
-
-  onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit) {
-    // See implementation in subclass
   }
 }

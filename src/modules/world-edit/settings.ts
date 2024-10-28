@@ -1,6 +1,6 @@
 import { Settings } from 'lib'
 
-export const WorldEditPlayerSettings = Settings.player('§6World§dEdit\n§7Настройки строителя мира', 'we', {
+export const worldEditPlayerSettings = Settings.player('§6World§dEdit\n§7Настройки строителя мира', 'we', {
   noBrushParticles: {
     name: 'Партиклы кисти',
     description: 'Отключает партиклы у кисти',

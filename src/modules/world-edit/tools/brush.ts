@@ -1,11 +1,18 @@
-import { Entity, LocationInUnloadedChunkError, LocationOutOfWorldBoundariesError, world } from '@minecraft/server'
-import { ModalForm, Vector, is } from 'lib'
+import {
+  Entity,
+  LocationInUnloadedChunkError,
+  LocationOutOfWorldBoundariesError,
+  Player,
+  world,
+} from '@minecraft/server'
+import { ModalForm, Vector, is, isKeyof } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
+import { t } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG } from '../config'
-import { BaseBrushTool } from '../lib/base-brush-tool'
 import { WorldEditTool } from '../lib/world-edit-tool'
+import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
 import {
   BlocksSetRef,
   SHARED_POSTFIX,
@@ -25,12 +32,12 @@ world.overworld
 
   .forEach(e => e.remove())
 
-class BrushTool extends BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }> {
-  onBrushUse: BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }>['onBrushUse'] = (player, lore, hit) => {
+class BrushTool extends WorldEditToolBrush<{ shape: string; blocksSet: BlocksSetRef }> {
+  onBrushUse: WorldEditToolBrush<{ shape: string; blocksSet: BlocksSetRef }>['onBrushUse'] = (player, lore, hit) => {
     const error = placeShape(
       player,
 
-      SHAPES[lore.shape],
+      ensureShape(player, lore.shape),
       hit.block.location,
       lore.size,
 
@@ -42,9 +49,16 @@ class BrushTool extends BaseBrushTool<{ shape: string; blocksSet: BlocksSetRef }
   }
 }
 
-const brush = new BrushTool({
-  name: 'brush',
-  displayName: 'кисть',
+function ensureShape(player: Player, shape: string) {
+  if (!isKeyof(shape, SHAPES)) {
+    player.warn(t`Неизвестная кисть: ${shape}`)
+    return Object.keys(SHAPES)[0]
+  } else return shape
+}
+
+export const weBrushTool = new BrushTool({
+  id: 'brush',
+  name: 'кисть',
   itemStackId: Items.WeBrush,
   loreFormat: {
     version: 2,
@@ -58,11 +72,11 @@ const brush = new BrushTool({
   },
 
   editToolForm(slot, player) {
-    const lore = brush.parseLore(slot.getLore())
+    const lore = this.parseLore(slot.getLore())
     const shapes = Object.keys(SHAPES)
 
     new ModalForm('§3Кисть')
-      .addDropdown('Форма', shapes, { defaultValue: lore.shape })
+      .addDropdown('Форма', shapes, { defaultValue: ensureShape(player, lore.shape) })
       .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
 
       .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
@@ -78,26 +92,24 @@ const brush = new BrushTool({
 
       .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet) => {
         lore.shape = shape
-
         lore.size = radius
-
         lore.blocksSet = [player.id, blocksSet]
 
         if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
         else lore.replaceBlocksSet = ['', '']
         slot.nameTag = `§r§3Кисть §6${shape}§r §f${blocksSet.replace(SHARED_POSTFIX, '')}`.slice(0, 254)
 
-        slot.setLore(brush.stringifyLore(lore))
+        slot.setLore(this.stringifyLore(lore))
         player.success(
-          `${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
-            replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
+          t`${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
+            replaceBlocksSet ? t`, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${radius}`,
         )
       })
   },
 
   interval0(player, slot, settings) {
-    const lore = brush.parseLore(slot.getLore())
+    const lore = this.parseLore(slot.getLore())
     const hit = player.getBlockFromViewDirection({
       maxDistance: lore.maxDistance,
     })
@@ -131,7 +143,7 @@ const brush = new BrushTool({
   },
 })
 
-brush.command
+weBrushTool.command
   .overload('extrasize')
   .setDescription('Устанавливает размер кисти больше чем лимит в форме')
   .setPermissions('techAdmin')
@@ -139,19 +151,19 @@ brush.command
   .executes((ctx, size) => {
     if (isNaN(size)) return ctx.error('Размер не является числом')
 
-    const tool = brush.getToolSlot(ctx.player)
+    const tool = weBrushTool.getToolSlot(ctx.player)
     if (typeof tool === 'string') return ctx.error(tool)
 
-    const lore = brush.parseLore(tool.getLore())
+    const lore = weBrushTool.parseLore(tool.getLore())
 
     lore.size = size
 
-    tool.setLore(brush.stringifyLore(lore))
+    tool.setLore(weBrushTool.stringifyLore(lore))
     ctx.reply('Успешно')
   })
 
 WorldEditTool.intervals.push((player, slot) => {
-  if (slot.typeId !== brush.itemId && BRUSH_LOCATORS.has(player.id)) {
+  if (slot.typeId !== weBrushTool.itemId && BRUSH_LOCATORS.has(player.id)) {
     BRUSH_LOCATORS.get(player.id)?.remove()
     BRUSH_LOCATORS.delete(player.id)
   }

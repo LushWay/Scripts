@@ -102,6 +102,7 @@ export class Region {
     return this.nearestRegions(location, dimensionId)[0]
   }
 
+  // TODO rename dimensionId to dimensionType
   /**
    * Returns the nearest regions based on a block location and dimension ID.
    *

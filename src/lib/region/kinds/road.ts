@@ -1,6 +1,6 @@
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { RegionEvents } from '../events'
-import { registerCreatableRegion, registerSaveableRegion } from '../index'
+import { registerCreateableRegion, registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
 
 export class RoadRegion extends Region {
@@ -26,8 +26,7 @@ export class RoadRegion extends Region {
 }
 
 registerSaveableRegion('road', RoadRegion)
-// TODO Tool for creating road
-registerCreatableRegion('Дороги', RoadRegion)
+registerCreateableRegion('Дороги', RoadRegion)
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest }) => {
   if (newest.some(e => e instanceof RoadRegion)) {

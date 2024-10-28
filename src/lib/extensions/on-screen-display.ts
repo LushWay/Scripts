@@ -119,16 +119,20 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
 
     // Workaround to fix overriding title by other displays
     if (prefix !== $title) {
-      const titleDispaly = playerScreenDisplay[$title]
+      const titleDisplay = playerScreenDisplay[$title]
 
-      if (titleDispaly && titleDispaly.expires) {
-        const { expires } = titleDispaly
+      if (titleDisplay && titleDisplay.expires) {
         playerScreenDisplay.actions.push(player => {
+          if (!titleDisplay.expires) return
+
+          const stayMs = Date.now() - titleDisplay.expires
+          if (stayMs < 0) return
+
           // @ts-expect-error AAAAAAAAAAAAAAA
-          player[ScreenDisplaySymbol].setTitle(`${$title}${titleDispaly.value as string}`, {
-            subtitle: titleDispaly.subtitle,
+          player[ScreenDisplaySymbol].setTitle(`${$title}${titleDisplay.value as string}`, {
+            subtitle: titleDisplay.subtitle,
             ...defaultOptions,
-            stayDuration: fromMsToTicks(expires - Date.now()),
+            stayDuration: fromMsToTicks(stayMs),
           })
         })
       }
@@ -216,33 +220,43 @@ const actionbarLock = new WeakPlayerMap<{ priority: ActionbarPriority; expires: 
 const defaultOptions = { fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 0 }
 const defaultTitleOptions = { ...defaultOptions, stayDuration: -1 }
 
-system.run(() => {
-  system.runInterval(
-    () => {
-      const players = world.getAllPlayers()
-      for (const [id, event] of titles.entries()) {
-        const player = players.find(e => e.id === id)
+run()
 
-        if (event.title?.expires && event.title.expires < Date.now()) {
-          player?.onScreenDisplay.setHudTitle('', {
-            ...defaultTitleOptions,
-            priority: (event.title.priority as number | undefined) ?? 0,
-          })
+function run() {
+  system.run(() => {
+    system.runJob(
+      (function* () {
+        const players = world.getAllPlayers()
+        for (const [id, event] of titles.entries()) {
+          const player = players.find(e => e.id === id)
 
-          titles.delete(id)
-        }
+          if (!player) {
+            titles.delete(id)
+            continue
+          }
 
-        if (player?.isValid()) {
+          if (!player.isValid()) continue
+
+          if (event.title?.expires && event.title.expires < Date.now()) {
+            player.onScreenDisplay.setHudTitle('', {
+              ...defaultTitleOptions,
+              priority: (event.title.priority as number | undefined) ?? 0,
+            })
+
+            titles.delete(id)
+          }
+
           // Take first action and execute it
           event.actions.shift()?.(player)
+          yield
         }
-      }
 
-      for (const [id, { expires }] of actionbarLock) {
-        if (expires < Date.now()) actionbarLock.delete(id)
-      }
-    },
-    'title set',
-    0,
-  )
-})
+        for (const [id, { expires }] of actionbarLock) {
+          if (expires < Date.now()) actionbarLock.delete(id)
+        }
+
+        run()
+      })(),
+    )
+  })
+}

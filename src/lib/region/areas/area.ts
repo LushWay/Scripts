@@ -46,6 +46,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   /** Center of the area */
   abstract get center(): Vector3
 
+  // TODO dimensionType support
   abstract isNear(vector: Vector3, distance: number): boolean
 
   get radius() {

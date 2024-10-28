@@ -6,8 +6,8 @@ import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { WorldEditTool } from 'modules/world-edit/lib/world-edit-tool'
 
 const clipboard = new WorldEditTool({
-  name: 'clipboard',
-  displayName: 'Копировать/Вставить',
+  id: 'clipboard',
+  name: 'Копировать/Вставить',
   itemStackId: Items.WeTool,
   loreFormat: {
     version: 0,

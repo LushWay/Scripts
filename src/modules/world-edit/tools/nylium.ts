@@ -7,8 +7,8 @@ import { WorldEditTool } from '../lib/world-edit-tool'
 import { BlocksSetRef, blocksSetDropdown, getBlocksSetByRef, stringifyBlocksSetRef } from '../utils/blocks-set'
 
 const nylium = new WorldEditTool({
-  name: 'nylium',
-  displayName: 'слуйчайный блок из набора',
+  id: 'nylium',
+  name: 'слуйчайный блок из набора',
   itemStackId: MinecraftBlockTypes.WarpedNylium,
   loreFormat: {
     version: 2,
@@ -18,8 +18,7 @@ const nylium = new WorldEditTool({
 
   editToolForm(slot, player) {
     const lore = nylium.parseLore(slot.getLore())
-    new ModalForm('§3' + this.displayName)
-
+    new ModalForm('§3' + this.name)
       .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
       .show(player, (_, blocksSet) => {
         configureNylium(slot, player, blocksSet, lore)

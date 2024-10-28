@@ -10,9 +10,9 @@ import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { SphereArea } from './areas/sphere'
 
-const addableRegions: { name: string; region: typeof Region }[] = []
-export function registerCreatableRegion(name: string, region: typeof Region) {
-  addableRegions.push({ name, region })
+export const createableRegions: { name: string; region: typeof Region }[] = []
+export function registerCreateableRegion(name: string, region: typeof Region) {
+  createableRegions.push({ name, region })
 }
 
 new Command('region')
@@ -38,7 +38,7 @@ function regionForm(player: Player) {
       () => editRegion(player, currentRegion, () => regionForm(player)),
     )
 
-  for (const r of addableRegions) {
+  for (const r of createableRegions) {
     form.addButton(r.name, reg(r.region))
   }
   form.show(player)

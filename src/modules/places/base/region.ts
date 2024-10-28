@@ -1,4 +1,4 @@
-import { registerCreatableRegion } from 'lib/region/command'
+import { registerCreateableRegion } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 
@@ -10,4 +10,4 @@ export class BaseRegion extends RegionWithStructure {
   }
 }
 registerSaveableRegion('base', BaseRegion)
-registerCreatableRegion('Базы', BaseRegion)
+registerCreateableRegion('Базы', BaseRegion)

@@ -6,8 +6,8 @@ import { WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
 
 const wand = new WorldEditTool({
-  name: 'wand',
-  displayName: 'топор',
+  id: 'wand',
+  name: 'топор',
   itemStackId: Items.WeWand,
   overrides: {
     getMenuButtonName(player) {

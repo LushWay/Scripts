@@ -2,6 +2,7 @@ import { world } from '@minecraft/server'
 import { ModalForm, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { t } from 'lib/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -13,9 +14,9 @@ import {
   getBlocksSetForReplaceTarget,
 } from '../utils/blocks-set'
 
-const shovel = new WorldEditTool({
-  name: 'shovel',
-  displayName: 'лопата',
+export const weShovelTool = new WorldEditTool({
+  id: 'shovel',
+  name: 'лопата',
   overrides: {
     getMenuButtonName(player) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -34,7 +35,7 @@ const shovel = new WorldEditTool({
   itemStackId: Items.WeShovel,
 
   editToolForm(slot, player) {
-    const lore = shovel.parseLore(slot.getLore())
+    const lore = this.parseLore(slot.getLore())
     new ModalForm('§3Лопата')
       .addSlider('Радиус', 0, 10, 1, lore.radius)
       .addSlider('Высота', 1, 10, 1, lore.height)
@@ -52,11 +53,8 @@ const shovel = new WorldEditTool({
       )
       .show(player, (_, radius, height, zone, blocksSet, replaceBlocksSet) => {
         slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
-
         lore.radius = radius
-
         lore.height = height
-
         lore.zone = zone
 
         lore.blocksSet = [player.id, blocksSet]
@@ -64,16 +62,16 @@ const shovel = new WorldEditTool({
         if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
         else lore.replaceBlocksSet = ['', '']
 
-        slot.setLore(shovel.stringifyLore(lore))
+        slot.setLore(this.stringifyLore(lore))
 
         player.success(
-          `${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
+          t`${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
         )
       })
   },
 
   interval10(player, slot) {
-    const lore = shovel.parseLore(slot.getLore(), true)
+    const lore = this.parseLore(slot.getLore(), true)
     if (!lore) return
 
     const blocks = getBlocksSetByRef(lore.blocksSet)

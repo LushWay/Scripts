@@ -1,6 +1,6 @@
 import { Player, PlayerBreakBlockBeforeEvent } from '@minecraft/server'
 import { isNotPlaying } from 'lib/game-utils'
-import { actionGuard, ActionGuardOrder, registerCreatableRegion } from 'lib/region'
+import { actionGuard, ActionGuardOrder, registerCreateableRegion } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
@@ -72,8 +72,8 @@ export class MineareaRegion extends RegionWithStructure {
   }
 }
 
-registerCreatableRegion('Зоны добычи', MineareaRegion)
 registerSaveableRegion('minearea', MineareaRegion)
+registerCreateableRegion('Зоны добычи', MineareaRegion)
 
 actionGuard((player, region, ctx) => {
   if (isNotPlaying(player)) return

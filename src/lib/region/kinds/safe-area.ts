@@ -1,6 +1,6 @@
 import { GameMode } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { registerCreatableRegion } from 'lib/region/command'
+import { registerCreateableRegion } from 'lib/region/command'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
 import { BossArenaRegion } from './boss-arena'
@@ -47,7 +47,7 @@ export class SafeAreaRegion extends Region {
     return this.safeAreaName
   }
 }
-registerCreatableRegion('Мирные зоны', SafeAreaRegion)
+registerCreateableRegion('Мирные зоны', SafeAreaRegion)
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
   const been = previous.length && (previous[0] instanceof SafeAreaRegion || previous[0] instanceof BossArenaRegion)
   const now = newest.length && (newest[0] instanceof SafeAreaRegion || newest[0] instanceof BossArenaRegion)

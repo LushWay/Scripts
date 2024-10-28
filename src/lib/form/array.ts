@@ -26,7 +26,7 @@ export declare namespace ArrayForm {
   type Sort<T, F> = (array: T[], filters: F) => T[]
   type AddCustomButtons<TH> = (this: TH, form: ActionForm, back: VoidFunction) => void
 
-  interface Options<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
+  interface Config<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
     filters: C
     description?: MaybeRawText
     button?: Button<T, F>
@@ -43,7 +43,7 @@ export class ArrayForm<
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
-  private config: ArrayForm.Options<T, C, F> = {
+  private config: ArrayForm.Config<T, C, F> = {
     filters: {
       [SETTINGS_GROUP_NAME]: 'Пустые фильтры',
     } as C,
@@ -64,7 +64,7 @@ export class ArrayForm<
     return this
   }
 
-  filters<V extends SettingsConfig>(filters: V) {
+  filters<const V extends SettingsConfig>(filters: V) {
     this.config.filters = {
       [SETTINGS_GROUP_NAME]: 'Фильтры',
       ...(filters as unknown as C),
@@ -77,7 +77,7 @@ export class ArrayForm<
     return this
   }
 
-  addCustomButtonBeforeArray(callback: ArrayForm.AddCustomButtons<ArrayForm.Options<T, C, F>>) {
+  addCustomButtonBeforeArray(callback: ArrayForm.AddCustomButtons<ArrayForm.Config<T, C, F>>) {
     this.config.addCustomButtonBeforeArray = callback
     return this
   }
@@ -87,8 +87,8 @@ export class ArrayForm<
     return this
   }
 
-  options(options: Omit<ArrayForm.Options<T, C, F>, keyof this>) {
-    Object.assign(this.config, options)
+  configure(config: Omit<ArrayForm.Config<T, C, F>, keyof this>) {
+    Object.assign(this.config, config)
     return this
   }
 
@@ -114,9 +114,14 @@ export class ArrayForm<
     // this is needed because when filters are applied and button count
     // is less then min items for filtes there is no way to
     // disable filters
-    if (paginator.array.length !== this.array.length || paginator.maxPages !== 1) {
+    const isFiltered = paginator.array.length !== this.array.length
+    const moreThenOnePage = paginator.maxPages !== 1
+
+    if (isFiltered || moreThenOnePage) {
       this.addFilterButton(form, filters, player, filtersDatabase, selfback)
       this.addSearchButton(form, searchQuery, player, fromPage, filtersDatabase, filters)
+    } else if (this.config.minItemsForFilters === 1) {
+      this.addFilterButton(form, filters, player, filtersDatabase, selfback)
     }
 
     this.config.addCustomButtonBeforeArray?.(form, selfback)

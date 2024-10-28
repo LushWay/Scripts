@@ -29,3 +29,8 @@ import './tools/shovel'
 import './tools/smooth'
 import './tools/tool'
 import './tools/wand'
+
+// Latest
+import './tools/create-region'
+import './tools/multi-brush'
+import './tools/multi-shovel'

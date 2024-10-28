@@ -6,7 +6,7 @@ import { Items } from 'lib/assets/custom-items'
 import { ngettext } from 'lib/utils/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { BlocksSetRef, getAllBlocksSets, SHARED_POSTFIX } from 'modules/world-edit/utils/blocks-set'
-import { BaseBrushTool } from '../lib/base-brush-tool'
+import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
 
 interface SmoothProps {
   smoothLevel: number
@@ -14,16 +14,16 @@ interface SmoothProps {
 
 // TODO Cache invalidation
 
-class SmoothTool extends BaseBrushTool<SmoothProps> {
-  onBrushUse: BaseBrushTool<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
+class SmoothTool extends WorldEditToolBrush<SmoothProps> {
+  onBrushUse: WorldEditToolBrush<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
     // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable
     smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(console.error)
   }
 }
 
 const smoother = new SmoothTool({
-  name: 'smoother',
-  displayName: 'сглаживание',
+  id: 'smoother',
+  name: 'сглаживание',
   itemStackId: Items.WeBrush,
   loreFormat: {
     version: 2,

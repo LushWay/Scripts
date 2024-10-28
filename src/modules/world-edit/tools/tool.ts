@@ -11,9 +11,9 @@ const actions: Record<string, string[]> = {
 }
 
 new WorldEditTool({
-  name: 'tool',
+  id: 'tool',
   itemStackId: Items.WeTool,
-  displayName: 'инструмент',
+  name: 'инструмент',
 
   editToolForm(item, player) {
     const lore = item.getLore()
@@ -38,7 +38,7 @@ new WorldEditTool({
         })
       })
       .addButton('Проверка звуков', () => {
-        SelectFromArray(ListSounds, '§3Звук', (sound, index) => {
+        selectFromArray(ListSounds, '§3Звук', (sound, index) => {
           item.nameTag = `§r§3Звук`
           lore[0] = 'Sound'
           lore[1] = sound
@@ -49,7 +49,7 @@ new WorldEditTool({
         })
       })
       .addButton('Проверка партиклов', () => {
-        SelectFromArray(ListParticles, '§3Партикл', (particle, index) => {
+        selectFromArray(ListParticles, '§3Партикл', (particle, index) => {
           item.nameTag = `§r§3Партикл`
           lore[0] = 'Particle'
           lore[1] = particle
@@ -61,17 +61,9 @@ new WorldEditTool({
       })
       .show(player)
 
-    /**
-     * @param {string[]} array
-     * @param {string} name
-     * @param {(element: string, index: number) => void} callback
-     */
-
-    function SelectFromArray(array: string[], name: string, callback: (element: string, index: number) => void) {
+    function selectFromArray(array: string[], name: string, callback: (element: string, index: number) => void) {
       new ModalForm(name)
-
         .addTextField('ID Текстом', 'Будет выбран номер')
-
         .addTextField('Номер', 'Будет выбран текст')
         .show(player, (ctx, text, num) => {
           const number = parseInt(num)
