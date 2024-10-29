@@ -4,7 +4,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm } from 'lib'
 import { isBuilding } from 'lib/game-utils'
 import { WorldEditTool } from '../lib/world-edit-tool'
-import { BlocksSetRef, blocksSetDropdown, getBlocksSetByRef, stringifyBlocksSetRef } from '../utils/blocks-set'
+import { BlocksSetRef, blocksSetDropdown, getBlocksInSet, stringifyBlocksSetRef } from '../utils/blocks-set'
 
 const nylium = new WorldEditTool({
   id: 'nylium',
@@ -47,7 +47,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
     const slot = player.mainhand()
     const lore = nylium.parseLore(slot.getLore())
 
-    const blocksSet = getBlocksSetByRef(lore.blocksSet)
+    const blocksSet = getBlocksInSet(lore.blocksSet)
 
     if (blocksSet.length) {
       system.runTimeout(

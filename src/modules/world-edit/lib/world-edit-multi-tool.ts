@@ -100,8 +100,8 @@ export abstract class WorldEditMultiTool extends WorldEditTool<{ version: number
   }
 
   protected updateItemSlot(slot: ContainerSlot, storage: StorageItem[]) {
-    slot.nameTag = t`${this.name} (${storage.length})`
-    slot.setLore(storage.map(e => e.name))
+    slot.nameTag = t`§r§l${this.name} (${storage.length})`
+    slot.setLore([' ', ...storage.map(e => e.name)])
   }
 
   private selectToolForm(slot: ContainerSlot, player: Player, storage: StorageItem[], back: VoidFunction) {

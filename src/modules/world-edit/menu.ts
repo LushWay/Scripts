@@ -1,4 +1,4 @@
-import { BlockPermutation, BlockStates, BlockTypes, ItemStack, Player, world } from '@minecraft/server'
+import { BlockStates, BlockTypes, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, inspect, is, noNullable, stringify } from 'lib'
@@ -13,16 +13,16 @@ import { configureNylium } from 'modules/world-edit/tools/nylium'
 import {
   BlocksSet,
   BlocksSets,
-  DEFAULT_BLOCK_SETS,
-  SHARED_POSTFIX,
   blocksSetDropdown,
   getAllBlocksSets,
-  getBlocksSetForReplaceTarget,
+  getBlocksInSet,
   getOtherPlayerBlocksSets,
   getOwnBlocksSetsCount,
   setBlocksSet,
+  toPermutation,
 } from 'modules/world-edit/utils/blocks-set'
 import { WorldEditTool } from './lib/world-edit-tool'
+import { DEFAULT_BLOCK_SETS, SHARED_POSTFIX } from './utils/default-block-sets'
 
 /** Main we menu */
 export function WEmenu(player: Player, body = '') {
@@ -60,7 +60,7 @@ function WEChestFromBlocksSet(player: Player) {
   new ModalForm('Выбери набор блоков...')
     .addDropdown('Набор блоков', ...blocksSetDropdown(['', ''], player))
     .show(player, (ctx, blockset) => {
-      const blocks: ReplaceTarget[] = getBlocksSetForReplaceTarget([player.id, blockset]).filter(noNullable)
+      const blocks = getBlocksInSet([player.id, blockset]).filter(noNullable)
       const pos1 = Vector.floor(player.location)
       const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
       WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
@@ -599,33 +599,6 @@ export function WEeditBlockStatesMenu(
 
     form.show(player)
   })
-}
-
-/** Reference to block that can be replaced */
-export interface ReplaceTarget {
-  typeId: string
-  states: Record<string, string | number | boolean>
-}
-
-/** Converts replace target or block permutation to permutation. Usefull when need to make code cleaner */
-export function toPermutation(target: ReplaceTarget | BlockPermutation) {
-  return target instanceof BlockPermutation ? target : BlockPermutation.resolve(target.typeId, target.states)
-}
-
-/** Converts replace target or block permutation to replace target. Usefull when need to make code cleaner */
-export function toReplaceTarget(permutation: ReplaceTarget | BlockPermutation | undefined) {
-  return permutation && permutation instanceof BlockPermutation
-    ? { typeId: permutation.type.id, states: permutation.getAllStates() }
-    : permutation
-}
-
-/** Stringifies replace targets to like "Wooden Slab, Stone" */
-export function stringifyReplaceTargets(targets: (undefined | ReplaceTarget)[]) {
-  return targets
-
-    .map(e => e?.typeId && typeIdToReadable(e.typeId))
-    .filter(Boolean)
-    .join(', ')
 }
 
 /**

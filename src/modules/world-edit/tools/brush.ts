@@ -15,12 +15,12 @@ import { WorldEditTool } from '../lib/world-edit-tool'
 import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
 import {
   BlocksSetRef,
-  SHARED_POSTFIX,
   blocksSetDropdown,
-  getAllBlocksSets,
-  getBlocksSetByRef,
-  getBlocksSetForReplaceTarget,
+  getBlocksInSet,
+  getReplaceTargets,
+  replaceTargetsDropdown,
 } from '../utils/blocks-set'
+import { SHARED_POSTFIX } from '../utils/default-block-sets'
 import { placeShape } from '../utils/shape'
 import { SHAPES } from '../utils/shapes'
 
@@ -41,8 +41,8 @@ class BrushTool extends WorldEditToolBrush<{ shape: string; blocksSet: BlocksSet
       hit.block.location,
       lore.size,
 
-      getBlocksSetByRef(lore.blocksSet),
-      getBlocksSetForReplaceTarget(lore.replaceBlocksSet),
+      getBlocksInSet(lore.blocksSet),
+      getReplaceTargets(lore.replaceBlocksSet),
     )
 
     if (error) player.fail(error)
@@ -80,15 +80,7 @@ export const weBrushTool = new BrushTool({
       .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
 
       .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
-      .addDropdownFromObject(
-        'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getAllBlocksSets(player.id)).map(e => [e, e])),
-        {
-          defaultValue: lore.replaceBlocksSet[1],
-          none: true,
-          noneText: 'Любой',
-        },
-      )
+      .addDropdownFromObject('Заменяемый набор блоков', ...replaceTargetsDropdown(lore.replaceBlocksSet, player))
 
       .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet) => {
         lore.shape = shape

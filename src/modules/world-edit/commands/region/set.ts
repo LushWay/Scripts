@@ -5,8 +5,13 @@ import { ActionForm, BUTTON, ModalForm } from 'lib'
 import { ChestForm } from 'lib/form/chest'
 import { inaccurateSearch } from 'lib/search'
 import { typeIdToReadable } from 'lib/utils/lang'
-import { ReplaceTarget, WEeditBlockStatesMenu } from 'modules/world-edit/menu'
-import { getAllBlocksSets, getBlocksSetByRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
+import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
+import {
+  getAllBlocksSets,
+  getBlocksInSet,
+  ReplaceTarget,
+  stringifyBlocksSetRef,
+} from 'modules/world-edit/utils/blocks-set'
 import { WorldEdit } from '../../lib/world-edit'
 
 const set = new Command('set')
@@ -138,7 +143,7 @@ function use(
           }
     result = block.permutations
   } else {
-    const set = getBlocksSetByRef(block.ref)
+    const set = getBlocksInSet(block.ref)
     if (!set[0]) return empty
     result = set
     dispaySource = set[0]

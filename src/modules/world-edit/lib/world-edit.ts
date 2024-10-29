@@ -1,22 +1,19 @@
-import {
-  BlockPermutation,
-  LocationInUnloadedChunkError,
-  LocationOutOfWorldBoundariesError,
-  Player,
-  StructureMirrorAxis,
-  StructureRotation,
-  system,
-  world,
-} from '@minecraft/server'
-import { Vector, getRole, prompt } from 'lib'
+import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
+import { Vector, getRole, isInvalidLocation, prompt } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { t } from 'lib/text'
 import { stringify } from 'lib/utils/inspect'
 import { ngettext } from 'lib/utils/ngettext'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { stringifyReplaceTargets, toPermutation, toReplaceTarget } from 'modules/world-edit/menu'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
+import {
+  ReplaceTarget,
+  replaceWithTargets,
+  stringifyBlockWeights,
+  toPermutation,
+  toReplaceTarget,
+} from '../utils/blocks-set'
 import { BigStructure } from './big-structure'
 import { Cuboid } from './cuboid'
 
@@ -328,8 +325,8 @@ export class WorldEdit {
   }
 
   async fillBetween(
-    blocks: (import('../menu').ReplaceTarget | BlockPermutation)[],
-    replaceBlocks: (undefined | import('../menu').ReplaceTarget | BlockPermutation)[] = [undefined],
+    blocks: (ReplaceTarget | BlockPermutation)[],
+    replaceBlocks: (ReplaceTarget | BlockPermutation)[] = [],
   ) {
     try {
       const selection = await this.ensureSelection()
@@ -343,44 +340,32 @@ export class WorldEdit {
       }
 
       const startTime = Date.now()
-      this.backup(
-        `§3Заполнение области размером §f${selection.size} §3блоками §f${stringifyReplaceTargets(
-          blocks.map(toReplaceTarget),
-        )}`,
-      )
+      this.backup(`§3Заполнение области размером §f${selection.size} §3блоками §f${stringifyBlockWeights(blocks)}`)
       let errors = 0
       let all = 0
 
       const replaceTargets = replaceBlocks.map(toReplaceTarget)
-
+      const permutations = blocks.map(toPermutation)
       const player = this.player
+
       system.runJob(
         (function* fillBetweenJob() {
-          nextBlock: for (const position of Vector.foreach(selection.min, selection.max)) {
+          for (const position of Vector.foreach(selection.min, selection.max)) {
             const block = world.overworld.getBlock(position)
+            if (!block) continue
 
-            for (const replaceBlock of replaceTargets) {
-              try {
-                if (replaceBlock && !block?.permutation.matches(replaceBlock.typeId, replaceBlock.states)) continue
-
-                block?.setPermutation(toPermutation(blocks.randomElement()))
-                yield
-                continue nextBlock
-              } catch (e) {
-                if (errors < 3 && e instanceof Error) {
-                  player.fail(`Ошибка при заполнении (§f${errors}§c): §4${e.name} §f${e.message}`)
-                }
-
-                if (
-                  !(e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) &&
-                  errors < 3
-                )
-                  console.error(e)
-
-                errors++
-              } finally {
-                all++
+            try {
+              replaceWithTargets(replaceTargets, block, permutations)
+              yield
+            } catch (error) {
+              if (errors < 3 && error instanceof Error) {
+                player.fail(`Ошибка при заполнении (§f${errors}§c): §4${error.name} §f${error.message}`)
               }
+              if (!isInvalidLocation(error) && errors < 3) console.error(error)
+
+              errors++
+            } finally {
+              all++
             }
           }
         })(),
@@ -393,7 +378,7 @@ export class WorldEdit {
       ])} за ${t.options({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
 
       if (replaceTargets.filter(Boolean).length) {
-        reply += `§3, заполняемые блоки: §f${stringifyReplaceTargets(replaceTargets)}`
+        reply += `§3, заполняемые блоки: §f${stringifyBlockWeights(replaceTargets)}`
       }
 
       if (errors) {

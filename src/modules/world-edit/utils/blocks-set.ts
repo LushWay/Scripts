@@ -1,19 +1,31 @@
-import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
+import { Block, BlockPermutation, Player } from '@minecraft/server'
 
-import { BlockStateMapping, MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { noNullable, typeIdToReadable } from 'lib'
 import { table } from 'lib/database/abstract'
+import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS } from './default-block-sets'
 
-type BlockStateWeight = [...Parameters<typeof BlockPermutation.resolve>, number]
+export type BlockStateWeight = [...Parameters<typeof BlockPermutation.resolve>, number]
 
 /** Blocks set is array that describes multiple blocks */
 export type BlocksSet = BlockStateWeight[]
+
 /** Blocks set is object that has blocks set name as key and blocks as value */
 export type BlocksSets = Record<string, BlocksSet>
 
-/** Reference to the blocks set. You can get set using {@link getBlocksSetByRef} */
+/** Reference to the blocks set. You can get set using {@link getBlocksInSet} */
 export type BlocksSetRef = [owner: string, blocksSetName: string]
 
+/** Reference to block replace validation */
+export interface ReplaceTarget {
+  typeId: string
+  states: Record<string, string | number | boolean>
+  matches(block: Block): boolean
+  select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
+}
+
 const blocksSets = table<BlocksSets>('blockSets')
+
+// GENERAL MANIPULATIONS
 
 export function getOtherPlayerBlocksSets(playerId: string): [string, BlocksSets][] {
   return Object.entries(blocksSets).filter(
@@ -36,7 +48,6 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
   if (typeof db !== 'undefined') {
     if (set) {
       // Append new set onto start
-
       blocksSets[id] = { [setName]: set, ...db }
     } else {
       Reflect.deleteProperty(db, setName)
@@ -44,13 +55,12 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
   }
 }
 
-function getActiveBlockInSetByRef([playerId, blocksSetName]: BlocksSetRef): BlocksSet | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  return getAllBlocksSets(playerId)[blocksSetName]?.filter(e => e[2] > 0)
+function getActiveBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
+  return (getAllBlocksSets(playerId)[blocksSetName] as BlocksSet | undefined)?.filter(e => e[2] > 0)
 }
 
-export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {
-  return (getActiveBlockInSetByRef([playerId, blocksSetName]) ?? [])
+export function getBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
+  return (getActiveBlocksInSet([playerId, blocksSetName]) ?? [])
     .map(([type, states, weight]) => {
       let permutation
 
@@ -76,48 +86,91 @@ export function getBlocksSetByRef([playerId, blocksSetName]: BlocksSetRef) {
     .flat()
 }
 
-export function getBlocksSetForReplaceTarget(ref: BlocksSetRef) {
-  return (getActiveBlockInSetByRef(ref) ?? [undefined]).map(e => {
-    if (Array.isArray(e)) {
-      const [typeId, states] = e
-      return { typeId, states: states ?? {} }
-    } else return e
-  })
+export function getReplaceTargets(ref: BlocksSetRef): ReplaceTarget[] {
+  if (ref[1] in DEFAULT_REPLACE_TARGET_SETS) {
+    return DEFAULT_REPLACE_TARGET_SETS[ref[1]]
+  }
+
+  return getActiveBlocksInSet(ref)?.map(fromBlockStateWeightToReplaceTarget) ?? []
 }
+
+// HELPERS
+
+export function replaceWithTargets(replaceBlocks: ReplaceTarget[], block: Block, permutations: BlockPermutation[]) {
+  if (!replaceBlocks.length) return block.setPermutation(permutations.randomElement())
+
+  for (const replaceBlock of replaceBlocks) {
+    if (!replaceBlock.matches(block)) continue
+
+    block.setPermutation(replaceBlock.select?.(block, permutations) ?? permutations.randomElement())
+  }
+}
+
+// DROPRODWN HELPERS
 
 export function blocksSetDropdown([_, defaultSet]: BlocksSetRef, player: Player): [string[], { defaultValue: string }] {
   return [Object.keys(getAllBlocksSets(player.id)), { defaultValue: defaultSet }]
 }
 
-export function stringifyBlocksSetRef(ref: BlocksSetRef): string {
-  return ref[1] in DEFAULT_BLOCK_SETS
-    ? ref[1]
-    : [Player.name(ref[0]) ?? '', ref[1] || '§7Пустой'].filter(Boolean).join(' ')
+export function replaceTargetsDropdown(
+  [_, defaultSet]: BlocksSetRef,
+  player: Player,
+): [Record<string, string>, { defaultValue: string; none: true; noneText: 'Любой' }] {
+  return [
+    Object.fromEntries(
+      Object.keys(getAllBlocksSets(player.id))
+        .concat(Object.keys(DEFAULT_REPLACE_TARGET_SETS))
+        .map(e => [e, e]),
+    ),
+    { defaultValue: defaultSet, none: true, noneText: 'Любой' },
+  ]
 }
 
-export function withState<Name extends keyof BlockStateMapping>(
-  name: Name,
-  states: BlockStateMapping[Name],
-  weight = 1,
-): BlockStateWeight {
-  return [name, states, weight]
+// STRINGIFIERS
+
+export function stringifyBlocksSetRef([playerId, set]: BlocksSetRef): string {
+  return set in DEFAULT_BLOCK_SETS || set in DEFAULT_REPLACE_TARGET_SETS
+    ? set
+    : [Player.name(playerId) ?? '', set || '§7Пустой'].filter(Boolean).join(' ')
 }
 
-const trees: BlockStateWeight[] = BlockTypes.getAll()
-  .filter(e => e.id.endsWith('_log') || e.id.includes('leaves'))
-  .map(e => [e.id, void 0, 1])
-
-trees.push([MinecraftBlockTypes.MangroveRoots, void 0, 1])
-
-export const DEFAULT_BLOCK_SETS: BlocksSets = {
-  'Земля': [[MinecraftBlockTypes.GrassBlock, void 0, 1]],
-  'Воздух': [[MinecraftBlockTypes.Air, void 0, 1]],
-  'Деревья заполняемые': trees,
+/** Stringifies replace targets, permutations and block weights to something like "Wooden Slab, Stone" */
+export function stringifyBlockWeights(targets: (undefined | ReplaceTarget | BlockPermutation | BlockStateWeight)[]) {
+  return targets
+    .filter(noNullable)
+    .map(e => typeIdToReadable(e instanceof BlockPermutation ? e.type.id : Array.isArray(e) ? e[0] : e.typeId))
+    .join(', ')
 }
 
-export const SHARED_POSTFIX = '§7 (Общий)'
+// CONVERTERS
 
-Object.keys(DEFAULT_BLOCK_SETS).forEach(e => {
-  DEFAULT_BLOCK_SETS[e + SHARED_POSTFIX] = DEFAULT_BLOCK_SETS[e]
-  Reflect.deleteProperty(DEFAULT_BLOCK_SETS, e)
-})
+/** Converts replace target or block permutation to permutation. Usefull when need to make code cleaner */
+export function toPermutation(target: ReplaceTarget | BlockPermutation) {
+  return target instanceof BlockPermutation ? target : BlockPermutation.resolve(target.typeId, target.states)
+}
+
+/** Converts replace target or block permutation to replace target. Usefull when need to make code cleaner */
+export function toReplaceTarget(permutation: ReplaceTarget | BlockPermutation): ReplaceTarget {
+  return permutation instanceof BlockPermutation
+    ? {
+        typeId: permutation.type.id,
+        states: permutation.getAllStates(),
+        matches: permutationMatcher,
+      }
+    : permutation
+}
+
+export function fromBlockStateWeightToReplaceTarget([typeId, states]: BlockStateWeight): ReplaceTarget {
+  return { typeId, states: states ?? {}, matches: permutationMatcher }
+}
+
+function permutationMatcher(this: ReplaceTarget, block: Block) {
+  if (!block.permutation.matches(this.typeId)) return false
+
+  const states = block.permutation.getAllStates()
+  for (const [name, value] of Object.entries(this.states)) {
+    if (states[name] !== value) return false
+  }
+
+  return true
+}

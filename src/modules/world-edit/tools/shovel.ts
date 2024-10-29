@@ -4,14 +4,16 @@ import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { stringifyReplaceTargets, toReplaceTarget } from 'modules/world-edit/menu'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import {
   BlocksSetRef,
   blocksSetDropdown,
-  getAllBlocksSets,
-  getBlocksSetByRef,
-  getBlocksSetForReplaceTarget,
+  getBlocksInSet,
+  getReplaceTargets,
+  replaceTargetsDropdown,
+  replaceWithTargets,
+  stringifyBlockWeights,
+  toReplaceTarget,
 } from '../utils/blocks-set'
 
 export const weShovelTool = new WorldEditTool({
@@ -42,15 +44,7 @@ export const weShovelTool = new WorldEditTool({
       .addSlider('Сдвиг (-1 под ногами, 2 над головой)', -10, 10, 1, lore.zone)
 
       .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
-      .addDropdownFromObject(
-        'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getAllBlocksSets(player.id)).map(e => [e, e])),
-        {
-          defaultValue: lore.replaceBlocksSet[1],
-          none: true,
-          noneText: 'Любой',
-        },
-      )
+      .addDropdownFromObject('Заменяемый набор блоков', ...replaceTargetsDropdown(lore.replaceBlocksSet, player))
       .show(player, (_, radius, height, zone, blocksSet, replaceBlocksSet) => {
         slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
         lore.radius = radius
@@ -74,17 +68,11 @@ export const weShovelTool = new WorldEditTool({
     const lore = this.parseLore(slot.getLore(), true)
     if (!lore) return
 
-    const blocks = getBlocksSetByRef(lore.blocksSet)
-    if (!blocks.length)
+    const permutations = getBlocksInSet(lore.blocksSet)
+    if (!permutations.length)
       return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.UrgentNotificiation)
 
-    const replaceBlocks = getBlocksSetForReplaceTarget(lore.replaceBlocksSet)
-    if (!replaceBlocks.length)
-      return player.onScreenDisplay.setActionBar(
-        '§cЗаменяемый набор блоков лопаты пустой!',
-        ActionbarPriority.UrgentNotificiation,
-      )
-
+    const replaceTargets = getReplaceTargets(lore.replaceBlocksSet)
     const loc = Vector.floor(player.location)
     const offset = lore.zone
     const pos1 = Vector.add(loc, new Vector(-lore.radius, offset - lore.height, -lore.radius))
@@ -93,29 +81,16 @@ export const weShovelTool = new WorldEditTool({
     WorldEdit.forPlayer(player).backup(
       `§eЛопата §7радиус §f${lore.radius} §7высота §f${lore.height} §7сдвиг §f${
         lore.zone
-      }\n§7блоки: §f${stringifyReplaceTargets(blocks.map(toReplaceTarget))}`,
+      }\n§7блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
       pos1,
       pos2,
     )
 
-    for (const loc of Vector.foreach(pos1, pos2)) {
-      const block = world.overworld.getBlock(loc)
-
+    for (const vector of Vector.foreach(pos1, pos2)) {
+      const block = world.overworld.getBlock(vector)
       if (!block) continue
 
-      for (const replaceBlock of replaceBlocks) {
-        if (replaceBlock) {
-          if (!block.permutation.matches(replaceBlock.typeId)) continue
-          const states = block.permutation.getAllStates()
-
-          for (const [name, value] of Object.entries(replaceBlock.states)) {
-            if (states[name] !== value) continue
-          }
-        }
-
-        block.setPermutation(blocks.randomElement())
-        break
-      }
+      replaceWithTargets(replaceTargets, block, permutations)
     }
   },
 

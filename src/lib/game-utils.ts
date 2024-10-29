@@ -8,10 +8,11 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
+import { BlockStateMapping, MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
 import { ConfigurableLocation } from 'lib/location'
 import { Vector } from 'lib/vector'
+import { BlockStateWeight } from 'modules/world-edit/utils/blocks-set'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
 
@@ -169,4 +170,11 @@ export async function getTopmostSolidBlock(location: Vector3) {
       return false
     } else return block.location
   } else return false
+}
+export function withState<Name extends keyof BlockStateMapping>(
+  name: Name,
+  states: BlockStateMapping[Name],
+  weight = 1,
+): BlockStateWeight {
+  return [name, states, weight]
 }

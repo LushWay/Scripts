@@ -14,7 +14,7 @@ export const weRegionTool = new WorldEditTool<{
 }>({
   id: 'create-region',
   itemStackId: Items.WeTool,
-  name: 'Регион',
+  name: 'регион',
 
   loreFormat: {
     version: 2,

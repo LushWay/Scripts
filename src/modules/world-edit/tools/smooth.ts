@@ -5,8 +5,9 @@ import { is, ModalForm, util, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ngettext } from 'lib/utils/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { BlocksSetRef, getAllBlocksSets, SHARED_POSTFIX } from 'modules/world-edit/utils/blocks-set'
+import { BlocksSetRef, getAllBlocksSets, getReplaceTargets, ReplaceTarget } from 'modules/world-edit/utils/blocks-set'
 import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
+import { SHARED_POSTFIX } from '../utils/default-block-sets'
 
 interface SmoothProps {
   smoothLevel: number
@@ -16,8 +17,10 @@ interface SmoothProps {
 
 class SmoothTool extends WorldEditToolBrush<SmoothProps> {
   onBrushUse: WorldEditToolBrush<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
-    // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable
-    smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel).catch(console.error)
+    smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel, getReplaceTargets(lore.replaceBlocksSet)).catch(
+      // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable
+      console.error,
+    )
   }
 }
 
@@ -77,7 +80,7 @@ export async function smoothVoxelData(
   baseBlock: Block,
   radius: number,
   smoothLevel: number,
-  replaceBlocks: (import('modules/world-edit/menu').ReplaceTarget | undefined)[] = [undefined],
+  replaceTargets: ReplaceTarget[],
 ) {
   return new Promise<void>((resolve, reject) => {
     const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
@@ -98,7 +101,7 @@ export async function smoothVoxelData(
 
         const voxelDataCopy = value.value
 
-        type BlockToFill = Pick<BlockCache, 'location' | 'permutation'>
+        type BlockToFill = Pick<BlockCache, 'location' | 'permutation' | 'block'>
         const setBlocks: BlockCacheMatrix<BlockToFill> = {}
         time1()
 
@@ -115,6 +118,9 @@ export async function smoothVoxelData(
                 let sum = 0
                 const permutations = []
                 const cache = voxelDataCopy[x][y][z]
+
+                if (replaceTargets.length && !replaceTargets.some(e => e.matches(cache.block))) continue
+
                 for (let dx = -1; dx <= 1; dx++) {
                   for (let dy = -1; dy <= 1; dy++) {
                     for (let dz = -1; dz <= 1; dz++) {
@@ -167,11 +173,13 @@ export async function smoothVoxelData(
             prefix + `Будет заполнено §6${toFill.length} §f${ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
           )
 
-        for (const e of toFill) {
-          const block = world.overworld.getBlock(e.location)
+        for (const toFillBlock of toFill) {
+          const block = world.overworld.getBlock(toFillBlock.location)
 
-          if (e.permutation) block?.setPermutation(e.permutation)
-          else block?.setType(MinecraftBlockTypes.Air)
+          if (!block) continue
+
+          if (toFillBlock.permutation) block.setPermutation(toFillBlock.permutation)
+          else block.setType(MinecraftBlockTypes.Air)
 
           yield
         }
@@ -190,6 +198,7 @@ export async function smoothVoxelData(
 interface BlockCache {
   permutation: BlockPermutation | undefined
   location: Vector3
+  block: Block
   void: boolean
 }
 
@@ -230,8 +239,10 @@ function* getBlocksAreasData(block: Block, radius: number) {
         const newBlockData = {
           permutation,
           location,
+          block,
           void: isAir || isLiquid || !isSolid,
-        }
+        } satisfies BlockCache
+
         bz.push(newBlockData)
         ;((BLOCK_CACHE[location.x] ??= {})[location.y] ??= {})[location.z] = newBlockData
 
