@@ -14,7 +14,7 @@ const multiShovel = new MultiShovelTool({
 
   interval10(player, slot, settings) {
     const storage = multiShovel.getStorage(slot)
-    for (const item of storage.reverse()) {
+    for (const item of storage) {
       const itemTool = multiShovel.getToolByItem(item)
       if (!itemTool) continue
 

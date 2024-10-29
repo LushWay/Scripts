@@ -36,9 +36,7 @@ export const weRegionTool = new WorldEditTool<{
         Object.fromEntries(
           createableRegions.map(e => [e.region.kind, e.name]).filter(e => !!e[0]) as [string, string][],
         ),
-        {
-          defaultValueIndex: lore.regionKind,
-        },
+        { defaultValueIndex: lore.regionKind },
       )
       .addSlider('Радиус', 2, 30, 1, lore.radius)
       .addSlider('Мин. радиус до ближайшего региона', 2, 40, 1, lore.minDistance)
@@ -49,6 +47,7 @@ export const weRegionTool = new WorldEditTool<{
         lore.minDistance = minDistance
         lore.minDistanceSameKind = minDistanceSameKind
 
+        slot.nameTag = t`Создать регион ${createableRegions.find(e => e.region.kind === lore.regionKind)?.name}`
         slot.setLore(this.stringifyLore(lore))
       })
   },

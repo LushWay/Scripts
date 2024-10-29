@@ -61,7 +61,7 @@ function roleMenu(player: Player) {
           .filter(key => key[0] !== player.id)
       } else return keys
     })
-    .addCustomButtonBeforeArray(function (this, form, back) {
+    .addCustomButtonBeforeArray(function (this, form, _, back) {
       const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
 
       if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', button[1])

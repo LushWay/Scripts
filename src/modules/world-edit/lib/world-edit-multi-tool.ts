@@ -26,6 +26,11 @@ interface StorageItem {
   d?: object
 }
 
+enum SortMode {
+  Up = 1,
+  Down = -1,
+}
+
 export abstract class WorldEditMultiTool extends WorldEditTool<{ version: number }> {
   loreFormat = {
     version: 1,
@@ -34,58 +39,85 @@ export abstract class WorldEditMultiTool extends WorldEditTool<{ version: number
   abstract tools: WorldEditTool<any>[]
 
   editToolForm = (slot: ContainerSlot, player: Player) => {
-    this.editMultiToolsForm(slot, player)
+    this.editMultiToolsForm(slot, player, { sortMode: SortMode.Up })
   }
 
-  protected editMultiToolsForm(slot: ContainerSlot, player: Player) {
+  protected editMultiToolsForm(slot: ContainerSlot, player: Player, options: { sortMode: SortMode }) {
     const storage = this.getStorage(slot)
 
     new ArrayForm('MultiToolForm', storage)
       .filters({
         mode: {
-          name: 'Режим',
+          name: '§l§dРежим',
           value: [
             ['edit', 'Редактировать'],
             ['delete', 'Удалить'],
+            ['sort', 'Изменить порядок'],
           ],
         },
       })
       .configure({ minItemsForFilters: 1 })
-      .addCustomButtonBeforeArray(form => {
-        form.addButton('Добавить', BUTTON['+'], () => {
-          new ArrayForm('Тип инструмента', this.tools)
-            .back(() => this.editMultiToolsForm(slot, player))
-            .button(tool => {
-              return [
-                tool.name,
-                () => {
-                  const item: StorageItem = { name: `T#: ${tool.name}`, tpid: tool.id }
-                  storage.unshift(item)
-                  this.editOneToolForm(slot, player, storage, item, tool)
-                },
-              ]
-            })
-            .show(player)
+      .addCustomButtonBeforeArray((form, filters, back) => {
+        form.addButton('§l§dДобавить', BUTTON['+'], () => {
+          this.selectToolForm(slot, player, storage, back)
         })
+
+        if (filters.mode === 'sort') {
+          form.addButton(t`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
+            options.sortMode = options.sortMode === SortMode.Up ? SortMode.Down : SortMode.Up
+            back()
+          })
+        }
       })
-      .button((item, filters) => {
+      .button((item, filters, _, back) => {
         const tool = this.getToolByItem(item)
         const onClick = () => {
           if (filters.mode === 'delete') {
             prompt(player, t.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
-              this.writeStorage(
-                slot,
-                storage.filter(e => e !== item),
-              )
+              const newStorage = storage.filter(e => e !== item)
+              this.writeStorage(slot, newStorage)
+              this.updateItemSlot(slot, newStorage)
             })
+          } else if (filters.mode === 'edit') {
+            if (tool) this.editOneToolForm(slot, player, storage, item, tool, back)
           } else {
-            if (tool) this.editOneToolForm(slot, player, storage, item, tool)
+            const index = storage.indexOf(item)
+            const move = options.sortMode
+            const to = index - move
+            const max = storage.length - 1
+            if (to < 0 || to > max) return back()
+            ;[storage[to], storage[index]] = [storage[index], storage[to]]
+            this.writeStorage(slot, storage)
+            back()
           }
         }
 
         if (!tool) return [`UNKNOWN\n${item.tpid}`, onClick]
 
         return [item.name, onClick]
+      })
+      .show(player)
+  }
+
+  protected updateItemSlot(slot: ContainerSlot, storage: StorageItem[]) {
+    slot.nameTag = t`${this.name} (${storage.length})`
+    slot.setLore(storage.map(e => e.name))
+  }
+
+  private selectToolForm(slot: ContainerSlot, player: Player, storage: StorageItem[], back: VoidFunction) {
+    new ArrayForm('Тип инструмента', this.tools)
+      .back(back)
+      .button(tool => {
+        return [
+          tool.name,
+          () => {
+            const item: StorageItem = { name: `T#: ${tool.name}`, tpid: tool.id }
+            storage.push(item)
+            this.editOneToolForm(slot, player, storage, item, tool, () =>
+              this.selectToolForm(slot, player, storage, back),
+            )
+          },
+        ]
       })
       .show(player)
   }
@@ -100,14 +132,16 @@ export abstract class WorldEditMultiTool extends WorldEditTool<{ version: number
     storage: StorageItem[],
     item: StorageItem,
     tool: WorldEditTool<any>,
+    back: VoidFunction,
   ) {
     const proxiedTool = this.proxyTool(tool, item)
     if (!proxiedTool.editToolForm) return player.fail('Инструмент неизменяем')
 
-    proxiedTool.editToolForm(this.proxySlot(slot, storage, item), player)
+    const onBack = () => (back(), this.updateItemSlot(slot, storage))
+    proxiedTool.editToolForm(this.proxySlot(slot, storage, item, onBack), player)
   }
 
-  proxySlot(slot: ContainerSlot, storage: StorageItem[], item: StorageItem) {
+  proxySlot(slot: ContainerSlot, storage: StorageItem[], item: StorageItem, back?: VoidFunction) {
     return {
       get nameTag() {
         return item.name
@@ -118,6 +152,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<{ version: number
       setLore: () => {
         // Set lore always happens last, so save all data
         this.writeStorage(slot, storage)
+        back?.()
       },
       getLore() {
         return []
@@ -152,7 +187,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<{ version: number
         const parsed = JSON.parse(property) as StorageFormat
         if (parsed.v !== this.loreFormat.version) return []
 
-        return parsed.i
+        return parsed.i.filter(Boolean)
       } catch {}
     }
 

@@ -24,14 +24,14 @@ export declare namespace ArrayForm {
     back: VoidFunction,
   ) => readonly [text: MaybeRawText, callback: NewFormCallback] | false
   type Sort<T, F> = (array: T[], filters: F) => T[]
-  type AddCustomButtons<TH> = (this: TH, form: ActionForm, back: VoidFunction) => void
+  type AddCustomButtons<TH, C> = (this: TH, form: ActionForm, filters: C, back: VoidFunction) => void
 
   interface Config<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
     filters: C
     description?: MaybeRawText
     button?: Button<T, F>
     sort?: Sort<T, F>
-    addCustomButtonBeforeArray?: AddCustomButtons<this>
+    addCustomButtonBeforeArray?: AddCustomButtons<this, F>
     itemsPerPage?: number
     minItemsForFilters?: number
     back?: VoidFunction
@@ -77,7 +77,7 @@ export class ArrayForm<
     return this
   }
 
-  addCustomButtonBeforeArray(callback: ArrayForm.AddCustomButtons<ArrayForm.Config<T, C, F>>) {
+  addCustomButtonBeforeArray(callback: ArrayForm.AddCustomButtons<ArrayForm.Config<T, C, F>, F>) {
     this.config.addCustomButtonBeforeArray = callback
     return this
   }
@@ -124,7 +124,7 @@ export class ArrayForm<
       this.addFilterButton(form, filters, player, filtersDatabase, selfback)
     }
 
-    this.config.addCustomButtonBeforeArray?.(form, selfback)
+    this.config.addCustomButtonBeforeArray?.(form, filters, selfback)
 
     // Array item buttons & navigation
     if (paginator.canGoBack)
