@@ -11,6 +11,7 @@ import {
   getBlocksInSet,
   ReplaceTarget,
   stringifyBlocksSetRef,
+  toReplaceTarget,
 } from 'modules/world-edit/utils/blocks-set'
 import { WorldEdit } from '../../lib/world-edit'
 
@@ -34,7 +35,7 @@ set.executes(ctx => {
 })
 
 type SelectedBlock =
-  | { permutations: (BlockPermutation | import('modules/world-edit/menu').ReplaceTarget)[] }
+  | { permutations: (BlockPermutation | ReplaceTarget)[] }
   | { ref: import('modules/world-edit/utils/blocks-set').BlocksSetRef }
   | undefined
 
@@ -116,7 +117,7 @@ function use(
   ]
   if (!block) return empty
 
-  let result: (BlockPermutation | import('modules/world-edit/menu').ReplaceTarget)[]
+  let result: (BlockPermutation | ReplaceTarget)[]
   let dispaySource: Pick<BlockPermutation, 'getAllStates' | 'type'>
   let options = {} as ButtonOptions
 
@@ -264,15 +265,20 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 
     if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
       base.addButton('§2Редактировать свойства выбранного блока', async () => {
-        const sel = currentSelection.permutations[0]
-        currentSelection.permutations[0] = {
-          typeId: sel instanceof BlockPermutation ? sel.type.id : sel.typeId,
-          states: await WEeditBlockStatesMenu(
-            player,
-            sel instanceof BlockPermutation ? sel.getAllStates() : sel.states,
-            () => base.show(player),
+        const selection = currentSelection.permutations[0]
+        currentSelection.permutations[0]
+        const states = await WEeditBlockStatesMenu(
+          player,
+          selection instanceof BlockPermutation ? selection.getAllStates() : selection.states,
+          () => base.show(player),
+        )
+
+        currentSelection.permutations[0] = toReplaceTarget(
+          BlockPermutation.resolve(
+            selection instanceof BlockPermutation ? selection.type.id : selection.typeId,
+            states,
           ),
-        }
+        )
 
         resolve(currentSelection)
       })
