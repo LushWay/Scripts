@@ -1,4 +1,4 @@
-import { TicksPerSecond } from '@minecraft/server'
+const TicksPerSecond = 20
 import { Plurals, ngettext } from './ngettext'
 
 type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'
