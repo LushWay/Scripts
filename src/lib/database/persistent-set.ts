@@ -26,13 +26,9 @@ export class PersistentSet<T extends Json> extends LimitedSet<T> {
     try {
       LongDynamicProperty.getJob(this.id, '[]', values => {
         if (typeof values === 'undefined') return // Set was not saved
-
         if (!Array.isArray(values)) return console.warn(`${id} Dynamic property is not array, it is:`, values)
-        system
-          .runJobForEach(values as T[], value => this.add(value))
-          .then(() => {
-            console.log(`${id} Loaded ${this.size} entries`)
-          })
+
+        system.runJobForEach(values as T[], value => this.add(value))
       })
     } catch (error) {
       console.error(`${id} Failed to load:`, error)
