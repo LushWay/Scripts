@@ -1,7 +1,7 @@
 import { LimitedSet } from 'lib/database/persistent-set'
 import { Vector } from 'lib/vector'
 
-const blendStorage = new LimitedSet<string>(1_000)
+const doNotBlendStorage = new LimitedSet<string>(1_000)
 const dontBlend = false
 
 export function skipForBlending(
@@ -21,15 +21,14 @@ export function skipForBlending(
     const vectorId = Vector.string(vector)
 
     if (radius > toBlend) {
-      if (blendStorage.has(vectorId)) return true
+      if (doNotBlendStorage.has(vectorId)) return true
 
       const blendingFactor = 1 + factor * 0.01
       if (Math.randomInt(toBlend, radius) < distance * blendingFactor) {
-        blendStorage.add(vectorId)
         return true
       }
     } else {
-      blendStorage.add(vectorId)
+      doNotBlendStorage.add(vectorId)
       return true
     }
   }

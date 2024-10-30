@@ -12,12 +12,16 @@ class MultiBrushTool extends WorldEditMultiTool {
   typeId = Items.WeBrush
 
   onUse(player: Player, itemStack: ItemStack, storage: ToolsDataStorage | undefined) {
-    this.forEachTool(itemStack, (proxiedItem, tool, toolData) => {
-      if (!tool.onUse) return
+    this.forEachTool(
+      itemStack,
+      (proxiedItem, tool, toolData) => {
+        if (!tool.onUse) return
 
-      const proxiedPlayer = storage?.spread ? this.proxyPlayer(player, storage.spread) : player
-      tool.onUse(proxiedPlayer, proxiedItem, toolData)
-    })
+        const proxiedPlayer = storage?.spread ? this.proxyPlayer(player, storage.spread) : player
+        tool.onUse(proxiedPlayer, proxiedItem, toolData)
+      },
+      storage?.tools,
+    )
   }
 
   private proxyPlayer(player: Player, spread: number): Player {

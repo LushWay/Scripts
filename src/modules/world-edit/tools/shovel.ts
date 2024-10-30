@@ -1,4 +1,4 @@
-import { ContainerSlot, Player, world } from '@minecraft/server'
+import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
 import { ModalForm, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
@@ -107,39 +107,37 @@ class ShovelTool extends WorldEditTool<Storage> {
         }
       }
     })
-    this.onInterval(10, (player, storage) => {
-      if (this.isLookingUp(player)) return
+  }
 
-      const permutations = getBlocksInSet(storage.blocksSet)
-      if (!permutations.length)
-        return player.onScreenDisplay.setActionBar(
-          '§cНабор блоков лопаты пустой!',
-          ActionbarPriority.UrgentNotificiation,
-        )
+  onUse(player: Player, _: ItemStack, storage: Storage) {
+    if (this.isLookingUp(player)) return
 
-      const { offset, radius, height } = storage
-      const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
-      const center = Vector.floor(player.location)
-      const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
-      const to = Vector.add(center, new Vector(radius, offset, radius))
+    const permutations = getBlocksInSet(storage.blocksSet)
+    if (!permutations.length)
+      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.UrgentNotificiation)
 
-      WorldEdit.forPlayer(player).backup(
-        `§eЛопата §7радиус §f${radius} §7высота §f${height} §7сдвиг §f${
-          offset
-        }\n§7блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
-        from,
-        to,
-      )
+    const { offset, radius, height } = storage
+    const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
+    const center = Vector.floor(player.location)
+    const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
+    const to = Vector.add(center, new Vector(radius, offset, radius))
 
-      for (const vector of Vector.foreach(from, to)) {
-        if (skipForBlending(storage, { vector, center })) continue
+    WorldEdit.forPlayer(player).backup(
+      `§eЛопата §7радиус §f${radius} §7высота §f${height} §7сдвиг §f${
+        offset
+      }\n§7блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
+      from,
+      to,
+    )
 
-        const block = world.overworld.getBlock(vector)
-        if (!block) continue
+    for (const vector of Vector.foreach(from, to)) {
+      if (skipForBlending(storage, { vector, center })) continue
 
-        replaceWithTargets(replaceTargets, getReplaceMode(storage.replaceMode), block, permutations)
-      }
-    })
+      const block = world.overworld.getBlock(vector)
+      if (!block) continue
+
+      replaceWithTargets(replaceTargets, getReplaceMode(storage.replaceMode), block, permutations)
+    }
   }
 
   private isLookingUp(player: Player) {
