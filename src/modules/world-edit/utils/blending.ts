@@ -27,7 +27,7 @@ export function skipForBlending(
     if (radius > toBlend) {
       if (doNotBlendStorage.has(vectorId)) return true
 
-      const blendingFactor = 1 + factor * 0.01
+      const blendingFactor = 1 + (100 - factor) * 0.01
       if (Math.randomInt(toBlend, radius) < distance * blendingFactor) return true
     }
   }
