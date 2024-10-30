@@ -13,16 +13,17 @@ export function skipForBlending(
   const distance = ~~Vector.distance(vector, center)
 
   if (blending === 0) {
-    // Circle
+    // Outside of circle, skip
     if (distance > radius) return true
   } else {
     // Blending
-    if (blending < radius) {
+    const toBlend = radius - blending
+    if (radius < toBlend) {
       const vectorId = Vector.string(vector)
       if (blendStorage.has(vectorId)) return true
 
       const blendingFactor = 1 + factor * 0.01
-      if (Math.randomInt(radius - blending, radius) < distance * blendingFactor) {
+      if (Math.randomInt(toBlend, radius) < distance * blendingFactor) {
         blendStorage.add(vectorId)
         return true
       }
