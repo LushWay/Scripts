@@ -18,7 +18,7 @@ export function skipForBlending(
   } else {
     // Blending
     const toBlend = radius - blending
-    if (radius < toBlend) {
+    if (radius > toBlend) {
       const vectorId = Vector.string(vector)
       if (blendStorage.has(vectorId)) return true
 
