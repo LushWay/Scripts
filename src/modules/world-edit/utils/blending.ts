@@ -9,7 +9,7 @@ export function skipForBlending(
 ) {
   const vectorId = Vector.string(vector)
   const dontBlend = () => {
-    doNotBlendStorage.add(vectorId)
+    // doNotBlendStorage.add(vectorId)
     return false
   }
 
