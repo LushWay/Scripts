@@ -106,7 +106,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
   }
 
   private selectToolForm(slot: ContainerSlot, player: Player, toolsData: ToolData[], back: VoidFunction) {
-    const select = (tool: WorldEditTool) => () => {
+    const select = (tool: WorldEditTool) => {
       const toolData: ToolData = { name: `T#: ${tool.name}`, tpid: tool.id }
       toolsData.push(toolData)
       this.editOneToolForm(slot, player, toolsData, toolData, tool, back)
@@ -116,7 +116,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
 
     new ArrayForm('Тип инструмента', this.tools)
       .back(back)
-      .button(tool => [tool.name, select.bind(undefined, tool)])
+      .button(tool => [tool.name, select.bind(undefined, tool)] as const)
       .show(player)
   }
 
