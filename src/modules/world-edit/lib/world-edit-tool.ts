@@ -4,9 +4,9 @@ import { textTable } from 'lib/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { worldEditPlayerSettings } from '../settings'
 
-export type WorldEditToolInterval<Tool> = (
-  this: Tool,
+export type WorldEditToolInterval<T> = (
   player: Player,
+  storage: T,
   slot: ContainerSlot,
   settings: ReturnType<typeof worldEditPlayerSettings>,
 ) => void
@@ -34,21 +34,28 @@ type StorageType = Partial<Record<StorageKey, any>> & {
 export abstract class WorldEditTool<Storage extends StorageType = any> {
   static loreBlockRefKeys: string[] = ['blocksSet', 'replaceBlocksSet'] satisfies StorageKey[]
   static tools: WorldEditTool[] = []
-  static intervals: OmitThisParameter<WorldEditToolInterval<any>>[] = []
 
   abstract id: string
   abstract name: string
   abstract typeId: string
   abstract storageSchema: Storage
 
-  command?: Command
+  private command?: Command
 
   editToolForm?(this: WorldEditTool<Storage>, slot: ContainerSlot, player: Player, initial?: boolean): void
-  onUse?(player: Player, item: ItemStack): void
+  onUse?(player: Player, item: ItemStack, storage: Storage): void
 
-  interval0?: WorldEditToolInterval<this>
-  interval10?: WorldEditToolInterval<this>
-  interval20?: WorldEditToolInterval<this>
+  onGlobalInterval(ticks: 'global', interval: WorldEditToolInterval<Storage | undefined>): void {
+    this[`interval${ticks}`] = interval
+  }
+  onInterval(ticks: 0 | 10 | 20, interval: WorldEditToolInterval<Storage>): void {
+    this[`interval${ticks}`] = interval
+  }
+
+  interval0?: WorldEditToolInterval<Storage>
+  interval10?: WorldEditToolInterval<Storage>
+  interval20?: WorldEditToolInterval<Storage>
+  intervalglobal?: WorldEditToolInterval<Storage | undefined>
 
   constructor() {
     WorldEditTool.tools.push(this)
@@ -73,7 +80,13 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   }
 
   isOurItemType(slot: ContainerSlot | ItemStack) {
-    return slot.typeId === this.typeId && !!this.getStorage(slot, true)
+    return (
+      slot.typeId === this.typeId &&
+      // Has our storage
+      (!!this.getStorage(slot, true) ||
+        // Or doesnt have storage at all
+        slot.getDynamicPropertyIds().length === 0)
+    )
   }
 
   getToolSlot(player: Player) {
@@ -99,10 +112,6 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
     const empty = !slot.typeId
     const color = our ? '§a' : empty ? '' : '§8'
-
-    if (our) {
-      console.log({ id: this.id, abc: !!this.getStorage(slot, true) })
-    }
 
     return `${color}${our ? 'Редактировать' : 'Создать'} ${this.name}`
   }
@@ -131,7 +140,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   getStorage(slot: ContainerSlot | ItemStack, returnUndefined = false): Storage | undefined {
     const property = slot.getDynamicProperty(this.storageProperty)
     const propertyParsed = typeof property === 'string' ? this.parse(property, true) : undefined
-    return propertyParsed ?? this.parseLore(slot.getLore(), returnUndefined as true)
+    return propertyParsed ?? this.parseLore(slot, returnUndefined as true)
   }
 
   saveStorage(slot: ContainerSlot | ItemStack, storage: Storage, writeLore = true) {
@@ -152,11 +161,12 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   }
 
   /** @deprecated */
-  private parseLore(lore: string[], returnUndefined?: false): Storage
-  /** @deprecated */
-  private parseLore(lore: string[], returnUndefined: true): Storage | undefined
-  /** @deprecated */
-  private parseLore(lore: string[], returnUndefined = false): Storage | undefined {
+  private parseLore(slot: ContainerSlot | ItemStack, returnUndefined = false): Storage | undefined {
+    let lore: string[] = []
+    try {
+      lore = slot.getLore()
+    } catch {}
+
     return this.parse(
       lore
         .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
@@ -223,7 +233,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
       WorldEditTool.tools
         .filter(tool => tool.onUse && tool.isOurItemType(item))
-        .forEach(tool => util.catch(() => tool.onUse?.(player, item)))
+        .forEach(tool => util.catch(() => tool.onUse?.(player, item, tool.getStorage(item, true))))
     })
   }
 
@@ -235,17 +245,21 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
     for (const player of world.getAllPlayers()) {
       if (!player.isValid()) continue
 
-      const item = player.mainhand()
-      const tools = WorldEditTool.tools.filter(e => e.typeId === item.typeId)
+      const slot = player.mainhand()
+      const tools = WorldEditTool.tools.filter(e => e.typeId === slot.typeId)
       const settings = worldEditPlayerSettings(player)
 
-      WorldEditTool.intervals.forEach(e => e(player, item, settings))
+      WorldEditTool.tools.forEach(tool =>
+        util.catch(() => tool.intervalglobal?.(player, tool.getStorage(slot, true), slot, settings)),
+      )
       for (const tool of tools) {
-        const fn: (undefined | OmitThisParameter<WorldEditToolInterval<any>>)[] = [tool.interval0?.bind(tool)]
+        const storage = tool.getStorage(slot, true) as unknown
+        if (!storage) continue
 
+        const fn: (undefined | OmitThisParameter<WorldEditToolInterval<any>>)[] = [tool.interval0?.bind(tool)]
         if (this.ticks % 10 === 0) fn.push(tool.interval10?.bind(tool))
         if (this.ticks % 20 === 0) fn.push(tool.interval20?.bind(tool))
-        fn.forEach(e => e?.(player, item, settings))
+        fn.forEach(e => e && util.catch(() => e(player, storage, slot, settings)))
       }
       yield
     }

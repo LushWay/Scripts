@@ -1,10 +1,10 @@
-import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
+import { ContainerSlot, Player, world } from '@minecraft/server'
 import { ModalForm, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { WorldEditTool, WorldEditToolInterval } from '../lib/world-edit-tool'
+import { WorldEditTool } from '../lib/world-edit-tool'
 import { skipForBlending } from '../utils/blending'
 import {
   BlocksSetRef,
@@ -85,56 +85,65 @@ class ShovelTool extends WorldEditTool<Storage> {
         else storage.replaceBlocksSet = ['', '']
 
         this.saveStorage(slot, storage)
-
         player.success(
           t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
         )
       })
   }
 
-  interval10: WorldEditToolInterval<this> = (player, slot) => {
-    const lookingUp = Math.round(player.getRotation().x) === -90
-    if (lookingUp) return
+  constructor() {
+    super()
+    this.onGlobalInterval('global', player => {
+      const { container } = player
+      if (!container) return
+      for (const [, item] of container.entries()) {
+        if (item?.typeId === this.typeId && this.isLookingUp(player)) {
+          const lookingUp = this.isLookingUp(player)
+          if (lookingUp)
+            return player.onScreenDisplay.setActionBar(
+              'Лопата выключена,\nможно настраивать',
+              ActionbarPriority.UrgentNotificiation,
+            )
+        }
+      }
+    })
+    this.onInterval(10, (player, storage) => {
+      if (this.isLookingUp(player)) return
 
-    const storage = this.getStorage(slot, true)
-    if (!storage) return
+      const permutations = getBlocksInSet(storage.blocksSet)
+      if (!permutations.length)
+        return player.onScreenDisplay.setActionBar(
+          '§cНабор блоков лопаты пустой!',
+          ActionbarPriority.UrgentNotificiation,
+        )
 
-    const permutations = getBlocksInSet(storage.blocksSet)
-    if (!permutations.length)
-      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.UrgentNotificiation)
+      const { offset, radius, height } = storage
+      const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
+      const center = Vector.floor(player.location)
+      const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
+      const to = Vector.add(center, new Vector(radius, offset, radius))
 
-    const { offset, radius, height } = storage
-    const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
-    const center = Vector.floor(player.location)
-    const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
-    const to = Vector.add(center, new Vector(radius, offset, radius))
+      WorldEdit.forPlayer(player).backup(
+        `§eЛопата §7радиус §f${radius} §7высота §f${height} §7сдвиг §f${
+          offset
+        }\n§7блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
+        from,
+        to,
+      )
 
-    WorldEdit.forPlayer(player).backup(
-      `§eЛопата §7радиус §f${radius} §7высота §f${height} §7сдвиг §f${
-        offset
-      }\n§7блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
-      from,
-      to,
-    )
+      for (const vector of Vector.foreach(from, to)) {
+        if (skipForBlending(storage, { vector, center })) continue
 
-    for (const vector of Vector.foreach(from, to)) {
-      if (skipForBlending(storage, { vector, center })) continue
+        const block = world.overworld.getBlock(vector)
+        if (!block) continue
 
-      const block = world.overworld.getBlock(vector)
-      if (!block) continue
-
-      replaceWithTargets(replaceTargets, getReplaceMode(storage.replaceMode), block, permutations)
-    }
+        replaceWithTargets(replaceTargets, getReplaceMode(storage.replaceMode), block, permutations)
+      }
+    })
   }
 
-  onUse(player: Player, item: ItemStack) {
-    const lore = item.getLore()
-    if (lore[0] === '§aEnabled') {
-      lore[0] = '§cDisabled'
-    } else lore[0] = '§aEnabled'
-
-    player.onScreenDisplay.setActionBar(lore[0], ActionbarPriority.UrgentNotificiation)
-    item.setLore(lore)
+  private isLookingUp(player: Player) {
+    return Math.round(player.getRotation().x) === -90
   }
 }
 

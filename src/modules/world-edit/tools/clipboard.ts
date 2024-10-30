@@ -3,7 +3,7 @@ import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { WorldEditTool, WorldEditToolInterval } from 'modules/world-edit/lib/world-edit-tool'
+import { WorldEditTool } from 'modules/world-edit/lib/world-edit-tool'
 
 interface Storage {
   version: number
@@ -34,20 +34,23 @@ class ClipboardTool extends WorldEditTool<Storage> {
     else we.paste()
   }
 
-  interval20: WorldEditToolInterval<this> = (player, slot) => {
-    if (this.getStorage(slot, true)?.mode !== 'paste') return
-    const we = WorldEdit.forPlayer(player)
+  constructor() {
+    super()
+    this.onInterval(20, (player, storage) => {
+      if (storage.mode !== 'paste') return
+      const we = WorldEdit.forPlayer(player)
 
-    if (we.currentCopy) {
-      const { pastePos1, pastePos2 } = we.pastePositions(StructureRotation.None, we.currentCopy)
-      system.delay(() => spawnParticlesInArea(pastePos1, pastePos2))
-      player.onScreenDisplay.setActionBar(
-        `Используйте предмет чтобы\n${
-          player.isSneaking ? '<Отменить последнее действие>' : '<Вставить скопированную область>'
-        }`,
-        ActionbarPriority.UrgentNotificiation,
-      )
-    } else player.onScreenDisplay.setActionBar('§cВы ничего не копировали!', ActionbarPriority.UrgentNotificiation)
+      if (we.currentCopy) {
+        const { pastePos1, pastePos2 } = we.pastePositions(StructureRotation.None, we.currentCopy)
+        system.delay(() => spawnParticlesInArea(pastePos1, pastePos2))
+        player.onScreenDisplay.setActionBar(
+          `Используйте предмет чтобы\n${
+            player.isSneaking ? '<Отменить последнее действие>' : '<Вставить скопированную область>'
+          }`,
+          ActionbarPriority.UrgentNotificiation,
+        )
+      } else player.onScreenDisplay.setActionBar('§cВы ничего не копировали!', ActionbarPriority.UrgentNotificiation)
+    })
   }
 }
 

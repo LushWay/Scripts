@@ -50,9 +50,7 @@ class SmoothTool extends WorldEditToolBrush<Storage> {
 
       .show(player, (ctx, size, smoothLevel, replaceBlocksSet) => {
         storage.size = size
-
         storage.smoothLevel = smoothLevel
-
         if (replaceBlocksSet) storage.replaceBlocksSet = [player.id, replaceBlocksSet]
         slot.nameTag = `§r§3Сглаживание §6${size}§r §f${shortenBlocksSetName(replaceBlocksSet)}`
 

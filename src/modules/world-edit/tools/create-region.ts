@@ -4,7 +4,7 @@ import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
-import { WorldEditTool, WorldEditToolInterval } from '../lib/world-edit-tool'
+import { WorldEditTool } from '../lib/world-edit-tool'
 
 interface Storage {
   version: number
@@ -55,28 +55,31 @@ class RegionTool extends WorldEditTool<Storage> {
       })
   }
 
-  interval10: WorldEditToolInterval<this> = (player, slot) => {
-    const storage = this.getStorage(slot)
+  constructor() {
+    super()
 
-    if (!storage.regionKind) return
+    this.onInterval(10, (player, storage) => {
+      if (!storage.regionKind) return
 
-    const createableRegion = createableRegions.find(e => e.region.kind === storage.regionKind)
-    if (!createableRegion)
-      return player.onScreenDisplay.setActionBar(
-        `§cUnknown region type: ${storage.regionKind}`,
-        ActionbarPriority.UrgentNotificiation,
+      const createableRegion = createableRegions.find(e => e.region.kind === storage.regionKind)
+      if (!createableRegion)
+        return player.onScreenDisplay.setActionBar(
+          `§cUnknown region type: ${storage.regionKind}`,
+          ActionbarPriority.UrgentNotificiation,
+        )
+
+      const regions = storage.minDistanceSameKind ? createableRegion.region.instances() : Region.regions
+      if (regions.some(r => r.area.isNear(player.location, storage.minDistance)))
+        return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.PvP)
+
+      createableRegion.region.create(
+        new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
       )
 
-    const regions = storage.minDistanceSameKind ? createableRegion.region.instances() : Region.regions
-    if (regions.some(r => r.area.isNear(player.location, storage.minDistance)))
-      return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.PvP)
-
-    createableRegion.region.create(
-      new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
-    )
-    const msg = t`§aРегион создан!`
-    player.success(msg)
-    player.onScreenDisplay.setActionBar(msg, ActionbarPriority.UrgentNotificiation)
+      const msg = t`§aРегион создан!`
+      player.success(msg)
+      player.onScreenDisplay.setActionBar(msg, ActionbarPriority.UrgentNotificiation)
+    })
   }
 }
 

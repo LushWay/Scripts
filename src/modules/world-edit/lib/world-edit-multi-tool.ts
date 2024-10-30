@@ -1,9 +1,9 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { ArrayForm, BUTTON, ModalForm, prompt } from 'lib'
+import { ArrayForm, BUTTON, doNothing, ModalForm, prompt } from 'lib'
 import { t } from 'lib/text'
 import { WorldEditTool } from './world-edit-tool'
 
-interface ToolsDataStorage {
+export interface ToolsDataStorage {
   /** Version */
   version: number
 
@@ -106,20 +106,17 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
   }
 
   private selectToolForm(slot: ContainerSlot, player: Player, toolsData: ToolData[], back: VoidFunction) {
+    const select = (tool: WorldEditTool) => () => {
+      const toolData: ToolData = { name: `T#: ${tool.name}`, tpid: tool.id }
+      toolsData.push(toolData)
+      this.editOneToolForm(slot, player, toolsData, toolData, tool, back)
+    }
+
+    if (this.tools.length === 0) return select(this.tools[0])
+
     new ArrayForm('Тип инструмента', this.tools)
       .back(back)
-      .button(tool => {
-        return [
-          tool.name,
-          () => {
-            const toolData: ToolData = { name: `T#: ${tool.name}`, tpid: tool.id }
-            toolsData.push(toolData)
-            this.editOneToolForm(slot, player, toolsData, toolData, tool, () =>
-              this.selectToolForm(slot, player, toolsData, back),
-            )
-          },
-        ]
-      })
+      .button(tool => [tool.name, select.bind(undefined, tool)])
       .show(player)
   }
 
@@ -148,35 +145,27 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
     tool: WorldEditTool,
     back: VoidFunction,
   ) {
-    const proxiedTool = this.proxyTool(tool, toolData)
+    const onBack = () => (back(), this.updateItemSlot(slot, toolsData))
+    const proxiedTool = this.proxyTool(tool, toolData, slot, toolsData, onBack)
     if (!proxiedTool.editToolForm) return player.fail('Инструмент неизменяем')
 
-    const onBack = () => (back(), this.updateItemSlot(slot, toolsData))
-    proxiedTool.editToolForm(this.proxySlot(slot, toolsData, toolData, onBack), player)
+    proxiedTool.editToolForm(this.proxySlot(toolData) as ContainerSlot, player)
   }
 
   forEachTool<T extends ContainerSlot | ItemStack>(
     slot: T,
-    callback: (proxiedSlot: T, proxiedTool: WorldEditTool) => void,
+    callback: (proxiedSlot: T, tool: WorldEditTool, toolData: ToolData) => void,
+    toolsData = this.getToolsData(slot),
   ) {
-    const toolsData = this.getToolsData(slot)
-    for (const item of toolsData) {
-      const itemTool = this.getToolByData(item)
-      if (!itemTool) continue
+    for (const toolData of toolsData) {
+      const tool = this.getToolByData(toolData)
+      if (!tool) continue
 
-      const proxiedTool = this.proxyTool(itemTool, item)
-      const proxiedSlot = this.proxySlot(slot, toolsData, item)
-
-      callback(proxiedSlot, proxiedTool)
+      callback(this.proxySlot(toolData) as typeof slot, tool, toolData)
     }
   }
 
-  proxySlot<T extends ContainerSlot | ItemStack>(
-    slot: T,
-    toolsData: ToolData[],
-    toolData: ToolData,
-    back?: VoidFunction,
-  ): T {
+  proxySlot(toolData: ToolData) {
     return {
       get nameTag() {
         return toolData.name
@@ -184,30 +173,35 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
       set nameTag(name) {
         toolData.name = name
       },
-      setLore: () => {
-        // Set lore always happens last, so save all data
-        if (slot instanceof ContainerSlot) this.saveToolsData(slot, toolsData)
-        back?.()
-      },
-      getLore() {
-        return []
-      },
-    } satisfies Partial<ContainerSlot> as unknown as T
+      setLore: doNothing,
+      getLore: () => [],
+    } satisfies Partial<ContainerSlot> as unknown as ContainerSlot | ItemStack
   }
 
-  proxyTool(tool: WorldEditTool, toolSettings: ToolData) {
+  proxyTool(
+    tool: WorldEditTool,
+    toolData: ToolData,
+    slot: ContainerSlot | ItemStack,
+    tools: ToolData[],
+    back?: VoidFunction,
+  ) {
+    const save = () => {
+      slot instanceof ContainerSlot && this.saveToolsData(slot, tools)
+      back?.()
+    }
     return Object.setPrototypeOf(
       {
         getStorage(_, returnUndefined) {
-          if (toolSettings.d) {
-            return toolSettings.d
+          if (toolData.d) {
+            return toolData.d
           } else {
             if (returnUndefined) return undefined
             return JSON.parse(JSON.stringify(this.storageSchema)) as object
           }
         },
         saveStorage(_, storage: object) {
-          toolSettings.d = storage
+          toolData.d = storage
+          save()
         },
       } satisfies Partial<WorldEditTool>,
       tool,

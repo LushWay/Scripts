@@ -1,4 +1,4 @@
-import { BlockRaycastHit, ContainerSlot, ItemStack, Player } from '@minecraft/server'
+import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
 import { isInvalidLocation } from 'lib'
 import stringifyError from 'lib/utils/error'
 import { worldEditPlayerSettings } from 'modules/world-edit/settings'
@@ -17,15 +17,8 @@ interface BrushStorage {
 export abstract class WorldEditToolBrush<MoreStorage extends object> extends WorldEditTool<BrushStorage & MoreStorage> {
   abstract onBrushUse(player: Player, lore: BrushStorage & MoreStorage, hit: BlockRaycastHit): void
 
-  override isOurItemType(lore: ItemStack | ContainerSlot | (BrushStorage & MoreStorage)) {
-    if (lore instanceof ItemStack || lore instanceof ContainerSlot) {
-      if (!super.isOurItemType(lore)) return false
-      lore = this.getStorage(lore)
-    }
-
-    if (lore.type !== this.storageSchema.type) return false
-
-    return true
+  isOurBrush(storage: BrushStorage & MoreStorage) {
+    return storage.type === this.storageSchema.type
   }
 
   override onUse(player: Player, item: ItemStack) {
@@ -33,7 +26,7 @@ export abstract class WorldEditToolBrush<MoreStorage extends object> extends Wor
     if (settings.enableMobile) return
 
     const storage = this.getStorage(item)
-    if (!this.isOurItemType(storage)) return
+    if (!this.isOurBrush(storage)) return
 
     const hit = player.getBlockFromViewDirection({ maxDistance: storage.maxDistance })
     const fail = (reason: string) => player.fail(`§7Кисть§f: §c${reason}`)

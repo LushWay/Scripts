@@ -9,11 +9,8 @@ import { BlocksSetRef, blocksSetDropdown, getBlocksInSet, stringifyBlocksSetRef 
 
 class RandomizerTool extends WorldEditTool<{ blocksSet: BlocksSetRef; version: number }> {
   id = 'randomizer'
-
   name = 'слуйчайный блок из набора'
-
   typeId = Items.WeRandomizer
-
   storageSchema = {
     version: 2,
 

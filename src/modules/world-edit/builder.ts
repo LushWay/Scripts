@@ -3,7 +3,7 @@ import { InventoryStore } from 'lib/database/inventory'
 import { CURRENT_BUILDERS, isBuilding } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
 
-const builderInventory = new InventoryStore('build')
+const builderInventory = new InventoryStore('build2')
 
 Join.onMoveAfterJoin.subscribe(({ player }) => {
   // First time set

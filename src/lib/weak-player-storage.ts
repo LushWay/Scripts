@@ -79,6 +79,7 @@ interface WeakStorageOptions<T> {
 function createWeakStorage(storage: WeakStorage, options?: WeakStorageOptions<any>) {
   if (options?.removeOnLeave ?? true) weakStorages.push(storage)
   if (options?.onLeave) storage.onLeave = options.onLeave
+  if (options?.onDelete) storage.onDelete = options.onDelete
 }
 
 const weakStorages: WeakStorage[] = []

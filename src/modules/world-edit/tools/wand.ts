@@ -22,7 +22,7 @@ class WandTool extends WorldEditTool {
     return color.slice(0, 2) + (tool ? (selection ? 'Действия с областью' : '§cЗона не выделена!') : 'Получить топор')
   }
 
-  editToolForm(slot: ContainerSlot, player: Player, initial: boolean) {
+  editToolForm(_: ContainerSlot, player: Player, initial: boolean) {
     if (initial) return
     new ActionForm('Действия с областью')
       .addButton('Заполнить/Заменить блоки', () => setSelectionMenu(player))

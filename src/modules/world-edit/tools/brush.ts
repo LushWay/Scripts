@@ -7,7 +7,6 @@ import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG } from '../config'
 import { Cuboid } from '../lib/cuboid'
 import { WorldEdit } from '../lib/world-edit'
-import { WorldEditTool, WorldEditToolInterval } from '../lib/world-edit-tool'
 import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
 import { skipForBlending } from '../utils/blending'
 import {
@@ -145,36 +144,6 @@ class BrushTool extends WorldEditToolBrush<Storage> {
       })
   }
 
-  interval0: WorldEditToolInterval<this> = (player, slot, settings) => {
-    const storage = this.getStorage(slot)
-    const hit = player.getBlockFromViewDirection({
-      maxDistance: storage.maxDistance,
-    })
-
-    if (hit && !settings.noBrushParticles) {
-      const location = Vector.add(hit.block.location, {
-        x: 0.5,
-        y: 0,
-        z: 0.5,
-      })
-
-      if (!this.brushLocators.has(player.id)) {
-        try {
-          const entity = player.dimension.spawnEntity(CustomEntityTypes.FloatingText, location)
-          entity.addTag(player.name)
-          entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
-
-          this.brushLocators.set(player.id, entity)
-        } catch (error) {
-          if (isInvalidLocation(error)) return
-          console.error(error)
-        }
-      } else this.brushLocators.get(player.id)?.teleport(location)
-    } else {
-      this.brushLocators.delete(player.id)
-    }
-  }
-
   ensureShape(player: Player, shape: string) {
     if (!isKeyof(shape, SHAPES)) {
       player.warn(t`Неизвестная кисть: ${shape}`)
@@ -206,13 +175,34 @@ class BrushTool extends WorldEditToolBrush<Storage> {
         type: CustomEntityTypes.FloatingText,
         name: WE_CONFIG.BRUSH_LOCATOR,
       })
-
       .forEach(e => e.remove())
 
-    WorldEditTool.intervals.push((player, slot) => {
+    this.onGlobalInterval('global', (player, _, slot) => {
       if (slot.typeId !== this.typeId && this.brushLocators.has(player.id)) {
-        this.brushLocators.get(player)?.remove()
         this.brushLocators.delete(player)
+      }
+    })
+
+    this.onInterval(0, (player, storage, _, settings) => {
+      const hit = player.getBlockFromViewDirection({ maxDistance: storage.maxDistance })
+
+      if (hit && !settings.noBrushParticles) {
+        const location = Vector.add(hit.block.location, { x: 0.5, y: 0, z: 0.5 })
+
+        if (!this.brushLocators.has(player.id)) {
+          try {
+            const entity = player.dimension.spawnEntity(CustomEntityTypes.FloatingText, location)
+            entity.addTag(player.name)
+            entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
+
+            this.brushLocators.set(player.id, entity)
+          } catch (error) {
+            if (isInvalidLocation(error)) return
+            console.error(error)
+          }
+        } else this.brushLocators.get(player.id)?.teleport(location)
+      } else {
+        this.brushLocators.delete(player.id)
       }
     })
   }
