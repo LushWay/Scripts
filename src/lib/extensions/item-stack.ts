@@ -6,7 +6,7 @@ import {
   ItemFoodComponent,
   ItemStack,
 } from '@minecraft/server'
-import { util } from 'lib/util'
+import { util, wrapLore } from 'lib/util'
 import { expand } from './extend'
 
 interface ItemComponentAliases {
@@ -53,7 +53,7 @@ for (const [aliasName, { componentId }] of Object.entries(aliases)) {
 expand(ItemStack.prototype, {
   setInfo(nameTag, description) {
     if (typeof nameTag === 'string') this.nameTag = '§r' + nameTag
-    if (typeof description === 'string') this.setLore(util.wrapLore(description))
+    if (typeof description === 'string') this.setLore(wrapLore(description))
 
     return this.clone()
   },

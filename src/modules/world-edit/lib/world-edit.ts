@@ -8,6 +8,7 @@ import { ngettext } from 'lib/utils/ngettext'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import {
+  ReplaceMode,
   ReplaceTarget,
   replaceWithTargets,
   stringifyBlockWeights,
@@ -327,6 +328,7 @@ export class WorldEdit {
   async fillBetween(
     blocks: (ReplaceTarget | BlockPermutation)[],
     replaceBlocks: (ReplaceTarget | BlockPermutation)[] = [],
+    replaceMode: ReplaceMode,
   ) {
     try {
       const selection = await this.ensureSelection()
@@ -355,7 +357,7 @@ export class WorldEdit {
             if (!block) continue
 
             try {
-              replaceWithTargets(replaceTargets, block, permutations)
+              replaceWithTargets(replaceTargets, replaceMode, block, permutations)
               yield
             } catch (error) {
               if (errors < 3 && error instanceof Error) {

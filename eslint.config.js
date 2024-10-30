@@ -41,7 +41,7 @@ export default ts.config(
       'no-console': 'off',
       'no-undef': 'off',
       'prefer-const': 'warn',
-      'lines-between-class-members': 'warn',
+      'lines-between-class-members': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-namespace': 'off',

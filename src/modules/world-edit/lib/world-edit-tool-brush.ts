@@ -1,70 +1,46 @@
-import { BlockRaycastHit, InvalidContainerSlotError, ItemStack, Player } from '@minecraft/server'
+import { BlockRaycastHit, ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { isInvalidLocation } from 'lib'
 import stringifyError from 'lib/utils/error'
 import { worldEditPlayerSettings } from 'modules/world-edit/settings'
+import { BlocksSetRef } from '../utils/blocks-set'
 import { WorldEditTool } from './world-edit-tool'
 
-interface BrushLoreFormat {
+interface BrushStorage {
   version: number
-  replaceBlocksSet: import('modules/world-edit/utils/blocks-set').BlocksSetRef
+  replaceBlocksSet: BlocksSetRef
+  replaceMode: string
   size: number
   maxDistance: number
-  type: 'brush' | 'smoother'
+  type: string
 }
 
-export abstract class WorldEditToolBrush<AdditionalLore extends object> extends WorldEditTool<
-  BrushLoreFormat & AdditionalLore
-> {
-  abstract onBrushUse(player: Player, lore: BrushLoreFormat & AdditionalLore, hit: BlockRaycastHit): void
+export abstract class WorldEditToolBrush<MoreStorage extends object> extends WorldEditTool<BrushStorage & MoreStorage> {
+  abstract onBrushUse(player: Player, lore: BrushStorage & MoreStorage, hit: BlockRaycastHit): void
 
-  override getToolSlot(player: Player) {
-    const slot = super.getToolSlot(player)
-
-    if (typeof slot === 'string') return slot
-
-    if (!this.isOurBrushType(slot)) return 'Возьмите ' + this.name + 'в руку, или выберите пустой слот, чтобы создать!'
-
-    return slot
-  }
-
-  override getMenuButtonNameColor(player: Player) {
-    const slot = player.mainhand()
-    if (!this.isOurBrushType(slot)) return '§8'
-    return super.getMenuButtonNameColor(player)
-  }
-
-  protected isOurBrushType(lore: this['loreFormat'] | Pick<ItemStack, 'getLore'>) {
-    if ('getLore' in lore) {
-      try {
-        lore = this.parseLore(lore.getLore())
-      } catch (e) {
-        if (e instanceof InvalidContainerSlotError) return false // No item in the container
-        throw e
-      }
+  override isOurItemType(lore: ItemStack | ContainerSlot | (BrushStorage & MoreStorage)) {
+    if (lore instanceof ItemStack || lore instanceof ContainerSlot) {
+      if (!super.isOurItemType(lore)) return false
+      lore = this.getStorage(lore)
     }
 
-    if ('type' in this.loreFormat && 'type' in lore && lore.type !== this.loreFormat.type) return false
+    if (lore.type !== this.storageSchema.type) return false
 
     return true
   }
 
-  onUse = function onUse(this: WorldEditToolBrush<AdditionalLore>, player: Player, item: ItemStack) {
+  override onUse(player: Player, item: ItemStack) {
     const settings = worldEditPlayerSettings(player)
     if (settings.enableMobile) return
 
-    const lore = this.parseLore(item.getLore())
+    const storage = this.getStorage(item)
+    if (!this.isOurItemType(storage)) return
 
-    if (!this.isOurBrushType(lore)) return
-    const hit = player.getBlockFromViewDirection({
-      maxDistance: lore.maxDistance,
-    })
-
-    const fail = (reason: string) => player.fail('§7Кисть§f: §c' + reason)
-
+    const hit = player.getBlockFromViewDirection({ maxDistance: storage.maxDistance })
+    const fail = (reason: string) => player.fail(`§7Кисть§f: §c${reason}`)
     if (!hit) return fail('Блок слишком далеко.')
 
     try {
-      this.onBrushUse(player, lore, hit)
+      this.onBrushUse(player, storage, hit)
     } catch (e: unknown) {
       if (isInvalidLocation(e)) {
         fail('Блок не прогружен.')

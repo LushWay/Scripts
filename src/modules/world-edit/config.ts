@@ -4,13 +4,12 @@ import {
   MolangVariableMap,
   world,
 } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vector } from 'lib/vector'
 
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
 
   STRUCTURE_CHUNK_SIZE: { x: 64, y: 384, z: 64 },
-  FILL_CHUNK_SIZE: { x: 32, y: 32, z: 32 },
   COPY_FILE_NAME: 'copy',
   BACKUP_PREFIX: 'backup',
 
@@ -20,7 +19,6 @@ export const WE_CONFIG = {
   /** The ammout of ticks to delay during a heavy proccess generation */
   TICKS_TO_SLEEP: 1,
 
-  DRAW_SELECTION_DEFAULT: true,
   DRAW_SELECTION_PARTICLE: 'minecraft:balloon_gas_particle',
   DRAW_SELECTION_MAX_SIZE: 5000,
   DRAW_SELECTION_PARTICLE_OPTIONS: new MolangVariableMap(),

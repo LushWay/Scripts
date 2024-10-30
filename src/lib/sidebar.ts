@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { util } from 'lib/util'
+import { util, wrap } from 'lib/util'
 import { ActionbarPriority } from './extensions/on-screen-display'
 import { WeakPlayerSet } from './weak-player-storage'
 
@@ -110,7 +110,7 @@ export class Sidebar<E = any> {
   static wrap(line: string, maxWordCount: number) {
     return line
       .split('\n')
-      .map(e => util.wrap(e, maxWordCount))
+      .map(e => wrap(e, maxWordCount))
       .flat()
       .join('\n')
   }

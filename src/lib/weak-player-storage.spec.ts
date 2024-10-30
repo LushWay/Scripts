@@ -41,6 +41,10 @@ gamesuite('WeakPlayerMap', () => {
         test.assert(pId === playerId, 'Player id should match')
         called++
       },
+      onDelete(pId) {
+        test.assert(pId === playerId, 'Player id should match')
+        called++
+      },
     })
 
     playerMap.set(player, 'testValue')

@@ -1,7 +1,7 @@
 import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
 import { t, textUnitColorize } from 'lib/text'
-import { noBoolean, util } from 'lib/util'
+import { noBoolean, util, wrapLore } from 'lib/util'
 
 export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
   constructor(
@@ -67,11 +67,7 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
 
   private prepareItem(itemStack: Item, storage: ParsedSchema<T>) {
     if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage)
-    itemStack.setLore(
-      this.prepareLore(this.prepareProperties(storage), itemStack, storage)
-        .map(e => util.wrapLore(e))
-        .flat(),
-    )
+    itemStack.setLore(this.prepareLore(this.prepareProperties(storage), itemStack, storage).map(wrapLore).flat())
   }
 
   private prepareLore: PrepareLore<T> = properties => properties

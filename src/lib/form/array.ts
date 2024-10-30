@@ -189,16 +189,16 @@ export class ArrayForm<
         back()
       })
     } else {
-      const propertName = 'filters'
-      const applied = Object.keys(database[propertName] ?? {}).length
+      const propertyName = 'filters'
+      const applied = Object.keys(database[propertyName] ?? {}).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,
-          propertName,
+          propertyName,
           false,
           {},
           database,
-          { [propertName]: this.config.filters },
+          { [propertyName]: this.config.filters },
           back,
           false,
         ),

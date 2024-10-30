@@ -1,4 +1,4 @@
-import { MolangVariableMap, system, world } from '@minecraft/server'
+import { ContainerSlot, MolangVariableMap, Player, system, world } from '@minecraft/server'
 import { ActionForm, ModalForm, Vector, inspect } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ListParticles } from 'lib/assets/particles'
@@ -10,52 +10,53 @@ const actions: Record<string, string[]> = {
   Sound: ListSounds,
 }
 
-new WorldEditTool({
-  id: 'tool',
-  itemStackId: Items.WeTool,
-  name: 'инструмент',
+class Tool extends WorldEditTool {
+  id = 'tool'
+  typeId = Items.WeTool
+  name = 'инструмент'
+  storageSchema: any
 
-  editToolForm(item, player) {
-    const lore = item.getLore()
+  editToolForm(slot: ContainerSlot, player: Player) {
+    const lore = slot.getLore()
     new ActionForm('§3Инструмент', 'Настройте, что будет происходить при использовании инструмента.')
       .addButton('Телепорт по взгляду', () => {
-        item.nameTag = `§r§a► Телепорт по взгляду`
+        slot.nameTag = `§r§a► Телепорт по взгляду`
         lore[0] = 'teleportToView'
 
-        item.setLore(lore)
+        slot.setLore(lore)
         player.success(`Режим инструмента изменен на телепорт по взгляду`)
       })
       .addButton('Выполнение команды', () => {
         new ModalForm('§3Инструмент').addTextField('Команда', '/tp @s ^^^5').show(player, (_, command) => {
           if (command.startsWith('/')) command = command.substring(1)
 
-          item.nameTag = `§r§aR► §f${command}`
+          slot.nameTag = `§r§aR► §f${command}`
           lore[0] = 'runCommand'
           lore[1] = command
 
-          item.setLore(lore)
+          slot.setLore(lore)
           player.success(`Команда: §7${command}`)
         })
       })
       .addButton('Проверка звуков', () => {
         selectFromArray(ListSounds, '§3Звук', (sound, index) => {
-          item.nameTag = `§r§3Звук`
+          slot.nameTag = `§r§3Звук`
           lore[0] = 'Sound'
           lore[1] = sound
           lore[2] = index.toString()
 
-          item.setLore(lore)
+          slot.setLore(lore)
           player.success(`Звук: §7${index} ${sound}`)
         })
       })
       .addButton('Проверка партиклов', () => {
         selectFromArray(ListParticles, '§3Партикл', (particle, index) => {
-          item.nameTag = `§r§3Партикл`
+          slot.nameTag = `§r§3Партикл`
           lore[0] = 'Particle'
           lore[1] = particle
           lore[2] = index.toString()
 
-          item.setLore(lore)
+          slot.setLore(lore)
           player.success(`Партикл: §7${index} ${particle}`)
         })
       })
@@ -81,9 +82,9 @@ new WorldEditTool({
           }
         })
     }
-  },
+  }
 
-  onUse(player) {
+  onUse(player: Player) {
     const item = player.mainhand()
     const lore = item.getLore()
     if (!lore[0]) return
@@ -105,40 +106,45 @@ new WorldEditTool({
       const dot = player.getBlockFromViewDirection()
       if (dot?.block) player.teleport(dot.block)
     }
-  },
-})
+  }
 
-const variables = new MolangVariableMap()
+  constructor() {
+    super()
+    const variables = new MolangVariableMap()
 
-system.runInterval(
-  () => {
-    for (const player of world.getAllPlayers()) {
-      const item = player.mainhand()
-      if (item.typeId !== Items.WeWand) return
+    system.runInterval(
+      () => {
+        for (const player of world.getAllPlayers()) {
+          const item = player.mainhand()
+          if (item.typeId !== Items.WeWand) return
 
-      const lore = item.getLore()
+          const lore = item.getLore()
 
-      if (lore[0] === 'Particle') {
-        const hit = player.getBlockFromViewDirection({
-          includeLiquidBlocks: false,
-          includePassableBlocks: false,
-          maxDistance: 50,
-        })
+          if (lore[0] === 'Particle') {
+            const hit = player.getBlockFromViewDirection({
+              includeLiquidBlocks: false,
+              includePassableBlocks: false,
+              maxDistance: 50,
+            })
 
-        if (!hit) return
+            if (!hit) return
 
-        hit.block.dimension.spawnParticle(
-          lore[1],
-          Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-          variables,
-        )
-      }
+            hit.block.dimension.spawnParticle(
+              lore[1],
+              Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+              variables,
+            )
+          }
 
-      if (lore[0] === 'Sound') {
-        player.playSound(lore[1])
-      }
-    }
-  },
-  'we tool',
-  20,
-)
+          if (lore[0] === 'Sound') {
+            player.playSound(lore[1])
+          }
+        }
+      },
+      'we tool',
+      20,
+    )
+  }
+}
+
+new Tool()

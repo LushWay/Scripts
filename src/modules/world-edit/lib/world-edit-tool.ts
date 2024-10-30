@@ -1,102 +1,65 @@
 import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
-import { expand, inspect, util } from 'lib'
+import { Command, inspect, isKeyof, stringify, util } from 'lib'
+import { textTable } from 'lib/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { worldEditPlayerSettings } from '../settings'
 
-type IntervalFunction<T extends LoreFormatType> = (
-  this: WorldEditTool<T>,
+export type WorldEditToolInterval<Tool> = (
+  this: Tool,
   player: Player,
   slot: ContainerSlot,
   settings: ReturnType<typeof worldEditPlayerSettings>,
 ) => void
-type LoreStringName = 'blocksSet' | 'replaceBlocksSet' | 'height' | 'size' | 'shape' | 'maxDistance' | 'zone'
+
+type StorageKey =
+  | 'blocksSet'
+  | 'replaceBlocksSet'
+  | 'height'
+  | 'size'
+  | 'shape'
+  | 'maxDistance'
+  | 'offset'
+  | 'replaceMode'
+  | 'type'
+  | 'radius'
+  | 'blending'
+  | 'factor'
 
 const LORE_SEPARATOR = '\u00a0'
 
-type LoreFormatType = {
-  [P in LoreStringName]?: unknown
-} & {
+type StorageType = Partial<Record<StorageKey, any>> & {
   version: number
 }
 
-export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
-  static loreBlockSetKeys: string[] = ['blocksSet', 'replaceBlocksSet'] satisfies LoreStringName[]
+export abstract class WorldEditTool<Storage extends StorageType = any> {
+  static loreBlockRefKeys: string[] = ['blocksSet', 'replaceBlocksSet'] satisfies StorageKey[]
+  static tools: WorldEditTool[] = []
+  static intervals: OmitThisParameter<WorldEditToolInterval<any>>[] = []
 
-  static tools: WorldEditTool<any>[] = []
+  abstract id: string
+  abstract name: string
+  abstract typeId: string
+  abstract storageSchema: Storage
 
-  static intervals: OmitThisParameter<IntervalFunction<any>>[] = []
+  command?: Command
 
-  command
+  editToolForm?(this: WorldEditTool<Storage>, slot: ContainerSlot, player: Player, initial?: boolean): void
+  onUse?(player: Player, item: ItemStack): void
 
-  name
+  interval0?: WorldEditToolInterval<this>
+  interval10?: WorldEditToolInterval<this>
+  interval20?: WorldEditToolInterval<this>
 
-  editToolForm
-
-  interval0
-
-  interval10
-
-  interval20
-
-  itemId
-
-  loreFormat
-
-  id
-
-  onUse
-
-  /**
-   * @param {Object} o
-   * @param {string} o.name
-   * @param {string} o.displayName
-   * @param {string} o.itemStackId
-   * @param {(slot: ContainerSlot, player: Player, initial?: boolean) => void} [o.editToolForm]
-   * @param {LoreFormat} [o.loreFormat]
-   * @param {IntervalFunction} [o.interval0]
-   * @param {IntervalFunction} [o.interval10]
-   * @param {IntervalFunction} [o.interval20]
-   * @param {(player: Player, item: ItemStack) => void} [o.onUse]
-   * @param {Partial<WorldEditTool<LoreFormat>> & ThisType<WorldEditTool<LoreFormat>>} [o.overrides]
-   */
-  constructor({
-    id,
-    name,
-    itemStackId,
-    editToolForm,
-    loreFormat,
-    interval0,
-    interval10,
-    interval20,
-    onUse,
-    overrides,
-  }: {
-    id: string
-    name: string
-    itemStackId: string
-    editToolForm?: (this: WorldEditTool<LoreFormat>, slot: ContainerSlot, player: Player, initial?: boolean) => void
-    loreFormat?: LoreFormat
-    interval0?: IntervalFunction<LoreFormat>
-    interval10?: IntervalFunction<LoreFormat>
-    interval20?: IntervalFunction<LoreFormat>
-    onUse?: (player: Player, item: ItemStack) => void
-    overrides?: Partial<WorldEditTool<LoreFormat>> & ThisType<WorldEditTool<LoreFormat>>
-  }) {
+  constructor() {
     WorldEditTool.tools.push(this)
-    this.id = id
-    this.name = name
-    this.itemId = itemStackId
-    if (editToolForm) this.editToolForm = editToolForm
-    this.loreFormat = loreFormat ?? { version: 0 }
-    ;(this.loreFormat as Partial<LoreFormat>).version ??= 0
-    this.onUse = onUse
-    this.interval0 = interval0
-    this.interval10 = interval10
-    this.interval20 = interval20
-    if (overrides) expand(this, overrides)
+    system.delay(() => this.createCommand())
+  }
 
-    this.command = new Command(id)
-      .setDescription(`Создает${editToolForm ? ' или редактирует ' : ''}${name}`)
+  createCommand() {
+    if (this.command) return this.command
+
+    this.command = new Command(this.id)
+      .setDescription(`Создает${this.editToolForm ? ' или редактирует ' : ''}${this.name}`)
       .setPermissions('builder')
       .setGroup('we')
       .executes(ctx => {
@@ -105,84 +68,132 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
         if (typeof slotOrError === 'string') ctx.error(slotOrError)
         else if (this.editToolForm) this.editToolForm(slotOrError, ctx.player, true)
       })
+
+    return this.command
+  }
+
+  isOurItemType(slot: ContainerSlot | ItemStack) {
+    return slot.typeId === this.typeId && !!this.getStorage(slot, true)
   }
 
   getToolSlot(player: Player) {
     const slot = player.mainhand()
 
     if (!slot.typeId) {
-      const item = ItemTypes.get(this.itemId)
-      if (!item) throw new TypeError(`ItemType '${this.itemId}' does not exists`)
+      const item = ItemTypes.get(this.typeId)
+      if (!item) throw new TypeError(`ItemType '${this.typeId}' does not exists`)
       slot.setItem(new ItemStack(item))
       return slot
-    } else if (slot.typeId === this.itemId) {
+    } else if (this.isOurItemType(slot)) {
       return slot
     } else {
       return `Выбери пустой слот чтобы создать ${this.name} или возьми для настройки!`
     }
   }
 
-  getMenuButtonNameColor(player: Player): string {
-    const { typeId } = player.mainhand()
-    const edit = typeId === this.itemId
-    const air = !typeId
-    return edit ? '§2' : air ? '' : '§8'
-  }
-
   getMenuButtonName(player: Player): string {
-    const { typeId } = player.mainhand()
-    const edit = typeId === this.itemId
+    const slot = player.mainhand()
+    const our = this.isOurItemType(slot)
 
-    if (!this.editToolForm && edit) return ''
+    if (!this.editToolForm && our) return ''
 
-    return `${this.getMenuButtonNameColor(player)}${edit ? 'Редактировать' : 'Создать'} ${this.name}`
-  }
+    const empty = !slot.typeId
+    const color = our ? '§a' : empty ? '' : '§8'
 
-  parseLore(lore: string[], returnUndefined?: false): LoreFormat
-
-  parseLore(lore: string[], returnUndefined?: true): LoreFormat | undefined
-
-  parseLore(lore: string[], returnUndefined = false): LoreFormat | undefined {
-    let raw
-    try {
-      raw = JSON.parse(
-        lore
-          .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
-          .join('')
-          .replace(/§(.)/g, '$1'),
-      ) as LoreFormat
-    } catch {}
-    if (raw?.version !== this.loreFormat.version) {
-      if (returnUndefined) return undefined
-      raw = JSON.parse(JSON.stringify(this.loreFormat)) as LoreFormat
+    if (our) {
+      console.log({ id: this.id, abc: !!this.getStorage(slot, true) })
     }
 
-    if ('version' in raw) Reflect.deleteProperty(raw, 'version')
-    return raw
+    return `${color}${our ? 'Редактировать' : 'Создать'} ${this.name}`
   }
 
-  loreTranslation: Record<string, string> = {
+  private get storageProperty() {
+    return `we:tool:${this.id}`
+  }
+
+  translation: Record<StorageKey, string> = {
     shape: 'Форма',
     size: 'Размер',
     height: 'Высота',
     maxDistance: 'Расстояние',
     blocksSet: 'Блоки',
     replaceBlocksSet: 'Заменяет',
+    replaceMode: 'Режим замены',
     radius: 'Радиус',
-    zone: 'Отступ',
+    offset: 'Отступ',
+    type: 'Тип',
+    blending: 'Смешивание',
+    factor: 'Фактор смешивания',
   }
 
-  stringifyLore(format: LoreFormat): string[] {
-    ;(format as Partial<LoreFormat>).version ??= this.loreFormat.version
+  getStorage(slot: ContainerSlot | ItemStack, returnUndefined?: false): Storage
+  getStorage(slot: ContainerSlot | ItemStack, returnUndefined: true): Storage | undefined
+  getStorage(slot: ContainerSlot | ItemStack, returnUndefined = false): Storage | undefined {
+    const property = slot.getDynamicProperty(this.storageProperty)
+    const propertyParsed = typeof property === 'string' ? this.parse(property, true) : undefined
+    return propertyParsed ?? this.parseLore(slot.getLore(), returnUndefined as true)
+  }
+
+  saveStorage(slot: ContainerSlot | ItemStack, storage: Storage, writeLore = true) {
+    slot.setDynamicProperty(this.storageProperty, JSON.stringify({ ...storage, version: this.storageSchema.version }))
+
+    if (!writeLore) return
+
+    const table = Object.map(storage, (key, value) => {
+      if (!isKeyof(key, this.translation)) return false
+
+      return [
+        this.translation[key],
+        WorldEditTool.loreBlockRefKeys.includes(key) ? stringifyBlocksSetRef(value as BlocksSetRef) : stringify(value),
+      ]
+    })
+
+    slot.setLore([' ', ...textTable(table, false, false).map(e => '§r' + e.slice(0, 48))])
+  }
+
+  /** @deprecated */
+  private parseLore(lore: string[], returnUndefined?: false): Storage
+  /** @deprecated */
+  private parseLore(lore: string[], returnUndefined: true): Storage | undefined
+  /** @deprecated */
+  private parseLore(lore: string[], returnUndefined = false): Storage | undefined {
+    return this.parse(
+      lore
+        .slice(lore.findIndex(e => e.includes(LORE_SEPARATOR)) + 1)
+        .join('')
+        .replace(/§(.)/g, '$1'),
+      returnUndefined as true,
+    )
+  }
+
+  private parse(storageData: string, returnUndefined?: false): Storage
+  private parse(storageData: string, returnUndefined: true): Storage | undefined
+  private parse(storageData: string, returnUndefined = false): Storage | undefined {
+    let raw
+    try {
+      raw = JSON.parse(storageData) as Storage
+    } catch {}
+    if (raw?.version !== this.storageSchema.version) {
+      if (returnUndefined) return undefined
+      raw = JSON.parse(JSON.stringify(this.storageSchema)) as Storage
+    }
+
+    if ('version' in raw) Reflect.deleteProperty(raw, 'version')
+    return raw
+  }
+
+  /** @deprecated */
+  stringifyLore(format: Storage): string[] {
+    ;(format as Partial<Storage>).version ??= this.storageSchema.version
     return [
       ...Object.entries(format)
         .filter(([key]) => key !== 'version')
         .map(([key, value]) => {
-          const val = WorldEditTool.loreBlockSetKeys.includes(key)
+          const val = WorldEditTool.loreBlockRefKeys.includes(key)
             ? stringifyBlocksSetRef(value as BlocksSetRef)
             : inspect(value)
 
-          const k = this.loreTranslation[key] ?? key
+          const k = isKeyof(key, this.translation) ? this.translation[key] : key
           return `${k}: ${val}`.match(/.{0,48}/g) ?? []
         })
         .flat()
@@ -198,42 +209,48 @@ export class WorldEditTool<LoreFormat extends LoreFormatType = LoreFormatType> {
         .match(/.{0,50}/g) ?? []),
     ]
   }
-}
 
-world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
-  if (!(player instanceof Player)) return
-  WorldEditTool.tools
-    .filter(e => e.itemId === item.typeId)
-    .forEach(tool => util.catch(() => tool.onUse?.(player, item)))
-})
+  private static ticks = 0
 
-let ticks = 0
-run()
-function run() {
-  system.run(() => {
-    system.runJob(
-      (function* () {
-        for (const player of world.getAllPlayers()) {
-          if (!player.isValid()) continue
+  static {
+    this.onUseEvent()
+    this.intervalsJob()
+  }
 
-          const item = player.mainhand()
-          const tools = WorldEditTool.tools.filter(e => e.itemId === item.typeId)
-          const settings = worldEditPlayerSettings(player)
+  private static onUseEvent() {
+    world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
+      if (!(player instanceof Player)) return
 
-          WorldEditTool.intervals.forEach(e => e(player, item, settings))
-          for (const tool of tools) {
-            const fn: (undefined | OmitThisParameter<IntervalFunction<any>>)[] = [tool.interval0?.bind(tool)]
+      WorldEditTool.tools
+        .filter(tool => tool.onUse && tool.isOurItemType(item))
+        .forEach(tool => util.catch(() => tool.onUse?.(player, item)))
+    })
+  }
 
-            if (ticks % 10 === 0) fn.push(tool.interval10?.bind(tool))
-            if (ticks % 20 === 0) fn.push(tool.interval20?.bind(tool))
-            fn.forEach(e => e?.(player, item, settings))
-          }
-          yield
-        }
-        if (ticks >= 20) ticks = 0
-        else ticks++
-        run()
-      })(),
-    )
-  })
+  private static intervalsJob() {
+    system.runJob(this.createJob())
+  }
+
+  private static *createJob() {
+    for (const player of world.getAllPlayers()) {
+      if (!player.isValid()) continue
+
+      const item = player.mainhand()
+      const tools = WorldEditTool.tools.filter(e => e.typeId === item.typeId)
+      const settings = worldEditPlayerSettings(player)
+
+      WorldEditTool.intervals.forEach(e => e(player, item, settings))
+      for (const tool of tools) {
+        const fn: (undefined | OmitThisParameter<WorldEditToolInterval<any>>)[] = [tool.interval0?.bind(tool)]
+
+        if (this.ticks % 10 === 0) fn.push(tool.interval10?.bind(tool))
+        if (this.ticks % 20 === 0) fn.push(tool.interval20?.bind(tool))
+        fn.forEach(e => e?.(player, item, settings))
+      }
+      yield
+    }
+    if (this.ticks >= 20) this.ticks = 0
+    else this.ticks++
+    this.intervalsJob()
+  }
 }

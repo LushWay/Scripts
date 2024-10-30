@@ -4,7 +4,7 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { nmspc } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
-import { inspect, util } from 'lib/util'
+import { inspect, util, wrapLore } from 'lib/util'
 import { typeIdToReadable } from 'lib/utils/lang'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
@@ -101,7 +101,7 @@ export class ChestForm {
     enchanted = false,
     callback,
   }: ChestButtonOptions) {
-    if (description) lore = util.wrapLore(description)
+    if (description) lore = wrapLore(description)
 
     this.buttons[slot] = {
       text: `stack#${Math.min(Math.max(amount, 1) || 1, 99)

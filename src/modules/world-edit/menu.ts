@@ -1,4 +1,4 @@
-import { BlockStates, BlockTypes, ItemStack, Player, world } from '@minecraft/server'
+import { BlockStates, BlockTypes, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, inspect, is, noNullable, stringify } from 'lib'
@@ -9,7 +9,7 @@ import { prompt } from 'lib/form/message'
 import { t } from 'lib/text'
 import { typeIdToReadable } from 'lib/utils/lang'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { configureNylium } from 'modules/world-edit/tools/nylium'
+import { weRandomizerTool } from 'modules/world-edit/tools/randomizer'
 import {
   BlocksSet,
   BlocksSets,
@@ -22,7 +22,7 @@ import {
   toPermutation,
 } from 'modules/world-edit/utils/blocks-set'
 import { WorldEditTool } from './lib/world-edit-tool'
-import { DEFAULT_BLOCK_SETS, SHARED_POSTFIX } from './utils/default-block-sets'
+import { DEFAULT_BLOCK_SETS, shortenBlocksSetName } from './utils/default-block-sets'
 
 /** Main we menu */
 export function WEmenu(player: Player, body = '') {
@@ -32,42 +32,47 @@ export function WEmenu(player: Player, body = '') {
   }
 
   const we = WorldEdit.forPlayer(player)
-
   const form = new ActionForm('§dWorld§6Edit', body)
 
   form.addButton(t.badge`§3Наборы блоков ${getOwnBlocksSetsCount(player.id)}`, () => WEblocksSetsMenu(player))
 
-  for (const tool of WorldEditTool.tools) {
-    const buttonName = tool.getMenuButtonName(player)
-    if (!buttonName) continue
+  const toolButtons = WorldEditTool.tools.map(tool => ({ tool, buttonText: tool.getMenuButtonName(player) }))
+  const inactiveTools = toolButtons.filter(e => e.buttonText.startsWith('§8'))
+  const activeTools = toolButtons.filter(e => !inactiveTools.includes(e))
 
-    form.addButton(buttonName, () => {
-      const slotOrError = tool.getToolSlot(player)
-      if (typeof slotOrError === 'string') {
-        WEmenu(player, '§c' + slotOrError)
-      } else {
-        tool.editToolForm?.(slotOrError, player, false)
-      }
-    })
-  }
+  addToForm(activeTools)
 
   form.addButton(t.badge`§3Отмена действий ${we.history.length}`, () => WEundoRedoMenu(player))
   form.addButton('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
+
+  addToForm(inactiveTools)
+
   form.show(player)
+
+  function addToForm(buttons: typeof toolButtons) {
+    for (const { tool, buttonText } of buttons) {
+      form.addButton(buttonText, () => {
+        const slotOrError = tool.getToolSlot(player)
+        if (typeof slotOrError === 'string') {
+          WEmenu(player, '§c' + slotOrError)
+        } else {
+          tool.editToolForm?.(slotOrError, player, false)
+        }
+      })
+    }
+  }
 }
 
 function WEChestFromBlocksSet(player: Player) {
   new ModalForm('Выбери набор блоков...')
     .addDropdown('Набор блоков', ...blocksSetDropdown(['', ''], player))
-    .show(player, (ctx, blockset) => {
-      const blocks = getBlocksInSet([player.id, blockset]).filter(noNullable)
+    .show(player, (ctx, blocksSet) => {
+      const blocks = getBlocksInSet([player.id, blocksSet]).filter(noNullable)
       const pos1 = Vector.floor(player.location)
       const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
       WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
 
-      const nylium = new ItemStack(MinecraftBlockTypes.WarpedNylium, 64)
-      configureNylium(nylium, player, blockset)
-
+      const randomizer = weRandomizerTool.create([player.id, blocksSet])
       const block = player.dimension.getBlock(player.location)
       if (!block) return ctx.error('Не удалось поместить блок')
 
@@ -75,7 +80,7 @@ function WEChestFromBlocksSet(player: Player) {
 
       const container = block.getComponent('inventory')?.container
       for (const [i] of container?.slotEntries() ?? []) {
-        container?.setItem(i, nylium.clone())
+        container?.setItem(i, randomizer.clone())
       }
 
       for (const [i, block] of blocks.entries()) {
@@ -283,7 +288,7 @@ function WEeditBlocksSetMenu(o: {
         nameTag: 'Копировать набор',
         description: 'Нажмите чтобы скопировать набор в свой список наборов. Вы сможете редактировать его.',
         callback() {
-          const newName = setName.replace(SHARED_POSTFIX, '')
+          const newName = shortenBlocksSetName(setName)
           setBlocksSet(player.id, newName, set)
           WEeditBlocksSetMenu({
             ...o,

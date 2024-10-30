@@ -1,7 +1,22 @@
-import { world } from '@minecraft/server'
+import { system } from '@minecraft/server'
+import { LongDynamicProperty } from './properties'
 
-export class PersistentSet<T extends Json> extends Set<T> {
-  constructor(public id: string) {
+export class LimitedSet<T> extends Set<T> {
+  constructor(protected limit = 1_000) {
+    super()
+  }
+
+  add(value: T) {
+    if (this.size >= this.limit) this.delete(this.values().next().value ?? ('' as T))
+    return super.add(value)
+  }
+}
+
+export class PersistentSet<T extends Json> extends LimitedSet<T> {
+  constructor(
+    public id: string,
+    protected limit = 1_000,
+  ) {
     super()
     this.load()
   }
@@ -9,21 +24,23 @@ export class PersistentSet<T extends Json> extends Set<T> {
   private load() {
     const id = `PersistentSet<${this.id}>:`
     try {
-      const saved = world.getDynamicProperty(this.id)
-      if (typeof saved === 'undefined') return // Set was not saved
-      if (typeof saved !== 'string') return console.warn(`${id} Dynamic property is not a string:`, saved)
+      LongDynamicProperty.getJob(this.id, '[]', values => {
+        if (typeof values === 'undefined') return // Set was not saved
 
-      const values = JSON.parse(saved) as T[]
-      if (!Array.isArray(values)) return console.warn(`${id} Dynamic property is not array, it is:`, values)
-
-      values.forEach(value => this.add(value))
+        if (!Array.isArray(values)) return console.warn(`${id} Dynamic property is not array, it is:`, values)
+        system
+          .runJobForEach(values as T[], value => this.add(value))
+          .then(() => {
+            console.log(`${id} Loaded ${this.size} entries`)
+          })
+      })
     } catch (error) {
       console.error(`${id} Failed to load:`, error)
     }
   }
 
   save() {
-    world.setDynamicProperty(this.id, JSON.stringify([...this]))
+    LongDynamicProperty.set(this.id, JSON.stringify([...this]))
     return this
   }
 

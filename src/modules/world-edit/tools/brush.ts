@@ -1,109 +1,154 @@
-import {
-  Entity,
-  LocationInUnloadedChunkError,
-  LocationOutOfWorldBoundariesError,
-  Player,
-  world,
-} from '@minecraft/server'
-import { ModalForm, Vector, is, isKeyof } from 'lib'
+import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
+import { ModalForm, Vector, is, isInvalidLocation, isKeyof } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { t } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG } from '../config'
-import { WorldEditTool } from '../lib/world-edit-tool'
+import { Cuboid } from '../lib/cuboid'
+import { WorldEdit } from '../lib/world-edit'
+import { WorldEditTool, WorldEditToolInterval } from '../lib/world-edit-tool'
 import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
+import { skipForBlending } from '../utils/blending'
 import {
   BlocksSetRef,
   blocksSetDropdown,
   getBlocksInSet,
+  getReplaceMode,
   getReplaceTargets,
+  replaceModeDropdown,
   replaceTargetsDropdown,
+  replaceWithTargets,
+  stringifyBlockWeights,
+  toReplaceTarget,
 } from '../utils/blocks-set'
-import { SHARED_POSTFIX } from '../utils/default-block-sets'
-import { placeShape } from '../utils/shape'
-import { SHAPES } from '../utils/shapes'
+import { shortenBlocksSetName } from '../utils/default-block-sets'
+import { SHAPES, ShapeFormula } from '../utils/shapes'
 
-world.overworld
-  .getEntities({
-    type: CustomEntityTypes.FloatingText,
-    name: WE_CONFIG.BRUSH_LOCATOR,
-  })
-
-  .forEach(e => e.remove())
-
-class BrushTool extends WorldEditToolBrush<{ shape: string; blocksSet: BlocksSetRef }> {
-  onBrushUse: WorldEditToolBrush<{ shape: string; blocksSet: BlocksSetRef }>['onBrushUse'] = (player, lore, hit) => {
-    const error = placeShape(
-      player,
-
-      ensureShape(player, lore.shape),
-      hit.block.location,
-      lore.size,
-
-      getBlocksInSet(lore.blocksSet),
-      getReplaceTargets(lore.replaceBlocksSet),
-    )
-
-    if (error) player.fail(error)
-  }
+interface Storage {
+  shape: string
+  blocksSet: BlocksSetRef
+  blending: number
+  factor: number
 }
 
-function ensureShape(player: Player, shape: string) {
-  if (!isKeyof(shape, SHAPES)) {
-    player.warn(t`Неизвестная кисть: ${shape}`)
-    return Object.keys(SHAPES)[0]
-  } else return shape
-}
+class BrushTool extends WorldEditToolBrush<Storage> {
+  id = 'brush'
+  name = 'кисть'
+  typeId = Items.WeBrush
+  storageSchema = {
+    version: 3,
 
-export const weBrushTool = new BrushTool({
-  id: 'brush',
-  name: 'кисть',
-  itemStackId: Items.WeBrush,
-  loreFormat: {
-    version: 2,
-
+    type: 'brush' as const,
     blocksSet: ['', ''] as BlocksSetRef,
     replaceBlocksSet: ['', ''] as BlocksSetRef,
+    replaceMode: '',
     shape: 'Сфера',
-    type: 'brush',
-    size: 1,
+    size: 3,
     maxDistance: 300,
-  },
+    blending: -1,
+    factor: 20,
+  }
 
-  editToolForm(slot, player) {
-    const lore = this.parseLore(slot.getLore())
+  onBrushUse: WorldEditToolBrush<Storage>['onBrushUse'] = (player, storage, hit) => {
+    const shapeName = this.ensureShape(player, storage.shape)
+    const size = storage.size
+    const center = hit.block.location
+    const permutations = getBlocksInSet(storage.blocksSet)
+    const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
+
+    if (permutations.length < 1) return player.fail('§cПустой набор блоков')
+
+    system.runJob(
+      (function* brushJob() {
+        const from = { x: -size, y: -size, z: -size }
+        const to = { x: size, z: size, y: size }
+
+        WorldEdit.forPlayer(player).backup(
+          `§3Кисть §6${shapeName}§3, размер §f${size}§3, блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
+          Vector.add(center, from),
+          Vector.add(center, to),
+        )
+
+        const shape = SHAPES[shapeName]
+        const cuboid = new Cuboid(from, to)
+        const blendOptions = { ...storage, radius: storage.size }
+
+        let blocksSet = 0
+        for (const vector of Vector.foreach(from, to)) {
+          const condition = shape(
+            Object.setPrototypeOf(
+              { rad: size, ...vector } satisfies Omit<Parameters<ShapeFormula>[0], keyof Cuboid>,
+              cuboid,
+            ) as Parameters<ShapeFormula>[0],
+          )
+          if (!condition) continue
+
+          if (skipForBlending(blendOptions, { vector, center })) continue
+
+          const block = player.dimension.getBlock(Vector.add(center, vector))
+          if (!block) continue
+
+          replaceWithTargets(replaceTargets, getReplaceMode(storage.replaceMode), block, permutations)
+
+          blocksSet++
+          if (blocksSet >= WE_CONFIG.BLOCKS_BEFORE_AWAIT) {
+            yield
+            blocksSet = 0
+          }
+        }
+      })(),
+    )
+  }
+
+  editToolForm(slot: ContainerSlot, player: Player) {
+    const storage = this.getStorage(slot)
     const shapes = Object.keys(SHAPES)
 
     new ModalForm('§3Кисть')
-      .addDropdown('Форма', shapes, { defaultValue: ensureShape(player, lore.shape) })
-      .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
+      .addDropdown('Форма', shapes, { defaultValue: this.ensureShape(player, storage.shape) })
+      .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, storage.size)
 
-      .addDropdown('Набор блоков', ...blocksSetDropdown(lore.blocksSet, player))
-      .addDropdownFromObject('Заменяемый набор блоков', ...replaceTargetsDropdown(lore.replaceBlocksSet, player))
+      .addDropdown('Набор блоков', ...blocksSetDropdown(storage.blocksSet, player))
+      .addDropdown('Заменяемый набор блоков', ...replaceTargetsDropdown(storage.replaceBlocksSet, player))
+      .addDropdown('Режим замены', ...replaceModeDropdown(storage.replaceMode))
 
-      .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet) => {
-        lore.shape = shape
-        lore.size = radius
-        lore.blocksSet = [player.id, blocksSet]
+      .addSlider(
+        'Смешивание с окрущающими блоками\n(-1 чтобы отключить, 0 чтобы сделать площадь круглой)',
+        -1,
+        9,
+        1,
+        storage.blending,
+      )
+      .addSlider('Сила смешивания', 0, 100, 1, storage.factor)
 
-        if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
-        else lore.replaceBlocksSet = ['', '']
-        slot.nameTag = `§r§3Кисть §6${shape}§r §f${blocksSet.replace(SHARED_POSTFIX, '')}`.slice(0, 254)
+      .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet, replaceMode, blending, factor) => {
+        storage.shape = shape
+        storage.size = radius
+        storage.factor = factor
+        storage.blending = blending
+        storage.blocksSet = [player.id, blocksSet]
 
-        slot.setLore(this.stringifyLore(lore))
+        if (replaceBlocksSet) storage.replaceBlocksSet = [player.id, replaceBlocksSet]
+        else storage.replaceBlocksSet = ['', '']
+
+        storage.replaceMode = replaceMode ?? ''
+
+        slot.nameTag = `§r§3Кисть §6${shape}§r §f${shortenBlocksSetName(blocksSet)}`.slice(0, 254)
+
+        this.saveStorage(slot, storage)
         player.success(
-          t`${lore.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
+          t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
             replaceBlocksSet ? t`, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${radius}`,
         )
       })
-  },
+  }
 
-  interval0(player, slot, settings) {
-    const lore = this.parseLore(slot.getLore())
+  interval0: WorldEditToolInterval<this> = (player, slot, settings) => {
+    const storage = this.getStorage(slot)
     const hit = player.getBlockFromViewDirection({
-      maxDistance: lore.maxDistance,
+      maxDistance: storage.maxDistance,
     })
 
     if (hit && !settings.noBrushParticles) {
@@ -113,52 +158,67 @@ export const weBrushTool = new BrushTool({
         z: 0.5,
       })
 
-      if (!BRUSH_LOCATORS.has(player.id)) {
+      if (!this.brushLocators.has(player.id)) {
         try {
           const entity = player.dimension.spawnEntity(CustomEntityTypes.FloatingText, location)
-
           entity.addTag(player.name)
           entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
 
-          BRUSH_LOCATORS.set(player.id, entity)
+          this.brushLocators.set(player.id, entity)
         } catch (error) {
-          if (error instanceof LocationOutOfWorldBoundariesError || error instanceof LocationInUnloadedChunkError)
-            return
-
+          if (isInvalidLocation(error)) return
           console.error(error)
         }
-      } else BRUSH_LOCATORS.get(player.id)?.teleport(location)
+      } else this.brushLocators.get(player.id)?.teleport(location)
     } else {
-      BRUSH_LOCATORS.get(player.id)?.remove()
-      BRUSH_LOCATORS.delete(player.id)
+      this.brushLocators.delete(player.id)
     }
-  },
-})
-
-weBrushTool.command
-  .overload('extrasize')
-  .setDescription('Устанавливает размер кисти больше чем лимит в форме')
-  .setPermissions('techAdmin')
-  .int('Size')
-  .executes((ctx, size) => {
-    if (isNaN(size)) return ctx.error('Размер не является числом')
-
-    const tool = weBrushTool.getToolSlot(ctx.player)
-    if (typeof tool === 'string') return ctx.error(tool)
-
-    const lore = weBrushTool.parseLore(tool.getLore())
-
-    lore.size = size
-
-    tool.setLore(weBrushTool.stringifyLore(lore))
-    ctx.reply('Успешно')
-  })
-
-WorldEditTool.intervals.push((player, slot) => {
-  if (slot.typeId !== weBrushTool.itemId && BRUSH_LOCATORS.has(player.id)) {
-    BRUSH_LOCATORS.get(player.id)?.remove()
-    BRUSH_LOCATORS.delete(player.id)
   }
-})
 
-const BRUSH_LOCATORS = new WeakPlayerMap<Entity>()
+  ensureShape(player: Player, shape: string) {
+    if (!isKeyof(shape, SHAPES)) {
+      player.warn(t`Неизвестная кисть: ${shape}`)
+      return Object.keys(SHAPES)[0]
+    } else return shape
+  }
+
+  constructor() {
+    super()
+    this.createCommand()
+      .overload('extrasize')
+      .setDescription('Устанавливает размер кисти больше чем лимит в форме')
+      .setPermissions('techAdmin')
+      .int('Size')
+      .executes((ctx, size) => {
+        if (isNaN(size)) return ctx.error('Размер не является числом')
+
+        const tool = this.getToolSlot(ctx.player)
+        if (typeof tool === 'string') return ctx.error(tool)
+
+        const storage = this.getStorage(tool)
+        storage.size = size
+        this.saveStorage(tool, storage)
+        ctx.player.success()
+      })
+
+    world.overworld
+      .getEntities({
+        type: CustomEntityTypes.FloatingText,
+        name: WE_CONFIG.BRUSH_LOCATOR,
+      })
+
+      .forEach(e => e.remove())
+
+    WorldEditTool.intervals.push((player, slot) => {
+      if (slot.typeId !== this.typeId && this.brushLocators.has(player.id)) {
+        this.brushLocators.delete(player.id)
+      }
+    })
+  }
+
+  brushLocators = new WeakPlayerMap<Entity>({
+    onDelete: (_, entity) => entity?.remove(),
+  })
+}
+
+export const weBrushTool = new BrushTool()

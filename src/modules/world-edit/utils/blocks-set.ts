@@ -2,7 +2,7 @@ import { Block, BlockPermutation, Player } from '@minecraft/server'
 
 import { noNullable, typeIdToReadable } from 'lib'
 import { table } from 'lib/database/abstract'
-import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS } from './default-block-sets'
+import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS, REPLACE_MODES } from './default-block-sets'
 
 export type BlockStateWeight = [...Parameters<typeof BlockPermutation.resolve>, number]
 
@@ -19,6 +19,12 @@ export type BlocksSetRef = [owner: string, blocksSetName: string]
 export interface ReplaceTarget {
   typeId: string
   states: Record<string, string | number | boolean>
+  matches(block: Block): boolean
+  select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
+}
+
+/** Reference to block replace validation */
+export interface ReplaceMode {
   matches(block: Block): boolean
   select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
 }
@@ -94,36 +100,49 @@ export function getReplaceTargets(ref: BlocksSetRef): ReplaceTarget[] {
   return getActiveBlocksInSet(ref)?.map(fromBlockStateWeightToReplaceTarget) ?? []
 }
 
+const defaultReplaceMode: ReplaceMode = {
+  matches: () => true,
+}
+
+export function getReplaceMode(replaceMode: string) {
+  return REPLACE_MODES[replaceMode] ?? defaultReplaceMode
+}
+
 // HELPERS
 
-export function replaceWithTargets(replaceBlocks: ReplaceTarget[], block: Block, permutations: BlockPermutation[]) {
-  if (!replaceBlocks.length) return block.setPermutation(permutations.randomElement())
+export function replaceWithTargets(
+  replaceBlocks: ReplaceTarget[],
+  replaceMode: ReplaceMode,
+  block: Block,
+  permutations: BlockPermutation[],
+) {
+  if (!replaceMode.matches(block)) return
+
+  const getPermutation = () => replaceMode.select?.(block, permutations) ?? permutations.randomElement()
+  if (!replaceBlocks.length) return block.setPermutation(getPermutation())
 
   for (const replaceBlock of replaceBlocks) {
     if (!replaceBlock.matches(block)) continue
 
-    block.setPermutation(replaceBlock.select?.(block, permutations) ?? permutations.randomElement())
+    block.setPermutation(getPermutation())
   }
 }
 
 // DROPRODWN HELPERS
 
-export function blocksSetDropdown([_, defaultSet]: BlocksSetRef, player: Player): [string[], { defaultValue: string }] {
-  return [Object.keys(getAllBlocksSets(player.id)), { defaultValue: defaultSet }]
+export function blocksSetDropdown([_, defaultSet]: BlocksSetRef, player: Player) {
+  return [Object.keys(getAllBlocksSets(player.id)), { defaultValue: defaultSet }] as const
 }
 
-export function replaceTargetsDropdown(
-  [_, defaultSet]: BlocksSetRef,
-  player: Player,
-): [Record<string, string>, { defaultValue: string; none: true; noneText: 'Любой' }] {
+export function replaceTargetsDropdown([_, defaultSet]: BlocksSetRef, player: Player) {
   return [
-    Object.fromEntries(
-      Object.keys(getAllBlocksSets(player.id))
-        .concat(Object.keys(DEFAULT_REPLACE_TARGET_SETS))
-        .map(e => [e, e]),
-    ),
+    Object.keys(getAllBlocksSets(player.id)).concat(Object.keys(DEFAULT_REPLACE_TARGET_SETS)),
     { defaultValue: defaultSet, none: true, noneText: 'Любой' },
-  ]
+  ] as const
+}
+
+export function replaceModeDropdown(replaceModeName: string) {
+  return [Object.keys(REPLACE_MODES), { defaultValue: replaceModeName, none: true, noneText: 'По умолчанию' }] as const
 }
 
 // STRINGIFIERS

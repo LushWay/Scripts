@@ -28,6 +28,7 @@ import {
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CommandContext } from 'lib/command/context'
 import { Cutscene } from 'lib/cutscene'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
@@ -35,7 +36,9 @@ import { form } from 'lib/form/new'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Rewards } from 'lib/shop/rewards'
+import { t } from 'lib/text'
 import { requestAirdrop } from 'modules/places/anarchy/airdrop'
+import { skipForBlending } from 'modules/world-edit/utils/blending'
 import loot from '../quests/learning/airdrop'
 import './enchant'
 import './properties'
@@ -52,6 +55,45 @@ import './properties'
 // other tests are available only for tech admins and above
 
 const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
+  blending(ctx) {
+    const lore = {
+      blending: Number(ctx.args[1] ?? '7'),
+      radius: 10,
+      zone: -4,
+      height: 0,
+      factor: Number(ctx.args[2] ?? '20'),
+    }
+    const player = ctx.player
+    const { radius, blending, height, zone: offset, factor } = lore
+
+    const center = Vector.floor(player.location)
+    const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
+    const to = Vector.add(center, new Vector(radius, offset, radius))
+
+    player.onScreenDisplay.setActionBar(
+      t`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
+      ActionbarPriority.UrgentNotificiation,
+    )
+
+    for (const vector of Vector.foreach(from, to)) {
+      const block = world.overworld.getBlock(vector)
+      if (!block) continue
+
+      block.setType(MinecraftBlockTypes.GrassBlock)
+    }
+
+    for (const vector of Vector.foreach(from, to)) {
+      if (skipForBlending(lore, { vector, center })) continue
+
+      const block = world.overworld.getBlock(vector)
+      if (!block) continue
+
+      block.setType(MinecraftBlockTypes.Stone)
+    }
+  },
+  rotation(ctx) {
+    ctx.reply(t`${ctx.player.getRotation()}`)
+  },
   air(ctx) {
     const airdrop = new Airdrop({ loot })
     airdrop.spawn(Vector.add(ctx.player.location, { x: 0, y: 30, z: 0 }))

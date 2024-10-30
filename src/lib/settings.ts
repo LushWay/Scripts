@@ -9,6 +9,9 @@ import { table } from './database/abstract'
 import { t } from './text'
 import stringifyError from './utils/error'
 
+// TODO refactor(leaftail1880): Move all types under the Settings namespace
+// TODO refactor(leaftail1880): Move everything into the lib/settings/ folder
+
 type DropdownSetting = [value: string, displayText: string]
 
 /** Any setting value type */
@@ -170,7 +173,7 @@ export class Settings {
             (Settings.isDropdown(value) ? value[0][0] : value)
           )
         },
-        set(v: SettingValue) {
+        set(v: toPlain<SettingValue>) {
           const value = (database[groupId] ??= {})
           value[key] = v
           config[prop].onChange?.()
@@ -191,8 +194,28 @@ export class Settings {
   }
 }
 
+export function settingsModal<const Config extends SettingsConfig<PlayerSettingValues>>(
+  player: Player,
+  config: Config,
+  settingsStorage: SettingsConfigParsed<Config>,
+  back: VoidFunction,
+) {
+  const propertyName = 'modal'
+  settingsGroupMenu(
+    player,
+    propertyName,
+    false,
+    {},
+    { [propertyName]: settingsStorage },
+    { [propertyName]: config },
+    back,
+    false,
+  )
+}
+
 const logger = createLogger('Settings')
 
+// TODO ref(leatail1880): Clenup settingsGroupMenu parameters
 export function settingsGroupMenu(
   player: Player,
   groupName: string,

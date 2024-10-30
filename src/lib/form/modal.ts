@@ -48,11 +48,23 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
    * @param p.defaultValue
    * @returns This
    */
-  addDropdown<T extends string[]>(
+  addDropdown<T extends string[], None extends false | true = false>(
     label: string,
     options: T,
-    { defaultValueIndex = 0, defaultValue }: { defaultValueIndex?: number; defaultValue?: T[number] } = {},
-  ): ModalForm<AppendFormField<Callback, T[number]>> {
+    {
+      defaultValueIndex = 0,
+      defaultValue,
+      none,
+      noneText = ModalForm.arrayDefaultNone,
+    }: {
+      defaultValueIndex?: number
+      defaultValue?: T[number]
+      none?: None
+      noneText?: string
+    } = {},
+  ): ModalForm<AppendFormField<Callback, Exclude<None extends false ? T[number] : T[number] | null, number>>> {
+    if (none) options.unshift(noneText)
+
     if (defaultValue) {
       defaultValueIndex = options.findIndex(e => e === defaultValue)
     }
@@ -76,7 +88,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
    * @param options.noneText
    * @returns This
    */
-  addDropdownFromObject<T extends Record<string, string> = Record<string, string>, None extends false | true = false>(
+  addDropdownFromObject<T extends Record<string, string>, None extends false | true = false>(
     label: string,
     object: T,
     {
@@ -84,7 +96,14 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       defaultValue,
       none,
       noneText = ModalForm.arrayDefaultNone,
-    }: { defaultValueIndex?: number | string; defaultValue?: T[keyof T]; none?: None; noneText?: string } = {},
+      noneSelected = false,
+    }: {
+      defaultValueIndex?: number | string
+      defaultValue?: T[keyof T]
+      none?: None
+      noneText?: string
+      noneSelected?: boolean
+    } = {},
   ): ModalForm<AppendFormField<Callback, Exclude<None extends false ? keyof T : keyof T | null, number>>> {
     let objectKeys: (string | null)[] = Object.keys(object)
     let visibleKeys = Object.values(object)
@@ -92,7 +111,6 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
     let defaultValueIndex = 0
     if (typeof defaultValueIndexInput === 'string') {
       // Index is the keyof object
-
       defaultValueIndex = objectKeys.indexOf(defaultValueIndexInput)
     } else if (typeof defaultValueIndexInput === 'number') {
       // Index is the number, the actual index
@@ -109,7 +127,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       visibleKeys = [noneText, ...visibleKeys]
 
       objectKeys = [null, ...objectKeys]
-      if (typeof defaultValueIndex === 'number') defaultValueIndex++
+      if (typeof defaultValueIndex === 'number' && !noneSelected) defaultValueIndex++
     }
 
     this.args.push({ type: 'dropdown', options: objectKeys })

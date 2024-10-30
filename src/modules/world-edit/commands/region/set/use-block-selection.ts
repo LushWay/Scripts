@@ -1,111 +1,39 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
-
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, ModalForm } from 'lib'
-import { ChestForm } from 'lib/form/chest'
-import { inaccurateSearch } from 'lib/search'
-import { typeIdToReadable } from 'lib/utils/lang'
+import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, typeIdToReadable } from 'lib'
+import { t } from 'lib/text'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
 import {
+  BlocksSetRef,
+  ReplaceTarget,
   getAllBlocksSets,
   getBlocksInSet,
-  ReplaceTarget,
   stringifyBlocksSetRef,
   toReplaceTarget,
 } from 'modules/world-edit/utils/blocks-set'
-import { WorldEdit } from '../../lib/world-edit'
+import { blockIsAvaible } from './block-is-avaible'
+import { ChestButton, setSelectionMenu } from './set-selection'
 
-const set = new Command('set')
-  .setDescription('Частично или полностью заполняет блоки в выделенной области')
-  .setPermissions('builder')
-
-set.string('block').executes((ctx, block) => {
-  const we = WorldEdit.forPlayer(ctx.player)
-  if (!we.selection) return ctx.reply('§cЗона не выделена!')
-  if (!blockIsAvaible(block, ctx.player)) return
-
-  we.fillBetween([BlockPermutation.resolve(block)])
-})
-
-set.executes(ctx => {
-  const we = WorldEdit.forPlayer(ctx.player)
-  if (!we.selection) return ctx.reply('§cЗона не выделена!')
-  ctx.reply('§b> §3Закрой чат!')
-  setSelection(ctx.player)
-})
-
-type SelectedBlock =
-  | { permutations: (BlockPermutation | ReplaceTarget)[] }
-  | { ref: import('modules/world-edit/utils/blocks-set').BlocksSetRef }
-  | undefined
-
-const selectedBlocks = {
-  block: {} as Record<string, SelectedBlock>,
-  replaceBlock: {} as Record<string, SelectedBlock>,
-}
-
-export function setSelection(player: Player) {
-  const [block, blockDisplay] = use(player, 'block', 'Блок, которым будет заполнена область')
-  const [replaceBlock, replaceBlockDisplay] = use(player, 'replaceBlock', 'Заменяемый блок', {
-    notSelected: {
-      description: 'Будут заполнены все блоки. Нажми чтобы выбрать конкретные',
-      icon: 'textures/ui/custom/search.png',
-    },
-  })
-  new ChestForm('small')
-    .title('Заполнение')
-    .pattern(
-      [0, 0],
-      [
-        // A
-        '         ',
-        '  B R D  ',
-        '         ',
-      ],
-      {
-        ' ': {
-          icon: MinecraftBlockTypes.Air,
-        },
-        'B': blockDisplay,
-        'R': replaceBlockDisplay,
-        'D': block
-          ? {
-              icon: 'textures/ui/check',
-              nameTag: 'Заполнить!',
-              callback() {
-                WorldEdit.forPlayer(player).fillBetween(block, replaceBlock)
-              },
-            }
-          : {
-              icon: MinecraftBlockTypes.Barrier,
-              nameTag: '§cВыбери блок, чтобы заполнить!',
-            },
-      },
-    )
-    .show(player)
-}
-
-type ButtonOptions = Omit<import('lib/form/chest').ChestButtonOptions, 'slot'>
-
-function use(
+export function useBlockSelection(
   player: Player,
-  type: keyof typeof selectedBlocks,
+  storage: WeakPlayerMap<SelectedBlock>,
   desc = '',
   {
-    onSelect = setSelection,
+    onSelect = setSelectionMenu,
     notSelected = {},
-  }: { onSelect?: (player: Player) => void; notSelected?: Partial<ButtonOptions> } = {},
-): [blocks: (BlockPermutation | ReplaceTarget)[] | undefined, options: ButtonOptions] {
-  const block = selectedBlocks[type][player.id]
+  }: { onSelect?: (player: Player) => void; notSelected?: Partial<ChestButton> } = {},
+): [blocks: (BlockPermutation | ReplaceTarget)[] | undefined, options: ChestButton] {
+  const block = storage.get(player.id)
 
   const callback = () => {
     selectBlockSource(player, () => onSelect(player), block).then(e => {
-      selectedBlocks[type][player.id] = e
+      storage.set(player, e)
       onSelect(player)
     })
   }
 
-  const empty: ReturnType<typeof use> = [
+  const empty: ReturnType<typeof useBlockSelection> = [
     void 0,
     {
       callback,
@@ -119,7 +47,7 @@ function use(
 
   let result: (BlockPermutation | ReplaceTarget)[]
   let dispaySource: Pick<BlockPermutation, 'getAllStates' | 'type'>
-  let options = {} as ButtonOptions
+  let options = {} as ChestButton
 
   if ('permutations' in block) {
     const type =
@@ -128,8 +56,8 @@ function use(
         : BlockTypes.get(block.permutations[0].typeId)
 
     if (!type) {
-      player.tell('AAAAAAAAAAA ВСЕ СЛОМАЛОСЬ')
-      throw new Error('AAAAAAAAAAAAAAAAAA')
+      player.fail(t.error`Неизвестный тип блока: ${inspect(block.permutations[0])}`)
+      throw new Error(`Unknown block type: ${inspect(block.permutations[0])}`)
     }
 
     dispaySource =
@@ -162,7 +90,6 @@ function use(
 
   return [result, options]
 }
-
 function selectBlockSource(player: Player, back: () => void, currentSelection: SelectedBlock) {
   const selectedBlocksSet = currentSelection && 'ref' in currentSelection && stringifyBlocksSetRef(currentSelection.ref)
 
@@ -235,16 +162,13 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
           })
           const { container } = player
           if (!container) return
-          /** @type {string[]} */
 
           const blocks: string[] = []
           for (let i = 0; i < container.size; i++) {
             const item = container.getItem(i)
-
             if (!item || !BlockTypes.get(item.typeId) || blocks.includes(item.typeId)) continue
 
             const base = 9 * 1 // 1 row
-
             const typeId = item.typeId
 
             form.button({
@@ -285,7 +209,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 
     base
       .addButton('Ввести ID вручную', () => {
-        enterBlockId(player, resolve)
+        selectBlockByIdModal(player, resolve)
       })
       .addButton('§cОчистить выделение', () => {
         resolve(undefined)
@@ -298,63 +222,12 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 
   return promise
 }
-
-/**
- * @param {Player} player
- * @param {(v: SelectedBlock) => void} resolve
- */
-
-function enterBlockId(player: Player, resolve: (v: SelectedBlock) => void, error = '') {
-  new ModalForm('Введи айди блока').addTextField(error + 'ID блока', 'например, stone').show(player, (_, id) => {
-    let text = ''
-    if (
-      !blockIsAvaible(id, {
-        tell(m) {
-          text += m
-        },
-      })
-    )
-      return enterBlockId(player, resolve, text + '\n')
+function selectBlockByIdModal(player: Player, resolve: (v: SelectedBlock) => void, error = '') {
+  new ModalForm('Введи айди блока').addTextField(`${error}ID блока`, 'например, stone').show(player, (_, id) => {
+    let error = ''
+    if (!blockIsAvaible(id, { fail: m => (error += m) })) return selectBlockByIdModal(player, resolve, `${error}\n`)
 
     resolve({ permutations: [BlockPermutation.resolve(id)] })
   })
 }
-
-const prefix = 'minecraft:'
-
-const blocks = BlockTypes.getAll().map(e => e.id.substring(prefix.length))
-
-/**
- * @param {string} block
- * @param {{ tell(s: string): void }} player
- * @returns {boolean}
- */
-
-function blockIsAvaible(block: string, player: { tell(s: string): void }): boolean {
-  if (blocks.includes(block)) return true
-
-  player.tell('§cБлока §f' + block + '§c не существует.')
-
-  let search = inaccurateSearch(block, blocks)
-
-  const options = {
-    minMatchTriggerValue: 0.5,
-    maxDifferenceBeetwenSuggestions: 0.15,
-    maxSuggestionsCount: 3,
-  }
-
-  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return false
-
-  const suggest = (a: [string, number]) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
-
-  let suggestion = '§cВы имели ввиду ' + suggest(search[0])
-  const firstValue = search[0][1]
-  search = search
-    .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
-    .slice(1, options.maxSuggestionsCount)
-
-  for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
-
-  player.tell(suggestion + '§c?')
-  return false
-}
+export type SelectedBlock = { permutations: (BlockPermutation | ReplaceTarget)[] } | { ref: BlocksSetRef } | undefined

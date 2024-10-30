@@ -72,56 +72,6 @@ export const util = {
     }
   },
 
-  /**
-   * Wraps the line
-   *
-   * @param string
-   * @param maxLength
-   */
-  wrap(string: string, maxLength: number) {
-    /** @type {string[]} */
-    const lines: string[] = []
-    const rawlines = string.split('')
-
-    for (const char of rawlines) {
-      if (!char) continue
-
-      // Empty lines, add first char
-      if (!lines.length) {
-        lines.push(char)
-        continue
-      }
-
-      // Last element index
-      const i = lines.length - 1
-      const line = lines[i]
-      const lastLineChar = line[line.length - 1]
-
-      if (lastLineChar === '§' || char === '§') {
-        // Ignore limit for invisible chars
-        lines[i] += char
-      } else if ((char + line).replace(/§./g, '').length > maxLength) {
-        // Limit exceeded, newline
-        char.trim() && lines.push(char)
-      } else {
-        // No limit, add char to the line
-        lines[i] += char
-      }
-    }
-
-    return lines
-  },
-
-  wrapLore(lore: string) {
-    let color = '§7'
-    return this.wrap(lore, 30).map(e => {
-      // Get latest color from the string
-      const match = /^.*(§.)/.exec(e)
-      if (match) color = match[1]
-      return '§r' + color + e
-    })
-  },
-
   /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
     return __SERVER__
@@ -129,6 +79,60 @@ export const util = {
           TerminalColors.r
       : text.replace(/§(.)/g, '')
   },
+}
+
+/**
+ * Wraps the line
+ *
+ * @param string
+ * @param maxLength
+ */
+export function wrap(string: string, maxLength: number) {
+  /** @type {string[]} */
+  const lines: string[] = []
+  const rawlines = string.split('')
+
+  for (const char of rawlines) {
+    if (!char) continue
+
+    // Empty lines, add first char
+    if (!lines.length) {
+      lines.push(char)
+      continue
+    }
+
+    // Last element index
+    const i = lines.length - 1
+    const line = lines[i]
+    const lastLineChar = line[line.length - 1]
+
+    if (lastLineChar === '§' || char === '§') {
+      // Ignore limit for invisible chars
+      lines[i] += char
+    } else if ((char + line).replace(/§./g, '').length > maxLength) {
+      // Limit exceeded, newline
+      char.trim() && lines.push(char)
+    } else {
+      // No limit, add char to the line
+      lines[i] += char
+    }
+  }
+
+  return lines
+}
+
+export function wrapLore(lore: string,) {
+  let color = '§7'
+  return wrap(lore, 30).map(e => {
+    // Get latest color from the string
+    const match = /^.*(§.)/.exec(e)
+    if (match) color = match[1]
+    return '§r' + color + e
+  })
+}
+
+export function wrapLoreArray(lore: string[]) {
+  return lore.map(wrapLore).flat()
 }
 
 export type Paginator = ReturnType<(typeof util)['paginate']>

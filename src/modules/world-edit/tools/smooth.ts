@@ -1,79 +1,74 @@
-import { Block, BlockPermutation, Player, system, world } from '@minecraft/server'
+import { Block, BlockPermutation, ContainerSlot, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, util, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ngettext } from 'lib/utils/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
-import { BlocksSetRef, getAllBlocksSets, getReplaceTargets, ReplaceTarget } from 'modules/world-edit/utils/blocks-set'
+import {
+  BlocksSetRef,
+  getReplaceTargets,
+  ReplaceTarget,
+  replaceTargetsDropdown,
+} from 'modules/world-edit/utils/blocks-set'
 import { WorldEditToolBrush } from '../lib/world-edit-tool-brush'
-import { SHARED_POSTFIX } from '../utils/default-block-sets'
+import { shortenBlocksSetName } from '../utils/default-block-sets'
 
-interface SmoothProps {
+interface Storage {
   smoothLevel: number
 }
 
 // TODO Cache invalidation
-
-class SmoothTool extends WorldEditToolBrush<SmoothProps> {
-  onBrushUse: WorldEditToolBrush<SmoothProps>['onBrushUse'] = (player, lore, hit) => {
+class SmoothTool extends WorldEditToolBrush<Storage> {
+  onBrushUse: WorldEditToolBrush<Storage>['onBrushUse'] = (player, lore, hit) => {
     smoothVoxelData(player, hit.block, lore.size, lore.smoothLevel, getReplaceTargets(lore.replaceBlocksSet)).catch(
-      // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable
-      console.error,
+      (e: unknown) => console.error(e),
     )
   }
-}
 
-const smoother = new SmoothTool({
-  id: 'smoother',
-  name: 'сглаживание',
-  itemStackId: Items.WeBrush,
-  loreFormat: {
+  id = 'smoother'
+  name = 'сглаживание'
+  typeId = Items.WeBrush
+  storageSchema = {
     version: 2,
+    type: 'smoother',
 
     replaceBlocksSet: ['', ''] as BlocksSetRef,
-    type: 'smoother',
+    replaceMode: '',
     smoothLevel: 1,
     size: 1,
     maxDistance: 300,
-  },
+  }
 
-  editToolForm(slot, player) {
-    const lore = smoother.parseLore(slot.getLore())
+  editToolForm(slot: ContainerSlot, player: Player) {
+    const storage = this.getStorage(slot)
 
-    void new ModalForm('§3Сглаживание')
-
-      .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.size)
-      .addSlider('Сила сглаживания', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, lore.smoothLevel)
-      .addDropdownFromObject(
-        'Заменяемый набор блоков',
-        Object.fromEntries(Object.keys(getAllBlocksSets(player.id)).map(e => [e, e])),
-        {
-          defaultValue: lore.replaceBlocksSet[1],
-          none: true,
-          noneText: 'Любой',
-        },
-      )
+    new ModalForm('§3Сглаживание')
+      .addSlider('Размер', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, storage.size)
+      .addSlider('Сила сглаживания', 1, is(player.id, 'grandBuilder') ? 20 : 10, 1, storage.smoothLevel)
+      .addDropdown('Заменяемый набор блоков', ...replaceTargetsDropdown(storage.replaceBlocksSet, player))
 
       .show(player, (ctx, size, smoothLevel, replaceBlocksSet) => {
-        lore.size = size
+        storage.size = size
 
-        lore.smoothLevel = smoothLevel
+        storage.smoothLevel = smoothLevel
 
-        if (replaceBlocksSet) lore.replaceBlocksSet = [player.id, replaceBlocksSet]
-        slot.nameTag = `§r§3Сглаживание §6${size}§r §f${replaceBlocksSet ? replaceBlocksSet.replace(SHARED_POSTFIX, '') : ''}`
+        if (replaceBlocksSet) storage.replaceBlocksSet = [player.id, replaceBlocksSet]
+        slot.nameTag = `§r§3Сглаживание §6${size}§r §f${shortenBlocksSetName(replaceBlocksSet)}`
 
-        slot.setLore(smoother.stringifyLore(lore))
+        this.saveStorage(slot, storage)
         player.success(
           `${
-            lore.replaceBlocksSet[0] ? 'Отредактирована' : 'Создана'
+            storage.replaceBlocksSet[0] ? 'Отредактирована' : 'Создана'
           } сглаживатель размером ${size} и силой ${smoothLevel}${
             replaceBlocksSet ? `, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${size}`,
         )
       })
-  },
-})
+  }
+}
+
+new SmoothTool()
 
 export async function smoothVoxelData(
   player: Player,

@@ -18,13 +18,14 @@ import './commands/selection/size'
 
 import './commands/region/copy'
 import './commands/region/paste'
-import './commands/region/set'
+import './commands/region/set/set-command'
+import './commands/region/set/set-selection'
 
 import './builder'
 
 import './tools/brush'
 import './tools/clipboard'
-import './tools/nylium'
+import './tools/randomizer'
 import './tools/shovel'
 import './tools/smooth'
 import './tools/tool'

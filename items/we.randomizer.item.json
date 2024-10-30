@@ -1,0 +1,21 @@
+{
+  "format_version": "1.18.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "we:randomizer"
+    },
+    "components": {
+      "minecraft:max_stack_size": 1,
+      "minecraft:foil": true,
+      "minecraft:icon": {
+        "texture": "name_tag"
+      },
+      "minecraft:display_name": {
+        "value": "Случайный блок\n§7Настраивается с помощью §f-we"
+      },
+      "minecraft:creative_category": {
+        "category": "construction"
+      }
+    }
+  }
+}
