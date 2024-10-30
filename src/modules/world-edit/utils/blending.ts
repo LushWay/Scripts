@@ -10,9 +10,6 @@ export function skipForBlending(
 ) {
   if (blending === -1) return dontBlend
 
-  const vectorId = Vector.string(vector)
-  if (blendStorage.has(vectorId)) return true
-
   const distance = ~~Vector.distance(vector, center)
 
   if (blending === 0) {
@@ -21,6 +18,9 @@ export function skipForBlending(
   } else {
     // Blending
     if (blending < radius) {
+      const vectorId = Vector.string(vector)
+      if (blendStorage.has(vectorId)) return true
+
       const blendingFactor = 1 + factor * 0.01
       if (Math.randomInt(radius - blending, radius) < distance * blendingFactor) {
         blendStorage.add(vectorId)
