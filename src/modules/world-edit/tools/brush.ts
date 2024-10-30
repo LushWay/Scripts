@@ -211,7 +211,8 @@ class BrushTool extends WorldEditToolBrush<Storage> {
 
     WorldEditTool.intervals.push((player, slot) => {
       if (slot.typeId !== this.typeId && this.brushLocators.has(player.id)) {
-        this.brushLocators.delete(player.id)
+        this.brushLocators.get(player)?.remove()
+        this.brushLocators.delete(player)
       }
     })
   }

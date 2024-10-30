@@ -61,27 +61,6 @@ export class LongDynamicProperty {
     return JSON.parse(metadata.value || defaultValue) as unknown
   }
 
-  static getJob(propertyId: string, defaultValue = '{}', onDone: (value: unknown) => void) {
-    const metadata = this.getMetadata(propertyId)
-    if (!metadata.value) {
-      metadata.value = ''
-      system.runJob(
-        (function* longDynamicPropertyLoader() {
-          for (let i = 0; i < metadata.length; i++) {
-            yield
-            if (!LongDynamicProperty.getProperty(propertyId, metadata, i)) {
-              return console.error(
-                `Table ${propertyId}, unable to load entries ${metadata.length - 1 - i} (${i + 1}/${metadata.length})`,
-              )
-            }
-          }
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          onDone(JSON.parse(metadata.value || defaultValue) as unknown)
-        })(),
-      )
-    }
-  }
-
   static set(propertyId: string, value: string) {
     const strings = value.match(DatabaseUtils.propertyChunkRegexp)
     if (!strings) throw new DatabaseError('Failed to save db: cannot split')
