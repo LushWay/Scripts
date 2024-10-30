@@ -1,4 +1,3 @@
-import { system } from '@minecraft/server'
 import { LongDynamicProperty } from './properties'
 
 export class LimitedSet<T> extends Set<T> {
@@ -24,12 +23,11 @@ export class PersistentSet<T extends Json> extends LimitedSet<T> {
   private load() {
     const id = `PersistentSet<${this.id}>:`
     try {
-      LongDynamicProperty.getJob(this.id, '[]', values => {
-        if (typeof values === 'undefined') return // Set was not saved
-        if (!Array.isArray(values)) return console.warn(`${id} Dynamic property is not array, it is:`, values)
+      const values = LongDynamicProperty.get(this.id, '[]')
+      if (typeof values === 'undefined') return // Set was not saved
+      if (!Array.isArray(values)) return console.warn(`${id} Dynamic property is not array, it is:`, values)
 
-        system.runJobForEach(values as T[], value => this.add(value))
-      })
+      values.forEach(e => this.add(e as T))
     } catch (error) {
       console.error(`${id} Failed to load:`, error)
     }
