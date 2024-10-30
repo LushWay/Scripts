@@ -21,12 +21,14 @@ export function skipForBlending(
 
   const distance = ~~Vector.distance(vector, center)
 
-  // Circle
-  if (distance > radius) return blend(vectorId)
-
-  // Blending
-  if (blending > 0 && blending < radius) {
-    const blendingFactor = 1 + factor * 0.01
-    if (Math.randomInt(radius - blending, radius) < distance * blendingFactor) return blend(vectorId)
+  if (blending === 0) {
+    // Circle
+    if (distance > radius) return blend(vectorId)
+  } else {
+    // Blending
+    if (blending < radius) {
+      const blendingFactor = 1 + factor * 0.01
+      if (Math.randomInt(radius - blending, radius) < distance * blendingFactor) return blend(vectorId)
+    }
   }
 }
