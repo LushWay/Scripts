@@ -14,7 +14,7 @@ export function skipForBlending(
   { blending, radius, factor }: { blending: number; radius: number; factor: number },
   { vector, center }: { vector: Vector3; center: Vector3 },
 ) {
-  if (blending <= 0) return dontBlend
+  if (blending === -1) return dontBlend
 
   const vectorId = Vector.string(vector)
   if (blendStorage.has(vectorId)) return true
