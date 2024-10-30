@@ -29,6 +29,8 @@ export function skipForBlending(
 
       const blendingFactor = 1 + factor * 0.01
       if (Math.randomInt(toBlend, radius) < distance * blendingFactor) return true
-    } else return dontBlend()
+    }
   }
+
+  return dontBlend()
 }
