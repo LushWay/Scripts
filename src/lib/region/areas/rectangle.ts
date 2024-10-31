@@ -1,18 +1,25 @@
 import { Vector3 } from '@minecraft/server'
+import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
 import { Area } from './area'
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-type Rect = {
+class Rectangle extends Area<{
   from: { x: number; z: number; y: number }
   to: { x: number; z: number; y: number }
-}
-
-class Rectangle extends Area<Rect> {
+}> {
   type = 'rect'
 
-  isVectorIn(vector: Vector3, dimension: Dimensions) {
-    return super.isVectorIn(vector, dimension) && Vector.between(...this.edges, vector)
+  isNear(point: AbstractPoint, distance: number): boolean {
+    const { vector, dimensionType } = toPoint(point)
+    if (!this.isOurDimension(dimensionType)) return false
+
+    const [from, to] = this.edges
+
+    return Vector.between(
+      distance === 0 ? from : Vector.add(Vector.min(from, to), { x: -distance, y: -distance, z: -distance }),
+      distance === 0 ? to : Vector.add(Vector.max(from, to), { x: distance, y: distance, z: distance }),
+      vector,
+    )
   }
 
   get center() {
@@ -26,16 +33,6 @@ class Rectangle extends Area<Rect> {
   get edges(): [Vector3, Vector3] {
     return [this.database.from, this.database.to]
   }
-
-  isNear(vector: Vector3, distance: number): boolean {
-    const [from, to] = this.edges
-
-    return Vector.between(
-      Vector.add(Vector.min(from, to), { x: -distance, y: -distance, z: -distance }),
-      Vector.add(Vector.max(from, to), { x: distance, y: distance, z: distance }),
-      { x: vector.x, y: vector.y, z: vector.z },
-    )
-  }
 }
 
-export const RectangleArea = Rectangle.SaveableArea()
+export const RectangleArea = Rectangle.asSaveableArea()

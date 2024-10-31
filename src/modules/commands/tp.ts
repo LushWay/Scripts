@@ -28,9 +28,9 @@ function tpMenu(player: Player) {
     'Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!',
   )
 
-  const players = world.getAllPlayers().map(e => ({
-    location: e.location,
-    dimension: e.dimension.type,
+  const players = world.getAllPlayers().map(player => ({
+    vector: player.location,
+    dimensionType: player.dimension.type,
   }))
 
   const locations: Record<string, ReturnType<typeof location>> = {
@@ -74,9 +74,9 @@ function tpToPlayer(player: Player) {
 function location(
   place: Pick<SafePlace, 'portalTeleportsTo' | 'safeArea'>,
   fallback: string,
-  players: { location: Vector3; dimension: Dimensions }[],
+  players: { vector: Vector3; dimensionType: DimensionType }[],
 ) {
-  const playersC = players.filter(e => place.safeArea?.area.isVectorIn(e.location, e.dimension)).length
+  const playersC = players.filter(player => place.safeArea?.area.isIn(player)).length
 
   if (place.portalTeleportsTo.valid) {
     return {

@@ -6,10 +6,10 @@ import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 class StoneQuarryInvestigating {
   private place = StoneQuarry
 
-  quest = new Quest('StoneQuarryInvestigating', StoneQuarry.name, 'Исследуйте новый город!', (q, p) => {
+  quest = new Quest('StoneQuarryInvestigating', StoneQuarry.name, 'Исследуйте новый город!', (q, player) => {
     if (!StoneQuarry.safeArea || !StoneQuarry.cutscene.start) return q.failed('Каменеломня не настроена')
 
-    if (!StoneQuarry.safeArea.area.isVectorIn(p.location, p.dimension.type)) {
+    if (!StoneQuarry.safeArea.area.isIn(player)) {
       q.place(...Vector.around(StoneQuarry.cutscene.start, 4), 'Доберитесь до города!')
       q.dynamic('Обзор города').activate(ctx => {
         this.place.cutscene.play(ctx.player)?.finally(() => ctx.next())

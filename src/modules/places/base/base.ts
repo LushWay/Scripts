@@ -1,16 +1,15 @@
 import { Block, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { LockAction, Mail, Region, Vector, getBlockStatus } from 'lib'
+import { AbstractPoint, getBlockStatus, LockAction, Mail, Region, Vector } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { Rewards } from 'lib/shop/rewards'
-import { openBaseMenu } from 'modules/places/base/base-menu'
+import { createLogger } from 'lib/utils/logger'
 import { askForExitingNewbieMode, isNewbie } from 'modules/pvp/newbie'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion } from './region'
-import { createLogger } from 'lib/utils/logger'
 
 export const BaseItem = new CustomItemWithBlueprint('base')
   .typeId(MinecraftItemTypes.Barrel)
@@ -46,7 +45,6 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   }
 
   const region = BaseRegion.instances().find(e => e.getMemberRole(player) !== false)
-
   if (region) {
     event.cancel = true
     const isOwner = region.getMemberRole(player) === 'owner'
@@ -62,47 +60,12 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   system.delay(() => createBase(block, player))
 })
 
-new Command('base').setDescription('Меню базы').executes(ctx => openBaseMenu(ctx.player))
-
-system.runInterval(
-  () => {
-    const playersLocations = world.getAllPlayers().map(p => ({ d: p.dimension.type, l: p.location }))
-
-    for (const base of BaseRegion.instances()) {
-      const block = getBlockStatus({ location: base.area.center, dimensionId: base.dimensionId })
-      if (block === 'unloaded') continue
-
-      if (block.typeId === MinecraftBlockTypes.Barrel) {
-        if (playersLocations.some(p => p.d === base.dimensionId && base.area.isNear(p.l, 10))) {
-          spawnParticlesInArea(base.area.center, Vector.add(base.area.center, Vector.one))
-        }
-      } else {
-        // TODO База должна сгнить
-        base.forEachOwner(player => {
-          const message = `§cБаза с владельцем §f${base.ownerName}§c разрушена.`
-          if (player instanceof Player) {
-            player.fail(message)
-          } else {
-            Mail.send(
-              player,
-              message,
-              'База была зарейжена. Сожалеем. Вы все еще можете восстановить ее если она не сгнила',
-              new Rewards(),
-            )
-          }
-        })
-      }
-    }
-  },
-  'baseInterval',
-  10,
-)
-
 const logger = createLogger('Base')
 
 function createBase(block: Block, player: Player) {
   const center = Vector.floor(block.location)
   if (!player.isSimulated()) logger.player(player).info`Created on ${center}`
+
   BaseRegion.create(new SphereArea({ center, radius: 10 }, block.dimension.type), {
     permissions: {
       doors: false,
@@ -116,3 +79,38 @@ function createBase(block: Block, player: Player) {
   })
   player.success('База успешно создана! Чтобы открыть меню базы используйте команду §6.base')
 }
+system.runInterval(
+  () => {
+    const players = world
+      .getAllPlayers()
+      .map(p => ({ dimensionType: p.dimension.type, vector: p.location })) satisfies AbstractPoint[]
+
+    for (const base of BaseRegion.instances()) {
+      const block = getBlockStatus({ location: base.area.center, dimensionId: base.dimensionType })
+      if (block === 'unloaded') continue
+
+      if (block.typeId === MinecraftBlockTypes.Barrel) {
+        if (players.some(player => base.area.isNear(player, 10))) {
+          spawnParticlesInArea(base.area.center, Vector.add(base.area.center, Vector.one))
+        }
+      } else {
+        // TODO База должна сгнить
+        base.forEachOwner(player => {
+          const message = `§cБаза с владельцем §f${base.ownerName}§c разрушена.`
+          if (player instanceof Player) {
+            player.fail(message)
+          } else {
+            Mail.send(
+              player,
+              message,
+              'База была зарейжена. Сожалеем. Вы все еще можете восстановить ее если она не сгнила полностью',
+              new Rewards(),
+            )
+          }
+        })
+      }
+    }
+  },
+  'baseInterval',
+  10,
+)

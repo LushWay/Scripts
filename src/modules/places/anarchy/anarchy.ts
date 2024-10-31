@@ -115,11 +115,7 @@ class AnarchyBuilder extends AreaWithInventory {
       .join('\n')}`
 
     // Do not save location if on spawn
-    if (
-      Spawn.region?.area.isVectorIn(player.location, player.dimension.type) ||
-      player.database.survival.doNotSaveAnarchy
-    )
-      return
+    if (Spawn.region?.area.isIn(player) || player.database.survival.doNotSaveAnarchy) return
     player.database.survival.anarchy = {
       x: Math.round(player.location.x),
       z: Math.round(player.location.z),

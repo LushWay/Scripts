@@ -1,18 +1,20 @@
-import { Dimension, system, world } from '@minecraft/server'
+import { Block, Dimension, Entity, system, world } from '@minecraft/server'
 import { Vector } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area
-export type TypedArea<T = AreaCreator> = T & {
+export type AreaWithType<T = AreaCreator> = T & {
   type: string
 }
 
+export type AbstractPoint = { vector: Vector3; dimensionType: DimensionType } | Entity | Block
+
 export abstract class Area<T extends JsonObject = JsonObject> {
-  static areas: TypedArea[] = []
+  static areas: AreaWithType[] = []
 
   static loaded = false
 
-  static SaveableArea<T extends AreaCreator>(this: T) {
-    const b = this as TypedArea<T>
+  static asSaveableArea<T extends AreaCreator>(this: T) {
+    const b = this as AreaWithType<T>
     b.type = new (this as unknown as AreaCreator)({}).type
 
     if ((this as unknown as typeof Area).loaded) {
@@ -21,23 +23,20 @@ export abstract class Area<T extends JsonObject = JsonObject> {
       )
     }
 
-    ;(this as unknown as typeof Area).areas.push(b as unknown as TypedArea)
+    ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
     return b
   }
 
   constructor(
     protected database: T,
-    public dimensionId: Dimensions = 'overworld',
+    public dimensionType: DimensionType = 'overworld',
   ) {}
 
   abstract type: string
 
-  /** Checks if the vector is in the region */
-  isVectorIn(vector: Vector3, dimensionId: Dimensions) {
-    if (this.dimensionId !== dimensionId) return false
-
-    // See the implementation in the sub class
-    return true
+  /** Checks if the point is inside the area */
+  isIn(point: AbstractPoint) {
+    return this.isNear(point, 0)
   }
 
   /** Edges of the area */
@@ -46,8 +45,11 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   /** Center of the area */
   abstract get center(): Vector3
 
-  // TODO dimensionType support
-  abstract isNear(vector: Vector3, distance: number): boolean
+  abstract isNear(point: AbstractPoint, distance: number): boolean
+
+  protected isOurDimension(dimensionType: DimensionType) {
+    return this.dimensionType === dimensionType
+  }
 
   get radius() {
     return Vector.distance(...this.edges) / 2
@@ -67,12 +69,12 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   }
 
   protected get dimension() {
-    return world[this.dimensionId]
+    return world[this.dimensionType]
   }
 
   forEachVector(callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void) {
     const { edges, dimension } = this
-    const isIn = (v: Vector3) => this.isVectorIn(v, this.dimensionId)
+    const isIn = (vector: Vector3) => this.isIn({ vector, dimensionType: this.dimensionType })
 
     return new Promise<void>((resolve, reject) => {
       system.runJob(

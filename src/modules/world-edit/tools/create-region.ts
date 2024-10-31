@@ -66,7 +66,7 @@ class RegionTool extends WorldEditTool<Storage> {
       )
 
     const regions = storage.minDistanceSameKind ? createableRegion.region.instances() : Region.regions
-    if (regions.some(r => r.area.isNear(player.location, storage.minDistance)))
+    if (regions.some(r => r.area.isNear(player, storage.minDistance)))
       return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.PvP)
 
     createableRegion.region.create(

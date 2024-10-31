@@ -72,7 +72,7 @@ RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
     playerTimeouts.set(player, {
       expires: Date.now() + ms.from('sec', 4),
       callback() {
-        if (lockAction.isLocked(player) && !region.area.isVectorIn(player.location, player.dimension.type)) {
+        if (lockAction.isLocked(player) && !region.area.isIn(player)) {
           player.teleport(region.area.center)
         }
       },

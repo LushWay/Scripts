@@ -33,7 +33,7 @@ new LockAction(player => IN_SKY.has(player.id), '§cВ начале коснит
  * @param {number} [options.y=200] - The height at which to teleport the player. Default is `200`
  * @param {number} [options.fromYtoBlock=60] - The minimum distance between the player and the ground for the
  *   teleportation to be valid. Default is `60`
- * @param {Dimensions} [options.dimension='overworld'] - The dimension in which to teleport the player. Default is
+ * @param {DimensionType} [options.dimension='overworld'] - The dimension in which to teleport the player. Default is
  *   `'overworld'`
  * @param {boolean} [options.elytra=true] - Whether or not to give the player an elytra after teleportation. Default is
  *   `true`
@@ -62,7 +62,7 @@ export function randomTeleport(
   }: {
     y?: number
     fromYtoBlock?: number
-    dimension?: Dimensions
+    dimension?: DimensionType
     elytra?: boolean
     c?: number
     teleportCallback?: (location: Vector3) => void

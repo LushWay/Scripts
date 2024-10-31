@@ -48,14 +48,14 @@ export class Group {
     }
   }
 
-  dimensionId: Dimensions = 'overworld'
+  dimensionId: DimensionType = 'overworld'
 
   /**
    * Sets group dimension id
    *
    * @param dimension
    */
-  setDimensionId(dimension: Dimensions) {
+  setDimensionId(dimension: DimensionType) {
     this.dimensionId = dimension
     return this
   }

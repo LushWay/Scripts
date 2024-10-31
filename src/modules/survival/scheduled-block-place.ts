@@ -14,7 +14,7 @@ interface ScheduledBlockPlace {
 }
 
 export const SCHEDULED_DB = table<ScheduledBlockPlace[]>('ScheduledBlockPlace', () => []) as Record<
-  Dimensions,
+  DimensionType,
   ScheduledBlockPlace[]
 >
 
@@ -23,14 +23,14 @@ export function scheduleBlockPlace({
   restoreTime,
   ...options
 }: Omit<ScheduledBlockPlace, 'date'> & {
-  dimension: Dimensions
+  dimension: DimensionType
   restoreTime: number
 }) {
   if (!isScheduledToPlace(options.location, dimension))
     SCHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
 
-export function isScheduledToPlace(location: Vector3, dimension: Dimensions) {
+export function isScheduledToPlace(location: Vector3, dimension: DimensionType) {
   const dimblocks = IMMUTABLE_DB[dimension]
   if (typeof dimblocks === 'undefined') return false
 
@@ -102,7 +102,7 @@ timeout()
 function getScheduleBlock(
   schedule: Readonly<ScheduledBlockPlace>,
   i: number,
-  dimension: Dimensions,
+  dimension: DimensionType,
   schedules: readonly ScheduledBlockPlace[],
 ) {
   if (typeof schedule === 'undefined') {

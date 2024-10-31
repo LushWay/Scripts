@@ -5,7 +5,7 @@ import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/kinds/region'
-import { textTable } from 'lib/text'
+import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { SphereArea } from './areas/sphere'
@@ -30,11 +30,11 @@ function regionForm(player: Player) {
     '§7Чтобы создать регион, перейдите в список определенных регионов',
   )
 
-  const currentRegion = Region.nearestRegion(player.location, player.dimension.type)
+  const currentRegion = Region.getAt(player)
 
   if (currentRegion)
     form.addButton(
-      'Регион на ' + Vector.string(Vector.floor(currentRegion.area.center), true) + '§f\n' + currentRegion.name,
+      `Регион на ${Vector.string(Vector.floor(currentRegion.area.center), true)}§f\n${currentRegion.name}`,
       () => editRegion(player, currentRegion, () => regionForm(player)),
     )
 
@@ -75,7 +75,7 @@ const pluralForms: WordPluralForms = ['региона', 'регион', 'в ре
 function editRegion(player: Player, region: Region, back: () => void) {
   const selfback = () => editRegion(player, region, back)
   const form = new ActionForm(
-    'Регион ' + region.name,
+    `Регион ${region.name}`,
     textTable({
       'Тип региона': region.creator.name,
       'Центр': Vector.string(region.area.center, true),
@@ -99,13 +99,22 @@ function editRegion(player: Player, region: Region, back: () => void) {
     )
 
   if (region.structure) {
-    const color = region.structure.exists ? '' : '§7'
-    form.addButton(`${color}Восстановить структуру`, () => region.structure?.place())
-    form.addButton(`${color}Пересохранить структуру`, () => {
-      region.structure?.delete()
-      region.structure?.save()
+    const exists = region.structure.exists
+    const color = exists ? '' : '§7'
+
+    if (!exists) form.addButton(`Установить структуру в мир`, () => region.structure?.place())
+    form.addButton(`${color}${exists ? 'Перес' : 'С'}охранить структуру`, async () => {
+      player.info('Сохраняем структуру...')
+      try {
+        if (exists) region.structure?.delete()
+        await region.structure?.save()
+
+        player.success('Структура успешно сохранена')
+      } catch (e) {
+        player.fail(t.error`Не удалось сохранить структуру: ${e}`)
+      }
     })
-    form.addButtonPrompt('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
+    if (exists) form.addButtonPrompt('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
   }
 
   form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
@@ -199,6 +208,9 @@ export function editRegionPermissions(
     back()
   })
 }
+
+// TODO Remove use of the plural forms
+// TODO Migrate to settingsMenu after its refactor
 
 export function manageRegionMembers(
   player: Player,

@@ -10,7 +10,7 @@ export interface LeaderboardInfo {
   objective: string
   displayName: string
   location: Vector3
-  dimension: Dimensions
+  dimension: DimensionType
 }
 
 export class Leaderboard {

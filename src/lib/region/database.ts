@@ -17,7 +17,7 @@ export interface RegionSave {
 
   /** Linked database */
   ldb?: RLDB
-  dimensionId: Dimensions
+  dimensionId: DimensionType
   permissions: Partial<RegionPermissions>
 }
 

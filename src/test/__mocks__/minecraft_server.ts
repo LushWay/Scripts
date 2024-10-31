@@ -118,6 +118,8 @@ export class Entity {
   }
 }
 
+export class Block {}
+
 export class Player extends Entity {
   constructor(initialSpawn = true) {
     super()

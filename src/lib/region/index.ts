@@ -9,7 +9,7 @@ import {
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
-import { isBuilding } from 'lib/game-utils'
+import { AbstractPoint, isBuilding } from 'lib/game-utils'
 import { EventSignal } from '../event-signal'
 import {
   BLOCK_CONTAINERS,
@@ -23,6 +23,7 @@ import {
 } from './config'
 import { RegionEvents } from './events'
 import { Region } from './kinds/region'
+
 export * from './command'
 export * from './config'
 export * from './database'
@@ -106,15 +107,15 @@ const allowed: InteractionAllowed = (player, region, context, regions) => {
   }
 }
 
-function getRegions(location: Vector3, dimensionType: Dimensions) {
-  const regions = Region.nearestRegions(location, dimensionType)
+function getRegions(point: AbstractPoint) {
+  const regions = Region.getManyAt(point)
   const region = regions[0] as Region | undefined
   return { region, regions }
 }
 
 /** Permissions for region */
 world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-  const { regions, region } = getRegions(event.block, event.player.dimension.type)
+  const { regions, region } = getRegions(event.block)
   if (allowed(event.player, region, { type: 'interactWithBlock', event }, regions)) return
 
   event.cancel = true
@@ -122,7 +123,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event => {
 
 /** Permissions for region */
 world.beforeEvents.playerInteractWithEntity.subscribe(event => {
-  const { regions, region } = getRegions(event.target.location, event.player.dimension.type)
+  const { regions, region } = getRegions(event.target)
   if (allowed(event.player, region, { type: 'interactWithEntity', event }, regions)) return
 
   // Allow interacting with any interactable entity by default
@@ -133,7 +134,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
 
 /** Permissions for region */
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
-  const { regions, region } = getRegions(event.block.location, event.player.dimension.type)
+  const { regions, region } = getRegions(event.block)
   if (allowed(event.player, region, { type: 'place', event }, regions)) return
 
   event.cancel = true
@@ -141,7 +142,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 
 /** Permissions for region */
 world.beforeEvents.playerBreakBlock.subscribe(event => {
-  const { regions, region } = getRegions(event.block.location, event.player.dimension.type)
+  const { regions, region } = getRegions(event.block)
   if (allowed(event.player, region, { type: 'break', event }, regions)) return
 
   event.cancel = true
@@ -151,7 +152,7 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   const { typeId } = entity
   if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid()) return
 
-  const region = Region.nearestRegion(entity.location, entity.dimension.type)
+  const region = Region.getAt(entity)
 
   if (isForceSpawnInRegionAllowed(entity) || (typeId === 'minecraft:item' && region?.permissions.allowedAllItem)) return
   if (!region || region.permissions.allowedEntities === 'all' || region.permissions.allowedEntities.includes(typeId))
@@ -164,7 +165,7 @@ system.runInterval(
   () => {
     for (const player of world.getAllPlayers()) {
       const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
-      const newest = Region.nearestRegions(player.location, player.dimension.type)
+      const newest = Region.getManyAt(player)
 
       if (!Array.equals(newest, previous)) {
         EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })

@@ -219,12 +219,7 @@ export class Boss {
       // Boss died or unloaded, respawn after interval
       this.onDie({ dropLoot: false })
     } else {
-      if (
-        this.region &&
-        this.location.valid &&
-        !this.region.area.isVectorIn(this.entity.location, this.entity.dimension.type)
-      )
-        this.entity.teleport(this.location)
+      if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
       this.entity.nameTag = this.options.place.name

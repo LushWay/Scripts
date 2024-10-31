@@ -83,7 +83,7 @@ const survivalSidebar = new Sidebar(
   },
   {
     [names.region]: (player, settings) => {
-      const regions = Region.nearestRegions(player.location, player.dimension.type)
+      const regions = Region.getManyAt(player)
       const region = regions[0] as Region | undefined
       const base = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
       let text = base

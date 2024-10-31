@@ -1,7 +1,7 @@
 import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Region, Vector } from 'lib'
+import { Vector } from 'lib'
 import { customItems } from 'lib/rpg/custom-item'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
@@ -72,13 +72,13 @@ system.runInterval(
 
       const base = Vector.floor(entity.location)
       const dimension = entity.dimension
+      const dimensionType = dimension.type
       getEdgeBlocksOf(base)
         .concat(base)
-        .forEach(e => {
-          const regions = Region.nearestRegions(e, dimension.type)
-          if (!regions.some(e => e instanceof BaseRegion)) return
+        .forEach(vector => {
+          if (!BaseRegion.getManyAt({ vector, dimensionType }).length) return
 
-          const block = dimension.getBlock(e)
+          const block = dimension.getBlock(vector)
           const transform = block && block.typeId in ICE_BOMB_TRANSOFORM
           const water = block?.isWaterlogged
           if (transform || water) {

@@ -1,18 +1,18 @@
-import { Vector } from 'lib'
+import { createPoint, Vector } from 'lib'
 import { RectangleArea } from './rectangle'
 
 describe('rectangle', () => {
   it('should detect if vector is in region', () => {
     const rect = new RectangleArea({ from: { x: 0, y: 0, z: 0 }, to: { x: 10, y: 10, z: 10 } }, 'overworld')
 
-    expect(rect.isVectorIn({ x: 0, y: 0, z: 0 }, 'overworld')).toBe(true)
-    expect(rect.isVectorIn({ x: 1, y: 1, z: 1 }, 'overworld')).toBe(true)
+    expect(rect.isIn({ vector: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toBe(true)
+    expect(rect.isIn({ vector: { x: 1, y: 1, z: 1 }, dimensionType: 'overworld' })).toBe(true)
 
-    expect(rect.isVectorIn({ x: 0, y: 0, z: 0 }, 'nether')).toBe(false)
-    expect(rect.isVectorIn({ x: 0, y: 11, z: 0 }, 'overworld')).toBe(false)
+    expect(rect.isIn(createPoint(0, 0, 0, 'nether'))).toBe(false)
+    expect(rect.isIn(createPoint(0, 11, 0))).toBe(false)
 
     expect(rect.center).toEqual({ x: 5, y: 5, z: 5 })
-    expect(rect.isNear({ x: 15, y: 15, z: 15 }, 5)).toBe(true)
+    expect(rect.isNear(createPoint(15, 15, 15), 5)).toBe(true)
   })
 
   it('should call forEachVector', async () => {

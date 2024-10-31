@@ -34,7 +34,7 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
   for (const vector of getEdgeBlocksOf(brokenLocation)) {
     const block = dimension.getBlock(vector)
     if (!block || block.isAir) continue
-    if (!MineshaftRegion.nearestRegion(block, dimension.type)) continue
+    if (!MineshaftRegion.getAt(block)) continue
 
     const nearAir = getEdgeBlocksOf(block).some(e => {
       const key = Vector.string(e)

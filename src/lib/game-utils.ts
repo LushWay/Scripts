@@ -1,6 +1,8 @@
 import {
   Block,
+  BlockPermutation,
   EasingType,
+  Entity,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
@@ -12,7 +14,6 @@ import { BlockStateMapping, MinecraftCameraPresetsTypes } from '@minecraft/vanil
 import { dedupe } from 'lib/dedupe'
 import { ConfigurableLocation } from 'lib/location'
 import { Vector } from 'lib/vector'
-import { BlockStateWeight } from 'modules/world-edit/utils/blocks-set'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
 
@@ -21,7 +22,7 @@ export interface LocationInDimension {
   /** Location of the place */
   location: Vector3 | ConfigurableLocation<Vector3>
   /** Dimension of the location */
-  dimensionId: Dimensions
+  dimensionId: DimensionType
 }
 
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
@@ -171,10 +172,35 @@ export async function getTopmostSolidBlock(location: Vector3) {
     } else return block.location
   } else return false
 }
+
 export function withState<Name extends keyof BlockStateMapping>(
   name: Name,
   states: BlockStateMapping[Name],
-  weight = 1,
-): BlockStateWeight {
-  return [name, states, weight]
+): Parameters<(typeof BlockPermutation)['resolve']> {
+  return [name, states]
+}
+
+interface DimensionLocation {
+  /** Representing the location of a block in the world */
+  vector: Vector3
+
+  /** Specific dimension in the world. It is used to specify the dimension in which the block location is located. */
+  dimensionType: DimensionType
+}
+
+export type AbstractPoint = DimensionLocation | Entity | Block
+
+export function toPoint(abstractPoint: AbstractPoint): DimensionLocation {
+  if (abstractPoint instanceof Entity || abstractPoint instanceof Block) {
+    return { vector: abstractPoint.location, dimensionType: abstractPoint.dimension.type }
+  } else return abstractPoint
+}
+
+export function createPoint(
+  x: number,
+  y: number,
+  z: number,
+  dimensionType: DimensionType = 'overworld',
+): DimensionLocation {
+  return { vector: { x, y, z }, dimensionType }
 }

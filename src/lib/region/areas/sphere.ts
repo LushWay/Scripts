@@ -1,12 +1,15 @@
-import { Vector3 } from '@minecraft/server'
+import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
 import { Area } from './area'
 
 class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius: number }> {
   type = 's'
 
-  isVectorIn(vector: Vector3, dimensionId: Dimensions): boolean {
-    return super.isVectorIn(vector, dimensionId) && this.isNear(vector, 0)
+  isNear(point: AbstractPoint, distance: number): boolean {
+    const { vector, dimensionType } = toPoint(point)
+    if (!this.isOurDimension(dimensionType)) return false
+
+    return Vector.distance(this.database.center, vector) < this.radius + distance
   }
 
   get edges() {
@@ -28,10 +31,6 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
   set center(c) {
     this.database.center = c
   }
-
-  isNear(vector: Vector3, distance: number): boolean {
-    return Vector.distance(this.database.center, vector) < this.radius + distance
-  }
 }
 
-export const SphereArea = Sphere.SaveableArea()
+export const SphereArea = Sphere.asSaveableArea()

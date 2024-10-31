@@ -9,7 +9,7 @@ declare global {
   type VectorXZ = Record<'x' | 'z', number>
   type Vector5 = Record<'x' | 'y' | 'z' | 'rx' | 'ry', number>
 
-  type Dimensions = mc.ShortcutDimensions
+  type DimensionType = mc.ShortcutDimensions
 
   /** Represents JSON-compatible primitive type */
   type JsonPrimative = string | number | boolean | null | undefined

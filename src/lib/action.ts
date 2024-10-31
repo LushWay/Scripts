@@ -8,11 +8,11 @@ type PlaceType = 'enters' | 'interactions'
 type PlayerCallback = (player: Player) => void
 
 export class PlaceAction {
-  private static placeId(place: Vector3, dimension: Dimensions) {
+  private static placeId(place: Vector3, dimension: DimensionType) {
     return Vector.string(Vector.floor(place)) + ' ' + dimension
   }
 
-  static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: Dimensions = 'overworld') {
+  static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: DimensionType = 'overworld') {
     const id = this.placeId(place, dimension)
 
     if (!this[type].has(id)) this[type].set(id, new Set())
@@ -28,7 +28,7 @@ export class PlaceAction {
     }
   }
 
-  private static emit(to: PlaceType, place: Vector3, player: Player, dimension: Dimensions) {
+  private static emit(to: PlaceType, place: Vector3, player: Player, dimension: DimensionType) {
     const actions = this[to].get(this.placeId(place, dimension))
     if (!actions) return false
 
@@ -37,14 +37,14 @@ export class PlaceAction {
   }
 
   /** Creates action that triggers function when any player walks into this place. */
-  static onEnter(place: Vector3, action: PlayerCallback, dimension?: Dimensions) {
+  static onEnter(place: Vector3, action: PlayerCallback, dimension?: DimensionType) {
     return this.subscribe('enters', place, action, dimension)
   }
 
   private static enters = new Map<string, Set<PlayerCallback>>()
 
   /** Creates action that triggers function when any player interacts with block on this place. */
-  static onInteract(place: Vector3, action: PlayerCallback, dimension: Dimensions) {
+  static onInteract(place: Vector3, action: PlayerCallback, dimension: DimensionType) {
     return this.subscribe('interactions', place, action, dimension)
   }
 

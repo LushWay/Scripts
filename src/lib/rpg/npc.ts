@@ -33,7 +33,7 @@ export class Npc {
 
   private readonly id: string
 
-  readonly dimensionId: Dimensions
+  readonly dimensionId: DimensionType
 
   /** Creates new dynamically loadable npc */
   constructor(

@@ -25,21 +25,21 @@ export class RadioactiveZone {
         if (i >= 3) i = 0
         const soundTick = i === 0
 
-        for (const p of players) {
-          if (typeof p === 'undefined') {
+        for (const player of players) {
+          if (typeof player === 'undefined') {
             if (!reloadSent) sendPacketToStdout('reload', { reason: 'Player is undefined' })
             reloadSent = true
             return
           }
 
-          if (p.database.inv !== 'anarchy' || Spawn.region?.area.isVectorIn(p.location, p.dimension.type)) continue
+          if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) continue
 
-          const distance = Vector.distance(p.location, center)
+          const distance = Vector.distance(player.location, center)
           let played = false
           const sound = (volume: number, num = 1) => {
             if (!played && soundTick) {
-              p.runCommand('stopsound @s ' + Sounds.Radiation)
-              for (let i = 0; i < num; i++) p.playSound(Sounds.Radiation, { volume, pitch: i * 0.5 + 1 })
+              player.runCommand('stopsound @s ' + Sounds.Radiation)
+              for (let i = 0; i < num; i++) player.playSound(Sounds.Radiation, { volume, pitch: i * 0.5 + 1 })
             }
             played = true
           }
@@ -50,20 +50,23 @@ export class RadioactiveZone {
 
           if (distance > rad) {
             sound(2, 2)
-            p.onScreenDisplay.setActionBar(t.warn`Высокая радиация!`, ActionbarPriority.UrgentNotificiation)
-            p.addEffect(MinecraftEffectTypes.Poison, 10 * TicksPerSecond, { showParticles: true, amplifier: 1 })
+            player.onScreenDisplay.setActionBar(t.warn`Высокая радиация!`, ActionbarPriority.UrgentNotificiation)
+            player.addEffect(MinecraftEffectTypes.Poison, 10 * TicksPerSecond, { showParticles: true, amplifier: 1 })
           }
 
           if (distance > rad + 20) {
             sound(4, 4)
             played = true
-            p.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`, ActionbarPriority.UrgentNotificiation)
-            p.applyDamage(2, { cause: EntityDamageCause.magic })
-            if (!p.getEffects().find(e => e.typeId === MinecraftEffectTypes.Darkness))
-              p.addEffect(MinecraftEffectTypes.Darkness, 10 * TicksPerSecond, { showParticles: true, amplifier: 255 })
+            player.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`, ActionbarPriority.UrgentNotificiation)
+            player.applyDamage(2, { cause: EntityDamageCause.magic })
+            if (!player.getEffects().find(e => e.typeId === MinecraftEffectTypes.Darkness))
+              player.addEffect(MinecraftEffectTypes.Darkness, 10 * TicksPerSecond, {
+                showParticles: true,
+                amplifier: 255,
+              })
           }
 
-          if (!played) p.runCommand('stopsound @s ' + Sounds.Radiation)
+          if (!played) player.runCommand('stopsound @s ' + Sounds.Radiation)
         }
       },
       'radioactive zone',

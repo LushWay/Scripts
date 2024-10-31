@@ -1,4 +1,5 @@
 import { Vector3 } from '@minecraft/server'
+import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { Area } from './area'
 
 class FlattenedSphere extends Area<{
@@ -8,8 +9,14 @@ class FlattenedSphere extends Area<{
 }> {
   type = 'fs'
 
-  isVectorIn(vector: Vector3, dimensionId: Dimensions): boolean {
-    return super.isVectorIn(vector, dimensionId) && this.isNear(vector, 0)
+  isNear(point: AbstractPoint, distance: number): boolean {
+    const { vector, dimensionType } = toPoint(point)
+    if (!this.isOurDimension(dimensionType)) return false
+
+    const dx = vector.x - this.database.center.x
+    const dz = vector.z - this.database.center.z
+
+    return Math.hypot(dx, dz) <= this.rx + distance && Math.abs(vector.y - this.database.center.y) <= this.ry + distance
   }
 
   get edges(): [Vector3, Vector3] {
@@ -51,13 +58,6 @@ class FlattenedSphere extends Area<{
   set center(c) {
     this.database.center = c
   }
-
-  isNear(vector: Vector3, distance: number): boolean {
-    const dx = vector.x - this.database.center.x
-    const dz = vector.z - this.database.center.z
-
-    return Math.hypot(dx, dz) <= this.rx + distance && Math.abs(vector.y - this.database.center.y) <= this.ry + distance
-  }
 }
 
-export const FlattenedSphereArea = FlattenedSphere.SaveableArea()
+export const FlattenedSphereArea = FlattenedSphere.asSaveableArea()

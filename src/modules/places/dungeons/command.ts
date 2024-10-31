@@ -64,7 +64,7 @@ world.afterEvents.itemUse.subscribe(event => {
   const dungeon = getDungeon(player)
   if (!dungeon) return
 
-  DungeonRegion.create(new SphereArea({ center: dungeon.area.center, radius: 0 }, dungeon.dimensionId), {
+  DungeonRegion.create(new SphereArea({ center: dungeon.area.center, radius: 0 }, dungeon.dimensionType), {
     structureId: dungeon.structureId,
   })
   player.success(t`Данж создан на ${Vector.string(dungeon.area.center, true)}`)

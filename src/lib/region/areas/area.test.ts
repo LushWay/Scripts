@@ -1,4 +1,5 @@
 import { Vector3 } from '@minecraft/server'
+import { AbstractPoint } from 'lib/game-utils'
 import { Area } from './area'
 
 describe('area reg', () => {
@@ -11,14 +12,14 @@ describe('area reg', () => {
       get center(): Vector3 {
         throw new Error('Method not implemented.')
       }
-      isNear(vector: Vector3, distance: number): boolean {
+      isNear(point: AbstractPoint): boolean {
         throw new Error('Method not implemented.')
       }
     }
 
     Area.loaded = true
     expect(() => {
-      TestArea.SaveableArea()
+      TestArea.asSaveableArea()
     }).toThrowErrorMatchingInlineSnapshot(
       `[Error: Registering area type test failed. Regions are already restored from json. Registering area should occur on the import-time.]`,
     )

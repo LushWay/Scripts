@@ -1,3 +1,4 @@
+import { createPoint, Region } from 'lib'
 import { Vector } from 'lib/vector'
 import { SphereArea } from '../areas/sphere'
 import { BossArenaRegion } from './boss-arena'

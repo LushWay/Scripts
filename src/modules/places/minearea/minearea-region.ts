@@ -34,7 +34,7 @@ export class MineareaRegion extends RegionWithStructure {
 
         eachVectorCallback?.(vector)
 
-        const regions = Region.nearestRegions(vector, this.dimensionId)
+        const regions = Region.getManyAt({ vector, dimensionType: this.dimensionType })
         for (const region of regions) {
           // Prevent from region save conflicts
           if (region instanceof MineareaRegion && !restoredRegions.includes(region) && region !== this) {
@@ -104,11 +104,12 @@ actionGuard((player, region, ctx) => {
 }, ActionGuardOrder.Lowest)
 
 onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
-  const regions = Region.nearestRegions(block, block.dimension.type)
+  const regions = MineareaRegion.getManyAt(block)
   for (const region of regions) {
     if (!(region instanceof MineareaRegion)) continue
 
-    const toRestore = schedules.filter(e => region.area.isVectorIn(e.location, region.dimensionId) && e !== schedule)
+    const dimensionType = block.dimension.type
+    const toRestore = schedules.filter(e => region.area.isIn({ vector: e.location, dimensionType }) && e !== schedule)
     if (toRestore.length) {
       // logger.debug`Still blocks to restore: ${toRestore.length}`
       continue

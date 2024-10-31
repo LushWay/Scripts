@@ -1,20 +1,43 @@
-import { Player } from '@minecraft/server'
+import { createPoint } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
+import { TEST_createPlayer } from 'test/utils'
 import { SphereArea } from '../areas/sphere'
 import { Region } from './region'
 
 describe('Region', () => {
+  beforeEach(() => (Region.regions = []))
+  afterEach(() => (Region.regions = []))
+
   it('should create region', () => {
     expect(Region.create(new SphereArea({ center: Vector.zero, radius: 0 }, 'overworld'))).toBeInstanceOf(Region)
   })
 
   it('should return owner name', () => {
-    // @ts-expect-error
-    const player = new Player() as Player
+    const player = TEST_createPlayer()
     const region = Region.create(new SphereArea({ center: Vector.zero, radius: 0 }, 'overworld'), {
       permissions: { owners: [player.id] },
     })
 
     expect(region.ownerName).toBe(player.name)
+  })
+
+  it('should return instances of right type', () => {
+    class TestRegion extends Region {}
+    class AnotherTestRegion extends Region {}
+
+    const region = TestRegion.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 1 }))
+    AnotherTestRegion.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 1 }))
+
+    expect(region).toBeInstanceOf(TestRegion)
+    expectTypeOf(region).toEqualTypeOf<TestRegion>()
+
+    expectTypeOf(TestRegion.instances()).toEqualTypeOf<TestRegion[]>()
+    expect(TestRegion.instances().length).toBe(1)
+    expect(TestRegion.instances()[0]).toBe(region)
+
+    expectTypeOf(TestRegion.getAt(createPoint(0, 0, 0))).toEqualTypeOf<TestRegion | undefined>()
+    expect(TestRegion.getAt(createPoint(0, 0, 0))).toBe(region)
+
+    expectTypeOf(TestRegion.getManyAt(createPoint(0, 0, 0))).toEqualTypeOf<TestRegion[]>()
   })
 })

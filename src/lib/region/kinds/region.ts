@@ -1,5 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
+import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
@@ -35,6 +36,11 @@ export interface RegionPermissions extends Record<string | number | symbol, unkn
 export interface RegionCreationOptions {
   permissions?: Partial<RegionPermissions>
   ldb?: JsonObject
+}
+
+interface RegionConstructor<I extends Region>
+  extends Pick<typeof Region, 'regions' | 'instances' | 'getAt' | 'getManyAt'> {
+  new (...args: any[]): I
 }
 
 /** Represents protected region in the world. */
@@ -87,43 +93,37 @@ export class Region {
    *
    * @returns Array of instances that match the specified type `R` of Region.
    */
-  static instances<I extends Region>(this: { new (...args: any[]): I; regions: Region[] }) {
+  static instances<I extends Region>(this: RegionConstructor<I>) {
     return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
   }
 
   /**
    * Returns the nearest region based on a block location and dimension ID.
    *
-   * @param {Vector3} location - Representing the location of a block in the world
-   * @param {Dimensions} dimensionId - Specific dimension in the world. It is used to specify the dimension in which the
-   *   block location is located.
+   * @param point - Represents point in the world
    */
-  static nearestRegion(location: Vector3, dimensionId: Dimensions): Region | undefined {
-    return this.nearestRegions(location, dimensionId)[0]
+  static getAt<I extends Region>(this: RegionConstructor<I>, point: AbstractPoint): I | undefined {
+    return this.getManyAt(point)[0]
   }
 
-  // TODO rename dimensionId to dimensionType
   /**
    * Returns the nearest regions based on a block location and dimension ID.
    *
-   * @param {Vector3} location - Representing the location of a block in the world
-   * @param {Dimensions} dimensionId - Specific dimension in the world. It is used to specify the dimension in which the
-   *   block location is located.
+   * @param point - Represents point in the world
    */
-  static nearestRegions(location: Vector3, dimensionId: Dimensions) {
+  static getManyAt<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
     const regions = this === Region ? this.regions : this.instances()
+    point = toPoint(point)
 
-    return regions
-      .filter(region => region.area.isVectorIn(location, dimensionId))
-      .sort((a, b) => b.priority - a.priority)
+    return regions.filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority) as I[]
   }
 
-  /** Region priority. Used in {@link Region.nearestRegion} */
+  /** Region priority. Used in {@link Region.getAt} */
   protected readonly priority: number = 0
 
   /** Region dimension */
-  get dimensionId(): Dimensions {
-    return this.area.dimensionId
+  get dimensionType(): DimensionType {
+    return this.area.dimensionType
   }
 
   /** Region permissions */
@@ -169,7 +169,7 @@ export class Region {
   }
 
   get dimension() {
-    return world[this.dimensionId]
+    return world[this.dimensionType]
   }
 
   /** Region owner name */
@@ -229,7 +229,7 @@ export class Region {
       a: this.area.toJSON(),
       k: this.kind,
       permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
-      dimensionId: this.dimensionId,
+      dimensionId: this.dimensionType,
       ldb: this.linkedDatabase,
     }
   }

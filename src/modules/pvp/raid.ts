@@ -14,7 +14,7 @@ const objective = ScoreboardDB.objective('raid')
 world.beforeEvents.explosion.subscribe(event => {
   let base = false
   const impactedBlocks = event.getImpactedBlocks().filter(block => {
-    const region = Region.nearestRegion(block, event.dimension.type)
+    const region = Region.getAt(block)
     if (region instanceof MineareaRegion) return true
     if (isScheduledToPlace(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
