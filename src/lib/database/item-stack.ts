@@ -16,21 +16,21 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   property<N extends string, const D extends Schema.Property<Schema.Property.Saveable>>(
     name: N,
     defaultValue: D,
-  ): ItemLoreSchema<T & { [K in N]?: D }, D>
+  ): ItemLoreSchema<T & Partial<Record<N, D>>, D>
 
   property<N extends string, const D extends Schema.Property<Schema.Property.Required>>(
     name: N,
     type: D,
-  ): ItemLoreSchema<T & { [K in N]: D }, D>
+  ): ItemLoreSchema<T & Record<N, D>, D>
 
   property<N extends string, const D extends Schema.Property.Any>(
     name: N,
     type: D,
-  ): ItemLoreSchema<T & { [K in N]: D }, D> {
+  ): ItemLoreSchema<T & Record<N, D>, D> {
     this.currentProperty = name
     this.properties[name] = { type }
 
-    return this as unknown as ItemLoreSchema<T & { [K in N]: D }, D>
+    return this as unknown as ItemLoreSchema<T & Record<N, D>, D>
   }
 
   display(text: Text, prepareProperty?: PrepareProperty<ParsedSchemaProperty<L>>) {
