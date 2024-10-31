@@ -6,6 +6,7 @@ import tr from './tools/eslint-plugin/index.js'
 
 const CI = process.env.CI
 const VSCODE = process.env.VSCODE_CWD
+const I18N = process.env.I18N
 
 export default ts.config(
   eslint.configs.recommended,
@@ -30,7 +31,7 @@ export default ts.config(
   {
     plugins: { tr },
     rules: {
-      'tr/tr': process.env.I18N ? 'error' : 'off',
+      'tr/tr': I18N ? 'error' : 'off',
       'tr/export-boundaries': 'error',
     },
   },

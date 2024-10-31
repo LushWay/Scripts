@@ -21,7 +21,7 @@ export function isScriptsDirectory(context) {
 }
 
 /** @param {Context} context */
-export function isLibDirectory(context) {
+export function isLibDirectory(context, filename = context.filename) {
   return toRelative(context).startsWith('/src/lib')
 }
 
@@ -30,6 +30,5 @@ export function isLibDirectory(context) {
  * @param {string | null | undefined} [filename]
  */
 export function isModulesDirectory(context, filename = context.filename) {
-  const relative = toRelative(context, filename)
-  return relative.startsWith('/src/modules')
+  return toRelative(context, filename).startsWith('/src/modules')
 }

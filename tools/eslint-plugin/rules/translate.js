@@ -25,14 +25,11 @@ const translateRule = createRule({
      */
     function addToTranslates(t, node) {
       const file = toRelative(context)
+      const ignore = ['.test.ts', '.spec.ts', 'world-edit', 'minigames']
 
-      if (
-        (file && (file.includes('.test.ts') || file.includes('.spec.ts') || file.includes('world-edit'))) ||
-        file.includes('minigames') ||
-        context.sourceCode.text.includes('/* i18n-ignore */')
-      )
-        return
+      if (ignore.some(e => file.includes(e)) || context.sourceCode.text.includes('/* i18n-ignore */')) return
 
+      // Ignore Settings.world({ setting: { name: 'Do not translate this' }})
       if (
         node.parent.type == 'Property' &&
         node.parent.parent.type === 'ObjectExpression' &&
