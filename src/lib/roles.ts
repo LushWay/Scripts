@@ -168,3 +168,15 @@ if (!__VITEST__) {
     }
   })
 }
+
+if (!__VITEST__) {
+  const lastVersionId = 'lastVersion'
+  if (world.getDynamicProperty(lastVersionId) !== __GIT__) {
+    world
+      .getAllPlayers()
+      .filter(e => is(e.id, 'techAdmin'))
+      .forEach(e => e.sendMessage(`§9>§f ${__GIT__}`))
+
+    world.setDynamicProperty(lastVersionId, __GIT__)
+  }
+}

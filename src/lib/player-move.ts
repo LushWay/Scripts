@@ -17,7 +17,7 @@ export const playerPositionCache = new WeakPlayerMap<PlayerPosition>()
 jobInterval()
 
 function jobInterval() {
-  system.runJob(jobPlayerPosition())
+  system.delay(() => system.runJob(jobPlayerPosition()))
 }
 
 function* jobPlayerPosition() {

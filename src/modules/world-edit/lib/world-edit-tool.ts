@@ -31,9 +31,9 @@ type StorageType = Partial<Record<StorageKey, any>> & {
   version: number
 }
 
-export abstract class WorldEditTool<Storage extends StorageType = StorageType> {
+export abstract class WorldEditTool<Storage extends StorageType = any> {
   static loreBlockRefKeys: string[] = ['blocksSet', 'replaceBlocksSet'] satisfies StorageKey[]
-  static tools: WorldEditTool<any>[] = []
+  static tools: WorldEditTool[] = []
 
   abstract id: string
   abstract name: string
