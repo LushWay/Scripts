@@ -1,5 +1,5 @@
 import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
-import { ModalForm, Vector, is, isInvalidLocation, isKeyof } from 'lib'
+import { ModalForm, Vector, is, isKeyof, isLocationError } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { t } from 'lib/text'
@@ -197,7 +197,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
 
             this.brushLocators.set(player.id, entity)
           } catch (error) {
-            if (isInvalidLocation(error)) return
+            if (isLocationError(error)) return
             console.error(error)
           }
         } else this.brushLocators.get(player.id)?.teleport(location)

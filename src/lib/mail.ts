@@ -36,12 +36,12 @@ export class Mail {
   /**
    * Sends the mail for the player
    *
-   * @param {string} playerId The reciever
-   * @param {string} title The letter title
-   * @param {string} content The letter content
-   * @param {Rewards} rewards The attached rewards
+   * @param playerId The reciever
+   * @param title The letter title
+   * @param content The letter content
+   * @param rewards The attached rewards
    */
-  static send(playerId: string, title: string, content: string, rewards: Rewards) {
+  static send(playerId: string, title: string, content: string, rewards = new Rewards()) {
     Mail.inform(playerId, title)
     this.dbPlayers[playerId].push({
       read: false,

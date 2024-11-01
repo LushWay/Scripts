@@ -1,5 +1,5 @@
 import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
-import { isInvalidLocation } from 'lib'
+import { isLocationError } from 'lib'
 import stringifyError from 'lib/utils/error'
 import { worldEditPlayerSettings } from 'modules/world-edit/settings'
 import { BlocksSetRef } from '../utils/blocks-set'
@@ -35,7 +35,7 @@ export abstract class WorldEditToolBrush<MoreStorage extends object> extends Wor
     try {
       this.onBrushUse(player, storage, hit)
     } catch (e: unknown) {
-      if (isInvalidLocation(e)) {
+      if (isLocationError(e)) {
         fail('Блок не прогружен.')
       } else {
         console.error(e)

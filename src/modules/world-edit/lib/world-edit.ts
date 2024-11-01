@@ -1,5 +1,5 @@
 import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
-import { Vector, getRole, isInvalidLocation, prompt } from 'lib'
+import { Vector, getRole, isLocationError, prompt } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { t } from 'lib/text'
@@ -363,7 +363,7 @@ export class WorldEdit {
               if (errors < 3 && error instanceof Error) {
                 player.fail(`Ошибка при заполнении (§f${errors}§c): §4${error.name} §f${error.message}`)
               }
-              if (!isInvalidLocation(error) && errors < 3) console.error(error)
+              if (!isLocationError(error) && errors < 3) console.error(error)
 
               errors++
             } finally {

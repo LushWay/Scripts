@@ -1,9 +1,10 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, LockAction, Region, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
-import { t } from 'lib/text'
+import { ActionForm, LockAction, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
+import { MaybeRawText, t } from 'lib/text'
 import { BaseRegion } from './region'
+import { baseUpgradeButton } from './actions/upgrade'
 
-new Command('base').setDescription('Меню базы').executes(ctx => openBaseMenu(ctx.player))
+export const baseCommand = new Command('base').setDescription('Меню базы').executes(ctx => openBaseMenu(ctx.player))
 
 export function openBaseMenu(
   player: Player,
@@ -18,23 +19,24 @@ export function openBaseMenu(
   baseMenu(player, base, back)
 }
 
-function baseMenu(player: Player, base: Region, back?: VoidFunction) {
+function baseMenu(player: Player, base: BaseRegion, back?: VoidFunction, message?: MaybeRawText) {
   const isOwner = base.getMemberRole(player) === 'owner'
-  const baseBack = () => baseMenu(player, base, back)
+  const baseBack = (message?: MaybeRawText) => baseMenu(player, base, back, message)
   const form = new ActionForm(
     'Меню базы',
-    t`${isOwner ? t`Это ваша база.` : t`База игрока ${base.ownerName}`}\n\nКоординаты: ${base.area.center}\nРадиус: ${base.area.radius}`,
+    t`${message ? t`${message}\n\n` : ''}${isOwner ? t`Это ваша база.` : t`База игрока ${base.ownerName}`}\n\nКоординаты: ${base.area.center}\nРадиус: ${base.area.radius}`,
   )
 
   form
     .addButtonBack(back)
     .addButton('Телепорт!', () => player.teleport(Vector.add(base.area.center, { x: 0.5, y: 2, z: 0.5 })))
-    .addButton(`Участники§7 (${base.permissions.owners.length})`, () =>
+    .addButton(`Участники §7(${base.permissions.owners.length})`, () =>
       manageRegionMembers(player, base, {
         back: baseBack,
         pluralForms: basePluralForms,
       }),
     )
+    .addButton(...baseUpgradeButton(base, player, baseBack))
 
   if (isOwner)
     form.addButton('Разрешения', () =>

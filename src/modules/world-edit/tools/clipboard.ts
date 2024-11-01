@@ -12,7 +12,7 @@ interface Storage {
 
 class ClipboardTool extends WorldEditTool<Storage> {
   id = 'clipboard'
-  name = 'Копировать/Вставить'
+  name = 'Вставить/Отменить'
   typeId = Items.WeTool
 
   storageSchema = {
@@ -21,8 +21,8 @@ class ClipboardTool extends WorldEditTool<Storage> {
   }
 
   editToolForm(slot: ContainerSlot) {
+    slot.nameTag = '§r§b> §fВставить/Отменить\n(крадитесь чтобы сменить действие)'
     this.saveStorage(slot, { version: 0, mode: 'paste' })
-    slot.nameTag = '§r§b> §fКопировать/Вставить/Отменить\n(крадитесь чтобы сменить действие)'
   }
 
   onUse(player: Player, item: ItemStack) {
@@ -37,19 +37,24 @@ class ClipboardTool extends WorldEditTool<Storage> {
   constructor() {
     super()
     this.onInterval(20, (player, storage) => {
+      console.log({ storage })
       if (storage.mode !== 'paste') return
       const we = WorldEdit.forPlayer(player)
 
       if (we.currentCopy) {
         const { pastePos1, pastePos2 } = we.pastePositions(StructureRotation.None, we.currentCopy)
-        system.delay(() => spawnParticlesInArea(pastePos1, pastePos2))
+        if (!player.isSneaking) system.delay(() => spawnParticlesInArea(pastePos1, pastePos2))
         player.onScreenDisplay.setActionBar(
           `Используйте предмет чтобы\n${
-            player.isSneaking ? '<Отменить последнее действие>' : '<Вставить скопированную область>'
+            player.isSneaking ? '§7<Отменить последнее действие>' : '§a<Вставить скопированную область>'
           }`,
           ActionbarPriority.UrgentNotificiation,
         )
-      } else player.onScreenDisplay.setActionBar('§cВы ничего не копировали!', ActionbarPriority.UrgentNotificiation)
+      } else
+        player.onScreenDisplay.setActionBar(
+          '§cВы ничего не копировали!\nИспользуйте §f.copy',
+          ActionbarPriority.UrgentNotificiation,
+        )
     })
   }
 }

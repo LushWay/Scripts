@@ -31,9 +31,9 @@ type StorageType = Partial<Record<StorageKey, any>> & {
   version: number
 }
 
-export abstract class WorldEditTool<Storage extends StorageType = any> {
+export abstract class WorldEditTool<Storage extends StorageType = StorageType> {
   static loreBlockRefKeys: string[] = ['blocksSet', 'replaceBlocksSet'] satisfies StorageKey[]
-  static tools: WorldEditTool[] = []
+  static tools: WorldEditTool<any>[] = []
 
   abstract id: string
   abstract name: string
@@ -242,29 +242,34 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   }
 
   private static *createJob() {
-    for (const player of world.getAllPlayers()) {
-      if (!player.isValid()) continue
+    try {
+      for (const player of world.getAllPlayers()) {
+        if (!player.isValid()) continue
 
-      const slot = player.mainhand()
-      const tools = WorldEditTool.tools.filter(e => e.typeId === slot.typeId)
-      const settings = worldEditPlayerSettings(player)
+        const slot = player.mainhand()
+        const tools = WorldEditTool.tools.filter(e => e.typeId === slot.typeId)
+        const settings = worldEditPlayerSettings(player)
 
-      WorldEditTool.tools.forEach(tool =>
-        util.catch(() => tool.intervalglobal?.(player, tool.getStorage(slot, true), slot, settings)),
-      )
-      for (const tool of tools) {
-        const storage = tool.getStorage(slot, true) as unknown
-        if (!storage) continue
+        WorldEditTool.tools.forEach(tool =>
+          util.catch(() => tool.intervalglobal?.(player, tool.getStorage(slot, true), slot, settings)),
+        )
+        for (const tool of tools) {
+          const storage = tool.getStorage(slot, true) as unknown
+          if (!storage) continue
 
-        const fn: (undefined | OmitThisParameter<WorldEditToolInterval<any>>)[] = [tool.interval0?.bind(tool)]
-        if (this.ticks % 10 === 0) fn.push(tool.interval10?.bind(tool))
-        if (this.ticks % 20 === 0) fn.push(tool.interval20?.bind(tool))
-        fn.forEach(e => e && util.catch(() => e(player, storage, slot, settings)))
+          const fn: (undefined | OmitThisParameter<WorldEditToolInterval<any>>)[] = [tool.interval0?.bind(tool)]
+          if (this.ticks % 10 === 0) fn.push(tool.interval10?.bind(tool))
+          if (this.ticks % 20 === 0) fn.push(tool.interval20?.bind(tool))
+          fn.forEach(e => e && util.catch(() => e(player, storage, slot, settings)))
+        }
+        yield
       }
-      yield
+    } catch (e) {
+      console.error(e)
+    } finally {
+      this.intervalsJob()
+      if (this.ticks >= 20) this.ticks = 0
+      else this.ticks++
     }
-    if (this.ticks >= 20) this.ticks = 0
-    else this.ticks++
-    this.intervalsJob()
   }
 }

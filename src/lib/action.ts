@@ -2,10 +2,9 @@ import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { Vector } from 'lib/vector'
+import { onPlayerMove } from './player-move'
 
 type PlaceType = 'enters' | 'interactions'
-
-type PlayerCallback = (player: Player) => void
 
 export class PlaceAction {
   private static placeId(place: Vector3, dimension: DimensionType) {
@@ -51,11 +50,7 @@ export class PlaceAction {
   private static interactions = new Map<string, Set<PlayerCallback>>()
 
   static {
-    system.runPlayerInterval(
-      player => this.emit('enters', Vector.floor(player.location), player, player.dimension.type),
-      'PlaceAction.enters',
-      10,
-    )
+    onPlayerMove.subscribe(({ player, vector, dimensionType }) => this.emit('enters', vector, player, dimensionType))
 
     actionGuard((_player, _region, ctx) => {
       // Allow using any block specified by interaction
@@ -69,9 +64,9 @@ export class PlaceAction {
   }
 }
 
-type LockActionChecker = (player: Player) => boolean | { lockText: string }
+type LockActionFunction = (player: Player) => boolean | { lockText: string }
 
-export interface LockActionOptions {
+export interface LockActionCheckOptions {
   ignore?: LockAction[]
   accept?: LockAction[]
   tell?: boolean
@@ -81,10 +76,6 @@ export interface LockActionOptions {
 export class LockAction {
   /** List of all existing lock actions */
   private static instances: LockAction[] = []
-
-  isLocked
-
-  lockText
 
   /**
    * Checks if player is locked by any LockerAction and returns first lockText from it
@@ -96,7 +87,7 @@ export class LockAction {
    * @param {boolean} [o.tell]
    * @param {boolean} [o.returnText] - Return lock text instead of boolean
    */
-  static locked(player: Player, { ignore, accept, tell = true, returnText }: LockActionOptions = {}) {
+  static locked(player: Player, { ignore, accept, tell = true, returnText }: LockActionCheckOptions = {}) {
     for (const lock of this.instances) {
       if (ignore?.includes(lock)) continue
       if (accept && !accept.includes(lock)) continue
@@ -112,16 +103,13 @@ export class LockAction {
     return false
   }
 
-  /**
-   * Creates new locker that can lock other actions
-   *
-   * @param isLocked - Fn that checks if player is locked
-   * @param lockText - Text that returns when player is locked
-   */
-  constructor(isLocked: LockActionChecker, lockText: string) {
-    this.isLocked = isLocked
-    this.lockText = lockText
-
+  /** Creates new locker that can lock other actions */
+  constructor(
+    /** Function that checks if player is being locked */
+    readonly isLocked: LockActionFunction,
+    /** Text that returns when player is locked */
+    readonly lockText: string,
+  ) {
     LockAction.instances.push(this)
   }
 }

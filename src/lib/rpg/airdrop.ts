@@ -7,7 +7,7 @@ import { createLogger } from 'lib/utils/logger'
 import { Vector } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
-import { isInvalidLocation } from '../game-utils'
+import { isLocationError } from '../game-utils'
 import { Temporary } from '../temporary'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './minimap'
 
@@ -159,7 +159,7 @@ export class Airdrop {
           world.overworld.spawnParticle('minecraft:balloon_gas_particle', { x, y, z })
           await system.sleep(3)
         } catch (error) {
-          if (isInvalidLocation(error)) continue
+          if (isLocationError(error)) continue
           logger.error(error)
         }
       }

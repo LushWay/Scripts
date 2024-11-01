@@ -10,6 +10,7 @@ import {
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { AbstractPoint, isBuilding } from 'lib/game-utils'
+import { onPlayerMove } from 'lib/player-move'
 import { EventSignal } from '../event-signal'
 import {
   BLOCK_CONTAINERS,
@@ -161,32 +162,26 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   entity.remove()
 })
 
-system.runInterval(
-  () => {
-    for (const player of world.getAllPlayers()) {
-      const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
-      const newest = Region.getManyAt(player)
+onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
+  const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
+  const newest = Region.getManyAt({ vector, dimensionType })
 
-      if (!Array.equals(newest, previous)) {
-        EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })
-      }
+  if (!Array.equals(newest, previous)) {
+    EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })
+  }
 
-      RegionEvents.playerInRegionsCache.set(player, newest)
-      const currentRegion = newest[0]
+  RegionEvents.playerInRegionsCache.set(player, newest)
+  const currentRegion = newest[0]
 
-      if (typeof currentRegion !== 'undefined' && !isBuilding(player)) {
-        if (currentRegion.permissions.pvp === false) {
-          player.triggerEvent(
-            player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
-          )
-        } else if (currentRegion.permissions.pvp === 'pve') {
-          player.setProperty(PlayerProperties['lw:newbie'], true)
-        } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], true)
-      }
+  if (typeof currentRegion !== 'undefined' && !isBuilding(player)) {
+    if (currentRegion.permissions.pvp === false) {
+      player.triggerEvent(
+        player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
+      )
+    } else if (currentRegion.permissions.pvp === 'pve') {
+      player.setProperty(PlayerProperties['lw:newbie'], true)
+    } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], true)
+  }
 
-      EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
-    }
-  },
-  'region callback',
-  20,
-)
+  EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
+})

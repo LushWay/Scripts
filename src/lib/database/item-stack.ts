@@ -1,7 +1,7 @@
 import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
 import { t, textUnitColorize } from 'lib/text'
-import { noBoolean, util, wrapLore } from 'lib/util'
+import { noBoolean, wrapLore } from 'lib/util'
 
 export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
   constructor(

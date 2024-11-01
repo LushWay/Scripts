@@ -1,5 +1,5 @@
 import { CameraFadeOptions, Player, TicksPerSecond } from '@minecraft/server'
-import { LockAction, LockActionOptions, PlaceAction } from 'lib/action'
+import { LockAction, LockActionCheckOptions, PlaceAction } from 'lib/action'
 import { hexToRgb } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { Core } from './extensions/core'
@@ -37,7 +37,7 @@ export class Portal {
       fadeScreen = true,
       lockAction,
       title,
-    }: { lockAction?: LockActionOptions; fadeScreen?: boolean; title?: string } = {},
+    }: { lockAction?: LockActionCheckOptions; fadeScreen?: boolean; title?: string } = {},
     updateHud?: VoidFunction,
   ) {
     if (!this.canTeleport(player, lockAction)) return

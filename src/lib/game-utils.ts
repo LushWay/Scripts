@@ -49,7 +49,7 @@ export function isChunkUnloaded(options: LocationInDimension) {
  * Checks if provided object is instance of {@link LocationInUnloadedChunkError} or
  * {@link LocationOutOfWorldBoundariesError}
  */
-export function isInvalidLocation(
+export function isLocationError(
   error: unknown,
 ): error is LocationInUnloadedChunkError | LocationOutOfWorldBoundariesError {
   return error instanceof LocationInUnloadedChunkError || error instanceof LocationOutOfWorldBoundariesError

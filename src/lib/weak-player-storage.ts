@@ -63,7 +63,7 @@ export class WeakPlayerSet extends Set<string> {
 type WeakStorage = Pick<Map<string, any>, 'has' | 'delete'> &
   Partial<Pick<WeakPlayerMap<any>, 'get' | 'onLeave' | 'onDelete'>>
 
-type OnLeaveCallback<T> = (playerId: string, setValue: T) => void
+type OnLeaveCallback<T> = (playerId: string, mapValue: T) => void
 
 interface WeakStorageOptions<T> {
   /** Whenether to remove player from map when it leaves */

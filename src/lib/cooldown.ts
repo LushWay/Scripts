@@ -38,14 +38,16 @@ export class Cooldown {
    * @param player - Player to check
    * @returns - Whenether cooldown is expired or not
    */
-  isExpired(player: Player) {
-    const elapsed = this.getElapsed(player.id)
+  isExpired(player: Player | string) {
+    const id = player instanceof Player ? player.id : player
+    const elapsed = this.getElapsed(id)
     if (elapsed) {
-      if (this.tell) player.fail(t.error.time`§cНе так быстро! Попробуй через §f${this.time - elapsed}`)
+      if (this.tell && player instanceof Player)
+        player.fail(t.error.time`§cНе так быстро! Попробуй через §f${this.time - elapsed}`)
 
       return false
     } else {
-      this.db[player.id] = Date.now()
+      this.db[id] = Date.now()
 
       return true
     }
