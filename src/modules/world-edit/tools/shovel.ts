@@ -29,6 +29,7 @@ interface Storage {
   offset: number
   blending: number
   factor: number
+  useInterval: boolean
 }
 
 class ShovelTool extends WorldEditTool<Storage> {
@@ -36,7 +37,7 @@ class ShovelTool extends WorldEditTool<Storage> {
   name = 'лопата'
   typeId = Items.WeShovel
   storageSchema = {
-    version: 4,
+    version: 5,
 
     blocksSet: ['', ''] as BlocksSetRef,
     replaceBlocksSet: ['', ''] as BlocksSetRef,
@@ -46,6 +47,7 @@ class ShovelTool extends WorldEditTool<Storage> {
     offset: -1,
     blending: -1,
     factor: 20,
+    useInterval: true,
   }
 
   getMenuButtonName(player: Player) {
@@ -70,25 +72,30 @@ class ShovelTool extends WorldEditTool<Storage> {
         storage.blending,
       )
       .addSlider('Сила смешивания', 0, 100, 1, storage.factor)
-      .show(player, (_, radius, height, offset, blocksSet, replaceBlocksSet, replaceMode, blending, factor) => {
-        slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
-        storage.radius = radius
-        storage.height = height
-        storage.offset = offset
-        storage.replaceMode = replaceMode ?? ''
-        storage.blending = Math.min(radius, blending)
-        storage.factor = factor
+      .addToggle('Использовать интервал для активации', storage.useInterval)
+      .show(
+        player,
+        (_, radius, height, offset, blocksSet, replaceBlocksSet, replaceMode, blending, factor, useInterval) => {
+          slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
+          storage.radius = radius
+          storage.height = height
+          storage.offset = offset
+          storage.replaceMode = replaceMode ?? ''
+          storage.blending = Math.min(radius, blending)
+          storage.factor = factor
+          storage.useInterval = useInterval
 
-        storage.blocksSet = [player.id, blocksSet]
+          storage.blocksSet = [player.id, blocksSet]
 
-        if (replaceBlocksSet) storage.replaceBlocksSet = [player.id, replaceBlocksSet]
-        else storage.replaceBlocksSet = ['', '']
+          if (replaceBlocksSet) storage.replaceBlocksSet = [player.id, replaceBlocksSet]
+          else storage.replaceBlocksSet = ['', '']
 
-        this.saveStorage(slot, storage)
-        player.success(
-          t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
-        )
-      })
+          this.saveStorage(slot, storage)
+          player.success(
+            t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
+          )
+        },
+      )
   }
 
   constructor() {
@@ -107,9 +114,19 @@ class ShovelTool extends WorldEditTool<Storage> {
         }
       }
     })
+
+    this.onInterval(10, (player, storage) => {
+      if (!storage.useInterval) return
+      this.run(player, storage)
+    })
   }
 
   onUse(player: Player, _: ItemStack, storage: Storage) {
+    if (storage.useInterval) return
+    this.run(player, storage)
+  }
+
+  run(player: Player, storage: Storage) {
     if (this.isLookingUp(player)) return
 
     const permutations = getBlocksInSet(storage.blocksSet)

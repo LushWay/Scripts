@@ -22,6 +22,20 @@ class MultiShovelTool extends WorldEditMultiTool {
       storage.tools,
     )
   }
+
+  constructor() {
+    super()
+    this.onInterval(10, (player, storage, slot, settings) => {
+      this.forEachTool(
+        slot,
+        (proxiedItem, tool, toolStorage) => {
+          if (!tool.onUse) return
+          tool.interval10?.(player, toolStorage, proxiedItem, settings)
+        },
+        storage.tools,
+      )
+    })
+  }
 }
 
 new MultiShovelTool()
