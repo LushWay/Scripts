@@ -83,9 +83,10 @@ class BrushTool extends WorldEditToolBrush<Storage> {
           )
           if (!condition) continue
 
-          if (skipForBlending(blendOptions, { vector, center })) continue
+          const location = Vector.add(center, vector)
+          if (skipForBlending(blendOptions, { vector: location, center })) continue
 
-          const block = player.dimension.getBlock(Vector.add(center, vector))
+          const block = player.dimension.getBlock(location)
           if (!block) continue
 
           replaceWithTargets(replaceTargets, getReplaceMode(storage.replaceMode), block, permutations)
@@ -112,13 +113,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
       .addDropdown('Заменяемый набор блоков', ...replaceTargetsDropdown(storage.replaceBlocksSet, player))
       .addDropdown('Режим замены', ...replaceModeDropdown(storage.replaceMode))
 
-      .addSlider(
-        'Смешивание с окрущающими блоками\n(-1 чтобы отключить, 0 чтобы сделать площадь круглой)',
-        -1,
-        9,
-        1,
-        storage.blending,
-      )
+      .addSlider('Смешивание с окрущающими блоками\n(-1 чтобы отключить)', -1, 9, 1, storage.blending)
       .addSlider('Сила смешивания', 0, 100, 1, storage.factor)
 
       .show(player, (ctx, shape, radius, blocksSet, replaceBlocksSet, replaceMode, blending, factor) => {
