@@ -14,7 +14,7 @@ class Tool extends WorldEditTool {
   id = 'tool'
   typeId = Items.WeTool
   name = 'инструмент'
-  storageSchema: any = { version: 1 }
+  storageSchema: any
 
   editToolForm(slot: ContainerSlot, player: Player) {
     const lore = slot.getLore()

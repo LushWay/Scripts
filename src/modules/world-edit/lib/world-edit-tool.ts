@@ -185,6 +185,10 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
     try {
       raw = JSON.parse(storageData) as Storage
     } catch {}
+    if (typeof this.storageSchema !== 'object') {
+      this.storageSchema = { version: 1 } as Storage
+    }
+
     if (raw?.version !== this.storageSchema.version) {
       if (returnUndefined) return undefined
       raw = JSON.parse(JSON.stringify(this.storageSchema)) as Storage
