@@ -140,8 +140,8 @@ export class WorldEdit {
    * @param history Save location where you want the to store your backup
    */
   backup(name: string, pos1: Vector3 = this.pos1, pos2: Vector3 = this.pos2, history: BigStructure[] = this.history) {
-    if (this.history.length === this.historyLimit) {
-      if (this.hasWarnAboutHistoryLimit) {
+    if (history.length === this.historyLimit) {
+      if (!this.hasWarnAboutHistoryLimit) {
         console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
         this.player.warn(
           `Вы превысили лимит отменяемых действий WorldEdit'а. Вы сможете восстановить лишь последние ${this.historyLimit} действий.`,

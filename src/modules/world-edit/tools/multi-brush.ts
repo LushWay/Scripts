@@ -27,13 +27,10 @@ class MultiBrushTool extends WorldEditMultiTool {
   private proxyPlayer(player: Player, spread: number): Player {
     return Object.setPrototypeOf(
       {
-        getBlockFromViewDirection(options) {
+        getBlockFromViewDirection: options => {
           const hit = player.getBlockFromViewDirection(options)
           if (hit) {
-            const half = spread / 2
-            const rd = () => Math.randomInt(-half, half)
-            const location = Vector.add(hit.block, { x: rd(), y: rd(), z: rd() })
-            const block = hit.block.dimension.getBlock(location)
+            const block = hit.block.dimension.getBlock(this.getRandomSpreadLocation(hit.block, spread))
             if (!block) return
             return {
               block,
@@ -45,6 +42,12 @@ class MultiBrushTool extends WorldEditMultiTool {
       } satisfies Partial<Player>,
       player,
     ) as Player
+  }
+
+  getRandomSpreadLocation(from: Vector3, spread: number) {
+    const half = spread / 2
+    const rd = () => Math.randomInt(-half, half)
+    return Vector.add(from, { x: rd(), y: rd(), z: rd() })
   }
 }
 

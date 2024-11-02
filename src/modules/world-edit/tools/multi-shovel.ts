@@ -29,8 +29,8 @@ class MultiShovelTool extends WorldEditMultiTool {
       this.forEachTool(
         slot,
         (proxiedItem, tool, toolStorage) => {
-          if (!tool.onUse) return
-          tool.interval10?.(player, toolStorage, proxiedItem, settings)
+          if (!tool.interval10) return
+          tool.interval10(player, toolStorage, proxiedItem, settings)
         },
         storage.tools,
       )
