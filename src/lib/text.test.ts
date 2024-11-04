@@ -88,8 +88,8 @@ describe('text', () => {
   it('should work with badge', () => {
     expect(t.badge`Письма ${-3}`).toMatchInlineSnapshot(`"§7Письма§7"`)
     expect(t.badge`Письма ${0}`).toMatchInlineSnapshot(`"§7Письма§7"`)
-    expect(t.badge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §8(§c3§8)§7"`)
-    expect(t.badge`${3}`).toMatchInlineSnapshot(`"§7§8(§c3§8)§7"`)
+    expect(t.badge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §7(§c3§7)§7"`)
+    expect(t.badge`${3}`).toMatchInlineSnapshot(`"§7§7(§c3§7)§7"`)
     expect(t.badge`${0}`).toMatchInlineSnapshot(`"§7§7"`)
 
     // @ts-expect-error
