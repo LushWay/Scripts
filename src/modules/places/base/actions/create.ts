@@ -15,6 +15,7 @@ actionGuard((_, __, ctx) => {
   )
     return true
 }, ActionGuardOrder.Feature)
+
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { player, block } = event
   const mainhand = player.mainhand()

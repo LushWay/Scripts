@@ -41,7 +41,7 @@ declare module '@minecraft/server' {
      * @param callback Code to run
      * @param tickInterval Time in ticks between each run. Its not guaranted that it will be consistent
      */
-    runJobInterval(callback: () => void | Generator, tickInterval: number): () => void
+    runJobInterval(callback: () => Generator, tickInterval: number): () => void
   }
 }
 
@@ -88,10 +88,10 @@ expand(System.prototype, {
     function jobInterval() {
       system.runJob(
         (function* job() {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          for (const _ of callback() ?? []) yield
+          for (const _ of callback()) yield
           if (stopped) return
-          system.runTimeout(jobInterval, 'jobInterval', tickInterval)
+          if (tickInterval === 0) system.delay(jobInterval)
+          else system.runTimeout(jobInterval, 'jobInterval', tickInterval)
         })(),
       )
     }

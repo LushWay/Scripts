@@ -121,7 +121,7 @@ export function wrap(string: string, maxLength: number) {
   return lines
 }
 
-export function wrapLore(lore: string,) {
+export function wrapLore(lore: string) {
   let color = '§7'
   return wrap(lore, 30).map(e => {
     // Get latest color from the string
@@ -208,6 +208,17 @@ export function hexToRgb(hex: `#${string}`): RGB {
   const [red, green, blue] = rgb
 
   return { red, green, blue }
+}
+
+/** Returns the size of an object or array by checking its length or number of keys. */
+export function sizeOf(target: object | unknown[]): number {
+  if (Array.isArray(target)) return target.length
+  return Object.keys(target).length
+}
+
+/** Checks whenether provided object or array has 0 keys */
+export function isEmpty(target: object | unknown[]): boolean {
+  return sizeOf(target) === 0
 }
 
 /** Empty function that does nothing. */

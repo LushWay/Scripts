@@ -31,6 +31,11 @@ export class Cooldown {
     return 0
   }
 
+  getRemainingTime(player: Player | string) {
+    const id = player instanceof Player ? player.id : player
+    return this.time - this.getElapsed(id)
+  }
+
   /**
    * Checks if cooldown for player is expired and returns true, otherwise tells player about it if {@link this.tell} is
    * true and returns false

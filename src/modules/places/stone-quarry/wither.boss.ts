@@ -1,4 +1,3 @@
-import { world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
 import { RegionStructure } from 'lib/region/structure'
@@ -22,12 +21,16 @@ export function createBossWither(group: Group) {
     .spawnEvent(true)
     .radius(30)
 
-  boss.onRegionCreate.subscribe(region => {
+  boss.onRegionCreate.subscribe(async region => {
     region.structure = new RegionStructure(region)
 
     if (!region.structure.exists) {
-      region.structure.save()
-      world.say(t`Saved structure for ${region.displayName}`)
+      try {
+        await region.structure.save()
+        console.info(t`Saved structure for ${region.displayName}`)
+      } catch (e) {
+        console.warn(t.warn`Unable to save structure for ${region.displayName}`)
+      }
     }
   })
 

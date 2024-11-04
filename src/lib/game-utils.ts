@@ -116,31 +116,29 @@ export function nmspc(text: string) {
  * for preventing overload
  */
 export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
-  // console.debug('Load chunk entering', Vector.string(location, true))
   await world.overworld.runCommandAsync(`tickingarea remove ldchnk`)
-  await world.overworld.runCommandAsync(`tickingarea add ${Vector.string(location)} ${Vector.string(location)} ldchnk `)
+  await world.overworld.runCommandAsync(`tickingarea add ${Vector.string(location)} ${Vector.string(location)} ldchnk`)
 
   let i = 100
   return new Promise<false | Block>(resolve => {
     function done(result: false | Block) {
-      stopInterval()
+      system.clearRun(interval)
       world.overworld.runCommand(`tickingarea remove ldchnk`)
-      // console.debug('Load chunk exit.', !!result)
       resolve(result)
     }
 
-    const stopInterval = system.runJobInterval(() => {
-      if (i < 0) return done(false)
+    const interval = system.runInterval(
+      () => {
+        if (i < 0) return done(false)
 
-      const status = getBlockStatus({ location, dimensionId: 'overworld' })
-      if (status === 'unloaded') {
-        i--
-        // console.debug('Chunk is unloaded')
-        return
-      }
+        const status = getBlockStatus({ location, dimensionId: 'overworld' })
+        if (status === 'unloaded') return i--
 
-      return done(status)
-    }, 5)
+        return done(status)
+      },
+      'loadChunk',
+      5,
+    )
   })
 })
 

@@ -70,7 +70,7 @@ export class Region {
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.kind = this.kind
     region.creator = this
-    if (options.ldb) region.linkedDatabase = options.ldb
+    if (options.ldb) region.ldb = options.ldb
     if (region.structure) region.structure.validateArea()
 
     if (!key) {
@@ -133,7 +133,7 @@ export class Region {
   protected readonly defaultPermissions: RegionPermissions = defaultRegionPermissions()
 
   /** Database linked to the region */
-  linkedDatabase!: JsonObject | undefined
+  ldb!: JsonObject | undefined
 
   /** Region kind */
   private kind!: string
@@ -230,7 +230,7 @@ export class Region {
       k: this.kind,
       permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionType,
-      ldb: this.linkedDatabase,
+      ldb: this.ldb,
     }
   }
 

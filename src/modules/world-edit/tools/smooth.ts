@@ -83,7 +83,7 @@ export async function smoothVoxelData(
 
     function* smootherJob() {
       try {
-        const prefix = '§7Сглаживание: §f '
+        const prefix = '§7Сглаживание: §f'
 
         if (radius > 5) player.info(prefix + 'Вычисление...')
         // Create a copy of the voxel data

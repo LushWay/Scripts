@@ -25,7 +25,7 @@ export class DungeonRegion extends Region {
       () => {
         for (const dungeon of this.dungeons) {
           for (const chest of dungeon.chests) {
-            const placed = dungeon.linkedDatabase.chests[chest.id]
+            const placed = dungeon.ldb.chests[chest.id]
             if (!placed || Cooldown.isExpired(placed, chest.restoreTime)) {
               dungeon.updateChest(chest)
             }
@@ -39,10 +39,10 @@ export class DungeonRegion extends Region {
 
   constructor(area: Area, options: DungeonRegionOptions, key: string) {
     super(area, options, key)
-    this.linkedDatabase.structureId = options.structureId
+    this.ldb.structureId = options.structureId
   }
 
-  linkedDatabase: DungeonRegionDatabase = {
+  ldb: DungeonRegionDatabase = {
     chests: {},
     structureId: '',
   }
@@ -50,7 +50,7 @@ export class DungeonRegion extends Region {
   protected structureFile: StructureFile | undefined
 
   get structureId() {
-    return this.linkedDatabase.structureId
+    return this.ldb.structureId
   }
 
   protected structureSize: Vector3 = Vector.one
@@ -136,7 +136,7 @@ export class DungeonRegion extends Region {
     const block = this.dimension.getBlock(Vector.add(this.structurePosition, chest.location))
     if (!block?.isValid()) return
 
-    this.linkedDatabase.chests[chest.id] = Date.now()
+    this.ldb.chests[chest.id] = Date.now()
 
     if (block.typeId !== MinecraftBlockTypes.Chest) block.setType(MinecraftBlockTypes.Chest)
 

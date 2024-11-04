@@ -19,6 +19,20 @@ import {
   toReplaceTarget,
 } from '../utils/blocks-set'
 
+enum Activator {
+  OnUse = 'use',
+  Interval0 = 'i0',
+  Interval10 = 'i10',
+  Interval20 = 'i20',
+}
+
+const activator: Record<Activator, string> = {
+  [Activator.Interval0]: 'Раз в тик',
+  [Activator.Interval10]: 'Раз в пол секунды',
+  [Activator.Interval20]: 'Раз в секунду',
+  [Activator.OnUse]: 'При использовании',
+}
+
 interface Storage {
   version: number
   blocksSet: BlocksSetRef
@@ -29,7 +43,7 @@ interface Storage {
   offset: number
   blending: number
   factor: number
-  useInterval: boolean
+  activator: Activator
 }
 
 class ShovelTool extends WorldEditTool<Storage> {
@@ -47,7 +61,7 @@ class ShovelTool extends WorldEditTool<Storage> {
     offset: -1,
     blending: -1,
     factor: 20,
-    useInterval: true,
+    activator: Activator.Interval10,
   }
 
   getMenuButtonName(player: Player) {
@@ -72,10 +86,10 @@ class ShovelTool extends WorldEditTool<Storage> {
         storage.blending,
       )
       .addSlider('Сила смешивания', 0, 100, 1, storage.factor)
-      .addToggle('Использовать интервал для активации', storage.useInterval)
+      .addDropdownFromObject('Метод активации', activator, { defaultValue: storage.activator })
       .show(
         player,
-        (_, radius, height, offset, blocksSet, replaceBlocksSet, replaceMode, blending, factor, useInterval) => {
+        (_, radius, height, offset, blocksSet, replaceBlocksSet, replaceMode, blending, factor, activator) => {
           slot.nameTag = `§r§3Лопата §f${radius} §6${blocksSet}`
           storage.radius = radius
           storage.height = height
@@ -83,7 +97,7 @@ class ShovelTool extends WorldEditTool<Storage> {
           storage.replaceMode = replaceMode ?? ''
           storage.blending = Math.min(radius, blending)
           storage.factor = factor
-          storage.useInterval = useInterval
+          storage.activator = activator
 
           storage.blocksSet = [player.id, blocksSet]
 
@@ -115,14 +129,22 @@ class ShovelTool extends WorldEditTool<Storage> {
       }
     })
 
+    this.onInterval(0, (player, storage) => {
+      if (storage.activator !== Activator.Interval0) return
+      this.run(player, storage)
+    })
     this.onInterval(10, (player, storage) => {
-      if (!storage.useInterval) return
+      if (storage.activator !== Activator.Interval10) return
+      this.run(player, storage)
+    })
+    this.onInterval(20, (player, storage) => {
+      if (storage.activator !== Activator.Interval20) return
       this.run(player, storage)
     })
   }
 
   onUse(player: Player, _: ItemStack, storage: Storage) {
-    if (storage.useInterval) return
+    if (storage.activator !== Activator.OnUse) return
     this.run(player, storage)
   }
 

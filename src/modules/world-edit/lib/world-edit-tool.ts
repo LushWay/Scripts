@@ -24,7 +24,7 @@ type StorageKey =
   | 'radius'
   | 'blending'
   | 'factor'
-  | 'useInterval'
+  | 'activator'
 
 const LORE_SEPARATOR = '\u00a0'
 
@@ -134,7 +134,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
     type: 'Тип',
     blending: 'Смешивание',
     factor: 'Фактор смешивания',
-    useInterval: 'Использовать интервал',
+    activator: 'Активатор',
   }
 
   getStorage(slot: ContainerSlot | ItemStack, returnUndefined?: false): Storage
@@ -195,7 +195,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
     }
 
     if ('version' in raw) Reflect.deleteProperty(raw, 'version')
-    return raw
+    return Object.setPrototypeOf(raw, this.storageSchema) as typeof raw
   }
 
   /** @deprecated */

@@ -34,7 +34,9 @@ export function WEmenu(player: Player, body = '') {
   const we = WorldEdit.forPlayer(player)
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  form.addButton(t.badge`§3Наборы блоков ${getOwnBlocksSetsCount(player.id)}`, () => WEblocksSetsMenu(player))
+  form.addButton(t.options({ num: '§f' }).badge`§3Наборы блоков ${getOwnBlocksSetsCount(player.id)}`, () =>
+    WEblocksSetsMenu(player),
+  )
 
   const toolButtons = WorldEditTool.tools.map(tool => ({ tool, buttonText: tool.getMenuButtonName(player) }))
   const inactiveTools = toolButtons.filter(e => e.buttonText.startsWith('§8'))
@@ -42,7 +44,7 @@ export function WEmenu(player: Player, body = '') {
 
   addToForm(activeTools)
 
-  form.addButton(t.badge`§3Отмена действий ${we.history.length}`, () => WEundoRedoMenu(player))
+  form.addButton(t.options({ num: '§f' }).badge`§3Отмена действий ${we.history.length}`, () => WEundoRedoMenu(player))
   form.addButton('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
 
   addToForm(inactiveTools)

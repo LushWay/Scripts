@@ -4,6 +4,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { t } from 'lib/text'
 import { stringify } from 'lib/utils/inspect'
+import { createLogger } from 'lib/utils/logger'
 import { ngettext } from 'lib/utils/ngettext'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
@@ -24,6 +25,8 @@ interface WeDB {
   pos1: Vector3
   pos2: Vector3
 }
+
+const logger = createLogger('WorldEdit')
 
 export class WorldEdit {
   static db = table<WeDB>('worldEdit', () => ({ pos1: { x: 0, y: 0, z: 0 }, pos2: { x: 0, y: 0, z: 0 } }))
@@ -120,7 +123,7 @@ export class WorldEdit {
     const text = stringify(error)
     if (!text) return
 
-    console.error(text)
+    logger.player(this.player).error`Failed to ${action}: ${error}`
     this.player.fail(`Не удалось ${action}§f: ${error}`)
   }
 
@@ -173,7 +176,9 @@ export class WorldEdit {
         this.loadBackup(history, backup)
       }
 
-      this.player.info(`§3Успешно отменено §f${amount} §3${ngettext(amount, ['действие', 'действия', 'действий'])}!`)
+      this.player.info(
+        `§3Успешно ${history === this.history ? 'отменить' : 'восстановить'} §f${amount} §3${ngettext(amount, ['действие', 'действия', 'действий'])}!`,
+      )
     } catch (error) {
       this.failedTo('отменить', error)
     }
@@ -185,7 +190,7 @@ export class WorldEdit {
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
       backup.pos1,
       backup.pos2,
-      this.undos,
+      history === this.history ? this.undos : this.history,
     )
 
     backup.load()

@@ -55,11 +55,14 @@ export const DEFAULT_REPLACE_TARGET_SETS: Record<string, ReplaceTarget[]> = {
 }
 
 export const REPLACE_MODES: Record<string, ReplaceMode> = {
+  'Не воздух': {
+    matches: block => !block.isAir,
+  },
   'Любой цельный блок': {
-    matches: block => block.isSolid,
+    matches: block => block.isSolid && !block.isAir,
   },
   'Любой водонепроницаемый блок': {
-    matches: block => !block.type.canBeWaterlogged,
+    matches: block => !block.type.canBeWaterlogged && !block.isAir && !block.isLiquid,
   },
   'Любой полублок': {
     matches: block => isSlab(block.typeId),

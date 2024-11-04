@@ -1,8 +1,9 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, LockAction, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
 import { MaybeRawText, t } from 'lib/text'
-import { BaseRegion } from './region'
+import { baseRottingButton } from './actions/rotting'
 import { baseUpgradeButton } from './actions/upgrade'
+import { BaseRegion } from './region'
 
 export const baseCommand = new Command('base').setDescription('Меню базы').executes(ctx => openBaseMenu(ctx.player))
 
@@ -24,7 +25,7 @@ function baseMenu(player: Player, base: BaseRegion, back?: VoidFunction, message
   const baseBack = (message?: MaybeRawText) => baseMenu(player, base, back, message)
   const form = new ActionForm(
     'Меню базы',
-    t`${message ? t`${message}\n\n` : ''}${isOwner ? t`Это ваша база.` : t`База игрока ${base.ownerName}`}\n\nКоординаты: ${base.area.center}\nРадиус: ${base.area.radius}`,
+    t.raw`${message ? t.raw`${message}\n\n` : ''}${isOwner ? t`Это ваша база.` : t`База игрока ${base.ownerName}`}${t`\n\nКоординаты: ${base.area.center}\nРадиус: ${base.area.radius}`}`,
   )
 
   form
@@ -36,6 +37,7 @@ function baseMenu(player: Player, base: BaseRegion, back?: VoidFunction, message
         pluralForms: basePluralForms,
       }),
     )
+    .addButton(...baseRottingButton(base, player, baseBack))
     .addButton(...baseUpgradeButton(base, player, baseBack))
 
   if (isOwner)

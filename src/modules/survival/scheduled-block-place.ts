@@ -30,6 +30,7 @@ export function scheduleBlockPlace({
     SCHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
 
+/** Checks whenether provided location in dimension has scheduled blocks */
 export function isScheduledToPlace(location: Vector3, dimension: DimensionType) {
   const dimblocks = IMMUTABLE_DB[dimension]
   if (typeof dimblocks === 'undefined') return false
@@ -37,11 +38,24 @@ export function isScheduledToPlace(location: Vector3, dimension: DimensionType) 
   return dimblocks.find(e => Vector.equals(e.location, location))
 }
 
+/** Event that triggers when scheduled block is being placed */
 export const onScheduledBlockPlace = new EventSignal<{
   schedule: Readonly<ScheduledBlockPlace>
   block: Block
+  dimensionType: DimensionType
   schedules: readonly ScheduledBlockPlace[]
 }>()
+
+const UNSCHEDULED = -1
+
+/**
+ * Cancels scheduled block place by setting its date to -1
+ *
+ * @param schedule - Schedule to be canceled
+ */
+export function unscheduleBlockPlace(schedule: ScheduledBlockPlace) {
+  schedule.date = UNSCHEDULED
+}
 
 const logger = createLogger('SheduledPlace')
 
@@ -74,9 +88,11 @@ function* scheduledBlockPlaceJob() {
         }
 
         block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
+
         if (__DEV__ || (schedules.length - 1) % 100 === 0)
           logger.info`${schedule.typeId.replace('minecraft:', '')} to ${schedule.location}, remains ${schedules.length - 1}`
-        EventSignal.emit(onScheduledBlockPlace, { schedule, block, schedules })
+
+        EventSignal.emit(onScheduledBlockPlace, { schedule, block, schedules, dimensionType: dimension })
       } catch (e) {
         if (e instanceof LocationInUnloadedChunkError) {
           yield
@@ -85,7 +101,7 @@ function* scheduledBlockPlaceJob() {
       }
 
       // Remove successfully placed block from the schedule array
-      SCHEDULED_DB[dimension].splice(i, 1)
+      removeScheduleAt(dimension, i)
       yield
     }
 
@@ -99,16 +115,17 @@ function timeout() {
 }
 timeout()
 
+function removeScheduleAt(dimension: DimensionType, i: number) {
+  SCHEDULED_DB[dimension].splice(i, 1)
+}
+
 function getScheduleBlock(
   schedule: Readonly<ScheduledBlockPlace>,
   i: number,
   dimension: DimensionType,
   schedules: readonly ScheduledBlockPlace[],
 ) {
-  if (typeof schedule === 'undefined') {
-    SCHEDULED_DB[dimension].splice(i, 1)
-    return
-  }
+  if (typeof schedule === 'undefined' || schedule.date === UNSCHEDULED) return removeScheduleAt(dimension, i)
 
   let date = schedule.date
   if (date !== 0) {

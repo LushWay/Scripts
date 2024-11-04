@@ -103,19 +103,23 @@ actionGuard((player, region, ctx) => {
   }
 }, ActionGuardOrder.Lowest)
 
-onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
-  const regions = MineareaRegion.getManyAt(block)
-  for (const region of regions) {
-    if (!(region instanceof MineareaRegion)) continue
+export function onFullRegionTypeRestore<T extends typeof Region>(
+  regionType: T,
+  callback: (region: InstanceType<T>) => void,
+) {
+  onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
+    const regions = regionType.getManyAt<InstanceType<T>>(block)
+    for (const region of regions) {
+      const dimensionType = block.dimension.type
+      const toRestore = schedules.filter(e => region.area.isIn({ vector: e.location, dimensionType }) && e !== schedule)
+      if (toRestore.length) continue
 
-    const dimensionType = block.dimension.type
-    const toRestore = schedules.filter(e => region.area.isIn({ vector: e.location, dimensionType }) && e !== schedule)
-    if (toRestore.length) {
-      // logger.debug`Still blocks to restore: ${toRestore.length}`
-      continue
+      callback(region)
     }
+  })
+}
 
-    logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
-    region.structure.place()
-  }
+onFullRegionTypeRestore(MineareaRegion, region => {
+  logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
+  region.structure.place()
 })

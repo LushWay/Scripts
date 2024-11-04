@@ -7,6 +7,9 @@ export class RegionStructure {
 
   protected id = `region:${this.region.id.replaceAll(':', '|')}`
 
+  /** Used when structure was saved with bigger area radius, for example in BaseRegion */
+  offset = 0
+
   save(): void | Promise<void> {
     this.validateArea()
     world.structureManager.createFromWorld(this.id, this.region.dimension, ...this.region.area.edges, {
@@ -45,16 +48,20 @@ export class RegionStructure {
   }
 
   forEachBlock(
-    callback: (vector: Vector3, structureSavedBlock: BlockPermutation | undefined, dimension: Dimension) => void,
+    callback: (location: Vector3, structureSavedBlock: BlockPermutation | undefined, dimension: Dimension) => void,
   ) {
     const structure = world.structureManager.get(this.id)
     if (!structure) throw new ReferenceError('No structure found!')
 
     const [, edge] = this.region.area.edges
+    const offset = this.offset ? { x: this.offset, y: this.offset, z: this.offset } : undefined
 
     return this.region.area.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
-        const structureSavedBlock = structure.getBlockPermutation(Vector.multiply(Vector.subtract(edge, vector), -1))
+        const structureLocation = Vector.multiply(Vector.subtract(edge, vector), -1)
+        const structureSavedBlock = structure.getBlockPermutation(
+          offset ? Vector.add(structureLocation, offset) : structureLocation,
+        )
         callback(vector, structureSavedBlock, dimension)
       }
     })

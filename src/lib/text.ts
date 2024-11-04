@@ -105,7 +105,7 @@ function createSingle(
 function createBadge(options: ColorizingOptions): (text: TSA, n: number) => Text {
   return createSingle(options, (text, unit) => {
     if (typeof unit !== 'number') return text + textUnitColorize(unit, options)
-    if (unit > 0) return `${text}§8(§c${unit}§8)`
+    if (unit > 0) return `${text}§7(${options.num ?? '§c'}${unit}§7)`
     return text.trimEnd()
   })
 }
