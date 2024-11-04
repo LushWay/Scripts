@@ -11,7 +11,7 @@ import { BlocksSetRef, blocksSetDropdown, getBlocksInSet, stringifyBlocksSetRef 
 
 class RandomizerTool extends WorldEditTool<{ blocksSet: BlocksSetRef; version: number }> {
   id = 'randomizer'
-  name = 'слуйчайный блок из набора'
+  name = 'случайный блок из набора'
   typeId = MinecraftBlockTypes.WarpedNylium
   storageSchema = {
     version: 2,

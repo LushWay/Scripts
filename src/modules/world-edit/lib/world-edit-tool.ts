@@ -200,7 +200,6 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
   /** @deprecated */
   stringifyLore(format: Storage): string[] {
-    ;(format as Partial<Storage>).version ??= this.storageSchema.version
     return [
       ...Object.entries(format)
         .filter(([key]) => key !== 'version')
@@ -218,7 +217,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
       LORE_SEPARATOR,
 
-      ...(JSON.stringify(format)
+      ...(JSON.stringify({ ...format, version: this.storageSchema.version })
         .split('')
         .map(e => '§' + e)
         .join('')
