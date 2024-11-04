@@ -42,9 +42,9 @@ describe('mail', () => {
     expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§7"`)
 
     Mail.send('playerId', 'Some mail', 'content', new Rewards())
-    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§8(§c1§8)§7"`)
+    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§7(§c1§7)§7"`)
 
     Mail.send('playerId', 'Some mail', 'content', new Rewards())
-    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§8(§c2§8)§7"`)
+    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§7(§c2§7)§7"`)
   })
 })
