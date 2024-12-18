@@ -9,7 +9,7 @@ export function lockBlockPriorToNpc(blockType: string, npc: string) {
 }
 
 actionGuard((player, region, ctx) => {
-  if (ctx.type !== 'interactWithBlock') return
+  if (ctx.type !== 'interactWithBlock' || !ctx.event.isFirstEvent) return
   if (!(ctx.event.block.typeId in blocked)) return
 
   const npc = blocked[ctx.event.block.typeId]

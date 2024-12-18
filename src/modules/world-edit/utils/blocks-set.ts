@@ -1,5 +1,6 @@
 import { Block, BlockPermutation, Player } from '@minecraft/server'
 
+import { BlockStateSuperset } from '@minecraft/vanilla-data'
 import { noNullable, typeIdToReadable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS, REPLACE_MODES } from './default-block-sets'
@@ -74,7 +75,7 @@ export function getBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
         permutation = BlockPermutation.resolve(type)
         if (states)
           for (const [state, value] of Object.entries(states)) {
-            permutation = permutation.withState(state, value)
+            permutation = permutation.withState(state as keyof BlockStateSuperset, value)
           }
       } catch (e) {
         console.error(

@@ -89,7 +89,7 @@ export const REPLACE_MODES: Record<string, ReplaceMode> = {
         for (const [state, value] of Object.entries(block.permutation.getAllStates())) {
           try {
             if (!blockPositionStates.includes(state)) continue
-            permutation = permutation.withState(state, value)
+            permutation = permutation.withState(state as keyof BlockStateSuperset, value)
           } catch (e) {
             console.warn('Unable to assign state', { state, value, typeId: block.typeId })
           }

@@ -15,13 +15,13 @@ export const shopFormula = {
       k: 5,
       defaultCount: 50,
     },
-    [MinecraftItemTypes.Log]: {
+    [MinecraftItemTypes.OakLog]: {
       maxCount: 10000,
       minPrice: 8,
       k: 0.0001,
       defaultCount: 5000,
     },
-    [MinecraftItemTypes.Planks]: {
+    [MinecraftItemTypes.OakPlanks]: {
       maxCount: 10000,
       minPrice: 2,
       k: 0.0001,

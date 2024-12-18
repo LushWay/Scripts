@@ -9,8 +9,8 @@ export class Woodman extends ShopNpc {
     this.shop.body(() => 'Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n')
 
     this.shop.menu(form => {
-      const planks = shopFormula.shop[MinecraftItemTypes.Planks]
-      const log = shopFormula.shop[MinecraftItemTypes.Log]
+      const planks = shopFormula.shop[MinecraftItemTypes.OakPlanks]
+      const log = shopFormula.shop[MinecraftItemTypes.OakLog]
 
       for (const [name, typeId] of Object.entries(i)) {
         if (name.startsWith('Warped') || name.startsWith('Crimson') || name === 'Planks' || name === 'Log') continue

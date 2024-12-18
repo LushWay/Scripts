@@ -96,7 +96,7 @@ export class Furnacer extends ShopNpc {
 
 actionGuard((player, region, ctx) => {
   // Not our event
-  if (ctx.type !== 'interactWithBlock') return
+  if (ctx.type !== 'interactWithBlock' || !ctx.event.isFirstEvent) return
   if (region !== StoneQuarry.safeArea) return
 
   const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))

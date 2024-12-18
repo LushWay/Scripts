@@ -4,14 +4,14 @@ import { Items } from 'lib/assets/custom-items'
 export default new Loot('starter')
   .item('WoodenSword')
   .chance('100%')
-  .enchantmetns({ unbreaking: { '0...2': '40%', '3': '60%' } })
+  .enchantmetns({ 'minecraft:unbreaking': { '0...2': '40%', '3': '60%' } })
 
   .item('LeatherBoots')
   .chance('100%')
 
   .item('LeatherLeggings')
   .chance('100%')
-  .enchantmetns({ unbreaking: { '0...2': '50%', '3': '50%' } })
+  .enchantmetns({ 'minecraft:unbreaking': { '0...2': '50%', '3': '50%' } })
 
   .item('LeatherChestplate')
   .chance('100%')

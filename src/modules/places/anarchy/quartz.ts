@@ -2,14 +2,11 @@ import { ItemStack, system } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, ms } from 'lib'
-import { withState } from 'lib/game-utils'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { TechCity } from 'modules/places/tech-city/tech-city'
 import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
-const [quartzTypeId] = withState(MinecraftBlockTypes.QuartzBlock, {
-  chisel_type: 'smooth',
-})
+const quartzTypeId = MinecraftBlockTypes.ChiseledQuartzBlock
 
 const HoeEffectLevels: Record<string, number> = {
   [MinecraftItemTypes.WoodenHoe]: 1,
@@ -43,7 +40,6 @@ actionGuard((player, region, ctx) => {
     // Check block
 
     ctx.event.block.typeId !== quartzTypeId ||
-    ctx.event.block.permutation.getState('chisel_type') !== 'smooth' ||
     // Check item
 
     !ctx.event.itemStack?.typeId ||
