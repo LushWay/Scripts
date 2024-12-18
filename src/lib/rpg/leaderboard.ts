@@ -159,8 +159,9 @@ system.runInterval(
       const info = Leaderboard.all.get(id)
 
       if (info) {
-        if (info.entity.lifetimeState === EntityLifetimeState.Unloaded) continue
-        info.updateLeaderboard()
+        if (info.entity.isValid()) {
+          info.updateLeaderboard()
+        }
       } else {
         const entity = world[leaderboard.dimension]
           .getEntities({
@@ -168,11 +169,9 @@ system.runInterval(
             tags: [Leaderboard.tag],
             type: Leaderboard.entityId,
           })
-
           .find(e => e.id === id)
 
-        if (!entity || entity.lifetimeState === EntityLifetimeState.Unloaded || typeof leaderboard === 'undefined')
-          continue
+        if (!entity || !entity.isValid() || typeof leaderboard === 'undefined') continue
         new Leaderboard(entity, leaderboard).updateLeaderboard()
       }
     }
