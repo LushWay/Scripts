@@ -1,5 +1,5 @@
 {
-  "format_version": "1.16.100",
+  "format_version": "1.20.10",
   "minecraft:item": {
     "description": {
       "identifier": "lw:fireball"
@@ -16,25 +16,6 @@
       },
       "minecraft:creative_category": {
         "category": "commands"
-      },
-      "minecraft:on_use": {
-        "on_use": {
-          "event": "throw"
-        }
-      }
-    },
-    "events": {
-      "throw": {
-        "shoot": {
-          "projectile": "lw:fireball",
-          "launch_power": 0.8,
-          "angle_offset": 1
-        },
-        "swing": {},
-        "decrement_stack": {},
-        "run_command": {
-          "command": ["playsound mob.witch.throw", "playsound fire.ignite"]
-        }
       }
     }
   }

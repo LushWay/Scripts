@@ -2,6 +2,7 @@ import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector } from 'lib'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { customItems } from 'lib/rpg/custom-item'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
@@ -16,6 +17,18 @@ export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
 )
 
 customItems.push(FireBallItem, IceBombItem)
+
+world.afterEvents.itemUse.subscribe(event => {
+  if (FireBallItem.is(event.itemStack)) return
+
+  const entity = event.source.dimension.spawnEntity(CustomEntityTypes.Fireball, event.source.location)
+  const projectile = entity.getComponent('projectile')
+
+  if (!projectile) throw new TypeError('No projectile!')
+
+  projectile.owner = event.source
+  projectile.shoot(Vector.multiply(event.source.getViewDirection(), 3))
+})
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
