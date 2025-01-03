@@ -1,4 +1,4 @@
-import { LootTable } from 'lib'
+import { location, LootTable } from 'lib'
 import { Crate } from 'lib/crates/crate'
 import { Cutscene } from 'lib/cutscene'
 import { Quest } from 'lib/quest'
@@ -6,6 +6,7 @@ import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
+import { FloatingText } from 'lib/rpg/floating-text'
 
 export class City extends SafePlace {
   quests: Quest[] = []
@@ -19,6 +20,12 @@ export class City extends SafePlace {
     donutLoot.id = `§7${this.group.id}§f Donut Crate`
     const normal = new Crate(this.group.point('normal kit').name(t`§7Обычный`), normalLoot)
     const donut = new Crate(this.group.point('donut kit').name(t`§bУсиленный`), donutLoot)
+    const storageLocationpoint = this.group.point('storage text').name(t`§9Хранилище`)
+    const storageLocation = location(storageLocationpoint)
+    const storageFloatingText = new FloatingText(storageLocationpoint.fullId, this.group.dimensionId)
+    storageLocation.onLoad.subscribe(location => {
+      storageFloatingText.update(location, storageLocationpoint.name)
+    })
 
     return { normal, donut }
   }
