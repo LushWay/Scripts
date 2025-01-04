@@ -37,8 +37,8 @@ export class Cooldown {
   }
 
   /**
-   * Checks if cooldown for player is expired and returns true, otherwise tells player about it if {@link this.tell} is
-   * true and returns false
+   * Checks if cooldown for player is expired, if so updates last cooldown time in db and returns true, otherwise tells
+   * player about it if {@link this.tell} is true and returns false
    *
    * @param player - Player to check
    * @returns - Whenether cooldown is expired or not

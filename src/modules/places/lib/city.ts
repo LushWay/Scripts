@@ -2,11 +2,11 @@ import { location, LootTable } from 'lib'
 import { Crate } from 'lib/crates/crate'
 import { Cutscene } from 'lib/cutscene'
 import { Quest } from 'lib/quest'
+import { FloatingText } from 'lib/rpg/floating-text'
 import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
-import { FloatingText } from 'lib/rpg/floating-text'
 
 export class City extends SafePlace {
   quests: Quest[] = []

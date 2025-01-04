@@ -6,6 +6,7 @@ import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { customItems } from 'lib/rpg/custom-item'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
+import { decreaseItemCount } from './throwable-tnt'
 
 export const FireBallItem = new ItemStack('lw:fireball').setInfo(
   undefined,
@@ -19,15 +20,17 @@ export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
 customItems.push(FireBallItem, IceBombItem)
 
 world.afterEvents.itemUse.subscribe(event => {
-  if (FireBallItem.is(event.itemStack)) return
+  if (!FireBallItem.is(event.itemStack)) return
 
-  const entity = event.source.dimension.spawnEntity(CustomEntityTypes.Fireball, event.source.location)
+  decreaseItemCount(event.source)
+
+  const entity = event.source.dimension.spawnEntity(CustomEntityTypes.Fireball, event.source.getHeadLocation())
   const projectile = entity.getComponent('projectile')
 
   if (!projectile) throw new TypeError('No projectile!')
 
   projectile.owner = event.source
-  projectile.shoot(Vector.multiply(event.source.getViewDirection(), 3))
+  projectile.shoot(Vector.multiply(event.source.getViewDirection(), 1.2))
 })
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(

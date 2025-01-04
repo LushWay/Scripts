@@ -2,7 +2,7 @@ import { Block, BlockPermutation, ContainerSlot, Player, RawText, system } from 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, Cooldown, getBlockStatus, isEmpty, isLocationError, Mail, ms, Vector } from 'lib'
 import { table } from 'lib/database/abstract'
-import { playerPositionCache } from 'lib/player-move'
+import { anyPlayerNearRegion, playerPositionCache } from 'lib/player-move'
 import { itemDescription } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import { onFullRegionTypeRestore } from 'modules/places/minearea/minearea-region'
@@ -22,9 +22,9 @@ const takeMaterialsCooldown = new Cooldown(takeMaterialsTime, false, cooldowns.t
 
 system.runInterval(
   () => {
-    for (const base of BaseRegion.instances()) {
+    for (const base of BaseRegion.getAll()) {
       const block = getBlockStatus({ location: base.area.center, dimensionId: base.dimensionType })
-      const isLoaded = anyPlayerNear(base)
+      const isLoaded = anyPlayerNearRegion(base, 20)
       if (block === 'unloaded' || !isLoaded) continue
 
       if (block.typeId === MinecraftBlockTypes.Barrel) {
@@ -293,11 +293,4 @@ function createMaterialsCounter(from?: Record<string, number>) {
     },
     result: () => Object.fromEntries(materials),
   }
-}
-
-function anyPlayerNear(base: BaseRegion) {
-  for (const [, point] of playerPositionCache) {
-    if (base.area.isNear(point, 20)) return true
-  }
-  return false
 }

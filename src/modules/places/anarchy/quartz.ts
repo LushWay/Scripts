@@ -38,10 +38,8 @@ actionGuard((player, region, ctx) => {
     ctx.type !== 'break' ||
     region !== TechCity.safeArea ||
     // Check block
-
     ctx.event.block.typeId !== quartzTypeId ||
     // Check item
-
     !ctx.event.itemStack?.typeId ||
     !(ctx.event.itemStack.typeId in HoeEffectLevels)
   )

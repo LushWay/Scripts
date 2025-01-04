@@ -35,9 +35,11 @@ system.delay(() => {
     }
   })
 
-  if (whitelist.enabled) {
-    logger.info('To disable, use /scriptevent whitelist:disable')
-  }
+  system.delay(() => {
+    if (whitelist.enabled) {
+      logger.info('To disable, use /scriptevent whitelist:disable')
+    }
+  })
 
   system.afterEvents.scriptEventReceive.subscribe(
     event => {

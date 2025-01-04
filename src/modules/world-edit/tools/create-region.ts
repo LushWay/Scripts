@@ -65,7 +65,7 @@ class RegionTool extends WorldEditTool<Storage> {
         ActionbarPriority.UrgentNotificiation,
       )
 
-    const regions = storage.minDistanceSameKind ? createableRegion.region.instances() : Region.regions
+    const regions = storage.minDistanceSameKind ? createableRegion.region.getAll() : Region.regions
     if (regions.some(r => r.area.isNear(player, storage.minDistance)))
       return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.PvP)
 

@@ -8,6 +8,7 @@ import { Region } from 'lib/region/kinds/region'
 import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
+import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
 export const createableRegions: { name: string; region: typeof Region }[] = []
@@ -47,24 +48,37 @@ function regionForm(player: Player) {
 function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {
   const form = new ActionForm('Список ' + RegionType.name)
 
-  form.addButton(ActionForm.backText, back).addButton('Создать', BUTTON['+'], () => {
-    const form = new ModalForm('Создать ' + RegionType.name)
+  form
+    .addButton(ActionForm.backText, back)
+    .addButton('Создать Сферический', BUTTON['+'], () => {
+      new ModalForm('Создать Сферический ' + RegionType.name)
+        .addTextField('Центр', '~~~', '~~~')
+        .addSlider('Радиус', 1, 100, 1)
+        .show(player, (ctx, rawCenter, radius) => {
+          const center = parseLocationFromForm(ctx, rawCenter, player)
+          if (!center) return
 
-    form
-      .addTextField('Центр', '~~~', '~~~')
-      .addSlider('Радиус', 1, 100, 1)
-      .show(player, (ctx, rawCenter, radius) => {
-        let center = parseLocationFromForm(ctx, rawCenter, player)
-        if (!center) return
-        center = Vector.floor(center)
+          editRegion(player, RegionType.create(new SphereArea({ radius, center }, player.dimension.type)), () =>
+            regionList(player, RegionType, back),
+          )
+        })
+    })
+    .addButton('Создать Кубический', BUTTON['+'], () => {
+      new ModalForm('Создать Кубический' + RegionType.name)
+        .addTextField('От', '~~~', '~~~')
+        .addTextField('До', '~~~', '~~~')
+        .show(player, (ctx, rawFrom, rawTo) => {
+          const from = parseLocationFromForm(ctx, rawFrom, player)
+          const to = parseLocationFromForm(ctx, rawTo, player)
+          if (!from || !to) return
 
-        editRegion(player, RegionType.create(new SphereArea({ radius, center }, player.dimension.type)), () =>
-          regionList(player, RegionType, back),
-        )
-      })
-  })
+          editRegion(player, RegionType.create(new RectangleArea({ from, to }, player.dimension.type)), () =>
+            regionList(player, RegionType, back),
+          )
+        })
+    })
 
-  for (const region of RegionType.instances()) {
+  for (const region of RegionType.getAll()) {
     form.addButton(region.name, () => editRegion(player, region, () => regionList(player, RegionType, back)))
   }
   form.show(player)
@@ -127,7 +141,7 @@ function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, p
   const parsed = parseLocationArguments([x, y, z], player)
   if (!parsed) return ctx.error('Неправильная локация: ' + inspect(location))
 
-  return parsed
+  return Vector.floor(parsed)
 }
 
 export function editRegionPermissions(

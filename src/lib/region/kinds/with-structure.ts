@@ -6,6 +6,6 @@ export abstract class RegionWithStructure extends Region {
 
   constructor(...args: ConstructorParameters<typeof Region>) {
     super(...args)
-    this.structure = new RegionStructure(this)
+    this.structure = new RegionStructure(this, this.id)
   }
 }

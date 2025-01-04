@@ -1,7 +1,6 @@
 /* eslint-disable no-var */
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { stringify } from 'lib/utils/inspect'
 import { util } from '../util'
 import { expand } from './extend'
 
@@ -140,28 +139,24 @@ declare global {
   }
 }
 
-function format(args: unknown[]) {
-  return args.map(e => util.toTerminalColors(stringify(e))).join(' ')
-}
-
 expand(console, {
   error(...args: unknown[]) {
-    super.error(format(args))
+    super.error(util.format(args))
   },
   warn(...args: unknown[]) {
-    super.warn(format(args))
+    super.warn(util.format(args))
   },
   info(...args: unknown[]) {
-    super.info(format(args))
+    super.info(util.format(args))
   },
   log(...args: unknown[]) {
-    super.log(format(args))
+    super.log(util.format(args))
   },
   debug(...args: unknown[]) {
-    super.log(format(args))
+    super.log(util.format(args))
   },
   verbose(...args: unknown[]) {
-    if (verbose) super.log(format(args))
+    if (verbose) super.log(util.format(args))
   },
 })
 

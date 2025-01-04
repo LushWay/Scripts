@@ -36,7 +36,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     )
   }
 
-  const region = BaseRegion.instances().find(e => e.getMemberRole(player) !== false)
+  const region = BaseRegion.getAll().find(e => e.getMemberRole(player) !== false)
   if (region) {
     event.cancel = true
     const isOwner = region.getMemberRole(player) === 'owner'

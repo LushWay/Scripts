@@ -30,12 +30,16 @@ export function scheduleBlockPlace({
     SCHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
 }
 
-/** Checks whenether provided location in dimension has scheduled blocks */
-export function isScheduledToPlace(location: Vector3, dimension: DimensionType) {
+export function getScheduledToPlace(location: Vector3, dimension: DimensionType) {
   const dimblocks = IMMUTABLE_DB[dimension]
   if (typeof dimblocks === 'undefined') return false
 
   return dimblocks.find(e => Vector.equals(e.location, location))
+}
+
+/** Checks whenether provided location in dimension has scheduled blocks */
+export function isScheduledToPlace(location: Vector3, dimension: DimensionType) {
+  return !!getScheduledToPlace(location, dimension)
 }
 
 /** Event that triggers when scheduled block is being placed */

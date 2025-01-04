@@ -39,7 +39,7 @@ export interface RegionCreationOptions {
 }
 
 interface RegionConstructor<I extends Region>
-  extends Pick<typeof Region, 'regions' | 'instances' | 'getAt' | 'getManyAt'> {
+  extends Pick<typeof Region, 'regions' | 'getAll' | 'getAt' | 'getManyAt'> {
   new (...args: any[]): I
 }
 
@@ -93,7 +93,7 @@ export class Region {
    *
    * @returns Array of instances that match the specified type `R` of Region.
    */
-  static instances<I extends Region>(this: RegionConstructor<I>) {
+  static getAll<I extends Region>(this: RegionConstructor<I>) {
     return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
   }
 
@@ -112,7 +112,7 @@ export class Region {
    * @param point - Represents point in the world
    */
   static getManyAt<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
-    const regions = this === Region ? this.regions : this.instances()
+    const regions = this === Region ? this.regions : this.getAll()
     point = toPoint(point)
 
     return regions.filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority) as I[]

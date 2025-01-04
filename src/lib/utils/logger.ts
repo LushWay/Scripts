@@ -4,7 +4,7 @@ import { type Text, t } from '../text'
 
 /** Creates new logger that will use name as prefix and will output info to the console */
 export function createLogger(name: string) {
-  name = name.startsWith('§9') ? name : `§9${name} `
+  name = name.startsWith('§9') ? name : `§9${name}`
   return {
     debug: createLevel(name, 'debug', debug),
     info: createLevel(name, 'info', info),
@@ -36,7 +36,7 @@ const error = t.error
 function createLevel(name: string, level: 'debug' | 'error' | 'info' | 'warn', text: Text.Static | Text.Function) {
   return (t: unknown, ...args: unknown[]) => {
     if (isTemplateStringsArray(t)) {
-      console[level](name + (text as unknown as Text.Function)(t, ...args))
+      console[level](name, (text as unknown as Text.Function)(t, ...args))
     } else {
       console[level](name, t, ...args)
     }

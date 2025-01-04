@@ -10,9 +10,9 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
 import { ConfigurableLocation, location } from 'lib/location'
+import { anyPlayerNear } from 'lib/player-move'
 import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
 import { Place } from './place'
 
 export declare namespace Npc {
@@ -122,10 +122,9 @@ export class Npc {
     Core.afterEvents.worldLoad.subscribe(() => {
       system.runInterval(
         () => {
-          const playerPositions = world.getAllPlayers().map(e => e.location)
           this.npcs.forEach(npc => {
-            if (npc.entity) return // Entity already loaded
-            if (!playerPositions.some(e => npc.location.valid && Vector.distance(e, npc.location) < 10)) return
+            if (npc.entity || !npc.location.valid) return // Entity already loaded
+            if (!anyPlayerNear(npc.location, npc.dimensionId, 10)) return
 
             const npcs = world[npc.dimensionId].getEntities({ type: Npc.type }).map(e => ({
               entity: e,

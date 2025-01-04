@@ -41,7 +41,7 @@ actionGuard((player, region, ctx) => {
     const interactable = INTERACTABLE.includes(ctx.event.block.typeId) || interactableItem
     if (interactable && region instanceof BaseRegion) return youCannot(player)
 
-    const scheduled = !!isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
+    const scheduled = isScheduledToPlace(ctx.event.block, ctx.event.block.dimension.type)
     return scheduled || !interactable
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (!region && ctx.type === 'interactWithEntity') {

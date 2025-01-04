@@ -31,9 +31,9 @@ describe('Region', () => {
     expect(region).toBeInstanceOf(TestRegion)
     expectTypeOf(region).toEqualTypeOf<TestRegion>()
 
-    expectTypeOf(TestRegion.instances()).toEqualTypeOf<TestRegion[]>()
-    expect(TestRegion.instances().length).toBe(1)
-    expect(TestRegion.instances()[0]).toBe(region)
+    expectTypeOf(TestRegion.getAll()).toEqualTypeOf<TestRegion[]>()
+    expect(TestRegion.getAll().length).toBe(1)
+    expect(TestRegion.getAll()[0]).toBe(region)
 
     expectTypeOf(TestRegion.getAt(createPoint(0, 0, 0))).toEqualTypeOf<TestRegion | undefined>()
     expect(TestRegion.getAt(createPoint(0, 0, 0))).toBe(region)

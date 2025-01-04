@@ -79,6 +79,17 @@ export const util = {
           TerminalColors.r
       : text.replace(/§(.)/g, '')
   },
+
+  fromTerminalColorsToMinecraft(string: string) {
+    for (const [mc, terminal] of Object.entries(TerminalColors)) {
+      string = string.replaceAll(terminal, `§${mc}`)
+    }
+    return string
+  },
+
+  format(args: unknown[]) {
+    return args.map(e => util.toTerminalColors(stringify(e))).join(' ')
+  },
 }
 
 /**

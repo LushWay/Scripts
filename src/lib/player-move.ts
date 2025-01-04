@@ -1,4 +1,6 @@
-import { Player, system, world } from '@minecraft/server'
+import { Player, ShortcutDimensions, system, world } from '@minecraft/server'
+import type { Region } from 'lib/region'
+import { Vector } from 'lib/vector'
 import { EventSignal } from './event-signal'
 import { WeakPlayerMap } from './weak-player-storage'
 
@@ -13,6 +15,22 @@ export const onPlayerMove = new EventSignal<PlayerPosition>()
 
 /** Cache used by {@link onPlayerMove}. Updates every job run */
 export const playerPositionCache = new WeakPlayerMap<PlayerPosition>()
+
+export function anyPlayerNear(location: Vector3, dimensionType: ShortcutDimensions, radius: number) {
+  for (const player of playerPositionCache.values()) {
+    if (dimensionType !== player.dimensionType) continue
+    if (Vector.distance(player.vector, location) < radius) return true
+  }
+
+  return false
+}
+
+export function anyPlayerNearRegion(region: Region, radius: number) {
+  for (const player of playerPositionCache.values()) {
+    if (region.area.isNear(player, radius)) return true
+  }
+  return false
+}
 
 jobInterval()
 
