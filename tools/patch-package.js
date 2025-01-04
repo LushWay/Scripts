@@ -31,8 +31,17 @@ export const resolve = require.resolve
  * @param {string} options.additions.ending - The code to add to the end of the file.
  */
 export async function patchPackage(packageName, options) {
+  const packageJsonPath = path.join(packageName, 'package.json')
+  let packagePath
+  try {
+    packagePath = resolve(packageJsonPath)
+  } catch {
+    console.log('Unable to resolve', packageJsonPath)
+    return
+  }
+
   // Get path to the package's TypeScript definition file
-  const indexDts = path.join(resolve(path.join(packageName, 'package.json')), '..', 'index.d.ts')
+  const indexDts = path.join(packagePath, '..', 'index.d.ts')
 
   let patchedCode = (await fs.readFile(indexDts, 'utf-8')).replaceAll('\r\n', '\n')
   if (patchedCode.includes(Notice)) return console.log('\x1B[94m➤\x1B[39m \x1B[90mYN0000\x1B[39m: Already patched')
