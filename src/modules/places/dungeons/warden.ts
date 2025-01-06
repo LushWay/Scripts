@@ -18,6 +18,8 @@ import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'm
 const logger = createLogger('warden')
 
 class WardenDungeonRegion extends Region {
+  protected priority = 3
+
   get displayName(): string | undefined {
     return '§5Варден'
   }
@@ -30,23 +32,26 @@ interface LinkedDatabase extends JsonObject {
 }
 
 class WardenDungeonLootRegion extends Region {
-  protected priority = 2
+  protected priority = 4
   get displayName(): string | undefined {
     return '§dНезеритовая жила'
   }
-  ldb: LinkedDatabase = {
-    blocks: [],
-  }
+  ldb: LinkedDatabase = { blocks: [] }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
 registerCreateableRegion('Лут данжа вардена', WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {
-  if (!(region instanceof WardenDungeonLootRegion)) return
-
-  if (ctx.type === 'break' || ctx.type === 'interactWithBlock') {
-    logger.player(player).debug('Break')
+  if (region instanceof WardenDungeonRegion) {
+    if (ctx.type === 'interactWithBlock') return false
     return true
+  }
+
+  if (region instanceof WardenDungeonLootRegion) {
+    if (ctx.type === 'break' || ctx.type === 'interactWithBlock') {
+      logger.player(player).debug('Break')
+      return true
+    }
   }
 }, ActionGuardOrder.Feature)
 
