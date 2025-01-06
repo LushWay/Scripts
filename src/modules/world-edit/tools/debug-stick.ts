@@ -75,16 +75,28 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       const stateInfo = this.getStatesInfo(hit.block)
       if (!stateInfo) return this.noStatesToChangeWarning(player, hit.block)
 
-      const { stateName, allStates } = stateInfo
-      player.onScreenDisplay.setActionBar(this.statesToString(hit.block, allStates, stateName), ActionbarPriority.PvP)
+      const { stateName, stateNames, allStates } = stateInfo
+      player.onScreenDisplay.setActionBar(
+        this.statesToString(player, stateNames, hit.block, allStates, stateName),
+        ActionbarPriority.PvP,
+      )
     })
   }
 
   private blockCache = new Map<string, string>()
 
-  private statesToString(block: Block, allStates: Record<string, string | number | boolean>, stateName: string) {
+  private statesToString(
+    player: Player,
+    stateNames: string[],
+    block: Block,
+    allStates: Record<string, string | number | boolean>,
+    stateName: string,
+  ) {
+    const nextStateName = player.isSneaking ? nextValue(stateNames, stateName) : stateName
     return t`${Vector.string(block, true)} ${block.typeId}\n${textTable(
-      Object.map(allStates, (key, value) => (key === stateName ? ['§b' + key, value] : [key, value])),
+      Object.map(allStates, (key, value) =>
+        key === stateName ? ['§b' + key, value] : key === nextStateName ? ['§e' + key, value] : [key, value],
+      ),
       true,
     )}`
   }
@@ -111,7 +123,10 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       const permutation = block.permutation.withState(stateName as keyof BlockStateSuperset, nextStateValue)
       block.setPermutation(permutation)
     }
-    player.onScreenDisplay.setActionBar(this.statesToString(block, allStates, stateName), ActionbarPriority.PvP)
+    player.onScreenDisplay.setActionBar(
+      this.statesToString(player, stateNames, block, allStates, stateName),
+      ActionbarPriority.PvP,
+    )
   }
 
   private noStatesToChangeWarning(player: Player, block: Block) {
@@ -126,7 +141,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     const stateNames = Object.keys(allStates)
     if (stateNames.length === 0) return
 
-    const cacheId = Vector.string(block)
+    const cacheId = block.typeId
     const stateName = this.blockCache.get(cacheId) ?? stateNames[0]
     return { stateNames, stateName, allStates, cacheId }
   }
