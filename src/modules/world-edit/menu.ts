@@ -551,13 +551,12 @@ export function WEeditBlockStatesMenu(
   states: Record<string, string | boolean | number>,
   back: () => void,
   edited = false,
+  backText = ActionForm.backText,
 ) {
   return new Promise<Record<string, string | boolean | number>>(resolve => {
     const form = new ActionForm('Редактировать свойства блока')
 
-    form.addButton(ActionForm.backText, () => {
-      resolve(states)
-    })
+    form.addButton(backText, () => resolve(states))
 
     if (edited) form.addButton(ActionForm.backText + ' без сохранения', back)
 

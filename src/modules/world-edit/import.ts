@@ -25,13 +25,14 @@ import './builder'
 
 import './tools/brush'
 import './tools/clipboard'
+import './tools/debug-stick'
 import './tools/randomizer'
 import './tools/shovel'
 import './tools/smooth'
 import './tools/tool'
 import './tools/wand'
 
-// Latest
+// Depend on other tools
 import './tools/create-region'
 import './tools/multi-brush'
 import './tools/multi-shovel'

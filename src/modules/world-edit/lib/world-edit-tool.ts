@@ -1,4 +1,13 @@
-import { ContainerSlot, ItemStack, ItemTypes, Player, system, world } from '@minecraft/server'
+import {
+  Block,
+  ContainerSlot,
+  ItemStack,
+  ItemTypes,
+  ItemUseOnBeforeEvent,
+  Player,
+  system,
+  world,
+} from '@minecraft/server'
 import { Command, inspect, isKeyof, stringify, util } from 'lib'
 import { textTable } from 'lib/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
@@ -43,8 +52,11 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
   private command?: Command
 
-  editToolForm?(this: WorldEditTool<Storage>, slot: ContainerSlot, player: Player, initial?: boolean): void
+  editToolForm?(this: WorldEditTool<Storage>, slot: ContainerSlot, player: Player, initial?: boolean): void {
+    this.saveStorage(slot, this.storageSchema)
+  }
   onUse?(player: Player, item: ItemStack, storage: Storage): void
+  onUseOnBlock?(player: Player, item: ItemStack, block: Block, storage: Storage): void
 
   onGlobalInterval(ticks: 'global', interval: WorldEditToolInterval<Storage | undefined>): void {
     this[`interval${ticks}`] = interval
@@ -228,17 +240,32 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   private static ticks = 0
 
   static {
-    this.onUseEvent()
+    this.onUseEvent('itemUse')
+    this.onUseEvent('itemUseOn')
     this.intervalsJob()
   }
 
-  private static onUseEvent() {
-    world.afterEvents.itemUse.subscribe(({ source: player, itemStack: item }) => {
+  private static onUseEvent(event: 'itemUse' | 'itemUseOn') {
+    const property =
+      event === 'itemUse' ? ('onUse' satisfies keyof WorldEditTool) : ('onUseOnBlock' satisfies keyof WorldEditTool)
+
+    world[event === 'itemUseOn' ? 'beforeEvents' : 'afterEvents'][event].subscribe(someEvent => {
+      const { source: player, itemStack: item } = someEvent
       if (!(player instanceof Player)) return
 
-      WorldEditTool.tools
-        .filter(tool => tool.onUse && tool.isOurItemType(item))
-        .forEach(tool => util.catch(() => tool.onUse?.(player, item, tool.getStorage(item, true))))
+      for (const tool of WorldEditTool.tools) {
+        if (!tool[property] || !tool.isOurItemType(item)) continue
+
+        if (property === 'onUse') {
+          tool[property](player, item, tool.getStorage(item, true))
+        } else {
+          const event = someEvent as ItemUseOnBeforeEvent
+          if (!event.isFirstEvent) return
+          
+          event.cancel = true
+          system.delay(() => tool[property]?.(player, item, event.block, tool.getStorage(item, true)))
+        }
+      }
     })
   }
 

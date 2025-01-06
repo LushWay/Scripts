@@ -9,8 +9,8 @@ export const notice = `/**
 ${Notice}
 * tools/patch-package.js
 *
-* New methods assigments can be founded in
-* scripts/lib/Extensions
+* New method assigments can be found in the
+* src/lib/extensions/
 */`
 
 export const { relative } = pathInfo(import.meta.url)

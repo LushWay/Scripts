@@ -2,6 +2,7 @@ import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { Vector } from 'lib/vector'
+import { Items } from './assets/custom-items'
 import { onPlayerMove } from './player-move'
 
 type PlaceType = 'enters' | 'interactions'
@@ -56,6 +57,7 @@ export class PlaceAction {
       // Allow using any block specified by interaction
       if (
         ctx.type === 'interactWithBlock' &&
+        (!ctx.event.itemStack || ctx.event.itemStack.typeId !== Items.WeDebugstick) &&
         this.emit('interactions', ctx.event.block, ctx.event.player, ctx.event.player.dimension.type)
       ) {
         return false
