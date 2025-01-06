@@ -83,7 +83,8 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     })
   }
 
-  private blockCache = new Map<string, string>()
+  private blockLocationCache = new Map<string, string>()
+  private blockTypeCache = new Map<string, string>()
 
   private statesToString(
     player: Player,
@@ -98,6 +99,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
         key === stateName ? ['§b' + key, value] : key === nextStateName ? ['§e' + key, value] : [key, value],
       ),
       true,
+      false,
     )}`
   }
 
@@ -105,7 +107,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     const stateInfo = this.getStatesInfo(block)
     if (!stateInfo) return this.noStatesToChangeWarning(player, block)
 
-    const { stateNames, stateName, allStates, cacheId } = stateInfo
+    const { stateNames, stateName, allStates, cacheLocationId, cacheTypeId } = stateInfo
 
     if (player.isSneaking) {
       if (stateNames.length === 1)
@@ -115,7 +117,8 @@ class DebugStick extends WorldEditTool<StorageSchema> {
         )
 
       const nextStateName = nextValue(stateNames, stateName)
-      this.blockCache.set(cacheId, nextStateName)
+      this.blockLocationCache.set(cacheLocationId, nextStateName)
+      this.blockTypeCache.set(cacheTypeId, nextStateName)
     } else {
       const validValues = BlockStates.get(stateName)?.validValues ?? [allStates[stateName]]
       const stateValue = allStates[stateName]
@@ -141,9 +144,11 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     const stateNames = Object.keys(allStates)
     if (stateNames.length === 0) return
 
-    const cacheId = block.typeId
-    const stateName = this.blockCache.get(cacheId) ?? stateNames[0]
-    return { stateNames, stateName, allStates, cacheId }
+    const cacheTypeId = block.typeId
+    const cacheLocationId = Vector.string(block)
+    const stateName =
+      this.blockLocationCache.get(cacheLocationId) ?? this.blockTypeCache.get(cacheTypeId) ?? stateNames[0]
+    return { stateNames, stateName, allStates, cacheTypeId, cacheLocationId }
   }
 }
 
