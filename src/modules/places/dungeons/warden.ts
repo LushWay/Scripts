@@ -15,7 +15,6 @@ import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'l
 import { createLogger } from 'lib/utils/logger'
 
 // TODO Add chest generation
-
 const logger = createLogger('warden')
 
 class WardenDungeonRegion extends Region {
