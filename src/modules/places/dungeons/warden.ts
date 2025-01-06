@@ -44,7 +44,6 @@ registerCreateableRegion('Лут данжа вардена', WardenDungeonLootRe
 actionGuard((player, region, ctx) => {
   if (region instanceof WardenDungeonRegion) {
     if (ctx.type === 'interactWithBlock') return false
-    return true
   }
 
   if (region instanceof WardenDungeonLootRegion) {
