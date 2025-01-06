@@ -6,6 +6,7 @@ import {
   fromMsToTicks,
   ms,
   Region,
+  RegionPermissions,
   registerCreateableRegion,
   registerSaveableRegion,
 } from 'lib'
@@ -37,15 +38,25 @@ class WardenDungeonLootRegion extends Region {
     return '§dНезеритовая жила'
   }
   ldb: LinkedDatabase = { blocks: [] }
+
+  protected defaultPermissions: RegionPermissions = {
+    allowedAllItem: true,
+    allowedEntities: 'all',
+
+    doors: true,
+    gates: true,
+    pvp: true,
+    switches: true,
+    trapdoors: true,
+
+    owners: [],
+    openContainers: false,
+  }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
 registerCreateableRegion('Лут данжа вардена', WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {
-  if (region instanceof WardenDungeonRegion) {
-    if (ctx.type === 'interactWithBlock') return false
-  }
-
   if (region instanceof WardenDungeonLootRegion) {
     if (ctx.type === 'break' || ctx.type === 'interactWithBlock') {
       logger.player(player).debug('Break')
