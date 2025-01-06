@@ -3,7 +3,6 @@ import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { inspect } from 'lib/util'
 import { blockItemsLangJson, langs, Language } from '../assets/lang'
 import { sprintf } from './sprintf'
-import { nmspc } from 'lib'
 
 /**
  * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
