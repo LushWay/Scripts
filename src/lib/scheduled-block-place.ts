@@ -84,12 +84,39 @@ function* scheduledBlockPlaceJob() {
 
     // The direction is reversed because we are mutating
     // the array that we are iterating thro
-    for (let i = schedules.length - 1; i >= 0; i--) {
+    mainLoop: for (let i = schedules.length - 1; i >= 0; i--) {
       try {
         const schedule = schedules[i]
-        const block = getScheduleBlock(schedule, i, dimension, schedules)
+        if (typeof schedule === 'undefined' || schedule.date === UNSCHEDULED) {
+          removeScheduleAt(dimension, i)
+          yield
+          continue
+        }
+
+        let date = schedule.date
+        if (date !== 0) {
+          if (schedules.length > 500) {
+            date -= ~~(schedules.length / 500)
+          }
+          if (Date.now() < date) {
+            yield
+            continue
+          }
+
+          // To prevent blocks from restoring randomly in air
+          // we calculate if there is near broken block
+          for (const [i, e] of schedules.entries()) {
+            if (i % 100 === 0) yield
+            if (e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > date) {
+              yield
+              continue mainLoop
+            }
+          }
+        }
+
         yield
-        if (!block) {
+        const block = world.overworld.getBlock(schedule.location)
+        if (!block?.isValid()) {
           continue
         }
 
@@ -123,35 +150,6 @@ timeout()
 
 function removeScheduleAt(dimension: DimensionType, i: number) {
   SCHEDULED_DB[dimension].splice(i, 1)
-}
-
-function getScheduleBlock(
-  schedule: Readonly<ScheduledBlockPlace>,
-  i: number,
-  dimension: DimensionType,
-  schedules: readonly ScheduledBlockPlace[],
-) {
-  if (typeof schedule === 'undefined' || schedule.date === UNSCHEDULED) return removeScheduleAt(dimension, i)
-
-  let date = schedule.date
-  if (date !== 0) {
-    if (schedules.length > 500) {
-      date -= ~~(schedules.length / 500)
-    }
-    if (Date.now() < date) return
-
-    // To prevent blocks from restoring randomly in air
-    // we calculate if there is near broken block
-    const nearAir = schedules.find(
-      e => e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > date,
-    )
-    if (nearAir) return
-  }
-
-  const block = world.overworld.getBlock(schedule.location)
-  if (!block?.isValid()) return
-
-  return block
 }
 
 const scheduleForm = form(form => {
