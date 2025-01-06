@@ -50,10 +50,12 @@ export class Gunsmith extends ShopNpc {
             const item = slot.getItem()
             if (!item?.durability) return false
 
+            const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 0) ?? 1
+
             form
               .product()
               .name('Починить')
-              .cost(new MultiCost().xp(item.durability.damage / 10))
+              .cost(new MultiCost().xp((item.durability.damage / 100) * (enchantmentsLevels / 1000)))
               .onBuy(() => {
                 if (item.durability) item.durability.damage = 0
                 const olditem = item.clone()
