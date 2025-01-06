@@ -3,6 +3,7 @@ import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { inspect } from 'lib/util'
 import { blockItemsLangJson, langs, Language } from '../assets/lang'
 import { sprintf } from './sprintf'
+import { nmspc } from 'lib'
 
 /**
  * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
@@ -48,7 +49,13 @@ export function langToken(item: { typeId: string } | string) {
  * another translated RawMessage
  */
 export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment): RawText {
-  const rawtext: RawMessage[] = [{ translate: langToken({ typeId: typeof e === 'string' ? e : e.type.id }) }]
+  const rawtext: RawMessage[] = [
+    {
+      translate: langToken({
+        typeId: typeof e === 'string' ? e.replace('minecraft:', '') : e.type.id.replace('minecraft:', ''),
+      }),
+    },
+  ]
   if (typeof e === 'object') {
     rawtext.push(
       { text: ' ' },

@@ -43,6 +43,19 @@ export class Mage extends ShopNpc {
       )
 
       form.itemModifierSection(
+        'Улучшить лук',
+        item => item.typeId.endsWith('bow'),
+        'любой лук',
+        (form, slot, item) => {
+          const ench = this.createEnch(form, item, slot)
+          const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
+
+          ench(e.Power, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.Flame, level => new MultiCost().money(level * 2000).xp(level * enchs))
+        },
+      )
+
+      form.itemModifierSection(
         'Улучшить броню',
         item => ['chestplate', 'leggings', 'boots', 'helmet'].some(e => item.typeId.endsWith(e)),
         'любой элемент брони',
