@@ -52,6 +52,14 @@ class WardenDungeonLootRegion extends Region {
     owners: [],
     openContainers: false,
   }
+
+  protected onCreate(): void {
+    this.area.forEachVector((vector, isIn, dimension) => {
+      if (isIn) {
+        dimension.setBlockType(vector, MinecraftBlockTypes.Air)
+      }
+    })
+  }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
 registerCreateableRegion('Лут данжа вардена', WardenDungeonLootRegion)
