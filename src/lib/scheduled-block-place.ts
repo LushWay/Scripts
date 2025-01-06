@@ -88,8 +88,8 @@ function* scheduledBlockPlaceJob() {
       try {
         const schedule = schedules[i]
         const block = getScheduleBlock(schedule, i, dimension, schedules)
+        yield
         if (!block) {
-          yield
           continue
         }
 
