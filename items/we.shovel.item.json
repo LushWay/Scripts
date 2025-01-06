@@ -11,7 +11,7 @@
         "texture": "shovel"
       },
       "minecraft:display_name": {
-        "value": "Строительная лопата\n§7Настраивается с помощью §f-we"
+        "value": "Строительная лопата\n§7Настраивается с помощью §f-shovel"
       },
       "minecraft:creative_category": {
         "category": "construction"

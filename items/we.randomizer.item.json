@@ -11,7 +11,7 @@
         "texture": "name_tag"
       },
       "minecraft:display_name": {
-        "value": "Случайный блок\n§7Настраивается с помощью §f-we"
+        "value": "Случайный блок\n§7Настраивается с помощью §f-randomizer"
       },
       "minecraft:creative_category": {
         "category": "construction"

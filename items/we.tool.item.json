@@ -11,7 +11,7 @@
         "texture": "chain"
       },
       "minecraft:display_name": {
-        "value": "Строительный инструмент\n§7Настраивается с помощью §f-we"
+        "value": "Строительный инструмент\n§7Настраивается с помощью §f-tool"
       },
       "minecraft:cooldown": {
         "duration": 0.1,
