@@ -18,7 +18,8 @@ export class Scavenger extends ShopNpc {
         item =>
           !(item.typeId in shopFormula.shop) &&
           !bannedToSell.includes(item.typeId) &&
-          !item.typeId.startsWith(Items.CompassPrefix),
+          !item.typeId.startsWith(Items.CompassPrefix) &&
+          !item.typeId.startsWith('lw:'),
         'Любой непродаваемый предмет',
         slot => {
           givePlayerMoneyAndXp(player, Math.randomInt(0, slot.amount))
