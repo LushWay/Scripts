@@ -3,8 +3,8 @@ import { ItemStack, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, ms } from 'lib'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
+import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { TechCity } from 'modules/places/tech-city/tech-city'
-import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 const quartzTypeId = MinecraftBlockTypes.ChiseledQuartzBlock
 

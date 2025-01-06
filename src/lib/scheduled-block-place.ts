@@ -1,10 +1,12 @@
 import { Block, BlockPermutation, LocationInUnloadedChunkError, system, world } from '@minecraft/server'
-import { EventSignal, Vector, util } from 'lib'
 import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
+import { EventSignal } from 'lib/event-signal'
 import { form } from 'lib/form/new'
 import { t } from 'lib/text'
+import { util } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
+import { Vector } from 'lib/vector'
 
 interface ScheduledBlockPlace {
   typeId: string

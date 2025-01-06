@@ -2,8 +2,8 @@ import { Player } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, ms } from 'lib'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'
+import { isScheduledToPlace, scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { BaseRegion } from 'modules/places/base/region'
-import { isScheduledToPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS, GATES)
 const INTERACTABLEITEMS = Object.values(MinecraftItemTypes)

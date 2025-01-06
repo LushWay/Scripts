@@ -1,10 +1,10 @@
 import { system, world } from '@minecraft/server'
 import { LockAction, Region, ms } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
+import { isScheduledToPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { BaseRegion } from 'modules/places/base/region'
 import { MineareaRegion } from 'modules/places/minearea/minearea-region'
-import { isScheduledToPlace } from 'modules/survival/scheduled-block-place'
 
 const notify = new Map<string, { time: number; reason: string }>()
 const targetLockTime = ms.from('min', 8)

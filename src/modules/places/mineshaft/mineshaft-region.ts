@@ -1,8 +1,8 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { ms, registerCreateableRegion } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
+import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
-import { scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { MineareaRegion } from '../minearea/minearea-region'
 import { ores, placeOre } from './algo'
 

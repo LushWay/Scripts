@@ -10,8 +10,8 @@ import {
   registerSaveableRegion,
 } from 'lib'
 import { anyPlayerNearRegion } from 'lib/player-move'
+import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
-import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 // TODO Add chest generation
 

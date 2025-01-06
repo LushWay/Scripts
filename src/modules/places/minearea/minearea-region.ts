@@ -4,9 +4,9 @@ import { actionGuard, ActionGuardOrder, registerCreateableRegion } from 'lib/reg
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
+import { onScheduledBlockPlace, scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
-import { onScheduledBlockPlace, scheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 
 const logger = createLogger('Minearea')
 

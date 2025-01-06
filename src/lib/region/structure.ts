@@ -1,4 +1,6 @@
 import { BlockPermutation, Dimension, StructureSaveMode, system, world } from '@minecraft/server'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
 import { Vector } from 'lib/vector'
 import { Region } from './kinds/region'
 
@@ -44,8 +46,15 @@ export class RegionStructure {
       try {
         if (block) dimension.setBlockPermutation(vector, block)
       } catch (e) {
-        console.warn('Unable to set block for structure:', e)
-        // TODO Scheduled block place?
+        const schedule = getScheduledToPlace(vector, dimension.type)
+        if (schedule) unscheduleBlockPlace(schedule)
+        scheduleBlockPlace({
+          dimension: dimension.type,
+          location: vector,
+          typeId: block?.type.id ?? MinecraftBlockTypes.Air,
+          states: block?.getAllStates() ?? {},
+          restoreTime: 0,
+        })
       }
     })
   }

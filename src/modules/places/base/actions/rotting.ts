@@ -2,11 +2,11 @@ import { Block, BlockPermutation, ContainerSlot, Player, RawText, system } from 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, Cooldown, getBlockStatus, isEmpty, isLocationError, Mail, ms, Vector } from 'lib'
 import { table } from 'lib/database/abstract'
-import { anyPlayerNearRegion, playerPositionCache } from 'lib/player-move'
+import { anyPlayerNearRegion } from 'lib/player-move'
+import { scheduleBlockPlace, SCHEDULED_DB, unscheduleBlockPlace } from 'lib/scheduled-block-place'
 import { itemDescription } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import { onFullRegionTypeRestore } from 'modules/places/minearea/minearea-region'
-import { scheduleBlockPlace, SCHEDULED_DB, unscheduleBlockPlace } from 'modules/survival/scheduled-block-place'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion } from '../region'
 
