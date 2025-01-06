@@ -1,5 +1,5 @@
 {
-  "format_version": "1.20.10",
+  "format_version": "1.21.50",
   "minecraft:item": {
     "description": {
       "identifier": "lw:fireball"
@@ -7,9 +7,7 @@
     "components": {
       "minecraft:max_stack_size": 16,
       "minecraft:allow_off_hand": false,
-      "minecraft:icon": {
-        "texture": "fireball"
-      },
+      "minecraft:icon": "fireball",
       "minecraft:cooldown": {
         "category": "gui",
         "duration": 0.5
