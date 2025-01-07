@@ -14,7 +14,7 @@ export const FireBallItem = new ItemStack('lw:fireball').setInfo(
 )
 export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
   '§3Снежная бомба',
-  'Используйте, чтобы отправить все к снежной королеве под льдину',
+  'Используйте, чтобы отправить все к снежной королеве подо льдину',
 )
 
 customItems.push(FireBallItem, IceBombItem)
@@ -36,7 +36,7 @@ world.afterEvents.itemUse.subscribe(event => {
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
     if (!event.entity.isValid()) return
-    if (event.entity.typeId !== 'lw:fireball') {
+    if (event.entity.typeId !== CustomEntityTypes.Fireball) {
       return system.delay(() => {
         try {
           event.entity.remove()
