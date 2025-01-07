@@ -11,7 +11,7 @@ import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPo
 export class Menu {
   static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
 
-  static createItem(typeId: string = Items.Menu, name = '§b§lМеню\n§r§f(use)') {
+  static createItem(typeId: string = Items.Menu, name?: string) {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
