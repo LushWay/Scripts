@@ -1,4 +1,4 @@
-import { ItemStack, TicksPerSecond, system, world } from '@minecraft/server'
+import { TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
@@ -12,11 +12,15 @@ import { t } from 'lib/text'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
 
+const furnaceExpireTime = ms.from('hour', 1)
+const furnaceExpireTimeText =
+  'Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!'
+
 export class Furnacer extends ShopNpc {
   static create() {
     return Group.pointCreator(place => ({
-      furnaces: (furnaces: string[]) => ({
-        onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer({ place, furnaces, onlyInStoneQuarry }),
+      furnaceTypeIds: (furnaceTypeIds: string[]) => ({
+        onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer(place, furnaceTypeIds, onlyInStoneQuarry),
       }),
     }))
   }
@@ -28,10 +32,9 @@ export class Furnacer extends ShopNpc {
    */
   static npcs: Furnacer[] = []
 
-  furnaceTypeIds
-
-  /** Item representing key for using furnace */
-  keyItem = new ItemStack(MinecraftItemTypes.TripwireHook).setInfo('§6Ключ от печки', '§7Ключ от печки в технограде')
+  get id() {
+    return this.place.fullId
+  }
 
   /**
    * Creates new Furnaceer npc store
@@ -41,22 +44,17 @@ export class Furnacer extends ShopNpc {
    * @param options.furnaceTypeIds - Type ids of the furnace blocks
    * @param options.onlyInStoneQuarry - Whenether to allow using this type of furnace outside Stone quarry
    */
-  private constructor({
-    place,
-    furnaces,
-    onlyInStoneQuarry,
-  }: {
-    place: Place
-    furnaces: string[]
-    onlyInStoneQuarry: boolean
-  }) {
+  private constructor(
+    place: Place,
+    readonly furnaceTypeIds: string[],
+    onlyInStoneQuarry: boolean,
+  ) {
     super(place)
-    this.shop.body(() => 'У меня ты можешь купить доступ к печкам\n\n')
+    this.shop.body(() => 'У меня ты можешь купить ключ доступа к печкам\n\n')
     Furnacer.npcs.push(this)
 
-    this.furnaceTypeIds = furnaces
     if (onlyInStoneQuarry) {
-      for (const furnace of furnaces) {
+      for (const furnace of furnaceTypeIds) {
         lockBlockPriorToNpc(furnace, place.name)
       }
     }
@@ -64,6 +62,7 @@ export class Furnacer extends ShopNpc {
     this.shop.menu((form, player) => {
       const { item } = FurnaceKeyItem.schema.create({
         status: 'notUsed',
+        furnacer: this.id,
         code: (Date.now() - 1_700_000_000_000).toString(32).toUpperCase(),
         player: player.name,
         location: '',
@@ -99,7 +98,8 @@ actionGuard((player, region, ctx) => {
   if (ctx.type !== 'interactWithBlock' || !ctx.event.isFirstEvent) return
   if (region !== StoneQuarry.safeArea) return
 
-  const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(ctx.event.block.typeId))
+  const furnaceTypeId = ctx.event.block.typeId
+  const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(furnaceTypeId))
   if (!furnacer) return
 
   // Restrictions
@@ -111,13 +111,31 @@ actionGuard((player, region, ctx) => {
   const lore = FurnaceKeyItem.schema.parse(player.mainhand(), undefined, false)
   if (!lore) return notAllowed()
 
+  if (lore.furnacer !== furnacer.id) return notAllowed(`Этот ключ используется для других печек!`)
+
   const blockId = Vector.string(ctx.event.block)
   const furnace = FurnaceKeyItem.db[blockId]
 
-  // Access allowed
-  if (furnace?.code === lore.code) {
-    furnace.lastPlayerId = player.id
-    return true
+  if (furnace) {
+    // Access allowed
+    if (furnace.code === lore.code) {
+      furnace.lastPlayerId = player.id
+      return true
+      // Search for other keys in the inventory
+    } else if (player.container) {
+      for (const [slot, item] of player.container.entries()) {
+        if (!item) continue
+
+        const lore = FurnaceKeyItem.schema.parse(item, undefined, false)
+        if (!lore) continue
+
+        if (furnace.code === lore.code) {
+          player.warn(t`Использован ключ из слота ${slot}`)
+          furnace.lastPlayerId = player.id
+          return true
+        }
+      }
+    }
   }
 
   // Furnace is free, creating access key
@@ -136,7 +154,7 @@ actionGuard((player, region, ctx) => {
       system.delay(() => {
         FurnaceKeyItem.db[blockId] = {
           code: lore.code,
-          expires: Date.now() + ms.from('hour', 1),
+          expires: Date.now() + furnaceExpireTime,
           lastPlayerId: player.id,
         }
 
@@ -144,7 +162,7 @@ actionGuard((player, region, ctx) => {
         lore.location = Vector.string(ctx.event.block.location, true)
         lore.player = player.name
 
-        player.success('Ключ теперь привязан к этой печке! В течении часа вы можете ей пользоваться!')
+        player.success(furnaceExpireTimeText)
       })
 
       // Prevent from opening furnace dialog
@@ -163,7 +181,9 @@ class FurnaceKeyItem {
 
   static schema = new ItemLoreSchema('furnace key')
     .nameTag(() => '§6Ключ от печки')
-    .lore('§7Ключ от печки в технограде. Используйте его чтобы открыть печку')
+    .lore('§7Ключ от печки в каменоломне. Используйте его, чтобы открыть печку')
+
+    .property('furnacer', String)
 
     .property('code', String)
 

@@ -35,7 +35,7 @@ class StoneQuarryBuilder extends City {
     .group(this.group)
     .id('ovener')
     .name('§6Печкин')
-    .furnaces([
+    .furnaceTypeIds([
       MinecraftBlockTypes.BlastFurnace,
       MinecraftBlockTypes.LitBlastFurnace,
       MinecraftBlockTypes.Furnace,
@@ -46,8 +46,8 @@ class StoneQuarryBuilder extends City {
   foodOvener = Furnacer.create()
     .group(this.group)
     .id('foodOvener')
-    .name('§6Тетя зина')
-    .furnaces([MinecraftBlockTypes.LitBlastFurnace])
+    .name('§6Баба валя')
+    .furnaceTypeIds([MinecraftBlockTypes.LitBlastFurnace])
     .onlyInStoneQuarry(false)
 
   gunsmith = new Gunsmith(this.group)
