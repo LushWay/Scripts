@@ -1,4 +1,4 @@
-import { EntityDamageCause, Player, system, TicksPerSecond, world } from '@minecraft/server'
+import { EntityDamageCause, GameMode, Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
@@ -32,7 +32,12 @@ export class RadioactiveZone {
             return
           }
 
-          if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) continue
+          if (
+            player.database.inv !== 'anarchy' ||
+            Spawn.region?.area.isIn(player) ||
+            player.getGameMode() === GameMode.creative
+          )
+            continue
 
           const distance = Vector.distance(player.location, center)
           let played = false
