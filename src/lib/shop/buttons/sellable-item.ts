@@ -3,6 +3,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
+import { is } from 'lib/roles'
 import { t } from 'lib/text'
 import { ItemCost, MoneyCost, MultiCost } from '../cost'
 import { ErrorCost, FreeCost } from '../cost/cost'
@@ -18,6 +19,8 @@ export function createSellableItem({
   maxCount,
   minPrice,
   k,
+  player,
+  inventory,
 }: {
   shop: Shop
   form: ShopForm
@@ -26,25 +29,33 @@ export function createSellableItem({
   maxCount: number
   minPrice: number
   k: number
+  player: Player
+  inventory: Map<string, number>
 }) {
   const aux = getAuxOrTexture(type)
   const db = ShopForm.database[shop.id]
-  const body = () =>
-    t.raw`Товара на складе: ${t`${db[type] ?? 0}/${maxCount}`}, ${t`${(((db[type] ?? 0) / maxCount) * 100).toFixed(2)}%%`}`
-  const getCount = () => Math.max(1, db[type] ?? defaultCount)
-  const getBuy = (count = getCount()) => {
-    return Math.max(1, shopFormula.formula(maxCount, count, minPrice, k))
+  const getCount = () => Math.max(0, db[type] ?? defaultCount)
+  const getBuy = (count = getCount()) => Math.max(1, shopFormula.formula(maxCount, count, minPrice, k))
+  const body = () => {
+    const storageAmount = t`${getCount()}/${maxCount}`
+    const filledPercent = t`${((getCount() / maxCount) * 100).toFixed(2)}%%`
+    return t.raw`Товара на складе: ${storageAmount}, ${filledPercent}`
   }
+  const adminBody = () => {
+    return t.raw`${body()}\n\nAdmin info below\n${t`DB count: ${db[type]}\nDefault count: ${defaultCount}`}`
+  }
+  const amount = inventory.get(type) ?? 0
 
   form.section(
-    itemDescription({ typeId: type, amount: 0 }),
+    itemDescription({ typeId: type, amount }),
     (form, player) => {
-      form.body = body
+      const bodyFn = is(player.id, 'techAdmin') ? adminBody : body
+      form.body = bodyFn
       form.section(
         '§3Продать',
         form => {
-          form.body = body
-          const addSell = createSell(getCount(), getBuy, type, form, db, maxCount, aux)
+          form.body = bodyFn
+          const addSell = createSell(getCount, getBuy, type, form, db, maxCount, aux)
           addSell(1)
           addSell(16)
           addSell(32)
@@ -55,7 +66,7 @@ export function createSellableItem({
         BUTTON['+'],
       )
 
-      const addBuy = createBuy(getCount(), getBuy, form, type, db, aux)
+      const addBuy = createBuy(getCount, getBuy, form, type, db, aux)
       addBuy(1)
       addBuy(16)
       addBuy(32)
@@ -86,65 +97,68 @@ export const ImpossibleBuyCost = ErrorCost(t.error`Покупка невозмо
 export const ImpossibleSellCost = ErrorCost(t.error`Продажа невозможна`)
 
 function createBuy(
-  dbCount: number,
+  getCount: () => number,
   getBuy: (n: number) => number,
   form: ShopFormSection,
   type: MinecraftItemTypes,
   db: Record<string, number | undefined>,
   aux: string,
 ) {
-  return (count = 1) => {
-    const total = getTotal(count, i => getBuy(dbCount - i))
-    const cost = total <= 0 ? ImpossibleBuyCost : dbCount - count < 0 ? NoItemsToSell : new MoneyCost(total)
+  const dbCount = getCount()
+  return (buyCount = 1) => {
+    const finalCost = getFinalCost(buyCount, i => getBuy(dbCount - i))
+    const cost = finalCost <= 0 ? ImpossibleBuyCost : dbCount - buyCount < 0 ? NoItemsToSell : new MoneyCost(finalCost)
 
     form
       .product()
-      .name(itemDescription({ typeId: type, amount: count }))
+      .name(itemDescription({ typeId: type, amount: buyCount }))
       .cost(cost)
       .onBuy(player => {
         if (!player.container) return
 
         cost.take(player)
-        db[type] = Math.max(0, (db[type] ?? count) - count)
-        player.runCommand(`give @s ${type} ${count}`)
+        console.log({ count: getCount(), buyCount, a: getCount() - buyCount, db: Math.max(0, getCount() - buyCount) })
+        db[type] = Math.max(0, getCount() - buyCount)
+        player.runCommand(`give @s ${type} ${buyCount}`)
       })
       .setTexture(aux)
-      .setTakeCost(true)
+      .setTakeCost(false)
   }
 }
 
 function createSell(
-  dbCount: number,
-  getSell: (n: number) => number,
+  getCount: () => number,
+  getBuy: (n: number) => number,
   type: MinecraftItemTypes,
   form: ShopFormSection,
   db: Record<string, number | undefined>,
   maxCount: number,
   aux: string,
 ) {
-  return (count = 1) => {
-    const total = getTotal(count, n => getSell(dbCount + n) / 2)
+  const dbCount = getCount()
+  return (sellCount = 1) => {
+    const finalCost = getFinalCost(sellCount, n => getBuy(dbCount + n) / 2)
     const cost = new MultiCost(
-      total <= 0 ? ImpossibleSellCost : count + dbCount > maxCount ? TooMuchItems : FreeCost,
-      new ItemCost(type, count),
+      finalCost <= 0 ? ImpossibleSellCost : sellCount + dbCount > maxCount ? TooMuchItems : FreeCost,
+      new ItemCost(type, sellCount),
     )
 
     form
       .product()
-      .name(new MoneyCost(total).toString())
+      .name(new MoneyCost(finalCost).toString())
       .cost(cost)
       .onBuy(player => {
-        db[type] = Math.min(maxCount, (db[type] ?? 0) + count)
-        player.scores.money += total
+        db[type] = Math.min(maxCount, getCount() + sellCount)
+        player.scores.money += finalCost
       })
       .setTexture(aux)
       .setSell(true)
   }
 }
 
-function getTotal(addCount: number, adder: (n: number) => number) {
+function getFinalCost(addCost: number, calculateCost: (n: number) => number) {
   let total = 0
-  for (let i = 0; i < addCount; i++) total += adder(i)
+  for (let i = 0; i < addCost; i++) total += calculateCost(i)
   return ~~total
 }
 

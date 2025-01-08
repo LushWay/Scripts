@@ -36,16 +36,13 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
     if (!block || block.isAir) continue
     if (!MineshaftRegion.getAt(block)) continue
 
-    const nearAir = getEdgeBlocksOf(block).some(e => {
-      const key = Vector.string(e)
-      if (!(key in airCache)) {
-        const block = dimension.getBlock(e)
-        if (block) {
-          airCache[key] = { block, air: !block.isSolid }
-        } else return true
-      }
+    const nearAir = getEdgeBlocksOf(block).some(location => {
+      const key = Vector.string(location)
+      if (key in airCache) return airCache[key].air
 
-      return airCache[key].air
+      const block = dimension.getBlock(location)
+      if (block) return (airCache[key] = { block, air: !block.isSolid }).air
+      else return true
     })
 
     if (nearAir) continue
@@ -57,17 +54,17 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
   const isDeepslate =
     brokenOre?.isDeepslate ?? (brokenTypeId === MinecraftBlockTypes.Deepslate || brokenLocation.y < -3)
 
-  const place = (block: Block, oreTypeId: string) => {
-    if (block.isValid() && !block.isAir && oreTypeId) {
-      block.setType(oreTypeId)
-      return true
-    } else return false
-  }
-
   for (const [action] of EventSignal.sortSubscribers(OrePlace)) {
     const placed = action({ player, isDeepslate, brokenOre: brokenOre?.ore, possibleBlocks, place, brokenLocation })
     if (placed) return
   }
+}
+
+function place(block: Block, oreTypeId: string) {
+  if (block.isValid() && !block.isAir && oreTypeId) {
+    block.setType(oreTypeId)
+    return true
+  } else return false
 }
 
 interface OrePlaceEvent {

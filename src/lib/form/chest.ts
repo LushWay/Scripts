@@ -2,9 +2,10 @@ import { BlockPermutation, Player, RawText } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
+import { textureData } from 'lib/assets/texture-data'
 import { nmspc } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
-import { inspect, util, wrapLore } from 'lib/util'
+import { inspect, isKeyof, util, wrapLore } from 'lib/util'
 import { typeIdToReadable } from 'lib/utils/lang'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
@@ -14,6 +15,8 @@ const NUMBER_OF_1_16_100_ITEMS = totalCustomItems
 const customItemsReverted: Record<string, string> = Object.map(Items, (k, v) => [v, k])
 export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
   if (textureOrTypeId.startsWith('textures')) return textureOrTypeId
+  if (isKeyof(textureOrTypeId, textureData)) return textureData[textureOrTypeId]
+
   if (
     customItemsReverted[textureOrTypeId] ||
     (textureOrTypeId.startsWith('lw:') && textureOrTypeId.includes('_spawn_egg'))

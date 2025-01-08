@@ -1,4 +1,5 @@
 import { Container, ContainerSlot, ItemStack, Player } from '@minecraft/server'
+import { enchantData } from 'lib/assets/texture-data'
 import { ChestForm } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
 import { MaybeRawText, t } from 'lib/text'
@@ -45,7 +46,8 @@ function addItem(
   select: OnSelect,
   container: Container,
 ) {
-  const enchanted = !!item.enchantable?.getEnchantments().length
+  // Enchant data does not applies for the custom items becuase they don't use aux ids
+  const enchanted = enchantData[item.typeId] ?? !!item.enchantable?.getEnchantments().length
   const nameTagPrefix = enchanted ? '§b' : ''
   const lore = [...enchantmentsToLore(item, player), ...item.getLore(), ...addItemDurabilityToLore(item)]
 

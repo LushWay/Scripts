@@ -48,13 +48,7 @@ export function langToken(item: { typeId: string } | string) {
  * another translated RawMessage
  */
 export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment): RawText {
-  const rawtext: RawMessage[] = [
-    {
-      translate: langToken({
-        typeId: typeof e === 'string' ? e.replace('minecraft:', '') : e.type.id.replace('minecraft:', ''),
-      }),
-    },
-  ]
+  const rawtext: RawMessage[] = [{ translate: langToken({ typeId: typeof e === 'string' ? e : e.type.id }) }]
   if (typeof e === 'object') {
     rawtext.push(
       { text: ' ' },

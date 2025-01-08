@@ -114,6 +114,8 @@ export class ShopForm {
     return this
   }
 
+  protected inventory?: Map<string, number>
+
   dynamicCostItem(typeId: keyof (typeof shopFormula)['shop']): ShopForm
 
   dynamicCostItem(typeId: MinecraftItemTypes, template: ValueOf<(typeof shopFormula)['shop']>): ShopForm
@@ -122,7 +124,25 @@ export class ShopForm {
     if (isKeyof(typeId, shopFormula.shop)) template ??= shopFormula.shop[typeId]
     if (!template) throw new Error('No template was provided for typeId ' + typeId)
 
-    createSellableItem({ form: this, shop: this.shop, type: typeId, ...template })
+    this.inventory ??= this.player.container
+      ? [...this.player.container.entries()].reduce((acc, [, item]) => {
+          if (item) {
+            const amount = acc.get(item.typeId) ?? 0
+            acc.set(item.typeId, amount + item.amount)
+          }
+
+          return acc
+        }, new Map<string, number>())
+      : new Map<string, number>()
+
+    createSellableItem({
+      player: this.player,
+      form: this,
+      shop: this.shop,
+      inventory: this.inventory,
+      type: typeId,
+      ...template,
+    })
     return this as ShopForm
   }
 

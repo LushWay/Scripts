@@ -156,7 +156,7 @@ class Learning {
         })
       })
 
-    q.item('§6Вернитесь к верстаку и сделайте каменную кирку')
+    q.item('§6Сделайте каменную кирку')
       .description('Вернитесь к верстаку и улучшите свой инструмент.')
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
       .place(crafting)
@@ -168,7 +168,7 @@ class Learning {
         ctx.subscribe(
           OrePlace,
           ({ player, isDeepslate, possibleBlocks, place }) => {
-            if (player.id !== player.id) return false
+            if (player.id !== ctx.player.id) return false
 
             ctx.db ??= { count: ctx.value }
             ;(ctx.db as { iron?: number }).iron ??= 0
