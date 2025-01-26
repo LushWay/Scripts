@@ -163,7 +163,7 @@ export class ShopForm {
         player.container.addItem(item)
       })
       .setTexture(texture)
-      .setTakeCost(true)
+      .setTakeCost(false)
 
     return this
   }

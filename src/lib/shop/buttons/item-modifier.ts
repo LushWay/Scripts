@@ -37,7 +37,7 @@ export function createItemModifier(
       )
       return false
     })
-    .setTakeCost(true)
+    .setTakeCost(false)
 }
 
 export type ShopMenuWithSlotCreate = (
