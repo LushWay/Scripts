@@ -68,6 +68,6 @@ jobs:
 
       - run: node tools/build
 
-      - run: yarn tsc -b
+      - run: yarn tsc
 
       - run: yarn eslint src
