@@ -9,6 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 import { Command, inspect, isKeyof, stringify, util } from 'lib'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { textTable } from 'lib/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { worldEditPlayerSettings } from '../settings'
@@ -95,10 +96,8 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   isOurItemType(slot: ContainerSlot | ItemStack) {
     return (
       slot.typeId === this.typeId &&
-      // Has our storage
-      (!!this.getStorage(slot, true) ||
-        // Or doesnt have storage at all
-        slot.getDynamicPropertyIds().length === 0)
+      (!!this.getStorage(slot, true) || // Has our storage
+        slot.getDynamicPropertyIds().length === 0) // Or doesnt have storage at all
     )
   }
 
@@ -197,6 +196,8 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
     try {
       raw = JSON.parse(storageData) as Storage
     } catch {}
+    if (typeof raw === 'undefined' && returnUndefined) return undefined
+
     if (typeof this.storageSchema !== 'object') {
       this.storageSchema = { version: 1 } as Storage
     }
@@ -256,17 +257,30 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
       for (const tool of WorldEditTool.tools) {
         if (!tool[property] || !tool.isOurItemType(item)) continue
 
+        const storage = tool.getStorage(item, true) as unknown
+        const create = typeof storage === 'undefined' ? this.create : undefined
+
         if (property === 'onUse') {
-          tool[property](player, item, tool.getStorage(item, true))
+          if (create) return create(tool, player)
+          tool[property](player, item, storage)
         } else {
           const event = someEvent as ItemUseOnBeforeEvent
           if (!event.isFirstEvent) return
-          
+
           event.cancel = true
-          system.delay(() => tool[property]?.(player, item, event.block, tool.getStorage(item, true)))
+          system.delay(() => {
+            if (create) return create(tool, player)
+            tool[property]?.(player, item, event.block, storage)
+          })
         }
       }
     })
+  }
+
+  private static create(this: void, tool: WorldEditTool, player: Player) {
+    if (tool.editToolForm) {
+      tool.editToolForm(player.mainhand(), player)
+    } else player.onScreenDisplay.setActionBar('§cИспользуй .we', ActionbarPriority.UrgentNotificiation)
   }
 
   private static intervalsJob() {

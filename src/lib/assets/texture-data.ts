@@ -12,7 +12,7 @@ export const textureData = {
   "lw:key": "textures/blocks/trip_wire_source",
   "lw:menu": "textures/items/totem",
   "lw:money": "textures/items/money",
-  "we:brush": "textures/items/compass_item",
+  "we:brush": "textures/items/brush",
   "we:dash": "textures/items/compass_item",
   "we:debugstick": "textures/items/stick",
   "we:randomizer": "textures/items/name_tag",

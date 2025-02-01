@@ -37,7 +37,6 @@ class ClipboardTool extends WorldEditTool<Storage> {
   constructor() {
     super()
     this.onInterval(20, (player, storage) => {
-      console.log({ storage })
       if (storage.mode !== 'paste') return
       const we = WorldEdit.forPlayer(player)
 

@@ -82,7 +82,6 @@ system.runInterval(
 
     const placedBefore = regions.find(e => !!e.ldb.blocks.length)
 
-    logger.debug('Placed before:', placedBefore?.ldb.blocks.length)
     if (placedBefore) {
       for (const location of placedBefore.ldb.blocks) {
         const schedule = getScheduledToPlace(location, placedBefore.dimensionType)
