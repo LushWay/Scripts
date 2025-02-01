@@ -35,7 +35,6 @@
       "ES2021.String"
     ],
     "types": ["vitest/globals"],
-    "sourceMap": true,
     "target": "ES2020",
     "module": "ES2020",
     "moduleResolution": "Bundler",
@@ -43,8 +42,8 @@
     "baseUrl": "src/"
   },
   "include": ["src", "tools/defines.d.ts"],
-  "exclude": ["node_modules", "src/chestui", "src/test/**", "vitest/dist/**", "scripts/**"],
+  "exclude": ["node_modules", "src/chestui", "src/test/**", "vitest/dist/**", "scripts/**"]
 
   // Pollutes global
-  "references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
+  // "references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
 }
