@@ -18,7 +18,9 @@ import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './mi
 const logger = createLogger('Airdrop')
 
 export class Airdrop {
-  static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true }>('airdrop')
+  static db = table<{ chicken: string; chest: string; loot: string; for?: string; looted?: true; type?: string }>(
+    'airdrop',
+  )
 
   static chestTypeId = CustomEntityTypes.Loot
 
@@ -48,9 +50,12 @@ export class Airdrop {
 
   status: 'restoring' | 'falling' | 'being looted' = 'restoring'
 
-  constructor(options: { loot: LootTable; forPlayerId?: string }, id?: string) {
+  type?: string
+
+  constructor(options: { loot: LootTable; forPlayerId?: string; type?: string }, id?: string) {
     this.lootTable = options.loot
     this.for = options.forPlayerId
+    this.type = options.type
 
     if (!id) {
       this.id = new Date().toISOString()
@@ -77,7 +82,7 @@ export class Airdrop {
           if (event.entity.id !== this[name]?.id) return
 
           event.entity.addTag(tag)
-          if (name === 'chest') event.entity.nameTag = `§l§f\\\\§r§b Аирдроп §f§l//§r`
+          if (name === 'chest') event.entity.nameTag = `§l§f<§r§b AirDrop §f§l>§r`
           cleanup()
         })
       })

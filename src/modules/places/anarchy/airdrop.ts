@@ -1,5 +1,5 @@
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
-import { Airdrop, Loot, Vector } from 'lib'
+import { Airdrop, isNotPlaying, Loot, Vector } from 'lib'
 import { t } from 'lib/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../features/cannon'
@@ -51,16 +51,33 @@ let airdrop: Airdrop | undefined
 function timeout() {
   system.runTimeout(
     async () => {
-      if (!Anarchy.zone) return timeout()
+      try {
+        if (!Anarchy.zone) return
 
-      const online = world.getAllPlayers().length
-      if (online < 1) return timeout()
+        const online = world.getAllPlayers().filter(e => !isNotPlaying(e)).length
+        if (online < 1) return
 
-      if (airdrop) airdrop.delete()
-      const isPowerfull = online > 3
-      airdrop = await requestAirdrop(isPowerfull)
+        for (const [id, airdrop] of Object.entries(Airdrop.db)) {
+          if (airdrop) {
+            if (airdrop.type === '15m') {
+              const instance = Airdrop.instances.find(e => e.id === id)
+              if (instance) {
+                instance.delete()
+              } else {
+                Reflect.deleteProperty(Airdrop.db, id)
+              }
+            }
+          }
+        }
+        if (airdrop) airdrop.delete()
 
-      timeout()
+        const isPowerfull = online > 3
+        airdrop = await requestAirdrop(isPowerfull)
+      } catch (e) {
+        console.warn('Unable to request 15m airdrop:', e)
+      } finally {
+        timeout()
+      }
     },
     'airdrop',
     // 15 min
@@ -69,11 +86,15 @@ function timeout() {
 }
 
 timeout()
+
 export async function requestAirdrop(isPowerfull: boolean) {
   const result = await randomLocationInAnarchy()
   if (result) {
     try {
-      const airdrop = new Airdrop({ loot: isPowerfull ? powerfull : base }).spawn(result.air).createMarkerOnMinimap()
+      const airdrop = new Airdrop({ loot: isPowerfull ? powerfull : base, type: '15m' })
+        .spawn(result.air)
+        .createMarkerOnMinimap()
+
       world.say(
         t.raw`§l§a>§r§7 ${isPowerfull ? 'Усиленный' : 'Обычный'} аирдроп появился на ${Vector.string(result.topmost, true)}!`,
       )
