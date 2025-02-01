@@ -86,7 +86,7 @@ class ShovelTool extends WorldEditTool<Storage> {
         storage.blending,
       )
       .addSlider('Сила смешивания', 0, 100, 1, storage.factor)
-      .addDropdownFromObject('Метод активации', activator, { defaultValue: storage.activator })
+      .addDropdownFromObject('Метод активации', activator, { defaultValueIndex: storage.activator })
       .show(
         player,
         (_, radius, height, offset, blocksSet, replaceBlocksSet, replaceMode, blending, factor, activator) => {
