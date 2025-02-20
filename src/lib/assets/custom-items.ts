@@ -21,5 +21,5 @@ export enum Items {
   WeWand = 'we:wand',
   CompassPrefix = 'lw:compass',
 }
-
-export const totalCustomItems = 47
+  
+  export const totalCustomItems = 47
