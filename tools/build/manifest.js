@@ -10,7 +10,7 @@ export async function generateManigestJson({ world, outfile, outdir }) {
     .map(([name, version]) => {
       const match = version.match(/\d+\.\d+\.\d+-(?:beta|stable)/)
 
-      if (!match && name !== '@minecraft/vanilla-data') {
+      if (!match && name !== '@minecraft/vanilla-data' && name !== 'async-mutex') {
         logger.warn(
           "Version of the package '" +
             name +
