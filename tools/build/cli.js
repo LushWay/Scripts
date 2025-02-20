@@ -73,8 +73,6 @@ function getOutPathsAndCleanDirectory(dir) {
  * @param {esbuild.BuildOptions} options
  */
 export function buildCommand({ test, dev, world, port, vitest, outfile, entry }, options) {
-  if (!entry) throw new Error('Entry not specified!')
-
   let start = Date.now()
   let firstBuild = true
   const at = process.cwd()
