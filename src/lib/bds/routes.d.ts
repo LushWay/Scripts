@@ -1,11 +1,12 @@
 export declare namespace ScriptServerRpc {
-  interface Routes {
+  // External routes accessible to script
+  interface OutgoingRoutes {
     ping: { req: undefined; res: { status: number } }
-
     command: { req: { command: string }; res: undefined }
   }
 
-  interface Packets {
+  // Extrnal routes accessible to script which don't require response
+  interface OutgoingPackets {
     chatMessage: {
       name: string
       message: string
@@ -26,7 +27,8 @@ export declare namespace ScriptServerRpc {
     reload: { reason: string }
   }
 
-  interface Events {
+  // Events that can be called from the outside
+  interface IncomingScriptEvents {
     giveAirdropKey: { level: 'basic' | 'powerfull' }
 
     updatePlayerMeta: { id: string; xuid: string; pfid: string; lang: string; name: string }[]

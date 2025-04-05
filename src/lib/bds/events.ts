@@ -2,7 +2,9 @@ import { system } from '@minecraft/server'
 import { externalSource } from './api'
 import { ScriptServerRpc } from './routes'
 
-const scriptevents: { [K in keyof ScriptServerRpc.Events]: (request: ScriptServerRpc.Events[K]) => void } = {
+const scriptevents: {
+  [K in keyof ScriptServerRpc.IncomingScriptEvents]: (request: ScriptServerRpc.IncomingScriptEvents[K]) => void
+} = {
   giveAirdropKey({ level }) {
     console.log('Gave airdrop key with level', level)
   },

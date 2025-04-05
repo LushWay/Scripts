@@ -11,10 +11,10 @@ class RequestError extends Error {}
  *
  * @deprecated Temporary not working
  */
-export async function request<Path extends keyof ScriptServerRpc.Routes>(
+export async function request<Path extends keyof ScriptServerRpc.OutgoingRoutes>(
   path: Path,
-  body: ScriptServerRpc.Routes[Path]['req'],
-): Promise<ScriptServerRpc.Routes[Path]['res']> {
+  body: ScriptServerRpc.OutgoingRoutes[Path]['req'],
+): Promise<ScriptServerRpc.OutgoingRoutes[Path]['res']> {
   console.info(t`request(${path}, ${body})`)
 
   if (ServerModules.Net) {
@@ -38,7 +38,7 @@ export async function request<Path extends keyof ScriptServerRpc.Routes>(
     }
 
     try {
-      return (response.body ? JSON.parse(response.body) : undefined) as ScriptServerRpc.Routes[Path]['res']
+      return (response.body ? JSON.parse(response.body) : undefined) as ScriptServerRpc.OutgoingRoutes[Path]['res']
     } catch (error) {
       throw new RequestError(
         t.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
@@ -54,12 +54,14 @@ export async function request<Path extends keyof ScriptServerRpc.Routes>(
  * @param type - Packet type
  * @param packet - Packet content
  */
-export function sendPacketToStdout<T extends keyof ScriptServerRpc.Packets>(
+export function sendPacketToStdout<T extends keyof ScriptServerRpc.OutgoingPackets>(
   type: T,
-  packet: ScriptServerRpc.Packets[T],
+  packet: ScriptServerRpc.OutgoingPackets[T],
 ) {
   console.log(`[Packet] [${type}] ${JSON.stringify(packet)}`)
 }
 
 /** Data in this source comes from API so it may be unavailable */
-export const externalSource: { playerMetadata: ScriptServerRpc.Events['updatePlayerMeta'] } = { playerMetadata: [] }
+export const externalSource: { playerMetadata: ScriptServerRpc.IncomingScriptEvents['updatePlayerMeta'] } = {
+  playerMetadata: [],
+}
