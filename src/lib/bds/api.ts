@@ -47,6 +47,8 @@ export async function request<Path extends keyof ScriptServerRpc.OutgoingRoutes>
   } else console.error('NET MODULE IS DISABLED, SKIPPING')
 }
 
+console.log('ASKLS')
+
 /**
  * Sends packet message to the core nodejs process running BDS. Used mostly for console/chat logging purposes, when data
  * must be sent but the response is not needed.
