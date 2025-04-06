@@ -30,8 +30,9 @@ export function build() {
             onWatchModeUpdate: onReload =>
               new Promise((resolve, reject) => {
                 args = args.concat(`--outdir=${outdir}`, entry ? `--entry=${entry}` : '').filter(Boolean)
+                console.log('aaaa')
                 const p = child_process
-                  .fork('tools/build.js', args, { cwd, stdio: 'inherit' })
+                  .fork('tools/build.js', args, { cwd, stdio: 'inherit', execArgv: [] })
                   .on('message', message => {
                     if (message === 'ready') onReady(build.outfile(outdir)), resolve(p)
                     if (Array.isArray(message) && message[0] === 'reload' && typeof message[1] === 'string')
