@@ -31,4 +31,4 @@ system.afterEvents.scriptEventReceive.subscribe(
   { namespaces: ['bds-api'] },
 )
 
-console.log('BBBB')
+console.log('CCCC')
