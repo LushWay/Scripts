@@ -3,7 +3,7 @@ import path from 'path'
 import { logger } from './logger.js'
 
 /** @param {import('./cli.js').BuildArgs} arg */
-export async function generateManigestJson({ world, outfile, outdir }) {
+export async function generateManifestJson({ world, outfile, outdir }) {
   const packagejson = new PackageJSON()
   await packagejson.init()
   const dependencies = Object.entries(packagejson.content.dependencies)

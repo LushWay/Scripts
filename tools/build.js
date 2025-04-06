@@ -3,7 +3,7 @@
 import fs from 'fs/promises'
 import { buildArgumentsWithDist, buildCommand } from './build/cli.js'
 import { injectAsset, injectEnum } from './build/inject.js'
-import { generateManigestJson } from './build/manifest.js'
+import { generateManifestJson } from './build/manifest.js'
 
 await injectAsset(
   'player-json.ts',
@@ -39,6 +39,7 @@ await injectAsset(
 )
 
 const args = buildArgumentsWithDist('scripts')
+await generateManifestJson(args)
 buildCommand(args, {
   entryPoints: [!args.test ? 'src/index.ts' : 'src/test/loader.ts'],
   target: 'es2020',
@@ -51,4 +52,3 @@ buildCommand(args, {
     '@minecraft/server-gametest',
   ],
 })
-generateManigestJson(args)
