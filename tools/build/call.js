@@ -30,7 +30,6 @@ export function build() {
             onWatchModeUpdate: onReload =>
               new Promise((resolve, reject) => {
                 args = args.concat(`--outdir=${outdir}`, entry ? `--entry=${entry}` : '').filter(Boolean)
-                console.log('aaaa')
                 const p = child_process
                   .fork('tools/build.js', args, { cwd, stdio: 'inherit', execArgv: [] })
                   .on('message', message => {
