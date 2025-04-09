@@ -117,12 +117,13 @@ function* scheduledBlockPlaceJob() {
         yield
         const block = world.overworld.getBlock(schedule.location)
         if (!block?.isValid()) {
+          if (debugLogging) logger.info`Skipping ${Vector.string(schedule.location)} because block is invalid`
           continue
         }
 
         block.setPermutation(BlockPermutation.resolve(schedule.typeId, schedule.states))
 
-        if (__DEV__ || (schedules.length - 1) % 100 === 0)
+        if (__DEV__ || (schedules.length - 1) % 100 === 0 || debugLogging)
           logger.info`${schedule.typeId.replace('minecraft:', '')} to ${schedule.location}, remains ${schedules.length - 1}`
 
         EventSignal.emit(onScheduledBlockPlace, { schedule, block, schedules, dimensionType: dimension })
@@ -152,11 +153,14 @@ function removeScheduleAt(dimension: DimensionType, i: number) {
   SCHEDULED_DB[dimension].splice(i, 1)
 }
 
+let debugLogging = false
+
 const scheduleForm = form(form => {
   form.title('schd')
   for (const [dim, blocks] of Object.entries(SCHEDULED_DB)) {
     form.button(scheduledDimensionForm(dim, blocks))
   }
+  form.button(t`debug: ${debugLogging}`, () => (debugLogging = !debugLogging))
 })
 
 const scheduledDimensionForm = (dim: string, blocks: ScheduledBlockPlace[]) =>
