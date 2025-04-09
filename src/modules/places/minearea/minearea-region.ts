@@ -32,8 +32,6 @@ export class MineareaRegion extends RegionWithStructure {
       .forEachVector(async (vector, isIn) => {
         if (!isIn) return
 
-        eachVectorCallback?.(vector)
-
         const regions = Region.getManyAt({ vector, dimensionType: this.dimensionType })
         for (const region of regions) {
           // Prevent from region save conflicts
@@ -42,6 +40,8 @@ export class MineareaRegion extends RegionWithStructure {
             await region.structure.place()
           }
         }
+
+        eachVectorCallback?.(vector)
       })
       .then(() => this.structure.save())
 
