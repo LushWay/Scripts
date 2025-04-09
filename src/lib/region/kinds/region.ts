@@ -1,5 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
+import { ActionForm } from 'lib/form/action'
 import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { Area } from '../areas/area'
@@ -246,6 +247,11 @@ export class Region {
     this.structure?.delete()
     Region.regions = Region.regions.filter(e => e.id !== this.id)
     Reflect.deleteProperty(RegionDatabase, this.id)
+  }
+
+  /** Can be overriden to add custom buttons to the .region edit form */
+  customFormButtons(form: ActionForm, player: Player) {
+    // Can be overriden to add custom buttons
   }
 }
 

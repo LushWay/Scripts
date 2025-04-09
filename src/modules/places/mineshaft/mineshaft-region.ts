@@ -1,10 +1,11 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { ms, registerCreateableRegion } from 'lib'
+import { ActionForm, ms, registerCreateableRegion } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
 import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../minearea/minearea-region'
 import { ores, placeOre } from './algo'
+import { t } from 'lib/text'
 
 const logger = createLogger('Shaft')
 
@@ -50,6 +51,15 @@ export class MineshaftRegion extends MineareaRegion {
 
   get displayName() {
     return '§7Шахта'
+  }
+
+  customFormButtons(form: ActionForm, player: Player): void {
+    form.addButton('Убрать все руды и сохранить структуру', () => {
+      player.info('Start')
+      this.removeAllOresAndResaveStructure()
+        .then(e => player.info(t`End ${e}`))
+        .catch((e: unknown) => player.fail(t.error`${e}`))
+    })
   }
 }
 
