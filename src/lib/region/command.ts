@@ -116,7 +116,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
     const exists = region.structure.exists
     const color = exists ? '' : '§7'
 
-    if (!exists) form.addButton(`Установить структуру в мир`, () => region.structure?.place())
+    if (exists) form.addButton(`Установить структуру в мир`, () => region.structure?.place())
     form.addButton(`${color}${exists ? 'Перес' : 'С'}охранить структуру`, async () => {
       player.info('Сохраняем структуру...')
       try {
