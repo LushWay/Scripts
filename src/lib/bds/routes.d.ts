@@ -1,8 +1,8 @@
 export declare namespace ScriptServerRpc {
   // External routes accessible to script
   interface OutgoingRoutes {
-    ping: { req: undefined; res: { status: number } }
-    command: { req: { command: string }; res: undefined }
+    ping: { req: undefined; res: undefined }
+    executeServerCommand: { req: { command: string }; res: undefined }
   }
 
   // Extrnal routes accessible to script which don't require response
