@@ -10,17 +10,24 @@ const logger = createLogger('Shaft')
 
 export class MineshaftRegion extends MineareaRegion {
   protected async onCreate() {
+    await this.removeAllOresAndResaveStructure()
+  }
+
+  async removeAllOresAndResaveStructure() {
     let oresFound = 0
     const regionsRestored = await this.restoreAndSaveStructure(vector => {
       const block = this.dimension.getBlock(vector)
       const ore = block && ores.getOre(block.typeId)
       if (ore) {
+        logger.info`Replacing ${block.typeId} at ${vector} with ${ore.empty}`
         block.setType(ore.empty)
         oresFound++
       }
     })
 
     logger.info`Created new mineshaft region. Ores found: ${oresFound}, crossregions restored: ${regionsRestored}`
+
+    return { oresFound, regionsRestored }
   }
 
   onBlockBreak(player: Player, event: PlayerBreakBlockBeforeEvent) {

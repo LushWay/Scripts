@@ -8,6 +8,7 @@ import { Region } from 'lib/region/kinds/region'
 import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
+import { MineshaftRegion } from 'modules/places/mineshaft/mineshaft-region'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
@@ -142,6 +143,16 @@ function editRegion(player: Player, region: Region, back: () => void) {
       }
     })
     if (exists) form.addButtonPrompt('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
+  }
+
+  if (region instanceof MineshaftRegion) {
+    form.addButton('Убрать все руды и сохранить структуру', () => {
+      player.info('Start')
+      region
+        .removeAllOresAndResaveStructure()
+        .then(e => player.info(t`End ${e}`))
+        .catch((e: unknown) => player.fail(t.error`${e}`))
+    })
   }
 
   form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
