@@ -18,6 +18,7 @@ export class SafeAreaRegion extends Region {
       MinecraftEntityTypes.ArmorStand,
       MinecraftEntityTypes.Chicken,
       'minecraft:painting',
+      'minecraft:leash_knot',
     ],
     doors: true,
     switches: false,
