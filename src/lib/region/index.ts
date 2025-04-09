@@ -71,6 +71,7 @@ actionGuard((player, region, ctx) => {
 }, ActionGuardOrder.RegionMember)
 
 actionGuard((player, region, ctx) => {
+  if (ctx.type === 'interactWithEntity' && ctx.event.target.hasTag('no_interact')) return false
   if (ctx.type !== 'interactWithBlock' || !region) return
   const { typeId } = ctx.event.block
 
