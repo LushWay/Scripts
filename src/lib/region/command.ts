@@ -116,7 +116,19 @@ function editRegion(player: Player, region: Region, back: () => void) {
     const exists = region.structure.exists
     const color = exists ? '' : '§7'
 
-    if (exists) form.addButton(`Установить структуру в мир`, () => region.structure?.place())
+    if (exists)
+      form.addButton(`Установить структуру в мир`, async () => {
+        if (!region.structure) return
+        player.info('Загружаем структуру...')
+        try {
+          await region.structure.place()
+          player.success('Структура загружена!')
+        } catch (e) {
+          console.log(e)
+          player.fail(t.error`Не удалось загрузить структуру: ${e}`)
+        }
+      })
+
     form.addButton(`${color}${exists ? 'Перес' : 'С'}охранить структуру`, async () => {
       player.info('Сохраняем структуру...')
       try {
@@ -125,6 +137,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
 
         player.success('Структура успешно сохранена')
       } catch (e) {
+        console.log(e)
         player.fail(t.error`Не удалось сохранить структуру: ${e}`)
       }
     })
