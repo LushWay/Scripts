@@ -59,6 +59,7 @@ export const NOT_MOB_ENTITIES = [
   CustomEntityTypes.Loot,
   MinecraftEntityTypes.Npc,
   'minecraft:item',
+  'minecraft:leash_know',
 ] as string[]
 
 const ALLOW_SPAWN_PROP = 'allowSpawn'
