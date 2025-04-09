@@ -52,7 +52,7 @@
     "arrowParens": "avoid",
     "semi": false,
     "printWidth": 120,
-    "endOfLine": "crlf",
+    "endOfLine": "lf",
     "quoteProps": "consistent",
     "plugins": [
       "prettier-plugin-jsdoc"
