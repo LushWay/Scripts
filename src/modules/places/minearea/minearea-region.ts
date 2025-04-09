@@ -43,6 +43,7 @@ export class MineareaRegion extends RegionWithStructure {
 
         eachVectorCallback?.(vector)
       })
+      .then(() => this.structure.delete())
       .then(() => this.structure.save())
 
     return restoredRegions.length
