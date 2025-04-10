@@ -22,7 +22,10 @@ export async function generateManifestJson({ world, outfile, outdir }) {
     })
     .filter(e => !!e[1])
 
-  packagejson.content.resolutions = packagejson.content.dependencies
+  if (!Object.entries(packagejson.content.resolutions).every(([k, v]) => packagejson.content.dependencies[k] === v)) {
+    packagejson.content.resolutions = packagejson.content.dependencies
+    await packagejson.write()
+  }
 
   const base = {
     format_version: 2,
@@ -70,5 +73,4 @@ export async function generateManifestJson({ world, outfile, outdir }) {
   await writeJSON(path.join(outdir, '../manifest.json'), base).catch(e =>
     logger.error('Failed writing manifest.json file:', e),
   )
-  await packagejson.write()
 }
