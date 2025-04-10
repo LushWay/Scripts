@@ -1,5 +1,5 @@
 import { GameMode, system, world } from '@minecraft/server'
- 
+
 import * as GameTest from '@minecraft/server-gametest'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'

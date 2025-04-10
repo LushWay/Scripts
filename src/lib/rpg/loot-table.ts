@@ -192,7 +192,7 @@ export class Loot {
 }
 
 export class LootTable {
-  static all: LootTable[] =[] 
+  static all: LootTable[] = []
 
   static instances = new Map<string, LootTable>()
 
