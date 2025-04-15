@@ -1,6 +1,7 @@
-import { m, notice, patchPackage } from './patch-package.js'
+import { m, notice, patchPackage } from './patch-package.ts'
 
-/** @typedef {import('@minecraft/server')} A */
+export type ________ = typeof import('@minecraft/server')
+
 patchPackage('@minecraft/server', {
   classes: {},
   replaces: [

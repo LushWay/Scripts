@@ -1,13 +1,11 @@
-// @ts-check
-
 import fs from 'fs/promises'
-import { buildArgumentsWithDist, buildCommand } from './build/cli.js'
-import { injectAsset, injectEnum } from './build/inject.js'
-import { generateManifestJson } from './build/manifest.js'
+import { buildArgumentsWithDist, buildCommand } from './build/esbuild.ts'
+import { injectAsset, injectEnum } from './build/inject.ts'
+import { generateManifestJson } from './build/manifest.ts'
 
 await injectAsset(
   'player-json.ts',
-  'tools/build.js',
+  'tools/build.ts',
   `export const playerJson = ${(await fs.readFile('entities/player.json')).toString().trimEnd()} as const
   
 export const PlayerProperties = Object.fromEntries(
@@ -18,8 +16,7 @@ export const PlayerEvents = Object.fromEntries(Object.keys(playerJson['minecraft
 `,
 )
 
-/** @type {[string, string][]} */
-const entities = (
+const entities: [string, string][] = (
   await Promise.all(
     (await fs.readdir('entities'))
       .filter(
@@ -36,7 +33,7 @@ const entities = (
 
 await injectAsset(
   'custom-entity-types.ts',
-  'tools/build.js',
+  'tools/build.ts',
   injectEnum('CustomEntityTypes', [...entities, ['FloatingText', 'f:t']]),
 )
 

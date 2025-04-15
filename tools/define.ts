@@ -1,7 +1,12 @@
 import ch from 'child_process'
 
-/** @param {Omit<import('./build/cli.js').BuildArgs, 'outfile' | 'outdir' | 'entry'>} args */
-export function generateDefine({ dev, test, world, port, vitest }) {
+export function generateDefine({
+  dev,
+  test,
+  world,
+  port,
+  vitest,
+}: Omit<import('./build/esbuild.ts').BuildArgs, 'outfile' | 'outdir' | 'entry'>) {
   let git = ''
   if (!dev && !vitest)
     try {
@@ -17,7 +22,6 @@ export function generateDefine({ dev, test, world, port, vitest }) {
       __VITEST__: vitest,
       __SERVER__: !world,
       __SERVER_PORT__: port,
-      __ESBUILD__: true,
       __GIT__: git,
     }).map(([key, value]) => [key, JSON.stringify(value)]),
   )

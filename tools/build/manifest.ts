@@ -1,14 +1,13 @@
 import { PackageJSON, writeJSON } from 'leafy-utils'
 import path from 'path'
-import { logger } from './logger.js'
+import { logger } from './logger.ts'
 
-/** @param {import('./cli.js').BuildArgs} arg */
-export async function generateManifestJson({ world, outfile, outdir }) {
+export async function generateManifestJson({ world, outfile, outdir }: import('./esbuild.ts').BuildArgs) {
   const packagejson = new PackageJSON()
   await packagejson.init()
   const dependencies = Object.entries(packagejson.content.dependencies)
     .map(([name, version]) => {
-      const match = version.match(/\d+\.\d+\.\d+-(?:beta|stable)/)
+      const match = (version as string).match(/\d+\.\d+\.\d+-(?:beta|stable)/)
 
       if (!match && name !== '@minecraft/vanilla-data' && name !== 'async-mutex') {
         logger.warn(
@@ -58,8 +57,7 @@ export async function generateManifestJson({ world, outfile, outdir }) {
         version: 'version',
       },
     ],
-    // TODO Remove on release
-    capabilities: true ? ['script_eval'] : [],
+    capabilities: [],
   }
 
   base.dependencies = dependencies

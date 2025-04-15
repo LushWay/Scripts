@@ -2,15 +2,14 @@ import * as esbuild from 'esbuild'
 import fs from 'fs'
 import path from 'path'
 import util, { isDeepStrictEqual } from 'util'
-import { generateDefine } from '../define.js'
-import { error } from '../error.js'
-import { build } from './call.js'
-import { logger } from './logger.js'
+import { generateDefine } from '../define.ts'
+import { error } from '../error.ts'
+import { build } from './api.ts'
+import { logger } from './logger.ts'
 
-/** @typedef {ReturnType<typeof buildArgumentsWithDist>} BuildArgs */
+export type BuildArgs = ReturnType<typeof buildArgumentsWithDist>
 
-/** @param {string} dir */
-export function buildArgumentsWithDist(dir) {
+export function buildArgumentsWithDist(dir: string) {
   try {
     const { values } = util.parseArgs({
       args: process.argv.slice(2),
@@ -24,6 +23,7 @@ export function buildArgumentsWithDist(dir) {
         outdir: { type: 'string', default: dir },
         entry: { type: 'string' },
       },
+      allowPositionals: true,
     })
     const { dev, test, world, port, vitest, outdir, entry } = values
 
@@ -52,8 +52,7 @@ export function buildArgumentsWithDist(dir) {
   }
 }
 
-/** @param {string} dir */
-function getOutPathsAndCleanDirectory(dir) {
+function getOutPathsAndCleanDirectory(dir: string) {
   try {
     if (fs.existsSync(path.join(dir, '.git'))) {
       logger.error('Unable to empty dir which contains .git folder:', path.join(process.cwd(), dir))
@@ -62,25 +61,22 @@ function getOutPathsAndCleanDirectory(dir) {
     fs.rmSync(dir, { force: true, recursive: true })
     fs.mkdirSync(dir)
   } catch (e) {
-    if (!error(e).is('EACESS')) logger.warn('Failed to empty out dir', e)
+    if (!error(e).is('EACESS') && !error(e).is('ENOENT')) logger.warn('Failed to empty out dir', e)
   }
 
   return { outdir: dir, outfile: build.outfile(dir) }
 }
 
-/**
- * @param {BuildArgs} param0
- * @param {esbuild.BuildOptions} options
- */
-export function buildCommand({ test, dev, world, port, vitest, outfile, entry }, options) {
+export function buildCommand(
+  { test, dev, world, port, vitest, outfile, entry }: BuildArgs,
+  options: esbuild.BuildOptions,
+) {
   let start = Date.now()
   let firstBuild = true
   const at = process.cwd()
-  /** @type {import('esbuild').Metafile | undefined} */
-  let oldmeta
+  let oldmeta: import('esbuild').Metafile | undefined
 
-  /** @type {esbuild.BuildOptions} */
-  const config = {
+  const config: esbuild.BuildOptions = {
     outfile,
     treeShaking: true,
     bundle: true,
@@ -136,4 +132,4 @@ export function buildCommand({ test, dev, world, port, vitest, outfile, entry },
   }
 }
 
-/** @typedef {() => void} VoidFunction */
+export type VoidFunction = () => void

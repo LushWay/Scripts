@@ -7,7 +7,7 @@ import { createRequire } from 'module'
 const Notice = '* This file was automatically patched by'
 export const notice = `/**
 ${Notice}
-* tools/patch-package.js
+* tools/patch-package.ts
 *
 * New method assigments can be found in the
 * src/lib/extensions/
@@ -20,17 +20,24 @@ export const resolve = require.resolve
 /**
  * Replaces and adds code to a package's TypeScript definition file.
  *
- * @param {string} packageName - The name of the package to patch.
- * @param {object} options - The patching options.
- * @param {{ find: RegExp | string; replace: string; all?: boolean; throwError?: boolean }[]} options.replaces - The
- *   replacements to make to the original code. Each object in the array should have a `find` and `replace` property.
- * @param {Record<string, string> | undefined} options.classes Pairs of class name and method to add.
- * @param {object} options.additions
- * @param {string} options.additions.beginning - The code to add to the beginning of the file.
- * @param {string} options.additions.afterImports - The code to add after any import statements.
- * @param {string} options.additions.ending - The code to add to the end of the file.
+ * @param packageName - The name of the package to patch.
+ * @param options - The patching options.
+ * @param options.replaces - The replacements to make to the original code. Each object in the array should have a
+ *   `find` and `replace` property.
+ * @param options.classes Pairs of class name and method to add.
+ * @param options.additions
+ * @param options.additions.beginning - The code to add to the beginning of the file.
+ * @param options.additions.afterImports - The code to add after any import statements.
+ * @param options.additions.ending - The code to add to the end of the file.
  */
-export async function patchPackage(packageName, options) {
+export async function patchPackage(
+  packageName: string,
+  options: {
+    replaces: { find: RegExp | string; replace: string; all?: boolean; throwError?: boolean }[]
+    classes: Record<string, string> | undefined
+    additions: { beginning: string; afterImports: string; ending: string }
+  },
+) {
   const packageJsonPath = path.join(packageName, 'package.json')
   let packagePath
   try {
@@ -64,8 +71,7 @@ export async function patchPackage(packageName, options) {
 
   if (options.additions.afterImports) {
     const lines = newCode.split(/\n/g)
-    /** @type {[number, string][]} */
-    const newLines = []
+    const newLines: [number, string][] = []
 
     let lastImport = 0
     for (const [i, rawLine] of lines.entries()) {
@@ -94,13 +100,7 @@ export async function patchPackage(packageName, options) {
   await fs.writeFile(indexDts, newCode)
 }
 
-/**
- * @template T
- * @param {T[]} arr
- * @param {[number, T][]} additions
- * @returns
- */
-function addEls(arr, additions) {
+function addEls<T>(arr: T[], additions: [number, T][]) {
   const result = []
   let currentAdditionIndex = 0
   for (let i = 0; i < arr.length; i++) {
@@ -119,13 +119,8 @@ function addEls(arr, additions) {
   return result
 }
 
-/**
- * Multi-line function
- *
- * @param {TemplateStringsArray} strings
- * @param {...any} values
- */
-export function m(strings, ...values) {
+/** Multi-line function */
+export function m(strings: TemplateStringsArray, ...values: any[]) {
   // Combine the template strings and values into a single string
   let newString = strings.reduce((result, string, i) => {
     return result + values[i - 1] + string

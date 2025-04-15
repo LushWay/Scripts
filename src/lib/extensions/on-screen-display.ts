@@ -87,9 +87,7 @@ type ScreenDisplayOverrideThis = ThisType<
 type ScreenDisplayOverrideTypes = Omit<(typeof ScreenDisplay)['prototype'], 'player'>
 
 export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOverrideThis = {
-  get isValid() {
-    return this.player[ScreenDisplaySymbol].isValid
-  },
+  isValid: true,
 
   setHudTitle(message, options, prefix = $title, n = 0) {
     let playerScreenDisplay = titles.get(this.player.id)

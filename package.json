@@ -8,7 +8,7 @@
     "test": "./node_modules/vitest/vitest.mjs",
     "coverage": "./node_modules/vitest/vitest.mjs --coverage",
     "cov": "./node_modules/vitest/vitest.mjs --coverage --ui",
-    "patches": "node tools/patches.js",
+    "patches": "node --no-warnings --experimental-strip-types tools/patches.ts",
     "prepare": "git config core.ignorecase false"
   },
   "dependencies": {
