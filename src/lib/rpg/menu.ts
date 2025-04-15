@@ -67,7 +67,7 @@ export class Compass {
       setMinimapNpcPosition(player, MinimapNpc.Quest, location.x, location.z)
     } else {
       this.players.delete(player)
-      if (player.isValid()) resetMinimapNpcPosition(player, MinimapNpc.Quest)
+      if (player.isValid) resetMinimapNpcPosition(player, MinimapNpc.Quest)
     }
   }
 

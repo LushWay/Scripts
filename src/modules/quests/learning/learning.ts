@@ -81,7 +81,7 @@ class Learning {
     q.dynamic('Залутай сундук, упавший с неба')
       .description('Забери все из упавшего с неба сундука')
       .activate((ctx, firstTime) => {
-        if (!player.isValid()) return
+        if (!player.isValid) return
 
         function spawnAirdrop() {
           const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })

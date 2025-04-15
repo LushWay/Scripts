@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
 import { DatabaseDefaultValue, DatabaseError, DatabaseTable, configureDatabase } from './abstract'
@@ -119,6 +119,6 @@ if (!__VITEST__)
 
     tables: DynamicPropertyDB.tables,
     getRawTableData(tableId) {
-      return `${world.getDynamicProperty(tableId)}`
+      return String(world.getDynamicProperty(tableId) as unknown as string)
     },
   })

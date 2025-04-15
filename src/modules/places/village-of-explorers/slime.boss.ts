@@ -31,7 +31,7 @@ export function createBossSlime(group: Group) {
     .spawnEvent(true)
     .radius()
     .interval(boss => {
-      if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return
+      if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return
 
       const slimes = world.overworld.getEntities({
         location: boss.location,
@@ -49,7 +49,7 @@ export function createBossSlime(group: Group) {
     })
 
   world.afterEvents.entityHurt.subscribe(({ hurtEntity }) => {
-    if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return
+    if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return
     if (hurtEntity.id !== boss.entity.id) return
 
     const health = hurtEntity.getComponent('health')

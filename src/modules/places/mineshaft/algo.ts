@@ -61,7 +61,7 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
 }
 
 function place(block: Block, oreTypeId: string) {
-  if (block.isValid() && !block.isAir && oreTypeId) {
+  if (block.isValid && !block.isAir && oreTypeId) {
     block.setType(oreTypeId)
     return true
   } else return false

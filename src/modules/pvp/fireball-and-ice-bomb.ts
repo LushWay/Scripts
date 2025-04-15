@@ -35,7 +35,7 @@ world.afterEvents.itemUse.subscribe(event => {
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   event => {
-    if (!event.entity.isValid()) return
+    if (!event.entity.isValid) return
     if (event.entity.typeId !== CustomEntityTypes.Fireball) {
       return system.delay(() => {
         try {
@@ -47,7 +47,7 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
     const location = event.entity.location
     const dimension = event.entity.dimension
     system.delay(() => {
-      if (event.entity.isValid()) event.entity.remove()
+      if (event.entity.isValid) event.entity.remove()
       dimension.createExplosion(location, 1, {
         causesFire: true,
         breaksBlocks: true,
@@ -84,7 +84,7 @@ world.afterEvents.itemUse.subscribe(event => {
 system.runInterval(
   () => {
     for (const entity of iceBombs) {
-      if (!entity.isValid()) continue
+      if (!entity.isValid) continue
 
       const base = Vector.floor(entity.location)
       const dimension = entity.dimension

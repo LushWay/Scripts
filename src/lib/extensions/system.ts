@@ -67,7 +67,7 @@ expand(System.prototype, {
       super.runInterval.bind(this),
       function playersInterval() {
         for (const player of world.getAllPlayers()) {
-          if (player.isValid()) callback(player)
+          if (player.isValid) callback(player)
         }
       },
 

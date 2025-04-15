@@ -97,7 +97,7 @@ export class LockAction {
       const isLocked = lock.isLocked(player)
       if (isLocked) {
         const text = typeof isLocked === 'object' ? isLocked.lockText : lock.lockText
-        if (tell && player.isValid()) player.fail(text)
+        if (tell && player.isValid) player.fail(text)
         return returnText ? text : true
       }
     }
@@ -126,7 +126,7 @@ export class InventoryInterval {
   static {
     system.runPlayerInterval(
       player => {
-        if (!player.isValid()) return
+        if (!player.isValid) return
 
         const { container } = player
         if (!container) return

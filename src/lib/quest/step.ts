@@ -190,7 +190,7 @@ export abstract class QS<DB = any> extends Temporary {
     if (typeof this.intervalId === 'undefined') {
       this.intervalId = this.system.runInterval(
         () => {
-          if (!this.player.isValid()) return
+          if (!this.player.isValid) return
           if (this.cleaned) return
           this.intervals.forEach(e => e())
         },

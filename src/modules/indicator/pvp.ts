@@ -137,7 +137,7 @@ function onDamage(
   { damage, hurtEntity, damageSource: { damagingEntity, cause } }: EntityHurtAfterEvent,
   fatal = false,
 ) {
-  if (!hurtEntity.isValid()) return
+  if (!hurtEntity.isValid) return
 
   if (
     ![

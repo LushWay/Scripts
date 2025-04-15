@@ -65,7 +65,7 @@ Reflect.defineProperty(Player.prototype, 'scores', {
     if (typeof players[player.id] !== 'undefined') {
       let valid = false
       try {
-        valid = players[player.id].player.isValid()
+        valid = players[player.id].player.isValid
       } catch {}
 
       if (!valid) players[player.id].player = player

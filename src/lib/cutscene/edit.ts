@@ -147,7 +147,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
         const { hotbarSlots, position } = editingPlayer
 
-        if (player.isValid()) {
+        if (player.isValid) {
           forEachHotbarSlot(player, (i, container) => container.setItem(i, hotbarSlots[i]))
           player.teleport(position)
         }

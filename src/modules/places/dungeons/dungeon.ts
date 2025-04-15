@@ -134,7 +134,7 @@ export class DungeonRegion extends Region {
 
   private updateChest(chest: DungeonChest) {
     const block = this.dimension.getBlock(Vector.add(this.structurePosition, chest.location))
-    if (!block?.isValid()) return
+    if (!block?.isValid) return
 
     this.ldb.chests[chest.id] = Date.now()
 

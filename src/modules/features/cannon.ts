@@ -35,12 +35,12 @@ world.beforeEvents.playerInteractWithEntity.subscribe(event => {
 
   event.cancel = true
   system.delay(() => {
-    if (mainhand.isValid()) {
+    if (mainhand.isValid) {
       if (mainhand.amount === 1) mainhand.setItem(undefined)
       else mainhand.amount--
     }
 
-    if (event.target.isValid()) {
+    if (event.target.isValid) {
       const view = event.target.getViewDirection()
       const location = Vector.add(Vector.add(event.target.location, Vector.multiply(view, 2.5)), {
         x: 0,

@@ -48,7 +48,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   if (!damagingEntity?.isPlayer() || !hurtEntity.isPlayer() || cause !== EntityDamageCause.entityAttack) return
 
   const mainhand = damagingEntity.mainhand()
-  const item = mainhand.isValid() && mainhand.getItem()
+  const item = mainhand.isValid && mainhand.getItem()
   const storage = item && schema.parse(item)
   if (!storage) return
 

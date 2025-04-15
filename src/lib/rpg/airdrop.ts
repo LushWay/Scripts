@@ -111,7 +111,7 @@ export class Airdrop {
   }
 
   teleport() {
-    if (!this.chest || !this.chicken || !this.chicken.isValid() || !this.chest.isValid()) return
+    if (!this.chest || !this.chicken || !this.chicken.isValid || !this.chest.isValid) return
 
     this.chest.teleport(Vector.add(this.chicken.location, Airdrop.chestOffset))
     if (!this.chest.dimension.getBlock(this.chest.location)?.below()?.isAir) {
@@ -152,7 +152,7 @@ export class Airdrop {
 
   /** Shows particle trace under chest minecart */
   showParticleTrace(entity = this.chicken) {
-    if (!entity?.isValid()) return { x: 0, y: 0, z: 0 }
+    if (!entity?.isValid) return { x: 0, y: 0, z: 0 }
 
     const from = entity.location
     const { x, z } = from
@@ -228,12 +228,12 @@ system.runInterval(
 
           const yes = () => logger.info`Restored airdrop with status ${airdrop.status}`
           if (saved.looted) {
-            if (airdrop.chest?.isValid()) {
+            if (airdrop.chest?.isValid) {
               airdrop.status = 'being looted'
               yes()
             }
           } else {
-            if (airdrop.chicken?.isValid() && airdrop.chest?.isValid()) {
+            if (airdrop.chicken?.isValid && airdrop.chest?.isValid) {
               airdrop.status = 'falling'
               yes()
             }
@@ -263,7 +263,7 @@ system.runInterval(
 )
 
 export function inventoryIsEmpty(entity: Entity | undefined) {
-  if (!entity?.isValid()) return false
+  if (!entity?.isValid) return false
 
   const { container } = entity
   if (!container) return false // Skip unloaded
@@ -273,7 +273,7 @@ export function inventoryIsEmpty(entity: Entity | undefined) {
 
 function cleanup(arr: Entity[], type: 'chest' | 'chicken') {
   for (const entity of arr) {
-    if (!entity.isValid()) continue
+    if (!entity.isValid) continue
 
     if (!Airdrop.instances.find(e => e[type]?.id === entity.id)) {
       entity.remove()

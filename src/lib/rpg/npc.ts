@@ -138,7 +138,7 @@ export class Npc {
             if (filteredNpcs.length > 1) {
               // More then one? Save only first one, kill others
               npc.entity = filteredNpcs.find(
-                e => e.entity.isValid() && e.entity.getComponent('npc')?.skinIndex !== 0,
+                e => e.entity.isValid && e.entity.getComponent('npc')?.skinIndex !== 0,
               )?.entity
 
               if (npc.entity) filteredNpcs.forEach(e => e.entity.id !== npc.entity?.id && e.entity.remove())

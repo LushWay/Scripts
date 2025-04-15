@@ -116,7 +116,7 @@ function* scheduledBlockPlaceJob() {
 
         yield
         const block = world.overworld.getBlock(schedule.location)
-        if (!block?.isValid()) {
+        if (!block?.isValid) {
           if (debugLogging) logger.info`Skipping ${Vector.string(schedule.location)} because block is invalid`
           continue
         }

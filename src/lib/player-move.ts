@@ -41,7 +41,7 @@ function jobInterval() {
 function* jobPlayerPosition() {
   try {
     for (const player of world.getAllPlayers()) {
-      if (!player.isValid()) continue
+      if (!player.isValid) continue
 
       const { location: vector, dimension } = player
       const { type: dimensionType } = dimension

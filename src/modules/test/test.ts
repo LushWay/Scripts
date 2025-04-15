@@ -99,7 +99,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     airdrop.spawn(Vector.add(ctx.player.location, { x: 0, y: 30, z: 0 }))
     system.runInterval(
       () => {
-        if (!airdrop.chest?.isValid()) return
+        if (!airdrop.chest?.isValid) return
 
         airdrop.showParticleTrace()
       },

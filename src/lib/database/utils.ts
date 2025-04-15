@@ -133,6 +133,6 @@ export class DatabaseUtils {
   }
 }
 
-world.afterEvents.worldInitialize.subscribe(() => {
-  world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
+world.afterEvents.worldLoad.subscribe(() => {
+  world.overworld.runCommand('tickingarea add 0 -64 0 0 200 0 database true')
 })

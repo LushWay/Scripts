@@ -93,7 +93,7 @@ function armorCommand() {
       }
 
       for (const player of players) {
-        if (!player.isValid()) continue
+        if (!player.isValid) continue
 
         const equippable = player.getComponent('equippable')
         if (!equippable) continue

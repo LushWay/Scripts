@@ -219,7 +219,7 @@ export class Boss {
       // Boss died or unloaded, respawn after interval
       this.onDie({ dropLoot: false })
     } else {
-      if (!this.entity.isValid()) return
+      if (!this.entity.isValid) return
       if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
@@ -239,7 +239,7 @@ export class Boss {
         .join(', ')}`,
     )
     EventSignal.emit(this.onEntityDie, undefined)
-    const location = this.entity?.isValid() ? this.entity.location : this.location
+    const location = this.entity?.isValid ? this.entity.location : this.location
     delete this.entity
 
     Boss.db[this.options.place.fullId] = {

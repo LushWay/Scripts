@@ -31,11 +31,11 @@ class WandTool extends WorldEditTool {
 
   constructor() {
     super()
-    world.beforeEvents.itemUseOn.subscribe(event => {
-      if (event.itemStack.typeId !== this.typeId || !(event.source instanceof Player) || !event.isFirstEvent) return
+    world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+      if (event.itemStack?.typeId !== this.typeId || !event.isFirstEvent) return
 
       event.cancel = true
-      WorldEdit.forPlayer(event.source).pos2 = event.block
+      WorldEdit.forPlayer(event.player).pos2 = event.block
     })
 
     world.beforeEvents.playerBreakBlock.subscribe(event => {

@@ -4,6 +4,7 @@ import { Language } from 'lib/assets/lang'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { MaybeRawText } from 'lib/text'
+import { Vector } from 'lib/vector'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -115,7 +116,7 @@ expand(Player, {
 
   getByName(name) {
     for (const player of world.getPlayers()) {
-      if (player.isValid() && player.name === name) return player
+      if (player.isValid && player.name === name) return player
     }
   },
 
@@ -137,7 +138,7 @@ function prefix(
 ): (this: Player, message?: MaybeRawText, playSound?: boolean) => void {
   return function (this, message = defaultText, playSound = true) {
     system.delay(() => {
-      if (!this.isValid() || !message) return
+      if (!this.isValid || !message) return
       if (playSound) this.playSound(sound)
       this.tell(typeof message === 'string' ? pref + message : { rawtext: [{ text: pref }, message] })
     })
@@ -180,7 +181,7 @@ expand(Player.prototype, {
     const view = target.getViewDirection()
     const hStrength = Math.sqrt(view.x ** 2 + view.z ** 2) * horizontalStrength
     const vStrength = view.y * verticalStrength
-    target.applyKnockback(view.x, view.z, hStrength, vStrength)
+    target.applyKnockback(Vector.multiply(view, hStrength), vStrength)
   },
 
   isGamemode(mode) {
@@ -251,7 +252,7 @@ expand(Entity.prototype, {
   get container() {
     if (typeof this === 'undefined' || !this.getComponent)
       throw new ReferenceError('Bound prototype object does not exists')
-    if (!super.isValid()) throw new ReferenceError('Entity is invalid')
+    if (!super.isValid) throw new ReferenceError('Entity is invalid')
     return this.getComponent('inventory')?.container
   },
   isPlayer() {

@@ -41,7 +41,7 @@ GameTest.registerAsync(simulatedPlayer, 'base', async test => {
 
   const id = player.id
   const event = world.afterEvents.entityDie.subscribe(data => {
-    if (!data.deadEntity.isValid()) return
+    if (!data.deadEntity.isValid) return
     if (data.deadEntity.typeId !== id) return
     test.succeed()
   })
@@ -142,7 +142,7 @@ GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
     util.catch(async () => {
       while (!succeed) {
         await test.idle(Math.random() * 40)
-        if (!player.isValid()) break
+        if (!player.isValid) break
         const net = player.dimension.getEntities({
           location: player.location,
           type: 'minecraft:player',

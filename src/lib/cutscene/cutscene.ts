@@ -102,7 +102,7 @@ export class Cutscene {
     const controller = { cancel: false }
     const promise = this.forEachPoint(
       async (point, pointNum, section, sectionNum) => {
-        if (!player.isValid()) {
+        if (!player.isValid) {
           controller.cancel = true
           return
         }
@@ -127,7 +127,7 @@ export class Cutscene {
 
           await system.sleep(10)
 
-          if (!player.isValid()) return
+          if (!player.isValid) return
 
           // There is no way to set a camera without easing using pure script
           player.runCommand(
@@ -228,7 +228,7 @@ export class Cutscene {
       restorePlayerCamera(player, this.restoreCameraTime)
       system.runTimeout(
         () => {
-          if (player.isValid()) player.onScreenDisplay.resetHudElements()
+          if (player.isValid) player.onScreenDisplay.resetHudElements()
           Compass.forceHide.delete(player)
           Sidebar.forceHide.delete(player)
         },

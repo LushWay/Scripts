@@ -18,7 +18,7 @@ export class FloatingText {
 
   hide() {
     if (!this.entity) this.entity = this.find()
-    if (this.entity?.isValid()) this.entity.remove()
+    if (this.entity?.isValid) this.entity.remove()
   }
 
   update(location: Vector3, nameTag: string) {
@@ -31,7 +31,7 @@ export class FloatingText {
       if (!this.entity) this.create(location)
     }
 
-    if (this.entity?.isValid()) {
+    if (this.entity?.isValid) {
       this.entity.teleport(location)
       this.entity.nameTag = nameTag
     } else {

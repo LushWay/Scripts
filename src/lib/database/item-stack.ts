@@ -154,7 +154,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
 
   is(itemStack: ItemStack | ContainerSlot) {
     if (itemStack instanceof ContainerSlot) {
-      if (!itemStack.isValid() || !itemStack.hasItem()) return false
+      if (!itemStack.isValid || !itemStack.hasItem()) return false
     }
     if (itemStack.isStackable) return false
 

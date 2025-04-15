@@ -5,9 +5,7 @@ import { EventSignal } from 'lib/event-signal'
 export abstract class Component {
   abstract readonly typeId: string
 
-  isValid(): boolean {
-    return true
-  }
+  isValid = true
 }
 
 export class BlockTypes {
@@ -113,9 +111,7 @@ export class Entity {
     return [...this.components.values()]
   }
 
-  isValid() {
-    return true
-  }
+  isValid = true
 }
 
 export class Block {}
@@ -299,9 +295,8 @@ export class ScoreboardObjective {
   hasParticipant(participant: Entity | ScoreboardIdentity | string): boolean {
     return this.participiants.has(this.getId(participant))
   }
-  isValid(): boolean {
-    return true
-  }
+  isValid = true
+
   removeParticipant(participant: Entity | ScoreboardIdentity | string): boolean {
     return false
   }
@@ -519,9 +514,7 @@ export class Container {
     return new ContainerSlot(slot, this)
   }
 
-  isValid(): boolean {
-    return true
-  }
+  isValid = true
 
   moveItem(fromSlot: number, toSlot: number, toContainer: Container): void {
     const item = this.getItem(fromSlot)

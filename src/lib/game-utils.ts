@@ -31,7 +31,7 @@ export function getBlockStatus({ location, dimensionId }: LocationInDimension) {
     if ('valid' in location && !location.valid) return 'unloaded'
 
     const block = world[dimensionId].getBlock(location)
-    if (!block?.isValid()) return 'unloaded'
+    if (!block?.isValid) return 'unloaded'
 
     return block
   } catch (e) {
@@ -116,8 +116,8 @@ export function nmspc(text: string) {
  * for preventing overload
  */
 export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
-  await world.overworld.runCommandAsync(`tickingarea remove ldchnk`)
-  await world.overworld.runCommandAsync(`tickingarea add ${Vector.string(location)} ${Vector.string(location)} ldchnk`)
+  world.overworld.runCommand(`tickingarea remove ldchnk`)
+  world.overworld.runCommand(`tickingarea add ${Vector.string(location)} ${Vector.string(location)} ldchnk`)
 
   let i = 100
   return new Promise<false | Block>(resolve => {
@@ -165,7 +165,7 @@ export async function getTopmostSolidBlock(location: Vector3) {
     if (!hit) return false
 
     const { block } = hit
-    if (!block.isValid() || block.isLiquid || block.isAir) {
+    if (!block.isValid || block.isLiquid || block.isAir) {
       return false
     } else return block.location
   } else return false
@@ -201,4 +201,19 @@ export function createPoint(
   dimensionType: DimensionType = 'overworld',
 ): DimensionLocation {
   return { vector: { x, y, z }, dimensionType }
+}
+
+export interface Startup<T> {
+  value: T
+}
+
+export function onStartup<T>(initialize: () => T) {
+  try {
+    world.setDynamicProperty('a', 1)
+    return { value: initialize() } satisfies Startup<T>
+  } catch (e) {
+    const result = { value: undefined } as unknown as Startup<T>
+    system.beforeEvents.startup.subscribe(() => (result.value = initialize()))
+    return result
+  }
 }

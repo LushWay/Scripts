@@ -1,4 +1,4 @@
-import { BlockPermutation, BlockTypes } from '@minecraft/server'
+import { BlockPermutation, BlockTypes, LiquidType } from '@minecraft/server'
 import { BlockStateSuperset, MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { noNullable } from 'lib'
 import {
@@ -62,7 +62,7 @@ export const REPLACE_MODES: Record<string, ReplaceMode> = {
     matches: block => block.isSolid && !block.isAir,
   },
   'Любой водонепроницаемый блок': {
-    matches: block => !block.type.canBeWaterlogged && !block.isAir && !block.isLiquid,
+    matches: block => !block.canContainLiquid(LiquidType.Water) && !block.isAir && !block.isLiquid,
   },
   'Любой полублок': {
     matches: block => isSlab(block.typeId),
@@ -81,7 +81,7 @@ export const REPLACE_MODES: Record<string, ReplaceMode> = {
         }
       }
 
-      if (!permutation && !block.type.canBeWaterlogged) {
+      if (!permutation && !block.canContainLiquid(LiquidType.Water)) {
         permutation = permutations.filter(e => allBlockTypes.every(isType => !isType(e.type.id))).randomElement()
       }
 

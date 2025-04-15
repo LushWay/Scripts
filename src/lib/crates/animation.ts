@@ -81,7 +81,7 @@ export default class ChestLootAnimation {
           this.stop()
           return
         }
-        if (!this.current.entity.isValid() || !this.current.player.isValid()) {
+        if (!this.current.entity.isValid || !this.current.player.isValid) {
           this.stop()
           return
         }
@@ -103,8 +103,8 @@ export default class ChestLootAnimation {
     if (!this.current) return
 
     system.clearRun(this.current.timeout)
-    if (this.current.entity.isValid()) this.current.entity.remove()
-    if (this.current.player.isValid()) {
+    if (this.current.entity.isValid) this.current.entity.remove()
+    if (this.current.player.isValid) {
       this.current.player.container?.addItem(this.current.item)
       this.current.player.info(t`Вы получили свою награду!`)
     }

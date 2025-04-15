@@ -4,7 +4,6 @@ import {
   PlayerInteractWithBlockBeforeEvent,
   PlayerInteractWithEntityBeforeEvent,
   PlayerPlaceBlockBeforeEvent,
-  system,
   world,
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
@@ -152,7 +151,7 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   const { typeId } = entity
-  if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid()) return
+  if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid) return
 
   const region = Region.getAt(entity)
 

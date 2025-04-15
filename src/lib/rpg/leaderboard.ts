@@ -147,7 +147,7 @@ export class Leaderboard {
       leaderboard += `§${s}${Leaderboard.parseCustomScore(this.scoreboard.id, scoreInfo.score, true)}§r\n`
     }
 
-    if (this.entity.isValid()) this.entity.nameTag = `§ы§l§${style.objName}${name}\n§ы§l${filler}§r\n${leaderboard}`
+    if (this.entity.isValid) this.entity.nameTag = `§ы§l§${style.objName}${name}\n§ы§l${filler}§r\n${leaderboard}`
   }
 }
 
@@ -159,7 +159,7 @@ system.runInterval(
       const info = Leaderboard.all.get(id)
 
       if (info) {
-        if (info.entity.isValid()) {
+        if (info.entity.isValid) {
           info.updateLeaderboard()
         }
       } else {
@@ -171,7 +171,7 @@ system.runInterval(
           })
           .find(e => e.id === id)
 
-        if (!entity || !entity.isValid() || typeof leaderboard === 'undefined') continue
+        if (!entity || !entity.isValid || typeof leaderboard === 'undefined') continue
         new Leaderboard(entity, leaderboard).updateLeaderboard()
       }
     }
