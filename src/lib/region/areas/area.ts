@@ -80,9 +80,11 @@ export abstract class Area<T extends JsonObject = JsonObject> {
       system.runJob(
         (function* forEachRegionVectorJob() {
           try {
+            let i = 0
             for (const vector of Vector.foreach(...edges)) {
               callback(vector, isIn(vector), dimension)
-              yield
+              i++
+              if (i % 10 === 0) yield
             }
             resolve()
           } catch (e: unknown) {

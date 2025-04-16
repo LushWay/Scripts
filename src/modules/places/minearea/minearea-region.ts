@@ -177,8 +177,12 @@ onFullRegionTypeRestore(MineareaRegion, region => {
 
 function notifyBuilder(player: Player, region: MineareaRegion) {
   if (region.scheduledToPlaceBlocks.length) {
-    player.fail('Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки.')
-    system.delay(() => region.restoreStructure(() => void 0))
+    system.delay(() => {
+      player.fail(
+        'Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки.',
+      )
+      region.restoreStructure(() => void 0)
+    })
 
     return false
   } else {
