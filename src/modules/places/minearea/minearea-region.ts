@@ -48,7 +48,21 @@ export class MineareaRegion extends RegionWithStructure {
     return restoredRegions.length
   }
 
+  restoringStructureProgress = 0
+
+  restoringStructurePromise: Promise<MineareaRegion[]> | undefined
+
   async restoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
+    if (this.restoringStructurePromise) return this.restoringStructurePromise
+    else {
+      this.restoringStructurePromise = this.restoreStructureImpl(eachVectorCallback)
+      const result = await this.restoringStructurePromise
+      delete this.restoringStructurePromise
+      return result
+    }
+  }
+
+  async restoreStructureImpl(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
     const restoredRegions: MineareaRegion[] = []
     try {
       await this.area.forEachVector(async (vector, isIn) => {
@@ -63,7 +77,7 @@ export class MineareaRegion extends RegionWithStructure {
           }
         }
 
-        this.restoringStructure++
+        this.restoringStructureProgress++
         eachVectorCallback?.(vector)
       })
 
@@ -71,7 +85,7 @@ export class MineareaRegion extends RegionWithStructure {
       this.scheduledToPlaceBlocks = []
       return restoredRegions
     } finally {
-      this.restoringStructure = 0
+      this.restoringStructureProgress = 0
     }
   }
 
@@ -94,8 +108,6 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   building = false
-
-  restoringStructure = 0
 
   scheduledToPlaceBlocks: Immutable<ScheduledBlockPlace>[] = []
 
@@ -120,7 +132,7 @@ export class MineareaRegion extends RegionWithStructure {
   customFormDescription(player: Player): Record<string, unknown> {
     return {
       'Building': this.building,
-      'Restoring structure': this.restoringStructure,
+      'Restoring structure': this.restoringStructureProgress,
       'Scheduled to place blocks': this.scheduledToPlaceBlocks.length,
     }
   }
@@ -195,7 +207,7 @@ function notifyBuilder(player: Player, region: MineareaRegion) {
   if (region.scheduledToPlaceBlocks.length) {
     system.delay(() => {
       player.fail(
-        t.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${region.restoringStructure / Vector.size({ x: 0, y: 0, z: 0 }, region.area.size)}%%`,
+        t.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${(region.restoringStructureProgress / Vector.size({ x: 0, y: 0, z: 0 }, region.area.size)) * 100}%%`,
       )
       region.restoreStructure(() => void 0)
     })
