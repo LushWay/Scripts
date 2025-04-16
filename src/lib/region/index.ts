@@ -63,7 +63,11 @@ export enum ActionGuardOrder {
   Lowest = 6,
 }
 
+export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []
+
 actionGuard((player, region, ctx) => {
+  if (region && regionTypesThatIgnoreIsBuildingGuard.some(e => region instanceof e)) return
+
   if (isBuilding(player)) return true
 
   if (region?.getMemberRole(player.id)) return true

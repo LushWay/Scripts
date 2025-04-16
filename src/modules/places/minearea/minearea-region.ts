@@ -1,6 +1,11 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { isBuilding } from 'lib/game-utils'
-import { actionGuard, ActionGuardOrder, registerCreateableRegion } from 'lib/region'
+import {
+  actionGuard,
+  ActionGuardOrder,
+  regionTypesThatIgnoreIsBuildingGuard,
+  registerCreateableRegion,
+} from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
@@ -114,6 +119,8 @@ export class MineareaRegion extends RegionWithStructure {
 
 registerSaveableRegion('minearea', MineareaRegion)
 registerCreateableRegion('Зоны добычи', MineareaRegion)
+
+regionTypesThatIgnoreIsBuildingGuard.push(MineareaRegion)
 
 actionGuard((player, region, ctx) => {
   if (!(region instanceof MineareaRegion)) return
