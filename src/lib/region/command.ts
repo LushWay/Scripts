@@ -1,4 +1,4 @@
-import { Player, world } from '@minecraft/server'
+import { LocationInUnloadedChunkError, MolangVariableMap, Player, system, world } from '@minecraft/server'
 import 'lib/command'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ActionForm } from 'lib/form/action'
@@ -16,12 +16,55 @@ export function registerCreateableRegion(name: string, region: typeof Region) {
   createableRegions.push({ name, region })
 }
 
-new Command('region')
+const command = new Command('region')
   .setPermissions('techAdmin')
   .setGroup('public')
   .executes(ctx => {
     regionForm(ctx.player)
   })
+
+let regionBorders = false
+
+command
+  .overload('borders')
+  .executes(ctx => ctx.player.tell(t`Borders enabled: ${regionBorders}`))
+  .boolean('set', true)
+  .executes((ctx, newValue = false) => {
+    ctx.player.tell(t`${regionBorders} -> ${newValue}`)
+    regionBorders = newValue
+  })
+
+const variables = new MolangVariableMap()
+variables.setColorRGBA('color', {
+  red: 0,
+  green: 1,
+  blue: 0,
+  alpha: 0,
+})
+
+system.runInterval(
+  () => {
+    if (!regionBorders) return
+    const players = world.getAllPlayers()
+
+    for (const region of Region.regions) {
+      if (!(region.area instanceof SphereArea)) continue
+      if (!players.some(e => region.area.isNear(e, 30))) continue
+
+      region.area.forEachVector((vector, isIn, dimension) => {
+        try {
+          const r = Vector.distance(region.area.center, vector)
+          if (isIn && r > region.area.radius - 1) dimension.spawnParticle('minecraft:wax_particle', vector, variables)
+        } catch (e) {
+          if (e instanceof LocationInUnloadedChunkError) return
+          throw e
+        }
+      })
+    }
+  },
+  'region borders',
+  40,
+)
 
 function regionForm(player: Player) {
   const reg = (region: Parameters<typeof regionList>[1]) => () => regionList(player, region)
@@ -94,6 +137,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
       'Тип региона': region.creator.name,
       'Центр': Vector.string(region.area.center, true),
       'Радиус': region.area instanceof SphereArea ? region.area.radius : 'не поддерживается',
+      ...region.customFormDescription(player),
     }),
   )
     .addButton(ActionForm.backText, back)

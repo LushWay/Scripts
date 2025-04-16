@@ -50,7 +50,7 @@ export class Region {
 
   protected static generateRegionKey(kind: string, area: string, radius: number) {
     const date = new Date()
-    let key = `${kind}-${area}-${radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
+    let key = `${kind}-${area}-${~~radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
     if (key in RegionDatabase) {
       let i = 0
       while (`${key}-${i}` in RegionDatabase) i++
@@ -252,6 +252,11 @@ export class Region {
   /** Can be overriden to add custom buttons to the .region edit form */
   customFormButtons(form: ActionForm, player: Player) {
     // Can be overriden to add custom buttons
+  }
+
+  /** Can be overriden to add custom description */
+  customFormDescription(player: Player): Record<string, unknown> {
+    return {}
   }
 }
 

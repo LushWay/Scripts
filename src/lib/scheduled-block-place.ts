@@ -8,7 +8,7 @@ import { util } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { Vector } from 'lib/vector'
 
-interface ScheduledBlockPlace {
+export interface ScheduledBlockPlace {
   typeId: string
   states?: Record<string, string | number | boolean>
   date: number
@@ -27,12 +27,19 @@ export function scheduleBlockPlace({
 }: Omit<ScheduledBlockPlace, 'date'> & {
   dimension: DimensionType
   restoreTime: number
-}) {
-  if (!isScheduledToPlace(options.location, dimension))
-    SCHEDULED_DB[dimension].push({ date: Date.now() + restoreTime, ...options })
+}): Immutable<ScheduledBlockPlace> {
+  const oldSchedule = getScheduledToPlace(options.location, dimension)
+  if (!oldSchedule) {
+    const schedule = { date: Date.now() + restoreTime, ...options }
+    SCHEDULED_DB[dimension].push(schedule)
+    return schedule
+  } else return oldSchedule
 }
 
-export function getScheduledToPlace(location: Vector3, dimension: DimensionType) {
+export function getScheduledToPlace(
+  location: Vector3,
+  dimension: DimensionType,
+): false | undefined | Immutable<ScheduledBlockPlace> {
   const dimblocks = IMMUTABLE_DB[dimension]
   if (typeof dimblocks === 'undefined') return false
 
@@ -49,7 +56,7 @@ export const onScheduledBlockPlace = new EventSignal<{
   schedule: Readonly<ScheduledBlockPlace>
   block: Block
   dimensionType: DimensionType
-  schedules: readonly ScheduledBlockPlace[]
+  schedules: Immutable<ScheduledBlockPlace>[]
 }>()
 
 const UNSCHEDULED = -1
@@ -74,7 +81,7 @@ const DIMENSIONS = ['overworld', 'nether', 'end'] as const
 
 function* scheduledBlockPlaceJob() {
   for (const dimension of DIMENSIONS) {
-    const schedules = IMMUTABLE_DB[dimension]
+    const schedules = IMMUTABLE_DB[dimension] as Immutable<ScheduledBlockPlace>[]
     if (typeof schedules === 'undefined') {
       Reflect.deleteProperty(SCHEDULED_DB, dimension)
       continue

@@ -2,10 +2,10 @@ import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { ActionForm, ms, registerCreateableRegion } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
 import { scheduleBlockPlace } from 'lib/scheduled-block-place'
+import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../minearea/minearea-region'
 import { ores, placeOre } from './algo'
-import { t } from 'lib/text'
 
 const logger = createLogger('Shaft')
 
@@ -16,7 +16,7 @@ export class MineshaftRegion extends MineareaRegion {
 
   async removeAllOresAndResaveStructure() {
     let oresFound = 0
-    const regionsRestored = await this.restoreAndSaveStructure(vector => {
+    const regionsRestored = await this.restoreAndResaveStructure(vector => {
       const block = this.dimension.getBlock(vector)
       const ore = block && ores.getOre(block.typeId)
       if (ore) {
@@ -38,13 +38,14 @@ export class MineshaftRegion extends MineareaRegion {
     const typeId = block.typeId
     system.delay(() => placeOre(block, typeId, dimension, player))
 
-    scheduleBlockPlace({
+    const schedule = scheduleBlockPlace({
       dimension: dimension.type,
       location: block.location,
       typeId: ore ? ore.empty : block.typeId,
       states: ore ? undefined : block.permutation.getAllStates(),
       restoreTime: ms.from('min', Math.randomInt(1, 3)),
     })
+    this.scheduledToPlaceBlocks.push(schedule)
 
     return true
   }
