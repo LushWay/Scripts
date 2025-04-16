@@ -14,6 +14,7 @@ import {
   onScheduledBlockPlace,
   scheduleBlockPlace,
   ScheduledBlockPlace,
+  unscheduleBlockPlace,
 } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
@@ -47,7 +48,6 @@ export class MineareaRegion extends RegionWithStructure {
 
   async restoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
     const restoredRegions: MineareaRegion[] = []
-    this.restoringStructure = true
     try {
       await this.area.forEachVector(async (vector, isIn) => {
         if (!isIn) return
@@ -61,22 +61,29 @@ export class MineareaRegion extends RegionWithStructure {
           }
         }
 
+        this.restoringStructure++
         eachVectorCallback?.(vector)
       })
+
+      this.scheduledToPlaceBlocks.forEach(e => unscheduleBlockPlace(e))
+      this.scheduledToPlaceBlocks = []
       return restoredRegions
     } finally {
-      this.restoringStructure = false
+      this.restoringStructure = 0
     }
   }
 
-  protected async onCreate() {
+  protected async onCreate(action = 'Created new') {
+    logger.info`${action} MineArea region...`
     const crossRegions = await this.restoreAndResaveStructure()
 
-    logger.info`Created new MineArea region ${this.id} and saved structure. Crossregions restored: ${crossRegions}`
+    logger.info`${action} MineArea region ${this.id} and saved structure. Crossregions restored: ${crossRegions}`
   }
 
-  protected onRestore(): void {
-    this.area.forEachVector((vector, isIn, dimension) => {
+  protected async onRestore() {
+    if (!this.structure.exists) await this.onCreate('Restored')
+
+    await this.area.forEachVector((vector, isIn, dimension) => {
       if (!isIn) return
 
       const scheduled = getScheduledToPlace(vector, dimension.type)
@@ -86,7 +93,7 @@ export class MineareaRegion extends RegionWithStructure {
 
   building = false
 
-  restoringStructure = false
+  restoringStructure = 0
 
   scheduledToPlaceBlocks: Immutable<ScheduledBlockPlace>[] = []
 

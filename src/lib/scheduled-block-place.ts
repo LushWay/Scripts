@@ -96,7 +96,6 @@ function* scheduledBlockPlaceJob() {
         const schedule = schedules[i]
         if (typeof schedule === 'undefined' || schedule.date === UNSCHEDULED) {
           removeScheduleAt(dimension, i)
-          yield
           continue
         }
 
