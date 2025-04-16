@@ -75,6 +75,7 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
         value,
         newValue => {
           table[key] = newValue
+          Reflect.deleteProperty(table, key)
           player.tell(inspect(value) + '§r -> ' + inspect(newValue))
         },
         () => tableProperty(key, table, player, back),
