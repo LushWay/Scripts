@@ -190,6 +190,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
 
   region.customFormButtons(form, player)
 
+  form.addButton('Переместиться в регион', () => player.teleport(region.area.center))
   form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
 }
 

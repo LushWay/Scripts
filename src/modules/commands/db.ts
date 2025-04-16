@@ -5,6 +5,7 @@ import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
 import { DatabaseTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
+import { t } from 'lib/text'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
 new Command('db')
@@ -80,6 +81,14 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
         key,
       ),
     )
+    .addButton('Переименовать', () => {
+      new ModalForm('Переименовать').addTextField('Ключ', 'останется прежним', key).show(player, (ctx, newKey) => {
+        if (newKey) {
+          player.success(t`Renamed ${key} -> ${newKey}`)
+          table[newKey] = table[key]
+        } else player.info(t`Key ${key} left as is`)
+      })
+    })
     .addButton('§cУдалить§r', () => {
       Reflect.deleteProperty(table, key)
       system.delay(back)
