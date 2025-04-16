@@ -1,4 +1,5 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
+import { Vector } from 'lib'
 import { isBuilding } from 'lib/game-utils'
 import {
   actionGuard,
@@ -16,6 +17,7 @@ import {
   ScheduledBlockPlace,
   unscheduleBlockPlace,
 } from 'lib/scheduled-block-place'
+import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
 
@@ -193,7 +195,7 @@ function notifyBuilder(player: Player, region: MineareaRegion) {
   if (region.scheduledToPlaceBlocks.length) {
     system.delay(() => {
       player.fail(
-        'Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки.',
+        t.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${region.restoringStructure / Vector.size({ x: 0, y: 0, z: 0 }, region.area.size)}%%`,
       )
       region.restoreStructure(() => void 0)
     })
