@@ -203,6 +203,7 @@ function notifyBuilder(player: Player, region: MineareaRegion) {
     region.building = true
     system.delay(() => {
       try {
+        region.structure.delete()
         region.structure.save()
       } finally {
         region.building = false
