@@ -67,7 +67,7 @@ export function createSellableItem({
         BUTTON['+'],
       )
 
-      function buyForm(form) {
+      function buyForm(form: ShopFormSection) {
         const addBuy = createBuy(getCount, getBuy, form, type, db, aux)
         addBuy(1)
         addBuy(16)
