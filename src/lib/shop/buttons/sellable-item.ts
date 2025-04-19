@@ -45,6 +45,7 @@ export function createSellableItem({
     return t.raw`${body()}\n\nAdmin info below\n${t`DB count: ${db[type]}\nDefault count: ${defaultCount}`}`
   }
   const amount = inventory.get(type) ?? 0
+  const settings = Shop.getPlayerSettings(player)
 
   form.section(
     itemDescription({ typeId: type, amount }),
@@ -66,25 +67,32 @@ export function createSellableItem({
         BUTTON['+'],
       )
 
-      const addBuy = createBuy(getCount, getBuy, form, type, db, aux)
-      addBuy(1)
-      addBuy(16)
-      addBuy(32)
-      addBuy(64)
-      addBuy(256)
+      function buyForm(form) {
+        const addBuy = createBuy(getCount, getBuy, form, type, db, aux)
+        addBuy(1)
+        addBuy(16)
+        addBuy(32)
+        addBuy(64)
+        addBuy(256)
 
-      let money = player.scores.money
-      let i = 0
-      for (;;) {
-        money -= getBuy(getCount() - i)
-        if (money > 0 && getCount() - i > 0) {
-          // More money, reduce
-          i++
-        } else {
-          // No more money, add item
-          if (i > 0) addBuy(i)
-          break
+        let money = player.scores.money
+        let i = 0
+        for (;;) {
+          money -= getBuy(getCount() - i)
+          if (money > 0 && getCount() - i > 0) {
+            // More money, reduce
+            i++
+          } else {
+            // No more money, add item
+            if (i > 0) addBuy(i)
+            break
+          }
         }
+      }
+      if (settings.sellableItemsScreen) {
+        buyForm(form)
+      } else {
+        form.section('Купить', f => buyForm(f))
       }
     },
     aux,

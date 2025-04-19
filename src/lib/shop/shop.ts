@@ -16,6 +16,11 @@ export class Shop {
       description: 'Показывать ли счет в меню (монеты, листья)',
       value: false,
     },
+    sellableItemsScreen: {
+      name: 'Продаваемые предметы',
+      description: 'Сразу открывать меню покупки',
+      value: false,
+    },
   })
 
   /** List of all available shops */

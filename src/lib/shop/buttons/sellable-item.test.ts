@@ -9,7 +9,7 @@ describe('sellableItem', () => {
     const player = TEST_createPlayer()
     const shop = new Shop('shop', 'id')
 
-   return // Skipped
+    return // Skipped
 
     shop.menu(form => {
       form.dynamicCostItem(MinecraftItemTypes.ArmadilloSpawnEgg, { defaultCount: 0, k: 1, maxCount: 10, minPrice: 1 })
