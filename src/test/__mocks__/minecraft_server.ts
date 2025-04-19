@@ -111,7 +111,9 @@ export class Entity {
     return [...this.components.values()]
   }
 
-  isValid = true
+  get isValid() {
+    return true
+  }
 }
 
 export class Block {}
@@ -249,6 +251,10 @@ export class Scoreboard {
   setObjectiveAtDisplaySlot(displaySlotId: any, objectiveDisplaySetting: any): ScoreboardObjective | undefined {
     return
   }
+}
+
+export class MolangVariableMap {
+  setColorRGBA = vi.fn()
 }
 
 /** Contains an identity of the scoreboard item. */
