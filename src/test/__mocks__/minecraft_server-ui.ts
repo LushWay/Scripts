@@ -1,5 +1,8 @@
 import * as minecraftserver from '@minecraft/server'
+import { Language } from 'lib/assets/lang'
+import { inaccurateSearch } from 'lib/search'
 import { isKeyof } from 'lib/util'
+import { rawTextToString } from 'lib/utils/lang'
 import { TestPlayer } from 'test/utils'
 
 export enum FormCancelationReason {
@@ -14,25 +17,25 @@ export enum FormRejectReason {
 }
 
 export class ActionFormData {
-  data: FormData['action']['arg'] = {
+  form: TFD['action']['form'] = {
     body: '',
     title: '',
     buttons: [],
   }
   title(titleText: minecraftserver.RawMessage | string): ActionFormData {
-    this.data.title = titleText
+    this.form.title = titleText
     return this
   }
   body(bodyText: minecraftserver.RawMessage | string): ActionFormData {
-    this.data.body = bodyText
+    this.form.body = bodyText
     return this
   }
   button(text: minecraftserver.RawMessage | string, iconPath?: string): ActionFormData {
-    this.data.buttons.push({ text, icon: iconPath })
+    this.form.buttons.push({ text, icon: iconPath })
     return this
   }
   async show(player: minecraftserver.Player): Promise<ActionFormResponse> {
-    return processCallback(player, 'action', this.data)
+    return processCallback(player, 'action', this.form)
   }
 }
 
@@ -48,30 +51,30 @@ export class ActionFormResponse extends FormResponse {
 }
 
 export class MessageFormData {
-  data: FormData['message']['arg'] = {
+  form: TFD['message']['form'] = {
     body: '',
     title: '',
     button1: { text: '' },
     button2: { text: '' },
   }
   title(titleText: minecraftserver.RawMessage | string): MessageFormData {
-    this.data.title = titleText
+    this.form.title = titleText
     return this
   }
   body(bodyText: minecraftserver.RawMessage | string): MessageFormData {
-    this.data.body = bodyText
+    this.form.body = bodyText
     return this
   }
   button1(text: minecraftserver.RawMessage | string): MessageFormData {
-    this.data.button1 = { text }
+    this.form.button1 = { text }
     return this
   }
   button2(text: minecraftserver.RawMessage | string): MessageFormData {
-    this.data.button2 = { text }
+    this.form.button2 = { text }
     return this
   }
   async show(player: minecraftserver.Player): Promise<MessageFormResponse> {
-    return processCallback(player, 'message', this.data)
+    return processCallback(player, 'message', this.form)
   }
 }
 
@@ -80,13 +83,13 @@ export class MessageFormResponse extends FormResponse {
 }
 
 export class ModalFormData {
-  data: FormData['modal']['arg'] = {
+  form: TFD['modal']['form'] = {
     buttons: [],
     title: '',
     body: '',
   }
   title(titleText: minecraftserver.RawMessage | string): ModalFormData {
-    this.data.title = titleText
+    this.form.title = titleText
     return this
   }
   dropdown(
@@ -94,7 +97,7 @@ export class ModalFormData {
     options: (minecraftserver.RawMessage | string)[],
     defaultValueIndex?: number,
   ): ModalFormData {
-    this.data.buttons.push({ type: 'dropdown', options, defaultValueIndex, label })
+    this.form.buttons.push({ type: 'dropdown', options, defaultValueIndex, label })
     return this
   }
 
@@ -105,11 +108,11 @@ export class ModalFormData {
     valueStep: number,
     defaultValue?: number,
   ): ModalFormData {
-    this.data.buttons.push({ type: 'slider', label, minimumValue, maximumValue, valueStep, defaultValue })
+    this.form.buttons.push({ type: 'slider', label, minimumValue, maximumValue, valueStep, defaultValue })
     return this
   }
   submitButton(submitButtonText: minecraftserver.RawMessage | string): ModalFormData {
-    this.data.submitText = submitButtonText
+    this.form.submitText = submitButtonText
     return this
   }
   textField(
@@ -117,16 +120,16 @@ export class ModalFormData {
     placeholderText: minecraftserver.RawMessage | string,
     defaultValue?: minecraftserver.RawMessage | string,
   ): ModalFormData {
-    this.data.buttons.push({ type: 'textField', label, placeholderText, defaultValue })
+    this.form.buttons.push({ type: 'textField', label, placeholderText, defaultValue })
     return this
   }
 
   toggle(label: minecraftserver.RawMessage | string, defaultValue?: boolean): ModalFormData {
-    this.data.buttons.push({ type: 'toggle', label, defaultValue })
+    this.form.buttons.push({ type: 'toggle', label, defaultValue })
     return this
   }
   async show(player: minecraftserver.Player): Promise<ModalFormResponse> {
-    return processCallback(player, 'modal', this.data)
+    return processCallback(player, 'modal', this.form)
   }
 }
 
@@ -140,33 +143,195 @@ export class FormRejectError extends Error {
 
 type MT = string | minecraftserver.RawMessage
 
-export type FormCl<T extends keyof FormData> = (
-  arg: FormData[T]['arg'],
-) => FormData[T]['returns'] | FormCancelationReason | FormRejectReason
+export class NotFoundButtonError extends Error {}
 
-interface BaseFormArg {
+abstract class FormSelector<T extends keyof TFD> {
+  constructor(
+    protected kind: T,
+    protected form: TFD[T]['form'],
+  ) {}
+
+  body() {
+    return TestFormUtils.toString(this.form.body)
+  }
+
+  title() {
+    return TestFormUtils.toString(this.form.title)
+  }
+
+  dump() {
+    return {
+      title: this.title(),
+      body: this.body(),
+      buttons: this.buttons.dump(),
+    }
+  }
+
+  abstract buttons: ButtonsSelector<T>
+}
+
+class ModalFormSelector extends FormSelector<'modal'> {
+  buttons: ModalButtonsSelector = new ModalButtonsSelector(this, this.form, this.kind)
+}
+
+class ActionMessageFormSelector<T extends keyof TFD> extends FormSelector<T> {
+  buttons: ActionAndMessageButtonsSelector<T> = new ActionAndMessageButtonsSelector(this, this.form, this.kind)
+}
+
+abstract class ButtonsSelector<T extends keyof TFD> {
+  constructor(
+    protected selector: FormSelector<T>,
+    protected form: TFD[T]['form'],
+    protected kind: T,
+  ) {}
+  protected isAction(form: TFD[T]['form']): form is TFD['action']['form'] {
+    return 'buttons' in form
+  }
+
+  protected isMessage(form: TFD[T]['form']): form is TFD['message']['form'] {
+    return 'button1' in form
+  }
+
+  protected isModal(form: TFD[T]['form']): form is TFD['modal']['form'] {
+    return 'submitText' in form
+  }
+
+  abstract dump(): unknown
+}
+
+class ModalButtonsSelector extends ButtonsSelector<'modal'> {
+  dump(): string {
+    return 'not implemented'
+  }
+}
+
+class ActionAndMessageButtonsSelector<T extends keyof TFD> extends ButtonsSelector<T> {
+  protected buttons() {
+    if (this.isAction(this.form)) {
+      return this.form.buttons
+    } else if (this.isMessage(this.form)) {
+      return [this.form.button1, this.form.button2]
+    } else throw new Error(`Unsupported form kind: ${this.kind}`)
+  }
+
+  protected searchRaw(buttons: { text: MT }[], searchFn: (text: MT) => boolean) {
+    const index = buttons.findIndex(e => searchFn(e.text))
+    if (index === -1) throw new NotFoundButtonError(`Unable to find button`)
+    return index
+  }
+
+  protected searchString(buttons: { text: MT }[], uncolored = false, searchFn: (button: string) => boolean) {
+    return this.searchRaw(buttons, text => searchFn(TestFormUtils.toString(text, uncolored)))
+  }
+
+  protected searchPattern(buttons: { text: MT }[], pattern: RegExp, uncolored = false) {
+    try {
+      return this.searchString(buttons, uncolored, text => pattern.test(text))
+    } catch (error) {
+      if (error instanceof NotFoundButtonError) {
+        throw new NotFoundButtonError(`Unable to find button which matches the pattern ${String(pattern)}`)
+      } else throw error
+    }
+  }
+
+  private searchEquals(buttons: { text: MT }[], pattern: string, uncolored = false) {
+    try {
+      return this.searchString(buttons, uncolored, text => pattern === text)
+    } catch (error) {
+      if (error instanceof NotFoundButtonError) {
+        const buttonTexts = buttons.map(e => TestFormUtils.toString(e.text, uncolored))
+        const closestButtons = inaccurateSearch(pattern, buttonTexts)
+        const closest = closestButtons
+          .slice(0, 5)
+          .map(e => `'${e[0]}' ${~~(e[1] * 100)}%`)
+          .join(', ')
+        throw new NotFoundButtonError(`Unable to find button with text '${pattern}', closest is ${closest}`)
+      } else throw error
+    }
+  }
+
+  matches(pattern: RegExp): TFD[T]['returns'] {
+    return this.searchPattern(this.buttons(), pattern, false)
+  }
+  matchesUncolored(pattern: RegExp): TFD[T]['returns'] {
+    return this.searchPattern(this.buttons(), pattern, true)
+  }
+
+  equals(buttonText: string): TFD[T]['returns'] {
+    return this.searchEquals(this.buttons(), buttonText, false)
+  }
+
+  equalsUncolored(buttonText: string): TFD[T]['returns'] {
+    return this.searchEquals(this.buttons(), buttonText, true)
+  }
+
+  dump() {
+    return this.buttons().map(e => TestFormUtils.toString(e.text))
+  }
+
+  dumpUncolored() {
+    return this.buttons().map(e => TestFormUtils.toString(e.text, true))
+  }
+
+  dumpRaw() {
+    return this.buttons().map(e => e.text)
+  }
+}
+
+class TestFormUtils {
+  static toString(buttonText: MT, uncolored = false) {
+    if (typeof buttonText !== 'string') buttonText = rawTextToString(buttonText, Language.en_US)
+    return uncolored ? buttonText.replace(/§./g, '') : buttonText
+  }
+}
+
+type TestFormCallbackSelect<T extends keyof TFD> = T extends 'modal' ? ModalFormSelector : ActionMessageFormSelector<T>
+
+export type TestFormCallback<T extends keyof TFD> = (
+  select: TestFormCallbackSelect<T>,
+  form: TFD[T]['form'],
+  utils: typeof TestFormUtils,
+) => TFD[T]['returns'] | FormCancelationReason | FormRejectReason
+
+interface BaseForm {
   title: MT
   body: MT
 }
 
-export interface FormData {
-  message: {
-    arg: BaseFormArg & {
-      button1: { text: MT }
-      button2: { text: MT }
+interface TestMessageFormData {
+  form: BaseForm & {
+    button1: {
+      text: MT
     }
-    returns: 0 | 1
-  }
-  action: {
-    arg: BaseFormArg & {
-      buttons: { text: MT; icon?: string }[]
+    button2: {
+      text: MT
     }
-    returns: number
   }
-  modal: {
-    arg: BaseFormArg & { buttons: ModalFormButton[]; submitText?: MT }
-    returns: (string | number | boolean)[]
+  returns: 0 | 1
+}
+
+interface TestActionFormData {
+  form: BaseForm & {
+    buttons: {
+      text: MT
+      icon?: string
+    }[]
   }
+  returns: number
+}
+
+interface TestModalFormData {
+  form: BaseForm & {
+    buttons: ModalFormButton[]
+    submitText?: MT
+  }
+  returns: (string | number | boolean)[]
+}
+
+export interface TFD {
+  message: TestMessageFormData
+  action: TestActionFormData
+  modal: TestModalFormData
 }
 
 type ModalFormButton =
@@ -196,12 +361,12 @@ const responses = {
   message: MessageFormResponse,
   modal: ModalFormResponse,
   action: ActionFormResponse,
-} satisfies Record<keyof FormData, typeof FormResponse>
+} satisfies Record<keyof TFD, typeof FormResponse>
 
-function processCallback<T extends keyof FormData>(
+function processCallback<T extends keyof TFD>(
   player: minecraftserver.Player,
   kind: T,
-  arg: FormData[T]['arg'],
+  form: TFD[T]['form'],
 ): InstanceType<(typeof responses)[T]> {
   const callback = (player as TestPlayer).onForm?.[kind]
 
@@ -209,7 +374,14 @@ function processCallback<T extends keyof FormData>(
 
   type TT = InstanceType<(typeof responses)[T]>
   const response = responses[kind]
-  const result = callback(arg)
+  const result = callback(
+    (kind === 'modal'
+      ? new ModalFormSelector(kind, form as TestModalFormData['form'])
+      : new ActionMessageFormSelector(kind, form)) as TestFormCallbackSelect<T>,
+    form,
+    TestFormUtils,
+  )
+
   if (typeof result === 'string' && isKeyof(result, FormCancelationReason)) return new response(true, result) as TT
 
   if (kind === 'action') {

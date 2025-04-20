@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Player } from '@minecraft/server'
-import type { FormCl, FormData } from 'test/__mocks__/minecraft_server-ui'
+import type { TestFormCallback, TFD } from 'test/__mocks__/minecraft_server-ui'
 
 export function TEST_createPlayer() {
   // @ts-expect-error Yes. We can do this
@@ -9,11 +9,11 @@ export function TEST_createPlayer() {
 }
 
 export interface TestPlayer extends Player {
-  onForm?: { [K in keyof FormData]?: FormCl<K> }
+  onForm?: { [K in keyof TFD]?: TestFormCallback<K> }
 }
 
-export function TEST_onFormOpen<T extends keyof FormData>(player: Player, kind: T, callback: FormCl<T>) {
-  ;(player as TestPlayer).onForm ??= {}
-  // @ts-expect-error Huhuhhuhuh
-  ;(player as TestPlayer).onForm[kind] = callback
+export function TEST_onFormOpen<T extends keyof TFD>(player: Player, kind: T, callback: TestFormCallback<T>) {
+  const onForm = ((player as TestPlayer).onForm ??= {})
+  // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+  ;(onForm[kind] as TestFormCallback<T>) = callback
 }

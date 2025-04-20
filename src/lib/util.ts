@@ -15,6 +15,7 @@ export const util = {
         promise.catch((e: unknown) => {
           console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
         })
+        return new Promise(r => promise.then(r))
       }
     } catch (e: unknown) {
       console.error(

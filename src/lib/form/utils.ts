@@ -41,8 +41,6 @@ export class FormCallback<Form extends BaseForm = BaseForm> {
   }
 }
 
-const { UserBusy, UserClosed } = FormCancelationReason
-
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it succeeds or the
  * maximum number of attempts is reached.
@@ -62,8 +60,8 @@ export async function showForm(
     const response: ActionFormResponse | ModalFormResponse | MessageFormResponse = await form.show(player)
 
     if (response.canceled) {
-      if (response.cancelationReason === UserClosed) return false
-      if (response.cancelationReason === UserBusy) {
+      if (response.cancelationReason === FormCancelationReason.UserClosed) return false
+      if (response.cancelationReason === FormCancelationReason.UserBusy) {
         switch (i) {
           case 1:
             // First attempt failed, maybe chat closed...

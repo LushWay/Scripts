@@ -5,34 +5,20 @@ describe('ActionForm', () => {
   it('should create action form', async () => {
     const cb = vi.fn()
     const player = TEST_createPlayer()
-    TEST_onFormOpen(player, 'action', arg => {
-      expect(arg).toMatchInlineSnapshot(`
+    TEST_onFormOpen(player, 'action', form => {
+      expect(form.dump()).toMatchInlineSnapshot(`
         {
           "body": "body",
           "buttons": [
-            {
-              "icon": undefined,
-              "text": "button",
-            },
+            "button",
           ],
-          "title": {
-            "rawtext": [
-              {
-                "text": "§c§o§m§m§o§n§r§f",
-              },
-              {
-                "text": "title",
-              },
-            ],
-          },
+          "title": "§c§o§m§m§o§n§r§ftitle",
         }
       `)
       return 0
     })
-    new ActionForm('title', 'body').addButton('button', cb).show(player)
+    await new ActionForm('title', 'body').addButton('button', cb).show(player)
 
-    await vi.waitFor(() => {
-      expect(cb).toHaveBeenCalledOnce()
-    })
+    expect(cb).toHaveBeenCalledOnce()
   })
 })

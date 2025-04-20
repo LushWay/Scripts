@@ -130,7 +130,7 @@ export class ActionForm {
 
     const callback = this.buttons[response.selection]?.callback
     if (typeof callback === 'function') {
-      util.catch(() => callback(player, () => this.show(player)))
+      util.catch(() => callback(player, () => this.show(player)) as void)
       return true
     }
 

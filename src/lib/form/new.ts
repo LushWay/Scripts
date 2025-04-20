@@ -6,7 +6,7 @@ import { Quest } from 'lib/quest'
 import { MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
 
-export type NewFormCallback = (player: Player, back?: NewFormCallback) => void
+export type NewFormCallback = (player: Player, back?: NewFormCallback) => void | Promise<void | boolean>
 
 class Form {
   constructor(private player: Player) {
@@ -99,7 +99,7 @@ class Form {
       return
 
     const callback = this.buttons[response.selection]
-    if (typeof callback === 'function') util.catch(() => callback(this.player, this.show))
+    if (typeof callback === 'function') await util.catch(() => callback(this.player, this.show) as void)
   }
 }
 
@@ -113,7 +113,7 @@ export function form(create: CreateForm) {
 export class ShowForm {
   constructor(private create: CreateForm) {}
 
-  show: NewFormCallback = (player, back) => {
+  show: NewFormCallback = async (player, back) => {
     const form = new Form(player)
     if (back) {
       form.button(ActionForm.backText, back)
