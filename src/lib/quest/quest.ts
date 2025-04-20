@@ -5,16 +5,19 @@ import { Join } from 'lib/player-join'
 import { Group } from 'lib/rpg/place'
 import { Settings, SETTINGS_GROUP_NAME } from 'lib/settings'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { QuestButton } from './button'
 import { PlayerQuest } from './player'
 import { QS } from './step'
 
-export interface QuestDB {
-  active: {
-    id: string
-    i: number
-    db?: unknown
-  }[]
-  completed: string[]
+export declare namespace Quest {
+  interface DB {
+    active: {
+      id: string
+      i: number
+      db?: unknown
+    }[]
+    completed: string[]
+  }
 }
 
 export class Quest {
@@ -64,7 +67,30 @@ export class Quest {
     return db && this.quests.get(db.id)?.getPlayerStep(player, db.i)
   }
 
-  players = new WeakPlayerMap<PlayerQuest>({ onLeave: (_, v) => v.list.forEach(e => e.cleanup()) })
+  static getDatabase(player: Player, quest: Quest) {
+    return player.database.quests?.active.find(e => e.id === quest.id)
+  }
+
+  private static restore(player: Player, quest: Quest, db = Quest.getDatabase(player, quest)) {
+    if (db) quest.setStep(player, db.i, true)
+  }
+
+  static {
+    Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
+      if (firstJoin) return
+
+      system.delay(() => {
+        player.database.quests?.active.forEach(db => {
+          const quest = Quest.quests.get(db.id)
+          if (!quest) return
+
+          this.restore(player, quest, db)
+        })
+      })
+    })
+  }
+
+  players = new WeakPlayerMap<PlayerQuest>({ onLeave: (_, v) => v.steps.forEach(e => e.cleanup()) })
 
   /**
    * Creates a Quest and registers it in a collection.
@@ -104,7 +130,7 @@ export class Quest {
     const step = this.getPlayerStep(player, i) ?? this.createPlayerSteps(player, i)
     if (typeof step === 'undefined') return // Index can be unknown, e.g quest have 4 steps but index is 10
 
-    const db = this.getDatabase(player) ?? this.createDatabase(player, i)
+    const db = Quest.getDatabase(player, this) ?? this.createDatabase(player, i)
 
     if (!restore) delete db.db // Next step, clean previous db
     db.i = i
@@ -112,20 +138,16 @@ export class Quest {
     step.enter(!restore)
   }
 
-  getPlayerStep(player: Player, index = this.getActive(player)?.i): QS | undefined {
-    return this.players.get(player)?.list[index ?? 0]
+  getPlayerStep(player: Player, stepIndex = this.getForPlayer(player)?.i): QS | undefined {
+    return this.players.get(player)?.steps[stepIndex ?? 0]
   }
 
   private createPlayerSteps(player: Player, index: number) {
-    const steps = new PlayerQuest(this, player)
-    this.players.set(player, steps)
-    this.create(steps, player)
+    const playerQuest = new PlayerQuest(this, player)
+    this.players.set(player, playerQuest)
+    this.create(playerQuest, player)
 
-    return steps.list[index]
-  }
-
-  private getDatabase(player: Player) {
-    return player.database.quests?.active.find(e => e.id === this.id)
+    return playerQuest.steps[index]
   }
 
   private createDatabase(player: Player, i: number) {
@@ -134,7 +156,7 @@ export class Quest {
       completed: [],
     })
 
-    const db = { id: this.id, i: i } as QuestDB['active'][number]
+    const db = { id: this.id, i: i } as Quest.DB['active'][number]
     quests.active.unshift(db)
 
     return db
@@ -148,7 +170,7 @@ export class Quest {
    * @param player - Player to recieve quest from
    * @param i - Number that represents the step index of the quest.
    */
-  private getActive(player: Player, i?: number) {
+  private getForPlayer(player: Player, i?: number) {
     const quests = (player.database.quests ??= {
       active: [],
       completed: [],
@@ -187,6 +209,12 @@ export class Quest {
     }
   }
 
+  /**
+   * Removes this quest from the active player quests
+   *
+   * @param player - Player to exit
+   * @param end - Whenther to mark this quest as completed successfully and add to the completed array or not
+   */
   exit(player: Player, end = false) {
     const db = player.database
     if (!db.quests) return
@@ -201,30 +229,9 @@ export class Quest {
     if (end) db.quests.completed.push(this.id)
   }
 
-  static {
-    Join.onMoveAfterJoin.subscribe(
-      ({ player, firstJoin }) =>
-        !firstJoin &&
-        system.delay(() => {
-          player.database.quests?.active.forEach(db => {
-            const quest = Quest.quests.get(db.id)
-            if (!quest) return
-
-            this.restore(player, quest, db)
-          })
-        }),
-    )
-  }
-
   get group() {
     return new Group('quest: ' + this.id, this.name)
   }
 
-  private static restore(
-    player: Player,
-    quest: Quest,
-    db = player.database.quests?.active.find(e => e.id === quest.id),
-  ) {
-    if (db) quest.setStep(player, db.i, true)
-  }
+  button = new QuestButton(this)
 }

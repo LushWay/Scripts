@@ -1,6 +1,19 @@
-import { BlockPermutation, Dimension, StructureSaveMode, system, world } from '@minecraft/server'
+import {
+  Block,
+  BlockPermutation,
+  Dimension,
+  LocationInUnloadedChunkError,
+  StructureSaveMode,
+  system,
+  world,
+} from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
+import {
+  getScheduledToPlace,
+  getScheduledToPlaceAsync,
+  scheduleBlockPlace,
+  unscheduleBlockPlace,
+} from 'lib/scheduled-block-place'
 import { Vector } from 'lib/vector'
 import { Region } from './kinds/region'
 
@@ -41,22 +54,42 @@ export class RegionStructure {
     return !!world.structureManager.get(this.id)
   }
 
-  place() {
-    return this.forEachBlock((vector, block, dimension) => {
+  async place() {
+    const dimension = this.region.dimension
+    interface VectorPermutation {
+      vector: Vector3
+      permutation: BlockPermutation | undefined
+    }
+
+    const blocks: VectorPermutation[] = []
+    await this.forEachBlock((vector, block) => blocks.push({ vector, permutation: block }))
+
+    const unloadedBlocks: VectorPermutation[] = []
+    for (const block of blocks) {
       try {
-        if (block) dimension.setBlockPermutation(vector, block)
+        if (block.permutation) this.region.dimension.setBlockPermutation(block.vector, block.permutation)
       } catch (e) {
-        const schedule = getScheduledToPlace(vector, dimension.type)
+        if (e instanceof LocationInUnloadedChunkError) unloadedBlocks.push(block)
+      }
+    }
+
+    const schedules = await getScheduledToPlaceAsync(
+      unloadedBlocks.map(e => e.vector),
+      this.region.dimensionType,
+    )
+    if (schedules) {
+      for (const unloadedBlock of unloadedBlocks) {
+        const schedule = schedules.find(e => Vector.equals(e.location, unloadedBlock.vector))
         if (schedule) unscheduleBlockPlace(schedule)
         scheduleBlockPlace({
           dimension: dimension.type,
-          location: vector,
-          typeId: block?.type.id ?? MinecraftBlockTypes.Air,
-          states: block?.getAllStates() ?? {},
+          location: unloadedBlock.vector,
+          typeId: unloadedBlock.permutation?.type.id ?? MinecraftBlockTypes.Air,
+          states: unloadedBlock.permutation?.getAllStates() ?? {},
           restoreTime: 0,
         })
       }
-    })
+    }
   }
 
   delete() {

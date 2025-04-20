@@ -2,13 +2,16 @@ import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ActionForm } from 'lib/form/action'
 import { showForm } from 'lib/form/utils'
+import { Quest } from 'lib/quest'
 import { MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => void
 
 class Form {
-  constructor(private player: Player) {}
+  constructor(private player: Player) {
+    this.form.title('§c§o§m§m§o§n§r§fForm')
+  }
 
   private form = new ActionFormData()
 
@@ -27,9 +30,6 @@ class Form {
 
   private buttons: (NewFormCallback | undefined)[] = []
 
-  /** Adds a button to this form */
-  button(link: Show, icon?: string | null): F
-
   /**
    * Adds a button to this form
    *
@@ -38,6 +38,9 @@ class Form {
    */
   button(text: MaybeRawText, callback: NewFormCallback): F
 
+  /** Adds a button to this form */
+  button(link: ShowForm, icon?: string | null): F
+
   /**
    * Adds a button to this form
    *
@@ -45,7 +48,7 @@ class Form {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, iconPath: string | null | undefined, callback: NewFormCallback | Show): F
+  button(text: MaybeRawText, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): F
 
   /**
    * Adds a button to this form
@@ -55,13 +58,13 @@ class Form {
    * @param callback - What happens when this button is clicked
    */
   button(
-    textOrForm: MaybeRawText | Show,
+    textOrForm: MaybeRawText | ShowForm,
     callbackOrIcon: string | null | undefined | NewFormCallback,
-    callbackOrUndefined?: NewFormCallback | Show,
+    callbackOrUndefined?: NewFormCallback | ShowForm,
   ): F {
     let text, icon, callback
 
-    if (textOrForm instanceof Show) {
+    if (textOrForm instanceof ShowForm) {
       text = textOrForm.title(this.player)
       callback = textOrForm.show
       if (typeof callbackOrIcon === 'string') icon = callbackOrIcon
@@ -71,14 +74,21 @@ class Form {
 
     if (typeof callbackOrIcon === 'function') {
       callback = callbackOrIcon
-    } else if (typeof callbackOrIcon === 'string') {
+    } else {
       icon = callbackOrIcon
       callback = callbackOrUndefined
     }
 
     this.form.button(text, icon ?? undefined)
-    this.buttons.push(callback instanceof Show ? callback.show : callback)
+    this.buttons.push(callback instanceof ShowForm ? callback.show : callback)
     return this
+  }
+
+  qbutton(quest: Quest, textOverride?: string) {
+    const rendered = quest.button.render(this.player, () => this.show())
+    if (!rendered) return
+
+    this.button(textOverride ?? rendered[0], rendered[1], rendered[2])
   }
 
   show = async () => {
@@ -97,10 +107,10 @@ type F = Omit<Form, 'show' | 'currentTitle'>
 type CreateForm = (form: F, player: Player, back?: NewFormCallback) => void
 
 export function form(create: CreateForm) {
-  return new Show(create)
+  return new ShowForm(create)
 }
 
-export class Show {
+export class ShowForm {
   constructor(private create: CreateForm) {}
 
   show: NewFormCallback = (player, back) => {

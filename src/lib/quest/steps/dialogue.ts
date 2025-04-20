@@ -21,18 +21,14 @@ export function QSDialogue(this: PlayerQuest, npc: Npc, text = `Поговори
             form.show(this.player)
           }
 
-          const inter: Npc.OnInteract = event => {
+          const interaction: Npc.OnInteract = event => {
             if (event.player.id !== this.player.id) return false
             show()
             return true
           }
 
-          npc.questInteractions.add(inter)
-          return {
-            cleanup() {
-              npc.questInteractions.delete(inter)
-            },
-          }
+          npc.questInteractions.add(interaction)
+          return { cleanup: () => npc.questInteractions.delete(interaction) }
         })
       },
     }),

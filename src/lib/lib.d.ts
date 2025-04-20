@@ -84,7 +84,7 @@ declare module '@minecraft/server' {
     name?: string | undefined
     readonly role: Role
     prevRole?: Role
-    quests?: import('./quest/quest').QuestDB
+    quests?: import('./quest/quest').Quest.DB
     join?: {
       position?: number[]
       stage?: number

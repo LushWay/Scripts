@@ -17,8 +17,6 @@ export function QSPlace(this: PlayerQuest, from: Vector3, to: Vector3, text: Tex
     const edge = Vector.multiply(size, 0.5)
     ctx.place = Vector.add(Vector.add(min, edge), { x: 1, y: 1, z: 1 })
 
-    return {
-      cleanup: () => actions.forEach(a => a.unsubscribe()),
-    }
+    return { cleanup: () => actions.forEach(a => a.unsubscribe()) }
   })
 }

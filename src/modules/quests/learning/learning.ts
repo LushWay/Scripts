@@ -10,10 +10,12 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { form } from 'lib/form/new'
+import { Npc } from 'lib/rpg/npc'
+import { Rewards } from 'lib/shop/rewards'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
-import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { MineareaRegion } from 'modules/places/minearea/minearea-region'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
@@ -142,18 +144,11 @@ class Learning {
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
       .place(crafting)
 
-    q.counter((i, end) => `§6Спуститесь в шахту и добудьте камня: §f${i}/${end}`, 10)
+    q.break((i, end) => `§6Спуститесь в шахту и добудьте камня: §f${i}/${end}`, 10)
       .description('Отправляйтесь в шахту, найдите и накопайте камня.')
+      .filter(broken => broken.type.id === b.Stone)
       .activate(ctx => {
         ctx.subscribe(OrePlace, () => true)
-
-        ctx.world.afterEvents.playerBreakBlock.subscribe(event => {
-          if (event.player.id !== player.id) return
-          if (event.brokenBlockPermutation.type.id !== b.Stone) return
-
-          player.playSound(Sounds.Success)
-          ctx.diff(1)
-        })
       })
 
     q.item('§6Сделайте каменную кирку')
@@ -206,13 +201,13 @@ class Learning {
         )
       })
 
-    q.dialogue(this.miner.npc, 'Узнайте, куда вам идти дальше у Шахтера')
+    q.dialogue(this.miner, 'Узнайте, куда вам идти дальше у Шахтера')
       .body('Приветствую!')
       .buttons(
         [
           'Где мне переплавить железо?',
           (ctx, back) => {
-            new ActionForm(this.miner.npc.name, `В месте, которое называется ${StoneQuarry.name}`)
+            new ActionForm(this.miner.name, `В месте, которое называется ${StoneQuarry.name}`)
               .addButtonBack(back)
               .addButton('Я хочу туда!', () => {
                 ctx.next()
@@ -221,9 +216,9 @@ class Learning {
               .show(player)
           },
         ],
-        ['Где я?', (ctx, back) => new ActionForm(this.miner.npc.name, 'Хз').addButtonBack(back).show(player)],
-        ['Кто я?', (ctx, back) => new ActionForm(this.miner.npc.name, 'Хз').addButtonBack(back).show(player)],
-        ['Кто ты?', (ctx, back) => new ActionForm(this.miner.npc.name, 'Хз').addButtonBack(back).show(player)],
+        ['Где я?', (ctx, back) => new ActionForm(this.miner.name, 'Хз').addButtonBack(back).show(player)],
+        ['Кто я?', (ctx, back) => new ActionForm(this.miner.name, 'Хз').addButtonBack(back).show(player)],
+        ['Кто ты?', (ctx, back) => new ActionForm(this.miner.name, 'Хз').addButtonBack(back).show(player)],
       )
   })
 
@@ -237,7 +232,22 @@ class Learning {
 
   minearea: MineareaRegion | undefined
 
-  miner = new Jeweler(this.quest.group, this.quest.group.point('miner').name('Шахтер'))
+  miner = new Npc(this.quest.group.point('miner').name('Шахтер'), ({ player }) => {
+    form(f => {
+      f.title(this.miner.name)
+      f.qbutton(stoneQuarryInvestigating.quest, 'Где мне переплавить железо?')
+      f.qbutton(this.questMiner2, 'Добыть еще больше железа')
+    }).show(player)
+    return true
+  })
+
+  questMiner2 = new Quest('mine-10-iron', 'Добыть железо', 'Да', q => {
+    q.break((c, end) => `${c}/${end}`, 10).filter(
+      ({ type: { id } }) => id === b.IronOre || id === MinecraftItemTypes.DeepslateIronOre,
+    )
+
+    q.button().reward(new Rewards().money(10))
+  })
 
   blockedOre = new WeakPlayerMap<string[]>()
 

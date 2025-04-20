@@ -46,6 +46,42 @@ export function getScheduledToPlace(
   return dimblocks.find(e => Vector.equals(e.location, location))
 }
 
+export async function getScheduledToPlaceAsync(
+  locations: Vector3[],
+  dimension: DimensionType,
+): Promise<false | undefined | Immutable<ScheduledBlockPlace>[]> {
+  const dimblocks = IMMUTABLE_DB[dimension]
+  if (typeof dimblocks === 'undefined') return false
+
+  return new Promise((resolve, reject) => {
+    const results: Immutable<ScheduledBlockPlace>[] = []
+    system.runJob(
+      (function* getSchedToPlaceJob() {
+        try {
+          for (const e of dimblocks) {
+            if (locations.length === 0) break
+
+            yield
+            let i = 0
+            for (const vector of locations) {
+              i++
+              if (i % 10 === 0) yield
+              if (Vector.equals(e.location, vector)) {
+                results.push(e)
+                locations = locations.filter(e => e !== vector)
+              }
+            }
+          }
+
+          resolve(results)
+        } catch (e: unknown) {
+          reject(e as Error)
+        }
+      })(),
+    )
+  })
+}
+
 /** Checks whenether provided location in dimension has scheduled blocks */
 export function isScheduledToPlace(location: Vector3, dimension: DimensionType) {
   return !!getScheduledToPlace(location, dimension)
@@ -59,7 +95,10 @@ export const onScheduledBlockPlace = new EventSignal<{
   schedules: Immutable<ScheduledBlockPlace>[]
 }>()
 
-const UNSCHEDULED = -1
+export enum ScheduleDateAction {
+  Remove = -1,
+  PlaceImmediately = 0,
+}
 
 /**
  * Cancels scheduled block place by setting its date to -1
@@ -67,7 +106,7 @@ const UNSCHEDULED = -1
  * @param schedule - Schedule to be canceled
  */
 export function unscheduleBlockPlace(schedule: ScheduledBlockPlace) {
-  schedule.date = UNSCHEDULED
+  schedule.date = ScheduleDateAction.Remove
 }
 
 const logger = createLogger('SheduledPlace')
@@ -94,13 +133,13 @@ function* scheduledBlockPlaceJob() {
     mainLoop: for (let i = schedules.length - 1; i >= 0; i--) {
       try {
         const schedule = schedules[i]
-        if (typeof schedule === 'undefined' || schedule.date === UNSCHEDULED) {
+        if (typeof schedule === 'undefined' || schedule.date === ScheduleDateAction.Remove) {
           removeScheduleAt(dimension, i)
           continue
         }
 
         let date = schedule.date
-        if (date !== 0) {
+        if (date !== ScheduleDateAction.PlaceImmediately) {
           if (schedules.length > 500) {
             date -= ~~(schedules.length / 500)
           }
@@ -175,7 +214,7 @@ const scheduledDimensionForm = (dim: string, blocks: ScheduledBlockPlace[]) =>
     form.title(`§7${dim}: §f${size}`)
     form.button(t`Place all blocks NOW`, () => {
       player.success(`Enjoy the CHAOS. Force-placed ${size} blocks.`)
-      system.runJobForEach(blocks, e => (e.date = 0))
+      system.runJobForEach(blocks, e => (e.date = ScheduleDateAction.PlaceImmediately))
     })
     const first = blocks[0]
     if (typeof first === 'undefined') return

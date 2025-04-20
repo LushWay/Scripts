@@ -1,21 +1,23 @@
 import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { langToken } from 'lib/utils/lang'
 import { emoji } from 'lib/assets/emoji'
 import { noBoolean } from 'lib/util'
+import { langToken } from 'lib/utils/lang'
 
-export type Reward =
-  | {
-      type: 'scores'
-      count: number
-      score: import('@minecraft/server').ScoreName
-    }
-  | {
-      type: 'item'
-      count: number
-      id: string
-      name: string
-    }
+declare namespace Rewards {
+  type DatabaseEntry =
+    | {
+        type: 'scores'
+        count: number
+        score: import('@minecraft/server').ScoreName
+      }
+    | {
+        type: 'item'
+        count: number
+        id: string
+        name: string
+      }
+}
 
 export class Rewards {
   /**
@@ -24,16 +26,20 @@ export class Rewards {
    * @param entries The array of reward entries
    * @returns {Rewards}
    */
-  static restore(entries: Reward[]): Rewards {
+  static restore(entries: Rewards.DatabaseEntry[]): Rewards {
     const rewards = new Rewards()
     rewards.entries = entries
 
     return rewards
   }
 
-  private entries: Reward[] = []
+  private entries: Rewards.DatabaseEntry[] = []
 
-  scores(type: ScoreName, count: number) {
+  money(count: number) {
+    return this.score('money', count)
+  }
+
+  score(type: ScoreName, count: number) {
     this.entries.push({ type: 'scores', count, score: type })
     return this
   }
@@ -53,9 +59,9 @@ export class Rewards {
   /**
    * Removes a reward
    *
-   * @param {Reward} reward The reward to remove
+   * @param {Rewards.DatabaseEntry} reward The reward to remove
    */
-  remove(reward: Reward) {
+  remove(reward: Rewards.DatabaseEntry) {
     this.entries = this.entries.filter(entry => entry != reward)
   }
 
@@ -65,7 +71,7 @@ export class Rewards {
    * @param player - The player to give out the rewards to
    * @param reward - The Reward to give
    */
-  private static giveOne(player: Player, reward: Reward) {
+  private static giveOne(player: Player, reward: Rewards.DatabaseEntry) {
     if (reward.type === 'item' && reward.id) {
       if (!player.container) return
       player.container.addItem(new ItemStack(reward.id, reward.count))
@@ -88,9 +94,9 @@ export class Rewards {
   /**
    * Serializes the object into an array
    *
-   * @returns {Reward[]} The array of rewards
+   * @returns {Rewards.DatabaseEntry[]} The array of rewards
    */
-  serialize(): Reward[] {
+  serialize(): Rewards.DatabaseEntry[] {
     return this.entries
   }
 
@@ -99,7 +105,7 @@ export class Rewards {
    *
    * @param reward The reward to stringify
    */
-  static rewardToString(this: void, reward: Reward): RawMessage {
+  static rewardToString(this: void, reward: Rewards.DatabaseEntry): RawMessage {
     let text: string | RawMessage
     if (reward.type === 'scores') {
       if (reward.score === 'leafs') text = `${reward.count}${emoji.leaf}`

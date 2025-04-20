@@ -27,7 +27,7 @@ function addScoresMenu(player: Player, state: SendState) {
     .addTextField('Количество', '1000', '0')
     .show(player, (_ctx, score, amountStr) => {
       const amount = parseInt(amountStr)
-      if (!isNaN(amount) && amount != 0) state.rewards.scores(score, amount)
+      if (!isNaN(amount) && amount != 0) state.rewards.score(score, amount)
       sendMenu(player, state.back, state)
     })
 }

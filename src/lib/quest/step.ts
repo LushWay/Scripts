@@ -3,6 +3,7 @@ import { developersAreWarned } from 'lib/assets/text'
 import { EventSignal } from 'lib/event-signal'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
+import { doNothing } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { PlayerQuest } from './player'
 import { Quest } from './quest'
@@ -68,7 +69,7 @@ export abstract class QS<DB = any> extends Temporary {
     public playerQuest: PlayerQuest,
     public readonly next: VoidFunction,
   ) {
-    super(() => void 0)
+    super(doNothing)
   }
 
   text: QS.TextFn = () => ''
@@ -128,16 +129,12 @@ export abstract class QS<DB = any> extends Temporary {
 
   /** Returns database assotiated with this quest step. Do note that after step switching it will be cleared. */
   get db() {
-    return this.getDatabase()?.db as DB | undefined
+    return Quest.getDatabase(this.player, this.quest)?.db as DB | undefined
   }
 
   set db(value) {
-    const active = this.getDatabase()
+    const active = Quest.getDatabase(this.player, this.quest)
     if (active) active.db = value
-  }
-
-  private getDatabase() {
-    return this.player.database.quests?.active.find(e => e.id === this.quest.id)
   }
 
   /**
@@ -161,14 +158,11 @@ export abstract class QS<DB = any> extends Temporary {
 
     if (!this.compassIntervalSetup) {
       this.compassIntervalSetup = true
-
       this.onInterval(() => {
         if (this.isActive && this.place && Vector.valid(this.place)) Compass.setFor(this.player, this.place)
       })
 
-      this.cleaners.push(() => {
-        Compass.setFor(this.player, undefined)
-      })
+      this.cleaners.push(() => Compass.setFor(this.player, undefined))
     }
   }
 

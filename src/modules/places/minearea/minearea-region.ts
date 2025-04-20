@@ -11,7 +11,7 @@ import { registerSaveableRegion } from 'lib/region/database'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import {
-  getScheduledToPlace,
+  getScheduledToPlaceAsync,
   onScheduledBlockPlace,
   scheduleBlockPlace,
   ScheduledBlockPlace,
@@ -99,12 +99,15 @@ export class MineareaRegion extends RegionWithStructure {
   protected async onRestore() {
     if (!this.structure.exists) await this.onCreate('Restored')
 
-    await this.area.forEachVector((vector, isIn, dimension) => {
+    const vectors: Vector3[] = []
+    await this.area.forEachVector((vector, isIn) => {
       if (!isIn) return
 
-      const scheduled = getScheduledToPlace(vector, dimension.type)
-      if (scheduled) this.scheduledToPlaceBlocks.push(scheduled)
+      vectors.push(vector)
     })
+
+    const scheduled = await getScheduledToPlaceAsync(vectors, this.dimension.type)
+    if (scheduled) this.scheduledToPlaceBlocks = scheduled
   }
 
   building = false
