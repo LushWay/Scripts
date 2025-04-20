@@ -7,7 +7,7 @@ import { MineshaftRegion } from './mineshaft-region'
 import { Ore, OreCollector, OreEntry } from './ore-collector'
 
 export const ores = new OreCollector(
-  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).chance(3),
+  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).chance(5),
   new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).below(-30).groupChance(90).chance(1),
   new Ore()
     .type(b.RedstoneOre)
