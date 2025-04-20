@@ -219,28 +219,36 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
 
   lush(ctx) {
     let size = parseInt(ctx.args[1])
-    size = isNaN(size) ? 5 : size
+    size = isNaN(size) ? 10 : size
     ctx.player.info(t`Trying to replace air under the cave vines with structure void in radius ${size}`)
-    for (const vector of Vector.foreach(...Vector.around(ctx.player.location, 5))) {
-      const block = ctx.player.dimension.getBlock(vector)
-      if (block && block.typeId !== MinecraftBlockTypes.Air) continue
 
-      const above = ctx.player.dimension.getBlock(Vector.add(vector, Vector.up))
+    const vines = [
+      MinecraftBlockTypes.Vine,
+      MinecraftBlockTypes.CaveVines,
+      MinecraftBlockTypes.CaveVinesBodyWithBerries,
+      MinecraftBlockTypes.CaveVinesHeadWithBerries,
+    ] as string[]
 
-      if (!above) return
-      if (
-        (
-          [
-            MinecraftBlockTypes.CaveVines,
-            MinecraftBlockTypes.CaveVinesBodyWithBerries,
-            MinecraftBlockTypes.CaveVinesHeadWithBerries,
-          ] as string[]
-        ).includes(above.typeId)
-      ) {
-        ctx.player.dimension.setBlockType(vector, MinecraftBlockTypes.StructureVoid)
-        ctx.player.success(t`lush > ${Vector.floor(vector)}!`)
-      }
-    }
+    system.runJob(
+      (function* lush() {
+        let i = 0
+        for (const vector of Vector.foreach(...Vector.around(ctx.player.location, 5))) {
+          i++
+          if (i % 100 === 0) yield
+
+          const block = ctx.player.dimension.getBlock(vector)
+          if (block && block.typeId !== MinecraftBlockTypes.Air) continue
+
+          const above = ctx.player.dimension.getBlock(Vector.add(vector, Vector.up))
+          if (!above) continue
+
+          if (vines.includes(above.typeId)) {
+            ctx.player.dimension.setBlockType(vector, MinecraftBlockTypes.StructureVoid)
+            ctx.player.success(t`lush > ${Vector.floor(vector)}!`)
+          }
+        }
+      })(),
+    )
   },
 
   dbinspect(ctx) {
