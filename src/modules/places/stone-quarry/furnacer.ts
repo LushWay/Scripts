@@ -1,4 +1,4 @@
-import { ContainerSlot, TicksPerSecond, system, world } from '@minecraft/server'
+import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vector, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
@@ -60,13 +60,7 @@ export class Furnacer extends ShopNpc {
     }
 
     this.shop.menu((form, player) => {
-      const { item } = FurnaceKeyItem.schema.create({
-        status: 'notUsed',
-        furnacer: this.id,
-        code: (Date.now() - 1_700_000_000_000).toString(32).toUpperCase(),
-        player: player.name,
-        location: '',
-      })
+      const item = this.createItemKey(player)
 
       form.itemStack(item, new MoneyCost(50), getAuxOrTexture(MinecraftItemTypes.TripwireHook, true))
       form.itemModifier(
@@ -90,6 +84,16 @@ export class Furnacer extends ShopNpc {
         },
       )
     })
+  }
+
+  createItemKey(player?: Player) {
+    return FurnaceKeyItem.schema.create({
+      status: 'notUsed',
+      furnacer: this.id,
+      code: (Date.now() - 1700000000000).toString(32).toUpperCase(),
+      player: player?.name ?? '',
+      location: '',
+    }).item
   }
 }
 

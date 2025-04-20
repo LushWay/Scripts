@@ -7,7 +7,7 @@ import { inspect, isKeyof } from 'lib/util'
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
 
-interface Options {
+interface ItemStackMetaOptions {
   lore?: string[]
   nameTag?: string
   keepOnDeath?: boolean
@@ -17,7 +17,7 @@ interface Options {
 }
 
 interface StoredItem {
-  itemStack: ItemStack
+  itemStack: ItemStack | (() => ItemStack)
   enchantments: Partial<Record<MinecraftEnchantmentTypes, number[]>>
   chance: number
   amount: number[]
@@ -84,13 +84,13 @@ export class Loot {
     return this
   }
 
-  itemStack(item: ItemStack) {
+  itemStack(item: ItemStack | (() => ItemStack)) {
     this.create(item)
 
     return this
   }
 
-  private create(itemStack: ItemStack) {
+  private create(itemStack: ItemStack | (() => ItemStack)) {
     if (this.current) this.items.push(this.current)
     this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {} }
   }
@@ -109,15 +109,17 @@ export class Loot {
     return this
   }
 
-  meta(meta: Options) {
+  meta(meta: ItemStackMetaOptions) {
     const { itemStack } = this.modifyCreatingItem()
-    const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } = meta
-    if (canDestroy) itemStack.setCanDestroy(canDestroy)
-    if (canPlaceOn) itemStack.setCanPlaceOn(canPlaceOn)
-    if (lockMode) itemStack.lockMode = lockMode
-    if (keepOnDeath) itemStack.keepOnDeath = true
-    if (lore) itemStack.setLore(lore)
-    if (nameTag) itemStack.nameTag = nameTag
+    if (typeof itemStack === 'function') {
+      this.modifyCreatingItem().itemStack = () => {
+        const item = itemStack()
+        applyOptions(item, meta)
+        return item
+      }
+    } else {
+      applyOptions(itemStack, meta)
+    }
 
     return this
   }
@@ -259,9 +261,12 @@ export class LootTable {
       // Randomise item properties
       const amount = item.amount.randomElement()
       if (amount <= 0) return []
-      if (amount > item.itemStack.maxAmount) {
-        const average = Math.floor(amount / item.itemStack.maxAmount)
-        const last = amount % item.itemStack.maxAmount
+
+      const stack = typeof item.itemStack === 'function' ? item.itemStack() : item.itemStack
+      const { maxAmount } = stack
+      if (amount > maxAmount) {
+        const average = Math.floor(amount / maxAmount)
+        const last = amount % maxAmount
         return new Array(average)
           .fill(null)
           .map((e, i, a) =>
@@ -273,7 +278,6 @@ export class LootTable {
           .flat()
       }
 
-      const stack = item.itemStack.clone()
       stack.amount = amount
 
       const { enchantable } = stack
@@ -330,4 +334,14 @@ export function selectByChance<T>(items: { chance: number; item: T }[]) {
   }
 
   return { index: 0, item: items[0].item }
+}
+
+function applyOptions(itemStack: ItemStack, meta: ItemStackMetaOptions) {
+  const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } = meta
+  if (canDestroy) itemStack.setCanDestroy(canDestroy)
+  if (canPlaceOn) itemStack.setCanPlaceOn(canPlaceOn)
+  if (lockMode) itemStack.lockMode = lockMode
+  if (keepOnDeath) itemStack.keepOnDeath = true
+  if (lore) itemStack.setLore(lore)
+  if (nameTag) itemStack.nameTag = nameTag
 }

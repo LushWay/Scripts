@@ -53,7 +53,10 @@ class StoneQuarryBuilder extends City {
   gunsmith = new Gunsmith(this.group)
 
   private create() {
-    this.createKits(new Loot().item('RedTerracotta').build, new Loot().item('RedTerracotta').build)
+    this.createKits(
+      new Loot().item('RedTerracotta').itemStack(() => this.commonOvener.createItemKey()).build,
+      new Loot().item('RedTerracotta').build,
+    )
   }
 }
 
