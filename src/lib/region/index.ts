@@ -8,7 +8,7 @@ import {
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
-import { AbstractPoint, isBuilding } from 'lib/game-utils'
+import { AbstractPoint, isNotPlaying } from 'lib/game-utils'
 import { onPlayerMove } from 'lib/player-move'
 import { EventSignal } from '../event-signal'
 import {
@@ -68,7 +68,7 @@ export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []
 actionGuard((player, region, ctx) => {
   if (region && regionTypesThatIgnoreIsBuildingGuard.some(e => region instanceof e)) return
 
-  if (isBuilding(player)) return true
+  if (isNotPlaying(player)) return true
 
   if (region?.getMemberRole(player.id)) return true
 }, ActionGuardOrder.RegionMember)
@@ -177,7 +177,7 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
   RegionEvents.playerInRegionsCache.set(player, newest)
   const currentRegion = newest[0]
 
-  if (typeof currentRegion !== 'undefined' && !isBuilding(player)) {
+  if (typeof currentRegion !== 'undefined' && !isNotPlaying(player)) {
     if (currentRegion.permissions.pvp === false) {
       player.triggerEvent(
         player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],

@@ -1,6 +1,6 @@
 import { Player, system } from '@minecraft/server'
 import { InventoryStore } from 'lib/database/inventory'
-import { CURRENT_BUILDERS, isBuilding } from 'lib/game-utils'
+import { CURRENT_BUILDERS, isNotPlaying } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
 
 const builderInventory = new InventoryStore('build2')
@@ -16,14 +16,14 @@ system.runPlayerInterval(updateBuilderStatus, 'builder list update', 10)
 // PlayerNameTagModifiers.push(p => isBuilding(p) && `\n${getFullname(p.id, { name: false })}`)
 
 export function updateBuilderStatus(player: Player) {
-  const isBuilder = isBuilding(player, true)
+  const building = isNotPlaying(player, true)
   const onList = CURRENT_BUILDERS.has(player.id)
 
-  if (isBuilder && !onList) {
+  if (building && !onList) {
     switchInv()
     setBuildingTip(player, true)
     CURRENT_BUILDERS.add(player.id)
-  } else if (!isBuilder && onList) {
+  } else if (!building && onList) {
     switchInv()
     setBuildingTip(player, false)
     CURRENT_BUILDERS.delete(player.id)

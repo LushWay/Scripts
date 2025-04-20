@@ -3,6 +3,7 @@ import {
   BlockPermutation,
   EasingType,
   Entity,
+  GameMode,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
@@ -79,6 +80,7 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
 }
 
 export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
+const buildingGameModes = [GameMode.creative, GameMode.spectator]
 
 /**
  * Check if player is currently building. Building player is player who is in the creative and whose role isn't member
@@ -87,19 +89,9 @@ export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
  * @param uptodate - If true, it will force get players status, if false, which is default, will get from cache
  * @returns - Whenether player is building or not
  */
-export function isBuilding(player: Player, uptodate = false) {
-  if (uptodate) return player.isGamemode('creative') && getRole(player) !== 'member'
+export function isNotPlaying(player: Player, uptodate = false) {
+  if (uptodate) return buildingGameModes.includes(player.getGameMode()) && getRole(player) !== 'member'
   return CURRENT_BUILDERS.has(player.id)
-}
-
-/**
- * Checks if player {@link isBuilding} or in spectator mode
- *
- * @param player - Player to check
- * @returns - Whenether player is playing or not
- */
-export function isNotPlaying(player: Player) {
-  return isBuilding(player, true) || player.isGamemode('spectator')
 }
 
 /** Adds minecraft: namespace to the text if not added already */

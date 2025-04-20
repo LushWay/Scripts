@@ -1,10 +1,10 @@
 import { Entity, Player, system } from '@minecraft/server'
-import { isBuilding } from 'lib'
+import { isNotPlaying } from 'lib'
 import { getFullname } from 'lib/get-fullname'
 
 export const PlayerNameTagModifiers: ((player: Player) => string | false)[] = [
   player => {
-    const role = getFullname(player, { clan: false, role: isBuilding(player), name: false })
+    const role = getFullname(player, { clan: false, role: isNotPlaying(player), name: false })
     const clanAndName = getFullname(player, { role: false, newbie: false, equippment: true })
     return role ? `${clanAndName}\n${role}` : clanAndName
   },

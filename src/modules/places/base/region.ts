@@ -1,4 +1,4 @@
-import { actionGuard, ActionGuardOrder, isBuilding, Vector } from 'lib'
+import { actionGuard, ActionGuardOrder, isNotPlaying, Vector } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { registerCreateableRegion } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
@@ -44,7 +44,7 @@ export class BaseRegion extends RegionWithStructure {
 }
 
 actionGuard((player, base, ctx) => {
-  if (!(base instanceof BaseRegion) || isBuilding(player) || !base.isMember(player.id)) return
+  if (!(base instanceof BaseRegion) || isNotPlaying(player) || !base.isMember(player.id)) return
 
   if (base.ldb.isRotting) {
     if (

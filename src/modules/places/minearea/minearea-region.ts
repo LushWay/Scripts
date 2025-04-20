@@ -1,6 +1,6 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { Vector } from 'lib'
-import { isBuilding } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/game-utils'
 import {
   actionGuard,
   ActionGuardOrder,
@@ -157,7 +157,7 @@ regionTypesThatIgnoreIsBuildingGuard.push(MineareaRegion)
 actionGuard((player, region, ctx) => {
   if (!(region instanceof MineareaRegion)) return
 
-  const building = isBuilding(player)
+  const building = isNotPlaying(player)
 
   if (region.building && !building) return player.fail('Регион сохраняется')
   if (region.creating && !building)

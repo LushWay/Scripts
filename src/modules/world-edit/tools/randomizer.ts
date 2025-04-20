@@ -2,7 +2,7 @@ import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm } from 'lib'
-import { isBuilding } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/game-utils'
 import { t } from 'lib/text'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { BlocksSetRef, blocksSetDropdown, getBlocksInSet, stringifyBlocksSetRef } from '../utils/blocks-set'
@@ -25,7 +25,7 @@ class RandomizerTool extends WorldEditTool<{ blocksSet: BlocksSetRef; version: n
     /* Replaces the block with a random block from the storage of the item. */
     world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
       const slot = player.mainhand()
-      if (!this.isOurItemType(slot) || !isBuilding(player)) return
+      if (!this.isOurItemType(slot) || !isNotPlaying(player)) return
 
       const storage = weRandomizerTool.getStorage(slot)
       const blocksSet = getBlocksInSet(storage.blocksSet)
