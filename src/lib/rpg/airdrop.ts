@@ -1,6 +1,7 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { onPlayerMove } from 'lib/player-move'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
 import { createLogger } from 'lib/utils/logger'
@@ -37,6 +38,8 @@ export class Airdrop {
   static instances: Airdrop[] = []
 
   static minimaped: Airdrop | undefined
+
+  static minimapedTemp: Temporary | undefined
 
   chest: Entity | undefined
 
@@ -106,6 +109,14 @@ export class Airdrop {
     for (const player of players) {
       setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
     }
+
+    Airdrop.minimapedTemp = new Temporary(() => {
+      const event = onPlayerMove.subscribe(({ player }) => {
+        setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
+      })
+
+      return { cleanup: () => onPlayerMove.unsubscribe(event) }
+    })
 
     return this
   }
