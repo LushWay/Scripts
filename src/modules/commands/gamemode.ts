@@ -48,9 +48,7 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
       if (ctx.player.getEffect(effect)) {
         ctx.player.removeEffect(effect)
       } else {
-        ctx.player.addEffect(effect, 99999, {
-          amplifier,
-        })
+        ctx.player.addEffect(effect, 99999, { amplifier, showParticles: false })
       }
     })
 }
