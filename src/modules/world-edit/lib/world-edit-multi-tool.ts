@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { ArrayForm, BUTTON, doNothing, ModalForm, prompt } from 'lib'
+import { ArrayForm, ask, BUTTON, doNothing, ModalForm } from 'lib'
 import { t } from 'lib/text'
 import { WorldEditTool } from './world-edit-tool'
 
@@ -74,7 +74,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
         const tool = this.getToolByData(item)
         const onClick = () => {
           if (filters.mode === 'delete') {
-            prompt(player, t.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
+            ask(player, t.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
               const newTools = tools.filter(e => e !== item)
               this.saveToolsData(slot, newTools)
               this.updateItemSlot(slot, newTools)

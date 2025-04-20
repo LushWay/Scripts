@@ -5,7 +5,7 @@ import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, inspect, is, noNul
 import { Sounds } from 'lib/assets/custom-sounds'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
-import { prompt } from 'lib/form/message'
+import { ask } from 'lib/form/message'
 import { t } from 'lib/text'
 import { typeIdToReadable } from 'lib/utils/lang'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
@@ -363,7 +363,7 @@ function WEeditBlocksSetMenu(o: {
         callback() {
           const blocksToClear = set.filter(e => e[2] < 1)
 
-          prompt(
+          ask(
             player,
 
             'Выключенные блоки будут очищены. Список:\n' + blocksToClear.map(e => typeIdToReadable(e[0])).join('\n'),
@@ -387,7 +387,7 @@ function WEeditBlocksSetMenu(o: {
         nameTag: '§4Удалить',
         description: '\n§4безвозвратно удаляет набор',
         callback() {
-          prompt(
+          ask(
             player,
             '§cУдалить набор? Это действие нельзя отменить',
             '§cУдалить',
@@ -560,7 +560,7 @@ export function WEeditBlockStatesMenu(
 
     if (edited) form.addButton(ActionForm.backText + ' без сохранения', back)
 
-    form.addButtonPrompt('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
+    form.addButtonAsk('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
 
     // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {

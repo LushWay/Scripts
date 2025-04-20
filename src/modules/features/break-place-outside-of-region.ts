@@ -1,6 +1,7 @@
-import { Player } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, ms } from 'lib'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { isScheduledToPlace, scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { BaseRegion } from 'modules/places/base/region'
@@ -11,8 +12,14 @@ const INTERACTABLEITEMS = Object.values(MinecraftItemTypes)
   .concat(MinecraftItemTypes.FlintAndSteel) as (undefined | string)[]
 
 const youCannot = (player: Player) => {
-  if (textCooldown.isExpired(player))
-    player.fail(`Вы не можете ломать непоставленные блоки вне баз, шахт или других зон добычи`)
+  if (textCooldown.isExpired(player)) {
+    system.delay(() =>
+      player.onScreenDisplay.setActionBar(
+        `§cВы не можете ломать непоставленные блоки\nвне баз, шахт или других зон добычи`,
+        ActionbarPriority.UrgentNotificiation,
+      ),
+    )
+  }
   return false
 }
 const textCooldown = new Cooldown(ms.from('sec', 2), false)

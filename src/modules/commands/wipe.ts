@@ -1,5 +1,5 @@
 import { GameMode, system } from '@minecraft/server'
-import { Airdrop, Compass, Join, prompt } from 'lib'
+import { Airdrop, Compass, Join, ask } from 'lib'
 import { Quest } from 'lib/quest'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Spawn } from 'modules/places/spawn'
@@ -10,7 +10,7 @@ new Command('wipe')
   .setDescription('Очищает все данные (для тестов)')
   .setPermissions('tester')
   .executes(ctx => {
-    prompt(
+    ask(
       ctx.player,
       'Вы уверены, что хотите очистить инвентарь анархии и ваше место? Полезно для тестирования обучения.',
       '§cДа',

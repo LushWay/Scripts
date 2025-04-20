@@ -40,60 +40,68 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   async restoreAndResaveStructure(eachVectorCallback?: (vector: Vector3) => void) {
-    const restoredRegions: MineareaRegion[] = await this.restoreStructure(eachVectorCallback)
+    try {
+      this.creating = true
+      const restoredRegions: MineareaRegion[] = await this.restoreStructure(eachVectorCallback)
 
-    this.structure.delete()
-    await this.structure.save()
+      this.structure.delete()
+      await this.structure.save()
 
-    return restoredRegions.length
+      return restoredRegions.length
+    } finally {
+      this.creating = false
+    }
   }
 
-  restoringStructureProgress = 0
+  creating = false
 
-  restoringStructurePromise: Promise<MineareaRegion[]> | undefined
+  private restoringStructureProgress = 0
+
+  get restoringStructurePercent() {
+    return (this.restoringStructureProgress / Vector.size({ x: 0, y: 0, z: 0 }, this.area.size)) * 100
+  }
+
+  private restoringStructurePromise: Promise<MineareaRegion[]> | undefined
 
   async restoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
     if (this.restoringStructurePromise) return this.restoringStructurePromise
-    else {
-      this.restoringStructurePromise = this.restoreStructureImpl(eachVectorCallback)
-      const result = await this.restoringStructurePromise
-      delete this.restoringStructurePromise
-      return result
-    }
-  }
 
-  async restoreStructureImpl(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
-    const restoredRegions: MineareaRegion[] = []
-    try {
-      await this.area.forEachVector(async (vector, isIn) => {
-        if (!isIn) return
+    this.restoringStructurePromise = new Promise((resolve, reject) => {
+      const restoredRegions: MineareaRegion[] = []
+      this.area
+        .forEachVector(async (vector, isIn) => {
+          if (!isIn) return
 
-        const regions = Region.getManyAt({ vector, dimensionType: this.dimensionType })
-        for (const region of regions) {
-          // Prevent from region save conflicts
-          if (region instanceof MineareaRegion && !restoredRegions.includes(region) && region !== this) {
-            restoredRegions.push(region)
-            await region.structure.place()
+          const regions = Region.getManyAt({ vector, dimensionType: this.dimensionType })
+          for (const region of regions) {
+            // Prevent from region save conflicts
+            if (region instanceof MineareaRegion && !restoredRegions.includes(region) && region !== this) {
+              restoredRegions.push(region)
+              await region.structure.place()
+            }
           }
-        }
 
-        this.restoringStructureProgress++
-        eachVectorCallback?.(vector)
-      })
-
-      this.scheduledToPlaceBlocks.forEach(e => unscheduleBlockPlace(e))
-      this.scheduledToPlaceBlocks = []
-      return restoredRegions
-    } finally {
-      this.restoringStructureProgress = 0
-    }
+          this.restoringStructureProgress++
+          eachVectorCallback?.(vector)
+        })
+        .then(() => {
+          this.scheduledToPlaceBlocks.forEach(e => unscheduleBlockPlace(e))
+          this.scheduledToPlaceBlocks = []
+          resolve(restoredRegions)
+        })
+        .finally(() => (this.restoringStructureProgress = 0))
+        .catch((e: unknown) => reject(e as Error))
+    })
+    const result = await this.restoringStructurePromise
+    delete this.restoringStructurePromise
+    return result
   }
 
   protected async onCreate(action = 'Created new') {
-    logger.info`${action} MineArea region...`
+    logger.info`${action} ${this.creator.name} region...`
     const crossRegions = await this.restoreAndResaveStructure()
 
-    logger.info`${action} MineArea region ${this.id} and saved structure. Crossregions restored: ${crossRegions}`
+    logger.info`${action} ${this.creator.name} region ${this.id} and saved structure. Crossregions restored: ${crossRegions}`
   }
 
   protected async onRestore() {
@@ -152,6 +160,8 @@ actionGuard((player, region, ctx) => {
   const building = isBuilding(player)
 
   if (region.building && !building) return player.fail('Регион сохраняется')
+  if (region.creating && !building)
+    return player.fail(t.error`Регион создается. ${~~region.restoringStructurePercent}%%`)
 
   switch (ctx.type) {
     case 'interactWithBlock':
@@ -207,10 +217,12 @@ onFullRegionTypeRestore(MineareaRegion, region => {
 })
 
 function notifyBuilder(player: Player, region: MineareaRegion) {
-  if (region.scheduledToPlaceBlocks.length) {
+  if (region.scheduledToPlaceBlocks.length || region.creating) {
     system.delay(() => {
       player.fail(
-        t.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${(region.restoringStructureProgress / Vector.size({ x: 0, y: 0, z: 0 }, region.area.size)) * 100}%%`,
+        t.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${
+          region.creating ? 'Сохранение структуры...' : `${~~region.restoringStructurePercent}%%`
+        }`,
       )
       region.restoreStructure(() => void 0)
     })
@@ -218,10 +230,10 @@ function notifyBuilder(player: Player, region: MineareaRegion) {
     return false
   } else {
     region.building = true
-    system.delay(() => {
+    system.delay(async () => {
       try {
         region.structure.delete()
-        region.structure.save()
+        await region.structure.save()
       } finally {
         region.building = false
       }

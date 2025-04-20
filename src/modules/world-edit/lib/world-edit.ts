@@ -1,5 +1,5 @@
 import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
-import { Vector, getRole, isLocationError, prompt } from 'lib'
+import { Vector, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { t } from 'lib/text'
@@ -316,7 +316,7 @@ export class WorldEdit {
       }
     } else {
       if (this.selection.size > 10000) {
-        const result = await prompt(
+        const result = await ask(
           player,
           `§6Внимание! §cВы уверены что хотите использовать выделенную область размером §f${this.selection.size}§c?`,
           'Да',

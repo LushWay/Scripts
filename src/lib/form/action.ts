@@ -1,6 +1,6 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { prompt } from 'lib/form/message'
+import { ask } from 'lib/form/message'
 import { util } from 'lib/util'
 import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'
@@ -89,21 +89,22 @@ export class ActionForm {
   }
 
   /**
-   * Adds prompt button to the form. Alias to {@link ActionForm.addButton}
+   * Adds ask button to the form. Alias to {@link ActionForm.addButton}
    *
-   * Prompt is alias to {@link prompt}
+   * Ask is alias to {@link ask}
    *
    * @example
-   *   addButtonPrompt('§cУдалить письмо', '§cУдалить', () => deleteLetter(), 'Отмена')
+   *   ask('§cУдалить письмо§r', '§cУдалить§r', () => deleteLetter(), 'Отмена') //
    *   // Will show message form with `§cВы уверены, что хотите удалить письмо?` and `§cУдалить`, `Отмена` buttons
+   *   §r
    *
-   * @param text - ActionForm Button text. Will be also used as prompt body
-   * @param yesText - PromptForm yes button text, e.g. 'Да'
-   * @param yesAction - Function callback that will be called when prompt yes button was pressed
-   * @param noText - PromptForm no button
-   * @param texture - PromptForm texture
+   * @param text - Button text. Will be also used as ask body
+   * @param yesText - Yes button text, e.g. 'Да'
+   * @param yesAction - Function that will be called when yes button was pressed
+   * @param noText - Function that will be called when no button was pressed
+   * @param texture - Button texture
    */
-  addButtonPrompt(
+  addButtonAsk(
     text: string,
     yesText: string,
     yesAction: VoidFunction,
@@ -111,7 +112,7 @@ export class ActionForm {
     texture: string | null = null,
   ) {
     return this.addButton(text, texture, p =>
-      prompt(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p)),
+      ask(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p)),
     )
   }
 

@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
+import { form } from 'lib/form/new'
 import { is } from 'lib/roles'
 import { t } from 'lib/text'
 import { noNullable } from 'lib/util'
@@ -57,7 +58,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
       const step = quest?.getPlayerStep(player, dbquest.i)
       if (!step || !quest) return false
 
-      return [`${quest.name}\n${step.text()}`, () => questMenu(player, quest, self)]
+      return [`${quest.name}\n${step.text()}`, () => manageQuestMenu(quest).show(player, self)]
     })
     .back(back)
     .show(player)
@@ -69,26 +70,41 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
 
   new ArrayForm('Завершенные задания', quests.completed.map(e => Quest.quests.get(e)).filter(noNullable))
     .description('Список завершенных заданий')
-    .button(quest => [quest.name, () => questMenu(player, quest, () => completeQuestsMenu(player, back))])
+    .button(
+      quest => [quest.name, () => manageQuestMenu(quest).show(player, () => completeQuestsMenu(player, back))] as const,
+    )
     .back(back)
     .show(player)
 }
 
-function questMenu(player: Player, quest: Quest, back: VoidFunction) {
-  const current = quest.getPlayerStep(player)
-  let currentDescription = ''
-  if (current) {
-    currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vector.string(current.place, true)}` : ''}`
-  } else if (player.database.quests?.completed.includes(quest.id)) {
-    currentDescription = '§aЗадание завершено'
-  }
+export function manageQuestMenu(quest: Quest) {
+  return form((f, player) => {
+    const current = quest.getPlayerStep(player)
+    let currentDescription = ''
+    if (current) {
+      currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vector.string(current.place, true)}` : ''}`
+    } else if (player.database.quests?.completed.includes(quest.id)) {
+      currentDescription = '§aЗадание завершено'
+    }
 
-  const form = new ActionForm(quest.name, `${quest.description}§r\n\n${currentDescription}`)
-  form.addButtonBack(back)
+    f.title(quest.name)
+    f.body(`${quest.description}§r\n\n${currentDescription}`)
 
-  const place = current?.place
-  if (is(player.id, 'techAdmin') && place) form.addButton('§7admin: tp to quest point', () => player.teleport(place))
+    if (Quest.getCurrentStepOf(player) !== quest.getPlayerStep(player)) {
+      f.button('Сделать приоритетным', () => {
+        if (!player.database.quests) return
 
-  form.addButtonPrompt('§cОтказаться от задания', '§cОтказаться', () => quest.exit(player), 'Назад')
-  form.show(player)
+        const active = Quest.getDatabase(player, quest)
+        if (!active) return
+
+        player.database.quests.active = player.database.quests.active.filter(e => e !== active)
+        player.database.quests.active.unshift(active)
+      })
+    }
+
+    f.ask('§cОтказаться от задания', '§cОтказаться', () => quest.exit(player), 'Назад')
+
+    const place = current?.place
+    if (is(player.id, 'techAdmin') && place) f.button('§7admin: tp to quest point', () => player.teleport(place))
+  })
 }

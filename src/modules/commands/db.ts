@@ -33,7 +33,7 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
         .addButton('§3Новое значение§r', () => {
           changeValue(player, null, (newVal, key) => (table[key] = newVal), selfback)
         })
-        .addButtonPrompt('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
+        .addButtonAsk('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
           Object.keys(table).forEach(e => Reflect.deleteProperty(table, e))
         })
     })

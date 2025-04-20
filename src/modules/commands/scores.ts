@@ -75,7 +75,7 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
     })
     .addCustomButtonBeforeArray(form => {
       form.addButton('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, objective))
-      form.addButtonPrompt(
+      form.addButtonAsk(
         '§cУдалить таблицу',
         '§cУдалить',
         () => world.scoreboard.removeObjective(objective.id),

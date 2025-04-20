@@ -20,7 +20,6 @@ import { MineareaRegion } from 'modules/places/minearea/minearea-region'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { stoneQuarryInvestigating } from 'modules/places/stone-quarry/quests/investigating'
-import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
 
@@ -201,25 +200,7 @@ class Learning {
         )
       })
 
-    q.dialogue(this.miner, 'Узнайте, куда вам идти дальше у Шахтера')
-      .body('Приветствую!')
-      .buttons(
-        [
-          'Где мне переплавить железо?',
-          (ctx, back) => {
-            new ActionForm(this.miner.name, `В месте, которое называется ${StoneQuarry.name}`)
-              .addButtonBack(back)
-              .addButton('Я хочу туда!', () => {
-                ctx.next()
-                stoneQuarryInvestigating.quest.enter(player)
-              })
-              .show(player)
-          },
-        ],
-        ['Где я?', (ctx, back) => new ActionForm(this.miner.name, 'Хз').addButtonBack(back).show(player)],
-        ['Кто я?', (ctx, back) => new ActionForm(this.miner.name, 'Хз').addButtonBack(back).show(player)],
-        ['Кто ты?', (ctx, back) => new ActionForm(this.miner.name, 'Хз').addButtonBack(back).show(player)],
-      )
+    q.dialogue(this.miner, 'Шахтер вас зовет!').body('Приветствую!').buttons()
   })
 
   randomTeleportLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
@@ -235,8 +216,8 @@ class Learning {
   miner = new Npc(this.quest.group.point('miner').name('Шахтер'), ({ player }) => {
     form(f => {
       f.title(this.miner.name)
-      f.qbutton(stoneQuarryInvestigating.quest, 'Где мне переплавить железо?')
-      f.qbutton(this.questMiner2, 'Добыть еще больше железа')
+      f.quest(stoneQuarryInvestigating.quest, 'Где мне переплавить железо?')
+      f.quest(this.questMiner2, 'Добыть еще больше железа')
     }).show(player)
     return true
   })
@@ -246,7 +227,8 @@ class Learning {
       ({ type: { id } }) => id === b.IronOre || id === MinecraftItemTypes.DeepslateIronOre,
     )
 
-    q.button().reward(new Rewards().money(10))
+    const reward = q.button().reward(new Rewards().money(10))
+    if (this.miner.location.valid) reward.place(this.miner.location)
   })
 
   blockedOre = new WeakPlayerMap<string[]>()
@@ -324,10 +306,10 @@ class Learning {
           Spawn.portal?.teleport(player)
         }
         new ActionForm(
-          'Заметка',
+          'Режим Анархия',
           'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
         )
-          .addButton('Продолжить!', () => {
+          .addButton('Вперед!', () => {
             if (!this.randomTeleportLocation.valid) return
 
             delete player.database.survival.doNotSaveAnarchy

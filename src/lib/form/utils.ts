@@ -3,6 +3,7 @@ import {
   ActionFormData,
   ActionFormResponse,
   FormCancelationReason,
+  FormRejectError,
   MessageFormData,
   MessageFormResponse,
   ModalFormData,
@@ -45,46 +46,51 @@ export class FormCallback<Form extends BaseForm = BaseForm> {
  * It shows a form to a player and if the player is busy, it will try to show the form again until it succeeds or the
  * maximum number of attempts is reached.
  *
- * @param {Pick<ActionFormData, 'show'> | Pick<ModalFormData, 'show'> | Pick<MessageFormData, 'show'>} form - The form
- *   you want to show.
- * @param {Player} player - The player who will receive the form.
+ * @param form - The form you want to show.
+ * @param player - The player who will receive the form.
  * @returns The response from the form.
  */
 export async function showForm(
   form: Pick<ActionFormData, 'show'> | Pick<ModalFormData, 'show'> | Pick<MessageFormData, 'show'>,
   player: Player,
 ) {
-  const hold = 5
-  for (let i = 1; i <= hold; i++) {
-    /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
-    const response: ActionFormResponse | ModalFormResponse | MessageFormResponse = await form.show(player)
+  try {
+    const hold = 5
+    for (let i = 1; i <= hold; i++) {
+      const response: ActionFormResponse | ModalFormResponse | MessageFormResponse = await form.show(player)
 
-    if (response.canceled) {
-      if (response.cancelationReason === FormCancelationReason.UserClosed) return false
-      if (response.cancelationReason === FormCancelationReason.UserBusy) {
-        switch (i) {
-          case 1:
-            // First attempt failed, maybe chat closed...
-            player.closeChat()
-            continue
+      if (response.canceled) {
+        if (response.cancelationReason === FormCancelationReason.UserClosed) return false
+        if (response.cancelationReason === FormCancelationReason.UserBusy) {
+          switch (i) {
+            case 1:
+              // First attempt failed, maybe chat closed...
+              player.closeChat()
+              continue
 
-          case 2:
-            // Second attempt, tell player to manually close chat...
-            player.info('Закрой чат!')
-            await system.sleep(10)
-            continue
+            case 2:
+              // Second attempt, tell player to manually close chat...
+              player.info('Закрой чат!')
+              await system.sleep(10)
+              continue
 
-          default:
-            await system.sleep(10)
-            break
+            default:
+              await system.sleep(10)
+              break
 
-          case hold:
-            // Last attempt, we cant do anything
-            player.fail(`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
-            return false
+            case hold:
+              // Last attempt, we cant do anything
+              player.fail(`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
+              return false
+          }
         }
-      }
-    } else return response
+      } else return response
+    }
+  } catch (e) {
+    if (e instanceof FormRejectError) {
+      console.warn(e)
+      return false
+    } else throw e
   }
 }
 

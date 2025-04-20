@@ -89,7 +89,7 @@ export class MessageForm {
 }
 
 /** Shows MessageForm to the player */
-export function prompt(
+export function ask(
   player: Player,
   text: string,
   yesText: string,

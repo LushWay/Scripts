@@ -1,12 +1,13 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ActionForm } from 'lib/form/action'
+import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
 import { Quest } from 'lib/quest'
 import { MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
 
-export type NewFormCallback = (player: Player, back?: NewFormCallback) => void | Promise<void | boolean>
+export type NewFormCallback = (player: Player, back?: NewFormCallback) => unknown
 
 class Form {
   constructor(private player: Player) {
@@ -84,11 +85,33 @@ class Form {
     return this
   }
 
-  qbutton(quest: Quest, textOverride?: string) {
+  quest(quest: Quest, textOverride?: string) {
     const rendered = quest.button.render(this.player, () => this.show())
     if (!rendered) return
 
-    this.button(textOverride ?? rendered[0], rendered[1], rendered[2])
+    this.button(textOverride && rendered[0] === quest.name ? textOverride : rendered[0], rendered[1], rendered[2])
+  }
+
+  /**
+   * Adds ask button to the form. Alias to {@link Form.button}
+   *
+   * Ask is alias to {@link ask}
+   *
+   * @example
+   *   ask('§cУдалить письмо§r', '§cУдалить§r', () => deleteLetter(), 'Отмена') //
+   *   // Will show message form with `§cВы уверены, что хотите удалить письмо?` and `§cУдалить`, `Отмена` buttons
+   *   §r
+   *
+   * @param text - Button text. Will be also used as ask body
+   * @param yesText - Yes button text, e.g. 'Да'
+   * @param yesAction - Function that will be called when yes button was pressed
+   * @param noText - Function that will be called when no button was pressed
+   * @param texture - Button texture
+   */
+  ask(text: string, yesText: string, yesAction: VoidFunction, noText = 'Отмена', texture: string | null = null) {
+    return this.button(text, texture, p =>
+      ask(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, this.show),
+    )
   }
 
   show = async () => {

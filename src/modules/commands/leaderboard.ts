@@ -128,7 +128,7 @@ function editLeaderboard(
         })
     })
 
-  if (lb) form.addButtonPrompt('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
+  if (lb) form.addButtonAsk('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
 
   form.show(player)
 }

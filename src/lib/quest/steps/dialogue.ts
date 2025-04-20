@@ -23,7 +23,10 @@ export function QSDialogue(this: PlayerQuest, npc: Npc, text = `Поговори
 
           const interaction: Npc.OnInteract = event => {
             if (event.player.id !== this.player.id) return false
-            show()
+            if (buttons.length === 0) {
+              ctx.next()
+              return false
+            } else show()
             return true
           }
 

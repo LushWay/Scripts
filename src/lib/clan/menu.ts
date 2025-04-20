@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
-import { MessageForm, prompt } from 'lib/form/message'
+import { MessageForm, ask } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
@@ -112,7 +112,7 @@ function inClanMenu(player: Player, clan: Clan, back?: VoidFunction) {
     )
 
     form.addButton(t.badge`Приглашения ${clan.db.invites.length}`, () => clanInvites(player, clan, selfback))
-    form.addButtonPrompt('§cУдалить клан', '§cУдалить', () => clan.delete())
+    form.addButtonAsk('§cУдалить клан', '§cУдалить', () => clan.delete())
   }
   form.show(player)
 }
@@ -155,7 +155,7 @@ function clanInvites(player: Player, clan: Clan, back?: VoidFunction) {
       return [
         name,
         () =>
-          void prompt(
+          void ask(
             player,
             'отозвать приглашение?',
             'Да, отозать',

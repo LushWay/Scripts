@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, ArrayForm, Mail, Menu, Settings, prompt } from 'lib'
+import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
@@ -110,7 +110,7 @@ function letterDetailsMenu(
   }
 
   form.addButton('§cУдалить письмо', null, () => {
-    prompt(player, deleteDescription, '§cУдалить', () => {
+    ask(player, deleteDescription, '§cУдалить', () => {
       if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
       Mail.deleteMessage(player, index)
       back()

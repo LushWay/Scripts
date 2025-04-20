@@ -15,15 +15,23 @@ export class QSButtonBuilder extends QSBuilder<QSButton> {
 
   reward(reward: Rewards) {
     this.activate(ctx => {
-      ctx.quest.button.renderOverride.set(ctx.player, (_, step) => {
+      ctx.subscribe(ctx.quest.button.override, ({ step, player }) => {
+        if (player.id !== ctx.player.id) return false
+
         return [
           `${step.text()}\n§aЗавершено!`,
           undefined,
           form(f => {
-            f.title('Задание').button('Забрать награду', () => reward.give(ctx.player))
+            f.title(ctx.quest.name)
+            f.body(reward.toString())
+            f.button('Забрать награду', () => {
+              reward.give(ctx.player)
+              ctx.next()
+            })
           }),
         ]
       })
     })
+    return this
   }
 }

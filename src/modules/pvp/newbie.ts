@@ -1,5 +1,5 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { Cooldown, Join, LockAction, ms, prompt } from 'lib'
+import { ask, Cooldown, Join, ms } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-json'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
@@ -20,7 +20,7 @@ export function askForExitingNewbieMode(
 ) {
   if (!isNewbie(player)) return callback()
 
-  prompt(
+  ask(
     player,
     'Если вы совершите это действие, вы потеряете статус новичка:\n - Другие игроки смогут наносить вам урон\n - Другие игроки смогут забирать ваш лут после смерти',
     '§cЯ больше не новичок',

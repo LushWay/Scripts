@@ -185,13 +185,13 @@ function editRegion(player: Player, region: Region, back: () => void) {
         player.fail(t.error`Не удалось сохранить структуру: ${e}`)
       }
     })
-    if (exists) form.addButtonPrompt('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
+    if (exists) form.addButtonAsk('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
   }
 
   region.customFormButtons(form, player)
 
   form.addButton('Переместиться в регион', () => player.teleport(region.area.center))
-  form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
+  form.addButtonAsk('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
@@ -339,7 +339,7 @@ export function manageRegionMembers(
       const form = new ActionForm(name, `Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
 
       if (region.getMemberRole(memberId) !== 'owner')
-        form.addButtonPrompt(
+        form.addButtonAsk(
           isOwner ? `Передать права владельца ${pluralForms[0]}` : `Назначить владельцем ${pluralForms[0]}`,
           'Передать',
           () => {
@@ -349,7 +349,7 @@ export function manageRegionMembers(
         )
 
       form
-        .addButtonPrompt('§cУдалить участника', '§cУдалить', () => {
+        .addButtonAsk('§cУдалить участника', '§cУдалить', () => {
           region.permissions.owners = region.permissions.owners.filter(e => e !== memberId)
           applyAction()
         })
