@@ -15,7 +15,9 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
       ? lootTable.items.reduce((p, c) => p + c.chance, 0)
       : Math.max(...lootTable.items.map(p => p.chance))
     for (const item of lootTable.items) {
-      const { itemStack, amount, enchantments } = item
+      const { amount, enchantments } = item
+      const itemStack = typeof item.itemStack === "function" ? 
+        item.itemStack() : item.itemStack
       const name = itemDescription(itemStack, '', false)
       const amountText = amount[0] === amount.at(-1) ? '' : ` x${amount[0]}...${amount.at(-1)} `
       const enchanted = !!Object.keys(enchantments).length
@@ -42,7 +44,9 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
 
   const itemForm = (item: (typeof lootTable.items)[number]) =>
     form(f => {
-      f.title(itemDescription(item.itemStack, '', false))
+      const i = typeof item.itemStack === "function" ? 
+        item.itemStack() : item.itemStack
+      f.title(itemDescription(i, '', false))
     })
 
   return previewItems
