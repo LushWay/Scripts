@@ -25,7 +25,7 @@ export class BossArenaRegion extends Region {
     openContainers: true,
     pvp: 'pve',
     owners: [],
-    allowedAllItem: false,
+    allowedAllItem: true,
   }
 
   constructor(area: Area, options: BossArenaRegionOptions, key: string) {
