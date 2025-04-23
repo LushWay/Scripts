@@ -4,8 +4,8 @@ import { emoji } from 'lib/assets/emoji'
 import { noBoolean } from 'lib/util'
 import { langToken } from 'lib/utils/lang'
 
-declare namespace Rewards {
-  type DatabaseEntry =
+export  namespace Rewards {
+  export type DatabaseEntry =
     | {
         type: 'scores'
         count: number

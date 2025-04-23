@@ -8,7 +8,7 @@ import { t } from './text'
 interface GlobalLetter {
   title: string
   content: string
-  rewards: import('lib/shop/rewards').Rewards.DB[]
+  rewards: import('lib/shop/rewards').Rewards.DatabaseEntry[]
 }
 
 interface LocalLetterMetadata {
