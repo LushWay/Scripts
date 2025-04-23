@@ -66,11 +66,13 @@ system.runPlayerInterval(
     const regions = RegionEvents.playerInRegionsCache.get(player)
     if (!regions?.length) return
 
-    const near = nearDisabledAdventureRegions(player)
-    console.log({ r: regions.length, near })
-    if (near && player.getGameMode() === GameMode.adventure) {
+    const gamemode = player.getGameMode()
+    const adventure = gamemode === GameMode.adventure
+    const survival = gamemode === GameMode.survival
+
+    if (adventure && nearDisabledAdventureRegions(player)) {
       player.setGameMode(GameMode.survival)
-    } else if (adventureModeRegion(regions[0])) {
+    } else if (survival && adventureModeRegion(regions[0])) {
       player.setGameMode(GameMode.adventure)
     }
   },
