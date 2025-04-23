@@ -35,7 +35,7 @@ world.afterEvents.entityDie.subscribe(event => {
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
     gravestone.setDynamicProperty(gravestoneDiedAtPve, !!pveRegion)
     gravestone.addTag(gravestoneTag)
-    gravestone.nameTag = `§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? '§bновичка ' : ''}§f${name}`
+    gravestone.nameTag = `§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? '§bновичка ' : pveRegion ? '§a(безопасно) ' : ''}§f${name}`
 
     const gravestoneContainer = gravestone.container
 
@@ -123,11 +123,11 @@ actionGuard((player, _, ctx) => {
 
   if (owner === player.id) return true
   if (Player.database[owner].survival.newbie) {
-    ctx.event.player.fail('Вы не можете залутать могилу новичка!')
+    ctx.event.player.fail('Вы не можете открыть могилу новичка!')
     return false
   }
   if (ctx.event.target.getDynamicProperty(gravestoneDiedAtPve)) {
-    ctx.event.player.fail('Вы не можете залутать могилу игрока, умершего в зоне без сражения!')
+    ctx.event.player.fail('Вы не можете открыть могилу игрока, умершего в зоне без сражения!')
     return false
   }
 
