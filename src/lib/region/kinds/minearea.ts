@@ -84,7 +84,7 @@ export class MineareaRegion extends RegionWithStructure {
 
           this.restoringStructureProgress++
           eachVectorCallback?.(vector)
-        })
+        }, 500)
         .then(() => {
           this.scheduledToPlaceBlocks.forEach(e => unscheduleBlockPlace(e))
           this.scheduledToPlaceBlocks = []
