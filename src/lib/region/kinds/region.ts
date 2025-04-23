@@ -94,8 +94,8 @@ export class Region {
    *
    * @returns Array of instances that match the specified type `R` of Region.
    */
-  static getAll<I extends Region>(this: RegionConstructor<I> | typeof Region) {
-    if (this === Region) return this.regions
+  static getAll<I extends Region>(this: RegionConstructor<I> | typeof Region): I[] {
+    if (this === Region) return this.regions as I[]
     return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
   }
 
@@ -107,7 +107,7 @@ export class Region {
   static getNear<I extends Region>(this: RegionConstructor<I>, point: AbstractPoint, radius: number): I[] {
     point = toPoint(point)
 
-    return this.getAll().filter(region => region.area.isNear(point, radius)) as I[]
+    return this.getAll().filter(region => region.area.isNear(point, radius))
   }
 
   /**
@@ -129,7 +129,7 @@ export class Region {
 
     return this.getAll()
       .filter(region => region.area.isIn(point))
-      .sort((a, b) => b.priority - a.priority) as I[]
+      .sort((a, b) => b.priority - a.priority)
   }
 
   /** Region priority. Used in {@link Region.getAt} */
