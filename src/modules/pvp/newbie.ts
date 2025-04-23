@@ -1,7 +1,6 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { ask, Cooldown, Join, ms } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-json'
-import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 
 const newbieTime = ms.from('hour', 2)
@@ -35,10 +34,10 @@ export function askForExitingNewbieMode(
 
 const logger = createLogger('Newbie')
 
-export function exitNewbieMode(player: Player, reason: Text) {
+function exitNewbieMode(player: Player, reason: Text) {
   if (!isNewbie(player)) return
 
-  player.warn(t.warn`Вы ${reason}, поэтому вышли из режима новичка.`)
+  player.warn(`§eВы ${reason}, поэтому вышли из режима новичка.`)
   delete player.database.survival.newbie
   player.setProperty(property, false)
 
@@ -52,6 +51,10 @@ export function enterNewbieMode(player: Player) {
 }
 
 Join.onFirstTimeSpawn.subscribe(enterNewbieMode)
+Join.onMoveAfterJoin.subscribe(({ player }) => {
+  const value = isNewbie(player)
+  if (value !== player.getProperty(property)) player.setProperty(property, value)
+})
 
 const damageCd = new Cooldown(ms.from('min', 1), false)
 
