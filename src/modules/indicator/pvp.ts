@@ -4,9 +4,11 @@ import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { RegionEvents } from 'lib/region/events'
-import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { t } from 'lib/text'
+import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
+import { Anarchy } from 'modules/places/anarchy/anarchy'
 
-const options = Settings.world(...Settings.worldCommon, {
+const settings = Settings.world(...Settings.worldCommon, {
   pvpEnabled: {
     value: true,
     description: 'Возможность входа в сражения режим (блокировка всех тп команд)',
@@ -26,6 +28,11 @@ const options = Settings.world(...Settings.worldCommon, {
     value: 120,
     description: 'Время блокировки в режиме сражения в секундах',
     name: 'Время сражения с боссом',
+  },
+  pvpKillOnJoin: {
+    value: true,
+    description: 'Убивать игрока, зашедшего на анархию после выхода с сервера со незавершенным таймером сражения',
+    name: 'Убивать вышедшего в сражении',
   },
 })
 
@@ -50,7 +57,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
 
 system.runInterval(
   () => {
-    if (options.pvpEnabled) {
+    if (settings.pvpEnabled) {
       for (const player of world.getAllPlayers()) {
         if (player.scores.pvp) player.scores.pvp--
       }
@@ -96,18 +103,18 @@ system.runInterval(
 Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
-      if (!options.pvpEnabled) return
+      if (!settings.pvpEnabled) return
       const score = player.scores.pvp
 
       if (score <= 0) return
 
-      const settings = getPlayerSettings(player)
-      if (!settings.indicator) return
+      const psettings = getPlayerSettings(player)
+      if (!psettings.indicator) return
 
       const q =
-        score === options.pvpBossCooldown ||
-        score === options.pvpMonsterCooldown ||
-        score == options.pvpPlayerCooldown ||
+        score === settings.pvpBossCooldown ||
+        score === settings.pvpMonsterCooldown ||
+        score === settings.pvpPlayerCooldown ||
         score === 1
       const g = (p: string) => (q ? `§4${p}` : '')
 
@@ -130,6 +137,25 @@ Core.afterEvents.worldLoad.subscribe(() => {
 
   world.afterEvents.entityHurt.subscribe(event => {
     onDamage(event, false)
+  })
+
+  // Reset on respawn
+  world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
+    if (!settings.pvpEnabled) return
+    if (!initialSpawn) player.scores.pvp = 0
+  })
+
+  const playerEnteredAnarchy = new WeakPlayerSet({ removeOnLeave: true })
+  Anarchy.onPlayerEnter.subscribe(({ player }) => {
+    if (!settings.pvpEnabled) return
+
+    if (playerEnteredAnarchy.has(player)) return
+    playerEnteredAnarchy.add(player) // to prevent from triggering multiple times
+
+    if (player.scores.pvp > 0) {
+      player.warn(t.warn`Вы вышли из сервера во время сражения, поэтому были убиты при входе.`)
+      player.kill()
+    }
   })
 })
 
@@ -154,7 +180,7 @@ function onDamage(
   if (
     !hurtEntity.typeId.startsWith('minecraft:') ||
     !(hurtEntity.isPlayer() || hurtEntity.matches({ families: ['monster'] }) || hurtBoss) ||
-    !options.pvpEnabled
+    !settings.pvpEnabled
   )
     return
 
@@ -167,24 +193,24 @@ function onDamage(
 
   const cooldown =
     damagingEntity?.isPlayer() && hurtEntity.isPlayer()
-      ? options.pvpPlayerCooldown
+      ? settings.pvpPlayerCooldown
       : hurtBoss || (damagingEntity && Boss.isBoss(damagingEntity))
-        ? options.pvpBossCooldown
-        : options.pvpMonsterCooldown
+        ? settings.pvpBossCooldown
+        : settings.pvpMonsterCooldown
 
   if (damagingEntity?.isPlayer()) {
     damagingEntity.scores.pvp = Math.max(damagingEntity.scores.pvp, cooldown)
     damagingEntity.scores.damageGive += damage
     if (fatal) damagingEntity.scores.kills++
 
-    const setting = getPlayerSettings(damagingEntity)
+    const psetting = getPlayerSettings(damagingEntity)
 
     const isBow = cause === EntityDamageCause.projectile
-    if (isBow && setting.bowSound) {
+    if (isBow && psetting.bowSound) {
       playHitSound(damagingEntity, current, value)
     }
 
-    if (setting.indicator) {
+    if (psetting.indicator) {
       if (!fatal) {
         // damagingEntity.onScreenDisplay.setActionBar(`§c-${damage}♥`)
       } else {
