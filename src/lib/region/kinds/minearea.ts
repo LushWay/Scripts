@@ -1,5 +1,5 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vector } from 'lib/vector'
 import { isNotPlaying } from 'lib/game-utils'
 import {
   actionGuard,

@@ -4,7 +4,7 @@ import { registerSaveableRegion } from 'lib/region/database'
 import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
-import { MineareaRegion } from '../minearea/minearea-region'
+import { MineareaRegion } from '../../../lib/region/kinds/minearea'
 import { ores, placeOre } from './algo'
 
 const logger = createLogger('Shaft')

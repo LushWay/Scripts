@@ -94,8 +94,20 @@ export class Region {
    *
    * @returns Array of instances that match the specified type `R` of Region.
    */
-  static getAll<I extends Region>(this: RegionConstructor<I>) {
+  static getAll<I extends Region>(this: RegionConstructor<I> | typeof Region) {
+    if (this === Region) return this.regions
     return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
+  }
+
+  /**
+   * Returns an array of regions of the type of the caller that are near a specified point within a given radius.
+   *
+   * @param point - Represents point in the world
+   */
+  static getNear<I extends Region>(this: RegionConstructor<I>, point: AbstractPoint, radius: number): I[] {
+    point = toPoint(point)
+
+    return this.getAll().filter(region => region.area.isNear(point, radius)) as I[]
   }
 
   /**
@@ -113,10 +125,11 @@ export class Region {
    * @param point - Represents point in the world
    */
   static getManyAt<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
-    const regions = this === Region ? this.regions : this.getAll()
     point = toPoint(point)
 
-    return regions.filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority) as I[]
+    return this.getAll()
+      .filter(region => region.area.isIn(point))
+      .sort((a, b) => b.priority - a.priority) as I[]
   }
 
   /** Region priority. Used in {@link Region.getAt} */
