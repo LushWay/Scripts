@@ -1,5 +1,5 @@
 import { GameMode, Player } from '@minecraft/server'
-import { InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToString } from 'lib'
+import { EventSignal, InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToString } from 'lib'
 import { Language } from 'lib/assets/lang'
 import { isNotPlaying } from 'lib/game-utils'
 import { itemDescription } from 'lib/shop/rewards'
@@ -69,6 +69,7 @@ class AnarchyBuilder extends AreaWithInventory {
         delete player.database.survival.anarchy
         showSurvivalHud(player)
         Portal.showHudTitle(player, '§6> §cAnarchy §6<')
+        EventSignal.emit(this.onPlayerEnter, { player })
       }
     })
 
@@ -84,6 +85,8 @@ class AnarchyBuilder extends AreaWithInventory {
         ctx.player.success(t`Успех! Теперь вы можете использовать ${command} для перемещения на случайную позицию.`)
       })
   }
+
+  onPlayerEnter = new EventSignal<{ player: Player }>()
 
   private logger = createLogger('Anarchy')
 
