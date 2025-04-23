@@ -2,13 +2,14 @@ import { Player, system, world } from '@minecraft/server'
 import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
-import { ActionGuardOrder, forceAllowSpawnInRegion } from 'lib/region'
+import { ActionGuardOrder, forceAllowSpawnInRegion, Region } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 
 const gravestoneOwnerKey = 'owner'
-export const gravestoneEntity = CustomEntityTypes.Grave
+const gravestoneDiedAtPve = 'gravestoneDiedAtPve'
+export const gravestoneEntityTypeId = CustomEntityTypes.Grave
 const gravestoneTag = 'gravestone'
 const gravestoneSpawnedAt = 'gravestoneAt'
 const gravestoneCleanupAfter = ms.from('sec', 5)
@@ -26,11 +27,13 @@ world.afterEvents.entityDie.subscribe(event => {
     const { dimension, id: playerId, location, name } = event.deadEntity
     event.deadEntity.database.survival.deadAt = Vector.floor(location)
     const head = event.deadEntity.getHeadLocation()
+    const pveRegion = Region.getManyAt(event.deadEntity).find(e => e.permissions.pvp === 'pve' || e.permissions.pvp)
 
-    const gravestone = dimension.spawnEntity(gravestoneEntity, head)
+    const gravestone = dimension.spawnEntity(gravestoneEntityTypeId, head)
     forceAllowSpawnInRegion(gravestone)
     gravestone.setDynamicProperty(gravestoneOwnerKey, playerId)
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
+    gravestone.setDynamicProperty(gravestoneDiedAtPve, !!pveRegion)
     gravestone.addTag(gravestoneTag)
     gravestone.nameTag = `§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? '§bновичка ' : ''}§f${name}`
 
@@ -95,7 +98,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
 
 system.runInterval(
   () => {
-    for (const entity of world.overworld.getEntities({ type: gravestoneEntity, tags: [gravestoneTag] })) {
+    for (const entity of world.overworld.getEntities({ type: gravestoneEntityTypeId, tags: [gravestoneTag] })) {
       const at = entity.getDynamicProperty(gravestoneSpawnedAt)
       if (typeof at !== 'number') {
         entity.remove()
@@ -113,7 +116,7 @@ system.runInterval(
 
 actionGuard((player, _, ctx) => {
   if (ctx.type !== 'interactWithEntity') return
-  if (ctx.event.target.typeId !== gravestoneEntity) return
+  if (ctx.event.target.typeId !== gravestoneEntityTypeId) return
 
   const owner = ctx.event.target.getDynamicProperty(gravestoneOwnerKey)
   if (typeof owner !== 'string') return true
@@ -123,6 +126,12 @@ actionGuard((player, _, ctx) => {
     ctx.event.player.fail('Вы не можете залутать могилу новичка!')
     return false
   }
+  if (ctx.event.target.getDynamicProperty(gravestoneDiedAtPve)) {
+    ctx.event.player.fail('Вы не можете залутать могилу игрока, умершего в зоне без сражения!')
+    return false
+  }
+
+  return true
 }, ActionGuardOrder.Feature)
 
 const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
