@@ -139,6 +139,12 @@ Core.afterEvents.worldLoad.subscribe(() => {
     onDamage(event, false)
   })
 
+  // Reset on respawn
+  world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
+    if (!settings.pvpEnabled) return
+    if (!initialSpawn) player.scores.pvp = 0
+  })
+
   const playerEnteredAnarchy = new WeakPlayerSet({ removeOnLeave: true })
   Anarchy.onPlayerEnter.subscribe(({ player }) => {
     if (!settings.pvpEnabled) return
@@ -215,7 +221,6 @@ function onDamage(
             `${isBow ? emoji.custom.kill : emoji.custom.kill} ${hurtEntity.name}`,
             ActionbarPriority.UrgentNotificiation,
           )
-          hurtEntity.scores.pvp = 0
         } else {
           // Entity
           const entityName = hurtEntity.typeId.replace('minecraft:', '')
