@@ -115,6 +115,11 @@ function regionList(player: Player, RegionType: typeof Region, back = () => regi
           const center = parseLocationFromForm(ctx, rawCenter, player)
           if (!center) return
 
+          if (center.y - radius <= -64)
+            return player.fail(
+              `Нельзя создать регион, область которого ниже -64 (y: ${center.y} radius: ${radius} result: ${center.y - radius})`,
+            )
+
           editRegion(player, RegionType.create(new SphereArea({ radius, center }, player.dimension.type)), () =>
             regionList(player, RegionType, back),
           )
