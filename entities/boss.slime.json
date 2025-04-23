@@ -27,12 +27,8 @@
 
         // Entity specific options
         "minecraft:collision_box": {
-          "width": 3.08,
-          "height": 3.08
-        },
-
-        "minecraft:movement.jump": {
-          "jump_delay": [0.5, 1.5]
+          "width": 2.08,
+          "height": 2.08
         },
 
         "minecraft:behavior.nearest_attackable_target": {

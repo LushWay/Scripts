@@ -29,7 +29,7 @@ export function createBossSlime(group: Group) {
     .respawnTime(ms.from('min', 10))
     .allowedEntities([])
     .spawnEvent(true)
-    .radius(30)
+    .radius(20)
     .interval(boss => {
       if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return
 
