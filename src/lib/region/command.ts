@@ -1,6 +1,7 @@
 import { LocationInUnloadedChunkError, MolangVariableMap, Player, system, world } from '@minecraft/server'
 import 'lib/command'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
+import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { BUTTON, FormCallback } from 'lib/form/utils'
@@ -23,15 +24,16 @@ const command = new Command('region')
     regionForm(ctx.player)
   })
 
-let regionBorders = false
+const db = table<{ enabled: boolean }>('regionBorders', () => ({ enabled: false }))
 
 command
   .overload('borders')
-  .executes(ctx => ctx.player.tell(t`Borders enabled: ${regionBorders}`))
-  .boolean('set', true)
-  .executes((ctx, newValue = false) => {
-    ctx.player.tell(t`${regionBorders} -> ${newValue}`)
-    regionBorders = newValue
+  .executes(ctx => ctx.player.tell(t`Borders enabled: ${db[ctx.player.id].enabled}`))
+  .boolean('toggle', true)
+  .executes((ctx, newValue = !db[ctx.player.id].enabled) => {
+    ctx.player.tell(t`${db[ctx.player.id].enabled} -> ${newValue}`)
+    ctx.player.database
+    db[ctx.player.id].enabled = newValue
   })
 
 const variables = new MolangVariableMap()
@@ -44,17 +46,29 @@ variables.setColorRGBA('color', {
 
 system.runInterval(
   () => {
-    if (!regionBorders) return
+    if (!Object.values(db).some(e => e.enabled)) return
     const players = world.getAllPlayers()
 
     for (const region of Region.regions) {
       if (!(region.area instanceof SphereArea)) continue
-      if (!players.some(e => region.area.isNear(e, 30))) continue
 
-      region.area.forEachVector((vector, isIn, dimension) => {
+      const playersNearRegion = players.filter(e => region.area.isNear(e, 30))
+      if (!playersNearRegion.length) continue
+
+      let skip = 0
+      region.area.forEachVector((vector, isIn) => {
+        skip++
+        if (skip % 2 === 0) return
+
         try {
           const r = Vector.distance(region.area.center, vector)
-          if (isIn && r > region.area.radius - 1) dimension.spawnParticle('minecraft:wax_particle', vector, variables)
+          if (isIn && r > region.area.radius - 1) {
+            for (const player of playersNearRegion) {
+              if (!db[player.id].enabled) continue
+
+              player.spawnParticle('minecraft:wax_particle', vector, variables)
+            }
+          }
         } catch (e) {
           if (e instanceof LocationInUnloadedChunkError) return
           throw e
