@@ -65,7 +65,7 @@ system.runInterval(
           const r = Vector.distance(region.area.center, vector)
           if (isIn && r > region.area.radius - 1) {
             for (const player of playersNearRegion) {
-              if (!player.isValid) break
+              if (!player.isValid) continue
               if (!db[player.id].enabled) continue
 
               player.spawnParticle('minecraft:wax_particle', vector, variables)
