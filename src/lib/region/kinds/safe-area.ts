@@ -51,10 +51,12 @@ export class SafeAreaRegion extends Region {
 }
 registerCreateableRegion('Мирные зоны', SafeAreaRegion)
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
-  const mineareasNear = !!Region.getNear(toPoint(player), 6).length
   const been = previous.length && (previous[0] instanceof SafeAreaRegion || previous[0] instanceof BossArenaRegion)
   const now =
-    newest.length && (newest[0] instanceof SafeAreaRegion || newest[0] instanceof BossArenaRegion || !mineareasNear)
+    newest.length &&
+    (newest[0] instanceof SafeAreaRegion ||
+      newest[0] instanceof BossArenaRegion ||
+      !Region.getNear(toPoint(player), 6).length)
 
   const gamemode = player.getGameMode()
   const adventure = gamemode === GameMode.adventure
