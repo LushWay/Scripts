@@ -43,7 +43,7 @@ export class MineshaftRegion extends MineareaRegion {
       location: block.location,
       typeId: ore ? ore.empty : block.typeId,
       states: ore ? undefined : block.permutation.getAllStates(),
-      restoreTime: ms.from('min', Math.randomInt(1, 3)),
+      restoreTime: ms.from('sec', Math.randomInt(30, 60)),
     })
     this.scheduledToPlaceBlocks.push(schedule)
 
