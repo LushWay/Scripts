@@ -1,13 +1,13 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { Vector } from 'lib/vector'
 import { isNotPlaying } from 'lib/game-utils'
+import { registerSaveableRegion } from 'lib/region/database'
 import {
   actionGuard,
   ActionGuardOrder,
+  disableAdventureNear,
   regionTypesThatIgnoreIsBuildingGuard,
   registerCreateableRegion,
-} from 'lib/region'
-import { registerSaveableRegion } from 'lib/region/database'
+} from 'lib/region/index'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import {
@@ -20,6 +20,7 @@ import {
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
+import { Vector } from 'lib/vector'
 
 const logger = createLogger('Minearea')
 
@@ -192,6 +193,8 @@ actionGuard((player, region, ctx) => {
     }
   }
 }, ActionGuardOrder.Lowest)
+
+disableAdventureNear.push(MineareaRegion)
 
 export function onFullRegionTypeRestore<T extends typeof Region>(
   regionType: T,

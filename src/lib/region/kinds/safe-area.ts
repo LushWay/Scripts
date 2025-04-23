@@ -1,4 +1,4 @@
-import { GameMode } from '@minecraft/server'
+import { GameMode, Player, system } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { toPoint } from 'lib/game-utils'
 import { registerCreateableRegion } from 'lib/region/command'
@@ -50,13 +50,37 @@ export class SafeAreaRegion extends Region {
   }
 }
 registerCreateableRegion('Мирные зоны', SafeAreaRegion)
+export const disableAdventureNear: (typeof Region)[] = []
+export const adventureModeRegions: (typeof Region)[] = []
+
+function nearDisabledAdventureRegions(player: Player): boolean {
+  return disableAdventureNear.some(e => e.getNear(toPoint(player), 6).length)
+}
+
+function adventureModeRegion(region: Region) {
+  return region instanceof SafeAreaRegion || region instanceof BossArenaRegion
+}
+
+system.runPlayerInterval(
+  player => {
+    const regions = RegionEvents.playerInRegionsCache.get(player)
+    if (!regions?.length) return
+
+    const near = nearDisabledAdventureRegions(player)
+    console.log({ r: regions.length, near })
+    if (near && player.getGameMode() === GameMode.adventure) {
+      player.setGameMode(GameMode.survival)
+    } else if (adventureModeRegion(regions[0])) {
+      player.setGameMode(GameMode.adventure)
+    }
+  },
+  'safeAreaDisableAdventureNear',
+  40,
+)
+
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
-  const been = previous.length && (previous[0] instanceof SafeAreaRegion || previous[0] instanceof BossArenaRegion)
-  const now =
-    newest.length &&
-    (newest[0] instanceof SafeAreaRegion ||
-      newest[0] instanceof BossArenaRegion ||
-      !Region.getNear(toPoint(player), 6).length)
+  const been = previous.length && adventureModeRegion(previous[0])
+  const now = newest.length && (adventureModeRegion(newest[0]) || !nearDisabledAdventureRegions(player))
 
   const gamemode = player.getGameMode()
   const adventure = gamemode === GameMode.adventure
