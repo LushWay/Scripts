@@ -112,7 +112,7 @@ export class MineareaRegion extends RegionWithStructure {
       if (!isIn) return
 
       vectors.push(vector)
-    })
+    }, 1000)
 
     const scheduled = await getScheduledToPlaceAsync(vectors, this.dimension.type)
     if (scheduled) this.scheduledToPlaceBlocks = scheduled

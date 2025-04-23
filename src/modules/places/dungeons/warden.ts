@@ -113,7 +113,7 @@ system.runInterval(
       })
       newRegion.ldb.blocks.push(location)
       newRegion.save()
-    })
+    }, 1000)
   },
   'wardenDungeonUpdateLoot',
   fromMsToTicks(ms.from('min', 1)),

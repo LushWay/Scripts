@@ -73,7 +73,7 @@ system.runInterval(
           if (e instanceof LocationInUnloadedChunkError) return
           throw e
         }
-      })
+      }, 100)
     }
   },
   'region borders',

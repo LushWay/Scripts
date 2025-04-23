@@ -62,7 +62,7 @@ export class RegionStructure {
     }
 
     const blocks: VectorPermutation[] = []
-    await this.forEachBlock((vector, block) => blocks.push({ vector, permutation: block }))
+    await this.forEachBlock((vector, block) => blocks.push({ vector, permutation: block }), 1000)
 
     const unloadedBlocks: VectorPermutation[] = []
     for (const block of blocks) {
@@ -107,6 +107,7 @@ export class RegionStructure {
 
   forEachBlock(
     callback: (location: Vector3, structureSavedBlock: BlockPermutation | undefined, dimension: Dimension) => void,
+    yieldEach?: number,
   ) {
     const structure = world.structureManager.get(this.id)
     if (!structure) throw new ReferenceError('No structure found!')
@@ -122,6 +123,6 @@ export class RegionStructure {
         )
         callback(vector, structureSavedBlock, dimension)
       }
-    })
+    }, yieldEach)
   }
 }
