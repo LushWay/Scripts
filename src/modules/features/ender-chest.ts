@@ -4,7 +4,7 @@ function interval() {
   try {
     for (const player of world.getAllPlayers()) {
       // TODO Increase on rank
-      const freeSlots = 10
+      const freeSlots = 9
 
       // There is no way to access this thing without command lol
 
