@@ -23,7 +23,7 @@ export const ores = new OreCollector(
   new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).below(0).groupChance(10).chance(0.5),
   new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).below(17).groupChance(20).chance(0.3),
   new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).below(-50).chance(0.1),
-).stoneChance(90)
+).stoneChance(70)
 
 export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {
   const possibleBlocks = []
