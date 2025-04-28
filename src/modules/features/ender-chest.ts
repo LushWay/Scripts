@@ -4,10 +4,17 @@ function interval() {
   try {
     for (const player of world.getAllPlayers()) {
       // TODO Increase on rank
-      const freeSlots = 5
+      const freeSlots = 10
+
+      // There is no way to access this thing without command lol
+
+      for (let i = 0; i < freeSlots; i++) {
+        player.runCommand(
+          `replaceitem entity @s[hasitem={location=slot.enderchest,slot=${i},item=barrier}] slot.enderchest ${i} air`,
+        )
+      }
 
       for (let i = freeSlots; i <= 26; i++) {
-        // There is no way to access this thing without command lol
         player.runCommand(
           `replaceitem entity @s slot.enderchest ${i} barrier 1 0 {"item_lock":{"mode":"lock_in_inventory"}}`,
         )
