@@ -6,6 +6,7 @@ import {
   MinecraftEnchantmentTypes,
   MinecraftItemTypes,
   MinecraftPotionEffectTypes,
+  MinecraftPotionModifierTypes,
 } from '@minecraft/vanilla-data'
 import { doNothing, Enchantments, getAuxOrTexture, isKeyof } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
@@ -163,6 +164,13 @@ export class Mage extends ShopNpc {
             form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Strength }), new MoneyCost(100))
             form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Healing }), new MoneyCost(100))
             form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Swiftness }), new MoneyCost(100))
+            form.itemStack(
+              ItemStack.createPotion({
+                effect: MinecraftPotionEffectTypes.NightVision,
+                modifier: MinecraftPotionModifierTypes.Long,
+              }),
+              new MoneyCost(10),
+            )
           })
           .itemStack(IceBombItem, new MoneyCost(100))
           .itemStack(FireBallItem, new MoneyCost(100))
