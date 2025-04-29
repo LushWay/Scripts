@@ -236,3 +236,12 @@ export function isEmpty(target: object | unknown[]): boolean {
 /** Empty function that does nothing. */
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const doNothing = () => {}
+/** Adds minecraft: namespace to the text if not added already */
+
+export function addNamespace(text: string) {
+  return text.includes(':') ? text : `minecraft:${text}`
+}
+
+export function removeNamespace(text: string) {
+  return text.replace(/^minecraft:/, '')
+}

@@ -94,11 +94,6 @@ export function isNotPlaying(player: Player, uptodate = false) {
   return CURRENT_BUILDERS.has(player.id)
 }
 
-/** Adds minecraft: namespace to the text if not added already */
-export function nmspc(text: string) {
-  return text.includes(':') ? text : `minecraft:${text}`
-}
-
 /**
  * Tries to load chunk at provided location by adding tickingarea and trying to get block at location 100 times. If
  * chunk is still unloaded, returns false. If chunk is finally loaded, returns block.
@@ -193,19 +188,4 @@ export function createPoint(
   dimensionType: DimensionType = 'overworld',
 ): DimensionLocation {
   return { vector: { x, y, z }, dimensionType }
-}
-
-export interface Startup<T> {
-  value: T
-}
-
-export function onStartup<T>(initialize: () => T) {
-  try {
-    world.setDynamicProperty('a', 1)
-    return { value: initialize() } satisfies Startup<T>
-  } catch (e) {
-    const result = { value: undefined } as unknown as Startup<T>
-    system.beforeEvents.startup.subscribe(() => (result.value = initialize()))
-    return result
-  }
 }

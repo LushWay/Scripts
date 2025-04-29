@@ -1,6 +1,6 @@
 import { Enchantment, RawMessage, RawText } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
-import { inspect } from 'lib/util'
+import { addNamespace, inspect } from 'lib/util'
 import { blockItemsLangJson, langs, Language } from '../assets/lang'
 import { sprintf } from './sprintf'
 
@@ -48,7 +48,7 @@ export function langToken(item: { typeId: string } | string) {
  * another translated RawMessage
  */
 export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment): RawText {
-  const rawtext: RawMessage[] = [{ translate: langToken({ typeId: typeof e === 'string' ? e : e.type.id }) }]
+  const rawtext: RawMessage[] = [{ translate: langToken(addNamespace(typeof e === 'string' ? e : e.type.id)) }]
   if (typeof e === 'object') {
     rawtext.push(
       { text: ' ' },

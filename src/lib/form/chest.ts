@@ -3,9 +3,8 @@ import { BlockPermutation, Player, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
-import { nmspc } from 'lib/game-utils'
 import { MaybeRawText, t } from 'lib/text'
-import { inspect, isKeyof, util, wrapLore } from 'lib/util'
+import { addNamespace, inspect, isKeyof, util, wrapLore } from 'lib/util'
 import { typeIdToReadable } from 'lib/utils/lang'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
@@ -23,7 +22,7 @@ export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
   )
     return `textures/items/${textureOrTypeId.replace('lw:', '').replace('_spawn_egg', '')}`
 
-  const typeId = nmspc(textureOrTypeId)
+  const typeId = addNamespace(textureOrTypeId)
   const ID = typeIdToID.get(typeId) ?? typeIdToDataId.get(typeId)
   if (typeof ID === 'undefined') return BUTTON['?']
 

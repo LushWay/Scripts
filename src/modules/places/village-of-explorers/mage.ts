@@ -159,10 +159,6 @@ export class Mage extends ShopNpc {
               .itemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
               .itemStack(new ItemStack(i.RedMushroom), new MoneyCost(200)),
           )
-
-          // TODO Potion API
-          // Пока нет PotionAPI или сгенереных предметов не трогаем
-
           .section('Зелья', form => {
             form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Strength }), new MoneyCost(100))
             form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Healing }), new MoneyCost(100))
@@ -186,7 +182,7 @@ export class Mage extends ShopNpc {
             MinecraftEnchantmentTypes.Efficiency,
             MinecraftEnchantmentTypes.Power,
             MinecraftEnchantmentTypes.Protection,
-          ]
+          ].reverse()
           for (const p of prior) {
             const ench = item.enchantable.getEnchantment(p)
             if (!ench) continue
@@ -202,7 +198,7 @@ export class Mage extends ShopNpc {
     })
   }
 
-  createEnch(form: ShopFormSection, item: ItemStack, slot: ContainerSlot) {
+  createEnch(form: ShopFormSection, _: ItemStack, slot: ContainerSlot) {
     return (type: e, getCost: (currentLevel: number) => Cost, up = 1) => {
       const { can, level } = this.updateEnchatnment(slot, type, up, true)
       form
@@ -231,7 +227,7 @@ export class Mage extends ShopNpc {
       const current = item.enchantable.getEnchantment(type)?.level ?? 0
       const level = current + up
 
-      if (level > max) {
+      if (level >= max) {
         const levels = Enchantments.typed[type]
         if (typeof levels === 'undefined') return cant
 
