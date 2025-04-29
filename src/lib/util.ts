@@ -245,3 +245,11 @@ export function addNamespace(text: string) {
 export function removeNamespace(text: string) {
   return text.replace(/^minecraft:/, '')
 }
+
+Promise.withResolvers = <T>() => {
+  let resolve: ((value: T | PromiseLike<T>) => void) | undefined
+  let reject: ((value: Error) => void) | undefined
+  const promise = new Promise<T>((r, j) => ((resolve = r), (reject = j)))
+  if (!resolve || !reject) throw new TypeError('Promise is broken lol')
+  return { resolve, reject, promise }
+}

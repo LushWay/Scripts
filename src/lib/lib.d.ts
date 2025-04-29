@@ -74,6 +74,17 @@ declare global {
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Worker {}
+
+  // I hate eslint btw
+  interface PromiseWithResolvers<T> {
+    promise: Promise<T>
+    resolve: (value: T | PromiseLike<T>) => void
+    reject: (reason?: any) => void
+  }
+
+  interface PromiseConstructor {
+    withResolvers<T>(): PromiseWithResolvers<T>
+  }
 }
 
 /** Describes types that can be narrowed */

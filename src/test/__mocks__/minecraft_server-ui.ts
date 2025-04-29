@@ -151,31 +151,35 @@ abstract class FormSelector<T extends keyof TFD> {
     protected form: TFD[T]['form'],
   ) {}
 
-  body() {
+  get body() {
     return TestFormUtils.toString(this.form.body)
   }
 
-  title() {
+  get title() {
     return TestFormUtils.toString(this.form.title)
   }
 
   dump() {
     return {
-      title: this.title(),
-      body: this.body(),
-      buttons: this.buttons.dump(),
+      title: this.title,
+      body: this.body,
+      buttons: this.clickOnButtonWhichText.dump(),
     }
   }
 
-  abstract buttons: ButtonsSelector<T>
+  abstract clickOnButtonWhichText: ButtonsSelector<T>
 }
 
 class ModalFormSelector extends FormSelector<'modal'> {
-  buttons: ModalButtonsSelector = new ModalButtonsSelector(this, this.form, this.kind)
+  clickOnButtonWhichText: ModalButtonsSelector = new ModalButtonsSelector(this, this.form, this.kind)
 }
 
 class ActionMessageFormSelector<T extends keyof TFD> extends FormSelector<T> {
-  buttons: ActionAndMessageButtonsSelector<T> = new ActionAndMessageButtonsSelector(this, this.form, this.kind)
+  clickOnButtonWhichText: ActionAndMessageButtonsSelector<T> = new ActionAndMessageButtonsSelector(
+    this,
+    this.form,
+    this.kind,
+  )
 }
 
 abstract class ButtonsSelector<T extends keyof TFD> {

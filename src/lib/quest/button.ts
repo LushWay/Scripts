@@ -4,6 +4,7 @@ import { form, ShowForm } from 'lib/form/new'
 import { manageQuestMenu } from './menu'
 import { Quest } from './quest'
 import { QS } from './step'
+import { t } from 'lib/text'
 
 type RenderedQuestButton = false | [text: string, texture: string | undefined, callback: VoidFunction | ShowForm]
 
@@ -13,6 +14,9 @@ export class QuestButton {
   override = new EventSignal<{ step: QS; back: VoidFunction; player: Player }, RenderedQuestButton>()
 
   render(player: Player, back: VoidFunction): RenderedQuestButton {
+    if (this.quest.isCompleted(player))
+      return [t`${this.quest.name}\n§aЗавершен!`, undefined, manageQuestMenu(this.quest)]
+
     const step = this.quest.getPlayerStep(player)
     if (!step)
       return [

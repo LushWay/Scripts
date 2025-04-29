@@ -122,10 +122,12 @@ export class Quest {
     })
   }
 
+  /** Starts this quest for player */
   enter(player: Player) {
     this.setStep(player, 0)
   }
 
+  /** Moves player to the specific quest step with all the visuals etc */
   setStep(player: Player, i: number, restore = false) {
     const step = this.getPlayerStep(player, i) ?? this.createPlayerSteps(player, i)
     if (typeof step === 'undefined') return // Index can be unknown, e.g quest have 4 steps but index is 10
@@ -138,6 +140,11 @@ export class Quest {
     step.enter(!restore)
   }
 
+  isCompleted(player: Player) {
+    return player.database.quests?.completed.includes(this.id)
+  }
+
+  /** Gets current active step of this quest that player is in */
   getPlayerStep(player: Player, stepIndex = this.getForPlayer(player)?.i): QS | undefined {
     return this.players.get(player)?.steps[stepIndex ?? 0]
   }

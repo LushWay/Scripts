@@ -32,10 +32,10 @@ export function typeIdToReadable(typeId: string) {
  *
  * @example
  *   const apple = new ItemStack(MinecraftItemTypes.Apple)
- *   langKey(apple) // %item.apple.name
+ *   langToken(apple) // %item.apple.name
  *
  * @example
- *   langKey(MinecraftEnchantmentTypes.Sharpness) // %enchantment.sharnpess.name
+ *   langToken(MinecraftEnchantmentTypes.Sharpness) // %enchantment.sharnpess.name
  */
 
 export function langToken(item: { typeId: string } | string) {

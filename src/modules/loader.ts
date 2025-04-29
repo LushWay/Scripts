@@ -10,6 +10,7 @@ import './places/stone-quarry/index'
 import './pvp/import'
 import './survival/import'
 import './test/test'
+import './wiki/wiki'
 import './world-edit/builder'
 import './world-edit/import'
 

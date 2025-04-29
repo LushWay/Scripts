@@ -217,19 +217,45 @@ class Learning {
     form(f => {
       f.title(this.miner.name)
       f.quest(stoneQuarryInvestigating.quest, 'Где мне переплавить железо?')
-      f.quest(this.questMiner2, 'Добыть еще больше железа')
+      f.quest(this.mine10Iron, 'Где добыть еще больше железа?')
+      f.quest(this.mine10Coal, 'Где добыть угля?')
+      f.quest(this.mine10Diamonds, 'Где добыть алмазы?')
     }).show(player)
     return true
   })
 
-  questMiner2 = new Quest('mine-10-iron', 'Добыть железо', 'Да', q => {
-    q.break((c, end) => `${c}/${end}`, 10).filter(
-      ({ type: { id } }) => id === b.IronOre || id === MinecraftItemTypes.DeepslateIronOre,
-    )
+  createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
+    return new Quest(id, text, 'Да', q => {
+      q.break((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
 
-    const reward = q.button().reward(new Rewards().money(10))
-    if (this.miner.location.valid) reward.place(this.miner.location)
-  })
+      const reward = q.button().reward(rewards)
+      if (this.miner.location.valid) reward.place(this.miner.location)
+    })
+  }
+
+  mine10Iron = this.createMineQuest(
+    'mine-10-iron',
+    'Добыть железо',
+    10,
+    [b.IronOre, b.DeepslateIronOre],
+    new Rewards().money(600),
+  )
+
+  mine10Coal = this.createMineQuest(
+    'mine-10-coal',
+    'Добыть уголь',
+    10,
+    [b.CoalOre, b.DeepslateCoalOre],
+    new Rewards().money(400),
+  )
+
+  mine10Diamonds = this.createMineQuest(
+    'mine-10-diamonds',
+    'Добыть алмазы',
+    10,
+    [b.DiamondOre, b.DeepslateDiamondOre],
+    new Rewards().money(1000),
+  )
 
   blockedOre = new WeakPlayerMap<string[]>()
 

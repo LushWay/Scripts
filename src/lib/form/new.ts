@@ -37,7 +37,7 @@ class Form {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, callback: NewFormCallback): F
+  button(text: MaybeRawText, callback: NewFormCallback | ShowForm): F
 
   /** Adds a button to this form */
   button(link: ShowForm, icon?: string | null): F
@@ -60,7 +60,7 @@ class Form {
    */
   button(
     textOrForm: MaybeRawText | ShowForm,
-    callbackOrIcon: string | null | undefined | NewFormCallback,
+    callbackOrIcon: string | null | undefined | NewFormCallback | ShowForm,
     callbackOrUndefined?: NewFormCallback | ShowForm,
   ): F {
     let text, icon, callback
@@ -73,7 +73,7 @@ class Form {
       text = textOrForm
     }
 
-    if (typeof callbackOrIcon === 'function') {
+    if (typeof callbackOrIcon === 'function' || callbackOrIcon instanceof ShowForm) {
       callback = callbackOrIcon
     } else {
       icon = callbackOrIcon

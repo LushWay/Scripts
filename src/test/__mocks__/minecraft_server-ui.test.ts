@@ -8,14 +8,14 @@ describe('Form', () => {
     const b2 = vi.fn()
 
     TEST_onFormOpen(player, 'action', form => {
-      expect(form.buttons.dump()).toMatchInlineSnapshot(`
+      expect(form.clickOnButtonWhichText.dump()).toMatchInlineSnapshot(`
         [
           "button1",
           "button2",
         ]
       `)
 
-      return form.buttons.equalsUncolored('button1')
+      return form.clickOnButtonWhichText.equalsUncolored('button1')
     })
 
     await form(f => {
@@ -34,7 +34,7 @@ describe('Form', () => {
     const b2 = vi.fn()
 
     TEST_onFormOpen(player, 'action', form => {
-      return form.buttons.equalsUncolored('buton1')
+      return form.clickOnButtonWhichText.equalsUncolored('buton1')
     })
 
     await expect(async () => {

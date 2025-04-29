@@ -83,8 +83,8 @@ export function manageQuestMenu(quest: Quest) {
     let currentDescription = ''
     if (current) {
       currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vector.string(current.place, true)}` : ''}`
-    } else if (player.database.quests?.completed.includes(quest.id)) {
-      currentDescription = '§aЗадание завершено'
+    } else if (quest.isCompleted(player)) {
+      currentDescription = '§aЗадание завершено!'
     }
 
     f.title(quest.name)

@@ -7,23 +7,21 @@ import { MineshaftRegion } from './mineshaft-region'
 import { Ore, OreCollector, OreEntry } from './ore-collector'
 
 export const ores = new OreCollector(
-  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).chance(5),
-  new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).below(-30).groupChance(90).chance(1),
+  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).range(60, 0).chance(5),
+  new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).range(20, -20).groupChance(90).chance(1),
   new Ore()
-    .type(b.RedstoneOre)
-    .type(b.LitRedstoneOre)
-    .deepslate(b.DeepslateRedstoneOre)
-    .deepslate(b.LitDeepslateRedstoneOre)
-    .below(-40)
+    .type(b.RedstoneOre, b.LitRedstoneOre)
+    .deepslate(b.DeepslateRedstoneOre, b.LitDeepslateRedstoneOre)
+    .range(20, -30)
     .groupChance(70)
     .chance(1),
 
-  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).below(-10).groupChance(80).chance(0.1),
-  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).below(30).groupChance(50).chance(2),
-  new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).below(0).groupChance(10).chance(0.5),
-  new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).below(17).groupChance(20).chance(0.3),
-  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).below(-50).chance(0.1),
-).stoneChance(70)
+  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).chance(0.1),
+  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -64).groupChance(50).chance(2),
+  new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).range(0, -64).groupChance(10).chance(0.5),
+  new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).range(0, -64).groupChance(60).chance(0.3),
+  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).range(-30, -64).chance(0.2),
+).stoneChance(40)
 
 export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {
   const possibleBlocks = []

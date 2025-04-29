@@ -324,8 +324,13 @@ function parseIntStrict(string: string) {
   return int
 }
 
-export function selectByChance<T>(items: { chance: number; item: T }[]) {
-  const totalChance = items.reduce((sum, { chance }) => sum + chance, 0)
+interface ChanceItem<T> {
+  chance: number
+  item: T
+}
+
+export function selectByChance<T>(items: ChanceItem<T>[]) {
+  const totalChance = selectByChance.getTotalChance(items)
   let random = Math.randomFloat(0, totalChance)
 
   for (const [index, { chance, item }] of items.entries()) {
@@ -334,6 +339,10 @@ export function selectByChance<T>(items: { chance: number; item: T }[]) {
   }
 
   return { index: 0, item: items[0].item }
+}
+
+selectByChance.getTotalChance = <T>(items: ChanceItem<T>[]) => {
+  return items.reduce((sum, { chance }) => sum + chance, 0)
 }
 
 function applyOptions(itemStack: ItemStack, meta: ItemStackMetaOptions) {
