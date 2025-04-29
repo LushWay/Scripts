@@ -127,7 +127,7 @@ export class Cutscene {
 
           await system.sleep(10)
 
-          if (!player.isValid) return
+          if (!(player.isValid as boolean)) return
 
           // There is no way to set a camera without easing using pure script
           player.runCommand(

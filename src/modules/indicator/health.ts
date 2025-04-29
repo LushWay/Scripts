@@ -160,9 +160,7 @@ class HealthIndicator {
     info.damage = Math.max(0, info.damage + damage) // Do not allow values less then 0
 
     setNameTag(info.separated ? info.indicator : info.hurtEntity, () => this.getBar(entity))
-    if (info.separated && entity.isValid) {
-      info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
-    }
+    if (info.separated) info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
   }
 
   private createHurtEntityRecord(entity: Entity) {

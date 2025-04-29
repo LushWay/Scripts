@@ -26,6 +26,8 @@ export default ts.config(
       '!src/lib/config.ts',
       'src/lib/lang/**',
       'src/test/__mocks__/**',
+      'coverage/**',
+      '.yarn/**',
     ],
   },
   {
