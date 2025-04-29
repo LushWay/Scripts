@@ -10,14 +10,14 @@ export class AuntZina extends ShopNpc {
     this.shop.body(() => 'Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n')
 
     this.shop.menu(form => {
-      form.itemStack(new ItemStack(i.Apple), new MoneyCost(500))
-      form.itemStack(new ItemStack(i.CookedBeef), new MoneyCost(200))
-      form.itemStack(new ItemStack(i.CookedChicken), new MoneyCost(200))
-      form.itemStack(new ItemStack(i.CookedCod), new MoneyCost(200))
-      form.itemStack(new ItemStack(i.CookedMutton), new MoneyCost(200))
-      form.itemStack(new ItemStack(i.CookedPorkchop), new MoneyCost(200))
-      form.itemStack(new ItemStack(i.CookedRabbit), new MoneyCost(200))
-      form.itemStack(new ItemStack(i.CookedSalmon), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.Apple, 64), new MoneyCost(500))
+      form.itemStack(new ItemStack(i.CookedBeef, 64), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedChicken, 64), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedCod, 64), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedMutton, 64), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedPorkchop, 64), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedRabbit, 64), new MoneyCost(200))
+      form.itemStack(new ItemStack(i.CookedSalmon, 64), new MoneyCost(200))
     })
   }
 }
