@@ -5,6 +5,7 @@ import {
   MinecraftBlockTypes,
   MinecraftEnchantmentTypes,
   MinecraftItemTypes,
+  MinecraftPotionEffectTypes,
 } from '@minecraft/vanilla-data'
 import { doNothing, Enchantments, getAuxOrTexture, isKeyof } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
@@ -37,6 +38,7 @@ export class Mage extends ShopNpc {
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Sharpness, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.Unbreaking, level => new MultiCost().money(level * 40).xp(level * enchs))
           ench(e.Looting, level => new MultiCost().money(level * 2000).xp(level * enchs))
           ench(e.Knockback, level => new MultiCost().money(level * 2000).xp(level * enchs))
         },
@@ -51,6 +53,7 @@ export class Mage extends ShopNpc {
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Power, level => new MultiCost().money(level * 20).xp(level * enchs))
+          ench(e.Unbreaking, level => new MultiCost().money(level * 40).xp(level * enchs))
           ench(e.BowInfinity, level => new MultiCost().money(level * 2000).xp(level * enchs))
           ench(e.Flame, level => new MultiCost().money(level * 2000).xp(level * enchs))
         },
@@ -160,9 +163,11 @@ export class Mage extends ShopNpc {
           // TODO Potion API
           // Пока нет PotionAPI или сгенереных предметов не трогаем
 
-          // .addSection('Зелья', form => {
-          //   form.addItemStack(new ItemStack(i.SplashPotion), new MoneyCost(10))
-          // })
+          .section('Зелья', form => {
+            form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Strength }), new MoneyCost(100))
+            form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Healing }), new MoneyCost(100))
+            form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Swiftness }), new MoneyCost(100))
+          })
           .itemStack(IceBombItem, new MoneyCost(100))
           .itemStack(FireBallItem, new MoneyCost(100))
           .itemStack(new ItemStack(i.TotemOfUndying), new MultiCost().money(6_000).item(i.Emerald, 1))
