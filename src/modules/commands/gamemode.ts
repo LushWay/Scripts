@@ -55,6 +55,7 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
 
 fastEffect(MinecraftEffectTypes.NightVision, 'night', 'ночного зрения')
 fastEffect(MinecraftEffectTypes.Speed, 'speed', 'скорости')
+fastEffect(MinecraftEffectTypes.Haste, 'haste', 'скорости копания')
 
 new Command('heal')
   .setPermissions(__RELEASE__ ? 'techAdmin' : 'builder')
