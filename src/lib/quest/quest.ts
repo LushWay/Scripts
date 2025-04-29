@@ -115,7 +115,7 @@ export class Quest {
         world.getAllPlayers().forEach(e => Quest.restore(e, this))
 
         const questSettings = Settings.worldMap[this.group.id]
-        if (typeof questSettings !== 'undefined' && Object.keys(questSettings).length) {
+        if (typeof questSettings !== 'undefined') {
           questSettings[SETTINGS_GROUP_NAME] = `Задание: ${this.name}\n§7${this.description}`
         }
       })
