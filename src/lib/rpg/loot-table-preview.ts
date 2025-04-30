@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
-import { itemDescription } from 'lib/shop/rewards'
+import { itemNameXCount } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { translateEnchantment } from 'lib/utils/lang'
 import { LootTable } from './loot-table'
@@ -17,7 +17,7 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
     for (const item of lootTable.items) {
       const { amount, enchantments, itemStack: i } = item
       const itemStack = typeof i === 'function' ? i() : i
-      const name = itemDescription(itemStack, '', false)
+      const name = itemNameXCount(itemStack, '', false)
       const amountText = amount[0] === amount.at(-1) ? '' : ` x${amount[0]}...${amount.at(-1)} `
       const enchanted = !!Object.keys(enchantments).length
       const enchantmentsText = enchanted
@@ -44,7 +44,7 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
   const itemForm = (item: (typeof lootTable.items)[number]) =>
     form(f => {
       const i = typeof item.itemStack === 'function' ? item.itemStack() : item.itemStack
-      f.title(itemDescription(i, '', false))
+      f.title(itemNameXCount(i, '', false))
     })
 
   return previewItems

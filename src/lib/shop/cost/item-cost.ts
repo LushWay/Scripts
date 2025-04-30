@@ -1,7 +1,7 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MaybeRawText, t } from 'lib/text'
 import { Cost } from '../cost'
-import { itemDescription } from '../rewards'
+import { itemNameXCount } from '../rewards'
 import { CostType } from './cost'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
@@ -69,7 +69,7 @@ export class ItemCost extends Cost {
   }
 
   toString(canBuy?: boolean, _?: Player, amount = true): MaybeRawText {
-    return itemDescription(
+    return itemNameXCount(
       this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',
       amount,

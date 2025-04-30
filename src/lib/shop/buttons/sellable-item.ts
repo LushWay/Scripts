@@ -8,7 +8,7 @@ import { t } from 'lib/text'
 import { ItemCost, MoneyCost, MultiCost } from '../cost'
 import { ErrorCost, FreeCost } from '../cost/cost'
 import { ShopForm, ShopFormSection } from '../form'
-import { itemDescription } from '../rewards'
+import { itemNameXCount } from '../rewards'
 import { Shop } from '../shop'
 
 export function createSellableItem({
@@ -48,7 +48,7 @@ export function createSellableItem({
   const settings = Shop.getPlayerSettings(player)
 
   form.section(
-    itemDescription({ typeId: type, amount }),
+    itemNameXCount({ typeId: type, amount }),
     (form, player) => {
       const bodyFn = is(player.id, 'techAdmin') ? adminBody : body
       form.body = bodyFn
@@ -119,7 +119,7 @@ function createBuy(
 
     form
       .product()
-      .name(itemDescription({ typeId: type, amount: buyCount }))
+      .name(itemNameXCount({ typeId: type, amount: buyCount }))
       .cost(cost)
       .onBuy(player => {
         if (!player.container) return

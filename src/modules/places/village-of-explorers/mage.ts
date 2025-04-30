@@ -161,16 +161,10 @@ export class Mage extends ShopNpc {
               .itemStack(new ItemStack(i.RedMushroom), new MoneyCost(200)),
           )
           .section('Зелья', form => {
-            form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Strength }), new MoneyCost(100))
-            form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Healing }), new MoneyCost(100))
-            form.itemStack(ItemStack.createPotion({ effect: MinecraftPotionEffectTypes.Swiftness }), new MoneyCost(100))
-            form.itemStack(
-              ItemStack.createPotion({
-                effect: MinecraftPotionEffectTypes.NightVision,
-                modifier: MinecraftPotionModifierTypes.Long,
-              }),
-              new MoneyCost(10),
-            )
+            form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Strength)
+            form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Healing)
+            form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Swiftness)
+            form.potion(new MoneyCost(10), MinecraftPotionEffectTypes.NightVision, MinecraftPotionModifierTypes.Long)
           })
           .itemStack(IceBombItem, new MoneyCost(100))
           .itemStack(FireBallItem, new MoneyCost(100))

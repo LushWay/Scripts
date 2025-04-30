@@ -5,7 +5,7 @@ import { table } from 'lib/database/abstract'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { onFullRegionTypeRestore } from 'lib/region/kinds/minearea'
 import { scheduleBlockPlace, SCHEDULED_DB, unscheduleBlockPlace } from 'lib/scheduled-block-place'
-import { itemDescription } from 'lib/shop/rewards'
+import { itemNameXCount } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion } from '../region'
@@ -45,7 +45,7 @@ function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) 
   const barrel = base.dimension.getBlock(base.area.center)
   const materials: RawText = {
     rawtext: Object.entries(base.ldb.materials).map(([typeId, amount]) => ({
-      rawtext: [itemDescription({ typeId, amount }, '§f§l'), { text: '\n' }],
+      rawtext: [itemNameXCount({ typeId, amount }, '§f§l'), { text: '\n' }],
     })),
   }
 

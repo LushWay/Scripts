@@ -1,9 +1,9 @@
-import { itemDescription } from './rewards'
+import { itemNameXCount } from './rewards'
 
 describe('itemDescription', () => {
   it('should create description without amount', () => {
     expect(
-      itemDescription({
+      itemNameXCount({
         typeId: 'minecraft:apple',
         amount: 0,
       }),
@@ -22,7 +22,7 @@ describe('itemDescription', () => {
   })
   it('should create description', () => {
     expect(
-      itemDescription({
+      itemNameXCount({
         typeId: 'minecraft:apple',
         nameTag: 'name tag',
         amount: 20,

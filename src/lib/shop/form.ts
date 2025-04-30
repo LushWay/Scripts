@@ -1,11 +1,16 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import {
+  MinecraftItemTypes,
+  MinecraftPotionEffectTypes as PotionEffects,
+  MinecraftPotionLiquidTypes as PotionLiquids,
+  MinecraftPotionModifierTypes as PotionModifiers,
+} from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
-import { getAuxOrTexture } from 'lib/form/chest'
+import { getAuxOrTexture, getPotionAux } from 'lib/form/chest'
 import { Cost } from 'lib/shop/cost'
-import { itemDescription } from 'lib/shop/rewards'
+import { itemNameXCount } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { isKeyof } from 'lib/util'
 import { createItemModifier, createItemModifierSection, ShopMenuWithSlotCreate } from './buttons/item-modifier'
@@ -152,9 +157,9 @@ export class ShopForm {
    * @param item
    * @param cost
    */
-  itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId)) {
+  itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId), name = itemNameXCount(item, '')) {
     this.product()
-      .name(itemDescription(item, ''))
+      .name(name)
       .cost(cost)
       .onBuy(player => {
         if (!player.container) return
@@ -166,6 +171,11 @@ export class ShopForm {
       .setTakeCost(false)
 
     return this
+  }
+
+  potion(cost: Cost, effect: PotionEffects, modifier = PotionModifiers.Normal, liquid = PotionLiquids.Regular) {
+    const item = ItemStack.createPotion({ effect, modifier, liquid })
+    this.itemStack(item, cost, getPotionAux(item))
   }
 
   /**

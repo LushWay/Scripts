@@ -1,13 +1,14 @@
 /* i18n-ignore */
 /* eslint-disable */
 
-import { MolangVariableMap, system, world } from '@minecraft/server'
+import { ItemStack, MolangVariableMap, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
   MinecraftEnchantmentTypes,
   MinecraftEntityTypes,
   MinecraftItemTypes,
+  MinecraftPotionEffectTypes,
 } from '@minecraft/vanilla-data'
 import {
   Airdrop,
@@ -19,6 +20,7 @@ import {
   Settings,
   Vector,
   getAuxOrTexture,
+  getPotionAux,
   inspect,
   is,
   isKeyof,
@@ -55,6 +57,12 @@ import './properties'
 // other tests are available only for tech admins and above
 
 const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
+  potionAux(ctx) {
+    for (const effect of Object.values(MinecraftPotionEffectTypes)) {
+      const item = ItemStack.createPotion({ effect })
+      getPotionAux(item)
+    }
+  },
   blending(ctx) {
     const lore = {
       blending: Number(ctx.args[1] ?? '7'),

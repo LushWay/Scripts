@@ -1,6 +1,7 @@
-import { BlockPermutation, Player, RawText } from '@minecraft/server'
+import { BlockPermutation, ItemPotionComponent, ItemStack, Player, RawText } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { MinecraftItemTypes, MinecraftPotionLiquidTypes } from '@minecraft/vanilla-data'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
 import { MaybeRawText, t } from 'lib/text'
@@ -24,12 +25,37 @@ export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
 
   const typeId = addNamespace(textureOrTypeId)
   const ID = typeIdToID.get(typeId) ?? typeIdToDataId.get(typeId)
+  return idToAux(ID, enchanted)
+}
+
+function idToAux(ID: number | undefined, enchanted: boolean) {
   if (typeof ID === 'undefined') return BUTTON['?']
 
   let AUX = (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536
   if (enchanted) AUX += 32768
 
   return AUX.toString()
+}
+
+export function getPotionAux(itemStack: ItemStack) {
+  const potion = itemStack.getComponent(ItemPotionComponent.componentId)
+  if (!potion) return getAuxOrTexture(MinecraftItemTypes.Potion)
+
+  const { potionEffectType: effect, potionLiquidType: liquid } = potion
+  const type = liquid.id !== MinecraftPotionLiquidTypes.Regular ? '_' + liquid.id.toLowerCase() : ''
+  const effectId =
+    effect.id[0].toLowerCase() +
+    effect.id
+      .slice(1)
+      .replace(/([A-Z])/g, '_$1')
+      .toLowerCase()
+  const typeId =
+    effectId === 'none' && type === ''
+      ? 'minecraft:potion'
+      : `minecraft:${effectId === 'none' ? '' : effectId}${type}_potion`
+  const ID = typeIdToDataId.get(typeId)
+
+  return idToAux(ID, false)
 }
 
 const SIZES = {
