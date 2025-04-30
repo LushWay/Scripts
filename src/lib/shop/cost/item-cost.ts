@@ -1,7 +1,7 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MaybeRawText, t } from 'lib/text'
 import { Cost } from '../cost'
-import { itemNameXCount } from '../rewards'
+import { itemNameXCount } from '../item-name-x-count'
 import { CostType } from './cost'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean

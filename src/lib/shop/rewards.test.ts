@@ -1,4 +1,4 @@
-import { itemNameXCount } from './rewards'
+import { itemNameXCount } from './item-name-x-count'
 
 describe('itemDescription', () => {
   it('should create description without amount', () => {

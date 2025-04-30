@@ -20,7 +20,7 @@ import {
   Settings,
   Vector,
   getAuxOrTexture,
-  getPotionAux,
+  getAuxTextureOrPotionAux,
   inspect,
   is,
   isKeyof,
@@ -60,7 +60,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   potionAux(ctx) {
     for (const effect of Object.values(MinecraftPotionEffectTypes)) {
       const item = ItemStack.createPotion({ effect })
-      getPotionAux(item)
+      getAuxTextureOrPotionAux(item)
     }
   },
   blending(ctx) {

@@ -8,14 +8,14 @@ import {
 import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
-import { getAuxOrTexture, getPotionAux } from 'lib/form/chest'
+import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
 import { Cost } from 'lib/shop/cost'
-import { itemNameXCount } from 'lib/shop/rewards'
 import { MaybeRawText, t } from 'lib/text'
 import { isKeyof } from 'lib/util'
 import { createItemModifier, createItemModifierSection, ShopMenuWithSlotCreate } from './buttons/item-modifier'
 import { createSellableItem } from './buttons/sellable-item'
 import { ItemFilter } from './cost/item-cost'
+import { itemNameXCount } from './item-name-x-count'
 import { Product, ProductName } from './product'
 import { Shop } from './shop'
 
@@ -175,7 +175,7 @@ export class ShopForm {
 
   potion(cost: Cost, effect: PotionEffects, modifier = PotionModifiers.Normal, liquid = PotionLiquids.Regular) {
     const item = ItemStack.createPotion({ effect, modifier, liquid })
-    this.itemStack(item, cost, getPotionAux(item))
+    this.itemStack(item, cost, getAuxTextureOrPotionAux(item))
   }
 
   /**

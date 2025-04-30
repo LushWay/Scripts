@@ -14,6 +14,10 @@ const NUMBER_OF_1_16_100_ITEMS = totalCustomItems
 
 const customItemsReverted: Record<string, string> = Object.map(Items, (k, v) => [v, k])
 export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
+  if (textureOrTypeId === MinecraftItemTypes.Potion) {
+    console.warn(new Error('Potion passed to getAuxOrTexture, use getAuxTextureOrPotionAux instead'))
+  }
+
   if (textureOrTypeId.startsWith('textures')) return textureOrTypeId
   if (isKeyof(textureOrTypeId, textureData)) return textureData[textureOrTypeId]
 
@@ -37,7 +41,7 @@ function idToAux(ID: number | undefined, enchanted: boolean) {
   return AUX.toString()
 }
 
-export function getPotionAux(itemStack: ItemStack) {
+export function getAuxTextureOrPotionAux(itemStack: ItemStack) {
   const potion = itemStack.getComponent(ItemPotionComponent.componentId)
   if (!potion) return getAuxOrTexture(MinecraftItemTypes.Potion)
 
