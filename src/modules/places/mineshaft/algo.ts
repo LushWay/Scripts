@@ -16,11 +16,11 @@ export const ores = new OreCollector(
     .groupChance(70)
     .chance(1),
 
-  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).chance(0.1),
-  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -64).groupChance(50).chance(2),
+  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).chance(0.5),
+  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -30).groupChance(50).chance(2),
   new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).range(0, -64).groupChance(10).chance(0.5),
   new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).range(0, -64).groupChance(60).chance(0.3),
-  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).range(-30, -64).chance(0.2),
+  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).range(-30, -64).chance(0.05),
 ).stoneChance(40)
 
 export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {
