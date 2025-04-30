@@ -7,7 +7,7 @@ export { inspect, stringify, stringifyError }
 
 export const util = {
   /** Runs the given callback safly. If it throws any error it will be handled */
-  catch(fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
+  catch(this: void, fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
     const prefix = `§6${subtype}: `
     try {
       const promise = fn()
@@ -15,7 +15,7 @@ export const util = {
         promise.catch((e: unknown) => {
           console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
         })
-        return new Promise(r => promise.then(r))
+        return new Promise((r, rr) => promise.then(r).catch(rr))
       }
     } catch (e: unknown) {
       console.error(

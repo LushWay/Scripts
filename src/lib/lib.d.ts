@@ -46,6 +46,8 @@ declare global {
   type Text = import('lib/text').Text
   // type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
 
+  type MaybePromise<T> = T | Promise<T>
+
   // Custom immutable type
   // source: https://github.com/Microsoft/TypeScript/issues/13923#issuecomment-653675557
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type

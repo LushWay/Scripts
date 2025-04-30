@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { Player } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
 import type { TestFormCallback, TFD } from 'test/__mocks__/minecraft_server-ui'
 
 export function TEST_createPlayer() {
@@ -16,7 +16,12 @@ interface RejectableFunction<T extends keyof TFD> extends TestFormCallback<T> {
   reject?: (error: Error) => void
 }
 
-export function TEST_onFormOpen<T extends keyof TFD>(player: Player, kind: T, callback: TestFormCallback<T>) {
+export function TEST_onFormOpen<T extends keyof TFD>(
+  player: Player,
+  kind: T,
+  callback: TestFormCallback<T>,
+  beforeReturn?: VoidFunction,
+) {
   const onForm = ((player as TestPlayer).onForm ??= {})
   const previousCallback = onForm[kind] as RejectableFunction<T> | undefined
   previousCallback?.reject?.(new Error('Form listen request was canceled by next call'))
@@ -25,6 +30,7 @@ export function TEST_onFormOpen<T extends keyof TFD>(player: Player, kind: T, ca
   const wrappedCallback: RejectableFunction<T> = (...args) => {
     delete wrappedCallback.reject
     resolve()
+    beforeReturn?.()
     return callback(...args)
   }
   wrappedCallback.reject = reject
@@ -33,4 +39,47 @@ export function TEST_onFormOpen<T extends keyof TFD>(player: Player, kind: T, ca
   ;(onForm[kind] as TestFormCallback<T>) = wrappedCallback
 
   return promise
+}
+
+type FormListener<T extends keyof TFD> = [kind: T, callback: TestFormCallback<T>]
+
+type FormsListeners<T extends keyof TFD> = FormListener<T>[]
+
+async function form<T extends keyof TFD>(player: Player, form: VoidFunction, ...forms: FormsListeners<T>) {
+  const promise = Promise.withResolvers<void>()
+  wrapInfinity(player, forms, () => system.run(promise.resolve), promise.reject)
+  catchE(form, promise.reject)
+  await promise.promise
+}
+
+form.action = (callback: TestFormCallback<'action'>) => ['action', callback] satisfies FormListener<'action'>
+form.message = (callback: TestFormCallback<'message'>) => ['message', callback] satisfies FormListener<'message'>
+form.modal = (callback: TestFormCallback<'modal'>) => ['modal', callback] satisfies FormListener<'modal'>
+
+export const test = {
+  createPlayer: TEST_createPlayer,
+  form: form,
+}
+
+async function catchE(v: () => MaybePromise<void>, onError: (error: Error) => void) {
+  try {
+    await v()
+  } catch (e) {
+    onError(e as Error)
+  }
+}
+
+function wrapInfinity<T extends keyof TFD>(
+  player: Player,
+  forms: FormsListeners<T>,
+  final: VoidFunction,
+  onError: (error: Error) => void,
+) {
+  try {
+    const f = forms[0]
+    const ff = forms.slice(1)
+    return TEST_onFormOpen(player, f[0], f[1], ff.length ? () => wrapInfinity(player, ff, final, onError) : final)
+  } catch (e) {
+    onError(e as Error)
+  }
 }

@@ -278,7 +278,7 @@ class ActionAndMessageButtonsSelector<T extends keyof TFD> extends ButtonsSelect
   }
 
   dumpRaw() {
-    return this.buttons().map(e => e.text)
+    return this.buttons().map(e => ('icon' in e ? e : e.text))
   }
 }
 
@@ -290,12 +290,11 @@ class TestFormUtils {
 }
 
 type TestFormCallbackSelect<T extends keyof TFD> = T extends 'modal' ? ModalFormSelector : ActionMessageFormSelector<T>
-
 export type TestFormCallback<T extends keyof TFD> = (
   select: TestFormCallbackSelect<T>,
   form: TFD[T]['form'],
   utils: typeof TestFormUtils,
-) => TFD[T]['returns'] | FormCancelationReason | FormRejectReason
+) => MaybePromise<TFD[T]['returns'] | FormCancelationReason | FormRejectReason>
 
 interface BaseForm {
   title: MT
@@ -367,18 +366,18 @@ const responses = {
   action: ActionFormResponse,
 } satisfies Record<keyof TFD, typeof FormResponse>
 
-function processCallback<T extends keyof TFD>(
+async function processCallback<T extends keyof TFD>(
   player: minecraftserver.Player,
   kind: T,
   form: TFD[T]['form'],
-): InstanceType<(typeof responses)[T]> {
+): Promise<InstanceType<(typeof responses)[T]>> {
   const callback = (player as TestPlayer).onForm?.[kind]
 
   if (!callback) throw new FormRejectError(FormRejectReason.MalformedResponse)
 
   type TT = InstanceType<(typeof responses)[T]>
   const response = responses[kind]
-  const result = callback(
+  const result = await callback(
     (kind === 'modal'
       ? new ModalFormSelector(kind, form as TestModalFormData['form'])
       : new ActionMessageFormSelector(kind, form)) as TestFormCallbackSelect<T>,

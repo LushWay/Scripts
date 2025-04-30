@@ -29,7 +29,7 @@ class Form {
     return this as F
   }
 
-  private buttons: (NewFormCallback | undefined)[] = []
+  private buttons: NewFormCallback[] = []
 
   /**
    * Adds a button to this form
@@ -78,10 +78,14 @@ class Form {
     } else {
       icon = callbackOrIcon
       callback = callbackOrUndefined
+      if (!callback && textOrForm instanceof ShowForm) callback = textOrForm
     }
 
+    const finalCallback = callback instanceof ShowForm ? callback.show : callback
+    if (!finalCallback) throw new TypeError(`No callback`)
+
     this.form.button(text, icon ?? undefined)
-    this.buttons.push(callback instanceof ShowForm ? callback.show : callback)
+    this.buttons.push(finalCallback)
     return this
   }
 
@@ -115,6 +119,8 @@ class Form {
   }
 
   show = async () => {
+    const callbackExecutor: (fn: VoidFunction) => void = __TEST__ ? f => f() : util.catch
+
     if (!this.buttons.length) this.button('Пусто', undefined, this.show)
 
     const response = await showForm(this.form, this.player)
@@ -122,7 +128,14 @@ class Form {
       return
 
     const callback = this.buttons[response.selection]
-    if (typeof callback === 'function') await util.catch(() => callback(this.player, this.show) as void)
+    if (typeof callback === 'undefined')
+      throw new TypeError(
+        `Callback for ${response.selection} does not exists, only ${this.buttons.length} callbacks are available`,
+      )
+
+    if (typeof callback === 'function') {
+      return callbackExecutor(() => callback(this.player, this.show))
+    }
   }
 }
 
