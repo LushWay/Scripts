@@ -7,21 +7,20 @@ new Command('enchant')
   .string('enchantName', true)
   .int('level')
   .executes((ctx, enchant, level) => {
-    if (!enchant || !(enchant in Enchantments.custom)) return ctx.reply(Object.keys(Enchantments.custom).join('\n'))
-    const ench = Enchantments.custom[enchant]
+    const ench = enchant && Enchantments.custom[enchant]
+    if (!ench) return ctx.reply(Object.keys(Enchantments.custom).join('\n'))
+
     const mainhand = ctx.player.mainhand()
     const item = mainhand.getItem()
-
     if (!item) return ctx.error('No item!')
 
     const enchlevels = ench[level]
-    if (typeof enchlevels === 'undefined')
-      return ctx.error('Level unavailable. Levels:\n' + Object.keys(ench).join('\n'))
+    if (!enchlevels) return ctx.error('Level unavailable. Levels:\n' + Object.keys(ench).join('\n'))
 
-    const enchitem = enchlevels[item.typeId]
-    if (typeof enchitem === 'undefined') return ctx.error('Available items:\n' + Object.keys(enchitem).join('\n'))
+      const enchitem = enchlevels[item.typeId]
+    if (!enchitem) return ctx.error('Available items:\n' + Object.keys(enchlevels).join('\n'))
 
-    const enchantments = item.getComponent('enchantable')
+      const enchantments = item.getComponent('enchantable')
     if (!enchantments) return ctx.error('Not enchantable!')
 
     const newitem = enchitem.clone()

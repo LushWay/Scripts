@@ -1,5 +1,5 @@
-import { Player } from '@minecraft/server'
-import { ActionForm, Menu, scoreboardDisplayNames, Settings } from 'lib'
+import { Player, ScoreName, ScoreNames } from '@minecraft/server'
+import { ActionForm, scoreboardObjectiveNames, capitalize, Menu, scoreboardDisplayNames, Settings } from 'lib'
 import { t, textTable } from 'lib/text'
 
 new Command('stats').setDescription('Показывает статистику по игре').executes(ctx => showStats(ctx.player))
@@ -34,17 +34,25 @@ function showStats(player: Player, target: Player = player, back?: VoidFunction)
     textTable({
       [scoreboardDisplayNames.totalOnlineTime]: formatDate(target.scores.totalOnlineTime),
       [scoreboardDisplayNames.anarchyOnlineTime]: formatDate(target.scores.anarchyOnlineTime),
-      [scoreboardDisplayNames.blocksBroken]: target.scores.blocksBroken,
-      [scoreboardDisplayNames.blocksPlaced]: target.scores.blocksPlaced,
-      [scoreboardDisplayNames.deaths]: target.scores.deaths,
-      [scoreboardDisplayNames.kills]: target.scores.kills,
-      'Убийств/Смертей': target.scores.kills / target.scores.deaths,
-      [scoreboardDisplayNames.damageRecieve]: target.scores.damageRecieve,
-      [scoreboardDisplayNames.damageGive]: target.scores.damageGive,
-      'Нанесено/Получено': target.scores.damageGive / target.scores.damageRecieve,
+      [scoreboardDisplayNames.lastSeenDate]: t.time`${target.scores.lastSeenDate}`,
+      [scoreboardDisplayNames.anarchyLastSeenDate]: t.time`${target.scores.anarchyLastSeenDate}`,
+      ...statsTable(target, key => key),
+      ...statsTable(target, key => `anarchy${capitalize(key)}`),
     }),
   )
     .addButton('OK', () => null)
     .addButtonBack(back)
     .show(player)
+}
+
+function statsTable(target: Player, getKey: (k: ScoreNames.Stat) => ScoreName) {
+  const s = target.scores
+  const table: Record<string, number | string> = {}
+  for (const key of scoreboardObjectiveNames.stats) {
+    const k = getKey(key)
+    table[scoreboardDisplayNames[k]] = s[k]
+    if (key === 'kills') table['Убийств/Смертей'] = s[getKey('kills')] / s[getKey('deaths')]
+    if (key === 'damageGive') table['Нанесено/Получено'] = s[getKey('damageGive')] / s[getKey('damageRecieve')]
+  }
+  return table
 }

@@ -21,12 +21,12 @@ class Form {
   title(title: MaybeRawText, prefix = '§c§o§m§m§o§n§r§f') {
     this.currentTitle = title
     this.form.title(t.raw`${prefix}${title}`)
-    return this as F
+    return this as NewFormCreator
   }
 
   body(body: MaybeRawText) {
     this.form.body(body)
-    return this as F
+    return this as NewFormCreator
   }
 
   private buttons: NewFormCallback[] = []
@@ -37,10 +37,10 @@ class Form {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, callback: NewFormCallback | ShowForm): F
+  button(text: MaybeRawText, callback: NewFormCallback | ShowForm): NewFormCreator
 
   /** Adds a button to this form */
-  button(link: ShowForm, icon?: string | null): F
+  button(link: ShowForm, icon?: string | null): NewFormCreator
 
   /**
    * Adds a button to this form
@@ -49,7 +49,7 @@ class Form {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): F
+  button(text: MaybeRawText, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): NewFormCreator
 
   /**
    * Adds a button to this form
@@ -62,7 +62,7 @@ class Form {
     textOrForm: MaybeRawText | ShowForm,
     callbackOrIcon: string | null | undefined | NewFormCallback | ShowForm,
     callbackOrUndefined?: NewFormCallback | ShowForm,
-  ): F {
+  ): NewFormCreator {
     let text, icon, callback
 
     if (textOrForm instanceof ShowForm) {
@@ -139,8 +139,8 @@ class Form {
   }
 }
 
-type F = Omit<Form, 'show' | 'currentTitle'>
-type CreateForm = (form: F, player: Player, back?: NewFormCallback) => void
+export type NewFormCreator = Omit<Form, 'show' | 'currentTitle'>
+type CreateForm = (form: NewFormCreator, player: Player, back?: NewFormCallback) => void
 
 export function form(create: CreateForm) {
   return new ShowForm(create)

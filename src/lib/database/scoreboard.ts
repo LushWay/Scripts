@@ -1,28 +1,35 @@
-import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
+import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecraft/server'
+import { capitalize } from 'lib/util'
 import { expand } from 'lib/extensions/extend'
 
+type LushWayGameModes = 'anarchy'
+
 declare module '@minecraft/server' {
-  type GameplayStatScoreName =
-    | 'blocksPlaced'
-    | 'blocksBroken'
-    | 'fireworksLaunched'
-    | 'fireworksExpoded'
-    | 'damageRecieve'
-    | 'damageGive'
-    | 'kills'
-    | 'deaths'
+  namespace ScoreNames {
+    type Stat =
+      | 'blocksPlaced'
+      | 'blocksBroken'
+      | 'fireworksLaunched'
+      | 'fireworksExpoded'
+      | 'damageRecieve'
+      | 'damageGive'
+      | 'kills'
+      | 'deaths'
 
-  type TimeStatScoreName = `${'total' | 'anarchy'}OnlineTime`
+    type OnlineTime = `${'total' | LushWayGameModes}OnlineTime`
 
-  type DateStatScoreName = `${'lastSeen' | 'join'}Date`
+    type Date = `${'lastSeen' | 'join'}Date`
 
-  type StatScoreName = GameplayStatScoreName | TimeStatScoreName | DateStatScoreName
+    type GameModesStat = `${'anarchy'}${Capitalize<Stat | Date>}`
 
-  type ScoreName = 'money' | 'leafs' | 'raid' | 'pvp' | 'joinTimes' | StatScoreName
+    type All = 'money' | 'leafs' | 'raid' | 'pvp' | 'joinTimes' | Stat | OnlineTime | Date | GameModesStat
+  }
+
+  type ScoreName = ScoreNames.All
 
   interface Player {
     /** Key-number scoreboard based database. Used as a counter mostly for money/leafs/stats etc. */
-    scores: Record<ScoreName, number>
+    scores: Record<ScoreNames.All, number>
   }
 }
 
@@ -37,15 +44,47 @@ export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreNam
   blocksPlaced: 'Блоков поставлено',
   blocksBroken: 'Блоков сломано',
   fireworksLaunched: 'Фейрверков запущено',
-  fireworksExpoded: 'Фейрвереов взорвано',
+  fireworksExpoded: 'Фейрверков взорвано',
   damageRecieve: 'Урона получено',
   damageGive: 'Урона нанесено',
   joinTimes: 'Всего входов на сервер',
   joinDate: 'Время первого входа',
 
+  anarchyBlocksPlaced: 'Блоков поставлено',
+  anarchyBlocksBroken: 'Блоков сломано',
+  anarchyFireworksLaunched: 'Фейрверков запущено',
+  anarchyFireworksExpoded: 'Фейрверков взорвано',
+  anarchyDamageRecieve: 'Урона получено',
+  anarchyDamageGive: 'Урона нанесено',
+  anarchyKills: 'Убийств',
+  anarchyDeaths: 'Смертей',
+
+  anarchyJoinDate: 'Время первого входа на анархию',
+  anarchyLastSeenDate: 'Последний раз онлайн на анархии',
+
   lastSeenDate: 'Последний раз онлайн',
   pvp: 'PVP',
 }
+
+const statScores: Record<ScoreNames.Stat, string> = {
+  blocksPlaced: '',
+  blocksBroken: '',
+  fireworksLaunched: '',
+  fireworksExpoded: '',
+  damageRecieve: '',
+  damageGive: '',
+  kills: '',
+  deaths: '',
+}
+
+const scorebaordStatNames = Object.keys(statScores)
+export const scoreboardObjectiveNames = {
+  stats: scorebaordStatNames,
+  gameModeStats: scorebaordStatNames
+    .map(e => `anarchy${capitalize(e)}`)
+    .concat(scorebaordStatNames) as ScoreNames.GameModesStat[],
+}
+
 const untypedDisplayNames: Record<string, string> = scoreboardDisplayNames
 
 expand(ScoreboardObjective.prototype, {

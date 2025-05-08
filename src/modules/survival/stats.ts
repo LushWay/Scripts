@@ -1,32 +1,42 @@
-import { EntityDamageCause, Player, TicksPerSecond, system, world } from '@minecraft/server'
+import { EntityDamageCause, Player, type ScoreNames, TicksPerSecond, system, world } from '@minecraft/server'
+import { capitalize } from 'lib/util'
 
 const interval = 20
 const time = TicksPerSecond * interval
 system.runPlayerInterval(
   player => {
-    player.scores.lastSeenDate = ~~(Date.now() / 1000)
+    const lastSeen = ~~(Date.now() / 1000)
+    player.scores.lastSeenDate = lastSeen
     player.scores.totalOnlineTime += time
-    if (player.database.inv === 'anarchy') player.scores.anarchyOnlineTime += time
+    if (player.database.inv === 'anarchy') {
+      player.scores.anarchyOnlineTime += time
+      player.scores.anarchyLastSeenDate = lastSeen
+    }
   },
   'player stats',
   interval,
 )
 
+function count(player: Player, stat: ScoreNames.Stat, add = 1) {
+  player.scores[stat] += add
+  if (player.database.inv === 'anarchy') player.scores[`anarchy${capitalize(stat)}`] += add
+}
+
 world.afterEvents.playerPlaceBlock.subscribe(({ player }) => {
-  player.scores.blocksPlaced++
+  count(player, 'blocksPlaced')
 })
 
 world.afterEvents.playerBreakBlock.subscribe(({ player }) => {
-  player.scores.blocksBroken++
+  count(player, 'blocksBroken')
 })
 
 world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
   if (deadEntity instanceof Player) {
-    deadEntity.scores.deaths++
+    count(deadEntity, 'deaths')
   }
 
   if (damageSource.damagingEntity instanceof Player) {
-    damageSource.damagingEntity.scores.kills++
+    count(damageSource.damagingEntity, 'kills')
   }
 })
 
@@ -43,10 +53,10 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) =>
     )
       return
 
-    hurtEntity.scores.damageRecieve += damage
+    count(hurtEntity, 'damageRecieve', damage)
   }
 
   if (damageSource.damagingEntity instanceof Player) {
-    damageSource.damagingEntity.scores.damageGive += damage
+    count(damageSource.damagingEntity, 'damageGive', damage)
   }
 })

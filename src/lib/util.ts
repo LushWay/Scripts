@@ -15,7 +15,6 @@ export const util = {
         promise.catch((e: unknown) => {
           console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
         })
-        return new Promise((r, rr) => promise.then(r).catch(rr))
       }
     } catch (e: unknown) {
       console.error(
@@ -252,4 +251,12 @@ Promise.withResolvers = <T>() => {
   const promise = new Promise<T>((r, j) => ((resolve = r), (reject = j)))
   if (!resolve || !reject) throw new TypeError('Promise is broken lol')
   return { resolve, reject, promise }
+}
+
+export function capitalize<T extends string>(str: T) {
+  return (str[0].toUpperCase() + str.slice(1)) as Capitalize<T>
+}
+
+export function pick<T extends object, K extends keyof T>(object: T, keys: K[]): Pick<T, K> {
+  return Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key as K))) as Pick<T, K>
 }

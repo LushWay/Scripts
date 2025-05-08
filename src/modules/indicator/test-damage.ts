@@ -71,10 +71,10 @@ function armorCommand() {
         [EquipmentSlot.Legs, `${type}Leggings`],
         [EquipmentSlot.Feet, `${type}Boots`],
       ]
-      let items: [EquipmentSlot, ItemStack][] = []
+      let items: [EquipmentSlot, ItemStack | undefined][] = []
 
-      const enchs = levels[level]
-      if (typeof enchs === 'undefined') {
+      const enchs = levels?.[level]
+      if (!enchs) {
         if (level <= 4 && level >= 0) {
           items = types.map(([slot, typeId]) => {
             const item = new ItemStack(MinecraftItemTypes[typeId])
