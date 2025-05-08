@@ -1,4 +1,5 @@
 import {
+  EntityHealthComponent,
   Player,
   PlayerBreakBlockBeforeEvent,
   PlayerInteractWithBlockBeforeEvent,
@@ -8,8 +9,11 @@ import {
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { AbstractPoint, isNotPlaying } from 'lib/game-utils'
 import { onPlayerMove } from 'lib/player-move'
+import { t } from 'lib/text'
+import { Vector } from 'lib/vector'
 import { EventSignal } from '../event-signal'
 import {
   BLOCK_CONTAINERS,
@@ -188,4 +192,30 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
   }
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
+})
+
+world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
+  if (!damagingEntity) return
+
+  const regions = Region.getManyAt(hurtEntity)
+  if (!regions[0]) return
+
+  const pvp = regions[0].permissions.pvp
+  if (!(!pvp || (pvp === 'pve' && hurtEntity instanceof Player))) return
+
+  let direction = Vector.subtract(damagingEntity.location, hurtEntity.location).normalized()
+  direction = Vector.multiply(direction, 10)
+
+  if (damagingEntity instanceof Player) {
+    damagingEntity.onScreenDisplay.setActionBar(t.error`Нельзя сражаться в мирной зоне`, ActionbarPriority.Highest)
+  }
+
+  const health = damagingEntity.getComponent(EntityHealthComponent.componentId)
+  if (!health) {
+    damagingEntity.kill()
+  } else {
+    health.setCurrentValue(health.currentValue - damage)
+    damagingEntity.applyDamage(0)
+    if (health.currentValue >= 0) damagingEntity.applyKnockback(direction, direction.y)
+  }
 })

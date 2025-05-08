@@ -33,7 +33,7 @@ registerAsync('test', 'damage', async test => {
           const hp = event.hurtEntity.getComponent('health')?.currentValue ?? 0
           event.damageSource.damagingEntity.onScreenDisplay.setActionBar(
             t`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`,
-            ActionbarPriority.UrgentNotificiation,
+            ActionbarPriority.Highest,
           )
         }
       }

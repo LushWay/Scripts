@@ -33,7 +33,7 @@ export const rtpCommand = new Command('rtp')
     rtpPlayers.set(ctx.player, ctx.player.location)
 
     randomLocationInAnarchy({
-      info: info => ctx.player.onScreenDisplay.setActionBar(info, ActionbarPriority.UrgentNotificiation),
+      info: info => ctx.player.onScreenDisplay.setActionBar(info, ActionbarPriority.Highest),
       onBlock: block => {
         ctx.player.addEffect(MinecraftEffectTypes.SlowFalling, 200 * TicksPerSecond, { amplifier: 100 })
         ctx.player.teleport(block)

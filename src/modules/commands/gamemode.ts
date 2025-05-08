@@ -99,7 +99,7 @@ new Command('hpi')
 
               ctx.player.onScreenDisplay.setActionBar(
                 t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
-                ActionbarPriority.UrgentNotificiation,
+                ActionbarPriority.Highest,
               )
             },
             'hpi',

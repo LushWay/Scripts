@@ -16,7 +16,7 @@ const youCannot = (player: Player) => {
     system.delay(() =>
       player.onScreenDisplay.setActionBar(
         `§cВы не можете ломать непоставленные блоки\nвне баз, шахт или других зон добычи`,
-        ActionbarPriority.UrgentNotificiation,
+        ActionbarPriority.Highest,
       ),
     )
   }

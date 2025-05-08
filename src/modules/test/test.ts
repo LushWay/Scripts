@@ -80,7 +80,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
 
     player.onScreenDisplay.setActionBar(
       t`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
-      ActionbarPriority.UrgentNotificiation,
+      ActionbarPriority.Highest,
     )
 
     for (const vector of Vector.foreach(from, to)) {

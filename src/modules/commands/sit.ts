@@ -17,10 +17,7 @@ new Command('sit')
     entity.setRotation(ctx.player.getRotation())
 
     system.delay(() => {
-      ctx.player.onScreenDisplay.setActionBar(
-        '§3> §fВы сели. Чтобы встать, крадитесь',
-        ActionbarPriority.UrgentNotificiation,
-      )
+      ctx.player.onScreenDisplay.setActionBar('§3> §fВы сели. Чтобы встать, крадитесь', ActionbarPriority.Highest)
     })
   })
 

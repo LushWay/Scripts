@@ -123,7 +123,7 @@ class ShovelTool extends WorldEditTool<Storage> {
           if (lookingUp)
             return player.onScreenDisplay.setActionBar(
               'Лопата выключена,\nможно настраивать',
-              ActionbarPriority.UrgentNotificiation,
+              ActionbarPriority.Highest,
             )
         }
       }
@@ -153,7 +153,7 @@ class ShovelTool extends WorldEditTool<Storage> {
 
     const permutations = getBlocksInSet(storage.blocksSet)
     if (!permutations.length)
-      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.UrgentNotificiation)
+      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.Highest)
 
     const { offset, radius, height } = storage
     const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)

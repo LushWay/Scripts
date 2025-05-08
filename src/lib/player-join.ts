@@ -82,7 +82,7 @@ class JoinBuilder {
 
               // Show actionBar
               if (Join.config.actionBar) {
-                player.onScreenDisplay.setActionBar(Join.config.actionBar, ActionbarPriority.UrgentNotificiation)
+                player.onScreenDisplay.setActionBar(Join.config.actionBar, ActionbarPriority.Highest)
               }
 
               player.onScreenDisplay.setHudTitle(title, {

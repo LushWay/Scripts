@@ -36,7 +36,7 @@ actionGuard((player, _, ctx) => {
     if (percent >= 90)
       player.onScreenDisplay.setActionBar(
         t.error`§cИнструмент скоро сломается! ${damage}/${maxDurability} (${percent}%)`,
-        ActionbarPriority.UrgentNotificiation,
+        ActionbarPriority.Highest,
       )
   })
 }, ActionGuardOrder.Feature)

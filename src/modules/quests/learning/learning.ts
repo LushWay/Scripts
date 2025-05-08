@@ -124,7 +124,7 @@ class Learning {
             if (!airdrop.chest) {
               player.onScreenDisplay.setActionBar(
                 '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',
-                ActionbarPriority.UrgentNotificiation,
+                ActionbarPriority.Highest,
               )
             } else {
               ctx.place = airdrop.showParticleTrace()

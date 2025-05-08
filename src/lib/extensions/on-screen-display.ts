@@ -4,7 +4,7 @@ import { fromMsToTicks, fromTicksToMs } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 export enum ActionbarPriority {
-  UrgentNotificiation = 3,
+  Highest = 3,
   PvP = 2,
   Quest = 1,
   Lowest = 0,

@@ -113,7 +113,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       if (stateNames.length === 1)
         return player.onScreenDisplay.setActionBar(
           t.error`У блока ${block.typeId} всего одно состояние`,
-          ActionbarPriority.UrgentNotificiation,
+          ActionbarPriority.Highest,
         )
 
       const nextStateName = nextValue(stateNames, stateName)
