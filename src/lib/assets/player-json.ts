@@ -98,21 +98,21 @@ export const playerJson = {
           "add_effects": [
             {
               "effect": "weakness",
-              "duration": 3,
+              "duration": 1,
               "amplifier": 255,
               "visible": false,
               "display_on_screen_animation": false
             },
             {
               "effect": "resistance",
-              "duration": 3,
+              "duration": 1,
               "amplifier": 255,
               "visible": false,
               "display_on_screen_animation": true
             },
             {
               "effect": "fire_resistance",
-              "duration": 3,
+              "duration": 1,
               "amplifier": 255,
               "visible": false,
               "display_on_screen_animation": false
@@ -125,7 +125,7 @@ export const playerJson = {
           "add_effects": [
             {
               "effect": "resistance",
-              "duration": 3,
+              "duration": 1,
               "amplifier": 1,
               "visible": false,
               "display_on_screen_animation": true

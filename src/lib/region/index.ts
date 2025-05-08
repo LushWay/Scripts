@@ -195,7 +195,7 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
 })
 
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
-  if (!damagingEntity) return
+  if (!damagingEntity?.isValid || !hurtEntity.isValid) return
 
   const regions = Region.getManyAt(hurtEntity)
   if (!regions[0]) return

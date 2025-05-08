@@ -27,7 +27,7 @@ world.afterEvents.entityDie.subscribe(event => {
     const { dimension, id: playerId, location, name } = event.deadEntity
     event.deadEntity.database.survival.deadAt = Vector.floor(location)
     const head = event.deadEntity.getHeadLocation()
-    const pveRegion = Region.getManyAt(event.deadEntity).find(e => e.permissions.pvp === 'pve' || e.permissions.pvp)
+    const pveRegion = Region.getManyAt(event.deadEntity).find(e => e.permissions.pvp === 'pve' || !e.permissions.pvp)
 
     const gravestone = dimension.spawnEntity(gravestoneEntityTypeId, head)
     forceAllowSpawnInRegion(gravestone)

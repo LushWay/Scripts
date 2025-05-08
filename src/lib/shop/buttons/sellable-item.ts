@@ -53,7 +53,7 @@ export function createSellableItem({
       const bodyFn = is(player.id, 'techAdmin') ? adminBody : body
       form.body = bodyFn
       form.section(
-        '§3Продать',
+        t.badge`§3Продать ${amount}`,
         form => {
           form.body = bodyFn
           const addSell = createSell(getCount, getBuy, type, form, db, maxCount, aux)
@@ -64,7 +64,7 @@ export function createSellableItem({
           addSell(256)
           addSell(countItems(player, type))
         },
-        BUTTON['+'],
+        BUTTON['-'],
       )
 
       function buyForm(form: ShopFormSection) {
@@ -92,7 +92,7 @@ export function createSellableItem({
       if (settings.sellableItemsScreen) {
         buyForm(form)
       } else {
-        form.section('§3Купить', f => buyForm(f), BUTTON['-'])
+        form.section('§3Купить', f => buyForm(f), BUTTON['+'])
       }
     },
     aux,
