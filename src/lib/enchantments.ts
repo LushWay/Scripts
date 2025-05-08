@@ -1,6 +1,7 @@
 import { ItemStack, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { EventLoader } from 'lib/event-signal'
+import { addNamespace } from 'lib/util'
 import { enchantmentsJson } from './assets/enchantments'
 import { Core } from './extensions/core'
 
@@ -8,8 +9,11 @@ const location = { x: 0, y: -10, z: 0 }
 const dimension = world.overworld
 
 export const Enchantments = {
-  custom: {} as Record<string, Record<number, Record<string, ItemStack>>>,
-  typed: {} as Record<MinecraftEnchantmentTypes, Record<number, Record<MinecraftItemTypes, ItemStack>>>,
+  custom: {} as Record<string, undefined | Record<number, undefined | Record<string, undefined | ItemStack>>>,
+  typed: {} as Record<
+    MinecraftEnchantmentTypes,
+    undefined | Record<number, undefined | Record<MinecraftItemTypes, undefined | ItemStack>>
+  >,
   onLoad: new EventLoader(),
 }
 
@@ -54,7 +58,7 @@ function load() {
         continue
       }
 
-      ;((Enchantments.custom[ench.type.id] ??= {})[ench.level] ??= {})[item.typeId] = item
+      ;((Enchantments.custom[addNamespace(ench.type.id)] ??= {})[ench.level] ??= {})[item.typeId] = item
       expecting--
     }
   }

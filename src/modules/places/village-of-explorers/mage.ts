@@ -1,4 +1,4 @@
-import { ContainerSlot, EnchantmentType, ItemStack } from '@minecraft/server'
+import { ContainerSlot, Enchantment, EnchantmentType, ItemStack } from '@minecraft/server'
 import {
   MinecraftEnchantmentTypes as e,
   MinecraftItemTypes as i,
@@ -8,7 +8,7 @@ import {
   MinecraftPotionEffectTypes,
   MinecraftPotionModifierTypes,
 } from '@minecraft/vanilla-data'
-import { doNothing, Enchantments, getAuxOrTexture, isKeyof } from 'lib'
+import { addNamespace, doNothing, Enchantments, getAuxOrTexture } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
@@ -83,9 +83,9 @@ export class Mage extends ShopNpc {
           const ench = this.createEnch(form, item, slot)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
-          ench(e.Efficiency, level => new MultiCost().money(level * 20).xp(level * enchs))
-          ench(e.Unbreaking, level => new MultiCost().money(level * 20).xp(level * enchs))
-          ench(e.SilkTouch, _ => new MultiCost().money(20000).xp(100))
+          ench(e.Efficiency, level => new MultiCost().money(level * 10).xp(level * enchs))
+          ench(e.Unbreaking, level => new MultiCost().money(level * 10).xp(level * enchs))
+          ench(e.SilkTouch, _ => new MultiCost().money(20000).xp(50))
         },
       )
 
@@ -202,10 +202,11 @@ export class Mage extends ShopNpc {
 
   createEnch(form: ShopFormSection, _: ItemStack, slot: ContainerSlot) {
     return (type: e, getCost: (currentLevel: number) => Cost, up = 1) => {
-      const { can, level } = this.updateEnchatnment(slot, type, up, true)
+      const { can, level, enchantment } = this.updateEnchatnment(slot, type, up, true)
+
       form
         .product()
-        .name({ rawtext: [{ text: `${can ? '' : '§7'}+` }, ...(translateEnchantment(type).rawtext ?? [])] })
+        .name({ rawtext: [{ text: can ? '' : '§7' }, ...(translateEnchantment(enchantment).rawtext ?? [])] })
         .cost(
           can
             ? new MultiCost(getCost(level)).item(MinecraftItemTypes.LapisLazuli, level)
@@ -220,42 +221,46 @@ export class Mage extends ShopNpc {
     }
   }
 
-  updateEnchatnment(slot: ContainerSlot | ItemStack, type: e, up = 1, check = false): { can: boolean; level: number } {
+  updateEnchatnment(
+    slot: ContainerSlot | ItemStack,
+    type: e,
+    up = 1,
+    check = false,
+  ): { can: boolean; level: number; enchantment: Enchantment } {
     const item = slot instanceof ItemStack ? slot.clone() : slot.getItem()?.clone()
-    const cant = { can: false, level: 0 }
+    const current = item?.enchantable?.getEnchantment(type)?.level ?? 0
+    const enchantment: Enchantment = { type: new EnchantmentType(type), level: current }
 
     if (item?.enchantable) {
-      const { maxLevel: max } = new EnchantmentType(type)
-      const current = item.enchantable.getEnchantment(type)?.level ?? 0
+      const { maxLevel: max } = enchantment.type
       const level = current + up
 
-      if (level >= max) {
-        const levels = Enchantments.typed[type]
-        if (typeof levels === 'undefined') return cant
+      if (level > max) {
+        const enchitem = Enchantments.custom[type]?.[current + 1]?.[item.typeId]
+        if (!enchitem) return { can: false, level: 0, enchantment }
 
-        const items = levels[current + 1]
-        if (typeof items === 'undefined') return cant
+        enchantment.level = level
+        if (check) return { can: true, level, enchantment }
 
-        const enchitem = isKeyof(item.typeId, items) ? items[item.typeId] : undefined
-        if (!enchitem) return cant
-
-        if (check) return { can: true, level }
         const newitem = enchitem.clone()
-        newitem.enchantable?.addEnchantments(item.enchantable.getEnchantments().filter(e => e.type.id !== type))
-
+        newitem.enchantable?.addEnchantments(
+          item.enchantable.getEnchantments().filter(e => addNamespace(e.type.id) !== type),
+        )
         copyAllItemPropertiesExceptEnchants(item, newitem)
         if (slot instanceof ContainerSlot) slot.setItem(newitem)
       } else {
         try {
-          item.enchantable.addEnchantment({ type: new EnchantmentType(type), level })
+          item.enchantable.addEnchantment(enchantment)
         } catch (e) {
-          return { can: false, level: -1 }
+          return { can: false, level: -1, enchantment }
         }
-        if (check) return { can: true, level }
+        enchantment.level = level
+        if (check) return { can: true, level, enchantment }
         if (slot instanceof ContainerSlot) slot.setItem(item)
       }
     }
-    return cant
+
+    return { can: false, level: 0, enchantment }
   }
 }
 

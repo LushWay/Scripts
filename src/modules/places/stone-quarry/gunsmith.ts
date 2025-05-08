@@ -53,7 +53,6 @@ export class Gunsmith extends ShopNpc {
 
             const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
             const repairCost = ((item.durability.damage / 1000) * enchantmentsLevels) / 5
-            console.log({ d: item.durability.damage / 1000, e: enchantmentsLevels / 5, cost: repairCost })
             const cost =
               item.durability.damage === 0
                 ? ErrorCost(t.error`Предмет целый, выберите другой`)

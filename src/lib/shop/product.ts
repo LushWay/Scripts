@@ -132,6 +132,26 @@ export class Product<T extends Cost = any> {
     if (this.onBuy(this.player, name, successBuy, successBuyText) !== false) successBuy()
   }
 
-  onBuy: ProductOnBuy = (...args) =>
-    this.takeCost ? (this.cost.take(this.player), this.onProductBuy(...args)) : this.onProductBuy(...args)
+  onBuy: ProductOnBuy = this.takeCost
+    ? wrapWithCatch((...args) => {
+        const result = this.onProductBuy(...args)
+        this.cost.take(this.player)
+        return result
+      }, this.player)
+    : wrapWithCatch(this.onProductBuy.bind(this), this.player)
+}
+
+function wrapWithCatch<T extends (...args: any[]) => unknown>(func: T, player: Player): T {
+  return ((...args) => {
+    try {
+      return func(...(args as Parameters<T>)) as ReturnType<T>
+    } catch (e) {
+      new MessageForm(
+        'Ошибка',
+        'При покупке произошла ошибка. Разработчики уже оповещены и скоро начнут работать над ее исправлением',
+      ).show(player)
+
+      throw e
+    }
+  }) as T
 }
