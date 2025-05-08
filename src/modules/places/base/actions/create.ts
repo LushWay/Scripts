@@ -36,7 +36,12 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     )
   }
 
-  const region = BaseRegion.getAll().find(e => e.getMemberRole(player) !== false)
+  const underLimit = 62
+  if (block.y < underLimit) {
+    return player.fail(t.error`Нельзя создать базу на высоте ниже ${underLimit}!`)
+  }
+
+  const region = BaseRegion.getAll().find(e => e.getMemberRole(player))
   if (region) {
     event.cancel = true
     const isOwner = region.getMemberRole(player) === 'owner'
@@ -51,6 +56,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 
   system.delay(() => createBase(block, player))
 })
+
 function createBase(block: Block, player: Player) {
   const center = Vector.floor(block.location)
   if (!player.isSimulated()) baseLogger.player(player).info`Created on ${center}`
