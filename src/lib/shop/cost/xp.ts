@@ -5,6 +5,7 @@ import { Cost } from './cost'
 export class XPCost extends Cost {
   constructor(private levels: number) {
     super()
+    this.levels = Math.round(this.levels)
     if (this.levels < 1) this.levels = 1
   }
 

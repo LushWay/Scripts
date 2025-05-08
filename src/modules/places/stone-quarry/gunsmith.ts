@@ -3,6 +3,7 @@ import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla
 import { langToken, selectByChance } from 'lib'
 import { Group } from 'lib/rpg/place'
 import { MultiCost } from 'lib/shop/cost'
+import { ErrorCost } from 'lib/shop/cost/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
@@ -50,12 +51,18 @@ export class Gunsmith extends ShopNpc {
             const item = slot.getItem()
             if (!item?.durability) return false
 
-            const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 0) ?? 1
+            const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
+            const repairCost = ((item.durability.damage / 1000) * enchantmentsLevels) / 5
+            console.log({ d: item.durability.damage / 1000, e: enchantmentsLevels / 5, cost: repairCost })
+            const cost =
+              item.durability.damage === 0
+                ? ErrorCost(t.error`Предмет целый, выберите другой`)
+                : new MultiCost().xp(repairCost)
 
             form
               .product()
               .name('Починить')
-              .cost(new MultiCost().xp((item.durability.damage / 100) * (enchantmentsLevels / 1000)))
+              .cost(cost)
               .onBuy(() => {
                 if (item.durability) item.durability.damage = 0
                 const olditem = item.clone()
