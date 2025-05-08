@@ -39,6 +39,6 @@ export class BossArenaRegion extends Region {
     const horizontal = Vector.distance({ x: location.x, y: 0, z: location.z }, { x: center.x, y: 0, z: center.z }) / 10
     const vertical = Math.abs(location.y - center.y) / 10
     const vector = Vector.subtract(location, center)
-    entity.applyKnockback(Vector.multiply(vector.normalized(), horizontal), vertical)
+    entity.applyKnockback(Vector.multiply(vector.normalized(), -horizontal), vertical)
   }
 }

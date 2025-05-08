@@ -5,7 +5,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
+import { isChunkUnloaded } from 'lib/game-utils'
 import { ConfigurableLocation, location } from 'lib/location'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { forceAllowSpawnInRegion } from 'lib/region/index'
@@ -65,6 +65,8 @@ export class Boss {
 
     return this.all.some(e => e.entity?.id === id)
   }
+
+  static entityTag = 'lw:boss'
 
   entity: Entity | undefined
 
@@ -140,19 +142,16 @@ export class Boss {
   }
 
   private check() {
-    if (!this.location.valid) return
-    if (isChunkUnloaded(this as LocationInDimension)) return
+    if (!this.location.valid || isChunkUnloaded(this)) return
 
     const db = Boss.db[this.options.place.fullId]
-    if (typeof db !== 'undefined') {
-      if (db.dead) {
-        this.checkRespawnTime(db)
-      } else {
-        this.ensureEntity(db)
-      }
-    } else {
+    if (!db) {
       // First time spawn
       this.spawnEntity()
+    } else {
+      // Interval check
+      if (db.dead) this.checkRespawnTime(db)
+      else this.ensureEntity(db)
     }
   }
 
@@ -172,22 +171,19 @@ export class Boss {
   private spawnEntity() {
     if (!this.location.valid) return
 
-    // Get type id
     const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
     this.logger.info`Spawn: ${entityTypeId}`
-
-    // Spawn entity
     this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
+
     try {
       new Temporary(({ world, cleanup }) => {
         world.afterEvents.entitySpawn.subscribe(({ entity }) => {
           if (entity.id !== this.entity?.id) return
 
           system.delay(() => {
-            if (!this.entity) return
-
+            entity.nameTag = this.options.place.name
+            entity.addTag(Boss.entityTag)
             EventSignal.emit(this.onEntitySpawn, entity)
-            this.entity.nameTag = this.options.place.name
           })
           cleanup()
         })
@@ -206,20 +202,22 @@ export class Boss {
 
   /** Ensures that entity exists and if not calls onDie method */
   private ensureEntity(db: BossDB) {
-    this.entity ??= world[this.dimensionId]
-      .getEntities({
-        type: this.options.typeId,
-        // location: this.location,
-        // maxDistance: this.areaRadius,
-      })
+    const entities = world[this.dimensionId].getEntities({
+      type: this.options.typeId,
+      tags: [Boss.entityTag],
+    })
 
-      .find(e => e.id === db.id)
+    for (const entity of entities) {
+      if (entity.id === db.id) {
+        this.entity ??= entity
+      } else entity.remove()
+    }
 
-    if (!this.entity) {
+    if (!this.entity?.isValid) {
       // Boss died or unloaded, respawn after interval
       this.onDie({ dropLoot: false })
     } else {
-      if (!this.entity.isValid) return
+      // Boss alive
       if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
