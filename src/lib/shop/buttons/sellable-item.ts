@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { getAuxOrTexture } from 'lib/form/chest'
@@ -68,7 +68,7 @@ export function createSellableItem({
       )
 
       function buyForm(form: ShopFormSection) {
-        const addBuy = createBuy(getCount, getBuy, form, type, db, aux)
+        const addBuy = createBuy(getCount, getBuy, form, type, db, aux, player)
         addBuy(1)
         addBuy(16)
         addBuy(32)
@@ -92,7 +92,7 @@ export function createSellableItem({
       if (settings.sellableItemsScreen) {
         buyForm(form)
       } else {
-        form.section('Купить', f => buyForm(f))
+        form.section('§3Купить', f => buyForm(f), BUTTON['-'])
       }
     },
     aux,
@@ -103,6 +103,21 @@ const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
 const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
 export const ImpossibleBuyCost = ErrorCost(t.error`Покупка невозможна`)
 export const ImpossibleSellCost = ErrorCost(t.error`Продажа невозможна`)
+const InventoryFull = (amount: number) => ErrorCost(t.error`Нет места в инвентаре (нужно еще ${amount})`)
+
+function getFreeSpaceForItemInInventory(player: Player, itemType: string) {
+  if (!player.container) return 0
+
+  const item = new ItemStack(itemType)
+  let space = 0
+
+  for (const [, slot] of player.container.slotEntries()) {
+    if (!slot.typeId) space += item.maxAmount
+    else if (slot.isStackableWith(item)) space += slot.maxAmount - slot.amount
+  }
+
+  return space
+}
 
 function createBuy(
   getCount: () => number,
@@ -111,11 +126,19 @@ function createBuy(
   type: MinecraftItemTypes,
   db: Record<string, number | undefined>,
   aux: string,
+  player: Player,
 ) {
   const dbCount = getCount()
+  const space = getFreeSpaceForItemInInventory(player, type)
   return (buyCount = 1) => {
     const finalCost = getFinalCost(buyCount, i => getBuy(dbCount - i))
-    const cost = finalCost <= 0 ? ImpossibleBuyCost : dbCount - buyCount < 0 ? NoItemsToSell : new MoneyCost(finalCost)
+
+    let cost = ErrorCost('Unknown Cost')
+
+    if (space < buyCount) cost = InventoryFull(buyCount - space)
+    else if (finalCost <= 0) cost = ImpossibleBuyCost
+    else if (dbCount - buyCount < 0) cost = NoItemsToSell
+    else cost = new MoneyCost(finalCost)
 
     form
       .product()
