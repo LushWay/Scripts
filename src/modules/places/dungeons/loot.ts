@@ -8,17 +8,6 @@ const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)
   .chance('10%')
 
-  .item('String')
-  .chance('30%')
-  .amount({
-    '10...20': '10%',
-    '21...30': '20%',
-  })
-
-  .item('Web')
-  .chance('40%')
-  .amount({ '1...2': '1%' })
-
   .item(Items.Money)
   .chance('100%')
   .amount({
@@ -40,17 +29,7 @@ const defaultLoot = new Loot('dungeon_default_loot')
     '21...64': '20%',
   })
 
-  .item('Web')
-  .chance('40%')
-  .amount({ '1...2': '1%' })
-
-  .item('Web')
-  .chance('40%')
-  .amount({ '1...2': '1%' })
-
-  .item('Web')
-  .chance('40%')
-  .amount({ '1...2': '1%' }).build
+  .trash({ web: 4, string: 1 }).build
 
 const d = StructureDungeonsId
 
@@ -63,8 +42,12 @@ const names: Record<StructureDungeonsId, string> = {
   [d.Avanpost]: 'Аванпост',
 }
 
-const coolLoot: Partial<Record<StructureDungeonsId, LootTable>> = {
-  [d.Avanpost]: new Loot(d.Avanpost + '2').item('GoldenApple').chance('100%').build,
+const customNames: Record<string, string> = {
+  factory: 'Заброшенный завод',
+}
+
+const powerfullLoot: Partial<Record<StructureDungeonsId, LootTable>> = {
+  [d.Avanpost]: new Loot(d.Avanpost + ' powerfull').item('GoldenApple').chance('100%').build,
 }
 
 const loot: Record<StructureDungeonsId, LootTable> = {
@@ -79,17 +62,6 @@ const loot: Record<StructureDungeonsId, LootTable> = {
 
     .item('Apple')
     .chance('50%')
-
-    .item('String')
-    .chance('30%')
-    .amount({
-      '10...20': '10%',
-      '21...30': '20%',
-    })
-
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
 
     .item(Items.Money)
     .chance('100%')
@@ -112,38 +84,63 @@ const loot: Record<StructureDungeonsId, LootTable> = {
       '21...64': '20%',
     })
 
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
+    .trash({ string: 1, web: 8 }).build,
+}
 
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
+const custom = {
+  ...loot,
+  ...Object.map(powerfullLoot, (key, loot) => ['powerfull ' + key, loot]),
+  defaultLoot,
+  factoryCommonChest: new Loot('factory common chest')
+    .itemStack(FireBallItem)
+    .chance('10%')
+    .amount({
+      '10...20': '20%',
+      '21...64': '80%',
+    })
 
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
+    .itemStack(IceBombItem)
+    .chance('10%')
+    .amount({
+      '10...20': '20%',
+      '21...64': '80%',
+    })
 
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
+    .item(Items.Money)
+    .chance('100%')
+    .amount({
+      '10...20': '10%',
+      '21...64': '90%',
+    })
+    .duplicate(3)
+    .trash({ string: 1, web: 3 }).build,
 
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
-
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' })
-
-    .item('Web')
-    .chance('40%')
-    .amount({ '1...2': '1%' }).build,
+  factoryPowerfullChest: new Loot('factory powerfull chest')
+    .item('Diamond')
+    .chance('100%')
+    .amount({
+      '10...20': '10%',
+      '21...64': '90%',
+    })
+    .item('NetheriteIngot')
+    .chance('100%')
+    .amount({
+      '10...20': '10%',
+      '21...64': '1%',
+    })
+    .item('NetheriteSword')
+    .chance('10%')
+    .enchantmetns({
+      'minecraft:sharpness': { '1...3': '1%', '4...5': '10%' },
+    })
+    .trash({ string: 3, web: 10 }).build,
 }
 
 export const Dungeon = {
   loot,
-  coolLoot,
+  powerfullLoot,
   defaultLoot,
   names,
+  customLoot: custom,
+  customNames,
 }

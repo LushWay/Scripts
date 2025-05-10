@@ -59,30 +59,30 @@ class RegionTool extends WorldEditTool<Storage> {
   onUse(player: Player, _: ItemStack, storage: Storage): void {
     if (!storage.regionKind) return
 
-    const createableRegion = createableRegions.find(e => e.region.kind === storage.regionKind)
-    if (!createableRegion)
+    const regionType = createableRegions.find(e => e.region.kind === storage.regionKind)
+    if (!regionType)
       return player.onScreenDisplay.setActionBar(
         `§cUnknown region type: ${storage.regionKind}`,
         ActionbarPriority.Highest,
       )
 
-    const regions = storage.minDistanceSameKind ? createableRegion.region.getAll() : Region.regions
+    const regions = storage.minDistanceSameKind ? regionType.region.getAll() : Region.regions
     if (storage.minDistance !== -1 && regions.some(r => r.area.isNear(player, storage.minDistance)))
       return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.Highest)
 
     const create = () =>
-      createableRegion.region.create(
+      regionType.region.create(
         new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
       )
-    create()
 
+    const region = create()
     const we = WorldEdit.forPlayer(player)
     we.backup(
       `Region create at ${Vector.string(Vector.floor(player.location), true)}`,
       undefined,
       undefined,
       undefined,
-      name => new WeRegionBackup(name, create),
+      name => new WeRegionBackup(name, region, create),
     )
 
     const msg = t`§aРегион создан!`
@@ -94,21 +94,14 @@ class RegionTool extends WorldEditTool<Storage> {
 class WeRegionBackup implements WeBackup {
   constructor(
     public name: string,
+    private region: Region | undefined,
     private createRegion: () => Region,
-    private onUndo: VoidFunction = () => {
-      this.region?.delete()
-    },
-    private onRedo: VoidFunction = () => {
-      this.region = this.createRegion()
-    },
   ) {}
 
-  private region: Region | undefined
-
-  type = (name: string) => new WeRegionBackup(name, this.createRegion, this.onRedo, this.onUndo)
+  type = (name: string) => new WeRegionBackup(name, this.region, this.createRegion)
 
   load() {
-    this.onUndo()
+    this.region ? this.region.delete() : (this.region = this.createRegion())
   }
 
   delete(): void {

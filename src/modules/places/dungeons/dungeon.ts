@@ -1,20 +1,26 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, Loot, LootTable, Vector, isKeyof, ms, registerSaveableRegion } from 'lib'
-import { StructureFile, structureFiles } from 'lib/assets/structures'
+import { Cooldown, isKeyof, Loot, LootTable, ms, registerSaveableRegion, Vector } from 'lib'
+import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
 import { Dungeon } from './loot'
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-type DungeonRegionDatabase = {
+export interface DungeonRegionDatabase extends JsonObject {
   chests: Record<string, number | null>
   structureId: string
 }
 
 interface DungeonRegionOptions extends RegionCreationOptions {
   structureId: string
+}
+
+export interface DungeonChest {
+  id: string
+  restoreTime: number
+  loot: LootTable
+  location: Vector3
 }
 
 export class DungeonRegion extends Region {
@@ -50,23 +56,22 @@ export class DungeonRegion extends Region {
   protected structureFile: StructureFile | undefined
 
   get structureId() {
-    return this.ldb.structureId
+    return this.ldb.structureId as StructureDungeonsId
   }
 
   protected structureSize: Vector3 = Vector.one
 
   protected configureDungeon(): void {
     if (this.structureFile) {
-      const loot = isKeyof(this.structureId, Dungeon.loot) ? Dungeon.loot[this.structureId] : Dungeon.defaultLoot
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const loot = Dungeon.loot[this.structureId] ?? Dungeon.defaultLoot
       for (const f of this.structureFile.chestPositions) {
         this.createChest(f, loot)
       }
 
-      const coolLoot =
-        (isKeyof(this.structureId, Dungeon.coolLoot) ? Dungeon.coolLoot[this.structureId] : Dungeon.defaultLoot) ??
-        Dungeon.defaultLoot
+      const powerfullLoot = Dungeon.powerfullLoot[this.structureId] ?? Dungeon.defaultLoot
       for (const f of this.structureFile.enderChestPositions) {
-        this.createChest(f, coolLoot)
+        this.createChest(f, powerfullLoot)
       }
     }
   }
@@ -100,7 +105,6 @@ export class DungeonRegion extends Region {
 
   protected defaultPermissions: RegionPermissions = {
     pvp: true,
-    pve: true,
     switches: true,
     doors: true,
     trapdoors: false,
@@ -111,29 +115,35 @@ export class DungeonRegion extends Region {
     allowedAllItem: true,
   }
 
-  protected chests: DungeonChest[] = []
+  chests: DungeonChest[] = []
 
-  protected createChest(location: Vector3, loot: LootTable | ((loot: Loot) => LootTable)) {
+  protected createChest(
+    location: Vector3,
+    loot: LootTable | ((loot: Loot) => LootTable),
+    restoreTime = ms.from('min', 20),
+  ) {
     // console.log('Created a chest at', Vector.string(location, true))
     const id = Vector.string(location)
     const chest: DungeonChest = {
       id,
       location,
       loot: loot instanceof LootTable ? loot : loot(new Loot('DungeonChest' + this.id + id)),
-      restoreTime: ms.from('min', 5),
+      restoreTime,
     }
 
     this.chests.push(chest)
-    return {
-      restoreTime(time: number) {
-        chest.restoreTime = time
-        return this
-      },
-    }
+  }
+
+  fromAbsoluteToRelative(vector: Vector3) {
+    return Vector.subtract(vector, this.structurePosition)
+  }
+
+  fromRelativeToAbsolute(vector: Vector3) {
+    return Vector.add(this.structurePosition, vector)
   }
 
   private updateChest(chest: DungeonChest) {
-    const block = this.dimension.getBlock(Vector.add(this.structurePosition, chest.location))
+    const block = this.dimension.getBlock(this.fromRelativeToAbsolute(chest.location))
     if (!block?.isValid) return
 
     this.ldb.chests[chest.id] = Date.now()
@@ -154,20 +164,14 @@ export class DungeonRegion extends Region {
     return { position: this.structurePosition, size: this.structureSize }
   }
 
-  private placeStructure() {
+  protected placeStructure() {
     console.log('placing structure', this.structureId)
     world.structureManager.place(this.structureId, this.dimension, this.structurePosition)
   }
 
   get displayName(): string | undefined {
-    return isKeyof(this.structureId, Dungeon.names) ? Dungeon.names[this.structureId] : 'Данж'
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return Dungeon.names[this.structureId] ?? 'Данж'
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion as typeof Region)
-
-interface DungeonChest {
-  id: string
-  restoreTime: number
-  loot: LootTable
-  location: Vector3
-}

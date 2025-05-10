@@ -2,7 +2,7 @@ import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@mi
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Command } from 'lib/command'
 import { EventSignal } from 'lib/event-signal'
-import { inspect, isKeyof } from 'lib/util'
+import { inspect, isKeyof, pick } from 'lib/util'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
@@ -95,7 +95,7 @@ export class Loot {
     this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {} }
   }
 
-  private modifyCreatingItem() {
+  private getCurrent() {
     if (!this.current) throw new Error('You should create item first! Use .item or .itemStack')
     return this.current
   }
@@ -104,15 +104,15 @@ export class Loot {
     const chance = parseInt(percent)
     if (isNaN(chance)) throw new TypeError(`Chance must be \`{number}%\`, got '${inspect(percent)}' instead!`)
 
-    this.modifyCreatingItem().chance = chance
+    this.getCurrent().chance = chance
 
     return this
   }
 
   meta(meta: ItemStackMetaOptions) {
-    const { itemStack } = this.modifyCreatingItem()
+    const { itemStack } = this.getCurrent()
     if (typeof itemStack === 'function') {
-      this.modifyCreatingItem().itemStack = () => {
+      this.getCurrent().itemStack = () => {
         const item = itemStack()
         applyOptions(item, meta)
         return item
@@ -125,22 +125,41 @@ export class Loot {
   }
 
   enchantmetns(enchantments: Partial<Record<MinecraftEnchantmentTypes, RandomCostMap>>) {
-    this.modifyCreatingItem().enchantments = Object.map(enchantments, (key, value) => [
-      key,
-      Loot.randomCostToArray(value),
-    ])
+    this.getCurrent().enchantments = Object.map(enchantments, (key, value) => [key, Loot.randomCostToArray(value)])
 
     return this
   }
 
   amount(amount: RandomCostMap) {
-    this.modifyCreatingItem().amount = Loot.randomCostToArray(amount)
+    this.getCurrent().amount = Loot.randomCostToArray(amount)
 
     return this
   }
 
   damage(damage: RandomCostMap) {
-    this.modifyCreatingItem().damage = Loot.randomCostToArray(damage)
+    this.getCurrent().damage = Loot.randomCostToArray(damage)
+
+    return this
+  }
+
+  duplicate(count: number) {
+    // We should push it count-1 times because next thing also pushes it
+    for (let i = 0; i < count - 1; i++) this.items.push(this.getCurrent())
+
+    return this
+  }
+
+  trash(types: Partial<Record<'web' | 'string', number>>) {
+    if (typeof types.string === 'number')
+      this.item('String')
+        .chance('30%')
+        .amount({
+          '10...20': '10%',
+          '21...30': '20%',
+        })
+        .duplicate(types.string)
+
+    if (typeof types.web === 'number') this.item('Web').chance('40%').amount({ '1...2': '1%' }).duplicate(types.web)
 
     return this
   }
@@ -262,7 +281,7 @@ export class LootTable {
       const amount = item.amount.randomElement()
       if (amount <= 0) return []
 
-      const stack = typeof item.itemStack === 'function' ? item.itemStack() : item.itemStack
+      const stack = typeof item.itemStack === 'function' ? item.itemStack().clone() : item.itemStack.clone()
       const { maxAmount } = stack
       if (amount > maxAmount) {
         const average = Math.floor(amount / maxAmount)
@@ -304,7 +323,12 @@ export class LootTable {
         },
       ]
     } catch (err) {
-      console.error('Failed to generate loot item for', item, 'error:', err)
+      console.error(
+        'Failed to generate loot item for',
+        pick(item, ['amount', 'chance', 'damage', 'enchantments']),
+        'error:',
+        err,
+      )
       return []
     }
   }

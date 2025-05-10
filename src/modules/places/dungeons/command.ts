@@ -6,6 +6,7 @@ import { ItemLoreSchema } from 'lib/database/item-stack'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { DungeonRegion } from 'modules/places/dungeons/dungeon'
+import { CustomDungeonRegion } from './custom-dungeon'
 import { Dungeon } from './loot'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
@@ -15,7 +16,7 @@ const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
   .display('Тип данжа', t => (isKeyof(t, Dungeon.names) ? Dungeon.names[t] : t))
   .build()
 
-const dungeons = Object.values(StructureDungeonsId)
+const dungeons = [...Object.values(StructureDungeonsId), ...Object.keys(Dungeon.customNames)]
 
 new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   const hand = ctx.player.mainhand()
@@ -26,7 +27,8 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   new ArrayForm('Выбери тип данжа', dungeons)
     .button(structureId => {
       return [
-        isKeyof(structureId, Dungeon.names) ? Dungeon.names[structureId] : structureId,
+        Dungeon.customNames[structureId] ??
+          (isKeyof(structureId, Dungeon.names) ? Dungeon.names[structureId] : structureId),
         () => {
           const hand = ctx.player.mainhand()
           if (toolSchema.is(hand)) {
@@ -47,11 +49,18 @@ function getDungeon(player: Player) {
   const storage = toolSchema.parse(mainhand)
   if (!storage) return
 
-  const region = new DungeonRegion(
-    new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
-    { structureId: storage.type },
-    '',
-  )
+  const region = isKeyof(storage.type, Dungeon.names)
+    ? new DungeonRegion(
+        new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
+        { structureId: storage.type },
+        '',
+      )
+    : new CustomDungeonRegion(
+        new SphereArea({ center: Vector.floor(player.location), radius: 10 }, player.dimension.type),
+        { name: storage.type },
+        '',
+      )
+
   if (!region.configureSize()) {
     player.onScreenDisplay.setActionBar(t.error`Неизвестный данж: ${storage.type}`)
     return
@@ -64,9 +73,12 @@ world.afterEvents.itemUse.subscribe(event => {
   const dungeon = getDungeon(player)
   if (!dungeon) return
 
-  DungeonRegion.create(new SphereArea({ center: dungeon.area.center, radius: 0 }, dungeon.dimensionType), {
-    structureId: dungeon.structureId,
-  })
+  if (dungeon instanceof CustomDungeonRegion) {
+    CustomDungeonRegion.create(dungeon.area, { name: dungeon.ldb.name })
+  } else {
+    DungeonRegion.create(dungeon.area, { structureId: dungeon.structureId })
+  }
+
   player.success(t`Данж создан на ${Vector.string(dungeon.area.center, true)}`)
 })
 
