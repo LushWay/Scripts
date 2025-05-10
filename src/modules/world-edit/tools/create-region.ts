@@ -1,9 +1,10 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { createableRegions, ModalForm, Region } from 'lib'
+import { createableRegions, ModalForm, Region, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
+import { WeBackup, WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
 
 interface Storage {
@@ -69,13 +70,49 @@ class RegionTool extends WorldEditTool<Storage> {
     if (storage.minDistance !== -1 && regions.some(r => r.area.isNear(player, storage.minDistance)))
       return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.Highest)
 
-    createableRegion.region.create(
-      new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
+    const create = () =>
+      createableRegion.region.create(
+        new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
+      )
+    create()
+
+    const we = WorldEdit.forPlayer(player)
+    we.backup(
+      `Region create at ${Vector.string(Vector.floor(player.location), true)}`,
+      undefined,
+      undefined,
+      undefined,
+      name => new WeRegionBackup(name, create),
     )
 
     const msg = t`§aРегион создан!`
     player.success(msg)
     player.onScreenDisplay.setActionBar(msg, ActionbarPriority.Highest)
+  }
+}
+
+class WeRegionBackup implements WeBackup {
+  constructor(
+    public name: string,
+    private createRegion: () => Region,
+    private onUndo: VoidFunction = () => {
+      this.region?.delete()
+    },
+    private onRedo: VoidFunction = () => {
+      this.region = this.createRegion()
+    },
+  ) {}
+
+  private region: Region | undefined
+
+  type = (name: string) => new WeRegionBackup(name, this.createRegion, this.onRedo, this.onUndo)
+
+  load() {
+    this.onUndo()
+  }
+
+  delete(): void {
+    // Nothing
   }
 }
 

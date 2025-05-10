@@ -1,4 +1,12 @@
-import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
+import {
+  BlockMapColorComponent,
+  BlockPermutation,
+  Player,
+  StructureMirrorAxis,
+  StructureRotation,
+  system,
+  world,
+} from '@minecraft/server'
 import { Vector, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
@@ -24,6 +32,15 @@ import { Cuboid } from './cuboid'
 interface WeDB {
   pos1: Vector3
   pos2: Vector3
+}
+
+export interface WeBackup {
+  load(): void
+  delete(): void
+  name: string
+  pos1?: Vector3
+  pos2?: Vector3
+  type?: (name: string) => WeBackup
 }
 
 const logger = createLogger('WorldEdit')
@@ -91,9 +108,9 @@ export class WorldEdit {
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
   }
 
-  history: BigStructure[] = []
+  history: WeBackup[] = []
 
-  undos: BigStructure[] = []
+  undos: WeBackup[] = []
 
   currentCopy: BigStructure | undefined
 
@@ -142,7 +159,13 @@ export class WorldEdit {
    * @param pos2 Position 2 of cuboid location
    * @param history Save location where you want the to store your backup
    */
-  backup(name: string, pos1: Vector3 = this.pos1, pos2: Vector3 = this.pos2, history: BigStructure[] = this.history) {
+  backup(
+    name: string,
+    pos1: Vector3 = this.pos1,
+    pos2: Vector3 = this.pos2,
+    history: WeBackup[] = this.history,
+    type?: WeBackup['type'],
+  ) {
     if (history.length === this.historyLimit) {
       if (!this.hasWarnAboutHistoryLimit) {
         console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
@@ -156,7 +179,9 @@ export class WorldEdit {
       history.splice(0, 1)
     }
 
-    const structrure = new BigStructure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, this.player.dimension, name)
+    const structrure = type
+      ? type(name)
+      : new BigStructure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, this.player.dimension, name)
 
     history.push(structrure)
   }
@@ -185,12 +210,13 @@ export class WorldEdit {
   }
 
   /** Loads backup and removes it from history */
-  loadBackup(history: BigStructure[], backup: BigStructure) {
+  loadBackup(history: WeBackup[], backup: WeBackup) {
     this.backup(
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
       backup.pos1,
       backup.pos2,
       history === this.history ? this.undos : this.history,
+      backup.type,
     )
 
     backup.load()
