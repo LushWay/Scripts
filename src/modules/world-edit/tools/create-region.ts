@@ -42,7 +42,7 @@ class RegionTool extends WorldEditTool<Storage> {
         { defaultValueIndex: storage.regionKind },
       )
       .addSlider('Радиус', 2, 30, 1, storage.radius)
-      .addSlider('Мин. радиус до ближайшего региона', 2, 40, 1, storage.minDistance)
+      .addSlider('Мин. радиус до ближайшего региона', -1, 40, 1, storage.minDistance)
       .addToggle('Мин. радиус работает только с регионами такого же типа', storage.minDistanceSameKind)
       .show(player, (_, regionId, radius, minDistance, minDistanceSameKind) => {
         storage.regionKind = regionId
@@ -66,8 +66,8 @@ class RegionTool extends WorldEditTool<Storage> {
       )
 
     const regions = storage.minDistanceSameKind ? createableRegion.region.getAll() : Region.regions
-    if (regions.some(r => r.area.isNear(player, storage.minDistance)))
-      return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.PvP)
+    if (storage.minDistance !== -1 && regions.some(r => r.area.isNear(player, storage.minDistance)))
+      return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.Highest)
 
     createableRegion.region.create(
       new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
