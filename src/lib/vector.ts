@@ -17,6 +17,14 @@ export class Vector {
   static string = (a: Vector3, colorize?: boolean) =>
     !colorize ? `${a.x} ${a.y} ${a.z}` : `§c${a.x} §a${a.y} §b${a.z}`
 
+  static parse = (string: string) => {
+    const match = /(?:§c)?(-?\d+) (?:§a)?(-?\d+) (?:§b)?(-?\d+)/.exec(string)
+    if (!match) return
+
+    const [x, y, z] = match.slice(1).map(parseFloat)
+    return new Vector(x, y, z)
+  }
+
   /**
    * Returns whenether vector is valid or not
    *
@@ -86,7 +94,7 @@ export class Vector {
 
   /** Floors each vector axis using Math.floor */
   static floor(x: Vector3) {
-    return { x: Math.floor(x.x), y: Math.floor(x.y), z: Math.floor(x.z) }
+    return new Vector(Math.floor(x.x), Math.floor(x.y), Math.floor(x.z))
   }
 
   /** Checks if vector c is between a and b */
@@ -295,28 +303,39 @@ export class Vector {
 
   /**
    * @remarks
+   *   X component of this vector.
+   */
+  public x: number
+  /**
+   * @remarks
+   *   Y component of this vector.
+   */
+  public y: number
+  /**
+   * @remarks
+   *   Z component of this vector.
+   */
+  public z: number
+
+  /**
+   * @remarks
    *   Creates a new instance of an abstract vector.
    * @param x X component of the vector.
    * @param y Y component of the vector.
    * @param z Z component of the vector.
    */
-  constructor(
-    /**
-     * @remarks
-     *   X component of this vector.
-     */
-    public x: number,
-    /**
-     * @remarks
-     *   Y component of this vector.
-     */
-    public y: number,
-    /**
-     * @remarks
-     *   Z component of this vector.
-     */
-    public z: number,
-  ) {}
+  constructor(x: number | Vector3, y?: number, z?: number) {
+    if (typeof x === 'object') {
+      this.x = x.x
+      this.y = x.y
+      this.z = x.z
+    } else {
+      if (typeof y !== 'number' || typeof z !== 'number') throw new TypeError(`Expected 3 numbrs, got ${y} ${z}`)
+      this.x = x
+      this.y = y
+      this.z = z
+    }
+  }
 
   /**
    * @remarks
@@ -359,5 +378,21 @@ export class Vector {
 
     const DirectionZ = this.z / magnitude
     return new Vector(DirectionX, DirectionY, DirectionZ)
+  }
+
+  add(a: Vector3) {
+    return Vector.add(this, a)
+  }
+
+  substract(a: Vector3) {
+    return Vector.subtract(this, a)
+  }
+
+  multiply(a: Vector3 | number) {
+    return Vector.multiply(this, a)
+  }
+
+  floor() {
+    return Vector.floor(this)
   }
 }

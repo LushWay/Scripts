@@ -212,7 +212,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
   region.customFormButtons(form, player)
 
   form.addButton('Переместиться в регион', () => player.teleport(region.area.center))
-  form.addButtonAsk('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
+  form.addButtonAsk('§cУдалить регион', '§cУдалить', () => (region.delete(), back()), '§aНе удалять').show(player)
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {

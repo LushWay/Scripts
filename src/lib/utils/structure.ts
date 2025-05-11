@@ -1,0 +1,60 @@
+import { StructureRotation } from '@minecraft/server'
+import { Vector } from 'lib/vector'
+
+export function structureLikeRotate({
+  rotation,
+  position,
+  size,
+  vectors,
+}: {
+  rotation: StructureRotation
+  position: Vector3
+  size: Vector3
+  vectors: Vector3[]
+}) {
+  if (rotation === StructureRotation.None) return vectors
+  return vectors.map(vector => {
+    const relative = Vector.subtract(vector, position)
+    const rotatedRelative = structureLikeRotateRelative(rotation, relative, size)
+    return Vector.add(rotatedRelative, position) as Vector3
+  })
+}
+
+export function structureLikeRotateRelative(rotation: StructureRotation, relative: Vector3, size: Vector3): Vector3 {
+  switch (rotation) {
+    case StructureRotation.None:
+      return relative
+
+    case StructureRotation.Rotate90:
+      return {
+        x: size.z - relative.z,
+        y: relative.y,
+        z: relative.x,
+      }
+
+    case StructureRotation.Rotate180:
+      return {
+        x: size.x - relative.x,
+        y: relative.y,
+        z: size.z - relative.z,
+      }
+
+    case StructureRotation.Rotate270:
+      return {
+        x: relative.z,
+        y: relative.y,
+        z: size.x - relative.x,
+      }
+
+    default:
+      return { ...relative }
+  }
+}
+
+export function toAbsolute(vector: Vector3, center: Vector3) {
+  return Vector.add(vector, center)
+}
+
+export function toRelative(vector: Vector3, center: Vector3) {
+  return Vector.subtract(vector, center)
+}

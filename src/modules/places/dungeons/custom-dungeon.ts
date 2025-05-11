@@ -1,6 +1,6 @@
-import { Block, Player, world } from '@minecraft/server'
+import { Block, Player, StructureRotation, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { is, ModalForm, ms, Region, RegionCreationOptions, registerSaveableRegion, Vector } from 'lib'
+import { is, ModalForm, ms, RegionCreationOptions, registerCreateableRegion, registerSaveableRegion, Vector } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { t } from 'lib/text'
@@ -22,7 +22,7 @@ interface CustomDungeonOptions extends RegionCreationOptions {
 
 export class CustomDungeonRegion extends DungeonRegion {
   constructor(area: Area, options: CustomDungeonOptions, key: string) {
-    super(area, { ...options, structureId: '' }, key)
+    super(area, { ...options, structureId: '', rotation: StructureRotation.None }, key)
     this.ldb.name = options.name
   }
 
@@ -31,6 +31,9 @@ export class CustomDungeonRegion extends DungeonRegion {
     chests: {},
     structureId: '',
     name: '',
+    rotation: StructureRotation.None,
+    terrainStructureId: '',
+    terrainStructurePosition: { x: 0, z: 0, y: 0 },
   }
 
   protected override configureDungeon(): void {
@@ -44,7 +47,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   protected override structureFile: StructureFile = {
     chestPositions: [],
     enderChestPositions: [],
-    size: this.area.size,
+    size: { x: 10, y: 10, z: 10 },
   }
 
   protected override placeStructure(): void {
@@ -72,7 +75,8 @@ export class CustomDungeonRegion extends DungeonRegion {
     this.save()
   }
 }
-registerSaveableRegion('customDungeon', CustomDungeonRegion as typeof Region)
+registerSaveableRegion('customDungeon', CustomDungeonRegion)
+registerCreateableRegion('Кастомный данж', CustomDungeonRegion)
 
 function eventHelper(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false
@@ -101,7 +105,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
       ),
     )
     .addSlider('Время восстановления (в минутах)', 1, 180, 1, 20)
-    .show(player, (ctx, loot, restoreTime) => {
+    .show(player, (_, loot, restoreTime) => {
       const relative = region.fromAbsoluteToRelative(block)
       region.addCustomChest(relative, loot as keyof (typeof Dungeon)['customLoot'], restoreTime)
       player.success(t`Created a chest with loot ${loot} and restore time ${restoreTime}min`)

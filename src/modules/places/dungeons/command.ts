@@ -1,8 +1,9 @@
-import { MolangVariableMap, Player, system, world } from '@minecraft/server'
+import { MolangVariableMap, Player, StructureRotation, system, world } from '@minecraft/server'
 import { ArrayForm, isKeyof, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { DungeonRegion } from 'modules/places/dungeons/dungeon'
@@ -10,11 +11,19 @@ import { CustomDungeonRegion } from './custom-dungeon'
 import { Dungeon } from './loot'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
-  .nameTag(() => '§fСоздает данж')
-  .lore('§7Используй, чтобы создать данж')
   .property('type', String)
   .display('Тип данжа', t => (isKeyof(t, Dungeon.names) ? Dungeon.names[t] : t))
+  .nameTag((_, s) => t`§7Создает данж ${getDungeonName(s.type)}`)
+  .lore('§7Используй, чтобы создать данж')
   .build()
+
+function getDungeonName(type: string) {
+  return isKeyof(type, Dungeon.names)
+    ? Dungeon.names[type]
+    : isKeyof(type, Dungeon.customNames)
+      ? Dungeon.customNames[type]
+      : type
+}
 
 const dungeons = [...Object.values(StructureDungeonsId), ...Object.keys(Dungeon.customNames)]
 
@@ -44,7 +53,15 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
     .show(ctx.player)
 })
 
-function getDungeon(player: Player) {
+function getStructureRotation(player: Player) {
+  const p = player.getRotation().y
+  if (p > 45 && p <= 135) return StructureRotation.Rotate90
+  if ((p > 135 && p <= 180) || (p < -135 && p >= -180)) return StructureRotation.Rotate180
+  if (p > -135 && p <= -90) return StructureRotation.Rotate270
+  return StructureRotation.None
+}
+
+function getDungeon(player: Player, rotation: StructureRotation) {
   const mainhand = player.mainhand()
   const storage = toolSchema.parse(mainhand)
   if (!storage) return
@@ -52,7 +69,7 @@ function getDungeon(player: Player) {
   const region = isKeyof(storage.type, Dungeon.names)
     ? new DungeonRegion(
         new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
-        { structureId: storage.type },
+        { structureId: storage.type, rotation },
         '',
       )
     : new CustomDungeonRegion(
@@ -70,13 +87,14 @@ function getDungeon(player: Player) {
 
 world.afterEvents.itemUse.subscribe(event => {
   const player = event.source
-  const dungeon = getDungeon(player)
+  const rotation = getStructureRotation(player)
+  const dungeon = getDungeon(player, rotation)
   if (!dungeon) return
 
   if (dungeon instanceof CustomDungeonRegion) {
     CustomDungeonRegion.create(dungeon.area, { name: dungeon.ldb.name })
   } else {
-    DungeonRegion.create(dungeon.area, { structureId: dungeon.structureId })
+    DungeonRegion.create(dungeon.area, { structureId: dungeon.structureId, rotation })
   }
 
   player.success(t`Данж создан на ${Vector.string(dungeon.area.center, true)}`)
@@ -84,16 +102,21 @@ world.afterEvents.itemUse.subscribe(event => {
 
 system.runPlayerInterval(
   player => {
-    const dungeon = getDungeon(player)
+    const rotation = getStructureRotation(player)
+    const dungeon = getDungeon(player, rotation)
     if (!dungeon) return
-    const { position, size } = dungeon.getVisualStructure()
 
-    const max = Vector.add(position, size)
-    for (const l of Vector.foreach(position, max)) {
-      if (!Vector.isedge(position, max, l)) continue
+    const { from, to } = dungeon.structureBounds()
+    for (const l of Vector.foreach(from, to)) {
+      if (!Vector.isedge(from, to, l)) continue
 
       player.spawnParticle('minecraft:balloon_gas_particle', l, particle)
     }
+
+    player.onScreenDisplay.setActionBar(
+      t`rotation: ${rotation} size: ${Vector.subtract(from, to)} ${from} ${to}`,
+      ActionbarPriority.Highest,
+    )
   },
   'dungeon place',
   30,

@@ -44,6 +44,7 @@ const names: Record<StructureDungeonsId, string> = {
 
 const customNames: Record<string, string> = {
   factory: 'Заброшенный завод',
+  avanpostTent: 'Палатка аванпоста',
 }
 
 const powerfullLoot: Partial<Record<StructureDungeonsId, LootTable>> = {
@@ -87,7 +88,7 @@ const loot: Record<StructureDungeonsId, LootTable> = {
     .trash({ string: 1, web: 8 }).build,
 }
 
-const custom = {
+const customLoot = {
   ...loot,
   ...Object.map(powerfullLoot, (key, loot) => ['powerfull ' + key, loot]),
   defaultLoot,
@@ -141,6 +142,6 @@ export const Dungeon = {
   powerfullLoot,
   defaultLoot,
   names,
-  customLoot: custom,
+  customLoot,
   customNames,
 }

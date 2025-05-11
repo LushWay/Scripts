@@ -33,7 +33,6 @@ export class BigStructure extends Cuboid {
   save() {
     this.structures = []
     const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
-    const options = { errors: 0, total: 0 }
 
     for (const [i, cube] of cubes.entries()) {
       const id = `mystructure:${this.prefix}|${i}`
@@ -52,11 +51,6 @@ export class BigStructure extends Cuboid {
 
       this.structures.push({ id, min, max })
     }
-
-    if (options.errors > 0)
-      throw new Error(
-        `§c${options.errors}§f/${options.total}§c не сохранено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
-      )
   }
 
   delete() {

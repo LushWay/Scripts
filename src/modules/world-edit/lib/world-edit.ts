@@ -267,10 +267,10 @@ export class WorldEdit {
   }
 
   /** Parses paste positions, used by this.paste and by draw paste selection */
-  pastePositions(rotation: StructureRotation, currentCopy: NonNullable<WorldEdit['currentCopy']>) {
-    let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
-    const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
-    let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
+  pastePositions(rotation: StructureRotation, structure: BigStructure) {
+    const dy = Math.abs(structure.pos2.y - structure.pos1.y)
+    let dx = Math.abs(structure.pos2.x - structure.pos1.x)
+    let dz = Math.abs(structure.pos2.z - structure.pos1.z)
     if (rotation === StructureRotation.Rotate270 || rotation === StructureRotation.Rotate90) [dx, dz] = [dz, dx]
 
     const pastePos1 = Vector.floor(this.player.location)

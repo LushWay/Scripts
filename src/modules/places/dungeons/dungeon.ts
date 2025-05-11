@@ -1,19 +1,24 @@
-import { system, world } from '@minecraft/server'
+import { StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, isKeyof, Loot, LootTable, ms, registerSaveableRegion, Vector } from 'lib'
+import { Cooldown, isKeyof, Loot, LootTable, ms, registerCreateableRegion, registerSaveableRegion, Vector } from 'lib'
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
+import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Dungeon } from './loot'
 
 export interface DungeonRegionDatabase extends JsonObject {
   chests: Record<string, number | null>
   structureId: string
+  rotation: StructureRotation
+  terrainStructureId: string
+  terrainStructurePosition: { x: number; z: number; y: number }
 }
 
 interface DungeonRegionOptions extends RegionCreationOptions {
   structureId: string
+  rotation: StructureRotation
 }
 
 export interface DungeonChest {
@@ -36,6 +41,21 @@ export class DungeonRegion extends Region {
               dungeon.updateChest(chest)
             }
           }
+
+          for (const chest of Object.keys(dungeon.ldb.chests)) {
+            const vector = Vector.parse(chest)
+            if (!vector) continue
+
+            if (dungeon.chests.find(e => Vector.equals(e.location, vector))) continue
+
+            // Old chest
+            console.log('Found old chest', Vector.string(dungeon.fromRelativeToAbsolute(vector), true))
+            try {
+              dungeon.dimension.setBlockType(dungeon.fromRelativeToAbsolute(vector), MinecraftBlockTypes.Air)
+              Reflect.deleteProperty(dungeon.ldb.chests, chest)
+              dungeon.save()
+            } catch (e) {}
+          }
         }
       },
       'dungeonRegionChestLoad',
@@ -46,11 +66,15 @@ export class DungeonRegion extends Region {
   constructor(area: Area, options: DungeonRegionOptions, key: string) {
     super(area, options, key)
     this.ldb.structureId = options.structureId
+    this.ldb.rotation = options.rotation
   }
 
   ldb: DungeonRegionDatabase = {
     chests: {},
     structureId: '',
+    terrainStructureId: '',
+    terrainStructurePosition: { x: 0, z: 0, y: 0 },
+    rotation: StructureRotation.None,
   }
 
   protected structureFile: StructureFile | undefined
@@ -59,21 +83,30 @@ export class DungeonRegion extends Region {
     return this.ldb.structureId as StructureDungeonsId
   }
 
-  protected structureSize: Vector3 = Vector.one
-
   protected configureDungeon(): void {
-    if (this.structureFile) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      const loot = Dungeon.loot[this.structureId] ?? Dungeon.defaultLoot
-      for (const f of this.structureFile.chestPositions) {
-        this.createChest(f, loot)
-      }
-
-      const powerfullLoot = Dungeon.powerfullLoot[this.structureId] ?? Dungeon.defaultLoot
-      for (const f of this.structureFile.enderChestPositions) {
-        this.createChest(f, powerfullLoot)
-      }
+    if (!this.structureFile) return
+    const { chestPositions, enderChestPositions } = this.structureFile
+    const toRotated = (f: Vector3[]) => {
+      return this.rotate(f.map(e => this.fromRelativeToAbsolute(e))).map(e => this.fromAbsoluteToRelative(e))
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const loot = Dungeon.loot[this.structureId] ?? Dungeon.defaultLoot
+    for (const f of toRotated(chestPositions)) this.createChest(f, loot)
+
+    const powerfullLoot = Dungeon.powerfullLoot[this.structureId] ?? Dungeon.defaultLoot
+    for (const f of toRotated(enderChestPositions)) this.createChest(f, powerfullLoot)
+  }
+
+  private rotate(vectors: Vector3[]) {
+    const { structureFile } = this
+    if (!structureFile) return vectors
+    return structureLikeRotate({
+      rotation: this.ldb.rotation,
+      position: this.structurePosition,
+      size: structureFile.size,
+      vectors: vectors,
+    })
   }
 
   protected override onCreate() {
@@ -91,7 +124,6 @@ export class DungeonRegion extends Region {
     // console.log('Configuring size of', this.structureId, this.linkedDatabase)
     if (isKeyof(this.structureId, structureFiles)) {
       this.structureFile = structureFiles[this.structureId]
-      this.structureSize = this.structureFile.size
       // console.log('Created dungeon with size', Vector.string(this.structureSize))
     } else return false
 
@@ -101,6 +133,62 @@ export class DungeonRegion extends Region {
     }
 
     return true
+  }
+
+  structureBounds() {
+    if (!this.structureFile) return { from: this.area.center, to: this.area.center, fromAbsolute: this.area.center }
+    const fromAbsolute = this.structurePosition
+    const toAbsolute = Vector.add(fromAbsolute, this.structureFile.size)
+
+    const [from, to] = this.rotate([fromAbsolute, toAbsolute])
+
+    return { from: Vector.min(from, to), to: Vector.max(from, to), fromAbsolute }
+  }
+
+  protected get structurePosition() {
+    if (!this.structureFile) throw new TypeError('No structure file!')
+
+    return new Vector(
+      structureLikeRotateRelative(
+        this.ldb.rotation,
+        Vector.multiply(this.structureFile.size, 0.5),
+        this.structureFile.size,
+      ),
+    )
+      .multiply(-1)
+      .floor()
+      .add(this.area.center)
+  }
+
+  protected placeStructure() {
+    if (!this.structureFile) return
+    const position = this.structurePosition
+
+    if (!this.ldb.terrainStructureId) {
+      const id = `dungeon:terrain_backup_${new Date().toISOString().replaceAll(':', '|')}`
+      const toRaw = Vector.add(position, this.structureFile.size)
+      const from = Vector.add(Vector.min(position, toRaw), { x: -1, z: -1, y: -1 })
+      const to = Vector.add(Vector.max(position, toRaw), { x: 1, z: 1, y: 1 })
+      world.structureManager.createFromWorld(id, this.dimension, from, to, {
+        saveMode: StructureSaveMode.World,
+        includeBlocks: true,
+        includeEntities: false,
+      })
+      this.ldb.terrainStructureId = id
+      this.ldb.terrainStructurePosition = from
+      console.log('Saved backup for', this.structureId, 'with id', id)
+    }
+
+    console.log('Placing structure', position, this.structureId)
+    world.structureManager.place(this.structureId, this.dimension, position, { rotation: this.ldb.rotation })
+  }
+
+  fromAbsoluteToRelative(vector: Vector3) {
+    return toRelative(vector, this.structureBounds().from)
+  }
+
+  fromRelativeToAbsolute(vector: Vector3) {
+    return toAbsolute(vector, this.structureBounds().from)
   }
 
   protected defaultPermissions: RegionPermissions = {
@@ -122,7 +210,12 @@ export class DungeonRegion extends Region {
     loot: LootTable | ((loot: Loot) => LootTable),
     restoreTime = ms.from('min', 20),
   ) {
-    // console.log('Created a chest at', Vector.string(location, true))
+    // console.log(
+    //   'Created a chest at',
+    //   Vector.string(location, true),
+    //   Vector.string(this.fromRelativeToAbsolute(location)),
+    //   true,
+    // )
     const id = Vector.string(location)
     const chest: DungeonChest = {
       id,
@@ -132,14 +225,6 @@ export class DungeonRegion extends Region {
     }
 
     this.chests.push(chest)
-  }
-
-  fromAbsoluteToRelative(vector: Vector3) {
-    return Vector.subtract(vector, this.structurePosition)
-  }
-
-  fromRelativeToAbsolute(vector: Vector3) {
-    return Vector.add(this.structurePosition, vector)
   }
 
   private updateChest(chest: DungeonChest) {
@@ -156,17 +241,22 @@ export class DungeonRegion extends Region {
     chest.loot.fillContainer(container)
   }
 
-  protected get structurePosition() {
-    return Vector.add(this.area.center, Vector.multiply(this.structureSize, -0.5))
-  }
+  delete(): void {
+    const { terrainStructureId: id, terrainStructurePosition: position } = this.ldb
+    const { dimension } = this
+    super.delete()
 
-  getVisualStructure() {
-    return { position: this.structurePosition, size: this.structureSize }
-  }
-
-  protected placeStructure() {
-    console.log('placing structure', this.structureId)
-    world.structureManager.place(this.structureId, this.dimension, this.structurePosition)
+    system.delay(() => {
+      try {
+        if (id) {
+          console.log('Placing structure', id, 'at', position)
+          world.structureManager.place(id, dimension, position)
+          world.structureManager.delete(id)
+        }
+      } catch (e) {
+        console.warn('Unable to place structure with id', id, e)
+      }
+    })
   }
 
   get displayName(): string | undefined {
@@ -174,4 +264,5 @@ export class DungeonRegion extends Region {
     return Dungeon.names[this.structureId] ?? 'Данж'
   }
 }
-registerSaveableRegion('dungeon', DungeonRegion as typeof Region)
+registerSaveableRegion('dungeon', DungeonRegion)
+registerCreateableRegion('Данж', DungeonRegion)

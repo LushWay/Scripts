@@ -5,4 +5,14 @@ describe('vector extra functions', () => {
     expect(Vector.around(Vector.zero, 5)).toEqual([new Vector(5, 5, 5), new Vector(-5, -5, -5)])
     expect(Vector.around({ x: 10, y: 0, z: -5 }, 5)).toEqual([new Vector(15, 5, 0), new Vector(5, -5, -10)])
   })
+
+  it('should parse', () => {
+    expect(Vector.parse('-2431 231 543')).toMatchInlineSnapshot(`
+      Vector {
+        "x": -2431,
+        "y": 231,
+        "z": 543,
+      }
+    `)
+  })
 })
