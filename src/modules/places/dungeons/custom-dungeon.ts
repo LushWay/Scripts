@@ -38,7 +38,6 @@ export class CustomDungeonRegion extends DungeonRegion {
 
   protected override configureDungeon(): void {
     for (const chest of this.ldb.chestLoot) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       const loot = Dungeon.customLoot[chest.loot] ?? Dungeon.defaultLoot
       this.createChest(chest.location, loot, chest.restoreTime)
     }
@@ -68,7 +67,6 @@ export class CustomDungeonRegion extends DungeonRegion {
 
   addCustomChest(location: Vector3, loot: keyof (typeof Dungeon)['customLoot'], restoreTimeMin: number) {
     const restoreTime = ms.from('min', restoreTimeMin)
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const lootTable = Dungeon.customLoot[loot] ?? Dungeon.defaultLoot
     this.ldb.chestLoot.push({ location, loot, restoreTime })
     this.createChest(location, lootTable, restoreTime)
@@ -100,7 +98,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
       'Лут',
       Object.fromEntries(
         Object.entriesStringKeys(Dungeon.customLoot)
-          .map(([key, value]) => [key, (value.id ?? key).replace('mystructure:dungeons/', '')])
+          .map(([key, value]) => [key, (value?.id ?? key).replace('mystructure:dungeons/', '')])
           .filter(e => (keys.includes(e[1]) ? false : (keys.push(e[1]), true))),
       ),
     )

@@ -80,7 +80,7 @@ export class DungeonRegion extends Region {
   protected structureFile: StructureFile | undefined
 
   get structureId() {
-    return this.ldb.structureId as StructureDungeonsId
+    return this.ldb.structureId
   }
 
   protected configureDungeon(): void {
@@ -90,7 +90,6 @@ export class DungeonRegion extends Region {
       return this.rotate(f.map(e => this.fromRelativeToAbsolute(e))).map(e => this.fromAbsoluteToRelative(e))
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const loot = Dungeon.loot[this.structureId] ?? Dungeon.defaultLoot
     for (const f of toRotated(chestPositions)) this.createChest(f, loot)
 
@@ -260,7 +259,6 @@ export class DungeonRegion extends Region {
   }
 
   get displayName(): string | undefined {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return Dungeon.names[this.structureId] ?? 'Данж'
   }
 }

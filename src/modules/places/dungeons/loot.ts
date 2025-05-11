@@ -33,25 +33,25 @@ const defaultLoot = new Loot('dungeon_default_loot')
 
 const d = StructureDungeonsId
 
-const names: Record<StructureDungeonsId, string> = {
+const names: Record<string, string> = {
   [d.GasStation1]: 'Заправка 1',
   [d.GasStation2]: 'Заправка 2',
   [d.GasStation3]: 'Заправка 3',
   [d.GasStation4]: 'Заправка 4',
   [d.GasStationGarage]: 'Гараж',
   [d.Avanpost]: 'Аванпост',
-}
+} satisfies Record<StructureDungeonsId, string>
 
 const customNames: Record<string, string> = {
   factory: 'Заброшенный завод',
   avanpostTent: 'Палатка аванпоста',
 }
 
-const powerfullLoot: Partial<Record<StructureDungeonsId, LootTable>> = {
+const powerfullLoot: Record<string, LootTable | undefined> = {
   [d.Avanpost]: new Loot(d.Avanpost + ' powerfull').item('GoldenApple').chance('100%').build,
-}
+} satisfies Partial<Record<StructureDungeonsId, LootTable>>
 
-const loot: Record<StructureDungeonsId, LootTable> = {
+const loot: Record<string, LootTable | undefined> = {
   [d.GasStation1]: defaultLoot,
   [d.GasStation2]: defaultLoot,
   [d.GasStation3]: defaultLoot,
@@ -86,9 +86,9 @@ const loot: Record<StructureDungeonsId, LootTable> = {
     })
 
     .trash({ string: 1, web: 8 }).build,
-}
+} satisfies Record<StructureDungeonsId, LootTable>
 
-const customLoot = {
+const customLoot: Record<string, LootTable | undefined> = {
   ...loot,
   ...Object.map(powerfullLoot, (key, loot) => ['powerfull ' + key, loot]),
   defaultLoot,
