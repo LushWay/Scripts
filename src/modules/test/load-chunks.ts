@@ -59,7 +59,7 @@ new Command('chunkload')
 
       const now = Date.now()
       const took = now - start
-      const speed = took / (i + 1)
+      const speed = took / (chunks.length - i)
       const eta = speed * chunks.length
       player.onScreenDisplay.setActionBar(
         t`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vector(x, y, z)}\nСкорость: ${speed < 1000 ? t`${~~speed}ms` : t.time`${speed}`}/chunk, осталось: ${t.time`${eta}`} прошло: ${t.time`${took}`}`,
