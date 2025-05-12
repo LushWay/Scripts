@@ -10,7 +10,8 @@ new Command('chunkload')
   .location('from')
   .location('to')
   .int('tickDelay', true)
-  .executes(async (ctx, from, to, tickDelay = 5) => {
+  .int('saveTickDelay', true)
+  .executes(async (ctx, from, to, tickDelay = 5, saveTickDelay = 40) => {
     const player = ctx.player
     from.y = to.y = 62
     player.success(t`Loading chunks from ${new Vector(from)} to ${new Vector(to)}`)
@@ -51,9 +52,12 @@ new Command('chunkload')
         try {
           if (tryI !== 0) await system.waitTicks(tickDelay)
           tryI++
-          block = player.dimension.getBlock({ x, y: -63, z })
+          block = player.dimension.getBlock({ x, y: -62, z })
           // Update the chunk to force save it
-          if (block) block.setType(MinecraftBlockTypes.Bedrock)
+          if (block) {
+            if (block.typeId === MinecraftBlockTypes.Bedrock) block.setType(MinecraftBlockTypes.Air)
+            else block.setType(MinecraftBlockTypes.Bedrock)
+          }
         } catch (e) {}
       }
 
@@ -61,6 +65,10 @@ new Command('chunkload')
       const took = now - start
       const speed = took / (chunks.length - i)
       const eta = speed * chunks.length
+
+      // Wait while chunk saves
+      await system.waitTicks(saveTickDelay)
+
       player.onScreenDisplay.setActionBar(
         t`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vector(x, y, z)}\nСкорость: ${speed < 1000 ? t`${~~speed}ms` : t.time`${speed}`}/chunk, осталось: ${t.time`${eta}`} прошло: ${t.time`${took}`}`,
         ActionbarPriority.Highest,
