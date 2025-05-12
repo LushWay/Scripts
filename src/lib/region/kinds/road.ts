@@ -9,10 +9,10 @@ export class RoadRegion extends Region {
     owners: [],
 
     doors: true,
-    gates: true,
+    gates: false,
     switches: true,
-    trapdoors: true,
-    openContainers: true,
+    trapdoors: false,
+    openContainers: false,
 
     allowedAllItem: true,
     allowedEntities: 'all',
