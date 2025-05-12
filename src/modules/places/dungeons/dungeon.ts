@@ -1,7 +1,17 @@
 import { StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Cooldown, isKeyof, Loot, LootTable, ms, registerCreateableRegion, registerSaveableRegion, Vector } from 'lib'
-import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
+import {
+  Cooldown,
+  isKeyof,
+  Loot,
+  LootTable,
+  ms,
+  registerCreateableRegion,
+  registerSaveableRegion,
+  removeNamespace,
+  Vector,
+} from 'lib'
+import { StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'

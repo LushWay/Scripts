@@ -43,6 +43,8 @@ import { requestAirdrop } from 'modules/places/anarchy/airdrop'
 import { skipForBlending } from 'modules/world-edit/utils/blending'
 import loot from '../quests/learning/airdrop'
 import './enchant'
+import './load-chunks'
+import './minimap'
 import './properties'
 // import './simulatedPlayer'
 

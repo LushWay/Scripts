@@ -36,13 +36,13 @@ class AnarchyBuilder extends AreaWithInventory {
     this.centerLocation.onLoad.subscribe(centerLocation => {
       if (!centerLocation.firstLoad) return console.warn('Anarchy center changed, reload to update zone/radius command')
 
-      this.zone = new RadioactiveZone(centerLocation, players => players.length * 500 + 3000)
+      this.zone = new RadioactiveZone(centerLocation, 4000)
 
       new Command('radius')
         .setDescription('Выдает радиус границы анархии сейчас')
         .setGroup('public')
         .setPermissions('member')
-        .executes(ctx => ctx.player.info(t`Радиус границы анархии сейчас: ${this.zone?.lastRadius}`))
+        .executes(ctx => ctx.player.info(t`Радиус границы анархии сейчас: ${this.zone?.radius}`))
     })
 
     this.portalLocation.onLoad.subscribe(portalLocation => this.createPortal(portalLocation))

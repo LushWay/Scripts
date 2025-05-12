@@ -1,4 +1,4 @@
-import { EntityDamageCause, GameMode, Player, system, TicksPerSecond, world } from '@minecraft/server'
+import { EntityDamageCause, GameMode, system, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
@@ -8,18 +8,15 @@ import { Vector } from 'lib/vector'
 import { Spawn } from '../spawn'
 
 export class RadioactiveZone {
-  lastRadius = 0
-
   constructor(
     readonly center: Vector3,
-    readonly radius: (players: Player[]) => number,
+    readonly radius: number,
   ) {
     let i = 0
     system.runInterval(
       () => {
         const players = world.getAllPlayers()
-        this.lastRadius = typeof this.radius === 'function' ? this.radius(players) : this.radius
-        const rad = this.lastRadius
+        const rad = this.radius
         const center = this.center
         i++
         if (i >= 3) i = 0
