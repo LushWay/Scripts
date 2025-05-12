@@ -48,6 +48,16 @@ describe('text', () => {
     expect(t`Используй ${new Command('name')}`).toMatchInlineSnapshot(`"§7Используй §f.name§7"`)
   })
 
+  it('should stringify chained command', () => {
+    const nameCommand = new Command('name')
+    nameCommand.overload('overload')
+    expect(t`Используй ${nameCommand}`).toMatchInlineSnapshot(`"§7Используй §f.name§7"`)
+  })
+
+  it('should stringify chained command overload', () => {
+    expect(t`Используй ${new Command('name').overload('overload')}`).toMatchInlineSnapshot(`"§7Используй §f.name overload§7"`)
+  })
+
   it('should stringify object', () => {
     expect(t`Объекты то тоже сюда кидают: ${{ value: true }}`).toMatchInlineSnapshot(`
       "§7Объекты то тоже сюда кидают: {

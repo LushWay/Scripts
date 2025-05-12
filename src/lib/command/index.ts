@@ -91,7 +91,13 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   }
 
   [stringifySymbol]() {
-    return '§f' + Command.prefixes[0] + this.sys.name
+    return '§f' + Command.prefixes[0] + this.getFullName()
+  }
+
+  private getFullName(name = ''): string {
+    const add = (v: string) => (name ? v + ' ' + name : v)
+    if (!this.sys.parent) return add(this.sys.name)
+    return this.sys.parent.getFullName(add(this.sys.name))
   }
 
   private static checkIsUnique(name: string) {
@@ -397,7 +403,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     const base = command.sys.callback ? [`${type}${description ? `§7§o - ${description}` : ''}`] : []
     return base.concat(
       command.sys.children
-        .map(e => this.getHelp(e, command.sys.description))
+        .map(e => this.getHelp(e, e.sys.description || command.sys.description))
         .flat()
         .map(e => type + ' ' + e),
     )
