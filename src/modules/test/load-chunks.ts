@@ -66,6 +66,8 @@ new Command('chunkload')
       const speed = took / (i + 1)
       const eta = speed * (chunks.length - i)
 
+      await system.waitTicks(saveTickDelay)
+
       player.onScreenDisplay.setActionBar(
         t`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vector(x, y, z)}\nСкорость: ${speed < 1000 ? t`${~~speed}ms` : t.time`${speed}`}/chunk, осталось: ${t.time`${eta}`} прошло: ${t.time`${took}`}`,
         ActionbarPriority.Highest,
