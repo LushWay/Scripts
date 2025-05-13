@@ -1,3 +1,4 @@
+import { Player, system } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { RegionEvents } from '../events'
 import { registerCreateableRegion, registerSaveableRegion } from '../index'
@@ -29,7 +30,23 @@ registerSaveableRegion('road', RoadRegion)
 registerCreateableRegion('Дороги', RoadRegion)
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest }) => {
-  if (newest.some(e => e instanceof RoadRegion)) {
+  speed(player, newest)
+})
+
+system.runPlayerInterval(
+  player => {
+    const regions = RegionEvents.playerInRegionsCache.get(player)
+
+    if (!regions) return
+
+    speed(player, regions)
+  },
+  'road skin region',
+  40,
+)
+
+function speed(player: Player, regions: Region[]) {
+  if (regions.some(e => e instanceof RoadRegion)) {
     player.addEffect(MinecraftEffectTypes.Speed, 40, { showParticles: false, amplifier: 2 })
   }
-})
+}
