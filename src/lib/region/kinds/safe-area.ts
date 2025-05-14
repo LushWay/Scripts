@@ -64,15 +64,17 @@ function adventureModeRegion(region: Region) {
 system.runPlayerInterval(
   player => {
     const regions = RegionEvents.playerInRegionsCache.get(player)
-    if (!regions?.length) return
+    if (!regions) return
+
+    const region = regions[0] as Region | undefined
 
     const gamemode = player.getGameMode()
     const adventure = gamemode === GameMode.adventure
     const survival = gamemode === GameMode.survival
 
-    if (adventure && nearDisabledAdventureRegions(player)) {
+    if (adventure && (!region || nearDisabledAdventureRegions(player))) {
       player.setGameMode(GameMode.survival)
-    } else if (survival && adventureModeRegion(regions[0])) {
+    } else if (survival && region && adventureModeRegion(region)) {
       player.setGameMode(GameMode.adventure)
     }
   },
