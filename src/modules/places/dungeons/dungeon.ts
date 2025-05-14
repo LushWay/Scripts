@@ -1,6 +1,7 @@
-import { StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
+import { Player, StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import {
+  ActionForm,
   Cooldown,
   isKeyof,
   Loot,
@@ -8,7 +9,6 @@ import {
   ms,
   registerCreateableRegion,
   registerSaveableRegion,
-  removeNamespace,
   Vector,
 } from 'lib'
 import { StructureFile, structureFiles } from 'lib/assets/structures'
@@ -144,6 +144,19 @@ export class DungeonRegion extends Region {
     return true
   }
 
+  customFormButtons(form: ActionForm, player: Player): void {
+    form.addButton('Установить структуру', () => {
+      this.placeStructure()
+    })
+  }
+
+  customFormDescription(player: Player): Record<string, unknown> {
+    return {
+      Rotation: this.ldb.rotation,
+      ...super.customFormDescription(player),
+    }
+  }
+
   structureBounds() {
     if (!this.structureFile) return { from: this.area.center, to: this.area.center, fromAbsolute: this.area.center }
     const fromAbsolute = this.structurePosition
@@ -175,7 +188,7 @@ export class DungeonRegion extends Region {
 
     if (!this.ldb.terrainStructureId) {
       const id = `dungeon:terrain_backup_${new Date().toISOString().replaceAll(':', '|')}`
-      const toRaw = Vector.add(position, this.structureFile.size)
+      const toRaw = Vector.add(position, this.rotate([this.structureFile.size])[0])
       const from = Vector.add(Vector.min(position, toRaw), { x: -1, z: -1, y: -1 })
       const to = Vector.add(Vector.max(position, toRaw), { x: 1, z: 1, y: 1 })
       world.structureManager.createFromWorld(id, this.dimension, from, to, {
