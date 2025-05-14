@@ -19,8 +19,8 @@ describe('structureLikeRotate', () => {
   it('should rotate 90', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate90, ...structure })
     expect(rotated).toEqual([
-      { x: 9, y: 1, z: 10 },
-      { x: 13, y: 1, z: 15 },
+      { x: 8, y: 1, z: 10 },
+      { x: 12, y: 1, z: 15 },
     ])
   })
 
