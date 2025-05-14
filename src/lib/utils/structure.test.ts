@@ -27,16 +27,16 @@ describe('structureLikeRotate', () => {
   it('should rotate 180', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate180, ...structure })
     expect(rotated).toEqual([
-      { x: 10, y: 1, z: 9 },
-      { x: 5, y: 1, z: 13 },
+      { x: 9, y: 1, z: 8 },
+      { x: 4, y: 1, z: 12 },
     ])
   })
 
   it('should rotate 270', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate270, ...structure })
     expect(rotated).toEqual([
-      { x: 13, y: 1, z: 10 },
-      { x: 9, y: 1, z: 5 },
+      { x: 13, y: 1, z: 9 },
+      { x: 9, y: 1, z: 4 },
     ])
   })
 })
