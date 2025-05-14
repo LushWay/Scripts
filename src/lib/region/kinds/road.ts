@@ -42,7 +42,7 @@ system.runPlayerInterval(
     speed(player, regions)
   },
   'road skin region',
-  40,
+  20,
 )
 
 function speed(player: Player, regions: Region[]) {
