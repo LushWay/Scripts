@@ -188,9 +188,9 @@ export class DungeonRegion extends Region {
 
     if (!this.ldb.terrainStructureId) {
       const id = `dungeon:terrain_backup_${new Date().toISOString().replaceAll(':', '|')}`
-      const toRaw = Vector.add(position, this.rotate([this.structureFile.size])[0])
-      const from = Vector.add(Vector.min(position, toRaw), { x: -1, z: -1, y: -1 })
-      const to = Vector.add(Vector.max(position, toRaw), { x: 1, z: 1, y: 1 })
+      const bounds = this.structureBounds()
+      const from = Vector.add(Vector.min(position, bounds.from), { x: -1, z: -1, y: -1 })
+      const to = Vector.add(Vector.max(position, bounds.to), { x: 1, z: 1, y: 1 })
       world.structureManager.createFromWorld(id, this.dimension, from, to, {
         saveMode: StructureSaveMode.World,
         includeBlocks: true,
