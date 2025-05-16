@@ -9,6 +9,12 @@ import { ItemCost, MoneyCost, MultiCost } from '../cost'
 import { ErrorCost, FreeCost } from '../cost/cost'
 import { ShopForm, ShopFormSection } from '../form'
 import { itemNameXCount } from '../item-name-x-count'
+import {
+  getFreeSpaceForItemInInventory,
+  ImpossibleBuyCost,
+  ImpossibleSellCost,
+  InventoryFull,
+} from '../sell-buy-errors'
 import { Shop } from '../shop'
 
 export function createSellableItem({
@@ -101,24 +107,6 @@ export function createSellableItem({
 
 const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
 const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
-export const ImpossibleBuyCost = ErrorCost(t.error`Покупка невозможна`)
-export const ImpossibleSellCost = ErrorCost(t.error`Продажа невозможна`)
-const InventoryFull = (amount: number) => ErrorCost(t.error`Нет места в инвентаре (нужно еще ${amount})`)
-
-function getFreeSpaceForItemInInventory(player: Player, itemType: string) {
-  if (!player.container) return 0
-
-  const item = new ItemStack(itemType)
-  let space = 0
-
-  for (const [, slot] of player.container.slotEntries()) {
-    if (!slot.typeId) space += item.maxAmount
-    else if (slot.isStackableWith(item)) space += slot.maxAmount - slot.amount
-  }
-
-  return space
-}
-
 function createBuy(
   getCount: () => number,
   getBuy: (n: number) => number,
@@ -129,7 +117,7 @@ function createBuy(
   player: Player,
 ) {
   const dbCount = getCount()
-  const space = getFreeSpaceForItemInInventory(player, type)
+  const space = getFreeSpaceForItemInInventory(player, new ItemStack(type))
   return (buyCount = 1) => {
     const finalCost = getFinalCost(buyCount, i => getBuy(dbCount - i))
 

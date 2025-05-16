@@ -4,6 +4,7 @@ import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
+import { form, NewFormCreator } from 'lib/form/new'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/kinds/region'
 import { t, textTable } from 'lib/text'
@@ -18,6 +19,7 @@ export function registerCreateableRegion(name: string, region: typeof Region) {
 }
 
 const command = new Command('region')
+  .setDescription('Управляет регионами')
   .setPermissions('techAdmin')
   .setGroup('public')
   .executes(ctx => {
@@ -83,25 +85,37 @@ system.runInterval(
 )
 
 function regionForm(player: Player) {
-  const reg = (region: Parameters<typeof regionList>[1]) => () => regionList(player, region)
+  form(f => {
+    f.title('Управление регионами')
+    f.body('§7Чтобы создать регион, перейдите в список определенных регионов')
 
-  const form = new ActionForm(
-    'Управление регионами',
-    '§7Чтобы создать регион, перейдите в список определенных регионов',
-  )
+    const currentRegions = Region.getManyAt(player)
+    const currentRegion = currentRegions[0]
 
-  const currentRegion = Region.getAt(player)
+    function addRegionButton(currentRegion: Region, form: NewFormCreator) {
+      form.button(
+        t`${currentRegion.displayName ?? 'Без имени'} (${currentRegion.area.toString()})\n${currentRegion.name}`,
+        () => editRegion(player, currentRegion, () => regionForm(player)),
+      )
+    }
 
-  if (currentRegion)
-    form.addButton(
-      `Регион на ${Vector.string(Vector.floor(currentRegion.area.center), true)}§f\n${currentRegion.name}`,
-      () => editRegion(player, currentRegion, () => regionForm(player)),
-    )
+    if (typeof currentRegion !== 'undefined') addRegionButton(currentRegion, f)
 
-  for (const r of createableRegions) {
-    form.addButton(r.name, reg(r.region))
-  }
-  form.show(player)
+    if (currentRegions.length > 1) {
+      f.button(
+        form(f => {
+          f.title(
+            t`Другие регионы тут (${currentRegions.length - 1})\n${[...new Set(currentRegions.map(e => e.creator.kind))].join(' ')}`,
+          )
+          for (const region of currentRegions.slice(1)) addRegionButton(region, f)
+        }),
+      )
+    }
+
+    for (const type of createableRegions) {
+      f.button(t`${type.name} ${t.badge`${type.region.getAll().length}`}`, () => regionList(player, type.region))
+    }
+  }).show(player)
 }
 
 function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {

@@ -269,7 +269,9 @@ export class Region {
 
   /** Can be overriden to add custom description */
   customFormDescription(player: Player): Record<string, unknown> {
-    return {}
+    return {
+      Приоритет: this.priority,
+    }
   }
 }
 

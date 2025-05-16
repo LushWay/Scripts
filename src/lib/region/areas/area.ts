@@ -1,4 +1,5 @@
 import { Block, Dimension, Entity, system, world } from '@minecraft/server'
+import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area
@@ -46,6 +47,10 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   abstract get center(): Vector3
 
   abstract isNear(point: AbstractPoint, distance: number): boolean
+
+  toString() {
+    return t`${Vector.string(Vector.floor(this.center), true)} radius=${Math.floor(this.radius)}`
+  }
 
   protected isOurDimension(dimensionType: DimensionType) {
     return this.dimensionType === dimensionType

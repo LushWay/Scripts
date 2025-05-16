@@ -17,6 +17,7 @@ import { createSellableItem } from './buttons/sellable-item'
 import { ItemFilter } from './cost/item-cost'
 import { itemNameXCount } from './item-name-x-count'
 import { Product, ProductName } from './product'
+import { getFreeSpaceForItemInInventory, InventoryFull } from './sell-buy-errors'
 import { Shop } from './shop'
 
 export type ShopMenuCreate = (menu: ShopFormSection, player: Player) => void
@@ -158,9 +159,11 @@ export class ShopForm {
    * @param cost
    */
   itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId), name = itemNameXCount(item, '')) {
+    const space = getFreeSpaceForItemInInventory(this.player, item)
+    const canAdd = space >= item.amount
     this.product()
       .name(name)
-      .cost(cost)
+      .cost(canAdd ? cost : InventoryFull(item.amount - space))
       .onBuy(player => {
         if (!player.container) return
 
