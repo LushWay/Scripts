@@ -4,7 +4,6 @@ import { toPoint } from 'lib/game-utils'
 import { registerRegionType } from 'lib/region/command'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
-import { BossArenaRegion } from './boss-arena'
 import { Region, RegionCreationOptions, RegionPermissions } from './region'
 
 interface SafeAreaRegionOptions extends RegionCreationOptions {
@@ -51,7 +50,7 @@ export class SafeAreaRegion extends Region {
 }
 registerRegionType('Мирные зоны', SafeAreaRegion)
 export const disableAdventureNear: (typeof Region)[] = []
-export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion, BossArenaRegion]
+export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion]
 
 function nearDisabledAdventureRegions(player: Player): boolean {
   return disableAdventureNear.some(e => e.getNear(toPoint(player), 6).length)
