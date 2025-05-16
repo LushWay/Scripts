@@ -29,7 +29,7 @@ export function structureLikeRotateRelative(rotation: StructureRotation, relativ
       return {
         x: size.z - 1 - relative.z,
         y: relative.y,
-        z: relative.x + 1,
+        z: relative.x,
       }
 
     case StructureRotation.Rotate180:
@@ -41,7 +41,7 @@ export function structureLikeRotateRelative(rotation: StructureRotation, relativ
 
     case StructureRotation.Rotate270:
       return {
-        x: relative.z + 1,
+        x: relative.z,
         y: relative.y,
         z: size.x - 1 - relative.x,
       }

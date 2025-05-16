@@ -114,12 +114,12 @@ system.runPlayerInterval(
     }
 
     player.onScreenDisplay.setActionBar(
-      t`rotation: ${rotation} size: ${Vector.subtract(from, to)} ${from} ${to}`,
+      t`rotation: ${rotation} size: ${Vector.subtract(from, to)}\nfrom: ${from} to: ${to}`,
       ActionbarPriority.Highest,
     )
   },
   'dungeon place',
-  30,
+  15,
 )
 
 const particle = new MolangVariableMap()

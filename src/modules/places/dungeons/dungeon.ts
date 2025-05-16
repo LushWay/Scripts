@@ -112,7 +112,7 @@ export class DungeonRegion extends Region {
     if (!structureFile) return vectors
     return structureLikeRotate({
       rotation: this.ldb.rotation,
-      position: this.structurePosition,
+      position: this.getStructurePosition(),
       size: structureFile.size,
       vectors: vectors,
     })
@@ -137,7 +137,7 @@ export class DungeonRegion extends Region {
     } else return false
 
     if (this.area instanceof SphereArea) {
-      this.area.radius = Vector.distance(this.structurePosition, this.area.center)
+      this.area.radius = Vector.distance(this.getStructurePosition(), this.area.center)
       // console.log('Changed radius of dungeon to', this.area.radius)
     }
 
@@ -153,13 +153,15 @@ export class DungeonRegion extends Region {
   customFormDescription(player: Player): Record<string, unknown> {
     return {
       Rotation: this.ldb.rotation,
+      StructurePosition: this.getStructurePosition(),
+      Chests: this.chests.map(e => e.location),
       ...super.customFormDescription(player),
     }
   }
 
   structureBounds() {
     if (!this.structureFile) return { from: this.area.center, to: this.area.center, fromAbsolute: this.area.center }
-    const fromAbsolute = this.structurePosition
+    const fromAbsolute = this.getStructurePosition(StructureRotation.None)
     const toAbsolute = Vector.add(fromAbsolute, this.structureFile.size)
 
     const [from, to] = this.rotate([fromAbsolute, toAbsolute])
@@ -167,15 +169,11 @@ export class DungeonRegion extends Region {
     return { from: Vector.min(from, to), to: Vector.max(from, to), fromAbsolute }
   }
 
-  protected get structurePosition() {
+  protected getStructurePosition(rotation = this.ldb.rotation) {
     if (!this.structureFile) throw new TypeError('No structure file!')
 
     return new Vector(
-      structureLikeRotateRelative(
-        this.ldb.rotation,
-        Vector.multiply(this.structureFile.size, 0.5),
-        this.structureFile.size,
-      ),
+      structureLikeRotateRelative(rotation, Vector.multiply(this.structureFile.size, 0.5), this.structureFile.size),
     )
       .multiply(-1)
       .floor()
@@ -184,7 +182,7 @@ export class DungeonRegion extends Region {
 
   protected placeStructure() {
     if (!this.structureFile) return
-    const position = this.structurePosition
+    const position = this.getStructurePosition()
 
     if (!this.ldb.terrainStructureId) {
       const id = `dungeon:terrain_backup_${new Date().toISOString().replaceAll(':', '|')}`
@@ -206,11 +204,11 @@ export class DungeonRegion extends Region {
   }
 
   fromAbsoluteToRelative(vector: Vector3) {
-    return toRelative(vector, this.structureBounds().from)
+    return toRelative(vector, this.getStructurePosition())
   }
 
   fromRelativeToAbsolute(vector: Vector3) {
-    return toAbsolute(vector, this.structureBounds().from)
+    return toAbsolute(vector, this.getStructurePosition())
   }
 
   protected defaultPermissions: RegionPermissions = {
