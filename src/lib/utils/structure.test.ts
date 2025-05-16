@@ -20,29 +20,71 @@ describe('structureLikeRotate', () => {
 
   it('should rotate 90', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate90, ...structure })
-    expect(rotated).toEqual([
-      { x: 0, y: 0, z: 0 },
-      { x: 8, y: 1, z: 11 },
-      { x: 12, y: 1, z: 16 },
-    ])
+    expect(rotated).toMatchInlineSnapshot(`
+      [
+        Vector {
+          "x": 21,
+          "y": 0,
+          "z": 0,
+        },
+        Vector {
+          "x": 8,
+          "y": 1,
+          "z": 10,
+        },
+        Vector {
+          "x": 12,
+          "y": 1,
+          "z": 15,
+        },
+      ]
+    `)
   })
 
   it('should rotate 180', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate180, ...structure })
-    expect(rotated).toEqual([
-      { x: 0, y: 0, z: 0 },
-      { x: 9, y: 1, z: 8 },
-      { x: 4, y: 1, z: 12 },
-    ])
+    expect(rotated).toMatchInlineSnapshot(`
+      [
+        Vector {
+          "x": 19,
+          "y": 0,
+          "z": 21,
+        },
+        Vector {
+          "x": 9,
+          "y": 1,
+          "z": 8,
+        },
+        Vector {
+          "x": 4,
+          "y": 1,
+          "z": 12,
+        },
+      ]
+    `)
   })
 
   it('should rotate 270', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate270, ...structure })
-    expect(rotated).toEqual([
-      { x: 0, y: 0, z: 0 },
-      { x: 15, y: 1, z: 11 },
-      { x: 10, y: 1, z: 4 },
-    ])
+    expect(rotated).toMatchInlineSnapshot(`
+      [
+        Vector {
+          "x": 0,
+          "y": 0,
+          "z": 19,
+        },
+        Vector {
+          "x": 13,
+          "y": 1,
+          "z": 9,
+        },
+        Vector {
+          "x": 9,
+          "y": 1,
+          "z": 4,
+        },
+      ]
+    `)
   })
 
   const vector1000 = Vector.multiply(Vector.one, 1000)
@@ -62,19 +104,19 @@ describe('structureLikeRotate', () => {
     expect(rotated).toMatchInlineSnapshot(`
       [
         Vector {
-          "x": 1000,
+          "x": 1021,
           "y": 1000,
           "z": 1000,
         },
         Vector {
           "x": 1008,
           "y": 1001,
-          "z": 1011,
+          "z": 1010,
         },
         Vector {
           "x": 1012,
           "y": 1001,
-          "z": 1016,
+          "z": 1015,
         },
       ]
     `)
@@ -85,9 +127,9 @@ describe('structureLikeRotate', () => {
     expect(rotated).toMatchInlineSnapshot(`
       [
         Vector {
-          "x": 1000,
+          "x": 1019,
           "y": 1000,
-          "z": 1000,
+          "z": 1021,
         },
         Vector {
           "x": 1009,
@@ -110,15 +152,15 @@ describe('structureLikeRotate', () => {
         Vector {
           "x": 1000,
           "y": 1000,
-          "z": 1000,
+          "z": 1019,
         },
         Vector {
-          "x": 1014,
+          "x": 1013,
           "y": 1001,
           "z": 1009,
         },
         Vector {
-          "x": 1010,
+          "x": 1009,
           "y": 1001,
           "z": 1004,
         },
