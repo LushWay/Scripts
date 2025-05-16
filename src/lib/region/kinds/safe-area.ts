@@ -51,14 +51,14 @@ export class SafeAreaRegion extends Region {
 }
 registerCreateableRegion('Мирные зоны', SafeAreaRegion)
 export const disableAdventureNear: (typeof Region)[] = []
-export const adventureModeRegions: (typeof Region)[] = []
+export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion, BossArenaRegion]
 
 function nearDisabledAdventureRegions(player: Player): boolean {
   return disableAdventureNear.some(e => e.getNear(toPoint(player), 6).length)
 }
 
 function adventureModeRegion(region: Region) {
-  return region instanceof SafeAreaRegion || region instanceof BossArenaRegion
+  return adventureModeRegions.some(e => region instanceof e)
 }
 
 system.runPlayerInterval(

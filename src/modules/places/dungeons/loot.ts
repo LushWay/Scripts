@@ -40,12 +40,12 @@ const names: Record<string, string> = {
   [d.GasStation3]: 'Заправка 3',
   [d.GasStation4]: 'Заправка 4',
   [d.GasStationGarage]: 'Гараж',
-  [d.Avanpost]: 'Аванпост',
+  [d.Avanpost]: '§cАванпост',
 } satisfies Record<StructureDungeonsId, string>
 
 const customNames: Record<string, string> = {
-  bunker: 'Бункер',
-  avanpostTent: 'Палатка аванпоста',
+  bunker: '§4Бункер',
+  avanpostTent: '§cПалатка аванпоста',
 }
 
 const powerfullLoot: Record<string, LootTable | undefined> = {

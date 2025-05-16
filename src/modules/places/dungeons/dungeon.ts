@@ -2,6 +2,7 @@ import { Player, StructureRotation, StructureSaveMode, system, world } from '@mi
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import {
   ActionForm,
+  adventureModeRegions,
   Cooldown,
   isKeyof,
   LootTable,
@@ -276,3 +277,4 @@ export class DungeonRegion extends Region {
 }
 registerSaveableRegion('dungeon', DungeonRegion)
 registerCreateableRegion('Данж', DungeonRegion)
+adventureModeRegions.push(DungeonRegion)
