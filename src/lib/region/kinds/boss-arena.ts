@@ -1,5 +1,5 @@
 import { Entity, Player } from '@minecraft/server'
-import { ActionForm } from 'lib'
+import { ActionForm } from 'lib/form/action'
 import { EventSignal } from 'lib/event-signal'
 import { registerRegionType } from 'lib/region'
 import { Boss } from 'lib/rpg/boss'
@@ -10,7 +10,7 @@ import { Region, RegionCreationOptions, type RegionPermissions } from './region'
 interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: string
 
-  boss: Boss
+  boss?: Boss
 }
 
 export class BossArenaRegion extends Region {
@@ -18,7 +18,7 @@ export class BossArenaRegion extends Region {
 
   bossName: string
 
-  boss: Boss
+  boss?: Boss
 
   get displayName(): string | undefined {
     return `§cБосс §6${this.bossName}`
@@ -61,7 +61,7 @@ export class BossArenaRegion extends Region {
 
   customFormButtons(form: ActionForm, player: Player): void {
     form.addButton('Вызвать босса', () => {
-      Reflect.deleteProperty(Boss.db, this.boss.id)
+      if (this.boss) Reflect.deleteProperty(Boss.db, this.boss.id)
     })
   }
 }

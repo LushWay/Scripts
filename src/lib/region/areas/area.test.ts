@@ -5,6 +5,9 @@ import { Area } from './area'
 describe('area reg', () => {
   it('should trow', () => {
     class TestArea extends Area {
+      getFormDescription(): Record<string, unknown> {
+        throw new Error('Method not implemented.')
+      }
       type = 'test'
       get edges(): [Vector3, Vector3] {
         throw new Error('Method not implemented.')
