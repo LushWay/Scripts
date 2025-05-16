@@ -99,6 +99,7 @@ export class Boss {
     })
 
     world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+      if (!entity.isValid) return
       const regions = BossArenaRegion.getManyAt(entity)
       for (const region of regions) if (region.boss) EventSignal.emit(region.boss.onEntitySpawn, entity)
     })
