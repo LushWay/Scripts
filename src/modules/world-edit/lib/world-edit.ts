@@ -375,13 +375,15 @@ export class WorldEdit {
 
       system.runJob(
         (function* fillBetweenJob() {
+          let i = 0
           for (const position of Vector.foreach(selection.min, selection.max)) {
+            i++
             const block = world.overworld.getBlock(position)
             if (!block) continue
 
             try {
               replaceWithTargets(replaceTargets, replaceMode, block, permutations)
-              yield
+              if (i % 500 === 0) yield
             } catch (error) {
               if (errors < 3 && error instanceof Error) {
                 player.fail(`Ошибка при заполнении (§f${errors}§c): §4${error.name} §f${error.message}`)

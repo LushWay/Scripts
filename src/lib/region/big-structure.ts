@@ -1,4 +1,5 @@
 import { StructureSaveMode, world } from '@minecraft/server'
+import { Vector } from 'lib/vector'
 import { Region } from 'lib/region'
 import { BigStructure } from 'lib/utils/big-structure'
 import { RegionStructure } from './structure'
@@ -28,7 +29,7 @@ export class BigRegionStructure extends RegionStructure {
   }
 
   place() {
-    return this.bigStructure.load(this.region.area.edges[0], this.region.dimension)
+    return this.bigStructure.load(Vector.min(...this.region.area.edges), this.region.dimension)
   }
 
   validateArea() {
