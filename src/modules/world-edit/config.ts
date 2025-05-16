@@ -9,15 +9,11 @@ import { Vector } from 'lib/vector'
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
 
-  STRUCTURE_CHUNK_SIZE: { x: 64, y: 384, z: 64 },
   COPY_FILE_NAME: 'copy',
   BACKUP_PREFIX: 'backup',
 
   /** The ammout of blocks in a generation before it will check servers speed to delay the loading of a generation */
   BLOCKS_BEFORE_AWAIT: 10000,
-
-  /** The ammout of ticks to delay during a heavy proccess generation */
-  TICKS_TO_SLEEP: 1,
 
   DRAW_SELECTION_PARTICLE: 'minecraft:balloon_gas_particle',
   DRAW_SELECTION_MAX_SIZE: 5000,

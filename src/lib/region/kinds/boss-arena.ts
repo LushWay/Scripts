@@ -1,16 +1,24 @@
-import { Entity } from '@minecraft/server'
+import { Entity, Player } from '@minecraft/server'
+import { ActionForm } from 'lib'
+import { EventSignal } from 'lib/event-signal'
+import { registerRegionType } from 'lib/region'
+import { Boss } from 'lib/rpg/boss'
 import { Vector } from 'lib/vector'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
 
 interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: string
+
+  boss: Boss
 }
 
 export class BossArenaRegion extends Region {
   protected priority = 10
 
   bossName: string
+
+  boss: Boss
 
   get displayName(): string | undefined {
     return `§cБосс §6${this.bossName}`
@@ -31,6 +39,7 @@ export class BossArenaRegion extends Region {
   constructor(area: Area, options: BossArenaRegionOptions, key: string) {
     super(area, options, key)
     this.bossName = options.bossName
+    this.boss = options.boss
   }
 
   returnEntity(entity: Entity) {
@@ -41,4 +50,19 @@ export class BossArenaRegion extends Region {
     const vector = Vector.subtract(location, center)
     entity.applyKnockback(Vector.multiply(vector.normalized(), -horizontal), vertical)
   }
+
+  onSave = new EventSignal()
+
+  save(): false | undefined {
+    EventSignal.emit(this.onSave, {})
+
+    return
+  }
+
+  customFormButtons(form: ActionForm, player: Player): void {
+    form.addButton('Вызвать босса', () => {
+      Reflect.deleteProperty(Boss.db, this.boss.id)
+    })
+  }
 }
+registerRegionType('Boss Region', BossArenaRegion, false)

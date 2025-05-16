@@ -1,7 +1,7 @@
 import { GameMode, Player, system } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { toPoint } from 'lib/game-utils'
-import { registerCreateableRegion } from 'lib/region/command'
+import { registerRegionType } from 'lib/region/command'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
 import { BossArenaRegion } from './boss-arena'
@@ -49,7 +49,7 @@ export class SafeAreaRegion extends Region {
     return this.safeAreaName
   }
 }
-registerCreateableRegion('Мирные зоны', SafeAreaRegion)
+registerRegionType('Мирные зоны', SafeAreaRegion)
 export const disableAdventureNear: (typeof Region)[] = []
 export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion, BossArenaRegion]
 

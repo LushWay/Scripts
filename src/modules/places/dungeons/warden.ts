@@ -7,7 +7,7 @@ import {
   ms,
   Region,
   RegionPermissions,
-  registerCreateableRegion,
+  registerRegionType,
   registerSaveableRegion,
 } from 'lib'
 import { anyPlayerNearRegion } from 'lib/player-move'
@@ -25,7 +25,7 @@ class WardenDungeonRegion extends Region {
   }
 }
 registerSaveableRegion('wardenDungeon', WardenDungeonRegion)
-registerCreateableRegion('Данж вардена', WardenDungeonRegion)
+registerRegionType('Данж вардена', WardenDungeonRegion)
 
 interface LinkedDatabase extends JsonObject {
   blocks: { x: number; y: number; z: number }[]
@@ -61,7 +61,7 @@ class WardenDungeonLootRegion extends Region {
   }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
-registerCreateableRegion('Лут данжа вардена', WardenDungeonLootRegion)
+registerRegionType('Лут данжа вардена', WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {
   if (region instanceof WardenDungeonLootRegion) {

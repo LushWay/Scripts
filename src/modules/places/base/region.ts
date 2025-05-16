@@ -1,6 +1,6 @@
 import { actionGuard, ActionGuardOrder, disableAdventureNear, isNotPlaying, Vector } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { registerCreateableRegion } from 'lib/region/command'
+import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 
@@ -62,5 +62,5 @@ actionGuard((player, base, ctx) => {
 }, ActionGuardOrder.BlockAction)
 
 registerSaveableRegion('base', BaseRegion)
-registerCreateableRegion('Базы', BaseRegion)
+registerRegionType('Базы', BaseRegion)
 disableAdventureNear.push(BaseRegion)

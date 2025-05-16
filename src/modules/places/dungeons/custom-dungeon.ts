@@ -1,6 +1,6 @@
 import { Block, GameMode, Player, StructureRotation, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { is, ModalForm, ms, RegionCreationOptions, registerCreateableRegion, registerSaveableRegion, Vector } from 'lib'
+import { is, ModalForm, ms, RegionCreationOptions, registerRegionType, registerSaveableRegion, Vector } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { t } from 'lib/text'
@@ -74,7 +74,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 }
 registerSaveableRegion('customDungeon', CustomDungeonRegion)
-registerCreateableRegion('Кастомный данж', CustomDungeonRegion)
+registerRegionType('Кастомный данж', CustomDungeonRegion)
 
 function eventHelper(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false

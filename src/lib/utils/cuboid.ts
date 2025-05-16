@@ -1,39 +1,40 @@
+// @author - Smell Of Curry
 export class Cuboid {
-  max
+  max: Vector3
 
-  min
+  min: Vector3
 
-  pos1
+  pos1: Vector3
 
-  pos2
+  pos2: Vector3
 
-  xCenter
+  xCenter: number
 
-  xMax
+  xMax: number
 
-  xMin
+  xMin: number
 
-  xRadius
+  xRadius: number
 
-  yCenter
+  yCenter: number
 
-  yMax
+  yMax: number
 
-  yMin
+  yMin: number
 
-  yRadius
+  yRadius: number
 
-  zCenter
+  zCenter: number
 
-  zMax
+  zMax: number
 
-  zMin
+  zMin: number
 
-  zRadius
+  zRadius: number
 
   constructor(pos1: Vector3, pos2: Vector3) {
-    // This is done to ensure that the passed values is copied
-    // For example if passed values is DatabaseValue it will
+    // This is done to ensure that the passed values are copied
+    // For example if passed values are DatabaseValue it will
     // decrease performance drastically when accessing any of
     // its axises
     this.pos1 = { x: pos1.x, y: pos1.y, z: pos1.z }
@@ -49,17 +50,9 @@ export class Cuboid {
     this.yMax = Math.max(this.pos1.y, this.pos2.y)
     this.zMax = Math.max(this.pos1.z, this.pos2.z)
 
-    this.min = {
-      x: this.xMin,
-      y: this.yMin,
-      z: this.zMin,
-    }
+    this.min = { x: this.xMin, y: this.yMin, z: this.zMin }
 
-    this.max = {
-      x: this.xMax,
-      y: this.yMax,
-      z: this.zMax,
-    }
+    this.max = { x: this.xMax, y: this.yMax, z: this.zMax }
 
     this.xRadius = (this.xMax - this.xMin) / 2
     this.yRadius = (this.yMax - this.yMin) / 2
@@ -78,21 +71,16 @@ export class Cuboid {
   }
 
   /** Splits a cuboid into mulitple cuboid of a chunk size */
-  split(size: Vector3 = { x: 1, y: 1, z: 1 }): Cuboid[] {
-    const breakpoints: Record<string, number[]> = {
-      x: [],
-      y: [],
-      z: [],
-    }
+  split(size: Vector3): Cuboid[] {
+    const breakpoints: Record<string, number[]> = { x: [], y: [], z: [] }
 
     const cubes: Cuboid[] = []
     for (const entry of Object.entries(size)) {
       const [axis, value] = entry as [keyof Vector3, number]
 
       for (let coordinate = this.min[axis]; ; coordinate = coordinate + value) {
-        if (coordinate < this.max[axis]) {
-          breakpoints[axis].push(coordinate)
-        } else {
+        if (coordinate < this.max[axis]) breakpoints[axis].push(coordinate)
+        else {
           breakpoints[axis].push(this.max[axis])
           break
         }
@@ -102,20 +90,12 @@ export class Cuboid {
     breakpoints.x.forEach((x, xi) => {
       breakpoints.y.forEach((y, yi) => {
         breakpoints.z.forEach((z, zi) => {
-          const current = {
-            x: x,
-            y: y,
-            z: z,
-          }
-          const indexOf = {
-            x: xi,
-            y: yi,
-            z: zi,
-          }
+          const current = { x: x, y: y, z: z }
+          const indexOf = { x: xi, y: yi, z: zi }
 
           const nextCord: Vector3 = {} as Vector3
           for (const key in breakpoints) {
-            const axis: keyof Vector3 = key as keyof Vector3
+            const axis = key as keyof Vector3
             const nextValue = breakpoints[axis][indexOf[axis] + 1]
             if (!nextValue && breakpoints[axis].length > 1) return
 

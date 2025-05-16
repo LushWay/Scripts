@@ -45,17 +45,19 @@ describe('text', () => {
   })
 
   it('should stringify command', () => {
-    expect(t`Используй ${new Command('name')}`).toMatchInlineSnapshot(`"§7Используй §f.name§7"`)
+    expect(t`Используй ${new Command('namew')}`).toMatchInlineSnapshot(`"§7Используй §f.namew§7"`)
   })
 
   it('should stringify chained command', () => {
-    const nameCommand = new Command('name')
+    const nameCommand = new Command('nameww')
     nameCommand.overload('overload')
-    expect(t`Используй ${nameCommand}`).toMatchInlineSnapshot(`"§7Используй §f.name§7"`)
+    expect(t`Используй ${nameCommand}`).toMatchInlineSnapshot(`"§7Используй §f.nameww§7"`)
   })
 
   it('should stringify chained command overload', () => {
-    expect(t`Используй ${new Command('name').overload('overload')}`).toMatchInlineSnapshot(`"§7Используй §f.name overload§7"`)
+    expect(t`Используй ${new Command('name').overload('overload')}`).toMatchInlineSnapshot(
+      `"§7Используй §f.name overload§7"`,
+    )
   })
 
   it('should stringify object', () => {

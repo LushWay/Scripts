@@ -1,7 +1,7 @@
 import { Player, system } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { RegionEvents } from '../events'
-import { registerCreateableRegion, registerSaveableRegion } from '../index'
+import { registerRegionType, registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
 
 export class RoadRegion extends Region {
@@ -27,7 +27,7 @@ export class RoadRegion extends Region {
 }
 
 registerSaveableRegion('road', RoadRegion)
-registerCreateableRegion('Дороги', RoadRegion)
+registerRegionType('Дороги', RoadRegion)
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest }) => {
   speed(player, newest)

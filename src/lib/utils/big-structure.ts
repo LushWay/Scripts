@@ -1,6 +1,5 @@
 import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
-import { Vector } from 'lib'
-import { WE_CONFIG } from '../config'
+import { Vector } from 'lib/vector'
 import { Cuboid } from './cuboid'
 
 export class BigStructure extends Cuboid {
@@ -18,21 +17,23 @@ export class BigStructure extends Cuboid {
    * @param {Vector3} pos2
    */
   constructor(
-    private prefix: string,
+    readonly prefix: string,
     pos1: Vector3,
     pos2: Vector3,
     public dimension: Dimension,
-    public name = '',
+    readonly name = '',
+    private readonly saveMode = StructureSaveMode.Memory,
+    saveOnCreate = true,
   ) {
     super(pos1, pos2)
     this.prefix = `${prefix}|${Date.now().toString(32)}`
 
-    this.save()
+    if (saveOnCreate) this.save()
   }
 
   save() {
     this.structures = []
-    const cubes = this.split(WE_CONFIG.STRUCTURE_CHUNK_SIZE)
+    const cubes = this.split({ x: 64, y: 384, z: 64 })
 
     for (const [i, cube] of cubes.entries()) {
       const id = `mystructure:${this.prefix}|${i}`
@@ -46,7 +47,7 @@ export class BigStructure extends Cuboid {
       world.structureManager.createFromWorld(id, this.dimension, min, max, {
         includeEntities: false,
         includeBlocks: true,
-        saveMode: StructureSaveMode.Memory,
+        saveMode: this.saveMode,
       })
 
       this.structures.push({ id, min, max })

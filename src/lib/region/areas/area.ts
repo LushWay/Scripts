@@ -52,6 +52,8 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return t`${Vector.string(Vector.floor(this.center), true)} radius=${Math.floor(this.radius)}`
   }
 
+  abstract getFormDescription(): Record<string, unknown>
+
   protected isOurDimension(dimensionType: DimensionType) {
     return this.dimensionType === dimensionType
   }

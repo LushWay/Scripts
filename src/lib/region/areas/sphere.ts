@@ -31,6 +31,10 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
   set center(c) {
     this.database.center = c
   }
+
+  getFormDescription(): Record<string, unknown> {
+    return { Center: Vector.string(this.center, true), Radius: this.radius }
+  }
 }
 
 export const SphereArea = Sphere.asSaveableArea()

@@ -7,8 +7,9 @@ import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
 import { isChunkUnloaded } from 'lib/game-utils'
 import { ConfigurableLocation, location } from 'lib/location'
+import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { forceAllowSpawnInRegion } from 'lib/region/index'
+import { forceAllowSpawnInRegion, restoreAreaFromJSON } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
@@ -26,6 +27,10 @@ interface BossDB {
   dead: boolean
 }
 
+interface BossArenaDB {
+  area: ReturnType<Area['toJSON']>
+}
+
 interface BossOptions {
   place: Place
   typeId: string
@@ -39,6 +44,7 @@ interface BossOptions {
 export class Boss {
   /** Boss Database. Contains meta information about spawned boss entities */
   static db = table<BossDB>('boss')
+  static arenaDb = table<BossArenaDB>('bossArena')
 
   /** List of all registered boss types */
   static all: Boss[] = []
@@ -91,6 +97,15 @@ export class Boss {
       const prev = boss.damage.get(event.damageSource.damagingEntity) ?? 0
       boss.damage.set(event.damageSource.damagingEntity, prev + event.damage)
     })
+
+    world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+      const regions = BossArenaRegion.getManyAt(entity)
+      for (const region of regions) EventSignal.emit(region.boss.onEntitySpawn, entity)
+    })
+  }
+
+  get id() {
+    return this.options.place.fullId
   }
 
   /**
@@ -107,13 +122,25 @@ export class Boss {
     if (Array.isArray(this.options.allowedEntities))
       this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
+    const areadb = Boss.arenaDb[this.options.place.fullId]
+
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()
-      this.region = BossArenaRegion.create(
-        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionId),
-        { bossName: this.options.place.name, permissions: { allowedEntities: this.options.allowedEntities } },
-      )
+      const area =
+        (areadb?.area ? restoreAreaFromJSON(areadb.area) : undefined) ??
+        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionId)
+
+      this.region = BossArenaRegion.create(area, {
+        boss: this,
+        bossName: this.options.place.name,
+        permissions: { allowedEntities: this.options.allowedEntities },
+      })
+      this.region.onSave.subscribe(() => {
+        if (this.region) {
+          Boss.arenaDb[this.options.place.fullId] = { area: this.region.area.toJSON() }
+        }
+      })
       EventLoaderWithArg.load(this.onRegionCreate, this.region)
     })
 
@@ -122,9 +149,11 @@ export class Boss {
 
   readonly onRegionCreate = new EventLoaderWithArg<BossArenaRegion>()
 
+  readonly onBossEntitySpawn = new EventSignal<Entity>()
+
   readonly onEntitySpawn = new EventSignal<Entity>()
 
-  readonly onEntityDie = new EventSignal()
+  readonly onBossEntityDie = new EventSignal()
 
   private logger = createLogger('Boss ' + this.options.place.fullId)
 
@@ -183,7 +212,7 @@ export class Boss {
           system.delay(() => {
             entity.nameTag = this.options.place.name
             entity.addTag(Boss.entityTag)
-            EventSignal.emit(this.onEntitySpawn, entity)
+            EventSignal.emit(this.onBossEntitySpawn, entity)
           })
           cleanup()
         })
@@ -236,7 +265,7 @@ export class Boss {
         .map(e => `§l${Player.name(e[0])}§r§f: §6${e[1]}§f`)
         .join(', ')}`,
     )
-    EventSignal.emit(this.onEntityDie, undefined)
+    EventSignal.emit(this.onBossEntityDie, undefined)
     const location = this.entity?.isValid ? this.entity.location : this.location
     delete this.entity
 

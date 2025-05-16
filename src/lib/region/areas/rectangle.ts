@@ -33,6 +33,13 @@ class Rectangle extends Area<{
   get edges(): [Vector3, Vector3] {
     return [this.database.from, this.database.to]
   }
+
+  getFormDescription(): Record<string, unknown> {
+    return {
+      From: Vector.string(this.database.from, true),
+      To: Vector.string(this.database.to, true),
+    }
+  }
 }
 
 export const RectangleArea = Rectangle.asSaveableArea()

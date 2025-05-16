@@ -11,12 +11,15 @@ import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
 import { Area } from './areas/area'
+import { ChunkCubeArea } from './areas/chunk-cube'
+import { CylinderArea } from './areas/cylinder'
+import { FlattenedSphereArea } from './areas/flattened-sphere'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
-export const createableRegions: { name: string; region: typeof Region }[] = []
-export function registerCreateableRegion(name: string, region: typeof Region) {
-  createableRegions.push({ name, region })
+export const regionTypes: { name: string; region: typeof Region; creatable: boolean }[] = []
+export function registerRegionType(name: string, region: typeof Region, creatable = true) {
+  regionTypes.push({ name, region, creatable })
 }
 
 const command = new Command('region')
@@ -113,32 +116,39 @@ function regionForm(player: Player) {
       )
     }
 
-    for (const type of createableRegions) {
-      f.button(t`${type.name} ${t.badge`${type.region.getAll().length}`}`, () => regionList(player, type.region))
+    for (const type of regionTypes) {
+      f.button(t`${type.name} ${t.badge`${type.region.getAll().length}`}`, () =>
+        regionList(player, type.region, type.creatable),
+      )
     }
   }).show(player)
 }
 
-function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {
+function regionList(player: Player, RegionType: typeof Region, creatable = true, back = () => regionForm(player)) {
   const form = new ActionForm('Список ' + RegionType.name)
 
-  selectArea(form, RegionType, player, area => {
-    editRegion(player, RegionType.create(area), () => regionList(player, RegionType, back))
-  })
+  if (creatable)
+    form.addButton('Добавить', BUTTON['+'], () => {
+      const form = new ActionForm('Выбери тип области региона')
+      selectArea(form, player, area => {
+        editRegion(player, RegionType.create(area), () => regionList(player, RegionType, creatable, back))
+      })
+      form.show(player)
+    })
 
   for (const region of RegionType.getAll()) {
     form.addButton(t`${region.name}\n${region.area.toString()}`, () =>
-      editRegion(player, region, () => regionList(player, RegionType, back)),
+      editRegion(player, region, () => regionList(player, RegionType, creatable, back)),
     )
   }
 
   form.show(player)
 }
 
-function selectArea(form: ActionForm, RegionType: typeof Region, player: Player, onSelect: (area: Area) => void) {
+function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => void) {
   form
-    .addButton('Создать Сферический', BUTTON['+'], () => {
-      new ModalForm('Создать Сферический ' + RegionType.name)
+    .addButton('Сфера', BUTTON['+'], () => {
+      new ModalForm('Сфера')
         .addTextField('Центр', '~~~', '~~~')
         .addSlider('Радиус', 1, 100, 1)
         .show(player, (ctx, rawCenter, radius) => {
@@ -153,8 +163,8 @@ function selectArea(form: ActionForm, RegionType: typeof Region, player: Player,
           onSelect(new SphereArea({ radius, center }, player.dimension.type))
         })
     })
-    .addButton('Создать Кубический', BUTTON['+'], () => {
-      new ModalForm('Создать Кубический' + RegionType.name)
+    .addButton('Куб', BUTTON['+'], () => {
+      new ModalForm('Куб')
         .addTextField('От', '~~~', '~~~')
         .addTextField('До', '~~~', '~~~')
         .show(player, (ctx, rawFrom, rawTo) => {
@@ -163,6 +173,42 @@ function selectArea(form: ActionForm, RegionType: typeof Region, player: Player,
           if (!from || !to) return
 
           onSelect(new RectangleArea({ from, to }, player.dimension.type))
+        })
+    })
+    .addButton('Куб без учета высоты', BUTTON['+'], () => {
+      new ModalForm('Куб без учета высоты')
+        .addTextField('От', '~~~', '~~~')
+        .addTextField('До', '~~~', '~~~')
+        .show(player, (ctx, rawFrom, rawTo) => {
+          const from = parseLocationFromForm(ctx, rawFrom, player)
+          const to = parseLocationFromForm(ctx, rawTo, player)
+          if (!from || !to) return
+
+          onSelect(new ChunkCubeArea({ from, to }, player.dimension.type))
+        })
+    })
+    .addButton('Цилиндр', BUTTON['+'], () => {
+      new ModalForm('Цилиндр')
+        .addTextField('Центр', '~~~', '~~~')
+        .addSlider('Радиус', 1, 100, 1)
+        .addSlider('Высота', 1, 100, 1)
+        .show(player, (ctx, rawCenter, radius, yradius) => {
+          const center = parseLocationFromForm(ctx, rawCenter, player)
+          if (!center) return
+
+          onSelect(new CylinderArea({ center, radius, yradius }, player.dimension.type))
+        })
+    })
+    .addButton('Приплюснутая сфера', BUTTON['+'], () => {
+      new ModalForm('Приплюснутая сфера')
+        .addTextField('Центр', '~~~', '~~~')
+        .addSlider('Радиус', 1, 100, 1)
+        .addSlider('Высота', 1, 100, 1)
+        .show(player, (ctx, rawCenter, rx, ry) => {
+          const center = parseLocationFromForm(ctx, rawCenter, player)
+          if (!center) return
+
+          onSelect(new FlattenedSphereArea({ center, rx, ry }, player.dimension.type))
         })
     })
 }
@@ -175,8 +221,8 @@ function editRegion(player: Player, region: Region, back: () => void) {
     `Регион ${region.name}`,
     textTable({
       'Тип региона': region.creator.name,
-      'Центр': Vector.string(region.area.center, true),
-      'Радиус': region.area instanceof SphereArea ? region.area.radius : 'не поддерживается',
+      'Тип зоны': Area.areas.find(e => e.type === region.area.type)?.name ?? region.area.type,
+      ...region.area.getFormDescription(),
       ...region.customFormDescription(player),
     }),
   )
@@ -234,7 +280,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
 
   form.addButton('Заменить зону', () => {
     const form = new ActionForm('Заменить зону')
-    selectArea(form, region.creator, player, area => {
+    selectArea(form, player, area => {
       region.area = area
       region.save()
     })

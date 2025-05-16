@@ -16,14 +16,28 @@ const defaultLoot = new Loot('dungeon_default_loot')
     '21...64': '20%',
   })
 
-  .itemStack(FireBallItem)
-  .chance('10%')
+  .item('Apple')
+  .chance('5%')
   .amount({
     '10...20': '80%',
     '21...64': '20%',
   })
 
+  .itemStack(FireBallItem)
+  .chance('10%')
+  .amount({
+    '10...29': '80%',
+    '30...64': '20%',
+  })
+
   .itemStack(IceBombItem)
+  .chance('10%')
+  .amount({
+    '10...29': '80%',
+    '30...64': '20%',
+  })
+
+  .item('BakedPotato')
   .chance('10%')
   .amount({
     '10...20': '80%',

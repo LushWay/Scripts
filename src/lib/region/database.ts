@@ -73,13 +73,18 @@ export function restoreRegionFromJSON([key, region]: [string, (typeof RegionData
     return
   }
 
-  const area = Area.areas.find(e => e.type === region.a.t)
+  const area = restoreAreaFromJSON(region.a)
+  if (!area) return
+
+  return kind.create(area, region, key)
+}
+
+export function restoreAreaFromJSON(a: ReturnType<Area['toJSON']>) {
+  const area = Area.areas.find(e => e.type === a.t)
   if (!area) {
-    console.warn(
-      t`[Region][Database] No area found for ${region.a.t}. Maybe you forgot to register kind or import file?`,
-    )
+    console.warn(t`[Region][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
     return
   }
 
-  return kind.create(new area(region.a.d), region, key)
+  return new area(a.d)
 }

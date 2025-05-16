@@ -7,7 +7,7 @@ import {
   isKeyof,
   LootTable,
   ms,
-  registerCreateableRegion,
+  registerRegionType,
   registerSaveableRegion,
   Vector,
 } from 'lib'
@@ -276,5 +276,5 @@ export class DungeonRegion extends Region {
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion)
-registerCreateableRegion('Данж', DungeonRegion)
+registerRegionType('Данж', DungeonRegion)
 adventureModeRegions.push(DungeonRegion)

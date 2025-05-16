@@ -27,6 +27,13 @@ class ChunkCube extends Area<{ from: VectorXZ; to: VectorXZ }> {
     }
   }
 
+  getFormDescription(): Record<string, unknown> {
+      return {
+        From: `${this.database.from.x} ${this.database.from.z}`,
+        To: `${this.database.to.x} ${this.database.to.z}`
+      }
+  }
+
   get edges(): [Vector3, Vector3] {
     const { max, min } = this.dimension.heightRange
     const { from, to } = this.database

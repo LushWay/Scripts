@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { createableRegions, ModalForm, Region, Vector } from 'lib'
+import { ModalForm, Region, regionTypes, Vector } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -37,9 +37,7 @@ class RegionTool extends WorldEditTool<Storage> {
     new ModalForm(this.name)
       .addDropdownFromObject(
         'Тип региона',
-        Object.fromEntries(
-          createableRegions.map(e => [e.region.kind, e.name]).filter(e => !!e[0]) as [string, string][],
-        ),
+        Object.fromEntries(regionTypes.map(e => [e.region.kind, e.name]).filter(e => !!e[0]) as [string, string][]),
         { defaultValueIndex: storage.regionKind },
       )
       .addSlider('Радиус', 2, 30, 1, storage.radius)
@@ -51,7 +49,7 @@ class RegionTool extends WorldEditTool<Storage> {
         storage.minDistance = minDistance
         storage.minDistanceSameKind = minDistanceSameKind
 
-        slot.nameTag = t`Создать регион ${createableRegions.find(e => e.region.kind === storage.regionKind)?.name}`
+        slot.nameTag = t`Создать регион ${regionTypes.find(e => e.region.kind === storage.regionKind)?.name}`
         this.saveStorage(slot, storage)
       })
   }
@@ -59,7 +57,7 @@ class RegionTool extends WorldEditTool<Storage> {
   onUse(player: Player, _: ItemStack, storage: Storage): void {
     if (!storage.regionKind) return
 
-    const regionType = createableRegions.find(e => e.region.kind === storage.regionKind)
+    const regionType = regionTypes.find(e => e.region.kind === storage.regionKind)
     if (!regionType)
       return player.onScreenDisplay.setActionBar(
         `§cUnknown region type: ${storage.regionKind}`,

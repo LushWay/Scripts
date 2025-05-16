@@ -1,4 +1,4 @@
-import type { Cuboid } from '../lib/cuboid'
+import type { Cuboid } from '../../../lib/utils/cuboid'
 
 export type ShapeFormula = (
   cuboid: Cuboid &

@@ -8,12 +8,7 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import {
-  getScheduledToPlace,
-  getScheduledToPlaceAsync,
-  scheduleBlockPlace,
-  unscheduleBlockPlace,
-} from 'lib/scheduled-block-place'
+import { getScheduledToPlaceAsync, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
 import { Vector } from 'lib/vector'
 import { Region } from './kinds/region'
 
@@ -30,8 +25,8 @@ system.delay(() => {
 
 export class RegionStructure {
   constructor(
-    private region: Region,
-    private regionId: string,
+    protected region: Region,
+    protected regionId: string,
   ) {
     this.id = `region:${this.regionId.replaceAll(':', '|')}`
   }

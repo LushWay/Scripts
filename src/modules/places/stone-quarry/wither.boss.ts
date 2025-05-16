@@ -1,6 +1,7 @@
+import { BlockTypes, EntityComponentTypes } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
-import { RegionStructure } from 'lib/region/structure'
+import { BigRegionStructure } from 'lib/region/big-structure'
 import { Group } from 'lib/rpg/place'
 import { t } from 'lib/text'
 
@@ -22,7 +23,7 @@ export function createBossWither(group: Group) {
     .radius(30)
 
   boss.onRegionCreate.subscribe(async region => {
-    region.structure = new RegionStructure(region, 'boss-wither')
+    region.structure = new BigRegionStructure(region, 'boss-wither-big')
 
     if (!region.structure.exists) {
       try {
@@ -34,7 +35,16 @@ export function createBossWither(group: Group) {
     }
   })
 
-  boss.onEntityDie.subscribe(() => {
+  boss.onBossEntitySpawn.subscribe(entity => {
+    if (entity.typeId !== 'minecraft:item') return
+
+    const itemComponent = entity.getComponent(EntityComponentTypes.Item)
+    if (!itemComponent) return entity.remove()
+
+    if (BlockTypes.get(itemComponent.itemStack.typeId)) entity.remove()
+  })
+
+  boss.onBossEntityDie.subscribe(() => {
     boss.region?.structure?.place()
   })
 

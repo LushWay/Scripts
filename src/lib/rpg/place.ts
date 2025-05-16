@@ -75,11 +75,14 @@ export class Group {
 }
 
 export class Place {
+  /** Example: StoneQuarry foodOvener */
   readonly fullId: string
 
   constructor(
     readonly group: Group,
+    /** Example: 'foodOvener' */
     readonly id: string,
+    /** Example: 'Печкин' */
     readonly name: string,
   ) {
     this.fullId = group.id + ' ' + this.id

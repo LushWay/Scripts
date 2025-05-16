@@ -1,12 +1,4 @@
-import {
-  BlockMapColorComponent,
-  BlockPermutation,
-  Player,
-  StructureMirrorAxis,
-  StructureRotation,
-  system,
-  world,
-} from '@minecraft/server'
+import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
 import { Vector, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
@@ -15,6 +7,8 @@ import { stringify } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
 import { ngettext } from 'lib/utils/ngettext'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { BigStructure } from '../../../lib/utils/big-structure'
+import { Cuboid } from '../../../lib/utils/cuboid'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import {
   ReplaceMode,
@@ -24,8 +18,6 @@ import {
   toPermutation,
   toReplaceTarget,
 } from '../utils/blocks-set'
-import { BigStructure } from './big-structure'
-import { Cuboid } from './cuboid'
 
 // TODO Add WorldEdit.runMultipleAsyncJobs
 
