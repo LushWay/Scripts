@@ -135,6 +135,9 @@ function restorePointMenu(player: Player, id: string, restorePoint: RestorePoint
   return form(f => {
     f.title(restorePoint.name)
     f.body(id)
+    f.ask('Перезаписать', 'Перезаписать точку восстановления', () => {
+      createRestorePoint(player, restorePoint.name, id)
+    })
     f.ask('Загрузиться', 'Загрузиться', () => {
       loadRestorePoint(player, id)
     })

@@ -325,6 +325,7 @@ export class LootTable {
     } catch (err) {
       console.error(
         'Failed to generate loot item for',
+        this.id,
         pick(item, ['amount', 'chance', 'damage', 'enchantments']),
         'error:',
         err,

@@ -9,11 +9,13 @@ import { Quest } from 'lib/quest/index'
 import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
+import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { form } from 'lib/form/new'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { Npc } from 'lib/rpg/npc'
 import { Rewards } from 'lib/shop/rewards'
+import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
@@ -35,9 +37,24 @@ class Learning {
     if (!this.randomTeleportLocation.valid || !this.craftingTableLocation.valid)
       return q.failed('§cОбучение не настроено')
 
+    const maxReturnToAreaSteps = 4
+    const returnToMineArea = (step: number) => () => {
+      if (player.database.inv !== 'anarchy') return
+
+      const regions = MineareaRegion.getManyAt(player)
+      if (!regions.length) {
+        player.fail(
+          t.error`Вы не можете покинуть зону добычи, пока не завершили задания ${step}/${maxReturnToAreaSteps}`,
+        )
+        if (this.randomTeleportLocation.valid) player.teleport(this.randomTeleportLocation)
+      }
+    }
+
     q.counter((current, end) => `§6Добыто дерева: §f${current}/${end}`, 5)
       .description('Нарубите дерева')
       .activate((ctx, firstTime) => {
+        ctx.onInterval(returnToMineArea(1))
+
         if (firstTime) {
           // Delay code by one tick to prevent giving item
           // in spawn inventory that will be replaced with
@@ -64,6 +81,8 @@ class Learning {
     q.dynamic('§6Выйди под открытое небо')
       .description('Деревья могут помешать. Выйди туда, где над тобой будет только небо')
       .activate(ctx => {
+        ctx.onInterval(returnToMineArea(2))
+
         ctx.system.runInterval(
           () => {
             const hit = player.dimension.getBlockFromRay(
@@ -82,6 +101,8 @@ class Learning {
     q.dynamic('Залутай сундук, упавший с неба')
       .description('Забери все из упавшего с неба сундука')
       .activate((ctx, firstTime) => {
+        ctx.onInterval(returnToMineArea(3))
+
         if (!player.isValid) return
 
         function spawnAirdrop() {
@@ -131,6 +152,23 @@ class Learning {
               ctx.update()
             }
           } else i++
+        })
+      })
+
+    q.dynamic('Используй монеты в инвентаре')
+      .description('Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет')
+      .activate(ctx => {
+        let money = 0
+        if (ctx.player.container) {
+          for (const [, item] of ctx.player.container.entries()) if (item?.typeId === Items.Money) money += item.amount
+        }
+
+        if (!money) ctx.next()
+
+        ctx.world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
+          if (source.id !== ctx.player.id || itemStack.typeId !== Items.Money) return
+
+          ctx.next()
         })
       })
 
@@ -200,7 +238,7 @@ class Learning {
         )
       })
 
-    q.dialogue(this.miner, 'Шахтер вас зовет!').body('Приветствую!').buttons()
+    q.dialogue(this.miner, 'Шахтер зовет вас наверх, чтобы поговорить!').body('Приветствую!').buttons()
   })
 
   randomTeleportLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
@@ -210,8 +248,6 @@ class Learning {
   startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 
   startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
-
-  minearea: MineareaRegion | undefined
 
   miner = new Npc(this.quest.group.point('miner').name('Шахтер'), ({ player }) => {
     form(f => {
