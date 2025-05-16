@@ -1,8 +1,9 @@
 import { Loot, LootTable } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
-import { CannonShellItem } from 'modules/features/cannon'
+import { CannonItem, CannonShellItem } from 'modules/features/cannon'
 import { FireBallItem, IceBombItem } from 'modules/pvp/fireball-and-ice-bomb'
+import { BaseItem } from '../base/base'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)
@@ -43,7 +44,7 @@ const names: Record<string, string> = {
 } satisfies Record<StructureDungeonsId, string>
 
 const customNames: Record<string, string> = {
-  factory: 'Заброшенный завод',
+  bunker: 'Бункер',
   avanpostTent: 'Палатка аванпоста',
 }
 
@@ -103,7 +104,7 @@ const customLoot: Record<string, LootTable | undefined> = {
   ...loot,
   ...Object.map(powerfullLoot, (key, loot) => ['powerfull ' + key, loot]),
   defaultLoot,
-  factoryCommonChest: new Loot('factory common chest')
+  bunker1Chest: new Loot('bunker 1 type chest')
     .itemStack(FireBallItem)
     .chance('10%')
     .amount({
@@ -127,7 +128,7 @@ const customLoot: Record<string, LootTable | undefined> = {
     .duplicate(3)
     .trash({ string: 1, web: 3 }).build,
 
-  factoryPowerfullChest: new Loot('factory powerfull chest')
+  bunkerPowerfullChest: new Loot('bunker powerfull chest')
     .item('Diamond')
     .chance('100%')
     .amount({
@@ -145,6 +146,22 @@ const customLoot: Record<string, LootTable | undefined> = {
     .enchantmetns({
       'minecraft:sharpness': { '1...3': '1%', '4...5': '10%' },
     })
+
+    .itemStack(CannonItem.itemStack)
+    .chance('40%')
+    .amount({ '1...2': '1%' })
+
+    .itemStack(CannonShellItem.itemStack)
+    .chance('60%')
+    .amount({
+      '1...9': '10%',
+      '10...16': '1%',
+    })
+
+    .itemStack(BaseItem.itemStack)
+    .chance('5%')
+    .amount({ '0...1': '1%' })
+
     .trash({ string: 3, web: 10 }).build,
 }
 

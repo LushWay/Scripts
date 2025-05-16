@@ -288,12 +288,7 @@ export class LootTable {
         const last = amount % maxAmount
         return new Array(average)
           .fill(null)
-          .map((e, i, a) =>
-            this.generateItems({
-              ...item,
-              amount: e === a.at(-1) ? [last] : [average],
-            }),
-          )
+          .map((_, i, a) => this.generateItems({ ...item, amount: i + 1 === a.length ? [last] : [average] }))
           .flat()
       }
 
