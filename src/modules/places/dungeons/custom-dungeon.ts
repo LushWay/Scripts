@@ -104,7 +104,7 @@ world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
     )
     .addSlider('Время восстановления (в минутах)', 1, 180, 1, 20)
     .show(player, (_, loot, restoreTime) => {
-      const relative = region.fromAbsoluteToRelative(block)
+      const relative = block
       region.addCustomChest(relative, loot as keyof (typeof Dungeon)['customLoot'], restoreTime)
       player.success(t`Created a chest with loot ${loot} and restore time ${restoreTime}min`)
     })
@@ -116,7 +116,7 @@ world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermut
   const region = eventHelper(player, block)
   if (!region) return
 
-  const relative = region.fromAbsoluteToRelative(block)
+  const relative = block
   const chest = region.ldb.chestLoot.find(e => Vector.equals(e.location, relative))
   if (chest) {
     region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)

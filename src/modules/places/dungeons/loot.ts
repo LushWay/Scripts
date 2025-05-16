@@ -135,14 +135,8 @@ const customLoot: Record<string, LootTable | undefined> = {
       '10...20': '10%',
       '21...64': '90%',
     })
-    .item('NetheriteIngot')
-    .chance('100%')
-    .amount({
-      '10...20': '10%',
-      '21...64': '1%',
-    })
     .item('NetheriteSword')
-    .chance('10%')
+    .chance('1%')
     .enchantmetns({
       'minecraft:sharpness': { '1...3': '1%', '4...5': '10%' },
     })

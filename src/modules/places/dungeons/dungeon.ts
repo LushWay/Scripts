@@ -4,7 +4,6 @@ import {
   ActionForm,
   Cooldown,
   isKeyof,
-  Loot,
   LootTable,
   ms,
   registerCreateableRegion,
@@ -59,9 +58,9 @@ export class DungeonRegion extends Region {
             if (dungeon.chests.find(e => Vector.equals(e.location, vector))) continue
 
             // Old chest
-            console.log('Found old chest', Vector.string(dungeon.fromRelativeToAbsolute(vector), true))
+            console.log('Found old chest', Vector.string(vector, true))
             try {
-              dungeon.dimension.setBlockType(dungeon.fromRelativeToAbsolute(vector), MinecraftBlockTypes.Air)
+              dungeon.dimension.setBlockType(vector, MinecraftBlockTypes.Air)
               Reflect.deleteProperty(dungeon.ldb.chests, chest)
               dungeon.save()
             } catch (e) {}
@@ -96,9 +95,7 @@ export class DungeonRegion extends Region {
   protected configureDungeon(): void {
     if (!this.structureFile) return
     const { chestPositions, enderChestPositions } = this.structureFile
-    const toRotated = (f: Vector3[]) => {
-      return this.rotate(f.map(e => this.fromRelativeToAbsolute(e))).map(e => this.fromAbsoluteToRelative(e))
-    }
+    const toRotated = (f: Vector3[]) => this.rotate(f.map(e => this.fromRelativeToAbsolute(e)))
 
     const loot = Dungeon.loot[this.structureId] ?? Dungeon.defaultLoot
     for (const f of toRotated(chestPositions)) this.createChest(f, loot)
@@ -155,7 +152,7 @@ export class DungeonRegion extends Region {
       ...super.customFormDescription(player),
       Rotation: this.ldb.rotation,
       StructurePosition: this.getStructurePosition(),
-      Chests: this.chests.map(e => Vector.string(this.fromRelativeToAbsolute(e.location), true)),
+      Chests: this.chests.map(e => Vector.string(e.location, true)),
     }
   }
 
@@ -225,30 +222,24 @@ export class DungeonRegion extends Region {
 
   chests: DungeonChest[] = []
 
-  protected createChest(
-    location: Vector3,
-    loot: LootTable | ((loot: Loot) => LootTable),
-    restoreTime = ms.from('min', 20),
-  ) {
+  protected createChest(location: Vector3, loot: LootTable, restoreTime = ms.from('min', 20)) {
     // console.log(
     //   'Created a chest at',
     //   Vector.string(location, true),
     //   Vector.string(this.fromRelativeToAbsolute(location)),
     //   true,
     // )
-    const id = Vector.string(location)
-    const chest: DungeonChest = {
-      id,
-      location,
-      loot: loot instanceof LootTable ? loot : loot(new Loot('DungeonChest' + this.id + id)),
-      restoreTime,
-    }
 
-    this.chests.push(chest)
+    this.chests.push({
+      id: Vector.string(location),
+      location,
+      loot,
+      restoreTime,
+    })
   }
 
   private updateChest(chest: DungeonChest) {
-    const block = this.dimension.getBlock(this.fromRelativeToAbsolute(chest.location))
+    const block = this.dimension.getBlock(chest.location)
     if (!block?.isValid) return
 
     this.ldb.chests[chest.id] = Date.now()
