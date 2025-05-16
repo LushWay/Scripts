@@ -59,10 +59,14 @@ const loot: Record<string, LootTable | undefined> = {
   [d.Avanpost]: new Loot(d.Avanpost).item('Apple').chance('100%').build,
   [d.GasStationGarage]: new Loot(`dungeon ${d.GasStationGarage}`)
     .itemStack(CannonShellItem.blueprint)
-    .chance('10%')
+    .chance('1%')
 
     .item('Apple')
-    .chance('50%')
+    .chance('5%')
+    .amount({
+      '10...20': '80%',
+      '21...64': '20%',
+    })
 
     .item(Items.Money)
     .chance('100%')
@@ -74,18 +78,25 @@ const loot: Record<string, LootTable | undefined> = {
     .itemStack(FireBallItem)
     .chance('10%')
     .amount({
-      '10...20': '80%',
-      '21...64': '20%',
+      '1...9': '80%',
+      '10...16': '20%',
     })
 
     .itemStack(IceBombItem)
+    .chance('10%')
+    .amount({
+      '1...9': '80%',
+      '10...16': '20%',
+    })
+
+    .item('BakedPotato')
     .chance('10%')
     .amount({
       '10...20': '80%',
       '21...64': '20%',
     })
 
-    .trash({ string: 1, web: 8 }).build,
+    .trash({ string: 5, web: 8 }).build,
 } satisfies Record<StructureDungeonsId, LootTable>
 
 const customLoot: Record<string, LootTable | undefined> = {
