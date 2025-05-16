@@ -231,7 +231,7 @@ function editRegion(player: Player, region: Region, back: () => void) {
   region.customFormButtons(form, player)
 
   form.addButton('Переместиться в регион', () => player.teleport(region.area.center))
-  form.addButtonAsk('§cУдалить регион', '§cУдалить', () => (region.delete(), back()), '§aНе удалять').show(player)
+
   form.addButton('Заменить зону', () => {
     const form = new ActionForm('Заменить зону')
     selectArea(form, region.creator, player, area => {
@@ -240,6 +240,8 @@ function editRegion(player: Player, region: Region, back: () => void) {
     })
     form.show(player)
   })
+
+  form.addButtonAsk('§cУдалить регион', '§cУдалить', () => (region.delete(), back()), '§aНе удалять').show(player)
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
