@@ -10,9 +10,11 @@ export class BigRegionStructure extends RegionStructure {
   constructor(region: Region, regionId: string) {
     super(region, regionId)
 
+    const [from, to] = region.area.edges
     this.bigStructure = new BigStructure(
       'region',
-      ...region.area.edges,
+      Vector.min(from, to),
+      Vector.max(from, to),
       region.dimension,
       '',
       StructureSaveMode.World,
