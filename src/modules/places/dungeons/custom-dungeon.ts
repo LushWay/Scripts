@@ -1,4 +1,4 @@
-import { Block, GameMode, Player, StructureRotation, world } from '@minecraft/server'
+import { Block, GameMode, Player, StructureRotation, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, ms, RegionCreationOptions, registerCreateableRegion, registerSaveableRegion, Vector } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
@@ -106,18 +106,25 @@ world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermut
     region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
     region.chests = region.chests.filter(e => !Vector.equals(e.location, location))
 
-    player.success(t`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime}min`)
+    player.success(t`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime / 60_000}min`)
   }
 })
 
-world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) => {
+world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+  const { player, block } = event
   if (player.getGameMode() !== GameMode.creative) return
+  if (!player.isSneaking) return
 
   const region = CustomDungeonRegion.getAt(block)
   if (!region) return
 
   const chest = getChest(region, block.location)
-  if (chest) editChest(player, block.location, region, chest)
+  if (chest) {
+    event.cancel
+    system.delay(() => {
+      editChest(player, block.location, region, chest)
+    })
+  }
 })
 
 function editChest(
