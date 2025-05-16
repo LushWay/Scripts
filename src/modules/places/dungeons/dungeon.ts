@@ -152,10 +152,10 @@ export class DungeonRegion extends Region {
 
   customFormDescription(player: Player): Record<string, unknown> {
     return {
+      ...super.customFormDescription(player),
       Rotation: this.ldb.rotation,
       StructurePosition: this.getStructurePosition(),
-      Chests: this.chests.map(e => e.location),
-      ...super.customFormDescription(player),
+      Chests: this.chests.map(e => Vector.string(this.fromRelativeToAbsolute(e.location), true)),
     }
   }
 
