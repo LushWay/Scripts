@@ -1,4 +1,4 @@
-import { Block, Player, StructureRotation, world } from '@minecraft/server'
+import { Block, GameMode, Player, StructureRotation, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, ms, RegionCreationOptions, registerCreateableRegion, registerSaveableRegion, Vector } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
@@ -91,6 +91,41 @@ world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
   const region = eventHelper(player, block)
   if (!region) return
 
+  editChest(player, block, region)
+})
+
+world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermutation }) => {
+  if (brokenBlockPermutation.type.id !== MinecraftBlockTypes.Chest) return false
+
+  const region = eventHelper(player, block)
+  if (!region) return
+
+  const location = block.location
+  const chest = getChest(region, location)
+  if (chest) {
+    region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
+    region.chests = region.chests.filter(e => !Vector.equals(e.location, location))
+
+    player.success(t`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime}min`)
+  }
+})
+
+world.afterEvents.playerInteractWithBlock.subscribe(({ player, block }) => {
+  if (player.getGameMode() !== GameMode.creative) return
+
+  const region = CustomDungeonRegion.getAt(block)
+  if (!region) return
+
+  const chest = getChest(region, block.location)
+  if (chest) editChest(player, block.location, region, chest)
+})
+
+function editChest(
+  player: Player,
+  location: Vector3,
+  region: CustomDungeonRegion,
+  chest?: CustomDungeonRegionDatabase['chestLoot'][number],
+) {
   const keys: string[] = []
 
   new ModalForm('Сундук с лутом')
@@ -101,27 +136,18 @@ world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
           .map(([key, value]) => [key, (value?.id ?? key).replace('mystructure:dungeons/', '')])
           .filter(e => (keys.includes(e[1]) ? false : (keys.push(e[1]), true))),
       ),
+      { defaultValueIndex: chest?.loot },
     )
-    .addSlider('Время восстановления (в минутах)', 1, 180, 1, 20)
+    .addSlider('Время восстановления (в минутах)', 1, 180, 1, chest ? chest.restoreTime / 60_000 : 20)
     .show(player, (_, loot, restoreTime) => {
-      const relative = block
-      region.addCustomChest(relative, loot as keyof (typeof Dungeon)['customLoot'], restoreTime)
+      if (chest) {
+      } else {
+        region.addCustomChest(location, loot as keyof (typeof Dungeon)['customLoot'], restoreTime)
+      }
       player.success(t`Created a chest with loot ${loot} and restore time ${restoreTime}min`)
     })
-})
+}
 
-world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermutation }) => {
-  if (brokenBlockPermutation.type.id !== MinecraftBlockTypes.Chest) return false
-
-  const region = eventHelper(player, block)
-  if (!region) return
-
-  const relative = block
-  const chest = region.ldb.chestLoot.find(e => Vector.equals(e.location, relative))
-  if (chest) {
-    region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
-    region.chests = region.chests.filter(e => !Vector.equals(e.location, relative))
-
-    player.success(t`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime}min`)
-  }
-})
+function getChest(region: CustomDungeonRegion, location: Vector3) {
+  return region.ldb.chestLoot.find(e => Vector.equals(e.location, location))
+}
