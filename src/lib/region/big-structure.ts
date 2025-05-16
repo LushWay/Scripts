@@ -1,7 +1,7 @@
 import { StructureSaveMode, world } from '@minecraft/server'
-import { Vector } from 'lib/vector'
 import { Region } from 'lib/region'
 import { BigStructure } from 'lib/utils/big-structure'
+import { Vector } from 'lib/vector'
 import { RegionStructure } from './structure'
 
 export class BigRegionStructure extends RegionStructure {
@@ -17,6 +17,7 @@ export class BigRegionStructure extends RegionStructure {
       '',
       StructureSaveMode.World,
       false,
+      regionId,
     )
   }
 

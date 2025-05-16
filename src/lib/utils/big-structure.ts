@@ -24,9 +24,10 @@ export class BigStructure extends Cuboid {
     readonly name = '',
     private readonly saveMode = StructureSaveMode.Memory,
     saveOnCreate = true,
+    date = Date.now().toString(32),
   ) {
     super(pos1, pos2)
-    this.prefix = `${prefix}|${Date.now().toString(32)}`
+    this.prefix = `${prefix}|${date}`
 
     if (saveOnCreate) this.save()
   }
