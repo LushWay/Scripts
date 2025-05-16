@@ -7,8 +7,9 @@ import { customItems } from 'lib/rpg/custom-item'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 import { decreaseItemCount } from './throwable-tnt'
+import { Items } from 'lib/assets/custom-items'
 
-export const FireBallItem = new ItemStack('lw:fireball').setInfo(
+export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
   undefined,
   'Используйте, чтобы отправить все в огненный ад',
 )
@@ -86,11 +87,11 @@ system.runInterval(
     for (const entity of iceBombs) {
       if (!entity.isValid) continue
 
-      const base = Vector.floor(entity.location)
+      const floored = Vector.floor(entity.location)
       const dimension = entity.dimension
       const dimensionType = dimension.type
-      getEdgeBlocksOf(base)
-        .concat(base)
+      getEdgeBlocksOf(floored)
+        .concat(floored)
         .forEach(vector => {
           if (!BaseRegion.getManyAt({ vector, dimensionType }).length) return
 
