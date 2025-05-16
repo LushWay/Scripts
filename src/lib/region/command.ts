@@ -10,6 +10,7 @@ import { Region } from 'lib/region/kinds/region'
 import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vector } from 'lib/vector'
+import { Area } from './areas/area'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
@@ -121,8 +122,21 @@ function regionForm(player: Player) {
 function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {
   const form = new ActionForm('Список ' + RegionType.name)
 
+  selectArea(form, RegionType, player, area => {
+    editRegion(player, RegionType.create(area), () => regionList(player, RegionType, back))
+  })
+
+  for (const region of RegionType.getAll()) {
+    form.addButton(t`${region.name}\n${region.area.toString()}`, () =>
+      editRegion(player, region, () => regionList(player, RegionType, back)),
+    )
+  }
+
+  form.show(player)
+}
+
+function selectArea(form: ActionForm, RegionType: typeof Region, player: Player, onSelect: (area: Area) => void) {
   form
-    .addButton(ActionForm.backText, back)
     .addButton('Создать Сферический', BUTTON['+'], () => {
       new ModalForm('Создать Сферический ' + RegionType.name)
         .addTextField('Центр', '~~~', '~~~')
@@ -136,9 +150,7 @@ function regionList(player: Player, RegionType: typeof Region, back = () => regi
               `Нельзя создать регион, область которого ниже -64 (y: ${center.y} radius: ${radius} result: ${center.y - radius})`,
             )
 
-          editRegion(player, RegionType.create(new SphereArea({ radius, center }, player.dimension.type)), () =>
-            regionList(player, RegionType, back),
-          )
+          onSelect(new SphereArea({ radius, center }, player.dimension.type))
         })
     })
     .addButton('Создать Кубический', BUTTON['+'], () => {
@@ -150,16 +162,9 @@ function regionList(player: Player, RegionType: typeof Region, back = () => regi
           const to = parseLocationFromForm(ctx, rawTo, player)
           if (!from || !to) return
 
-          editRegion(player, RegionType.create(new RectangleArea({ from, to }, player.dimension.type)), () =>
-            regionList(player, RegionType, back),
-          )
+          onSelect(new RectangleArea({ from, to }, player.dimension.type))
         })
     })
-
-  for (const region of RegionType.getAll()) {
-    form.addButton(region.name, () => editRegion(player, region, () => regionList(player, RegionType, back)))
-  }
-  form.show(player)
 }
 
 const pluralForms: WordPluralForms = ['региона', 'регион', 'в регионе']
@@ -227,6 +232,14 @@ function editRegion(player: Player, region: Region, back: () => void) {
 
   form.addButton('Переместиться в регион', () => player.teleport(region.area.center))
   form.addButtonAsk('§cУдалить регион', '§cУдалить', () => (region.delete(), back()), '§aНе удалять').show(player)
+  form.addButton('Заменить зону', () => {
+    const form = new ActionForm('Заменить зону')
+    selectArea(form, region.creator, player, area => {
+      region.area = area
+      region.save()
+    })
+    form.show(player)
+  })
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {

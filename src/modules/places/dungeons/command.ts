@@ -36,8 +36,9 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
   new ArrayForm('Выбери тип данжа', dungeons)
     .button(structureId => {
       return [
-        Dungeon.customNames[structureId] ??
-          (isKeyof(structureId, Dungeon.names) ? Dungeon.names[structureId] : structureId),
+        structureId in Dungeon.customNames
+          ? t`(Без структуры) ${Dungeon.customNames[structureId]}`
+          : (Dungeon.names[structureId] ?? structureId),
         () => {
           const hand = ctx.player.mainhand()
           if (toolSchema.is(hand)) {
