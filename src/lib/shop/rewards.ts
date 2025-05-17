@@ -14,7 +14,7 @@ export namespace Rewards {
         type: 'item'
         count: number
         id: string
-        name: string
+        name?: string
       }
 }
 
@@ -50,7 +50,7 @@ export class Rewards {
    * @param name The item name
    * @param count The item count
    */
-  item(id: MinecraftItemTypes | string, name: string, count: number): Rewards {
+  item(id: MinecraftItemTypes | string, count: number, name?: string): Rewards {
     this.entries.push({ type: 'item', id, name, count })
     return this
   }
@@ -73,7 +73,9 @@ export class Rewards {
   private static giveOne(player: Player, reward: Rewards.DatabaseEntry) {
     if (reward.type === 'item' && reward.id) {
       if (!player.container) return
-      player.container.addItem(new ItemStack(reward.id, reward.count))
+      const item = new ItemStack(reward.id, reward.count)
+      if (reward.name) item.nameTag = reward.name
+      player.container.addItem(item)
     } else if (reward.type === 'scores') {
       player.scores[reward.score] += reward.count
     }
@@ -84,9 +86,9 @@ export class Rewards {
    *
    * @param player The player to give out the rewards to
    */
-  give(player: Player): Rewards {
+  give(player: Player, tell = true): Rewards {
     for (const reward of this.entries) Rewards.giveOne(player, reward)
-    player.success('Вы получили награды!')
+    if (tell) player.success('Вы получили награды!')
     return this
   }
 
@@ -119,7 +121,11 @@ export class Rewards {
 
   /** Returns the rewards as a human-readable string */
   toString(): RawMessage {
-    return { rawtext: this.entries.map(Rewards.rewardToString) }
+    return {
+      rawtext: this.entries
+        .map((e, i, a) => [Rewards.rewardToString(e), i === a.length - 1 ? { text: '' } : { text: ', ' }])
+        .flat(),
+    }
   }
 }
 

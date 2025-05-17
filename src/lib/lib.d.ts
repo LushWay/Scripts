@@ -98,6 +98,7 @@ declare module '@minecraft/server' {
     readonly role: Role
     prevRole?: Role
     quests?: import('./quest/quest').Quest.DB
+    achivs?: import('./achievement/achievement').Achievement.DB
     join?: {
       position?: number[]
       stage?: number

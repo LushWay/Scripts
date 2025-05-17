@@ -164,4 +164,8 @@ export class ShowForm {
     this.create(form, player)
     return form.currentTitle ?? 'No title'
   }
+
+  get command() {
+    return (ctx: import('lib/command/context').CommandContext) => this.show(ctx.player)
+  }
 }

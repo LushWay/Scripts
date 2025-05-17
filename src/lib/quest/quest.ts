@@ -233,7 +233,7 @@ export class Quest {
     }
 
     db.quests.active = db.quests.active.filter(q => q !== active)
-    if (end) db.quests.completed.push(this.id)
+    if (end && !db.quests.completed.includes(this.id)) db.quests.completed.push(this.id)
   }
 
   get group() {
