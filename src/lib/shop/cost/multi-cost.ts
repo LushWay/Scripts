@@ -74,10 +74,7 @@ export class MultiCost<T extends Cost[]> extends Cost {
 
   private createCostAlias<T extends typeof ItemCost | typeof ScoreboardCost | typeof XPCost>(target: T) {
     return (...args: ConstructorParameters<T>) => {
-      this.costs.push(
-        // @ts-expect-error Idk why it complains
-        new target(...args),
-      )
+      this.costs.push(new (target as unknown as new (...args: ConstructorParameters<T>) => Cost)(...args))
       return this
     }
   }

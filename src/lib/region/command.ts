@@ -297,7 +297,7 @@ function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, p
   const parsed = parseLocationArguments([x, y, z], player)
   if (!parsed) return ctx.error('Неправильная локация: ' + inspect(location))
 
-  return Vector.floor(parsed)
+  return Vector.floor(parsed) as Vector3
 }
 
 export function editRegionPermissions(

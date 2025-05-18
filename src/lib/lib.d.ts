@@ -4,7 +4,8 @@ import '../../tools/defines'
 declare global {
   type VoidFunction = () => void
 
-  type Vector3 = mc.Vector3
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  type Vector3 = { x: number; y: number; z: number }
   type Vector2 = mc.Vector2
   type VectorXZ = Record<'x' | 'z', number>
   type Vector5 = Record<'x' | 'y' | 'z' | 'rx' | 'ry', number>

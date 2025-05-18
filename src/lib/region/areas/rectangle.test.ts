@@ -18,11 +18,53 @@ describe('rectangle', () => {
   it('should have center', () => {
     const rect = new RectangleArea({ from: { x: 10, y: 10, z: 10 }, to: { x: 20, y: 20, z: 20 } }, 'overworld')
 
+    expect(rect.edges).toMatchInlineSnapshot(`
+      [
+        {
+          "x": 10,
+          "y": 10,
+          "z": 10,
+        },
+        {
+          "x": 20,
+          "y": 20,
+          "z": 20,
+        },
+      ]
+    `)
+
     expect(rect.center).toMatchInlineSnapshot(`
       {
         "x": 15,
         "y": 15,
         "z": 15,
+      }
+    `)
+  })
+
+  it('should have negative center', () => {
+    const rect = new RectangleArea({ from: { x: -10, y: -10, z: -10 }, to: { x: -20, y: -20, z: -20 } }, 'overworld')
+
+    expect(rect.edges).toMatchInlineSnapshot(`
+      [
+        {
+          "x": -20,
+          "y": -20,
+          "z": -20,
+        },
+        {
+          "x": -10,
+          "y": -10,
+          "z": -10,
+        },
+      ]
+    `)
+
+    expect(rect.center).toMatchInlineSnapshot(`
+      {
+        "x": -15,
+        "y": -15,
+        "z": -15,
       }
     `)
   })

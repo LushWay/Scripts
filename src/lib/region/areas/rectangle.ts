@@ -10,8 +10,12 @@ interface RectangleDatabase extends JsonObject {
 
 class Rectangle extends Area<RectangleDatabase> {
   constructor(database: RectangleDatabase, dimensionType?: DimensionType) {
-    database.from = Vector.min(database.from, database.to)
-    database.to = Vector.max(database.from, database.to)
+    if (typeof database.from === 'object') {
+      const from = Vector.min(database.from, database.to)
+      const to = Vector.max(database.from, database.to)
+      database.from = from
+      database.to = to
+    }
     super(database, dimensionType)
   }
 
@@ -33,9 +37,9 @@ class Rectangle extends Area<RectangleDatabase> {
   get center() {
     const [from, to] = this.edges
     return {
-      x: from.x + (from.x - to.x) / 2,
-      y: from.y + (from.y - to.y) / 2,
-      z: from.z + (from.z - to.z) / 2,
+      x: from.x + (to.x - from.x) / 2,
+      y: from.y + (to.y - from.y) / 2,
+      z: from.z + (to.z - from.z) / 2,
     }
   }
 
