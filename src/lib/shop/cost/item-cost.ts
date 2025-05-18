@@ -1,10 +1,13 @@
-import { ItemStack, Player } from '@minecraft/server'
+import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
+import { eqSlots } from 'lib/form/select-item'
 import { MaybeRawText, t } from 'lib/text'
 import { Cost } from '../cost'
 import { itemNameXCount } from '../item-name-x-count'
 import { CostType } from './cost'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
+
+type Slots = Map<number | EquipmentSlot, { amount: number | undefined; slot: ContainerSlot }>
 
 export class ItemCost extends Cost {
   /**
@@ -26,22 +29,27 @@ export class ItemCost extends Cost {
   }
 
   protected getItems(player: Player) {
-    if (!player.container) return { canBuy: false, slots: new Map<number, number | undefined>(), amount: 0 }
+    const equippable = player.getComponent(EntityComponentTypes.Equippable)
+    if (!player.container || !equippable) return { canBuy: false, slots: new Map() as Slots, amount: 0 }
 
     let amount = this.amount
-    const slots = new Map<number, number | undefined>()
-    for (const [i, item] of player.container.entries()) {
+    const slots = new Map() as Slots
+    for (const [i, slot] of [
+      ...player.container.slotEntries(),
+      ...eqSlots.map(e => [e, equippable.getEquipmentSlot(e)] as const),
+    ]) {
       if (amount === 0) break
+      const item = slot.getItem()
       if (!item || !this.is(item)) continue
 
       amount -= item.amount
       if (amount < 0) {
         // in this slot there is more items then we need
-        slots.set(i, -(amount + item.amount))
+        slots.set(i, { amount: -(amount + item.amount), slot })
         break
       } else {
         // take all the items from this slot
-        slots.set(i, undefined)
+        slots.set(i, { amount: undefined, slot })
       }
     }
 
@@ -57,11 +65,11 @@ export class ItemCost extends Cost {
 
     const { container } = player
     if (!container) return
-    for (const [i, amount] of items.slots) {
+    for (const [, { amount, slot }] of items.slots) {
       if (amount) {
-        container.getSlot(i).amount += amount
+        slot.amount += amount
       } else {
-        container.setItem(i, undefined)
+        slot.setItem(undefined)
       }
     }
 
