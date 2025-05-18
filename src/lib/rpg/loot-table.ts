@@ -22,6 +22,7 @@ interface StoredItem {
   chance: number
   amount: number[]
   damage: number[]
+  custom: { chances: number[]; apply: (item: ItemStack, result: number) => void }[]
 }
 
 new Command('loot')
@@ -92,7 +93,7 @@ export class Loot {
 
   private create(itemStack: ItemStack | (() => ItemStack)) {
     if (this.current) this.items.push(this.current)
-    this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {} }
+    this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {}, custom: [] }
   }
 
   private getCurrent() {
@@ -140,6 +141,10 @@ export class Loot {
     this.getCurrent().damage = Loot.randomCostToArray(damage)
 
     return this
+  }
+
+  custom(chances: RandomCostMap, apply: (item: ItemStack, result: number) => void) {
+    this.getCurrent().custom.push({ chances: Loot.randomCostToArray(chances), apply })
   }
 
   duplicate(count: number) {
@@ -310,6 +315,8 @@ export class LootTable {
         const damage = item.damage.randomElement()
         if (damage && stack.durability) stack.durability.damage = damage
       }
+
+      for (const custom of item.custom) custom.apply(stack, custom.chances.randomElement())
 
       return [
         {
