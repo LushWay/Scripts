@@ -24,9 +24,9 @@ class Rectangle extends Area<{
 
   get center() {
     return {
-      x: Math.abs(this.database.from.x - this.database.to.x) / 2,
-      y: Math.abs(this.database.from.y - this.database.to.y) / 2,
-      z: Math.abs(this.database.from.z - this.database.to.z) / 2,
+      x: this.database.from.x + Math.abs(this.database.from.x - this.database.to.x) / 2,
+      y: this.database.from.y + Math.abs(this.database.from.y - this.database.to.y) / 2,
+      z: this.database.from.z + Math.abs(this.database.from.z - this.database.to.z) / 2,
     }
   }
 

@@ -15,6 +15,18 @@ describe('rectangle', () => {
     expect(rect.isNear(createPoint(15, 15, 15), 5)).toBe(true)
   })
 
+  it('should have center', () => {
+    const rect = new RectangleArea({ from: { x: 10, y: 10, z: 10 }, to: { x: 20, y: 20, z: 20 } }, 'overworld')
+
+    expect(rect.center).toMatchInlineSnapshot(`
+      {
+        "x": 15,
+        "y": 15,
+        "z": 15,
+      }
+    `)
+  })
+
   it('should call forEachVector', async () => {
     const rect = new RectangleArea({ from: { x: 0, y: 0, z: 0 }, to: { x: 2, y: 3, z: 2 } }, 'overworld')
     const v = vi.fn()
