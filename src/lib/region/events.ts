@@ -26,8 +26,10 @@ export class RegionEvents {
    * @param callback - Fnction that will be called when a player enters the specified region.
    */
   static onEnter(region: Region, callback: PlayerCallback) {
-    this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
+    const event = this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
       if (!previous.includes(region) && newest.includes(region)) callback(player)
     })
+
+    return () => this.onPlayerRegionsChange.unsubscribe(event)
   }
 }

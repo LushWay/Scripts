@@ -14,7 +14,7 @@ interface RestorePoint {
   location: Vector3
   dimensionType: ShortcutDimensions
   scores: Pick<Player['scores'], 'money' | 'pvp' | 'raid' | 'anarchyOnlineTime' | ScoreNames.GameModesStat>
-  db: Pick<PlayerDatabase, 'inv' | 'survival' | 'unlockedPortals' | 'quests'>
+  db: Pick<PlayerDatabase, 'inv' | 'survival' | 'unlockedPortals' | 'quests' | 'achivs'>
 }
 
 interface RestorePointLoadLog {
@@ -60,7 +60,7 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
         'anarchyOnlineTime',
         ...scoreboardObjectiveNames.gameModeStats,
       ]),
-      db: pick(player.database, ['inv', 'survival', 'unlockedPortals', 'quests']),
+      db: pick(player.database, ['inv', 'survival', 'unlockedPortals', 'quests', 'achivs']),
     }
     wipeInventoryDatabase.saveFrom(player, { rewrite: true, key: id, keepInventory: true })
     player.success(t`Restore point ${id} created`)
@@ -166,6 +166,8 @@ function wipe(player: Player) {
   Spawn.portal?.teleport(player)
   player.scores.money = 0
   player.scores.anarchyOnlineTime = 0
+
+  delete player.database.achivs
 
   enterNewbieMode(player)
 

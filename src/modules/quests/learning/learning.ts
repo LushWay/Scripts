@@ -252,7 +252,7 @@ class Learning {
   miner = new Npc(this.quest.group.point('miner').name('Шахтер'), ({ player }) => {
     form(f => {
       f.title(this.miner.name)
-      f.quest(stoneQuarryInvestigating.quest, 'Где мне переплавить железо?')
+      f.quest(stoneQuarryInvestigating.goToCityQuest, 'Где мне переплавить железо?')
       f.quest(this.mine10Iron, 'Где добыть еще больше железа?')
       f.quest(this.mine10Coal, 'Где добыть угля?')
       f.quest(this.mine10Diamonds, 'Где добыть алмазы?')
@@ -387,4 +387,4 @@ class Learning {
   }
 }
 
-new Learning()
+export const learningQuest = new Learning()

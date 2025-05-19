@@ -1,5 +1,6 @@
 import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { EventLoader } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
 import { Join } from 'lib/player-join'
 import { Group } from 'lib/rpg/place'
@@ -90,6 +91,20 @@ export class Quest {
     })
   }
 
+  static {
+    Core.afterEvents.worldLoad.subscribe(() => {
+      system.delay(() => {
+        EventLoader.load(this.onQuestLoad)
+
+        EventLoader.load(this.onLoad)
+      })
+    })
+  }
+
+  protected static onQuestLoad = new EventLoader()
+
+  static onLoad = new EventLoader()
+
   players = new WeakPlayerMap<PlayerQuest>({ onLeave: (_, v) => v.steps.forEach(e => e.cleanup()) })
 
   /**
@@ -110,15 +125,13 @@ export class Quest {
     ) => void,
   ) {
     Quest.quests.set(this.id, this)
-    Core.afterEvents.worldLoad.subscribe(() => {
-      system.delay(() => {
-        world.getAllPlayers().forEach(e => Quest.restore(e, this))
+    Quest.onQuestLoad.subscribe(() => {
+      world.getAllPlayers().forEach(e => Quest.restore(e, this))
 
-        const questSettings = Settings.worldMap[this.group.id]
-        if (typeof questSettings !== 'undefined') {
-          questSettings[SETTINGS_GROUP_NAME] = `Задание: ${this.name}\n§7${this.description}`
-        }
-      })
+      const questSettings = Settings.worldMap[this.group.id]
+      if (typeof questSettings !== 'undefined') {
+        questSettings[SETTINGS_GROUP_NAME] = `Задание: ${this.name}\n§7${this.description}`
+      }
     })
   }
 
@@ -222,7 +235,7 @@ export class Quest {
    * @param player - Player to exit
    * @param end - Whenther to mark this quest as completed successfully and add to the completed array or not
    */
-  exit(player: Player, end = false) {
+  exit(player: Player, end = false, removeFromCompleted = false) {
     const db = player.database
     if (!db.quests) return
 
@@ -234,6 +247,9 @@ export class Quest {
 
     db.quests.active = db.quests.active.filter(q => q !== active)
     if (end && !db.quests.completed.includes(this.id)) db.quests.completed.push(this.id)
+    if (removeFromCompleted) {
+      db.quests.completed = db.quests.completed.filter(e => e !== this.id)
+    }
   }
 
   get group() {

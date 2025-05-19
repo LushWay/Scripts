@@ -78,7 +78,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
 }
 
 export function manageQuestMenu(quest: Quest) {
-  return form((f, player) => {
+  return form((f, player, back) => {
     const current = quest.getPlayerStep(player)
     let currentDescription = ''
     if (current) {
@@ -102,7 +102,12 @@ export function manageQuestMenu(quest: Quest) {
       })
     }
 
-    f.ask('§cОтказаться от задания', '§cОтказаться', () => quest.exit(player), 'Назад')
+    f.ask(
+      '§cОтказаться от задания',
+      '§cОтказаться',
+      () => (quest.exit(player, undefined, true), back?.(player)),
+      'Назад',
+    )
 
     const place = current?.place
     if (is(player.id, 'techAdmin') && place) f.button('§7admin: tp to quest point', () => player.teleport(place))

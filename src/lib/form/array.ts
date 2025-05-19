@@ -34,7 +34,7 @@ export declare namespace ArrayForm {
     addCustomButtonBeforeArray?: AddCustomButtons<this, F>
     itemsPerPage?: number
     minItemsForFilters?: number
-    back?: VoidFunction
+    back?: NewFormCallback
   }
 }
 
@@ -82,7 +82,7 @@ export class ArrayForm<
     return this
   }
 
-  back(back?: VoidFunction) {
+  back(back?: NewFormCallback) {
     this.config.back = back
     return this
   }

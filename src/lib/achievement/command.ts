@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
-import { form } from 'lib/form/new'
+import { form, NewFormCallback } from 'lib/form/new'
 import { t } from 'lib/text'
 import { Achievement } from './achievement'
 
@@ -10,8 +10,11 @@ new Command('achievement')
   .setPermissions('member')
   .executes(ctx => achievementsForm(ctx.player))
 
-export function achievementsForm(player: Player) {
+export function achievementsForm(player: Player, back?: NewFormCallback) {
+  const self = () => achievementsForm(player, back)
+
   new ArrayForm('Достижения', Achievement.list)
+    .back(back)
     .filters({
       sortMode: {
         name: 'Режим сортировки',
@@ -48,7 +51,7 @@ export function achievementsForm(player: Player) {
       const isRewardTaken = item.isRewardTaken(player)
       return [
         isDone ? (isRewardTaken ? item.name : t`${item.name}§c*\n§aЗаберите награды!`) : '?\nНеизвестно',
-        isDone ? p => achievementDetails(item).show(p, () => achievementsForm(player)) : () => achievementsForm(player),
+        isDone ? p => achievementDetails(item).show(p, self) : self,
       ] as const
     })
     .show(player)

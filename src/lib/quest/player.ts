@@ -9,7 +9,7 @@ import { QSCounter, QSCounterBuilder } from './steps/counter'
 import { QSDialogue } from './steps/dialogue'
 import { QSDynamic, QSDynamicBuilder } from './steps/dynamic'
 import { QSItem, QSItemBuilder } from './steps/item'
-import { QSPlace } from './steps/place'
+import { QSPlace, QSPlaceRegion } from './steps/place'
 
 export class PlayerQuest {
   constructor(
@@ -34,6 +34,8 @@ export class PlayerQuest {
   }
 
   place = QSPlace.bind(this)
+
+  region = QSPlaceRegion.bind(this)
 
   dialogue = QSDialogue.bind(this)
 

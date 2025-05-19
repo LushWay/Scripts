@@ -1,4 +1,5 @@
 import { ActionForm, BUTTON, FormCallback } from 'lib'
+import { achievementsForm } from 'lib/achievement/command'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { Mail } from 'lib/mail'
@@ -9,6 +10,7 @@ import { playerSettingsMenu } from 'lib/settings'
 import { t } from 'lib/text'
 import { mailMenu } from 'modules/commands/mail'
 import { openBaseMenu } from 'modules/places/base/base-menu'
+import { wiki } from 'modules/wiki/wiki'
 import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
 
@@ -45,12 +47,14 @@ Menu.open = player => {
       openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
     )
     const [clanText, clan] = clanMenu(player, back)
-    form.addButton(clanText, 'textures/ui/permissions_op_crown', clan)
+    form.addButton(clanText, 'textures/ui/FriendsIcon', clan)
   }
 
   form
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
-    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, BUTTON.settings, () => mailMenu(player, back))
+    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, back))
+    .addButton('§bВики', BUTTON.search, wiki.show)
+    .addButton('§eДостижения', 'textures/blocks/gold_block', achievementsForm)
     .addButton('§7Настройки', BUTTON.settings, () => playerSettingsMenu(player, back))
 
   return form

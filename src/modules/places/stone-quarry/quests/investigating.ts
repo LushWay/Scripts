@@ -1,40 +1,16 @@
-import { isNotPlaying, Vector } from 'lib'
-import { Quest } from 'lib/quest/index'
-import { RegionEvents } from 'lib/region/events'
+import { CityInvestigating } from 'modules/places/lib/city-investigating-quest'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 
-class StoneQuarryInvestigating {
-  private place = StoneQuarry
+export const stoneQuarryInvestigating = new CityInvestigating(StoneQuarry, (place, q, player) => {
+  q.dialogue(place.commonOvener.npc)
+    .body('Привет я печкин я продаю ключи к печкам сзвди меня вот да')
+    .buttons(['Хорошо отлично я у тебя их куплю и переплавлю руду', ctx => ctx.next()])
 
-  quest = new Quest('StoneQuarryInvestigating', StoneQuarry.name, 'Исследуйте новый город!', (q, player) => {
-    if (!StoneQuarry.safeArea || !StoneQuarry.cutscene.start) return q.failed('Каменеломня не настроена')
+  q.dialogue(place.foodOvener.npc)
+    .body('Привет я едовой печкин я продаю ключи к печкам сзвди меня вот да')
+    .buttons(['Хорошо отлично я у тебя их куплю и переплавлю еду', ctx => ctx.next()])
 
-    if (!StoneQuarry.safeArea.area.isIn(player)) {
-      q.place(...Vector.around(StoneQuarry.cutscene.start, 4), 'Доберитесь до города!')
-      q.dynamic('Обзор города').activate(ctx => {
-        this.place.cutscene.play(ctx.player)?.finally(() => ctx.next())
-      })
-    }
-    q.dialogue(this.place.commonOvener.npc)
-      .body('ПРивет я продаю печки даааaaaaаааа')
-      .buttons([
-        'Хоршо отлично я у тебя их куплю и переплавлю руду',
-        ctx => {
-          ctx.next()
-        },
-      ])
-  })
-
-  constructor() {
-    if (this.place.safeArea) {
-      if (__RELEASE__)
-        RegionEvents.onEnter(this.place.safeArea, player => {
-          if (isNotPlaying(player)) return
-          this.quest.enter(player)
-          this.place.cutscene.play(player)
-        })
-    }
-  }
-}
-
-export const stoneQuarryInvestigating = new StoneQuarryInvestigating()
+  q.dialogue(place.gunsmith.npc)
+    .body('Привет я оружейник я прокачаю твое оружие')
+    .buttons(['Хорошо отлично я у тебя его прокачаю', ctx => ctx.next()])
+})

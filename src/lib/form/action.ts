@@ -83,7 +83,7 @@ export class ActionForm {
    *
    * @param backCallback - Callback function that will be called when back button is pressed.
    */
-  addButtonBack(backCallback: VoidFunction | undefined) {
+  addButtonBack(backCallback: NewFormCallback | undefined) {
     if (!backCallback) return this
     else return this.addButton('§r§3Назад', BUTTON['<'], backCallback)
   }

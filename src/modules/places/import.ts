@@ -1,0 +1,8 @@
+import './anarchy/anarchy'
+import './spawn'
+import './stone-quarry/index'
+import './tech-city/index'
+import './village-of-explorers/index'
+import './village-of-miners/index'
+import './dungeons/warden'
+import './dungeons/command'
