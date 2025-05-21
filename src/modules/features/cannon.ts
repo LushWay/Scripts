@@ -4,6 +4,7 @@ import { actionGuard, ActionGuardOrder, Cooldown, ms, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { t } from 'lib/text'
+import { explosibleEntities } from 'modules/pvp/explosible-fireworks'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
@@ -26,8 +27,8 @@ function guide(player: Player) {
   return false
 }
 
-world.beforeEvents.itemUse.subscribe(event => {
-  event.cancel = !fire(event.source, true)
+world.afterEvents.itemUse.subscribe(event => {
+  fire(event.source, true)
 })
 
 function fire(player: Player, fire = false) {
@@ -54,6 +55,7 @@ function fire(player: Player, fire = false) {
           Vector.add(location, { x: 0, y: -0.5, z: 0 }),
         )
         tnt.applyImpulse(Vector.multiply(player.getViewDirection(), 2))
+        explosibleEntities.set(tnt.id, { source: player, entity: tnt })
         cannon.dimension.playSound('random.explode', location, { volume: 4, pitch: 0.9 })
         cannon.dimension.spawnParticle('minecraft:dragon_dying_explosion', location)
       }

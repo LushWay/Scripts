@@ -19,13 +19,13 @@ world.afterEvents.itemUse.subscribe(event => {
     if (!entity.isValid) continue
     if (Date.now() - date < 5 && Vector.distance(event.source.location, entity.location) < 2) {
       SPAWNED_FIREWORKS.delete(id)
-      FIREWORKS.set(id, { source: event.source, firework: entity })
+      explosibleEntities.set(id, { source: event.source, entity: entity })
       return
     }
   }
 })
 
-const FIREWORKS = new Map<string, { source: Player; firework: Entity }>()
+export const explosibleEntities = new Map<string, { source: Player; entity: Entity }>()
 
 system.runInterval(
   () => {
@@ -33,32 +33,32 @@ system.runInterval(
       if (Date.now() - date > 5) SPAWNED_FIREWORKS.delete(id)
     }
 
-    for (const [id, { source, firework }] of FIREWORKS.entries()) {
-      if (!firework.isValid) {
-        FIREWORKS.delete(id)
+    for (const [id, { source, entity }] of explosibleEntities.entries()) {
+      if (!entity.isValid) {
+        explosibleEntities.delete(id)
         continue
       }
 
-      const location = firework.location
-      const block = firework.dimension.getBlock(Vector.add(location, Vector.multiply(firework.getViewDirection(), 1.2)))
-      const b4 = firework.dimension.getBlock(firework.location)
-      const b2 = firework.getBlockFromViewDirection({ maxDistance: 1 })
+      const location = entity.location
+      const block = entity.dimension.getBlock(Vector.add(location, Vector.multiply(entity.getViewDirection(), 1.2)))
+      const b4 = entity.dimension.getBlock(entity.location)
+      const b2 = entity.getBlockFromViewDirection({ maxDistance: 1 })
 
       if ((block && !block.isAir) || b2 || (b4 && !b4.isAir)) {
-        firework.dimension.createExplosion(location, 1.6, {
+        entity.dimension.createExplosion(location, 1.6, {
           source,
           breaksBlocks: true,
         })
-        const entities = firework.dimension.getEntities({ location: firework.location, maxDistance: 4 })
+        const entities = entity.dimension.getEntities({ location: entity.location, maxDistance: 4 })
         for (const entity of entities) {
           entity.applyDamage(5, {
             cause: EntityDamageCause.entityExplosion,
             damagingEntity: source,
-            damagingProjectile: firework,
+            damagingProjectile: entity,
           })
         }
-        firework.remove()
-        FIREWORKS.delete(id)
+        entity.remove()
+        explosibleEntities.delete(id)
       }
     }
   },

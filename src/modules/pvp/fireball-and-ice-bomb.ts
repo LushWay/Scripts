@@ -8,6 +8,7 @@ import { customItems } from 'lib/rpg/custom-item'
 import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
+import { explosibleEntities } from './explosible-fireworks'
 import { decreaseItemCount } from './throwable-tnt'
 
 export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
@@ -33,6 +34,7 @@ world.afterEvents.itemUse.subscribe(event => {
 
   projectile.owner = event.source
   projectile.shoot(Vector.multiply(event.source.getViewDirection(), 1.4), { uncertainty: 0.1 })
+  explosibleEntities.set(entity.id, { source: event.source, entity })
 })
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
