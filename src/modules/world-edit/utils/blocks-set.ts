@@ -1,4 +1,4 @@
-import { Block, BlockPermutation, Player } from '@minecraft/server'
+import { Block, BlockPermutation, Player, TargetBlockHitAfterEvent } from '@minecraft/server'
 
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
 import { noNullable, typeIdToReadable } from 'lib'
@@ -20,7 +20,6 @@ export type BlocksSetRef = [owner: string, blocksSetName: string]
 export interface ReplaceTarget extends ReplaceMode {
   typeId: string
   states: Record<string, string | number | boolean>
- 
 }
 
 /** Reference to block replace validation */
@@ -116,13 +115,14 @@ export function replaceWithTargets(
   block: Block,
   permutations: BlockPermutation[],
 ) {
-  if (!replaceMode.matches(block, replaceBlocks)) return
+  const targets = replaceBlocks.slice()
+  if (!replaceMode.matches(block, targets)) return
 
   const getPermutation = () => replaceMode.select?.(block, permutations) ?? permutations.randomElement()
-  if (!replaceBlocks.length) return block.setPermutation(getPermutation())
+  if (!targets.length) return block.setPermutation(getPermutation())
 
-  for (const replaceBlock of replaceBlocks) {
-    if (!replaceBlock.matches(block, replaceBlocks)) continue
+  for (const replaceBlock of targets) {
+    if (!replaceBlock.matches(block, targets)) continue
 
     block.setPermutation(getPermutation())
   }
