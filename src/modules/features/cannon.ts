@@ -1,8 +1,9 @@
-import { system, world } from '@minecraft/server'
+import { EntityComponentTypes, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard, ActionGuardOrder, Cooldown, ms, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
+import { t } from 'lib/text'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
@@ -14,46 +15,37 @@ export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')
 
 const cooldown = new Cooldown(ms.from('sec', 5))
 
-world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-  if (CannonShellItem.isItem(event.itemStack)) {
-    event.cancel = true
-  }
-})
+actionGuard((player, _, ctx) => {
+  if (ctx.type !== 'interactWithEntity' && ctx.type !== 'interactWithBlock') return
 
-actionGuard((_, __, ctx) => {
-  if (ctx.type === 'interactWithEntity') {
-    if (ctx.event.target.typeId === CustomEntityTypes.Cannon) return true
-  }
-}, ActionGuardOrder.Feature)
+  if (!CannonShellItem.isItem(player.mainhand().getItem())) return
 
-world.beforeEvents.playerInteractWithEntity.subscribe(event => {
-  if (event.target.typeId !== 'lw:cannon') return
+  const riding = player.getComponent(EntityComponentTypes.Riding)
+  const cannon = riding?.entityRidingOn
+  if (!cannon || cannon.typeId !== CustomEntityTypes.Cannon) return guide(player)
+  if (!cooldown.isExpired(player)) return false
 
-  const mainhand = event.player.mainhand()
-  if (!CannonShellItem.isItem(mainhand.getItem())) return
-  if (!cooldown.isExpired(event.player)) return
-
-  event.cancel = true
   system.delay(() => {
+    const mainhand = player.mainhand()
     if (mainhand.isValid) {
       if (mainhand.amount === 1) mainhand.setItem(undefined)
       else mainhand.amount--
     }
 
-    if (event.target.isValid) {
-      const view = event.target.getViewDirection()
-      const location = Vector.add(Vector.add(event.target.location, Vector.multiply(view, 2.5)), {
-        x: 0,
-        y: 1.5,
-        z: 0,
-      })
-      const tnt = event.target.dimension.spawnEntity(
-        MinecraftEntityTypes.Tnt,
-        Vector.add(location, { x: 0, y: -0.5, z: 0 }),
-      )
-      tnt.applyImpulse(Vector.multiply(view, 3))
-      event.target.dimension.playSound('random.explode', location, { volume: 4, pitch: 0.9 })
-      event.target.dimension.spawnParticle('minecraft:dragon_dying_explosion', location)
+    if (cannon.isValid) {
+      const view = cannon.getViewDirection()
+      const location = Vector.add(Vector.add(cannon.location, Vector.multiply(view, 2.5)), { x: 0, y: 1.5, z: 0 })
+      const tnt = cannon.dimension.spawnEntity(MinecraftEntityTypes.Tnt, Vector.add(location, { x: 0, y: -0.5, z: 0 }))
+      tnt.applyImpulse(Vector.multiply(player.getViewDirection(), 2))
+      cannon.dimension.playSound('random.explode', location, { volume: 4, pitch: 0.9 })
+      cannon.dimension.spawnParticle('minecraft:dragon_dying_explosion', location)
     }
   })
-})
+
+  return false
+}, ActionGuardOrder.Feature)
+
+function guide(player: Player) {
+  system.delay(() => player.fail(t.error`Используй этот предмет сидя на пушке`))
+  return false
+}
