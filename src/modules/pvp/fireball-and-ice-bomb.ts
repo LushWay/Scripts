@@ -32,7 +32,7 @@ world.afterEvents.itemUse.subscribe(event => {
   if (!projectile) throw new TypeError('No projectile!')
 
   projectile.owner = event.source
-  projectile.shoot(Vector.multiply(event.source.getViewDirection(), 1.2))
+  projectile.shoot(Vector.multiply(event.source.getViewDirection(), 1.4), { uncertainty: 0.1 })
 })
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
@@ -50,7 +50,7 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
     const dimension = event.entity.dimension
     system.delay(() => {
       if (event.entity.isValid) event.entity.remove()
-      dimension.createExplosion(location, 1, {
+      dimension.createExplosion(location, 1.5, {
         causesFire: true,
         breaksBlocks: true,
       })
