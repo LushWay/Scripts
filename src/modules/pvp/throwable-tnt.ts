@@ -1,5 +1,6 @@
-import { ItemUseAfterEvent, Player, system, world } from '@minecraft/server'
-import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Player, system, world } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Vector } from 'lib'
 import { Cooldown } from 'lib/cooldown'
 import { ms } from 'lib/utils/ms'
 
@@ -16,6 +17,7 @@ export function decreaseItemCount(player: Player) {
 world.beforeEvents.itemUse.subscribe(event => {
   if (event.itemStack.typeId !== MinecraftItemTypes.Tnt) return
   if (!cooldown.isExpired(event.source)) return
+  if (event.source.isSneaking) return
   event.cancel = true
 
   system.delay(() => {
@@ -24,7 +26,14 @@ world.beforeEvents.itemUse.subscribe(event => {
     decreaseItemCount(event.source)
 
     const tnt = event.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, event.source.location)
-    tnt.applyImpulse(event.source.getViewDirection())
+    tnt.applyImpulse(Vector.multiply(event.source.getViewDirection(), 0.8))
     event.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
   })
+})
+
+world.beforeEvents.playerPlaceBlock.subscribe(event => {
+  if (event.permutationBeingPlaced.type.id !== MinecraftBlockTypes.Tnt) return
+  if (!event.player.isSneaking) {
+    event.cancel = true
+  }
 })
