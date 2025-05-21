@@ -1,13 +1,14 @@
 import { Entity, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { ms, toPoint, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { Items } from 'lib/assets/custom-items'
 import { customItems } from 'lib/rpg/custom-item'
+import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 import { decreaseItemCount } from './throwable-tnt'
-import { Items } from 'lib/assets/custom-items'
 
 export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
   undefined,
@@ -93,12 +94,24 @@ system.runInterval(
       getEdgeBlocksOf(floored)
         .concat(floored)
         .forEach(vector => {
-          if (!BaseRegion.getNear({ vector, dimensionType }, region => region.area.radius + 3).length) return
+          const point = toPoint({ vector, dimensionType })
+          const baseRegions = BaseRegion.getNear(point, region => region.area.radius + 3)
+          if (!baseRegions.length) return
 
+          const inRegion = baseRegions.some(e => e.area.isIn(point))
           const block = dimension.getBlock(vector)
           const transform = block && block.typeId in ICE_BOMB_TRANSOFORM
           const water = block?.isWaterlogged
           if (transform || water) {
+            if (!inRegion) {
+              scheduleBlockPlace({
+                dimension: dimensionType,
+                location: vector,
+                typeId: block.typeId,
+                states: block.permutation.getAllStates(),
+                restoreTime: ms.from('min', 5),
+              })
+            }
             if (transform) {
               block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
             } else if (water) {

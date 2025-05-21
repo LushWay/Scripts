@@ -5,7 +5,6 @@ import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { isScheduledToPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { BaseRegion } from 'modules/places/base/region'
-import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
 
 const notify = new Map<string, { time: number; reason: string }>()
 const targetLockTime = ms.from('min', 8)
