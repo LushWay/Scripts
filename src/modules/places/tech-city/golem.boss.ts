@@ -45,7 +45,7 @@ export function createBossGolem(group: Group) {
       hurtEntity.addEffect(MinecraftEffectTypes.Speed, 60, { amplifier: 10 })
       const boss = hurtEntity.location
       const player = damagingEntity
-      if (player && player.location.y - 3 > hurtEntity.location.y && lessThenQuarter) {
+      if (player && player.location.y - 2 > hurtEntity.location.y && lessThenQuarter) {
         const distance = Vector.subtract(boss, player.location)
         player.applyKnockback(distance, distance.y)
       }

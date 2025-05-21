@@ -197,11 +197,11 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
   if (!damagingEntity?.isValid || !hurtEntity.isValid) return
 
-  const regions = Region.getManyAt(hurtEntity)
-  if (!regions[0]) return
+  const region = Region.getAt(hurtEntity)
+  if (!region) return
 
-  const pvp = regions[0].permissions.pvp
-  if (!(!pvp || (pvp === 'pve' && hurtEntity instanceof Player))) return
+  const pvp = region.permissions.pvp
+  if (!(!pvp || (pvp === 'pve' && !(hurtEntity instanceof Player)))) return
 
   let direction = Vector.subtract(damagingEntity.location, hurtEntity.location).normalized()
   direction = Vector.multiply(direction, 10)
