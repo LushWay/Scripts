@@ -17,16 +17,15 @@ export type BlocksSets = Record<string, BlocksSet>
 export type BlocksSetRef = [owner: string, blocksSetName: string]
 
 /** Reference to block replace validation */
-export interface ReplaceTarget {
+export interface ReplaceTarget extends ReplaceMode {
   typeId: string
   states: Record<string, string | number | boolean>
-  matches(block: Block): boolean
-  select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
+ 
 }
 
 /** Reference to block replace validation */
 export interface ReplaceMode {
-  matches(block: Block): boolean
+  matches(block: Block, replaceBlocks: ReplaceTarget[]): boolean
   select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
 }
 
@@ -117,13 +116,13 @@ export function replaceWithTargets(
   block: Block,
   permutations: BlockPermutation[],
 ) {
-  if (!replaceMode.matches(block)) return
+  if (!replaceMode.matches(block, replaceBlocks)) return
 
   const getPermutation = () => replaceMode.select?.(block, permutations) ?? permutations.randomElement()
   if (!replaceBlocks.length) return block.setPermutation(getPermutation())
 
   for (const replaceBlock of replaceBlocks) {
-    if (!replaceBlock.matches(block)) continue
+    if (!replaceBlock.matches(block, replaceBlocks)) continue
 
     block.setPermutation(getPermutation())
   }

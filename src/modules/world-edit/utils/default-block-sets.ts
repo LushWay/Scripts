@@ -67,6 +67,9 @@ export const REPLACE_MODES: Record<string, ReplaceMode> = {
   'Любой полублок': {
     matches: block => isSlab(block.typeId),
   },
+  'Любой блок кроме': {
+    matches: (block, replaceBlocks) => !replaceBlocks.some(e => e.matches(block, replaceBlocks)),
+  },
   'Замена соответств. блока': {
     matches: () => true,
     select(block, permutations) {

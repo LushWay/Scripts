@@ -112,7 +112,7 @@ export async function smoothVoxelData(
                 const permutations = []
                 const cache = voxelDataCopy[x][y][z]
 
-                if (replaceTargets.length && !replaceTargets.some(e => e.matches(cache.block))) continue
+                if (replaceTargets.length && !replaceTargets.some(e => e.matches(cache.block, replaceTargets))) continue
 
                 for (let dx = -1; dx <= 1; dx++) {
                   for (let dy = -1; dy <= 1; dy++) {
