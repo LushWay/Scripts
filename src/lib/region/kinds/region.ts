@@ -104,10 +104,16 @@ export class Region {
    *
    * @param point - Represents point in the world
    */
-  static getNear<I extends Region>(this: RegionConstructor<I>, point: AbstractPoint, radius: number): I[] {
+  static getNear<I extends Region>(
+    this: RegionConstructor<I>,
+    point: AbstractPoint,
+    radius: number | ((region: I) => number),
+  ): I[] {
     point = toPoint(point)
 
-    return this.getAll().filter(region => region.area.isNear(point, radius))
+    return this.getAll().filter(region =>
+      region.area.isNear(point, typeof radius === 'number' ? radius : radius(region)),
+    )
   }
 
   /**

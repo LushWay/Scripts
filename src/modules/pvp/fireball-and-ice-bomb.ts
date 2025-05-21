@@ -93,7 +93,7 @@ system.runInterval(
       getEdgeBlocksOf(floored)
         .concat(floored)
         .forEach(vector => {
-          if (!BaseRegion.getManyAt({ vector, dimensionType }).length) return
+          if (!BaseRegion.getNear({ vector, dimensionType }, region => region.area.radius + 3).length) return
 
           const block = dimension.getBlock(vector)
           const transform = block && block.typeId in ICE_BOMB_TRANSOFORM

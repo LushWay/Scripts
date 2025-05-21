@@ -12,8 +12,6 @@ export function openBaseMenu(
   back?: VoidFunction,
   onFail: (message: string) => void = message => player.fail(message),
 ) {
-  if (LockAction.locked(player)) return
-
   const base = BaseRegion.getAll().find(r => r.getMemberRole(player))
   if (!base) return onFail('§cУ вас нет базы! Вступите в существующую или создайте свою.')
 
