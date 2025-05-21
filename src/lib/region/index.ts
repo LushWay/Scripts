@@ -186,9 +186,10 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
       player.triggerEvent(
         player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
       )
+      player.setProperty(PlayerProperties['lw:newbie'], true)
     } else if (currentRegion.permissions.pvp === 'pve') {
       player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], true)
+    } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], false)
   }
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
