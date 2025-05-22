@@ -1,10 +1,11 @@
 import { EntityComponentTypes, Player, system, world } from '@minecraft/server'
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard, ActionGuardOrder, Cooldown, ms, Vector } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { t } from 'lib/text'
-import { explosibleEntities } from 'modules/pvp/explosible-fireworks'
+import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
+import { decreaseMainhandItemCount } from './throwable-tnt'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
@@ -15,6 +16,7 @@ export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')
   .lore('Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.')
 
 const cooldown = new Cooldown(ms.from('sec', 5))
+const tellCooldown = new Cooldown(ms.from('sec', 1), false)
 
 actionGuard((player, _, ctx) => {
   if (ctx.type !== 'interactWithEntity' && ctx.type !== 'interactWithBlock') return
@@ -23,13 +25,22 @@ actionGuard((player, _, ctx) => {
 }, ActionGuardOrder.Feature)
 
 function guide(player: Player) {
-  system.delay(() => player.fail(t.error`Используй этот предмет сидя на пушке`))
+  if (tellCooldown.isExpired(player)) system.delay(() => player.fail(t.error`Используй этот предмет сидя на пушке`))
   return false
 }
 
 world.afterEvents.itemUse.subscribe(event => {
   fire(event.source, true)
 })
+
+const cannonShellExplosion: ExplosibleEntityOptions = {
+  damage: 0,
+  strength: 5,
+  breaksBlocks: true,
+  causesFire: false,
+  customBlocksToBreak: [MinecraftBlockTypes.Obsidian, MinecraftBlockTypes.CryingObsidian],
+  r: true,
+}
 
 function fire(player: Player, fire = false) {
   if (!CannonShellItem.isItem(player.mainhand().getItem())) return
@@ -41,11 +52,7 @@ function fire(player: Player, fire = false) {
 
   if (fire)
     system.delay(() => {
-      const mainhand = player.mainhand()
-      if (mainhand.isValid) {
-        if (mainhand.amount === 1) mainhand.setItem(undefined)
-        else mainhand.amount--
-      }
+      decreaseMainhandItemCount(player)
 
       if (cannon.isValid) {
         const view = cannon.getViewDirection()
@@ -55,7 +62,7 @@ function fire(player: Player, fire = false) {
           Vector.add(location, { x: 0, y: -0.5, z: 0 }),
         )
         tnt.applyImpulse(Vector.multiply(player.getViewDirection(), 2))
-        explosibleEntities.set(tnt.id, { source: player, entity: tnt })
+        explosibleEntities.add({ source: player, entity: tnt, explosion: cannonShellExplosion })
         cannon.dimension.playSound('random.explode', location, { volume: 4, pitch: 0.9 })
         cannon.dimension.spawnParticle('minecraft:dragon_dying_explosion', location)
       }

@@ -180,8 +180,11 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
 
   RegionEvents.playerInRegionsCache.set(player, newest)
   const currentRegion = newest[0]
+  const isPlaying = !isNotPlaying(player)
 
-  if (typeof currentRegion !== 'undefined' && !isNotPlaying(player)) {
+  const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
+
+  if (typeof currentRegion !== 'undefined' && isPlaying) {
     if (currentRegion.permissions.pvp === false) {
       player.triggerEvent(
         player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
@@ -189,8 +192,8 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
       player.setProperty(PlayerProperties['lw:newbie'], true)
     } else if (currentRegion.permissions.pvp === 'pve') {
       player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], false)
-  }
+    } else resetNewbie()
+  } else resetNewbie()
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
 })

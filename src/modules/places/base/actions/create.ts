@@ -21,6 +21,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const mainhand = player.mainhand()
   try {
     if (!BaseItem.isItem(mainhand.getItem())) return
+    if (BaseRegion.getAt(block)?.getMemberRole(player)) return // Allow restoring base (handled in other place)
     if (LockAction.locked(player)) return (event.cancel = true)
   } catch (e) {
     if (e instanceof TypeError && e.message.includes('native handle')) return

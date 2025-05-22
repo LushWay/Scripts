@@ -15,7 +15,7 @@ export class RegionEvents {
 
   /**
    * Event that triggers when player regions have changed. Updated each second by region interval. Uses
-   * {@link Region.playerInRegionsCache} under the hood
+   * {@link RegionEvents.playerInRegionsCache} under the hood
    */
   static onPlayerRegionsChange = new EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>()
 

@@ -1,18 +1,29 @@
 import { Block, BlockPermutation, ContainerSlot, Player, RawText, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, Cooldown, getBlockStatus, isEmpty, isLocationError, Mail, ms, Vector } from 'lib'
+import {
+  ActionForm,
+  actionGuard,
+  ActionGuardOrder,
+  Cooldown,
+  getBlockStatus,
+  isEmpty,
+  isLocationError,
+  isNotPlaying,
+  Mail,
+  ms,
+  Vector,
+} from 'lib'
 import { table } from 'lib/database/abstract'
 import { anyPlayerNearRegion } from 'lib/player-move'
-import { onFullRegionTypeRestore } from 'lib/region/kinds/minearea'
-import { scheduleBlockPlace, SCHEDULED_DB, unscheduleBlockPlace } from 'lib/scheduled-block-place'
+import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
 import { itemNameXCount } from 'lib/shop/item-name-x-count'
 import { t } from 'lib/text'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
-import { BaseRegion } from '../region'
+import { BaseRegion, RottingState } from '../region'
 
-const takeMaterialsTime = __DEV__ ? ms.from('min', 5) : ms.from('day', 1)
-const blocksReviseTime = __DEV__ ? ms.from('sec', 3) : ms.from('min', 2)
-const materialsReviseTime = __DEV__ ? ms.from('sec', 1) : ms.from('min', 1)
+const takeMaterialsTime = __DEV__ ? ms.from('day', 1) : ms.from('day', 1)
+const blocksReviseTime = __DEV__ ? ms.from('min', 1) : ms.from('min', 2)
+const materialsReviseTime = __DEV__ ? ms.from('min', 1) : ms.from('min', 1)
 
 const cooldowns = table<Record<string, unknown>>('baseCoooldowns', () => ({}))
 
@@ -27,56 +38,87 @@ system.runInterval(
       const isLoaded = anyPlayerNearRegion(base, 20)
       if (block === 'unloaded' || !isLoaded) continue
 
-      if (block.typeId === MinecraftBlockTypes.Barrel) {
-        spawnParticlesInArea(base.area.center, Vector.add(base.area.center, Vector.one))
+      spawnParticlesInArea(base.area.center, Vector.add(base.area.center, Vector.one))
 
+      if (block.typeId === MinecraftBlockTypes.Barrel) {
         if (blocksToMaterialsCooldown.isExpired(base.id)) blocksToMaterials(base)
         if (reviseMaterialsCooldown.isExpired(base.id)) reviseMaterials(base, block)
         if (takeMaterialsCooldown.isExpired(base.id)) takeMaterials(base, block)
-      } else startRotting(base)
+      } else startRotting(base, RottingState.Destroyed)
     }
   },
   'baseInterval',
   10,
 )
 
-function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) {
-  const selfback = () => baseRottingMenu(base, player, back)
-  const barrel = base.dimension.getBlock(base.area.center)
-  const materials: RawText = {
-    rawtext: Object.entries(base.ldb.materials).map(([typeId, amount]) => ({
-      rawtext: [itemNameXCount({ typeId, amount }, '§f§l'), { text: '\n' }],
-    })),
+function substractMaterials(a: Readonly<Record<string, number>>, b: Readonly<Record<string, number>>): number {
+  const values: number[] = []
+  for (const [ka, va] of Object.entries(a)) {
+    let vb = b[ka]
+    if (typeof vb === 'undefined') vb = 0
+    values.push(vb / va)
   }
+
+  const value = Math.min(...values)
+  if (value < 0 || value === Infinity) return 0
+  return value
+}
+
+export function getSafeFromRottingTime(base: BaseRegion) {
+  const time = substractMaterials(base.ldb.materials, base.ldb.barrel)
+  if (time === 0) return '§cскоро начнется гниение'
+  return t.time(time * takeMaterialsTime)
+}
+
+function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) {
+  const barrel = base.dimension.getBlock(base.area.center)
+  if (barrel?.isValid) reviseMaterials(base, barrel)
+
+  const materials: RawText = materialsToRawText(base.ldb.materials)
+  const barrelMaterials = materialsToRawText(base.ldb.barrel)
+  const missingMaterialsText = isEmpty(base.ldb.materialsMissing)
+    ? t`§aВсех материалов хватает!\nБаза защищена от гниения на ${getSafeFromRottingTime(base)}§r\n`
+    : t.raw`§cНе хватает ресурсов:\n${materialsToRawText(base.ldb.materialsMissing)}`
 
   const form = new ActionForm(
     'Гниение базы',
-    t.raw`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n\n${materials}\n\nДо следующей проверки: ${t.time(takeMaterialsCooldown.getRemainingTime(base.id))}`,
+    t.raw`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${t.time(takeMaterialsCooldown.getRemainingTime(base.id))}`,
   ).addButtonBack(back)
-
-  if (barrel) form.addButton('Проверить блоки в бочке', () => (reviseMaterials(base, barrel), selfback()))
 
   form.show(player)
 }
 
+export function materialsToRawText(ldbMaterials: Readonly<Record<string, number>>): RawText {
+  return {
+    rawtext: Object.entries(ldbMaterials)
+      .map(([typeId, amount]) => ({
+        rawtext: [itemNameXCount({ typeId, amount }, '§f§l'), { text: '\n' }],
+      }))
+      .concat({ rawtext: [{ text: '§r' }] }),
+  }
+}
+
 export function baseRottingButton(base: BaseRegion, player: Player, back?: VoidFunction) {
   let text = ''
-  if (base.ldb.isRotting) {
+  if (base.ldb.state === RottingState.NoMaterials) {
     text = '§cБаза гниет!\n§4Срочно пополните материалы!'
+  } else if (base.ldb.state === RottingState.Destroyed) {
+    text = `§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vector.string(base.area.center, true)}!`
   } else {
-    text = `Поддержание базы`
+    text = `Состояние базы`
   }
 
   return [text, baseRottingMenu.bind(null, base, player, back)] as const
 }
 
-async function startRotting(base: BaseRegion) {
-  if (base.ldb.isRotting) return
+async function startRotting(base: BaseRegion, state: RottingState) {
+  if (base.ldb.state === state) return
 
-  base.ldb.isRotting = true
+  base.ldb.state = state
   base.save()
 
-  const message = t.error`База с владельцем ${base.ownerName} разрушена.`
+  const messageAction = state === RottingState.NoMaterials ? t.error`гниет` : t.error`разрушена`
+  const message = t.error`База с владельцем ${base.ownerName} ${messageAction}.`
   base.forEachOwner(player => {
     if (player instanceof Player) {
       player.fail(message)
@@ -84,7 +126,9 @@ async function startRotting(base: BaseRegion) {
       Mail.send(
         player,
         message,
-        'База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью',
+        state === RottingState.NoMaterials
+          ? 'Нужно срочно положить материалы в бочку!'
+          : 'База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью',
       )
     }
   })
@@ -113,19 +157,23 @@ async function startRotting(base: BaseRegion) {
 }
 
 function stopRotting(base: BaseRegion) {
-  if (!base.ldb.isRotting) return
+  base.area
+    .forEachVector((v, isIn) => {
+      if (isIn) {
+        const schd = getScheduledToPlace(v, base.dimensionType)
+        if (schd) unscheduleBlockPlace(schd)
+      }
+    }, 100)
 
-  base.ldb.isRotting = false
+    .catch((e: unknown) => console.error(e))
+
+  if (base.ldb.state === RottingState.No) return
+
+  base.ldb.state = RottingState.No
   base.save()
-
-  const { dimensionType } = base
-
-  base.area.forEachVector(vector => {
-    const schedule = SCHEDULED_DB[dimensionType].find(e => Vector.equals(e.location, vector))
-    if (schedule) unscheduleBlockPlace(schedule)
-  })
 }
 
+const blocksToSkip: string[] = [MinecraftBlockTypes.Sand, MinecraftBlockTypes.GrassBlock, MinecraftBlockTypes.Gravel]
 let revising = false
 async function blocksToMaterials(base: BaseRegion) {
   if (revising) return false
@@ -135,13 +183,14 @@ async function blocksToMaterials(base: BaseRegion) {
 
     const materials = createMaterialsCounter()
     await forEachChangedBlock(base, block => {
-      if (!block || block.isAir) return
+      if (!block || block.isAir || blocksToSkip.includes(block.typeId)) return
 
       const typeId = block.getItemStack(1, true)?.typeId
       if (typeId) materials.add(typeId)
     })
 
     base.ldb.materials = materials.result()
+    base.save()
     return true
   } catch (e) {
     if (!isLocationError(e)) console.error('Unable to revise base materials:', e)
@@ -176,7 +225,7 @@ function countMaterialsInBarrel(base: BaseRegion, barrel: Block) {
   return typeIdsToSlots
 }
 
-function reviseMaterials(base: BaseRegion, barrel: Block) {
+export function reviseMaterials(base: BaseRegion, barrel: Block) {
   const barrelSlots = countMaterialsInBarrel(base, barrel)
   if (!barrelSlots) return
 
@@ -186,7 +235,11 @@ function reviseMaterials(base: BaseRegion, barrel: Block) {
   }
 
   base.ldb.materialsMissing = missing.result()
-  console.log('reviseMaterials: Missing', base.ldb.materialsMissing)
+  console.log(`${base.ownerName} base reviseMaterialsMissing:`, base.ldb.materialsMissing)
+
+  if (base.ldb.state === RottingState.Destroyed && barrel.isValid) base.ldb.state = RottingState.NoMaterials
+  if (isEmpty(base.ldb.materialsMissing)) stopRotting(base)
+  base.save()
 
   return barrelSlots
 }
@@ -197,7 +250,7 @@ function takeMaterials(base: BaseRegion, barrel: Block) {
   const barrelMaterials = createMaterialsCounter(base.ldb.barrel)
 
   if (!isEmpty(base.ldb.materialsMissing)) {
-    startRotting(base)
+    startRotting(base, RottingState.NoMaterials)
   } else {
     stopRotting(base)
 
@@ -245,13 +298,6 @@ function takeMaterials(base: BaseRegion, barrel: Block) {
   base.save()
 }
 
-onFullRegionTypeRestore(BaseRegion, async base => {
-  // Rotting complete
-  await base.structure.place()
-  base.dimension.setBlockType(base.area.center, MinecraftBlockTypes.Air)
-  base.delete()
-})
-
 function forEachChangedBlock(
   base: BaseRegion,
   callback: (block: Block | undefined, savedPermutation: BlockPermutation | undefined, location: Vector3) => void,
@@ -294,3 +340,25 @@ function createMaterialsCounter(from?: Record<string, number>) {
     result: () => Object.fromEntries(materials),
   }
 }
+
+actionGuard((player, base, ctx) => {
+  if (!(base instanceof BaseRegion) || isNotPlaying(player) || !base.isMember(player.id)) return
+
+  if (base.ldb.state === RottingState.NoMaterials || base.ldb.state === RottingState.Destroyed) {
+    if (
+      (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
+      Vector.equals(ctx.event.block.location, base.area.center)
+    ) {
+      system.delay(() => {
+        console.log('revise')
+        reviseMaterials(base, ctx.event.block)
+      })
+      // Allow interacting with base block or placing
+      return true
+    }
+
+    if (base.ldb.state === RottingState.NoMaterials)
+      player.fail('База гниет! Положите материалы из .base -> Гниение в бочку')
+    return base.ldb.state !== RottingState.NoMaterials
+  }
+}, ActionGuardOrder.BlockAction)

@@ -2,7 +2,7 @@ import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { Airdrop, isNotPlaying, Loot, Vector } from 'lib'
 import { t } from 'lib/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
-import { CannonItem, CannonShellItem } from '../../features/cannon'
+import { CannonItem, CannonShellItem } from '../../pvp/cannon'
 import { randomLocationInAnarchy } from './random-location-in-anarchy'
 
 const base = new Loot('base_airdrop')

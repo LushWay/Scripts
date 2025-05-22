@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server'
+import { Block, Entity, system, world } from '@minecraft/server'
 import { LockAction, Region, ms } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
@@ -12,32 +12,44 @@ const raiderLockTime = ms.from('min', 10)
 const objective = ScoreboardDB.objective('raid')
 
 world.beforeEvents.explosion.subscribe(event => {
+  const checker = createBlockExplosionChecker()
+  const impactedBlocks = event.getImpactedBlocks().filter(checker.canBlockExplode)
+  if (impactedBlocks.length) checker.raidLock(event.source)
+
+  event.setImpactedBlocks(impactedBlocks)
+})
+
+export function createBlockExplosionChecker() {
   let base = false
-  const impactedBlocks = event.getImpactedBlocks().filter(block => {
+
+  function canBlockExplode(block: Block) {
     const region = Region.getAt(block)
     if (region instanceof MineareaRegion) return true
     if (isScheduledToPlace(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
-      for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: 'вас рейдят' })
-      base = true
+      if (!base) {
+        for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: 'вас рейдят' })
+        base = true
+      }
       return true
     }
 
     return false
-  })
+  }
 
-  if ((base as boolean) && event.source && impactedBlocks.length)
-    notify.set(event.source.id, { time: raiderLockTime, reason: 'вы разрушили блок на базе' })
+  function raidLock(source: undefined | Entity) {
+    if (base && source) notify.set(source.id, { time: raiderLockTime, reason: 'вы разрушили блок на базе' })
+  }
 
-  event.setImpactedBlocks(impactedBlocks)
-})
+  return { canBlockExplode, raidLock }
+}
 
 const locktext = 'Вы находитесь в режиме рейдблока.'
 new LockAction(player => {
   const raidLockTime = player.scores.raid
   if (raidLockTime > 0) {
     console.log(new Error('aaa'))
-    return { lockText: `${locktext} Осталось ${t.error.time(raidLockTime * 1000)}` }
+    return { lockText: `${locktext} Осталось ${t.error.time(raidLockTime)}` }
   } else return false
 }, locktext)
 

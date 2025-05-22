@@ -200,6 +200,10 @@ export function onFullRegionTypeRestore<T extends typeof Region>(
   regionType: T,
   callback: (region: InstanceType<T>) => void,
 ) {
+  if (typeof regionType === 'undefined') {
+    console.warn(new Error('Undefined regionType'))
+    return
+  }
   onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
     const regions = regionType.getManyAt<InstanceType<T>>(block)
     for (const region of regions) {

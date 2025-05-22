@@ -1,5 +1,5 @@
 import { Loot } from 'lib'
-import { CannonItem, CannonShellItem } from 'modules/features/cannon'
+import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'

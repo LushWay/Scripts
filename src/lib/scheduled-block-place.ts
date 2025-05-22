@@ -49,6 +49,7 @@ export function getScheduledToPlace(
 export async function getScheduledToPlaceAsync(
   locations: Vector3[],
   dimension: DimensionType,
+  yieldEach = 100,
 ): Promise<false | undefined | Immutable<ScheduledBlockPlace>[]> {
   const dimblocks = IMMUTABLE_DB[dimension]
   if (typeof dimblocks === 'undefined') return false
@@ -65,7 +66,10 @@ export async function getScheduledToPlaceAsync(
             let i = 0
             for (const vector of locations) {
               i++
-              if (i % 10 === 0) yield
+              if (i % yieldEach === 0) {
+                if (yieldEach === 1000) console.log(getScheduledToPlaceAsync.name, results.length, i)
+                yield
+              }
               if (Vector.equals(e.location, vector)) {
                 results.push(e)
                 locations = locations.filter(e => e !== vector)

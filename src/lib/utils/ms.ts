@@ -42,7 +42,7 @@ export class ms {
 
         return {
           value: parsedTime,
-          type: ngettext(Number(parsedTime), plurals),
+          type: ngettext(parseInt(value.toString()), plurals),
         }
       }
     }

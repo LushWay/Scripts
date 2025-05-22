@@ -94,8 +94,9 @@ const survivalSidebar = new Sidebar(
           const { displayName } = region
           if (displayName) text += displayName
           if (region instanceof BaseRegion) {
-            if (region.getMemberRole(player.id)) text = '§6Ваша база'
-            else text = base
+            if (region.getMemberRole(player.id)) {
+              return region.baseMemberText()
+            } else text = base
           }
         }
       }

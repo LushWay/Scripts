@@ -25,7 +25,7 @@ export class Menu {
 
   static itemStack = this.createItem()
 
-  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another))
+  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), 'меню')
 
   static {
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -138,9 +138,12 @@ export class Compass {
   }
 }
 
-export function createPublicGiveItemCommand(name: string, itemStack: ItemStack, is = itemStack.is.bind(itemStack)) {
-  const itemNameTag = itemStack.nameTag?.split('\n')[0]
-
+export function createPublicGiveItemCommand(
+  name: string,
+  itemStack: ItemStack,
+  is = itemStack.is.bind(itemStack),
+  itemNameTag = itemStack.nameTag?.split('\n')[0],
+) {
   /** Gives player an item */
   function give(player: Player, { mode = 'tell' }: { mode?: 'tell' | 'ensure' } = {}) {
     const { container } = player

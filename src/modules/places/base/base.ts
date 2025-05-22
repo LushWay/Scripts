@@ -5,6 +5,8 @@ import './actions/create'
 import './actions/rotting'
 import './actions/upgrade'
 
+import './actions/on-full-restore'
+
 export const BaseItem = new CustomItemWithBlueprint('base')
   .typeId(MinecraftItemTypes.Barrel)
   .nameTag('§6База')
