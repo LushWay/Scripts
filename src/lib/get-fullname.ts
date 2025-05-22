@@ -48,7 +48,7 @@ export function getFullname(
   let result = ''
   const add = (text: string) => (result += result ? ' ' + text : text)
 
-  if (useNewbie && Player.database[id].survival.newbie) add('§bНовичок')
+  if (useNewbie && Player.database.getImmutable(id).survival.newbie) add('§bНовичок')
 
   if (useRole) {
     const role = getRole(playerID)

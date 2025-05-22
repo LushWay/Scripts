@@ -32,7 +32,7 @@ new Command('loot')
     const lootTable = LootTable.instances.get(lootTableName)
     if (typeof lootTable === 'undefined')
       return ctx.error(
-        `${lootTableName} - unknown loot table. All tables:\n${Object.keys(LootTable.instances).join('\n')}`,
+        `${lootTableName} - unknown loot table. All tables:\n${[...LootTable.instances.keys()].join('\n')}`,
       )
 
     const block = ctx.player.dimension.getBlock(ctx.player.location)?.below()
@@ -156,13 +156,7 @@ export class Loot {
 
   trash(types: Partial<Record<'web' | 'string', number>>) {
     if (typeof types.string === 'number')
-      this.item('String')
-        .chance('30%')
-        .amount({
-          '10...20': '10%',
-          '21...30': '20%',
-        })
-        .duplicate(types.string)
+      this.item('String').chance('30%').amount({ '10...20': '10%', '21...30': '20%' }).duplicate(types.string)
 
     if (typeof types.web === 'number') this.item('Web').chance('40%').amount({ '1...2': '1%' }).duplicate(types.web)
 
@@ -318,12 +312,7 @@ export class LootTable {
 
       for (const custom of item.custom) custom.apply(stack, custom.chances.randomElement())
 
-      return [
-        {
-          item: stack,
-          chance: item.chance,
-        },
-      ]
+      return [{ item: stack, chance: item.chance }]
     } catch (err) {
       console.error(
         'Failed to generate loot item for',

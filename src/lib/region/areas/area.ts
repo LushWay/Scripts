@@ -3,9 +3,7 @@ import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area
-export type AreaWithType<T = AreaCreator> = T & {
-  type: string
-}
+export type AreaWithType<T = AreaCreator> = T & { type: string }
 
 export type AbstractPoint = { vector: Vector3; dimensionType: DimensionType } | Entity | Block
 

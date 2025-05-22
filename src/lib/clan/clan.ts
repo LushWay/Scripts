@@ -34,7 +34,7 @@ export class Clan {
   static create(player: Player, name: string, shortname: string) {
     while (name in this.database) name += '-'
 
-    this.database[name] = {
+    this.database.set(name, {
       members: [player.id],
       owners: [player.id],
 
@@ -45,18 +45,16 @@ export class Clan {
       joinRequests: [],
 
       createdAt: new Date().toISOString(),
-    }
+    })
 
-    return new Clan(name, this.database[name])
+    return new Clan(name, this.database.get(name))
   }
 
   private static instances = new Map<string, Clan>()
 
   static {
     system.run(() => {
-      for (const [id, db] of Object.entries(this.database)) {
-        new Clan(id, db)
-      }
+      for (const [id, db] of this.database.entries()) new Clan(id, db)
     })
   }
 
@@ -70,7 +68,7 @@ export class Clan {
     if (clan) return clan
 
     if (!db) {
-      db = Clan.database[id]
+      db = Clan.database.get(id)
       if (!db) throw new ReferenceError(t.error`Clan with id ${id} does not exists.`)
     } else this.db = db
 
@@ -154,7 +152,7 @@ export class Clan {
       'К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.',
       new Rewards(),
     )
-    Reflect.deleteProperty(Clan.database, this.id)
+    Clan.database.delete(this.id)
     Clan.instances.delete(this.id)
   }
 }

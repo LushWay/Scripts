@@ -27,11 +27,7 @@ export class Mail {
 
   static dbGlobal = table<GlobalLetter>('mailGlobal')
 
-  static globalNotFound: GlobalLetter = {
-    title: 'Рассылка не найдена',
-    content: 'Рассылка не найдена',
-    rewards: [],
-  }
+  static globalNotFound: GlobalLetter = { title: 'Рассылка не найдена', content: 'Рассылка не найдена', rewards: [] }
 
   /**
    * Sends the mail for the player
@@ -43,13 +39,9 @@ export class Mail {
    */
   static send(playerId: string, title: string, content: string, rewards = new Rewards()) {
     Mail.inform(playerId, title)
-    this.dbPlayers[playerId].push({
-      read: false,
-      title,
-      content,
-      rewards: rewards.serialize(),
-      rewardsClaimed: false,
-    })
+    this.dbPlayers
+      .get(playerId)
+      .push({ read: false, title, content, rewards: rewards.serialize(), rewardsClaimed: false })
   }
 
   private static inform(playerId: string, title: string) {
@@ -74,19 +66,11 @@ export class Mail {
       id = id + postfix.toString()
     }
 
-    this.dbGlobal[id] = {
-      title,
-      content,
-      rewards: rewards.serialize(),
-    }
+    this.dbGlobal.set(id, { title, content, rewards: rewards.serialize() })
 
     for (const playerId of playerIds) {
       Mail.inform(playerId, title)
-      this.dbPlayers[playerId].push({
-        read: false,
-        rewardsClaimed: false,
-        id,
-      })
+      this.dbPlayers.get(playerId).push({ read: false, rewardsClaimed: false, id })
     }
   }
 
@@ -97,7 +81,7 @@ export class Mail {
    * @returns {number} Unread messages count
    */
   static getUnreadMessagesCount(playerId: string): number {
-    return this.dbPlayers[playerId].filter(letter => !letter.read).length
+    return this.dbPlayers.get(playerId).filter(letter => !letter.read).length
   }
 
   /**
@@ -116,7 +100,7 @@ export class Mail {
    */
   static toLocalLetter(letter: LetterLink | LocalLetter) {
     if ('id' in letter) {
-      const global = Mail.dbGlobal[letter.id]
+      const global = Mail.dbGlobal.get(letter.id)
       if (typeof global === 'undefined') return
 
       // We cannot use spread syntax here because it will create new
@@ -133,7 +117,7 @@ export class Mail {
   static getLetters(playerId: string) {
     const letters = []
 
-    for (const [index, anyLetter] of this.dbPlayers[playerId].entries()) {
+    for (const [index, anyLetter] of this.dbPlayers.get(playerId).entries()) {
       const letter = this.toLocalLetter(anyLetter)
       if (letter) letters.push({ letter, index })
     }
@@ -148,7 +132,7 @@ export class Mail {
    * @param {number} index The index of the message in the player's mailbox
    */
   static claimRewards(player: Player, index: number) {
-    const letter = this.toLocalLetter(this.dbPlayers[player.id][index])
+    const letter = this.toLocalLetter(this.dbPlayers.get(player.id)[index])
     if (!letter || letter.rewardsClaimed) return
 
     Rewards.restore(letter.rewards).give(player)
@@ -162,7 +146,7 @@ export class Mail {
    * @param {number} index The index of the message in the player's mailbox
    */
   static readMessage(playerId: string, index: number) {
-    const letter = this.dbPlayers[playerId][index]
+    const letter = this.dbPlayers.get(playerId)[index]
     if (letter.read) return
 
     letter.read = true
@@ -175,6 +159,6 @@ export class Mail {
    * @param {number} index The index of the message in the player's mailbox
    */
   static deleteMessage(player: Player, index: number) {
-    this.dbPlayers[player.id].splice(index, 1)
+    this.dbPlayers.get(player.id).splice(index, 1)
   }
 }

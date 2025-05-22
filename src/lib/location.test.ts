@@ -10,7 +10,7 @@ const point = group.point('id').name('name')
 
 beforeEach(() => {
   Settings.worldMap = {}
-  Object.keys(Settings.worldDatabase).forEach(e => Reflect.deleteProperty(Settings.worldDatabase, e))
+  for (const key of Settings.worldDatabase.keys()) Settings.worldDatabase.delete(key)
 })
 
 describe('location', () => {
@@ -34,7 +34,7 @@ describe('location', () => {
   })
 
   it('should load and update location from Settings', () => {
-    Settings.worldDatabase[group.id] = { [point.id]: '10 20 30' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '10 20 30' })
     const loc = location(point)
     expect(loc.valid).toBe(true)
     if (!loc.valid) return
@@ -43,7 +43,7 @@ describe('location', () => {
     expect(loc.y).toBe(20)
     expect(loc.z).toBe(30)
 
-    Settings.worldDatabase[group.id] = { [point.id]: '40 60 30' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '40 60 30' })
     Settings.worldMap[group.id][point.id].onChange?.()
     expect(loc.x).toBe(40)
     expect(loc.y).toBe(60)
@@ -51,7 +51,7 @@ describe('location', () => {
   })
 
   it('should emit event on location change', () => {
-    Settings.worldDatabase[group.id] = { [point.id]: '0 0 1' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '0 0 1' })
     const loc = location(point)
     const callback = vi.fn()
 
@@ -67,7 +67,7 @@ describe('location', () => {
 
   it('should not load invalid location', () => {
     const consoleErrorSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    Settings.worldDatabase[group.id] = { [point.id]: 'in va lid' }
+    Settings.worldDatabase.set(group.id, { [point.id]: 'in va lid' })
     location(point)
 
     expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
@@ -83,11 +83,7 @@ describe('location', () => {
     const player = new Player(false) as Player
     loc.teleport(player)
     expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toEqual([
-      {
-        x: 0.5,
-        y: 0,
-        z: 0.5,
-      },
+      { x: 0.5, y: 0, z: 0.5 },
       {},
     ])
   })
@@ -103,7 +99,7 @@ describe('locationWithRotation', () => {
   })
 
   it('should load and update location with rotation from Settings', () => {
-    Settings.worldDatabase[group.id] = { [point.id]: '10 20 30 45 90' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '10 20 30 45 90' })
     const loc = locationWithRotation(point)
 
     expect(loc.valid).toBe(true)
@@ -117,7 +113,7 @@ describe('locationWithRotation', () => {
   })
 
   it('should emit event on location with rotation change', () => {
-    Settings.worldDatabase[group.id] = { [point.id]: '10 20 30 45 90' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '10 20 30 45 90' })
     const loc = locationWithRotation(point)
     const callback = vi.fn()
 
@@ -136,17 +132,8 @@ describe('locationWithRotation', () => {
     const player = new Player(false) as Player
     loc.teleport(player)
     expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toEqual([
-      {
-        x: 0.5,
-        y: 0,
-        z: 0.5,
-      },
-      {
-        rotation: {
-          x: 90,
-          y: 0,
-        },
-      },
+      { x: 0.5, y: 0, z: 0.5 },
+      { rotation: { x: 90, y: 0 } },
     ])
   })
 })
@@ -160,7 +147,7 @@ describe('locationWithRadius', () => {
   })
 
   it('should load and update location with radius from Settings', () => {
-    Settings.worldDatabase[group.id] = { [point.id]: '10 20 30 5' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '10 20 30 5' })
     const loc = locationWithRadius(point)
 
     expect(loc.valid).toBe(true)
@@ -173,7 +160,7 @@ describe('locationWithRadius', () => {
   })
 
   it('should emit event on location with radius change', () => {
-    Settings.worldDatabase[group.id] = { [point.id]: '10 20 30 5' }
+    Settings.worldDatabase.set(group.id, { [point.id]: '10 20 30 5' })
     const loc = locationWithRadius(point)
     const callback = vi.fn()
     loc.onLoad.subscribe(callback)
@@ -187,13 +174,13 @@ describe('locationWithRadius', () => {
 
 describe('migrate', () => {
   it('should migrate location', () => {
-    Settings.worldDatabase[group.id][point.id] = '1 0 1'
+    Settings.worldDatabase.get(group.id)[point.id] = '1 0 1'
     const consoleLogSpy = vi.spyOn(console, 'debug').mockImplementation(() => {})
 
-    Settings.worldDatabase['locations']['oldname'] = '1 0 1'
+    Settings.worldDatabase.get('locations')['oldname'] = '1 0 1'
     migrateLocationName('locations', 'oldname', group.id, 'newname')
 
-    expect(Settings.worldDatabase[group.id]['newname']).toBe('1 0 1')
+    expect(Settings.worldDatabase.get(group.id)['newname']).toBe('1 0 1')
     expect(consoleLogSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
         "§7Migrating location §flocations§7:§foldname§7 to §fid§7:§fnewname§7",
@@ -202,13 +189,13 @@ describe('migrate', () => {
   })
 
   it('should not migrate already migrated location', () => {
-    Settings.worldDatabase[group.id][point.id] = '1 0 1'
+    Settings.worldDatabase.get(group.id)[point.id] = '1 0 1'
     const consoleErrorSpy = vi.spyOn(console, 'warn')
 
     migrateLocationName('unknown group', 'does not exists', group.id, point.id)
 
     expect(consoleErrorSpy.mock.calls[0]).toBeUndefined()
-    expect(Settings.worldDatabase[group.id][point.id]).toBe('1 0 1')
+    expect(Settings.worldDatabase.get(group.id)[point.id]).toBe('1 0 1')
   })
 
   it('should not migrate location that was empty', () => {
@@ -221,6 +208,6 @@ describe('migrate', () => {
         "§cNo location found at §funknown group§c:§fwas never defined§c",
       ]
     `)
-    expect(Settings.worldDatabase[group.id][point.id]).toBeUndefined()
+    expect(Settings.worldDatabase.get(group.id)[point.id]).toBeUndefined()
   })
 })

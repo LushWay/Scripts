@@ -1,11 +1,11 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
-import { DatabaseDefaultValue, DatabaseError, DatabaseTable, configureDatabase } from './abstract'
+import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 
-class DynamicPropertyDB<Key extends string = string, Value = undefined> extends ProxyDatabase<Key, Value> {
-  static tables: Record<string, DatabaseTable> = {}
+class DynamicPropertyDB<Value = unknown, Key extends string = string> extends ProxyDatabase<Value, Key> {
+  static tables: Record<string, UnknownTable> = {}
 
   constructor(
     protected id: string,
@@ -14,21 +14,21 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
     super(id, defaultValue)
     if (id in DynamicPropertyDB.tables) throw new DatabaseError(`Table ${this.id} already initialized!`)
     this.init()
-    DynamicPropertyDB.tables[id] = this.proxy()
+    DynamicPropertyDB.tables[id] = this as UnknownTable
   }
 
   private init() {
     // Init
     try {
-      this.value = Object.fromEntries(
+      this.value = new Map(
         Object.entries(LongDynamicProperty.get(this.id) as Record<string, unknown>).map(([key, value]) => {
           const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
           return [
             // Add default value
-            key,
-            typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
+            key as Key,
+            (typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
               ? ProxyDatabase.setDefaults(value as JsonObject, defaultv as JsonObject)
-              : (value ?? defaultv),
+              : (value ?? defaultv)) as Value,
           ]
         }),
       )
@@ -115,7 +115,7 @@ export class LongDynamicProperty {
 if (!__VITEST__)
   configureDatabase({
     createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
-      new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
+      new DynamicPropertyDB<unknown, string>(name, defaultValue),
 
     tables: DynamicPropertyDB.tables,
     getRawTableData(tableId) {

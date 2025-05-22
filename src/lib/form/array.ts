@@ -1,4 +1,5 @@
 import { Player } from '@minecraft/server'
+import { MemoryTable } from 'lib/database/abstract'
 import {
   SETTINGS_GROUP_NAME,
   Settings,
@@ -43,11 +44,7 @@ export class ArrayForm<
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
-  private config: ArrayForm.Config<T, C, F> = {
-    filters: {
-      [SETTINGS_GROUP_NAME]: 'Пустые фильтры',
-    } as C,
-  }
+  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: 'Пустые фильтры' } as C }
 
   constructor(
     private title: Text,
@@ -65,10 +62,7 @@ export class ArrayForm<
   }
 
   filters<const V extends SettingsConfig>(filters: V) {
-    this.config.filters = {
-      [SETTINGS_GROUP_NAME]: 'Фильтры',
-      ...(filters as unknown as C),
-    }
+    this.config.filters = { [SETTINGS_GROUP_NAME]: 'Фильтры', ...(filters as unknown as C) }
     return this as unknown as ArrayForm<T, V>
   }
 
@@ -95,7 +89,7 @@ export class ArrayForm<
   show(
     player: Player,
     fromPage = 1,
-    filtersDatabase: SettingsDatabase = {},
+    filtersDatabase = new MemoryTable() as SettingsDatabase,
     filters = Settings.parseConfig(filtersDatabase, 'filters', this.config.filters) as F,
     searchQuery = '',
   ) {
@@ -190,7 +184,7 @@ export class ArrayForm<
       })
     } else {
       const propertyName = 'filters'
-      const applied = Object.keys(database[propertyName] ?? {}).length
+      const applied = Object.keys(database.get(propertyName) ?? {}).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,

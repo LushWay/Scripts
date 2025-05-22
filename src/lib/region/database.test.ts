@@ -54,7 +54,7 @@ describe('region initialization', () => {
 
   it('should restore region from database', () => {
     const region = TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
-    const regionJSON = RegionDatabase[region.regionKey]
+    const regionJSON = RegionDatabase.get(region.regionKey)
 
     expect(regionJSON).toEqual(region.json)
 
@@ -64,7 +64,7 @@ describe('region initialization', () => {
 
   it('should restore cuberegion', () => {
     const region = TestK2Region.create(new ChunkCubeArea({ from: Vector.one, to: Vector.one }, 'overworld'))
-    const regionJSON = RegionDatabase[region.regionKey]
+    const regionJSON = RegionDatabase.get(region.regionKey)
 
     expect(regionJSON).toEqual(region.json)
     expect(restoreRegionFromJSON(['test', regionJSON])).toBeInstanceOf(TestK2Region)
@@ -81,7 +81,7 @@ describe('region initialization', () => {
     expect(restoreRegionFromJSON(['test', region.json])).toBeUndefined()
     expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7[Region][Database] No kind found for §funknown§7. Maybe you forgot to register kind or import file?§7",
+        "§7[Region][Database] No kind found for §funknown§7. Available kinds: §froad, k1, k2§7. Maybe you forgot to register kind or import file?§7",
       ]
     `)
   })

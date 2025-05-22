@@ -6,7 +6,7 @@ import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'
 
 class ChatBuilder {
-  db = table<string>('chatCooldown')
+  db = table<Record<string, number>>('chatCooldown', () => ({}))
 
   settings = Settings.world(...Settings.worldCommon, {
     cooldown: {
@@ -47,7 +47,7 @@ class ChatBuilder {
   private cooldown: Cooldown
 
   private updateCooldown() {
-    this.cooldown = new Cooldown(this.settings.cooldown, true, this.db)
+    this.cooldown = new Cooldown(this.settings.cooldown, true, this.db.get('cooldown'))
   }
 
   constructor() {

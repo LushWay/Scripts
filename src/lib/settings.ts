@@ -5,7 +5,7 @@ import { FormCallback } from 'lib/form/utils'
 import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { table } from './database/abstract'
+import { MemoryTable, Table, table } from './database/abstract'
 import { t } from './text'
 import stringifyError from './utils/error'
 
@@ -25,12 +25,7 @@ interface ConfigMeta {
 
 export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
   string,
-  {
-    name: string
-    description?: string
-    value: T
-    onChange?: VoidFunction
-  }
+  { name: string; description?: string; value: T; onChange?: VoidFunction }
 > &
   ConfigMeta
 
@@ -46,12 +41,10 @@ type toPlain<T extends SettingValue> = T extends true | false
         ? number
         : T
 
-export type SettingsConfigParsed<T extends SettingsConfig> = {
-  -readonly [K in keyof T]: toPlain<T[K]['value']>
-}
+export type SettingsConfigParsed<T extends SettingsConfig> = { -readonly [K in keyof T]: toPlain<T[K]['value']> }
 
 export type SettingsDatabaseValue = Record<string, SettingValue>
-export type SettingsDatabase = Record<string, SettingsDatabaseValue>
+export type SettingsDatabase = Table<SettingsDatabaseValue, string>
 
 export type PlayerSettingValues = boolean | string | number | DropdownSetting[]
 
@@ -132,10 +125,7 @@ export class Settings {
     if (!(groupId in this[to])) {
       this[to][groupId] = config
     } else {
-      this[to][groupId] = {
-        ...config,
-        ...this[to][groupId],
-      }
+      this[to][groupId] = { ...config, ...this[to][groupId] }
     }
 
     this[to][groupId][SETTINGS_GROUP_NAME] = groupName
@@ -169,15 +159,19 @@ export class Settings {
         get() {
           const value = config[prop].value
           return (
-            (database[groupId] as SettingsDatabaseValue | undefined)?.[key] ??
+            (database.getImmutable(groupId) as SettingsDatabaseValue | undefined)?.[key] ??
             (Settings.isDropdown(value) ? value[0][0] : value)
           )
         },
         set(v: toPlain<SettingValue>) {
-          const value = (database[groupId] ??= {})
+          let value = database.get(groupId)
+          if (!value) {
+            database.set(groupId, {})
+            value = database.get(groupId)
+          }
           value[key] = v
           config[prop].onChange?.()
-          database[groupId] = value
+          database.set(groupId, value)
         },
       })
     }
@@ -206,7 +200,7 @@ export function settingsModal<const Config extends SettingsConfig<PlayerSettingV
     propertyName,
     false,
     {},
-    { [propertyName]: settingsStorage },
+    new MemoryTable<SettingsDatabaseValue>({ [propertyName]: settingsStorage }, () => ({})),
     { [propertyName]: config },
     back,
     false,
@@ -339,12 +333,7 @@ export function settingsGroupMenu(
 
 const settingTypes: Partial<
   Record<'string' | 'number' | 'object' | 'boolean' | 'symbol' | 'bigint' | 'undefined' | 'function', string>
-> = {
-  string: 'Строка',
-  number: 'Число',
-  object: 'JSON-Объект',
-  boolean: 'Переключатель',
-}
+> = { string: 'Строка', number: 'Число', object: 'JSON-Объект', boolean: 'Переключатель' }
 
 /** Opens player settings menu */
 export function playerSettingsMenu(player: Player, back?: VoidFunction) {
@@ -363,7 +352,7 @@ export function worldSettingsMenu(player: Player) {
   const form = new ActionForm('§dНастройки мира')
 
   for (const [groupId, group] of Object.entries(Settings.worldMap)) {
-    const database = Settings.worldDatabase[groupId]
+    const database = Settings.worldDatabase.get(groupId)
 
     let unsetCount = 0
     for (const [key, option] of Object.entries(group)) {

@@ -84,7 +84,7 @@ export function is(playerID: string, role: Role) {
 export function getRole(playerID: Player | string): Role {
   if (playerID instanceof Player) playerID = playerID.id
 
-  const role = Player.database[playerID].role
+  const role = Player.database.getImmutable(playerID).role
 
   if (!Object.keys(ROLES).includes(role)) return 'member'
   return role
@@ -104,7 +104,7 @@ export function getRole(playerID: Player | string): Role {
  */
 export function setRole(player: Player | string, role: Role): void {
   const id = player instanceof Player ? player.id : player
-  const database = Player.database[id]
+  const database = Player.database.get(id)
   if (typeof database !== 'undefined') {
     EventSignal.emit(Core.beforeEvents.roleChange, {
       id,

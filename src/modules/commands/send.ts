@@ -55,13 +55,7 @@ function editEmailMenu(player: Player, state: SendState) {
 export function sendMenu(player: Player, back?: VoidFunction, state?: SendState) {
   if (!back) back = () => null
   if (!state)
-    state = {
-      recipients: createSelectPlayerMenu.defaultAll(),
-      rewards: new Rewards(),
-      title: '',
-      contents: '',
-      back,
-    }
+    state = { recipients: createSelectPlayerMenu.defaultAll(), rewards: new Rewards(), title: '', contents: '', back }
 
   const form = new ActionForm('Отправить письмо')
 
@@ -85,7 +79,7 @@ export function sendMenu(player: Player, back?: VoidFunction, state?: SendState)
 
   form.addButton('Отправить', () =>
     Mail.sendMultiple(
-      state.recipients.length == 0 ? Object.keys(Player.database) : state.recipients.map(p => p.id),
+      state.recipients.length == 0 ? [...Player.database.keys()] : state.recipients.map(p => p.id),
       state.title,
       state.contents,
       state.rewards,

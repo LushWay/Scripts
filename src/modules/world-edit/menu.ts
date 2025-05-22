@@ -562,7 +562,6 @@ export function WEeditBlockStatesMenu(
 
     form.addButtonAsk('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
 
-    // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {
       const stateDef = allStates.find(e => e.id === stateName)
       if (!stateDef) continue

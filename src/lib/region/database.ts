@@ -41,7 +41,7 @@ export const RegionDatabase = table<RegionSave>('region-v2', () => ({
 }))
 
 system.delay(() => {
-  Object.entries(RegionDatabase).forEach(r => restoreRegionFromJSON(r))
+  RegionDatabase.entries().forEach(r => restoreRegionFromJSON(r))
 })
 
 let loaded = false
@@ -60,7 +60,7 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
   kinds.push(region)
 }
 
-export function restoreRegionFromJSON([key, region]: [string, (typeof RegionDatabase)[string]]) {
+export function restoreRegionFromJSON([key, region]: [string, RegionSave]) {
   Area.loaded = true
   loaded = true
 
@@ -69,7 +69,9 @@ export function restoreRegionFromJSON([key, region]: [string, (typeof RegionData
 
   const kind = kinds.find(e => e.kind === region.k)
   if (!kind) {
-    console.warn(t`[Region][Database] No kind found for ${region.k}. Maybe you forgot to register kind or import file?`)
+    console.warn(
+      t`[Region][Database] No kind found for ${region.k}. Available kinds: ${kinds.map(e => e.kind).join(', ')}. Maybe you forgot to register kind or import file?`,
+    )
     return
   }
 

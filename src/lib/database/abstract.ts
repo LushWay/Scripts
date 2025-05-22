@@ -2,8 +2,22 @@ import { ProxyDatabase } from './proxy'
 
 export type DatabaseDefaultValue<Value> = (key: string) => NoInfer<Value>
 
-export function table<Value>(name: string): Record<string, Value | undefined>
-export function table<Value>(name: string, defaultValue?: DatabaseDefaultValue<Value>): Record<string, Value>
+export interface Table<Value, Key = string> {
+  get(key: Key): Value
+  getImmutable(key: Key): Immutable<Value>
+  set(key: Key, value: Value): void
+  delete(key: Key): void
+  keys(): MapIterator<Key>
+  entries(): [Key, Value][]
+  values(): Value[]
+  entriesImmutable(): MapIterator<[Key, Immutable<Value>]>
+}
+
+export function table<Value, Key extends string = string>(name: string): Table<Value | undefined, Key>
+export function table<Value, Key extends string = string>(
+  name: string,
+  defaultValue?: DatabaseDefaultValue<Value>,
+): Table<Value, Key>
 
 /**
  * Creates proxy-based database that works just like an ordinary ja
@@ -11,19 +25,19 @@ export function table<Value>(name: string, defaultValue?: DatabaseDefaultValue<V
  * @param name - Name of the table
  * @param defaultValue - Function that generates default value
  */
-export function table<Value>(
+export function table<Value, Key extends string = string>(
   name: string,
   defaultValue?: DatabaseDefaultValue<Value>,
-): Record<string, Value | undefined> {
+): Table<Value | undefined, Key> {
   return provider.createTable(name, defaultValue)
 }
 
-export type DatabaseTable = Record<string, unknown>
+export type UnknownTable = Table<unknown, string>
 
 /** Describes unified database provider */
 export interface DatabaseProvider {
   createTable: typeof table
-  tables: Record<string, DatabaseTable>
+  tables: Record<string, UnknownTable>
   getRawTableData: (tableId: string) => string
 }
 
@@ -44,16 +58,30 @@ export function getProvider() {
   return provider
 }
 
+/** Database table that doesn't saves values anywhere except memory */
+export class MemoryTable<Value, Key extends string = string> extends ProxyDatabase<Value, Key> {
+  static id = 0
+
+  constructor(tableData?: Partial<Record<Key, Value>>, defaultValue?: DatabaseDefaultValue<Value>) {
+    MemoryTable.id++
+    super(MemoryTable.id.toString(), defaultValue)
+    if (tableData) {
+      this.value = new Map(Object.entries(tableData)) as Map<Key, Value>
+    }
+  }
+}
+
 if (__TEST__) {
-  class TestDatabase<Key extends string, Value> extends ProxyDatabase<Key, Value> {}
+  class TestDatabase<Value, Key extends string> extends ProxyDatabase<Value, Key> {}
 
   configureDatabase({
     tables: TestDatabase.tables,
 
     createTable: (name, defaultValue?: DatabaseDefaultValue<unknown>) =>
-      new TestDatabase<string, unknown>(name, defaultValue).proxy(),
+      new TestDatabase<unknown, string>(name, defaultValue),
 
-    getRawTableData: tableId => JSON.stringify(TestDatabase.tables[tableId]),
+    getRawTableData: tableId =>
+      JSON.stringify((TestDatabase.tables[tableId] as TestDatabase<unknown, string>).getRawValue()),
   })
 }
 

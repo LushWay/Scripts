@@ -2,7 +2,7 @@
 
 import { Player, system, world } from '@minecraft/server'
 import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
-import { DatabaseTable, getProvider } from 'lib/database/abstract'
+import { UnknownTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { t } from 'lib/text'
@@ -16,7 +16,7 @@ new Command('db')
 function selectTable(player: Player, firstCall?: true) {
   const form = new ActionForm('Таблицы данных')
   for (const [tableId, table] of Object.entries(getProvider().tables)) {
-    const name = `${tableId} §7${Object.keys(table).length}§r`
+    const name = `${tableId} §7${[...table.keys()].length}§r`
 
     form.addButton(name, () => showTable(player, tableId, table))
   }
@@ -24,17 +24,17 @@ function selectTable(player: Player, firstCall?: true) {
   if (firstCall) player.info('Закрой чат!')
 }
 
-function showTable(player: Player, tableId: string, table: DatabaseTable) {
+function showTable(player: Player, tableId: string, table: UnknownTable) {
   const selfback = () => showTable(player, tableId, table)
-  const keys = Object.keys(table)
+  const keys = [...table.keys()]
   new ArrayForm(`${tableId} ${keys.length}`, keys)
     .addCustomButtonBeforeArray(form => {
       form
         .addButton('§3Новое значение§r', () => {
-          changeValue(player, null, (newVal, key) => (table[key] = newVal), selfback)
+          changeValue(player, null, (newVal, key) => table.set(key, newVal), selfback)
         })
         .addButtonAsk('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
-          Object.keys(table).forEach(e => Reflect.deleteProperty(table, e))
+          for (const key of table.keys()) table.delete(key)
         })
     })
     .back(() => selectTable(player))
@@ -42,9 +42,9 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
       let name = key
       if (tableId === 'player') {
         const playerDatabase = table as typeof Player.database
-        name = `${playerDatabase[key].name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
+        name = `${playerDatabase.get(key).name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
       } else {
-        name += `\n§7${JSON.stringify(table[key]).slice(0, 200).replace(/"/g, '')}`
+        name += `\n§7${JSON.stringify(table.get(key)).slice(0, 200).replace(/"/g, '')}`
       }
 
       return [name, () => tableProperty(key, table, player, selfback)] as const
@@ -52,13 +52,13 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
     .show(player)
 }
 
-function tableProperty(key: string, table: DatabaseTable, player: Player, back: VoidFunction) {
+function tableProperty(key: string, table: UnknownTable, player: Player, back: VoidFunction) {
   key = key + ''
   let value: unknown
   let failedToLoad = false
 
   try {
-    value = table[key]
+    value = table.get(key)
   } catch (e) {
     console.error(e)
     value = 'a'
@@ -74,8 +74,7 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
         player,
         value,
         newValue => {
-          table[key] = newValue
-          Reflect.deleteProperty(table, key)
+          table.set(key, newValue)
           player.tell(inspect(value) + '§r -> ' + inspect(newValue))
         },
         () => tableProperty(key, table, player, back),
@@ -86,12 +85,12 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
       new ModalForm('Переименовать').addTextField('Ключ', 'останется прежним', key).show(player, (ctx, newKey) => {
         if (newKey) {
           player.success(t`Renamed ${key} -> ${newKey}`)
-          table[newKey] = table[key]
+          table.set(newKey, table.get(key))
         } else player.info(t`Key ${key} left as is`)
       })
     })
     .addButton('§cУдалить§r', () => {
-      Reflect.deleteProperty(table, key)
+      table.delete(key)
       system.delay(back)
     })
     .addButtonBack(back)
@@ -166,13 +165,7 @@ cmd
     }
 
     function show() {
-      new ActionForm(
-        'Benchmark',
-        stringifyBenchmarkResult({
-          type: type ?? 'timers',
-          timerPathes: pathes ?? false,
-        }),
-      )
+      new ActionForm('Benchmark', stringifyBenchmarkResult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
         .addButton('Refresh', null, show)
         .addButton('Exit', null, () => void 0)
         .show(ctx.player)

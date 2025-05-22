@@ -51,10 +51,7 @@ export class Cutscene {
   private restoreCameraTime = 2
 
   /** List of players that currently see cutscene play */
-  private current = new WeakPlayerMap<{
-    player: Player
-    controller: AbortController
-  }>({
+  private current = new WeakPlayerMap<{ player: Player; controller: AbortController }>({
     onLeave: playerId => this.exit(playerId),
   })
 
@@ -66,16 +63,11 @@ export class Cutscene {
   ) {
     Cutscene.all.set(id, this)
 
-    this.sections = Cutscene.db[this.id].slice()
+    this.sections = Cutscene.db.get(this.id).slice()
   }
 
   private get defaultSection() {
-    return {
-      points: [],
-      step: 0.15,
-      easeTime: 1,
-      easeType: EasingType.Linear,
-    }
+    return { points: [], step: 0.15, easeTime: 1, easeType: EasingType.Linear }
   }
 
   get start() {
@@ -138,10 +130,7 @@ export class Cutscene {
       { controller, exit: () => this.exit(player) },
     )
 
-    this.current.set(player.id, {
-      player,
-      controller,
-    })
+    this.current.set(player.id, { player, controller })
 
     return promise
   }
@@ -269,7 +258,7 @@ export class Cutscene {
 
   /** Saves cutscene sections to the database */
   save() {
-    Cutscene.db[this.id] = this.sections
+    Cutscene.db.set(this.id, this.sections)
   }
 }
 

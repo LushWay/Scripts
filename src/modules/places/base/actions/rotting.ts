@@ -27,9 +27,9 @@ const materialsReviseTime = __DEV__ ? ms.from('min', 1) : ms.from('min', 1)
 
 const cooldowns = table<Record<string, unknown>>('baseCoooldowns', () => ({}))
 
-const blocksToMaterialsCooldown = new Cooldown(blocksReviseTime, false, cooldowns.blocksToMaterials)
-const reviseMaterialsCooldown = new Cooldown(materialsReviseTime, false, cooldowns.revise)
-const takeMaterialsCooldown = new Cooldown(takeMaterialsTime, false, cooldowns.takeMaterials)
+const blocksToMaterialsCooldown = new Cooldown(blocksReviseTime, false, cooldowns.get('blocksToMaterials'))
+const reviseMaterialsCooldown = new Cooldown(materialsReviseTime, false, cooldowns.get('revise'))
+const takeMaterialsCooldown = new Cooldown(takeMaterialsTime, false, cooldowns.get('takeMaterials'))
 
 system.runInterval(
   () => {

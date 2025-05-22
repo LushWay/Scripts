@@ -72,8 +72,8 @@ export class Furnacer extends ShopNpc {
           const parsed = FurnaceKeyItem.schema.parse(slot)
           if (!parsed) return
 
-          const key = Object.entries(FurnaceKeyItem.db).find(e => e[1]?.code === parsed.code)?.[0]
-          if (key) Reflect.deleteProperty(FurnaceKeyItem.db, key)
+          const key = FurnaceKeyItem.db.entries().find(e => e[1]?.code === parsed.code)?.[0]
+          if (key) FurnaceKeyItem.db.delete(key)
           slot.setItem(undefined)
 
           form.show(text)
@@ -120,7 +120,7 @@ actionGuard((player, region, ctx) => {
     if (lore.furnacer !== furnacer.id) return notAllowed(`Этот ключ используется для других печек!`)
 
     const blockId = Vector.string(ctx.event.block)
-    const furnace = FurnaceKeyItem.db[blockId]
+    const furnace = FurnaceKeyItem.db.get(blockId)
 
     // Furnace is already taken
     if (furnace && furnace.code === lore.code) {
@@ -143,11 +143,11 @@ actionGuard((player, region, ctx) => {
       } else {
         // Create new...
         system.delay(() => {
-          FurnaceKeyItem.db[blockId] = {
+          FurnaceKeyItem.db.set(blockId, {
             code: lore.code,
             expires: Date.now() + furnaceExpireTime,
             lastPlayerId: player.id,
-          }
+          })
 
           lore.status = 'inUse'
           lore.location = Vector.string(ctx.event.block.location, true)
@@ -183,12 +183,7 @@ actionGuard((player, region, ctx) => {
 }, ActionGuardOrder.Feature)
 
 class FurnaceKeyItem {
-  static db = table<{
-    expires: number
-    code: string
-    lastPlayerId: string
-    warnedAboutExpire?: 1
-  }>('furnaceKeys')
+  static db = table<{ expires: number; code: string; lastPlayerId: string; warnedAboutExpire?: 1 }>('furnaceKeys')
 
   static schema = new ItemLoreSchema('furnace key')
     .nameTag(() => '§6Ключ от печки')
@@ -208,17 +203,13 @@ class FurnaceKeyItem {
     .display('', unit => this.status[unit])
     .build()
 
-  static status = {
-    notUsed: '§r§aНе использован',
-    inUse: '§r§6Печка плавит...',
-    used: '§r§cВремя истекло',
-  }
+  static status = { notUsed: '§r§aНе использован', inUse: '§r§6Печка плавит...', used: '§r§cВремя истекло' }
 
   static {
     system.runInterval(
       () => {
         let players
-        for (const [key, furnace] of Object.entries(FurnaceKeyItem.db)) {
+        for (const [key, furnace] of FurnaceKeyItem.db.entries()) {
           if (typeof furnace === 'undefined') continue
           if (furnace.warnedAboutExpire) continue
 
@@ -235,7 +226,7 @@ class FurnaceKeyItem {
               furnace.warnedAboutExpire = 1
             }
           } else if (untilExpire < 0) {
-            Reflect.deleteProperty(FurnaceKeyItem.db, key)
+            FurnaceKeyItem.db.delete(key)
           }
         }
       },

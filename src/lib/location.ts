@@ -11,14 +11,9 @@ interface LocationCommon<T extends Vector3> {
   firstLoad: boolean
 }
 
-export type ValidLocation<T extends Vector3> = {
-  valid: true
-} & LocationCommon<T> &
-  T
+export type ValidLocation<T extends Vector3> = { valid: true } & LocationCommon<T> & T
 
-export type InvalidLocation<T extends Vector3> = {
-  valid: false
-} & LocationCommon<T>
+export type InvalidLocation<T extends Vector3> = { valid: false } & LocationCommon<T>
 
 export type ConfigurableLocation<T extends Vector3> = InvalidLocation<T> | ValidLocation<T>
 
@@ -70,7 +65,7 @@ class Location<T extends Vector3> {
   ) {}
 
   private load(throws = false) {
-    const raw = Settings.worldDatabase[this.group][this.name]
+    const raw = Settings.worldDatabase.get(this.group)[this.name]
     if (typeof raw !== 'string' || raw === '') {
       if (this.fallback) this.updateLocation(this.fallback)
       return
@@ -112,10 +107,7 @@ class Location<T extends Vector3> {
   }
 }
 
-export type Vector3Rotation = Vector3 & {
-  xRot: number
-  yRot: number
-}
+export type Vector3Rotation = Vector3 & { xRot: number; yRot: number }
 
 class LocationWithRotation extends Location<Vector3Rotation> {
   protected locationFormat = { x: 0, y: 0, z: 0, xRot: 0, yRot: 0 }
@@ -125,9 +117,7 @@ class LocationWithRotation extends Location<Vector3Rotation> {
   }
 }
 
-export type Vector3Radius = Vector3 & {
-  radius: number
-}
+export type Vector3Radius = Vector3 & { radius: number }
 
 class LocationWithRadius extends Location<Vector3Radius> {
   protected locationFormat = { x: 0, y: 0, z: 0, radius: 0 }
@@ -146,38 +136,35 @@ export const locationWithRotation = LocationWithRotation.creator<
 export const locationWithRadius = LocationWithRadius.creator<Vector3 & { radius: number }, typeof LocationWithRadius>()
 
 system.delay(() => {
-  for (const [k, d] of Object.entries(Settings.worldDatabase)) {
+  for (const [k, d] of Settings.worldDatabase.entries()) {
     if (!Object.keys(d).length) {
-      Reflect.deleteProperty(Settings.worldDatabase, k)
+      Settings.worldDatabase.delete(k)
     }
   }
 })
 
 /** Migration helper */
 export function migrateLocationName(oldGroup: string, oldName: string, newGroup: string, newName: string) {
-  const location = Settings.worldDatabase[oldGroup][oldName]
+  const location = Settings.worldDatabase.get(oldGroup)[oldName]
   if (typeof location !== 'undefined') {
     console.debug(t`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
 
-    Settings.worldDatabase[newGroup][newName] = location
+    Settings.worldDatabase.get(newGroup)[newName] = location
 
-    Reflect.deleteProperty(Settings.worldDatabase[oldGroup], oldName)
-  } else if (!Settings.worldDatabase[newGroup][newName]) {
+    Reflect.deleteProperty(Settings.worldDatabase.get(oldGroup), oldName)
+  } else if (!Settings.worldDatabase.get(newGroup)[newName]) {
     console.warn(t.error`No location found at ${oldGroup}:${oldName}`)
   }
 }
 
 export function migrateLocationGroup(from: string, to: string) {
-  const group = Settings.worldDatabase[from]
+  const group = Settings.worldDatabase.get(from)
   if (typeof group !== 'undefined') {
     console.debug(t`Migrating group ${from} to ${to}`)
 
-    Settings.worldDatabase[to] = {
-      ...(Settings.worldDatabase[to] ?? {}),
-      ...group,
-    }
+    Settings.worldDatabase.set(to, { ...(Settings.worldDatabase.get(to) ?? {}), ...group })
 
-    Reflect.deleteProperty(Settings.worldDatabase, from)
+    Settings.worldDatabase.delete(from)
   } else {
     console.warn(t.error`No migration for group ${from}`)
   }

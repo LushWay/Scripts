@@ -36,11 +36,7 @@ class Rectangle extends Area<RectangleDatabase> {
 
   get center() {
     const [from, to] = this.edges
-    return {
-      x: from.x + (to.x - from.x) / 2,
-      y: from.y + (to.y - from.y) / 2,
-      z: from.z + (to.z - from.z) / 2,
-    }
+    return { x: from.x + (to.x - from.x) / 2, y: from.y + (to.y - from.y) / 2, z: from.z + (to.z - from.z) / 2 }
   }
 
   get edges(): [Vector3, Vector3] {

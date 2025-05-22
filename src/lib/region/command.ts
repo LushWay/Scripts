@@ -34,25 +34,20 @@ const db = table<{ enabled: boolean }>('regionBorders', () => ({ enabled: false 
 
 command
   .overload('borders')
-  .executes(ctx => ctx.player.tell(t`Borders enabled: ${db[ctx.player.id].enabled}`))
+  .executes(ctx => ctx.player.tell(t`Borders enabled: ${db.get(ctx.player.id).enabled}`))
   .boolean('toggle', true)
-  .executes((ctx, newValue = !db[ctx.player.id].enabled) => {
-    ctx.player.tell(t`${db[ctx.player.id].enabled} -> ${newValue}`)
+  .executes((ctx, newValue = !db.get(ctx.player.id).enabled) => {
+    ctx.player.tell(t`${db.get(ctx.player.id).enabled} -> ${newValue}`)
     ctx.player.database
-    db[ctx.player.id].enabled = newValue
+    db.get(ctx.player.id).enabled = newValue
   })
 
 const variables = new MolangVariableMap()
-variables.setColorRGBA('color', {
-  red: 0,
-  green: 1,
-  blue: 0,
-  alpha: 0,
-})
+variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })
 
 system.runInterval(
   () => {
-    if (!Object.values(db).some(e => e.enabled)) return
+    if (!db.values().some(e => e.enabled)) return
     const players = world.getAllPlayers()
 
     for (const region of Region.regions) {
@@ -72,7 +67,7 @@ system.runInterval(
           if (isIn && r > region.area.radius - 1) {
             for (const player of playersNearRegion) {
               if (!player.isValid) continue
-              if (!db[player.id].enabled) continue
+              if (!db.get(player.id).enabled) continue
 
               player.spawnParticle('minecraft:wax_particle', vector, variables)
             }
@@ -227,19 +222,9 @@ function editRegion(player: Player, region: Region, back: () => void) {
     }),
   )
     .addButton(ActionForm.backText, back)
-    .addButton('Участники', () =>
-      manageRegionMembers(player, region, {
-        isOwner: true,
-        back: selfback,
-        pluralForms,
-      }),
-    )
+    .addButton('Участники', () => manageRegionMembers(player, region, { isOwner: true, back: selfback, pluralForms }))
     .addButton('Разрешения', () =>
-      editRegionPermissions(player, region, {
-        pluralForms,
-        back: selfback,
-        extendedEditPermissions: true,
-      }),
+      editRegionPermissions(player, region, { pluralForms, back: selfback, extendedEditPermissions: true }),
     )
 
   if (region.structure) {
@@ -346,11 +331,7 @@ export function editRegionPermissions(
   if (extendedEditPermissions) {
     form = form.addDropdownFromObject(
       `Сражение\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`,
-      {
-        true: 'Да',
-        pve: 'Только с сущностями (pve)',
-        false: 'Нет',
-      },
+      { true: 'Да', pve: 'Только с сущностями (pve)', false: 'Нет' },
       { defaultValueIndex: String(region.permissions.pvp) },
     )
 
@@ -402,13 +383,7 @@ export function manageRegionMembers(
     isOwner ? 'Для управления участником нажмите на кнопку с его ником' : 'Вы можете только посмотреть их',
   )
 
-  const selfback = () =>
-    manageRegionMembers(player, region, {
-      back,
-      member,
-      isOwner,
-      pluralForms,
-    })
+  const selfback = () => manageRegionMembers(player, region, { back, member, isOwner, pluralForms })
 
   const applyAction = () => {
     region.save()

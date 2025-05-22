@@ -2,11 +2,12 @@ import 'lib/extensions/player'
 
 import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/shop/rewards'
+import { UnknownTable } from './database/abstract'
 
 describe('mail', () => {
   beforeEach(() => {
-    function clear(database: Record<string, unknown>) {
-      Object.keys(database).forEach(e => Reflect.deleteProperty(database, e))
+    function clear(database: UnknownTable) {
+      for (const key of database.keys()) database.delete(key)
     }
 
     clear(Mail.dbGlobal)

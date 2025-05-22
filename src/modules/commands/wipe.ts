@@ -48,7 +48,7 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
       return player.fail('Вы не можете создать точку восстановления не находясь в выживании или приключении')
     }
 
-    const playerDb = db[player.id]
+    const playerDb = db.get(player.id)
     playerDb.restorePoints[id] = {
       name,
       location: player.location,
@@ -71,7 +71,7 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
 }
 
 function loadRestorePoint(player: Player, id: string) {
-  const point = db[player.id].restorePoints[id]
+  const point = db.get(player.id).restorePoints[id]
   if (!point) throw new Error('No restore point found in db for id ' + id)
 
   Object.assign(player.database, point.db)
@@ -105,16 +105,16 @@ new Command('wipe')
           )
           .show(player, (ctx, name) => {
             const id = generateId(name)
-            if (db[player.id].restorePoints[id])
+            if (db.get(player.id).restorePoints[id])
               return ctx.error(
-                t.error`Restore point ${id} already exists. Other existing points:\n${Object.keys(db[player.id].restorePoints).join('\n')}`,
+                t.error`Restore point ${id} already exists. Other existing points:\n${Object.keys(db.get(player.id).restorePoints).join('\n')}`,
               )
 
             createRestorePoint(player, name)
           })
       })
 
-      const source = db[player.id]
+      const source = db.get(player.id)
       renderList(f, source, player)
     }).show(player)
   })
@@ -143,7 +143,7 @@ function restorePointMenu(player: Player, id: string, restorePoint: RestorePoint
     })
     if (is(player.id, 'techAdmin')) f.button('Log to the console', () => console.log(JSON.stringify(restorePoint)))
     f.ask('§cУдалить', 'удалить точку', () => {
-      Reflect.deleteProperty(db[player.id].restorePoints, id)
+      Reflect.deleteProperty(db.get(player.id).restorePoints, id)
     })
   })
 }

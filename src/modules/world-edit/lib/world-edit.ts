@@ -111,7 +111,7 @@ export class WorldEdit {
   private historyLimit = 100
 
   constructor(private player: Player) {
-    this.db = WorldEdit.db[this.player.id]
+    this.db = WorldEdit.db.get(this.player.id)
 
     const we = WorldEdit.instances.get(player)
     if (we) return we

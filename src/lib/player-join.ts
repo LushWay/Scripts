@@ -14,17 +14,11 @@ class JoinBuilder {
     title_animation: {
       stages: ['» $title «', '»  $title  «'],
       /** @type {Record<string, string>} */
-      vars: {
-        title: `${Core.name}§r§f`,
-      },
+      vars: { title: `${Core.name}§r§f` },
     },
     actionBar: '', // Optional
     subtitle: 'Добро пожаловать!', // Optional
-    messages: {
-      air: '§8Очнулся в воздухе',
-      ground: '§8Проснулся',
-      sound: 'break.amethyst_cluster',
-    },
+    messages: { air: '§8Очнулся в воздухе', ground: '§8Проснулся', sound: 'break.amethyst_cluster' },
   }
 
   onMoveAfterJoin = new EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>()
@@ -147,21 +141,9 @@ class JoinBuilder {
   }
 
   settings = Settings.player('Вход\n§7Все действия, связанные со входом', 'join', {
-    message: {
-      name: 'Сообщение',
-      description: 'о входе других игроков',
-      value: true,
-    },
-    sound: {
-      name: 'Звук',
-      description: 'при входе игроков',
-      value: true,
-    },
-    time: {
-      name: 'Время',
-      description: 'при входе',
-      value: true,
-    },
+    message: { name: 'Сообщение', description: 'о входе других игроков', value: true },
+    sound: { name: 'Звук', description: 'при входе игроков', value: true },
+    time: { name: 'Время', description: 'при входе', value: true },
   })
 
   emitFirstJoin(player: Player) {

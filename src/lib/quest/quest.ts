@@ -12,11 +12,7 @@ import { QS } from './step'
 
 export declare namespace Quest {
   interface DB {
-    active: {
-      id: string
-      i: number
-      db?: unknown
-    }[]
+    active: { id: string; i: number; db?: unknown }[]
     completed: string[]
   }
 }
@@ -171,10 +167,7 @@ export class Quest {
   }
 
   private createDatabase(player: Player, i: number) {
-    const quests = (player.database.quests ??= {
-      active: [],
-      completed: [],
-    })
+    const quests = (player.database.quests ??= { active: [], completed: [] })
 
     const db = { id: this.id, i: i } as Quest.DB['active'][number]
     quests.active.unshift(db)
@@ -191,10 +184,7 @@ export class Quest {
    * @param i - Number that represents the step index of the quest.
    */
   private getForPlayer(player: Player, i?: number) {
-    const quests = (player.database.quests ??= {
-      active: [],
-      completed: [],
-    })
+    const quests = (player.database.quests ??= { active: [], completed: [] })
 
     let active = quests.active.find(e => e.id === this.id)
     if (!active && typeof i === 'number') {

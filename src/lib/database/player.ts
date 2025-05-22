@@ -2,12 +2,12 @@ import { Player, world, type PlayerDatabase } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
 import { DEFAULT_ROLE } from 'lib/roles'
 import { t } from 'lib/text'
-import { table } from './abstract'
+import { Table, table } from './abstract'
 
 declare module '@minecraft/server' {
   namespace Player {
     /** Link to the global defined player database. See more here {@link table} */
-    const database: Record<string, PlayerDatabase>
+    const database: Table<PlayerDatabase, string>
 
     /**
      * Gets player name from the {@link Player.database} by id
@@ -36,15 +36,11 @@ declare module '@minecraft/server' {
 }
 
 expand(Player, {
-  database: table<PlayerDatabase>('player', () => ({
-    role: DEFAULT_ROLE,
-    inv: 'spawn',
-    survival: {},
-  })),
+  database: table<PlayerDatabase>('player', () => ({ role: DEFAULT_ROLE, inv: 'spawn', survival: {} })),
   name(id) {
     if (!id) return void 0
 
-    return Player.database[id].name
+    return Player.database.getImmutable(id).name
   },
 })
 
@@ -52,7 +48,7 @@ Object.defineProperty(Player.prototype, 'database', {
   enumerable: true,
   configurable: false,
   get(this: Player) {
-    return Player.database[this.id]
+    return Player.database.get(this.id)
   },
 })
 

@@ -1,6 +1,5 @@
 import { Entity, Player, ScoreboardObjective, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 import { table } from '../database/abstract'
@@ -33,30 +32,9 @@ export class Leaderboard {
   }
 
   static styles = {
-    gray: {
-      objName: '7',
-      fill1: '7',
-      fill2: 'f',
-      pos: '7',
-      nick: 'f',
-      score: '7',
-    },
-    white: {
-      objName: 'f',
-      fill1: 'f',
-      fill2: 'f',
-      pos: 'f',
-      nick: 'f',
-      score: 'f',
-    },
-    green: {
-      objName: 'a',
-      fill1: '2',
-      fill2: '3',
-      pos: 'a',
-      nick: 'f',
-      score: 'a',
-    },
+    gray: { objName: '7', fill1: '7', fill2: 'f', pos: '7', nick: 'f', score: '7' },
+    white: { objName: 'f', fill1: 'f', fill2: 'f', pos: 'f', nick: 'f', score: 'f' },
+    green: { objName: 'a', fill1: '2', fill2: '3', pos: 'a', nick: 'f', score: 'a' },
   }
 
   static all = new Map<string, Leaderboard>()
@@ -72,13 +50,7 @@ export class Leaderboard {
     entity.nameTag = 'Updating...'
     entity.addTag(Leaderboard.tag)
 
-    return new Leaderboard(entity, {
-      style,
-      objective,
-      location,
-      dimension,
-      displayName,
-    })
+    return new Leaderboard(entity, { style, objective, location, dimension, displayName })
   }
 
   /** Creates manager of Leaderboard */
@@ -100,7 +72,7 @@ export class Leaderboard {
   }
 
   update() {
-    Leaderboard.db[this.entity.id] = this.info
+    Leaderboard.db.set(this.entity.id, this.info)
   }
 
   private objective?: ScoreboardObjective
@@ -151,10 +123,9 @@ export class Leaderboard {
   }
 }
 
-const immutable = ProxyDatabase.immutableUnproxy(Leaderboard.db)
 system.runInterval(
   () => {
-    for (const [id, leaderboard] of Object.entries(immutable)) {
+    for (const [id, leaderboard] of Leaderboard.db.entriesImmutable()) {
       if (typeof leaderboard === 'undefined') continue
       const info = Leaderboard.all.get(id)
 
@@ -164,11 +135,7 @@ system.runInterval(
         }
       } else {
         const entity = world[leaderboard.dimension]
-          .getEntities({
-            location: leaderboard.location,
-            tags: [Leaderboard.tag],
-            type: Leaderboard.entityId,
-          })
+          .getEntities({ location: leaderboard.location, tags: [Leaderboard.tag], type: Leaderboard.entityId })
           .find(e => e.id === id)
 
         if (!entity || !entity.isValid || typeof leaderboard === 'undefined') continue

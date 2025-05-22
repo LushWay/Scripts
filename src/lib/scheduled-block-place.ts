@@ -15,10 +15,7 @@ export interface ScheduledBlockPlace {
   location: Vector3
 }
 
-export const SCHEDULED_DB = table<ScheduledBlockPlace[]>('ScheduledBlockPlace', () => []) as Record<
-  DimensionType,
-  ScheduledBlockPlace[]
->
+export const SCHEDULED_DB = table<ScheduledBlockPlace[]>('ScheduledBlockPlace', () => [])
 
 export function scheduleBlockPlace({
   dimension,
@@ -31,7 +28,7 @@ export function scheduleBlockPlace({
   const oldSchedule = getScheduledToPlace(options.location, dimension)
   if (!oldSchedule) {
     const schedule = { date: Date.now() + restoreTime, ...options }
-    SCHEDULED_DB[dimension].push(schedule)
+    SCHEDULED_DB.get(dimension).push(schedule)
     return schedule
   } else return oldSchedule
 }
@@ -40,7 +37,7 @@ export function getScheduledToPlace(
   location: Vector3,
   dimension: DimensionType,
 ): false | undefined | Immutable<ScheduledBlockPlace> {
-  const dimblocks = IMMUTABLE_DB[dimension]
+  const dimblocks = SCHEDULED_DB.getImmutable(dimension)
   if (typeof dimblocks === 'undefined') return false
 
   return dimblocks.find(e => Vector.equals(e.location, location))
@@ -51,7 +48,7 @@ export async function getScheduledToPlaceAsync(
   dimension: DimensionType,
   yieldEach = 100,
 ): Promise<false | undefined | Immutable<ScheduledBlockPlace>[]> {
-  const dimblocks = IMMUTABLE_DB[dimension]
+  const dimblocks = SCHEDULED_DB.getImmutable(dimension)
   if (typeof dimblocks === 'undefined') return false
 
   return new Promise((resolve, reject) => {
@@ -115,18 +112,13 @@ export function unscheduleBlockPlace(schedule: ScheduledBlockPlace) {
 
 const logger = createLogger('SheduledPlace')
 
-// If we will not use immutable unproxied value,
-// proxy wrapper will convert all values into subproxies
-// which is too expensive when arrays are very big
-const IMMUTABLE_DB = ProxyDatabase.immutableUnproxy(SCHEDULED_DB)
-
 const DIMENSIONS = ['overworld', 'nether', 'end'] as const
 
 function* scheduledBlockPlaceJob() {
   for (const dimension of DIMENSIONS) {
-    const schedules = IMMUTABLE_DB[dimension] as Immutable<ScheduledBlockPlace>[]
+    const schedules = SCHEDULED_DB.getImmutable(dimension) as Immutable<ScheduledBlockPlace>[]
     if (typeof schedules === 'undefined') {
-      Reflect.deleteProperty(SCHEDULED_DB, dimension)
+      SCHEDULED_DB.delete(dimension)
       continue
     }
 
@@ -199,14 +191,14 @@ function timeout() {
 timeout()
 
 function removeScheduleAt(dimension: DimensionType, i: number) {
-  SCHEDULED_DB[dimension].splice(i, 1)
+  SCHEDULED_DB.get(dimension).splice(i, 1)
 }
 
 let debugLogging = false
 
 const scheduleForm = form(form => {
   form.title('schd')
-  for (const [dim, blocks] of Object.entries(SCHEDULED_DB)) {
+  for (const [dim, blocks] of SCHEDULED_DB.entries()) {
     form.button(scheduledDimensionForm(dim, blocks))
   }
   form.button(t`debug: ${debugLogging}`, () => (debugLogging = !debugLogging))

@@ -39,7 +39,7 @@ export function createSellableItem({
   inventory: Map<string, number>
 }) {
   const aux = getAuxOrTexture(type)
-  const db = ShopForm.database[shop.id]
+  const db = ShopForm.database.get(shop.id)
   const getCount = () => Math.max(0, db[type] ?? defaultCount)
   const getBuy = (count = getCount()) => Math.max(1, shopFormula.formula(maxCount, count, minPrice, k))
   const body = () => {

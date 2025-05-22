@@ -32,7 +32,7 @@ cutscene
   .string('name', false)
   .executes((ctx, name) => {
     const cutscene = Cutscene.all.get(name)
-    if (!cutscene) return ctx.error(Object.keys(Cutscene.all).join('\n'))
+    if (!cutscene) return ctx.error([...Cutscene.all.keys()].join('\n'))
 
     cutscene.play(ctx.player)
   })

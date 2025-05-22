@@ -4,11 +4,11 @@ import { table } from './abstract'
 const database = table<boolean>('databaseMigrations')
 
 export function migration(name: string, migrateFN: VoidFunction) {
-  if (!database[name]) {
+  if (!database.get(name)) {
     system.delay(() => {
-      if (database[name]) return
+      if (database.get(name)) return
       migrateFN()
-      database[name] = true
+      database.set(name, true)
     })
   }
 }

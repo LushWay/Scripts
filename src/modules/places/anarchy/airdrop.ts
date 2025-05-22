@@ -7,17 +7,11 @@ import { randomLocationInAnarchy } from './random-location-in-anarchy'
 
 const base = new Loot('base_airdrop')
   .item('Gunpowder')
-  .amount({
-    '1...10': '40%',
-    '11...20': '2%',
-  })
+  .amount({ '1...10': '40%', '11...20': '2%' })
   .chance('20%')
 
   .item('CookedBeef')
-  .amount({
-    '30...64': '40%',
-    '65...128': '2%',
-  })
+  .amount({ '30...64': '40%', '65...128': '2%' })
   .chance('20%')
 
   .itemStack(CannonShellItem.blueprint)
@@ -28,17 +22,11 @@ const base = new Loot('base_airdrop')
 
 const powerfull = new Loot('powerfull_airdrop')
   .item('Gunpowder')
-  .amount({
-    '30...64': '40%',
-    '65...100': '2%',
-  })
+  .amount({ '30...64': '40%', '65...100': '2%' })
   .chance('20%')
 
   .item('CookedBeef')
-  .amount({
-    '30...64': '40%',
-    '65...128': '2%',
-  })
+  .amount({ '30...64': '40%', '65...128': '2%' })
   .chance('20%')
 
   .itemStack(CannonShellItem.itemStack)
@@ -57,15 +45,12 @@ function timeout() {
         const online = world.getAllPlayers().filter(e => !isNotPlaying(e)).length
         if (online < 1) return
 
-        for (const [id, airdrop] of Object.entries(Airdrop.db)) {
+        for (const [id, airdrop] of Airdrop.db.entriesImmutable()) {
           if (airdrop) {
             if (airdrop.type === '15m') {
               const instance = Airdrop.instances.find(e => e.id === id)
-              if (instance) {
-                instance.delete()
-              } else {
-                Reflect.deleteProperty(Airdrop.db, id)
-              }
+              if (instance) instance.delete()
+              else Airdrop.db.delete(id)
             }
           }
         }

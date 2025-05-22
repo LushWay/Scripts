@@ -122,7 +122,7 @@ actionGuard((player, _, ctx) => {
   if (typeof owner !== 'string') return true
 
   if (owner === player.id) return true
-  if (Player.database[owner].survival.newbie) {
+  if (Player.database.getImmutable(owner).survival.newbie) {
     ctx.event.player.fail('Вы не можете открыть могилу новичка!')
     return false
   }

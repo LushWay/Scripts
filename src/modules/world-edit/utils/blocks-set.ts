@@ -28,7 +28,7 @@ export interface ReplaceMode {
   select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
 }
 
-const blocksSets = table<BlocksSets>('blockSets')
+const blocksSets = table<BlocksSets>('blockSets', () => ({}))
 
 // GENERAL MANIPULATIONS
 
@@ -39,21 +39,20 @@ export function getOtherPlayerBlocksSets(playerId: string): [string, BlocksSets]
 }
 
 export function getAllBlocksSets(id: string): BlocksSets {
-  const playerBlocksSets = blocksSets[id] ?? {}
+  const playerBlocksSets = blocksSets.get(id)
   return { ...playerBlocksSets, ...DEFAULT_BLOCK_SETS }
 }
 
 export function getOwnBlocksSetsCount(id: string) {
-  return Object.keys(blocksSets[id] ?? {}).length
+  return Object.keys(blocksSets.get(id)).length
 }
 
 export function setBlocksSet(id: string, setName: string, set: BlocksSet | undefined) {
-  blocksSets[id] ??= {}
-  const db = blocksSets[id]
+  const db = blocksSets.get(id)
   if (typeof db !== 'undefined') {
     if (set) {
       // Append new set onto start
-      blocksSets[id] = { [setName]: set, ...db }
+      blocksSets.set(id, { [setName]: set, ...db })
     } else {
       Reflect.deleteProperty(db, setName)
     }

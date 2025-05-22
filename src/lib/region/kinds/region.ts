@@ -258,14 +258,14 @@ export class Region {
   save() {
     if (!(RegionIsSaveable in this)) return false
 
-    RegionDatabase[this.id] = this.toJSON()
+    RegionDatabase.set(this.id, this.toJSON())
   }
 
   /** Removes this region */
   delete() {
     this.structure?.delete()
     Region.regions = Region.regions.filter(e => e.id !== this.id)
-    Reflect.deleteProperty(RegionDatabase, this.id)
+    RegionDatabase.delete(this.id)
   }
 
   /** Can be overriden to add custom buttons to the .region edit form */
@@ -275,9 +275,7 @@ export class Region {
 
   /** Can be overriden to add custom description */
   customFormDescription(player: Player): Record<string, unknown> {
-    return {
-      Приоритет: this.priority,
-    }
+    return { Приоритет: this.priority }
   }
 }
 

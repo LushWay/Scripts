@@ -1,14 +1,13 @@
 import { system } from '@minecraft/server'
+import type { DatabaseDefaultValue, Table, UnknownTable } from './abstract'
 
 const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
 
 type DynamicObject = Record<string | number | symbol, unknown>
-type ProxiedDynamicObject = DynamicObject & {
-  [IS_PROXIED]?: boolean
-}
+type ProxiedDynamicObject = DynamicObject & { [IS_PROXIED]?: boolean }
 
-export class ProxyDatabase<Key extends string = string, Value = undefined> {
+export class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
   private static getUnproxied<T>(value: T): T {
     if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET] as T
     return value
@@ -115,33 +114,81 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
     return COMPOSED as S
   }
 
-  static tables: Record<string, import('./abstract').DatabaseTable> = {}
+  static tables: Record<string, UnknownTable> = {}
 
   constructor(
     protected id: string,
-    protected defaultValue?: import('./abstract').DatabaseDefaultValue<Value>,
+    protected defaultValue?: DatabaseDefaultValue<Value>,
   ) {
-    ProxyDatabase.tables[id] = this.proxy()
+    ProxyDatabase.tables[id] = this as UnknownTable
   }
 
-  proxy() {
-    return this.subproxy(this.value, '', true) as Record<Key, Value>
+  getRawValue() {
+    return Object.fromEntries(this.value)
   }
 
-  private subproxy(object: ProxiedDynamicObject, keys: string, initial = false): DynamicObject {
+  get(key: Key): Value {
+    return this.wrap(this.getImmutable(key), '') as Value
+  }
+
+  getImmutable(key: Key): Immutable<Value> {
+    const value = this.value.get(key)
+    if (this.defaultValue && typeof value === 'undefined') {
+      this.value.set(key, this.defaultValue(key))
+      return this.value.get(key) as Immutable<Value>
+    }
+
+    return value as Immutable<Value>
+  }
+
+  delete(key: Key): void {
+    const deleted = this.value.delete(key)
+    if (deleted) this.needSave()
+  }
+
+  set(key: Key, value: Value): void {
+    this.value.set(key, value)
+    this.needSave()
+  }
+
+  keys(): MapIterator<Key> {
+    return this.value.keys()
+  }
+
+  values(): Value[] {
+    const values: Value[] = []
+    for (const value of this.value.values()) values.push(value)
+    return values
+  }
+
+  entries(): [Key, Value][] {
+    const entries: [Key, Value][] = []
+    for (const [key, value] of this.value.entries()) entries.push([key, this.wrap(value, '') as Value])
+    return entries
+  }
+
+  entriesImmutable(): MapIterator<[Key, Immutable<Value>]> {
+    return this.value.entries() as MapIterator<[Key, Immutable<Value>]>
+  }
+
+  private wrap(value: unknown, keys: string): unknown {
+    if (typeof value !== 'object' || value === null) return value
+
+    const object = value as ProxiedDynamicObject
+
     if (object[IS_PROXIED]) return object
 
     const cache = this.proxyCache.get(object)
     if (cache) return cache
 
-    const proxy = new Proxy(object, this.createProxy(initial, keys))
+    const proxy = new Proxy(object, this.createProxy(keys))
     Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
 
     this.proxyCache.set(object, proxy)
     return proxy
   }
 
-  private createProxy(initial: boolean, keys: string): ProxyHandler<ProxiedDynamicObject> {
+  private createProxy(keys: string): ProxyHandler<ProxiedDynamicObject> {
     return {
       get: (target, p, reciever) => {
         // Filter non db keys
@@ -155,15 +202,9 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
 
         if (value && (value as ProxiedDynamicObject)[IS_PROXIED]) value = (value as ProxiedDynamicObject)[PROXY_TARGET]
 
-        // Add default value
-        if (initial && typeof value === 'undefined' && this.defaultValue) {
-          value = this.defaultValue(p)
-          Reflect.set(target, p, value, reciever)
-        }
-
         // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
-          return this.subproxy(value as DynamicObject, keys + '.' + p)
+          return this.wrap(value as DynamicObject, keys + '.' + p)
         } else return value
       },
       set: (target, p, value, reciever) => {
@@ -189,7 +230,7 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
     }
   }
 
-  protected value: DynamicObject = {}
+  protected value = new Map<Key, Value>()
 
   private proxyCache = new WeakMap<DynamicObject, DynamicObject>()
 
@@ -203,7 +244,7 @@ export class ProxyDatabase<Key extends string = string, Value = undefined> {
       const databaseData = JSON.stringify(
         // Modify all values
         Object.fromEntries(
-          Object.entries(this.value).map(([key, value]) => {
+          [...this.value.entries()].map(([key, value]) => {
             const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
 
             return [

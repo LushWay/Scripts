@@ -123,7 +123,7 @@ export class Boss {
     if (Array.isArray(this.options.allowedEntities))
       this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
-    const areadb = Boss.arenaDb[this.options.place.fullId]
+    const areadb = Boss.arenaDb.get(this.options.place.fullId)
 
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
@@ -139,7 +139,7 @@ export class Boss {
       })
       this.region.onSave.subscribe(() => {
         if (this.region) {
-          Boss.arenaDb[this.options.place.fullId] = { area: this.region.area.toJSON() }
+          Boss.arenaDb.set(this.options.place.fullId, { area: this.region.area.toJSON() })
         }
       })
       EventLoaderWithArg.load(this.onRegionCreate, this.region)
@@ -174,7 +174,7 @@ export class Boss {
   private check() {
     if (!this.location.valid || isChunkUnloaded(this)) return
 
-    const db = Boss.db[this.options.place.fullId]
+    const db = Boss.db.get(this.options.place.fullId)
     if (!db) {
       // First time spawn
       this.spawnEntity()
@@ -223,19 +223,12 @@ export class Boss {
     }
 
     // Save to database
-    Boss.db[this.options.place.fullId] = {
-      id: this.entity.id,
-      date: Date.now(),
-      dead: false,
-    }
+    Boss.db.set(this.options.place.fullId, { id: this.entity.id, date: Date.now(), dead: false })
   }
 
   /** Ensures that entity exists and if not calls onDie method */
   private ensureEntity(db: BossDB) {
-    const entities = world[this.dimensionId].getEntities({
-      type: this.options.typeId,
-      tags: [Boss.entityTag],
-    })
+    const entities = world[this.dimensionId].getEntities({ type: this.options.typeId, tags: [Boss.entityTag] })
 
     for (const entity of entities) {
       if (entity.id === db.id) {
@@ -270,11 +263,7 @@ export class Boss {
     const location = this.entity?.isValid ? this.entity.location : this.location
     delete this.entity
 
-    Boss.db[this.options.place.fullId] = {
-      id: '',
-      date: Date.now(),
-      dead: true,
-    }
+    Boss.db.set(this.options.place.fullId, { id: '', date: Date.now(), dead: true })
 
     if (dropLoot) {
       world.say(`§6Убит босс §f${this.options.place.name}!`)

@@ -152,13 +152,13 @@ export class Airdrop {
       return
     }
 
-    Airdrop.db[this.id] = {
+    Airdrop.db.set(this.id, {
       for: this.for,
       chest: this.chest.id,
       chicken: this.chicken.id,
       loot: this.lootTable.id,
       ...(this.status === 'being looted' ? { looted: true } : {}),
-    }
+    })
   }
 
   /** Shows particle trace under chest minecart */
@@ -186,7 +186,7 @@ export class Airdrop {
 
   delete() {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
-    Reflect.deleteProperty(Airdrop.db, this.id)
+    Airdrop.db.delete(this.id)
 
     /** @param {'chest' | 'chicken'} key */
     const kill = (key: 'chest' | 'chicken') => {
@@ -220,18 +220,12 @@ system.runInterval(
 
       if (!canPerformHeavyOperation) continue
 
-      chestMinecarts ??= world.overworld.getEntities({
-        type: Airdrop.chestTypeId,
-        tags: [Airdrop.chestTag],
-      })
-      chickens ??= world.overworld.getEntities({
-        type: Airdrop.chickenTypeId,
-        tags: [Airdrop.chickenTag],
-      })
+      chestMinecarts ??= world.overworld.getEntities({ type: Airdrop.chestTypeId, tags: [Airdrop.chestTag] })
+      chickens ??= world.overworld.getEntities({ type: Airdrop.chickenTypeId, tags: [Airdrop.chickenTag] })
 
       if (airdrop.status === 'restoring') {
         try {
-          const saved = Airdrop.db[airdrop.id]
+          const saved = Airdrop.db.get(airdrop.id)
           if (typeof saved === 'undefined') return airdrop.delete()
 
           airdrop.chest = findAndRemove(chestMinecarts, saved.chest)
@@ -299,7 +293,7 @@ const findAndRemove = (arr: Entity[], id: string) => {
 }
 
 Core.afterEvents.worldLoad.subscribe(() => {
-  for (const [key, saved] of Object.entries(Airdrop.db)) {
+  for (const [key, saved] of Airdrop.db.entries()) {
     if (typeof saved === 'undefined') continue
     const loot = LootTable.instances.get(saved.loot)
 

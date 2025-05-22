@@ -43,7 +43,7 @@ function roleMenu(player: Player) {
 
   const players = world.getAllPlayers()
 
-  new ArrayForm('Roles $page/$max', Object.entries(Player.database).reverse())
+  new ArrayForm('Roles $page/$max', Player.database.entries().reverse())
     .description('§3Ваша роль: ' + ROLES[prole])
     .filters({
       sort: {
