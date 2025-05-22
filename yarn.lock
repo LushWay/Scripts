@@ -2083,7 +2083,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.25.3":
+"esbuild@npm:^0.25.4":
   version: 0.25.4
   resolution: "esbuild@npm:0.25.4"
   dependencies:
@@ -3884,7 +3884,7 @@ __metadata:
     "@vitest/coverage-istanbul": "npm:3.1.4"
     "@vitest/ui": "npm:3.1.4"
     async-mutex: "npm:^0.5.0"
-    esbuild: "npm:^0.25.3"
+    esbuild: "npm:^0.25.4"
     eslint: "npm:^9.27.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-import-resolver-typescript: "npm:^4.3.5"
