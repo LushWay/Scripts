@@ -205,7 +205,8 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   if (!region) return
 
   const pvp = region.permissions.pvp
-  if (!(!pvp || (pvp === 'pve' && !(hurtEntity instanceof Player)))) return
+  if (pvp === true) return
+  if (pvp === 'pve' && !(hurtEntity instanceof Player && damagingEntity instanceof Player)) return
 
   let direction = Vector.subtract(damagingEntity.location, hurtEntity.location).normalized()
   direction = Vector.multiply(direction, 10)
