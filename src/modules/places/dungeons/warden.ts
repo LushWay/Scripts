@@ -78,7 +78,7 @@ system.runInterval(
     if (!regions.length) return
 
     const dungeonRegions = WardenDungeonRegion.getAll()
-    if (!dungeonRegions.length || !anyPlayerNearRegion(dungeonRegions[0], 20)) return
+    if (!dungeonRegions[0] || !anyPlayerNearRegion(dungeonRegions[0], 20)) return
 
     const placedBefore = regions.find(e => !!e.ldb.blocks.length)
 

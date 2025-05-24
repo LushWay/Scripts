@@ -162,7 +162,7 @@ export class DungeonRegion extends Region {
     const fromAbsolute = this.getStructurePosition(StructureRotation.None)
     const toAbsolute = Vector.add(fromAbsolute, this.structureFile.size)
 
-    const [from, to] = this.rotate([fromAbsolute, toAbsolute])
+    const [from, to] = this.rotate([fromAbsolute, toAbsolute]) as [Vector3, Vector3]
 
     return { from: Vector.min(from, to), to: Vector.max(from, to), fromAbsolute }
   }

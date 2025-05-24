@@ -7,7 +7,7 @@ import { Table, table } from './abstract'
 declare module '@minecraft/server' {
   namespace Player {
     /** Link to the global defined player database. See more here {@link table} */
-    const database: Table<PlayerDatabase, string>
+    const database: Table<PlayerDatabase>
 
     /**
      * Gets player name from the {@link Player.database} by id
@@ -17,7 +17,7 @@ declare module '@minecraft/server' {
      * @example
      *   Player.nameById(playerId) // Shp1nat9841
      */
-    function name(id: string): string | undefined
+    function name(id: string | undefined): string | undefined
   }
 
   interface Player {

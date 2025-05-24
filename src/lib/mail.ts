@@ -98,7 +98,8 @@ export class Mail {
    *
    * @param letter - Letter pointer or the local letter
    */
-  static toLocalLetter(letter: LetterLink | LocalLetter) {
+  static toLocalLetter(letter: LetterLink | LocalLetter | undefined) {
+    if (!letter) return
     if ('id' in letter) {
       const global = Mail.dbGlobal.get(letter.id)
       if (typeof global === 'undefined') return
@@ -147,7 +148,7 @@ export class Mail {
    */
   static readMessage(playerId: string, index: number) {
     const letter = this.dbPlayers.get(playerId)[index]
-    if (letter.read) return
+    if (!letter || letter.read) return
 
     letter.read = true
   }

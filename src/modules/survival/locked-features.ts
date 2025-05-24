@@ -10,9 +10,9 @@ export function lockBlockPriorToNpc(blockType: string, npc: string) {
 
 actionGuard((player, region, ctx) => {
   if (ctx.type !== 'interactWithBlock' || !ctx.event.isFirstEvent) return
-  if (!(ctx.event.block.typeId in blocked)) return
 
   const npc = blocked[ctx.event.block.typeId]
+  if (!npc) return
   if (npc.length > 1) {
     // TODO Use Intl.ListFormat
     player.fail(

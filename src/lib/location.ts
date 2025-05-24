@@ -29,8 +29,7 @@ class Location<T extends Vector3> {
     return (place: Place, fallback?: V) => {
       const location = new this(place.group.id, place.id, fallback)
 
-      Settings.worldMap[place.group.id] ??= {}
-      Settings.worldMap[place.group.id][place.id] = {
+      ;(Settings.worldMap[place.group.id] ??= {})[place.id] = {
         name: place.name,
         description: location.format,
         value: fallback ? Object.values(fallback).join(' ').trim() : '',
@@ -79,7 +78,9 @@ class Location<T extends Vector3> {
     }
 
     for (const [i, key] of Object.keys(this.locationFormat).entries()) {
-      ;(this.locationFormat[key as keyof T] as number) = input[i]
+      const n = input[i]
+      if (typeof n === 'undefined') throw new TypeError(`I out of bounds: ${i}`)
+      ;(this.locationFormat[key as keyof T] as number) = n
     }
     this.updateLocation(this.locationFormat)
   }
@@ -162,7 +163,7 @@ export function migrateLocationGroup(from: string, to: string) {
   if (typeof group !== 'undefined') {
     console.debug(t`Migrating group ${from} to ${to}`)
 
-    Settings.worldDatabase.set(to, { ...(Settings.worldDatabase.get(to) ?? {}), ...group })
+    Settings.worldDatabase.set(to, { ...Settings.worldDatabase.get(to), ...group })
 
     Settings.worldDatabase.delete(from)
   } else {

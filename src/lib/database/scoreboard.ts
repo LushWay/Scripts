@@ -1,6 +1,6 @@
 import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecraft/server'
-import { capitalize } from 'lib/util'
 import { expand } from 'lib/extensions/extend'
+import { capitalize } from 'lib/util'
 
 type LushWayGameModes = 'anarchy'
 
@@ -20,7 +20,9 @@ declare module '@minecraft/server' {
 
     type Date = `${'lastSeen' | 'join'}Date`
 
-    type GameModesStat = `${'anarchy'}${Capitalize<Stat | Date>}`
+    type GameModes = 'anarchy'
+
+    type GameModesStat = `${GameModes}${Capitalize<Stat | Date>}`
 
     type All = 'money' | 'leafs' | 'raid' | 'pvp' | 'joinTimes' | Stat | OnlineTime | Date | GameModesStat
   }
@@ -101,15 +103,16 @@ Reflect.defineProperty(Player.prototype, 'scores', {
   get() {
     const player = this as Player
 
-    if (typeof players[player.id] !== 'undefined') {
+    const scoreboardPlayer = players[player.id]
+    if (scoreboardPlayer) {
       let valid = false
       try {
-        valid = players[player.id].player.isValid
+        valid = scoreboardPlayer.player.isValid
       } catch {}
 
-      if (!valid) players[player.id].player = player
+      if (!valid) scoreboardPlayer.player = player
 
-      return players[player.id].proxy
+      return scoreboardPlayer.proxy
     } else {
       const obj: (typeof players)[string] = {
         player,
@@ -149,7 +152,7 @@ export class ScoreboardDB {
   static objectives: Record<string, ScoreboardObjective> = {}
 
   static objective(name: string, displayName = name) {
-    if (name in this.objectives) return this.objectives[name]
+    if (this.objectives[name]) return this.objectives[name]
 
     const objective = (this.objectives[name] =
       world.scoreboard.getObjective(name) ?? world.scoreboard.addObjective(name, displayName))

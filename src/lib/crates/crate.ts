@@ -55,7 +55,7 @@ export class Crate {
 
     try {
       const block = world[this.dimensionId].getBlock(location)
-      if (!block || Crate.typeIds.includes(block.typeId)) return
+      if (!block || !Crate.typeIds[0] || Crate.typeIds.includes(block.typeId)) return
 
       block.setType(Crate.typeIds[0])
     } catch (e) {

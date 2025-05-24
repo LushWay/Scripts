@@ -60,7 +60,7 @@ system.runInterval(
 
         const inRegion = baseRegions.some(e => e.area.isIn(point))
         const block = dimension.getBlock(vector)
-        const transform = block && block.typeId in ICE_BOMB_TRANSOFORM
+        const transform = block && ICE_BOMB_TRANSOFORM[block.typeId]
         const water = block?.isWaterlogged
         if (!(transform || water)) continue
 
@@ -75,7 +75,7 @@ system.runInterval(
         }
 
         if (transform) {
-          block.setType(ICE_BOMB_TRANSOFORM[block.typeId])
+          block.setType(transform)
         } else if (water) {
           block.setWaterlogged(false)
         }

@@ -36,7 +36,7 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
 
     const nearAir = getEdgeBlocksOf(block).some(location => {
       const key = Vector.string(location)
-      if (key in airCache) return airCache[key].air
+      if (airCache[key]) return airCache[key].air
 
       const block = dimension.getBlock(location)
       if (block) return (airCache[key] = { block, air: !block.isSolid }).air

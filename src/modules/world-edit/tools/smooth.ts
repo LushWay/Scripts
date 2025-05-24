@@ -101,8 +101,8 @@ export async function smoothVoxelData(
         const time2 = util.benchmark('calculate smooth', 'we')
 
         const sizeX = voxelDataCopy.length
-        const sizeY = voxelDataCopy[0].length
-        const sizeZ = voxelDataCopy[0][0].length
+        const sizeY = voxelDataCopy[0]?.length ?? 0
+        const sizeZ = voxelDataCopy[0]?.[0]?.length ?? 0
         for (let smooth = 0; smooth <= smoothLevel; smooth++) {
           // Apply smoothing
           for (let x = 1; x < sizeX - 1; x++) {
@@ -110,14 +110,18 @@ export async function smoothVoxelData(
               for (let z = 1; z < sizeZ - 1; z++) {
                 let sum = 0
                 const permutations = []
-                const cache = voxelDataCopy[x][y][z]
+                const cache = voxelDataCopy[x]?.[y]?.[z]
+                if (!cache) continue
 
                 if (replaceTargets.length && !replaceTargets.some(e => e.matches(cache.block, replaceTargets))) continue
 
                 for (let dx = -1; dx <= 1; dx++) {
                   for (let dy = -1; dy <= 1; dy++) {
                     for (let dz = -1; dz <= 1; dz++) {
-                      const { permutation, void: isVoid } = voxelDataCopy[x + dx][y + dy][z + dz]
+                      const cached = voxelDataCopy[x + dx]?.[y + dy]?.[z + dz]
+                      if (!cached) continue
+
+                      const { permutation, void: isVoid } = cached
                       if (!isVoid) {
                         sum++
                         permutations.push(permutation)

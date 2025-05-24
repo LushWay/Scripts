@@ -22,8 +22,11 @@ export function typeIdToReadable(typeId: string) {
   // Format
   typeId = typeId.replace(/^minecraft:/, '').replace(/_(.)/g, ' $1')
 
+  const first = typeId[0]
+  if (!first) return ''
+
   // Capitalize first letter
-  typeId = typeId[0].toUpperCase() + typeId.slice(1)
+  typeId = first.toUpperCase() + typeId.slice(1)
 
   return typeId
 }
@@ -73,10 +76,12 @@ export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment)
  * @param token
  * @returns
  */
-export function translateToken(token: string, lang: Language): string {
+export function translateToken(token: string | undefined, lang: Language): string {
+  if (!token) return ''
+
   const langMap = langs[lang]
 
-  if (typeof langMap === 'undefined' || !(token in langMap)) {
+  if (!(lang in langs) || !langMap[token]) {
     for (const langMap of Object.values(langs)) {
       if (langMap[token]) return langMap[token]
     }

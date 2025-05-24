@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
-    "allowJs": true,
-    "checkJs": true,
     "noEmit": true,
     "skipLibCheck": true,
 
@@ -13,6 +10,8 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "noErrorTruncation": true,
 
     "lib": [
       "ES2016",
@@ -43,7 +42,4 @@
   },
   "include": ["src", "tools/defines.d.ts"],
   "exclude": ["node_modules", "src/chestui", "vitest/dist/**", "scripts/**"] //  "src/test/**",
-
-  // Pollutes global
-  // "references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
 }

@@ -12,7 +12,7 @@ import { Dungeon } from './loot'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
   .property('type', String)
-  .display('Тип данжа', t => (isKeyof(t, Dungeon.names) ? Dungeon.names[t] : t))
+  .display('Тип данжа', t => Dungeon.names[t] ?? t)
   .nameTag((_, s) => t`§7Создает данж ${getDungeonName(s.type)}`)
   .lore('§7Используй, чтобы создать данж')
   .build()

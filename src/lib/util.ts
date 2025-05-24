@@ -74,10 +74,10 @@ export const util = {
 
   /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
-    return __SERVER__
-      ? text.replace(/§(.)/g, (_, a: string) => (TerminalColors[a] as string | undefined) ?? TerminalColors.r) +
-          TerminalColors.r
-      : text.replace(/§(.)/g, '')
+    const r = TerminalColors.r
+    if (!r) throw new TypeError('Broken terminal colors: no r')
+
+    return __SERVER__ ? text.replace(/§(.)/g, (_, a: string) => TerminalColors[a] ?? r) + r : text.replace(/§(.)/g, '')
   },
 
   fromTerminalColorsToMinecraft(string: string) {
@@ -114,17 +114,19 @@ export function wrap(string: string, maxLength: number) {
 
     // Last element index
     const i = lines.length - 1
-    const line = lines[i]
+    const line = lines[i] ?? ''
     const lastLineChar = line[line.length - 1]
 
     if (lastLineChar === '§' || char === '§') {
       // Ignore limit for invisible chars
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       lines[i] += char
     } else if ((char + line).replace(/§./g, '').length > maxLength) {
       // Limit exceeded, newline
       char.trim() && lines.push(char)
     } else {
       // No limit, add char to the line
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       lines[i] += char
     }
   }
@@ -137,7 +139,7 @@ export function wrapLore(lore: string) {
   return wrap(lore, 30).map(e => {
     // Get latest color from the string
     const match = /^.*(§.)/.exec(e)
-    if (match) color = match[1]
+    if (match?.[1]) color = match[1]
     return '§r' + color + e
   })
 }
@@ -216,7 +218,7 @@ export function hexToRgb(hex: `#${string}`): RGB {
     ?.map(x => parseInt(x, 16) / 256)
 
   if (!rgb) throw new TypeError(`HEX ${hex} is invalid. Expected #[a-f\\d][a-f\\d][a-f\\d]`)
-  const [red, green, blue] = rgb
+  const [red, green, blue] = rgb as [number, number, number]
 
   return { red, green, blue }
 }
@@ -254,7 +256,7 @@ Promise.withResolvers = <T>() => {
 }
 
 export function capitalize<T extends string>(str: T) {
-  return (str[0].toUpperCase() + str.slice(1)) as Capitalize<T>
+  return ((str[0] ?? '').toUpperCase() + str.slice(1)) as Capitalize<T>
 }
 
 export function pick<T extends object, K extends keyof T>(object: T, keys: K[]): Pick<T, K> {

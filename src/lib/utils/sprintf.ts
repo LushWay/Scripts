@@ -10,7 +10,7 @@ type LiteralToken = {
 }
 
 type PlaceholderToken = {
-  conversion: string
+  conversion?: string
   flag: Flag | null
   placeholder: string
   position: number

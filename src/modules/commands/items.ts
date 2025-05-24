@@ -8,7 +8,7 @@ new Command('items')
     new ArrayForm('Items', customItems)
       .button(item => {
         return [
-          `${item.nameTag ?? translateToken(langToken(item.typeId), ctx.player.lang)}\n${item.getLore().join('')}`,
+          `${item.nameTag ?? translateToken(langToken(item.typeId) ?? '', ctx.player.lang)}\n${item.getLore().join('')}`,
           () => ctx.player.container?.addItem(item),
         ]
       })

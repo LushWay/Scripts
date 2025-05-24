@@ -7,9 +7,11 @@ import { util } from 'lib/util'
  * @returns A string.
  */
 export function stringifyBenchmarkResult({ type = 'test', timerPathes = false } = {}) {
-  let output = ''
+  const results = util.benchmark.results[type]
+  if (!results) return `No results for type ${type}`
 
-  let res = Object.entries(util.benchmark.results[type])
+  let output = ''
+  let res = Object.entries(results)
 
   res = res.sort((a, b) => a[1] - b[1])
 

@@ -154,7 +154,7 @@ export class ArrayArgumentType<const T extends string[], B extends boolean = fal
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
   }
 
-  type: T[number] = this.types[0]
+  type = this.types[0] as T[number]
 
   typeName = 'string'
 

@@ -23,7 +23,7 @@ const scriptevents: {
 system.afterEvents.scriptEventReceive.subscribe(
   event => {
     const id = event.id.split(':')[1]
-    if (id in scriptevents) {
+    if (id && id in scriptevents) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       scriptevents[id as keyof typeof scriptevents](JSON.parse(decodeURI(event.message)))
     }

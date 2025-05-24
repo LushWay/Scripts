@@ -24,10 +24,10 @@ export function useBlockSelection(
     notSelected = {},
   }: { onSelect?: (player: Player) => void; notSelected?: Partial<ChestButton> } = {},
 ): [blocks: (BlockPermutation | ReplaceTarget)[] | undefined, options: ChestButton] {
-  const block = storage.get(player.id)
+  const selection = storage.get(player.id)
 
   const callback = () => {
-    selectBlockSource(player, () => onSelect(player), block).then(e => {
+    selectBlockSource(player, () => onSelect(player), selection).then(e => {
       storage.set(player, e)
       onSelect(player)
     })
@@ -43,42 +43,43 @@ export function useBlockSelection(
       ...notSelected,
     },
   ]
-  if (!block) return empty
+  if (!selection) return empty
 
   let result: (BlockPermutation | ReplaceTarget)[]
   let dispaySource: Pick<BlockPermutation, 'getAllStates' | 'type'>
   let options = {} as ChestButton
 
-  if ('permutations' in block) {
-    const type =
-      block.permutations[0] instanceof BlockPermutation
-        ? block.permutations[0].type
-        : BlockTypes.get(block.permutations[0].typeId)
+  if ('permutations' in selection) {
+    const block = selection.permutations[0]
+
+    if (!block) {
+      player.fail('No permutations selected')
+      throw new Error('No permutations selected')
+    }
+
+    const type = block instanceof BlockPermutation ? block.type : BlockTypes.get(block.typeId)
 
     if (!type) {
-      player.fail(t.error`Неизвестный тип блока: ${inspect(block.permutations[0])}`)
-      throw new Error(`Unknown block type: ${inspect(block.permutations[0])}`)
+      player.fail(t.error`Неизвестный тип блока: ${inspect(selection.permutations[0])}`)
+      throw new Error(`Unknown block type: ${inspect(selection.permutations[0])}`)
     }
 
     dispaySource =
-      block.permutations[0] instanceof BlockPermutation
-        ? block.permutations[0]
+      block instanceof BlockPermutation
+        ? block
         : {
-            getAllStates() {
-              if (block.permutations[0] instanceof BlockPermutation) return block.permutations[0].getAllStates()
-              return block.permutations[0].states
-            },
+            getAllStates: () => (block instanceof BlockPermutation ? block.getAllStates() : block.states),
             type: type,
           }
-    result = block.permutations
+    result = selection.permutations
   } else {
-    const set = getBlocksInSet(block.ref)
+    const set = getBlocksInSet(selection.ref)
     if (!set[0]) return empty
     result = set
     dispaySource = set[0]
 
     options.nameTag = desc
-    desc = 'Набор блоков ' + stringifyBlocksSetRef(block.ref)
+    desc = 'Набор блоков ' + stringifyBlocksSetRef(selection.ref)
   }
   options = {
     ...ChestForm.permutationToButton(dispaySource),
@@ -190,7 +191,8 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
     if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
       base.addButton('§2Редактировать свойства выбранного блока', async () => {
         const selection = currentSelection.permutations[0]
-        currentSelection.permutations[0]
+        if (!selection) throw new Error('No selection!')
+
         const states = await WEeditBlockStatesMenu(
           player,
           selection instanceof BlockPermutation ? selection.getAllStates() : selection.states,

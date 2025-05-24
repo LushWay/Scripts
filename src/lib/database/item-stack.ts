@@ -36,8 +36,11 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   display(text: Text, prepareProperty?: PrepareProperty<ParsedSchemaProperty<L>>) {
     if (!this.currentProperty) throw new Error('Create property first!')
 
-    this.properties[this.currentProperty].text = text
-    if (prepareProperty) this.properties[this.currentProperty].prepareProperty = prepareProperty
+    const property = this.properties[this.currentProperty]
+    if (!property) throw new TypeError('Unknown property')
+
+    property.text = text
+    if (prepareProperty) property.prepareProperty = prepareProperty
 
     return this
   }

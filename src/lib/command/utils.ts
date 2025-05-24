@@ -76,7 +76,7 @@ function suggestCommand(player: Player, command: string): void {
     maxSuggestionsCount: 3,
   }
 
-  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return
+  if (!search[0] || search[0][1] < options.minMatchTriggerValue) return
 
   const suggest = (a: [string, number]) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
@@ -149,12 +149,15 @@ export function parseLocationArguments(
   })
   const b = [x, y, z].map((arg, index) => {
     return arg.includes('~')
-      ? a[index] + locations[index]
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        a[index]! + locations[index]!
       : arg.includes('^')
-        ? a[index] + viewVectors[index]
+        ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          a[index]! + viewVectors[index]!
         : a[index]
   })
-  return { x: b[0], y: b[1], z: b[2] }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return { x: b[0]!, y: b[1]!, z: b[2]! }
 }
 
 /**
@@ -179,12 +182,12 @@ export function sendCallback(
     if (arg.sys.type.name.endsWith('*')) continue
     if (arg.sys.type instanceof LocationArgumentType) {
       argsToReturn.push(
-        parseLocationArguments([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender) ?? event.sender.location,
+        parseLocationArguments(cmdArgs as [string, string, string], event.sender) ?? event.sender.location,
       )
       continue
     }
     if (arg.sys.type instanceof LiteralArgumentType) continue
-    argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
+    if (cmdArgs[i]) argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
   }
   if (typeof lastArg.sys.callback !== 'function') {
     console.warn('Command not implemented: ', lastArg)

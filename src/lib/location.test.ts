@@ -44,7 +44,7 @@ describe('location', () => {
     expect(loc.z).toBe(30)
 
     Settings.worldDatabase.set(group.id, { [point.id]: '40 60 30' })
-    Settings.worldMap[group.id][point.id].onChange?.()
+    Settings.worldMap[group.id]?.[point.id]?.onChange?.()
     expect(loc.x).toBe(40)
     expect(loc.y).toBe(60)
     expect(loc.z).toBe(30)
@@ -59,7 +59,7 @@ describe('location', () => {
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 0, y: 0, z: 1 }))
     expect(loc.firstLoad).toBe(true)
 
-    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id])
+    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id] ?? {})
     settings[point.id] = '40 50 60'
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60 }))
     expect(loc.firstLoad).toBe(false)
@@ -120,7 +120,7 @@ describe('locationWithRotation', () => {
     loc.onLoad.subscribe(callback)
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 10, y: 20, z: 30, xRot: 45, yRot: 90 }))
 
-    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id])
+    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id] ?? {})
     settings[point.id] = '40 50 60 30 60'
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60, xRot: 30, yRot: 60 }))
@@ -165,7 +165,7 @@ describe('locationWithRadius', () => {
     const callback = vi.fn()
     loc.onLoad.subscribe(callback)
 
-    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id])
+    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id] ?? {})
     settings[point.id] = '40 50 60 10'
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60, radius: 10 }))

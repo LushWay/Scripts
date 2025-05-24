@@ -173,7 +173,7 @@ export class Loot {
         const match = /^(\d{1,4})\.\.\.(\d{1,4})$/.exec(range)
         if (!match) throw new RangeError(`Range '${range}' doesn't matches the pattern 'number...number'.`)
 
-        const [, min, max] = match.map(parseIntStrict)
+        const [, min, max] = match.map(parseIntStrict) as [string, number, number]
         if (min > max) throw new RangeError('Min cannot be greater than max.')
         if (min === max) throw new RangeError('Min cannot be equal to max. Use one number as key instead.')
 
@@ -354,7 +354,7 @@ export function selectByChance<T>(items: ChanceItem<T>[]) {
     if (random < 0) return { index, item }
   }
 
-  return { index: 0, item: items[0].item }
+  return { index: 0, item: items[0]?.item as T }
 }
 
 selectByChance.getTotalChance = <T>(items: ChanceItem<T>[]) => {

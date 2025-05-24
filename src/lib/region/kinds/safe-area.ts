@@ -82,8 +82,8 @@ system.runPlayerInterval(
 )
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
-  const been = previous.length && adventureModeRegion(previous[0])
-  const now = newest.length && (adventureModeRegion(newest[0]) || !nearDisabledAdventureRegions(player))
+  const been = previous[0] && adventureModeRegion(previous[0])
+  const now = newest[0] && (adventureModeRegion(newest[0]) || !nearDisabledAdventureRegions(player))
 
   const gamemode = player.getGameMode()
   const adventure = gamemode === GameMode.adventure

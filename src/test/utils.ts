@@ -77,6 +77,7 @@ function wrapInfinity<T extends keyof TFD>(
 ) {
   try {
     const f = forms[0]
+    if (!f) return onError(new Error('Undefined form at index 0'))
     const ff = forms.slice(1)
     return TEST_onFormOpen(player, f[0], f[1], ff.length ? () => wrapInfinity(player, ff, final, onError) : final)
   } catch (e) {

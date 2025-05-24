@@ -93,13 +93,13 @@ class Tool extends WorldEditTool {
     if (action in actions) {
       const list = actions[action]
       const num = Number(lore[2]) + (player.isSneaking ? -1 : 1)
-      if (!list[num]) return player.fail('Список кончился')
+      if (!list?.[num]) return player.fail('Список кончился')
       lore[1] = list[num]
       lore[2] = num.toString()
       player.success(`§7${lore[2]} §f${lore[1]}`)
       item.setLore(lore)
     }
-    if (action === 'runCommand') {
+    if (action === 'runCommand' && lore[1]) {
       player.runCommand(lore[1])
     }
     if (action === 'teleportToView') {
@@ -119,6 +119,8 @@ class Tool extends WorldEditTool {
           if (item.typeId !== Items.WeWand) return
 
           const lore = item.getLore()
+
+          if (!lore[1]) return
 
           if (lore[0] === 'Particle') {
             const hit = player.getBlockFromViewDirection({

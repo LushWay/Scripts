@@ -32,7 +32,7 @@ export function table<Value, Key extends string = string>(
   return provider.createTable(name, defaultValue)
 }
 
-export type UnknownTable = Table<unknown, string>
+export type UnknownTable = Table<unknown>
 
 /** Describes unified database provider */
 export interface DatabaseProvider {

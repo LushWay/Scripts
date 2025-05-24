@@ -69,7 +69,7 @@ class JoinBuilder {
               if (isNaN(db.stage) || db.stage >= Join.config.title_animation.stages.length) db.stage = 0
 
               // Creating title
-              let title = Join.config.title_animation.stages[db.stage]
+              let title = Join.config.title_animation.stages[db.stage] ?? ''
               for (const [key, value] of Object.entries(Join.config.title_animation.vars)) {
                 title = title.replace('$' + key, value)
               }

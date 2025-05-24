@@ -167,13 +167,16 @@ export class ArrayForm<
     const size = keys.length
 
     const key = keys[0]
+    if (!key) return
+
     const firstFilterConfig = this.config.filters[key]
+    if (!firstFilterConfig) return
 
     if (size === 0) return
     if (size === 1 && Settings.isDropdown(firstFilterConfig.value)) {
       const values = firstFilterConfig.value
       let i = values.findIndex(e => filters[key] === e[0])
-      form.addButton('§3' + firstFilterConfig.name + ':§f ' + values[i][1], () => {
+      form.addButton(`§3${firstFilterConfig.name}:§f ${values[i]?.[1]}`, () => {
         if (i >= values.length - 1) i = 0
         else i++
 
@@ -184,7 +187,7 @@ export class ArrayForm<
       })
     } else {
       const propertyName = 'filters'
-      const applied = Object.keys(database.get(propertyName) ?? {}).length
+      const applied = Object.keys(database.get(propertyName)).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,

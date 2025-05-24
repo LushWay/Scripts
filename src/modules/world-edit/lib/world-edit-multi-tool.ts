@@ -87,6 +87,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
             const to = index - move
             const max = tools.length - 1
             if (to < 0 || to > max) return back()
+            if (!tools[index] || !tools[to]) return back()
             ;[tools[to], tools[index]] = [tools[index], tools[to]]
             this.saveToolsData(slot, tools)
             back()
@@ -106,13 +107,13 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
   }
 
   private selectToolForm(slot: ContainerSlot, player: Player, toolsData: ToolData[], back: VoidFunction) {
+    if (this.tools.length === 0) throw new Error('No tools to select!')
+
     const select = (tool: WorldEditTool) => {
       const toolData: ToolData = { name: `T#: ${tool.name}`, tpid: tool.id }
       toolsData.push(toolData)
       this.editOneToolForm(slot, player, toolsData, toolData, tool, back)
     }
-
-    if (this.tools.length === 0) return select(this.tools[0])
 
     new ArrayForm('Тип инструмента', this.tools)
       .back(back)

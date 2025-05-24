@@ -147,13 +147,15 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     const cacheTypeId = block.typeId
     const cacheLocationId = Vector.string(block)
     const stateName =
-      this.blockLocationCache.get(cacheLocationId) ?? this.blockTypeCache.get(cacheTypeId) ?? stateNames[0]
+      this.blockLocationCache.get(cacheLocationId) ??
+      this.blockTypeCache.get(cacheTypeId) ??
+      (stateNames[0] as unknown as string)
     return { stateNames, stateName, allStates, cacheTypeId, cacheLocationId }
   }
 }
 
-function nextValue<T>(array: T[], value: T) {
-  return array[array.findIndex(e => e === value) + 1] ?? array[0]
+function nextValue<T>(array: T[], value: T): T {
+  return array[array.findIndex(e => e === value) + 1] ?? (array[0] as T)
 }
 
 new DebugStick()

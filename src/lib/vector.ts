@@ -21,7 +21,7 @@ export class Vector {
     const match = /(?:§c)?(-?\d+) (?:§a)?(-?\d+) (?:§b)?(-?\d+)/.exec(string)
     if (!match) return
 
-    const [x, y, z] = match.slice(1).map(parseFloat)
+    const [x, y, z] = match.slice(1).map(parseFloat) as [number, number, number]
     return new Vector(x, y, z)
   }
 
@@ -220,11 +220,6 @@ export class Vector {
    *   Returns the spherical linear interpolation between a and b using s as the control.
    */
   static slerp(a: Vector3, b: Vector3, s: number) {
-    type Vector3Array = [number, number, number]
-    function MathDot(a: Vector3Array, b: Vector3Array): number {
-      return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n)
-    }
-
     const θ = Math.acos(MathDot([a.x, a.y, a.z], [b.x, b.y, b.z]))
     const factor1 = Math.sin(θ * (1 - s)) / Math.sin(θ)
     const factor2 = Math.sin(θ * s) / Math.sin(θ)
@@ -395,4 +390,10 @@ export class Vector {
   floor() {
     return Vector.floor(this)
   }
+}
+
+type Vector3Array = [number, number, number]
+function MathDot(a: Vector3Array, b: Vector3Array): number {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return a.map((x, i) => a[i]! * b[i]!).reduce((m, n) => m + n)
 }

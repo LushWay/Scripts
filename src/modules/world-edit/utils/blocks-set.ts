@@ -1,4 +1,4 @@
-import { Block, BlockPermutation, Player, TargetBlockHitAfterEvent } from '@minecraft/server'
+import { Block, BlockPermutation, Player } from '@minecraft/server'
 
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
 import { noNullable, typeIdToReadable } from 'lib'
@@ -91,9 +91,8 @@ export function getBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
 }
 
 export function getReplaceTargets(ref: BlocksSetRef): ReplaceTarget[] {
-  if (ref[1] in DEFAULT_REPLACE_TARGET_SETS) {
-    return DEFAULT_REPLACE_TARGET_SETS[ref[1]]
-  }
+  const defaultReplaceTarget = DEFAULT_REPLACE_TARGET_SETS[ref[1]]
+  if (defaultReplaceTarget) return defaultReplaceTarget
 
   return getActiveBlocksInSet(ref)?.map(fromBlockStateWeightToReplaceTarget) ?? []
 }

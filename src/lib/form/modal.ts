@@ -207,10 +207,10 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       if (!response.formValues) return
       const args = response.formValues.map((formValue, i) => {
         const arg = this.args[i]
+        if (!arg) return formValue
 
-        if (arg.type === 'dropdown' && typeof formValue === 'number') {
-          return arg.options?.[formValue]
-        } else return formValue
+        if (arg.type === 'dropdown' && typeof formValue === 'number') return arg.options?.[formValue]
+        else return formValue
       })
       callback(new FormCallback(this, player, () => this.show(player, callback)), ...args)
     })

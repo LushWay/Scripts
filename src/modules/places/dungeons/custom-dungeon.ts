@@ -141,7 +141,7 @@ function editChest(
       Object.fromEntries(
         Object.entriesStringKeys(Dungeon.customLoot)
           .map(([key, value]) => [key, (value?.id ?? key).replace('mystructure:dungeons/', '')])
-          .filter(e => (keys.includes(e[1]) ? false : (keys.push(e[1]), true))),
+          .filter(e => (keys.includes(e[1] ?? '') ? false : (keys.push(e[1] ?? ''), true))),
       ),
       { defaultValueIndex: chest?.loot },
     )

@@ -95,9 +95,12 @@ export class OreCollector {
     return this
   }
 
-  selectOreByChance(deepslate = false, y: number) {
+  selectOreByChance(deepslate = false, y: number): string {
     const ore = selectByChance(this.getAtY(y)).item
-    return deepslate ? ore.deepslates[0] : ore.types[0]
+    const result = deepslate ? ore.deepslates[0] : ore.types[0]
+    if (!result) throw new TypeError('No ore found!')
+
+    return result
   }
 
   getAtY(y: number) {

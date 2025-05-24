@@ -67,7 +67,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
       if (!command) return 'fail'
       if (start.sys.children.length > 0) {
         const child = start.sys.children.find(
-          v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          v => v.sys.type.matches(args[i]!).success || (!args[i] && v.sys.type.optional),
         )
         if (!child && !args[i] && start.sys.callback) return 'success'
         if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
@@ -91,7 +92,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   }
 
   [stringifySymbol]() {
-    return '§f' + Command.prefixes[0] + this.getFullName()
+    return `§f${Command.prefixes[0]}${this.getFullName()}`
   }
 
   private getFullName(name = ''): string {

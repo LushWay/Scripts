@@ -167,7 +167,7 @@ export class WorldEdit {
         this.hasWarnAboutHistoryLimit = true
       }
 
-      history[0].delete()
+      history[0]?.delete()
       history.splice(0, 1)
     }
 

@@ -44,7 +44,7 @@ type toPlain<T extends SettingValue> = T extends true | false
 export type SettingsConfigParsed<T extends SettingsConfig> = { -readonly [K in keyof T]: toPlain<T[K]['value']> }
 
 export type SettingsDatabaseValue = Record<string, SettingValue>
-export type SettingsDatabase = Table<SettingsDatabaseValue, string>
+export type SettingsDatabase = Table<SettingsDatabaseValue>
 
 export type PlayerSettingValues = boolean | string | number | DropdownSetting[]
 
@@ -157,20 +157,21 @@ export class Settings {
         configurable: false,
         enumerable: true,
         get() {
-          const value = config[prop].value
+          const value = config[prop]?.value
+          if (!value) throw new TypeError(`No config value for prop ${prop}`)
           return (
             (database.getImmutable(groupId) as SettingsDatabaseValue | undefined)?.[key] ??
-            (Settings.isDropdown(value) ? value[0][0] : value)
+            (Settings.isDropdown(value) ? value[0]?.[0] : value)
           )
         },
         set(v: toPlain<SettingValue>) {
           let value = database.get(groupId)
-          if (!value) {
+          if (typeof value === 'undefined') {
             database.set(groupId, {})
             value = database.get(groupId)
           }
           value[key] = v
-          config[prop].onChange?.()
+          config[prop]?.onChange?.()
           database.set(groupId, value)
         },
       })
@@ -222,6 +223,8 @@ export function settingsGroupMenu(
 ) {
   const displayType = forRegularPlayer ? 'own' : 'world'
   const config = configSource[groupName]
+  if (!config) throw new TypeError(`No config for groupName ${groupName}`)
+
   const store = Settings.parseConfig(storeSource, groupName, config, forRegularPlayer ? player : null)
   const buttons: [string, (input: string | boolean) => string][] = []
   const form = new ModalForm<(ctx: FormCallback<ModalForm>, ...options: (string | boolean)[]) => void>(
@@ -231,11 +234,12 @@ export function settingsGroupMenu(
   for (const key in config) {
     const saved = store[key] as string | number | boolean | undefined
     const setting = config[key]
+    if (!setting) throw new TypeError(`No setting for key ${key}`)
+
     const value = saved ?? setting.value
 
     const isUnset = typeof saved === 'undefined'
-    const isRequired = (Reflect.get(config[key], 'requires') as boolean) && isUnset
-
+    const isRequired = (Reflect.get(setting, 'requires') as boolean) && isUnset
     const isToggle = typeof value === 'boolean'
 
     let label = ''
@@ -311,7 +315,10 @@ export function settingsGroupMenu(
     const hints: Record<string, string> = {}
 
     for (const [i, setting] of settings.entries()) {
-      const [key, callback] = buttons[i]
+      const button = buttons[i]
+      if (!button) continue
+
+      const [key, callback] = button
       const hint = callback(setting)
 
       if (hint) hints[key] = hint
@@ -341,7 +348,7 @@ export function playerSettingsMenu(player: Player, back?: VoidFunction) {
   if (back) form.addButtonBack(back)
 
   for (const groupName in Settings.playerMap) {
-    const name = Settings.playerMap[groupName][SETTINGS_GROUP_NAME]
+    const name = Settings.playerMap[groupName]?.[SETTINGS_GROUP_NAME]
     if (name) form.addButton(name, () => settingsGroupMenu(player, groupName, true))
   }
 

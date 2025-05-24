@@ -55,16 +55,16 @@ function getChance(chance: number, totalChance: number) {
 }
 
 function getOreTexture(item: OreEntry['item']) {
-  return getAuxOrTexture(item.types[0] || MinecraftBlockTypes.Stone)
+  return getAuxOrTexture(item.types[0] ?? MinecraftBlockTypes.Stone)
 }
 
 function oreName(item: OreEntry['item'], chance: number, separator = '\n') {
-  return t`${'%' + langToken(item.types[0] || MinecraftBlockTypes.Stone)}${separator}${chance}%%`
+  return t`${`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`}${separator}${chance}%%`
 }
 
 const wikiOre = ({ item }: OreEntry) =>
   form(f => {
-    f.title(t`${langToken(item.types[0])}`)
+    f.title(t`${`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`}`)
     f.body(
       textTable({
         Под: item.below,

@@ -280,9 +280,7 @@ export class InventoryStore {
       }
     } else if (entitiesToSpawn < 0) {
       // Check for unused entities and despawn them
-      for (let i = totalEntities; i >= entities.length; i--) {
-        entities[i].remove()
-      }
+      for (let i = totalEntities; i >= entities.length; i--) entities[i]?.remove()
     }
 
     let itemIndex = 0

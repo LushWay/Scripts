@@ -1,6 +1,6 @@
 import { system, System, world } from '@minecraft/server'
 import stringifyError from 'lib/utils/error'
-import { util } from '../util'
+import { capitalize, util } from '../util'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -135,7 +135,7 @@ function Timer(
   TIMERS_PATHES[visualId] = path
 
   function timer() {
-    util.catch(fn, type[0].toUpperCase() + type.slice(1))
+    util.catch(fn, capitalize(type))
   }
 
   return __DEV__

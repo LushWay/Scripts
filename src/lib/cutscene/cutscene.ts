@@ -176,15 +176,16 @@ export class Cutscene {
 
   /** Uses bezier curves to interpolate points along a section. */
   private *pointIterator({ step = 0.5, points }: Section) {
+    const emptyPoint: Point = { rx: 0, ry: 0, x: 0, y: 0, z: 0 }
     let index = 0
     for (let point = 0; point <= points.length; point += step) {
       if (!points[0]) yield { x: 0, y: 0, z: 0, rx: 0, ry: 0, index }
       const i = Math.floor(point)
       const t = point - i
-      const v0 = points[i - 1] || points[0]
-      const v1 = points[i] || points[0]
-      const v2 = points[i + 1] || v1
-      const v3 = points[i + 2] || v2
+      const v0 = points[i - 1] ?? points[0] ?? emptyPoint
+      const v1 = points[i] ?? points[0] ?? emptyPoint
+      const v2 = points[i + 1] ?? v1
+      const v3 = points[i + 2] ?? v2
 
       const x = bezier([v0, v1, v2, v3], 'x', t)
       const y = bezier([v0, v1, v2, v3], 'y', t)
@@ -277,12 +278,13 @@ function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: k
   const [v0, v1, v2, v3] = vectors
   const t2 = t * t
   const t3 = t2 * t
+  const vv1 = v1[axis] ?? 0
+  const vv0 = v0[axis] ?? 0
+  const vv2 = v2[axis] ?? 0
+  const vv3 = v3[axis] ?? 0
   return (
     0.5 *
-    (2 * v1[axis] +
-      (-v0[axis] + v2[axis]) * t +
-      (2 * v0[axis] - 5 * v1[axis] + 4 * v2[axis] - v3[axis]) * t2 +
-      (-v0[axis] + 3 * v1[axis] - 3 * v2[axis] + v3[axis]) * t3)
+    (2 * vv1 + (-vv0 + vv2) * t + (2 * vv0 - 5 * vv1 + 4 * vv2 - vv3) * t2 + (-vv0 + 3 * vv1 - 3 * vv2 + vv3) * t3)
   )
 }
 

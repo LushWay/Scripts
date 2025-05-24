@@ -254,12 +254,13 @@ function WEeditBlocksSetMenu(o: {
     editStates = false,
     back = () => WEblocksSetsMenu(player),
   } = o
-  let set = sets[setName]
-  if (typeof set === 'undefined') {
-    set = []
-    setBlocksSet(player.id, setName, set)
-    sets[setName] = set
-  }
+  const set =
+    sets[setName] ??
+    (() => {
+      const s = (sets[setName] = [])
+      setBlocksSet(player.id, setName, s)
+      return s
+    })()
 
   const blockBelow = player.dimension.getBlock(player.location)?.below()
   const blockOnViewHit = player.getBlockFromViewDirection()
@@ -562,6 +563,7 @@ export function WEeditBlockStatesMenu(
 
     form.addButtonAsk('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
 
+    // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {
       const stateDef = allStates.find(e => e.id === stateName)
       if (!stateDef) continue

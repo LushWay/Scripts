@@ -139,10 +139,10 @@ class BrushTool extends WorldEditToolBrush<Storage> {
       })
   }
 
-  ensureShape(player: Player, shape: string) {
+  ensureShape(player: Player, shape: string): keyof typeof SHAPES {
     if (!isKeyof(shape, SHAPES)) {
       player.warn(t`Неизвестная кисть: ${shape}`)
-      return Object.keys(SHAPES)[0]
+      return Object.keys(SHAPES)[0] as unknown as keyof typeof SHAPES
     } else return shape
   }
 

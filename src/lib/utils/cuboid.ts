@@ -79,27 +79,27 @@ export class Cuboid {
       const [axis, value] = entry as [keyof Vector3, number]
 
       for (let coordinate = this.min[axis]; ; coordinate = coordinate + value) {
-        if (coordinate < this.max[axis]) breakpoints[axis].push(coordinate)
+        if (coordinate < this.max[axis]) breakpoints[axis]?.push(coordinate)
         else {
-          breakpoints[axis].push(this.max[axis])
+          breakpoints[axis]?.push(this.max[axis])
           break
         }
       }
     }
 
-    breakpoints.x.forEach((x, xi) => {
-      breakpoints.y.forEach((y, yi) => {
-        breakpoints.z.forEach((z, zi) => {
+    breakpoints.x?.forEach((x, xi) => {
+      breakpoints.y?.forEach((y, yi) => {
+        breakpoints.z?.forEach((z, zi) => {
           const current = { x: x, y: y, z: z }
           const indexOf = { x: xi, y: yi, z: zi }
 
           const nextCord: Vector3 = {} as Vector3
           for (const key in breakpoints) {
             const axis = key as keyof Vector3
-            const nextValue = breakpoints[axis][indexOf[axis] + 1]
-            if (!nextValue && breakpoints[axis].length > 1) return
+            const nextValue = breakpoints[axis]?.[indexOf[axis] + 1]
+            if (!nextValue && (breakpoints[axis]?.length ?? 2) > 1) return
 
-            nextCord[axis] = (nextValue as number | undefined) ?? current[axis]
+            nextCord[axis] = nextValue ?? current[axis]
             if (nextCord[axis] !== this.max[axis]) nextCord[axis]--
           }
 

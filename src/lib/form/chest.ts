@@ -48,7 +48,7 @@ export function getAuxTextureOrPotionAux(itemStack: ItemStack) {
   const { potionEffectType: effect, potionLiquidType: liquid } = potion
   const type = liquid.id !== MinecraftPotionLiquidTypes.Regular ? '_' + liquid.id.toLowerCase() : ''
   const effectId =
-    effect.id[0].toLowerCase() +
+    (effect.id[0] ?? '').toLowerCase() +
     effect.id
       .slice(1)
       .replace(/([A-Z])/g, '_$1')
@@ -159,14 +159,13 @@ export class ChestForm {
   pattern(from: [number, number], pattern: string[], key: Record<string, Omit<ChestButtonOptions, 'slot'>>) {
     for (let y = 0; y < pattern.length; y++) {
       const row = pattern[y]
-      for (let x = 0; x < row.length; x++) {
-        const slot = key[row[x]]
-        if (typeof slot === 'undefined') continue
+      if (!row) continue
 
-        this.button({
-          ...slot,
-          slot: from[1] + x + (from[0] + y) * 9,
-        })
+      for (let x = 0; x < row.length; x++) {
+        const slot = key[row[x] ?? '']
+        if (!slot) continue
+
+        this.button({ ...slot, slot: from[1] + x + (from[0] + y) * 9 })
       }
     }
     return this
@@ -186,7 +185,7 @@ export class ChestForm {
         )
           return
 
-        const callback = this.buttons[response.selection].callback
+        const callback = this.buttons[response.selection]?.callback
         if (!callback) this.show(player)
         else util.catch(() => callback(player))
       })

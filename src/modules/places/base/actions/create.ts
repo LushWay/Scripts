@@ -62,7 +62,10 @@ function createBase(block: Block, player: Player) {
   const center = Vector.floor(block.location)
   if (!player.isSimulated()) baseLogger.player(player).info`Created on ${center}`
 
-  BaseRegion.create(new SphereArea({ center, radius: baseLevels[1].radius }, block.dimension.type), {
+  const level = baseLevels[1]
+  if (!level) throw new TypeError('No level!')
+
+  BaseRegion.create(new SphereArea({ center, radius: level.radius }, block.dimension.type), {
     permissions: {
       doors: false,
       switches: false,

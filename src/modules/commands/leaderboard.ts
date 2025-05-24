@@ -104,7 +104,7 @@ function editLeaderboard(
             if (l.length !== 3 || l.find(isNaN))
               return ctx.error("Неверная локация '" + location + "', ожидался формат 'x y z' с числами")
 
-            const [x, y, z] = l
+            const [x, y, z] = l as [number, number, number]
             data.location = { x, y, z }
           }
           data.dimension = dimension

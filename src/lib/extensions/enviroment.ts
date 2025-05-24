@@ -48,7 +48,8 @@ Object.map = (object, mapper) => {
   const result: Record<string, unknown> = {}
 
   for (const key of Object.getOwnPropertyNames(object)) {
-    const mapped = mapper(key, (object as Record<string | number | symbol, never>)[key], object)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const mapped = mapper(key, object[key] as any, object)
     if (mapped) result[mapped[0]] = mapped[1]
   }
 

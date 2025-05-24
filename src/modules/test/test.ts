@@ -228,7 +228,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
 
   lush(ctx) {
-    let size = parseInt(ctx.args[1])
+    let size = parseInt(ctx.args[1] ?? '')
     size = isNaN(size) ? 10 : size
     ctx.player.info(t`Trying to replace air under the cave vines with structure void in radius ${size}`)
 
@@ -417,5 +417,5 @@ c.string('id', true).executes(async (ctx, id) => {
   if (!isKeyof(id as string, source)) return ctx.error('Неизвестный тест ' + id + ', доступные:\n§f' + keys.join('\n'))
   ctx.reply('Tест ' + id)
 
-  util.catch(() => source[id as string](ctx), 'Test')
+  util.catch(() => source[id as string]?.(ctx), 'Test')
 })

@@ -55,7 +55,7 @@ export default class ChestLootAnimation {
     // Equippable does not work's with armor stand in 1.20.81, please replace to equippable replace when fixed
     entity.runCommand(`replaceitem entity @s slot.weapon.mainhand 0 ${item.typeId}`)
     const enchantments = item.enchantable?.getEnchantments()
-    if (enchantments?.length) entity.runCommand(`enchant @s ${enchantments[0].type.id} 1`)
+    if (enchantments?.length) entity.runCommand(`enchant @s ${enchantments[0]?.type.id} 1`)
 
     entity.addEffect(MinecraftEffectTypes.SlowFalling, this.timetick, { showParticles: false, amplifier: 255 })
     entity.teleport(Vector.add(location, this.entityOffset))
