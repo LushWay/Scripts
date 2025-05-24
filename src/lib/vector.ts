@@ -231,11 +231,19 @@ export class Vector {
    * @remarks
    *   Returns the subtraction of these vectors.
    */
-  static subtract(a: Vector3, b: Vector3) {
+  static subtract(a: Vector3, b: number | Vector3) {
     const vector = new Vector(a.x, a.y, a.z)
-    vector.x -= b.x
-    vector.y -= b.y
-    vector.z -= b.z
+
+    if (typeof b === 'number') {
+      vector.x /= b
+      vector.y /= b
+      vector.z /= b
+    } else {
+      vector.x /= b.x
+      vector.y /= b.y
+      vector.z /= b.z
+    }
+
     return vector
   }
 
@@ -379,7 +387,7 @@ export class Vector {
     return Vector.add(this, a)
   }
 
-  substract(a: Vector3) {
+  substract(a: Vector3 | number) {
     return Vector.subtract(this, a)
   }
 

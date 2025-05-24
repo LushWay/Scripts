@@ -42,11 +42,11 @@ export function createBossGolem(group: Group) {
       const quarter = half / 2
       const lessThenQuarter = hp < quarter
 
-      hurtEntity.addEffect(MinecraftEffectTypes.Speed, 60, { amplifier: 10 })
+      hurtEntity.addEffect(MinecraftEffectTypes.Speed, 60, { amplifier: 3 })
       const boss = hurtEntity.location
       const player = damagingEntity
       if (player && player.location.y - 2 > hurtEntity.location.y && lessThenQuarter) {
-        const distance = Vector.subtract(boss, player.location)
+        const distance = Vector.subtract(boss, player.location).substract(2)
         player.applyKnockback(distance, distance.y)
       }
     }

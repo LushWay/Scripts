@@ -56,7 +56,6 @@ export class BossArenaRegion extends Region {
 
   save(): false | undefined {
     EventSignal.emit(this.onSave, {})
-
     return
   }
 

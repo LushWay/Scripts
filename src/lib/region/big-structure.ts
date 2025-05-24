@@ -1,6 +1,6 @@
 import { StructureSaveMode, world } from '@minecraft/server'
 import { Region } from 'lib/region'
-import { BigStructure } from 'lib/utils/big-structure'
+import { BigStructure, BigStructureSaved } from 'lib/utils/big-structure'
 import { Vector } from 'lib/vector'
 import { RegionStructure } from './structure'
 
@@ -9,6 +9,8 @@ export class BigRegionStructure extends RegionStructure {
 
   constructor(region: Region, regionId: string) {
     super(region, regionId)
+
+    const saved = region.ldb?.bigStructure
 
     const [from, to] = region.area.edges
     this.bigStructure = new BigStructure(
@@ -20,7 +22,10 @@ export class BigRegionStructure extends RegionStructure {
       StructureSaveMode.World,
       false,
       regionId,
+      Array.isArray(saved) ? (saved as BigStructureSaved[]) : undefined,
     )
+
+    if (region.ldb) region.ldb.bigStructure = this.bigStructure.toJSON()
   }
 
   get exists(): boolean {

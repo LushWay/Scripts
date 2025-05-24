@@ -2,13 +2,13 @@ import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } fr
 import { Vector } from 'lib/vector'
 import { Cuboid } from './cuboid'
 
-export class BigStructure extends Cuboid {
-  private structures: {
-    id: string
-    min: Vector3
-    max: Vector3
-  }[] = []
+export interface BigStructureSaved extends JsonObject {
+  id: string
+  min: Vector3
+  max: Vector3
+}
 
+export class BigStructure extends Cuboid {
   /**
    * Creates a new structure save
    *
@@ -25,11 +25,16 @@ export class BigStructure extends Cuboid {
     private readonly saveMode = StructureSaveMode.Memory,
     saveOnCreate = true,
     date = Date.now().toString(32),
+    private structures: BigStructureSaved[] = [],
   ) {
     super(pos1, pos2)
     this.prefix = `${prefix}|${date}`
 
     if (saveOnCreate) this.save()
+  }
+
+  toJSON() {
+    return this.structures
   }
 
   save() {
