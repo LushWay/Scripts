@@ -23,7 +23,7 @@ export function createBossWither(group: Group) {
     .radius(30)
 
   boss.onRegionCreate.subscribe(async region => {
-    region.ldb = {}
+    region.ldb ??= {}
     region.structure = new BigRegionStructure(region, 'boss-wither-big')
 
     if (!region.structure.exists) {
