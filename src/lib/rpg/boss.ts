@@ -29,6 +29,7 @@ interface BossDB {
 
 interface BossArenaDB {
   area: ReturnType<Area['toJSON']>
+  ldb?: JsonObject
 }
 
 interface BossOptions {
@@ -137,9 +138,12 @@ export class Boss {
         bossName: this.options.place.name,
         permissions: { allowedEntities: this.options.allowedEntities },
       })
+
+      if (areadb?.ldb) this.region.ldb = areadb.ldb
+
       this.region.onSave.subscribe(() => {
         if (this.region) {
-          Boss.arenaDb.set(this.options.place.fullId, { area: this.region.area.toJSON() })
+          Boss.arenaDb.set(this.options.place.fullId, { area: this.region.area.toJSON(), ldb: this.region.ldb })
         }
       })
       EventLoaderWithArg.load(this.onRegionCreate, this.region)

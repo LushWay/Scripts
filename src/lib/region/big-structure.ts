@@ -25,7 +25,10 @@ export class BigRegionStructure extends RegionStructure {
       Array.isArray(saved) ? (saved as BigStructureSaved[]) : undefined,
     )
 
-    if (region.ldb) region.ldb.bigStructure = this.bigStructure.toJSON()
+    if (region.ldb) {
+      region.ldb.bigStructure = this.bigStructure.toJSON()
+      region.save()
+    }
   }
 
   get exists(): boolean {
