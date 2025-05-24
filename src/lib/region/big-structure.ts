@@ -7,12 +7,15 @@ import { RegionStructure } from './structure'
 export class BigRegionStructure extends RegionStructure {
   private bigStructure: BigStructure
 
-  constructor(region: Region, regionId: string) {
+  constructor(
+    protected region: Region,
+    regionId: string,
+  ) {
     super(region, regionId)
 
     const saved = region.ldb?.bigStructure
-
     const [from, to] = region.area.edges
+
     this.bigStructure = new BigStructure(
       'region',
       Vector.min(from, to),
@@ -24,11 +27,6 @@ export class BigRegionStructure extends RegionStructure {
       regionId,
       Array.isArray(saved) ? (saved as BigStructureSaved[]) : undefined,
     )
-
-    if (region.ldb) {
-      region.ldb.bigStructure = this.bigStructure.toJSON()
-      region.save()
-    }
   }
 
   get exists(): boolean {
@@ -37,6 +35,10 @@ export class BigRegionStructure extends RegionStructure {
 
   save() {
     this.bigStructure.save()
+    if (this.region.ldb) {
+      this.region.ldb.bigStructure = this.bigStructure.toJSON()
+      this.region.save()
+    }
   }
 
   place() {
