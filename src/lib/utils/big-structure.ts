@@ -69,6 +69,8 @@ export class BigStructure extends Cuboid {
   async load(position = this.min, dimension = this.dimension, placeOptions?: StructurePlaceOptions) {
     const { structures, min } = this
 
+    if (!this.structures.length) throw new Error('Empty big structure save!!!')
+
     return new Promise<void>((resolve, reject) => {
       let errors = 0
       let total = 0
