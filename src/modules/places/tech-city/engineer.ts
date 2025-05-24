@@ -54,7 +54,7 @@ export class Engineer extends ShopNpc {
       )
 
       for (const [item, cost] of [
-        [CannonItem, new MultiCost().money(200)],
+        [CannonItem, new MultiCost().item(Chip).money(200)],
         [CannonShellItem, new MultiCost().item(MinecraftItemTypes.Gunpowder, 20).money(100)],
       ] as [CustomItemWithBlueprint, Cost][]) {
         menu.itemStack(item.itemStack, new MultiCost(new ItemCost(item.blueprint), cost))
@@ -66,6 +66,7 @@ export class Engineer extends ShopNpc {
           .item(Chip)
           .item(MinecraftItemTypes.IronIngot, 20)
           .item(MinecraftItemTypes.GoldIngot, 10)
+          .item(MinecraftItemTypes.Quartz, 10)
           .item(MinecraftItemTypes.CopperIngot, 10)
           .money(4500),
       )
