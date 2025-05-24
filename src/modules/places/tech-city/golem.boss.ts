@@ -46,7 +46,7 @@ export function createBossGolem(group: Group) {
       const boss = hurtEntity.location
       const player = damagingEntity
       if (player && player.location.y - 2 > hurtEntity.location.y && lessThenQuarter) {
-        const distance = Vector.subtract(boss, player.location).substract(2)
+        const distance = Vector.subtract(boss, player.location).multiply(0.5)
         player.applyKnockback(distance, distance.y)
       }
     }
