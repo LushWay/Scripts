@@ -158,7 +158,7 @@ export class Settings {
         enumerable: true,
         get() {
           const value = config[prop]?.value
-          if (!value) throw new TypeError(`No config value for prop ${prop}`)
+          if (typeof value === 'undefined') throw new TypeError(`No config value for prop ${prop}`)
           return (
             (database.getImmutable(groupId) as SettingsDatabaseValue | undefined)?.[key] ??
             (Settings.isDropdown(value) ? value[0]?.[0] : value)
