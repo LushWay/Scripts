@@ -18,8 +18,8 @@ export class BigRegionStructure extends RegionStructure {
 
     this.bigStructure = new BigStructure(
       'region',
-      Vector.min(from, to),
-      Vector.max(from, to),
+      from,
+      to,
       region.dimension,
       '',
       StructureSaveMode.World,
@@ -33,16 +33,21 @@ export class BigRegionStructure extends RegionStructure {
     return !!world.structureManager.get(`mystructure:${this.bigStructure.prefix}|0`)
   }
 
+  protected get bigStructurePos() {
+    return (this.region.ldb?.bigStructurePos as unknown as Vector3 | undefined) ?? Vector.min(...this.region.area.edges)
+  }
+
   save() {
-    this.bigStructure.save()
+    const pos = this.bigStructure.save()
     if (this.region.ldb) {
       this.region.ldb.bigStructure = this.bigStructure.toJSON()
+      this.region.ldb.bigStructurePos = pos
       this.region.save()
     }
   }
 
   place() {
-    return this.bigStructure.load(Vector.min(...this.region.area.edges), this.region.dimension)
+    return this.bigStructure.load(this.bigStructurePos, this.region.dimension)
   }
 
   validateArea() {

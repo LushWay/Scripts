@@ -58,6 +58,8 @@ export class BigStructure extends Cuboid {
 
       this.structures.push({ id, min, max })
     }
+
+    return this.min
   }
 
   delete() {
