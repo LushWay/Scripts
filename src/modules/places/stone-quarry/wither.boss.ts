@@ -35,7 +35,7 @@ export function createBossWither(group: Group) {
     }
   })
 
-  boss.onBossEntitySpawn.subscribe(entity => {
+  boss.onEntitySpawn.subscribe(entity => {
     if (entity.typeId !== 'minecraft:item') return
 
     const itemComponent = entity.getComponent(EntityComponentTypes.Item)
