@@ -1,7 +1,7 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
-import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
+import { customItems, CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { Group } from 'lib/rpg/place'
 import { Cost, ItemCost, MultiCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
@@ -20,6 +20,7 @@ export const Chip = new ItemStack(Items.Chip).setInfo(
   undefined,
   'Используется для создания платы у Инжинера в Технограде',
 )
+customItems.push(CircuitBoard, Chip)
 
 export const NotNewbieCost = new (class NotNewbieCost extends Cost {
   toString(canBuy?: boolean): MaybeRawText {
