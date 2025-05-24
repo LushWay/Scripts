@@ -132,7 +132,7 @@ function regionList(player: Player, RegionType: typeof Region, creatable = true,
     })
 
   for (const region of RegionType.getAll()) {
-    form.addButton(t`${creatable ? region.displayName : region.name}\n${region.area.toString()}`, () =>
+    form.addButton(t`${creatable ? region.name : region.displayName}\n${region.area.toString()}`, () =>
       editRegion(player, region, () => regionList(player, RegionType, creatable, back)),
     )
   }
