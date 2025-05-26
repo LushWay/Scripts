@@ -77,8 +77,8 @@ export abstract class Chunk extends ChunkArea {
     query: ChunkQuery,
   ): { chunks64: number; chunks16: number; objects: number }
 
-  protected getKey(x = this.indexX, z = this.indexZ, size = this.size) {
-    return `${x} ${z} ${size}`
+  protected getKey(x = this.indexX, z = this.indexZ) {
+    return `${x} ${z}`
   }
 
   toJSON(): object {
@@ -151,6 +151,8 @@ export class Chunk16 extends Chunk {
   }
 }
 
+let l = false
+
 export class Chunk64 extends Chunk {
   static size = 64
 
@@ -168,6 +170,18 @@ export class Chunk64 extends Chunk {
     let chunks = this.chunks.get(dimensionType)
     if (!chunks) this.chunks.set(dimensionType, (chunks = []))
     return chunks
+  }
+
+  protected chunksCache = new Map<DimensionType, Record<string, Chunk>>()
+
+  protected getChunksCache(dimensionType: DimensionType): Record<string, Chunk> {
+    let cache = this.chunksCache.get(dimensionType)
+    if (!cache) {
+      const chunks = this.getChunks(dimensionType)
+      cache = Object.fromEntries(chunks.map(chunk => [(chunk as Chunk64).getKey(), chunk]))
+      this.chunksCache.set(dimensionType, cache)
+    }
+    return cache
   }
 
   getAt(point: VectorInDimension, query: ChunkQuery, ctx = new QueryContext()): object[] {
@@ -231,38 +245,46 @@ export class Chunk64 extends Chunk {
     from: Vector3,
     to: Vector3,
     dimensionType: DimensionType,
-    ctx: { iteration: number, visited:Set<Chunk | undefined> } = { iteration: 0, visited: new Set<Chunk | undefined>() },
+    ctx: { iteration: number } = { iteration: 0 },
   ): Promise<Chunk[]> {
     const step = this.children.size
     const addedTo: MaybePromise<Chunk[]>[] = []
+    const visited = new Set<Chunk | undefined>()
     const area = new ChunkArea(from.x, from.z, this.children.size, dimensionType, undefined)
     const chunks = this.getChunks(dimensionType)
-    const createdChunks = query.getChunksCache(dimensionType)
-    const actualFrom = area.from // this.size > 1 ? this.from : from
-    const actualTo = to // this.size > 1 ? this.to : to
+    const createdChunks = this.getChunksCache(dimensionType)
 
     await new Promise<void>(resolve => {
       system.runJob(
         function* ChunkAdd(this: Chunk64) {
-          for (let x = actualFrom.x; x <= actualTo.x; x += step) {
-            for (let z = actualFrom.z; z <= actualTo.z; z += step) {
+          for (let x = area.from.x; x <= to.x; x += step) {
+            for (let z = area.from.z; z <= to.z; z += step) {
               ctx.iteration++
               if (ctx.iteration % 10 === 0) yield
 
               const key = this.getKey(Math.floor(x / step), Math.floor(z / step))
-              const existing = createdChunks.get(key)
+              const queryExisting = query.chunkCache.get(key)
+              let existing = createdChunks[key]
 
-              if (ctx.visited.has(existing)) continue // Skip already visited chunks to not add twice
+              if (!existing && queryExisting) {
+                if (!l) {
+                  console.error(x, z, key, this, queryExisting)
+                  l = true
+                }
+                existing = queryExisting
+              }
+
+              // const existing = chunks.find(e => e.isAt({ x, z, y: 0 }))
+              if (visited.has(existing)) continue // Skip already visited chunks to not add twice
 
               let chunk: Chunk | undefined
               if (existing) chunk = existing
               else {
                 chunk = new this.children(x, z, this.children.size, dimensionType, this)
-                const key = (chunk as Chunk64).getKey()
-                createdChunks.set(key, chunk)
+                createdChunks[(chunk as Chunk64).getKey()] = chunk
               }
 
-              ctx.visited.add(chunk)
+              visited.add(chunk)
               if (!chunks.includes(chunk)) chunks.push(chunk) // We created a new chunk and should store it
 
               addedTo.push(chunk.add(object, query, from, to, dimensionType, ctx))
@@ -284,19 +306,10 @@ export class Chunk64 extends Chunk {
 export class ChunkQuery<T extends object = any> extends Chunk64 {
   static chunks = Chunk64.createDimensionTypeChunkStorage()
 
-  static getChunks(query: Chunk64) {
-    return (query as ChunkQuery).chunks
-  }
-
   chunkCache = new Map<string, Chunk>()
 
-  protected chunksCache = new Map<DimensionType, Map<string, Chunk>>()
-
-  getChunksCache(dimensionType: DimensionType): Map<string, Chunk> {
-    let cache = this.chunksCache.get(dimensionType)
-    if (!cache) this.chunksCache.set(dimensionType, (cache = new Map<string, Chunk>()))
-
-    return cache
+  static getChunks(query: Chunk64) {
+    return (query as ChunkQuery).chunks
   }
 
   protected children = Chunk64
