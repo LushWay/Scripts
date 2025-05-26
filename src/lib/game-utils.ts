@@ -174,6 +174,11 @@ export function toPoint(abstractPoint: AbstractPoint): VectorInDimension {
   } else return abstractPoint
 }
 
+export function toFlooredPoint(abstractPoint: AbstractPoint): VectorInDimension {
+  const { vector, dimensionType } = toPoint(abstractPoint)
+  return { vector: Vector.floor(vector), dimensionType }
+}
+
 export function createPoint(
   x: number,
   y: number,

@@ -588,6 +588,17 @@ describe('ChunkQuery', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
+    it('should work with stone quarry', () => {
+      const query = createQuery()
+
+      query.add(createSinglePoint(-1321, 88, 14816, 200))
+
+      expect(query.getAt(createPoint(-1359, 88, 14815)).map(byRadius)).toEqual([200])
+      expect(query.getAt(createPoint(-1360.35, 88.0, 14815.53)).map(byRadius)).toEqual([200])
+      expect(query.getAt(createPoint(-1361, 88, 14815)).map(byRadius)).toEqual([200])
+      expect(query.getAt(createPoint(-1362, 88, 14815)).map(byRadius)).toEqual([200])
+    })
+
     it('should handle negative coordinates', () => {
       const query = createQuery()
 

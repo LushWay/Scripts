@@ -1,4 +1,4 @@
-import { AbstractPoint, toPoint, VectorInDimension } from 'lib/game-utils'
+import { AbstractPoint, toFlooredPoint, toPoint, VectorInDimension } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { inspect } from 'lib/utils/inspect'
 import { VecXZ } from 'lib/vector'
@@ -287,15 +287,15 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
   }
 
   getAt(point: AbstractPoint): T[] {
-    return super.getAt(toPoint(point), this) as T[]
+    return super.getAt(toFlooredPoint(point), this) as T[]
   }
 
   getNear(point: AbstractPoint, distance: number): T[] {
-    return super.getNear(toPoint(point), distance, this) as T[]
+    return super.getNear(toFlooredPoint(point), distance, this) as T[]
   }
 
   getChunksNear(point: AbstractPoint, distance: number): Chunk[] {
-    return super.getChunksNear(toPoint(point), distance, this)
+    return super.getChunksNear(toFlooredPoint(point), distance, this)
   }
 
   add(object: T): Chunk[] {
