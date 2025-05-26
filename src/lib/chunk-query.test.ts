@@ -1,7 +1,6 @@
 import { createPoint } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
 import { Chunk64, ChunkArea, ChunkQuery } from './chunk-query'
-import { STOP_AREA_FOR_EACH_VECTOR } from './region/areas/area'
 import { SphereArea } from './region/areas/sphere'
 
 function byId(object: { id: number }) {
@@ -27,15 +26,14 @@ function inspectChunks(query: ChunkQuery, dimensionType: DimensionType = 'overwo
   for (const e of chunksFrom(ChunkQuery)) {
     if (!(e instanceof Chunk64)) return
 
-    const chunks = chunksFrom(e)
     // @ts-expect-error aaaaaaa
     const size = e.children.size
     for (let x = e.from.x; x <= e.to.x; x += size) {
       for (let z = e.from.z; z <= e.to.z; z += size) {
-        const chunk = e.getChunksNear({ vector: { x, z, y: 0 }, dimensionType }, 0, query)[0]
+        const chunk = e.getChunksAt({ vector: { x, z, y: 0 }, dimensionType }, query)[0]
 
         let result = ''
-        if (chunk) result = '' + e.getSize(dimensionType, query).objects
+        if (chunk) result = '' + chunk.getSize(dimensionType, query).objects
         else result = '*'
 
         fromX ??= x
@@ -75,7 +73,6 @@ describe('ChunkQuery', () => {
     const createQuery = () =>
       new ChunkQuery<{ vector: Vector3; dimensionType: DimensionType; id: number }>(
         (point, object) => Vector.equals(point, object.vector),
-        (area, object) => area.isAt(object.vector),
         (vector, object, distance) => Vector.distanceCompare(vector, object.vector, distance + 1),
         object => object.dimensionType,
         object => [object.vector, object.vector] as const,
@@ -89,13 +86,37 @@ describe('ChunkQuery', () => {
     it('should query for single vector', async () => {
       const query = createQuery()
 
-      expect(await query.add(createSinglePoint(1, 1, 1, 0))).toMatchInlineSnapshot(`
+      await query.add(createSinglePoint(16, 16, 16, 1))
+      await query.add(createSinglePoint(17, 17, 17, 2))
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: 0  z: 0
+
+          *  *  *  *
+          *  2  *  *
+          *  *  *  *
+          *  *  *  *
+
+        x: 48  z: 48
+        "
+      `)
+      await query.add(createSinglePoint(100, 100, 100, 3))
+
+      await query.add(createSinglePoint(100, 100, 100, 4, 'end'))
+
+      expect(query.getAt(createPoint(1, 1, 1)).map(byId)).toEqual([])
+      expect(query.getAt(createPoint(16, 16, 16)).map(byId)).toEqual([1])
+      expect(query.getAt(createPoint(17, 17, 17)).map(byId)).toEqual([2])
+      expect(query.getAt(createPoint(18, 18, 18)).map(byId)).toEqual([])
+      expect(query.getAt(createPoint(100, 100, 100)).map(byId)).toEqual([3])
+      expect(query.getAt(createPoint(100, 100, 100, 'end')).map(byId)).toEqual([4])
+
+      expect(query.getChunksNear(createPoint(15, 15, 15), 5)).toMatchInlineSnapshot(`
         [
           {
-            "from": "0 0",
-            "key": "0 0 16",
+            "from": "16 16",
+            "key": "1 1 16",
             "size": 16,
-            "to": "15 15",
+            "to": "31 31",
             "w": {
               "from": "0 0",
               "key": "0 0 64",
@@ -112,45 +133,6 @@ describe('ChunkQuery', () => {
           },
         ]
       `)
-      await query.add(createSinglePoint(16, 16, 16, 1))
-      await query.add(createSinglePoint(17, 17, 17, 2))
-      expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "x: 0  z: 0
-
-          3  *  *  *
-          *  3  *  *
-          *  *  *  *
-          *  *  *  *
-
-        x: 48  z: 48
-        "
-      `)
-      await query.add(createSinglePoint(100, 100, 100, 3))
-
-      await query.add(createSinglePoint(100, 100, 100, 4, 'end'))
-
-      expect(query.getAt(createPoint(1, 1, 1)).map(byId)).toEqual([0])
-      expect(query.getAt(createPoint(16, 16, 16)).map(byId)).toEqual([1])
-      expect(query.getAt(createPoint(17, 17, 17)).map(byId)).toEqual([2])
-      expect(query.getAt(createPoint(18, 18, 18)).map(byId)).toEqual([])
-      expect(query.getAt(createPoint(100, 100, 100)).map(byId)).toEqual([3])
-      expect(query.getAt(createPoint(100, 100, 100, 'end')).map(byId)).toEqual([4])
-
-      expect(query.getChunksNear(createPoint(15, 15, 15), 5).map(e => e.getSize('overworld', query)))
-        .toMatchInlineSnapshot(`
-          [
-            {
-              "chunks16": 1,
-              "chunks64": 0,
-              "objects": 1,
-            },
-            {
-              "chunks16": 1,
-              "chunks64": 0,
-              "objects": 2,
-            },
-          ]
-        `)
 
       expect(query.getNear(createPoint(15, 15, 15), 5).map(byId)).toMatchInlineSnapshot(`
         [
@@ -172,8 +154,8 @@ describe('ChunkQuery', () => {
 
           *  *  *  *
           *  *  *  *
-          *  *  3  *
-          *  *  *  3
+          *  *  1  *
+          *  *  *  2
 
         x: -16  z: -16
         "
@@ -189,7 +171,6 @@ describe('ChunkQuery', () => {
       const query = createQuery()
       const point = createSinglePoint(1, 1, 1, 10)
       const isObjectAt = vi.spyOn(query, 'isObjectAt')
-      const isObjectIn = vi.spyOn(query, 'isObjectIn')
       const isObjectNear = vi.spyOn(query, 'isObjectNear')
       const getObjectEdges = vi.spyOn(query as unknown as { getObjectEdges: VoidFunction }, 'getObjectEdges')
       const getObjectDimension = vi.spyOn(
@@ -199,7 +180,6 @@ describe('ChunkQuery', () => {
       const getStats = () =>
         Object.entries({
           isObjectAt,
-          isObjectIn,
           isObjectNear,
           getObjectEdges,
           getObjectDimension,
@@ -214,7 +194,6 @@ describe('ChunkQuery', () => {
       await query.add(point)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 0
         getObjectEdges: 1
         getObjectDimension: 1"
@@ -223,7 +202,6 @@ describe('ChunkQuery', () => {
       expect(query.getAt(createPoint(1, 1, 1)).map(byId)).toEqual([10])
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 1
-        isObjectIn: 0
         isObjectNear: 0
         getObjectEdges: 0
         getObjectDimension: 0"
@@ -232,7 +210,6 @@ describe('ChunkQuery', () => {
       expect(query.getNear(createPoint(2, 2, 2), 5).map(byId)).toEqual([10])
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 1
         getObjectEdges: 0
         getObjectDimension: 0"
@@ -241,7 +218,6 @@ describe('ChunkQuery', () => {
       query.remove(point)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 0
         getObjectEdges: 0
         getObjectDimension: 1"
@@ -271,17 +247,6 @@ describe('ChunkQuery', () => {
     const createQuery = () =>
       new ChunkQuery<InstanceType<typeof SphereArea>>(
         (vector, object) => object.isIn({ vector, dimensionType: object.dimensionType }),
-        (area, object) => {
-          let result = false
-          object.forEachVector((vector, isIn) => {
-            if (isIn && area.isAt(vector)) {
-              result = true
-              return STOP_AREA_FOR_EACH_VECTOR
-            }
-          })
-
-          return result
-        },
         (vector, object, distance) => object.isNear({ vector, dimensionType: object.dimensionType }, distance),
         object => object.dimensionType,
         object => {
@@ -299,7 +264,6 @@ describe('ChunkQuery', () => {
       const query = createQuery()
       const point = createSinglePoint(1, 1, 1, 10)
       const isObjectAt = vi.spyOn(query, 'isObjectAt')
-      const isObjectIn = vi.spyOn(query, 'isObjectIn')
       const isObjectNear = vi.spyOn(query, 'isObjectNear')
       const pointIsIn = vi.spyOn(point, 'isIn')
       const pointIsNear = vi.spyOn(point, 'isNear')
@@ -311,7 +275,6 @@ describe('ChunkQuery', () => {
       const getStats = () =>
         Object.entries({
           isObjectAt,
-          isObjectIn,
           isObjectNear,
           pointIsIn,
           pointIsNear,
@@ -328,7 +291,6 @@ describe('ChunkQuery', () => {
       await query.add(point)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 0
         pointIsIn: 0
         pointIsNear: 0
@@ -341,6 +303,14 @@ describe('ChunkQuery', () => {
       await query.add(createSinglePoint(1, 1, 300, 12))
       await query.add(createSinglePoint(1, 1, 100, 12))
       await query.add(createSinglePoint(1, 1, 17, 12))
+      expect(getStats()).toMatchInlineSnapshot(`
+        "isObjectAt: 0
+        isObjectNear: 0
+        pointIsIn: 0
+        pointIsNear: 0
+        getObjectEdges: 5
+        getObjectDimension: 5"
+      `)
 
       expect(query.getAt(createPoint(0, 0, 0)).map(byRadius)).toMatchInlineSnapshot(`
         [
@@ -351,18 +321,16 @@ describe('ChunkQuery', () => {
       `)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 4
-        isObjectIn: 0
         isObjectNear: 0
         pointIsIn: 1
         pointIsNear: 1
-        getObjectEdges: 5
-        getObjectDimension: 5"
+        getObjectEdges: 0
+        getObjectDimension: 0"
       `)
 
       expect(query.getAt(createPoint(100, 0, 0)).map(byRadius)).toEqual([])
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 0
         pointIsIn: 0
         pointIsNear: 0
@@ -373,7 +341,6 @@ describe('ChunkQuery', () => {
       expect(query.getNear(createPoint(15, 15, 15), 7).map(byRadius)).toEqual([])
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 5
         pointIsIn: 0
         pointIsNear: 1
@@ -384,7 +351,6 @@ describe('ChunkQuery', () => {
       query.remove(point)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectIn: 0
         isObjectNear: 0
         pointIsIn: 0
         pointIsNear: 0
@@ -401,16 +367,23 @@ describe('ChunkQuery', () => {
         "x: -64  z: -64
 
           *  *  *  *  *  *  *  *
-          *  9  9  9  9  9  9  *
-          *  9  9  9  9  9  9  *
-          *  9  9  9  9  9  9  *
-          *  9  9  9  9  9  9  *
-          *  9  9  9  9  9  9  *
-          *  9  9  9  9  9  9  *
+          *  1  1  1  1  1  1  *
+          *  1  1  1  1  1  1  *
+          *  1  1  1  1  1  1  *
+          *  1  1  1  1  1  1  *
+          *  1  1  1  1  1  1  *
+          *  1  1  1  1  1  1  *
           *  *  *  *  *  *  *  *
 
         x: 48  z: 48
         "
+      `)
+      expect(query.getSize()).toMatchInlineSnapshot(`
+        {
+          "chunks16": 36,
+          "chunks64": 5,
+          "objects": 36,
+        }
       `)
 
       expect((await query.add(createSinglePoint(0, 0, 100, 8))).length).toMatchInlineSnapshot(`4`)
@@ -418,12 +391,12 @@ describe('ChunkQuery', () => {
         "x: -64  z: -64
 
           *  *  *  *  *  *  *  *  *  *  *  *
-          *  9  9  9  9  9  9  *  *  *  *  *
-          *  9  9  9  9  9  9  *  *  *  *  *
-          *  9  9  9  9  9  9  *  *  2  2  *
-          *  9  9  9  9  9  9  *  *  2  2  *
-          *  9  9  9  9  9  9  *  *  *  *  *
-          *  9  9  9  9  9  9  *  *  *  *  *
+          *  1  1  1  1  1  1  *  *  *  *  *
+          *  1  1  1  1  1  1  *  *  *  *  *
+          *  1  1  1  1  1  1  *  *  1  1  *
+          *  1  1  1  1  1  1  *  *  1  1  *
+          *  1  1  1  1  1  1  *  *  *  *  *
+          *  1  1  1  1  1  1  *  *  *  *  *
           *  *  *  *  *  *  *  *  *  *  *  *
 
         x: 48  z: 112
@@ -482,8 +455,8 @@ describe('ChunkQuery', () => {
           *  *  *  *  *  *  *  *
           *  *  *  *  *  *  *  *
           *  *  *  1  1  *  *  *
-          *  *  *  1  6  6  *  *
-          *  *  *  *  6  6  *  *
+          *  *  *  1  3  1  *  *
+          *  *  *  *  1  1  *  *
           *  *  *  *  *  *  *  *
           *  *  *  *  *  *  *  *
 
@@ -499,8 +472,8 @@ describe('ChunkQuery', () => {
           *  *  *  *  *  *  *  *
           *  *  *  *  *  *  *  *
           *  *  *  1  1  *  *  *
-          *  *  *  1 10 10  *  *
-          *  *  *  * 10 10  *  *
+          *  *  *  1  4  2  *  *
+          *  *  *  *  2  2  *  *
           *  *  *  *  *  *  *  *
           *  *  *  *  *  *  *  *
 
@@ -516,8 +489,8 @@ describe('ChunkQuery', () => {
           *  *  *  *  *  *  *  *  _  _  _  _
           *  *  *  *  *  *  *  *  _  _  _  _
           *  *  *  1  1  *  *  *  _  _  _  _
-          *  *  *  1 10 10  *  *  _  _  _  _
-          *  *  *  * 10 10  *  *  _  _  _  _
+          *  *  *  1  4  2  *  *  _  _  _  _
+          *  *  *  *  2  2  *  *  _  _  _  _
           *  *  *  *  *  *  *  *  _  _  _  _
           *  *  *  *  *  *  *  *  _  _  _  _
           _  _  _  _  _  _  _  _  *  *  *  *
@@ -537,8 +510,8 @@ describe('ChunkQuery', () => {
           *  *  *  *  *  *  *  *  _  _  _  _
           *  *  *  *  *  *  *  *  _  _  _  _
           *  *  *  1  1  *  *  *  _  _  _  _
-          *  *  *  1 10 10  *  *  _  _  _  _
-          *  *  *  * 10 10  *  *  _  _  _  _
+          *  *  *  1  4  2  *  *  _  _  _  _
+          *  *  *  *  2  2  *  *  _  _  _  _
           *  *  *  *  *  *  *  *  _  _  _  _
           *  *  *  *  *  *  *  *  _  _  _  _
           _  _  _  _  _  _  _  _  *  *  *  *
@@ -632,19 +605,65 @@ describe('ChunkQuery', () => {
       const query = createQuery()
 
       const area1 = createSinglePoint(5, 0, 5, 2)
-      const area2 = createSinglePoint(-5, 0, -5, 1)
+      const area2 = createSinglePoint(-5, 0, -35, 6)
 
       await query.add(area1)
       await query.add(area2)
 
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: -64  z: -64
+
+          *  *  *  *  _  _  _  _
+          *  *  *  *  _  _  _  _
+          *  *  *  *  _  _  _  _
+          *  1  1  *  _  _  _  _
+          *  1  1  *  1  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
+      `)
+
       expect(query.getAt(createPoint(5, 0, 5)).map(byRadius)).toEqual([2])
-      expect(query.getAt(createPoint(-5, 0, -5)).map(byRadius)).toEqual([1])
+      expect(query.getAt(createPoint(-5, 0, -35)).map(byRadius)).toEqual([6])
 
       query.remove(area1)
       expect(query.getAt(createPoint(5, 0, 5)).map(byRadius)).toEqual([])
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: -64  z: -64
+
+          *  *  *  *  _  _  _  _
+          *  *  *  *  _  _  _  _
+          *  *  *  *  _  _  _  _
+          *  1  1  *  _  _  _  _
+          *  1  1  *  0  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
+      `)
 
       query.remove(area2)
-      expect(query.getAt(createPoint(-5, 0, -5)).map(byRadius)).toEqual([])
+      expect(query.getAt(createPoint(-5, 0, -35)).map(byRadius)).toEqual([])
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: -64  z: -64
+
+          *  *  *  *  _  _  _  _
+          *  *  *  *  _  _  _  _
+          *  *  *  *  _  _  _  _
+          *  0  0  *  _  _  _  _
+          *  0  0  *  0  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
+      `)
     })
   })
 

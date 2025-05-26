@@ -196,6 +196,18 @@ export class Chunk64 extends Chunk {
     return [...result]
   }
 
+  getChunksAt(point: VectorInDimension, query: ChunkQuery, ctx = new QueryContext()): Chunk[] {
+    const result = new Set<Chunk>()
+    for (const chunk of this.getChunks(point.dimensionType)) {
+      if (ctx.visitedChunks.has(chunk) || !chunk.isAt(point.vector)) continue
+      ctx.visitedChunks.add(chunk)
+
+      if (chunk instanceof Chunk64) for (const c of chunk.getChunksAt(point, query, ctx)) result.add(c)
+      else result.add(chunk)
+    }
+    return [...result]
+  }
+
   getChunksNear(point: VectorInDimension, distance: number, query: ChunkQuery, ctx = new QueryContext()): Chunk[] {
     const result = new Set<Chunk>()
     for (const chunk of this.getChunks(point.dimensionType)) {
@@ -204,11 +216,8 @@ export class Chunk64 extends Chunk {
       if (hh || !chunk.isNear(point.vector, distance)) continue
       ctx.visitedChunks.add(chunk)
 
-      if (chunk instanceof Chunk64) {
-        for (const c of chunk.getChunksNear(point, distance, query)) result.add(c)
-      } else {
-        result.add(chunk)
-      }
+      if (chunk instanceof Chunk64) for (const c of chunk.getChunksNear(point, distance, query, ctx)) result.add(c)
+      else result.add(chunk)
     }
     return [...result]
   }
@@ -242,17 +251,19 @@ export class Chunk64 extends Chunk {
     const chunks = this.getChunks(dimensionType)
     const createdChunks = query.getChunksCache(dimensionType)
 
+    const isQuery = this instanceof ChunkQuery
+    const f = area.from
+    const t = to
+
     await new Promise<void>(resolve => {
       system.runJob(
         function* ChunkAdd(this: Chunk64) {
-          for (let x = area.from.x; x <= to.x; x += step) {
-            for (let z = area.from.z; z <= to.z; z += step) {
+          for (let x = f.x; x <= t.x; x += step) {
+            for (let z = f.z; z <= t.z; z += step) {
               ctx.iteration++
               if (ctx.iteration % 10 === 0) yield
 
-              if (this.size > 1) {
-                if (!this.isAt({ x, z, y: 0 })) continue
-              }
+              if (!isQuery && !this.isAt({ x, z, y: 0 })) continue
 
               const key = this.getKey(Math.floor(x / step), Math.floor(z / step), step)
               const existing = createdChunks.get(key)
@@ -318,7 +329,6 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
 
   constructor(
     readonly isObjectAt: (point: Vector3, object: T) => boolean,
-    readonly isObjectIn: (area: ChunkArea, object: T) => MaybePromise<boolean>,
     readonly isObjectNear: (point: Vector3, object: T, distance: number) => boolean,
     protected readonly getObjectDimension: (object: T) => DimensionType,
     protected readonly getObjectEdges: (object: T) => [from: Vector3, to: Vector3],

@@ -92,17 +92,6 @@ export class Region {
 
   static chunkQuery = new ChunkQuery<Region>(
     (vector, object) => object.area.isIn({ vector, dimensionType: object.area.dimensionType }),
-    async (area, object) => {
-      let result = false
-      await object.area.forEachVector((vector, isIn) => {
-        if (isIn && area.isAt(vector)) {
-          result = true
-          return STOP_AREA_FOR_EACH_VECTOR
-        }
-      })
-
-      return result
-    },
     (vector, object, distance) => object.area.isNear({ vector, dimensionType: object.area.dimensionType }, distance),
     object => object.dimensionType,
     object => {
