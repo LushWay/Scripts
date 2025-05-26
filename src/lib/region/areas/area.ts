@@ -76,7 +76,10 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return world[this.dimensionType]
   }
 
-  forEachVector(callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | symbol, yieldEach = 10) {
+  forEachVector(
+    callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | Promise<void> | symbol,
+    yieldEach = 10,
+  ) {
     const { edges, dimension } = this
     const isIn = (vector: Vector3) => this.isIn({ vector, dimensionType: this.dimensionType })
 

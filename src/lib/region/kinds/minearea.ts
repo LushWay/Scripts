@@ -73,10 +73,9 @@ export class MineareaRegion extends RegionWithStructure {
         .forEachVector(async (vector, isIn) => {
           if (!isIn) return
 
-          const regions = Region.getManyAt({ vector, dimensionType: this.dimensionType })
-          for (const region of regions) {
+          for (const region of MineareaRegion.getManyAt({ vector, dimensionType: this.dimensionType })) {
             // Prevent from region save conflicts
-            if (region instanceof MineareaRegion && !restoredRegions.includes(region) && region !== this) {
+            if (!restoredRegions.includes(region) && region !== this) {
               restoredRegions.push(region)
               await region.structure.place()
             }

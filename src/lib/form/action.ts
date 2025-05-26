@@ -73,7 +73,7 @@ export class ActionForm {
     } else iconPath = iconPathOrCallback
 
     this.buttons.push({ text, iconPath, callback })
-    this.form.button(text, iconPath ? iconPath : void 0)
+    this.form.button(text, iconPath ?? void 0)
 
     return this
   }

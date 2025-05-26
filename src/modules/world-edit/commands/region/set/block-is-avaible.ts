@@ -1,5 +1,5 @@
 import { BlockTypes } from '@minecraft/server'
-import { inaccurateSearch } from 'lib'
+import { inaccurateSearch } from 'lib/search'
 import { t } from 'lib/text'
 
 const prefix = 'minecraft:'
@@ -17,7 +17,7 @@ export function blockIsAvaible(block: string, player: { fail(s: string): void })
     maxSuggestionsCount: 3,
   }
 
-  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return false
+  if (!search[0] || search[0][1] < options.minMatchTriggerValue) return false
 
   const suggest = (a: [string, number]) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 

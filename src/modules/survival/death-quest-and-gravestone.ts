@@ -80,7 +80,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
     }))
     .sort((a, b) => a.distance - b.distance)
 
-  const nearestPlace = places[0]?.place as SafePlace | undefined
+  const nearestPlace = places[0]?.place
 
   if (nearestPlace?.portalTeleportsTo.valid) {
     player.teleport(nearestPlace.portalTeleportsTo)

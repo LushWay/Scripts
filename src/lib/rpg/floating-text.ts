@@ -17,7 +17,7 @@ export class FloatingText {
   private entity: Entity | undefined
 
   hide() {
-    if (!this.entity) this.entity = this.find()
+    this.entity ??= this.find()
     if (this.entity?.isValid) this.entity.remove()
   }
 

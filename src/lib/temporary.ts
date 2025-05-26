@@ -28,7 +28,7 @@ export class Temporary {
 
   /** Creates new temporary system */
   constructor(execute: (arg: ProxiedSubscribers) => void | { cleanup(this: void): void }, parent?: Temporary) {
-    const target = parent ? parent : this
+    const target = parent ?? this
     if (target === this) {
       this.proxies = {
         world: Object.setPrototypeOf(

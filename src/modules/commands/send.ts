@@ -53,9 +53,8 @@ function editEmailMenu(player: Player, state: SendState) {
 }
 
 export function sendMenu(player: Player, back?: VoidFunction, state?: SendState) {
-  if (!back) back = () => null
-  if (!state)
-    state = { recipients: createSelectPlayerMenu.defaultAll(), rewards: new Rewards(), title: '', contents: '', back }
+  back ??= () => null
+  state ??= { recipients: createSelectPlayerMenu.defaultAll(), rewards: new Rewards(), title: '', contents: '', back }
 
   const form = new ActionForm('Отправить письмо')
 

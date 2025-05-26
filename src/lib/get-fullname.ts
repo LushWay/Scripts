@@ -71,7 +71,7 @@ export function getFullname(
       add(playerID.name)
     } else {
       const name = Player.name(playerID)
-      add(name ? name : noName)
+      add(name ?? noName)
     }
   }
 

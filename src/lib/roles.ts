@@ -146,7 +146,7 @@ if (!__VITEST__) {
       if (event.sourceType === ScriptEventSource.Server) {
         // Allow
       } else {
-        if (Object.values(Player.database).find(e => WHO_CAN_CHANGE.includes(e.role))) {
+        if (Player.database.values().find(e => WHO_CAN_CHANGE.includes(e.role))) {
           return console.error(`(SCRIPTEVENT::${event.id}) Admin already set.`)
         }
       }
