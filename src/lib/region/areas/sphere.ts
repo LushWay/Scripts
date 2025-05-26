@@ -9,7 +9,7 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
     const { vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
-    return Vector.distance(this.database.center, vector) < this.radius + distance
+    return Vector.distanceCompare(this.database.center, vector, this.radius + distance)
   }
 
   get edges() {

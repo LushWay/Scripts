@@ -1,4 +1,107 @@
 export const VectorSymbol = Symbol('vector')
+
+export class VecXZ {
+  /** Checks if vector c is between a and b */
+  static between(a: VectorXZ, b: VectorXZ, c: VectorXZ) {
+    return (
+      c.x >= (a.x < b.x ? a.x : b.x) &&
+      c.x <= (a.x > b.x ? a.x : b.x) &&
+      c.z >= (a.z < b.z ? a.z : b.z) &&
+      c.z <= (a.z > b.z ? a.z : b.z)
+    )
+  }
+
+  /**
+   * Returns if 2d distance between a and b is less then radius. This is way faster then Vector.distance because it only
+   * checks x and z, and also it does not uses Math.hypot
+   */
+  static distanceCompare(a: VectorXZ, b: VectorXZ, radius: number) {
+    return (a.x - b.x) ** 2 + (a.z - b.z) ** 2 < radius ** 2
+  }
+
+  static center(a: VectorXZ, b: VectorXZ) {
+    return {
+      x: (b.x - a.x) / 2 + a.x,
+      z: (b.z - a.z) / 2 + a.z,
+    }
+  }
+
+  /**
+   * @remarks
+   *   Returns a vector that is made from the largest components of two vectors.
+   */
+  static max(a: VectorXZ, b: VectorXZ) {
+    return { x: Math.max(a.x, b.x), z: Math.max(a.z, b.z) }
+  }
+
+  /**
+   * @remarks
+   *   Returns a vector that is made from the smallest components of two vectors.
+   */
+  static min(a: VectorXZ, b: VectorXZ) {
+    return { x: Math.min(a.x, b.x), z: Math.min(a.z, b.z) }
+  }
+
+  /**
+   * @remarks
+   *   Returns the component-wise product of these vectors.
+   */
+  static multiply(a: VectorXZ, b: number | VectorXZ) {
+    const vector = new Vector(a.x, a.z)
+
+    if (typeof b === 'number') {
+      vector.x *= b
+      vector.z *= b
+    } else {
+      vector.x *= b.x
+      vector.z *= b.z
+    }
+
+    return vector
+  }
+
+  /**
+   * @remarks
+   *   Returns the addition of these vectors.
+   */
+  static add(a: VectorXZ, b: VectorXZ): VecXZ {
+    const vector = new VecXZ(a.x, a.z)
+    vector.x += b.x
+    vector.z += b.z
+    return vector
+  }
+
+  /**
+   * @remarks
+   *   X component of this vector.
+   */
+  public x: number
+
+  /**
+   * @remarks
+   *   Z component of this vector.
+   */
+  public z: number
+
+  /**
+   * @remarks
+   *   Creates a new instance of an abstract vector.
+   * @param x X component of the vector.
+   * @param y Y component of the vector.
+   * @param z Z component of the vector.
+   */
+  constructor(x: number | VectorXZ, z?: number) {
+    if (typeof x === 'object') {
+      this.x = x.x
+      this.z = x.z
+    } else {
+      if (typeof z !== 'number') throw new TypeError(`Expected 2 numbers, got ${x} ${z}`)
+      this.x = x
+      this.z = z
+    }
+  }
+}
+
 export class Vector {
   static is = (unit: unknown): unit is Vector =>
     !!(
@@ -147,6 +250,14 @@ export class Vector {
   }
 
   /**
+   * Returns if 3d distance between a and b is less or equal to radius. This is faster then using Vector.distance <=
+   * radius because it does not uses Math.hypot and instead multiplies radius by radius
+   */
+  static distanceCompare(a: Vector3, b: Vector3, radius: number) {
+    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 < radius ** 2
+  }
+
+  /**
    * @remarks
    *   Returns the component-wise division of these vectors.
    * @throws This function can throw errors.
@@ -237,6 +348,10 @@ export class Vector {
     vector.y -= b.y
     vector.z -= b.z
     return vector
+  }
+
+  static center(a: Vector3, b: Vector3) {
+    return new Vector((b.x - a.x) / 2 + a.x, (b.y - a.y) / 2 + a.y, (b.z - a.z) / 2 + a.z)
   }
 
   /** Checks if provided vector is on the edge of max and min */

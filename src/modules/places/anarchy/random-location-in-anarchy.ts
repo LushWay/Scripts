@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import { dedupe } from 'lib/dedupe'
-import { getRandomVectorInCircle, getTopmostSolidBlock } from 'lib/game-utils'
+import { getRandomXZInCircle, getTopmostSolidBlock } from 'lib/game-utils'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 
 /**
@@ -31,7 +31,7 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
           if (i < 0) return resolve(false)
           if (!Anarchy.zone) return
 
-          const random = getRandomVectorInCircle(1000)
+          const random = getRandomXZInCircle(1000)
           const position = { x: random.x + Anarchy.zone.center.x, y: 200, z: random.z + Anarchy.zone.center.z }
           onBlock?.(position)
           const topmostBlock = await getTopmostSolidBlock(position)

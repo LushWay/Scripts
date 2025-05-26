@@ -1,5 +1,5 @@
 import { AbstractPoint, toPoint } from 'lib/game-utils'
-import { Vector } from 'lib/vector'
+import { Vector, VecXZ } from 'lib/vector'
 import { Area } from './area'
 
 class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radius: number; yradius: number }> {
@@ -11,11 +11,7 @@ class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radiu
 
     return (
       Math.abs(this.database.center.y - vector.y) <= this.database.yradius + distance &&
-      Vector.distance(
-        { x: this.database.center.x, y: 0, z: this.database.center.z },
-        { x: vector.x, y: 0, z: vector.z },
-      ) <
-        this.database.radius + distance
+      VecXZ.distanceCompare(this.database.center, vector, this.database.radius + distance)
     )
   }
 

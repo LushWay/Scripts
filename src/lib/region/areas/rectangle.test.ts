@@ -34,7 +34,7 @@ describe('rectangle', () => {
     `)
 
     expect(rect.center).toMatchInlineSnapshot(`
-      {
+      Vector {
         "x": 15,
         "y": 15,
         "z": 15,
@@ -61,7 +61,7 @@ describe('rectangle', () => {
     `)
 
     expect(rect.center).toMatchInlineSnapshot(`
-      {
+      Vector {
         "x": -15,
         "y": -15,
         "z": -15,

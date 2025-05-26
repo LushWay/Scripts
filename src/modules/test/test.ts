@@ -1,7 +1,7 @@
 /* i18n-ignore */
 /* eslint-disable */
 
-import { ItemStack, MolangVariableMap, system, world } from '@minecraft/server'
+import { ItemStack, MolangVariableMap, Player, ScriptEventSource, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
@@ -17,6 +17,9 @@ import {
   DatabaseUtils,
   Mail,
   NpcForm,
+  Region,
+  RoadRegion,
+  SafeAreaRegion,
   Settings,
   Vector,
   getAuxOrTexture,
@@ -28,7 +31,9 @@ import {
   util,
 } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { ChunkQuery } from 'lib/chunk-query'
 import { CommandContext } from 'lib/command/context'
+import { parseArguments } from 'lib/command/utils'
 import { Cutscene } from 'lib/cutscene'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
@@ -58,7 +63,87 @@ import './properties'
 // use public tests with caution, they're available to the all players!
 // other tests are available only for tech admins and above
 
-const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
+const tests: Record<
+  string,
+  (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
+> = {
+  duplicates() {
+    const keys = new Set<string>()
+    for (const chunk of ChunkQuery.getChunks(Region.chunkQuery).get('overworld') ?? []) {
+      const key = chunk.getKey()
+      if (keys.has(key)) {
+        console.log('Duplicate!', key)
+        continue
+      }
+      keys.add(key)
+    }
+  },
+  chunks() {
+    console.log(Region.chunkQuery.getSize())
+  },
+  chunksNear(ctx) {
+    const distance = Number(ctx.args[1] ?? '5')
+    const near = Region.chunkQuery
+      .getChunksNear(ctx.player, distance)
+      .map(e => `size: ${e.size}, x: ${e.indexX}, z: ${e.indexZ}`)
+    console.log(near)
+    ctx.player.success('' + near.length)
+  },
+
+  chunkQuery(ctx) {
+    console.log(Region.chunkQuery.getSize(ctx.player.dimension.type))
+  },
+
+  distanceQuery(ctx) {
+    const a = { x: 10341, y: -4121, z: 14 }
+    const b = { x: -1341, y: 121, z: 0 }
+    const r = 424
+    bench(
+      ctx.player,
+      'distance',
+      1000000,
+      [
+        [() => Vector.distance(a, b) <= r, 'Vector.distance'],
+        [
+          () => {
+            return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 <= r ** 2
+          },
+          'sqrt',
+        ],
+        [
+          () => {
+            return (a.x - b.x) ** 2 + (a.z - b.z) ** 2 <= r ** 2
+          },
+          'sqrt xz',
+        ],
+      ],
+      e => e,
+      10000,
+    ).then(results => {
+      console.log([...results])
+    })
+  },
+
+  regionQuery(ctx) {
+    bench<unknown[]>(
+      ctx.player,
+      'region',
+      1000,
+      [Region, RoadRegion, SafeAreaRegion]
+        .map(type => {
+          const label = t`${type.name} ${type.getAll().length} - `
+          return [
+            [() => type.getManyAt(ctx.player), label + 'getManyAt old'],
+            [() => type.getManyAtV2(ctx.player), label + 'getManyAt §lnew'],
+            [() => type.getNear(ctx.player, 10), label + 'getNear old'],
+            [() => type.getNearV2(ctx.player, 10), label + 'getNear §lnew'],
+          ] as [VoidFunction, string][]
+        })
+        .flat(),
+      e => e.length,
+      50,
+    )
+  },
   potionAux(ctx) {
     for (const effect of Object.values(MinecraftPotionEffectTypes)) {
       const item = ItemStack.createPotion({ effect })
@@ -399,6 +484,30 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
 }
 
+system.afterEvents.scriptEventReceive.subscribe(event => {
+  if (event.sourceType !== ScriptEventSource.Server) return
+  if (!event.id.startsWith('t:')) return
+  const id = event.id.split(':')[1]
+  if (!id || !tests[id]) return console.log(Object.keys(tests))
+
+  const args = parseArguments(event.message)
+  try {
+    tests[id]({
+      args,
+      error: console.error,
+      reply: console.info,
+      player: {
+        location: { x: 0, y: 0, z: 0 },
+        fail: console.error,
+        info: console.info,
+        success: console.info,
+      } as Player,
+    })
+  } catch (e) {
+    console.error(e)
+  }
+})
+
 const publicTests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   death(ctx) {
     ctx.player.kill()
@@ -419,3 +528,39 @@ c.string('id', true).executes(async (ctx, id) => {
 
   util.catch(() => source[id as string]?.(ctx), 'Test')
 })
+
+function bench<T>(
+  player: Player,
+  ttype: string,
+  runs: number,
+  tests: [fn: VoidFunction, label: string][],
+  saveResultsMapper?: (r: T) => unknown,
+  yildEach = 30,
+) {
+  const subruns = yildEach
+  const r = Math.round(runs / subruns)
+  player.tell(t`Will run ${r} with ${subruns}`)
+  const start = Date.now()
+  const results = new Set<unknown>()
+  return new Promise<Set<unknown>>(resolve => {
+    system.runJob(
+      (function* testRegionQuery() {
+        for (const [fn, name] of tests) {
+          for (let i = 0; i < r; i++) {
+            const bench = util.benchmark(name, ttype)
+            for (let iii = 0; iii < subruns; iii++) {
+              const result = fn()
+              if (saveResultsMapper) results.add(saveResultsMapper(result as T))
+            }
+            bench(undefined, subruns)
+            yield
+          }
+          yield
+          player.info('Done for ' + name)
+        }
+        player.info(`Done! Took ${(Date.now() - start) / 1000}s`)
+        resolve(results)
+      })(),
+    )
+  })
+}

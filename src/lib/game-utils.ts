@@ -1,6 +1,5 @@
 import {
   Block,
-  BlockPermutation,
   EasingType,
   Entity,
   GameMode,
@@ -11,27 +10,19 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { BlockStateMapping, MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
+import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
 import { ConfigurableLocation } from 'lib/location'
 import { Vector } from 'lib/vector'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
 
-/** Represents location in the specific dimension */
-export interface LocationInDimension {
-  /** Location of the place */
-  location: Vector3 | ConfigurableLocation<Vector3>
-  /** Dimension of the location */
-  dimensionId: DimensionType
-}
-
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
-export function getBlockStatus({ location, dimensionId }: LocationInDimension) {
+export function getBlockStatus({ location, dimensionType }: ConfigurableVectorInDimension) {
   try {
     if ('valid' in location && !location.valid) return 'unloaded'
 
-    const block = world[dimensionId].getBlock(location)
+    const block = world[dimensionType].getBlock(location)
     if (!block?.isValid) return 'unloaded'
 
     return block
@@ -39,11 +30,6 @@ export function getBlockStatus({ location, dimensionId }: LocationInDimension) {
     if (e instanceof LocationInUnloadedChunkError) return 'unloaded'
     throw e
   }
-}
-
-/** Checks if chunks is loaded (e.g. we can operate with blocks/entities on it) */
-export function isChunkUnloaded(options: LocationInDimension) {
-  return getBlockStatus(options) === 'unloaded'
 }
 
 /**
@@ -63,9 +49,10 @@ export function isLocationError(
  * @param animTime - Time of the animation
  */
 export function restorePlayerCamera(player: Player, animTime = 1) {
+  const headLocation = player.getHeadLocation()
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-    location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 0.3)),
-    facingLocation: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 10)),
+    location: Vector.add(headLocation, Vector.multiply(player.getViewDirection(), 0.3)),
+    facingLocation: Vector.add(headLocation, Vector.multiply(player.getViewDirection(), 10)),
     easeOptions: {
       easeTime: animTime,
       easeType: EasingType.OutCubic,
@@ -73,7 +60,12 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
   })
 
   system.runTimeout(
-    () => player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson),
+    () => {
+      if (Vector.distance(player.getHeadLocation(), headLocation) > 1) {
+        // Apply animation again because player had moved
+        restorePlayerCamera(player, animTime * 0.5)
+      } else player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+    },
     restorePlayerCamera.name,
     animTime * TicksPerSecond,
   )
@@ -118,7 +110,7 @@ export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
       () => {
         if (i < 0) return done(false)
 
-        const status = getBlockStatus({ location, dimensionId: 'overworld' })
+        const status = getBlockStatus({ location, dimensionType: 'overworld' })
         if (status === 'unloaded') return i--
 
         return done(status)
@@ -136,7 +128,7 @@ export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
  * @returns - An object with properties `x` and `z`, representing a random vector within a circle of the specified
  *   radius.
  */
-export function getRandomVectorInCircle(radius: number): { x: number; z: number } {
+export function getRandomXZInCircle(radius: number): { x: number; z: number } {
   const angle = Math.randomFloat(0, 2 * Math.PI)
   const distance = Math.randomFloat(100, radius)
   const result = {
@@ -146,6 +138,7 @@ export function getRandomVectorInCircle(radius: number): { x: number; z: number 
 
   return result
 }
+
 export async function getTopmostSolidBlock(location: Vector3) {
   if (await loadChunk(location)) {
     const hit = world.overworld.getBlockFromRay(location, Vector.down, { includeLiquidBlocks: true })
@@ -158,24 +151,24 @@ export async function getTopmostSolidBlock(location: Vector3) {
   } else return false
 }
 
-export function withState<Name extends keyof BlockStateMapping>(
-  name: Name,
-  states: BlockStateMapping[Name],
-): Parameters<(typeof BlockPermutation)['resolve']> {
-  return [name, states]
-}
-
-interface DimensionLocation {
-  /** Representing the location of a block in the world */
+/** Represents location in the specific dimension */
+export interface VectorInDimension {
+  /** Location of the place */
   vector: Vector3
-
-  /** Specific dimension in the world. It is used to specify the dimension in which the block location is located. */
+  /** Dimension of the location */
   dimensionType: DimensionType
 }
 
-export type AbstractPoint = DimensionLocation | Entity | Block
+/** Represents location in the specific dimension */
+export interface ConfigurableVectorInDimension {
+  /** Location of the place */
+  location: Vector3 | ConfigurableLocation<Vector3>
+  dimensionType: DimensionType
+}
 
-export function toPoint(abstractPoint: AbstractPoint): DimensionLocation {
+export type AbstractPoint = VectorInDimension | Entity | Block
+
+export function toPoint(abstractPoint: AbstractPoint): VectorInDimension {
   if (abstractPoint instanceof Entity || abstractPoint instanceof Block) {
     return { vector: abstractPoint.location, dimensionType: abstractPoint.dimension.type }
   } else return abstractPoint
@@ -186,6 +179,6 @@ export function createPoint(
   y: number,
   z: number,
   dimensionType: DimensionType = 'overworld',
-): DimensionLocation {
+): VectorInDimension {
   return { vector: { x, y, z }, dimensionType }
 }

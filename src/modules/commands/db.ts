@@ -147,6 +147,7 @@ function changeValue(
 }
 
 const cmd = new Command('benchmark')
+  .setAliases('bench')
   .setDescription('Показывает время работы серверных систем')
   .setPermissions('techAdmin')
 
@@ -154,18 +155,19 @@ cmd
   .string('type', true)
   .boolean('pathes', true)
   .boolean('useChat', true)
-  .executes((ctx, type, pathes, useChat) => {
-    if (type && !(type in util.benchmark.results))
+  .boolean('sort', true)
+  .executes((ctx, type = 'timers', timerPathes = false, useChat, sort = true) => {
+    if (!(type in util.benchmark.results))
       return ctx.error(
         'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  '),
       )
 
-    if (useChat) {
-      return ctx.reply(stringifyBenchmarkResult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
-    }
+    const result = stringifyBenchmarkResult({ type: type, timerPathes, sort })
+
+    if (useChat) return ctx.reply(result)
 
     function show() {
-      new ActionForm('Benchmark', stringifyBenchmarkResult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
+      new ActionForm('Benchmark', result)
         .addButton('Refresh', null, show)
         .addButton('Exit', null, () => void 0)
         .show(ctx.player)

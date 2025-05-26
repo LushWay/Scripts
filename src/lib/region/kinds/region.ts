@@ -1,9 +1,11 @@
 import { Player, world } from '@minecraft/server'
+import { ChunkQuery } from 'lib/chunk-query'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { ActionForm } from 'lib/form/action'
 import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { util } from 'lib/util'
-import { Area } from '../areas/area'
+import { Vector } from 'lib/vector'
+import { Area, STOP_AREA_FOR_EACH_VECTOR } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 import { RegionStructure } from '../structure'
 
@@ -40,7 +42,7 @@ export interface RegionCreationOptions {
 }
 
 interface RegionConstructor<I extends Region>
-  extends Pick<typeof Region, 'regions' | 'getAll' | 'getAt' | 'getManyAt'> {
+  extends Pick<typeof Region, 'regions' | 'getAll' | 'getAt' | 'getManyAt' | 'chunkQuery'> {
   new (...args: any[]): I
 }
 
@@ -83,8 +85,31 @@ export class Region {
       region.onRestore()
     }
 
+    if (area.radius) this.chunkQuery.add(region)
+
     return region as unknown as InstanceType<T>
   }
+
+  static chunkQuery = new ChunkQuery<Region>(
+    (vector, object) => object.area.isIn({ vector, dimensionType: object.area.dimensionType }),
+    async (area, object) => {
+      let result = false
+      await object.area.forEachVector((vector, isIn) => {
+        if (isIn && area.isAt(vector)) {
+          result = true
+          return STOP_AREA_FOR_EACH_VECTOR
+        }
+      })
+
+      return result
+    },
+    (vector, object, distance) => object.area.isNear({ vector, dimensionType: object.area.dimensionType }, distance),
+    object => object.dimensionType,
+    object => {
+      const [from, to] = object.area.edges
+      return [Vector.min(from, to), Vector.max(from, to)]
+    },
+  )
 
   /** Regions list */
   static regions: Region[] = []
@@ -96,7 +121,25 @@ export class Region {
    */
   static getAll<I extends Region>(this: RegionConstructor<I> | typeof Region): I[] {
     if (this === Region) return this.regions as I[]
-    return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
+    return this.regions.filter(e => e instanceof this) as I[]
+  }
+
+  /**
+   * Returns an array of regions of the type of the caller that are near a specified point within a given radius.
+   *
+   * @param point - Represents point in the world
+   */
+  static getNearV2<I extends Region>(this: RegionConstructor<I>, point: AbstractPoint, radius: number): I[] {
+    return this.chunkQuery.getNear(point, radius).filter(e => e instanceof this) as I[]
+  }
+
+  /**
+   * Returns the nearest regions based on a block location and dimension ID.
+   *
+   * @param point - Represents point in the world
+   */
+  static getManyAtV2<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
+    return (this.chunkQuery.getAt(point).filter(e => e instanceof this) as I[]).sort((a, b) => b.priority - a.priority)
   }
 
   /**
@@ -264,6 +307,7 @@ export class Region {
   /** Removes this region */
   delete() {
     this.structure?.delete()
+    Region.chunkQuery.remove(this)
     Region.regions = Region.regions.filter(e => e.id !== this.id)
     RegionDatabase.delete(this.id)
   }

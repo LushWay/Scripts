@@ -1,11 +1,10 @@
-import { Block, Dimension, Entity, system, world } from '@minecraft/server'
+import { Dimension, system, world } from '@minecraft/server'
+import { AbstractPoint } from 'lib/game-utils'
 import { t } from 'lib/text'
 import { Vector } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area
 export type AreaWithType<T = AreaCreator> = T & { type: string }
-
-export type AbstractPoint = { vector: Vector3; dimensionType: DimensionType } | Entity | Block
 
 export abstract class Area<T extends JsonObject = JsonObject> {
   static areas: AreaWithType[] = []
@@ -77,7 +76,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return world[this.dimensionType]
   }
 
-  forEachVector(callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void, yieldEach = 10) {
+  forEachVector(callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | symbol, yieldEach = 10) {
     const { edges, dimension } = this
     const isIn = (vector: Vector3) => this.isIn({ vector, dimensionType: this.dimensionType })
 
@@ -87,7 +86,8 @@ export abstract class Area<T extends JsonObject = JsonObject> {
           try {
             let i = 0
             for (const vector of Vector.foreach(...edges)) {
-              callback(vector, isIn(vector), dimension)
+              const result = callback(vector, isIn(vector), dimension)
+              if (result === STOP_AREA_FOR_EACH_VECTOR) break
               i++
               if (i % yieldEach === 0) yield
             }
@@ -100,3 +100,5 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     })
   }
 }
+
+export const STOP_AREA_FOR_EACH_VECTOR = Symbol('Stop area for each vector')

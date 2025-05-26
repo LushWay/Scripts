@@ -30,11 +30,11 @@ export const util = {
      * @param {string} label - The name of the benchmark.
      * @returns {(label?: string) => number} A function that returns the time it took to run the function.
      */
-    function benchmark(label: string, type = 'test'): (label?: string) => number {
+    function benchmark(label: string, type = 'test'): (label?: string, subruns?: number) => number {
       const startTime = Date.now()
 
-      return function end(string) {
-        const tookTime = Date.now() - startTime
+      return function end(string, tookDivide = 1) {
+        const tookTime = (Date.now() - startTime) / tookDivide
 
         const typeresults = (util.benchmark.results[type] ??= {})
         typeresults[label] = ((typeresults[label] ?? 0) + tookTime) / 2

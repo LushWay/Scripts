@@ -25,7 +25,7 @@ class Rectangle extends Area<RectangleDatabase> {
     const { vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
-    const [from, to] = this.edges
+    const { from, to } = this.database
 
     return Vector.between(
       distance === 0 ? from : Vector.add(from, { x: -distance, y: -distance, z: -distance }),
@@ -35,8 +35,8 @@ class Rectangle extends Area<RectangleDatabase> {
   }
 
   get center() {
-    const [from, to] = this.edges
-    return { x: from.x + (to.x - from.x) / 2, y: from.y + (to.y - from.y) / 2, z: from.z + (to.z - from.z) / 2 }
+    const { from, to } = this.database
+    return Vector.center(from, to)
   }
 
   get edges(): [Vector3, Vector3] {

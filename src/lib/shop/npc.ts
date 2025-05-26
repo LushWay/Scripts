@@ -50,7 +50,7 @@ export class ShopBlock {
           })
           return true
         },
-        place.group.dimensionId,
+        place.group.dimensionType,
       )
     })
   }

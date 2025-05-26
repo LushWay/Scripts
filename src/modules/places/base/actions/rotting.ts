@@ -34,7 +34,7 @@ const takeMaterialsCooldown = new Cooldown(takeMaterialsTime, false, cooldowns.g
 system.runInterval(
   () => {
     for (const base of BaseRegion.getAll()) {
-      const block = getBlockStatus({ location: base.area.center, dimensionId: base.dimensionType })
+      const block = getBlockStatus({ location: base.area.center, dimensionType: base.dimensionType })
       const isLoaded = anyPlayerNearRegion(base, 20)
       if (block === 'unloaded' || !isLoaded) continue
 

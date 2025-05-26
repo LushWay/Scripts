@@ -22,7 +22,7 @@ export class City extends SafePlace {
     const donut = new Crate(this.group.point('donut kit').name(t`§bУсиленный`), donutLoot)
     const storageLocationpoint = this.group.point('storage text').name(t`§9Хранилище`)
     const storageLocation = location(storageLocationpoint)
-    const storageFloatingText = new FloatingText(storageLocationpoint.fullId, this.group.dimensionId)
+    const storageFloatingText = new FloatingText(storageLocationpoint.fullId, this.group.dimensionType)
     storageLocation.onLoad.subscribe(location => {
       storageFloatingText.update(location, storageLocationpoint.name)
     })

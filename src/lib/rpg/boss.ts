@@ -5,7 +5,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { isChunkUnloaded } from 'lib/game-utils'
+import { getBlockStatus } from 'lib/game-utils'
 import { ConfigurableLocation, location } from 'lib/location'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -131,7 +131,7 @@ export class Boss {
       this.check()
       const area =
         (areadb?.area ? restoreAreaFromJSON(areadb.area) : undefined) ??
-        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionId)
+        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
 
       this.region = BossArenaRegion.create(area, {
         boss: this,
@@ -164,8 +164,8 @@ export class Boss {
 
   private damage = new WeakPlayerMap<number>({ removeOnLeave: true })
 
-  get dimensionId() {
-    return this.options.place.group.dimensionId
+  get dimensionType() {
+    return this.options.place.group.dimensionType
   }
 
   private onInterval?: (boss: this) => void
@@ -176,7 +176,7 @@ export class Boss {
   }
 
   private check() {
-    if (!this.location.valid || isChunkUnloaded(this)) return
+    if (!this.location.valid || getBlockStatus(this) === 'unloaded') return
 
     const db = Boss.db.get(this.options.place.fullId)
     if (!db) {
@@ -189,7 +189,7 @@ export class Boss {
     }
   }
 
-  private floatingText = new FloatingText(this.options.place.fullId, this.dimensionId)
+  private floatingText = new FloatingText(this.options.place.fullId, this.dimensionType)
 
   private checkRespawnTime(db: BossDB) {
     if (Date.now() > db.date + this.options.respawnTime) {
@@ -207,7 +207,7 @@ export class Boss {
 
     const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
     this.logger.info`Spawn: ${entityTypeId}`
-    this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
+    this.entity = world[this.dimensionType].spawnEntity(entityTypeId, this.location)
 
     try {
       new Temporary(({ world, cleanup }) => {
@@ -232,7 +232,7 @@ export class Boss {
 
   /** Ensures that entity exists and if not calls onDie method */
   private ensureEntity(db: BossDB) {
-    const entities = world[this.dimensionId].getEntities({ type: this.options.typeId, tags: [Boss.entityTag] })
+    const entities = world[this.dimensionType].getEntities({ type: this.options.typeId, tags: [Boss.entityTag] })
 
     for (const entity of entities) {
       if (entity.id === db.id) {
@@ -274,7 +274,7 @@ export class Boss {
 
       this.options.loot.generate().forEach(e => {
         if (e) {
-          const item = world[this.dimensionId].spawnItem(e, location)
+          const item = world[this.dimensionType].spawnItem(e, location)
           forceAllowSpawnInRegion(item)
         }
       })

@@ -40,7 +40,7 @@ export class Npc {
     private onInteract: Npc.OnInteract,
   ) {
     this.id = point.fullId
-    this.dimensionId = point.group.dimensionId
+    this.dimensionId = point.group.dimensionType
     this.location = location(point)
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
