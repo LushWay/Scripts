@@ -1,10 +1,7 @@
-import { system } from '@minecraft/server'
 import { AbstractPoint, toPoint, VectorInDimension } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { inspect } from 'lib/utils/inspect'
 import { VecXZ } from 'lib/vector'
-
-let i = 0
 
 export class ChunkArea {
   static size = 16
@@ -26,9 +23,6 @@ export class ChunkArea {
     this.indexX = Math.floor(x / size)
     this.indexZ = Math.floor(z / size)
 
-    i++
-    if (i > 1000 && i < 1020) console.log('chunk created', x, z, this.indexX, this.indexZ)
-
     this.from = { x: this.indexX * size, z: this.indexZ * size }
     this.to = { x: this.from.x + size - 1, z: this.from.z + size - 1 }
     this.center = VecXZ.center(this.from, this.to)
@@ -40,7 +34,6 @@ export class ChunkArea {
 
   isNear(point: Vector3, distance: number): boolean {
     const { from, to } = this
-    // return VecXZ.distanceCompare(point, this.center, distance + this.size)
     return VecXZ.between(
       VecXZ.add(from, { x: -distance, z: -distance }),
       VecXZ.add(to, { x: distance, z: distance }),
@@ -75,18 +68,11 @@ export abstract class Chunk extends ChunkArea {
 
   abstract getNear(point: VectorInDimension, distance: number, query: ChunkQuery, ctx: QueryContext): object[]
 
-  abstract add(
-    object: object,
-    query: ChunkQuery,
-    from?: Vector3,
-    to?: Vector3,
-    dimensionType?: DimensionType,
-    ctx?: { iteration: number },
-  ): MaybePromise<Chunk[]>
+  abstract add(object: object, query: ChunkQuery, from?: Vector3, to?: Vector3, dimensionType?: DimensionType): Chunk[]
 
   abstract remove(object: object, query: ChunkQuery, dimensionType?: DimensionType): MaybePromise<void>
 
-  abstract getSize(
+  abstract storageSize(
     dimensionType: DimensionType,
     query: ChunkQuery,
   ): { chunks64: number; chunks16: number; objects: number }
@@ -111,22 +97,18 @@ export class Chunk16 extends Chunk {
   getAt(point: VectorInDimension, query: ChunkQuery, ctx: QueryContext): object[] {
     return this.getOrCreateIteratorFor(query).filter(object => {
       if (ctx.visited.has(object)) return false
+      ctx.visited.add(object)
 
-      if (query.isObjectAt(point.vector, object)) {
-        ctx.visited.add(object)
-        return true
-      }
+      return query.isObjectAt(point.vector, object)
     })
   }
 
   getNear(point: VectorInDimension, distance: number, query: ChunkQuery, ctx: QueryContext): object[] {
     return this.getOrCreateIteratorFor(query).filter(object => {
       if (ctx.visited.has(object)) return false
+      ctx.visited.add(object)
 
-      if (query.isObjectNear(point.vector, object, distance)) {
-        ctx.visited.add(object)
-        return true
-      }
+      return query.isObjectNear(point.vector, object, distance)
     })
   }
 
@@ -146,12 +128,10 @@ export class Chunk16 extends Chunk {
     this.storage.get(query)?.delete(object)
   }
 
-  getSize(_: undefined | DimensionType, query: ChunkQuery) {
+  storageSize(_: undefined | DimensionType, query: ChunkQuery) {
     return { chunks64: 0, chunks16: 1, objects: this.storage.get(query)?.size ?? 0 }
   }
 }
-
-let l = false
 
 export class Chunk64 extends Chunk {
   static size = 64
@@ -172,35 +152,35 @@ export class Chunk64 extends Chunk {
     return chunks
   }
 
-  getAt(point: VectorInDimension, query: ChunkQuery, ctx = new QueryContext()): object[] {
-    const result = []
-    for (const chunk of this.getChunks(point.dimensionType)) {
-      if (ctx.visitedChunks.has(chunk) || !chunk.isAt(point.vector)) continue
+  protected *iterate(dimensionType: DimensionType, ctx: QueryContext) {
+    for (const chunk of this.getChunks(dimensionType)) {
+      if (ctx.visitedChunks.has(chunk)) continue
       ctx.visitedChunks.add(chunk)
 
-      result.push(...chunk.getAt(point, query, ctx))
+      yield chunk
+    }
+  }
+
+  getAt(point: VectorInDimension, query: ChunkQuery, ctx = new QueryContext()): object[] {
+    const result: object[] = []
+    for (const chunk of this.iterate(point.dimensionType, ctx)) {
+      if (chunk.isAt(point.vector)) result.push(...chunk.getAt(point, query, ctx))
     }
     return result
   }
 
   getNear(point: VectorInDimension, distance: number, query: ChunkQuery, ctx = new QueryContext()): object[] {
-    const result = new Set<object>()
-    for (const chunk of this.getChunks(point.dimensionType)) {
-      const hh = ctx.visitedChunks.has(chunk)
-      if (hh) console.log('asfkdoakdfoaksfos')
-      if (hh || !chunk.isNear(point.vector, distance)) continue
-      ctx.visitedChunks.add(chunk)
-
-      for (const object of chunk.getNear(point, distance, query, ctx)) result.add(object)
+    const result: object[] = []
+    for (const chunk of this.iterate(point.dimensionType, ctx)) {
+      if (chunk.isNear(point.vector, distance)) result.push(...chunk.getNear(point, distance, query, ctx))
     }
-    return [...result]
+    return result
   }
 
   getChunksAt(point: VectorInDimension, query: ChunkQuery, ctx = new QueryContext()): Chunk[] {
     const result = new Set<Chunk>()
-    for (const chunk of this.getChunks(point.dimensionType)) {
-      if (ctx.visitedChunks.has(chunk) || !chunk.isAt(point.vector)) continue
-      ctx.visitedChunks.add(chunk)
+    for (const chunk of this.iterate(point.dimensionType, ctx)) {
+      if (!chunk.isAt(point.vector)) continue
 
       if (chunk instanceof Chunk64) for (const c of chunk.getChunksAt(point, query, ctx)) result.add(c)
       else result.add(chunk)
@@ -210,11 +190,8 @@ export class Chunk64 extends Chunk {
 
   getChunksNear(point: VectorInDimension, distance: number, query: ChunkQuery, ctx = new QueryContext()): Chunk[] {
     const result = new Set<Chunk>()
-    for (const chunk of this.getChunks(point.dimensionType)) {
-      const hh = ctx.visitedChunks.has(chunk)
-      if (hh) console.log('asfkdoakdfoaksfos')
-      if (hh || !chunk.isNear(point.vector, distance)) continue
-      ctx.visitedChunks.add(chunk)
+    for (const chunk of this.iterate(point.dimensionType, ctx)) {
+      if (!chunk.isNear(point.vector, distance)) continue
 
       if (chunk instanceof Chunk64) for (const c of chunk.getChunksNear(point, distance, query, ctx)) result.add(c)
       else result.add(chunk)
@@ -222,12 +199,15 @@ export class Chunk64 extends Chunk {
     return [...result]
   }
 
-  getSize(dimensionType: DimensionType, query: ChunkQuery): { chunks64: number; chunks16: number; objects: number } {
+  storageSize(
+    dimensionType: DimensionType,
+    query: ChunkQuery,
+  ): { chunks64: number; chunks16: number; objects: number } {
     let chunks64 = 1
     let chunks16 = 0
     let objects = 0
     for (const chunk of this.getChunks(dimensionType)) {
-      const size = chunk.getSize(dimensionType, query)
+      const size = chunk.storageSize(dimensionType, query)
       chunks16 += size.chunks16
       chunks64 += size.chunks64
       objects += size.objects
@@ -236,70 +216,41 @@ export class Chunk64 extends Chunk {
     return { objects, chunks64, chunks16 }
   }
 
-  async add(
-    object: object,
-    query: ChunkQuery,
-    from: Vector3,
-    to: Vector3,
-    dimensionType: DimensionType,
-    ctx: { iteration: number } = { iteration: 0 },
-  ): Promise<Chunk[]> {
+  add(object: object, query: ChunkQuery, from: Vector3, to: Vector3, dimensionType: DimensionType): Chunk[] {
     const step = this.children.size
-    const addedTo: MaybePromise<Chunk[]>[] = []
+    const addedTo: Chunk[] = []
     const visited = new Set<Chunk | undefined>()
     const area = new ChunkArea(from.x, from.z, this.children.size, dimensionType, undefined)
     const chunks = this.getChunks(dimensionType)
     const createdChunks = query.getChunksCache(dimensionType)
 
     const isQuery = this instanceof ChunkQuery
-    const f = area.from
-    const t = to
 
-    await new Promise<void>(resolve => {
-      system.runJob(
-        function* ChunkAdd(this: Chunk64) {
-          for (let x = f.x; x <= t.x; x += step) {
-            for (let z = f.z; z <= t.z; z += step) {
-              ctx.iteration++
-              if (ctx.iteration % 10 === 0) yield
+    for (let x = area.from.x; x <= to.x; x += step) {
+      for (let z = area.from.z; z <= to.z; z += step) {
+        if (!isQuery && !this.isAt({ x, z, y: 0 })) continue
 
-              if (!isQuery && !this.isAt({ x, z, y: 0 })) continue
+        const key = this.getKey(Math.floor(x / step), Math.floor(z / step), step)
+        const existing = createdChunks.get(key)
 
-              const key = this.getKey(Math.floor(x / step), Math.floor(z / step), step)
-              const existing = createdChunks.get(key)
+        if (visited.has(existing)) continue // Skip already visited chunks to not add twice
 
-              if (visited.has(existing)) continue // Skip already visited chunks to not add twice
+        let chunk: Chunk | undefined
+        if (existing) chunk = existing
+        else {
+          chunk = new this.children(x, z, this.children.size, dimensionType, this)
+          createdChunks.set((chunk as Chunk64).getKey(), chunk)
+        }
 
-              let chunk: Chunk | undefined
-              if (existing) chunk = existing
-              else {
-                chunk = new this.children(x, z, this.children.size, dimensionType, this)
-                createdChunks.set((chunk as Chunk64).getKey(), chunk)
-              }
+        visited.add(chunk)
+        // We created a new chunk and should store it
+        if (!chunks.includes(chunk)) chunks.push(chunk)
 
-              visited.add(chunk)
-              if (!chunks.includes(chunk)) {
-                const double = query.usedChunksCache.has(chunk)
-                query.usedChunksCache.add(chunk)
-                if (double && !l) {
-                  l = true
-                  console.error('Double!', chunk, this)
-                }
+        addedTo.push(...chunk.add(object, query, from, to, dimensionType))
+      }
+    }
 
-                // if (!double) {
-                chunks.push(chunk)
-                // }
-              } // We created a new chunk and should store it
-
-              addedTo.push(chunk.add(object, query, from, to, dimensionType, ctx))
-            }
-          }
-          resolve()
-        }.call(this),
-      )
-    })
-
-    return (await Promise.all(addedTo)).flat()
+    return addedTo
   }
 
   remove(object: object, query: ChunkQuery, dimensionType: DimensionType) {
@@ -310,7 +261,7 @@ export class Chunk64 extends Chunk {
 export class ChunkQuery<T extends object = any> extends Chunk64 {
   static chunks = Chunk64.createDimensionTypeChunkStorage()
 
-  chunksCache = new Map<DimensionType, Map<string, Chunk>>()
+  private chunksCache = new Map<DimensionType, Map<string, Chunk>>()
 
   getChunksCache(dimensionType: DimensionType): Map<string, Chunk> {
     let cache = this.chunksCache.get(dimensionType)
@@ -318,8 +269,6 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
 
     return cache
   }
-
-  usedChunksCache = new Set<Chunk>()
 
   static getChunks(query: Chunk64) {
     return (query as ChunkQuery).chunks
@@ -349,9 +298,9 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
     return super.getChunksNear(toPoint(point), distance, this)
   }
 
-  async add(object: T): Promise<Chunk[]> {
+  add(object: T): Chunk[] {
     const bench = util.benchmark('ChunkQuery add', 'chunkQuery')
-    const result = await super.add(object, this, ...this.getObjectEdges(object), this.getObjectDimension(object))
+    const result = super.add(object, this, ...this.getObjectEdges(object), this.getObjectDimension(object))
     bench()
     if (!result.length) throw new Error(`Unable to add point ${inspect(object).replace(/§./g, '')}`)
     return result
@@ -361,7 +310,7 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
     return super.remove(object, this, this.getObjectDimension(object))
   }
 
-  getSize(dimensionType: DimensionType = 'overworld') {
-    return super.getSize(dimensionType, this)
+  storageSize(dimensionType: DimensionType = 'overworld') {
+    return super.storageSize(dimensionType, this)
   }
 }

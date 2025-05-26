@@ -55,7 +55,7 @@ system.runInterval(
 
       for (const vector of getEdgeBlocksOf(floored).concat(floored)) {
         const point = toPoint({ vector, dimensionType })
-        const baseRegions = BaseRegion.getNear(point, region => region.area.radius + 3)
+        const baseRegions = BaseRegion.getNear(point, 6)
         if (!baseRegions.length) continue
 
         const inRegion = baseRegions.some(e => e.area.isIn(point))

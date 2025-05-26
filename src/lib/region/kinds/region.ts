@@ -5,7 +5,7 @@ import { ActionForm } from 'lib/form/action'
 import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { Vector } from 'lib/vector'
-import { Area, STOP_AREA_FOR_EACH_VECTOR } from '../areas/area'
+import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 import { RegionStructure } from '../structure'
 
@@ -68,7 +68,11 @@ export class Region {
     options: ConstructorParameters<T>[1] = {},
     key?: string,
   ): InstanceType<T> {
+    if (this !== Region && this.regions === Region.regions) this.regions = []
+
     const region = new this(area, options, key ?? this.generateRegionKey(this.kind, area.type, area.radius))
+    this.regions.push(region)
+    if (this !== Region) Region.regions.push(region)
 
     region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.kind = this.kind
@@ -109,26 +113,7 @@ export class Region {
    * @returns Array of instances that match the specified type `R` of Region.
    */
   static getAll<I extends Region>(this: RegionConstructor<I> | typeof Region): I[] {
-    if (this === Region) return this.regions as I[]
-    return this.regions.filter(e => e instanceof this) as I[]
-  }
-
-  /**
-   * Returns an array of regions of the type of the caller that are near a specified point within a given radius.
-   *
-   * @param point - Represents point in the world
-   */
-  static getNearV2<I extends Region>(this: RegionConstructor<I>, point: AbstractPoint, radius: number): I[] {
-    return this.chunkQuery.getNear(point, radius).filter(e => e instanceof this) as I[]
-  }
-
-  /**
-   * Returns the nearest regions based on a block location and dimension ID.
-   *
-   * @param point - Represents point in the world
-   */
-  static getManyAtV2<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
-    return (this.chunkQuery.getAt(point).filter(e => e instanceof this) as I[]).sort((a, b) => b.priority - a.priority)
+    return this.regions as I[]
   }
 
   /**
@@ -137,15 +122,18 @@ export class Region {
    * @param point - Represents point in the world
    */
   static getNear<I extends Region>(
-    this: RegionConstructor<I>,
+    this: RegionConstructor<I> | typeof Region,
     point: AbstractPoint,
-    radius: number | ((region: I) => number),
+    radius: number,
   ): I[] {
     point = toPoint(point)
 
-    return this.getAll().filter(region =>
-      region.area.isNear(point, typeof radius === 'number' ? radius : radius(region)),
-    )
+    if (this.regions.length > 50) {
+      const all = this.chunkQuery.getNear(point, radius)
+      return (this === Region ? all : all.filter(e => e instanceof this)) as I[]
+    }
+
+    return (this.regions as I[]).filter(region => region.area.isNear(point, radius))
   }
 
   /**
@@ -165,9 +153,13 @@ export class Region {
   static getManyAt<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
     point = toPoint(point)
 
-    return this.getAll()
-      .filter(region => region.area.isIn(point))
-      .sort((a, b) => b.priority - a.priority)
+    if (this.regions.length > 50) {
+      const all = this.chunkQuery.getAt(point)
+      const filtered = (this === Region ? all : all.filter(e => e instanceof this)) as I[]
+      return filtered.sort((a, b) => b.priority - a.priority)
+    }
+
+    return (this.regions as I[]).filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority)
   }
 
   /** Region priority. Used in {@link Region.getAt} */
@@ -205,10 +197,7 @@ export class Region {
     public area: Area,
     options: RegionCreationOptions,
     readonly id: string,
-  ) {
-    this.area = area
-    if (id) Region.regions.push(this)
-  }
+  ) {}
 
   /** Function that gets called on region creation after saving (once) */
   protected onCreate() {
@@ -298,6 +287,7 @@ export class Region {
     this.structure?.delete()
     Region.chunkQuery.remove(this)
     Region.regions = Region.regions.filter(e => e.id !== this.id)
+    this.creator.regions = this.creator.regions.filter(e => e.id !== this.id)
     RegionDatabase.delete(this.id)
   }
 

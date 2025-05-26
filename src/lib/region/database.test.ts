@@ -1,5 +1,4 @@
 import { Region, RegionIsSaveable } from 'lib'
-import { Vector } from 'lib/vector'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { SphereArea } from './areas/sphere'
 import { RegionDatabase, registerSaveableRegion, restoreRegionFromJSON } from './database'
@@ -63,7 +62,7 @@ describe('region initialization', () => {
   })
 
   it('should restore cuberegion', () => {
-    const region = TestK2Region.create(new ChunkCubeArea({ from: Vector.one, to: Vector.one }, 'overworld'))
+    const region = TestK2Region.create(new ChunkCubeArea({ from: { x: 1, z: 1 }, to: { x: 1, z: 1 } }, 'overworld'))
     const regionJSON = RegionDatabase.get(region.regionKey)
 
     expect(regionJSON).toEqual(region.json)

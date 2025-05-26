@@ -53,7 +53,7 @@ export const disableAdventureNear: (typeof Region)[] = []
 export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion]
 
 function nearDisabledAdventureRegions(player: Player): boolean {
-  return disableAdventureNear.some(e => e.getNear(toPoint(player), 6).length)
+  return Region.getNear(toPoint(player), 6).some(region => disableAdventureNear.some(type => region instanceof type))
 }
 
 function adventureModeRegion(region: Region) {

@@ -25,8 +25,16 @@ describe('Region', () => {
     class TestRegion extends Region {}
     class AnotherTestRegion extends Region {}
 
+    expect(Region.regions.length).toBe(0)
+    expect(TestRegion.regions.length).toBe(0)
+    expect(AnotherTestRegion.regions.length).toBe(0)
+
     const region = TestRegion.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 1 }))
     AnotherTestRegion.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 1 }))
+
+    expect(Region.regions.length).toBe(2)
+    expect(TestRegion.regions.length).toBe(1)
+    expect(AnotherTestRegion.regions.length).toBe(1)
 
     expect(region).toBeInstanceOf(TestRegion)
     expectTypeOf(region).toEqualTypeOf<TestRegion>()

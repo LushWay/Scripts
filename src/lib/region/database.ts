@@ -41,7 +41,16 @@ export const RegionDatabase = table<RegionSave>('region-v2', () => ({
 }))
 
 system.delay(() => {
-  RegionDatabase.entries().forEach(r => restoreRegionFromJSON(r))
+  system.runJob(
+    (function* regionRestore() {
+      let i = 0
+      for (const r of RegionDatabase.entries()) {
+        restoreRegionFromJSON(r)
+        i++
+        if (i % 500 === 0) yield
+      }
+    })(),
+  )
 })
 
 let loaded = false

@@ -49,8 +49,8 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     return player.fail(`§cВы уже ${isOwner ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`}!`)
   }
 
-  const isThereNearRegions = Region.regions.some(r => r.area.isNear(block, 50))
-  if (isThereNearRegions) {
+  const nearRegions = Region.getNear(block, 50)
+  if (nearRegions.length) {
     event.cancel = true
     return player.fail('§cРядом есть другие регионы!')
   }

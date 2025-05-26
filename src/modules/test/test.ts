@@ -51,6 +51,7 @@ import './enchant'
 import './load-chunks'
 import './minimap'
 import './properties'
+import { BaseRegion } from 'modules/places/base/region'
 // import './simulatedPlayer'
 
 // There you can create simple one time tests taht will be run using .test <name> command
@@ -67,9 +68,18 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  regionNear(ctx) {
+    const distance = Number(ctx.args[1] ?? '5')
+    const near = Region.chunkQuery.getNear(ctx.player, distance)
+
+    console.log(near.length)
+    ctx.player.success('' + near.length)
+  },
+
   duplicates() {
     const keys = new Set<string>()
     for (const chunk of ChunkQuery.getChunks(Region.chunkQuery).get('overworld') ?? []) {
+      // @ts-expect-error aaaaaaaaaaaaaaaaaaaaaaaaaaa
       const key = chunk.getKey()
       if (keys.has(key)) {
         console.log('Duplicate!', key)
@@ -79,7 +89,7 @@ const tests: Record<
     }
   },
   chunks() {
-    console.log(Region.chunkQuery.getSize())
+    console.log(Region.chunkQuery.storageSize())
   },
   chunksNear(ctx) {
     const distance = Number(ctx.args[1] ?? '5')
@@ -91,7 +101,7 @@ const tests: Record<
   },
 
   chunkQuery(ctx) {
-    console.log(Region.chunkQuery.getSize(ctx.player.dimension.type))
+    console.log(Region.chunkQuery.storageSize(ctx.player.dimension.type))
   },
 
   distanceQuery(ctx) {
@@ -129,14 +139,15 @@ const tests: Record<
       ctx.player,
       'region',
       1000,
-      [Region, RoadRegion, SafeAreaRegion]
+      [Region, RoadRegion, SafeAreaRegion, BaseRegion]
+        // [Region]
         .map(type => {
           const label = t`${type.name} ${type.getAll().length} - `
           return [
             [() => type.getManyAt(ctx.player), label + 'getManyAt old'],
-            [() => type.getManyAtV2(ctx.player), label + 'getManyAt §lnew'],
+            // [() => type.getManyAtV2(ctx.player), label + 'getManyAt §lnew'],
             [() => type.getNear(ctx.player, 10), label + 'getNear old'],
-            [() => type.getNearV2(ctx.player, 10), label + 'getNear §lnew'],
+            // [() => type.getNearV2(ctx.player, 10), label + 'getNear §lnew'],
           ] as [VoidFunction, string][]
         })
         .flat(),
@@ -559,6 +570,7 @@ function bench<T>(
           player.info('Done for ' + name)
         }
         player.info(`Done! Took ${(Date.now() - start) / 1000}s`)
+        if (results.size) console.log([...results])
         resolve(results)
       })(),
     )

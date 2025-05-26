@@ -33,7 +33,7 @@ function inspectChunks(query: ChunkQuery, dimensionType: DimensionType = 'overwo
         const chunk = e.getChunksAt({ vector: { x, z, y: 0 }, dimensionType }, query)[0]
 
         let result = ''
-        if (chunk) result = '' + chunk.getSize(dimensionType, query).objects
+        if (chunk) result = '' + chunk.storageSize(dimensionType, query).objects
         else result = '*'
 
         fromX ??= x
@@ -83,11 +83,11 @@ describe('ChunkQuery', () => {
       return { ...createPoint(x, y, z, dimensionType), id }
     }
 
-    it('should query for single vector', async () => {
+    it('should query for single vector', () => {
       const query = createQuery()
 
-      await query.add(createSinglePoint(16, 16, 16, 1))
-      await query.add(createSinglePoint(17, 17, 17, 2))
+      query.add(createSinglePoint(16, 16, 16, 1))
+      query.add(createSinglePoint(17, 17, 17, 2))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: 0  z: 0
 
@@ -99,9 +99,9 @@ describe('ChunkQuery', () => {
         x: 48  z: 48
         "
       `)
-      await query.add(createSinglePoint(100, 100, 100, 3))
+      query.add(createSinglePoint(100, 100, 100, 3))
 
-      await query.add(createSinglePoint(100, 100, 100, 4, 'end'))
+      query.add(createSinglePoint(100, 100, 100, 4, 'end'))
 
       expect(query.getAt(createPoint(1, 1, 1)).map(byId)).toEqual([])
       expect(query.getAt(createPoint(16, 16, 16)).map(byId)).toEqual([1])
@@ -142,12 +142,12 @@ describe('ChunkQuery', () => {
       `)
     })
 
-    it('should handle negative coordinates', async () => {
+    it('should handle negative coordinates', () => {
       const query = createQuery()
 
-      await query.add(createSinglePoint(-16, 0, -16, 10))
-      await query.add(createSinglePoint(-1, 0, -1, 11))
-      await query.add(createSinglePoint(-32, 0, -32, 12))
+      query.add(createSinglePoint(-16, 0, -16, 10))
+      query.add(createSinglePoint(-1, 0, -1, 11))
+      query.add(createSinglePoint(-32, 0, -32, 12))
 
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
@@ -167,7 +167,7 @@ describe('ChunkQuery', () => {
       expect(query.getAt(createPoint(-100, 0, -100)).map(byId)).toEqual([])
     })
 
-    it('should inspect api calls for area', async () => {
+    it('should inspect api calls for area', () => {
       const query = createQuery()
       const point = createSinglePoint(1, 1, 1, 10)
       const isObjectAt = vi.spyOn(query, 'isObjectAt')
@@ -191,7 +191,7 @@ describe('ChunkQuery', () => {
           })
           .join('\n')
 
-      await query.add(point)
+      query.add(point)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
         isObjectNear: 0
@@ -224,13 +224,13 @@ describe('ChunkQuery', () => {
       `)
     })
 
-    it('should remove points correctly', async () => {
+    it('should remove points correctly', () => {
       const query = createQuery()
 
       const pt1 = createSinglePoint(5, 0, 5, 20)
       const pt2 = createSinglePoint(-5, 0, -5, 21)
-      await query.add(pt1)
-      await query.add(pt2)
+      query.add(pt1)
+      query.add(pt2)
 
       expect(query.getAt(createPoint(5, 0, 5)).map(byId)).toEqual([20])
       expect(query.getAt(createPoint(-5, 0, -5)).map(byId)).toEqual([21])
@@ -260,7 +260,7 @@ describe('ChunkQuery', () => {
       return new SphereArea({ center: { x, y, z }, radius: radius }, dimensionType)
     }
 
-    it('should inspect api calls for area', async () => {
+    it('should inspect api calls for area', () => {
       const query = createQuery()
       const point = createSinglePoint(1, 1, 1, 10)
       const isObjectAt = vi.spyOn(query, 'isObjectAt')
@@ -288,7 +288,7 @@ describe('ChunkQuery', () => {
           })
           .join('\n')
 
-      await query.add(point)
+      query.add(point)
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
         isObjectNear: 0
@@ -298,11 +298,11 @@ describe('ChunkQuery', () => {
         getObjectDimension: 1"
       `)
 
-      await query.add(createSinglePoint(1, 1, 3, 11))
-      await query.add(createSinglePoint(1, 3, 3, 12))
-      await query.add(createSinglePoint(1, 1, 300, 12))
-      await query.add(createSinglePoint(1, 1, 100, 12))
-      await query.add(createSinglePoint(1, 1, 17, 12))
+      query.add(createSinglePoint(1, 1, 3, 11))
+      query.add(createSinglePoint(1, 3, 3, 12))
+      query.add(createSinglePoint(1, 1, 300, 12))
+      query.add(createSinglePoint(1, 1, 100, 12))
+      query.add(createSinglePoint(1, 1, 17, 12))
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
         isObjectNear: 0
@@ -341,7 +341,7 @@ describe('ChunkQuery', () => {
       expect(query.getNear(createPoint(15, 15, 15), 7).map(byRadius)).toEqual([])
       expect(getStats()).toMatchInlineSnapshot(`
         "isObjectAt: 0
-        isObjectNear: 5
+        isObjectNear: 4
         pointIsIn: 0
         pointIsNear: 1
         getObjectEdges: 0
@@ -359,10 +359,10 @@ describe('ChunkQuery', () => {
       `)
     })
 
-    it('should add to the area', async () => {
+    it('should add to the area', () => {
       const query = createQuery()
 
-      expect((await query.add(createSinglePoint(0, 0, 0, 36))).length).toMatchInlineSnapshot(`36`)
+      expect(query.add(createSinglePoint(0, 0, 0, 36)).length).toMatchInlineSnapshot(`36`)
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -378,7 +378,7 @@ describe('ChunkQuery', () => {
         x: 48  z: 48
         "
       `)
-      expect(query.getSize()).toMatchInlineSnapshot(`
+      expect(query.storageSize()).toMatchInlineSnapshot(`
         {
           "chunks16": 36,
           "chunks64": 5,
@@ -386,7 +386,7 @@ describe('ChunkQuery', () => {
         }
       `)
 
-      expect((await query.add(createSinglePoint(0, 0, 100, 8))).length).toMatchInlineSnapshot(`4`)
+      expect(query.add(createSinglePoint(0, 0, 100, 8)).length).toMatchInlineSnapshot(`4`)
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -404,7 +404,7 @@ describe('ChunkQuery', () => {
       `)
     })
 
-    it('should query for area', async () => {
+    it('should query for area', () => {
       const query = createQuery()
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: undefined  z: undefined
@@ -414,7 +414,7 @@ describe('ChunkQuery', () => {
         "
       `)
 
-      await query.add(createSinglePoint(-1, -1, -1, 3))
+      query.add(createSinglePoint(-1, -1, -1, 3))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -431,7 +431,7 @@ describe('ChunkQuery', () => {
         "
       `)
 
-      await query.add(createSinglePoint(1, 1, 1, 2))
+      query.add(createSinglePoint(1, 1, 1, 2))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -447,7 +447,7 @@ describe('ChunkQuery', () => {
         x: 48  z: 48
         "
       `)
-      await query.add(createSinglePoint(16, 16, 16, 3))
+      query.add(createSinglePoint(16, 16, 16, 3))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -464,7 +464,7 @@ describe('ChunkQuery', () => {
         "
       `)
 
-      await query.add(createSinglePoint(17, 17, 17, 4))
+      query.add(createSinglePoint(17, 17, 17, 4))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -481,7 +481,7 @@ describe('ChunkQuery', () => {
         "
       `)
 
-      await query.add(createSinglePoint(100, 100, 100, 5))
+      query.add(createSinglePoint(100, 100, 100, 5))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -502,7 +502,7 @@ describe('ChunkQuery', () => {
         "
       `)
 
-      await query.add(createSinglePoint(100, 100, 100, 6, 'end'))
+      query.add(createSinglePoint(100, 100, 100, 6, 'end'))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
 
@@ -544,7 +544,7 @@ describe('ChunkQuery', () => {
     `)
     })
 
-    it('query.getNear should work same as iteration', async () => {
+    it('query.getNear should work same as iteration', () => {
       const points = [
         createSinglePoint(0, 0, 0, 10),
         createSinglePoint(0, 0, 5, 11),
@@ -573,7 +573,7 @@ describe('ChunkQuery', () => {
 
       const query = createQuery()
 
-      await Promise.all(points.map(e => query.add(e)))
+      points.forEach(e => query.add(e))
 
       expect(query.getNear(point, 10).map(byRadius)).toMatchInlineSnapshot(`
         [
@@ -588,12 +588,12 @@ describe('ChunkQuery', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should handle negative coordinates', async () => {
+    it('should handle negative coordinates', () => {
       const query = createQuery()
 
-      await query.add(createSinglePoint(-16, 0, -16, 10))
-      await query.add(createSinglePoint(-1, 0, -1, 11))
-      await query.add(createSinglePoint(-32, 0, -32, 12))
+      query.add(createSinglePoint(-16, 0, -16, 10))
+      query.add(createSinglePoint(-1, 0, -1, 11))
+      query.add(createSinglePoint(-32, 0, -32, 12))
 
       expect(query.getAt(createPoint(-16, 0, -16)).map(byRadius)).toEqual([10])
       expect(query.getAt(createPoint(-1, 0, -1)).map(byRadius)).toEqual([11])
@@ -601,14 +601,14 @@ describe('ChunkQuery', () => {
       expect(query.getAt(createPoint(-100, 0, -100)).map(byRadius)).toEqual([])
     })
 
-    it('should remove areas correctly', async () => {
+    it('should remove areas correctly', () => {
       const query = createQuery()
 
       const area1 = createSinglePoint(5, 0, 5, 2)
       const area2 = createSinglePoint(-5, 0, -35, 6)
 
-      await query.add(area1)
-      await query.add(area2)
+      query.add(area1)
+      query.add(area2)
 
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
         "x: -64  z: -64
