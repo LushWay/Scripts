@@ -30,7 +30,7 @@ export class ChunkArea {
     if (i > 1000 && i < 1020) console.log('chunk created', x, z, this.indexX, this.indexZ)
 
     this.from = { x: this.indexX * size, z: this.indexZ * size }
-    this.to = { x: this.indexX * size + size - 1, z: this.indexZ * size + size - 1 }
+    this.to = { x: this.from.x + size - 1, z: this.from.z + size - 1 }
     this.center = VecXZ.center(this.from, this.to)
   }
 
@@ -46,6 +46,20 @@ export class ChunkArea {
       VecXZ.add(to, { x: distance, z: distance }),
       point,
     )
+  }
+
+  protected getKey(x = this.indexX, z = this.indexZ, size = this.size) {
+    return `${x} ${z} ${size}`
+  }
+
+  toJSON(): object {
+    return {
+      from: `${this.from.x} ${this.from.z}`,
+      to: `${this.to.x} ${this.to.z}`,
+      key: this.getKey(),
+      size: this.size,
+      w: this.parent?.toJSON(),
+    }
   }
 }
 
@@ -76,20 +90,6 @@ export abstract class Chunk extends ChunkArea {
     dimensionType: DimensionType,
     query: ChunkQuery,
   ): { chunks64: number; chunks16: number; objects: number }
-
-  protected getKey(x = this.indexX, z = this.indexZ) {
-    return `${x} ${z}`
-  }
-
-  toJSON(): object {
-    return {
-      from: `${this.from.x} ${this.from.z}`,
-      to: `${this.to.z} ${this.to.z}`,
-      key: this.getKey(),
-      size: this.size,
-      w: this.parent?.toJSON(),
-    }
-  }
 }
 
 interface ChunkCreator {
@@ -172,18 +172,6 @@ export class Chunk64 extends Chunk {
     return chunks
   }
 
-  protected chunksCache = new Map<DimensionType, Record<string, Chunk>>()
-
-  protected getChunksCache(dimensionType: DimensionType): Record<string, Chunk> {
-    let cache = this.chunksCache.get(dimensionType)
-    if (!cache) {
-      const chunks = this.getChunks(dimensionType)
-      cache = Object.fromEntries(chunks.map(chunk => [(chunk as Chunk64).getKey(), chunk]))
-      this.chunksCache.set(dimensionType, cache)
-    }
-    return cache
-  }
-
   getAt(point: VectorInDimension, query: ChunkQuery, ctx = new QueryContext()): object[] {
     const result = []
     for (const chunk of this.getChunks(point.dimensionType)) {
@@ -252,7 +240,7 @@ export class Chunk64 extends Chunk {
     const visited = new Set<Chunk | undefined>()
     const area = new ChunkArea(from.x, from.z, this.children.size, dimensionType, undefined)
     const chunks = this.getChunks(dimensionType)
-    const createdChunks = this.getChunksCache(dimensionType)
+    const createdChunks = query.getChunksCache(dimensionType)
 
     await new Promise<void>(resolve => {
       system.runJob(
@@ -262,30 +250,35 @@ export class Chunk64 extends Chunk {
               ctx.iteration++
               if (ctx.iteration % 10 === 0) yield
 
-              const key = this.getKey(Math.floor(x / step), Math.floor(z / step))
-              const queryExisting = query.chunkCache.get(key)
-              let existing = createdChunks[key]
-
-              if (!existing && queryExisting) {
-                if (!l) {
-                  console.error(x, z, key, this, queryExisting)
-                  l = true
-                }
-                existing = queryExisting
+              if (this.size > 1) {
+                if (!this.isAt({ x, z, y: 0 })) continue
               }
 
-              // const existing = chunks.find(e => e.isAt({ x, z, y: 0 }))
+              const key = this.getKey(Math.floor(x / step), Math.floor(z / step), step)
+              const existing = createdChunks.get(key)
+
               if (visited.has(existing)) continue // Skip already visited chunks to not add twice
 
               let chunk: Chunk | undefined
               if (existing) chunk = existing
               else {
                 chunk = new this.children(x, z, this.children.size, dimensionType, this)
-                createdChunks[(chunk as Chunk64).getKey()] = chunk
+                createdChunks.set((chunk as Chunk64).getKey(), chunk)
               }
 
               visited.add(chunk)
-              if (!chunks.includes(chunk)) chunks.push(chunk) // We created a new chunk and should store it
+              if (!chunks.includes(chunk)) {
+                const double = query.usedChunksCache.has(chunk)
+                query.usedChunksCache.add(chunk)
+                if (double && !l) {
+                  l = true
+                  console.error('Double!', chunk, this)
+                }
+
+                // if (!double) {
+                chunks.push(chunk)
+                // }
+              } // We created a new chunk and should store it
 
               addedTo.push(chunk.add(object, query, from, to, dimensionType, ctx))
             }
@@ -306,7 +299,16 @@ export class Chunk64 extends Chunk {
 export class ChunkQuery<T extends object = any> extends Chunk64 {
   static chunks = Chunk64.createDimensionTypeChunkStorage()
 
-  chunkCache = new Map<string, Chunk>()
+  chunksCache = new Map<DimensionType, Map<string, Chunk>>()
+
+  getChunksCache(dimensionType: DimensionType): Map<string, Chunk> {
+    let cache = this.chunksCache.get(dimensionType)
+    if (!cache) this.chunksCache.set(dimensionType, (cache = new Map<string, Chunk>()))
+
+    return cache
+  }
+
+  usedChunksCache = new Set<Chunk>()
 
   static getChunks(query: Chunk64) {
     return (query as ChunkQuery).chunks

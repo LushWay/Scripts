@@ -1,6 +1,6 @@
 import { createPoint } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
-import { Chunk, Chunk64, ChunkArea, ChunkQuery } from './chunk-query'
+import { Chunk64, ChunkArea, ChunkQuery } from './chunk-query'
 import { STOP_AREA_FOR_EACH_VECTOR } from './region/areas/area'
 import { SphereArea } from './region/areas/sphere'
 
@@ -15,11 +15,59 @@ function byRadius(object: { radius: number }) {
 }
 
 function inspectChunks(query: ChunkQuery, dimensionType: DimensionType = 'overworld') {
-  const chunkToString = (e: Chunk): unknown =>
-    e instanceof Chunk64
-      ? '[' + (ChunkQuery.getChunks(e).get(dimensionType)?.map(chunkToString) ?? []).join(' ') + ']'
-      : e.getSize(dimensionType, query).objects
-  return (ChunkQuery.getChunks(query)?.get(dimensionType)?.map(chunkToString) ?? []).join('\n')
+  let results: (VectorXZ & { v: string })[] = []
+
+  const chunksFrom = (c: typeof ChunkQuery | Chunk64) => ChunkQuery.getChunks(query)?.get(dimensionType) ?? []
+
+  let fromX
+  let fromZ
+  let toX
+  let toZ
+
+  for (const e of chunksFrom(ChunkQuery)) {
+    if (!(e instanceof Chunk64)) return
+
+    const chunks = chunksFrom(e)
+    // @ts-expect-error aaaaaaa
+    const size = e.children.size
+    for (let x = e.from.x; x <= e.to.x; x += size) {
+      for (let z = e.from.z; z <= e.to.z; z += size) {
+        const chunk = e.getChunksNear({ vector: { x, z, y: 0 }, dimensionType }, 0, query)[0]
+
+        let result = ''
+        if (chunk) result = '' + e.getSize(dimensionType, query).objects
+        else result = '*'
+
+        fromX ??= x
+        fromZ ??= z
+        toX ??= x
+        toZ ??= z
+
+        fromX = Math.min(fromX, x)
+        fromZ = Math.min(fromZ, z)
+        toX = Math.max(toX, x)
+        toZ = Math.max(toZ, z)
+
+        results.push({ x, z, v: result })
+      }
+    }
+  }
+
+  let result = `x: ${fromX}  z: ${fromZ}\n\n`
+  if (typeof fromX === 'number' && typeof toX === 'number' && typeof toZ === 'number' && typeof fromZ === 'number') {
+    for (let x = fromX; x <= toX; x += 16) {
+      for (let z = fromZ; z <= toZ; z += 16) {
+        const point = results.find(e => e.x === x && e.z === z)
+        const v = point ? point.v : '_'
+        result += ' ' + v.padStart(2, ' ')
+      }
+      result += '\n'
+    }
+  }
+
+  result += `\nx: ${toX}  z: ${toZ}\n`
+
+  return result
 }
 
 describe('ChunkQuery', () => {
@@ -45,17 +93,17 @@ describe('ChunkQuery', () => {
         [
           {
             "from": "0 0",
-            "key": "0 0",
+            "key": "0 0 16",
             "size": 16,
             "to": "15 15",
             "w": {
               "from": "0 0",
-              "key": "0 0",
+              "key": "0 0 64",
               "size": 64,
               "to": "63 63",
               "w": {
                 "from": "0 0",
-                "key": "0 0",
+                "key": "0 0 1",
                 "size": 1,
                 "to": "0 0",
                 "w": undefined,
@@ -66,7 +114,19 @@ describe('ChunkQuery', () => {
       `)
       await query.add(createSinglePoint(16, 16, 16, 1))
       await query.add(createSinglePoint(17, 17, 17, 2))
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: 0  z: 0
+
+          3  *  *  *
+          *  3  *  *
+          *  *  *  *
+          *  *  *  *
+
+        x: 48  z: 48
+        "
+      `)
       await query.add(createSinglePoint(100, 100, 100, 3))
+
       await query.add(createSinglePoint(100, 100, 100, 4, 'end'))
 
       expect(query.getAt(createPoint(1, 1, 1)).map(byId)).toEqual([0])
@@ -106,6 +166,18 @@ describe('ChunkQuery', () => {
       await query.add(createSinglePoint(-16, 0, -16, 10))
       await query.add(createSinglePoint(-1, 0, -1, 11))
       await query.add(createSinglePoint(-32, 0, -32, 12))
+
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: -64  z: -64
+
+          *  *  *  *
+          *  *  *  *
+          *  *  3  *
+          *  *  *  3
+
+        x: -16  z: -16
+        "
+      `)
 
       expect(query.getAt(createPoint(-16, 0, -16)).map(byId)).toEqual([10])
       expect(query.getAt(createPoint(-1, 0, -1)).map(byId)).toEqual([11])
@@ -321,57 +393,161 @@ describe('ChunkQuery', () => {
       `)
     })
 
+    it('should add to the area', async () => {
+      const query = createQuery()
+
+      expect((await query.add(createSinglePoint(0, 0, 0, 36))).length).toMatchInlineSnapshot(`36`)
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *
+          *  9  9  9  9  9  9  *
+          *  9  9  9  9  9  9  *
+          *  9  9  9  9  9  9  *
+          *  9  9  9  9  9  9  *
+          *  9  9  9  9  9  9  *
+          *  9  9  9  9  9  9  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
+      `)
+
+      expect((await query.add(createSinglePoint(0, 0, 100, 8))).length).toMatchInlineSnapshot(`4`)
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *  *  *  *  *
+          *  9  9  9  9  9  9  *  *  *  *  *
+          *  9  9  9  9  9  9  *  *  *  *  *
+          *  9  9  9  9  9  9  *  *  2  2  *
+          *  9  9  9  9  9  9  *  *  2  2  *
+          *  9  9  9  9  9  9  *  *  *  *  *
+          *  9  9  9  9  9  9  *  *  *  *  *
+          *  *  *  *  *  *  *  *  *  *  *  *
+
+        x: 48  z: 112
+        "
+      `)
+    })
+
     it('should query for area', async () => {
       const query = createQuery()
-      expect(inspectChunks(query)).toMatchInlineSnapshot(`""`)
+      expect(inspectChunks(query)).toMatchInlineSnapshot(`
+        "x: undefined  z: undefined
+
+
+        x: undefined  z: undefined
+        "
+      `)
 
       await query.add(createSinglePoint(-1, -1, -1, 3))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "[1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]"
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  1  1  *  *  *
+          *  *  *  1  1  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
       `)
 
       await query.add(createSinglePoint(1, 1, 1, 2))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "[1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 2]"
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  1  1  *  *  *
+          *  *  *  1  2  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
       `)
       await query.add(createSinglePoint(16, 16, 16, 3))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "[1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 3 1 1 1]"
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  1  1  *  *  *
+          *  *  *  1  6  6  *  *
+          *  *  *  *  6  6  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
       `)
 
       await query.add(createSinglePoint(17, 17, 17, 4))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "[1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 4 2 2 2]"
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  1  1  *  *  *
+          *  *  *  1 10 10  *  *
+          *  *  *  * 10 10  *  *
+          *  *  *  *  *  *  *  *
+          *  *  *  *  *  *  *  *
+
+        x: 48  z: 48
+        "
       `)
 
       await query.add(createSinglePoint(100, 100, 100, 5))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "[1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 4 2 2 2]
-        [1]"
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  1  1  *  *  *  _  _  _  _
+          *  *  *  1 10 10  *  *  _  _  _  _
+          *  *  *  * 10 10  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          _  _  _  _  _  _  _  _  *  *  *  *
+          _  _  _  _  _  _  _  _  *  *  *  *
+          _  _  _  _  _  _  _  _  *  *  1  *
+          _  _  _  _  _  _  _  _  *  *  *  *
+
+        x: 112  z: 112
+        "
       `)
 
       await query.add(createSinglePoint(100, 100, 100, 6, 'end'))
       expect(inspectChunks(query)).toMatchInlineSnapshot(`
-        "[1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 1]
-        [1 1 1 4 2 2 2]
-        [1]"
+        "x: -64  z: -64
+
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  1  1  *  *  *  _  _  _  _
+          *  *  *  1 10 10  *  *  _  _  _  _
+          *  *  *  * 10 10  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          *  *  *  *  *  *  *  *  _  _  _  _
+          _  _  _  _  _  _  _  _  *  *  *  *
+          _  _  _  _  _  _  _  _  *  *  *  *
+          _  _  _  _  _  _  _  _  *  *  1  *
+          _  _  _  _  _  _  _  _  *  *  *  *
+
+        x: 112  z: 112
+        "
       `)
 
       expect(query.getAt(createPoint(0, 0, 0)).map(byRadius)).toEqual([3, 2])
@@ -475,47 +651,35 @@ describe('ChunkQuery', () => {
   describe('ChunkArea', () => {
     it('should create area in ++', () => {
       expect(new ChunkArea(0, 0, 16, 'overworld', undefined)).toMatchInlineSnapshot(`
-        ChunkArea {
-          "center": {
-            "x": 7.5,
-            "z": 7.5,
-          },
-          "dimensionType": "overworld",
-          "from": {
-            "x": 0,
-            "z": 0,
-          },
-          "indexX": 0,
-          "indexZ": 0,
-          "parent": undefined,
+        {
+          "from": "0 0",
+          "key": "0 0 16",
           "size": 16,
-          "to": {
-            "x": 15,
-            "z": 15,
-          },
+          "to": "15 15",
+          "w": undefined,
         }
       `)
     })
     it('should create area in --', () => {
       expect(new ChunkArea(-16, -16, 16, 'overworld', undefined)).toMatchInlineSnapshot(`
-        ChunkArea {
-          "center": {
-            "x": -8.5,
-            "z": -8.5,
-          },
-          "dimensionType": "overworld",
-          "from": {
-            "x": -16,
-            "z": -16,
-          },
-          "indexX": -1,
-          "indexZ": -1,
-          "parent": undefined,
+        {
+          "from": "-16 -16",
+          "key": "-1 -1 16",
           "size": 16,
-          "to": {
-            "x": -1,
-            "z": -1,
-          },
+          "to": "-1 -1",
+          "w": undefined,
+        }
+      `)
+    })
+
+    it('should create area in --', () => {
+      expect(new ChunkArea(0, 1211, 16, 'overworld', undefined)).toMatchInlineSnapshot(`
+        {
+          "from": "0 1200",
+          "key": "0 75 16",
+          "size": 16,
+          "to": "15 1215",
+          "w": undefined,
         }
       `)
     })
