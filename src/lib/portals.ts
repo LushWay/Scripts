@@ -79,7 +79,7 @@ export class Portal {
     this.unsubscribers = []
 
     if (this.from && this.to)
-      for (const pos of Vector.foreach(this.from, this.to)) {
+      for (const pos of Vector.forEach(this.from, this.to)) {
         this.unsubscribers.push(PlaceAction.onEnter(pos, p => this.teleport(p)).unsubscribe)
       }
   }

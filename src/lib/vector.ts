@@ -2,7 +2,7 @@ export const VectorSymbol = Symbol('vector')
 
 export class VecXZ {
   /** Checks if vector c is between a and b */
-  static between(a: VectorXZ, b: VectorXZ, c: VectorXZ) {
+  static isBetween(a: VectorXZ, b: VectorXZ, c: VectorXZ) {
     return (
       c.x >= (a.x < b.x ? a.x : b.x) &&
       c.x <= (a.x > b.x ? a.x : b.x) &&
@@ -26,6 +26,32 @@ export class VecXZ {
     }
   }
 
+  static equals = (a: VectorXZ, b: VectorXZ) => a.x === b.x && a.z === b.z
+
+  /**
+   * Returns two dots around vector
+   *
+   * Alias to
+   *
+   *       Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
+   *
+   * @param x Number to increase vector on x axis.
+   * @param y Number to increase vector on y axis. Defaults to x
+   * @param z Number to increase vector on z axis. Defaults to x
+   */
+  static around(a: VectorXZ, x: number, y = x, z = y): [VecXZ, VecXZ] {
+    const difference = { x, y, z }
+    return [VecXZ.subtract(a, difference), VecXZ.add(a, difference)]
+  }
+
+  /**
+   * @remarks
+   *   Returns the subtraction of these vectors.
+   */
+  static subtract(a: VectorXZ, b: VectorXZ) {
+    return new VecXZ(a.x - b.x, a.z - b.z)
+  }
+
   /**
    * @remarks
    *   Returns a vector that is made from the largest components of two vectors.
@@ -47,7 +73,7 @@ export class VecXZ {
    *   Returns the component-wise product of these vectors.
    */
   static multiply(a: VectorXZ, b: number | VectorXZ) {
-    const vector = new Vector(a.x, a.z)
+    const vector = new VecXZ(a.x, a.z)
 
     if (typeof b === 'number') {
       vector.x *= b
@@ -65,52 +91,40 @@ export class VecXZ {
    *   Returns the addition of these vectors.
    */
   static add(a: VectorXZ, b: VectorXZ): VecXZ {
-    const vector = new VecXZ(a.x, a.z)
-    vector.x += b.x
-    vector.z += b.z
-    return vector
+    return new VecXZ(a.x + b.x, a.z + b.x)
   }
 
-  /**
-   * @remarks
-   *   X component of this vector.
-   */
-  public x: number
-
-  /**
-   * @remarks
-   *   Z component of this vector.
-   */
-  public z: number
+  static fromVectorXZ(vector: VectorXZ) {
+    return new this(vector.x, vector.z)
+  }
 
   /**
    * @remarks
    *   Creates a new instance of an abstract vector.
-   * @param x X component of the vector.
-   * @param y Y component of the vector.
-   * @param z Z component of the vector.
    */
-  constructor(x: number | VectorXZ, z?: number) {
-    if (typeof x === 'object') {
-      this.x = x.x
-      this.z = x.z
-    } else {
-      if (typeof z !== 'number') throw new TypeError(`Expected 2 numbers, got ${x} ${z}`)
-      this.x = x
-      this.z = z
-    }
-  }
+  constructor(
+    /**
+     * @remarks
+     *   X component of this vector.
+     */
+    public x: number,
+
+    /**
+     * @remarks
+     *   Z component of this vector.
+     */
+    public z: number,
+  ) {}
 }
 
 export class Vector {
-  static is = (unit: unknown): unit is Vector =>
-    !!(
-      unit &&
-      typeof unit === 'object' &&
-      (unit instanceof Vector ||
-        (Object.keys(unit).length === 3 && Object.keys(unit).every(e => ['x', 'y', 'z'].includes(e))) ||
-        VectorSymbol in unit)
-    )
+  static is(unit: unknown): unit is Vector3 {
+    if (!unit || typeof unit !== 'object') return false
+    if (unit instanceof Vector || VectorSymbol in unit) return true
+
+    const keys = Object.getOwnPropertyNames(unit)
+    return keys.length === 3 && ['x', 'y', 'z'].every(e => keys.includes(e))
+  }
 
   /**
    * Returns string representation of vector ('x y z')
@@ -133,7 +147,7 @@ export class Vector {
    *
    * Valid vector don't uses NaN values
    */
-  static valid = (a: Vector3) =>
+  static isValid = (a: Vector3) =>
     !isNaN(a.x) &&
     !isNaN(a.y) &&
     !isNaN(a.z) &&
@@ -158,7 +172,8 @@ export class Vector {
    * @param z Number to increase vector on z axis. Defaults to x
    */
   static around(a: Vector3, x: number, y = x, z = y): [Vector, Vector] {
-    return [Vector.add(a, { x: x, y: y, z: z }), Vector.add(a, { x: -x, y: -y, z: -z })]
+    const difference = { x, y, z }
+    return [Vector.subtract(a, difference), Vector.add(a, difference)]
   }
 
   /**
@@ -168,7 +183,7 @@ export class Vector {
    * @param b - Ending Vector3 point
    * @returns - Generator of Vector3 objects
    */
-  static *foreach(a: Vector3, b: Vector3) {
+  static *forEach(a: Vector3, b: Vector3) {
     const [xmin, xmax] = a.x < b.x ? [a.x, b.x] : [b.x, a.x]
     const [ymin, ymax] = a.y < b.y ? [a.y, b.y] : [b.y, a.y]
     const [zmin, zmax] = a.z < b.z ? [a.z, b.z] : [b.z, a.z]
@@ -201,7 +216,7 @@ export class Vector {
   }
 
   /** Checks if vector c is between a and b */
-  static between(a: Vector3, b: Vector3, c: Vector3) {
+  static isBetween(a: Vector3, b: Vector3, c: Vector3) {
     return (
       c.x >= (a.x < b.x ? a.x : b.x) &&
       c.x <= (a.x > b.x ? a.x : b.x) &&
@@ -221,11 +236,7 @@ export class Vector {
    *   Returns the addition of these vectors.
    */
   static add(a: Vector3, b: Vector3): Vector {
-    const vector = new Vector(a.x, a.y, a.z)
-    vector.x += b.x
-    vector.y += b.y
-    vector.z += b.z
-    return vector
+    return new Vector(a.x + b.x, a.y + b.y, a.z + b.z)
   }
 
   /**
@@ -355,7 +366,7 @@ export class Vector {
   }
 
   /** Checks if provided vector is on the edge of max and min */
-  static isedge(min: Vector3, max: Vector3, { x, y, z }: Vector3) {
+  static isEdge(min: Vector3, max: Vector3, { x, y, z }: Vector3) {
     return (
       ((x == min.x || x == max.x) && (y == min.y || y == max.y)) ||
       ((y == min.y || y == max.y) && (z == min.z || z == max.z)) ||
@@ -411,41 +422,31 @@ export class Vector {
    */
   static readonly zero = new Vector(0, 0, 0)
 
-  /**
-   * @remarks
-   *   X component of this vector.
-   */
-  public x: number
-  /**
-   * @remarks
-   *   Y component of this vector.
-   */
-  public y: number
-  /**
-   * @remarks
-   *   Z component of this vector.
-   */
-  public z: number
+  static fromVector3(vector: Vector3) {
+    return new this(vector.x, vector.y, vector.z)
+  }
 
   /**
    * @remarks
    *   Creates a new instance of an abstract vector.
-   * @param x X component of the vector.
-   * @param y Y component of the vector.
-   * @param z Z component of the vector.
    */
-  constructor(x: number | Vector3, y?: number, z?: number) {
-    if (typeof x === 'object') {
-      this.x = x.x
-      this.y = x.y
-      this.z = x.z
-    } else {
-      if (typeof y !== 'number' || typeof z !== 'number') throw new TypeError(`Expected 3 numbrs, got ${y} ${z}`)
-      this.x = x
-      this.y = y
-      this.z = z
-    }
-  }
+  constructor(
+    /**
+     * @remarks
+     *   X component of this vector.
+     */
+    public x: number,
+    /**
+     * @remarks
+     *   Y component of this vector.
+     */
+    public y: number,
+    /**
+     * @remarks
+     *   Z component of this vector.
+     */
+    public z: number,
+  ) {}
 
   /**
    * @remarks

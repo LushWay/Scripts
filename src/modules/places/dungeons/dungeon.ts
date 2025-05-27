@@ -170,7 +170,7 @@ export class DungeonRegion extends Region {
   protected getStructurePosition(rotation = this.ldb.rotation) {
     if (!this.structureFile) throw new TypeError('No structure file!')
 
-    return new Vector(
+    return Vector.fromVector3(
       structureLikeRotateRelative(rotation, Vector.multiply(this.structureFile.size, 0.5), this.structureFile.size),
     )
       .multiply(-1)

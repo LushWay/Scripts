@@ -108,8 +108,8 @@ system.runPlayerInterval(
     if (!dungeon) return
 
     const { from, to } = dungeon.structureBounds()
-    for (const l of Vector.foreach(from, to)) {
-      if (!Vector.isedge(from, to, l)) continue
+    for (const l of Vector.forEach(from, to)) {
+      if (!Vector.isEdge(from, to, l)) continue
 
       player.spawnParticle('minecraft:balloon_gas_particle', l, particle)
     }

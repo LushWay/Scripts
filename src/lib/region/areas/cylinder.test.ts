@@ -16,8 +16,8 @@ describe('cylinder', () => {
     expect(cylinder.isIn({ vector: { x: 0, y: 0, z: 0 }, dimensionType: 'nether' })).toBe(false)
 
     expect(cylinder.edges).toEqual([
-      { x: 1, y: 2, z: 1 },
       { x: -1, y: -2, z: -1 },
+      { x: 1, y: 2, z: 1 },
     ])
 
     cylinder.radius = 5

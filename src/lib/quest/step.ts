@@ -159,7 +159,7 @@ export abstract class QS<DB = any> extends Temporary {
     if (!this.compassIntervalSetup) {
       this.compassIntervalSetup = true
       this.onInterval(() => {
-        if (this.isActive && this.place && Vector.valid(this.place)) Compass.setFor(this.player, this.place)
+        if (this.isActive && this.place && Vector.isValid(this.place)) Compass.setFor(this.player, this.place)
       })
 
       this.cleaners.push(() => Compass.setFor(this.player, undefined))

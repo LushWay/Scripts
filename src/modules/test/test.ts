@@ -45,13 +45,13 @@ import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import { requestAirdrop } from 'modules/places/anarchy/airdrop'
+import { BaseRegion } from 'modules/places/base/region'
 import { skipForBlending } from 'modules/world-edit/utils/blending'
 import loot from '../quests/learning/airdrop'
 import './enchant'
 import './load-chunks'
 import './minimap'
 import './properties'
-import { BaseRegion } from 'modules/places/base/region'
 // import './simulatedPlayer'
 
 // There you can create simple one time tests taht will be run using .test <name> command
@@ -181,14 +181,14 @@ const tests: Record<
       ActionbarPriority.Highest,
     )
 
-    for (const vector of Vector.foreach(from, to)) {
+    for (const vector of Vector.forEach(from, to)) {
       const block = world.overworld.getBlock(vector)
       if (!block) continue
 
       block.setType(MinecraftBlockTypes.GrassBlock)
     }
 
-    for (const vector of Vector.foreach(from, to)) {
+    for (const vector of Vector.forEach(from, to)) {
       if (skipForBlending(lore, { vector, center })) continue
 
       const block = world.overworld.getBlock(vector)
@@ -338,7 +338,7 @@ const tests: Record<
     system.runJob(
       (function* lush() {
         let i = 0
-        for (const vector of Vector.foreach(...Vector.around(ctx.player.location, 5))) {
+        for (const vector of Vector.forEach(...Vector.around(ctx.player.location, 5))) {
           i++
           if (i % 100 === 0) yield
 

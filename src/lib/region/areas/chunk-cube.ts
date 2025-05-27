@@ -27,7 +27,7 @@ class ChunkCube extends Area<ChunkCubeDatabase> {
 
     const { from, to } = this.database
 
-    return VecXZ.between(
+    return VecXZ.isBetween(
       distance === 0 ? from : VecXZ.add(from, { x: -distance, z: -distance }),
       distance === 0 ? to : VecXZ.add(to, { x: distance, z: distance }),
       vector,
@@ -54,8 +54,8 @@ class ChunkCube extends Area<ChunkCubeDatabase> {
     const { max, min } = this.dimension.heightRange
     const { from, to } = this.database
     return [
-      { x: from.x, y: max, z: from.z },
-      { x: to.x, y: min, z: to.z },
+      { x: from.x, y: min, z: from.z },
+      { x: to.x, y: max, z: to.z },
     ]
   }
 }

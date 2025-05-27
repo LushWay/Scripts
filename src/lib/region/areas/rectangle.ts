@@ -27,7 +27,7 @@ class Rectangle extends Area<RectangleDatabase> {
 
     const { from, to } = this.database
 
-    return Vector.between(
+    return Vector.isBetween(
       distance === 0 ? from : Vector.add(from, { x: -distance, y: -distance, z: -distance }),
       distance === 0 ? to : Vector.add(to, { x: distance, y: distance, z: distance }),
       vector,

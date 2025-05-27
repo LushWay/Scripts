@@ -102,7 +102,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
         await cutscene.forEachPoint(
           point => {
-            if (!Vector.valid(point)) return
+            if (!Vector.isValid(point)) return
             particle(point, whiteParticle)
           },
           { controller, sections, intervalTime: 1 },

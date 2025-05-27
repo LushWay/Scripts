@@ -27,8 +27,8 @@ class FlattenedSphere extends Area<{
       center: { x, y, z },
     } = this.database
     return [
-      { x: x + rx, y: y + ry, z: z + rx },
-      { x: x - rx, y: y - ry, z: y - rx },
+      { x: x - rx, y: y - ry, z: z - rx },
+      { x: x + rx, y: y + ry, z: y + rx },
     ]
   }
 

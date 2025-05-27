@@ -1,12 +1,12 @@
 import { PlaceAction } from 'lib/action'
+import { RegionEvents } from 'lib/region/events'
+import { Region } from 'lib/region/index'
 import { Vector } from 'lib/vector'
 import { PlayerQuest } from '../player'
-import { Region } from 'lib/region/index'
-import { RegionEvents } from 'lib/region/events'
 
 export function QSPlace(this: PlayerQuest, from: Vector3, to: Vector3, text: Text) {
   return this.dynamic(text).activate(ctx => {
-    const actions = [...Vector.foreach(from, to)].map(pos =>
+    const actions = [...Vector.forEach(from, to)].map(pos =>
       PlaceAction.onEnter(pos, player => {
         if (player.id !== this.player.id) return
         ctx.next()

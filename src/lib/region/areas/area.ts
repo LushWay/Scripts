@@ -38,7 +38,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   }
 
   /** Edges of the area */
-  abstract get edges(): [Vector3, Vector3]
+  abstract get edges(): [min: Vector3, max: Vector3]
 
   /** Center of the area */
   abstract get center(): Vector3
@@ -61,7 +61,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
   get size() {
     const [from, to] = this.edges
-    return Vector.subtract(from, to)
+    return Vector.subtract(to, from)
   }
 
   /**
@@ -88,7 +88,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
         (function* forEachRegionVectorJob() {
           try {
             let i = 0
-            for (const vector of Vector.foreach(...edges)) {
+            for (const vector of Vector.forEach(...edges)) {
               const result = callback(vector, isIn(vector), dimension)
               if (result === STOP_AREA_FOR_EACH_VECTOR) break
               i++

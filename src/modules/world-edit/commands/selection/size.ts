@@ -30,7 +30,7 @@ command
     const we = getSelection(ctx)
     if (!we) return
 
-    const isIn = Vector.between(we.pos1, we.pos2, location)
+    const isIn = Vector.isBetween(we.pos1, we.pos2, location)
     ctx.reply(
       (isIn
         ? t

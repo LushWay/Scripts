@@ -94,7 +94,7 @@ export class WorldEdit {
   }
 
   private updateSelectionCuboids() {
-    if (!Vector.valid(this.pos1) || !Vector.valid(this.pos2)) return
+    if (!Vector.isValid(this.pos1) || !Vector.isValid(this.pos2)) return
 
     this.selection = new Cuboid(this.pos1, this.pos2)
     this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
@@ -376,7 +376,7 @@ export class WorldEdit {
       system.runJob(
         (function* fillBetweenJob() {
           let i = 0
-          for (const position of Vector.foreach(selection.min, selection.max)) {
+          for (const position of Vector.forEach(selection.min, selection.max)) {
             i++
             const block = world.overworld.getBlock(position)
             if (!block) continue

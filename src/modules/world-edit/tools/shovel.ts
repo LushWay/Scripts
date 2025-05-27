@@ -169,7 +169,7 @@ class ShovelTool extends WorldEditTool<Storage> {
       to,
     )
 
-    for (const vector of Vector.foreach(from, to)) {
+    for (const vector of Vector.forEach(from, to)) {
       if (skipForBlending(storage, { vector, center })) continue
 
       const block = world.overworld.getBlock(vector)

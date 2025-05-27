@@ -74,7 +74,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
         const blendOptions = { ...storage, radius: storage.size }
 
         let blocksSet = 0
-        for (const vector of Vector.foreach(from, to)) {
+        for (const vector of Vector.forEach(from, to)) {
           const condition = shape(
             Object.setPrototypeOf(
               { rad: size, ...vector } satisfies Omit<Parameters<ShapeFormula>[0], keyof Cuboid>,

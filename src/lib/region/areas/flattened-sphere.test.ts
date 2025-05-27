@@ -19,8 +19,8 @@ describe('rectangle', () => {
     expect(flts.isNear(createPoint(12, 0, 0), 1)).toBe(false)
 
     expect(flts.edges).toEqual([
-      { x: 10, y: 2, z: 10 },
       { x: -10, y: -2, z: -10 },
+      { x: 10, y: 2, z: 10 },
     ])
 
     expect(flts.radius).toBe(10)

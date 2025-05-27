@@ -125,10 +125,10 @@ export class Compass {
   }
 
   private static getCompassItem(view: Vector3, origin: Vector3, target: Vector3) {
-    if (!Vector.valid(view) || !Vector.valid(target) || !Vector.valid(origin)) return
+    if (!Vector.isValid(view) || !Vector.isValid(target) || !Vector.isValid(origin)) return
 
     const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
-    const ot = Vector.multiply(Vector.subtract(target, origin), { x: 1, y: 0, z: 1 }).normalized()
+    const ot = Vector.subtract(target, origin).multiply({ x: 1, y: 0, z: 1 }).normalized()
     const cos = Vector.dot(v, ot)
     const sin = Vector.dot(Vector.cross(ot, v), Vector.up)
     const angle = Math.atan2(sin, cos)
