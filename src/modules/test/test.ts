@@ -31,7 +31,6 @@ import {
   util,
 } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { ChunkQuery } from 'lib/chunk-query'
 import { CommandContext } from 'lib/command/context'
 import { parseArguments } from 'lib/command/utils'
 import { Cutscene } from 'lib/cutscene'
@@ -44,6 +43,7 @@ import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
+import { toPoint } from 'lib/utils/point'
 import { requestAirdrop } from 'modules/places/anarchy/airdrop'
 import { BaseRegion } from 'modules/places/base/region'
 import { skipForBlending } from 'modules/world-edit/utils/blending'
@@ -78,7 +78,7 @@ const tests: Record<
 
   duplicates() {
     const keys = new Set<string>()
-    for (const chunk of ChunkQuery.getChunks(Region.chunkQuery).get('overworld') ?? []) {
+    for (const chunk of Region.chunkQuery.getStorage('overworld')) {
       // @ts-expect-error aaaaaaaaaaaaaaaaaaaaaaaaaaa
       const key = chunk.getKey()
       if (keys.has(key)) {
@@ -94,8 +94,8 @@ const tests: Record<
   chunksNear(ctx) {
     const distance = Number(ctx.args[1] ?? '5')
     const near = Region.chunkQuery
-      .getChunksNear(ctx.player, distance)
-      .map(e => `size: ${e.size}, x: ${e.indexX}, z: ${e.indexZ}`)
+      .getChunksNear(toPoint(ctx.player), distance)
+      .map(e => `xfrom: ${e.from.x} zfrom: ${e.from.z} x: ${e.indexX}, z: ${e.indexZ}`)
     console.log(near)
     ctx.player.success('' + near.length)
   },
@@ -144,10 +144,10 @@ const tests: Record<
         .map(type => {
           const label = t`${type.name} ${type.getAll().length} - `
           return [
-            [() => type.getManyAt(ctx.player), label + 'getManyAt old'],
-            // [() => type.getManyAtV2(ctx.player), label + 'getManyAt §lnew'],
-            [() => type.getNear(ctx.player, 10), label + 'getNear old'],
-            // [() => type.getNearV2(ctx.player, 10), label + 'getNear §lnew'],
+            [() => type.getManyAt(ctx.player, false), label + 'getManyAt old'],
+            [() => type.getManyAt(ctx.player, true), label + 'getManyAt §lnew'],
+            [() => type.getNear(ctx.player, 10, true), label + 'getNear old'],
+            [() => type.getNear(ctx.player, 10, false), label + 'getNear §lnew'],
           ] as [VoidFunction, string][]
         })
         .flat(),

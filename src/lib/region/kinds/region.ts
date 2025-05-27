@@ -1,10 +1,9 @@
 import { Player, world } from '@minecraft/server'
-import { ChunkQuery } from 'lib/chunk-query'
+import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { ActionForm } from 'lib/form/action'
 import { util } from 'lib/util'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
 import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 import { RegionStructure } from '../structure'
@@ -97,11 +96,13 @@ export class Region {
   static chunkQuery = new ChunkQuery<Region>(
     (vector, object) => object.area.isIn({ vector, dimensionType: object.area.dimensionType }),
     (vector, object, distance) => object.area.isNear({ vector, dimensionType: object.area.dimensionType }, distance),
+    (chunk, object) =>
+      object.area.isNear(
+        { dimensionType: chunk.dimensionType, vector: { ...chunk.center, y: object.area.center.y } },
+        ChunkArea.size,
+      ),
     object => object.dimensionType,
-    object => {
-      const [from, to] = object.area.edges
-      return [Vector.min(from, to), Vector.max(from, to)]
-    },
+    object => object.area.edges,
   )
 
   /** Regions list */
@@ -125,10 +126,11 @@ export class Region {
     this: RegionConstructor<I> | typeof Region,
     point: AbstractPoint,
     radius: number,
+    chunkQuery = false, // Still slower. Need to investigate
   ): I[] {
     point = toPoint(point)
 
-    if (this.regions.length > 50) {
+    if (chunkQuery) {
       const all = this.chunkQuery.getNear(point, radius)
       return (this === Region ? all : all.filter(e => e instanceof this)) as I[]
     }
@@ -150,10 +152,14 @@ export class Region {
    *
    * @param point - Represents point in the world
    */
-  static getManyAt<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
+  static getManyAt<I extends Region>(
+    this: RegionConstructor<I> | typeof Region,
+    point: AbstractPoint,
+    chunkQuery = true, // 99% faster then iteration
+  ): I[] {
     point = toPoint(point)
 
-    if (this.regions.length > 50) {
+    if (chunkQuery) {
       const all = this.chunkQuery.getAt(point)
       const filtered = (this === Region ? all : all.filter(e => e instanceof this)) as I[]
       return filtered.sort((a, b) => b.priority - a.priority)

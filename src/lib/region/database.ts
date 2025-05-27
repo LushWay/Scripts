@@ -47,7 +47,7 @@ system.delay(() => {
       for (const r of RegionDatabase.entries()) {
         restoreRegionFromJSON(r)
         i++
-        if (i % 500 === 0) yield
+        if (i % 100 === 0) yield
       }
     })(),
   )
