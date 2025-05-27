@@ -1,4 +1,4 @@
-import { createPoint } from 'lib'
+import { createPoint } from 'lib/utils/point'
 import { FlattenedSphereArea } from './flattened-sphere'
 
 describe('rectangle', () => {

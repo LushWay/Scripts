@@ -1,4 +1,5 @@
-import { createPoint, Vector } from 'lib'
+import { createPoint } from 'lib/utils/point'
+import { Vector } from 'lib/vector'
 import { RectangleArea } from './rectangle'
 
 describe('rectangle', () => {

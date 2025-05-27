@@ -1,7 +1,7 @@
 import { GameMode, Player, system } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { toPoint } from 'lib/game-utils'
 import { registerRegionType } from 'lib/region/command'
+import { toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
 import { Region, RegionCreationOptions, RegionPermissions } from './region'

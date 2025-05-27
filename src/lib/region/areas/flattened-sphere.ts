@@ -1,6 +1,6 @@
 import { Vector3 } from '@minecraft/server'
+import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vector } from 'lib/vector'
-import { AbstractPoint, toPoint } from 'lib/game-utils'
 import { Area } from './area'
 
 class FlattenedSphere extends Area<{

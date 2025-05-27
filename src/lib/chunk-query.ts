@@ -1,7 +1,20 @@
-import { AbstractPoint, toFlooredPoint, toPoint, VectorInDimension } from 'lib/game-utils'
 import { util } from 'lib/util'
 import { inspect } from 'lib/utils/inspect'
 import { VecXZ } from 'lib/vector'
+import { AbstractPoint, toFlooredPoint, VectorInDimension } from './utils/point'
+
+const chunkSize = 16
+
+function getChunkIndexes(x: number, z: number, size = chunkSize) {
+  const indexX = Math.floor(x / size)
+  const indexZ = Math.floor(z / size)
+
+  return { indexX, indexZ }
+}
+
+function getChunkKey(indexX: number, indexZ: number, size = chunkSize) {
+  return `${indexX} ${indexZ} ${size}`
+}
 
 export class ChunkArea {
   static size = 16
@@ -20,8 +33,9 @@ export class ChunkArea {
     readonly dimensionType: DimensionType,
     readonly parent: Chunk | undefined,
   ) {
-    this.indexX = Math.floor(x / size)
-    this.indexZ = Math.floor(z / size)
+    const { indexX, indexZ } = getChunkIndexes(x, z, size)
+    this.indexX = indexX
+    this.indexZ = indexZ
 
     this.from = { x: this.indexX * size, z: this.indexZ * size }
     this.to = { x: this.from.x + size - 1, z: this.from.z + size - 1 }
@@ -29,12 +43,12 @@ export class ChunkArea {
   }
 
   isAt(point: Vector3): boolean {
-    return VecXZ.between(this.from, this.to, point)
+    return VecXZ.isBetween(this.from, this.to, point)
   }
 
   isNear(point: Vector3, distance: number): boolean {
     const { from, to } = this
-    return VecXZ.between(
+    return VecXZ.isBetween(
       VecXZ.add(from, { x: -distance, z: -distance }),
       VecXZ.add(to, { x: distance, z: distance }),
       point,
@@ -230,7 +244,8 @@ export class Chunk64 extends Chunk {
       for (let z = area.from.z; z <= to.z; z += step) {
         if (!isQuery && !this.isAt({ x, z, y: 0 })) continue
 
-        const key = this.getKey(Math.floor(x / step), Math.floor(z / step), step)
+        const { indexX, indexZ } = getChunkIndexes(x, z)
+        const key = getChunkKey(indexX, indexZ, step)
         const existing = createdChunks.get(key)
 
         if (visited.has(existing)) continue // Skip already visited chunks to not add twice
@@ -239,7 +254,7 @@ export class Chunk64 extends Chunk {
         if (existing) chunk = existing
         else {
           chunk = new this.children(x, z, this.children.size, dimensionType, this)
-          createdChunks.set((chunk as Chunk64).getKey(), chunk)
+          createdChunks.set(key, chunk)
         }
 
         visited.add(chunk)
@@ -258,14 +273,16 @@ export class Chunk64 extends Chunk {
   }
 }
 
+type ChunksCache = Map<string, Chunk>
+
 export class ChunkQuery<T extends object = any> extends Chunk64 {
   static chunks = Chunk64.createDimensionTypeChunkStorage()
 
-  private chunksCache = new Map<DimensionType, Map<string, Chunk>>()
+  private chunksCache = new Map<DimensionType, ChunksCache>()
 
-  getChunksCache(dimensionType: DimensionType): Map<string, Chunk> {
+  getChunksCache(dimensionType: DimensionType): ChunksCache {
     let cache = this.chunksCache.get(dimensionType)
-    if (!cache) this.chunksCache.set(dimensionType, (cache = new Map<string, Chunk>()))
+    if (!cache) this.chunksCache.set(dimensionType, (cache = new Map() as ChunksCache))
 
     return cache
   }
@@ -286,12 +303,38 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
     super(0, 0, 1, 'overworld', undefined)
   }
 
+  private getChunkAt(x: number, z: number, cache: ChunksCache) {
+    const { indexX, indexZ } = getChunkIndexes(x, z)
+    const key = getChunkKey(indexX, indexZ)
+    return cache.get(key)
+  }
+
   getAt(point: AbstractPoint): T[] {
-    return super.getAt(toFlooredPoint(point), this) as T[]
+    point = toFlooredPoint(point)
+
+    const chunk = this.getChunkAt(point.vector.x, point.vector.z, this.getChunksCache(point.dimensionType))
+
+    if (!chunk) return []
+    return chunk.getAt(point, this, new QueryContext()) as T[]
   }
 
   getNear(point: AbstractPoint, distance: number): T[] {
-    return super.getNear(toFlooredPoint(point), distance, this) as T[]
+    point = toFlooredPoint(point)
+
+    const ctx = new QueryContext()
+    const result: object[] = []
+    const cache = this.getChunksCache(point.dimensionType)
+    const [from, to] = VecXZ.around(point.vector, distance + chunkSize)
+    for (let x = from.x; x <= to.x; x += chunkSize) {
+      for (let z = from.z; z <= to.z; z += chunkSize) {
+        const chunk = this.getChunkAt(x, z, cache)
+        if (!chunk) continue
+
+        result.push(...chunk.getNear(point, distance, this, ctx))
+      }
+    }
+
+    return result as T[]
   }
 
   getChunksNear(point: AbstractPoint, distance: number): Chunk[] {
@@ -313,4 +356,10 @@ export class ChunkQuery<T extends object = any> extends Chunk64 {
   storageSize(dimensionType: DimensionType = 'overworld') {
     return super.storageSize(dimensionType, this)
   }
+}
+
+function getOrCreate<K, V>(map: Map<K, V>, key: K, create: (key: K) => V): V {
+  let value = map.get(key)
+  if (typeof value === 'undefined') map.set(key, (value = create(key)))
+  return value
 }

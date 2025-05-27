@@ -1,4 +1,4 @@
-import { createPoint } from 'lib/game-utils'
+import { createPoint } from 'lib/utils/point'
 import { Vector } from 'lib/vector'
 import { TEST_createPlayer } from 'test/utils'
 import { SphereArea } from '../areas/sphere'

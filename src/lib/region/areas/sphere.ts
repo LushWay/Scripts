@@ -1,4 +1,4 @@
-import { AbstractPoint, toPoint } from 'lib/game-utils'
+import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vector } from 'lib/vector'
 import { Area } from './area'
 

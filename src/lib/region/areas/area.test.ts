@@ -1,5 +1,5 @@
 import { Vector3 } from '@minecraft/server'
-import { AbstractPoint } from 'lib/game-utils'
+import { AbstractPoint } from 'lib/utils/point'
 import { Area } from './area'
 
 describe('area reg', () => {

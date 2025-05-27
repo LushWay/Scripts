@@ -10,9 +10,10 @@ import {
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { AbstractPoint, isNotPlaying } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/game-utils'
 import { onPlayerMove } from 'lib/player-move'
 import { t } from 'lib/text'
+import { AbstractPoint } from 'lib/utils/point'
 import { Vector } from 'lib/vector'
 import { EventSignal } from '../event-signal'
 import {

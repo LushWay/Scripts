@@ -1,6 +1,6 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { AbstractPoint } from 'lib/game-utils'
 import { t } from 'lib/text'
+import { AbstractPoint } from 'lib/utils/point'
 import { Vector } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area

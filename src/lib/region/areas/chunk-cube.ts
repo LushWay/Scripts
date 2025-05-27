@@ -1,5 +1,5 @@
 import { Vector3 } from '@minecraft/server'
-import { AbstractPoint, toPoint } from 'lib/game-utils'
+import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { VecXZ } from 'lib/vector'
 import { Area } from './area'
 

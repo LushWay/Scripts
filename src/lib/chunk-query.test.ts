@@ -1,7 +1,7 @@
-import { createPoint } from 'lib/game-utils'
 import { Vector } from 'lib/vector'
-import { Chunk64, ChunkArea, ChunkQuery } from './chunk-query'
+import { ChunkArea, ChunkQuery } from './chunk-query'
 import { SphereArea } from './region/areas/sphere'
+import { createPoint, VectorInDimension } from './utils/point'
 
 function byId(object: { id: number }) {
   if (object && 'id' in object) return object.id
@@ -16,39 +16,28 @@ function byRadius(object: { radius: number }) {
 function inspectChunks(query: ChunkQuery, dimensionType: DimensionType = 'overworld') {
   let results: (VectorXZ & { v: string })[] = []
 
-  const chunksFrom = (c: typeof ChunkQuery | Chunk64) => ChunkQuery.getChunks(query)?.get(dimensionType) ?? []
-
   let fromX
   let fromZ
   let toX
   let toZ
 
-  for (const e of chunksFrom(ChunkQuery)) {
-    if (!(e instanceof Chunk64)) return
+  for (const chunk of query.getChunks(dimensionType).values()) {
+    const x = chunk.indexX
+    const z = chunk.indexZ
 
-    // @ts-expect-error aaaaaaa
-    const size = e.children.size
-    for (let x = e.from.x; x <= e.to.x; x += size) {
-      for (let z = e.from.z; z <= e.to.z; z += size) {
-        const chunk = e.getChunksAt({ vector: { x, z, y: 0 }, dimensionType }, query)[0]
+    const result = '' + chunk.storageSize(dimensionType, query).objects
 
-        let result = ''
-        if (chunk) result = '' + chunk.storageSize(dimensionType, query).objects
-        else result = '*'
+    fromX ??= x
+    fromZ ??= z
+    toX ??= x
+    toZ ??= z
 
-        fromX ??= x
-        fromZ ??= z
-        toX ??= x
-        toZ ??= z
+    fromX = Math.min(fromX, x)
+    fromZ = Math.min(fromZ, z)
+    toX = Math.max(toX, x)
+    toZ = Math.max(toZ, z)
 
-        fromX = Math.min(fromX, x)
-        fromZ = Math.min(fromZ, z)
-        toX = Math.max(toX, x)
-        toZ = Math.max(toZ, z)
-
-        results.push({ x, z, v: result })
-      }
-    }
+    results.push({ x, z, v: result })
   }
 
   let result = `x: ${fromX}  z: ${fromZ}\n\n`
@@ -76,7 +65,6 @@ describe('ChunkQuery', () => {
         (vector, object, distance) => Vector.distanceCompare(vector, object.vector, distance + 1),
         object => object.dimensionType,
         object => [object.vector, object.vector] as const,
-        ChunkQuery.createDimensionTypeChunkStorage(),
       )
 
     function createSinglePoint(x: number, y: number, z: number, id: number, dimensionType?: DimensionType) {
@@ -253,7 +241,6 @@ describe('ChunkQuery', () => {
           const [from, to] = object.edges
           return [Vector.min(from, to), Vector.max(from, to)]
         },
-        ChunkQuery.createDimensionTypeChunkStorage(),
       )
 
     function createSinglePoint(x: number, y: number, z: number, radius: number, dimensionType?: DimensionType) {
@@ -552,14 +539,14 @@ describe('ChunkQuery', () => {
         createSinglePoint(5, 5, 5, 13),
         createSinglePoint(-5, 0, 0, 14),
       ]
-      const neverHitPoint = createSinglePoint(0, 1, 30, 15)
+      const neverHitPoint = createSinglePoint(0, 0, 46, 15)
       const spy = vi.spyOn(neverHitPoint, 'isNear')
       points.push(neverHitPoint)
 
       const point = createPoint(5, 0, 0)
-      const iteration = points.filter(e => e.isNear(point, 5))
+      const iteration = (point: VectorInDimension) => points.filter(e => e.isNear(point, 10)).map(byRadius)
 
-      expect(iteration.map(byRadius)).toMatchInlineSnapshot(`
+      expect(iteration(point)).toMatchInlineSnapshot(`
         [
           10,
           11,
@@ -568,14 +555,12 @@ describe('ChunkQuery', () => {
           14,
         ]
       `)
-
       expect(spy).toHaveBeenCalledTimes(1)
 
       const query = createQuery()
-
       points.forEach(e => query.add(e))
 
-      expect(query.getNear(point, 10).map(byRadius)).toMatchInlineSnapshot(`
+      expect(query.getNear(point, 10).map(byRadius).sort()).toMatchInlineSnapshot(`
         [
           10,
           11,
@@ -586,9 +571,12 @@ describe('ChunkQuery', () => {
       `)
 
       expect(spy).toHaveBeenCalledTimes(1)
+
+      const newPoint = createPoint(3.14, 4.0, 6.88)
+      expect(query.getNear(newPoint, 10).map(byRadius).sort()).toEqual(iteration(newPoint))
     })
 
-    it('should work with stone quarry', () => {
+    it('should work with decimals', () => {
       const query = createQuery()
 
       query.add(createSinglePoint(-1321, 88, 14816, 200))
