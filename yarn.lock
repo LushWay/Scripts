@@ -3898,7 +3898,7 @@ __metadata:
     typescript-eslint: "npm:^8.32.1"
     typescript-plugin-import-filter: "npm:^0.2.0"
     vite-tsconfig-paths: "npm:5.1.4"
-    vitest: "npm:^3.1.4"
+    vitest: "npm:3.1.4"
   languageName: unknown
   linkType: soft
 
@@ -4507,7 +4507,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^3.1.4":
+"vitest@npm:3.1.4":
   version: 3.1.4
   resolution: "vitest@npm:3.1.4"
   dependencies:
