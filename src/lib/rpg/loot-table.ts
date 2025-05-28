@@ -67,20 +67,8 @@ export class Loot {
    *
    * @param type Keyof MinecraftItemTypes
    */
-  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>): this
-
-  /**
-   * Creates new item entry
-   *
-   * @param type String type of the item
-   */
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  item(type: string): this
-
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-  item(type: string | Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
-    if (isKeyof(type, MinecraftItemTypes)) type = MinecraftItemTypes[type]
-    this.create(new ItemStack(type))
+  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
+    this.create(new ItemStack(isKeyof(type, MinecraftItemTypes) ? MinecraftItemTypes[type] : type))
 
     return this
   }
