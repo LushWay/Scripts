@@ -108,7 +108,7 @@ const loot: Record<string, LootTable | undefined> = {
       '5...20': '1%',
     })
 
-    .item('Iron')
+    .item('IronIngot')
     .chance('5%')
     .amount({
       '5...10': '1%',
