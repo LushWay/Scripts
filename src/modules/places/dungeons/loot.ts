@@ -8,7 +8,13 @@ import { BaseItem } from '../base/base'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)
-  .chance('10%')
+  .chance('5%')
+
+  .item('Apple')
+  .chance('5%')
+  .amount({
+    '5...20': '1%',
+  })
 
   .item(Items.Money)
   .chance('100%')
@@ -17,34 +23,24 @@ const defaultLoot = new Loot('dungeon_default_loot')
     '21...64': '20%',
   })
 
-  .item('Apple')
-  .chance('5%')
-  .amount({
-    '10...20': '80%',
-    '21...64': '20%',
-  })
-
   .itemStack(FireBallItem)
   .chance('10%')
   .amount({
-    '10...29': '80%',
-    '30...64': '20%',
+    '10...32': '1%',
   })
 
   .itemStack(IceBombItem)
   .chance('10%')
   .amount({
-    '10...29': '80%',
-    '30...64': '20%',
+    '10...32': '1%',
   })
 
   .item('BakedPotato')
   .chance('10%')
   .amount({
-    '10...20': '80%',
-    '21...64': '20%',
+    '5...10': '80%',
+    '11...30': '20%',
   })
-
   .trash({ web: 4, string: 1 }).build
 
 const d = StructureDungeonsId
@@ -64,7 +60,40 @@ const customNames: Record<string, string> = {
 }
 
 const powerfullLoot: Record<string, LootTable | undefined> = {
-  [d.Avanpost]: new Loot(d.Avanpost + ' powerfull').item('GoldenApple').chance('100%').build,
+  [d.Avanpost]: new Loot(d.Avanpost + ' powerfull')
+    .item('GoldenApple')
+    .chance('10%')
+    .amount({
+      '5...20': '1%',
+    })
+
+    .item('IronIngot')
+    .chance('10%')
+    .amount({
+      '5...10': '1%',
+    })
+
+    .item('GoldenCarrot')
+    .chance('10%')
+    .amount({
+      '5...20': '1%',
+    })
+
+    .item('GoldIngot')
+    .chance('5%')
+    .amount({
+      '5...10': '1%',
+    })
+
+    .item('TotemOfUndying')
+    .chance('5%')
+
+    .item(Items.Money)
+    .chance('100%')
+    .amount({
+      '10...20': '80%',
+      '21...64': '20%',
+    }).build,
 } satisfies Partial<Record<StructureDungeonsId, LootTable>>
 
 const loot: Record<string, LootTable | undefined> = {
@@ -72,16 +101,23 @@ const loot: Record<string, LootTable | undefined> = {
   [d.GasStation2]: defaultLoot,
   [d.GasStation3]: defaultLoot,
   [d.GasStation4]: defaultLoot,
-  [d.Avanpost]: new Loot(d.Avanpost).item('Apple').chance('100%').build,
-  [d.GasStationGarage]: new Loot(`dungeon ${d.GasStationGarage}`)
-    .itemStack(CannonShellItem.blueprint)
-    .chance('1%')
-
+  [d.Avanpost]: new Loot(d.Avanpost)
     .item('Apple')
+    .chance('10%')
+    .amount({
+      '5...20': '1%',
+    })
+
+    .item('Iron')
     .chance('5%')
     .amount({
-      '10...20': '80%',
-      '21...64': '20%',
+      '5...10': '1%',
+    })
+
+    .item('Carrot')
+    .chance('10%')
+    .amount({
+      '5...20': '1%',
     })
 
     .item(Items.Money)
@@ -89,30 +125,8 @@ const loot: Record<string, LootTable | undefined> = {
     .amount({
       '10...20': '80%',
       '21...64': '20%',
-    })
-
-    .itemStack(FireBallItem)
-    .chance('10%')
-    .amount({
-      '1...9': '80%',
-      '10...16': '20%',
-    })
-
-    .itemStack(IceBombItem)
-    .chance('10%')
-    .amount({
-      '1...9': '80%',
-      '10...16': '20%',
-    })
-
-    .item('BakedPotato')
-    .chance('10%')
-    .amount({
-      '10...20': '80%',
-      '21...64': '20%',
-    })
-
-    .trash({ string: 5, web: 8 }).build,
+    }).build,
+  [d.GasStationGarage]: defaultLoot,
 } satisfies Record<StructureDungeonsId, LootTable>
 
 const customLoot: Record<string, LootTable | undefined> = {
@@ -153,7 +167,7 @@ const customLoot: Record<string, LootTable | undefined> = {
     .item('NetheriteSword')
     .chance('1%')
     .enchantmetns({
-      'minecraft:sharpness': { '1...3': '1%', '4...5': '10%' },
+      sharpness: { '1...3': '1%', '4...5': '10%' },
     })
 
     .itemStack(CannonItem.itemStack)
