@@ -1,5 +1,6 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Items } from 'lib/assets/custom-items'
 import { Command } from 'lib/command'
 import { EventSignal } from 'lib/event-signal'
 import { inspect, isKeyof, pick } from 'lib/util'
@@ -67,7 +68,7 @@ export class Loot {
    *
    * @param type Keyof MinecraftItemTypes
    */
-  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
+  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'> | Items) {
     this.create(new ItemStack(isKeyof(type, MinecraftItemTypes) ? MinecraftItemTypes[type] : type))
 
     return this
