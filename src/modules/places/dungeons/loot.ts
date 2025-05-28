@@ -8,7 +8,7 @@ import { BaseItem } from '../base/base'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)
-  .chance('5%')
+  .chance('1%')
 
   .item('Apple')
   .chance('5%')
