@@ -1,5 +1,5 @@
 import { AbstractPoint, toPoint } from 'lib/utils/point'
-import { Vector, VecXZ } from 'lib/vector'
+import { Vec, VecXZ } from 'lib/vector'
 import { Area } from './area'
 
 class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radius: number; yradius: number }> {
@@ -11,13 +11,13 @@ class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radiu
 
     return (
       Math.abs(this.database.center.y - vector.y) <= this.database.yradius + distance &&
-      VecXZ.distanceCompare(this.database.center, vector, this.database.radius + distance)
+      VecXZ.isInsideRadius(this.database.center, vector, this.database.radius + distance)
     )
   }
 
   get edges() {
     const x = this.database.radius - 1
-    return Vector.around(this.database.center, x, this.database.yradius - 1, x)
+    return Vec.around(this.database.center, x, this.database.yradius - 1, x)
   }
 
   get radius() {
@@ -37,7 +37,7 @@ class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radiu
   }
 
   getFormDescription(): Record<string, unknown> {
-    return { Center: Vector.string(this.center, true), Radius: this.radius, YRadius: this.database.yradius }
+    return { Center: Vec.string(this.center, true), Radius: this.radius, YRadius: this.database.yradius }
   }
 }
 

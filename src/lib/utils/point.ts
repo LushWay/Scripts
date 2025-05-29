@@ -1,5 +1,5 @@
 import { Block, Entity } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 /** Represents location in the specific dimension */
 
@@ -20,7 +20,7 @@ export function toPoint(abstractPoint: AbstractPoint): VectorInDimension {
 
 export function toFlooredPoint(abstractPoint: AbstractPoint): VectorInDimension {
   const { vector, dimensionType } = toPoint(abstractPoint)
-  return { vector: Vector.floor(vector), dimensionType }
+  return { vector: Vec.floor(vector), dimensionType }
 }
 
 export function createPoint(

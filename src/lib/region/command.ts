@@ -9,7 +9,7 @@ import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/kinds/region'
 import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Area } from './areas/area'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { CylinderArea } from './areas/cylinder'
@@ -63,7 +63,7 @@ system.runInterval(
         if (!Region.regions.includes(region)) return
 
         try {
-          const r = Vector.distance(region.area.center, vector)
+          const r = Vec.distance(region.area.center, vector)
           if (isIn && r > region.area.radius - 1) {
             for (const player of playersNearRegion) {
               if (!player.isValid) continue
@@ -282,7 +282,7 @@ function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, p
   const parsed = parseLocationArguments([x, y, z], player)
   if (!parsed) return ctx.error('Неправильная локация: ' + inspect(location))
 
-  return Vector.floor(parsed) as Vector3
+  return Vec.floor(parsed) as Vector3
 }
 
 export function editRegionPermissions(
@@ -338,7 +338,7 @@ export function editRegionPermissions(
     if (region.area instanceof SphereArea)
       form
         .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
-        .addTextField('Центр региона', Vector.string(region.area.center), Vector.string(region.area.center))
+        .addTextField('Центр региона', Vec.string(region.area.center), Vec.string(region.area.center))
   }
   form.show(player, (ctx, doors, switches, trapdoors, containers, fences, pvp, radiusOrCenter, rawCenter) => {
     region.permissions.doors = doors

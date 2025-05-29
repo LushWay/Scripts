@@ -1,5 +1,5 @@
 import { Block, Player, system, world } from '@minecraft/server'
-import { actionGuard, ActionGuardOrder, LockAction, Region, Vector } from 'lib'
+import { actionGuard, ActionGuardOrder, LockAction, Region, Vec } from 'lib'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { t } from 'lib/text'
 import { askForExitingNewbieMode, isNewbie } from 'modules/pvp/newbie'
@@ -59,7 +59,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 })
 
 function createBase(block: Block, player: Player) {
-  const center = Vector.floor(block.location)
+  const center = Vec.floor(block.location)
   if (!player.isSimulated()) baseLogger.player(player).info`Created on ${center}`
 
   const level = baseLevels[1]

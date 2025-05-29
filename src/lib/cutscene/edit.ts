@@ -1,7 +1,7 @@
 /* i18n-ignore */
 
 import { Container, ItemStack, MolangVariableMap, Player } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
@@ -102,7 +102,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
         await cutscene.forEachPoint(
           point => {
-            if (!Vector.isValid(point)) return
+            if (!Vec.isValid(point)) return
             particle(point, whiteParticle)
           },
           { controller, sections, intervalTime: 1 },
@@ -187,7 +187,7 @@ const EditingCutscene = new Map<string, EditingCutscenePlayer>()
 function backupPlayerInventoryAndCutscene(player: Player, cutscene: Cutscene) {
   EditingCutscene.set(player.id, {
     hotbarSlots: backupPlayerInventory(player),
-    position: Vector.floor(player.location),
+    position: Vec.floor(player.location),
     cutsceneSectionsBackup: cutscene.sections.slice(),
   })
 

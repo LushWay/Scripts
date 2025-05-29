@@ -1,5 +1,5 @@
 import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Cuboid } from './cuboid'
 
 export interface BigStructureSaved extends JsonObject {
@@ -84,8 +84,8 @@ export class BigStructure extends Cuboid {
               if (position === min) {
                 to = file.min
               } else {
-                const offsetTo = Vector.subtract(file.min, min)
-                to = Vector.add(position, offsetTo)
+                const offsetTo = Vec.subtract(file.min, min)
+                to = Vec.add(position, offsetTo)
               }
 
               // console.log(`/structure load "${file.name}" ${Vector.string(to)}`)

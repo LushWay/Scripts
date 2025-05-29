@@ -1,9 +1,9 @@
 import { world } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 
 world.afterEvents.itemUse.subscribe(({ itemStack, source }) => {
   if (itemStack.typeId === Items.WeDash) {
-    source.teleport(Vector.add(source.location, Vector.multiply(source.getViewDirection(), 5)))
+    source.teleport(Vec.add(source.location, Vec.multiply(source.getViewDirection(), 5)))
   }
 })

@@ -1,6 +1,6 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 
 const fireworks = new Set<{ date: number; entity: Entity }>()
@@ -24,7 +24,7 @@ world.afterEvents.itemUse.subscribe(event => {
 
   for (const firework of fireworks) {
     if (!firework.entity.isValid) continue
-    if (Date.now() - firework.date < 5 && Vector.distance(event.source.location, firework.entity.location) < 2) {
+    if (Date.now() - firework.date < 5 && Vec.distance(event.source.location, firework.entity.location) < 2) {
       fireworks.delete(firework)
       console.log(firework.entity.id)
       explosibleEntities.add({ source: event.source, entity: firework.entity, explosion: fireworkExplosionOptions })

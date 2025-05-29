@@ -1,6 +1,6 @@
 import { Player, TicksPerSecond } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { LockAction, Vector } from 'lib'
+import { LockAction, Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { randomLocationInAnarchy } from 'modules/places/anarchy/random-location-in-anarchy'
@@ -41,7 +41,7 @@ export const rtpCommand = new Command('rtp')
     }).then(location => {
       if (!location) return cancelRtp(ctx.player)
 
-      rtpComplete(ctx.player, Vector.add(location.topmost, Vector.up))
+      rtpComplete(ctx.player, Vec.add(location.topmost, Vec.up))
     })
   })
   .overload('cancel')

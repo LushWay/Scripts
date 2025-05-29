@@ -1,6 +1,6 @@
 import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector, getAuxOrTexture, ms } from 'lib'
+import { Vec, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
@@ -119,7 +119,7 @@ actionGuard((player, region, ctx) => {
 
     if (lore.furnacer !== furnacer.id) return notAllowed(`Этот ключ используется для других печек!`)
 
-    const blockId = Vector.string(ctx.event.block)
+    const blockId = Vec.string(ctx.event.block)
     const furnace = FurnaceKeyItem.db.get(blockId)
 
     // Furnace is already taken
@@ -150,7 +150,7 @@ actionGuard((player, region, ctx) => {
           })
 
           lore.status = 'inUse'
-          lore.location = Vector.string(ctx.event.block.location, true)
+          lore.location = Vec.string(ctx.event.block.location, true)
           lore.player = player.name
 
           player.success(furnaceExpireTimeText)

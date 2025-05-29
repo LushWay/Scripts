@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import 'lib/database/scoreboard'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
 import { Group } from './rpg/place'
@@ -23,7 +23,7 @@ describe('location', () => {
 
   it('should create vectorable location', () => {
     const loc = location(point)
-    expect(Vector.is(loc)).toBe(true)
+    expect(Vec.isVec(loc)).toBe(true)
   })
 
   it('should create a location with default values', () => {

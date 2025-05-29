@@ -1,5 +1,5 @@
 import { createPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { TEST_createPlayer } from 'test/utils'
 import { SphereArea } from '../areas/sphere'
 import { Region } from './region'
@@ -9,12 +9,12 @@ describe('Region', () => {
   afterEach(() => (Region.regions = []))
 
   it('should create region', () => {
-    expect(Region.create(new SphereArea({ center: Vector.zero, radius: 0 }, 'overworld'))).toBeInstanceOf(Region)
+    expect(Region.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld'))).toBeInstanceOf(Region)
   })
 
   it('should return owner name', () => {
     const player = TEST_createPlayer()
-    const region = Region.create(new SphereArea({ center: Vector.zero, radius: 0 }, 'overworld'), {
+    const region = Region.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld'), {
       permissions: { owners: [player.id] },
     })
 

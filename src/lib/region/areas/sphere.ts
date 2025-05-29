@@ -1,5 +1,5 @@
 import { AbstractPoint, toPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Area } from './area'
 
 class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius: number }> {
@@ -9,11 +9,11 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
     const { vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
-    return Vector.distanceCompare(this.database.center, vector, this.radius + distance)
+    return Vec.isInsideRadius(this.database.center, vector, this.radius + distance)
   }
 
   get edges() {
-    return Vector.around(this.database.center, this.database.radius - 1)
+    return Vec.around(this.database.center, this.database.radius - 1)
   }
 
   get radius() {
@@ -33,7 +33,7 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
   }
 
   getFormDescription(): Record<string, unknown> {
-    return { Center: Vector.string(this.center, true), Radius: this.radius }
+    return { Center: Vec.string(this.center, true), Radius: this.radius }
   }
 }
 

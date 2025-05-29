@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ActionForm, LockAction, Vector, editRegionPermissions, manageRegionMembers } from 'lib'
+import { ActionForm, Vec, editRegionPermissions, manageRegionMembers } from 'lib'
 import { MaybeRawText, t } from 'lib/text'
 import { baseRottingButton } from './actions/rotting'
 import { baseUpgradeButton } from './actions/upgrade'
@@ -28,7 +28,7 @@ function baseMenu(player: Player, base: BaseRegion, back?: VoidFunction, message
 
   form
     .addButtonBack(back)
-    .addButton('Телепорт!', () => player.teleport(Vector.add(base.area.center, { x: 0.5, y: 2, z: 0.5 })))
+    .addButton('Телепорт!', () => player.teleport(Vec.add(base.area.center, { x: 0.5, y: 2, z: 0.5 })))
     .addButton(`Участники §7(${base.permissions.owners.length})`, () =>
       manageRegionMembers(player, base, {
         back: baseBack,

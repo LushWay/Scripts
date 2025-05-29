@@ -1,7 +1,7 @@
 /* i18n-ignore */
 
 import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 interface TableEntity {
   entity: Entity
@@ -38,7 +38,7 @@ export class DatabaseUtils {
         if (typeof tableName !== 'string' || typeof tableType !== 'string' || typeof index !== 'number')
           return { entity, tableName: 'NOTDB', tableType: 'NONE', index: 0 }
 
-        if (Vector.distance(entity.location, DatabaseUtils.entityLocation) > 1) {
+        if (Vec.distance(entity.location, DatabaseUtils.entityLocation) > 1) {
           entity.teleport(DatabaseUtils.entityLocation)
         }
 

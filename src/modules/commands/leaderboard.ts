@@ -2,7 +2,7 @@
 
 import { Player, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 new Command('leaderboard')
   .setAliases('leaderboards', 'lb')
@@ -27,7 +27,7 @@ function leaderboardMenu(player: Player) {
 }
 
 function info(lb: Leaderboard) {
-  return lb.info.displayName + '\n' + Vector.string(Vector.floor(lb.info.location))
+  return lb.info.displayName + '\n' + Vec.string(Vec.floor(lb.info.location))
 }
 
 function editLeaderboard(
@@ -94,7 +94,7 @@ function editLeaderboard(
         end: 'Край',
       }
       new ModalForm('Позиция')
-        .addTextField('Позиция', 'Не изменится', Vector.string(data.location ?? Vector.floor(player.location)))
+        .addTextField('Позиция', 'Не изменится', Vec.string(data.location ?? Vec.floor(player.location)))
         .addDropdownFromObject('Измерение', dimensions, {
           defaultValueIndex: Object.keys(dimensions).findIndex(e => e === player.dimension.type),
         })

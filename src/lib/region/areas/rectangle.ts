@@ -1,6 +1,6 @@
 import { Vector3 } from '@minecraft/server'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Area } from './area'
 
 interface RectangleDatabase extends JsonObject {
@@ -11,8 +11,8 @@ interface RectangleDatabase extends JsonObject {
 class Rectangle extends Area<RectangleDatabase> {
   constructor(database: RectangleDatabase, dimensionType?: DimensionType) {
     if (typeof database.from === 'object') {
-      const from = Vector.min(database.from, database.to)
-      const to = Vector.max(database.from, database.to)
+      const from = Vec.min(database.from, database.to)
+      const to = Vec.max(database.from, database.to)
       database.from = from
       database.to = to
     }
@@ -27,16 +27,16 @@ class Rectangle extends Area<RectangleDatabase> {
 
     const { from, to } = this.database
 
-    return Vector.isBetween(
-      distance === 0 ? from : Vector.add(from, { x: -distance, y: -distance, z: -distance }),
-      distance === 0 ? to : Vector.add(to, { x: distance, y: distance, z: distance }),
+    return Vec.isBetween(
+      distance === 0 ? from : Vec.add(from, { x: -distance, y: -distance, z: -distance }),
+      distance === 0 ? to : Vec.add(to, { x: distance, y: distance, z: distance }),
       vector,
     )
   }
 
   get center() {
     const { from, to } = this.database
-    return Vector.center(from, to)
+    return Vec.center(from, to)
   }
 
   get edges(): [Vector3, Vector3] {
@@ -45,10 +45,10 @@ class Rectangle extends Area<RectangleDatabase> {
 
   getFormDescription(): Record<string, unknown> {
     return {
-      From: Vector.string(this.database.from, true),
-      To: Vector.string(this.database.to, true),
-      Center: Vector.string(this.center, true),
-      Size: Vector.size(this.database.from, this.database.to),
+      From: Vec.string(this.database.from, true),
+      To: Vec.string(this.database.to, true),
+      Center: Vec.string(this.center, true),
+      Size: Vec.size(this.database.from, this.database.to),
     }
   }
 }

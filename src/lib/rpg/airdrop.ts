@@ -5,7 +5,7 @@ import { onPlayerMove } from 'lib/player-move'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
 import { isLocationError } from '../game-utils'
@@ -75,7 +75,7 @@ export class Airdrop {
    * @param position - Position to spawn airdrop on
    */
   spawn(position: Vector3) {
-    logger.info`Spawning at ${Vector.floor(position)}`
+    logger.info`Spawning at ${Vec.floor(position)}`
 
     const spawn = (name: 'chicken' | 'chest', typeId: string, position: Vector3, tag: string) => {
       this[name] = world.overworld.spawnEntity(typeId, position)
@@ -92,7 +92,7 @@ export class Airdrop {
     }
 
     spawn('chicken', `${Airdrop.chickenTypeId}<chicken:drop>`, position, Airdrop.chickenTag)
-    spawn('chest', Airdrop.chestTypeId, Vector.add(position, Airdrop.chestOffset), Airdrop.chestTag)
+    spawn('chest', Airdrop.chestTypeId, Vec.add(position, Airdrop.chestOffset), Airdrop.chestTag)
 
     this.status = 'falling'
     this.save()
@@ -104,7 +104,7 @@ export class Airdrop {
     if (!this.chest) return
 
     Airdrop.minimaped = this
-    const { x, z } = Vector.floor(this.chest.location)
+    const { x, z } = Vec.floor(this.chest.location)
 
     for (const player of players) {
       setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
@@ -124,7 +124,7 @@ export class Airdrop {
   teleport() {
     if (!this.chest || !this.chicken || !this.chicken.isValid || !this.chest.isValid) return
 
-    this.chest.teleport(Vector.add(this.chicken.location, Airdrop.chestOffset))
+    this.chest.teleport(Vec.add(this.chicken.location, Airdrop.chestOffset))
     if (!this.chest.dimension.getBlock(this.chest.location)?.below()?.isAir) {
       this.beingLooted()
     }

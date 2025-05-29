@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { ModalForm, Region, regionTypes, Vector } from 'lib'
+import { ModalForm, Region, regionTypes, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -76,7 +76,7 @@ class RegionTool extends WorldEditTool<Storage> {
     const region = create()
     const we = WorldEdit.forPlayer(player)
     we.backup(
-      `Region create at ${Vector.string(Vector.floor(player.location), true)}`,
+      `Region create at ${Vec.string(Vec.floor(player.location), true)}`,
       undefined,
       undefined,
       undefined,

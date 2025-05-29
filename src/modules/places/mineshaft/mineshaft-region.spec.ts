@@ -1,6 +1,6 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { TestStructures } from 'test/constants'
 import { gamesuite, gametest } from 'test/framework'
 import { MineshaftRegion } from './mineshaft-region'
@@ -18,7 +18,7 @@ class TestMineshaftRegion extends MineshaftRegion {
 gamesuite('MineshaftRegion', () => {
   gametest('Ore', async test => {
     const region = TestMineshaftRegion.create(
-      new SphereArea({ center: test.worldLocation(new Vector(5, 20, 5)), radius: 20 }, test.getDimension().type),
+      new SphereArea({ center: test.worldLocation(new Vec(5, 20, 5)), radius: 20 }, test.getDimension().type),
     )
 
     await region.area.forEachVector((vector, isIn, dimension) => {

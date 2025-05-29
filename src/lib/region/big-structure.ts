@@ -1,7 +1,7 @@
 import { StructureSaveMode, world } from '@minecraft/server'
 import { Region } from 'lib/region'
 import { BigStructure, BigStructureSaved } from 'lib/utils/big-structure'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { RegionStructure } from './structure'
 
 export class BigRegionStructure extends RegionStructure {
@@ -35,7 +35,7 @@ export class BigRegionStructure extends RegionStructure {
 
   protected get bigStructurePos() {
     // TODO Use this.region.area.edges[0] after adding tests
-    return (this.region.ldb?.bigStructurePos as unknown as Vector3 | undefined) ?? Vector.min(...this.region.area.edges)
+    return (this.region.ldb?.bigStructurePos as unknown as Vector3 | undefined) ?? Vec.min(...this.region.area.edges)
   }
 
   save() {

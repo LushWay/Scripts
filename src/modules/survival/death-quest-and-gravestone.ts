@@ -1,5 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
-import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vector } from 'lib'
+import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, forceAllowSpawnInRegion, Region } from 'lib/region'
@@ -25,7 +25,7 @@ world.afterEvents.entityDie.subscribe(event => {
     }
 
     const { dimension, id: playerId, location, name } = event.deadEntity
-    event.deadEntity.database.survival.deadAt = Vector.floor(location)
+    event.deadEntity.database.survival.deadAt = Vec.floor(location)
     const head = event.deadEntity.getHeadLocation()
     const pveRegion = Region.getManyAt(event.deadEntity).find(e => e.permissions.pvp === 'pve' || !e.permissions.pvp)
 
@@ -73,7 +73,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   const places = SafePlace.places
     .map(place => ({
       distance: place.safeArea
-        ? Vector.distance(place.safeArea.area.center, deadAt) -
+        ? Vec.distance(place.safeArea.area.center, deadAt) -
           (place.safeArea.area instanceof SphereArea ? place.safeArea.area.radius : 0)
         : 0,
       place,
@@ -138,11 +138,11 @@ const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верн
   const { deadAt } = player.database.survival
   if (!deadAt) return q.failed('Ваше место смерти потерялось!')
 
-  q.dynamic(Vector.string(deadAt, true))
+  q.dynamic(Vec.string(deadAt, true))
     .description(
       `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
-      }, они ждут вас на ${Vector.string(deadAt, true)}§6!`,
+      }, они ждут вас на ${Vec.string(deadAt, true)}§6!`,
     )
     .activate(ctx => {
       ctx.place = deadAt

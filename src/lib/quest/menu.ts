@@ -6,7 +6,7 @@ import { form } from 'lib/form/new'
 import { is } from 'lib/roles'
 import { t } from 'lib/text'
 import { noNullable } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Quest } from './quest'
 
 const quest = new Command('q')
@@ -82,7 +82,7 @@ export function manageQuestMenu(quest: Quest) {
     const current = quest.getPlayerStep(player)
     let currentDescription = ''
     if (current) {
-      currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vector.string(current.place, true)}` : ''}`
+      currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vec.string(current.place, true)}` : ''}`
     } else if (quest.isCompleted(player)) {
       currentDescription = '§aЗадание завершено!'
     }

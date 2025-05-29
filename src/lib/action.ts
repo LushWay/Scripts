@@ -1,7 +1,7 @@
 import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Items } from './assets/custom-items'
 import { onPlayerMove } from './player-move'
 
@@ -9,7 +9,7 @@ type PlaceType = 'enters' | 'interactions'
 
 export class PlaceAction {
   private static placeId(place: Vector3, dimension: DimensionType) {
-    return Vector.string(Vector.floor(place)) + ' ' + dimension
+    return Vec.string(Vec.floor(place)) + ' ' + dimension
   }
 
   static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: DimensionType = 'overworld') {

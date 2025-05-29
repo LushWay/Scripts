@@ -1,5 +1,5 @@
 import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
@@ -123,7 +123,7 @@ export class Cutscene {
 
           // There is no way to set a camera without easing using pure script
           player.runCommand(
-            `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vector.string(point)} rot ${point.rx} ${point.ry}`,
+            `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vec.string(point)} rot ${point.rx} ${point.ry}`,
           )
         }
       },
@@ -290,6 +290,6 @@ function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: k
 
 function getVector5(player: Player): Vector5 {
   const { x: rx, y: ry } = player.getRotation()
-  const { x, y, z } = Vector.floor(player.getHeadLocation())
+  const { x, y, z } = Vec.floor(player.getHeadLocation())
   return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }
 }

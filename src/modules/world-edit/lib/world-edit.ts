@@ -1,5 +1,5 @@
 import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
-import { Vector, ask, getRole, isLocationError } from 'lib'
+import { Vec, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { t } from 'lib/text'
@@ -87,17 +87,17 @@ export class WorldEdit {
 
       const color = { 1: '§5', 2: '§d' }[pos]
 
-      this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
+      this.player.tell(`${color}►${pos}◄§r (${action}) ${Vec.string(this[`pos${pos}`])}`)
       this.player.playSound(Sounds.Success)
       this.updateSelectionCuboids()
     })
   }
 
   private updateSelectionCuboids() {
-    if (!Vector.isValid(this.pos1) || !Vector.isValid(this.pos2)) return
+    if (!Vec.isValid(this.pos1) || !Vec.isValid(this.pos2)) return
 
     this.selection = new Cuboid(this.pos1, this.pos2)
-    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
+    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vec.add(this.selection.max, Vec.one))
   }
 
   history: WeBackup[] = []
@@ -248,7 +248,7 @@ export class WorldEdit {
         this.player.dimension,
       )
       this.player.info(
-        `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
+        `Скопирована область размером ${selection.size}\n§3От: ${Vec.string(this.pos1, true)}\n§3До: ${Vec.string(
           this.pos2,
           true,
         )}`,
@@ -265,8 +265,8 @@ export class WorldEdit {
     let dz = Math.abs(structure.pos2.z - structure.pos1.z)
     if (rotation === StructureRotation.Rotate270 || rotation === StructureRotation.Rotate90) [dx, dz] = [dz, dx]
 
-    const pastePos1 = Vector.floor(this.player.location)
-    const pastePos2 = Vector.add(pastePos1, { x: dx, y: dy, z: dz })
+    const pastePos1 = Vec.floor(this.player.location)
+    const pastePos2 = Vec.add(pastePos1, { x: dx, y: dy, z: dz })
 
     return { pastePos1, pastePos2 }
   }
@@ -309,7 +309,7 @@ export class WorldEdit {
         integritySeed,
       })
 
-      this.player.success(`Успешно вставлено в ${Vector.string(pastePos1)}`)
+      this.player.success(`Успешно вставлено в ${Vec.string(pastePos1)}`)
     } catch (error) {
       this.failedTo('вставить', error)
     }
@@ -376,7 +376,7 @@ export class WorldEdit {
       system.runJob(
         (function* fillBetweenJob() {
           let i = 0
-          for (const position of Vector.forEach(selection.min, selection.max)) {
+          for (const position of Vec.forEach(selection.min, selection.max)) {
             i++
             const block = world.overworld.getBlock(position)
             if (!block) continue

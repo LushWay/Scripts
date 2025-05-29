@@ -1,5 +1,5 @@
 import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
-import { ActionForm, ActionGuardOrder, location, Temporary, Vector } from 'lib'
+import { ActionForm, ActionGuardOrder, location, Temporary, Vec } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib'
@@ -108,7 +108,7 @@ class Learning {
         function spawnAirdrop() {
           const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })
           ctx.db = airdrop.id
-          const position = Vector.add(player.location, { x: 0, y: 20, z: 0 })
+          const position = Vec.add(player.location, { x: 0, y: 20, z: 0 })
           airdrop.spawn(position)
           return airdrop
         }
@@ -172,9 +172,9 @@ class Learning {
         })
       })
 
-    const crafting = Vector.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
+    const crafting = Vec.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
 
-    q.place(...Vector.around(crafting, 10), '§6Следуя компасу, доберитесь до верстака')
+    q.place(...Vec.around(crafting, 10), '§6Следуя компасу, доберитесь до верстака')
 
     q.item('§6Сделайте деревянную кирку')
       .description('Используя верстак сделайте деревянную кирку!')
@@ -299,7 +299,7 @@ class Learning {
     actionGuard((player, region, ctx) => {
       if (ctx.type !== 'break') return
       if (ctx.event.dimension.type !== 'overworld') return
-      if ([...this.blockedOre.values()].flat().includes(Vector.string(ctx.event.block))) {
+      if ([...this.blockedOre.values()].flat().includes(Vec.string(ctx.event.block))) {
         player.fail('Вы не можете ломать руду новичка.')
         return false
       }

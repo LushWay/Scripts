@@ -1,6 +1,6 @@
 import { Vector3 } from '@minecraft/server'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Area } from './area'
 
 class FlattenedSphere extends Area<{
@@ -61,7 +61,7 @@ class FlattenedSphere extends Area<{
   }
 
   getFormDescription(): Record<string, unknown> {
-    return { Center: Vector.string(this.center, true), Radius: this.rx, YRadius: this.ry }
+    return { Center: Vec.string(this.center, true), Radius: this.rx, YRadius: this.ry }
   }
 }
 

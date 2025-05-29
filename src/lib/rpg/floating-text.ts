@@ -2,7 +2,7 @@ import { Entity, ShortcutDimensions, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { anyPlayerNear } from 'lib/player-move'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 export class FloatingText {
   private static readonly dynamicProperty = 'floatingText'
@@ -24,7 +24,7 @@ export class FloatingText {
   update(location: Vector3, nameTag: string) {
     if (!anyPlayerNear(location, this.dimensionType, 30)) return
 
-    location = Vector.add(location, { x: 0.5, y: 0.7, z: 0.5 })
+    location = Vec.add(location, { x: 0.5, y: 0.7, z: 0.5 })
 
     if (!this.entity) {
       this.entity = this.find()

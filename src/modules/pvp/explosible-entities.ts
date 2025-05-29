@@ -1,6 +1,6 @@
 import { Entity, EntityDamageCause, ExplosionOptions, Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 import { createBlockExplosionChecker } from './raid'
 
@@ -29,7 +29,7 @@ system.runInterval(
       }
 
       const location = entity.location
-      const viewBlock = entity.dimension.getBlock(Vector.add(location, Vector.multiply(entity.getViewDirection(), 1.2)))
+      const viewBlock = entity.dimension.getBlock(Vec.add(location, Vec.multiply(entity.getViewDirection(), 1.2)))
       const entityLocationBlocks = isEntityInBlock(entity, explosion.r)
       const ray = entity.getBlockFromViewDirection({ maxDistance: 1, includePassableBlocks: false })
 

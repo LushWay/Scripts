@@ -4,7 +4,7 @@ import { ActionForm } from 'lib/form/action'
 import { registerRegionType } from 'lib/region/command'
 import { adventureModeRegions } from 'lib/region/kinds/safe-area'
 import { Boss } from 'lib/rpg/boss'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
 
@@ -45,10 +45,10 @@ export class BossArenaRegion extends Region {
 
   returnEntity(entity: Entity, center = this.area.center) {
     const location = entity.location
-    const horizontal = Vector.distance({ x: location.x, y: 0, z: location.z }, { x: center.x, y: 0, z: center.z }) / 10
+    const horizontal = Vec.distance({ x: location.x, y: 0, z: location.z }, { x: center.x, y: 0, z: center.z }) / 10
     const vertical = Math.abs(location.y - center.y) / 10
-    const vector = Vector.subtract(location, center)
-    entity.applyKnockback(Vector.multiply(vector.normalized(), -horizontal), vertical)
+    const vector = Vec.subtract(location, center)
+    entity.applyKnockback(Vec.multiply(vector.normalized(), -horizontal), vertical)
   }
 
   onSave = new EventSignal()

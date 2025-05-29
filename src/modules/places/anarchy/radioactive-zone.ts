@@ -4,7 +4,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Spawn } from '../spawn'
 
 export class RadioactiveZone {
@@ -36,7 +36,7 @@ export class RadioactiveZone {
           )
             continue
 
-          const distance = Vector.distance(player.location, center)
+          const distance = Vec.distance(player.location, center)
           let played = false
           const sound = (volume: number, num = 1) => {
             if (!played && soundTick) {

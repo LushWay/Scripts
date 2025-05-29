@@ -1,5 +1,5 @@
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
-import { Airdrop, isNotPlaying, Loot, Vector } from 'lib'
+import { Airdrop, isNotPlaying, Loot, Vec } from 'lib'
 import { t } from 'lib/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../pvp/cannon'
@@ -81,7 +81,7 @@ export async function requestAirdrop(isPowerfull: boolean) {
         .createMarkerOnMinimap()
 
       world.say(
-        t.raw`§l§a>§r§7 ${isPowerfull ? 'Усиленный' : 'Обычный'} аирдроп появился на ${Vector.string(result.topmost, true)}!`,
+        t.raw`§l§a>§r§7 ${isPowerfull ? 'Усиленный' : 'Обычный'} аирдроп появился на ${Vec.string(result.topmost, true)}!`,
       )
       return airdrop
     } catch (e) {

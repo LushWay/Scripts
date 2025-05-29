@@ -4,7 +4,7 @@ import { Language } from 'lib/assets/lang'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
 import { MaybeRawText } from 'lib/text'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -181,7 +181,7 @@ expand(Player.prototype, {
     const view = target.getViewDirection()
     const hStrength = Math.sqrt(view.x ** 2 + view.z ** 2) * horizontalStrength
     const vStrength = view.y * verticalStrength
-    target.applyKnockback(Vector.multiply(view, hStrength), vStrength)
+    target.applyKnockback(Vec.multiply(view, hStrength), vStrength)
   },
 
   isGamemode(mode) {

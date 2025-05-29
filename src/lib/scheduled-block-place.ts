@@ -1,12 +1,11 @@
 import { Block, BlockPermutation, LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { ProxyDatabase } from 'lib/database/proxy'
 import { EventSignal } from 'lib/event-signal'
 import { form } from 'lib/form/new'
 import { t } from 'lib/text'
 import { util } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 export interface ScheduledBlockPlace {
   typeId: string
@@ -40,7 +39,7 @@ export function getScheduledToPlace(
   const dimblocks = SCHEDULED_DB.getImmutable(dimension)
   if (typeof dimblocks === 'undefined') return false
 
-  return dimblocks.find(e => Vector.equals(e.location, location))
+  return dimblocks.find(e => Vec.equals(e.location, location))
 }
 
 export async function getScheduledToPlaceAsync(
@@ -67,7 +66,7 @@ export async function getScheduledToPlaceAsync(
                 if (yieldEach === 1000) console.log(getScheduledToPlaceAsync.name, results.length, i)
                 yield
               }
-              if (Vector.equals(e.location, vector)) {
+              if (Vec.equals(e.location, vector)) {
                 results.push(e)
                 locations = locations.filter(e => e !== vector)
               }
@@ -148,7 +147,7 @@ function* scheduledBlockPlaceJob() {
           // we calculate if there is near broken block
           for (const [i, e] of schedules.entries()) {
             if (i % 100 === 0) yield
-            if (e !== schedule && Vector.distance(e.location, schedule.location) <= 1 && e.date > date) {
+            if (e !== schedule && Vec.distance(e.location, schedule.location) <= 1 && e.date > date) {
               yield
               continue mainLoop
             }
@@ -158,7 +157,7 @@ function* scheduledBlockPlaceJob() {
         yield
         const block = world.overworld.getBlock(schedule.location)
         if (!block?.isValid) {
-          if (debugLogging) logger.info`Skipping ${Vector.string(schedule.location)} because block is invalid`
+          if (debugLogging) logger.info`Skipping ${Vec.string(schedule.location)} because block is invalid`
           continue
         }
 
@@ -214,7 +213,7 @@ const scheduledDimensionForm = (dim: string, blocks: ScheduledBlockPlace[]) =>
     })
     const first = blocks[0]
     if (typeof first === 'undefined') return
-    form.button(t`TP to first: ${Vector.string(first.location, true)}\n${first.typeId}`, () => {
+    form.button(t`TP to first: ${Vec.string(first.location, true)}\n${first.typeId}`, () => {
       player.teleport(first.location)
       player.success()
     })

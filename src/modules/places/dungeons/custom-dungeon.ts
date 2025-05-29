@@ -1,6 +1,6 @@
 import { Block, GameMode, Player, StructureRotation, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { is, ModalForm, ms, RegionCreationOptions, registerRegionType, registerSaveableRegion, Vector } from 'lib'
+import { is, ModalForm, ms, RegionCreationOptions, registerRegionType, registerSaveableRegion, Vec } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { t } from 'lib/text'
@@ -104,7 +104,7 @@ world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermut
   const chest = getChest(region, location)
   if (chest) {
     region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
-    region.chests = region.chests.filter(e => !Vector.equals(e.location, location))
+    region.chests = region.chests.filter(e => !Vec.equals(e.location, location))
 
     player.success(t`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime / 60_000}min`)
   }
@@ -156,5 +156,5 @@ function editChest(
 }
 
 function getChest(region: CustomDungeonRegion, location: Vector3) {
-  return region.ldb.chestLoot.find(e => Vector.equals(e.location, location))
+  return region.ldb.chestLoot.find(e => Vec.equals(e.location, location))
 }

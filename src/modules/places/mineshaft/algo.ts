@@ -1,6 +1,6 @@
 import { Block, Dimension, Player } from '@minecraft/server'
 import { MinecraftBlockTypes as b, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { EventSignal } from 'lib/event-signal'
 import { getEdgeBlocksOf } from './get-edge-blocks-of'
 import { MineshaftRegion } from './mineshaft-region'
@@ -26,7 +26,7 @@ export const ores = new OreCollector(
 export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {
   const possibleBlocks = []
   const airCache: Record<string, { air: boolean; block: Block }> = {
-    [Vector.string(brokenLocation)]: { air: false, block: brokenLocation },
+    [Vec.string(brokenLocation)]: { air: false, block: brokenLocation },
   }
 
   for (const vector of getEdgeBlocksOf(brokenLocation)) {
@@ -35,7 +35,7 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
     if (!MineshaftRegion.getAt(block)) continue
 
     const nearAir = getEdgeBlocksOf(block).some(location => {
-      const key = Vector.string(location)
+      const key = Vec.string(location)
       if (airCache[key]) return airCache[key].air
 
       const block = dimension.getBlock(location)

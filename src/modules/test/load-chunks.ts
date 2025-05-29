@@ -1,6 +1,6 @@
 import { Block, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t } from 'lib/text'
 
@@ -14,7 +14,7 @@ new Command('chunkload')
   .executes(async (ctx, from, to, tickDelay = 5, saveTickDelay = 40) => {
     const player = ctx.player
     from.y = to.y = 62
-    player.success(t`Loading chunks from ${Vector.fromVector3(from)} to ${Vector.fromVector3(to)}`)
+    player.success(t`Loading chunks from ${Vec.fromVector3(from)} to ${Vec.fromVector3(to)}`)
 
     player.info('Calculating total chunk size, this might take a while...')
     const chunks: Vector3[] = []
@@ -22,7 +22,7 @@ new Command('chunkload')
       system.runJob(
         (function* uhh() {
           let i = 0
-          for (const { x, y, z } of Vector.forEach(from, to)) {
+          for (const { x, y, z } of Vec.forEach(from, to)) {
             if (!(x % 16 === 0 && z % 16 === 0)) continue
 
             i++
@@ -69,7 +69,7 @@ new Command('chunkload')
       await system.waitTicks(saveTickDelay)
 
       player.onScreenDisplay.setActionBar(
-        t`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vector(x, y, z)}\nСкорость: ${speed < 1000 ? t`${~~speed}ms` : t.time`${speed}`}/chunk, осталось: ${t.time`${eta}`} прошло: ${t.time`${took}`}`,
+        t`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nСкорость: ${speed < 1000 ? t`${~~speed}ms` : t.time`${speed}`}/chunk, осталось: ${t.time`${eta}`} прошло: ${t.time`${took}`}`,
         ActionbarPriority.Highest,
       )
     }

@@ -4,7 +4,7 @@ import { EventSignal } from 'lib/event-signal'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
 import { doNothing } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { PlayerQuest } from './player'
 import { Quest } from './quest'
 
@@ -159,7 +159,7 @@ export abstract class QS<DB = any> extends Temporary {
     if (!this.compassIntervalSetup) {
       this.compassIntervalSetup = true
       this.onInterval(() => {
-        if (this.isActive && this.place && Vector.isValid(this.place)) Compass.setFor(this.player, this.place)
+        if (this.isActive && this.place && Vec.isValid(this.place)) Compass.setFor(this.player, this.place)
       })
 
       this.cleaners.push(() => Compass.setFor(this.player, undefined))

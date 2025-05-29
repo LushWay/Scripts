@@ -3,7 +3,7 @@ import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
 import { MessageForm } from 'lib/form/message'
 import { util } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { ActionForm } from '../form/action'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
@@ -125,12 +125,12 @@ export class Compass {
   }
 
   private static getCompassItem(view: Vector3, origin: Vector3, target: Vector3) {
-    if (!Vector.isValid(view) || !Vector.isValid(target) || !Vector.isValid(origin)) return
+    if (!Vec.isValid(view) || !Vec.isValid(target) || !Vec.isValid(origin)) return
 
-    const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
-    const ot = Vector.subtract(target, origin).multiply({ x: 1, y: 0, z: 1 }).normalized()
-    const cos = Vector.dot(v, ot)
-    const sin = Vector.dot(Vector.cross(ot, v), Vector.up)
+    const v = Vec.multiplyVec(view, { x: 1, y: 0, z: 1 }).normalized()
+    const ot = Vec.subtract(target, origin).multiplyVec({ x: 1, y: 0, z: 1 }).normalized()
+    const cos = Vec.dot(v, ot)
+    const sin = Vec.dot(Vec.cross(ot, v), Vec.up)
     const angle = Math.atan2(sin, cos)
     const i = Math.floor((16 * angle) / Math.PI + 16) || 0
 

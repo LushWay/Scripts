@@ -1,5 +1,5 @@
 import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
-import { ModalForm, Vector, is, isKeyof, isLocationError } from 'lib'
+import { ModalForm, Vec, is, isKeyof, isLocationError } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { t } from 'lib/text'
@@ -65,8 +65,8 @@ class BrushTool extends WorldEditToolBrush<Storage> {
 
         WorldEdit.forPlayer(player).backup(
           `§3Кисть §6${shapeName}§3, размер §f${size}§3, блоки: §f${stringifyBlockWeights(permutations.map(toReplaceTarget))}`,
-          Vector.add(center, from),
-          Vector.add(center, to),
+          Vec.add(center, from),
+          Vec.add(center, to),
         )
 
         const shape = SHAPES[shapeName]
@@ -74,7 +74,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
         const blendOptions = { ...storage, radius: storage.size }
 
         let blocksSet = 0
-        for (const vector of Vector.forEach(from, to)) {
+        for (const vector of Vec.forEach(from, to)) {
           const condition = shape(
             Object.setPrototypeOf(
               { rad: size, ...vector } satisfies Omit<Parameters<ShapeFormula>[0], keyof Cuboid>,
@@ -83,7 +83,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
           )
           if (!condition) continue
 
-          const location = Vector.add(center, vector)
+          const location = Vec.add(center, vector)
           if (skipForBlending(blendOptions, { vector: location, center })) continue
 
           const block = player.dimension.getBlock(location)
@@ -182,7 +182,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
       const hit = player.getBlockFromViewDirection({ maxDistance: storage.maxDistance })
 
       if (hit && !settings.noBrushParticles) {
-        const location = Vector.add(hit.block.location, { x: 0.5, y: 0, z: 0.5 })
+        const location = Vec.add(hit.block.location, { x: 0.5, y: 0, z: 0.5 })
 
         if (!this.brushLocators.has(player.id)) {
           try {

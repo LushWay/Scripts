@@ -12,7 +12,7 @@ import {
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
 import { ConfigurableLocation } from 'lib/location'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { PersistentSet } from './database/persistent-set'
 import { getRole } from './roles'
 
@@ -57,8 +57,8 @@ export function isLocationError(
 export function restorePlayerCamera(player: Player, animTime = 1) {
   const headLocation = player.getHeadLocation()
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-    location: Vector.add(headLocation, Vector.multiply(player.getViewDirection(), 0.3)),
-    facingLocation: Vector.add(headLocation, Vector.multiply(player.getViewDirection(), 10)),
+    location: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 0.3)),
+    facingLocation: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 10)),
     easeOptions: {
       easeTime: animTime,
       easeType: EasingType.OutCubic,
@@ -67,7 +67,7 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
 
   system.runTimeout(
     () => {
-      if (Vector.distance(player.getHeadLocation(), headLocation) > 1) {
+      if (Vec.distance(player.getHeadLocation(), headLocation) > 1) {
         // Apply animation again because player had moved
         restorePlayerCamera(player, animTime * 0.5)
       } else player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
@@ -102,7 +102,7 @@ export function isNotPlaying(player: Player, uptodate = false) {
  */
 export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
   world.overworld.runCommand(`tickingarea remove ldchnk`)
-  world.overworld.runCommand(`tickingarea add ${Vector.string(location)} ${Vector.string(location)} ldchnk`)
+  world.overworld.runCommand(`tickingarea add ${Vec.string(location)} ${Vec.string(location)} ldchnk`)
 
   let i = 100
   return new Promise<false | Block>(resolve => {
@@ -129,7 +129,7 @@ export const loadChunk = dedupe(async function loadChunk(location: Vector3) {
 
 export async function getTopmostSolidBlock(location: Vector3) {
   if (await loadChunk(location)) {
-    const hit = world.overworld.getBlockFromRay(location, Vector.down, { includeLiquidBlocks: true })
+    const hit = world.overworld.getBlockFromRay(location, Vec.down, { includeLiquidBlocks: true })
     if (!hit) return false
 
     const { block } = hit

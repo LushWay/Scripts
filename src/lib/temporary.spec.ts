@@ -1,18 +1,18 @@
 import { system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { gamesuite, gametest } from 'test/framework'
 import { Temporary } from './temporary'
 
 gamesuite('temporary', () => {
   gametest('should unsubscribe afterEvents', async test => {
-    const blockLocation = new Vector(0, 3, 0)
+    const blockLocation = new Vec(0, 3, 0)
     const worldLocation = test.worldLocation(blockLocation)
 
     test.setBlockType(MinecraftBlockTypes.GrassBlock, blockLocation)
     new Temporary(({ world, cleanup }) => {
       world.beforeEvents.explosion.subscribe(event => {
-        if (event.getImpactedBlocks().find(e => Vector.string(worldLocation) === Vector.string(e.location))) {
+        if (event.getImpactedBlocks().find(e => Vec.string(worldLocation) === Vec.string(e.location))) {
           event.cancel = true
           system.delay(() => {
             cleanup()

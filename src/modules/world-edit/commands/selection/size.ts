@@ -1,5 +1,5 @@
 import {} from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { CommandContext } from 'lib/command/context'
 import { t } from 'lib/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
@@ -19,7 +19,7 @@ const command = new Command('size')
     const we = getSelection(ctx)
     if (!we) return
 
-    ctx.reply(`§3В выделенной зоне §f${Vector.size(we.pos1, we.pos2)}§3 блоков`)
+    ctx.reply(`§3В выделенной зоне §f${Vec.size(we.pos1, we.pos2)}§3 блоков`)
   })
 
 command
@@ -30,11 +30,11 @@ command
     const we = getSelection(ctx)
     if (!we) return
 
-    const isIn = Vector.isBetween(we.pos1, we.pos2, location)
+    const isIn = Vec.isBetween(we.pos1, we.pos2, location)
     ctx.reply(
       (isIn
         ? t
-        : t.error)`Позиция ${Vector.string(Vector.floor(location), true)}${isIn ? '' : ' не'} находится внутри выделенной зоны.`,
+        : t.error)`Позиция ${Vec.string(Vec.floor(location), true)}${isIn ? '' : ' не'} находится внутри выделенной зоны.`,
     )
   })
 

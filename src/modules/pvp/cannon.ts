@@ -1,6 +1,6 @@
 import { EntityComponentTypes, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { actionGuard, ActionGuardOrder, Cooldown, ms, Vector } from 'lib'
+import { actionGuard, ActionGuardOrder, Cooldown, ms, Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { t } from 'lib/text'
@@ -56,12 +56,9 @@ function fire(player: Player, fire = false) {
 
       if (cannon.isValid) {
         const view = cannon.getViewDirection()
-        const location = Vector.add(Vector.add(cannon.location, Vector.multiply(view, 2.5)), { x: 0, y: 1.5, z: 0 })
-        const tnt = cannon.dimension.spawnEntity(
-          MinecraftEntityTypes.Tnt,
-          Vector.add(location, { x: 0, y: -0.5, z: 0 }),
-        )
-        tnt.applyImpulse(Vector.multiply(player.getViewDirection(), 2))
+        const location = Vec.add(Vec.add(cannon.location, Vec.multiply(view, 2.5)), { x: 0, y: 1.5, z: 0 })
+        const tnt = cannon.dimension.spawnEntity(MinecraftEntityTypes.Tnt, Vec.add(location, { x: 0, y: -0.5, z: 0 }))
+        tnt.applyImpulse(Vec.multiply(player.getViewDirection(), 2))
         explosibleEntities.add({ source: player, entity: tnt, explosion: cannonShellExplosion })
         cannon.dimension.playSound('random.explode', location, { volume: 4, pitch: 0.9 })
         cannon.dimension.spawnParticle('minecraft:dragon_dying_explosion', location)

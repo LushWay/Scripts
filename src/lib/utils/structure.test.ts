@@ -1,5 +1,5 @@
 import { StructureRotation } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { structureLikeRotate, toAbsolute, toRelative } from './structure'
 
 describe('structureLikeRotate', () => {
@@ -87,11 +87,11 @@ describe('structureLikeRotate', () => {
     `)
   })
 
-  const vector1000 = Vector.multiply(Vector.one, 1000)
+  const vector1000 = Vec.multiply(Vec.one, 1000)
   const structure2 = {
-    position: Vector.add(structure.position, vector1000),
+    position: Vec.add(structure.position, vector1000),
     size: structure.size,
-    vectors: structure.vectors.map(e => Vector.add(e, vector1000)),
+    vectors: structure.vectors.map(e => Vec.add(e, vector1000)),
   }
 
   it('should rotate none 1000', () => {

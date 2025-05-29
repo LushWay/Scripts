@@ -1,7 +1,7 @@
 import { Dimension, system, world } from '@minecraft/server'
 import { t } from 'lib/text'
 import { AbstractPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area
 export type AreaWithType<T = AreaCreator> = T & { type: string }
@@ -46,7 +46,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   abstract isNear(point: AbstractPoint, distance: number): boolean
 
   toString() {
-    return t`${Vector.string(Vector.floor(this.center), true)} radius=${Math.floor(this.radius)}`
+    return t`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
   }
 
   abstract getFormDescription(): Record<string, unknown>
@@ -56,12 +56,12 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   }
 
   get radius() {
-    return Vector.distance(...this.edges) / 2
+    return Vec.distance(...this.edges) / 2
   }
 
   get size() {
     const [from, to] = this.edges
-    return Vector.subtract(to, from)
+    return Vec.subtract(to, from)
   }
 
   /**
@@ -88,7 +88,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
         (function* forEachRegionVectorJob() {
           try {
             let i = 0
-            for (const vector of Vector.forEach(...edges)) {
+            for (const vector of Vec.forEach(...edges)) {
               const result = callback(vector, isIn(vector), dimension)
               if (result === STOP_AREA_FOR_EACH_VECTOR) break
               i++

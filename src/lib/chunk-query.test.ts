@@ -1,4 +1,4 @@
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { ChunkArea, ChunkQuery } from './chunk-query'
 import { SphereArea } from './region/areas/sphere'
 import { createPoint, VectorInDimension } from './utils/point'
@@ -501,8 +501,8 @@ function createSpherePoint(x: number, y: number, z: number, radius: number, dime
 
 function createVectorQuery() {
   return new ChunkQuery<{ vector: Vector3; dimensionType: DimensionType; id: number }>(
-    (point, object) => Vector.equals(point, object.vector),
-    (vector, object, distance) => Vector.distanceCompare(vector, object.vector, distance + 1),
+    (point, object) => Vec.equals(point, object.vector),
+    (vector, object, distance) => Vec.isInsideRadius(vector, object.vector, distance + 1),
     () => true,
     object => object.dimensionType,
     object => [object.vector, object.vector] as const,

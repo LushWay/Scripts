@@ -1,5 +1,5 @@
 import { createPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { RectangleArea } from './rectangle'
 
 describe('rectangle', () => {
@@ -83,7 +83,7 @@ describe('rectangle', () => {
     }
 
     await rect.forEachVector(v)
-    expect(v.mock.calls.map(e => Vector.string(e[0]) + ' -> ' + e[1])).toMatchInlineSnapshot(`
+    expect(v.mock.calls.map(e => Vec.string(e[0]) + ' -> ' + e[1])).toMatchInlineSnapshot(`
       [
         "0 0 0 -> true",
         "0 0 1 -> true",

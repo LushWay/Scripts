@@ -1,7 +1,7 @@
 /** I18n-ignore */
 
 import { Player, world } from '@minecraft/server'
-import { ActionForm, Vector } from 'lib'
+import { ActionForm, Vec } from 'lib'
 import { debounceMenu } from 'lib/form/utils'
 import { isNotPlaying } from 'lib/game-utils'
 import { getFullname } from 'lib/get-fullname'
@@ -81,7 +81,7 @@ function location(
   if (place.portalTeleportsTo.valid) {
     return {
       players: playersC,
-      location: `${Vector.string(place.portalTeleportsTo)} ${place.portalTeleportsTo.xRot} ${place.portalTeleportsTo.yRot}`,
+      location: `${Vec.string(place.portalTeleportsTo)} ${place.portalTeleportsTo.xRot} ${place.portalTeleportsTo.yRot}`,
     }
   }
 

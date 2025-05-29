@@ -9,7 +9,7 @@ import {
   ms,
   registerRegionType,
   registerSaveableRegion,
-  Vector,
+  Vec,
 } from 'lib'
 import { StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
@@ -53,13 +53,13 @@ export class DungeonRegion extends Region {
           }
 
           for (const chest of Object.keys(dungeon.ldb.chests)) {
-            const vector = Vector.parse(chest)
+            const vector = Vec.parse(chest)
             if (!vector) continue
 
-            if (dungeon.chests.find(e => Vector.equals(e.location, vector))) continue
+            if (dungeon.chests.find(e => Vec.equals(e.location, vector))) continue
 
             // Old chest
-            console.log('Found old chest', Vector.string(vector, true))
+            console.log('Found old chest', Vec.string(vector, true))
             try {
               dungeon.dimension.setBlockType(vector, MinecraftBlockTypes.Air)
               Reflect.deleteProperty(dungeon.ldb.chests, chest)
@@ -135,7 +135,7 @@ export class DungeonRegion extends Region {
     } else return false
 
     if (this.area instanceof SphereArea) {
-      this.area.radius = Vector.distance(this.getStructurePosition(), this.area.center)
+      this.area.radius = Vec.distance(this.getStructurePosition(), this.area.center)
       // console.log('Changed radius of dungeon to', this.area.radius)
     }
 
@@ -153,25 +153,25 @@ export class DungeonRegion extends Region {
       ...super.customFormDescription(player),
       Rotation: this.ldb.rotation,
       StructurePosition: this.getStructurePosition(),
-      Chests: this.chests.map(e => Vector.string(e.location, true)),
+      Chests: this.chests.map(e => Vec.string(e.location, true)),
     }
   }
 
   structureBounds() {
     if (!this.structureFile) return { from: this.area.center, to: this.area.center, fromAbsolute: this.area.center }
     const fromAbsolute = this.getStructurePosition(StructureRotation.None)
-    const toAbsolute = Vector.add(fromAbsolute, this.structureFile.size)
+    const toAbsolute = Vec.add(fromAbsolute, this.structureFile.size)
 
     const [from, to] = this.rotate([fromAbsolute, toAbsolute]) as [Vector3, Vector3]
 
-    return { from: Vector.min(from, to), to: Vector.max(from, to), fromAbsolute }
+    return { from: Vec.min(from, to), to: Vec.max(from, to), fromAbsolute }
   }
 
   protected getStructurePosition(rotation = this.ldb.rotation) {
     if (!this.structureFile) throw new TypeError('No structure file!')
 
-    return Vector.fromVector3(
-      structureLikeRotateRelative(rotation, Vector.multiply(this.structureFile.size, 0.5), this.structureFile.size),
+    return Vec.fromVector3(
+      structureLikeRotateRelative(rotation, Vec.multiply(this.structureFile.size, 0.5), this.structureFile.size),
     )
       .multiply(-1)
       .floor()
@@ -185,8 +185,8 @@ export class DungeonRegion extends Region {
     if (!this.ldb.terrainStructureId) {
       const id = `dungeon:terrain_backup_${new Date().toISOString().replaceAll(':', '|')}`
       const bounds = this.structureBounds()
-      const from = Vector.add(Vector.min(position, bounds.from), { x: -1, z: -1, y: -1 })
-      const to = Vector.add(Vector.max(position, bounds.to), { x: 1, z: 1, y: 1 })
+      const from = Vec.add(Vec.min(position, bounds.from), { x: -1, z: -1, y: -1 })
+      const to = Vec.add(Vec.max(position, bounds.to), { x: 1, z: 1, y: 1 })
       world.structureManager.createFromWorld(id, this.dimension, from, to, {
         saveMode: StructureSaveMode.World,
         includeBlocks: true,
@@ -232,7 +232,7 @@ export class DungeonRegion extends Region {
     // )
 
     this.chests.push({
-      id: Vector.string(location),
+      id: Vec.string(location),
       location,
       loot,
       restoreTime,

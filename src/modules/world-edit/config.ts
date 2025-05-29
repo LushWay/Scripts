@@ -4,7 +4,7 @@ import {
   MolangVariableMap,
   world,
 } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
@@ -29,11 +29,11 @@ WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
 export function spawnParticlesInArea(
   pos1: Vector3,
   pos2: Vector3,
-  { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) }: { min?: Vector3; max?: Vector3 } = {},
+  { min = Vec.min(pos1, pos2), max = Vec.max(pos1, pos2) }: { min?: Vector3; max?: Vector3 } = {},
 ) {
-  const size = Vector.size(min, max)
+  const size = Vec.size(min, max)
   if (size > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
-  for (const { x, y, z } of Vector.forEach(min, max)) {
+  for (const { x, y, z } of Vec.forEach(min, max)) {
     const isEdge =
       ((x == min.x || x == max.x) && (y == min.y || y == max.y)) ||
       ((y == min.y || y == max.y) && (z == min.z || z == max.z)) ||

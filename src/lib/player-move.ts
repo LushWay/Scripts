@@ -1,6 +1,6 @@
 import { Player, ShortcutDimensions, system, world } from '@minecraft/server'
 import type { Region } from 'lib/region'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { EventSignal } from './event-signal'
 import { WeakPlayerMap } from './weak-player-storage'
 
@@ -19,7 +19,7 @@ export const playerPositionCache = new WeakPlayerMap<PlayerPosition>()
 export function anyPlayerNear(location: Vector3, dimensionType: ShortcutDimensions, radius: number) {
   for (const player of playerPositionCache.values()) {
     if (dimensionType !== player.dimensionType) continue
-    if (Vector.distance(player.vector, location) < radius) return true
+    if (Vec.distance(player.vector, location) < radius) return true
   }
 
   return false

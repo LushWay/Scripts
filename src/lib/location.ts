@@ -1,5 +1,5 @@
 import { Player, TeleportOptions, Vector3, system } from '@minecraft/server'
-import { Vector, VectorSymbol } from 'lib/vector'
+import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
 import { Place } from './rpg/place'
 import { Settings } from './settings'
@@ -47,7 +47,7 @@ class Location<T extends Vector3> {
 
   protected location = Object.assign({}, this.locationFormat)
 
-  private [VectorSymbol] = true
+  private [VecSymbol] = true
 
   private get format() {
     return Object.keys(this.locationFormat).join(' ').trim()
@@ -104,7 +104,7 @@ class Location<T extends Vector3> {
   }
 
   teleport(player: Player) {
-    player.teleport(Vector.add(this.locationFormat, { x: 0.5, y: 0, z: 0.5 }), this.teleportOptions)
+    player.teleport(Vec.add(this.locationFormat, { x: 0.5, y: 0, z: 0.5 }), this.teleportOptions)
   }
 }
 

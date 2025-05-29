@@ -1,4 +1,4 @@
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { SphereArea } from './sphere'
 
 describe('sphere', () => {
@@ -29,7 +29,7 @@ describe('sphere', () => {
 
     const vOrder = v.mock.calls.map(e => e[1])
 
-    expect(v.mock.calls.map(e => Vector.string(e[0]).padEnd(8, ' ') + ' -> ' + e[1])).toMatchInlineSnapshot(`
+    expect(v.mock.calls.map(e => Vec.string(e[0]).padEnd(8, ' ') + ' -> ' + e[1])).toMatchInlineSnapshot(`
       [
         "-2 -2 -2 -> false",
         "-2 -2 -1 -> false",

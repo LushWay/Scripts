@@ -21,7 +21,7 @@ import {
   RoadRegion,
   SafeAreaRegion,
   Settings,
-  Vector,
+  Vec,
   getAuxOrTexture,
   getAuxTextureOrPotionAux,
   inspect,
@@ -113,7 +113,7 @@ const tests: Record<
       'distance',
       1000000,
       [
-        [() => Vector.distance(a, b) <= r, 'Vector.distance'],
+        [() => Vec.distance(a, b) <= r, 'Vector.distance'],
         [
           () => {
             return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 <= r ** 2
@@ -172,23 +172,23 @@ const tests: Record<
     const player = ctx.player
     const { radius, blending, height, zone: offset, factor } = lore
 
-    const center = Vector.floor(player.location)
-    const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
-    const to = Vector.add(center, new Vector(radius, offset, radius))
+    const center = Vec.floor(player.location)
+    const from = Vec.add(center, new Vec(-radius, offset - height, -radius))
+    const to = Vec.add(center, new Vec(radius, offset, radius))
 
     player.onScreenDisplay.setActionBar(
       t`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
       ActionbarPriority.Highest,
     )
 
-    for (const vector of Vector.forEach(from, to)) {
+    for (const vector of Vec.forEach(from, to)) {
       const block = world.overworld.getBlock(vector)
       if (!block) continue
 
       block.setType(MinecraftBlockTypes.GrassBlock)
     }
 
-    for (const vector of Vector.forEach(from, to)) {
+    for (const vector of Vec.forEach(from, to)) {
       if (skipForBlending(lore, { vector, center })) continue
 
       const block = world.overworld.getBlock(vector)
@@ -202,7 +202,7 @@ const tests: Record<
   },
   air(ctx) {
     const airdrop = new Airdrop({ loot })
-    airdrop.spawn(Vector.add(ctx.player.location, { x: 0, y: 30, z: 0 }))
+    airdrop.spawn(Vec.add(ctx.player.location, { x: 0, y: 30, z: 0 }))
     system.runInterval(
       () => {
         if (!airdrop.chest?.isValid) return
@@ -217,7 +217,7 @@ const tests: Record<
     const player = ctx.player
 
     player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-      location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 20)),
+      location: Vec.add(player.getHeadLocation(), Vec.multiply(player.getViewDirection(), 20)),
     })
 
     system.runTimeout(
@@ -338,19 +338,19 @@ const tests: Record<
     system.runJob(
       (function* lush() {
         let i = 0
-        for (const vector of Vector.forEach(...Vector.around(ctx.player.location, 5))) {
+        for (const vector of Vec.forEach(...Vec.around(ctx.player.location, 5))) {
           i++
           if (i % 100 === 0) yield
 
           const block = ctx.player.dimension.getBlock(vector)
           if (block && block.typeId !== MinecraftBlockTypes.Air) continue
 
-          const above = ctx.player.dimension.getBlock(Vector.add(vector, Vector.up))
+          const above = ctx.player.dimension.getBlock(Vec.add(vector, Vec.up))
           if (!above) continue
 
           if (vines.includes(above.typeId)) {
             ctx.player.dimension.setBlockType(vector, MinecraftBlockTypes.StructureVoid)
-            ctx.player.success(t`lush > ${Vector.floor(vector)}!`)
+            ctx.player.success(t`lush > ${Vec.floor(vector)}!`)
           }
         }
       })(),
@@ -419,7 +419,7 @@ const tests: Record<
         c++
         block.dimension.spawnParticle(
           'minecraft:wax_particle',
-          Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+          Vec.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
           variables,
         )
 

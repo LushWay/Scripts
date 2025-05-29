@@ -1,4 +1,4 @@
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 // const doNotBlendStorage = new LimitedSet<string>(1_000)
 const dontBlend = () => {
@@ -14,7 +14,7 @@ export function skipForBlending(
 
   if (blending === -1) return dontBlend()
 
-  const distance = ~~Vector.distance(vector, center)
+  const distance = ~~Vec.distance(vector, center)
 
   // Outside of circle, skip
   if (distance > radius) return true // blend

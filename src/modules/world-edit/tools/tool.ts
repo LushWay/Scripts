@@ -1,5 +1,5 @@
 import { ContainerSlot, MolangVariableMap, Player, system, world } from '@minecraft/server'
-import { ActionForm, ModalForm, Vector, inspect } from 'lib'
+import { ActionForm, ModalForm, Vec, inspect } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
@@ -133,7 +133,7 @@ class Tool extends WorldEditTool {
 
             hit.block.dimension.spawnParticle(
               lore[1],
-              Vector.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+              Vec.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
               variables,
             )
           }

@@ -1,7 +1,7 @@
 import { Entity, Player, ScoreboardObjective, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { t } from 'lib/text'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 
 export interface LeaderboardInfo {
@@ -46,7 +46,7 @@ export class Leaderboard {
     style = 'green',
     displayName = objective,
   }: LeaderboardInfo) {
-    const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vector.floor(location))
+    const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vec.floor(location))
     entity.nameTag = 'Updating...'
     entity.addTag(Leaderboard.tag)
 

@@ -1,7 +1,7 @@
 import { Entity, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, ms, Vector } from 'lib'
+import { Boss, ms, Vec } from 'lib'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ClosingChatSet } from 'lib/extensions/player'
@@ -160,7 +160,7 @@ class HealthIndicator {
     info.damage = Math.max(0, info.damage + damage) // Do not allow values less then 0
 
     setNameTag(info.separated ? info.indicator : info.hurtEntity, () => this.getBar(entity))
-    if (info.separated) info.indicator.teleport(Vector.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
+    if (info.separated) info.indicator.teleport(Vec.add(entity.getHeadLocation(), { x: 0, y: 1, z: 0 }))
   }
 
   private createHurtEntityRecord(entity: Entity) {

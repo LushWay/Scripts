@@ -1,5 +1,5 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { ROLES, getRole } from './roles'
 import { separateNumberWithDots } from './util'
 import { stringify } from './utils/inspect'
@@ -176,8 +176,8 @@ export function textUnitColorize(unit: unknown, options: ColorizingOptions = {})
       if (unit instanceof Player) {
         if (options.roles) return `${ROLES[getRole(unit.id)]}§r ${unitColor}${unit.name}`
         else return unitColor + unit.name
-      } else if (Vector.is(unit)) {
-        return Vector.string(unit, true)
+      } else if (Vec.isVec(unit)) {
+        return Vec.string(unit, true)
       } else return stringify(unit)
 
     case 'symbol':

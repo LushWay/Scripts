@@ -16,7 +16,7 @@ import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { FloatingText } from './floating-text'
 import { Group, Place } from './place'
@@ -196,7 +196,7 @@ export class Boss {
       this.spawnEntity()
     } else if (this.location.valid) {
       this.floatingText.update(
-        Vector.add(this.location, { x: 0, y: 2, z: 0 }),
+        Vec.add(this.location, { x: 0, y: 2, z: 0 }),
         `${this.options.place.name}\n${t.time`До появления\n§7осталось ${this.options.respawnTime - (Date.now() - db.date)}`}`,
       )
     }

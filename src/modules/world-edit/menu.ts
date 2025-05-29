@@ -1,7 +1,7 @@
 import { BlockStates, BlockTypes, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, FormCallback, ModalForm, Vector, inspect, is, noNullable, stringify } from 'lib'
+import { ActionForm, BUTTON, FormCallback, ModalForm, Vec, inspect, is, noNullable, stringify } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
@@ -70,8 +70,8 @@ function WEChestFromBlocksSet(player: Player) {
     .addDropdown('Набор блоков', ...blocksSetDropdown(['', ''], player))
     .show(player, (ctx, blocksSet) => {
       const blocks = getBlocksInSet([player.id, blocksSet]).filter(noNullable)
-      const pos1 = Vector.floor(player.location)
-      const pos2 = Vector.add(pos1, { x: 0, z: 0, y: -blocks.length })
+      const pos1 = Vec.floor(player.location)
+      const pos2 = Vec.add(pos1, { x: 0, z: 0, y: -blocks.length })
       WorldEdit.forPlayer(player).backup('Раздатчик блоков из набора', pos1, pos2)
 
       const randomizer = weRandomizerTool.create([player.id, blocksSet])
@@ -86,7 +86,7 @@ function WEChestFromBlocksSet(player: Player) {
       }
 
       for (const [i, block] of blocks.entries()) {
-        const pos = Vector.add(pos1, { x: 0, z: 0, y: -i - 1 })
+        const pos = Vec.add(pos1, { x: 0, z: 0, y: -i - 1 })
         player.dimension.getBlock(pos)?.setPermutation(toPermutation(block))
       }
     })

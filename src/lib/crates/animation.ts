@@ -3,7 +3,7 @@ import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-d
 import { StructureRootId } from 'lib/assets/structures'
 import { Cooldown } from '../cooldown'
 import { t } from '../text'
-import { Vector } from '../vector'
+import { Vec } from '../vector'
 
 export default class ChestLootAnimation {
   constructor(
@@ -22,13 +22,13 @@ export default class ChestLootAnimation {
   private animate(entity: Entity, player: Player, current: CurrentAnimation) {
     const standing = current.stage > 25
     const y = standing ? 0 : current.stage * 0.005
-    const animationLocation = Vector.add(entity.location, { x: 0, y, z: 0 })
+    const animationLocation = Vec.add(entity.location, { x: 0, y, z: 0 })
     entity.teleport(animationLocation)
-    const particleSource = !standing ? animationLocation : Vector.add(entity.location, { x: 0, y: 1.5, z: 0 })
+    const particleSource = !standing ? animationLocation : Vec.add(entity.location, { x: 0, y: 1.5, z: 0 })
 
     player.spawnParticle(
       'minecraft:balloon_gas_particle',
-      Vector.subtract(Vector.add(particleSource, { x: 0.5, y: -0.2, z: 0.5 }), this.entityOffset),
+      Vec.subtract(Vec.add(particleSource, { x: 0.5, y: -0.2, z: 0.5 }), this.entityOffset),
     )
   }
 
@@ -48,7 +48,7 @@ export default class ChestLootAnimation {
     })[0]
 
     if (typeof entity === 'undefined') {
-      console.warn(t.error`Unable to spawn armor stand for ${this.id}, location ${Vector.string(location, true)}`)
+      console.warn(t.error`Unable to spawn armor stand for ${this.id}, location ${Vec.string(location, true)}`)
       return
     }
 
@@ -58,7 +58,7 @@ export default class ChestLootAnimation {
     if (enchantments?.length) entity.runCommand(`enchant @s ${enchantments[0]?.type.id} 1`)
 
     entity.addEffect(MinecraftEffectTypes.SlowFalling, this.timetick, { showParticles: false, amplifier: 255 })
-    entity.teleport(Vector.add(location, this.entityOffset))
+    entity.teleport(Vec.add(location, this.entityOffset))
 
     this.current = {
       item,

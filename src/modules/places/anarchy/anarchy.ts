@@ -1,5 +1,5 @@
 import { GameMode, Player } from '@minecraft/server'
-import { EventSignal, InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToString } from 'lib'
+import { EventSignal, InventoryStore, Portal, ValidLocation, Vec, location, rawMessageToString } from 'lib'
 import { Language } from 'lib/assets/lang'
 import { isNotPlaying } from 'lib/game-utils'
 import { itemNameXCount } from 'lib/shop/item-name-x-count'
@@ -49,7 +49,7 @@ class AnarchyBuilder extends AreaWithInventory {
   }
 
   private createPortal(portalLocation: ValidLocation<Vector3>) {
-    this.portal = new Portal('anarchy', ...Vector.around(portalLocation, 0, 1, 1), player => {
+    this.portal = new Portal('anarchy', ...Vec.around(portalLocation, 0, 1, 1), player => {
       if (isNotPlaying(player)) return tpMenuOnce(player)
       if (player.database.inv === this.inventoryName) {
         return player.fail(t.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)

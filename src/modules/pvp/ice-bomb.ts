@@ -1,6 +1,6 @@
 import { Entity, EntityComponentTypes, ItemStack, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector, ms } from 'lib'
+import { Vec, ms } from 'lib'
 import { customItems } from 'lib/rpg/custom-item'
 import { scheduleBlockPlace } from 'lib/scheduled-block-place'
 import { toPoint } from 'lib/utils/point'
@@ -50,7 +50,7 @@ system.runInterval(
         continue
       }
 
-      const floored = Vector.floor(entity.location)
+      const floored = Vec.floor(entity.location)
       const dimension = entity.dimension
       const dimensionType = dimension.type
 

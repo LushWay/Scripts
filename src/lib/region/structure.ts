@@ -1,5 +1,4 @@
 import {
-  Block,
   BlockPermutation,
   Dimension,
   LocationInUnloadedChunkError,
@@ -9,7 +8,7 @@ import {
 } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { getScheduledToPlaceAsync, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Region } from './kinds/region'
 
 system.delay(() => {
@@ -75,7 +74,7 @@ export class RegionStructure {
     )
     if (schedules) {
       for (const unloadedBlock of unloadedBlocks) {
-        const schedule = schedules.find(e => Vector.equals(e.location, unloadedBlock.vector))
+        const schedule = schedules.find(e => Vec.equals(e.location, unloadedBlock.vector))
         if (schedule) unscheduleBlockPlace(schedule)
         scheduleBlockPlace({
           dimension: dimension.type,
@@ -96,7 +95,7 @@ export class RegionStructure {
     const { x, y, z } = this.region.area.size
     if (x >= 64 || y >= 128 || z >= 64) {
       throw new TypeError(
-        `Can only save structures with x <= 64, y <= 128 and z <= 64 because of the structures limit. Got ${Vector.string({ x, y, z })}`,
+        `Can only save structures with x <= 64, y <= 128 and z <= 64 because of the structures limit. Got ${Vec.string({ x, y, z })}`,
       )
     }
   }
@@ -113,9 +112,9 @@ export class RegionStructure {
 
     return this.region.area.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
-        const structureLocation = Vector.multiply(Vector.subtract(edge, vector), -1)
+        const structureLocation = Vec.multiply(Vec.subtract(edge, vector), -1)
         const structureSavedBlock = structure.getBlockPermutation(
-          offset ? Vector.add(structureLocation, offset) : structureLocation,
+          offset ? Vec.add(structureLocation, offset) : structureLocation,
         )
         callback(vector, structureSavedBlock, dimension)
       }

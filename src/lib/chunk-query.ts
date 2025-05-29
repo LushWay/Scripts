@@ -148,7 +148,7 @@ export class ChunkQuery<T extends object = any> {
     const [from, to] = VecXZ.around(point.vector, distance + ChunkArea.size)
     for (let x = from.x; x <= to.x; x += ChunkArea.size) {
       for (let z = from.z; z <= to.z; z += ChunkArea.size) {
-        if (!VecXZ.distanceCompare(point.vector, { x, z }, distance + ChunkArea.size)) continue
+        if (!VecXZ.isInsideRadius(point.vector, { x, z }, distance + ChunkArea.size)) continue
         const key = this.getChunkKey(x, z)
         const chunk = chunks.get(key)
         if (chunk) result.push(chunk)

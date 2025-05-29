@@ -3,7 +3,7 @@ import { GameMode, system, world } from '@minecraft/server'
 import * as GameTest from '@minecraft/server-gametest'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector, util } from 'lib'
+import { Vec, util } from 'lib'
 import { TestStructures } from 'test/constants'
 const time = 9999999
 
@@ -125,7 +125,7 @@ new Command('player')
       `execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "${simulatedPlayer}:spawn_one"`,
     )
 
-    world.overworld.getBlock(Vector.add(testLoc, { x: 1, y: 0, z: 1 }))?.setType(MinecraftBlockTypes.RedstoneBlock)
+    world.overworld.getBlock(Vec.add(testLoc, { x: 1, y: 0, z: 1 }))?.setType(MinecraftBlockTypes.RedstoneBlock)
 
     await system.sleep(10)
 

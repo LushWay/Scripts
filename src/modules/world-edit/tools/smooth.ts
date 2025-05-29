@@ -1,7 +1,7 @@
 import { Block, BlockPermutation, ContainerSlot, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { is, ModalForm, util, Vector } from 'lib'
+import { is, ModalForm, util, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ngettext } from 'lib/utils/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
@@ -76,8 +76,8 @@ export async function smoothVoxelData(
   replaceTargets: ReplaceTarget[],
 ) {
   return new Promise<void>((resolve, reject) => {
-    const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
-    const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
+    const pos1 = Vec.add(baseBlock, { x: radius, y: radius, z: radius })
+    const pos2 = Vec.add(baseBlock, { x: -radius, y: -radius, z: -radius })
 
     WorldEdit.forPlayer(player).backup('Сглаживание', pos1, pos2)
 
@@ -213,7 +213,7 @@ function* getBlocksAreasData(block: Block, radius: number) {
     for (let x = -radius, x2 = 0; x < radius; x++, x2++) {
       const bz = []
       for (let z = -radius; z < radius; z++) {
-        const location = Vector.add(block.location, { x, y, z })
+        const location = Vec.add(block.location, { x, y, z })
 
         const value = BLOCK_CACHE[location.x]?.[location.y]?.[location.z]
         if (value) {

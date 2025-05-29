@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, ms, Vector } from 'lib'
+import { Boss, Loot, ms, Vec } from 'lib'
 import { Group } from 'lib/rpg/place'
 import { Chip } from './engineer'
 
@@ -46,7 +46,7 @@ export function createBossGolem(group: Group) {
       const boss = hurtEntity.location
       const player = damagingEntity
       if (player && player.location.y - 2 > hurtEntity.location.y && lessThenQuarter) {
-        const distance = Vector.subtract(boss, player.location).multiply(0.5)
+        const distance = Vec.subtract(boss, player.location).multiply(0.5)
         player.applyKnockback(distance, distance.y)
       }
     }

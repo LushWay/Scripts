@@ -1,6 +1,6 @@
 import { ItemStack, system, world } from '@minecraft/server'
 
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { customItems } from 'lib/rpg/custom-item'
@@ -31,7 +31,7 @@ world.afterEvents.itemUse.subscribe(event => {
   if (!projectile) throw new TypeError('No projectile!')
 
   projectile.owner = event.source
-  projectile.shoot(Vector.multiply(event.source.getViewDirection(), 1.3), { uncertainty: 0.1 })
+  projectile.shoot(Vec.multiply(event.source.getViewDirection(), 1.3), { uncertainty: 0.1 })
   explosibleEntities.add({ source: event.source, entity, explosion: fireballExplosion })
 })
 

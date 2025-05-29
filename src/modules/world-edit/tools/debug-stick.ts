@@ -1,6 +1,6 @@
 import { Block, BlockStates, ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
-import { ModalForm, Vector } from 'lib'
+import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { t, textTable } from 'lib/text'
@@ -94,7 +94,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     stateName: string,
   ) {
     const nextStateName = player.isSneaking ? nextValue(stateNames, stateName) : stateName
-    return t`${Vector.string(block, true)} ${block.typeId}\n${textTable(
+    return t`${Vec.string(block, true)} ${block.typeId}\n${textTable(
       Object.map(allStates, (key, value) =>
         key === stateName ? ['§b' + key, value] : key === nextStateName ? ['§e' + key, value] : [key, value],
       ),
@@ -145,7 +145,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     if (stateNames.length === 0) return
 
     const cacheTypeId = block.typeId
-    const cacheLocationId = Vector.string(block)
+    const cacheLocationId = Vec.string(block)
     const stateName =
       this.blockLocationCache.get(cacheLocationId) ??
       this.blockTypeCache.get(cacheTypeId) ??

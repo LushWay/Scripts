@@ -14,7 +14,7 @@ import { isNotPlaying } from 'lib/game-utils'
 import { onPlayerMove } from 'lib/player-move'
 import { t } from 'lib/text'
 import { AbstractPoint } from 'lib/utils/point'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
 import {
   BLOCK_CONTAINERS,
@@ -209,8 +209,8 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   if (pvp === true) return
   if (pvp === 'pve' && !(hurtEntity instanceof Player && damagingEntity instanceof Player)) return
 
-  let direction = Vector.subtract(damagingEntity.location, hurtEntity.location).normalized()
-  direction = Vector.multiply(direction, 10)
+  let direction = Vec.subtract(damagingEntity.location, hurtEntity.location).normalized()
+  direction = Vec.multiply(direction, 10)
 
   if (damagingEntity instanceof Player) {
     damagingEntity.onScreenDisplay.setActionBar(t.error`Нельзя сражаться в мирной зоне`, ActionbarPriority.Highest)

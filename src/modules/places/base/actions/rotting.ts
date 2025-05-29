@@ -11,7 +11,7 @@ import {
   isNotPlaying,
   Mail,
   ms,
-  Vector,
+  Vec,
 } from 'lib'
 import { table } from 'lib/database/abstract'
 import { anyPlayerNearRegion } from 'lib/player-move'
@@ -38,7 +38,7 @@ system.runInterval(
       const isLoaded = anyPlayerNearRegion(base, 20)
       if (block === 'unloaded' || !isLoaded) continue
 
-      spawnParticlesInArea(base.area.center, Vector.add(base.area.center, Vector.one))
+      spawnParticlesInArea(base.area.center, Vec.add(base.area.center, Vec.one))
 
       if (block.typeId === MinecraftBlockTypes.Barrel) {
         if (blocksToMaterialsCooldown.isExpired(base.id)) blocksToMaterials(base)
@@ -103,7 +103,7 @@ export function baseRottingButton(base: BaseRegion, player: Player, back?: VoidF
   if (base.ldb.state === RottingState.NoMaterials) {
     text = '§cБаза гниет!\n§4Срочно пополните материалы!'
   } else if (base.ldb.state === RottingState.Destroyed) {
-    text = `§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vector.string(base.area.center, true)}!`
+    text = `§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vec.string(base.area.center, true)}!`
   } else {
     text = `Состояние базы`
   }
@@ -135,7 +135,7 @@ async function startRotting(base: BaseRegion, state: RottingState) {
 
   const { radius, center } = base.area
   await forEachChangedBlock(base, (_, savedPermutation, location) => {
-    if (!savedPermutation || Vector.equals(base.area.center, location)) return
+    if (!savedPermutation || Vec.equals(base.area.center, location)) return
 
     // radius = 10
     // distance | restore time
@@ -143,7 +143,7 @@ async function startRotting(base: BaseRegion, state: RottingState) {
     // 6 (stone)  4 hours
     // This means that the far block is from
     // center the faster it will rot
-    const distance = Vector.distance(location, center)
+    const distance = Vec.distance(location, center)
     const restoreTime = ms.from(__DEV__ ? 'min' : 'hour', radius - distance)
 
     scheduleBlockPlace({
@@ -303,7 +303,7 @@ function forEachChangedBlock(
   callback: (block: Block | undefined, savedPermutation: BlockPermutation | undefined, location: Vector3) => void,
 ) {
   return base.structure.forEachBlock((location, savedPermutation) => {
-    if (Vector.equals(location, base.area.center)) return
+    if (Vec.equals(location, base.area.center)) return
 
     const block = base.dimension.getBlock(location)
     if (savedPermutation && block && permutationEquals(block.permutation, savedPermutation)) return
@@ -347,7 +347,7 @@ actionGuard((player, base, ctx) => {
   if (base.ldb.state === RottingState.NoMaterials || base.ldb.state === RottingState.Destroyed) {
     if (
       (ctx.type === 'interactWithBlock' || ctx.type === 'place') &&
-      Vector.equals(ctx.event.block.location, base.area.center)
+      Vec.equals(ctx.event.block.location, base.area.center)
     ) {
       system.delay(() => {
         console.log('revise')

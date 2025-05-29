@@ -20,7 +20,7 @@ import {
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 const logger = createLogger('Minearea')
 
@@ -59,7 +59,7 @@ export class MineareaRegion extends RegionWithStructure {
   private restoringStructureProgress = 0
 
   get restoringStructurePercent() {
-    return (this.restoringStructureProgress / Vector.size({ x: 0, y: 0, z: 0 }, this.area.size)) * 100
+    return (this.restoringStructureProgress / Vec.size({ x: 0, y: 0, z: 0 }, this.area.size)) * 100
   }
 
   private restoringStructurePromise: Promise<MineareaRegion[]> | undefined

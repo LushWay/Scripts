@@ -1,5 +1,5 @@
 import { MolangVariableMap, Player, StructureRotation, system, world } from '@minecraft/server'
-import { ArrayForm, isKeyof, Vector } from 'lib'
+import { ArrayForm, isKeyof, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
@@ -69,12 +69,12 @@ function getDungeon(player: Player, rotation: StructureRotation) {
 
   const region = isKeyof(storage.type, Dungeon.names)
     ? new DungeonRegion(
-        new SphereArea({ center: Vector.floor(player.location), radius: 0 }, player.dimension.type),
+        new SphereArea({ center: Vec.floor(player.location), radius: 0 }, player.dimension.type),
         { structureId: storage.type, rotation },
         '',
       )
     : new CustomDungeonRegion(
-        new SphereArea({ center: Vector.floor(player.location), radius: 10 }, player.dimension.type),
+        new SphereArea({ center: Vec.floor(player.location), radius: 10 }, player.dimension.type),
         { name: storage.type },
         '',
       )
@@ -98,7 +98,7 @@ world.afterEvents.itemUse.subscribe(event => {
     DungeonRegion.create(dungeon.area, { structureId: dungeon.structureId, rotation })
   }
 
-  player.success(t`Данж создан на ${Vector.string(dungeon.area.center, true)}`)
+  player.success(t`Данж создан на ${Vec.string(dungeon.area.center, true)}`)
 })
 
 system.runPlayerInterval(
@@ -108,14 +108,14 @@ system.runPlayerInterval(
     if (!dungeon) return
 
     const { from, to } = dungeon.structureBounds()
-    for (const l of Vector.forEach(from, to)) {
-      if (!Vector.isEdge(from, to, l)) continue
+    for (const l of Vec.forEach(from, to)) {
+      if (!Vec.isEdge(from, to, l)) continue
 
       player.spawnParticle('minecraft:balloon_gas_particle', l, particle)
     }
 
     player.onScreenDisplay.setActionBar(
-      t`rotation: ${rotation} size: ${Vector.subtract(from, to)}\nfrom: ${from} to: ${to}`,
+      t`rotation: ${rotation} size: ${Vec.subtract(from, to)}\nfrom: ${from} to: ${to}`,
       ActionbarPriority.Highest,
     )
   },

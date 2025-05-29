@@ -1,6 +1,6 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { Cooldown } from 'lib/cooldown'
 import { ms } from 'lib/utils/ms'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
@@ -31,7 +31,7 @@ world.beforeEvents.itemUse.subscribe(event => {
 
     decreaseMainhandItemCount(event.source)
     const tnt = event.source.dimension.spawnEntity(MinecraftEntityTypes.Tnt, event.source.location)
-    tnt.applyImpulse(Vector.multiply(event.source.getViewDirection(), 0.8))
+    tnt.applyImpulse(Vec.multiply(event.source.getViewDirection(), 0.8))
     event.source.playSound('camera.take_picture', { volume: 4, pitch: 0.9 })
     explosibleEntities.add({ entity: tnt, source: event.source, explosion: throwableTntExplosion })
   })
