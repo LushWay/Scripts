@@ -43,8 +43,7 @@ export class BossArenaRegion extends Region {
     this.boss = options.boss
   }
 
-  returnEntity(entity: Entity) {
-    const center = this.area.center
+  returnEntity(entity: Entity, center = this.area.center) {
     const location = entity.location
     const horizontal = Vector.distance({ x: location.x, y: 0, z: location.z }, { x: center.x, y: 0, z: center.z }) / 10
     const vertical = Math.abs(location.y - center.y) / 10

@@ -75,7 +75,8 @@ RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
   const region = previous.find(e => e instanceof BossArenaRegion)
 
   if (lockAction.isLocked(player) && region && !newest.some(e => e instanceof BossArenaRegion)) {
-    region.returnEntity(player)
+    const boss = region.boss
+    region.returnEntity(player, boss?.location.valid ? boss.location : undefined)
     playerTimeouts.set(player, {
       expires: Date.now() + ms.from('sec', 4),
       callback() {
