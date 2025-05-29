@@ -43,13 +43,10 @@ export class SafePlace {
       this.createSafeArea(location)
     })
 
+    // The order doesn't matter because onLoad is being called
+    // if location was already loaded and you try to subscribe to it
     this.portalFrom.onLoad.subscribe(from => {
       this.portalTo.onLoad.subscribe(to => {
-        this.createPortal(from, to)
-      })
-    })
-    this.portalTo.onLoad.subscribe(to => {
-      this.portalFrom.onLoad.subscribe(from => {
         this.createPortal(from, to)
       })
     })

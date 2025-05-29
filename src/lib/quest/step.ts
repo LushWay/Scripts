@@ -51,6 +51,7 @@ export abstract class QSBuilder<S extends QS> {
    *
    * @param place - Place to target compass to
    */
+  // TODO Migrate to LocationInDimension
   place(place: Vector3) {
     this.step.place = place
     return this

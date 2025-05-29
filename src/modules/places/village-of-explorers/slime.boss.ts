@@ -3,7 +3,7 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Loot, ms } from 'lib'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
-import { MagicSlimeBall } from './village-of-explorers'
+import { MagicSlimeBall } from './items'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()

@@ -11,22 +11,15 @@ import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { form } from 'lib/form/new'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
-import { Npc } from 'lib/rpg/npc'
-import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
-import { stoneQuarryInvestigating } from 'modules/places/stone-quarry/quests/investigating'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
-
-// TODO Write second quests for investigating other places
-// TODO Add catscenes
 
 const logger = createLogger('Learning Quest')
 
@@ -237,7 +230,7 @@ class Learning {
         )
       })
 
-    q.dialogue(this.miner, 'Шахтер зовет вас наверх, чтобы поговорить!').body('Приветствую!').buttons()
+    q.dialogue(VillageOfMiners.guide, 'Шахтер зовет вас наверх, чтобы поговорить!').body('Приветствую!').buttons()
   })
 
   learningLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
@@ -247,50 +240,6 @@ class Learning {
   startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 
   startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
-
-  miner = new Npc(this.quest.group.point('miner').name('Шахтер'), ({ player }) => {
-    form(f => {
-      f.title(this.miner.name)
-      f.quest(stoneQuarryInvestigating.goToCityQuest, 'Где мне переплавить железо?')
-      f.quest(this.mine10Iron, 'Где добыть еще больше железа?')
-      f.quest(this.mine10Coal, 'Где добыть угля?')
-      f.quest(this.mine10Diamonds, 'Где добыть алмазы?')
-    }).show(player)
-    return true
-  })
-
-  createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
-    return new Quest(id, text, 'Да', q => {
-      q.break((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
-
-      const reward = q.button().reward(rewards)
-      if (this.miner.location.valid) reward.place(this.miner.location)
-    })
-  }
-
-  mine10Iron = this.createMineQuest(
-    'mine-10-iron',
-    'Добыть железо',
-    10,
-    [b.IronOre, b.DeepslateIronOre],
-    new Rewards().money(600),
-  )
-
-  mine10Coal = this.createMineQuest(
-    'mine-10-coal',
-    'Добыть уголь',
-    10,
-    [b.CoalOre, b.DeepslateCoalOre],
-    new Rewards().money(400),
-  )
-
-  mine10Diamonds = this.createMineQuest(
-    'mine-10-diamonds',
-    'Добыть алмазы',
-    10,
-    [b.DiamondOre, b.DeepslateDiamondOre],
-    new Rewards().money(1000),
-  )
 
   blockedOre = new WeakPlayerMap<string[]>()
 

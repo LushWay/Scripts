@@ -1,4 +1,5 @@
 import { Player, TeleportOptions, Vector3, system } from '@minecraft/server'
+import { isEmpty } from 'lib/util'
 import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
 import { Place } from './rpg/place'
@@ -146,7 +147,8 @@ system.delay(() => {
 
 /** Migration helper */
 export function migrateLocationName(oldGroup: string, oldName: string, newGroup: string, newName: string) {
-  const location = Settings.worldDatabase.get(oldGroup)[oldName]
+  const group = Settings.worldDatabase.get(oldGroup)
+  const location = group[oldName]
   if (typeof location !== 'undefined') {
     console.debug(t`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
 
@@ -154,7 +156,9 @@ export function migrateLocationName(oldGroup: string, oldName: string, newGroup:
 
     Reflect.deleteProperty(Settings.worldDatabase.get(oldGroup), oldName)
   } else if (!Settings.worldDatabase.get(newGroup)[newName]) {
-    console.warn(t.error`No location found at ${oldGroup}:${oldName}`)
+    console.warn(
+      t.error`No location found at ${oldGroup}:${oldName}. Group: ${isEmpty(group) ? [...Settings.worldDatabase.keys()] : Object.keys(group)}`,
+    )
   }
 }
 
@@ -167,6 +171,6 @@ export function migrateLocationGroup(from: string, to: string) {
 
     Settings.worldDatabase.delete(from)
   } else {
-    console.warn(t.error`No migration for group ${from}`)
+    console.warn(t.error`No group found for migration: ${from} -> ${to}. Groups: ${[...Settings.worldDatabase.keys()]}`)
   }
 }

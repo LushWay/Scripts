@@ -1,19 +1,14 @@
-import { ItemStack } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Loot } from 'lib'
-import { customItems } from 'lib/rpg/custom-item'
+import { form } from 'lib/form/new'
+import { Npc } from 'lib/rpg/npc'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
+import { techCityInvestigating } from '../tech-city/quests/investigating'
+import { MagicSlimeBall } from './items'
 import { Mage } from './mage'
 import { createBossSlime } from './slime.boss'
-
-export const MagicSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
-  '§aМагическая слизь',
-  'Используется у Инженера',
-)
-customItems.push(MagicSlimeBall)
 
 class VillageOfExporersBuilder extends City {
   constructor() {
@@ -34,6 +29,14 @@ class VillageOfExporersBuilder extends City {
   }
 
   stoner = new Stoner(this.group)
+
+  guide = new Npc(this.group.point('guide').name('Исследователь'), ({ player }) => {
+    form(f => {
+      f.title(this.guide.name)
+      f.quest(techCityInvestigating.goToCityQuest, 'А где мне базу сделать-то?')
+    }).show(player)
+    return true
+  })
 }
 
 export const VillageOfExplorers = new VillageOfExporersBuilder()

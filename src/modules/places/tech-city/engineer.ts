@@ -9,7 +9,7 @@ import { MaybeRawText, t } from 'lib/text'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { isNewbie } from 'modules/pvp/newbie'
 import { BaseItem } from '../base/base'
-import { MagicSlimeBall } from '../village-of-explorers/village-of-explorers'
+import { MagicSlimeBall } from '../village-of-explorers/items'
 
 export const CircuitBoard = new ItemStack(Items.CircuitBoard).setInfo(
   undefined,

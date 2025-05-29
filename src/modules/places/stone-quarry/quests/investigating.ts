@@ -13,4 +13,12 @@ export const stoneQuarryInvestigating = new CityInvestigating(StoneQuarry, (plac
   q.dialogue(place.gunsmith.npc)
     .body('Привет я оружейник я прокачаю твое оружие')
     .buttons(['Хорошо отлично я у тебя его прокачаю', ctx => ctx.next()])
+
+  q.dialogue(place.butcher.npc).body('').buttons()
+
+  q.dialogue(place.barman.npc).body('').buttons()
+
+  q.dialogue(place.auntzine.npc).body('').buttons()
+
+  q.dialogue(place.scavenger.npc).body('').buttons()
 })

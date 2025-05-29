@@ -7,8 +7,10 @@ import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
+import { form, NewFormCreator } from 'lib/form/new'
+import { Npc } from 'lib/rpg/npc'
 
-export class City extends SafePlace {
+export abstract class City extends SafePlace {
   quests: Quest[] = []
 
   createQuest() {
@@ -35,4 +37,6 @@ export class City extends SafePlace {
   jeweler = new Jeweler(this.group)
 
   scavenger = new Scavenger(this.group)
+
+  abstract guide: Npc
 }
