@@ -19,7 +19,7 @@ describe('ChunkCubeArea', () => {
     expect(chunk.radius).toMatchInlineSnapshot(`214.6165184695717`)
 
     expect(chunk.size).toMatchInlineSnapshot(`
-    Vector {
+    Vec {
       "x": 10,
       "y": 429,
       "z": 10,

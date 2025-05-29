@@ -1,5 +1,7 @@
 import { Loot } from 'lib'
+import { CutArea } from 'lib/region/areas/cut'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
+import { QuartzMineRegion } from '../anarchy/quartz'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
@@ -25,6 +27,10 @@ class TechCityBuilder extends City {
   golem = createBossGolem(this.group)
 
   private create() {
+    if (this.safeArea) {
+      QuartzMineRegion.create(new CutArea({ parent: this.safeArea.area.toJSON(), cut: { axis: 'y', to: 56 } }))
+    }
+
     const { normal, donut } = this.createKits(
       new Loot()
         .itemStack(CannonItem.blueprint)

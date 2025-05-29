@@ -7,9 +7,9 @@ import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
 import { getBlockStatus } from 'lib/game-utils'
 import { ConfigurableLocation, location } from 'lib/location'
-import { Area } from 'lib/region/areas/area'
+import { Area, AreaAsJson } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { forceAllowSpawnInRegion, restoreAreaFromJSON } from 'lib/region/index'
+import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
@@ -28,7 +28,7 @@ interface BossDB {
 }
 
 interface BossArenaDB {
-  area: ReturnType<Area['toJSON']>
+  area: AreaAsJson
   ldb?: JsonObject
 }
 
@@ -130,7 +130,7 @@ export class Boss {
     this.location.onLoad.subscribe(center => {
       this.check()
       const area =
-        (areadb?.area ? restoreAreaFromJSON(areadb.area) : undefined) ??
+        (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??
         new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
 
       this.region = BossArenaRegion.create(area, {

@@ -9,6 +9,7 @@ import './menu'
 import './random-teleport'
 import './realtime'
 import './sidebar'
+import './cleanup'
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
@@ -22,8 +23,6 @@ declare module '@minecraft/server' {
 
       /** Player anarchy position */
       anarchy?: Vector3
-
-      doNotSaveAnarchy?: 1
 
       deadAt?: Vector3
 

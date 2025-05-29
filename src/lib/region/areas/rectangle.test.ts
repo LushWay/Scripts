@@ -21,12 +21,12 @@ describe('rectangle', () => {
 
     expect(rect.edges).toMatchInlineSnapshot(`
       [
-        {
+        Vec {
           "x": 10,
           "y": 10,
           "z": 10,
         },
-        {
+        Vec {
           "x": 20,
           "y": 20,
           "z": 20,
@@ -35,7 +35,7 @@ describe('rectangle', () => {
     `)
 
     expect(rect.center).toMatchInlineSnapshot(`
-      Vector {
+      Vec {
         "x": 15,
         "y": 15,
         "z": 15,
@@ -48,12 +48,12 @@ describe('rectangle', () => {
 
     expect(rect.edges).toMatchInlineSnapshot(`
       [
-        {
+        Vec {
           "x": -20,
           "y": -20,
           "z": -20,
         },
-        {
+        Vec {
           "x": -10,
           "y": -10,
           "z": -10,
@@ -62,7 +62,7 @@ describe('rectangle', () => {
     `)
 
     expect(rect.center).toMatchInlineSnapshot(`
-      Vector {
+      Vec {
         "x": -15,
         "y": -15,
         "z": -15,

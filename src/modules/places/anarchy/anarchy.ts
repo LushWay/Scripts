@@ -18,7 +18,7 @@ class AnarchyBuilder extends AreaWithInventory {
 
   zone: RadioactiveZone | undefined
 
-  async learningRTP(player: Player): Promise<void> {
+  async enterLearning(player: Player): Promise<void> {
     // Hook function
   }
 
@@ -57,18 +57,21 @@ class AnarchyBuilder extends AreaWithInventory {
 
       if (!Portal.canTeleport(player)) return
 
-      Portal.fadeScreen(player)
-      this.switchInventory(player)
-
       if (!player.database.survival.anarchy) {
-        this.learningRTP(player).then(() => {
+        this.enterLearning(player).then(() => {
+          this.switchInventory(player)
           showSurvivalHud(player)
         })
       } else {
+        Portal.fadeScreen(player)
+
         player.teleport(player.database.survival.anarchy)
         delete player.database.survival.anarchy
+        this.switchInventory(player)
+
         showSurvivalHud(player)
         Portal.showHudTitle(player, '§6> §cAnarchy §6<')
+
         EventSignal.emit(this.onPlayerEnter, { player })
       }
     })
@@ -118,7 +121,7 @@ class AnarchyBuilder extends AreaWithInventory {
       .join('\n')}`
 
     // Do not save location if on spawn
-    if (Spawn.region?.area.isIn(player) || player.database.survival.doNotSaveAnarchy) return
+    if (Spawn.region?.area.isIn(player)) return
     player.database.survival.anarchy = {
       x: Math.round(player.location.x),
       z: Math.round(player.location.z),

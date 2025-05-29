@@ -11,7 +11,7 @@ import {
   registerSaveableRegion,
   Vec,
 } from 'lib'
-import { StructureFile, structureFiles } from 'lib/assets/structures'
+import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
@@ -152,8 +152,10 @@ export class DungeonRegion extends Region {
     return {
       ...super.customFormDescription(player),
       Rotation: this.ldb.rotation,
+      Dungeon: StructureDungeonsId[this.structureId as keyof typeof StructureDungeonsId],
+      StructureId: this.ldb.structureId,
       StructurePosition: this.getStructurePosition(),
-      Chests: this.chests.map(e => Vec.string(e.location, true)),
+      Chests: this.chests.map(e => `${Vec.string(e.location, true)} ${e.loot.id ?? 'no loot'}`).join('\n'),
     }
   }
 
@@ -161,7 +163,6 @@ export class DungeonRegion extends Region {
     if (!this.structureFile) return { from: this.area.center, to: this.area.center, fromAbsolute: this.area.center }
     const fromAbsolute = this.getStructurePosition(StructureRotation.None)
     const toAbsolute = Vec.add(fromAbsolute, this.structureFile.size)
-
     const [from, to] = this.rotate([fromAbsolute, toAbsolute]) as [Vector3, Vector3]
 
     return { from: Vec.min(from, to), to: Vec.max(from, to), fromAbsolute }
@@ -170,9 +171,9 @@ export class DungeonRegion extends Region {
   protected getStructurePosition(rotation = this.ldb.rotation) {
     if (!this.structureFile) throw new TypeError('No structure file!')
 
-    return Vec.fromVector3(
-      structureLikeRotateRelative(rotation, Vec.multiply(this.structureFile.size, 0.5), this.structureFile.size),
-    )
+    const size = this.structureFile.size
+    const center = Vec.divide(size, 2)
+    return Vec.fromVector3(structureLikeRotateRelative(rotation, center, size))
       .multiply(-1)
       .floor()
       .add(this.area.center)
@@ -276,5 +277,5 @@ export class DungeonRegion extends Region {
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion)
-registerRegionType('Данж', DungeonRegion)
+registerRegionType('Данжи', DungeonRegion, false, true)
 adventureModeRegions.push(DungeonRegion)

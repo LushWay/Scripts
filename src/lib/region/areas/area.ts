@@ -6,6 +6,11 @@ import { Vec } from 'lib/vector'
 export type AreaCreator = new (o: any) => Area
 export type AreaWithType<T = AreaCreator> = T & { type: string }
 
+export interface AreaAsJson extends JsonObject {
+  t: string
+  d: JsonObject
+}
+
 export abstract class Area<T extends JsonObject = JsonObject> {
   static areas: AreaWithType[] = []
 
@@ -23,6 +28,18 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
     ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
     return b
+  }
+
+  static fromJson(a: AreaAsJson) {
+    Area.loaded = true
+
+    const area = Area.areas.find(e => e.type === a.t)
+    if (!area) {
+      console.warn(t`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
+      return
+    }
+
+    return new area(a.d)
   }
 
   constructor(
@@ -68,7 +85,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
    * Json representation that is used to save area to the database. Then result of this function will be provided to
    * restore the same state
    */
-  toJSON() {
+  toJSON(): AreaAsJson {
     return { t: this.type, d: this.database }
   }
 

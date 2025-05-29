@@ -8,7 +8,7 @@ describe('vector extra functions', () => {
 
   it('should parse', () => {
     expect(Vec.parse('-2431 231 543')).toMatchInlineSnapshot(`
-      Vector {
+      Vec {
         "x": -2431,
         "y": 231,
         "z": 543,

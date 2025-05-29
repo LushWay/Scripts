@@ -34,8 +34,7 @@ class Learning {
   id = 'learning'
 
   quest = new Quest('learning', 'Обучение', 'Обучение базовым механикам сервера', (q, player) => {
-    if (!this.randomTeleportLocation.valid || !this.craftingTableLocation.valid)
-      return q.failed('§cОбучение не настроено')
+    if (!this.learningLocation.valid || !this.craftingTableLocation.valid) return q.failed('§cОбучение не настроено')
 
     const maxReturnToAreaSteps = 4
     const returnToMineArea = (step: number) => () => {
@@ -46,7 +45,7 @@ class Learning {
         player.fail(
           t.error`Вы не можете покинуть зону добычи, пока не завершили задания ${step}/${maxReturnToAreaSteps}`,
         )
-        if (this.randomTeleportLocation.valid) player.teleport(this.randomTeleportLocation)
+        if (this.learningLocation.valid) player.teleport(this.learningLocation)
       }
     }
 
@@ -241,7 +240,7 @@ class Learning {
     q.dialogue(this.miner, 'Шахтер зовет вас наверх, чтобы поговорить!').body('Приветствую!').buttons()
   })
 
-  randomTeleportLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
+  learningLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
 
   craftingTableLocation = location(this.quest.group.point('crafting table').name('Верстак'))
 
@@ -335,13 +334,9 @@ class Learning {
       }
     })
 
-    Anarchy.learningRTP = async player => {
-      if (!this.randomTeleportLocation.valid) {
-        player.fail('Случайное перемещение не настроено')
-        Spawn.portal?.teleport(player)
-        delete player.database.survival.anarchy
-        return
-      }
+    Anarchy.enterLearning = async player => {
+      const toSpawn = () => Spawn.portal?.teleport(player)
+      if (!this.learningLocation.valid) return toSpawn(), player.fail('Случайное перемещение не настроено')
 
       const temp = new Temporary(({ system }) => {
         system.runInterval(
@@ -353,35 +348,30 @@ class Learning {
               fadeTime: { fadeInTime: 0, holdTime: 2, fadeOutTime: 2 },
             })
           },
-          'asdada',
+          'anarchy learning screen fade',
           20,
         )
       })
 
-      logger.info`Teleporting to ${this.randomTeleportLocation}`
-      player.database.survival.doNotSaveAnarchy = 1
-      player.teleport(this.randomTeleportLocation)
+      logger.player(player).info`Open rebith form`
 
       return new Promise(resolve => {
-        const back = () => {
-          delete player.database.survival.anarchy
-          Spawn.portal?.teleport(player)
-        }
         new ActionForm(
-          'Режим Анархия',
-          'Ты - выживший, ты мало что умеешь, и просто так рубить блоки не можешь, да. Следуй по компасу.',
+          'Перерождение',
+          'Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.',
         )
           .addButton('Вперед!', () => {
-            if (!this.randomTeleportLocation.valid) return
+            if (!this.learningLocation.valid) return
 
-            delete player.database.survival.doNotSaveAnarchy
+            logger.player(player).info`Teleporting to ${this.learningLocation}`
+            player.teleport(this.learningLocation)
             temp.cleanup()
             resolve()
             this.quest.enter(player)
           })
-          .addButtonBack(back)
+          .addButtonBack(toSpawn)
           .show(player)
-          .then(e => !e && back())
+          .then(shown => !shown && toSpawn())
       })
     }
   }

@@ -22,17 +22,17 @@ describe('structureLikeRotate', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate90, ...structure })
     expect(rotated).toMatchInlineSnapshot(`
       [
-        Vector {
+        Vec {
           "x": 21,
           "y": 0,
           "z": 0,
         },
-        Vector {
+        Vec {
           "x": 8,
           "y": 1,
           "z": 10,
         },
-        Vector {
+        Vec {
           "x": 12,
           "y": 1,
           "z": 15,
@@ -45,17 +45,17 @@ describe('structureLikeRotate', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate180, ...structure })
     expect(rotated).toMatchInlineSnapshot(`
       [
-        Vector {
+        Vec {
           "x": 19,
           "y": 0,
           "z": 21,
         },
-        Vector {
+        Vec {
           "x": 9,
           "y": 1,
           "z": 8,
         },
-        Vector {
+        Vec {
           "x": 4,
           "y": 1,
           "z": 12,
@@ -68,17 +68,17 @@ describe('structureLikeRotate', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate270, ...structure })
     expect(rotated).toMatchInlineSnapshot(`
       [
-        Vector {
+        Vec {
           "x": 0,
           "y": 0,
           "z": 19,
         },
-        Vector {
+        Vec {
           "x": 13,
           "y": 1,
           "z": 9,
         },
-        Vector {
+        Vec {
           "x": 9,
           "y": 1,
           "z": 4,
@@ -103,17 +103,17 @@ describe('structureLikeRotate', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate90, ...structure2 })
     expect(rotated).toMatchInlineSnapshot(`
       [
-        Vector {
+        Vec {
           "x": 1021,
           "y": 1000,
           "z": 1000,
         },
-        Vector {
+        Vec {
           "x": 1008,
           "y": 1001,
           "z": 1010,
         },
-        Vector {
+        Vec {
           "x": 1012,
           "y": 1001,
           "z": 1015,
@@ -126,17 +126,17 @@ describe('structureLikeRotate', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate180, ...structure2 })
     expect(rotated).toMatchInlineSnapshot(`
       [
-        Vector {
+        Vec {
           "x": 1019,
           "y": 1000,
           "z": 1021,
         },
-        Vector {
+        Vec {
           "x": 1009,
           "y": 1001,
           "z": 1008,
         },
-        Vector {
+        Vec {
           "x": 1004,
           "y": 1001,
           "z": 1012,
@@ -149,17 +149,17 @@ describe('structureLikeRotate', () => {
     const rotated = structureLikeRotate({ rotation: StructureRotation.Rotate270, ...structure2 })
     expect(rotated).toMatchInlineSnapshot(`
       [
-        Vector {
+        Vec {
           "x": 1000,
           "y": 1000,
           "z": 1019,
         },
-        Vector {
+        Vec {
           "x": 1013,
           "y": 1001,
           "z": 1009,
         },
-        Vector {
+        Vec {
           "x": 1009,
           "y": 1001,
           "z": 1004,

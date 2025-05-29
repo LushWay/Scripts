@@ -17,9 +17,9 @@ import { FlattenedSphereArea } from './areas/flattened-sphere'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
-export const regionTypes: { name: string; region: typeof Region; creatable: boolean }[] = []
-export function registerRegionType(name: string, region: typeof Region, creatable = true) {
-  regionTypes.push({ name, region, creatable })
+export const regionTypes: { name: string; region: typeof Region; creatable: boolean; displayName: boolean }[] = []
+export function registerRegionType(name: string, region: typeof Region, creatable = true, displayName = creatable) {
+  regionTypes.push({ name, region, creatable, displayName })
 }
 
 const command = new Command('region')
@@ -113,27 +113,34 @@ function regionForm(player: Player) {
 
     for (const type of regionTypes) {
       f.button(t`${type.name} ${t.badge`${type.region.getAll().length}`}`, () =>
-        regionList(player, type.region, type.creatable),
+        regionList(player, type.region, type.creatable, type.displayName),
       )
     }
   }).show(player)
 }
 
-function regionList(player: Player, RegionType: typeof Region, creatable = true, back = () => regionForm(player)) {
+function regionList(
+  player: Player,
+  RegionType: typeof Region,
+  creatable = true,
+  displayName = creatable,
+  back = () => regionForm(player),
+) {
   const form = new ActionForm('Список ' + RegionType.name)
+  const selfback = () => regionList(player, RegionType, creatable, displayName, back)
 
   if (creatable)
     form.addButton('Добавить', BUTTON['+'], () => {
       const form = new ActionForm('Выбери тип области региона')
       selectArea(form, player, area => {
-        editRegion(player, RegionType.create(area), () => regionList(player, RegionType, creatable, back))
+        editRegion(player, RegionType.create(area), selfback)
       })
       form.show(player)
     })
 
   for (const region of RegionType.getAll()) {
-    form.addButton(t`${creatable ? region.name : region.displayName}\n${region.area.toString()}`, () =>
-      editRegion(player, region, () => regionList(player, RegionType, creatable, back)),
+    form.addButton(t`${displayName ? region.name : region.displayName}\n${region.area.toString()}`, () =>
+      editRegion(player, region, selfback),
     )
   }
 

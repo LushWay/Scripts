@@ -3,6 +3,7 @@ import { table } from 'lib/database/abstract'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { t } from 'lib/text'
 import { Area } from './areas/area'
+import './areas/cut'
 import { SphereArea } from './areas/sphere'
 import { RegionIsSaveable, type Region, type RegionPermissions } from './kinds/region'
 
@@ -70,7 +71,6 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
 }
 
 export function restoreRegionFromJSON([key, region]: [string, RegionSave]) {
-  Area.loaded = true
   loaded = true
 
   if (typeof region === 'undefined') return
@@ -84,18 +84,8 @@ export function restoreRegionFromJSON([key, region]: [string, RegionSave]) {
     return
   }
 
-  const area = restoreAreaFromJSON(region.a)
+  const area = Area.fromJson(region.a)
   if (!area) return
 
   return kind.create(area, region, key)
-}
-
-export function restoreAreaFromJSON(a: ReturnType<Area['toJSON']>) {
-  const area = Area.areas.find(e => e.type === a.t)
-  if (!area) {
-    console.warn(t`[Region][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
-    return
-  }
-
-  return new area(a.d)
 }
