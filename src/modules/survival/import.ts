@@ -26,6 +26,8 @@ declare module '@minecraft/server' {
       doNotSaveAnarchy?: 1
 
       deadAt?: Vector3
+
+      gravestoneId?: string
     }
   }
 }

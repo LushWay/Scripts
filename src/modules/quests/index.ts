@@ -1,2 +1,2 @@
+import 'lib/quest/achievements/index'
 import './learning/learning'
-import 'lib/achievement/index'

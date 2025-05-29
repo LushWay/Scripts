@@ -1,9 +1,10 @@
-import { Player, system, world } from '@minecraft/server'
-import { actionGuard, Cooldown, inventoryIsEmpty, ms, Settings, Vec } from 'lib'
+import { Entity, Player, system, world } from '@minecraft/server'
+import { actionGuard, Cooldown, EventSignal, inventoryIsEmpty, ms, Settings, Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, forceAllowSpawnInRegion, Region } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
+import { t } from 'lib/text'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 
@@ -36,6 +37,7 @@ world.afterEvents.entityDie.subscribe(event => {
     gravestone.setDynamicProperty(gravestoneDiedAtPve, !!pveRegion)
     gravestone.addTag(gravestoneTag)
     gravestone.nameTag = `§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? '§bновичка ' : pveRegion ? '§a(безопасно) ' : ''}§f${name}`
+    event.deadEntity.database.survival.gravestoneId = gravestone.id
 
     const gravestoneContainer = gravestone.container
 
@@ -114,11 +116,16 @@ system.runInterval(
   20,
 )
 
+export function gravestoneGetOwner(entity: Entity) {
+  const owner = entity.getDynamicProperty(gravestoneOwnerKey)
+  return typeof owner === 'string' ? owner : undefined
+}
+
 actionGuard((player, _, ctx) => {
   if (ctx.type !== 'interactWithEntity') return
   if (ctx.event.target.typeId !== gravestoneEntityTypeId) return
 
-  const owner = ctx.event.target.getDynamicProperty(gravestoneOwnerKey)
+  const owner = gravestoneGetOwner(ctx.event.target)
   if (typeof owner !== 'string') return true
 
   if (owner === player.id) return true
@@ -134,8 +141,29 @@ actionGuard((player, _, ctx) => {
   return true
 }, ActionGuardOrder.Feature)
 
+world.beforeEvents.entityRemove.subscribe(({ removedEntity }) => {
+  const ownerId = gravestoneGetOwner(removedEntity)
+  if (!ownerId) return
+
+  const player = Player.database.getImmutable(ownerId)
+  if (player.survival.gravestoneId !== removedEntity.id) return
+
+  system.delay(() => EventSignal.emit(onGravestoneRemove, { ownerId }))
+})
+
+const onGravestoneRemove = new EventSignal<{ ownerId: string }>()
+
+onGravestoneRemove.subscribe(({ ownerId }) => {
+  const onlinePlayer = world.getAllPlayers().find(e => e.id === ownerId)
+  if (onlinePlayer) return
+
+  const player = Player.database.get(ownerId)
+  delete player.survival.gravestoneId
+}, -10)
+
 const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
-  const { deadAt } = player.database.survival
+  const { deadAt, gravestoneId } = player.database.survival
+  if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.')
   if (!deadAt) return q.failed('Ваше место смерти потерялось!')
 
   q.dynamic(Vec.string(deadAt, true))
@@ -148,9 +176,14 @@ const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верн
       ctx.place = deadAt
       ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
         if (event.player.id !== player.id) return
-        const key = event.target.getDynamicProperty(gravestoneOwnerKey)
-        if (key !== player.id) return
+        if (gravestoneGetOwner(event.target) !== player.id) return
 
+        ctx.next()
+      })
+      ctx.subscribe(onGravestoneRemove, ({ ownerId }) => {
+        if (ownerId !== player.id) return
+
+        player.fail(t.error`Могила исчезла...`)
         ctx.next()
       })
     })
