@@ -1,5 +1,6 @@
 import { system } from '@minecraft/server'
 import type { DatabaseDefaultValue, Table, UnknownTable } from './abstract'
+import { removeDefaults, setDefaults } from './defaults'
 
 const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
@@ -8,112 +9,6 @@ type DynamicObject = Record<string | number | symbol, unknown>
 type ProxiedDynamicObject = DynamicObject & { [IS_PROXIED]?: boolean }
 
 export class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
-  private static getUnproxied<T>(value: T): T {
-    if (typeof value === 'object' && value !== null && PROXY_TARGET in value) return value[PROXY_TARGET] as T
-    return value
-  }
-
-  /**
-   * Usefull when a lot of data is being read from object, taken from database.
-   *
-   * **Caution**: This creates new object on every use, consider using {@link ProxyDatabase.immutableUnproxy} instead
-   */
-  static unproxy<T>(value: T): T {
-    if (value !== null && typeof value === 'object')
-      return this.setDefaults({}, this.getUnproxied(value as DynamicObject)) as T
-
-    return value
-  }
-
-  /** Usefull when a lot of data is being read from object, taken from database. */
-  static immutableUnproxy<T extends object>(value: T): Immutable<T> {
-    return this.getUnproxied(value as DynamicObject) as Immutable<T>
-  }
-
-  static setDefaults<D extends DynamicObject>(sourceObject: DynamicObject, defaultObject: D): D {
-    if (Array.isArray(sourceObject)) {
-      return sourceObject as D
-    } else if (Array.isArray(defaultObject)) return defaultObject
-
-    // Create a new object to avoid modifying the original object
-    const COMPOSED: DynamicObject = {}
-
-    // Copy properties from the defaults object
-    for (const key in defaultObject) {
-      const value = sourceObject[key]
-      const defaultValue = defaultObject[key]
-
-      if (typeof defaultValue === 'object' && defaultValue !== null) {
-        // Value is Object or array, recurse...
-
-        if (Array.isArray(defaultValue)) {
-          if (typeof value !== 'undefined' && Array.isArray(value)) {
-            COMPOSED[key] = [...value]
-          } else {
-            COMPOSED[key] = [...defaultValue]
-          }
-        } else {
-          if (key in sourceObject) {
-            COMPOSED[key] = this.setDefaults(value as DynamicObject, defaultValue as DynamicObject)
-          } else {
-            // If the original object doesn't have the property, add default value
-            // And unlink properties...
-
-            COMPOSED[key] = this.setDefaults({}, defaultValue as DynamicObject)
-          }
-        }
-      } else {
-        // Primitive value, assign
-        COMPOSED[key] = typeof value === 'undefined' ? defaultValue : value
-      }
-    }
-
-    // Copy properties from the original object
-    for (const key in sourceObject) {
-      // If the property is not in the result object, copy it from the original object
-      if (!(key in COMPOSED)) {
-        COMPOSED[key] = sourceObject[key]
-      }
-    }
-
-    return COMPOSED as D
-  }
-
-  static removeDefaults<S extends DynamicObject>(sourceObject: S, defaultObject: DynamicObject): S {
-    if (Array.isArray(sourceObject)) return sourceObject
-
-    // Create a new object to avoid modifying the original object
-    const COMPOSED: DynamicObject = {}
-
-    for (const key in sourceObject) {
-      const value = sourceObject[key]
-      const defaultValue = defaultObject[key]
-
-      if (value === defaultValue) continue
-
-      if (typeof defaultValue === 'object' && defaultValue !== null && typeof value === 'object' && value !== null) {
-        if (Array.isArray(defaultValue)) {
-          //
-          if (Array.isArray(value) && Array.equals(value as unknown[], defaultValue)) continue
-
-          COMPOSED[key] = value
-        } else {
-          //
-          const composedSubObject = this.removeDefaults(value as DynamicObject, defaultValue as DynamicObject)
-          if (Object.keys(composedSubObject).length < 1) continue
-
-          COMPOSED[key] = composedSubObject
-        }
-      } else {
-        // Primitive value, assign
-
-        COMPOSED[key] = value
-      }
-    }
-
-    return COMPOSED as S
-  }
-
   static tables: Record<string, UnknownTable> = {}
 
   constructor(
@@ -121,6 +16,14 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
     protected defaultValue?: DatabaseDefaultValue<Value>,
   ) {
     ProxyDatabase.tables[id] = this as UnknownTable
+  }
+
+  get size(): number {
+    return this.value.size
+  }
+
+  has(key: Key): boolean {
+    return this.value.has(key)
   }
 
   getRawValue() {
@@ -141,9 +44,10 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
     return value as Immutable<Value>
   }
 
-  delete(key: Key): void {
+  delete(key: Key): boolean {
     const deleted = this.value.delete(key)
     if (deleted) this.needSave()
+    return deleted
   }
 
   set(key: Key, value: Value): void {
@@ -159,6 +63,10 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
     const values: Value[] = []
     for (const value of this.value.values()) values.push(value)
     return values
+  }
+
+  valuesImmutable() {
+    return this.value.values() as MapIterator<Immutable<Value>>
   }
 
   entries(): [Key, Value][] {
@@ -234,6 +142,19 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
 
   private proxyCache = new WeakMap<DynamicObject, DynamicObject>()
 
+  protected restore(from: Record<string, unknown>) {
+    return Object.entries(from).map(([key, value]) => {
+      const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
+      return [
+        // Add default value
+        key as Key,
+        (typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
+          ? setDefaults(value as JsonObject, defaultv as JsonObject)
+          : (value ?? defaultv)) as Value,
+      ] as [Key, Value]
+    })
+  }
+
   private needSaveHadRun = false
 
   private needSave() {
@@ -251,7 +172,7 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
               // Remove default if defaultv and value are objects
               key,
               typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-                ? ProxyDatabase.removeDefaults(value as DynamicObject, defaultv as DynamicObject)
+                ? removeDefaults(value as DynamicObject, defaultv as DynamicObject)
                 : value,
             ]
           }),

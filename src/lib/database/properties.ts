@@ -20,18 +20,7 @@ class DynamicPropertyDB<Value = unknown, Key extends string = string> extends Pr
   private init() {
     // Init
     try {
-      this.value = new Map(
-        Object.entries(LongDynamicProperty.get(this.id) as Record<string, unknown>).map(([key, value]) => {
-          const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
-          return [
-            // Add default value
-            key as Key,
-            (typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-              ? ProxyDatabase.setDefaults(value as JsonObject, defaultv as JsonObject)
-              : (value ?? defaultv)) as Value,
-          ]
-        }),
-      )
+      this.value = new Map(this.restore(LongDynamicProperty.get(this.id) as Record<string, unknown>))
     } catch (error) {
       console.error(new DatabaseError(t`Failed to init table '${this.id}': ${error}`))
     }

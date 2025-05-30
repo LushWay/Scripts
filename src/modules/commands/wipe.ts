@@ -13,7 +13,7 @@ interface RestorePoint {
   name: string
   location: Vector3
   dimensionType: ShortcutDimensions
-  scores: Pick<Player['scores'], 'money' | 'pvp' | 'raid' | 'anarchyOnlineTime' | ScoreNames.GameModesStat>
+  scores: Pick<Player['scores'], 'money' | 'anarchyOnlineTime' | ScoreNames.GameModesStat>
   db: Pick<PlayerDatabase, 'inv' | 'survival' | 'unlockedPortals' | 'quests' | 'achivs'>
 }
 
@@ -53,13 +53,7 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
       name,
       location: player.location,
       dimensionType: player.dimension.type,
-      scores: pick(player.scores, [
-        'money',
-        'pvp',
-        'raid',
-        'anarchyOnlineTime',
-        ...scoreboardObjectiveNames.gameModeStats,
-      ]),
+      scores: pick(player.scores, ['money', 'anarchyOnlineTime', ...scoreboardObjectiveNames.gameModeStats]),
       db: pick(player.database, ['inv', 'survival', 'unlockedPortals', 'quests', 'achivs']),
     }
     wipeInventoryDatabase.saveFrom(player, { rewrite: true, key: id, keepInventory: true })
@@ -156,18 +150,25 @@ function wipe(player: Player) {
 
   player.database.quests?.active.forEach(e => Quest.quests.get(e.id)?.exit(player))
   delete player.database.quests
+  delete player.database.achivs
 
   Compass.setFor(player, undefined)
   Airdrop.instances.filter(a => a.for === player.id).forEach(a => a.delete())
 
+  player.scores.money = 0
+  player.scores.raid = 0
+  player.scores.pvp = 0
+  player.scores.anarchyOnlineTime = 0
+
   delete player.database.survival.anarchy
+  delete player.database.survival.deadAt
+  delete player.database.survival.gravestoneId
+  delete player.database.survival.newbie
+  delete player.database.survival.rtpElytra
+
   Anarchy.inventoryStore.remove(player.id)
   Spawn.loadInventory(player)
   Spawn.portal?.teleport(player)
-  player.scores.money = 0
-  player.scores.anarchyOnlineTime = 0
-
-  delete player.database.achivs
 
   enterNewbieMode(player)
 
@@ -175,11 +176,5 @@ function wipe(player: Player) {
     player.runCommand(`replaceitem entity @s slot.enderchest ${i} air`)
   }
 
-  system.runTimeout(
-    () => {
-      Join.emitFirstJoin(player)
-    },
-    'clear',
-    30,
-  )
+  system.runTimeout(() => Join.emitFirstJoin(player), 'clear', 30)
 }

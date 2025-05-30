@@ -1,7 +1,7 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { ActionForm, ms, registerRegionType } from 'lib'
+import { ActionForm, ms, registerRegionType, Vec } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
-import { scheduleBlockPlace } from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../../../lib/region/kinds/minearea'
@@ -38,14 +38,14 @@ export class MineshaftRegion extends MineareaRegion {
     const typeId = block.typeId
     system.delay(() => placeOre(block, typeId, dimension, player))
 
-    const schedule = scheduleBlockPlace({
+    const schedule = ScheduleBlockPlace.set({
       dimension: dimension.type,
       location: block.location,
       typeId: ore ? ore.empty : block.typeId,
       states: ore ? undefined : block.permutation.getAllStates(),
       restoreTime: ms.from('min', Math.randomInt(2, 3)),
     })
-    this.scheduledToPlaceBlocks.push(schedule)
+    this.scheduledToPlaceBlocks.push(Vec.string(schedule.l))
 
     return true
   }

@@ -1,5 +1,5 @@
 import { BlockTypes, Entity } from '@minecraft/server'
-import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 
 /** All doors and switches in minecraft */
@@ -27,19 +27,23 @@ fill(GATES, e => e.id.includes('fence_gate'))
 
 /** A list of all containers a item could be in */
 export const BLOCK_CONTAINERS = [
-  'minecraft:chest',
+  MinecraftBlockTypes.Chest,
   // 'minecraft:ender_chest',
-  'minecraft:barrel',
-  'minecraft:trapped_chest',
-  'minecraft:dispenser',
-  'minecraft:dropper',
-  'minecraft:furnace',
-  'minecraft:blast_furnace',
-  'minecraft:lit_furnace',
-  'minecraft:lit_blast_furnace',
-  'minecraft:hopper',
+  MinecraftBlockTypes.Barrel,
+  MinecraftBlockTypes.TrappedChest,
+  MinecraftBlockTypes.Dropper,
+  MinecraftBlockTypes.Dispenser,
+  MinecraftBlockTypes.Furnace,
+  MinecraftBlockTypes.LitFurnace,
+  MinecraftBlockTypes.BlastFurnace,
+  MinecraftBlockTypes.LitBlastFurnace,
+  MinecraftBlockTypes.Smoker,
+  MinecraftBlockTypes.LitSmoker,
+  MinecraftBlockTypes.Hopper,
   'minecraft:shulker_box',
   'minecraft:undyed_shulker_box',
+  MinecraftBlockTypes.DecoratedPot,
+  ...Object.values(MinecraftBlockTypes).filter(e => e.endsWith('shulker_box')),
 ]
 
 /** With this entities player can interact (e.g. npc, custom buttons, etc) */
@@ -62,7 +66,7 @@ export const NOT_MOB_ENTITIES = [
   CustomEntityTypes.Loot,
   MinecraftEntityTypes.Npc,
   'minecraft:item',
-  'minecraft:leash_know',
+  'minecraft:leash_knot',
 ] as string[]
 
 const ALLOW_SPAWN_PROP = 'allowSpawn'

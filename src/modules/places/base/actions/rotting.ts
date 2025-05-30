@@ -15,7 +15,7 @@ import {
 } from 'lib'
 import { table } from 'lib/database/abstract'
 import { anyPlayerNearRegion } from 'lib/player-move'
-import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { itemNameXCount } from 'lib/shop/item-name-x-count'
 import { t } from 'lib/text'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
@@ -146,23 +146,14 @@ async function startRotting(base: BaseRegion, state: RottingState) {
     const distance = Vec.distance(location, center)
     const restoreTime = ms.from(__DEV__ ? 'min' : 'hour', radius - distance)
 
-    scheduleBlockPlace({
-      dimension: base.dimensionType,
-      location: location,
-      restoreTime: restoreTime,
-      states: savedPermutation.getAllStates(),
-      typeId: savedPermutation.type.id,
-    })
+    ScheduleBlockPlace.setPermutation(savedPermutation, location, base.dimensionType, restoreTime)
   })
 }
 
 function stopRotting(base: BaseRegion) {
   base.area
     .forEachVector((v, isIn) => {
-      if (isIn) {
-        const schd = getScheduledToPlace(v, base.dimensionType)
-        if (schd) unscheduleBlockPlace(schd)
-      }
+      if (isIn) ScheduleBlockPlace.deleteAt(v, base.dimensionType)
     }, 100)
 
     .catch((e: unknown) => console.error(e))

@@ -7,6 +7,7 @@ import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 import { RegionStructure } from '../structure'
+import { removeDefaults, setDefaults } from 'lib/database/defaults'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
@@ -73,7 +74,7 @@ export class Region {
     this.regions.push(region)
     if (this !== Region) Region.regions.push(region)
 
-    region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
+    region.permissions = setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.kind = this.kind
     region.creator = this
     if (options.ldb) region.ldb = options.ldb
@@ -275,7 +276,7 @@ export class Region {
     return {
       a: this.area.toJSON(),
       k: this.kind,
-      permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
+      permissions: removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionType,
       ldb: this.ldb,
     }

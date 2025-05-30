@@ -4,12 +4,15 @@ export type DatabaseDefaultValue<Value> = (key: string) => NoInfer<Value>
 
 export interface Table<Value, Key = string> {
   get(key: Key): Value
+  has(key: Key): boolean
   getImmutable(key: Key): Immutable<Value>
   set(key: Key, value: Value): void
-  delete(key: Key): void
+  delete(key: Key): boolean
+  size: number
   keys(): MapIterator<Key>
-  entries(): [Key, Value][]
   values(): Value[]
+  valuesImmutable(): MapIterator<Immutable<Value>>
+  entries(): [Key, Value][]
   entriesImmutable(): MapIterator<[Key, Immutable<Value>]>
 }
 

@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { ProxyDatabase } from 'lib/database/proxy'
+import { deepClone } from 'lib/database/defaults'
 import { t } from 'lib/text'
 import { Area } from './areas/area'
 import './areas/cut'
@@ -45,7 +45,7 @@ system.delay(() => {
   system.runJob(
     (function* regionRestore() {
       let i = 0
-      for (const r of RegionDatabase.entries()) {
+      for (const r of RegionDatabase.entriesImmutable()) {
         restoreRegionFromJSON(r)
         i++
         if (i % 100 === 0) yield
@@ -70,11 +70,11 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
   kinds.push(region)
 }
 
-export function restoreRegionFromJSON([key, region]: [string, RegionSave]) {
+export function restoreRegionFromJSON([key, regionImmutable]: [string, Immutable<RegionSave>]) {
   loaded = true
 
-  if (typeof region === 'undefined') return
-  region = ProxyDatabase.unproxy(region)
+  if (typeof regionImmutable === 'undefined') return
+  const region = deepClone(regionImmutable) as RegionSave
 
   const kind = kinds.find(e => e.kind === region.k)
   if (!kind) {

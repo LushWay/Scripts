@@ -1,4 +1,4 @@
-import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
+import { Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
 import { isNotPlaying } from 'lib/game-utils'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
@@ -10,17 +10,12 @@ import {
 } from 'lib/region/index'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
-import {
-  getScheduledToPlaceAsync,
-  onScheduledBlockPlace,
-  scheduleBlockPlace,
-  ScheduledBlockPlace,
-  unscheduleBlockPlace,
-} from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
+import { Area } from '../areas/area'
 
 const logger = createLogger('Minearea')
 
@@ -85,8 +80,7 @@ export class MineareaRegion extends RegionWithStructure {
           eachVectorCallback?.(vector)
         }, 500)
         .then(() => {
-          this.scheduledToPlaceBlocks.forEach(e => unscheduleBlockPlace(e))
-          this.scheduledToPlaceBlocks = []
+          this.deleteSchedules()
           resolve(restoredRegions)
         })
         .finally(() => (this.restoringStructureProgress = 0))
@@ -95,6 +89,12 @@ export class MineareaRegion extends RegionWithStructure {
     const result = await this.restoringStructurePromise
     delete this.restoringStructurePromise
     return result
+  }
+
+  deleteSchedules() {
+    const dimensionType = this.dimensionType
+    this.scheduledToPlaceBlocks.forEach(e => ScheduleBlockPlace.deleteAt(e, dimensionType))
+    this.scheduledToPlaceBlocks = []
   }
 
   protected async onCreate(action = 'Created new') {
@@ -107,31 +107,16 @@ export class MineareaRegion extends RegionWithStructure {
   protected async onRestore() {
     if (!this.structure.exists) await this.onCreate('Restored')
 
-    const vectors: Vector3[] = []
-    await this.area.forEachVector((vector, isIn) => {
-      if (!isIn) return
-
-      vectors.push(vector)
-    }, 1000)
-
-    const scheduled = await getScheduledToPlaceAsync(vectors, this.dimension.type)
-    if (scheduled) this.scheduledToPlaceBlocks = scheduled
+    this.scheduledToPlaceBlocks = await getSchedules(this.area, this.dimensionType)
   }
 
   building = false
 
-  scheduledToPlaceBlocks: Immutable<ScheduledBlockPlace>[] = []
+  scheduledToPlaceBlocks: string[] = []
 
   onBlockBreak(_player: Player, event: PlayerBreakBlockBeforeEvent) {
-    const { block, dimension } = event
-    const schedule = scheduleBlockPlace({
-      dimension: dimension.type,
-      location: block.location,
-      typeId: block.typeId,
-      states: block.permutation.getAllStates(),
-      restoreTime: ms.from('sec', 10), // ms.from('min', Math.randomInt(1, 3)),
-    })
-    this.scheduledToPlaceBlocks.push(schedule)
+    const schedule = ScheduleBlockPlace.setBlock(event.block, ms.from('sec', 10))
+    this.scheduledToPlaceBlocks.push(Vec.string(schedule.l)) //  ms.from('min', Math.randomInt(1, 3))
 
     return true
   }
@@ -153,6 +138,17 @@ registerSaveableRegion('minearea', MineareaRegion)
 registerRegionType('Зоны добычи', MineareaRegion)
 
 regionTypesThatIgnoreIsBuildingGuard.push(MineareaRegion)
+
+async function getSchedules(area: Area, dimensionType: ShortcutDimensions) {
+  const schedules: string[] = []
+  await area.forEachVector((location, isIn) => {
+    if (!isIn) return
+
+    const schedule = ScheduleBlockPlace.has(location, dimensionType)
+    if (schedule) schedules.push(schedule)
+  }, 2000)
+  return schedules
+}
 
 actionGuard((player, region, ctx) => {
   if (!(region instanceof MineareaRegion)) return
@@ -176,16 +172,8 @@ actionGuard((player, region, ctx) => {
 
     case 'place': {
       if (!building) {
-        const { block, dimension } = ctx.event
-        const schedule = scheduleBlockPlace({
-          dimension: dimension.type,
-          location: block.location,
-          typeId: block.typeId,
-          states: block.permutation.getAllStates(),
-          restoreTime: ms.from('min', Math.randomInt(3, 10)),
-        })
-
-        region.scheduledToPlaceBlocks.push(schedule)
+        const schedule = ScheduleBlockPlace.setBlock(ctx.event.block, ms.from('sec', 10))
+        region.scheduledToPlaceBlocks.push(Vec.string(schedule.l))
 
         return true
       } else return notifyBuilder(player, region)
@@ -203,22 +191,44 @@ export function onFullRegionTypeRestore<T extends typeof Region>(
     console.warn(new Error('Undefined regionType'))
     return
   }
-  onScheduledBlockPlace.subscribe(({ block, schedules, schedule }) => {
-    const regions = regionType.getManyAt<InstanceType<T>>(block)
-    for (const region of regions) {
-      const dimensionType = block.dimension.type
-      const toRestore = schedules.filter(e => region.area.isIn({ vector: e.location, dimensionType }) && e !== schedule)
-      if (region instanceof MineareaRegion) region.scheduledToPlaceBlocks = toRestore
-      if (toRestore.length) continue
+  const hadSchedules = new Set<InstanceType<T>>()
 
-      callback(region)
-    }
-  })
+  timeout()
+  function timeout() {
+    system.runTimeout(
+      async () => {
+        try {
+          if (ScheduleBlockPlace.getSize() !== 0) {
+            for (const region of regionType.getAll<InstanceType<T>>()) {
+              const dimensionType = region.dimensionType
+              const toRestore = await getSchedules(region.area, dimensionType)
+
+              if (region instanceof MineareaRegion) region.scheduledToPlaceBlocks = toRestore
+              if (toRestore.length) {
+                hadSchedules.add(region)
+              } else {
+                if (hadSchedules.has(region)) {
+                  hadSchedules.delete(region)
+                  callback(region)
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error(e)
+        } finally {
+          timeout()
+        }
+      },
+      'onFullregionTypeRestore ' + regionType.kind,
+      100,
+    )
+  }
 }
 
 onFullRegionTypeRestore(MineareaRegion, region => {
   logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
-  region.scheduledToPlaceBlocks = []
+  region.deleteSchedules()
   region.structure.place()
 })
 

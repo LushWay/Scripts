@@ -11,7 +11,7 @@ import {
   registerSaveableRegion,
 } from 'lib'
 import { anyPlayerNearRegion } from 'lib/player-move'
-import { getScheduledToPlace, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 
 // TODO Add chest generation
@@ -84,17 +84,8 @@ system.runInterval(
 
     if (placedBefore) {
       for (const location of placedBefore.ldb.blocks) {
-        const schedule = getScheduledToPlace(location, placedBefore.dimensionType)
-        if (schedule) {
-          unscheduleBlockPlace(schedule)
-        } else {
-          scheduleBlockPlace({
-            restoreTime: 0,
-            dimension: placedBefore.dimensionType,
-            typeId: MinecraftBlockTypes.Air,
-            location,
-          })
-        }
+        if (!ScheduleBlockPlace.deleteAt(location, placedBefore.dimensionType))
+          ScheduleBlockPlace.setAir(location, placedBefore.dimensionType, 0)
       }
       placedBefore.ldb.blocks = []
       placedBefore.save()
@@ -105,7 +96,7 @@ system.runInterval(
       if (!isIn) return
       if (Math.randomInt(0, 2) === 1) return
 
-      scheduleBlockPlace({
+      ScheduleBlockPlace.set({
         restoreTime: 0,
         dimension: newRegion.dimensionType,
         typeId: MinecraftBlockTypes.AncientDebris,

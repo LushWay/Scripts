@@ -1,8 +1,8 @@
 import { Block, Entity, system, world } from '@minecraft/server'
-import { LockAction, Region, ms } from 'lib'
+import { LockAction, ms, Region } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
-import { isScheduledToPlace } from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { BaseRegion } from 'modules/places/base/region'
 
@@ -25,7 +25,7 @@ export function createBlockExplosionChecker() {
   function canBlockExplode(block: Block) {
     const region = Region.getAt(block)
     if (region instanceof MineareaRegion) return true
-    if (isScheduledToPlace(block, block.dimension.type)) return true
+    if (ScheduleBlockPlace.has(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
       if (!base) {
         for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: 'вас рейдят' })
@@ -48,7 +48,6 @@ const locktext = 'Вы находитесь в режиме рейдблока.'
 new LockAction(player => {
   const raidLockTime = player.scores.raid
   if (raidLockTime > 0) {
-    console.log(new Error('aaa'))
     return { lockText: `${locktext} Осталось ${t.error.time(raidLockTime)}` }
   } else return false
 }, locktext)

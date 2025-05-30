@@ -39,6 +39,7 @@ import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
+import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Rewards } from 'lib/shop/rewards'
@@ -68,6 +69,27 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  async breakMine(ctx) {
+    const regions = MineareaRegion.getManyAt(ctx.player)
+    for (const region of regions) {
+      ctx.reply('R' + region.name)
+      await region.area.forEachVector((vector, isIn, dimension) => {
+        if (!isIn) return
+        const block = dimension.getBlock(vector)
+        if (!block) return
+
+        region.onBlockBreak(ctx.player, {
+          block,
+          cancel: false,
+          dimension: dimension,
+          itemStack: undefined,
+          player: ctx.player,
+        })
+        block.setType(MinecraftBlockTypes.Air)
+      }, 1000)
+    }
+  },
+
   regionNear(ctx) {
     const distance = Number(ctx.args[1] ?? '5')
     const near = Region.chunkQuery.getNear(ctx.player, distance)

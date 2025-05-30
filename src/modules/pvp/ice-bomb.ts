@@ -2,7 +2,7 @@ import { Entity, EntityComponentTypes, ItemStack, Player, system, world } from '
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vec, ms } from 'lib'
 import { customItems } from 'lib/rpg/custom-item'
-import { scheduleBlockPlace } from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { toPoint } from 'lib/utils/point'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { BaseRegion } from 'modules/places/base/region'
@@ -54,25 +54,19 @@ system.runInterval(
       const dimension = entity.dimension
       const dimensionType = dimension.type
 
-      for (const vector of getEdgeBlocksOf(floored).concat(floored)) {
-        const point = toPoint({ vector, dimensionType })
+      for (const location of getEdgeBlocksOf(floored).concat(floored)) {
+        const point = toPoint({ vector: location, dimensionType })
         const baseRegions = BaseRegion.getNear(point, 6)
         if (!baseRegions.length) continue
 
         const inRegion = baseRegions.some(e => e.area.isIn(point))
-        const block = dimension.getBlock(vector)
+        const block = dimension.getBlock(location)
         const transform = block && ICE_BOMB_TRANSOFORM[block.typeId]
         const water = block?.isWaterlogged
         if (!(transform || water)) continue
 
         if (!inRegion) {
-          scheduleBlockPlace({
-            dimension: dimensionType,
-            location: vector,
-            typeId: block.typeId,
-            states: block.permutation.getAllStates(),
-            restoreTime: ms.from('min', 5),
-          })
+          ScheduleBlockPlace.setPermutation(block.permutation, location, dimensionType, ms.from('min', 5))
         }
 
         if (transform) {

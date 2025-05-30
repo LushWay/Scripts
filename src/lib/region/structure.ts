@@ -7,7 +7,6 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { getScheduledToPlaceAsync, scheduleBlockPlace, unscheduleBlockPlace } from 'lib/scheduled-block-place'
 import { Vec } from 'lib/vector'
 import { Region } from './kinds/region'
 
@@ -51,40 +50,32 @@ export class RegionStructure {
 
   async place() {
     const dimension = this.region.dimension
-    interface VectorPermutation {
-      vector: Vector3
+    const dimensionType = dimension.type
+
+    const unloadedBlocks: {
+      location: Vector3
       permutation: BlockPermutation | undefined
-    }
+    }[] = []
 
-    const blocks: VectorPermutation[] = []
-    await this.forEachBlock((vector, block) => blocks.push({ vector, permutation: block }), 1000)
-
-    const unloadedBlocks: VectorPermutation[] = []
-    for (const block of blocks) {
+    await this.forEachBlock((location, permutation) => {
       try {
-        if (block.permutation) this.region.dimension.setBlockPermutation(block.vector, block.permutation)
+        if (permutation) this.region.dimension.setBlockPermutation(location, permutation)
+        else this.region.dimension.setBlockType(location, MinecraftBlockTypes.Air)
       } catch (e) {
-        if (e instanceof LocationInUnloadedChunkError) unloadedBlocks.push(block)
+        if (e instanceof LocationInUnloadedChunkError) unloadedBlocks.push({ location, permutation })
+        else console.error(e)
       }
-    }
+    }, 100)
 
-    const schedules = await getScheduledToPlaceAsync(
-      unloadedBlocks.map(e => e.vector),
-      this.region.dimensionType,
-    )
-    if (schedules) {
-      for (const unloadedBlock of unloadedBlocks) {
-        const schedule = schedules.find(e => Vec.equals(e.location, unloadedBlock.vector))
-        if (schedule) unscheduleBlockPlace(schedule)
-        scheduleBlockPlace({
-          dimension: dimension.type,
-          location: unloadedBlock.vector,
-          typeId: unloadedBlock.permutation?.type.id ?? MinecraftBlockTypes.Air,
-          states: unloadedBlock.permutation?.getAllStates() ?? {},
-          restoreTime: 0,
-        })
-      }
-    }
+    // for (const { location, permutation } of unloadedBlocks) {
+    //   ScheduleBlockPlace.deleteAt(location, dimensionType)
+
+    //   if (permutation) {
+    //     ScheduleBlockPlace.setPermutation(permutation, location, dimensionType, 0)
+    //   } else {
+    //     ScheduleBlockPlace.setAir(location, dimension.type, 0)
+    //   }
+    // }
   }
 
   delete() {

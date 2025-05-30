@@ -3,7 +3,7 @@ import { ItemStack, system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, ms } from 'lib'
 import { actionGuard, ActionGuardOrder, disableAdventureNear, Region, RegionPermissions } from 'lib/region/index'
-import { scheduleBlockPlace } from 'lib/scheduled-block-place'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { TechCity } from '../tech-city/tech-city'
 
 export class QuartzMineRegion extends Region {
@@ -66,13 +66,7 @@ actionGuard((player, region, ctx) => {
   )
     return
 
-  scheduleBlockPlace({
-    dimension: ctx.event.dimension.type,
-    location: ctx.event.block.location,
-    typeId: ctx.event.block.typeId,
-    states: ctx.event.block.permutation.getAllStates(),
-    restoreTime: ms.from('min', 2),
-  })
+  ScheduleBlockPlace.setBlock(ctx.event.block, ms.from('min', 2))
 
   system.delay(() => {
     ctx.event.dimension.spawnItem(new ItemStack(MinecraftItemTypes.Quartz), ctx.event.block.location)

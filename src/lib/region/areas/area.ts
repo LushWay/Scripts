@@ -30,7 +30,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return b
   }
 
-  static fromJson(a: AreaAsJson) {
+  static fromJson(a: Immutable<AreaAsJson>) {
     Area.loaded = true
 
     const area = Area.areas.find(e => e.type === a.t)

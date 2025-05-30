@@ -14,7 +14,7 @@ import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
-import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
@@ -283,28 +283,31 @@ class Learning {
       }
     })
 
+    const sent = new WeakPlayerSet()
+
     Anarchy.enterLearning = async player => {
+      if (sent.has(player)) return false
+
       const toSpawn = () => Spawn.portal?.teleport(player)
-      if (!this.learningLocation.valid) return toSpawn(), player.fail('Случайное перемещение не настроено')
+      if (!this.learningLocation.valid) return toSpawn(), player.fail('Случайное перемещение не настроено'), false
 
       const temp = new Temporary(({ system }) => {
-        system.runInterval(
-          () => {
-            if (player.database.inv !== 'anarchy') return temp.cleanup()
+        const fadeCamera = () => {
+          player.camera.fade({
+            fadeColor: { blue: 0, green: 0, red: 0 },
+            fadeTime: { fadeInTime: 1, holdTime: 2, fadeOutTime: 2 },
+          })
+        }
 
-            player.camera.fade({
-              fadeColor: { blue: 0, green: 0, red: 0 },
-              fadeTime: { fadeInTime: 0, holdTime: 2, fadeOutTime: 2 },
-            })
-          },
-          'anarchy learning screen fade',
-          20,
-        )
+        fadeCamera()
+
+        system.runInterval(fadeCamera, 'anarchy learning screen fade', 20)
       })
 
       logger.player(player).info`Open rebith form`
 
-      return new Promise(resolve => {
+      return new Promise<boolean>(resolve => {
+        sent.add(player)
         new ActionForm(
           'Перерождение',
           'Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.',
@@ -315,12 +318,13 @@ class Learning {
             logger.player(player).info`Teleporting to ${this.learningLocation}`
             player.teleport(this.learningLocation)
             temp.cleanup()
-            resolve()
+            resolve(true)
             this.quest.enter(player)
           })
           .addButtonBack(toSpawn)
           .show(player)
-          .then(shown => !shown && toSpawn())
+          .then(shown => (shown && toSpawn(), false))
+          .finally(() => sent.delete(player))
       })
     }
   }
