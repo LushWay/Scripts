@@ -16,7 +16,7 @@ new Command('db')
 function selectTable(player: Player, firstCall?: true) {
   const form = new ActionForm('Таблицы данных')
   for (const [tableId, table] of Object.entries(getProvider().tables)) {
-    const name = `${tableId} §7${[...table.keys()].length}§r`
+    const name = t`${tableId} ${`§7${table.size}`} ${getProvider().getRawTableData(tableId).length / (256 * 1024)}§r`
 
     form.addButton(name, () => showTable(player, tableId, table))
   }

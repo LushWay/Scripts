@@ -34,7 +34,7 @@ class DynamicPropertyDB<Value = unknown, Key extends string = string> extends Pr
 const separator = '|'
 
 export class LongDynamicProperty {
-  static get(propertyId: string, defaultValue = '{}') {
+  static get(propertyId: string, defaultValue = '{}', parse = true) {
     const metadata = this.getMetadata(propertyId)
     if (!metadata.value) {
       metadata.value = ''
@@ -47,7 +47,7 @@ export class LongDynamicProperty {
       }
     }
 
-    return JSON.parse(metadata.value || defaultValue) as unknown
+    return parse ? (JSON.parse(metadata.value || defaultValue) as unknown) : metadata.value
   }
 
   static set(propertyId: string, value: string) {
@@ -108,6 +108,6 @@ if (!__VITEST__)
 
     tables: DynamicPropertyDB.tables,
     getRawTableData(tableId) {
-      return String(world.getDynamicProperty(tableId) as unknown as string)
+      return String(LongDynamicProperty.get(tableId, undefined, false))
     },
   })
