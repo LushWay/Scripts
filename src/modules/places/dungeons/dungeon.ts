@@ -152,10 +152,10 @@ export class DungeonRegion extends Region {
     return {
       ...super.customFormDescription(player),
       Rotation: this.ldb.rotation,
-      Dungeon: StructureDungeonsId[this.structureId as keyof typeof StructureDungeonsId],
+      Dungeon: Object.entries(StructureDungeonsId).find(e => e[1] === this.structureId)?.[0],
       StructureId: this.ldb.structureId,
       StructurePosition: this.getStructurePosition(),
-      Chests: this.chests.map(e => `${Vec.string(e.location, true)} ${e.loot.id ?? 'no loot'}`).join('\n'),
+      Chests: '\n' + this.chests.map(e => `${Vec.string(e.location, true)} ${e.loot.id ?? 'no loot'}`).join('\n'),
     }
   }
 

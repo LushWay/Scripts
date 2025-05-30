@@ -18,7 +18,7 @@ import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
 export const regionTypes: { name: string; region: typeof Region; creatable: boolean; displayName: boolean }[] = []
-export function registerRegionType(name: string, region: typeof Region, creatable = true, displayName = creatable) {
+export function registerRegionType(name: string, region: typeof Region, creatable = true, displayName = !creatable) {
   regionTypes.push({ name, region, creatable, displayName })
 }
 
@@ -94,7 +94,7 @@ function regionForm(player: Player) {
     function addRegionButton(currentRegion: Region, form: NewFormCreator) {
       form.button(
         t`${currentRegion.displayName ?? 'Без имени'} (${currentRegion.area.toString()})\n${currentRegion.name}`,
-        () => editRegion(player, currentRegion, () => regionForm(player)),
+        () => editRegion(player, currentRegion, false, () => regionForm(player)),
       )
     }
 
@@ -133,14 +133,14 @@ function regionList(
     form.addButton('Добавить', BUTTON['+'], () => {
       const form = new ActionForm('Выбери тип области региона')
       selectArea(form, player, area => {
-        editRegion(player, RegionType.create(area), selfback)
+        editRegion(player, RegionType.create(area), displayName, selfback)
       })
       form.show(player)
     })
 
   for (const region of RegionType.getAll()) {
-    form.addButton(t`${displayName ? region.name : region.displayName}\n${region.area.toString()}`, () =>
-      editRegion(player, region, selfback),
+    form.addButton(t`${displayName ? region.displayName : region.name}\n${region.area.toString()}`, () =>
+      editRegion(player, region, displayName, selfback),
     )
   }
 
@@ -217,10 +217,10 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
 
 const pluralForms: WordPluralForms = ['региона', 'регион', 'в регионе']
 
-function editRegion(player: Player, region: Region, back: () => void) {
-  const selfback = () => editRegion(player, region, back)
+function editRegion(player: Player, region: Region, displayName: boolean, back: () => void) {
+  const selfback = () => editRegion(player, region, displayName, back)
   const form = new ActionForm(
-    `Регион ${region.name}`,
+    displayName ? (region.displayName ?? region.creator.name) : region.name,
     textTable({
       'Тип региона': region.creator.name,
       'Тип зоны': Area.areas.find(e => e.type === region.area.type)?.name ?? region.area.type,

@@ -205,7 +205,10 @@ describe('migrate', () => {
 
     expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§cNo location found at §funknown group§c:§fwas never defined§c",
+        "§cNo location found at §funknown group§c:§fwas never defined§c. Group: [
+        §2\`unknown group\`§r,
+        §2\`id\`§r
+      ]§c",
       ]
     `)
     expect(Settings.worldDatabase.get(group.id)[point.id]).toBeUndefined()
