@@ -3,6 +3,7 @@ import { ArrayForm } from 'lib/form/array'
 import { form, NewFormCallback } from 'lib/form/new'
 import { t } from 'lib/text'
 import { Achievement } from './achievement'
+import { is } from 'lib/roles'
 
 new Command('achievement')
   .setAliases('ach', 'achiv', 'achiev', 'achivs', 'achievs')
@@ -65,4 +66,7 @@ const achievementDetails = (achiv: Achievement<unknown>) =>
       achiv.isRewardTaken(player) ? 'Награды забраны' : '§aЗабрать награды',
       () => (achiv.takeRewards(player), achievementDetails(achiv).show(player, back)),
     )
+    if (is(player.id, 'admin')) {
+      f.button('admin: unachieve', () => achiv.undone(player))
+    }
   })

@@ -52,7 +52,7 @@ export class Achievement<T> {
     if (duplicate) {
       console.warn('Duplicate achievement:', id, '1:', this.stack, '2:', duplicate.stack)
     }
-    
+
     creator(this)
     Achievement.list.push(this)
   }
@@ -63,6 +63,11 @@ export class Achievement<T> {
 
     player.success('Достижение получено: ' + this.name + '! Заберите награды использовав .achiv')
     db.d = Date.now()
+  }
+
+  undone(player: Player) {
+    const db = this.getDatabase(player)
+    delete db.d
   }
 
   break(blocks: string | string[], subscriber: (p: Player, typeId: string) => void) {

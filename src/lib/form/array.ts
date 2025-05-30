@@ -187,7 +187,7 @@ export class ArrayForm<
       })
     } else {
       const propertyName = 'filters'
-      const applied = Object.keys(database.get(propertyName)).length
+      const applied = Object.keys(database.get(propertyName) ?? {}).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,
