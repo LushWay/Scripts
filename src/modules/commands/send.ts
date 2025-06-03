@@ -3,7 +3,7 @@
 import { Player, ScoreName, world } from '@minecraft/server'
 import { ActionForm, Mail, ModalForm } from 'lib'
 import { createSelectPlayerMenu } from 'lib/form/select-player'
-import { Rewards } from 'lib/shop/rewards'
+import { Rewards } from 'lib/utils/rewards'
 
 interface SendState {
   recipients: { id: string; name: string }[]

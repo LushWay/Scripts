@@ -1,8 +1,8 @@
 import { Player, system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { Mail } from 'lib/mail'
-import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
+import { Rewards } from 'lib/utils/rewards'
 import './command'
 
 interface StoredClan {

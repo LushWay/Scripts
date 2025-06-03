@@ -1,8 +1,8 @@
 import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { eqSlots } from 'lib/form/select-item'
 import { MaybeRawText, t } from 'lib/text'
+import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
-import { itemNameXCount } from '../item-name-x-count'
 import { CostType } from './cost'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean

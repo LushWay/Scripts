@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 
-import { Rewards } from 'lib/shop/rewards'
+import { Rewards } from 'lib/utils/rewards'
 import { table } from './database/abstract'
 import { t } from './text'
 
@@ -8,7 +8,7 @@ import { t } from './text'
 interface GlobalLetter {
   title: string
   content: string
-  rewards: import('lib/shop/rewards').Rewards.DatabaseEntry[]
+  rewards: import('lib/utils/rewards').Rewards.DatabaseEntry[]
 }
 
 interface LocalLetterMetadata {

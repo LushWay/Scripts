@@ -1,7 +1,7 @@
 import 'lib/extensions/player'
 
 import { Mail } from 'lib/mail'
-import { Rewards } from 'lib/shop/rewards'
+import { Rewards } from 'lib/utils/rewards'
 import { UnknownTable } from './database/abstract'
 
 describe('mail', () => {

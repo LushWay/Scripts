@@ -1,8 +1,7 @@
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Rewards } from 'lib/shop/rewards'
-import { Achievement, CountingAchievement } from './achievement'
 import { world } from '@minecraft/server'
-import { isKeyof } from 'lib/util'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { Rewards } from 'lib/utils/rewards'
+import { Achievement, CountingAchievement } from './achievement'
 
 for (const num of [10, 100, 1000, 10000]) {
   CountingAchievement.createV()
@@ -56,23 +55,32 @@ Achievement.create()
   .name('Активированный уголь')
   .defaultStorage(() => undefined)
   .creator(ctx => {
-    const directions = {
-      north: 'south',
-      south: 'north',
-      east: 'west',
-      west: 'east',
-      up: 'below',
-      down: 'above',
-    } as const
+    function toBlockFunction(leverDirection: string) {
+      switch (leverDirection) {
+        case 'south':
+          return 'north'
+        case 'north':
+          return 'south'
+        case 'west':
+          return 'east'
+        case 'east':
+          return 'west'
+        case 'below':
+          return 'above'
+        case 'above':
+          return 'below'
+        default:
+          return 'above'
+      }
+    }
 
     world.afterEvents.leverAction.subscribe(event => {
-      console.log(event.isPowered)
-      if (!event.isPowered) return
+      if (!event.isPowered || ctx.isDone(event.player)) return
 
       const leverDirection = event.block.permutation.getState('lever_direction')?.split('_')[0]
-      if (!leverDirection || !isKeyof(leverDirection, directions)) return
+      if (!leverDirection) return
 
-      const coalBlock = event.block[directions[leverDirection]](1)
+      const coalBlock = event.block[toBlockFunction(leverDirection)](1)
       if (!coalBlock?.isValid || coalBlock.typeId !== MinecraftBlockTypes.CoalBlock) return
 
       ctx.done(event.player)

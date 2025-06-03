@@ -6,8 +6,8 @@ import { ModalForm } from 'lib/form/modal'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
 import { Mail } from 'lib/mail'
-import { Rewards } from 'lib/shop/rewards'
 import { t, textTable } from 'lib/text'
+import { Rewards } from 'lib/utils/rewards'
 import { Clan } from './clan'
 
 export function clanMenu(player: Player, back?: VoidFunction) {

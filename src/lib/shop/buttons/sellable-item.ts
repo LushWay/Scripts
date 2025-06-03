@@ -5,10 +5,10 @@ import { getAuxOrTexture } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
 import { is } from 'lib/roles'
 import { t } from 'lib/text'
+import { itemNameXCount } from '../../utils/item-name-x-count'
 import { ItemCost, MoneyCost, MultiCost } from '../cost'
 import { ErrorCost, FreeCost } from '../cost/cost'
 import { ShopForm, ShopFormSection } from '../form'
-import { itemNameXCount } from '../item-name-x-count'
 import {
   getFreeSpaceForItemInInventory,
   ImpossibleBuyCost,

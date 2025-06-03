@@ -16,8 +16,8 @@ import {
 import { table } from 'lib/database/abstract'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { itemNameXCount } from 'lib/shop/item-name-x-count'
 import { t } from 'lib/text'
+import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion, RottingState } from '../region'
 

@@ -1,5 +1,5 @@
 import { Player, world } from '@minecraft/server'
-import { Rewards } from 'lib/shop/rewards'
+import { Rewards } from 'lib/utils/rewards'
 
 export namespace Achievement {
   export interface DBSingle<T = unknown> {

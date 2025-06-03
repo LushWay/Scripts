@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
 import { Join } from 'lib/player-join'
-import { Rewards } from 'lib/shop/rewards'
 import { t } from 'lib/text'
+import { Rewards } from 'lib/utils/rewards'
 
 const command = new Command('mail')
   .setDescription('Посмотреть входящие сообщения почты')
