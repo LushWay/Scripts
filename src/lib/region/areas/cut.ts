@@ -25,13 +25,13 @@ class Cut extends Area<CutDatabase> {
 
   isNear(point: AbstractPoint, distance: number): boolean {
     if (!this.parent) return false
-    const { vector, dimensionType } = toPoint(point)
+    const { location: vector, dimensionType } = toPoint(point)
     const {
       cut: { axis, from, to },
     } = this.database
 
     return (
-      this.parent.isNear({ vector, dimensionType }, distance) &&
+      this.parent.isNear({ location: vector, dimensionType }, distance) &&
       (typeof from === 'number' ? vector[axis] > from - distance : true) &&
       (typeof to === 'number' ? vector[axis] < to + distance : true)
     )

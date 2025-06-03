@@ -5,7 +5,6 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { getBlockStatus } from 'lib/game-utils'
 import { ConfigurableLocation, location } from 'lib/location'
 import { Area, AreaAsJson } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -15,6 +14,7 @@ import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
 import { t } from 'lib/text'
+import { getBlockStatus } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
@@ -107,7 +107,7 @@ export class Boss {
   }
 
   get id() {
-    return this.options.place.fullId
+    return this.options.place.id
   }
 
   /**
@@ -119,12 +119,12 @@ export class Boss {
    * @param o.respawnTime In ms
    */
   constructor(private options: BossOptions) {
-    this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.id}`
+    this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.shortId}`
 
     if (Array.isArray(this.options.allowedEntities))
       this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
-    const areadb = Boss.arenaDb.get(this.options.place.fullId)
+    const areadb = Boss.arenaDb.get(this.options.place.id)
 
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
@@ -143,7 +143,7 @@ export class Boss {
 
       this.region.onSave.subscribe(() => {
         if (this.region) {
-          Boss.arenaDb.set(this.options.place.fullId, { area: this.region.area.toJSON(), ldb: this.region.ldb })
+          Boss.arenaDb.set(this.options.place.id, { area: this.region.area.toJSON(), ldb: this.region.ldb })
         }
       })
       EventLoaderWithArg.load(this.onRegionCreate, this.region)
@@ -160,7 +160,7 @@ export class Boss {
 
   readonly onBossEntityDie = new EventSignal()
 
-  private logger = createLogger('Boss ' + this.options.place.fullId)
+  private logger = createLogger('Boss ' + this.options.place.id)
 
   private damage = new WeakPlayerMap<number>({ removeOnLeave: true })
 
@@ -176,9 +176,9 @@ export class Boss {
   }
 
   private check() {
-    if (!this.location.valid || getBlockStatus(this) === 'unloaded') return
+    if (!this.location.valid || getBlockStatus(this.location.toPoint()) === 'unloaded') return
 
-    const db = Boss.db.get(this.options.place.fullId)
+    const db = Boss.db.get(this.options.place.id)
     if (!db) {
       // First time spawn
       this.spawnEntity()
@@ -189,7 +189,7 @@ export class Boss {
     }
   }
 
-  private floatingText = new FloatingText(this.options.place.fullId, this.dimensionType)
+  private floatingText = new FloatingText(this.options.place.id, this.dimensionType)
 
   private checkRespawnTime(db: BossDB) {
     if (Date.now() > db.date + this.options.respawnTime) {
@@ -227,7 +227,7 @@ export class Boss {
     }
 
     // Save to database
-    Boss.db.set(this.options.place.fullId, { id: this.entity.id, date: Date.now(), dead: false })
+    Boss.db.set(this.options.place.id, { id: this.entity.id, date: Date.now(), dead: false })
   }
 
   /** Ensures that entity exists and if not calls onDie method */
@@ -267,7 +267,7 @@ export class Boss {
     const location = this.entity?.isValid ? this.entity.location : this.location
     delete this.entity
 
-    Boss.db.set(this.options.place.fullId, { id: '', date: Date.now(), dead: true })
+    Boss.db.set(this.options.place.id, { id: '', date: Date.now(), dead: true })
 
     if (dropLoot) {
       world.say(`§6Убит босс §f${this.options.place.name}!`)

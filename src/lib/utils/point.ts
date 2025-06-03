@@ -5,7 +5,7 @@ import { Vec } from 'lib/vector'
 
 export interface VectorInDimension {
   /** Location of the place */
-  vector: Vector3
+  location: Vector3
   /** Dimension of the location */
   dimensionType: DimensionType
 }
@@ -14,13 +14,13 @@ export type AbstractPoint = VectorInDimension | Entity | Block
 
 export function toPoint(abstractPoint: AbstractPoint): VectorInDimension {
   if (abstractPoint instanceof Entity || abstractPoint instanceof Block) {
-    return { vector: abstractPoint.location, dimensionType: abstractPoint.dimension.type }
+    return { location: abstractPoint.location, dimensionType: abstractPoint.dimension.type }
   } else return abstractPoint
 }
 
 export function toFlooredPoint(abstractPoint: AbstractPoint): VectorInDimension {
-  const { vector, dimensionType } = toPoint(abstractPoint)
-  return { vector: Vec.floor(vector), dimensionType }
+  const { location, dimensionType } = toPoint(abstractPoint)
+  return { location: Vec.floor(location), dimensionType }
 }
 
 export function createPoint(
@@ -29,5 +29,9 @@ export function createPoint(
   z: number,
   dimensionType: DimensionType = 'overworld',
 ): VectorInDimension {
-  return { vector: { x, y, z }, dimensionType }
+  return { location: { x, y, z }, dimensionType }
+}
+
+export function createPointVec(location: Vector3, dimensionType: DimensionType = 'overworld'): VectorInDimension {
+  return { location, dimensionType }
 }

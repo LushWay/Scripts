@@ -76,15 +76,15 @@ export class Group {
 
 export class Place {
   /** Example: StoneQuarry foodOvener */
-  readonly fullId: string
+  readonly id: string
 
   constructor(
     readonly group: Group,
     /** Example: 'foodOvener' */
-    readonly id: string,
+    readonly shortId: string,
     /** Example: 'Печкин' */
     readonly name: string,
   ) {
-    this.fullId = group.id + ' ' + this.id
+    this.id = group.id + ' ' + this.shortId
   }
 }

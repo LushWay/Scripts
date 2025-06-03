@@ -3,9 +3,10 @@
 import { Player, world } from '@minecraft/server'
 import { ActionForm, Vec } from 'lib'
 import { debounceMenu } from 'lib/form/utils'
-import { isNotPlaying } from 'lib/game-utils'
 import { getFullname } from 'lib/get-fullname'
+import { isNotPlaying } from 'lib/utils/game'
 import { ngettext } from 'lib/utils/ngettext'
+import { VectorInDimension } from 'lib/utils/point'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
@@ -28,10 +29,13 @@ function tpMenu(player: Player) {
     'Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!',
   )
 
-  const players = world.getAllPlayers().map(player => ({
-    vector: player.location,
-    dimensionType: player.dimension.type,
-  }))
+  const players = world.getAllPlayers().map(
+    player =>
+      ({
+        location: player.location,
+        dimensionType: player.dimension.type,
+      }) satisfies VectorInDimension,
+  )
 
   const locations: Record<string, ReturnType<typeof location>> = {
     [VillageOfMiners.name]: location(VillageOfMiners, '136 71 13457 140 -10', players),
@@ -74,7 +78,7 @@ function tpToPlayer(player: Player) {
 function location(
   place: Pick<SafePlace, 'portalTeleportsTo' | 'safeArea'>,
   fallback: string,
-  players: { vector: Vector3; dimensionType: DimensionType }[],
+  players: VectorInDimension[],
 ) {
   const playersC = players.filter(player => place.safeArea?.area.isIn(player)).length
 

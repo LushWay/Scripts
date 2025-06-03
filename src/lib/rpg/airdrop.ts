@@ -5,11 +5,12 @@ import { onPlayerMove } from 'lib/player-move'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
 import { createLogger } from 'lib/utils/logger'
+import { toPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
-import { isLocationError } from '../game-utils'
 import { Temporary } from '../temporary'
+import { isLocationError } from '../utils/game'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './minimap'
 
 // TODO Refactor to use creator style for creating
@@ -163,7 +164,7 @@ export class Airdrop {
 
   /** Shows particle trace under chest minecart */
   showParticleTrace(entity = this.chicken) {
-    if (!entity?.isValid) return { x: 0, y: 0, z: 0 }
+    if (!entity?.isValid) return toPoint({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })
 
     const from = entity.location
     const { x, z } = from
@@ -181,7 +182,7 @@ export class Airdrop {
       }
     }
 
-    return from
+    return toPoint(entity)
   }
 
   delete() {

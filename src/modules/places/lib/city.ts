@@ -3,12 +3,11 @@ import { Crate } from 'lib/crates/crate'
 import { Cutscene } from 'lib/cutscene'
 import { Quest } from 'lib/quest'
 import { FloatingText } from 'lib/rpg/floating-text'
+import { Npc } from 'lib/rpg/npc'
 import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
-import { form, NewFormCreator } from 'lib/form/new'
-import { Npc } from 'lib/rpg/npc'
 
 export abstract class City extends SafePlace {
   quests: Quest[] = []
@@ -24,7 +23,7 @@ export abstract class City extends SafePlace {
     const donut = new Crate(this.group.point('donut kit').name(t`§bУсиленный`), donutLoot)
     const storageLocationpoint = this.group.point('storage text').name(t`§9Хранилище`)
     const storageLocation = location(storageLocationpoint)
-    const storageFloatingText = new FloatingText(storageLocationpoint.fullId, this.group.dimensionType)
+    const storageFloatingText = new FloatingText(storageLocationpoint.id, this.group.dimensionType)
     storageLocation.onLoad.subscribe(location => {
       storageFloatingText.update(location, storageLocationpoint.name)
     })

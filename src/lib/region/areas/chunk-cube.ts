@@ -22,7 +22,7 @@ class ChunkCube extends Area<ChunkCubeDatabase> {
   type = 'c'
 
   isNear(point: AbstractPoint, distance: number): boolean {
-    const { vector, dimensionType } = toPoint(point)
+    const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
     const { from, to } = this.database

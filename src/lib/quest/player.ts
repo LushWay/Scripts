@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { isNotPlaying } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/utils/game'
 import { Quest } from './quest'
 import { QS, QSBuilder } from './step'
 
@@ -9,7 +9,8 @@ import { QSCounter, QSCounterBuilder } from './steps/counter'
 import { QSDialogue } from './steps/dialogue'
 import { QSDynamic, QSDynamicBuilder } from './steps/dynamic'
 import { QSItem, QSItemBuilder } from './steps/item'
-import { QSPlace, QSPlaceRegion } from './steps/place'
+import { QSReachArea } from './steps/reach-area'
+import { QSReachRegion } from './steps/reach-region'
 
 export class PlayerQuest {
   constructor(
@@ -27,15 +28,15 @@ export class PlayerQuest {
 
   counter = this.wrapStep(QSCounterBuilder, QSCounter)
 
-  break = this.wrapStep(QSBreakCounterBuilder, QSBreakCounter)
+  breakCounter = this.wrapStep(QSBreakCounterBuilder, QSBreakCounter)
 
   failed = (reason: string) => {
     return this.dynamic(reason).activate(ctx => ctx.error(reason))
   }
 
-  place = QSPlace.bind(this)
+  reachArea = QSReachArea.bind(this)
 
-  region = QSPlaceRegion.bind(this)
+  reachRegion = QSReachRegion.bind(this)
 
   dialogue = QSDialogue.bind(this)
 

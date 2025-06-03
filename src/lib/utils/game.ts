@@ -11,23 +11,14 @@ import {
 } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
-import { ConfigurableLocation } from 'lib/location'
 import { Vec } from 'lib/vector'
-import { PersistentSet } from './database/persistent-set'
-import { getRole } from './roles'
-
-/** Represents location in the specific dimension */
-export interface ConfigurableVectorInDimension {
-  /** Location of the place */
-  location: Vector3 | ConfigurableLocation<Vector3>
-  dimensionType: DimensionType
-}
+import { PersistentSet } from '../database/persistent-set'
+import { getRole } from '../roles'
+import { VectorInDimension } from './point'
 
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
-export function getBlockStatus({ location, dimensionType }: ConfigurableVectorInDimension) {
+export function getBlockStatus({ location, dimensionType }: VectorInDimension) {
   try {
-    if ('valid' in location && !location.valid) return 'unloaded'
-
     const block = world[dimensionType].getBlock(location)
     if (!block?.isValid) return 'unloaded'
 

@@ -4,9 +4,9 @@ describe('ChunkCubeArea', () => {
   it('should show whenether is vector in region or not', () => {
     const chunk = new ChunkCubeArea({ from: { x: 0, z: 0 }, to: { x: 10, z: 10 } }, 'overworld')
 
-    expect(chunk.isIn({ vector: { x: 0, y: 10, z: 0 }, dimensionType: 'overworld' })).toBe(true)
-    expect(chunk.isIn({ vector: { x: 0, y: 10, z: 0 }, dimensionType: 'end' })).toBe(false)
-    expect(chunk.isIn({ vector: { x: -5, y: 10, z: 0 }, dimensionType: 'overworld' })).toBe(false)
+    expect(chunk.isIn({ location: { x: 0, y: 10, z: 0 }, dimensionType: 'overworld' })).toBe(true)
+    expect(chunk.isIn({ location: { x: 0, y: 10, z: 0 }, dimensionType: 'end' })).toBe(false)
+    expect(chunk.isIn({ location: { x: -5, y: 10, z: 0 }, dimensionType: 'overworld' })).toBe(false)
 
     expect(chunk.center).toMatchInlineSnapshot(`
     {
@@ -26,7 +26,7 @@ describe('ChunkCubeArea', () => {
     }
   `)
 
-    expect(chunk.isNear({ vector: { x: 20, y: 0, z: 20 }, dimensionType: chunk.dimensionType }, 11)).toBe(true)
+    expect(chunk.isNear({ location: { x: 20, y: 0, z: 20 }, dimensionType: chunk.dimensionType }, 11)).toBe(true)
   })
 
   it('should calculate center for any coordinate ++', () => {

@@ -11,6 +11,8 @@ import './realtime'
 import './sidebar'
 import './cleanup'
 
+import type { VectorInDimension } from 'lib/utils/point'
+
 declare module '@minecraft/server' {
   interface PlayerDatabase {
     inv: InventoryTypeName
@@ -24,7 +26,7 @@ declare module '@minecraft/server' {
       /** Player anarchy position */
       anarchy?: Vector3
 
-      deadAt?: Vector3
+      deadAt2?: VectorInDimension
 
       gravestoneId?: string
     }

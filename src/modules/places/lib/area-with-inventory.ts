@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { isNotPlaying } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/utils/game'
 
 export abstract class AreaWithInventory {
   static places: AreaWithInventory[] = []

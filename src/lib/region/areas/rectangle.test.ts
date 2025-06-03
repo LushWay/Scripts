@@ -6,8 +6,8 @@ describe('rectangle', () => {
   it('should detect if vector is in region', () => {
     const rect = new RectangleArea({ from: { x: 0, y: 0, z: 0 }, to: { x: 10, y: 10, z: 10 } }, 'overworld')
 
-    expect(rect.isIn({ vector: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toBe(true)
-    expect(rect.isIn({ vector: { x: 1, y: 1, z: 1 }, dimensionType: 'overworld' })).toBe(true)
+    expect(rect.isIn({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toBe(true)
+    expect(rect.isIn({ location: { x: 1, y: 1, z: 1 }, dimensionType: 'overworld' })).toBe(true)
 
     expect(rect.isIn(createPoint(0, 0, 0, 'nether'))).toBe(false)
     expect(rect.isIn(createPoint(0, 11, 0))).toBe(false)

@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import { dedupe } from 'lib/dedupe'
-import { getRandomXZInCircle, getTopmostSolidBlock } from 'lib/game-utils'
+import { getRandomXZInCircle, getTopmostSolidBlock } from 'lib/utils/game'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 
 /**

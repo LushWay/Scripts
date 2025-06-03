@@ -483,11 +483,11 @@ describe('ChunkQuery', () => {
 
 function createSphereQuery() {
   return new ChunkQuery<InstanceType<typeof SphereArea>>(
-    (vector, object) => object.isIn({ vector, dimensionType: object.dimensionType }),
-    (vector, object, distance) => object.isNear({ vector, dimensionType: object.dimensionType }, distance),
+    (vector, object) => object.isIn({ location: vector, dimensionType: object.dimensionType }),
+    (vector, object, distance) => object.isNear({ location: vector, dimensionType: object.dimensionType }, distance),
     (chunk, object) =>
       object.isNear(
-        { dimensionType: chunk.dimensionType, vector: { ...chunk.center, y: object.center.y } },
+        { dimensionType: chunk.dimensionType, location: { ...chunk.center, y: object.center.y } },
         ChunkArea.size,
       ),
     object => object.dimensionType,
@@ -500,12 +500,12 @@ function createSpherePoint(x: number, y: number, z: number, radius: number, dime
 }
 
 function createVectorQuery() {
-  return new ChunkQuery<{ vector: Vector3; dimensionType: DimensionType; id: number }>(
-    (point, object) => Vec.equals(point, object.vector),
-    (vector, object, distance) => Vec.isInsideRadius(vector, object.vector, distance + 1),
+  return new ChunkQuery<VectorInDimension & { id: number }>(
+    (point, object) => Vec.equals(point, object.location),
+    (vector, object, distance) => Vec.isInsideRadius(vector, object.location, distance + 1),
     () => true,
     object => object.dimensionType,
-    object => [object.vector, object.vector] as const,
+    object => [object.location, object.location] as const,
   )
 }
 

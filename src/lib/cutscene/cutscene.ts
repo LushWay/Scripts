@@ -3,9 +3,9 @@ import { Vec } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
-import { restorePlayerCamera } from 'lib/game-utils'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
+import { restorePlayerCamera } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 /**

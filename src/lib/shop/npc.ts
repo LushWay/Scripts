@@ -23,7 +23,7 @@ export class ShopNpc {
    * @param options - Creation options
    */
   constructor(protected place: Place) {
-    this.shop = new Shop(place.name, place.fullId)
+    this.shop = new Shop(place.name, place.id)
     this.npc = new Npc(place, event => {
       this.shop.open(event.player)
       return true
@@ -39,7 +39,7 @@ export class ShopBlock {
   private cooldown = new Cooldown(1000, false)
 
   constructor(place: Place) {
-    this.shop = new Shop(place.name, place.fullId)
+    this.shop = new Shop(place.name, place.id)
     this.location = location(place)
     this.location.onLoad.subscribe(location => {
       PlaceAction.onInteract(

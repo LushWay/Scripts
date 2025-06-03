@@ -41,10 +41,9 @@ class VillageOfMinersBuilder extends City {
 
   createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
     return new Quest(id, text, 'Да', q => {
-      q.break((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
+      q.breakCounter((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
 
-      const reward = q.button().reward(rewards)
-      if (this.guide.location.valid) reward.place(this.guide.location)
+      q.button().reward(rewards).target(this.guide.location.toPoint())
     })
   }
 

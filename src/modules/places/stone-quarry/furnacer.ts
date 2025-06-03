@@ -33,7 +33,7 @@ export class Furnacer extends ShopNpc {
   static npcs: Furnacer[] = []
 
   get id() {
-    return this.place.fullId
+    return this.place.id
   }
 
   /**

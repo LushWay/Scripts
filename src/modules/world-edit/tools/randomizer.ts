@@ -2,8 +2,8 @@ import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm } from 'lib'
-import { isNotPlaying } from 'lib/game-utils'
 import { t } from 'lib/text'
+import { isNotPlaying } from 'lib/utils/game'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { BlocksSetRef, blocksSetDropdown, getBlocksInSet, stringifyBlocksSetRef } from '../utils/blocks-set'
 

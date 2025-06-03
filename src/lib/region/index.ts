@@ -10,9 +10,9 @@ import {
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { isNotPlaying } from 'lib/game-utils'
 import { onPlayerMove } from 'lib/player-move'
 import { t } from 'lib/text'
+import { isNotPlaying } from 'lib/utils/game'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
@@ -171,9 +171,9 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   entity.remove()
 })
 
-onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
+onPlayerMove.subscribe(({ player, location, dimensionType }) => {
   const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
-  const newest = Region.getManyAt({ vector, dimensionType })
+  const newest = Region.getManyAt({ location, dimensionType })
 
   if (!Array.equals(newest, previous)) {
     EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })

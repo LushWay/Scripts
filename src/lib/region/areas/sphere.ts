@@ -6,7 +6,7 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
   type = 's'
 
   isNear(point: AbstractPoint, distance: number): boolean {
-    const { vector, dimensionType } = toPoint(point)
+    const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
     return Vec.isInsideRadius(this.database.center, vector, this.radius + distance)

@@ -1,4 +1,4 @@
-import { LocationInUnloadedChunkError, Player, system, world, type ShortcutDimensions } from '@minecraft/server'
+import { LocationInUnloadedChunkError, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { form } from 'lib/form/new'
 import { is } from 'lib/roles'
@@ -33,11 +33,11 @@ export class Crate {
   constructor(
     public place: Place,
     private lootTable: LootTable,
-    public dimensionId: ShortcutDimensions = 'overworld',
+    public dimensionType: DimensionType = place.group.dimensionType,
   ) {
-    this.id = place.fullId
+    this.id = place.id
     this.location = location(place)
-    this.floatingText = new FloatingText(this.id, this.dimensionId)
+    this.floatingText = new FloatingText(this.id, this.dimensionType)
     this.location.onLoad.subscribe(l => this.onValidLocation(l))
 
     Crate.crates.set(this.id, this)
@@ -51,10 +51,10 @@ export class Crate {
 
   private onValidLocation(location: ValidLocation<Vector3>) {
     this.floatingText.update(location, t`${this.place.name} ящик\n§7${this.place.group.name}`)
-    if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionId)
+    if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionType)
 
     try {
-      const block = world[this.dimensionId].getBlock(location)
+      const block = world[this.dimensionType].getBlock(location)
       if (!block || !Crate.typeIds[0] || Crate.typeIds.includes(block.typeId)) return
 
       block.setType(Crate.typeIds[0])
@@ -108,7 +108,7 @@ export class Crate {
 
   private previewItems = lootTablePreview(this.lootTable, t.header`${this.name + ' ящик'} > Содержимое`, true)
 
-  private animation = new CrateLootAnimation(this.place.fullId, this.dimensionId)
+  private animation = new CrateLootAnimation(this.place.id, this.dimensionType)
 }
 
 const schema = new ItemLoreSchema('crate')

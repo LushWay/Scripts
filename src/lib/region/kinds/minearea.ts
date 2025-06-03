@@ -1,5 +1,4 @@
 import { Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
-import { isNotPlaying } from 'lib/game-utils'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
   actionGuard,
@@ -12,6 +11,7 @@ import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
+import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
@@ -68,7 +68,7 @@ export class MineareaRegion extends RegionWithStructure {
         .forEachVector(async (vector, isIn) => {
           if (!isIn) return
 
-          for (const region of MineareaRegion.getManyAt({ vector, dimensionType: this.dimensionType })) {
+          for (const region of MineareaRegion.getManyAt({ location: vector, dimensionType: this.dimensionType })) {
             // Prevent from region save conflicts
             if (!restoredRegions.includes(region) && region !== this) {
               restoredRegions.push(region)

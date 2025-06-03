@@ -98,7 +98,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     yieldEach = 10,
   ) {
     const { edges, dimension } = this
-    const isIn = (vector: Vector3) => this.isIn({ vector, dimensionType: this.dimensionType })
+    const isIn = (vector: Vector3) => this.isIn({ location: vector, dimensionType: this.dimensionType })
 
     return new Promise<void>((resolve, reject) => {
       system.runJob(

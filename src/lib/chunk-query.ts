@@ -63,7 +63,7 @@ export class Chunk extends ChunkArea {
       if (ctx.visited.has(object)) return false
       ctx.visited.add(object)
 
-      return query.isObjectAt(point.vector, object)
+      return query.isObjectAt(point.location, object)
     })
   }
 
@@ -72,7 +72,7 @@ export class Chunk extends ChunkArea {
       if (ctx.visited.has(object)) return false
       ctx.visited.add(object)
 
-      return query.isObjectNear(point.vector, object, distance)
+      return query.isObjectNear(point.location, object, distance)
     })
   }
 
@@ -123,7 +123,7 @@ export class ChunkQuery<T extends object = any> {
   getAt(point: AbstractPoint): T[] {
     point = toPoint(point)
 
-    const key = this.getChunkKey(point.vector.x, point.vector.z)
+    const key = this.getChunkKey(point.location.x, point.location.z)
     const chunk = this.getStorage(point.dimensionType).get(key)
 
     if (!chunk) return []
@@ -145,10 +145,10 @@ export class ChunkQuery<T extends object = any> {
   getChunksNear(point: VectorInDimension, distance: number) {
     const result: Chunk[] = []
     const chunks = this.getStorage(point.dimensionType)
-    const [from, to] = VecXZ.around(point.vector, distance + ChunkArea.size)
+    const [from, to] = VecXZ.around(point.location, distance + ChunkArea.size)
     for (let x = from.x; x <= to.x; x += ChunkArea.size) {
       for (let z = from.z; z <= to.z; z += ChunkArea.size) {
-        if (!VecXZ.isInsideRadius(point.vector, { x, z }, distance + ChunkArea.size)) continue
+        if (!VecXZ.isInsideRadius(point.location, { x, z }, distance + ChunkArea.size)) continue
         const key = this.getChunkKey(x, z)
         const chunk = chunks.get(key)
         if (chunk) result.push(chunk)

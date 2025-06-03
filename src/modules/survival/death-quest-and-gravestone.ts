@@ -26,7 +26,7 @@ world.afterEvents.entityDie.subscribe(event => {
     }
 
     const { dimension, id: playerId, location, name } = event.deadEntity
-    event.deadEntity.database.survival.deadAt = Vec.floor(location)
+    event.deadEntity.database.survival.deadAt2 = { location: Vec.floor(location), dimensionType: dimension.type }
     const head = event.deadEntity.getHeadLocation()
     const pveRegion = Region.getManyAt(event.deadEntity).find(e => e.permissions.pvp === 'pve' || !e.permissions.pvp)
 
@@ -69,13 +69,14 @@ const getSettings = Settings.player(...Quest.playerSettings.extend, {
 world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   if (initialSpawn) return
 
-  const deadAt = player.database.survival.deadAt
+  const deadAt = player.database.survival.deadAt2
   if (!deadAt) return
 
   const places = SafePlace.places
+    .filter(place => place.safeArea?.dimensionType === deadAt.dimensionType)
     .map(place => ({
       distance: place.safeArea
-        ? Vec.distance(place.safeArea.area.center, deadAt) -
+        ? Vec.distance(place.safeArea.area.center, deadAt.location) -
           (place.safeArea.area instanceof SphereArea ? place.safeArea.area.radius : 0)
         : 0,
       place,
@@ -162,18 +163,18 @@ onGravestoneRemove.subscribe(({ ownerId }) => {
 }, -10)
 
 const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
-  const { deadAt, gravestoneId } = player.database.survival
+  const { deadAt2, gravestoneId } = player.database.survival
   if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.')
-  if (!deadAt) return q.failed('Ваше место смерти потерялось!')
+  if (!deadAt2) return q.failed('Ваше место смерти потерялось!')
 
-  q.dynamic(Vec.string(deadAt, true))
+  q.dynamic(Vec.string(deadAt2.location, true))
     .description(
       `Верните свои вещи${
         player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
-      }, они ждут вас на ${Vec.string(deadAt, true)}§6!`,
+      }, они ждут вас на ${Vec.string(deadAt2.location, true)}§6!`,
     )
     .activate(ctx => {
-      ctx.place = deadAt
+      ctx.target = deadAt2
       ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
         if (event.player.id !== player.id) return
         if (gravestoneGetOwner(event.target) !== player.id) return

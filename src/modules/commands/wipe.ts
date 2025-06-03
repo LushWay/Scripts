@@ -161,7 +161,7 @@ function wipe(player: Player) {
   player.scores.anarchyOnlineTime = 0
 
   delete player.database.survival.anarchy
-  delete player.database.survival.deadAt
+  delete player.database.survival.deadAt2
   delete player.database.survival.gravestoneId
   delete player.database.survival.newbie
   delete player.database.survival.rtpElytra

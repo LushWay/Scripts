@@ -14,10 +14,12 @@ export enum Items {
   Money = 'lw:money',
   WeBrush = 'we:brush',
   WeDash = 'we:dash',
+  WeDebugstick = 'we:debugstick',
+  WeRandomizer = 'we:randomizer',
   WeShovel = 'we:shovel',
   WeTool = 'we:tool',
   WeWand = 'we:wand',
   CompassPrefix = 'lw:compass',
 }
   
-  export const totalCustomItems = 45
+  export const totalCustomItems = 47

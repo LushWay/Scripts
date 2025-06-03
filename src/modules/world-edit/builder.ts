@@ -1,7 +1,7 @@
 import { Player, system } from '@minecraft/server'
 import { InventoryStore } from 'lib/database/inventory'
-import { CURRENT_BUILDERS, isNotPlaying } from 'lib/game-utils'
 import { Join } from 'lib/player-join'
+import { CURRENT_BUILDERS, isNotPlaying } from 'lib/utils/game'
 
 const builderInventory = new InventoryStore('build2')
 

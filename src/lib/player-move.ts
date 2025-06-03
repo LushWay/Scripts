@@ -2,12 +2,11 @@ import { Player, ShortcutDimensions, system, world } from '@minecraft/server'
 import type { Region } from 'lib/region'
 import { Vec } from 'lib/vector'
 import { EventSignal } from './event-signal'
+import { VectorInDimension } from './utils/point'
 import { WeakPlayerMap } from './weak-player-storage'
 
-interface PlayerPosition {
+interface PlayerPosition extends VectorInDimension {
   player: Player
-  vector: Vector3
-  dimensionType: DimensionType
 }
 
 /** Event that triggers when player location or dimension changes */
@@ -19,7 +18,7 @@ export const playerPositionCache = new WeakPlayerMap<PlayerPosition>()
 export function anyPlayerNear(location: Vector3, dimensionType: ShortcutDimensions, radius: number) {
   for (const player of playerPositionCache.values()) {
     if (dimensionType !== player.dimensionType) continue
-    if (Vec.distance(player.vector, location) < radius) return true
+    if (Vec.distance(player.location, location) < radius) return true
   }
 
   return false
@@ -43,7 +42,7 @@ function* jobPlayerPosition() {
     for (const player of world.getAllPlayers()) {
       if (!player.isValid) continue
 
-      const { location: vector, dimension } = player
+      const { location: location, dimension } = player
       const { type: dimensionType } = dimension
 
       const cache = playerPositionCache.get(player)
@@ -51,13 +50,13 @@ function* jobPlayerPosition() {
       if (
         cache &&
         cache.dimensionType === dimensionType &&
-        cache.vector.x === vector.x &&
-        cache.vector.y === vector.y &&
-        cache.vector.x === vector.x
+        cache.location.x === location.x &&
+        cache.location.y === location.y &&
+        cache.location.x === location.x
       )
         return
 
-      const position: PlayerPosition = { vector, dimensionType, player }
+      const position: PlayerPosition = { location, dimensionType, player }
       playerPositionCache.set(player, position)
       EventSignal.emit(onPlayerMove, position)
       yield

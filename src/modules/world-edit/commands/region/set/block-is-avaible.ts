@@ -1,6 +1,6 @@
 import { BlockTypes } from '@minecraft/server'
-import { inaccurateSearch } from 'lib/search'
 import { t } from 'lib/text'
+import { inaccurateSearch } from 'lib/utils/search'
 
 const prefix = 'minecraft:'
 const blocks = BlockTypes.getAll().map(e => e.id.substring(prefix.length))

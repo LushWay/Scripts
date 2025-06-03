@@ -1,4 +1,4 @@
-import { isNotPlaying } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/utils/game'
 import { QS, QSBuilder } from '../step'
 
 export class QSCounter extends QS<{ count: number }> {

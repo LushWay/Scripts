@@ -14,6 +14,7 @@ import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
+import { createPointVec } from 'lib/utils/point'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
@@ -38,7 +39,7 @@ class Learning {
         player.fail(
           t.error`Вы не можете покинуть зону добычи, пока не завершили задания ${step}/${maxReturnToAreaSteps}`,
         )
-        if (this.learningLocation.valid) player.teleport(this.learningLocation)
+        this.learningLocation.teleport(player)
       }
     }
 
@@ -140,7 +141,7 @@ class Learning {
                 ActionbarPriority.Highest,
               )
             } else {
-              ctx.place = airdrop.showParticleTrace()
+              ctx.target = airdrop.showParticleTrace()
               ctx.update()
             }
           } else i++
@@ -164,16 +165,23 @@ class Learning {
         })
       })
 
-    const crafting = Vec.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 })
+    const crafting = createPointVec(
+      Vec.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 }),
+      this.craftingTableLocation.dimensionType,
+    )
 
-    q.place(...Vec.around(crafting, 10), '§6Следуя компасу, доберитесь до верстака')
+    q.reachArea(
+      ...Vec.around(crafting.location, 10),
+      '§6Следуя компасу, доберитесь до верстака',
+      crafting.dimensionType,
+    )
 
     q.item('§6Сделайте деревянную кирку')
       .description('Используя верстак сделайте деревянную кирку!')
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
-      .place(crafting)
+      .target(crafting)
 
-    q.break((i, end) => `§6Спуститесь в шахту и добудьте камня: §f${i}/${end}`, 10)
+    q.breakCounter((i, end) => `§6Спуститесь в шахту и добудьте камня: §f${i}/${end}`, 10)
       .description('Отправляйтесь в шахту, найдите и накопайте камня.')
       .filter(broken => broken.type.id === b.Stone)
       .activate(ctx => {
@@ -183,7 +191,7 @@ class Learning {
     q.item('§6Сделайте каменную кирку')
       .description('Вернитесь к верстаку и улучшите свой инструмент.')
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
-      .place(crafting)
+      .target(crafting)
 
     q.counter(i => (i === 0 ? `§6Вновь вскопайте камень в шахте §f0/1` : `§6Добыто железной руды: §f${i - 1}/3`), 3 + 1)
       .description('Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')

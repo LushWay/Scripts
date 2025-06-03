@@ -4,6 +4,7 @@ import { EventSignal } from 'lib/event-signal'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
 import { doNothing } from 'lib/util'
+import { VectorInDimension } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { PlayerQuest } from './player'
 import { Quest } from './quest'
@@ -49,11 +50,10 @@ export abstract class QSBuilder<S extends QS> {
   /**
    * Sets place where to target compass to
    *
-   * @param place - Place to target compass to
+   * @param target - Place to target compass to
    */
-  // TODO Migrate to LocationInDimension
-  place(place: Vector3) {
-    this.step.place = place
+  target(target: VectorInDimension | undefined) {
+    this.step.target = target
     return this
   }
 
@@ -146,21 +146,25 @@ export abstract class QS<DB = any> extends Temporary {
     return Quest.getCurrentStepOf(this.player) === this
   }
 
-  /** Last set place thro {@link place} */
-  private currentPlace?: Vector3
+  /** Last set place thro {@link target} */
+  private currentPlace?: VectorInDimension
 
   /** Sets place to player compass should target to */
-  get place() {
+  get target() {
     return this.currentPlace
   }
 
-  set place(place) {
+  set target(place) {
     this.currentPlace = place
 
     if (!this.compassIntervalSetup) {
       this.compassIntervalSetup = true
       this.onInterval(() => {
-        if (this.isActive && this.place && Vec.isValid(this.place)) Compass.setFor(this.player, this.place)
+        if (this.isActive && this.target && Vec.isValid(this.target.location)) {
+          if (this.target.dimensionType === this.player.dimension.type)
+            Compass.setFor(this.player, this.target.location)
+          else Compass.setFor(this.player, undefined)
+        }
       })
 
       this.cleaners.push(() => Compass.setFor(this.player, undefined))

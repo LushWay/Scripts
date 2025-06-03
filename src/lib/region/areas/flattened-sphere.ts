@@ -11,7 +11,7 @@ class FlattenedSphere extends Area<{
   type = 'fs'
 
   isNear(point: AbstractPoint, distance: number): boolean {
-    const { vector, dimensionType } = toPoint(point)
+    const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
     const dx = vector.x - this.database.center.x

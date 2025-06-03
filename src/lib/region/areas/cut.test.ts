@@ -9,14 +9,14 @@ describe('sphere', () => {
       cut: { axis: 'y', to: 0 },
     })
 
-    cut.isNear({ vector: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' }, 0)
+    cut.isNear({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' }, 0)
 
-    expect(cut.isIn({ vector: { x: 0, y: -1, z: 0 }, dimensionType: 'overworld' })).toBe(true)
+    expect(cut.isIn({ location: { x: 0, y: -1, z: 0 }, dimensionType: 'overworld' })).toBe(true)
 
-    expect(cut.isIn({ vector: { x: 0, y: 1, z: 0 }, dimensionType: 'overworld' })).toBe(false)
-    expect(cut.isIn({ vector: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toBe(false)
-    expect(cut.isIn({ vector: { x: 0, y: 0, z: 0 }, dimensionType: 'nether' })).toBe(false)
-    expect(cut.isIn({ vector: { x: 0, y: 3, z: 0 }, dimensionType: 'overworld' })).toBe(false)
+    expect(cut.isIn({ location: { x: 0, y: 1, z: 0 }, dimensionType: 'overworld' })).toBe(false)
+    expect(cut.isIn({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toBe(false)
+    expect(cut.isIn({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'nether' })).toBe(false)
+    expect(cut.isIn({ location: { x: 0, y: 3, z: 0 }, dimensionType: 'overworld' })).toBe(false)
 
     expect(cut.edges).toEqual([
       { x: -1, y: -1, z: -1 },
@@ -28,7 +28,7 @@ describe('sphere', () => {
       cut: { axis: 'y', from: -Infinity, to: 0 },
     })
 
-    expect(cut2.isIn({ vector: { x: 0, y: -1, z: 0 }, dimensionType: 'overworld' })).toEqual(true)
+    expect(cut2.isIn({ location: { x: 0, y: -1, z: 0 }, dimensionType: 'overworld' })).toEqual(true)
 
     cut.radius = 10
     cut.center = { x: 10, y: 10, z: 10 }

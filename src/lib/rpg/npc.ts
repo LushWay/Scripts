@@ -39,7 +39,7 @@ export class Npc {
     readonly point: Place,
     private onInteract: Npc.OnInteract,
   ) {
-    this.id = point.fullId
+    this.id = point.id
     this.dimensionId = point.group.dimensionType
     this.location = location(point)
     this.location.onLoad.subscribe(location => {

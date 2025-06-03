@@ -51,7 +51,9 @@ export class PlaceAction {
   private static interactions = new Map<string, Set<PlayerCallback>>()
 
   static {
-    onPlayerMove.subscribe(({ player, vector, dimensionType }) => this.emit('enters', vector, player, dimensionType))
+    onPlayerMove.subscribe(({ player, location, dimensionType }) =>
+      this.emit('enters', location, player, dimensionType),
+    )
 
     actionGuard((_player, _region, ctx) => {
       // Allow using any block specified by interaction

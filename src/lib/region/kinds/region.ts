@@ -1,13 +1,12 @@
 import { Player, world } from '@minecraft/server'
 import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
-import { ProxyDatabase } from 'lib/database/proxy'
+import { removeDefaults, setDefaults } from 'lib/database/defaults'
 import { ActionForm } from 'lib/form/action'
 import { util } from 'lib/util'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 import { RegionStructure } from '../structure'
-import { removeDefaults, setDefaults } from 'lib/database/defaults'
 
 /** Role of the player related to the region */
 export type RegionPlayerRole = 'owner' | 'member' | false
@@ -95,11 +94,11 @@ export class Region {
   }
 
   static chunkQuery = new ChunkQuery<Region>(
-    (vector, object) => object.area.isIn({ vector, dimensionType: object.area.dimensionType }),
-    (vector, object, distance) => object.area.isNear({ vector, dimensionType: object.area.dimensionType }, distance),
-    (chunk, object) =>
-      object.area.isNear(
-        { dimensionType: chunk.dimensionType, vector: { ...chunk.center, y: object.area.center.y } },
+    (location, { area }) => area.isIn({ location, dimensionType: area.dimensionType }),
+    (location, { area }, distance) => area.isNear({ location, dimensionType: area.dimensionType }, distance),
+    (chunk, { area }) =>
+      area.isNear(
+        { dimensionType: chunk.dimensionType, location: { ...chunk.center, y: area.center.y } },
         ChunkArea.size,
       ),
     object => object.dimensionType,

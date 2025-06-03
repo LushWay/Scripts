@@ -5,8 +5,8 @@ import { Boss, ms, Vec } from 'lib'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ClosingChatSet } from 'lib/extensions/player'
-import { isNotPlaying } from 'lib/game-utils'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
+import { isNotPlaying } from 'lib/utils/game'
 import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/player-name-tag'
 
 interface BaseHurtEntity {

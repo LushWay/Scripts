@@ -4,7 +4,7 @@ import { QS, QSBuilder } from '../step'
 
 export class QSButton extends QS {
   protected activate(): QS.Cleanup {
-    // uh idk?
+    return
   }
 }
 

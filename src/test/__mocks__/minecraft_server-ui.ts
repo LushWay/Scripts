@@ -1,8 +1,8 @@
 import * as minecraftserver from '@minecraft/server'
 import { Language } from 'lib/assets/lang'
-import { inaccurateSearch } from 'lib/search'
 import { isKeyof } from 'lib/util'
 import { rawTextToString } from 'lib/utils/lang'
+import { inaccurateSearch } from 'lib/utils/search'
 import { TestPlayer } from 'test/utils'
 
 export enum FormCancelationReason {

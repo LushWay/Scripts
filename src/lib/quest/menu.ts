@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
@@ -82,7 +82,10 @@ export function manageQuestMenu(quest: Quest) {
     const current = quest.getPlayerStep(player)
     let currentDescription = ''
     if (current) {
-      currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.place ? `\n${Vec.string(current.place, true)}` : ''}`
+      currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.target ? `\n${Vec.string(current.target.location, true)}` : ''}`
+      if (current.target?.dimensionType !== 'overworld') {
+        currentDescription += `\n${current.target?.dimensionType}`
+      }
     } else if (quest.isCompleted(player)) {
       currentDescription = '§aЗадание завершено!'
     }
@@ -109,7 +112,10 @@ export function manageQuestMenu(quest: Quest) {
       'Назад',
     )
 
-    const place = current?.place
-    if (is(player.id, 'techAdmin') && place) f.button('§7admin: tp to quest point', () => player.teleport(place))
+    const place = current?.target
+    if (is(player.id, 'techAdmin') && place)
+      f.button('§7admin: tp to quest point', () =>
+        player.teleport(place.location, { dimension: world[place.dimensionType] }),
+      )
   })
 }

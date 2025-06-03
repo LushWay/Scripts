@@ -55,7 +55,7 @@ system.runInterval(
       const dimensionType = dimension.type
 
       for (const location of getEdgeBlocksOf(floored).concat(floored)) {
-        const point = toPoint({ vector: location, dimensionType })
+        const point = toPoint({ location: location, dimensionType })
         const baseRegions = BaseRegion.getNear(point, 6)
         if (!baseRegions.length) continue
 

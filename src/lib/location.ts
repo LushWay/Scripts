@@ -1,18 +1,21 @@
-import { Player, TeleportOptions, Vector3, system } from '@minecraft/server'
+import { Player, TeleportOptions, Vector3, system, world } from '@minecraft/server'
 import { isEmpty } from 'lib/util'
 import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
 import { Place } from './rpg/place'
 import { Settings } from './settings'
 import { t } from './text'
+import { VectorInDimension } from './utils/point'
 
 interface LocationCommon<T extends Vector3> {
   onLoad: Location<T>['onLoad']
   teleport: Location<T>['teleport']
   firstLoad: boolean
+  dimensionType: DimensionType
+  toPoint: Location<T>['toPoint']
 }
 
-export type ValidLocation<T extends Vector3> = { valid: true } & LocationCommon<T> & T
+export type ValidLocation<T extends Vector3> = { valid: true; toPoint: () => VectorInDimension } & LocationCommon<T> & T
 
 export type InvalidLocation<T extends Vector3> = { valid: false } & LocationCommon<T>
 
@@ -28,9 +31,9 @@ class Location<T extends Vector3> {
   static creator<V extends Vector3, L extends typeof Location<V>>(this: L) {
     /** @param group - Location group */
     return (place: Place, fallback?: V) => {
-      const location = new this(place.group.id, place.id, fallback)
+      const location = new this(place.group.id, place.shortId, place.group.dimensionType, fallback)
 
-      ;(Settings.worldMap[place.group.id] ??= {})[place.id] = {
+      ;(Settings.worldMap[place.group.id] ??= {})[place.shortId] = {
         name: place.name,
         description: location.format,
         value: fallback ? Object.values(fallback).join(' ').trim() : '',
@@ -44,11 +47,19 @@ class Location<T extends Vector3> {
     }
   }
 
+  toPoint(): undefined | VectorInDimension {
+    if (!this.valid) return
+    return {
+      location: { x: this.location.x, y: this.location.y, z: this.location.z },
+      dimensionType: this.dimensionType,
+    }
+  }
+
   protected locationFormat = { x: 0, y: 0, z: 0 } as T
 
   protected location = Object.assign({}, this.locationFormat)
 
-  private [VecSymbol] = true
+  protected [VecSymbol] = true
 
   private get format() {
     return Object.keys(this.locationFormat).join(' ').trim()
@@ -61,6 +72,7 @@ class Location<T extends Vector3> {
   protected constructor(
     protected group: string,
     protected name: string,
+    readonly dimensionType: DimensionType,
     protected fallback?: T,
   ) {}
 
@@ -101,11 +113,11 @@ class Location<T extends Vector3> {
   }
 
   protected get teleportOptions(): TeleportOptions {
-    return {}
+    return { dimension: world[this.dimensionType] }
   }
 
   teleport(player: Player) {
-    player.teleport(Vec.add(this.locationFormat, { x: 0.5, y: 0, z: 0.5 }), this.teleportOptions)
+    player.teleport(Vec.add(this.location, { x: 0.5, y: 0, z: 0.5 }), this.teleportOptions)
   }
 }
 
@@ -115,7 +127,7 @@ class LocationWithRotation extends Location<Vector3Rotation> {
   protected locationFormat = { x: 0, y: 0, z: 0, xRot: 0, yRot: 0 }
 
   protected get teleportOptions(): TeleportOptions {
-    return { rotation: { x: this.location.xRot, y: this.location.yRot } }
+    return { ...super.teleportOptions, rotation: { x: this.location.xRot, y: this.location.yRot } }
   }
 }
 

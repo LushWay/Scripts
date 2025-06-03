@@ -10,10 +10,10 @@ export class CityInvestigating<T extends City> {
     `${this.place.group.id}GoTo`,
     this.place.name,
     'Доберитесь до указанного города или деревни',
-    (q, player) => {
+    q => {
       if (!this.place.safeArea) return q.failed('Город не настроен!')
 
-      q.region(this.place.safeArea, 'Доберитесь до города!')
+      q.reachRegion(this.place.safeArea, 'Доберитесь до города!')
     },
   )
 

@@ -7,32 +7,31 @@ export function QSDialogue(this: PlayerQuest, npc: Npc, text = `Поговори
   return {
     body: (body: string) => ({
       buttons: (...buttons: [string, (ctx: QSDynamic, back: VoidFunction) => void][]) => {
-        const step = this.dynamic(text)
-        if (npc.location.valid) step.place(npc.location)
+        this.dynamic(text)
+          .target(npc.location.toPoint())
+          .activate(ctx => {
+            const show = () => {
+              const form = new ActionForm(npc.name, body)
 
-        step.activate(ctx => {
-          const show = () => {
-            const form = new ActionForm(npc.name, body)
+              for (const [text, callback] of buttons) {
+                form.addButton(text, callback.bind(null, ctx, show))
+              }
 
-            for (const [text, callback] of buttons) {
-              form.addButton(text, callback.bind(null, ctx, show))
+              form.show(this.player)
             }
 
-            form.show(this.player)
-          }
+            const interaction: Npc.OnInteract = event => {
+              if (event.player.id !== this.player.id) return false
+              if (buttons.length === 0) {
+                ctx.next()
+                return false
+              } else show()
+              return true
+            }
 
-          const interaction: Npc.OnInteract = event => {
-            if (event.player.id !== this.player.id) return false
-            if (buttons.length === 0) {
-              ctx.next()
-              return false
-            } else show()
-            return true
-          }
-
-          npc.questInteractions.add(interaction)
-          return { cleanup: () => npc.questInteractions.delete(interaction) }
-        })
+            npc.questInteractions.add(interaction)
+            return { cleanup: () => npc.questInteractions.delete(interaction) }
+          })
       },
     }),
   }
