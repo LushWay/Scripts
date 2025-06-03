@@ -124,7 +124,7 @@ export class MineareaRegion extends RegionWithStructure {
     return true
   }
 
-  get displayName() {
+  get displayName(): string {
     return this.newbie ? '§bЗона добычи новичков' : '§7Зона добычи'
   }
 
