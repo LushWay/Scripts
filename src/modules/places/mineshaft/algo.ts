@@ -7,20 +7,20 @@ import { MineshaftRegion } from './mineshaft-region'
 import { Ore, OreCollector, OreEntry } from './ore-collector'
 
 export const ores = new OreCollector(
-  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).range(60, 0).chance(5),
-  new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).range(20, -20).groupChance(90).chance(1),
+  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).range(60, 0).weight(5),
+  new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).range(20, -20).groupChance(90).weight(1),
   new Ore()
     .type(b.RedstoneOre, b.LitRedstoneOre)
     .deepslate(b.DeepslateRedstoneOre, b.LitDeepslateRedstoneOre)
     .range(20, -30)
     .groupChance(70)
-    .chance(1),
+    .weight(1),
 
-  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).chance(0.8),
-  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -30).groupChance(50).chance(2),
-  new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).range(0, -64).groupChance(10).chance(0.5),
-  new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).range(0, -64).groupChance(60).chance(0.3),
-  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).range(-30, -64).chance(0.05),
+  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).weight(0.8),
+  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -30).groupChance(50).weight(2),
+  new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).range(0, -64).groupChance(10).weight(0.5),
+  new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).range(0, -64).groupChance(60).weight(0.3),
+  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).range(-30, -64).weight(0.05),
 ).stoneChance(40)
 
 export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {

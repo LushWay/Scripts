@@ -12,8 +12,8 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
     f.title(name)
 
     const maxPercent = one
-      ? lootTable.items.reduce((p, c) => p + c.chance, 0)
-      : Math.max(...lootTable.items.map(p => p.chance))
+      ? lootTable.items.reduce((p, c) => p + c.weight, 0)
+      : Math.max(...lootTable.items.map(p => p.weight))
     for (const item of lootTable.items) {
       const { amount, enchantments, itemStack: i } = item
       const itemStack = typeof i === 'function' ? i() : i
@@ -34,7 +34,7 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
         : ''
 
       f.button(
-        t.raw`${name}\n${'§r§7' + (~~((item.chance / maxPercent) * 100)).toString()}§7%%${amountText}${enchantmentsText}`,
+        t.raw`${name}\n${'§r§7' + (~~((item.weight / maxPercent) * 100)).toString()}§7%%${amountText}${enchantmentsText}`,
         getAuxOrTexture(itemStack.typeId, enchanted),
         itemForm(item),
       )

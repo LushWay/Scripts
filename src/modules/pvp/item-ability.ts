@@ -1,6 +1,7 @@
 import { EntityDamageCause, world } from '@minecraft/server'
-import { isKeyof, selectByChance } from 'lib'
+import { isKeyof } from 'lib'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { rollChance } from 'lib/rpg/random'
 
 export enum Ability {
   Vampire = 'vamp',
@@ -66,7 +67,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       break
     }
     case Ability.ExtraDamage: {
-      if (selectByChance(extraDamage).item) {
+      if (rollChance(10)) {
         damagingEntity.success('х2 урон!', false)
         hurtEntity.applyDamage(damage, { damagingEntity, cause })
       }
@@ -77,8 +78,3 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
     }
   }
 })
-
-const extraDamage = [
-  { chance: 10, item: true },
-  { chance: 100, item: false },
-]

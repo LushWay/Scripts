@@ -1,6 +1,7 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { getAuxOrTexture, langToken, selectByChance } from 'lib'
+import { getAuxOrTexture, langToken } from 'lib'
 import { form } from 'lib/form/new'
+import { selectByChance } from 'lib/rpg/random'
 import { t, textTable } from 'lib/text'
 import { ores } from 'modules/places/mineshaft/algo'
 import { OreEntry } from 'modules/places/mineshaft/ore-collector'
@@ -26,7 +27,7 @@ export const wikiOres = form((f, player) => {
   const nowAvailableChance = selectByChance.getTotalChance(nowAvailable)
   if (nowAvailable.length) {
     const ores = nowAvailable.map(entry => {
-      const chance = getChance(entry.chance, nowAvailableChance)
+      const chance = getChance(entry.weight, nowAvailableChance)
       return { entry, text: oreName(entry.item, chance, ' '), chance }
     })
     f.button(t`Руды на y: ${y}:\n${ores.map(e => e.text).join(', ')}`, wikiOresAtY(ores, y))
@@ -34,11 +35,11 @@ export const wikiOres = form((f, player) => {
     f.button('На этой высоте руд нет', wikiOres)
   }
 
-  for (const { item, chance } of ores.getAll()) {
+  for (const { item, weight: chance } of ores.getAll()) {
     f.button(
       t`${oreName(item, getChance(chance, totalChance))}, ${`§7${item.below}...${item.above}`}, Группа: ${item.groupChance}%%`,
       getOreTexture(item),
-      wikiOre({ item, chance: chance / totalChance }),
+      wikiOre({ item, weight: chance / totalChance }),
     )
   }
 })

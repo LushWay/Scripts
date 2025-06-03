@@ -1,5 +1,6 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
-import { selectByChance, stringifyError } from 'lib'
+import { stringifyError } from 'lib'
+import { selectByChance } from 'lib/rpg/random'
 import { t } from 'lib/text'
 
 export class Ore {
@@ -41,11 +42,11 @@ export class Ore {
     return this
   }
 
-  chance(chance: number) {
+  weight(weight: number) {
     return {
-      chance,
+      weight,
       item: {
-        chance,
+        weight,
         all: this.types.concat(this.deepslates),
         types: this.types,
         deepslates: this.deepslates,
@@ -57,7 +58,7 @@ export class Ore {
   }
 }
 
-export type OreEntry = ReturnType<Ore['chance']>
+export type OreEntry = ReturnType<Ore['weight']>
 
 export class OreCollector {
   private entries: OreEntry[]
@@ -90,7 +91,7 @@ export class OreCollector {
   }
 
   stoneChance(stoneChance: number) {
-    this.entries = this.entries.concat(new Ore().type('').deepslate('').chance(stoneChance))
+    this.entries = this.entries.concat(new Ore().type('').deepslate('').weight(stoneChance))
 
     return this
   }
@@ -107,10 +108,10 @@ export class OreCollector {
     return this.entries.filter(e => y <= e.item.below && y >= e.item.above)
   }
 
-  with(ore: OreEntry, chance = ore.chance) {
+  with(ore: OreEntry, chance = ore.weight) {
     return Object.setPrototypeOf(
       {
-        entries: this.entries.concat({ chance, item: { ...ore.item, chance } }),
+        entries: this.entries.concat({ weight: chance, item: { ...ore.item, weight: chance } }),
       },
       Object.getPrototypeOf(this) as this,
     ) as this

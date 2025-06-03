@@ -44,36 +44,36 @@ class TechCityBuilder extends City {
     const { normal, donut } = this.createKits(
       new Loot()
         .itemStack(CannonItem.blueprint)
-        .chance('10%')
+        .weight('10%')
 
         .itemStack(CannonShellItem.blueprint)
-        .chance('10%')
+        .weight('10%')
 
         .item('RedTerracotta')
         .amount({
           '20...40': '70%',
           '41...64': '30%',
         })
-        .chance('10%').build,
+        .weight('10%').build,
 
       new Loot()
         .itemStack(CannonShellItem.blueprint)
-        .chance('3%')
+        .weight('3%')
 
         .itemStack(CannonShellItem.itemStack)
-        .chance('3%')
+        .weight('3%')
 
         .itemStack(CannonItem.blueprint)
-        .chance('2%')
+        .weight('2%')
 
         .itemStack(CannonItem.itemStack)
-        .chance('2%')
+        .weight('2%')
 
         .itemStack(BaseItem.blueprint)
-        .chance('1%')
+        .weight('1%')
 
         .itemStack(BaseItem.itemStack)
-        .chance('1%').build,
+        .weight('1%').build,
     )
 
     new Command('techcity').setPermissions('techAdmin').executes(ctx => {

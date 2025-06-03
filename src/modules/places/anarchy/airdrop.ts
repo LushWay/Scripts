@@ -8,32 +8,32 @@ import { randomLocationInAnarchy } from './random-location-in-anarchy'
 const base = new Loot('base_airdrop')
   .item('Gunpowder')
   .amount({ '1...10': '40%', '11...20': '2%' })
-  .chance('20%')
+  .weight('20%')
 
   .item('CookedBeef')
   .amount({ '30...64': '40%', '65...128': '2%' })
-  .chance('20%')
+  .weight('20%')
 
   .itemStack(CannonShellItem.blueprint)
-  .chance('10%')
+  .weight('10%')
 
   .itemStack(CannonItem.blueprint)
-  .chance('5%').build
+  .weight('5%').build
 
 const powerfull = new Loot('powerfull_airdrop')
   .item('Gunpowder')
   .amount({ '30...64': '40%', '65...100': '2%' })
-  .chance('20%')
+  .weight('20%')
 
   .item('CookedBeef')
   .amount({ '30...64': '40%', '65...128': '2%' })
-  .chance('20%')
+  .weight('20%')
 
   .itemStack(CannonShellItem.itemStack)
-  .chance('10%')
+  .weight('10%')
 
   .itemStack(CannonItem.itemStack)
-  .chance('5%').build
+  .weight('5%').build
 
 let airdrop: Airdrop | undefined
 function timeout() {

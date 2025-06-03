@@ -14,14 +14,14 @@ export function createBossSlime(group: Group) {
     .loot(
       new Loot('slime boss')
         .itemStack(MagicSlimeBall)
-        .chance('100%')
+        .weight('100%')
         .amount({
           '40...64': '2%',
           '65...128': '1%',
         })
 
         .item('SlimeBall')
-        .chance('100%')
+        .weight('100%')
         .amount({
           '0...10': '10%',
           '11...64': '40%',

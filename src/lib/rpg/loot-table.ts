@@ -4,6 +4,7 @@ import { Items } from 'lib/assets/custom-items'
 import { Command } from 'lib/command'
 import { EventSignal } from 'lib/event-signal'
 import { inspect, isKeyof, pick } from 'lib/util'
+import { selectByChance } from './random'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
@@ -20,7 +21,7 @@ interface ItemStackMetaOptions {
 interface StoredItem {
   itemStack: ItemStack | (() => ItemStack)
   enchantments: Partial<Record<MinecraftEnchantmentTypes, number[]>>
-  chance: number
+  weight: number
   amount: number[]
   damage: number[]
   custom: { chances: number[]; apply: (item: ItemStack, result: number) => void }[]
@@ -43,7 +44,7 @@ new Command('loot')
     lootTable.fillContainer(inventory.container)
   })
 
-type PreparedItems = { item: ItemStack; chance: number }[]
+type PreparedItems = { item: ItemStack; weight: number }[]
 
 export class Loot {
   private items: StoredItem[] = []
@@ -82,7 +83,7 @@ export class Loot {
 
   private create(itemStack: ItemStack | (() => ItemStack)) {
     if (this.current) this.items.push(this.current)
-    this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {}, custom: [] }
+    this.current = { itemStack, weight: 100, amount: [1], damage: [0], enchantments: {}, custom: [] }
   }
 
   private getCurrent() {
@@ -90,11 +91,11 @@ export class Loot {
     return this.current
   }
 
-  chance(percent: Percent) {
-    const chance = parseInt(percent)
-    if (isNaN(chance)) throw new TypeError(`Chance must be \`{number}%\`, got '${inspect(percent)}' instead!`)
+  weight(percent: Percent) {
+    const weight = parseInt(percent)
+    if (isNaN(weight)) throw new TypeError(`Chance must be \`{number}%\`, got '${inspect(percent)}' instead!`)
 
-    this.getCurrent().chance = chance
+    this.getCurrent().weight = weight
 
     return this
   }
@@ -145,9 +146,9 @@ export class Loot {
 
   trash(types: Partial<Record<'web' | 'string', number>>) {
     if (typeof types.string === 'number')
-      this.item('String').chance('30%').amount({ '10...20': '10%', '21...30': '20%' }).duplicate(types.string)
+      this.item('String').weight('30%').amount({ '10...20': '10%', '21...30': '20%' }).duplicate(types.string)
 
-    if (typeof types.web === 'number') this.item('Web').chance('40%').amount({ '1...2': '1%' }).duplicate(types.web)
+    if (typeof types.web === 'number') this.item('Web').weight('40%').amount({ '1...2': '1%' }).duplicate(types.web)
 
     return this
   }
@@ -178,13 +179,12 @@ export class Loot {
       }
     }
 
-    const size = Object.values(parsed).reduce((p, c) => p + c, 0)
-    const array = new Array<number>(size)
+    const min = Math.min(...Object.values(parsed))
+    let array: number[] = []
 
-    let i = 0
     for (const [key, value] of Object.entries(parsed)) {
-      array.fill(Number(key), i, i + value)
-      i += value
+      const toFill = Math.round(value / min)
+      array = array.concat(new Array(toFill).fill(Number(key), 0, toFill))
     }
 
     return array
@@ -234,12 +234,15 @@ export class LootTable {
    * @returns Array of ItemStack or undefined
    */
   generate(length = this.items.length): (ItemStack | undefined)[] {
-    const items = this.items.map(i => this.generateItems(i)).flat()
+    const items = this.items.map(i => this.generateItems(i)).flat() as {
+      item: undefined | ItemStack
+      weight: number
+    }[]
     if (length === 1) return items.map(e => e.item)
 
     // Separate items by chance
-    let explictItems = items.filter(e => e.chance === 100)
-    const randomizableItems = items.filter(e => e.chance !== 100)
+    let explictItems = items.filter(e => e.weight === 100)
+    const randomizableItems = items.filter(e => e.weight !== 100)
 
     let air = 0
 
@@ -256,7 +259,7 @@ export class LootTable {
         return item.item
       } else if (randomizableItems.length > 0) {
         const { index, item } = selectByChance(randomizableItems)
-        randomizableItems.splice(index, 1)
+        if (randomizableItems[index]) randomizableItems[index].item = undefined
 
         return item
       }
@@ -301,12 +304,12 @@ export class LootTable {
 
       for (const custom of item.custom) custom.apply(stack, custom.chances.randomElement())
 
-      return [{ item: stack, chance: item.chance }]
+      return [{ item: stack, weight: item.weight }]
     } catch (err) {
       console.error(
         'Failed to generate loot item for',
         this.id,
-        pick(item, ['amount', 'chance', 'damage', 'enchantments']),
+        pick(item, ['amount', 'weight', 'damage', 'enchantments']),
         'error:',
         err,
       )
@@ -327,27 +330,6 @@ function parseIntStrict(string: string) {
   if (isNaN(int)) throw new TypeError(`Expected number, got ${inspect(string)}`)
 
   return int
-}
-
-interface ChanceItem<T> {
-  chance: number
-  item: T
-}
-
-export function selectByChance<T>(items: ChanceItem<T>[]) {
-  const totalChance = selectByChance.getTotalChance(items)
-  let random = Math.randomFloat(0, totalChance)
-
-  for (const [index, { chance, item }] of items.entries()) {
-    random -= chance
-    if (random < 0) return { index, item }
-  }
-
-  return { index: 0, item: items[0]?.item as T }
-}
-
-selectByChance.getTotalChance = <T>(items: ChanceItem<T>[]) => {
-  return items.reduce((sum, { chance }) => sum + chance, 0)
 }
 
 function applyOptions(itemStack: ItemStack, meta: ItemStackMetaOptions) {

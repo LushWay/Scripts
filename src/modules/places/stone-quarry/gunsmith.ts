@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { langToken, selectByChance } from 'lib'
+import { langToken } from 'lib'
 import { Group } from 'lib/rpg/place'
 import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
@@ -8,6 +8,7 @@ import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { copyAllItemPropertiesExceptEnchants } from '../village-of-explorers/mage'
+import { rollChance } from 'lib/rpg/random'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
@@ -89,7 +90,7 @@ export class Gunsmith extends ShopNpc {
     let lost = false
     if (newitem.enchantable && item.enchantable) {
       for (const ench of item.enchantable.getEnchantments()) {
-        if (!lost && selectByChance(looseEnchantment).item) {
+        if (!lost && rollChance(3)) {
           lost = true
           player.tell(
             t.warn
@@ -103,14 +104,3 @@ export class Gunsmith extends ShopNpc {
     }
   }
 }
-
-const looseEnchantment = [
-  {
-    item: true,
-    chance: 3,
-  },
-  {
-    item: false,
-    chance: 97,
-  },
-]

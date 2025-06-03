@@ -14,15 +14,15 @@ export function createBossGolem(group: Group) {
       new Loot('GolemLoot')
         .itemStack(Chip)
         .amount({ '1...2': '1%' })
-        .chance('20%')
+        .weight('20%')
 
         .itemStack(Chip)
         .amount({ '1...2': '1%' })
-        .chance('20%')
+        .weight('20%')
 
         .itemStack(Chip)
         .amount({ '1...2': '1%' })
-        .chance('20%').build,
+        .weight('20%').build,
     )
     .respawnTime(ms.from('min', 10))
     .allowedEntities('all')
