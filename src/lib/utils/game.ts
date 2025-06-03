@@ -48,17 +48,17 @@ export function isLocationError(
 export function restorePlayerCamera(player: Player, animTime = 1) {
   const headLocation = player.getHeadLocation()
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-    location: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 0.3)),
+    location: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 0.5)),
     facingLocation: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 10)),
     easeOptions: {
       easeTime: animTime,
-      easeType: EasingType.OutCubic,
+      // easeType: EasingType.OutCubic,
     },
   })
 
   system.runTimeout(
     () => {
-      if (Vec.distance(player.getHeadLocation(), headLocation) > 1) {
+      if (Vec.distance(player.getHeadLocation(), headLocation) > 0.3) {
         // Apply animation again because player had moved
         restorePlayerCamera(player, animTime * 0.5)
       } else player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)

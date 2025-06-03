@@ -45,6 +45,7 @@ describe('Region', () => {
 
     expectTypeOf(TestRegion.getAt(createPoint(0, 0, 0))).toEqualTypeOf<TestRegion | undefined>()
     expect(TestRegion.getAt(createPoint(0, 0, 0))).toBe(region)
+    expect(TestRegion.getAt(createPoint(0.4, 0.4, 0.4))).toBe(region)
 
     expectTypeOf(TestRegion.getManyAt(createPoint(0, 0, 0))).toEqualTypeOf<TestRegion[]>()
   })

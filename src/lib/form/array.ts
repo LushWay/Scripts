@@ -3,6 +3,7 @@ import { MemoryTable } from 'lib/database/abstract'
 import {
   SETTINGS_GROUP_NAME,
   Settings,
+  SettingsDatabaseValue,
   settingsGroupMenu,
   type SettingsConfig,
   type SettingsConfigParsed,
@@ -89,7 +90,7 @@ export class ArrayForm<
   show(
     player: Player,
     fromPage = 1,
-    filtersDatabase = new MemoryTable() as SettingsDatabase,
+    filtersDatabase: SettingsDatabase = new MemoryTable<SettingsDatabaseValue>({}, () => ({})),
     filters = Settings.parseConfig(filtersDatabase, 'filters', this.config.filters) as F,
     searchQuery = '',
   ) {
@@ -187,7 +188,7 @@ export class ArrayForm<
       })
     } else {
       const propertyName = 'filters'
-      const applied = Object.keys(database.get(propertyName) ?? {}).length
+      const applied = Object.keys(database.get(propertyName)).length
       form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,

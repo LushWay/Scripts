@@ -82,10 +82,24 @@ describe('location', () => {
     // @ts-expect-error
     const player = new Player(false) as Player
     loc.teleport(player)
-    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toEqual([
-      { x: 0.5, y: 0, z: 0.5 },
-      {},
-    ])
+    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        Vec {
+          "x": 0.5,
+          "y": 1,
+          "z": 1.5,
+        },
+        {
+          "dimension": Dimension {
+            "heightRange": {
+              "max": 365,
+              "min": -64,
+            },
+            "id": "minecraft:overworld",
+          },
+        },
+      ]
+    `)
   })
 })
 
@@ -131,10 +145,28 @@ describe('locationWithRotation', () => {
     // @ts-expect-error
     const player = new Player(false) as Player
     loc.teleport(player)
-    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toEqual([
-      { x: 0.5, y: 0, z: 0.5 },
-      { rotation: { x: 90, y: 0 } },
-    ])
+    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        Vec {
+          "x": 0.5,
+          "y": 1,
+          "z": 1.5,
+        },
+        {
+          "dimension": Dimension {
+            "heightRange": {
+              "max": 365,
+              "min": -64,
+            },
+            "id": "minecraft:overworld",
+          },
+          "rotation": {
+            "x": 90,
+            "y": 0,
+          },
+        },
+      ]
+    `)
   })
 })
 

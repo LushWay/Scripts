@@ -1,10 +1,12 @@
 import { system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { deepClone } from 'lib/database/defaults'
+import { EventLoader } from 'lib/event-signal'
 import { t } from 'lib/text'
 import { Area } from './areas/area'
 import './areas/cut'
 import { SphereArea } from './areas/sphere'
+import { RegionEvents } from './events'
 import { RegionIsSaveable, type Region, type RegionPermissions } from './kinds/region'
 
 export type RLDB = JsonObject | undefined
@@ -50,6 +52,7 @@ system.delay(() => {
         i++
         if (i % 100 === 0) yield
       }
+      EventLoader.load(RegionEvents.onLoad)
     })(),
   )
 })

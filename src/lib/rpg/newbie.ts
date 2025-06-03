@@ -1,7 +1,10 @@
 import { EntityDamageCause, Player, system, world } from '@minecraft/server'
-import { ask, Cooldown, Join, ms } from 'lib'
 import { PlayerProperties } from 'lib/assets/player-json'
+import { Cooldown } from 'lib/cooldown'
+import { ask } from 'lib/form/message'
+import { Join } from 'lib/player-join'
 import { createLogger } from 'lib/utils/logger'
+import { ms } from 'lib/utils/ms'
 
 const newbieTime = ms.from('hour', 2)
 

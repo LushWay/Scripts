@@ -3,10 +3,10 @@ import { Airdrop, BUTTON, Compass, InventoryStore, is, Join, ModalForm, pick, sc
 import { table } from 'lib/database/abstract'
 import { form, NewFormCreator } from 'lib/form/new'
 import { Quest } from 'lib/quest'
+import { enterNewbieMode } from 'lib/rpg/newbie'
 import { t } from 'lib/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Spawn } from 'modules/places/spawn'
-import { enterNewbieMode } from 'modules/pvp/newbie'
 import { updateBuilderStatus } from 'modules/world-edit/builder'
 
 interface RestorePoint {

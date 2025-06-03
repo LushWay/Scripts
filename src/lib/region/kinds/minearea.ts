@@ -9,6 +9,7 @@ import {
 } from 'lib/region/index'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
+import { isNewbie } from 'lib/rpg/newbie'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
@@ -114,6 +115,8 @@ export class MineareaRegion extends RegionWithStructure {
 
   scheduledToPlaceBlocks: string[] = []
 
+  newbie = false
+
   onBlockBreak(_player: Player, event: PlayerBreakBlockBeforeEvent) {
     const schedule = ScheduleBlockPlace.setBlock(event.block, ms.from('sec', 10))
     this.scheduledToPlaceBlocks.push(Vec.string(schedule.l)) //  ms.from('min', Math.randomInt(1, 3))
@@ -122,7 +125,7 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   get displayName() {
-    return '§7Зона добычи'
+    return this.newbie ? '§bЗона добычи новичков' : '§7Зона добычи'
   }
 
   customFormDescription(player: Player): Record<string, unknown> {
@@ -130,6 +133,7 @@ export class MineareaRegion extends RegionWithStructure {
       'Building': this.building,
       'Restoring structure': this.restoringStructureProgress,
       'Scheduled to place blocks': this.scheduledToPlaceBlocks.length,
+      'Newbie': this.newbie,
     }
   }
 }
@@ -152,6 +156,8 @@ async function getSchedules(area: Area, dimensionType: ShortcutDimensions) {
 
 actionGuard((player, region, ctx) => {
   if (!(region instanceof MineareaRegion)) return
+
+  if (region.newbie && !isNewbie(player)) return player.fail('Вы не можете добывать блоки в зоне добычи новичков')
 
   const building = isNotPlaying(player)
 

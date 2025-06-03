@@ -1,5 +1,5 @@
 import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
-import { ActionForm, ActionGuardOrder, location, Temporary, Vec } from 'lib'
+import { ActionForm, ActionGuardOrder, location, Region, Temporary, Vec } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib'
@@ -11,6 +11,7 @@ import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
@@ -252,6 +253,14 @@ class Learning {
   blockedOre = new WeakPlayerMap<string[]>()
 
   constructor() {
+    RegionEvents.onLoad.subscribe(() => {
+      this.learningLocation.onLoad.subscribe(location => {
+        for (const region of MineareaRegion.getManyAt(location.toPoint())) {
+          region.newbie = true
+        }
+      })
+    })
+
     actionGuard((player, region, ctx) => {
       if (ctx.type !== 'break') return
       if (ctx.event.dimension.type !== 'overworld') return
