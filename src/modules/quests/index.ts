@@ -1,2 +1,3 @@
-import 'lib/achievements/index'
 import './learning/learning'
+
+import './achievements/common'

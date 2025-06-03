@@ -1,2 +1,0 @@
-import './command'
-import './common'

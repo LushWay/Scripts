@@ -1,7 +1,8 @@
-import { world } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { system, TicksPerSecond, world } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Achievement, CountingAchievement } from 'lib/achievements/achievement'
 import { Rewards } from 'lib/utils/rewards'
-import { Achievement, CountingAchievement } from './achievement'
+import { gravestoneEntityTypeId, gravestoneGetOwner } from 'modules/survival/death-quest-and-gravestone'
 
 for (const num of [10, 100, 1000, 10000]) {
   CountingAchievement.createV()
@@ -87,3 +88,35 @@ Achievement.create()
     })
   })
   .reward(new Rewards().item(MinecraftBlockTypes.CoalBlock, 20))
+
+Achievement.create()
+  .id('madeMyself')
+  .name('Сделал себя сам: Получи первые 10.000 монет')
+  .defaultStorage(() => undefined)
+  .creator(ctx => {
+    system.runPlayerInterval(
+      player => {
+        if (player.scores.money >= 10000) ctx.done(player)
+      },
+      'madeMyselfAchiev',
+      TicksPerSecond * 10,
+    )
+  })
+
+Achievement.create()
+  .id('gravestoner')
+  .name(`Гробовщик: открой 10 могил разных игроков`)
+  .defaultStorage(() => [] as string[])
+  .creator(ctx => {
+    world.afterEvents.playerInteractWithEntity.subscribe(event => {
+      if (event.target.typeId !== gravestoneEntityTypeId || ctx.isDone(event.player)) return
+      const owner = gravestoneGetOwner(event.target)
+      if (!owner) return
+
+      const storage = ctx.storage(event.player)
+      if (!storage.includes(owner)) storage.push(owner)
+
+      if (storage.length >= 10) ctx.done(event.player)
+    })
+  })
+  .reward(new Rewards().item(MinecraftItemTypes.RoseBush, 1, 'Гробовщику посвящается'))
