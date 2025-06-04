@@ -58,7 +58,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 
   override get structureId(): StructureDungeonsId {
-    throw new Error('structureId is not supported for CustomDungeonRegion')
+    return '' as StructureDungeonsId
   }
 
   override get displayName() {
@@ -74,7 +74,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 }
 registerSaveableRegion('customDungeon', CustomDungeonRegion)
-registerRegionType('Кастомный данж', CustomDungeonRegion)
+registerRegionType('Кастомный данж', CustomDungeonRegion, false, true)
 
 function eventHelper(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false
