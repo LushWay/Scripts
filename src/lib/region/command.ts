@@ -273,8 +273,13 @@ function editRegion(player: Player, region: Region, displayName: boolean, back: 
   form.addButton('Заменить зону', () => {
     const form = new ActionForm('Заменить зону')
     selectArea(form, player, area => {
+      // Area changed, need to update chunk query storages too
+      Region.chunkQuery.remove(region)
+
       region.area = area
       region.save()
+
+      Region.chunkQuery.add(region)
     })
     form.show(player)
   })
