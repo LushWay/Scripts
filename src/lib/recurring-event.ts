@@ -27,7 +27,7 @@ export class RecurringEvent<T extends JsonObject = JsonObject> {
 
   stop: VoidFunction
 
-  protected getNextRunDate: () => string
+  getNextEventDate: () => Date
 
   constructor(
     readonly id: string,
@@ -37,19 +37,19 @@ export class RecurringEvent<T extends JsonObject = JsonObject> {
     protected readonly runAfterOffline = false,
   ) {
     this.schedule = later.schedule(scheduleRaw)
-    this.getNextRunDate = () => this.schedule.next(1).toString()
+    this.getNextEventDate = () => this.schedule.next(1) as Date
 
     this.db = RecurringEvent.db.get(id) as RecurringEvent.DB<T>
-    setDefaults(this.db.storage, this.createStorage())
+    this.db.storage = setDefaults(this.db.storage, this.createStorage())
 
     const interval = later.setInterval(this.run.bind(this), scheduleRaw)
     this.stop = interval.clear.bind(interval)
 
-    if (runAfterOffline && this.db.nextRun !== this.getNextRunDate()) this.run(true)
+    if (runAfterOffline && this.db.nextRun !== this.getNextEventDate().toString()) this.run(true)
   }
 
   protected run(afterOffline = false) {
-    this.db.nextRun = this.getNextRunDate()
+    this.db.nextRun = this.getNextEventDate().toString()
     this.callback(this.db.storage, afterOffline)
   }
 }

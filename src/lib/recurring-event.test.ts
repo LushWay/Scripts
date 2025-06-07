@@ -64,4 +64,40 @@ describe('RecurringEvent', () => {
     create()
     expect(fn).toHaveBeenCalledTimes(1)
   })
+
+  it('should execute recurring event with storage', () => {
+    const fn = vi.fn()
+    vi.setSystemTime(new Date(2000, 0, 0, 23, 59, 59))
+
+    const event = new RecurringEvent(
+      'midnightCleanup',
+      later.parse.recur().on('00:00:00').time(),
+      () => ({ value: [] }),
+      fn,
+      true,
+    )
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn.mock.calls[0]).toMatchInlineSnapshot(`
+      [
+        {
+          "value": [],
+        },
+        true,
+      ]
+    `)
+
+    vi.advanceTimersByTime(1100)
+    expect(fn).toHaveBeenCalledTimes(2)
+    expect(fn.mock.calls[1]).toMatchInlineSnapshot(`
+      [
+        {
+          "value": [],
+        },
+        false,
+      ]
+    `)
+
+    event.stop()
+  })
 })

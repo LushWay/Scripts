@@ -20,9 +20,11 @@ describe('area reg', () => {
       }
     }
 
-    const mock = vi.spyOn(console, 'warn')
+    const mock = vi.spyOn(console, 'warn').mockImplementation(() => {})
     expect(TestArea.fromJson({ t: 'unknown', d: {} })).toMatchInlineSnapshot(`undefined`)
-    expect(mock.mock.calls[0]?.[0]).toMatchInlineSnapshot(`"§7[Area][Database] No area found for §funknown§7. Maybe you forgot to register kind or import file?§7"`)
+    expect(mock.mock.calls[0]?.[0]).toMatchInlineSnapshot(
+      `"§7[Area][Database] No area found for §funknown§7. Maybe you forgot to register kind or import file?§7"`,
+    )
     mock.mockClear()
 
     Area.loaded = true
