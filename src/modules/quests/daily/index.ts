@@ -17,7 +17,7 @@ new RecurringEvent(
     let quests = [...DailyQuest.dailyQuests.values()]
     currentDailyQuests = []
 
-    if (restore) {
+    if (restore && storage.questIds.length) {
       for (const questId of storage.questIds) {
         const quest = quests.find(e => e.id === questId)
         if (quest) currentDailyQuests.push(quest)

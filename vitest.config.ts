@@ -1,4 +1,4 @@
-import tsconfig_paths from 'vite-tsconfig-paths'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 import { generateDefine } from './tools/define'
 
@@ -8,7 +8,7 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: 'istanbul',
-      reporter: ['html', 'json', 'lcov'],
+      reporter: process.env.CI ? ['lcov'] : ['html', 'json'],
       include: ['src/lib', 'src/modules'],
       exclude: ['src/lib/assets', 'src/lib/bds', 'src/test', '**/*.test.ts', '**/*.spec.ts'],
     },
@@ -21,5 +21,5 @@ export default defineConfig({
     },
     exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts'],
   },
-  plugins: [tsconfig_paths()],
+  plugins: [tsconfigPaths()],
 })

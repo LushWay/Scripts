@@ -11,17 +11,15 @@ later.runtime = {
 
 later.date.localTime()
 
-export namespace RecurringEvent {
-  export interface DB<T = unknown> {
-    nextRun: string
-    storage: T
-  }
+interface DB<T = unknown> {
+  nextRun: string
+  storage: T
 }
 
 export class RecurringEvent<T extends JsonObject = JsonObject> {
-  static db = table<RecurringEvent.DB>('recurringEvents', () => ({ nextRun: '', storage: {} }))
+  static db = table<DB>('recurringEvents', () => ({ nextRun: '', storage: {} }))
 
-  protected db: RecurringEvent.DB<T>
+  protected db: DB<T>
 
   protected schedule: Later.Schedule
 
@@ -39,7 +37,7 @@ export class RecurringEvent<T extends JsonObject = JsonObject> {
     this.schedule = later.schedule(scheduleRaw)
     this.getNextEventDate = () => this.schedule.next(1) as Date
 
-    this.db = RecurringEvent.db.get(id) as RecurringEvent.DB<T>
+    this.db = RecurringEvent.db.get(id) as DB<T>
     this.db.storage = setDefaults(this.db.storage, this.createStorage())
 
     const interval = later.setInterval(this.run.bind(this), scheduleRaw)
