@@ -23,6 +23,17 @@ describe('sphere', () => {
       { x: 1, y: 1, z: 1 },
     ])
 
+    expect(cut.getFormDescription()).toMatchInlineSnapshot(`
+      {
+        "Center": "§c0 §a0 §b0",
+        "Cut": {
+          "axis": "y",
+          "to": 0,
+        },
+        "Radius": 2,
+      }
+    `)
+
     const cut2 = new CutArea({
       parent: new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }).toJSON(),
       cut: { axis: 'y', from: -Infinity, to: 0 },
@@ -33,6 +44,50 @@ describe('sphere', () => {
     cut.radius = 10
     cut.center = { x: 10, y: 10, z: 10 }
     expect(cut.center).toEqual({ x: 10, y: 10, z: 10 })
+  })
+
+  it('should work with both empty from and to', () => {
+    const cut = new CutArea({
+      parent: new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }).toJSON(),
+      cut: { axis: 'y' },
+    })
+
+    expect(cut.isIn({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toEqual(true)
+  })
+
+  it('should work even with empty initializer', () => {
+    // @ts-expect-error
+    const area = new CutArea({})
+    expect(area.center).toMatchInlineSnapshot(`
+      Vec {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+      }
+    `)
+    expect(area.isIn({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })).toEqual(false)
+    expect(area.radius).toBe(0)
+
+    area.radius = 10
+    expect(area.radius).toBe(0)
+
+    area.center = { x: 10, y: 10, z: 10 }
+    expect(area.center).toEqual(Vec.zero)
+
+    expect(area.edges).toMatchInlineSnapshot(`
+      [
+        Vec {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        Vec {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+      ]
+    `)
   })
 
   it('should call forEachVector', async () => {

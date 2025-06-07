@@ -102,8 +102,8 @@ export enum EntityComponentTypes {
   AddRider = 'minecraft:addrider',
   /**
    * @remarks
-   *   Adds a timer for the entity to grow up. It can be accelerated by giving the entity the items it likes as defined
-   *   by feedItems.
+   *   Adds a timer for the entity to grow up. It can be accelerated by giving the entity the items it likes as defined by
+   *   feedItems.
    */
   Ageable = 'minecraft:ageable',
   /**
@@ -118,8 +118,8 @@ export enum EntityComponentTypes {
   CanClimb = 'minecraft:can_climb',
   /**
    * @remarks
-   *   When added, this component signifies that the entity can fly, and the pathfinder won't be restricted to paths
-   *   where a solid block is required underneath it.
+   *   When added, this component signifies that the entity can fly, and the pathfinder won't be restricted to paths where
+   *   a solid block is required underneath it.
    */
   CanFly = 'minecraft:can_fly',
   /**
@@ -268,8 +268,8 @@ export enum EntityComponentTypes {
   Leashable = 'minecraft:leashable',
   /**
    * @remarks
-   *   When added, this component signifies that this entity contains an additional variant value. Can be used to
-   *   further differentiate variants.
+   *   When added, this component signifies that this entity contains an additional variant value. Can be used to further
+   *   differentiate variants.
    */
   MarkVariant = 'minecraft:mark_variant',
   /**
@@ -339,14 +339,14 @@ export enum EntityComponentTypes {
   NavigationFly = 'minecraft:navigation.fly',
   /**
    * @remarks
-   *   Allows this entity to generate paths by walking, swimming, flying and/or climbing around and jumping up and down
-   *   a block.
+   *   Allows this entity to generate paths by walking, swimming, flying and/or climbing around and jumping up and down a
+   *   block.
    */
   NavigationGeneric = 'minecraft:navigation.generic',
   /**
    * @remarks
-   *   Allows this entity to generate paths in the air (for example, like the Minecraft Bees do.) Keeps them from
-   *   falling out of the skies and doing predictive movement.
+   *   Allows this entity to generate paths in the air (for example, like the Minecraft Bees do.) Keeps them from falling
+   *   out of the skies and doing predictive movement.
    */
   NavigationHover = 'minecraft:navigation.hover',
   /**
@@ -548,6 +548,8 @@ export class System {
     }
     return 0
   }
+
+  clearRun(h: number) {}
 
   beforeEvents = new SystemBeforeEvents()
 

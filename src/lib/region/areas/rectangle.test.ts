@@ -14,6 +14,15 @@ describe('rectangle', () => {
 
     expect(rect.center).toEqual({ x: 5, y: 5, z: 5 })
     expect(rect.isNear(createPoint(15, 15, 15), 5)).toBe(true)
+
+    expect(rect.getFormDescription()).toMatchInlineSnapshot(`
+      {
+        "Center": "§c5 §a5 §b5",
+        "From": "§c0 §a0 §b0",
+        "Size": 1331,
+        "To": "§c10 §a10 §b10",
+      }
+    `)
   })
 
   it('should have center', () => {

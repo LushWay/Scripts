@@ -19,6 +19,15 @@ describe('sphere', () => {
     sphere.radius = 10
     sphere.center = { x: 10, y: 10, z: 10 }
     expect(sphere.center).toEqual({ x: 10, y: 10, z: 10 })
+
+    expect(sphere.getFormDescription()).toMatchInlineSnapshot(`
+      {
+        "Center": "§c10 §a10 §b10",
+        "Radius": 10,
+      }
+    `)
+
+    expect(sphere.toString()).toMatchInlineSnapshot(`"§7§f§c10 §a10 §b10§7 radius=§610§7"`)
   })
 
   it('should call forEachVector', async () => {

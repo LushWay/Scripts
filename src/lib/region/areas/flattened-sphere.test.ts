@@ -31,5 +31,13 @@ describe('rectangle', () => {
     expect(flts.radius).toBe(20)
 
     flts.center = { x: 10, y: 10, z: 10 }
+
+    expect(flts.getFormDescription()).toMatchInlineSnapshot(`
+      {
+        "Center": "§c10 §a10 §b10",
+        "Radius": 12,
+        "YRadius": 20,
+      }
+    `)
   })
 })

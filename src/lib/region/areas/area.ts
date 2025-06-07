@@ -106,8 +106,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
           try {
             let i = 0
             for (const vector of Vec.forEach(...edges)) {
-              const result = callback(vector, isIn(vector), dimension)
-              if (result === STOP_AREA_FOR_EACH_VECTOR) break
+              callback(vector, isIn(vector), dimension)
               i++
               if (i % yieldEach === 0) yield
             }
@@ -120,5 +119,3 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     })
   }
 }
-
-export const STOP_AREA_FOR_EACH_VECTOR = Symbol('Stop area for each vector')

@@ -23,6 +23,14 @@ describe('cylinder', () => {
     cylinder.radius = 5
     cylinder.center = { x: 10, y: 10, z: 10 }
     expect(cylinder.center).toEqual({ x: 10, y: 10, z: 10 })
+
+    expect(cylinder.getFormDescription()).toMatchInlineSnapshot(`
+      {
+        "Center": "§c10 §a10 §b10",
+        "Radius": 5,
+        "YRadius": 3,
+      }
+    `)
   })
 
   it('should detect if vector is in region 2', () => {
