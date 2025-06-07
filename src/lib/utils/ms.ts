@@ -93,9 +93,9 @@ export class ms {
 }
 
 export function fromTicksToMs(ticks: number) {
-  return ~~((ticks / TicksPerSecond) * 1000)
+  return ~~(ticks * 50)
 }
 
 export function fromMsToTicks(ms: number) {
-  return ~~((ms / 1000) * TicksPerSecond)
+  return ~~(ms * 0.02)
 }

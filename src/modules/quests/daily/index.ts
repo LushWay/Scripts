@@ -3,12 +3,56 @@ import { Cooldown, ms, noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { DailyQuest } from 'lib/quest/quest'
-import { RegularEvent } from 'lib/regular-event'
+import { RecurringEvent } from 'lib/recurring-event'
 import { t, textTable } from 'lib/text'
+import later from 'lib/utils/later'
 import { City } from 'modules/places/lib/city'
 import { CityInvestigating } from 'modules/places/lib/city-investigating-quest'
 
-new RegularEvent(0, 0, true, generateDailyQuests)
+new RecurringEvent(
+  'dailyQuest',
+  later.parse.recur().on('00:00').time(),
+  () => ({ questIds: [] as string[] }),
+  (storage, restore) => {
+    let quests = [...DailyQuest.dailyQuests.values()]
+    currentDailyQuests = []
+
+    if (restore) {
+      for (const questId of storage.questIds) {
+        const quest = quests.find(e => e.id === questId)
+        if (quest) currentDailyQuests.push(quest)
+      }
+      return
+    }
+
+    for (let i = 0; i <= dailyQuests; i++) {
+      const quest = quests.randomElement()
+      quests = quests.filter(e => e !== quest)
+      if (typeof quest !== 'undefined') {
+        currentDailyQuests.push(quest)
+      }
+    }
+
+    storage.questIds = currentDailyQuests.map(e => e.id)
+
+    const cities = currentDailyQuests
+      .map(quest => City.places.find(e => e.group === quest.place.group))
+      .filter(noNullable)
+      .filter(e => e instanceof City)
+
+    const questCityCount = new Map<City, number>()
+    for (const city of cities) questCityCount.set(city, questCityCount.get(city) ?? 0)
+
+    const mostPopular = [...questCityCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+
+    currentDailyQuestCity = mostPopular
+
+    for (const value of db.values()) {
+      value.today = 0
+    }
+  },
+  true,
+)
 
 const dailyQuests = 4
 
