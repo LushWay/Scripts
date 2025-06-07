@@ -48,6 +48,6 @@ describe('Form', () => {
       `[Error: Unable to find button with text 'buton1', closest is 'button1' 87%, 'button2' 62%]`,
     )
 
-    expect(b1).not.toHaveBeenCalled()
+    expect(b1).toHaveBeenCalledTimes(0)
   })
 })
