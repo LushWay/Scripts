@@ -55,7 +55,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
     })
     .button(dbquest => {
       const quest = Quest.quests.get(dbquest.id)
-      const step = quest?.getPlayerStep(player, dbquest.i)
+      const step = quest?.getCurrentStep(player, dbquest.i)
       if (!step || !quest) return false
 
       return [`${quest.name}\n${step.text()}`, () => manageQuestMenu(quest).show(player, self)]
@@ -79,7 +79,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
 
 export function manageQuestMenu(quest: Quest) {
   return form((f, player, back) => {
-    const current = quest.getPlayerStep(player)
+    const current = quest.getCurrentStep(player)
     let currentDescription = ''
     if (current) {
       currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.target ? `\n${Vec.string(current.target.location, true)}` : ''}`
@@ -93,11 +93,11 @@ export function manageQuestMenu(quest: Quest) {
     f.title(quest.name)
     f.body(`${quest.description}§r\n\n${currentDescription}`)
 
-    if (Quest.getCurrentStepOf(player) !== quest.getPlayerStep(player)) {
+    if (Quest.getCurrentStepOf(player) !== quest.getCurrentStep(player)) {
       f.button('Сделать приоритетным', () => {
         if (!player.database.quests) return
 
-        const active = Quest.getDatabase(player, quest)
+        const active = quest.getDatabase(player)
         if (!active) return
 
         player.database.quests.active = player.database.quests.active.filter(e => e !== active)

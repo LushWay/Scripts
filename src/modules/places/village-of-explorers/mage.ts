@@ -24,7 +24,7 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 
 export class Mage extends ShopNpc {
   constructor(group: Group) {
-    super(group.point('mage').name('Маг'))
+    super(group.place('mage').name('Маг'))
 
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)

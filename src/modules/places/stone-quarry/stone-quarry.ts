@@ -1,5 +1,7 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { doNothing, Loot } from 'lib'
+import { form } from 'lib/form/new'
+import { Npc } from 'lib/rpg/npc'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
@@ -10,8 +12,6 @@ import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 import { createBossWither } from './wither.boss'
-import { form } from 'lib/form/new'
-import { Npc } from 'lib/rpg/npc'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -54,7 +54,7 @@ class StoneQuarryBuilder extends City {
 
   gunsmith = new Gunsmith(this.group)
 
-  guide = new Npc(this.group.point('guide').name('Каменщик'), ({ player }) => {
+  guide = new Npc(this.group.place('guide').name('Каменщик'), ({ player }) => {
     form(f => {
       f.title(this.guide.name)
       f.button('Скоро здесь будут задания', doNothing)

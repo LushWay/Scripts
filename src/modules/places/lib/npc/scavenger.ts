@@ -9,7 +9,7 @@ const bannedToSell = [Items.Menu, Items.Money] as string[]
 
 export class Scavenger extends ShopNpc {
   constructor(group: Group) {
-    super(group.point('scavenger').name('Мусорщик'))
+    super(group.place('scavenger').name('Мусорщик'))
     this.shop.body(() => 'Продай мне весь свой мусор')
     this.shop.menu((form, player) => {
       form.itemModifier(

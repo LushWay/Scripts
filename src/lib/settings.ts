@@ -129,7 +129,6 @@ export class Settings {
     }
 
     this[to][groupId][SETTINGS_GROUP_NAME] = groupName
-    this[to][groupId]
   }
 
   /**

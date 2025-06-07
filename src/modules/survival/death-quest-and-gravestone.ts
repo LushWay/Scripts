@@ -4,6 +4,7 @@ import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, forceAllowSpawnInRegion, Region } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
+import { noGroup } from 'lib/rpg/place'
 import { t } from 'lib/text'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
@@ -162,34 +163,38 @@ onGravestoneRemove.subscribe(({ ownerId }) => {
   delete player.survival.gravestoneId
 }, -10)
 
-const quest = new Quest('restoreInventory', 'Вернуть вещи', 'Верните вещи после смерти!', (q, player) => {
-  const { deadAt2, gravestoneId } = player.database.survival
-  if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.')
-  if (!deadAt2) return q.failed('Ваше место смерти потерялось!')
+const quest = new Quest(
+  noGroup.place('restoreInventory').name('Вернуть вещи'),
+  'Верните вещи после смерти!',
+  (q, player) => {
+    const { deadAt2, gravestoneId } = player.database.survival
+    if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.')
+    if (!deadAt2) return q.failed('Ваше место смерти потерялось!')
 
-  q.dynamic(Vec.string(deadAt2.location, true))
-    .description(
-      `Верните свои вещи${
-        player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
-      }, они ждут вас на ${Vec.string(deadAt2.location, true)}§6!`,
-    )
-    .activate(ctx => {
-      ctx.target = deadAt2
-      ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
-        if (event.player.id !== player.id) return
-        if (gravestoneGetOwner(event.target) !== player.id) return
+    q.dynamic(Vec.string(deadAt2.location, true))
+      .description(
+        `Верните свои вещи${
+          player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
+        }, они ждут вас на ${Vec.string(deadAt2.location, true)}§6!`,
+      )
+      .activate(ctx => {
+        ctx.target = deadAt2
+        ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
+          if (event.player.id !== player.id) return
+          if (gravestoneGetOwner(event.target) !== player.id) return
 
-        ctx.next()
+          ctx.next()
+        })
+        ctx.subscribe(onGravestoneRemove, ({ ownerId }) => {
+          if (ownerId !== player.id) return
+
+          player.fail(t.error`Могила исчезла...`)
+          ctx.next()
+        })
       })
-      ctx.subscribe(onGravestoneRemove, ({ ownerId }) => {
-        if (ownerId !== player.id) return
 
-        player.fail(t.error`Могила исчезла...`)
-        ctx.next()
-      })
+    q.end(() => {
+      player.success('Поздравляем! В будущем постарайтесь быть осторожнее.')
     })
-
-  q.end(() => {
-    player.success('Поздравляем! В будущем постарайтесь быть осторожнее.')
-  })
-})
+  },
+)

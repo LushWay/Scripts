@@ -27,7 +27,7 @@ class SpawnBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'spawn'
 
-  location = locationWithRotation(this.group.point('spawn').name('Спавн'), { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
+  location = locationWithRotation(this.group.place('spawn').name('Спавн'), { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
 
   settings = Settings.player('Вход', 'join', {
     teleportToSpawnOnJoin: {

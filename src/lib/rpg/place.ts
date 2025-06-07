@@ -3,7 +3,7 @@ import { Settings } from 'lib/settings'
 export class Group {
   static groups = new Map<string, Group>()
 
-  static pointCreator<T>(onCreate: (place: Place) => T) {
+  static placeCreator<T>(onCreate: (place: Place) => T) {
     return {
       group: (group: Group) => ({
         /**
@@ -13,11 +13,11 @@ export class Group {
          * @returns Other setter
          */
         id: (id: string) => {
-          if (group.points.has(id)) {
-            console.error(new Error(`Group(${group.id}).point(${id}) already exists`))
-            while (group.points.has(id)) id += '_'
+          if (group.places.has(id)) {
+            console.error(new Error(`Group(${group.id}).place(${id}) already exists`))
+            while (group.places.has(id)) id += '_'
           }
-          group.points.add(id)
+          group.places.add(id)
 
           return {
             /**
@@ -60,15 +60,15 @@ export class Group {
     return this
   }
 
-  private points = new Set<string>()
+  private places = new Set<string>()
 
   /**
    * Creates new point of matter
    *
    * @returns
    */
-  point(id: string) {
-    return Group.pointCreator(place => place)
+  place(id: string) {
+    return Group.placeCreator(place => place)
       .group(this)
       .id(id)
   }
@@ -85,6 +85,10 @@ export class Place {
     /** Example: 'Печкин' */
     readonly name: string,
   ) {
-    this.id = group.id + ' ' + this.shortId
+    // Trim start needed for empty point
+    this.id = `${group.id} ${this.shortId}`.trimStart()
   }
 }
+
+// Empty group. Used to create places not linked with any groups/cities/villages
+export const noGroup = new Group('')

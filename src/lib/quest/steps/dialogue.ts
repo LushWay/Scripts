@@ -3,7 +3,7 @@ import { Npc } from 'lib/rpg/npc'
 import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'
 
-export function QSDialogue(this: PlayerQuest, npc: Npc, text = `Поговорите с ${npc.name}`) {
+export function QSDialogue(this: PlayerQuest, npc: Npc, text = `Вас ждет §f${npc.name}`) {
   return {
     body: (body: string) => ({
       buttons: (...buttons: [string, (ctx: QSDynamic, back: VoidFunction) => void][]) => {

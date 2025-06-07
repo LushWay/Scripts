@@ -28,7 +28,7 @@ class TechCityBuilder extends City {
 
   golem = createBossGolem(this.group)
 
-  guide = new Npc(this.group.point('guide').name('Техник'), ({ player }) => {
+  guide = new Npc(this.group.place('guide').name('Техник'), ({ player }) => {
     form(f => {
       f.title(this.guide.name)
       f.button('Скоро здесь будут задания', doNothing)

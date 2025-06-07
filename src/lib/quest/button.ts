@@ -1,10 +1,10 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { form, ShowForm } from 'lib/form/new'
+import { t } from 'lib/text'
 import { manageQuestMenu } from './menu'
 import { Quest } from './quest'
 import { QS } from './step'
-import { t } from 'lib/text'
 
 type RenderedQuestButton = false | [text: string, texture: string | undefined, callback: VoidFunction | ShowForm]
 
@@ -17,7 +17,7 @@ export class QuestButton {
     if (this.quest.isCompleted(player))
       return [t`${this.quest.name}\n§aЗавершен!`, undefined, manageQuestMenu(this.quest)]
 
-    const step = this.quest.getPlayerStep(player)
+    const step = this.quest.getCurrentStep(player)
     if (!step)
       return [
         this.quest.name,

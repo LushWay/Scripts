@@ -51,7 +51,7 @@ export class Boss {
   static all: Boss[] = []
 
   static create() {
-    return Group.pointCreator(place => ({
+    return Group.placeCreator(place => ({
       typeId: (typeId: string) => ({
         loot: (loot: LootTable) => ({
           respawnTime: (respawnTime: number) => ({

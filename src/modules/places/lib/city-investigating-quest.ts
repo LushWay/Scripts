@@ -4,46 +4,44 @@ import { RegionEvents } from 'lib/region/events'
 import { City } from './city'
 
 export class CityInvestigating<T extends City> {
+  static cities = new Set<CityInvestigating<City>>()
+
   quest: Quest
 
   goToCityQuest = new Quest(
-    `${this.place.group.id}GoTo`,
-    this.place.name,
+    this.city.group.place('goTo').name(''),
     'Доберитесь до указанного города или деревни',
     q => {
-      if (!this.place.safeArea) return q.failed('Город не настроен!')
+      if (!this.city.safeArea) return q.failed('Город не настроен!')
 
-      q.reachRegion(this.place.safeArea, 'Доберитесь до города!')
+      q.reachRegion(this.city.safeArea, 'Доберитесь до города!')
     },
   )
 
   constructor(
-    readonly place: T,
+    readonly city: T,
     private q: (city: T, ...params: Parameters<Quest['create']>) => void,
   ) {
+    CityInvestigating.cities.add(this as unknown as CityInvestigating<City>)
+
     Quest.onLoad.subscribe(() => {
-      if (this.place.safeArea) {
-        RegionEvents.onEnter(this.place.safeArea, player => {
+      if (this.city.safeArea) {
+        RegionEvents.onEnter(this.city.safeArea, player => {
           if (isNotPlaying(player)) return
-          if (!this.quest.isCompleted(player) && !this.quest.getPlayerStep(player)) this.quest.enter(player)
+          if (!this.quest.hadEntered(player)) this.quest.enter(player)
         })
       }
     })
 
-    this.quest = new Quest(
-      `${this.place.group.id}Investigating`,
-      this.place.name,
-      'Исследуйте новый город!',
-      (q, player) => {
-        if (!this.place.safeArea) return q.failed('Город не настроен!')
+    this.quest = new Quest(this.city.group.place('investigating').name(''), 'Исследуйте новый город!', (q, player) => {
+      if (!this.city.safeArea) return q.failed('Город не настроен!')
 
-        if (this.place.cutscene.sections.length)
-          q.dynamic('Обзор города').activate(ctx => {
-            this.place.cutscene.play(ctx.player)?.finally(() => ctx.next())
-          })
+      if (this.city.cutscene.sections.length)
+        q.dynamic('Обзор города').activate(ctx => {
+          this.city.cutscene.play(ctx.player)?.finally(() => ctx.next())
+        })
 
-        this.q(this.place, q, player)
-      },
-    )
+      this.q(this.city, q, player)
+    })
   }
 }

@@ -5,7 +5,7 @@ import { ShopNpc } from 'lib/shop/npc'
 
 export class Woodman extends ShopNpc {
   constructor(group: Group) {
-    super(group.point('woodman').name('Дровосек'))
+    super(group.place('woodman').name('Дровосек'))
     this.shop.body(() => 'Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n')
 
     this.shop.menu(form => {

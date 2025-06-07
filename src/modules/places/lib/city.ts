@@ -8,20 +8,15 @@ import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
+import { DailyQuest } from 'lib/quest/quest'
 
 export abstract class City extends SafePlace {
-  quests: Quest[] = []
-
-  createQuest() {
-    // return new Quest()
-  }
-
   protected createKits(normalLoot: LootTable, donutLoot: LootTable) {
     normalLoot.id = `§7${this.group.id}§f Normal Crate`
     donutLoot.id = `§7${this.group.id}§f Donut Crate`
-    const normal = new Crate(this.group.point('normal kit').name(t`§7Обычный`), normalLoot)
-    const donut = new Crate(this.group.point('donut kit').name(t`§bУсиленный`), donutLoot)
-    const storageLocationpoint = this.group.point('storage text').name(t`§9Хранилище`)
+    const normal = new Crate(this.group.place('normal kit').name(t`§7Обычный`), normalLoot)
+    const donut = new Crate(this.group.place('donut kit').name(t`§bУсиленный`), donutLoot)
+    const storageLocationpoint = this.group.place('storage text').name(t`§9Хранилище`)
     const storageLocation = location(storageLocationpoint)
     const storageFloatingText = new FloatingText(storageLocationpoint.id, this.group.dimensionType)
     storageLocation.onLoad.subscribe(location => {
@@ -37,5 +32,16 @@ export abstract class City extends SafePlace {
 
   scavenger = new Scavenger(this.group)
 
+  // TODO Standartized guide ui
+  // use quests from the Quest.quests and filter them by linked place
+  // also add some info about the city
   abstract guide: Npc
+
+  visitCityQuest = new DailyQuest(
+    this.group.place('visit').name(''),
+    'Сходи в город, сделай запланированые покупки',
+    q => {
+      if (this.safeArea) q.reachRegion(this.safeArea, `Посети ${this.group.name}`)
+    },
+  )
 }

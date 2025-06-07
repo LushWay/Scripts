@@ -130,11 +130,11 @@ export abstract class QS<DB = any> extends Temporary {
 
   /** Returns database assotiated with this quest step. Do note that after step switching it will be cleared. */
   get db() {
-    return Quest.getDatabase(this.player, this.quest)?.db as DB | undefined
+    return this.quest.getDatabase(this.player)?.db as DB | undefined
   }
 
   set db(value) {
-    const active = Quest.getDatabase(this.player, this.quest)
+    const active = this.quest.getDatabase(this.player)
     if (active) active.db = value
   }
 

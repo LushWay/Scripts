@@ -6,7 +6,7 @@ import { Group } from './rpg/place'
 import { Settings } from './settings'
 
 const group = new Group('id')
-const point = group.point('id').name('name')
+const point = group.place('id').name('name')
 
 beforeEach(() => {
   Settings.worldMap = {}

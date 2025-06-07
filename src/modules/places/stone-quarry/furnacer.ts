@@ -18,7 +18,7 @@ const furnaceExpireTimeText =
 
 export class Furnacer extends ShopNpc {
   static create() {
-    return Group.pointCreator(place => ({
+    return Group.placeCreator(place => ({
       furnaceTypeIds: (furnaceTypeIds: string[]) => ({
         onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer(place, furnaceTypeIds, onlyInStoneQuarry),
       }),

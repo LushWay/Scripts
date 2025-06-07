@@ -5,7 +5,7 @@ import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { RegionEvents } from 'lib/region/events'
 import { t } from 'lib/text'
-import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 
 const settings = Settings.world(...Settings.worldCommon, {
@@ -146,12 +146,8 @@ Core.afterEvents.worldLoad.subscribe(() => {
     if (!initialSpawn) player.scores.pvp = 0
   })
 
-  const playerEnteredAnarchy = new WeakPlayerSet({ removeOnLeave: true })
-  Anarchy.onPlayerEnter.subscribe(({ player }) => {
+  Anarchy.onPlayerFirstEnter.subscribe(({ player }) => {
     if (!settings.pvpEnabled) return
-
-    if (playerEnteredAnarchy.has(player)) return
-    playerEnteredAnarchy.add(player) // to prevent from triggering multiple times
 
     if (player.scores.pvp > 0) {
       player.warn(t.warn`Вы вышли из сервера во время сражения, поэтому были убиты при входе.`)

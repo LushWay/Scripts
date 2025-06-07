@@ -38,7 +38,7 @@ export const NotNewbieCost = new (class NotNewbieCost extends Cost {
 
 export class Engineer extends ShopNpc {
   constructor(public group: Group) {
-    super(group.point('engineer').name('Инженер'))
+    super(group.place('engineer').name('Инженер'))
 
     this.shop.body(() => 'Ну типа дай мне чертеж, a я те чета там наколупаю, да\n')
     this.shop.menu(menu => {

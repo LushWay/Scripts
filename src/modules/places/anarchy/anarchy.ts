@@ -5,6 +5,7 @@ import { t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { createLogger } from 'lib/utils/logger'
+import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { rtpCommand } from 'modules/commands/rtp'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
@@ -25,9 +26,9 @@ class AnarchyBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location(Spawn.group.point('anarchy center').name('центр анархии'))
+  centerLocation = location(Spawn.group.place('anarchy center').name('центр анархии'))
 
-  portalLocation = location(Spawn.group.point('anarchy portal').name('портал на анархию'))
+  portalLocation = location(Spawn.group.place('anarchy portal').name('портал на анархию'))
 
   inventoryStore = new InventoryStore('anarchy')
 
@@ -75,6 +76,10 @@ class AnarchyBuilder extends AreaWithInventory {
         Portal.showHudTitle(player, '§6> §cAnarchy §6<')
 
         EventSignal.emit(this.onPlayerEnter, { player })
+        if (!this.playerEnteredAnarchy.has(player)) {
+          EventSignal.emit(this.onPlayerFirstEnter, { player })
+          this.playerEnteredAnarchy.add(player)
+        }
       }
     })
 
@@ -92,6 +97,11 @@ class AnarchyBuilder extends AreaWithInventory {
   }
 
   onPlayerEnter = new EventSignal<{ player: Player }>()
+
+  // to prevent from triggering multiple times
+  private playerEnteredAnarchy = new WeakPlayerSet({ removeOnLeave: true })
+
+  onPlayerFirstEnter = new EventSignal<{ player: Player }>()
 
   private logger = createLogger('Anarchy')
 

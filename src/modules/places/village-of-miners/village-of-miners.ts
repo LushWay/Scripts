@@ -9,6 +9,7 @@ import { Butcher } from '../lib/npc/butcher'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { stoneQuarryInvestigating } from '../stone-quarry/quests/investigating'
+import { DailyQuest } from 'lib/quest/quest'
 
 class VillageOfMinersBuilder extends City {
   constructor() {
@@ -28,7 +29,7 @@ class VillageOfMinersBuilder extends City {
 
   woodman = new Woodman(this.group)
 
-  guide = new Npc(this.group.point('guide').name('Шахтер'), ({ player }) => {
+  guide = new Npc(this.group.place('guide').name('Шахтер'), ({ player }) => {
     form(f => {
       f.title(this.guide.name)
       f.quest(stoneQuarryInvestigating.goToCityQuest, 'Где мне переплавить железо?')
@@ -40,7 +41,7 @@ class VillageOfMinersBuilder extends City {
   })
 
   createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
-    return new Quest(id, text, 'Да', q => {
+    return new DailyQuest(this.group.place(id).name(text), 'Да', q => {
       q.breakCounter((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
 
       q.button().reward(rewards).target(this.guide.location.toPoint())

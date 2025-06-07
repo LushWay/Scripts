@@ -2,17 +2,17 @@ import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { langToken } from 'lib'
 import { Group } from 'lib/rpg/place'
+import { rollChance } from 'lib/rpg/random'
 import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { copyAllItemPropertiesExceptEnchants } from '../village-of-explorers/mage'
-import { rollChance } from 'lib/rpg/random'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
-    super(group.point('gunsmith').name('Оружейник'))
+    super(group.place('gunsmith').name('Оружейник'))
     this.shop.body(() => 'Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.')
 
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)

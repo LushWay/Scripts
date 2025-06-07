@@ -25,13 +25,13 @@ export class SafePlace {
 
   readonly group = new Group(this.groupId, this.name)
 
-  private safeAreaLocation = locationWithRadius(this.group.point('safearea').name('мирная зона'))
+  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name('мирная зона'))
 
-  portalTeleportsTo = locationWithRotation(this.group.point('portal teleports to').name('портал телепортирует на'))
+  portalTeleportsTo = locationWithRotation(this.group.place('portal teleports to').name('портал телепортирует на'))
 
-  private portalFrom = location(this.group.point('portal from').name('портал от'))
+  private portalFrom = location(this.group.place('portal from').name('портал от'))
 
-  private portalTo = location(this.group.point('portal to').name('портал до'))
+  private portalTo = location(this.group.place('portal to').name('портал до'))
 
   safeArea?: SafeAreaRegion
 
@@ -52,6 +52,12 @@ export class SafePlace {
     })
 
     SafePlace.places.push(this)
+
+    this.onCreate()
+  }
+
+  protected onCreate() {
+    // hook
   }
 
   private createPortal(from: Vector3, to: Vector3) {
@@ -69,6 +75,7 @@ export class SafePlace {
   }
 
   private createSafeArea(location: Vector3Radius) {
+    this.safeArea?.delete()
     this.safeArea = SafeAreaRegion.create(new SphereArea({ center: location, radius: location.radius }, 'overworld'), {
       safeAreaName: this.name,
     })

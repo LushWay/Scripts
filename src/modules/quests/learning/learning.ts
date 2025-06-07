@@ -1,5 +1,5 @@
 import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
-import { ActionForm, ActionGuardOrder, location, Region, Temporary, Vec } from 'lib'
+import { ActionForm, ActionGuardOrder, location, Temporary, Vec } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard } from 'lib'
@@ -13,6 +13,7 @@ import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
+import { noGroup } from 'lib/rpg/place'
 import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { createPointVec } from 'lib/utils/point'
@@ -28,7 +29,7 @@ const logger = createLogger('Learning Quest')
 class Learning {
   id = 'learning'
 
-  quest = new Quest('learning', 'Обучение', 'Обучение базовым механикам сервера', (q, player) => {
+  quest = new Quest(noGroup.place('learning').name('Обучение'), 'Обучение базовым механикам сервера', (q, player) => {
     if (!this.learningLocation.valid || !this.craftingTableLocation.valid) return q.failed('§cОбучение не настроено')
 
     const maxReturnToAreaSteps = 4
@@ -242,9 +243,9 @@ class Learning {
     q.dialogue(VillageOfMiners.guide, 'Шахтер зовет вас наверх, чтобы поговорить!').body('Приветствую!').buttons()
   })
 
-  learningLocation = location(this.quest.group.point('tp').name('Куда игроки будут тепаться при обучении'))
+  learningLocation = location(this.quest.group.place('tp').name('Куда игроки будут тепаться при обучении'))
 
-  craftingTableLocation = location(this.quest.group.point('crafting table').name('Верстак'))
+  craftingTableLocation = location(this.quest.group.place('crafting table').name('Верстак'))
 
   startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
 
@@ -270,7 +271,7 @@ class Learning {
       }
 
       if (region !== VillageOfMiners.safeArea) return
-      if (this.quest.getPlayerStep(player)) {
+      if (this.quest.getCurrentStep(player)) {
         const isOre =
           ores.isOre(ctx.event.block.typeId) ||
           (

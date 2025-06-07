@@ -1,0 +1,114 @@
+import { Player } from '@minecraft/server'
+import { Cooldown, ms, noNullable } from 'lib'
+import { table } from 'lib/database/abstract'
+import { form } from 'lib/form/new'
+import { DailyQuest } from 'lib/quest/quest'
+import { RegularEvent } from 'lib/regular-event'
+import { t, textTable } from 'lib/text'
+import { City } from 'modules/places/lib/city'
+import { CityInvestigating } from 'modules/places/lib/city-investigating-quest'
+
+new RegularEvent(0, 0, true, generateDailyQuests)
+
+const dailyQuests = 4
+
+const questsStreakToGainDonutCrate = 4
+
+let currentDailyQuests: DailyQuest[] = []
+let currentDailyQuestCity: City | undefined
+
+interface DB {
+  streak: number
+  streakDate: number
+  today: number
+}
+
+const db = table<DB>('dailyQuest', () => ({ streak: 0, today: 0, streakDate: Date.now() }))
+
+const streakExpireCooldown = ms.from('day', 1)
+
+function generateDailyQuests() {
+  let quests = [...DailyQuest.dailyQuests.values()]
+  currentDailyQuests = []
+
+  for (let i = 0; i <= dailyQuests; i++) {
+    const quest = quests.randomElement()
+    quests = quests.filter(e => e !== quest)
+    if (typeof quest !== 'undefined') {
+      currentDailyQuests.push(quest)
+    }
+  }
+
+  const cities = currentDailyQuests
+    .map(quest => City.places.find(e => e.group === quest.place.group))
+    .filter(noNullable)
+    .filter(e => e instanceof City)
+
+  const questCityCount = new Map<City, number>()
+  for (const city of cities) questCityCount.set(city, questCityCount.get(city) ?? 0)
+
+  const mostPopular = [...questCityCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+
+  currentDailyQuestCity = mostPopular
+
+  for (const value of db.values()) {
+    value.today = 0
+  }
+}
+
+function hasAccessToDaily(player: Player, tell = true) {
+  const cities = [...CityInvestigating.cities]
+  const completed = cities.filter(e => e.quest.hadEntered(player))
+  if (completed.length !== cities.length) {
+    if (tell) {
+      player.fail(
+        t.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${cities
+          .filter(e => !completed.includes(e))
+          .map(e => e.city.group.name)
+          .join(', ')}`,
+      )
+    }
+    return false
+  } else return true
+}
+
+DailyQuest.onEnd.subscribe(({ quest, player }) => {
+  if (!(quest instanceof DailyQuest)) return
+
+  if (!currentDailyQuests.includes(quest)) return
+  const playerDb = db.get(player.id)
+  playerDb.today++
+
+  if (playerDb.today >= dailyQuests) {
+    if (Cooldown.isExpired(playerDb.streakDate, streakExpireCooldown)) {
+      playerDb.streak = 0
+    } else {
+      playerDb.streak++
+    }
+  }
+})
+
+new Command('daily').setDescription('Ежедневные задания').executes(ctx => {
+  if (!hasAccessToDaily(ctx.player)) return
+
+  dailyQuestsForm.show(ctx.player)
+})
+
+export const dailyQuestsForm = form((f, player) => {
+  const playerDb = db.get(player.id)
+  f.title('Ежедневные задания')
+  f.body(
+    t`Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ${dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий ${questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n${textTable({ 'Выполнено подряд': playerDb.streak })}`,
+  )
+
+  const name = currentDailyQuestCity?.group.name
+  if (name) {
+    f.button(t`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`, () => {
+      //
+    })
+  }
+
+  for (const quest of currentDailyQuests) {
+    f.quest(quest)
+  }
+})

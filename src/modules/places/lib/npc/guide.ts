@@ -5,7 +5,7 @@ export class GuideNpc extends Npc {
   constructor(
     group: Group,
     name: string,
-    point = group.point('guide').name(name),
+    point = group.place('guide').name(name),
     onInteract: Npc.OnInteract = () => true,
   ) {
     super(point, onInteract)

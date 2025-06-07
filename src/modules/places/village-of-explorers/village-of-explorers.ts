@@ -30,7 +30,7 @@ class VillageOfExporersBuilder extends City {
 
   stoner = new Stoner(this.group)
 
-  guide = new Npc(this.group.point('guide').name('Исследователь'), ({ player }) => {
+  guide = new Npc(this.group.place('guide').name('Исследователь'), ({ player }) => {
     form(f => {
       f.title(this.guide.name)
       f.quest(techCityInvestigating.goToCityQuest, 'А где мне базу сделать-то?')
