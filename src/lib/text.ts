@@ -15,6 +15,7 @@ type OptionsModifiers = 'error' | 'warn' | 'header'
 interface MultiStatic {
   raw: (text: TSA, ...units: (string | RawText | RawMessage)[]) => RawText
   roles: (text: TSA, ...players: Player[]) => Text
+  /** Example: t.badge`Some text ${number}` */
   badge: (text: TSA, n: number) => Text
   num: (text: TSA, n: number, plurals: Plurals) => Text
 

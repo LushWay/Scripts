@@ -1,7 +1,19 @@
 import { GameMode, Player, PlayerDatabase, ScoreNames, ShortcutDimensions, system, world } from '@minecraft/server'
-import { Airdrop, BUTTON, Compass, InventoryStore, is, Join, ModalForm, pick, scoreboardObjectiveNames } from 'lib'
+import {
+  Airdrop,
+  ArrayForm,
+  BUTTON,
+  Compass,
+  InventoryStore,
+  is,
+  Join,
+  ModalForm,
+  pick,
+  scoreboardObjectiveNames,
+  sizeOf,
+} from 'lib'
 import { table } from 'lib/database/abstract'
-import { form, NewFormCreator } from 'lib/form/new'
+import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
 import { Quest } from 'lib/quest'
 import { enterNewbieMode } from 'lib/rpg/newbie'
 import { t } from 'lib/text'
@@ -9,8 +21,18 @@ import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Spawn } from 'modules/places/spawn'
 import { updateBuilderStatus } from 'modules/world-edit/builder'
 
+type RestorePointRef = [owner: string, name: string]
+
+declare module '@minecraft/server' {
+  interface PlayerDatabase {
+    /* Latest restore point player loaded into */
+    restorePoint?: RestorePointRef
+  }
+}
+
 interface RestorePoint {
   name: string
+  parent?: RestorePointRef
   location: Vector3
   dimensionType: ShortcutDimensions
   scores: Pick<Player['scores'], 'money' | 'anarchyOnlineTime' | ScoreNames.GameModesStat>
@@ -24,7 +46,7 @@ interface RestorePointLoadLog {
 }
 
 interface DB {
-  restorePoints: Record<string, undefined | RestorePoint>
+  restorePoints: Record<string, RestorePoint>
   loads: RestorePointLoadLog[]
 }
 
@@ -51,6 +73,7 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
     const playerDb = db.get(player.id)
     playerDb.restorePoints[id] = {
       name,
+      parent: player.database.restorePoint,
       location: player.location,
       dimensionType: player.dimension.type,
       scores: pick(player.scores, ['money', 'anarchyOnlineTime', ...scoreboardObjectiveNames.gameModeStats]),
@@ -64,14 +87,19 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
   }
 }
 
-function loadRestorePoint(player: Player, id: string) {
-  const point = db.get(player.id).restorePoints[id]
-  if (!point) throw new Error('No restore point found in db for id ' + id)
+function getRestorePointByRef([ownerId, id]: RestorePointRef) {
+  return db.get(ownerId).restorePoints[id]
+}
+
+function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
+  const point = getRestorePointByRef([ownerId, id])
+  if (!point) throw new Error(`No restore point found in db for id ${id}`)
 
   Object.assign(player.database, point.db)
   Object.assign(player.scores, point.scores)
   player.teleport(point.location, { dimension: world[point.dimensionType] })
   InventoryStore.load({ to: player, from: wipeInventoryDatabase.get(id, { remove: false }) })
+  player.database.restorePoint = [player.id, id]
   player.success(t`Restore point ${id} loaded.`)
 }
 
@@ -94,7 +122,7 @@ new Command('wipe')
       f.button('Создать точку восстановления', BUTTON['+'], () => {
         new ModalForm('Создать точку восстановления')
           .addTextField(
-            '§cЭНДЕР СУНДУК НЕ СОХРАНЯЮТСЯ\n\n§f\nСохраняются:\nПозиция в мире\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:',
+            '§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мире\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:',
             '',
           )
           .show(player, (ctx, name) => {
@@ -108,32 +136,55 @@ new Command('wipe')
           })
       })
 
-      const source = db.get(player.id)
-      renderList(f, source, player)
+      f.button('Точки восстановления других игроков', otherPlayerRestorePoints)
+
+      const playerDb = db.get(player.id)
+      renderList(f, playerDb, player.id, player)
     }).show(player)
   })
 
-function renderList(f: NewFormCreator, source: DB, player: Player) {
+function otherPlayerRestorePoints(player: Player, back?: NewFormCallback) {
+  const players = db.entries().filter(e => e[0] !== player.id)
+  new ArrayForm('Other players', players)
+    .back(back)
+    .button(([ownerId, db]) => {
+      const title = t`${Player.name(ownerId) ?? ownerId} (${sizeOf(db.restorePoints)})`
+      return [
+        title,
+        form(f => {
+          f.title(title)
+          renderList(f, db, ownerId, player)
+        }).show,
+      ]
+    })
+    .show(player)
+}
+
+function renderList(f: NewFormCreator, source: DB, sourceOwnerId: string, player: Player) {
   for (const [id, restorePoint] of Object.entries(source.restorePoints)) {
-    if (!restorePoint) continue
     const logs = source.loads.filter(e => e.pointId === id)
 
     f.button(
-      restorePoint.name.replaceAll('\n', '') + '\n' + id.split(' | ').at(-1),
-      restorePointMenu(player, id, restorePoint),
+      `${restorePoint.name.replaceAll('\n', '')}\n${id.split(' | ').at(-1)}`,
+      restorePointMenu(player, [sourceOwnerId, id], restorePoint),
     )
   }
 }
 
-function restorePointMenu(player: Player, id: string, restorePoint: RestorePoint) {
+function restorePointMenu(player: Player, [ownerId, id]: RestorePointRef, restorePoint: RestorePoint) {
   return form(f => {
+    const isOwner = ownerId === player.id
     f.title(restorePoint.name)
     f.body(id)
-    f.ask('Перезаписать', 'Перезаписать точку восстановления', () => {
-      createRestorePoint(player, restorePoint.name, id)
-    })
+
+    if (isOwner) {
+      f.ask('Перезаписать', 'Перезаписать точку восстановления', () => {
+        createRestorePoint(player, restorePoint.name, id)
+      })
+    }
+
     f.ask('Загрузиться', 'Загрузиться', () => {
-      loadRestorePoint(player, id)
+      loadRestorePoint(player, [ownerId, id])
     })
     if (is(player.id, 'techAdmin')) f.button('Log to the console', () => console.log(JSON.stringify(restorePoint)))
     f.ask('§cУдалить', 'удалить точку', () => {
@@ -146,11 +197,10 @@ function wipe(player: Player) {
   player.setGameMode(GameMode.survival)
   updateBuilderStatus(player)
 
-  delete player.database.survival.rtpElytra
-
   player.database.quests?.active.forEach(e => Quest.quests.get(e.id)?.exit(player))
   delete player.database.quests
   delete player.database.achivs
+  delete player.database.restorePoint
 
   Compass.setFor(player, undefined)
   Airdrop.instances.filter(a => a.for === player.id).forEach(a => a.delete())
@@ -172,9 +222,7 @@ function wipe(player: Player) {
 
   enterNewbieMode(player)
 
-  for (let i = 0; i <= 26; i++) {
-    player.runCommand(`replaceitem entity @s slot.enderchest ${i} air`)
-  }
+  for (let i = 0; i <= 26; i++) player.runCommand(`replaceitem entity @s slot.enderchest ${i} air`)
 
   system.runTimeout(() => Join.emitFirstJoin(player), 'clear', 30)
 }
