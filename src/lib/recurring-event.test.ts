@@ -70,7 +70,7 @@ describe('RecurringEvent', () => {
     vi.setSystemTime(new Date(2000, 0, 0, 23, 59, 59))
 
     const event = new RecurringEvent(
-      'midnightCleanup',
+      'midnightCleanup 2',
       later.parse.recur().on('00:00:00').time(),
       () => ({ value: [] }),
       fn,
