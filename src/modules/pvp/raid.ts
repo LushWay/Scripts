@@ -24,7 +24,7 @@ export function createBlockExplosionChecker() {
 
   function canBlockExplode(block: Block) {
     const region = Region.getAt(block)
-    if (region instanceof MineareaRegion) return true
+    if (region instanceof MineareaRegion) return !region.newbie
     if (ScheduleBlockPlace.has(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
       if (!base) {
