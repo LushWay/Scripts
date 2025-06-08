@@ -10,6 +10,7 @@ import './random-teleport'
 import './realtime'
 import './sidebar'
 import './cleanup'
+import './recurring-events'
 
 import type { VectorInDimension } from 'lib/utils/point'
 

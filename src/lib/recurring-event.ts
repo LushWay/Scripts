@@ -1,4 +1,5 @@
 import { system } from '@minecraft/server'
+import { Temporary, TemporaryProxies } from 'lib/temporary'
 import { fromMsToTicks } from 'lib/utils/ms'
 import { table } from './database/abstract'
 import { setDefaults } from './database/defaults'
@@ -12,42 +13,97 @@ later.runtime = {
 later.date.localTime()
 
 interface DB<T = unknown> {
-  nextRun: string
+  lastRun: string
   storage: T
 }
 
+interface RecurringOptions {
+  runAfterOffline?: boolean
+}
+
+interface RecurringCallbackContext {
+  restoreAfterOffline: boolean
+  lastRun: Date
+}
+
+type RecurringEventCallback<T extends JsonObject = JsonObject> = (storage: T, ctx: RecurringCallbackContext) => void
+
 export class RecurringEvent<T extends JsonObject = JsonObject> {
-  static db = table<DB>('recurringEvents', () => ({ nextRun: '', storage: {} }))
+  static db = table<DB>('recurringEvents', () => ({ lastRun: '', storage: {} }))
 
   protected db: DB<T>
 
   protected schedule: Later.Schedule
 
-  stop: VoidFunction
+  protected interval: Later.Timer
 
-  getNextEventDate: () => Date
+  stop() {
+    this.interval.clear()
+  }
+
+  getNextOccurances(n: number): Date[] {
+    return n === 1 ? [this.schedule.next(n)] : this.schedule.next(n)
+  }
+
+  getLastRunDate() {
+    return this.schedule.prev(1)
+  }
 
   constructor(
     readonly id: string,
-    scheduleRaw: Later.ScheduleData,
+    readonly scheduleData: Later.ScheduleData,
     protected readonly createStorage: () => T,
-    protected readonly callback: (storage: T, afterOffline: boolean) => void,
-    protected readonly runAfterOffline = false,
+    protected readonly callback: RecurringEventCallback<T>,
+    { runAfterOffline = false }: RecurringOptions = {},
   ) {
-    this.schedule = later.schedule(scheduleRaw)
-    this.getNextEventDate = () => this.schedule.next(1) as Date
-
+    this.schedule = later.schedule(scheduleData)
     this.db = RecurringEvent.db.get(id) as DB<T>
     this.db.storage = setDefaults(this.db.storage, this.createStorage())
 
-    const interval = later.setInterval(this.run.bind(this), scheduleRaw)
-    this.stop = interval.clear.bind(interval)
+    this.interval = later.setInterval(this.run.bind(this), scheduleData)
 
-    if (runAfterOffline && this.db.nextRun !== this.getNextEventDate().toString()) this.run(true)
+    if (runAfterOffline && this.db.lastRun !== this.getLastRunDate().toString()) this.run(true)
   }
 
-  protected run(afterOffline = false) {
-    this.db.nextRun = this.getNextEventDate().toString()
-    this.callback(this.db.storage, afterOffline)
+  protected run(restoreAfterOffline = false) {
+    const lastRun = this.getLastRunDate()
+    this.db.lastRun = lastRun.toString()
+    this.callback(this.db.storage, { restoreAfterOffline, lastRun })
+  }
+}
+
+interface DurationalRecurringCallbackContext {
+  temp: TemporaryProxies
+}
+
+export type DurationalRecurringCallback<T extends JsonObject = JsonObject> = (
+  storage: T,
+  ctx: DurationalRecurringCallbackContext,
+) => void
+
+export class DurationalRecurringEvent<T extends JsonObject = JsonObject> extends RecurringEvent<T> {
+  constructor(
+    id: string,
+    scheduleData: Later.ScheduleData,
+    readonly duration: number,
+    createStorage: () => T,
+    durationalCallback: DurationalRecurringCallback<T>,
+  ) {
+    super(
+      id,
+      scheduleData,
+      createStorage,
+      (storage, ctx) => {
+        // If since start elapsed more time then event runs, skip
+        if (Date.now() - ctx.lastRun.getTime() > duration) return
+
+        const temp = new Temporary(ctx => {
+          ctx.system.runTimeout(() => ctx.cleanup(), id, fromMsToTicks(duration))
+        })
+
+        durationalCallback(storage, { temp: temp.proxies })
+      },
+      { runAfterOffline: true },
+    )
   }
 }

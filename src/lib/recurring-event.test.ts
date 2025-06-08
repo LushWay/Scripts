@@ -1,20 +1,16 @@
-import { system } from '@minecraft/server'
-import { fromTicksToMs, ms } from 'lib/utils/ms'
-import { RecurringEvent } from './recurring-event'
+import { Temporary } from 'lib//temporary'
+import { ms } from 'lib/utils/ms'
+import { mockMinecraftTimers, unmockMinecraftTimers } from 'test/timers'
+import { DurationalRecurringCallback, DurationalRecurringEvent, RecurringEvent } from './recurring-event'
 import later from './utils/later'
 
-declare function setTimeout(fn: VoidFunction, delay: number): number
-declare function clearTimeout(handle: number): number
+beforeAll(() => mockMinecraftTimers())
+afterAll(() => unmockMinecraftTimers())
+
+beforeEach(() => vi.useFakeTimers())
+afterEach(() => vi.useRealTimers())
 
 describe('RecurringEvent', () => {
-  beforeAll(() => {
-    vi.spyOn(system, 'runTimeout').mockImplementation((r, _, tickDelay = 0) => setTimeout(r, fromTicksToMs(tickDelay)))
-    vi.spyOn(system, 'clearRun').mockImplementation(r => clearTimeout(r))
-  })
-
-  beforeEach(() => vi.useFakeTimers())
-  afterEach(() => vi.useRealTimers())
-
   it('should execute recurring event at specified time', () => {
     const fn = vi.fn()
     vi.setSystemTime(new Date(2000, 0, 0, 10, 29, 59))
@@ -29,7 +25,9 @@ describe('RecurringEvent', () => {
     const fn = vi.fn()
     vi.setSystemTime(new Date(2000, 0, 0, 23, 59, 59))
     const create = () =>
-      new RecurringEvent('midnightCleanup', later.parse.recur().on('00:00:00').time(), () => ({}), fn, true)
+      new RecurringEvent('midnightCleanup', later.parse.recur().on('00:00:00').time(), () => ({}), fn, {
+        runAfterOffline: true,
+      })
 
     let event = create()
 
@@ -49,7 +47,9 @@ describe('RecurringEvent', () => {
     const fn = vi.fn()
     vi.setSystemTime(new Date(2000, 0, 0, 23, 59, 59))
     const create = () =>
-      new RecurringEvent('midnightCleanup', later.parse.recur().on('00:00:00').time(), () => ({}), fn, false)
+      new RecurringEvent('midnightCleanup', later.parse.recur().on('00:00:00').time(), () => ({}), fn, {
+        runAfterOffline: false,
+      })
 
     const event = create()
 
@@ -67,14 +67,14 @@ describe('RecurringEvent', () => {
 
   it('should execute recurring event with storage', () => {
     const fn = vi.fn()
-    vi.setSystemTime(new Date(2000, 0, 0, 23, 59, 59))
+    vi.setSystemTime(new Date(2000, 0, 1, 23, 59, 59))
 
     const event = new RecurringEvent(
       'midnightCleanup 2',
       later.parse.recur().on('00:00:00').time(),
       () => ({ value: [] }),
       fn,
-      true,
+      { runAfterOffline: true },
     )
 
     expect(fn).toHaveBeenCalledTimes(1)
@@ -84,10 +84,12 @@ describe('RecurringEvent', () => {
           "value": [],
         },
         true,
+        1999-12-31T21:00:00.000Z,
       ]
     `)
 
     vi.advanceTimersByTime(1100)
+    expect(vi.getMockedSystemTime()).toMatchInlineSnapshot(`2000-01-01T21:00:00.100Z`)
     expect(fn).toHaveBeenCalledTimes(2)
     expect(fn.mock.calls[1]).toMatchInlineSnapshot(`
       [
@@ -95,9 +97,56 @@ describe('RecurringEvent', () => {
           "value": [],
         },
         false,
+        2000-01-01T21:00:00.000Z,
       ]
     `)
 
     event.stop()
+  })
+})
+
+describe('DurationalRecurringEvent', () => {
+  it('should execute durational event and call durational callback', () => {
+    vi.setSystemTime(new Date(2000, 0, 0, 10, 29, 59))
+    let temp: Temporary | undefined
+    const fn = vi.fn<DurationalRecurringCallback>().mockImplementation((_, ctx) => {
+      temp = ctx.temp.temporary
+    })
+
+    new DurationalRecurringEvent(
+      'durational',
+      later.parse.recur().on('10:30:00').time(),
+      ms.from('min', 1),
+      () => ({}),
+      fn,
+    )
+
+    expect(temp).toBe(undefined)
+    expect(fn).toHaveBeenCalledTimes(0)
+
+    vi.advanceTimersByTime(1100)
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(temp?.cleaned).toBe(false)
+
+    // Expire duration
+    vi.advanceTimersByTime(ms.from('min', 1) + 1000)
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(temp?.cleaned).toBe(true)
+  })
+
+  it('s', () => {
+    expect(later.parse.recur().every(5).hour().startingOn(3).schedules).toMatchInlineSnapshot(`
+      [
+        {
+          "h": [
+            3,
+            8,
+            13,
+            18,
+            23,
+          ],
+        },
+      ]
+    `)
   })
 })

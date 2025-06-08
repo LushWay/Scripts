@@ -155,6 +155,9 @@ export declare namespace Later {
      * @param dateFrom: The earliest a valid instance can occur
      * @param dateTo: The latest a valid instance can occur
      */
+
+    next(numberOfInst: 1, dateFrom?: Date, dateTo?: Date): Date
+    next(numberOfInst: Exclude<number, 1>, dateFrom?: Date, dateTo?: Date): Date[]
     next(numberOfInst: number, dateFrom?: Date, dateTo?: Date): Date[] | Date
 
     /**
@@ -176,6 +179,8 @@ export declare namespace Later {
      * @param dateFrom: The earliest a valid instance can occur
      * @param dateTo: The latest a valid instance can occur
      */
+    prev(numberOfInst: 1, dateFrom?: Date, dateTo?: Date): Date
+    prev(numberOfInst: Exclude<number, 1>, dateFrom?: Date, dateTo?: Date): Date[]
     prev(numberOfInst: number, dateFrom?: Date, dateTo?: Date): Date[] | Date
 
     /**
@@ -235,7 +240,7 @@ export declare namespace Later {
      *
      * @param values - A list of values.
      */
-    on(...values: number[]): RecurrenceBuilder
+    on(...values: (string | Date | number)[]): RecurrenceBuilder
 
     /**
      * Specifies one or more specific values of a time period information provider. When used to specify a time, a
