@@ -83,8 +83,10 @@ describe('RecurringEvent', () => {
         {
           "value": [],
         },
-        true,
-        1999-12-31T21:00:00.000Z,
+        {
+          "lastRun": 1999-12-31T21:00:00.000Z,
+          "restoreAfterOffline": true,
+        },
       ]
     `)
 
@@ -96,8 +98,10 @@ describe('RecurringEvent', () => {
         {
           "value": [],
         },
-        false,
-        2000-01-01T21:00:00.000Z,
+        {
+          "lastRun": 2000-01-01T21:00:00.000Z,
+          "restoreAfterOffline": false,
+        },
       ]
     `)
 

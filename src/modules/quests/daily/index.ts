@@ -13,11 +13,11 @@ new RecurringEvent(
   'dailyQuest',
   later.parse.recur().on('00:00').time(),
   () => ({ questIds: [] as string[] }),
-  (storage, restore) => {
+  (storage, ctx) => {
     let quests = [...DailyQuest.dailyQuests.values()]
     currentDailyQuests = []
 
-    if (restore && storage.questIds.length) {
+    if (ctx.restoreAfterOffline && storage.questIds.length) {
       for (const questId of storage.questIds) {
         const quest = quests.find(e => e.id === questId)
         if (quest) currentDailyQuests.push(quest)
@@ -51,7 +51,7 @@ new RecurringEvent(
       value.today = 0
     }
   },
-  true,
+  { runAfterOffline: true },
 )
 
 const dailyQuests = 4
