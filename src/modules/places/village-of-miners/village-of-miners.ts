@@ -41,11 +41,15 @@ class VillageOfMinersBuilder extends City {
   })
 
   createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
-    return new DailyQuest(this.group.place(id).name(text), 'Да', q => {
-      q.breakCounter((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
+    return new DailyQuest(
+      this.group.place(id).name(text),
+      'Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!',
+      q => {
+        q.breakCounter((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
 
-      q.button().reward(rewards).target(this.guide.location.toPoint())
-    })
+        q.button().reward(rewards).target(this.guide.location.toPoint())
+      },
+    )
   }
 
   mine10Iron = this.createMineQuest(

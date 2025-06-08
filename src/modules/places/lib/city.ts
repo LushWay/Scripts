@@ -1,14 +1,13 @@
 import { location, LootTable } from 'lib'
 import { Crate } from 'lib/crates/crate'
 import { Cutscene } from 'lib/cutscene'
-import { Quest } from 'lib/quest'
+import { DailyQuest } from 'lib/quest/quest'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { Npc } from 'lib/rpg/npc'
 import { t } from 'lib/text'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
-import { DailyQuest } from 'lib/quest/quest'
 
 export abstract class City extends SafePlace {
   protected createKits(normalLoot: LootTable, donutLoot: LootTable) {
@@ -38,10 +37,10 @@ export abstract class City extends SafePlace {
   abstract guide: Npc
 
   visitCityQuest = new DailyQuest(
-    this.group.place('visit').name(''),
+    this.group.place('visit').name('Посети город'),
     'Сходи в город, сделай запланированые покупки',
     q => {
-      if (this.safeArea) q.reachRegion(this.safeArea, `Посети ${this.group.name}`)
+      if (this.safeArea) q.reachRegion(this.safeArea, `0/1`)
     },
   )
 }

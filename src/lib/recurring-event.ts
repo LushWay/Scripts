@@ -62,7 +62,7 @@ export class RecurringEvent<T extends JsonObject = JsonObject> {
 
     this.interval = later.setInterval(this.run.bind(this), scheduleData)
 
-    if (runAfterOffline && this.db.lastRun !== this.getLastRunDate().toString()) this.run(true)
+    if (runAfterOffline) this.run(this.db.lastRun === this.getLastRunDate().toString())
   }
 
   protected run(restoreAfterOffline = false) {

@@ -32,15 +32,60 @@ describe('RecurringEvent', () => {
     let event = create()
 
     expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
+      {
+        "lastRun": 1999-12-30T21:00:00.000Z,
+        "restoreAfterOffline": false,
+      }
+    `)
     vi.advanceTimersByTime(1100)
     expect(fn).toHaveBeenCalledTimes(2)
+    expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
+      {
+        "lastRun": 1999-12-31T21:00:00.000Z,
+        "restoreAfterOffline": false,
+      }
+    `)
 
     // Simulate server shutdown
+    event.stop()
+    vi.advanceTimersByTime(ms.from('day', 1) - 1200)
+
+    event = create()
+
+    // Server went back offline before new event, restore state
+    expect(fn).toHaveBeenCalledTimes(3)
+    expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
+      {
+        "lastRun": 1999-12-31T21:00:00.000Z,
+        "restoreAfterOffline": true,
+      }
+    `)
+
+    // New event
+    vi.advanceTimersByTime(2000)
+    expect(fn).toHaveBeenCalledTimes(4)
+    expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
+      {
+        "lastRun": 2000-01-01T21:00:00.000Z,
+        "restoreAfterOffline": false,
+      }
+    `)
+
+    // Simulate server shutdown x2
     event.stop()
     vi.advanceTimersByTime(ms.from('day', 1))
 
     event = create()
-    expect(fn).toHaveBeenCalledTimes(3)
+
+    // Server went back offline after new event, run without restore
+    expect(fn).toHaveBeenCalledTimes(5)
+    expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
+      {
+        "lastRun": 2000-01-02T21:00:00.900Z,
+        "restoreAfterOffline": false,
+      }
+    `)
   })
 
   it('should execute recurring event at specified time after server was offline', () => {
@@ -56,10 +101,16 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(0)
     vi.advanceTimersByTime(1100)
     expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
+      {
+        "lastRun": 1999-12-31T21:00:00.000Z,
+        "restoreAfterOffline": false,
+      }
+    `)
 
     // Simulate server shutdown
     event.stop()
-    vi.advanceTimersByTime(ms.from('day', 1))
+    vi.advanceTimersByTime(ms.from('day', 1) - 2100)
 
     create()
     expect(fn).toHaveBeenCalledTimes(1)
@@ -85,7 +136,7 @@ describe('RecurringEvent', () => {
         },
         {
           "lastRun": 1999-12-31T21:00:00.000Z,
-          "restoreAfterOffline": true,
+          "restoreAfterOffline": false,
         },
       ]
     `)
@@ -136,21 +187,5 @@ describe('DurationalRecurringEvent', () => {
     vi.advanceTimersByTime(ms.from('min', 1) + 1000)
     expect(fn).toHaveBeenCalledTimes(1)
     expect(temp?.cleaned).toBe(true)
-  })
-
-  it('s', () => {
-    expect(later.parse.recur().every(5).hour().startingOn(3).schedules).toMatchInlineSnapshot(`
-      [
-        {
-          "h": [
-            3,
-            8,
-            13,
-            18,
-            23,
-          ],
-        },
-      ]
-    `)
   })
 })

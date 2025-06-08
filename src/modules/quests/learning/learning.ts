@@ -34,7 +34,7 @@ class Learning {
 
     const maxReturnToAreaSteps = 4
     const returnToMineArea = (step: number) => () => {
-      if (player.database.inv !== 'anarchy') return
+      if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) return
 
       const regions = MineareaRegion.getManyAt(player)
       if (!regions.length) {
@@ -93,8 +93,8 @@ class Learning {
         )
       })
 
-    q.dynamic('Залутай сундук, упавший с неба')
-      .description('Забери все из упавшего с неба сундука')
+    q.dynamic('Заберите все из сундука, упавшего с неба')
+      .description('Заберите все из упавшего с неба сундука. На него указывает компас')
       .activate((ctx, firstTime) => {
         ctx.onInterval(returnToMineArea(3))
 
@@ -258,6 +258,7 @@ class Learning {
       this.learningLocation.onLoad.subscribe(location => {
         for (const region of MineareaRegion.getManyAt(location.toPoint())) {
           region.newbie = true
+          region.permissions.pvp = false
         }
       })
     })
@@ -306,20 +307,20 @@ class Learning {
     Anarchy.enterLearning = async player => {
       if (sent.has(player)) return false
 
-      const toSpawn = () => Spawn.portal?.teleport(player)
+      const toSpawn = () => (temp.cleanup(), Spawn.portal?.teleport(player))
       if (!this.learningLocation.valid) return toSpawn(), player.fail('Случайное перемещение не настроено'), false
 
-      const temp = new Temporary(({ system }) => {
+      const temp = new Temporary(ctx => {
         const fadeCamera = () => {
           player.camera.fade({
             fadeColor: { blue: 0, green: 0, red: 0 },
-            fadeTime: { fadeInTime: 1, holdTime: 2, fadeOutTime: 2 },
+            fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
           })
         }
 
         fadeCamera()
 
-        system.runInterval(fadeCamera, 'anarchy learning screen fade', 20)
+        ctx.system.runInterval(fadeCamera, 'anarchy learning screen fade', 10)
       })
 
       logger.player(player).info`Open rebith form`
@@ -334,10 +335,13 @@ class Learning {
             if (!this.learningLocation.valid) return
 
             logger.player(player).info`Teleporting to ${this.learningLocation}`
-            player.teleport(this.learningLocation)
-            temp.cleanup()
             resolve(true)
-            this.quest.enter(player)
+            system.delay(() => {
+              if (!this.learningLocation.valid) return
+              player.teleport(this.learningLocation)
+              temp.cleanup()
+              this.quest.enter(player)
+            })
           })
           .addButtonBack(toSpawn)
           .show(player)

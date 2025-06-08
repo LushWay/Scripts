@@ -24,7 +24,7 @@ export const ROLES = {
   tester: '§9Тестер',
 }
 
-export const DEFAULT_ROLE: Role = __RELEASE__ ? 'member' : 'spectator'
+export const DEFAULT_ROLE: Role = 'member'
 
 /** List of role permissions */
 const PERMISSIONS: Record<Role, Role[]> = {

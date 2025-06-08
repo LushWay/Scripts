@@ -58,7 +58,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
       const step = quest?.getCurrentStep(player, dbquest.i)
       if (!step || !quest) return false
 
-      return [`${quest.name}\n${step.text()}`, () => manageQuestMenu(quest).show(player, self)]
+      return [`${quest.name}\n§7${step.text()}`, () => manageQuestMenu(quest).show(player, self)]
     })
     .back(back)
     .show(player)
@@ -82,16 +82,16 @@ export function manageQuestMenu(quest: Quest) {
     const current = quest.getCurrentStep(player)
     let currentDescription = ''
     if (current) {
-      currentDescription = `${current.text()}§r\n${current.description?.() ?? ''}${current.target ? `\n${Vec.string(current.target.location, true)}` : ''}`
+      currentDescription = t`Текущее действие: ${current.text()}\nОписание действия: ${current.description?.() ?? ''}\nЛокация: ${current.target ? Vec.string(current.target.location, true) : ''}`
       if (current.target?.dimensionType !== 'overworld') {
-        currentDescription += `\n${current.target?.dimensionType}`
+        currentDescription += t`\nИзмерение: ${current.target?.dimensionType}`
       }
     } else if (quest.isCompleted(player)) {
       currentDescription = '§aЗадание завершено!'
     }
 
     f.title(quest.name)
-    f.body(`${quest.description}§r\n\n${currentDescription}`)
+    f.body(t`Описание задания: ${quest.description}\n\n${currentDescription}`)
 
     if (Quest.getCurrentStepOf(player) !== quest.getCurrentStep(player)) {
       f.button('Сделать приоритетным', () => {
