@@ -1,13 +1,17 @@
 import { Temporary } from 'lib//temporary'
 import { ms } from 'lib/utils/ms'
 import { mockMinecraftTimers, unmockMinecraftTimers } from 'test/timers'
+import { TEST_clearDatabase } from 'test/utils'
 import { DurationalRecurringCallback, DurationalRecurringEvent, RecurringEvent } from './recurring-event'
 import later from './utils/later'
 
 beforeAll(() => mockMinecraftTimers())
 afterAll(() => unmockMinecraftTimers())
 
-beforeEach(() => vi.useFakeTimers())
+beforeEach(() => {
+  TEST_clearDatabase(RecurringEvent.db)
+  vi.useFakeTimers()
+})
 afterEach(() => vi.useRealTimers())
 
 describe('RecurringEvent', () => {
@@ -121,7 +125,7 @@ describe('RecurringEvent', () => {
     vi.setSystemTime(new Date(2000, 0, 1, 23, 59, 59))
 
     const event = new RecurringEvent(
-      'midnightCleanup 2',
+      'midnightCleanup',
       later.parse.recur().on('00:00:00').time(),
       () => ({ value: [] }),
       fn,

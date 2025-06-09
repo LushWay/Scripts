@@ -139,6 +139,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   }
 })
 
+/* istanbul ignore next */
 if (!__VITEST__) {
   // Allow recieving roles from scriptevent function run by console
   system.afterEvents.scriptEventReceive.subscribe(event => {

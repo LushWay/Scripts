@@ -1,7 +1,23 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Player, system } from '@minecraft/server'
+import { EventSignal } from 'lib'
+import type { Table } from 'lib/database/abstract'
 import type { TestFormCallback, TFD } from 'test/__mocks__/minecraft_server-ui'
+
+interface MinecraftEventSignal<T> {
+  subscribe(callback: (arg0: T) => void, ...args: unknown[]): (arg0: T) => void
+  unsubscribe(callback: (arg0: T) => void): void
+}
+
+export function TEST_emitEvent<T>(eventSignal: MinecraftEventSignal<T>, data: T) {
+  // @ts-expect-error We use our standart signals
+  EventSignal.emit(eventSignal, data)
+}
+
+export function TEST_clearDatabase(database: Table<any>) {
+  for (const key of database.keys()) database.delete(key)
+}
 
 export function TEST_createPlayer() {
   // @ts-expect-error Yes. We can do this

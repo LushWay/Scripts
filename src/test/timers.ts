@@ -1,6 +1,13 @@
 import { system } from '@minecraft/server'
 import { fromTicksToMs } from 'lib/utils/ms'
 
+// Determenstic test results across all enviroments
+if ('process' in globalThis) {
+  // @ts-expect-error No node types installed because they pollute globals
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  process.env.TZ = 'Europe/Moscow'
+}
+
 declare function setTimeout(fn: VoidFunction, delay: number): number
 declare function setInterval(fn: VoidFunction, delay: number): number
 declare function clearTimeout(handle: number): number
