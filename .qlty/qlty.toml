@@ -42,7 +42,8 @@ exclude_patterns = [
   "**/vendor/**",
   "src/lib/assets/**",
   "tools/**",
-  "*.config.ts"
+  "*.config.ts",
+  "src/modules/world-edit/**",
 ]
 
 test_patterns = [
@@ -58,6 +59,9 @@ test_patterns = [
 
 [smells]
 mode = "comment"
+
+[smells.return_statements]
+enabled = false
 
 [[source]]
 name = "default"
@@ -83,3 +87,13 @@ drivers = [
 [[plugin]]
 name = "trufflehog"
 
+
+# [[plugin]]
+# name = "eslint"
+# package_file = "package.json"
+# package_filters = ["eslint", "prettier"]
+
+[[plugin]]
+name = "prettier"
+package_file = "package.json"
+package_filters = ["prettier"]
