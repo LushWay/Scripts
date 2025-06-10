@@ -6,6 +6,10 @@ export default defineConfig({
   define: generateDefine({ dev: true, test: true, world: false, port: '1000', vitest: true }),
   test: {
     globals: true,
+
+    isolate: false,
+    pool: 'threads',
+
     coverage: {
       provider: 'istanbul',
       reporter: process.env.CI ? ['lcov'] : ['html', 'json'],

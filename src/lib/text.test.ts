@@ -4,11 +4,11 @@ import { Player } from '@minecraft/server'
 import { setRole } from './roles'
 import './text'
 import { t, textTable } from './text'
+import { TEST_createPlayer } from 'test/utils'
 
 let player: Player
 beforeEach(() => {
-  // @ts-expect-error
-  player = new Player()
+  player = TEST_createPlayer()
 })
 
 describe('text', () => {
@@ -26,13 +26,13 @@ describe('text', () => {
 
   it('should create nested text', () => {
     expect(t`А мы любим ${t.roles`вложенные роли этого чела: ${player}`}`).toMatchInlineSnapshot(
-      `"§7А мы любим §f§7вложенные роли этого чела: §5Админ§r §fTest player name§7§7"`,
+      `"§7А мы любим §f§7вложенные роли этого чела: §fУчастник§r §fTest player name§7§7"`,
     )
   })
 
   it('should apply options', () => {
     expect(t.options({ unit: '§g', text: '§4' }).roles`Все должно работать ${player}`).toMatchInlineSnapshot(
-      `"§4Все должно работать §5Админ§r §gTest player name§4"`,
+      `"§4Все должно работать §fУчастник§r §gTest player name§4"`,
     )
   })
 

@@ -480,6 +480,8 @@ export class Entity {
 
 export class Block {}
 
+let players = 0
+
 export class Player extends Entity {
   constructor(initialSpawn = true) {
     super()
@@ -493,7 +495,7 @@ export class Player extends Entity {
     )
   }
 
-  id = 'test player id'
+  id = `test player id ${players++}`
   name = 'Test player name'
   nameTag = this.name
   playSound = vi.fn()
