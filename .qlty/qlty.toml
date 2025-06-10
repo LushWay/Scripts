@@ -44,6 +44,12 @@ exclude_patterns = [
   "tools/**",
   "*.config.ts",
   "src/modules/world-edit/**",
+  "items/**",
+  "*.json",
+  "functions/**",
+  ".github",
+  "entities",
+  ".vscode"
 ]
 
 test_patterns = [
