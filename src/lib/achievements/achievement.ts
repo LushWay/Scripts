@@ -1,4 +1,5 @@
 import { Player, world } from '@minecraft/server'
+import { isNotPlaying } from 'lib/utils/game'
 import { Rewards } from 'lib/utils/rewards'
 
 export namespace Achievement {
@@ -58,6 +59,8 @@ export class Achievement<T> {
   }
 
   done(player: Player) {
+    if (isNotPlaying(player)) return
+
     const db = this.getDatabase(player)
     if (db.d) return
 
@@ -151,6 +154,8 @@ export class CountingAchievement<T extends { count: number }> extends Achievemen
   }
 
   diff(player: Player, value: number) {
+    if (isNotPlaying(player)) return
+
     const storage = this.storage(player)
     storage.count += value
     if (storage.count >= this.value) this.done(player)
