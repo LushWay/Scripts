@@ -12,8 +12,8 @@ function fastGamemode(mode: GameMode, shorname: string) {
     .setDescription('Переключает режим на ' + mode)
     .setPermissions('builder')
     .executes(ctx => {
+      ctx.player.success(t`${shorname}: ${ctx.player.getGameMode()} -> ${mode}`)
       ctx.player.setGameMode(mode)
-      ctx.player.success()
     })
 }
 
@@ -45,10 +45,27 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
       if (!isNotPlaying(ctx.player) && !is(ctx.player.id, 'techAdmin'))
         return ctx.error('Вы не можете совершить это действие вне режима строительства')
 
-      if (ctx.player.getEffect(effect)) {
+      const has = ctx.player.getEffect(effect)
+      if (has?.amplifier === amplifier) {
+        log()
         ctx.player.removeEffect(effect)
       } else {
-        ctx.player.addEffect(effect, 99999, { amplifier, showParticles: false })
+        if (has) {
+          log()
+          ctx.player.removeEffect(effect)
+        }
+        log()
+        ctx.player.addEffect(effect, 20000000, { amplifier, showParticles: false })
+      }
+
+      function log() {
+        const current = ctx.player.getEffect(effect)
+        const effectname = Object.entries(MinecraftEffectTypes).find(e => e[1] === effect)?.[0]
+        if (current) {
+          ctx.player.success(t`${'§c-'} ${effectname} ${current.amplifier}`)
+        } else {
+          ctx.player.success(t`${'§a+'} ${effectname} ${amplifier}`)
+        }
       }
     })
 }
