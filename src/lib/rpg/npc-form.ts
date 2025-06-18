@@ -15,16 +15,23 @@ export type NpcFormCreator = (
 ) => void
 
 export class NpcForm extends Npc {
-  constructor(point: Place, creator: NpcFormCreator) {
+  constructor(
+    readonly point: Place,
+    private creator: NpcFormCreator,
+  ) {
     super(point, ({ player }) => {
-      form((f, _, back) => {
-        f.title(point.name)
-
-        const lf = new LoreForm(point.id, f, player)
-        creator(f, { npc: this, player, back, lf })
-        lf.renderHistory()
-      }).show(player)
+      this.showForm(player)
       return true
     })
+  }
+
+  private showForm(player: Player) {
+    form((f, _, back) => {
+      f.title(this.point.name)
+
+      const lf = new LoreForm(this.point.id, f, player, this.showForm.bind(this))
+      this.creator(f, { npc: this, player, back, lf })
+      lf.renderHistory()
+    }).show(player)
   }
 }
