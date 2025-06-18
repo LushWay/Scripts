@@ -12,7 +12,7 @@ for (const num of [10, 100, 1000, 10000]) {
     .creator(ctx => {
       ctx.break(
         Object.values(MinecraftBlockTypes).filter(e => e.endsWith('_wood') || e.endsWith('_log')),
-        player => ctx.diff(player, 1),
+        player => ctx.add(player, 1),
       )
     })
     .reward(new Rewards().item(MinecraftBlockTypes.BirchWood, num / 10).money(num * 10))
@@ -24,7 +24,7 @@ for (const num of [100, 1000, 10000]) {
     .id(v => `miner${v}`)
     .name(v => `Шахтер: накопайте ${v} камня`)
     .creator(ctx => {
-      ctx.break(MinecraftBlockTypes.Stone, player => ctx.diff(player, 1))
+      ctx.break(MinecraftBlockTypes.Stone, player => ctx.add(player, 1))
     })
     .reward(new Rewards().money(num * 10))
 }
@@ -35,7 +35,7 @@ for (const num of [10, 100, 1000, 10000]) {
     .id(v => `minerCoal${v}`)
     .name(v => `Угольный шахтер: накопайте ${v} угля`)
     .creator(ctx => {
-      ctx.break(MinecraftBlockTypes.CoalOre, player => ctx.diff(player, 1))
+      ctx.break(MinecraftBlockTypes.CoalOre, player => ctx.add(player, 1))
     })
     .reward(new Rewards().money(num * 10))
 }
@@ -46,7 +46,7 @@ for (const num of [10, 100, 1000, 10000]) {
     .id(v => `minerIron${v}`)
     .name(v => `Железный шахтер: накопайте ${v} железа`)
     .creator(ctx => {
-      ctx.break(MinecraftBlockTypes.IronOre, player => ctx.diff(player, 1))
+      ctx.break(MinecraftBlockTypes.IronOre, player => ctx.add(player, 1))
     })
     .reward(new Rewards().money(num * 10))
 }

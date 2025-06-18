@@ -1,12 +1,11 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { doNothing, Loot } from 'lib'
-import { form } from 'lib/form/new'
-import { Npc } from 'lib/rpg/npc'
+import { Loot } from 'lib'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { GuideNpc } from '../lib/npc/guide'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
@@ -54,18 +53,44 @@ class StoneQuarryBuilder extends City {
 
   gunsmith = new Gunsmith(this.group)
 
-  guide = new Npc(this.group.place('guide').name('Ломщик'), ({ player }) => {
-    form(f => {
-      f.title(this.guide.name)
-      f.button('Скоро здесь будут задания', doNothing)
-    }).show(player)
-    return true
+  guide = new GuideNpc(this.group, 'Ломщик', (f, { lf }) => {
+    f.title(this.guide.name)
+    lf.question('wtfCity', 'А что за город', 'Ну типа крутой камни ломаем вот да')
   })
 
   private create() {
     this.createKits(
-      new Loot().item('RedTerracotta').itemStack(() => this.commonOvener.createItemKey()).build,
-      new Loot().item('RedTerracotta').build,
+      new Loot()
+        .item('IronIngot')
+        .amount({
+          '20...40': '70%',
+          '41...64': '30%',
+        })
+        .weight('50%')
+
+        .itemStack(() => this.commonOvener.createItemKey())
+        .weight('20%')
+
+        .itemStack(() => this.foodOvener.createItemKey())
+        .weight('20%')
+
+        .item('IronSword')
+        .enchantmetns({ Sharpness: { '0...8': '1%' }, Unbreaking: { '0...1': '1%' } })
+        .weight('20%').build,
+      new Loot()
+        .item('Diamond')
+        .amount({
+          '20...40': '70%',
+          '41...64': '30%',
+        })
+        .weight('50%')
+
+        .item('NetherStar')
+        .weight('1%')
+
+        .item('NetheriteSword')
+        .enchantmetns({ Sharpness: { '0...4': '1%' }, Unbreaking: { '0...1': '1%' } })
+        .weight('10%').build,
     )
   }
 }

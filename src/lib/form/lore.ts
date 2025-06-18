@@ -36,9 +36,11 @@ export class LoreForm {
   question(id: string, name: string, answer: string): LoreForm {
     this.add(id, f => {
       f.button(
+        name,
         form(f => {
           f.title(name)
           f.body(answer)
+          this.db.seen.push(id)
         }),
       )
     })

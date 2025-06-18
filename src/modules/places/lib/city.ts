@@ -31,9 +31,6 @@ export abstract class City extends SafePlace {
 
   scavenger = new Scavenger(this.group)
 
-  // TODO Standartized guide ui
-  // use quests from the Quest.quests and filter them by linked place
-  // also add some info about the city
   abstract guide: Npc
 
   visitCityQuest = new DailyQuest(
@@ -42,5 +39,6 @@ export abstract class City extends SafePlace {
     q => {
       if (this.safeArea) q.reachRegion(this.safeArea, `0/1`)
     },
+    true,
   )
 }

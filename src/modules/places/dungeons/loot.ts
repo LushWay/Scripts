@@ -167,7 +167,7 @@ const customLoot: Record<string, LootTable | undefined> = {
     .item('NetheriteSword')
     .weight('1%')
     .enchantmetns({
-      'minecraft:sharpness': { '1...3': '1%', '4...5': '10%' },
+      Sharpness: { '1...3': '1%', '4...5': '10%' },
     })
 
     .itemStack(CannonItem.itemStack)

@@ -123,6 +123,7 @@ export class Quest {
       q: Omit<PlayerQuest, 'list' | 'updateListeners' | 'update' | 'player' | 'quest'>,
       p: Player,
     ) => void,
+    public readonly guideIgnore = false,
   ) {
     Quest.quests.set(this.id, this)
     Quest.onQuestLoad.subscribe(() => {

@@ -1,8 +1,7 @@
 import { Loot } from 'lib'
-import { form } from 'lib/form/new'
-import { Npc } from 'lib/rpg/npc'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { GuideNpc } from '../lib/npc/guide'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { techCityInvestigating } from '../tech-city/quests/investigating'
@@ -30,12 +29,15 @@ class VillageOfExporersBuilder extends City {
 
   stoner = new Stoner(this.group)
 
-  guide = new Npc(this.group.place('guide').name('Исследователь'), ({ player }) => {
-    form(f => {
-      f.title(this.guide.name)
-      f.quest(techCityInvestigating.goToCityQuest, 'А где мне базу сделать-то?')
-    }).show(player)
-    return true
+  guide = new GuideNpc(this.group, 'Исследователь', (f, { lf }) => {
+    f.title(this.guide.name)
+    lf.question(
+      'wtfCity',
+      'А что за город',
+      'Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ',
+    )
+
+    f.quest(techCityInvestigating.goToCityQuest, 'А где мне базу сделать-то?')
   })
 }
 

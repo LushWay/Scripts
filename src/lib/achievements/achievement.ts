@@ -153,7 +153,7 @@ export class CountingAchievement<T extends { count: number }> extends Achievemen
     super(id(value), name(value), databaseDefaultValue, creator as CreatorAchievement<T>, reward)
   }
 
-  diff(player: Player, value: number) {
+  add(player: Player, value: number) {
     if (isNotPlaying(player)) return
 
     const storage = this.storage(player)

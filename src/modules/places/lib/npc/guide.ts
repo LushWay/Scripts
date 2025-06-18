@@ -1,13 +1,21 @@
-import { Npc } from 'lib/rpg/npc'
+import { Quest } from 'lib/quest'
+import { NpcForm, NpcFormCreator } from 'lib/rpg/npc-form'
 import { Group } from 'lib/rpg/place'
 
-export class GuideNpc extends Npc {
+export class GuideNpc extends NpcForm {
   constructor(
     group: Group,
     name: string,
-    point = group.place('guide').name(name),
-    onInteract: Npc.OnInteract = () => true,
+    create: NpcFormCreator,
+    readonly point = group.place('guide').name(name),
   ) {
-    super(point, onInteract)
+    super(point, (f, ctx) => {
+      create(f, ctx)
+
+      for (const quest of Quest.quests.values()) {
+        if (quest.guideIgnore) continue
+        if (quest.group === group) f.quest(quest)
+      }
+    })
   }
 }

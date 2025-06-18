@@ -4,6 +4,21 @@ import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'
 
 export function QSDialogue(this: PlayerQuest, npc: Npc, text = `Вас ждет §f${npc.name}`) {
+  return this.dynamic(text)
+    .target(npc.location.toPoint())
+    .activate(ctx => {
+      const interaction: Npc.OnInteract = event => {
+        if (event.player.id !== this.player.id) return false
+        ctx.next()
+        return false
+      }
+
+      npc.questInteractions.add(interaction)
+      return { cleanup: () => npc.questInteractions.delete(interaction) }
+    })
+}
+
+export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = `Вас ждет §f${npc.name}`) {
   return {
     body: (body: string) => ({
       buttons: (...buttons: [string, (ctx: QSDynamic, back: VoidFunction) => void][]) => {

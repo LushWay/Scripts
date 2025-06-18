@@ -1,6 +1,6 @@
 import { ActionForm } from './action'
 
-export class NpcForm extends ActionForm {
+export class FormNpc extends ActionForm {
   constructor(title: string, body = '') {
     super(title, body, '§n§p§c§r')
   }

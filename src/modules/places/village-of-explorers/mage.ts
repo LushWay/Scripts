@@ -16,6 +16,7 @@ import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'
 import { ShopFormSection } from 'lib/shop/form'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
+import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { langToken, translateEnchantment } from 'lib/utils/lang'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
@@ -269,15 +270,3 @@ const LevelIsHigher = ErrorCost(t.error`Уровень зачара предме
 const LevelIsSame = ErrorCost(t.error`Уровень зачара предмета как у книжки`)
 const MaxLevel = ErrorCost(t.error`Максимальный уровень`)
 const Incompatible = ErrorCost(t`§8Зачарование несовместимо`)
-
-export function copyAllItemPropertiesExceptEnchants(item: ItemStack, newitem: ItemStack) {
-  newitem.nameTag = item.nameTag
-  newitem.amount = item.amount
-  if (newitem.durability && item.durability) newitem.durability.damage = item.durability.damage
-  newitem.setLore(item.getLore())
-  newitem.setCanDestroy(item.getCanDestroy())
-  newitem.setCanPlaceOn(item.getCanPlaceOn())
-  newitem.keepOnDeath = item.keepOnDeath
-  newitem.lockMode = item.lockMode
-  for (const prop of item.getDynamicPropertyIds()) newitem.setDynamicProperty(prop, item.getDynamicProperty(prop))
-}

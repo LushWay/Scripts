@@ -1,9 +1,11 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
-import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { MinecraftEnchantmentTypes, MinecraftEnchantmentTypesUnion, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
 import { Command } from 'lib/command'
+import { Enchantments } from 'lib/enchantments'
 import { EventSignal } from 'lib/event-signal'
 import { inspect, isKeyof, pick } from 'lib/util'
+import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { selectByChance } from './random'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
@@ -115,8 +117,11 @@ export class Loot {
     return this
   }
 
-  enchantmetns(enchantments: Partial<Record<MinecraftEnchantmentTypes, RandomCostMap>>) {
-    this.getCurrent().enchantments = Object.map(enchantments, (key, value) => [key, Loot.randomCostToArray(value)])
+  enchantmetns(enchantments: Partial<Record<MinecraftEnchantmentTypesUnion, RandomCostMap>>) {
+    this.getCurrent().enchantments = Object.map(enchantments, (key, value) => [
+      MinecraftEnchantmentTypes[key],
+      Loot.randomCostToArray(value),
+    ])
 
     return this
   }
@@ -272,7 +277,7 @@ export class LootTable {
       const amount = item.amount.randomElement()
       if (amount <= 0) return []
 
-      const stack = typeof item.itemStack === 'function' ? item.itemStack().clone() : item.itemStack.clone()
+      let stack = typeof item.itemStack === 'function' ? item.itemStack().clone() : item.itemStack.clone()
       const { maxAmount } = stack
       if (amount > maxAmount) {
         const average = Math.floor(amount / maxAmount)
@@ -293,7 +298,19 @@ export class LootTable {
           const level = levels.randomElement()
           if (!level) continue
 
-          enchantable.addEnchantment({ type: new EnchantmentType(type), level })
+          const etype = new EnchantmentType(type)
+
+          if (level <= etype.maxLevel) {
+            enchantable.addEnchantment({ type: etype, level })
+          } else {
+            const custom = Enchantments.custom[type]?.[level]?.[stack.typeId]
+            if (!custom) throw new Error(`Unkown enchantment for ${stack.typeId}: ${type} ${level}`)
+
+            const newitem = custom.clone()
+            copyAllItemPropertiesExceptEnchants(stack, newitem)
+            newitem.enchantable?.addEnchantments(enchantable.getEnchantments())
+            stack = newitem
+          }
         }
       }
 

@@ -1,13 +1,11 @@
-import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { Loot, migrateLocationName } from 'lib'
-import { DailyQuest } from 'lib/quest/quest'
-import { Npc } from 'lib/rpg/npc'
-import { Rewards } from 'lib/utils/rewards'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { GuideNpc } from '../lib/npc/guide'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { stoneQuarryInvestigating } from '../stone-quarry/quests/investigating'
+import { createMineQuests } from './quests/mine-x-blocks'
 
 class VillageOfMinersBuilder extends City {
   constructor() {
@@ -27,7 +25,7 @@ class VillageOfMinersBuilder extends City {
 
   woodman = new Woodman(this.group)
 
-  guide = Npc.form(this.group.place('guide').name('Шахтер'), (f, { lf }) => {
+  guide = new GuideNpc(this.group, 'Шахтер', (f, { lf }) => {
     f.title(this.guide.name)
     lf.question(
       'whereIam',
@@ -78,47 +76,9 @@ class VillageOfMinersBuilder extends City {
       'Как мне переплавить руду?',
       'Возьми у меня задание и отправляйся в другое поселение следуя компасу.',
     )
-
-    f.quest(this.mine10Iron, 'Где добыть еще больше железа?')
-    f.quest(this.mine10Coal, 'Где добыть угля?')
-    f.quest(this.mine10Diamonds, 'Где добыть алмазы?')
   })
 
-  createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
-    return new DailyQuest(
-      this.group.place(id).name(text),
-      'Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!',
-      q => {
-        q.breakCounter((c, end) => `${c}/${end}`, amount).filter(({ type: { id } }) => itemTypes.includes(id))
-
-        q.button().reward(rewards).target(this.guide.location.toPoint())
-      },
-    )
-  }
-
-  mine10Iron = this.createMineQuest(
-    'mine-10-iron',
-    'Добыть железо',
-    10,
-    [b.IronOre, b.DeepslateIronOre],
-    new Rewards().money(600),
-  )
-
-  mine10Coal = this.createMineQuest(
-    'mine-10-coal',
-    'Добыть уголь',
-    10,
-    [b.CoalOre, b.DeepslateCoalOre],
-    new Rewards().money(400),
-  )
-
-  mine10Diamonds = this.createMineQuest(
-    'mine-10-diamonds',
-    'Добыть алмазы',
-    10,
-    [b.DiamondOre, b.DeepslateDiamondOre],
-    new Rewards().money(1000),
-  )
+  mineQuests = createMineQuests(this)
 }
 
 export const VillageOfMiners = new VillageOfMinersBuilder()

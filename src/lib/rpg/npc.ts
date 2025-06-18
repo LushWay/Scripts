@@ -37,7 +37,8 @@ export class Npc {
 
   readonly dimensionId: DimensionType
 
-  static form(
+  static form<T extends new () => Npc>(
+    this: T,
     point: Place,
     creator: (form: NewFormCreator, ctx: { npc: Npc; player: Player; back?: NewFormCallback; lf: LF }) => void,
   ) {
@@ -51,7 +52,7 @@ export class Npc {
       }).show(player)
       return true
     })
-    return npc
+    return npc as InstanceType<T>
   }
 
   /** Creates new dynamically loadable npc */

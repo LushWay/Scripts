@@ -15,8 +15,8 @@ import {
   BUTTON,
   ChestForm,
   DatabaseUtils,
+  FormNpc,
   Mail,
-  NpcForm,
   Region,
   RoadRegion,
   SafeAreaRegion,
@@ -477,7 +477,7 @@ const tests: Record<
   form(ctx) {
     new ActionForm('Common action form', 'Common action form body')
       .addButton('NpcForm', () => {
-        const form = new NpcForm(
+        const form = new FormNpc(
           'title',
           'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs',
         )

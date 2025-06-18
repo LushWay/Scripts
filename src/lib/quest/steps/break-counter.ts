@@ -12,7 +12,7 @@ export class QSBreakCounterBuilder extends QSCounterBuilder {
         if (!filter(event.brokenBlockPermutation)) return
 
         this.step.player.playSound(Sounds.Success)
-        ctx.diff(1)
+        ctx.add(1)
         onBreak?.()
       })
     })

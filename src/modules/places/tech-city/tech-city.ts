@@ -1,12 +1,11 @@
-import { doNothing, Loot } from 'lib'
-import { form } from 'lib/form/new'
+import { Loot } from 'lib'
 import { CutArea } from 'lib/region/areas/cut'
-import { Npc } from 'lib/rpg/npc'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { QuartzMineRegion } from '../anarchy/quartz'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { GuideNpc } from '../lib/npc/guide'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Engineer } from './engineer'
@@ -28,12 +27,9 @@ class TechCityBuilder extends City {
 
   golem = createBossGolem(this.group)
 
-  guide = new Npc(this.group.place('guide').name('Техник'), ({ player }) => {
-    form(f => {
-      f.title(this.guide.name)
-      f.button('Скоро здесь будут задания', doNothing)
-    }).show(player)
-    return true
+  guide = new GuideNpc(this.group, 'Техник', (f, { lf }) => {
+    f.title(this.guide.name)
+    lf.question('wtfCity', 'А что за город', 'Ну крутой техно типо не понял что ли')
   })
 
   private create() {

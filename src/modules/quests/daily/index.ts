@@ -74,12 +74,11 @@ new RecurringEvent(
 )
 
 function hasAccessToDaily(player: Player, tell = true) {
-  const cities = [...CityInvestigating.cities]
-  const completed = cities.filter(e => e.quest.hadEntered(player))
-  if (completed.length !== cities.length) {
+  const completed = CityInvestigating.list.filter(e => e.quest.hadEntered(player))
+  if (completed.length !== CityInvestigating.list.length) {
     if (tell) {
       player.fail(
-        t.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${cities
+        t.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${CityInvestigating.list
           .filter(e => !completed.includes(e))
           .map(e => e.city.group.name)
           .join(', ')}`,

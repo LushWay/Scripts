@@ -69,7 +69,7 @@ class Learning {
           logger.player(player).info`Mined ${brokenBlockPermutation.type.id}`
 
           player.playSound(Sounds.Success)
-          ctx.diff(1)
+          ctx.add(1)
         })
       })
 
@@ -235,12 +235,12 @@ class Learning {
               return
 
             player.playSound(Sounds.Success)
-            ctx.diff(1)
+            ctx.add(1)
           },
         )
       })
 
-    q.dialogue(VillageOfMiners.guide, 'Шахтер зовет вас наверх, чтобы поговорить!').body('Приветствую!').buttons()
+    q.dialogue(VillageOfMiners.guide, 'Шахтер зовет вас наверх, чтобы поговорить!')
   })
 
   learningLocation = location(this.quest.group.place('tp').name('Куда игроки будут тепаться при обучении'))

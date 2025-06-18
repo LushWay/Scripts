@@ -1,7 +1,7 @@
 import {
   Block,
-  EasingType,
   GameMode,
+  ItemStack,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
@@ -146,4 +146,16 @@ export function getRandomXZInCircle(radius: number): { x: number; z: number } {
   }
 
   return result
+}
+
+export function copyAllItemPropertiesExceptEnchants(item: ItemStack, newitem: ItemStack) {
+  newitem.nameTag = item.nameTag
+  newitem.amount = item.amount
+  if (newitem.durability && item.durability) newitem.durability.damage = item.durability.damage
+  newitem.setLore(item.getLore())
+  newitem.setCanDestroy(item.getCanDestroy())
+  newitem.setCanPlaceOn(item.getCanPlaceOn())
+  newitem.keepOnDeath = item.keepOnDeath
+  newitem.lockMode = item.lockMode
+  for (const prop of item.getDynamicPropertyIds()) newitem.setDynamicProperty(prop, item.getDynamicProperty(prop))
 }

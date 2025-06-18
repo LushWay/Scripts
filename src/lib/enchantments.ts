@@ -9,11 +9,8 @@ const location = { x: 0, y: -10, z: 0 }
 const dimension = world.overworld
 
 export const Enchantments = {
-  custom: {} as Record<string, undefined | Record<number, undefined | Record<string, undefined | ItemStack>>>,
-  typed: {} as Record<
-    MinecraftEnchantmentTypes,
-    undefined | Record<number, undefined | Record<MinecraftItemTypes, undefined | ItemStack>>
-  >,
+  custom: {} as Record<string, Record<number, Record<string, ItemStack>>>,
+  typed: {} as Record<MinecraftEnchantmentTypes, Record<number, Record<MinecraftItemTypes, ItemStack>>>,
   onLoad: new EventLoader(),
 }
 

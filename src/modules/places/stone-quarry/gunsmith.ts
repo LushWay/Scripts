@@ -7,8 +7,8 @@ import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { t } from 'lib/text'
+import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
-import { copyAllItemPropertiesExceptEnchants } from '../village-of-explorers/mage'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
@@ -87,6 +87,7 @@ export class Gunsmith extends ShopNpc {
   }
 
   private copyEnchantments(newitem: ItemStack, item: ItemStack, player: Player) {
+    // TODO Enchants above max level won't work here
     let lost = false
     if (newitem.enchantable && item.enchantable) {
       for (const ench of item.enchantable.getEnchantments()) {
