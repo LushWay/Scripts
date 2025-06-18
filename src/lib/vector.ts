@@ -86,6 +86,38 @@ export class VecXZ {
     /** Z component of this vector. */
     public z: number,
   ) {}
+
+  /** Returns the length of this vector. */
+  length() {
+    return Math.hypot(this.x, this.z)
+  }
+
+  /** Returns this vector as a normalized vector. */
+  normalized() {
+    const magnitude = this.length()
+    if (magnitude === 0) return this
+
+    const directionX = this.x / magnitude
+    const directionZ = this.z / magnitude
+
+    return new VecXZ(directionX, directionZ)
+  }
+
+  add(a: VectorXZ) {
+    return VecXZ.add(this, a)
+  }
+
+  substract(a: VectorXZ) {
+    return VecXZ.subtract(this, a)
+  }
+
+  multiply(a: number) {
+    return VecXZ.multiply(this, a)
+  }
+
+  multiplyVec(a: VectorXZ) {
+    return VecXZ.multiplyVec(this, a)
+  }
 }
 
 export class Vec {

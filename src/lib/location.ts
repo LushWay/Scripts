@@ -30,10 +30,11 @@ class Location<T extends Vector3> {
    */
   static creator<V extends Vector3, L extends typeof Location<V>>(this: L) {
     /** @param group - Location group */
-    return (place: Place, fallback?: V) => {
-      const location = new this(place.group.id, place.shortId, place.group.dimensionType, fallback)
+    return (place: Place, fallback?: V, floor = false) => {
+      const location = new this(place.group.id, place.shortId, place.group.dimensionType, fallback, floor)
 
-      ;(Settings.worldMap[place.group.id] ??= {})[place.shortId] = {
+      const wm = (Settings.worldMap[place.group.id] ??= {})
+      wm[place.shortId] = {
         name: place.name,
         description: location.format,
         value: fallback ? Object.values(fallback).join(' ').trim() : '',
@@ -42,6 +43,12 @@ class Location<T extends Vector3> {
 
       location.load()
       location.firstLoad = true
+      if (floor && !Vec.equals(location.location, Vec.zero)) {
+        Settings.parseConfig(Settings.worldDatabase, place.group.id, wm)[place.shortId] = Vec.string(
+          location.location,
+          false,
+        )
+      }
 
       return location.safe
     }
@@ -74,6 +81,7 @@ class Location<T extends Vector3> {
     protected name: string,
     readonly dimensionType: DimensionType,
     protected fallback?: T,
+    protected readonly floor = false,
   ) {}
 
   private load(throws = false) {
@@ -90,15 +98,20 @@ class Location<T extends Vector3> {
       else return console.warn(error)
     }
 
-    for (const [i, key] of Object.keys(this.locationFormat).entries()) {
+    const loc = Object.assign({}, this.locationFormat)
+    for (const [i, key] of Object.keys(loc).entries()) {
       const n = input[i]
       if (typeof n === 'undefined') throw new TypeError(`I out of bounds: ${i}`)
-      ;(this.locationFormat[key as keyof T] as number) = n
+      ;(loc[key as keyof T] as number) = n
     }
-    this.updateLocation(this.locationFormat)
+    this.updateLocation(loc)
   }
 
   private updateLocation(location: T) {
+    if (this.floor) {
+      const { x, y, z } = Vec.floor(location)
+      location = { ...location, x, y, z }
+    }
     this.location = location
     EventLoaderWithArg.load(this.onLoad, this.safe as ValidLocation<T>)
     this.firstLoad = false

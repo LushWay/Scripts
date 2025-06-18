@@ -10,6 +10,7 @@ import {
   locationWithRotation,
   Portal,
   SafeAreaRegion,
+  Vec,
   Vector3Radius,
 } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
@@ -29,9 +30,9 @@ export class SafePlace {
 
   portalTeleportsTo = locationWithRotation(this.group.place('portal teleports to').name('портал телепортирует на'))
 
-  private portalFrom = location(this.group.place('portal from').name('портал от'))
+  private portalFrom = location(this.group.place('portal from').name('портал от'), undefined, true)
 
-  private portalTo = location(this.group.place('portal to').name('портал до'))
+  private portalTo = location(this.group.place('portal to').name('портал до'), undefined, true)
 
   safeArea?: SafeAreaRegion
 
@@ -61,7 +62,9 @@ export class SafePlace {
   }
 
   private createPortal(from: Vector3, to: Vector3) {
-    new Portal(this.group.id, from, to, player => {
+    const start = Vec.min(from, to)
+    const end = Vec.max(from, to)
+    new Portal(this.group.id, start, end, player => {
       if (!Portal.canTeleport(player)) return
 
       player.database.unlockedPortals ??= []
@@ -70,7 +73,7 @@ export class SafePlace {
         player.database.unlockedPortals.push(this.groupId)
       }
 
-      portalMenuOnce(player, undefined, this.group)
+      portalMenuOnce(player, undefined, this.group, start, end)
     })
   }
 
@@ -110,7 +113,13 @@ system.delay(() => {
   }, ActionGuardOrder.Feature)
 })
 
-const portalMenuOnce = debounceMenu(function portalMenu(player: Player, message?: MaybeRawText, group?: Group) {
+const portalMenuOnce = debounceMenu(function portalMenu(
+  player: Player,
+  message?: MaybeRawText,
+  group?: Group,
+  from?: Vector3,
+  to?: Vector3,
+) {
   return new ArrayForm(
     'Перемещение...',
     SafePlace.places
@@ -120,7 +129,7 @@ const portalMenuOnce = debounceMenu(function portalMenu(player: Player, message?
     .description(message)
     .button(place => {
       const [name, , callback] = Product.create()
-        .form(message => portalMenu(player, message))
+        .form(message => portalMenu(player, message, group, from, to))
         .player(player)
         .name(place.group.name ?? 'Unknown')
         .cost(new MoneyCost(1000))
@@ -136,6 +145,14 @@ const portalMenuOnce = debounceMenu(function portalMenu(player: Player, message?
       return [name, callback]
     })
     .show(player)
+    .then(success => {
+      if (!success && from && to) {
+        const direction = from.x === to.x ? 'x' : 'z'
+        const distance = player.location[direction] - from[direction]
+        player.applyKnockback({ x: 0, z: 0, [direction]: distance * 5 }, 0.5)
+      }
+      return success
+    })
 })
 
 new Command('portals')
