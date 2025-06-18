@@ -103,7 +103,7 @@ export class RegionStructure {
 
     return this.region.area.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
-        const structureLocation = Vec.multiply(Vec.subtract(edge, vector), -1)
+        const structureLocation = Vec.subtract(edge, vector)
         const structureSavedBlock = structure.getBlockPermutation(
           offset ? Vec.add(structureLocation, offset) : structureLocation,
         )
