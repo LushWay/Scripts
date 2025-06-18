@@ -89,8 +89,8 @@ class Form {
     return this
   }
 
-  quest(quest: Quest, textOverride?: string) {
-    const rendered = quest.button.render(this.player, () => this.show())
+  quest(quest: Quest, textOverride?: string, descriptionOverride?: string) {
+    const rendered = quest.button.render(this.player, () => this.show(), descriptionOverride)
     if (!rendered) return
 
     this.button(textOverride && rendered[0] === quest.name ? textOverride : rendered[0], rendered[1], rendered[2])

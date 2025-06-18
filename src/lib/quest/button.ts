@@ -13,7 +13,7 @@ export class QuestButton {
 
   override = new EventSignal<{ step: QS; back: VoidFunction; player: Player }, RenderedQuestButton>()
 
-  render(player: Player, back: VoidFunction): RenderedQuestButton {
+  render(player: Player, back: VoidFunction, description = this.quest.description): RenderedQuestButton {
     if (this.quest.isCompleted(player))
       return [t`${this.quest.name}\n§aЗавершен!`, undefined, manageQuestMenu(this.quest)]
 
@@ -24,7 +24,7 @@ export class QuestButton {
         undefined,
         form(f => {
           f.title(this.quest.name)
-          f.body(this.quest.description)
+          f.body(description)
           f.button('Взять задание', () => this.quest.enter(player))
         }),
       ]
