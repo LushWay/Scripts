@@ -98,7 +98,7 @@ export class RegionStructure {
     const structure = world.structureManager.get(this.id)
     if (!structure) throw new ReferenceError('No structure found!')
 
-    const [edge] = this.region.area.edges
+    const [, edge] = this.region.area.edges
     const offset = this.offset ? { x: this.offset, y: this.offset, z: this.offset } : undefined
 
     return this.region.area.forEachVector((vector, isIn, dimension) => {
