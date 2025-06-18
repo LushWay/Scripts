@@ -1,6 +1,7 @@
 import {
   Entity,
   LocationInUnloadedChunkError,
+  Player,
   PlayerInteractWithEntityBeforeEvent,
   system,
   world,
@@ -9,11 +10,13 @@ import {
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
+import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
 import { ConfigurableLocation, location } from 'lib/location'
 import { anyPlayerNear } from 'lib/player-move'
 import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
 import { Place } from './place'
+import { LoreForm } from 'lib/form/lore'
 
 export declare namespace Npc {
   type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => boolean
@@ -33,6 +36,20 @@ export class Npc {
   private readonly id: string
 
   readonly dimensionId: DimensionType
+
+  static form(
+    point: Place,
+    creator: (form: NewFormCreator, ctx: { npc: Npc; player: Player; back?: NewFormCallback; lf: LoreForm }) => void,
+  ) {
+    const npc = new Npc(point, ({ player }) => {
+      form((f, _, back) => {
+        f.title(point.name)
+        creator(f, { npc, player, back, lf: new LoreForm(point.id, f, player) })
+      }).show(player)
+      return true
+    })
+    return npc
+  }
 
   /** Creates new dynamically loadable npc */
   constructor(

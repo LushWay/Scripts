@@ -44,7 +44,7 @@ export class Quest {
         const cached = textCache.get(player)
 
         if (cached?.step !== step) {
-          textCache.set(player, { step: step, time: 6 })
+          textCache.set(player, { step: step, time: 10 })
           return text
         }
 

@@ -33,7 +33,7 @@ export class PlayerQuest {
   failed = (reason: string, exit = false) => {
     return this.dynamic(reason).activate(ctx => {
       ctx.error(reason)
-      if (exit) ctx.next()
+      if (exit) this.quest.exit(this.player)
     })
   }
 
