@@ -54,7 +54,8 @@ export class Region {
     let key = `${kind}-${area}-${~~radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
     if (RegionDatabase.has(key)) {
       let i = 0
-      while (RegionDatabase.has(key)) i++
+      const keys = [...RegionDatabase.keys()]
+      while (keys.includes(key)) i++
       key = `${key}-${i}`
     }
     return key
