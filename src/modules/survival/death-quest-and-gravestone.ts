@@ -168,8 +168,8 @@ const quest = new Quest(
   'Верните вещи после смерти!',
   (q, player) => {
     const { deadAt2, gravestoneId } = player.database.survival
-    if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.')
-    if (!deadAt2) return q.failed('Ваше место смерти потерялось!')
+    if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.', true)
+    if (!deadAt2) return q.failed('Ваше место смерти потерялось!', true)
 
     q.dynamic(Vec.string(deadAt2.location, true))
       .description(

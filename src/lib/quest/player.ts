@@ -30,8 +30,11 @@ export class PlayerQuest {
 
   breakCounter = this.wrapStep(QSBreakCounterBuilder, QSBreakCounter)
 
-  failed = (reason: string) => {
-    return this.dynamic(reason).activate(ctx => ctx.error(reason))
+  failed = (reason: string, exit = false) => {
+    return this.dynamic(reason).activate(ctx => {
+      ctx.error(reason)
+      if (exit) ctx.next()
+    })
   }
 
   reachArea = QSReachArea.bind(this)
