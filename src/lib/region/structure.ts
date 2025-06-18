@@ -98,12 +98,12 @@ export class RegionStructure {
     const structure = world.structureManager.get(this.id)
     if (!structure) throw new ReferenceError('No structure found!')
 
-    const [, edge] = this.region.area.edges
+    const [from] = this.region.area.edges
     const offset = this.offset ? { x: this.offset, y: this.offset, z: this.offset } : undefined
 
     return this.region.area.forEachVector((vector, isIn, dimension) => {
       if (isIn) {
-        const structureLocation = Vec.subtract(edge, vector).multiply(-1)
+        const structureLocation = Vec.subtract(from, vector).multiply(-1)
         const structureSavedBlock = structure.getBlockPermutation(
           offset ? Vec.add(structureLocation, offset) : structureLocation,
         )
