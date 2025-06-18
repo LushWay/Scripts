@@ -54,7 +54,7 @@ class StoneQuarryBuilder extends City {
 
   gunsmith = new Gunsmith(this.group)
 
-  guide = new Npc(this.group.place('guide').name('Каменщик'), ({ player }) => {
+  guide = new Npc(this.group.place('guide').name('Ломщик'), ({ player }) => {
     form(f => {
       f.title(this.guide.name)
       f.button('Скоро здесь будут задания', doNothing)
