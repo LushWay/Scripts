@@ -33,9 +33,9 @@ const blocksSets = table<BlocksSets>('blockSets', () => ({}))
 // GENERAL MANIPULATIONS
 
 export function getOtherPlayerBlocksSets(playerId: string): [string, BlocksSets][] {
-  return Object.entries(blocksSets).filter(
-    (e => e[0] !== playerId && e[1]) as (e: [string, BlocksSets | undefined]) => e is [string, BlocksSets],
-  )
+  return blocksSets
+    .entries()
+    .filter((e => e[0] !== playerId && e[1]) as (e: [string, BlocksSets | undefined]) => e is [string, BlocksSets])
 }
 
 export function getAllBlocksSets(id: string): BlocksSets {
