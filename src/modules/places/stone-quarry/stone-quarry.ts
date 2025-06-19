@@ -54,7 +54,6 @@ class StoneQuarryBuilder extends City {
   gunsmith = new Gunsmith(this.group)
 
   guide = new GuideNpc(this.group, 'Ломщик', (f, { lf }) => {
-    f.title(this.guide.name)
     lf.question('wtfCity', 'А что за город', 'Ну типа крутой камни ломаем вот да')
   })
 

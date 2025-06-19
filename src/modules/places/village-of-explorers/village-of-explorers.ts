@@ -30,7 +30,6 @@ class VillageOfExporersBuilder extends City {
   stoner = new Stoner(this.group)
 
   guide = new GuideNpc(this.group, 'Исследователь', (f, { lf }) => {
-    f.title(this.guide.name)
     lf.question(
       'wtfCity',
       'А что за город',

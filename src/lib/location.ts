@@ -42,6 +42,7 @@ class Location<T extends Vector3> {
         name: place.name,
         description: location.format,
         value: fallback ? Location.toString(fallback) : '',
+        required: true,
         onChange: () => location.load(true),
       }
 

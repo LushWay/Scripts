@@ -10,6 +10,7 @@ export class GuideNpc extends NpcForm {
     readonly point = group.place('guide').name(name),
   ) {
     super(point, (f, ctx) => {
+      f.title(name)
       create(f, ctx)
 
       for (const quest of Quest.quests.values()) {

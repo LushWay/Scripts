@@ -45,6 +45,8 @@ export class CityInvestigating<T extends City> {
             this.city.cutscene.play(ctx.player)?.finally(() => ctx.next())
           })
 
+        q.dialogue(this.city.guide)
+
         this.q(this.city, q, player)
       },
       true,

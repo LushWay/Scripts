@@ -28,7 +28,6 @@ class TechCityBuilder extends City {
   golem = createBossGolem(this.group)
 
   guide = new GuideNpc(this.group, 'Техник', (f, { lf }) => {
-    f.title(this.guide.name)
     lf.question('wtfCity', 'А что за город', 'Ну крутой техно типо не понял что ли')
   })
 

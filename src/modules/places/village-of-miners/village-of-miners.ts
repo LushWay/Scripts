@@ -26,7 +26,6 @@ class VillageOfMinersBuilder extends City {
   woodman = new Woodman(this.group)
 
   guide = new GuideNpc(this.group, 'Шахтер', (f, { lf }) => {
-    f.title(this.guide.name)
     lf.question(
       'whereIam',
       'Где я?',
