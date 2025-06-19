@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { Cooldown, ms, noNullable } from 'lib'
+import { ms, noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { DailyQuest } from 'lib/quest/quest'
@@ -20,9 +20,10 @@ interface DB {
   streak: number
   streakDate: number
   today: number
+  takenToday: boolean
 }
 
-const db = table<DB>('dailyQuest', () => ({ streak: 0, today: 0, streakDate: Date.now() }))
+const db = table<DB>('dailyQuest', () => ({ streak: 0, today: 0, streakDate: Date.now(), takenToday: false }))
 
 const streakExpireCooldown = ms.from('day', 1)
 
@@ -67,7 +68,9 @@ new RecurringEvent(
     storage.cityId = mostPopular?.group.id ?? ''
 
     for (const value of db.values()) {
+      if (!value.takenToday) value.streak = 0
       value.today = 0
+      value.takenToday = false
     }
   },
   { runAfterOffline: true },
@@ -96,11 +99,7 @@ DailyQuest.onEnd.subscribe(({ quest, player }) => {
   playerDb.today++
 
   if (playerDb.today >= dailyQuests) {
-    if (Cooldown.isExpired(playerDb.streakDate, streakExpireCooldown)) {
-      playerDb.streak = 0
-    } else {
-      playerDb.streak++
-    }
+    playerDb.streak++
   }
 })
 
@@ -119,9 +118,26 @@ export const dailyQuestsForm = form((f, player) => {
 
   const name = currentDailyQuestCity?.group.name
   if (name) {
-    f.button(t`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`, () => {
-      //
-    })
+    const completed = playerDb.today < dailyQuests
+    f.button(
+      (completed
+        ? playerDb.takenToday
+          ? t.options({ text: '§8', unit: '§7', num: '§7' })
+          : t
+        : t.error)`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`,
+      () => {
+        if (!completed) return player.fail(t.error`Сначала выполните все ежедневные задания!`)
+        if (playerDb.takenToday) return player.fail(t.error`Вы уже забрали награды сегодня! Заходите завтра`)
+
+        const donut = playerDb.streak > 0 && playerDb.streak % questsStreakToGainDonutCrate === 0
+        const crate = donut ? currentDailyQuestCity?.donutCrate : currentDailyQuestCity?.normalCrate
+        if (!crate) return
+
+        player.success('Вы получили ключ!')
+        player.container?.addItem(crate.createKeyItemStack())
+        playerDb.takenToday = true
+      },
+    )
   }
 
   for (const quest of currentDailyQuests) {

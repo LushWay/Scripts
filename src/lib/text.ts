@@ -54,7 +54,7 @@ interface MultiStatic {
    */
   timeHHMMSS(time: number): Text
 
-  options: (options: ColorOptions) => Multi
+  options: (options: ColorOptions) => Multi & Fn
 }
 
 export declare namespace Text {

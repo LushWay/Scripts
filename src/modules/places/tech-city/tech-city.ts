@@ -36,7 +36,7 @@ class TechCityBuilder extends City {
       QuartzMineRegion.create(new CutArea({ parent: this.safeArea.area.toJSON(), cut: { axis: 'y', to: 56 } }))
     }
 
-    const { normal, donut } = this.createKits(
+    this.createKits(
       new Loot()
         .itemStack(CannonItem.blueprint)
         .weight('10%')

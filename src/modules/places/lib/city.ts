@@ -22,8 +22,13 @@ export abstract class City extends SafePlace {
       storageFloatingText.update(location, storageLocationpoint.name)
     })
 
-    return { normal, donut }
+    this.normalCrate = normal
+    this.donutCrate = donut
   }
+
+  normalCrate?: Crate
+
+  donutCrate?: Crate
 
   cutscene = new Cutscene(this.group.id, 'Исследование ' + this.name)
 
