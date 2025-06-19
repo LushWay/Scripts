@@ -2,6 +2,7 @@ import { ItemStack, system } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, ms } from 'lib'
+import { RegionEvents } from 'lib/region/events'
 import { actionGuard, ActionGuardOrder, disableAdventureNear, Region, RegionPermissions } from 'lib/region/index'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { TechCity } from '../tech-city/tech-city'
@@ -42,29 +43,28 @@ system.runPlayerInterval(
   player => {
     const { typeId } = player.mainhand()
 
-    // TODO Maybe check for region or inv type
     if (typeId && isKeyof(typeId, HoeEffectLevels)) {
-      player.addEffect(MinecraftEffectTypes.Haste, 2, {
-        amplifier: HoeEffectLevels[typeId],
-        showParticles: false,
-      })
+      const inQuartzMine = RegionEvents.playerInRegionsCache
+        .get(player)
+        ?.some(e => e === TechCity.safeArea || e instanceof QuartzMineRegion)
+
+      if (inQuartzMine) {
+        player.addEffect(MinecraftEffectTypes.Haste, 2, {
+          amplifier: HoeEffectLevels[typeId],
+          showParticles: false,
+        })
+      }
     }
   },
   'quartz feature, hoe haste effect',
   2,
 )
 
-actionGuard((player, region, ctx) => {
-  if (
-    ctx.type !== 'break' ||
-    (region !== TechCity.safeArea && !(region instanceof QuartzMineRegion)) ||
-    // Check block
-    ctx.event.block.typeId !== quartzTypeId ||
-    // Check item
-    !ctx.event.itemStack?.typeId ||
-    !(ctx.event.itemStack.typeId in HoeEffectLevels)
-  )
-    return
+actionGuard((_, region, ctx) => {
+  if (ctx.type !== 'break') return
+  if (region !== TechCity.safeArea && !(region instanceof QuartzMineRegion)) return
+  if (ctx.event.block.typeId !== quartzTypeId) return
+  if (!ctx.event.itemStack?.typeId || !(ctx.event.itemStack.typeId in HoeEffectLevels)) return
 
   ScheduleBlockPlace.setBlock(ctx.event.block, ms.from('min', 2))
 

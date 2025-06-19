@@ -565,4 +565,3 @@ function inspectChunks(query: ChunkQuery, dimensionType: DimensionType = 'overwo
     return 'Empty'
   }
 }
-

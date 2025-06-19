@@ -1,5 +1,3 @@
-// TODO Group actions (e.g. mute, ban, invsee, wpchest etc)
-
 import { Player } from '@minecraft/server'
 import { is, Portal, stringify } from 'lib'
 import { Achievement } from 'lib/achievements/achievement'

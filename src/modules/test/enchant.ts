@@ -17,10 +17,10 @@ new Command('enchant')
     const enchlevels = ench[level]
     if (!enchlevels) return ctx.error('Level unavailable. Levels:\n' + Object.keys(ench).join('\n'))
 
-      const enchitem = enchlevels[item.typeId]
+    const enchitem = enchlevels[item.typeId]
     if (!enchitem) return ctx.error('Available items:\n' + Object.keys(enchlevels).join('\n'))
 
-      const enchantments = item.getComponent('enchantable')
+    const enchantments = item.getComponent('enchantable')
     if (!enchantments) return ctx.error('Not enchantable!')
 
     const newitem = enchitem.clone()

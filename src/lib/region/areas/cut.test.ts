@@ -248,4 +248,3 @@ describe('sphere', () => {
     expect(vOrder).toEqual(otherVOrder)
   })
 })
-

@@ -36,7 +36,6 @@ export class RegionStructure {
 
   save(): void | Promise<void> {
     this.validateArea()
-    // TODO Test that changin order of edges does not break structure
     world.structureManager.createFromWorld(this.id, this.region.dimension, ...this.region.area.edges, {
       saveMode: StructureSaveMode.World,
       includeEntities: false,

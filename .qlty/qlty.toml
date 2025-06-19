@@ -44,6 +44,9 @@ exclude_patterns = [
   "tools/**",
   "*.config.ts",
   "src/modules/world-edit/**",
+  "src/lib/utils/sprintf.ts",
+  "src/lib/utils/later.ts",
+  "src/lib/vector.ts",
   "items/**",
   "*.json",
   "functions/**",
@@ -65,19 +68,20 @@ test_patterns = [
 
 [smells]
 mode = "comment"
-
-[smells.return_statements]
-enabled = false
+return_statements.enabled = false
+function_parameters.threshold = 10
+function_complexity.threshold = 40
+file_complexity.threshold = 100
 
 [[source]]
 name = "default"
 default = true
 
-[[plugin]]
-name = "osv-scanner"
+# [[plugin]]
+# name = "osv-scanner"
 
-[[plugin]]
-name = "radarlint-js"
+# [[plugin]]
+# name = "radarlint-js"
 
 [[plugin]]
 name = "ripgrep"

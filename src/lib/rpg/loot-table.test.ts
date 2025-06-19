@@ -63,4 +63,3 @@ describe('loot table random cost', () => {
     `)
   })
 })
-
