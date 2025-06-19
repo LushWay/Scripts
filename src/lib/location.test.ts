@@ -9,7 +9,7 @@ const group = new Group('id')
 const point = group.place('id').name('name')
 
 beforeEach(() => {
-  Settings.worldMap = {}
+  Settings.worldConfigs = {}
   for (const key of Settings.worldDatabase.keys()) Settings.worldDatabase.delete(key)
 })
 
@@ -34,7 +34,7 @@ describe('location', () => {
   })
 
   it('should load and update location from Settings', () => {
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '10 20 30' })
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10 20 30')
     const loc = location(point)
     expect(loc.valid).toBe(true)
     if (!loc.valid) return
@@ -43,15 +43,14 @@ describe('location', () => {
     expect(loc.y).toBe(20)
     expect(loc.z).toBe(30)
 
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '40 60 30' })
-    Settings.worldMap[group.id]?.[point.shortId]?.onChange?.()
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '40 60 30')
     expect(loc.x).toBe(40)
     expect(loc.y).toBe(60)
     expect(loc.z).toBe(30)
   })
 
   it('should emit event on location change', () => {
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '0 0 1' })
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '0 0 1')
     const loc = location(point)
     const callback = vi.fn()
 
@@ -59,8 +58,7 @@ describe('location', () => {
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 0, y: 0, z: 1 }))
     expect(loc.firstLoad).toBe(true)
 
-    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id] ?? {})
-    settings[point.shortId] = '40 50 60'
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '40 50 60')
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60 }))
     expect(loc.firstLoad).toBe(false)
   })
@@ -70,19 +68,18 @@ describe('location', () => {
     Settings.worldDatabase.set(group.id, { [point.shortId]: 'in va lid' })
     location(point)
 
-    expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
-      [
-        [TypeError: §cInvalid location, expected '§fx y z§c' but recieved '§fin va lid§c'§c],
-      ]
-    `)
+    expect(consoleErrorSpy.mock.calls[0]?.[0]).toMatchInlineSnapshot(
+      `[TypeError: §cInvalid location, expected '§fx y z§c' but recieved '§fin va lid§c'§c]`,
+    )
   })
 
   it('should teleport', () => {
     const loc = location(point, { x: 0, y: 1, z: 1 })
     // @ts-expect-error
     const player = new Player(false) as Player
+    const tp = vi.spyOn(player, 'teleport')
     loc.teleport(player)
-    expect((player.teleport as unknown as ReturnType<typeof vi.fn>).mock.calls[0]).toMatchInlineSnapshot(`
+    expect(tp.mock.calls[0]).toMatchInlineSnapshot(`
       [
         Vec {
           "x": 0.5,
@@ -113,7 +110,7 @@ describe('locationWithRotation', () => {
   })
 
   it('should load and update location with rotation from Settings', () => {
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '10 20 30 45 90' })
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10 20 30 45 90')
     const loc = locationWithRotation(point)
 
     expect(loc.valid).toBe(true)
@@ -126,16 +123,29 @@ describe('locationWithRotation', () => {
     expect(loc.yRot).toBe(90)
   })
 
+  it('should load, floor and update location with rotation from Settings', () => {
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10.522 20.53 30.883 45.43 90.43')
+    const loc = locationWithRotation(point, undefined, true)
+
+    expect(loc.valid).toBe(true)
+    if (!loc.valid) return
+
+    expect(loc.x).toBe(10)
+    expect(loc.y).toBe(20)
+    expect(loc.z).toBe(30)
+    expect(loc.xRot).toBe(45.43)
+    expect(loc.yRot).toBe(90.43)
+  })
+
   it('should emit event on location with rotation change', () => {
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '10 20 30 45 90' })
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10 20 30 45 90')
     const loc = locationWithRotation(point)
     const callback = vi.fn()
 
     loc.onLoad.subscribe(callback)
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 10, y: 20, z: 30, xRot: 45, yRot: 90 }))
 
-    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id] ?? {})
-    settings[point.shortId] = '40 50 60 30 60'
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '40 50 60 30 60')
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60, xRot: 30, yRot: 60 }))
   })
@@ -179,7 +189,8 @@ describe('locationWithRadius', () => {
   })
 
   it('should load and update location with radius from Settings', () => {
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '10 20 30 5' })
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10 20 30 5')
+
     const loc = locationWithRadius(point)
 
     expect(loc.valid).toBe(true)
@@ -191,14 +202,28 @@ describe('locationWithRadius', () => {
     expect(loc.radius).toBe(5)
   })
 
+  it('should load, floor and update location with radius from Settings', () => {
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10.453 20.24 30.432 5.54')
+
+    const loc = locationWithRadius(point, undefined, true)
+
+    expect(loc.valid).toBe(true)
+    if (!loc.valid) return
+
+    expect(loc.x).toBe(10)
+    expect(loc.y).toBe(20)
+    expect(loc.z).toBe(30)
+    expect(loc.radius).toBe(5.54)
+  })
+
   it('should emit event on location with radius change', () => {
-    Settings.worldDatabase.set(group.id, { [point.shortId]: '10 20 30 5' })
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '10 20 30 5')
+
     const loc = locationWithRadius(point)
     const callback = vi.fn()
     loc.onLoad.subscribe(callback)
 
-    const settings = Settings.parseConfig(Settings.worldDatabase, group.id, Settings.worldMap[group.id] ?? {})
-    settings[point.shortId] = '40 50 60 10'
+    Settings.set(Settings.worldDatabase, group.id, point.shortId, '40 50 60 10')
 
     expect(callback).toHaveBeenCalledWith(expect.objectContaining({ x: 40, y: 50, z: 60, radius: 10 }))
   })

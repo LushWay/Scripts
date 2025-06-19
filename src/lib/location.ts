@@ -22,6 +22,10 @@ export type InvalidLocation<T extends Vector3> = { valid: false } & LocationComm
 export type ConfigurableLocation<T extends Vector3> = InvalidLocation<T> | ValidLocation<T>
 
 class Location<T extends Vector3> {
+  protected static toString(t: Vector3 & object) {
+    return Object.values(t).join(' ').trim()
+  }
+
   /**
    * Returns function that creates location
    *
@@ -33,21 +37,20 @@ class Location<T extends Vector3> {
     return (place: Place, fallback?: V, floor = false) => {
       const location = new this(place.group.id, place.shortId, place.group.dimensionType, fallback, floor)
 
-      const wm = (Settings.worldMap[place.group.id] ??= {})
-      wm[place.shortId] = {
+      const config = (Settings.worldConfigs[place.group.id] ??= {})
+      config[place.shortId] = {
         name: place.name,
         description: location.format,
-        value: fallback ? Object.values(fallback).join(' ').trim() : '',
+        value: fallback ? Location.toString(fallback) : '',
         onChange: () => location.load(true),
       }
 
       location.load()
       location.firstLoad = true
+
+      // Set floored value on reload
       if (floor && !Vec.equals(location.location, Vec.zero)) {
-        Settings.parseConfig(Settings.worldDatabase, place.group.id, wm)[place.shortId] = Vec.string(
-          location.location,
-          false,
-        )
+        Settings.set(Settings.worldDatabase, place.group.id, place.shortId, Location.toString(location.location))
       }
 
       return location.safe
@@ -62,9 +65,9 @@ class Location<T extends Vector3> {
     }
   }
 
-  protected locationFormat = { x: 0, y: 0, z: 0 } as T
+  protected readonly locationFormat = { x: 0, y: 0, z: 0 } as T
 
-  protected location = Object.assign({}, this.locationFormat)
+  protected readonly location = Object.assign({}, this.locationFormat)
 
   protected [VecSymbol] = true
 
@@ -112,7 +115,7 @@ class Location<T extends Vector3> {
       const { x, y, z } = Vec.floor(location)
       location = { ...location, x, y, z }
     }
-    this.location = location
+    Object.assign(this.location, location)
     EventLoaderWithArg.load(this.onLoad, this.safe as ValidLocation<T>)
     this.firstLoad = false
   }

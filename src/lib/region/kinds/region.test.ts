@@ -1,15 +1,42 @@
+import { RegionDatabase, registerSaveableRegion } from 'lib'
 import { createPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
-import { TEST_createPlayer } from 'test/utils'
+import { TEST_clearDatabase, TEST_createPlayer } from 'test/utils'
 import { SphereArea } from '../areas/sphere'
 import { Region } from './region'
 
 describe('Region', () => {
-  beforeEach(() => (Region.regions = []))
+  beforeEach(() => ((Region.regions = []), TEST_clearDatabase(RegionDatabase)))
   afterEach(() => (Region.regions = []))
 
   it('should create region', () => {
     expect(Region.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld'))).toBeInstanceOf(Region)
+  })
+
+  it('should create regions with different ids', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(0))
+    class T extends Region {}
+    registerSaveableRegion('t', T)
+
+    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
+      `"t-s-0-Jan 1, 1970-06:00"`,
+    )
+    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
+      `"t-s-0-Jan 1, 1970-06:00-0"`,
+    )
+    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
+      `"t-s-0-Jan 1, 1970-06:00-1"`,
+    )
+    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
+      `"t-s-0-Jan 1, 1970-06:00-2"`,
+    )
+    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
+      `"t-s-0-Jan 1, 1970-06:00-3"`,
+    )
+    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
+      `"t-s-0-Jan 1, 1970-06:00-4"`,
+    )
   })
 
   it('should return owner name', () => {

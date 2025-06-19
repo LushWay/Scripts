@@ -200,7 +200,7 @@ declare global {
 Date.prototype.toYYYYMMDD = function () {
   const date = new Date(this)
   date.setHours(date.getHours() + 3)
-  return date.toLocaleDateString([], { dateStyle: 'medium' }).split('.').reverse().join('-')
+  return date.toLocaleDateString('en-US', { dateStyle: 'medium' }).split('.').reverse().join('-')
 }
 
 Date.prototype.toHHMM = function () {

@@ -58,7 +58,7 @@ export class Settings {
 
   static playerDatabase = this.createDatabase('playerOptions')
 
-  static playerMap: Record<string, SettingsConfig<PlayerSettingValues>> = {}
+  static playerConfigs: Record<string, SettingsConfig<PlayerSettingValues>> = {}
 
   /**
    * It creates a proxy object that has the same properties as the `CONFIG` object, but the values are stored in a
@@ -75,7 +75,7 @@ export class Settings {
     groupId: string,
     config: Config,
   ) {
-    this.insertGroup('playerMap', groupName, groupId, config)
+    this.insertGroup('playerConfigs', groupName, groupId, config)
 
     const cache = new WeakPlayerMap()
 
@@ -84,7 +84,12 @@ export class Settings {
       if (cached) {
         return cached as SettingsConfigParsed<Config>
       } else {
-        const settings = this.parseConfig(Settings.playerDatabase, groupId, this.playerMap[groupId] as Config, player)
+        const settings = this.parseConfig(
+          Settings.playerDatabase,
+          groupId,
+          this.playerConfigs[groupId] as Config,
+          player,
+        )
         cache.set(player, settings)
         return settings
       }
@@ -99,7 +104,7 @@ export class Settings {
 
   static worldDatabase = this.createDatabase('worldOptions')
 
-  static worldMap: Record<string, WorldSettingsConfig> = {}
+  static worldConfigs: Record<string, WorldSettingsConfig> = {}
 
   /**
    * It takes a prefix and a configuration object, and returns a proxy that uses the prefix to store the configuration
@@ -115,13 +120,18 @@ export class Settings {
     groupId: string,
     config: Config,
   ): SettingsConfigParsed<Config> {
-    this.insertGroup('worldMap', groupName, groupId, config)
-    return this.parseConfig(Settings.worldDatabase, groupId, this.worldMap[groupId] as Config)
+    this.insertGroup('worldConfigs', groupName, groupId, config)
+    return this.parseConfig(Settings.worldDatabase, groupId, this.worldConfigs[groupId] as Config)
   }
 
   static worldCommon = ['Общие настройки мира\n§7Чат, спавн и тд', 'common'] as const
 
-  private static insertGroup(to: 'worldMap' | 'playerMap', groupName: string, groupId: string, config: SettingsConfig) {
+  private static insertGroup(
+    to: 'worldConfigs' | 'playerConfigs',
+    groupName: string,
+    groupId: string,
+    config: SettingsConfig,
+  ) {
     if (!(groupId in this[to])) {
       this[to][groupId] = config
     } else {
@@ -164,19 +174,29 @@ export class Settings {
           )
         },
         set(v: toPlain<SettingValue>) {
-          let value = database.get(groupId)
-          if (typeof value === 'undefined') {
-            database.set(groupId, {})
-            value = database.get(groupId)
-          }
-          value[key] = v
-          config[prop]?.onChange?.()
-          database.set(groupId, value)
+          Settings.set(database, groupId, key, v, config[prop])
         },
       })
     }
 
     return settings as SettingsConfigParsed<Config>
+  }
+
+  static set(
+    database: SettingsDatabase,
+    groupId: string,
+    key: string,
+    v: SettingValue,
+    configProp = Settings.worldConfigs[groupId]?.[key],
+  ) {
+    let value = database.get(groupId)
+    if (typeof value === 'undefined') {
+      database.set(groupId, {})
+      value = database.get(groupId)
+    }
+    value[key] = v
+    configProp?.onChange?.()
+    database.set(groupId, value)
   }
 
   static isDropdown(v: SettingValue): v is DropdownSetting[] {
@@ -216,7 +236,7 @@ export function settingsGroupMenu(
   forRegularPlayer: boolean,
   hints: Record<string, string> = {},
   storeSource = forRegularPlayer ? Settings.playerDatabase : Settings.worldDatabase,
-  configSource = forRegularPlayer ? Settings.playerMap : Settings.worldMap,
+  configSource = forRegularPlayer ? Settings.playerConfigs : Settings.worldConfigs,
   back = forRegularPlayer ? playerSettingsMenu : worldSettingsMenu,
   showHintAboutSavedStatus = true,
 ) {
@@ -346,8 +366,8 @@ export function playerSettingsMenu(player: Player, back?: VoidFunction) {
   const form = new ActionForm('§dНастройки')
   if (back) form.addButtonBack(back)
 
-  for (const groupName in Settings.playerMap) {
-    const name = Settings.playerMap[groupName]?.[SETTINGS_GROUP_NAME]
+  for (const groupName in Settings.playerConfigs) {
+    const name = Settings.playerConfigs[groupName]?.[SETTINGS_GROUP_NAME]
     if (name) form.addButton(name, () => settingsGroupMenu(player, groupName, true))
   }
 
@@ -357,7 +377,7 @@ export function playerSettingsMenu(player: Player, back?: VoidFunction) {
 export function worldSettingsMenu(player: Player) {
   const form = new ActionForm('§dНастройки мира')
 
-  for (const [groupId, group] of Object.entries(Settings.worldMap)) {
+  for (const [groupId, group] of Object.entries(Settings.worldConfigs)) {
     const database = Settings.worldDatabase.get(groupId)
 
     let unsetCount = 0

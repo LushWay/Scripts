@@ -136,9 +136,9 @@ const portalMenuOnce = debounceMenu(function portalMenu(
         .onBuy(() => {
           if (place.location.valid) Portal.teleport(player, place.location, { title: '' })
 
-          system.runTimeout(() => Portal.showHudTitle(player, place.group.name, 3), 'saklds', 10)
+          system.runTimeout(() => Portal.showHudTitle(player, place.group.name, 3), 'teleport title', 10)
 
-          // Do not open form on success teleportation
+          // Do not open product form on successful teleportation
           return false
         }).button
 
@@ -146,9 +146,10 @@ const portalMenuOnce = debounceMenu(function portalMenu(
     })
     .show(player)
     .then(success => {
+      // Push player away from portal in case they closed the form
       if (!success && from && to) {
         const direction = from.x === to.x ? 'x' : 'z'
-        const distance = player.location[direction] - from[direction]
+        const distance = player.location[direction] - (from[direction] + 0.5)
         player.applyKnockback({ x: 0, z: 0, [direction]: distance * 5 }, 0.5)
       }
       return success
