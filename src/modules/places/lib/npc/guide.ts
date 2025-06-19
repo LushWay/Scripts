@@ -15,7 +15,7 @@ export class GuideNpc extends NpcForm {
 
       for (const quest of Quest.quests.values()) {
         if (quest.guideIgnore) continue
-        if (quest.group === group) f.quest(quest)
+        if (quest.place.group === group) f.quest(quest)
       }
     })
   }
