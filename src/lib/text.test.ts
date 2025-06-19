@@ -102,10 +102,10 @@ describe('text', () => {
     expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
       `"§604:32:01§7"`,
     )
-    expect(t.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§f100 §7дней, §600:00:03§7"`)
+    expect(t.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§6100 §7дней, §600:00:03§7"`)
 
     expect(t.error.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§700:00:03§c"`)
-    expect(t.error.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§f100 §cдней, §700:00:03§c"`)
+    expect(t.error.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§7100 §cдней, §700:00:03§c"`)
 
     // @ts-expect-error
     expect(t.time`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
