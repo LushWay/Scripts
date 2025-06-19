@@ -29,7 +29,7 @@ export function createMineQuests(city: City) {
           .filter(({ type: { id } }) => itemTypes.includes(id))
           .activate(ctx => {
             ctx.onInterval(() => {
-              y = player.location.y
+              y = ~~player.location.y
               ctx.update()
             })
           })
