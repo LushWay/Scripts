@@ -14,7 +14,7 @@ export function createMineQuests(city: City) {
         const ore = itemTypes[0] && ores.getOre(itemTypes[0])
         if (!ore) return q.failed('No ore found', true)
 
-        let y = player.location.y
+        let y = ~~player.location.y
 
         const { below, above } = ore.ore.item
         const inRange = () => y < below && y > above

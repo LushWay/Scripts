@@ -6,7 +6,7 @@ import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
 import { MaybeRawText, t } from 'lib/text'
 import { addNamespace, inspect, isKeyof, util, wrapLore } from 'lib/util'
-import { typeIdToReadable } from 'lib/utils/lang'
+import { translateTypeId } from 'lib/utils/lang'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 
@@ -96,10 +96,11 @@ export interface ChestButtonOptions {
 export class ChestForm {
   static permutationToButton(
     permutation: Pick<BlockPermutation, 'getAllStates' | 'type'>,
+    player: Player,
   ): Omit<ChestButtonOptions, 'slot'> {
     const states = permutation.getAllStates()
     return {
-      nameTag: typeIdToReadable(permutation.type.id),
+      nameTag: translateTypeId(permutation.type.id, player.lang),
       icon: permutation.type.id,
       lore: [...(Object.keys(states).length ? inspect(states).split('\n') : [])],
     }

@@ -42,6 +42,8 @@ declare module '@minecraft/server' {
      * @param tickInterval Time in ticks between each run. Its not guaranted that it will be consistent
      */
     runJobInterval(callback: () => Generator, tickInterval: number): () => void
+
+    runJob(generator: Generator<void, void, void>, name?: string): number
   }
 }
 
@@ -58,6 +60,21 @@ expand(System.prototype, {
   runTimeout(...args) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return Timer('timeout', super.runTimeout.bind(this), ...args)
+  },
+
+  runJob(generator, name) {
+    const id = name ?? stringifyError.parent()
+    return super.runJob(
+      (function* runJobWrapper() {
+        let v
+        do {
+          const end = util.benchmark(id, 'job')
+          v = generator.next()
+          end()
+          yield
+        } while (!v.done)
+      })(),
+    )
   },
 
   runPlayerInterval(callback, ...args) {

@@ -1,4 +1,5 @@
 import { Dimension, system, world } from '@minecraft/server'
+import { stringifyError } from 'lib/util'
 import { t } from 'lib/text'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
@@ -115,6 +116,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
             reject(e as Error)
           }
         })(),
+        `forEachRegionVectorJob ${stringifyError.stack.get(2)}`,
       )
     })
   }

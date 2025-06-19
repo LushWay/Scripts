@@ -154,9 +154,9 @@ const cmd = new Command('benchmark')
 cmd
   .string('type', true)
   .boolean('pathes', true)
-  .boolean('useChat', true)
   .boolean('sort', true)
-  .executes((ctx, type = 'timers', timerPathes = false, useChat, sort = true) => {
+  .array('output', ['form', 'chat', 'log'], true)
+  .executes((ctx, type = 'timers', timerPathes = false, sort = true, output = 'form') => {
     if (!(type in util.benchmark.results))
       return ctx.error(
         'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  '),
@@ -164,13 +164,19 @@ cmd
 
     const result = stringifyBenchmarkResult({ type: type, timerPathes, sort })
 
-    if (useChat) return ctx.reply(result)
-
-    function show() {
-      new ActionForm('Benchmark', result)
-        .addButton('Refresh', null, show)
-        .addButton('Exit', null, () => void 0)
-        .show(ctx.player)
+    switch (output) {
+      case 'form': {
+        const show = () => {
+          new ActionForm('Benchmark', result)
+            .addButton('Refresh', null, show)
+            .addButton('Exit', null, () => void 0)
+            .show(ctx.player)
+        }
+        return show()
+      }
+      case 'chat':
+        return ctx.reply(result)
+      case 'log':
+        return console.log(result)
     }
-    show()
   })

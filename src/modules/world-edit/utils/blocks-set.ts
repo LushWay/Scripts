@@ -1,9 +1,10 @@
 import { Block, BlockPermutation, Player } from '@minecraft/server'
 
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
-import { noNullable, typeIdToReadable } from 'lib'
+import { noNullable, translateTypeId } from 'lib'
 import { table } from 'lib/database/abstract'
 import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS, REPLACE_MODES } from './default-block-sets'
+import { Language } from 'lib/assets/lang'
 
 export type BlockStateWeight = [...Parameters<typeof BlockPermutation.resolve>, number]
 
@@ -155,7 +156,9 @@ export function stringifyBlocksSetRef([playerId, set]: BlocksSetRef): string {
 export function stringifyBlockWeights(targets: (undefined | ReplaceTarget | BlockPermutation | BlockStateWeight)[]) {
   return targets
     .filter(noNullable)
-    .map(e => typeIdToReadable(e instanceof BlockPermutation ? e.type.id : Array.isArray(e) ? e[0] : e.typeId))
+    .map(e =>
+      translateTypeId(e instanceof BlockPermutation ? e.type.id : Array.isArray(e) ? e[0] : e.typeId, Language.ru_RU),
+    )
     .join(', ')
 }
 

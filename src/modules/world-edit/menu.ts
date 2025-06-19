@@ -7,7 +7,7 @@ import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { ask } from 'lib/form/message'
 import { t } from 'lib/text'
-import { typeIdToReadable } from 'lib/utils/lang'
+import { translateTypeId } from 'lib/utils/lang'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { weRandomizerTool } from 'modules/world-edit/tools/randomizer'
 import {
@@ -364,14 +364,13 @@ function WEeditBlocksSetMenu(o: {
 
           ask(
             player,
-
-            'Выключенные блоки будут очищены. Список:\n' + blocksToClear.map(e => typeIdToReadable(e[0])).join('\n'),
+            'Выключенные блоки будут очищены. Список:\n' +
+              blocksToClear.map(e => translateTypeId(e[0], player.lang)).join('\n'),
             '§cОчистить',
             () => {
               setBlocksSet(
                 player.id,
                 setName,
-
                 set.filter(e => !blocksToClear.includes(e)),
               )
               WEeditBlocksSetMenu({ ...o, sets: undefined })
@@ -421,12 +420,6 @@ function WEeditBlocksSetMenu(o: {
     },
   )
 
-  /**
-   * @param {number} slot
-   * @param {string} typeId
-   * @param {Record<string, string | number | boolean> | undefined} states
-   */
-
   function addBlock(
     slot: number,
     typeId: string,
@@ -449,7 +442,7 @@ function WEeditBlocksSetMenu(o: {
       enchanted: amount > 0,
 
       amount: Math.max(amount, 1),
-      nameTag: typeIdToReadable(typeId),
+      nameTag: translateTypeId(typeId, player.lang),
       lore: [
         '',
         ...(states ? inspect(states).split('\n') : []),

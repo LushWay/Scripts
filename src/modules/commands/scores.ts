@@ -56,9 +56,15 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
       },
     })
     .sort((array, filters) => {
-      if (!filters.online) return array
-
       const online = world.getAllPlayers().map(e => e.id)
+      if (!filters.online)
+        return array.sort((a, b) => {
+          const ao = online.includes(a.displayName)
+          const bo = online.includes(b.displayName)
+          if (ao && bo) return 0
+          if (ao) return -1
+          return 1
+        })
 
       return array.filter(e => online.includes(e.displayName))
     })

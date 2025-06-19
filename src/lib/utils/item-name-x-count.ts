@@ -30,7 +30,7 @@ export function itemNameXCount(
     return {
       rawtext: [
         colorMessage,
-        { translate: lang },
+        item.nameTag ? { text: item.nameTag } : { translate: lang },
         modifierS ? { text: modifierS } : false,
         time ? { text: ` §7${time}` } : false,
       ].filter(noBoolean),

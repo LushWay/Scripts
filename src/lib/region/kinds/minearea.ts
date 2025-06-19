@@ -150,7 +150,7 @@ async function getSchedules(area: Area, dimensionType: ShortcutDimensions) {
 
     const schedule = ScheduleBlockPlace.has(location, dimensionType)
     if (schedule) schedules.push(schedule)
-  }, 2000)
+  }, 50)
   return schedules
 }
 

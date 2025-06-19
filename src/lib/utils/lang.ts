@@ -5,33 +5,22 @@ import { blockItemsLangJson, langs, Language } from '../assets/lang'
 import { sprintf } from './sprintf'
 
 /**
- * Converts any minecraft type id to human readable format, e.g. removes minecraft: prefix, replaces _ with spaces and
- * capitalizes first letter
- *
- * @deprecated Consider using {@link langToken}
- * @example
- *   typeIdToReadable('minecraft:chorus_fruit') // Chorus fruit
+ * Gets lang token of type id and translates it server side based on providen language
  *
  * @example
- *   typeIdToReadable('minecraft:cobblestone') // Cobblestone
+ *   translateTypeId('minecraft:chorus_fruit', Language.en_US) // Chorus fruit
  *
- * @param {string} typeId
+ * @example
+ *   translateTypeId('minecraft:cobblestone', Language.en_US) // Cobblestone
+ *
+ * @param typeId - Type id of block or item
  */
 
-export function typeIdToReadable(typeId: string) {
-  // Format
-  typeId = typeId.replace(/^minecraft:/, '').replace(/_(.)/g, ' $1')
-
-  const first = typeId[0]
-  if (!first) return ''
-
-  // Capitalize first letter
-  typeId = first.toUpperCase() + typeId.slice(1)
-
-  return typeId
+export function translateTypeId(typeId: string, lang: Language) {
+  return translateToken(langToken(typeId), lang)
 }
 /**
- * Gets localization name of the ItemStack
+ * Gets localization name of the ItemStack or Block
  *
  * @example
  *   const apple = new ItemStack(MinecraftItemTypes.Apple)

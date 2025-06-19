@@ -1,6 +1,6 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, typeIdToReadable } from 'lib'
+import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, translateTypeId } from 'lib'
 import { t } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
@@ -82,7 +82,7 @@ export function useBlockSelection(
     desc = 'Набор блоков ' + stringifyBlocksSetRef(selection.ref)
   }
   options = {
-    ...ChestForm.permutationToButton(dispaySource),
+    ...ChestForm.permutationToButton(dispaySource, player),
     ...options,
     callback,
   }
@@ -98,10 +98,11 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
     currentSelection &&
     'permutations' in currentSelection &&
     currentSelection.permutations[0] &&
-    typeIdToReadable(
+    translateTypeId(
       currentSelection.permutations[0] instanceof BlockPermutation
         ? currentSelection.permutations[0].type.id
         : currentSelection.permutations[0].typeId,
+      player.lang,
     )
 
   const promise = new Promise<SelectedBlock>(resolve => {
@@ -142,7 +143,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             },
             'B': {
               ...(blockBelow
-                ? ChestForm.permutationToButton(blockBelow.permutation)
+                ? ChestForm.permutationToButton(blockBelow.permutation, player)
                 : { icon: MinecraftBlockTypes.Air }),
               description: 'Нажми чтобы выбрать',
               callback: () =>
@@ -152,7 +153,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             },
             'G': {
               ...(blockFromView?.block
-                ? ChestForm.permutationToButton(blockFromView.block.permutation)
+                ? ChestForm.permutationToButton(blockFromView.block.permutation, player)
                 : { icon: MinecraftBlockTypes.Air }),
               description: 'Нажми чтобы выбрать блок на который смотришь',
               callback: () =>
@@ -175,7 +176,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             form.button({
               slot: base + blocks.length,
               icon: typeId,
-              nameTag: typeIdToReadable(typeId),
+              nameTag: translateTypeId(typeId, player.lang),
               description: 'Нажми чтобы выбрать',
               callback() {
                 resolve({ permutations: [BlockPermutation.resolve(typeId)] })

@@ -158,7 +158,12 @@ export class ShopForm {
    * @param item
    * @param cost
    */
-  itemStack(item: ItemStack, cost: Cost, texture = getAuxOrTexture(item.typeId), name = itemNameXCount(item, '')) {
+  itemStack(
+    item: ItemStack,
+    cost: Cost,
+    texture = item.typeId.includes('potion') ? getAuxTextureOrPotionAux(item) : getAuxOrTexture(item.typeId),
+    name = itemNameXCount(item, ''),
+  ) {
     const space = getFreeSpaceForItemInInventory(this.player, item)
     const canAdd = space >= item.amount
     this.product()
