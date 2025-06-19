@@ -70,8 +70,8 @@ test_patterns = [
 mode = "comment"
 return_statements.enabled = false
 function_parameters.threshold = 10
-function_complexity.threshold = 40
-file_complexity.threshold = 100
+function_complexity.threshold = 30
+file_complexity.threshold = 80
 
 [[source]]
 name = "default"
