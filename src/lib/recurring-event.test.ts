@@ -38,7 +38,7 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
       {
-        "lastRun": 1999-12-30T21:00:00.000Z,
+        "lastRun": 1999-12-31T00:00:00.000Z,
         "restoreAfterOffline": false,
       }
     `)
@@ -46,7 +46,7 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(2)
     expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
       {
-        "lastRun": 1999-12-31T21:00:00.000Z,
+        "lastRun": 2000-01-01T00:00:00.000Z,
         "restoreAfterOffline": false,
       }
     `)
@@ -61,7 +61,7 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(3)
     expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
       {
-        "lastRun": 1999-12-31T21:00:00.000Z,
+        "lastRun": 2000-01-01T00:00:00.000Z,
         "restoreAfterOffline": true,
       }
     `)
@@ -71,7 +71,7 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(4)
     expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
       {
-        "lastRun": 2000-01-01T21:00:00.000Z,
+        "lastRun": 2000-01-02T00:00:00.000Z,
         "restoreAfterOffline": false,
       }
     `)
@@ -86,7 +86,7 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(5)
     expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
       {
-        "lastRun": 2000-01-02T21:00:00.900Z,
+        "lastRun": 2000-01-03T00:00:00.900Z,
         "restoreAfterOffline": false,
       }
     `)
@@ -107,7 +107,7 @@ describe('RecurringEvent', () => {
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn.mock.lastCall?.[1]).toMatchInlineSnapshot(`
       {
-        "lastRun": 1999-12-31T21:00:00.000Z,
+        "lastRun": 2000-01-01T00:00:00.000Z,
         "restoreAfterOffline": false,
       }
     `)
@@ -139,14 +139,14 @@ describe('RecurringEvent', () => {
           "value": [],
         },
         {
-          "lastRun": 1999-12-31T21:00:00.000Z,
+          "lastRun": 2000-01-01T00:00:00.000Z,
           "restoreAfterOffline": false,
         },
       ]
     `)
 
     vi.advanceTimersByTime(1100)
-    expect(vi.getMockedSystemTime()).toMatchInlineSnapshot(`2000-01-01T21:00:00.100Z`)
+    expect(vi.getMockedSystemTime()).toMatchInlineSnapshot(`2000-01-02T00:00:00.100Z`)
     expect(fn).toHaveBeenCalledTimes(2)
     expect(fn.mock.calls[1]).toMatchInlineSnapshot(`
       [
@@ -154,7 +154,7 @@ describe('RecurringEvent', () => {
           "value": [],
         },
         {
-          "lastRun": 2000-01-01T21:00:00.000Z,
+          "lastRun": 2000-01-02T00:00:00.000Z,
           "restoreAfterOffline": false,
         },
       ]

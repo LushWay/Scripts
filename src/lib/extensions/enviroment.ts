@@ -1,6 +1,7 @@
 /* eslint-disable no-var */
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { Language } from 'lib/assets/lang'
 import { util } from '../util'
 import { expand } from './extend'
 
@@ -172,45 +173,64 @@ Object.entriesStringKeys(MinecraftEntityTypes).forEach(([k, v]) => {
 
 declare global {
   interface Date {
-    /**
-     * Converts date to format DD-MM-YYYY HH:MM:SS
-     *
-     * @param seconds Adds :SS to format
-     */
-    format(seconds?: boolean): string
+    /** Converts date to format DD-MM-YYYY HH:MM:SS */
+    format(lang?: Language): string
 
     /**
      * Converts date to format DD-MM-YYYY
      *
      * @example
-     *   const date = new Date()
-     *   date.toYYYYMMDD() 2024-12-04
+     *   new Date().toYYYYMMDD() === '04-12-2025'
+     *   new Date(Language.ru_RU).toYYYYMMDD() === '04-12-2025'
      */
-    toYYYYMMDD(): string
+    toYYYYMMDD(lang?: Language): string
+
+    /** Converts date to format HH:MM */
+    toHHMM(lang?: Language): string
 
     /**
-     * Converts date to format HH:MM
+     * Converts date to format HH:MM:SS
      *
-     * @param seconds Adds :SS to format
+     * @example
+     *   new Date().toYYMMSS() === '00:12:31'
+     *   new Date(Language.ru_RU).toYYMMSS() === '03:12:31'
      */
-    toHHMM(seconds?: boolean): string
+    toHHMMSS(lang?: Language): string
   }
 }
 
-Date.prototype.toYYYYMMDD = function () {
-  const date = new Date(this)
-  date.setHours(date.getHours() + 3)
-  return date.toLocaleDateString('en-US', { dateStyle: 'medium' }).split('.').reverse().join('-')
+function getTimezone(language?: Language) {
+  switch (language) {
+    case Language.ru_RU:
+      return 3
+    default:
+      return 0
+  }
 }
 
-Date.prototype.toHHMM = function () {
+Date.prototype.toYYYYMMDD = function (lang) {
+  // Ignore lang support and timezone for now. Maybe use date.toLocaleDateString in future
   const date = new Date(this)
-  date.setHours(date.getHours() + 3)
+  date.setHours(date.getHours() + getTimezone(lang))
+  const year = date.getFullYear()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  return `${day}-${month}-${year}`
+}
+
+Date.prototype.toHHMM = function (lang) {
+  const date = new Date(this)
+  date.setHours(date.getHours() + getTimezone(lang))
   const hours = date.getHours().toString().padStart(2, '0')
   const minutes = date.getMinutes().toString().padStart(2, '0')
-  return hours + ':' + minutes
+  return `${hours}:${minutes}`
 }
 
-Date.prototype.format = function () {
-  return this.toHHMM() + ' ' + this.toYYYYMMDD()
+Date.prototype.toHHMMSS = function (lang) {
+  const seconds = this.getSeconds().toString().padStart(2, '0')
+  return `${this.toHHMM(lang)}:${seconds}`
+}
+
+Date.prototype.format = function (lang) {
+  return `${this.toHHMM(lang)} ${this.toYYYYMMDD()}`
 }

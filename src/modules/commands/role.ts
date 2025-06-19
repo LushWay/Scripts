@@ -49,16 +49,18 @@ function roleMenu(player: Player) {
       sort: {
         name: 'Сортировать по',
         value: [
+          ['online', '§bонлайну'],
           ['role', '§aролям'],
           ['join date', '§6дате входа'],
         ],
       },
     })
     .sort((keys, filters) => {
-      if (filters.sort === 'role') {
+      if (filters.sort === 'role' || filters.sort === 'online') {
+        const online = world.getAllPlayers().map(e => e.id)
         return keys
           .sort((a, b) => FULL_HIERARCHY.indexOf(a[1].role) - FULL_HIERARCHY.indexOf(b[1].role))
-          .filter(key => key[0] !== player.id)
+          .filter(key => (key[0] !== player.id && filters.sort === 'online' ? online.includes(key[0]) : true))
       } else return keys
     })
     .addCustomButtonBeforeArray(function (this, form, _, back) {

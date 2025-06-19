@@ -29,23 +29,6 @@ interface StoredItem {
   custom: { chances: number[]; apply: (item: ItemStack, result: number) => void }[]
 }
 
-new Command('loot')
-  .setPermissions('curator')
-  .string('lootTableName')
-  .executes((ctx, lootTableName) => {
-    const lootTable = LootTable.instances.get(lootTableName)
-    if (typeof lootTable === 'undefined')
-      return ctx.error(
-        `${lootTableName} - unknown loot table. All tables:\n${[...LootTable.instances.keys()].join('\n')}`,
-      )
-
-    const block = ctx.player.dimension.getBlock(ctx.player.location)?.below()
-    if (!block) return ctx.error('No block under feats')
-    const inventory = block.getComponent('inventory')
-    if (!inventory?.container) return ctx.error('No inventory in block')
-    lootTable.fillContainer(inventory.container)
-  })
-
 type PreparedItems = { item: ItemStack; weight: number }[]
 
 export class Loot {

@@ -15,19 +15,51 @@ type OptionsModifiers = 'error' | 'warn' | 'header'
 interface MultiStatic {
   raw: (text: TSA, ...units: (string | RawText | RawMessage)[]) => RawText
   roles: (text: TSA, ...players: Player[]) => Text
-  /** Example: t.badge`Some text ${number}` */
-  badge: (text: TSA, n: number) => Text
+
+  /**
+   * @example
+   *   t.badge`Some text ${3}` -> Some text (3)
+   */
+  unreadBadge: (text: TSA, n: number) => Text
+
+  /**
+   * @example
+   *   t.size(3) -> ' (3)', t.size(0) -> ''
+   */
+  size: (n: number) => Text
+
+  /**
+   * @example
+   *   t.num`Было сломано ${n} ${['блок', 'блока', 'блоков']}` -> "Было сломано 10 блоков"
+   */
   num: (text: TSA, n: number, plurals: Plurals) => Text
 
+  /**
+   * @example
+   *   t.time(3000) -> "3 секунды"
+   */
   time(time: number): Text
+  /**
+   * @example
+   *   t.time`Прошло ${3000}` -> "Прошло 3 секунды"
+   */
   time(text: TSA, time: number): Text
 
-  options: (options: ColorizingOptions) => Multi
+  /**
+   * @example
+   *   t.time(3000) -> "00:00:03"
+   *   t.time(ms.from('min', 32) + 1000) -> "00:32:01"
+   *   t.time(ms.from('day', 1) +  ms.from('min', 32) + 1000) -> "1 день, 00:32:01"
+   *   t.time(ms.from('day', 10000) +  ms.from('min', 32) + 1000) -> "10000 дней, 00:32:01"
+   */
+  timeHHMMSS(time: number): Text
+
+  options: (options: ColorOptions) => Multi
 }
 
 export declare namespace Text {
   export type Function = Fn
-  export type Optiosn = ColorizingOptions
+  export type Optiosn = ColorOptions
   export type Static = Multi
 }
 
@@ -45,13 +77,15 @@ export function textTable(table: Record<string, unknown>, join = true, twoColors
 
 export const t = createGroup()
 
-function createGroup(options: ColorizingOptions = {}, modifier = false) {
+function createGroup(options: ColorOptions = {}, modifier = false) {
   const t = createSingle(options)
   t.roles = createSingle({ roles: true, ...options })
-  t.badge = createBadge(options)
+  t.unreadBadge = createBadge(options)
   t.num = createNum(options)
   t.time = createOverload(createTime(options), (t, time: number) => t`${time}`)
   t.raw = createRaw(options)
+  t.timeHHMMSS = createRemaining(options)
+  t.size = createSize(t)
 
   if (!modifier) {
     t.header = createGroup({ text: '§6', ...options, unit: '§f§l' }, true)
@@ -62,7 +96,27 @@ function createGroup(options: ColorizingOptions = {}, modifier = false) {
   return t
 }
 
-function createRaw(options: ColorizingOptions): (text: TSA, ...units: (string | RawText)[]) => RawText {
+const dayMs = ms.from('day', 1)
+function createRemaining(options: ColorOptions): MultiStatic['timeHHMMSS'] {
+  const { text, num } = addDefaultsToOptions(options)
+  return n => {
+    const date = new Date(n)
+    if (n >= dayMs) {
+      const rem = ms.remaining(n, { converters: ['day'], friction: 0 })
+      return `${num}${rem.value} ${text}${rem.type}, ${num}${date.toHHMMSS()}${text}`
+    }
+    return num + date.toHHMMSS() + text
+  }
+}
+
+function createSize(t: Fn): MultiStatic['size'] {
+  return s => {
+    if (s === 0) return ''
+    return t` (${s})`
+  }
+}
+
+function createRaw(options: ColorOptions): (text: TSA, ...units: (string | RawText)[]) => RawText {
   options = addDefaultsToOptions(options)
   return (text, ...units) => {
     const texts = text.slice()
@@ -91,7 +145,7 @@ function createRaw(options: ColorizingOptions): (text: TSA, ...units: (string | 
 }
 
 function createSingle(
-  options?: ColorizingOptions,
+  options?: ColorOptions,
   fn = (text: string, unit: unknown, i: number, units: unknown[]) => text + textUnitColorize(unit, options),
 ) {
   const { text: textColor } = addDefaultsToOptions(options)
@@ -103,7 +157,7 @@ function createSingle(
   } as Fn & Multi
 }
 
-function createBadge(options: ColorizingOptions): (text: TSA, n: number) => Text {
+function createBadge(options: ColorOptions): (text: TSA, n: number) => Text {
   return createSingle(options, (text, unit) => {
     if (typeof unit !== 'number') return text + textUnitColorize(unit, options)
     if (unit > 0) return `${text}§7(${options.num ?? '§c'}${unit}§7)`
@@ -111,7 +165,7 @@ function createBadge(options: ColorizingOptions): (text: TSA, n: number) => Text
   })
 }
 
-function createNum(options: ColorizingOptions): (text: TSA, n: number, plurals: Plurals) => Text {
+function createNum(options: ColorOptions): (text: TSA, n: number, plurals: Plurals) => Text {
   return createSingle(options, (text, unit, i, units) => {
     if (isPlurals(unit)) {
       const n = units[i - 1]
@@ -137,12 +191,13 @@ function isTSA(arg: unknown): arg is TemplateStringsArray {
   return Array.isArray(arg) && 'raw' in arg
 }
 
-function createTime(options: ColorizingOptions): (text: TSA, time: number) => Text {
-  return createSingle(options, (text, unit) => {
-    if (typeof unit !== 'number') return text + textUnitColorize(unit, options)
+function createTime(options: ColorOptions): (text: TSA, time: number) => Text {
+  const { text } = addDefaultsToOptions(options)
+  return createSingle(options, (prev, unit) => {
+    if (typeof unit !== 'number') return prev + textUnitColorize(unit, options)
 
     const time = ms.remaining(unit)
-    return text + `${textUnitColorize(time.value, options)} ${addDefaultsToOptions(options).text}${time.type}`
+    return prev + `${textUnitColorize(time.value, options)} ${text}${time.type}`
   })
 }
 
@@ -152,19 +207,19 @@ function isPlurals(unit: unknown): unit is Plurals {
   )
 }
 
-function addDefaultsToOptions(options: ColorizingOptions = {}): Required<ColorizingOptions> {
+function addDefaultsToOptions(options: ColorOptions = {}): Required<ColorOptions> {
   const { unit = '§f', text = '§7', num = '§6', roles = false } = options
   return { unit, text, roles, num }
 }
 
-export interface ColorizingOptions {
+export interface ColorOptions {
   unit?: string
   num?: string
   text?: string
   roles?: boolean
 }
 
-export function textUnitColorize(unit: unknown, options: ColorizingOptions = {}) {
+export function textUnitColorize(unit: unknown, options: ColorOptions = {}) {
   const { unit: unitColor, num } = addDefaultsToOptions(options)
   switch (typeof unit) {
     case 'string':

@@ -20,6 +20,7 @@ export class Leaderboard {
   static entityId = CustomEntityTypes.FloatingText
 
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
+    // TODO Localize somehow?
     if (scoreboardId.endsWith('Time')) {
       return t.time`${score}`
     } else if (scoreboardId.endsWith('Date')) {

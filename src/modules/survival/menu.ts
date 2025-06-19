@@ -1,10 +1,10 @@
 import { ActionForm, BUTTON, FormCallback } from 'lib'
+import { achievementsForm, achievementsFormName } from 'lib/achievements/command'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { questsMenu } from 'lib/quest/menu'
-import { achievementsForm } from 'lib/achievements/command'
 import { Menu } from 'lib/rpg/menu'
 import { playerSettingsMenu } from 'lib/settings'
 import { t } from 'lib/text'
@@ -38,8 +38,10 @@ Menu.open = player => {
       Anarchy.portal?.teleport(player)
     })
     .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', back)
-    .addButton(t.badge`Задания ${player.database.quests?.active.length ?? 0}`, 'textures/ui/sidebar_icons/genre', () =>
-      questsMenu(player, back),
+    .addButton(
+      t.unreadBadge`Задания ${player.database.quests?.active.length ?? 0}`,
+      'textures/ui/sidebar_icons/genre',
+      () => questsMenu(player, back),
     )
 
   if (player.database.inv === 'anarchy') {
@@ -54,7 +56,7 @@ Menu.open = player => {
     .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
     .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, back))
     .addButton('§bВики', BUTTON.search, wiki.show)
-    .addButton('§eДостижения', 'textures/blocks/gold_block', achievementsForm)
+    .addButton(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
     .addButton('§7Настройки', BUTTON.settings, () => playerSettingsMenu(player, back))
 
   return form

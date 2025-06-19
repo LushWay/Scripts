@@ -34,9 +34,7 @@ export function WEmenu(player: Player, body = '') {
   const we = WorldEdit.forPlayer(player)
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  form.addButton(t.options({ num: '§f' }).badge`§3Наборы блоков ${getOwnBlocksSetsCount(player.id)}`, () =>
-    WEblocksSetsMenu(player),
-  )
+  form.addButton(t`§3Наборы блоков${t.size(getOwnBlocksSetsCount(player.id))}`, () => WEblocksSetsMenu(player))
 
   const toolButtons = WorldEditTool.tools.map(tool => ({ tool, buttonText: tool.getMenuButtonName(player) }))
   const inactiveTools = toolButtons.filter(e => e.buttonText.startsWith('§8'))
@@ -44,7 +42,7 @@ export function WEmenu(player: Player, body = '') {
 
   addToForm(activeTools)
 
-  form.addButton(t.options({ num: '§f' }).badge`§3Отмена действий ${we.history.length}`, () => WEundoRedoMenu(player))
+  form.addButton(t`§3Отмена действий${t.size(we.history.length)}`, () => WEundoRedoMenu(player))
   form.addButton('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
 
   addToForm(inactiveTools)
@@ -191,7 +189,7 @@ function WEotherPlayersBlockSetsMenu(player: Player, back: VoidFunction) {
       const name = Player.name(otherPlayerId) ?? otherPlayerId
 
       return [
-        filters.blockCount ? `${name}${t.badge` ${Object.keys(blocksSets).length}`}` : name,
+        filters.blockCount ? `${name} ${t.size(Object.keys(blocksSets).length)}` : name,
         () => {
           WEplayerBlockSetMenu(player, otherPlayerId, blocksSets, () => WEotherPlayersBlockSetsMenu(player, back))
         },

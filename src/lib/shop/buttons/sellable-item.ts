@@ -59,7 +59,7 @@ export function createSellableItem({
       const bodyFn = is(player.id, 'techAdmin') ? adminBody : body
       form.body = bodyFn
       form.section(
-        t.badge`§3Продать ${amount}`,
+        t`§3Продать${t.size(amount)}`,
         form => {
           form.body = bodyFn
           const addSell = createSell(getCount, getBuy, type, form, db, maxCount, aux)

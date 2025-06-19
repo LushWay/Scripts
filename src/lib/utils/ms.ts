@@ -28,7 +28,10 @@ export class ms {
    */
   static remaining(
     ms: number,
-    { converters: converterTypes = ['sec', 'min', 'hour', 'day'] }: { converters?: Time[] } = {},
+    {
+      converters: converterTypes = ['sec', 'min', 'hour', 'day'],
+      friction: frictionOverride,
+    }: { converters?: Time[]; friction?: number } = {},
   ): { value: string; type: string } {
     const converters = converterTypes.map(type => this.converters[type]).sort((a, b) => b.time - a.time)
     for (const { time, friction = 0, plurals } of converters) {
@@ -36,7 +39,7 @@ export class ms {
       if (~~value >= 1) {
         // Replace all 234.0 values to 234
         const parsedTime = value
-          .toFixed(friction)
+          .toFixed(frictionOverride ?? friction)
           .replace(/(\.[1-9]*)0+$/m, '$1')
           .replace(/\.$/m, '')
 

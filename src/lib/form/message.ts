@@ -3,12 +3,13 @@ import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
 import { MaybeRawText } from 'lib/text'
 import { util } from '../util'
 import { showForm } from './utils'
+import { NewFormCallback } from './new'
 
 interface IMessageFormButton {
   /** Text that gets displayed on the button */
   text: string
   /** What gets called when this gets clicked */
-  callback?: VoidFunction
+  callback?: NewFormCallback
 }
 
 export class MessageForm {
@@ -51,7 +52,7 @@ export class MessageForm {
    * @param text Text to show on this button
    * @param callback What happens when this button is clicked
    */
-  setButton1(text: string, callback: VoidFunction): MessageForm {
+  setButton1(text: string, callback: NewFormCallback): MessageForm {
     this.button1 = { text: text, callback: callback }
     this.form.button2(text)
     return this
@@ -68,7 +69,7 @@ export class MessageForm {
    * @param text Text to show on this button
    * @param callback What happens when this button is clicked
    */
-  setButton2(text: string, callback: VoidFunction): MessageForm {
+  setButton2(text: string, callback: NewFormCallback): MessageForm {
     this.button2 = { text: text, callback: callback }
     this.form.button1(text)
     return this
@@ -84,7 +85,7 @@ export class MessageForm {
     if (response === false || !(response instanceof MessageFormResponse)) return
 
     const callback = this[response.selection ? 'button1' : 'button2']?.callback
-    if (callback) util.catch(callback)
+    if (callback) util.catch(() => callback(player) as void)
   }
 }
 

@@ -197,7 +197,7 @@ export class Boss {
     } else if (this.location.valid) {
       this.floatingText.update(
         Vec.add(this.location, { x: 0, y: 2, z: 0 }),
-        `${this.options.place.name}\n${t.time`До появления\n§7осталось ${this.options.respawnTime - (Date.now() - db.date)}`}`,
+        t`${this.options.place.name}\nДо появления\nосталось ${t.timeHHMMSS(this.options.respawnTime - (Date.now() - db.date))}`,
       )
     }
   }

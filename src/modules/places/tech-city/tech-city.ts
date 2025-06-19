@@ -71,11 +71,6 @@ class TechCityBuilder extends City {
         .itemStack(BaseItem.itemStack)
         .weight('1%').build,
     )
-
-    new Command('techcity').setPermissions('techAdmin').executes(ctx => {
-      ctx.player.container?.addItem(normal.createKeyItemStack())
-      ctx.player.container?.addItem(donut.createKeyItemStack())
-    })
   }
 }
 

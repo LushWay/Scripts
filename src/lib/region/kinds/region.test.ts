@@ -6,37 +6,34 @@ import { SphereArea } from '../areas/sphere'
 import { Region } from './region'
 
 describe('Region', () => {
-  beforeEach(() => ((Region.regions = []), TEST_clearDatabase(RegionDatabase)))
-  afterEach(() => (Region.regions = []))
+  beforeEach(() => {
+    Region.regions = []
+    TEST_clearDatabase(RegionDatabase)
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(0))
+  })
+  afterEach(() => {
+    Region.regions = []
+    TEST_clearDatabase(RegionDatabase)
+    vi.useRealTimers()
+  })
 
   it('should create region', () => {
     expect(Region.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld'))).toBeInstanceOf(Region)
   })
 
   it('should create regions with different ids', () => {
-    vi.useFakeTimers()
     vi.setSystemTime(new Date(0))
     class T extends Region {}
     registerSaveableRegion('t', T)
+    const area = new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')
 
-    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
-      `"t-s-0-Jan 1, 1970-06:00"`,
-    )
-    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
-      `"t-s-0-Jan 1, 1970-06:00-0"`,
-    )
-    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
-      `"t-s-0-Jan 1, 1970-06:00-1"`,
-    )
-    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
-      `"t-s-0-Jan 1, 1970-06:00-2"`,
-    )
-    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
-      `"t-s-0-Jan 1, 1970-06:00-3"`,
-    )
-    expect(T.create(new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')).id).toMatchInlineSnapshot(
-      `"t-s-0-Jan 1, 1970-06:00-4"`,
-    )
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-0"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-1"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-2"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-3"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-4"`)
   })
 
   it('should return owner name', () => {

@@ -15,12 +15,12 @@ export function clanMenu(player: Player, back?: VoidFunction) {
 
   if (clan) {
     return [
-      t.badge`§6Ваш клан ${clan.isOwner(player.id) ? clan.db.joinRequests.length : 0}`,
+      t.unreadBadge`§6Ваш клан ${clan.isOwner(player.id) ? clan.db.joinRequests.length : 0}`,
       () => inClanMenu(player, clan, back),
     ] as const
   } else {
     const invitedTo = getInvites(player.id)
-    return [t.badge`§6Кланы ${invitedTo.length}`, () => selectOrCreateClanMenu(player, back)] as const
+    return [t.unreadBadge`§6Кланы ${invitedTo.length}`, () => selectOrCreateClanMenu(player, back)] as const
   }
 }
 
@@ -40,7 +40,7 @@ function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
     .addCustomButtonBeforeArray(form => {
       const invitedTo = getInvites(player.id)
       if (invitedTo.length)
-        form.addButton(t.badge`§3Приглашения ${invitedTo.length}`, () => {
+        form.addButton(t.unreadBadge`§3Приглашения ${invitedTo.length}`, () => {
           new ArrayForm('Приглашения', invitedTo)
             .button(clan => [getClanName(clan), () => clan.add(player)])
             .back(() => selectOrCreateClanMenu(player, back))
@@ -94,24 +94,24 @@ function createClan(player: Player, back: VoidFunction, name?: string, shortname
 function inClanMenu(player: Player, clan: Clan, back?: VoidFunction) {
   const form = new ActionForm(
     'Меню клана',
-    textTable({ 'Имя клана': clan.db.name, 'Дата создания': clan.createdAt.toYYYYMMDD() }),
+    textTable({ 'Имя клана': clan.db.name, 'Дата создания': clan.createdAt.toYYYYMMDD(player.lang) }),
   ).addButtonBack(back)
 
   const selfback = () => inClanMenu(player, clan, back)
   const isOwner = clan.isOwner(player.id)
 
-  form.addButton(t.badge`§7Базы клана ${0}`, () => {
+  form.addButton(t.unreadBadge`§7Базы клана ${0}`, () => {
     player.fail('СКОРО')
   })
 
   form.addButton(t`Участники (${clan.db.members.length})`, () => clanMembers(player, clan, selfback))
 
   if (isOwner) {
-    form.addButton(t.badge`Заявки на вступление ${clan.db.joinRequests.length}`, () =>
+    form.addButton(t.unreadBadge`Заявки на вступление ${clan.db.joinRequests.length}`, () =>
       clanJoinRequests(player, clan, back),
     )
 
-    form.addButton(t.badge`Приглашения ${clan.db.invites.length}`, () => clanInvites(player, clan, selfback))
+    form.addButton(t.unreadBadge`Приглашения ${clan.db.invites.length}`, () => clanInvites(player, clan, selfback))
     form.addButtonAsk('§cУдалить клан', '§cУдалить', () => clan.delete())
   }
   form.show(player)

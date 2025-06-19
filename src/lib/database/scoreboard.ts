@@ -96,37 +96,31 @@ expand(ScoreboardObjective.prototype, {
   },
 })
 
-const players: Record<string, { player: Player; proxy: unknown }> = {}
+const players: Record<string, { proxy: Player['scores'] }> = {}
 Reflect.defineProperty(Player.prototype, 'scores', {
   configurable: false,
   enumerable: true,
   get() {
     const player = this as Player
+    return ScoreboardDB.getOrCreateProxyFor(player.id)
+  },
+})
 
-    const scoreboardPlayer = players[player.id]
+export class ScoreboardDB {
+  static getOrCreateProxyFor(playerId: string) {
+    const scoreboardPlayer = players[playerId]
     if (scoreboardPlayer) {
-      let valid = false
-      try {
-        valid = scoreboardPlayer.player.isValid
-      } catch {}
-
-      if (!valid) scoreboardPlayer.player = player
-
       return scoreboardPlayer.proxy
     } else {
       const obj: (typeof players)[string] = {
-        player,
         proxy: new Proxy(
-          {
-            leafs: 0,
-            money: 0,
-          },
+          { leafs: 0, money: 0 },
           {
             set(_, p, newValue: number) {
               if (typeof p === 'symbol')
                 throw new Error(`Symbol objectives to set are not accepted, recieved ${p.description}`)
 
-              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(obj.player.id, Math.round(newValue))
+              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(playerId, Math.round(newValue))
               return true
             },
             get(_, p) {
@@ -134,21 +128,19 @@ Reflect.defineProperty(Player.prototype, 'scores', {
                 throw new Error(`Symbol objectives to get are not accepted, recieved ${p.description}`)
 
               try {
-                return ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(obj.player.id) ?? 0
+                return ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(playerId) ?? 0
               } catch (e) {
                 return 0
               }
             },
           },
-        ),
+        ) as Player['scores'],
       }
 
-      return (players[player.id] = obj).proxy
+      return (players[playerId] = obj).proxy
     }
-  },
-})
+  }
 
-export class ScoreboardDB {
   static objectives: Record<string, ScoreboardObjective> = {}
 
   static objective(name: string, displayName = name) {

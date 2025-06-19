@@ -1,10 +1,11 @@
 import 'lib/command/index'
 
 import { Player } from '@minecraft/server'
+import { ms } from 'lib'
+import { TEST_createPlayer } from 'test/utils'
 import { setRole } from './roles'
 import './text'
 import { t, textTable } from './text'
-import { TEST_createPlayer } from 'test/utils'
 
 let player: Player
 beforeEach(() => {
@@ -85,27 +86,45 @@ describe('text', () => {
   })
 
   it('should stringify in error mode with nested options', () => {
-    expect(t.error)
+    expect(t.error`Some ${'with error'} ${4} ${TEST_createPlayer()}`).toMatchInlineSnapshot(
+      `"§cSome §fwith error§c §74§c §fTest player name§c"`,
+    )
   })
 
   it('should work with time', () => {
+    expect(t.time(3000)).toMatchInlineSnapshot(`"§7§f3 §7секунды§7"`)
+
     expect(t.time`Прошло ${0}`).toMatchInlineSnapshot(`"§7Прошло §f0 §7миллисекунд§7"`)
     expect(t.time`Прошло ${3000}`).toMatchInlineSnapshot(`"§7Прошло §f3 §7секунды§7"`)
     expect(t.time`Прошло ${300000}`).toMatchInlineSnapshot(`"§7Прошло §f5 §7минут§7"`)
+
+    expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§600:00:03§7"`)
+    expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
+      `"§604:32:01§7"`,
+    )
+    expect(t.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§f100 §7дней, §600:00:03§7"`)
+
+    expect(t.error.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§700:00:03§c"`)
+    expect(t.error.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§f100 §cдней, §700:00:03§c"`)
 
     // @ts-expect-error
     expect(t.time`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
   })
 
   it('should work with badge', () => {
-    expect(t.badge`Письма ${-3}`).toMatchInlineSnapshot(`"§7Письма§7"`)
-    expect(t.badge`Письма ${0}`).toMatchInlineSnapshot(`"§7Письма§7"`)
-    expect(t.badge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §7(§c3§7)§7"`)
-    expect(t.badge`${3}`).toMatchInlineSnapshot(`"§7§7(§c3§7)§7"`)
-    expect(t.badge`${0}`).toMatchInlineSnapshot(`"§7§7"`)
+    expect(t.unreadBadge`Письма ${-3}`).toMatchInlineSnapshot(`"§7Письма§7"`)
+    expect(t.unreadBadge`Письма ${0}`).toMatchInlineSnapshot(`"§7Письма§7"`)
+    expect(t.unreadBadge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §7(§c3§7)§7"`)
+    expect(t.unreadBadge`${3}`).toMatchInlineSnapshot(`"§7§7(§c3§7)§7"`)
+    expect(t.unreadBadge`${0}`).toMatchInlineSnapshot(`"§7§7"`)
+
+    expect(t.size(3)).toMatchInlineSnapshot(`"§7 (§63§7)§7"`)
+    expect(t.size(0)).toMatchInlineSnapshot(`""`)
+    expect(t.error.size(3)).toMatchInlineSnapshot(`"§c (§73§c)§c"`)
+    expect(t.error.size(0)).toMatchInlineSnapshot(`""`)
 
     // @ts-expect-error
-    expect(t.badge`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
+    expect(t.unreadBadge`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
   })
 
   it('should work with rawTxt', () => {

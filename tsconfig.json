@@ -31,7 +31,8 @@
       "ES2020.Promise",
       "ES2020.String",
       "ES2020.Symbol.WellKnown",
-      "ES2021.String"
+      "ES2021.String",
+      "ESNext.Intl"
     ],
     "types": ["./src/test/vitest"],
     "target": "ES2020",

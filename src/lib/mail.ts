@@ -90,7 +90,7 @@ export class Mail {
    * @param {string} playerId - Id of the player to get messages from
    */
   static unreadBadge(playerId: string) {
-    return t.badge`${this.getUnreadMessagesCount(playerId)}`
+    return t.unreadBadge`${this.getUnreadMessagesCount(playerId)}`
   }
 
   /**

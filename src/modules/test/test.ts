@@ -16,6 +16,7 @@ import {
   ChestForm,
   DatabaseUtils,
   FormNpc,
+  LootTable,
   Mail,
   Region,
   RoadRegion,
@@ -69,6 +70,22 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  loot(ctx) {
+    const lootTableName = ctx.args[1] ?? ''
+    const lootTable = LootTable.instances.get(lootTableName)
+    if (typeof lootTable === 'undefined')
+      return ctx.error(
+        `${lootTableName} - unknown loot table. All tables:\n${[...LootTable.instances.keys()].join('\n')}`,
+      )
+
+    const b = ctx.player.dimension.getBlock(ctx.player.location)
+    const block = b?.typeId === MinecraftBlockTypes.Chest ? b : b?.below()
+    if (!block) return ctx.error('No block under feet')
+    const inventory = block.getComponent('inventory')
+    if (!inventory?.container) return ctx.error('No inventory in block')
+    lootTable.fillContainer(inventory.container)
+  },
+
   async breakMine(ctx) {
     const regions = MineareaRegion.getManyAt(ctx.player)
     for (const region of regions) {

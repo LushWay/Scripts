@@ -385,7 +385,7 @@ export function worldSettingsMenu(player: Player) {
       if (option.required && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.addButton(`${group[SETTINGS_GROUP_NAME] ?? groupId} ${t.error.badge`${unsetCount}`}`, () => {
+    form.addButton(`${group[SETTINGS_GROUP_NAME] ?? groupId}${t.error.size(unsetCount)}`, () => {
       settingsGroupMenu(player, groupId, false)
     })
   }

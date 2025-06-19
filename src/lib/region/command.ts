@@ -112,7 +112,7 @@ function regionForm(player: Player) {
     }
 
     for (const type of regionTypes) {
-      f.button(t`${type.name} ${t.badge`${type.region.getAll().length}`}`, () =>
+      f.button(t`${type.name}${t.size(type.region.getAll().length)}`, () =>
         regionList(player, type.region, type.creatable, type.displayName),
       )
     }

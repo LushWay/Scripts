@@ -67,7 +67,7 @@ function substractMaterials(a: Readonly<Record<string, number>>, b: Readonly<Rec
 export function getSafeFromRottingTime(base: BaseRegion) {
   const time = substractMaterials(base.ldb.materials, base.ldb.barrel)
   if (time === 0) return '§cскоро начнется гниение'
-  return t.time(time * takeMaterialsTime)
+  return t.timeHHMMSS(time * takeMaterialsTime)
 }
 
 function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) {
@@ -82,7 +82,7 @@ function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) 
 
   const form = new ActionForm(
     'Гниение базы',
-    t.raw`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${t.time(takeMaterialsCooldown.getRemainingTime(base.id))}`,
+    t.raw`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${t.timeHHMMSS(takeMaterialsCooldown.getRemainingTime(base.id))}`,
   ).addButtonBack(back)
 
   form.show(player)

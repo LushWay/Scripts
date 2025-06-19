@@ -2,6 +2,7 @@ import { Player, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { BUTTON } from 'lib/form/utils'
 import { t } from 'lib/text'
+import { NewFormCallback } from './new'
 
 /**
  * Creates select player menu
@@ -45,12 +46,12 @@ export function createSelectPlayerMenu(
       })
       .addCustomButtonBeforeArray(form => {
         if (selected.length) {
-          form.addButton(t.badge`§3Убрать выделение ${selected.length}`, BUTTON['-'], () => {
+          form.addButton(`§3Убрать выделение${t.size(selected.length)}`, BUTTON['-'], () => {
             selected.splice(0, selected.length)
             callback()
           })
         } else {
-          form.addButton(t.badge`§3Выбрать всех ${players.length}`, BUTTON['+'], () => {
+          form.addButton(`§3Выбрать всех${t.size(players.length)}`, BUTTON['+'], () => {
             selected.splice(0, selected.length, ...getAllPlayersSelected())
             callback()
           })
@@ -92,7 +93,7 @@ function getPlayersForSelectMenu(offline = true) {
 export function selectPlayer(
   player: Player,
   reason: string,
-  back?: VoidFunction,
+  back?: NewFormCallback,
 ): Promise<{ id: string; name: string; player?: Player }> {
   return new Promise(resolve => {
     const onlinePlayers = world.getAllPlayers()

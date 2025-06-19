@@ -52,7 +52,7 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
 
 new Command('loottable')
   .setPermissions('techAdmin')
-  .setDescription('Просмотр таблицы лута')
+  .setDescription('Просмотр содержимого таблиц лута')
   .executes(ctx => {
     lootTables(ctx.player)
   })
