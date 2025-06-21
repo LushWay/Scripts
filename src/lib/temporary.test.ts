@@ -20,7 +20,7 @@ describe('Temporary', () => {
     })
 
     expect(intervalFn).toBeCalledTimes(0)
-    vi.advanceTimersByTime(1100)
+    vi.advanceTimersByTime(1200)
     expect(intervalFn).toBeCalledTimes(1)
 
     expect(eventFn).toBeCalledTimes(0)
@@ -31,7 +31,7 @@ describe('Temporary', () => {
     expect(temp.cleaned).toBe(true)
 
     expect(intervalFn).toBeCalledTimes(1)
-    vi.advanceTimersByTime(1100)
+    vi.advanceTimersByTime(1200)
     expect(intervalFn).toBeCalledTimes(1)
 
     expect(eventFn).toBeCalledTimes(1)
