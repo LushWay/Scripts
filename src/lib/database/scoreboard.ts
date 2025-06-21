@@ -2,8 +2,6 @@ import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecra
 import { expand } from 'lib/extensions/extend'
 import { capitalize } from 'lib/util'
 
-type LushWayGameModes = 'anarchy'
-
 declare module '@minecraft/server' {
   namespace ScoreNames {
     type Stat =
@@ -16,11 +14,11 @@ declare module '@minecraft/server' {
       | 'kills'
       | 'deaths'
 
-    type OnlineTime = `${'total' | LushWayGameModes}OnlineTime`
+    type GameModes = 'anarchy'
+
+    type OnlineTime = `${'total' | GameModes}OnlineTime`
 
     type Date = `${'lastSeen' | 'join'}Date`
-
-    type GameModes = 'anarchy'
 
     type GameModesStat = `${GameModes}${Capitalize<Stat | Date>}`
 
@@ -42,7 +40,6 @@ export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreNam
   deaths: 'Смертей',
   raid: 'Рейд-блок',
   totalOnlineTime: 'Онлайн всего',
-  anarchyOnlineTime: 'Онлайн на анархии',
   blocksPlaced: 'Блоков поставлено',
   blocksBroken: 'Блоков сломано',
   fireworksLaunched: 'Фейрверков запущено',
@@ -52,6 +49,7 @@ export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreNam
   joinTimes: 'Всего входов на сервер',
   joinDate: 'Время первого входа',
 
+  anarchyOnlineTime: 'Онлайн на анархии',
   anarchyBlocksPlaced: 'Блоков поставлено',
   anarchyBlocksBroken: 'Блоков сломано',
   anarchyFireworksLaunched: 'Фейрверков запущено',
@@ -79,12 +77,12 @@ const statScores: Record<ScoreNames.Stat, string> = {
   deaths: '',
 }
 
-const scorebaordStatNames = Object.keys(statScores)
+const scoreboardStatNames = Object.keys(statScores)
 export const scoreboardObjectiveNames = {
-  stats: scorebaordStatNames,
-  gameModeStats: scorebaordStatNames
+  stats: scoreboardStatNames,
+  gameModeStats: scoreboardStatNames
     .map(e => `anarchy${capitalize(e)}`)
-    .concat(scorebaordStatNames) as ScoreNames.GameModesStat[],
+    .concat(scoreboardStatNames) as ScoreNames.GameModesStat[],
 }
 
 const untypedDisplayNames: Record<string, string> = scoreboardDisplayNames
@@ -107,6 +105,10 @@ Reflect.defineProperty(Player.prototype, 'scores', {
 })
 
 export class ScoreboardDB {
+  static defineName(id: string, name: string) {
+    untypedDisplayNames[id] = name
+  }
+
   static getOrCreateProxyFor(playerId: string) {
     const scoreboardPlayer = players[playerId]
     if (scoreboardPlayer) {
@@ -141,13 +143,14 @@ export class ScoreboardDB {
     }
   }
 
-  static objectives: Record<string, ScoreboardObjective> = {}
+  private static objectives = new Map<string, ScoreboardObjective>()
 
-  static objective(name: string, displayName = name) {
-    if (this.objectives[name]) return this.objectives[name]
-
-    const objective = (this.objectives[name] =
-      world.scoreboard.getObjective(name) ?? world.scoreboard.addObjective(name, displayName))
+  static objective(id: string, displayName = id) {
+    let objective = this.objectives.get(id)
+    if (!objective) {
+      objective = world.scoreboard.getObjective(id) ?? world.scoreboard.addObjective(id, displayName)
+      this.objectives.set(id, objective)
+    }
 
     return objective
   }
@@ -163,28 +166,16 @@ export class ScoreboardDB {
     this.scoreboard = ScoreboardDB.objective(name, displayName)
   }
 
-  /**
-   * @param {Entity | string} id
-   * @param {number} value
-   */
   set(id: Entity | string, value: number) {
     if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, value)
   }
 
-  /**
-   * @param {Entity | string} id
-   * @param {number} value
-   */
   add(id: Entity | string, value: number) {
     if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, this.get(id) + value)
   }
 
-  /**
-   * @param {Entity | string} id
-   * @returns {number}
-   */
   get(id: Entity | string): number {
     if (typeof id !== 'string') id = id.id
     try {
@@ -193,21 +184,4 @@ export class ScoreboardDB {
       return 0
     }
   }
-
-  reset() {
-    this.scoreboard.getParticipants().forEach(e => this.scoreboard.removeParticipant(e))
-  }
 }
-
-/*
-const objective = new ScoreboardDB('objectiveName', 'display name')
-
-const score = objective.get(player)
-objective.set(player, 1)
-objective.add(player, 1)
-
-objective.nameSet('custom name', 1)
-objective.nameGet('custom name')
-
-objective.reset()
-*/

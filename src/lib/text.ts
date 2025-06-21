@@ -176,10 +176,9 @@ function createNum(options: ColorOptions): (text: TSA, n: number, plurals: Plura
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-function createOverload<T extends (text: TSA, ...args: any[]) => Text, O extends (t: T, ...args: any[]) => Text>(
+function createOverload<T extends (text: TSA, ...args: any[]) => Text>(
   tsa: T,
-  overload: O,
+  overload: (t: T, ...args: any[]) => Text,
 ) {
   return (...args: unknown[]) => {
     if (isTSA(args[0])) return tsa(args[0], ...args.slice(1))

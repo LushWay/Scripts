@@ -1,4 +1,4 @@
-import { Entity, Player, ScoreboardObjective, system, world } from '@minecraft/server'
+import { Entity, Player, ScoreboardObjective, ScoreboardScoreInfo, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { t } from 'lib/text'
 import { Vec } from 'lib/vector'
@@ -12,6 +12,9 @@ export interface LeaderboardInfo {
   dimension: DimensionType
 }
 
+const biggest = (a: ScoreboardScoreInfo, b: ScoreboardScoreInfo) => b.score - a.score
+const smallest = (a: ScoreboardScoreInfo, b: ScoreboardScoreInfo) => a.score - b.score
+
 export class Leaderboard {
   static db = table<LeaderboardInfo>('leaderboard')
 
@@ -20,11 +23,12 @@ export class Leaderboard {
   static entityId = CustomEntityTypes.FloatingText
 
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
-    // TODO Localize somehow?
     if (scoreboardId.endsWith('Time')) {
-      return t.time`${score}`
+      return t.timeHHMMSS(score * 2.5)
     } else if (scoreboardId.endsWith('Date')) {
       return new Date(score * 1000).format()
+    } else if (scoreboardId.endsWith('SpeedRun')) {
+      return t.timeHHMMSS(score)
     }
 
     if (convertToMetricNumbers) {
@@ -92,10 +96,13 @@ export class Leaderboard {
   }
 
   updateLeaderboard() {
+    if (!this.entity.isValid) return
+
     type Nullable<T> = T | null
 
     const scoreboard = this.scoreboard
     const dname = scoreboard.displayName
+    const id = this.scoreboard.id
     const name = dname.charAt(0).toUpperCase() + dname.slice(1)
     const style =
       (Leaderboard.styles[this.info.style] as Nullable<ValueOf<typeof Leaderboard.styles>>) ?? Leaderboard.styles.gray
@@ -104,11 +111,9 @@ export class Leaderboard {
     let leaderboard = ``
     for (const [i, scoreInfo] of scoreboard
       .getScores()
-
-      .sort((a, b) => b.score - a.score)
-
-      .filter((_, i) => i < 10)
+      .sort(id.endsWith('SpeedRun') ? smallest : biggest)
       .entries()) {
+      if (i >= 10) continue
       const { pos: t, nick: n, score: s } = style
 
       const name =
@@ -117,10 +122,10 @@ export class Leaderboard {
 
       leaderboard += `§ы§${t}#${i + 1}§r `
       leaderboard += `§${n}${name}§r `
-      leaderboard += `§${s}${Leaderboard.parseCustomScore(this.scoreboard.id, scoreInfo.score, true)}§r\n`
+      leaderboard += `§${s}${Leaderboard.parseCustomScore(id, scoreInfo.score, true)}§r\n`
     }
 
-    if (this.entity.isValid) this.entity.nameTag = `§ы§l§${style.objName}${name}\n§ы§l${filler}§r\n${leaderboard}`
+    this.entity.nameTag = `§ы§l§${style.objName}${name}\n§ы§l${filler}§r\n${leaderboard}`
   }
 }
 
@@ -130,10 +135,8 @@ system.runInterval(
       if (typeof leaderboard === 'undefined') continue
       const info = Leaderboard.all.get(id)
 
-      if (info) {
-        if (info.entity.isValid) {
-          info.updateLeaderboard()
-        }
+      if (info?.entity) {
+        if (info.entity.isValid) info.updateLeaderboard()
       } else {
         const entity = world[leaderboard.dimension]
           .getEntities({ location: leaderboard.location, tags: [Leaderboard.tag], type: Leaderboard.entityId })

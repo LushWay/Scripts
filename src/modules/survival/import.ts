@@ -4,13 +4,14 @@ import '../places/import'
 import '../quests/index'
 import './stats'
 
+import './cleanup'
 import './death-quest-and-gravestone'
 import './menu'
 import './random-teleport'
 import './realtime'
-import './sidebar'
-import './cleanup'
 import './recurring-events'
+import './sidebar'
+import './speedrun/target'
 
 import type { VectorInDimension } from 'lib/utils/point'
 
