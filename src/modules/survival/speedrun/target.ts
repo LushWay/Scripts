@@ -73,8 +73,12 @@ InventoryInterval.slots.subscribe(({ player, slot }) => {
 
 const speedrunForm = form((f, player) => {
   f.title('Speedrun')
+  f.body(
+    t`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${t.timeHHMMSS(player.scores.anarchyOnlineTime * 2.5)}`,
+  )
   for (const [target, name] of Object.entries(speedRunNames)) {
-    f.button(name, () => {
+    const selected = player.database.speedrunTarget?.target === target
+    f.button((selected ? t.header : t)`${name}${selected ? '\n§aВыбрано' : ''}`, () => {
       player.database.speedrunTarget = {
         target,
         finished: false,
