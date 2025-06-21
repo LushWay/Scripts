@@ -106,6 +106,6 @@ new Command('newbie')
   })
 
 system.runPlayerInterval(player => {
-  if (isNewbie(player) && player.scores.anarchyOnlineTime > newbieTime)
+  if (isNewbie(player) && player.scores.anarchyOnlineTime * 2.5 > newbieTime)
     exitNewbieMode(player, 'провели на анархии больше 2 часов')
 }, 'newbie mode exit')

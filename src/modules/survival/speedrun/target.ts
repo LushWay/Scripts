@@ -26,8 +26,7 @@ function finishSpeedRun(player: Player, target: SpeedRunTarget) {
   if (!player.database.speedrunTarget) return
 
   player.database.speedrunTarget.finished = true
-  const start = player.scores.anarchyOnlineTime * 2.5 // ms
-  const took = Date.now() - start
+  const took = player.scores.anarchyOnlineTime * 2.5 // ms
   const previous = (player.scores as Record<string, number>)[target] ?? 0
 
   const name = speedRunNames[target]
