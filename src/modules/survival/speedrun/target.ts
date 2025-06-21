@@ -20,18 +20,24 @@ const speedRunNames: Record<SpeedRunTarget, string> = {
   [SpeedRunTarget.FullNetheriteArmor]: 'Полная незеритовая броня',
 }
 
-for (const [target, name] of Object.entries(speedRunNames)) ScoreboardDB.defineName(target, name)
+const objectives: Record<SpeedRunTarget, ScoreboardDB> = Object.fromEntries(
+  Object.entriesStringKeys(speedRunNames).map(([target, name]) => {
+    const key = `${target}SpeedRun`
+    ScoreboardDB.defineName(key, name)
+    return [target, new ScoreboardDB(key, name)]
+  }),
+)
 
 function finishSpeedRun(player: Player, target: SpeedRunTarget) {
   if (!player.database.speedrunTarget) return
 
   player.database.speedrunTarget.finished = true
   const took = player.scores.anarchyOnlineTime * 2.5 // ms
-  const previous = (player.scores as Record<string, number>)[target] ?? 0
+  const previous = objectives[target].get(player)
 
   const name = speedRunNames[target]
   if (previous === 0 || took < previous) {
-    ;(player.scores as Record<string, number>)[target] = took
+    objectives[target].set(player, took)
     if (previous === 0) {
       player.success(t`Ваш первый рекорд ${name} поставлен! Это заняло ${t.timeHHMMSS(took)}`)
     } else {
