@@ -29,12 +29,10 @@ export class RadioactiveZone {
             return
           }
 
-          if (
-            player.database.inv !== 'anarchy' ||
-            Spawn.region?.area.isIn(player) ||
-            player.getGameMode() === GameMode.creative
-          )
-            continue
+          if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) continue
+
+          const gameMode = player.getGameMode()
+          if (gameMode === GameMode.creative || gameMode === GameMode.spectator) continue
 
           const distance = Vec.distance(player.location, center)
           let played = false
@@ -62,7 +60,7 @@ export class RadioactiveZone {
             player.onScreenDisplay.setActionBar(t.error`Очень высокая радиация!`, ActionbarPriority.Highest)
             player.applyDamage(2, { cause: EntityDamageCause.magic })
             if (!player.getEffects().find(e => e.typeId === MinecraftEffectTypes.Darkness))
-              player.addEffect(MinecraftEffectTypes.Darkness, 10 * TicksPerSecond, {
+              player.addEffect(MinecraftEffectTypes.Darkness, 5 * TicksPerSecond, {
                 showParticles: true,
                 amplifier: 255,
               })
