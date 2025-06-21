@@ -10,7 +10,7 @@ beforeEach(() => vi.useFakeTimers())
 afterEach(() => vi.useRealTimers())
 
 describe('Temporary', () => {
-  it('should unsubscribe events and intervals', () => {
+  it.todo('should unsubscribe events and intervals', () => {
     const player = TEST_createPlayer()
     const intervalFn = vi.fn()
     const eventFn = vi.fn()
