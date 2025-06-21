@@ -39,6 +39,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
 
   const underLimit = 62
   if (block.y < underLimit) {
+    event.cancel
     return player.fail(t.error`Нельзя создать базу на высоте ниже ${underLimit}!`)
   }
 
