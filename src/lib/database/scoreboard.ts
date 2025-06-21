@@ -158,12 +158,10 @@ export class ScoreboardDB {
   scoreboard
 
   constructor(
-    public name: string,
-    displayName: string = name,
+    public id: string,
+    displayName: string = id,
   ) {
-    if (name.length > 16) name = name.substring(0, 16)
-
-    this.scoreboard = ScoreboardDB.objective(name, displayName)
+    this.scoreboard = ScoreboardDB.objective(id, displayName)
   }
 
   set(id: Entity | string, value: number) {

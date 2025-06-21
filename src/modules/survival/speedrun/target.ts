@@ -22,7 +22,7 @@ const speedRunNames: Record<SpeedRunTarget, string> = {
 
 const objectives: Record<SpeedRunTarget, ScoreboardDB> = Object.fromEntries(
   Object.entriesStringKeys(speedRunNames).map(([target, name]) => {
-    const key = `${target}SpeedRun`
+    const key = `${target[0]?.toLowerCase()}${target.slice(1)}SpeedRun`
     ScoreboardDB.defineName(key, name)
     return [target, new ScoreboardDB(key, name)]
   }),
