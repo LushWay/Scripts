@@ -5,6 +5,7 @@ import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
+import { l } from 'lib/text'
 import { restorePlayerCamera } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
@@ -83,7 +84,7 @@ export class Cutscene {
   play(player: Player) {
     if (!this.sections[0]?.points[0]) {
       console.error(`${this.id}: cutscene is not ready.`)
-      player.fail(`${this.displayName}: cцена еще не настроена`)
+      player.fail(l`${this.displayName}: cutscene is not ready.`)
       return
     }
 
@@ -243,7 +244,11 @@ export class Cutscene {
     if (section) {
       section.points.push(getVector5(source))
     } else {
-      warn && source.warn(`Не удалось найти секцию. Позиция секции: ${sectionIndex}, всего секций: ${sections.length}`)
+      if (warn) {
+        source.warn(
+          l`Unable to find section. Section index: ${sectionIndex}, total amount of sections: ${sections.length}`,
+        )
+      }
 
       return false
     }

@@ -1,4 +1,4 @@
-const TicksPerSecond = 20
+/* i18n-ignore */
 import { Plurals, ngettext } from './ngettext'
 
 type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'

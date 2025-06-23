@@ -4,6 +4,7 @@ import { Player, world } from '@minecraft/server'
 import { ActionForm, Vec } from 'lib'
 import { debounceMenu } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
+import { t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { ngettext } from 'lib/utils/ngettext'
 import { VectorInDimension } from 'lib/utils/point'
@@ -16,17 +17,17 @@ import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-min
 
 new Command('tp')
   .setPermissions(__RELEASE__ ? 'techAdmin' : 'everybody')
-  .setDescription('Открывает меню телепортации')
+  .setDescription(t`Открывает меню телепортации`)
   .executes(ctx => {
     if (ctx.player.database.role === 'member')
-      return ctx.error('Команда доступна только тестерам, наблюдателям и администраторам.')
+      return ctx.error(t`Команда доступна только тестерам, наблюдателям и администраторам.`)
     tpMenu(ctx.player)
   })
 
 function tpMenu(player: Player) {
   const form = new ActionForm(
-    'Выберите локацию',
-    'Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!',
+    t`Выберите локацию`,
+    t`Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!`,
   )
 
   const players = world.getAllPlayers().map(
@@ -45,26 +46,26 @@ function tpMenu(player: Player) {
   }
 
   if (Spawn.region)
-    locations['Спавн'] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
+    locations[t`Спавн`] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    form.addButton(`${name} §7(${players} ${ngettext(players, ['игрок', 'игрока', 'игроков'])})`, () => {
+    form.addButton(`${name} §7(${players} ${ngettext(players, [t`игрок`, t`игрока`, t`игроков`])})`, () => {
       if (player.database.inv !== 'anarchy' && !isNotPlaying(player)) {
         return player.fail(
-          'Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.',
+          t`Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.`,
         )
       }
       player.runCommand('tp ' + location)
     })
   }
 
-  form.addButton('Телепорт к игроку...', () => tpToPlayer(player))
+  form.addButton(t`Телепорт к игроку...`, () => tpToPlayer(player))
 
   return form.show(player)
 }
 
 function tpToPlayer(player: Player) {
-  const form = new ActionForm('Телепорт к игроку...')
+  const form = new ActionForm(t`Телепорт к игроку...`)
 
   form.addButtonBack(() => tpMenu(player))
 

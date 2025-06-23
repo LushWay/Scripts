@@ -1,5 +1,6 @@
 import { system } from '@minecraft/server'
 import { dedupe } from 'lib/dedupe'
+import { t } from 'lib/text'
 import { getRandomXZInCircle, getTopmostSolidBlock } from 'lib/utils/game'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 
@@ -18,7 +19,7 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
   onBlock?: (block: Vector3) => void
 } = {}) {
   if (!Anarchy.zone) return
-  info?.('Поиск случайной локации без воды...')
+  info?.(t`Поиск случайной локации без воды...`)
 
   return new Promise<false | { air: Vector3; topmost: Vector3 }>(resolve => {
     const maxTries = 100
@@ -37,10 +38,10 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
           const topmostBlock = await getTopmostSolidBlock(position)
 
           if (topmostBlock) {
-            info?.('Найдено!')
+            info?.(t`Найдено!`)
             return resolve({ air: position, topmost: topmostBlock })
           } else {
-            info?.(`Вода. Попытка §6${maxTries - i}/${maxTries}`)
+            info?.(t`Вода. Попытка §6${maxTries - i}/${maxTries}`)
             timeout()
           }
         },

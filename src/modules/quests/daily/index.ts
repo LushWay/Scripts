@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ms, noNullable } from 'lib'
+import { noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { DailyQuest } from 'lib/quest/quest'
@@ -24,8 +24,6 @@ interface DB {
 }
 
 const db = table<DB>('dailyQuest', () => ({ streak: 0, today: 0, streakDate: Date.now(), takenToday: false }))
-
-const streakExpireCooldown = ms.from('day', 1)
 
 new RecurringEvent(
   'dailyQuest',
@@ -103,7 +101,7 @@ DailyQuest.onEnd.subscribe(({ quest, player }) => {
   }
 })
 
-new Command('daily').setDescription('Ежедневные задания').executes(ctx => {
+new Command('daily').setDescription(t`Ежедневные задания`).executes(ctx => {
   if (!hasAccessToDaily(ctx.player)) return
 
   dailyQuestsForm.show(ctx.player)
@@ -111,7 +109,7 @@ new Command('daily').setDescription('Ежедневные задания').execu
 
 export const dailyQuestsForm = form((f, player) => {
   const playerDb = db.get(player.id)
-  f.title('Ежедневные задания')
+  f.title(t`Ежедневные задания`)
   f.body(
     t`Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ${dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий ${questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n${textTable({ 'Выполнено подряд': playerDb.streak })}`,
   )
@@ -133,7 +131,7 @@ export const dailyQuestsForm = form((f, player) => {
         const crate = donut ? currentDailyQuestCity?.donutCrate : currentDailyQuestCity?.normalCrate
         if (!crate) return
 
-        player.success('Вы получили ключ!')
+        player.success(t`Вы получили ключ!`)
         player.container?.addItem(crate.createKeyItemStack())
         playerDb.takenToday = true
       },

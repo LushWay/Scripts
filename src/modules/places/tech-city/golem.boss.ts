@@ -3,12 +3,13 @@ import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-d
 import { Boss, Loot, ms, Vec } from 'lib'
 import { Group } from 'lib/rpg/place'
 import { Chip } from './engineer'
+import { t } from 'lib/text'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('golem')
-    .name('Робот')
+    .name(t`Робот`)
     .typeId(MinecraftEntityTypes.IronGolem)
     .loot(
       new Loot('GolemLoot')

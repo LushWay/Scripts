@@ -1,7 +1,7 @@
+/* i18n-ignore */
 import { system, WatchdogTerminateReason, world } from '@minecraft/server'
 
 declare global {
-  // eslint-disable-next-line no-var
   var loaded: number
 }
 

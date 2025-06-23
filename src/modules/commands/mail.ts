@@ -6,49 +6,49 @@ import { ngettext } from 'lib/utils/ngettext'
 import { Rewards } from 'lib/utils/rewards'
 
 const command = new Command('mail')
-  .setDescription('Посмотреть входящие сообщения почты')
+  .setDescription(t`Посмотреть входящие сообщения почты`)
   .setPermissions('member')
   .executes(ctx => mailMenu(ctx.player))
 
 const getSettings = Settings.player(...Menu.settings, {
   mailReadOnOpen: {
-    name: 'Читать письмо при открытии',
-    description: 'Помечать ли письмо прочитанным при открытии',
+    name: t`Читать письмо при открытии`,
+    description: t`Помечать ли письмо прочитанным при открытии`,
     value: true,
   },
   mailClaimOnDelete: {
-    name: 'Собирать награды при удалении',
-    description: 'Собирать ли награды при удалении письма',
+    name: t`Собирать награды при удалении`,
+    description: t`Собирать ли награды при удалении письма`,
     value: true,
   },
 })
 
 const getJoinSettings = Settings.player(...Join.settings.extend, {
   unreadMails: {
-    name: 'Почта',
-    description: 'Показывать ли при входе сообщение с кол-вом непрочитанных',
+    name: t`Почта`,
+    description: t`Показывать ли при входе сообщение с кол-вом непрочитанных`,
     value: true,
   },
 })
 
 export function mailMenu(player: Player, back?: VoidFunction) {
-  new ArrayForm(`Почта${Mail.unreadBadge(player.id)}`, Mail.getLetters(player.id))
+  new ArrayForm(t`Почта${Mail.unreadBadge(player.id)}`, Mail.getLetters(player.id))
     .filters({
       unread: {
-        name: 'Непрочитанные',
-        description: 'Показывать только непрочитанные сообщения',
+        name: t`Непрочитанные`,
+        description: t`Показывать только непрочитанные сообщения`,
         value: false,
       },
       unclaimed: {
-        name: 'Несобранные награды',
-        description: 'У письма есть несобранные награды',
+        name: t`Несобранные награды`,
+        description: t`У письма есть несобранные награды`,
         value: false,
       },
       sort: {
-        name: 'Соритровать по',
+        name: t`Соритровать по`,
         value: [
-          ['date', 'Дате'],
-          ['name', 'Имени'],
+          ['date', t`Дате`],
+          ['name', t`Имени`],
         ],
       },
     })
@@ -90,28 +90,30 @@ function letterDetailsMenu(
   ).addButtonBack(back)
 
   if (!letter.rewardsClaimed && letter.rewards.length)
-    form.addButton('Забрать награду', () => {
+    form.addButton(t`Забрать награду`, () => {
       Mail.claimRewards(player, index)
-      letterDetailsMenu({ letter, index }, player, back, message + '§aНаграда успешно забрана!\n\n§r§f')
+      letterDetailsMenu({ letter, index }, player, back, message + t`§aНаграда успешно забрана!
+
+§r§f`)
     })
 
   if (!letter.read && !settings.mailReadOnOpen)
-    form.addButton('Пометить как прочитанное', () => {
+    form.addButton(t`Пометить как прочитанное`, () => {
       Mail.readMessage(player.id, index)
       back()
     })
 
-  let deleteDescription = '§cУдалить письмо?'
+  let deleteDescription = t`§cУдалить письмо?`
   if (!letter.rewardsClaimed) {
     if (getSettings(player).mailClaimOnDelete) {
-      deleteDescription += ' Все награды будут собраны автоматически'
+      deleteDescription += t` Все награды будут собраны автоматически`
     } else {
-      deleteDescription += ' Вы потеряете все награды, прикрепленные к письму!'
+      deleteDescription += t` Вы потеряете все награды, прикрепленные к письму!`
     }
   }
 
-  form.addButton('§cУдалить письмо', null, () => {
-    ask(player, deleteDescription, '§cУдалить', () => {
+  form.addButton(t`§cУдалить письмо`, null, () => {
+    ask(player, deleteDescription, t`§cУдалить`, () => {
       if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
       Mail.deleteMessage(player, index)
       back()
@@ -128,9 +130,9 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
   if (unreadCount === 0) return
 
   const messages = ngettext(unreadCount, [
-    'У вас непрочитанное сообщение',
-    'У вас непрочитанных сообщения',
-    'У вас непрочитанных сообщений',
+    t`У вас непрочитанное сообщение`,
+    t`У вас непрочитанных сообщения`,
+    t`У вас непрочитанных сообщений`,
   ])
   player.info(t`${t.header`Почта:`} ${messages}! Посмотреть: ${command}`)
 })

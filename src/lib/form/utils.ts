@@ -81,7 +81,7 @@ export async function showForm(
 
             case hold:
               // Last attempt, we cant do anything
-              player.fail(`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
+              player.fail(t`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
               return false
           }
         }

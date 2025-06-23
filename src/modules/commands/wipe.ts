@@ -63,11 +63,11 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
 
   try {
     if (player.database.inv !== 'anarchy') {
-      return player.fail('Вы не можете создать точку восстановления не находясь на анархии')
+      return player.fail(t.error`Вы не можете создать точку восстановления не находясь на анархии`)
     }
 
     if (![GameMode.adventure, GameMode.survival].includes(player.getGameMode())) {
-      return player.fail('Вы не можете создать точку восстановления не находясь в выживании или приключении')
+      return player.fail(t.error`Вы не можете создать точку восстановления не находясь в выживании или приключении`)
     }
 
     const playerDb = db.get(player.id)
@@ -105,24 +105,24 @@ function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
 
 new Command('wipe')
   .setAliases('save')
-  .setDescription('Очищает и сохраняет все данные (для тестов)')
+  .setDescription(t`Очищает и сохраняет все данные (для тестов)`)
   .setPermissions('tester')
   .executes(ctx => {
     const player = ctx.player
     form(f => {
-      f.title('Сохранения')
-      f.body('Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ')
+      f.title(t`Сохранения`)
+      f.body(t`Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ`)
 
       f.ask(
-        '§cПолный сброс',
-        'Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.',
+        t`§cПолный сброс`,
+        t`Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.`,
         () => wipe(player),
       )
 
-      f.button('Создать точку восстановления', BUTTON['+'], () => {
-        new ModalForm('Создать точку восстановления')
+      f.button(t`Создать точку восстановления`, BUTTON['+'], () => {
+        new ModalForm(t`Создать точку восстановления`)
           .addTextField(
-            '§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мире\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:',
+            t`§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:`,
             '',
           )
           .show(player, (ctx, name) => {
@@ -136,7 +136,7 @@ new Command('wipe')
           })
       })
 
-      f.button('Точки восстановления других игроков', otherPlayerRestorePoints)
+      f.button(t`Точки восстановления других игроков`, otherPlayerRestorePoints)
 
       const playerDb = db.get(player.id)
       renderList(f, playerDb, player.id, player)
@@ -178,16 +178,16 @@ function restorePointMenu(player: Player, [ownerId, id]: RestorePointRef, restor
     f.body(id)
 
     if (isOwner) {
-      f.ask('Перезаписать', 'Перезаписать точку восстановления', () => {
+      f.ask(t`Перезаписать`, t`Перезаписать точку восстановления`, () => {
         createRestorePoint(player, restorePoint.name, id)
       })
     }
 
-    f.ask('Загрузиться', 'Загрузиться', () => {
+    f.ask(t`Загрузиться`, t`Загрузиться`, () => {
       loadRestorePoint(player, [ownerId, id])
     })
     if (is(player.id, 'techAdmin')) f.button('Log to the console', () => console.log(JSON.stringify(restorePoint)))
-    f.ask('§cУдалить', 'удалить точку', () => {
+    f.ask(t`§cУдалить`, t`удалить точку`, () => {
       Reflect.deleteProperty(db.get(player.id).restorePoints, id)
     })
   })

@@ -1,16 +1,17 @@
 import { playerSettingsMenu, worldSettingsMenu } from 'lib/settings'
+import { t } from 'lib/text'
 
 new Command('settings')
   .setAliases('options')
   .setPermissions('member')
-  .setDescription('Настройки')
+  .setDescription(t`Настройки`)
   .executes(ctx => {
     playerSettingsMenu(ctx.player)
   })
 
 new Command('wsettings')
   .setPermissions('techAdmin')
-  .setDescription('Настройки мира')
+  .setDescription(t`Настройки мира`)
   .executes(ctx => {
     worldSettingsMenu(ctx.player)
   })

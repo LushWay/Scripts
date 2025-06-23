@@ -2,6 +2,7 @@ import { EntityDamageCause, world } from '@minecraft/server'
 import { isKeyof } from 'lib'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { rollChance } from 'lib/rpg/random'
+import { l, t } from 'lib/text'
 
 export enum Ability {
   Vampire = 'vamp',
@@ -10,20 +11,20 @@ export enum Ability {
 }
 
 const names = {
-  [Ability.Vampire]: 'Вампиризм',
-  [Ability.ExtraDamage]: 'Дополнительный урон',
-  [Ability.Nothing]: 'Неизвестная',
+  [Ability.Vampire]: t`Вампиризм`,
+  [Ability.ExtraDamage]: t`Дополнительный урон`,
+  [Ability.Nothing]: t`Неизвестная`,
 } satisfies Record<Ability, string>
 
 const descriptions = {
-  [Ability.Vampire]: 'Восстанавливает вам половину наносимого этим мечом урона',
-  [Ability.ExtraDamage]: '10% шанс сделать двойной урон',
+  [Ability.Vampire]: t`Восстанавливает вам половину наносимого этим мечом урона`,
+  [Ability.ExtraDamage]: t`10% шанс сделать двойной урон`,
   [Ability.Nothing]: '',
 }
 
 export const schema = new ItemLoreSchema('item-ability')
   .property('ability', String)
-  .display('Способность', p =>
+  .display(t`Способность`, p =>
     isKeyof(p, descriptions) ? `${names[p]}\n\n${descriptions[p]}` : names[Ability.Nothing],
   )
   .build()
@@ -36,7 +37,7 @@ export const ItemAbility = {
 }
 
 new Command('itemability')
-  .setDescription('Позволяет получать предмет с кастомной чаркой')
+  .setDescription(l`Позволяет получать предмет с кастомной чаркой`)
   .setPermissions('techAdmin')
   .array('sword type', ['diamond', 'iron', 'netherite'])
   .array('ability', [Ability.Vampire, Ability.ExtraDamage])
@@ -68,7 +69,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
     }
     case Ability.ExtraDamage: {
       if (rollChance(10)) {
-        damagingEntity.success('х2 урон!', false)
+        damagingEntity.success(t`х2 урон!`, false)
         hurtEntity.applyDamage(damage, { damagingEntity, cause })
       }
       break

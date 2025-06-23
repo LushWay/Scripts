@@ -1,4 +1,5 @@
 import { system } from '@minecraft/server'
+import { t } from 'lib/text'
 
 async function getServerTPS(): Promise<number> {
   const startTime = Date.now()
@@ -16,11 +17,13 @@ async function getServerTPS(): Promise<number> {
 }
 
 new Command('ping')
-  .setDescription('Показывает пинг сервера')
+  .setDescription(t`Показывает пинг сервера`)
   .setPermissions('member')
   .executes(async ctx => {
-    ctx.reply('§b> §3Понг! Проверяем...')
+    ctx.player.info(t`Понг! Проверяем...`)
     const ticks = await getServerTPS()
 
-    ctx.reply(`§b> §3TPS сервера ${ticks > 18 ? '§aхороший' : ticks > 13 ? '§gнормальный' : '§cплохой'}§f: ${ticks}`)
+    ctx.player.info(
+      t`TPS сервера ${ticks > 18 ? t`§aхороший` : ticks > 13 ? t`§gнормальный` : t`§cплохой`}§f: ${ticks}`,
+    )
   })

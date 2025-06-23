@@ -1,3 +1,4 @@
+/* i18n-ignore */
 import { world } from '@minecraft/server'
 import { Enchantments } from 'lib/enchantments'
 

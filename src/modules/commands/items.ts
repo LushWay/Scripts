@@ -1,9 +1,10 @@
 import { ArrayForm, langToken, translateToken } from 'lib'
 import { customItems } from 'lib/rpg/custom-item'
+import { l } from 'lib/text'
 
 new Command('items')
   .setPermissions('techAdmin')
-  .setDescription('Получает кастомный предмет')
+  .setDescription(l`Получает кастомный предмет`)
   .executes(ctx => {
     new ArrayForm('Items', customItems)
       .button(item => {

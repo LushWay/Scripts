@@ -3,14 +3,15 @@ import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@
 import { Vec, ms } from 'lib'
 import { customItems } from 'lib/rpg/custom-item'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { t } from 'lib/text'
 import { toPoint } from 'lib/utils/point'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 
 export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
-  '§3Снежная бомба',
-  'Используйте, чтобы отправить все к снежной королеве подо льдину',
+  t`§3Снежная бомба`,
+  t`Используйте, чтобы отправить все к снежной королеве подо льдину`,
 )
 customItems.push(IceBombItem)
 

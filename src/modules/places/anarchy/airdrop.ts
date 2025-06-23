@@ -81,7 +81,7 @@ export async function requestAirdrop(isPowerfull: boolean) {
         .createMarkerOnMinimap()
 
       world.say(
-        t.raw`§l§a>§r§7 ${isPowerfull ? 'Усиленный' : 'Обычный'} аирдроп появился на ${Vec.string(result.topmost, true)}!`,
+        t.raw`§l§a>§r§7 ${isPowerfull ? t`Усиленный` : t`Обычный`} аирдроп появился на ${Vec.string(result.topmost, true)}!`,
       )
       return airdrop
     } catch (e) {

@@ -12,6 +12,7 @@ import {
 } from 'lib'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { l, t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 
 // TODO Add chest generation
@@ -21,11 +22,11 @@ class WardenDungeonRegion extends Region {
   protected priority = 3
 
   get displayName(): string | undefined {
-    return '§5Варден'
+    return t.nocolor`§5Варден`
   }
 }
 registerSaveableRegion('wardenDungeon', WardenDungeonRegion)
-registerRegionType('Данж вардена', WardenDungeonRegion)
+registerRegionType(t`Данж вардена`, WardenDungeonRegion)
 
 interface LinkedDatabase extends JsonObject {
   blocks: { x: number; y: number; z: number }[]
@@ -34,7 +35,7 @@ interface LinkedDatabase extends JsonObject {
 class WardenDungeonLootRegion extends Region {
   protected priority = 4
   get displayName(): string | undefined {
-    return '§dНезеритовая жила'
+    return t.nocolor`§dНезеритовая жила`
   }
   ldb: LinkedDatabase = { blocks: [] }
 
@@ -61,7 +62,7 @@ class WardenDungeonLootRegion extends Region {
   }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
-registerRegionType('Лут данжа вардена', WardenDungeonLootRegion)
+registerRegionType(l`Лут данжа вардена`, WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {
   if (region instanceof WardenDungeonLootRegion) {

@@ -9,7 +9,7 @@ export function createMineQuests(city: City) {
   function createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
     return new DailyQuest(
       city.group.place(id).name(text),
-      'Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!',
+      t`Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!`,
       (q, player) => {
         const ore = itemTypes[0] && ores.getOre(itemTypes[0])
         if (!ore) return q.failed('No ore found', true)
@@ -41,7 +41,7 @@ export function createMineQuests(city: City) {
 
   const iron10 = createMineQuest(
     'mine-10-iron',
-    'Добыть железо',
+    t`Добыть железо`,
     10,
     [b.IronOre, b.DeepslateIronOre],
     new Rewards().money(600),
@@ -49,7 +49,7 @@ export function createMineQuests(city: City) {
 
   const coal10 = createMineQuest(
     'mine-10-coal',
-    'Добыть уголь',
+    t`Добыть уголь`,
     10,
     [b.CoalOre, b.DeepslateCoalOre],
     new Rewards().money(400),
@@ -57,7 +57,7 @@ export function createMineQuests(city: City) {
 
   const diamonds10 = createMineQuest(
     'mine-10-diamonds',
-    'Добыть алмазы',
+    t`Добыть алмазы`,
     10,
     [b.DiamondOre, b.DeepslateDiamondOre],
     new Rewards().money(1000),

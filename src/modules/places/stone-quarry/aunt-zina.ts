@@ -3,11 +3,12 @@ import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
+import { t } from 'lib/text'
 
 export class AuntZina extends ShopNpc {
   constructor(group: Group) {
-    super(group.place('aunt-zina').name('Тетя Зина'))
-    this.shop.body(() => 'Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n')
+    super(group.place('aunt-zina').name(t`Тетя Зина`))
+    this.shop.body(() => t`Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n`)
 
     this.shop.menu(form => {
       form.itemStack(new ItemStack(i.PumpkinPie, 64), new MoneyCost(400))

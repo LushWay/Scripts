@@ -8,7 +8,7 @@ export function baseUpgradeButton(base: BaseRegion, player: Player, back: (messa
   const upgradeLevel = base.ldb.level + 1
   const upgrade = baseLevels[upgradeLevel]
   let levelText = t`${base.ldb.level}/${baseLevels.length - 1}`
-  if (!upgrade) return [`§7Максимальный уровень\n${levelText}`, undefined, back] as Product['button']
+  if (!upgrade) return [t`§7Максимальный уровень\n${levelText}`, undefined, back] as Product['button']
 
   levelText = t`${levelText} (радиус ${base.area.radius} -> ${upgrade.radius})`
   return Product.create()

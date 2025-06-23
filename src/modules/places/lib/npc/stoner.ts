@@ -1,11 +1,12 @@
 import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
 import { Group } from 'lib/rpg/place'
 import { ShopNpc } from 'lib/shop/npc'
+import { t } from 'lib/text'
 
 export class Stoner extends ShopNpc {
   constructor(group: Group) {
-    super(group.place('stoner').name('Каменщик'))
-    this.shop.body(() => 'А камень я тебе дам.\n\n')
+    super(group.place('stoner').name(t`Каменщик`))
+    this.shop.body(() => t`А камень я тебе дам.\n\n`)
 
     this.shop.menu(form => {
       form

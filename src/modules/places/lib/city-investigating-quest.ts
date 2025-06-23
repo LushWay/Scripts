@@ -2,6 +2,7 @@ import { isNotPlaying } from 'lib'
 import { Quest } from 'lib/quest'
 import { RegionEvents } from 'lib/region/events'
 import { City } from './city'
+import { t } from 'lib/text'
 
 export class CityInvestigating<T extends City> {
   static list: CityInvestigating<City>[] = []
@@ -10,11 +11,11 @@ export class CityInvestigating<T extends City> {
 
   goToCityQuest = new Quest(
     this.city.group.place('goTo').name(''),
-    'Доберитесь до указанного города или деревни',
+    t`Доберитесь до указанного города или деревни`,
     q => {
-      if (!this.city.safeArea) return q.failed('Город не настроен!')
+      if (!this.city.safeArea) return q.failed(t`Город не настроен!`)
 
-      q.reachRegion(this.city.safeArea, 'Доберитесь до города!')
+      q.reachRegion(this.city.safeArea, t`Доберитесь до города!`)
     },
     true,
   )
@@ -36,12 +37,12 @@ export class CityInvestigating<T extends City> {
 
     this.quest = new Quest(
       this.city.group.place('investigating').name(''),
-      'Исследуйте новый город!',
+      t`Исследуйте новый город!`,
       (q, player) => {
-        if (!this.city.safeArea) return q.failed('Город не настроен!')
+        if (!this.city.safeArea) return q.failed(t`Город не настроен!`)
 
         if (this.city.cutscene.sections.length)
-          q.dynamic('Обзор города').activate(ctx => {
+          q.dynamic(t`Обзор города`).activate(ctx => {
             this.city.cutscene.play(ctx.player)?.finally(() => ctx.next())
           })
 

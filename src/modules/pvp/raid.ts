@@ -28,7 +28,7 @@ export function createBlockExplosionChecker() {
     if (ScheduleBlockPlace.has(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
       if (!base) {
-        for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: 'вас рейдят' })
+        for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: t`вас рейдят` })
         base = true
       }
       return true
@@ -38,17 +38,17 @@ export function createBlockExplosionChecker() {
   }
 
   function raidLock(source: undefined | Entity) {
-    if (base && source) notify.set(source.id, { time: raiderLockTime, reason: 'вы разрушили блок на базе' })
+    if (base && source) notify.set(source.id, { time: raiderLockTime, reason: t`вы разрушили блок на базе` })
   }
 
   return { canBlockExplode, raidLock }
 }
 
-const locktext = 'Вы находитесь в режиме рейдблока.'
+const locktext = t`Вы находитесь в режиме рейдблока.`
 new LockAction(player => {
   const raidLockTime = player.scores.raid
   if (raidLockTime > 0) {
-    return { lockText: `${locktext} Осталось ${t.error.timeHHMMSS(raidLockTime)}` }
+    return { lockText: t`${locktext} Осталось ${t.error.timeHHMMSS(raidLockTime)}` }
   } else return false
 }, locktext)
 

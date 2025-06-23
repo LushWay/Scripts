@@ -17,6 +17,7 @@ import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
 import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Dungeon } from './loot'
+import { l, t } from 'lib/text'
 
 export interface DungeonRegionDatabase extends JsonObject {
   chests: Record<string, number | null>
@@ -143,7 +144,7 @@ export class DungeonRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.addButton('Установить структуру', () => {
+    form.addButton(l`Установить структуру`, () => {
       this.placeStructure()
     })
   }
@@ -273,9 +274,9 @@ export class DungeonRegion extends Region {
   }
 
   get displayName(): string | undefined {
-    return Dungeon.names[this.structureId] ?? 'Данж'
+    return Dungeon.names[this.structureId] ?? t`Данж`
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion)
-registerRegionType('Данжи', DungeonRegion, false, true)
+registerRegionType(l`Данжи`, DungeonRegion, false, true)
 adventureModeRegions.push(DungeonRegion)

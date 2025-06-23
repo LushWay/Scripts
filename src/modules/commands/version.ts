@@ -1,9 +1,9 @@
 import { is } from 'lib'
-import { textTable } from 'lib/text'
+import { t, textTable } from 'lib/text'
 
 new Command('version')
   .setAliases('v')
-  .setDescription('Версия сервера')
+  .setDescription(t`Версия сервера`)
   .executes(ctx => {
     ctx.reply(
       textTable({

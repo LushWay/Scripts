@@ -1,5 +1,6 @@
 import { Loot } from 'lib'
 import { CutArea } from 'lib/region/areas/cut'
+import { t } from 'lib/text'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { QuartzMineRegion } from '../anarchy/quartz'
 import { BaseItem } from '../base/base'
@@ -13,7 +14,7 @@ import { createBossGolem } from './golem.boss'
 
 class TechCityBuilder extends City {
   constructor() {
-    super('TechCity', 'Техноград')
+    super('TechCity', t`Техноград`)
     this.create()
   }
 
@@ -27,8 +28,8 @@ class TechCityBuilder extends City {
 
   golem = createBossGolem(this.group)
 
-  guide = new GuideNpc(this.group, 'Техник', (f, { lf }) => {
-    lf.question('wtfCity', 'А что за город', 'Ну крутой техно типо не понял что ли')
+  guide = new GuideNpc(this.group, t`Техник`, (f, { lf }) => {
+    lf.question('wtfCity', t`А что за город`, t`Ну крутой техно типо не понял что ли`)
   })
 
   private create() {

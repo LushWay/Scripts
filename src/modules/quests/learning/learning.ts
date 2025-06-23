@@ -14,7 +14,7 @@ import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { noGroup } from 'lib/rpg/place'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { createPointVec } from 'lib/utils/point'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
@@ -29,8 +29,9 @@ const logger = createLogger('Learning Quest')
 class Learning {
   id = 'learning'
 
-  quest = new Quest(noGroup.place('learning').name('Обучение'), 'Обучение базовым механикам сервера', (q, player) => {
-    if (!this.learningLocation.valid || !this.craftingTableLocation.valid) return q.failed('§cОбучение не настроено')
+  quest = new Quest(noGroup.place('learning').name(t`Обучение`), t`Обучение базовым механикам сервера`, (q, player) => {
+    if (!this.learningLocation.valid || !this.craftingTableLocation.valid)
+      return q.failed(l`Learning is not setup properly`)
 
     const maxReturnToAreaSteps = 4
     const returnToMineArea = (step: number) => () => {
@@ -45,8 +46,8 @@ class Learning {
       }
     }
 
-    q.counter((current, end) => `§6Добыто дерева: §f${current}/${end}`, 5)
-      .description('Нарубите дерева')
+    q.counter((current, end) => t.header`Добыто дерева: ${current}/${end}`, 5)
+      .description(t`Нарубите дерева`)
       .activate((ctx, firstTime) => {
         ctx.onInterval(returnToMineArea(1))
 
@@ -73,8 +74,8 @@ class Learning {
         })
       })
 
-    q.dynamic('§6Выйди под открытое небо')
-      .description('Деревья могут помешать. Выйди туда, где над тобой будет только небо')
+    q.dynamic(t.header`Выйди под открытое небо`)
+      .description(t`Деревья могут помешать. Выйди туда, где над тобой будет только небо`)
       .activate(ctx => {
         ctx.onInterval(returnToMineArea(2))
 
@@ -93,8 +94,8 @@ class Learning {
         )
       })
 
-    q.dynamic('Заберите все из сундука, упавшего с неба')
-      .description('Заберите все из упавшего с неба сундука. На него указывает компас')
+    q.dynamic(t`Заберите все из сундука, упавшего с неба`)
+      .description(t`Заберите все из упавшего с неба сундука. На него указывает компас`)
       .activate((ctx, firstTime) => {
         ctx.onInterval(returnToMineArea(3))
 
@@ -139,7 +140,8 @@ class Learning {
 
             if (!airdrop.chest) {
               player.onScreenDisplay.setActionBar(
-                '§cНе удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение',
+                t.error`Не удалось найти аирдроп
+Используйте .wipe чтобы перепройти обучение`,
                 ActionbarPriority.Highest,
               )
             } else {
@@ -150,8 +152,8 @@ class Learning {
         })
       })
 
-    q.dynamic('Используй монеты в инвентаре')
-      .description('Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет')
+    q.dynamic(t`Используй монеты в инвентаре`)
+      .description(t`Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет`)
       .activate(ctx => {
         let money = 0
         if (ctx.player.container) {
@@ -174,29 +176,33 @@ class Learning {
 
     q.reachArea(
       ...Vec.around(crafting.location, 10),
-      '§6Следуя компасу, доберитесь до верстака',
+      t.header`Следуя компасу, доберитесь до верстака`,
       crafting.dimensionType,
     )
 
-    q.item('§6Сделайте деревянную кирку')
-      .description('Используя верстак сделайте деревянную кирку!')
+    q.item(t.header`Сделайте деревянную кирку`)
+      .description(t`Используя верстак сделайте деревянную кирку!`)
       .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
       .target(crafting)
 
-    q.breakCounter((i, end) => `§6Спуститесь в шахту и добудьте камня: §f${i}/${end}`, 10)
-      .description('Отправляйтесь в шахту, найдите и накопайте камня.')
+    q.breakCounter((i, end) => t.header`Спуститесь в шахту и добудьте камня: ${i}/${end}`, 10)
+      .description(t`Отправляйтесь в шахту, найдите и накопайте камня.`)
       .filter(broken => broken.type.id === b.Stone)
       .activate(ctx => {
         ctx.subscribe(OrePlace, () => true)
       })
 
-    q.item('§6Сделайте каменную кирку')
-      .description('Вернитесь к верстаку и улучшите свой инструмент.')
+    q.item(t.header`Сделайте каменную кирку`)
+      .description(t`Вернитесь к верстаку и улучшите свой инструмент.`)
       .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
       .target(crafting)
 
-    q.counter(i => (i === 0 ? `§6Вновь вскопайте камень в шахте §f0/1` : `§6Добыто железной руды: §f${i - 1}/3`), 3 + 1)
-      .description('Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!')
+    q.counter(
+      i =>
+        i === 0 ? t.header`Вновь вскопайте камень в шахте ${0}/${1}` : t.header`Добыто железной руды: ${i - 1}/${3}`,
+      3 + 1,
+    )
+      .description(t`Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!`)
       .activate(ctx => {
         // Force iron ore generation
         ctx.subscribe(
@@ -240,14 +246,14 @@ class Learning {
         )
       })
 
-    q.dialogue(VillageOfMiners.guide, 'Шахтер зовет вас наверх, чтобы поговорить!')
+    q.dialogue(VillageOfMiners.guide, t`Шахтер зовет вас наверх, чтобы поговорить!`)
   })
 
-  learningLocation = location(this.quest.group.place('tp').name('Куда игроки будут тепаться при обучении'))
+  learningLocation = location(this.quest.group.place('tp').name(l`Куда игроки будут тепаться при обучении`))
 
-  craftingTableLocation = location(this.quest.group.place('crafting table').name('Верстак'))
+  craftingTableLocation = location(this.quest.group.place('crafting table').name(l`Верстак`))
 
-  startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo('§r§6Начальный топор', 'Начальный топор')
+  startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(t`§r§6Начальный топор`, t`Начальный топор`)
 
   startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
 
@@ -267,7 +273,7 @@ class Learning {
       if (ctx.type !== 'break') return
       if (ctx.event.dimension.type !== 'overworld') return
       if ([...this.blockedOre.values()].flat().includes(Vec.string(ctx.event.block))) {
-        player.fail('Вы не можете ломать руду новичка.')
+        player.fail(t.error`Вы не можете ломать руду новичка.`)
         return false
       }
 
@@ -286,9 +292,9 @@ class Learning {
           ).includes(ctx.event.block.typeId)
         system.delay(() => {
           if (isOre) {
-            player.fail('Блоки можно ломать только глубоко в шахте!')
+            player.fail(t.error`Блоки можно ломать только глубоко в шахте!`)
           } else {
-            player.fail('В мирной зоне ломать блоки запрещено.')
+            player.fail(t.error`В мирной зоне ломать блоки запрещено.`)
           }
         })
       }
@@ -297,7 +303,7 @@ class Learning {
     Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (player.database.role === 'spectator') {
         player.info(
-          '§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.',
+          l`§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.`,
         )
       }
     })
@@ -308,7 +314,8 @@ class Learning {
       if (sent.has(player)) return false
 
       const toSpawn = () => (temp.cleanup(), Spawn.portal?.teleport(player))
-      if (!this.learningLocation.valid) return toSpawn(), player.fail('Случайное перемещение не настроено'), false
+      if (!this.learningLocation.valid)
+        return toSpawn(), player.fail(l.error`Learning is not setup properly (1)`), false
 
       const temp = new Temporary(ctx => {
         const fadeCamera = () => {
@@ -328,10 +335,10 @@ class Learning {
       return new Promise<boolean>(resolve => {
         sent.add(player)
         new ActionForm(
-          'Режим Перерождение',
-          'Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.',
+          t`Режим Перерождение`,
+          t`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`,
         )
-          .addButton('Вперед!', () => {
+          .addButton(t`Вперед!`, () => {
             if (!this.learningLocation.valid) return
 
             logger.player(player).info`Teleporting to ${this.learningLocation}`

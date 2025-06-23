@@ -56,7 +56,7 @@ function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
     .show(player)
 
   function getClanName(clan: Clan, color = '§f'): string {
-    return `§7[${clan.db.shortname}] ${color}${clan.db.name}\nУчастники: ${clan.db.members.length}`
+    return t.nocolor`§7[${clan.db.shortname}] ${color}${clan.db.name}\nУчастники: ${clan.db.members.length}`
   }
 }
 function createClan(player: Player, back: VoidFunction, name?: string, shortname?: string) {
@@ -76,7 +76,7 @@ function createClan(player: Player, back: VoidFunction, name?: string, shortname
       if (shortname.length > 5) return err(t`Короткое имя должно быть КОРОТКИМ, меньше 5 символов`)
       if (shortname.length < 2)
         return err(
-          `Короткое имя не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '${shortname}'`,
+          t.error`Короткое имя не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '${shortname}'`,
         )
 
       for (const clan of Clan.getAll()) {

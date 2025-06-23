@@ -46,12 +46,12 @@ export function createSelectPlayerMenu(
       })
       .addCustomButtonBeforeArray(form => {
         if (selected.length) {
-          form.addButton(`§3Убрать выделение${t.size(selected.length)}`, BUTTON['-'], () => {
+          form.addButton(t`§3Убрать выделение${t.size(selected.length)}`, BUTTON['-'], () => {
             selected.splice(0, selected.length)
             callback()
           })
         } else {
-          form.addButton(`§3Выбрать всех${t.size(players.length)}`, BUTTON['+'], () => {
+          form.addButton(t`§3Выбрать всех${t.size(players.length)}`, BUTTON['+'], () => {
             selected.splice(0, selected.length, ...getAllPlayersSelected())
             callback()
           })

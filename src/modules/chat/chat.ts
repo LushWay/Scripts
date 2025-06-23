@@ -100,7 +100,9 @@ class ChatBuilder {
         }
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages
-        event.sender.tell(doHightlight ? `${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message)
+        event.sender.tell(
+          doHightlight ? t.nocolor`${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message,
+        )
       } catch (error) {
         console.error(error)
       }

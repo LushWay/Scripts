@@ -13,8 +13,7 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
 
 const furnaceExpireTime = ms.from('hour', 1)
-const furnaceExpireTimeText =
-  'Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!'
+const furnaceExpireTimeText = t`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
 
 export class Furnacer extends ShopNpc {
   static create() {
@@ -50,7 +49,7 @@ export class Furnacer extends ShopNpc {
     onlyInStoneQuarry: boolean,
   ) {
     super(place)
-    this.shop.body(() => 'У меня ты можешь купить ключ доступа к печкам\n\n')
+    this.shop.body(() => t`У меня ты можешь купить ключ доступа к печкам\n\n`)
     Furnacer.npcs.push(this)
 
     if (onlyInStoneQuarry) {
@@ -64,10 +63,10 @@ export class Furnacer extends ShopNpc {
 
       form.itemStack(item, new MoneyCost(50), getAuxOrTexture(MinecraftItemTypes.TripwireHook, true))
       form.itemModifier(
-        'Сдать неиспользуемый ключ',
+        t`Сдать неиспользуемый ключ`,
         FreeCost,
         i => FurnaceKeyItem.schema.is(i),
-        'Ключ от печки',
+        t`Ключ от печки`,
         (slot, _, text) => {
           const parsed = FurnaceKeyItem.schema.parse(slot)
           if (!parsed) return
@@ -108,7 +107,7 @@ actionGuard((player, region, ctx) => {
 
   // Restrictions
   const notAllowed = (
-    message = 'Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!',
+    message = t`Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!`,
   ) => {
     return () => (system.delay(() => player.fail(message)), false)
   }
@@ -117,7 +116,7 @@ actionGuard((player, region, ctx) => {
     const lore = FurnaceKeyItem.schema.parse(slot, undefined, false)
     if (!lore) return notAllowed()
 
-    if (lore.furnacer !== furnacer.id) return notAllowed(`Этот ключ используется для других печек!`)
+    if (lore.furnacer !== furnacer.id) return notAllowed(t`Этот ключ используется для других печек!`)
 
     const blockId = Vec.string(ctx.event.block)
     const furnace = FurnaceKeyItem.db.get(blockId)
@@ -137,7 +136,7 @@ actionGuard((player, region, ctx) => {
           // Notify previous owner (Maybe?)
         } else {
           return notAllowed(
-            t.error`Эта печка уже занята. Печка освободится через ${t.error.time`${furnace.expires - Date.now()}`}, ключ: ${furnace.code}`,
+            t.error`Эта печка уже занята. Печка освободится через ${t.error.time(furnace.expires - Date.now())}, ключ: ${furnace.code}`,
           )
         }
       } else {
@@ -159,7 +158,7 @@ actionGuard((player, region, ctx) => {
         // Prevent from opening furnace dialog
         return false
       }
-    } else return notAllowed('Вы уже использовали этот ключ для другой печки.')
+    } else return notAllowed(t.error`Вы уже использовали этот ключ для другой печки.`)
   }
 
   const mainhand = tryItem(player.mainhand())
@@ -186,24 +185,28 @@ class FurnaceKeyItem {
   static db = table<{ expires: number; code: string; lastPlayerId: string; warnedAboutExpire?: 1 }>('furnaceKeys')
 
   static schema = new ItemLoreSchema('furnace key')
-    .nameTag(() => '§6Ключ от печки')
-    .lore('§7Открывает печку в каменоломне.')
+    .nameTag(() => t`§6Ключ от печки`)
+    .lore(t`§7Открывает печку в каменоломне.`)
 
     .property('furnacer', String)
 
     .property('code', String)
 
     .property('location', String)
-    .display('На', l => (!l ? false : l))
+    .display(t`На`, l => (!l ? false : l))
 
     .property('player', String)
-    .display('Владелец')
+    .display(t`Владелец`)
 
     .property<'status', 'notUsed' | 'inUse' | 'used'>('status', 'notUsed')
     .display('', unit => this.status[unit])
     .build()
 
-  static status = { notUsed: '§r§aНе использован', inUse: '§r§6Печка плавит...', used: '§r§cВремя истекло' }
+  static status = {
+    notUsed: t.nocolor`§r§aНе использован`,
+    inUse: t.nocolor`§r§6Печка плавит...`,
+    used: t.nocolor`§r§cВремя истекло`,
+  }
 
   static {
     system.runInterval(

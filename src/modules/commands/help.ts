@@ -3,9 +3,10 @@ import { ROLES, getRole } from 'lib'
 import { CmdLet } from 'lib/command/cmdlet'
 import { Command } from 'lib/command/index'
 import { commandNoPermissions, commandNotFound } from 'lib/command/utils'
+import { l, t } from 'lib/text'
 
 const help = new Command('help')
-  .setDescription('Выводит список команд')
+  .setDescription(t`Выводит список команд`)
   .setAliases('?', 'h')
   .setPermissions('everybody')
 
@@ -21,17 +22,17 @@ help
 
     const cv = colors[getRole(ctx.player.id)]
 
-    ctx.reply(`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
+    ctx.reply(l.nocolor`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
 
     for (const command of path) {
       const q = '§f.'
 
       const c = `${cv}§r ${q}${command.sys.name} §o§7- ${
-        command.sys.description ? command.sys.description : ' Пусто' //§r
+        command.sys.description ? command.sys.description : t` Пусто` //§r
       }`
-      ctx.reply('§ы' + c)
+      ctx.reply(l.nocolor`§ы` + c)
     }
-    ctx.reply(`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
+    ctx.reply(t`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
   })
 
 function helpForCommand(player: Player, commandName: string) {
@@ -42,8 +43,8 @@ function helpForCommand(player: Player, commandName: string) {
   if (!cmd.sys.requires(player)) return commandNoPermissions(player, cmd)
 
   const d = cmd.sys
-  const aliases = d.aliases.length > 0 ? ' §7(также §f' + d.aliases.join('§7, §f') + '§7)§r' : ''
-  const overview = `   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
+  const aliases = d.aliases.length > 0 ? t` §7(также §f` + d.aliases.join('§7, §f') + '§7)§r' : ''
+  const overview = t`   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
 
   player.tell(' ')
   player.tell(overview)
@@ -61,7 +62,7 @@ function helpForCommand(player: Player, commandName: string) {
 Command.getHelpForCommand = (command, ctx) => helpForCommand(ctx.player, command.sys.name)
 help.string('commandName').executes((ctx, command) => helpForCommand(ctx.player, command))
 
-new CmdLet('help').setDescription('Выводит справку о команде').executes(ctx => {
+new CmdLet('help').setDescription(t`Выводит справку о команде`).executes(ctx => {
   helpForCommand(ctx.player, ctx.command.sys.name)
   return 'stop'
 })

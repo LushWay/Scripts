@@ -1,6 +1,7 @@
 import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
 import { Vec } from 'lib/vector'
 import { Cuboid } from './cuboid'
+import { l } from 'lib/text'
 
 export interface BigStructureSaved extends JsonObject {
   id: string
@@ -102,7 +103,7 @@ export class BigStructure extends Cuboid {
           if (errors > 0)
             reject(
               new Error(
-                `§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
+                l`§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
               ),
             )
 

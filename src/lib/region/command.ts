@@ -159,7 +159,7 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
 
           if (center.y - radius <= -64)
             return player.fail(
-              `Нельзя создать регион, область которого ниже -64 (y: ${center.y} radius: ${radius} result: ${center.y - radius})`,
+              t`Нельзя создать регион, область которого ниже -64 (y: ${center.y} radius: ${radius} result: ${center.y - radius})`,
             )
 
           onSelect(new SphereArea({ radius, center }, player.dimension.type))
@@ -320,36 +320,36 @@ export function editRegionPermissions(
     ) => void
   > = new ModalForm(t`Разрешения ` + pluralForms[0])
     .addToggle(
-      `Двери\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери.`,
+      t`Двери\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери.`,
       region.permissions.doors,
     )
     .addToggle(
-      `Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать рычаг и кнопки.`,
+      t`Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать рычаг и кнопки.`,
       region.permissions.switches,
     )
     .addToggle(
-      `Люки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать люки.`,
+      t`Люки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать люки.`,
       region.permissions.trapdoors,
     )
     .addToggle(
-      `Контейнеры\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки открывать контейнеры (сундуки, шалкеры и тд)`,
+      t`Контейнеры\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки открывать контейнеры (сундуки, шалкеры и тд)`,
       region.permissions.openContainers,
     )
     .addToggle(
-      `Калитки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать калитки.`,
+      t`Калитки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать калитки.`,
       region.permissions.gates,
     )
 
   if (extendedEditPermissions) {
     form = form.addDropdownFromObject(
-      `Сражение\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`,
+      t`Сражение\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`,
       { true: t`Да`, pve: t`Только с сущностями (pve)`, false: t`Нет` },
       { defaultValueIndex: String(region.permissions.pvp) },
     )
 
     if (region.area instanceof SphereArea)
       form
-        .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
+        .addSlider(t`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
         .addTextField(t`Центр региона`, Vec.string(region.area.center), Vec.string(region.area.center))
   }
   form.show(player, (ctx, doors, switches, trapdoors, containers, fences, pvp, radiusOrCenter, rawCenter) => {
@@ -419,11 +419,11 @@ export function manageRegionMembers(
     const name = Player.nameOrUnknown(memberId)
 
     form.addButton(`${i === 0 ? t`§7Владелец > ` : ''}§f${name}`, () => {
-      const form = new ActionForm(name, `Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
+      const form = new ActionForm(name, t`Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
 
       if (region.getMemberRole(memberId) !== 'owner')
         form.addButtonAsk(
-          isOwner ? `Передать права владельца ${pluralForms[0]}` : `Назначить владельцем ${pluralForms[0]}`,
+          isOwner ? t`Передать права владельца ${pluralForms[0]}` : t`Назначить владельцем ${pluralForms[0]}`,
           t`Передать`,
           () => {
             region.permissions.owners = region.permissions.owners.sort(a => (a === memberId ? 1 : -1))

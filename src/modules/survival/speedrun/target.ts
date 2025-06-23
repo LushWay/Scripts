@@ -1,4 +1,4 @@
-import { GameRule, Player } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import { InventoryInterval, ScoreboardDB } from 'lib'
 import { form } from 'lib/form/new'
 import { t } from 'lib/text'
@@ -13,11 +13,11 @@ export enum SpeedRunTarget {
 }
 
 const speedRunNames: Record<SpeedRunTarget, string> = {
-  [SpeedRunTarget.AllAchievements]: 'Все достижения',
-  [SpeedRunTarget.GetBaseItem]: 'Получить базу',
-  [SpeedRunTarget.AllQuests]: 'Все задания',
-  [SpeedRunTarget.MillionOfMoney]: '1.000.000 монет',
-  [SpeedRunTarget.FullNetheriteArmor]: 'Полная незеритовая броня',
+  [SpeedRunTarget.AllAchievements]: t`Все достижения`,
+  [SpeedRunTarget.GetBaseItem]: t`Получить базу`,
+  [SpeedRunTarget.AllQuests]: t`Все задания`,
+  [SpeedRunTarget.MillionOfMoney]: t`1.000.000 монет`,
+  [SpeedRunTarget.FullNetheriteArmor]: t`Полная незеритовая броня`,
 }
 
 const objectives: Record<SpeedRunTarget, ScoreboardDB> = Object.fromEntries(
@@ -78,7 +78,7 @@ const speedrunForm = form((f, player) => {
   )
   for (const [target, name] of Object.entries(speedRunNames)) {
     const selected = player.database.speedrunTarget?.target === target
-    f.button((selected ? t.header : t)`${name}${selected ? '\n§aВыбрано' : ''}`, () => {
+    f.button((selected ? t.header : t)`${name}${selected ? t`\n§aВыбрано` : ''}`, () => {
       player.database.speedrunTarget = {
         target,
         finished: false,

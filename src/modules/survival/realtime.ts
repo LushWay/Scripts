@@ -1,5 +1,6 @@
 import { TicksPerDay, TimeOfDay, system, world } from '@minecraft/server'
 import { Settings } from 'lib'
+import { l } from 'lib/text'
 
 const MinutesPerDay = 24 * 60
 const Offset = 6000
@@ -24,10 +25,10 @@ const settings = Settings.world(...Settings.worldCommon, {
     value: true,
     onChange() {
       if (settings.syncRealTime) {
-        world.say('§7Теперь время игры синхронизируется с реальным')
+        world.say(l`§7Теперь время игры синхронизируется с реальным`)
         sync()
       } else {
-        world.say('§7Время игры больше не синхронизируется с реальным')
+        world.say(l`§7Время игры больше не синхронизируется с реальным`)
         system.clearRun(id)
         world.setTimeOfDay(TimeOfDay.Day)
       }

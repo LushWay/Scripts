@@ -43,7 +43,7 @@ const logger = createLogger('Newbie')
 function exitNewbieMode(player: Player, reason: Text) {
   if (!isNewbie(player)) return
 
-  player.warn(`§eВы ${reason}, поэтому вышли из режима новичка.`)
+  player.warn(t.nocolor`§eВы ${reason}, поэтому вышли из режима новичка.`)
   delete player.database.survival.newbie
   player.setProperty(property, false)
 

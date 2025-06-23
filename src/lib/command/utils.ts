@@ -49,7 +49,7 @@ export function commandNotFound(player: Player, command: string): void {
   player.playSound(Sounds.Fail)
 
   suggestCommand(player, command)
-  player.tell(t`§cСписок всех доступных вам команд: §f.help`)
+  player.tell(t.error`Список всех доступных вам команд: §f.help`)
   Command.logger.player(player).warn`Unknown command: ${command}`
 }
 
@@ -100,10 +100,10 @@ function suggestCommand(player: Player, command: string): void {
 export function commandNoPermissions(player: Player, command: import('./index').Command): void {
   let additional = ''
   if (!__RELEASE__ && typeof command.sys.role !== 'undefined') {
-    additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.role]}§c`
+    additional += t.error`\nКоманда доступна начиная с роли ${ROLES[command.sys.role]}`
   }
   player.fail(
-    `§cУ вас нет разрешения для использования команды §f${command.sys.name}${additional}\n§cСписок всех доступных вам команд: §f.help`,
+    t.error`У вас нет разрешения для использования команды ${command.sys.name}${additional}\nСписок всех доступных вам команд: §f.help`,
   )
 
   Command.logger.player(player).warn`No permission to use ${command}`

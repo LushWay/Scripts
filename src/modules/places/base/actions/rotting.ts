@@ -66,7 +66,7 @@ function substractMaterials(a: Readonly<Record<string, number>>, b: Readonly<Rec
 
 export function getSafeFromRottingTime(base: BaseRegion) {
   const time = substractMaterials(base.ldb.materials, base.ldb.barrel)
-  if (time === 0) return '§cскоро начнется гниение'
+  if (time === 0) return t.error`скоро начнется гниение`
   return t.timeHHMMSS(time * takeMaterialsTime)
 }
 
@@ -81,7 +81,7 @@ function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) 
     : t.raw`§cНе хватает ресурсов:\n${materialsToRawText(base.ldb.materialsMissing)}`
 
   const form = new ActionForm(
-    'Гниение базы',
+    t`Гниение базы`,
     t.raw`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${t.timeHHMMSS(takeMaterialsCooldown.getRemainingTime(base.id))}`,
   ).addButtonBack(back)
 
@@ -101,11 +101,12 @@ export function materialsToRawText(ldbMaterials: Readonly<Record<string, number>
 export function baseRottingButton(base: BaseRegion, player: Player, back?: VoidFunction) {
   let text = ''
   if (base.ldb.state === RottingState.NoMaterials) {
-    text = '§cБаза гниет!\n§4Срочно пополните материалы!'
+    text = t.nocolor`§cБаза гниет!
+§4Срочно пополните материалы!`
   } else if (base.ldb.state === RottingState.Destroyed) {
-    text = `§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vec.string(base.area.center, true)}!`
+    text = t.nocolor`§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vec.string(base.area.center, true)}!`
   } else {
-    text = `Состояние базы`
+    text = t.nocolor`Состояние базы`
   }
 
   return [text, baseRottingMenu.bind(null, base, player, back)] as const
@@ -127,8 +128,8 @@ async function startRotting(base: BaseRegion, state: RottingState) {
         player,
         message,
         state === RottingState.NoMaterials
-          ? 'Нужно срочно положить материалы в бочку!'
-          : 'База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью',
+          ? t`Нужно срочно положить материалы в бочку!`
+          : t`База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью`,
       )
     }
   })
@@ -349,7 +350,7 @@ actionGuard((player, base, ctx) => {
     }
 
     if (base.ldb.state === RottingState.NoMaterials)
-      player.fail('База гниет! Положите материалы из .base -> Гниение в бочку')
+      player.fail(t.error`База гниет! Положите материалы из .base -> Гниение в бочку`)
     return base.ldb.state !== RottingState.NoMaterials
   }
 }, ActionGuardOrder.BlockAction)

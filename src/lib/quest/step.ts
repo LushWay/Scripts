@@ -108,7 +108,7 @@ export abstract class QS<DB = any> extends Temporary {
         const result = activate(this, firstTime)
         if (result) this.cleaners.push(result.cleanup)
       } catch (e) {
-        this.error(`При активации шага произошла ошибка. ${developersAreWarned}`)
+        this.error(t.error`При активации шага произошла ошибка. ${developersAreWarned}`)
         throw e
       }
     })

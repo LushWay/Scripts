@@ -1,3 +1,4 @@
+/* i18n-ignore */
 import { GameMode, system, world } from '@minecraft/server'
 
 import * as GameTest from '@minecraft/server-gametest'

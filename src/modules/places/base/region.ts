@@ -4,6 +4,7 @@ import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
+import { l, t } from 'lib/text'
 import { getSafeFromRottingTime, materialsToRawText } from './actions/rotting'
 import { baseLevels } from './base-levels'
 
@@ -44,11 +45,11 @@ export class BaseRegion extends RegionWithStructure {
   }
 
   baseMemberText() {
-    let text = '§6Ваша база'
-    if (this.ldb.state === RottingState.NoMaterials) text += ' §c(гниет)'
-    if (this.ldb.state === RottingState.Destroyed) text += ' §c(разрушена)'
-    if (this.ldb.state === RottingState.No) text += ` ${getSafeFromRottingTime(this)}`
-    return text
+    let text = ''
+    if (this.ldb.state === RottingState.NoMaterials) text += t.error`(гниет)`
+    if (this.ldb.state === RottingState.Destroyed) text += t.error`(разрушена)`
+    if (this.ldb.state === RottingState.No) text += getSafeFromRottingTime(this)
+    return t.nocolor`§6Ваша база ${text}`
   }
 
   updateRadius() {
@@ -81,5 +82,5 @@ export class BaseRegion extends RegionWithStructure {
 }
 
 registerSaveableRegion('base', BaseRegion)
-registerRegionType('Базы', BaseRegion)
+registerRegionType(l`Базы`, BaseRegion)
 disableAdventureNear.push(BaseRegion)

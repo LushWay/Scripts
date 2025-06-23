@@ -270,7 +270,7 @@ export class Boss {
     Boss.db.set(this.options.place.id, { id: '', date: Date.now(), dead: true })
 
     if (dropLoot) {
-      world.say(`§6Убит босс §f${this.options.place.name}!`)
+      world.say(t.header`Убит босс ${this.options.place.name}!`)
 
       this.options.loot.generate().forEach(e => {
         if (e) {

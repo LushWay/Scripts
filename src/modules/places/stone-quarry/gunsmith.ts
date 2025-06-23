@@ -12,8 +12,8 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
-    super(group.place('gunsmith').name('Оружейник'))
-    this.shop.body(() => 'Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.')
+    super(group.place('gunsmith').name(t`Оружейник`))
+    this.shop.body(() => t`Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.`)
 
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
@@ -21,7 +21,7 @@ export class Gunsmith extends ShopNpc {
     this.shop.menu((form, player) => {
       form
         .itemModifierSection(
-          'Улучшить до незерита',
+          t`Улучшить до незерита`,
           item =>
             (
               [
@@ -34,20 +34,20 @@ export class Gunsmith extends ShopNpc {
                 i.DiamondSword,
               ] as string[]
             ).includes(item.typeId),
-          'Алмазный предмет',
+          t`Алмазный предмет`,
           (form, slot) => {
             form
               .product()
-              .name('Улучшить')
+              .name(t`Улучшить`)
               .cost(new MultiCost().item(i.NetheriteIngot, 1).money(1000))
               .onBuy(() => this.upgradeDiamondSwordToNetherite(slot, player))
           },
         )
 
         .itemModifierSection(
-          'Починить',
+          t`Починить`,
           i => !!i.durability && i.durability.damage !== 0,
-          'Любой поломанный предмет',
+          t`Любой поломанный предмет`,
           (form, slot) => {
             const item = slot.getItem()
             if (!item?.durability) return false
@@ -61,7 +61,7 @@ export class Gunsmith extends ShopNpc {
 
             form
               .product()
-              .name('Починить')
+              .name(t`Починить`)
               .cost(cost)
               .onBuy(() => {
                 if (item.durability) item.durability.damage = 0

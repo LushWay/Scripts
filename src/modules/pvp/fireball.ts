@@ -6,10 +6,11 @@ import { Items } from 'lib/assets/custom-items'
 import { customItems } from 'lib/rpg/custom-item'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
+import { t } from 'lib/text'
 
 export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
   undefined,
-  'Используйте, чтобы отправить все в огненный ад',
+  t`Используйте, чтобы отправить все в огненный ад`,
 )
 
 customItems.push(FireBallItem)

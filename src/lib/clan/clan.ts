@@ -128,7 +128,7 @@ export class Clan {
       new Rewards(),
     )
     this.db.joinRequests.push(player.id)
-    player.success(`Заявка на вступление в клан '${this.db.name}' отправлена!`)
+    player.success(t`Заявка на вступление в клан '${this.db.name}' отправлена!`)
   }
 
   add(playerOrId: Player | string) {

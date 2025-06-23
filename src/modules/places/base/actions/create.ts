@@ -31,8 +31,8 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   if (isNewbie(player)) {
     event.cancel = true
     return system.delay(() =>
-      askForExitingNewbieMode(player, 'решили создать базу', () =>
-        player.success('Теперь вы можете свободно создать базу!'),
+      askForExitingNewbieMode(player, t`решили создать базу`, () =>
+        player.success(t`Теперь вы можете свободно создать базу!`),
       ),
     )
   }
@@ -47,13 +47,15 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   if (region) {
     event.cancel = true
     const isOwner = region.getMemberRole(player) === 'owner'
-    return player.fail(`§cВы уже ${isOwner ? 'владеете базой' : `состоите в базе игрока '${region.ownerName}'`}!`)
+    return player.fail(
+      t.nocolor`§cВы уже ${isOwner ? t`владеете базой` : t`состоите в базе игрока '${region.ownerName}'`}!`,
+    )
   }
 
   const nearRegions = Region.getNear(block, 50)
   if (nearRegions.length) {
     event.cancel = true
-    return player.fail('§cРядом есть другие регионы!')
+    return player.fail(t.error`Рядом есть другие регионы!`)
   }
 
   system.delay(() => createBase(block, player))

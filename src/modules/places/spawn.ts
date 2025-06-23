@@ -9,13 +9,14 @@ import { RegionEvents } from 'lib/region/events'
 import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
 import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
+import { t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
 
 class SpawnBuilder extends AreaWithInventory {
-  group = new Group('common', 'Общее')
+  group = new Group('common', t`Общее`)
 
   private readonly name = 'Spawn'
 
@@ -28,16 +29,16 @@ class SpawnBuilder extends AreaWithInventory {
   inventoryName: InventoryTypeName = 'spawn'
 
   location = locationWithRotation(
-    this.group.place('spawn').name('Спавн'),
+    this.group.place('spawn').name(t`Спавн`),
     { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
     true,
   )
 
-  settings = Settings.player('Вход', 'join', {
+  settings = Settings.player(t`Вход`, 'join', {
     teleportToSpawnOnJoin: {
       value: true,
-      name: 'Телепорт на спавн',
-      description: 'Определяет, будете ли вы телепортироваться на спавн при входе',
+      name: t`Телепорт на спавн`,
+      description: t`Определяет, будете ли вы телепортироваться на спавн при входе`,
     },
   })
 
@@ -61,7 +62,10 @@ class SpawnBuilder extends AreaWithInventory {
         Portal.showHudTitle(player, '§9> §bSpawn §9<')
       })
 
-      this.portal.createCommand().setPermissions('everybody').setDescription('§r§bПеремещает на спавн')
+      this.portal
+        .createCommand()
+        .setPermissions('everybody')
+        .setDescription(t.nocolor`§r§bПеремещает на спавн`)
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {

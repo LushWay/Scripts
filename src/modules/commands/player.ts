@@ -10,7 +10,7 @@ import { showStats } from './stats'
 new Command('player')
   .setAliases('p', 'profile')
   .setPermissions('everybody')
-  .setDescription('Общее меню игрока')
+  .setDescription(t`Общее меню игрока`)
   .executes(ctx => playerMenu(ctx.player.id).command(ctx))
 
 const playerMenu = (targetId: string) =>
@@ -21,16 +21,16 @@ const playerMenu = (targetId: string) =>
     f.title(db.name ?? targetId)
 
     if (moder) {
-      f.button('Другие игроки', () => {
-        selectPlayer(player, 'открыть его меню', back).then(target => {
+      f.button(t`Другие игроки`, () => {
+        selectPlayer(player, t`открыть его меню`, back).then(target => {
           playerMenu(target.id).show(player, back)
         })
       })
     }
-    f.button('Статистика', () => showStats(player, targetId, back))
+    f.button(t`Статистика`, () => showStats(player, targetId, back))
 
     f.button(
-      'Задания',
+      t`Задания`,
       form(f => f.body(stringify(db.quests))),
     )
     f.button(

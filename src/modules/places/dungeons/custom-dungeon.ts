@@ -3,7 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, ms, RegionCreationOptions, registerRegionType, registerSaveableRegion, Vec } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
 import { Area } from 'lib/region/areas/area'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { DungeonRegion, DungeonRegionDatabase } from './dungeon'
 import { Dungeon } from './loot'
 
@@ -62,7 +62,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 
   override get displayName() {
-    return Dungeon.customNames[this.ldb.name] ?? 'Данж'
+    return Dungeon.customNames[this.ldb.name] ?? t`Данж`
   }
 
   addCustomChest(location: Vector3, loot: keyof (typeof Dungeon)['customLoot'], restoreTimeMin: number) {
@@ -74,7 +74,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 }
 registerSaveableRegion('customDungeon', CustomDungeonRegion)
-registerRegionType('Кастомный данж', CustomDungeonRegion, false, true)
+registerRegionType(l`Кастомный данж`, CustomDungeonRegion, false, true)
 
 function eventHelper(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false
@@ -135,9 +135,9 @@ function editChest(
 ) {
   const keys: string[] = []
 
-  new ModalForm('Сундук с лутом')
+  new ModalForm(l`Сундук с лутом`)
     .addDropdownFromObject(
-      'Лут',
+      l`Лут`,
       Object.fromEntries(
         Object.entriesStringKeys(Dungeon.customLoot)
           .map(([key, value]) => [key, (value?.id ?? key).replace('mystructure:dungeons/', '')])
@@ -145,7 +145,7 @@ function editChest(
       ),
       { defaultValueIndex: chest?.loot },
     )
-    .addSlider('Время восстановления (в минутах)', 1, 180, 1, chest ? chest.restoreTime / 60_000 : 20)
+    .addSlider(l`Время восстановления (в минутах)`, 1, 180, 1, chest ? chest.restoreTime / 60_000 : 20)
     .show(player, (_, loot, restoreTime) => {
       if (chest) {
       } else {

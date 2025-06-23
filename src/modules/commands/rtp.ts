@@ -2,15 +2,16 @@ import { Player, TicksPerSecond } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { LockAction, Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { t } from 'lib/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { randomLocationInAnarchy } from 'modules/places/anarchy/random-location-in-anarchy'
 
 const rtpPlayers = new WeakPlayerMap<Vector3>()
-new LockAction(player => rtpPlayers.has(player), 'Вы телепортируетесь!')
+new LockAction(player => rtpPlayers.has(player), t.error`Вы телепортируетесь!`)
 
 function cancelRtp(player: Player) {
   const location = rtpPlayers.get(player)
-  if (!location) return player.fail('Вы не телепортируетесь!')
+  if (!location) return player.fail(t.error`Вы не телепортируетесь!`)
 
   rtpComplete(player, location)
 }
@@ -23,11 +24,11 @@ function rtpComplete(player: Player, location: Vector3) {
 
 export const rtpCommand = new Command('rtp')
   .setAliases('wild')
-  .setDescription('Телепортация в случайное место на анархии')
+  .setDescription(t`Телепортация в случайное место на анархии`)
   .setPermissions('member')
   .executes(ctx => {
     if (ctx.player.dimension.type !== 'overworld' || ctx.player.database.inv !== 'anarchy')
-      return ctx.error('Недоступно')
+      return ctx.error(t.error`Недоступно`)
     if (LockAction.locked(ctx.player)) return
 
     rtpPlayers.set(ctx.player, ctx.player.location)
@@ -45,7 +46,7 @@ export const rtpCommand = new Command('rtp')
     })
   })
   .overload('cancel')
-  .setDescription('Отменяет телепортацию')
+  .setDescription(t`Отменяет телепортацию`)
   .setPermissions('member')
   .executes(ctx => {
     cancelRtp(ctx.player)

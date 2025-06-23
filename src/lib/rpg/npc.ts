@@ -14,6 +14,7 @@ import { anyPlayerNear } from 'lib/player-move'
 import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
 import { Place } from './place'
+import { t } from 'lib/text'
 
 export declare namespace Npc {
   type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => boolean
@@ -110,10 +111,10 @@ export class Npc {
           const npcName = component ? component.name : event.target.nameTag
 
           if (!npc || !(npc.onQuestInteraction(event) || npc.onInteract(event))) {
-            return event.player.fail(`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
+            return event.player.fail(t`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
           }
         } catch (e) {
-          event.player.warn(`Не удалось открыть диалог. ${developersAreWarned}`)
+          event.player.warn(t.warn`Не удалось открыть диалог. ${developersAreWarned}`)
           this.logger.error(e)
         }
       })

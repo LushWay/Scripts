@@ -243,7 +243,7 @@ export class Quest {
   }
 
   get group() {
-    return new Group(`quest: ${this.id}`, `Задание: ${this.name}\n§7${this.description}`)
+    return new Group(`quest: ${this.id}`, t`Задание: ${this.name}\n§7${this.description}`)
   }
 
   button = new QuestButton(this)

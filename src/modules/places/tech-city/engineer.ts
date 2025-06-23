@@ -13,12 +13,12 @@ import { MagicSlimeBall } from '../village-of-explorers/items'
 
 export const CircuitBoard = new ItemStack(Items.CircuitBoard).setInfo(
   undefined,
-  'Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота',
+  t`Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота`,
 )
 
 export const Chip = new ItemStack(Items.Chip).setInfo(
   undefined,
-  'Используется для создания платы у Инжинера в Технограде',
+  t`Используется для создания платы у Инжинера в Технограде`,
 )
 customItems.push(CircuitBoard, Chip)
 
@@ -38,9 +38,12 @@ export const NotNewbieCost = new (class NotNewbieCost extends Cost {
 
 export class Engineer extends ShopNpc {
   constructor(public group: Group) {
-    super(group.place('engineer').name('Инженер'))
+    super(group.place('engineer').name(t`Инженер`))
 
-    this.shop.body(() => 'Ну типа дай мне чертеж, a я те чета там наколупаю, да\n')
+    this.shop.body(
+      () => t`Ну типа дай мне чертеж, a я те чета там наколупаю, да
+`,
+    )
     this.shop.menu(menu => {
       menu.itemStack(
         BaseItem.itemStack,
@@ -71,7 +74,7 @@ export class Engineer extends ShopNpc {
           .money(4500),
       )
 
-      menu.section('Все для редстоуна', menu => {
+      menu.section(t`Все для редстоуна`, menu => {
         menu.itemStack(new ItemStack(i.Slime), new MultiCost().money(5))
         menu.itemStack(new ItemStack(i.HoneyBlock), new MultiCost().money(10))
         menu.itemStack(new ItemStack(i.Piston), new MultiCost().money(8))

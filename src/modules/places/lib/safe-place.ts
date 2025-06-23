@@ -19,20 +19,20 @@ import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
 import { Product } from 'lib/shop/product'
-import { MaybeRawText } from 'lib/text'
+import { l, MaybeRawText, t } from 'lib/text'
 
 export class SafePlace {
   static places: SafePlace[] = []
 
   readonly group = new Group(this.groupId, this.name)
 
-  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name('мирная зона'))
+  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name(l`мирная зона`))
 
-  portalTeleportsTo = locationWithRotation(this.group.place('portal teleports to').name('портал телепортирует на'))
+  portalTeleportsTo = locationWithRotation(this.group.place('portal teleports to').name(l`портал телепортирует на`))
 
-  private portalFrom = location(this.group.place('portal from').name('портал от'), undefined, true)
+  private portalFrom = location(this.group.place('portal from').name(l`портал от`), undefined, true)
 
-  private portalTo = location(this.group.place('portal to').name('портал до'), undefined, true)
+  private portalTo = location(this.group.place('portal to').name(l`портал до`), undefined, true)
 
   safeArea?: SafeAreaRegion
 
@@ -69,7 +69,7 @@ export class SafePlace {
 
       player.database.unlockedPortals ??= []
       if (!player.database.unlockedPortals.includes(this.groupId)) {
-        player.success('Открыт новый портал! [Когда-нибудь здесь будет анимация...]')
+        player.success(t`Открыт новый портал! [Когда-нибудь здесь будет анимация...]`)
         player.database.unlockedPortals.push(this.groupId)
       }
 
@@ -85,7 +85,7 @@ export class SafePlace {
     RegionEvents.onEnter(this.safeArea, player => {
       if (this.showOnEnterTitle(player)) {
         player.onScreenDisplay.setHudTitle(`§f${this.name}`, {
-          subtitle: '§aМирная зона',
+          subtitle: t`§aМирная зона`,
           fadeInDuration: 0.5 * TicksPerSecond,
           stayDuration: 1 * TicksPerSecond,
           fadeOutDuration: 1 * TicksPerSecond,
@@ -121,7 +121,7 @@ const portalMenuOnce = debounceMenu(function portalMenu(
   to?: Vector3,
 ) {
   return new ArrayForm(
-    'Перемещение...',
+    t`Перемещение...`,
     SafePlace.places
       .map(e => ({ location: e.portalTeleportsTo, group: e.group }))
       .filter(e => e.location.valid && e.group.id !== group?.id),
@@ -157,6 +157,6 @@ const portalMenuOnce = debounceMenu(function portalMenu(
 })
 
 new Command('portals')
-  .setDescription('Порталы')
+  .setDescription(t`Порталы`)
   .setPermissions('techAdmin')
   .executes(ctx => portalMenuOnce(ctx.player))

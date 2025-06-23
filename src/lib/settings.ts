@@ -269,7 +269,7 @@ export function settingsGroupMenu(
     label += `§f§l${setting.name}§r§f` //§r
 
     if (setting.description) label += `§i - ${setting.description}`
-    if (isUnset) label += `§8(По умолчанию)\n`
+    if (isUnset) label += t.nocolor`§8(По умолчанию)\n`
 
     if (isToggle) {
       form.addToggle(label, value)
@@ -281,9 +281,9 @@ export function settingsGroupMenu(
       const isString = typeof value === 'string'
 
       if (!isString) {
-        label += `\n§7§lЗначение:§r ${stringify(value)}`
+        label += t.nocolor`\n§7§lЗначение:§r ${stringify(value)}`
 
-        label += `\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`
+        label += t.nocolor`\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`
       }
 
       form.addTextField(label, t`Настройка не изменится`, isString ? value : JSON.stringify(value))

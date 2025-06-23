@@ -1,4 +1,5 @@
 import { ChatSendAfterEvent } from '@minecraft/server'
+import { t } from 'lib/text'
 import { CommandContext } from './context'
 import { Command } from './index'
 
@@ -37,9 +38,9 @@ export class CmdLet {
 
     if (cmdlets.length > 0 && results.length < 1) {
       event.sender.fail(
-        `§cНеизвестный аргумент: §f${cmdlets.join(
+        t.error`Неизвестный аргумент: ${cmdlets.join(
           '§c, §f',
-        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(e => `\n  §f${e.name} §7§o- ${e.description}`)}\n `,
+        )}.\nДоступные командлеты: \n${CmdLet.list.map(e => `\n  §f${e.name} §7§o- ${e.description}`)}\n `,
       )
       return 'stop'
     }

@@ -70,7 +70,7 @@ export class CustomItemWithBlueprint extends CustomItem {
 
   get blueprint() {
     return new ItemStack(Items.Blueprint).setInfo(
-      `§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, Language.ru_RU) : this._bprintName)}`,
+      t`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, Language.ru_RU) : this._bprintName)}`,
       t`С помощью него вы можете сделать предмет у инженера`,
     )
   }

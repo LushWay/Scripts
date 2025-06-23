@@ -30,7 +30,7 @@ export abstract class City extends SafePlace {
 
   donutCrate?: Crate
 
-  cutscene = new Cutscene(this.group.id, 'Исследование ' + this.name)
+  cutscene = new Cutscene(this.group.id, t`Исследование ${this.name}`)
 
   jeweler = new Jeweler(this.group)
 
@@ -39,8 +39,8 @@ export abstract class City extends SafePlace {
   abstract guide: Npc
 
   visitCityQuest = new DailyQuest(
-    this.group.place('visit').name('Посети город'),
-    'Сходи в город, сделай запланированые покупки',
+    this.group.place('visit').name(t`Посети город`),
+    t`Сходи в город, сделай запланированые покупки`,
     q => {
       if (this.safeArea) q.reachRegion(this.safeArea, `0/1`)
     },

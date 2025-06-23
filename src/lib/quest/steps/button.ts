@@ -20,7 +20,7 @@ export class QSButtonBuilder extends QSBuilder<QSButton> {
         if (player.id !== ctx.player.id) return false
 
         return [
-          `${step.text()}\n§aЗавершено! §6Заберите награду.`,
+          t`${step.text()}\n§aЗавершено! §6Заберите награду.`,
           undefined,
           form(f => {
             f.title(ctx.quest.name)

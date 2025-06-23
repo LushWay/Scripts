@@ -4,6 +4,7 @@ import { Cooldown, ms } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { t } from 'lib/text'
 import { BaseRegion } from 'modules/places/base/region'
 
 const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS, GATES)
@@ -17,7 +18,7 @@ function youCannot(player: Player) {
   if (textCooldown.isExpired(player)) {
     system.delay(() =>
       player.onScreenDisplay.setActionBar(
-        `§cВы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`,
+        t.error`Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`,
         ActionbarPriority.Highest,
       ),
     )

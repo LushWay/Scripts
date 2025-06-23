@@ -22,7 +22,7 @@ world.afterEvents.entityDie.subscribe(event => {
     const playerContainer = event.deadEntity.container
 
     if (playerContainer?.emptySlotsCount === playerContainer?.size && settings.noInvMessage) {
-      event.deadEntity.warn('Вы умерли без вещей!')
+      event.deadEntity.warn(t`Вы умерли без вещей!`)
       if (event.deadEntity.isSimulated()) return
     }
 
@@ -37,7 +37,7 @@ world.afterEvents.entityDie.subscribe(event => {
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())
     gravestone.setDynamicProperty(gravestoneDiedAtPve, !!pveRegion)
     gravestone.addTag(gravestoneTag)
-    gravestone.nameTag = `§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? '§bновичка ' : pveRegion ? '§a(безопасно) ' : ''}§f${name}`
+    gravestone.nameTag = t.nocolor`§c§h§e§s§t§6Могила ${event.deadEntity.database.survival.newbie ? t.nocolor`§bновичка ` : pveRegion ? t.nocolor`§a(безопасно) ` : ''}§f${name}`
     event.deadEntity.database.survival.gravestoneId = gravestone.id
 
     const gravestoneContainer = gravestone.container
@@ -56,13 +56,13 @@ world.afterEvents.entityDie.subscribe(event => {
 
 const getSettings = Settings.player(...Quest.playerSettings.extend, {
   restoreInvQuest: {
-    name: 'Задание "Вернуть вещи"',
-    description: 'Включать ли задание по восстановлению инвентаря после смерти',
+    name: t`Задание "Вернуть вещи"`,
+    description: t`Включать ли задание по восстановлению инвентаря после смерти`,
     value: true,
   },
   noInvMessage: {
-    name: 'Сообщение при смерти с пустым инвентарём',
-    description: 'Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов',
+    name: t`Сообщение при смерти с пустым инвентарём`,
+    description: t`Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов`,
     value: true,
   },
 })
@@ -132,11 +132,11 @@ actionGuard((player, _, ctx) => {
 
   if (owner === player.id) return true
   if (Player.database.getImmutable(owner).survival.newbie) {
-    ctx.event.player.fail('Вы не можете открыть могилу новичка!')
+    ctx.event.player.fail(t.error`Вы не можете открыть могилу новичка!`)
     return false
   }
   if (ctx.event.target.getDynamicProperty(gravestoneDiedAtPve)) {
-    ctx.event.player.fail('Вы не можете открыть могилу игрока, умершего в зоне без сражения!')
+    ctx.event.player.fail(t.error`Вы не можете открыть могилу игрока, умершего в зоне без сражения!`)
     return false
   }
 
@@ -164,17 +164,17 @@ onGravestoneRemove.subscribe(({ ownerId }) => {
 }, -10)
 
 const quest = new Quest(
-  noGroup.place('restoreInventory').name('Вернуть вещи'),
-  'Верните вещи после смерти!',
+  noGroup.place('restoreInventory').name(t`Вернуть вещи`),
+  t`Верните вещи после смерти!`,
   (q, player) => {
     const { deadAt2, gravestoneId } = player.database.survival
-    if (!gravestoneId) return q.failed('Могила была удалена очисткой мусора.', true)
-    if (!deadAt2) return q.failed('Ваше место смерти потерялось!', true)
+    if (!gravestoneId) return q.failed(t.error`Могила была удалена очисткой мусора.`, true)
+    if (!deadAt2) return q.failed(t.error`Ваше место смерти потерялось!`, true)
 
     q.dynamic(Vec.string(deadAt2.location, true))
       .description(
-        `Верните свои вещи${
-          player.database.survival.newbie ? ', никто кроме вас их забрать не может' : ''
+        t`Верните свои вещи${
+          player.database.survival.newbie ? t`, никто кроме вас их забрать не может` : ''
         }, они ждут вас на ${Vec.string(deadAt2.location, true)}§6!`,
       )
       .activate(ctx => {
@@ -194,7 +194,7 @@ const quest = new Quest(
       })
 
     q.end(() => {
-      player.success('Поздравляем! В будущем постарайтесь быть осторожнее.')
+      player.success(t`Поздравляем! В будущем постарайтесь быть осторожнее.`)
     })
   },
 )

@@ -3,6 +3,7 @@ import { FormCallback, ROLES, getRole, setRole } from 'lib'
 import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
 import { WHO_CAN_CHANGE } from 'lib/roles'
+import { t } from 'lib/text'
 
 const FULL_HIERARCHY = Object.keys(ROLES)
 
@@ -14,13 +15,13 @@ function canChange(who: Role, target: Role, allowSame = false) {
 }
 
 const command = new Command('role')
-  .setDescription('Показывает вашу роль')
+  .setDescription(t`Показывает вашу роль`)
   .setPermissions('everybody')
   .executes(ctx => roleMenu(ctx.player))
 
 const restoreRole = command
   .overload('restore')
-  .setDescription('Восстанавливает вашу роль')
+  .setDescription(t`Восстанавливает вашу роль`)
   .setPermissions(p => !!p.database.prevRole)
   .executes(ctx => {
     const prevRole = ctx.player.database.prevRole
@@ -29,29 +30,29 @@ const restoreRole = command
     setRole(ctx.player, prevRole)
     delete ctx.player.database.prevRole
 
-    ctx.player.info(`Вы вернули роль §r${ROLES[prevRole]}`)
+    ctx.player.info(t`Вы вернули роль §r${ROLES[prevRole]}`)
   })
 
 function roleMenu(player: Player) {
   const prole = getRole(player.id)
   if (!WHO_CAN_CHANGE.includes(prole))
     return player.info(
-      `Ваша роль: ${ROLES[prole]}${
-        restoreRole.sys.requires(player) ? '\n\n§3Восстановить прошлую роль: §f.role restore' : ''
+      t`Ваша роль: ${ROLES[prole]}${
+        restoreRole.sys.requires(player) ? t`\n\n§3Восстановить прошлую роль: §f.role restore` : ''
       }`,
     )
 
   const players = world.getAllPlayers()
 
   new ArrayForm('Roles $page/$max', Player.database.entries().reverse())
-    .description('§3Ваша роль: ' + ROLES[prole])
+    .description(t`§3Ваша роль: ${ROLES[prole]}`)
     .filters({
       sort: {
-        name: 'Сортировать по',
+        name: t`Сортировать по`,
         value: [
-          ['online', '§bонлайну'],
-          ['role', '§aролям'],
-          ['join date', '§6дате входа'],
+          ['online', t`§bонлайну`],
+          ['role', t`§aролям`],
+          ['join date', t`§6дате входа`],
         ],
       },
     })
@@ -66,21 +67,26 @@ function roleMenu(player: Player) {
     .addCustomButtonBeforeArray(function (this, form, _, back) {
       const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
 
-      if (button) form.addButton('§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)', button[1])
+      if (button)
+        form.addButton(
+          t`§3Сменить мою роль
+§7(Восстановить потом: §f.role restore§7)`,
+          button[1],
+        )
     })
     .button(([id, { role, name: dbname }], _, form) => {
       const target = players.find(e => e.id === id) ?? id
-      const name = typeof target === 'string' ? (dbname ?? 'Без имени') : target.name
+      const name = typeof target === 'string' ? (dbname ?? t`Без имени`) : target.name
 
       return [
         `${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${
-          canChange(prole, role) ? '' : ' §4Не сменить'
+          canChange(prole, role) ? '' : t` §4Не сменить`
         }`,
         () => {
           const self = player.id === id
           if (!canChange(prole, role, self)) {
             return new FormCallback(form, player).error(
-              '§4У игрока §f' + name + '§4 роль выше или такая же как у вас, вы не можете ее сменить.',
+              t`§4У игрока §f` + name + t`§4 роль выше или такая же как у вас, вы не можете ее сменить.`,
             )
           }
           const filteredRoles = Object.fromEntries(
@@ -90,23 +96,23 @@ function roleMenu(player: Player) {
               .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`]),
           )
           new ModalForm(name)
-            .addToggle('Уведомлять', true)
-            .addToggle('Показать Ваш ник в уведомлении', true)
-            .addDropdownFromObject('Роль', filteredRoles, {
+            .addToggle(t`Уведомлять`, true)
+            .addToggle(t`Показать Ваш ник в уведомлении`, true)
+            .addDropdownFromObject(t`Роль`, filteredRoles, {
               defaultValueIndex: Object.keys(filteredRoles).findIndex(e => e === role),
             })
-            .addTextField('Причина смены роли', `Например, "чел дурной, пол технограда снес"`)
+            .addTextField(t`Причина смены роли`, t`Например, "чел дурной, пол технограда снес"`)
             .show(player, (_, notify, showName, newrole, message) => {
               if (target instanceof Player) {
                 if (notify && target instanceof Player)
                   target.info(
-                    `Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
-                      showName ? `§3 игроком §r${player.name}` : ''
-                    }${message ? `\n§r§3Причина: §r${message}` : ''}`,
+                    t`Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
+                      showName ? t`§3 игроком §r${player.name}` : ''
+                    }${message ? t`\n§r§3Причина: §r${message}` : ''}`,
                   )
 
-                player.success(`Роль игрока ${target.name} сменена успешно`)
-              } else player.success('Роль сменена успешно')
+                player.success(t`Роль игрока ${target.name} сменена успешно`)
+              } else player.success(t`Роль сменена успешно`)
 
               setRole(target, newrole)
               if (self) {

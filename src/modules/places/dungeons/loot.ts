@@ -5,6 +5,7 @@ import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { BaseItem } from '../base/base'
+import { t } from 'lib/text'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)
@@ -46,17 +47,17 @@ const defaultLoot = new Loot('dungeon_default_loot')
 const d = StructureDungeonsId
 
 const names: Record<string, string> = {
-  [d.GasStation1]: 'Заправка 1',
-  [d.GasStation2]: 'Заправка 2',
-  [d.GasStation3]: 'Заправка 3',
-  [d.GasStation4]: 'Заправка 4',
-  [d.GasStationGarage]: 'Гараж',
-  [d.Avanpost]: '§cАванпост',
+  [d.GasStation1]: t`Заправка 1`,
+  [d.GasStation2]: t`Заправка 2`,
+  [d.GasStation3]: t`Заправка 3`,
+  [d.GasStation4]: t`Заправка 4`,
+  [d.GasStationGarage]: t`Гараж`,
+  [d.Avanpost]: t`§cАванпост`,
 } satisfies Record<StructureDungeonsId, string>
 
 const customNames: Record<string, string> = {
-  bunker: '§4Бункер',
-  avanpostTent: '§cПалатка аванпоста',
+  bunker: t`§4Бункер`,
+  avanpostTent: t`§cПалатка аванпоста`,
 }
 
 const powerfullLoot: Record<string, LootTable | undefined> = {

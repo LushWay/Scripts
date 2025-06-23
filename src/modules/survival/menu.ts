@@ -14,9 +14,9 @@ import { wiki } from 'modules/wiki/wiki'
 import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
 
-function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = 'Спавн', extra = '') {
+function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = t`Спавн`, extra = '') {
   const here = inv === place
-  if (here) extra = `${extra ? extra + ' ' : ''}§8Вы тут`
+  if (here) extra = t`${extra ? extra + ' ' : ''}§8Вы тут`
   if (extra) extra = '\n' + extra
   const prefix = here ? '§7' : color
   return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
@@ -31,13 +31,13 @@ Menu.open = player => {
   }
 
   const form: ActionForm = new ActionForm(Core.name, '', '§c§u§s§r')
-    .addButton(tp('spawn', inv, '§9', 'Спавн'), 'textures/ui/worldsIcon', () => {
+    .addButton(tp('spawn', inv, '§9', t`Спавн`), 'textures/ui/worldsIcon', () => {
       Spawn.portal?.teleport(player)
     })
-    .addButton(tp('anarchy', inv, '§c', 'Анархия'), 'textures/blocks/tnt_side', () => {
+    .addButton(tp('anarchy', inv, '§c', t`Анархия`), 'textures/blocks/tnt_side', () => {
       Anarchy.portal?.teleport(player)
     })
-    .addButton(tp('mg', inv, `§6`, `Миниигры`, `§7СКОРО!`), 'textures/blocks/bedrock', back)
+    .addButton(tp('mg', inv, `§6`, t`Миниигры`, t`§7СКОРО!`), 'textures/blocks/bedrock', back)
     .addButton(
       t.unreadBadge`Задания ${player.database.quests?.active.length ?? 0}`,
       'textures/ui/sidebar_icons/genre',
@@ -45,7 +45,7 @@ Menu.open = player => {
     )
 
   if (player.database.inv === 'anarchy') {
-    form.addButton('База', 'textures/blocks/barrel_side', () =>
+    form.addButton(t`База`, 'textures/blocks/barrel_side', () =>
       openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
     )
     const [clanText, clan] = clanMenu(player, back)
@@ -53,11 +53,11 @@ Menu.open = player => {
   }
 
   form
-    .addButton('§6Донат\n§7СКОРО!', 'textures/ui/permissions_op_crown', back)
-    .addButton(`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, back))
-    .addButton('§bВики', BUTTON.search, wiki.show)
+    .addButton(t.nocolor`§6Донат\n§7СКОРО!`, 'textures/ui/permissions_op_crown', back)
+    .addButton(t.nocolor`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, back))
+    .addButton(t.nocolor`§bВики`, BUTTON.search, wiki.show)
     .addButton(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
-    .addButton('§7Настройки', BUTTON.settings, () => playerSettingsMenu(player, back))
+    .addButton(t.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, back))
 
   return form
 }

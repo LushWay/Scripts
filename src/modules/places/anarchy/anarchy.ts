@@ -1,7 +1,7 @@
 import { GameMode, Player } from '@minecraft/server'
 import { EventSignal, InventoryStore, Portal, ValidLocation, Vec, location, rawMessageToString } from 'lib'
 import { Language } from 'lib/assets/lang'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { createLogger } from 'lib/utils/logger'
@@ -26,9 +26,9 @@ class AnarchyBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location(Spawn.group.place('anarchy center').name('центр анархии'))
+  centerLocation = location(Spawn.group.place('anarchy center').name(l`центр анархии`))
 
-  portalLocation = location(Spawn.group.place('anarchy portal').name('портал на анархию'))
+  portalLocation = location(Spawn.group.place('anarchy portal').name(l`портал на анархию`))
 
   inventoryStore = new InventoryStore('anarchy')
 
@@ -41,7 +41,7 @@ class AnarchyBuilder extends AreaWithInventory {
       this.zone = new RadioactiveZone(centerLocation, 2000)
 
       new Command('radius')
-        .setDescription('Выдает радиус границы анархии сейчас')
+        .setDescription(t`Выдает радиус границы анархии сейчас`)
         .setGroup('public')
         .setPermissions('member')
         .executes(ctx => ctx.player.info(t`Радиус границы анархии сейчас: ${this.zone?.radius}`))
@@ -83,12 +83,12 @@ class AnarchyBuilder extends AreaWithInventory {
       }
     })
 
-    const command = this.portal.createCommand().setDescription('§bПеремещает на анархию')
+    const command = this.portal.createCommand().setDescription(t`§bПеремещает на анархию`)
 
     command
       .overload('clearpos')
       .setDescription(
-        'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
+        t`Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку`,
       )
       .executes(ctx => {
         delete ctx.player.database.survival.anarchy

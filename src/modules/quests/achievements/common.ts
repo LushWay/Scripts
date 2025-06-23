@@ -1,6 +1,7 @@
 import { system, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Achievement, CountingAchievement } from 'lib/achievements/achievement'
+import { t } from 'lib/text'
 import { Rewards } from 'lib/utils/rewards'
 import { gravestoneEntityTypeId, gravestoneGetOwner } from 'modules/survival/death-quest-and-gravestone'
 
@@ -8,7 +9,7 @@ for (const num of [10, 100, 1000, 10000]) {
   CountingAchievement.createV()
     .value(num)
     .id(v => `woodchopper${v}`)
-    .name(v => `Дровосек: нарубите ${v} дерева`)
+    .name(v => t`Дровосек: нарубите ${v} дерева`)
     .creator(ctx => {
       ctx.break(
         Object.values(MinecraftBlockTypes).filter(e => e.endsWith('_wood') || e.endsWith('_log')),
@@ -22,7 +23,7 @@ for (const num of [100, 1000, 10000]) {
   CountingAchievement.createV()
     .value(num)
     .id(v => `miner${v}`)
-    .name(v => `Шахтер: накопайте ${v} камня`)
+    .name(v => t`Шахтер: накопайте ${v} камня`)
     .creator(ctx => {
       ctx.break(MinecraftBlockTypes.Stone, player => ctx.add(player, 1))
     })
@@ -33,7 +34,7 @@ for (const num of [10, 100, 1000, 10000]) {
   CountingAchievement.createV()
     .value(num)
     .id(v => `minerCoal${v}`)
-    .name(v => `Угольный шахтер: накопайте ${v} угля`)
+    .name(v => t`Угольный шахтер: накопайте ${v} угля`)
     .creator(ctx => {
       ctx.break(MinecraftBlockTypes.CoalOre, player => ctx.add(player, 1))
     })
@@ -44,7 +45,7 @@ for (const num of [10, 100, 1000, 10000]) {
   CountingAchievement.createV()
     .value(num)
     .id(v => `minerIron${v}`)
-    .name(v => `Железный шахтер: накопайте ${v} железа`)
+    .name(v => t`Железный шахтер: накопайте ${v} железа`)
     .creator(ctx => {
       ctx.break(MinecraftBlockTypes.IronOre, player => ctx.add(player, 1))
     })
@@ -53,7 +54,7 @@ for (const num of [10, 100, 1000, 10000]) {
 
 Achievement.create()
   .id('activeCoal')
-  .name('Активированный уголь')
+  .name(t`Активированный уголь`)
   .defaultStorage(() => undefined)
   .creator(ctx => {
     function toBlockFunction(leverDirection: string) {
@@ -91,7 +92,7 @@ Achievement.create()
 
 Achievement.create()
   .id('madeMyself')
-  .name('Сделал себя сам: Получи первые 10.000 монет')
+  .name(t`Сделал себя сам: Получи первые 10.000 монет`)
   .defaultStorage(() => undefined)
   .creator(ctx => {
     system.runPlayerInterval(
@@ -105,7 +106,7 @@ Achievement.create()
 
 Achievement.create()
   .id('gravestoner')
-  .name(`Гробовщик: открой 10 могил разных игроков`)
+  .name(t`Гробовщик: открой 10 могил разных игроков`)
   .defaultStorage(() => [] as string[])
   .creator(ctx => {
     world.afterEvents.playerInteractWithEntity.subscribe(event => {
@@ -119,4 +120,4 @@ Achievement.create()
       if (storage.length >= 10) ctx.done(event.player)
     })
   })
-  .reward(new Rewards().item(MinecraftItemTypes.RoseBush, 1, 'Гробовщику посвящается'))
+  .reward(new Rewards().item(MinecraftItemTypes.RoseBush, 1, t`Гробовщику посвящается`))

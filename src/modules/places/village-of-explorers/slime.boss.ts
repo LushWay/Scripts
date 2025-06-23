@@ -4,12 +4,13 @@ import { Loot, ms } from 'lib'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
 import { MagicSlimeBall } from './items'
+import { t } from 'lib/text'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('slime')
-    .name('Магический Слайм')
+    .name(t`Магический Слайм`)
     .typeId(MinecraftEntityTypes.Slime)
     .loot(
       new Loot('slime boss')

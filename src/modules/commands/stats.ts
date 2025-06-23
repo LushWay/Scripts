@@ -11,12 +11,12 @@ import {
 import { NewFormCallback } from 'lib/form/new'
 import { t, textTable } from 'lib/text'
 
-new Command('stats').setDescription('Показывает статистику по игре').executes(ctx => showStats(ctx.player))
+new Command('stats').setDescription(t`Показывает статистику по игре`).executes(ctx => showStats(ctx.player))
 
 const getSettings = Settings.player(...Menu.settings, {
   statsRelative: {
-    name: 'Показывать относительную дату',
-    description: 'Показывать относительную дату на экране статистики',
+    name: t`Показывать относительную дату`,
+    description: t`Показывать относительную дату на экране статистики`,
     value: true,
   },
 })
@@ -31,10 +31,10 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
     } else {
       const secsTotal = Math.floor(date / 1000)
 
-      const days = `${Math.floor(secsTotal / 86400)} дней`
-      const hours = `${Math.floor(secsTotal / 3600) % 24} часов`
-      const mins = `${Math.floor(secsTotal / 60) % 60} минут`
-      const secs = `${secsTotal % 60} секунд`
+      const days = t`${Math.floor(secsTotal / 86400)} дней`
+      const hours = t`${Math.floor(secsTotal / 3600) % 24} часов`
+      const mins = t`${Math.floor(secsTotal / 60) % 60} минут`
+      const secs = t`${secsTotal % 60} секунд`
       return `${days} ${hours} ${mins} ${secs}`
     }
   }
@@ -57,7 +57,7 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
       ...statsTable(
         scores,
         key => `anarchy${capitalize(key)}`,
-        n => `Анархия ${n}`,
+        n => t`Анархия ${n}`,
       ),
     }),
   )
@@ -71,8 +71,8 @@ function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreNa
   for (const key of scoreboardObjectiveNames.stats) {
     const k = getKey(key)
     table[getN(scoreboardDisplayNames[k])] = s[k]
-    if (key === 'kills') table[getN('Убийств/Смертей')] = s[getKey('kills')] / s[getKey('deaths')]
-    if (key === 'damageGive') table[getN('Нанесено/Получено')] = s[getKey('damageGive')] / s[getKey('damageRecieve')]
+    if (key === 'kills') table[getN(t`Убийств/Смертей`)] = s[getKey('kills')] / s[getKey('deaths')]
+    if (key === 'damageGive') table[getN(t`Нанесено/Получено`)] = s[getKey('damageGive')] / s[getKey('damageRecieve')]
   }
   return table
 }

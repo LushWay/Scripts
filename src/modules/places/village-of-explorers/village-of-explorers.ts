@@ -8,10 +8,11 @@ import { techCityInvestigating } from '../tech-city/quests/investigating'
 import { MagicSlimeBall } from './items'
 import { Mage } from './mage'
 import { createBossSlime } from './slime.boss'
+import { t } from 'lib/text'
 
 class VillageOfExporersBuilder extends City {
   constructor() {
-    super('VillageOfExporers', 'Деревня исследователей')
+    super('VillageOfExporers', t`Деревня исследователей`)
     this.create()
   }
 
@@ -29,14 +30,14 @@ class VillageOfExporersBuilder extends City {
 
   stoner = new Stoner(this.group)
 
-  guide = new GuideNpc(this.group, 'Исследователь', (f, { lf }) => {
+  guide = new GuideNpc(this.group, t`Исследователь`, (f, { lf }) => {
     lf.question(
       'wtfCity',
-      'А что за город',
-      'Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ',
+      t`А что за город`,
+      t`Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ`,
     )
 
-    f.quest(techCityInvestigating.goToCityQuest, 'А где мне базу сделать-то?')
+    f.quest(techCityInvestigating.goToCityQuest, t`А где мне базу сделать-то?`)
   })
 }
 

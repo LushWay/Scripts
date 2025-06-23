@@ -6,6 +6,7 @@ import { RegionEvents } from 'lib/region/events'
 import { actionGuard, ActionGuardOrder, disableAdventureNear, Region, RegionPermissions } from 'lib/region/index'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { TechCity } from '../tech-city/tech-city'
+import { t } from 'lib/text'
 
 export class QuartzMineRegion extends Region {
   protected priority = 100
@@ -23,7 +24,7 @@ export class QuartzMineRegion extends Region {
   }
 
   get displayName(): string | undefined {
-    return 'Озеро Технограда'
+    return t.nocolor`Озеро Технограда`
   }
 }
 disableAdventureNear.push(QuartzMineRegion)

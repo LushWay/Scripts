@@ -16,7 +16,7 @@ actionGuard((player, region, ctx) => {
   if (npc.length > 1) {
     // TODO Use Intl.ListFormat
     player.fail(
-      t.error`Я не знаю что мне делать с этим, возможно ${npc.map((e, i, a) => (i === 0 ? e : i + 1 === a.length ? '§c или §f' + e : '§c, §f' + e)).join('')} смогут сделать это за меня...`,
+      t.error`Я не знаю что мне делать с этим, возможно ${npc.map((e, i, a) => (i === 0 ? e : i + 1 === a.length ? t`§c или §f` + e : '§c, §f' + e)).join('')} смогут сделать это за меня...`,
     )
   } else {
     player.fail(t.error`Я не знаю что мне делать с этим, возможно ${npc[0]} сможет сделать это за меня...`)

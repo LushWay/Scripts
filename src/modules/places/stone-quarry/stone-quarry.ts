@@ -11,10 +11,11 @@ import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 import { createBossWither } from './wither.boss'
+import { t } from 'lib/text'
 
 class StoneQuarryBuilder extends City {
   constructor() {
-    super('StoneQuarry', 'Каменоломня')
+    super('StoneQuarry', t`Каменоломня`)
     this.create()
   }
 
@@ -35,7 +36,7 @@ class StoneQuarryBuilder extends City {
   commonOvener = Furnacer.create()
     .group(this.group)
     .id('ovener')
-    .name('§6Печкин')
+    .name(t`§6Печкин`)
     .furnaceTypeIds([
       MinecraftBlockTypes.BlastFurnace,
       MinecraftBlockTypes.LitBlastFurnace,
@@ -47,14 +48,14 @@ class StoneQuarryBuilder extends City {
   foodOvener = Furnacer.create()
     .group(this.group)
     .id('foodOvener')
-    .name('§6Баба валя')
+    .name(t`§6Баба валя`)
     .furnaceTypeIds([MinecraftBlockTypes.Smoker, MinecraftBlockTypes.LitSmoker])
     .onlyInStoneQuarry(false)
 
   gunsmith = new Gunsmith(this.group)
 
-  guide = new GuideNpc(this.group, 'Ломщик', (f, { lf }) => {
-    lf.question('wtfCity', 'А что за город', 'Ну типа крутой камни ломаем вот да')
+  guide = new GuideNpc(this.group, t`Ломщик`, (f, { lf }) => {
+    lf.question('wtfCity', t`А что за город`, t`Ну типа крутой камни ломаем вот да`)
   })
 
   private create() {

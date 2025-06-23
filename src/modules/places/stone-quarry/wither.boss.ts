@@ -3,13 +3,13 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
 import { BigRegionStructure } from 'lib/region/big-structure'
 import { Group } from 'lib/rpg/place'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 
 export function createBossWither(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('wither')
-    .name('Камнедробилка')
+    .name(t`Камнедробилка`)
     .typeId(MinecraftEntityTypes.Wither)
     .loot(new Loot().item('NetherStar').build)
     .respawnTime(ms.from('hour', 1))
@@ -29,9 +29,9 @@ export function createBossWither(group: Group) {
     if (!region.structure.exists) {
       try {
         await region.structure.save()
-        console.info(t`Saved structure for ${region.displayName}`)
+        console.info(l`Saved structure for ${region.displayName}`)
       } catch (e) {
-        console.warn(t.warn`Unable to save structure for ${region.displayName}`)
+        console.warn(l.warn`Unable to save structure for ${region.displayName}`)
       }
     }
   })

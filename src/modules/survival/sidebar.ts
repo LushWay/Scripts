@@ -2,26 +2,27 @@ import { Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { Menu, Region, separateNumberWithDots, Settings, Sidebar } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Quest } from 'lib/quest/quest'
+import { t } from 'lib/text'
 import { Minigame } from 'modules/minigames/Builder'
 import { BaseRegion } from 'modules/places/base/region'
 
 const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
-    name: 'Использовать меню',
-    description: 'Определяет, включено ли внутриигровое меню',
+    name: t`Использовать меню`,
+    description: t`Определяет, включено ли внутриигровое меню`,
     value: true,
   },
   sidebarMaxWordLength: {
-    name: 'Максимальный размер бокового меню',
-    description: 'Максимально допустимое кол-во символов, при достижении которого слова будут переноситься',
+    name: t`Максимальный размер бокового меню`,
+    description: t`Максимально допустимое кол-во символов, при достижении которого слова будут переноситься`,
     value: 20,
   },
   mode: {
-    name: 'Режим отображения',
-    description: 'Определяет, где будет меню',
+    name: t`Режим отображения`,
+    description: t`Определяет, где будет меню`,
     value: [
-      ['tips', 'Разделенные подсказки'],
-      ['sidebar', 'Боковое меню'],
+      ['tips', t`Разделенные подсказки`],
+      ['sidebar', t`Боковое меню`],
     ],
   },
   //   format: {
@@ -42,18 +43,18 @@ const getSidebarSettings = Settings.player(...Menu.settings, {
 })
 
 const inventoryDisplay: Record<Player['database']['inv'], string> = {
-  anarchy: 'Анархия',
-  mg: 'Миниигра',
-  spawn: 'Спавн',
+  anarchy: t`Анархия`,
+  mg: t`Миниигра`,
+  spawn: t`Спавн`,
 }
 
 const names = {
-  mode: 'режим',
-  region: 'регион',
-  money: 'монеты',
-  leafs: 'листья',
-  online: 'онлайн',
-  quest: 'квест',
+  mode: t`режим`,
+  region: t`регион`,
+  money: t`монеты`,
+  leafs: t`листья`,
+  online: t`онлайн`,
+  quest: t`квест`,
 }
 
 // $режим§l§7$регион
@@ -90,7 +91,7 @@ const survivalSidebar = new Sidebar(
       if (player.database.inv === 'anarchy') {
         if (region) {
           text = ''
-          if (!region.permissions.pvp) text = '§aМирная зона§f '
+          if (!region.permissions.pvp) text = t`§aМирная зона§f `
           const { displayName } = region
           if (displayName) text += displayName
           if (region instanceof BaseRegion) {

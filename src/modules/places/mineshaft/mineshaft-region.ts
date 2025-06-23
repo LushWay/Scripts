@@ -2,7 +2,7 @@ import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { ActionForm, ms, registerRegionType, Vec } from 'lib'
 import { registerSaveableRegion } from 'lib/region/database'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../../../lib/region/kinds/minearea'
 import { ores, placeOre } from './algo'
@@ -51,11 +51,11 @@ export class MineshaftRegion extends MineareaRegion {
   }
 
   get displayName() {
-    return '§7Шахта'
+    return t.nocolor`§7Шахта`
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.addButton('Убрать все руды и сохранить структуру', () => {
+    form.addButton(l`Убрать все руды и сохранить структуру`, () => {
       player.info('Start')
       this.removeAllOresAndResaveStructure()
         .then(e => player.info(t`End ${e}`))
@@ -65,4 +65,4 @@ export class MineshaftRegion extends MineareaRegion {
 }
 
 registerSaveableRegion('mine', MineshaftRegion)
-registerRegionType('Шахты', MineshaftRegion)
+registerRegionType(l`Шахты`, MineshaftRegion)

@@ -9,11 +9,11 @@ import { decreaseMainhandItemCount } from './throwable-tnt'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
-  .lore('Используй этот предмет, чтобы установить пушку')
+  .lore(t`Используй этот предмет, чтобы установить пушку`)
 
 export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')
   .typeId('lw:cannon_shell')
-  .lore('Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.')
+  .lore(t`Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.`)
 
 const cooldown = new Cooldown(ms.from('sec', 5))
 const tellCooldown = new Cooldown(ms.from('sec', 1), false)

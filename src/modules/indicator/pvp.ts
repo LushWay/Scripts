@@ -38,18 +38,18 @@ const settings = Settings.world(...Settings.worldCommon, {
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   indicator: {
-    name: 'Индикатор',
-    description: 'Индикатор попадания по существу из лука',
+    name: t`Индикатор`,
+    description: t`Индикатор попадания по существу из лука`,
     value: true,
   },
   bowSound: {
-    name: 'Звук лука',
-    description: 'Звук попадания по существо из лука',
+    name: t`Звук лука`,
+    description: t`Звук попадания по существо из лука`,
     value: true,
   },
 })
 
-const lockAction = new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме сражения!')
+const lockAction = new LockAction(p => p.scores.pvp > 0, t`Вы находитесь в режиме сражения!`)
 
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
   if (deadEntity.isPlayer()) deadEntity.scores.pvp = 0

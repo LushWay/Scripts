@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { Entity, Player, ScoreboardObjective, ScoreboardScoreInfo, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { t } from 'lib/text'
