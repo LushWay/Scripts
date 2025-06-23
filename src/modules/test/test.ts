@@ -86,6 +86,11 @@ const tests: Record<
     lootTable.fillContainer(inventory.container)
   },
 
+  na(ctx) {
+    ctx.player.mainhand().nameTag = '%enchantment.mending'
+    ctx.player.mainhand().setLore(['%enchantment.mending'])
+  },
+
   async breakMine(ctx) {
     const regions = MineareaRegion.getManyAt(ctx.player)
     for (const region of regions) {

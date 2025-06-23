@@ -73,7 +73,7 @@ function armorCommand() {
       ]
       let items: [EquipmentSlot, ItemStack | undefined][] = []
 
-      const enchs = levels?.[level]
+      const enchs = levels[level]
       if (!enchs) {
         if (level <= 4 && level >= 0) {
           items = types.map(([slot, typeId]) => {

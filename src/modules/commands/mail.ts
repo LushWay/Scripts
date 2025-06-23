@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
 import { Join } from 'lib/player-join'
 import { t } from 'lib/text'
+import { ngettext } from 'lib/utils/ngettext'
 import { Rewards } from 'lib/utils/rewards'
 
 const command = new Command('mail')
@@ -126,6 +127,10 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
   const unreadCount = Mail.getUnreadMessagesCount(player.id)
   if (unreadCount === 0) return
 
-  const messages = t.num`${unreadCount} ${['непрочитанное сообщение', 'непрочитанных сообщения', 'непрочитанных сообщений']}!`
-  player.info(t`${t.header`Почта:`} У вас ${messages} Посмотреть: ${command}`)
+  const messages = ngettext(unreadCount, [
+    'У вас непрочитанное сообщение',
+    'У вас непрочитанных сообщения',
+    'У вас непрочитанных сообщений',
+  ])
+  player.info(t`${t.header`Почта:`} ${messages}! Посмотреть: ${command}`)
 })

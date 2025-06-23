@@ -2,11 +2,11 @@ import { Block, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { l } from 'lib/text'
 
 new Command('chunkload')
   .setPermissions('curator')
-  .setDescription('Прогружает чанки во всей анархии путем телепорта вызвавшего команду')
+  .setDescription('Loads chunks in providen area by teleporting player that executed this command')
   .location('from')
   .location('to')
   .int('tickDelay', true)
@@ -14,7 +14,7 @@ new Command('chunkload')
   .executes(async (ctx, from, to, tickDelay = 5, saveTickDelay = 40) => {
     const player = ctx.player
     from.y = to.y = 62
-    player.success(t`Loading chunks from ${Vec.fromVector3(from)} to ${Vec.fromVector3(to)}`)
+    player.success(l`Loading chunks from ${Vec.fromVector3(from)} to ${Vec.fromVector3(to)}`)
 
     player.info('Calculating total chunk size, this might take a while...')
     const chunks: Vector3[] = []
@@ -27,7 +27,7 @@ new Command('chunkload')
 
             i++
             if (i % 500 === 0) {
-              player.info(t`Chunks: ${chunks.length + 1}`)
+              player.info(l`Chunks: ${chunks.length + 1}`)
               yield
             }
             chunks.push({ x, y, z })
@@ -68,11 +68,13 @@ new Command('chunkload')
 
       await system.waitTicks(saveTickDelay)
 
+      const speedText = speed < 1000 ? l`${~~speed}ms/chunk` : l.time(speed)
+
       player.onScreenDisplay.setActionBar(
-        t`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nСкорость: ${speed < 1000 ? t`${~~speed}ms` : t.time`${speed}`}/chunk, осталось: ${t.time`${eta}`} прошло: ${t.time`${took}`}`,
+        l`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nSpeed: ${speedText}/chunk, remaining: ${l.timeHHMMSS(eta)} elapsed: ${l.timeHHMMSS(took)}`,
         ActionbarPriority.Highest,
       )
     }
 
-    player.success(t.time`Loaded. Took ${Date.now() - start}`)
+    player.success(l`Loaded. Took ${l.time(Date.now() - start)}`)
   })

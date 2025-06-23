@@ -1,10 +1,8 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { Vec } from 'lib/vector'
-import { ROLES, getRole } from './roles'
 import { separateNumberWithDots } from './util'
 import { stringify } from './utils/inspect'
 import { ms } from './utils/ms'
-import { Plurals, ngettext } from './utils/ngettext'
 
 export type Text = string
 export type MaybeRawText = string | RawText
@@ -14,7 +12,6 @@ type Fn = (text: TSA, ...args: unknown[]) => Text
 type OptionsModifiers = 'error' | 'warn' | 'header'
 interface MultiStatic {
   raw: (text: TSA, ...units: (string | RawText | RawMessage)[]) => RawText
-  roles: (text: TSA, ...players: Player[]) => Text
 
   /**
    * @example
@@ -30,20 +27,9 @@ interface MultiStatic {
 
   /**
    * @example
-   *   t.num`Было сломано ${n} ${['блок', 'блока', 'блоков']}` -> "Было сломано 10 блоков"
-   */
-  num: (text: TSA, n: number, plurals: Plurals) => Text
-
-  /**
-   * @example
    *   t.time(3000) -> "3 секунды"
    */
   time(time: number): Text
-  /**
-   * @example
-   *   t.time`Прошло ${3000}` -> "Прошло 3 секунды"
-   */
-  time(text: TSA, time: number): Text
 
   /**
    * @example
@@ -76,15 +62,14 @@ export function textTable(table: Record<string, unknown>, join = true, twoColors
 }
 
 export const t = createGroup()
+export const l = createGroup()
 
 function createGroup(options: ColorOptions = {}, modifier = false) {
   const t = createSingle(options)
-  t.roles = createSingle({ roles: true, ...options })
   t.unreadBadge = createBadge(options)
-  t.num = createNum(options)
-  t.time = createOverload(createTime(options), (t, time: number) => t`${time}`)
+  t.time = createTime(options)
   t.raw = createRaw(options)
-  t.timeHHMMSS = createRemaining(options)
+  t.timeHHMMSS = createTimeHHMMSS(options)
   t.size = createSize(t)
 
   if (!modifier) {
@@ -97,7 +82,7 @@ function createGroup(options: ColorOptions = {}, modifier = false) {
 }
 
 const dayMs = ms.from('day', 1)
-function createRemaining(options: ColorOptions): MultiStatic['timeHHMMSS'] {
+function createTimeHHMMSS(options: ColorOptions): MultiStatic['timeHHMMSS'] {
   const { text, num } = addDefaultsToOptions(options)
   return n => {
     const date = new Date(n)
@@ -165,57 +150,23 @@ function createBadge(options: ColorOptions): (text: TSA, n: number) => Text {
   })
 }
 
-function createNum(options: ColorOptions): (text: TSA, n: number, plurals: Plurals) => Text {
-  return createSingle(options, (text, unit, i, units) => {
-    if (isPlurals(unit)) {
-      const n = units[i - 1]
-      if (typeof n === 'number') return text + ngettext(n, unit)
-    }
-
-    return text + textUnitColorize(unit, options)
-  })
-}
-
-function createOverload<T extends (text: TSA, ...args: any[]) => Text>(
-  tsa: T,
-  overload: (t: T, ...args: any[]) => Text,
-) {
-  return (...args: unknown[]) => {
-    if (isTSA(args[0])) return tsa(args[0], ...args.slice(1))
-    else return overload(tsa, ...args)
+function createTime(options: ColorOptions): (timen: number) => Text {
+  const { text } = addDefaultsToOptions(options)
+  return timen => {
+    const time = ms.remaining(timen)
+    return `${textUnitColorize(time.value, options)} ${text}${time.type}`
   }
 }
 
-function isTSA(arg: unknown): arg is TemplateStringsArray {
-  return Array.isArray(arg) && 'raw' in arg
-}
-
-function createTime(options: ColorOptions): (text: TSA, time: number) => Text {
-  const { text } = addDefaultsToOptions(options)
-  return createSingle(options, (prev, unit) => {
-    if (typeof unit !== 'number') return prev + textUnitColorize(unit, options)
-
-    const time = ms.remaining(unit)
-    return prev + `${textUnitColorize(time.value, options)} ${text}${time.type}`
-  })
-}
-
-function isPlurals(unit: unknown): unit is Plurals {
-  return (
-    Array.isArray(unit) && typeof unit[0] === 'string' && typeof unit[1] === 'string' && typeof unit[2] === 'string'
-  )
-}
-
 function addDefaultsToOptions(options: ColorOptions = {}): Required<ColorOptions> {
-  const { unit = '§f', text = '§7', num = '§6', roles = false } = options
-  return { unit, text, roles, num }
+  const { unit = '§f', text = '§7', num = '§6' } = options
+  return { unit, text, num }
 }
 
 export interface ColorOptions {
   unit?: string
   num?: string
   text?: string
-  roles?: boolean
 }
 
 export function textUnitColorize(unit: unknown, options: ColorOptions = {}) {
@@ -229,8 +180,7 @@ export function textUnitColorize(unit: unknown, options: ColorOptions = {}) {
 
     case 'object':
       if (unit instanceof Player) {
-        if (options.roles) return `${ROLES[getRole(unit.id)]}§r ${unitColor}${unit.name}`
-        else return unitColor + unit.name
+        return unitColor + unit.name
       } else if (Vec.isVec(unit)) {
         return Vec.string(unit, true)
       } else return stringify(unit)

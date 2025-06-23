@@ -3,7 +3,6 @@ import 'lib/command/index'
 import { Player } from '@minecraft/server'
 import { ms } from 'lib'
 import { TEST_createPlayer } from 'test/utils'
-import { setRole } from './roles'
 import './text'
 import { t, textTable } from './text'
 
@@ -20,20 +19,19 @@ describe('text', () => {
     expect(t`Some string with ${player}`).toMatchInlineSnapshot(`"§7Some string with §fTest player name§7"`)
   })
 
-  it('should create text with roles', () => {
-    setRole(player, 'admin')
-    expect(t.roles`Строка с ${player}`).toMatchInlineSnapshot(`"§7Строка с §5Админ§r §fTest player name§7"`)
-  })
-
   it('should create nested text', () => {
-    expect(t`А мы любим ${t.roles`вложенные роли этого чела: ${player}`}`).toMatchInlineSnapshot(
-      `"§7А мы любим §f§7вложенные роли этого чела: §fУчастник§r §fTest player name§7§7"`,
+    expect(t`А мы любим ${t`вложенные роли этого чела: ${player}`}`).toMatchInlineSnapshot(
+      `"§7А мы любим §f§7вложенные роли этого чела: §fTest player name§7§7"`,
     )
   })
 
   it('should apply options', () => {
-    expect(t.options({ unit: '§g', text: '§4' }).roles`Все должно работать ${player}`).toMatchInlineSnapshot(
-      `"§4Все должно работать §fУчастник§r §gTest player name§4"`,
+    expect(t.options({ unit: '§g', text: '§4' })`Все должно работать ${player}`).toMatchInlineSnapshot(
+      `"§4Все должно работать §gTest player name§4"`,
+    )
+
+    expect(t.error`Не так быстро! Попробуй через ${t.error.time(3000)}`).toMatchInlineSnapshot(
+      `"§cНе так быстро! Попробуй через §f§c§f3 §cсекунды§c§c"`,
     )
   })
 
@@ -92,11 +90,9 @@ describe('text', () => {
   })
 
   it('should work with time', () => {
+    expect(t.time(0)).toMatchInlineSnapshot(`"§7§f0 §7миллисекунд§7"`)
     expect(t.time(3000)).toMatchInlineSnapshot(`"§7§f3 §7секунды§7"`)
-
-    expect(t.time`Прошло ${0}`).toMatchInlineSnapshot(`"§7Прошло §f0 §7миллисекунд§7"`)
-    expect(t.time`Прошло ${3000}`).toMatchInlineSnapshot(`"§7Прошло §f3 §7секунды§7"`)
-    expect(t.time`Прошло ${300000}`).toMatchInlineSnapshot(`"§7Прошло §f5 §7минут§7"`)
+    expect(t.time(300000)).toMatchInlineSnapshot(`"§7§f5 §7минут§7"`)
 
     expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§600:00:03§7"`)
     expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
@@ -108,13 +104,13 @@ describe('text', () => {
     expect(t.error.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§7100 §cдней, §700:00:03§c"`)
 
     // @ts-expect-error
-    expect(t.time`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
+    expect(t.time('string')).toMatchInlineSnapshot(`"§7§fstring§7"`)
   })
 
   it('should work with badge', () => {
-    expect(t.unreadBadge`Письма ${-3}`).toMatchInlineSnapshot(`"§7Письма§7"`)
-    expect(t.unreadBadge`Письма ${0}`).toMatchInlineSnapshot(`"§7Письма§7"`)
-    expect(t.unreadBadge`Письма ${3}`).toMatchInlineSnapshot(`"§7Письма §7(§c3§7)§7"`)
+    expect(t.unreadBadge`Почта ${-3}`).toMatchInlineSnapshot(`"§7Почта§7"`)
+    expect(t.unreadBadge`Почта ${0}`).toMatchInlineSnapshot(`"§7Почта§7"`)
+    expect(t.unreadBadge`Почта ${3}`).toMatchInlineSnapshot(`"§7Почта §7(§c3§7)§7"`)
     expect(t.unreadBadge`${3}`).toMatchInlineSnapshot(`"§7§7(§c3§7)§7"`)
     expect(t.unreadBadge`${0}`).toMatchInlineSnapshot(`"§7§7"`)
 

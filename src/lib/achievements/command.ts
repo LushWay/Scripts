@@ -19,22 +19,22 @@ export function achievementsFormName(player: Player) {
 export function achievementsForm(player: Player, back?: NewFormCallback) {
   const self = () => achievementsForm(player, back)
 
-  new ArrayForm('Достижения', Achievement.list)
+  new ArrayForm(t`Достижения`, Achievement.list)
     .back(back)
     .filters({
       sortMode: {
-        name: 'Режим сортировки',
+        name: t`Режим сортировки`,
         value: [
-          ['achivDate', 'По дате получения'],
-          ['alphabet', 'По алфавиту'],
+          ['achivDate', t`По дате получения`],
+          ['alphabet', t`По алфавиту`],
         ],
       },
       hideUnknown: {
-        name: 'Скрыть неизвестные',
+        name: t`Скрыть неизвестные`,
         value: false,
       },
       showOnlyUncollected: {
-        name: 'Несобранные вверху',
+        name: t`Несобранные вверху`,
         value: true,
       },
     })

@@ -1,4 +1,4 @@
-import { Player } from '@minecraft/server'
+import { GameRule, Player } from '@minecraft/server'
 import { InventoryInterval, ScoreboardDB } from 'lib'
 import { form } from 'lib/form/new'
 import { t } from 'lib/text'
