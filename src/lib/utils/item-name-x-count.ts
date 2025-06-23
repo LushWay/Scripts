@@ -3,6 +3,7 @@ import {
   MinecraftPotionEffectTypes as PotionEffects,
   MinecraftPotionModifierTypes as PotionModifiers,
 } from '@minecraft/vanilla-data'
+import { t } from 'lib/text'
 import { noBoolean } from 'lib/util'
 import { langToken } from 'lib/utils/lang'
 
@@ -52,8 +53,9 @@ function uncolor(t: string) {
   return t.replaceAll(/§./g, '')
 }
 
-const modifierIndexToS = ['', ' (долгое)', ' II']
+const modifierIndexToS = ['', t` (долгое)`, ' II']
 
+// TODO Ensure it works properly for all modifiers
 const potionModifierToTime: Record<string, undefined | [normal: string, longPlus: string, levelTwo: string]> = {
   [PotionEffects.Healing]: ['0:45', '2:00', '0:22'],
   [PotionEffects.Swiftness]: ['3:00', '8:00', '1:30'],

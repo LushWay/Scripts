@@ -6,7 +6,7 @@ import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
-import { t } from './text'
+import { l, t } from './text'
 import stringifyError from './utils/error'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace
@@ -124,7 +124,7 @@ export class Settings {
     return this.parseConfig(Settings.worldDatabase, groupId, this.worldConfigs[groupId] as Config)
   }
 
-  static worldCommon = ['Общие настройки мира\n§7Чат, спавн и тд', 'common'] as const
+  static worldCommon = [t`Общие настройки мира\n§7Чат, спавн и тд`, 'common'] as const
 
   private static insertGroup(
     to: 'worldConfigs' | 'playerConfigs',
@@ -286,7 +286,7 @@ export function settingsGroupMenu(
         label += `\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`
       }
 
-      form.addTextField(label, 'Настройка не изменится', isString ? value : JSON.stringify(value))
+      form.addTextField(label, t`Настройка не изменится`, isString ? value : JSON.stringify(value))
     }
 
     buttons.push([
@@ -305,7 +305,7 @@ export function settingsGroupMenu(
                 break
               case 'number':
                 result = Number(input)
-                if (isNaN(result)) return '§cВведите число!'
+                if (isNaN(result)) return t`§cВведите число!`
                 break
               case 'object':
                 result = JSON.parse(input) as typeof result
@@ -320,7 +320,7 @@ export function settingsGroupMenu(
             store[key] = result
           }
 
-          return showHintAboutSavedStatus ? '§aСохранено!' : ''
+          return showHintAboutSavedStatus ? t`§aСохранено!` : ''
         } catch (error: unknown) {
           logger.player(player).info`Changing ${displayType} setting '${groupName} > ${key}' error: ${error}`
 
@@ -359,11 +359,11 @@ export function settingsGroupMenu(
 
 const settingTypes: Partial<
   Record<'string' | 'number' | 'object' | 'boolean' | 'symbol' | 'bigint' | 'undefined' | 'function', string>
-> = { string: 'Строка', number: 'Число', object: 'JSON-Объект', boolean: 'Переключатель' }
+> = { string: t`Строка`, number: t`Число`, object: t`JSON-Объект`, boolean: t`Переключатель` }
 
 /** Opens player settings menu */
 export function playerSettingsMenu(player: Player, back?: VoidFunction) {
-  const form = new ActionForm('§dНастройки')
+  const form = new ActionForm(t`§dНастройки`)
   if (back) form.addButtonBack(back)
 
   for (const groupName in Settings.playerConfigs) {
@@ -375,7 +375,7 @@ export function playerSettingsMenu(player: Player, back?: VoidFunction) {
 }
 
 export function worldSettingsMenu(player: Player) {
-  const form = new ActionForm('§dНастройки мира')
+  const form = new ActionForm(l`§dНастройки мира`)
 
   for (const [groupId, group] of Object.entries(Settings.worldConfigs)) {
     const database = Settings.worldDatabase.get(groupId)

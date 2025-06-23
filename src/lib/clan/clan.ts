@@ -1,7 +1,7 @@
 import { Player, system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { Mail } from 'lib/mail'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { Rewards } from 'lib/utils/rewards'
 import './command'
 
@@ -69,7 +69,7 @@ export class Clan {
 
     if (!db) {
       db = Clan.database.get(id)
-      if (!db) throw new ReferenceError(t.error`Clan with id ${id} does not exists.`)
+      if (!db) throw new ReferenceError(l.error`Clan with id ${id} does not exists.`)
     } else this.db = db
 
     Clan.instances.set(this.id, this)
@@ -95,8 +95,8 @@ export class Clan {
   kickMember(playerId: string, whoKicked: string, message: string) {
     Mail.send(
       playerId,
-      `Вы выгнаны из клана '${this.db.name}'`,
-      `Вы были выгнаны из клана игроком '${whoKicked}'. Причина: ${message}`,
+      t.nocolor`Вы выгнаны из клана '${this.db.name}'`,
+      t`Вы были выгнаны из клана игроком '${whoKicked}'. Причина: ${message}`,
       new Rewards(),
     )
     this.db.members = this.db.members.filter(e => e !== playerId)
@@ -109,8 +109,8 @@ export class Clan {
     this.db.invites.push(playerId)
     Mail.send(
       playerId,
-      `Приглашение в клан '${this.db.name}'`,
-      'Вы были приглашены в клан! Чтобы вступить, используйте .clan или раздел кланов из основого меню',
+      t.nocolor`Приглашение в клан '${this.db.name}'`,
+      t`Вы были приглашены в клан! Чтобы вступить, используйте .clan или раздел кланов из основого меню`,
       new Rewards(),
     )
     return true
@@ -123,8 +123,8 @@ export class Clan {
 
     Mail.sendMultiple(
       this.db.owners,
-      'Запрос на вступление в клан от ' + player.name,
-      'Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов',
+      t.nocolor`Запрос на вступление в клан от ${player.name}`,
+      t`Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов`,
       new Rewards(),
     )
     this.db.joinRequests.push(player.id)
@@ -133,10 +133,10 @@ export class Clan {
 
   add(playerOrId: Player | string) {
     const id = playerOrId instanceof Player ? playerOrId.id : playerOrId
-    const message = `Вы приняты в клан ${this.db.name}`
+    const message = t.nocolor`Вы приняты в клан ${this.db.name}`
     if (playerOrId instanceof Player) {
       playerOrId.success(message)
-    } else Mail.send(id, message, 'Ура', new Rewards())
+    } else Mail.send(id, message, t`Ура`, new Rewards())
 
     for (const clan of Clan.getAll()) {
       clan.db.joinRequests = clan.db.joinRequests.filter(e => e !== id)
@@ -148,8 +148,8 @@ export class Clan {
   delete() {
     Mail.sendMultiple(
       this.db.members,
-      `Клан '${this.db.name}' распущен`,
-      'К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.',
+      t.nocolor`Клан '${this.db.name}' распущен`,
+      t`К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.`,
       new Rewards(),
     )
     Clan.database.delete(this.id)

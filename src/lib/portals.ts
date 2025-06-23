@@ -3,6 +3,7 @@ import { LockAction, LockActionCheckOptions, PlaceAction } from 'lib/action'
 import { hexToRgb } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { Core } from './extensions/core'
+import { t } from './text'
 
 export class Portal {
   static canTeleport(player: Player, lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]) {
@@ -15,7 +16,7 @@ export class Portal {
         fadeInDuration: 0,
         stayDuration: time * TicksPerSecond,
         fadeOutDuration: 0,
-        subtitle: '§2Перемещение...',
+        subtitle: t.nocolor`§2Перемещение...`,
         priority: 100,
       })
     }

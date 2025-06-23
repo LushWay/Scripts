@@ -2,6 +2,7 @@ import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/s
 import { EventSignal } from 'lib/event-signal'
 import { isKeyof } from 'lib/util'
 import { Core } from './extensions/core'
+import { t } from './text'
 
 declare global {
   /** Any known role */
@@ -10,18 +11,18 @@ declare global {
 
 /** The roles that are in this server */
 export const ROLES = {
-  creator: '§aРуководство',
-  curator: '§6Куратор',
-  techAdmin: '§cТех. Админ',
-  chefAdmin: '§dГл. Админ',
-  admin: '§5Админ',
-  moderator: '§6Модератор',
-  helper: '§eПомошник',
-  grandBuilder: '§bГл. Строитель',
-  builder: '§3Строитель',
-  member: '§fУчастник',
-  spectator: '§9Наблюдатель',
-  tester: '§9Тестер',
+  creator: t.nocolor`§aРуководство`,
+  curator: t.nocolor`§6Куратор`,
+  techAdmin: t.nocolor`§cТех. Админ`,
+  chefAdmin: t.nocolor`§dГл. Админ`,
+  admin: t.nocolor`§5Админ`,
+  moderator: t.nocolor`§6Модератор`,
+  helper: t.nocolor`§eПомошник`,
+  grandBuilder: t.nocolor`§bГл. Строитель`,
+  builder: t.nocolor`§3Строитель`,
+  member: t.nocolor`§fУчастник`,
+  spectator: t.nocolor`§9Наблюдатель`,
+  tester: t.nocolor`§9Тестер`,
 }
 
 export const DEFAULT_ROLE: Role = 'member'

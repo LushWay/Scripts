@@ -2,14 +2,14 @@ import { Player } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { is } from 'lib/roles'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { Cutscene } from './cutscene'
 import { editCatcutscene } from './edit'
 
 new Cutscene('test', 'Test')
 
 export const cutscene = new Command('cutscene')
-  .setDescription('Катсцена')
+  .setDescription(t`Катсцена`)
   .setPermissions('member')
   .executes(ctx => {
     if (is(ctx.player.id, 'curator')) selectCutsceneMenu(ctx.player)
@@ -18,10 +18,10 @@ export const cutscene = new Command('cutscene')
 
 cutscene
   .overload('exit')
-  .setDescription('Выход из катсцены')
+  .setDescription(t`Выход из катсцены`)
   .executes(ctx => {
     const cutscene = Cutscene.getCurrent(ctx.player)
-    if (!cutscene) return ctx.error('Вы не находитесь в катсцене!')
+    if (!cutscene) return ctx.error(t.error`Вы не находитесь в катсцене!`)
 
     cutscene.exit(ctx.player)
   })
@@ -38,8 +38,8 @@ cutscene
   })
 
 function selectCutsceneMenu(player: Player) {
-  new ArrayForm('Катсцены', [...Cutscene.all.values()])
-    .description('Список доступных для редактирования катсцен:')
+  new ArrayForm(l`Катсцены`, [...Cutscene.all.values()])
+    .description(l`Список доступных для редактирования катсцен:`)
     .button(cutscene => [cutscene.id, () => manageCutsceneMenu(player, cutscene)])
     .show(player)
 }
@@ -47,9 +47,9 @@ function selectCutsceneMenu(player: Player) {
 function manageCutsceneMenu(player: Player, cutscene: Cutscene) {
   const dots = cutscene.sections.reduce((count, section) => (section ? count + section.points.length : count), 0)
 
-  new ActionForm(cutscene.id, t`Секций: ${cutscene.sections.length}\nТочек: ${dots}`)
+  new ActionForm(cutscene.id, l`Секций: ${cutscene.sections.length}\nТочек: ${dots}`)
     .addButton(ActionForm.backText, () => selectCutsceneMenu(player))
-    .addButton('Редактировать', () => editCatcutscene(player, cutscene))
-    .addButton('Воспроизвести', () => cutscene.play(player))
+    .addButton(l`Редактировать`, () => editCatcutscene(player, cutscene))
+    .addButton(l`Воспроизвести`, () => cutscene.play(player))
     .show(player)
 }

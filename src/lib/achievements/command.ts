@@ -5,9 +5,9 @@ import { is } from 'lib/roles'
 import { t } from 'lib/text'
 import { Achievement } from './achievement'
 
-new Command('achievement')
-  .setAliases('ach', 'achiv', 'achiev', 'achivs', 'achievs')
-  .setDescription('Достижения')
+Achievement.command = new Command('achiv')
+  .setAliases('ach', 'achievement', 'achiev', 'achivs', 'achievs')
+  .setDescription(t`Достижения`)
   .setPermissions('member')
   .executes(ctx => achievementsForm(ctx.player))
 
@@ -56,7 +56,7 @@ export function achievementsForm(player: Player, back?: NewFormCallback) {
       const isDone = item.isDone(player)
       const isRewardTaken = item.isRewardTaken(player)
       return [
-        isDone ? (isRewardTaken ? item.name : t`${item.name}§c*\n§aЗаберите награды!`) : '?\nНеизвестно',
+        isDone ? (isRewardTaken ? item.name : t`${item.name}§c*\n§aЗаберите награды!`) : t`?\nНеизвестно`,
         isDone ? p => achievementDetails(item).show(p, self) : self,
       ] as const
     })
@@ -68,7 +68,7 @@ const achievementDetails = (achiv: Achievement<unknown>) =>
     f.title(achiv.name)
     f.body(t.raw`Награда: ${achiv.reward.toString()}`)
     f.button(
-      achiv.isRewardTaken(player) ? 'Награды забраны' : '§aЗабрать награды',
+      achiv.isRewardTaken(player) ? t`Награды забраны` : t`§aЗабрать награды`,
       () => (achiv.takeRewards(player), achievementDetails(achiv).show(player, back)),
     )
     if (is(player.id, 'admin')) {

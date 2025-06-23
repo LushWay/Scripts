@@ -7,7 +7,7 @@ import { ModalForm } from 'lib/form/modal'
 import { form, NewFormCreator } from 'lib/form/new'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { Region } from 'lib/region/kinds/region'
-import { t, textTable } from 'lib/text'
+import { l, t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { Area } from './areas/area'
@@ -23,7 +23,7 @@ export function registerRegionType(name: string, region: typeof Region, creatabl
 }
 
 const command = new Command('region')
-  .setDescription('Управляет регионами')
+  .setDescription(t`Управляет регионами`)
   .setPermissions('techAdmin')
   .setGroup('public')
   .executes(ctx => {
@@ -85,15 +85,15 @@ system.runInterval(
 
 function regionForm(player: Player) {
   form(f => {
-    f.title('Управление регионами')
-    f.body('§7Чтобы создать регион, перейдите в список определенных регионов')
+    f.title(l`Управление регионами`)
+    f.body(l`Чтобы создать регион, перейдите в список определенных регионов`)
 
     const currentRegions = Region.getManyAt(player)
     const currentRegion = currentRegions[0]
 
     function addRegionButton(currentRegion: Region, form: NewFormCreator) {
       form.button(
-        t`${currentRegion.displayName ?? 'Без имени'} (${currentRegion.area.toString()})\n${currentRegion.name}`,
+        l`${currentRegion.displayName ?? l`Без имени`} (${currentRegion.area.toString()})\n${currentRegion.name}`,
         () => editRegion(player, currentRegion, false, () => regionForm(player)),
       )
     }
@@ -104,7 +104,7 @@ function regionForm(player: Player) {
       f.button(
         form(f => {
           f.title(
-            t`Другие регионы тут (${currentRegions.length - 1})\n${[...new Set(currentRegions.map(e => e.creator.kind))].join(' ')}`,
+            l`Другие регионы тут (${currentRegions.length - 1})\n${[...new Set(currentRegions.map(e => e.creator.kind))].join(' ')}`,
           )
           for (const region of currentRegions.slice(1)) addRegionButton(region, f)
         }),
@@ -126,12 +126,12 @@ function regionList(
   displayName = creatable,
   back = () => regionForm(player),
 ) {
-  const form = new ActionForm('Список ' + RegionType.name)
+  const form = new ActionForm(l`Список ` + RegionType.name)
   const selfback = () => regionList(player, RegionType, creatable, displayName, back)
 
   if (creatable)
-    form.addButton('Добавить', BUTTON['+'], () => {
-      const form = new ActionForm('Выбери тип области региона')
+    form.addButton(l`Добавить`, BUTTON['+'], () => {
+      const form = new ActionForm(l`Выбери тип области региона`)
       selectArea(form, player, area => {
         editRegion(player, RegionType.create(area), displayName, selfback)
       })
@@ -139,7 +139,7 @@ function regionList(
     })
 
   for (const region of RegionType.getAll()) {
-    form.addButton(t`${displayName ? region.displayName : region.name}\n${region.area.toString()}`, () =>
+    form.addButton(l`${displayName ? region.displayName : region.name}\n${region.area.toString()}`, () =>
       editRegion(player, region, displayName, selfback),
     )
   }
@@ -149,10 +149,10 @@ function regionList(
 
 function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => void) {
   form
-    .addButton('Сфера', BUTTON['+'], () => {
-      new ModalForm('Сфера')
-        .addTextField('Центр', '~~~', '~~~')
-        .addSlider('Радиус', 1, 100, 1)
+    .addButton(l`Сфера`, BUTTON['+'], () => {
+      new ModalForm(l`Сфера`)
+        .addTextField(l`Центр`, '~~~', '~~~')
+        .addSlider(l`Радиус`, 1, 100, 1)
         .show(player, (ctx, rawCenter, radius) => {
           const center = parseLocationFromForm(ctx, rawCenter, player)
           if (!center) return
@@ -165,10 +165,10 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
           onSelect(new SphereArea({ radius, center }, player.dimension.type))
         })
     })
-    .addButton('Куб', BUTTON['+'], () => {
-      new ModalForm('Куб')
-        .addTextField('От', '~~~', '~~~')
-        .addTextField('До', '~~~', '~~~')
+    .addButton(l`Куб`, BUTTON['+'], () => {
+      new ModalForm(l`Куб`)
+        .addTextField(l`От`, '~~~', '~~~')
+        .addTextField(l`До`, '~~~', '~~~')
         .show(player, (ctx, rawFrom, rawTo) => {
           const from = parseLocationFromForm(ctx, rawFrom, player)
           const to = parseLocationFromForm(ctx, rawTo, player)
@@ -177,10 +177,10 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
           onSelect(new RectangleArea({ from, to }, player.dimension.type))
         })
     })
-    .addButton('Куб без учета высоты', BUTTON['+'], () => {
-      new ModalForm('Куб без учета высоты')
-        .addTextField('От', '~~~', '~~~')
-        .addTextField('До', '~~~', '~~~')
+    .addButton(l`Куб без учета высоты`, BUTTON['+'], () => {
+      new ModalForm(l`Куб без учета высоты`)
+        .addTextField(l`От`, '~~~', '~~~')
+        .addTextField(l`До`, '~~~', '~~~')
         .show(player, (ctx, rawFrom, rawTo) => {
           const from = parseLocationFromForm(ctx, rawFrom, player)
           const to = parseLocationFromForm(ctx, rawTo, player)
@@ -189,11 +189,11 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
           onSelect(new ChunkCubeArea({ from, to }, player.dimension.type))
         })
     })
-    .addButton('Цилиндр', BUTTON['+'], () => {
-      new ModalForm('Цилиндр')
-        .addTextField('Центр', '~~~', '~~~')
-        .addSlider('Радиус', 1, 100, 1)
-        .addSlider('Высота', 1, 100, 1)
+    .addButton(l`Цилиндр`, BUTTON['+'], () => {
+      new ModalForm(l`Цилиндр`)
+        .addTextField(l`Центр`, '~~~', '~~~')
+        .addSlider(l`Радиус`, 1, 100, 1)
+        .addSlider(l`Высота`, 1, 100, 1)
         .show(player, (ctx, rawCenter, radius, yradius) => {
           const center = parseLocationFromForm(ctx, rawCenter, player)
           if (!center) return
@@ -201,11 +201,11 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
           onSelect(new CylinderArea({ center, radius, yradius }, player.dimension.type))
         })
     })
-    .addButton('Приплюснутая сфера', BUTTON['+'], () => {
-      new ModalForm('Приплюснутая сфера')
-        .addTextField('Центр', '~~~', '~~~')
-        .addSlider('Радиус', 1, 100, 1)
-        .addSlider('Высота', 1, 100, 1)
+    .addButton(l`Приплюснутая сфера`, BUTTON['+'], () => {
+      new ModalForm(l`Приплюснутая сфера`)
+        .addTextField(l`Центр`, '~~~', '~~~')
+        .addSlider(l`Радиус`, 1, 100, 1)
+        .addSlider(l`Высота`, 1, 100, 1)
         .show(player, (ctx, rawCenter, rx, ry) => {
           const center = parseLocationFromForm(ctx, rawCenter, player)
           if (!center) return
@@ -215,7 +215,7 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
     })
 }
 
-const pluralForms: WordPluralForms = ['региона', 'регион', 'в регионе']
+const pluralForms: WordPluralForms = [t`региона`, t`регион`, t`в регионе`]
 
 function editRegion(player: Player, region: Region, displayName: boolean, back: () => void) {
   const selfback = () => editRegion(player, region, displayName, back)
@@ -229,49 +229,49 @@ function editRegion(player: Player, region: Region, displayName: boolean, back: 
     }),
   )
     .addButton(ActionForm.backText, back)
-    .addButton('Участники', () => manageRegionMembers(player, region, { isOwner: true, back: selfback, pluralForms }))
-    .addButton('Разрешения', () =>
+    .addButton(t`Участники`, () => manageRegionMembers(player, region, { isOwner: true, back: selfback, pluralForms }))
+    .addButton(t`Разрешения`, () =>
       editRegionPermissions(player, region, { pluralForms, back: selfback, extendedEditPermissions: true }),
     )
 
   if (region.structure) {
     const exists = region.structure.exists
-    const color = exists ? '' : '§7'
+    const color = exists ? l : l.warn
 
     if (exists)
-      form.addButton(`Установить структуру в мир`, async () => {
+      form.addButton(l`Установить структуру в мир`, async () => {
         if (!region.structure) return
-        player.info('Загружаем структуру...')
+        player.info(l`Загружаем структуру...`)
         try {
           await region.structure.place()
-          player.success('Структура загружена!')
+          player.success(l`Структура загружена!`)
         } catch (e) {
           console.log(e)
-          player.fail(t.error`Не удалось загрузить структуру: ${e}`)
+          player.fail(l.error`Не удалось загрузить структуру: ${e}`)
         }
       })
 
-    form.addButton(`${color}${exists ? 'Перес' : 'С'}охранить структуру`, async () => {
-      player.info('Сохраняем структуру...')
+    form.addButton(exists ? color`Пересохранить структуру` : color`Сохранить структуру`, async () => {
+      player.info(l`Сохраняем структуру...`)
       try {
         if (exists) region.structure?.delete()
         await region.structure?.save()
 
-        player.success('Структура успешно сохранена')
+        player.success(l`Структура успешно сохранена`)
       } catch (e) {
         console.log(e)
         player.fail(t.error`Не удалось сохранить структуру: ${e}`)
       }
     })
-    if (exists) form.addButtonAsk('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
+    if (exists) form.addButtonAsk(l`§cУдалить структуру`, l`§cУдалить`, () => region.structure?.delete())
   }
 
   region.customFormButtons(form, player)
 
-  form.addButton('Переместиться в регион', () => player.teleport(region.area.center))
+  form.addButton(l`Переместиться в регион`, () => player.teleport(region.area.center))
 
-  form.addButton('Заменить зону', () => {
-    const form = new ActionForm('Заменить зону')
+  form.addButton(l`Заменить зону`, () => {
+    const form = new ActionForm(l`Заменить зону`)
     selectArea(form, player, area => {
       // Area changed, need to update chunk query storages too
       Region.chunkQuery.remove(region)
@@ -284,15 +284,15 @@ function editRegion(player: Player, region: Region, displayName: boolean, back: 
     form.show(player)
   })
 
-  form.addButtonAsk('§cУдалить регион', '§cУдалить', () => (region.delete(), back()), '§aНе удалять').show(player)
+  form.addButtonAsk(l`§cУдалить регион`, t`§cУдалить`, () => (region.delete(), back()), l`§aНе удалять`).show(player)
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
   const [x, y, z] = parseArguments(location)
-  if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + inspect(location))
+  if (!x || !y || !z) return ctx.error(l`Неправильные координаты: ` + inspect(location))
 
   const parsed = parseLocationArguments([x, y, z], player)
-  if (!parsed) return ctx.error('Неправильная локация: ' + inspect(location))
+  if (!parsed) return ctx.error(l`Неправильная локация: ` + inspect(location))
 
   return Vec.floor(parsed) as Vector3
 }
@@ -318,7 +318,7 @@ export function editRegionPermissions(
       radius?: number,
       center?: string,
     ) => void
-  > = new ModalForm('Разрешения ' + pluralForms[0])
+  > = new ModalForm(t`Разрешения ` + pluralForms[0])
     .addToggle(
       `Двери\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери.`,
       region.permissions.doors,
@@ -343,14 +343,14 @@ export function editRegionPermissions(
   if (extendedEditPermissions) {
     form = form.addDropdownFromObject(
       `Сражение\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`,
-      { true: 'Да', pve: 'Только с сущностями (pve)', false: 'Нет' },
+      { true: t`Да`, pve: t`Только с сущностями (pve)`, false: t`Нет` },
       { defaultValueIndex: String(region.permissions.pvp) },
     )
 
     if (region.area instanceof SphereArea)
       form
         .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
-        .addTextField('Центр региона', Vec.string(region.area.center), Vec.string(region.area.center))
+        .addTextField(t`Центр региона`, Vec.string(region.area.center), Vec.string(region.area.center))
   }
   form.show(player, (ctx, doors, switches, trapdoors, containers, fences, pvp, radiusOrCenter, rawCenter) => {
     region.permissions.doors = doors
@@ -391,8 +391,8 @@ export function manageRegionMembers(
   },
 ) {
   const form = new ActionForm(
-    'Участники ' + pluralForms[0],
-    isOwner ? 'Для управления участником нажмите на кнопку с его ником' : 'Вы можете только посмотреть их',
+    t`Участники ` + pluralForms[0],
+    isOwner ? t`Для управления участником нажмите на кнопку с его ником` : t`Вы можете только посмотреть их`,
   )
 
   const selfback = () => manageRegionMembers(player, region, { back, member, isOwner, pluralForms })
@@ -405,8 +405,8 @@ export function manageRegionMembers(
   form.addButtonBack(back)
 
   if (isOwner)
-    form.addButton('§3Добавить!', BUTTON['+'], () => {
-      const form = new ActionForm('Добавить участника ' + pluralForms[2])
+    form.addButton(t`§3Добавить!`, BUTTON['+'], () => {
+      const form = new ActionForm(t`Добавить участника`)
 
       for (const player of world.getAllPlayers())
         form.addButton(player.name, () => {
@@ -416,15 +416,15 @@ export function manageRegionMembers(
       form.show(player)
     })
   for (const [i, memberId] of region.permissions.owners.entries()) {
-    const name = Player.name(memberId) ?? '§7<Имя неизвестно>'
+    const name = Player.nameOrUnknown(memberId)
 
-    form.addButton(`${i === 0 ? '§7Владелец > §f' : ''}${name}`, () => {
+    form.addButton(`${i === 0 ? t`§7Владелец > ` : ''}§f${name}`, () => {
       const form = new ActionForm(name, `Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
 
       if (region.getMemberRole(memberId) !== 'owner')
         form.addButtonAsk(
           isOwner ? `Передать права владельца ${pluralForms[0]}` : `Назначить владельцем ${pluralForms[0]}`,
-          'Передать',
+          t`Передать`,
           () => {
             region.permissions.owners = region.permissions.owners.sort(a => (a === memberId ? 1 : -1))
             applyAction()
@@ -432,7 +432,7 @@ export function manageRegionMembers(
         )
 
       form
-        .addButtonAsk('§cУдалить участника', '§cУдалить', () => {
+        .addButtonAsk(t`§cУдалить участника`, t`§cУдалить`, () => {
           region.permissions.owners = region.permissions.owners.filter(e => e !== memberId)
           applyAction()
         })

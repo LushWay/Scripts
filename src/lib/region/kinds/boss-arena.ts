@@ -4,6 +4,7 @@ import { ActionForm } from 'lib/form/action'
 import { registerRegionType } from 'lib/region/command'
 import { adventureModeRegions } from 'lib/region/kinds/safe-area'
 import { Boss } from 'lib/rpg/boss'
+import { l, t } from 'lib/text'
 import { Vec } from 'lib/vector'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
@@ -22,7 +23,7 @@ export class BossArenaRegion extends Region {
   boss?: Boss
 
   get displayName(): string | undefined {
-    return `§cБосс §6${this.bossName}`
+    return t.nocolor`§cБосс §6${this.bossName}`
   }
 
   protected readonly defaultPermissions: RegionPermissions = {
@@ -59,7 +60,7 @@ export class BossArenaRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.addButton('Вызвать босса', () => {
+    form.addButton(l`Вызвать босса`, () => {
       if (this.boss) Boss.db.delete(this.boss.id)
     })
   }

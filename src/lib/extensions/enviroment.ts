@@ -1,4 +1,4 @@
-/* eslint-disable no-var */
+ 
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Language } from 'lib/assets/lang'

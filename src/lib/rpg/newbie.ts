@@ -3,6 +3,7 @@ import { PlayerProperties } from 'lib/assets/player-json'
 import { Cooldown } from 'lib/cooldown'
 import { ask } from 'lib/form/message'
 import { Join } from 'lib/player-join'
+import { t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
 
@@ -18,19 +19,21 @@ export function askForExitingNewbieMode(
   player: Player,
   reason: Text,
   callback: VoidFunction,
-  back: VoidFunction = () => player.success('Успешно отменено'),
+  back: VoidFunction = () => player.success(t`Успешно отменено`),
 ) {
   if (!isNewbie(player)) return callback()
 
   ask(
     player,
-    'Если вы совершите это действие, вы потеряете статус новичка:\n - Другие игроки смогут наносить вам урон\n - Другие игроки смогут забирать ваш лут после смерти',
-    '§cЯ больше не новичок',
+    t`Если вы совершите это действие, вы потеряете статус новичка:
+ - Другие игроки смогут наносить вам урон
+ - Другие игроки смогут забирать ваш лут после смерти`,
+    t`§cЯ больше не новичок`,
     () => {
       exitNewbieMode(player, reason)
       callback()
     },
-    'НЕТ, НАЗАД',
+    t`НЕТ, НАЗАД`,
     back,
   )
 }
@@ -79,27 +82,27 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       denyDamage()
       askForExitingNewbieMode(
         damagingEntity,
-        'ударили игрока',
+        t`ударили игрока`,
         () => void 0,
-        () => damagingEntity.info('Будь осторожнее в следующий раз.'),
+        () => damagingEntity.info(t`Будь осторожнее в следующий раз.`),
       )
     } else {
-      exitNewbieMode(damagingEntity, 'снова ударили игрока')
+      exitNewbieMode(damagingEntity, t`снова ударили игрока`)
     }
   }
 })
 
 new Command('newbie')
   .setPermissions('member')
-  .setDescription('Используйте, чтобы выйти из режима новичка')
+  .setDescription(t`Используйте, чтобы выйти из режима новичка`)
   .executes(ctx => {
     if (isNewbie(ctx.player)) {
-      askForExitingNewbieMode(ctx.player, 'использовали команду', () => void 0)
-    } else return ctx.error('Вы не находитесь в режиме новичка.')
+      askForExitingNewbieMode(ctx.player, t`использовали команду`, () => void 0)
+    } else return ctx.error(t`Вы не находитесь в режиме новичка.`)
   })
   .overload('set')
   .setPermissions('techAdmin')
-  .setDescription('Вводит в режим новичка')
+  .setDescription(t`Вводит в режим новичка`)
   .executes(ctx => {
     enterNewbieMode(ctx.player)
     ctx.player.success()
@@ -107,5 +110,5 @@ new Command('newbie')
 
 system.runPlayerInterval(player => {
   if (isNewbie(player) && player.scores.anarchyOnlineTime * 2.5 > newbieTime)
-    exitNewbieMode(player, 'провели на анархии больше 2 часов')
+    exitNewbieMode(player, t`провели на анархии больше 2 часов`)
 }, 'newbie mode exit')

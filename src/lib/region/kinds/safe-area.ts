@@ -1,6 +1,7 @@
 import { GameMode, Player, system } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { registerRegionType } from 'lib/region/command'
+import { l, t } from 'lib/text'
 import { toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
 import { RegionEvents } from '../events'
@@ -41,14 +42,14 @@ export class SafeAreaRegion extends Region {
   }
 
   get name() {
-    return this.safeAreaName ? `Безопасная зона ${this.safeAreaName}` : super.name
+    return this.safeAreaName ? t.nocolor`Безопасная зона ${this.safeAreaName}` : super.name
   }
 
   get displayName() {
     return this.safeAreaName
   }
 }
-registerRegionType('Мирные зоны', SafeAreaRegion)
+registerRegionType(l`Мирные зоны`, SafeAreaRegion)
 export const disableAdventureNear: (typeof Region)[] = []
 export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion]
 

@@ -147,8 +147,8 @@ function wrapWithCatch<T extends (...args: any[]) => unknown>(func: T, player: P
       return func(...(args as Parameters<T>)) as ReturnType<T>
     } catch (e) {
       new MessageForm(
-        'Ошибка',
-        'При покупке произошла ошибка. Разработчики уже оповещены и скоро начнут работать над ее исправлением',
+        t`Ошибка`,
+        t`При покупке произошла ошибка. Разработчики уже оповещены и скоро начнут работать над ее исправлением`,
       ).show(player)
 
       throw e

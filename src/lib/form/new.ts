@@ -4,7 +4,7 @@ import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
 import { Quest } from 'lib/quest'
-import { MaybeRawText, t } from 'lib/text'
+import { l, MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => unknown
@@ -112,16 +112,17 @@ class Form {
    * @param noText - Function that will be called when no button was pressed
    * @param texture - Button texture
    */
-  ask(text: string, yesText: string, yesAction: VoidFunction, noText = 'Отмена', texture: string | null = null) {
+  // TODO Fix
+  ask(text: string, yesText: string, yesAction: VoidFunction, noText = t`Отмена`, texture: string | null = null) {
     return this.button(text, texture, p =>
-      ask(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, this.show),
+      ask(p, t.error`Вы уверены, что хотите ${text}?`, yesText, yesAction, noText, this.show),
     )
   }
 
   show = async () => {
     const callbackExecutor: (fn: VoidFunction) => void = __TEST__ ? f => f() : util.catch
 
-    if (!this.buttons.length) this.button('Пусто', undefined, this.show)
+    if (!this.buttons.length) this.button(l`Empty`, undefined, this.show)
 
     const response = await showForm(this.form, this.player)
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')

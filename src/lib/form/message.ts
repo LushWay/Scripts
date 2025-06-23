@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
-import { MaybeRawText } from 'lib/text'
+import { l, MaybeRawText, t } from 'lib/text'
 import { util } from '../util'
 import { showForm } from './utils'
 import { NewFormCallback } from './new'
@@ -36,7 +36,7 @@ export class MessageForm {
     this.form = new MessageFormData()
     if (title) this.form.title(title)
     if (body) this.form.body(body)
-    this.setButton2('Ок', () => 0)
+    this.setButton2(l`Оk`, () => 0)
     this.setButton1('', () => 0)
     this.triedToShow = 0
   }
@@ -95,11 +95,11 @@ export function ask(
   text: string,
   yesText: string,
   yesAction?: VoidFunction,
-  noText = 'Отмена',
+  noText = t`Отмена`,
   noAction?: VoidFunction,
 ) {
   return new Promise<boolean>(resolve => {
-    new MessageForm('Вы уверены?', text)
+    new MessageForm(t`Вы уверены?`, text)
       .setButton1(yesText, () => {
         yesAction?.()
         resolve(true)

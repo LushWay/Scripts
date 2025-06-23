@@ -10,6 +10,7 @@ import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { QuestButton } from './button'
 import { PlayerQuest } from './player'
 import { QS } from './step'
+import { t } from 'lib/text'
 
 export declare namespace Quest {
   interface DB {
@@ -21,11 +22,12 @@ export declare namespace Quest {
 export class Quest {
   static error = class QuestError extends Error {}
 
-  static playerSettings = Settings.player('Задания\n§7Настройки игровых заданий', 'quest', {
+  static playerSettings = Settings.player(t`Задания
+§7Настройки игровых заданий`, 'quest', {
     messageForEachStep: {
       value: false,
-      name: 'Сообщение в чат при каждом шаге',
-      description: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
+      name: t`Сообщение в чат при каждом шаге`,
+      description: t`Отправлять ли сообщение в чат при каждом новом разделе задания`,
     },
   })
 

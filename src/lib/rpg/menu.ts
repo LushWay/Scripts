@@ -2,6 +2,7 @@ import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Playe
 import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
 import { MessageForm } from 'lib/form/message'
+import { l, t } from 'lib/text'
 import { util } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
@@ -9,13 +10,17 @@ import { ActionForm } from '../form/action'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
 
 export class Menu {
-  static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
+  static settings: [string, string] = [
+    t`Меню
+§7Разные настройки интерфейсов и меню в игре`,
+    'menu',
+  ]
 
   static createItem(typeId: string = Items.Menu, name?: string) {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
-      '§r§7Возьми в руку и используй §r§7предмет\n\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu',
+      t.nocolor`§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu`,
     )
     item.lockMode = ItemLockMode.inventory
     item.keepOnDeath = true
@@ -25,7 +30,7 @@ export class Menu {
 
   static itemStack = this.createItem()
 
-  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), 'меню')
+  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), t`меню`)
 
   static {
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -40,7 +45,7 @@ export class Menu {
   }
 
   static open(player: Player): ActionForm | false {
-    new MessageForm('Меню выключено', 'Все еще в разработке').show(player)
+    new MessageForm(l`Меню выключено`, l`Все еще в разработке`).show(player)
 
     return false
   }
@@ -72,7 +77,7 @@ export class Compass {
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(`${Items.CompassPrefix}${i}`, '§r§l§6Цель\n§r§7(use)')
+    return Menu.createItem(`${Items.CompassPrefix}${i}`, t.nocolor`§r§l§6Цель\n§r§7(use)`)
   })
 
   /** Map of player as key and compass target as value */

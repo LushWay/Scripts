@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { Clan } from './clan/clan'
 import { getRole, ROLES } from './roles'
 import { EquippmentLevel } from './rpg/equipment-level'
+import { t } from './text'
 
 /**
  * Gets displayable the role of this player
@@ -48,7 +49,7 @@ export function getFullname(
   let result = ''
   const add = (text: string) => (result += result ? ' ' + text : text)
 
-  if (useNewbie && Player.database.getImmutable(id).survival.newbie) add('§bНовичок')
+  if (useNewbie && Player.database.getImmutable(id).survival.newbie) add(t.nocolor`§bНовичок`)
 
   if (useRole) {
     const role = getRole(playerID)

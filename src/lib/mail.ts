@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 
 import { Rewards } from 'lib/utils/rewards'
 import { table } from './database/abstract'
-import { t } from './text'
+import { l, t } from './text'
 
 /** A global letter is a letter sent to multiple players */
 interface GlobalLetter {
@@ -27,7 +27,7 @@ export class Mail {
 
   static dbGlobal = table<GlobalLetter>('mailGlobal')
 
-  static globalNotFound: GlobalLetter = { title: 'Рассылка не найдена', content: 'Рассылка не найдена', rewards: [] }
+  static globalNotFound: GlobalLetter = { title: l`Not found`, content: l`404 Error`, rewards: [] }
 
   /**
    * Sends the mail for the player

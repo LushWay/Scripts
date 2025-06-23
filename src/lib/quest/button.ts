@@ -25,7 +25,7 @@ export class QuestButton {
         form(f => {
           f.title(this.quest.name)
           f.body(description)
-          f.button('Взять задание', () => this.quest.enter(player))
+          f.button(t`Взять задание`, () => this.quest.enter(player))
         }),
       ]
 

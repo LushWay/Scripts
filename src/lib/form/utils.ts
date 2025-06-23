@@ -9,6 +9,7 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
+import { t } from 'lib/text'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { MessageForm } from './message'
 
@@ -33,9 +34,9 @@ export class FormCallback<Form extends BaseForm = BaseForm> {
    * @param message Error message to show
    */
   error(message: string): void {
-    new MessageForm('§cОшибка', message)
-      .setButton1('Назад', this.back)
-      .setButton2('§cЗакрыть', () => {
+    new MessageForm(t.error`Ошибка`, message)
+      .setButton1(t`Назад`, this.back)
+      .setButton2(t.error`Закрыть`, () => {
         // Do nothing
       })
       .show(this.player)
@@ -70,7 +71,7 @@ export async function showForm(
 
             case 2:
               // Second attempt, tell player to manually close chat...
-              player.info('Закрой чат!')
+              player.info(t`Закрой чат!`)
               await system.sleep(10)
               continue
 

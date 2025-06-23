@@ -106,13 +106,13 @@ export function selectPlayer(
       players.push({ online: !!player, name, id, player })
     }
 
-    new ArrayForm('§3Выберите игрока чтобы §f' + reason, players)
+    new ArrayForm(t`§3Выберите игрока чтобы ${reason}`, players)
       .filters({
         sort: {
-          name: 'Сортировать по',
+          name: t`Сортировать по`,
           value: [
-            ['online', 'Онлайну'],
-            ['date', 'Дате входа'],
+            ['online', t`Онлайну`],
+            ['date', t`Дате входа`],
           ],
         },
       })

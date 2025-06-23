@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
 import { capitalize } from 'lib/util'

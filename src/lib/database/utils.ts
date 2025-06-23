@@ -1,6 +1,7 @@
 /* i18n-ignore */
 
 import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
+import { l } from 'lib/text'
 import { Vec } from 'lib/vector'
 
 interface TableEntity {
@@ -60,7 +61,7 @@ export class DatabaseUtils {
     this.allEntities = this.getEntities()
 
     if (this.allEntities.length < 1) {
-      console.warn('§6Не удалось найти базы данных. Попытка загрузить бэкап...')
+      console.warn(l`§6Не удалось найти базы данных. Попытка загрузить бэкап...`)
 
       world.overworld
         .getEntities({
@@ -75,7 +76,7 @@ export class DatabaseUtils {
       this.allEntities = this.getEntities()
 
       if (this.allEntities.length < 1) {
-        console.warn('§cНе удалось загрузить базы данных из бэкапа.')
+        console.warn(l`§cНе удалось загрузить базы данных из бэкапа.`)
         return []
       } else console.warn(`Бэкап успешно загружен! Всего баз данных: ${this.allEntities.length}`)
     }
@@ -90,7 +91,7 @@ export class DatabaseUtils {
     entity.setDynamicProperty('tableName', tableName)
     entity.setDynamicProperty('tableType', tableType)
     entity.setDynamicProperty('index', index)
-    entity.nameTag = `§7DB §f${tableName} `
+    entity.nameTag = l`DB ${tableName} `
 
     return entity
   }

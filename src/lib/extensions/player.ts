@@ -3,7 +3,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { Language } from 'lib/assets/lang'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
-import { MaybeRawText } from 'lib/text'
+import { MaybeRawText, t } from 'lib/text'
 import { Vec } from 'lib/vector'
 import { expand } from './extend'
 
@@ -171,7 +171,7 @@ expand(Player.prototype, {
 
   fail: prefix('§4§l> §r§c', Sounds.Fail),
   warn: prefix('§e⚠ §6', Sounds.Fail),
-  success: prefix('§a§l> §r', Sounds.Success, 'Успешно'),
+  success: prefix('§a§l> §r', Sounds.Success, t`Успешно`),
   info: prefix('§b§l> §r§3', Sounds.Success),
 
   // eslint-disable-next-line @typescript-eslint/unbound-method

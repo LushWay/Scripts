@@ -1,6 +1,7 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ask } from 'lib/form/message'
+import { l, t } from 'lib/text'
 import { util } from 'lib/util'
 import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'
@@ -15,8 +16,9 @@ interface IActionFormButton {
 }
 
 export class ActionForm {
+  // TODO Remove
   /** Text used by back button */
-  static backText = '§l§b< §r§3Назад'
+  static backText = t`§l§b< §r§3Назад`
 
   /** The buttons this form has */
   private buttons: IActionFormButton[] = []
@@ -85,7 +87,7 @@ export class ActionForm {
    */
   addButtonBack(backCallback: NewFormCallback | undefined) {
     if (!backCallback) return this
-    else return this.addButton('§r§3Назад', BUTTON['<'], backCallback)
+    else return this.addButton(t`§r§3Назад`, BUTTON['<'], backCallback)
   }
 
   /**
@@ -108,11 +110,12 @@ export class ActionForm {
     text: string,
     yesText: string,
     yesAction: VoidFunction,
-    noText = 'Отмена',
+    noText = t`Отмена`,
     texture: string | null = null,
   ) {
+    // TODO Fix
     return this.addButton(text, texture, p =>
-      ask(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p)),
+      ask(p, t`§cВы уверены, что хотите ` + text + '?', yesText, yesAction, noText, () => this.show(p)),
     )
   }
 
@@ -122,7 +125,7 @@ export class ActionForm {
    * @param player Player to show form to
    */
   async show(player: Player): Promise<boolean> {
-    if (!this.buttons.length) this.addButton('Пусто', () => this.show(player))
+    if (!this.buttons.length) this.addButton(l`Empty`, () => this.show(player))
 
     const response = await showForm(this.form, player)
 

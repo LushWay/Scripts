@@ -1,15 +1,15 @@
 import { Player } from '@minecraft/server'
 import { MemoryTable } from 'lib/database/abstract'
 import {
-  SETTINGS_GROUP_NAME,
   Settings,
+  SETTINGS_GROUP_NAME,
   SettingsDatabaseValue,
   settingsGroupMenu,
   type SettingsConfig,
   type SettingsConfigParsed,
   type SettingsDatabase,
 } from 'lib/settings'
-import { MaybeRawText } from 'lib/text'
+import { l, MaybeRawText, t } from 'lib/text'
 import { rawTextToString } from 'lib/utils/lang'
 import { util } from '../util'
 import { stringSimilarity } from '../utils/search'
@@ -45,7 +45,7 @@ export class ArrayForm<
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
-  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: 'Пустые фильтры' } as C }
+  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: l`Empty filters` } as C }
 
   constructor(
     private title: Text,
@@ -63,7 +63,7 @@ export class ArrayForm<
   }
 
   filters<const V extends SettingsConfig>(filters: V) {
-    this.config.filters = { [SETTINGS_GROUP_NAME]: 'Фильтры', ...(filters as unknown as C) }
+    this.config.filters = { [SETTINGS_GROUP_NAME]: t`Фильтры`, ...(filters as unknown as C) }
     return this as unknown as ArrayForm<T, V>
   }
 
@@ -123,11 +123,11 @@ export class ArrayForm<
 
     // Array item buttons & navigation
     if (paginator.canGoBack)
-      form.addButton('§r§3Предыдущая', BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
+      form.addButton(t`§r§3Предыдущая`, BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
 
     this.addButtons(paginator.array, form, filters, selfback)
 
-    if (paginator.canGoNext) form.addButton('§3Следующая', BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
+    if (paginator.canGoNext) form.addButton(t`§3Следующая`, BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
 
     return form.show(player)
   }
@@ -150,8 +150,8 @@ export class ArrayForm<
     filtersDatabase: SettingsDatabase,
     parsedFilters: F,
   ) {
-    form.addButton(!searchQuery ? '§3Поиск' : `§3Результаты поиска по запросу\n§f${searchQuery}`, BUTTON.search, () => {
-      new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
+    form.addButton(!searchQuery ? t`§3Поиск` : t`§3Результаты поиска по запросу\n${searchQuery}`, BUTTON.search, () => {
+      new ModalForm(t`Поиск`).addTextField(t`Запрос`, t`Ничего не произойдет`).show(player, (ctx, query) => {
         this.show(player, fromPage, filtersDatabase, parsedFilters, query)
       })
     })
@@ -189,7 +189,7 @@ export class ArrayForm<
     } else {
       const propertyName = 'filters'
       const applied = Object.keys(database.get(propertyName)).length
-      form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
+      form.addButton(t`§3Фильтры${t.size(applied)}`, BUTTON.settings, () =>
         settingsGroupMenu(
           player,
           propertyName,

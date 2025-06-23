@@ -2,6 +2,7 @@ import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { developersAreWarned } from 'lib/assets/text'
 import { ROLES } from 'lib/roles'
+import { l, t } from 'lib/text'
 import { inaccurateSearch } from '../utils/search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
@@ -48,7 +49,7 @@ export function commandNotFound(player: Player, command: string): void {
   player.playSound(Sounds.Fail)
 
   suggestCommand(player, command)
-  player.tell('§cСписок всех доступных вам команд: §f.help')
+  player.tell(t`§cСписок всех доступных вам команд: §f.help`)
   Command.logger.player(player).warn`Unknown command: ${command}`
 }
 
@@ -80,13 +81,13 @@ function suggestCommand(player: Player, command: string): void {
 
   const suggest = (a: [string, number]) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
 
-  let suggestion = '§cВы имели ввиду ' + suggest(search[0])
+  let suggestion = t`§cВы имели ввиду ${suggest(search[0])}`
   const firstValue = search[0][1]
   search = search
     .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
     .slice(1, options.maxSuggestionsCount)
 
-  for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
+  for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? t` или ` : ', '}${suggest(e)}`
 
   player.tell(suggestion + '§c?')
 }
@@ -191,7 +192,7 @@ export function sendCallback(
   }
   if (typeof lastArg.sys.callback !== 'function') {
     console.warn('Command not implemented: ', lastArg)
-    return event.sender.warn('Упс, эта команда пока не работает.')
+    return event.sender.warn(l`Command not implemented.`)
   }
 
   ;(async () => {
@@ -202,7 +203,7 @@ export function sendCallback(
         ...argsToReturn,
       ) as Promise<void> | void)
     } catch (e) {
-      event.sender.warn(`При выполнении команды произошла ошибка. ${developersAreWarned}`)
+      event.sender.warn(t`При выполнении команды произошла ошибка. ${developersAreWarned}`)
       console.error(e)
     }
   })()

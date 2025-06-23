@@ -11,7 +11,7 @@ import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { isNewbie } from 'lib/rpg/newbie'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
@@ -125,7 +125,7 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   get displayName(): string {
-    return this.newbie ? '§bЗона добычи новичков' : '§7Зона добычи'
+    return this.newbie ? t.nocolor`§bЗона добычи новичков` : t.nocolor`§7Зона добычи`
   }
 
   customFormDescription(player: Player): Record<string, unknown> {
@@ -139,7 +139,7 @@ export class MineareaRegion extends RegionWithStructure {
 }
 
 registerSaveableRegion('minearea', MineareaRegion)
-registerRegionType('Зоны добычи', MineareaRegion)
+registerRegionType(l`Зоны добычи`, MineareaRegion)
 
 regionTypesThatIgnoreIsBuildingGuard.push(MineareaRegion)
 
@@ -157,11 +157,12 @@ async function getSchedules(area: Area, dimensionType: ShortcutDimensions) {
 actionGuard((player, region, ctx) => {
   if (!(region instanceof MineareaRegion)) return
 
-  if (region.newbie && !isNewbie(player)) return player.fail('Вы не можете добывать блоки в зоне добычи новичков')
+  if (region.newbie && !isNewbie(player))
+    return player.fail(t.error`Вы не можете добывать блоки в зоне добычи новичков`)
 
   const building = isNotPlaying(player)
 
-  if (region.building && !building) return player.fail('Регион сохраняется')
+  if (region.building && !building) return player.fail(t.error`Регион сохраняется`)
   if (region.creating && !building)
     return player.fail(t.error`Регион создается. ${~~region.restoringStructurePercent}%%`)
 
@@ -242,8 +243,8 @@ function notifyBuilder(player: Player, region: MineareaRegion) {
   if (region.scheduledToPlaceBlocks.length || region.creating) {
     system.delay(() => {
       player.fail(
-        t.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${
-          region.creating ? 'Сохранение структуры...' : `${~~region.restoringStructurePercent}%%`
+        l.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${
+          region.creating ? l`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`
         }`,
       )
       region.restoreStructure(() => void 0)

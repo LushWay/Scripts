@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
 import { util } from 'lib/util'
 import { FormCallback, showForm } from './utils'
+import { t } from 'lib/text'
 
 interface IModalFormArg {
   /** What this form arg is */
@@ -13,7 +14,7 @@ interface IModalFormArg {
 type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R ? (...args: [...E, Next]) => R : never
 
 export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => void = (ctx: FormCallback) => void> {
-  static arrayDefaultNone = 'Никакой'
+  static arrayDefaultNone = t.nocolor`Никакой`
 
   triedToShow
 

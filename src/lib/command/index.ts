@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { t } from 'lib/text'
+import { l, t } from 'lib/text'
 import { stringifyError } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
@@ -48,7 +48,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     const parsed = parseCommand(event.message, 1)
     if (!parsed) {
       this.logger.player(event.sender).error`Unable to parse: ${event.message}`
-      return event.sender.fail('Не удалось обработать команду.')
+      return event.sender.fail(l`Failed to parse command`)
     } else this.logger.player(event.sender).info`Command ${event.message}`
 
     const { cmd, args, input } = parsed
@@ -88,7 +88,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   static commands: Command[] = []
 
   static getHelpForCommand(command: Command, ctx: CommandContext) {
-    return ctx.error('Генератор справки для команд выключен!')
+    return ctx.error(l`Help is disabled`)
   }
 
   [stringifySymbol]() {
@@ -414,7 +414,6 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
 type CommandModule = typeof Command
 
 declare global {
-  // eslint-disable-next-line no-var
   var Command: CommandModule
 }
 

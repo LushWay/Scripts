@@ -8,6 +8,7 @@ import { VectorInDimension } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { PlayerQuest } from './player'
 import { Quest } from './quest'
+import { t } from 'lib/text'
 
 export namespace QS {
   export type Text = string | TextFn
@@ -124,7 +125,7 @@ export abstract class QS<DB = any> extends Temporary {
    * @param text - Text to print
    */
   error(text: string) {
-    this.player.fail('§cУпс, задание сломалось: ' + text)
+    this.player.fail(t.error`Задание сломалось: ${text}`)
     return this
   }
 

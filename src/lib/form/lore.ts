@@ -47,7 +47,7 @@ export class LoreForm {
         form(f => {
           f.title(name)
           f.body(answer)
-          f.button('Хорошо, назад', this.back)
+          f.button(t`Хорошо, назад`, this.back)
           this.db.seen.push(id)
         }).show(player),
       )

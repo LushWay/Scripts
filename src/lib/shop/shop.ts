@@ -5,20 +5,20 @@ import { t, textTable } from 'lib/text'
 import { ShopForm, ShopMenuCreate } from './form'
 
 export class Shop {
-  static getPlayerSettings = Settings.player('Магазин\n§7Внутриигровой магазин', 'market', {
+  static getPlayerSettings = Settings.player(t`Магазин\n§7Внутриигровой магазин`, 'market', {
     prompt: {
-      name: 'Подтверждение покупки',
-      description: 'Определяет, включено ли подтверждение перед покупкой.',
+      name: t`Подтверждение покупки`,
+      description: t`Определяет, включено ли подтверждение перед покупкой.`,
       value: true,
     },
     defaultBody: {
-      name: 'Показывать счет',
-      description: 'Показывать ли счет в меню (монеты, листья)',
+      name: t`Показывать счет`,
+      description: t`Показывать ли счет в меню (монеты, листья)`,
       value: false,
     },
     sellableItemsScreen: {
-      name: 'Продаваемые предметы',
-      description: 'Сразу открывать меню покупки',
+      name: t`Продаваемые предметы`,
+      description: t`Сразу открывать меню покупки`,
       value: false,
     },
   })

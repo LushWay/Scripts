@@ -1,3 +1,5 @@
+import { t } from "lib/text"
+
 export const text: Record<string, (...args: (string | number)[]) => string> = {
   'api.name': () => 'Smelly API',
   'api.error.unknown': () => 'An unknown error has occured.',
@@ -54,4 +56,4 @@ export const text: Record<string, (...args: (string | number)[]) => string> = {
 §8-----------------------------`,
 }
 
-export const developersAreWarned = `Разработчики уже оповещены о проблеме и работают над ее исправлением.`
+export const developersAreWarned = t`Разработчики уже оповещены о проблеме и работают над ее исправлением.`

@@ -15,9 +15,21 @@ declare module '@minecraft/server' {
      * If the id is undefined or name not found, undefined is returned
      *
      * @example
-     *   Player.nameById(playerId) // Shp1nat9841
+     *   Player.name(playerId) // Shp1nat9841
      */
     function name(id: string | undefined): string | undefined
+
+    /**
+     * Gets player name from the {@link Player.database} by id
+     *
+     * If the id is undefined or name not found, 'Unknown' is returned
+     *
+     * @example
+     *   Player.name(playerId) // Shp1nat9841
+     *   Player.name(undefined) // Unknown
+     *   Player.name('non existen id') // Unknown
+     */
+    function nameOrUnknown(id: string | undefined): string
   }
 
   interface Player {
@@ -41,6 +53,9 @@ expand(Player, {
     if (!id) return void 0
 
     return Player.database.getImmutable(id).name
+  },
+  nameOrUnknown(id) {
+    return this.name(id) ?? 'Unknown'
   },
 })
 

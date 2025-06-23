@@ -10,7 +10,7 @@ import { Place } from 'lib/rpg/place'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
-import { t } from '../text'
+import { l, t } from '../text'
 import CrateLootAnimation from './animation'
 
 export class Crate {
@@ -19,7 +19,7 @@ export class Crate {
   static getName(id: string, crate = Crate.crates.get(id)) {
     if (crate) {
       return `${crate.place.group.name} - ${crate.place.name}`
-    } else return 'Неизвестный'
+    } else return l`Unknown`
   }
 
   static typeIds: string[] = [MinecraftBlockTypes.EnderChest, MinecraftBlockTypes.Chest]
@@ -97,16 +97,16 @@ export class Crate {
   private preview = form((f, player) => {
     f.title(this.name)
       .body(t`Чтобы открыть этот сундук, возьмите в руки ключ`)
-      .button('Купить ключ', () => {
-        player.fail('Пока не работает.')
+      .button(t`Купить ключ`, () => {
+        player.fail(t`Пока не работает.`)
       })
-      .button('Посмотреть содержимое', this.previewItems.show)
+      .button(t`Посмотреть содержимое`, this.previewItems.show)
 
     if (is(player.id, 'techAdmin'))
       f.button('admin: get key', () => player.container?.addItem(this.createKeyItemStack()))
   })
 
-  private previewItems = lootTablePreview(this.lootTable, t.header`${this.name + ' ящик'} > Содержимое`, true)
+  private previewItems = lootTablePreview(this.lootTable, t.header`${t`${this.name} ящик`} > Содержимое`, true)
 
   private animation = new CrateLootAnimation(this.place.id, this.dimensionType)
 }

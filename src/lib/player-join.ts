@@ -17,8 +17,8 @@ class JoinBuilder {
       vars: { title: `${Core.name}§r§f` },
     },
     actionBar: '', // Optional
-    subtitle: 'Добро пожаловать!', // Optional
-    messages: { air: '§8Очнулся в воздухе', ground: '§8Проснулся', sound: 'break.amethyst_cluster' },
+    subtitle: t.nocolor`Добро пожаловать!`, // Optional
+    messages: { air: t.nocolor`§8Очнулся в воздухе`, ground: t.nocolor`§8Проснулся`, sound: 'break.amethyst_cluster' },
   }
 
   onMoveAfterJoin = new EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>()
@@ -102,7 +102,7 @@ class JoinBuilder {
     )
 
     new Command('join')
-      .setDescription('Имитирует первый вход')
+      .setDescription(t`Имитирует первый вход`)
       .setPermissions('member')
       .executes(ctx => {
         const player = ctx.player
@@ -140,10 +140,10 @@ class JoinBuilder {
     })
   }
 
-  settings = Settings.player('Вход\n§7Все действия, связанные со входом', 'join', {
-    message: { name: 'Сообщение', description: 'о входе других игроков', value: true },
-    sound: { name: 'Звук', description: 'при входе игроков', value: true },
-    time: { name: 'Время', description: 'при входе', value: true },
+  settings = Settings.player(t`Вход\n§7Все действия, связанные со входом`, 'join', {
+    message: { name: t`Сообщение`, description: t`о входе других игроков`, value: true },
+    sound: { name: t`Звук`, description: t`при входе игроков`, value: true },
+    time: { name: t`Время`, description: t`при входе`, value: true },
   })
 
   emitFirstJoin(player: Player) {
@@ -160,10 +160,10 @@ export const Join = new JoinBuilder()
  */
 function timeNow(): string {
   const time = new Date(Date()).getHours() + 3
-  if (time < 6) return '§9Доброй ночи'
-  if (time < 12) return '§6Доброе утро'
-  if (time < 18) return '§bДобрый день'
-  return '§3Добрый вечер'
+  if (time < 6) return t`§9Доброй ночи`
+  if (time < 12) return t`§6Доброе утро`
+  if (time < 18) return t`§bДобрый день`
+  return t`§3Добрый вечер`
 }
 
 /**

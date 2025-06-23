@@ -2,7 +2,7 @@ import { Block, BlockPermutation, LocationInUnloadedChunkError, system, world } 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Table, table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
-import { t } from 'lib/text'
+import { l } from 'lib/text'
 import { util } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
@@ -224,7 +224,7 @@ const scheduleForm = form(form => {
   for (const [dim, blocks] of Object.entriesStringKeys(DB)) {
     form.button(scheduledDimensionForm(dim, blocks))
   }
-  form.button(t`debug: ${debugLogging}`, () => (debugLogging = !debugLogging))
+  form.button(l`debug: ${debugLogging}`, () => (debugLogging = !debugLogging))
 })
 
 const scheduledDimensionForm = (
@@ -235,7 +235,7 @@ const scheduledDimensionForm = (
     const keys = [...schedules.keys()]
     const size = keys.length
     form.title(`§7${dimensionType}: §f${size}`)
-    form.button(t`Place all blocks now`, () => {
+    form.button(l`Place all blocks now`, () => {
       player.success(`Enjoy the CHAOS. Force-placing ${size} blocks...`)
       system.runJob(
         (function* placeNow() {
@@ -254,13 +254,13 @@ const scheduledDimensionForm = (
     const first = keys[0] ? schedules.get(keys[0]) : undefined
     if (!first) return
 
-    form.button(t`Teleport to first: ${Vec.string(first.l, true)}\n${first.t}`, () => {
+    form.button(l`Teleport to first: ${Vec.string(first.l, true)}\n${first.t}`, () => {
       player.teleport(first.l)
       player.success()
     })
   })
 
 new Command('schd')
-  .setDescription('Отложенная установка блоков')
+  .setDescription(l`Отложенная установка блоков`)
   .setPermissions('techAdmin')
   .executes(ctx => scheduleForm.show(ctx.player))

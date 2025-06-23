@@ -4,6 +4,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'
+import { t } from 'lib/text'
 
 class ChatBuilder {
   db = table<Record<string, number>>('chatCooldown', () => ({}))
@@ -30,15 +31,15 @@ class ChatBuilder {
     },
   })
 
-  playerSettings = Settings.player('Чат\n§7Звуки и внешний вид чата', 'chat', {
+  playerSettings = Settings.player(t`Чат\n§7Звуки и внешний вид чата`, 'chat', {
     hightlightMessages: {
-      name: 'Подсветка моих сообщений',
-      description: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
+      name: t`Подсветка моих сообщений`,
+      description: t`Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r`,
       value: true,
     },
     disableSound: {
-      name: 'Выключение звука',
-      description: 'Выключение звука чужих сообщений',
+      name: t`Выключение звука`,
+      description: t`Выключение звука чужих сообщений`,
       value: false,
     },
   })

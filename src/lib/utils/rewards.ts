@@ -1,6 +1,7 @@
 import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { emoji } from 'lib/assets/emoji'
+import { l, t } from 'lib/text'
 import { itemNameXCount } from './item-name-x-count'
 
 export namespace Rewards {
@@ -88,7 +89,7 @@ export class Rewards {
    */
   give(player: Player, tell = true): Rewards {
     for (const reward of this.entries) Rewards.giveOne(player, reward)
-    if (tell) player.success('Вы получили награды!')
+    if (tell) player.success(t`Вы получили награды!`)
     return this
   }
 
@@ -114,7 +115,7 @@ export class Rewards {
       else text = `${reward.score} x${reward.count}`
     } else if ((reward.type as string) === 'item')
       text = itemNameXCount({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
-    else text = 'Неизвестная награда...'
+    else text = l`Unknown reward ${reward.type}`
 
     return typeof text === 'string' ? { text } : text
   }

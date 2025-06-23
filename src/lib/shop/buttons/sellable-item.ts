@@ -98,7 +98,7 @@ export function createSellableItem({
       if (settings.sellableItemsScreen) {
         buyForm(form)
       } else {
-        form.section('§3Купить', f => buyForm(f), BUTTON['+'])
+        form.section(t`§3Купить`, f => buyForm(f), BUTTON['+'])
       }
     },
     aux,

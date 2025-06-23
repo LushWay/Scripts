@@ -9,7 +9,7 @@ export type MaybeRawText = string | RawText
 
 type TSA = TemplateStringsArray
 type Fn = (text: TSA, ...args: unknown[]) => Text
-type OptionsModifiers = 'error' | 'warn' | 'header'
+type OptionsModifiers = 'error' | 'warn' | 'header' | 'nocolor'
 interface MultiStatic {
   raw: (text: TSA, ...units: (string | RawText | RawMessage)[]) => RawText
 
@@ -73,6 +73,7 @@ function createGroup(options: ColorOptions = {}, modifier = false) {
   t.size = createSize(t)
 
   if (!modifier) {
+    t.nocolor = createGroup({ text: '', unit: '', num: '' }, true)
     t.header = createGroup({ text: '§6', ...options, unit: '§f§l' }, true)
     t.error = createGroup({ ...options, text: '§c', unit: '§f', num: '§7' }, true)
     t.warn = createGroup({ ...options, text: '§e', unit: '§f' }, true)
@@ -194,6 +195,6 @@ export function textUnitColorize(unit: unknown, options: ColorOptions = {}) {
       return `${num}${separateNumberWithDots(unit)}`
 
     case 'boolean':
-      return unit ? '§fДа' : '§cНет'
+      return unit ? t`§fДа` : t`§cНет`
   }
 }

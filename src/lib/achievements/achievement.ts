@@ -1,4 +1,6 @@
 import { Player, world } from '@minecraft/server'
+import type { Command } from 'lib/command'
+import { t } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { Rewards } from 'lib/utils/rewards'
 
@@ -21,6 +23,8 @@ type StripUnneded<T extends Achievement<unknown>> = Omit<T, 'isRewardsTaken' | '
 type CreatorAchievement<T> = (ctx: StripUnneded<Achievement<T>>) => void
 
 export class Achievement<T> {
+  static command?: Command
+
   static list: Achievement<unknown>[] = []
 
   static create() {
@@ -64,7 +68,7 @@ export class Achievement<T> {
     const db = this.getDatabase(player)
     if (db.d) return
 
-    player.success('Достижение получено: ' + this.name + '! Заберите награды использовав .achiv')
+    player.success(t`Достижение получено: ${this.name}! Заберите награды, используя ${Achievement.command}`)
     db.d = Date.now()
   }
 
