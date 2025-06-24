@@ -1,7 +1,7 @@
 /* i18n-ignore */
 
 import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
-import { l } from 'lib/text'
+import { l } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 
 interface TableEntity {

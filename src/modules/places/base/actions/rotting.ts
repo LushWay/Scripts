@@ -14,9 +14,9 @@ import {
   Vec,
 } from 'lib'
 import { table } from 'lib/database/abstract'
+import { t } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { t } from 'lib/text'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion, RottingState } from '../region'

@@ -2,9 +2,9 @@ import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
-import { MaybeRawText, t } from 'lib/text'
+import { translateEnchantment } from 'lib/i18n/lang'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
-import { translateEnchantment } from 'lib/utils/lang'
 import { LootTable } from './loot-table'
 
 export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.header`Содержимое`, one = false) => {

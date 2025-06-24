@@ -2,7 +2,7 @@ import { Entity, ItemStack, Player, ShortcutDimensions, TicksPerSecond, system, 
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { StructureRootId } from 'lib/assets/structures'
 import { Cooldown } from '../cooldown'
-import { t } from '../text'
+import { t } from '../i18n/text'
 import { Vec } from '../vector'
 
 export default class ChestLootAnimation {

@@ -1,7 +1,7 @@
 import { Vector3 } from '@minecraft/server'
+import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint } from 'lib/utils/point'
 import { Area } from './area'
-import { TextTable } from 'lib/text'
 
 describe('area reg', () => {
   it('should trow', () => {

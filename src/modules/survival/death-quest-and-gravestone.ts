@@ -1,11 +1,11 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 import { actionGuard, Cooldown, EventSignal, inventoryIsEmpty, ms, Settings, Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { t } from 'lib/i18n/text'
 import { Quest } from 'lib/quest/quest'
 import { ActionGuardOrder, forceAllowSpawnInRegion, Region } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { noGroup } from 'lib/rpg/place'
-import { t } from 'lib/text'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 

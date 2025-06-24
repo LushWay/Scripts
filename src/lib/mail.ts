@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 
 import { Rewards } from 'lib/utils/rewards'
 import { table } from './database/abstract'
-import { l, t } from './text'
+import { l, t } from './i18n/text'
 
 /** A global letter is a letter sent to multiple players */
 interface GlobalLetter {
@@ -90,7 +90,7 @@ export class Mail {
    * @param {string} playerId - Id of the player to get messages from
    */
   static unreadBadge(playerId: string) {
-    return t.unreadBadge`${this.getUnreadMessagesCount(playerId)}`
+    return t.badge(this.getUnreadMessagesCount(playerId))
   }
 
   /**

@@ -9,7 +9,7 @@ import {
   Settings,
 } from 'lib'
 import { NewFormCallback } from 'lib/form/new'
-import { t, TextTable, textTable } from 'lib/text'
+import { t, TextTable, textTable } from 'lib/i18n/text'
 
 new Command('stats').setDescription(t`Показывает статистику по игре`).executes(ctx => showStats(ctx.player))
 

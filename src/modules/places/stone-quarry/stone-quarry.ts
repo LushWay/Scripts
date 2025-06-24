@@ -1,5 +1,6 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Loot } from 'lib'
+import { t } from 'lib/i18n/text'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
@@ -11,7 +12,6 @@ import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 import { createBossWither } from './wither.boss'
-import { t } from 'lib/text'
 
 class StoneQuarryBuilder extends City {
   constructor() {

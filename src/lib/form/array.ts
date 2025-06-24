@@ -1,5 +1,7 @@
 import { Player } from '@minecraft/server'
 import { MemoryTable } from 'lib/database/abstract'
+import { rawTextToString } from 'lib/i18n/lang'
+import { l, MaybeRawText, t } from 'lib/i18n/text'
 import {
   Settings,
   SETTINGS_GROUP_NAME,
@@ -9,8 +11,6 @@ import {
   type SettingsConfigParsed,
   type SettingsDatabase,
 } from 'lib/settings'
-import { l, MaybeRawText, t } from 'lib/text'
-import { rawTextToString } from 'lib/utils/lang'
 import { util } from '../util'
 import { stringSimilarity } from '../utils/search'
 import { ActionForm } from './action'

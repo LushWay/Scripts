@@ -2,8 +2,8 @@ import { Player, world } from '@minecraft/server'
 import { FormCallback, ROLES, getRole, setRole } from 'lib'
 import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
+import { t } from 'lib/i18n/text'
 import { WHO_CAN_CHANGE } from 'lib/roles'
-import { t } from 'lib/text'
 
 const FULL_HIERARCHY = Object.keys(ROLES)
 

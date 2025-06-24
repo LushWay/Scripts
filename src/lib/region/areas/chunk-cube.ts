@@ -1,5 +1,5 @@
 import { Vector3 } from '@minecraft/server'
-import { TextTable } from 'lib/text'
+import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { VecXZ } from 'lib/vector'
 import { Area } from './area'

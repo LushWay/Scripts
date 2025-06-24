@@ -2,7 +2,7 @@ import { Block, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { l } from 'lib/text'
+import { l } from 'lib/i18n/text'
 
 new Command('chunkload')
   .setPermissions('curator')

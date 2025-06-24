@@ -10,9 +10,9 @@ import {
   registerRegionType,
   registerSaveableRegion,
 } from 'lib'
+import { l, t } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { l, t } from 'lib/text'
 import { createLogger } from 'lib/utils/logger'
 
 // TODO Add chest generation

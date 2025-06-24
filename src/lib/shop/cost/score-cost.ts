@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { separateNumberWithDots } from 'lib/util'
 import { Cost } from '../cost'
 

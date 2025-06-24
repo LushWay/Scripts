@@ -1,6 +1,6 @@
 import { TicksPerDay, TimeOfDay, system, world } from '@minecraft/server'
 import { Settings } from 'lib'
-import { l } from 'lib/text'
+import { l } from 'lib/i18n/text'
 
 const MinutesPerDay = 24 * 60
 const Offset = 6000

@@ -1,7 +1,13 @@
 import { Region, RegionIsSaveable } from 'lib'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { SphereArea } from './areas/sphere'
-import { RegionDatabase, RegionSave, registerSaveableRegion, restoreRegionFromJSON } from './database'
+import {
+  RegionDatabase,
+  RegionSave,
+  registerSaveableRegion,
+  restoreRegionFromJSON,
+  TEST_clearSaveableRegions,
+} from './database'
 
 class TestK1Region extends Region {
   method() {}
@@ -16,7 +22,6 @@ class TestK1Region extends Region {
     return this.id
   }
 }
-registerSaveableRegion('k1', TestK1Region)
 
 class TestK2Region extends Region {
   get regionKey() {
@@ -27,7 +32,16 @@ class TestK2Region extends Region {
     return this.toJSON()
   }
 }
-registerSaveableRegion('k2', TestK2Region)
+
+beforeEach(() => {
+  TEST_clearSaveableRegions()
+  registerSaveableRegion('k2', TestK2Region)
+  registerSaveableRegion('k1', TestK1Region)
+})
+
+afterAll(() => {
+  TEST_clearSaveableRegions()
+})
 
 beforeAll(() => {
   TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
@@ -80,7 +94,7 @@ describe('region initialization', () => {
     expect(restoreRegionFromJSON(['test', region.json as Immutable<RegionSave>])).toBeUndefined()
     expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7[Region][Database] No kind found for §funknown§7. Available kinds: §froad, k1, k2§7. Maybe you forgot to register kind or import file?§7",
+        "§7[Region][Database] No kind found for §funknown§7. Available kinds: §fk2, k1§7. Maybe you forgot to register kind or import file?§7",
       ]
     `)
   })

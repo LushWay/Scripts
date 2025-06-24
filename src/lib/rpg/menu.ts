@@ -2,7 +2,7 @@ import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Playe
 import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
 import { MessageForm } from 'lib/form/message'
-import { l, t } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'

@@ -4,7 +4,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 
 class ChatBuilder {
   db = table<Record<string, number>>('chatCooldown', () => ({}))

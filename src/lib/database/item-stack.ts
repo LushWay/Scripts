@@ -1,6 +1,6 @@
 import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
-import { t, textUnitColorize } from 'lib/text'
+import { t, textUnitColorize } from 'lib/i18n/text'
 import { noBoolean, wrapLore } from 'lib/util'
 
 export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
@@ -83,7 +83,7 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
         const unit = prepareProperty ? prepareProperty(storage[key], key) : storage[key]
         if (unit === false) return false
 
-        return `§7${text}: ${textUnitColorize(unit)}`
+        return `§7${text}: ${textUnitColorize(unit, undefined, false)}`
       })
       .filter(noBoolean)
   }

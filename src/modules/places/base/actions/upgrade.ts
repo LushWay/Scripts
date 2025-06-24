@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { Product } from 'lib/shop/product'
-import { MaybeRawText, t } from 'lib/text'
 import { baseLevels } from '../base-levels'
 import { BaseRegion } from '../region'
 

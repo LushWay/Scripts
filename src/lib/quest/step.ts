@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 import { developersAreWarned } from 'lib/assets/text'
 import { EventSignal } from 'lib/event-signal'
+import { t } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
 import { doNothing } from 'lib/util'
@@ -8,7 +9,6 @@ import { VectorInDimension } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { PlayerQuest } from './player'
 import { Quest } from './quest'
-import { t } from 'lib/text'
 
 export namespace QS {
   export type Text = string | TextFn

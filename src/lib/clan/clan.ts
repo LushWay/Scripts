@@ -1,7 +1,7 @@
 import { Player, system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
+import { l, t } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
-import { l, t } from 'lib/text'
 import { Rewards } from 'lib/utils/rewards'
 import './command'
 

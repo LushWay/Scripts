@@ -1,8 +1,8 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { ItemFilter, OnSelect, selectItemForm } from 'lib/form/select-item'
-import { MaybeRawText, t } from 'lib/text'
-import { langToken, translateEnchantment } from 'lib/utils/lang'
+import { langToken, translateEnchantment } from 'lib/i18n/lang'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { Cost, MultiCost, ShouldHaveItemCost } from '../cost'
 import { ShopForm, ShopFormSection } from '../form'
 import { ProductName } from '../product'
@@ -119,7 +119,7 @@ function onSelect(
 
         const addSelectItem = () =>
           form.button(
-            t.raw`Выбранный предмет: ${{ translate: langToken(item) }}\n§7Нажмите, чтобы сменить`,
+            t.raw`Выбранный предмет: ${{ string: langToken(item) }}\n§7Нажмите, чтобы сменить`,
             getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
             select,
           )

@@ -1,10 +1,10 @@
 import { Items } from 'lib/assets/custom-items'
 import { shopFormula } from 'lib/assets/shop'
+import { t } from 'lib/i18n/text'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Group } from 'lib/rpg/place'
 import { FreeCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
-import { t } from 'lib/text'
 
 const bannedToSell = [Items.Menu, Items.Money] as string[]
 

@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
+import { l, t } from 'lib/i18n/text'
 import { is } from 'lib/roles'
-import { l, t } from 'lib/text'
 import { Cutscene } from './cutscene'
 import { editCatcutscene } from './edit'
 

@@ -3,7 +3,7 @@ import { ROLES, getRole } from 'lib'
 import { CmdLet } from 'lib/command/cmdlet'
 import { Command } from 'lib/command/index'
 import { commandNoPermissions, commandNotFound } from 'lib/command/utils'
-import { l, t } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 
 const help = new Command('help')
   .setDescription(t`Выводит список команд`)

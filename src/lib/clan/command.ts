@@ -1,4 +1,4 @@
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { clanMenu } from './menu'
 
 new Command('clan')

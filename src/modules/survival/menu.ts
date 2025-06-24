@@ -2,12 +2,12 @@ import { ActionForm, BUTTON, FormCallback } from 'lib'
 import { achievementsForm, achievementsFormName } from 'lib/achievements/command'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
+import { t } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { questsMenu } from 'lib/quest/menu'
 import { Menu } from 'lib/rpg/menu'
 import { playerSettingsMenu } from 'lib/settings'
-import { t } from 'lib/text'
 import { mailMenu } from 'modules/commands/mail'
 import { openBaseMenu } from 'modules/places/base/base-menu'
 import { wiki } from 'modules/wiki/wiki'
@@ -38,10 +38,8 @@ Menu.open = player => {
       Anarchy.portal?.teleport(player)
     })
     .addButton(tp('mg', inv, `§6`, t`Миниигры`, t`§7СКОРО!`), 'textures/blocks/bedrock', back)
-    .addButton(
-      t.unreadBadge`Задания ${player.database.quests?.active.length ?? 0}`,
-      'textures/ui/sidebar_icons/genre',
-      () => questsMenu(player, back),
+    .addButton(t`Задания${t.badge(player.database.quests?.active.length)}`, 'textures/ui/sidebar_icons/genre', () =>
+      questsMenu(player, back),
     )
 
   if (player.database.inv === 'anarchy') {

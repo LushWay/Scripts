@@ -2,8 +2,8 @@ import { Block, GameMode, Player, StructureRotation, system, world } from '@mine
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, ms, RegionCreationOptions, registerRegionType, registerSaveableRegion, Vec } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
+import { l, t } from 'lib/i18n/text'
 import { Area } from 'lib/region/areas/area'
-import { l, t } from 'lib/text'
 import { DungeonRegion, DungeonRegionDatabase } from './dungeon'
 import { Dungeon } from './loot'
 

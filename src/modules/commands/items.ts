@@ -1,6 +1,6 @@
 import { ArrayForm, langToken, translateToken } from 'lib'
+import { l } from 'lib/i18n/text'
 import { customItems } from 'lib/rpg/custom-item'
-import { l } from 'lib/text'
 
 new Command('items')
   .setPermissions('techAdmin')

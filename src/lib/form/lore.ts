@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { form, NewFormCallback, NewFormCreator } from './new'
 
 interface LoreFormDb {

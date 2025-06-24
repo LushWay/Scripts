@@ -1,8 +1,8 @@
 import { Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { Menu, Region, separateNumberWithDots, Settings, Sidebar } from 'lib'
 import { emoji } from 'lib/assets/emoji'
+import { t } from 'lib/i18n/text'
 import { Quest } from 'lib/quest/quest'
-import { t } from 'lib/text'
 import { Minigame } from 'modules/minigames/Builder'
 import { BaseRegion } from 'modules/places/base/region'
 

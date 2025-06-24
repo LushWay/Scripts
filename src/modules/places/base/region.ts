@@ -1,10 +1,10 @@
 import { Player } from '@minecraft/server'
 import { disableAdventureNear, rawTextToString } from 'lib'
+import { l, t, TextTable } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
-import { l, t, TextTable } from 'lib/text'
 import { getSafeFromRottingTime, materialsToRawText } from './actions/rotting'
 import { baseLevels } from './base-levels'
 

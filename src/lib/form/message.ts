@@ -1,9 +1,9 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
-import { l, MaybeRawText, t } from 'lib/text'
+import { l, MaybeRawText, t } from 'lib/i18n/text'
 import { util } from '../util'
-import { showForm } from './utils'
 import { NewFormCallback } from './new'
+import { showForm } from './utils'
 
 interface IMessageFormButton {
   /** Text that gets displayed on the button */

@@ -1,8 +1,9 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { developersAreWarned } from 'lib/assets/text'
+import { intlListFormat } from 'lib/i18n/intl'
+import { l, t } from 'lib/i18n/text'
 import { ROLES } from 'lib/roles'
-import { l, t } from 'lib/text'
 import { inaccurateSearch } from '../utils/search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
@@ -35,17 +36,7 @@ export function parseArguments(message: string): string[] {
  * @param player Player to send message to
  */
 export function commandNotFound(player: Player, command: string): void {
-  player.tell({
-    rawtext: [
-      {
-        text: `§c`,
-      },
-      {
-        translate: `commands.generic.unknown`,
-        with: [command],
-      },
-    ],
-  })
+  player.tell({ rawtext: [{ text: `§c` }, { translate: `commands.generic.unknown`, with: [command] }] })
   player.playSound(Sounds.Fail)
 
   suggestCommand(player, command)
@@ -65,9 +56,7 @@ function suggestCommand(player: Player, command: string): void {
 
   for (const c of Command.commands.filter(e => e.sys.requires(player))) {
     cmds.add(c.sys.name)
-    if (c.sys.aliases.length > 0) {
-      c.sys.aliases.forEach(e => cmds.add(e))
-    }
+    if (c.sys.aliases.length > 0) c.sys.aliases.forEach(e => cmds.add(e))
   }
   let search = inaccurateSearch(command, [...cmds.values()])
 
@@ -85,11 +74,18 @@ function suggestCommand(player: Player, command: string): void {
   const firstValue = search[0][1]
   search = search
     .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
-    .slice(1, options.maxSuggestionsCount)
+    .slice(0, options.maxSuggestionsCount)
 
   for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? t` или ` : ', '}${suggest(e)}`
 
-  player.tell(suggestion + '§c?')
+  player.tell(
+    t.error`Вы имели ввиду ${intlListFormat(
+      t.error.currentColors,
+      player.lang,
+      'or',
+      search.map(e => t.error`${e[0]} (${~~(e[1] * 100)}%%)`),
+    )}?`,
+  )
 }
 
 /**
@@ -113,9 +109,7 @@ export function commandNoPermissions(player: Player, command: import('./index').
 export function commandSyntaxFail(player: Player, command: import('./index').Command, args: string[], i: number) {
   player.tell({
     rawtext: [
-      {
-        text: `§c`,
-      },
+      { text: `§c` },
       {
         translate: `commands.generic.syntax`,
         with: [
@@ -166,9 +160,6 @@ export function parseLocationArguments(
  *
  * @param cmdArgs The args that the command used
  * @param args Args to use
- * @param event
- * @param baseCommand
- * @param rawInput
  */
 export function sendCallback(
   cmdArgs: string[],

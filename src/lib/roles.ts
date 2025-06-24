@@ -2,7 +2,7 @@ import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/s
 import { EventSignal } from 'lib/event-signal'
 import { isKeyof } from 'lib/util'
 import { Core } from './extensions/core'
-import { t } from './text'
+import { t } from './i18n/text'
 
 declare global {
   /** Any known role */

@@ -1,12 +1,12 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { langToken } from 'lib'
+import { t } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { rollChance } from 'lib/rpg/random'
 import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
 import { ShopNpc } from 'lib/shop/npc'
-import { t } from 'lib/text'
 import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 
@@ -95,7 +95,7 @@ export class Gunsmith extends ShopNpc {
           lost = true
           player.tell(
             t.warn
-              .raw`Онет, кажется, зачарование ${{ translate: langToken(ench.type.id) }} уровнем ${ench.level.toString()}§e потерялось...`,
+              .raw`Онет, кажется, зачарование ${{ string: langToken(ench.type.id) }} уровнем ${ench.level.toString()}§e потерялось...`,
           )
           continue
         } else {

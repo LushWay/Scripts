@@ -1,9 +1,9 @@
 import { BlockTypes, EntityComponentTypes } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms } from 'lib'
+import { l, t } from 'lib/i18n/text'
 import { BigRegionStructure } from 'lib/region/big-structure'
 import { Group } from 'lib/rpg/place'
-import { l, t } from 'lib/text'
 
 export function createBossWither(group: Group) {
   const boss = Boss.create()

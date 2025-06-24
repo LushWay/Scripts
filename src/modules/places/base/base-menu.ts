@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, Vec, editRegionPermissions, manageRegionMembers } from 'lib'
-import { MaybeRawText, t } from 'lib/text'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { baseRottingButton } from './actions/rotting'
 import { baseUpgradeButton } from './actions/upgrade'
 import { BaseRegion } from './region'

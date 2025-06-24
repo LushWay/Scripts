@@ -1,7 +1,7 @@
+import { textTable } from 'lib/i18n/text'
 import { createPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { RectangleArea } from './rectangle'
-import { textTable } from 'lib/text'
 
 describe('rectangle', () => {
   it('should detect if vector is in region', () => {

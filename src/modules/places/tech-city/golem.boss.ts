@@ -1,9 +1,9 @@
 import { world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms, Vec } from 'lib'
+import { t } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Chip } from './engineer'
-import { t } from 'lib/text'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()

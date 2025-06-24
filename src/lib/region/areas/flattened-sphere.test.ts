@@ -1,6 +1,6 @@
+import { textTable } from 'lib/i18n/text'
 import { createPoint } from 'lib/utils/point'
 import { FlattenedSphereArea } from './flattened-sphere'
-import { textTable } from 'lib/text'
 
 describe('rectangle', () => {
   it('should detect if vector is in region', () => {

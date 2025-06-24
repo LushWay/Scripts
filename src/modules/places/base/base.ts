@@ -5,8 +5,8 @@ import './actions/create'
 import './actions/rotting'
 import './actions/upgrade'
 
+import { t } from 'lib/i18n/text'
 import './actions/on-full-restore'
-import { t } from 'lib/text'
 
 export const BaseItem = new CustomItemWithBlueprint('base')
   .typeId(MinecraftItemTypes.Barrel)

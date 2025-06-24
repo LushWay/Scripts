@@ -6,7 +6,7 @@ import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
-import { l, t } from './text'
+import { l, t } from './i18n/text'
 import stringifyError from './utils/error'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace

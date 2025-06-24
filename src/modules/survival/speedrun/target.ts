@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { InventoryInterval, ScoreboardDB } from 'lib'
 import { form } from 'lib/form/new'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { BaseItem } from 'modules/places/base/base'
 
 export enum SpeedRunTarget {

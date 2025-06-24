@@ -2,9 +2,9 @@ import { Player } from '@minecraft/server'
 import { noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
+import { t, textTable } from 'lib/i18n/text'
 import { DailyQuest } from 'lib/quest/quest'
 import { RecurringEvent } from 'lib/recurring-event'
-import { t, textTable } from 'lib/text'
 import later from 'lib/utils/later'
 import { City } from 'modules/places/lib/city'
 import { CityInvestigating } from 'modules/places/lib/city-investigating-quest'
@@ -120,7 +120,7 @@ export const dailyQuestsForm = form((f, player) => {
     f.button(
       (completed
         ? playerDb.takenToday
-          ? t.options({ text: '§8', unit: '§7', num: '§7' })
+          ? t.colors({ text: '§8', unit: '§7', num: '§7' })
           : t
         : t.error)`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`,
       () => {

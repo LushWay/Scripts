@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { BUTTON, settingsModal } from 'lib'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { getReplaceMode, ReplaceMode } from 'modules/world-edit/utils/blocks-set'
 import { REPLACE_MODES } from 'modules/world-edit/utils/default-block-sets'

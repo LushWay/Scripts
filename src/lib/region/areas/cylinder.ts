@@ -1,7 +1,7 @@
+import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vec, VecXZ } from 'lib/vector'
 import { Area } from './area'
-import { TextTable } from 'lib/text'
 
 class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radius: number; yradius: number }> {
   type = 'ss'

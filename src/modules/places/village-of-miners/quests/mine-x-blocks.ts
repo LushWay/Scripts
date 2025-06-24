@@ -1,6 +1,6 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
+import { t } from 'lib/i18n/text'
 import { DailyQuest } from 'lib/quest/quest'
-import { t } from 'lib/text'
 import { Rewards } from 'lib/utils/rewards'
 import { City } from 'modules/places/lib/city'
 import { ores } from 'modules/places/mineshaft/algo'

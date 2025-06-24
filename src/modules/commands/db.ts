@@ -5,7 +5,7 @@ import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
 import { UnknownTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
 new Command('db')

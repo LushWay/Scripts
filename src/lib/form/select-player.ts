@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { BUTTON } from 'lib/form/utils'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { NewFormCallback } from './new'
 
 /**

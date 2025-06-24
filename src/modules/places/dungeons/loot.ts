@@ -1,11 +1,11 @@
 import { Loot, LootTable } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
+import { t } from 'lib/i18n/text'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { BaseItem } from '../base/base'
-import { t } from 'lib/text'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)

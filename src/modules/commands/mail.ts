@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
+import { ngettext } from 'lib/i18n/ngettext'
+import { t } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
-import { t } from 'lib/text'
-import { ngettext } from 'lib/utils/ngettext'
 import { Rewards } from 'lib/utils/rewards'
 
 const command = new Command('mail')
@@ -92,9 +92,15 @@ function letterDetailsMenu(
   if (!letter.rewardsClaimed && letter.rewards.length)
     form.addButton(t`Забрать награду`, () => {
       Mail.claimRewards(player, index)
-      letterDetailsMenu({ letter, index }, player, back, message + t`§aНаграда успешно забрана!
+      letterDetailsMenu(
+        { letter, index },
+        player,
+        back,
+        message +
+          t`§aНаграда успешно забрана!
 
-§r§f`)
+§r§f`,
+      )
     })
 
   if (!letter.read && !settings.mailReadOnOpen)

@@ -4,7 +4,7 @@ import { Achievement } from 'lib/achievements/achievement'
 import { LoreForm } from 'lib/form/lore'
 import { form } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { showStats } from './stats'
 
 new Command('player')

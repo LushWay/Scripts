@@ -10,14 +10,14 @@ import {
 } from '@minecraft/vanilla-data'
 import { addNamespace, doNothing, Enchantments, getAuxOrTexture } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { langToken, translateEnchantment } from 'lib/i18n/lang'
+import { t } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'
 import { ShopFormSection } from 'lib/shop/form'
 import { ShopNpc } from 'lib/shop/npc'
-import { t } from 'lib/text'
 import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
-import { langToken, translateEnchantment } from 'lib/utils/lang'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { ItemAbility } from 'modules/pvp/item-ability'
@@ -124,7 +124,7 @@ export class Mage extends ShopNpc {
 
               itemForm
                 .product()
-                .name(t.raw`Зачаровать`)
+                .name(t`Зачаровать`)
                 .cost(
                   level >= bookEnch.level
                     ? level === bookEnch.level

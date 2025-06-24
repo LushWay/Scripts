@@ -1,6 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import type { Command } from 'lib/command'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { Rewards } from 'lib/utils/rewards'
 

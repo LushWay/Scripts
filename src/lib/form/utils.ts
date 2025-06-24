@@ -9,7 +9,7 @@ import {
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { MessageForm } from './message'
 

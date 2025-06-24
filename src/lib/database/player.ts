@@ -1,7 +1,7 @@
 import { Player, world, type PlayerDatabase } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
+import { t } from 'lib/i18n/text'
 import { DEFAULT_ROLE } from 'lib/roles'
-import { t } from 'lib/text'
 import { Table, table } from './abstract'
 
 declare module '@minecraft/server' {

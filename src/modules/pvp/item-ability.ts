@@ -1,8 +1,8 @@
 import { EntityDamageCause, world } from '@minecraft/server'
 import { isKeyof } from 'lib'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { l, t } from 'lib/i18n/text'
 import { rollChance } from 'lib/rpg/random'
-import { l, t } from 'lib/text'
 
 export enum Ability {
   Vampire = 'vamp',

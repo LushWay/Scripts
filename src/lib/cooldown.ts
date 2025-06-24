@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { t } from './text'
+import { t } from './i18n/text'
 
 export class Cooldown {
   static isExpired(timestamp: number, cooldown: number) {
@@ -48,7 +48,7 @@ export class Cooldown {
     const elapsed = this.getElapsed(id)
     if (elapsed) {
       if (this.tell && player instanceof Player)
-        player.fail(t.error`§cНе так быстро! Попробуй через §f${t.time(this.time - elapsed)}`)
+        player.fail(t.error`Не так быстро! Попробуй через ${t.time(this.time - elapsed)}`)
 
       return false
     } else {

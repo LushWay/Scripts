@@ -5,8 +5,8 @@ import { MessageForm, ask } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
+import { t, textTable } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
-import { t, textTable } from 'lib/text'
 import { Rewards } from 'lib/utils/rewards'
 import { Clan } from './clan'
 
@@ -15,12 +15,12 @@ export function clanMenu(player: Player, back?: VoidFunction) {
 
   if (clan) {
     return [
-      t.unreadBadge`§6Ваш клан ${clan.isOwner(player.id) ? clan.db.joinRequests.length : 0}`,
+      t.header`Ваш клан${t.badge(clan.isOwner(player.id) ? clan.db.joinRequests.length : 0)}`,
       () => inClanMenu(player, clan, back),
     ] as const
   } else {
     const invitedTo = getInvites(player.id)
-    return [t.unreadBadge`§6Кланы ${invitedTo.length}`, () => selectOrCreateClanMenu(player, back)] as const
+    return [t.header`Кланы${t.badge(invitedTo.length)}`, () => selectOrCreateClanMenu(player, back)] as const
   }
 }
 
@@ -40,7 +40,7 @@ function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
     .addCustomButtonBeforeArray(form => {
       const invitedTo = getInvites(player.id)
       if (invitedTo.length)
-        form.addButton(t.unreadBadge`§3Приглашения ${invitedTo.length}`, () => {
+        form.addButton(t.accent`Приглашения${t.badge(invitedTo.length)}`, () => {
           new ArrayForm(t`Приглашения`, invitedTo)
             .button(clan => [getClanName(clan), () => clan.add(player)])
             .back(() => selectOrCreateClanMenu(player, back))
@@ -103,18 +103,18 @@ function inClanMenu(player: Player, clan: Clan, back?: VoidFunction) {
   const selfback = () => inClanMenu(player, clan, back)
   const isOwner = clan.isOwner(player.id)
 
-  form.addButton(t.unreadBadge`Базы клана ${0}`, () => {
+  form.addButton(t`Базы клана${t.size(0)}`, () => {
     player.fail(t`СКОРО`)
   })
 
   form.addButton(t`Участники (${clan.db.members.length})`, () => clanMembers(player, clan, selfback))
 
   if (isOwner) {
-    form.addButton(t.unreadBadge`Заявки на вступление ${clan.db.joinRequests.length}`, () =>
+    form.addButton(t`Заявки на вступление${t.badge(clan.db.joinRequests.length)}`, () =>
       clanJoinRequests(player, clan, back),
     )
 
-    form.addButton(t.unreadBadge`Приглашения ${clan.db.invites.length}`, () => clanInvites(player, clan, selfback))
+    form.addButton(t`Приглашения${t.badge(clan.db.invites.length)}`, () => clanInvites(player, clan, selfback))
     form.addButtonAsk(t.error`Удалить клан`, t.error`Удалить`, () => clan.delete())
   }
   form.show(player)

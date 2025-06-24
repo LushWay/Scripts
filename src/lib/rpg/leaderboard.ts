@@ -2,7 +2,7 @@
 
 import { Entity, Player, ScoreboardObjective, ScoreboardScoreInfo, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 

@@ -1,5 +1,5 @@
 import { ItemStack, Player } from '@minecraft/server'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { ErrorCost } from './cost/cost'
 
 export const ImpossibleBuyCost = ErrorCost(t.error`Покупка невозможна`)

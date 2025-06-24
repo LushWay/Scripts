@@ -1,5 +1,5 @@
 import { system } from '@minecraft/server'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 
 async function getServerTPS(): Promise<number> {
   const startTime = Date.now()

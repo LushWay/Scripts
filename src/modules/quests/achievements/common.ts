@@ -1,7 +1,7 @@
 import { system, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Achievement, CountingAchievement } from 'lib/achievements/achievement'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { Rewards } from 'lib/utils/rewards'
 import { gravestoneEntityTypeId, gravestoneGetOwner } from 'modules/survival/death-quest-and-gravestone'
 

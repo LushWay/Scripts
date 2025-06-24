@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
+import { t, textTable } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 import { LeafyCost, MoneyCost } from 'lib/shop/cost'
-import { t, textTable } from 'lib/text'
 import { ShopForm, ShopMenuCreate } from './form'
 
 export class Shop {

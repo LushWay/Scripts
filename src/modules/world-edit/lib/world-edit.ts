@@ -2,10 +2,10 @@ import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, syste
 import { Vec, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
-import { t } from 'lib/text'
+import { ngettext } from 'lib/i18n/ngettext'
+import { t } from 'lib/i18n/text'
 import { stringify } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
-import { ngettext } from 'lib/utils/ngettext'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { BigStructure } from '../../../lib/utils/big-structure'
 import { Cuboid } from '../../../lib/utils/cuboid'
@@ -402,7 +402,7 @@ export class WorldEdit {
         'блок',
         'блока',
         'блоков',
-      ])} за ${t.options({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
+      ])} за ${t.colors({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
 
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyBlockWeights(replaceTargets)}`

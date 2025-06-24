@@ -1,4 +1,5 @@
 import { Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
+import { l, t, TextTable } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
   actionGuard,
@@ -11,7 +12,6 @@ import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { isNewbie } from 'lib/rpg/newbie'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { l, t, TextTable } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'

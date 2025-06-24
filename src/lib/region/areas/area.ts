@@ -1,6 +1,6 @@
 import { Dimension, system, world } from '@minecraft/server'
+import { t, TextTable } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
-import { t, TextTable } from 'lib/text'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 

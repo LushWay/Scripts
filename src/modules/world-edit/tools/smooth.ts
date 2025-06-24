@@ -3,7 +3,7 @@ import { Block, BlockPermutation, ContainerSlot, Player, system, world } from '@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, util, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
-import { ngettext } from 'lib/utils/ngettext'
+import { ngettext } from 'lib/i18n/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import {
   BlocksSetRef,

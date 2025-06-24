@@ -1,7 +1,7 @@
 import { form } from 'lib/form/new'
+import { t } from 'lib/i18n/text'
 import { Rewards } from 'lib/utils/rewards'
 import { QS, QSBuilder } from '../step'
-import { t } from 'lib/text'
 
 export class QSButton extends QS {
   protected activate(): QS.Cleanup {

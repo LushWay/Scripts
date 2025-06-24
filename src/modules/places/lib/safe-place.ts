@@ -14,12 +14,12 @@ import {
   Vector3Radius,
 } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { l, MaybeRawText, t } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
 import { Product } from 'lib/shop/product'
-import { l, MaybeRawText, t } from 'lib/text'
 
 export class SafePlace {
   static places: SafePlace[] = []

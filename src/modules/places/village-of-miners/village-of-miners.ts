@@ -1,5 +1,5 @@
 import { Loot, migrateLocationName } from 'lib'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { GuideNpc } from '../lib/npc/guide'

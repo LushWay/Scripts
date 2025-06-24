@@ -44,7 +44,7 @@ declare global {
   type ValueOf<T> = T[keyof T]
 
   /** Text that can be displayed on player screen and should support translation */
-  type Text = import('lib/text').Text
+  type Text = import('lib/i18n/text').Text
   // type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
 
   type MaybePromise<T> = T | Promise<T>

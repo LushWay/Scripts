@@ -1,6 +1,6 @@
 import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { eqSlots } from 'lib/form/select-item'
-import { MaybeRawText, t } from 'lib/text'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
 import { CostType } from './cost'
@@ -110,7 +110,7 @@ export class ShouldHaveItemCost extends ItemCost {
   }
 
   failed(player: Player) {
-    return this.text ? t.options({ text: '§c', unit: '§c' }).raw`В инвентаре нет ${this.text}` : t.error`Нет предмета`
+    return this.text ? t.colors({ text: '§c', unit: '§c' }).raw`В инвентаре нет ${this.text}` : t.error`Нет предмета`
   }
 
   take(player: Player): void {

@@ -3,10 +3,10 @@ import { ItemStack, system, world } from '@minecraft/server'
 import { Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
+import { t } from 'lib/i18n/text'
 import { customItems } from 'lib/rpg/custom-item'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
-import { t } from 'lib/text'
 
 export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
   undefined,

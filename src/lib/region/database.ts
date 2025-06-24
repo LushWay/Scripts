@@ -2,7 +2,7 @@ import { system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { deepClone } from 'lib/database/defaults'
 import { EventLoader } from 'lib/event-signal'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { Area } from './areas/area'
 import './areas/cut'
 import { SphereArea } from './areas/sphere'
@@ -58,7 +58,7 @@ system.delay(() => {
 })
 
 let loaded = false
-const kinds: (typeof Region)[] = []
+let kinds: (typeof Region)[] = []
 export function registerSaveableRegion(kind: string, region: typeof Region) {
   if (loaded)
     throw new Error(
@@ -71,6 +71,12 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
   region.prototype[RegionIsSaveable] = true
 
   kinds.push(region)
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export function TEST_clearSaveableRegions() {
+  loaded = false
+  kinds = []
 }
 
 export function restoreRegionFromJSON([key, regionImmutable]: [string, Immutable<RegionSave>]) {

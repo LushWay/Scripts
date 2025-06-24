@@ -1,8 +1,8 @@
 import { ActionForm } from 'lib/form/action'
+import { t } from 'lib/i18n/text'
 import { Npc } from 'lib/rpg/npc'
 import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'
-import { t } from 'lib/text'
 
 export function QSDialogue(this: PlayerQuest, npc: Npc, text = t.nocolor`Вас ждет §f${npc.name}`) {
   return this.dynamic(text)

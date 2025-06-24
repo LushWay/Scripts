@@ -2,6 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
+import { t } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Compass } from 'lib/rpg/menu'
 import { Group, Place } from 'lib/rpg/place'
@@ -10,7 +11,6 @@ import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { QuestButton } from './button'
 import { PlayerQuest } from './player'
 import { QS } from './step'
-import { t } from 'lib/text'
 
 export declare namespace Quest {
   interface DB {
@@ -22,14 +22,18 @@ export declare namespace Quest {
 export class Quest {
   static error = class QuestError extends Error {}
 
-  static playerSettings = Settings.player(t`Задания
-§7Настройки игровых заданий`, 'quest', {
-    messageForEachStep: {
-      value: false,
-      name: t`Сообщение в чат при каждом шаге`,
-      description: t`Отправлять ли сообщение в чат при каждом новом разделе задания`,
+  static playerSettings = Settings.player(
+    t`Задания
+§7Настройки игровых заданий`,
+    'quest',
+    {
+      messageForEachStep: {
+        value: false,
+        name: t`Сообщение в чат при каждом шаге`,
+        description: t`Отправлять ли сообщение в чат при каждом новом разделе задания`,
+      },
     },
-  })
+  )
 
   static sidebar: import('lib/sidebar').SidebarLineCreate<unknown> = {
     create(sidebar) {

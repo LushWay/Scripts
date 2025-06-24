@@ -9,8 +9,8 @@ import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { Cost } from 'lib/shop/cost'
-import { MaybeRawText, t } from 'lib/text'
 import { isKeyof } from 'lib/util'
 import { itemNameXCount } from '../utils/item-name-x-count'
 import { createItemModifier, createItemModifierSection, ShopMenuWithSlotCreate } from './buttons/item-modifier'
@@ -207,7 +207,7 @@ export class ShopForm {
         // Section
         const { name, onOpen, texture } = button
 
-        actionForm.addButton(t.options({ unit: '§3' }).raw`${name}`, texture, () => {
+        actionForm.addButton(t.colors({ unit: '§3' }).raw`${name}`, texture, () => {
           ShopForm.showSection(name, form, this.shop, player, this.show, onOpen)
         })
       } else {

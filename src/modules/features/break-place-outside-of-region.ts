@@ -2,9 +2,9 @@ import { Player, system } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, ms } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { t } from 'lib/i18n/text'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { t } from 'lib/text'
 import { BaseRegion } from 'modules/places/base/region'
 
 const INTERACTABLE = DOORS.concat(SWITCHES, TRAPDOORS, BLOCK_CONTAINERS, GATES)

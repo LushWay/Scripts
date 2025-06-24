@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { form, ShowForm } from 'lib/form/new'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { manageQuestMenu } from './menu'
 import { Quest } from './quest'
 import { QS } from './step'

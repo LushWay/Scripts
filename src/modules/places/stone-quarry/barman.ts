@@ -5,10 +5,10 @@ import {
   MinecraftPotionLiquidTypes as lt,
   MinecraftPotionModifierTypes as mt,
 } from '@minecraft/vanilla-data'
+import { t } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
-import { t } from 'lib/text'
 
 export class Barman extends ShopNpc {
   constructor(group: Group) {

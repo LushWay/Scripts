@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { ArrayForm, ask, BUTTON, doNothing, ModalForm } from 'lib'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { WorldEditTool } from './world-edit-tool'
 
 export interface ToolsDataStorage {

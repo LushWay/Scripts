@@ -1,7 +1,7 @@
 import { GameMode, Player } from '@minecraft/server'
 import { EventSignal, InventoryStore, Portal, ValidLocation, Vec, location, rawMessageToString } from 'lib'
 import { Language } from 'lib/assets/lang'
-import { l, t } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { createLogger } from 'lib/utils/logger'

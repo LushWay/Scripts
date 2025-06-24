@@ -3,7 +3,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { Language } from 'lib/assets/lang'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
-import { MaybeRawText, t } from 'lib/text'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { expand } from './extend'
 

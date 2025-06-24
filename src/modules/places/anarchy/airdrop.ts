@@ -1,6 +1,6 @@
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { Airdrop, isNotPlaying, Loot, Vec } from 'lib'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../pvp/cannon'
 import { randomLocationInAnarchy } from './random-location-in-anarchy'
@@ -80,14 +80,18 @@ export async function requestAirdrop(isPowerfull: boolean) {
         .spawn(result.air)
         .createMarkerOnMinimap()
 
+      const location = Vec.string(result.topmost, true)
       world.say(
-        t.raw`§l§a>§r§7 ${isPowerfull ? t`Усиленный` : t`Обычный`} аирдроп появился на ${Vec.string(result.topmost, true)}!`,
+        '§l§a>§r ' +
+          (isPowerfull
+            ? t`Усиленный аирдроп скоро упадет на ${location}!`
+            : t`Обычный аирдроп скоро упадет на ${location}!`),
       )
       return airdrop
     } catch (e) {
       if (e instanceof LocationInUnloadedChunkError) {
         console.warn('Unable to spawn 15m airdrop: location unloaded')
-      }
+      } else console.error(e)
     }
   }
 }

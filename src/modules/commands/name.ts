@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 
 const name = new Command('name')
   .setDescription(t`Меняет имя`)

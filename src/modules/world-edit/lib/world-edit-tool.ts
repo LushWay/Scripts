@@ -10,7 +10,7 @@ import {
 } from '@minecraft/server'
 import { Command, inspect, isKeyof, noBoolean, stringify, util } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { textTable } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { worldEditPlayerSettings } from '../settings'
 
@@ -165,16 +165,16 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
       .map(([key, value]) => {
         if (!isKeyof(key, this.translation)) return false
 
-        return [
-          this.translation[key],
-          WorldEditTool.loreBlockRefKeys.includes(key)
-            ? stringifyBlocksSetRef(value as BlocksSetRef)
-            : stringify(value),
-        ] as const
+        const translatedKey = this.translation[key]
+        const fullValue = WorldEditTool.loreBlockRefKeys.includes(key)
+          ? stringifyBlocksSetRef(value as BlocksSetRef)
+          : stringify(value)
+
+        return t`${'§7' + translatedKey}: ${fullValue}`
       })
       .filter(noBoolean)
 
-    slot.setLore([' ', ...textTable(table, false, false).map(e => '§r' + e.slice(0, 48))])
+    slot.setLore([' ', ...table.map(e => `§r${l`${e[0]}: ${e[1]}`.slice(0, 48)}`)])
   }
 
   /** @deprecated */

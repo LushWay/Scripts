@@ -1,7 +1,7 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { stringifyError } from 'lib'
+import { t } from 'lib/i18n/text'
 import { selectByChance } from 'lib/rpg/random'
-import { t } from 'lib/text'
 
 export class Ore {
   private types: string[] = []

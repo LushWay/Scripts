@@ -2,7 +2,7 @@ import { system, world } from '@minecraft/server'
 import { LockAction } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 
 new Command('sit')
   .setDescription(t`Присаживает вас`)

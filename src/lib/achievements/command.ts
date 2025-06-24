@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { form, NewFormCallback } from 'lib/form/new'
+import { t } from 'lib/i18n/text'
 import { is } from 'lib/roles'
-import { t } from 'lib/text'
 import { Achievement } from './achievement'
 
 Achievement.command = new Command('achiv')
@@ -13,7 +13,7 @@ Achievement.command = new Command('achiv')
 
 export function achievementsFormName(player: Player) {
   const notTaken = Achievement.list.filter(e => e.isDone(player) && !e.isRewardTaken(player))
-  return t.unreadBadge`§eДостижения ${notTaken.length}`
+  return t.warn`Достижения${t.badge(notTaken.length)}`
 }
 
 export function achievementsForm(player: Player, back?: NewFormCallback) {

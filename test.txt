@@ -112,19 +112,20 @@ file:///.//src/lib/command/cmdlet.ts
 Неизвестный аргумент: ${0}.\nДоступные командлеты: \n${0}\n 
 
 
-file:///.//src/lib/cooldown.ts
-
-§cНе так быстро! Попробуй через §f${0}
-
-
 file:///.//src/lib/command/utils.ts
 
 Список всех доступных вам команд: §f.help
 §cВы имели ввиду ${0}
  или 
+Вы имели ввиду ${0}?
 \nКоманда доступна начиная с роли ${0}
 У вас нет разрешения для использования команды ${0}${0}\nСписок всех доступных вам команд: §f.help
 При выполнении команды произошла ошибка. ${0}
+
+
+file:///.//src/lib/cooldown.ts
+
+§cНе так быстро! Попробуй через §f${0}
 
 
 file:///.//src/lib/crates/animation.ts
@@ -159,11 +160,6 @@ file:///.//src/lib/database/player.ts
 Игрок ${0} сменил ник на ${0}
 
 
-file:///.//src/lib/extensions/player.ts
-
-Успешно
-
-
 file:///.//src/lib/form/action.ts
 
 §l§b< §r§3Назад
@@ -185,16 +181,15 @@ file:///.//src/lib/form/array.ts
 §3Фильтры${0}
 
 
+file:///.//src/lib/extensions/player.ts
+
+Успешно
+
+
 file:///.//src/lib/form/lore.ts
 
 Хорошо, назад
 История${0}
-
-
-file:///.//src/lib/form/message.ts
-
-Отмена
-Вы уверены?
 
 
 file:///.//src/lib/form/modal.ts
@@ -218,6 +213,12 @@ file:///.//src/lib/form/select-player.ts
 Дате входа
 
 
+file:///.//src/lib/form/message.ts
+
+Отмена
+Вы уверены?
+
+
 file:///.//src/lib/form/utils.ts
 
 Ошибка
@@ -230,6 +231,12 @@ file:///.//src/lib/form/utils.ts
 file:///.//src/lib/get-fullname.ts
 
 §bНовичок
+
+
+file:///.//src/lib/i18n/text.ts
+
+§fДа
+§cНет
 
 
 file:///.//src/lib/mail.ts
@@ -263,12 +270,6 @@ file:///.//src/lib/portals.ts
 §2Перемещение...
 
 
-file:///.//src/lib/quest/button.ts
-
-${0}\n§aЗавершен!
-Взять задание
-
-
 file:///.//src/lib/quest/menu.ts
 
 Меню заданий
@@ -290,6 +291,12 @@ file:///.//src/lib/quest/menu.ts
 §cОтказаться от задания
 §cОтказаться
 Назад
+
+
+file:///.//src/lib/quest/button.ts
+
+${0}\n§aЗавершен!
+Взять задание
 
 
 file:///.//src/lib/quest/quest.ts
@@ -543,12 +550,6 @@ file:///.//src/lib/shop/shop.ts
 Ваш баланс
 
 
-file:///.//src/lib/text.ts
-
-§fДа
-§cНет
-
-
 file:///.//src/lib/utils/item-name-x-count.ts
 
  (долгое)
@@ -559,6 +560,11 @@ file:///.//src/lib/utils/rewards.ts
 Вы получили награды!
 
 
+file:///.//src/modules/commands/camera.ts
+
+Возвращает камеру в исходное состояние
+
+
 file:///.//src/modules/chat/chat.ts
 
 Чат\n§7Звуки и внешний вид чата
@@ -567,11 +573,6 @@ file:///.//src/modules/chat/chat.ts
 Выключение звука
 Выключение звука чужих сообщений
 ${0}§6§lЯ§r: §f${0}
-
-
-file:///.//src/modules/commands/camera.ts
-
-Возвращает камеру в исходное состояние
 
 
 file:///.//src/modules/commands/help.ts
@@ -635,6 +636,16 @@ file:///.//src/modules/commands/pid.ts
 Выдает ваш айди
 
 
+file:///.//src/modules/commands/ping.ts
+
+Показывает пинг сервера
+Понг! Проверяем...
+TPS сервера ${0}§f: ${0}
+§aхороший
+§gнормальный
+§cплохой
+
+
 file:///.//src/modules/commands/player.ts
 
 Общее меню игрока
@@ -647,14 +658,13 @@ file:///.//src/modules/commands/player.ts
 Лор прочитан${0}
 
 
-file:///.//src/modules/commands/ping.ts
+file:///.//src/modules/commands/rtp.ts
 
-Показывает пинг сервера
-Понг! Проверяем...
-TPS сервера ${0}§f: ${0}
-§aхороший
-§gнормальный
-§cплохой
+Вы телепортируетесь!
+Вы не телепортируетесь!
+Телепортация в случайное место на анархии
+Недоступно
+Отменяет телепортацию
 
 
 file:///.//src/modules/commands/role.ts
@@ -685,15 +695,6 @@ file:///.//src/modules/commands/role.ts
 \n§r§3Причина: §r${0}
 Роль игрока ${0} сменена успешно
 Роль сменена успешно
-
-
-file:///.//src/modules/commands/rtp.ts
-
-Вы телепортируетесь!
-Вы не телепортируетесь!
-Телепортация в случайное место на анархии
-Недоступно
-Отменяет телепортацию
 
 
 file:///.//src/modules/commands/settings.ts
@@ -942,16 +943,16 @@ file:///.//src/modules/places/lib/city.ts
 Сходи в город, сделай запланированые покупки
 
 
-file:///.//src/modules/places/lib/npc/jeweler.ts
-
-Ювелир
-Украшения я делать пока не умею.\n\n
-
-
 file:///.//src/modules/places/lib/npc/butcher.ts
 
 Мясник
 И рыбник.\n\n
+
+
+file:///.//src/modules/places/lib/npc/jeweler.ts
+
+Ювелир
+Украшения я делать пока не умею.\n\n
 
 
 file:///.//src/modules/places/lib/npc/scavenger.ts
@@ -1319,9 +1320,7 @@ file:///.//src/modules/survival/death-quest-and-gravestone.ts
 
 file:///.//src/modules/survival/locked-features.ts
 
-Я не знаю что мне делать с этим, возможно ${0} смогут сделать это за меня...
-§c или §f
-Я не знаю что мне делать с этим, возможно ${0} сможет сделать это за меня...
+Я не знаю что мне делать с этим, стоит спросить ${0}
 
 
 file:///.//src/modules/survival/menu.ts
@@ -1379,16 +1378,6 @@ file:///.//src/modules/survival/speedrun/target.ts
 
 file:///.//src/modules/wiki/wiki.ts
 
-Что где как все расскажу
-Википедия
-Руды
-Руды
-Руды на y: ${0}:\n${0}
-На этой высоте руд нет
-${0}, ${0}, Группа: ${0}%%
-Руды на ${0}
-LITERAL Под
-LITERAL Над
 Что где как все расскажу
 Википедия
 Руды

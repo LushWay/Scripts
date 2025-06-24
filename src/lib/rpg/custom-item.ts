@@ -1,8 +1,8 @@
 import { ItemStack, system } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
 import { Language } from 'lib/assets/lang'
-import { t } from 'lib/text'
-import { translateTypeId } from 'lib/utils/lang'
+import { translateTypeId } from 'lib/i18n/lang'
+import { t } from 'lib/i18n/text'
 
 export const customItems: ItemStack[] = []
 

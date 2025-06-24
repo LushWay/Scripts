@@ -2,8 +2,8 @@ import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player }
 import { enchantData } from 'lib/assets/texture-data'
 import { ChestForm } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
-import { MaybeRawText, t } from 'lib/text'
-import { langToken, rawTextToString, translateEnchantment, translateToken } from 'lib/utils/lang'
+import { langToken, rawTextToString, translateEnchantment, translateToken } from 'lib/i18n/lang'
+import { MaybeRawText, t } from 'lib/i18n/text'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
 export type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
@@ -25,7 +25,7 @@ export function selectItemForm(
 ) {
   const { container } = player
   if (!container) return
-  const chestForm = new ChestForm('45').title(t.options({ unit: '§0' }).raw`${text}`).pattern([0, 0], ['<-     -?'], {
+  const chestForm = new ChestForm('45').title(t.colors({ unit: '§0' }).raw`${text}`).pattern([0, 0], ['<-     -?'], {
     '<': {
       icon: BUTTON['<'],
       callback: back,

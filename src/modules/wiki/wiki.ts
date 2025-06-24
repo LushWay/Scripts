@@ -1,8 +1,8 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { getAuxOrTexture, langToken } from 'lib'
 import { form } from 'lib/form/new'
+import { t, textTable } from 'lib/i18n/text'
 import { selectByChance } from 'lib/rpg/random'
-import { t, textTable } from 'lib/text'
 import { ores } from 'modules/places/mineshaft/algo'
 import { OreEntry } from 'modules/places/mineshaft/ore-collector'
 
@@ -65,7 +65,7 @@ function oreName(item: OreEntry['item'], chance: number, separator = '\n') {
 
 const wikiOre = ({ item }: OreEntry) =>
   form(f => {
-    f.title(t`${`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`}`)
+    f.title(t`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`)
     f.body(
       textTable([
         [t`Под`, item.below],

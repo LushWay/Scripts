@@ -1,4 +1,5 @@
 import { Loot } from 'lib'
+import { t } from 'lib/i18n/text'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { GuideNpc } from '../lib/npc/guide'
@@ -8,7 +9,6 @@ import { techCityInvestigating } from '../tech-city/quests/investigating'
 import { MagicSlimeBall } from './items'
 import { Mage } from './mage'
 import { createBossSlime } from './slime.boss'
-import { t } from 'lib/text'
 
 class VillageOfExporersBuilder extends City {
   constructor() {

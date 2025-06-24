@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageForm } from 'lib/form/message'
-import { MaybeRawText, t } from 'lib/text'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { Cost } from './cost'
 import { CostType } from './cost/cost'
 import { Shop } from './shop'
@@ -78,7 +78,7 @@ export class Product<T extends Cost = any> {
   private name = typeof this.nameGenerator === 'function' ? this.nameGenerator(this.canBuy) : this.nameGenerator
 
   /** Name of this product. Includes cost. */
-  text = t.options({ unit: this.canBuy ? '§f' : '§7' })
+  text = t.colors({ unit: this.canBuy ? '§f' : '§7' })
     .raw`§l${this.name}§r\n${this.cost.toString(this.canBuy, this.player)}`
 
   private ensurePlayerCanBuy() {
@@ -124,8 +124,8 @@ export class Product<T extends Cost = any> {
 
     const { sell, name, costString } = this
     const successBuyText = sell
-      ? t.options({ text: '§a' }).raw`Успешная продажа ${name} за ${costString}!`
-      : t.options({ text: '§a' }).raw`Успешная покупка ${name} за ${costString}!`
+      ? t.colors({ text: '§a' }).raw`Успешная продажа ${name} за ${costString}!`
+      : t.colors({ text: '§a' }).raw`Успешная покупка ${name} за ${costString}!`
 
     const successBuy = () => this.backForm(successBuyText)
 

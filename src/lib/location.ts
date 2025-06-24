@@ -2,9 +2,9 @@ import { Player, TeleportOptions, Vector3, system, world } from '@minecraft/serv
 import { isEmpty } from 'lib/util'
 import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
+import { t } from './i18n/text'
 import { Place } from './rpg/place'
 import { Settings } from './settings'
-import { t } from './text'
 import { VectorInDimension } from './utils/point'
 
 interface LocationCommon<T extends Vector3> {

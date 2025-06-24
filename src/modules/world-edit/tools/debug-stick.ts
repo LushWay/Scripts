@@ -3,7 +3,7 @@ import { BlockStateSuperset } from '@minecraft/vanilla-data'
 import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t, textTable } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { WEeditBlockStatesMenu } from '../menu'
 
@@ -24,18 +24,8 @@ class DebugStick extends WorldEditTool<StorageSchema> {
   editToolForm(slot: ContainerSlot, player: Player, initial?: boolean): void {
     const storage = this.getStorage(slot)
     new ModalForm(this.name)
-      .addTextField('Ыыы просто потому что интерфейс сломан лол', '')
-      .addDropdownFromObject(
-        'Тип активации',
-        {
-          ui: 'Интерфейс',
-          click: 'При использовании',
-        },
-        {
-          defaultValue: storage.mode,
-        },
-      )
-      .show(player, (_, __, mode) => {
+      .addDropdownFromObject('Activation type', { ui: 'UI', click: 'On use' }, { defaultValue: storage.mode })
+      .show(player, (_, mode) => {
         storage.mode = mode
         this.saveStorage(slot, storage)
         player.info(t`Mode is set to ${mode}`)
@@ -59,7 +49,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       }
       block.setPermutation(permutation)
     }
-    WEeditBlockStatesMenu(player, blockStates, onChangeListener, false, '§l§bСохранить').then(onChangeListener)
+    WEeditBlockStatesMenu(player, blockStates, onChangeListener, false, '§l§bSave').then(onChangeListener)
   }
 
   constructor() {
@@ -94,13 +84,9 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     stateName: string,
   ) {
     const nextStateName = player.isSneaking ? nextValue(stateNames, stateName) : stateName
-    return t`${Vec.string(block, true)} ${block.typeId}\n${textTable(
-      Object.entries(allStates).map(([key, value]) =>
-        key === stateName ? ['§b' + key, value] : key === nextStateName ? ['§e' + key, value] : [key, value],
-      ),
-      true,
-      false,
-    )}`
+    return l`${Vec.string(block, true)} ${block.typeId}\n${Object.entries(allStates)
+      .map(([key, value]) => `${(key === stateName ? '§b' : key === nextStateName ? '§9' : '§7') + key}: ${value}`)
+      .join('\n')}`
   }
 
   private changeProperty(player: Player, block: Block) {
@@ -112,7 +98,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     if (player.isSneaking) {
       if (stateNames.length === 1)
         return player.onScreenDisplay.setActionBar(
-          t.error`У блока ${block.typeId} всего одно состояние`,
+          l.error`Block ${block.typeId} has only one state`,
           ActionbarPriority.Highest,
         )
 
@@ -134,7 +120,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
 
   private noStatesToChangeWarning(player: Player, block: Block) {
     return player.onScreenDisplay.setActionBar(
-      t.error`У блока ${block.typeId} нет состояний для изменения`,
+      t.error`Block ${block.typeId} has no states to change`,
       ActionbarPriority.PvP,
     )
   }

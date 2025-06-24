@@ -1,4 +1,4 @@
-import { t } from "lib/text"
+import { t } from "lib/i18n/text"
 
 export const text: Record<string, (...args: (string | number)[]) => string> = {
   'api.name': () => 'Smelly API',

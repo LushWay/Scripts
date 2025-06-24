@@ -1,7 +1,7 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ask } from 'lib/form/message'
-import { l, t } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'

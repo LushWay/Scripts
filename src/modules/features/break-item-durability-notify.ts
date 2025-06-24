@@ -1,20 +1,18 @@
 import { system } from '@minecraft/server'
 import { actionGuard, ActionGuardOrder, Menu, Settings } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 
 const playerSettings = Settings.player(...Menu.settings, {
   breakItemDurabilityNotify: {
     name: t`Уведомлять о ломающемся предмете`,
-    description:
-      t`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран`,
+    description: t`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран`,
     value: true,
   },
   // TODO Donut feature
   breakItemDurabilityCancel: {
     name: t`Не давать ломать предмет`,
-    description:
-      t`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.`,
+    description: t`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.`,
     value: true,
   },
 })

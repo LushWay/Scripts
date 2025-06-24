@@ -3,7 +3,7 @@ import { LockAction, LockActionCheckOptions, PlaceAction } from 'lib/action'
 import { hexToRgb } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { Core } from './extensions/core'
-import { t } from './text'
+import { t } from './i18n/text'
 
 export class Portal {
   static canTeleport(player: Player, lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]) {

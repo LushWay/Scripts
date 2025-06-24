@@ -1,9 +1,9 @@
 import { Player, system } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
+import { l, t } from 'lib/i18n/text'
 import { RegionEvents } from '../events'
 import { registerRegionType, registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
-import { l, t } from 'lib/text'
 
 export class RoadRegion extends Region {
   protected defaultPermissions: RegionPermissions = {

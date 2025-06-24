@@ -1,5 +1,5 @@
 import { BlockTypes } from '@minecraft/server'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { inaccurateSearch } from 'lib/utils/search'
 
 const prefix = 'minecraft:'

@@ -21,20 +21,4 @@ describe('ms', () => {
   it('should convert decimals from ticks and back', () => {
     expect(fromTicksToMs(fromMsToTicks(ms.from('ms', 1001)))).toMatchInlineSnapshot(`1000`)
   })
-
-  it('should get remaining time', () => {
-    expect(ms.remaining(ms.from('day', 1000), { converters: ['day', 'year'] })).toMatchInlineSnapshot(`
-      {
-        "type": "года",
-        "value": "2.778",
-      }
-    `)
-    expect(ms.remaining(ms.from('day', 32) + ms.from('hour', 3), { converters: ['day'], friction: 0 }))
-      .toMatchInlineSnapshot(`
-        {
-          "type": "дня",
-          "value": "32",
-        }
-      `)
-  })
 })

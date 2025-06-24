@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { Clan } from './clan/clan'
+import { t } from './i18n/text'
 import { getRole, ROLES } from './roles'
 import { EquippmentLevel } from './rpg/equipment-level'
-import { t } from './text'
 
 /**
  * Gets displayable the role of this player

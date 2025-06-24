@@ -3,8 +3,8 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
+import { l, MaybeRawText, t } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
-import { l, MaybeRawText, t } from 'lib/text'
 import { util } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => unknown

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { l, t } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
@@ -184,7 +184,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    */
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
     this.stack = stringifyError.stack.get(2)
-    if (!parent) Command.checkIsUnique(name)
+    if (!parent && !__VITEST__) Command.checkIsUnique(name)
 
     this.sys.name = name
 

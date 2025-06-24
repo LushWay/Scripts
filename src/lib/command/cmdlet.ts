@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent } from '@minecraft/server'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { CommandContext } from './context'
 import { Command } from './index'
 

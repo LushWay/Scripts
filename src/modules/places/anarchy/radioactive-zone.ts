@@ -3,7 +3,7 @@ import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { Spawn } from '../spawn'
 

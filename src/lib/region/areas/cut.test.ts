@@ -1,7 +1,7 @@
+import { textTable } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { CutArea } from './cut'
 import { SphereArea } from './sphere'
-import { textTable } from 'lib/text'
 
 describe('sphere', () => {
   it('should detect if vector is in region', () => {

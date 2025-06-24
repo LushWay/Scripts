@@ -1,5 +1,5 @@
+import { t } from 'lib/i18n/text'
 import { playerSettingsMenu, worldSettingsMenu } from 'lib/settings'
-import { t } from 'lib/text'
 
 new Command('settings')
   .setAliases('options')

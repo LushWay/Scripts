@@ -9,7 +9,7 @@ export async function generateManifestJson({ world, outfile, outdir }: import('.
     .map(([name, version]) => {
       const match = (version as string).match(/\d+\.\d+\.\d+-(?:beta|stable)/)
 
-      if (!match && name !== '@minecraft/vanilla-data' && name !== 'async-mutex') {
+      if (!match && name !== '@minecraft/vanilla-data' && name !== 'async-mutex' && !name.startsWith('@formatjs')) {
         logger.warn(
           "Version of the package '" +
             name +

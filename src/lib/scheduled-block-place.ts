@@ -2,7 +2,7 @@ import { Block, BlockPermutation, LocationInUnloadedChunkError, system, world } 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Table, table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
-import { l } from 'lib/text'
+import { l } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'

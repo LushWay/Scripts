@@ -1,5 +1,5 @@
 import { is } from 'lib'
-import { t, textTable } from 'lib/text'
+import { t, textTable } from 'lib/i18n/text'
 
 new Command('version')
   .setAliases('v')

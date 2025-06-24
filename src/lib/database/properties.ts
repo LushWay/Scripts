@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 

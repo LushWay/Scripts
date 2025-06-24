@@ -1,22 +1,18 @@
-import { ItemPotionComponent, ItemStack, RawMessage } from '@minecraft/server'
+import { ItemPotionComponent, ItemStack, Player, RawMessage } from '@minecraft/server'
 import {
   MinecraftPotionEffectTypes as PotionEffects,
   MinecraftPotionModifierTypes as PotionModifiers,
 } from '@minecraft/vanilla-data'
-import { t } from 'lib/text'
+import { langToken } from 'lib/i18n/lang'
+import { t } from 'lib/i18n/text'
 import { noBoolean } from 'lib/util'
-import { langToken } from 'lib/utils/lang'
 
-/**
- * Returns <item name>\nx<count>
- *
- * @param {ItemStack} item
- */
-
+/** Returns <item name>\nx<count> */
 export function itemNameXCount(
   item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'> | ItemStack,
   c = '§7',
   amount = true,
+  player?: Player,
 ): RawMessage {
   const colorMessage: RawMessage | false = c ? { text: c } : false
   const potion = item instanceof ItemStack && item.getComponent(ItemPotionComponent.componentId)

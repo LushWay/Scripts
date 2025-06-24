@@ -1,7 +1,7 @@
 import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
+import { l } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { Cuboid } from './cuboid'
-import { l } from 'lib/text'
 
 export interface BigStructureSaved extends JsonObject {
   id: string

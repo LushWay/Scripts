@@ -1,8 +1,8 @@
 import { Player } from '@minecraft/server'
 import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
+import { t } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { FormCallback, showForm } from './utils'
-import { t } from 'lib/text'
 
 interface IModalFormArg {
   /** What this form arg is */

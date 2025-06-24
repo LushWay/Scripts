@@ -1,6 +1,6 @@
 import { Loot } from 'lib'
+import { t } from 'lib/i18n/text'
 import { CutArea } from 'lib/region/areas/cut'
-import { t } from 'lib/text'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { QuartzMineRegion } from '../anarchy/quartz'
 import { BaseItem } from '../base/base'

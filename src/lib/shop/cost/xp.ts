@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { MaybeRawText, t } from 'lib/text'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { Cost } from './cost'
 
 export class XPCost extends Cost {
@@ -10,7 +10,7 @@ export class XPCost extends Cost {
   }
 
   toString(canBuy?: boolean, player?: Player): MaybeRawText {
-    return t.options({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' }).raw`${this.levels.toString()}lvl`
+    return t.colors({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' }).raw`${this.levels.toString()}lvl`
   }
 
   has(player: Player): boolean {

@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { DEFAULT_ROLE, is, ROLES, Settings } from 'lib'
-import { l } from 'lib/text'
+import { l } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 
 // Delay execution to move whitelist settings to the end of the settings menu

@@ -8,7 +8,7 @@ import {
   world,
 } from '@minecraft/server'
 import { ms, Settings } from 'lib'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 import { gravestoneEntityTypeId, gravestoneGetOwner } from './death-quest-and-gravestone'
 

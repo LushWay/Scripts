@@ -9,8 +9,8 @@ import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
+import { l, t } from '../i18n/text'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
-import { l, t } from '../text'
 import CrateLootAnimation from './animation'
 
 export class Crate {

@@ -1,4 +1,4 @@
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { inspect } from 'lib/util'
 import './events'
 import { ServerModules } from './modules'

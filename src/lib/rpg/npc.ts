@@ -9,12 +9,12 @@ import {
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
+import { t } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
 import { anyPlayerNear } from 'lib/player-move'
 import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
 import { Place } from './place'
-import { t } from 'lib/text'
 
 export declare namespace Npc {
   type OnInteract = (event: Omit<PlayerInteractWithEntityBeforeEvent, 'cancel'>) => boolean

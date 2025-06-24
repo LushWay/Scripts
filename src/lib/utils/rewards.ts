@@ -1,7 +1,7 @@
 import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { emoji } from 'lib/assets/emoji'
-import { l, t } from 'lib/text'
+import { l, t } from 'lib/i18n/text'
 import { itemNameXCount } from './item-name-x-count'
 
 export namespace Rewards {

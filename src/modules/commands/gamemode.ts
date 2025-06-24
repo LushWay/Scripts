@@ -4,7 +4,7 @@ import { GameMode } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { is, isNotPlaying, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { t } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 function fastGamemode(mode: GameMode, shorname: string) {

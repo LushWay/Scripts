@@ -1,5 +1,5 @@
 import { Player, RawText } from '@minecraft/server'
-import { MaybeRawText, t } from 'lib/text'
+import { MaybeRawText, t } from 'lib/i18n/text'
 import { noBoolean } from 'lib/util'
 import { Cost, ItemCost, LeafyCost, MoneyCost, ScoreboardCost } from '../cost'
 import { CostType } from './cost'

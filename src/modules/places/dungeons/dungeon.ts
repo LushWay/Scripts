@@ -12,10 +12,10 @@ import {
   Vec,
 } from 'lib'
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
+import { l, t, TextTable } from 'lib/i18n/text'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
-import { l, t, TextTable } from 'lib/text'
 import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Dungeon } from './loot'
 

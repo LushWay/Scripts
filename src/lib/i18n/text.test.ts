@@ -2,13 +2,23 @@ import 'lib/command/index'
 
 import { Player } from '@minecraft/server'
 import { ms } from 'lib'
+import { Language } from 'lib/assets/lang'
 import { TEST_createPlayer } from 'test/utils'
+import { Message } from './message'
 import './text'
-import { t, textTable } from './text'
+import { i18n, t, textTable } from './text'
 
 let player: Player
 beforeEach(() => {
   player = TEST_createPlayer()
+})
+
+describe('i18n', () => {
+  it('should translate text', () => {
+    expect(i18n`Some string with ${i18n.time(3000)} and`.size(30).string(Language.en_US)).toMatchInlineSnapshot(
+      `"§7Some string with §f3 seconds§7 and§7 §7(§630§7)"`,
+    )
+  })
 })
 
 describe('text', () => {
@@ -26,12 +36,12 @@ describe('text', () => {
   })
 
   it('should apply options', () => {
-    expect(t.options({ unit: '§g', text: '§4' })`Все должно работать ${player}`).toMatchInlineSnapshot(
+    expect(t.colors({ unit: '§g', text: '§4' })`Все должно работать ${player}`).toMatchInlineSnapshot(
       `"§4Все должно работать §gTest player name§4"`,
     )
 
-    expect(t.error`Не так быстро! Попробуй через ${t.error.time(3000)}`).toMatchInlineSnapshot(
-      `"§cНе так быстро! Попробуй через §f§f3 §cсекунды§c"`,
+    expect(t.error`Не так быстро! Попробуй через ${t.time(3000)}`).toMatchInlineSnapshot(
+      `"§cНе так быстро! Попробуй через §f3 секунды§c"`,
     )
   })
 
@@ -47,7 +57,7 @@ describe('text', () => {
     expect(t`Используй ${new Command('namew')}`).toMatchInlineSnapshot(`"§7Используй §f.namew§7"`)
   })
 
-  it('should stringify chained command', () => {
+  it('should stringify chained command without overload', () => {
     const nameCommand = new Command('nameww')
     nameCommand.overload('overload')
     expect(t`Используй ${nameCommand}`).toMatchInlineSnapshot(`"§7Используй §f.nameww§7"`)
@@ -69,14 +79,12 @@ describe('text', () => {
 
   it('should stringify symbol', () => {
     expect(t`Символы то тоже сюда кидают: ${Symbol('test')}`).toMatchInlineSnapshot(
-      `"§7Символы то тоже сюда кидают: §c<>§r§7"`,
+      `"§7Символы то тоже сюда кидают: §c<>§7"`,
     )
   })
 
   it('should stringify function', () => {
-    expect(t`Фнукции то тоже сюда кидают: ${() => {}}`).toMatchInlineSnapshot(
-      `"§7Фнукции то тоже сюда кидают: §c<>§r§7"`,
-    )
+    expect(t`Фнукции то тоже сюда кидают: ${() => {}}`).toMatchInlineSnapshot(`"§7Фнукции то тоже сюда кидают: §c<>§7"`)
   })
 
   it('should stringify undefined', () => {
@@ -84,43 +92,65 @@ describe('text', () => {
   })
 
   it('should stringify in error mode with nested options', () => {
-    expect(t.error`Some ${'with error'} ${4} ${TEST_createPlayer()}`).toMatchInlineSnapshot(
-      `"§cSome §fwith error§c §74§c §fTest player name§c"`,
+    expect(
+      t.error`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
+    ).toMatchInlineSnapshot(`"§cSome long text §fwith error§c and number §74§c and player §fTest player name§c"`)
+  })
+
+  it('should stringify in accent with nested options', () => {
+    expect(
+      t.accent`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
+    ).toMatchInlineSnapshot(`"§3Some long text §fwith error§3 and number §64§3 and player §fTest player name§3"`)
+  })
+
+  it('should stringify in warn with nested options', () => {
+    expect(
+      t.warn`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
+    ).toMatchInlineSnapshot(`"§eSome long text §fwith error§e and number §64§e and player §fTest player name§e"`)
+  })
+
+  it('should stringify in without color with nested options', () => {
+    expect(
+      t.nocolor`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
+    ).toMatchInlineSnapshot(`"Some long text with error and number 4 and player Test player name"`)
+  })
+  it('should stringify in header with nested options', () => {
+    expect(
+      t.header`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
+    ).toMatchInlineSnapshot(
+      `"§r§6Some long text §f§lwith error§r§6 and number §f4§r§6 and player §f§lTest player name§r§6"`,
     )
   })
 
   it('should work with time', () => {
-    expect(t.time(0)).toMatchInlineSnapshot(`"§f0 §7миллисекунд"`)
-    expect(t.time(3000)).toMatchInlineSnapshot(`"§f3 §7секунды"`)
-    expect(t.time(300000)).toMatchInlineSnapshot(`"§f5 §7минут"`)
+    const lang = Language.ru_RU
+    expect(t.time(0).string(lang)).toMatchInlineSnapshot(`""`)
+    expect(t.time(3000).string(lang)).toMatchInlineSnapshot(`"3 секунды"`)
+    expect(t.time(300000).string(lang)).toMatchInlineSnapshot(`"5 минут"`)
 
-    expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§600:00:03§7"`)
+    expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"00:00:03"`)
     expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
-      `"§604:32:01§7"`,
+      `"04:32:01"`,
     )
-    expect(t.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§6100 §7дней, §600:00:03§7"`)
+    expect((t.timeHHMMSS(ms.from('day', 100) + 3000) as Message).string(lang)).toMatchInlineSnapshot(
+      `"100 дней, 00:00:03"`,
+    )
 
-    expect(t.error.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§700:00:03§c"`)
-    expect(t.error.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§7100 §cдней, §700:00:03§c"`)
-
-    // @ts-expect-error
-    expect(t.time('string')).toMatchInlineSnapshot(`"§fstring §7миллисекунд"`)
+    expect(t.error.timeHHMMSS(3000)).toMatchInlineSnapshot(`"00:00:03"`)
+    expect((t.error.timeHHMMSS(ms.from('day', 100) + 3000) as Message).string(lang)).toMatchInlineSnapshot(
+      `"100 дней, 00:00:03"`,
+    )
   })
 
   it('should work with badge', () => {
-    expect(t.unreadBadge`Почта ${-3}`).toMatchInlineSnapshot(`"§7Почта§7"`)
-    expect(t.unreadBadge`Почта ${0}`).toMatchInlineSnapshot(`"§7Почта§7"`)
-    expect(t.unreadBadge`Почта ${3}`).toMatchInlineSnapshot(`"§7Почта §7(§c3§7)§7"`)
-    expect(t.unreadBadge`${3}`).toMatchInlineSnapshot(`"§7§7(§c3§7)§7"`)
-    expect(t.unreadBadge`${0}`).toMatchInlineSnapshot(`"§7§7"`)
+    expect(t.badge(-3)).toMatchInlineSnapshot(`"§4 (§c-3§4)"`)
+    expect(t.badge(3)).toMatchInlineSnapshot(`"§4 (§c3§4)"`)
+    expect(t.badge(0)).toMatchInlineSnapshot(`""`)
 
-    expect(t.size(3)).toMatchInlineSnapshot(`"§7 (§63§7)§7"`)
+    expect(t.size(3)).toMatchInlineSnapshot(`"§7 (§63§7)"`)
     expect(t.size(0)).toMatchInlineSnapshot(`""`)
-    expect(t.error.size(3)).toMatchInlineSnapshot(`"§c (§73§c)§c"`)
+    expect(t.error.size(3)).toMatchInlineSnapshot(`"§c (§73§c)"`)
     expect(t.error.size(0)).toMatchInlineSnapshot(`""`)
-
-    // @ts-expect-error
-    expect(t.unreadBadge`Плохо${'string'}`).toMatchInlineSnapshot(`"§7Плохо§fstring§7"`)
   })
 
   it('should work with rawTxt', () => {

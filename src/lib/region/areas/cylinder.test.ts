@@ -1,4 +1,4 @@
-import { textTable } from 'lib/text'
+import { textTable } from 'lib/i18n/text'
 import { CylinderArea } from './cylinder'
 
 describe('cylinder', () => {

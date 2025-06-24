@@ -2,7 +2,7 @@ import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/ser
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Core } from 'lib/extensions/core'
-import { l } from 'lib/text'
+import { l } from 'lib/i18n/text'
 import stringifyError from 'lib/utils/error'
 import { DatabaseError } from './abstract'
 import { DatabaseUtils } from './utils'
