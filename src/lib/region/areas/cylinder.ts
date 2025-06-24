@@ -1,6 +1,7 @@
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vec, VecXZ } from 'lib/vector'
 import { Area } from './area'
+import { TextTable } from 'lib/text'
 
 class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radius: number; yradius: number }> {
   type = 'ss'
@@ -36,8 +37,12 @@ class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radiu
     this.database.center = c
   }
 
-  getFormDescription(): Record<string, unknown> {
-    return { Center: Vec.string(this.center, true), Radius: this.radius, YRadius: this.database.yradius }
+  getFormDescription(): TextTable {
+    return [
+      ['Center', Vec.string(this.center, true)],
+      ['Radius', this.radius],
+      ['YRadius', this.database.yradius],
+    ]
   }
 }
 

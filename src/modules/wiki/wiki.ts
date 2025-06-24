@@ -67,9 +67,9 @@ const wikiOre = ({ item }: OreEntry) =>
   form(f => {
     f.title(t`${`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`}`)
     f.body(
-      textTable({
-        Под: item.below,
-        Над: item.above,
-      }),
+      textTable([
+        [t`Под`, item.below],
+        [t`Над`, item.above],
+      ]),
     )
   })

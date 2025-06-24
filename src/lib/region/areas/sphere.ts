@@ -1,3 +1,4 @@
+import { TextTable } from 'lib/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { Area } from './area'
@@ -32,8 +33,11 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
     this.database.center = c
   }
 
-  getFormDescription(): Record<string, unknown> {
-    return { Center: Vec.string(this.center, true), Radius: this.radius }
+  getFormDescription(): TextTable {
+    return [
+      ['Center', Vec.string(this.center, true)],
+      ['Radius', this.radius],
+    ]
   }
 }
 

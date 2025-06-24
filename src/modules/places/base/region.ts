@@ -4,7 +4,7 @@ import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
-import { l, t } from 'lib/text'
+import { l, t, TextTable } from 'lib/text'
 import { getSafeFromRottingTime, materialsToRawText } from './actions/rotting'
 import { baseLevels } from './base-levels'
 
@@ -68,16 +68,16 @@ export class BaseRegion extends RegionWithStructure {
     state: RottingState.No,
   }
 
-  customFormDescription(player: Player): Record<string, unknown> {
-    return {
+  customFormDescription(player: Player): TextTable {
+    return [
       ...super.customFormDescription(player),
-      'Level': RottingState[this.ldb.level],
-      'State': RottingState[this.ldb.state],
-      'Materials': rawTextToString(materialsToRawText(this.ldb.materials), player.lang),
-      'Materials missing': rawTextToString(materialsToRawText(this.ldb.materialsMissing), player.lang),
-      'Barrel': rawTextToString(materialsToRawText(this.ldb.barrel), player.lang),
-      'To take': rawTextToString(materialsToRawText(this.ldb.toTakeFromBarrel), player.lang),
-    }
+      ['Level', RottingState[this.ldb.level]],
+      ['State', RottingState[this.ldb.state]],
+      ['Materials', rawTextToString(materialsToRawText(this.ldb.materials), player.lang)],
+      ['Materials missing', rawTextToString(materialsToRawText(this.ldb.materialsMissing), player.lang)],
+      ['Barrel', rawTextToString(materialsToRawText(this.ldb.barrel), player.lang)],
+      ['To take', rawTextToString(materialsToRawText(this.ldb.toTakeFromBarrel), player.lang)],
+    ]
   }
 }
 

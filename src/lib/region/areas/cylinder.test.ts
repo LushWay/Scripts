@@ -1,3 +1,4 @@
+import { textTable } from 'lib/text'
 import { CylinderArea } from './cylinder'
 
 describe('cylinder', () => {
@@ -24,12 +25,10 @@ describe('cylinder', () => {
     cylinder.center = { x: 10, y: 10, z: 10 }
     expect(cylinder.center).toEqual({ x: 10, y: 10, z: 10 })
 
-    expect(cylinder.getFormDescription()).toMatchInlineSnapshot(`
-      {
-        "Center": "§c10 §a10 §b10",
-        "Radius": 5,
-        "YRadius": 3,
-      }
+    expect(textTable(cylinder.getFormDescription())).toMatchInlineSnapshot(`
+      "§7Center: §f§c10 §a10 §b10
+      §7Radius: §65
+      §7YRadius: §63"
     `)
   })
 

@@ -22,16 +22,16 @@ const translateRule = createRule({
   },
   defaultOptions: [],
   create(context) {
+    const file = toRelative(context)
+    const ignore = ['.test.ts', '.spec.ts', 'world-edit', 'minigames']
+
+    if (ignore.some(e => file.includes(e)) || context.sourceCode.text.includes('/* i18n-ignore */')) return {}
+
     /**
      * @param {string} t
      * @param {TSESTree.Literal | TSESTree.TemplateLiteral} node
      */
     function addToTranslates(t, node, literal = false) {
-      const file = toRelative(context)
-      const ignore = ['.test.ts', '.spec.ts', 'world-edit', 'minigames']
-
-      if (ignore.some(e => file.includes(e)) || context.sourceCode.text.includes('/* i18n-ignore */')) return
-
       // Ignore Settings.world({ setting: { name: 'Do not translate this' }})
       if (
         node.parent.type == 'Property' &&

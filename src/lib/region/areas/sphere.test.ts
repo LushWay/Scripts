@@ -1,3 +1,4 @@
+import { textTable } from 'lib/text'
 import { Vec } from 'lib/vector'
 import { SphereArea } from './sphere'
 
@@ -20,11 +21,9 @@ describe('sphere', () => {
     sphere.center = { x: 10, y: 10, z: 10 }
     expect(sphere.center).toEqual({ x: 10, y: 10, z: 10 })
 
-    expect(sphere.getFormDescription()).toMatchInlineSnapshot(`
-      {
-        "Center": "§c10 §a10 §b10",
-        "Radius": 10,
-      }
+    expect(textTable(sphere.getFormDescription())).toMatchInlineSnapshot(`
+      "§7Center: §f§c10 §a10 §b10
+      §7Radius: §610"
     `)
 
     expect(sphere.toString()).toMatchInlineSnapshot(`"§7§f§c10 §a10 §b10§7 radius=§610§7"`)

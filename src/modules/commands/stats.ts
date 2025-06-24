@@ -9,7 +9,7 @@ import {
   Settings,
 } from 'lib'
 import { NewFormCallback } from 'lib/form/new'
-import { t, textTable } from 'lib/text'
+import { t, TextTable, textTable } from 'lib/text'
 
 new Command('stats').setDescription(t`Показывает статистику по игре`).executes(ctx => showStats(ctx.player))
 
@@ -41,25 +41,25 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
 
   new ActionForm(
     t.header`Статистика игрока ${Player.name(targetId)}`,
-    textTable({
-      [scoreboardDisplayNames.totalOnlineTime]: formatDate(scores.totalOnlineTime),
-      [scoreboardDisplayNames.anarchyOnlineTime]: formatDate(scores.anarchyOnlineTime),
-      [' ']: '',
-      [scoreboardDisplayNames.lastSeenDate]: t.time(Date.now() - scores.lastSeenDate * 1000),
-      [scoreboardDisplayNames.anarchyLastSeenDate]: t.time(Date.now() - scores.anarchyLastSeenDate * 1000),
-      ['  ']: '',
+    textTable([
+      [scoreboardDisplayNames.totalOnlineTime, formatDate(scores.totalOnlineTime)],
+      [scoreboardDisplayNames.anarchyOnlineTime, formatDate(scores.anarchyOnlineTime)],
+      [' ', ''],
+      [scoreboardDisplayNames.lastSeenDate, t.time(Date.now() - scores.lastSeenDate * 1000)],
+      [scoreboardDisplayNames.anarchyLastSeenDate, t.time(Date.now() - scores.anarchyLastSeenDate * 1000)],
+      ['  ', ''],
       ...statsTable(
         scores,
         key => key,
         n => n,
       ),
-      ['   ']: '',
+      ['   ', ''],
       ...statsTable(
         scores,
         key => `anarchy${capitalize(key)}`,
         n => t`Анархия ${n}`,
       ),
-    }),
+    ]),
   )
     .addButton('OK', () => null)
     .addButtonBack(back)
@@ -67,12 +67,13 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
 }
 
 function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreName, getN: (n: string) => string) {
-  const table: Record<string, number | string> = {}
+  const table: TextTable[number][] = []
   for (const key of scoreboardObjectiveNames.stats) {
     const k = getKey(key)
-    table[getN(scoreboardDisplayNames[k])] = s[k]
-    if (key === 'kills') table[getN(t`Убийств/Смертей`)] = s[getKey('kills')] / s[getKey('deaths')]
-    if (key === 'damageGive') table[getN(t`Нанесено/Получено`)] = s[getKey('damageGive')] / s[getKey('damageRecieve')]
+    table.push([getN(scoreboardDisplayNames[k]), s[k]])
+    if (key === 'kills') table.push([getN(t`Убийств/Смертей`), s[getKey('kills')] / s[getKey('deaths')]])
+    if (key === 'damageGive')
+      table.push([getN(t`Нанесено/Получено`), s[getKey('damageGive')] / s[getKey('damageRecieve')]])
   }
-  return table
+  return table satisfies TextTable
 }

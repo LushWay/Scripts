@@ -1,6 +1,6 @@
 import { Dimension, system, world } from '@minecraft/server'
 import { stringifyError } from 'lib/util'
-import { t } from 'lib/text'
+import { t, TextTable } from 'lib/text'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 
@@ -67,7 +67,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return t`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
   }
 
-  abstract getFormDescription(): Record<string, unknown>
+  abstract getFormDescription(): TextTable
 
   protected isOurDimension(dimensionType: DimensionType) {
     return this.dimensionType === dimensionType

@@ -1,6 +1,7 @@
 import { Vec } from 'lib/vector'
 import { CutArea } from './cut'
 import { SphereArea } from './sphere'
+import { textTable } from 'lib/text'
 
 describe('sphere', () => {
   it('should detect if vector is in region', () => {
@@ -23,15 +24,13 @@ describe('sphere', () => {
       { x: 1, y: 1, z: 1 },
     ])
 
-    expect(cut.getFormDescription()).toMatchInlineSnapshot(`
-      {
-        "Center": "§c0 §a0 §b0",
-        "Cut": {
-          "axis": "y",
-          "to": 0,
-        },
-        "Radius": 2,
+    expect(textTable(cut.getFormDescription())).toMatchInlineSnapshot(`
+      "§7Cut: {
+        axis: §2\`y\`§r,
+        to: §60§r
       }
+      §7Center: §f§c0 §a0 §b0
+      §7Radius: §62"
     `)
 
     const cut2 = new CutArea({

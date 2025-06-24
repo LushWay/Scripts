@@ -8,7 +8,7 @@ import {
   system,
   world,
 } from '@minecraft/server'
-import { Command, inspect, isKeyof, stringify, util } from 'lib'
+import { Command, inspect, isKeyof, noBoolean, stringify, util } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { textTable } from 'lib/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
@@ -161,14 +161,18 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
     if (!writeLore) return
 
-    const table = Object.map(storage, (key, value) => {
-      if (!isKeyof(key, this.translation)) return false
+    const table = Object.entries(storage)
+      .map(([key, value]) => {
+        if (!isKeyof(key, this.translation)) return false
 
-      return [
-        this.translation[key],
-        WorldEditTool.loreBlockRefKeys.includes(key) ? stringifyBlocksSetRef(value as BlocksSetRef) : stringify(value),
-      ]
-    })
+        return [
+          this.translation[key],
+          WorldEditTool.loreBlockRefKeys.includes(key)
+            ? stringifyBlocksSetRef(value as BlocksSetRef)
+            : stringify(value),
+        ] as const
+      })
+      .filter(noBoolean)
 
     slot.setLore([' ', ...textTable(table, false, false).map(e => '§r' + e.slice(0, 48))])
   }

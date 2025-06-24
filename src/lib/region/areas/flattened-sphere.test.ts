@@ -1,5 +1,6 @@
 import { createPoint } from 'lib/utils/point'
 import { FlattenedSphereArea } from './flattened-sphere'
+import { textTable } from 'lib/text'
 
 describe('rectangle', () => {
   it('should detect if vector is in region', () => {
@@ -32,12 +33,10 @@ describe('rectangle', () => {
 
     flts.center = { x: 10, y: 10, z: 10 }
 
-    expect(flts.getFormDescription()).toMatchInlineSnapshot(`
-      {
-        "Center": "§c10 §a10 §b10",
-        "Radius": 12,
-        "YRadius": 20,
-      }
+    expect(textTable(flts.getFormDescription())).toMatchInlineSnapshot(`
+      "§7Center: §f§c10 §a10 §b10
+      §7Radius: §612
+      §7YRadius: §620"
     `)
   })
 })

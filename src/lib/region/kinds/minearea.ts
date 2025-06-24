@@ -11,7 +11,7 @@ import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { isNewbie } from 'lib/rpg/newbie'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { l, t } from 'lib/text'
+import { l, t, TextTable } from 'lib/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
@@ -128,13 +128,13 @@ export class MineareaRegion extends RegionWithStructure {
     return this.newbie ? t.nocolor`§bЗона добычи новичков` : t.nocolor`§7Зона добычи`
   }
 
-  customFormDescription(player: Player): Record<string, unknown> {
-    return {
-      'Building': this.building,
-      'Restoring structure': this.restoringStructureProgress,
-      'Scheduled to place blocks': this.scheduledToPlaceBlocks.length,
-      'Newbie': this.newbie,
-    }
+  customFormDescription(player: Player): TextTable {
+    return [
+      ['Building', this.building],
+      ['Restoring structure', this.restoringStructureProgress],
+      ['Scheduled to place blocks', this.scheduledToPlaceBlocks.length],
+      ['Newbie', this.newbie],
+    ]
   }
 }
 

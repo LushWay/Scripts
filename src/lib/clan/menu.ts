@@ -94,13 +94,16 @@ function createClan(player: Player, back: VoidFunction, name?: string, shortname
 function inClanMenu(player: Player, clan: Clan, back?: VoidFunction) {
   const form = new ActionForm(
     t`Меню клана`,
-    textTable({ 'Имя клана': clan.db.name, 'Дата создания': clan.createdAt.toYYYYMMDD(player.lang) }),
+    textTable([
+      [t`Имя клана`, clan.db.name],
+      [t`Дата создания`, clan.createdAt.toYYYYMMDD(player.lang)],
+    ]),
   ).addButtonBack(back)
 
   const selfback = () => inClanMenu(player, clan, back)
   const isOwner = clan.isOwner(player.id)
 
-  form.addButton(t.unreadBadge`§7Базы клана ${0}`, () => {
+  form.addButton(t.unreadBadge`Базы клана ${0}`, () => {
     player.fail(t`СКОРО`)
   })
 
@@ -112,7 +115,7 @@ function inClanMenu(player: Player, clan: Clan, back?: VoidFunction) {
     )
 
     form.addButton(t.unreadBadge`Приглашения ${clan.db.invites.length}`, () => clanInvites(player, clan, selfback))
-    form.addButtonAsk(t`§cУдалить клан`, t`§cУдалить`, () => clan.delete())
+    form.addButtonAsk(t.error`Удалить клан`, t.error`Удалить`, () => clan.delete())
   }
   form.show(player)
 }

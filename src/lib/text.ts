@@ -51,11 +51,13 @@ export declare namespace Text {
 
 type Multi = MultiStatic & Record<OptionsModifiers, Fn & Omit<MultiStatic, OptionsModifiers>>
 
-export function textTable(table: Record<string, unknown>, join: false, twoColors?: boolean): string[]
-export function textTable(table: Record<string, unknown>, join?: true, twoColors?: boolean): string
-export function textTable(table: Record<string, unknown>, join = true, twoColors = true): string | string[] {
-  const long = Object.keys(table).length > 5 && twoColors
-  const mapped = Object.entries(table).map(
+export type TextTable = readonly (readonly [string, unknown])[]
+
+export function textTable(table: TextTable, join: false, twoColors?: boolean): string[]
+export function textTable(table: TextTable, join?: true, twoColors?: boolean): string
+export function textTable(table: TextTable, join = true, twoColors = true): string | string[] {
+  const long = table.length > 5 && twoColors
+  const mapped = table.map(
     ([key, value], i) => `${long && i % 2 === 0 ? '§f' : '§7'}${key}: ${textUnitColorize(value)}`,
   )
   return join ? mapped.join('\n') : mapped

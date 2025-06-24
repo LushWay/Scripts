@@ -48,11 +48,13 @@ export class Shop {
 
   private static defaultBody = (player: Player) =>
     Shop.getPlayerSettings(player).defaultBody
-      ? textTable({
-          'Подтверждение перед покупкой': Shop.getPlayerSettings(player).prompt,
-          'Ваш баланс':
+      ? textTable([
+          [t`Подтверждение перед покупкой`, Shop.getPlayerSettings(player).prompt],
+          [
+            t`Ваш баланс`,
             new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
-        })
+          ],
+        ])
       : ''
 
   private getBody = (player: Player): Text => ''

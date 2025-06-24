@@ -28,7 +28,7 @@ describe('item stack', () => {
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
         "§r§f§7Владелец: §fИмя",
-        "§r§f§7Занято: §fДа",
+        "§r§7§7Занято: §7§fДа§7",
         "§r§6§7Отображение опции: §63.000",
       ]
     `)
@@ -42,7 +42,7 @@ describe('item stack', () => {
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
         "§r§f§7Владелец: §fowner",
-        "§r§f§7Занято: §fДа",
+        "§r§7§7Занято: §7§fДа§7",
         "§r§6§7Отображение опции: §63.000",
       ]
     `)

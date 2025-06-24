@@ -31,7 +31,7 @@ describe('text', () => {
     )
 
     expect(t.error`Не так быстро! Попробуй через ${t.error.time(3000)}`).toMatchInlineSnapshot(
-      `"§cНе так быстро! Попробуй через §f§c§f3 §cсекунды§c§c"`,
+      `"§cНе так быстро! Попробуй через §f§f3 §cсекунды§c"`,
     )
   })
 
@@ -90,9 +90,9 @@ describe('text', () => {
   })
 
   it('should work with time', () => {
-    expect(t.time(0)).toMatchInlineSnapshot(`"§7§f0 §7миллисекунд§7"`)
-    expect(t.time(3000)).toMatchInlineSnapshot(`"§7§f3 §7секунды§7"`)
-    expect(t.time(300000)).toMatchInlineSnapshot(`"§7§f5 §7минут§7"`)
+    expect(t.time(0)).toMatchInlineSnapshot(`"§f0 §7миллисекунд"`)
+    expect(t.time(3000)).toMatchInlineSnapshot(`"§f3 §7секунды"`)
+    expect(t.time(300000)).toMatchInlineSnapshot(`"§f5 §7минут"`)
 
     expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"§600:00:03§7"`)
     expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
@@ -104,7 +104,7 @@ describe('text', () => {
     expect(t.error.timeHHMMSS(ms.from('day', 100) + 3000)).toMatchInlineSnapshot(`"§7100 §cдней, §700:00:03§c"`)
 
     // @ts-expect-error
-    expect(t.time('string')).toMatchInlineSnapshot(`"§7§fstring§7"`)
+    expect(t.time('string')).toMatchInlineSnapshot(`"§fstring §7миллисекунд"`)
   })
 
   it('should work with badge', () => {
@@ -170,11 +170,11 @@ describe('text', () => {
 describe('textTable', () => {
   it('should create text table', () => {
     expect(
-      textTable({
-        'Ключ': 'значение',
-        'Другой ключ': 2,
-        'Игрок': player,
-      }),
+      textTable([
+        ['Ключ', 'значение'],
+        ['Другой ключ', 2],
+        ['Игрок', player],
+      ]),
     ).toMatchInlineSnapshot(`
       "§7Ключ: §fзначение
       §7Другой ключ: §62
@@ -182,16 +182,16 @@ describe('textTable', () => {
     `)
 
     expect(
-      textTable({
-        'Ключ': 'значение',
-        'Другой ключ': 2,
-        'Другой клsюч': 2,
-        'Другой клssюч': 2,
-        'Другой клsssюч': 2,
-        'Другой клssssюч': 2,
-        'Другой клsssssюч': 2,
-        'Игрок': player,
-      }),
+      textTable([
+        ['Ключ', 'значение'],
+        ['Другой ключ', 2],
+        ['Другой клsюч', 2],
+        ['Другой клssюч', 2],
+        ['Другой клsssюч', 2],
+        ['Другой клssssюч', 2],
+        ['Другой клsssssюч', 2],
+        ['Игрок', player],
+      ]),
     ).toMatchInlineSnapshot(`
       "§fКлюч: §fзначение
       §7Другой ключ: §62
@@ -205,11 +205,11 @@ describe('textTable', () => {
   })
 
   it('should create array', () => {
-    expectTypeOf(textTable({})).toBeString()
-    expectTypeOf(textTable({}, true)).toBeString()
+    expectTypeOf(textTable([])).toBeString()
+    expectTypeOf(textTable([], true)).toBeString()
 
-    expectTypeOf(textTable({}, false)).toBeArray()
+    expectTypeOf(textTable([], false)).toBeArray()
 
-    expect(textTable({ key: 'value' }, false)).toEqual(['§7key: §fvalue'])
+    expect(textTable([['key', 'value']], false)).toEqual(['§7key: §fvalue'])
   })
 })

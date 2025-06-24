@@ -1,11 +1,12 @@
 import { Vector3 } from '@minecraft/server'
 import { AbstractPoint } from 'lib/utils/point'
 import { Area } from './area'
+import { TextTable } from 'lib/text'
 
 describe('area reg', () => {
   it('should trow', () => {
     class TestArea extends Area {
-      getFormDescription(): Record<string, unknown> {
+      getFormDescription(): TextTable {
         throw new Error('Method not implemented.')
       }
       type = 'test'

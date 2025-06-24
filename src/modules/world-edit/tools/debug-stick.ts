@@ -95,7 +95,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
   ) {
     const nextStateName = player.isSneaking ? nextValue(stateNames, stateName) : stateName
     return t`${Vec.string(block, true)} ${block.typeId}\n${textTable(
-      Object.map(allStates, (key, value) =>
+      Object.entries(allStates).map(([key, value]) =>
         key === stateName ? ['§b' + key, value] : key === nextStateName ? ['§e' + key, value] : [key, value],
       ),
       true,

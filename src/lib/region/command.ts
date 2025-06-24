@@ -221,12 +221,12 @@ function editRegion(player: Player, region: Region, displayName: boolean, back: 
   const selfback = () => editRegion(player, region, displayName, back)
   const form = new ActionForm(
     displayName ? (region.displayName ?? region.creator.name) : region.name,
-    textTable({
-      'Тип региона': region.creator.name,
-      'Тип зоны': Area.areas.find(e => e.type === region.area.type)?.name ?? region.area.type,
+    textTable([
+      [t`Тип региона`, region.creator.name],
+      [t`Тип зоны`, Area.areas.find(e => e.type === region.area.type)?.name ?? region.area.type],
       ...region.area.getFormDescription(),
       ...region.customFormDescription(player),
-    }),
+    ]),
   )
     .addButton(ActionForm.backText, back)
     .addButton(t`Участники`, () => manageRegionMembers(player, region, { isOwner: true, back: selfback, pluralForms }))

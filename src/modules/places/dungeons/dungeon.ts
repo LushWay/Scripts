@@ -15,9 +15,9 @@ import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/s
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
+import { l, t, TextTable } from 'lib/text'
 import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Dungeon } from './loot'
-import { l, t } from 'lib/text'
 
 export interface DungeonRegionDatabase extends JsonObject {
   chests: Record<string, number | null>
@@ -149,15 +149,15 @@ export class DungeonRegion extends Region {
     })
   }
 
-  customFormDescription(player: Player): Record<string, unknown> {
-    return {
+  customFormDescription(player: Player): TextTable {
+    return [
       ...super.customFormDescription(player),
-      Rotation: this.ldb.rotation,
-      Dungeon: Object.entries(StructureDungeonsId).find(e => e[1] === this.structureId)?.[0],
-      StructureId: this.ldb.structureId,
-      StructurePosition: this.getStructurePosition(),
-      Chests: '\n' + this.chests.map(e => `${Vec.string(e.location, true)} ${e.loot.id ?? 'no loot'}`).join('\n'),
-    }
+      ['Rotation', this.ldb.rotation],
+      ['Dungeon', Object.entries(StructureDungeonsId).find(e => e[1] === this.structureId)?.[0]],
+      ['StructureId', this.ldb.structureId],
+      ['StructurePosition', this.getStructurePosition()],
+      ['Chests', '\n' + this.chests.map(e => `${Vec.string(e.location, true)} ${e.loot.id ?? 'no loot'}`).join('\n')],
+    ]
   }
 
   structureBounds() {

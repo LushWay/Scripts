@@ -111,7 +111,7 @@ export const dailyQuestsForm = form((f, player) => {
   const playerDb = db.get(player.id)
   f.title(t`Ежедневные задания`)
   f.body(
-    t`Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ${dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий ${questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n${textTable({ 'Выполнено подряд': playerDb.streak })}`,
+    t`Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ${dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий ${questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n${textTable([[t`Выполнено подряд`, playerDb.streak]])}`,
   )
 
   const name = currentDailyQuestCity?.group.name
