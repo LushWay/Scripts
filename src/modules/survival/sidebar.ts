@@ -95,9 +95,10 @@ const survivalSidebar = new Sidebar(
           } else text = base
         } else if (region) {
           text = ''
-          if (!region.permissions.pvp) text = i18n.success`Мирная зона `.toString(player.lang)
-          const { displayName } = region
-          if (displayName) text += displayName.toString(player.lang)
+          const displayName = region.displayName?.toString(player.lang)
+          if (!region.permissions.pvp)
+            text = i18n.success`Мирная зона${displayName ? ' ' + displayName : ''}`.toString(player.lang)
+          else if (displayName) text = displayName
         }
       }
 

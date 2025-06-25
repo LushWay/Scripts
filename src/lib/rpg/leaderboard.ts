@@ -103,7 +103,7 @@ export class Leaderboard {
     type Nullable<T> = T | null
 
     const scoreboard = this.scoreboard
-    const dname = scoreboard.displayName
+    const dname = scoreboard.displayName.toString()
     const id = this.scoreboard.id
     const name = dname.charAt(0).toUpperCase() + dname.slice(1)
     const style =

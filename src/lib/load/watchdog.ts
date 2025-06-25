@@ -7,6 +7,9 @@ declare global {
 
 globalThis.loaded = Date.now()
 
+//@ts-expect-error Define global
+globalThis.Intl = {}
+
 const reasons: Record<WatchdogTerminateReason, string> = {
   Hang: 'Скрипт завис',
   StackOverflow: 'Стэк переполнен',

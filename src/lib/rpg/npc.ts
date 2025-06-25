@@ -114,7 +114,7 @@ export class Npc {
           const npcName = component ? component.name : event.target.nameTag
 
           if (!npc || !(npc.onQuestInteraction(event) || npc.onInteract(event))) {
-            return event.player.fail(i18n`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
+            return event.player.fail(i18n.error`${npcName}: Я не могу с вами говорить. Приходите позже.`)
           }
         } catch (e) {
           event.player.warn(i18n.warn`Не удалось открыть диалог. ${developersAreWarned}`)

@@ -5,7 +5,6 @@ import { MinecraftItemTypes, MinecraftPotionLiquidTypes } from '@minecraft/vanil
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
 import { translateTypeId } from 'lib/i18n/lang'
-import { Message } from 'lib/i18n/message'
 import { addNamespace, inspect, isKeyof, util, wrapLore } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
@@ -113,7 +112,7 @@ export class ChestForm {
   constructor(sizeType: keyof typeof SIZES = 'small') {
     const [sizeName, size] = SIZES[sizeType]
 
-    this.titleText = sizeName
+    this.titleText = sizeName + '§0'
 
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }

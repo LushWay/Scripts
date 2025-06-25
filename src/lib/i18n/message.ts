@@ -1,9 +1,10 @@
 import { RawMessage, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
 import { Text, textUnitColorize } from './text'
-type I18nMessages = Record<string, Record<string, readonly string[]>>
+type I18nMessages = Record<string, Record<string, string | readonly string[]>>
 
 const extractedMessageIdsToLangTokes: Record<string, string> = {}
+
 const extractedCompiledMessages: I18nMessages = {}
 
 export type RawTextArg = string | RawText | Message | undefined | null
@@ -42,9 +43,9 @@ export class Message {
   }
 
   color(c: Text.Colors | Pick<Text.Static<unknown>, 'currentColors'>) {
-    if (this.postfixes.length) {
-      console.warn(`Color modificator for message ${this.id} will not be applied for postfixes ${this.postfixes}`)
-    }
+    // if (this.postfixes.length) {
+    //   console.warn(`Color modificator for message ${this.id} will not be applied for postfixes ${this.postfixes}`)
+    // }
 
     this.colors = 'currentColors' in c ? c.currentColors : c
     for (const arg of this.args) {
@@ -122,9 +123,10 @@ export class Message {
 
 export class I18nMessage extends Message {
   toString(language: Language): string {
+    const translated = extractedCompiledMessages[language]?.[this.id]
     return Message.string(
       language,
-      extractedCompiledMessages[language]?.[this.id] ?? this.template,
+      translated ? (Array.isArray(translated) ? translated : [translated]) : this.template,
       this.args,
       this.colors,
       this.postfixes,

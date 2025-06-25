@@ -184,6 +184,7 @@ export function textUnitColorize(
 ): string {
   switch (typeof v) {
     case 'string':
+      if (v.includes('§l')) return unit + v + '§r'
       return unit + v
     case 'undefined':
       return ''
