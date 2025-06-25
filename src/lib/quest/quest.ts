@@ -46,7 +46,7 @@ export class Quest {
 
         step.playerQuest.updateListeners.add(showSidebar)
 
-        const text = `§l${step.quest.name}:§r§6 ${step.text()}`
+        const text = `§l${step.quest.name.toString(player.lang)}:§r§6 ${step.text().toString(player.lang)}`
         const cached = textCache.get(player)
 
         if (cached?.step !== step) {

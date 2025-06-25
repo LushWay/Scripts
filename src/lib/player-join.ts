@@ -31,7 +31,7 @@ class JoinBuilder {
 
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-      if (!firstJoin) player.tell(i18n.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
+      if (!firstJoin) player.tell(i18n.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`.toString(player.lang))
     }, -1),
     playerSpawn: world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       if (!initialSpawn) return
