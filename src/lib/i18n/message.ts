@@ -20,10 +20,11 @@ export class Message {
     colors: Text.Colors,
     postfixes: string[] = [],
   ) {
-    if (template.length === 1 && template[0] && args.length === 0) return template[0] // Return as is, without any colors if string has no args
+    if (template.length === 1 && template[0] && args.length === 0 && postfixes.length === 0 && colors.text === '§7')
+      return template[0] // Return as is, without any colors if string has no args
 
     let v = ''
-    for (const [i, t] of template.concat(postfixes).entries()) {
+    for (const [i, t] of [...template, ...postfixes].entries()) {
       v += colors.text + t
       if (i in args) v += textUnitColorize(args[i], colors, language)
     }
@@ -54,14 +55,24 @@ export class Message {
 
   protected postfixes: string[] = []
 
+  /**
+   * @example
+   *   `Text`.badge(3) -> 'Text (3)' // §r
+   *   `Text`.badge(0) -> 'Text'
+   */
   size(n: number | undefined, text = this.colors.text, num = this.colors.num) {
     if (!n) return this
     this.postfixes.push(` ${text}(${num}${n}${text})`)
     return this
   }
 
+  /**
+   * @example
+   *   `Text`.badge(3) -> 'Text §4(§c3§4)' // §r
+   *   `Text`.badge(0) -> 'Text'
+   */
   badge(n: number | undefined) {
-    return this.size(n, '§c', '§4')
+    return this.size(n, '§4', '§c')
   }
 
   // Name is not toString to avoid unexpected behavior related to js builtin toString

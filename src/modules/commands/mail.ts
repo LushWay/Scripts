@@ -32,7 +32,7 @@ const getJoinSettings = Settings.player(...Join.settings.extend, {
 })
 
 export function mailMenu(player: Player, back?: VoidFunction) {
-  new ArrayForm(t`Почта${Mail.unreadBadge(player.id)}`, Mail.getLetters(player.id))
+  new ArrayForm(i18n`Почта`.badge(Mail.getUnreadMessagesCount(player.id)), Mail.getLetters(player.id))
     .filters({
       unread: {
         name: t`Непрочитанные`,

@@ -15,12 +15,12 @@ export function clanMenu(player: Player, back?: VoidFunction) {
 
   if (clan) {
     return [
-      t.header`Ваш клан${t.badge(clan.isOwner(player.id) ? clan.db.joinRequests.length : 0)}`,
+      i18n.header`Ваш клан`.badge(clan.isOwner(player.id) ? clan.db.joinRequests.length : 0),
       () => inClanMenu({ clan }).show(player, back),
     ] as const
   } else {
     const invitedTo = getInvites(player.id)
-    return [t.header`Кланы${t.badge(invitedTo.length)}`, () => selectOrCreateClanMenu(player, back)] as const
+    return [i18n.header`Кланы`.badge(invitedTo.length), () => selectOrCreateClanMenu(player, back)] as const
   }
 }
 
@@ -40,13 +40,15 @@ function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
     .addCustomButtonBeforeArray(form => {
       const invitedTo = getInvites(player.id)
       if (invitedTo.length)
-        form.button(t.accent`Приглашения${t.badge(invitedTo.length)}`, () => {
-          new ArrayForm(t`Приглашения`, invitedTo)
+        form.button(i18n.accent`Приглашения`.badge(invitedTo.length).toString(player.lang), () => {
+          new ArrayForm(i18n`Приглашения`, invitedTo)
             .button(clan => [getClanName(clan), () => clan.add(player)])
             .back(() => selectOrCreateClanMenu(player, back))
             .show(player)
         })
-      form.button(t`§3Создать свой клан`, () => createClan(player, () => selectOrCreateClanMenu(player, back)))
+      form.button(i18n.accent`Создать свой клан`.toString(player.lang), () =>
+        createClan(player, () => selectOrCreateClanMenu(player, back)),
+      )
     })
     .button(clan => [
       getClanName(clan, clan.db.joinRequests.includes(player.id) ? '§7' : '§f'),
@@ -102,16 +104,16 @@ const inClanMenu = form.withParams<{ clan: Clan }>((f, { self, player, params: {
 
   const isOwner = clan.isOwner(player.id)
 
-  f.button(t`Базы клана${t.size(0)}`, () => {
+  f.button(i18n`Базы клана`.size(0), () => {
     player.fail(t`СКОРО`)
   })
 
-  f.button(t`Участники (${clan.db.members.length})`, () => clanMembers(player, clan, self))
+  f.button(i18n`Участники`.size(clan.db.members.length), () => clanMembers(player, clan, self))
 
   if (isOwner) {
-    f.button(t`Заявки на вступление${t.badge(clan.db.joinRequests.length)}`, () => clanJoinRequests(player, clan, self))
+    f.button(i18n`Заявки на вступление`.badge(clan.db.joinRequests.length), () => clanJoinRequests(player, clan, self))
 
-    f.button(t`Приглашения${t.badge(clan.db.invites.length)}`, () => clanInvites(player, clan, self))
+    f.button(i18n`Приглашения`.badge(clan.db.invites.length), () => clanInvites(player, clan, self))
     f.ask(t.error`Удалить клан`, t.error`Удалить`, () => clan.delete())
   }
 })

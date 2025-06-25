@@ -2,6 +2,7 @@ import { textTable } from 'lib/i18n/text'
 import { createPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { RectangleArea } from './rectangle'
+import { consoleLang } from 'lib/assets/lang'
 
 describe('rectangle', () => {
   it('should detect if vector is in region', () => {
@@ -16,7 +17,7 @@ describe('rectangle', () => {
     expect(rect.center).toEqual({ x: 5, y: 5, z: 5 })
     expect(rect.isNear(createPoint(15, 15, 15), 5)).toBe(true)
 
-    expect(textTable(rect.getFormDescription())).toMatchInlineSnapshot(`
+    expect(textTable(rect.getFormDescription()).toString(consoleLang)).toMatchInlineSnapshot(`
       "§7From: §f§c0 §a0 §b0
       §7To: §f§c10 §a10 §b10
       §7Center: §f§c5 §a5 §b5

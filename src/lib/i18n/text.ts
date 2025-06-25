@@ -16,22 +16,6 @@ export declare namespace Text {
   export type RawTextArg = string | RawText | RawMessage | Message | undefined | null
 
   export interface Static<T> {
-    raw: (text: TSA, ...units: RawTextArg[]) => RawText
-
-    /**
-     * @example
-     *   t.badge(3) -> '§4 (§c3§4)' // §r
-     *   t.badge(0) -> ''
-     */
-    badge: (n: number | undefined) => string
-
-    /**
-     * @example
-     *   t.size(3) -> '§7 (§f3§7)' // §r
-     *   t.size(0) -> ''
-     */
-    size: (n: number | undefined) => string
-
     /**
      * @example
      *   t.time(3000) -> "3 секунды"
@@ -45,7 +29,7 @@ export declare namespace Text {
      *   t.time(ms.from('day', 1) +  ms.from('min', 32) + 1000) -> "1 день, 00:32:01"
      *   t.time(ms.from('day', 10000) +  ms.from('min', 32) + 1000) -> "10000 дней, 00:32:01"
      */
-    timeHHMMSS(time: number): Message | string
+    hhmmss(time: number): Message | string
 
     colors: (colors: Partial<Text.Colors>) => Chained<T>
 
@@ -110,6 +94,20 @@ export function textTable(table: TextTable): Message {
   })
 }
 
+function createStyle(colors: Text.Colors) {
+  return Object.freeze(colors)
+}
+
+const styles = {
+  nocolor: createStyle({ text: '', unit: '', num: '' }),
+  header: createStyle({ text: '§r§6', num: '§f', unit: '§f§l' }),
+  error: createStyle({ num: '§7', text: '§c', unit: '§f' }),
+  warn: createStyle({ num: '§6', text: '§e', unit: '§f' }),
+  accent: createStyle({ num: '§6', text: '§3', unit: '§f' }),
+  success: createStyle({ num: '§6', text: '§a', unit: '§f' }),
+  disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
+}
+
 export const t = createStatic(undefined, undefined, simpleString)
 export const l = createStatic(undefined, undefined, simpleString) as Omit<Text.Chained<string>, 'shared' | 'rp'> &
   Text.Fn<string>
@@ -136,20 +134,6 @@ function defaultColors(colors: Partial<Text.Colors> = {}): Required<Text.Colors>
   return { unit: colors.unit ?? '§f', text: colors.text ?? '§7', num: colors.num ?? '§6' }
 }
 
-function createStyle(colors: Text.Colors) {
-  return Object.freeze(colors)
-}
-
-const styles = {
-  nocolor: createStyle({ text: '', unit: '', num: '' }),
-  header: createStyle({ text: '§r§6', num: '§f', unit: '§f§l' }),
-  error: createStyle({ num: '§7', text: '§c', unit: '§f' }),
-  warn: createStyle({ num: '§6', text: '§e', unit: '§f' }),
-  accent: createStyle({ num: '§6', text: '§3', unit: '§f' }),
-  success: createStyle({ num: '§6', text: '§a', unit: '§f' }),
-  disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
-}
-
 function createStatic<T = string>(
   colors: Partial<Text.Colors> = {},
   modifier = false,
@@ -160,11 +144,8 @@ function createStatic<T = string>(
   fn.shared = fn
   fn.rp = fn
   fn.currentColors = dcolors
-  fn.raw = createRaw(dcolors)
   fn.time = createTime(dcolors)
-  fn.timeHHMMSS = createTimeHHMMSS(dcolors)
-  fn.size = createSizePostfixer(dcolors)
-  fn.badge = createSizePostfixer({ ...dcolors, num: '§c', text: '§4' })
+  fn.hhmmss = createTimeHHMMSS(dcolors)
   fn.colors = colors => createStatic<T>(colors, false, createFn)
 
   if (!modifier) {
@@ -180,47 +161,12 @@ function createStatic<T = string>(
 }
 
 const dayMs = ms.from('day', 1)
-function createTimeHHMMSS(colors: Text.Colors): Text.Static<unknown>['timeHHMMSS'] {
+function createTimeHHMMSS(colors: Text.Colors): Text.Static<unknown>['hhmmss'] {
   return n => {
     const date = new Date(n)
     if (n >= dayMs) {
       return new ServerSideI18nMessage(colors, l => `${intlRemaining(l, n, [ms.converters.day])}, ${date.toHHMMSS()}`)
     } else return date.toHHMMSS()
-  }
-}
-
-export function createSizePostfixer(colors: Text.Colors): Text.Static<unknown>['size'] {
-  return s => {
-    if (!s) return ''
-    return `${colors.text} (${colors.num}${s}${colors.text})`
-  }
-}
-
-// TODO Migrate to never use it
-function createRaw(colors: Text.Colors): Text.Static<unknown>['raw'] {
-  return (text, ...units) => {
-    const texts = text.slice()
-    const raw: RawText = { rawtext: [{ text: colors.text }] }
-
-    for (const [i, t] of texts.entries()) {
-      const unit = units[i] as string | RawText | undefined | null
-
-      raw.rawtext?.push({ text: t })
-      if (unit === '' || unit === undefined || unit === null) continue
-      else if (typeof unit === 'string') {
-        if (unit !== '') raw.rawtext?.push({ text: textUnitColorize(unit, colors, false) })
-      } else {
-        raw.rawtext?.push({ text: colors.unit })
-        if (Array.isArray(unit.rawtext)) {
-          raw.rawtext?.push(...unit.rawtext)
-        } else {
-          raw.rawtext?.push(unit)
-        }
-        raw.rawtext?.push({ text: colors.text })
-      }
-    }
-
-    return raw
   }
 }
 
@@ -260,6 +206,6 @@ export function textUnitColorize(
     case 'bigint':
       return '§c<>'
     case 'boolean':
-      return v ? t.nocolor`§fДа` : t.nocolor`§cНет`
+      return (v ? i18n.nocolor`§fДа` : i18n.nocolor`§cНет`).toString(lang || Language.en_US)
   }
 }

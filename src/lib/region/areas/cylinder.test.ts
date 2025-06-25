@@ -1,5 +1,6 @@
 import { textTable } from 'lib/i18n/text'
 import { CylinderArea } from './cylinder'
+import { consoleLang } from 'lib/assets/lang'
 
 describe('cylinder', () => {
   it('should detect if vector is in region', () => {
@@ -25,7 +26,7 @@ describe('cylinder', () => {
     cylinder.center = { x: 10, y: 10, z: 10 }
     expect(cylinder.center).toEqual({ x: 10, y: 10, z: 10 })
 
-    expect(textTable(cylinder.getFormDescription())).toMatchInlineSnapshot(`
+    expect(textTable(cylinder.getFormDescription()).toString(consoleLang)).toMatchInlineSnapshot(`
       "§7Center: §f§c10 §a10 §b10
       §7Radius: §65
       §7YRadius: §63"

@@ -3,7 +3,7 @@ import { achievementsForm, achievementsFormName } from 'lib/achievements/command
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { form } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { questsMenu } from 'lib/quest/menu'
@@ -33,7 +33,7 @@ Menu.form = form((f, { player, self }) => {
       Anarchy.portal?.teleport(player)
     })
     .button(tp('mg', inv, `§6`, t`Миниигры`, t`§7СКОРО!`), 'textures/blocks/bedrock', self)
-    .button(t`Задания${t.badge(player.database.quests?.active.length)}`, 'textures/ui/sidebar_icons/genre', () =>
+    .button(i18n`Задания`.badge(player.database.quests?.active.length), 'textures/ui/sidebar_icons/genre', () =>
       questsMenu(player, self),
     )
 
@@ -44,7 +44,9 @@ Menu.form = form((f, { player, self }) => {
   }
 
   f.button(t.nocolor`§6Донат\n§7СКОРО!`, 'textures/ui/permissions_op_crown', self)
-    .button(t.nocolor`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, self))
+    .button(i18n.nocolor`§fПочта`.badge(Mail.getUnreadMessagesCount(player.id)), 'textures/ui/feedIcon', () =>
+      mailMenu(player, self),
+    )
     .button(t.nocolor`§bВики`, BUTTON.search, wiki.show)
     .button(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
     .button(t.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, self))

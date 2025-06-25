@@ -28,7 +28,7 @@ describe('item stack', () => {
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
         "§r§f§7Владелец: §fИмя",
-        "§r§7§7Занято: §7§fДа§7",
+        "§r§f§7Занято: §fДа",
         "§r§6§7Отображение опции: §63.000",
       ]
     `)
@@ -42,14 +42,14 @@ describe('item stack', () => {
     expect(item.getLore()).toMatchInlineSnapshot(`
       [
         "§r§f§7Владелец: §fowner",
-        "§r§7§7Занято: §7§fДа§7",
+        "§r§f§7Занято: §fДа",
         "§r§6§7Отображение опции: §63.000",
       ]
     `)
   })
 
   it('should create item with array property', () => {
-    const key = new ItemLoreSchema('test').property('keys', [String]).display('Ключи').build()
+    const key = new ItemLoreSchema('test 2').property('keys', [String]).display('Ключи').build()
 
     const { item, storage } = key.create({ keys: ['string', 'string2'] })
     if (!storage) throw new TypeError('Storage is empty!')

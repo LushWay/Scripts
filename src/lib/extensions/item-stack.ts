@@ -6,7 +6,7 @@ import {
   ItemFoodComponent,
   ItemStack,
 } from '@minecraft/server'
-import { util, wrapLore } from 'lib/util'
+import { wrapLore } from 'lib/util'
 import { expand } from './extend'
 
 interface ItemComponentAliases {
@@ -41,6 +41,7 @@ const aliases = {
 } satisfies Record<keyof ItemComponentAliases, unknown>
 
 for (const [aliasName, { componentId }] of Object.entries(aliases)) {
+  if (aliasName in ItemStack.prototype) continue
   Object.defineProperty(ItemStack.prototype, aliasName, {
     get(this: ItemStack) {
       return this.getComponent(componentId) as ItemComponent

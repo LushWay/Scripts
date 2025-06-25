@@ -39,14 +39,12 @@ function finishSpeedRun(player: Player, target: SpeedRunTarget) {
   if (previous === 0 || took < previous) {
     objectives[target].set(player, took)
     if (previous === 0) {
-      player.success(t`Ваш первый рекорд ${name} поставлен! Это заняло ${t.timeHHMMSS(took)}`)
+      player.success(t`Ваш первый рекорд ${name} поставлен! Это заняло ${t.hhmmss(took)}`)
     } else {
-      player.success(t`Вы побили ваш предыдущий рекорд ${name}! ${t.timeHHMMSS(took)} -> ${t.timeHHMMSS(previous)}`)
+      player.success(t`Вы побили ваш предыдущий рекорд ${name}! ${t.hhmmss(took)} -> ${t.hhmmss(previous)}`)
     }
   } else {
-    player.fail(
-      t`Вы не смогли побить ваш предыдущий рекорд ${name}! ${t.timeHHMMSS(took)} -> ${t.timeHHMMSS(previous)}`,
-    )
+    player.fail(t`Вы не смогли побить ваш предыдущий рекорд ${name}! ${t.hhmmss(took)} -> ${t.hhmmss(previous)}`)
   }
 }
 
@@ -74,7 +72,7 @@ InventoryInterval.slots.subscribe(({ player, slot }) => {
 const speedrunForm = form((f, { player }) => {
   f.title('Speedrun')
   f.body(
-    i18n`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${i18n.timeHHMMSS(player.scores.anarchyOnlineTime * 2.5)}`,
+    i18n`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${i18n.hhmmss(player.scores.anarchyOnlineTime * 2.5)}`,
   )
   for (const [target, name] of Object.entries(speedRunNames)) {
     const selected = player.database.speedrunTarget?.target === target

@@ -26,9 +26,9 @@ export class Leaderboard {
 
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
     if (scoreboardId.endsWith('SpeedRun')) {
-      return t.timeHHMMSS(score)
+      return t.hhmmss(score)
     } else if (scoreboardId.endsWith('Time')) {
-      return t.timeHHMMSS(score * 2.5)
+      return t.hhmmss(score * 2.5)
     } else if (scoreboardId.endsWith('Date')) {
       return new Date(score * 1000).format()
     }

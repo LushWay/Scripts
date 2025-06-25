@@ -69,7 +69,7 @@ describe('location', () => {
     location(point)
 
     expect(consoleErrorSpy.mock.calls[0]?.[0]).toMatchInlineSnapshot(
-      `[TypeError: §cInvalid location, expected '§fx y z§c' but recieved '§fin va lid§c'§c]`,
+      `[TypeError: §cInvalid location, expected '§fx y z§c' but recieved '§fin va lid§c']`,
     )
   })
 

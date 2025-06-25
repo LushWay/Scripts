@@ -19,8 +19,8 @@ export const baseMenu = form.withParams<{ base?: BaseRegion; message?: Text }>(
     f.body(
       i18n`${message ? tm`${message}\n\n` : ''}${isOwner ? t`Это ваша база.` : t`База игрока ${base.ownerName}`}${t`\n\nКоординаты: ${base.area.center}\nРадиус: ${base.area.radius}`}`,
     )
-      .button(t`Телепорт!`, () => player.teleport(Vec.add(base.area.center, { x: 0.5, y: 2, z: 0.5 })))
-      .button(t`Участники${t.size(base.permissions.owners.length)}`, () =>
+      .button(i18n`Телепорт!`, () => player.teleport(Vec.add(base.area.center, { x: 0.5, y: 2, z: 0.5 })))
+      .button(i18n`Участники`.size(base.permissions.owners.length), () =>
         manageRegionMembers(player, base, {
           back: baseBack,
         }),

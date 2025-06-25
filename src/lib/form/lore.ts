@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { form, NewFormCallback, NewFormCreator } from './new'
 
 interface LoreFormDb {
@@ -58,7 +58,7 @@ export class LoreForm {
   renderHistory() {
     this.form.button(
       form(f => {
-        f.title(t`История${t.size(this.history.length)}`)
+        f.title(i18n`История`.size(this.history.length))
         for (const add of this.history) add(f)
       }),
     )

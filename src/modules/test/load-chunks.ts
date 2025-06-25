@@ -71,7 +71,7 @@ new Command('chunkload')
       const speedText = speed < 1000 ? l`${~~speed}ms/chunk` : l.time(speed)
 
       player.onScreenDisplay.setActionBar(
-        l`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nSpeed: ${speedText}/chunk, remaining: ${l.timeHHMMSS(eta)} elapsed: ${l.timeHHMMSS(took)}`,
+        l`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nSpeed: ${speedText}/chunk, remaining: ${l.hhmmss(eta)} elapsed: ${l.hhmmss(took)}`,
         ActionbarPriority.Highest,
       )
     }

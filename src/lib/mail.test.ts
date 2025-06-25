@@ -2,16 +2,12 @@ import 'lib/extensions/player'
 
 import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/utils/rewards'
-import { UnknownTable } from './database/abstract'
+import { TEST_clearDatabase } from 'test/utils'
 
 describe('mail', () => {
   beforeEach(() => {
-    function clear(database: UnknownTable) {
-      for (const key of database.keys()) database.delete(key)
-    }
-
-    clear(Mail.dbGlobal)
-    clear(Mail.dbPlayers)
+    TEST_clearDatabase(Mail.dbGlobal)
+    TEST_clearDatabase(Mail.dbPlayers)
   })
 
   it('should send mail', () => {
@@ -37,15 +33,5 @@ describe('mail', () => {
         },
       ]
     `)
-  })
-
-  it('should have unread badge', () => {
-    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§7"`)
-
-    Mail.send('playerId', 'Some mail', 'content', new Rewards())
-    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§7(§c1§7)§7"`)
-
-    Mail.send('playerId', 'Some mail', 'content', new Rewards())
-    expect(Mail.unreadBadge('playerId')).toMatchInlineSnapshot(`"§7§7(§c2§7)§7"`)
   })
 })

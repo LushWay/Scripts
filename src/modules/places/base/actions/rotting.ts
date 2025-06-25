@@ -68,7 +68,7 @@ function substractMaterials(a: Readonly<Record<string, number>>, b: Readonly<Rec
 export function getSafeFromRottingTime(base: BaseRegion) {
   const time = substractMaterials(base.ldb.materials, base.ldb.barrel)
   if (time === 0) return i18n.error`скоро начнется гниение`
-  return i18n.timeHHMMSS(time * takeMaterialsTime)
+  return i18n.hhmmss(time * takeMaterialsTime)
 }
 
 const baseRottingMenu = form.withParams<{ base: BaseRegion }>((f, { params: { base }, player }) => {
@@ -83,7 +83,7 @@ const baseRottingMenu = form.withParams<{ base: BaseRegion }>((f, { params: { ba
 
   f.title(i18n`Гниение базы`)
   f.body(
-    i18n`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${i18n.timeHHMMSS(takeMaterialsCooldown.getRemainingTime(base.id))}`,
+    i18n`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${i18n.hhmmss(takeMaterialsCooldown.getRemainingTime(base.id))}`,
   )
 })
 

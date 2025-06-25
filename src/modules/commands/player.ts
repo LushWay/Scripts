@@ -4,7 +4,7 @@ import { Achievement } from 'lib/achievements/achievement'
 import { LoreForm } from 'lib/form/lore'
 import { form } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { showStats } from './stats'
 
 new Command('player')
@@ -49,7 +49,7 @@ const playerMenu = form.withParams<{ targetId: string }>((f, { player, params: {
   f.button(
     form(f => {
       const lore = LoreForm.getAll(targetId)
-      f.title(t`Лор прочитан${t.size(lore.length)}`)
+      f.title(i18n`Лор прочитан`.size(lore.length))
       f.body(lore.map(e => stringify(e)).join('\n'))
     }),
   )

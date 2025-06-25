@@ -85,15 +85,6 @@ export class Mail {
   }
 
   /**
-   * Helper function that returns count surrounded by §c() if it is above 0
-   *
-   * @param {string} playerId - Id of the player to get messages from
-   */
-  static unreadBadge(playerId: string) {
-    return t.badge(this.getUnreadMessagesCount(playerId))
-  }
-
-  /**
    * Converts letter pointer or local letter to the LocalLetter
    *
    * @param letter - Letter pointer or the local letter

@@ -6,7 +6,7 @@ import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
-import { l, t } from './i18n/text'
+import { l, t, tm } from './i18n/text'
 import stringifyError from './utils/error'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace
@@ -385,7 +385,7 @@ export function worldSettingsMenu(player: Player) {
       if (option.required && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.button(`${group[SETTINGS_GROUP_NAME] ?? groupId}${t.error.size(unsetCount)}`, () => {
+    form.button(tm.nocolor`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).toString(player.lang), () => {
       settingsGroupMenu(player, groupId, false)
     })
   }

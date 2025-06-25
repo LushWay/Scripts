@@ -94,7 +94,7 @@ describe('region initialization', () => {
     expect(restoreRegionFromJSON(['test', region.json as Immutable<RegionSave>])).toBeUndefined()
     expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7[Region][Database] No kind found for §funknown§7. Available kinds: §fk2, k1§7. Maybe you forgot to register kind or import file?§7",
+        "§7[Region][Database] No kind found for §funknown§7. Available kinds: §fk2, k1§7. Maybe you forgot to register kind or import file?",
       ]
     `)
   })

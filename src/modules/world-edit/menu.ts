@@ -7,7 +7,7 @@ import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { ask } from 'lib/form/message'
 import { translateTypeId } from 'lib/i18n/lang'
-import { t } from 'lib/i18n/text'
+import { tm } from 'lib/i18n/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { weRandomizerTool } from 'modules/world-edit/tools/randomizer'
 import {
@@ -34,7 +34,9 @@ export function WEmenu(player: Player, body = '') {
   const we = WorldEdit.forPlayer(player)
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  form.button(t`§3Наборы блоков${t.size(getOwnBlocksSetsCount(player.id))}`, () => WEblocksSetsMenu(player))
+  form.button(tm.accent`Наборы блоков`.size(getOwnBlocksSetsCount(player.id)).toString(player.lang), () =>
+    WEblocksSetsMenu(player),
+  )
 
   const toolButtons = WorldEditTool.tools.map(tool => ({ tool, buttonText: tool.getMenuButtonName(player) }))
   const inactiveTools = toolButtons.filter(e => e.buttonText.startsWith('§8'))
@@ -42,8 +44,8 @@ export function WEmenu(player: Player, body = '') {
 
   addToForm(activeTools)
 
-  form.button(t`§3Отмена действий${t.size(we.history.length)}`, () => WEundoRedoMenu(player))
-  form.button('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
+  form.button(tm.accent`Отмена действий`.size(we.history.length).toString(player.lang), () => WEundoRedoMenu(player))
+  form.button(tm.accent`Создать сундук блоков из набора`.toString(player.lang), () => WEChestFromBlocksSet(player))
 
   addToForm(inactiveTools)
 
@@ -189,7 +191,7 @@ function WEotherPlayersBlockSetsMenu(player: Player, back: VoidFunction) {
       const name = Player.name(otherPlayerId) ?? otherPlayerId
 
       return [
-        filters.blockCount ? `${name} ${t.size(Object.keys(blocksSets).length)}` : name,
+        filters.blockCount ? tm.nocolor`${name}`.size(Object.keys(blocksSets).length) : name,
         () => {
           WEplayerBlockSetMenu(player, otherPlayerId, blocksSets, () => WEotherPlayersBlockSetsMenu(player, back))
         },

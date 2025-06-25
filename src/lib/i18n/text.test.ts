@@ -24,7 +24,7 @@ describe('i18n', () => {
 describe('text', () => {
   it('should create text', () => {
     expect(t`Some string ${'that colors'} properly ${5} times`).toMatchInlineSnapshot(
-      `"§7Some string §fthat colors§7 properly §65§7 times§7"`,
+      `"§7Some string §fthat colors§7 properly §65§7 times"`,
     )
     expect(t`Some string with ${player}`).toMatchInlineSnapshot(`"§7Some string with §fTest player name§7"`)
   })
@@ -111,11 +111,11 @@ describe('text', () => {
 
   it('should change colors after', () => {
     const msg = i18n.success`Some long text ${'with error'} and number ${4}`
-    expect(msg).toMatchInlineSnapshot(
-      `"§aSome long text §fwith error§a and number §64§a and player §fTest player name§a"`,
-    )
+    expect(msg.toString(Language.en_US)).toMatchInlineSnapshot(`"§aSome long text §fwith error§a and number §64§a"`)
 
-    expect(msg.color(i18n.disabled)).toMatchInlineSnapshot()
+    expect(msg.color(i18n.disabled).toString(Language.en_US)).toMatchInlineSnapshot(
+      `"§8Some long text §7with error§8 and number §74§8"`,
+    )
   })
 
   it('should stringify in warn with nested options', () => {
@@ -143,72 +143,30 @@ describe('text', () => {
     expect(t.time(3000).toString(lang)).toMatchInlineSnapshot(`"3 секунды"`)
     expect(t.time(300000).toString(lang)).toMatchInlineSnapshot(`"5 минут"`)
 
-    expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"00:00:03"`)
-    expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
-      `"04:32:01"`,
-    )
-    expect((t.timeHHMMSS(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
+    expect(t.hhmmss(3000)).toMatchInlineSnapshot(`"00:00:03"`)
+    expect(t.hhmmss(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(`"04:32:01"`)
+    expect((t.hhmmss(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
       `"100 дней, 00:00:03"`,
     )
 
-    expect(t.error.timeHHMMSS(3000)).toMatchInlineSnapshot(`"00:00:03"`)
-    expect((t.error.timeHHMMSS(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
+    expect(t.error.hhmmss(3000)).toMatchInlineSnapshot(`"00:00:03"`)
+    expect((t.error.hhmmss(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
       `"100 дней, 00:00:03"`,
     )
   })
 
   it('should work with badge', () => {
-    expect(t.badge(-3)).toMatchInlineSnapshot(`"§4 (§c-3§4)"`)
-    expect(t.badge(3)).toMatchInlineSnapshot(`"§4 (§c3§4)"`)
-    expect(t.badge(0)).toMatchInlineSnapshot(`""`)
+    const lang = Language.en_US
+    expect(i18n`Text`.badge(-3).toString(lang)).toMatchInlineSnapshot(`"§7Text§7 §4(§c-3§4)"`)
+    expect(i18n`Text`.badge(3).toString(lang)).toMatchInlineSnapshot(`"§7Text§7 §4(§c3§4)"`)
+    expect(i18n`Text`.badge(0).toString(lang)).toMatchInlineSnapshot(`"Text"`)
 
-    expect(t.size(3)).toMatchInlineSnapshot(`"§7 (§63§7)"`)
-    expect(t.size(0)).toMatchInlineSnapshot(`""`)
-    expect(t.error.size(3)).toMatchInlineSnapshot(`"§c (§73§c)"`)
-    expect(t.error.size(0)).toMatchInlineSnapshot(`""`)
-  })
-
-  it('should work with rawTxt', () => {
-    expect(t.raw`Common text`).toMatchInlineSnapshot(`
-      {
-        "rawtext": [
-          {
-            "text": "§7",
-          },
-          {
-            "text": "Common text",
-          },
-        ],
-      }
-    `)
-
-    const rawText = { text: 'value' }
-    const ttt = t.raw`${rawText}`
-    expect(ttt).toMatchInlineSnapshot(`
-      {
-        "rawtext": [
-          {
-            "text": "§7",
-          },
-          {
-            "text": "",
-          },
-          {
-            "text": "§f",
-          },
-          {
-            "text": "value",
-          },
-          {
-            "text": "§7",
-          },
-          {
-            "text": "",
-          },
-        ],
-      }
-    `)
-    expect(ttt.rawtext?.[3]).toBe(rawText)
+    expect(i18n`Size`.size(3).toString(lang)).toMatchInlineSnapshot(`"§7Size§7 §7(§63§7)"`)
+    expect(i18n`Size`.size(0).toString(lang)).toMatchInlineSnapshot(`"Size"`)
+    expect(i18n.nocolor`Size`.size(3).toString(lang)).toMatchInlineSnapshot(`"Size (3)"`)
+    expect(i18n.nocolor`Size`.size(0).toString(lang)).toMatchInlineSnapshot(`"Size"`)
+    expect(i18n.error`Size`.size(3).toString(lang)).toMatchInlineSnapshot(`"§cSize§c §c(§73§c)"`)
+    expect(i18n.error`Size`.size(0).toString(lang)).toMatchInlineSnapshot(`"§cSize"`)
   })
 })
 
@@ -252,6 +210,6 @@ describe('textTable', () => {
 
   it('should create array', () => {
     const player = TEST_createPlayer()
-    expect(textTable([['key', 'value']]).toString(player.lang)).toEqual(['§7key: §fvalue'])
+    expect(textTable([['key', 'value']]).toString(player.lang)).toMatchInlineSnapshot(`"§7key: §fvalue"`)
   })
 })

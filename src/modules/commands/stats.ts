@@ -27,7 +27,7 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
 
   function formatDate(date: number) {
     if (settings.statsRelative) {
-      return t.timeHHMMSS(date)
+      return t.hhmmss(date)
     } else {
       const secsTotal = Math.floor(date / 1000)
 
