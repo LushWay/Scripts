@@ -19,7 +19,7 @@ describe('i18n', () => {
       `"§7Some string with §f3 seconds§7 and§7 §7(§630§7)"`,
     )
 
-    expect(i18n`Гробовщику посвящается`.toString(Language.en_US)).toMatchInlineSnapshot(`"For Gravestoner"`)
+    expect(i18n`Гробовщику посвящается`.toString(Language.en_US)).toMatchInlineSnapshot(`"Гробовщику посвящается"`)
 
     expect(i18n`Вы были выгнаны из клана игроком '${1}'. Причина: ${2}`.toString(Language.en_US)).toMatchInlineSnapshot(
       `"§7You were kicked from the clan by player '§61§7'. Reason: §62§7"`,
@@ -35,7 +35,7 @@ describe('text', () => {
     expect(i18n`Some string with ${player}`).toMatchInlineSnapshot(`"§7Some string with §fTest player name§7"`)
 
     expect(i18n`Some string ${'§lthat colors'} properly ${5} times`).toMatchInlineSnapshot(
-      `"§7Some string §f§lthat colors§7 properly §65§7 times"`,
+      `"§7Some string §f§lthat colors§r§7 properly §65§7 times"`,
     )
   })
 

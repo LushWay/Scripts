@@ -1,11 +1,12 @@
 import { RawMessage, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
 import { Text, textUnitColorize } from './text'
+import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
 type I18nMessages = Record<string, Record<string, string | readonly string[]>>
 
-const extractedMessageIdsToLangTokes: Record<string, string> = {}
+const extractedMessageIdsToLangTokes: Record<string, string> = extractedSharedMessagesIds
 
-const extractedCompiledMessages: I18nMessages = {}
+const extractedCompiledMessages: I18nMessages = extractedTranslatedMessages
 
 export type RawTextArg = string | RawText | Message | undefined | null
 
