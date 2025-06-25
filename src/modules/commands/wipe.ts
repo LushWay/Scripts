@@ -114,7 +114,7 @@ new Command('wipe')
       f.body(i18n`Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ`)
 
       f.ask(
-        i18n`§cПолный сброс`,
+        i18n.error`Полный сброс`,
         i18n`Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.`,
         () => wipe(player),
       )
@@ -189,7 +189,7 @@ function restorePointMenu(player: Player, [ownerId, id]: RestorePointRef, restor
       loadRestorePoint(player, [ownerId, id])
     })
     if (is(player.id, 'techAdmin')) f.button('Log to the console', () => console.log(JSON.stringify(restorePoint)))
-    f.ask(i18n`§cУдалить`, i18n`удалить точку`, () => {
+    f.ask(i18n.error`Удалить`, i18n`удалить точку`, () => {
       Reflect.deleteProperty(db.get(player.id).restorePoints, id)
     })
   })

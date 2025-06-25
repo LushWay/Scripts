@@ -81,12 +81,14 @@ export async function requestAirdrop(isPowerfull: boolean) {
         .createMarkerOnMinimap()
 
       const location = Vec.string(result.topmost, true)
-      world.say(
-        '§l§a>§r ' +
-          (isPowerfull
+
+      for (const player of world.getAllPlayers()) {
+        player.success(
+          isPowerfull
             ? i18n`Усиленный аирдроп скоро упадет на ${location}!`
-            : i18n`Обычный аирдроп скоро упадет на ${location}!`),
-      )
+            : i18n`Обычный аирдроп скоро упадет на ${location}!`,
+        )
+      }
       return airdrop
     } catch (e) {
       if (e instanceof LocationInUnloadedChunkError) {

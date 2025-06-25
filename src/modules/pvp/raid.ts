@@ -60,8 +60,8 @@ system.runInterval(
       const player = players.find(e => e.id === id)?.player
       if (player) {
         if (player.scores.raid === 0) {
-          player.tell(
-            i18n.error`§4§l> §r§cВы вошли в режим рейдблока, потому что ${reason}. Некоторые функции могут быть недоступны`,
+          player.fail(
+            i18n.error`Вы вошли в режим рейдблока, потому что ${reason}. Некоторые функции могут быть недоступны`,
           )
           player.playSound('mob.wolf.bark')
         }

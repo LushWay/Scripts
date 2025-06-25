@@ -31,7 +31,7 @@ const translateRule = createRule({
      * @param {string} t
      * @param {TSESTree.Literal | TSESTree.TemplateLiteral} node
      */
-    function addToTranslates(t, node, literal = false) {
+    function addToTranslates(t, node, additional = '') {
       // Ignore Settings.world({ setting: { name: 'Do not translate this' }})
       if (
         node.parent.type == 'Property' &&
@@ -54,11 +54,11 @@ const translateRule = createRule({
         text += filelink + '\n'
         text += '\n'
       }
-      if (literal) text += 'LITERAL '
+      if (additional) text += additional
       text += t + '\n'
       messages[t] ??= { sources: [], message: t }
       messages[t].sources.push(file)
-      if (literal) {
+      if (additional) {
         messages[t].literal = []
         messages[t].literal.push(file)
       }
@@ -70,12 +70,12 @@ const translateRule = createRule({
     return {
       Literal(node) {
         if (typeof node.value === 'string' && /[а-яА-Я]/.test(node.value)) {
-          if (addToTranslates(node.value, node, true)) {
+          if (addToTranslates(node.value, node, 'LITERAL ')) {
             context.report({
               node,
               messageId: 'dontUseLiterals',
               fix: fixer => {
-                return fixer.replaceText(node, `t\`${node.value}\``)
+                return fixer.replaceText(node, `i18n\`${node.value}\``)
               },
             })
           }
@@ -93,16 +93,16 @@ const translateRule = createRule({
                   : undefined
 
             const name = tag ? tag.name : undefined
-            if (name === 'l') return
+            if (name === 'noI18n' || name === 'i18nJoin') return
 
-            addToTranslates(r, node)
+            addToTranslates(r, node, name === 'i18nShared' ? 'SHARED ' : '')
           } else {
             if (addToTranslates(r, node))
               context.report({
                 node,
                 messageId: 'dontUseLiterals',
                 fix: fixer => {
-                  return fixer.replaceText(node, `t${context.sourceCode.getText(node)}`)
+                  return fixer.replaceText(node, `i18n${context.sourceCode.getText(node)}`)
                 },
               })
           }

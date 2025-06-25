@@ -1,6 +1,7 @@
 import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecraft/server'
 import { defaultLang } from 'lib/assets/lang'
 import { expand } from 'lib/extensions/extend'
+import { i18nShared } from 'lib/i18n/text'
 import { capitalize } from 'lib/util'
 
 declare module '@minecraft/server' {
@@ -35,35 +36,35 @@ declare module '@minecraft/server' {
 }
 
 export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, Text> = {
-  leafs: '§aЛистья',
-  money: '§6Монеты',
-  kills: 'Убийств',
-  deaths: 'Смертей',
-  raid: 'Рейд-блок',
-  totalOnlineTime: 'Онлайн всего',
-  blocksPlaced: 'Блоков поставлено',
-  blocksBroken: 'Блоков сломано',
-  fireworksLaunched: 'Фейрверков запущено',
-  fireworksExpoded: 'Фейрверков взорвано',
-  damageRecieve: 'Урона получено',
-  damageGive: 'Урона нанесено',
-  joinTimes: 'Всего входов на сервер',
-  joinDate: 'Время первого входа',
+  leafs: i18nShared`§aЛистья`,
+  money: i18nShared`§6Монеты`,
+  kills: i18nShared`Убийств`,
+  deaths: i18nShared`Смертей`,
+  raid: i18nShared`Рейд-блок`,
+  totalOnlineTime: i18nShared`Онлайн всего`,
+  blocksPlaced: i18nShared`Блоков поставлено`,
+  blocksBroken: i18nShared`Блоков сломано`,
+  fireworksLaunched: i18nShared`Фейрверков запущено`,
+  fireworksExpoded: i18nShared`Фейрверков взорвано`,
+  damageRecieve: i18nShared`Урона получено`,
+  damageGive: i18nShared`Урона нанесено`,
+  joinTimes: i18nShared`Всего входов на сервер`,
+  joinDate: i18nShared`Время первого входа`,
 
-  anarchyOnlineTime: 'Онлайн на анархии',
-  anarchyBlocksPlaced: 'Блоков поставлено',
-  anarchyBlocksBroken: 'Блоков сломано',
-  anarchyFireworksLaunched: 'Фейрверков запущено',
-  anarchyFireworksExpoded: 'Фейрверков взорвано',
-  anarchyDamageRecieve: 'Урона получено',
-  anarchyDamageGive: 'Урона нанесено',
-  anarchyKills: 'Убийств',
-  anarchyDeaths: 'Смертей',
+  anarchyOnlineTime: i18nShared`Онлайн на анархии`,
+  anarchyBlocksPlaced: i18nShared`Блоков поставлено`,
+  anarchyBlocksBroken: i18nShared`Блоков сломано`,
+  anarchyFireworksLaunched: i18nShared`Фейрверков запущено`,
+  anarchyFireworksExpoded: i18nShared`Фейрверков взорвано`,
+  anarchyDamageRecieve: i18nShared`Урона получено`,
+  anarchyDamageGive: i18nShared`Урона нанесено`,
+  anarchyKills: i18nShared`Убийств`,
+  anarchyDeaths: i18nShared`Смертей`,
 
-  anarchyJoinDate: 'Время первого входа на анархию',
-  anarchyLastSeenDate: 'Последний раз онлайн на анархии',
+  anarchyJoinDate: i18nShared`Время первого входа на анархию`,
+  anarchyLastSeenDate: i18nShared`Последний раз онлайн на анархии`,
 
-  lastSeenDate: 'Последний раз онлайн',
+  lastSeenDate: i18nShared`Последний раз онлайн`,
   pvp: 'PVP',
 }
 

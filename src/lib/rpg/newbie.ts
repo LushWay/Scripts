@@ -28,7 +28,7 @@ export function askForExitingNewbieMode(
     i18n`Если вы совершите это действие, вы потеряете статус новичка:
  - Другие игроки смогут наносить вам урон
  - Другие игроки смогут забирать ваш лут после смерти`,
-    i18n`§cЯ больше не новичок`,
+    i18n.error`Я больше не новичок`,
     () => {
       exitNewbieMode(player, reason)
       callback()
@@ -43,7 +43,7 @@ const logger = createLogger('Newbie')
 function exitNewbieMode(player: Player, reason: Text) {
   if (!isNewbie(player)) return
 
-  player.warn(i18n.nocolor`§eВы ${reason}, поэтому вышли из режима новичка.`)
+  player.warn(i18n.warn`Вы ${reason}, поэтому вышли из режима новичка.`)
   delete player.database.survival.newbie
   player.setProperty(property, false)
 
@@ -87,7 +87,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
         () => damagingEntity.info(i18n`Будь осторожнее в следующий раз.`),
       )
     } else {
-      exitNewbieMode(damagingEntity, i18n`снова ударили игрока`)
+      exitNewbieMode(damagingEntity, i18n.warn`снова ударили игрока`)
     }
   }
 })
@@ -110,5 +110,5 @@ new Command('newbie')
 
 system.runPlayerInterval(player => {
   if (isNewbie(player) && player.scores.anarchyOnlineTime * 2.5 > newbieTime)
-    exitNewbieMode(player, i18n`провели на анархии больше 2 часов`)
+    exitNewbieMode(player, i18n.warn`провели на анархии больше 2 часов`)
 }, 'newbie mode exit')

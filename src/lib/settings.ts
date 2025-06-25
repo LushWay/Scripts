@@ -313,7 +313,7 @@ export function settingsGroupMenu(
                 break
               case 'number':
                 result = Number(input)
-                if (isNaN(result)) return i18n`§cВведите число!`.toString(player.lang)
+                if (isNaN(result)) return i18n.error`Введите число!`.toString(player.lang)
                 break
               case 'object':
                 result = JSON.parse(input) as typeof result

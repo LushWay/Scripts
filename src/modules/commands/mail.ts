@@ -110,7 +110,7 @@ function letterDetailsMenu(
       back()
     })
 
-  let deleteDescription = i18n`§cУдалить письмо?`.toString(player.lang)
+  let deleteDescription = i18n.error`Удалить письмо?`.toString(player.lang)
   if (!letter.rewardsClaimed) {
     if (getSettings(player).mailClaimOnDelete) {
       deleteDescription += i18n` Все награды будут собраны автоматически`.toString(player.lang)

@@ -2,7 +2,7 @@ import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/s
 import { EventSignal } from 'lib/event-signal'
 import { isKeyof } from 'lib/util'
 import { Core } from './extensions/core'
-import { i18n } from './i18n/text'
+import { i18n, noI18n } from './i18n/text'
 
 declare global {
   /** Any known role */
@@ -157,7 +157,7 @@ if (!__VITEST__) {
       if (!isKeyof(role, ROLES)) {
         return console.error(
           `(SCRIPTEVENT::${event.id}) Unkown role: ${role}, allowed roles:\n${Object.entries(ROLES)
-            .map(e => e[0] + ': ' + e[1])
+            .map(e => noI18n`${e[0]}: ${e[1]}`)
             .join('\n')}`,
         )
       }

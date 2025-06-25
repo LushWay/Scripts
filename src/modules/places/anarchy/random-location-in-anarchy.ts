@@ -41,7 +41,7 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
             info?.(i18n`Найдено!`)
             return resolve({ air: position, topmost: topmostBlock })
           } else {
-            info?.(i18n`Вода. Попытка §6${maxTries - i}/${maxTries}`)
+            info?.(i18n`Вода. Попытка ${maxTries - i}/${maxTries}`)
             timeout()
           }
         },

@@ -31,7 +31,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   if (isNewbie(player)) {
     event.cancel = true
     return system.delay(() =>
-      askForExitingNewbieMode(player, i18n`решили создать базу`, () =>
+      askForExitingNewbieMode(player, i18n.warn`решили создать базу`, () =>
         player.success(i18n`Теперь вы можете свободно создать базу!`),
       ),
     )
