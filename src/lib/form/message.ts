@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
-import { l, MaybeRawText, t } from 'lib/i18n/text'
+import { i18n, l, MaybeRawText } from 'lib/i18n/text'
 import { util } from '../util'
 import { NewFormCallback } from './new'
 import { showForm } from './utils'
@@ -92,19 +92,19 @@ export class MessageForm {
 /** Shows MessageForm to the player */
 export function ask(
   player: Player,
-  text: string,
-  yesText: string,
+  text: Text,
+  yesText: Text,
   yesAction?: VoidFunction,
-  noText = t`Отмена`,
+  noText: Text = i18n`Отмена`,
   noAction?: VoidFunction,
 ) {
   return new Promise<boolean>(resolve => {
-    new MessageForm(t`Вы уверены?`, text)
-      .setButton1(yesText, () => {
+    new MessageForm(i18n`Вы уверены?`.toString(player.lang), text.toString(player.lang))
+      .setButton1(yesText.toString(player.lang), () => {
         yesAction?.()
         resolve(true)
       })
-      .setButton2(noText, () => {
+      .setButton2(noText.toString(player.lang), () => {
         noAction?.()
         resolve(false)
       })

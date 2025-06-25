@@ -1,5 +1,5 @@
 import { form } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { Rewards } from 'lib/utils/rewards'
 import { QS, QSBuilder } from '../step'
 
@@ -10,7 +10,7 @@ export class QSButton extends QS {
 }
 
 export class QSButtonBuilder extends QSBuilder<QSButton> {
-  create([text]: [text: QS.Text, ...args: unknown[]] | []) {
+  create([text]: [text: QS.TextT, ...args: unknown[]] | []) {
     super.create(text ? [text] : [t`Заберите награду`])
   }
 
@@ -20,12 +20,12 @@ export class QSButtonBuilder extends QSBuilder<QSButton> {
         if (player.id !== ctx.player.id) return false
 
         return [
-          t`${step.text()}\n§aЗавершено! §6Заберите награду.`,
+          i18n`${step.text()}\n§aЗавершено! §6Заберите награду.`,
           undefined,
           form(f => {
             f.title(ctx.quest.name)
-            f.body(reward.toString())
-            f.button(t`Забрать награду`, () => {
+            f.body(reward.toString(player))
+            f.button(i18n`Забрать награду`, () => {
               reward.give(ctx.player)
               ctx.next()
             })

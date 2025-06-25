@@ -17,7 +17,7 @@ export const wiki = form(f => {
   f.button(t`Руды`, 'textures/blocks/diamond_ore.png', wikiOres)
 })
 
-export const wikiOres = form((f, player) => {
+export const wikiOres = form((f, { player }) => {
   f.title(t`Руды`)
   const totalChance = selectByChance.getTotalChance(ores.getAll())
 

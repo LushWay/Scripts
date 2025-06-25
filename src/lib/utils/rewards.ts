@@ -1,4 +1,4 @@
-import { ItemStack, Player, RawMessage, ScoreName } from '@minecraft/server'
+import { ItemStack, Player, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { emoji } from 'lib/assets/emoji'
 import { l, t } from 'lib/i18n/text'
@@ -107,25 +107,26 @@ export class Rewards {
    *
    * @param reward The reward to stringify
    */
-  static rewardToString(this: void, reward: Rewards.DatabaseEntry): RawMessage {
-    let text: string | RawMessage
+  static rewardToString(this: void, reward: Rewards.DatabaseEntry, player: Player): string {
+    let text: string
     if (reward.type === 'scores') {
       if (reward.score === 'leafs') text = `${reward.count}${emoji.leaf}`
       else if (reward.score === 'money') text = `${reward.count}${emoji.money}`
       else text = `${reward.score} x${reward.count}`
     } else if ((reward.type as string) === 'item')
-      text = itemNameXCount({ nameTag: reward.name, amount: reward.count, typeId: reward.id })
+      text = itemNameXCount(
+        { nameTag: reward.name, amount: reward.count, typeId: reward.id },
+        undefined,
+        undefined,
+        player,
+      )
     else text = l`Unknown reward ${reward.type}`
 
-    return typeof text === 'string' ? { text } : text
+    return text
   }
 
   /** Returns the rewards as a human-readable string */
-  toString(): RawMessage {
-    return {
-      rawtext: this.entries
-        .map((e, i, a) => [Rewards.rewardToString(e), i === a.length - 1 ? { text: '' } : { text: ', ' }])
-        .flat(),
-    }
+  toString(player: Player): string {
+    return this.entries.map(e => Rewards.rewardToString(e, player)).join(', ')
   }
 }

@@ -1,20 +1,16 @@
 import { Player } from '@minecraft/server'
+import { developersAreWarned } from 'lib/assets/text'
 import { MessageForm } from 'lib/form/message'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { Cost } from './cost'
 import { CostType } from './cost/cost'
 import { Shop } from './shop'
 
-export type ProductName = MaybeRawText | ((canBuy: boolean) => MaybeRawText)
+export type ProductName = Text | ((canBuy: boolean) => Text)
 
-type ProductOnBuy = (
-  player: Player,
-  text: MaybeRawText,
-  successBuy: VoidFunction,
-  successBuyText: MaybeRawText,
-) => void | false
+type ProductOnBuy = (player: Player, text: Text, successBuy: VoidFunction, successBuyText: Text) => void | false
 
-type BackFormWithMessage = (message?: MaybeRawText) => void
+type BackFormWithMessage = (message?: Text) => void
 
 type OnProductCreate<T> = (product: Product) => T
 
@@ -78,15 +74,15 @@ export class Product<T extends Cost = any> {
   private name = typeof this.nameGenerator === 'function' ? this.nameGenerator(this.canBuy) : this.nameGenerator
 
   /** Name of this product. Includes cost. */
-  text = t.colors({ unit: this.canBuy ? '§f' : '§7' })
-    .raw`§l${this.name}§r\n${this.cost.toString(this.canBuy, this.player)}`
+  // TODO Fix colors
+  text = i18n.colors({
+    unit: this.canBuy ? '§f' : '§7',
+  })`§l${this.name}§r\n${this.cost.toString(this.player, this.canBuy)}`
 
   private ensurePlayerCanBuy() {
     if (this.cost.has(this.player)) return true
 
-    this.backForm(
-      t.raw`${t.error`Покупка невозможна:${this.cost.multiline ? '\n' : ' '}`}${this.cost.failed(this.player)}`,
-    )
+    this.backForm(t.error`Покупка невозможна:${this.cost.multiline ? '\n' : ' '}${this.cost.failed(this.player)}`)
     return false
   }
 
@@ -105,14 +101,13 @@ export class Product<T extends Cost = any> {
     return [this.text, this.texture, this.callback] as const
   }
 
-  private costString = this.cost.toString(true)
-
   private prompt() {
-    const { player, sell, name, backForm, costString } = this
+    const { player, sell, name, backForm } = this
+    const costString = this.cost.toString(player, true)
 
     new MessageForm(
       t.header`Подтверждение`,
-      sell ? t.raw`Продать ${costString}§r§7 за ${name}§r§7?` : t.raw`Купить ${name}§r§7 за ${costString}§r§7?`,
+      sell ? t`Продать ${costString} за ${name}?` : t`Купить ${name} за ${costString}?`,
     )
       .setButton1(sell ? t`Продать!` : t`Купить!`, this.buy)
       .setButton2(t.error`Отмена`, () => backForm(sell ? t.error`Продажа отменена` : t.error`Покупка отменена`))
@@ -122,10 +117,11 @@ export class Product<T extends Cost = any> {
   private buy = () => {
     if (!this.ensurePlayerCanBuy()) return
 
-    const { sell, name, costString } = this
+    const { sell, name } = this
+    const costString = this.cost.toString(this.player, true)
     const successBuyText = sell
-      ? t.colors({ text: '§a' }).raw`Успешная продажа ${name} за ${costString}!`
-      : t.colors({ text: '§a' }).raw`Успешная покупка ${name} за ${costString}!`
+      ? t.success`Успешная продажа ${name} за ${costString}!`
+      : t.success`Успешная покупка ${name} за ${costString}!`
 
     const successBuy = () => this.backForm(successBuyText)
 
@@ -146,10 +142,7 @@ function wrapWithCatch<T extends (...args: any[]) => unknown>(func: T, player: P
     try {
       return func(...(args as Parameters<T>)) as ReturnType<T>
     } catch (e) {
-      new MessageForm(
-        t`Ошибка`,
-        t`При покупке произошла ошибка. Разработчики уже оповещены и скоро начнут работать над ее исправлением`,
-      ).show(player)
+      new MessageForm(t`Ошибка`, t`При покупке произошла ошибка. ${developersAreWarned}`).show(player)
 
       throw e
     }

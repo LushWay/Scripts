@@ -231,7 +231,7 @@ export class Region {
   }
 
   /** Name that will be displayed on the sidebar e.g. It can be empty. */
-  get displayName(): string | undefined {
+  get displayName(): Text | undefined {
     return undefined
   }
 

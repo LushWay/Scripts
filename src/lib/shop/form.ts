@@ -9,7 +9,8 @@ import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { Message } from 'lib/i18n/message'
+import { t, Text, tm } from 'lib/i18n/text'
 import { Cost } from 'lib/shop/cost'
 import { isKeyof } from 'lib/util'
 import { itemNameXCount } from '../utils/item-name-x-count'
@@ -22,16 +23,16 @@ import { Shop } from './shop'
 
 export type ShopMenuCreate = (menu: ShopFormSection, player: Player) => void
 
-type MaybeRawTextFn = () => MaybeRawText
+type MaybeRawTextFn = () => Text
 
 interface Section {
-  name: MaybeRawText
+  name: Text
   texture?: string
   onOpen: ShopMenuCreate
 }
 
 interface SimpleButton {
-  text: MaybeRawText
+  text: Text
   texture?: string
   callback: VoidFunction
 }
@@ -42,7 +43,7 @@ interface BodyAndTitle {
 }
 
 export type ShopFormSection = {
-  show: (message?: MaybeRawText) => void
+  show: (message?: Text) => void
 } & BodyAndTitle &
   Omit<ShopForm, 'show'>
 
@@ -102,17 +103,17 @@ export class ShopForm {
     name: ProductName,
     cost: Cost,
     itemFilter: (itemStack: ItemStack) => boolean,
-    itemFilterName: MaybeRawText,
-    modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: MaybeRawText) => boolean | void,
+    itemFilterName: Text,
+    modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: Text) => boolean | void,
   ) {
     createItemModifier(this, name, cost, itemFilterName, itemFilter, modifyItem)
     return this
   }
 
   itemModifierSection(
-    name: MaybeRawText,
+    name: Text,
     itemFilter: ItemFilter,
-    itemFilterName: MaybeRawText,
+    itemFilterName: Text,
     onOpen: ShopMenuWithSlotCreate,
     manualAddSelectItem = false,
   ) {
@@ -152,17 +153,12 @@ export class ShopForm {
     return this as ShopForm
   }
 
-  /**
-   * Adds buyable item to shop menu
-   *
-   * @param item
-   * @param cost
-   */
+  /** Adds buyable item to shop menu */
   itemStack(
     item: ItemStack,
     cost: Cost,
     texture = item.typeId.includes('potion') ? getAuxTextureOrPotionAux(item) : getAuxOrTexture(item.typeId),
-    name = itemNameXCount(item, ''),
+    name = itemNameXCount(item, '', undefined, this.player),
   ) {
     const space = getFreeSpaceForItemInInventory(this.player, item)
     const canAdd = space >= item.amount
@@ -192,14 +188,18 @@ export class ShopForm {
    * @param player - Player to open store for
    * @param message - Additional message to show in store description
    */
-  show = (message: MaybeRawText = '') => {
+  show = (message: Text = '') => {
     const { player, back } = this
     const form = Object.setPrototypeOf({ buttons: [] } satisfies { buttons: Buttons }, this) as ShopFormSection & {
       buttons: Buttons
     }
     this.onOpen(form, player)
 
-    const actionForm = new ActionForm(form.title(), t.raw`${message}${message ? '§r\n \n§f' : ''}${form.body()}`)
+    // TODO Fix colors
+    const actionForm = new ActionForm(
+      Message.translate(player.lang, form.title()),
+      t`${message}${message ? '\n\n' : ''}${form.body()}`,
+    )
     if (back) actionForm.addButtonBack(back)
 
     for (const button of form.buttons) {
@@ -207,12 +207,12 @@ export class ShopForm {
         // Section
         const { name, onOpen, texture } = button
 
-        actionForm.addButton(t.colors({ unit: '§3' }).raw`${name}`, texture, () => {
+        actionForm.button(tm`${name}`.color(tm.accent).toString(player.lang), texture, () => {
           ShopForm.showSection(name, form, this.shop, player, this.show, onOpen)
         })
       } else {
         // Common button
-        actionForm.addButton(button.text, button.texture, button.callback)
+        actionForm.button(button.text.toString(player.lang), button.texture, button.callback)
       }
     }
 
@@ -220,14 +220,14 @@ export class ShopForm {
   }
 
   static showSection(
-    name: MaybeRawText,
+    name: Text,
     parent: BodyAndTitle,
     shop: Shop,
     player: Player,
     back: undefined | VoidFunction,
     onOpen: ShopMenuCreate,
   ) {
-    const title = () => t.header.raw`${parent.title()} > ${name}`
+    const title = () => t.header`${parent.title()} > ${name}`
     new ShopForm(title, () => '', shop, onOpen, player, back).show()
   }
 

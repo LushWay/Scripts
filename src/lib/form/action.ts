@@ -45,7 +45,7 @@ export class ActionForm {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, callback: NewFormCallback): ActionForm
+  button(text: string | RawMessage, callback: NewFormCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -54,7 +54,7 @@ export class ActionForm {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, iconPath: string | null | undefined, callback: NewFormCallback): ActionForm
+  button(text: string | RawMessage, iconPath: string | null | undefined, callback: NewFormCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -63,7 +63,7 @@ export class ActionForm {
    * @param iconPathOrCallback - The path this button icon
    * @param callback - What happens when this button is clicked
    */
-  addButton(
+  button(
     text: string | RawMessage,
     iconPathOrCallback: string | null | undefined | NewFormCallback,
     callback?: NewFormCallback,
@@ -81,17 +81,17 @@ export class ActionForm {
   }
 
   /**
-   * Adds back button to the form. Alias to {@link ActionForm.addButton}
+   * Adds back button to the form. Alias to {@link ActionForm.button}
    *
    * @param backCallback - Callback function that will be called when back button is pressed.
    */
   addButtonBack(backCallback: NewFormCallback | undefined) {
     if (!backCallback) return this
-    else return this.addButton(t`§r§3Назад`, BUTTON['<'], backCallback)
+    else return this.button(t`§r§3Назад`, BUTTON['<'], backCallback)
   }
 
   /**
-   * Adds ask button to the form. Alias to {@link ActionForm.addButton}
+   * Adds ask button to the form. Alias to {@link ActionForm.button}
    *
    * Ask is alias to {@link ask}
    *
@@ -106,15 +106,9 @@ export class ActionForm {
    * @param noText - Function that will be called when no button was pressed
    * @param texture - Button texture
    */
-  addButtonAsk(
-    text: string,
-    yesText: string,
-    yesAction: VoidFunction,
-    noText = t`Отмена`,
-    texture: string | null = null,
-  ) {
+  ask(text: string, yesText: string, yesAction: VoidFunction, noText = t`Отмена`, texture: string | null = null) {
     // TODO Fix
-    return this.addButton(text, texture, p =>
+    return this.button(text, texture, p =>
       ask(p, t`§cВы уверены, что хотите ` + text + '?', yesText, yesAction, noText, () => this.show(p)),
     )
   }
@@ -125,7 +119,7 @@ export class ActionForm {
    * @param player Player to show form to
    */
   async show(player: Player): Promise<boolean> {
-    if (!this.buttons.length) this.addButton(l`Empty`, () => this.show(player))
+    if (!this.buttons.length) this.button(l`Empty`, () => this.show(player))
 
     const response = await showForm(this.form, player)
 

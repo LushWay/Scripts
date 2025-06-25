@@ -9,7 +9,7 @@ import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
-import { l, t } from '../i18n/text'
+import { i18n, l, t } from '../i18n/text'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
 import CrateLootAnimation from './animation'
 
@@ -94,19 +94,23 @@ export class Crate {
     this.animation.start(player, this.lootTable.generateOne(), location)
   }
 
-  private preview = form((f, player) => {
+  private preview = form((f, { player }) => {
     f.title(this.name)
-      .body(t`Чтобы открыть этот сундук, возьмите в руки ключ`)
-      .button(t`Купить ключ`, () => {
-        player.fail(t`Пока не работает.`)
+      .body(i18n`Чтобы открыть этот сундук, возьмите в руки ключ`)
+      .button(i18n`Купить ключ`, () => {
+        player.fail(l`Пока не работает.`)
       })
-      .button(t`Посмотреть содержимое`, this.previewItems.show)
+      .button(i18n`Посмотреть содержимое`, this.previewItems.show)
 
     if (is(player.id, 'techAdmin'))
       f.button('admin: get key', () => player.container?.addItem(this.createKeyItemStack()))
   })
 
-  private previewItems = lootTablePreview(this.lootTable, t.header`${t`${this.name} ящик`} > Содержимое`, true)
+  private previewItems = lootTablePreview({
+    lootTable: this.lootTable,
+    name: i18n.header`${i18n`${this.name} ящик`} > Содержимое`,
+    one: true,
+  })
 
   private animation = new CrateLootAnimation(this.place.id, this.dimensionType)
 }

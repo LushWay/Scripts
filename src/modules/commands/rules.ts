@@ -8,7 +8,7 @@ new Command('rules')
   .setPermissions('techAdmin')
   .executes(ctx => f.show(ctx.player))
 
-const f = form((form, player) => {
+const f = form((form, { player }) => {
   form.title('GameRules')
   for (const [name, rules] of Object.entries(ruleSets)) {
     let color = ''

@@ -49,7 +49,7 @@ function tpMenu(player: Player) {
     locations[t`Спавн`] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    form.addButton(`${name} §7(${players} ${ngettext(players, [t`игрок`, t`игрока`, t`игроков`])})`, () => {
+    form.button(`${name} §7(${players} ${ngettext(players, [t`игрок`, t`игрока`, t`игроков`])})`, () => {
       if (player.database.inv !== 'anarchy' && !isNotPlaying(player)) {
         return player.fail(
           t`Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.`,
@@ -59,7 +59,7 @@ function tpMenu(player: Player) {
     })
   }
 
-  form.addButton(t`Телепорт к игроку...`, () => tpToPlayer(player))
+  form.button(t`Телепорт к игроку...`, () => tpToPlayer(player))
 
   return form.show(player)
 }
@@ -70,7 +70,7 @@ function tpToPlayer(player: Player) {
   form.addButtonBack(() => tpMenu(player))
 
   for (const p of world.getAllPlayers()) {
-    form.addButton(getFullname(p), () => player.teleport(p.location))
+    form.button(getFullname(p), () => player.teleport(p.location))
   }
 
   form.show(player)

@@ -368,7 +368,7 @@ export function playerSettingsMenu(player: Player, back?: VoidFunction) {
 
   for (const groupName in Settings.playerConfigs) {
     const name = Settings.playerConfigs[groupName]?.[SETTINGS_GROUP_NAME]
-    if (name) form.addButton(name, () => settingsGroupMenu(player, groupName, true))
+    if (name) form.button(name, () => settingsGroupMenu(player, groupName, true))
   }
 
   form.show(player)
@@ -385,7 +385,7 @@ export function worldSettingsMenu(player: Player) {
       if (option.required && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.addButton(`${group[SETTINGS_GROUP_NAME] ?? groupId}${t.error.size(unsetCount)}`, () => {
+    form.button(`${group[SETTINGS_GROUP_NAME] ?? groupId}${t.error.size(unsetCount)}`, () => {
       settingsGroupMenu(player, groupId, false)
     })
   }

@@ -338,7 +338,7 @@ class Learning {
           t`Режим Перерождение`,
           t`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`,
         )
-          .addButton(t`Вперед!`, () => {
+          .button(t`Вперед!`, () => {
             if (!this.learningLocation.valid) return
 
             logger.player(player).info`Teleporting to ${this.learningLocation}`

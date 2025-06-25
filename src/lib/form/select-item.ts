@@ -2,8 +2,8 @@ import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player }
 import { enchantData } from 'lib/assets/texture-data'
 import { ChestForm } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
-import { langToken, rawTextToString, translateEnchantment, translateToken } from 'lib/i18n/lang'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { langToken, translateEnchantment, translateToken } from 'lib/i18n/lang'
+import { Message } from 'lib/i18n/message'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
 export type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
@@ -19,13 +19,13 @@ export const eqSlots = [
 export function selectItemForm(
   itemFilter: ItemFilter,
   player: Player,
-  text: MaybeRawText,
+  text: Text,
   select: OnSelect,
   back?: VoidFunction,
 ) {
   const { container } = player
   if (!container) return
-  const chestForm = new ChestForm('45').title(t.colors({ unit: '§0' }).raw`${text}`).pattern([0, 0], ['<-     -?'], {
+  const chestForm = new ChestForm('45').title(Message.translate(player.lang, text)).pattern([0, 0], ['<-     -?'], {
     '<': {
       icon: BUTTON['<'],
       callback: back,
@@ -83,7 +83,7 @@ function addItem(
 
 function enchantmentsToLore(item: ItemStack, player: Player): string[] {
   if (item.enchantable) {
-    return item.enchantable.getEnchantments().map(e => rawTextToString(translateEnchantment(e), player.lang))
+    return item.enchantable.getEnchantments().map(e => translateEnchantment(e, player.lang))
   } else return []
 }
 

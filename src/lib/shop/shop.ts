@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { t, textTable } from 'lib/i18n/text'
+import { i18n, t, textTable } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 import { LeafyCost, MoneyCost } from 'lib/shop/cost'
 import { ShopForm, ShopMenuCreate } from './form'
@@ -52,7 +52,9 @@ export class Shop {
           [t`Подтверждение перед покупкой`, Shop.getPlayerSettings(player).prompt],
           [
             t`Ваш баланс`,
-            new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
+            new MoneyCost(player.scores.money).toString(player) +
+              ' ' +
+              new LeafyCost(player.scores.leafs).toString(player),
           ],
         ])
       : ''
@@ -90,8 +92,8 @@ export class Shop {
    */
   open(player: Player) {
     new ShopForm(
-      () => t.header.raw`${this.name}`,
-      () => t.raw`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
+      () => i18n.header`${this.name}`,
+      () => i18n`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
       this,
       this.onOpen,
       player,

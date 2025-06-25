@@ -231,12 +231,12 @@ const scheduledDimensionForm = (
   dimensionType: DimensionType,
   schedules: Table<ScheduleBlockPlace.Stored | undefined>,
 ) =>
-  form((form, player) => {
+  form((form, { player }) => {
     const keys = [...schedules.keys()]
     const size = keys.length
     form.title(`§7${dimensionType}: §f${size}`)
     form.button(l`Place all blocks now`, () => {
-      player.success(`Enjoy the CHAOS. Force-placing ${size} blocks...`)
+      player.success(l`Enjoy the CHAOS. Force-placing ${size} blocks...`)
       system.runJob(
         (function* placeNow() {
           let i = 0

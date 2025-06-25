@@ -115,7 +115,7 @@ system.delay(() => {
 
 const portalMenuOnce = debounceMenu(function portalMenu(
   player: Player,
-  message?: MaybeRawText,
+  message?: Text,
   group?: Group,
   from?: Vector3,
   to?: Vector3,

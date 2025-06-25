@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { i18n, l } from 'lib/i18n/text'
 import { Cost } from './cost'
 
 export class XPCost extends Cost {
@@ -9,18 +9,18 @@ export class XPCost extends Cost {
     if (this.levels < 1) this.levels = 1
   }
 
-  toString(canBuy?: boolean, player?: Player): MaybeRawText {
-    return t.colors({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' }).raw`${this.levels.toString()}lvl`
+  toString(_: Player, canBuy?: boolean): string {
+    return l.colors({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' })`${this.levels.toString()}lvl`
   }
 
   has(player: Player): boolean {
     return player.level >= this.levels
   }
 
-  failed(player: Player): MaybeRawText {
+  failed(player: Player): string {
     const xp = player.level
     const lvl = this.levels
-    return t.error.raw`Нужно уровней опыта: ${(lvl - xp).toString()}§c, ${xp.toString()}/${lvl.toString()}`
+    return i18n.error`Нужно уровней опыта: ${lvl - xp}, ${xp}/${lvl}`.toString(player.lang)
   }
 
   take(player: Player) {

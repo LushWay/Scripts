@@ -144,7 +144,7 @@ export class DungeonRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.addButton(l`Установить структуру`, () => {
+    form.button(l`Установить структуру`, () => {
       this.placeStructure()
     })
   }

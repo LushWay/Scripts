@@ -15,7 +15,7 @@ beforeEach(() => {
 
 describe('i18n', () => {
   it('should translate text', () => {
-    expect(i18n`Some string with ${i18n.time(3000)} and`.size(30).string(Language.en_US)).toMatchInlineSnapshot(
+    expect(i18n`Some string with ${i18n.time(3000)} and`.size(30).toString(Language.en_US)).toMatchInlineSnapshot(
       `"§7Some string with §f3 seconds§7 and§7 §7(§630§7)"`,
     )
   })
@@ -103,6 +103,21 @@ describe('text', () => {
     ).toMatchInlineSnapshot(`"§3Some long text §fwith error§3 and number §64§3 and player §fTest player name§3"`)
   })
 
+  it('should stringify in success with nested options', () => {
+    expect(
+      t.success`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
+    ).toMatchInlineSnapshot(`"§aSome long text §fwith error§a and number §64§a and player §fTest player name§a"`)
+  })
+
+  it('should change colors after', () => {
+    const msg = i18n.success`Some long text ${'with error'} and number ${4}`
+    expect(msg).toMatchInlineSnapshot(
+      `"§aSome long text §fwith error§a and number §64§a and player §fTest player name§a"`,
+    )
+
+    expect(msg.color(i18n.disabled)).toMatchInlineSnapshot()
+  })
+
   it('should stringify in warn with nested options', () => {
     expect(
       t.warn`Some long text ${'with error'} and number ${4} and player ${TEST_createPlayer()}`,
@@ -124,20 +139,20 @@ describe('text', () => {
 
   it('should work with time', () => {
     const lang = Language.ru_RU
-    expect(t.time(0).string(lang)).toMatchInlineSnapshot(`""`)
-    expect(t.time(3000).string(lang)).toMatchInlineSnapshot(`"3 секунды"`)
-    expect(t.time(300000).string(lang)).toMatchInlineSnapshot(`"5 минут"`)
+    expect(t.time(0).toString(lang)).toMatchInlineSnapshot(`""`)
+    expect(t.time(3000).toString(lang)).toMatchInlineSnapshot(`"3 секунды"`)
+    expect(t.time(300000).toString(lang)).toMatchInlineSnapshot(`"5 минут"`)
 
     expect(t.timeHHMMSS(3000)).toMatchInlineSnapshot(`"00:00:03"`)
     expect(t.timeHHMMSS(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(
       `"04:32:01"`,
     )
-    expect((t.timeHHMMSS(ms.from('day', 100) + 3000) as Message).string(lang)).toMatchInlineSnapshot(
+    expect((t.timeHHMMSS(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
       `"100 дней, 00:00:03"`,
     )
 
     expect(t.error.timeHHMMSS(3000)).toMatchInlineSnapshot(`"00:00:03"`)
-    expect((t.error.timeHHMMSS(ms.from('day', 100) + 3000) as Message).string(lang)).toMatchInlineSnapshot(
+    expect((t.error.timeHHMMSS(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
       `"100 дней, 00:00:03"`,
     )
   })
@@ -199,12 +214,13 @@ describe('text', () => {
 
 describe('textTable', () => {
   it('should create text table', () => {
+    const player = TEST_createPlayer()
     expect(
       textTable([
         ['Ключ', 'значение'],
         ['Другой ключ', 2],
         ['Игрок', player],
-      ]),
+      ]).toString(player.lang),
     ).toMatchInlineSnapshot(`
       "§7Ключ: §fзначение
       §7Другой ключ: §62
@@ -218,28 +234,24 @@ describe('textTable', () => {
         ['Другой клsюч', 2],
         ['Другой клssюч', 2],
         ['Другой клsssюч', 2],
-        ['Другой клssssюч', 2],
+        ['Другой клssssюч', i18n.time(3202)],
         ['Другой клsssssюч', 2],
         ['Игрок', player],
-      ]),
+      ]).toString(player.lang),
     ).toMatchInlineSnapshot(`
       "§fКлюч: §fзначение
       §7Другой ключ: §62
       §fДругой клsюч: §62
       §7Другой клssюч: §62
       §fДругой клsssюч: §62
-      §7Другой клssssюч: §62
+      §7Другой клssssюч: §f3 секунды
       §fДругой клsssssюч: §62
       §7Игрок: §fTest player name"
     `)
   })
 
   it('should create array', () => {
-    expectTypeOf(textTable([])).toBeString()
-    expectTypeOf(textTable([], true)).toBeString()
-
-    expectTypeOf(textTable([], false)).toBeArray()
-
-    expect(textTable([['key', 'value']], false)).toEqual(['§7key: §fvalue'])
+    const player = TEST_createPlayer()
+    expect(textTable([['key', 'value']]).toString(player.lang)).toEqual(['§7key: §fvalue'])
   })
 })

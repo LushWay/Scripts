@@ -1,6 +1,5 @@
-import { Player, RawText } from '@minecraft/server'
-import { MaybeRawText, t } from 'lib/i18n/text'
-import { noBoolean } from 'lib/util'
+import { Player } from '@minecraft/server'
+import { i18n } from 'lib/i18n/text'
 import { Cost, ItemCost, LeafyCost, MoneyCost, ScoreboardCost } from '../cost'
 import { CostType } from './cost'
 import { XPCost } from './xp'
@@ -22,17 +21,11 @@ export class MultiCost<T extends Cost[]> extends Cost {
     return this.costs.length > 1 || this.costs.some(e => e.multiline)
   }
 
-  toString(canBuy = true, player?: Player): RawText {
-    return {
-      rawtext: this.costs
-        .map(cost => cost.toString(!canBuy && player ? cost.has(player) : canBuy, player))
-        .map((string, i, arr) => {
-          if (string === '') return false
-          if (arr.length !== 0 && arr[i - 1]) return t.raw`, ${string}`
-          else return t.raw`${string}`
-        })
-        .filter(noBoolean),
-    }
+  toString(player: Player, canBuy = true): string {
+    return this.costs
+      .map(cost => cost.toString(player, canBuy ? true : cost.has(player)))
+      .filter(e => !!e)
+      .join(', ')
   }
 
   has(player: Player): boolean {
@@ -46,22 +39,20 @@ export class MultiCost<T extends Cost[]> extends Cost {
     }
   }
 
-  failed(player: Player): MaybeRawText {
+  failed(player: Player): string {
     super.failed(player)
-    let messages: RawText | undefined
+    let messages = ''
     for (const cost of this.costs) {
       const canBuy = cost.has(player)
       if (!canBuy) {
         const failed = cost.failed(player)
         if (failed === '') continue
 
-        if (messages) {
-          messages = t.raw`${messages}\n${failed}`
-        } else messages = t.raw`${failed}`
+        messages += failed
       }
     }
 
-    return messages ?? t.raw`Недостаточно средств.`
+    return messages || i18n.error`Недостаточно средств.`.toString(player.lang)
   }
 
   item = this.createCostAlias(ItemCost)

@@ -59,9 +59,9 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
         key => `anarchy${capitalize(key)}`,
         n => t`Анархия ${n}`,
       ),
-    ]),
+    ]).toString(player.lang),
   )
-    .addButton('OK', () => null)
+    .button('OK', () => null)
     .addButtonBack(back)
     .show(player)
 }

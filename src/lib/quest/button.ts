@@ -1,12 +1,12 @@
 import { Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { form, ShowForm } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { manageQuestMenu } from './menu'
 import { Quest } from './quest'
 import { QS } from './step'
 
-type RenderedQuestButton = false | [text: string, texture: string | undefined, callback: VoidFunction | ShowForm]
+type RenderedQuestButton = false | [text: Text, texture: string | undefined, callback: VoidFunction | ShowForm]
 
 export class QuestButton {
   constructor(private quest: Quest) {}
@@ -15,7 +15,7 @@ export class QuestButton {
 
   render(player: Player, back: VoidFunction, description = this.quest.description): RenderedQuestButton {
     if (this.quest.isCompleted(player))
-      return [t`${this.quest.name}\n§aЗавершен!`, undefined, manageQuestMenu(this.quest)]
+      return [i18n.success`${this.quest.name}\nЗавершен!`, undefined, manageQuestMenu({ quest: this.quest })]
 
     const step = this.quest.getCurrentStep(player)
     if (!step)
@@ -25,7 +25,7 @@ export class QuestButton {
         form(f => {
           f.title(this.quest.name)
           f.body(description)
-          f.button(t`Взять задание`, () => this.quest.enter(player))
+          f.button(i18n`Взять задание`, () => this.quest.enter(player))
         }),
       ]
 
@@ -34,6 +34,7 @@ export class QuestButton {
       if (override) return override
     }
 
-    return [`§l${this.quest.name}§r\n§6${step.text()}`, undefined, manageQuestMenu(this.quest)]
+    // TODO Fix colors
+    return [`§l${this.quest.name}§r\n§6${step.text()}`, undefined, manageQuestMenu({ quest: this.quest })]
   }
 }

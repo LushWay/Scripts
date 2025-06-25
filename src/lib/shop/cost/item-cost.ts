@@ -1,6 +1,7 @@
 import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { eqSlots } from 'lib/form/select-item'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { Message } from 'lib/i18n/message'
+import { Text, i18n, l } from 'lib/i18n/text'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
 import { CostType } from './cost'
@@ -76,19 +77,20 @@ export class ItemCost extends Cost {
     super.take(player)
   }
 
-  toString(canBuy?: boolean, _?: Player, amount = true): MaybeRawText {
+  toString(player: Player, canBuy?: boolean, amount = true): string {
     return itemNameXCount(
       this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',
       amount,
+      player.lang,
     )
   }
 
-  failed(player: Player): MaybeRawText {
+  failed(player: Player): string {
     super.failed(player)
     const items = this.getItems(player)
 
-    return t.raw`${t.error`${this.amount - items.amount}/${this.amount} `}${this.toString(false, void 0, false)}`
+    return l.error`${this.amount - items.amount}/${this.amount} ${this.toString(player, false, false)}`
   }
 }
 
@@ -97,20 +99,22 @@ export class ShouldHaveItemCost extends ItemCost {
     return CostType.Requirement
   }
 
-  static createFromFilter(filter: ItemFilter, text?: ShouldHaveItemCost['text']) {
+  static createFromFilter(filter: ItemFilter, text?: Text) {
     const cost = new this('', 1, filter)
     cost.text = text ?? ''
     return cost
   }
 
-  private text: MaybeRawText = ''
+  private text: Text = ''
 
-  toString() {
-    return this.text
+  toString(player: Player) {
+    return Message.translate(player.lang, this.text)
   }
 
   failed(player: Player) {
-    return this.text ? t.colors({ text: '§c', unit: '§c' }).raw`В инвентаре нет ${this.text}` : t.error`Нет предмета`
+    // TODO Fix colors
+    const message = this.text ? i18n.error`В инвентаре нет ${this.text}` : i18n.error`Нет предмета`
+    return Message.translate(player.lang, message)
   }
 
   take(player: Player): void {

@@ -3,13 +3,20 @@ import { ArrayForm } from 'lib/form/array'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
 import { translateEnchantment } from 'lib/i18n/lang'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { I18nMessage } from 'lib/i18n/message'
+import { i18n, t } from 'lib/i18n/text'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { LootTable } from './loot-table'
 
-export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.header`Содержимое`, one = false) => {
-  const previewItems = form(f => {
+// TODO Fix colors
+export const lootTablePreview = form.withParams<{ lootTable: LootTable; name?: I18nMessage; one?: boolean }>(
+  (f, { player, params: { lootTable, name = i18n.header`Содержимое`, one = false } }) => {
     f.title(name)
+
+    const itemForm = form.withParams<{ item: (typeof lootTable.items)[number] }>((f, { player, params: { item } }) => {
+      const i = typeof item.itemStack === 'function' ? item.itemStack() : item.itemStack
+      f.title(itemNameXCount(i, '', false, player))
+    })
 
     const maxPercent = one
       ? lootTable.items.reduce((p, c) => p + c.weight, 0)
@@ -17,38 +24,24 @@ export const lootTablePreview = (lootTable: LootTable, name: MaybeRawText = t.he
     for (const item of lootTable.items) {
       const { amount, enchantments, itemStack: i } = item
       const itemStack = typeof i === 'function' ? i() : i
-      const name = itemNameXCount(itemStack, '', false)
+      const name = itemNameXCount(itemStack, '', false, player)
       const amountText = amount[0] === amount.at(-1) ? '' : ` x${amount[0]}...${amount.at(-1)} `
       const enchanted = !!Object.keys(enchantments).length
       const enchantmentsText = enchanted
-        ? {
-            rawtext: [
-              { text: ' ' },
-              ...Object.keys(enchantments)
-                .map(e => translateEnchantment(e))
-                .map(e => e.rawtext)
-                .flat()
-                .filter(e => typeof e === 'object'),
-            ],
-          }
+        ? ' ' +
+          Object.keys(enchantments)
+            .map(e => translateEnchantment(e, player.lang))
+            .join('\n')
         : ''
 
       f.button(
-        t.raw`${name}\n${'§r§7' + (~~((item.weight / maxPercent) * 100)).toString()}§7%%${amountText}${enchantmentsText}`,
+        t`${name}\n${'§r§7' + (~~((item.weight / maxPercent) * 100)).toString()}§7%%${amountText}${enchantmentsText}`,
         getAuxOrTexture(itemStack.typeId, enchanted),
-        itemForm(item),
+        itemForm({ item }),
       )
     }
-  })
-
-  const itemForm = (item: (typeof lootTable.items)[number]) =>
-    form(f => {
-      const i = typeof item.itemStack === 'function' ? item.itemStack() : item.itemStack
-      f.title(itemNameXCount(i, '', false))
-    })
-
-  return previewItems
-}
+  },
+)
 
 new Command('loottable')
   .setPermissions('techAdmin')
@@ -70,7 +63,7 @@ function lootTables(player: Player) {
       if (!table.id && settings.onlyWithId) return false
       return [
         table.id ?? t`Unkown table with ${table.items.length} items`,
-        () => lootTablePreview(table).show(player, back),
+        () => lootTablePreview({ lootTable: table }).show(player, back),
       ] as const
     })
     .show(player)

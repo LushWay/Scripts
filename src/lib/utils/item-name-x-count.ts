@@ -1,48 +1,33 @@
-import { ItemPotionComponent, ItemStack, Player, RawMessage } from '@minecraft/server'
+import { ItemPotionComponent, ItemStack, Player } from '@minecraft/server'
 import {
   MinecraftPotionEffectTypes as PotionEffects,
   MinecraftPotionModifierTypes as PotionModifiers,
 } from '@minecraft/vanilla-data'
-import { langToken } from 'lib/i18n/lang'
+import { Language } from 'lib/assets/lang'
+import { langToken, translateToken } from 'lib/i18n/lang'
 import { t } from 'lib/i18n/text'
-import { noBoolean } from 'lib/util'
 
 /** Returns <item name>\nx<count> */
 export function itemNameXCount(
   item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'> | ItemStack,
   c = '§7',
   amount = true,
-  player?: Player,
-): RawMessage {
-  const colorMessage: RawMessage | false = c ? { text: c } : false
+  player: Player | Language,
+): string {
+  const locale = player instanceof Player ? player.lang : player
   const potion = item instanceof ItemStack && item.getComponent(ItemPotionComponent.componentId)
   if (potion) {
     const { potionEffectType: effect, potionLiquidType: liquid, potionModifierType: modifier } = potion
 
-    const lang = langToken(`minecraft:${liquid.id}_${effect.id}_potion`)
+    const token = langToken(`minecraft:${liquid.id}_${effect.id}_potion`)
     const modifierIndex = modifier.id === PotionModifiers.Normal ? 0 : modifier.id === PotionModifiers.Long ? 1 : 2
     const time = potionModifierToTime[effect.id]?.[modifierIndex]
     const modifierS = modifierIndexToS[modifierIndex]
 
-    return {
-      rawtext: [
-        colorMessage,
-        item.nameTag ? { text: item.nameTag } : { translate: lang },
-        modifierS ? { text: modifierS } : false,
-        time ? { text: ` §7${time}` } : false,
-      ].filter(noBoolean),
-    }
+    return `${c}${item.nameTag ?? translateToken(token, locale)}${modifierS ?? ''}${time ? ` §7${time}` : ''}`
   }
 
-  return {
-    rawtext: [
-      colorMessage,
-      item.nameTag
-        ? { text: (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') }
-        : { translate: langToken(item) },
-      amount && item.amount ? { text: ` §r§f${c}x${item.amount}` } : false,
-    ].filter(noBoolean),
-  }
+  return `${c}${item.nameTag ? (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') : translateToken(langToken(item), locale)}${amount && item.amount ? ` §r§f${c}x${item.amount}` : ''}`
 }
 
 function uncolor(t: string) {

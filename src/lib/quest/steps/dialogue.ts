@@ -30,7 +30,7 @@ export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = t.nocolor
               const form = new ActionForm(npc.name, body)
 
               for (const [text, callback] of buttons) {
-                form.addButton(text, callback.bind(null, ctx, show))
+                form.button(text, callback.bind(null, ctx, show))
               }
 
               form.show(this.player)

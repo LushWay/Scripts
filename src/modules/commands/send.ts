@@ -58,25 +58,25 @@ export function sendMenu(player: Player, back?: VoidFunction, state?: SendState)
 
   const form = new ActionForm('Отправить письмо')
 
-  form.addButton(
+  form.button(
     ...createSelectPlayerMenu(player, state.recipients, () => sendMenu(player, back, state), {
       title: 'Выбрать игроков',
     }),
   )
 
-  form.addButton('Добавить счёт', () => addScoresMenu(player, state))
+  form.button('Добавить счёт', () => addScoresMenu(player, state))
   const rewards = state.rewards.serialize()
   for (const reward of rewards) {
     // We want to use the index
-    form.addButton(Rewards.rewardToString(reward), () => {
+    form.button(Rewards.rewardToString(reward, player), () => {
       state.rewards.remove(reward)
       sendMenu(player, state.back, state)
     })
   }
 
-  form.addButton('Изменить тему и текст', () => editEmailMenu(player, state))
+  form.button('Изменить тему и текст', () => editEmailMenu(player, state))
 
-  form.addButton('Отправить', () =>
+  form.button('Отправить', () =>
     Mail.sendMultiple(
       state.recipients.length == 0 ? [...Player.database.keys()] : state.recipients.map(p => p.id),
       state.title,

@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { form, NewFormCallback } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { Achievement } from './achievement'
 
@@ -13,7 +13,7 @@ Achievement.command = new Command('achiv')
 
 export function achievementsFormName(player: Player) {
   const notTaken = Achievement.list.filter(e => e.isDone(player) && !e.isRewardTaken(player))
-  return t.warn`Достижения${t.badge(notTaken.length)}`
+  return i18n.warn`Достижения`.badge(notTaken.length)
 }
 
 export function achievementsForm(player: Player, back?: NewFormCallback) {
@@ -55,8 +55,9 @@ export function achievementsForm(player: Player, back?: NewFormCallback) {
     .button(item => {
       const isDone = item.isDone(player)
       const isRewardTaken = item.isRewardTaken(player)
+      // TODO Fix colors
       return [
-        isDone ? (isRewardTaken ? item.name : t`${item.name}§c*\n§aЗаберите награды!`) : t`?\nНеизвестно`,
+        isDone ? (isRewardTaken ? item.name : t`${item.name}§c*\n§aЗаберите награды!`) : i18n`?\nНеизвестно`,
         isDone ? p => achievementDetails(item).show(p, self) : self,
       ] as const
     })
@@ -64,11 +65,11 @@ export function achievementsForm(player: Player, back?: NewFormCallback) {
 }
 
 const achievementDetails = (achiv: Achievement<unknown>) =>
-  form((f, player, back) => {
+  form((f, { player, back }) => {
     f.title(achiv.name)
-    f.body(t.raw`Награда: ${achiv.reward.toString()}`)
+    f.body(i18n`Награда: ${achiv.reward.toString(player)}`)
     f.button(
-      achiv.isRewardTaken(player) ? t`Награды забраны` : t`§aЗабрать награды`,
+      achiv.isRewardTaken(player) ? i18n`Награды забраны` : i18n.success`Забрать награды`,
       () => (achiv.takeRewards(player), achievementDetails(achiv).show(player, back)),
     )
     if (is(player.id, 'admin')) {

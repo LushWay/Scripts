@@ -1,7 +1,7 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { customItems, CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { isNewbie } from 'lib/rpg/newbie'
 import { Group } from 'lib/rpg/place'
@@ -23,16 +23,16 @@ export const Chip = new ItemStack(Items.Chip).setInfo(
 customItems.push(CircuitBoard, Chip)
 
 export const NotNewbieCost = new (class NotNewbieCost extends Cost {
-  toString(canBuy?: boolean): MaybeRawText {
-    return canBuy ? '' : t.error`Вы не можете купить это в режиме новичка`
+  toString(player: Player, canBuy?: boolean): string {
+    return canBuy ? '' : i18n.error`Вы не можете купить это в режиме новичка`.toString(player.lang)
   }
 
   has(player: Player): boolean {
     return !isNewbie(player)
   }
 
-  failed(player: Player): MaybeRawText {
-    return this.toString()
+  failed(player: Player): string {
+    return this.toString(player)
   }
 })()
 

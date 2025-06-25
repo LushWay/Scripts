@@ -17,7 +17,7 @@ describe('ActionForm', () => {
       `)
       return 0
     })
-    await new ActionForm('title', 'body').addButton('button', cb).show(player)
+    await new ActionForm('title', 'body').button('button', cb).show(player)
 
     expect(cb).toHaveBeenCalledOnce()
   })

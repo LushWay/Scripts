@@ -291,11 +291,11 @@ const tests: Record<
   },
   f(ctx) {
     const form = new ActionForm('MENUS', 'Menu body', '§c§u§s§r§f')
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
     form.show(ctx.player)
   },
   title(ctx) {
@@ -348,7 +348,7 @@ const tests: Record<
     console.error(new TypeError('This is error test'))
   },
   forms: ctx => {
-    const menu = new ActionForm('Action', 'body').addButton('button', () => {
+    const menu = new ActionForm('Action', 'body').button('button', () => {
       new ModalForm('ModalForm')
         .addDropdown('drdown', ['op', 'op2'])
         .addSlider('slider', 0, 5, 1)
@@ -486,10 +486,10 @@ const tests: Record<
   },
   frm(ctx) {
     new ActionForm('Test')
-      .addButton('Test', getAuxOrTexture(MinecraftItemTypes.TripwireHook), () => {})
-      .addButton('Test', BUTTON['<'], () => {})
-      .addButton('Test', getAuxOrTexture(BUTTON['<']), () => {})
-      .addButton('Test', () => {})
+      .button('Test', getAuxOrTexture(MinecraftItemTypes.TripwireHook), () => {})
+      .button('Test', BUTTON['<'], () => {})
+      .button('Test', getAuxOrTexture(BUTTON['<']), () => {})
+      .button('Test', () => {})
       .show(ctx.player)
   },
   lore(ctx) {
@@ -498,21 +498,21 @@ const tests: Record<
 
   form(ctx) {
     new ActionForm('Common action form', 'Common action form body')
-      .addButton('NpcForm', () => {
+      .button('NpcForm', () => {
         const form = new FormNpc(
           'title',
           'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs',
         )
 
-        form.addButton('Кнопка 1', () => ctx.player.success('Ура'))
+        form.button('Кнопка 1', () => ctx.player.success('Ура'))
 
-        form.addButton('Кнопка 2', () => ctx.player.success('Ура'))
+        form.button('Кнопка 2', () => ctx.player.success('Ура'))
 
-        form.addButton('Кнопка 3', () => ctx.player.success('Ура'))
+        form.button('Кнопка 3', () => ctx.player.success('Ура'))
 
         form.show(ctx.player)
       })
-      .addButton('ChestForm', () => {
+      .button('ChestForm', () => {
         new ChestForm('9')
           .title('9 slots chest ui')
           .pattern([0, 0], ['xxxxxx'], {

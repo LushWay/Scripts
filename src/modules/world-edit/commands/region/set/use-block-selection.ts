@@ -107,22 +107,19 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 
   const promise = new Promise<SelectedBlock>(resolve => {
     const base = new ActionForm('Выбери блок/набор блоков')
-      .addButton(ActionForm.backText, back)
-      .addButton(
-        selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков',
-        () => {
-          const blocksSets = getAllBlocksSets(player.id)
+      .button(ActionForm.backText, back)
+      .button(selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков', () => {
+        const blocksSets = getAllBlocksSets(player.id)
 
-          const form = new ActionForm('Наборы блоков').addButton(ActionForm.backText, () => base.show(player))
+        const form = new ActionForm('Наборы блоков').button(ActionForm.backText, () => base.show(player))
 
-          for (const blocksSet of Object.keys(blocksSets)) {
-            form.addButton(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
-          }
+        for (const blocksSet of Object.keys(blocksSets)) {
+          form.button(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
+        }
 
-          form.show(player)
-        },
-      )
-      .addButton(
+        form.show(player)
+      })
+      .button(
         selectedBlock ? `§2Сменить выбранный блок: §f${selectedBlock}` : 'Выбрать из инвентаря/под ногами',
         () => {
           const form = new ChestForm('large')
@@ -190,7 +187,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
       )
 
     if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
-      base.addButton('§2Редактировать свойства выбранного блока', async () => {
+      base.button('§2Редактировать свойства выбранного блока', async () => {
         const selection = currentSelection.permutations[0]
         if (!selection) throw new Error('No selection!')
 
@@ -211,10 +208,10 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
       })
 
     base
-      .addButton('Ввести ID вручную', () => {
+      .button('Ввести ID вручную', () => {
         selectBlockByIdModal(player, resolve)
       })
-      .addButton('§cОчистить выделение', () => {
+      .button('§cОчистить выделение', () => {
         resolve(undefined)
       })
 

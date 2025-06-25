@@ -1,7 +1,6 @@
-import { Block, BlockPermutation, ContainerSlot, Player, RawText, system } from '@minecraft/server'
+import { Block, BlockPermutation, ContainerSlot, Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import {
-  ActionForm,
   actionGuard,
   ActionGuardOrder,
   Cooldown,
@@ -14,7 +13,9 @@ import {
   Vec,
 } from 'lib'
 import { table } from 'lib/database/abstract'
-import { t } from 'lib/i18n/text'
+import { form } from 'lib/form/new'
+import { Message } from 'lib/i18n/message'
+import { i18n, t } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
@@ -66,50 +67,46 @@ function substractMaterials(a: Readonly<Record<string, number>>, b: Readonly<Rec
 
 export function getSafeFromRottingTime(base: BaseRegion) {
   const time = substractMaterials(base.ldb.materials, base.ldb.barrel)
-  if (time === 0) return t.error`скоро начнется гниение`
-  return t.timeHHMMSS(time * takeMaterialsTime)
+  if (time === 0) return i18n.error`скоро начнется гниение`
+  return i18n.timeHHMMSS(time * takeMaterialsTime)
 }
 
-function baseRottingMenu(base: BaseRegion, player: Player, back?: VoidFunction) {
+const baseRottingMenu = form.withParams<{ base: BaseRegion }>((f, { params: { base }, player }) => {
   const barrel = base.dimension.getBlock(base.area.center)
   if (barrel?.isValid) reviseMaterials(base, barrel)
 
-  const materials: RawText = materialsToRawText(base.ldb.materials)
-  const barrelMaterials = materialsToRawText(base.ldb.barrel)
+  const materials = materialsToRString(base.ldb.materials, player)
+  const barrelMaterials = materialsToRString(base.ldb.barrel, player)
   const missingMaterialsText = isEmpty(base.ldb.materialsMissing)
-    ? t`§aВсех материалов хватает!\nБаза защищена от гниения на ${getSafeFromRottingTime(base)}§r\n`
-    : t.raw`§cНе хватает ресурсов:\n${materialsToRawText(base.ldb.materialsMissing)}`
+    ? i18n.success`Всех материалов хватает!\nБаза защищена от гниения на ${getSafeFromRottingTime(base)}§r\n`
+    : i18n.error`Не хватает ресурсов:\n${materialsToRString(base.ldb.materialsMissing, player)}`
 
-  const form = new ActionForm(
-    t`Гниение базы`,
-    t.raw`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${t.timeHHMMSS(takeMaterialsCooldown.getRemainingTime(base.id))}`,
-  ).addButtonBack(back)
+  f.title(i18n`Гниение базы`)
+  f.body(
+    i18n`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${i18n.timeHHMMSS(takeMaterialsCooldown.getRemainingTime(base.id))}`,
+  )
+})
 
-  form.show(player)
-}
-
-export function materialsToRawText(ldbMaterials: Readonly<Record<string, number>>): RawText {
-  return {
-    rawtext: Object.entries(ldbMaterials)
-      .map(([typeId, amount]) => ({
-        rawtext: [itemNameXCount({ typeId, amount }, '§f§l'), { text: '\n' }],
-      }))
-      .concat({ rawtext: [{ text: '§r' }] }),
-  }
+export function materialsToRString(ldbMaterials: Readonly<Record<string, number>>, player: Player): string {
+  return (
+    Object.entries(ldbMaterials)
+      .map(([typeId, amount]) => itemNameXCount({ typeId, amount }, '§f§l', undefined, player.lang))
+      .join('\n') + '§r'
+  )
 }
 
 export function baseRottingButton(base: BaseRegion, player: Player, back?: VoidFunction) {
-  let text = ''
+  let text: Message
   if (base.ldb.state === RottingState.NoMaterials) {
-    text = t.nocolor`§cБаза гниет!
+    text = i18n.nocolor`§cБаза гниет!
 §4Срочно пополните материалы!`
   } else if (base.ldb.state === RottingState.Destroyed) {
-    text = t.nocolor`§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vec.string(base.area.center, true)}!`
+    text = i18n.nocolor`§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vec.string(base.area.center, true)}!`
   } else {
-    text = t.nocolor`Состояние базы`
+    text = i18n.nocolor`Состояние базы`
   }
 
-  return [text, baseRottingMenu.bind(null, base, player, back)] as const
+  return [text, baseRottingMenu({ base })] as const
 }
 
 async function startRotting(base: BaseRegion, state: RottingState) {

@@ -36,7 +36,7 @@ function scoreManagerMenu(player: Player) {
     if (a1) return -1
     return 1
   })) {
-    form.addButton(scoreboard.displayName, () => {
+    form.button(scoreboard.displayName, () => {
       scoreboardMenu(player, scoreboard)
     })
   }
@@ -80,8 +80,8 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
       ]
     })
     .addCustomButtonBeforeArray(form => {
-      form.addButton('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, objective))
-      form.addButtonAsk(
+      form.button('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, objective))
+      form.ask(
         '§cУдалить таблицу',
         '§cУдалить',
         () => world.scoreboard.removeObjective(objective.id),
@@ -111,8 +111,8 @@ function editPlayerScore(
   const description = getScoreDescription(targetId, targetName, manager)
   new ActionForm(scoreboard.displayName, description)
     .addButtonBack(back)
-    .addButton('Добавить к счету', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'add'))
-    .addButton('Установить значение', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'set'))
+    .button('Добавить к счету', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'add'))
+    .button('Установить значение', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'set'))
     .show(player)
 }
 

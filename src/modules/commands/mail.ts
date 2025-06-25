@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
 import { ngettext } from 'lib/i18n/ngettext'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/utils/rewards'
 
@@ -84,27 +84,27 @@ function letterDetailsMenu(
   message = '',
 ) {
   const settings = getSettings(player)
+  // TODO Fix collors
   const form = new ActionForm(
     letter.title,
-    t.raw`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString()}`,
+    i18n`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString(player)}`.toString(
+      player.lang,
+    ),
   ).addButtonBack(back)
 
   if (!letter.rewardsClaimed && letter.rewards.length)
-    form.addButton(t`Забрать награду`, () => {
+    form.button(t`Забрать награду`, () => {
       Mail.claimRewards(player, index)
       letterDetailsMenu(
         { letter, index },
         player,
         back,
-        message +
-          t`§aНаграда успешно забрана!
-
-§r§f`,
+        message + i18n.success`Награда успешно забрана!\n\n`.toString(player.lang),
       )
     })
 
   if (!letter.read && !settings.mailReadOnOpen)
-    form.addButton(t`Пометить как прочитанное`, () => {
+    form.button(t`Пометить как прочитанное`, () => {
       Mail.readMessage(player.id, index)
       back()
     })
@@ -118,7 +118,7 @@ function letterDetailsMenu(
     }
   }
 
-  form.addButton(t`§cУдалить письмо`, null, () => {
+  form.button(t`§cУдалить письмо`, null, () => {
     ask(player, deleteDescription, t`§cУдалить`, () => {
       if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
       Mail.deleteMessage(player, index)

@@ -33,7 +33,7 @@ const info = t
 const warn = t.warn
 const error = t.error
 
-function createLevel(name: string, level: 'debug' | 'error' | 'info' | 'warn', text: Text.Fn) {
+function createLevel(name: string, level: 'debug' | 'error' | 'info' | 'warn', text: Text.Fn<string>) {
   return (t: unknown, ...args: unknown[]) => {
     if (isTemplateStringsArray(t)) {
       console[level](name, text(t, ...args))

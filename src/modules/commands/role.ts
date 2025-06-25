@@ -68,7 +68,7 @@ function roleMenu(player: Player) {
       const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
 
       if (button)
-        form.addButton(
+        form.button(
           t`§3Сменить мою роль
 §7(Восстановить потом: §f.role restore§7)`,
           button[1],

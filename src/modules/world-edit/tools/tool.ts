@@ -19,14 +19,14 @@ class Tool extends WorldEditTool {
   editToolForm(slot: ContainerSlot, player: Player) {
     const lore = slot.getLore()
     new ActionForm('§3Инструмент', 'Настройте, что будет происходить при использовании инструмента.')
-      .addButton('Телепорт по взгляду', () => {
+      .button('Телепорт по взгляду', () => {
         slot.nameTag = `§r§a► Телепорт по взгляду`
         lore[0] = 'teleportToView'
 
         slot.setLore(lore)
         player.success(`Режим инструмента изменен на телепорт по взгляду`)
       })
-      .addButton('Выполнение команды', () => {
+      .button('Выполнение команды', () => {
         new ModalForm('§3Инструмент').addTextField('Команда', '/tp @s ^^^5').show(player, (_, command) => {
           if (command.startsWith('/')) command = command.substring(1)
 
@@ -38,7 +38,7 @@ class Tool extends WorldEditTool {
           player.success(`Команда: §7${command}`)
         })
       })
-      .addButton('Проверка звуков', () => {
+      .button('Проверка звуков', () => {
         selectFromArray(ListSounds, '§3Звук', (sound, index) => {
           slot.nameTag = `§r§3Звук`
           lore[0] = 'Sound'
@@ -49,7 +49,7 @@ class Tool extends WorldEditTool {
           player.success(`Звук: §7${index} ${sound}`)
         })
       })
-      .addButton('Проверка партиклов', () => {
+      .button('Проверка партиклов', () => {
         selectFromArray(ListParticles, '§3Партикл', (particle, index) => {
           slot.nameTag = `§r§3Партикл`
           lore[0] = 'Particle'

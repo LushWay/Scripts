@@ -60,7 +60,7 @@ export class BossArenaRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.addButton(l`Вызвать босса`, () => {
+    form.button(l`Вызвать босса`, () => {
       if (this.boss) Boss.db.delete(this.boss.id)
     })
   }

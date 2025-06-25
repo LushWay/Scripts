@@ -1,12 +1,11 @@
 import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
 import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
-import { MessageForm } from 'lib/form/message'
+import { form } from 'lib/form/new'
 import { l, t } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
-import { ActionForm } from '../form/action'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
 
 export class Menu {
@@ -38,17 +37,12 @@ export class Menu {
       if (!this.isMenu(itemStack)) return
 
       util.catch(() => {
-        const menu = this.open(player)
-        if (menu) menu.show(player)
+        this.form.show(player)
       })
     })
   }
 
-  static open(player: Player): ActionForm | false {
-    new MessageForm(l`Меню выключено`, l`Все еще в разработке`).show(player)
-
-    return false
-  }
+  static form = form(f => f.title(l`Меню выключено`).body(l`Все еще в разработке`))
 
   static isCompass(slot: Pick<ContainerSlot, 'typeId'>) {
     return !!slot.typeId?.startsWith(Items.CompassPrefix)

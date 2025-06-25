@@ -1,11 +1,11 @@
 import { Player } from '@minecraft/server'
-import { disableAdventureNear, rawTextToString } from 'lib'
-import { l, t, TextTable } from 'lib/i18n/text'
+import { disableAdventureNear } from 'lib'
+import { i18n, l, TextTable } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
-import { getSafeFromRottingTime, materialsToRawText } from './actions/rotting'
+import { getSafeFromRottingTime, materialsToRString } from './actions/rotting'
 import { baseLevels } from './base-levels'
 
 interface BaseLDB extends JsonObject {
@@ -44,12 +44,12 @@ export class BaseRegion extends RegionWithStructure {
     this.structure.offset = MAX_RADIUS - this.area.radius
   }
 
-  baseMemberText() {
-    let text = ''
-    if (this.ldb.state === RottingState.NoMaterials) text += t.error`(гниет)`
-    if (this.ldb.state === RottingState.Destroyed) text += t.error`(разрушена)`
-    if (this.ldb.state === RottingState.No) text += getSafeFromRottingTime(this)
-    return t.nocolor`§6Ваша база ${text}`
+  baseMemberText(player: Player) {
+    let text
+    if (this.ldb.state === RottingState.NoMaterials) text = i18n.error`(гниет)`
+    if (this.ldb.state === RottingState.Destroyed) text = i18n.error`(разрушена)`
+    if (this.ldb.state === RottingState.No) text = getSafeFromRottingTime(this)
+    return i18n.nocolor`§6Ваша база ${text}`.toString(player.lang)
   }
 
   updateRadius() {
@@ -73,10 +73,10 @@ export class BaseRegion extends RegionWithStructure {
       ...super.customFormDescription(player),
       ['Level', RottingState[this.ldb.level]],
       ['State', RottingState[this.ldb.state]],
-      ['Materials', rawTextToString(materialsToRawText(this.ldb.materials), player.lang)],
-      ['Materials missing', rawTextToString(materialsToRawText(this.ldb.materialsMissing), player.lang)],
-      ['Barrel', rawTextToString(materialsToRawText(this.ldb.barrel), player.lang)],
-      ['To take', rawTextToString(materialsToRawText(this.ldb.toTakeFromBarrel), player.lang)],
+      ['Materials', materialsToRString(this.ldb.materials, player)],
+      ['Materials missing', materialsToRString(this.ldb.materialsMissing, player)],
+      ['Barrel', materialsToRString(this.ldb.barrel, player)],
+      ['To take', materialsToRString(this.ldb.toTakeFromBarrel, player)],
     ]
   }
 }

@@ -57,18 +57,18 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
       })
       .configure({ minItemsForFilters: 1 })
       .addCustomButtonBeforeArray((form, filters, back) => {
-        form.addButton('§l§dДобавить', BUTTON['+'], () => {
+        form.button('§l§dДобавить', BUTTON['+'], () => {
           this.selectToolForm(slot, player, tools, back)
         })
 
         if (filters.mode === 'sort') {
-          form.addButton(t`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
+          form.button(t`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
             options.sortMode = options.sortMode === SortMode.Up ? SortMode.Down : SortMode.Up
             back()
           })
         }
 
-        form.addButton(t`§l§dНастройки`, () => this.settingsForm(slot, player, back))
+        form.button(t`§l§dНастройки`, () => this.settingsForm(slot, player, back))
       })
       .button((item, filters, _, back) => {
         const tool = this.getToolByData(item)

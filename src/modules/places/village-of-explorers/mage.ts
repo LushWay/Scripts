@@ -1,4 +1,4 @@
-import { ContainerSlot, Enchantment, EnchantmentType, ItemStack } from '@minecraft/server'
+import { ContainerSlot, Enchantment, EnchantmentType, ItemStack, Player } from '@minecraft/server'
 import {
   MinecraftEnchantmentTypes as e,
   MinecraftItemTypes as i,
@@ -10,7 +10,7 @@ import {
 } from '@minecraft/vanilla-data'
 import { addNamespace, doNothing, Enchantments, getAuxOrTexture } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
-import { langToken, translateEnchantment } from 'lib/i18n/lang'
+import { translateEnchantment, translateTypeId } from 'lib/i18n/lang'
 import { t } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
@@ -37,7 +37,7 @@ export class Mage extends ShopNpc {
         item => ['sword'].some(e => item.typeId.endsWith(e)),
         t`любой меч`,
         (form, slot, item) => {
-          const ench = this.createEnch(form, item, slot)
+          const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Sharpness, level => new MultiCost().money(level * 20).xp(level * enchs))
@@ -52,7 +52,7 @@ export class Mage extends ShopNpc {
         item => item.typeId.endsWith('bow'),
         t`любой лук`,
         (form, slot, item) => {
-          const ench = this.createEnch(form, item, slot)
+          const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Power, level => new MultiCost().money(level * 20).xp(level * enchs))
@@ -67,7 +67,7 @@ export class Mage extends ShopNpc {
         item => ['chestplate', 'leggings', 'boots', 'helmet'].some(e => item.typeId.endsWith(e)),
         t`любой элемент брони`,
         (form, slot, item) => {
-          const ench = this.createEnch(form, item, slot)
+          const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Protection, level => new MultiCost().money(level * 20).xp(level * enchs))
@@ -82,7 +82,7 @@ export class Mage extends ShopNpc {
         item => ['shovel', 'pickaxe', 'axe', 'hoe'].some(e => item.typeId.endsWith(e)),
         t`любые топор, кирка, мотыга или лопата`,
         (form, slot, item) => {
-          const ench = this.createEnch(form, item, slot)
+          const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
           ench(e.Efficiency, level => new MultiCost().money(level * 10).xp(level * enchs))
@@ -94,7 +94,7 @@ export class Mage extends ShopNpc {
       form.itemModifierSection(
         t`Использовать книгу чар`,
         item => item.typeId === MinecraftItemTypes.EnchantedBook,
-        { rawtext: [{ translate: langToken(MinecraftItemTypes.EnchantedBook) }] },
+        translateTypeId(MinecraftItemTypes.EnchantedBook, player.lang),
         (bookForm, book, bookItem) => {
           const bookEnch = bookItem.enchantable?.getEnchantments()[0]
           const type = Object.values(MinecraftEnchantmentTypes).find(e => e === bookEnch?.type.id)
@@ -115,7 +115,7 @@ export class Mage extends ShopNpc {
 
               itemForm
                 .product()
-                .name(t.raw`§r§7Выбранная книга: ${translateEnchantment(bookEnch)}`)
+                .name(t`Выбранная книга: ${translateEnchantment(bookEnch, player.lang)}`)
                 .cost(FreeCost)
                 .onBuy(() => bookForm.show())
                 .setTexture(getAuxOrTexture(MinecraftItemTypes.EnchantedBook))
@@ -207,13 +207,13 @@ export class Mage extends ShopNpc {
     })
   }
 
-  createEnch(form: ShopFormSection, _: ItemStack, slot: ContainerSlot) {
+  createEnch(form: ShopFormSection, _: ItemStack, slot: ContainerSlot, player: Player) {
     return (type: e, getCost: (currentLevel: number) => Cost, up = 1) => {
       const { can, level, enchantment } = this.updateEnchatnment(slot, type, up, true)
 
       form
         .product()
-        .name({ rawtext: [{ text: can ? '' : '§7' }, ...(translateEnchantment(enchantment).rawtext ?? [])] })
+        .name(translateEnchantment(enchantment, player.lang))
         .cost(
           can
             ? new MultiCost(getCost(level)).item(MinecraftItemTypes.LapisLazuli, level)

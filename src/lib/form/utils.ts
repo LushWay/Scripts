@@ -12,12 +12,13 @@ import {
 import { t } from 'lib/i18n/text'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { MessageForm } from './message'
+import { ShowForm } from './new'
 
 interface BaseForm {
   show(player: Player, ...args: unknown[]): void
 }
 
-export class FormCallback<Form extends BaseForm = BaseForm> {
+export class FormCallback<Form extends ShowForm | BaseForm = BaseForm> {
   /** Creates a new form callback instance that can be used by buttons, and args to run various functions */
   constructor(
     /** Form that was used in this call */

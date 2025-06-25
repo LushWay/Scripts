@@ -201,14 +201,16 @@ export class Quest {
   private stepSwitchVisual(player: Player, step: QS, i: number, restore: boolean) {
     if (Quest.playerSettings(player).messageForEachStep) {
       const text = step.description?.()
+      // TODO Fix colors
       if (text) player.success(`§f§l${this.name}: §r§6${text}`)
     }
 
     if (i === 0 && !restore) {
       system.runTimeout(
         () => {
+          // TODO Fix colors
           player.onScreenDisplay.setHudTitle('§6' + this.name, {
-            subtitle: this.description,
+            subtitle: this.description.toString(player.lang),
             fadeInDuration: 0,
             stayDuration: 20 * 8,
             fadeOutDuration: 0,

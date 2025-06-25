@@ -1,7 +1,7 @@
 import { Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { Menu, Region, separateNumberWithDots, Settings, Sidebar } from 'lib'
 import { emoji } from 'lib/assets/emoji'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
 import { BaseRegion } from 'modules/places/base/region'
@@ -89,16 +89,15 @@ const survivalSidebar = new Sidebar(
       const base = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
       let text = base
       if (player.database.inv === 'anarchy') {
-        if (region) {
+        if (region instanceof BaseRegion) {
+          if (region.getMemberRole(player.id)) {
+            text = region.baseMemberText(player)
+          } else text = base
+        } else if (region) {
           text = ''
-          if (!region.permissions.pvp) text = t`§aМирная зона§f `
+          if (!region.permissions.pvp) text = i18n.success`Мирная зона `.toString(player.lang)
           const { displayName } = region
-          if (displayName) text += displayName
-          if (region instanceof BaseRegion) {
-            if (region.getMemberRole(player.id)) {
-              return region.baseMemberText()
-            } else text = base
-          }
+          if (displayName) text += displayName.toString(player.lang)
         }
       }
 

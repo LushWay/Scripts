@@ -1,7 +1,8 @@
 import { Player } from '@minecraft/server'
 import { developersAreWarned } from 'lib/assets/text'
 import { EventSignal } from 'lib/event-signal'
-import { t } from 'lib/i18n/text'
+import { Message } from 'lib/i18n/message'
+import { i18n } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Temporary } from 'lib/temporary'
 import { doNothing } from 'lib/util'
@@ -11,8 +12,8 @@ import { PlayerQuest } from './player'
 import { Quest } from './quest'
 
 export namespace QS {
-  export type Text = string | TextFn
-  export type TextFn = (...args: any[]) => string
+  export type TextT = Text | TextFn
+  export type TextFn = (...args: any[]) => Text
 
   export type Activator<T extends QS> = (ctx: T, firstTime: boolean) => Cleanup
 
@@ -24,7 +25,7 @@ export namespace QS {
 export abstract class QSBuilder<S extends QS> {
   constructor(protected readonly step: S) {}
 
-  create(args: [text: QS.Text, ...args: any[]]) {
+  create(args: [text: QS.TextT, ...args: any[]]) {
     this.step.text = this.toFn(args[0])
   }
 
@@ -33,7 +34,7 @@ export abstract class QSBuilder<S extends QS> {
    *
    * @param text - Text to display
    */
-  description(text: QS.Text) {
+  description(text: QS.TextT) {
     this.step.description = this.toFn(text)
     return this
   }
@@ -58,8 +59,8 @@ export abstract class QSBuilder<S extends QS> {
     return this
   }
 
-  private toFn(text: QS.Text) {
-    return typeof text === 'string' ? () => text : text
+  private toFn(text: QS.TextT): QS.TextFn {
+    return typeof text === 'string' || text instanceof Message ? () => text : text
   }
 }
 
@@ -108,7 +109,7 @@ export abstract class QS<DB = any> extends Temporary {
         const result = activate(this, firstTime)
         if (result) this.cleaners.push(result.cleanup)
       } catch (e) {
-        this.error(t.error`При активации шага произошла ошибка. ${developersAreWarned}`)
+        this.error(i18n.error`При активации шага произошла ошибка. ${developersAreWarned}`)
         throw e
       }
     })
@@ -124,8 +125,8 @@ export abstract class QS<DB = any> extends Temporary {
    *
    * @param text - Text to print
    */
-  error(text: string) {
-    this.player.fail(t.error`Задание сломалось: ${text}`)
+  error(text: Text) {
+    this.player.fail(i18n.error`Задание сломалось: ${text}`.toString(this.player.lang))
     return this
   }
 

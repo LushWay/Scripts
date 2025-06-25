@@ -1,7 +1,8 @@
-import { ActionForm, BUTTON, FormCallback } from 'lib'
+import { BUTTON } from 'lib'
 import { achievementsForm, achievementsFormName } from 'lib/achievements/command'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
+import { form } from 'lib/form/new'
 import { t } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
@@ -9,7 +10,7 @@ import { questsMenu } from 'lib/quest/menu'
 import { Menu } from 'lib/rpg/menu'
 import { playerSettingsMenu } from 'lib/settings'
 import { mailMenu } from 'modules/commands/mail'
-import { openBaseMenu } from 'modules/places/base/base-menu'
+import { baseMenu } from 'modules/places/base/base-menu'
 import { wiki } from 'modules/wiki/wiki'
 import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
@@ -22,43 +23,32 @@ function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', tex
   return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
 }
 
-Menu.open = player => {
+Menu.form = form((f, { player, self }) => {
   const inv = player.database.inv
-  const back = () => {
-    const menu = Menu.open(player)
-
-    if (menu) menu.show(player)
-  }
-
-  const form: ActionForm = new ActionForm(Core.name, '', '§c§u§s§r')
-    .addButton(tp('spawn', inv, '§9', t`Спавн`), 'textures/ui/worldsIcon', () => {
-      Spawn.portal?.teleport(player)
-    })
-    .addButton(tp('anarchy', inv, '§c', t`Анархия`), 'textures/blocks/tnt_side', () => {
+  f.title(Core.name, '§c§u§s§r')
+  f.button(tp('spawn', inv, '§9', t`Спавн`), 'textures/ui/worldsIcon', () => {
+    Spawn.portal?.teleport(player)
+  })
+    .button(tp('anarchy', inv, '§c', t`Анархия`), 'textures/blocks/tnt_side', () => {
       Anarchy.portal?.teleport(player)
     })
-    .addButton(tp('mg', inv, `§6`, t`Миниигры`, t`§7СКОРО!`), 'textures/blocks/bedrock', back)
-    .addButton(t`Задания${t.badge(player.database.quests?.active.length)}`, 'textures/ui/sidebar_icons/genre', () =>
-      questsMenu(player, back),
+    .button(tp('mg', inv, `§6`, t`Миниигры`, t`§7СКОРО!`), 'textures/blocks/bedrock', self)
+    .button(t`Задания${t.badge(player.database.quests?.active.length)}`, 'textures/ui/sidebar_icons/genre', () =>
+      questsMenu(player, self),
     )
 
   if (player.database.inv === 'anarchy') {
-    form.addButton(t`База`, 'textures/blocks/barrel_side', () =>
-      openBaseMenu(player, back, message => new FormCallback(form, player).error(message)),
-    )
-    const [clanText, clan] = clanMenu(player, back)
-    form.addButton(clanText, 'textures/ui/FriendsIcon', clan)
+    f.button(t`База`, 'textures/blocks/barrel_side', baseMenu({}))
+    const [clanText, clan] = clanMenu(player, self)
+    f.button(clanText, 'textures/ui/FriendsIcon', clan)
   }
 
-  form
-    .addButton(t.nocolor`§6Донат\n§7СКОРО!`, 'textures/ui/permissions_op_crown', back)
-    .addButton(t.nocolor`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, back))
-    .addButton(t.nocolor`§bВики`, BUTTON.search, wiki.show)
-    .addButton(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
-    .addButton(t.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, back))
-
-  return form
-}
+  f.button(t.nocolor`§6Донат\n§7СКОРО!`, 'textures/ui/permissions_op_crown', self)
+    .button(t.nocolor`§fПочта${Mail.unreadBadge(player.id)}`, 'textures/ui/feedIcon', () => mailMenu(player, self))
+    .button(t.nocolor`§bВики`, BUTTON.search, wiki.show)
+    .button(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
+    .button(t.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, self))
+})
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
   if (firstJoin) Menu.item.give(player, { mode: 'ensure' })

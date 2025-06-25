@@ -34,7 +34,7 @@ export function WEmenu(player: Player, body = '') {
   const we = WorldEdit.forPlayer(player)
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  form.addButton(t`§3Наборы блоков${t.size(getOwnBlocksSetsCount(player.id))}`, () => WEblocksSetsMenu(player))
+  form.button(t`§3Наборы блоков${t.size(getOwnBlocksSetsCount(player.id))}`, () => WEblocksSetsMenu(player))
 
   const toolButtons = WorldEditTool.tools.map(tool => ({ tool, buttonText: tool.getMenuButtonName(player) }))
   const inactiveTools = toolButtons.filter(e => e.buttonText.startsWith('§8'))
@@ -42,8 +42,8 @@ export function WEmenu(player: Player, body = '') {
 
   addToForm(activeTools)
 
-  form.addButton(t`§3Отмена действий${t.size(we.history.length)}`, () => WEundoRedoMenu(player))
-  form.addButton('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
+  form.button(t`§3Отмена действий${t.size(we.history.length)}`, () => WEundoRedoMenu(player))
+  form.button('§3Создать сундук блоков из набора', () => WEChestFromBlocksSet(player))
 
   addToForm(inactiveTools)
 
@@ -51,7 +51,7 @@ export function WEmenu(player: Player, body = '') {
 
   function addToForm(buttons: typeof toolButtons) {
     for (const { tool, buttonText } of buttons) {
-      form.addButton(buttonText, () => {
+      form.button(buttonText, () => {
         const slotOrError = tool.getToolSlot(player)
         if (typeof slotOrError === 'string') {
           WEmenu(player, '§c' + slotOrError)
@@ -96,7 +96,7 @@ function WEblocksSetsMenu(player: Player) {
   new ArrayForm('Наборы блоков §l$page/$max', Object.keys(blockSets))
     .back(() => WEmenu(player))
     .addCustomButtonBeforeArray(sets => {
-      sets.addButton('§3Новый набор блоков', 'textures/ui/plus', () => {
+      sets.button('§3Новый набор блоков', 'textures/ui/plus', () => {
         WEmanageBlocksSetMenu({
           blockSets,
           player,
@@ -104,7 +104,7 @@ function WEblocksSetsMenu(player: Player) {
         })
       })
 
-      sets.addButton('§3Наборы других игроков...', () =>
+      sets.button('§3Наборы других игроков...', () =>
         WEotherPlayersBlockSetsMenu(player, () => WEblocksSetsMenu(player)),
       )
     })
@@ -218,10 +218,10 @@ function WEplayerBlockSetMenu(
   const name = Player.name(otherPlayerId) ?? otherPlayerId
   const pform = new ActionForm(name, '§3Наборы блоков:')
 
-  pform.addButton(ActionForm.backText, onBack)
+  pform.button(ActionForm.backText, onBack)
 
   for (const setName of Object.keys(blockSets)) {
-    pform.addButton(setName, () =>
+    pform.button(setName, () =>
       WEeditBlocksSetMenu({
         player,
         setName,
@@ -548,18 +548,18 @@ export function WEeditBlockStatesMenu(
   return new Promise<Record<string, string | boolean | number>>(resolve => {
     const form = new ActionForm('Редактировать свойства блока')
 
-    form.addButton(backText, () => resolve(states))
+    form.button(backText, () => resolve(states))
 
-    if (edited) form.addButton(ActionForm.backText + ' без сохранения', back)
+    if (edited) form.button(ActionForm.backText + ' без сохранения', back)
 
-    form.addButtonAsk('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
+    form.ask('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
 
     // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {
       const stateDef = allStates.find(e => e.id === stateName)
       if (!stateDef) continue
 
-      form.addButton(
+      form.button(
         `${stateName}: ${stringify(stateValue)}\n${stateDef.validValues[0] === stateValue ? '§8По умолчанию' : ''}`,
         () => {
           update()
@@ -571,7 +571,7 @@ export function WEeditBlockStatesMenu(
               resolve(WEeditBlockStatesMenu(player, states, back))
             })
 
-            editStateForm.addButton('§cУдалить значение', () => {
+            editStateForm.button('§cУдалить значение', () => {
               Reflect.deleteProperty(states, stateName)
               resolve(WEeditBlockStatesMenu(player, states, back))
             })
@@ -579,7 +579,7 @@ export function WEeditBlockStatesMenu(
             try {
               if (!stateDef) return
               for (const validValue of Array.from(stateDef.validValues)) {
-                editStateForm.addButton(`${validValue === stateValue ? '> ' : ''}${stringify(validValue)}`, () => {
+                editStateForm.button(`${validValue === stateValue ? '> ' : ''}${stringify(validValue)}`, () => {
                   states[stateName] = validValue
                   stateValue = validValue
                   update()
@@ -623,12 +623,12 @@ export function WEundoRedoMenu(
   )
   form.addButtonBack(back)
 
-  form.addButton(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
+  form.button(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
     WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', [source, we]),
   )
 
   if (is(player.id, 'grandBuilder')) {
-    form.addButton('§3Действия других игроков', () => {
+    form.button('§3Действия других игроков', () => {
       WEundoRedoOtherPlayersMenu(player, () => void form.show(player))
     })
   }
@@ -636,7 +636,7 @@ export function WEundoRedoMenu(
   const actions = mode === 'undo' ? we.history : we.undos
 
   for (const action of actions.slice().reverse()) {
-    form.addButton(action.name, () => {
+    form.button(action.name, () => {
       we.loadBackup(actions, action)
       player.playSound(Sounds.LevelUp)
       WEundoRedoMenu(player, back, mode, [source, we], '§aУспешно загружено!\n\n')
@@ -652,7 +652,7 @@ function WEundoRedoOtherPlayersMenu(player: Player, back: VoidFunction) {
   for (const [playerId, we] of WorldEdit.instances.entries()) {
     const name = Player.name(playerId) ?? '<Без имени>'
 
-    form.addButton(name, () => {
+    form.button(name, () => {
       WEundoRedoMenu(player, () => WEundoRedoOtherPlayersMenu(player, back), 'undo', [playerId, we])
     })
   }

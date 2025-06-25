@@ -3,7 +3,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
-import { t } from 'lib/i18n/text'
+import { i18n, l, t } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { ItemCost, MoneyCost, MultiCost } from '../cost'
@@ -43,26 +43,25 @@ export function createSellableItem({
   const getCount = () => Math.max(0, db[type] ?? defaultCount)
   const getBuy = (count = getCount()) => Math.max(1, shopFormula.formula(maxCount, count, minPrice, k))
   const body = () => {
-    const storageAmount = t`${getCount()}/${maxCount}`
-    const filledPercent = t`${((getCount() / maxCount) * 100).toFixed(2)}%%`
-    return t.raw`Товара на складе: ${storageAmount}, ${filledPercent}`
+    const count = getCount()
+    return i18n`Товара на складе: ${count}/${maxCount}, ${((count / maxCount) * 100).toFixed(2)}%%`
   }
   const adminBody = () => {
-    return t.raw`${body()}\n\nAdmin info below\n${t`DB count: ${db[type]}\nDefault count: ${defaultCount}`}`
+    return l`${body()}\n\nAdmin info below\n${t`DB count: ${db[type]}\nDefault count: ${defaultCount}`}`
   }
   const amount = inventory.get(type) ?? 0
   const settings = Shop.getPlayerSettings(player)
 
   form.section(
-    itemNameXCount({ typeId: type, amount }),
+    itemNameXCount({ typeId: type, amount }, undefined, undefined, player),
     (form, player) => {
       const bodyFn = is(player.id, 'techAdmin') ? adminBody : body
       form.body = bodyFn
       form.section(
-        t`§3Продать${t.size(amount)}`,
+        i18n.accent`Продать`.size(amount),
         form => {
           form.body = bodyFn
-          const addSell = createSell(getCount, getBuy, type, form, db, maxCount, aux)
+          const addSell = createSell(getCount, getBuy, type, form, db, maxCount, aux, player)
           addSell(1)
           addSell(16)
           addSell(32)
@@ -98,7 +97,7 @@ export function createSellableItem({
       if (settings.sellableItemsScreen) {
         buyForm(form)
       } else {
-        form.section(t`§3Купить`, f => buyForm(f), BUTTON['+'])
+        form.section(i18n.accent`Купить`, f => buyForm(f), BUTTON['+'])
       }
     },
     aux,
@@ -130,7 +129,7 @@ function createBuy(
 
     form
       .product()
-      .name(itemNameXCount({ typeId: type, amount: buyCount }))
+      .name(itemNameXCount({ typeId: type, amount: buyCount }, undefined, undefined, player))
       .cost(cost)
       .onBuy(player => {
         if (!player.container) return
@@ -153,6 +152,7 @@ function createSell(
   db: Record<string, number | undefined>,
   maxCount: number,
   aux: string,
+  player: Player,
 ) {
   const dbCount = getCount()
   return (sellCount = 1) => {
@@ -164,7 +164,7 @@ function createSell(
 
     form
       .product()
-      .name(new MoneyCost(finalCost).toString())
+      .name(new MoneyCost(finalCost).toString(player))
       .cost(cost)
       .onBuy(player => {
         db[type] = Math.min(maxCount, getCount() + sellCount)

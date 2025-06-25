@@ -3,11 +3,24 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
-import { l, MaybeRawText, t } from 'lib/i18n/text'
+import { Message } from 'lib/i18n/message'
+import { i18n, l } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
-import { util } from 'lib/util'
+import { doNothing, util } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => unknown
+
+export interface FormContext<T extends FormParams> {
+  player: Player
+  back?: NewFormCallback
+  self: VoidFunction
+  params: T
+}
+
+type FormParams = Record<string, unknown> | undefined
+export type NewFormCreator = Omit<Form, 'show' | 'currentTitle'>
+
+type CreateForm<T extends FormParams = undefined> = (form: NewFormCreator, ctx: FormContext<T>) => void
 
 class Form {
   constructor(private player: Player) {
@@ -16,16 +29,16 @@ class Form {
 
   private form = new ActionFormData()
 
-  currentTitle?: MaybeRawText
+  currentTitle?: Text
 
-  title(title: MaybeRawText, prefix = '§c§o§m§m§o§n§r§f') {
+  title(title: Text, prefix = '§c§o§m§m§o§n§r§f') {
     this.currentTitle = title
-    this.form.title(t.raw`${prefix}${title}`)
+    this.form.title(`${prefix}${Message.translate(this.player.lang, title)}`)
     return this as NewFormCreator
   }
 
-  body(body: MaybeRawText) {
-    this.form.body(body)
+  body(body: Text) {
+    this.form.body(body.toString(this.player.lang))
     return this as NewFormCreator
   }
 
@@ -37,7 +50,7 @@ class Form {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, callback: NewFormCallback | ShowForm): NewFormCreator
+  button(text: Text, callback: NewFormCallback | ShowForm): NewFormCreator
 
   /** Adds a button to this form */
   button(link: ShowForm, icon?: string | null): NewFormCreator
@@ -49,7 +62,7 @@ class Form {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  button(text: MaybeRawText, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): NewFormCreator
+  button(text: Text, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): NewFormCreator
 
   /**
    * Adds a button to this form
@@ -59,7 +72,7 @@ class Form {
    * @param callback - What happens when this button is clicked
    */
   button(
-    textOrForm: MaybeRawText | ShowForm,
+    textOrForm: Text | ShowForm,
     callbackOrIcon: string | null | undefined | NewFormCallback | ShowForm,
     callbackOrUndefined?: NewFormCallback | ShowForm,
   ): NewFormCreator {
@@ -84,7 +97,7 @@ class Form {
     const finalCallback = callback instanceof ShowForm ? callback.show : callback
     if (!finalCallback) throw new TypeError(`No callback`)
 
-    this.form.button(text, icon ?? undefined)
+    this.form.button(Message.translate(this.player.lang, text), icon ?? undefined)
     this.buttons.push(finalCallback)
     return this
   }
@@ -113,9 +126,9 @@ class Form {
    * @param texture - Button texture
    */
   // TODO Fix
-  ask(text: string, yesText: string, yesAction: VoidFunction, noText = t`Отмена`, texture: string | null = null) {
+  ask(text: Text, yesText: Text, yesAction: VoidFunction, noText: Text = i18n`Отмена`, texture: string | null = null) {
     return this.button(text, texture, p =>
-      ask(p, t.error`Вы уверены, что хотите ${text}?`, yesText, yesAction, noText, this.show),
+      ask(p, i18n.error`Вы уверены, что хотите ${text}?`, yesText, yesAction, noText, this.show),
     )
   }
 
@@ -140,29 +153,34 @@ class Form {
   }
 }
 
-export type NewFormCreator = Omit<Form, 'show' | 'currentTitle'>
-type CreateForm = (form: NewFormCreator, player: Player, back?: NewFormCallback) => void
-
 export function form(create: CreateForm) {
-  return new ShowForm(create)
+  return new ShowForm(create, undefined)
 }
 
-export class ShowForm {
-  constructor(private create: CreateForm) {}
+form.withParams = <T extends FormParams>(create: CreateForm<T>) => {
+  return (params: T) => new ShowForm<T>(create, params) as unknown as ShowForm
+}
+
+// TODO
+form.array = doNothing
+
+export class ShowForm<T extends FormParams = undefined> {
+  constructor(
+    private create: CreateForm<T>,
+    private params: T,
+  ) {}
 
   show: NewFormCallback = async (player, back) => {
     const form = new Form(player)
-    if (back) {
-      form.button(ActionForm.backText, back)
-    }
+    if (back) form.button(ActionForm.backText, back)
 
-    this.create(form, player, back)
+    this.create(form, { player, back, params: this.params, self: () => this.show(player, back) })
     return form.show()
   }
 
   title(player: Player) {
     const form = new Form(player)
-    this.create(form, player)
+    this.create(form, { player, back: doNothing, params: this.params, self: doNothing })
     return form.currentTitle ?? 'No title'
   }
 

@@ -18,7 +18,7 @@ function selectTable(player: Player, firstCall?: true) {
   for (const [tableId, table] of Object.entries(getProvider().tables)) {
     const name = t`${tableId} ${`§7${table.size}`} ${getProvider().getRawTableData(tableId).length / (256 * 1024)}§r`
 
-    form.addButton(name, () => showTable(player, tableId, table))
+    form.button(name, () => showTable(player, tableId, table))
   }
   form.show(player)
   if (firstCall) player.info('Закрой чат!')
@@ -30,10 +30,10 @@ function showTable(player: Player, tableId: string, table: UnknownTable) {
   new ArrayForm(`${tableId} ${keys.length}`, keys)
     .addCustomButtonBeforeArray(form => {
       form
-        .addButton('§3Новое значение§r', () => {
+        .button('§3Новое значение§r', () => {
           changeValue(player, null, (newVal, key) => table.set(key, newVal), selfback)
         })
-        .addButtonAsk('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
+        .ask('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
           for (const key of table.keys()) table.delete(key)
         })
     })
@@ -69,7 +69,7 @@ function tableProperty(key: string, table: UnknownTable, player: Player, back: V
     '§3Ключ ' + key,
     `§7Тип: §f${typeof value}\n ${failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''}\n${inspect(value)}\n `,
   )
-    .addButton('Изменить', () =>
+    .button('Изменить', () =>
       changeValue(
         player,
         value,
@@ -81,7 +81,7 @@ function tableProperty(key: string, table: UnknownTable, player: Player, back: V
         key,
       ),
     )
-    .addButton('Переименовать', () => {
+    .button('Переименовать', () => {
       new ModalForm('Переименовать').addTextField('Ключ', 'останется прежним', key).show(player, (ctx, newKey) => {
         if (newKey) {
           player.success(t`Renamed ${key} -> ${newKey}`)
@@ -89,7 +89,7 @@ function tableProperty(key: string, table: UnknownTable, player: Player, back: V
         } else player.info(t`Key ${key} left as is`)
       })
     })
-    .addButton('§cУдалить§r', () => {
+    .button('§cУдалить§r', () => {
       table.delete(key)
       system.delay(back)
     })
@@ -168,8 +168,8 @@ cmd
       case 'form': {
         const show = () => {
           new ActionForm('Benchmark', result)
-            .addButton('Refresh', null, show)
-            .addButton('Exit', null, () => void 0)
+            .button('Refresh', null, show)
+            .button('Exit', null, () => void 0)
             .show(ctx.player)
         }
         return show()

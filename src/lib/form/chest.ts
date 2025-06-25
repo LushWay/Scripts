@@ -1,11 +1,11 @@
-import { BlockPermutation, ItemPotionComponent, ItemStack, Player, RawText } from '@minecraft/server'
+import { BlockPermutation, ItemPotionComponent, ItemStack, Player } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { MinecraftItemTypes, MinecraftPotionLiquidTypes } from '@minecraft/vanilla-data'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
 import { translateTypeId } from 'lib/i18n/lang'
-import { MaybeRawText, t } from 'lib/i18n/text'
+import { Message } from 'lib/i18n/message'
 import { addNamespace, inspect, isKeyof, util, wrapLore } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
@@ -106,20 +106,20 @@ export class ChestForm {
     }
   }
 
-  private titleText: RawText
+  private titleText: string
 
   private buttons: ChestButton[] = []
 
   constructor(sizeType: keyof typeof SIZES = 'small') {
     const [sizeName, size] = SIZES[sizeType]
 
-    this.titleText = t.raw`${sizeName}`
+    this.titleText = sizeName
 
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
 
-  title(text: MaybeRawText) {
-    this.titleText = t.raw`${this.titleText}${text}`
+  title(text: string) {
+    this.titleText = `${this.titleText}${text}`
     return this
   }
 

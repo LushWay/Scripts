@@ -107,7 +107,7 @@ new Command('daily').setDescription(t`Ежедневные задания`).exec
   dailyQuestsForm.show(ctx.player)
 })
 
-export const dailyQuestsForm = form((f, player) => {
+export const dailyQuestsForm = form((f, { player }) => {
   const playerDb = db.get(player.id)
   f.title(t`Ежедневные задания`)
   f.body(

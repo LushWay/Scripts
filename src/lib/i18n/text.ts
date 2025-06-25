@@ -7,14 +7,12 @@ import { ms } from '../utils/ms'
 import { intlRemaining } from './intl'
 import { I18nMessage, Message, ServerSideI18nMessage } from './message'
 
-export type Text = string
+export type Text = string | Message
 export type MaybeRawText = string | RawText
 
 type TSA = TemplateStringsArray
 
 export declare namespace Text {
-  export type Msg = string | Message
-
   export type RawTextArg = string | RawText | RawMessage | Message | undefined | null
 
   export interface Static<T> {
@@ -63,10 +61,32 @@ export declare namespace Text {
     rp: Static<T>
   }
 
-  export type Fn<T = string> = (text: TSA, ...args: unknown[]) => T
+  /** "§7Some long text §fwith substring§7 and number §64§7" */
+  export type Fn<T> = (text: TSA, ...args: unknown[]) => T
 
-  type Modifiers = 'error' | 'warn' | 'header' | 'accent' | 'nocolor'
-  export type Chained<T> = Fn<T> & Static<T> & Record<Modifiers, Fn<T> & Static<T>>
+  interface Modifiers<T> {
+    /** "§cSome long text §fwith substring§c and number §74§c" */
+    error: Fn<T> & Static<T>
+
+    /** "§eSome long text §fwith substring§e and number §64§e" */
+    warn: Fn<T> & Static<T>
+
+    /** "§aSome long text §fwith substring§a and number §64§a" */
+    success: Fn<T> & Static<T>
+
+    /** "§3Some long text §fwith substring§3 and number §64§3" */
+    accent: Fn<T> & Static<T>
+
+    /** "§8Some long text §7with substring§8 and number §74§8" */
+    disabled: Fn<T> & Static<T>
+
+    /** "§r§6Some long text §f§lwith substring§r§6 and number §f4§r§6" */
+    header: Fn<T> & Static<T>
+
+    /** "Some long text with substring and number 4" */
+    nocolor: Fn<T> & Static<T>
+  }
+  export type Chained<T> = Fn<T> & Static<T> & Modifiers<T>
   export interface Colors {
     unit: string
     num: string
@@ -76,20 +96,23 @@ export declare namespace Text {
 
 type FnCreator<T> = (colors: Text.Colors) => Text.Fn<T>
 
-export type TextTable = readonly (readonly [string, unknown])[]
+export type TextTable = readonly (readonly [Text, unknown])[]
 
-export function textTable(table: TextTable, join: false, twoColors?: boolean): string[]
-export function textTable(table: TextTable, join?: true, twoColors?: boolean): string
-export function textTable(table: TextTable, join = true, twoColors = true): string | string[] {
-  const long = table.length > 5 && twoColors
-  const mapped = table.map(
-    ([key, value], i) => `${i % 2 === 0 && long ? '§f' : '§7'}${key}: ${textUnitColorize(value, undefined, false)}`,
-  )
-  return join ? mapped.join('\n') : mapped
+export function textTable(table: TextTable): Message {
+  return new ServerSideI18nMessage(defaultColors(), lang => {
+    const long = table.length > 5
+    return table
+      .map(
+        ([key, value], i) =>
+          `${i % 2 === 0 && long ? '§f' : '§7'}${key.toString(lang)}: ${textUnitColorize(value, undefined, lang)}`,
+      )
+      .join('\n')
+  })
 }
 
-export const t = createStatic(undefined, undefined, simpleToString)
-export const l = createStatic(undefined, undefined, simpleToString) as Omit<Text.Chained<string>, 'shared' | 'rp'>
+export const t = createStatic(undefined, undefined, simpleString)
+export const l = createStatic(undefined, undefined, simpleString) as Omit<Text.Chained<string>, 'shared' | 'rp'> &
+  Text.Fn<string>
 
 export const i18n = createStatic(undefined, undefined, colors => {
   return function i18n(template, ...args) {
@@ -97,49 +120,63 @@ export const i18n = createStatic(undefined, undefined, colors => {
   }
 })
 
-function simpleToString(colors: Text.Colors) {
-  const { text: textColor } = colors
-  return function t(text, ...units) {
-    const raw = text.slice()
-    if (raw.at(-1) === '') raw.pop()
-    return raw.reduce(
-      (previous, templateText, i) =>
-        previous + templateText + textUnitColorize(units[i], colors, Language.ru_RU) + textColor,
-      textColor,
-    )
+export const tm = createStatic(undefined, undefined, colors => {
+  return function tm(template, ...args) {
+    return new Message(template, args, colors)
+  }
+})
+
+function simpleString(colors: Text.Colors) {
+  return function simpleStr(template, ...args) {
+    return Message.string(Language.ru_RU, template, args, colors)
   } as Text.Chained<string>
 }
 
 function defaultColors(colors: Partial<Text.Colors> = {}): Required<Text.Colors> {
-  const { unit = '§f', text = '§7', num = '§6' } = colors
-  return { unit, text, num }
+  return { unit: colors.unit ?? '§f', text: colors.text ?? '§7', num: colors.num ?? '§6' }
+}
+
+function createStyle(colors: Text.Colors) {
+  return Object.freeze(colors)
+}
+
+const styles = {
+  nocolor: createStyle({ text: '', unit: '', num: '' }),
+  header: createStyle({ text: '§r§6', num: '§f', unit: '§f§l' }),
+  error: createStyle({ num: '§7', text: '§c', unit: '§f' }),
+  warn: createStyle({ num: '§6', text: '§e', unit: '§f' }),
+  accent: createStyle({ num: '§6', text: '§3', unit: '§f' }),
+  success: createStyle({ num: '§6', text: '§a', unit: '§f' }),
+  disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
 }
 
 function createStatic<T = string>(
   colors: Partial<Text.Colors> = {},
   modifier = false,
-  creator: FnCreator<T>,
+  createFn: FnCreator<T>,
 ): Text.Chained<T> {
   const dcolors = defaultColors(colors)
-  const t = creator(dcolors) as Text.Chained<T>
-  t.shared = t
-  t.rp = t
-  t.currentColors = dcolors
-  t.raw = createRaw(dcolors)
-  t.time = createTime(dcolors)
-  t.timeHHMMSS = createTimeHHMMSS(dcolors)
-  t.size = createSizePostfixer(dcolors)
-  t.badge = createSizePostfixer({ ...dcolors, num: '§c', text: '§4' })
-  t.colors = colors => createStatic<T>(colors, false, creator)
+  const fn = createFn(dcolors) as Text.Chained<T>
+  fn.shared = fn
+  fn.rp = fn
+  fn.currentColors = dcolors
+  fn.raw = createRaw(dcolors)
+  fn.time = createTime(dcolors)
+  fn.timeHHMMSS = createTimeHHMMSS(dcolors)
+  fn.size = createSizePostfixer(dcolors)
+  fn.badge = createSizePostfixer({ ...dcolors, num: '§c', text: '§4' })
+  fn.colors = colors => createStatic<T>(colors, false, createFn)
 
   if (!modifier) {
-    t.nocolor = createStatic({ text: '', unit: '', num: '' }, true, creator)
-    t.header = createStatic({ text: '§r§6', num: '§f', unit: '§f§l' }, true, creator)
-    t.error = createStatic({ num: '§7', text: '§c', unit: '§f' }, true, creator)
-    t.warn = createStatic({ ...colors, text: '§e', unit: '§f' }, true, creator)
-    t.accent = createStatic({ ...colors, text: '§3', unit: '§f' }, true, creator)
+    fn.nocolor = createStatic(styles.nocolor, true, createFn)
+    fn.header = createStatic(styles.header, true, createFn)
+    fn.error = createStatic(styles.error, true, createFn)
+    fn.warn = createStatic(styles.warn, true, createFn)
+    fn.accent = createStatic(styles.accent, true, createFn)
+    fn.success = createStatic(styles.success, true, createFn)
+    fn.disabled = createStatic(styles.disabled, true, createFn)
   }
-  return t
+  return fn
 }
 
 const dayMs = ms.from('day', 1)
@@ -207,7 +244,7 @@ export function textUnitColorize(
           throw new TypeError(`Text unit colorize cannot translate I18nMessage '${v.id}' if no locale was given!`)
         }
 
-        const vstring = v.string(lang)
+        const vstring = v.toString(lang)
         return vstring.startsWith('§') ? vstring : unit + vstring
       }
       if (v instanceof Player) {

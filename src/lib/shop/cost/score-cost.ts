@@ -19,7 +19,7 @@ export abstract class ScoreboardCost extends Cost {
 
   color = '§7'
 
-  toString(canBuy = true) {
+  toString(_: Player, canBuy = true) {
     return `${canBuy ? this.color : '§c'}${separateNumberWithDots(this.cost)}${this.emoji}`
   }
 

@@ -55,7 +55,7 @@ export class MineshaftRegion extends MineareaRegion {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.addButton(l`Убрать все руды и сохранить структуру`, () => {
+    form.button(l`Убрать все руды и сохранить структуру`, () => {
       player.info('Start')
       this.removeAllOresAndResaveStructure()
         .then(e => player.info(t`End ${e}`))

@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { InventoryInterval, ScoreboardDB } from 'lib'
 import { form } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n, t } from 'lib/i18n/text'
 import { BaseItem } from 'modules/places/base/base'
 
 export enum SpeedRunTarget {
@@ -71,19 +71,19 @@ InventoryInterval.slots.subscribe(({ player, slot }) => {
   }
 })
 
-const speedrunForm = form((f, player) => {
+const speedrunForm = form((f, { player }) => {
   f.title('Speedrun')
   f.body(
-    t`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${t.timeHHMMSS(player.scores.anarchyOnlineTime * 2.5)}`,
+    i18n`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${i18n.timeHHMMSS(player.scores.anarchyOnlineTime * 2.5)}`,
   )
   for (const [target, name] of Object.entries(speedRunNames)) {
     const selected = player.database.speedrunTarget?.target === target
-    f.button((selected ? t.header : t)`${name}${selected ? t`\n§aВыбрано` : ''}`, () => {
+    f.button((selected ? i18n.header : i18n)`${name}${selected ? i18n.success`\nВыбрано` : ''}`, () => {
       player.database.speedrunTarget = {
         target,
         finished: false,
       }
-      player.info(t`Спидран '${name}' начат. Для сброса времени воспользуйтесь .wipe`)
+      player.info(i18n`Спидран '${name}' начат. Для сброса времени воспользуйтесь .wipe`.toString(player.lang))
     })
   }
 })

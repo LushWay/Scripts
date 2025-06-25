@@ -39,15 +39,16 @@ export function langToken(item: { typeId: string } | string) {
  * Returns RawText representation of an Enchantment or Enchantment Type. If Enchanment is provided, also returns its as
  * another translated RawMessage
  */
-export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment): RawText {
-  const rawtext: RawMessage[] = [{ translate: langToken(addNamespace(typeof e === 'string' ? e : e.type.id)) }]
+export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment, language: Language): string {
+  let result = translateTypeId(addNamespace(typeof e === 'string' ? e : e.type.id), language)
+
   if (typeof e === 'object' && e.level > 0) {
-    rawtext.push(
-      { text: ' ' },
-      e.level < 10 ? { translate: `enchantment.level.${e.level.toString()}` } : { text: e.level.toString() },
-    )
+    const level =
+      e.level < 10 ? translateTypeId(`enchantment.level.${e.level.toString()}`, language) : e.level.toString()
+    result += ' ' + level
   }
-  return { rawtext }
+
+  return result
 }
 
 /**

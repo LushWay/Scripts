@@ -15,10 +15,10 @@ new Command('leaderboard')
 function leaderboardMenu(player: Player) {
   const form = new ActionForm('Таблицы лидеров')
 
-  form.addButton('§3Добавить', BUTTON['+'], p => editLeaderboard(p))
+  form.button('§3Добавить', BUTTON['+'], p => editLeaderboard(p))
 
   for (const lb of Leaderboard.all.values()) {
-    form.addButton(info(lb), () => {
+    form.button(info(lb), () => {
       editLeaderboard(player, lb)
     })
   }
@@ -55,7 +55,7 @@ function editLeaderboard(
 
   const form = new ActionForm('Таблица лидеров', lb ? info(lb) : '')
     .addButtonBack(() => leaderboardMenu(player))
-    .addButton(action + 'целевую таблицу' + warn('displayName', 'objective'), () => {
+    .button(action + 'целевую таблицу' + warn('displayName', 'objective'), () => {
       new ModalForm('Изменение целевой таблицы')
         .addDropdownFromObject(
           'Выбрать из списка',
@@ -87,7 +87,7 @@ function editLeaderboard(
           },
         )
     })
-    .addButton(action + 'позицию' + warn('location', 'dimension'), () => {
+    .button(action + 'позицию' + warn('location', 'dimension'), () => {
       const dimensions: Record<import('@minecraft/server').ShortcutDimensions, string> = {
         overworld: 'Верхний мир',
         nether: 'Нижний мир',
@@ -112,7 +112,7 @@ function editLeaderboard(
           update()
         })
     })
-    .addButton(action + 'стиль' + warn('style'), () => {
+    .button(action + 'стиль' + warn('style'), () => {
       const styles: Record<keyof (typeof Leaderboard)['styles'], string> = {
         gray: '§7Серый',
         white: '§fБелый',
@@ -128,7 +128,7 @@ function editLeaderboard(
         })
     })
 
-  if (lb) form.addButtonAsk('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
+  if (lb) form.ask('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
 
   form.show(player)
 }

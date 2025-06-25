@@ -1,7 +1,7 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { langToken } from 'lib'
-import { t } from 'lib/i18n/text'
+import { translateTypeId } from 'lib'
+import { i18n, t } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { rollChance } from 'lib/rpg/random'
 import { MultiCost } from 'lib/shop/cost'
@@ -93,9 +93,10 @@ export class Gunsmith extends ShopNpc {
       for (const ench of item.enchantable.getEnchantments()) {
         if (!lost && rollChance(3)) {
           lost = true
-          player.tell(
-            t.warn
-              .raw`Онет, кажется, зачарование ${{ string: langToken(ench.type.id) }} уровнем ${ench.level.toString()}§e потерялось...`,
+          player.warn(
+            i18n.warn`Онет, кажется, зачарование ${translateTypeId(ench.type.id, player.lang)} уровнем ${ench.level.toString()} потерялось...`.toString(
+              player.lang,
+            ),
           )
           continue
         } else {
